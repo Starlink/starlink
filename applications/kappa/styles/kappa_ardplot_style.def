@@ -1,0 +1,31 @@
+#+
+#  Name:
+#     kappa_ardplot_style.def
+
+#  Purpose:
+#     Defines the default style produced by the ardplot application.
+
+#  Description:
+#     This file contains default settings for plotting style attributes
+#     to be used by ardplot. These defaults can be over-ridden by the user 
+#     by supplying a value for the STYLE parameter when running ardplot. 
+#     The defaults in this file over-ride the defaults in kappa_style.def.
+#     See $KAPPA_DIR/kappa_style.def for more information on KAPPA style
+#     files.
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explcitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-OCT-1999 (DSB):
+#        Original version.
+#-
+
+      colour(curves)=red
+
