@@ -87,9 +87,12 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      REAL RAND                  ! Random number in range [0,1]
+
 *  Local Constants:
       DOUBLE PRECISION EPS       ! Grid axis increment used to evaluate
-      PARAMETER ( EPS = 1 )     ! pixel size.
+      PARAMETER ( EPS = 1 )      ! pixel size.
 
       DOUBLE PRECISION MAXERR    ! Maximum allowable error at a test
       PARAMETER ( MAXERR = 0.5 ) ! point, in pixels.
