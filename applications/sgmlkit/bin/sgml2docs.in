@@ -146,6 +146,7 @@ test -n "$IMGEQ"      || IMGEQ=$LIBDIR/img-eqlist.pl
 test -n "$DVI2BITMAP" || DVI2BITMAP=@DVI2BITMAP@
 test -n "$LATEX"      || LATEX=latex
 test -n "$BIBTEX"     || BIBTEX=bibtex
+test -n "$PYTHON"     || PYTHON=@PYTHON@
 
 TARGETFORMAT=0			# html
 OPTIONS=
@@ -359,6 +360,7 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: dvi2bitmap version is $d2bv"
     echo "$PROGNAME:I: LATEX=$LATEX"
     echo "$PROGNAME:I: BIBTEX=$BIBTEX"
+    echo "$PROGNAME:I: PYTHON=$PYTHON"
     echo "$PROGNAME:I: WORKDIR=$WORKDIR"
     echo "$PROGNAME:I: JADEFLAGS=$JADEFLAGS"
     echo "$PROGNAME:I: TARGETFORMAT=$TARGETFORMAT"
@@ -541,9 +543,14 @@ elif [ $TARGETFORMAT -eq 2 ]; then
         > $tempdest
     test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
 
+    # Magic names: we know from sldocs.dsl:process-texml-document that
+    # the main output file is $ROOT.xml, and we know from
+    # slback:get-bibliography that the generated .aux file is
+    # $ROOT.texmlbib.aux
+
     # If there was no backmatter, then don't invoke BibTeX
-    if [ -r $ROOT.latexbib.aux ]; then
-	BSTINPUTS=$LIBDIR:$BSTINPUTS $run $BIBTEX $ROOT.latexbib
+    if [ -r $ROOT.texmlbib.aux ]; then
+	BSTINPUTS=$LIBDIR:$BSTINPUTS $run $BIBTEX $ROOT.texmlbib
     fi
 
     # Generate the XML file
@@ -553,10 +560,15 @@ elif [ $TARGETFORMAT -eq 2 ]; then
         > $tempdest
 
     if $USEMANIFEST; then
-        test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
+        test -r texml.manifest && ln -s texml.manifest MANIFEST
     else
 	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
     fi
+
+    # convert the $ROOT.xml file into LaTeX
+    $VERBOSE && echo "PWD=$PWD" $PYTHON $LIBDIR/texml/texml.py $ROOT.xml $ROOT.tex
+    $run $PYTHON $LIBDIR/texml/texml.py $ROOT.xml $ROOT.tex
+    echo $ROOT.tex >>MANIFEST
 
 else
 
