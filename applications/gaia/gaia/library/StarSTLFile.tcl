@@ -8,6 +8,7 @@
 #
 #  Purpose:
 #    Support reading and querying an STL file, as defined in SUN/190
+#    and written by the CAT library (SUN/181).
 #
 #  Description:
 #    Reads in and parses a file containing a list of column
@@ -42,7 +43,7 @@
 #    None
 #
 #  Copyright:
-#     Copyright 1999, Central Laboratory of the Research Councils
+#     Copyright 2000, Central Laboratory of the Research Councils
 #
 #  Author:
 #    NG: Norman Gray (Starlink, Glasgow)
@@ -77,21 +78,18 @@ itcl::class gaia::StarSTLFile {
 		    set lname [string tolower $name]
 		    set hash_(pv$lname) $value
 		    set hash_(pu$lname) $units
-		    #puts "P: name=$lname units=$units value=$value"
 		} elseif {[regexp {^ *[Cc][^ ]* +([^ ]+) +([A-Za-z]+) +([0-9]+)} $line wholeline name units colnum] != 0} {
 		    set lname [string tolower $name]
 		    set hash_(cn$lname) $colnum
 		    set hash_(ca$colnum) $lname
 		    set hash_(cu$colnum) $units
 		    incr ncolumns_
-		    #puts "C $ncolumns_: name=$lname units=$units number=$colnum"
 		} elseif {[regexp -nocase {^ *begintable} $line] != 0} {
 		    if {[read_array_ $f] != 0} {
 			incr nerrs
 		    }
 		} elseif {[regexp {^ *$} $line] != 0 || [regexp {^ *:} $line] != 0} {
 		    # blank or continuation line -- do nothing
-		    #puts "ignore line <$line>"
 		} else {
 		    set errs_ "${errs_}Warning: Unparseable line <$line>"
 		}
@@ -151,7 +149,6 @@ body gaia::StarSTLFile::table {row col} {
 	set lname [string tolower $col]
 	set colindex $hash_(cn$lname)
     }
-    #puts "col=$col --> $colindex"
     if {$colindex != "" && [info exists hash_(t-$row-$colindex)]} {
 	return $hash_(t-$row-$colindex)
     } else {

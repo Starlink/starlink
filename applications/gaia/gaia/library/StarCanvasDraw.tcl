@@ -38,6 +38,9 @@
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
 #     NG: Norman Gray (Starlink, Glasgow)
 #
+#  Copyright:
+#     Copyright 2000, Central Laboratory of the Research Councils
+#
 #  History:
 #     9-MAY-1996 (PDRAPER):
 #        Original version.
@@ -53,7 +56,9 @@
 #          "$w_.objects" in addition to the more general tag "objects".
 #          Updated method create_object.
 #     5-Dec-1999 (NG):
-#        Added `square' and `sector' drawing modes.
+#        Added `square' and `sector' drawing modes.  These aren't used
+#        in the version of the toolbox which implements only the
+#        ELLPRO/FOU interface.
 #
 #-
 

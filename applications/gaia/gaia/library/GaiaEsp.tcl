@@ -14,7 +14,7 @@
 #    plugin.
 #
 #  Copyright:
-#    Copyright 1999 Central Laboratory of the Research Councils
+#    Copyright 2000 Central Laboratory of the Research Councils
 #
 #  Authors:
 #    NG: Norman Gray (Starlink, Glasgow)
@@ -26,25 +26,26 @@
 #      GAIA plugin.
 #    {enter_further_changes_here}
 #
+#  Inheritance:
+#    util::TopLevelWidget
+#
 #  Weaknesses:
 #    The following aren't really bugs, but things it would be nice to
 #    improve, given the opportunity:
 #
 #      - Supporting some of the other ESP tools (see notes below).
-#      - Setting the colour of the ellipse drawn by the ellprofou
-#        tool.
 #      - Graphing the output of the ellprofou tool.
 #
 #  Notes:
 #
-#    There is a fair amount of redundant code in here.  In an early phase
-#    of this interface's development, I (NG) implemented _all_ the ESP
-#    tools, in a fairly rough fashion.  Subsequently, I substantially
-#    rewrote the ellprofou tool, without having time to rewrite the
-#    other tools in the same way.  The code supporting the other tools
-#    can't be reused trivially, but it should still be of some use
-#    when and if support for those other tools is added, so it makes
-#    sense to leave the un-called code lying around.
+#    In an early phase of this interface's development, I (NG)
+#    implemented _all_ the ESP tools, in a fairly rough fashion.
+#    Subsequently, I substantially rewrote the ellprofou tool, without
+#    having time to rewrite the other tools in the same way.  The code
+#    supporting the other tools can't be reused trivially, but it
+#    might still be of some use when and if support for those other
+#    tools is added.  That old code can be found in the CVS
+#    repository, in versions of this module before 1.15.
 #
 #  RCS id:
 #    $Id$
@@ -91,9 +92,11 @@ itcl::class gaia::GaiaEsp {
 		-accelerator {Control-n}
 	bind $w_ <Control-n> [code $this clone_me_]
 	add_menu_short_help $File {New window} {Create a new toolbox}
+
 	# Dummy command menu item
 	$File add command -label {Show ESP command} \
 		-command [code $this run 0 1]
+
 	# Exit menu item
 	$File add command -label Exit \
 		-command [code $this close] \
@@ -143,8 +146,8 @@ itcl::class gaia::GaiaEsp {
 	pack $itk_component(notebook) -side top -fill both -expand 1 \
 		-ipadx 1m -ipady 1m
 
-	set thisnum [get_panel_number_]
 	#  OBJECT SELECTION
+	set thisnum [get_panel_number_]
 	$itk_component(notebook) add -label {Objects} \
 		-command [code $this reveal_ $thisnum]
 	set pages_($thisnum) objectselection
@@ -152,127 +155,15 @@ itcl::class gaia::GaiaEsp {
 	set notebook_characteristics_(disable,objectselection) {run}
 	set notebook_characteristics_(reqsrc,objectselection) 0
 
-	#  CORR
-	#$itk_component(notebook) add -label Corr \
-	#	-command [code $this reveal_ 0]
-	#set pages_(0) corr
-	#set revealed_(0) 0
-	##set notebook_characteristics_(disable,corr) {outtextname inardname}
-	#set notebook_characteristics_(reqsrc,corr) 0
-
-	set thisnum [get_panel_number_]
 	#  ELLPRO/ELLFOU
+	set thisnum [get_panel_number_]
 	$itk_component(notebook) add -label {Ellipse fit} \
 		-command [code $this reveal_ $thisnum]
 	set pages_($thisnum) ellprofou
 	set revealed_($thisnum) 0
 	set notebook_characteristics_(files,ellprofou) \
 		{sourcefile outputtextfile outputstlfile}
-	#set notebook_characteristics_(disable,ellprofou) {outndfname nsigma}
 	set notebook_characteristics_(reqsrc,ellprofou) 1
-
-	#  FASTMED
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Fastmed \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) fastmed
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,fastmed) {outtextname inardname  nsigma}
-	#set notebook_characteristics_(reqsrc,fastmed) 0
-
-	#  GAUFIT
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Gaufit \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) gaufit
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,gaufit) {inardname}
-	#set notebook_characteristics_(reqsrc,gaufit) 1
-
-	#  HSUB
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Histpeak \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) hsub
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,hsub) {inardname outndfname  back nsigma}
-	#set notebook_characteristics_(reqsrc,hsub) 0
-
-	#  LOBACK
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Loback \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) loback
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,loback) \
-	#	{inardname outndfname back nsigma}
-	#set notebook_characteristics_(reqsrc,loback) 1
-	#set notebook_characteristics_(sourceconfig,loback) {-sourceshape square -maxobjects 1}
-
-	#  MASK
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Mask \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) mask
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,mask) \
-	#	{outtextname  back nsigma}
-	#set notebook_characteristics_(reqsrc,mask) 0
-	
-	#  MIXUP
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Mixup \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) mixup
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,mixup) \
-	#	{outtextname inardname  back nsigma}
-	#set notebook_characteristics_(reqsrc,mixup) 0
-
-	#  SECTOR
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Sector \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) sector
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,sector) \
-	#	{nsigma outndfname}
-	## We do require a source selection, which is why selobj
-	## isn't disabled, but we do _not_ require those to be saved,
-	## because that's done through the command line in sector.
-	#set notebook_characteristics_(reqsrc,sector) 0
-	#set notebook_characteristics_(sourceconfig,sector) \
-	#	{-sourceshape sector -maxobjects 1}
-
-	#  SELFC
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Selfc(w) \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) selfc
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,selfc) \
-	#	{outtextname }
-	#set notebook_characteristics_(reqsrc,selfc) 0
-	#set notebook_characteristics_(sourceconfig,selfc) {-maxobjects 1}
-
-	#  SKEW
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Skew \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) skew
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,skew) \
-	#	{outtextname }
-	#set notebook_characteristics_(reqsrc,skew) 0
-
-	# TOPPED
-	#set thisnum [get_panel_number_]
-	#$itk_component(notebook) add -label Topped \
-	#	-command [code $this reveal_ $thisnum]
-	#set pages_($thisnum) topped
-	#set revealed_($thisnum) 0
-	#set notebook_characteristics_(disable,topped) {outtextname }
-	#set notebook_characteristics_(reqsrc,topped) 0
 
 	#  RESULTS
 	set thisnum [get_panel_number_]
@@ -281,7 +172,7 @@ itcl::class gaia::GaiaEsp {
 	set pages_($thisnum) results
 	set revealed_($thisnum) 0
 
-	# create the inverse of pages_
+	# create the inverse of the array pages_
 	foreach num [array names pages_] {
 	    set indexes_($pages_($num)) $num
 	}
@@ -337,7 +228,6 @@ itcl::class gaia::GaiaEsp {
 		-side bottom -fill x -pady 5 -padx 5
 
 	# buttons
-	#pack $itk_component(selobj) -side right -expand 1 -pady 3 -padx 3
 	pack $itk_component(run) \
 		$itk_component(resetpage) \
 		$itk_component(resetall) \
@@ -360,14 +250,12 @@ itcl::class gaia::GaiaEsp {
 	$itk_component(notebook) select 0
 
 	#  Create an object for dealing with image names
-	set namer_ [GaiaImageName \#auto]
+	set namer_ [GaiaImageName #auto]
     }
 
     # Destructor
     destructor {
-	puts "GaiaEsp destructor: delete files..."
 	foreach f $temporary_files_ {
-	    puts "deleting file $f..."
 	    exec rm $f
 	}
 	if { $star_app_ != {} } {
@@ -397,7 +285,7 @@ itcl::class gaia::GaiaEsp {
 
     #  Actually run the command
     public method run {execit showit} {
-	# delete the results of any previous run from this toolbox
+	# delete the results of any previous run from _this_ toolbox
 	delete_canvas_graphics_ esp_out$w_
 
 	set image [$itk_option(-rtdimage) cget -file]
@@ -413,18 +301,44 @@ itcl::class gaia::GaiaEsp {
 	    foreach ftype $notebook_characteristics_(files,$whichpage) {
 		set fname $values_($this,$ftype)
 		if {$fname == {}} {
-		    if {$ftype == "outputstlfile"} {
-			set values_($this,$ftype) "GaiaEsp_catalogue.txt"
-		    } else {
-			set values_($this,$ftype) [format "GaiaEsp_%s" $ftype]
+		    switch $ftype {
+			"outputstlfile" {
+			    # Note that this filename _must_ end in .txt,
+			    # so that a STL catalogue will be generated,
+			    # as this file is to be parsed by class
+			    # StarSTLFile. 
+			    set fname "GaiaEspCat.txt"
+			}
+			"outputtextfile" {
+			    set fname "GaiaEspResults.txt"
+			}
+			"outputndffile" {
+			    set fname "GaiaEspResults.sdf"
+			}
+			"ardfile"
+			set fname "GaiaEspArd.txt"
+			"sourcefile" {
+			    set fname "GaiaEspSources.txt"
+			}
+			default {
+			    # I'm rather surprised this is happening --
+			    # what file type is this?  Still, never say die!
+			    set fname [format "GaiaEsp_%s" $ftype]
+			}
 		    }
-		    set fname $values_($this,$ftype)
+		    set values_($this,$ftype) $fname
 		}
 		# Check that none of these output files already exist.
 		if {[file exists $fname]} {
 		    set fileexists [format "%s%s " $fileexists $fname]
 		}
 	    }
+	    # If there is one or more of the output files which
+	    # already exists, then warn the user, and offer to delete
+	    # the file before we go on.  If we didn't do this, the ESP
+	    # application would fail, as the routines in there
+	    # generally refuse to open already-existing files for
+	    # output.  Omit the warning if -warn-if-overwrite is false.
 	    if {$fileexists != ""} {
 		if {$itk_option(-warn-if-overwrite)} {
 		    set w [DialogWidget $w_.dialog \
@@ -464,24 +378,6 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Can't save sources"
 	}
 
-	#if {[info exists notebook_characteristics_(disable,$whichpage)]} {
-	#    set disable_chars $notebook_characteristics_(disable,$whichpage)
-	#} else {
-	#    set disable_chars {}
-	#}
-	#if {[lsearch $disable_chars {outndfname}] < 0} {
-	#    if {[file exists $values_($this,outputndffile)]} {
-	#	set allok 0
-	#	error_dialog "Output NDF file $values_($this,outputndffile) already exists"
-	#    }
-	#}
-	#if {[lsearch $disable_chars {outtextname}] < 0} {
-	#    if {[file exists $values_($this,outputtextfile)]} {
-	#	set allok 0
-	#	error_dialog "Output text file $values_($this,outputtextfile) already exists"
-	#    }
-	#}
-
 	if {$allok} {
 
 	    # Save the source information to a file
@@ -499,7 +395,7 @@ itcl::class gaia::GaiaEsp {
 		    if {[info exists defaults_($parameter)]} {
 			lappend norm_arglist "$parameter=$defaults_($parameter)"
 		    } else {
-			puts "ERROR: no value for parameter '$parameter' and no default"
+			puts stderr "ERROR: no value for parameter '$parameter' and no default"
 		    }
 		} else {
 		    lappend norm_arglist $setting
@@ -510,11 +406,15 @@ itcl::class gaia::GaiaEsp {
 	    set invoke_args [join [lrange $norm_arglist 1 end]]
 
 	    if {$showit} {
-		puts "invocation: $invoke_cmd $invoke_args"
+		# We've been invoked with the $showit argument true,
+		# so echo the command-line we've just constructed.
+		puts stdout "invocation: $invoke_cmd $invoke_args"
 	    }
 	    if {$execit} {
+		# We've been invoked with the $execit argument true,
+		# so carry on and do the work.
+
 		# Establish a control object for this task, if not already done
-		# (dunno what this does!, but GaiaSextractor does it)
 		blt::busy hold $w_
 
 		if {$star_app_ == {} || $star_app_name_ != $invoke_cmd} {
@@ -538,43 +438,26 @@ itcl::class gaia::GaiaEsp {
     # Any cleanup when task is completed
     private method completed_ {} {
 	blt::busy release $w_
-
-	set whichpage $pages_([$itk_component(notebook) index select])
-
-	if {[info exists notebook_characteristics_(disable,$whichpage)]} {
-	    set disable_chars $notebook_characteristics_(disable,$whichpage)
-	} else {
-	    set disable_chars {}
-	}
-
-	set s "[string toupper $whichpage] output:\n"
-	if {[lsearch $disable_chars {outndfname}] < 0} {
-	    set s "${s}NDF in file $values_($this,outputndffile)\n"
-	}
-	if {[lsearch $disable_chars {outtextname}] < 0} {
-	    set s "${s}Text output in file $values_($this,outputtextfile)\n"
-	}
-	
-	info_dialog $s
     }
 
     private method completed_ellprofou_ {} {
 	blt::busy release $w_
 
-	# Get rid of the scrawls on the canvas,
-	# and replace them with the result ellipses.
-	#$itk_option(-canvasdraw) clear
-
 	if {! $revealed_($indexes_(results))} {
-	    # This has to be revealed (ie, constructed) before we can
-	    # add material to the results-menu component below.
+	    # The results notebook page has to be revealed (ie,
+	    # constructed) before we can add material to the
+	    # results-menu component below.
 	    reveal_ $indexes_(results)
 	}
 
 	set stl [gaia::StarSTLFile #auto $values_($this,outputstlfile)]
 	if {[$stl status]} {
+	    # nellipses is the number of rows read from the STL catalogue.
 	    set nellipses [$stl parameter _nrows]
+	    # ESP_results_ is the list of results from the catalogue,
+	    # selected from the columns present there.
 	    set ESP_results_ {}
+
 	    $itk_component(results-menu) clear
 	    set sourcen 0
 	    for {set elln 1} {$elln <= $nellipses} {incr elln} {
@@ -626,6 +509,7 @@ itcl::class gaia::GaiaEsp {
 		    [list $sourcen $ell_x $ell_y $ell_sma $ell_pos [expr 1/$ell_invell]]
 	    }
 	    show_ellprofou_results_ 1
+	    # Force the label on the menu to be updated.
             $itk_component(results-menu) configure -value 1
 	} else {
 	    error_dialog "Error reading ELLPRO output file:\n[$stl error_msg]"
@@ -633,6 +517,8 @@ itcl::class gaia::GaiaEsp {
     }
 
     private method show_ellprofou_results_ {sourcen} {
+	# Display the subset of rows in the array ESP_results_ which
+	# have column 0 equal to $sourcen
 	if {! $revealed_($indexes_(results))} {
 	    reveal_ $indexes_(results)
 	}
@@ -645,8 +531,8 @@ itcl::class gaia::GaiaEsp {
 	$itk_component(results) new_info
     }
 
-    # return `true' or `false' depending on whether $value_($this,$var) is
-    # true or false
+    # return the string `true' or `false' depending on whether
+    # $value_($this,$var) is true or false
     private method bool_value {var} {
 	if {$values_($this,$var)} {
 	    return "true"
@@ -693,10 +579,6 @@ itcl::class gaia::GaiaEsp {
 	}
     }
 
-
-
-
-
     #  Reset the current page to its default values.
     protected method reset_page_ {{all 0}} {
 	set npages [$itk_component(notebook) index end]
@@ -724,11 +606,6 @@ itcl::class gaia::GaiaEsp {
 	}
     }
 
-    #  Select one or more objects
-    #protected method select_objects_ {} {
-    #$objectlist_ edit_sourcelist
-    #}
-
     ### OBJECT SELECTION...
     # Following three functions should exists for consistency with
     # the other panels of the notebook, but should never be called.
@@ -752,90 +629,6 @@ itcl::class gaia::GaiaEsp {
 		{Select objects to be fitted}
     }
 
-    ### CORR...
-    private method make_corr_command_ {image} {
-	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 || $values_($this,sigma) <= 0} {
-	    error_dialog "Need to have BACK and SIGMA specified"
-	    return {}
-	}
-	
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/corr"
-
-	lappend arglist "in=$image"
-	lappend arglist "mult=$values_($this,mult)"
-	lappend arglist "back=$values_($this,back)"
-	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "nsigma=$values_($this,nsigma)"
-	lappend arglist "out=$values_($this,outputndffile)"
-	lappend arglist "psize=$values_($this,psize)"
-	lappend arglist "scale=$values_($this,scale)"
-	lappend arglist "useall=[bool_value useall]"
-
-	return $arglist
-    }
-
-    private method reset_corr_ {} {
-	$itk_component(back) configure -value $defaults_(back)
-	$itk_component(mult-corr) configure -value $defaults_(mult)
-	$itk_component(nsigma) configure -value $defaults_(nsigma)
-	$itk_component(psize-corr) configure -value $defaults_(psize)
-	#$itk_component(sigma) configure -value $defaults_(sigma)
-	$itk_component(useall-corr) configure -value $defaults_(useall)
-	$itk_component(scale) configure -value $defaults_(scale)
-    }
-
-    private method add_corr_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add mult-corr {
-	    LabelEntry $parent.mult \
-		    -text "Multiplication factor" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,mult)]
-	}
-	pack $itk_component(mult-corr) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(mult-corr) \
-		{A multiplying factor applied to each of the results}
-
-	itk_component add psize-corr {
-	    LabelEntry $parent.psize \
-		    -text "Pixel size/as." \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,psize)]
-	}
-	pack $itk_component(psize-corr) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(psize-corr) \
-		{The size of each image pixel, in units of arc-seconds}
-
-	itk_component add useall-corr {
-	    StarLabelCheck $parent.useall \
-		    -text "Use pixel threshold" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,useall)]
-	}
-	pack $itk_component(useall-corr) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(useall-corr) \
-		{Is a pixel count threshold use when calculation the correlation?}
-
-	itk_component add scale {
-	    LabelEntry $parent.scale \
-		    -text "Scale length" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,scale)]
-	}
-	pack $itk_component(scale) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(scale) \
-		{The scale length of the galaxies to be highlighted in the output image (units as.)}
-    }
-
     ### ELLPRO...
     # Save the ELLPRO/FOU source selections to a file
     private method save_ellprofou_sourcefile_ {filename} {
@@ -845,6 +638,10 @@ itcl::class gaia::GaiaEsp {
 		set fid [::open $filename w]
 		puts $fid "# GAIA ESP ELLPRO sources file"
 		puts $fid "# Columns:  X, Y Background (ignored) rlim"
+		# Tell ESP that the following lines are in the GRID
+		# WCS domain (ie, they're pixel coordinates rather
+		# than world ones).  This behaviour is not publicly
+		# documented.
 		puts $fid "## wcsdomain = grid"
 
 		foreach o $olist {
@@ -896,9 +693,6 @@ itcl::class gaia::GaiaEsp {
 
 	set arglist {}
 
-	#set meth [string range $values_($this,ellprofoumethod) 0 2]
-	#set is_ellpro [expr {$meth == "pro"}]
-
 	set fullmeth $values_($this,ellprofoumethod)
 	set meth [string range $fullmeth 0 2]
 	set is_ellpro [expr {$meth == "pro"}]
@@ -940,18 +734,15 @@ itcl::class gaia::GaiaEsp {
 	} else {
 	    lappend arglist "ardfil=!"
 	}
-	#lappend arglist "autol=[bool_value autol]"
 	lappend arglist "back=$values_($this,back)"
 	lappend arglist "sigma=$values_($this,sigma)"
 	if {$is_ellpro} {
 	    # fast is true if ellprofoumethod is pro, false if it's proslow
 	    lappend arglist "fast=[expr {($fullmeth == "pro") ? "true" : "false"}]"
-	    #lappend arglist "fast=[expr {($values_($this,ellprofoumethod) == "pro") ? true : false}]"
 	}
 	if {[$itk_component(fine) is_enabled]} {
 	    lappend arglist "fine=$values_($this,fine)"
 	}
-	#lappend arglist "frzori=[bool_value frzori]"
 
 	set sourcepos $values_($this,ellprofouoriginflag)
 	if {[string index $sourcepos 0] == {y}} {
@@ -960,7 +751,6 @@ itcl::class gaia::GaiaEsp {
 	} else {
 	    lappend arglist noautol
 	}
-	#lappend arglist [expr {[string index $sourcepos 0]=={y} ? "autol" : "noautol"}]
 	lappend arglist [expr {[string index $sourcepos 1]=={y} ? "nofrzori" : "frzori"}]
 
 	if {$is_ellpro && [$itk_component(fract) is_enabled]} {
@@ -996,34 +786,13 @@ itcl::class gaia::GaiaEsp {
     }
 
     protected method reset_ellprofou_ {} {
-	#$itk_component(angcon) configure -value $defaults_(angcon)
-	#$itk_component(angoff) configure -value $defaults_(angoff)
-	#set values_($this,angoff) $defaults_(angoff)
-	#set values_($this,angcon) $defaults_(angcon)
-
-	#set values_($this,autol) $defaults_(autol)
-	#$itk_component(back-ellprofou)   configure -value $defaults_(back)
-	#$itk_component(sigma)  configure -value $defaults_(sigma)
-
-	#$itk_component(expert) configure -value $defaults_(expert)
 	set values_($this,expert) $defaults_(expert)
-
-	#$itk_component(autolt) configure -value $defaults_(autolt)
-	#$itk_component(fast)   configure -value $defaults_(fast)
-	#$itk_component(fine)   configure -value $defaults_(fine)
 	$itk_component(fine) reset
-	#$itk_component(fract)  configure -value $defaults_(fract)
 	$itk_component(fract) reset
-	#$itk_component(frzori) configure -value $defaults_(frzori)
-	#$itk_component(lim1)   configure -value $defaults_(lim1)
-	#$itk_component(lim2)   configure -value $defaults_(lim2)
-	#$itk_component(lim3)   configure -value $defaults_(lim3)
 	$itk_component(lim1) reset
 	$itk_component(lim2) reset
 	$itk_component(lim3) reset
 	$itk_component(zerop) reset
-	#$itk_component(rlim)   configure -value $defaults_(rlim)
-	#$itk_component(zerop)  configure -value $defaults_(zerop)
 	$itk_component(minmod) configure -value $defaults_(minmod)
     }
 
@@ -1245,1149 +1014,15 @@ itcl::class gaia::GaiaEsp {
 		{minmod: Which minimisation mode should be used?}
 
 	# Set up for initial values of enabled/disabled
-	#toggle_seellpro_
 	toggle_originflag_
 	toggle_expert_
     }
 
-    ### FASTMED...
 
-    private method make_fastmed_command_ {image} {
-	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 || $values_($this,sigma) <= 0} {
-	    error_dialog "Need to have BACK and SIGMA specified"
-	    return {}
-	}
-	
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/fastmed"
-
-	lappend arglist "in=$image"
-	lappend arglist "out=$values_($this,outputndffile)"
-	lappend arglist "back=$values_($this,back)"
-	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "width=$values_($this,width)"	
-
-	return $arglist
-    }
-
-    private method reset_fastmed_ {} {
-	$itk_component(back) configure -value $defaults_(back)
-	$itk_component(width) configure -value $defaults_(width)
-    }
-
-    private method add_fastmed_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add width {
-	    LabelEntryScale $parent.width \
-		    -text "Width" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 2 \
-		    -resolution 2 \
-		    -fix_range 1 \
-		    -validate real \
-		    -from 2 \
-		    -to 200 \
-		    -value $values_($this,width) \
-		    -command [code $this set_values_ width]
-	}
-	pack $itk_component(width) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(width) \
-		{The width of the median filter to be employed.  Units pixels}
-    }
-
-
-    ###  GAUFIT...
-    # Save the GAUFIT source selections to a file
-    private method save_gaufit_sourcefile_ {filename} {
-	set olist [$objectlist_ get_sourcelist]
-	if {[llength $olist] > 0 && $filename != {}} {
-	    busy {
-		set fid [::open $filename w]
-		puts $fid "# GAIA ESP GAUFIT sources file"
-		puts $fid "# Columns:  X, Y, Radius"
-
-		foreach o $olist {
-		    puts $fid [$o coords]
-		}
-		::close $fid
-	    }
-	}
-    }
-
-    protected method reset_gaufit_ {} {
-	$itk_component(angcon)  configure -value $defaults_(angcon)
-	$itk_component(angoff)  configure -value $defaults_(angoff)
-
-	$itk_component(fwhm)    configure -value $defaults_(fwhm)
-	$itk_component(psize)   configure -value $defaults_(psize)
-	$itk_component(calcsd)  configure -value $defaults_(calcsd)
-	$itk_component(maxiter) configure -value $defaults_(maxiter)
-
-	set values_($this,fitback) $defaults_(fitback)
-	$itk_component(back)    configure -value $defaults_(back)
-	#$itk_component(sigma)   configure -value $defaults_(sigma)
-	$itk_component(nsigma)  configure -value $defaults_(nsigma)
-	toggle_fitback_
-
-	#$itk_component(lsqfit)  configure -value $defaults_(lsqfit)
-	set values_($this,lsqfit) $defaults_(lsqfit)
-	#$itk_component(autol)   configure -value $defaults_(autol)
-	set values_($this,autol)  $defaults_(autol)
-	$itk_component(anginc)  configure -value $defaults_(anginc)
-	$itk_component(pinc)    configure -value $defaults_(pinc)
-	$itk_component(sainc)   configure -value $defaults_(sainc)
-	$itk_component(sbinc)   configure -value $defaults_(sbinc)
-	$itk_component(xinc)    configure -value $defaults_(xinc)
-	$itk_component(yinc)    configure -value $defaults_(yinc)
-	toggle_lsqfit_
-    }
-
-    # Add controls for the gaufit parameter
-    protected method add_gaufit_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add angoff {
-	    gaia::StarLabelWidgetChild $parent.angoff \
-		    -text "Angular offset" \
-		    -labelwidth $lwidth
-	}
-	set cs [$itk_component(angoff) childsite]
-	entry $cs.b -textvariable [scope values_($this,angoff)] -width 10
-	radiobutton $cs.a1 -text "clockwise" \
-		-variable [scope values_($this,angcon)] \
-		-value 1 -anchor w
-	radiobutton $cs.a0 -text "anticlockwise" \
-		-variable [scope values_($this,angcon)] \
-		-value 0 -anchor w
-	pack $cs.b $cs.a1 $cs.a0 -side left -fill x
-	pack $itk_component(angoff) -side top -fill x -ipadx 1m -ipady 1m
-  	add_short_help $itk_component(angoff) \
-  		{Angular offset for position angles generated.  Units degrees}
-
-	#  Perhaps put the fitting parameters in another notebook, to
-	#  avoid them sprawling all over the screen.
-	#itk_component add gaufitnotebook {
-	#    ::iwidgets::tabnotebook #auto \
-	#	    -tabpos n -angle 15
-	#}
-	#pack $itk_component(gaufitnotebook) -side top -fill both -expand 1 \
-	#	-ipadx 1m -ipady 1m
-	    
-	#  Do we use the least-squares fit or not?
-	#  (it might be better to use radiobuttons for
-	#  least-squares/search)
-	itk_component add lsqfit {
-	    StarLabelCheck $parent.lsqfit \
-		    -text "Least-squares fit" \
-		    -onvalue 1 \
-		    -offvalue 0 \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,lsqfit)] \
-		    -command [code $this toggle_lsqfit_]
-	}
-	pack $itk_component(lsqfit) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(lsqfit) \
-		{Use a least-squares fit (newer, more robust)}
-
-	#  Now add the autol toggle and the six *inc fields
-	itk_component add autol-gaufit {
-	    StarLabelCheck $parent.autol-gaufit \
-		    -text "Auto-locate origin" \
-		    -onvalue 1 \
-		    -offvalue 0 \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,autol)]
-	}
-	pack $itk_component(autol-gaufit) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(autol-gaufit) \
-		{Is the source origin provided to be refined?}		    
-
-	itk_component add anginc {
-	    LabelEntryScale $parent.anginc \
-		    -text "Angular increment" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05  \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -fix_range 1 \
-		    -validate real \
-		    -anchor w \
-		    -value $values_($this,anginc) \
-		    -from 0.0 \
-		    -to 1.0 \
-		    -command [code $this set_values_ anginc]
-	}
-	pack $itk_component(anginc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(anginc) \
-		{The amount by which the angle of a source may vary, from 0 (fixed) to 1 (completely free)}
-
-	itk_component add pinc {
-	    LabelEntryScale $parent.pinc \
-		    -text "Peak increment" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05  \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -fix_range 1 \
-		    -validate real \
-		    -anchor w \
-		    -value $values_($this,pinc) \
-		    -from 0.0 \
-		    -to 1.0 \
-		    -command [code $this set_values_ pinc]
-	}
-	pack $itk_component(pinc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(pinc) \
-		{The amount by which the peak of a source may vary, from 0 (fixed) to 1 (completely free)}
-
-	itk_component add sainc {
-	    LabelEntryScale $parent.sainc \
-		    -text "sigma_a increment" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05  \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -fix_range 1 \
-		    -validate real \
-		    -anchor w \
-		    -value $values_($this,sainc) \
-		    -from 0.0 \
-		    -to 1.0 \
-		    -command [code $this set_values_ sainc]
-	}
-	pack $itk_component(sainc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(sainc) \
-		{The amount by which the width (larger axis) of a source may vary, from 0 (fixed) to 1 (completely free)}
-
-	itk_component add sbinc {
-	    LabelEntryScale $parent.sbinc \
-		    -text "sigma_b increment" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05  \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -fix_range 1 \
-		    -validate real \
-		    -anchor w \
-		    -value $values_($this,sbinc) \
-		    -from 0.0 \
-		    -to 1.0 \
-		    -command [code $this set_values_ sbinc]
-	}
-	pack $itk_component(sbinc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(sbinc) \
-		{The amount by which the width (smaller axis) of a source may vary, from 0 (fixed) to 1 (completely free)}
-
-	itk_component add xinc {
-	    LabelEntryScale $parent.xinc \
-		    -text "X increment" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05  \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -fix_range 1 \
-		    -validate real \
-		    -anchor w \
-		    -value $values_($this,xinc) \
-		    -from 0.0 \
-		    -to 1.0 \
-		    -command [code $this set_values_ xinc]
-	}
-	pack $itk_component(xinc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(xinc) \
-		{The amount by which the X-coordinate of a source may vary, from 0 (fixed) to 1 (completely free)}
-
-	itk_component add yinc {
-	    LabelEntryScale $parent.yinc \
-		    -text "Y increment" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05  \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -fix_range 1 \
-		    -validate real \
-		    -anchor w \
-		    -value $values_($this,yinc) \
-		    -from 0.0 \
-		    -to 1.0 \
-		    -command [code $this set_values_ yinc]
-	}
-	pack $itk_component(yinc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(yinc) \
-		{The amount by which the Y-coordinate of a source may vary, from 0 (fixed) to 1 (completely free)}
-
-	
-	#  Fit background?
-	#  If not, then also back, sigma, nsigma
-
-	itk_component add maxiter {
-	    LabelEntry $parent.maxiter \
-		    -text "Maximum iterations" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,maxiter)]
-	}
-	pack $itk_component(maxiter) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(maxiter) \
-		{Upper-bound on iteration count}
-
-	itk_component add psize-gaufit {
-	    LabelEntry $parent.psize \
-		    -text "Pixel size/as." \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,psize)]
-	}
-	pack $itk_component(psize-gaufit) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(psize-gaufit) \
-		{The size of each image pixel, in units of arc-seconds}
-
-	#  Should we fit the background or specify it
-	itk_component add fitback {
-	    StarLabelCheck $parent.fitback \
-		    -text "Fit background " \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,fitback)] \
-		    -command [code $this toggle_fitback_]
-	}
-	pack $itk_component(fitback) -side left -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(fitback) \
-		{Fit the background}
-
-	itk_component add calcsd {
-	    StarLabelCheck $parent.calcsd \
-		    -text "Calculate SD" \
-		    -anchor w \
-		    -variable [scope values_($this,calcsd)]
-	}
-	pack $itk_component(calcsd) -side left -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(calcsd) \
-		{Calculate fit errors}
-
-	itk_component add fwhm {
-	    StarLabelCheck $parent.fwhm \
-		    -text "FWHM" \
-		    -anchor w \
-		    -variable [scope values_($this,fwhm)]
-	}
-	pack $itk_component(fwhm) -side left -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(fwhm) \
-		{Display results in FWHM rather than sigma?}
-
-	#  Set fitback to the default
-	toggle_fitback_
-	#  Finally set the lsqfit toggle to the default
-	toggle_lsqfit_
-
-	#  I/O: in, infile, model, modtype, out, device?
-
-	#  Ignore: colour, mode
-    }
-
-    private method make_gaufit_command_ {image} {
-	# insist that either fitback is true, or else 
-	# back, sigma and nsigma have values.
-	if {! $values_($this,fitback)
-	&& ($values_($this,back) < 0
-	|| $values_($this,sigma) < 0
-	|| $values_($this,nsigma) < 0)} {
-	    error_dialog "If fitback is not selected, back, sigma and nsigma must have values"
-	    return {}
-	}
-
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/gaufit"
-
-	lappend arglist "infile=$values_($this,sourcefile)"
-	lappend arglist "in=$image"
-	lappend arglist "mode=false"
-	lappend arglist "angcon=[bool_value angcon]"
-	lappend arglist "angoff=$values_($this,angoff)"
-	lappend arglist "fwhm=[bool_value fwhm]"
-	lappend arglist "psize=$values_($this,psize)"
-	lappend arglist "calcsd=[bool_value calcsd]"
-
-	if {$values_($this,lsqfit)} {
-	    lappend arglist "lsqfit=true"
-	    if {$values_($this,maxiter) > 0.0} {
-		lappend arglist "maxiter=$values_($this,maxiter)"
-	    }
-	    if {$values_($this,fitback)} {
-		lappend arglist "back=-1"
-	    } else {
-		# XXX What do I do when these have no value???
-		lappend arglist "back=$values_($this,back)"
-		lappend arglist "sigma=$values_($this,sigma)"
-		lappend arglist "nsigma=$values_($this,nsigma)"
-	    }
-	} else {
-	    lappend arglist "lsqfit=false"
-	    lappend arglist "autol=[bool_value autol]"
-	    lappend arglist "anginc=$values_($this,anginc)"
-	    lappend arglist "pinc=$values_($this,pinc)"
-	    lappend arglist "sainc=$values_($this,sainc)"
-	    lappend arglist "sbinc=$values_($this,sbinc)"
-	    lappend arglist "xinc=$values_($this,xinc)"
-	    lappend arglist "yinc=$values_($this,yinc)"
-	    lappend arglist "back=$values_($this,back)"
-	    lappend arglist "sigma=$values_($this,sigma)"
-	    lappend arglist "nsigma=$values_($this,nsigma)"
-	    if {$values_($this,maxiter) > 0.0} {
-		lappend arglist "niter=$values_($this,maxiter)"
-	    }
-	}
-
-	# Set the model type, and model and output text files.
-	lappend arglist "model=$values_($this,outputndffile)"
-	lappend arglist "out=$values_($this,outputtextfile)"
-	lappend arglist "modtyp=w"
-
-	return $arglist
-    }
-
-    ### HSUB...
-    private method make_hsub_command_ {image} {
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/hsub"
-
-	lappend arglist "in=$image"
-	if {$values_($this,sfactflag) <= 0} {
-	    lappend arglist "sfact=$values_($this,sfactflag)"
-	} else {
-	    lappend arglist "sfact=$values_($this,sfact)"
-	}
-	lappend arglist "type=$values_($this,hsubtype)"
-	lappend arglist "out=$values_($this,outputtextfile)"
-	lappend arglist "formatted=[bool_value hsubformatted]"
-
-	return $arglist
-    }
-
-    private method reset_hsub_ {} {
-	$itk_component(back)      configure -value $defaults_(back)
-	$itk_component(sfact-hsub)     configure -value $defaults_(sfact)
-	set values_($this,sfactflag) $defaults_(sfactflag)
-	$itk_component(hsubtype)  configure -value $defaults_(hsubtype)
-	$itk_component(hsubformatted) configure -value $defaults_(hsubformatted)
-    }
-
-    private method add_hsub_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add sfact-hsub {
-	    gaia::StarLabelWidgetChild $parent.sfact \
-		    -text "Smoothing" \
-		    -labelwidth $lwidth
-	}
-	set cs [$itk_component(sfact-hsub) childsite]
-	frame $cs.f1
-	frame $cs.f2
-	radiobutton $cs.rb1 \
-		-text {Automatic} \
-		-variable [scope values_($this,sfactflag)] \
-		-value -1 -anchor w
-	radiobutton $cs.rb2 \
-		-text {None} \
-		-variable [scope values_($this,sfactflag)] \
-		-value 0 -anchor w
-	radiobutton $cs.rb3 \
-		-text {Set} \
-		-variable [scope values_($this,sfactflag)] \
-		-value 1 -anchor w
-	spinint $cs.e \
-		-textvariable [scope values_($this,sfact)] \
-		-range {1 100} \
-		-wrap 0
-	pack $cs.f1 $cs.f2 -side top -anchor w
-	pack $cs.rb1 $cs.rb2 -side top -anchor w -in $cs.f1 -ipady 1m
-	pack $cs.rb3 $cs.e -side left -in $cs.f2 
-	pack $itk_component(sfact-hsub) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(sfact-hsub) \
-		{Type of Gaussian smoothing requested}
-
-	itk_component add hsubtype {
-	    LabelMenu $parent.hsubtype \
-		    -text {Modal pixel calc.} \
-		    -labelwidth $lwidth \
-		    -variable [scope values_($this,hsubtype)]
-	}
-	pack $itk_component(hsubtype) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(hsubtype) \
-		{How should the modal pixel be calculated?}
-	foreach {name value} {
-	    Automatic 0
-	    {Raw histogram} 1
-	    {Smoothed histogram} 2
-	    {Extrapolated chords} 3
-	    {Interpolation of data points} 4
-	} {
-	    $itk_component(hsubtype) add -label $name -value $value
-	}
-
-	itk_component add hsubformatted {
-	    StarLabelCheck $parent.hsubformatted \
-		    -text "Formatted output" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,hsubformatted)]
-	}
-	pack $itk_component(hsubformatted) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(hsubformatted) \
-		{Produce formatted output?}
-
-	itk_component add hsubnote {
-	    label $parent.note \
-		    -justify left \
-		    -relief raised \
-		    -text \
-"This panel provides the functionality of the ESP HISTPEAK
-application, but without the graph-drawing capabilities
-of that tool.  It is, however, actually implemented using
-the ESP HSUB application, so it is that part of the ESP
-documentation which you should refer to for further details"
-	}
-	pack $itk_component(hsubnote) -side top -fill x -ipadx 1m -ipady 1m
-
-    }
-
-    ### LOBACK...
-    # Save source selections to a file.
-    private method save_loback_sourcefile_ {filename} {
-	set olist [$objectlist_ get_sourcelist]
-	if {[llength $olist] > 0 && $filename != {}} {
-	    busy {
-		set fid [::open $filename w]
-		puts $fid "# GAIA LOBACK sources file"
-		foreach o $olist {
-		    set xyr [$o coords]
-		    set wid [lindex $xyr 2]
-		    puts $fid "[lindex $xyr 0] [lindex $xyr 1] [expr $wid*$wid]"
-		}
-		::close $fid
-	    }
-	}
-    }
-
-    private method make_loback_command_ {image} {
-
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/loback"
-
-	lappend arglist "in=$image"
-	lappend arglist "infile=$values_($this,sourcefile)"
-	lappend arglist "out=$values_($this,outputtextfile)"
-	if {$values_($this,sfactflag) <= 0} {
-	    lappend arglist "sfact=$values_($this,sfactflag)"
-	} else {
-	    lappend arglist "sfact=$values_($this,sfact)"
-	}
-	lappend arglist "third=false"	;# support this loback mode only
-	lappend arglist "width=32"	;# ignored, but needs to be there
-
-	return $arglist
-    }
-
-    private method reset_loback_ {} {
-	$itk_component(sfact) configure -value $defaults_(sfact)
-	set values_($this,sfactflag) $defaults_(sfactflag)
-    }
-
-    private method add_loback_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add sfact-loback {
-	    gaia::StarLabelWidgetChild $parent.sfact \
-		    -text "Smoothing" \
-		    -labelwidth $lwidth
-	}
-	set cs [$itk_component(sfact-loback) childsite]
-	frame $cs.f1
-	frame $cs.f2
-	radiobutton $cs.rb1 \
-		-text {Automatic} \
-		-variable [scope values_($this,sfactflag)] \
-		-value -1 -anchor w
-	radiobutton $cs.rb2 \
-		-text {None} \
-		-variable [scope values_($this,sfactflag)] \
-		-value 0 -anchor w
-	radiobutton $cs.rb3 \
-		-text {Set} \
-		-variable [scope values_($this,sfactflag)] \
-		-value 1 -anchor w
-	spinint $cs.e \
-		-textvariable [scope values_($this,sfact)] \
-		-range {1 100} \
-		-wrap 0
-	pack $cs.f1 $cs.f2 -side top -anchor w
-	pack $cs.rb1 $cs.rb2 -side top -anchor w -in $cs.f1 -ipady 1m
-	pack $cs.rb3 $cs.e -side left -in $cs.f2 
-	pack $itk_component(sfact-loback) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(sfact-loback) \
-		{Type of Gaussian smoothing requested}
-    }
-
-
-    ### MASK...
-    private method make_mask_command_ {image} {
-
-	if {$values_($this,ardfile) == {} || $values_($this,outputndffile) == {}} {
-	    error_dialog "ARD file and Output NDF must be specified"
-	    return {}
-	}
-
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/mask"
-
-	lappend arglist "in=$image"
-	lappend arglist "ardfil=$values_($this,ardfile)"
-	lappend arglist "out=$values_($this,outputndffile)"
-
-	return $arglist
-    }
-
-    private method reset_mask_ {} {
-	$itk_component(inardname)  configure -value $defaults_(inardname)
-	$itk_component(outndfname) configure -value $defaults_(outndfname)
-    }
-
-    private method add_mask_selections_ {parent} {
-	itk_component add masknote {
-	    label $parent.note \
-		    -justify left \
-		    -relief raised \
-		    -text \
-"This panel provides the functionality of the ESP MASK
-application.  It requires only the ARD file and output NDF
-to be specified"
-	}
-	pack $itk_component(masknote) -side top -fill x -ipadx 1m -ipady 1m
-    }
-
-    ### MIXUP...
-    private method make_mixup_command_ {image} {
-
-	if {$values_($this,outputndffile) == {}} {
-	    error_dialog "Output NDF must be specified"
-	    return {}
-	}
-
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/mixup"
-
-	lappend arglist "in=$image"
-	lappend arglist "out=$values_($this,outputndffile)"
-
-	return $arglist
-    }
-
-    private method reset_mixup_ {} {
-	$itk_component(outndfname) configure -value $defaults_(outndfname)
-    }
-
-    private method add_mixup_selections_ {parent} {
-	itk_component add mixupnote {
-	    label $parent.note \
-		    -justify left \
-		    -relief raised \
-		    -text \
-"This panel provides the functionality of the ESP MIXUP
-application.  It requires only the output NDF
-to be specified"
-	}
-	pack $itk_component(mixupnote) -side top -fill x -ipadx 1m -ipady 1m
-    }
-
-    ### SECTOR...
-    private method make_sector_command_ {image} {
-	if {$values_($this,back) == 0 || $values_($this,sigma) == 0} {
-	    error_dialog "Background must be specified"
-	    return {}
-	}
-	set olist [$objectlist_ get_sourcelist]
-	if {[llength $olist] != 1} {
-	    error_dialog "Must specify exactly one source"
-	    return {}
-	}
-
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/sector"
-
-	lappend arglist "in=$image"
-	lappend arglist "out=$values_($this,outputtextfile)"
-	if {$values_($this,ardfile) == {}} {
-	    lappend arglist "ardfil=!"
-	} else {
-	    lappend arglist "ardfil=^$values_($this,ardfile)"
-	}
-	lappend arglist "back=$values_($this,back)"
-	lappend arglist "sigma=$values_($this,sigma)"
-
-	lappend arglist "autol=[bool_value autol]"
-	lappend arglist "mirror=[bool_value mirror]"
-	lappend arglist "surf=[bool_value surf]"
-
-	lappend arglist "psize=$values_($this,psize)"
-	lappend arglist "radisp=$values_($this,radisp)"
-
-	lappend arglist "fitlim=$values_($this,fitlim1),$values_($this,fitlim2)"
-	if {$values_($this,zeropflag)} {
-	    lappend arglist "zerop=$values_($this,zerop)"
-	}
-
-	# Specify position.  coords method gives posang in degrees
-	# from x-axis, with anti-clockwise positive.  posang parameter
-	# is degrees from y-axis, with clockwise positive.
-	set source1 [lindex $olist 0]
-	set oc [$source1 coords]
-	lappend arglist "porigin=\[[lindex $oc 0],[lindex $oc 1]\]"
-	lappend arglist "rlim=[lindex $oc 2]"
-	set pang [expr 90-[lindex $oc 3]]
-	while {$pang < 0} {
-	    set pang [expr $pang+360]
-	}
-	lappend arglist "posang=$pang"
-	lappend arglist "angwid=[lindex $oc 4]"
-
-	lappend arglist "cursor=no"
-	lappend arglist "again=no"
-
-	return $arglist	
-    }
-
-    private method reset_sector_ {} {
-	$itk_component(autol-sector) configure -value $defaults_(autol)
-	$itk_component(fitlim)       configure -value $defaults_(fitlim)
-	$itk_component(mirror)       configure -value $defaults_(mirror)
-	$itk_component(psize-sector) configure -value $defaults_(psize)
-	$itk_component(radisp)       configure -value $defaults_(radisp)
-	$itk_component(surf)         configure -value $defaults_(surf)
-    }
-
-    private method add_sector_selections_ {parent} {
-	set lwidth 12
-	set vwidth 5
-
-	#  Now add the autol toggle and the six *inc fields
-	itk_component add autol-sector {
-	    StarLabelCheck $parent.autol-sector \
-		    -text "Auto-locate" \
-		    -onvalue 1 \
-		    -offvalue 0 \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,autol)]
-	}
-	pack $itk_component(autol-sector) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(autol-sector) \
-		{Is the source origin provided to be refined?}
-
-	itk_component add fitlim {
-	    gaia::StarLabelWidgetChild $parent.fitlim \
-		    -text "Fit limits" \
-		    -labelwidth $lwidth
-	}
-	set cs [$itk_component(fitlim) childsite]
-	scale $cs.s1 \
-		-label "from" \
-		-orient horizontal \
-		-showvalue 1 \
-		-resolution 0.5 \
-		-from 0 \
-		-to 40 \
-		-command [code $this synch_fitlim_ 2] \
-		-variable [scope values_($this,fitlim1)]
-	scale $cs.s2 \
-		-label "to" \
-		-orient horizontal \
-		-showvalue 1 \
-		-resolution 0.5 \
-		-from 0 \
-		-to 40 \
-		-command [code $this synch_fitlim_ 1] \
-		-variable [scope values_($this,fitlim2)]
-	pack $cs.s1 $cs.s2 -side left -padx 1m -fill x
-	pack $itk_component(fitlim) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(fitlim) \
-		{The range of fitted radius values}
-
-	itk_component add mirror {
-	    StarLabelCheck $parent.mirror \
-		    -text "Use mirror" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,mirror)]
-	}
-	pack $itk_component(mirror) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(mirror) \
-		{Sum diametrically opposite sectors}
-
-	itk_component add psize-sector {
-	    LabelEntry $parent.psize \
-		    -text "Pixel size/as." \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,psize)]
-	}
-	pack $itk_component(psize-sector) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(psize-sector) \
-		{The size of each image pixel, in units of arc-seconds}
-
-	itk_component add radisp {
-	    LabelMenu $parent.radisp \
-		    -text {Output display type} \
-		    -labelwidth $lwidth \
-		    -variable [scope values_($this,radisp)]
-	}
-	pack $itk_component(radisp) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(radisp) \
-		{Display mode used for the radius axis of the graphs}
-	foreach {name value} {
-	    {Quarter power} q
-	    {Logarithmic} l
-	    {Square root} s
-	    {Linear} r
-	} {
-	    $itk_component(radisp) add -label $name -value $value
-	}
-
-	itk_component add surf {
-	    StarLabelCheck $parent.surf \
-		    -text "Output surface brightness" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,surf)]
-	}
-	pack $itk_component(surf) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(surf) \
-		{Are the pixel values to be expressed as surface brightness?}
-    }
-    private method synch_fitlim_ {which newval} {
-	if {$which == 1} {
-	    # synch fitlim1
-	    if {$values_($this,fitlim1) > $newval} {
-		set values_($this,fitlim1) $newval
-	    }
-	} else {
-	    if {$values_($this,fitlim2) < $newval} {
-		set values_($this,fitlim2) $newval
-	    }
-	}
-    }
-
-    ### SELFC...
-    private method make_selfc_command_ {image} {
-
-	if {$values_($this,outputndffile) == {}} {
-	    error_dialog "Output NDF must be specified"
-	    return {}
-	}
-	if {$values_($this,back) == 0} {
-	    error_dialog "Background must be specified"
-	    return {}
-	}
-	set olist [$objectlist_ get_sourcelist]
-	if {[llength $olist] != 1} {
-	    error_dialog "Must specify exactly one 'source'"
-	}
-
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/selfc"
-
-	lappend arglist "in=$image"
-	lappend arglist "out=$values_($this,outputndffile)"
-	lappend arglist "back=$values_($this,back)"
-	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "nsigma=$values_($this,nsigma)"
-	if {$values_($this,psize) != 1} {
-	    lappend arglist "psize=$values_($this,psize)"
-	}
-	lappend arglist "useall=[bool_value useall]"
-
-	set source1 [lindex $olist 0]
-	set xyr [$source1 coords]
-	if {$values_($this,isselfc)} {
-	    lappend arglist "diam=[lindex $xyr 2]"
-	} else {
-	    lappend arglist "mult=$values_($this,mult)"
-	    lappend arglist "scale=[lindex $xyr 2]"
-	}
-
-	return $arglist
-    }
-
-    private method reset_selfc_ {} {
-	$itk_component(psize-selfc) configure -value $defaults_(psize)
-	$itk_component(useall-selfc) configure -value $defaults_(useall)
-	$itk_component(mult-selfc) configure -value $defaults_(mult)
-	set values_($this,selfcflag) $defaults_(selfcflag)
-    }
-
-    private method add_selfc_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add isselfc {
-	    gaia::StarLabelWidgetChild $parent.isselfc \
-		    -text "Mode" \
-		    -labelwidth $lwidth
-	}
-	set cs [$itk_component(isselfc) childsite]
-	radiobutton $cs.a1 -text SELFC \
-		-variable [scope values_($this,selfcflag)] \
-		-value 1 -anchor w \
-		-command [code $this toggle_isselfc_]
-	radiobutton $cs.a0 -text SELFCW \
-		-variable [scope values_($this,selfcflag)] \
-		-value 0 -anchor w \
-		-command [code $this toggle_isselfc_]
-	pack $cs.a1 $cs.a0 -side left -fill x
-	pack $itk_component(isselfc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(isselfc) \
-		{Select between SELFC and SELFCW}
-
-	itk_component add psize-selfc {
-	    LabelEntry $parent.psize \
-		    -text "Pixel size/as." \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,psize)]
-	}
-	pack $itk_component(psize-selfc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(psize-selfc) \
-		{The size of each image pixel, in units of arc-seconds}
-
-	itk_component add mult-selfc {
-	    LabelEntry $parent.mult \
-		    -text "Multiplication factor" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,mult)]
-	}
-	pack $itk_component(mult-selfc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(mult-selfc) \
-		{A multiplying factor applied to each of the results}
-
-
-	itk_component add useall-selfc {
-	    StarLabelCheck $parent.useall \
-		    -text "Use pixel threshold" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,useall)]
-	}
-	pack $itk_component(useall-selfc) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(useall-selfc) \
-		{Is a pixel count threshold use when calculation the correlation?}
-
-	itk_component add diag-b {
-	    button $parent.diag \
-		    -text "Draw galaxy diameter" \
-		    -command [code $this select_objects_]
-	}
-	pack $itk_component(diag-b) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(diag-b) \
-		{draw circle}
-
-	toggle_isselfc_
-    }
-
-
-    ### SKEW...
-    private method make_skew_command_ {image} {
-	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 
-		|| $values_($this,sigma) <= 0
-    		|| $values_($this,nsigma) <= 0} {
-	    error_dialog "Need to have BACK, SIGMA, NSIGMA specified"
-	    return {}
-	}
-	
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/skew"
-
-	lappend arglist "in=$image"
-	lappend arglist "out=$values_($this,outputndffile)"
-	lappend arglist "back=$values_($this,back)"
-	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "nsigma=$values_($this,nsigma)"
-	lappend arglist "width=$values_($this,width)"
-	lappend arglist "psize=$values_($this,psize)"
-	lappend arglist "mult=$values_($this,mult)"
-	lappend arglist "useall=[bool_value useall]"
-	lappend arglist "modet=[bool_value modet]"
-
-	return $arglist
-    }
-
-    private method reset_skew_ {} {
-	$itk_component(nsigma)      configure -value $defaults_($this,nsigma)
-	$itk_component(psize-skew)  configure -value $defaults_($this,psize)
-	$itk_component(useall-skew) configure -value $defaults_($this,useall)
-	$itk_component(modet)       configure -value $defaults_($this,modet)
-	$itk_component(mult-skew)   configure -value $defaults_($this,mult)
-	$itk_component(width-skew)  configure -value $defaults_($this,width)
-    }
-
-    private method add_skew_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add psize-skew {
-	    LabelEntry $parent.psize \
-		    -text "Pixel size/as." \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,psize)]
-	}
-	pack $itk_component(psize-skew) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(psize-skew) \
-		{The size of each image pixel, in units of arc-seconds}
-
-	itk_component add useall-skew {
-	    StarLabelCheck $parent.useall \
-		    -text "Use pixel threshold" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,useall)]
-	}
-	pack $itk_component(useall-skew) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(useall-skew) \
-		{Is a pixel count threshold use when calculation the correlation?}
-	itk_component add modet {
-	    StarLabelCheck $parent.modet \
-		    -text "Use global modal pixel value" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,modet)]
-	}
-	pack $itk_component(modet) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(modet) \
-		{Use a global modal pixel value when calculating skewness?}
-
-	itk_component add mult-skew {
-	    LabelEntry $parent.mult \
-		    -text "Multiplication factor" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,mult)]
-	}
-	pack $itk_component(mult-skew) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(mult-skew) \
-		{A multiplying factor applied to each of the results}
-
-	itk_component add width-skew {
-	    LabelEntry $parent.width \
-		    -text "Sampling width" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,width)]
-	}
-	pack $itk_component(width-skew) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(width-skew) \
-		{Width of the sampling area/filter (units as.)}
-
-    }
-
-    ### TOPPED...
-    private method make_topped_command_ {image} {
-	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 
-		|| $values_($this,sigma) <= 0
-    		|| $values_($this,nsigma) <= 0} {
-	    error_dialog "Need to have BACK, SIGMA, NSIGMA specified"
-	    return {}
-	}
-	
-	set arglist {}
-
-	lappend arglist "$itk_option(-esp_dir)/topped"
-
-	lappend arglist "in=$image"
-	lappend arglist "out=$values_($this,outputndffile)"
-	lappend arglist "back=$values_($this,back)"
-	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "nsigma=$values_($this,nsigma)"
-	lappend arglist "width=$values_($this,width)"
-	lappend arglist "psize=$values_($this,psize)"
-	lappend arglist "noise=[bool_value noise]"
-
-	return $arglist
-    }
-
-    private method reset_topped_ {} {
-	$itk_component(nsigma)       configure -value $defaults_($this,nsigma)
-	$itk_component(psize-topped) configure -value $defaults_($this,psize)
-	$itk_component(noise)        configure -value $defaults_($this,noise)
-	$itk_component(width-topped) configure -value $defaults_($this,width)
-    }
-
-    private method add_topped_selections_ {parent} {
-	set lwidth 16
-	set vwidth 5
-
-	itk_component add noise {
-	    StarLabelCheck $parent.noise \
-		    -text "Noise" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,noise)]
-	}
-	pack $itk_component(noise) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(noise) \
-		{Set selected pixels to random value, or BAD}
-
-	itk_component add psize-topped {
-	    LabelEntry $parent.psize \
-		    -text "Pixel size/as." \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,psize)]
-	}
-	pack $itk_component(psize-topped) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(psize-topped) \
-		{The size of each image pixel, in units of arc-seconds}
-
-	itk_component add width-topped {
-	    LabelEntry $parent.width \
-		    -text "Radius" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,width)]
-	}
-	pack $itk_component(width-topped) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(width-topped) \
-		{Radius of the selected circle around bright pixels (units as.)}
-    }
-
-    ### Results...
+    ### RESULTS...
     private method make_results_command_ {image} {
 	# do nothing
+	return {}
     }
 
     private method reset_results_ {} {
@@ -2446,11 +1081,6 @@ to be specified"
 	set values_($this,psize) 1
 	set values_($this,sigma) 0.0
 
-	# corr-specific
-	set values_($this,mult) 1000
-	set values_($this,scale) 5	;# reasonable default?
-	set values_($this,useall) 1	;# boolean
-
 	# ellprofou-specific
 	set values_($this,ellprofoumethod) pro
 	set values_($this,autolt) 1	;# boolean
@@ -2466,98 +1096,43 @@ to be specified"
 	set values_($this,minmod) 0
 	set values_($this,ellprofouoriginflag) yy
 
-	# fastmed-specific
-	set values_($this,width) 50
-
-	# gaufit-specific
-	set values_($this,lsqfit) 1
-	set values_($this,anginc) 0.0
-	set values_($this,pinc) 0.0
-	set values_($this,sainc) 0.0
-	set values_($this,sbinc) 0.0
-	set values_($this,xinc) 0.0
-	set values_($this,yinc) 0.0
-	set values_($this,fitback) 1
-
-	# hsub-specific
-	set values_($this,sfact) 10
-	set values_($this,sfactflag) -1
-	set values_($this,hsubtype) 0
-	set values_($this,hsubformatted) 1	;# boolean
-
-	# selfc-specific
-	set values_($this,selfcflag) 1		;# boolean
-
-	# skew-specific
-	set values_($this,modet) 1		;# boolean
-
-	# sector-specific
-	set values_($this,fitlim1) 0
-	set values_($this,fitlim2) 20
-	set values_($this,mirror) 0		;# boolean
-	set values_($this,radisp) r
-	set values_($this,surf) 1		;# boolean
-
 	# File names
 	set values_($this,sourcefile) {}
-	set values_($this,outputndffile) {GaiaEsp_output}
-	set values_($this,outputtextfile) {GaiaEsp_outputtext}
-	set values_($this,outputstlfile) {GaiaEsp_outputstl.txt}
+	set values_($this,outputndffile) {GaiaEspResults.sdf}
+	set values_($this,outputtextfile) {GaiaEspResults.txt}
+	set values_($this,outputstlfile) {GaiaEspCat.txt}
 	set values_($this,ardfile) {}
 
 	set valuenames_ {
-angcon
-angoff
-autol
-back
-calcsd
-expert
-fwhm
-maxiter
-nsigma
-psize
-sigma
-mult
-scale
-useall
-ellprofoumethod
-autolt
-fast
-fine
-fract
-frzori
-lim1
-lim2
-lim3
-lim3flag
-zerop
-minmod
-ellprofouoriginflag
-width
-lsqfit
-anginc
-pinc
-sainc
-sbinc
-xinc
-yinc
-fitback
-fitlim1
-fitlim2
-mirror
-radisp
-surf
-sfact
-sfactflag
-hsubtype
-hsubformatted
-selfcflag
-modet
-sourcefile
-outputndffile
-outputtextfile
-outputstlfile
-ardfile
+	    angcon
+	    angoff
+	    autol
+	    back
+	    calcsd
+	    expert
+	    fwhm
+	    maxiter
+	    nsigma
+	    psize
+	    sigma
+	    ellprofoumethod
+	    autolt
+	    fast
+	    fine
+	    fract
+	    frzori
+	    lim1
+	    lim2
+	    lim3
+	    lim3flag
+	    zerop
+	    minmod
+	    ellprofouoriginflag
+	    sourcefile
+	    outputndffile
+	    outputtextfile
+	    outputstlfile
+	    ardfile
 	}
 
 	#  Record defaults so they can be restored
@@ -2568,55 +1143,6 @@ ardfile
     }
 
     #  Helper methods
-    private method toggle_angcon_ {value} {
-	set values_($this,angcon) $value
-	if { $value == 1 } {
-	    set help {Positive angles denote clockwise rotation}
-	} else {
-	    set help {Positive angles denote anti-clockwise rotation}
-	}
-	add_short_help $itk_component(angcon) "$help"
-    }
-
-    private method toggle_lsqfit_ {} {
-	set search_only {autol-gaufit anginc pinc sainc sbinc xinc yinc}
-	set lsqfit_only {fitback calcsd}
-	if { $values_($this,lsqfit) } {
-	    foreach cpt $search_only {
-		$itk_component($cpt) configure -state disabled
-	    }
-	    foreach cpt $lsqfit_only {
-		$itk_component($cpt) configure -state normal
-	    }
-	    $itk_component(maxiter) configure -text "Maximum iterations"
-	    add_short_help $itk_component(maxiter) \
-		    {maxiter: Upper-bound on iteration count}
-	} else {
-	    foreach cpt $search_only {
-		$itk_component($cpt) configure -state normal
-	    }
-	    set values_($this,fitback) 0
-	    foreach cpt $lsqfit_only {
-		$itk_component($cpt) configure -state disabled
-	    }
-	    $itk_component(maxiter) configure -text "Iteration count"
-	    add_short_help $itk_component(maxiter) \
-		    {niter: number of iterations}
-	}
-	toggle_fitback_
-    }
-
-    private method toggle_fitback_ {} {
-	if { $values_($this,fitback) } {
-	    foreach cpt "back nsigma" {
-		$itk_component($cpt) configure -state disabled
-	    }
-	} else {
-	    foreach cpt "back nsigma" {
-		$itk_component($cpt) configure -state normal
-	    }
-	}
-    }
 
     # If values_($this,expert) is now `true', then enable a set of
     # fields; if it is now `false',
@@ -2656,18 +1182,6 @@ ardfile
 	}
     }
 
-    private method toggle_isselfc_ {} {
-	if {$values_($this,selfcflag)} {
-	    $itk_component(mult-selfc) configure -state disabled
-	    add_short_help $itk_component(diag-b) \
-		{Draw a circle: expected galaxy diameter}
-	} else {
-	    $itk_component(mult-selfc) configure -state normal
-	    add_short_help $itk_component(diag-b) \
-		{Draw a circle: expected galaxy scalelength}
-	}
-    }
-
     # Return the name of a temporary file.  Do this by trying ten filenames
     # starting with the PID.  Something is amiss if this doesn't work.
     #
@@ -2702,7 +1216,9 @@ ardfile
 	}
 
 	set invoke_cmd "$itk_option(-esp_dir)/hsub"
-	set invoke_args "in=$image sfact=-1 type=0 noformatted out=$hsub_wfile_"
+	# When given the `noformatted' parameter, HSUB writes its
+	# output 
+	set invoke_args "in=$image sfact=-1 type=0 out=! outcat=$hsub_wfile_"
 
 	# Establish a control object for this task, if not already done
 	blt::busy hold $w_
@@ -2720,6 +1236,10 @@ ardfile
 	$hsub_star_app_ runwiths $invoke_args
 
 	if {$wait_for_it} {
+	    # Don't return until the application has completed.  The
+	    # method completed_bg_from_hsub_ sets the variable
+	    # hsub_semaphore_ to 0, so we wait on that happening by
+	    # using the tkwait function.
 	    set hsub_semaphore_ 1
 	    tkwait variable [scope hsub_semaphore_]
 	}
@@ -2744,7 +1264,7 @@ ardfile
 		    puts "Errors from $hsub_wfile_: [$kw error_msg]"
 		}
 	    } else {
-		puts "Can't read $hsub_wfile_: [$kw error_msg]"
+		puts stderr "Can't read $hsub_wfile_: [$kw error_msg]"
 	    }
 
 	} else {
@@ -2851,11 +1371,11 @@ ardfile
 	}
     }
 
-      # Disable a subset of the common widgets.  Argument is a list of elements
-      # in common_widgets_ which are to be disabled; others are enabled.
-      # disable_common_widgets_{} enables all,
-      # disable_common_widgets_{$common_widgets_} disables all.
-      private method disable_common_widgets_ {subset} {
+    # Disable a subset of the common widgets.  Argument is a list of elements
+    # in common_widgets_ which are to be disabled; others are enabled.
+    # disable_common_widgets_{} enables all,
+    # disable_common_widgets_{$common_widgets_} disables all.
+    private method disable_common_widgets_ {subset} {
   	foreach w $common_widgets_ {
   	    if {[lsearch $subset $w] >= 0} {
   		$itk_component($w) configure -state disabled
@@ -2863,7 +1383,7 @@ ardfile
   		$itk_component($w) configure -state normal
   	    }
   	}
-      }
+    }
 
     private method get_panel_number_ {} {
 	if {$int_panel_number_ < 0} {
@@ -2908,11 +1428,6 @@ ardfile
 		-outline $itk_option(-selection_colour)
 	$itk_option(-canvasdraw) configure \
 		-outlinecolor $itk_option(-selection_colour)
-	#if { $objectlist_ != {} } {
-	#    foreach o $objectlist_ {
-	#	$o configure -selection_colour $itk_option(-selection_colour)
-	#    }
-	#}
     }
 
     #  Command to execute to create a new instance of this object.

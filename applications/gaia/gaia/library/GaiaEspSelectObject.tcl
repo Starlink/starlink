@@ -31,11 +31,19 @@
 #    Performs the given method on this widget.
 #
 #  Copyright:
-#    Copyright 1999, Central Laboratory of the Research Councils
+#    Copyright 2000, Central Laboratory of the Research Councils
 #
 #  Author:
 #    NG: Norman Gray (Starlink, Glasgow)
 #    {enter_new_authors_here}
+#
+#  Notes:
+#
+#    There are methods in here to select and update both squares and
+#    sectors.  These were required for an early version of this
+#    toolkit, which implemented several of the ESP tools, but they're
+#    not used at present (in the version of the toolbox which only
+#    provides the ELLPRO/FOU interface).
 #
 #  History:
 #    01-NOV-1999 (NG):
@@ -106,12 +114,6 @@ itcl::class gaia::GaiaEspSelectObject {
     # when an object is updated
     public variable update_callback {} {}
 
-    #  Colour of selection shapes
-    #public variable selection_colour white {
-	#puts "selection colour now $selection_colour"
-	#$canvasdraw configure -outlinecolor $selection_colour
-	##$canvasdraw itemconfigure esp_sel -outline $selection_colour
-    #}
     itk_option define -selection_colour selection_colour Selection_colour {white} {
 	$canvasdraw configure -outlinecolour $itk_option(-selection_colour)
     }

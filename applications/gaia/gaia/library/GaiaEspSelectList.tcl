@@ -36,7 +36,7 @@
 #    None
 #
 #  Copyright:
-#    Copyright 1999, Central Laboratory of the Research Councils
+#    Copyright 2000, Central Laboratory of the Research Councils
 #
 #  Author:
 #    NG: Norman Gray (Starlink, Glasgow)
@@ -161,12 +161,9 @@ body gaia::GaiaEspSelectList::default_config {} {
     set maxobjects 0
 }
 
-# Set a configuration option for all objects.  Note that it is
-# important to make sure that the object is drawn, using sync,
-# before applying the update.
+# Set a configuration option for all objects.
 body gaia::GaiaEspSelectList::config_all {item value} {
     foreach o $object_list_ {
-	#$o sync
 	$o configure -$item $value
     }
 }

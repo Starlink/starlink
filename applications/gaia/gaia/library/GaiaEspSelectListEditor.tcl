@@ -36,7 +36,7 @@
 #    This widget inherits itk::Widget and gaia::GaiaEspSelectList.
 #
 #  Copyright:
-#    Copyright 1999, Central Laboratory of the Research Councils
+#    Copyright 2000, Central Laboratory of the Research Councils
 #
 #  Author:
 #    NG: Norman Gray (Starlink, Glasgow)
@@ -226,10 +226,11 @@ body gaia::GaiaEspSelectListEditor::remake_table_ {} {
 # Delete a source from the canvas, the table, and the object_list_
 # The elements in the table are in the same order as the elements in 
 # object_list_ (maintained so by update_source_).
+#
 # Could also delete object when they are selected on the canvas, using
 # [$canvasdraw selected_items], but this seems less good, since
-# they're less obviously selected, and so are more likely to be
-# deleted accidentally.
+# they're less obviously selected, and so there's a greater danger of
+# them being deleted accidentally.
 body gaia::GaiaEspSelectListEditor::delete_source {} {
     set dlist [$itk_component(objlist) get_selected_with_rownum]
     if {[llength $dlist] == 0} {
@@ -238,7 +239,6 @@ body gaia::GaiaEspSelectListEditor::delete_source {} {
 	# go through the list is descending order, so we remove items from
 	# object_list_ from the end
 	set sdlist [lsort -decreasing $dlist]
-	puts "Editor: dlist=$dlist  sdlist=$sdlist"
 	foreach row $sdlist {
 	    set rownum [lindex $row 0]
 	    set rowval [lindex $row 1]
@@ -276,7 +276,4 @@ body gaia::GaiaEspSelectListEditor::reset {} {
 
     # clear the table by remaking it with the newly empty objectlist
     remake_table_
-
-    # Finally, close the window
-    #close_window
 }
