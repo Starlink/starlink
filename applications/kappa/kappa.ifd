@@ -12668,7 +12668,7 @@ iraf! {
          parameter mapping {
             type FILENAME
             ppath CURRENT DEFAULT
-            prompt {A file containing the Mapping}
+            prompt {A file containing the Mapping, or null}
             default !
             helpkey *
          }
