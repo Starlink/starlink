@@ -124,6 +124,7 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.ndx...
   [javadoc] Loading source files for package uk.ac.starlink.table...
   [javadoc] Loading source files for package uk.ac.starlink.table.join...
+  [javadoc] Loading source files for package uk.ac.starlink.table.storage...
   [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
@@ -1868,7 +1869,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 118 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 125 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -1964,7 +1965,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -2151,7 +2151,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -2351,4 +2350,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 21 seconds
+Total time: 5 minutes 28 seconds

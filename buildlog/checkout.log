@@ -8658,12 +8658,14 @@ U java/source/table/src/main/uk/ac/starlink/table/RowListStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowPermutedStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowRandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/RowStore.java
 U java/source/table/src/main/uk/ac/starlink/table/RowSubsetStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableWriter.java
+U java/source/table/src/main/uk/ac/starlink/table/StoragePolicy.java
 U java/source/table/src/main/uk/ac/starlink/table/TableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/TableCopy.java
 U java/source/table/src/main/uk/ac/starlink/table/TableFormatException.java
@@ -8731,6 +8733,14 @@ U java/source/table/src/main/uk/ac/starlink/table/join/RowMatcher.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowRef.java
 U java/source/table/src/main/uk/ac/starlink/table/join/SphericalPolarMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/TextProgressIndicator.java
+cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/storage
+U java/source/table/src/main/uk/ac/starlink/table/storage/Codec.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/ColumnWidth.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/DiskRowStore.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/ListRowStore.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/NioDataInput.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/Offsets.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/SeekableDataInput.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 cvs checkout: Updating java/source/table/src/resources
 cvs checkout: Updating java/source/table/src/resources/uk

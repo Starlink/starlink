@@ -395,7 +395,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 118 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 125 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -878,4 +878,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 16 seconds
+Total time: 3 minutes 56 seconds

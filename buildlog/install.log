@@ -449,7 +449,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/table
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 118 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 125 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -1125,4 +1125,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 11 seconds
+Total time: 4 minutes 13 seconds
