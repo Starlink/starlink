@@ -472,9 +472,11 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = c1_com me_com ira_par ira_com ira_err ctm_com \
-                   ctm_par fts_par hlpcmd sft_com kpg_ast kpg_par \
-                   grf.h grecom.inc grerr $(I_NDG)
+PRIVATE_INCLUDES = $(I_KAPPA) $(I_NDG)
+
+I_KAPPA = c1_com me_com ira_par ira_com ira_err ctm_com \
+          ctm_par fts_par hlpcmd sft_com kpg_ast kpg_par \
+          grf.h grecom.inc grerr 
 
 I_NDG = ndg_com ndg_const ndg_err
 
@@ -1042,7 +1044,7 @@ TRN_PAR:     $(STAR_INC)/trn_par;     $(LINK) $? $@
 #  avoid "too many lefts".
 #
 $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(LINK_SCRIPT) $(ICL_SCRIPT) \
-$(PRIVATE_INCLUDES) $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
+$(I_KAPPA) $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
 $(STYLE_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
@@ -2335,7 +2337,7 @@ strip:
 #  Rule for building the source tar files.
 $(PKG_NAME)_source.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) \
-                  $(LINK_SCRIPT) $(ICL_SCRIPT) $(PRIVATE_INCLUDES) \
+                  $(LINK_SCRIPT) $(ICL_SCRIPT) $(I_KAPPA) \
                   $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) $(STYLE_FILES)
 
 $(PKG_NAME)_iraf.tar: 
