@@ -96,8 +96,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     23 May 1996 (DJA):
+*        Added LoError and HiError invention
 *     {enter_changes_here}
 
 *  Bugs:
@@ -453,6 +455,49 @@
         IF ( .NOT. RMODE ) THEN
           WBPTR = UTIL_PLOC( BDI1_WBERR )
         END IF
+
+*  Low or high data error?
+      ELSE IF ( ((ITEM .EQ. 'LoError') .OR. (ITEM .EQ. 'HiError'))
+     :          .AND. RMODE ) THEN
+
+*    Locate variance
+        CALL BDI1_CFIND( BDID, HFID, 'Variance', .FALSE., .FALSE., CLOC,
+     :                   NDIM, DIMS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 59
+
+*    Create invented object
+        CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
+
+*    Locate the BDI private storage for the variance, creating if required
+        CALL BDI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
+
+*    Map it
+        CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                    PSID, PTR, NELM, STATUS )
+
+*    Map the invented object
+        CALL ADI_MAP( ITID, TYPE, 'WRITE', WPTR, STATUS )
+
+*    Convert to lo/hi error
+        IF ( TYPE .EQ. 'REAL' ) THEN
+          CALL BDI1_INVNT_V2ER( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+          CALL ARR_MULTR( 0.5, NELM, %VAL(WPTR), STATUS )
+        ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+          CALL BDI1_INVNT_V2ED( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+          CALL ARR_MULTD( 0.5D0, NELM, %VAL(WPTR), STATUS )
+        ELSE
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'T', TYPE )
+          CALL ERR_REP( ' ', 'Error converting variance to error '/
+     :                    /'for type ^T', STATUS )
+        END IF
+
+*    Unmap the invented object and the file data
+        CALL ADI_UNMAP( ITID, WPTR, STATUS )
+        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+
+*    Release storage
+        CALL ADI_ERASE( PSID, STATUS )
 
 *  Axis bounds?
       ELSE IF ( (ITEM(1:5).EQ.'Axis_') .AND.
