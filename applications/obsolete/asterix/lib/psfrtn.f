@@ -1518,7 +1518,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( E_AX .GT. 0 ) THEN
           CALL BDI_GETSHP( FID, ADI__MXDIM, DIMS, NDIM, STATUS )
-          CALL BDI_AXMAPR( FID, E_AX, 'Bounds', ABPTR, STATUS )
+          CALL BDI_AXMAPR( FID, E_AX, 'Bounds', 'READ', ABPTR, STATUS )
           CALL ARR_ELEM1R( ABPTR, 2*DIMS(E_AX), 1, CLO, STATUS )
           CALL ARR_ELEM1R( ABPTR, 2*DIMS(E_AX), 2*DIMS(E_AX),
      :                     CHI, STATUS )

@@ -449,7 +449,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
             CALL REBIN_WRTAXIS(OPT,MXBIN,BNDS(1,1,I),ODIM(I),
      :                      %VAL(AXVP(I)),%VAL(AXWP(I)),DIR(I),RAT(I),
      :                           %VAL(AXVPO(I)),%VAL(AXWPO(I)),STATUS)
-
+            CALL BDI_AXUNMAP(OFID,I,'Data',AXVPO(I),STATUS)
+            CALL BDI_AXUNMAP(OFID,I,'Width',AXWPO(I),STATUS)
           ENDIF
 
 *  not rebinning so copy input axis
