@@ -1,16 +1,38 @@
 #!perl
 
 use strict;
-use Test::More tests => 6;
+use Test::More;
 use Data::Dumper;
 
 require_ok( "Starlink::AST" );
 require_ok( "Starlink::AST::PGPLOT" );
 
-use PGPLOT;
 use File::Spec;
-use Astro::FITS::CFITSIO;
-use Astro::FITS::Header::CFITSIO;
+
+BEGIN {
+ 
+ use PGPLOT;
+ eval { PGPLOT::pgbegin(0,"/xw",1,1) };
+ if ( $@ ) {
+   plan skip_all => "PGPLOT module not installed.";
+   exit;
+ } 
+ 
+ eval "use Astro::FITS::CFITSIO;";
+ if ( $@ ) {
+   plan skip_all => "Astro::FITS::CFITSIO not installed.";
+   exit;
+ }
+ 
+ eval "use Astro::FITS::Header::CFITSIO;";
+ if ( $@ ) {
+   plan skip_all => "Astro::FITS::Header::CFITSIO not installed.";
+   exit;
+ }
+ 
+ plan tests => 5;  
+ 
+};
 
 Starlink::AST::Begin();
 
@@ -31,9 +53,6 @@ isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Set up window
 # -------------
-
-is( PGPLOT::pgbegin(0,"/xw",1,1), 1, "Result from the PGBEGIN() call" );
-
 my $nx = $header->value("NAXIS1");
 my $ny = $header->value("NAXIS2");
 pgpage();
@@ -78,6 +97,7 @@ $plot->Text("Test Text 1", [0.4,0.4],[0.0,1.0],"CC");
 $plot->Text("Test Text 2", [0.5,0.5],[0.0,1.0],"CC");
 $plot->Text("Test Text 2", [0.6,0.6],[0.0,1.0],"CC");
 # Done!
+sleep(2);
 exit;
 
 sub read_file {

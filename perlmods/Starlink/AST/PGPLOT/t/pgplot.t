@@ -1,15 +1,26 @@
 #!perl
 
 use strict;
-use Test::More tests => 18;
+use Test::More;
 
-require_ok("PGPLOT");
+BEGIN {
+ use PGPLOT;
+ 
+ # pgbegin( $unit, $file, $nxsub, $nysub );
+ eval { PGPLOT::pgbegin(0,"/xw",1,1) };
+ if ( $@ ) {
+   plan skip_all => "PGPLOT module not installed.";
+   exit;
+ } else {
+   plan tests => 16;
+ }  
+ 
+};
+
 require_ok("Starlink::AST");
 require_ok("Starlink::AST::PGPLOT");
 
-# pgbegin( $unit, $file, $nxsub, $nysub );
 # pgenv( $xmin, $xmax, $ymin, $ymax, $axis_scaling, $axis_type );
-is( PGPLOT::pgbegin(0,"/xw",1,1), 1, "Calling PGBEGIN()" );
 PGPLOT::pgenv(0,10,0,10,0,0);
 
 my ( @x, @y );
@@ -74,4 +85,5 @@ is( Starlink::AST::PGPLOT::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 is( Starlink::AST::PGPLOT::_GFlush(), 1, "Calling _GFlush()" );
 
 # Done!
+sleep(1);
 exit;

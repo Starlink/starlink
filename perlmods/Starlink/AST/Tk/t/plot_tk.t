@@ -1,17 +1,44 @@
 #!perl
 
 use strict;
-use Test::More tests => 5;
+use Test::More;
 use Data::Dumper;
-use Tk;
-use Tk::JPEG;
 
 require_ok("Starlink::AST");
 require_ok("Starlink::AST::Tk");
 
 use File::Spec;
-use Astro::FITS::CFITSIO;
-use Astro::FITS::Header::CFITSIO;
+
+BEGIN {
+
+ use Tk;
+ eval "use Tk::Button";
+ if ( $@ ) {
+   plan skip_all => "Tk modules not installed";
+   exit;
+ } 
+
+ eval "use Tk::JPEG;";
+ if ( $@ ) {
+   plan skip_all => "Tk::JPEG modules not installed";
+   exit;
+ }
+ 
+ eval "use Astro::FITS::CFITSIO; ";
+ if ( $@ ) {
+   plan skip_all => "Astro::FITS::CFITSIO not installed.";
+   exit;
+ } 
+
+ eval "use Astro::FITS::Header::CFITSIO;";
+ if ( $@ ) {
+   plan skip_all => "Astro::FITS::Header::CFITSIO not installed.";
+   exit;
+ }
+ 
+ plan tests => 5;    
+ 
+};
 
 Starlink::AST::Begin();
 

@@ -1,11 +1,23 @@
 #!perl
 
 use strict;
-use Test::More tests => 7;
-use Tk;
+use Test::More;
 
 require_ok("Starlink::AST");
 require_ok("Starlink::AST::Tk");
+
+
+BEGIN {
+
+ use Tk;
+ eval "use Tk::Button;";
+ if ( $@ ) {
+   plan skip_all => "Tk modules not installed";
+   exit;
+ } else {
+   plan tests => 7;
+ }
+};   
 
 # create Tk test harness
 my $c = create_window();
