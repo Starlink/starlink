@@ -98,7 +98,7 @@ void ADIcnvNew( ADIclassDef *from, ADIclassDef *to,
 #define _start_c_tr(_prefix,_data) \
   if ( _prefix##_nterm ) _prefix##dptr = (char **) _data; \
   else if ( _prefix##_is_adi ) _prefix##sptr = (ADIstring *) _data; \
-  else _prefix##ptr = (char *) _data
+  else _prefix##ptr = (char *) _data;
 
 #define _setbuf_c_tr(_prefix) \
     if ( _prefix##_nterm ) \
@@ -106,7 +106,7 @@ void ADIcnvNew( ADIclassDef *from, ADIclassDef *to,
     else if ( _prefix##_is_adi ) \
       {_prefix##_buf=_prefix##sptr->data;_prefix##_blen=_prefix##sptr->len;} \
     else \
-      _prefix##_buf = _prefix##ptr
+      _prefix##_buf = _prefix##ptr;
 
 #define _coppad_c_tr(_pref,_source) \
   {char *sptr;int ic; \

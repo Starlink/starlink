@@ -602,8 +602,21 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
 	      else
 		npr = prec;
 	      }
-	    if ( npr )
-	      ADIstrmPutInt( dev, sdata->data, npr, status );
+	    if ( npr ) {
+	      char	*sptr = sdata->data;
+	      int	np = npr;
+
+	      while ( np ) {
+		char   ch = *sptr++;
+		if ( dev->bnc == (dev->bufsiz-1) )
+		  ADIstrmFlushDev( dev, status );
+		if ( ch < ' ' )
+		  dev->buf[dev->bnc++] = '.';
+		else
+		  dev->buf[dev->bnc++] = ch;
+		np--;
+		}
+	      }
 	    break;
 	  case 'd':
 	    i_arg = va_arg(ap,int);
@@ -839,8 +852,9 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
 	    fgets( str->dev->buf, str->dev->bufsiz, stdin );
 	    if ( feof(stdin) )
 	      ADIdropDevice( stream, status );
-	    else
-	      gotit = ADI__true;
+	    else {
+	      ch = *(str->dev->ptr++); gotit = ADI__true;
+	      }
 	    }
 	  break;
 	}

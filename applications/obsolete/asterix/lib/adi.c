@@ -65,15 +65,9 @@
  *
  *     - Generic Functions
  *
- *    To test :
- *
- *     Check C <-> Fortran logical translation
- *     Character array copying ok?
- *
- *    Bugs :
- *
  *    To be done :
  *
+ *     printer precision & width to be done
  *     free list created in method lookup
  *     grouping of identifiers
  *     distinguish annuling and erasing?
@@ -122,6 +116,7 @@
 #include "adiparse.h"
 #include "adicface.h"
 #include "aditable.h"
+#include "adiexpr.h"
 #include "adifsys.h"
 #include "adisyms.h"
 #include "adierror.h"
@@ -1048,11 +1043,11 @@ ADIobj ADIdefClassLocMember( ADIobj memlist, char *name, int nlen,
       curm = mdata->next;
     }
 
-  return found ? curm : ADI__nullid;
+  return found && _ok(status) ? curm : ADI__nullid;
   }
 
 
-ADIobj ADIdefClassCopyMember( ADIobj pmem, ADIobj *members,
+ADIobj ADIdefClassCopyMember( ADIobj pmem,
 			      ADIobj **ipoint, ADIstatus status )
   {
   ADIobj        newid;                  /* The new member definition */
@@ -1333,7 +1328,7 @@ void ADIparseClassSupers( ADIobj pstream, ADIobj *supers,
 
 /* Loop over all slots of the superclass */
     for( pmem = ptdef->members; _valid_q(pmem); pmem = _mdef_next(pmem) )
-      (void) ADIdefClassCopyMember( pmem, members, &mnext, status );
+      (void) ADIdefClassCopyMember( pmem, &mnext, status );
 
 /* Next superclass in list */
     curp = _pdef_next(curp);
@@ -1830,6 +1825,7 @@ void adi_init( ADIstatus status )
     adic_defcls( "ADIbase", "", "ADIlink", &DsysADIbase, status );
 
 /* Install file system data extensions */
+    ADIetnInit( status );
     ADIfsysInit( status );
     }
 
@@ -3459,13 +3455,12 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
 
       if ( ! value_only )
 	ADIstrmPrintf( stream, "%s", status, tdef->name );
-/*      if ( ! _han_set(id) )
-	{
+      if ( tdef->prim && ! _han_set(id) ) {
 	if ( ! value_only )
-	  printf( ", " );
-	printf( "not set" );
-	}
-      else */ if ( tdef->prnt ) {
+	  ADIstrmPrintf( stream, ", ", status );
+	ADIstrmPrintf( stream, "<not set>", status );
+        }
+      else if ( tdef->prnt ) {
 	if ( ! value_only )
 	  ADIstrmPrintf( stream, ", ", status );
 	(*tdef->prnt)( stream, id, status );
@@ -3668,7 +3663,11 @@ void adix_cputid( ADIobj id, char *name, int nlen,
 /* Find data insertion point */
   adix_locdat( &id, name, nlen, DA__CREATE, &mid, &parid, status );
 
-  if ( _null_q(*mid) )                  /* Set object slot */
+/* Located ok? */
+  if ( _ok(status) ) {
+
+/* Set object slot */
+  if ( _null_q(*mid) )
     *mid = value;
   else {
     adix_erase( mid, 1, status );
@@ -3676,8 +3675,9 @@ void adix_cputid( ADIobj id, char *name, int nlen,
     }
 
 /* Set parent object if the data being written is a handled object */
-  if ( _valid_q(parid) && _han_q(value) )
-    _han_pid(value) = parid;
+    if ( _valid_q(parid) && _han_q(value) )
+      _han_pid(value) = parid;
+    }
   }
 
 void adix_cputiid( ADIobj id, ADIobj name, ADIobj value, ADIstatus status )
