@@ -201,7 +201,7 @@ dist:
 
 install:
 [loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 76 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 78 files to /apps/cvsbuild/starjava/docs
      [echo] Executing DIVA target: install
 
 prepare:
@@ -223,7 +223,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
@@ -946,4 +945,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 49 seconds
+Total time: 5 minutes 23 seconds

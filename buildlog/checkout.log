@@ -7732,6 +7732,7 @@ U java/source/jniast/src/ast/frame.c
 U java/source/jniast/src/ast/frameset.c
 U java/source/jniast/src/ast/grf.h
 U java/source/jniast/src/ast/grismmap.c
+U java/source/jniast/src/ast/keymap.c
 U java/source/jniast/src/ast/lutmap.c
 U java/source/jniast/src/ast/mapping.c
 U java/source/jniast/src/ast/mathmap.c
@@ -7741,6 +7742,7 @@ U java/source/jniast/src/ast/pcdmap.c
 U java/source/jniast/src/ast/permmap.c
 U java/source/jniast/src/ast/plot.c
 U java/source/jniast/src/ast/polymap.c
+U java/source/jniast/src/ast/ratemap.c
 U java/source/jniast/src/ast/shiftmap.c
 U java/source/jniast/src/ast/skyframe.c
 U java/source/jniast/src/ast/slamap.c
@@ -7768,6 +7770,7 @@ U java/source/jniast/src/jni/FrameSet.c
 U java/source/jniast/src/jni/GrfEscape.c
 U java/source/jniast/src/jni/GrismMap.c
 U java/source/jniast/src/jni/IntraMap.c
+U java/source/jniast/src/jni/KeyMap.c
 U java/source/jniast/src/jni/LutMap.c
 U java/source/jniast/src/jni/Mapping.c
 U java/source/jniast/src/jni/MathMap.c
@@ -7776,6 +7779,7 @@ U java/source/jniast/src/jni/PcdMap.c
 U java/source/jniast/src/jni/PermMap.c
 U java/source/jniast/src/jni/Plot.c
 U java/source/jniast/src/jni/PolyMap.c
+U java/source/jniast/src/jni/RateMap.c
 U java/source/jniast/src/jni/ShiftMap.c
 U java/source/jniast/src/jni/SkyFrame.c
 U java/source/jniast/src/jni/SlaMap.c
@@ -7826,6 +7830,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/FrameSet.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Grf.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/GrismMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/IntraMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/KeyMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/LutMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Mapping.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/MathMap.java
@@ -7835,6 +7840,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/PcdMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/PermMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Plot.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/PolyMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/RateMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/ShiftMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyAxis.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyFrame.java
@@ -7878,6 +7884,7 @@ U java/source/jniast/src/perl/Frame.pl
 U java/source/jniast/src/perl/FrameSet.pl
 U java/source/jniast/src/perl/GrismMap.pl
 U java/source/jniast/src/perl/JMaker.pm
+U java/source/jniast/src/perl/KeyMap.pl
 U java/source/jniast/src/perl/LutMap.pl
 U java/source/jniast/src/perl/Mapping.pl
 U java/source/jniast/src/perl/MathMap.pl
@@ -7886,6 +7893,7 @@ U java/source/jniast/src/perl/PcdMap.pl
 U java/source/jniast/src/perl/PermMap.pl
 U java/source/jniast/src/perl/Plot.pl
 U java/source/jniast/src/perl/PolyMap.pl
+U java/source/jniast/src/perl/RateMap.pl
 U java/source/jniast/src/perl/ShiftMap.pl
 U java/source/jniast/src/perl/SkyFrame.pl
 U java/source/jniast/src/perl/SlaMap.pl
@@ -7908,6 +7916,7 @@ cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink/ast
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/AstTest.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/EscapeTest.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/KeyMapTest.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/MemoryXmlChan.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/XmlChanTest.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/alcyone.ast

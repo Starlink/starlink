@@ -68,7 +68,7 @@ check_packages:
 
 build_classes:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/classes
-    [javac] Compiling 53 source files to /apps/cvsbuild/java/source/jniast/build/classes
+    [javac] Compiling 55 source files to /apps/cvsbuild/java/source/jniast/build/classes
 
 unpack_jni:
 
@@ -491,4 +491,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 19 seconds
+Total time: 1 minute 20 seconds
