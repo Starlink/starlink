@@ -5,6 +5,8 @@
 	public "-//Starlink//DOCUMENT Summary SUN/199//EN" subdoc>
   <!entity sgmlsystem.eps system 'SGMLsystem.eps' ndata eps>
   <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif87a>
+  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.2.text'>
+  <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.text'>
   <!entity % Feature.Routinelist 'include'>
   <!entity rsqbrack ']'>
 ]>
@@ -20,7 +22,7 @@
 <docnumber>70
 
 <history>
-<version number=0 date='21-APR-1999'>Initial version
+<version number=0 date='21-APR-1999' author=ng>Initial version
 </history>
 
 <copyright>
@@ -721,7 +723,7 @@ maths, program code.
 
 <p>Discuss markup minimisation: recap tag omission, mention NET and SHORTREFs.
 
-<subsect id=str.structure>Overall structure
+<subsect id=str.structure export>Overall structure
 
 <sect id=processing export>Processing your document
 
@@ -761,9 +763,17 @@ maths, program code.
 <p>Everything, including the HTML version of the DTD in the HTML
 version of the manual
 
+<subsect id=appx.general.elementlist export>Element listing
+
+&starlinkdtddoc;
+
 <sect id=appx.programcode.dtd export>The Programcode DTD
 
 <p>The programcode DTD.
+
+<subsect id=appx.programcode.elementlist export>Element listing
+
+&programcodedtddoc;
 
 <sect id=appx.system export>The Starlink SGML system for maintainers
 
