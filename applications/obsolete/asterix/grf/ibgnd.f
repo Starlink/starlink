@@ -1613,7 +1613,7 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Variables:
-      REAL			MINR, MAXR		! Extreme radii
+      REAL			MAXR			! Extreme radii
       REAL			X0, Y0			! Centre of bgnd annuli
       REAL			XW, YW			! World coords
       REAL			R			! Off-axis angle
@@ -1647,14 +1647,12 @@
 
 *    Find extreme radius
         MAXR = VAL__MINR
-        MINR = VAL__MAXR
         DO J = 1, I_NY, I_NY-1
           DO I = 1, I_NX, I_NX-1
             CALL IMG_PIXTOWORLD( REAL(I)-0.5, REAL(J)-0.5, XW, YW,
      :                           STATUS )
             R = SQRT( (XW-X0)**2 + (YW-Y0)**2 )
             MAXR = MAX( MAXR, R )
-            MINR = MIN( MINR, R )
           END DO
         END DO
         I_BGM_X0 = X0
@@ -1662,7 +1660,7 @@
 
 *    Number of samples is radial range divided by annulus width
         CALL USI_GET0R( 'RBIN', I_BGM_RBIN, STATUS )
-        I_BGM_NSAMP =  INT((MAXR-MINR) / I_BGM_RBIN) + 1
+        I_BGM_NSAMP =  INT(MAXR / I_BGM_RBIN) + 1
 
 *    Compute sample index
         CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, X0, Y0, RBIN,
@@ -2142,7 +2140,7 @@
 *      Store sample mean
           SAMM(S) = MEAN
 
-	print *,'Sample ',s, 'mean=',samm(s),' +- ',samem(s), ' (',
+	print *,'Sample ',s, ' mean=',samm(s),' +- ',samem(s), ' (',
      :  samnp(s),' points)'
         END DO
 
@@ -2447,8 +2445,8 @@
      :                     XW2, YW2, STATUS )
 
 *  Convert worst residuals to percentages
-      MAXFR = MAXFR*1.0
-      MINFR = MINFR*1.0
+      MAXFR = MAXFR*100.0
+      MINFR = MINFR*100.0
 
 *  Write to environment
       IF ( I_GUI ) THEN
