@@ -260,9 +260,15 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C1','_CHAR',0,16,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C2','_CHAR',0,16,SID,STATUS)
+
 *  help string
         CALL NBS_DEFINE_PRIMITIVE(ID,'HELP','_CHAR',0,80,SID,STATUS)
 
+*  status of buffer and cache
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BUFFER','_INTEGER',0,VAL__NBI,
+     :                                                    SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'CACHE','_INTEGER',0,VAL__NBI,
+     :                                                    SID,STATUS)
 *  colour table
         CNAME='DATA'
         DO I=1,9
@@ -368,6 +374,8 @@
         CALL IMG_NBPUT0I('PAR_D2',0.0d0,STATUS)
         CALL IMG_NBPUT0C('PAR_C1',' ',STATUS)
         CALL IMG_NBPUT0C('PAR_C2',' ',STATUS)
+        CALL IMG_NBPUT0I('BUFFER',0,STATUS)
+        CALL IMG_NBPUT0I('CACHE',0,STATUS)
         CNAME='DATA'
         DO I=1,9
           DO J=1,9
