@@ -74,7 +74,7 @@ kps1_memou.f kps1_memsa.f kps1_memsy.f kps1_memtr.f opus.f \
 tropus.f uget.f uput.f
 
 GEN_F_ROUTINES = $(KPG_N_GEN:.gen=.f) $(KPG_DR_GEN:.gdr=.f) \
-	$(KPG_BDIRW_GEN:.gbdirw=.f)
+	$(KPG_BDIRW_GEN:.gbdirw=.f) $(KPG_R_GEN:.gr=.f)
 
 ## Generic
 
