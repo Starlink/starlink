@@ -284,14 +284,20 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*3		SYS			! Coord system name
       CHARACTER*1		EFORM			! Form of epoch
+      CHARACTER*3		PRJ			! Projection name
+      CHARACTER*20		RAS, DECS		! RA,DEC in strings
+      CHARACTER*3		SYS			! Coord system name
 
       DOUBLE PRECISION		EQNX, EPOCH		! Equinox & epoch
+      DOUBLE PRECISION		PNT(2)			! Pointing direction
 
+      INTEGER			NVAL			! Values read from obj
       INTEGER			PIXID			! Pixellation
       INTEGER			PRJID			! Projection
       INTEGER			SYSID			! Coord system
+
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -313,23 +319,68 @@
       CALL AIO_BLNK( OCH, STATUS )
       IF ( SYSID .NE. ADI__NULLID ) THEN
         CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
-        CALL AIO_IWRITE( OCH, 6, 'System name : '//SYS, STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'System name     : '//SYS, STATUS )
         CALL ADI_CGET0D( SYSID, 'EQUINOX', EQNX, STATUS )
         CALL MSG_SETD( 'EQNX', EQNX )
-        CALL AIO_IWRITE( OCH, 6, 'Equinox     : ^EQNX', STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'Equinox         : ^EQNX', STATUS )
         CALL ADI_CGET0C( SYSID, 'EFORM', EFORM, STATUS )
         CALL ADI_CGET0D( SYSID, 'EPOCH', EPOCH, STATUS )
         CALL MSG_SETC( 'EF', EFORM )
         CALL MSG_SETD( 'EP', EPOCH )
-        CALL AIO_IWRITE( OCH, 6, 'Epoch       : ^EF^EP', STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'Epoch           : ^EF^EP', STATUS )
       ELSE
         CALL AIO_IWRITE( OCH, 6, '* not present *', STATUS )
       END IF
       CALL AIO_BLNK( OCH, STATUS )
 
-	CALL ADI_PRINT( SYSID,STATUS)
-	CALL ADI_PRINT( PRJID,STATUS)
-	CALL ADI_PRINT( PIXID,STATUS)
+*  The projection
+      CALL AIO_IWRITE( OCH, 4, 'Coordinate reference & projection :',
+     :                 STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+      IF ( SYSID .NE. ADI__NULLID ) THEN
+
+*    Name of projection
+        CALL ADI_CGET0C( PRJID, 'NAME', PRJ, STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'Projection name : '//PRJ, STATUS )
+
+*    Axis origin
+        CALL ADI_CGET1D( PRJID, 'SPOINT', 2, PNT, NVAL, STATUS )
+        IF ( SYS(1:2) .EQ. 'FK' ) THEN
+          CALL STR_DRADTOC( PNT(1)*MATH__DDTOR, 'HHh MMm SS.SSs', RAS,
+     :                      STATUS )
+          CALL STR_DRADTOC( PNT(2)*MATH__DDTOR, 'SDDd MMm SS.Ss', DECS,
+     :                      STATUS )
+          CALL MSG_SETC( 'A', RAS )
+          CALL MSG_SETC( 'B', DECS )
+        ELSE
+          CALL MSG_SETD( 'A', PNT(1) )
+          CALL MSG_SETD( 'B', PNT(2) )
+        END IF
+        CALL AIO_IWRITE( OCH, 6, 'Axis origin : ^A ^B', STATUS )
+
+*    Centre of f.o.v
+        CALL ADI_THERE( PRJID, 'NPOINT', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET1D( PRJID, 'NPOINT', 2, PNT, NVAL, STATUS )
+          IF ( SYS(1:2) .EQ. 'FK' ) THEN
+            CALL STR_DRADTOC( PNT(1)*MATH__DDTOR, 'HHh MMm SS.SSs', RAS,
+     :                      STATUS )
+            CALL STR_DRADTOC( PNT(2)*MATH__DDTOR, 'SDDd MMm SS.Ss', DECS,
+     :                      STATUS )
+            CALL MSG_SETC( 'A', RAS )
+            CALL MSG_SETC( 'B', DECS )
+          ELSE
+            CALL MSG_SETD( 'A', PNT(1) )
+            CALL MSG_SETD( 'B', PNT(2) )
+          END IF
+          CALL AIO_IWRITE( OCH, 6, 'FOV position : ^A ^B', STATUS )
+        END IF
+
+      ELSE
+        CALL AIO_IWRITE( OCH, 6, '* not present *', STATUS )
+      END IF
+      CALL AIO_BLNK( OCH, STATUS )
+
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_WCS', STATUS )
 
