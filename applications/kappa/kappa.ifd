@@ -1964,6 +1964,14 @@ package kappa {
             default 1994.0D0
             helpkey *
           }
+         parameter iras90 {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Create an IRAS90 astrometry structure?}
+            helpkey *
+          }
          parameter lat {
             position 7
             type LITERAL
