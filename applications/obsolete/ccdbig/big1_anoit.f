@@ -48,7 +48,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! Bad values VAL__BADR
 
 *  Arguments Given:
       CHARACTER * ( * ) DTYPE
@@ -87,4 +86,4 @@
       END IF
 
       END
-* $Id: big1_anoit.f,v 1.1 1998/07/03 13:44:06 mbt Exp $
+* $Id: big1_anoit.f,v 1.2 1998/07/03 15:37:27 mbt Exp $
