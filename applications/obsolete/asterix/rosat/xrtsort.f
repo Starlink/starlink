@@ -1085,7 +1085,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
           SRT.ROOTNAME = RAWDIR(1:CHR_LEN(RAWDIR))//FIL_SEP_CH//RTNAME
 *
 * Check if any files are present
-          CALL UTIL_FINDFILE(RAWDIR,RTNAME(1:CHR_LEN(RTNAME)//'*',
+          CALL UTIL_FINDFILE(RAWDIR,RTNAME(1:CHR_LEN(RTNAME))//'*',
      &                                   MAXRAW,FILE,NFILES,STATUS)
           IF (NFILES .EQ. 0) THEN
              CALL MSG_PRNT(
@@ -1314,6 +1314,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 *    Status :
       INTEGER STATUS
 *    Local variables :
+      CHARACTER*40 UNITS(2)
+      REAL BASE(2),SCALE(2)
       REAL LOW,HIGH                             ! Range of each axis
       REAL PTOD                                 ! Pixels to degrees conversion
 *-
@@ -3015,9 +3017,10 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
          IF (STATUS.NE.SAI__OK) GOTO 999
 
 ***      Check them against the sort parameters
-         CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),%val(PTRA(2)),
-     &      %val(PTRA(3)), %val(PTRA(4)), %val(PTRA(5)), %val(PTRA(6)),
-     &      %val(PTRA(7)), NELEMS, SDATA, SDIM1, SDIM2,
+         CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),
+     &      %val(PTRA(2)),%val(PTRA(3)), %val(PTRA(4)),
+     &      %val(PTRA(5)), %val(PTRA(6)),%val(PTRA(7)),
+     &      NELEMS, SDATA, SDIM1, SDIM2,
      &      SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
      &      BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
      &      MDIM1,MDIM2,MRES,SMASK,BMASK,
