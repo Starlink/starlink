@@ -88,14 +88,22 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
  
+*  Notes:
+*     Uses the T_HOT and TARRAY parameters.
+
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2000 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     1997 March 21 (TIMJ)
 *        Original version
+*     $Log$
+*     Revision 1.6  2000/05/11 20:00:06  timj
+*     Add support for defaulting temperature values intelligently.
+*     Uses TARRAY parameter
+*
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -153,12 +161,17 @@
       PARAMETER (SCUBA__MAX_SUB = 5)
 
 *  Local Variables:
+      LOGICAL ADJUST_TCOLD       ! Have we overriden T_COLD
+      LOGICAL ARRAY              ! Use array read for T_COLD
       INTEGER BOL                ! Loop counter
       INTEGER COUNT              ! Loop counter
+      REAL    EPOCH              ! Julian epoch of observation
       INTEGER EXP_END            ! End of exposure (integration)
       INTEGER EXP_START          ! Star of exposure (integration)
       INTEGER FINISH             ! End of loop for T_COLD
+      CHARACTER * 10 FILT_NAME   ! Filter name in use
       INTEGER I                  ! Loop variable
+      CHARACTER * 20 INSTRUMENT  ! Instrument name
       INTEGER INTEGRATION        ! Loop variable
       INTEGER ITEMP              ! Temporary integer
       REAL    J_SKY_AV(SCUBA__MAX_SUB)   ! Average sky temperature
@@ -166,6 +179,7 @@
       BYTE    J_SKY_AV_QUALITY(SCUBA__MAX_SUB) ! Quality on average sky temp
       INTEGER LOAD               ! Loop variable
       INTEGER MEASUREMENT        ! Loop variable
+      DOUBLE PRECISION MJD       ! Modified Julian Date of observation
       INTEGER N_SAMP_IN          ! Number of samples passed to SKYDIP_TEMP
       INTEGER N_SUB              ! Number of sub instruments. Equivalent to
                                  ! N_BOLS
@@ -174,10 +188,13 @@
       CHARACTER*(80) STEMP       ! Temporary string
       CHARACTER*15 SUB_INSTRUMENT (SCUBA__MAX_SUB)
                                  ! sub-instruments used
+      CHARACTER*10 SUB_FILT (SCUBA__MAX_SUB) ! filters of observation
       REAL    SUB_WAVE (SCUBA__MAX_SUB) ! wavelengths of observation
       REAL    T_ASK              ! Temperature read from parameter
       REAL    T_COLD(SCUBA__MAX_SUB) ! Cold temperature
-      REAL    T_HOT              ! Temperature of the hot load
+      REAL    T_HOT (SCUBA__MAX_SUB) ! Temperature of the hot load for each sub
+      REAL    T_HOT_DELTA(SCUBA__MAX_SUB) ! Adjustment to T_HOT for each sub
+      REAL    T_HOT_FITS         ! Temperature of the hot load from FITS header
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -185,6 +202,11 @@
 *     First need to find out the wavelengths and sub-instrument name
 
       N_SUB = N_BOLS
+
+*     Get the instrument name
+      CALL SCULIB_GET_FITS_C( N_FITS, N_FITS, FITS,
+     :     'INSTRUME', INSTRUMENT, STATUS)
+      CALL CHR_UCASE( INSTRUMENT )
 
 *     Get SUB_instrument list
       STEMP = 'SUB_'
@@ -217,79 +239,267 @@
      :        STEMP, SUB_WAVE(I), STATUS)
       END DO
 
+*     Get FILTER name
+      CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
+     :     'FILTER', FILT_NAME, STATUS)
+
+*     Convert to upper case
+      CALL CHR_UCASE( FILT_NAME )
+
+
+*     Construct a filter name list. Include the w and n specifiers 
+*     as required. Does not work for 450o:850s or 850s:phot
+      STEMP = 'FILT_'
+      DO I = 1, N_SUB
+
+         ITEMP = 5
+         CALL CHR_PUTI(I, STEMP, ITEMP)
+         CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS,
+     :        STEMP, SUB_FILT(I), STATUS)
+
+*     Compare with the filter name itself and add a 'w' or 'n' as 
+*     required.
+         ITEMP = CHR_LEN(SUB_FILT(I))
+         IF (FILT_NAME .EQ. '450N:850N') THEN
+            CALL CHR_APPND('N', SUB_FILT(I), ITEMP)
+         ELSE IF (FILT_NAME .EQ. '450W:850W') THEN
+            CALL CHR_APPND('W', SUB_FILT(I), ITEMP)
+         END IF
+
+      END DO
+
 *     Read the hot load temperature from the FITS data and then
 *     get the required value from the parameter.
+*     Before 19980204 (MJD = 50848) we have to use T_AMB instead.
+*     Get the MJD
+      CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, EPOCH, STATUS)
 
-      CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 'T_HOT',
-     :  T_HOT, STATUS)
+      IF (MJD < 50848.0D0 .AND. INSTRUMENT .EQ. 'SCUBA') THEN
+         CALL MSG_OUTIF(MSG__NORM, ' ', ' Skydip taken before '//
+     :        '19980204. Using T_AMB rather than T_HOT as default.', 
+     :        STATUS)
+         CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 'T_AMB',
+     :        T_HOT_FITS, STATUS)
+      ELSE
+         CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 'T_HOT',
+     :        T_HOT_FITS, STATUS)
+      END IF
 
-      CALL PAR_DEF0R('T_HOT',T_HOT, STATUS)
-      CALL PAR_GET0R('T_HOT', T_HOT, STATUS)
+      CALL PAR_DEF0R('T_HOT', T_HOT_FITS, STATUS)
+      CALL PAR_GET0R('T_HOT', T_HOT_FITS, STATUS)
 
 *     Update the FITS entry
       CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, 'T_HOT',
-     :     T_HOT, STATUS)
+     :     T_HOT_FITS, STATUS)
 
-      
-* Read the COLD temperatures from FITS information
 
+*     Read the COLD temperatures from FITS information
+*     We now have to be clever since it is not always true that the
+*     cold load temperatures are correct. Prior to 13 March 2000
+*     the 450/850 T_COLD values stored in the header are known to 
+*     be incorrect. After that date, the colod temperatures are correct
+*     for 450W:850W but not for 450N:850N. We have no idea about the
+*     validity of the cold load temperatures for other wavelengths.
+
+*     Must also determine the hot load temperature offset to be applied.
+*     This is sub-instrument dependent in the same way as T_COLD but
+*     is a correction on the T_HOT that is stored in the header.
+
+      ADJUST_TCOLD = .FALSE.
       STEMP = 'T_COLD_'
       DO I = 1, N_SUB
          ITEMP = 7
          CALL CHR_PUTI(I, STEMP, ITEMP)
          CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, STEMP,
      :        T_COLD(I), STATUS)
+
+*     Now apply a modification to T_COLD if required
+*     Adjust T_COLD regardless of date. On 13 March 2000
+*     we changed the wide band cold temperatures.
+*     but since this does not mean that the other filters will be correct.
+*     we change everything for now.
+
+         IF (INSTRUMENT .EQ. 'SCUBA') THEN
+            IF (SUB_FILT(I) .EQ. '450W') THEN
+
+               T_COLD(I) = 95.0
+               ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
+               
+            ELSE IF (SUB_FILT(I) .EQ. '450N') THEN
+               
+               T_COLD(I) = 102.0
+               ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
+               
+            ELSE IF (SUB_FILT(I) .EQ. '850W') THEN
+               
+               T_COLD(I) = 90.0
+               ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
+               
+            ELSE IF (SUB_FILT(I) .EQ. '850N') THEN
+               
+               T_COLD(I) = 92.0
+               ADJUST_TCOLD = .TRUE. ! Indicate we have overriden default
+               
+            END IF
+
+         END IF
+            
       END DO
 
-
-* Get all the temperatures. Note that we have to change the prompt
-*     as we are asking multiple times
+*     Get all the temperatures. Note that we have to change the prompt
+*     as we are asking multiple times (unless TARRAY = TRUE)
 
 *     This bit decides on how many sub instruments we are going to ask
 *     questions about. If we are running from reduce_switch we have to
 *     process all the subinstruments. Running from SKYDIP we only need
 *     to deal with one subinstrument.
 
+*     In order to automate the setting of T_COLD from the command-line
+*     or from ORAC-DR we need to be able to specify all the cold temperatures
+*     in one go rather than looping round and anulling a parameter.
+*     This means that REDUCE_SWITCH needs to use an ARRAY parameter
+*     and SKYDIP needs to use a SCALAR. There is a backwards compatibility
+*     issue but I feel that hardly anyone runs REDUCE_SWITCH on
+
       IF (SUB_REQUIRED .EQ. 0 .OR. SUB_REQUIRED .GT. N_SUB) THEN
          START = 1
          FINISH = N_SUB
+
+*     Ask whether we want to supply numbers as an array or a set
+*     of scalars. Default to false for backwards compatibility.
+         CALL PAR_DEF0L('TARRAY', .FALSE., STATUS)
+         CALL PAR_GET0L('TARRAY', ARRAY, STATUS)
+
       ELSE
          START = SUB_REQUIRED
          FINISH = SUB_REQUIRED
+         ARRAY = .FALSE.
       END IF
+
+*     Now need to calculate the override of T_HOT for each sub-instrument
+*     Do it here since we are printing output from each sub-instrument
+*     and we only want to do that if the sub-inst is selected.
+*     This varies with sub-instrument so we have to adjust after the
+*     value has been supplied (not modifying the default, just storing
+*     the offset). This is because T_HOT is not an array value.
+*     Separate this from the T_COLD code since it may have a different
+*     time scale to the T_COLD adjustment (this will always be required
+*     (modulo BOLOCAM) whereas the T_COLD adjustment will be removable
+*     after a certain date. (and the adjustment is only wavelength 
+*     dependent, not filter dependent)
+*     Generate an array of T_HOT
+*     This works because START=1 for SKYDIP and REDUCE_SWITCH
+*     (If it didnt we would have a problem since the early members
+*     would contain undefined values)
+*     Do it here since we need START/FINISH. We also want these messages
+*     to appear before the warning messages re T_COLD (and before T_COLD
+*     is requested) so that T_HOT is dealt with (from the users perspective)
+*     before moving on to T_COLD
 
       DO I = START, FINISH
 
-*     Set the default value
-         CALL PAR_DEF0R(PARAM, T_COLD(I), STATUS)
+         CALL MSG_SETC('SUB', SUB_INSTRUMENT(I))
 
+         IF (SUB_FILT(I)(1:3) .EQ. '450') THEN
+
+            T_HOT_DELTA(I) = -3.0
+            CALL MSG_SETR('T', T_HOT_DELTA(I))
+            CALL MSG_OUTIF(MSG__NORM, ' ', ' Hot load temperature for'//
+     :           ' sub ^SUB will be changed by ^T K', STATUS)
+
+         ELSE IF (SUB_FILT(I)(1:3) .EQ. '850') THEN
+
+            T_HOT_DELTA(I) = -1.0
+            CALL MSG_SETR('T', T_HOT_DELTA(I))
+            CALL MSG_OUTIF(MSG__NORM, ' ', ' Hot load temperature for'//
+     :           ' sub ^SUB will be changed by ^T K', STATUS)
+            
+         ELSE
+
+            T_HOT_DELTA(I) = 0.0
+
+         END IF
+
+*     Calculate T_HOT for this sub
+         T_HOT(I) = T_HOT_FITS + T_HOT_DELTA(I)
+
+      END DO
+
+*     Print informative message to indicate that we have overriden
+*     header values
+*     Print this after T_HOT has been corrected so as not to confuse
+*     the user with warning messages coming out in the wrong order.
+      IF (ADJUST_TCOLD) THEN
+
+         CALL MSG_OUTIF(MSG__NORM, ' ', ' Reading default T_COLD '//
+     :        'from a lookup table rather than '//
+     :        'from the FITS header', STATUS)
+
+      END IF
+
+
+*     Now, depending on the ARRAY logical we loop over sub-instruments
+*     or we read all the values in one go
+      IF (ARRAY) THEN
+
+*     Print out message indicating the required order of the temperatures
+         CALL MSG_OUTIF(MSG__NORM,' ','Order of sub-instruments with '//
+     :        'current cold temps:', STATUS)
+         DO I = START, FINISH
+            CALL MSG_SETC('SUB', SUB_INSTRUMENT(I))
+            CALL MSG_SETR('T_COLD', T_COLD(I))
+            CALL MSG_OUTIF(MSG__NORM, ' ', '  ^SUB  - ^T_COLD K', 
+     :           STATUS)
+         END DO
+
+*     Calculate how many we want to read
+         I = FINISH - START + 1
+
+*     Now set the default values
+         CALL PAR_DEF1R( PARAM, I, T_COLD, STATUS)
+
+*     Now read the required number of values from the parameter
+*     Currently assume that START = 1 since we would have to shift
+*     the offset of the array otherwsie using %LOC
+
+         IF (START .NE. 1 .AND. STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI('I', START)
+            CALL ERR_REP(' ','SCULIB_CALC_SKYDIP_TEMPS: Start '//
+     :           'index must be 1 but is ^I. Serious error.',
+     :           STATUS)
+         END IF
+
+         CALL PAR_EXACR(PARAM, I, T_COLD, STATUS)
+
+      ELSE 
+
+         DO I = START, FINISH
+
+*     Set the default value
+            CALL PAR_DEF0R(PARAM, T_COLD(I), STATUS)
 
 *     Set the prompt
-         STEMP = 'Temperature of cold load for '//SUB_INSTRUMENT(I)
-         CALL PAR_PROMT(PARAM, STEMP, STATUS)
+            STEMP = 'Temperature of cold load for '//SUB_INSTRUMENT(I)
+            CALL PAR_PROMT(PARAM, STEMP, STATUS)
 
 *     Get the parameter value and unset it for next time
-         CALL PAR_GET0R (PARAM, T_ASK, STATUS )
-         CALL PAR_CANCL (PARAM, STATUS)
+            CALL PAR_GET0R (PARAM, T_ASK, STATUS )
+            CALL PAR_CANCL (PARAM, STATUS)
 
-*     Check to see if the value has changed
-*     and if it has changed then rewrite the FITS entry
+         END DO
 
-         IF (T_ASK.NE. T_COLD(I)) THEN
-            CALL MSG_SETR ('T_COLD', T_COLD(I))
-            CALL MSG_SETC ('SUB', SUB_INSTRUMENT(I))
-            CALL MSG_OUTIF(MSG__NORM,' ', 
-     :           'SKYDIP: Redefining T_COLD from ^T_COLD for sub ^SUB', 
-     :           STATUS)
-            T_COLD(I) = T_ASK
+      END IF
 
-            STEMP = 'T_COLD_'
-            ITEMP = 7
-            CALL CHR_PUTI(I, STEMP, ITEMP)
-            CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, STEMP,
-     :           T_COLD(I), STATUS)
+*     Now rewrite the FITS header since we want the selected T_COLD values
+*     to be stored in the header on exit
 
-         ENDIF
+      DO I = START, FINISH
+         STEMP = 'T_COLD_'
+         ITEMP = 7
+         CALL CHR_PUTI(I, STEMP, ITEMP)
+         CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, STEMP,
+     :        T_COLD(I), STATUS)
       END DO
 
 *     Fill the output array with bad values before filling it with good!
