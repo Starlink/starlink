@@ -2,7 +2,7 @@ INTERFACE WFCSPEC
 
   PARAMETER INP
     POSITION 1
-    TYPE    'UNIV'
+    TYPE    'LITERAL'
     PROMPT  'Input dataset name'
     PPATH   'GLOBAL,CURRENT'
     ASSOCIATION '<-GLOBAL.BINDS'
@@ -11,7 +11,7 @@ INTERFACE WFCSPEC
   ENDPARAMETER
 
   PARAMETER AUX
-    TYPE    'UNIV'
+    TYPE    'LITERAL'
     PROMPT  'Dataset which was searched to create results file'
     PPATH   'GLOBAL,CURRENT'
     VPATH   'PROMPT'
@@ -19,7 +19,7 @@ INTERFACE WFCSPEC
 
   PARAMETER OUT
     POSITION 2
-    TYPE    'UNIV'
+    TYPE    'LITERAL'
     PROMPT  'Output dataset name'
     PPATH   'CURRENT'
     VPATH   'PROMPT'
