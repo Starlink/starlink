@@ -92,11 +92,18 @@
 
 *  Local Variables:
       CHARACTER*132		CMT			! Keyword comment
+      CHARACTER*132		CVALUE			! Keyword value
 
       INTEGER			FSTAT			! FITSIO status
+      INTEGER			HID			! HDU object
+      INTEGER			IKEY			! Loop over keys
+      INTEGER			KID			! Keyword object
       INTEGER			LUN			! Logical unit number
       INTEGER			NAXES(ADI__MXDIM)	! Dimensions
       INTEGER			NAXIS			! Dimensionality
+      INTEGER			NKEY			! # of keywords
+
+      LOGICAL			COMIT			! Value committed?
 *.
 
 *  Check inherited global status.
@@ -116,11 +123,30 @@
       END IF
 
 *  Define the header
-      CALL FTPHPR( LUN, .TRUE., 8, NAXIS, NAXES, 0, 1, .TRUE., STATUS )
-      CALL FTRDEF( LUN, STATUS )
-      print *,'Committing changes to ',lun
+      FSTAT = 0
+      CALL FTPHPR( LUN, .TRUE., 8, NAXIS, NAXES, 0, 1, .TRUE., FSTAT )
+      CALL FTRDEF( LUN, FSTAT )
 
 *  Write the other keywords
+      CALL ADI2_LOCHDU( FID, ' ', HID, STATUS )
+      CALL ADI_NCMP( HID, NKEY, STATUS )
+      DO IKEY = 1, NKEY
+        CALL ADI_INDCMP( HID, IKEY, KID, STATUS )
+        CALL ADI_THERE( KID, '.COMMITTED', COMIT, STATUS )
+        IF ( .NOT. COMIT ) THEN
+          CALL ADI_GET0C( KID, CVALUE, STATUS )
+          CALL ADI_THERE( KID, '.COMMENT', THERE, STATUS )
+          IF ( THERE ) THEN
+            CALL ADI_CGET0C( KID, '.COMMENT', CMT, STATUS )
+          ELSE
+            CALL ADI2_STDCMT( KEY, CMT, STATUS )
+          END IF
+          CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
+          CALL ADI_CPUT0L( KID, '.COMMITTED', .TRUE., STATUS )
+        END IF
+        CALL ADI_ERASE( KID, STATUS )
+      END DO
+      CALL ADI_ERASE( HID, STATUS )
 
 *  Trap bad close status
       IF ( FSTAT .NE. 0 ) THEN
