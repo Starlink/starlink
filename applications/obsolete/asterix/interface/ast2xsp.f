@@ -340,7 +340,7 @@ C      END IF
       GEOMAREA = -1.0
       IF ( INDEX(INSTMNT, 'XRT') .GT. 0 ) THEN
 
-        IF ( DET(1:4) .EQ. 'PSPC' ) THEN
+        IF ( INDEX( DET,'PSPC') .NE. 0 ) THEN
 	  GEOMAREA = 1141.0
 
 *      Standard ignores for XRT/PSPC are channels 1-7
