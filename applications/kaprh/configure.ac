@@ -21,7 +21,7 @@ AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_CHECK_PROGS([ifd2star hlib generic])
+STAR_CHECK_PROGS([ifd2star hlib fgeneric])
 STAR_CHECK_PROGS(prohlp,sst)
 
 

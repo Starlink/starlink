@@ -21,7 +21,7 @@ STAR_MONOLITHS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_CHECK_PROGS([generic])
+STAR_CHECK_PROGS([fgeneric])
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 

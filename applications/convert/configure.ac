@@ -29,7 +29,7 @@ STAR_DECLARE_DEPENDENCIES([build],
    [ast chr cnf figaro fio grp hds mers ndf ndg par prm psx sae shl subpar])
 
 dnl    Need to pre-process generic code.
-STAR_CHECK_PROGS(generic)
+STAR_CHECK_PROGS(fgeneric)
 
 dnl    Progs needed for gif2ndf, ndf2gif and tiff2ndf
 STAR_CHECK_PROGS(ppmtogif)

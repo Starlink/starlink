@@ -46,7 +46,7 @@ dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    Locate the Starlink generic pre-processor.
-STAR_CHECK_PROGS(generic)
+STAR_CHECK_PROGS(fgeneric)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

@@ -22,7 +22,7 @@ AC_PROG_LIBTOOL
 STAR_MONOLITHS
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_CHECK_PROGS([ifd2star awish atclsh hlib generic])
+STAR_CHECK_PROGS([ifd2star awish atclsh hlib fgeneric])
 STAR_CHECK_PROGS(prohlp,sst)
 
 dnl    Look for tcl/tk system

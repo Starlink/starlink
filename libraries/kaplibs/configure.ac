@@ -16,7 +16,7 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-STAR_CHECK_PROGS([generic])
+STAR_CHECK_PROGS([fgeneric])
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS

@@ -23,7 +23,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
-STAR_CHECK_PROGS([hlib generic])
+STAR_CHECK_PROGS([hlib fgeneric])
 
 dnl    Conditional compile for missing symbols on Mac OSX. Using this in
 dnl    an odd way, essentially to check whether we're on a Mac. If we are
