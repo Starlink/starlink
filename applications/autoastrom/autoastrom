@@ -22,7 +22,7 @@
 
 use strict;
 
-my $VERSION = '0.0';		# %%VERSION%%
+my $VERSION = '0.4';		# %%VERSION%%
 my $RCSInfo = '$Revision$ $Date$ ';
 
 my $Usage = "$0 [OPTIONS] <NDF> or $0 --help";
@@ -57,7 +57,12 @@ my $retainwcs = undef;		# If this is defined, it gives the
                                 # the temporary files to be deleted).
 
 my $CCDcat = undef;		# If defined, a catalogue of objects
-                                # on the CCD, as obtained from SExtractor.
+                                # on the CCD, as obtained from
+                                # SExtractor.  Set only by the
+                                # debugging/testing option xxxccdcat
+
+my $NDFoverrides = undef;	# Overrides for NDFinfo.  Set only by
+                                # the debugging/testing option xxxndfinfo.
 
 my $monolithTimeout = 180;	# Timeout for monoliths.  Needs to be
                                 # larger than default 60s.
@@ -168,7 +173,7 @@ foreach (@ARGV) { push (@arglist2, $_); }
 
 
 # Examine the argument list and options (man Getopt::Long).  Option(s)
-# test-* are for testing and debugging only.
+# xxx* are for testing and debugging only.
 my %optionset = ();
 GetOptions (\%optionset,
 	    "catalogue=s",	# SkyCat name of online catalogue to use
@@ -182,10 +187,11 @@ GetOptions (\%optionset,
 	    "obsdata=s",	# source of WCS info (AST/FITS)
 	    "skycatconfig=s",	# SkyCat configuration file
 	    "temp=s",		# name of temporary directory
-	    "testccdcat=s",	# catalogue of objects on CCD
 	    "timeout=i",	# monolith timeout
 	    "verbose!",		# verbosity
 	    "version!",		# display version number
+	    "xxxccdcat=s",	# catalogue of objects on CCD
+	    'xxxndfinfo=s',	# overrides for NDFinfo
 	    )
   || wmessage 'fatal', "Can't parse options\n";
 
@@ -193,7 +199,6 @@ if (defined($optionset{help}) && $optionset{help}) {
     print "Usage: $0 [options] NDF-file\n";
     print "Options: [and defaults; if no default, value is generated]\n";
     print "\tcatalogue     SkyCat name of online catalogue to use [$esocatname]\n";
-    #print "\ttest-ccdcat   CCD catalogue\n";
     print "\thelp          Print this help\n";
     print "\tinsert        Insert WCS info into NDF at end? [", ($insertwcs ? "true" : "false"), "]\n";
     print "\tkeepfits      Retain WCS in specified file (default if empty) ['']\n";
@@ -219,7 +224,6 @@ defined($NDF) || wmessage 'fatal', "Usage: $Usage";
 $NDF =~ s/\.sdf$//;		# remove any .sdf extension
 
 $esocatname = $optionset{catalogue}	if defined ($optionset{catalogue});
-$CCDcat = $optionset{testccdcat}	if defined ($optionset{testccdcat});
 $insertwcs = $optionset{insert}		if defined ($optionset{insert});
 $retainwcs = $optionset{keepfits}	if defined ($optionset{keepfits});
 $keeptemps = $optionset{keeptemps}	if defined ($optionset{keeptemps});
@@ -231,7 +235,8 @@ $tempDir = $optionset{temp}		if defined ($optionset{temp});
 $monolithTimeout = $optionset{timeout}	if defined ($optionset{timeout});
 $verbose = $optionset{verbose}		if defined ($optionset{verbose});
 $dumpstatefile = $optionset{dump}	if defined ($optionset{dump});#-=stdout
-
+$CCDcat = $optionset{xxxccdcat}		if defined ($optionset{xxxccdcat});
+$NDFoverrides = $optionset{xxxndfinfo}	if defined ($optionset{xxxndfinfo});
 
 # Do some processing, defaulting, and checking of options.
 
@@ -283,7 +288,7 @@ if (defined($badkwd)) {
 
 
 # Start things up, set the timeout to be 30 seconds, and turn off all
-# but error messages by setting $ams->messages(0) (don't do this yet).
+# but error messages if $monolithMessages is 0.
 wmessage ('info', "Starting monoliths...");
 my $ams = new Starlink::AMS::Init(1);
 $ams->timeout($monolithTimeout);
@@ -374,6 +379,16 @@ if ($ENV{http_proxy}) {
 my $NDFinfo = ndf_info ($NDF, \%helpers, \%obsdata, $tempDir);
 wmessage ('info', "NDF <$NDF> examined OK");
 
+
+# Allow the NDFinfo fields to be overridden.  This is only for
+# debugging and testing.
+if (defined($NDFoverrides)) {
+    foreach my $ndfkw (split(',',$NDFoverrides)) {
+	my ($k,$v) = $ndfkw =~ /(.*)=(.*)/;
+	$NDFinfo->{$k} = $v;
+	printf STDERR ("OVERRIDING NDFinfo{%s}=%s\n", $k, $NDFinfo->{$k});
+    }
+}
 
 
 # Now select a source for the WCS information, and add this to the
@@ -525,7 +540,7 @@ my $moggy = Moggy->new($esocatname, $skycatconfig, $moggylocation);
 $helpers{moggy} = $moggy;
 #$moggy = Moggy->new ('dummy@home',
 #		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
-$moggy->debug('asthandler cataloguehandler');
+#$moggy->debug('asthandler cataloguehandler');
 
 
 # Obtain a catalogue covering the same part of the sky as the NDF.  We
@@ -614,16 +629,17 @@ my $iterationsleft = 7;
 # Set findofferrs and findoffminsep based on the object size
 # statistics returned from extract_objects.  Be generous in the
 # multipliers here -- the poserr returned from extract_objects is a
-# measure of only statistical error, whereas FINDOFF's error parameter
-# must try to take into account the distortion effects, too; the
-# returned objsize is something like a third of the visual extent of
-# the object (see the EXTRACTOR documentation), so multiply that up
-# generously, too.  There's no need to worry over-much about the
-# details here: pragmatism rules.
-my $findofferrs =     10*$CCDcathash->{poserr};
-my $findoffminsep =   5*$CCDcathash->{objsize};
+# measure of only statistical error, whereas when we estimate the best
+# FINDOFF error parameter to choose, we must try to take into account the
+# distortion effects, too; the returned objsize is something like a
+# third of the visual extent of the object (see the EXTRACTOR
+# documentation), so multiply that up generously, too.  There's no
+# need to worry over-much about the details here: pragmatism rules.
+my $findofferrs =     15*$CCDcathash->{poserr};
+my $findoffminsep =   10*$CCDcathash->{objsize};
 ($findoffminsep > 5*$findofferrs) || ($findoffminsep = 5*$findofferrs);
 # Other parameters
+my $findoffcomplete = 0.2;	# very tolerant -- default is 0.5
 my $lastfindofferrs = 0;	# ...and the value it had last time.
 my $findoffnmatches = 0;
 my $findoffndf =      'X';	# Ref. star pixel coordinates...
@@ -657,7 +673,8 @@ my $findofffits =     'X';	# WCS information obtained by ASTROM.
 # (and we switch between these at the end of the loop) -- if the
 # actual number of parameters is to be lowered to 6, that'll be done
 # within generate_astrom.
-my @astromnterms = (7, 9);
+my @astromnterms = (9);
+#my @astromnterms = (7, 9);
 my $ntermidx = 0;	# Index into @astromnterms
 #my $ntermidx = $#astromnterms;	# Index into @astromnterms
 
@@ -668,12 +685,12 @@ my %lastastrom;			# Hash holding the results of the last
 # $findoffmaxdisp initially the length of the shorter side of the image.  This
 # doesn't have to be exact, but it's better than not specifying it at
 # all.  Successive iterations decrease this, reasonably carefully.
-#my $findoffmaxdisp = (($NDFinfo->{dim1} < $NDFinfo->{dim2})
-#		      ? $NDFinfo->{dim1}
-#		      : $NDFinfo->{dim2});
-my $findoffmaxdisp = 2*(($NDFinfo->{dim1} > $NDFinfo->{dim2})
-			? $NDFinfo->{dim1}
-			: $NDFinfo->{dim2});
+my $findoffmaxdisp = (($NDFinfo->{dim1} < $NDFinfo->{dim2})
+		      ? $NDFinfo->{dim1}
+		      : $NDFinfo->{dim2});
+#my $findoffmaxdisp = 2*(($NDFinfo->{dim1} > $NDFinfo->{dim2})
+#			? $NDFinfo->{dim1}
+#			: $NDFinfo->{dim2});
 
 my $iterno = 0;
 while ($iterno < $iterationsleft) {
@@ -683,7 +700,10 @@ while ($iterno < $iterationsleft) {
 
     my $tfile = sprintf ("%s/%02d", $tempDir, $iterno);
 
-    # Invoke FINDOFF, returning the names of the two output files
+    # Invoke FINDOFF, returning the names of the two output files.
+    # Tolerate a rather low value of complete -- FINDOFF will find
+    # fewer matches than are `really there', since it gets bedly
+    # confused by distortion.
     wmessage ('info', "Matching position lists...");
     my ($ccdlist, $catlist, $matchworked)
       = match_positions ($CCDPack,
@@ -691,7 +711,7 @@ while ($iterno < $iterationsleft) {
 			 {error => $findofferrs,
 			  minsep => $findoffminsep,
 			  maxdisp => $findoffmaxdisp,
-			  complete => 0.3,
+			  complete => $findoffcomplete,
 			 },
 			 $tfile);
 
@@ -715,7 +735,7 @@ while ($iterno < $iterationsleft) {
 			     {error => $findofferrs,
 			      minsep => $findoffminsep,
 			      maxdisp => $findoffmaxdisp,
-			      complete => 0.3,
+			      complete => $findoffcomplete,
 			     },
 			     $tfile);
     }
@@ -763,8 +783,8 @@ while ($iterno < $iterationsleft) {
 
     # Summarise the fits we obtained.
     if ($verbose) {
-	printf STDERR ("%9s %6s %9s %22s %s\n",
-		       "n", "nterms", "centre", "q", "FITS-WCS");
+	print STDERR
+	  "        n nterms          centre               q FITS-WCS\n";
 	foreach my $k (0..$#fitdetails) {
 	    if ($fitdetails[$k]->{STATUS}) {
 		printf STDERR ("%9d %3d %12.12s %13.13s %7.7s %s\n",
