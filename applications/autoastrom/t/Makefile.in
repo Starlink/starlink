@@ -4,7 +4,7 @@
 
 #CXX=@CXX@
 #CXXFLAGS=-I.. @CXXFLAGS@
-#PERLBIN=@PERL@		# don't need -- use Starlink Perl binary
+PERLBIN=@STARPERL@
 
 all: test
 
