@@ -4,7 +4,7 @@
 *     OUTLINE
 
 *  Purpose:
-*     Draws aligned outlines of multiple NDFs.
+*     Draws aligned outlines of NDFs on a graphics display.
 
 *  Language:
 *     Starlink Fortran 77
@@ -26,15 +26,12 @@
 *     and so can, for instance, be used to check that alignment looks
 *     sensible prior to resampling and combining into a mosaic.
 *     Each outline indicates the extent of the data of the 
-*     corresponding NDF; no graphical indication is given of the value
-*     or quality of pixels.  Each outline is therefore basically
-*     rectangular in shape, though it may be distorted if the mapping
-*     between pixel and Current coordinates is nonlinear.
-*     The origin (minimum X,Y pixel value) of each outline can be
-*     marked and/or labelled with the NDF's name and/or index number
-*     (as determined by the LABEL parameter).  This label is written
-*     parallel to the X direction, or anti-parallel if the mapping
-*     between pixel and Current coordinates includes a reflection.
+*     corresponding NDF, and is therefore basically rectangular
+*     in shape, though it may be distorted if the mapping
+*     between pixel and Current coordinates is nonlinear.  The origin
+*     (minimum X,Y pixel value) of each outline can be marked and
+*     and the outline labelled with the NDF's name and/or index number
+*     (as determined by the LABMODE parameter).
 *
 *     The results are only likely to be sensible if the Current 
 *     coordinate system of all the NDFs is one in which they are all
@@ -47,7 +44,10 @@
 *     suitably registered graphics which are already on the graphics 
 *     device.  So, for instance, it is easy to overlay the outlines
 *     of a set of NDFs on a mosaic image which has been constructed 
-*     using those NDFs.
+*     using those NDFs, or to see how an undisplayed set of NDFs 
+*     would map onto one already displayed, either by a previous 
+*     invocation of OUTLINE or by a KAPPA program such as DISPLAY
+*     or CONTOUR.
 *
 *     This routine is designed for use on two-dimensional NDFs;
 *     if the NDFs presented have more than two dimensions, any extra
@@ -83,17 +83,49 @@
 *        [Current display device]
 *     IN = LITERAL (Read)
 *        A list of the NDFs whose outlines are to be drawn.
-*     LABEL = LITERAL( * ) (Read)
-*        This is an array of keywords indicating what sort of label
-*        should be written at the origin of the outlines.
+*     LABMODE = LITERAL( * ) (Read)
+*        This is a comma-separated list of keywords indicating what 
+*        sort of label should be written to label the outlines.
 *        Any combination of one or more of the following keywords may 
 *        be used:
 *           - NAME   -- The name of the NDF is written
 *           - INDEX  -- The index number of the NDF is written
-*           - DOT    -- The origin of the NDF is marked by a dot
+*           - ORIGIN -- The pixel coordinate origin of the NDF is marked
+*           - OPAQUE -- The text is written on an opaque background
 *
-*        If you do not want any of the above, use the null (!) value.
-*        ["NAME","DOT"]
+*        Unrecognised values will be ignored.  If you don't want any
+*        of these options, use the null value (!).
+*        [NAME,ORIGIN]
+*     LABPOS = LITERAL (Read)
+*        A two-character string identifying the positioning of the text 
+*        label (only used if the value of LABEL includes either "INDEX"
+*        or "NAME").  The first letter indicates the side-to-side
+*        position and the second indicates the up-and-down position
+*        in the pixel coordinates of each NDF.  Each letter must be
+*        "N", "C" or "F", for Near to the origin, Central or Far from
+*        the origin.  Normally (unless LABUP is true) the text 
+*        will be written parallel or antiparallel to the X pixel 
+*        direction for each NDF, with one edge anchored as per the 
+*        value of LABPOS in such a way that the text sits inside the 
+*        outline (if it will fit).
+*
+*        Only the first two characters are significant.
+*
+*        LABPOS normally defaults to "NN", indicating the label written
+*        next to the origin, but if LABUP is set TRUE, then it 
+*        defaults to "CC".
+*        [NN]
+*     LABUP = _LOGICAL (Read)
+*        Normally this parameter is FALSE, and each text label (as
+*        determined by LABMODE) is written parallel or anti-parallel 
+*        to the pixel X axis of the corresponding NDF.  If this
+*        parameter is set TRUE however, text will be written upright,
+*        that is, horizontal on the graphics device.  In this case
+*        the positioning algorithm may fail to place it inside the
+*        corresponding outline; it is generally not advisable to 
+*        set LABUP to TRUE unless the label is positioned in the 
+*        centre of the outline by setting LABPOS="CC".
+*        [FALSE]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -227,10 +259,12 @@
       INTEGER I                  ! Loop variable
       INTEGER INDF               ! NDF identifier
       INTEGER IPEN               ! Current pen index
+      INTEGER IX                 ! Group search index
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
       INTEGER JCOM               ! Index of common frame in global FSET
       INTEGER LBGCOL             ! Label text background colour
+      INTEGER LMGID              ! Labelling mode option GRP identifier
       INTEGER LOCOL              ! Lowest colour index available
       INTEGER LW                 ! Normal plotting line width
       INTEGER MAP                ! AST identifier for a mapping
@@ -249,16 +283,17 @@
       LOGICAL AXES               ! Draw axes?
       LOGICAL CLEAR              ! Clear the graphics device before plotting?
       LOGICAL DIFERS             ! Not all the same domain?
-      LOGICAL LABNAM             ! Use labelling NAME option?
+      LOGICAL LABDOT             ! Use labelling ORIGIN option?
       LOGICAL LABIND             ! Use labelling INDEX option?
-      LOGICAL LABDOT             ! Use labelling DOT option?
+      LOGICAL LABNAM             ! Use labelling NAME option?
+      LOGICAL LABOPQ             ! Use labelling OPAQUE option?
+      LOGICAL LABUP              ! Write labels upright on graphics device?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
       LOGICAL NOINV              ! Has coordinate system been reflected?
       REAL XCH                   ! Vertical baseline text character height
       REAL YCH                   ! Horizontal baseline text character height
       REAL UP( 2 )               ! Up direction for text
       DOUBLE PRECISION DIMOD     ! Length of the unit diagonal vector
-      DOUBLE PRECISION DOT       ! Dot product
       DOUBLE PRECISION GLBND( 2 ) ! Lower GRID-like coordinate bounds
       DOUBLE PRECISION GUBND( 2 ) ! Upper GRID-like coordinate bounds
       DOUBLE PRECISION IXUN( 4 ) ! Input X corners of the unit square 
@@ -273,16 +308,25 @@
       DOUBLE PRECISION UPOS( 2 ) ! Dummy high position
       DOUBLE PRECISION VERTEX( 5, 2 ) ! GRID-like coordinates of array corners
       DOUBLE PRECISION XADD      ! Padding in X direction
+      DOUBLE PRECISION XC        ! X coordinate of NDF grid centre
+      DOUBLE PRECISION XF        ! X coordinate of NDF grid Far edge
       DOUBLE PRECISION XHI       ! Upper X coordinate of outline
       DOUBLE PRECISION XLO       ! Lower X coordinate of outline
       DOUBLE PRECISION XMAX      ! Upper X coordinate of bounding box
       DOUBLE PRECISION XMIN      ! Lower X coordinate of bounding box
-      DOUBLE PRECISION YHI       ! Upper Y coordinate of outline
+      DOUBLE PRECISION XN        ! X coordinate of NDF grid Near edge
+      DOUBLE PRECISION XPT       ! X coordinate of text anchor position
       DOUBLE PRECISION YADD      ! Padding in Y direction
+      DOUBLE PRECISION YC        ! Y coordinate of NDF grid centre
+      DOUBLE PRECISION YF        ! Y coordinate of NDF grid Far edge
+      DOUBLE PRECISION YHI       ! Upper Y coordinate of outline
       DOUBLE PRECISION YLO       ! Lower Y coordinate of outline
       DOUBLE PRECISION YMAX      ! Upper Y coordinate of bounding box
       DOUBLE PRECISION YMIN      ! Lower Y coordinate of bounding box
+      DOUBLE PRECISION YN        ! Y coordinate of NDF grid Near edge
+      DOUBLE PRECISION YPT       ! Y coordinate of text anchor position
       CHARACTER * ( 2 ) JUST     ! Justification for text placement
+      CHARACTER * ( 2 ) LABPOS   ! Label positioning
       CHARACTER * ( 16 ) LABOPT( MAXLAB ) ! Labelling mode strings
       CHARACTER * ( 16 ) LFMT    ! Format string for text labels
       CHARACTER * ( 80 ) BUFFER  ! Line buffer for output
@@ -294,9 +338,6 @@
 *  Local data:
       DATA PAXES / 1, 2 /
       DATA BGCOL / 0 /
-      DATA LBGCOL / -1 /
-      DATA IXUN / 1D0, 0D0, 1D0, 0D0 /
-      DATA IYUN / 0D0, 1D0, 1D0, 0D0 /
 
 *.
 
@@ -313,29 +354,29 @@
       CALL AST_BEGIN( STATUS )
 
 *  Get the list of NDFs for display.
+      NNDF = 0
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, GID, NNDF, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Determine what the labelling options are required.
-      CALL PAR_CHOIV( 'LABEL', MAXLAB, 'NAME,INDEX,DOT', LABOPT, NLAB,
-     :                STATUS )
+      NLAB = 0
+      IX = 0
+      CALL ERR_MARK
+      CALL CCD1_STRGR( 'LABMODE', GRP__NOID, 0, 6, LMGID, NLAB, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          NLAB = 0
          CALL ERR_ANNUL( STATUS )
       END IF
-
-*  Set the labelling flags accordingly.
-      LABNAM = .FALSE.
-      LABIND = .FALSE.
-      LABDOT = .FALSE.
-      DO I = 1, NLAB
-         IF ( LABOPT( I ) .EQ. 'NAME' ) THEN
-            LABNAM = .TRUE.
-         ELSE IF ( LABOPT( I ) .EQ. 'INDEX' ) THEN
-            LABIND = .TRUE.
-         ELSE IF ( LABOPT( I ) .EQ. 'DOT' ) THEN
-            LABDOT = .TRUE.
-         END IF
-      END DO
+      CALL GRP_SETCS( LMGID, .FALSE., STATUS )
+      CALL GRP_INDEX( 'NAME', LMGID, 1, IX, STATUS )
+      LABNAM = IX .GT. 0
+      CALL GRP_INDEX( 'INDEX', LMGID, 1, IX, STATUS )
+      LABIND = IX .GT. 0
+      CALL GRP_INDEX( 'ORIGIN', LMGID, 1, IX, STATUS )
+      LABDOT = IX .GT. 0
+      CALL GRP_INDEX( 'OPAQUE', LMGID, 1, IX, STATUS )
+      LABOPQ = IX .GT. 0
+      CALL CCD1_GRDEL( LMGID, STATUS )
 
 *  Construct a labelling format string accordingly.
       IF ( LABNAM .AND. LABIND ) THEN
@@ -346,6 +387,39 @@
          LFMT = '^INDEX'
       ELSE
          LFMT = ' '
+      END IF
+
+*  Get label positioning and orientation options if required.
+      IF ( LFMT .NE. ' ' ) THEN
+
+*  Get label orientation option.
+         CALL PAR_GET0L( 'LABUP', LABUP, STATUS )
+
+*  If labels are to be written horizontally on the graphics device, then
+*  dynamically default the label positioning to central.
+         IF ( LABUP ) CALL PAR_DEF0C( 'LABPOS', 'CC', STATUS )
+
+*  Get and validate the label positioning option.
+         CALL PAR_GET0C( 'LABPOS', LABPOS, STATUS ) 
+         CALL CHR_UCASE( LABPOS )
+         IF ( STATUS .EQ. SAI__OK .AND. (
+     :        LABPOS( 1:1 ) .NE. 'N' .AND. LABPOS( 1:1 ) .NE. 'C' .AND.
+     :        LABPOS( 1:1 ) .NE. 'F' .OR. 
+     :        LABPOS( 2:2 ) .NE. 'N' .AND. LABPOS( 2:2 ) .NE. 'C' .AND.
+     :        LABPOS( 2:2 ) .NE. 'F' ) ) THEN
+            STATUS = SAI__ERROR
+            CALL CCD1_ERREP( 'OUTLINE_BADJUST', 'OUTLINE: LABPOS ' //
+     :                       'parameter not of form [NCF][NCF]',
+     :                       STATUS )
+            GO TO 99
+         END IF
+      END IF
+
+*  Set text background.
+      IF ( LABOPQ ) THEN
+         LBGCOL = 0
+      ELSE
+         LBGCOL = -1
       END IF
 
 *  Determine whether we will be rotating pens for different outlines.
@@ -642,7 +716,7 @@ c        CALL PGSCLP( 0 )
 
 *  Set the length of the offset vector for text labels.
       CALL PGQCS( 4, XCH, YCH )
-      OFS = XCH * 0.8D0
+      OFS = XCH * 0.7D0
 
 *  Loop for each NDF.
       DO I = 1, NNDF
@@ -680,11 +754,59 @@ c        CALL PGSCLP( 0 )
 *  Check if we need to write any text.
          IF ( LFMT .NE. ' ' ) THEN
 
-*  Calculate the transformed corners of the unit square.
+*  Set the near, centre, and far edge grid coordinates.
+            XN = 0.5D0
+            YN = 0.5D0
+            XC = 0.5D0 + DIMS( 1, I ) * 0.5D0
+            YC = 0.5D0 + DIMS( 2, I ) * 0.5D0
+            XF = 0.5D0 + DIMS( 1, I )
+            YF = 0.5D0 + DIMS( 2, I )
+
+*  Get coordinates of the text labelling reference postion, and translate
+*  the label positioning option into an AST_TEXT-friendly form.
+            IF ( LABPOS( 1:1 ) .EQ. 'N' ) THEN
+               JUST( 2:2 ) = 'L'
+               XPT = XN
+            ELSE IF ( LABPOS( 1:1 ) .EQ. 'C' ) THEN
+               JUST( 2:2 ) = 'C'
+               XPT = XC
+            ELSE IF ( LABPOS( 1:1 ) .EQ. 'F' ) THEN
+               JUST( 2:2 ) = 'R'
+               XPT = XF
+            END IF
+            IF ( LABPOS( 2:2 ) .EQ. 'N' ) THEN
+               JUST( 1:1 ) = 'B'
+               YPT = YN
+            ELSE IF ( LABPOS( 2:2 ) .EQ. 'C' ) THEN
+               JUST( 1:1 ) = 'C'
+               YPT = YC
+            ELSE IF ( LABPOS( 2:2 ) .EQ. 'F' ) THEN
+               JUST( 1:1 ) = 'T'
+               YPT = YF
+            END IF
+
+*  Set up some useful positions in NDF grid coordinates:
+*     1: reference position + X unit vector
+*     2: reference position + Y unit vector
+*     3: centre of the NDF
+*     4: reference position
+            IXUN( 1 ) = XPT + 1D0
+            IYUN( 1 ) = YPT
+            IXUN( 2 ) = XPT
+            IYUN( 2 ) = YPT + 1D0
+            IXUN( 3 ) = XC
+            IYUN( 3 ) = YC
+            IXUN( 4 ) = XPT
+            IYUN( 4 ) = YPT
+
+*  Transform the useful positions into Plot coordinates.
             CALL AST_TRAN2( PLOT, 4, IXUN, IYUN, .FALSE., OXUN, OYUN,
      :                      STATUS )
 
-*  Convert these into the X, Y and diagonal unit vectors for convenience.
+*  Convert the positions into vectors for convenience:
+*     1: X unit vector
+*     2: Y unit vector
+*     3: Vector towards the centre of the NDF
             DO J = 1, 3
                OXUN( J ) = OXUN( J ) - OXUN( 4 )
                OYUN( J ) = OYUN( J ) - OYUN( 4 )
@@ -696,32 +818,38 @@ c        CALL PGSCLP( 0 )
             NOINV = OXUN( 1 ) * OYUN( 2 ) - OYUN( 1 ) * OXUN( 2 )
      :              .GT. 0D0
 
-*  Get 'up' direction normal to which to write the text.  This the 
-*  direction of the transformed X unit vector rotated by plus or
-*  minus 90 degrees.
-            IF ( NOINV ) THEN
-               UP( 1 ) = - REAL( OYUN( 1 ) )
-               UP( 2 ) =   REAL( OXUN( 1 ) )
+*  Get 'up' direction normal to which to write the text.  This is either
+*  the graphics up directions, or the direction of the transformed X 
+*  unit vector rotated by plus or minus 90 degrees.
+            IF ( LABUP ) THEN
+               UP( 1 ) = 0.0
+               UP( 2 ) = 1.0
             ELSE
-               UP( 1 ) =   REAL( OYUN( 1 ) )
-               UP( 2 ) = - REAL( OXUN( 1 ) )
+               IF ( NOINV ) THEN
+                  UP( 1 ) = - REAL( OYUN( 1 ) )
+                  UP( 2 ) =   REAL( OXUN( 1 ) )
+               ELSE
+                  UP( 1 ) =   REAL( OYUN( 1 ) )
+                  UP( 2 ) = - REAL( OXUN( 1 ) )
+               END IF
             END IF
 
-*  Get the position of the outline origin, plus a small offset in the 
-*  direction of the transformed diagonal unit vector.
+*  If the coordinates have been reflected then we need to switch left
+*  and right for the text justification.
+            IF ( .NOT. NOINV ) THEN
+               IF ( JUST( 2:2 ) .EQ. 'L' ) THEN
+                  JUST( 2:2 ) = 'R'
+               ELSE IF ( JUST( 2:2 ) .EQ. 'R' ) THEN
+                  JUST( 2:2 ) = 'L'
+               END IF
+            END IF
+
+*  Get the position of the outline origin, plus a small padding offset
+*  towards the centre of the NDF.
             DIMOD = SQRT( OXUN( 3 ) ** 2 + OYUN( 3 ) ** 2 )
+            IF ( DIMOD .EQ. 0D0 ) DIMOD = 1D0
             TPOS( 1 ) = OXUN( 4 ) + OFS * OXUN( 3 ) / DIMOD
             TPOS( 2 ) = OYUN( 4 ) + OFS * OYUN( 3 ) / DIMOD
-
-*  Arrange for the text to sit inside the outline regardless of which
-*  direction the coordinates increase in.  This is done setting 
-*  justification so that either the bottom left or bottom right corner
-*  of the text bounding box is near the origin.
-            IF ( NOINV ) THEN
-               JUST = 'BL'
-            ELSE
-               JUST = 'BR'
-            END IF
 
 *  Construct the labelling string.
             CALL GRP_GET( GID, I, 1, NDFNAM, STATUS )

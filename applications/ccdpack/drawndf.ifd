@@ -48,7 +48,7 @@
          parameter clear {
             access READ
             type _LOGICAL
-            vpath CURRENT DEFAULT
+            vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default TRUE
             prompt {Clear display device}
@@ -88,14 +88,36 @@
             helpkey *
          }
 
-         parameter label {
+         parameter labup {
+                          # Labelling orientation
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Write text upright on graphics device?}
+            helpkey *
+         }
+
+         parameter labmode {
                             # Labelling mode
             type LITERAL
             access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default NAME DOT
-            prompt {Labelling mode (1 or more of NAME,INDEX,DOT, or NULL(!))}
+            default {NAME,ORIGIN}
+            prompt {Labelling mode (NAME,INDEX,ORIGIN,OPAQUE)}
+            helpkey *
+         }
+
+         parameter labpos {
+                            # Labelling position
+            type LITERAL
+            access READ
+            vpath DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
+            default NN
+            prompt {Label positioning (2 characters each Near Centre or Far)}
             helpkey *
          }
 
