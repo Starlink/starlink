@@ -133,7 +133,7 @@
       IF ( EP .GT. 0 ) THEN
         DP = INDEX( FSPEC(EP:), '.' )
         IF ( DP .GT. 0 ) THEN
-          DP = DP + EP
+          DP = DP + EP - 1
           IF ( CHR_SIMLR( FSPEC(DP+1:FLEN), 'sdf' ) ) THEN
             DP = 0
             FLEN = FLEN - 4
