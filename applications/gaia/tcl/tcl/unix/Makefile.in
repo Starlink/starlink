@@ -26,6 +26,7 @@ VERSION = @TCL_VERSION@
 
 prefix =	@prefix@
 exec_prefix =	@exec_prefix@
+EXEEXT=@EXEEXT@
 
 # The following definition can be set to non-null for special systems
 # like AFS with replication.  It allows the pathnames used for installation
@@ -329,7 +330,7 @@ DL_SRCS = \
 
 SRCS = $(GENERIC_SRCS) $(UNIX_SRCS)
 
-all: ${TCL_LIB_FILE} tclsh
+all: ${TCL_LIB_FILE} tclsh$(EXEEXT)
 
 # The following target is configured by autoconf to generate either
 # a shared library or non-shared library for Tcl.
@@ -350,11 +351,11 @@ tclLibObjs:
 objs: ${OBJS}
 
 
-tclsh: ${TCLSH_OBJS} ${TCL_LIB_FILE}
+tclsh$(EXEEXT): ${TCLSH_OBJS} ${TCL_LIB_FILE}
 	${CC} @LD_FLAGS@ ${TCLSH_OBJS} @TCL_BUILD_LIB_SPEC@ ${LIBS} \
 		@TCL_LD_SEARCH_FLAGS@ -o tclsh
 
-tcltest: ${TCLTEST_OBJS} ${TCL_LIB_FILE} ${BUILD_DLTEST}
+tcltest$(EXEEXT): ${TCLTEST_OBJS} ${TCL_LIB_FILE} ${BUILD_DLTEST}
 	${CC} @LD_FLAGS@ ${TCLTEST_OBJS} @TCL_BUILD_LIB_SPEC@ ${LIBS} \
 		@TCL_LD_SEARCH_FLAGS@ -o tcltest
 
@@ -369,7 +370,7 @@ xttest:  ${XTTEST_OBJS} ${GENERIC_OBJS} ${UNIX_OBJS} ${COMPAT_OBJS} \
 # "make test" won't work in the case where the compilation directory
 # isn't the same as the source directory.
 
-test: tcltest
+test: tcltest$(EXEEXT)
 	LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}; export LD_LIBRARY_PATH; \
 	SHLIB_PATH=`pwd`:${SHLIB_PATH}; export SHLIB_PATH; \
 	TCL_LIBRARY=${TOP_DIR}/library; export TCL_LIBRARY; \
@@ -417,7 +418,7 @@ gendate:
 # command is needed for the same reason (must make sure that it exists).
 
 dltest/pkg5${SHLIB_SUFFIX}: dltest/Makefile
-	if test ! -f tclsh; then $(MAKE) tclsh; else true; fi
+	if test ! -f tclsh$(EXEEXT); then $(MAKE) tclsh$(EXEEXT); else true; fi
 	cd dltest; PATH=..:${PATH} TCL_LIBRARY=../../library $(MAKE)
 
 dltest/Makefile: $(DLTEST_DIR)/configure $(DLTEST_DIR)/Makefile.in tclConfig.sh
@@ -431,7 +432,7 @@ install: install-binaries install-libraries install-man
 # some ranlibs write to current directory, and this might not always be
 # possible (e.g. if installing as root).
 
-install-binaries: $(TCL_LIB_FILE) tclsh
+install-binaries: $(TCL_LIB_FILE) tclsh$(EXEEXT)
 	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) ; \
 	    do \
 	    if [ ! -d $$i ] ; then \
@@ -446,7 +447,7 @@ install-binaries: $(TCL_LIB_FILE) tclsh
 	@(cd $(LIB_INSTALL_DIR); $(RANLIB) $(TCL_LIB_FILE))
 	@chmod 555 $(LIB_INSTALL_DIR)/$(TCL_LIB_FILE)
 	@echo "Installing tclsh"
-	@$(INSTALL_PROGRAM) tclsh $(BIN_INSTALL_DIR)/tclsh$(VERSION)
+	@$(INSTALL_PROGRAM) tclsh$(EXEEXT) $(BIN_INSTALL_DIR)/tclsh$(VERSION)$(EXEEXT)
 	@echo "Installing tclConfig.sh"
 	@$(INSTALL_DATA) tclConfig.sh $(LIB_INSTALL_DIR)/tclConfig.sh
 
@@ -529,7 +530,7 @@ Makefile: $(UNIX_DIR)/Makefile.in
 
 clean:
 	rm -f *.a *.o libtcl* core errs *~ \#* TAGS *.E a.out \
-		errors tclsh tcltest lib.exp
+		errors tclsh$(EXEEXT) tcltest$(EXEEXT) lib.exp
 	if test -f dltest/Makefile; then cd dltest; $(MAKE) clean; fi
 
 distclean: clean
@@ -1010,7 +1011,7 @@ package-common:
 	mkdir -p $(DISTDIR)/$(PACKAGE)/$(VERSION)/bin
 	sed -e "s/TCLVERSION/$(VERSION)/g" < $(UNIX_DIR)/tclsh.sh \
 		> $(DISTDIR)/$(PACKAGE)/$(VERSION)/bin/tclsh$(VERSION)
-	chmod 755 $(DISTDIR)/$(PACKAGE)/$(VERSION)/bin/tclsh$(VERSION)
+	chmod 755 $(DISTDIR)/$(PACKAGE)/$(VERSION)/bin/tclsh$(VERSION)$(EXEEXT)
 
 #
 # Build and install the architecture specific files in the dist directory.

@@ -996,10 +996,10 @@ if test -r WrongNumArgs.3; then
     rm -f Tcl_WrongNumArgs.3
     ln WrongNumArgs.3 Tcl_WrongNumArgs.3
 fi
-if test -r http.n; then
-    rm -f Http.n
-    ln http.n Http.n
-fi
+#if test -r http.n; then
+#    rm -f Http.n
+#    ln http.n Http.n
+#fi
 if test -r pkgMkIndex.n; then
     rm -f pkg_mkIndex.n
     ln pkgMkIndex.n pkg_mkIndex.n

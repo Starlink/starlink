@@ -27,6 +27,7 @@ VERSION = @TK_VERSION@
 
 prefix =		@prefix@
 exec_prefix =		@exec_prefix@
+EXEEXT=@EXEEXT@
 
 # The following definition can be set to non-null for special systems
 # like AFS with replication.  It allows the pathnames used for installation
@@ -302,7 +303,7 @@ HDRS = bltList.h \
 
 DEMOPROGS = browse hello ixset rmt rolodex square tcolor timer widget
 
-all: wish
+all: wish$(EXEEXT)
 
 # The following target is configured by autoconf to generate either
 # a shared library or non-shared library for Tk.
@@ -321,11 +322,11 @@ tkLibObjs:
 objs: ${OBJS}
 
 
-wish: $(WISH_OBJS) $(TK_LIB_FILE)
+wish$(EXEEXT): $(WISH_OBJS) $(TK_LIB_FILE)
 	$(CC) @LD_FLAGS@ $(WISH_OBJS) @TK_BUILD_LIB_SPEC@ $(LIBS) \
 		$(TK_CC_SEARCH_FLAGS) -o wish
 
-tktest: $(TKTEST_OBJS) $(TK_LIB_FILE)
+tktest$(EXEEXT): $(TKTEST_OBJS) $(TK_LIB_FILE)
 	${CC} @LD_FLAGS@ $(TKTEST_OBJS) @TK_BUILD_LIB_SPEC@ $(LIBS) \
 		$(TK_CC_SEARCH_FLAGS) -o tktest
 
@@ -338,7 +339,7 @@ xttest: test.o tkTest.o tkSquare.o $(TK_LIB_FILE)
 # "make test" won't work in the case where the compilation directory
 # isn't the same as the source directory.
 
-test: tktest
+test: tktest$(EXEEXT)
 	LD_LIBRARY_PATH=`pwd`:${TCL_BIN_DIR}:${LD_LIBRARY_PATH}; \
 	export LD_LIBRARY_PATH; \
 	SHLIB_PATH=`pwd`:${TCL_BIN_DIR}:${SHLIB_PATH}; \
@@ -365,7 +366,7 @@ install: install-binaries install-libraries install-demos install-man
 # some ranlibs write to current directory, and this might not always be
 # possible (e.g. if installing as root).
 
-install-binaries: $(TK_LIB_FILE) wish
+install-binaries: $(TK_LIB_FILE) wish$(EXEEXT)
 	@for i in $(LIB_INSTALL_DIR) $(BIN_INSTALL_DIR) ; \
 	    do \
 	    if [ ! -d $$i ] ; then \
@@ -380,7 +381,7 @@ install-binaries: $(TK_LIB_FILE) wish
 	@(cd $(LIB_INSTALL_DIR); $(RANLIB) $(TK_LIB_FILE))
 	@chmod 555 $(LIB_INSTALL_DIR)/$(TK_LIB_FILE)
 	@echo "Installing wish"
-	@$(INSTALL_PROGRAM) wish $(BIN_INSTALL_DIR)/wish$(VERSION)
+	@$(INSTALL_PROGRAM) wish$(EXEEXT) $(BIN_INSTALL_DIR)/wish$(VERSION)$(EXEEXT)
 	@echo "Installing tkConfig.sh"
 	@$(INSTALL_DATA) tkConfig.sh $(LIB_INSTALL_DIR)/tkConfig.sh
 
@@ -485,7 +486,7 @@ Makefile: $(UNIX_DIR)/Makefile.in
 
 clean:
 	rm -f *.a *.o libtk* core errs *~ \#* TAGS *.E a.out errors \
-		tktest wish config.info lib.exp
+		tktest$(EXEEXT) wish$(EXEEXT) config.info lib.exp
 
 distclean: clean
 	rm -f Makefile config.status config.cache config.log tkConfig.sh \
@@ -999,7 +1000,7 @@ package-common:
 	sed -e "s/TCLVERSION/$(TCLVERSION)/g" \
 		-e "s/TKVERSION/$(VERSION)/g" < $(UNIX_DIR)/wish.sh \
 		> $(DISTDIR)/SUNWtcl/$(TCLVERSION)/bin/wish$(VERSION)
-	chmod 755 $(DISTDIR)/SUNWtcl/$(TCLVERSION)/bin/wish$(VERSION)
+	chmod 755 $(DISTDIR)/SUNWtcl/$(TCLVERSION)/bin/wish$(VERSION)$(EXEEXT)
 
 #
 # Build and install the architecture specific files in the dist directory.

@@ -19,11 +19,14 @@ if test "${exec_prefix}" = "NONE"; then
 fi
 TK_SRC_DIR=`cd $srcdir/..; pwd`
 
+dnl need this for EXEEXT and friends
+AC_PROG_CC
+
 AC_PROG_RANLIB
 AC_ARG_ENABLE(gcc, [  --enable-gcc            allow use of gcc if available],
     [tk_ok=$enableval], [tkl_ok=no])
 if test "$tk_ok" = "yes"; then
-    AC_PROG_CC
+    : AC_PROG_CC
 else
     CC=${CC-cc}
 AC_SUBST(CC)

@@ -18,11 +18,14 @@ if test "${exec_prefix}" = "NONE"; then
 fi
 TCL_SRC_DIR=`cd $srcdir/..; pwd`
 
+dnl  For EXEEXT and friends, we must do this.
+AC_PROG_CC
+
 AC_PROG_RANLIB
 AC_ARG_ENABLE(gcc, [  --enable-gcc            allow use of gcc if available],
     [tcl_ok=$enableval], [tcl_ok=no])
 if test "$tcl_ok" = "yes"; then
-    AC_PROG_CC
+    : AC_PROG_CC
 else
     CC=${CC-cc}
 AC_SUBST(CC)
@@ -46,9 +49,9 @@ AC_CHECK_FUNCS(getcwd, , AC_DEFINE(USEGETWD))
 # Nb: if getcwd uses popen and pwd(1) (like SunOS 4) we should really
 # define USEGETWD even if the posix getcwd exists. Add a test ?
 
-AC_REPLACE_FUNCS(opendir strstr)
+AC_REPLACE_FUNCS([opendir strstr])
 
-AC_REPLACE_FUNCS(strtol tmpnam waitpid)
+AC_REPLACE_FUNCS([strtol tmpnam waitpid])
 AC_CHECK_FUNC(strerror, , AC_DEFINE(NO_STRERROR))
 AC_CHECK_FUNC(getwd, , AC_DEFINE(NO_GETWD))
 AC_CHECK_FUNC(wait3, , AC_DEFINE(NO_WAIT3))
@@ -512,8 +515,9 @@ fi
 #	   declare it.
 #--------------------------------------------------------------------
 
-AC_CHECK_FUNC(BSDgettimeofday, AC_DEFINE(HAVE_BSDGETTIMEOFDAY),
-	AC_CHECK_FUNC(gettimeofday, , AC_DEFINE(NO_GETTOD)))
+AC_CHECK_FUNC(BSDgettimeofday, AC_DEFINE(HAVE_BSDGETTIMEOFDAY),)
+AC_CHECK_FUNC(gettimeofday,,AC_DEFINE(NO_GETTOD))
+
 AC_MSG_CHECKING([for gettimeofday declaration])
 AC_EGREP_HEADER(gettimeofday, sys/time.h, AC_MSG_RESULT(present), [
     AC_MSG_RESULT(missing)
@@ -953,7 +957,7 @@ case $system in
 	# Some UNIX_SV* systems (unixware 1.1.2 for example) have linkers
 	# that don't grok the -Bexport option.  Test that it does.
 	hold_ldflags=$LDFLAGS
-	AC_MSG_CHECKING(for ld accepts -Bexport flag)
+	AC_MSG_CHECKING([for ld accepts -Bexport flag])
 	LDFLAGS="${LDFLAGS} -Wl,-Bexport"
 	AC_TRY_LINK(, [int i;], found=yes, found=no)
 	LDFLAGS=$hold_ldflags
