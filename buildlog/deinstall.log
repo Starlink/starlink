@@ -150,6 +150,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/jpcs/.jpcs.install
+     [echo] Executing StarTask target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/startask/.startask.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
@@ -195,4 +201,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 10 seconds
+Total time: 11 seconds

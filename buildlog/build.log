@@ -296,6 +296,18 @@ execute_mk_script:
      [exec]        -lcnf"
 
 build:
+     [echo] Executing StarTask target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/startask/build/classes
+    [javac] Compiling 32 source files to /apps/cvsbuild/java/source/startask/build/classes
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/startask/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/startask/lib/startask
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/startask/lib/startask
      [echo] Executing SOG target: build
 
 prepare:
@@ -462,4 +474,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 5 seconds
+Total time: 1 minute 6 seconds

@@ -150,6 +150,14 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/jpcs/build
    [delete] Deleting directory /apps/cvsbuild/java/source/jpcs/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/jpcs/docs
+     [echo] Executing StarTask target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/startask/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/startask/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/startask/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/startask/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/startask/etc
      [echo] Executing SOG target: clean
 
 clean:

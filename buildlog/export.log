@@ -733,6 +733,30 @@ create_archives:
      [gzip] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.gz
     [bzip2] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
+     [echo] Executing StarTask target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/startask-0.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/startask/startask-0.1.tar
+     [gzip] Building: /apps/cvsbuild/export/startask-0.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/startask-0.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/startask/startask-0.1.tar
      [echo] Executing SOG target: export
 
 export:
@@ -859,7 +883,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Oct 10, 2004 5:38:05 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Oct 12, 2004 5:38:47 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -867,11 +891,14 @@ docs:
   [javadoc] Constructing Javadoc information...
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+Xlib: connection to "europa:0.0" refused by server
+Xlib: No protocol specified
+
      [xslt] apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt:568:68: Error! java.lang.reflect.InvocationTargetException Cause: java.lang.reflect.InvocationTargetException
      [xslt] : Fatal Error! java.lang.NullPointerException Cause: java.lang.NullPointerException
      [xslt] Failed to process /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/topcat/build.xml:1105: Fatal error during transformation
+file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 20 minutes 58 seconds
+Total time: 21 minutes 26 seconds

@@ -620,6 +620,27 @@ dist:
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 37 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing StarTask target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/etc
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 47 files to /apps/cvsbuild/starjava/docs
      [echo] Executing SOG target: install
 
 prepare:
@@ -734,7 +755,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Oct 10, 2004 5:41:31 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Oct 12, 2004 5:41:46 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -742,11 +763,14 @@ docs:
   [javadoc] Constructing Javadoc information...
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+Xlib: connection to "europa:0.0" refused by server
+Xlib: No protocol specified
+
      [xslt] apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt:568:68: Error! java.lang.reflect.InvocationTargetException Cause: java.lang.reflect.InvocationTargetException
      [xslt] : Fatal Error! java.lang.NullPointerException Cause: java.lang.NullPointerException
      [xslt] Failed to process /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/topcat/build.xml:1105: Fatal error during transformation
+file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 3 minutes 25 seconds
+Total time: 2 minutes 58 seconds

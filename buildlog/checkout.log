@@ -6650,14 +6650,23 @@ cvs checkout: Updating java/source/jnihds/src/testcases/uk/ac/starlink/hds
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/HDSObjectTest.java
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/reduced_data1.sdf
 cvs checkout: Updating java/source/jnikappa
+U java/source/jnikappa/build.xml
 cvs checkout: Updating java/source/jnikappa/src
 cvs checkout: Updating java/source/jnikappa/src/jni
+U java/source/jnikappa/src/jni/KAPPA.c
+U java/source/jnikappa/src/jni/KAPPA_libraries
+U java/source/jnikappa/src/jni/makefile
+U java/source/jnikappa/src/jni/mk
 cvs checkout: Updating java/source/jnikappa/src/main
 cvs checkout: Updating java/source/jnikappa/src/main/uk
 cvs checkout: Updating java/source/jnikappa/src/main/uk/ac
 cvs checkout: Updating java/source/jnikappa/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/jnikappa/src/main/uk/ac/starlink/kappa
+U java/source/jnikappa/src/main/uk/ac/starlink/kappa/KAPPA.java
 cvs checkout: Updating java/source/jnikappa/src/main/uk/ac/starlink/kappa/support
+U java/source/jnikappa/src/main/uk/ac/starlink/kappa/support/contour.ifx
+U java/source/jnikappa/src/main/uk/ac/starlink/kappa/support/display.ifx
+U java/source/jnikappa/src/main/uk/ac/starlink/kappa/support/stats.ifx
 cvs checkout: Updating java/source/jpcs
 U java/source/jpcs/.properties
 U java/source/jpcs/build.xml
@@ -8668,17 +8677,61 @@ U java/source/src/etc/LICENCE.txt
 U java/source/src/etc/README
 U java/source/src/etc/tags
 cvs checkout: Updating java/source/startask
+U java/source/startask/build.xml
 cvs checkout: Updating java/source/startask/src
 cvs checkout: Updating java/source/startask/src/etc
+U java/source/startask/src/etc/policy.all
+U java/source/startask/src/etc/star_space.prop
 cvs checkout: Updating java/source/startask/src/lib
+U java/source/startask/src/lib/jini-core.jar
+U java/source/startask/src/lib/jini-ext.jar
 cvs checkout: Updating java/source/startask/src/main
 cvs checkout: Updating java/source/startask/src/main/uk
 cvs checkout: Updating java/source/startask/src/main/uk/ac
 cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink/jiniutils
+U java/source/startask/src/main/uk/ac/starlink/jiniutils/SpaceAccessor.java
+U java/source/startask/src/main/uk/ac/starlink/jiniutils/TransactionManagerAccessor.java
 cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink/startask
+U java/source/startask/src/main/uk/ac/starlink/startask/ConfirmingILFactory.java
+U java/source/startask/src/main/uk/ac/starlink/startask/ConfirmingInvocationHandler.java
+U java/source/startask/src/main/uk/ac/starlink/startask/FileDateComparator.java
+U java/source/startask/src/main/uk/ac/starlink/startask/FilenameSequencer.java
+U java/source/startask/src/main/uk/ac/starlink/startask/LineReader.java
+U java/source/startask/src/main/uk/ac/starlink/startask/Proxy.java
+U java/source/startask/src/main/uk/ac/starlink/startask/RunWS.java
+U java/source/startask/src/main/uk/ac/starlink/startask/ServerPermission.java
+U java/source/startask/src/main/uk/ac/starlink/startask/ShellRunner.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarSpaceDemo.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTask.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskAcceptance.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskClient.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskDataPack.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskDataPacket.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskException.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskFile.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskJob.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskJobList.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskReply.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskRequest.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskRequestGenerator.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskRequestId.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskRunner.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskServer.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskSetter.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarTaskURL.java
+U java/source/startask/src/main/uk/ac/starlink/startask/StarlinkService.java
+U java/source/startask/src/main/uk/ac/starlink/startask/URLFetcher.java
+U java/source/startask/src/main/uk/ac/starlink/startask/WSGUI.java
 cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink/startask/support
+U java/source/startask/src/main/uk/ac/starlink/startask/support/runMakeGIF
+U java/source/startask/src/main/uk/ac/starlink/startask/support/runPack
+U java/source/startask/src/main/uk/ac/starlink/startask/support/rundisplay
 cvs checkout: Updating java/source/startask/src/script
+U java/source/startask/src/script/runrunner
+U java/source/startask/src/script/runsetter
+U java/source/startask/src/script/url2ndf
+U java/source/startask/src/script/urlsetup
 cvs checkout: Updating java/source/table
 U java/source/table/.properties
 U java/source/table/build.xml

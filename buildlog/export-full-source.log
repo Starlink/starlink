@@ -126,6 +126,11 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+     [echo] Executing StarTask target: deinstall
+
+deinstall:
+
+real_deinstall:
      [echo] Executing SOG target: deinstall
 
 deinstall:
@@ -240,6 +245,9 @@ clean:
 
 clean:
      [echo] Executing JPCS target: clean
+
+clean:
+     [echo] Executing StarTask target: clean
 
 clean:
      [echo] Executing SOG target: clean
@@ -397,6 +405,11 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jpcs/build/java
      [copy] Copying 33 files to /apps/cvsbuild/java/source/jpcs/build/java
+     [echo] Executing StarTask target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/startask/build/java
+     [copy] Copying 35 files to /apps/cvsbuild/java/source/startask/build/java
      [echo] Executing SOG target: javadoc-sources
 
 javadoc-sources:
@@ -437,7 +450,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2164 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2232 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
