@@ -65,6 +65,20 @@ first.
 	      (loop (ipreced n)
 		    (+ inc 1))))))))
 
+(element table
+  (let ((float (attribute-string (normalize "float"))))
+    (if (and float
+	     (string=? float "float"))
+	(make environment name: "table"
+	      parameters: `(,%latex-float-spec%)
+	      (process-matching-children 'tabular)
+	      (process-matching-children 'caption))
+	(make environment brackets: '("{" "}")
+	      (make empty-command name: "SetCapType"
+		    parameters: '("table"))
+	      (process-matching-children 'tabular)
+	      (process-matching-children 'caption)))))
+
 ;; TABULAR
 ;; Supported attributes colsep, frame (in tgroup), rowsep (in row)
 ;; Unsuported: pgwide
@@ -138,8 +152,9 @@ first.
 				 (node-list->list (get-colspecs))))
 		       (if (null? def-l)
 			   res
-			   (if (= (get-column-number colspec: (car cs-l))
-				  (+ (length res) 1))
+			   (if (and (not (null? cs-l))
+				    (= (get-column-number colspec: (car cs-l))
+				       (+ (length res) 1)))
 			       (loop (append res `(,(proc-colspec (car cs-l)
 							       (car def-l))))
 				     (cdr def-l)
@@ -160,17 +175,19 @@ first.
 			       (current-node))))
 		   ;; produce a list containing #t when the (top bottom sides)
 		   ;; are to have a border
-		   (case bspec
-		     (("top")    '(#t #f #f))
-		     (("bottom") '(#f #t #f))
-		     (("topbot") '(#t #t #f))
-		     (("all")    '(#t #t #t))
-		     (("sides")  '(#f #f #t))
-		     (("none")   '(#f #f #f))
-		     (else
-		      (error (string-append
-			      "tabular: illegal frame spec ("
-			      bspec ")"))))))
+		   (if bspec
+		       (case bspec
+			 (("top")    '(#t #f #f))
+			 (("bottom") '(#f #t #f))
+			 (("topbot") '(#t #t #f))
+			 (("all")    '(#t #t #t))
+			 (("sides")  '(#f #f #t))
+			 (("none")   '(#f #f #f))
+			 (else
+			  (error (string-append
+				  "tabular: illegal frame spec ("
+				  bspec ")"))))
+		       '(#f #f #f))))	;no frame by default
 	 )
     (make environment name: "tabular"
 	  parameters: (list (string-append (if (caddr border) "|" "")
