@@ -446,7 +446,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
         CALL MSG_SETR('CHISQR',CHISQ )
         CALL MSG_SETI('NDOF',NDOF )
         CALL MSG_PRNT( 'Chi squared value of fit to mean = ^CHISQR'/
-     :L             /' with ^NDOF degrees of freedom')
+     :                 /' with ^NDOF degrees of freedom')
       END IF
 
 *  Release datasets
