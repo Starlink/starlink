@@ -112,7 +112,7 @@
           ELSEIF (MODE.EQ.'SLI') THEN
             CALL IREGION_SLICE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'GTE') THEN
-            CALL IREGION_GTE(EXCLUDE,STATUS)
+            CALL IREGION_GTE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'SHO') THEN
             CALL IREGION_SHOW(STATUS)
           ELSEIF (MODE.EQ.'LIS') THEN
@@ -649,7 +649,7 @@
 
 
 *+
-      SUBROUTINE IREGION_GTE(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_GTE(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -664,6 +664,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
@@ -678,8 +679,8 @@
 
         CALL USI_GET0R('LEV',LEV,STATUS)
 
-        CALL IREGION_GTE_SUB(LEV,%val(I_DPTR),EXCLUDE,
-     :                            %val(I_REG_PTR),STATUS)
+        CALL IREGION_GTE_SUB(LEV,%val(I_DPTR),MODE,EXCLUDE,
+     :                               %val(I_REG_PTR),STATUS)
         I_REG_TYPE='COMPLEX'
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -693,7 +694,7 @@
 
 
 *+
-      SUBROUTINE IREGION_GTE_SUB(LEV,D,EXCLUDE,REG,STATUS)
+      SUBROUTINE IREGION_GTE_SUB(LEV,D,MODE,EXCLUDE,REG,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -710,14 +711,19 @@
 *    Import :
       REAL LEV
       REAL D(I_NX,I_NY)
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
       BYTE REG(I_NX,I_NY)
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
+      CHARACTER*80 TEXT
+      REAL X,Y
+      INTEGER L
       INTEGER I,J
       BYTE FLAG
 *-
@@ -730,11 +736,51 @@
           FLAG='01'X
         ENDIF
 
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
+        ELSE
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (PIXEL( '
+        ELSE
+          TEXT(L:)=' PIXEL( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+
+
+
         DO J=1,I_NY
           DO I=1,I_NX
 
             IF (D(I,J).GE.LEV) THEN
+
               REG(I,J)=FLAG
+
+*  write each pixel allowing for line continuation
+              CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
+              CALL MSG_SETR( 'X', X)
+              CALL MSG_SETR( 'Y', Y)
+              CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
+              IF ( L .GT. 65)) THEN
+                CALL ARX_PUT(GRPID,0,TEXT(:L),STATUS)
+                TEXT = ' '
+                L = 1
+              ENDIF
+
+              IF (EXCLUDE) THEN
+                TEXT(L:)='))'
+                L=L+1
+              ELSE
+                TEXT(L:L)=')'
+              ENDIF
+
+              CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+
+
             ENDIF
 
           ENDDO
