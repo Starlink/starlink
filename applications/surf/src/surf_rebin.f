@@ -127,6 +127,15 @@
 *        This parameter sets the size of the output grid in pixels. The default
 *        values are the minimum dimensions required to display the entirety
 *        of the mapped area.
+*     USEGRD = LOGICAL (Read)
+*        Determines whether a guard ring of bolometers should be used
+*        during the weight function regridding. A guard ring simulates
+*        a ring of bolometers at the edge of the supplied data containing
+*        a value of zero volts. Default is to use a guard ring. It should be
+*        turned off if the edge of the observed dataset does not have zero
+*        flux. Currently this should also be turned off if the regridding
+*        parameters are modified (eg if WTFNRAD or SCALE are changed from
+*        their default values).
 *     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 *     WEIGHTS = LOGICAL (Read)
@@ -198,6 +207,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.59  1998/12/08 21:34:39  timj
+*     Add USEGRD parameter and make the default value be TRUE
+*
 *     Revision 1.58  1998/10/02 18:55:31  timj
 *     Change MAX_FILE to 256 (was 100)
 *
@@ -1585,7 +1597,7 @@ c
      :           '^PKG: Initialising LINEAR weighting functions',
      :           STATUS)
             CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
-            USEGRD = .FALSE.
+            USEGRD = .TRUE.
 
          ELSE IF (METHOD.EQ.'GAUSSIAN') THEN
 *     Gaussian
@@ -1594,8 +1606,14 @@ c
      :           '^PKG: Initialising GAUSSIAN weighting functions',
      :           STATUS)
             CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
-            USEGRD = .FALSE.
+            USEGRD = .TRUE.
          ENDIF
+
+*     Allow my decision for the Guard ring to be overridden with a
+*     parameter USEGRD
+
+         CALL PAR_DEF0L('USEGRD', USEGRD, STATUS)
+         CALL PAR_GET0L('USEGRD', USEGRD, STATUS)
 
       END IF
 
