@@ -26,8 +26,6 @@
 
 *    Local variables :
       CHARACTER*80           TEXT(8)    ! history text
-      CHARACTER*80           ITEXT(4)   ! name of input file
-      CHARACTER*80           OTEXT(4)   ! name of output file
       CHARACTER*80           STRING     ! Axis labels/units
       LOGICAL OK			! data valid
       LOGICAL VOK			! Data VARIANCE present
@@ -46,13 +44,11 @@
       INTEGER QPTRO	              ! quality
       INTEGER VPTRO	              ! data VARIANCE
       INTEGER I,J
-
+      INTEGER			IFILES,OFILES		! Files info
       INTEGER			IFID			! Input dataset id
       INTEGER			OFID			! Output dataset id
 
       BYTE 			MASK                    ! QUALITY mask
-      INTEGER INLINES                	! # lines input name
-      INTEGER ONLINES                	! # line output name
       LOGICAL NORM
 *-
       CALL MSG_PRNT (VERSION)
@@ -62,7 +58,7 @@
 *  Associate input dataset
       CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
-      CALL USI_NAMEI(INLINES,ITEXT,STATUS)
+      CALL USI_NAMES('I',IFILES,STATUS)
 
 * Check input dataset
       CALL BDI_CHK( IFID, 'Data', OK, STATUS )
@@ -162,9 +158,9 @@
 *  Copy and update history
       CALL HSI_COPY(IFID,OFID,STATUS)
       CALL HSI_ADD(OFID,VERSION,STATUS)
-      CALL HSI_PTXT(OFID,INLINES,ITEXT,STATUS)
-      CALL USI_NAMEO(ONLINES,OTEXT,STATUS)
-      CALL HSI_PTXT(OFID,ONLINES,OTEXT,STATUS)
+      CALL HSI_PTXTI(OFID,IFILES,.TRUE.,STATUS)
+      CALL USI_NAMES( 'O', OFILES, STATUS )
+      CALL HSI_PTXTI(OFID,OFILES,.TRUE.,STATUS)
       TEXT(1)='Axis   collapsed'
       WRITE(TEXT(1)(6:6),'(I1)') PAX
 
