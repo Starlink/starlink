@@ -34,10 +34,19 @@
 #     part of.
 #
 #     Additionally a list of packages, and tasks within each package,
-#     is written out to a second file.
+#     is written out to a second file ($taskfile).
+#
+#  Invocation:
+#     scbindex.pl [package-location package-location ...]
+#
+#  Arguments:
+#     If no arguments are specified, the program indexes all the packages
+#     under the default source directory as specified in libscb.pm 
+#     (typically /star/sources).  If any arguments are specified, 
+#     then instead these are taken as package locations.
 #
 #  Index DBM file format.
-#     The index file named $indexfile and stored as a Perl SDBM file.  
+#     The index file is named $indexfile and stored as a Perl SDBM file.  
 #     This resembles a Unix dbm(3) file and is therefore an unordered 
 #     set of (key, value) pairs.
 #
@@ -128,14 +137,10 @@ use Cwd;
 use SDBM_File;
 use libscb;
 
-#  Debug: override source directory location.
-
-$srcdir = "/local/star/src/from-ussc";
-
 #  Declarations.
 
 sub index_list;
-sub index_incdir;
+sub index_pack;
 sub index_dir;
 sub index_tar;
 sub index_hlp;
@@ -143,6 +148,7 @@ sub index_f;
 sub index_c;
 sub index_h;
 sub index_gen;
+sub indexinc_dir;
 sub indexinc_list;
 sub write_entry;
 
@@ -153,44 +159,65 @@ print "rm -rf $tmpdir\n" if $verbose;
 system "rm -rf $tmpdir" and die "Couldn't clean out $tmpdir: $?\n";
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
-#  Initialise and open index file.
+#  Read values of index file into %locate.
 
-unlink "$indexfile.pag", "$indexfile.dir";
 tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
 
-#  Index source files.
+#  If task file exists, read values from it into @tasks.
 
-chdir $srcdir or die "Couldn't enter $srcdir\n";
-index_dir "SOURCE#", ".";
-write_entry "SOURCE#", $srcdir;
+if (open TASKS, "$taskfile") {
+   my ($pack, $tasks);
+   while (<TASKS>) {
+      ($pack, $tasks) = /^ *(\S+) *: *(.*)$/;
+      ${tasks{$pack}} = [ split ' ', $tasks ];
+   }
+}
+
+#  Index packages.
+
+if (@ARGV) {
+   foreach $package_file (@ARGV) {
+      index_pack $package_file;
+   }
+}
+else {
+   $locate{'SOURCE#'} = $srcdir;
+   foreach $package_file (glob "$srcdir/*") {
+      index_pack $package_file;
+   }
+}
 
 #  Index files from include directory.
 
-chdir $incdir or die "Couldn't enter $incdir\n";
-index_incdir "INCLUDE#", ".";
+if (@ARGV == 0) {
+   indexinc_dir "INCLUDE#", $incdir;
+}
+
+$verbose = 0;
 
 #  Write checked task names out to text file.
 #  Currently, a task is identified as the text of any entry in a .hlp file
 #  for which a module of the same name exists in the same package.
 
+my $line;
 open TASKS, ">$taskfile" or die "Couldn't open $taskfile\n";
-foreach $package (sort keys %tasks) {
+foreach $pack (sort keys %tasks) {
    $npackages++;
-   print TASKS "$package:";
-   print "$package:" if $verbose;
-   foreach $task (sort @{$tasks{$package}}) {
+   $line = "$pack:";
+   foreach $task (sort @{$tasks{$pack}}) {
       if ($locate{$task}) {
          foreach $path (split ' ', $locate{$task}) {
-            if (starpack ($path) eq $package) {
-               print TASKS " $task";
-               print       " $task" if $verbose;
+            if (starpack ($path) eq $pack) {
+               $line .= " $task";
                next;
             }
          }
       }
    }
-   print TASKS "\n";
-   print       "\n" if $verbose;
+   if ($line =~ / /) {
+      print TASKS "$line\n";
+      print       "$line\n" if $verbose;
+   }
 }
 close TASKS;
 
@@ -221,6 +248,60 @@ exit;
 ########################################################################
 
 ########################################################################
+sub index_pack {
+
+#  Given the location of a package, examine all files in it and write 
+#  index entries for each indexable module.
+
+#  Arguments.
+
+   my $pack_file = shift;             #  Tar file or directory
+
+#  Get name of package.
+
+   $pack_file =~ m%^(.*/)?([^.]+)(\.tar.*)?%;
+   my ($dir, $tarext);
+   ($dir, $package, $tarext) = ($1, $2, $3);
+   print "PACKAGE: $package\n";
+   $locate{"$package#"} = $pack_file;
+
+#  If any records for this package already exist in the index, delete them.
+
+   my ($module);
+   foreach $module (keys %locate) {
+      my ($loc, @loc) = undef;
+      next unless ($locate{$module} =~ /\b$package#/);
+      foreach $loc (split ' ', $locate{$module}) {
+         push @loc, $loc unless (starpack ($loc) eq $package);
+      }
+      if (@loc) {
+         $locate{$module} = join ' ', @loc;
+      }
+      else {
+         delete $locate{$module};
+      }
+   }
+
+#  If any tasks exist for this package delete them.
+
+   $tasks{$package} = [ ];
+
+#  Perform the indexing.
+
+   if (-d $pack_file) {
+      index_dir "$package#", "$dir$package";
+   }
+   elsif ($tarext) {
+      index_tar "$package#", "$dir$package$tarext";
+   }
+   else {
+      die "Arguments must be package tar files or directories\n";
+   }
+}
+ 
+
+
+########################################################################
 sub index_list {
 
 #  Examine and index a list of source files; identify each file as a 
@@ -233,44 +314,32 @@ sub index_list {
    my $path = shift;      #  Logical pathname of current directory.
    my @files = @_;        #  Files in current directory to be indexed.
 
-#  Rephrase logical path as a package reference if it looks like it needs 
-#  doing i.e. if it starts off with the literal 'SOURCE#' followed by a 
-#  tarfile or a directory.
-
-   local $package;
-   $path =~ s%([/#>])./%$1%g;    #  Tidy up the path.
-   $path =~ s%//*%/%g;           #
-   if ($path =~ s%^SOURCE#([^./>]+)(.tar.Z>|.tar.gz>|.tar>|/)$% 
-              ($package = uc $1) . '#' %e) {
-      $tasks{$package} ||= [];
-   }
-
    my $file;
    foreach $file (@files) {
       if (-d $file) {                 #  directory.
-         index_dir $path, $file; 
+         index_dir "$path$file/", $file; 
       }
       elsif ($file =~ /\.tar\b/) {    #  tar archive (possibly compressed).
-         index_tar $path, $file;
+         index_tar "$path$file>", $file;
       }
       elsif ($file =~ /\.f$/) {       #  fortran source file.
          $nfiles{'f'}++;
-         index_f $path, $file;
+         index_f "$path$file", $file;
       }
       elsif ($file =~ /\.gen$/) {     #  generic fortran source file.
          $nfiles{'gen'}++;
-         index_gen $path, $file;
+         index_gen "$path$file", $file;
       }
       elsif ($file =~ /\.c$/) {       #  C source file.
          $nfiles{'c'}++;
-         index_c $path, $file;
+         index_c "$path$file", $file;
       }
       elsif ($file =~ /\.h$/) {       #  C header file.
          $nfiles{'h'}++;
-         index_h $path, $file;
+         index_h "$path$file", $file;
       }
       elsif ($file =~ /\.hlp$/) {     #  starlink help file
-         index_hlp $path, $file;
+         index_hlp "$path$file", $file;
       }
    }
 }
@@ -283,11 +352,11 @@ sub index_dir {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
+   my $path = shift;      #  Logical pathname of directory to be indexed.
    my $dir = shift;       #  Directory in current directory to be indexed.
 
    pushd $dir;
-   index_list "$path$dir/", <*>;
+   index_list $path, glob "*";
    popd;
 }
 
@@ -298,12 +367,12 @@ sub index_tar {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
-   my $tarfile = shift;   #  Tarfile in current directory to be indexed.
+   my $path = shift;      #  Logical pathname of tar file.
+   my $tarfile = shift;   #  Tarfile to be indexed.
 
 #  Define fully qualified pathname for file.
 
-   my $fqtarfile = cwd . '/' . $tarfile;
+   $tarfile = cwd . "/$tarfile" unless ($tarfile =~ m%^/%);
 
 #  Change to scratch directory.
 
@@ -311,11 +380,12 @@ sub index_tar {
 
 #  Unpack tar file.
 
-   my @files = tarxf $fqtarfile;
+   print "*** Unpacking $tarfile  ***\n" if ($verbose);
+   my @files = tarxf $tarfile;
 
 #  Pass list of files to indexing routine.
 
-   index_list "$path$tarfile>", @files;
+   index_list $path, @files;
    
 #  Tidy up.
 
@@ -330,7 +400,7 @@ sub index_fortran_file {
 
 #  Arguments.
 
-   my $path = shift;          #  Logical pathname of FILE to be indexed.
+   my $path = shift;          #  Logical pathname of file to be indexed.
    my $file = shift;          #  File in current directory to be indexed.
    my $ftype = shift || 'f';  #  Type of file ('f' or 'gen' - default 'f').
 
@@ -351,10 +421,10 @@ sub index_f {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
+   my $path = shift;      #  Logical pathname of .f file.
    my $file = shift;      #  .f file in current directory to be indexed.
 
-   index_fortran_file "$path$file", $file, 'f';
+   index_fortran_file $path, $file, 'f';
 }
 
 ########################################################################
@@ -364,26 +434,37 @@ sub index_gen {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
+   my $path = shift;      #  Logical pathname of .gen file.
    my $file = shift;      #  .gen file in current directory to be indexed.
 
 #  Index unprocessed source code.
 
-   index_fortran_file "$path$file", $file, 'gen';
+   index_fortran_file $path, $file, 'gen';
+
+#  Move file to scratch space.
+
+   my $gtmpdir = "$tmpdir/generic_tmpdir";
+   my $tail = $file;
+   $tail =~ s%.*/%%;
+   system "mkdir -p $gtmpdir" and die "Failed to mkdir $gtmpdir\n";
+   system "cp $file $gtmpdir/$tail" and die "Failed to copy $file\n";
+   pushd $gtmpdir;
 
 #  Process file to produce normal fortran source code.
 
-   system "$generic $file" and die "Command '$generic $file' failed: $?\n";
+   system "$generic $tail" and die "Command '$generic $tail' failed: $?\n";
 
 #  Hand file over to routine which handles normal fortran source code.
 
-   my $ffile = $file;
+   my $ffile = "$gtmpdir/$tail";
    $ffile =~ s/\.gen$/.f/;
-   index_fortran_file "$path$file", $ffile, 'f';
+   index_fortran_file $path, $ffile, 'f';
 
 #  Tidy up.
 
-   unlink $file or die "Failed to remove file $file\n";
+   popd;
+   unlink "$gtmpdir/$tail", $ffile;
+   rmdir $gtmpdir or die "Failed to rmdir $gtmpdir\n";
 }
 
 ########################################################################
@@ -406,10 +487,9 @@ sub index_hlp {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
+   my $path = shift;      #  Logical pathname .hlp file.
    my $file = shift;      #  .hlp file in current directory to be indexed.
 
-   my $package = starpack $path;
    open HLP, $file or die "Couldn't open $file in directory ".cwd."\n";
    my ($level, $baselevel);
    while (<HLP>) {
@@ -440,18 +520,17 @@ sub index_h {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
+   my $path = shift;      #  Logical pathname of .h file.
    my $file = shift;      #  .h file in current directory to be indexed.
 
 #  Strip head part of path.
 
    my $include = $file;
    $include =~ s%^.*/%%;
-   $file =~ s%^./%%;
 
 #  Write to index.
 
-   write_entry $include, "$path$file";
+   write_entry $include, $path;
 }
 
 
@@ -464,12 +543,12 @@ sub index_c {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
+   my $path = shift;      #  Logical pathname of .c file.
    my $file = shift;      #  .c file in current directory to be indexed.
 
    open C, $file or die "Couldn't open $file in directory ".cwd."\n";
    while (<C>) {
-      write_entry $name, "$path$file" if ($name = module_name 'c', $_);
+      write_entry $name, $path if ($name = module_name 'c', $_);
       $nlines{'c'}++;
    }
    close C;
@@ -478,17 +557,17 @@ sub index_c {
 
 
 ########################################################################
-sub index_incdir {
+sub indexinc_dir {
 
 #  Examine and index a directory of files containing include files.
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of current directory.
-   my $dir = shift;       #  Directory in current directory to be indexed.
+   my $path = shift;      #  Logical pathname of directory to be indexed.
+   my $dir = shift;       #  Directory to be indexed.
 
    pushd $dir;
-   indexinc_list "$path$dir/", <*>;
+   indexinc_list $path, <*>;
    popd;
 }
 
@@ -523,11 +602,30 @@ sub write_entry {
    my $name = shift;      #  Name of module.
    my $location = shift;  #  Logical pathname of module.
 
-#  Write entry to database (hash of hashes %locate); if no identifiable 
-#  package the hash key is ''.
+#  Tidy path string.
 
-   $locate{$name} .= ' ' if (defined $locate{$name});
-   $locate{$name} .= $location;
+   $location =~ s%([#>/])\./%$1%g;
+   $location =~ s%//+%/%g;
+
+#  Write entry to database if there is not already a better entry for 
+#  that module name in the same package.
+
+   if ($locate{$name}) {
+      my ($loc, %loc, $oldloc);
+      foreach $loc (split ' ', $locate{$name}) {
+         $loc{starpack $loc} = $loc;
+      }
+      $oldloc = $loc{$package};
+      $loc{$package} = $location 
+         if (!$oldloc ||
+             ($otl = ($oldloc =~ tr/>/>/)) < ($tl = ($location =~ tr/>/>/)) ||
+             $otl == $tl && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/
+            );
+      $locate{$name} = join ' ', values %loc;
+   }
+   else {
+      $locate{$name} = $location;
+   }
 
 #  Optionally log entry to stdout.
 
