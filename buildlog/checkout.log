@@ -8969,7 +8969,6 @@ U java/source/util/src/main/uk/ac/starlink/util/text/map_1_0.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/toc_1_0.dtd
 cvs checkout: Updating java/source/util/src/script
 U java/source/util/src/script/starjava
-U java/source/util/src/script/starjava.bat
 U java/source/util/src/script/starlocation
 cvs checkout: Updating java/source/util/src/testcases
 U java/source/util/src/testcases/TestProxySetupFrame.java
