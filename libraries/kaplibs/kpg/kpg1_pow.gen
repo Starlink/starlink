@@ -1,0 +1,582 @@
+      SUBROUTINE KPG1_POW<T>( BAD, VAR, POWER, EL, DIN, VIN, DOUT,
+     :                        VOUT, NBAD, STATUS )
+*+
+*  Name:
+*     KPG1_POW<T>
+ 
+*  Purpose:
+*     Raise each element of a vectorised array to a specified power.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_POW<T>( BAD, VAR, POWER, EL, DIN, VIN, DOUT, VOUT, NBAD, 
+*                      STATUS )
+ 
+*  Description:
+*     The routine raises each element of a vectorised array to a specified 
+*     power. Any associated variance values are also modified appropriately.
+*     For general non-integer powers the result is calculated as
+*     EXP(power*LOG(data)). This enables bad output pixels to be detected by
+*     checking the magnitude of LOG(data). For integer powers, the result
+*     is calcualted using the Fortran "**" operator, which is more
+*     efficient.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether to check for bad values in the input arrays.
+*     VAR = LOGICAL (Given)
+*        Have associated variances been supplied?
+*     POWER = DOUBLE PRECISION (Given)
+*        The required power.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     DIN( EL ) = <TYPE> (Given)
+*        Input data array.
+*     VIN( EL ) = <TYPE> (Given)
+*        Input variance array. Only accessed if VAR is .TRUE.
+*     DOUT( EL ) = <TYPE> (Given)
+*        Output data array.
+*     VOUT( EL ) = <TYPE> (Given)
+*        Output variance array. Only accessed if VAR is .TRUE.
+*     NBAD( 2 ) = INTEGER (Returned)
+*        Element 1 has the number of bad values stored in DOUT, and element 
+*        2 has the number of bad values stored in VOUT.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     30-NOV-2001 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL VAR
+      DOUBLE PRECISION POWER
+      INTEGER EL
+      <TYPE> DIN( EL )
+      <TYPE> VIN( EL )
+ 
+*  Arguments Returned:
+      <TYPE> DOUT( EL )
+      <TYPE> VOUT( EL )
+      INTEGER NBAD( 2 )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      <TYPE> LOGY                ! Log(result)
+      <TYPE> MAXDAT              ! Larest input value which can be used
+      <TYPE> MAXLOG              ! Most positive log(result) which can be used
+      <TYPE> MINLOG              ! Most negative log(result) which can be used
+      <TYPE> MINDAT              ! Smallest input value which can be used
+      <TYPE> ONE                 ! One in the correct data type
+      <TYPE> ZERO                ! Zero in the correct data type
+      INTEGER I                  ! Loop counter for array elements
+      INTEGER INTPOW             ! The nearest integer power
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+ 
+*.
+ 
+*  Initialize
+      NBAD( 1 ) = 0
+      NBAD( 2 ) = 0
+
+*  Check inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert zero to the correct data type.
+      ZERO = NUM_DTO<T>( 0.0D0 )
+
+*  Convert one to the correct data type.
+      ONE = NUM_DTO<T>( 1.0D0 )
+
+*  Find the nearest integer power
+      INTPOW = NINT( POWER )
+
+*  If the power is a positive integer...
+*  =====================================
+      IF( POWER .EQ. INTPOW ) THEN
+         IF( INTPOW .GT. 0 ) THEN
+
+*  Find the maximum absolute input value which can produce a good (i.e.
+*  not overflowed) output value.
+            MAXDAT = NUM_DTO<T>( NUM_<T>TOD( VAL__MAX<T> )**
+     :                           ( 1.0D0/INTPOW ) )
+
+*  Bad pixels?
+            IF( BAD ) THEN
+
+*  Variances?
+               IF( VAR ) THEN
+
+*  Loop round the supplied arrays.
+                  DO I = 1, EL
+
+*  Check the input data value is not bad, and has an absolute value no
+*  less than the max allowed. If OK, store the output values. Otherwise,
+*  store bad output values.
+                     IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                   ABS( DIN( I ) ) .LT. MAXDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+   
+                        IF( VIN( I ) .NE. VAL__BAD<T> ) THEN
+                           IF( DIN( I ) .EQ. ZERO ) THEN
+                              VOUT( I ) = ZERO
+                           ELSE
+                              VOUT( I ) = VIN( I )*( 
+     :                                    INTPOW*DOUT( I )/DIN( I ) )**2
+                           END IF
+                        ELSE
+                           VOUT( I ) = VAL__BAD<T>
+                           NBAD( 2 ) = NBAD( 2 ) + 1
+                        END IF
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+                  END DO
+
+*  No variances.
+               ELSE
+                  DO I = 1, EL
+                     IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                   ABS( DIN( I ) ) .LT. MAXDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                     END IF
+                  END DO
+               END IF
+
+*  No bad pixels.
+            ELSE
+
+*  Variances?
+               IF( VAR ) THEN
+                  DO I = 1, EL
+                     IF( ABS( DIN( I ) ) .LT. MAXDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+                        IF( DIN( I ) .EQ. ZERO ) THEN
+                           VOUT( I ) = ZERO
+                        ELSE
+                           VOUT( I ) = VIN( I )*( 
+     :                                 INTPOW*DOUT( I )/DIN( I ) )**2
+                        END IF
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+                  END DO
+*  No variances.
+               ELSE
+                  DO I = 1, EL
+                     IF( ABS( DIN( I ) ) .LT. MAXDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                     END IF
+                  END DO
+               END IF
+            END IF
+
+*  If the power is zero...
+*  =======================
+*  If the power is zero, the answer is 1.0 (unless the input is zero in
+*  which case the answer is zero).
+         ELSE IF( INTPOW .EQ. 0 ) THEN
+
+*  Bad pixels?
+            IF( BAD ) THEN
+
+*  Variances?
+               IF( VAR ) THEN
+                  DO I = 1, EL
+
+                     IF( DIN( I ) .EQ. VAL__BAD<T> ) THEN
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                     ELSE IF( DIN( I ) .EQ. ZERO ) THEN
+                        DOUT( I ) = ZERO
+                     ELSE
+                        DOUT( I ) = ONE
+                     END IF
+
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+
+                  END DO
+
+*  No variances.
+               ELSE
+                  DO I = 1, EL
+                     IF( DIN( I ) .EQ. VAL__BAD<T> ) THEN
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                     ELSE IF( DIN( I ) .EQ. ZERO ) THEN
+                        DOUT( I ) = ZERO
+                     ELSE
+                        DOUT( I ) = ONE
+                     END IF
+                  END DO
+               END IF
+
+*  No bad pixels.
+            ELSE
+
+*  Variances?
+               IF( VAR ) THEN
+                  DO I = 1, EL
+                     IF( DIN( I ) .EQ. ZERO ) THEN
+                        DOUT( I ) = ZERO
+                     ELSE
+                        DOUT( I ) = ONE
+                     END IF
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END DO
+*  No variances.
+               ELSE
+                  DO I = 1, EL
+                     IF( DIN( I ) .EQ. ZERO ) THEN
+                        DOUT( I ) = ZERO
+                     ELSE
+                        DOUT( I ) = ONE
+                     END IF
+                  END DO
+               END IF
+            END IF
+
+*  If the power is a negative integer...
+*  =====================================
+*  We need to guard against divide by zero.
+         ELSE
+
+*  Find the minimum absolute input value which can produce a good (i.e.
+*  not overflowed) output value.
+            MINDAT = NUM_DTO<T>( NUM_<T>TOD( VAL__MAX<T> )**
+     :                           ( 1.0D0/INTPOW ) )
+
+*  Bad pixels?
+            IF( BAD ) THEN
+
+*  Variances?
+               IF( VAR ) THEN
+
+*  Loop round the supplied arrays.
+                  DO I = 1, EL
+
+*  Check the input data value is not bad, and has an absolute value no
+*  greater than the min allowed. If OK, store the output values. Otherwise, 
+*  store bad output values.
+                     IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                   ABS( DIN( I ) ) .GT. MINDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+   
+                        IF( VIN( I ) .NE. VAL__BAD<T> ) THEN
+                           VOUT( I ) = VIN( I )*( 
+     :                                 INTPOW*DOUT( I )/DIN( I ) )**2
+                        ELSE
+                           VOUT( I ) = VAL__BAD<T>
+                           NBAD( 2 ) = NBAD( 2 ) + 1
+                        END IF
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+                  END DO
+
+*  No variances.
+               ELSE
+                  DO I = 1, EL
+                     IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                   ABS( DIN( I ) ) .GT. MINDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                     END IF
+                  END DO
+               END IF
+
+*  No bad pixels.
+            ELSE
+
+*  Variances?
+               IF( VAR ) THEN
+                  DO I = 1, EL
+                     IF( ABS( DIN( I ) ) .GT. MINDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+                        VOUT( I ) = VIN( I )*( 
+     :                              INTPOW*DOUT( I )/DIN( I ) )**2
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+                  END DO
+
+*  No variances.
+               ELSE
+                  DO I = 1, EL
+                     IF( ABS( DIN( I ) ) .GT. MINDAT ) THEN
+                        DOUT( I ) = DIN( I )**INTPOW
+                     ELSE
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+                     END IF
+                  END DO
+               END IF
+            END IF
+         END IF
+
+*  Now deal with the general case of a non-integer power.
+*  ======================================================
+      ELSE
+
+*  Note the largest and smallest acceptable value for the log of the
+*  output value.
+         MAXLOG = LOG( VAL__MAX<T> )
+         MINLOG = LOG( VAL__SML<T> )
+
+*  Bad values may be present:
+*  ==========================
+         IF( BAD ) THEN
+ 
+*  Are variances available?
+            IF( VAR ) THEN 
+
+*  Do each value.
+               DO I = 1, EL
+
+*  The output is bad if the input is bad, or if the input is zero and the 
+*  power is less than or equal to zero, or if the input is less than zero.
+                  IF( DIN( I ) .EQ. VAL__BAD<T> .OR. 
+     :                ( DIN( I ) .EQ. ZERO .AND. POWER .LE. ZERO ) .OR.
+     :                DIN( I ) .LT. ZERO ) THEN
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the above tests were passed and the input is zero, then the output
+*  must also be zero.
+                  ELSE IF( DIN( I ) .EQ. ZERO ) THEN
+                     DOUT( I ) = ZERO
+
+*  Otherwise, find the log of the absolute value of the required result,
+*  and note if we need to negate the result. The above tests will have
+*  ensured that the input is positive.
+                  ELSE
+                     LOGY = POWER*LOG( DIN( I ) ) 
+
+*  If the log of the required answer is larger than the largest acceptable
+*  value, there would be an overflow so set the output bad.
+                     IF( LOGY .GE. MAXLOG ) THEN
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the log of the required answer is smaller than the smallest acceptable
+*  value, there would be an underflow so set the output zero.
+                     ELSE IF( LOGY .LE. MINLOG ) THEN
+                        DOUT( I ) = ZERO
+
+*  Otherwise find the required answer.
+                     ELSE
+                        DOUT( I ) = EXP( LOGY )
+                     END IF
+
+*  The output variance value is always bad if the input variance is bad
+*  or the input data value is zero or if the result data value is bad.
+                     IF( VIN( I ) .EQ. VAL__BAD<T> .OR.
+     :                   DIN( I ) .EQ. ZERO .OR. 
+     :                   DOUT( I ) .EQ. VAL__BAD<T> ) THEN
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+
+*  Otherwise, calculate the appropriate new variance.
+                     ELSE
+                        VOUT( I ) = VIN( I )*( POWER*DOUT( I )/DIN( I ) )**2
+                     END IF
+
+                  END IF
+
+               END DO   
+
+*  Variances not available.
+            ELSE
+
+*  Do each value.
+               DO I = 1, EL
+
+*  The output is bad if the input is bad, or if the input is zero and the 
+*  power is less than or equal to zero, or if the input is less than zero.
+                  IF( DIN( I ) .EQ. VAL__BAD<T> .OR. 
+     :                ( DIN( I ) .EQ. ZERO .AND. POWER .LE. ZERO ) .OR.
+     :                DIN( I ) .LT. ZERO ) THEN
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the above tests were passed and the input is zero, then the output
+*  must also be zero.
+                  ELSE IF( DIN( I ) .EQ. ZERO ) THEN
+                     DOUT( I ) = ZERO
+
+*  Otherwise, find the log of the absolute value of the required result.
+*  The above tests will have ensured that the input data value is positive.
+                  ELSE
+                     LOGY = POWER*LOG( DIN( I ) ) 
+
+*  If the log of the required answer is larger than the largest acceptable
+*  value, there would be an overflow so set the output bad.
+                     IF( LOGY .GE. MAXLOG ) THEN
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the log of the required answer is smaller than the smallest acceptable
+*  value, there would be an underflow so set the output zero.
+                     ELSE IF( LOGY .LE. MINLOG ) THEN
+                        DOUT( I ) = ZERO
+
+*  Otherwise find the required answer.
+                     ELSE
+                        DOUT( I ) = EXP( LOGY )
+                     END IF
+
+                  END IF
+               END DO   
+
+            END IF
+
+*  Bad values are not present:
+*  ==========================
+         ELSE
+ 
+*  Are variances available?
+            IF( VAR ) THEN 
+
+*  Do each value.
+               DO I = 1, EL
+
+*  The output is bad if the input is zero and the power is less than or 
+*  equal to zero, or if the input is less than zero.
+                  IF( ( DIN( I ) .EQ. ZERO .AND. POWER .LE. ZERO ) .OR.
+     :                DIN( I ) .LT. ZERO ) THEN
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the above tests were passed and the input is zero, then the output
+*  must also be zero.
+                  ELSE IF( DIN( I ) .EQ. ZERO ) THEN
+                     DOUT( I ) = ZERO
+
+*  Otherwise, find the log of the absolute value of the required result.
+                  ELSE
+                     LOGY = POWER*LOG( DIN( I ) ) 
+
+*  If the log of the required answer is larger than the largest acceptable
+*  value, there would be an overflow so set the output bad.
+                     IF( LOGY .GE. MAXLOG ) THEN
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the log of the required answer is smaller than the smallest acceptable
+*  value, there would be an underflow so set the output zero.
+                     ELSE IF( LOGY .LE. MINLOG ) THEN
+                        DOUT( I ) = ZERO
+
+*  Otherwise find the required answer.
+                     ELSE
+                        DOUT( I ) = EXP( LOGY )
+                     END IF
+
+*  The output variance value is always bad if the input data value is zero 
+*  or if the result data value is bad.
+                     IF( DIN( I ) .EQ. ZERO .OR. 
+     :                   DOUT( I ) .EQ. VAL__BAD<T> ) THEN
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+
+*  Otherwise, calculate the appropriate new variance.
+                     ELSE
+                        VOUT( I ) = VIN( I )*( POWER*DOUT( I )/DIN( I ) )**2
+                     END IF
+
+                  END IF
+
+               END DO   
+
+*  No variances available.
+            ELSE
+
+*  Do each value.
+               DO I = 1, EL
+
+*  The output is bad if the input is zero and the power is less than or 
+*  equal to zero, or if the input is less than zero.
+                  IF( ( DIN( I ) .EQ. ZERO .AND. POWER .LE. ZERO ) .OR.
+     :                DIN( I ) .LT. ZERO ) THEN
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the above tests were passed and the input is zero, then the output
+*  must also be zero.
+                  ELSE IF( DIN( I ) .EQ. ZERO ) THEN
+                     DOUT( I ) = ZERO
+
+*  Otherwise, find the log of the absolute value of the required result.
+                  ELSE
+                     LOGY = POWER*LOG( DIN( I ) ) 
+
+*  If the log of the required answer is larger than the largest acceptable
+*  value, there would be an overflow so set the output bad.
+                     IF( LOGY .GE. MAXLOG ) THEN
+                        DOUT( I ) = VAL__BAD<T>
+                        NBAD( 1 ) = NBAD( 1 ) + 1
+
+*  If the log of the required answer is smaller than the smallest acceptable
+*  value, there would be an underflow so set the output zero.
+                     ELSE IF( LOGY .LE. MINLOG ) THEN
+                        DOUT( I ) = ZERO
+
+*  Otherwise find the required answer.
+                     ELSE
+                        DOUT( I ) = EXP( LOGY )
+                     END IF
+
+                  END IF
+               END DO   
+            END IF
+         END IF
+      END IF
+
+      END

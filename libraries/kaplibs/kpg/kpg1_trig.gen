@@ -1,0 +1,886 @@
+      SUBROUTINE KPG1_TRIG<T>( BAD, VAR, TRIGFN, EL, DIN, VIN, DOUT,
+     :                        VOUT, NBAD, STATUS )
+*+
+*  Name:
+*     KPG1_TRIG<T>
+ 
+*  Purpose:
+*     Apply a trig function to each element of a vectorised array.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_TRIG<T>( BAD, VAR, TRIGFN, EL, DIN, VIN, DOUT, VOUT, NBAD, 
+*                      STATUS )
+ 
+*  Description:
+*     The routine applied a specified trig function to each element of a
+*     vectorised array. Any associated variance values are also modified 
+*     appropriately.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether to check for bad values in the input arrays.
+*     VAR = LOGICAL (Given)
+*        Have associated variances been supplied?
+*     TRIGFN = CHARACTER*(*) (Given)
+*        The required trig function. This should be one of SIN, COS, TAN, 
+*        SIND, COSD, TAND, ASIN, ACOS, ATAN, ASIND, ACOSD, ATAND.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     DIN( EL ) = <TYPE> (Given)
+*        Input data array.
+*     VIN( EL ) = <TYPE> (Given)
+*        Input variance array. Only accessed if VAR is .TRUE.
+*     DOUT( EL ) = <TYPE> (Given)
+*        Output data array.
+*     VOUT( EL ) = <TYPE> (Given)
+*        Output variance array. Only accessed if VAR is .TRUE.
+*     NBAD( 2 ) = INTEGER (Returned)
+*        Element 1 has the number of bad values stored in DOUT, and element 
+*        2 has the number of bad values stored in VOUT.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     3-DEC-2001 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      LOGICAL VAR
+      CHARACTER TRIGFN*(*)
+      INTEGER EL
+      <TYPE> DIN( EL )
+      <TYPE> VIN( EL )
+ 
+*  Arguments Returned:
+      <TYPE> DOUT( EL )
+      <TYPE> VOUT( EL )
+      INTEGER NBAD( 2 )
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Constants:
+      <TYPE> DTOR                ! Conversion from degrees to radians
+      PARAMETER ( DTOR = 0.0174532925199432957692369 )
+
+*  Local Variables:
+      <TYPE> ONE                 ! One in the correct data type
+      <TYPE> TWO                 ! Two in the correct data type
+      <TYPE> ZERO                ! Zero in the correct data type
+      <TYPE> K1                  ! A constant
+      <TYPE> K2                  ! A constant
+      <TYPE> K3                  ! A constant
+      INTEGER I                  ! Loop counter for array elements
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define functions...
+ 
+*.
+ 
+*  Initialize
+      NBAD( 1 ) = 0
+      NBAD( 2 ) = 0
+
+*  Check inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Set up constants
+      K1 = DTOR**2
+      K2 = NUM_DTO<T>( NUM_<T>TOD( VAL__MAX<T> )**0.25 )
+      K3 = 1.0/K1
+
+      ONE = NUM_DTO<T>( 1.0D0 )
+      TWO = NUM_DTO<T>( 2.0D0 )
+      ZERO = NUM_DTO<T>( 0.0D0 )
+      
+*  Bad pixels present
+*  ==================
+      IF( BAD ) THEN 
+
+*  Variances present
+         IF( VAR ) THEN 
+
+*  SIN
+            IF( TRIGFN .EQ. 'SIN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = SIN( DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> ) THEN
+                        VOUT( I ) = ( ONE - DOUT( I )**2 )*VIN( I )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  SIND
+            ELSE IF( TRIGFN .EQ. 'SIND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = SIN( DTOR*DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> ) THEN
+                        VOUT( I ) = K1*( ONE - DOUT( I )**2 )*VIN( I )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  COS
+            ELSE IF( TRIGFN .EQ. 'COS' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = COS( DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> ) THEN
+                        VOUT( I ) = ( ONE - DOUT( I )**2 )*VIN( I )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  COSD
+            ELSE IF( TRIGFN .EQ. 'COSD' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = COS( DTOR*DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> ) THEN
+                        VOUT( I ) = K1*( ONE - DOUT( I )**2 )*VIN( I )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  TAN
+            ELSE IF( TRIGFN .EQ. 'TAN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                ABS( COS( DIN( I ) ) )*VAL__MAX<T> .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   ABS( DOUT( I ) ) .LT. K2 ) THEN
+                        VOUT( I ) = VIN( I )*( ( ONE + 
+     :                                           DOUT( I )**2 )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  TAND
+            ELSE IF( TRIGFN .EQ. 'TAND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                ABS( COS( DTOR*DIN( I ) ) )*VAL__MAX<T> 
+     :                .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DTOR*DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   ABS( DOUT( I ) ) .LT. K2 ) THEN
+                        VOUT( I ) = VIN( I )*( ( ONE + 
+     :                                           DOUT( I )**2 )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ASIN
+            ELSE IF( TRIGFN .EQ. 'ASIN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ASIN( DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ASIND
+            ELSE IF( TRIGFN .EQ. 'ASIND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ASIN( DIN( I ) )/DTOR
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = K3*VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ACOS
+            ELSE IF( TRIGFN .EQ. 'ACOS' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ACOS( DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ACOSD
+            ELSE IF( TRIGFN .EQ. 'ACOSD' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ACOS( DIN( I ) )/DTOR
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = K3*VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+               
+*  ATAN
+            ELSE IF( TRIGFN .EQ. 'ATAN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+
+                     DOUT( I ) = ATAN( DIN( I ) )
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   ABS( DIN( I ) ) .LT. K2 ) THEN
+                        VOUT( I ) = VIN( I )/( ONE + DIN( I )**2 )**2
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ATAND
+            ELSE IF( TRIGFN .EQ. 'ATAND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+
+                     DOUT( I ) = ATAN( DIN( I ) )/DTOR
+      
+                     IF( VIN( I ) .NE. VAL__BAD<T> .AND.
+     :                   ABS( DIN( I ) ) .LT. K2 ) THEN
+                        VOUT( I ) = K3*VIN( I )/( ONE + DIN( I )**2 )**2
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+            END IF
+
+*  Variances not present
+         ELSE
+
+*  SIN
+            IF( TRIGFN .EQ. 'SIN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = SIN( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  SIND
+            ELSE IF( TRIGFN .EQ. 'SIND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = SIN( DTOR*DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  COS
+            ELSE IF( TRIGFN .EQ. 'COS' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = COS( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  COSD
+            ELSE IF( TRIGFN .EQ. 'COSD' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = COS( DTOR*DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  TAN
+            ELSE IF( TRIGFN .EQ. 'TAN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                ABS( COS( DIN( I ) ) )*VAL__MAX<T> .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  TAND
+            ELSE IF( TRIGFN .EQ. 'TAND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND. 
+     :                ABS( COS( DTOR*DIN( I ) ) )*VAL__MAX<T> 
+     :                .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DTOR*DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ASIN
+            ELSE IF( TRIGFN .EQ. 'ASIN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ASIN( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ASIND
+            ELSE IF( TRIGFN .EQ. 'ASIND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ASIN( DIN( I ) )/DTOR
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ACOS
+            ELSE IF( TRIGFN .EQ. 'ACOS' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ACOS( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ACOSD
+            ELSE IF( TRIGFN .EQ. 'ACOSD' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> .AND.
+     :                DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ACOS( DIN( I ) )/DTOR
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+               
+*  ATAN
+            ELSE IF( TRIGFN .EQ. 'ATAN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = ATAN( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ATAND
+            ELSE IF( TRIGFN .EQ. 'ATAND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .NE. VAL__BAD<T> ) THEN
+                     DOUT( I ) = ATAN( DIN( I ) )/DTOR
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+            END IF
+
+         END IF
+
+
+*  Bad pixels not present
+*  ======================
+      ELSE
+
+*  Variances present
+         IF( VAR ) THEN 
+
+*  SIN
+            IF( TRIGFN .EQ. 'SIN' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = SIN( DIN( I ) )
+                  VOUT( I ) = ( ONE - DOUT( I )**2 )*VIN( I )
+               END DO
+
+*  SIND
+            ELSE IF( TRIGFN .EQ. 'SIND' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = SIN( DTOR*DIN( I ) )
+                  VOUT( I ) = K1*( ONE - DOUT( I )**2 )*VIN( I )
+               END DO
+
+*  COS
+            ELSE IF( TRIGFN .EQ. 'COS' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = COS( DIN( I ) )
+                  VOUT( I ) = ( ONE - DOUT( I )**2 )*VIN( I )
+               END DO
+
+*  COSD
+            ELSE IF( TRIGFN .EQ. 'COSD' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = COS( DTOR*DIN( I ) )
+                  VOUT( I ) = K1*( ONE - DOUT( I )**2 )*VIN( I )
+               END DO
+
+*  TAN
+            ELSE IF( TRIGFN .EQ. 'TAN' ) THEN
+               DO I = 1, EL
+                  IF( ABS( COS( DIN( I ) ) )*VAL__MAX<T> .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DIN( I ) )
+      
+                     IF( ABS( DOUT( I ) ) .LT. K2 ) THEN
+                        VOUT( I ) = VIN( I )*( ( ONE + 
+     :                                           DOUT( I )**2 )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  TAND
+            ELSE IF( TRIGFN .EQ. 'TAND' ) THEN
+               DO I = 1, EL
+                  IF( ABS( COS( DTOR*DIN( I ) ) )*VAL__MAX<T> 
+     :                .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DTOR*DIN( I ) )
+      
+                     IF( ABS( DOUT( I ) ) .LT. K2 ) THEN
+                        VOUT( I ) = VIN( I )*( ( ONE + 
+     :                                           DOUT( I )**2 )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ASIN
+            ELSE IF( TRIGFN .EQ. 'ASIN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ASIN( DIN( I ) )
+      
+                     IF( DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ASIND
+            ELSE IF( TRIGFN .EQ. 'ASIND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ASIN( DIN( I ) )/DTOR
+      
+                     IF( DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = K3*VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ACOS
+            ELSE IF( TRIGFN .EQ. 'ACOS' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ACOS( DIN( I ) )
+      
+                     IF( DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ACOSD
+            ELSE IF( TRIGFN .EQ. 'ACOSD' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+
+                     DOUT( I ) = ACOS( DIN( I ) )/DTOR
+      
+                     IF( DIN( I ) .GT. -ONE .AND.
+     :                   DIN( I ) .LT. ONE ) THEN
+                        VOUT( I ) = K3*VIN( I )/( ONE - DIN( I )**2 )
+                     ELSE
+                        VOUT( I ) = VAL__BAD<T>
+                        NBAD( 2 ) = NBAD( 2 ) + 1
+                     END IF
+      
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+               
+*  ATAN
+            ELSE IF( TRIGFN .EQ. 'ATAN' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = ATAN( DIN( I ) )
+                  IF( ABS( DIN( I ) ) .LT. K2 ) THEN
+                     VOUT( I ) = VIN( I )/( ONE + DIN( I )**2 )**2
+                  ELSE
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+*  ATAND
+            ELSE IF( TRIGFN .EQ. 'ATAND' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = ATAN( DIN( I ) )/DTOR
+                  IF( ABS( DIN( I ) ) .LT. K2 ) THEN
+                     VOUT( I ) = K3*VIN( I )/( ONE + DIN( I )**2 )**2
+                  ELSE
+                     VOUT( I ) = VAL__BAD<T>
+                     NBAD( 2 ) = NBAD( 2 ) + 1
+                  END IF
+               END DO
+
+            END IF
+
+*  Variances not present
+         ELSE
+
+*  SIN
+            IF( TRIGFN .EQ. 'SIN' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = SIN( DIN( I ) )
+               END DO
+
+*  SIND
+            ELSE IF( TRIGFN .EQ. 'SIND' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = SIN( DTOR*DIN( I ) )
+               END DO
+
+*  COS
+            ELSE IF( TRIGFN .EQ. 'COS' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = COS( DIN( I ) )
+               END DO
+
+*  COSD
+            ELSE IF( TRIGFN .EQ. 'COSD' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = COS( DTOR*DIN( I ) )
+               END DO
+
+*  TAN
+            ELSE IF( TRIGFN .EQ. 'TAN' ) THEN
+               DO I = 1, EL
+                  IF( ABS( COS( DIN( I ) ) )*VAL__MAX<T> .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  TAND
+            ELSE IF( TRIGFN .EQ. 'TAND' ) THEN
+               DO I = 1, EL
+                  IF( ABS( COS( DTOR*DIN( I ) ) )*VAL__MAX<T> 
+     :                .GT. TWO ) THEN
+                     DOUT( I ) = TAN( DTOR*DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ASIN
+            ELSE IF( TRIGFN .EQ. 'ASIN' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+                     DOUT( I ) = ASIN( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ASIND
+            ELSE IF( TRIGFN .EQ. 'ASIND' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+                     DOUT( I ) = ASIN( DIN( I ) )/DTOR
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ACOS
+            ELSE IF( TRIGFN .EQ. 'ACOS' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+                     DOUT( I ) = ACOS( DIN( I ) )
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+
+*  ACOSD
+            ELSE IF( TRIGFN .EQ. 'ACOSD' ) THEN
+               DO I = 1, EL
+                  IF( DIN( I ) .LE. ONE .AND.
+     :                DIN( I ) .GE. -ONE ) THEN
+                     DOUT( I ) = ACOS( DIN( I ) )/DTOR
+                  ELSE
+                     DOUT( I ) = VAL__BAD<T>
+                     NBAD( 1 ) = NBAD( 1 ) + 1
+                  END IF
+               END DO
+               
+*  ATAN
+            ELSE IF( TRIGFN .EQ. 'ATAN' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = ATAN( DIN( I ) )
+               END DO
+
+*  ATAND
+            ELSE IF( TRIGFN .EQ. 'ATAND' ) THEN
+               DO I = 1, EL
+                  DOUT( I ) = ATAN( DIN( I ) )/DTOR
+               END DO
+
+            END IF
+
+         END IF
+
+      END IF
+
+      END
