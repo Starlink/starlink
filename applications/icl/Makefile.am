@@ -11,7 +11,7 @@ icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs
 AM_YFLAGS = -d
 
 icl_io_SOURCES = icl_io.c
-icl_io_LDADD = `ams_link_adam` `par_link_adam`
+icl_io_LDADD = `ams_link_adam` `subpar_link_adam`
 
 BUILT_SOURCES = UFACE_ERR
 
