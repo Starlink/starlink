@@ -59,6 +59,8 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +79,10 @@
 *     1993 January 5 (PDRAPER):
 *        Extract kaphelp system from KAPPA and converted for 
 *        CCDPACK use. As few changes as possible made.
+*     2004 July 30 (MBT):
+*        Changed GETHLP to SHL_GETHLP to use new external help library.
+*     2004 December 1 (TIMJ):
+*        Use the ADAM helper code from SHL rather than low level SHL_GETHLP
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,78 +95,25 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_PAR'
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
 
 *  Status:
       INTEGER STATUS
 
 *  External References:
-      INTEGER
-     :  CHR_LEN                ! Length of character strings ignoring
-                               ! trailing blanks
 
 *  Local Constants:
       CHARACTER*12 LIBNAM      ! Name of the KAPPA help library
       PARAMETER ( LIBNAM = 'CCDPACK_HELP' )
-      INTEGER MAXLEV           ! Maximum number of help levels
-      PARAMETER ( MAXLEV = 4 )
 
 *  Local Variables:
-      CHARACTER*19
-     :  HLPTXT*80,             ! Composite command
-     :  LIBRAY*132,            ! Library name and path
-     :  PATH*122,              ! Library path
-     :  TOPIC( MAXLEV )        ! Name of the topic required
 
-      INTEGER
-     :  I,                     ! Loop counter
-     :  NC                     ! Number of characters in the help string
-                               ! less trailing blanks
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Translate the environment variable/logical name.
-      CALL PSX_GETENV( LIBNAM, PATH, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Form the full library name.
-         NC = CHR_LEN( PATH )
-         LIBRAY = PATH( :NC )//'.shl'
-
-*  Get topic and subtopics.
-         CALL PAR_GET0C( 'TOPIC', TOPIC(1), STATUS )
-         CALL PAR_CANCL( 'TOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBTOPIC', TOPIC(2), STATUS )
-         CALL PAR_CANCL( 'SUBTOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBSUBTOPIC', TOPIC(3), STATUS )
-         CALL PAR_CANCL( 'SUBSUBTOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBSUBSUBTOPIC', TOPIC(4), STATUS )
-         CALL PAR_CANCL( 'SUBSUBSUBTOPIC', STATUS )
-
-*  Concatenate the help topics into a single string
-         HLPTXT = TOPIC( 1 )
-         NC = CHR_LEN( TOPIC( 1 ) ) + 1
-         DO I = 2, MAXLEV
-            CALL CHR_APPND( ' '//TOPIC( I ), HLPTXT, NC )
-         END DO
-
-*  Use a null string when something has gone wrong obtaining the
-*  topics and sub-topics.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )
-            HLPTXT = '         '
-         END IF
-
-*  Get help text.
-         CALL SHL_GETHLP( LIBRAY, HLPTXT, STATUS )
-      END IF
+*  Call out to the help support library
+      CALL SHL_ADAM( LIBNAM, .TRUE., STATUS )
 
       END
 * $Id$
