@@ -1,0 +1,26 @@
+<!--
+  Additional entities, for use with XML.  These are extracted from the
+  XML versions of the ISO entities contained in dtd/ISOent/xml.
+
+  &amp and &lt are predeclared in XML.
+
+  $Id$
+-->
+
+<!ENTITY gt		"&#x003E;"> <!-- GREATER-THAN SIGN -->
+<!ENTITY pounds		"&#x00A3;"> <!-- POUND SIGN -->
+<!ENTITY dollar		"&#x0024;"> <!-- DOLLAR SIGN -->
+<!ENTITY copy		"&#x00A9;"> <!-- COPYRIGHT SIGN -->
+<!ENTITY nbsp		"&#x00A0;"> <!-- NO-BREAK SPACE -->
+<!ENTITY percent	"&#x0025;"> <!-- PERCENT SIGN -->
+<!ENTITY deg		"&#x00B0;"> <!-- DEGREE SIGN -->
+<!ENTITY emdash		"&#x2014;"> <!-- EM DASH -->
+<!ENTITY endash		"&#x2013;"> <!-- EN DASH -->
+<!ENTITY ellip		"&#x2026;"> <!-- HORIZONTAL ELLIPSIS -->
+<!ENTITY tilde		"&#x007E;"> <!-- TILDE -->
+<!ENTITY hash		"&#x0023;"> <!-- NUMBER SIGN -->
+<!ENTITY quot		"&#x0022;"> <!-- QUOTATION MARK -->
+<!ENTITY underscore	"&#x005F;"> <!-- underscore		-->
+
+<!ENTITY latex  "LaTeX"	> <!-- might as well...	-->
+<!ENTITY tex	"TeX"	> <!-- might as well...	-->
