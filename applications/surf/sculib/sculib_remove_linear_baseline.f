@@ -276,6 +276,8 @@
      :                             IN_DATA(BOL, POS) .NE. VAL__BADR) 
      :                             THEN
                                  
+*     Can use FALSE for bad pixel checking since we already know
+*     the point is good from above check.
                                  CALL VEC_RTOD(.FALSE., 1, 
      :                                IN_DATA(BOL,POS), 
      :                                %VAL(FITDATA_PTR + 
