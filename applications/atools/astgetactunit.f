@@ -61,6 +61,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
+*  External References:
+      EXTERNAL AST_ISAFRAME
+
 *  Status:
       INTEGER STATUS
 

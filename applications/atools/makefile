@@ -504,7 +504,7 @@ astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astshiftmap astfindframe astpermaxes astpickaxes \
 astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos \
-astgetrefpos astformat asttran2 astmathmap astsetactunit astgetactunit.f
+astgetrefpos astformat asttran2 astmathmap astsetactunit astgetactunit
 
 
 #  Monolith routine source name.

@@ -28,7 +28,7 @@ astpickaxes.f astpickaxes.ifl astsimplify.f astsimplify.ifl asttrann.ifl \
 asttrann.f atl1_cpcol.f gethlp.f astinvert.f astinvert.ifl astmapbox.f \
 astmapbox.ifl astgetrefpos.f astsetrefpos.f astspecframe.f astgetrefpos.ifl \
 astsetrefpos.ifl astspecframe.ifl astformat.ifl asttran2.ifl astformat.f \
-asttran2.f astmathmap.f astmathmap.ifl astsetactiveunit.f astsetactiveunit.ifl \
+asttran2.f astmathmap.f astmathmap.ifl astsetactunit.f astsetactunit.ifl \
 astgetactunit.f astgetactunit.ifl
 
 # The contents of the atools_iraf.tar file:

@@ -175,10 +175,10 @@
          CALL ASTMATHMAP( STATUS )
  
       ELSE IF ( NAME .EQ. 'ASTSETACTUNIT' ) THEN
-         CALL ASTSETACTIVEUNIT( STATUS )
+         CALL ASTSETACTUNIT( STATUS )
  
       ELSE IF ( NAME .EQ. 'ASTGETACTUNIT' ) THEN
-         CALL ASTGETACTIVEUNIT( STATUS )
+         CALL ASTGETACTUNIT( STATUS )
  
 
 *  If the action name is not recognised, then report an error.

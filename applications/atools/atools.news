@@ -25,7 +25,7 @@
   - New command astsetactunit. Sets the value of the ActiveUnit flag
   for a Frame, which determines how the Unit attribute of the Frame is used.
   This corresponds to the AST_SETACTIVEUNIT routine (the name has been
-  abbreviated because fo a limitation on th elength of ADAM command names).
+  abbreviated because of a limitation on the length of ADAM command names).
 
   - New command astgetactunit. Returns the value of the ActiveUnit flag
   for a Frame. This corresponds to the AST_GETACTIVEUNIT routine.
