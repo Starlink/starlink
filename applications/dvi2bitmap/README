@@ -29,18 +29,21 @@ setting the environment variable CXX, either via `CXX=cxx ./configure'
 or `env CXX=cxx ./configure', depending on your shell.
 
 To install, just copy the executable dvi2bitmap wherever you want it
-to live.  The program generates XBM bitmaps by default.
+to live.
 
 Since this program uses `standard' TeX fonts, but at resolutions
 appropriate for screens rather than paper, there is a certain fuss
 involved in generating, and after that, finding, these fonts.  If you
-have the `kpathsea' library installed, then this should Just Work;
-failing that, you might have to set an environment variable.  See the
+have the `kpathsea' library installed, then this should Just Work.
+Failing that, you might have to set an environment variable.  See the
 section of the manual entitled `Finding fonts' for some discussion of
-this.  As well, it's a good idea to give the command `make test' after
-you've built the distribution.  As well as testing the program, this
-attempts to give you some advice about what you need to do on your
-particular system to tell dvi2bitmap where its fonts are.
+this.  As well, it's a good idea to give the command
+
+    make test
+
+after you've built the distribution.  As well as testing the program,
+this attempts to give you some advice about what you need to do on
+your particular system to tell dvi2bitmap where its fonts are.
 
 If you want it to be able to generate GIFs, then give the configure
 option `--enable-gif'.  The GIF format is the copyright of CompuServe.
@@ -61,9 +64,9 @@ this utility: you can find it at <http://www.libpng.org/pub/png/>.
 
 The program can work with the kpathsea library.  This is the same
 path-searching library which several TeX implementations use to find
-fonts (and more).  If you wish to use this, then give the option
-`--with-kpathsea' to the configure command, and if the library is
-installed on your machine, the program will use it.
+fonts (and more).  If you wish to use this (you should, if you can),
+then give the option `--with-kpathsea' to the configure command, and
+if the library is installed on your machine, the program will use it.
 
 The program builds successfully on (at least) the following
 machine/compiler combinations.  It should be written in
