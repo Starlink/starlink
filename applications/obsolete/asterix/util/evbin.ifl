@@ -2,7 +2,7 @@ INTERFACE EVBIN
 
   PARAMETER INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.EVDS'
     PROMPT      'Enter name of input dataset'
