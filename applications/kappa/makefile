@@ -900,6 +900,10 @@ STYLE_FILES = kappa_style.def kappa_lutview_style.def \
 kappa_keystyle.def kappa_linplot_keystyle.def kappa_vecplot_keystyle.def \
 kappa_display_keystyle.def
 
+#  Define the package demo files for use with stardemo.tcl
+
+DEMO_FILES = kappa.demo
+
 #  List of TK/TCL object libraries.
 
 TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS) 
@@ -1015,7 +1019,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
               $(IRAF_STARTUP) $(IRAF_PKG_PAR) $(IRAF_IFC_FILES) \
               $(IRAF_OUTPAR_FILES) $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) \
               $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
-              $(IRAF_DEMO) $(IRAF_DATA) $(STYLE_FILES)
+              $(IRAF_DEMO) $(IRAF_DATA) $(STYLE_FILES) $(DEMO_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -1101,7 +1105,7 @@ TRN_PAR:     $(STAR_INC)/trn_par;     $(LINK) $? $@
 #
 $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(LINK_SCRIPT) $(ICL_SCRIPT) \
 $(I_KAPPA) $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
-$(STYLE_FILES):
+$(STYLE_FILES) $(DEMO_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1634,6 +1638,17 @@ install:
         done
 
 #
+#  Install the demo files, giving them world-read permission.
+	for f in $(DEMO_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
+        done
+
+#
 #  Install the help files, giving them world-read permission.
 	for f in $(HELP_FILES) ""; do \
            if test -n "$$f"; then \
@@ -1949,6 +1964,15 @@ do_deinstall:
 #
 #  Deinstall the stle files, if installed versions exist.
 	- for f in $(STYLE_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the demo files, if installed versions exist.
+	- for f in $(DEMO_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
@@ -2361,7 +2385,8 @@ strip:
 $(PKG_NAME)_source.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) \
                   $(LINK_SCRIPT) $(ICL_SCRIPT) $(I_KAPPA) \
-                  $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) $(STYLE_FILES)
+                  $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
+                  $(STYLE_FILES) $(DEMO_FILES)
 
 $(PKG_NAME)_iraf.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(IRAF_STARTUP) $(IRAF_PKG_PAR) \
