@@ -33,7 +33,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="atools">
-  <version>1.7-1</version>
+  <version>1.8</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -1267,9 +1267,14 @@ package.
   <version>0.7-13</version>
   <path>applications/sgmlkit</path>
   <description>Starlink documentation SGML kit</description>
-  <!-- <abstract><p></p></abstract> -->
+  <abstract><p>The Starlink SGML set supports people writing Starlink
+      documents, such as SUNs, SSNs, MUDs and the like.  It consists of a
+      definition of a markup language suitable for such documents,
+      plus software to convert these source documents to reader-friendly
+      form.  At present, these `output formats' include HTML and LaTeX
+      (and hence include postscript and PDF formats).</p></abstract>
   <dependencies >
-    
+    <sourceset>dvi2bitmap</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1283,7 +1288,7 @@ package.
       <email>m.b.taylor@bristol.ac.uk</email>
     </person>
   </developers>
-  <!-- <documentation></documentation> -->
+  <documentation> ssn70</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->

@@ -1486,7 +1486,8 @@ $(MANIFEST)/scb: \
 	cd applications/scb \
 	  && $(MAKE_CPT)
 
-$(MANIFEST)/sgmlkit:
+$(MANIFEST)/sgmlkit: \
+		$(MANIFEST)/dvi2bitmap
 	cd applications/sgmlkit \
 	  && $(MAKE_CPT)
 
@@ -1546,6 +1547,7 @@ $(MANIFEST)/spt: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/ssn78: \
+		$(MANIFEST)/dvi2bitmap \
 		$(MANIFEST)/sgmlkit
 	cd docs/ssn/078 \
 	  && $(MAKE_CPT)
