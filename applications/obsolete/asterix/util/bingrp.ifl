@@ -17,6 +17,20 @@ INTERFACE BINGRP
     PROMPT 'Delete existing group information'
   ENDPARAMETER
 
+  PARAMETER DUMP
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PROMPT 'Dump group data to a new file'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    TYPE    'LITERAL'
+    PROMPT  'Name of output grouped dataset'
+    VPATH   'PROMPT'
+    HELP    'Data groups will be written to this file, one group per pixel'
+  ENDPARAMETER
+
   PARAMETER POLAR
     TYPE '_LOGICAL'
     DEFAULT N
