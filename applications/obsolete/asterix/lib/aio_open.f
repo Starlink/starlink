@@ -288,6 +288,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*200		LFILE			! Local copy of FILE
       CHARACTER*20              SYSNAME, NODENAME,	! Operating system
      :                          RELEASE, VERSION, 	! description
      :                          MACHINE
@@ -296,32 +297,36 @@
       LOGICAL			THERE			! File exists?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Don't bother with this on VMS
+*  Make copy of FILE
+      LFILE = FILE
+
+*  Don't bother with this on VMS
       CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE,
      :                STATUS )
       IF ( (INDEX(SYSNAME,'VMS').EQ.0) .AND.
      :     (INDEX(SYSNAME,'vms').EQ.0) ) THEN
 
-*      Get length of filename
-        FLEN = CHR_LEN(FILE)
+*    Get length of filename
+        FLEN = CHR_LEN(LFILE)
+        LFILE(FLEN+1:FLEN+1) = '~'
 
-*      Does file exist?
-        INQUIRE( FILE=FILE(:FLEN), EXIST=THERE )
+*    Does file exist?
+        INQUIRE( FILE=LFILE(:FLEN), EXIST=THERE )
         IF ( THERE ) THEN
 
-*        Does a backup file already exist?
-          INQUIRE( FILE=FILE(:FLEN)//'~', EXIST=THERE )
+*      Does a backup file already exist?
+          INQUIRE( FILE=LFILE(:FLEN+1), EXIST=THERE )
 
 *        If so, delete it
           IF ( THERE ) THEN
-            CALL UTIL_DELETE( FILE(:FLEN)//'~', STATUS )
+            CALL UTIL_DELETE( LFILE(:FLEN+1), STATUS )
           END IF
 
 *        Rename old file
-          CALL UTIL_RENAME( FILE(:FLEN), FILE(:FLEN)//'~', STATUS )
+          CALL UTIL_RENAME( LFILE(:FLEN), LFILE(:FLEN+1), STATUS )
 
         END IF
 

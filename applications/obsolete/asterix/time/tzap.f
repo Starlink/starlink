@@ -133,12 +133,12 @@
           IF (EOK) THEN
             CALL GCB_SETI('ERR_COLOUR',ECOL,STATUS)
           ELSE
-            CALL GCB_CANI('ERR_COLOUR',STATUS)
+            CALL GCB_CAN('ERR_COLOUR',STATUS)
           ENDIF
           IF (POK) THEN
             CALL GCB_SETI('POINT_COLOUR',PCOL,STATUS)
           ELSE
-            CALL GCB_CANI('POINT_COLOUR',STATUS)
+            CALL GCB_CAN('POINT_COLOUR',STATUS)
           ENDIF
 
           CALL TIM_SETTR(0,STATUS)
