@@ -316,7 +316,7 @@ to need explanation or elaboration.
         (make-latex-environment
          name: "Verbatimlines"
          recontrol: "/-/"
-         (process-children))))
+         (process-children-trim))))
 
 (element attribution
   (make-latex-command name: "textit"
