@@ -207,7 +207,7 @@ itcl::class gaia::Gaia {
          [ProgressBar $w.progress \
              -from 0 -to 10 -value 0 \
              -borderwidth 2 -relief groove] \
-         -side top -fill x -padx 1m -pady 2m
+         -side top -fill x -padx 1m -pady 2m -expand 1
       tkwait visibility $w
    }
 
