@@ -111,11 +111,14 @@
      :                STATUS )
       END IF
 
-*  Locate the memory
-      CALL DYN0_FIND( PTR, SLOT, STATUS )
+*  Locate the memory. Prevent deallocation of null pointer
+      IF ( PTR .NE. 0 ) THEN
+        CALL DYN0_FIND( PTR, SLOT, STATUS )
 
-*  Unmap it
-      CALL DYN0_UNMAP( SLOT, STATUS )
+*    Unmap it
+        CALL DYN0_UNMAP( SLOT, STATUS )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'DYN_UNMAP', STATUS )
