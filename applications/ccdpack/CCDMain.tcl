@@ -23,7 +23,6 @@
 #     any other combinations and will not work with earlier versions
 #     of Tcl and Tk or [incr Tcl].
 
-
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
 #     MBT: Mark Taylor (STARLINK)
@@ -43,6 +42,8 @@
 #        now the default help browser (same as HTX).
 #     11-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     4-JUL-2001 (MBT):
+#        Upgraded for use with Sets.
 #     {enter_changes_here}
 
 #-
@@ -52,6 +53,7 @@
    global CCDbrowser
    global CCDdetectorcache
    global CCDdir
+   global CCDglobalpars
    global CCDseetasks
    global CCDstarhtml
    global CCDimagefilters
@@ -143,7 +145,7 @@
 #  used as part of the file filtering mechanisms (note this isn't 
 #  therefore set by any values in .ccdpack, it's important that
 #  the conversion filters are actually setup).
-set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
+   set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
    if { [info exists env(NDF_FORMATS_IN)] } { 
       set new_types [split $env(NDF_FORMATS_IN) ","]
       foreach pair $new_types { 
@@ -224,8 +226,18 @@ set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
                   -width 30 \
                   -buttonwidth 18
 
-#  Create & Run reduction script.
+#  Set grouping.
    CCDTkWidget Separate4 separate4 frame $top.s4 -height 3
+   CCDCcdWidget Sethead sethead \
+      Ccd_choice $Top.sets \
+                  -standard false \
+                  -label "\nGroup by Set\n" \
+                  -stack horizontal \
+                  -width 30 \
+                  -buttonwidth 18
+
+#  Create & Run reduction script.
+   CCDTkWidget Separate5 separate5 frame $top.s5 -height 3
    CCDCcdWidget Run run \
       Ccd_choice $Top.run \
                -standard false \
@@ -276,19 +288,41 @@ set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
 #  Button to by-pass this part (usual if state has been restored).
    $Config addbutton {Bypass Stage} "$Import state all normal"
 
+#  Construct the command to move the the stage after data import - may
+#  be either Set grouping or run.
+   set nextstage "
+      global CCDglobalpars
+      if { \$CCDglobalpars(USESET) == \"TRUE\" } {
+         set Next $Sethead
+      } else {
+         set Next $Run
+      }
+      \$Next state all normal
+   "
+    
 #  Button for organising NDFs into types etc. "by hand".
    $Import addbutton {Manual Organization} \
-      "CCDNDFOrganize $Top.doimport $Run state all normal"
+      "CCDNDFOrganize $Top.doimport $nextstage"
 
 #  Button for importing FITS headers.
    $Import addbutton {Using FITS Headers} \
-      "CCDFITSImport $Top.doimport $Run state all normal"
+      "CCDFITSImport $Top.doimport $nextstage"
 
 #  Button for skipping this section.
-   $Import addbutton {Bypass Stage} "$Run state all normal"
+   $Import addbutton {Bypass Stage} "$nextstage"
 
 #  Disable import buttons for now.
    $Import state all disabled
+
+#  Button for generic Set grouping.
+   $Sethead addbutton {Add Set headers} \
+      "CCDAddSetHeaders $Top.setgrp $Run state all normal"
+
+#  Button for skipping this section.
+   $Sethead addbutton {Bypass Stage} "$Run state all normal"
+
+#  Disable Set grouping buttons for now.
+   $Sethead state all disabled
 
 #  Button for creating and running reduction script.
    $Run addbutton {Setup and Run} \
@@ -344,8 +378,10 @@ set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
    pack $separate2 -fill x
    pack $import -fill x -side top
    pack $separate3 -fill x
-   pack $run -fill x -side top
+   pack $sethead -fill x -side top
    pack $separate4 -fill x
+   pack $run -fill x -side top
+   pack $separate5 -fill x
    pack $names -fill both -expand true
 
 
