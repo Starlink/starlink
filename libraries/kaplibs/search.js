@@ -648,7 +648,7 @@ function displayResults(){
       for( i = 0; i < matchedNames.length; i++ ){
          name = matchedNames[i];
          doc.writeln( '<tr><td align="left" valign="top">' );
-         doc.writeln( '<a href="'+routines[name].URL+'">'+name+':</A></TD>' );
+         doc.writeln( '<a href="'+routines[name].URL+'" target=MAIN>'+name+':</A></TD>' );
          doc.writeln( '<td align="left" valign="top">' );
          doc.writeln( routines[name].purpose );
    
