@@ -1,0 +1,3344 @@
+\documentclass[a4paper]{book}
+\usepackage{graphics}
+\pagenumbering{roman}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {27.5}
+\newcommand{\stardocauthors}   {P N Daly}
+\newcommand{\stardocaddress}   {pnd$@$jach.hawaii.edu}
+\newcommand{\stardocdate}      {8 April 1996}
+\newcommand{\stardoctitle}     {Portable--CGS4DR \\
+                                CGS4 Data Reduction}
+\newcommand{\stardocversion}   {Version V1.3-0}
+\newcommand{\stardocmanual}    {Users' Guide}
+%------------------------------------------------------------------------------
+\newcommand{\radec}     {$[\alpha,\delta\,]$}
+\newcommand{\hadec}     {$[h,\delta\,]$}
+\newcommand{\azel}      {$[Az,El\,]$}
+\newcommand{\gal}       {$[l^{I\!I},b^{I\!I}]$}
+\newcommand{\xy}        {$[x,y\,]$}
+\newcommand{\xyz}       {$[x,y,z\,]$}
+\newcommand{\xyzd}      {$[\dot{x},\dot{y},\dot{z}\,]$}
+\newcommand{\xyzxyzd}   {$[x,y,z,\dot{x},\dot{y},\dot{z}\,]$}
+\newcommand{\arcsec}    {$\hspace{-0.05em}\raisebox{-0.5ex}
+                        {$^{'\hspace{-0.1em}'}$}
+                        \hspace{-0.7em}.\hspace{-0.05em}$}
+\newcommand{\tsec}      {\mbox{$^{\rm s}\!\!.$}}
+\newcommand{\hms}[4]    {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
+\newcommand{\dms}[4]    {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
+%------------------------------------------------------------------------------
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+\renewcommand{\_}{{\tt\char'137}}
+\voffset = -1.0cm
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\renewcommand{\thepage}{\roman{page}}
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+%  Define cross and tick, footnote symbols
+\newcommand{\cross}{$\times$}
+\newcommand{\tick}{$\surd$}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+%End of LAYOUT.TEX layout definitions.
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+{\large Particle Physics \& Astronomy Research Council}\\
+{\large Starlink Project\\}
+{\large \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\footnote[2]{{\em Present Address:}
+ {\sf Joint Astronomy Centre, 660 N. A'oh\={o}k\={u} Place, University Park,
+  Hilo HI 96720, USA.}} \\
+{\em \stardocaddress} \\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{20mm}
+%------------------------------------------------------------------------------
+%  Introduction page
+
+\newpage
+\thispagestyle{empty}
+
+\vspace*{\fill}
+
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+
+\vspace*{\fill}
+
+%  Table of contents.  Page numbering in roman.
+%  -------------------------------------------
+\newpage
+\pagenumbering{roman}
+\pagestyle{myheadings}
+\markright{\stardocname}
+
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+
+\newpage
+
+%------------------------------------------------------------------------------
+%  Acknowledgements page
+\chapter*{Acknowledgements}
+\markboth{Acknowledgements}{\stardocname}
+\label{acknowledgements}
+
+The following have contributed to Portable--CGS4DR or its predecessors:
+Jeremy Bailey, Steven Beard, Phil Blanco, Alan Bridger, Bob Carswell, Alan 
+Chipperfield, Phil Daly, Tom Geballe, Graeme Harkness, Kevin Krisciunas, 
+John Lightfoot, William Lupton, Chris Mayer, Dave Mills, Matt Mountain, 
+Alan Pickup, Phil Puxley, Suzanne Ramsay, Keith Shortridge, Dave Terrett 
+and Gillian Wright. There may be others whom I have neglected to mention. 
+My thanks to them all.
+                                               
+Sun is a trademark of Sun Microsystems, Inc.
+Unix is a registered trademark of UNIX System Laboratories, Inc.
+PostScript is a registered trademark of Adobe Systems, Inc.
+{\sc pgplot} is copyright by the California Institute of Technology.
+
+\vspace{15mm}
+\begin{center}
+\rule{80mm}{0.5mm}
+
+\vspace{15mm}
+
+{\tt http://www.jach.hawaii.edu/ukirt\_sw/}.
+
+\vspace{15mm}
+
+\rule{80mm}{0.5mm}
+
+\vspace{15mm}
+
+Reference: \ \ Daly, P. N. 1996, SUN/27, Starlink Project, CLRC.
+\end{center}
+
+\cleardoublepage
+\pagenumbering{arabic}
+%------------------------------------------------------------------------------
+%  Part I 
+\part{INTRODUCTION TO CGS4DR}
+\pagestyle{myheadings}
+\markboth{Introduction to Portable--CGS4DR}{\stardocname}
+
+\chapter{Introduction}
+\section{Introduction to Portable--CGS4DR}
+The fourth generation {\sc cooled grating spectrometer}, CGS4, is
+designed to operate on UKIRT in the 1--5 $\mu$m region of the
+electromagnetic spectrum at resolutions in the range
+$\lambda$/$\Delta\lambda$ $\sim$ 300--20000 (Mountain et al. 1990,
+Ramsay 1993). To reduce background noise, it is maintained on the
+telescope in vacuum at cryogenic temperatures. It achieved first light
+at UKIRT on 4 February 1991 (Carswell et al. 1991). On 22 April 1995 a
+new InSb 256 $\times$ 256 array was commissioned into the instrument.
+The new array having a dark current of $<<$ 1 $e^{-}$ $s^{-1}$ and a
+read noise of $\sim$ 40 $e^{-}$ per integration, is much more sensitive
+than previous detectors. On any given spectroscopic night, an observer
+can expect to acquire and reduce $\sim$ 100 Mb of high quality data
+with CGS4.
+
+To an observer, the system appears as two black boxes: the data
+acquisition system and the data reduction system (Wright et al. 1994).
+Both are under the direct control of the observer and can be
+manipulated to deal with a wide variety of astronomical configurations.
+The data is, therefore, both acquired and reduced in real-time at the
+telescope.
+
+This document describes the CGS4 data reduction system now called
+Portable--CGS4DR. The software has been carefully designed and tested
+under the Figaro (Shortridge 1993) and {\sc adam} (Lawden \& Hartley 1992)
+environments under Unix.  The data files produced by Portable--CGS4DR
+are readable by standard Figaro applications although not all may
+handle the quality and error arrays correctly.
+
+For best results, Portable--CGS4DR should be run on a single user
+workstation having at least 32 Mb of main memory and a colour monitor.
+It can, of course, run on a dumb terminal and display to any {\sc
+starlink} supported graphics device.
+
+If you think you have discovered a bug, please report it by e-mail to
+{\tt ussc$@$star.rl.ac.uk}.
+
+\section{What It Can Do}
+First, it can reduce spectrographic data in an automatic way.  No
+system, however, will do everything every user will ever want so some
+post processing may be required in certain circumstances. The aim is to
+produce publishable quality spectra at the telescope via an automated
+reduction paradigm.
+
+Briefly, Portable--CGS4DR can do the following:
+
+\begin{itemize}
+\item Allows a wide variety of data reduction configurations.
+\item Interlaces oversampled data frames.
+\item Reduce known {\sc bias}, {\sc dark}, {\sc flat}, {\sc arc}, {\sc object}
+and {\sc sky} frames.
+\item Wavelength calibrate via suitable {\sc arc} lines.
+\item Flux calibrate via a suitable {\sc standard}.
+\item Remove the {\sc sky}, residual sky OH-lines ($\lambda <$ 2.3 $\mu$m) 
+  and thermal emission ($\lambda \geq$ 2.3 $\mu$m) from data. 
+\item Add data into groups for improved signal-to-noise.
+\item Extract and de-ripple a spectrum.
+\item Maintains an index of reduced observations.
+\item Maintains, if required, an archive of observations.
+\item Plot data in a variety of ways.
+\end{itemize}
+
+The basic concept of the system is based upon re-scheduling to read a 
+data reduction queue.  This queue is maintained in memory.
+
+\section{Version History}
+This is the fourth incantation of the Portable--CGS4DR software. The
+functionality of each release is:
+
+\begin{description}
+\item[] {\bf V1.0--0}
+ \begin{enumerate}
+  \item First release of Portable-CGS4DR.
+  \item Supports reduction of all frames into calibrated or uncalibrated reduced 
+        observations and groups in {\sc dst} or {\sc ndf} format using {\sc stare} 
+        or {\sc ndstare} observing modes.
+  \item Supports calibration of {\sc arc} into reduced calibration frames.
+  \item Supports observation filing, dividing by a standard source and automated
+        extraction of spectra.
+  \item Supports ICL command line interface.
+ \end{enumerate}
+\item[] {\bf V1.1--0}
+ \begin{enumerate}
+  \item Supports all features in V1.0-0.
+  \item Supports user defined bad pixel masks.
+  \item Supports 256$\times$256 {\sc alice} data in all modes (including {\sc chop}).
+  \item New features include set\_/get\_polyfit, set\_/get\_file\_selection, set\_/get\_cut\_dir
+        and oversampled {\sc flat} fields.
+  \item Bug fixes for endgroup and plot\_graph.
+  \item Support for a demo.
+ \end{enumerate}
+\item[] {\bf V1.2--0}
+ \begin{enumerate}
+  \item Supports all features in V1.1-0.
+  \item Bug fixes for pause\_on\_error, ukirtfig and NBS.
+  \item Supports {\sc tcladam} {\sc gui}.
+ \end{enumerate}
+\item[] {\bf V1.3--0}
+ \begin{enumerate}
+  \item Supports all features in V1.2-0.
+  \item Corrects problems with bad pixel mask generation.
+  \item Bug fixes to irflat, deripple, create\_window\_mask, divide\_by\_ff.
+  \item Conforms to Figaro V5 structure.
+  \item Removes NAG dependency by using PDA\_ routines.
+  \item Essential engineering functions added (two row/col line fitting).
+  \item Supports dynamic defaults in GUI.
+  \item Supports on-line help in GUI.
+  \item Fully documented on WWW (using client-side image maps etc).
+  \item Adds default foreground/background colours to GUI.
+ \end{enumerate}
+\end{description}
+
+\section{Some Basic Definitions}
+Preliminary reduction of array data is common to both spectroscopy and
+photometry and techniques describing the removal of instrumental
+effects are noted elsewhere (Daly 1987). Before starting to use
+Portable--CGS4DR, however, you should be familiar with the reduction of
+spectroscopic data (Puxley 1988).  It would also be advantageous to be
+familiar with Figaro data reduction (Bailey 1990, Bailey 1991).
+Portable--CGS4DR software knows about the following observation types:
+
+\begin{description}
+\item[{\sc bias}]--- A short blank observation.
+\item[{\sc dark}]--- Blank observation with the same on-chip exposure time as 
+ another observation.
+\item[{\sc flat}]--- Observation of black-body source in calibration unit, 
+ the sky or the illuminated dome.
+\item[{\sc object}]--- Observation of an astronomical object.
+\item[{\sc sky}]--- Observation to subtract from an {\sc object} frame to 
+ perform first order sky subtraction. 
+\item[{\sc arc}]--- Uncalibrated observation of the arc lamp or OH-lines from
+ the sky. 
+\item[{\sc calibr}]--- An {\sc arc} observation converted into a wavelength 
+ calibrated frame.
+\item[{\sc standard}]--- A standard star observation divided by a model 
+ black-body.
+\end{description}
+
+In a common data reduction sequence the following operations would be
+carried out: 
+
+\begin{enumerate}
+\item Apply a bad pixel mask.
+\item Subtract a {\sc bias} frame.
+\item Linearise the signal.
+\item Subtract a {\sc dark} frame.
+\item Divide by a {\sc flat} field.
+\item Interlace integrations taken at different detector positions.
+\item Calibrate x-axis into wavelength.
+\item Co-add observations and subtract {\sc sky} frames.
+\item Divide by a {\sc standard} source.
+\item Extract up to 3 spectra nodded along the slit.
+\end{enumerate}
+
+These steps are configurable to allow for a wide variety of astronomical
+configurations. When observations are reduced they are recorded in an
+index file of the form {\sc cgs4\_}{\em yymmdd.}{\sc index}, where {\em
+yyddmm} is the UT date on which the observations were made, in the
+directory {\sc \$cgs4\_index/}. The system will try to replace the date
+string with an appropriate value whenever possible based upon universal
+time. The contents of the index file may also be manipulated. 
+
+\section{Files Used by the System}
+When the data acquisition system obtains a raw data frame from the control
+system, it writes it to an integration file whose name is of the form
+iyymmdd\_oooo\_iiii where `yymmdd' is the UT date, `oooo' the observation
+number and `iiii' the integration number. Integration files are,
+therefore, frames taken at a single detector position and are written to
+the directory {\sc \$idir/}. If a single integration is reduced, the
+result is written to a reduced integration file whose name is of the form
+riyymmdd\_oooo\_iiii, written to the directory {\sc \$ridir/}. 
+
+In CGS4, however, the spectrum may be oversampled by combining several
+integrations at different detector positions. A description of the
+instrument configuration during an observation is held in an observation
+file whose name is of the form oyymmdd\_oooo in the directory {\sc
+\$odir/}.  This information is combined with the data in the integration
+files to produce a reduced observation of size $x \times y*n$ elements
+where {\em n} is the oversampling factor and $x \times y$ is the readout
+area.  This reduced observation, whose name is of the form royymmdd\_oooo,
+is held in the directory {\sc \$rodir/}.  The reduced observation file
+contains the reduced data for a single observation. 
+
+When observing astronomical objects, individual observations may be of
+{\sc object} or {\sc sky}. Any number of {\sc object} and {\sc sky}
+observations relating to one particular astronomical object may be
+combined together into a reduced group whose name is of the form
+rgyymmdd\_gggg, where `gggg' is a unique group number, which is the first
+observation in the group as defined by the data acquisition system, held
+in the directory {\sc \$rgdir/}. These reduced group files contain
+sky-subtracted data. These files may be manipulated further by the
+automatic data reduction sequence to provide enhanced sky-subtraction for
+point sources and to ratio by a standard star.  Depending upon the options
+selected the prefixes \_pf, \_dbs, \_spc, \_imspc may be appended to the
+reduced group filenames. For example, a group called rg920530\_17 which is
+divided by a standard will produce a group called rg920530\_17\_dbs. If
+the same group is `polysky-ed', divided by a standard and a spectrum is
+extracted, two files will be created named rg920530\_17\_pf\_dbs\_spc and
+rg920530\_17\_pf\_dbs\_imspc. The Unix file clobbering mechanism should
+ensure that only one version of each file exists at any one time. 
+
+The system will clear up any temporary files upon receipt of an {\sc
+endgroup} command in the data reduction queue. The data acquisition system
+places such a command in the queue automatically but the data reduction
+system does not. 
+
+The data reduction system uses two other types of file. Wavelength
+calibrated {\sc calibr} frames are held in files of type cayymmdd\_oooo in
+the {\sc \$rodir/} directory. Standard star observations are held in files
+whose names are of the form styymmdd\_gggg, held in the {\sc \$rgdir/}
+directory. 
+
+Note that the files contained in {\sc \$idir/} and {\sc \$odir/} are never
+over-written whereas the files in {\sc \$ridir/}, {\sc \$rodir/} and {\sc
+\$rgdir/} may be over-written by re-reducing the data. 
+
+\section{How Does Portable--CGS4DR Select Calibration Frames?}
+The files of type {\sc bias}, {\sc dark}, {\sc flat}, {\sc calibr} and
+{\sc standard} are generically termed calibration frames\footnote[2]{In
+this document, I have tried to use the lowercase calibrate or calibration
+to refer to the technique or a generic frame and the uppercase {\sc
+calibr} to refer to a specific wavelength calibration observation.}. When
+such frames are required by the software to reduce another observation, a
+search is made on the index file of already reduced observations. 
+
+Normally, the user lets the software decide which calibration frames to
+use. In general, it is true to say that the nearest observation in time
+that matches the instrument configuration of the observed object is
+selected and such frames are memory mapped to prevent unnecessary
+processing thus speeding up the reduction considerably. 
+
+If a specific observation is chosen, the software will use that
+observation irrespective of any criteria mis-match. In verbose mode the
+software will report any mis-matched criteria to the user but otherwise
+the user may be unaware that the frame is unsuitable. Indeed, if a user
+wants to know why certain calibration frames are being rejected, setting
+verbose output to {\sc true} is the only way of obtaining such
+information. 
+
+\begin{table}
+\begin{center}
+\caption{\bf Calibration Frame Matching Criteria} \label{tab1}
+\vglue 0.6cm
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+{\em Criteria} & {\sc bias} & {\sc dark} & {\sc flat} & {\sc calibr} & {\sc standard} \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+Detector size               & \tick   & \tick   & \tick   & \cross  & \tick  \\
+Detector columns            & \cross  & \cross  & \cross  & \tick   & \cross \\
+On-chip Exposure Time       & \cross  & \tick   & \cross  & \cross  & \cross \\
+Observation mode (NDR)      & \cross  & \tick   & \cross  & \cross  & \cross \\
+Oversampling parameters     & \cross  & \cross  & \tick   & \tick   & \tick  \\
+Grating name                & \cross  & \cross  & \tick   & \cross  & \tick  \\
+Grating wavelength          & \cross  & \cross  & \tick   & \cross  & \tick  \\
+Slit name                   & \cross  & \cross  & \tick   & \cross  & \cross \\
+Configuration index         & \cross  & \cross  & \cross  & \tick   & \cross \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+\hline
+\end{tabular}
+\vglue 0.3cm
+{\em Key:} \cross = not checked; \tick = must match.
+\end{center}
+\end{table}
+
+There are two types of calibration frame checking within Portable--CGS4DR. 
+Compulsory checks are hard-wired into the code and consist of basic
+integrity checks such as detector size and so forth. Optional checks are
+defined only for oversampled frames and are specified by the flat\_match,
+calib\_match and standard\_match parameters in the task interface file. In
+both cases, these criteria are not configurable by the end user but are,
+for completeness, shown in table \ref{tab1}. 
+
+These matches are performed by evaluating and equating various {\sc fits}
+items pertinent to each observation. Note that the configuration index in
+the table is a time-stamp referring to when the grating was last moved and
+as such provides the strictest criteria. 
+
+\chapter{Reducing Astronomical Array Data}
+\markboth{General DR Paradigms}{\stardocname}
+\section{Eliminating Data with Bad Pixel Masks}
+A bad pixel mask is a data frame that indicates which pixels on the
+detector array are good and which bad. It may be used to mask off faulty
+detectors. Normally the mask contains 0 to indicate good, and 1 to
+indicate bad. It should be the same size as the area of the data array
+read by the data acquisition system. Bad pixel masks are held in the {\sc
+\$cgs4\_masks/} directory. 
+
+Besides flagging faulty detectors, a bad pixel mask can also be used for
+masking off un-illuminated areas at the edge of the detector array. 
+
+A bad pixel mask can be created by the software using one of three
+methods: 
+
+\begin{enumerate}
+ \item By setting all the data values lying outside a given range to bad.
+ Some sample data are plotted as a histogram, and the required range is 
+ selected using a cursor. This is called `thresholding'.
+ \item By setting all the pixels outside a given window on the detector 
+ array to bad.
+ \item By thresholding an error array.
+\end{enumerate}
+
+Masks generated by any method may be combined together. 
+
+The data reduction system can change masks by responding to a `{\sc
+drmask} {\em maskname}' command entered into the data reduction queue.
+There is also an option to specify no mask at all (\#). 
+
+Bad pixel masks can be any size or shape. When a mask is created, it
+assumes the same size and shape as the data from which it was created. The
+size and shape of the mask created by windowing can also be specified. Of
+course, allowing masks to be any size means there is a chance that the
+wrong type of mask may be specified when reducing some data. The data
+reduction system will check the bad pixel mask against each integration
+being reduced to ensure it is the right size and will report if it is not. 
+
+Portable--CGS4DR is shipped with several bad pixel masks specific to the
+current arrays: 
+
+\begin{description}
+\item[{\sf fpa61}] --- Masks the known dead, hot and variable pixels for the 
+58 $\times$ 62 InSb array in CGS4.
+\item[{\sf fpa61\_lc}] --- To be used with the CGS4 long focal length camera 
+ observations when the whole array is illuminated.
+\item[{\sf fpa61\_75}] --- To be used with the CGS4 short focal length camera
+ observations and the 75 or 150 lines per millimetre gratings.
+\item[{\sf alice\_fpa42}] --- Masks the known dead, hot and variable pixels 
+for the InSb 256$\times$256 array in IRCAM3.
+\item[{\sf fpa46\_short}] --- Masks the known dead, hot and variable pixels 
+for the InSb 256$\times$256 array in CGS4 using the short camera.
+\end{description}
+
+For the echelle, it is better to make your own windows as the illuminated area
+is a strong function of the grating angle.
+
+Note that there are problems with pixel conventions when manipulating
+masks. Some packages use the {\sc starlink} pixel convention and some the Figaro
+convention which differ by 0.5 in each direction. Combining masks can lead
+to errors. The usual way around this problem is to use the Figaro
+functions {\sc xcsub} and {\sc ycsub}\footnote[2]{To be released `real
+soon now'!} to adjust to the appropriate origin. Portable--CGS4DR conforms
+to the Figaro pixel convention where the data is centered on the
+half-integer values {\em i.e.} the origin is at (0.5,0.5). 
+
+\section{Reducing a Bias}
+To reduce a {\sc bias}, Portable--CGS4DR reads the raw data from store in
+{\sc \$idir/} and {\sc fits} header information from store in {\sc
+\$odir/}, applies a bad pixel mask, writes the reduced data parameters
+into the index file and stores the reduced {\sc bias} in {\sc \$rodir/} as
+shown in figure \ref{latfig1}. 
+
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.012500in}
+\begin{picture}(281,180)(19,635)
+\thicklines
+\put(160,735){\circle{70}}
+\put( 60,815){\line( 1, 0){ 40}}
+\put( 60,795){\line( 1, 0){ 40}}
+\put(220,815){\line( 1, 0){ 40}}
+\put(220,795){\line( 1, 0){ 40}}
+\put( 20,735){\line( 1, 0){ 40}}
+\put( 20,715){\line( 1, 0){ 40}}
+\put(260,735){\line( 1, 0){ 40}}
+\put(260,715){\line( 1, 0){ 40}}
+\put(140,655){\line( 1, 0){ 40}}
+\put(140,635){\line( 1, 0){ 40}}
+\put( 80,795){\vector( 3,-2){ 54.231}}
+\put(240,795){\vector(-3,-2){ 54.231}}
+\put(160,700){\vector( 0,-1){ 45}}
+\put( 65,725){\vector( 4, 1){ 58.824}}
+\put(195,735){\vector( 4,-1){ 58.824}}
+\put( 80,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm ODIR}}}
+\put(240,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm IDIR}}}
+\put( 40,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASKS}}}
+\put(280,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put(160,640){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put(160,740){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm APPLY}}}
+\put(160,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASK}}}
+\put(140,680){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put(175,680){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(205,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize raw}}}
+\put(240,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put( 80,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize fits}}}
+\put(120,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize header}}}
+\put(220,735){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(220,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put( 85,735){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize b.p.m.}}}
+\end{picture}
+\end{center}
+\caption{Reducing a {\sc bias}} \label{latfig1}
+\end{figure}
+
+Note that {\sc bias} frames are not subtracted when data is taken in {\sc
+ndr} (non-destructive read) mode---even if requested---since the {\sc ndr}
+algorithm has already accounted for the bias level in the data. 
+
+\section{Linearising the Data}
+After {\sc bias} subtraction, the signal from the detector array may be
+corrected for non-linearity by modifying it with a suitable polynomial of
+the form: 
+
+\begin{equation}
+  S(x) = Ax + Bx^{2} + Cx^{3} + Dx^{4} + Ex^{5} \label{equation_1}
+\end{equation}
+
+where $x$ is the measured signal and $S(x)$ is proportional to the light
+intensity falling on the detector. These coefficients may determined
+manually by examining {\sc flat} fields taken at different exposure times
+as the software does not contain any automated way of doing this. Such
+coefficients are specified in {\sc ascii} text in a linearization file: 
+
+\begin{verbatim}
+! +
+! \$CGS4_MASKS/fpa61_linear.dat
+! Linearization coefficients determined on 23-Jan-1991 by A CGS4 User
+! Order given is A, B, C, D, E vertically.
+! -
+0.9980
+0.0176
+-0.0037
+6.46E-5
+0.0000
+\end{verbatim}
+
+Note that this means that all pixels are calibrated with the same
+polynomial. The file type must be .dat and it is stored in the directory
+{\sc \$cgs4\_masks/}. Note that, although every effort has been made to
+avoid arithmetic errors during linearization, floating point overflows can
+occur if the coefficients are set to ridiculous values. The higher order
+terms, in particular, should be $<<$ 1.00 to avoid such problems. 
+
+For the arrays used in CGS4, no measurable non-linearity has been found to
+within 98\% of full well. For these reasons, this facility is normally
+turned off by setting the value to \#. 
+
+\section{Reducing a Dark}
+To reduce a {\sc dark}, Portable--CGS4DR reads the raw data from store in
+{\sc \$idir}/ and {\sc fits} header information from store in {\sc
+\$odir/}, applies a bad pixel mask, optionally subtracts a reduced {\sc
+bias} frame if in stare mode, linearises the data (if required) and writes
+the reduced data parameters into the index file and stores the reduced
+{\sc dark} in {\sc \$rodir/} as shown in figure \ref{latfig2}.
+
+Note that {\sc dark} frames are not normally subtracted when the data
+is reduced as {\sc object---sky} pairs.
+
+%\begin{figure}[!b]
+\begin{figure}[hpbt]
+\begin{center}
+\setlength{\unitlength}{0.012500in}
+\begin{picture}(285,340)(15,475)
+\thicklines
+\put( 40,560){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm COEFFS}}}
+\put( 15,575){\line( 1, 0){ 50}}
+\put( 15,555){\line( 1, 0){ 50}}
+\put( 40,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASKS}}}
+\put( 20,735){\line( 1, 0){ 40}}
+\put( 20,715){\line( 1, 0){ 40}}
+\put( 40,655){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put( 20,670){\line( 1, 0){ 40}}
+\put( 20,650){\line( 1, 0){ 40}}
+\put( 60,815){\line( 1, 0){ 40}}
+\put( 60,795){\line( 1, 0){ 40}}
+\put( 65,725){\vector( 4, 1){ 58.824}}
+\put( 65,660){\vector( 1, 0){ 55}}
+\put( 65,565){\vector( 1, 0){ 55}}
+\put( 80,795){\vector( 3,-2){ 54.231}}
+\put( 80,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm ODIR}}}
+\put( 80,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize fits}}}
+\put( 80,645){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put( 85,550){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize coeffs}}}
+\put( 85,735){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize b.p.m.}}}
+\put( 85,665){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put( 90,570){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize linear}}}
+\put(120,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize header}}}
+\put(140,495){\line( 1, 0){ 40}}
+\put(140,475){\line( 1, 0){ 40}}
+\put(140,510){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put(160,735){\circle{70}} % apply mask
+\put(160,740){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm APPLY}}}
+\put(160,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASK}}}
+\put(160,710){\vector( 0,-1){ 35}}
+\put(160,650){\circle{70}} % -bias
+\put(160,650){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm --BIAS}}}
+\put(160,620){\vector( 0,-1){ 35}}
+\put(160,560){\circle{70}} % linear
+\put(160,557){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm LINEAR}}}
+\put(160,530){\vector( 0,-1){ 35}}
+\put(160,480){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put(175,510){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(200,560){\vector( 1, 0){ 55}}
+\put(205,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize raw}}}
+\put(220,815){\line( 1, 0){ 40}}
+\put(220,795){\line( 1, 0){ 40}}
+\put(220,570){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(220,550){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put(225,660){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(225,645){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put(240,795){\vector(-3,-2){ 54.231}}
+\put(240,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm IDIR}}}
+\put(240,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(254,664){\vector(-4,-1){ 54.118}}
+\put(260,670){\line( 1, 0){ 40}}
+\put(260,650){\line( 1, 0){ 40}}
+\put(260,575){\line( 1, 0){ 40}}
+\put(260,555){\line( 1, 0){ 40}}
+\put(280,655){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put(280,560){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\end{picture}
+\end{center}
+\caption{Reducing a {\sc dark}} \label{latfig2}
+\end{figure}
+
+\section{Reducing a Flat}
+To reduce a {\sc flat}, Portable--CGS4DR reads the raw data from store in
+{\sc \$idir/} and {\sc fits} header information from store in {\sc
+\$odir/}, applies a bad pixel mask, optionally subtracts a reduced {\sc
+bias} frame, linearises the data (if required), optionally subtracts a
+reduced {\sc dark} (with the same on-chip exposure time), normalises the
+data (if required) and writes the reduced data parameters into the index
+file and stores the reduced {\sc flat} in {\sc \$rodir/} as shown in figure
+\ref{latfig3}.
+
+For normalisation a 1-D spectrum is extracted from within the window
+defined by the bad pixel mask and a polynomial is fitted to that spectrum.
+The order of the polynomial is defined by the user and the polynomial is
+grown along the slit to fill the array. Finally, the original flat field
+is divided by the polynomial frame to produce a normalised flat field.
+Normalisation also removes the spectrum of the black body calibration
+source used to generate the flat field. 
+
+An alternative method of normalising the data using a smoothing box is also
+available.
+
+For spectral configurations, the flat field algorithm pre-supposes that
+the illumination from the black body source is uniform along the slit. 
+This does mean that if a very accurate photometric comparison of spectra
+at different points along the slit is required, the flat field will need
+to be checked for variations in illumination and refined to remove this
+variability. 
+
+It has also been discovered that at some wavelengths, the {\sc cvf} acts
+like a Fabry-Perot and produces diagonal stripes in observations. These
+should be removed using oversampled {\sc flat} fields although this has
+yet to be tried. An alternative strategy to remove these stripes is to
+take an {\sc object} observation of the black body source at the same
+oversampling factor and normalise this particular observation to create a
+pseudo-{\sc flat} field. Subsequently divide your real observation by this
+observation. 
+
+Finally, if the black body has not been allowed to warm up sufficiently,
+or the detector array temperature varies, or the detector is allowed to
+saturate resulting in ghost images and so forth, the spectrum generated
+may be too noisy. Observers should pay due care and attention to acquiring
+the data. 
+
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.012500in}%
+\begin{picture}(285,480)(15,335)
+\thicklines
+\put(160,735){\circle{70}}
+\put(160,560){\circle{70}}
+\put(160,650){\circle{70}}
+\put(160,480){\circle{70}}
+\put(160,400){\circle{70}}
+\put( 60,815){\line( 1, 0){ 40}}
+\put( 60,795){\line( 1, 0){ 40}}
+\put(220,815){\line( 1, 0){ 40}}
+\put(220,795){\line( 1, 0){ 40}}
+\put( 20,735){\line( 1, 0){ 40}}
+\put( 20,715){\line( 1, 0){ 40}}
+\put( 80,795){\vector( 3,-2){ 54.231}}
+\put(240,795){\vector(-3,-2){ 54.231}}
+\put( 65,725){\vector( 4, 1){ 58.824}}
+\put( 20,670){\line( 1, 0){ 40}}
+\put( 20,650){\line( 1, 0){ 40}}
+\put(260,670){\line( 1, 0){ 40}}
+\put(260,650){\line( 1, 0){ 40}}
+\put( 15,575){\line( 1, 0){ 50}}
+\put( 15,555){\line( 1, 0){ 50}}
+\put(160,710){\vector( 0,-1){ 35}}
+\put(160,620){\vector( 0,-1){ 35}}
+\put( 65,660){\vector( 1, 0){ 55}}
+\put(254,664){\vector(-4,-1){ 54.118}}
+\put( 65,565){\vector( 1, 0){ 55}}
+\put(140,355){\line( 1, 0){ 40}}
+\put(140,335){\line( 1, 0){ 40}}
+\put(160,530){\vector( 0,-1){ 25}}
+\put(160,450){\vector( 0,-1){ 25}}
+\put(160,375){\vector( 0,-1){ 20}}
+\put( 20,495){\line( 1, 0){ 40}}
+\put( 20,475){\line( 1, 0){ 40}}
+\put( 20,415){\line( 1, 0){ 40}}
+\put( 20,395){\line( 1, 0){ 40}}
+\put(260,415){\line( 1, 0){ 40}}
+\put(260,395){\line( 1, 0){ 40}}
+\put(260,475){\line( 1, 0){ 40}}
+\put(260,495){\line( 1, 0){ 40}}
+\put( 65,485){\vector( 1, 0){ 65}}
+\put(255,480){\vector(-1, 0){ 65}}
+\put( 60,405){\vector( 1, 0){ 70}}
+\put(190,400){\vector( 1, 0){ 65}}
+\put( 80,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm ODIR}}}
+\put(240,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm IDIR}}}
+\put( 40,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASKS}}}
+\put(160,740){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm APPLY}}}
+\put(160,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASK}}}
+\put(205,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize raw}}}
+\put( 80,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize fits}}}
+\put(120,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize header}}}
+\put( 85,735){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize b.p.m.}}}
+\put(160,650){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm --BIAS}}}
+\put(160,557){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm LINEAR}}}
+\put( 40,655){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put( 40,560){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm COEFFS}}}
+\put(280,655){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put( 85,665){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put( 80,645){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(225,660){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(225,645){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put( 90,570){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize linear}}}
+\put( 85,550){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize coeffs}}}
+\put(160,477){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm --DARK}}}
+\put(160,397){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm NORM}}}
+\put(160,340){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put( 40,480){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put(280,480){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put(280,400){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put( 40,400){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm NBS}}}
+\put(240,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize flat}}}
+\put( 85,490){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put( 80,470){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(220,490){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(220,470){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put( 95,410){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize normalisation}}}
+\put( 90,385){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize method}}}
+\put(215,410){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize flat}}}
+\put(210,390){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put(140,365){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put(175,365){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize flat}}}
+\end{picture}
+\end{center}
+\caption{Reducing a {\sc flat}} \label{latfig3}
+\end{figure}
+
+\chapter{Reducing Spectroscopic Array Data}
+\markboth{Spectroscopic DR Paradigms}{\stardocname}
+\section{Reducing an Object, Sky or Arc}
+To reduce an {\sc object}, {\sc sky} or {\sc arc}, Portable--CGS4DR reads
+the raw data from store in {\sc \$idir/} and {\sc fits} header information
+from store in {\sc \$odir/}, applies a bad pixel mask, optionally
+subtracts a reduced {\sc bias} frame, linearises the data (if required),
+optionally subtracts a reduced {\sc dark}, optionally divides by a flat
+field and wavelength calibrates the data (if required), and writes the
+reduced data parameters into the index file and stores the reduced {\sc
+object}, {\sc sky} or {\sc arc} in {\sc \$rodir/} as shown in figure
+\ref{latfig4}.
+
+Note that if the bad pixel mask is changed between the calibration frame
+and the astronomical data, the resultant quality array will contain the
+logical {\sc and} of the two masks until the calibration data is
+re-reduced with the new mask and the {\sc red4} task is re-initialised to
+force it to memory map the new calibration frame. This has caused some
+confusion in the past. 
+
+%\begin{figure}[!htp]
+\begin{figure}[htbp]
+\begin{center}
+\setlength{\unitlength}{0.012500in}%
+\begin{picture}(285,480)(15,335)
+\thicklines
+\put(160,735){\circle{70}}
+\put(160,560){\circle{70}}
+\put(160,650){\circle{70}}
+\put(160,480){\circle{70}}
+\put(160,400){\circle{70}}
+\put( 60,815){\line( 1, 0){ 40}}
+\put( 60,795){\line( 1, 0){ 40}}
+\put(220,815){\line( 1, 0){ 40}}
+\put(220,795){\line( 1, 0){ 40}}
+\put( 20,735){\line( 1, 0){ 40}}
+\put( 20,715){\line( 1, 0){ 40}}
+\put( 80,795){\vector( 3,-2){ 54.231}}
+\put(240,795){\vector(-3,-2){ 54.231}}
+\put( 65,725){\vector( 4, 1){ 58.824}}
+\put( 20,670){\line( 1, 0){ 40}}
+\put( 20,650){\line( 1, 0){ 40}}
+\put(260,670){\line( 1, 0){ 40}}
+\put(260,650){\line( 1, 0){ 40}}
+\put( 15,575){\line( 1, 0){ 50}}
+\put( 15,555){\line( 1, 0){ 50}}
+\put(160,710){\vector( 0,-1){ 35}}
+\put(160,620){\vector( 0,-1){ 35}}
+\put( 65,660){\vector( 1, 0){ 55}}
+\put(254,664){\vector(-4,-1){ 54.118}}
+\put( 65,565){\vector( 1, 0){ 55}}
+\put(140,355){\line( 1, 0){ 40}}
+\put(140,335){\line( 1, 0){ 40}}
+\put(160,530){\vector( 0,-1){ 25}}
+\put(160,450){\vector( 0,-1){ 25}}
+\put(160,375){\vector( 0,-1){ 20}}
+\put( 20,495){\line( 1, 0){ 40}}
+\put( 20,475){\line( 1, 0){ 40}}
+\put( 20,415){\line( 1, 0){ 40}}
+\put( 20,395){\line( 1, 0){ 40}}
+\put(260,415){\line( 1, 0){ 40}}
+\put(260,395){\line( 1, 0){ 40}}
+\put(260,475){\line( 1, 0){ 40}}
+\put(260,495){\line( 1, 0){ 40}}
+\put(260,435){\line( 1, 0){ 40}}
+\put(260,455){\line( 1, 0){ 40}}
+\put( 65,485){\vector( 1, 0){ 65}}
+\put(255,480){\vector(-1, 0){ 65}}
+\put(255,440){\vector(-2,-1){ 60.0}}
+\put(210,430){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize flat info}}}
+\put( 60,405){\vector( 1, 0){ 70}}
+\put(190,400){\vector( 1, 0){ 65}}
+\put( 80,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm ODIR}}}
+\put(240,800){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm IDIR}}}
+\put( 40,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASKS}}}
+\put(160,740){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm APPLY}}}
+\put(160,720){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm MASK}}}
+\put(205,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize raw}}}
+\put( 80,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize fits}}}
+\put(120,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize header}}}
+\put( 85,735){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize b.p.m.}}}
+\put(160,650){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm --BIAS}}}
+\put(160,557){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm LINEAR}}}
+\put( 40,655){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put( 40,560){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm COEFFS}}}
+\put(280,655){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put( 85,665){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put( 80,645){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(225,660){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize bias}}}
+\put(225,645){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put( 90,570){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize linear}}}
+\put( 85,550){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize coeffs}}}
+\put(160,477){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm --DARK}}}
+\put(160,397){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm /FLAT}}}
+\put(160,340){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put( 40,480){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put(280,480){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put(280,440){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put(280,400){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm INDEX}}}
+\put( 40,400){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\rm RODIR}}}
+\put(250,780){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize obj/sky/arc}}}
+\put( 85,490){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put( 80,470){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(220,490){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize dark}}}
+\put(220,470){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put( 95,410){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put( 90,385){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize flat}}}
+\put(230,405){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize obj/sky/arc}}}
+\put(210,390){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize info}}}
+\put(140,365){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize reduced}}}
+\put(185,365){\makebox(0,0)[b]{\raisebox{0pt}[0pt][0pt]{\scriptsize obj/sky/arc}}}
+\end{picture}
+\end{center}
+\caption{Reducing an {\sc object}, {\sc sky} or {\sc arc}} \label{latfig4}
+\end{figure}
+
+\section{Wavelength Calibration}
+Wavelength calibration can take two forms within Portable--CGS4DR {\em
+i.e. viz.} estimated or calibrated. The estimated method generates a
+rough scale from the grating wavelength and dispersion and is usually
+accurate to better than 20\% of the resolution. The X axis label will be
+set to `estimated wavelength' in microns. 
+
+If the wavelength calibration option is set to calibrated,
+Portable--CGS4DR searches the index file for a suitable {\sc calibr} frame
+of the form cayymmdd\_oooo and having the same instrument configuration
+and oversampling factor as the observation to be calibrated and uses that. 
+Note that when such a {\sc calibr} observation is used, the X axis is
+simply copied over and no attempt is made to re-bin the data. This means
+that if anything other than a straight line fit is used in the {\sc arc}
+function, the data will end up with an X axis whose values are not equally
+spaced. 
+
+Wavelength calibration by either method takes place when the reduced
+observation file is created and before any integrations are reduced so if
+you change your mind about wavelength calibration and the reduced
+observation file already exists, you will have to delete it before new
+instructions take effect. 
+
+A {\sc calibr} frame is created by observing a wavelength calibration
+source such as a lamp or the sky (OH-lines) and this is normally called an
+{\sc arc} frame. This data is reduced in the usual way (and may be
+wavelength calibrated!). CGS4 has argon, xenon and krypton lamps for this
+purpose and the in-vacuum wavelengths for most infra-red emission lines
+from these lamps are included with the software (as indeed are the OH
+lines). They are recorded in \AA ~but may be converted to $\mu$m by the
+calibrate procedure. 
+
+Arc-lines are identified using the mouse and selected by depressing the
+space bar. Note that if you know the exact value of a spectral line, you
+can over-ride that chosen by the software by specifying the the `E' suffix
+when inputting the wavelength value to the prompt. For example, the
+wavelength 16952.3 \AA ~may be specified: 
+
+\begin{quote}
+? Enter wavelength (null to delete) - /''/ $>$ 16952.3 E
+\end{quote}
+
+After this procedure is complete, the frame is automaticall filed as a {\sc
+calibr} frame. By invoking file\_calib manually, the x-axis label and units may be 
+altered by the user but default to those contained in the original frame. 
+
+Observations such as {\sc bias}, {\sc dark}, {\sc flat}, {\sc object} or 
+{\sc sky} may be used for wavelength calibration but once filed as a
+{\sc calibr} frame it cannot be used for any other purpose. 
+
+\section{Sky Subtraction and the Propagation of Variance}
+There are two strategies for combining observations into groups depending
+upon the value of the logical flag add\_in\_pairs. If {\sc true} the
+reduction routines combine reduced observations belonging to a particular
+group into pairs of observations. Each pair must consist of one
+observation of type {\sc object} and one of type {\sc sky}. Other
+combinations are not allowed. 
+
+If an observation is the first of the pair, it is simply remembered until
+next time around. If it is the second observation, the {\sc sky} member of
+the pair may be multiplied by a weighting factor indicated by the sky\_wt
+parameter before being subtracted from the {\sc object} member, and the
+result co-added to the group. Pairs of observations may also be weighted
+according to their variance. 
+
+The variance in the group may be propagated by combining together the
+variances contained in the individual reduced observations {\em i.e.}
+{\sc from\_int} according to the familiar variance rule (Bevington 1969): 
+
+\begin{equation}
+\sigma^{2}_{group} = \sum_{i=1}^{n} \sigma^{2}_{obs(i)} \label{equation_2}
+\end{equation}
+
+or, if these are poorly determined, by estimating the standard error, S,
+in the variations between the pairs of reduced observations when they are
+co-added into the group {\em i.e.} {\sc from\_obs} according to the
+formula: 
+
+\begin{equation}
+S^2 = \frac{\sigma^2}{N} = \frac{\sum x^{2} - \frac{1}{N}(\sum x )^{2}}{N(N-1)} \label{equation_3}
+\end{equation}
+
+The latter will be necessary if the observations consist of only one
+exposure per integration and one detector scan, and therefore contain no
+error information themselves. 
+
+It is important to grasp that variance weighting of errors can only be
+used when the errors are already determined. It makes no sense, therefore,
+to enable variance weighting and attempt to propagate errors using the
+{\sc from\_obs} regime. 
+
+Indeed, at the present time, although the data reduction provides both
+methods for error propagation {\em i.e. viz.} {\sc from\_int} and {\sc
+from\_obs}, the user is advised to default to {\sc from\_obs} as, aside from
+the aforementioned caveat, a bug exists somewhere in the {\sc
+from\_int} code that has never been traced. For completeness, however,
+both are documented here. 
+
+If add\_in\_pairs is {\sc false}, the routines apply a reduced observation
+belonging to a particular group to a reduced group file.  Reduced
+observations of type {\sc object} are added to the contents of the reduced
+group file whilst reduced observations of type {\sc sky} are subtracted
+from the contents of the reduced group file, after being optionally
+multiplied by a weighting factor indicated by the sky\_wt parameter. 
+Observations may also be weighted according to their variance if observing
+conditions dictate. Observation types other than {\sc object} and {\sc
+sky} are not allowed. 
+
+You might well ask, then, what is the difference between add\_in\_pairs
+set to {\sc false} as opposed to {\sc true} since both appear to produce
+sky subtracted reduced groups? 
+
+First, if an equal number of {\sc object} and {\sc sky} observations are
+taken, the running mean should be calculated using the number of pairs of
+observations, rather than the total number of observations, or the mean
+signal calculated will be a factor of 2 smaller than it should be. The
+signal will be calculated correctly for a series of {\sc object}
+observations with no {\sc sky}s. 
+
+Second, if there are unequal numbers of bad pixels at a given location
+from the {\sc sky} and {\sc object} observations, that particular point
+will not be sky-subtracted properly. 
+
+Third, the variance weighting algorithm will work properly only for a
+series of consecutive {\sc object} observations. If both {\sc object} and
+{\sc sky} observations are reduced, different weights may be applied to
+{\sc object} and {\sc sky}, and the data will not be properly
+sky-subtracted. 
+
+For these reasons, it is better to add such observations in pairs {\em
+i.e.} with add\_in\_pairs set to {\sc true}. 
+
+This is only part of the story, however, as CGS4 can take data in several
+modes the two most common of which are {\sc chop} and {\sc stare}.  For
+{\sc chop} mode sky subtraction, phase A -- B is calculated within the
+acquisition electronics and groups are formed as a sum of objects. If
+chopping and nodding are enabled then {\sc object---sky} pairs are formed
+as for {\sc stare} mode (essentially already described above but, of
+course, there should be an equal number of {\sc object} and {\sc sky}
+frames taken during the acquisition phase). 
+
+Note that when observations are combined into reduced groups, a running
+average is maintained, with hooks built in for first and second
+observations so that a sensible mean and variance are generated, broadly
+according to the formula: 
+
+\begin{equation}
+D_{group} = \frac{n*D_{group} + (D_{object} - D_{sky})}{n+1} \label{equation_4}
+\end{equation}
+
+where $D_{item}$ is the data value for group, object and sky and $n$ is
+the number of coadds. Some observers have noted that coadding many sky
+subtracted frames into reduced groups ({\em i.e.} $ n > 50 $) slows the
+data reduction down by a significant factor and have attributed this to
+re-averaging the whole stack. That is incorrect. The probable cause of the
+slow down is the many {\sc fits} items and Portable--CGS4DR specific
+structures that must be included in the reduced group as part of the
+reduction. Extending such structures is, unfortunately, a costly process. 
+
+\section{Ratio-ing by a Standard Star}
+Any spectra observed at the Earth's surface will differ from true due to
+atmospheric effects, particularly wavelength dependent transmission,
+noticeable in the infra-red due to water vapour and carbon dioxide.
+The correction of these effects is to compare the source with another
+having a well-behaved and understood spectral shape {\em i.e. viz.} a
+standard source. 
+
+In general, the flux density from an astronomical source,
+$S_{*}(\lambda)$, and the flux density of a standard, $S_{st}(\lambda)$,
+will both suffer attenuation and diminution by atmospheric transmission,
+T($\lambda$), and the instrumental response, I($\lambda$). The measured
+signals for each type of source will be proportional to the products of
+the three terms (loosely, STI). Early type (A) stars are known to
+approximate very well to black body sources\footnote[3]{Actually,
+infra-red astronomers consider all standard stars as black bodies
+irrespective of stellar type!} and so, for a star of known spectral type
+and luminosity class, the spectrum can be re-created using: 
+
+\begin{equation}
+  Spectrum = \frac{S_{*}(\lambda) T(\lambda) I(\lambda)}{S_{st}(\lambda) T(\lambda) I(\lambda)} \times B_{T_{eff}}(\lambda)
+\label{equation_5}
+\end{equation}
+
+where $B_{T_{eff}}(\lambda)$ is the black body density flux of the
+standard at some effective temperature, $T_{eff}$. This term must be
+proportional to the product of $S_{st}(\lambda)$ and some term which is
+dependent only upon the arbitrary brightness, $k(\lambda)$, of the
+`ratio-ing' source {\em i.e.} the spectral standard. Thus: 
+
+\begin{equation}
+  Spectrum \approx k(\lambda) S_{*}(\lambda) \label{equation_6}
+\end{equation}
+
+It can be seen that dividing by a standard star in this way removes
+atmospheric absorption features from the spectrum. This depends upon the
+path length through which both source and standard are measured. To remain
+true both must be observed at, or close to, the same airmass. 
+
+Equation \ref{equation_5} contains the key. Standard stars are observed in
+exactly the same way as other astronomical objects. They are sky
+subtracted into reduced group files, although a reduced observation can be
+filed as a standard if desired.  Converting an observation to a standard
+involves Portable--CGS4DR extracting a 1-D spectrum, generating a
+normalised (model) black body, dividing the spectrum by this model black
+body and growing the result along the slit. It is filed in the index file
+as a frame beginning with `st' and stored in {\sc \$rgdir/}. 
+
+When the time comes to ratio a source, Portable--CGS4DR will select a
+standard based upon pre-determined criteria and divide the observation to
+be calibrated by it and, hence, re-create the spectrum. The output file
+has the label \_dbs appended to it and is simply the ratio of the DN/exp
+in the source divided by the DN/exp in the standard {\em i.e.} no account
+is taken of exposure times. 
+
+\section{Flux Calibration}
+The technique most frequently used to flux calibrate a spectrum is to
+re-use the standard source which has a known brightness quoted relative to
+Vega ($\alpha$ Lyrae is defined to have zero magnitude at every
+wavelength). The flux density, $F_{\lambda}$, of a star at magnitude $m$
+can be described thus (Puxley 1988, Mountain 1985): 
+
+\begin{equation}
+ F_{\lambda}(m) = F_{\lambda}(\alpha Lyrae) \times 10^{-0.4m} \label{equation_7}
+\end{equation}
+
+The software uses the values of flux densities for $\alpha$ Lyrae that are
+listed in table \ref{tab2} and automatically accounts for
+the exposure times of source and standard. 
+
+When the flux standard is also the ratio-ing source, $k(\lambda)$ in
+equation \ref{equation_6} is known and we immediately obtain a flux
+calibrated spectrum.  If the flux and spectral standards are not the same
+then one must determine the relative brightness of the two stars by flux
+calibrating the spectral standard. 
+
+\begin{table}
+\begin{center}
+\caption{\bf Flux Densities for $\alpha$ Lyrae} \label{tab2}
+\vglue 0.6cm
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+Band & $\lambda$  & $f_{\lambda}^{*}$         & $f_{\lambda}$            & $f_{\lambda}$ & $f_{\lambda}$  \\ 
+\ \  & $(\mu m)$  & $(W m^{-2} {\mu m}^{-1})$ & $(W m^{-2} {Hz}^{-1})$ & $(mJy)$         & $(ergs \ s^{-1} cm^{-2} {\mu m}^{-1})$  \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+%$V$  &  0.5556  &  3.44 $\times$ $10^{-8}$  & 3.54 $\times$ $10^{-23}$ & 3.54 $\times$ $10^{6}$ & 3.44 $\times$ $10^{-5}$ \\
+$J$  &  1.2500  &  3.07 $\times$ $10^{-9}$  & 1.60 $\times$ $10^{-23}$ & 1.60 $\times$ $10^{6}$ & 3.07 $\times$ $10^{-6}$ \\
+$H$  &  1.6500  &  1.12 $\times$ $10^{-9}$  & 1.02 $\times$ $10^{-23}$ & 1.02 $\times$ $10^{6}$ & 1.12 $\times$ $10^{-6}$ \\
+$K$  &  2.2000  &  4.07 $\times$ $10^{-10}$ & 6.57 $\times$ $10^{-24}$ & 6.57 $\times$ $10^{5}$ & 4.07 $\times$ $10^{-7}$ \\
+$L$  &  3.4500  &  7.30 $\times$ $10^{-11}$ & 2.90 $\times$ $10^{-24}$ & 2.90 $\times$ $10^{5}$ & 7.30 $\times$ $10^{-8}$ \\
+$L'$ &  3.8000  &  5.24 $\times$ $10^{-11}$ & 2.52 $\times$ $10^{-24}$ & 2.52 $\times$ $10^{5}$ & 5.24 $\times$ $10^{-8}$ \\
+$M$  &  4.8000  &  2.12 $\times$ $10^{-11}$ & 1.63 $\times$ $10^{-24}$ & 1.63 $\times$ $10^{5}$ & 2.12 $\times$ $10^{-8}$ \\
+%\    &  7.8000  &  3.22 $\times$ $10^{-12}$ & 6.53 $\times$ $10^{-25}$ & 6.53 $\times$ $10^{4}$ & 3.22 $\times$ $10^{-9}$ \\
+%\    &  8.7000  &  2.10 $\times$ $10^{-12}$ & 5.30 $\times$ $10^{-25}$ & 5.30 $\times$ $10^{4}$ & 2.10 $\times$ $10^{-9}$ \\
+%\    &  9.8000  &  1.32 $\times$ $10^{-12}$ & 4.23 $\times$ $10^{-25}$ & 4.23 $\times$ $10^{4}$ & 1.32 $\times$ $10^{-9}$ \\
+%$N$  &  10.100  &  1.17 $\times$ $10^{-12}$ & 3.98 $\times$ $10^{-25}$ & 3.98 $\times$ $10^{4}$ & 1.17 $\times$ $10^{-9}$ \\
+%\    &  10.300  &  1.09 $\times$ $10^{-12}$ & 3.85 $\times$ $10^{-25}$ & 3.85 $\times$ $10^{4}$ & 1.09 $\times$ $10^{-9}$ \\
+%\    &  11.600  &  6.81 $\times$ $10^{-13}$ & 3.05 $\times$ $10^{-25}$ & 3.05 $\times$ $10^{4}$ & 6.81 $\times$ $10^{-10}$ \\
+%\    &  12.500  &  5.07 $\times$ $10^{-13}$ & 2.64 $\times$ $10^{-25}$ & 2.64 $\times$ $10^{4}$ & 5.07 $\times$ $10^{-10}$ \\
+%$Q$  &  20.000  &  7.80 $\times$ $10^{-14}$ & 1.04 $\times$ $10^{-25}$ & 1.04 $\times$ $10^{4}$ & 7.80 $\times$ $10^{-11}$ \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+\hline
+\end{tabular}
+\vglue 0.3cm
+{\em Conversion via: }
+$\mid f_{\lambda}^{*} \mid$ \ \ ($W \ m^{-2} \ {\mu m}^{-1}$) $=$ 
+$\frac{\mid f_{\lambda}^{*} \mid \lambda^{2}}{c}$ \ \ ($W \ m^{-2} \ {Hz}^{-1}$) $=$
+
+$\frac{\mid f_{\lambda}^{*} \mid \lambda^{2}}{c}$ $\times$ $10^{29}$  \ \ ($mJy$) $=$
+$\mid f_{\lambda}^{*} \mid$ $\times$ $10^{3}$ \ \ ($ergs \ s^{-1} \ cm^{-2} \ {\mu m}^{-1}$)
+
+\vglue 0.1cm
+
+where c = speed of light in microns / second.
+
+\vglue 0.3cm
+%Note: Only bands $J$, $H$, $K$, $L$, $L'$ and $M$ apply to CGS4. 
+\end{center}
+\end{table}
+
+\section{Extraction of Nodded Spectra}
+Portable--CGS4DR now has the ability to extract up to 3 spectra nodded
+along the slit in an automated way. For one spectrum on the array, the
+result is analogous to the simple Figaro {\sc extract} command. For two
+spectra, the upper row is assumed to be negative and the lower positive.
+For three spectra, the middle beam is assumed to be positive and is
+flanked by two negative beams. Note that in the two and three beam cases,
+a switch to invert the spectrum is included in case the beams are not in
+the sense expected.  Note that the number of rows over which the extraction
+occurs is {\em not} taken into account when combining multiple beams: just
+the total extracted flux is used.
+
+Further, for three beam extraction, two algorithms are provided {\em i.e.
+viz.} for bright and faint sources. The fundamental difference is the
+weighting given to the outer beams. Let the signal from the star in one
+chop beam be $S$ and the error $\delta S$. Assuming that there is no beam
+imbalance, the final reduced group will contain three spectra in which the
+middle is the positive beam (P) and has twice the signal of the outer
+negative beams (N1 and N2). 
+
+This reduced group is formed from the difference of two observations,
+namely an {\sc object} and a {\sc sky}. These individual reduced
+observations will each have two spectra offset by the nodding distance.
+For the {\sc object} observation, the upper beam with be negative and the
+lower beam positive. For the {\sc sky} frame the situation is reversed but
+the position on the array of the upper beam in the {\sc sky} matches the
+lower beam in the {\sc object}. 
+
+For the bright source algorithm, the final signal, $F_{b}$ is given by:
+
+\begin{equation}
+  F_{b} = \frac{P-(N1+N2)}{4} = \frac{2S-((-S)+(-S))}{4} = S
+\label{equation_8}
+\end{equation}
+
+For the faint source algorithm, the final signal, $F_{f}$ is given by:
+
+\begin{equation}
+  F_{f} = \frac{ P-\frac{ N1+N2 }{ 2 } }{ 3 } =
+   \frac{2S-\frac{ (-S)+(-S) }{ 2 }}{ 3 } = S
+\label{equation_9}
+\end{equation}
+
+If $\delta F_{b}$ and $\delta F_{f}$ are the errors in the bright and faint
+source algorithm, then:
+
+\begin{equation}
+  \frac{F_{b} / \delta F_{b}}{F_{f} / \delta F_{f}} = \frac{\sqrt[2]{10}}{3} 
+\label{equation_10}
+\end{equation}
+
+Note that the faint source algorithm will give better cancellation of any
+residual atmospheric lines on the array and a more representative error
+for the case where the dominant source of noise is the infra-red
+background. 
+
+%------------------------------------------------------------------------------
+%  Part II
+\part{THE COMMAND LINE INTERFACE}
+\pagestyle{myheadings}
+\markboth{ICL Interface}{\stardocname}
+
+\chapter{The Command Line Interface}
+\section{Introduction}
+This section describes the ICL command line interface to
+Portable--CGS4DR now available under all Unix platforms supported by
+{\sc starlink}. Significant modifications to the task structures were made
+during the porting process (Daly 1995) but every attempt has been made to achieve the
+same `look and feel' as the older software. 
+
+The command line interface offers a limited subset of the previous 
+functionality for two reasons:
+
+\begin{itemize}
+\item CGS4 data reduction is not well suited to a command line interface
+      and some users may find the software rather `kludgey'. 
+      Writing the scripts to give the full functionality required is a 
+      tiresome process and little effort is available to do it.
+\item Limited time was available for testing the software so only the key 
+      elements of the data reduction were tested. That does not mean that the
+      other aspects of CGS4 data reduction do not work merely that they have
+      not been tested. If you do try the more advanced features of Portable--CGS4DR,
+      please let me know how you get on.
+\end{itemize}
+
+\section{Starting the Software}
+Portable--CGS4DR can be started with three optional command line parameters:
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \$1 is a data directory \hfill /\$\{home\}/ \\
+  \$2 is a UT date \hfill /current UT-date/ \\
+  \$3 is the file type {\sc dst} or {\sc ndf} \hfill /ndf/
+\end{quote}
+\end{minipage}
+
+To start the software, source the {\sc starlink} login and cshrc files
+and use your local data directory. {\em E.g.:}
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \%  source \ \ /star/etc/login \\
+  \%  source \ \ /star/etc/cshrc \\
+  \%  cgs4dr \ \ /scratch/pnd/19940811 \ \ 940811 \ \ ndf \\[4ex]
+      {\tt Welcome to Portable-CGS4DR V1.3-0} \\[2ex]
+  ICL$>$
+\end{quote}
+\end{minipage}
+
+There is also a `setup' facility for defining evironmental variables without
+invoking the software:
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \%  source \ \ /star/etc/login \\
+  \%  source \ \ /star/etc/cshrc \\
+  \%  cgs4dr\_setup \ \ /scratch/pnd/19940811 \ \ 940811 \ \ ndf \\[4ex]
+      {\tt Setup Portable-CGS4DR V1.3-0 for /scratch/pnd/19940811} \\[2ex]
+  \%
+\end{quote}
+\end{minipage}
+
+\section{Changing System Defaults}
+On some systems, certain defaults may be changed {\em prior} to
+starting the software. Some common examples are\footnote[2]{Note that I 
+use the `;:' construct for Unix in-line comments.}:
+
+\begin{quote}
+ \% setenv \ \ {\sc shell} \ \ /bin/csh \hfill ;: Invokes csh via ICL `sh' command \\
+ \% setenv \ \ {\sc term} \ \ vt100     \hfill ;: Required by DEC-Alphas? \\
+ \% setenv \ \ {\sc lpdest} \ \ hp3d    \hfill ;: Where `hp3d' is a PostScript printer \\
+ \% setenv \ \ {\sc cgs4\_masks} \ \ /scratch/pnd/19940811 \hfill ;: User's bad pixel masks
+\end{quote}
+
+The last option allows user defined bad pixel masks {\em e.g.} 
+when reducing echelle data. If the user requires system defined bad pixel 
+masks as well these must be manually copied to the new directory before the 
+software is invoked. For example, to use fpa46\_short and one's own masks 
+enter:
+
+\begin{quote}
+ \% setenv \ \ {\sc cgs4\_masks} \ \ /scratch/pnd/19940811/masks \\
+ \% cp -p \ \ {\sc \${cgs4dr\_root}}/ndf/fpa46\_short.sdf \ \ {\sc \${cgs4\_masks}}/fpa46\_short.sdf \\
+ \% cgs4dr \ \ /scratch/pnd/19940811 \ \ 940811 \ \ ndf 
+\end{quote}
+
+\section{Running the Demo}
+The Portable--CGS4DR demo has two parts. The first reduces several groups
+and takes around 14 minutes on a SPARCstation LX. The second, which
+demonstrates filing a source as a standard and dividing a reduced group by
+it, takes another 2 minutes on the same machine. To load the demo files,
+use the command: 
+
+\begin{quote}
+  \% cgs4dr\_demo
+\end{quote}
+
+Once the software has been loaded the demos can be run with the following
+commands (and in the given order): 
+
+\begin{quote}
+  ICL$>$ cgs4dr\_demo \\
+  ICL$>$ cgs4dr\_demo2
+\end{quote}
+
+\section{Set Nocheckpars and Other Defaults}
+All procedures have `set nocheckpars' enabled so that they can be invoked
+with or without parameters. If the required input parameters are not given
+on the command line, they are either prompted for or assume sensible
+defaults (as indicated in this document by /{\em default\_value}/). 
+
+Note that, where required, full responses must be given e.g. YES not Y or y.
+
+\section{A Typical User Session}
+The procedures available in Portable--CGS4DR are described in the
+following chapters but a typical user session appears below (where lines
+beginning `\{' are comment lines that need not be typed in by the user). 
+
+\begin{verbatim}
+   $ cgs4dr  /scratch/pnd/19940811  940811  ndf
+      .
+      .
+      .
+   ICL> { Check the current configurations
+   ICL> get_reduction_sequence
+   ICL> get_file_selection
+   ICL> get_ff_normalisation
+   ICL> get_wavelength_calib
+   ICL> get_bad_pixel_mask
+   ICL> get_extract_spectrum
+   ICL> get_integration_display
+   ICL> get_observation_display
+   ICL> get_group_display
+   ICL> get_spectrum_display
+      .
+      .
+      .
+   ICL> { If necessary, set the reduction sequence etc
+   ICL> set_reduction_sequence
+      .
+      .
+      .
+   ICL> set_ff_normalisation
+      .
+      .
+      .
+   ICL> { Enter observation numbers 2 through 5 to the tail of the queue
+   ICL> enter_obs_range 2 5
+   ICL> { Enter observation number 1 to the head of the queue
+   ICL> enter_obs_range 1 1 newest
+   ICL> { Check the queue
+   ICL> list_queue
+      .
+      .
+      .
+   ICL> { Start the automatic reduction
+   ICL> start_autoreduce
+      .
+      .
+      .
+   ICL> { Save the current config
+   ICL> save_config myconfig
+   ICL> { List the index file
+   ICL> list_index
+   ICL> { Stop automatic reduction and exit
+   ICL> stop_autoreduce
+   ICL> exit
+\end{verbatim}
+
+\chapter{Control \& Setup Procedures}
+\markboth{Control \& Setup Procedures}{\stardocname}
+\section{start\_autoreduce}
+\begin{quote}
+ICL$>$ start\_autoreduce \\
+Use: Starts the automatic reduction of data
+\end{quote}
+\section{stop\_autoreduce}
+\begin{quote}
+ICL$>$ stop\_autoreduce \\
+Use: Stops the automatic reduction of data
+\end{quote}
+\section{drpause}
+\begin{quote}
+ICL$>$ drpause \\
+Use: Pauses the automatic reduction of data
+\end{quote}
+\section{drcontinue}
+\begin{quote}
+ICL$>$ drcontinue \\
+Use: Resumes the automatic reduction of data
+\end{quote}
+\section{set\_reduction\_sequence}
+\begin{quote}
+ICL$>$ set\_reduction\_sequence p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 \\
+Use: Sets the data reduction sequence \\
+p1 = Subtract bias \\
+p2 = Subtract dark \\
+p3 = Coadd integrations \\
+p4 = Archive observations \\
+p5 = File observations \\
+p6 = Normalise flat field \\
+p7 = divide by flat field \\
+p8 = Wavelength calibrate \\
+p9 = Add observations into groups \\
+p10 = Divide by standard \\
+p11 = Extract spectrum \\
+{\em E.g:} set\_reduction\_sequence YES NO YES NO YES YES YES YES YES NO YES
+\end{quote}
+
+\section{get\_reduction\_sequence}
+\begin{quote}
+ICL$>$ get\_reduction\_sequence \\
+Use: Returns the current data reduction sequence
+\end{quote}
+
+\section{set\_file\_selection}
+\begin{quote}
+ICL$>$ set\_file\_selection p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 \\
+Use: Sets the calibration file selection parameters \\
+p1 = Direction to search for BIAS frames \\ 
+p2 = Direction to search for DARK frames \\ 
+p3 = Direction to search for FLAT frames \\ 
+p4 = Direction to search for CALIB frames \\ 
+p5 = Direction to search for STANDARD frames \\ 
+p6 = Name of specific BIAS observation \\
+p7 = Name of specific DARK observation \\
+p8 = Name of specific FLAT observation \\
+p9 = Name of specific CALIB observation \\
+p10 = Name of specific STANDARD observation \\
+{\em E.g:} set\_file\_selection BOTH BOTH BOTH SPECIFIED BOTH '' '' '' ca950516\_5 ''
+\end{quote}
+
+\section{get\_file\_selection}
+\begin{quote}
+ICL$>$ get\_file\_selection \\
+Use: Returns calibration frame file selection parameters
+\end{quote}
+
+\section{set\_ff\_normalisation}
+\begin{quote}
+ICL$>$ set\_ff\_normalisation p1 p2 p3 \\
+Use: Sets the flat field normalisation parameters \\
+p1 = Flat fielding method \\
+p2 = Order of polynomial \\
+p3 = Smoothing box \\
+{\em E.g:} set\_ff\_normalisation POLYFIT 3 5
+\end{quote}
+
+\section{get\_ff\_normalisation}
+\begin{quote}
+ICL$>$ get\_ff\_normalisation \\
+Use: Returns the current flat field normalisation parameters
+\end{quote}
+\section{set\_wavelength\_calib}
+\begin{quote}
+ICL$>$ set\_wavelength\_calib \\
+Use: Sets the current wavelength calibration method \\
+p1 = Wavelength calibration method \\
+{\em E.g:} set\_wavelength\_calib ESTIMATED
+\end{quote}
+\section{get\_wavelength\_calib}
+\begin{quote}
+ICL$>$ get\_wavelength\_calib \\
+Use: Returns the current wavelength calibration method
+\end{quote}
+\section{set\_bad\_pixel\_mask}
+\begin{quote}
+ICL$>$ set\_bad\_pixel\_mask \\
+Use: Sets the bad pixel mask \\
+p1 = Name of mask only \\
+{\em E.g:} set\_bad\_pixel\_mask fpa61\_75
+\end{quote}
+\section{get\_bad\_pixel\_mask}
+\begin{quote}
+ICL$>$ get\_bad\_pixel\_mask \\
+Use: Returns the current bad pixel mask
+\end{quote}
+\section{set\_polyfit}
+\begin{quote}
+ICL$>$ set\_polyfit p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 \\
+Use: Sets the method and rows to extract for enhanced sky subtraction \\
+p1 = Type of polyfit (NONE, REDUCED\_GRP, OBJ--SKY, OBJECT) \\
+p2 = Degree of polynomial to fit \\
+p3 = Number of points to reject from fit \\
+p4 = Use weights for fit? \\ 
+p5 = Start of first sky area (-1 = ignore) \\
+p6 = End of first sky area (-1 = ignore) \\
+p7 = Start of second sky area (-1 = ignore) \\
+p8 = End of second sky area (-1 = ignore) \\
+p9 = Start of third sky area (-1 = ignore) \\
+p10 = End of third sky area (-1 = ignore) \\
+p11 = Start of fourth sky area (-1 = ignore) \\
+p12 = End of fourth sky area (-1 = ignore) \\
+{\em E.g:} set\_polyfit REDUCED\_GRP 3 0 {\sc true} 10 15 35 40 -1 -1 -1 -1
+\end{quote}
+\section{get\_polyfit}
+\begin{quote}
+ICL$>$ get\_polyfit \\
+Use: Returns enhanced sky subtraction setup
+\end{quote}
+
+\section{set\_extract\_spectrum}
+\begin{quote}
+ICL$>$ set\_extract\_spectrum p1 p2 p3 p4 p5 p6 p7 p8 \\
+Use: Sets the method and rows to extract into a 1-D spectrum and 2-D spectral image \\
+p1 = Start of first row to be extracted (-1 = ignore) \\
+p2 = End of first row to be extracted (-1 = ignore) \\
+p3 = Start of second row to be extracted (-1 = ignore) \\
+p4 = End of second row to be extracted (-1 = ignore) \\
+p5 = Start of third row to be extracted (-1 = ignore) \\
+p6 = End of third row to be extracted (-1 = ignore) \\
+p7 = Invert spectrum upon output \\
+p8 = Extraction algorithm \\
+{\em E.g:} set\_extract\_spectrum 29 31 -1 -1 -1 -1 {\sc false} BRIGHT
+\end{quote}
+\section{get\_extract\_spectrum}
+\begin{quote}
+ICL$>$ get\_extract\_spectrum \\
+Use: Returns automated extraction of spectra setup
+\end{quote}
+\section{save\_config}
+\begin{quote}
+ICL$>$ save\_config p1 \\
+Use: Saves the cred4 and p4 configurations \\
+p1 = Name of config file only \\
+{\em E.g:} save\_config myconfig
+\end{quote}
+\section{restore\_config}
+\begin{quote}
+ICL$>$ restore\_config p1 \\
+Use: Restores the cred4 and p4 configurations \\
+p1 = Name of config file only \\
+{\em E.g:} restore\_config myconfig
+\end{quote}
+\section{set\_integration\_display}
+\label{set_int_display}
+\begin{quote}
+ICL$>$ set\_integration\_display p0 p1 p2 p3 p4 p5 p6 p7 p8 \\
+Use: Sets the display of reduced integrations \\
+p0 = Display in port 0 \\
+p1 = Display in port 1 \\
+p2 = Display in port 2 \\
+p3 = Display in port 3 \\
+p4 = Display in port 4 \\
+p5 = Display in port 5 \\
+p6 = Display in port 6 \\
+p7 = Display in port 7 \\
+p8 = Display in port 8 \\
+{\em E.g:} set\_integration\_display NO NO NO NO NO NO NO NO NO
+\end{quote}
+\section{get\_integration\_display}
+\begin{quote}
+ICL$>$ get\_integration\_display \\
+Use: Gets the current display mode for reduced integrations
+\end{quote}
+\section{set\_observation\_display}
+\label{set_obs_display}
+\begin{quote}
+ICL$>$ set\_observation\_display p0 p1 p2 p3 p4 p5 p6 p7 p8 \\
+Use: Sets the display of reduced observations \\
+p0 = Display in port 0 \\
+p1 = Display in port 1 \\
+p2 = Display in port 2 \\
+p3 = Display in port 3 \\
+p4 = Display in port 4 \\
+p5 = Display in port 5 \\
+p6 = Display in port 6 \\
+p7 = Display in port 7 \\
+p8 = Display in port 8 \\
+{\em E.g:} set\_observation\_display NO YES YES YES YES NO NO NO NO
+\end{quote}
+\section{get\_observation\_display}
+\begin{quote}
+ICL$>$ get\_observation\_display \\
+Use: Gets the current display mode for reduced observations
+\end{quote}
+\section{set\_group\_display}
+\label{set_grp_display}
+\begin{quote}
+ICL$>$ set\_group\_display p0 p1 p2 p3 p4 p5 p6 p7 p8 \\
+Use: Sets the display of reduced groups \\
+p0 = Display in port 0 \\
+p1 = Display in port 1 \\
+p2 = Display in port 2 \\
+p3 = Display in port 3 \\
+p4 = Display in port 4 \\
+p5 = Display in port 5 \\
+p6 = Display in port 6 \\
+p7 = Display in port 7 \\
+p8 = Display in port 8 \\
+{\em E.g:} set\_group\_display NO NO NO NO NO YES YES NO NO
+\end{quote}
+\section{get\_group\_display}
+\begin{quote}
+ICL$>$ get\_group\_display \\
+Use: Gets the current display mode for reduced groups
+\end{quote}
+\section{set\_spectrum\_display}
+\label{set_spc_display}
+\begin{quote}
+ICL$>$ set\_spectrum\_display p0 p1 p2 p3 p4 p5 p6 p7 p8 \\
+Use: Sets the display of reduced spectra \\
+p0 = Display in port 0 \\
+p1 = Display in port 1 \\
+p2 = Display in port 2 \\
+p3 = Display in port 3 \\
+p4 = Display in port 4 \\
+p5 = Display in port 5 \\
+p6 = Display in port 6 \\
+p7 = Display in port 7 \\
+p8 = Display in port 8 \\
+{\em E.g:} set\_spectrum\_display NO NO NO NO NO NO NO YES YES
+\end{quote}
+\section{get\_spectrum\_display}
+\begin{quote}
+ICL$>$ get\_spectrum\_display \\
+Use: Gets the current display mode for reduced spectra 
+\end{quote}
+
+\chapter{Reduction Procedures}
+\markboth{Reduction Procedures}{\stardocname}
+\section{file\_standard}
+\begin{quote}
+ICL$>$ file\_standard p1 p2 p3 p4 p5 \\
+Use: Files a group as a standard \\
+p1 = Name of reduced group \\
+p2 = Effective temperature \\
+p3 = Reference wavelength \\
+p4 = Start row for extraction \\
+p5 = End row for extraction \\
+{\em E.g:} file\_standard rg940311\_21 5000 2.2 20 40
+\end{quote}
+\section{file\_obs}
+\begin{quote}
+ICL$>$ file\_obs p1 \\
+Use: Files an observation as whatever it is \\
+p1 = Name of observation file \\
+{\em E.g:} file\_obs o940311\_17  
+\end{quote}
+\section{file\_calib}
+\begin{quote}
+ICL$>$ file\_calib p1 \\
+Use: Files an observation as a calibration \\ 
+p1 = Name of calibration file \\
+{\em E.g:} file\_calib o940311\_9
+\end{quote}
+\section{bad\_observation}
+\begin{quote}
+ICL$>$ bad\_observation \\
+Use: Files an observation as bad \\
+p1 = Name of bad observation \\
+{\em E.g:} bad\_observation o940311\_5
+\end{quote}
+\section{list\_index}
+\begin{quote}
+ICL$>$ list\_index \\
+Use: Lists the observation index 
+\end{quote}
+\section{list\_index2}
+\begin{quote}
+ICL$>$ list\_index2 \\
+Use: Lists the observation index in an alternative format
+\end{quote}
+\section{calibrate}
+\begin{quote}
+ICL$>$ calibrate p1 p2 p3 p4 p5 p6 \\
+Use: Calibrates an {\sc arc} lamp \\
+p1 = Name of reduced observation (must be specified in full) \\
+p2 = Start row for extraction \\
+p3 = End row for extraction \\
+p4 = Type of {\sc arc} lamp used \\
+p5 = Order of polynomial to fit \\
+p6 = Arcline half-width in pixels \\
+{\em E.g:} calibrate {\sc \$rodir/}ro940311\_17 20 40 argon 2.0 1.0
+\end{quote}
+\section{cgs4list}
+\begin{quote}
+ICL$>$ cgs4list \\
+Use: Lists the observation headers
+\end{quote}
+\chapter{Queue Procedures}
+\markboth{Queue Procedures}{\stardocname}
+\section{enter\_string}
+\begin{quote}
+ICL$>$ enter\_string p1 p2 \\
+Use: Writes any string to database \\
+p1 = string to write  \\
+p2 = queue position /`oldest'/ \\
+{\em E.g:} enter\_string 'This is a junk string' oldest
+\end{quote}
+\section{enter\_mask}
+\begin{quote}
+ICL$>$ enter\_mask p1 p2 \\
+Use: Writes ``DRMASK p1'' to database \\
+p1 = Name of mask only  \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_mask fpa61\_75 newest
+\end{quote}
+\section{cancel\_mask}
+\begin{quote}
+ICL$>$ cancel\_mask p1 p2 \\
+Use: Cancels ``DRMASK p1'' from database \\
+p1 = Name of mask only  \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_mask fpa61\_75
+\end{quote}
+\section{enter\_config}
+\begin{quote}
+ICL$>$ enter\_config p1 p2 \\
+Use: Writes ``DRCONFIG p1'' to database \\
+p1 = Name of configuration file only \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_config bias\_tests newest
+\end{quote}
+\section{cancel\_config}
+\begin{quote}
+ICL$>$ cancel\_config p1 p2 \\
+Use: Cancels ``DRCONFIG p1'' from database \\
+p1 = Name of configuration file only \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_config bias\_tests
+\end{quote}
+\section{enter\_skywt}
+\begin{quote}
+ICL$>$ enter\_skywt p1 p2 \\
+Use: Writes ``DRSKYWT p1'' to database \\
+p1 = Value of SKYWT /1.0/ \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_skywt 1.5
+\end{quote}
+\section{cancel\_skywt}
+\begin{quote}
+ICL$>$ cancel\_skywt p1 p2 \\
+Use: Cancels ``DRSKYWT p1'' from database \\
+p1 = Value of SKYWT /1.0/ \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_skywt 1.5
+\end{quote}
+\section{enter\_varwt}
+\begin{quote}
+ICL$>$ enter\_varwt p1 p2 \\
+Use: Writes ``DRVARWT p1'' to database \\
+p1 = Value of VARWT /false/ \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_varwt true
+\end{quote}
+\section{cancel\_varwt}
+\begin{quote}
+ICL$>$ cancel\_varwt p1 p2 \\
+Use: Cancels ``DRVARWT p1'' from database \\
+p1 = Value of VARWT /false/ \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_varwt true
+\end{quote}
+\section{enter\_obs\_range}
+\begin{quote}
+ICL$>$ enter\_obs\_range p1 p2 p3 \\
+Use: Recursively writes ``REDUCE oyymmdd\_n'' and
+``END oyymmdd\_n'' pairs 
+(for n = p1 to p2) to database for pre-defined UT-date \\
+p1 = Start observation number /1/ \\
+p2 = End observation number /p1/ \\
+p3 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_obs\_range 1 5 oldest 
+\end{quote}
+\section{cancel\_obs\_range}
+\begin{quote}
+ICL$>$ cancel\_obs\_range p1 p2 p3 \\
+Use: Recursively cancels ``REDUCE oyymmdd\_n'' and
+``END oyymmdd\_n'' pairs 
+(for n = p1 to p2) from database for pre-defined UT-date \\
+p1 = Start observation number /1/ \\
+p2 = End observation number /p1/ \\
+p3 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_obs\_range 1 5
+\end{quote}
+\section{enter\_int\_range}
+\begin{quote}
+ICL$>$ enter\_int\_range p1 p2 p3 p4 \\
+Use: Recursively writes ``REDUCE iyymmdd\_p1\_n'' 
+(for n = p2 to p3) to database for pre-defined UT-date \\
+p1 = Observation number /1/ \\
+p2 = Start integration number /1/ \\
+p3 = End integration number /p2/ \\
+p4 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_int\_range 1 1 5 newest
+\end{quote}
+\section{cancel\_int\_range}
+\begin{quote}
+ICL$>$ cancel\_int\_range p1 p2 p3 p4 \\
+Use: Recursively cancels ``REDUCE iyymmdd\_p1\_n'' 
+(for n = p2 to p3) from database for pre-defined UT-date \\
+p1 = Observation number /1/ \\
+p2 = Start integration number /1/ \\
+p3 = End integration number /p2/ \\
+p4 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_int\_range 1 1 5 newest
+\end{quote}
+\section{enter\_end\_range}
+\begin{quote}
+ICL$>$ enter\_end\_range p1 p2 p3 \\
+Use: Recursively writes ``END oyymmdd\_n'' (for n = p1 to p2) 
+ from database for pre-defined UT-date \\
+p1 = Start observation number /1/ \\
+p2 = End observation number /p1/ \\
+p3 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_end\_range 1 3 
+\end{quote}
+\section{cancel\_end\_range}
+\begin{quote}
+ICL$>$ cancel\_end\_range p1 p2 p3 \\
+Use: Recursively cancels ``END oyymmdd\_n'' (for n = p1 to p2) 
+ from database for pre-defined UT-date \\
+p1 = Start observation number /1/ \\
+p2 = End observation number /p1/ \\
+p3 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_end\_range 1 3
+\end{quote}
+\section{enter\_endgroup}
+\begin{quote}
+ICL$>$ enter\_endgroup p1 p2 \\
+Use: Writes ``ENDGROUP rgyymmdd\_p1'' to database for
+ pre-defined UT-date \\
+p1 = Group number /1/ \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} enter\_endgroup 12
+\end{quote}
+\section{cancel\_endgroup}
+\begin{quote}
+ICL$>$ cancel\_endgroup p1 p2 \\
+Use: Cancels ``ENDGROUP rgyymmdd\_p1'' from database for
+ pre-defined UT-date \\
+p1 = Group number /1/ \\
+p2 = Queue position /`oldest'/ \\
+{\em E.g:} cancel\_endgroup 12
+\end{quote}
+\section{cancel\_all\_qentries}
+\begin{quote}
+ICL$>$ cancel\_all\_qentries \\
+Use: Deletes the whole database
+\end{quote}
+\section{list\_queue}
+\begin{quote}
+ICL$>$ list\_queue \\
+Use: Lists the database in the order in which
+Portable--CGS4DR will execute them
+\end{quote}
+
+\chapter{Graphics Procedures}
+\markboth{Graphics Procedures}{\stardocname}
+\section{lut}
+\begin{quote}
+ICL$>$ lut p1 \\
+Use: Load a colour (look-up) table \\
+p1 = Name of colour table \\
+{\em E.g:} lut col19
+\end{quote}
+\section{plot\_image}
+\begin{quote}
+ICL$>$ plot\_image p1 p2 \\
+Use: Plot the dataset as an image \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number /0/ \\
+{\em E.g:} plot\_image \$rodir/ro940311\_17 0
+\end{quote}
+\section{plot\_graph}
+\begin{quote}
+ICL$>$ plot\_graph p1 p2 \\
+Use: Plot the dataset as a graph \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number /0/ \\
+{\em E.g:} plot\_graph \$rodir/ro940311\_17 0
+\end{quote}
+\section{plot\_overgraph}
+\begin{quote}
+ICL$>$ plot\_overgraph p1 p2 \\
+Use: Plot the dataset as an image \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number /0/ \\
+{\em E.g:} plot\_overgraph \$rodir/ro940311\_17 0
+\end{quote}
+\section{plot\_histogram}
+\begin{quote}
+ICL$>$ plot\_histogram p1 p2 \\
+Use: Plot the dataset as an histogram \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number /0/ \\
+{\em E.g:} plot\_histogram \$rodir/ro940311\_17 0
+\end{quote}
+\section{plot\_surface}
+\begin{quote}
+ICL$>$ plot\_surface p1 p2 \\
+Use: Plot the dataset as a surface \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number /0/ \\
+{\em E.g:} plot\_surface \$rodir/ro940311\_17 0
+\end{quote}
+\section{plot\_contour}
+\begin{quote}
+ICL$>$ plot\_contour p1 p2 \\
+Use: Plot the dataset as a contour map \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number /0/ \\
+{\em E.g:} plot\_contour \$rodir/ro940311\_17 0
+\end{quote}
+\section{cursor}
+\begin{quote}
+ICL$>$ cursor p1 p2 \\
+Use: Enquire dataset X,Y position and data,variance,quality of point using cursor \\
+p1 = Task alias \\
+p2 = Port number /0/ \\
+{\em E.g:} cursor (p4\_alias) 0 
+\end{quote}
+\section{print\_ps}
+\begin{quote}
+ICL$>$ print\_ps p1 p2 \\
+Use: Print a {\em PostScript} file \\
+p1 = Name of dataset to be displayed \\
+p2 = Port number \\
+{\em E.g:} set\_device0 ps\_l \\
+print\_ps \$rodir/ro940311\_17 0
+\end{quote}
+
+\chapter{More on Graphics} \label{p4_chap}
+\markboth{Graphics Options}{\stardocname}
+\section{The Plotting Task}
+P4 is the generic plotting package. The lower
+layers of the software call {\sc pgplot} routines and access to the data is via
+Figaro's {\sc dsa} library. Thus P4 can handle either {\sc ndf} or {\sc dst} files
+and plots to any {\sc starlink} supported graphics device for which a {\sc pgplot} driver
+is available.
+
+A noticeboard is maintained in memory describing the attributes of the available 
+display surfaces, plotting devices open on each surface and some aspects of the data.
+This noticeboard can be manipulated directly by the user giving a wide-variety
+of options to tailor the display. Indeed, some users may find the range of 
+options too broad and confusing.
+
+Although the package is quite generic and may be invoked separately from other
+items of software, it still retains some intelligence regarding CGS4 data and directory structures.
+
+P4 can plot data as an image, a graph, an overgraph (over-laid graph upon
+a previous graph), a surface, a histogram or a contour map (with several
+algorithms to determine contour levels). Nearly seventy colour (look-up) tables are
+shipped with the software that should cater to most tastes.
+P4 also generates labels and titles from the contents of the data-file or
+as specified by the user.
+
+Any number of users may run P4 concurrently. Each viewport (0 -- 8)
+may have a separate plot device defined but a {\sc pgplot} restriction is that only one may be
+open at any one time. Thus using multiple devices on different viewports may
+slow the software down.
+
+\section{Types of Plot and Units}
+P4 has the following types of plot available:
+\begin{description}
+\item[{\sc image}]--- Plots an image in colour or greyscale using the full dynamic range of the data and the display device.
+\item[{\sc graph}]--- Plots 1-D lines graphics as summed through several rows (or columns) of the array.
+\item[{\sc overgraph}]--- A 1-D graph on the same scale as a previous graph with the overlay in a different colour.
+\item[{\sc histogram}]--- Standard histogram using any number of bins. The data may be sampled with any number of steps 
+  in either direction.
+\item[{\sc surface}]--- A sequence of 1-D plots offset to give the impression of a surface.
+\item[{\sc contour}]--- A contour map derived from linear scaling, n-Sigma about the mean or increment or decrement in magnitudes,
+  common logarithms or natural logarithms. The contour levels are written to {\em filename}\_contours.lis for the plotted
+  {\em filename}.
+\end{description}
+The data may be plotted either in axis (x,y) units or pixel (i,j) units. For example, a spectrum of a source might
+be plotted  by an astronomer between, say, 2.1 -- 2.5 $\mu$m whereas an engineer might look at the same data from pixels
+20 -- 50 to see if there is any noise on the detector. The natural units of P4 are axis units. 
+If you want to plot in pixel units, you must set any (or all) of the istart, iend, jstart, jend values to be
+non-negative. In the latter case, the labels are ignored and a default title is printed.
+\section{The Viewports}
+The plotting surface is divided into 9 viewports (0--8) as shown in figure \ref{latfig5}.
+
+%\begin{figure}[h]
+\begin{figure}[htbp]
+\begin{center}
+\begin{picture}(105,85)
+\thicklines
+\put(0,0){\framebox(50,38){}}
+\put(0,42){\framebox(50,38){}}
+\put(55,0){\framebox(50,38){}}
+\put(55,42){\framebox(50,38){}}
+\thinlines
+\put(2,44){\framebox(46,34) {Port 0}}
+\put(57,62){\framebox(22,16){Port 1}}
+\put(81,62){\framebox(22,16){Port 2}}
+\put(57,44){\framebox(22,16){Port 3}}
+\put(81,44){\framebox(22,16){Port 4}}
+\put(2,20){\framebox(46,16) {Port 5}}
+\put(2,2){\framebox(46,16)  {Port 6}}
+\put(57,2){\framebox(22,34) {Port 7}}
+\put(81,2){\framebox(22,34) {Port 8}}
+\end{picture}
+\caption{The P4 Viewports} \label{latfig5}
+\end{center}
+\end{figure}
+
+\section{Initialising the Display}
+The CGS4 data reduction plotting task has been de-coupled from the
+control task and now maintains its own noticeboard containing the
+details of the plotting capability on each port. This noticeboard can
+be manipulated by the user to tailor the display as required.
+
+Note that, by default, the xwindows device is loaded the first time the
+software is created. If you do not wish to do this, execute the
+following commands, the first time only {\em e.g.} to set to device
+postscript\_l:
+
+\begin{quote}
+ \% \ mkdir \ $\sim$/cgs4dr\_configs \\
+ \% \ cp {\sc \$\{cgs4dr\_root\}}/default.p4 $\sim$/cgs4dr\_configs/default.p4 \\
+ \% \ sed \ 's/xwindows/postscript\_l/' \ $\sim$/cgs4dr\_configs/default.p4 \ $>$ \ \$\$tmp \\
+ \% \ mv \ \$\$tmp \ $\sim$/cgs4dr\_configs/default.p4
+\end{quote}
+
+Thereafter, whenever the software runs down cleanly, this 
+$\sim$/cgs4dr\_configs/default.p4 file will be overwritten with the latest
+noticeboard contents.
+
+\section{The Set Commands}
+P4 maintains a noticeboard for each port and these items are used
+tailor the display in a variety of ways. The more common items can be
+accessed through the set\_{\em item}n commands. The suite of commands
+available are shown in table \ref{tab3}.  The set\_{\em
+item} commands ({\em i.e.} without a specific port number attached)
+are treated as a special case and assign the given value to {\em all} ports.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{||l|l|l|c|l||}
+\hline
+\ & \ & \ & \ & \\
+Set Command & Get Command & Sets or Gets ... & Type & Default \\
+$0<n<8$ & $0<n<8$ & \ & \ & \\
+\ & \ & \ & \ & \\
+\hline
+\ & \ & \ & \ & \\
+set\_device{\em n}     & get\_device{\em n}     & Device name                & \_CHAR    & xwindows \\
+set\_lut{\em n}        & get\_lut{\em n}        & Colour table               & \_CHAR    & {\sc \$p4\_ct/}default  \\
+set\_title{\em n}      & get\_title{\em n}      & Title                      & \_CHAR    & A\_U\_T\_O\footnotemark[2] \\
+set\_type{\em n}       & get\_type{\em n}       & Display type               & \_CHAR    & IMAGE\footnotemark[3] \\
+set\_plane{\em n}      & get\_plane{\em n}      & Display  plane             & \_CHAR    & DATA\footnotemark[4] \\
+set\_autoscale{\em n}  & get\_autoscale{\em n}  & Autoscaling                & \_LOGICAL & {\sc true} \\
+set\_erase{\em n}      & get\_erase{\em n}      & Pre-erasure of plot        & \_LOGICAL & {\sc true} \\
+set\_high{\em n}       & get\_high{\em n}       & High value if autoscale=F  & \_REAL    & 1000.0 \\
+set\_low{\em n}        & get\_low{\em n}        & Low value if autoscale=F   & \_REAL    & 0.0 \\
+set\_whole{\em n}      & get\_whole{\em n}      & Display to whole array     & \_LOGICAL & {\sc true} \\
+set\_xstart{\em n}     & get\_xstart{\em n}     & Start of X-axis if whole=F & \_REAL    & 0.0 \\
+set\_xend{\em n}       & get\_xend{\em n}       & End of X-axis if whole=F   & \_REAL    & 256.0 \\
+set\_ystart{\em n}     & get\_ystart{\em n}     & Start of Y-axis if whole=F & \_REAL    & 0.0 \\
+set\_yend{\em n}       & get\_yend{\em n}       & End of Y-axis if whole=F   & \_REAL    & 256.0 \\
+set\_istart{\em n}     & get\_istart{\em n}     & Start X-pixel for sub-plot & \_INTEGER & -1 \\
+set\_iend{\em n}       & get\_iend{\em n}       & End X-pixel for sub-plot   & \_INTEGER & -1 \\
+set\_jstart{\em n}     & get\_jstart{\em n}     & Start Y-pixel for sub-plot & \_INTEGER & -1 \\
+set\_jend{\em n}       & get\_jend{\em n}       & End Y-pixel for sub-plot   & \_INTEGER & -1 \\
+set\_errors{\em n}     & get\_errors{\em n}     & Display error bars?        & \_LOGICAL & {\sc true}\footnotemark[5] \\
+set\_cut\_dir{\em n}   & get\_cut\_dir{\em n}   & Direction of cut?          & \_CHAR    & X \\
+set\_cut\_start{\em n} & get\_cut\_start{\em n} & Start of cut summation     & \_REAL    & 20.0 \\
+set\_cut\_end{\em n}   & get\_cut\_end{\em n}   & End of cut summation       & \_REAL    & 40.0 \\
+set\_bins{\em n}       & get\_bins{\em n}       & Number of histogram bins   & \_INTEGER & 50 \\
+set\_overcol{\em n}    & get\_overcol{\em n}    & Colour of overgraph line   & \_CHAR    & RED\footnotemark[6] \\
+set\_fg\_colour{\em n} & get\_fg\_colour{\em n} & Foreground colour          & \_CHAR    & BLACK\footnotemark[6] \\
+set\_bg\_colour{\em n} & get\_bg\_colour{\em n} & Background colour          & \_CHAR    & WHITE\footnotemark[6] \\
+set\_contour{\em n}    & get\_contour{\em n}    & Contour type               & \_CHAR    & LIN\footnotemark[7] \\
+\ & \ & \ & \ & \\
+\hline
+\end{tabular}
+\caption{The Set and Get Commands for $0 < n <8$.} \label{tab3}
+\end{center}
+\footnotemark[2]{\scriptsize Auto-generates from axis and label units in dataset.}
+
+\footnotemark[3]{\scriptsize Options are IMAGE | GRAPH | OVERGRAPH | HISTOGRAM | SURFACE | CONTOUR.}
+
+\footnotemark[4]{\scriptsize Options are DATA | QUALITY | ERRORS.}
+
+\footnotemark[5]{\scriptsize Only applies to GRAPH | OVERGRAPH | SURFACE plots.}
+
+\footnotemark[6]{\scriptsize Options are RED | BLUE | GREEN | YELLOW | ORANGE | BLACK | WHITE.}
+
+\footnotemark[7]{\scriptsize Options are LIN | SIG | MAGD | MAGI | LOGD | LOGI | LND |LNI.}
+\end{table}
+
+\section{The Get Commands}
+In a similar fashion, there are a suite of get\_{\em item}n commands
+that are the inverse of the `set' commands shown in table \ref{tab3}.
+The get\_{\em item} commands ({\em i.e.} without a
+specific port number attached) are treated as a special case and return
+the required value from {\em all} ports.
+
+There is an important distinction, however, inasmuch as the get\_{\em
+item}n commands demand an empty variable into which to write the
+result. Failure to do so, may crash Unix-ICL.  Thus the correct way to
+enquire, for example, about the current plot device open port 4 would
+be to use the commands:
+
+\begin{quote}
+  ICL$>$ junk = ' ' \\
+  ICL$>$ get\_device4 (junk) \\
+  ICL$>$ print 'Port 4 plot device = ' \& (junk) \\
+  {\tt Port 4 plot device = xwindows }
+\end{quote}
+
+There is a good chance that the user will forget do this so it is recommended that
+the get\_{\em item} commands be used instead.
+
+\section{How to Enable Overgraphs}
+It might appear from the other sections of this document that the 
+set{\em something}\_display routines refer to specific ports. If that were true, 
+there would be no way to enable overgraphs during the automated display 
+of reduced data. How then do we overcome this restriction? The answer lies 
+in allowing the procedure to prompt for a response and entering one of 
+the following (where sans-serif type indicates an input):
+\begin{quote}
+ICL$>$ set\_observation\_display \\
+Display in port 0?  $>$ {\tt yes} \\
+Display in port 1?  $>$ {\tt yes} \\
+Display in port 2?  $>$ {\tt yes} \\
+Display in port 3?  $>$ {\tt yes} \\
+Display in port 4?  $>$ {\tt yes} \\
+Display in port 5?  $>$ {\tt overgraph port=1 cut=X spos=20 epos=40 colour=red} \\
+Display in port 6?  $>$ {\tt overgraph port=1 cut=X spos=25 epos=30 colour=blue} \\
+Display in port 7?  $>$ {\tt overgraph port=1 cut=X spos=30 epos=35 colour=green} \\
+Display in port 8?  $>$ {\tt overgraph port=1 cut=X spos=15 epos=45 colour=yellow}
+\end{quote}
+
+In this example, port 0 -- 4 display data in whatever way they are set
+up. Ports 5 -- 8, however, are used as dummies to display overgraphs in
+port 1 (which has presumably been set up to display graphs in the first
+place). Note the syntax of the overgraph command line. The parameters
+have the following meaning:
+
+\begin{description}
+\item[{\sc port}]--- The port in which to display the overgraph.
+\item[{\sc cut}]--- cut direction (x, X, y, Y, h, H, v or V).
+\item[{\sc spos}]--- Start row of slice for extraction of graph data.
+\item[{\sc epos}]--- End row of slice for extraction of graph data.
+\item[{\sc colour}]--- The colour of the pen for the overgraph plot.
+\end{description}
+
+\section{Some Examples of Using the Task}
+Once P4 has been started, a default configuration file is copied to
+$\sim$/cgs4dr\_configs/default.p4 and an xwindows device is opened. An
+image of a simple ramp function is also plotted using the default
+colour table. Examples of using the task from this point now follow
+demonstrating most of the functionality available.
+
+Note that all ICL procedures have `set nocheckpars' enabled so that
+they can be invoked with or without parameters. If the required input
+parameters are not given on the command lines, they are either prompted
+for. If a port number is required but not specified, the default port
+selected is 0.
+
+\subsection{Getting the Viewport Configuration}
+To obtain the current settings for port 0, say, use ({\em e.g.}):
+
+\begin{quote}
+ICL$>$ get\_display 0
+\end{quote}
+
+\subsection{Plotting Error Bars}
+To plot error bars on a graph of ro940311\_17 on port 5, use ({\em e.g.}):
+
+\begin{quote}
+ICL$>$ set\_errors5 true \\
+ICL$>$ plot\_graph ro940311\_17 5
+\end{quote}
+
+Errors can be plotted on graphs, overgraphs and surfaces only although
+the latter is not recommended as it may take some time.
+
+\subsection{Plotting a Sub-Area of an Image in Axis Units} 
+To plot a sub-area in axis units of {\sc \$kappa\_dir}/comwest on port
+7, use ({\em e.g.}):
+
+\begin{quote}
+ICL$>$ set\_whole7 false \\
+ICL$>$ set\_xstart7 64 \\
+ICL$>$ set\_xend7 128 \\
+ICL$>$ set\_ystart7 64 \\
+ICL$>$ set\_yend7 192 \\
+ICL$>$ plot\_image {\sc \$kappa\_dir}/comwest 7
+\end{quote}
+
+\subsection{Plotting a Sub-Area of an Image in Pixel Units}
+To plot a sub-area in axis units of {\sc \$kappa\_dir/}comwest on port
+7, use ({\em e.g.}):
+
+\begin{quote}
+ICL$>$ set\_whole7 false \\
+ICL$>$ set\_istart7 64 \\
+ICL$>$ set\_iend7 128 \\
+ICL$>$ set\_jstart7 64 \\
+ICL$>$ set\_jend7 192 \\
+ICL$>$ plot\_image {\sc \$kappa\_dir/}comwest 7
+\end{quote}
+
+\subsection{Plotting to a Given Scale}
+To plot a graph of ro940311\_17 between the limits -100 and 500 on port
+8, use ({\em e.g.}):
+
+\begin{quote}
+ICL$>$ set\_autoscale8 false \\
+ICL$>$ set\_low8 -100 \\
+ICL$>$ set\_high8 500 \\
+ICL$>$ plot\_graph ro940311\_17 8
+\end{quote}
+\subsection{Changing the Default Title}
+To plot the standard colour ramp on port 0, with a different title, use ({\em e.g.}):
+\begin{quote}
+ICL$>$ set\_title0 'P4 Colour Table' \\
+ICL$>$ plot\_image {\sc \$p4\_ct/}cgs4 0
+\end{quote}
+\subsection{Printing PostScript Graphics}
+To print a PostScript file of the standard colour ramp on port 0, 
+use ({\em e.g.}):
+\begin{quote}
+ICL$>$ set\_device0 ps\_l \\
+ICL$>$ print\_ps {\sc \$p4\_ct/}cgs4 0
+\end{quote}
+To obtain a list of current devices, use:
+\begin{quote}
+ \% more /star/starlink/lib/gns/gksnames.dat
+\end{quote}
+
+\chapter{Manipulating the Noticeboards}
+\markboth{Behind the Scenes with NBS}{\stardocname}
+\section{How to Manipulate the Noticeboards Directly}
+
+From time to time the user will want to do something not described in
+this document. Perhaps it might be to try something that was available
+under VMS. This is usually accomplished by manipulating the
+noticeboards directly.  So, how is it done?
+
+First, the noticeboards are referenced by aliases contained within the
+ICL (global) variables cred4\_nb\_alias and p4\_nb\_alias. These can be
+used in conjunction with the ICL defstring utility to create mnemonics
+for each noticeboard item. Indeed, the files cred4.icl and p4.icl in
+{\sc \$cgs4dr\_root} are full of such definitions.
+
+Let us take an example: we wish to use a specific {\sc bias}
+observation rather than let the software auto-select a suitable frame.
+The required {\sc bias} is, say, ro950516\_256. This can be achieved by
+defining the following mnemonics:
+
+\begin{quote}
+ ICL$>$ defstring set\_bias\_mode putnbs ((cred4\_nb\_alias)\&'.miscellaneous.bias\_mode') \\
+ ICL$>$ defstring get\_bias\_mode getnbs ((cred4\_nb\_alias)\&'.miscellaneous.bias\_mode') \\
+ ICL$>$ defstring set\_specified\_bias putnbs ((cred4\_nb\_alias)\&'.miscellaneous.specified\_bias') \\
+ ICL$>$ defstring get\_specified\_bias getnbs ((cred4\_nb\_alias)\&'.miscellaneous.specified\_bias')
+\end{quote}
+
+The quotes, braces and ampersand are all necessary. We can use them
+(rather verbosely) thus:
+
+\begin{quote}
+ ICL$>$ bias\_mode = ' ' \\
+ ICL$>$ get\_bias\_mode (bias\_mode) \\
+ ICL$>$ =(bias\_mode) \\
+ BOTH \\
+ ICL$>$ set\_bias\_mode SPECIFIED \\
+ ICL$>$ set\_specified\_bias ro950516\_256 \\
+ ICL$>$ get\_bias\_mode (bias\_mode) \\
+ ICL$>$ =(bias\_mode) \\
+ SPECIFIED \\
+ ICL$>$ which\_bias = ' ' \\
+ ICL$>$ get\_specified\_bias (which\_bias) \\
+ ICL$>$ =(which\_bias) \\
+ ro950516\_256
+\end{quote}
+
+This might seem complicated but the above definitions can be saved to a
+file and loaded when needed. {\em E.g:}
+
+\begin{quote}
+ ICL$>$ \% cat mydefs.icl \\
+ defstring set\_bias\_mode putnbs ((cred4\_nb\_alias)\&'.miscellaneous.bias\_mode') \\
+ defstring get\_bias\_mode getnbs ((cred4\_nb\_alias)\&'.miscellaneous.bias\_mode') \\
+ defstring set\_specified\_bias putnbs ((cred4\_nb\_alias)\&'.miscellaneous.specified\_bias') \\
+ defstring get\_specified\_bias getnbs ((cred4\_nb\_alias)\&'.miscellaneous.specified\_bias') \\
+ ICL$>$ load mydefs.icl
+\end{quote}
+
+The noticeboards are described in tables \ref{tab4}, \ref{tab5}, \ref{tab6} and \ref{tab7} respectively. 
+
+\begin{table}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Noticeboard Item\footnotemark[2] & Meaning & Typical Value \\
+\hline
+.display.int\_p0 & Display integration in port 0? & NO \\
+.display.int\_p1 & Display integration in port 1? & NO \\
+.display.int\_p2 & Display integration in port 2? & NO \\
+.display.int\_p3 & Display integration in port 3? & NO \\
+.display.int\_p4 & Display integration in port 4? & NO \\
+.display.int\_p5 & Display integration in port 5? & NO \\
+.display.int\_p6 & Display integration in port 6? & NO \\
+.display.int\_p7 & Display integration in port 7? & NO \\
+.display.int\_p8 & Display integration in port 8? & NO \\
+.display.obs\_p0 & Display observation in port 0? & NO \\
+.display.obs\_p1 & Display observation in port 1? & YES \\
+.display.obs\_p2 & Display observation in port 2? & YES \\
+.display.obs\_p3 & Display observation in port 3? & YES \\
+.display.obs\_p4 & Display observation in port 4? & YES \\
+.display.obs\_p5 & Display observation in port 5? & NO \\
+.display.obs\_p6 & Display observation in port 6? & NO \\
+.display.obs\_p7 & Display observation in port 7? & NO \\
+.display.obs\_p8 & Display observation in port 8? & NO \\
+.display.grp\_p0 & Display group in port 0? & NO \\
+.display.grp\_p1 & Display group in port 1? & NO \\
+.display.grp\_p2 & Display group in port 2? & NO \\
+.display.grp\_p3 & Display group in port 3? & NO \\
+.display.grp\_p4 & Display group in port 4? & NO \\
+.display.grp\_p5 & Display group in port 5? & YES \\
+.display.grp\_p6 & Display group in port 6? & YES \\
+.display.grp\_p7 & Display group in port 7? & NO \\
+.display.grp\_p8 & Display group in port 8? & NO \\
+.display.spc\_p0 & Display spectrum in port 0? & YES \\
+.display.spc\_p1 & Display spectrum in port 1? & NO \\
+.display.spc\_p2 & Display spectrum in port 2? & NO \\
+.display.spc\_p3 & Display spectrum in port 3? & NO \\
+.display.spc\_p4 & Display spectrum in port 4? & NO \\
+.display.spc\_p5 & Display spectrum in port 5? & NO \\
+.display.spc\_p6 & Display spectrum in port 6? & NO \\
+.display.spc\_p7 & Display spectrum in port 7? & NO \\
+.display.spc\_p8 & Display spectrum in port 8? & NO \\
+\hline
+\end{tabular}
+\caption{CRED4 Noticeboard Display Items} \label{tab4}
+\end{center}
+\footnotemark[2]{\scriptsize {\em E.g.} defstring get\_display\_intp0 getnbs ((cred4\_nb\_alias)\&'.display.int\_p0')}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Noticeboard Item\footnotemark[2] & Meaning & Typical Value \\
+\hline
+.reduction.add\_int.execute & Coadd integrations? & YES \\
+.reduction.add\_obs.execute & Coadd observations into groups? & YES \\
+.reduction.archive\_obs.execute & Archive observations? & NO \\
+.reduction.file\_obs.execute & File observations to index? & YES \\
+.reduction.divide\_by\_ff.execute & Divide by FLAT field? & YES \\
+.reduction.divide\_by\_std.execute & Divide by STANDARD? & NO \\
+.reduction.subtract\_bias.execute & Subtract BIAS frame? & YES \\
+.reduction.subtract\_dark.execute & Subtract DARK frame? & NO \\
+.reduction.normalise\_ff.execute & Normalise FLAT field? & YES \\
+.reduction.normalise\_ff.method & Method for mormalising FLAT & POLYFIT \\
+.reduction.normalise\_ff.order & Order for polynomial to fit & 3 \\
+.reduction.normalise\_ff.boxsize & Smooth box size for fit & 5 \\
+.reduction.to\_wavelength.execute & Wavelength calibrate? & YES \\
+.reduction.to\_wavelength.method & Method to use for calibration & ESTIMATED \\
+.reduction.autofit.execute & Automatically fit lines? & NO \\
+.reduction.autofit.nrows & Number of rows to be averaged?  & 1 \\
+.reduction.autofit.row1 & First row for fitting & 10 \\
+.reduction.autofit.row2 & Second row for fitting & 40 \\
+.reduction.autofit.xstart & Xstart for extraction and fitting & 1.0 \\
+.reduction.autofit.xend & Xend for extraction and fitting & 256.0 \\
+.reduction.extract\_spc.execute & Extract spectra? & NO \\
+.reduction.extract\_spc.algorithm & Algorithm to use & BRIGHT \\
+.reduction.extract\_spc.invert & Invert the output spectrum? & {\sc false} \\
+.reduction.extract\_spc.row1s & First row for extraction & 23 \\
+.reduction.extract\_spc.row1e & First row start for extraction & 25 \\
+.reduction.extract\_spc.row2s & Second row start for extraction & -1 \\
+.reduction.extract\_spc.row2e & Second row end for extraction & -1 \\
+.reduction.extract\_spc.row3s & Third row start for extraction & -1 \\
+.reduction.extract\_spc.row3e & Third row end for extraction & -1 \\
+\hline
+\end{tabular}
+\caption{CRED4 Noticeboard Reduction Items} \label{tab5}
+\end{center}
+\footnotemark[2]{\scriptsize {\em E.g.} defstring get\_add\_int getnbs ((cred4\_nb\_alias)\&'.reduction.add\_int')}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Noticeboard Item\footnotemark[2] & Meaning & Typical Value \\
+\hline
+.miscellaneous.bias\_mode & How to search for BIAS & BOTH \\
+.miscellaneous.dark\_mode & How to search for DARK & BOTH \\
+.miscellaneous.flat\_mode & How to search for FLAT & BOTH \\
+.miscellaneous.calib\_mode & How to search for CALIB & BOTH \\
+.miscellaneous.standard\_mode & How to search for STD & BOTH \\
+.miscellaneous.specified\_bias & Specified BIAS frame & royymmdd\_oooo \\
+.miscellaneous.specified\_dark & Specified DARK frame & royymmdd\_oooo \\
+.miscellaneous.specified\_flat & Specified FLAT frame & royymmdd\_oooo \\
+.miscellaneous.specified\_calib & Specified CALIB frame & cayymmdd\_oooo \\
+.miscellaneous.specified\_std & Specified STANDARD frame & styymmdd\_gggg \\
+.miscellaneous.errors & Hot to propagate error & {\sc from\_obs} \\
+.miscellaneous.lincoeffs & Name of linearisation file & \# \\
+.miscellaneous.mask & Name of bad pixel mask & fpa46\_short \\
+.miscellaneous.pf\_polyfit & Polysky method & NONE \\
+.miscellaneous.pf\_degree & Degree of polynomial for fit & 1  \\
+.miscellaneous.pf\_nreject & Number of points to reject & 0 \\
+.miscellaneous.pf\_saye1 & Start of first sky area & 20 \\
+.miscellaneous.pf\_says1 & End of first sky area & 25 \\
+.miscellaneous.pf\_saye2 & Start of second sky area & 35 \\
+.miscellaneous.pf\_says2 & End of second sky area & 40 \\
+.miscellaneous.pf\_saye3 & Start of third sky area & -1 \\
+.miscellaneous.pf\_says3 & End of third sky area & -1 \\
+.miscellaneous.pf\_saye4 & Start of fourth sky area & -1 \\
+.miscellaneous.pf\_says4 & End of fourth sky area & -1 \\
+.miscellaneous.pf\_weight & Weight the fit? &  {\sc true} \\
+.miscellaneous.variance\_wt & T for variance weighting & {\sc false} \\
+.miscellaneous.add\_in\_pairs & Add observations in pairs? & {\sc true} \\
+.miscellaneous.sky\_wt & Weighting value for sky frames & 1.0 \\
+\hline
+\end{tabular}
+\caption{CRED4 Noticeboard Miscellaneous Items} \label{tab6}
+\end{center}
+\footnotemark[2]{\scriptsize {\em E.g.} defstring get\_bias\_mode getnbs ((cred4\_nb\_alias)\&'.miscellaneous.bias\_mode')}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Noticeboard Item\footnotemark[2] $0<n<8$ & Meaning & Typical Value \\
+\hline
+.port\_$n$.device\_name & Name of plotting device & xwindows \\
+.port\_$n$.device\_xopt & X-axis options & BNCTSI \\
+.port\_$n$.device\_yopt & X-axis options & BNCTSI \\
+.port\_$n$.device\_lut & Colour table & \$P4\_CT/default \\
+.port\_$n$.display\_plane & Plane of data to display & DATA \\
+.port\_$n$.display\_data & Name of dataset & \$P4\_CT/cgs4 \\
+.port\_$n$.display\_type & Type of display required & IMAGE \\
+.port\_$n$.bg\_colour & Display device background colour & WHITE \\
+.port\_$n$.fg\_colour & Display device foreground colour & BLACK \\
+.port\_$n$.colour\_style & Monochrome or full colour?  & COLOUR \\
+.port\_$n$.overcolour & Colour for overgraph? & RED \\
+.port\_$n$.cut\_direction & Direction of cut for (OVER)GRAPHs? & X \\
+.port\_$n$.contour\_type & Type of contour plot required? & LIN \\
+.port\_$n$.title & Title for plot & A\_U\_T\_O \\
+.port\_$n$.autoscale & T for autoscaling & {\sc true} \\
+.port\_$n$.plot\_axes & T if axes are to be plotted & {\sc true} \\
+.port\_$n$.plot\_errors & T if errors are to be plotted & {\sc true} \\
+.port\_$n$.plot\_whole & T if whole array is to be plotted & {\sc true} \\
+.port\_$n$.plot\_axes & T if axes are to be plotted & {\sc true} \\
+.port\_$n$.pre\_erase\_plot & T if port is to be cleared & {\sc true} \\
+.port\_$n$.histogram\_bins & Number of histogram bins & 50 \\
+.port\_$n$.histogram\_smooth & Smooth box for histogramming & 3 \\
+.port\_$n$.histogram\_xstep & Number of columns to overstep & 1 \\
+.port\_$n$.histogram\_ystep & Number of rows to overstep & 1 \\
+.port\_$n$.contour\_levels & Number of contour levels & 25 \\
+.port\_$n$.istart & Start pixel number for sub-arrays & 1 \\
+.port\_$n$.iend & End pixel number for sub-arrays & 256 \\
+.port\_$n$.jstart & Start pixel number for sub-arrays & 1 \\
+.port\_$n$.jend & End pixel number for sub-arrays & 256 \\
+.port\_$n$.xstart & Xstart of sub-array & 1.0 \\
+.port\_$n$.xend & Xend of sub-array & 256.0 \\
+.port\_$n$.ystart & Ystart of sub-array & 1.0 \\
+.port\_$n$.yend & Yend of sub-array & 256.0 \\
+.port\_$n$.slice\_start & Start of slice for (OVER)GRAPH & 20.0 \\
+.port\_$n$.slice\_end & End of slice for (OVER)GRAPH & 40.0 \\
+.port\_$n$.char\_height & Height of characters in labels & 1.0 \\
+\hline
+\end{tabular}
+\caption{P4 Noticeboard Modifiable Items} \label{tab7}
+\end{center}
+\footnotemark[2]{\scriptsize {\em E.g.} defstring get\_device0 getnbs ((p4\_nb\_alias)\&'.port\_0.device\_name')}
+\end{table}
+
+%------------------------------------------------------------------------------
+%  Part III 
+\part{THE Tcl/tk INTERFACE}
+\pagestyle{myheadings}
+\markboth{Tcl/tk Interface}{\stardocname}
+
+\chapter{Introduction to Tcl/tk}
+\section{Historical Perspective}
+Tcl/tk (Ousterhout, 1994) stands for the `tool command language/toolkit'.
+It was written by John Ousterhout of the University of California in
+response to the continual development of ad-hoc interfaces to different
+projects. What was needed was a generic command language that could be
+modified to suit the user's needs {\em i.e.} it had to be {\em
+extensible}. Thus tcl was born. The addition of the toolkit at a later
+stage made tcl/tk a very powerful {\sc gui} prototyping environment available
+with little effort and, perhaps more importantly, at no cost to the
+community. 
+
+In September 1993, the {\sc adam} V Workshop provided demonstrations of two
+proposed {\sc gui}s for Starlink development: Xadam (based upon tcl/tk's expect
+command) and ICLmenus (an in-house solution). {\sc gui}-builders were ruled out
+at any early stage. In October 1994, at the Baltimore ADASS IV meeting, it
+was clear that tcl/tk was taking the astronomical world by storm (as, for
+example, had xmosaic a year or so earlier). Starlink had implemented some
+extensions to tcl to allow the system to communicate with {\sc adam} tasks.
+Later work done at ROE provided tcl extensions to communicate with NBS.
+Together these systems formed what is now known as {\sc tcladam} (Terrett, 1995)
+and it is this product that is the basis for the Portable-CGS4DR graphical
+user interface. 
+
+\section{A Few Words on {\sc gui}s}
+{\sc gui} stands for graphical user interface. Personally, I prefer the term
+`pictorial interface' as it gets the idea accross must quicker. In a {\sc gui}
+there are graphical (pictorial) elements such as pull-down menus, action
+buttons, radiobuttons, checkbuttons, slide bars, scroll bars, text panes
+and the like. All of these elements are generically termed `widgets' and
+they can be ordered into hierarchies called widget trees. {\sc gui}s are also
+capable of providing colourful interfaces and usually require a mouse to
+interact with the system. Advanced {\sc gui}s have {\em keyboard traveral} so
+that a keyboard can be used for input when a mouse is not available. 
+
+\section{The Portable-CGS4DR Style}
+The Portable-CGS4DR {\sc tcladam} interface provides a window to each major
+task. Each window consists of a title bar, a menu bar, a text pane and a
+wigdet tree in some order. In addtion, {\sc tcladam} also provides a {\sc gwm} widget
+which includes the xdisplay plotting surface. Note that the style described
+below may change as users feedback their preferences. 
+
+It may also appear different if your $\sim$/.Xdefaults file has been edited for any reason.
+In particular, if you use white or near-white as a foregound colour, the Portable-CGS4DR
+{\sc gui} may be unreadable. The way around this is to invoke the following command
+{\em before} invoking the {\sc gui}:
+
+\begin{quote}
+ \% \ xrdb \ $<$ \ /dev/null
+\end{quote}
+
+The defaults for the Portable-CGS4DR interface are:
+\begin{description}
+\item[{\sf OK Button}] --- Performs some action {\em i.e.} it does something.
+\item[{\sf Cancel Button}] --- Aborts some menu without action {\em i.e.} does nothing.
+\item[{\sf Dismiss Button}] --- Dismisses an informational dialogue box {\em i.e.} does nothing.
+\item[{\sf Background}] --- wheat.
+\item[{\sf Text Pane}] --- snow.
+\item[{\sf Scrollbars}] --- lightyellow (inactive), palegreen (active). 
+\item[{\sf Checkbuttons}] --- Used for binary choices ({\em e.g.} autoscaling in the plotting interface). \\
+ --- wheat with grey border (inactive), all grey (active). 
+\item[{\sf Radiobuttons}] --- Used for multiple but restricted choices 
+({\em e.g.} {\sf Yes}, {\sf No} or {\sf Ask}). \\
+ --- wheat with grey border (inactive), palegreen with grey border (active).
+\item[{\sf Actionbuttons}] --- Used to invoke some action
+  either by communicating directly with the task ({\em e.g.} Plot) or 
+  generating a dialogue box. \\
+  --- pink (inactive), palegreen (active). 
+for further input ({\em e.g.} flux\_calibrate).
+\item[{\sf Menus}] --- wheat (inactive), palegreen (active).
+\item[{\sf Menu Items}] --- wheat (inactive), palegreen (active). 
+\item[{\sf Cursor}] --- green arrow (normal), orange pirate (a dialogue box is open), red wrist-watch (task busy), yellow pencil (help box open).
+\item[{\sf Mouse Button 1}] Use as follows \\
+  --- Single Click: Invokes action ({\em e.g.} OK or Cancel). \\
+  --- Double Click: Invokes action in listbox
+\item[{\sf Mouse Button 2}] Use as follows \\
+  --- Single Click: Invokes dynamic default if appropriate. \\
+  --- Double Click: Clears entry widget.
+\item[{\sf Mouse Button 3}] --- Invokes on-line help dialogue box.
+\end{description}
+
+\subsection{The Title Bar}
+The title bar identifies the software version and task name to which it applies.
+
+\subsection{The Menu Bar}
+The menu bar and the menus contained within have keyboard traversal enabled so that, for example, any option
+can be invoked using the {\sc alt} key and the appropriate underscored character.
+
+The menu bar consists of three items: {\sf File}, {\sf Options} and {\sf Help}. 
+
+The {\sf File} menu contains just one entry: {\sf Exit}. This is used to exit Portable-CGS4DR after confirmation
+via a dialogue box.
+
+The {\sf Help} menu contains several items: {\sf Author(s)}, {\sf Tcl/tk Version} and {\sf Portable-CGS4DR Version} 
+all write an information string to the text pane. The {\sf Portable-CGS4DR WWW Page} item invokes the Starlink findme script.
+
+The {\sf Options} menu contains several items some of which are geared towards the particular task from
+which the menu was invoked. The default set contains a checkbutton for toggling verbose messages on (illuminated)
+and off, an action to clear the text widget and an action to communicate with the task directly via a dialogue box.
+
+\subsection{The Text Pane}
+The text pane is a large area which the tasks use to output their
+messages of any type. It is not writeable by the user but may be
+cleared from the {\sf Options} menu using {\sf Clear Text Widget}.
+
+\subsection{The Widget Tree}
+The widget tree is specific to each task. They are dealt with in separate chapters.
+
+\section{Invoking Dynamic Defaults and On-line Help}
+The generic mouse supplied with workstations has three buttons labelled
+left-to-right as MB1, MB2 and MB3. The Portable-CGS4DR style is to use
+all three buttons:
+
+\begin{itemize}
+\item MB1 - Single Click: Invoke an action or dialogue box or similar 
+\item MB1 - Double Click: Invoke an action or dialogue box from a listbox widget
+\item MB2 - Single Click: Invoke a dynamic default value 
+\item MB2 - Double Click: Reset a text entry widget to a null string (empty) 
+\item MB3 - Single Click: Invoke on-line help 
+\end{itemize}
+
+In listboxes, the primary selection of text is made using a single click with MB1.
+This {\em must} be done prior to using MB3 for on-line help. Failure to do so will 
+either invoke the help text associated with the current selected item (which is 
+likely to be different from the one you want) or return an error: {\tt
+PRIMARY selection doesn't exist or form ``STRING'' not defined}.
+
+Dynamic defaulting has been enabled, where appropriate, using MB2. The following
+scheme has been enabled: using MB2 within any particular data input widget will set the
+dynamic default for just that widget whereas using MB2 on any text label within
+that widget tree sets all defaults within that tree. A double click within an entry
+widget clear that widget of all text.
+
+As an example, the CRED4 setup button invokes a dialogue box with the various
+data reduction sequences offerred via a series of radiobuttons. Using MB2
+within any horizontal level of radiobuttons will set just that value to some
+sensible default. If, however, you position the mouse over any text label
+(such as `Subtract BIAS Frame?', `Subtract DARK Frame?' etc), the all of the
+displayed values will be set to sensible defaults when MB2 is depressed.
+
+\section{Starting the Software}
+The Portable-CGS4DR {\sc gui} can be started with three optional command line
+parameters: 
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \$1 is a data directory \hfill /\$\{home\}/ \\
+  \$2 is a UT date \hfill /current UT-date/ \\
+  \$3 is the file type {\sc dst} or {\sc ndf} \hfill /ndf/
+\end{quote}
+\end{minipage}
+
+To start the software, source the {\sc starlink} login and cshrc files and
+use your local data directory. {\em E.g.:}
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \%  source \ \ /star/etc/login \\
+  \%  source \ \ /star/etc/cshrc \\
+  \%  cgs4dr\_tcl \ \ /scratch/pnd/19940811 \ \ 940811 \ \ ndf
+\end{quote}
+\end{minipage}
+
+If any of the command line parameters are missing, a confirmation dialogue box
+is created. Items labelled in {\em red} script within this box are those that
+require confirmation.
+
+Once started, as a background job, a `traffic light' window will appear containing entries
+for each of the four primary tasks. Initially, the backgrounds to these widgets are red
+(meaning stop) and as the tasks are loaded and become available they turn to green (for go).
+Once all four tasks are `go' the window disappears to be replaced by the 
+3 full-size windows (cred4, p4\_disp and qman) and two iconic windows
+(red4 and p4 control). At this point, Portable-CGS4DR using {\sc tcladam} is
+ready.
+
+There is also a `setup' facility for defining evironmental variables without
+invoking the software:
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \%  source \ \ /star/etc/login \\
+  \%  source \ \ /star/etc/cshrc \\
+  \%  cgs4dr\_setup \ \ /scratch/pnd/19940811 \ \ 940811 \ \ ndf \\[4ex]
+      {\tt Setup Portable-CGS4DR V1.3-0 for /scratch/pnd/19940811} \\[2ex]
+  \%
+\end{quote}
+\end{minipage}
+
+\subsection{Startling the Software at UKIRT}
+If you are using the software at the telescope, the following startup procedure is
+recommended:
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \%  source \ \ /star/etc/login \\
+  \%  source \ \ /star/etc/cshrc \\
+  \%  start\_adamnet \\
+  \%  cgs4dr\_ukirt \\
+  \%
+\end{quote}
+\end{minipage}
+
+The alias {\it cgs4dr\_ukirt} points to the correct directory and UT-date.
+When the night's observing is finished, you should remember to kill ADAMnet with:
+
+\begin{minipage}{120mm}
+\begin{quote}
+  \%  stop\_adamnet \\
+  \%
+\end{quote}
+\end{minipage}
+
+\section{Common Problems Upon Startup}
+\begin{description}
+\item[{\bf \S}] {\sf /star/bin/cgs4dr/tcl/cgs4dr\_tcl: Command not found.} 
+
+  The awish program has not been found.
+
+  By default, awish is installed in /star/bin/awish and this is reflected
+  in the first line of the file {\sc \$cgs4dr\_root}/tcl/cgs4dr\_tcl:
+  \begin{verbatim}
+    #!/star/bin/awish -file
+  \end{verbatim}
+  If awish has been installed elsewhere, this line will need editing to reflect 
+  the correct location.
+
+\item[{\bf \S}] {\sf Invalid command name ``adamtask''.}
+
+  The {\sc adam} extensions to tcl are not readable. 
+
+  The {\sc tcladam} software specifies a series of extensions to tcl that allow
+  communications with the {\sc adam} messaging system and, hence, the tasks. These
+  extensions are held in some directory in a file called adamtask.tcl (and others).
+  The {\sc gui} startup file {\sc \$cgs4dr\_root}/tcl/cgs4dr\_tcl has a line thus:
+  \begin{verbatim}
+    set tclAdamLib /star/lib/tk/adam
+  \end{verbatim}
+  This needs to reflect the location of your site's copy of the {\sc tcladam} software.
+
+\item[{\bf \S}] {\sf cgs4dr\_tcl aborting, failed creating task rendezvous file: File exists.}
+
+  Task redezvous files were not deleted by previous shutdown.
+
+  The task rendezvous files are located in the directory {\sc \$home}/adam and have the generic form 
+  {\sf xxxx}\_{\em task}\_{\sf yyyy} where {\sf xxxx} and {\sf yyyy} are unique numbers
+  and {\em task} is one of the Portable-CGS4DR tasks (cred4, red4, p4, qman and, possibly, ukirtfig).
+  There are also files called cgs4dr\_tcl\_relay\_{\sf zzzz} and the like where {\sf zzzz}
+  is another unique identifier. These are the task rendezvous files. If the software is, 
+  for example, aborted (using \% kill -9 {\em something}) rather than shutdown, these files may not be deleted.
+  Subsequent attempts to run the software will fail until these rendezvous files are
+  deleted. A list of current rendezvous files can be created thus:
+
+  \begin{verbatim}
+    % ls -l ~/adam | grep 'p---'
+  \end{verbatim}
+
+  Note that if you run the software more than once, some files are created with names such as
+  `cgs4dr\_tcl \#2\_xxxx'. The quotes are deliberate as the filename contains a space character
+  which is completely legal under Unix. Such files must be deleted properly.
+
+\item[{\bf \S}] {\sf grab failed: another application has grab while executing ``grab \$QmanWidgets(INTERRUPT)''}
+
+  Tcl/tk can't grab the widget defining the interrupt.
+
+  This occurs when another version of the queue manager task is running or a previous incantation was
+  not shut down properly. The solution is to run the cgs4dr\_kill script before re-invoking the software.
+
+\item[{\bf \S}] {\sf A dialogue box appears requesting parameter values.}
+
+  This is a result of a file corruption probably in the ADAM parameter file.  There are two
+  solutions. The easier, and preferred, solution is to shut the software down using the commands
+  in \S \ref{restart}. If you wish to persevere, though, the parameter prompt box appears due to
+  character items having a missing end-quote mark. You can always just add
+  the end-quote (or delete the start-quote) and click on {\sf OK} for each item.
+
+\item[{\bf \S}] {\sf Unable to allocate colour cells.}
+
+  Software could not allocate enough colour cells.
+
+  The number of colour cells is finite. Running too many (colour) applications (such as
+  netscape, xmosaic etc) can exhaust the number of colour cells resulting in a failure
+  to load the {\sc gui}. If this happens, you must delete some applications.
+
+\item[{\bf \S}] {\sf adamnet failed to bind socket: Address already in use. \\
+  adamnet: bad initialisation status = 141525083}
+
+  This only happens at {\sc ukirt} where distributed ADAMnet communications are required
+  between the VAX data acquisition and Unix data reduction systems. This happens because
+  another user left ADAMnet running. The solution is to login as a privileged user and do:
+
+  \begin{verbatim}
+    % kill -9 `ps -ef | grep adamnet | grep -v grep | nawk '{print $2}'`
+  \end{verbatim}
+\end{description}
+
+\section{Running the Tasks Individually}
+In Portable-CGS4DR the software tasks have been de-coupled which allows each task to be
+run individually. Clearly this functionality is useful for debugging. Some tasks, however,
+are generic so that they can be used outside of Portable-CGS4DR. I am thinking particularly
+of the plotting task which can display {\sc dst} or {\sc ndf} data. If you wish to run the
+tasks separately, set up the symbolic links thus:
+
+\begin{quote}
+  \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ p4\_tcl \\
+  \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ q4\_tcl \\
+  \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ r4\_tcl \\
+  \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ c4\_tcl 
+\end{quote}
+
+One can then invoke the plotting task, like so:
+
+\begin{quote}
+  \% \ p4\_tcl \ \&
+\end{quote}
+
+\markboth{The GUI Interfaces}{\stardocname}
+\chapter{The GUI Interfaces}
+\section{The Reduction Task Interface}
+The RED4 interface is the simplest of its kind being a suite of commands 
+contained within a listbox. An action is invoked by double clicking on a selected item using MB1
+Some actions are `direct' {\em i.e} they do something with no further
+input ({\em e.g.} status) whilst others display dialogue boxes for manipulation of the action
+parameters ({\em e.g.} add\_two\_images). Error and informational messages are displayed in the text pane.
+
+For a full description of each action invoke on-line help using MB3 or view the hypertext web document.
+
+Before any such action is invoked, however, the interface checks that the task is
+ready to execute commands and is not busy doing other things. If the task is busy a confirmation 
+dialogue box is returned: the {\sf Cancel} button aborts the action whereas the {\sf OK} will continue 
+{\em and will wait until the task becomes free}.
+
+\section{The Queue Manager Task Interface}
+The QMAN interface comprises mainly action buttons.
+As before, error and informational messages are displayed in the text pane.
+The various elements in the widget tree are described below.
+
+For a full description of each action invoke on-line help using MB3 or view the hypertext web document.
+
+\subsection{Observation Range}
+The widget tree labelled {\sf Observation Range} allows the user to enter a
+suitable range of observations into the data reduction queue. The {\sf First}
+and {\sf Last} parameters are checked before invoking the action. The {\sf Enter}
+button enters commands in the queue whilst the {\sf Remove} button removes them.
+There is also a check on the total number of entries written at one time: if
+more than 50 entries are requested (an arbitrary choice), the user is asked to
+confirm the range of entries via a dialogue box (not shown).
+
+\subsection{Queue Position}
+The queue position can be specified using the {\sf Queue Position} radiobuttons.
+Loosely, the oldest position is analagous to the `bottom' of the queue and the
+newest position to the `top'. 
+
+\subsection{List Queue}
+The {\sf List Queue} action button, lists the contents of the data reduction
+queue in the order in which Portable-CGS4DR will execute them. The output is written to the text pane.
+
+\subsection{Remove All Entries}
+The {\sf Remove All Entries} action button returns a dialogue box 
+for confirmation of the deletion of the database. If {\sf OK}, the entire contents of the database
+are deleted.
+
+\subsection{Interrupt}
+The {\sf Interrupt} action button uses widget grabs to seize control of the interface at
+any particular instant. It would normally be used in the situation where a user
+has inadvertently started writing a large number of entries to the queue. By clicking
+on the {\sf Interrupt} button, the normal flow of {\sc tcladam} messages to the
+qman task is interrupted thus preventing database overflowing and returning control to
+the user.
+
+\subsection{Qman Options}
+The QMAN options menu contains the defaults plus specific options detailed below.
+
+\subsection{Enter / Remove ...}
+\subsubsection{End Group}
+The widget tree labelled {\sf End Group} allows the user to enter a suitable
+endgroup command into the data reduction queue. The {\sf Group Number} parameter
+is checked before proceeding. The {\sf Enter} button enters the command whilst the
+{\sf Remove} button removes it. Since Unix is, by default, `self-clobbering' this
+functionality is largely redundant but has been retained for compatibility with the
+VMS system. 
+
+\subsubsection{End Range}
+The widget tree labelled {\sf End Range} allows the user to enter a range of
+END oyymmdd\_oooo commands into the queue for re-filing reduced observations.
+The {\sf Observation Number} parameter is checked before proceeding. The {\sf Enter} 
+button enters the command whilst the {\sf Remove} button removes it. 
+
+\subsubsection{Integration Range}
+The widget tree labelled {\sf Integration Range} allows the user to enter a range
+of REDUCE iyymmdd\_oooo\_iiii commands into the queue.
+The {\sf Observation Number, Start Integration, End Integration} parameters
+is checked before proceeding. The {\sf Enter} button enters the command whilst the
+{\sf Remove} button removes it. 
+
+\subsubsection{String}
+The widget tree labelled {\sf String} allows the user to enter a suitable
+string into the data reduction queue. The {\sf String} parameter
+is checked before proceeding and a radiobutton offers various string types. 
+The {\sf Enter} button enters the command whilst the {\sf Remove} button removes it. 
+
+\subsection{Set UT Date}
+{\sf Set UT Date} returns a dialogue box with a single data entry field labelled {\sf UT Date} 
+(which defaults to the present UT date). If {\sf OK}, the given date is used as the root
+date for further data reduction commands.
+
+\section{The Control Task Interface}
+The CRED4 interface comprises mainly action buttons.
+As before, error and informational messages are displayed in the text pane.
+The various elements in the widget tree are described below.
+
+For a full description of each action invoke on-line help using MB3 or view the hypertext web document.
+
+\subsection{START / STOP}
+The {\sf START} action button starts the
+automated data reduction software. When invoked, this button is deleted and replaced
+{\em at the same location} with a button labelled {\sf STOP}. This latter
+button stops the automated data reduction software. 
+
+\subsection{Pause}
+The {\sf Pause} checkbutton toggles between pausing and resuming the
+data reduction software. It does not stop the data reduction software.
+
+\subsection{Status Label}
+The data reduction status label shows the current status and is initialized to read 
+{\sc stopped}. This is written on a red background. When the data reduction is started (whilst not paused), this
+label changes to the string {\sc running} on a green background. If paused, the label reads {\sc paused} on an
+orange background. 
+
+\subsection{Setup}
+The {\sf Setup} action button returns a dialogue box of radiobuttons that tailor the automated data
+reduction sequence using the familiar {\sf Yes}, {\sf No} or {\sf Ask} switches. The action buttons within this dialogue
+box are labelled {\sf OK}, {\sf Defaults} and {\sf Cancel}.
+{\sf OK} and {\sf Cancel} have their usual meaning whilst {\sf Defaults} sets the database to the defaults contained
+in the startup file. The defaults are not changed dynamically within the dialogue box but
+are sent direct to the task noticeboard and the dialogue box disappears. To view these defaults,
+therefore, the action needs to be re-invoked. The same is true for all other dialogue boxes.
+
+\subsection{Display}
+The {\sf Display} action button returns a dialogue box of
+multiple-page radiobuttons. When first invoked, four radiobuttons are displayed with labels
+{\sf Integrations}, {\sf Observations}, {\sf Groups} and {\sf Spectra}. Selecting any particular
+value then displays a further page of radiobuttons with four choices per port: {\sf Yes}, 
+{\sf No}, {\sf Ask} and {\sf Overgraph}.
+
+If the user desires, for example, to plot images in port 1, a graph in port 2 and two overgraphs the
+{\sf Observations} page would be tailored like so: click on {\sf Observations} at the page head to 
+bring up the correct page. Then click on {\sf Yes} for ports 1 and 2 then
+click on {\sf Overgraph} in port 3 and 4. If {\sf Overgraph} is selected a flip-out box appears
+to take the appropriate command. Such text must be entered into the {\sf Command} field
+manually and might be (for ports 3 and 4 for example):
+
+\begin{verbatim}
+  OVERGRAPH PORT=2 CUT=X SPOS=20 EPOS=40 COLOUR=RED
+  OVERGRAPH PORT=2 CUT=X SPOS=25 EPOS=30 COLOUR=BLUE
+\end{verbatim}
+
+As before, the dialogue box action buttons include {\sf OK}, {\sf Defaults} and {\sf Cancel}.
+Note here that the {\sf Defaults} button sets the defaults for {\em all four} types of display
+and exits.
+
+\subsection{Configs}
+The {\sf Configs} action button returns a dialogue box that
+allows the user to {\sf Save} to or {\sf Restore} from the specified configuration
+file. 
+
+\subsection{Masks}
+The {\sf Masks} action button returns a dialogue box that
+accepts inputs to change the bad pixel mask or linerisation file.
+
+\subsection{Bias}
+The {\sf Bias} action button returns a dialogue box that
+accepts inputs to change various parameters associated with {\sc bias} reduction.
+
+\subsection{Dark}
+The {\sf Dark} action button returns a dialogue box that
+accepts inputs to change various parameters associated with {\sc dark} reduction.
+
+\subsection{Flat}
+The {\sf Flat} action button returns a dialogue box that
+accepts inputs to change various parameters associated with {\sc flat} reduction.
+
+\subsection{Calibration}
+The {\sf Calibration} action button returns a dialogue box that
+accepts inputs to change various parameters associated with {\sc calib} reduction.
+
+\subsection{Standard}
+The {\sf Standard} action button returns a dialogue box that
+accepts inputs to change various parameters associated with {\sc standard} reduction.
+
+\subsection{Sky}
+The {\sf Sky} action button returns a dialogue box that
+accepts inputs to change various parameters associated with normal sky subtraction.
+
+\subsection{Polysky}
+The {\sf Polysky} action button returns a dialogue box that
+accepts inputs to change various parameters associated with enhanced sky subtraction.
+
+\subsection{Extract}
+The {\sf Extract} action button returns a dialogue box that
+accepts inputs to change various parameters associated with extracting a nodded spectrum.
+
+\subsection{Cred4 Options}
+The CRED4 options menu contains the defaults plus specific options detailed below.
+
+\subsubsection{Peek Noticeboard}
+Allows the user to peek at control task noticeboard values.
+
+\subsubsection{Poke Noticeboard}
+Allows the user to poke control task noticeboard values.
+
+\subsubsection{Pause On Error}
+Allows the user to tailor the behaviour when an error occurs.
+
+\subsubsection{Load Demo \#1}
+Loads the demo, if the software has been invoked correctly for this purpose.
+To do so, use cgs4dr\_tcldemo and click on START when ready.
+
+\subsubsection{Load Demo \#2}
+Loads the demo, if the software has been invoked correctly for this purpose.
+To do so, use cgs4dr\_tcldemo and click on START when ready.
+
+\section{The Plotting Task Interface}
+The P4 interface comprises mainly action buttons.
+As before, error and informational messages are displayed in the text pane.
+The various elements in the widget tree are described below. 
+
+Loaded with the plotting task widget is a GWM display widget. This widget
+has options for altering the colour values of the foreground, background,
+overlay plane (if present), crosshair and individual pixel values. A further
+widget provides hardcopy graphics. The {\sc clear} buttons clears the whole screen.
+If you want to clear an individual port, you should use the `Send Task An Action'
+menu item under options and enter `clear' for the {\sc action} and `port=1' (say)
+for {\sc parameters} (sic).
+
+For a full description of each action invoke on-line help using MB3 or view the hypertext web document.
+
+\subsection{Data}
+A dataset is specified by writing a string into the {\sf Data} field. Since
+the plotting task can handle both {\sc ndf} and {\sc dst} data, any suitable
+dataset can be plotted. Note that this entry widget has a binding to the plot
+action upon receipt of a carriage return. That is, typing in a dataset name
+and pressing {\sc return} invokes the plot action and the given dataset is
+displayed.
+
+\subsection{Port}
+Ports are specified using bitmaps to represent portions of the screen 
+where the data will be plotted. 
+The {\sf Port} radiobuttons allow the user to toggle between different viewports.
+
+\subsection{Plane}
+The {\sf Plane} radiobuttons allow the user to specify which data plane is to be
+plotted. If the requested plane does not exist, an error is returned to the text pane.
+
+\subsection{Type}
+The {\sf Type} radiobuttons allow the user to specify the type of plot to execute
+in the given viewport. For {\sf Image} and {\sf Surface} plots not further information
+is necessary. For the other types of plots a new flip-out widget is created {\em on the
+fly} and prompts the user for start of cut, end of cut and so forth as required. Note that if
+{\sf Graph} is selected, a pen colour {\em may} be selected but does not work --- that 
+functionality is, at present, reserved for {\sf Overgraphs}.
+
+\subsection{Autoscale}
+The {\sf Autoscale} checkbutton allows the user to select specific scaling limits.
+If `unchecked', a new flip-out widget is created {\em on the fly} to prompt the user for
+high and low values. 
+
+\subsection{Whole Array}
+The {\sf Whole Array} checkbutton allows the user to select sub-areas of the array.
+If `unchecked', a new flip-out widget is created {\em on the fly} to prompt the user for
+(xstart,xend) and (ystart,yend) pairs.
+
+\subsection{Plot}
+The {\sf Plot} action button invokes the P4 display action to plot the given dataset
+in the manner chosen. It is the most commonly used action.
+
+\subsection{Cursor}
+The {\sf Cursor} action button runs the P4 cursorval routine on the displayed dataset. 
+When invoked control is passed to the GWM widget display surface and a click with
+MB1 returns the X,Y co-ordinates of the point plus the data, error and quality array
+values at that point.
+
+\subsection{Set Port}
+The {\sf Set Port} action button returns a dialogue box that
+allows the user to tailor the display on any port and specifies a range of
+options not included in the main widget trees such as device and axis attributes. If OK, the 
+task noticeboard is altered to the values specified. That is to say, to reset the (autpomated)
+plotting characteristics of a port, this button {\em must} be used. There is little effect
+by just clicking on widgets in the p4 window.
+
+See Chapter \ref{p4_chap} and tables
+\ref{tab3}, \ref{tab7} for further information on these items.
+
+\subsection{Configs}
+The {\sf Configs} action button returns a dialogue box that
+allows the user to {\sf Save} to or {\sf Restore} from the specified configuration
+file. 
+
+\subsection{P4 Options}
+The P4 options menu contains the defaults plus specific options detailed below.
+
+\subsubsection{Set Look-Up-Table}
+This option invokes a listbox containing the CGS4DR colour tables. Double clicking
+on any item using MB1 will load that colour table.
+
+\subsubsection{Set Widget Colours}
+This option invokes a dialogue box that allows the user to tailor the foreground,
+background and overlay colours in the GWM widget.
+
+\subsubsection{Peek Noticeboard}
+Allows the user to peek at control task noticeboard values.
+
+\subsubsection{Poke Noticeboard}
+Allows the user to poke control task noticeboard values.
+
+\subsection{Reset Autoplot}
+If set (which it is by default), then the noticeboard is reset for automated plotting
+after a manual plot is made to the same port. For example, if the automated reduction
+is plotting images in port 1 and the user plots a graph in the same port, after the
+graph is finished the noticeboard for port 1 is reset for imaging. If this toggle were
+switched off, the noticeboard would not be reset and the next automated plot would would
+also be made as a graph.
+
+\chapter{Miscellaneous}
+\markboth{Miscellaneous}{\stardocname}
+\section{May I run the {\sc gui} More Than Once?}
+No, although this is being investigated. You can run the command line version more than
+once so long as it is loaded from a separate xterm.
+
+\section{May I Run the Software in Batch?}
+No. Unix does not recognize `batch' mode. The {\sc tcladam} interface, by default,
+runs as a background job but the system is inherently interactive.
+
+\section{Do I Still Need to Run the Kill Script?}
+No. This was necessary under OSF/1 and an earlier version of ICL but no more. The
+script has been retained, however, to start with a `clean' system when desired.
+
+\section{How Do I Print Graphics?}
+The {\sc gwm} widget is delivered with an action button labelled {\sf Print}. When
+invoked, this returns a dialogue box tailoring the output to a variety of postscript
+formats via an intermediate file. The file can be printed in the usual way.
+
+\section{How Do I List the Noticeboard?}
+Use the {\sf Peek Noticeboard} item in the {\sf Options} menu. This applies only to
+the control and plotting tasks. The dialogue box returned defaults to the top-level
+of either noticeboard. Thus selecting {\sf OK} with no further input, will list the
+whole noticeboard.
+
+\section{How Do I Reset the Tasks?}
+\label{reset}
+From time to time. it might be necessary to reset the tasks {\em e.g.} if you forget to
+normalize a {\sc flat} field. This is done on a task-by-task basis via the {\sf Options}
+menu. Click on the item {\sf Send Task an Action} and input the action name `reset'
+into the data entry field. Then click on {\sf OK}.
+
+\section{How Do I Check the Status of the Tasks?}
+This is done on a task-by-task basis via the {\sf Options}
+menu. Click on the item {\sf Send Task an Action} and input the action name `status'
+into the data entry field. Then click on {\sf OK}.
+
+\section{How Do I Read Old Index Files from VMS?}
+Unfortunately, you can't. Under VMS the index file was maintained as an indexed sequential
+access method (ISAM) file. These files were DEC Fortran compiler extensions and, as such,
+were not portable between systems. 
+
+\section{How Do I List the Available Masks and Colour Tables?}
+Under Portable-CGS4DR both masks and colour tables are held in the same sub-directory.
+Actually there are two sub-directories, one for {\sc dst} data and one for {\sc ndf} data.
+The commands for listing {\sc ndf} data and {\sc dst} data from the shell are respectively:
+
+\begin{quote}
+ \% \ ls \ \$(CGS4DR\_ROOT)/ndf \\
+ \% \ ls \ \$(CGS4DR\_ROOT)/dst
+\end{quote}
+
+Alternatively, if you are using the graphical user interface, you can select the following:
+
+\begin{quote}
+ {\sf List Masks} from the control task options menu for a list of bad pixel and window masks.\\
+ {\sf Set Look--Up--Table} from the plotting task options menu for a list(box) of available colour tables.
+\end{quote}
+
+\section{How Do I Re-Normalize a {\sc flat} Field?}
+If you forget to normalize a {\sc flat} field, the observation should be re-entered into the
+queue at some appropriate point. The {\sc flat} field normalisation parameters should be
+altered using the {\sf Reduction Params} action button from the control task interface.
+
+Once the {\sc flat} field has been successfully re-reduced, the reduction task monolith,
+RED4, {\em must} be reset to force the mapping of the new reduced observation file. To reset
+any task, see section \ref{reset}.
+
+\section{How Do I Start from Scratch?}
+\label{restart}
+If you encounter several problems and wish to revert to a known state, do the following:
+
+\begin{quote}
+  \% \ cgs4dr\_kill \\
+  \% \ rm -f \ $\sim$/adam/* \\
+  \% \ rm -f \ $\sim$/cgs4dr\_configs/*
+\end{quote}
+
+%%-----------------------------------------------------------------------------
+%  References 
+\chapter*{References}
+\markboth{References}{\stardocname}
+
+\begin{description}
+\item[] Mountain, C. M., Robertson, D. J., Lee, T. J., \& Wade, R. 1990,
+      in Instrumentation in Astronomy VII, Proc. SPIE, Vol. 1235, ed. David L. Crawford, p25--33.
+\item[] Ramsay, S. K., 1993, PhD Thesis, University of Edinburgh.
+\item[] Carswell, R. F. et al. 1991, Astrophysical Journal, Vol. 381, L5--8.
+\item[] Wright, G. S. et al. 1993, in Infrared Detectors and Instrumentation, Proc. SPIE,
+      Vol. 1946, ed. Albert M. Fowler, p547--557.
+\item[] Shortridge, K. 1993, in  Astronomical Data Analysis Software
+      and Systems II, A. S. P. Conf. Ser., Vol. 52, eds. R. J. Hanisch, 
+      R. J. V. Brissenden \& J. Barnes, p219-223.
+\item[] Lawden, M. D., \& Hartley, K. F. 1992, SG/4, Starlink Project, CCL.
+\item[] Daly, P. N. 1987, MSc Thesis, University of Wales.
+\item[] Puxley, P. J. 1988, PhD Thesis, University of Edinburgh.
+\item[] Bailey, J. A. 1990, UON/8, Joint Astronomy Centre.
+\item[] Bailey, J. A. 1991, UON/9, Joint Astronomy Centre.
+\item[] Bevington, P. R. 1969, `Data Reduction and Error Analysis for the Physical Sciences',
+      ISBN 0--07--005135--6, McGraw Hill Inc., NY.
+\item[] Mountain, C. M. et al. 1985, Astronomy \& Astrophysics, Vol. 151, Number 2, p339--402.
+\item[] Daly, P. N. 1995, in Astronomical Data Analysis Software and Systems IV, 
+      A. S. P. Conf. Ser., Vol. 77, eds. R. A. Shaw, H. E. Payne \& J. J. E. Hayes, p375-378.
+\item[] Ousterhout, J. K. 1994, `Tcl and the Tk Toolkit', ISBN 0--201--63337--X, Addison Wesley.
+\item[] Terrett, D. L. 1995, SUN/186, Starlink Project, CCL.
+\end{description}
+\end{document}
