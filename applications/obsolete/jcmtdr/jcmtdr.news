@@ -1,6 +1,8 @@
-1 JCMTDR - Reduction of JCMT On-the-fly raster map data
-
+1 JCMTDR - Applications for reducing JCMT GSD on-the-fly data
                                                       Expires: ????.??.??
+
+ This is release V1.2-2 of JCMTDR. This is the first release for
+ Linux and the first without reliance on the NAG library.
 
  JCMTDR is a collection of applications for use in reducing JCMT 
  mapping data taken using the IFD in conjunction with UKT14 or the
@@ -10,9 +12,7 @@
 
  For processing of SCUBA data use SURF (see SUN/216).
 
-2 News_1.2-2
-
-  Version 1.2-2 of JCMTDR is the port to Linux.
+2 New_in_version_1.2-2
 
   o  This involved the replacement of all NAG routines with
      routines from the PDA library (see SUN/194). AE2RD2 has been removed
@@ -28,4 +28,33 @@
   o  The jcmt_xhelp command has been replaced with the standard Starlink
      HTML access system ('findme sun132').
 
+2 New_in_version_1.2
 
+ Since the previous version (1.1), GSD support has been added.
+
+  o GSD files can be converted with "makemap" into NDF format for (i)
+    further use in JCMTDR, (ii) use in Figaro, (iii) use in Kappa and
+    associated packages.
+
+  o GSD files can be inspected with "gsd_print". The name of the GSD
+    file must be given as first argument. Output is on standard output,
+    it can be re-directed to a file or piped into other commands like
+    "more".
+    The exact format of gsd_print is changed compared to the VAX
+    version.
+
+ GSD files must be specified by full name, including the file name
+ extension (usually .DAT or .dat).
+
+ GSD files can be taken across from the VAX/VMS system to the Unix
+ system either by ftp transfer in binary mode, or with the Unix "cp"
+ command if the VAX file system is mounted by the Unix machine.
+
+
+ A further change is in "ae2rd1" and "ae2rd2". The parameter INFILE is
+ now prompted with blank default for the first file and with default
+ 'END' for any further files.
+
+
+ Starlink User Note 132 is available on-line as Web pages. The browser
+ for these pages can be started with "jcmt_xhelp" from the Unix shell.
