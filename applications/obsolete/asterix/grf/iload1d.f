@@ -29,13 +29,13 @@
       PARAMETER (VERSION = 'ILOAD1D Version 2.2-0')
 *-
 *  first invocation do global initialisation
-      IF (.NOT.I_OPEN) THEN
-        CALL AST_INIT()
-        I_BGM_ON = .FALSE.
-        I_OPEN = .TRUE.
-      ELSE
+c     IF (.NOT.I_OPEN) THEN
+c       CALL AST_INIT()
+c       I_BGM_ON = .FALSE.
+c       I_OPEN = .TRUE.
+c     ELSE
         CALL USI_INIT()
-      ENDIF
+c     ENDIF
 
       CALL MSG_PRNT(VERSION)
 
