@@ -30,7 +30,7 @@
 *     11 Jun 91 : Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     20 Apr 95 : V1.8-1 New data interface (DJA)
-*
+*     13 Dec 1995 : V2.0-0 ADI port (DJA)
 *    Type definitions :
 *
       IMPLICIT NONE
@@ -48,8 +48,8 @@
 *
       INTEGER                   MAXLINES
         PARAMETER               ( MAXLINES = 6 )
-      CHARACTER*7     		MAPTYPE
-        PARAMETER               ( MAPTYPE = '_DOUBLE' )
+      CHARACTER*6     		MAPTYPE
+        PARAMETER               ( MAPTYPE = 'DOUBLE' )
 *
 *    Local variables :
 *
@@ -74,79 +74,66 @@
       INTEGER                   NKNOT(ADI__MXDIM)      ! Actual # of knots
       INTEGER                   ODPTR           	! Output data pointers
       INTEGER			OFID			! Output dataset id
-      INTEGER                   TDIMS(ADI__MXDIM)       ! Dummy dims array
       INTEGER                   TLEN                    ! String length
-      INTEGER                   TNDIM                   ! Temp dimensionality
       INTEGER                   WGTPTR                  ! Weights array
       INTEGER                   LWRK,WRKPTR             ! NAG float workspace
 
-      LOGICAL                   ANYBAD                 ! Any bad quality data?
       LOGICAL                   OK                     ! General validity
-      LOGICAL                   PRIM                   ! Input primitive
       LOGICAL                   QUAL_OK, VAR_OK        ! Quality,variance ok?
-      LOGICAL                   REG                    ! Axis regular?
       LOGICAL                   USE_WEIGHTS            ! Use variance & quality
 *
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER  		( VERSION = 'SPLINEFIT Version 1.8-1' )
+        PARAMETER  		( VERSION = 'SPLINEFIT Version 2.0-0' )
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       CALL MSG_PRNT(VERSION)
       CALL AST_INIT()
 
-*    Get locators to input and output
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+*  Get input and output
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Copy input to output
-      CALL BDI_COPAXES( IFID, OFID, STATUS )
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
-      CALL BDI_COPTEXT( IFID, OFID, STATUS )
-
-*    Check input
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
+*  Check input
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid dataset', STATUS )
         GOTO 99
       END IF
-      CALL BDI_CHKVAR( IFID, VAR_OK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Variance', VAR_OK, STATUS )
       IF ( VAR_OK ) THEN
         CALL MSG_PRNT('Data errors present')
       ELSE
         CALL MSG_PRNT('No data errors')
       END IF
 
-      CALL BDI_CHKQUAL( IFID, QUAL_OK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHK( IFID, 'Quality', QUAL_OK, STATUS )
       IF ( .NOT. QUAL_OK ) THEN
         CALL MSG_PRNT('No data quality')
       ELSE
         CALL MSG_PRNT('Data quality present')
-        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
-        IF ( .NOT. ANYBAD ) THEN
-          CALL BDI_UNMAPLQUAL( IFID, STATUS )
-          QUAL_OK = .FALSE.
-        END IF
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
       END IF
 
-*    Map input data
-      CALL BDI_MAPTDATA( IFID, MAPTYPE, 'READ', IDPTR, STATUS )
+*  Map input data
+      CALL BDI_MAP( IFID, 'Data', MTYPE, 'READ', IDPTR, STATUS )
 
-*    Create and map output data
-      CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
-      CALL BDI_MAPTDATA( OFID, MAPTYPE, 'WRITE', ODPTR, STATUS )
+*  Create and map output data
+      CALL BDI_MAP( OFID, 'Data', MTYPE, 'WRITE', ODPTR, STATUS )
       IF ( VAR_OK ) THEN
-        CALL BDI_MAPTVAR( IFID, MAPTYPE, 'READ', IVPTR, STATUS )
+        CALL BDI_MAP( OFID, 'Variance', MTYPE, 'READ', IVPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Total number of data elements
+*  Total number of data elements
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Check enough data items
@@ -159,41 +146,30 @@
         END IF
       END IF
 
-*    Check and map axes if not primitive
-      CALL BDI_PRIM( IFID, PRIM, STATUS )
-      IF ( .NOT. PRIM ) THEN
-        DO I = 1, NDIM
-          CALL BDI_CHKAXVAL( IFID, I, OK, REG, TDIMS, STATUS )
-          IF ( OK ) THEN
-            CALL BDI_MAPTAXVAL( IFID, MAPTYPE, 'READ', I, IAPTR(I),
-     :                                                   STATUS )
-          ELSE
-            CALL MSG_SETI( 'N', I )
-            CALL MSG_PRNT( 'Axis ^N invalid, assuming regularly'/
-     :                                               /' spaced' )
-          END IF
-        END DO
+*  Map axes
+      DO I = 1, NDIM
 
-*    otherwise map arrays for pixel centres
-      ELSE
+*    Data exists?
+        CALL BDI_AXCHK( IFID, I, 'Data', OK, STATUS )
+        IF ( .NOT. OK ) THEN
+          CALL MSG_SETI( 'N', I )
+          CALL MSG_PRNT( 'No axis ^N data, assuming regularly spaced' )
+        END IF
 
-        CALL MSG_PRNT( 'No axis data, assuming regularly spaced' )
-        DO I = 1, NDIM
-          CALL DYN_MAPT( 1, DIMS(I), MAPTYPE, IAPTR(I), STATUS )
-          CALL ARR_REG1D( 0.5D0, 1.0D0, DIMS(I), %VAL(IAPTR(I)),
-     :                                                  STATUS )
-        END DO
+*    Map regardless, this routine will invent valuers
+        CALL BDI_AXMAP( IFID, I, 'Data', MAPTYPE, 'READ', IAPTR(I),
+     :                  STATUS )
 
-      END IF
+      END DO
 
-*    Number of points in dataset
+*  Number of points in dataset
       CALL MSG_SETI( 'NP', NELM )
       CALL MSG_PRNT( 'There are ^NP valid points in the dataset' )
 
-*    Spline control parameters
+*  Spline control parameters
       CALL USI_GET0R( 'SQ_RES', SQ_RES, STATUS )
 
-*    Use weights and quality?
+*  Use weights and quality?
       USE_WEIGHTS = .TRUE.
       IF ( VAR_OK .AND. ( NDIM .GT. 1 ) ) THEN
         CALL USI_GET0L( 'USEW', USE_WEIGHTS, STATUS )
@@ -207,11 +183,7 @@
      :                       %VAL(IQPTR), %VAL(WGTPTR), STATUS )
       END IF
 
-*    Unmap stuff no longer needed
-      IF ( VAR_OK ) CALL BDI_UNMAPVAR( IFID, STATUS )
-      IF ( QUAL_OK ) CALL BDI_UNMAPLQUAL( IFID, STATUS )
-
-*    Map space for knots
+*  Map space for knots
       MAXKNOT = 1
       DO I = 1, NDIM
         NEST(I) = DIMS(I) + 4
@@ -222,10 +194,10 @@
         KNOTPTR(I) = KNOTPTR(I-1) + (NEST(I-1)-1)*8
       END DO
 
-*    Workspace for spline coefficients
+*  Workspace for spline coefficients
       CALL DYN_MAPT( 1, MAXKNOT, MAPTYPE, COEFF, STATUS )
 
-*    Floating point workspace
+*  Floating point workspace
       IF ( NDIM .EQ. 1 ) THEN
         LWRK = 4*NELM + 16*NEST(1) + 41
       ELSE
@@ -234,7 +206,7 @@
       END IF
       CALL DYN_MAPT( 1, LWRK, MAPTYPE, WRKPTR, STATUS )
 
-*    Get integer workspace
+*  Get integer workspace
       IF ( NDIM .EQ. 1 ) THEN
         LIWRK = NEST(1)
       ELSE
@@ -243,7 +215,7 @@
       CALL DYN_MAPI( 1, LIWRK, IWRKPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Fit spline
+*  Fit spline
       IF ( NDIM .EQ. 1 ) THEN
         CALL SPLINEFIT_1D( DIMS, %VAL(IAPTR(1)), %VAL(IDPTR), SQ_RES,
      :                          %VAL(WGTPTR), NEST, %VAL(KNOTPTR(1)),
@@ -260,11 +232,11 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Free workspace
+*  Free workspace
       CALL DYN_UNMAP( WRKPTR, STATUS )
       CALL DYN_UNMAP( IWRKPTR, STATUS )
 
-*    Write history
+*  Write history
       CALL HSI_ADD( OFID, VERSION, STATUS )
       TEXT(1) = 'Input : {INP}'
       TEXT(2) = ' '
@@ -276,11 +248,7 @@
       CALL USI_TEXT( 3, TEXT, NHREC, STATUS )
       CALL HSI_PTXT( OFID, NHREC, TEXT, STATUS )
 
-*    Close files
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( OFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE( )
       CALL AST_ERR( STATUS )
 
