@@ -1,8 +1,7 @@
 *+  SCULIB_FIT_SKYDIP - fit the SKYDIP data
       SUBROUTINE SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, DATA,
      :  VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
-     :  T_AMB, SUB_ETA_TEL, B_FIT1, TAUZ_FIT1, ETA_TEL_FIT2, B_FIT2,
-     :  TAUZ_FIT2, STATUS)
+     :  T_AMB, SUB_ETA_TEL, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
 *    Description :
 *     This routine fits a sub-instrument's measurements of the sky 
 *     brightness at a range of airmasses to obtain the sky opacity, ETAtel
@@ -40,10 +39,7 @@
 *     preprint and `Inversion of Sky Dips', SCU/WDD/31.1/1093 for further 
 *     details.
 *
-*        Two fits are made; the first with ETAtel fixed and varying only b 
-*     and tau, the second allowing all 3 to vary. The first fit will give the 
-*     measurement of tau to be used and a value for b, the second will give 
-*     values for ETA_tel, tau and b to be used for long-term sky statistics.
+*        The fit allows B and ETA_TEL to vary - Free is negative, else fixed.
 *        The fitting is done using the NAG routine E04UPF, which needs several
 *     work arrays whose size depends on the number of measurements taken.
 *
@@ -58,27 +54,15 @@
 *        SCULIB_SET_USER is called to fill with appropriate information the 
 *        USER array which communicates it to routines called by E04UPF.
 *
-*        For fit 1 -
-*
-*           An initial guess for the solution is set; eta_tel to the 
-*           current value used, b = 0.9 and tau = 0.1
-*
-*           Constraints on the values are set such that -
-*
-*              eta_tel  = fixed
+*        The constraints are:
 *               0.9999 >= b   >= 0.0001
 *              15      >= tau >= 0.0001
-*               0.9999 >= eta_tel * b >= 0.0001
+*               0.9999 >= eta_tel >= 0.0001
 *
 *           E04UPF is called to perform the fit. If no satisfactory fit can
-*           be achieved a warning will be issued but the routine will
-*           complete with good status. Otherwise, the fitted results and 
+*           be achieved a warning will be issued and the routine will
+*           complete with bad status. Otherwise, the fitted results and 
 *           the chi-squared achieved will be reported. 
-*
-*        Fit 2 is done in exactly the same way but eta_tel is allowed to
-*        vary subject to the constraint -
-*
-*               0.9999 >= eta_tel >= 0.0001
 *
 *        Lastly, the virtual memory used as work arrays by E04UPF is freed.
 *
@@ -108,16 +92,14 @@
 *              the ambient temperature (K)
 *     SUB_ETA_TEL               = REAL (Given)
 *              current value of eta_tel for this sub-instrument/filter
-*     B_FIT1                    = REAL (Returned)
-*              fitted value of b with eta_tel fixed at SUB_ETA_TEL
-*     TAUZ_FIT1                 = REAL (Returned)
-*              fitted value of tauz with eta_tel fixed at SUB_ETA_TEL
-*     ETA_TEL_FIT2              = REAL (Returned)
+*     B_IN                      = REAL (Returned)
+*              current value of B to be used for fit
+*     ETA_TEL_FIT               = REAL (Returned)
 *              fitted value of eta_tel
-*     B_FIT2                    = REAL (Returned)
-*              fitted value of b with eta_tel allowed to vary
-*     TAUZ_FIT2                 = REAL (Returned)
-*              fitted value of tauz with eta_tel allowed to vary
+*     B_FIT                     = REAL (Returned)
+*              fitted value of b with eta_tel
+*     TAUZ_FIT                  = REAL (Returned)
+*              fitted value of tauz with eta_tel
 *     STATUS                    = INTEGER (Given and returned)
 *              Global status
 *    Method :
@@ -130,6 +112,11 @@
 *      7-FEB-1996: split off from SCUDR_SKYDIP_SWITCH.
 *     23-JUL-1996: renamed SCULIB_ from SCUDR_ and made to fit the correct
 *                  function (JFL).
+*     $Log$
+*     Revision 1.2  1996/08/16 15:36:00  timj
+*     Now only does one fit (for off-line SKYDIP). Accepts B and ETA_TEL as free
+*     or fixed paramters. Returns bad status if fit fails.
+*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -147,13 +134,12 @@
       REAL    T_TEL
       REAL    T_AMB
       REAL    SUB_ETA_TEL
+      REAL    B_IN
 *    Import-Export :
 *    Export :
-      REAL    B_FIT1
-      REAL    TAUZ_FIT1
-      REAL    ETA_TEL_FIT2
-      REAL    B_FIT2
-      REAL    TAUZ_FIT2
+      REAL    B_FIT
+      REAL    TAUZ_FIT
+      REAL    ETA_TEL_FIT
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -247,10 +233,8 @@
          NCLIN = 0
          NCNLN = 1
    
-*  fit 1, only fitting TAU and B, set initial guess 
+*  Set initial guess on tau
 
-         X (1) = DBLE (SUB_ETA_TEL)
-         X (2) = 0.99D0
          X (3) = 0.1D0
 
 *  set arrays holding limits and constraints for fitted values:-
@@ -262,17 +246,35 @@
 
 *  lower and upper limits
 
-         BL (1) = DBLE (SUB_ETA_TEL)
-         BL (2) = 0.0001D0
          BL (3) = 0.0001D0
          BL (4) = 0.0001D0
 
-         BU (1) = DBLE (SUB_ETA_TEL)
-         BU (2) = 0.9999D0
          BU (3) = 15.0D0
          BU (4) = 0.9999D0
 
-*  and set IFAIL for `silent' failure and do the fit
+
+         IF (SUB_ETA_TEL .LT. 0.0) THEN
+            X(1)  = 0.99D0
+            BL(1) = 0.0001D0
+            BU(1) = 0.9999D0
+         ELSE
+            X(1)  = DBLE (SUB_ETA_TEL)
+            BL(1) = DBLE (SUB_ETA_TEL)
+            BU(1) = DBLE (SUB_ETA_TEL)
+         ENDIF
+
+         IF (B_IN .LT. 0.0) THEN
+            X(2)  = 0.99D0
+            BL(2) = 0.0001D0
+            BU(2) = 0.9999D0
+         ELSE
+            X(2)  = DBLE (B_IN)
+            BL(2) = DBLE (B_IN)
+            BU(2) = DBLE (B_IN)
+         ENDIF
+
+
+* Now try to fit this
 
          IF (STATUS .EQ. SAI__OK) THEN
             IFAIL = 1
@@ -291,75 +293,16 @@
                CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
                CALL MSG_SETC ('FILT', SUB_FILTER)
                STATUS = SAI__WARN
-               CALL ERR_OUT (' ', 'SCULIB_FIT_SKYDIP: '//
-     :           'E04UPF has failed to fit B and TAUZ '//
-     :           'for filter = ^FILT and sub-instrument '//
-     :           '^SUB with IFAIL = ^IFAIL', STATUS)
-
-               B_FIT1 = REAL (X(2))
-               TAUZ_FIT1 = REAL (X(3))
-            ELSE
-               CALL MSG_SETC ('FILT', SUB_FILTER)
-               CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
-               CALL MSG_OUT (' ', 'SCULIB: fit for filter '//
-     :           '^FILT and sub-instrument ^SUB with ETA '//
-     :           'fixed', STATUS)
-
-               B_FIT1 = REAL (X(2))
-               TAUZ_FIT1 = REAL (X(3))
-
-               WRITE (BUFFER, 10) SUB_ETA_TEL, B_FIT1, TAUZ_FIT1, 
-     :           REAL(CHISQ), ITER
- 10            FORMAT ('eta = ', F6.2, ' (fixed)  b = ', F6.2,
-     :           '  tau = ', F6.2, '  X = ', F7.1, '  N = ', I4)
-
-               CALL MSG_SETC ('BUFFER', BUFFER)
-               CALL MSG_OUT (' ', ' ^BUFFER', STATUS)
-            END IF
-         END IF
-
-
-*  fit 2, fitting ETA_TEL, TAU and B
-  
-         X (1) = DBLE (SUB_ETA_TEL)
-         X (2) = 0.99D0
-         X (3) = 0.1D0
-
-         BL (1) = 0.0001D0
-         BL (2) = 0.0001D0
-         BL (3) = 0.0001D0
-         BL (4) = 0.0001D0
-       
-         BU (1) = 0.9999D0
-         BU (2) = 0.9999D0
-         BU (3) = 15.0D0
-         BU (4) = 0.9999D0
-
-         IF (STATUS .EQ. SAI__OK) THEN
-            IFAIL = 1
-
-            CALL E04UPF (N_MEASUREMENTS, 3, 0, 1, 1, 1, 
-     :        N_MEASUREMENTS, 3, DIGNORE, BL, BU, 
-     :        SCULIB_SKYCON_1, SCULIB_SKYFUNC_1, ITER, 
-     :        ISTATE, C, CJAC, %val(NAG_F_PTR), 
-     :        %val(NAG_FJAC_PTR), CLAMBDA, CHISQ, R, X, 
-     :        %val(NAG_IWORK_PTR), LIWORK, 
-     :        %val(NAG_WORK_PTR), LWORK, IUSER, 
-     :        %val(NAG_USER_PTR), IFAIL)
-
-            IF (IFAIL .NE. 0) THEN
-               CALL MSG_SETI ('IFAIL', IFAIL)
-               CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
-               CALL MSG_SETC ('FILT', SUB_FILTER)
-               STATUS = SAI__WARN
+*     I didnt flush ERR before returning...
                CALL ERR_OUT (' ', 'SCULIB_FIT_SKYDIP: '//
      :           'E04UPF has failed to fit ETA_TEL, B and '//
      :           'TAUZ for filter = ^FILT and sub-instrument '//
      :           '^SUB with IFAIL = ^IFAIL', STATUS)
 
-               ETA_TEL_FIT2 = REAL (X(1))
-               B_FIT2 = REAL (X(2))
-               TAUZ_FIT2 = REAL (X(3))
+               STATUS = SAI__WARN
+               ETA_TEL_FIT = REAL (X(1))
+               B_FIT = REAL (X(2))
+               TAUZ_FIT = REAL (X(3))
             ELSE
                CALL MSG_SETC ('FILT', SUB_FILTER)
                CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
@@ -367,11 +310,11 @@
      :           '^FILT and sub-instrument ^SUB with ETA '//
      :           'varying', STATUS)
 
-               ETA_TEL_FIT2 = REAL (X(1))
-               B_FIT2 = REAL (X(2))
-               TAUZ_FIT2 = REAL (X(3))
+               ETA_TEL_FIT = REAL (X(1))
+               B_FIT = REAL (X(2))
+               TAUZ_FIT = REAL (X(3))
 
-               WRITE (BUFFER, 20) ETA_TEL_FIT2, B_FIT2, TAUZ_FIT2, 
+               WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
      :           REAL(CHISQ), ITER
  20            FORMAT ('eta = ', F6.2, '          b = ', F6.2,
      :           '  tau = ', F6.2, '  X = ', F7.1, '  N = ', I4)
