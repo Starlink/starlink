@@ -28,6 +28,9 @@
 *                       now (correctly) uses UT but all other SLA routines
 *                       use TT. LST calculation factored out into separate
 *                       function.
+*                     - Use TELESCOPE common block for telescope parameters
+*                       rather than duplicating the information. Now use
+*                       SLA_OBS to obtain coordinates.
 *     4  Dec 98 : TIMJ- Fix problems with linux port: Have to use
 *                       BLOCK DATA to initialise COMMON. Fix MSG_FMTD
 *                       (concerning SIGN variable) since SIGN is
@@ -181,7 +184,7 @@
      :     FREQ(15,2),GD,GHZ90,GHZ857,HD,
      :     HPBW(15),OMEGA,PI,R,RA,
      :     RAD,RJD,RJDATE,S,SDEC,SGD,SRA,TB(15),
-     :     TBNORM(15,10),TB90,TB857
+     :     TBNORM(15,10),TB90,TB857,TLONG,TLAT,THEIGHT
       REAL*8  FREQUENCY,WIDTH,BW
       INTEGER I,IC,ID,IH,IM,IP,IY,IR,IQ,J,M,NF,FIOD,FIOD2,IS
       INTEGER START(3),ASTOP(3),LSTAT,LPATH,LEN,LUP(10)
@@ -189,8 +192,9 @@
 
       CHARACTER*2  WORDS(3)
       CHARACTER*7  REQBODY,BODY, PLANET(10), FPLAN(5)
-      CHARACTER*10 REQFILT,FILT,DUMMY, FNAME(15)
+      CHARACTER*10 REQFILT,FILT,DUMMY, FNAME(15),TNAME
       CHARACTER*25 ALINE
+      CHARACTER*40 TFULLNAME
       CHARACTER*256 STRING
       CHARACTER*79 NOTE(50)
       CHARACTER*256 STRING1,STRING2
@@ -239,7 +243,7 @@ C For the time
       COMMON /OUTPUT2/OUTFILE
 
       COMMON/INPUT/LUP,PLANET
-     
+      COMMON /TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN   
@@ -254,6 +258,14 @@ C For the time
       FIOD=7
 
       LSTAT = SAI__OK
+
+*   Populate the telescope details common block. We use a common
+*   block since 1) the numbers were originally in the code twice
+*   2) that seems to be the fluxes style 3) we may want to allow
+*   a parameter to control the telescope position
+      TNAME = 'JCMT'
+      CALL SLA_OBS(-1,TNAME,TFULLNAME,TLONG,TLAT,THEIGHT)
+      TLONG = -1.0D0 * TLONG
 
 *   Tell the user we are running.
       CALL MSG_BLANK(STATUS)
@@ -352,6 +364,7 @@ C For the time
 *   required -- see ephemeris B8 et seq.
       IP=0
       IC=0
+      REPEAT = .FALSE.
      
 *     Loop for each pass requested.
      
@@ -1246,9 +1259,12 @@ C  GET UT in an array
 *   Variables:     
       INTEGER NOPL,NP,LUP(10)
       DOUBLE PRECISION EXDEC,EXRA,TDB,RAV1,DECV1,DIST 
-      DOUBLE PRECISION HLAT,HLONG,RJD,LONGR,LATR,HEIGHT
+      DOUBLE PRECISION RJD
+      DOUBLE PRECISION TLONG,TLAT,THEIGHT
       CHARACTER PLANET(10)*7
-     
+      CHARACTER *10 TNAME
+      CHARACTER *40 TFULLNAME
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
 		   
@@ -1257,27 +1273,19 @@ C  GET UT in an array
 
 *   Common
       COMMON/INPUT/LUP,PLANET
+      COMMON/TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
 
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN   
  
-*   Set Mauna Kea altitude/lat/long value.
-      HEIGHT=4506.D0
-      HLONG =-155.47208D0
-      HLAT  =19.8258333D0
-
 *   Calculate the modified time.     
       TDB=RJD
 	 
 *   Calculate approximate topographical positions.
       NP=LUP(NOPL)
  
-*   Convert lat and long to radians.
-      LONGR=HLONG/360.d0*2.d0*3.141592653d0
-      LATR =HLAT /360.d0*2.d0*3.141592653d0
- 
 *   Call JPL/SLA_LIB locations.
-      CALL SLAJPL2(TDB,NP,LONGR,RAV1,DECV1,DIST)
+      CALL SLAJPL2(TDB,NP,TLONG,RAV1,DECV1,DIST)
      
 *   Convert radians to degrees.
       EXRA=RAV1  /2.d0/3.141592653d0*360.d0
@@ -1304,7 +1312,7 @@ C  GET UT in an array
 
 *   Variables:
       DOUBLE PRECISION EXDEC,EXGD,EXRA
-      DOUBLE PRECISION HLAT,HLONG,S,RJD
+      DOUBLE PRECISION S,RJD
       INTEGER I,ID,IH,IM,IS,IQ,IR,IY,FIOD,M,JUNK,TEMPI
       CHARACTER*7   REQBODY
       CHARACTER*128 OUTFILE
@@ -1323,11 +1331,13 @@ C  GET UT in an array
        DOUBLE PRECISION PI
      
        DOUBLE PRECISION TDB,TDB2,RAV2,DECV2,DLEN3,DLEN4
-       DOUBLE PRECISION RAV1,DECV1,DIST
+       DOUBLE PRECISION RAV1,DECV1,DIST,TLONG,TLAT,THEIGHT
        INTEGER NP,IVR1(4),IVR2(4),LUP(10)
-       DOUBLE PRECISION FRAC1,FRAC2,STL,LONGR,LATR
-       DOUBLE PRECISION HEIGHT,AIRM,EPOCH
+       DOUBLE PRECISION FRAC1,FRAC2,STL
+       DOUBLE PRECISION AIRM,EPOCH
        CHARACTER *1 SIGN
+       CHARACTER *10 TNAME
+       CHARACTER *40 TFULLNAME
  
 *   External function.
        DOUBLE PRECISION SLA_EPJ, SLALAST
@@ -1344,14 +1354,11 @@ C  GET UT in an array
       COMMON /OUTPUT2/OUTFILE
 
       COMMON /INPUT/LUP,PLANET
+      COMMON /TELESCOPE/TLONG,TLAT,THEIGHT,TNAME,TFULLNAME
  
 *   Check the inherited global status.
       IF (STATUS.NE.SAI__OK) RETURN   
     
-*   Hawaii long and lat.  
-      HLONG=-155.47208D0
-      HLAT=  19.8258333D0
-     
 *   Initialise flags.  
       ALL = .FALSE.
 
@@ -1416,23 +1423,16 @@ C  GET UT in an array
          CALL FIO_WRITE(FIOD,' ',STATUS)
       ENDIF
 
-*   Set Mauna Kea altitude value.
-      HEIGHT=4506.D0
- 
 *   Calculate the modified time.[RJD now is the MJD]
       TDB=RJD
 *   And a time 1 second into the future
       TDB2=TDB+1.D0/86400.0D0
 	 
-*   Convert lat and long to radians.
-      LONGR=HLONG/360.D0*2.D0*3.141592653D0
-      LATR =HLAT /360.D0*2.D0*3.141592653D0
- 
 *   Current epoch.
       EPOCH=SLA_EPJ(TDB)
      
 *   Call the slalib jpl routines to get the local sid. time. 
-      CALL SLA_DR2TF(4,SLALAST(TDB,LONGR),SIGN,IVR1)
+      CALL SLA_DR2TF(4,SLALAST(TDB,TLONG),SIGN,IVR1)
      
 *   Create output strings.      
       CALL MSG_FMTI('P1','I2.2',IVR1(1)) 
@@ -1482,7 +1482,7 @@ C  GET UT in an array
 	 NP=LUP(I)
 
 *      Call the slalib jpl routines. 
-	 CALL SLAJPL(TDB,NP,LONGR,LATR,HEIGHT,
+	 CALL SLAJPL(TDB,NP,TLONG,TLAT,THEIGHT,
      :               RAV1,DECV1,DIST,STL,AIRM)
 
 *      Convert radians to hh mm ss and dd mm ss.
@@ -1505,7 +1505,7 @@ C  GET UT in an array
 	 CALL MSG_FMTD('P11','F6.3',AIRM)
 
 *      Recalc positions 1 sec later and deduce movement rate.
-	 CALL SLAJPL(TDB2,NP,LONGR,LATR,HEIGHT,
+	 CALL SLAJPL(TDB2,NP,TLONG,TLAT,THEIGHT,
      :               RAV2,DECV2,DIST,STL,AIRM)
 	 DLEN3=(RAV2-RAV1)*360./2./3.1415926*3600.
 	 DLEN4=(DECV2-DECV1)*360./2./3.1415926*3600.
