@@ -49,7 +49,7 @@ public:
     const string *filename () const { return &fileName_; }
 
 private:
-    const string fileName_;
+    string fileName_;
     // all dimensions within this class are in DVI units, except where stated.
     int h_, v_, w_, x_, y_, z_;
     int pending_hupdate_;	// in DVIUnits
