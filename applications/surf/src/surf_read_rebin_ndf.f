@@ -6,7 +6,7 @@
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     INT_LIST,
+     :     QMF, QUALITY_PTR, QUALITY_END, INT_LIST,
      :     STATUS)
 *+
 *  Name:
@@ -24,13 +24,14 @@
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-*     :     INT_LIST,
+*     :     QMF, QUALITY_PTR, QUALITY_END, INT_LIST,
 *     :     STATUS)
 
  
 *  Description:
 *     This routines reads all necessary information from an NDF (via
-*     the given NDF identifier) for rebinning.
+*     the given NDF identifier) for rebinning. Optionally, returns
+*     the quality array (needed for despiking).
  
 *  Arguments:
 *     IN_NDF = INTEGER (Given)
@@ -93,6 +94,13 @@
 *        Pointer to variance values
 *     VARIANCE_END = INTEGER (Returned)
 *        Pointer to end of variance values
+*     QMF = LOGICAL (Given)
+*        Flag to decide whether quality is being stored (.FALSE.) or
+*        being folded into the data array (.true.). See NDF_SQMF
+*     QUALITY_PTR = INTEGER (Returned)
+*        Pointer to quality array
+*     QUALITY_END = INTEGER (Returned)
+*        Pointer to end of quality array
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
 *     STATUS = INTEGER (Given and Returned)
@@ -107,6 +115,11 @@
 *  History:
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
+*     $Log$
+*     Revision 1.10  1997/10/20 21:13:16  timj
+*     Pass through quality arrays if needed.
+*     Free memory allocated to DUMMY_VARIANCE_PTR
+*
 
 *-
  
@@ -132,6 +145,7 @@
       INTEGER          MAX_FILE
       INTEGER          NSPEC
       CHARACTER*(*)    OUT_COORDS
+      LOGICAL          QMF
       LOGICAL          USE_SECTION
 
 *  Arguments Given & Returned:
@@ -156,6 +170,8 @@
       INTEGER          N_POS
       DOUBLE PRECISION OUT_RA_CEN
       DOUBLE PRECISION OUT_DEC_CEN
+      INTEGER          QUALITY_END
+      INTEGER          QUALITY_PTR
       CHARACTER*(*)    SOBJECT
       CHARACTER*(*)    SUTDATE
       CHARACTER*(*)    SUTSTART
@@ -177,14 +193,17 @@
       BYTE             BTEMP           ! Temporary byte
       INTEGER          DATA_OFFSET     ! Offset for pointer arrays
       INTEGER          DIM (MAX_DIM)   ! array dimensions
+      INTEGER          DUMMY_ENDQ_PTR  ! Pointer to end of dummy quality
       INTEGER          DUMMY_ENDVAR_PTR
                                        ! Pointer to end of dummy var
+      INTEGER          DUMMY_QUALITY_PTR ! Pointer to dummy quality
       INTEGER          DUMMY_VARIANCE_PTR
                                        ! Pointer to dummy variance
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
       INTEGER          FILE_DATA_PTR   ! pointer to main data array in input
                                        ! file
+      INTEGER          FILE_QUALITY_PTR ! pointer to quality array in input file
       INTEGER          FILE_VARIANCE_PTR
                                        ! pointer to variance array in input file
       CHARACTER*80     FITS (SCUBA__MAX_FITS) 
@@ -310,10 +329,14 @@
       BOL_DEC_END = 0
       DUMMY_VARIANCE_PTR = 0
       DUMMY_ENDVAR_PTR = 0
+      DUMMY_ENDQ_PTR = 0
+      DUMMY_QUALITY_PTR = 0
       DATA_PTR = 0
       DATA_END = 0
       VARIANCE_END =0
       VARIANCE_PTR = 0
+      QUALITY_PTR = 0
+      QUALITY_END = 0
       
 *     get some general descriptive parameters of the observation
 
@@ -671,8 +694,8 @@
 
 *     Map the data and variance
 
-      CALL NDF_SQMF(.TRUE., IN_NDF, STATUS)
-      CALL NDF_SQMF(.TRUE., SECNDF, STATUS)
+      CALL NDF_SQMF(QMF, IN_NDF, STATUS)
+      CALL NDF_SQMF(QMF, SECNDF, STATUS)
       CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'READ', 
      :     FILE_DATA_PTR, ITEMP, STATUS)
 
@@ -699,6 +722,37 @@
             FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR
          END IF               
       END IF
+
+*     Handle the quality array if necessary
+*     Deal with the possibility that FIGARO has removed it!
+
+      IF (.NOT.QMF) THEN
+
+         CALL NDF_STATE(IN_NDF, 'QUALITY', STATE, STATUS)
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            IF (STATE) THEN
+               CALL NDF_MAP (SECNDF, 'QUALITY', '_UBYTE', 'READ',
+     :              FILE_QUALITY_PTR, ITEMP, STATUS)
+            ELSE
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_OUTIF(MSG__QUIET, ' ','WARNING! ^TASK: '//
+     :              'Quality array is missing. Using dummy array',
+     :              STATUS)
+               CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBUB,
+     :              DUMMY_QUALITY_PTR, DUMMY_ENDQ_PTR,
+     :              STATUS)
+               ITEMP = DIM(1) * DIM(2)
+               BTEMP = 0
+               CALL SCULIB_CFILLB(ITEMP, BTEMP,
+     :              %VAL(DUMMY_QUALITY_PTR))
+               FILE_QUALITY_PTR = DUMMY_QUALITY_PTR
+            END IF               
+         END IF
+
+      END IF
+
+
 
 *     map the DEM_PNTR and LST arrays and check their dimensions
 
@@ -815,8 +869,38 @@
          CALL VEC_RTOR(.FALSE., N_POS * N_BOL,
      :        %VAL(FILE_VARIANCE_PTR), 
      :        %VAL(VARIANCE_PTR), IERR, NERR, STATUS)
-
+         
       END IF
+
+*     Copy quality if needed
+
+      IF (.NOT.QMF) THEN
+
+         CALL SCULIB_MALLOC (N_POS * N_BOL * VAL__NBUB,
+     :        QUALITY_PTR, QUALITY_END, STATUS)
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            
+            CALL VEC_UBTOUB(.FALSE., N_POS * N_BOL,
+     :           %VAL(FILE_QUALITY_PTR), %VAL(QUALITY_PTR), IERR,
+     :           NERR, STATUS)
+
+         END IF
+      END IF
+
+*     Free up the dummy variance and quality arrays if they were used
+
+      IF (DUMMY_VARIANCE_PTR .NE. 0) THEN
+         CALL SCULIB_FREE ('DUMMY_VAR', DUMMY_VARIANCE_PTR,
+     :        DUMMY_ENDVAR_PTR, STATUS)
+      END IF
+
+      IF (DUMMY_QUALITY_PTR .NE. 0) THEN
+         CALL SCULIB_FREE ('DUMMY_QUAL', DUMMY_QUALITY_PTR,
+     :        DUMMY_ENDQ_PTR, STATUS)
+      END IF
+
+
 
 *     Annul the NDF section
       CALL NDF_UNMAP(SECNDF, '*', STATUS)
