@@ -10,7 +10,7 @@
 #
 #  Description:
 #     This script uses custom [incr Tcl] classes to present a GUI to the
-#     user which allows interactive placement of pairs of NDFs.
+#     user which allows interactive placement of pairs of NDF Sets.
 #
 #  External Variables:
 #     MARKSTYLE = string (Given and Returned)
@@ -18,29 +18,36 @@
 #        indicating how markers should be plotted on the image.
 #     MATPTS = list of lists of quads (Returned)
 #        This gives a list of the centroided points for each of the 
-#        pairs of NDFs which the user matched up.  It contains one 
+#        pairs of NDF Sets which the user matched up.  It contains one 
 #        element for each element of the PAIRS list.  Each element of
 #        the list contains an entry for each of the points which waas
-#        successfully centroided in both NDFs, and each of those
-#        entries is a quad giving coordinates in each NDF, of the 
+#        successfully centroided in both NDF Sets, and each of those
+#        entries is a quad giving coordinates in each NDF Set, of the 
 #        form {X1 Y1 X2 Y2}.
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
-#        pair of NDFs is to be displayed.  If zero, there is no limit.
+#        pair of NDF Sets is to be displayed.  If zero, there is no limit.
 #     MAXPOS = integer (Given)
 #        The maximum number of points which may be selected on the 
-#        overlap region of any pair of NDFs.
-#     NDFNAMES = list of strings (Given)
-#        A list of strings giving the name of each of the NDFs which is
+#        overlap region of any pair of NDF Sets.
+#     NDFSETS = list of lists (Given)
+#        Each element of this list represents a set of NDFs which is
 #        to be presented to the user for aligning using this script.
+#        The format of each element is {setname ndfname ?ndfname ...?}.
+#        The setname is a text name of each set which is to be presented
+#        to the user, and each ndfname is the name of one of the NDFs
+#        which is to be a member of that set.  If only one ndfname
+#        appears in each list, the program will effectively work 
+#        on single NDFs.
 #     PAIRS = list of lists (Returned)
-#        The script returns a list with one element for each pair of NDFs
-#        which the user managed to match.  Each element of the list is 
-#        of the form {I J NMAT XOFF YOFF}, where I and J are the indices
-#        in the list NDFNAMES of the matched pair, NMAT is the number of
-#        centroided points which were used to achieve the exact offsets,
-#        and XOFF and YOFF are the position of the pixel index origin of
-#        NDF J in pixel index coordinates of NDF I.
+#        The script returns a list with one element for each pair of NDF
+#        Sets which the user managed to match.  Each element of the list
+#        is of the form {I J NMAT XOFF YOFF}, where I and J are the 
+#        indices in the list NDFSETS of the matched pair, NMAT is the
+#        number of centroided points which were used to achieve the
+#        exact offsets, and XOFF and YOFF are the position of the pixel
+#        index origin of NDF Set J in pixel index coordinates of 
+#        NDF Set I.
 #     PERCHI = real (Given)
 #        The percentile of the data above which all values should be 
 #        plotted as the same colour.  Must be between 0 and 100.
@@ -48,10 +55,10 @@
 #        The percentile of the data below which all values should be 
 #        plotted as the same colour.  Must be between 0 and 100.
 #     PREVX = integer (Given and Returned)
-#        X dimension of the preview window for each NDF in the chooser 
+#        X dimension of the preview window for each NDF Set in the chooser 
 #        widget.
 #     PREVY = integer (Given and Returned)
-#        Y dimensino of the preview window for each NDF in the chooser
+#        Y dimension of the preview window for each NDF Set in the chooser
 #        widget.
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
@@ -67,6 +74,8 @@
 #  History:
 #     4-SEP-2000 (MBT):
 #        Original version.
+#     8-MAR-2001 (MBT):
+#        Upgraded for use with Sets.
 #-
 
 #  Global variables.
@@ -84,40 +93,40 @@
 #  Initialise screen.
       wm withdraw .
 
-#  Generate ndf objects for all of the NDFs in the input list.  At the 
+#  Generate ndfset objects for all of the NDFs in the input list.  At the 
 #  same time, check whether they all share the same Current WCS frame.
-      set nndf 0
-      set ndflist {}
+      set nndfset 0
+      set ndfsetlist {}
       set diffcurrent 0
       set maxleng 0
-      foreach n $NDFNAMES {
-         incr nndf
-         set ndf [ ndf $n ]
-         set ndfs($nndf) $ndf
-         lappend ndflist $ndf
-         set current [ $ndf frameatt domain CURRENT ]
-         set nameleng [ string length [ $ndf name ] ]
-         if {  $nameleng > $maxleng } {
+      foreach ns $NDFSETS {
+         incr nndfset
+         set ndfset [ eval ndfset $ns ]
+         set ndfsets($nndfset) $ndfset
+         lappend ndfsetlist $ndfset
+         set current [ $ndfset frameatt domain CURRENT ]
+         set nameleng [ string length [ $ndfset name ] ]
+         if { $nameleng > $maxleng } {
             set maxleng $nameleng
          }
-         if { $nndf > 1 && $current != $lastcurrent } {
+         if { $nndfset > 1 && $current != $lastcurrent } {
             set diffcurrent 1
          }
-         set lastcurrent [ $ndf frameatt domain CURRENT ]
+         set lastcurrent [ $ndfset frameatt domain CURRENT ]
       }
 
-#  If not all the NDFs have the same Current frame, check that the user
-#  is aware of the fact.
+#  If not all the NDF Sets have the same Current frame, check that the 
+#  user is aware of the fact.
      if { $diffcurrent } {
         catch { unset warnlines }
         lappend warnlines \
            "The input images do not all have Current coordinate systems" \
            "with the same name; they are:" \
            ""
-        foreach ndf $ndflist {
+        foreach ndfset $ndfsetlist {
            lappend warnlines [ format "    %-${maxleng}s:  %s" \
-                                      [ $ndf name ] \
-                                      [ $ndf frameatt domain CURRENT ] ]
+                                      [ $ndfset name ] \
+                                      [ $ndfset frameatt domain CURRENT ] ]
         }
         lappend warnlines \
            "" \
@@ -224,7 +233,7 @@
       }
 
 #  Create an NDF chooser widget.
-      set chooser [ eval ndfchoose $base.c $ndflist ]
+      set chooser [ eval ndfchoose $base.c $ndfsetlist ]
       $chooser configure \
                          -title "PAIRNDF chooser" \
                          -watchstatus choosestatus \
@@ -304,10 +313,10 @@
    "automatically move to the next stage, and mutually register them all."
       $chooser configure -helptext [ join $helplines "\n" ]
 
-#  Loop until all the NDFs have been paired.
-      while { [ array size Done ] < $nndf } {
+#  Loop until all the NDF Sets have been paired.
+      while { [ array size Done ] < $nndfset } {
 
-#  Get the user to pick a pair of NDFs.
+#  Get the user to pick a pair of NDF Sets.
          wm deiconify $chooser
          raise $chooser
          set pair ""
@@ -335,9 +344,9 @@
 
 #  Log to the user.
          ccdputs -log "  "
-         ccdputs -log "  Aligning NDFS $iA and $iB"
+         ccdputs -log "  Aligning images $iA and $iB"
 
-#  Load the NDF pair into the aligner widget and wait for the user to 
+#  Load the NDF Set pair into the aligner widget and wait for the user to 
 #  select some positions in common.
          wm positionfrom $chooser user
          wm withdraw $chooser
@@ -345,8 +354,8 @@
          raise $aligner
          set percA [ $chooser percentiles $iA ]
          set percB [ $chooser percentiles $iB ]
-         $aligner loadndf A $ndfs($iA) CURRENT $percA $MAXCANV
-         $aligner loadndf B $ndfs($iB) CURRENT $percB $MAXCANV
+         $aligner loadndf A $ndfsets($iA) CURRENT $percA $MAXCANV
+         $aligner loadndf B $ndfsets($iB) CURRENT $percB $MAXCANV
 
 #  Loop until the user is happy with the outcome.
          set tryagain 1
@@ -373,8 +382,8 @@
                                      [ lindex [ lindex $pB $i ] 2 ] ]
                }
 	       set scale [ $aligner cget -zoom ]
-               set offset [ ndfcentroffset $ndfs($iA) CURRENT $ndfs($iB) \
-                            CURRENT $pts $scale ]
+               set offset [ ndfcentroffset $ndfsets($iA) CURRENT \
+                                           $ndfsets($iB) CURRENT $pts $scale ]
                set nmatch [ lindex $offset 0 ]
 
 #  We have a successful match.
