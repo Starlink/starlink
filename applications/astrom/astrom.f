@@ -12,111 +12,133 @@
 *  plate reduction utility.
 *
 *  This version is for the Unix systems on Starlink DECstations and
-*  Suns.  It works in conjunction with a shell script, which invokes
-*  the ASTROM program with four simulated command-line arguments:
+*  Suns.  The program expects a list of arguments of the form
+*  `keyword=value'.  It interprets these keywords as filenames, filename
+*  prefixes or options as described below.  The program works in
+*  conjunction with a shell script, which slightly enhances the
+*  interface by defaulting keywords.
 *
-*     1   terminal identifier
-*     2   input file; data
-*     3   output file; full report
-*     4   output file; synopsis + errors
+*  The recognised keywords are:
+*
+*    input     data
+*    report    full report
+*    summary   synopsis + errors
+*    log       easily-parseable log file, reporting status and errors
+*    fits      prefix for generated FITS files
+*    wcsstyle  style of FITS WCS headers generated
 *
 *  Called:  IARGC, GETARG, tpt_OPW, tpt_OPR, tpt_ASTRML
 *
 *  P T Wallace   Starlink   28 June 1994
 *
-*  Norman Gray, 2001-06-08: I added two further arguments, when I added
-*    further arguments to astrml().  The fifth argument is a filename
-*    prefix; if present, then this will be used to generate a filename
-*    for a FITS-WCS file.  The sixth argument is a filename; if present, 
-*    and not the same as argument one, it specifies a file
-*    which will receive essentially the same information as the synopsis
-*    file, but more easily parseable by machine; if not present, no such
-*    information is generated.
+*  Norman Gray, Starlink, 2001--2003: Interface expanded to match extra
+*  arguments to astrml().
 *    
 *-
 
       IMPLICIT NONE
 
-      INTEGER NFILE
-      PARAMETER (NFILE=100)
-      CHARACTER*(NFILE) TERM,INP,REP,SYN,FILE,LOGFIL,FITSFN
-      INTEGER LUINP,LUREP,LUSYN,LULOG,LU,J,N
+      INCLUDE 'params.inc'
+
+*      INTEGER NFILE
+*      PARAMETER (NFILE=100)
+*      CHARACTER*(NFILE) TERM,INP,REP,SYN,FILE,LOGFIL,FITSFN
+      CHARACTER*(NFILE) FILE,FITSFN,FITSWCSSTYLE
+      CHARACTER*(NFILE) ARG,ARGNAME,ARGVALUE
+      INTEGER LUINP,LUREP,LUSYN,LULOG,LU,I,J,N
+      INTEGER ARGN
 
       INTEGER IARGC
 
+*   Defaults
+      LUINP=UNITIN              ! standard input
+      LUREP=UNITOUT             ! standard output
+      LUSYN=UNITOUT
+      LULOG=0
+      FITSFN=' '                ! suppresses generation of FITS files
+      FITSWCSSTYLE=DEFWCSSTYLE
 
+      ARGN=1
+      DO WHILE (ARGN.LE.IARGC())
+         CALL GETARG(ARGN,ARG)
+         I=1
+         DO WHILE (ARG(I:I).EQ.' ')
+            I=I+1
+            IF (I.EQ.NFILE) GO TO 9015
+         ENDDO
+         J=I
+         DO WHILE (ARG(J:J).NE.'=')
+            J=J+1
+            IF (J.EQ.NFILE) GO TO 9015
+         ENDDO
+         ARGNAME=ARG(I:J-1)
+         J=J+1
+         I=J
+         DO WHILE (ARG(J:J).NE.' ')
+            J=J+1
+            IF (J.GE.NFILE) GO TO 9015
+         ENDDO
+         ARGVALUE=ARG(I:J-1)
+         IF (ARGNAME(1:5).EQ."input") THEN
+            LUINP=11
+            LU=LUINP
+            FILE=ARGVALUE
+            CALL OPR(LU,FILE,J)
+            IF (J.NE.0) GO TO 9020
+         ELSE IF (ARGNAME(1:6).EQ."report") THEN
+            LUREP=13
+            LU=LUREP
+            FILE=ARGVALUE
+            CALL OPW(LU,FILE,J)
+            IF (J.NE.0) GO TO 9020
+         ELSE IF (ARGNAME(1:7).EQ."summary") THEN
+            LUSYN=16
+            LU=LUSYN
+            FILE=ARGVALUE
+            CALL OPW(LU,FILE,J)
+            IF (J.NE.0) GO TO 9020
+         ELSE IF (ARGNAME(1:3).EQ."log") THEN
+            LULOG=19
+            LU=LULOG
+            FILE=ARGVALUE
+            CALL OPW(LU,FILE,J)
+            IF (J.NE.0) GO TO 9020
+         ELSE IF (ARGNAME(1:4).EQ."fits") THEN
+            FITSFN=ARGVALUE
+         ELSE IF (ARGNAME(1:8).EQ."wcsstyle") THEN
+            FITSWCSSTYLE=ARGVALUE
+         ELSE
+            GO TO 9016
+         ENDIF
+         ARGN=ARGN+1
+      ENDDO
 
-*  Verify there are the right number of arguments
-*      IF (IARGC().NE.4) GO TO 9010
-      IF (IARGC().LT.4.OR.IARGC().GT.6) GO TO 9010
-
-*  Pick them up
-      CALL GETARG(1,TERM)
-      CALL GETARG(2,INP)
-      CALL GETARG(3,REP)
-      CALL GETARG(4,SYN)
-      IF (IARGC().GT.4) THEN
-         CALL GETARG(5,FITSFN)
-      ELSE
-*      Blank suppresses generation of FITS files
-         FITSFN=' '
-      ENDIF
-      IF (IARGC().GT.5) THEN
-         CALL GETARG(6,LOGFIL)
-      ELSE
-         LOGFIL=TERM
-      ENDIF
-
-*  Open the files
-      IF (INP.EQ.TERM) THEN
-         LUINP=5
-      ELSE
-         LUINP=11
-         LU=LUINP
-         FILE=INP
-         CALL OPR(LU,FILE,J)
-         IF (J.NE.0) GO TO 9020
-      END IF
-
-      IF (REP.EQ.TERM) THEN
-         LUREP=6
-      ELSE
-         LUREP=13
-         LU=LUREP
-         FILE=REP
-         CALL OPW(LU,FILE,J)
-         IF (J.NE.0) GO TO 9020
-      END IF
-
-      IF (SYN.EQ.TERM) THEN
-         LUSYN=6
-      ELSE
-         LUSYN=16
-         LU=LUSYN
-         FILE=SYN
-         CALL OPW(LU,FILE,J)
-         IF (J.NE.0) GO TO 9020
-      END IF
-      
-      IF (LOGFIL.EQ.TERM) THEN
-         LULOG=0
-      ELSE
-         LULOG=19
-         LU=LULOG
-         FILE=LOGFIL
-         CALL OPW(LU,FILE,J)
-         IF (J.NE.0) GO TO 9020
-      ENDIF
 
 *   Don't do anything with the FITS filename template -- leave that to astrml
 
 *  Call the ASTROM mainline program and exit when finished
-      CALL ASTRML(LUINP,LUREP,LUSYN,LULOG,FITSFN)
+      CALL ASTRML(LUINP,LUREP,LUSYN,LULOG,FITSFN,FITSWCSSTYLE)
       GO TO 9999
 
 *  Errors
  9010 CONTINUE
       WRITE (*,'(''Please run ASTROM from the correct script!'')')
+      GO TO 9999
+      
+ 9015 CONTINUE
+      I=1
+      DO WHILE (I.LE.NFILE.AND.ARG(I:I).NE.' ')
+         I=I+1
+      ENDDO
+      WRITE (*,'(''Unparseable argument '',A)') ARG(1:I)
+      GO TO 9999
+
+ 9016 CONTINUE
+      I=1
+      DO WHILE (I.LE.NFILE.AND.ARGNAME(I:I).NE.' ')
+         I=I+1
+      ENDDO
+      WRITE (*,'(''Unrecognised parameter '',A)') ARGNAME(1:I)
       GO TO 9999
 
  9020 CONTINUE
@@ -131,3 +153,5 @@
  9999 CONTINUE
 
       END
+
+      
