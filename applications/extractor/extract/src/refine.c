@@ -16,6 +16,7 @@
 *                         Nullify freed pointers to make sure memort
 *                         is reallocated next pass. Removed AJC
 *                         changes in this area.
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -234,7 +235,7 @@ int	gatherup(objliststruct *objlistin, objliststruct *objlistout)
 
    pliststruct	*pixelin = objlistin->plist, *pixelout, *pixt,*pixt2;
 
-   int		i,j,k,l, *n, iclst, npix, bmwidth,
+   int		i,k,l, *n, iclst, npix, bmwidth,
 		nobj = objlistin->nobj, xs,ys, x,y, out;
 
   out = RETURN_OK;

@@ -6,6 +6,8 @@
 *	Part of:	ADAM SExtractor
 *
 *	Author:		A. Chipperfield (Starlink, CCLRC, RAL)
+*                       P.W. Draper (Starlink, Durham University)
+*                       E. Bertin (IAP, Leiden observatory & ESO)
 *
 *	Contents:	functions for input of image data.
 *
@@ -15,6 +17,7 @@
 *                          Added USHORT and UBYTE support.
 *                       17/12/98 (PWD):
 *                          Changed to use NDF WCS component for astrometry.
+*	Last modify:	28/11/98 (EB):
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -24,9 +27,6 @@
 
 #include        "ast.h"
 
-/*#include	"wcs/wcs.h"*/
-/* Special to avoid re-defining prjprm */
-/*#include        "wcsmod/wcs.h"*/
 #include	"define.h"
 #include	"globals.h"
 #include	"check.h"
@@ -173,7 +173,7 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
   {
    checkstruct	*check;
    int		y, w, flags, interpflag;
-   PIXTYPE	*data, *wdata, *rmsdata, *checklinebuf;
+   PIXTYPE	*data, *wdata, *rmsdata;
 
   w = field->width;
   flags = field->flags;
@@ -229,12 +229,18 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
               writecheck(check, data, w);
             if (check = prefs.check[CHECK_APERTURES])
               writecheck(check, data, w);
-            if (check = prefs.check[CHECK_SUBPROTOS])
+            if (check = prefs.check[CHECK_SUBPSFPROTOS])
+              writecheck(check, data, w);
+            if (check = prefs.check[CHECK_SUBPCPROTOS])
+              writecheck(check, data, w);
+            if (check = prefs.check[CHECK_PCOPROTOS])
               writecheck(check, data, w);
             }
-          else if ((check = prefs.check[CHECK_BACKRMS])
-		&& (flags & (WEIGHT_FIELD|VAR_FIELD|RMS_FIELD|BACKRMS_FIELD)))
-            writecheck(check, data, w);
+          else if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
+            {
+            backrmsline(field, y, (PIXTYPE *)check->pix);
+            writecheck(check, check->pix, w);
+            }
           }
         }
       }
@@ -289,12 +295,18 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
             writecheck(check, data, w);
           if (check = prefs.check[CHECK_APERTURES])
             writecheck(check, data, w);
-          if (check = prefs.check[CHECK_SUBPROTOS])
+          if (check = prefs.check[CHECK_SUBPSFPROTOS])
+            writecheck(check, data, w);
+          if (check = prefs.check[CHECK_SUBPCPROTOS])
+            writecheck(check, data, w);
+          if (check = prefs.check[CHECK_PCOPROTOS])
             writecheck(check, data, w);
           }
-        else if ((check = prefs.check[CHECK_BACKRMS])
-		&& (flags & (WEIGHT_FIELD|VAR_FIELD|RMS_FIELD|BACKRMS_FIELD)))
-          writecheck(check, data, w);
+        else if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
+          {
+          backrmsline(field, y, (PIXTYPE *)check->pix);
+          writecheck(check, check->pix, w);
+          }
         }
       }
     else
