@@ -5443,15 +5443,26 @@ f     RESULT = AST_MATHMAP( NIN, NOUT, NFWD, FWD, NINV, INV, OPTIONS, STATUS )
 *     This function creates a new MathMap and optionally initialises its
 *     attributes.
 *
-*     A MathMap is a Mapping which allows you to specify a set of forward
-*     and/or inverse transformation functions using arithmetic operations
-*     and mathematical functions similar to those available in C. The
-*     MathMap interprets these functions at run-time, whenever its forward
-*     or inverse transformation is required. Because the functions are not
-*     compiled in the normal sense, they may be used to describe Mappings in
-*     a transportable manner (unlike an IntraMap). A MathMap therefore
-*     provides a very flexible way of defining new Mappings whose description
-*     may be stored as part of a dataset and interpreted by other programs.
+c     A MathMap is a Mapping which allows you to specify a set of forward
+c     and/or inverse transformation functions using arithmetic operations
+c     and mathematical functions similar to those available in C. The
+c     MathMap interprets these functions at run-time, whenever its forward
+c     or inverse transformation is required. Because the functions are not
+c     compiled in the normal sense (unlike an IntraMap), they may be used to
+c     describe coordinate transformations in a transportable manner. A
+c     MathMap therefore provides a flexible way of defining new types of
+c     Mapping whose descriptions may be stored as part of a dataset and
+c     interpreted by other programs.
+f     A MathMap is a Mapping which allows you to specify a set of forward
+f     and/or inverse transformation functions using arithmetic operations
+f     and mathematical functions similar to those available in Fortran. The
+f     MathMap interprets these functions at run-time, whenever its forward
+f     or inverse transformation is required. Because the functions are not
+f     compiled in the normal sense (unlike an IntraMap), they may be used to
+f     describe coordinate transformations in a transportable manner. A
+f     MathMap therefore provides a flexible way of defining new types of
+f     Mapping whose descriptions may be stored as part of a dataset and
+f     interpreted by other programs.
 
 *  Parameters:
 c     nin
@@ -5466,32 +5477,30 @@ c     nfwd
 f     NFWD = INTEGER
 *        The number of forward transformation functions being supplied.
 c        This must be at least equal to "nout", but may be increased to
-c        accommodate any addition expressions being supplied to define
-c        intermediate variables for the forward transformation.
-f        This must be at least equal to NOUT.
+f        This must be at least equal to NOUT, but may be increased to
+*        accommodate any additional expressions which define intermediate
+*        variables for the forward transformation.
 c     fwd
 f     FWD = CHARACTER * ( * )( NFWD )
-c        Pointer to an array (with "nfwd" elements) of pointers to null
-c        terminated strings which contain each of the expressions defining
-c        the forward transformation. The syntax of these expressions
-c        is described below.
-f        An array containing each of the forward transformation
-f        functions.
+c        An array (with "nfwd" elements) of pointers to null terminated strings
+c        which contain the expressions defining the forward transformation.
+f        An array which contains the expressions defining the forward
+f        transformation.
+*        The syntax of these expressions is described below.
 c     ninv
 f     NINV = INTEGER
 *        The number of inverse transformation functions being supplied.
 c        This must be at least equal to "nin", but may be increased to
-c        accommodate any addition expressions being supplied to define
-c        intermediate variables for the inverse transformation.
-f        This must be at least equal to NIN.
+f        This must be at least equal to NIN, but may be increased to
+*        accommodate any additional expressions which define intermediate
+*        variables for the inverse transformation.
 c     inv
 f     INV = CHARACTER * ( * )( NINV )
-c        Pointer to an array (with "ninv" elements) of pointers to null
-c        terminated strings which contain each of the expressions defining
-c        the inverse transformation. The syntax of these expressions
-c        is described below.
-f        An array containing each of the inverse transformation
-f        functions.
+c        An array (with "ninv" elements) of pointers to null terminated strings
+c        which contain the expressions defining the inverse transformation.
+f        An array which contains the expressions defining the inverse
+f        transformation.
+*        The syntax of these expressions is described below.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -5522,67 +5531,145 @@ f     AST_MATHMAP = INTEGER
 *        A pointer to the new MathMap.
 
 *  Defining Transformation Functions:
-*     A MathMap's transformation functions are supplied as expressions
-*     contained in the elements of an array of character strings. Normally
-*     you would supply the same number of expressions for the forward
-*     transformation as there are output variables (given by the MathMap's
-*     Nout attribute). For example, if Nout is 2, you might use:
-*     {"r=sqrt(x*x+y*y)", "theta=atan2(y,x)"}.  Here, the variables that
-*     appear on the left of each expression ("r" and "theta") provide names
-*     for the output variables and those that appear on the right ("x" and
-*     "y") are references to input variables.
+c     A MathMap's transformation functions are supplied as a set of
+c     expressions in an array of character strings. Normally you would
+c     supply the same number of expressions for the forward transformation
+c     as there are output variables (given by the MathMap's Nout
+c     attribute). For instance, if Nout is 2 you might use:
+c     - "r = sqrt( x * x + y * y )"
+c     - "theta = atan2( y, x )"
+c
+c     which defines a transformation from Cartesian to polar
+c     coordinates. Here, the variables that appear on the left of each
+c     expression ("r" and "theta") provide names for the output variables
+c     and those that appear on the right ("x" and "y") are references to
+c     input variables.
+f     A MathMap's transformation functions are supplied as a set of
+f     expressions in an array of character strings. Normally you would
+f     supply the same number of expressions for the forward transformation
+f     as there are output variables (given by the MathMap's Nout
+f     attribute). For instance, if Nout is 2 you might use:
+f     - 'R = SQRT( X * X + Y * Y )'
+f     - 'THETA = ATAN2( Y, X )'
+f
+f     which defines a transformation from Cartesian to polar
+f     coordinates. Here, the variables that appear on the left of each
+f     expression (R and THETA) provide names for the output variables and
+f     those that appear on the right (X and Y) are references to input
+f     variables.
 *
-*     In the same manner, the number of expressions for the inverse
-*     transformation would normally match the number of MathMap input
-*     coordinates (given by the Nin attribute).  Again, if Nin is 2, you
-*     might use: {"x=r*cos(theta)", "y=r*sin(theta)"}, which expresses the
-*     inverse transformation to the one above. Note that here the input
-*     variables ("x" and "y") are named on the left of each expression, and
-*     output variables ("r" and "theta") are referenced on the right.
+c     In the same manner, the number of expressions for the inverse
+c     transformation would normally match the number of MathMap input
+c     coordinates (given by the Nin attribute).  If Nin is 2, you might use:
+c     - "x = r * cos( theta )"
+c     - "y = r * sin( theta )"}
+c
+c     which expresses the inverse transformation from polar to Cartesian
+c     coordinates. Note that here the input variables ("x" and "y") are
+c     named on the left of each expression, and the output variables ("r"
+c     and "theta") are referenced on the right.
+f     In the same manner, the number of expressions for the inverse
+f     transformation would normally match the number of MathMap input
+f     coordinates (given by the Nin attribute).  If Nin is 2, you might use:
+f     - 'X = R * COS( THETA )'
+f     - 'Y = R * SIN( THETA )'
+f
+f     which expresses the inverse transformation from polar to Cartesian
+f     coordinates. Note that here the input variables (X and Y) are named on
+f     the left of each expression, and the output variables (R and THETA)
+f     are referenced on the right.
 *
-*     Normally, you cannot refer to a variable on the right of an expression
-*     unless it is named on the left of an expression in the complementary
-*     set of functions. This means that if you wish to leave one of the
-*     transformations undefined, you must still supply dummy expressions
-*     which name each of the output (or input) variables.  For example, you
-*     might use: {"x", "y"} for the inverse transformation above in order to
-*     name the input variables but without defining an inverse transformation.
+c     Normally, you cannot refer to a variable on the right of an expression
+c     unless it is named on the left of an expression in the complementary
+c     set of functions. This means that if you wish to leave one of the
+c     transformations undefined, you must supply dummy expressions which
+c     name each of the output (or input) variables.  For example, you might
+c     use:
+c     - "x"
+c     - "y"
+c
+c     for the inverse transformation above in order to name the input
+c     variables but without defining an inverse transformation.
+f     Normally, you cannot refer to a variable on the right of an expression
+f     unless it is named on the left of an expression in the complementary
+f     set of functions. This means that if you wish to leave one of the
+f     transformations undefined, you must supply dummy expressions which
+f     name each of the output (or input) variables.  For example, you might
+f     use:
+f     - 'X'
+f     - 'Y'
+f
+f     for the inverse transformation above in order to name the input
+f     variables but without defining an inverse transformation.
 
 *  Calculating Intermediate Values:
-*     It is sometimes useful to be able to calculate intermediate results
-*     and then to use these in the final expressions for the output (or
-*     input) variables. This may be done by supplying additional expressions
-*     for the forward (or inverse) transformation functions.  For instance,
-*     the following array of five expressions describes 2-dimensional barrel
-*     distortion: {"r=sqrt(xin*xin+yin*yin)", "theta=atan2(yin,xin)",
-*     "rout=r*(1+0.1*r*r)", "xout=rout*cos(theta)", "yout=rout*sin(theta)"}.
+c     It is sometimes useful to calculate intermediate results and then to
+c     use these in the final expressions for the output (or input)
+c     variables. This may be done by supplying additional expressions for
+c     the forward (or inverse) transformation functions. For instance, the
+c     following array of five expressions describes 2-dimensional barrel
+c     distortion:
+c     - "r = sqrt( xin * xin + yin * yin )"
+c     - "rout = r * ( 1 + 0.1 * r * r )"
+c     - "theta = atan2( yin, xin )"
+c     - "xout = rout * cos( theta )"
+c     - "yout = rout * sin( theta )"
+f     It is sometimes useful to calculate intermediate results and then to
+f     use these in the final expressions for the output (or input)
+f     variables. This may be done by supplying additional expressions for
+f     the forward (or inverse) transformation functions. For instance, the
+f     following array of five expressions describes 2-dimensional barrel
+f     distortion:
+f     - 'R = SQRT( XIN * XIN + YIN * YIN )'
+f     - 'ROUT = R * ( 1 + 0.1 * R * R )'
+f     - 'THETA = ATAN2( YIN, XIN )',
+f     - 'XOUT = ROUT * COS( THETA )'
+f     - 'YOUT = ROUT * SIN( THETA )'
 *
-*     Note how we first calculate three intermediate results ("r", "rout"
-*     and "theta") and then use these to calculate the final results ("xout"
-*     and "yout"). The MathMap knows that only the final two results
-*     constitute values for the output variables because its Nout attribute
-*     is set to 2.  You may define as many intermediate variables in this
-*     way as you choose. Having defined a variable, you may then refer to it
-*     on the right of any subsequent expressions.
+c     Note how we first calculate three intermediate results ("r", "rout"
+c     and "theta") and then use these to calculate the final results ("xout"
+c     and "yout"). The MathMap knows that only the final two results
+c     constitute values for the output variables because its Nout attribute
+c     is set to 2. You may define as many intermediate variables in this
+c     way as you choose. Having defined a variable, you may then refer to it
+c     on the right of any subsequent expressions.
+f     Note how we first calculate three intermediate results (R, ROUT
+f     and THETA) and then use these to calculate the final results (XOUT
+f     and YOUT). The MathMap knows that only the final two results
+f     constitute values for the output variables because its Nout attribute
+f     is set to 2. You may define as many intermediate variables in this
+f     way as you choose. Having defined a variable, you may then refer to it
+f     on the right of any subsequent expressions.
 *
-*     We could use a similar technique to define the inverse transformation,
-*     but may only refer to the output variables "xout" and "yout" in the
-*     expressions we use. The intermediate variables "r", "rout" and "theta"
-*     (above) are private to the forward transformation and may not be
-*     referenced by the inverse transformation.
+c     We could use a similar technique to define the inverse transformation,
+c     but may only refer to the output variables "xout" and "yout" in the
+c     expressions we use. The intermediate variables "r", "rout" and "theta"
+c     (above) are private to the forward transformation and may not be
+c     referenced by the inverse transformation.
+f     We could use a similar technique to define the inverse transformation,
+f     but may only refer to the output variables XOUT and YOUT in the
+f     expressions we use. The intermediate variables R, ROUT and THETA
+f     (above) are private to the forward transformation and may not be
+f     referenced by the inverse transformation.
 
 *  Expression Syntax:
-*     The expressions given for the forward and inverse transformations
-*     closely follow the syntax of the C programming language (with some
-*     extensions for compatibility with Fortran). They may
-*     contain references to variables and literal constants, together with
-*     arithmetic, boolean and bit-wise operators and function invocations. A
-*     set of symbolic constants is also available. Each of these is
-*     described in detail below.
+c     The expressions given for the forward and inverse transformations
+c     closely follow the syntax of the C programming language (with some
+c     extensions for compatibility with Fortran). They may contain
+c     references to variables and literal constants, together with
+c     arithmetic, boolean, relational and bitwise operators, and function
+c     invocations. A set of symbolic constants is also available. Each of
+c     these is described in detail below.
+f     The expressions given for the forward and inverse transformations
+f     closely follow the syntax of Fortran (with some extensions for
+f     compatibility with the C language). They may contain references to
+f     variables and literal constants, together with arithmetic, logical,
+f     relational and bitwise operators, and function invocations. A set of
+f     symbolic constants is also available. Each of these is described in
+f     detail below.
 *
 *     There is no built-in limit to the length of expressions and they are
-*     insensitive to case (upper or lower) or the presence of additional
-*     white space.
+*     insensitive to case or the presence of additional white space.
 
 *  Variables:
 *     Variable names must begin with an alphabetic character and may contain
@@ -5590,202 +5677,384 @@ f     AST_MATHMAP = INTEGER
 *     "_". There is no built-in limit to the length of variable names.
 
 *  Literal Constants:
-*     Literal constants, such as "0", "1", "0.007" or "2.505e-16" may appear
-*     in expressions, with the decimal point and exponent being optional (a
-*     "d" may also be used as an exponent character for compatibility with
-*     Fortran). A unary minus "-" may be used as a prefix.
+c     Literal constants, such as "0", "1", "0.007" or "2.505e-16" may appear
+c     in expressions, with the decimal point and exponent being optional (a
+c     "D" may also be used as an exponent character for compatibility with
+c     Fortran). A unary minus "-" may be used as a prefix.
+f     Literal constants, such as "0", "1", "0.007" or "2.505E-16" may appear
+f     in expressions, with the decimal point and exponent being optional (a
+f     "D" may also be used as an exponent character). A unary minus "-" may
+f     be used as a prefix.
 
 *  Arithmetic Precision:
 *     All arithmetic is floating point, performed in double precision.
 
 *  Propagation of Missing Data:
-*     Unless noted to the contrary, if any argument of a function or
-*     operator has the special value AST__BAD (indicating missing data),
-*     then the result of that function or operation is also AST__BAD, so
-*     that such values are propagated automatically through all operations
-*     performed by MathMap transformations.
+*     Unless indicated otherwise, if any argument of a function or operator
+*     has the special value AST__BAD (indicating missing data), then the
+*     result of that function or operation is also AST__BAD, so that such
+*     values are propagated automatically through all operations performed
+*     by MathMap transformations.  The special value AST__BAD can be
+*     represented in expressions by the symbolic constant "<bad>".
 *
-*     Note that the special AST__BAD value can be represented in expressions
-*     by the symbolic constant "<bad>".
-
-*  Numerical Errors:
-*     A <bad> result (AST__BAD) is also produced in response to any
-*     numerical error (such as division by zero or numerical overflow), or
-*     if an invalid argument value is provided to a function or operator.
+*     A <bad> result (i.e. equal to AST__BAD) is also produced in response
+*     to any numerical error (such as division by zero or numerical
+*     overflow), or if an invalid argument value is provided to a function
+*     or operator.
 
 *  Arithmetic Operators:
 *     The following arithmetic operators are available:
-*     - x1 + x2: Sum of "x1" and "x2".
-*     - x1 - x2: Difference of "x1" and "x2".
-*     - x1 * x2: Product of "x1" and "x1".
-*     - x1 / x2: Ratio of "x1" and "x2" (AST__BAD if "x2" is zero).
-*     - x1 ** x2: "x1" raised to the power of "x2" (AST__BAD if "x1" is zero
-*     and "x2" is zero or less, or if "x1" is less than zero and "x2" is not
-*     an integer).
-*     - + x: Unary plus, has no effect on its argument.
-*     - - x: Unary minus, negates its argument.
+c     - x1 + x2: Sum of "x1" and "x2".
+f     - X1 + X2: Sum of X1 and X2.
+c     - x1 - x2: Difference of "x1" and "x2".
+f     - X1 - X2: Difference of X1 and X2.
+c     - x1 * x2: Product of "x1" and "x1".
+f     - X1 * X2: Product of X1 and X2.
+c     - x1 / x2: Ratio of "x1" and "x2".
+f     - X1 / X2: Ratio of X1 and X2.
+c     - x1 ** x2: "x1" raised to the power of "x2".
+f     - X1 ** X2: X1 raised to the power of X2.
+c     - + x: Unary plus, has no effect on its argument.
+f     - + X: Unary plus, has no effect on its argument.
+c     - - x: Unary minus, negates its argument.
+f     - - X: Unary minus, negates its argument.
 
-*  Boolean Operators:
-*     Boolean values are represented using zero to indicate false and
-*     non-zero to indicate true. In addition, the value AST__BAD is taken to
-*     mean "unknown". The values returned by boolean operators may be 0, 1
-*     or AST__BAD.
+c  Boolean Operators:
+f  Logical Operators:
+c     Boolean values are represented using zero to indicate false and
+c     non-zero to indicate true. In addition, the value AST__BAD is taken to
+c     mean "unknown". The values returned by boolean operators may therefore
+c     be 0, 1 or AST__BAD. Where appropriate, "tri-state" logic is
+c     implemented. For example, "a||b" may evaluate to 1 if "a" is non-zero,
+c     even if "b" has the value AST__BAD. This is because the result of the
+c     operation would not be affected by the value of "b", so long as "a" is
+c     non-zero.
+f     Logical values are represented using zero to indicate .FALSE. and
+f     non-zero to indicate .TRUE.. In addition, the value AST__BAD is taken to
+f     mean "unknown". The values returned by logical operators may therefore
+f     be 0, 1 or AST__BAD. Where appropriate, "tri-state" logic is
+f     implemented. For example, A.OR.B may evaluate to 1 if A is non-zero,
+f     even if B has the value AST__BAD. This is because the result of the
+f     operation would not be affected by the value of B, so long as A is
+f     non-zero.
 *
-*     Where appropriate, "tri-state" logic is implemented. For example,
-*     "a||b" may evaluate to 1 if "a" is non-zero, even if "b" has the value
-*     AST__BAD. This is because the result of the operation would not be
-*     affected by the value of "b", so long as "a" is non-zero.
+c     The following boolean operators are available:
+f     The following logical operators are available:
+c     - x1 && x2: Boolean AND between "x1" and "x2", returning 1 if both "x1"
+c     and "x2" are non-zero, and 0 otherwise. This operator implements
+c     tri-state logic. (The synonym ".and." is also provided for compatibility
+c     with Fortran.)
+f     - X1 .AND. X2: Logical AND between X1 and X2, returning 1 if both X1
+f     and X2 are non-zero, and 0 otherwise. This operator implements
+f     tri-state logic. (The synonym "&&" is also provided for compatibility
+f     with C.)
+c     - x1 || x2: Boolean OR between "x1" and "x2", returning 1 if either "x1"
+c     or "x2" are non-zero, and 0 otherwise. This operator implements
+c     tri-state logic. (The synonym ".or." is also provided for compatibility
+c     with Fortran.)
+f     - X1 .OR. X2: Logical OR between X1 and X2, returning 1 if either X1
+f     or X2 are non-zero, and 0 otherwise. This operator implements
+f     tri-state logic. (The synonym "||" is also provided for compatibility
+f     with C.)
+c     - x1 ^^ x2: Boolean exclusive OR (XOR) between "x1" and "x2", returning
+c     1 if exactly one of "x1" and "x2" is non-zero, and 0 otherwise. Tri-state
+c     logic is not used with this operator. (The synonyms ".neqv." and ".xor."
+c     are also provided for compatibility with Fortran, although the second
+c     of these is not standard.)
+f     - X1 .NEQV. X2: Logical exclusive OR (XOR) between X1 and X2,
+f     returning 1 if exactly one of X1 and X2 is non-zero, and 0
+f     otherwise. Tri-state logic is not used with this operator. (The
+f     synonym ".XOR." is also provided, although this is not standard
+f     Fortran. In addition, the C-like synonym "^^" may be used, although
+f     this is also not standard.)
+c     - x1 .eqv. x2: This is provided only for compatibility with Fortran
+c     and tests whether the boolean states of "x1" and "x2" (i.e. true/false)
+c     are equal. It is the negative of the exclusive OR (XOR) function.
+c     Tri-state logic is not used with this operator.
+f     - X1 .EQV. X2: Tests whether the logical states of X1 and X2
+f     (i.e. .TRUE./.FALSE.) are equal. It is the negative of the exclusive OR
+f     (XOR) function.  Tri-state logic is not used with this operator.
+c     - ! x: Boolean unary NOT operation, returning 1 if "x" is zero, and
+c     0 otherwise.
+f     - .NOT. X: Logical unary NOT operation, returning 1 if X is zero, and
+f     0 otherwise.
+c     - isbad(x): Returns a boolean result (0 or 1) indicating whether "x" is
+c     set to the <bad> data value AST__BAD.
+f     - ISBAD(X): Returns a logical result (0 or 1) indicating whether X is
+f     set to the <bad> data value AST__BAD.
+
+*  Relational Operators:
+*     Relational operators return the boolean result (0 or 1) of comparing
+*     the values of two floating pojnt values for equality or inequality. The
+*     value AST__BAD may also be returned if either argument is <bad>.
 *
-*     The following boolean operators may be used in expressions:
-*     - x1 && x2: Boolean AND between "x1" and "x2", returning 1 if both "x1"
-*     and "x2" are non-zero, and 0 otherwise. This operator implements
-*     tri-state logic. (The synonym ".and." is also provided for compatibility
-*     with Fortran.)
-*     - x1 || x2: Boolean OR between "x1" and "x2", returning 1 if either "x1"
-*     or "x2" are non-zero, and 0 otherwise. This operator implements
-*     tri-state logic. (The synonym ".or." is also provided for compatibility
-*     with Fortran.)
-*     - x1 ^^ x2: Boolean exclusive OR (XOR) between "x1" and "x2", returning
-*     1 if exactly one of "x1" and "x2" is non-zero, and 0 otherwise. Tri-state
-*     logic is not used with this operator. (The synonyms ".neqv." and ".xor."
-*     are also provided for compatibility with Fortran, although the second
-*     of these is not standard.)
-*     - x1 .eqv. x2: This is provided only for compatibility with Fortran
-*     and tests whether the boolean states of "x1" and "x2" (i.e. true/false)
-*     are equal. It is the negative of the exclusive OR (XOR) function.
-*     Tri-state logic is not used with this operator.
-*     - ! x: Boolean unary NOT operation, returning 1 if "x" is zero, and
-*     0 otherwise.
-*     - isbad(x): Returns a boolean result (0 or 1) indicating whether "x" is
-*     set to the <bad> data value AST__BAD.
+*     The following relational operators are available:
+c     - x1 == x2: "x1" equals "x1"? (The synonym ".eq." is also provided for
+c     compatibility with Fortran.)
+f     - X1 .EQ. X2: X1 equals X2? (The synonym "==" is also provided for
+f     compatibility with C.)
+c     - x1 != x2: "x1" is unequal to "x2"? (The synonym ".ne." is also
+c     provided for compatibility with Fortran.)
+f     - X1 .NE. X2: X1 is unequal to X2? (The synonym "!=" is also
+f     provided for compatibility with C.)
+c     - x1 > x2: "x1" is greater than "x2"? (The synonym ".gt." is also
+c     provided for compatibility with Fortran.)
+f     - X1 > X2: X1 is greater than X2? (The synonym ">" is also
+f     provided for compatibility with C.)
+c     - x1 >= x2: "x1" is greater than or equal to "x2"? (The synonym ".ge."
+c     is also provided for compatibility with Fortran.)
+f     - X1 >= X2: X1 is greater than or equal to X2? (The synonym ">="
+f     is also provided for compatibility with C.)
+c     - x1 < x2: "x2" is less than "x2"? (The synonym ".gt." is also
+c     provided for compatibility with Fortran.)
+f     - X1 < X2: X1 is less than X2? (The synonym "<" is also
+f     provided for compatibility with C.)
+c     - x1 <= x2: "x1" is less than or equal to "x2"? (The synonym ".le." is
+c     also provided for compatibility with Fortran.)
+f     - X1 <= X2: X1 is less than or equal to X2? (The synonym "<=" is
+f     also provided for compatibility with C.)
+f
+f     Note that because logical operators can operate on floating point
+f     values, care must be taken to use parentheses in some cases where they
+f     would not be required in Fortran. For example, the expresssion:
+f     - .NOT. A .EQ. B
+f
+f     must be written:
+f     - .NOT. ( A .EQ. B )
+f
+f     if the .NOT. operator is not to associate with the variable A.
 
 *  Bitwise Operators:
-*     The bitwise operators provided by C are often useful when operating on
-*     raw data (e.g. from instruments), so they are also provided for use in
-*     MathMap expressions. In this case, however, the values on which they
-*     operate are floating point values rather than pure integers. In order
-*     to produce results which match the pure integer case, the operands are
-*     therefore regarded as fixed point binary numbers (with the binary
-*     equivalent of a decimal point) and negative numbers are represented
-*     using twos-complement notation. For integer values, the resulting bit
-*     pattern corresponds to that of the equivalent signed integer (digits
-*     to the right of the point being zero). However, operations on the bits
-*     representing the fractional part are also possible.
+c     The bitwise operators provided by C are often useful when operating on
+c     raw data (e.g. from instruments), so they are also provided for use in
+c     MathMap expressions. In this case, however, the values on which they
+c     operate are floating point values rather than pure integers. In order
+c     to produce results which match the pure integer case, the operands are
+c     regarded as fixed point binary numbers (i.e. with the binary
+c     equivalent of a decimal point) with negative numbers represented using
+c     twos-complement notation. For integer values, the resulting bit
+c     pattern corresponds to that of the equivalent signed integer (digits
+c     to the right of the point being zero). Operations on the bits
+c     representing the fractional part are also possible, however.
+f     Bitwise operators are often useful when operating on raw data
+f     (e.g. from instruments), so they are provided for use in MathMap
+f     expressions. In this case, however, the values on which they operate
+f     are floating point values rather than the more usual pure integers. In
+f     order to produce results which match the pure integer case, the
+f     operands are regarded as fixed point binary numbers (i.e. with the
+f     binary equivalent of a decimal point) with negative numbers
+f     represented using twos-complement notation. For integer values, the
+f     resulting bit pattern corresponds to that of the equivalent signed
+f     integer (digits to the right of the point being zero). Operations on
+f     the bits representing the fractional part are also possible, however.
 *
 *     The following bitwise operators are available:
-*     - x1 >> x2: Rightward bit shift. The integer value of "x2" is taken
-*     (rounding towards zero), and the bits representing "x1" are then
-*     shifted this number of places to the right (or to the left if the
-*     number of places is negative). This is equivalent to dividing "x1" by
-*     the corresponding power of 2.
-*     - x1 << x2: Leftward bit shift. The integer value of "x2" is taken
-*     (rounding towards zero), and the bits representing "x1" are then
-*     shifted this number of places to the left (or to the right if the
-*     number of places is negative). This is equivalent to multiplying "x1"
-*     by the corresponding power of 2.
-*     - x1 & x2: Bitwise AND between the bits of "x1" and those of "x2"
-*     (equivalent to a boolean AND applied at each bit position in turn).
-*     - x1 | x2: Bitwise OR between the bits of "x1" and those of "x2"
-*     (equivalent to a boolean OR applied at each bit position in turn).
-*     - x1 ^ x2: Bitwise exclusive OR (XOR) between the bits of "x1" and
-*     those of "x2" (equivalent to a boolean XOR applied at each bit
-*     position in turn).
+c     - x1 >> x2: Rightward bit shift. The integer value of "x2" is taken
+c     (rounding towards zero) and the bits representing "x1" are then
+c     shifted this number of places to the right (or to the left if the
+c     number of places is negative). This is equivalent to dividing "x1" by
+c     the corresponding power of 2.
+f     - X1 >> X2: Rightward bit shift. The integer value of X2 is taken
+f     (rounding towards zero) and the bits representing X1 are then
+f     shifted this number of places to the right (or to the left if the
+f     number of places is negative). This is equivalent to dividing X1 by
+f     the corresponding power of 2.
+c     - x1 << x2: Leftward bit shift. The integer value of "x2" is taken
+c     (rounding towards zero), and the bits representing "x1" are then
+c     shifted this number of places to the left (or to the right if the
+c     number of places is negative). This is equivalent to multiplying "x1"
+c     by the corresponding power of 2.
+f     - X1 << X2: Leftward bit shift. The integer value of X2 is taken
+f     (rounding towards zero), and the bits representing X1 are then
+f     shifted this number of places to the left (or to the right if the
+f     number of places is negative). This is equivalent to multiplying X1
+f     by the corresponding power of 2.
+c     - x1 & x2: Bitwise AND between the bits of "x1" and those of "x2"
+c     (equivalent to a boolean AND applied at each bit position in turn).
+f     - X1 & X2: Bitwise AND between the bits of X1 and those of X2
+f     (equivalent to a logical AND applied at each bit position in turn).
+c     - x1 | x2: Bitwise OR between the bits of "x1" and those of "x2"
+c     (equivalent to a boolean OR applied at each bit position in turn).
+f     - X1 | X2: Bitwise OR between the bits of X1 and those of X2
+f     (equivalent to a logical OR applied at each bit position in turn).
+c     - x1 ^ x2: Bitwise exclusive OR (XOR) between the bits of "x1" and
+c     those of "x2" (equivalent to a boolean XOR applied at each bit
+c     position in turn).
+f     - X1 ^ X2: Bitwise exclusive OR (XOR) between the bits of X1 and
+f     those of X2 (equivalent to a logical XOR applied at each bit
+f     position in turn).
 *
-*     Note that no bit inversion operator ("~" in C) is provided. This is
-*     because inverting the bits of a twos-complement fixed point binary
-*     number is simply equivalent to negating it. This is different to the
-*     pure integer case because bits to the right of the binary point are
-*     also inverted. To invert only those bits to the left of the binary
-*     point, use a bitwise exclusive OR with the value "-1" (i.e. "x^-1").
+c     Note that no bit inversion operator ("~" in C) is provided. This is
+c     because inverting the bits of a twos-complement fixed point binary
+c     number is equivalent to simply negating it. This differs from the
+c     pure integer case because bits to the right of the binary point are
+c     also inverted. To invert only those bits to the left of the binary
+c     point, use a bitwise exclusive OR with the value "-1" (i.e. "x^-1").
+f     Note that no bit inversion operator is provided. This is
+f     because inverting the bits of a twos-complement fixed point binary
+f     number is equivalent to simply negating it. This differs from the
+f     pure integer case because bits to the right of the binary point are
+f     also inverted. To invert only those bits to the left of the binary
+f     point, use a bitwise exclusive OR with the value "-1" (i.e. "x^-1").
 
 *  Functions:
 *     The following functions are available:
-*     - abs(x): Absolute value of "x" (sign removal), same as fabs(x).
-*     - acos(x): Inverse cosine of "x", in radians.
-*     - acosd(x): Inverse cosine of "x", in degrees.
-*     - aint(x): Integer part of "x" (round towards zero), same as int(x).
-*     - asin(x): Inverse sine of "x", in radians.
-*     - asind(x): Inverse sine of "x", in degrees.
-*     - atan(x): Inverse tangent of "x", in radians.
-*     - atan2(x1, x2): Inverse tangent of "x1/x2", in degrees.
-*     - atan2(x1, x2): Inverse tangent of "x1/x2", in radians.
-*     - atand(x): Inverse tangent of "x", in degrees.
-*     - ceil(x): Smallest integer value not less then "x" (round towards
-*       plus infinity).
-*     - cos(x): Cosine of "x" in radians.
-*     - cosd(x): Cosine of "x" in degrees.
-*     - cosh(x): Hyperbolic cosine of "x".
-*     - dim(x1, x2): Returns "x1-x2" if "x1" is greater than "x2", otherwise 0.
-*     - exp(x): Exponential function of "x".
-*     - fabs(x): Absolute value of "x" (sign removal), same as abs(x).
-*     - floor(x): Largest integer not greater than "x" (round towards
-*       minus infinity).
-*     - fmod(x1, x2): Remainder when "x1" is divided by "x2", same as
-*       mod(x1, x2).
-*     - gauss(x1, x2): Random sample from a Gaussian distribution with mean
-*       "x1" and standard deviation "x2".
-*     - int(x): Integer part of "x" (round towards zero), same as aint(x).
-*     - isbad(x): Returns 1 if "x" has the <bad> value (AST__BAD), otherwise 0.
-*     - log(x): Natural logarithm of "x".
-*     - log10(x): Logarithm of "x" to base 10.
-*     - max(x1, x2, ...): Maximum of two or more values.
-*     - min(x1, x2, ...): Minimum of two or more values.
-*     - mod(x1, x2): Remainder when "x1" is divided by "x2", same as
-*       fmod(x1, x2).
-*     - nint(x): Nearest integer to "x" (round to nearest).
-*     - poisson(x): Random integer-valued sample from a Poisson
-*       distribution with mean "x".
-*     - pow(x1, x2): "x2" raised to the power of "x2".
-*     - rand(x1, x2): Random sample from a uniform distribution in the
-*       range "x1" to "x2" inclusive.
-*     - sign(x1, x2): Absolute value of "x1" with the sign of "x2"
-*       (transfer of sign).
-*     - sin(x): Sine of "x" in radians.
-*     - sind(x): Sine of "x" in degrees.
-*     - sinh(x): Hyperbolic sine of "x".
-*     - sqr(x): Square of "x" (= "x*x").
-*     - sqrt(x): Square root of "x".
-*     - tan(x): Tangent of "x" in radians.
-*     - tand(x): Tangent of "x" in degrees.
-*     - tanh(x): Hyperbolic tangent of "x".
+c     - abs(x): Absolute value of "x" (sign removal), same as fabs(x).
+f     - ABS(X): Absolute value of X (sign removal), same as FABS(X).
+c     - acos(x): Inverse cosine of "x", in radians.
+f     - ACOS(X): Inverse cosine of X, in radians.
+c     - acosd(x): Inverse cosine of "x", in degrees.
+f     - ACOSD(X): Inverse cosine of X, in degrees.
+c     - aint(x): Integer part of "x" (round towards zero), same as int(x).
+f     - AINT(X): Integer part of X (round towards zero), same as INT(X).
+c     - asin(x): Inverse sine of "x", in radians.
+f     - ASIN(X): Inverse sine of X, in radians.
+c     - asind(x): Inverse sine of "x", in degrees.
+f     - ASIND(X): Inverse sine of X, in degrees.
+c     - atan(x): Inverse tangent of "x", in radians.
+f     - ATAN(X): Inverse tangent of X, in radians.
+c     - atand(x): Inverse tangent of "x", in degrees.
+f     - ATAND(X): Inverse tangent of X, in degrees.
+c     - atan2(x1, x2): Inverse tangent of "x1/x2", in radians.
+f     - ATAN2(X1, X2): Inverse tangent of X1/X2, in radians.
+c     - atan2d(x1, x2): Inverse tangent of "x1/x2", in degrees.
+f     - ATAN2D(X1, X2): Inverse tangent of X1/X2, in degrees.
+c     - ceil(x): Smallest integer value not less then "x" (round towards
+c       plus infinity).
+f     - CEIL(X): Smallest integer value not less then X (round towards
+f       plus infinity).
+c     - cos(x): Cosine of "x" in radians.
+f     - COS(X): Cosine of X in radians.
+c     - cosd(x): Cosine of "x" in degrees.
+f     - COSD(X): Cosine of X in degrees.
+c     - cosh(x): Hyperbolic cosine of "x".
+f     - COSH(X): Hyperbolic cosine of X.
+c     - dim(x1, x2): Returns "x1-x2" if "x1" is greater than "x2", otherwise 0.
+f     - DIM(X1, X2): Returns X1-X2 if X1 is greater than X2, otherwise 0.
+c     - exp(x): Exponential function of "x".
+f     - EXP(X): Exponential function of X.
+c     - fabs(x): Absolute value of "x" (sign removal), same as abs(x).
+f     - FABS(X): Absolute value of X (sign removal), same as ABS(X).
+c     - floor(x): Largest integer not greater than "x" (round towards
+c       minus infinity).
+f     - FLOOR(X): Largest integer not greater than X (round towards
+f       minus infinity).
+c     - fmod(x1, x2): Remainder when "x1" is divided by "x2", same as
+c       mod(x1, x2).
+f     - FMOD(X1, X2): Remainder when X1 is divided by X2, same as
+f       MOD(X1, X2).
+c     - gauss(x1, x2): Random sample from a Gaussian distribution with mean
+c       "x1" and standard deviation "x2".
+f     - GAUSS(X1, X2): Random sample from a Gaussian distribution with mean
+f       X1 and standard deviation X2.
+c     - int(x): Integer part of "x" (round towards zero), same as aint(x).
+f     - INT(X): Integer part of X (round towards zero), same as AINT(X).
+c     - isbad(x): Returns 1 if "x" has the <bad> value (AST__BAD), otherwise 0.
+f     - ISBAD(X): Returns 1 if X has the <bad> value (AST__BAD), otherwise 0.
+c     - log(x): Natural logarithm of "x".
+f     - LOG(X): Natural logarithm of X.
+c     - log10(x): Logarithm of "x" to base 10.
+f     - LOG10(X): Logarithm of X to base 10.
+c     - max(x1, x2, ...): Maximum of two or more values.
+f     - MAX(X1, X2, ...): Maximum of two or more values.
+c     - min(x1, x2, ...): Minimum of two or more values.
+f     - MIN(X1, X2, ...): Minimum of two or more values.
+c     - mod(x1, x2): Remainder when "x1" is divided by "x2", same as
+c       fmod(x1, x2).
+f     - MOD(X1, X2): Remainder when X1 is divided by X2, same as
+f       FMOD(X1, X2).
+c     - nint(x): Nearest integer to "x" (round to nearest).
+f     - NINT(X): Nearest integer to X (round to nearest).
+c     - poisson(x): Random integer-valued sample from a Poisson
+c       distribution with mean "x".
+f     - POISSON(X): Random integer-valued sample from a Poisson
+f       distribution with mean X.
+c     - pow(x1, x2): "x1" raised to the power of "x2".
+f     - POW(X1, X2): X1 raised to the power of X2.
+c     - rand(x1, x2): Random sample from a uniform distribution in the
+c       range "x1" to "x2" inclusive.
+f     - RAND(X1, X2): Random sample from a uniform distribution in the
+f       range X1 to X2 inclusive.
+c     - sign(x1, x2): Absolute value of "x1" with the sign of "x2"
+c       (transfer of sign).
+f     - SIGN(X1, X2): Absolute value of X1 with the sign of X2
+f       (transfer of sign).
+c     - sin(x): Sine of "x" in radians.
+f     - SIN(X): Sine of X in radians.
+c     - sind(x): Sine of "x" in degrees.
+f     - SIND(X): Sine of X in degrees.
+c     - sinh(x): Hyperbolic sine of "x".
+f     - SINH(X): Hyperbolic sine of X.
+c     - sqr(x): Square of "x" (= "x*x").
+f     - SQR(X): Square of X (= X*X).
+c     - sqrt(x): Square root of "x".
+f     - SQRT(X): Square root of X.
+c     - tan(x): Tangent of "x" in radians.
+f     - TAN(X): Tangent of X in radians.
+c     - tand(x): Tangent of "x" in degrees.
+f     - TAND(X): Tangent of X in degrees.
+c     - tanh(x): Hyperbolic tangent of "x".
+f     - TANH(X): Hyperbolic tangent of X.
 
 *  Symbolic Constants:
-*     The following symbolic constants are available:
-*     - <bad>: The "bad" value (AST__BAD) used to flag missing data. Note
-*       that you cannot usefully compare values with this constant (the result
-*       is always <bad>). The isbad() function should be used instead.
-*     - <dig>: Number of decimal digits of precision available in a
-*       floating point (double) value.
+*     The following symbolic constants are available (the enclosing "<>"
+*     brackets must be included):
+c     - <bad>: The "bad" value (AST__BAD) used to flag missing data. Note
+c     that you cannot usefully compare values with this constant because the
+c     result is always <bad>. The isbad() function should be used instead.
+f     - <bad>: The "bad" value (AST__BAD) used to flag missing data. Note
+f     that you cannot usefully compare values with this constant because the
+f     result is always <bad>. The ISBAD() function should be used instead.
+c     - <dig>: Number of decimal digits of precision available in a
+c     floating point (double) value.
+f     - <dig>: Number of decimal digits of precision available in a
+f     floating point (double precision) value.
 *     - <e>: Base of natural logarithms.
-*     - <epsilon>: Smallest number such that "1.0+<epsilon>" is
-*       distinguishable from "1.0".
-*     - <mant_dig>: The number of base "<radix>" digits stored in the
-*       mantissa of a floating point (double) value.
-*     - <max>: Maximum representable floating point (double) value.
-*     - <max_10_exp>: Maximum integer such that 10 raised to that power
-*       can be represented as a floating point (double) value.
-*     - <max_exp>: Maximum integer such that "<radix>" raised to that
-*       power minus 1 can be represented as a floating point (double) value.
-*     - <min>: Smallest positive number which can be represented as a
-*       normalised floating point (double) value.
-*     - <min_10_exp>: Minimum negative integer such that 10 raised to that
-*       power can be represented as a normalised floating point (double) value.
-*     - <min_exp>: Minimum negative integer such that "<radix>" raised to
-*       that power minus 1 can be represented as a normalised floating point
-*       (double) value.
+*     - <epsilon>: Smallest number such that 1.0+<epsilon> is
+*     distinguishable from unity.
+c     - <mant_dig>: The number of base <radix> digits stored in the
+c     mantissa of a floating point (double) value.
+f     - <mant_dig>: The number of base <radix> digits stored in the
+f     mantissa of a floating point (double precision) value.
+c     - <max>: Maximum representable floating point (double) value.
+f     - <max>: Maximum representable floating point (double precision) value.
+c     - <max_10_exp>: Maximum integer such that 10 raised to that power
+c     can be represented as a floating point (double) value.
+f     - <max_10_exp>: Maximum integer such that 10 raised to that power
+f     can be represented as a floating point (double precision) value.
+c     - <max_exp>: Maximum integer such that <radix> raised to that
+c     power minus 1 can be represented as a floating point (double) value.
+f     - <max_exp>: Maximum integer such that <radix> raised to that
+f     power minus 1 can be represented as a floating point (double precision)
+f     value.
+c     - <min>: Smallest positive number which can be represented as a
+c     normalised floating point (double) value.
+f     - <min>: Smallest positive number which can be represented as a
+f     normalised floating point (double precision) value.
+c     - <min_10_exp>: Minimum negative integer such that 10 raised to that
+c     power can be represented as a normalised floating point (double) value.
+f     - <min_10_exp>: Minimum negative integer such that 10 raised to that
+f     power can be represented as a normalised floating point (double
+f     precision) value.
+c     - <min_exp>: Minimum negative integer such that <radix> raised to
+c     that power minus 1 can be represented as a normalised floating point
+c     (double) value.
+f     - <min_exp>: Minimum negative integer such that <radix> raised to
+f     that power minus 1 can be represented as a normalised floating point
+f     (double precision) value.
 *     - <pi>: Ratio of the circumference of a circle to its diameter.
-*     - <radix>: The radix (number base) used to represent the mantissa of
-*       floating point (double) values.
+c     - <radix>: The radix (number base) used to represent the mantissa of
+c     floating point (double) values.
+f     - <radix>: The radix (number base) used to represent the mantissa of
+f     floating point (double precision) values.
 *     - <rounds>: The mode used for rounding floating point results after
-*       addition. Possible values include: -1 (indeterminate), 0 (toward
-*       zero), 1 (to nearest), 2 (toward plus infinity) and 3 (toward minus
-*       infinity). Other values indicate machine-dependent behaviour.
-*
-*     Note that the the enclosing "<>" brackets must be included.
+*     addition. Possible values include: -1 (indeterminate), 0 (toward
+*     zero), 1 (to nearest), 2 (toward plus infinity) and 3 (toward minus
+*     infinity). Other values indicate machine-dependent behaviour.
 
 *  Evaluation Precedence and Associativity:
-*     Operators appearing in expressions are evaluated in the following
-*     order (highest precedence first):
+*     Items appearing in expressions are evaluated in the following order
+*     (highest precedence first):
 *     - Constants and variables
 *     - Function arguments and parenthesised expressions
 *     - Function invocations
@@ -5804,10 +6073,28 @@ f     AST_MATHMAP = INTEGER
 *     - || .or
 *     - .eqv. .neqv. .xor.
 *
-*     All operators associate from left-to-right apart from unary "+", unary
-*     "-", "!", ".not." and "**" which associate from right-to-left.
+*     All operators associate from left-to-right, except for unary +,
+*     unary -, !, .not. and ** which associate from right-to-left.
 
 *  Notes:
+*     - The sequence of numbers produced by the random number functions
+*     available within a MathMap is normally unpredictable and different for
+*     each MathMap. However, this behaviour may be controlled by means of
+*     the MathMap's Seed attribute.
+c     - Normally, compound Mappings (CmpMaps) which involve MathMaps will
+c     not be subject to simplification (e.g. using astSimplify) because AST
+c     cannot know how different MathMaps will interact. However, in the
+c     special case where a MathMap occurs in series with its own inverse,
+c     then simplification may be possible. Whether simplification does, in
+c     fact, occur under these circumstances is controlled by the SimpFI and
+c     SimpIF attributes.
+f     - Normally, compound Mappings (CmpMaps) which involve MathMaps will
+f     not be subject to simplification (e.g. using AST_SIMPLIFY) because AST
+f     cannot know how different MathMaps will interact. However, in the
+f     special case where a MathMap occurs in series with its own inverse,
+f     then simplification may be possible. Whether simplification does, in
+f     fact, occur under these circumstances is controlled by the SimpFI and
+f     SimpIF attributes.
 *     - A null Object pointer (AST__NULL) will be returned if this
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
