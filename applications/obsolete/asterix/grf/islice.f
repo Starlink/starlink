@@ -15,6 +15,7 @@
 *      9 Aug 94: V1.7-2  really handles QUALITY (RJV)
 *     31 Jan 95: V1.8-0  bug fix to keyboard mode (RJV)
 *     31 Jan 95: V1.8-1  axis units pixels->angle (RJV)
+*     11 dec 95: V2.0-0  GUI version (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -30,6 +31,7 @@
       PARAMETER (PI=3.14159265,DTOR=PI/180.0)
 *    Local variables :
       CHARACTER*1 CH
+      CHARACTER*12 OPT
       REAL XCENT,YCENT
       REAL PXCENT,PYCENT
       REAL XEND,YEND
@@ -49,9 +51,11 @@
       INTEGER LS
       INTEGER L
       INTEGER FLAG
+      INTEGER OID,NB
+      LOGICAL PLOT
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISLICE Version 1.8-1')
+      PARAMETER (VERSION = 'ISLICE Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -63,6 +67,22 @@
         CALL MSG_PRNT('AST_ERR: no image being displayed')
 
       ELSE
+
+*  if run from GUI - is plot required
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
+          CALL NBS_GET_CVALUE(OID,0,OPT,NB,STATUS)
+*  GUI is plotting externally - so no plot here
+          IF (OPT(1:1).EQ.'E') THEN
+            PLOT=.FALSE.
+          ELSE
+            PLOT=.TRUE.
+          ENDIF
+
+        ELSE
+          PLOT=.TRUE.
+        ENDIF
+
 
 *  ensure transformations correct
         CALL GTR_RESTORE(STATUS)
@@ -243,12 +263,20 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         CALL GCB_SETL('POLY_FLAG',.FALSE.,STATUS)
         CALL GCB_SETL('POINT_FLAG',.FALSE.,STATUS)
 
-        CALL IMG_PLOT(STATUS)
+        IF (PLOT) THEN
+          CALL IMG_PLOT(STATUS)
 
 *  flag current plotting status
-        I_DISP_1D=.TRUE.
-        I_DISP=.FALSE.
-        I_CLEAR=.FALSE.
+          I_DISP_1D=.TRUE.
+          I_DISP=.FALSE.
+          I_CLEAR=.FALSE.
+        ELSE
+*  if not plotting then resynchronise GCBs
+          I_DISP_1D=.TRUE.
+          CALL IMG_2DGCB(STATUS)
+          I_DISP_1D=.FALSE.
+        ENDIF
+
 
       ENDIF
 

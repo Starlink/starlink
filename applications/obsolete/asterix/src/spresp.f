@@ -407,6 +407,7 @@
       SPARR(1) = (0.0-DY*DIMS(2))/TOR
       SPARR(2) = DY/TOR
       CALL BDI_AXPUT1R( BIID, 2, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT0C( BIID, 2, 'Units', UNITS, STATUS )
 
       IF ( RADIAL ) THEN
         CALL BDI_AXPUT0C( BIID, 3, 'Label', 'Off-axis angle', STATUS )
