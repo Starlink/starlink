@@ -17,29 +17,31 @@
 #     made however, and the resulting file will need some edits to be
 #     made by hand.
 #
-#  *  The changes it attempts to make are as follows:
-#  *     - Add comment blocks describing the two new values of SYSTEM
-#  *     - Modify the comment describing the default value of CFLAGS
-#  *     - Add a comment describing the INTEGER8 environment variable
-#  *     - Export the INTEGER8 environment variable
-#  *     - Modify SYSTEM-specific settings for existing SYSTEMs
-#  *     - Add support for the two new SYSTEMs 
-#  *
-#  *  If it is unable to make any of the modifications it would like to,
-#  *  it will print an explanatory message saying what it could not do.
-#  *
-#  *  The only change which might be required which this script does not
-#  *  make is to set values for the SOURCE_VARIANT variable.  Depending
-#  *  on how the system-specific compilation is going to be done, it 
-#  *  may be desirable to add SOURCE_VARIANT='alpha_OSF1' in the new 
-#  *  alpha_OSF1_64 stanza, and SOURCE_VARIANT='sun4_Solaris' in the 
-#  *  new sun4_Solaris_64 stanza.  If required, this must be done by hand.
-#  *
-#  *  This script is not extremely intelligent - unless the mk file
-#  *  follows the usual pattern quite closely, the output may be in
-#  *  error, or complete rubbish.  It is intended as a convenience, 
-#  *  and if it does not work, then it will be necessary to make the
-#  *  modifications by hand; this is not too arduous.
+#     The changes it attempts to make are as follows:
+#        - Add ' -DINT_BIG=int' to the default CFLAGS macro
+#        - Add 'INTEGER8 = INTEGER' default macro setting
+#        - Add definition of the REPLACE_INTEGER8 macro
+#        - Add a rule for extracting Fortran source files from source archive
+#        - Add code for recording the INTEGER8 macro in the datestamp file
+#   
+#     If it is unable to make any of the modifications it would like to,
+#     it will print an explanatory message saying what it could not do.
+#
+#     Various changes will still need to be made by hand after generating
+#     a new makefile by running this script.  The principal one is 
+#     splitting files between Fortran and non-Fortran ones, so that the
+#     non-Fortran files can be extracted using the old rule, but the
+#     Fortran files can be extracted using the new rule inserted by this
+#     script (the dummy target '$(FORTRAN_FILES)' is written as a 
+#     placeholder for these files).  This may require splitting up 
+#     existing macros, for instance splitting PRIVATE_INCLUDES into 
+#     PRIVATE_C_INCLUDES and PRIVATE_F_INCLUDES.
+#   
+#     This script is not extremely intelligent - unless the makefile
+#     follows the usual pattern quite closely, the output may be in
+#     error.  It is strongly advised that the input and output are
+#     compared using diff.  If there are problems, it may be necessary
+#     to make the modifications by hand; this is not too arduous.
 #
 #  Authors:
 #     MBT: Mark Taylor (Starlink)
@@ -100,7 +102,7 @@
          s{
             ( \n   \ *  CFLAGS  [\t\ ]*  =  .*  )
          }{
-            $1 . "-DINT_BIG=int"
+            $1 . " -DINT_BIG=int"
          }ex;
 
 #  Add the replacement text for Fortran INTEGER * 8 type.
@@ -109,7 +111,7 @@
          s{ 
             ( \n FFLAGS  [\t\ ]* = .*?  \n )  ( \# ) 
          }{
-            $1 . "\n" .
+            $1 .
             "\#  Default replacement text for Fortran INTEGER * 8 type.\n\n" .
             "INTEGER8 = INTEGER\n\n" .
             $2
@@ -117,6 +119,7 @@
 
 #  Add the macro for replacing INTEGER * 8 declarations.
       $done{ "Add definition of REPLACE_INTEGER8 macro" } =
+      $makefile =~
          s{
             ( \n \ * \n  \#  \ *   Rules\ for\ extracting\   [^\n]*  \n \ * \n )
             ( .*? \n ) ( \ * \n )
@@ -125,7 +128,7 @@
             my( $extract ) = $2;
             my( $comm_f ) = "";
             my( $extract_f ) = "";
-            if ( $extract =~ s{\$\(TAR_OUT\).*\$\@ *$\n} ) {
+            if ( $extract =~ /\$\(TAR_OUT\).*\$\@ *\n/ ) {
                $comm_f = $comm;
                $comm_f =~ s/source files/Fortran source files/;
                $extract_f = 
@@ -133,10 +136,9 @@
                   "\tif test \$(INTEGER8); then \\\n" . 
                   "           \$(REPLACE_INTEGER8) < \$\@ > \$\@_tmp; \\\n" .
                   "           mv \$\@_tmp \$\@; \\\n" .
-                  "        else :; fi\n" .
-                  "\n";
+                  "        else :; fi\n";
                $extract_f =~ s/^\n*//;
-               $extract_f =~ s/^([^\t].*\n)*/\$(FORTRAN_FILES):/;
+               $extract_f =~ s/^([^\t].*\n)*/\$(FORTRAN_FILES):\n/;
                $done{ "Add rule for extracting Fortran source files" } = 1;
             }
             else {
@@ -145,10 +147,10 @@
 
             "\n\n" .
             "\#  Macro for filter to replace INTEGER * 8 declarations" .
-                                           " with INTEGER8\n\n" .
+                                           " with INTEGER8.\n\n" .
             "REPLACE_INTEGER8 = sed \\\n" .
             '   "s/^[ \t]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr] *\* *8' .
-                                           '/      $(INTEGER8)/"' . "\n\n" .
+                                           '/      $(INTEGER8)/"' .
             $comm . $extract .
             $comm_f . $extract_f
             ;
@@ -157,6 +159,7 @@
 
 #  Add the code for recording INTEGER8 macro in datestamp file.
       $done{ "Add @ echo '   INTEGER8: \$(INTEGER8)  >>\$(DATE_STAMP)" } =
+      $makefile =~
          s{
             ( \n  \t  @?  \ *  echo  .*   \$\(LINK\) .*  >>\ *\$\(DATE_STAMP\) )
          }{
@@ -164,9 +167,7 @@
             "\n\t@ echo '   INTEGER8: \$(INTEGER8)'     >>\$(DATE_STAMP)"
          }ex;
 
-
-
-#  Output the remainder of the modified text.
+#  Output the modified text.
       print $makefile;
 
 #  Record any parts of the process which didn't get done.
@@ -176,6 +177,7 @@
          push( @undone, $task ) unless ( $success );
       }
       if ( @undone ) {
+         print( STDERR "\n" );
          print( STDERR join( "\n      ", 
                              "The following edits could not be made:",
                              @undone ),
@@ -183,13 +185,15 @@
       }
 
 #  Reminder that hand editing is required.
+      print( STDERR "\n" );
       print( STDERR join( "\n      ",
             "The following must still be done:",
-            "Extract Fortran files using new extraction rule.",
-            "Locate any other extractions of Fortran files from archives.",
-            "Add new include files and dependencies if required.",
-            "Check private archive-building type targets which may be broken.",
+            "Extract Fortran files using new extraction rule",
+            "Locate any other extractions of Fortran files from archives",
+            "Add new include files and dependencies if required",
+            "Check private archive-building type targets which may be broken",
          ), "\n" );
+      print( STDERR "\n" );
         
 
 # $Id$
