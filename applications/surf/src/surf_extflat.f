@@ -27,14 +27,14 @@
 *     responsivities.
 
 *  Usage:
-*     extract_flat in out
+*     extract_flat in file
 
 *  ADAM parameters:
 *     IN = NDF (Read)
 *        The name of the NDF containing the demodulated data with the
 *        required flatfield.
 *     MSG_FILTER = CHAR (Read)
-*         Message filter level. Default is NORM.
+*         Message filter level. Default is NORM. There are no verbose messages.
 *     FILE = FILE (Write)
 *        The name of the ascii file to which the flatfield information
 *        will be written
@@ -54,6 +54,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1997/12/01 02:01:30  timj
+*     Update documentation
+*
 *     Revision 1.2  1997/10/28 03:08:37  timj
 *     Tidy up header.
 *
