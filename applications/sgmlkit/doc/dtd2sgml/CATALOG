@@ -1,0 +1,4 @@
+	-- custom CATALOG to link versionless pub-id in
+	   starlink-everything.dtd to a DTD file --
+
+PUBLIC "-//Starlink//DTD Starlink General//EN"		../../dtd/starlink-0.5.dtd
