@@ -494,11 +494,6 @@
       DOUBLE PRECISION FORVAL( CCD1__MTRNP ) ! Forward general coefficients
       DOUBLE PRECISION IDEN( 6 ) ! Identity transformation
       DOUBLE PRECISION INVVAL( CCD1__MTRNP ) ! Inverse general coefficients
-      DOUBLE PRECISION MATRIX( 4 ) ! Transformation matrix
-      DOUBLE PRECISION PIA( 2 ) ! First point initial position for WinMap defn
-      DOUBLE PRECISION PIB( 2 ) ! Second point initial position for WinMap defn
-      DOUBLE PRECISION POA( 2 ) ! First point final position for WinMap defn
-      DOUBLE PRECISION POB( 2 ) ! Second point final position for WinMap defn
       DOUBLE PRECISION RMS      ! Root mean square difference in fitted lists and reference list
       DOUBLE PRECISION TOLER    ! Tolerance in RMS devations
       DOUBLE PRECISION TR( 6, CCD1__MXLIS ) ! The transformation coefficients
@@ -530,10 +525,7 @@
       INTEGER JPIX              ! Index of Pixel domain frame in frameset
       INTEGER JREG              ! Index of CCD_Reg domain frame in frameset
       INTEGER MAP               ! AST pointer for mapping
-      INTEGER MAPCMP            ! AST pointer for combined map
-      INTEGER MAPMX             ! AST pointer for matrix map
       INTEGER MAPTFM            ! AST pointer for Pixel - CCD_Reg mapping
-      INTEGER MAPTR             ! AST pointer for translational map
       INTEGER MAXIN             ! Maximum number of input lists
       INTEGER MININ             ! Minimum number of input lists
       INTEGER NCLASS            ! Number of classifications
@@ -870,34 +862,7 @@
 
 *  Generate a mapping representing the non-translational parts of the
 *  linear transformation.
-                     MATRIX( 1 ) = TR( 2, I )
-                     MATRIX( 2 ) = TR( 3, I )
-                     MATRIX( 3 ) = TR( 5, I )
-                     MATRIX( 4 ) = TR( 6, I )
-                     MAPMX = AST_MATRIXMAP( 2, 2, 0, MATRIX, ' ', 
-     :                                      STATUS )
-
-*  Generate a mapping representing the translational parts of the 
-*  linear transformation.
-                     PIA( 1 ) = 0D0
-                     PIA( 2 ) = 0D0
-                     PIB( 1 ) = 1D0
-                     PIB( 2 ) = 1D0
-                     POA( 1 ) = TR( 1, I )
-                     POA( 2 ) = TR( 4, I )
-                     POB( 1 ) = TR( 1, I ) + 1D0
-                     POB( 2 ) = TR( 4, I ) + 1D0
-                     MAPTR = AST_WINMAP( 2, PIA, PIB, POA, POB, ' ',
-     :                                   STATUS )
-
-*  Combine the translational and non-translational mappings to generate
-*  a single one which represents the whole linear transformation.
-                     MAPCMP = AST_CMPMAP( MAPMX, MAPTR, .TRUE., ' ',
-     :                                    STATUS )
-
-*  Have a go at simplifying the combined mapping (one or other of the 
-*  translational or non-translational parts may be Unit).
-                     MAPTFM = AST_SIMPLIFY( MAPCMP, STATUS )
+                     CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
 
 *  Get the Pixel domain frame and its index in the WCS component.
                      CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )

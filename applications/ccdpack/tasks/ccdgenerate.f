@@ -192,8 +192,6 @@
       INTEGER IPYT              ! Pointer to transformed Y positions
       INTEGER IWCS              ! AST pointer to WCS component
       INTEGER JPIX              ! Index of PIXEL domain frame in frameset
-      INTEGER MAPMX             ! AST pointer to matrix mapping
-      INTEGER MAPTR             ! AST pointer to translation mapping
       INTEGER MAPTFM            ! AST pointer to mapping between domains
       INTEGER NCHAR             ! Number of characters returned
       INTEGER NERR              ! Number of numeric errors
@@ -209,13 +207,9 @@
       DOUBLE PRECISION ANGLE( CCD1__MXNDF ) ! Orientation of output frames
       DOUBLE PRECISION ANGLR    ! Orientation of current frame in radians
       DOUBLE PRECISION DEGRA    ! Degrees - Radians conversion factor
-      DOUBLE PRECISION MATRIX( 4 ) ! Transformation matrix
       DOUBLE PRECISION ORG( 2 * CCD1__MXNDF ) ! Origin coords for output frames
-      DOUBLE PRECISION PIA( 2 ) ! First point initial position for WinMap defn
-      DOUBLE PRECISION PIB( 2 ) ! Second point initial position for WinMap defn
-      DOUBLE PRECISION POA( 2 ) ! First point final position for WinMap defn
-      DOUBLE PRECISION POB( 2 ) ! Second point final position for WinMap defn
       DOUBLE PRECISION PI       ! Pi
+      DOUBLE PRECISION TR( 6 )  ! Coefficients for linear transformation
 
 *  Local data. This names follow the ING/WHT convention.
 
@@ -377,26 +371,18 @@
      :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
 
+*  Generate mapping into image generation frame.
+         ANGLR = DEGRA * ANGLE( I )
+         TR( 1 ) = ORG( 2 * I - 1 )
+         TR( 4 ) = ORG( 2 * I )
+         TR( 2 ) = COS( ANGLR )
+         TR( 3 ) = SIN( ANGLR )
+         TR( 5 ) = - SIN( ANGLR )
+         TR( 6 ) = COS( ANGLR )
+         CALL CCD1_LNMAP( TR, MAPTFM, STATUS )
+
 *  Modify WCS component.
          CALL CCD1_GTWCS( IDO, IWCS, STATUS )
-         ANGLR = DEGRA * ANGLE( I )
-         MATRIX( 1 ) = COS( ANGLR )
-         MATRIX( 2 ) = SIN( ANGLR )
-         MATRIX( 3 ) = - SIN( ANGLR )
-         MATRIX( 4 ) = COS( ANGLR )
-         MAPMX = AST_MATRIXMAP( 2, 2, 0, MATRIX, ' ', STATUS )
-
-         PIA( 1 ) = 0D0
-         PIA( 2 ) = 0D0
-         PIB( 1 ) = 1D0
-         PIB( 2 ) = 1D0
-         POA( 1 ) = ORG( 2 * I - 1 )
-         POA( 2 ) = ORG( 2 * I )
-         POB( 1 ) = ORG( 2 * I - 1 ) + 1D0
-         POB( 2 ) = ORG( 2 * I ) + 1D0
-         MAPTR = AST_WINMAP( 2, PIA, PIB, POA, POB, ' ', STATUS )
-
-         MAPTFM = AST_CMPMAP( MAPMX, MAPTR, .TRUE., ' ', STATUS )
          FRGEN = AST_FRAME( 2, 'Domain=CCD_GEN', STATUS )
          CALL AST_SETC( FRGEN, 'Title', 
      :                  'Alignment of CCDGENERATE test data', STATUS )
