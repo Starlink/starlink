@@ -47,6 +47,7 @@
 * SKL@JACH  24thFeb94 : Added ROPARS and RONEXT
 * SKL@JACH  25thJul94 : Removed 'value' from action arguments, errors
 *                       reported using ERR_ system within routines 
+* TIMJ@JACH 11Aug2004 : Use ADAM_DEFNS
 * Endhistory
 *
 * Type Definitions
@@ -55,8 +56,7 @@
 * Global constants :
         include 'SAE_PAR'
         INCLUDE 'PAR_PAR'               ! Necessary for non-VMS
-        INCLUDE 'ADAMDEFNS'
-        INCLUDE 'ADAMERRS'
+        INCLUDE 'ADAM_DEFNS'
         INCLUDE 'ACT_ERR'
         INCLUDE 'NDF_PAR'
         INCLUDE 'NDF_ERR'
@@ -103,7 +103,7 @@
 * =========================================================================
 *
 * check status for ok value
-        IF ( STATUS .NE. ADAM__OK ) THEN
+        IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'ERR', 'Error : PLT2D On entry', STATUS )
           CALL ERR_FLUSH( STATUS )
           RETURN
