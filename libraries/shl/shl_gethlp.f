@@ -13,6 +13,12 @@
 *     CALL SHL_GETHLP( HELPLB, KEYWRD, STATUS )
 
 *  Arguments:
+*     HELPLB = CHARACTER (Given)
+*        Name of help file to open. See SHL_TRNVAR in order to
+*        obtain this filename from an environment variable.
+*     KEYWRD = CHARACTER (Given)
+*        Keyword to use to search help system. Space separated
+*        hierarchy. Can be blank.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -156,7 +162,7 @@
          CALL MSG_SETC( 'LIB', HELPLB )
          STATUS = SAI__ERROR
          CALL ERR_REP( 'SHL_GETHLP_ERR',
-     :     'Error accessing help on topic ^TOPIC in library ^LIB. '/
+     :     'Error accessing help on topic \'^TOPIC\' in library ^LIB. '/
      :     /'Reason was "^ERR". ', STATUS )
       END IF
 
