@@ -1080,8 +1080,8 @@ static int ConStart( const char *text, double *val, int *nc ) {
 *        The text to check.
 *     val
 *        Address of a double to receive any numerical constant read
-*        from the start of the string. Supplied value is unchanged on
-*        exit if the string does not start with a numerical constant.
+*        from the start of the string. Unity is returned if the string 
+*        does not start with a numerical constant.
 *     nc
 *        Address of an int to receive the number of characters used to
 *        create the value returned in "val". Zero is returned if the
@@ -1094,17 +1094,14 @@ static int ConStart( const char *text, double *val, int *nc ) {
 
 /* Local Variables: */
    int result;
-   double val0;
    const char *c;
 
-/* initialise */      
+/* Initialise */      
    *nc = 0;
+   *val = 1.0;
 
 /* Return zero if no text was supplied */
    if( !text ) return 0;
-
-/* Save the supplied value so it can be reinstated later if necessary. */
-   val0 = *val;
 
 /* Use sscanf to see if the string begin with a numerical constant */
    result = astSscanf( text, "%lf%n", val, nc );
@@ -1117,7 +1114,7 @@ static int ConStart( const char *text, double *val, int *nc ) {
       if( *c == 'n' || *c == 'N' ) {
          result = 0;
          *nc = 0;
-         *val = val0;       
+         *val = 1.0;
       }
    }
 
