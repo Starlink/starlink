@@ -97,7 +97,8 @@ the diytopic elements, which are formatted together.
 types.
 <codebody>
 (define %display-programcode-elements%
-  '("description"
+  '("purpose"
+    "description"
     "invocation"
     "argumentlist"			;shouldn't have both argumentlist
     "parameterlist"			;and parameterlist in same prologue
