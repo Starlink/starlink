@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 #ifndef INPUT_BYTE_STREAM_HEADER_READ
 #define INPUT_BYTE_STREAM_HEADER_READ 1
 
@@ -11,7 +14,7 @@ class InputByteStream {
     signed int getSIU(int);
     signed int getSIS(int);
     unsigned int getUIU(int);
-    const Byte *getBlock (unsigned int);
+    const Byte *getBlock (unsigned int pos, unsigned int len);
     void seek (unsigned int);
     unsigned int pos ();
     void skip (unsigned int);
