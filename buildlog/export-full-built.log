@@ -415,7 +415,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jun 13, 2003 4:36:02 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 14, 2003 4:35:10 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -876,8 +876,8 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java:43: warning - Tag @link: reference not found: uk.ac.starlink.hds.NDFNdxHandler
-  [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java:43: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsNdxHandler
+  [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java:44: warning - Tag @link: reference not found: uk.ac.starlink.hds.NDFNdxHandler
+  [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java:44: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsNdxHandler
   [javadoc] Generating /apps/cvsbuild/java/source/ndx/docs/ndx/javadocs/stylesheet.css...
   [javadoc] 2 warnings
 
@@ -3362,4 +3362,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 48 seconds
+Total time: 4 minutes 49 seconds
