@@ -240,13 +240,13 @@ c$$$      endif
       
 *   Sanity-check the parameters.  Are these all the checks we need?
       if (nsour .lt. 1 .or. upix .lt. 1 .or. upix .lt. p+1) then
+         status = sai__error
          call msg_seti ('NSOUR', nsour)
          call msg_seti ('UPIX', upix)
          call msg_seti ('P', p)
-         call msg_out (' ', 'Sanity-check failed: '//
+         call err_rep (' ', 'Sanity-check failed: '//
      :        'crazy input parameters: nsour=^NSOUR, upix=^UPIX'//
      :        ', p=^P', status)
-         status = sai__error
          goto 999
       endif
       
@@ -281,6 +281,8 @@ c$$$      endif
       if (status .ne. sai__ok) then
          gau2par(gau2status) = gau2memory
          status = sai__error
+         call err_rep (' ', 'Could not allocate memory for image',
+     :        status)
          goto 998
       endif
 
@@ -478,6 +480,7 @@ c$$$      endif
       real driftmetric, gau2_drift
       
       character *(80)line       ! output line
+      character *(80)errmsg     ! error message
       integer nchar             ! running line length
 
       if (status .ne. sai__ok) return
@@ -526,6 +529,8 @@ c$$$      endif
             
             gau2par(gau2status) = gau2drifted
             status = sai__error
+            call err_rep (' ','gaufit: solution has drifted too far',
+     :           status)
             keeplooping = .false.
 
          else if (iv(1).eq.1) then
@@ -571,15 +576,21 @@ c$$$      endif
                gau2par(gau2xstatus) = iv(1) ! for reference
             else if (iv(1) .eq. 7 .or. iv(1) .eq. 8) then
                gau2par(gau2status) = gau2noconv
+               errmsg = 'gaufit: convergence tests failed in NSG'
             else if (iv(1) .eq. 9 .or. iv(1) .eq. 10) then
                gau2par(gau2status) = gau2maxiter
                gau2par(gau2xstatus) = iv(18) ! pass back the iteration limit
+               errmsg = 'gaufit: too many iterations in NSG'
             else
                gau2par(gau2status) = gau2unkerror ! odd...
                gau2par(gau2xstatus) = iv(1)
+               errmsg = 'gaufit: unknown error in NSG'
             endif
             
-            if (gau2par(gau2status) .ne. 0) status = sai__error
+            if (gau2par(gau2status) .ne. 0) then
+               status = sai__error
+               call err_rep (' ',errmsg,status)
+            endif
 
          endif
 
@@ -872,6 +883,7 @@ c$$$      endif
       if (status .ne. sai__ok) then
          gau2par(gau2status) = gau2memory
          status = sai__error
+         call err_rep (' ','gaufit: error freeing memory',status)
       endif
       
       end
@@ -1141,6 +1153,7 @@ c$$$      endif
          gau2par(gau2status) = gau2code
          gau2par(gau2xstatus) = 2
          status = sai__error    ! so we jump out
+         call err_rep (' ','gaufit: coding error (2)',status)
          goto 999
       endif
       
@@ -1240,6 +1253,7 @@ c$$$      endif
          gau2par(gau2status) = gau2code
          gau2par(gau2xstatus) = 1
          status = sai__error
+         call err_rep (' ','gaufit: coding error (1)',status)
 
       else
 
