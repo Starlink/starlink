@@ -1495,13 +1495,13 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         IF ( STATUS .NE. SAI__OK ) THEN
 
           CALL ERR_ANNUL( STATUS )
-          RCLO = 0
-          IF ( AS_INSTR(SLOT) = 'SIS' ) THEN
-            RCHI = 4095
+          RCLO = 0.0
+          IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
+            RCHI = 4095.0
           ELSE
-            RCHI(SLOT) = 1023
+            RCHI = 1023.0
           END IF
-          CALL MSG_SETI( 'TOP', RCHI(SLOT) )
+          CALL MSG_SETI( 'TOP', RCHI )
           CALL MSG_PRNT( 'Error reading raw channel bounds, '/
      :                 /'assuming 0..^TOP' )
         END IF
