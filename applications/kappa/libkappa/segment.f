@@ -171,10 +171,11 @@
 *        Each of the parameters POLY1 to POLY20 are used to access text
 *        files containing the x-y co-ordinates of the vertices of a
 *        single polygon.  If a value is assigned to POLY1 on the
-*        command line then only a single polygonal segment is copied,
-*        and you are not prompted for any of the remaining parameters
-*        in this group.  Otherwise, you are prompted for POLY1, then
-*        POLY2, etc. until a null value is given or POLY20 is reached.
+*        command line, you are not prompted for any of the remaining
+*        parameters in this group; additional polygon files must also
+*        be supplied on the command line.  Otherwise, you are prompted
+*        for POLY1, then POLY2, etc. until a null value is given or
+*        POLY20 is reached.
 *     QUALITY = _LOGICAL (Read)
 *        If a TRUE value is supplied for parameter QUALITY then quality
 *        information is copied from the input NDFs to the output NDFs.
@@ -264,6 +265,10 @@
 *        Added headings to the commentary.  Made the non-warning
 *        messages conditional.  Used AGI_BEGIN/END to delimit picture
 *        processing.
+*     1997 July 11 (MJC):
+*        When POLY1 is given on the command line in file mode, it is
+*        now possible to supply additional polygons through parameters
+*        POLY2-POLY20 also given on the command line.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -369,6 +374,7 @@
       INTEGER SUBND( IDIM )      ! Upper bounds of axes spanning polygon
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of the output NDF
       LOGICAL UNIT               ! Does AGI give a unit transformation?
+      LOGICAL USE                ! Use the current polygon?
       CHARACTER * ( GNS__SZKEY ) WKCLAS ! Workstation class
       REAL WX( 4 )               ! World x co-ordinates
       REAL WY( 4 )               ! World y co-ordinates
@@ -824,9 +830,16 @@
       IF ( MODE .EQ. 'FILE' ) THEN
          CALL PAR_STATE( 'POLY1', PSTATE, STATUS )
          LOOP = PSTATE .NE. PAR__ACTIVE
+
       ELSE
          LOOP = .TRUE.
       END IF
+
+*  Decides whether to process the first polygon (when given on the
+*  command line), or all polygons otherwise.  For command-line use
+*  this flag will change depending on whether or not the polygon file
+*  is supplied on the command line or not.
+      USE = .TRUE.
 
 *  Obtain space to store the polygons.
 *  ===================================
@@ -914,7 +927,7 @@
 *  Initialise the number of polygons inserted into the mask so far.
       NPOLY = 0
 
-*  Arrive here when a new polygon is to be addded to the mask.
+*  Arrive here when a new polygon is to be added to the mask.
    10 CONTINUE
 
 *  Abort if an error has occurred.
@@ -933,14 +946,23 @@
          LPNAME = 4
          CALL CHR_PUTI( NPOLY + 1, PNAME, LPNAME )
 
+*  In no-prompt mode (i.e. when POLY1 is supplied on the command line)
+*  check when the next polygon is supplied there too.
+         IF ( NPOLY .GT. 0 .AND. .NOT. LOOP ) THEN
+            CALL PAR_STATE( PNAME( :LPNAME ), PSTATE, STATUS )
+            USE = PSTATE .EQ. PAR__ACTIVE
+         END IF
+
 *  Obtain the co-ordinate list.  Pointers to workspace holding the x
 *  and y co-ordinate values are returned, together with the number of
 *  vertices in the polygon.  Co-ordinates are stored in single
 *  precision.
-         POSCOD( 1 ) = 1
-         POSCOD( 2 ) = 2
-         CALL KPG1_FLCOR( PNAME( : LPNAME ), IDIM, POSCOD, NVERT, IPXY,
-     :                    COLBND, COUBND, STATUS )
+         IF ( USE ) THEN
+            POSCOD( 1 ) = 1
+            POSCOD( 2 ) = 2
+            CALL KPG1_FLCOR( PNAME( :LPNAME ), IDIM, POSCOD, NVERT,
+     :                       IPXY, COLBND, COUBND, STATUS )
+         END IF
 
 *  Obtain the co-ordinates in the cursor mode.
 *  ===========================================
@@ -959,26 +981,28 @@
 
       END IF
 
+      IF ( USE ) THEN
+
 *  Validate the polygon.
 *  =====================
 
 *  If no valid polygon was obtained, check that the minimum number of
 *  polygons has been processed.  If not, warn the user, and go back for
 *  another polygon.
-      IF ( NVERT .EQ. 0 ) THEN
+         IF ( NVERT .EQ. 0 ) THEN
 
-         IF ( NPOLY .LT. MINPOL ) THEN
-            CALL MSG_BLANK( STATUS )
-            CALL MSG_SETI( 'MIN', MINPOL )
-            CALL MSG_OUT( 'SEGMENT_MSG4', 'Please give another '/
-     :        /'polygon (at least ^MIN must be given in total).',
-     :        STATUS )
-            CALL MSG_BLANK( STATUS )
-            GO TO 10
-         END IF
+            IF ( NPOLY .LT. MINPOL ) THEN
+               CALL MSG_BLANK( STATUS )
+               CALL MSG_SETI( 'MIN', MINPOL )
+               CALL MSG_OUT( 'SEGMENT_MSG4', 'Please give another '/
+     :           /'polygon (at least ^MIN must be given in total).',
+     :           STATUS )
+               CALL MSG_BLANK( STATUS )
+               GO TO 10
+            END IF
 
 *  If a valid polygon was obtained, process it.
-      ELSE
+         ELSE
 
 *  Unzip the co-ordinate array into x and y co-ordinate arrays.
 *  ============================================================
@@ -988,36 +1012,36 @@
 *  which are more work to maintain, or accept the differences and
 *  use the appropriate storage for the job in hand.   The latter
 *  approach is used.
-         IF ( MODE .EQ. 'FILE' .OR. MODE .EQ. 'INTERFACE' ) THEN
+            IF ( MODE .EQ. 'FILE' .OR. MODE .EQ. 'INTERFACE' ) THEN
 
 *  Get two work arrays to hold the x and y co-ordinates of the vertices.
-            CALL PSX_CALLOC( NVERT, '_REAL', IPX, STATUS )
-            CALL PSX_CALLOC( NVERT, '_REAL', IPY, STATUS )
+               CALL PSX_CALLOC( NVERT, '_REAL', IPX, STATUS )
+               CALL PSX_CALLOC( NVERT, '_REAL', IPY, STATUS )
 
 *  Split the 2-dimensional array into the x-y arrays.
-            CALL KPG1_UNZ2R( NVERT, %VAL( IPXY ), %VAL( IPX ),
-     :                       %VAL( IPY ), STATUS )
+               CALL KPG1_UNZ2R( NVERT, %VAL( IPXY ), %VAL( IPX ),
+     :                          %VAL( IPY ), STATUS )
 
 *  Free the original array.
-            CALL PSX_FREE( IPXY, STATUS )
-         END IF
+               CALL PSX_FREE( IPXY, STATUS )
+            END IF
 
 *  Log the current polygon and co-ordinates.
 *  =========================================
 
 *  Write a comment to the log file identifying the current polygon.
-         IF ( LOGPOS ) THEN
-            CALL FIO_WRITE( FD, '#', STATUS )
-            CALL MSG_SETI( 'NPOLY', NPOLY + 1 )
-            CALL MSG_LOAD( ' ', '# Polygon no: ^NPOLY', BUF, LBUF,
-     :                     STATUS )
-            CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
+            IF ( LOGPOS ) THEN
+               CALL FIO_WRITE( FD, '#', STATUS )
+               CALL MSG_SETI( 'NPOLY', NPOLY + 1 )
+               CALL MSG_LOAD( ' ', '# Polygon no: ^NPOLY', BUF, LBUF,
+     :                        STATUS )
+               CALL FIO_WRITE( FD, BUF( : LBUF ), STATUS )
 
 *  Write the positions in the input co-ordinate system to the log file.
-            CALL KPS1_LOGXY( FD, NVERT, %VAL( IPX ), %VAL( IPY ),
-     :                       STATUS )
+               CALL KPS1_LOGXY( FD, NVERT, %VAL( IPX ), %VAL( IPY ),
+     :                          STATUS )
 
-         END IF
+            END IF
 
 *  Convert data to world co-ordinates.
 *  ===================================
@@ -1027,42 +1051,43 @@
 *  precision (imposed by the cursor mode), the single-precision
 *  conversion is used.  Also this is probably adequate as we only want
 *  to find the next pixel.
-         IF ( COSYS .EQ. 'DATA' ) THEN
-            CALL KPG1_D2W2R( SCALE, OFFSET, NVERT, %VAL( IPX ),
-     :                       %VAL( IPY ), STATUS )
-         END IF
+            IF ( COSYS .EQ. 'DATA' ) THEN
+               CALL KPG1_D2W2R( SCALE, OFFSET, NVERT, %VAL( IPX ),
+     :                          %VAL( IPY ), STATUS )
+            END IF
 
 *  Add the current polygon it to the mask.
 *  =======================================
 
 *  Now insert this polygon into the mask.
-         CALL KPS1_PLMSK( NPOLY, SLBND( 1 ), SUBND( 1 ), SLBND( 2 ),
-     :                    SUBND( 2 ), NVERT, %VAL( IPX ), %VAL( IPY ),
-     :                    %VAL( IPMASK ), STATUS )
+            CALL KPS1_PLMSK( NPOLY, SLBND( 1 ), SUBND( 1 ), SLBND( 2 ),
+     :                       SUBND( 2 ), NVERT, %VAL( IPX ),
+     :                       %VAL( IPY ), %VAL( IPMASK ), STATUS )
 
 *  Release the workspace used to hold the co-ordinates of the polygon
 *  vertices.
-         CALL PSX_FREE( IPX, STATUS )
-         CALL PSX_FREE( IPY, STATUS )
+            CALL PSX_FREE( IPX, STATUS )
+            CALL PSX_FREE( IPY, STATUS )
 
 *  Decide whether to loop or not.
 *  ==============================
 
 *  Increment the number of polygons in the mask.
-         NPOLY = NPOLY + 1
+            NPOLY = NPOLY + 1
 
 *  If more polygons are to be defined, tell the user which polygon has
 *  just been processed.
-         IF ( LOOP ) THEN
-            CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
-            CALL MSG_SETI( 'NPOLY', NPOLY )
-            CALL MSG_OUTIF( MSG__NORM, 'SEGMENT_MSG5', 'Polygon '/
-     :                      /'number ^NPOLY done.', STATUS )
+            IF ( LOOP ) THEN
+               CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+               CALL MSG_SETI( 'NPOLY', NPOLY )
+               CALL MSG_OUTIF( MSG__NORM, 'SEGMENT_MSG5', 'Polygon '/
+     :                         /'number ^NPOLY done.', STATUS )
+            END IF
 
 *  If the maximum number of polygons has not yet been reached loop back
 *  to process another polygon.
             IF ( NPOLY .LT. MAXPOL ) GO TO 10
-      
+
          END IF
 
       END IF

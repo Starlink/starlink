@@ -26540,10 +26540,11 @@ POLY1-POLY20 = FILENAME (Read)
    Each of the parameters POLY1 to POLY20 are used to access text
    files containing the x-y co-ordinates of the vertices of a
    single polygon.  If a value is assigned to POLY1 on the
-   command line then only a single polygonal segment is copied,
-   and you are not prompted for any of the remaining parameters
-   in this group.  Otherwise, you are prompted for POLY1, then
-   POLY2, etc. until a null value is given or POLY20 is reached.
+   command line, you are not prompted for any of the remaining
+   parameters in this group; additional polygon files must also
+   be supplied on the command line.  Otherwise, you are prompted
+   for POLY1, then POLY2, etc. until a null value is given or
+   POLY20 is reached.
 3 QUALITY
 QUALITY = _LOGICAL (Read)
    If a TRUE value is supplied for parameter QUALITY then quality
@@ -26620,6 +26621,11 @@ MJC: Malcolm J. Currie (STARLINK)
     Added headings to the commentary.  Made the non-warning
     messages conditional.  Used AGI_BEGIN/END to delimit picture
     processing.
+
+ 1997 July 11 (MJC):
+    When POLY1 is given on the command line in file mode, it is
+    now possible to supply additional polygons through parameters
+    POLY2-POLY20 also given on the command line.
 2 Implementation_Status
    -  This routine will propagate VARIANCE component values so long
    as all supplied input NDFs have defined VARIANCE components, and
