@@ -425,7 +425,7 @@
          MAKEP = .TRUE.
 
 *  Set up the WCS information 
-         CALL NDF_PTWCS( IWCS, INDFI, STATUS )
+         CALL NDF_PTWCS( IWCS, INDFP, STATUS )
 
 *  Set the LABEL and TITLE in the output NDF to 'Percentage polarisation'.
          CALL NDF_CPUT( 'Percentage Polarisation', INDFP, 'LABEL',
@@ -466,7 +466,7 @@
          MAKET = .TRUE.
 
 *  Set up the WCS information 
-         CALL NDF_PTWCS( IWCS, INDFI, STATUS )
+         CALL NDF_PTWCS( IWCS, INDFT, STATUS )
 
 *  Set the LABEL and TITLE in the output NDF to 'Polarisation Angle'.
          CALL NDF_CPUT( 'Polarisation Angle', INDFT, 'LABEL', STATUS )
@@ -504,7 +504,7 @@
          MAKEIP = .TRUE.
 
 *  Set up the WCS information 
-         CALL NDF_PTWCS( IWCS, INDFI, STATUS )
+         CALL NDF_PTWCS( IWCS, INDFIP, STATUS )
 
 *  Set the LABEL and TITLE in the output NDF to 'Polarised Intensity'.
          CALL NDF_CPUT( 'Polarised Intensity', INDFIP, 'LABEL', STATUS )
