@@ -18,10 +18,14 @@
 *    Import-Export :
 *    Export :
 *    Status :
+*    Functions:
+      INTEGER CHR_LEN
 *    Local variables :
+      INTEGER L
       INTEGER ISTAT
 *-
       ISTAT=SAI__OK
-      CALL MSG_OUT(' ',STR,ISTAT)
+      L=CHR_LEN(STR)
+      CALL MSG_OUT(' ',STR(1:L),ISTAT)
 
       END
