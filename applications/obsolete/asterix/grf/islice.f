@@ -26,6 +26,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
       REAL PI,DTOR
       PARAMETER (PI=3.14159265,DTOR=PI/180.0)
@@ -48,9 +49,10 @@
       REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
       INTEGER WPNTR
       INTEGER LS
+      INTEGER L
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISLICE Version 1.8-0')
+      PARAMETER (VERSION = 'ISLICE Version 1.8-1')
 *-
       CALL USI_INIT()
 
