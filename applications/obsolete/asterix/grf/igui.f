@@ -113,6 +113,7 @@
         CALL NBS_BEGIN_DEFINITION(ID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'FLAG','_INTEGER',0,VAL__NBI,
      :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'OPTIONS','_CHAR',0,12,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'X','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'Y','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'RA','_CHAR',0,12,SID,STATUS)
@@ -129,10 +130,14 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'XPIX','_REAL',0,VAL__NBR,SID,
-     :                                                       STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'YPIX','_REAL',0,VAL__NBR,SID,
-     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'XP','_INTEGER',0,VAL__NBR,SID,
+     :                                                         STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'YP','_INTEGER',0,VAL__NBR,SID,
+     :                                                         STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'XPMAX','_INTEGER',0,VAL__NBR,SID,
+     :                                                         STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'YPMAX','_INTEGER',0,VAL__NBR,SID,
+     :                                                         STATUS)
         CNAME='DATA'
         DO I=1,9
           DO J=1,9
@@ -183,14 +188,20 @@
         CALL NBS_FIND_NOTICEBOARD(NAME,I_NBID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'FLAG',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',ITEMID,STATUS)
+        CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'X',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'Y',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'XPIX',ITEMID,STATUS)
-        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YPIX',ITEMID,STATUS)
-        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XP',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YP',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XPMAX',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YPMAX',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'RA',ITEMID,STATUS)
         CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'DEC',ITEMID,STATUS)
