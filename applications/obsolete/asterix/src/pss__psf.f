@@ -192,6 +192,7 @@
 *     19 Feb 92 : Tells user whether psf varies in idiot mode (DJA)
 *     11 Sep 92 : Writes extrema of accessed image area (DJA)
 *     10 Jul 93 : No longer uses inline functions (DJA)
+*     20 Nov 95 : Add support for specifying PSFPIX by percentage (DJA)
 *
 *    Type definitions :
 *
@@ -214,6 +215,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*80		PDATA			! PSFPIX response
       CHARACTER*80     		TEXT                    ! Output data
 
       REAL             		MAXOFF                  ! Maximum off-axis angle
@@ -298,12 +300,12 @@
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Set default at 68% radius
+*  Set default at 68% radius
       DO IPOS = 1, 3
         R68(IPOS) = MAX(1,NINT(PSF_PIXL(2,IPOS)))
       END DO
 
-*    Display table in expert mode
+*  Display table in expert mode
       IF ( CP_EXPERT ) THEN
 
         CALL MSG_PRNT( ' ' )
@@ -338,18 +340,47 @@
         END DO
         CALL MSG_PRNT( ' ' )
 
-*      Set default to 68% energy
-        CALL USI_DEF1I( 'PSFPIX', NIPOS, R68, STATUS )
+*    Set default to 68% energy
+        CALL USI_DEF0C( 'PSFPIX', '68%', STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Loop to get box spec
+*    Loop to get box spec
         GOT_RADII = .FALSE.
         DO WHILE ( (STATUS.EQ.SAI__OK) .AND. .NOT. GOT_RADII )
 
-*        Get list of radii
-          CALL USI_GET1I( 'PSFPIX', NIPOS, PSF_PPS, NUR, STATUS )
+*      Get PSFPIX specification
+          CALL USI_GET0C( 'PSFPIX', PDATA, STATUS )
           CALL USI_CANCL( 'PSFPIX', STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*      User supplied a percentage
+          PLEN = CHR_LEN( PDADTA )
+          IF ( PDATA(PLEN:PLEN) .EQ. '%' ) THEN
+            IF ( PDATA(1:PLEN-1) .EQ. '50' ) THEN
+              ILEV = 1
+            ELSE IF ( PDATA(1:PLEN-1) .EQ. '68' ) THEN
+              ILEV = 2
+            ELSE IF ( PDATA(1:PLEN-1) .EQ. '90' ) THEN
+              ILEV = 3
+            ELSE IF ( PDATA(1:PLEN-1) .EQ. '95' ) THEN
+              ILEV = 4
+            ELSE
+              STATUS = SAI__ERROR
+              CALL ERR_REP( ' ', 'Cannot translate ^P to radii, try '/
+     :                      /'one of 50%, 68%, 90% or 95%', STATUS )
+              GOTO 99
+            END IF
+            DO IPOS = 1, NIPOS
+              PSF_PPS(IPOS) = ABS(PSF_PIXL(ILEV,IPOS)
+            END DO
+            NUR = NIPOS
+
+          ELSE
+            CALL PRS_GETLIST_INT( PDATA(:PLEN), NIPOS, PSF_PPS, NUR,
+     :                            STATUS )
+          END IF
+          CALL USI_GET1I( 'PSFPIX', NIPOS, PSF_PPS, NUR, STATUS )
+	PRINT *,PSF_PPS
 
 *        Right number?
           IF ( NUR .NE. NIPOS ) THEN
