@@ -89,6 +89,20 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 \\setlength{\\parindent}{0mm}
 \\setlength{\\parskip}{\\medskipamount}
 \\setlength{\\unitlength}{1mm}
+<!-- Are we using pdftex?  This is the effective content of 
+     Heiko Oberdiek's ifpdf package. -->
+\\newif\\ifpdf % initially false
+\\ifx\\pdfoutput\\undefined
+\\else
+  \\ifx\\pdfoutput\\relax
+  \\else
+    \\ifcase\\pdfoutput
+    \\else
+      \\pdftrue
+    \\fi
+  \\fi
+\\fi
+<!-- Prepare to use @ in command names -->
 \\makeatletter
 <!-- Catcode all specials to other, and add discretionary hyphenation for
      dots and slashes within URLs and paths.  There's no need for any
