@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = sgs_link sgs_link_adam
+bin_SCRIPTS = sgs_link
 
 lib_LTLIBRARIES = libsgs.la
 
