@@ -746,7 +746,7 @@ int astIsA##class##_( const Ast##class *this ) { \
 \
 /* To test if the object is correctly constructed, we first test if it is a \
    member of the parent class. This improves the security of the test by \
-   checking the object structure from the base Object class downwards
+   checking the object structure from the base Object class downwards \
    (without this, the "magic numbers" that identify classes might be \
    encountered by accident or we might address parts of the Object which \
    don't exist). */ \
