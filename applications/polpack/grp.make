@@ -17,7 +17,9 @@ polpack_link_adam polpack_mon.f polpack_mon.ifl polpack_test polreg.f \
 polreg.ifl pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit \
 segment.f segment.ifl sread.f vertex.bit wrndf.f datapic.ifl polpack.c \
 gui.gif hlpcmd polmap.f polmap.ifl calpol.f calpol.ifl ndfac.f pol_cale.f \
-pol_calf.f pol_calp.f pol_calti.f
+pol_calf.f pol_calp.f pol_calti.f ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f \
+ccd1_skysr.f ccg1_cenr.f ccg1_cmltr.f ccg1_is2r.f ccg1_is3r.f ccg1_is4d.f \
+ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
