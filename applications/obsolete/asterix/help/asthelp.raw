@@ -8113,11 +8113,11 @@
     Hidden default 'TERMINAL'
  SLICE     -    CHAR        Description of data subset (range in
                             1st dimension {,range in 2nd
-                            dimension},{...}) eg. 5:10,1:5 for 2-D,
+                            dimension},{...}) eg. 5:10;1:5 for 2-D,
                             10:20 for 1-D. The range specifier for
                             each dimension follows the same
                             convention as the FORTRAN substring
-                            specifier so ":50" "20:" "5:10,:" are
+                            specifier so ":50" "20:" "5:10;:" are
                             all valid.
     Hidden default = *
  FMT       -   CHARACTER    FORTRAN format string
@@ -8134,7 +8134,7 @@
  Outputs the specified slice of a
  quality array in hex format to the printer<p>
  <exam>
- > hdisplay img.quality.quality dev=p slice=100:120,250:300 fmt=z1
+ > hdisplay img.quality.quality dev=p slice=100:120;250:300 fmt=z1
  </exam>
 
  Outputs the current HDS object to the terminal with page width 132<p>
