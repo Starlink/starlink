@@ -66,16 +66,22 @@ fi
 
 dnl    Determine whether the Fortran compiler supports the 'xxx'X notation
 dnl    for integers and reals.  The notation Z"xxx" is the one blessed
-dnl    by ISO-1539, but 'xxx'X hasn't caused problems so far.
+dnl    by ISO-1539, but (a) 'xxx'X hasn't caused problems so far, and
+dnl    (b) some compilers (for example g77 without the -ftypeless-boz
+dnl    option) parse the notation as an integer -- INTEGER(KIND=1) --
+dnl    rather than typeless), and (c) in any case ISO-1539 states
+dnl    that these boz-constants can appear only in DATA statements.
+dnl    If we can't use the 'xxx'X notation, we're therefore better
+dnl    off sticking to ordinary decimal notation.
 AC_CACHE_CHECK([whether ${FC} supports hex notation for numbers],
-               [ac_cv_fc_has_hex_numbers],
-               [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
+   [ac_cv_fc_have_hex_numbers],
+   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
       INTEGER I
       PARAMETER ( I = 'FF'X )
 ])],
-                                  ac_cv_fc_has_hex_numbers=yes,
-                                  ac_cv_fc_has_hex_numbers=no)])
-if test $ac_cv_fc_has_hex_numbers = yes; then
+        ac_cv_fc_have_hex_numbers=yes,
+        ac_cv_fc_have_hex_numbers=no)])
+if test $ac_cv_fc_have_hex_numbers = yes; then
     AC_DEFINE([FC_HAVE_HEX_NUMBERS], 1,
               [Define as 1 if the Fortran compiler supports 'xxx'X numbers])
 fi
@@ -87,7 +93,7 @@ dnl    section 4.3.1.  Unfortunately, the standard doesn't specify
 dnl    what these parameters are, other than that they are as
 dnl    returned by the KIND intrinsic function.  We'll test for _8 for
 dnl    integers, however, since that's the one we want to use.
-AC_CACHE_CHECK([Whether ${FC} supports type-kind notation],
+AC_CACHE_CHECK([whether ${FC} supports type-kind notation],
    [ac_cv_fc_type_kind],
    [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
       I=1_8
