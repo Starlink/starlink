@@ -1,7 +1,7 @@
 <!--
 
 Title:
-  Starlink General DTD: LaTeX stylesheet miscellaneous elements
+  Starlink General DTD: TeXML stylesheet miscellaneous elements
 
 Author:
   Norman Gray, Glasgow (NG)
