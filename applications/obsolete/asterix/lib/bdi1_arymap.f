@@ -101,6 +101,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
       CHARACTER*(DAT__SZLOC)	LOC
@@ -173,7 +174,15 @@
         CALL DAT_GET( LOC, HTYPE, 0, 0, DBUF, STATUS )
 
 *    Size in bytes of scalar
-        CALL DAT_PREC( LOC, SSIZE, STATUS )
+        IF ( HTYPE .EQ. '_DOUBLE' ) THEN
+          SSIZE = VAL__NBD
+        ELSE IF ( (HTYPE .EQ. '_UBYTE') .OR. (HTYPE .EQ. '_BYTE') ) THEN
+          SSIZE = VAL__NBB
+        ELSE IF ( (HTYPE .EQ. '_UWORD') .OR. (HTYPE .EQ. '_WORD') ) THEN
+          SSIZE = VAL__NBW
+        ELSE
+          SSIZE = VAL__NBR
+        END IF
 
 *    Fill mapped array with copies of scalar data
         IF ( ENELM .GT. NELM ) THEN
