@@ -142,7 +142,7 @@ in mode make-manifest-mode in sl.dsl
 			  attributes:
 			  (list (list "href" (string-append
 					      (idindex-sys-id)
-					      "#" (idindex-frag-id))))
+					      "#" idindex-frag-id)))
 			  (literal "ID index")))
 	      #f))
 	 (contentslist (if (or noteslist biblist updateslist idindex)
@@ -442,32 +442,50 @@ removed from it elements which are expensive to work with.
   (if (chunking?)
       (html-file uniq: "idindex")
       (html-file target_nd: (document-element))))
-(define (idindex-frag-id) "xref__IDINDEX")
-;; This function (make-idindex) seems to be taking an atrociously long
-;; time to run (294s runtime with `--jadeflags -Vsuppress-idindex' and
-;; 759s without), which I just don't understand -- what can be
-;; happening in there?  I thought it might be due to taking a long
-;; time to find routine elements cross-document, so had
-;; idindex-element-list consist of everything in target-element-list
-;; except "routine", but that didn't make any difference, so now the
-;; two are identical.  Tracing the output (by putting (debug)
-;; statements in the handlers in make-idindex-mode) suggests that
-;; every element in the idindex is taking a couple of seconds or so to
-;; process.  Bizarre!
+(define idindex-frag-id "xref__IDINDEX")
+
+;; The all-els variable in this function is bound to (select-by-class
+;; (descendants (getdocbody)) 'element), and the resulting node-list
+;; is processed by handlers which check whether (current-node) is a
+;; member of (idindex-element-list) .  It's very important that this
+;; is _not_ optimised to (node-list-filter-by-gi
+;; ... (idindex-element-list)).  You'd think that would be faster, but
+;; it seems to slow this function down by at least one order of
+;; magnitude (306s runtime in this version, and 759s in the old).
+;;
+;; I don't understand this -- what can be happening in there?  I
+;; thought it might be due to taking a long time to find routine
+;; elements cross-document, so had idindex-element-list consist of
+;; everything in target-element-list except "routine", but that didn't
+;; make any difference, so now the two are identical.  Tracing the
+;; output (by putting (debug) statements in the handlers in
+;; make-idindex-mode) suggests that every element in the idindex is
+;; taking a couple of seconds or so to process.  Bizarre!  Further
+;; experiments suggest that it's not some weird late-binding issue, as
+;; exactly the same seems to happen if you process the all-els
+;; node-list twice in succession with trivially different modes.  It
+;; does, however, appear to be linked to the size of the element in
+;; question, with elements which have more element content taking
+;; longer to process, even though I'd have thought that the
+;; node-list-filter-by-gi step would avoid this.
+;;
 (define (make-idindex)
   (if suppress-idindex
       (empty-sosofo)
-      (let ((body (let ((all-els (node-list-filter-by-gi
-				  (select-by-class (descendants (getdocbody))
-						   'element)
-				  (idindex-element-list))))
+      (let ((body (let (;(all-els (node-list-filter-by-gi
+			;	  (select-by-class (descendants (getdocbody))
+			;			   'element)
+			;	  (idindex-element-list)))
+			(all-els (select-by-class (descendants (getdocbody))
+						  'element)))
 		    (make sequence
 		      (make element gi: "h2"
 			    (make element gi: "a"
-				  attributes: (list (list "name" (idindex-frag-id)))
+				  attributes: `(("name" ,idindex-frag-id))
 				  (literal "ID Index")))
 		      (make element gi: "p"
-			    (literal "Index of IDs in this document.  Exported IDs indicated ")
+			    (literal "Index of IDs in this document. "
+				     "Exported IDs indicated ")
 			    (make element gi: "strong"
 				  (literal "like this.")))
 		      (with-mode make-idindex-mode
@@ -483,18 +501,18 @@ removed from it elements which are expensive to work with.
 (mode make-idindex-mode
   (default
     (let ((id (attribute-string (normalize "id") (current-node))))
-      (if id
+      (if (and (member (gi (current-node)) (idindex-element-list))
+	       id)
 	  (let* ((export (attribute-string (normalize "export")
 					   (current-node)))
-		 (format (if export "strong" "em"))
 		 (target (element-with-id id)))
 	    (make element gi: "p"
 		  (make sequence
-		    (make element gi: format
+		    (make element gi: (if export "strong" "em")
 			  (literal "<" (gi target) " id=")
 			  (make element gi: "a"
 				attributes:
-				(list (list "href" (href-to target)))
+				`(("href" ,(href-to target)))
 				(literal id)))
 		    (literal ">")
 		    (with-mode section-reference
@@ -503,29 +521,29 @@ removed from it elements which are expensive to work with.
 	  (empty-sosofo))))
   (element sect
     (let ((id (attribute-string (normalize "id") (current-node))))
-      (if id
+      (if (and (member (gi (current-node)) (idindex-element-list))
+	       id)
 	  (let* ((export (attribute-string (normalize "export")
 					   (current-node)))
-		 (format (if export "strong" "em"))
+		 ;(format (if export "strong" "em"))
 		 (target (element-with-id id)))
 	    (make sequence
 	      (make empty-element gi: "hr")
 	      (make element gi: "h3"
 		    (make sequence
-		      (make element gi: format
+		      (make element gi: (if export "strong" "em")
 			    (literal "<" "sect id=")
 			    (make element gi: "a"
-				  attributes:
-				  (list (list "href" (href-to target))
-					(list "name" (string-append
-						      "xref__IDINDEX_" id)))
+				  attributes: `(("href" ,(href-to target))
+						("name" ,(string-append
+							  idindex-frag-id
+							  "_" id)))
 				  (literal id)))
 		      (literal ">")
 		      (with-mode section-reference
 				 (process-node-list target))
 		      ))))
 	  (empty-sosofo)))))
-; nothing yet
 
 <codereference doc="lib.dsl" id="code.lib">
 <title>Library code
