@@ -35,14 +35,12 @@
 ^thirdparty/fsf/autoconf	mail -s "CVS commit: autotools" stardev@jiscmail.ac.uk, tow21@cam.ac.uk
 ^thirdparty/fsf		mail -s "CVS commit: autotools" stardev@jiscmail.ac.uk
 #
-^java/source/hdx	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
-^java/source/ndx	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/hds	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/util	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
-^java/source/ast	mail -s %1s M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
-^java			mail -s %1s ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
-^applications/autoastrom	mail -s %1s norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
-^applications/sgmlkit	mail -s %1s norman@astro.gla.ac.uk
-# CVS manual doesn't make it clear whether this %p inside quotes also
-# generates a separate argument.  So have to experiment.
+^java/source/hdx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
+^java/source/ndx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/hds	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/util	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
+^java/source/ast	mail -s "CVS commit: %p" M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk
+^java			mail -s "CVS commit: %p" ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
+^applications/autoastrom	mail -s "CVS commit: %p" norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
+^applications/sgmlkit	mail -s "CVS commit: %p" norman@astro.gla.ac.uk
 ^libraries/ast		mail -s "CVS commit: %p" dsb@ast.man.ac.uk norman@astro.gla.ac.uk
