@@ -5,7 +5,9 @@
 *    Bugs :
 *    Authors :
 *     rjv@star.sr.bham.ac.uk
+*     rb@star.sr.bham.ac.uk
 *    History :
+*     17 Jul 1997: Activate image processing system (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -26,7 +28,13 @@
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'ILOAD1D Version 2.2-0')
 *-
-      CALL USI_INIT()
+*  first invocation do global initialisation
+      IF (.NOT.I_OPEN) THEN
+        CALL AST_INIT()
+        I_BGM_ON = .FALSE.
+      ELSE
+        CALL USI_INIT()
+      ENDIF
 
       CALL MSG_PRNT(VERSION)
 
