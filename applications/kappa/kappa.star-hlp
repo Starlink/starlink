@@ -2153,14 +2153,12 @@ THRESH      - Edits an NDF such that array values below and above two
 3 Device_selection
 GDNAMES     - Shows which graphics devices are available.
 GDSET       - Selects a current graphics device.
-OVSET       - Selects a current image-display overlay.
 
 3 Display_control
 CURSOR      - Reports the co-ordinates of points selected using the
               cursor.
 GDCLEAR     - Clears a graphics device and purges its database entries.
 GDSTATE     - Shows the current status of a graphics device.
-OVCLEAR     - Clears an image-display overlay.
 
 3 Graphics_database
 PICBASE     - Selects the BASE picture from the graphics database.
@@ -3627,9 +3625,6 @@ Palette entry 0 is the background colour, and entries 1--5
 correspond to SGS pens or PGPLOT colour indices of the same number.
 By choosing a palette colour equal to the background colour,
 features may be `erased'.
-
-Note that X-windows overlays only have one colour, and so do not
-have a palette.
 
 1 COLLAPSE
 Reduce the number of axes in an N-dimensional NDF by compressing it
@@ -10597,7 +10592,7 @@ gdclear current
 gdclear xw
    Clears the xw device and purges its graphics database entries.
 2 Related_Applications
-   KAPPA: GDSET, GDSTATE, OVCLEAR.
+   KAPPA: GDSET, GDSTATE.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 2 History
@@ -13000,7 +12995,7 @@ There are also many applications for data visualisation:
   o creation, selection, saving and manipulation of colour tables and
     palettes (for axes, annotation, coloured markers and borders);
   o blinking and visibility of image-display planes; and
-  o line graphics: contouring, including overlay; columnar and
+  o line graphics: contouring; columnar and
     hidden-line plots of images; histogram; line plots of
     1-dimensional arrays, and multiple-line plot of images; pie
     sections and slices through an image; vector plot of image; all
@@ -13032,8 +13027,7 @@ Many applications handle all non-complex data types directly, for
 efficient memory and disc usage.  Those that do not will usually
 undergo automatic data conversion to produce the desired result.
 
-KAPPA's graphics are device independent.  X-windows and overlays are
-supported.
+KAPPA's graphics are device independent.  X-windows is supported.
 
 2 Requests
 KAPPA is continuing to be developed and additional applications
@@ -15685,12 +15679,7 @@ CURPIC = _LOGICAL (Read)
 3 DEVICE
 DEVICE = DEVICE (Read)
    The image-display device on which the colour table is to be
-   drawn.  The device must be in one of the following GNS
-   categories: IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or
-   WINDOW, and have at least 24 greyscale intensities or colour
-   indices.  It must also not reset when the device is opened
-   (since the colour table would be lost) unless parameter LUT
-   does not have the null value.  [Current image-display device]
+   drawn.  [Current image-display device]
 3 FRAME
 FRAME = LITERAL (Read)
    Specifies the co-ordinate Frame of the positions supplied using
@@ -20216,75 +20205,6 @@ DSB: David S. Berry (STARLINK)
   help        'This will become the new value for all pixels outside 
               the circle.  BAD gives the bad-pixel value.'
 
-1 OVCLEAR
-Clears an image-display overlay.
-
-Usage:
-
-   ovclear [device] [current]
-
-Description:
-
-   This application clears an overlay device, but without purging
-   the graphics-database entries for the device.  Optionally, only
-   the current picture is cleared.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 CURRENT
-CURRENT = _LOGICAL (Read)
-   If TRUE, then only the current picture is cleared. [FALSE]
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The graphics device to be cleared.  It must be in GNS classes
-   IMAGE_OVERLAY or WINDOW_OVERLAY. [Current image-display-overlay
-   device]
-2 Examples
-ovclear
-   Clears the current image-overlay device.
-
-ovclear current
-   Clears the current picture on the current image-overlay device.
-
-ovclear xoverlay
-   Clears the xoverlay device.
-2 Related_Applications
-   KAPPA: GDCLEAR, OVSET.
-2 Authors
-MJC: Malcolm J. Currie  (STARLINK)
-2 History
- 1992 November 30 (MJC):
-    Original version.
-1 OVSET
-Selects a current image-display overlay.
-
-Usage:
-
-   ovset device
-
-Description:
-
-   This application selects a current image-display overlay. This
-   device will be used for all applications requiring an
-   image-display overlay until changed explicitly.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The image-display overlay to become the current image-display
-   overlay device.  The device must be in GNS categories
-   IMAGE_OVERLAY or WINDOW_OVERLAY.
-2 Examples
-ovset xov
-   Makes the xov device the current image-display overlay.
-2 Authors
-MJC: Malcolm J. Currie  (STARLINK)
-2 History
- 1991 June 27 (MJC):
-    Original version.
-
- 1992 June 16 (MJC):
-    Made to work with WINDOW_OVERLAY class.  The restriction on the
-    number of colour indices has therefore been been relaxed.
 1 PALDEF
 Loads the default palette to a colour table.
 
@@ -20748,8 +20668,6 @@ defined.  The full list is given below.
 GLOBAL.COORD_SYSTEM     Current co-ordinate system.
 GLOBAL.DATA_ARRAY       Last NDF/foreign dataset accessed or written.
 GLOBAL.GRAPHICS_DEVICE  Current GKS workstation.
-GLOBAL.IMAGE_DISPLAY    Current image display (base).
-GLOBAL.IMAGE_OVERLAY    Current image-display overlay.
 GLOBAL.INTERACTIONMODE  Current interaction mode. 
 GLOBAL.LUT              Last lookup table file accessed or written. 
 GLOBAL.TRANSFORM        Current transformation structure.
@@ -20771,17 +20689,14 @@ GLOBALS task.  You can make them undefined using NOGLOBALS.
      ICL> globals
      The current data file                : @/home/dro/jkt/ccdpic
      The current graphics device is       : @ps_l
-     The current image-display device is  : @xwindows
-     The current image-display overlay is : <undefined>
      The current transformation is        : @/home/dro/deform/warpit
      The current interaction mode is      : <undefined>
      The current co-ordinate system is    : WORLD
 
 In the above example no interaction mode is defined.  The next time
 you call an application which uses the interaction mode you would be
-prompted for a value.   Likewise for the image-display overlay. 
-(Under normal circumstances you will not have to enter the @ prefix
-yourself.) 
+prompted for a value.   (Under normal circumstances you will not have 
+to enter the @ prefix yourself.) 
 
 2 Strings
 Notice that the single or double quotes around strings given in
@@ -25039,28 +24954,14 @@ GDNAMES.  Names can be abbreviated provided they remain unambiguous.
 There are global parameters (cf. topic "Parameters Globals") for the
 graphics devices:
 
-   o  Graphics Device  --- The device used for line graphics.
-   o  Image Display    --- The device used for displaying images,
-                           but this does not exclude the possibility
-                           of line graphics, such as axes, when they
-                           are associated with the image.  The
-                           image-display device should be capable of
-                           showing at least 24 colours or grey
-                           levels simultaneously, and more for
-                           certain applications.
-   o  Image-display    --- The device used for overlays on the image
-      Overlay              display.  Again there is a restriction
-                           there should be at least 16 colours, except
-                           for X-windows overlays, since these only
-                           have a single colour.
+   o  Graphics Device  --- The device used for graphics.
 
 The purpose of these global parameters is ostensibly to prevent
 unnecessary prompting.  However, there is an ulterior motive as well.
 The selection of devices outside of the graphics applications
 enables us to perform other necessary actions just once.
 
-There are commands for selecting each type of device: GDSET
-and OVSET for the graphics device and overlay respectively.  For example,
+The GDSET command selects the type of device. For example,
  
      ICL> gdset xwindows
  
@@ -25115,47 +25016,28 @@ This example makes a window of dimension 600-by-450 pixels, the
 background colour is black and colour for the line graphics is
 yellow. 
 
-GWM also enables a single-colour overlay to be associated with a
-window.  This lets you clear the overlay independently of the image
-(task OVCLEAR), so you can annotate a picture with other graphics.
-This is most useful in interactive applications like ARDGEN,
-or SEGMENT.  A GWM overlay does have one drawback,
-however: it halves the number of available colour indices.  If you
-want to use an X-windows overlay, you must ensure that you have made
-the window with the -overlay qualifier to xmake, or change your
-X-defaults file, or use a + suffix to the device name.
-
 The following set up to place in your X-defaults file is a reasonable
 compromise, as it maximises the number of colour indices for the
-image-display window (xwindows), has a yellow overlay (xoverlay),
-and a line-graphics window (x2windows).  In the defaults file there
-are the following lines
+image-display window (xwindows), and a line-graphics window (x2windows).  
+In the defaults file there are the following lines
 
      Gwm*xwindows*colours:         80
-     Gwm*xwindows*overlay:         True
-     Gwm*xwindows*ovcolour:        Yellow
      Gwm*xwindows2*colours:        20
 
 and you can also set the sizes of the windows too.  Notice that the
-second device name is x2windows, but the window name is xwindows2.
-Don't ask why.  An overlay on this device is called x2overlay.  This
-confusing name rule applies also to all but the first window of the
-maximum of four windows allowed.
+second device name is x2windows, but the window name is xwindows2. Don't
+ask why.  This confusing name rule applies also to all but the first
+window of the maximum of four windows allowed.
 
-The device names can be abbreviated, to give unambiguous names.
-Thus you can enter xw for the xwindows device, and xo for its
-overlay; x2w for the x2windows device, and x2o for its overlay; and
-so on.  This is the reason for having device names as they are.  If
-a window does not exist, you can create one with an overlay by
-appending a + to the name, so for example a device name of x2w+
-would open the x2windows device with an overlay plane.
+The device names can be abbreviated, to give unambiguous names. Thus you
+can enter xw for the xwindows device; x2w for the x2windows device; and
+so on.  This is the reason for having device names as they are.  
 
-The following tells KAPPA that these are the current devices.
-These remain as global parameters, so you probably will not need to
-issue these commands that often.
+The following tells KAPPA that this is the current device. This remains
+as a global parameter, so you probably will not need to issue this
+commands that often.
 
      % gdset x2windows
-     % ovset xoverlay
 
 
 1 SETAXIS
@@ -27559,8 +27441,6 @@ NUMB        - Counts the number of elements of an NDF with values or
               absolute values above or below a threshold.
 OUTSET      - Sets pixels outside a specified circle in a 2-d data
               array to a specified value.
-OVCLEAR     - Clears an image-display overlay.
-OVSET       - Selects a current image-display overlay.
 PALDEF      - Loads the default palette to a colour table.
 PALENTRY    - Enters a colour into an image display's palette.
 PALREAD     - Fills the palette of a colour table from an NDF.
