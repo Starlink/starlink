@@ -77,8 +77,9 @@ $usage = "Usage: $self <module> [<package>]\n";
 
 use Fcntl;
 use SDBM_File;
-use libscb;
-use Ftag;
+use Scb;
+use FortranTag;
+use CTag;
 
 #  Declarations.
 
@@ -97,7 +98,6 @@ sub quasialph;
 $cgi = defined $ENV{'SERVER_PROTOCOL'};
 print "Content-Type: text/html\n\n" if ($cgi);
 $html = $cgi;
-$html = 1;
 
 #  Parse arguments.
 
@@ -119,6 +119,16 @@ if (@args) {
 
 #  If chosen variables still have no value pick them up by order on 
 #  command line.
+
+while ($args[0] =~ /^-/) {
+   $flag = shift @args;
+   if ($flag eq '-html') {
+      $html = 1;
+   }
+   else {
+      error $usage;
+   }
+}
 
 $arg{'module'}  ||= shift @args;
 $arg{'package'} ||= shift @args;
@@ -463,8 +473,8 @@ sub output {
 
 #  Get file type.
 
-   $file =~ m%\.([^/]*)$%;
-   my $ftype = $1;
+   my ($ftype) = ($file =~ m%\.([^/]*)$%);
+   $ftype ||= '';
 
 #  Open module source file.
 
@@ -485,34 +495,58 @@ sub output {
    my ($body, $name, @names, $include, $sub, $copyright);
 
    if ($html) {
-      if ($ftype eq 'f' || $ftype eq 'gen') {
 
-#        Add SGML-like tags to source code.
+#     Add SGML-like tags to source code.
 
-         $tagged = tag_f (join '', <FILE>);
+      if ($ftype eq 'f' || $ftype eq 'gen' || $ftype eq '') {
+         $tagged = FortranTag::tag (join '', <FILE>);
+      }
+      elsif ($ftype eq 'c' || $ftype eq 'h') {
+         $tagged = CTag::tag (join '', <FILE>);
+         # print <FILE>; return;
+      }     
 
-#        Check tags, and remove those which fail to refer.
 
-         my $inhref = 0;
-         $tagged =~ s~(<[^>]+>)~
-            &{sub {
+#     Check tags, and remove those which fail to refer.
+
+      my $inhref = 0;
+      $tagged =~ s{(<[^>]+>)}{
+         &{
+            sub {
                %tag = parsetag $1;
                if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
-                  return '<b>' unless ($locate{$name});
+                  return '<b>' unless ($loc = $locate{$name});
                   $inhref = 1;
-                  return "<a href='$scb?$name&$package#$name'>";
+                  if ($name =~ /^INCLUDE-/) {
+                     $href = "$scb?$name&$package";
+                  }
+                  elsif (index ($loc, $locname) >= 0) {
+                     $href = "#$name";
+                  }
+                  else {
+                     $href = "$scb?$name&$package#$name";
+                  }
+                  return "<a href='$href'>";
                }
                elsif ($tag{'End'} eq 'a') {
                   my $retval = $inhref ? '</a>' : '</b>';
                   $inhref = 0;
                   return $retval;
                }
+               elsif (($tag{'Start'} eq 'a') && ($ftype eq 'gen') &&
+                      ($tag{'name'} =~ /(.*)(&lt;t&gt;)(.*)/i)) {
+                  my ($pre, $gen, $post) = ($1, $2, $3);
+                  return join ('', map ("<a name='$pre$_$post'>",
+                     ($gen, qw/i r d l c b ub w uw/)));
+               }
                return $1;
-            }}
-         ~ges;
-      }
+            }
+         }
+      }ges;
+
       print $tagged;
    }
+
    else {
       while (<FILE>) {
          print;
@@ -526,21 +560,21 @@ sub output {
 # 
 #          if ($ftype eq 'f' || $ftype eq 'gen') {
 # 
-#             $body = /^[cC*]/ ? '' : $_;     #  Ignore comments.
+#             $body = /^[cC*]/ ? '' : $_;   #  Ignore comments.
 #             if ($body) {
-#                $body =~ s/^......//;        #  Discard first six characters.
-#                $body =~ s/!.*//;            #  Discard inline comments.
-#                $body =~ s/\s//g;            #  Discard spaces.
-#                $body =~ tr/a-z/A-Z/;        #  Fold to upper case.
+#                $body =~ s/^......//;      #  Discard first six characters.
+#                $body =~ s/!.*//;          #  Discard inline comments.
+#                $body =~ s/\s//g;          #  Discard spaces.
+#                $body =~ tr/a-z/A-Z/;      #  Fold to upper case.
 #             }
 #          }
 # 
 #          elsif ($ftype eq 'c' || $ftype eq 'h') {
 # 
 #             $body = $_;
-#             $body =~ s%^#.*%%;              #  Discard preprocessor directives.
-#             $body =~ s%/\*.*\*/%%g;         #  Discard comments fully inline.
-#             $body =~ s%/\*.*%%;             #  Discard started comments.
+#             $body =~ s%^#.*%%;            #  Discard preprocessor directives.
+#             $body =~ s%/\*.*\*/%%g;       #  Discard comments fully inline.
+#             $body =~ s%/\*.*%%;           #  Discard started comments.
 #          }
 # 
 # #        Substitute for HTML meta-characters.
