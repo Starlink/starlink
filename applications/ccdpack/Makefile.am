@@ -32,20 +32,21 @@ ccdpack_red_TASKS = $(REDTASKS)
 ccdpack_reg_TASKS = $(REGTASKS)
 ccdpack_res_TASKS = $(RESTASKS)
 ccdpack_scr_TASKS = $(SCRTASKS)
-ccdhelp_TASKS = ccdhelp
+ccdhelp_TASKS = 
 
-#  Link flags.
+#  Link flags.  This is untidy; you'd think there would be a better way
+#  to cope with interdependencies between noinst_LTLIBRARIES libraries
+#  in subdirectories.  But I don't know what it is.
 CCDPACK_LIBS = tasks/libccdpack_tasks.la \
+               main/libccdpack.la \
                gen/libccdpack_gen.la \
-               main/libccdpack.la
+               main/ccd1_wedge.o main/ccd1_orvar.o
 
-CCDPACK_LDADD = $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam`
-CCDPACK_LDADD_PGP = $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam-pgp`
 
-ccdpack_red_LDADD = $(LDADD) $(CCDPACK_LDADD)
-ccdpack_reg_LDADD = $(LDADD) $(CCDPACK_LDADD_PGP)
-ccdpack_res_LDADD = $(LDADD) $(CCDPACK_LDADD_PGP)
-ccdpack_scr_LDADD = $(LDADD) $(CCDPACK_LDADD)
+ccdpack_red_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam`
+ccdpack_reg_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/pgp_ccdpack_link_adam`
+ccdpack_res_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/pgp_ccdpack_link_adam`
+ccdpack_scr_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam`
 ccdhelp_LDADD = $(LDADD) help/libccdpack_help.la
 
 #  List of applications/tasks in monoliths.
@@ -63,8 +64,8 @@ SCRTASKS = reduce ccdalign xreduce
 #  scripts as they are edited by the installation procedure.
 
 STARTUP_SCRIPT = ccdpack.csh
-IRAF_STARTUP_SCRIPT = ccdpack.cl
 ICL_STARTUP_SCRIPT = ccdpack.icl
+IRAF_STARTUP_SCRIPT = ccdpack.cl
 
 
 
@@ -73,7 +74,8 @@ ICL_STARTUP_SCRIPT = ccdpack.icl
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set. 
 
-PUBLIC_SCR = $(SHELL_SCR) $(ICL_SCR) $(CONFIG_SCR)
+PUBLIC_SCR = $(SHELL_SCR) $(ICL_SCR) $(CONFIG_SCR) \
+             $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT)
 
 SHELL_SCR = ccdfork ccdexercise wcsexercise setexercise \
  ccdpack_back xreduce \
@@ -117,7 +119,7 @@ $(IFL_FILES) $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT): $(IFD_FILES)
 #  List of task interface files.
 
 IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
-            $(SCRTASKS:=.ifl)
+            $(SCRTASKS:=.ifl) ccdhelp.ifl
 
 
 
