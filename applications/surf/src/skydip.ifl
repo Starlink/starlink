@@ -30,6 +30,8 @@
 #        Add the FIT parameters
 #     1998 Jan 15 (TimJ)
 #        Add T_HOT
+#     1998 Jun 5  (TimJ)
+#        Add ERRORS
 #-
 
    INTERFACE SKYDIP
@@ -38,6 +40,15 @@
 
       PARAMETER B_FIT
         PROMPT 'Fitted value of B'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
+      PARAMETER B_ERR
+        PROMPT 'Error in fitted value of B'
         TYPE '_REAL'
         DEFAULT -1.0
         HELPKEY '*'
@@ -57,8 +68,9 @@
       PARAMETER CVAR
         PROMPT 'Use the same variance for each point'
         TYPE '_LOGICAL'
-        DEFAULT 'TRUE'
+        DEFAULT 'FALSE'
         HELPKEY '*'
+        VPATH   'CURRENT,DEFAULT'
         PPATH   'CURRENT,DEFAULT'
       ENDPARAMETER
  
@@ -70,6 +82,16 @@
         RANGE    -1000000, 1.0
 	HELPKEY '*'
       ENDPARAMETER 
+
+      PARAMETER ETA_TEL_ERR
+        PROMPT 'Error in fitted value of ETA_TEL'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
 
       PARAMETER ETA_TEL_FIT
         PROMPT 'Fitted value of Eta_Tel'
@@ -113,6 +135,14 @@
         HELPKEY  '*'
       ENDPARAMETER
 
+      PARAMETER SIGMA
+        PROMPT 'Standard deviation of residuals'
+        TYPE '_DOUBLE'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
 
       PARAMETER   SUB_INSTRUMENT
          POSITION 2
@@ -129,6 +159,16 @@
 	 DEFAULT  !
 	 HELPKEY '*'
       ENDPARAMETER 
+
+      PARAMETER TAUZ_ERR
+        PROMPT 'Error in fitted sky opacity'
+        TYPE '_REAL'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
+      ENDPARAMETER
+
 
       PARAMETER TAUZ_FIT
         PROMPT 'Fitted sky opacity'
