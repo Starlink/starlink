@@ -6011,7 +6011,7 @@ proc Fit {labxy gx gy labuv gu gv fittype mess} {
             set ret [DescMap ${trfile}.TRN_2.TRANSFORM]
 
 # Delete the TRANSFORM structure.
-            HdsDel ${trfile}.TRN_2.TRANSFORM]
+            HdsDel ${trfile}.TRN_2.TRANSFORM
          }
       }
    }
