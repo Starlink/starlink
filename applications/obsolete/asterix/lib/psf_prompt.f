@@ -19,9 +19,12 @@
 *
 *    History :
 *
-*     31 Aug 89 : Original (DJA)
-*     25 Oct 92 : Added channel spectrum model option (DJA)
-*     23 Feb 94 : Doesn't display options if PSF parameter set (DJA)
+*     31 Aug 1989 (DJA):
+*        Original version
+*     25 Oct 1992 (DJA):
+*        Added channel spectrum model option
+*     23 Feb 1994 (DJA):
+*        Doesn't display options if PSF parameter set
 *
 *    Type definitions :
 *
@@ -680,8 +683,7 @@
       ELSE
 
 *      Look for named psf
-	CALL PSF_CHKLIBRTN( ' ', STR, P_LIBID(SLOT), P_MODID(SLOT),
-     :                      STATUS )
+	CALL PSF_CHKLIBRTN( STR, TAG, STATUS )
         P_MODEL(SLOT) = .FALSE.
 
 *      Report error if PSF not found
@@ -691,6 +693,7 @@
 	  CALL ERR_ANNUL( STATUS )
 	  GOTO 59
         ELSE
+          CALL ADI_CPUT0C( P_PSID(SLOT), 'Tag', TAG, STATUS )
           GOTO 99
 	END IF
 
@@ -712,12 +715,13 @@
 	IC = IC + 1
       END DO
       IC = IC - 1
-      CALL PSF_CHKLIBRTN( ' ', STR(BEG:IC), P_LIBID(SLOT),
-     :                             P_MODID(SLOT), STATUS )
+      CALL PSF_CHKLIBRTN( STR(BEG:IC), TAG, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         RSN = 'Unknown psf /'//STR(BEG:IC)//'/'
         CALL MSG_SETC( 'REASON', RSN )
 	GOTO 99
+      ELSE
+        CALL ADI_CPUT0C( P_PSID(SLOT), 'Tag', TAG, STATUS )
       END IF
 
 *  Locate comma

@@ -91,7 +91,7 @@
 *  Report error
       IF ( .NOT. FOUND ) THEN
         STATUS = SAI__ERROR
-        CALL MSF_SETC( 'P', ROUT )
+        CALL MSG_SETC( 'P', ROUT )
         CALL ERR_REP( ' ', 'Psf /^P/ not found in PSF_CHKLIBRTN',
      :                STATUS )
       END IF

@@ -51,13 +51,13 @@
 *
 *    Local variables :
 *
-      CHARACTER*80             LNAME, RNAME            ! Library/routine names
+      CHARACTER*80             RNAME            	! Routine names
       CHARACTER*(DAT__SZLOC)   LOC                     ! Input dataset
       CHARACTER*(DAT__SZLOC)   PLOC                    ! Input dataset PSF
       CHARACTER*(DAT__SZLOC)   SLOC                    ! Spatial response
+      CHARACTER*15		TAG			! Suggested psf tag
 
       INTEGER			FLID
-      INTEGER                  LIBID,MODID             ! Library/routine codes
 
       LOGICAL                  GOOD_PSF                ! Found a valid PSF
       LOGICAL			ISHDS			! Input is HDS file?
@@ -90,7 +90,6 @@
 
 *      We have an internal routine to handle responses
         GOOD_PSF = .TRUE.
-        LNAME = 'PSFLIB'
         RNAME = 'PSF_RESPFILE'
 
       ELSE
@@ -105,7 +104,6 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Get the components which identify the routine
-          CALL CMP_GET0C( PLOC, 'LIBRARY_NAME', LNAME, STATUS )
           CALL CMP_GET0C( PLOC, 'ROUTINE_NAME', RNAME, STATUS )
 
 *        Trap failure to find routine
@@ -129,7 +127,7 @@
 
 *    Good psf? Check that the routine exists
       IF ( GOOD_PSF ) THEN
-        CALL PSF_CHKLIBRTN( LNAME, RNAME, LIBID, MODID, STATUS )
+        CALL PSF_CHKLIBRTN( RNAME, TAG, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           GOOD_PSF = .FALSE.
