@@ -1,8 +1,8 @@
-1 KAPPA_Version_0.14-5
+1 KAPPA_Version_0.15-0
 
-   A new release of KAPPA (V0.14-5) has been made. The changes are
-   described fully in sun95.14. A demonstration of the main effects of
-   the changes can be seen by issuing the command "kapdemo v0.14-5".
+   A new release of KAPPA (V0.15-0) has been made. The changes are
+   described fully in sun95.16. A demonstration of the main effects of
+   the changes can be seen by issuing the command "kapdemo v0.15-0".
 
    The majority of the changes are again in the field of graphics and WCS
    handling. More applications have been changed to use AST/PGPLOT for
@@ -11,63 +11,27 @@
 
 *      Scripts which make use of any of the removed or
 *      modified parameters will fail when run with KAPPA
-*      V0.14-5. Such scripts will need to be changed to
+*      V0.15-0. Such scripts will need to be changed to
 *      take account of the new features introduced in this
 *      release. Check the lists below for details.}
 
-   The updated applications include: CENTROID, DRAWSIG, HISTOGRAM,
-   LUTVIEW, MLINPLOT, NORMALIZE, PSF, VECPLOT.
+   The updated applications include: 
 
    Several other applications have been changed to PGPLOT but with
    no changes in the parameter list or visible functionality (e.g.
-   GDCLEAR, GDSET, IDCLEAR, IDSET, PALREAD, PALDEF, etc).
-
-   Another significant change in this release is that KAPPA commands
-   which process individual NDFs or positions lists can now be
-   supplied with a group of such files, and the application will
-   automatically be re-invoked to process the entire group. Again,
-   full details can be found in SUN/95.
+   , etc).
 
 
    Other changes include:
 
-     - A new application SCATTER to perform simple scatter plots of the
-     values in two NDFs.
+     - 
 
-     - A new application COLCOMP to combine 1, 2 or 3 NDFs into a colour
-     composite image, retaining WCS information.
-
-     - A new application KAPVERSION which checks the version number of the
-     installed package.
-
-     - DISPLAY now has a KEY parameter which causes a colour ramp to be
-     drawn to the right of the image.
-
-     - The LOGAR and EXPON applications have been converted to use the
-     full NDF structure. The EXP10, EXPE, LOG10 and LOGE applications are
-     now alias for LOGAR and EXPON, using appropriate bases.
-
-     - FITSMOD now has an EXISTS parameter to store the result of the
-     final "Exist" operation.
-
-     - LINPLOT now has an LMODE parameter which allows the default limits
-     for the vertical axis to be chosen in various ways (for instance
-     using percentiles, multiples of the standard deviation, etc).
-
-     - Several new interpolation methods have been added to WCSALIGN, and
-     an improved algorithm is now used which should be more efficient in
-     some cases.
+     - 
 
 
    Various bugs have been fixed, the most noticable being:
 
-     - A bug which could prevent numerical labels from being drawn within
-     annotated axes.
+     - 
 
-     - A bug which caused CURSOR to fail after giving 40 positions.
+     - 
 
-     - PIXDUPE and ROTATE no longer discards pixel origin information.   
-
-     - COMPAVE and COMPADD used to produce incorrect WCS co-ordinates in the
-     output NDF if the lower bounds of the input NDF were not (1,1). This
-     has been fixed.
