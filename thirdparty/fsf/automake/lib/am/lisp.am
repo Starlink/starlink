@@ -72,8 +72,8 @@ install-%DIR%LISP: $(%DIR%_LISP) $(ELCFILES)
 ?!BASE?	      $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
 ?!BASE?	      *) f=$$p;; \
 ?!BASE?	    esac; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	    if test -n "$(MANIFEST_FD)"; then \
+		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$(MANIFEST_FD); \
 	    else :; fi; \
 	    echo " $(%DIR%LISP_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(%DIR%LISP_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
@@ -81,8 +81,8 @@ install-%DIR%LISP: $(%DIR%_LISP) $(ELCFILES)
 	    if test -f $${p}c; then \
 	      echo " $(%DIR%LISP_INSTALL) $${p}c $(DESTDIR)$(%NDIR%dir)/$${f}c"; \
 	      $(%DIR%LISP_INSTALL) $${p}c $(DESTDIR)$(%NDIR%dir)/$${f}c; \
-	      if test -n "$$MANIFEST_FILE"; then \
-                echo "$(DESTDIR)$(%NDIR%dir)/$${f}c" >>$$MANIFEST_FILE; \
+	      if test -n "$(MANIFEST_FD)"; then \
+                echo "$(DESTDIR)$(%NDIR%dir)/$${f}c" >&$(MANIFEST_FD); \
 	      else :; fi; \
 	    else : ; fi; \
 	  done; \

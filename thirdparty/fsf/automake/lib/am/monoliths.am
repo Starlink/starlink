@@ -58,8 +58,8 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 ?LIBTOOL?	   $(INSTALL_MONOLITH_ENV) $(LIBTOOL) --mode=install $(%DIR%MONOLITHS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
 ?!LIBTOOL?	   echo " $(INSTALL_MONOLITH_ENV) $(%DIR%MONOLITHS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 ?!LIBTOOL?	   $(INSTALL_MONOLITH_ENV) $(%DIR%MONOLITHS_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f || exit 1; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	    if test -n "$(MANIFEST_FD)"; then \
+		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$(MANIFEST_FD); \
 	    else :; fi; \
 	  else :; fi; \
 	done
@@ -83,8 +83,8 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 ?!BASE?	  esac; \
 	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	  if test -n "$(MANIFEST_FD)"; then \
+	  	echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$(MANIFEST_FD); \
 	  else :; fi; \
 	done
 ## Finally, make links for each of the task:monolith pairs in variable
@@ -95,8 +95,8 @@ install-%DIR%MONOLITHS: $(%DIR%_MONOLITHS) $(%DIR%_MONOLITH_IFCS)
 	    rm -f $$task; \
 	    echo $(LN_S) $$monolith $$task; \
 	    $(LN_S) $$monolith $$task; \
-	    if test -n "$$MANIFEST_FILE"; then \
-	      echo "$(DESTDIR)$(%NDIR%dir)/$$task" >>$$MANIFEST_FILE; \
+	    if test -n "$(MANIFEST_FD)"; then \
+	      echo "$(DESTDIR)$(%NDIR%dir)/$$task" >&$(MANIFEST_FD); \
 	    else :; fi; \
 	  done
 endif %?INSTALL%

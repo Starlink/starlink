@@ -53,8 +53,8 @@ install-%DIR%SCRIPTS: $(%DIR%_SCRIPTS)
 ?!BASE?	    f=`echo "$$p" | sed 's|[^/]*$$||'`"$$f"; \
 	    echo " $(%DIR%SCRIPT_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(%DIR%SCRIPT_INSTALL) $$d$$p $(DESTDIR)$(%NDIR%dir)/$$f; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	    if test -n "$(MANIFEST_FD)"; then \
+		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$(MANIFEST_FD); \
 	    else :; fi; \
 	  else :; fi; \
 	done
