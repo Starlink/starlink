@@ -20,15 +20,16 @@ fi
 d2bpath=$1
 infile=$2
 
-# Check that kpsewhich is in the path.  Can't reliably use `which' here.
-for d in `echo $PATH|sed 's/:/ /'`;do 
+# Check that kpsewhich is in the path.  Can't reliably use `which' here,
+# since it's sometimes a stoopid script.
+for d in `echo $PATH | sed 's/:/ /g'`; do
     if test -f $d/kpsewhich -a -z "$KPW"; then
 	KPW=$d/kpsewhich
     fi
 done
 
 if [ -z "$KPW" ]; then
-    echo "Couldn't find kpsewhich!"
+    echo "Couldn't find kpsewhich in $PATH"
     exit 1
 fi
 
