@@ -73,7 +73,16 @@
 
 #  Edit the kplsearch script to include the names and purposes of
 #  all routines.
-      $KAPLIBS_DEV/bin/make_kplsearch.csh
+      set ans = `confirm "Re-create SUN238?\n\n$n"`
+      if( "$ans" == "n" || "$ans" == "N" ) then
+         makesun = "no"
+      else
+         makesun = "yes"
+      endif
+
+      if( "$makesun" == "yes" ) then
+         $KAPLIBS_DEV/bin/make_kplsearch.csh
+      endif
 
 #  Create each of the tar files. First do the system-independant ones
 #  listed in group TAR_FILES_A...
@@ -87,7 +96,9 @@
       end
 
 #  Create the documentation in the current directory
-      $KAPLIBS_DEV/bin/make_sun238.csh 
+      if( "$makesun" == "yes" ) then
+         $KAPLIBS_DEV/bin/make_sun238.csh 
+      endif
 
 #  Tar up all the release files and then remove them.
       echo "Creating kaplibs.tar"
