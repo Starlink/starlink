@@ -78,15 +78,6 @@ INTERFACE SERROR
       DEFAULT 20
    ENDPARAMETER
 
-   PARAMETER NUP
-      TYPE '_INTEGER'
-      DEFAULT 3
-      VPATH 'DEFAULT'
-      PPATH 'DEFAULT'
-      PROMPT 'Update interval'
-      HELP 'Number of its. between update of model file (and diagnostic o/p)'
-   ENDPARAMETER
-
    PARAMETER OP
       TYPE '_LOGICAL'
       PROMPT 'Output results?'
