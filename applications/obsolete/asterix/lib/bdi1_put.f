@@ -1,0 +1,161 @@
+      SUBROUTINE BDI1_PUT( NARG, ARGS, OARG, STATUS )
+*+
+*  Name:
+*     BDI1_PUT
+
+*  Purpose:
+*     Service FileItemPut requests from the BDI system for HDS files
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_PUT( NARG, ARGS, OARG, STATUS )
+
+*  Description:
+*     Services BDI put requests for HDS files.
+
+*  Arguments:
+*     NARG = INTEGER (given)
+*        Number of method arguments
+*     ARGS(*) = INTEGER (given)
+*        ADI identifier of method arguments
+*     OARG = INTEGER (returned)
+*        Output data
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+      INCLUDE 'DAT_PAR'
+
+*  Arguments Given:
+      INTEGER                   NARG, ARGS(*)
+
+*  Arguments Returned:
+      INTEGER                   OARG
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*(DAT__SZLOC)	CLOC			! New component
+      CHARACTER*20		ITEM
+
+      DOUBLE PRECISION		SPARR(2)		! Spaced array data
+
+      INTEGER			NELM			! # data elements
+      INTEGER			PTR			! Mapped axis values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Default return value
+      OARG = ADI__NULLID
+
+*  Extract the arguments
+      CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
+
+*  Trap the Axis_<n>_SpacedData item
+      IF ( (ITEM(1:5) .EQ. 'Axis_') .AND.
+     :     (ITEM(8:17).EQ.'SpacedData') ) THEN
+
+*    Locate object to be got
+        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Data', .TRUE.,
+     :                   CLOC, STATUS )
+
+*    Extract spaced parameters
+        CALL ADI_GET1D( ARGS(4), 2, SPARR, NELM, STATUS )
+
+*    Map array for write
+        CALL DAT_MAPV( CLOC, '_DOUBLE', 'WRITE', PTR, NELM, STATUS )
+
+*    Fill with regularly spaced values
+        CALL ARR_REG1D( SPARR(1), SPARR(2), NELM, %VAL(PTR), STATUS )
+
+*    Unmap the array
+        CALL DAT_UNMAP( CLOC, STATUS )
+
+      ELSE
+
+*    Locate object to be got
+        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC,
+     :                   STATUS )
+
+*    Everything ok?
+        IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
+
+*      Copy from ADI to HDS
+          CALL ADI1_CCA2HT( ARGS(4), ' ', CLOC, ' ', STATUS )
+
+*      Free the HDS object
+          CALL DAT_ANNUL( CLOC, STATUS )
+
+        END IF
+
+      END IF
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_PUT', STATUS )
+
+      END
