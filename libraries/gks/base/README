@@ -60,13 +60,15 @@ Files also added from the machine specific system directories:
                                  AND vs IAND and OR vs IOR
                Include RS6000 tweak
 
- gkioop.     - Very different on different platforms.
+ gkioop.f.in - Very different on different platforms.
                Use most current (solaris, alpha, linux) version as root
 	       Older versions do not use GKDFOP routine
                Solaris version seems to be the same as linux and
                alpha versions except that Solaris uses UNIT=(A+B) syntax
                Note that CSSFN is disabled on Linux.
 	       Presumably because SCRATCH files do not need a filename.
+	       [verified in Balfour and Marwick]
+               Use configure to insert version number into file names.
 
   gklor.fpp
   gkland.fpp - simple configure tests. Could use these functions in

@@ -1,0 +1,439 @@
+      SUBROUTINE GKIOOP(KEY1, KEY2, ICHAN)
+*
+* Copyright (C) SERC 1986
+*
+*-----------------------------------------------------------------------
+*
+*  Type of routine:  SYSTEM INTERFACE
+*  Author:           PJWR
+*
+      INCLUDE '../include/check.inc'
+*
+*  PURPOSE OF THE ROUTINE
+*  ----------------------
+*     The connection specified by KEY1 and  KEY2  is  established,   and
+*     either an internal stream number or error value returned in ICHAN.
+*
+*  MAINTENANCE LOG
+*  ---------------
+*     ??/??/86  PJWR  Original UNIX version stabilized.
+*     ??/??/86  PJWR  Added use of GKIOSB() to guarantee GKS break
+*                     character is available for use.
+*     ??/??/87  PJWR  Modified KFWKFW code to use default files.
+*     25/03/87  PJWR  Tightened up OPEN statements so input devices
+*                     and terminals must exist to be opened!
+*     08/04/87  PJWR  Modified to give common functionality with
+*                     GKS-UK.
+*     09/07/87  PJWR  Updated error numbers for GKS 7.4,  improved
+*                     stream validation.  Added environment search for
+*                     runtime files.
+*     29/12/87  PJWR  Changed runtime filenames for release 1.10.
+*     28/03/89  PLP   Changed runtime filenames for release 1.15.
+*     26/06/89  PLP   Changed runtime filenames for release 1.20.
+*     04/07/89  PLP   Changed runtime filenames for release 1.30.
+*     04/12/90  KEVP  Added REWIND for already opened Input Workstation file,
+*                     to allow Meta-In workstation to be reopened (S412=C62).
+*     12/12/90  PLP   Changed runtime filenames for release 1.31.
+*     25/01/91  PLP   For OUTPUT workstation added filename existence
+*                     check and code to avoid concatenation of output
+*                     when the workstation is being opened and closed
+*                     several times in succession. Also added check
+*                     for preconnected streams and setting of the
+*                     newly introduced ISPREC flag (S434).
+*     30/01/91  PLP   Changed runtime filenames for release 1.32.
+*     07/02/91  PLP   Added preconnection flag setting ERPREC for 
+*                     the error logfile(S441).
+*     24/02/91  PLP   Changed runtime filenames for release 1.33.
+*     24/02/91  PLP   Changed runtime filenames for release 1.34.
+*     05/06/91  PLP   Changed runtime filenames for release 1.35.
+*     05/07/91  PLP   Changed runtime filenames for release 1.36.
+*     27/04/92  CDS   Changed runtime filenames to pick up
+*                     release from SCCSid numbers.
+*     28/05/92  CDS   Included use of KRCBYT in recl variables
+*                     to make less system dependant
+*     28/11/95  DLT   Moved location of data file to separate routine
+*     24/02/97  BKM   Linux version of this file created based on OSF1
+*                     example.
+*     18/06/04  TIMJ  Autoconf version
+*
+*  ARGUMENTS
+*  ---------
+*     KEY1    INP  Function code for connection type.
+*     KEY2    INP  Connection identifier if KEY1 is a workstation.
+*     ICHAN   OUT  Internal channel number.
+*
+      INTEGER KEY1, KEY2, KEY3, ICHAN
+*
+*  COMMON BLOCK USAGE
+*  ------------------
+*     Read    /GKYWCA/  KWKIX
+*     Modify  /GKYERR/  KERROR
+*             /GKYFLS/  G??FLS
+*             /GKZXIO/  ISWKT, ISPREC, ERPREC
+*
+      INCLUDE '../include/gkerr.par'
+      INCLUDE '../include/gkerr.cmn'
+      INCLUDE '../include/gkdt.par'
+      INCLUDE '../include/gkwca.cmn'
+      INCLUDE '../include/gkfls.cmn'
+      INCLUDE '../include/gkfls.par'
+      INCLUDE '../include/gkmc.par'
+      INCLUDE '../include/gkxio.cmn'
+*
+*  LOCALS
+*  ------
+*     LNBLNK   Fortran 77 library routine [see index(3f)].
+*     GETPID   Fortran 77 library routine [see getpid(3f)].
+*     GKAN1    GKS function to convert a single ASCII number into a character.
+*     IOS      Status return variable for OPEN.
+*     ISOP1    Status return variable for INQUIRE.
+*     ISOP2    Status return variable for INQUIRE.
+*     FNAME    String to hold filenames.
+*     NFNAME   String to construct new filenames.
+*     ENVCON   String to hold environment variable name.
+*     WDTLU    WDT File logical unit.
+*     WDTRL    WDT File record length.
+*     WDTFN    WDT File name.
+*     EMESLU   Error Message File logical unit.
+*     EMESRL   Error Message File record length.
+*     EMESFN   Error Message File name.
+*     DATALU   Font Database File logical unit.
+*     DATARL   Font Database File record length.
+*     DATAFN   Font Database File name.
+*     CSSLU    Central Segment Store File logical unit.
+*     CSSRL    Central Segment Store File record length.
+*     CSSFN    Central Segment Store File basename [see COMMENTS].
+*     AXS      Auxiliary string.
+*     FORM     String to hold formats when constructing filenames.
+*     LFIELD   Length of the connection ID part of the filename.
+*     THERE    Logical used when checking for existence of filenames.
+*     NMEND    Position of the last nonblank in a filename.
+*     J        A loop variable
+*     MAXNFA   Maximum number of attempts when constructing new file name.
+*
+      INTEGER LNBLNK, GETPID, GKDFOP
+      CHARACTER GKAN1
+      LOGICAL ISOP1, ISOP2, THERE
+      CHARACTER*256 FNAME
+      CHARACTER*265 NFNAME
+      CHARACTER*7 FORM
+      CHARACTER*6 ENVCON
+      CHARACTER*5 AXS
+      INTEGER IOS, NMEND, J, LFIELD
+*
+      INTEGER   WDTLU,                      WDTRL
+      PARAMETER(WDTLU = (KMXIO + 1),        WDTRL = 512/KRCBYT)
+      INTEGER   EMESLU,                     EMESRL
+      PARAMETER(EMESLU = WDTLU,             EMESRL = 512/KRCBYT)
+      INTEGER   DATALU,                     DATARL
+      PARAMETER(DATALU = (KMXIO + 2),       DATARL = 512/KRCBYT)
+      INTEGER   CSSLU,                      CSSRL
+      PARAMETER(CSSLU = (KMXIO + 3),        CSSRL = 512/KRCBYT)
+      INTEGER   MAXNFA
+      PARAMETER(MAXNFA = 10000)
+      CHARACTER*(*) WDTFN, EMESFN, DATAFN
+      CHARACTER*(*) CSSFN
+      PARAMETER(WDTFN =  '/gks.wdt-@PACKAGE_VERSION_MAJOR@.@PACKAGE_VERSION_MINOR@',
+     :          EMESFN = '/gks.emf-@PACKAGE_VERSION_MAJOR@.@PACKAGE_VERSION_MINOR@',
+     :          DATAFN = '/gks.dbs-@PACKAGE_VERSION_MAJOR@.@PACKAGE_VERSION_MINOR@'
+*     :     ,    CSSFN = '/tmp/gks.CSS.'  ! Now an unnamed SCRATCH file
+     :          )
+*
+      DATA FORM/'(A1,I )'/
+*
+*  STREAMS USED
+*  ------------
+*     See COMMENTS below.
+*
+*  ERRORS
+*  ------
+*     -1042 Error while trying to open internal segment store
+*     -1010 Unable to access Error file
+*     -1009 Unable to access Data Base file
+*     -1008 Unable to access Error Message file
+*     -1007 Unable to access Workstation Description Table file
+*        21 Specified connection identifier is invalid
+*        26 Specified workstation cannot be opened
+*       200 Specified error file is invalid
+*
+*  COMMENTS
+*  --------
+*
+*     This routine requires three streams whose LUNs are greater than
+*     KMXIO to be "reserved" for its use in the PARAMETER statements
+*     above.  Streams are allocated from a request as follows:
+*
+*     KFWDT, KFEMES, KFDATA, KFCSS
+*       The appropriate parametrised stream is opened.  Note that
+*       opening the WDT file closes the Error Message file and vice
+*       versa.  All this does is save a stream.  For KFCSS,  a temporary
+*       filename is created using CSSFN and the process ID. Although
+*       now the scratch file is not named. Use INQUIRE to get the temp file.
+*
+*     KFERR, KFWKFR, KFWKFW
+*       The stream is INQUIREd and if it is open then the value of
+*       KEY2 is returned as ICHAN.  If it is closed,  the environment is
+*       searched for a filename to open.  If no such name is found error
+*       26 is set and KNIL returned in ICHAN.  These workstations aren't
+*       interactive,  so ISWKT(KWKIX) is set to false.
+*       
+*     KFWKT
+*       Interactive workstations are opened on pairs of consecutive
+*       LUNs.  If the preconnected streams to the control tty (5 and 6)
+*       are to be used, ie KEY2=5, then KEY2 is returned as ICHAN.  If
+*       both streams are closed and an environment variable of the form
+*       GCONnn where nn=KEY2 is found,  then the value of this variable
+*       is used as the file to be opened and KEY2 is returned as ICHAN.
+*       Any combination of open/closed streams or a failed environment
+*       search results in KERROR = 26 and ICHAN = KNIL as above.
+*       When an interactive workstation connection is opened, then the
+*       GKS break character is guaranteed using GKIOSB and ISWKT(KWKIX)
+*       is set to true.
+*     
+*-----------------------------------------------------------------------
+
+* WDT File - closes Error Message File
+      IF (KEY1.EQ.KFWDT) THEN
+        IOS = GKDFOP( WDTLU, WDTFN, WDTRL)
+        IF (IOS.EQ.0) THEN
+          KWDFLS = KFLOP
+          KEMFLS = KFLCL
+          ICHAN = WDTLU
+        ELSE
+          KWDFLS = KFLNA
+          KERROR = -1007
+          ICHAN = KNIL
+        ENDIF
+* Error Message File - closes WDT File
+      ELSE IF (KEY1.EQ.KFEMES) THEN
+        IOS = GKDFOP( EMESLU, EMESFN, EMESRL)
+        IF (IOS.EQ.0) THEN
+          KEMFLS = KFLOP
+          KWDFLS = KFLCL
+          ICHAN = EMESLU
+        ELSE
+          KEMFLS = KFLNA
+          KERROR = -1008
+          ICHAN = KNIL
+        ENDIF
+* Error Logfile
+      ELSE IF (KEY1.EQ.KFERR) THEN
+	IF (KEY2.GE.KMNIO.AND.KEY2.LE.KMXIO.AND.KEY2.NE.5) THEN
+	  INQUIRE(UNIT = KEY2, OPENED = ISOP1)
+	  IF (ISOP1) THEN
+*           Preconnected - set the flag, it will be enquired
+*           by GKIOCL later.
+            ERPREC=.TRUE.
+	    ICHAN = KEY2
+	  ELSE
+*           Check environment for GERLOG and use associated file,  or
+*           open default file if GERLOG is unset or null. Also, set
+*           the preconnected flag fo FALSE. This will be enquired
+*           by GKIOCL later.
+            ERPREC=.FALSE.
+	    CALL GETENV('GERLOG', FNAME)
+	    IF (LNBLNK(FNAME).GT.0) THEN
+	      OPEN(UNIT = KERRFL, IOSTAT = IOS, FILE = FNAME,
+     :             STATUS = 'UNKNOWN')
+	    ELSE
+	      OPEN(UNIT = KEY2, IOSTAT = IOS, STATUS = 'UNKNOWN')
+	    ENDIF
+	    IF (IOS.EQ.0) THEN
+	      ICHAN = KEY2
+	    ELSE
+	      KERROR = -1010
+	      ICHAN = KNIL
+	    ENDIF
+	  ENDIF
+	ELSE
+*         Invalid stream
+	  KERROR = 200
+	  ICHAN = KNIL
+	ENDIF
+* Font Database File
+      ELSE IF (KEY1.EQ.KFDATA) THEN
+        IOS = GKDFOP( DATALU, DATAFN, DATARL)
+        IF (IOS.EQ.0) THEN
+          KDBFLS = KFLOP
+          ICHAN = DATALU
+        ELSE
+          KDBFLS = KFLNA
+          KERROR = -1009
+          ICHAN = KNIL
+        ENDIF
+* Central Segment Store
+      ELSE IF (KEY1.EQ.KFCSS) THEN
+*       Create temporary filename.
+*       The Fortran standard says that SCRATCH files should not be named
+*       The original code had a file name here (in CSSFN)
+*	WRITE(FNAME, '(A, I5.5)') CSSFN, GETPID()
+        OPEN(UNIT = CSSLU, IOSTAT = IOS,
+*     :       FILE = FNAME,
+     :       STATUS = 'SCRATCH', ACCESS = 'DIRECT', RECL = CSSRL)
+        IF (IOS.EQ.0) THEN
+          KCSFLS = KFLOP
+          ICHAN = CSSLU
+        ELSE
+          KCSFLS = KFLNA
+          KERROR = -1042
+          ICHAN = KNIL
+        ENDIF
+* Input Workstation
+      ELSE IF (KEY1.EQ.KFWKFR) THEN
+        IF (KEY2.GT.KMNIO.AND.KEY2.LE.KMXIO.AND.KEY2.NE.6) THEN
+          INQUIRE(UNIT = KEY2, OPENED = ISOP1)
+          IF (ISOP1) THEN
+*           Preconnected and non-interactive.
+            ICHAN = KEY2
+            ISWKT(KWKIX) = .FALSE.
+*           Set the preconnected flag to TRUE.
+            ISPREC(KWKIX) = .TRUE.
+            REWIND (ICHAN)
+          ELSE
+*           Search for a suitable environment variable.  Generate error
+*           26 if the variable isn't found.
+            WRITE(ENVCON, '(A, I2.2)') 'GCON', KEY2
+            CALL GETENV(ENVCON, FNAME)
+            IF (LNBLNK(FNAME).GT.0) THEN
+              OPEN(UNIT = KEY2,STATUS = 'OLD',IOSTAT = IOS,FILE = FNAME)
+              IF (IOS.EQ.0) THEN
+                ICHAN = KEY2
+                ISWKT(KWKIX) = .FALSE.
+*               Set the preconnected flag to FALSE.
+                ISPREC(KWKIX) = .FALSE.
+              ELSE
+                KERROR = 26
+                ICHAN = KNIL
+              ENDIF
+            ELSE
+              KERROR = 26
+              ICHAN = KNIL
+            ENDIF
+          ENDIF
+        ELSE
+*         Invalid connection ID
+          KERROR = 21
+          ICHAN = KNIL
+        ENDIF
+* Output Workstation
+      ELSE IF (KEY1.EQ.KFWKFW) THEN
+        IF (KEY2.GT.KMNIO.AND.KEY2.LE.KMXIO.AND.KEY2.NE.5) THEN
+          INQUIRE(UNIT = KEY2, OPENED = ISOP1)
+          IF (ISOP1) THEN
+*           Preconnected and non-interactive.
+            ICHAN = KEY2
+            ISWKT(KWKIX) = .FALSE.
+*           Set the preconnected flag to TRUE, it will be enquired
+*           by GKIOCL later.
+            ISPREC(KWKIX) = .TRUE.
+          ELSE
+*           Search for a suitable environment variable.  Open the system
+*           default file if the variable isn't found. Set the preconnected 
+*           flag to FALSE.
+            ISPREC(KWKIX) = .FALSE.
+            WRITE(ENVCON, '(A, I2.2)') 'GCON', KEY2
+            CALL GETENV(ENVCON, FNAME)
+*           Make sure files will not be overwritten - select a new
+*           filename if that supplied already exists.
+            IF (LNBLNK(FNAME).EQ.0) THEN
+*              Construct default filename when the environment variable is 
+*              not found. Follow the Unix pattern: fort.x, where x is the
+*              connection ID.
+               FNAME='fort'
+               LFIELD=INT(ALOG10(FLOAT(KEY2))) + 1
+               FORM(6:6)=GKAN1(LFIELD+48)
+               WRITE(AXS(1:LFIELD+1), FORM)'.', KEY2
+               NMEND=LNBLNK(FNAME)
+               FNAME(NMEND+1:NMEND+LFIELD+1)=AXS(1:LFIELD+1)
+            ENDIF 
+            NFNAME=FNAME
+            NMEND=LNBLNK(NFNAME)
+*           Check whether file exists or not.
+            DO 100 J=1,MAXNFA
+               LFIELD=INT(ALOG10(FLOAT(J))) + 1
+               INQUIRE(FILE=NFNAME, EXIST=THERE)
+               IF(THERE) THEN 
+*                The file NFNAME exists - append .J to its end and check again.
+                 FORM(6:6)= GKAN1(LFIELD+48)
+                 WRITE(NFNAME(NMEND+1:NMEND+LFIELD+1),FORM)'.', J
+               ELSE
+*                The file NFNAME does not exist - leave the loop.
+                 GOTO 200
+               ENDIF 
+  100       CONTINUE
+*           MAXFNA attempts to construct a non-existent filename and
+*           no luck - give up!
+            KERROR = 26
+	    ICHAN = KNIL
+  200       CONTINUE
+            IF (KERROR.EQ.0) THEN
+               OPEN(UNIT = KEY2, IOSTAT = IOS, FILE = NFNAME,
+     :              STATUS = 'UNKNOWN')
+	       IF (IOS.EQ.0) THEN
+	          ICHAN = KEY2
+	          ISWKT(KWKIX) = .FALSE.
+	       ELSE
+	          KERROR = 26
+	          ICHAN = KNIL
+	      ENDIF
+            ENDIF
+          ENDIF
+        ELSE
+*         Invalid connection ID
+          KERROR = 21
+          ICHAN = KNIL
+        ENDIF
+* Interactive Workstation.  User supplies the input LUN as ICONID.
+      ELSE IF (KEY1.EQ.KFWKT) THEN
+        IF (KEY2.GT.KMNIO.AND.KEY2.LT.KMXIO) THEN
+*         Check the status of both streams.
+          INQUIRE(UNIT = KEY2, OPENED = ISOP1)
+          KEY3 = KEY2 + 1
+	  INQUIRE(UNIT = KEY3, OPENED = ISOP2)
+          IF (KEY2.EQ.5) THEN
+*           Use the preconnected streams 5 and 6.
+            IF (.NOT.ISOP1) OPEN(UNIT=KEY2,STATUS='UNKNOWN')
+            IF (.NOT.ISOP2) OPEN(UNIT=KEY3,STATUS='UNKNOWN')
+	    ICHAN = KEY2
+	    CALL GKIOSB(ICHAN, KON)
+	    ISWKT(KWKIX) = .TRUE.
+          ELSE IF((.NOT.ISOP1).AND.(.NOT.ISOP2)) THEN
+*           Both streams closed,  so check environment as for Input and
+*           Output Workstations
+	    WRITE(ENVCON, '(A, I2.2)') 'GCON', KEY2
+	    CALL GETENV(ENVCON, FNAME)
+	    IF (LNBLNK(FNAME).GT.0) THEN
+*             Open KEY2 as input,  (KEY2 + 1) as output - file must
+*             already exist.
+              OPEN(UNIT=KEY2,STATUS='OLD',IOSTAT=IOS,FILE=FNAME)
+              KEY3 = KEY2 + 1
+	      OPEN(UNIT=KEY3,STATUS='OLD',IOSTAT=IOS,FILE=FNAME)
+	      IF (IOS.EQ.0) THEN
+		ICHAN = KEY2
+		CALL GKIOSB(ICHAN, KON)
+		ISWKT(KWKIX) = .TRUE.
+	      ELSE
+		KERROR = 26
+		ICHAN = KNIL
+	      ENDIF
+	    ELSE
+*             No environment variable.
+	      KERROR = 26
+	      ICHAN = KNIL
+	    ENDIF
+	  ELSE
+*           One or both streams open and it isn't streams 5 and/or 6.
+	    KERROR = 26
+	    ICHAN = KNIL
+	  ENDIF
+        ELSE
+*         The output channel will collide with the runtime files
+*         or the input channel will collide with stderr.
+	  KERROR = 21
+	  ICHAN = KNIL
+	ENDIF
+      ENDIF
+
+      RETURN
+
+      END

@@ -38,7 +38,7 @@ AM_CONFIG_HEADER(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile gkioop.f])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
