@@ -49,7 +49,6 @@ stdout, then generates an entity which contains the entire LaTeX file.
 (element sc  (process-latex-document))
 (element sg  (process-latex-document))
 (element sgp (process-latex-document))
-(element mud (process-latex-document))
 
 
 <routine>
@@ -92,8 +91,11 @@ interface with the `style file' defined there.
 	(empty-sosofo))
     (if docref
 	(make sequence
-	  (make empty-command name: "setDocCode"
-		parameters: `(,(string-append docref "." (caddr rel))))
+	  (if (caddr rel)
+	      (make empty-command name: "setDocCode"
+		    parameters: `(,(string-append docref "." (caddr rel))))
+	      (make empty-command name: "setDocCode"
+		    parameters: `(,docref)))
 	  (make empty-command name: "setDocRef"
 		parameters: `(,(getdocnumber (current-node) #t))))
 	(empty-sosofo))
