@@ -42,7 +42,7 @@
 
 #  Write startup message.
       echo " "
-      echo "   EXTREME commands are now available -- Version @PACKAGE_VERSION"
+      echo "   EXTREME commands are now available -- Version @PACKAGE_VERSION@"
       echo " "
 
 
