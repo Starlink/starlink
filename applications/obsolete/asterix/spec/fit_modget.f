@@ -227,6 +227,14 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
       CALL FIT_MODGET_TIES( FLOC, MODEL_SPEC_NTIE(IMOD),
      :                      TSTART, TGROUP, STATUS )
 
+*    Now copy the full ties back
+      DO I = 1, MAXTIE
+        MODEL_SPEC_TSTART(IMOD, I) = TSTART(I)
+      END DO
+      DO I = 1, NPAMAX
+        MODEL_SPEC_TGROUP(IMOD, I) = TGROUP(I)
+      END DO
+
 *    Initialise stack pointer to 0 (flag for pointer not set)
       MODEL_SPEC_STACKPTR(IMOD) = 0
 
