@@ -22,6 +22,8 @@ AC_PROG_FC
 AC_CHECK_FUNCS([getpwuid geteuid getlogin cuserid])
 AC_CHECK_DECLS([cuserid])
 AC_CHECK_FUNCS([setenv])
+AC_CHECK_FUNCS([getenv])
+
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
