@@ -71,3 +71,7 @@ Files also added from the machine specific system directories:
   gklor.fpp
   gkland.fpp - simple configure tests. Could use these functions in
                gkiofo.fpp to simplify that ifdef forest
+
+  gkna1.f    - no system specific code
+  ggkntoa.f  - no system specific code
+  lnblnk.f   - no system specific code
