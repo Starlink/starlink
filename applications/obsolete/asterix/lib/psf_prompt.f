@@ -60,46 +60,56 @@
       INTEGER			STATE			! PSF parameter state
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Set the default if required
-      IF ( USEDEFAULT ) THEN
-	CALL USI_DEF0C( PAR, DEFAULT, STATUS )
-	STATUS = SAI__OK
+*  Automatic mode?
+      IF ( PSFAUTO ) THEN
+
+*    Just take default
+        UPSF = DEFAULT
+
       ELSE
-	CALL USI_DEF0C( PAR, 'ANALYTIC', STATUS )
+
+*      Set the default if required
+        IF ( USEDEFAULT ) THEN
+	  CALL USI_DEF0C( PAR, DEFAULT, STATUS )
+	  STATUS = SAI__OK
+        ELSE
+	  CALL USI_DEF0C( PAR, 'ANALYTIC', STATUS )
+        END IF
+
+*      Display PSFs first time through
+        CALL USI_STATE( PAR, STATE, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+        IF ( STATE .NE. PAR__ACTIVE ) THEN
+          CALL PSF_DISPLAY( STATUS )
+        END IF
+
+*      Ask user to choose a PSF
+ 59     CALL USI_GET0C( PAR, UPSF, STATUS )
+        CALL USI_CANCL( PAR, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
       END IF
 
-*    Display PSFs first time through
-      CALL USI_STATE( PAR, STATE, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-      IF ( STATE .NE. PAR__ACTIVE ) THEN
-        CALL PSF_DISPLAY( STATUS )
-      END IF
-
-*    Ask user to choose a PSF
- 59   CALL USI_GET0C( PAR, UPSF, STATUS )
-      CALL USI_CANCL( PAR, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Locate interesting bit of string
+*  Locate interesting bit of string
       CALL CHR_FANDL( UPSF, BEG, END )
 
-*    Did use try one of the special options?
+*  Did use try one of the special options?
       IF ( CHR_SIMLR( UPSF(BEG:END), 'LIST') ) THEN
 	CALL PSF_DISPLAY( STATUS )
 	GOTO 59
 
-*    Parse the psf specification
+*  Parse the psf specification
       ELSE
 
-*      Parse model
+*    Parse model
 	CALL PSF_MODEL_PARSE( UPSF(BEG:END), SLOT, STATUS )
 
       END IF
 
-*    Calling routine will report status
+*  Calling routine will report status
  99   CONTINUE
 
       END
