@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroImage.C,v 1.11 1998/08/21 10:45:32 abrighto Exp $
+ * $Id$
  *
  * AstroImage.C - method definitions for class AstroImage
  *
@@ -13,7 +13,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: AstroImage.C,v 1.11 1998/08/21 10:45:32 abrighto Exp $";
+static const char* const rcsId="@(#) $Id$";
 
 
 #include <sys/types.h>

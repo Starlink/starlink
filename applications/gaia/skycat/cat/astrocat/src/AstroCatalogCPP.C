@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59:14 abrighto Exp $
+ * $Id$
  *
  * AstroCatalog.C - method definitions for class AstroCatalog
  * 
@@ -16,7 +16,7 @@
  *                            reference to "cat" (->equinox()). 
  *                            Started crashing query subprocess.
  */
-static const char* const rcsId="@(#) $Id: AstroCatalog.C,v 1.36 1999/03/11 20:59:14 abrighto Exp $";
+static const char* const rcsId="@(#) $Id$";
 
 
 #include <sys/types.h>
