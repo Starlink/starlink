@@ -239,8 +239,8 @@
 #include <string.h>
 #include "wcslib.h"
 
-int  npcode = 25;
-char pcodes[25][4] =
+int  skycat_npcode = 25;
+char skycat_pcodes[25][4] =
       {"AZP", "TAN", "SIN", "STG", "ARC", "ZPN", "ZEA", "AIR", "CYP", "CAR",
        "MER", "CEA", "COP", "COD", "COE", "COO", "BON", "PCO", "GLS", "PAR",
        "AIT", "MOL", "CSC", "QSC", "TSC"};

@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-extern int npcode;
-extern char pcodes[25][4];
+extern int skycat_npcode;
+extern char skycat_pcodes[25][4];
 
 struct celprm {
    int flag;
