@@ -65,7 +65,12 @@ dist-hook:
 # Generate library documentation using Doxygen
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
 $(libdocdir): Doxyfile
-	doxygen
+	if test -n "@DOXYGEN@"; then \
+	  @DOXYGEN@; \
+	else \
+	  mkdir $(libdocdir); \
+	  echo "No doxygen available -- library documentation not generated" >$(libdocdir)/stamp; \
+	fi
 
 # doc/ directory has its own simple makefile
 manual.tar: VERSION
