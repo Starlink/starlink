@@ -1,0 +1,96 @@
+*+
+*  Name:
+*     CAT5_STL.CMN
+*  Purpose:
+*     Internal common block specific to the small text list back-end.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block specific to the small text list back-end.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     2/7/96   (ACD): Original version.
+*     26/7/96  (ACD): First stable version.
+*     10/12/96 (ACD): Added KFLAG__CAT5.
+*     6/6/98   (ACD): Modified the way that the details for individual
+*       Fields are stored.
+*-
+
+*
+*    Parametric constants.
+*    ====================
+
+*
+*    The maximum permitted number of rows in a small text list.
+
+      INTEGER CAT5__MXROW
+      PARAMETER (CAT5__MXROW = 15000)
+
+*
+*    The minimum permitted deviation of the scale factor and zero
+*    point from 1.0D0 and 0.0D0 respectively if the column is to be
+*    scaled.
+
+      DOUBLE PRECISION CAT5__MNSCL
+      PARAMETER (CAT5__MNSCL = 1.0D-8)
+
+*
+*    Maximum permitted number of columns in a small text list.
+
+      INTEGER CAT5__MXCOL
+      PARAMETER (CAT5__MXCOL = 200)
+
+*
+*    Common block variables.
+*    ======================
+
+*
+*    Fortran unit number for the description file.
+
+      INTEGER
+     :  STUNT__CAT5(CAT__MXCAT)
+
+*
+*    Flag indicating whether or not the description file has been
+*    completely read.
+
+      LOGICAL
+     :  FNDSC__CAT5(CAT__MXCAT)
+
+*
+*    Flag indicating whether or not the description file for an output
+*    catalogue is to be written in 'Kappa format' or as a standard STL.
+*    The coding is as follows:
+*     .TRUE.  -  write as 'Kappa format',
+*     .FALSE. -  write as standard STL.
+
+      LOGICAL
+     :  KFLAG__CAT5(CAT__MXCAT)
+
+*
+*    Details defining the position of and format of each field within
+*    a single record.
+
+      INTEGER
+     :  FPOSN__CAT5(CAT1__MXIDS),  ! Position of each field.
+     :  FDTYP__CAT5(CAT1__MXIDS),  ! Data type code.
+     :  FCSIZ__CAT5(CAT1__MXIDS),  ! Size of CHARACTER columns.
+     :  FPTR__CAT5(CAT1__MXIDS),   ! Pointers to columns.
+     :  FPTRN__CAT5(CAT1__MXIDS)   ! Pointers to null value flags.
+      CHARACTER
+     :  FFMT__CAT5(CAT1__MXIDS)*(CAT__SZEXF)   ! Column format.
+
+*
+*    Common blocks
+*    =============
+
+      COMMON /STL/
+     :  STUNT__CAT5,
+     :  FPOSN__CAT5,  FDTYP__CAT5,  FCSIZ__CAT5,
+     :  FPTR__CAT5,   FPTRN__CAT5,  FNDSC__CAT5,  KFLAG__CAT5
+
+      COMMON /STL_C/
+     :  FFMT__CAT5

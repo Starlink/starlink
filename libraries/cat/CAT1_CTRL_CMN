@@ -1,0 +1,50 @@
+*+
+*  Name:
+*     CAT1_CTRL_CMN
+*  Purpose:
+*     Internal common block to control the operation of StarBase.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     An internal common block to hold variables which control the
+*     overal operation and configuration of StarBase.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     13/8/93  (ACD): Original version.
+*     9/3/95   (ACD): Added ANGCV__CAT1.
+*     11/4/95  (ACD): Changed the name given in the 'Name:' section of
+*        the prologue to reflect Unix rather than VMS conventions.
+*     17/8/99  (ACD): Removed PARSE__CAT1.
+*     14/10/99 (ACD): Added QUIET__CAT1.
+*     21/12/99 (ACD): Corrected description of QUIET__CAT1.
+*-
+
+*
+*    The following variable controls whether columns of angles in
+*    radians are converted to hours or degrees and formatted as
+*    sexagesimal values prior to output.  It is coded as follows:
+*
+*     .TRUE.  - convert angles prior to output,
+*     .FALSE. - do not convert angles prior to output.
+
+      LOGICAL ANGCV__CAT1
+
+*
+*    The following variable controls the level of messages issued
+*    by the CAT library:
+*
+*     .TRUE.  - do not issue informational messages (ie. be quiet),
+*     .FALSE. - issue informational messages (ie. not quiet).
+*
+*    Note that it only controls informational messages; error messages
+*    are not affected.
+
+      LOGICAL QUIET__CAT1
+
+*---------------------------------------------------------------------
+
+      COMMON /CTRL/
+     :  ANGCV__CAT1, QUIET__CAT1

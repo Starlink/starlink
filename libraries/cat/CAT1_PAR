@@ -1,0 +1,208 @@
+*+
+*  Name:
+*     CAT1_PAR.
+*  Purpose:
+*     Internal parametric constants for the CAT library.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal parametric constants for the CAT library.
+*
+*     These constants are internal to StarBase; they are not available
+*     to applications calling the CAT routines.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     13/5/93 (ACD): Original version.
+*     15/7/93 (ACD): First stable version.
+*     9/2/94  (ACD): Increased the maximum permitted number of 
+*       attributes.
+*     3/3/95  (ACD): Changed definitions of the constants for array
+*       sizes from CAT1_SZ... to CAT1__MX...  Also removed unused constants.
+*     8/3/95  (ACD): Added CAT1__PI and the codes for the various
+*       format descriptors for sexagesimal angles.
+*     11/4/95 (ACD): Changed the name given in the 'Name:' section of
+*        the prologue to reflect Unix rather than VMS conventions.
+*     11/4/95 (ACD): Tweaked the value of CAT1_SZDIR.
+*     21/6/95 (ACD): Increased the maximum number of identifiers and
+*        attributes.
+*     29/2/96 (ACD): Added angular units codes for minutes and seconds
+*        of arc and time.
+*     2/7/96  (ACD): Added constants pertaining to the description files
+*        for small text list and direct access binary catalogues.
+*     9/7/96  (ACD): Fixed bug in definition of CAT1__SEPFL
+*     11/7/96 (ACD): Added CAT1__BKSTL.
+*     23/7/96 (ACD): Added CAT1__SZFLT.
+*     26/7/96 (ACD): Added CAT1__SZDRC.
+*     30/7/96 (ACD): Added CAT1__NANGL and CAT1_SDEG.
+*     25/9/96 (ACD): Increased size of CAT1__SZDRC.
+*     27/5/98 (ACD): Removed the individual maxima for attributes of
+*        differing data types.  Also increased the maximum permitted
+*        number of attributes and decreased CAT1__SZATS to 90.
+*     4/6/99  (ACD): Added CAT1__BKTST.
+*     8/10/99 (ACD): Added CAT1__MXACL.
+*     11/9/00 (ACD): Increased the value of CAT1__SZDRC from 500 to 1000.
+*     13/9/00 (ACD): Increased the value of CAT1__SZDRC from 1000 to 1500.
+*-
+
+*
+*    Maximum permitted number of identifiers.
+
+      INTEGER CAT1__MXIDS
+      PARAMETER (CAT1__MXIDS = 10000)
+
+*
+*    Maximum permitted number of attributes.
+
+      INTEGER CAT1__MXATT   ! Maximum number of attributes.
+      PARAMETER (CAT1__MXATT = 40000)
+
+      INTEGER CAT1__SZATS   ! Maximum size of a character attribute.
+      PARAMETER (CAT1__SZATS = 90)
+
+*
+*    Size of the directory path to a catalogue.
+
+      INTEGER CAT1__SZDIR
+      PARAMETER (CAT1__SZDIR = 256)
+
+*
+*    Size of the file type for a catalogue.
+
+      INTEGER CAT1__SZFLT
+      PARAMETER (CAT1__SZFLT = 5)
+
+*
+*    Maximum size of a record in the description file for a small text
+*    list or direct access binary catalogue.
+
+      INTEGER CAT1__SZDRC
+      PARAMETER (CAT1__SZDRC = 1500)
+
+*
+*    Internal codes for states and modes for catalogue access.
+
+      INTEGER CAT1__STNEW   ! State = 'NEW'
+      PARAMETER (CAT1__STNEW = 1)
+
+      INTEGER CAT1__STOLD   ! State = 'OLD'
+      PARAMETER (CAT1__STOLD = 2)
+
+      INTEGER CAT1__MDRD    ! Mode = 'READ'
+      PARAMETER (CAT1__MDRD = 1)
+
+      INTEGER CAT1__MDUPD   ! Mode = 'UPDATE'
+      PARAMETER (CAT1__MDUPD = 2)
+
+      INTEGER CAT1__MDMOD   ! Mode = 'MODIFY'
+      PARAMETER (CAT1__MDMOD = 3)
+
+      INTEGER CAT1__MDWRT   ! Mode = 'WRITE'
+      PARAMETER (CAT1__MDWRT = 4)
+
+*
+*    Codes to identify the various backends.
+
+      INTEGER CAT1__BKADC   ! ADC / SCAR (binary only).
+      PARAMETER (CAT1__BKADC = 1)
+
+      INTEGER CAT1__BKFIT   ! FITS.
+      PARAMETER (CAT1__BKFIT = 2)
+
+      INTEGER CAT1__BKCHI   ! CHI.
+      PARAMETER (CAT1__BKCHI = 3)
+
+      INTEGER CAT1__BKSTL   ! Small Text List (STL).
+      PARAMETER (CAT1__BKSTL = 4)
+
+      INTEGER CAT1__BKTST   ! Tab-separated table (TST).
+      PARAMETER (CAT1__BKTST = 5)
+
+*
+*    Pi.  This constant is used for Pi throughout CAT.
+
+      DOUBLE PRECISION CAT1__PI   ! Pi.
+      PARAMETER (CAT1__PI = 3.14159265359D0)
+
+*
+*    Codes for the various format descriptors for sexagesimal angles.
+
+      INTEGER CAT1__ISO     ! ISO separator (':').
+      PARAMETER (CAT1__ISO = 1)
+
+      INTEGER CAT1__BLANK   ! Blank as separator.
+      PARAMETER (CAT1__BLANK = 2)
+
+      INTEGER CAT1__LETTR   ! Letter as separator (one of: h, d, m, s).
+      PARAMETER (CAT1__LETTR = 3)
+
+      INTEGER CAT1__HOUR    ! Express the angle in hours.
+      PARAMETER (CAT1__HOUR = 1)
+
+      INTEGER CAT1__DEG     ! Express the angle in degrees.
+      PARAMETER (CAT1__DEG = 2)
+
+      INTEGER CAT1__TIMIN   ! Express the angle in minutes of time.
+      PARAMETER (CAT1__TIMIN = 3)
+
+      INTEGER CAT1__ARMIN   ! Express the angle in minutes of arc.
+      PARAMETER (CAT1__ARMIN = 4)
+
+      INTEGER CAT1__TISEC   ! Express the angle in seconds of time.
+      PARAMETER (CAT1__TISEC = 5)
+
+      INTEGER CAT1__ARSEC   ! Express the angle in seconds of arc.
+      PARAMETER (CAT1__ARSEC = 6)
+
+*
+*    Additional codes for describing angles on input.
+
+      INTEGER CAT1__SDEG    ! Angle is in degree if signed, otherwise hours.
+      PARAMETER (CAT1__SDEG = 7)
+
+      INTEGER CAT1__NANGL    ! Not an angle.
+      PARAMETER (CAT1__NANGL = 8)
+
+*
+*    The following constants pertain to the descriptions of small text
+*    list and direct access binary catalogues, as decoded from their
+*    description files.
+*
+*    The following two flags indicate whether the table of values for
+*    the catalogue is in the same file as the description file or in
+*    a separate file.
+
+      INTEGER CAT1__INDSC   ! In the same file.
+      PARAMETER (CAT1__INDSC = 1)
+
+      INTEGER CAT1__SEPFL   ! In a separate file.
+      PARAMETER (CAT1__SEPFL = 2)
+
+*
+*    The following two flags indicate whether the positions of columns
+*    in the table of values are indicated by 'COLUMN' or 'CHARACTER'.
+*    The meaning of these two options is:
+*
+*    COLUMN - A sequential count of the columns, starting at one.
+*        Columns must be separated by one or more spaces.
+*
+*    CHARACTER - The position of the first element corresponding to the
+*        column in the table record in characters or bytes.  Again
+*        counting starts at one.
+
+      INTEGER CAT1__PSCOL   ! Positions specified by COLUMN.
+      PARAMETER (CAT1__PSCOL = 1)
+
+      INTEGER CAT1__PSCHR   ! Positions specified by CHARACTER.
+      PARAMETER (CAT1__PSCHR = 2)
+
+*
+*    Maximum number of continuation lines to be used when storing a single
+*    line of AST data in HDS.  Continuation lines are indicated by a '+'
+*    as the first character (normally this is a space). AST data lines which
+*    are still too long to be accommodated will cause an error.
+
+      INTEGER CAT1__MXACL
+      PARAMETER ( CAT1__MXACL = 64 )

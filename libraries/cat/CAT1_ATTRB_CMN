@@ -1,0 +1,84 @@
+*+
+*  Name:
+*     CAT1_ATTRB_CMN
+*  Purpose:
+*     Internal common block holdling the list of attributes.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block holdling the list of attributes.
+*
+*     Every attribute is defined by five quantities:
+*
+*      - the identifier for the component to which it belongs,
+*      - its name (defining the type of attribute it is),
+*      - a flag indicating whether or not it is mutable,
+*      - its data type,
+*      - its value.
+*
+*     A set of 4 arrays hold the first four quantities for each 
+*     attribute.  The value is held in one of a set of arrays, with
+*     one array for each data type.  A 5th array, parallel to the
+*     first 4, indicates which element of the appropriate value
+*     array hold the value.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     23/6/93 (ACD): Original version.
+*     20/7/93 (ACD): First stable version.
+*     9/3/94  (ACD): Changed variables to occur in the common block
+*        in order of decreasing size of data type.
+*     6/3/95  (ACD): Modified to reflect the changed names for the
+*        constants defining the array sizes.
+*     11/4/95 (ACD): Changed the name given in the 'Name:' section of
+*        the prologue to reflect Unix rather than VMS conventions.
+*     27/5/98 (ACD): Removed the separate array sizes and counts for
+*        the individual data types.
+*-
+
+*
+*    Arrays holding the attribute details.
+
+      INTEGER ATTID__CAT1(CAT1__MXATT) ! Identifier to parent component.
+
+      CHARACTER ATTNM__CAT1(CAT1__MXATT)*(CAT__SZANM)  ! Attribute name.
+
+      LOGICAL ATTMU__CAT1(CAT1__MXATT) ! Flag; attribute mutable?
+
+      INTEGER ATTYP__CAT1(CAT1__MXATT) ! Attribute data type.
+
+*
+*    Arrays holding the attribute value; one for each data type.
+
+      BYTE              ATTVV__CAT1(CAT1__MXATT) ! Unsigned byte,
+      BYTE              ATTVB__CAT1(CAT1__MXATT) ! Byte,
+      INTEGER*2         ATTVU__CAT1(CAT1__MXATT) ! Unsigned word,
+      INTEGER*2         ATTVW__CAT1(CAT1__MXATT) ! Word,
+      INTEGER           ATTVI__CAT1(CAT1__MXATT) ! Integer,
+      REAL              ATTVR__CAT1(CAT1__MXATT) ! Real,
+      DOUBLE PRECISION  ATTVD__CAT1(CAT1__MXATT) ! Double Precision,
+      LOGICAL           ATTVL__CAT1(CAT1__MXATT) ! Logical,
+      CHARACTER         ATTVC__CAT1(CAT1__MXATT)*(CAT1__SZATS) ! Character.
+
+*
+*    Counter holding the current number of attributes.
+
+      INTEGER
+     :  NATT__CAT1     ! Total number of attributes.
+
+*
+*    Common blocks.
+*    =============
+
+      COMMON /ATTRB/
+     :  ATTVD__CAT1,  ATTVR__CAT1,
+     :  ATTID__CAT1,  ATTYP__CAT1,  ATTVI__CAT1,
+     :  NATT__CAT1,
+     :  ATTMU__CAT1,  ATTVL__CAT1,
+     :  ATTVU__CAT1,  ATTVW__CAT1,  ATTVV__CAT1,  ATTVB__CAT1
+
+
+      COMMON /ATTRB_C/
+     :  ATTVC__CAT1,  ATTNM__CAT1

@@ -1,0 +1,101 @@
+*+
+*  Name:
+*     CAT1_AST_CMN
+*  Purpose:
+*     Internal common block containing AST information.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     An internal common block containing AST information.
+*
+*     This file contains definitions of AST-related global variables used 
+*     internally by the CAT library for things such as local communication 
+*     between the CAT library and the 'source' and 'sink' routines used to
+*     read and write AST_ data to and from catalogues.
+*  Authors:
+*     DSB: David S. Berry (Starlink)
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     8/10/99 (ACD): Original version (based on KPG_AST).
+*     3/11/99 (ACD): First stable version.
+*-
+
+*
+*    Parameters
+*    ==========
+
+      INTEGER AST__SZSTR           ! String size.
+      PARAMETER (AST__SZSTR = 15)
+
+      INTEGER AST__SZLNE           ! Size of a line of AST information.
+      PARAMETER (AST__SZLNE = 16510)
+
+      INTEGER AST__MXDIM           ! Maximum dimensionality of a
+      PARAMETER (AST__MXDIM = 2)   ! catalogue frame-set.
+
+      INTEGER AST__SZATR           ! AST Attribute list string size.
+      PARAMETER (AST__SZATR = 65)
+
+
+*---------------------------------------------------------------------
+
+*
+*    Variables
+*    =========
+
+*
+*    Flag; has an AST frame-set been found?
+
+      LOGICAL FND__AST
+
+*
+*    Identifier for the catalogue being searched for an AST frame-set.
+
+      INTEGER CI__AST
+
+*
+*    The current line of AST information and its length (excluding
+*    trailing blanks).
+
+      CHARACTER LINE__AST*(AST__SZLNE)
+      INTEGER   LLINE__AST
+
+*
+*    Length of a line of texual information for the catalogue
+*    associated with an AST frame-set.
+
+      INTEGER TLNSZ__AST
+
+*
+*    Details of any AST frame-set which is created for any of the
+*    open catalogues.
+
+      LOGICAL                   ! Flag; sky or grid (Cartesian) frame?
+     :  SKYFR__AST(CAT__MXCAT)  ! If .TRUE. then sky frame.
+
+      CHARACTER
+     :  COLS__AST(CAT__MXCAT, AST__MXDIM)*(CAT__SZCMP), ! Columns for axes.
+     :  DOMAN__AST(CAT__MXCAT)*(AST__SZSTR), ! Domain.
+     :  ATTRB__AST(CAT__MXCAT)*(AST__SZATR), ! Attributes list.
+     :  SYS__AST(CAT__MXCAT)*(AST__SZSTR),   ! Coordinate system.
+     :  EPOCH__AST(CAT__MXCAT)*(AST__SZSTR), !     "        "    epoch.
+     :  EQUIN__AST(CAT__MXCAT)*(AST__SZSTR)  !     "        "    equinox.
+
+*---------------------------------------------------------------------
+
+*
+*    Common blocks.
+*    =============
+
+      COMMON /AST_I/
+     :  CI__AST,  LLINE__AST,  TLNSZ__AST
+
+      COMMON /AST_L/
+     :  FND__AST,  SKYFR__AST
+
+      COMMON /AST_C/
+     :  LINE__AST,
+     :  COLS__AST,  DOMAN__AST,  ATTRB__AST,
+     :  SYS__AST,  EPOCH__AST,  EQUIN__AST

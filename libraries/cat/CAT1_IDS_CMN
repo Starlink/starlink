@@ -1,0 +1,51 @@
+*+
+*  Name:
+*     CAT1_IDS_CMN
+*  Purpose:
+*     Internal common block holdling the list of identifiers.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block holdling the list of identifiers.
+*
+*     For each identifier the following information is recorded:
+*
+*      - the value of the identifier,
+*      - its type (catalogue, column, parameter etc.),
+*      - the first element in the attributes common blocks to store
+*        its attributes,
+*      - the identifier which is the parent of the current identifier.
+*      - the corresponding array element in the catalogue arrays (this
+*        quantity is only used for catalogue identifiers, for other
+*        identifiers it is set to zero).
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     23/6/93 (ACD): Original version.
+*     6/3/95  (ACD): Modified to reflect the changed names for the
+*        constants defining the array sizes.
+*     7/3/95  (ACD): Added array IDCEL__CAT1.
+*     11/4/95 (ACD): Changed the name given in the 'Name:' section of
+*        the prologue to reflect Unix rather than VMS conventions.
+*-
+
+*
+*    Details of each identifier.
+
+      INTEGER
+     :  IDVAL__CAT1(CAT1__MXIDS), ! Value of the identifier.
+     :  IDTYP__CAT1(CAT1__MXIDS), ! Type of the identifier (cat. etc.).
+     :  IDATT__CAT1(CAT1__MXIDS), ! First element used in attibs array.
+     :  IDPRN__CAT1(CAT1__MXIDS), ! Parent identifier.
+     :  IDCEL__CAT1(CAT1__MXIDS)  ! Element in catalogue arrays.
+
+*
+*    The total current number of identifiers.
+
+      INTEGER NIDS__CAT1
+
+      COMMON /IDS/
+     :  IDVAL__CAT1,  IDTYP__CAT1,  IDATT__CAT1,  IDPRN__CAT1,
+     :  IDCEL__CAT1,  NIDS__CAT1

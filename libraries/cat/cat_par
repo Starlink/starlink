@@ -1,0 +1,244 @@
+
+*+
+*  Name:
+*     cat_par
+*  Purpose:
+*     External parametric constants for the CAT library.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     External parametric constants for the CAT library.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     13/5/93 (ACD): Original version.
+*     8/2/94  (ACD): First stable version.
+*     13/2/95 (ACD): Added CAT_UPAIR.
+*     6/3/95  (ACD): Changed definitions of the constants for array
+*       sizes from CAT_SZ... to CAT__MX...  Also removed unused constants.
+*     11/4/95 (ACD): Changed the name given in the 'Name:' section of
+*        the prologue to reflect Unix rather than VMS conventions.
+*     11/4/95 (ACD): Changed the name of the null identifier and tweaked
+*        several of the values.
+*     13/5/96 (ACD): Removed CAT__MXEXP, the parameteric constant for the
+*        maximum permitted number of expressions.  CAT__MXEXP was not
+*        used and the parser actually used a different constant in its
+*        own INCLUDE files for the maximum number of expressions.  Thus
+*        CAT__MXEXP was confusing.
+*     16/7/96 (ACD): Changed size of CAT__SZTYP from 7 to 10 to
+*        accommodate the leading underscore ('_') and CHARACTER strings
+*        of up to four-digit elements (that is, up to _CHAR*9999).
+*     27/3/97 (ACD): Changed size of CAT__SZCNM from 15 to 80 in order
+*        to permit long catalogue names.
+*     2/8/98  (ACD): Increased CAT__SZEXF to 40 to accommodate more
+*        complicated table format specifiers for angles.
+*     8/10/99 (ACD): CAT__SZTXL and CAT__ASTSG.
+*     1/11/99 (ACD): changed the value of CAT__ASTSG.
+*-
+
+*    Success status.
+
+      INTEGER CAT__OK
+      PARAMETER (CAT__OK = 0)
+      
+*
+*    Maximum numbers of various entities.
+
+      INTEGER CAT__MXCAT   ! Maximum permitted number of open 
+      PARAMETER (CAT__MXCAT = 5)  ! catalogues.
+
+      INTEGER CAT__MXCOL   ! Maximum permitted number of columns.
+      PARAMETER (CAT__MXCOL = 1000)
+
+      INTEGER CAT__MXIND   ! Maximum permitted number of indices.
+      PARAMETER (CAT__MXIND = CAT__MXCOL)
+
+      INTEGER CAT__MXPAR   ! Maximum permitted number of parameters.
+      PARAMETER (CAT__MXPAR = 500)
+
+      INTEGER CAT__MXPRT   ! Maximum permitted number of parts.
+      PARAMETER (CAT__MXPRT = CAT__MXCOL + CAT__MXPAR)
+
+      INTEGER CAT__MXSEL   ! Maximum permitted number of selections.
+      PARAMETER (CAT__MXSEL = 100)
+
+      INTEGER CAT__MXJOI   ! Maximum permitted number of joins.
+      PARAMETER (CAT__MXJOI = 100)
+
+*
+*    Maximum sizes of catalogue attributes.
+
+      INTEGER CAT__SZCNM   ! Maximum size of catalogue name.
+      PARAMETER (CAT__SZCNM = 80)
+
+      INTEGER CAT__SZCNF   ! Maximum size of full catalogue name, that 
+      PARAMETER (CAT__SZCNF = 256) ! is, including a directory spec.
+
+*
+*    Maximum sizes of various column and parameter attributes.
+
+      INTEGER CAT__SZANM   ! Maximum size of an attribute name.
+      PARAMETER (CAT__SZANM = 15)
+
+      INTEGER CAT__SZCMP   ! Maximum size of a component (column, 
+      PARAMETER (CAT__SZCMP = 15) ! parameter or index) name.
+
+      INTEGER CAT__SZTYP   ! Size of the type attribute for a column or
+      PARAMETER (CAT__SZTYP = 10) ! parameter.
+
+      INTEGER CAT__SZUNI   ! Size of the units attribute for a column or
+      PARAMETER (CAT__SZUNI = 20) ! parameter.
+
+      INTEGER CAT__SZEXF   ! Size of the external format attribute for a
+      PARAMETER (CAT__SZEXF = 40) ! column or parameter.
+
+      INTEGER CAT__SZCOM   ! Size of the comments attribute for a column
+      PARAMETER (CAT__SZCOM = 80)  ! or parameter.
+
+      INTEGER CAT__SZVAL   ! Maximum size of value attribute for a 
+      PARAMETER (CAT__SZVAL = 80)  ! parameter.
+
+      INTEGER CAT__SZEXP   ! Maximum size of character string to hold an
+      PARAMETER (CAT__SZEXP = 200) ! expression.
+
+      INTEGER CAT__SZTXL   ! Maximum size of line of textual information.
+      PARAMETER (CAT__SZTXL = 500)
+
+*
+*    Flags indicating whether columns and parameters are scalars or
+*    vectors.
+
+      INTEGER CAT__SCALR   ! Flag: column or parameter is a scalar.
+      PARAMETER (CAT__SCALR = 0)
+
+      INTEGER CAT__VECTR   ! Flag: column or parameter is a vector
+      PARAMETER (CAT__VECTR = 1)   ! (1-D array).
+
+*
+*    Flags indicating the way that null values are handled for a column.
+
+      INTEGER CAT__NULLD  ! Default, HDS null values.
+      PARAMETER (CAT__NULLD = 1)
+
+      INTEGER CAT__NULLS  ! Null values explicitly specified.
+      PARAMETER (CAT__NULLS = 2)
+
+      INTEGER CAT__LOCUM  ! Locum values.
+      PARAMETER (CAT__LOCUM = 3)
+
+*
+*    Flags indicating either the intrinsic order of a column, or the
+*    order of an index.
+
+      INTEGER CAT__ASCND  ! Ascending order.
+      PARAMETER (CAT__ASCND = 1)
+
+      INTEGER CAT__DSCND  ! Descending order.
+      PARAMETER (CAT__DSCND = 2)
+
+      INTEGER CAT__NOORD  ! No order.
+      PARAMETER (CAT__NOORD = 3)
+
+*
+*    Flags indicating the genus of a column.
+*    These flags are also used as flags to identify the type of
+*    columns required, hence CAT__GALL, indicating both virtual and
+*    physical columns.
+
+      INTEGER CAT__GVIRT  ! Genus of the column is virtual.
+      PARAMETER (CAT__GVIRT = 1)
+
+      INTEGER CAT__GPHYS  ! Genus of the column is physical.
+      PARAMETER (CAT__GPHYS = 2)
+
+      INTEGER CAT__GALL   ! Both virtual and physical columns.
+      PARAMETER (CAT__GALL = 3)
+
+*
+*    Types of identifiers.
+
+      INTEGER CAT__CITYP   ! Catalogue.
+      PARAMETER (CAT__CITYP = 1)
+
+      INTEGER CAT__FITYP   ! Column or field.
+      PARAMETER (CAT__FITYP = 2)
+
+      INTEGER CAT__QITYP   ! Parameter.
+      PARAMETER (CAT__QITYP = 3)
+
+      INTEGER CAT__EITYP   ! Expression.
+      PARAMETER (CAT__EITYP = 4)
+
+      INTEGER CAT__IITYP   ! Index.
+      PARAMETER (CAT__IITYP = 5)
+
+      INTEGER CAT__SITYP   ! Selection.
+      PARAMETER (CAT__SITYP = 6)
+
+      INTEGER CAT__JITYP   ! Join.
+      PARAMETER (CAT__JITYP = 7)
+
+      INTEGER CAT__FETYP   ! Vector column element.
+      PARAMETER (CAT__FETYP = 8)
+
+      INTEGER CAT__QETYP   ! Vector parameter element.
+      PARAMETER (CAT__QETYP = 9)
+
+*
+*    Special identifiers.
+
+      INTEGER CAT__NOID   ! Null identifier.
+      PARAMETER (CAT__NOID = -1)
+
+      INTEGER CAT__PRNUL   ! No parent identifier.
+      PARAMETER (CAT__PRNUL = -2)
+
+*
+*    Codes denoting the various data types.
+*    Note that by Starlink convention the parameters for the unsigned
+*    INTEGER data types are permitted to have six characters in the
+*    main body of the name (that is, excluding the prefix).
+
+      INTEGER CAT__TYPEUB  ! Unsigned byte.
+      PARAMETER (CAT__TYPEUB = 1)
+
+      INTEGER CAT__TYPEB   ! Byte
+      PARAMETER (CAT__TYPEB = 2)
+
+      INTEGER CAT__TYPEUW  ! Unsigned word.
+      PARAMETER (CAT__TYPEUW = 3)
+
+      INTEGER CAT__TYPEW   ! Word.
+      PARAMETER (CAT__TYPEW = 4)
+
+      INTEGER CAT__TYPEI   ! Integer.
+      PARAMETER (CAT__TYPEI = 5)
+
+      INTEGER CAT__TYPER   ! Real.
+      PARAMETER (CAT__TYPER = 6)
+
+      INTEGER CAT__TYPED   ! Double precision.
+      PARAMETER (CAT__TYPED = 7)
+
+      INTEGER CAT__TYPEL   ! Logical.
+      PARAMETER (CAT__TYPEL = 8)
+
+      INTEGER CAT__TYPEC   ! Character.
+      PARAMETER (CAT__TYPEC = 9)
+
+*
+*    Flag to indicate that a row is not paired or joined; it is used
+*    in any list of such pairs or joins.
+
+      INTEGER CAT__UPAIR
+      PARAMETER (CAT__UPAIR = 0)
+
+*
+*    AST object signature.  A line of AST information stored as textual
+*    information in a catalogue will always be prefixed with this
+*    signature.
+
+      CHARACTER CAT__ASTSG*2
+      PARAMETER (CAT__ASTSG = '!!')

@@ -1,0 +1,110 @@
+*+
+*  Name:
+*     CAT5_ANG.CMN
+*  Purpose:
+*     Internal small text list angles details common block.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block specifying details of all the columns
+*     of angles in the small text list which is currently being
+*     opened.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     28/7/98  (ACD): Original version.
+*     2/8/98   (ACD): First stable version.
+*-
+
+*
+*    Parametric constants.
+*    ====================
+
+*
+*    The maximum permitted number of columns of angles in a catalogue.
+
+      INTEGER CAT5__MXANG
+      PARAMETER (CAT5__MXANG = 20)
+
+*
+*    The size of format specifiers.
+
+      INTEGER CAT5__FMTSZ
+      PARAMETER (CAT5__FMTSZ = 10)
+
+*
+*    Common block variables.
+*    ======================
+
+*
+*    The number of columns of angles in the catalogue.
+
+      INTEGER NANG__CAT5
+
+*
+*    Details for each column of angles.
+*
+*    Flag indicating whether the angle is simple or complex, coded
+*    as follows:
+*     .FALSE. - simple angle,
+*     .TRUE.  - complex angle.
+*    A simple angle has colons separating the sexagesimal subdivisions;
+*    a complex angle has Fortran-like format specifiers defining how
+*    the subdivisions are laid out.
+
+      LOGICAL ANCMX__CAT5(CAT5__MXANG)
+
+*
+*    Details of the angle.
+
+      INTEGER
+     :  ANUNI__CAT5(CAT5__MXANG),   ! Units code: hours, degrees, etc.
+     :  ANWID__CAT5(CAT5__MXANG)    ! Total width.
+
+*
+*    Details of the separate sign.
+*
+*    The separate sign flag is coded as follows:
+*     .TRUE.  - the angle has a separate sign field.
+*     .FALSE. - the angle does not have a separate sign field.
+
+      LOGICAL
+     :  ANSGN__CAT5(CAT5__MXANG)    ! Separate sign flag.
+      INTEGER
+     :  ANPSG__CAT5(CAT5__MXANG),   ! Relative postion
+     :  ANWSG__CAT5(CAT5__MXANG)    ! Width.
+      CHARACTER
+     :  ANFSG__CAT5(CAT5__MXANG)*(CAT5__FMTSZ) ! Format specifier.
+
+*
+*    Number of sexagesimal subdivisions for the angle.
+
+      INTEGER ANNSG__CAT5(CAT5__MXANG)
+
+*
+*    Details of the individual sexagesimal subdivisions.
+
+      INTEGER
+     :  ANTYP__CAT5(CAT5__MXANG, 3),  ! Data type.
+     :  ANPOS__CAT5(CAT5__MXANG, 3),  ! Relative position.
+     :  ANSWD__CAT5(CAT5__MXANG, 3)   ! Width.
+      CHARACTER
+     :  ANFMT__CAT5(CAT5__MXANG, 3)*(CAT5__FMTSZ)  ! Format specifier.
+
+
+*
+*    Common blocks
+*    =============
+
+      COMMON /STLAN/
+     :  NANG__CAT5,
+     :  ANUNI__CAT5,  ANWID__CAT5,
+     :  ANPSG__CAT5,  ANWSG__CAT5,
+     :  ANNSG__CAT5,
+     :  ANTYP__CAT5,  ANPOS__CAT5,  ANSWD__CAT5,
+     :  ANCMX__CAT5,  ANSGN__CAT5
+
+      COMMON /STLAN_C/
+     :  ANFSG__CAT5,  ANFMT__CAT5

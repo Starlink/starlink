@@ -1,0 +1,95 @@
+*+
+*  Name:
+*     CAT1_DSDIR_CMN
+*  Purpose:
+*     Internal common block description file directives.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     An internal common block to hold variables corresponding to
+*     description file directives.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     2/7/96   (ACD): Original version.
+*     19/11/96 (ACD): First stable version.
+*-
+
+*
+*    Flag determining whether the table of values for the catalogue is
+*    in the description file or a separate file.  The permitted values
+*    are:
+*
+*    CAT1__INDSC  - in the description file.
+*    CAT1__SEPFL  - in a separate file.
+
+      INTEGER DFLFG__CAT1
+
+*
+*    Variable holding the name of the file containing the table of values
+*    if the table is in a separate file, otherwise unused.
+
+      CHARACTER DFILE__CAT1*(CAT__SZCNF)
+
+*
+*    Flag indicating whether columns in the table are identified by
+*    the COLUMN sequence number or the position of the first CHARACTER.
+*    The permitted values are:
+*
+*    CAT1__PSCOL  - by COLUMN,
+*    CAT1__PSCHR  - by CHARACTER.
+
+      INTEGER DPOSN__CAT1
+
+*
+*    The size of each record in the table, in bytes.  This value is only
+*    used for direct access binary catalogues.
+
+      INTEGER DRESZ__CAT1
+
+*
+*    The number of rows in the table.
+
+      INTEGER DROWS__CAT1
+
+*
+*    The number of header rows to skip at the start of the table.
+
+      INTEGER DSKIP__CAT1
+
+*
+*    Number of columns in the table.
+
+      INTEGER DCOLS__CAT1
+
+*
+*    Number of parameters in the table.
+
+      INTEGER DPARS__CAT1
+
+*
+*    Number of lines in the description part of the description file.
+*    This count includes everything up to and including any 'BEGINTABLE'.
+
+      INTEGER DDESC__CAT1
+
+*
+*    Arrays holding additional details for individual columns.
+
+      INTEGER   DFID__CAT1(CAT__MXCOL)                ! Identifiers.
+      INTEGER   DPOS__CAT1(CAT__MXCOL)                ! Positions.
+      CHARACTER DFMT__CAT1(CAT__MXCOL)*(CAT__SZEXF)   ! Format in table.
+
+*
+*    Common blocks.
+*    =============
+      
+      COMMON /DSDIR/
+     :  DFLFG__CAT1,  DPOSN__CAT1,  DRESZ__CAT1,  DROWS__CAT1,
+     :  DSKIP__CAT1,  DCOLS__CAT1,  DPARS__CAT1,  DDESC__CAT1,
+     :  DFID__CAT1,   DPOS__CAT1
+
+      COMMON /DSDIR_C/
+     :  DFILE__CAT1,  DFMT__CAT1

@@ -1,0 +1,92 @@
+*+
+*  Name:
+*     CAT6_TST.CMN
+*  Purpose:
+*     Internal common block specific to the tab-separated table back-end.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block specific to the tab-separated table back-end.
+*  Authors:
+*     ACD: A C Davenhall (Edinburgh)
+*  History:
+*     18/5/99 (ACD): Original version.
+*     18/6/99 (ACD): First stable version.
+*     12/7/00 (ACD): Removed constants associated with the 'interpretation
+*        mode' which also removed.
+*     11/9/00 (ACD): Changed CAT6__SZDRC to be defined as CAT1__SZDRC.
+*-
+
+*
+*    Parametric constants.
+*    ====================
+
+*
+*    The maximum permitted number of rows.
+
+      INTEGER CAT6__MXROW
+      PARAMETER (CAT6__MXROW = 15000)
+
+*
+*    Maximum size of a record.
+
+      INTEGER CAT6__SZDRC
+      PARAMETER (CAT6__SZDRC = CAT1__SZDRC)
+
+*
+*    Maximum permitted number of columns.
+
+      INTEGER CAT6__MXCOL
+      PARAMETER (CAT6__MXCOL = 200)
+
+*
+*    Maximum permitted field size.
+
+      INTEGER CAT6__FLDSZ
+      PARAMETER (CAT6__FLDSZ = 100)
+
+*
+*    ASCII value of tab character (which is used to separate fields).
+
+      INTEGER CAT6__TABI
+      PARAMETER (CAT6__TABI = 9)
+
+
+*
+*    Common block variables.
+*    ======================
+
+*
+*    Fortran unit number for the description file.
+
+      INTEGER
+     :  TSUNT__CAT6(CAT__MXCAT)
+
+*
+*    Total number of header records at the start of the tab-separated table
+*    and the current record in the header.
+
+      INTEGER
+     :  HDREC__CAT6(CAT__MXCAT),  ! Total number of header records.
+     :  HDCUR__CAT6(CAT__MXCAT)   ! Current header record.
+
+*
+*    Details defining the position of and format of each field within
+*    a single record.
+
+      INTEGER
+     :  FDTYP__CAT6(CAT1__MXIDS),  ! Data type code.
+     :  FCSIZ__CAT6(CAT1__MXIDS),  ! Size of CHARACTER columns.
+     :  FPTR__CAT6(CAT1__MXIDS),   ! Pointers to columns.
+     :  FPTRN__CAT6(CAT1__MXIDS)   ! Pointers to null value flags.
+
+
+*
+*    Common blocks
+*    =============
+
+      COMMON /TST/
+     :  TSUNT__CAT6,  HDREC__CAT6,  HDCUR__CAT6,
+     :  FDTYP__CAT6,  FCSIZ__CAT6,  FPTR__CAT6,   FPTRN__CAT6

@@ -1,0 +1,80 @@
+*+
+*  Name:
+*     CAT3_FIT_PAR
+*  Purpose:
+*     Internal symbolic constants for the FITS back-end.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal symbolic constants for the FITS back-end.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     5/7/94  (ACD): Original version.
+*     22/9/94 (ACD): First stable version.
+*     10/3/95 (ACD): Added CAT3_SZCVL.
+*-
+
+*
+*    Symbolic constants for the various FITSIO data types.
+
+      INTEGER CAT3__FTYPX           ! Bit flags ????
+      PARAMETER (CAT3__FTYPX = 1)
+
+      INTEGER CAT3__FTYPB           ! Byte.
+      PARAMETER (CAT3__FTYPB = 2)
+
+      INTEGER CAT3__FTYPI           ! Word.
+      PARAMETER (CAT3__FTYPI = 3)
+
+      INTEGER CAT3__FTYPJ           ! Integer.
+      PARAMETER (CAT3__FTYPJ = 4)
+
+      INTEGER CAT3__FTYPE           ! Real.
+      PARAMETER (CAT3__FTYPE = 5)
+
+      INTEGER CAT3__FTYPD           ! Double Precision.
+      PARAMETER (CAT3__FTYPD = 6)
+
+      INTEGER CAT3__FTYPL           ! Logical.
+      PARAMETER (CAT3__FTYPL = 7)
+
+      INTEGER CAT3__FTYPA           ! Character.
+      PARAMETER (CAT3__FTYPA = 8)
+
+      INTEGER CAT3__FTYPC           ! Complex real.
+      PARAMETER (CAT3__FTYPC = 9)
+
+      INTEGER CAT3__FTYPM           ! Complex double precision.
+      PARAMETER (CAT3__FTYPM = 10)
+
+*
+*    Minimum value by which either the scale factor must differ from
+*    1.0D0 or the zero point must differ from 0.0D0 for a column to
+*    be considered scaled.
+
+      DOUBLE PRECISION CAT3__MINVL
+      PARAMETER (CAT3__MINVL = 1.0D-8)
+
+*
+*    Symbolic constants defining the various permitted states when
+*    accessing textual information in the primary and extension
+*    headers for a FITS table.
+
+      INTEGER CAT3__HSTTB           ! Before the primary header.
+      PARAMETER (CAT3__HSTTB = 1)
+
+      INTEGER CAT3__HSTTP           ! In the primary header.
+      PARAMETER (CAT3__HSTTP = 2)
+
+      INTEGER CAT3__HSTTE           ! In the table extension header.
+      PARAMETER (CAT3__HSTTE = 3)
+
+*
+*    The maximum permitted size for the value of a FITS keyword of data
+*    type CHARACTER.
+
+      INTEGER CAT3__SZCVL
+      PARAMETER (CAT3__SZCVL = 67)

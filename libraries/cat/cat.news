@@ -1,0 +1,20 @@
+1 CAT_library
+
+  Version 8.1 of the CAT subroutine library for manipulating astronomical
+  catalogues and tables has recently been released.
+
+  The CAT library can access catalogues and tables held in a number of
+  formats, including FITS tables and simple text files in the Small Text
+  List (STL) and Tab-Separated Table (TST) formats.  The major change in
+  version 8.1 is the removal of support for the CHI/HDS catalogue format,
+  which was little used.  If you continue to require access to catalogues
+  in this format then please contact me at the e-mail address given below
+  and I should be able to provide a work-around.
+
+  There are no other major changes in version 8.1, just some bug fixes
+  and minor enhancements.
+
+  The CAT library is documented in SUN/181.
+
+
+  A C Davenhall (acd@roe.ac.uk), 4 April 2001.
