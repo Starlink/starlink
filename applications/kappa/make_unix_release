@@ -51,7 +51,7 @@
       set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
       if( "$n" != "" ) then
          echo "The following files contain references to NDF parameter routines or"
-         echo "to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines??
+         echo "to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines??"
          echo $n
          echo -n "Continue? (Y/N): "
          set ans = $<

@@ -566,7 +566,7 @@
 
 *  Create the output NDF to contain the integer colour indices. Propagate
 *  the section from the first supplied input NDF.
-      CALL NDF_PROP( INDF( FIRST ), 'AXIS,WCS,NOLABEL,NOTITLE', 'OUT',
+      CALL LPG_PROP( INDF( FIRST ), 'AXIS,WCS,NOLABEL,NOTITLE', 'OUT',
      :               INDFO, STATUS ) 
 
 *  Annul the error if a null value was supplied. We can still create the
@@ -610,7 +610,7 @@
 *  Create the output colour table.
          LUTBND( 1 ) = 3
          LUTBND( 2 ) = NLUT
-         CALL NDF_CREP( 'LUT', '_REAL', 2, LUTBND, INDFL, STATUS ) 
+         CALL LPG_CREP( 'LUT', '_REAL', 2, LUTBND, INDFL, STATUS ) 
 
 *  Map the output colour table.
          CALL NDF_MAP( INDFL, 'DATA', '_REAL', 'WRITE', IPLUT, EL, 
