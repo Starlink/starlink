@@ -27,7 +27,7 @@
 * Global constants :
 
 	INCLUDE 'ADAM_DEFNS'
-
+	INCLUDE 'SAE_PAR'
 	INCLUDE 'DTDEFNS'
 	INCLUDE 'DTERRS'
 
