@@ -31,13 +31,11 @@ f     display by using AST_FORMAT.
 *     SkyFrame also has the following attributes:
 *
 *     - AsTime(axis): Format celestial coordinates as times?
-*     - Epoch: Epoch of observation
 *     - Equinox: Epoch of the mean equinox
 *     - LatAxis: Index of the latitude axis
 *     - LonAxis: Index of the longitude axis
 *     - NegLon: Display longitude values in the range [-pi,pi]?
 *     - Projection: Sky projection description.
-*     - System: Celestial coordinate system
 
 *  Functions:
 c     The SkyFrame class does not define any new functions beyond those
@@ -100,6 +98,11 @@ f     The SkyFrame class does not define any new routines beyond those
 *        considered to be unrelated, resulting in no ability to convert from 
 *        one to the other. This could result for instance in astConvert
 *        being unable to find a maping from a SkyFrame to itself.
+*     15-NOV-2002 (DSB):
+*        Moved System and Epoch attributes to the Frame class.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitSkyFrameVtab
+*        method.
 *class--
 */
 
@@ -109,6 +112,10 @@ f     The SkyFrame class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS SkyFrame
+
+/* Define the first and last acceptable System values. */
+#define FIRST_SYSTEM AST__FK4
+#define LAST_SYSTEM AST__UNKNOWN
 
 /* Header files. */
 /* ============= */
@@ -151,6 +158,8 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are used or extended by this
    class. */
+static AstSystemType (* parent_getsystem)( AstFrame * );
+static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static const char *(* parent_format)( AstFrame *, int, double );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static const char *(* parent_getdomain)( AstFrame * );
@@ -159,10 +168,11 @@ static const char *(* parent_getlabel)( AstFrame *, int );
 static const char *(* parent_getsymbol)( AstFrame *, int );
 static const char *(* parent_gettitle)( AstFrame * );
 static const char *(* parent_getunit)( AstFrame *, int );
+static double (* parent_getepoch)( AstFrame * );
 static double (* parent_gap)( AstFrame *, int, double, int * );
-static int (* parent_getdirection)( AstFrame *, int );
 static double (* parent_getbottom)( AstFrame *, int );
 static double (* parent_gettop)( AstFrame *, int );
+static int (* parent_getdirection)( AstFrame *, int );
 static int (* parent_match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int (* parent_subframe)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int (* parent_testattrib)( AstObject *, const char * );
@@ -184,9 +194,10 @@ static double piby2;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstSkySystemType GetSystem( AstSkyFrame * );
-static AstSkySystemType SystemCode( const char * );
-static const char *FmtDecimalYr( double, int );
+static AstSystemType GetAlignSystem( AstFrame * );
+static AstSystemType GetSystem( AstFrame * );
+static AstSystemType SystemCode( AstFrame *, const char * );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
 static const char *Format( AstFrame *, int, double );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetDomain( AstFrame * );
@@ -196,58 +207,49 @@ static const char *GetProjection( AstSkyFrame * );
 static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
-static const char *SystemString( AstSkySystemType );
+static const char *SystemString( AstFrame *, AstSystemType );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
-static double GetEpoch( AstSkyFrame * );
+static double GetBottom( AstFrame *, int );
+static double GetEpoch( AstFrame * );
 static double GetEquinox( AstSkyFrame * );
+static double GetTop( AstFrame *, int );
 static double Offset2( AstFrame *, const double[2], double, double, double[2] );
-static double ReadDateTime( const char * );
-static int ChrMatch( const char *, const char * );
 static int GetAsTime( AstSkyFrame *, int );
 static int GetDirection( AstFrame *, int );
-static double GetBottom( AstFrame *, int );
-static double GetTop( AstFrame *, int );
 static int GetLatAxis( AstSkyFrame * );
 static int GetLonAxis( AstSkyFrame * );
 static int GetNegLon( AstSkyFrame * );
-static int IsEquatorial( AstSkySystemType );
-static int MakeSkyMapping( AstSkyFrame *, AstSkyFrame *, AstMapping ** );
+static int IsEquatorial( AstSystemType );
+static int MakeSkyMapping( AstSkyFrame *, AstSkyFrame *, AstSystemType, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 static int TestAsTime( AstSkyFrame *, int );
 static int TestAttrib( AstObject *, const char * );
-static int TestEpoch( AstSkyFrame * );
 static int TestEquinox( AstSkyFrame * );
 static int TestNegLon( AstSkyFrame * );
 static int TestProjection( AstSkyFrame * );
-static int TestSystem( AstSkyFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
 static void ClearAsTime( AstSkyFrame *, int );
 static void ClearAttrib( AstObject *, const char * );
-static void ClearEpoch( AstSkyFrame * );
 static void ClearEquinox( AstSkyFrame * );
 static void ClearNegLon( AstSkyFrame * );
 static void ClearProjection( AstSkyFrame * );
-static void ClearSystem( AstSkyFrame * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstSkyFrameVtab * );
 static void Norm( AstFrame *, double[] );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
-static void SetEpoch( AstSkyFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
-static void SetNegLon( AstSkyFrame *, int );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
+static void SetNegLon( AstSkyFrame *, int );
 static void SetProjection( AstSkyFrame *, const char * );
-static void SetSystem( AstSkyFrame *, AstSkySystemType );
 static void Shapp( double, double *, double *, double, double * );
 static void Shcal( double, double, double, double *, double * );
 
@@ -315,22 +317,12 @@ static double Angle( AstFrame *this_frame, const double a[],
    double bb[ 2 ];               /* Permuted b coordinates */
    double cc[ 2 ];               /* Permuted c coordinates */
    double result;                /* Value to return */
-   int stat;                     /* Status return from SLALIB */
-   static double piby2;          /* Value of pi/2 */
-   static int init = 0;          /* Value of pi/2 initialised? */
 
 /* Initialise. */
    result = AST__BAD;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-
-/* If not already done, obtain a value for pi/2 from SLALIB by
-   converting 90 degrees into radians. */
-   if ( !init ) {   
-      slaDaf2r( 90, 0, 0.0, &piby2, &stat );
-      init = 1;
-   }
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -384,72 +376,6 @@ static double Angle( AstFrame *this_frame, const double a[],
    return result;
 }
 
-static int ChrMatch( const char *str1, const char *str2 ) {
-/*
-*  Name:
-*     ChrMatch
-
-*  Purpose:
-*     Case insensitive string comparison.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     int ChrMatch( const char *str1, const char *str2 )
-
-*  Class Membership:
-*     SkyFrame member function.
-
-*  Description:
-*     This function compares two null terminated strings for equality,
-*     discounting differences in case and any trailing white space in either
-*     string.
-
-*  Parameters:
-*     str1
-*        Pointer to the first string.
-*     str2
-*        Pointer to the second string.
-
-*  Returned Value:
-*     Non-zero if the two strings match, otherwise zero.
-
-*  Notes:
-*     -  A value of zero is returned if this function is invoked with the
-*     global error status set or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   int match;                    /* Strings match? */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Initialise. */
-   match = 1;
-
-/* Loop to compare characters in the two strings until a mis-match occurs or
-   we reach the end of the longer string. */
-   while ( match && ( *str1 || *str2 ) ) {
-
-/* Two characters match if (a) we are at the end of one string and the other
-   string contains white space or (b) both strings contain the same character
-   when converted to lower case. */
-      match = ( !*str1 && isspace( *str2 ) ) ||
-              ( !*str2 && isspace( *str1 ) ) ||
-              ( tolower( *str1 ) == tolower( *str2 ) );
-
-/* Step through each string a character at a time until its end is reached. */
-      if ( *str1 ) str1++;
-      if ( *str2 ) str2++;
-   }
-
-/* Return the result. */
-   return match;
-}
-   
 static void ClearAsTime( AstSkyFrame *this, int axis ) {
 /*
 *  Name:
@@ -564,11 +490,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
         && ( nc >= len ) ) {
       astClearAsTime( this, axis - 1 );
 
-/* Epoch. */
-/* ------ */
-   } else if ( !strcmp( attrib, "epoch" ) ) {
-      astClearEpoch( this );
-
 /* Equinox. */
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
@@ -584,11 +505,6 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "projection" ) ) {
       astClearProjection( this );
 
-/* System. */
-/* ------- */
-   } else if ( !strcmp( attrib, "system" ) ) {
-      astClearSystem( this );
-   
 /* If the name was not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then report an
    error. */
@@ -691,82 +607,6 @@ static double Distance( AstFrame *this_frame,
 
 /* Return the result. */
    return result;
-}
-
-static const char *FmtDecimalYr( double year, int digits ) {
-/*
-*  Name:
-*     FmtDecimalYr
-
-*  Purpose:
-*     Format an epoch expressed in years as a decimal string.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     const char *FmtDecimalYr( double year, int digits )
-
-*  Class Membership:
-*     SkyFrame member function.
-
-*  Description:
-*     This function formats an epoch expressed in years as a decimal string
-*     and returns a pointer to the result. It is intended for formatting 
-*     SkyFrame Equinox and Epoch values for display.
-
-*  Parameters:
-*     year
-*        The epoch to be formatted.
-*     digits
-*        The number of digits of precision required.
-
-*  Returned Value:
-*     Pointer to a null terminated string containing the formatted value.
-
-*  Notes:
-*     - The result string is stored in static memory and may be
-*     over-written by a subsequent invocation of this function.
-*     - A NULL pointer is returned if this function is invoked with
-*     the global error status set or if it should fail for any reason.
-*/
-
-/* Local Constants: */
-#define BUFF_LEN 50              /* Max characters in result string */
-
-/* Local Variables: */
-   const char *result;           /* Pointer value to return */
-   int nc;                       /* Number of characters in buffer */
-   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
-
-/* Check the global error status. */
-   if ( !astOK ) return NULL;
-
-/* Limit the precision to what is meaningful. */
-   digits = ( digits > DBL_DIG ) ? DBL_DIG : digits;
-
-/* Format the year value. Use "g" format to avoid buffer overflow and
-   to get useful diagnostic output if a silly value is given. */
-   nc = sprintf( buff, "%#.*g", digits, year );
-
-/* Set the result value. */
-   result = buff;
-
-/* Loop to remove redundant zeros from the end of the result. */
-   while ( buff[ --nc ] == '0' ) buff[ nc ] = '\0';
-
-/* If the last character is now a decimal point, put back one zero. */
-   if ( buff[ nc ] == '.' ) {
-      buff[ ++nc ] = '0';
-      buff[ ++nc ] = '\0';
-   }
-
-/* Return the result. */
-   return buff;
-
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
 static const char *Format( AstFrame *this_frame, int axis, double value ) {
@@ -1072,9 +912,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
-   AstSkySystemType system;      /* System attribute value */
    const char *result;           /* Pointer value to return */
-   double epoch;                 /* Epoch attribute value (as MJD) */
    double equinox;               /* Equinox attribute value (as MJD) */
    int as_time;                  /* AsTime attribute value */
    int axis;                     /* SkyFrame axis number */
@@ -1111,18 +949,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
-/* Epoch. */
-/* ------ */
-   } else if ( !strcmp( attrib, "epoch" ) ) {
-      epoch = astGetEpoch( this );
-      if ( astOK ) {
-
-/* Format the Epoch as decimal years. Use a Besselian epoch if it will
-   be less than 1984.0, otherwise use a Julian epoch. */
-         result = FmtDecimalYr( ( epoch < slaEpj2d( 1984.0 ) ) ?
-                                slaEpb( epoch ) : slaEpj( epoch ), DBL_DIG );
-      }
-
 /* Equinox. */
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
@@ -1131,9 +957,9 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Format the Equinox as decimal years. Use a Besselian epoch if it
    will be less than 1984.0, otherwise use a Julian epoch. */
-         result = FmtDecimalYr( ( equinox < slaEpj2d( 1984.0 ) ) ?
-                                slaEpb( equinox ) : slaEpj( equinox ),
-                                DBL_DIG );
+         result = astFmtDecimalYr( ( equinox < slaEpj2d( 1984.0 ) ) ?
+                                   slaEpb( equinox ) : slaEpj( equinox ),
+                                   DBL_DIG );
       }
 
 /* LatAxis */
@@ -1167,26 +993,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "projection" ) ) {
       result = astGetProjection( this );
-
-/* System. */
-/* ------- */
-/* Obtain the System code and convert to a string. (Note that this
-   will fail if derived classes have extended the range of codes in
-   use, in which case they must also over-ride this attribute name in
-   astGetAttrib to extend the range of strings returned.) */
-   } else if ( !strcmp( attrib, "system" ) ) {
-      system = astGetSystem( this );
-      if ( astOK ) {
-         result = SystemString( system );
-
-/* Report an error if the value was not recognised. */
-         if ( !result ) {
-            astError( AST__SCSIN,
-                     "astGetAttrib(%s): Corrupt %s contains invalid sky "
-                     "coordinate system identification code (%d).",
-                     astGetClass( this ), astGetClass( this ), (int) system );
-         }   
-      }
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1382,15 +1188,9 @@ static double GetBottom( AstFrame *this_frame, int axis ) {
    SkyFrame class. */
    } else {
 
-/* If this is a co-latitude axis return zero. */
-      if( axis_p == 1 ) {
-         if( astGetSystem( this ) == AST__HPR ) {
-            result = 0.0;
-
 /* If it is a latitude axis return -pi/2. */
-         } else {
-            result = -piby2;
-         }
+      if( axis_p == 1 ) {
+         result = -piby2;
 
 /* If it is a longitude value return -DBL_MAX (i.e. no lower limit). */
       } else {
@@ -1400,6 +1200,82 @@ static double GetBottom( AstFrame *this_frame, int axis ) {
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = -DBL_MAX;
+
+/* Return the result. */
+   return result;
+}
+
+static double GetEpoch( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetEpoch
+
+*  Purpose:
+*     Obtain the value of the Epoch attribute for a SkyFrame axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double GetEpoch( AstFrame *this_frame )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetEpoch method inherited
+*     from the Frame class).
+
+*  Description:
+*     This function returns the value of the Epoch attribute for a
+*     SkyFrame. A suitable default value is returned if no value has 
+*     previously been set.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The Epoch value to use.
+
+*  Notes:
+*     -  A value of AST__BAD will be returned if this function is invoked 
+*     with the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
+   AstSystemType system;         /* System attribute */
+   double result;                /* Result to be returned */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Check if a value has been set for the Epoch attribute. If so, obtain its 
+   value. */
+   if ( astTestEpoch( this ) ) {
+      result = (*parent_getepoch)( this_frame );
+
+/* Otherwise, we will return a default Epoch value appropriate to the
+   SkyFrame class. */
+   } else {
+
+/* Provide a default value of B1950.0 or J2000.0 depending on the System
+   setting. */
+      system = astGetSystem( this );
+      if( system  == AST__FK4 || system == AST__FK4_NO_E ) {
+         result = slaEpb2d( 1950.0 );
+      } else {
+         result = slaEpj2d( 2000.0 );
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BAD;
 
 /* Return the result. */
    return result;
@@ -1470,15 +1346,9 @@ static double GetTop( AstFrame *this_frame, int axis ) {
    SkyFrame class. */
    } else {
 
-/* If this is a co-latitude axis return pi. */
+/* If this is a latitude axis return pi/2. */
       if( axis_p == 1 ) {
-         if( astGetSystem( this ) == AST__HPR ) {
-            result = pi;
-
-/* If it is a latitude axis return pi/2. */
-         } else {
-            result = piby2;
-         }
+         result = piby2;
 
 /* If it is a longitude value return DBL_MAX (i.e. no upper limit). */
       } else {
@@ -1777,7 +1647,7 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 */
 
 /* Local Variables: */
-   AstSkySystemType system;      /* Code identifying type of sky coordinates */
+   AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *result;           /* Pointer to label string */
    int axis_p;                   /* Permuted axis index */
 
@@ -2005,7 +1875,7 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
 */
 
 /* Local Variables: */
-   AstSkySystemType system;      /* Code identifying type of sky coordinates */
+   AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *result;           /* Pointer to symbol string */
    int axis_p;                   /* Permuted axis index */
 
@@ -2064,6 +1934,125 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
    return result;
 }
 
+static AstSystemType GetAlignSystem( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetAlignSystem
+
+*  Purpose:
+*     Obtain the AlignSystem attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     AstSystemType GetAlignSystem( AstFrame *this_frame )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetAlignSystem protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns the AlignSystem attribute for a SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The AlignSystem value.
+
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   AstSystemType result;         /* Value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* If a AlignSystem attribute has been set, invoke the parent method to obtain 
+   it. */
+   if ( astTestAlignSystem( this ) ) {
+      result = (*parent_getalignsystem)( this_frame );
+
+/* Otherwise, provide a suitable default. */
+   } else {
+      result = AST__FK5;
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static AstSystemType GetSystem( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetSystem
+
+*  Purpose:
+*     Obtain the System attribute for a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     AstSystemType GetSystem( AstFrame *this_frame )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetSystem protected
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns the System attribute for a SkyFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The System value.
+
+*  Notes:
+*     - AST__BADSYSTEM is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   AstSystemType result;         /* Value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* If a System attribute has been set, invoke the parent method to obtain 
+   it. */
+   if ( astTestSystem( this ) ) {
+      result = (*parent_getsystem)( this_frame );
+
+/* Otherwise, provide a suitable default. */
+   } else {
+      result = AST__FK5;
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static const char *GetTitle( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -2106,7 +2095,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to SkyFrame structure */
-   AstSkySystemType system;      /* Code identifying type of sky coordinates */
+   AstSystemType system;         /* Code identifying type of sky coordinates */
    const char *p;                /* Character pointer */
    const char *projection;       /* Pointer to sky projection description */
    const char *result;           /* Pointer to result string */
@@ -2139,7 +2128,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
       system = astGetSystem( this );
 
 /* Classify the coordinate system type and create an appropriate Title
-   string.  (Note that when invoking the FmtDecimalYr function we must
+   string.  (Note that when invoking the astFmtDecimalYr function we must
    use a separate sprintf on each occasion so as not to over-write its
    internal buffer before the result string has been used.) */
       if ( astOK ) {
@@ -2152,9 +2141,9 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	 case AST__FK4:
 	    pos = sprintf( buff,
 		           "FK4 equatorial coordinates; mean equinox B%s; ",
-		           FmtDecimalYr( slaEpb( equinox ), 9 ) );
+		           astFmtDecimalYr( slaEpb( equinox ), 9 ) );
             pos += sprintf( buff + pos,
-                            "epoch B%s", FmtDecimalYr( slaEpb( epoch ), 9 ) );
+                            "epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
 	    break;
 
 /* FK4 coordinates with no E-terms of aberration. */
@@ -2164,9 +2153,9 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff,
 			   "FK4 equatorial coordinates; no E-terms; mean "
 			   "equinox B%s; ",
-                           FmtDecimalYr( slaEpb( equinox ), 9 ) );
+                           astFmtDecimalYr( slaEpb( equinox ), 9 ) );
             pos += sprintf( buff + pos,
-                            "epoch B%s", FmtDecimalYr( slaEpb( epoch ), 9 ) );
+                            "epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
 	    break;
 
 /* FK5 equatorial coordinates. */
@@ -2175,7 +2164,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	 case AST__FK5:
 	    pos = sprintf( buff,
                            "FK5 equatorial coordinates; mean equinox J%s",
-                           FmtDecimalYr( slaEpj( equinox ), 9 ) );
+                           astFmtDecimalYr( slaEpj( equinox ), 9 ) );
 	    break;
 
 /* Geocentrc apparent equatorial coordinates. */
@@ -2184,7 +2173,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	 case AST__GAPPT:
 	    pos = sprintf( buff,
                            "Geocentric apparent equatorial coordinates; "
-                           "epoch J%s", FmtDecimalYr( slaEpj( epoch ), 9 ) );
+                           "epoch J%s", astFmtDecimalYr( slaEpj( epoch ), 9 ) );
 	    break;
 
 /* Ecliptic coordinates. */
@@ -2193,7 +2182,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	 case AST__ECLIPTIC:
 	    pos = sprintf( buff,
                            "Ecliptic coordinates; mean equinox J%s",
-                           FmtDecimalYr( slaEpj( equinox ), 9 ) );
+                           astFmtDecimalYr( slaEpj( equinox ), 9 ) );
 	    break;
 
 /* Galactic coordinates. */
@@ -2342,23 +2331,24 @@ static const char *GetUnit( AstFrame *this_frame, int axis ) {
    return result;
 }
 
-static void InitVtab( AstSkyFrameVtab *vtab ) {
+void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitSkyFrameVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a SkyFrame.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     void InitVtab( AstSkyFrameVtab *vtab )
+*     void astInitSkyFrameVtab( AstSkyFrameVtab *vtab, const char *name )
 
 *  Class Membership:
-*     SkyFrame member function.
+*     SkyFrame vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -2367,7 +2357,14 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -2377,6 +2374,10 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitFrameVtab( (AstFrameVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsASkyFrame) to determine if an object belongs
@@ -2389,31 +2390,23 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
    vtab->ClearAsTime = ClearAsTime;
-   vtab->ClearEpoch = ClearEpoch;
    vtab->ClearEquinox = ClearEquinox;
    vtab->ClearNegLon = ClearNegLon;
    vtab->ClearProjection = ClearProjection;
-   vtab->ClearSystem = ClearSystem;
    vtab->GetAsTime = GetAsTime;
-   vtab->GetEpoch = GetEpoch;
    vtab->GetEquinox = GetEquinox;
    vtab->GetNegLon = GetNegLon;
    vtab->GetLatAxis = GetLatAxis;
    vtab->GetLonAxis = GetLonAxis;
    vtab->GetProjection = GetProjection;
-   vtab->GetSystem = GetSystem;
    vtab->SetAsTime = SetAsTime;
-   vtab->SetEpoch = SetEpoch;
    vtab->SetEquinox = SetEquinox;
    vtab->SetNegLon = SetNegLon;
    vtab->SetProjection = SetProjection;
-   vtab->SetSystem = SetSystem;
    vtab->TestAsTime = TestAsTime;
-   vtab->TestEpoch = TestEpoch;
    vtab->TestEquinox = TestEquinox;
    vtab->TestNegLon = TestNegLon;
    vtab->TestProjection = TestProjection;
-   vtab->TestSystem = TestSystem;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2435,6 +2428,9 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    parent_getbottom = frame->GetBottom;
    frame->GetBottom = GetBottom;
 
+   parent_getepoch = frame->GetEpoch;
+   frame->GetEpoch = GetEpoch;
+
    parent_format = frame->Format;
    frame->Format = Format;
    parent_gap = frame->Gap;
@@ -2443,6 +2439,10 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    frame->GetDirection = GetDirection;
    parent_getdomain = frame->GetDomain;
    frame->GetDomain = GetDomain;
+   parent_getsystem = frame->GetSystem;
+   frame->GetSystem = GetSystem;
+   parent_getalignsystem = frame->GetAlignSystem;
+   frame->GetAlignSystem = GetAlignSystem;
    parent_getformat = frame->GetFormat;
    frame->GetFormat = GetFormat;
    parent_getlabel = frame->GetLabel;
@@ -2474,6 +2474,9 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    frame->Resolve = Resolve;
    frame->Offset = Offset;
    frame->Offset2 = Offset2;
+   frame->ValidateSystem = ValidateSystem;
+   frame->SystemString = SystemString;
+   frame->SystemCode = SystemCode;
 
 /* Store pointers to inherited methods that will be invoked explicitly
    by this class. */
@@ -2496,7 +2499,7 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    piby2 = 0.5*pi;
 }
 
-static int IsEquatorial( AstSkySystemType system ) {
+static int IsEquatorial( AstSystemType system ) {
 /*
 *  Name:
 *     IsEquatorial
@@ -2509,7 +2512,7 @@ static int IsEquatorial( AstSkySystemType system ) {
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     int IsEquatorial( AstSkySystemType system )
+*     int IsEquatorial( AstSystemType system )
 
 *  Class Membership:
 *     SkyFrame member function.
@@ -2547,7 +2550,7 @@ static int IsEquatorial( AstSkySystemType system ) {
 }
 
 static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
-                           AstMapping **map ) {
+                           AstSystemType align_sys, AstMapping **map ) {
 /*
 *  Name:
 *     MakeSkyMapping
@@ -2561,7 +2564,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 *  Synopsis:
 *     #include "skyframe.h"
 *     int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
-*                         AstMapping **map )
+*                         AstSystemType align_sys, AstMapping **map )
 
 *  Class Membership:
 *     SkyFrame member function.
@@ -2577,6 +2580,8 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 *        Pointer to the first SkyFrame.
 *     result
 *        Pointer to the second SkyFrame.
+*     align_sys
+*        The system in which to align the two SkyFrames.
 *     map
 *        Pointer to a location which is to receive a pointer to the
 *        returned Mapping. The forward transformation of this Mapping
@@ -2595,12 +2600,14 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 */
 
 /* Local Constants: */
-#define MAX_ARGS 2               /* Max arguments for an SlaMap conversion */
+#define MAX_ARGS 4               /* Max arguments for an SlaMap conversion */
 
 /* Local Variables: */
-   AstSkySystemType system;      /* Code to identify coordinate system */
+   AstSystemType system;         /* Code to identify coordinate system */
    AstSlaMap *slamap;            /* Pointer to SlaMap */
    double args[ MAX_ARGS ];      /* Conversion argument array */
+   double result_epoch;          /* Result frame Epoch */
+   double target_epoch;          /* Target frame Epoch */
    double epoch;                 /* Epoch as Modified Julian Date */
    double epoch_B;               /* Besselian epoch as decimal years */
    double equinox;               /* Equinox as Modified Julian Date */
@@ -2617,12 +2624,21 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 
 /* If both systems are unknown, assume they are the same. Return a UnitMap.
    We need to do this, otherwise a simple change of Title (for instance)
-   will result in a FrameSet loosing its integrity. */
+   will result in a FrameSet whose current Frame has System=AST__UNKNOWN 
+   loosing its integrity. */
    if( astGetSystem( target ) == AST__UNKNOWN && 
        astGetSystem( result ) == AST__UNKNOWN ) {
       *map = (AstMapping *) astUnitMap( 2, "" );
       return 1;
    }
+
+/* If the epochs are the same, or if the alignment system is FK5, we do 
+   not need to transform between intermediate FK5 system and the alignment 
+   system. */
+   result_epoch = astGetEpoch( result );
+   target_epoch = astGetEpoch( target );
+   if( result_epoch == target_epoch ||
+       align_sys == AST__FK5 ) align_sys = AST__BADSYSTEM;
 
 /* Create an initial (null) SlaMap. */
    slamap = astSlaMap( 0, "" );
@@ -2644,18 +2660,30 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
         args[ 1 ] = arg1; \
         astSlaAdd( slamap, cvt, args );
 
+#define TRANSFORM_3(cvt,arg0,arg1,arg2) \
+        args[ 0 ] = arg0; \
+        args[ 1 ] = arg1; \
+        args[ 2 ] = arg2; \
+        astSlaAdd( slamap, cvt, args );
+
+#define TRANSFORM_4(cvt,arg0,arg1,arg2,arg3) \
+        args[ 0 ] = arg0; \
+        args[ 1 ] = arg1; \
+        args[ 2 ] = arg2; \
+        args[ 3 ] = arg3; \
+        astSlaAdd( slamap, cvt, args );
+
 /* Convert _to_ FK5 J2000.0 coordinates. */
 /* ===================================== */
-/* The overall conversion is formulated in two phases. In this first
-   phase, we convert from the target coordinate system to standard sky
-   coordinates expressed using the FK5 system, mean equinox
-   J2000.0. */
+/* The overall conversion is formulated in four phases. In this first
+   phase, we convert from the target coordinate system to intermediate sky
+   coordinates expressed using the FK5 system, mean equinox J2000.0. */
 
-/* Obtain the sky coordinate system, equinox and epoch of the target
+/* Obtain the sky coordinate system, equinox, epoch, etc, of the target
    SkyFrame. */
    system = astGetSystem( target );
    equinox = astGetEquinox( target );
-   epoch = astGetEpoch( target );
+   epoch = target_epoch;
    if ( astOK ) {
 
 /* Convert the equinox and epoch values (stored as Modified Julian
@@ -2734,24 +2762,177 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       }
    }
 
-/* Convert _from_ FK5 J2000.0 coordinates. */
-/* ======================================= */
-/* In this second phase, we convert to the result coordinate system
-   from the standard sky coordinates generated above. */
+/* Convert _from_ FK5 J2000.0 coordinates _to_ the alignment system. */
+/* ============================================================ */
+/* In this second phase, we convert to the system given by the align_sys
+   argument (if required), still using the properties of the target Frame. */
+   if ( astOK && match && align_sys != AST__BADSYSTEM ) {
 
-/* Obtain the sky coordinate system, equinox and epoch of the result
+/* Align in FK4. */
+/* --------------- */
+/* Convert directly from FK5 J2000.0 to FK4 B1950.0 coordinates at the
+   appropriate epoch. Then, if necessary, apply the old-style FK4
+   precession model to bring the equinox to that required, with
+   rigorous handling of the E-terms of aberration. */
+      if ( align_sys == AST__FK4 ) {
+         TRANSFORM_1( "FK54Z", epoch_B )
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_1( "SUBET", 1950.0 )
+            TRANSFORM_2( "PREBN", 1950.0, equinox_B )
+            TRANSFORM_1( "ADDET", equinox_B )
+         }
+
+/* Align in FK4 with no E-terms. */
+/* ------------------------------- */
+/* This is the same as above, except that we do not need to add the
+   E-terms at the end. */
+      } else if ( align_sys == AST__FK4_NO_E ) {
+         TRANSFORM_1( "FK54Z", epoch_B )
+         TRANSFORM_1( "SUBET", 1950.0 )
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_2( "PREBN", 1950.0, equinox_B )
+         }
+
+/* Align in FK5. */
+/* --------------- */
+/* We simply need to apply a precession correction for the change of
+   equinox.  Omit even this if the required equinox is J2000.0. */
+      } else if ( align_sys == AST__FK5 ) {
+         if ( equinox_J != 2000.0 ) {
+            TRANSFORM_2( "PREC", 2000.0, equinox_J )
+         }
+
+/* Align in geocentric apparent. */
+/* ------------------------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__GAPPT ) {
+         TRANSFORM_2( "MAP", 2000.0, epoch )
+
+/* Align in ecliptic coordinates. */
+/* -------------------------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__ECLIPTIC ) {
+         TRANSFORM_1( "EQECL", equinox )
+
+/* Align in galactic coordinates. */
+/* -------------------------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__GALACTIC ) {
+         TRANSFORM_0( "EQGAL" )
+
+/* Align in supergalactic coordinates. */
+/* ------------------------------------- */
+/* Convert to galactic coordinates and then to supergalactic. */
+      } else if ( align_sys == AST__SUPERGALACTIC ) {
+         TRANSFORM_0( "EQGAL" )
+         TRANSFORM_0( "GALSUP" )
+
+/* Align in unknown coordinates. */
+/* ------------------------------- */
+/* No conversion is possible. */
+      } else if ( align_sys == AST__UNKNOWN ) {
+         match = 0;
+      }
+   }
+
+/* Convert _from_ the alignment system _to_ FK5 J2000.0 coordinates */
+/* =========================================================== */
+/* In this third phase, we convert from the alignment system (if required)
+   to the intermediate FK5 J2000 system, using the properties of the
+   result SkyFrame. */
+
+/* Obtain the sky coordinate system, equinox, epoch, etc, of the result
    SkyFrame. */
    system = astGetSystem( result );
    equinox = astGetEquinox( result );
-   epoch = astGetEpoch( result );
-   if ( astOK && match ) {
+   epoch = result_epoch;
 
 /* Convert the equinox and epoch values (stored as Modified Julian
    Dates) into the equivalent Besselian and Julian epochs (as decimal
    years). */
+   if( astOK ) {
       equinox_B = slaEpb( equinox );
       equinox_J = slaEpj( equinox );
       epoch_B = slaEpb( epoch );
+   }
+
+/* Check we need to do the conversion. */
+   if ( astOK && match && align_sys != AST__BADSYSTEM ) {
+
+/* Formulate the conversion... */
+
+/* From FK4. */
+/* --------- */
+/* If necessary, apply the old-style FK4 precession model to bring the
+   equinox to B1950.0, with rigorous handling of the E-terms of
+   aberration. Then convert directly to FK5 J2000.0 coordinates. */
+      if ( align_sys == AST__FK4 ) {
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_1( "SUBET", equinox_B )
+            TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
+            TRANSFORM_1( "ADDET", 1950.0 )
+         }
+         TRANSFORM_1( "FK45Z", epoch_B )
+
+/* From FK4 with no E-terms. */
+/* ------------------------- */
+/* This is the same as above, except that we do not need to subtract
+   the E-terms initially as they are already absent. */
+      } else if ( align_sys == AST__FK4_NO_E ) {
+         if ( equinox_B != 1950.0 ) {
+            TRANSFORM_2( "PREBN", equinox_B, 1950.0 )
+         }
+         TRANSFORM_1( "ADDET", 1950.0 )
+         TRANSFORM_1( "FK45Z", epoch_B )
+
+/* From FK5. */
+/* --------- */
+/* We simply need to apply a precession correction for the change of
+   equinox.  Omit even this if the equinox is already J2000.0. */
+      } else if ( align_sys == AST__FK5 ) {
+         if ( equinox_J != 2000.0 ) {
+            TRANSFORM_2( "PREC", equinox_J, 2000.0 );
+         }
+
+/* From geocentric apparent. */
+/* ------------------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__GAPPT ) {
+         TRANSFORM_2( "AMP", epoch, 2000.0 )
+
+/* From ecliptic coordinates. */
+/* -------------------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__ECLIPTIC ) {
+         TRANSFORM_1( "ECLEQ", equinox )
+
+/* From galactic coordinates. */
+/* -------------------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__GALACTIC ) {
+         TRANSFORM_0( "GALEQ" )
+
+/* From supergalactic coordinates. */
+/* ------------------------------- */
+/* Convert to galactic coordinates and then to FK5 J2000.0
+   equatorial. */
+      } else if ( align_sys == AST__SUPERGALACTIC ) {
+         TRANSFORM_0( "SUPGAL" )
+         TRANSFORM_0( "GALEQ" )
+
+/* From unknown coordinates. */
+/* ------------------------------- */
+/* No conversion is possible. */
+      } else if ( align_sys == AST__UNKNOWN ) {
+         match = 0;
+      }
+   }
+
+/* Convert _from_ FK5 J2000.0 coordinates. */
+/* ======================================= */
+/* In this fourth and final phase, we convert to the result coordinate
+   system from the intermediate FK5 J2000 sky coordinates generated above. */
+   if ( astOK && match ) {
 
 /* To FK4. */
 /* ------- */
@@ -2840,6 +3021,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 #undef TRANSFORM_0
 #undef TRANSFORM_1
 #undef TRANSFORM_2
+#undef TRANSFORM_3
 }
 
 static int Match( AstFrame *template_frame, AstFrame *target,
@@ -3462,22 +3644,12 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
    double sinoff;              /* Sine of offset */
    double sina1;               /* Sine of longitude at start */
    double sinb1;               /* Sine of latitude at start */
-   int stat;                   /* Status return from SLALIB */
-   static double piby2;        /* Value of pi/2 */
-   static int init = 0;        /* Value of pi/2 initialised? */
 
 /* Initialise. */
    result = AST__BAD;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-
-/* If not already done, obtain a value for pi/2 from SLALIB by
-   converting 90 degrees into radians. */
-   if ( !init ) {   
-      slaDaf2r( 90, 0, 0.0, &piby2, &stat );
-      init = 1;
-   }
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -3634,10 +3806,11 @@ static void Overlay( AstFrame *template, const int *template_axes,
 
 
 /* Local Variables: */
-   AstSkySystemType new_system;  /* Code identifying new sky cordinates */
-   AstSkySystemType old_system;  /* Code identifying old sky coordinates */
+   AstSystemType new_system;     /* Code identifying new sky cordinates */
+   AstSystemType old_system;     /* Code identifying old sky coordinates */
    int axis;                     /* Loop counter for result SkyFrame axes */
    int skyframe;                 /* Result Frame is a SkyFrame? */
+   int resetSystem;              /* Was the template System value cleared? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3675,11 +3848,24 @@ static void Overlay( AstFrame *template, const int *template_axes,
             }
          }
       }
+
+/* If the result Frame is not a SkyFrame, we must temporarily clear the
+   System value since the System values used by this class are only
+   appropriate to this class. */
+   } else {
+      if( astTestSystem( template ) ) {
+         new_system = astGetSystem( template );
+         astClearSystem( template );
+         resetSystem = 1;
+      }
    }
 
 /* Invoke the parent class astOverlay method to transfer attributes inherited
    from the parent class. */
    (*parent_overlay)( template, template_axes, result );
+
+/* Reset the System value if necessary */
+   if( resetSystem ) astSetSystem( template, new_system );
 
 /* Check if the result Frame is a SkyFrame or from a class derived from
    SkyFrame. If not, we cannot transfer SkyFrame attributes to it as it is
@@ -3694,413 +3880,13 @@ static void Overlay( AstFrame *template, const int *template_axes,
    }
 
 /* Use the macro to transfer each SkyFrame attribute in turn. */
-      OVERLAY(Epoch);
       OVERLAY(Equinox);
       OVERLAY(Projection);
-      OVERLAY(System);
       OVERLAY(NegLon);
    }
 
 /* Undefine macros local to this function. */
 #undef OVERLAY
-}
-
-static double ReadDateTime( const char *value ) {
-/*
-*  Name:
-*     ReadDateTime
-
-*  Purpose:
-*     Read a date/time string.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     double ReadDateTime( const char *value )
-
-*  Class Membership:
-*     SkyFrame member function.
-
-*  Description:
-*     This function reads a date/time string in a variety of formats and
-*     returns the resulting time as a Modified Julian Date. If the string
-*     cannot be interpreted as a date/time or contains invalid values, an
-*     error is reported.
-
-*  Parameters:
-*     value
-*        Pointer to a null terminated string containing the value to be read.
-
-*  Returned Value:
-*     The time as a Modified Julian date.
-
-*  Date/Time Formats:
-*     The date/time formats supported by this function are listed below. These
-*     are interpreted in a case-insensitive manner and the function is
-*     generally flexible about the presence of additional white space and the
-*     use of alternative field delimiters.
-*
-*     Besselian Epoch
-*        Expressed in decimal years, with or without decimal places
-*        ("B1950" or "B1976.13", for example).
-*     Julian Epoch
-*        Expressed in decimal years, with or without decimal places
-*        ("J2000" or "J2100.9", for example).
-*     Year
-*        Decimal years, with or without decimal places ("1996.8" for example).
-*        Such values are interpreted as a Besselian epoch (see above) if less
-*        than 1984.0 and as a Julian epoch otherwise.
-*     Julian Date
-*        With or without decimal places ("JD 2454321.9" for example).
-*     Modified Julian Date
-*        With or without decimal places ("MJD 54321.4" for example).
-*     Gregorian Calendar Date
-*        With the month expressed as an integer or 3-character
-*        abbreviation, and with optional decimal places to represent a
-*        fraction of a day ("1996-10-2" or "1996-Oct-2.6" for
-*        example). If no fractional part of a day is given, the time
-*        refers to the start of the day (zero hours).
-*     Gregorian Date and Time
-*        Any calendar date (as above) but with a fraction of a day expressed
-*        as hours, minutes and seconds ("1996-Oct-2 12:13:56.985" for example).
-
-*  Notes:
-*     -  The date/time value is interpreted as a calendar date and time, not
-*     linked to any particular time system. Thus, interpretation of hours,
-*     minutes and seconds is done in the obvious manner assuming 86400 seconds
-*     in a day. No allowance for is made, for instance, for leap seconds or for
-*     the varying length of a second in some time systems.
-*     -  A value of AST__BAD is returned if this function is invoked with the
-*     global error status set or if it should fail for any reason.
-*/
-
-/* Local Vaiables: */
-   char cmonth[ 4 ];             /* Buffer for name of month */
-   char sep1[ 2 ];               /* Year/month separator string */
-   char sep2[ 2 ];               /* Month/day separator string */
-   char sep3[ 2 ];               /* Hour/minute separator string */
-   char sep4[ 2 ];               /* Minute/second separator string */
-   const char *v;                /* Pointer into value string */
-   double day;                   /* Day number plus fraction of whole day */
-   double epoch;                 /* Epoch stored as decimal years */
-   double hms;                   /* Hours, min & sec as fraction of a day */
-   double jd;                    /* Julian Date */
-   double mjd;                   /* Modified Julian Date */
-   double result;                /* Result to be returned */
-   double sec;                   /* Seconds and fractions of a second */
-   int hour;                     /* Number of hours */
-   int iday;                     /* Number of whole days */
-   int l;                        /* Length of string remaining */
-   int len;                      /* Length of string */
-   int match;                    /* Date/time string has correct form? */
-   int minute;                   /* Number of minutes */
-   int month;                    /* Number of months */
-   int nc;                       /* Number of characters read from string */
-   int stat;                     /* Status return from SLALIB functions */
-   int year;                     /* Number of years */
-
-/* Check the global error status. */
-   if ( !astOK ) return AST__BAD;
-
-/* Initialise. */
-   result = AST__BAD;
-
-/* Obtain the length of the input string. */
-   len = (int) strlen( value );
-
-/* Attempt to read the string using each recognised format in turn. */
-
-/* Besselian epoch in decimal years (e.g. "B1950.0"). */
-/* ================================================== */
-   if ( nc = 0,
-        ( 1 == astSscanf( value, " %*1[Bb] %lf %n", &epoch, &nc ) )
-        && ( nc >= len ) ) {
-
-/* Convert to Modified Julian Date. */
-      result = slaEpb2d( epoch );
-
-/* Julian epoch in decimal years (e.g. "J2000.0"). */
-/* =============================================== */
-   } else if ( nc = 0,
-               ( 1 == astSscanf( value, " %*1[Jj] %lf %n", &epoch, &nc ) )
-               && ( nc >= len ) ) {
-
-/* Convert to Modified Julian Date. */
-      result = slaEpj2d( epoch );
-
-/* Decimal years (e.g. "1976.2"). */
-/* ============================== */
-   } else if ( nc = 0,
-               ( 1 == astSscanf( value, " %lf %n", &epoch, &nc ) )
-               && ( nc >= len ) ) {
-
-/* Convert to Modified Julian Date, treating the epoch as Julian or Besselian
-   depending on whether it is 1984.0 or later. */
-      result = ( epoch < 1984.0 ) ? slaEpb2d( epoch ) : slaEpj2d( epoch );
-
-/* Modified Julian Date (e.g. "MJD 54321.0"). */
-/* ============================================ */
-   } else if ( nc = 0,
-               ( 1 == astSscanf( value, " %*1[Mm] %*1[Jj] %*1[Dd] %lf %n",
-                              &mjd, &nc ) ) && ( nc >= len ) ) {
-
-/* Use the result directly. */
-      result = mjd;
-
-/* Julian Date (e.g. "JD 2454321.5"). */
-/* ==================================== */
-   } else if ( nc = 0,
-               ( 1 == astSscanf( value, " %*1[Jj] %*1[Dd] %lf %n",
-                              &jd, &nc ) ) && ( nc >= len ) ) {
-
-/* Convert to Modified Julian Date. */
-      result = jd - 2400000.5;
-
-/* Gregorian calendar date (e.g. "1996-10-2" or "1996-Oct-2"). */
-/* =========================================================== */
-/* This format also allows day fractions expressed as decimal days, e.g:
-
-      "1996-Oct-2.5001"
-
-   or as hours, minutes and seconds, e.g:
-
-      "1996-Oct-2 12:14:30.52"
-
-   Various alternative field delimiters are also allowed. */
-   } else {
-
-/* Note that the method used to parse this format relies heavily on
-   conditional execution controlled by "&&" and "||" operators. Initialise
-   the variables used. */
-      v = value;
-      l = len;
-      *cmonth = '\0';
-      year = month = iday = hour = minute = 0;
-      day = sec = 0.0;
-
-/* Identify the year and month. */
-/* ---------------------------- */
-/* Try to match an initial " 1996 - 10 -" or " 1996 10 " or similar. */
-      match =
-         ( nc = 0, ( 4 == astSscanf( v, " %d %1[:/-] %2d %1[:/-]%n",
-                                  &year, sep1, &month, sep2, &nc ) ) );
-      match = match ||
-         ( nc = 0, ( 4 == astSscanf( v, " %d%1[ ] %2d%1[ ]%n",
-                                  &year, sep1, &month, sep2, &nc ) ) );
-
-/* If that failed, allow " 1996 - Oct -" or " 1996 Oct " or similar. */
-      match = match ||
-         ( nc = 0, ( 4 == astSscanf( v,
-                                  " %d %1[:/-] %3[ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                  "abcdefghijklmnopqrstuvwxyz] %1[:/-]%n",
-                                  &year, sep1, cmonth, sep2, &nc ) ) );
-      match = match ||
-         ( nc = 0, ( 4 == astSscanf( v,
-                                  " %d%1[ ] %3[ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                                  "abcdefghijklmnopqrstuvwxyz]%1[ ]%n",
-                                  &year, sep1, cmonth, sep2, &nc ) ) );
-
-/* Alternative field separators are permitted above, but ensure that
-   they are both the same. */
-      match = match && ( *sep1 == *sep2 );
-
-/* Identify the day and fraction of day. */
-/*-------------------------------------- */
-/* If the above matched correctly, modify the string pointer "v" to
-   the next character to be interpreted and decrement the remaining
-   string length. */
-      if ( match ) {
-         v += nc;
-         l -= nc;
-
-/* We now try to match the following characters but without reading
-   any values.  This is done to ensure the string has the correct form
-   (e.g. exclude "-" signs and exponents in numbers, which are
-   otherwise hard to detect). */
-
-/* Try to match " 12.3456 " or similar. */
-         match =
-            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789].%*[0123456789] %n",
-                                     &nc ) )
-                      && ( nc == l ) );
-
-/* If that failed, then try to match " 12. " or similar. */
-         match = match ||
-            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789]. %n", &nc ) )
-                      && ( nc == l ) );
-
-/* If that also failed, then try to match just " 12 " or similar. */
-         match = match ||
-            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789] %n", &nc ) )
-                      && ( nc == l ) );
-
-/* If any of the above patterns matched, now read the data (the day number)
-   as a double value. */
-         if ( match ) {
-            match = ( nc = 0, ( 1 == astSscanf( v, " %lf %n", &day, &nc ) )
-                              && ( nc == l ) );
-
-/* If none of the above matched, then look to see if the day fraction has been
-   given in hours, minutes and seconds by trying to match " 12 03 : 45 :" or
-   " 12 13 45 " or similar. */
-         } else {
-            match =
-               ( nc = 0, ( 5 == astSscanf( v,
-                                        " %2d%*1[ ] %2d %1[:/-] %2d %1[:/-]%n",
-                                        &iday, &hour, sep3, &minute, sep4,
-                                        &nc ) ) );
-            match = match ||
-               ( nc = 0, ( 5 == astSscanf( v, " %2d%*1[ ] %2d%1[ ] %2d%1[ ]%n",
-                                        &iday, &hour, sep3, &minute, sep4,
-                                        &nc ) ) );
-
-/* Alternative field separators are permitted above, but ensure that
-   they are both the same. */
-            match = match && ( *sep3 == *sep4 );
-
-/* If the day number was read as an integer, convert it to double. */
-            if ( match ) day = (double) iday;
-
-/* Identify the seconds field. */
-/* --------------------------- */
-/* If hours and minutes fields have been matched, now look for the
-   final seconds (and fractions of seconds) field. This is similar to
-   the day/fraction field (see earlier) in that we first check that it
-   has the correct form before reading its value. */
-
-/* Adjust the string pointer and remaining string length. */
-            if ( match ) {
-               v += nc;
-               l -= nc;
-
-/* Try to match " 12.3456 " or similar. */
-               match =
-                  ( nc = 0, ( 0 == astSscanf( v,
-                                          " %*2[0123456789].%*[0123456789] %n",
-                                           &nc ) )
-                            && ( nc == l ) );
-
-/* If that failed, then try to match " 12. " or similar. */
-               match = match ||
-                  ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789]. %n", &nc ) )
-                            && ( nc == l ) );
-
-/* If that also failed, then try to match just " 12 " or similar. */
-               match = match ||
-                  ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789] %n", &nc ) )
-                            && ( nc == l ) );
-
-/* If any of the above patterns matched, now read the data (the number of
-   seconds) as a double value. */
-               if ( match ) {
-                  match = ( nc = 0, ( 1 == astSscanf( v, " %lf %n", &sec, &nc ) )
-                                    && ( nc == l ) );
-               }
-            }
-         }
-      }
-
-/* Interpret the values that were read. */
-/* ------------------------------------ */
-/* We execute this if all of the above text matching was successful,
-   transferred the required number of data values, and consumed the
-   entire input string. */
-      if ( match ) {
-
-/* See if the month was given as a character string (e.g. "Oct") instead of
-   a number. If so, define local variables for use in converting it. */
-         if ( *cmonth ) {
-            char lcmonth[ 4 ];      /* Lower case copy of month string */
-            const char *ptr;        /* Pointer result from look up */
-            const char *table =     /* Month look up table */
-                       "jan feb mar apr may jun jul aug sep oct nov dec";
-            int i;                  /* Loop counter for characters */
-
-/* Convert the month string to lower case. */
-            for ( i = 0; cmonth[ i ]; i++ ) {
-               lcmonth[ i ] = tolower( cmonth[ i ] );
-            }
-            lcmonth[ i ] = '\0';
-
-/* Look the month up in the table of months and generate the required month
-   number. */
-            if ( ( ptr = strstr( table, lcmonth ) ) ) {
-               month = 1 + ( ptr - table ) / 4;
-
-/* If the lookup failed, report an error. */
-   	    } else {
-               astError( AST__DTERR, "Month value \"%s\" is invalid.",
-                         cmonth );
-            }
-         }
-
-/* If OK, extract the integral day number and convert years, months and days
-   to a Modified Julian Date. */
-         if ( astOK ) {
-            iday = (int) day;
-            slaCaldj( year, month, iday, &mjd, &stat );
-
-/* Examine the return status from the conversion and report an appropriate
-   error if necessary. */
-            switch ( stat ) {
-            case 1:
-               astError( AST__DTERR, "Year value (%d) is invalid.", year );
-               break;
-            case 2:
-               astError( AST__DTERR, "Month value (%d) is invalid.", month );
-               break;
-            case 3:
-               astError( AST__DTERR, "Day value (%.*g) is invalid.", DBL_DIG,
-                         day );
-               break;
-
-/* If conversion to MJD was successful, add any fractional part of a day to the
-   result. */
-            default:
-               mjd += ( day - (double) iday );
-
-/* Convert hours, minutes and seconds to a fraction of a day (this will give
-   zero if none of these quantities was supplied). */
-               slaDtf2d( hour, minute, sec, &hms, &stat );
-
-/* Examine the return status from the conversion and report an appropriate
-   error if necessary. */
-               switch ( stat ) {
-               case 1:
-                  astError( AST__DTERR, "Hour value (%d) is invalid.", hour );
-                  break;
-               case 2:
-                  astError( AST__DTERR, "Minute value (%d) is invalid.",
-                            minute );
-                  break;
-               case 3:
-                  astError( AST__DTERR, "Seconds value (%.*g) is invalid.",
-                            DBL_DIG, sec );
-                  break;
-
-/* Add the fraction of a day derived from hours, minutes and seconds fields to
-   the result. */
-               default:
-                  mjd += hms;
-                  break;
-               }
-               break;
-            }
-
-/* Return the result, if no error occurred. */
-            if ( astOK ) result = mjd;
-         }
-
-/* If none of the supported date/time formats matched, then report an error. */
-      } else {
-         astError( AST__DTERR, "Date/time does not have the correct form." );
-      }
-   }
-
-/* Return the result. */
-   return result;
 }
 
 static void Resolve( AstFrame *this_frame, const double point1[], 
@@ -4403,9 +4189,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 *     As well as those attributes inherited from the parent class, this
 *     function also accepts values for the following additional attributes:
 *
-*        Epoch (double, read as a string)
 *        Equinox (double, read as a string)
-*        System (AstSkySystemType, read as a string)
 
 *  Notes:
 *     This protected method is intended to be invoked by the Object astSet
@@ -4414,17 +4198,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Vaiables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
-   AstSkySystemType system_code; /* System type code */
    double mjd;                   /* Modified Julian Date */
    int astime;                   /* Value of AsTime attribute */
    int axis;                     /* Axis index */
-   int epoch;                    /* Offset of Projection attribute value */
    int equinox;                  /* Offset of Equinox attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
    int neglon;                   /* Display -ve longitudes? */
-   int projection;               /* Offset of Epoch attribute value */
-   int system;                   /* Offset of System attribute value */
+   int projection;               /* Offset of projection attribute value */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -4448,24 +4229,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetAsTime( this, axis - 1, astime );
 
-/* Epoch. */
-/* ------ */
-   } else if ( nc = 0,
-        ( 0 == astSscanf( setting, "epoch=%n%*[^\n]%n", &epoch, &nc ) )
-        && ( nc >= len ) ) {
-
-/* Convert the Epoch value to a Modified Julian Date before use. */
-      mjd = ReadDateTime( setting + epoch );
-      if ( astOK ) {
-         astSetEpoch( this, mjd );
-
-/* Report contextual information if the conversion failed. */
-      } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid epoch value "
-                   "\"%s\" given for sky coordinate system.",
-                   astGetClass( this ), setting + epoch );
-      }
-
 /* Equinox. */
 /* -------- */
    } else if ( nc = 0,
@@ -4473,7 +4236,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               &equinox, &nc ) ) && ( nc >= len ) ) {
 
 /* Convert the Equinox value to a Modified Julian Date before use. */
-      mjd = ReadDateTime( setting + equinox );
+      mjd = astReadDateTime( setting + equinox );
       if ( astOK ) {
          astSetEquinox( this, mjd );
 
@@ -4499,25 +4262,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       astSetProjection( this, setting + projection );
 
-/* System. */
-/* ------- */
-   } else if ( nc = 0,
-               ( 0 == astSscanf( setting, "system= %n%*s %n", &system, &nc ) )
-               && ( nc >= len ) ) {
-
-/* Convert the string to a System code before use. */
-      system_code = SystemCode( system + setting );
-      if ( system_code != AST__NOSKYSYSTEM ) {
-         astSetSystem( this, system_code );
-
-/* Report an error if the string value wasn't recognised. */
-      } else {
-         astError( AST__ATTIN,
-                   "astSetAttrib(%s): Invalid sky coordinate system "
-                   "description \"%s\".",
-                   astGetClass( this ), system + setting );
-      }
-   
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
@@ -4916,6 +4660,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    AstPermMap *permmap;          /* Pointer to PermMap */
    AstSkyFrame *target;          /* Pointer to the SkyFrame structure */
    AstSkyFrame *temp;            /* Pointer to copy of target SkyFrame */
+   AstSystemType align_sys;      /* System in which to align the SkyFrames */
    int match;                    /* Coordinate conversion is possible? */
    int perm[ 2 ];                /* Permutation array for axis swap */
    int result_swap;              /* Swap result SkyFrame coordinates? */
@@ -4947,14 +4692,23 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
       *result = astCopy( target );
       astPermAxes( *result, target_axes );
 
-/* If required, overlay the template attributes on to the result SkyFrame. */
-      if ( template ) astOverlay( template, template_axes, *result );
+/* If required, overlay the template attributes on to the result SkyFrame.
+   Also get the system in which to align the two SkyFrames. This is the 
+   value of the AlignSystem attribute from the template (if there is a
+   template). */
+      if ( template ) {
+         astOverlay( template, template_axes, *result );
+         align_sys = astGetAlignSystem( template );
+      } else {
+         align_sys = astGetAlignSystem( target );
+      }
 
 /* Generate a Mapping that takes account of changes in the sky coordinate
    system (equinox, epoch, etc.) between the target SkyFrame and the result
    SkyFrame. If this Mapping can be generated, set "match" to indicate that
    coordinate conversion is possible. */
-      match = ( MakeSkyMapping( target, (AstSkyFrame *) *result, map ) != 0 );
+      match = ( MakeSkyMapping( target, (AstSkyFrame *) *result, 
+                                align_sys, map ) != 0 );
 
 /* If a Mapping has been obtained, it will expect coordinate values to be
    supplied in (longitude,latitude) pairs. Test whether we need to swap the
@@ -5041,6 +4795,10 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
          SET_AXIS(Symbol)
          SET_AXIS(Unit)
 
+/* Clear attributes which have an extended range of values allowed by
+   this class. */
+         astClearSystem( temp );
+
 /* Now handle axis attributes for which there are no SkyFrame access
    methods.  For these we require a pointer to the temporary
    SkyFrame's Axis object. */
@@ -5082,7 +4840,7 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 #undef SET_AXIS
 }
 
-static AstSkySystemType SystemCode( const char *system ) {
+static AstSystemType SystemCode( AstFrame *this, const char *system ) {
 /*
 *  Name:
 *     SystemCode
@@ -5095,18 +4853,21 @@ static AstSkySystemType SystemCode( const char *system ) {
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     AstSkySystemType SystemCode( const char *system )
+*     AstSystemType SystemCode( AstFrame *this, const char *system )
 
 *  Class Membership:
-*     SkyFrame member function.
+*     SkyFrame member function (over-rides the astSystemCode method
+*     inherited from the Frame class).
 
 *  Description:
 *     This function converts a string used for the external
 *     description of a sky coordinate system into a SkyFrame
 *     coordinate system type code (System attribute value). It is the
-*     inverse of the SystemString function.
+*     inverse of the astSystemString function.
 
 *  Parameters:
+*     this
+*        The Frame.
 *     system
 *        Pointer to a constant null-terminated string containing the
 *        external description of the sky coordinate system.
@@ -5115,51 +4876,51 @@ static AstSkySystemType SystemCode( const char *system ) {
 *     The System type code.
 
 *  Notes:
-*     - A value of AST__NOSKYSYSTEM is returned if the sky coordinate
+*     - A value of AST__BADSYSTEM is returned if the sky coordinate
 *     system description was not recognised. This does not produce an
 *     error.
-*     - A value of AST__NOSKYSYSTEM is also returned if this function
+*     - A value of AST__BADSYSTEM is also returned if this function
 *     is invoked with the global error status set or if it should fail
 *     for any reason.
 */
 
 /* Local Variables: */
-   AstSkySystemType result;      /* Result value to return */
+   AstSystemType result;      /* Result value to return */
 
 /* Initialise. */
-   result = AST__NOSKYSYSTEM;
+   result = AST__BADSYSTEM;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
 
 /* Match the "system" string against each possibility and assign the
    result. */
-   if ( ChrMatch( "FK4", system ) ) {
+   if ( astChrMatch( "FK4", system ) ) {
       result = AST__FK4;
 
-   } else if ( ChrMatch( "FK4_NO_E", system ) ||
-               ChrMatch( "FK4-NO-E", system ) ) {
+   } else if ( astChrMatch( "FK4_NO_E", system ) ||
+               astChrMatch( "FK4-NO-E", system ) ) {
       result = AST__FK4_NO_E;
 
-   } else if ( ChrMatch( "FK5", system ) ||
-               ChrMatch( "Equatorial", system ) ) {
+   } else if ( astChrMatch( "FK5", system ) ||
+               astChrMatch( "Equatorial", system ) ) {
       result = AST__FK5;
 
-   } else if ( ChrMatch( "GAPPT", system ) ||
-               ChrMatch( "GEOCENTRIC", system ) ||
-               ChrMatch( "APPARENT", system ) ) {
+   } else if ( astChrMatch( "GAPPT", system ) ||
+               astChrMatch( "GEOCENTRIC", system ) ||
+               astChrMatch( "APPARENT", system ) ) {
          result = AST__GAPPT;
 
-   } else if ( ChrMatch( "ECLIPTIC", system ) ) {
+   } else if ( astChrMatch( "ECLIPTIC", system ) ) {
       result = AST__ECLIPTIC;
 
-   } else if ( ChrMatch( "GALACTIC", system ) ) {
+   } else if ( astChrMatch( "GALACTIC", system ) ) {
       result = AST__GALACTIC;
 
-   } else if ( ChrMatch( "SUPERGALACTIC", system ) ) {
+   } else if ( astChrMatch( "SUPERGALACTIC", system ) ) {
       result = AST__SUPERGALACTIC;
 
-   } else if ( ChrMatch( "UNKNOWN", system ) ) {
+   } else if ( astChrMatch( "UNKNOWN", system ) ) {
       result = AST__UNKNOWN;
    }
 
@@ -5167,7 +4928,7 @@ static AstSkySystemType SystemCode( const char *system ) {
    return result;
 }
 
-static const char *SystemString( AstSkySystemType system ) {
+static const char *SystemString( AstFrame *this, AstSystemType system ) {
 /*
 *  Name:
 *     SystemString
@@ -5180,10 +4941,11 @@ static const char *SystemString( AstSkySystemType system ) {
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     const char *SystemString( AstSkySystemType system )
+*     const char *SystemString( AstFrame *this, AstSystemType system )
 
 *  Class Membership:
-*     SkyFrame member function.
+*     SkyFrame member function (over-rides the astSystemString method
+*     inherited from the Frame class).
 
 *  Description:
 *     This function converts a SkyFrame coordinate system type code
@@ -5191,6 +4953,8 @@ static const char *SystemString( AstSkySystemType system ) {
 *     external representation of the coordinate system type.
 
 *  Parameters:
+*     this
+*        The Frame.
 *     system
 *        The coordinate system type code.
 
@@ -5387,11 +5151,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
         && ( nc >= len ) ) {
       result = astTestAsTime( this, axis - 1 );
 
-/* Epoch. */
-/* ------ */
-   } else if ( !strcmp( attrib, "epoch" ) ) {
-      result = astTestEpoch( this );
-
 /* Equinox. */
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
@@ -5406,11 +5165,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "projection" ) ) {
       result = astTestProjection( this );
-
-/* System. */
-/* ------- */
-   } else if ( !strcmp( attrib, "system" ) ) {
-      result = astTestSystem( this );
 
 /* If the name is not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then return
@@ -5541,6 +5295,76 @@ static int Unformat( AstFrame *this_frame, int axis, const char *string,
    return nc;
 }
 
+static int ValidateSystem( AstFrame *this, AstSystemType system, const char *method ) {
+/*
+*
+*  Name:
+*     ValidateSystem
+
+*  Purpose:
+*     Validate a value for a Frame's System attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int ValidateSystem( AstFrame *this, AstSystemType system, 
+*                         const char *method )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astValidateSystem method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function checks the validity of the supplied system value.
+*     If the value is valid, it is returned unchanged. Otherwise, an
+*     error is reported and a value of AST__BADSYSTEM is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        The system value to be checked. 
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate an axis index. This method name is used solely
+*        for constructing error messages.
+
+*  Returned Value:
+*     The validated system value.
+
+*  Notes:
+*     - A value of AST__BADSYSTEM will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstSystemType result;              /* Validated system value */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the value is out of bounds, report an error. */
+   if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
+         astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
+                   "attribute of a %s.", method, astGetClass( this ),
+                   (int) system, astGetClass( this ) );
+
+/* Otherwise, return the supplied value. */
+   } else {
+      result = system;
+   }
+
+/* Return the result. */
+   return result;
+}
+
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
 /*
@@ -5590,118 +5414,6 @@ f     used (e.g. by AST_FORMAT) for the celestial coordinate values
 *     over-ride any effect from the AsTime attribute.
 *att--
 */
-
-/*
-*att++
-*  Name:
-*     Epoch
-
-*  Purpose:
-*     Epoch of observation.
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     Floating point.
-
-*  Description:
-*     This attribute is used to qualify the celestial coordinate
-*     system described by a SkyFrame, by giving the moment in time
-*     when the coordinates are known to be correct. Often, this will
-*     be the date of observation.
-*
-*     The Epoch value is important in cases where the coordinates of
-*     sources may change with time. Possible reasons for this include:
-*     (i) changing aberration of light caused by the observer's
-*     velocity (e.g. due to the Earth's motion around the Sun), (ii)
-*     changing gravitational deflection by the Sun due to changes in
-*     the observer's position with time, (iii) fictitious motion due
-*     to rotation of non-inertial coordinate systems (e.g. the old FK4
-*     system), and (iv) proper motion of the source itself (although
-*     this last effect is not handled by the SkyFrame class because it
-*     affects individual sources rather than the coordinate system as
-*     a whole).
-*
-*     The Epoch attribute is stored as a Modified Julian Date, but
-*     when setting its value it may be given in a variety of
-*     formats. See the "Input Formats" section (below) for details.
-*
-*     The default Epoch value is B1950.0 (Besselian) for the old
-*     FK4-based coordinate systems (see the System attribute) and
-*     J2000.0 (Julian) for all others.
-
-*  Input Formats:
-*     The formats accepted when setting an Epoch value are listed
-*     below. They are all case-insensitive and are generally tolerant
-*     of extra white space and alternative field delimiters:
-*
-*     - Besselian Epoch: Expressed in decimal years, with or without
-*     decimal places ("B1950" or "B1976.13" for example).
-*
-*     - Julian Epoch: Expressed in decimal years, with or without
-*     decimal places ("J2000" or "J2100.9" for example).
-*
-*     - Year: Decimal years, with or without decimal places ("1996.8"
-*     for example).  Such values are interpreted as a Besselian epoch
-*     (see above) if less than 1984.0 and as a Julian epoch otherwise.
-*
-*     - Julian Date: With or without decimal places ("JD 2454321.9" for
-*     example).
-*
-*     - Modified Julian Date: With or without decimal places
-*     ("MJD 54321.4" for example).
-*
-*     - Gregorian Calendar Date: With the month expressed either as an
-*     integer or a 3-character abbreviation, and with optional decimal
-*     places to represent a fraction of a day ("1996-10-2" or
-*     "1996-Oct-2.6" for example). If no fractional part of a day is
-*     given, the time refers to the start of the day (zero hours).
-*
-*     - Gregorian Date and Time: Any calendar date (as above) but with
-*     a fraction of a day expressed as hours, minutes and seconds
-*     ("1996-Oct-2 12:13:56.985" for example).
-
-*  Output Format:
-*     When enquiring Epoch values, the format used is the "Year"
-*     format described under "Input Formats". This is a value in
-*     decimal years which will be a Besselian epoch if less than
-*     1984.0 and a Julian epoch otherwise.  By omitting any character
-*     prefix, this format allows the Epoch value to be obtained as
-*     either a character string or a floating point value.
-
-*  Applicability:
-*     SkyFrame
-*        All SkyFrames have this attribute.
-
-*  Notes:
-*     - Care must be taken to distinguish the Epoch value, which
-*     relates to motion (or apparent motion) of the source, from the
-*     superficially similar Equinox value. The latter is used to
-*     qualify a coordinate system which is itself in motion in a
-*     (notionally) predictable way as a result of being referred to a
-*     slowly moving reference plane (e.g. the equator).
-*     - See the description of the System attribute for details of
-*     which qualifying attributes apply to each celestial coordinate
-*     system.
-*att--
-*/
-/* Clear the Epoch value by setting it to AST__BAD. */
-astMAKE_CLEAR(SkyFrame,Epoch,epoch,AST__BAD)
-
-/* Provide a default value of B1950.0 or J2000.0 depending on the System
-   setting. */
-astMAKE_GET(SkyFrame,Epoch,double,AST__BAD,(
-            ( this->epoch != AST__BAD ) ? this->epoch :
-               ( ( ( astGetSystem( this ) == AST__FK4 ) ||
-                   ( astGetSystem( this ) == AST__FK4_NO_E ) ) ?
-                    slaEpb2d( 1950.0 ) : slaEpj2d( 2000.0 ) ) ))
-
-/* Allow any Epoch value to be set. */
-astMAKE_SET(SkyFrame,Epoch,double,epoch,value)
-
-/* An Epoch value is set if it is not equal to AST__BAD. */
-astMAKE_TEST(SkyFrame,Epoch,( this->epoch != AST__BAD ))
 
 /*
 *att++
@@ -5931,114 +5643,6 @@ astMAKE_SET(SkyFrame,Projection,const char *,projection,astStore(
 /* The Projection value is set if the pointer to it is not NULL. */
 astMAKE_TEST(SkyFrame,Projection,( this->projection != NULL ))
 
-/*
-*att++
-*  Name:
-*     System
-
-*  Purpose:
-*     Celestial coordinate system.
-
-*  Type:
-*     Public attribute.
-
-*  Synopsis:
-*     String.
-
-*  Description:
-*     This attribute identifies the particular celestial coordinate
-*     system represented by a SkyFrame, and may take any of the values
-*     listed in the "Celestial Coordinate Systems" section (below).
-*
-*     Currently, the default System value is "FK5". However, this
-*     default may change in future as new astrometric standards
-*     evolve. The intention is to track the most modern appropriate
-*     standard. For this reason, you should use the default only if
-*     this is what you intend (and can tolerate any associated slight
-*     change in future). If you intend to use the FK5 system
-*     indefinitely, then you should specify it explicitly.
-
-*  Applicability:
-*     SkyFrame
-*        All SkyFrames have this attribute.
-
-*  Celestial Coordinate Systems:
-*     The SkyFrame class supports the following System values (all are
-*     case-insensitive) and associated celestial coordinate systems:
-*
-*     - "FK4": The old FK4 (barycentric) equatorial coordinate system,
-*     which should be qualified by an Equinox value. The underlying
-*     model on which this is based is non-inertial and rotates slowly
-*     with time, so for accurate work FK4 coordinate systems should
-*     also be qualified by an Epoch value.
-*
-*     - "FK4-NO-E" or "FK4_NO_E": The old FK4 (barycentric) equatorial
-*     system but without the "E-terms of aberration" (e.g. some radio
-*     catalogues). This coordinate system should also be qualified by
-*     both an Equinox and an Epoch value.
-*
-*     - "FK5" or "EQUATORIAL": The modern FK5 (barycentric) equatorial
-*     coordinate system. This should be qualified by an Equinox value.
-*
-*     - "GAPPT", "GEOCENTRIC" or "APPARENT": The geocentric apparent
-*     equatorial coordinate system, which gives the apparent positions
-*     of sources relative to the true plane of the Earth's equator and
-*     the equinox (the coordinate origin) at a time specified by the
-*     qualifying Epoch value. (Note that no Equinox is needed to
-*     qualify this coordinate system because no model "mean equinox"
-*     is involved.)  These coordinates give the apparent right
-*     ascension and declination of a source for a specified date of
-*     observation, and therefore form an approximate basis for
-*     pointing a telescope. Note, however, that they are applicable to
-*     a fictitious observer at the Earth's centre, and therefore
-*     ignore such effects as atmospheric refraction and the (normally
-*     much smaller) aberration of light due to the rotational velocity
-*     of the Earth's surface.  Geocentric apparent coordinates are
-*     derived from the standard FK5 (J2000.0) barycentric coordinates
-*     by taking account of the gravitational deflection of light by
-*     the Sun (usually small), the aberration of light caused by the
-*     motion of the Earth's centre with respect to the barycentre
-*     (larger), and the precession and nutation of the Earth's spin
-*     axis (normally larger still).
-*
-*     - "ECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
-*     ecliptic and mean equinox specified by the qualifying Equinox
-*     value.
-*
-*     - "GALACTIC": Galactic coordinates (IAU 1958).
-*
-*     - "SUPERGALACTIC": De Vaucouleurs Supergalactic coordinates.
-*
-*     - "UNKNOWN": Any other general spherical coordinate system. No
-*     Mapping can be created between a pair of SkyFrames if either of the
-*     SkyFrames has System set to "Unknown".
-*
-*     Where more than one alternative System value is shown above, the
-*     first of these will be returned when an enquiry is made.
-*att--
-*/
-/* Clear the System value by setting it to AST__NOSKYSYSTEM. */
-astMAKE_CLEAR(SkyFrame,System,system,AST__NOSKYSYSTEM)
-
-/* Provide a default sky coordinate system of AST__FK5. */
-astMAKE_GET(SkyFrame,System,AstSkySystemType,AST__NOSKYSYSTEM,(
-            ( this->system == AST__NOSKYSYSTEM ) ? AST__FK5 : this->system ) )
-
-/* Validate the System value being set and report an error if necessary. */
-astMAKE_SET(SkyFrame,System,AstSkySystemType,system,(
-            ( ( value >= AST__SKYSYSTEM_FIRST ) &&
-              ( value <= AST__SKYSYSTEM_LAST ) ) ?
-                 value :
-                 ( astError( AST__ATTIN, "astSetSystem(%s): Bad value (%d) "
-                             "given for System attribute.",
-                             astGetClass( this ), (int) value ),
-
-/* Leave the value unchanged on error. */
-                                            this->system ) ) )
-
-/* The System value is set if it is not AST__NOSKYSYSTEM. */
-astMAKE_TEST(SkyFrame,System,( this->system != AST__NOSKYSYSTEM ))
-
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -6161,10 +5765,10 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Local Variables: */
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
-   AstSkySystemType system;      /* System attribute value */
+   AstSystemType system;         /* System attribute value */
    const char *sval;             /* Pointer to string value */
    double dval;                  /* Double value */
-   int bessyr;                   /* Format as Besselian years (else Julian) */
+   int bessyr;                   /* Use a Besselian year value ?*/
    int helpful;                  /* Helpful to display un-set value? */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
@@ -6191,61 +5795,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
 
-/* System. */
-/* ------- */
-   set = TestSystem( this );
-   system = set ? GetSystem( this ) : astGetSystem( this );
-
-/* If set, convert explicitly to a string for the external
-   representation. */
-   if ( set ) {
-      if ( astOK ) {
-         sval = SystemString( system );
-
-/* Report an error if the System value was not recognised. */
-         if ( !sval ) {
-            astError( AST__SCSIN,
-                     "astWrite(%s): Corrupt %s contains invalid sky "
-                     "coordinate system identification code (%d).",
-                     astGetClass( channel ), astGetClass( this ),
-                     (int) system );
-         }
-      }
-
-/* If not set, use astGetAttrib which returns a string value using
-   (possibly over-ridden) methods. */
-   } else {
-      sval = astGetAttrib( this_object, "system" );
-   }
-
-/* Write out the value. */
-   astWriteString( channel, "System", set, 1, sval,
-                   "Celestial coordinate system type" );
-
 /* Projection. */
 /* ----------- */
    set = TestProjection( this );
    sval = set ? GetProjection( this ) : astGetProjection( this );
    astWriteString( channel, "Proj", set, 0, sval,
                    "Description of sky projection" );
-
-/* Epoch. */
-/* ------ */
-   set = TestEpoch( this );
-   dval = set ? GetEpoch( this ) : astGetEpoch( this );
-
-/* Decide whether the Epoch value is relevant to ths current
-   coordinate system. */
-   helpful = ( ( system == AST__FK4 ) ||
-               ( system == AST__FK4_NO_E ) ||
-               ( system == AST__GAPPT ) );
-
-/* Convert MJD to Besselian or Julian years, depending on the value. */
-   bessyr = ( dval < slaEpj2d( 1984.0 ) );
-   dval = bessyr ? slaEpb( dval ) : slaEpj( dval );
-   astWriteDouble( channel, "Epoch", set, helpful, dval,
-                   bessyr ? "Besselian epoch of observation" :
-                            "Julian epoch of observation" );
 
 /* NegLon. */
 /* ------- */
@@ -6436,23 +5991,21 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitSkyFrameVtab( vtab, name );
+
 /* Initialise a Frame structure (the parent class) as the first component
    within the SkyFrame structure, allocating memory if necessary. */
-   new = (AstSkyFrame *) astInitFrame( mem, size, init,
+   new = (AstSkyFrame *) astInitFrame( mem, size, 0,
                                        (AstFrameVtab *) vtab, name, 2 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
       if ( astOK ) {
 
 /* Initialise the SkyFrame data. */
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
-      new->epoch = AST__BAD;
       new->equinox = AST__BAD;
       new->projection = NULL;
-      new->system = AST__NOSKYSYSTEM;
       new->neglon = -INT_MAX;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
@@ -6474,7 +6027,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
    return new;
 }
 
-AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
+AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
                                AstSkyFrameVtab *vtab, const char *name,
                                AstChannel *channel ) {
 /*
@@ -6490,7 +6043,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "skyframe.h"
-*     AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
+*     AstSkyFrame *astLoadSkyFrame( void *mem, size_t size,
 *                                    AstSkyFrameVtab *vtab, const char *name,
 *                                    AstChannel *channel )
 
@@ -6503,10 +6056,6 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
 *     (which allocates memory if necessary) and then initialises a
 *     SkyFrame structure in this memory, using data read from the
 *     input Channel.
-*
-*     If the "init" flag is set, it also initialises the contents of a
-*     virtual function table for a SkyFrame at the start of the memory
-*     passed via the "vtab" parameter.
 
 *  Parameters:
 *     mem
@@ -6525,14 +6074,6 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstSkyFrame) is used instead.
-*     init
-*        A boolean flag indicating if the SkyFrame's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the SkyFrame class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new SkyFrame. If this is NULL, a pointer
@@ -6560,6 +6101,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
 /* Local Variables: */
    AstSkyFrame *new;             /* Pointer to the new SkyFrame */
    char *sval;                   /* Pointer to string value */
+   double dval;                  /* Floating point attribute value */
 
 /* Initialise. */
    new = NULL;
@@ -6573,26 +6115,23 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstSkyFrame );
-      init = !class_init;
       vtab = &class_vtab;
       name = "SkyFrame";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitSkyFrameVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built SkyFrame. */
-   new = astLoadFrame( mem, size, init, (AstFrameVtab *) vtab, name,
+   new = astLoadFrame( mem, size, (AstFrameVtab *) vtab, name,
                        channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */
@@ -6610,53 +6149,66 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
 
 /* System. */
 /* ------- */
-/* Set the default and read the external representation as a string. */
-   new->system = AST__NOSKYSYSTEM;
-   sval = astReadString( channel, "system", NULL );
+/* The System attribute is now part of the Frame class, but this code is
+   retained to allow this version of AST to read SkyFrames dumped by
+   previous versions.  */
 
-/* If a value was read, convert from a string to a System code. */
-   if ( sval ) {
-      if ( astOK ) {
-         new->system = SystemCode( sval );
+/* Check a value has not already been assigned to the Frames System
+   attribute.  */
+      if( !astTestSystem( new ) ){
 
-/* Report an error if the value wasn't recognised. */
-         if ( new->system == AST__NOSKYSYSTEM ) {
-            astError( AST__ATTIN,
-                      "astRead(%s): Invalid sky coordinate system description "
-                      "\"%s\".", astGetClass( channel ), sval );
+/* Read the external representation as a string. */
+         sval = astReadString( channel, "system", NULL );
+ 
+/* If a value was read, use the SetAttrib method to validate and store the 
+   new value in the correct place, then free the string. */
+         if ( sval ) {
+            astSet( new, "System=%s", sval );
+            sval = astFree( sval );
          }
       }
 
-/* Free the string value. */
-      sval = astFree( sval );
-   }
+/* Epoch. */
+/* ------ */
+/* The Epoch attribute is now part of the Frame class, but this code is
+   retained to allow this version of AST to read SkyFrames dumped by
+   previous versions.  */
+
+/* Check a value has not already been assigned to the Frames Epoch
+   attribute.  */
+      if( !astTestEpoch( new ) ){
+
+/* Get the value. */
+         dval = astReadDouble( channel, "epoch", AST__BAD );
+
+/* If a value was read, use the SetAttrib method to validate and store the 
+   new value in the correct place. */
+         if( dval != AST__BAD ) {
+            if( dval < 1984.0 ) {
+               astSet( new, "Epoch=B%.*g", DBL_DIG, dval );
+            } else {
+               astSet( new, "Epoch=J%.*g", DBL_DIG, dval );
+            }
+         }
+      }
 
 /* Projection. */
 /* ----------- */
-   new->projection = astReadString( channel, "proj", NULL );
-
-/* Epoch. */
-/* ------ */
-/* Interpret this as Besselian or Julian depending on its value. */
-   new->epoch = astReadDouble( channel, "epoch", AST__BAD );
-   if ( TestEpoch( new ) ) {
-      SetEpoch( new, ( new->epoch < 1984.0 ) ? slaEpb2d( new->epoch ) :
-                                               slaEpj2d( new->epoch ) );
-   }
+      new->projection = astReadString( channel, "proj", NULL );
 
 /* Equinox. */
 /* -------- */
 /* Interpret this as Besselian or Julian depending on its value. */
-   new->equinox = astReadDouble( channel, "eqnox", AST__BAD );
-   if ( TestEquinox( new ) ) {
-      SetEquinox( new, ( new->equinox < 1984.0 ) ? slaEpb2d( new->equinox ) :
-                                                   slaEpj2d( new->equinox ) );
-   }
+      new->equinox = astReadDouble( channel, "eqnox", AST__BAD );
+      if ( TestEquinox( new ) ) {
+         SetEquinox( new, ( new->equinox < 1984.0 ) ? slaEpb2d( new->equinox ) :
+                                                      slaEpj2d( new->equinox ) );
+      }
 
-/* MatchEnd. */
-/* --------- */
-   new->neglon = astReadInt( channel, "neglon", -INT_MAX );
-   if ( TestNegLon( new ) ) SetNegLon( new, new->neglon );
+/* NegLon. */
+/* ------- */
+      new->neglon = astReadInt( channel, "neglon", -INT_MAX );
+      if ( TestNegLon( new ) ) SetNegLon( new, new->neglon );
 
 /* If an error occurred, clean up by deleting the new SkyFrame. */
       if ( !astOK ) new = astDelete( new );
@@ -6847,7 +6399,8 @@ c     supplying SkyFrames to astConvert),
 f     supplying SkyFrames AST_CONVERT),
 *     account will be taken of the nature of the celestial coordinate
 *     systems they represent, together with any qualifying mean Equinox or
-*     Epoch values, etc. The results will therefore fully reflect the
+*     Epoch values, etc. The AlignSystem attribute will also be taken into
+*     account. The results will therefore fully reflect the
 *     relationship between positions on the sky measured in the two
 *     systems.
 *     - A null Object pointer (AST__NULL) will be returned if this

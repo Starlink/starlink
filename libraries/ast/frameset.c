@@ -165,6 +165,12 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     27-MAY-1998 (RFWS):
 *        Fixed bug: failure to record new invert flag value after
 *        simplifying a CmpMap in TidyNodes.
+*     17-DEC-2002 (DSB):
+*        Override accessors for Frame attributes Top, Bottom, Epoch,
+*        System, AlignSystem and ActiveUnit.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitFrameSetVtab
+*        method.
 *class--
 */
 
@@ -720,12 +726,12 @@ static const char *GetUnit( AstFrame *, int );
 static const int *GetPerm( AstFrame * );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
-static int ChrMatch( const char *str1, const char *str2 );
 static int ForceCopy( AstFrameSet *, int );
 static int GetBase( AstFrameSet * );
 static int GetCurrent( AstFrameSet * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
+static int GetActiveUnit( AstFrame * );
 static int GetMatchEnd( AstFrame * );
 static int GetMaxAxes( AstFrame * );
 static int GetMinAxes( AstFrame * );
@@ -748,6 +754,7 @@ static int TestDirection( AstFrame *, int );
 static int TestDomain( AstFrame * );
 static int TestFormat( AstFrame *, int );
 static int TestLabel( AstFrame *, int );
+static int TestActiveUnit( AstFrame * );
 static int TestMatchEnd( AstFrame * );
 static int TestMaxAxes( AstFrame * );
 static int TestMinAxes( AstFrame * );
@@ -780,7 +787,6 @@ static void ClearUnit( AstFrame *, int );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstFrameSetVtab * );
 static void Norm( AstFrame *, double[] );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
@@ -800,6 +806,7 @@ static void SetDirection( AstFrame *, int, int );
 static void SetDomain( AstFrame *, const char * );
 static void SetFormat( AstFrame *, int, const char * );
 static void SetLabel( AstFrame *, int, const char * );
+static void SetActiveUnit( AstFrame *, int );
 static void SetMatchEnd( AstFrame *, int );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
@@ -810,6 +817,33 @@ static void SetTitle( AstFrame *, const char * );
 static void SetUnit( AstFrame *, int, const char * );
 static void TidyNodes( AstFrameSet * );
 static void VSet( AstObject *, const char *, va_list );
+
+static double GetBottom( AstFrame *, int );
+static int TestBottom( AstFrame *, int );
+static void ClearBottom( AstFrame *, int );
+static void SetBottom( AstFrame *, int, double );
+
+static double GetTop( AstFrame *, int );
+static int TestTop( AstFrame *, int );
+static void ClearTop( AstFrame *, int );
+static void SetTop( AstFrame *, int, double );
+
+static double GetEpoch( AstFrame * );
+static int TestEpoch( AstFrame * );
+static void ClearEpoch( AstFrame * );
+static void SetEpoch( AstFrame *, double );
+
+static AstSystemType GetSystem( AstFrame * );
+static int TestSystem( AstFrame * );
+static void ClearSystem( AstFrame * );
+static void SetSystem( AstFrame *, AstSystemType );
+
+static AstSystemType GetAlignSystem( AstFrame * );
+static int TestAlignSystem( AstFrame * );
+static void ClearAlignSystem( AstFrame * );
+static void SetAlignSystem( AstFrame *, AstSystemType );
+
+
 
 /* Member functions. */
 /* ================= */
@@ -1293,72 +1327,6 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
    }
 }
 
-static int ChrMatch( const char *str1, const char *str2 ) {
-/*
-*  Name:
-*     ChrMatch
-
-*  Purpose:
-*     Case insensitive string comparison.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "frameset.h"
-*     int ChrMatch( const char *str1, const char *str2 )
-
-*  Class Membership:
-*     FrameSet member function.
-
-*  Description:
-*     This function compares two null terminated strings for equality,
-*     discounting differences in case and any trailing white space in either
-*     string.
-
-*  Parameters:
-*     str1
-*        Pointer to the first string.
-*     str2
-*        Pointer to the second string.
-
-*  Returned Value:
-*     Non-zero if the two strings match, otherwise zero.
-
-*  Notes:
-*     -  A value of zero is returned if this function is invoked with the
-*     global error status set or if it should fail for any reason.
-*/
-
-/* Local Variables: */
-   int match;                    /* Strings match? */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Initialise. */
-   match = 1;
-
-/* Loop to compare characters in the two strings until a mis-match occurs or
-   we reach the end of the longer string. */
-   while ( match && ( *str1 || *str2 ) ) {
-
-/* Two characters match if (a) we are at the end of one string and the other
-   string contains white space or (b) both strings contain the same character
-   when converted to lower case. */
-      match = ( !*str1 && isspace( *str2 ) ) ||
-              ( !*str2 && isspace( *str1 ) ) ||
-              ( tolower( *str1 ) == tolower( *str2 ) );
-
-/* Step through each string a character at a time until its end is reached. */
-      if ( *str1 ) str1++;
-      if ( *str2 ) str2++;
-   }
-
-/* Return the result. */
-   return match;
-}
-   
 static void Clear( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -3833,23 +3801,24 @@ static int GetTranInverse( AstMapping *this_mapping ) {
    return result;
 }
 
-static void InitVtab( AstFrameSetVtab *vtab ) {
+void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitFrameSetVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a FrameSet.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "frameset.h"
-*     void InitVtab( AstFrameSetVtab *vtab )
+*     void astInitFrameSetVtab( AstFrameSetVtab *vtab, const char *name )
 
 *  Class Membership:
-*     FrameSet member function.
+*     FrameSet vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -3858,7 +3827,14 @@ static void InitVtab( AstFrameSetVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -3868,6 +3844,10 @@ static void InitVtab( AstFrameSetVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitFrameVtab( (AstFrameVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAFrameSet) to determine if an object belongs
@@ -3995,6 +3975,35 @@ static void InitVtab( AstFrameSetVtab *vtab ) {
    frame->TestUnit = TestUnit;
    frame->Unformat = Unformat;
    frame->ValidateAxis = ValidateAxis;
+
+   frame->GetActiveUnit = GetActiveUnit;
+   frame->SetActiveUnit = SetActiveUnit;
+   frame->TestActiveUnit = TestActiveUnit;
+
+   frame->GetTop = GetTop;
+   frame->SetTop = SetTop;
+   frame->TestTop = TestTop;
+   frame->ClearTop = ClearTop;
+
+   frame->GetBottom = GetBottom;
+   frame->SetBottom = SetBottom;
+   frame->TestBottom = TestBottom;
+   frame->ClearBottom = ClearBottom;
+
+   frame->GetEpoch = GetEpoch;
+   frame->SetEpoch = SetEpoch;
+   frame->TestEpoch = TestEpoch;
+   frame->ClearEpoch = ClearEpoch;
+
+   frame->GetSystem = GetSystem;
+   frame->SetSystem = SetSystem;
+   frame->TestSystem = TestSystem;
+   frame->ClearSystem = ClearSystem;
+
+   frame->GetAlignSystem = GetAlignSystem;
+   frame->SetAlignSystem = SetAlignSystem;
+   frame->TestAlignSystem = TestAlignSystem;
+   frame->ClearAlignSystem = ClearAlignSystem;
 
 /* Declare the copy constructor, destructor and class dump
    functions. */
@@ -5170,9 +5179,11 @@ static void RestoreIntegrity( AstFrameSet *this ) {
 /* If no conversion could be found, then the FrameSet's integrity
    state cannot be restored, so report an error. */
       if ( !cvt ) {
-         astError( AST__ILOST, "%s(%s): Cannot maintain %s integrity.",
-                               integrity_method, astGetClass( this ),
-                               astGetClass( this ) );
+         if( astOK ) {
+            astError( AST__ILOST, "%s(%s): Cannot maintain %s integrity.",
+                      integrity_method, astGetClass( this ),
+                      astGetClass( this ) );
+         }
 
 /* Otherwise, obtain a pointer to the conversion Mapping. */
       } else {
@@ -5298,14 +5309,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                  && ( nc >= len ) ) {
 
 /* Check for "AST__CURRENT" or "Current". */
-      if ( ChrMatch( "AST__CURRENT", setting + base_off ) ||
-           ChrMatch( "Current", setting + base_off ) ) {
+      if ( astChrMatch( "AST__CURRENT", setting + base_off ) ||
+           astChrMatch( "Current", setting + base_off ) ) {
          astSetBase( this, AST__CURRENT );
 
 /* Check for "AST__BASE" or "Base" (possible, although not very
    useful). */
-      } else if ( ChrMatch( "AST__BASE", setting + base_off ) ||
-                  ChrMatch( "Base", setting + base_off ) ) {
+      } else if ( astChrMatch( "AST__BASE", setting + base_off ) ||
+                  astChrMatch( "Base", setting + base_off ) ) {
 
 /* Report an error if the value wasn't recognised. */
       } else {
@@ -5335,16 +5346,16 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                  && ( nc >= len ) ) {
 
 /* Check for "AST__BASE" or "Base". */
-      if ( ChrMatch( "AST__BASE", setting + current_off ) ||
-           ChrMatch( "Base", setting + current_off ) ) {
+      if ( astChrMatch( "AST__BASE", setting + current_off ) ||
+           astChrMatch( "Base", setting + current_off ) ) {
          RestoreIntegrity( this );
          astSetCurrent( this, AST__BASE );
          RecordIntegrity( this );
 
 /* Check for "AST__CURRENT" or "Current" (possible, although not very
    useful). */
-      } else if ( ChrMatch( "AST__CURRENT", setting + current_off ) ||
-                  ChrMatch( "Current", setting + current_off ) ) {
+      } else if ( astChrMatch( "AST__CURRENT", setting + current_off ) ||
+                  astChrMatch( "Current", setting + current_off ) ) {
 
 /* Report an error if the value wasn't recognised. */
       } else {
@@ -6880,6 +6891,7 @@ static void VSet( AstObject *this_object, const char *settings,
    const char *save_method;      /* Saved pointer to method name */
    int ok;                       /* Status OK? */
    int save_lost;                /* Saved integrity modified flag */
+   char buff[ 255 ];             /* Buffer for expanded settings string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -6913,8 +6925,14 @@ static void VSet( AstObject *this_object, const char *settings,
 /* If integrity could not be restored, then add contextual error
    information. */
    if ( !astOK && ok ) {
+
+/* Use "vsprintf" to substitute values for any format specifiers in
+   the "settings" string, writing the resulting string into the buffer. */
+      vsprintf( buff, settings, args );
+
+/* Display the message. */
       astError( astStatus, "Unable to accommodate the attribute setting "
-                            "\"%s\".", settings );
+                            "\"%s\".", buff );
    }
 
 /* Restore any saved FrameSet integrity information. */
@@ -7030,6 +7048,7 @@ MAKE_CLEAR(MinAxes)
 MAKE_CLEAR(Permute)
 MAKE_CLEAR(PreserveAxes)
 MAKE_CLEAR(Title)
+
 MAKE_GET(Digits,int)
 MAKE_GET(Domain,const char *)
 MAKE_GET(MatchEnd,int)
@@ -7055,6 +7074,25 @@ MAKE_TEST(Permute)
 MAKE_TEST(PreserveAxes)
 MAKE_TEST(Title)
 
+MAKE_GET(ActiveUnit,int)
+MAKE_SET(ActiveUnit,int)
+MAKE_TEST(ActiveUnit)
+
+MAKE_GET(System,AstSystemType)
+MAKE_SET(System,AstSystemType)
+MAKE_TEST(System)
+MAKE_CLEAR(System)
+
+MAKE_GET(AlignSystem,AstSystemType)
+MAKE_SET(AlignSystem,AstSystemType)
+MAKE_TEST(AlignSystem)
+MAKE_CLEAR(AlignSystem)
+
+MAKE_GET(Epoch,double)
+MAKE_SET(Epoch,double)
+MAKE_TEST(Epoch)
+MAKE_CLEAR(Epoch)
+
 /* Clear, Get, Set and Test axis-dependent Frame attributes. */
 MAKE_CLEAR_AXIS(Direction)
 MAKE_CLEAR_AXIS(Format)
@@ -7076,6 +7114,16 @@ MAKE_TEST_AXIS(Format)
 MAKE_TEST_AXIS(Label)
 MAKE_TEST_AXIS(Symbol)
 MAKE_TEST_AXIS(Unit)
+
+MAKE_GET_AXIS(Bottom,double)
+MAKE_SET_AXIS(Bottom,double)
+MAKE_TEST_AXIS(Bottom)
+MAKE_CLEAR_AXIS(Bottom)
+
+MAKE_GET_AXIS(Top,double)
+MAKE_SET_AXIS(Top,double)
+MAKE_TEST_AXIS(Top)
+MAKE_CLEAR_AXIS(Top)
 
 /* Copy constructor. */
 /* ----------------- */
@@ -7599,16 +7647,16 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitFrameSetVtab( vtab, name );
+
 /* Initialise a Frame structure (the parent class) as the first
    component within the FrameSet structure, allocating memory if
    necessary. Give this Frame zero axes, as all axis information for
    the FrameSet will be derived from the Frames it contains. */
-   new = (AstFrameSet *) astInitFrame( mem, size, init,
+   new = (AstFrameSet *) astInitFrame( mem, size, 0,
                                        (AstFrameVtab *) vtab, name, 0 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the FrameSet data. */
@@ -7725,7 +7773,7 @@ AstFrameSet *astInitFrameSet_( void *mem, size_t size, int init,
 #undef TRANSFER
 }
 
-AstFrameSet *astLoadFrameSet_( void *mem, size_t size, int init,
+AstFrameSet *astLoadFrameSet_( void *mem, size_t size,
                                AstFrameSetVtab *vtab, const char *name,
                                AstChannel *channel ) {
 /*
@@ -7741,7 +7789,7 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "frameset.h"
-*     AstFrameSet *astLoadFrameSet( void *mem, size_t size, int init,
+*     AstFrameSet *astLoadFrameSet( void *mem, size_t size,
 *                                   AstFrameSetVtab *vtab, const char *name,
 *                                   AstChannel *channel )
 
@@ -7754,10 +7802,6 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size, int init,
 *     (which allocates memory if necessary) and then initialises a
 *     FrameSet structure in this memory, using data read from the
 *     input Channel.
-*
-*     If the "init" flag is set, it also initialises the contents of a
-*     virtual function table for a FrameSet at the start of the memory
-*     passed via the "vtab" parameter.
 
 *  Parameters:
 *     mem
@@ -7776,14 +7820,6 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstFrameSet) is used instead.
-*     init
-*        A boolean flag indicating if the FrameSet's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the FrameSet class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new FrameSet. If this is NULL, a pointer
@@ -7829,26 +7865,23 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstFrameSet );
-      init = !class_init;
       vtab = &class_vtab;
       name = "FrameSet";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitFrameSetVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built FrameSet. */
-   new = astLoadFrame( mem, size, init, (AstFrameVtab *) vtab, name,
+   new = astLoadFrame( mem, size, (AstFrameVtab *) vtab, name,
                        channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

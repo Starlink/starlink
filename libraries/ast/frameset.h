@@ -349,6 +349,8 @@
 *           Validate class membership.
 *        astInitFrameSet
 *           Initialise a FrameSet.
+*        astInitFrameSetVtab
+*           Initialise the virtual function table for the FrameSet class.
 *        astLoadFrameSet
 *           Load a FrameSet.
 
@@ -407,6 +409,8 @@
 *        values associated with the current Frame are modified.
 *     25-FEB-1998 (RFWS):
 *        Over-ride the astUnformat method.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitFrameSetVtab method.
 *-
 */
 
@@ -506,8 +510,11 @@ AstFrameSet *astFrameSetId_( void *, const char *, ... );
 AstFrameSet *astInitFrameSet_( void *, size_t, int, AstFrameSetVtab *,
                                const char *, AstFrame * );
 
+/* Vtab initialiser. */
+void astInitFrameSetVtab_( AstFrameSetVtab *, const char * );
+
 /* Loader. */
-AstFrameSet *astLoadFrameSet_( void *, size_t, int, AstFrameSetVtab *,
+AstFrameSet *astLoadFrameSet_( void *, size_t, AstFrameSetVtab *,
                                const char *, AstChannel * );
 #endif
 
@@ -563,9 +570,11 @@ void astSetCurrent_( AstFrameSet *, int );
 #define astInitFrameSet(mem,size,init,vtab,name,frame) \
 astINVOKE(O,astInitFrameSet_(mem,size,init,vtab,name,astCheckFrame(frame)))
 
+/* Vtab Initialiser. */
+#define astInitFrameSetVtab(vtab,name) astINVOKE(V,astInitFrameSetVtab_(vtab,name))
 /* Loader. */
-#define astLoadFrameSet(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadFrameSet_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadFrameSet(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadFrameSet_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */
