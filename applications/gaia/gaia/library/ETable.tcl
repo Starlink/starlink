@@ -474,7 +474,7 @@ itcl::class gaia::ETable {
    }
 
    #  Clear a range of rows. Note this actually deletes the entry widgets
-   #  in these rows and is fundermentally different from clearing a cell.
+   #  in these rows and is fundamentally different from clearing a cell.
    method clearrows { first args } { clear $first $args}
    method clear { first args } {
       set first [_index $first 0 0]
@@ -511,7 +511,7 @@ itcl::class gaia::ETable {
    }
 
    #  Clear a range of columns. Note this actually deletes the entry widgets
-   #  in these columns and is fundermentally different from clearing a cell.
+   #  in these columns and is fundamentally different from clearing a cell.
    method clearcols { first args } {
       if { $args == "" } {
          set last $first

@@ -49,7 +49,7 @@
 #     Originally this routine used the FIGARO application SLICE, but
 #     has been changed to use an internal routine instead. This is
 #     because SLICE cannot deal with the situation when axes are
-#     monotonically decreasing (which is pretty fundermental
+#     monotonically decreasing (which is pretty fundamental
 #     when dealing with celestial coordinate systems). SLICE also
 #     always insists on using axes values, which hardly ever useful
 #     for us.

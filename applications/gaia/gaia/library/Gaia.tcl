@@ -592,6 +592,10 @@ itcl::class gaia::Gaia {
          {Choose a coordinate system } \
          -command [code $this make_toolbox astdomain]
 
+      add_menuitem $m.coords command "Show all coordinates..." \
+         {Display coordinates for all known systems} \
+         -command [code $this make_toolbox astdisplay]
+
       add_menuitem $m.coords command "Celestial coordinates...  " \
          {Change the celestial coordinate system} \
 	 -command [code $this make_toolbox astsystem]
@@ -832,6 +836,18 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Make an AST display all known coordinates readout.
+   public method make_astdisplay_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaAstDisplayDomains $w_.\#auto \
+            -rtdimage [$image_ get_image] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox astdisplay 1] \
+            -really_die $cloned
+      }
+   }
+
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
       itk_component add $name {
@@ -1022,6 +1038,11 @@ itcl::class gaia::Gaia {
       if { [info exists itk_component(astdomain) ] } {
          if { [winfo exists $itk_component(astdomain) ] } {
             $itk_component(astdomain) image_changed
+         }
+      }
+      if { [info exists itk_component(astdisplay) ] } {
+         if { [winfo exists $itk_component(astdisplay) ] } {
+            $itk_component(astdisplay) image_changed
          }
       }
       if { [info exists itk_component(contour) ] } {

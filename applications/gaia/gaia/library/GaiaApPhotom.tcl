@@ -27,7 +27,7 @@
 #     to rerun the same measurements on other frames. Full control
 #     over the parameters of this application is also available.
 #
-#     There are two fundermentally different modes used in this
+#     There are two fundamentally different modes used in this
 #     routine, the first use magnitudes for the output results
 #     and the second straight counts (or flux). To create an instance
 #     of this class you must supply a boolean value as a second

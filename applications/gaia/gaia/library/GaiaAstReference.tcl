@@ -1169,7 +1169,7 @@ itcl::class gaia::GaiaAstReference {
          {Quadtrilaterized Spherical Cube} -QSC
          {Tangential Spherical Cube} -TSC}
 
-   #  Names of all the possible RA/DEC fundermental coordinate
+   #  Names of all the possible RA/DEC fundamental coordinate
    #  systems. The values following these are the need for an equinox
    #  and an epoch.
    protected variable systemattrib_ \

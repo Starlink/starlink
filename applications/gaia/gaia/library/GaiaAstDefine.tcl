@@ -298,7 +298,7 @@ itcl::class gaia::GaiaAstDefine {
 
       #  RADECSYS and EQUINOX.
       itk_component add space5 {
-         LabelRule $itk_component(f1).space5 -text "Fundermental coordinate system:"
+         LabelRule $itk_component(f1).space5 -text "Fundamental coordinate system:"
       }
 
       #  radecsys.
@@ -885,7 +885,7 @@ itcl::class gaia::GaiaAstDefine {
          {Quadtrilaterized Spherical Cube} -QSC
          {Tangential Spherical Cube} -TSC}
 
-   #  Names of all the possible RA/DEC fundermental coordinate
+   #  Names of all the possible RA/DEC fundamental coordinate
    #  systems. The values following these are the need for an equinox.
    protected variable systemattrib_ {FK5 1 FK4 1 FK4-NO-E 1 GAPPT 0 {} 0} 
 
