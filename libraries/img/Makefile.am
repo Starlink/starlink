@@ -90,25 +90,25 @@ EXTRA_DIST += $(EXAMPLES)
 ## copy them through to the output.
 
 ##  Generic
-GC=$(STARLINK)/bin/generic
+GENERIC=@GENERIC@
 
 #  Run generic to get numeric types.
 GFLAGS = n
 .gen.f:
-	$(GC) -t $(GFLAGS) $<
+	$(GENERIC) -t $(GFLAGS) $<
 
 #  Run generic to get the complete set of parameter types (rlidc)
 GCPFLAGS = rlidc
 .gcp.f:
 	$(LN_S) $< $(<:.gcp=.gen)
-	$(GC) -t $(GCPFLAGS) $(<:.gcp=.gen)
+	$(GENERIC) -t $(GCPFLAGS) $(<:.gcp=.gen)
 	$(RM) $(<:.gcp=.gen)
 
 #  Run generic to get numeric parameter rlid types.
 GNPFLAGS = rlid
 .gnp.f:
 	$(LN_S) $< $(<:.gnp=.gen)
-	$(GC) -t $(GNPFLAGS) $(<:.gnp=.gen)
+	$(GENERIC) -t $(GNPFLAGS) $(<:.gnp=.gen)
 	$(RM) $(<:.gnp=.gen)
 
 ##  The Fortran intermediary files should be cleaned away sometime.

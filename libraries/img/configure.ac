@@ -25,6 +25,8 @@ dnl    Other options here, such as
 dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ndf sae hds par cnf prm])
 STAR_DECLARE_DEPENDENCIES(link, [ndf prm])
@@ -43,7 +45,7 @@ dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
 
 dnl    Define GC for the Starlink generic pre-processor.
-
+AC_PATH_PROG(GENERIC, generic)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
