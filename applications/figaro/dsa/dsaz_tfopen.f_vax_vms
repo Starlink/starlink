@@ -1,0 +1,190 @@
+C+
+C                    D S A Z _ T F O P E N _ V A X
+C
+C  Routine name:
+C     DSAZ_TFOPEN
+C
+C  Function:
+C     Performs the system dependent part of opening a text file.
+C
+C  Description:
+C     This routine will try to open either a new or existing text file.
+C     It is passed a 'directory specification', which is a way of
+C     specifying symbolically the name of a directory that the
+C     file may be found in. This is intended to be something like
+C     'FIGARO_PROG_L' and on a VAX will be a logical name, under UNIX
+C     an environment variable, etc. This can be blank. The special case
+C     where this is the single character '$' is taken as a reference to
+C     the directory from which the current program is being run. Systems
+C     where this concept cannot be implemented will simply not find
+C     an existing file in this 'execute' directory and will not be able to 
+C     create a new file in it. The routine is also passed a file name,
+C     which may be a completely specified file name, complete with 
+C     directory specification, file extension and version number (where
+C     supported), or can be just the bare filename. It is also passed a 
+C     default file extension for use if this is not provided in the filename. 
+C     (If the filename appears to contain an extension, ie a dot within the
+C     body of the filename, then the default extension will be ignored,
+C     so a filename 'FILE.EXT' with a default extension of '.EXT' will
+C     not be taken as the file 'FILE.EXT.EXT', even on a system where
+C     this would be a valid name.) The default extension should begin
+C     with a dot character, if specified. If it is blank, no extension
+C     is assumed by this program. This routine respects the case of all these
+C     strings and does not attempt to change them; whether the underlying
+C     operating system respects filename case is not a question addressed
+C     by this routine.  A file will be opened in the most suitable way for
+C     a text file. The file can be specified as 'new' or 'not new' - ie
+C     existing; a new file will always be opened for writing. An existing
+C     file can be opened for writing or not; a file opened for reading will
+C     be opened in such a way that other programs can share access to it.
+C     Opening a 'new' file when a file of the same name exists will either
+C     create a new version of the file or will replace the existing file -
+C     this depends on the operating system. Note that the symbolic directory
+C     is always used if it is non-blank; usually this program will be called
+C     several times as a file is searched for, with various symbols for the
+C     directory, and in one of these cases the symbolic directory will
+C     normally be blank to allow the case where the filename itself 
+C     contains the directory specification to succeed. 
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL DSAZ_TFOPEN (LU,SYMDIR,FILENAME,DEFEXT,NEW,
+C                                          WRITE,EXIST,ERROR,STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (>) LU       (Integer) The number of the Fortran logical
+C                  unit to be used to access the file.
+C     (>) SYMDIR   (character*(*)) The symbolic name for the directory.
+C     (>) FILENAME (Character*(*)) The name of the file to be opened,
+C                  either bare or with an explicit directory specification
+C                  and or extension.
+C     (>) DEFEXT   (Character*(*)) A string specifying the default
+C                  extension for the file, including the leading dot.
+C     (>) NEW      (Logical) True if a new file is to be created.
+C     (>) WRITE    (Logical) True if an existing file is to be opened
+C                  for writing.
+C     (<) EXIST    (Logical) Independent of whether or not the file
+C                  was opened, indicates if it existed or not.
+C     (<) ERROR    (Character*(*)) A single string describing any error.
+C     (!) STATUS   (Integer) Status value.  If this is passed as non
+C                  zero, this routine returns immediately. If the file 
+C                  cannot be opened, this will be set to some non-zero
+C                  code.
+C
+C  External variables used: None.
+C
+C  Prior requirements: None.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 29th August 1992
+C-
+C  System:
+C     This is the VAX/VMS version of this routine.
+C
+C  External subroutines / functions used:
+C     GEN_EXEDIR, GEN_FORTERR, ICH_LEN
+C
+C  Subroutine / function details:
+C     GEN_EXEDIR     Returns the directory from which the current .EXE was run
+C     GEN_FORTERR    Given a Fortran error code, returns an error message
+C     ICH_LEN        Position of last non-blank character in a string
+C
+C  History:
+C     24th Aug  1992  Original version.  KS / AAO.
+C     29th Aug 1992   "INCLUDE" filenames now upper case. KS/AAO
+C+
+      SUBROUTINE DSAZ_TFOPEN (LU,SYMDIR,FILENAME,DEFEXT,NEW,
+     :                                       WRITE,EXIST,ERROR,STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      LOGICAL NEW, WRITE, EXIST
+      INTEGER LU, STATUS
+      CHARACTER*(*) SYMDIR, FILENAME, DEFEXT, ERROR
+C
+C     Functions used
+C
+      INTEGER ICH_LEN
+C
+C     Local variables
+C
+      CHARACTER EXEDIR*128           ! Name of current .EXE directory
+      INTEGER   FLEN                 ! Number of characters in FILENAME
+      CHARACTER FULL_NAME*256        ! Name of file to be opened
+      INTEGER   ISTAT                ! Status of inquire operation
+      INTEGER   NCH                  ! Number of characters in EXEDIR
+      INTEGER   SLEN                 ! Number of characters in SYMDIR
+C
+      IF (STATUS.NE.0) RETURN
+C
+C     Generate the filename to use.  This involves looking at FILENAME and
+C     pre-pending the symbolic directory name (with a ':', on the assumption
+C     that this is a logical name).  In the special case of '$' for the
+C     symbolic directory, get the current execution directory.
+C
+      FLEN=ICH_LEN(FILENAME)
+      SLEN=ICH_LEN(SYMDIR)
+      IF (SLEN.GT.0) THEN
+         IF (SYMDIR.EQ.'$') THEN
+            CALL GEN_EXEDIR(EXEDIR,NCH)
+            FULL_NAME=EXEDIR(:NCH)//FILENAME
+            FLEN=NCH+FLEN
+         ELSE            
+            FULL_NAME=SYMDIR(:ICH_LEN(SYMDIR))//':'//FILENAME
+            FLEN=SLEN+1+FLEN
+         END IF
+      ELSE
+         FULL_NAME=FILENAME
+      END IF
+C
+C     First, see if the file exists - we need to know this to report
+C     using EXIST, even if a new version is to be created.
+C
+      INQUIRE (FILE=FULL_NAME(:FLEN),DEFAULTFILE=DEFEXT,EXIST=EXIST,
+     :                                                     IOSTAT=ISTAT)
+      IF (ISTAT.NE.0) EXIST=.FALSE.
+C
+      IF (NEW) THEN
+C
+C        If the file is to be created, see if we can create it. If FILENAME
+C        contained a directory name and SYMDIR was non-blank, this will 
+C        probably fail with a filename error, which is only to be expected.
+C
+         OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),DEFAULTFILE=DEFEXT,
+     :                STATUS='NEW',CARRIAGECONTROL='LIST',IOSTAT=STATUS)
+         IF (STATUS.NE.0) THEN
+            CALL GEN_FORTERR(STATUS,.FALSE.,ERROR)
+         END IF
+      ELSE
+C
+C        The file should already exist. See if it did - this assumes that 
+C        this routine will be called more frequently for a file that doesn't 
+C        exist than for one that does, and that the INQUIRE is faster than 
+C        a tentative OPEN. (Otherwise, we'd only do the INQUIRE for the
+C        'new' case and just use an OPEN here.) If it does exist, try to 
+C        open it.
+C
+         IF (EXIST) THEN
+            IF (WRITE) THEN
+               OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),DEFAULTFILE=DEFEXT,
+     :               STATUS='OLD',CARRIAGECONTROL='LIST',IOSTAT=STATUS)
+            ELSE
+               OPEN (UNIT=LU,FILE=FULL_NAME(:FLEN),DEFAULTFILE=DEFEXT,
+     :             STATUS='OLD',SHARED,READONLY,CARRIAGECONTROL='LIST')
+            END IF
+            IF (STATUS.NE.0) THEN
+               CALL GEN_FORTERR(STATUS,.FALSE.,ERROR)
+            END IF
+         ELSE
+            STATUS=1
+            ERROR='File does not exist'
+         END IF
+      END IF
+C
+      END
