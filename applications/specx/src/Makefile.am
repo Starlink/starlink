@@ -7,7 +7,7 @@ AM_FCFLAGS = -I../inc
 specx_SOURCES = run_specx.c scl_main.f TITLE
 specx_help_SOURCES = helpm.c
 
-specx_help_LDADD = `shl_link`
+specx_help_LDADD = `shl_link` @FCLIBS@
 
 FIG_LIBS = \
 /home/timj/data/tmp/star/cvs/applications/figaro/fit/libfit.la \
@@ -36,6 +36,6 @@ specx_LDADD = \
 ../gen/libgen.la \
 ../getaline/libgetaline.la \
 $(FIG_LIBS) \
-`$(srcdir)/specx_link`
+`$(srcdir)/specx_link` @FCLIBS@
 
 
