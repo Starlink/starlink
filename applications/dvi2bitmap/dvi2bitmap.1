@@ -4,7 +4,8 @@
 dvi2bitmap
 .SH SYNOPSIS
 .B dvi2bitmap 
-    [\-f font-path] [\-r resolution] [\-m magnification] 
+    [\-r resolution] [\-m magnification] 
+    [\-fp font-path] [\-fm mfmode] [\-fg] [\-fG]
     [\-P[bt]] [\-s scalefactor] [\-t gif|xbm] [\-o output]
     [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
     [\-nqQV] [\-L[L]] [\-p num] [\-l num] [\-pp ranges]
@@ -73,9 +74,20 @@ See below for TeX
 .I "\especial"
 commands which set this within the TeX file.
 .TP
-.I "\-f font-path"
+.I "\-fp font-path"
 Specifies the path to the PK fonts which dvi2bitmap will use.  See
 also the discussion of font searching below.
+.TP
+.I "\-fm mode"
+Set the MetaFont mode which is used for generating font files.  The
+default is 
+.I "ibmvga."
+If you set this, you will probably have to set the resolution to a consistent
+number.
+.TP
+.I "\-fg, \-fG"
+Switch automatic generation of fonts off and on, respectively.  The
+default is set at compile time.
 .TP
 .I "-l pagenum"
 See option 
@@ -110,9 +122,6 @@ postamble.  Useful in conjunction with the
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 .TP
-.I "\-nf"
-Do process the DVI file, but don't generate missing fonts.
-.TP
 .I "\-o output"
 Choose the output filename pattern.  The value is a 
 `printf' formatting string, with a single
@@ -125,49 +134,73 @@ embedded in the DVI file (see below).  If there is no
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 .TP
-.I "\-p p-spec, \-l l-spec, \-pp pp-spec"
+.I "\-p pnum, \-l lnum, \-pp pagelist"
 These select page ranges, using a slight extension of the notation
-used by
+used by 
 .I "dvips"
-(and the same option letters).  The
-.I "p-spec"
-and
-.I "l-spec"
-are single page numbers; if either of these are
-given, then the program will process pages from page
-.I "p-spec"
-to page
-.I "l-spec"
-, and if either is missing, it implies the
-corresponding extreme.  The
-.I "pp-spec"
-consists of a sequence of
-page numbers and ranges
-.I "(number1-number2)"
-; only those pages,
-and the pages falling in those ranges (inclusive of the end pages) are
-processed.  Any of these may be prefixed by either
-.I =
-or
-.I ":n,"
-In the former case, DVI page numbers are used rather
-than TeX
-.I "\ecount"
-registers; in the latter case, the program examines the
-.I "\ecountn"
-register rather than the default
-.I "\ecount0"
-You can specify both of these prefixes in one or more options, and the
-program will respect only the last one, but you cannot mix
+(and the same option letters).
+.PP
+The
 .I "\-p"
 and
 .I "\-l"
-options with the
+options take single page numbers; if
+either of these is given, then the program will process pages from
+page 
+.I "pnum"
+to page 
+.I "lnum"
+, with the defaults being the
+corresponding extremes.  The 
+.I "pagelist"
+consists of a
+comma-separated sequence of page numbers and ranges (
+.I "a-b"
+); only
+those pages, and the pages falling in those ranges (inclusive of the
+end pages) are processed.  Any of these specifications may be prefixed
+by either
+.I "="
+or
+.I ":n,"
+.  In the former case, DVI page
+numbers are used rather than TeX
+.I "\ecount"
+registers; in the latter case, the program examines the 
+.I "\ecountn"
+register
+rather than the default 
+.I "\ecount0"
+.PP
+You can specify both of these prefixes one or more times, but you
+cannot mix the 
+.I "\-p"
+and 
+.I "\-l"
+options with the 
 .I "\-pp"
-option.  There may be no
-spaces in the
-.I "pp-spec."
+option.  The program will respect only the last 
+.I "-p"
+and
+.I "\-l"
+options, but the 
+.I "\-pp"
+options are cumulative.  There
+may be no spaces in the 
+.I "pagelist."
 The page numbers may be negative.
+.PP
+Examples:
+.PP
+.I "dvi2bitmap \-pp 3,6\-10 ..."
+.PP
+process only the specified pages
+.PP
+.I "dvi2bitmap \-pp :2,1 ..."
+.PP
+process only pages where
+.I "\ecount2"
+was 1.
 .TP
 .I "\-P[bt]"
 Specifies processing of the output bitmap.
@@ -193,7 +226,10 @@ Silent mode -- do not display warnings or errors.
 .TP
 .I "\-r resolution"
 Specifies the output resolution, in pixels-per-inch.  This is used
-when deciding which PK files to use. The default is 72.
+when deciding which PK files to use. The default is 110, which matches
+the default 
+.I "ibmvga"
+metafont mode.
 .TP
 .I "\-s scalefactor"
 Reduces the linear size of the output bitmap by a factor
