@@ -78,14 +78,16 @@
 # even if there's some fatal error, such as an input file not being present,
 # then the script will still return with a zero exit status.
 #
-#<returnvalue none>
+# <returnvalue type=file>
+# A file conforming to the DocumentSummary DTD
+#
 #  <parameter>input-file-name
 #    <type>Star2HTML file
 #    <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
 #
 #  <parameter>index-file-name
-#    <type>SGML file
-#    <description>A file conforming to the DocumentSummary DTD
+#    <type>HTX index file
+#    <description>The index file produced by HTX (see SUN/188)
 #
 #  <parameter>--prefix=url-prefix
 #    <type>option
@@ -98,6 +100,7 @@
 #  <parameter>--output=outfile
 #    <type>option
 #    <description>The name of the file to receive the generated output.
+#    If omitted, the result goes to STDOUT.
 #
 #  <parameter>--force
 #    <type>option
