@@ -1,26 +1,43 @@
-      SUBROUTINE SCULIB_WTFN_REGRID_3 (DIAMETER, RES, PIXSPACE, NI,NJ,
+      SUBROUTINE SCULIB_WTFN_REGRID_3 (USEGUARD, RES, PIXSPACE, NI,NJ,
      :     ICEN, JCEN, TOT_WEIGHT_IN, WAVELENGTH, CONV_DATA_SUM, 
      :     CONV_VARIANCE_SUM, CONV_QUALITY_SUM, CONV_WEIGHT, 
-     :     WEIGHTSIZE, WTFN, STATUS)
+     :     WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
 *  Name:
 *     SCULIB_BESSEL_REGRID_3
 
 *  Purpose:
+*     Sets up the 'guard ring' of bolometers outside the data.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_BESSEL_REGRID_3 (DIAMETER, RES,PIXSPACE, NI, NJ, ICEN, JCEN, 
+*     CALL SCULIB_BESSEL_REGRID_3 (METHOD,RES,PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOT_WEIGHT_IN, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
-*    :  CONV_QUALITY_SUM, CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
+*    :  CONV_QUALITY_SUM, CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
 *  Description:
+*     Takes the regridded image and adds in data of value 'zero'
+*     for any points that are within range of the weighting function
+*     (ie if TOTAL_WEIGHT is greater than 0) but that do not already
+*     contain any data (ie TOTAL_WEIGHT is set to something becuase
+*     regrid_1 determined that the pixel was close enough to be
+*     influenced by the convolution function, BUT no data was actually
+*     found to lie in that pixel). This has the effect of enforcing
+*     zero flux density at the edges of the map or where no data
+*     was present (eg surrounding a bad pixel).
+*     This is only really necessary for the bessel function regrid since
+*     that function is extremely sensitive to edge effects.
+*     Once the 'guard ring' has been processed, the output image is
+*     normalised by dividing by the convolution weight (ie the actual
+*     weight used for each pixel). Any point that has zero convolution
+*     weight is set to bad.
+
 
 *  Arguments:
-*     DIAMETER                       = REAL (given)
-*        size of dish
+*     USEGUARD                       = LOGICAL (Given)
+*       Logical to determine whether the gueard ring should be used.
 *     RES                            = INTEGER (Given)
 *        number of resolution elements per scale length
 *     PIXSPACE                       = REAL (Given)
@@ -47,6 +64,8 @@
 *        the convolution weight for each output pixel.
 *     WEIGHTSIZE                       = INTEGER (Given)
 *        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 1 for LINEAR)
+*     SCLSZ                          = REAL (Given)
+*        1 scale length in the same units as pixspace
 *     WTFN (RES * RES * WEIGHTSIZE * WEIGHTSIZE) = REAL (Given)
 *        convolution weighting function
 *     STATUS = INTEGER (Given and Returned)
@@ -69,23 +88,24 @@
       INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
-      REAL DIAMETER
+      LOGICAL USEGUARD
       INTEGER RES
-      REAL PIXSPACE
+      REAL    PIXSPACE
       INTEGER NI
       INTEGER NJ
       INTEGER ICEN
       INTEGER JCEN
-      REAL TOT_WEIGHT_IN (NI, NJ)
-      REAL WAVELENGTH
+      REAL    SCLSZ
+      REAL    TOT_WEIGHT_IN (NI, NJ)
+      REAL    WAVELENGTH
       INTEGER WEIGHTSIZE
-      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
+      REAL    WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
 
 *  Arguments Returned:
-      REAL CONV_DATA_SUM (NI, NJ)
-      REAL CONV_VARIANCE_SUM (NI, NJ)
-      BYTE CONV_QUALITY_SUM (NI, NJ)
-      REAL CONV_WEIGHT (NI, NJ)
+      REAL    CONV_DATA_SUM (NI, NJ)
+      REAL    CONV_VARIANCE_SUM (NI, NJ)
+      BYTE    CONV_QUALITY_SUM (NI, NJ)
+      REAL    CONV_WEIGHT (NI, NJ)
 
 *  Status:
       INTEGER STATUS                             ! Global status
@@ -119,12 +139,12 @@
                                                  ! at output pixel
       INTEGER FILTER1_SQ
       INTEGER FILTER_RAD_SQ
-      REAL SCALE
-      REAL SCALESQ
-      REAL RES_SCAL
-      REAL RAD_OV_SCAL
-      REAL SMALL
-      REAL SMALLRT
+      REAL    SCALE
+      REAL    SCALESQ
+      REAL    RES_SCAL
+      REAL    RAD_OV_SCAL
+      REAL    SMALL
+      REAL    SMALLRT
 *   local data
 *.
 
@@ -132,79 +152,88 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     If we are processing the guard ring do this.
+*     else go straight to the divide-by-weights part.
+
+      IF (USEGUARD) THEN
+
 * Set up small to prevent comparing REAL to 0.0
 
-      SMALL = VAL__SMLR
-      SMALLRT = SQRT(SMALL)
-
+         SMALL = VAL__SMLR
+         SMALLRT = SQRT(SMALL)
 
 *  set x and y axis pixel increments, x increases to left hence -ve.
 
-      XINC = -PIXSPACE
-      YINC = PIXSPACE
+         XINC = -PIXSPACE
+         YINC = PIXSPACE
 
 * Some time saving squares
 
-      FILTER1_SQ = RES * RES
-      FILTER_RAD_SQ = WEIGHTSIZE * WEIGHTSIZE
+         FILTER1_SQ = RES * RES
+         FILTER_RAD_SQ = WEIGHTSIZE * WEIGHTSIZE
 
 *  ..extent of convolution function in units of output pixels
     
-      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-      SCALE = 1.0 / RES_ELEMENT
+*      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
+*      SCALE = 1.0 / RES_ELEMENT
+         SCALE = 1.0 / SCLSZ
 
-      SCALESQ = SCALE * SCALE
+         SCALESQ = SCALE * SCALE
       
-      RTEMP = REAL(WEIGHTSIZE) * RES_ELEMENT / PIXSPACE
-      PIX_RANGE = INT (RTEMP) + 1
+         RTEMP = REAL(WEIGHTSIZE) * SCLSZ / PIXSPACE
+         PIX_RANGE = INT (RTEMP) + 1
 
-      RAD_OV_SCAL = REAL(FILTER_RAD_SQ) / SCALESQ
-      RES_SCAL = REAL(FILTER1_SQ) * SCALESQ
-
+         RAD_OV_SCAL = REAL(FILTER_RAD_SQ) / SCALESQ
+         RES_SCAL = REAL(FILTER1_SQ) * SCALESQ
 
 *  now do the convolution
 
-      DO JOUT = 1, NJ
-         DO IOUT = 1, NI
-
-            IF (TOT_WEIGHT_IN (IOUT,JOUT) .GT. SMALL) THEN
+         DO JOUT = 1, NJ
+            DO IOUT = 1, NI
+               
+               IF (TOT_WEIGHT_IN (IOUT,JOUT) .GT. SMALL) THEN
 
 *  OK, good map point, loop through other map points in convolution
 *  function range ...
 
-               YPIX = REAL (JOUT-JCEN) * YINC     
-               XPIX = REAL (IOUT-ICEN) * XINC
+                  YPIX = REAL (JOUT-JCEN) * YINC     
+                  XPIX = REAL (IOUT-ICEN) * XINC
 
-               DO JCONV = MAX(1,JOUT-PIX_RANGE), MIN(NJ,JOUT+PIX_RANGE)
-                  DO ICONV = MAX(1,IOUT-PIX_RANGE), 
-     :              MIN(NI,IOUT+PIX_RANGE)
+                  DO JCONV = MAX(1,JOUT-PIX_RANGE), 
+     :                 MIN(NJ,JOUT+PIX_RANGE)
+                     DO ICONV = MAX(1,IOUT-PIX_RANGE), 
+     :                    MIN(NI,IOUT+PIX_RANGE)
 
 *  and if they have zero weight, add them into the convolution function 
 *  weight as if they were measured to be zero
 
-                     IF (TOT_WEIGHT_IN(ICONV,JCONV) .LT. SMALL) THEN
-                        YCONV = REAL (JCONV-JCEN) * YINC     
-                        XCONV = REAL (ICONV-ICEN) * XINC 
-                        RPIX = (YPIX-YCONV)**2 + (XPIX-XCONV)**2
-
-                        WT = 0.0
+                        IF (TOT_WEIGHT_IN(ICONV,JCONV) .LT. SMALL) THEN
+                           YCONV = REAL (JCONV-JCEN) * YINC     
+                           XCONV = REAL (ICONV-ICEN) * XINC 
+                           RPIX = (YPIX-YCONV)**2 + (XPIX-XCONV)**2
+                           
+                           WT = 0.0
 * Same method as used in REGRID_2
-                        IF (RPIX .LT. RAD_OV_SCAL) THEN
-                           ICPIX = NINT(RES_SCAL * RPIX)
-                           WT = WTFN(ICPIX+1)
-                        ENDIF
+                           IF (RPIX .LT. RAD_OV_SCAL) THEN
+                              ICPIX = NINT(RES_SCAL * RPIX)
+                              WT = WTFN(ICPIX+1)
+                              
+                              CONV_WEIGHT(IOUT,JOUT) = 
+     :                             CONV_WEIGHT(IOUT,JOUT) + WT
 
-                        CONV_WEIGHT(IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) 
-     :                     + WT
-                     END IF
+                           ENDIF
 
+                        END IF
+
+                     END DO
                   END DO
-               END DO
 
-            END IF
+               END IF
 
+            END DO
          END DO
-      END DO
+      
+      END IF
 
 *  finally go through output pixels normalising them by CONV_WEIGHT
 *  to give the final result. Those whose `total input weight' is zero
