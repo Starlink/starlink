@@ -65,6 +65,10 @@ Smallish DTD and DC changes, arising from the programmers' meeting and
 discussion with Mark Taylor.
 </distribution>
 
+<change date='13-SEP-1999' versionid="post-v0-4">
+Assorted tidyups and clarifications from user comments
+</change>
+
 </history>
 
 <coverimage>
@@ -1419,6 +1423,9 @@ id=el.sun.verbatim text='verbatim'> element) as figure content.
 
 <subsect id=str.tables export>Tables
 <update versionid="v0-4">Include description of new tabular element</update>
+<update versionid="post-v0-4">
+Clarified description of tabular element, and linebreaks.</update>
+
 
 <p>Includes
 <ref id='el.sun.caption' text='caption'>,
@@ -1436,6 +1443,14 @@ between the two is that the tabular is the object which contains data
 lined up in columns, whilst the table is an object which might float
 from its declared position, which has a caption, and
 which can be referred to from elsewhere.
+
+<p>The tabular element will most commonly be used within a table
+element, but it is also permissible within ordinary paragraphs.  Note,
+however, that the tabular element does not necessarily have a
+linebreak before and after it in this case.  If you want the tabular
+to go on a line by itself (which will usually be the case, you should
+include it within a <ref id='el.sun.blockquote' text='blockquote'>
+element.
 
 <p><update versionid="post-0.2">Corrected Oasis URL</update>
 The Starlink DTDs use the <webref
