@@ -9,7 +9,7 @@
 \newcommand{\stardocsource}    {}
 \newcommand{\stardocnumber}    {}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {19th May 1998}
+\newcommand{\stardocdate}      {23rd June 1998}
 \newcommand{\stardoctitle}     {POLKA \\ [1ex]
                                 A Tool for Image Registration, Sky Subtraction,
                                 and Calculation of Stokes Parameters}
@@ -380,13 +380,12 @@ estimated within a specified area of the corresponding input object frame
 (see \hyperref{here}{section }{}{POLKA_SKYSUB} if you wish to use
 separate sky frames instead).
 
-The \htmlref{{\em Dump}}{POLKA_DUMP} command (available in the \htmlref{{\em 
-File}}{POLKA_FILE_MENU} menu) can be used to save the current state of
-POLKA to a disk file at any time. This includes information describing
-any identified features, masks, sky regions etc. This information may be
-restored using the \htmlref{{\em Restore}}{POLKA_RESTORE} command. This
-facility enables execution of POLKA to be interrupted and continued at a
-later time.
+The \htmlref{{\em Dump}}{POLKA_DUMP} command (available in the
+\htmlref{{\em File}}{POLKA_FILE_MENU} menu) can be used to save
+information describing any identified features, masks, sky regions, etc,
+to a disk file at any time. This information may be restored using the
+\htmlref{{\em Restore}}{POLKA_RESTORE} command. This facility enables
+execution of POLKA to be interrupted and continued at a later time.
 
 \subsection {\mylabel{POLKA_SBEAM_TUT}Single-beam Mode}
 Single-beam mode is very similar to dual-beam mode. The only real
@@ -595,6 +594,14 @@ the left mouse button. To delete one or more vertices, draw a box around
 them by clicking and dragging, and then press the \htmlref{{\em
 Delete}}{POLKA_DELETE} button.
 
+If you want to use the same masks for several runs, you can save the $O$
+and $E$ ray masks to a text file on disk using the
+\htmlref{\emph{Dump/Masks Only}}{POLKA_DUMP} item in the
+\htmlref{\emph{File}}{POLKA_FILE_MENU} menu to save the mask geometry to
+a text file. On each subsequent run, you can restore these masks using the 
+\htmlref{\emph{Restore/Masks Only}}{POLKA_RESTORE} item in the \htmlref{\emph{File}}{POLKA_FILE_MENU} 
+menu. 
+
 \subsubsection {Identifying the $E$-ray areas.}
 Once the $O$-ray areas have been identified, you can click on the {\em
 E-ray mask} button in the box labelled \htmlref{{\em
@@ -800,16 +807,29 @@ temporary interruption of POLKA,
 termination of POLKA, and the creation of the output images. They are:
 
 \subsubsection {\mylabel{POLKA_DUMP}{\em Dump}} 
-Creates a new text file holding all the current feature positions, masks,
-mappings, etc, for all images. You supply the name of the text file in a
-simple dialog box ( you are asked for confirmation if you specify the
-name of an existing file).
+Dumps information describing supplied features and masks to a text file 
+on disk which can be restore in a subsequent run of POLKA, using the 
+\htmlref{{\em Restore}}{POLKA_RESTORE} command. There are two
+options:
 
-The created file can be used later to restore the current conditions.
-This can be useful, for instance, if you want to interrupt POLKA before
-the output data files have been created. You may then re-start POLKA
-later on, and use the \htmlref{{\em Restore}}{POLKA_RESTORE} command to
-restore the conditions which existed when the dump file was created.
+\begin{description}
+
+\item [{\em Everything}] - Creates a new text file holding all the current 
+feature positions, masks, mappings, etc, for all images. This can be useful, 
+for instance, if you want to interrupt POLKA before the output data files 
+have been created. You may then re-start POLKA later on, and use the 
+\htmlref{{\em Restore}}{POLKA_RESTORE} command to restore the conditions 
+which existed when the dump file was created. 
+
+\item [{\em Masks Only}] - Creates a new text file holding just the $O$
+and $E$ ray masks from the first (reference) image. This can be useful
+as a means of saving masks to be re-used in several different runs.
+
+\end{description}
+
+In either case, you supply the name of the text file in a simple dialog
+box (you are asked for confirmation if you specify the name of an
+existing file).
 
 {\em {\center Note, you should not change the contents of the dump file.}}
 
@@ -819,15 +839,27 @@ POLKA. The user is asked to confirm the operation once the output images
 have been saved.
 
 \subsubsection {\mylabel{POLKA_RESTORE}{\em Restore}} 
-This restores features lists, masks, mappings, etc, for all images from 
-the information in a specified existing text file. The file should have
-been created using the \htmlref{{\em Dump}}{POLKA_DUMP} command. All
-current information is first cleared. 
+This restores features lists, masks, mappings, etc, from a text file
+created earlier using the \htmlref{{\em Dump}}{POLKA_DUMP} command.
+\htmlref{{\em Restore}}{POLKA_RESTORE} command. There are two
+options:
 
-If the supplied dump file contains information for too many images (i.e.
-more than is available in the current invocation of POLKA), then the
-extra information is ignored. If there are two few images described in
-the dump file, then the extra images are left unchanged.
+\begin{description}
+
+\item [{\em Everything}] - Restores current feature positions, masks,
+mappings, etc, for all images, replacing any existing values. If the
+supplied dump file contains information for too many images (i.e. more
+than is available in the current invocation of POLKA), then the extra
+information is ignored. If there are two few images described in the dump
+file, then the extra images are left unchanged.
+
+\item [{\em Masks Only}] - Reads an $O$ and an $E$ ray mask from the supplied
+file, and assigns them to all images, replacing any existing masks.
+
+\end{description}
+
+In either case, the file should have been created using the
+corresponding option in the \htmlref{{\em Dump}}{POLKA_DUMP} command. 
 
 \subsubsection {\mylabel{POLKA_SAVE}{\em Save}} Causes the output images to be
 created, based on the current set of image feature positions and area masks. If
@@ -1945,16 +1977,25 @@ generated automatically). The simplest way to do this is to click on
 the corresponding reference marker. The new feature will then inherit the
 label of the reference marker.
 
+\subsection {\mylabel{POLKA_STOP_START}Use the Same Mask for Several Runs}
+Create the $O$ and $E$ ray masks for the first (reference) image, and
+then use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Mask Only} and
+\htmlref{{\em Restore}}{POLKA_RESTORE}/{\em Mask Only} commands in the
+\htmlref{{\em File}}{POLKA_FILE_MENU} menu. {\em Dump} creates a text file
+containing the current $O$ and $E$ ray masks from the first image. This
+file can then be restored at the start of each subsequent run of POLKA to
+re-establish the $O$ and $E$ ray masks.
+
 \subsection {\mylabel{POLKA_STOP_START}Stop and Re-start POLKA}
-Use the \htmlref{{\em Dump}}{POLKA_DUMP} and \htmlref{{\em
-Restore}}{POLKA_RESTORE} commands in the \htmlref{{\em
-File}}{POLKA_FILE_MENU} menu. {\em Dump} creates a text file containing 
-all the features positions, masks, mappings, etc, which you have supplied so 
-far. After using {\em Dump}, you can use \htmlref{{\em Quit}}{POLKA_QUIT}
-to terminate execution of POLKA without creating the output images. You
-can then re-start POLKA later, and use {\em Restore} to read the text
-file created by {\em Dump}. This puts POLKA into the state it was
-in  when the dump file was created.
+Use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Everything} and 
+\htmlref{{\em Restore}}{POLKA_RESTORE}/{\em Everything} commands in the 
+\htmlref{{\em File}}{POLKA_FILE_MENU} menu. {\em Dump} creates a text file
+containing all the features positions, masks, mappings, etc, which you
+have supplied so far. After using {\em Dump}, you can use \htmlref{{\em
+Quit}}{POLKA_QUIT} to terminate execution of POLKA without creating the
+output images. You can then re-start POLKA later, and use {\em Restore}
+to read the text file created by {\em Dump}. This puts POLKA into the
+state it was in when the dump file was created.
 
 \subsection {\mylabel{POLKA_PREALIGNED_IMAGES}Use pre-aligned images}
 If your images are already in alignment (or nearly in alignment), then
