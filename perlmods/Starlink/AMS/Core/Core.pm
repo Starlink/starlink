@@ -173,7 +173,12 @@ sub adamtask_init {
   # Create pipe
   # Relay should be executable and in the users path.
   $RELAY = new IO::Pipe;
-  $RELAY->reader("$relay $taskname");
+  eval {
+    $RELAY->reader("$relay $taskname");
+  };
+  if ($@) {
+    croak "Error starting ADAM relay '$relay': $@";
+  }
   $RELAY->autoflush;
 
   # Wait for a message from the RELAY
