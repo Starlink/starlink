@@ -261,7 +261,6 @@
       CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
 
 *  Write the names and node indices of the NDFs to the user.
-*  Write the names of the associated NDFs out to the user.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       CALL CCD1_MSG( ' ', '    NDFs with graph node indices', STATUS )
       CALL CCD1_MSG( ' ', '    ----------------------------', STATUS )
@@ -322,7 +321,8 @@
 
 *  Construct the output registration frame as a doctored copy of the 
 *  Current frame of the reference NDF.
-      OUTFR = AST_GETFRAME( IWCS( REFPOS ), JREF, STATUS )
+      OUTFR = AST_COPY( AST_GETFRAME( IWCS( REFPOS ), JREF, STATUS ),
+     :                  STATUS )
       CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
       CALL AST_SETC( OUTFR, 'Domain', OUTDM, STATUS )
 
@@ -346,30 +346,38 @@
 *  Set the reference frame in the reference WCS frameset.
       CALL AST_SETI( IWCS( REFPOS ), 'Current', JREF, STATUS )
 
+*  Treat the trivial case of a single NDF to be aligned specially.
+*  In this case no graph is constructed, but CCD1_GRPTH doesn't 
+*  actually use it for a path from one node to itself.
+      IF ( NNDF .EQ. 1 ) THEN
+         COMPL = .TRUE.
+      ELSE
+
 *  Allocate memory for the conversion graph.
-      CALL CCD1_MALL( NNDF * ( NNDF - 1 ) / 2 * 4, '_INTEGER', IPGRA,
-     :                STATUS )
+         CALL CCD1_MALL( NNDF * ( NNDF - 1 ) / 2 * 4, '_INTEGER', IPGRA,
+     :                   STATUS )
 
 *  Create a graph of all possible conversions between the WCS framesets.
-      CALL CCD1_CNVGR( IWCS, NNDF, DMNS, NDMN, %VAL( IPGRA ), NEDGE,
-     :                 STATUS )
+         CALL CCD1_CNVGR( IWCS, NNDF, DMNS, NDMN, %VAL( IPGRA ), NEDGE,
+     :                    STATUS )
 
 *  Allocate some temporary workspace.
-      CALL CCD1_MALL( 4 * NEDGE, '_INTEGER', IPWK1, STATUS )
-      CALL CCD1_MALL( NNDF, '_INTEGER', IPWK2, STATUS )
-      CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK3, STATUS )
-      CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK4, STATUS )
+         CALL CCD1_MALL( 4 * NEDGE, '_INTEGER', IPWK1, STATUS )
+         CALL CCD1_MALL( NNDF, '_INTEGER', IPWK2, STATUS )
+         CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK3, STATUS )
+         CALL CCD1_MALL( NNDF, '_LOGICAL', IPWK4, STATUS )
 
 *  Check the graph for completeness and report accordingly.
-      CALL CCD1_GRREP( %VAL( IPGRA ), NEDGE, NNDF, REFPOS, 
-     :                 %VAL( IPWK1 ), %VAL( IPWK2 ), %VAL( IPWK3 ),
-     :                 %VAL( IPWK4 ), COMPL, STATUS )
+         CALL CCD1_GRREP( %VAL( IPGRA ), NEDGE, NNDF, REFPOS, 
+     :                    %VAL( IPWK1 ), %VAL( IPWK2 ), %VAL( IPWK3 ),
+     :                    %VAL( IPWK4 ), COMPL, STATUS )
 
 *  Free temporary workspace.
-      CALL CCD1_MFREE( IPWK1, STATUS )
-      CALL CCD1_MFREE( IPWK2, STATUS )
-      CALL CCD1_MFREE( IPWK3, STATUS )
-      CALL CCD1_MFREE( IPWK4, STATUS )
+         CALL CCD1_MFREE( IPWK1, STATUS )
+         CALL CCD1_MFREE( IPWK2, STATUS )
+         CALL CCD1_MFREE( IPWK3, STATUS )
+         CALL CCD1_MFREE( IPWK4, STATUS )
+      END IF
 
 *  If the graph is not complete, we may wish to exit.
       IF ( .NOT. COMPL ) THEN
