@@ -1019,6 +1019,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/ArcConnector.java:364: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/canvas/connector/ArcConnector.html...
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  Apart from changing (slightly) the way the arc geometry is
@@ -1028,7 +1029,6 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/canvas/connector/Arrowhead.html...
   [javadoc] "Set the flag that says the arrowhead is "flipped." This means
   [javadoc]  that the arrowhead is drawn so that the apparent direction
@@ -1320,11 +1320,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/LassoSelectionAction.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:35: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/MultiStateInterpreter.html...
-  [javadoc] "The timeout for single/double/triple/.."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The timeout for single/double/triple/.. clicks,
-  [javadoc]  in milliseconds."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/PenStroke.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/SketchController.java:58: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/SketchEvent.java:20: warning - @rating is an unknown tag.
@@ -1333,12 +1328,19 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/SketchPane.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/StrokeSymbol.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/CrossValidation.java:17: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/MultiStateInterpreter.html...
+  [javadoc] "The timeout for single/double/triple/.."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The timeout for single/double/triple/.. clicks,
+  [javadoc]  in milliseconds."
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/classification/TrainableClassifier.html...
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/classification/BayesClassifier.html...
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
@@ -1347,8 +1349,6 @@ javadocs:
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f. calculation."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/CrossValidation.java:17: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/classification/RubineClassifier.html...
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2624,13 +2624,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:939: warning - Tag @see: reference not found: trackMouseMotion
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: Tag @see: Malformed: DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:16: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:31: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: Tag @see: Malformed: Plot, PlotConfigurator
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DragRegion.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: Tag @see: Malformed: SelectionDragger, Plot
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:16: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:31: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/FigureChangedEvent.html...
   [javadoc] "Used when figure is changed (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2691,4 +2691,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 17 seconds
+Total time: 3 minutes 22 seconds
