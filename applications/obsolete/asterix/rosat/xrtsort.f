@@ -1,0 +1,4164 @@
+*+  XRTSORT - Sorts XRT data into ASTERIX output file(s)
+      SUBROUTINE XRTSORT( STATUS )
+*    Description :
+*     Program to create an ASTERIX data set using
+*     ROSAT XRT pointed phase data
+*    Parameters :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*       Richard Saxton  (LTVAD::RDS)
+*    History :
+*   Oct 1988 Original
+*   Mar 1990 Real version
+*   Apr 1991 Version 1.3-3     Includes radial spectra and time series.
+*                              also supports elliptical boxes
+*   Jun 1991 Version 1.3-4     Fixes a bug involving image axes
+*   Jul 1991 Version 1.3-5     BASE_TAI redefined, it is now 10 seconds
+*                              less than it was before
+*   Oct 1991 Version 1.3-6     Fixed a bug giving an incorrect value for
+*                              seconds of DEC in the pointing position.
+*   Nov 1991 Version 1.5-1     Now sorts HRI data
+*   Nov 1991 Version 1.5-2     Fixes bug in sorting elliptical boxes
+*   Jan 1992 VERSION 1.5-3     Uses multiple time windows
+*   Feb 1992 VERSION 1.5-4     Rounding error in start and stop times
+*                              fixed.
+*   Mar 1992 Version 1.5-5     Fixed a bug in background event sorting
+*   May 1992 Version 1.5-6     Avoids duplicating an event at the edge
+*                              of each small map.
+*   Jan 1993 V1.6-1/2          Now sorts US FITS data.
+*   MAY 1993 V1.6-4            Sets the default Corr. PHA channel to 256
+*                              maximum. Uses dub. prec. for the time
+*                              event lists
+*   2 AUG 93 V1.6-5            Fix for US/HRI (RJV)
+*  17 Sep 93 V1.6-6            Bug in FX_ fixed (RJV)
+*  29 Nov 93 V1.6-7            Now sorts rational FITS files(JKA).
+*  18 Feb 94 V1.6-8            Now uses EXTNAME convention (INC_RDF)
+*   8 Apr 94 V1.6-9            Bug fix in image orientation for MPE-sdf
+*  24 Apr 94 (v1.7-0) for new asterix release
+*  25 May 94 (v1.7-1) PSF structure added in HDS output files
+*  25 Aug 95 V1.8-0   Bug fix for event datasets (RJV)
+*  11 Sep 95 V1.8-1   OMD support removed (RJV)
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'QUAL_PAR'
+*
+*    Global variables :
+      INCLUDE 'INC_XRTHEAD'
+      INCLUDE 'INC_XRTSRT'
+*
+*    Status :
+      INTEGER                 STATUS
+*    Functions :
+      INTEGER CHR_LEN
+        EXTERNAL CHR_LEN
+*    Local Constants :
+      CHARACTER*30            VERSION
+         PARAMETER          ( VERSION = 'XSORT Version 1.8-1' )
+
+*    Local variables :
+      RECORD /XRT_HEAD/ HEAD                    ! Observation header information
+      RECORD /XRT_SCFDEF/ SRT, BSRT             ! Sorting parameters for source
+*                                               ! and background files
+*
+      CHARACTER*(DAT__SZLOC)  LOCS		! Locator to Binned file
+      CHARACTER*(DAT__SZLOC)  LOCB		! Locator to Binned bckgnd file
+      CHARACTER*(DAT__SZLOC)  ELOCS(7)		! Locators to EVDS source lists
+      CHARACTER*(DAT__SZLOC)  ELOCB(7)		! Locators to EVDS bckgnd lists
+      CHARACTER*30 VERS       	                ! SASS version date
+
+      INTEGER                 SID               ! ID of source output dataset
+      INTEGER                 BID               ! ID of bckgrnd output data
+      INTEGER                 SDIM(7)           ! Dimensions of source array
+      INTEGER                 BDIM(7)           ! Dimensions of bckgnd array
+      INTEGER                 MDIM(2)		! Dimensions of spatial mask
+      INTEGER                 NRBIN             ! Number of output radial bins
+      INTEGER                 NAZBIN            ! Number of output azim. bins
+      INTEGER                 SRCPTR            ! Pointer to mapped source array
+      INTEGER                 BCKPTR            ! Pointer to background array
+      INTEGER                 SQPTR             ! Pointer to source quality
+      INTEGER                 BQPTR             ! Pointer to bckgnd quality
+      INTEGER                 SMPTR             ! Pointer to src image mask
+      INTEGER                 BMPTR             ! Pointer to bckgnd image mask
+      INTEGER                 SEVPTR(7)         ! Pointers to source lists
+      INTEGER                 BEVPTR(7)         ! Pointers to bckgnd lists
+      INTEGER                 WPNTR1,WPNTR2     ! Pointer to workspace arrays
+      INTEGER		      MAPLIM		! Current mapping extent of EVDS lists
+
+      INTEGER                 LP                ! Loop variable
+      INTEGER                 TOTEV_SRC         ! Number of events in source box
+      INTEGER                 TOTEV_BCK         ! Number of events in bckgnd box
+
+      REAL                    MRES		! Resolution of spatial mask
+*
+*-
+
+      CALL MSG_PRNT(VERSION)
+
+      CALL AST_INIT()
+
+*  Get directory name from user and display the available observations.
+*  Get rootname of file wanted.
+      CALL XRTSORT_FILESELECT(SRT, HEAD, STATUS)
+*
+
+*  Read header info from the corresponding _HDR.SDF file
+      CALL RAT_GETXRTHEAD(SRT.ROOTNAME, HEAD, STATUS)
+
+*
+* Get type of output dataset - binned or event?
+      CALL USI_GET0C('DATASET', SRT.DTYPE, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*
+* Check if response made sense
+      CALL CHR_UCASE(SRT.DTYPE)
+      IF (SRT.DTYPE(1:1).EQ.'B') THEN
+        SRT.DTYPE='BinDS'
+      ELSEIF (SRT.DTYPE(1:1).EQ.'E') THEN
+        SRT.DTYPE='EventDS'
+      ELSE
+        CALL MSG_PRNT('AST_ERR: invalid data type')
+        GOTO 999
+      ENDIF
+
+*
+*  Get the sort control information from the user
+      CALL XRTSORT_RANGESELECT(HEAD,SRT,BSRT,SDIM,BDIM,NRBIN,NAZBIN,
+     :                                                      STATUS)
+
+      CALL USI_TASSOCO('SRCFILE',SRT.DTYPE,SID,STATUS)
+      CALL ADI1_GETLOC(SID,LOCS,STATUS)
+      IF (SRT.BCKGND) THEN
+        CALL USI_TASSOCO('BCKFILE',SRT.DTYPE,BID,STATUS)
+        CALL ADI1_GETLOC(BID,LOCB,STATUS)
+      ENDIF
+
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Sorting to a binned data set ?
+      IF ( SRT.DTYPE .EQ. 'BinDS') THEN
+
+*  Create the output data set and get a pointer to mapped data array.
+         CALL XRTSORT_CRE_BINNED (HEAD, SRT, LOCS, SDIM, NRBIN,
+     &                                   SRCPTR, SQPTR, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Create a background dataset if required
+         IF (SRT.BCKGND) THEN
+*
+            CALL XRTSORT_CRE_BINNED (HEAD, BSRT, LOCB, BDIM, 1,
+     &                                   BCKPTR, BQPTR, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+         ELSE
+*
+*     Dummy up a couple of arrays.
+            CALL DYN_MAPR(7,BDIM,BCKPTR,STATUS)
+            CALL DYN_MAPB(7,BDIM,BQPTR,STATUS)
+*
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('Error mapping dynamic arrays')
+               GOTO 999
+            ENDIF
+         ENDIF
+*
+*   Map a couple of workspace arrays
+         CALL DYN_MAPR(1, NRBIN, WPNTR1, STATUS)
+         CALL DYN_MAPR(1, NRBIN, WPNTR2, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('Error mapping dynamic arrays')
+            GOTO 999
+         ENDIF
+*
+*   Create spatial masks
+         CALL XRTSORT_CRE_MASK(HEAD,SRT,BSRT,SDIM,NRBIN,
+     :                      MDIM,MRES,SMPTR,BMPTR,STATUS)
+
+*
+         CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
+     &          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
+     &          BDIM(1), BDIM(2), BDIM(3), BDIM(4), BDIM(5), BDIM(6),
+     &          BDIM(7), NRBIN, NAZBIN, MDIM(1), MDIM(2),
+     &          MRES,%val(SMPTR), %val(BMPTR),
+     &          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
+     &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+         CALL DYN_UNMAP(SMPTR,STATUS)
+         IF (SRT.BCKGND) THEN
+           CALL DYN_UNMAP(BMPTR,STATUS)
+         ENDIF
+*
+*  Sorting to an Event data set
+      ELSEIF (SRT.DTYPE .EQ. 'EventDS') THEN
+*
+*   Calculate the maximum number of photons which may be put into
+*   the event lists.
+         CALL XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAPLIM, STATUS)
+*
+*   Create & map the output Event data set.
+         CALL XRTSORT_CRE_EVENT(HEAD, SRT , MAPLIM, LOCS,
+     &                                       ELOCS, SEVPTR, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*   Create background file if wanted
+         IF (SRT.BCKGND) THEN
+            CALL XRTSORT_CRE_EVENT(HEAD, BSRT, MAPLIM, LOCB,
+     &                                     ELOCB, BEVPTR, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+         ELSE
+*
+*     Otherwise create dummy arrays
+            DO LP=1,7
+               CALL DYN_MAPR(1, MAPLIM, BEVPTR(LP), STATUS)
+            ENDDO
+*
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('Error obtaining dynamic memory')
+               GOTO 999
+            ENDIF
+*
+         ENDIF
+*
+*   Do the sort
+         CALL XRTSORT_SORT_EVE(SRT, BSRT, MAPLIM,
+     &          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
+     &          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
+     &          %val(SEVPTR(7)), %val(BEVPTR(1)), %val(BEVPTR(2)),
+     &          %val(BEVPTR(3)), %val(BEVPTR(4)), %val(BEVPTR(5)),
+     &          %val(BEVPTR(6)), %val(BEVPTR(7)), TOTEV_SRC,
+     &                                         TOTEV_BCK, STATUS )
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Tidy up and shrink lists to the number of events recorded
+         DO LP=1,7
+            CALL DAT_UNMAP(ELOCS(LP), STATUS)
+            CALL DAT_ALTER(ELOCS(LP), 1, TOTEV_SRC, STATUS)
+            CALL DAT_ANNUL(ELOCS(LP),STATUS)
+         ENDDO
+*
+         IF (SRT.BCKGND) THEN
+*
+            DO LP=1,7
+               CALL DAT_UNMAP(ELOCB(LP), STATUS)
+               CALL DAT_ALTER(ELOCB(LP), 1, TOTEV_BCK, STATUS)
+               CALL DAT_ANNUL(ELOCB(LP),STATUS)
+            ENDDO
+*
+         ELSE
+            DO LP=1,7
+               CALL DYN_UNMAP(BEVPTR(LP),STATUS)
+            ENDDO
+*
+         ENDIF
+      ENDIF
+*
+*   Put SORT box into output files
+      CALL XRTSORT_WRISORT(LOCS, SRT, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error writing source file SORT box')
+         GOTO 999
+      ENDIF
+
+*   Background sort box
+      IF (SRT.BCKGND) THEN
+         CALL XRTSORT_WRISORT(LOCB, BSRT, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL MSG_PRNT('Error writing SORT box')
+            GOTO 999
+         ENDIF
+      ENDIF
+
+*   History
+      CALL HSI_NEW(SID, STATUS)
+      CALL HSI_ADD(SID, VERSION, STATUS)
+
+      IF (SRT.BCKGND) THEN
+         CALL HSI_NEW(BID, STATUS)
+         CALL HSI_ADD(BID, VERSION, STATUS)
+      ENDIF
+*
+999   CONTINUE
+*
+*   Tidy up
+      CALL USI_TANNUL(SID,STATUS)
+      IF (SRT.BCKGND) THEN
+         CALL USI_TANNUL(BID,STATUS)
+      ENDIF
+      CALL AST_CLOSE()
+*
+
+      END
+
+
+*+XRTSORT_AXES   Writes the axes info into the output datafile
+	SUBROUTINE XRTSORT_AXES(LOC,NELS,NRBIN,NAXES,AXES,HIGH,LOW,
+     :                                                       STATUS)
+* Description :
+*        This routine writes axes structures into an output datafile
+* Method :
+* Deficiencies :
+* Bugs :
+* Authors :
+*     Richard Saxton
+* History :
+*     6 Nov 88: original (LTVAD::RDS)            based on EXOLESORT_AXES
+*    17 Apr 91  now copes with a radial axis    (LTVAD::RDS)
+* Type Definitions :
+      IMPLICIT NONE
+* Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+* Import :
+      CHARACTER*(DAT__SZLOC) LOC        !Locator of HDS file
+
+      INTEGER NELS(7)                   !Number of elements in each dimension
+      INTEGER NRBIN                     !Number of radial bins
+      INTEGER NAXES                     !Number of axes of output array
+      INTEGER AXES(8)                   !Code for each axis (1-8)
+      REAL HIGH(8),LOW(8)               !Extreme values for each dimension
+* Export :
+* Status :
+      INTEGER STATUS
+* Local variables :
+      CHARACTER*6 VARIANT(8)               ! The type of data-array
+      INTEGER DIMENSION(8)                 ! Length of each axis
+      REAL BASE(8)                         ! Zero point for each axis
+      REAL SCALE(8)                        ! Scale value for each axis
+      LOGICAL NORMALISED(8)                ! Data normalised to this axis ?
+      CHARACTER*30 LABEL(8)                ! Axes labels
+      CHARACTER*30 UNITS(8)                ! Axes units
+      INTEGER PNTR,LP,AXLP
+      INTEGER SELS(8)                      ! An array of dimensions
+*-
+* Check status:
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+* Create new element array
+      DO LP=1,7
+         SELS(LP) = NELS(LP)
+      ENDDO
+      SELS(8) = NRBIN
+*
+* Set up units and labels for axes
+*
+      UNITS(1)='degrees'
+      LABEL(1)='X position'
+      UNITS(2)='degrees'
+      LABEL(2)='Y position'
+      UNITS(3)='pixels'
+      LABEL(3)='Detector X'
+      UNITS(4)='pixels'
+      LABEL(4)='Detector Y'
+      UNITS(5)='seconds'
+      LABEL(5)='Time'
+      UNITS(6)='channel no.'
+      LABEL(6)='PHA channel'
+      UNITS(7)='channel no'
+      LABEL(7)='Corrected PHA channel'
+      UNITS(8)='degrees'
+      LABEL(8)='Radius'
+*
+      DO LP=1,8
+         VARIANT(LP)='SPACED'
+      ENDDO
+*
+* Set arrays for outputting later
+*
+      DO LP=1,NAXES
+*
+          PNTR=AXES(LP)
+*
+          DIMENSION(LP)=SELS(PNTR)
+          SCALE(LP)=(HIGH(PNTR)-LOW(PNTR))/SELS(PNTR)
+          BASE(LP)=LOW(PNTR)+0.5*SCALE(LP)
+          LABEL(LP)=LABEL(PNTR)
+          UNITS(LP)=UNITS(PNTR)
+*
+          NORMALISED(LP)=.FALSE.
+*
+      ENDDO
+*
+* Create axis structure in output file
+*
+      CALL BDA_CREAXES(LOC,NAXES,STATUS)
+*
+      IF (STATUS.NE.SAI__OK) GOTO 999
+*
+* Put in components of each axis
+*
+      DO AXLP=1,NAXES
+*
+         CALL BDA_PUTAXLABEL(LOC,AXLP,LABEL(AXLP),STATUS)
+*
+         CALL BDA_PUTAXUNITS(LOC,AXLP,UNITS(AXLP),STATUS)
+*
+         CALL BDA_PUTAXNORM(LOC,AXLP,NORMALISED(AXLP),STATUS)
+*
+* Write axis data as a spaced array
+*
+         CALL BDA_PUTAXVAL(LOC, AXLP, BASE(AXLP), SCALE(AXLP),
+     &                                   DIMENSION(AXLP), STATUS)
+      ENDDO
+*
+999   CONTINUE
+      IF (STATUS .NE. SAI__OK) THEN
+          CALL ERR_REP(' ','from XRTSORT_AXES',STATUS)
+      ENDIF
+*
+      END
+
+*+XRTSORT_BADTIME     Finds times when quality is outside defined range
+      SUBROUTINE XRTSORT_BADTIME(SRT, OBS, MAXBAD, NBAD, STBAD,
+     &                              ENBAD, STATUS)
+*    Description :
+*      Interogates a file to find the times when data has been rejected
+*    Environment parameters :
+*     parameter(dimensions) =type(access,i.e. R,W or U)
+*           <description of parameter>
+*    Method :
+*     <description of how the subroutine works - for programmer info>
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*     author (institution::username)
+*    History :
+*     date:  changes (institution::username)
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*     <any INCLUDE files containing global constant definitions>
+*    Global variables :
+*     <global variables held in named COMMON>
+*    Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+*    Import :
+      RECORD /XRT_SCFDEF/ SRT          ! Sort control structure
+      INTEGER OBS                      ! Observation number
+      INTEGER MAXBAD                   ! Max number of bad time ranges
+*    Import-Export :
+*    Export :
+      INTEGER NBAD                     ! Number of bad time ranges
+      REAL STBAD(MAXBAD)               ! Start times of bad time ranges
+      REAL ENBAD(MAXBAD)               ! End times of bad time ranges
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*     <declarations for function references>
+*    Local constants :
+*     <local constants defined by PARAMETER>
+*    Local variables :
+      CHARACTER*3 COBS
+      CHARACTER*80 QUAFIL                          ! Quality filename
+      CHARACTER*(DAT__SZLOC) QLOC                  ! Locator to quality file
+      INTEGER QLEN                                 ! Length of event lists
+      INTEGER TPNTR,TEPNTR,GPNTR                   ! Pointers to arrays
+      INTEGER K
+*    Local data :
+*     <any DATA initialisations for local variables>
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+* Create quality filename
+      CALL CHR_ITOC(OBS, COBS, K)
+      QUAFIL=SRT.ROOTNAME//'_'//COBS//'.QUAL'
+*
+* Open file of quality values
+      CALL HDS_OPEN(QUAFIL, 'READ', QLOC, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_SETC('QUALFIL', QUAFIL)
+         CALL MSG_PRNT('Error opening quality file ^QUALFIL')
+         GOTO 999
+      ENDIF
+*
+* Map quality arrays from file
+      CALL CMP_MAPV(QLOC, 'TIME', '_REAL', 'READ', TPNTR, QLEN, STATUS)
+      CALL CMP_MAPV(QLOC, 'TEMPERATURE', '_INTEGER', 'READ', TEPNTR,
+     &                                                    QLEN, STATUS)
+      CALL CMP_MAPV(QLOC, 'GAIN', '_INTEGER', 'READ', GPNTR,
+     &                                                    QLEN, STATUS)
+*
+* Find the quality bad times
+      CALL XRTSORT_BADTIME_DOIT(QLEN, %val(TPNTR), %val(TEPNTR),
+     &                 %val(GPNTR), SRT, MAXBAD, NBAD, STBAD, ENBAD)
+*
+* Unmap and annul
+      CALL CMP_UNMAP(QLOC, 'TIME', STATUS)
+      CALL CMP_UNMAP(QLOC, 'TEMPERATURE', STATUS)
+      CALL CMP_UNMAP(QLOC, 'GAIN', STATUS)
+*
+      CALL HDS_CLOSE(QLOC, STATUS)
+      CALL DAT_ANNUL(QLOC, STATUS)
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRTSORT_BADTIME',STATUS)
+      ENDIF
+*
+      END
+
+*+XRTSORT_BADTIME_DOIT    Find times when quality is outside selected range
+      SUBROUTINE XRTSORT_BADTIME_DOIT(QLEN, TIME, TEMP, GAIN, SRT,
+     &                              MAXBAD, NBAD, STBAD, ENBAD)
+*    Description :
+*     <description of what the subroutine does>
+*    History :
+*     date:  original (institution::username)
+*    Type definitions :
+      IMPLICIT NONE
+*    Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+*    Import :
+      INTEGER QLEN               ! Length of quality property lists
+      REAL TIME(QLEN)            ! Time of quality state
+      INTEGER TEMP(QLEN)         ! Temperature quality
+      INTEGER GAIN(QLEN)         ! Gain quality
+*
+      RECORD /XRT_SCFDEF/ SRT    ! Sort control structure
+*
+      INTEGER MAXBAD             ! Dimension of output arrays
+*    Import-Export :
+*     <declarations and descriptions for imported/exported arguments>
+*    Export :
+      INTEGER NBAD               ! Number of bad time ranges
+      REAL STBAD(MAXBAD)         ! Start of bad range
+      REAL ENBAD(MAXBAD)         ! End of bad range
+*    Local constants :
+*     <local constants defined by PARAMETER>
+*    Local variables :
+      INTEGER TLP
+      INTEGER NLOW,NHIGH
+*-
+* Loop over times
+      DO TLP=1,QLEN
+*
+*   Check if quality is within bounds for this time
+         IF (TEMP(TLP).LT.SRT.TEMP_MIN .OR. TEMP(TLP).GT.SRT.TEMP_MAX
+     &       .OR. GAIN(TLP) .LT. SRT.GAIN_MIN .OR.
+     &            GAIN(TLP) .GT. SRT.GAIN_MAX) THEN
+*
+            IF (NLOW .EQ. NHIGH) THEN
+               NLOW=NLOW+1
+               STBAD(NLOW)=TIME(TLP)
+            ENDIF
+*
+         ELSEIF (NLOW .GT. NHIGH) THEN
+               NHIGH=NHIGH+1
+               ENBAD(NHIGH)=TIME(TLP)
+         ENDIF
+*
+      ENDDO
+*
+      END
+
+*+XRTSORT_CRE_ASTERIX - Create an ASTERIX structure
+      SUBROUTINE XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
+*    Description :
+*       Writes information into the .MORE.ASTERIX box.
+*    Environment parameters :
+*     parameter(dimensions) =type(access,i.e. R,W or U)
+*           <description of parameter>
+*    Method :
+*    Authors :
+*     Richard Saxton   (LTVAD::RDS)      from SORT_CRE_ASTERIX   by M.Denby
+*    History :
+*     9-Nov-1988       original
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Global variables :
+*    Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      CHARACTER*(DAT__SZLOC) OUTLOC
+      RECORD /XRT_HEAD/ HEAD
+      RECORD /XRT_SCFDEF/ SRT
+*    Status :
+      INTEGER STATUS
+*    Local constants :
+*    Local variables:
+      INTEGER                 LOOP,LOOP2          ! Loop counter
+      REAL                    EXPO_TIM            ! Exposure time (s)
+      REAL                    OBSLEN              ! Observation length (s)time
+      CHARACTER*20	      SDATE
+      DOUBLE PRECISION	      STAI
+      DOUBLE PRECISION	      BASEUT
+
+      CHARACTER*(DAT__SZLOC)  HEA              ! HEADER
+      CHARACTER*(DAT__SZLOC)  INS              ! INSTRUMENT
+      CHARACTER*(DAT__SZLOC)  SOR              ! SORT
+      CHARACTER*(DAT__SZLOC)  PSF              ! PSF
+      CHARACTER*(DAT__SZLOC)  AST              ! ASTERIX
+      CHARACTER*(DAT__SZLOC)  MOR              ! MORE
+
+*-
+
+*   Check status - return if bad
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+*    Create the MORE ASTERIX and HEADER boxes
+      CALL BDA_CREHEAD( OUTLOC, STATUS )
+      CALL BDA_LOCHEAD(OUTLOC, HEA, STATUS)
+*    Create an instrument extension
+      CALL BDA_CREINSTR( OUTLOC, STATUS )
+      CALL BDA_LOCINSTR( OUTLOC, INS, STATUS )
+*    Create an instrument extension
+      CALL BDA_CREPSF( OUTLOC, STATUS )
+      CALL BDA_LOCPSF( OUTLOC, PSF, STATUS )
+*    Create LIVE_TIME structure
+C     CALL BDA_CRELIVE( OUTLOC, STATUS )
+C     CALL BDA_LOCLIVE( OUTLOC, LIV, STATUS )
+*    Create and write CORRECTIONS structure for use by corrections prog
+      CALL XRT_CREPROC(OUTLOC, .FALSE., .FALSE., .FALSE., STATUS)
+*
+*   Create & write the header components.
+      CALL HDX_PUTC( HEA, 'TARGET', 1, HEAD.TARGET, STATUS )
+      CALL HDX_PUTC( HEA, 'OBSERVER', 1, HEAD.OBSERVER, STATUS )
+      CALL HDX_PUTC( HEA, 'OBSERVATORY', 1, 'ROSAT', STATUS)
+      CALL HDX_PUTC( HEA, 'INSTRUMENT', 1, 'XRT', STATUS )
+      CALL HDX_PUTD( HEA, 'AXIS_RA', 1, HEAD.AXIS_RA, STATUS )
+      CALL HDX_PUTD( HEA, 'AXIS_DEC', 1, HEAD.AXIS_DEC, STATUS )
+      CALL HDX_PUTD( HEA, 'FIELD_RA', 1, SRT.FIELD_RA, STATUS )
+      CALL HDX_PUTD( HEA, 'FIELD_DEC', 1, SRT.FIELD_DEC, STATUS )
+      CALL HDX_PUTI( HEA, 'EQUINOX', 1, 2000, STATUS )
+*
+      IF (HEAD.ROLLCI .LT. -180.D0) HEAD.ROLLCI = HEAD.ROLLCI + 360.D0
+      IF (HEAD.ROLLCI .GT.  180.D0) HEAD.ROLLCI = HEAD.ROLLCI - 360.D0
+*
+      CALL HDX_PUTD( HEA, 'POSITION_ANGLE', 1, HEAD.ROLLCI, STATUS )
+*
+*  Times:
+      CALL HDX_PUTI( HEA, 'BASE_MJD', 1, INT(HEAD.BASE_MJD), STATUS)
+      CALL CONV_MJDDAT( HEAD.BASE_MJD, SDATE)
+      CALL HDX_PUTC( HEA, 'BASE_DATE', 1, SDATE(1:11), STATUS )
+      BASEUT = DMOD(HEAD.BASE_MJD, 1.0D0) * 86400.0
+      CALL HDX_PUTD( HEA, 'BASE_UTC', 1, BASEUT, STATUS )
+*
+*   Convert to atomic time
+      CALL TIM_MJD2TAI( HEAD.BASE_MJD, STAI)
+      CALL HDX_PUTD(HEA, 'BASE_TAI', 1, STAI, STATUS)
+*
+      OBSLEN = 0.0
+      DO LOOP=1,SRT.NTIME
+         OBSLEN = OBSLEN + SRT.MAX_T(LOOP) - SRT.MIN_T(LOOP)
+      ENDDO
+      CALL HDX_PUTR( HEA, 'OBS_LENGTH', 1, OBSLEN, STATUS)
+*
+* Calculate exposure time and write to header
+      EXPO_TIM=0.0
+      DO LOOP=1,HEAD.NTRANGE
+        DO LOOP2=1,SRT.NTIME
+*
+          IF ( SRT.MIN_T(LOOP2) .LT. HEAD.TEND(LOOP) .AND.
+     &          SRT.MAX_T(LOOP2) .GT. HEAD.TSTART(LOOP)) THEN
+*
+            EXPO_TIM = EXPO_TIM + MIN(HEAD.TEND(LOOP), SRT.MAX_T(LOOP2))
+     &                    - MAX (HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2))
+          ENDIF
+*
+        ENDDO
+      ENDDO
+*
+      CALL HDX_PUTR( HEA, 'EXPOSURE_TIME', 1, EXPO_TIM, STATUS)
+
+*    Create elements in the livetime extension
+C      CALL DAT_NEW ( LIV, 'ON',  '_DOUBLE', 1, SRT.NWINS, STATUS )
+C      CALL DAT_NEW ( LIV, 'OFF', '_DOUBLE', 1, SRT.NWINS, STATUS )
+C      CALL CMP_PUT1D (LIV, 'ON', SRT.NWINS, SRT.WST, STATUS)
+C      CALL CMP_PUT1D (LIV, 'OFF',SRT.NWINS, SRT.WET, STATUS)
+
+*    Create elements in the instrument extension
+      CALL HDX_PUTR ( INS, 'PIXEL_SIZE', 1, HEAD.PIXEL, STATUS )
+      CALL HDX_PUTC ( INS, 'FILTER', 1, HEAD.FILTER, STATUS)
+      CALL HDX_PUTC ( INS, 'DETECTOR', 1, HEAD.DETECTOR, STATUS)
+*
+*    Write spacecraft clock start time and conversion time
+      CALL HDX_PUTD ( INS, 'SC_BASE', 1, HEAD.BASE_SCTIME, STATUS )
+      CALL HDX_PUTD ( INS, 'SC_CONV', 1, HEAD.SCCONV, STATUS )
+*
+*    Write in the raw data type - MPE, US & RDF at the moment.
+      CALL HDX_PUTC ( INS, 'RAWDATA', 1, HEAD.ORIGIN, STATUS )
+      CALL HDX_PUTC ( INS, 'SASS_VERSION',1,HEAD.SASS_DATE,STATUS )
+*
+*    Create elements in the PSF extension
+      CALL HDX_PUTC( PSF, 'LIBRARY_NAME', 1, 'PSFLIB', STATUS)
+      IF (HEAD.DETECTOR .EQ. 'HRI') THEN
+         CALL HDX_PUTC( PSF, 'ROUTINE_NAME', 1, 'XRT_HRI', STATUS)
+      ELSE
+         CALL HDX_PUTC( PSF, 'ROUTINE_NAME', 1, 'XRT_PSPC', STATUS)
+      ENDIF
+*
+C     CALL BDA_ANNUL(HEA, STATUS)
+C     CALL BDA_ANNUL(INS, STATUS)
+C     CALL BDA_ANNUL(PSF, STATUS)
+C     CALL BDA_ANNUL(LIV, STATUS)
+*
+*      Check status
+999   IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRTSORT_CRE_ASTERIX',STATUS)
+      ENDIF
+*
+      END
+
+*+XRTSORT_CRE_BINNED - Create output binned dataset
+      SUBROUTINE XRTSORT_CRE_BINNED(HEAD, SRT, OUTLOC, SDIM, NRBIN,
+     &                                      ARRPTR, QPTR, STATUS )
+*    Description :
+*    Environment parameters :
+*       OUTPUT             UNIV             Name of binned output file
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     R.D.Saxton      (LTVAD::RDS)
+*    History :
+*     7-Nov-1988    original
+*     8-Apr-1994    parameter LMPE removed, now checks HEAD.YSTART (JKA)
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Structure definitions :
+      INCLUDE 'INC_XRTSRT'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_HEAD/ HEAD
+      RECORD /XRT_SCFDEF/ SRT
+      CHARACTER*(DAT__SZLOC)  OUTLOC            ! HDS locator to binned file
+      INTEGER SDIM(7)                           ! Dimensions of binned axes
+      INTEGER NRBIN                             ! Number of radial bins
+*    Import-Export :
+*    Export :
+      INTEGER ARRPTR                            ! Pointer to mapped array
+      INTEGER QPTR                              ! Pointer to quality array
+*    Status :
+      INTEGER STATUS
+*    Local variables :
+      CHARACTER*(DAT__SZTYP)  TYPE
+      INTEGER IDIMS(7)                          ! Dimensions of output array
+      REAL LOW(8),HIGH(8)                       ! Range of each axis
+      REAL PTOD                                 ! Pixels to degrees conversion
+      INTEGER TOTELS,LP
+*-
+*   Check status - return if bad
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+*   Work out dataset type
+      CALL XRT_GETTYPE(SRT.NAXES,SRT.BINAXIS,TYPE)
+*
+*   Find dimensions of output array from the SORT structure
+      TOTELS=1
+      DO LP=1,SRT.NAXES
+         IF (SRT.BINAXIS(LP) .NE. 8) THEN
+            IDIMS(LP)=SDIM(SRT.BINAXIS(LP))
+         ELSE
+            IDIMS(LP)=NRBIN
+         ENDIF
+         TOTELS=TOTELS*IDIMS(LP)
+      ENDDO
+*
+*   Write in units and title
+      CALL BDA_PUTTITLE (OUTLOC, HEAD.TITLE, STATUS)
+      CALL BDA_PUTUNITS (OUTLOC, 'Counts',    STATUS)
+*
+*   Create and map the data array
+      CALL BDA_CREDATA  (OUTLOC, SRT.NAXES, IDIMS, STATUS)
+      CALL BDA_MAPDATA (OUTLOC, 'WRITE', ARRPTR, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error creating output data array')
+         GOTO 999
+      ENDIF
+*
+      CALL BDA_CREQUAL (OUTLOC, SRT.NAXES, IDIMS, STATUS)
+      CALL BDA_MAPQUAL (OUTLOC, 'WRITE', QPTR, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error creating output quality array')
+         GOTO 999
+      ENDIF
+*
+*   Initialise data and quality
+      CALL ARR_INIT1R(0.0, TOTELS, %val(ARRPTR),STATUS)
+      CALL ARR_INIT1B(0, TOTELS, %val(QPTR),STATUS)
+*
+*   Calculate maximum and minimum axis values
+      PTOD = HEAD.PIXEL/3600.
+*
+*    Assume centre pixel is 0,0
+      HIGH(1)= - (SRT.MAX_X - HEAD.SKYCX) * PTOD
+      LOW(1) = - (SRT.MIN_X - HEAD.SKYCX) * PTOD
+
+*
+      IF (HEAD.YSTART.LT.0) THEN
+         HIGH(2)= - (SRT.MIN_Y - HEAD.SKYCY) * PTOD
+         LOW(2) = - (SRT.MAX_Y - HEAD.SKYCY) * PTOD
+      ELSE
+         LOW(2)= (SRT.MIN_Y - HEAD.SKYCY) * PTOD
+         HIGH(2) = (SRT.MAX_Y - HEAD.SKYCY) * PTOD
+      ENDIF
+*
+      HIGH(3)=REAL(SRT.MAX_XD) + 0.5
+      LOW(3) =REAL(SRT.MIN_XD) - 0.5
+      HIGH(4)=REAL(SRT.MAX_YD) + 0.5
+      LOW(4) =REAL(SRT.MIN_YD) - 0.5
+      HIGH(5)=SRT.MAX_T(SRT.NTIME)
+      LOW(5) =SRT.MIN_T(1)
+      HIGH(6)=REAL(SRT.MAX_PH) + 0.5
+      LOW(6) =REAL(SRT.MIN_PH) - 0.5
+      HIGH(7)=REAL(SRT.MAX_EN) + 0.5
+      LOW(7) =REAL(SRT.MIN_EN) - 0.5
+      HIGH(8)=REAL(SRT.ELAMAX) * SRT.PTOD
+      LOW(8) =REAL(SRT.ELAMIN) * SRT.PTOD
+*
+*   Create and fill axis data
+      CALL XRTSORT_AXES( OUTLOC, SDIM, NRBIN, SRT.NAXES, SRT.BINAXIS,
+     &                                            HIGH, LOW, STATUS)
+*
+*   Now create the ASTERIX box
+      CALL XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ',' from XRTSORT_CRE_BINNED',STATUS)
+      ENDIF
+*
+      END
+
+*+XRTSORT_CRE_EVENT - Create & map the output event dataset
+      SUBROUTINE XRTSORT_CRE_EVENT(HEAD, SRT, MAPLIM,
+     &                              OUTLOC, DATALOC, DATAPTR, STATUS )
+*    Description :
+*     Creates & maps output event dataset
+*    Parameters :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     Richard Saxton  (LTVAD::RDS)
+*    History :
+*     27/5/88:  Original (PLA)
+*     6-MAY-1993  Uses double precision time lists (RDS)
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Structures :
+      INCLUDE 'INC_XRTSRT'
+      INCLUDE 'INC_XRTHEAD'
+
+*    Import :
+      RECORD /XRT_HEAD/ HEAD
+      RECORD /XRT_SCFDEF/ SRT
+      INTEGER  MAPLIM                          ! Current mapping extent of lists
+      CHARACTER*(DAT__SZLOC)  OUTLOC           ! Locator to Event dataset
+*    Export :
+      CHARACTER*(DAT__SZLOC)  DATALOC(7)       ! Locators to DATA_ARRAY objects
+
+      INTEGER                 DATAPTR(7)       ! Pointers to mapped DATA_ARRAYS
+*    Status :
+      INTEGER                 STATUS
+
+*    Local variables :
+      CHARACTER*(DAT__SZLOC)  DELLOC
+      REAL MINX,MAXX,MINY,MAXY                 ! Min. and max. X values (arcmin)
+*-
+*   Check status
+      IF ( STATUS .NE. SAI__OK) RETURN
+
+
+*   Create min and max values in arcmins - note the reversal which seems
+*   to be necessary to give correct value of FIELD_MIN/MAX in output
+      MAXX = -(SRT.MIN_X - HEAD.SKYCX) * SRT.PTOD * 60.
+      MINX = -(SRT.MAX_X - HEAD.SKYCX) * SRT.PTOD * 60.
+
+      IF (HEAD.YSTART .LT. 0) THEN
+        MAXY = -(SRT.MIN_Y - HEAD.SKYCY) * SRT.PTOD * 60.
+        MINY = -(SRT.MAX_Y - HEAD.SKYCY) * SRT.PTOD * 60.
+      ELSE
+        MINY = (SRT.MIN_Y - HEAD.SKYCY) * SRT.PTOD * 60.
+        MAXY = (SRT.MAX_Y - HEAD.SKYCY) * SRT.PTOD * 60.
+      ENDIF
+
+
+*   Create the list structures to hold the event data
+      CALL LIST_CREMAP( OUTLOC, 'X_CORR', '_REAL', MAPLIM, 0.0,'arcmin',
+     &            MINX, MAXX, DATAPTR(1), DATALOC(1), STATUS)
+*
+*   Write in a flag to say that this needs to be binned backwards
+      CALL DAT_FIND( OUTLOC, 'X_CORR', DELLOC, STATUS)
+      CALL HDX_PUTL( DELLOC, 'DECREASING', 1, .TRUE., STATUS)
+      CALL DAT_ANNUL(DELLOC, STATUS)
+*
+      CALL LIST_CREMAP( OUTLOC, 'Y_CORR', '_REAL', MAPLIM, 0.0,'arcmin',
+     &            MINY, MAXY, DATAPTR(2), DATALOC(2), STATUS)
+*
+      CALL LIST_CREMAP( OUTLOC, 'X_DET', '_INTEGER', MAPLIM, 1.0,
+     &           'pixels', REAL(SRT.MIN_XD), REAL(SRT.MAX_XD),
+     &           DATAPTR(3), DATALOC(3), STATUS)
+*
+      CALL LIST_CREMAP( OUTLOC, 'Y_DET', '_INTEGER', MAPLIM, 1.0,
+     &           'pixels', REAL(SRT.MIN_YD), REAL(SRT.MAX_YD),
+     &           DATAPTR(4), DATALOC(4), STATUS)
+*
+      CALL LIST_CREMAP( OUTLOC, 'RAW_TIMETAG', '_DOUBLE', MAPLIM, 0.0,
+     &   'seconds', SRT.MIN_T(1), SRT.MAX_T(SRT.NTIME), DATAPTR(5),
+     &    DATALOC(5), STATUS)
+*
+      CALL LIST_CREMAP( OUTLOC, 'PULSE_HEIGHT_CH', '_INTEGER', MAPLIM,
+     &           1.0,'channel no.',REAL(SRT.MIN_PH), REAL(SRT.MAX_PH),
+     &                                  DATAPTR(6), DATALOC(6), STATUS)
+*
+      CALL LIST_CREMAP( OUTLOC, 'CORR_PH_CH', '_INTEGER', MAPLIM, 1.0,
+     &          'channel_no', REAL(SRT.MIN_EN), REAL(SRT.MAX_EN),
+     &           DATAPTR(7), DATALOC(7), STATUS)
+*
+*   Check status - drop out if bad
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error creating event lists')
+         GOTO 999
+      ENDIF
+*
+*   Initialise lists
+      CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(1)),STATUS)
+      CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(2)),STATUS)
+      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(3)),STATUS)
+      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(4)),STATUS)
+      CALL ARR_INIT1D(0.0, MAPLIM, %val(DATAPTR(5)),STATUS)
+      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(6)),STATUS)
+      CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(7)),STATUS)
+*
+*   Write the title and units
+      CALL BDA_PUTTITLE (OUTLOC, HEAD.TITLE, STATUS)
+      CALL BDA_PUTUNITS (OUTLOC, 'Counts', STATUS)
+
+*   Check status - drop out if bad
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Create ASTERIX structure.
+      CALL XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
+*
+999   IF (STATUS .NE. SAI__OK) THEN
+	 CALL ERR_REP(' ','from XRTSORT_CRE_EVENT', STATUS)
+      ENDIF
+*
+      END
+
+
+*+XRTSORT_FILESELECT - Select XRT observations to sort
+	SUBROUTINE XRTSORT_FILESELECT(SRT, HEAD, STATUS)
+* Description :
+*         This routine allows the user to select a list of files from
+*   which data can be extracted.
+*
+* Environment parameters :
+*      RAWDIR   char.       Directory for raw files
+*      ROOTNAME char.       Rootname of files
+*      LISTDIR  logical     LIst files on directory ?
+*      INDEX    char.       Index file into events
+* Method :
+* Deficiencies :
+* Bugs :
+* Authors :
+*     Richard Saxton
+* History :
+*    20-APR-1990         Original
+*     9-Mar-1993         Uses portable C routine to fine current directory
+*     8-Dec-1993	 Looks for <rtn>_hdr file. sets HEAD.ORIGIN = 'OMD'
+*                        if old-style .OMD files found
+*    18-Jan-1994         uses INC_RDF to determin filenaming conventions
+*
+* Type Definitions :
+      IMPLICIT NONE
+* Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'AST_SYS_PAR'
+* Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTHEAD'
+* Import :
+* Import-Export :
+      RECORD /XRT_SCFDEF/ SRT
+      RECORD /XRT_HEAD/ HEAD
+* Export :
+* Status :
+      INTEGER STATUS
+* Function declarations :
+      INTEGER CHR_LEN
+         EXTERNAL CHR_LEN
+* Local constants :
+      INTEGER MAXRAW,MAXRANGE
+      PARAMETER (MAXRAW=500,MAXRANGE=10)
+* Local variables :
+        CHARACTER*80 RAWDIR                     ! Directory for Raw files
+        CHARACTER*30 RTNAME                     ! Rootname for files
+        CHARACTER*100 FILE(MAXRAW)              ! Names of files in dir.
+        INTEGER NFILES                          ! No of files in dir.
+        LOGICAL LISTDIR                         ! List files on directory ?
+*
+        INTEGER K
+        INTEGER LP
+*
+* Check status :
+        IF (STATUS .NE. SAI__OK) RETURN
+*
+* Find the name of the present directory and set as a default
+        CALL UTIL_GETCWD(RAWDIR, STATUS)
+*
+* Annul the status variable if the current directory couldn't be found
+        IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
+*
+* Get directory name
+	CALL USI_DEF0C('RAWDIR', RAWDIR, STATUS)
+	CALL USI_GET0C('RAWDIR', RAWDIR, STATUS)
+*
+	IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*
+
+* Look for the header file
+        CALL UTIL_FINDFILE(RAWDIR, '*_hdr.sdf', MAXRAW, FILE,
+     &                                         NFILES, STATUS)
+
+* Test if file is found
+        IF (NFILES.LE.0) THEN
+          STATUS=SAI__ERROR
+          CALL MSG_PRNT('AST_ERR:No header files in this directory')
+          GOTO 999
+
+        ELSE
+
+*   Check if user wants a directory listing. Display by default.
+          CALL USI_GET0L('DIR',LISTDIR,STATUS)
+
+          IF (LISTDIR) THEN
+
+            CALL MSG_PRNT('The following header files are present:')
+            CALL MSG_BLNK()
+            DO LP=1,NFILES
+              CALL MSG_SETC('FILE', FILE(LP))
+              CALL MSG_PRNT(' ^FILE')
+            ENDDO
+
+          ENDIF
+*
+*  Get root-name
+          CALL STR_ROOT(FILE(1), RTNAME)
+          K = INDEX(RTNAME, '.')
+          CALL USI_DEF0C('ROOTNAME', RTNAME(1:K-1), STATUS)
+          CALL USI_GET0C('ROOTNAME', RTNAME, STATUS)
+*
+          IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Create rootname + directory string
+          SRT.ROOTNAME = RAWDIR(1:CHR_LEN(RAWDIR))//FIL_SEP_CH//RTNAME
+*
+* Check if any files are present
+          CALL UTIL_FINDFILE(RAWDIR,RTNAME(1:CHR_LEN(RTNAME)//'*',
+     &                                   MAXRAW,FILE,NFILES,STATUS)
+          IF (NFILES .EQ. 0) THEN
+             CALL MSG_PRNT(
+     &             'AST_ERR: no files found with that root-name')
+             STATUS=SAI__ERROR
+             GOTO 999
+          ENDIF
+
+        ENDIF
+*
+*
+999     CONTINUE
+*
+        IF (STATUS .NE. SAI__OK) THEN
+           CALL ERR_REP(' ','from XRTSORT_FILESELECT' ,STATUS)
+        ENDIF
+*
+        END
+
+*+XRTSORT_GETQLIM    Get quality limits from file and user
+      SUBROUTINE XRTSORT_GETQLIM(HEAD, SRT, STATUS)
+*    Description :
+*     Reads the file containing the quality limits imposed by the preprocessing
+*     system at GSOC. Displays these limits to the user and asks if
+*     these are adequate. If not, the user can select quality ranges to use
+*     in the subsequent sorting.
+*    Environment parameters :
+*    Method :
+*     <description of how the subroutine works - for programmer info>
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*     Richard Saxton
+*    History :
+*     25-Apr-1990        original  (LTVAD::RDS)
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Global variables :
+*    Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_HEAD/ HEAD                    ! Header from files
+*    Import-Export :
+      RECORD /XRT_SCFDEF/ SRT                   ! Sort control structure
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+      INTEGER CHR_LEN
+        EXTERNAL CHR_LEN
+*    Local constants :
+*     <local constants defined by PARAMETER>
+*    Local variables :
+      CHARACTER*(DAT__SZLOC) QLOC               ! Locator to quality file
+      LOGICAL QCHANGE                           ! Change quality limits ?
+      CHARACTER*80 QNAME                        ! Name of quality file
+      CHARACTER*20 CPROP                        ! Properties to change
+      INTEGER TEMP_MIN,TEMP_MAX                 ! Min and max temperature quals
+      INTEGER GAIN_MIN,GAIN_MAX                 ! Min and max gain qualities
+*    Local data :
+*     <any DATA initialisations for local variables>
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+* Set quality logicals false
+      SRT.QUAL_LESS=.FALSE.
+      SRT.QUAL_MORE=.FALSE.
+*
+* See if user wants to change quality limits at all
+      CALL USI_GET0L('QCHANGE', QCHANGE, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Is a quality change wanted ?
+      IF (.NOT. QCHANGE) GOTO 999
+*
+* Get the quality limits used in the pre-processing phase at GSOC.
+*    Create the filename for the quality limits file
+      QNAME = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//'_000.QLIM'
+*
+*    Open the file
+      CALL HDS_OPEN(QNAME, 'READ', QLOC, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error opening quality limits file')
+         STATUS=SAI__ERROR
+         GOTO 999
+      ENDIF
+*
+*    Read the various quality limits from the file
+      CALL CMP_GET0I(QLOC, 'TEMP_MIN', TEMP_MIN, STATUS)
+      CALL CMP_GET0I(QLOC, 'TEMP_MAX', TEMP_MAX, STATUS)
+      CALL CMP_GET0I(QLOC, 'GAIN_MIN', GAIN_MIN, STATUS)
+      CALL CMP_GET0I(QLOC, 'GAIN_MAX', GAIN_MAX, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error reading quality limits from file')
+         STATUS=SAI__ERROR
+         GOTO 999
+      ENDIF
+*
+*    Close the file
+      CALL HDS_CLOSE(QLOC, STATUS)
+      CALL DAT_ANNUL(QLOC, STATUS)
+*
+*    Show the user the current ranges
+      CALL MSG_PRNT('    Quality ranges')
+      CALL MSG_PRNT('   ****************')
+      CALL MSG_SETI('QTEMPMIN', TEMP_MIN)
+      CALL MSG_SETI('QTEMPMAX', TEMP_MAX)
+      CALL MSG_PRNT(' 1. Temperature: ^QTEMPMIN : ^QTEMPMAX')
+      CALL MSG_SETI('QGAINMIN', GAIN_MIN)
+      CALL MSG_SETI('QGAINMAX', GAIN_MAX)
+      CALL MSG_PRNT(' 2. Gain       : ^QGAINMIN : ^QGAINMAX')
+*
+*    Ask the user which ranges to change
+      CALL USI_GET0C('PROPERTY', CPROP, STATUS)
+*
+*    Check for a par_null and jump to the end if received
+      IF (STATUS .EQ. PAR__NULL) THEN
+         CALL ERR_ANNUL(STATUS)
+         GOTO 999
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*    Get user ranges
+      IF (INDEX (CPROP, '1') .NE. 0) THEN
+*
+         CALL USI_DEF0I('TEMPMIN', TEMP_MIN, STATUS)
+         CALL USI_DEF0I('TEMPMAX', TEMP_MAX, STATUS)
+         CALL USI_GET0I('TEMPMIN', SRT.TEMP_MIN, STATUS)
+         CALL USI_GET0I('TEMPMAX', SRT.TEMP_MAX, STATUS)
+*
+*      Check if acceptable temperature range has been made more stringent
+         IF (SRT.TEMP_MIN .GT. TEMP_MIN .OR.
+     &                   SRT.TEMP_MAX .LT. TEMP_MAX) THEN
+            SRT.QUAL_MORE=.TRUE.
+         ENDIF
+*
+*      Check if acceptable temperature range has been made less stringent
+         IF (SRT.TEMP_MIN .LT. TEMP_MIN .OR.
+     &                   SRT.TEMP_MAX .GT. TEMP_MAX) THEN
+            SRT.QUAL_LESS=.TRUE.
+         ENDIF
+*
+      ELSE
+*
+*      Set the sort range to the pre-processing range
+         SRT.TEMP_MIN=TEMP_MIN
+         SRT.TEMP_MAX=TEMP_MAX
+*
+      ENDIF
+*
+      IF (INDEX (CPROP, '2') .NE. 0) THEN
+*
+         CALL USI_DEF0I('GAINMIN', GAIN_MIN, STATUS)
+         CALL USI_DEF0I('GAINMAX', GAIN_MAX, STATUS)
+         CALL USI_GET0I('GAINMIN', SRT.GAIN_MIN, STATUS)
+         CALL USI_GET0I('GAINMAX', SRT.GAIN_MAX, STATUS)
+*
+*      Check if acceptable GAIN range has been made more stringent
+         IF (SRT.GAIN_MIN .GT. GAIN_MIN .OR.
+     &                   SRT.GAIN_MAX .LT. GAIN_MAX) THEN
+            SRT.QUAL_MORE=.TRUE.
+         ENDIF
+*
+*      Check if acceptable GAIN range has been made less stringent
+         IF (SRT.GAIN_MIN .LT. GAIN_MIN .OR.
+     &                   SRT.GAIN_MAX .GT. GAIN_MAX) THEN
+            SRT.QUAL_LESS=.TRUE.
+         ENDIF
+*
+      ELSE
+*
+*      Set the sort range to the pre-processing range
+         SRT.GAIN_MIN=GAIN_MIN
+         SRT.GAIN_MAX=GAIN_MAX
+*
+      ENDIF
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','From XRTSORT_GETQLIM',STATUS)
+      ENDIF
+*
+      END
+
+
+*+XRTSORT_CRE_MASK - Create spatial mask
+      SUBROUTINE XRTSORT_CRE_MASK(HEAD, SRT, BSRT, SDIM, NRBIN,
+     &                             MDIM,MRES,SMPTR,BMPTR,STATUS )
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Structure definitions :
+      INCLUDE 'INC_XRTSRT'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_SCFDEF/ SRT
+      RECORD /XRT_SCFDEF/ BSRT
+      RECORD /XRT_HEAD/ HEAD
+*
+      INTEGER SDIM(7)                           ! Dimensions of binned axes
+      INTEGER NRBIN                             ! Number of radial bins
+*    Import-Export :
+*    Export :
+      INTEGER MDIM(2)				! Dimensions of mask
+      REAL MRES					! Resolution of mask
+      INTEGER SMPTR,BMPTR			! Pointers to mask
+*    Status :
+      INTEGER STATUS
+*    Local variables :
+      REAL LOW,HIGH                             ! Range of each axis
+      REAL PTOD                                 ! Pixels to degrees conversion
+*-
+*   Check status - return if bad
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+*  if output contains an image - create mask of same dimensions
+      IF (SDIM(1).GT.1.AND.SDIM(2).GT.1.AND.NRBIN.EQ.1) THEN
+        MDIM(1)=SDIM(1)
+        MDIM(2)=SDIM(2)
+        PTOD = HEAD.PIXEL/3600.
+        HIGH= - (SRT.MAX_X - HEAD.SKYCX) * PTOD
+        LOW = - (SRT.MIN_X - HEAD.SKYCX) * PTOD
+        SCALE(1)=(HIGH-LOW)/REAL(MDIM(1))
+        BASE(1)=LOW+SCALE(1)/2.0
+        SCALE(1)=(HIGH-LOW)/REAL(MDIM(1))
+        BASE(1)=LOW+SCALE(1)/2.0
+        IF (HEAD.YSTART.LT.0) THEN
+          HIGH= - (SRT.MIN_Y - HEAD.SKYCY) * PTOD
+          LOW = - (SRT.MAX_Y - HEAD.SKYCY) * PTOD
+        ELSE
+          LOW= (SRT.MIN_Y - HEAD.SKYCY) * PTOD
+          HIGH = (SRT.MAX_Y - HEAD.SKYCY) * PTOD
+        ENDIF
+        SCALE(2)=(HIGH-LOW)/REAL(MDIM(2))
+        BASE(2)=LOW+SCALE(2)/2.0
+      ELSE
+*  set resolution to 4 raw pixels to avoid gigantic array size
+        MRES=4.0
+        IF (HEAD.ORIGIN.EQ.'MPE') THEN
+          MDIM(1)=INT(ABS(HEAD.XEND-HEAD.XSTART)/MRES)
+          MDIM(2)=INT(ABS(HEAD.YEND-HEAD.YSTART)/MRES)
+        ELSE
+          MDIM(1)=HEAD.XEND/MRES
+          MDIM(2)=HEAD.YEND/MRES
+        ENDIF
+        SCALE(1)=-HEAD.PIXEL*MRES/3600.0
+        SCALE(2)=HEAD.PIXEL*MRES/3600.0
+        BASE(1)=MDIM(1)*SCALE(1)+SCALE(1)/2.0
+        BASE(2)=-MDIM(2)*SCALE(2)+SCALE(2)/2.0
+      ENDIF
+      UNITS(1)='degrees'
+      UNITS(2)='degrees'
+*
+      CALL DYN_MAPI(2,MDIM,SMPTR,STATUS)
+      CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(SMPTR),STATUS)
+      IF (SRT.BKGRND) THEN
+        CALL DYN_MAPI(2,MDIM,SMPTR,STATUS)
+        CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(SMPTR),
+     :                                                     STATUS)
+      ENDIF
+
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ',' from XRTSORT_CRE_MASK',STATUS)
+      ENDIF
+*
+      END
+
+
+
+*+XRTSORT_MASK - creates image masks
+      SUBROUTINE XRTSORT_MASK(SRT, DIM1, DIM2, AMASK, STATUS)
+*    Description :
+*     <description of what the subroutine does - for user info>
+*    Method :
+*     <description of how the subroutine works - for programmer info>
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*     R.D.Saxton
+*    History :
+*     12-May-1992
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Global variables :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+*    Structure definitions :
+*     <specification of FORTRAN structures>
+*    Import :
+      RECORD /XRT_SCFDEF/ SRT               ! Sort values
+      INTEGER DIM1,DIM2                     ! Image pixel dims
+*    Import-Export :
+      INTEGER AMASK(DIM1,DIM2)              ! Image mask
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Local variables :
+      CHARACTER*3 MODE
+      CHARACTER*6 UNITS(2)
+      INTEGER ARDID
+      INTEGER DIMS(2)
+      REAL XSCALE,YSCALE
+      REAL XC,YC
+      REAL RAD,MINRAD,MAJRAD
+      REAL XWID,YWID
+      REAL ANGLE
+      REAL BASE(2),SCALE(2)
+      LOGICAL EXC
+*-
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+
+      XSCALE = ABS(SRT.MAX_X - SRT.MIN_X) / REAL(DIM1)
+      YSCALE = ABS(SRT.MAX_Y - SRT.MIN_Y) / REAL(DIM2)
+*
+* Open an ARD description
+      CALL ARX_OPEN('WRITE',ARDID,STATUS)
+
+* Set the mask to all excluded (zero)
+      CALL ARR_INIT1I(0, DIM1*DIM2, AMASK,STATUS)
+*
+* Fill in the first region
+      XC=REAL(DIM1)/2.0
+      YC=REAL(DIM2)/2.0
+*
+      IF (INDEX(SRT.SHAPE, 'E') .NE. 0) THEN
+*
+         MAJRAD = SRT.ELAMAX / XSCALE
+         MINRAD = SRT.ELBMAX / YSCALE
+         ANGLE = SRT.PHI
+
+         MODE='ADD'
+         EXC=.FALSE.
+
+         CALL ARX_ELLIPSE(ARDID,0,MODE,EXC,XC,YC,MAJRAD,MINRAD,
+     :                                             ANGLE,STATUS)
+*
+* Exclude the interior region bad if this is an annulus
+         IF (SRT.ELAMIN .GT. 0.0) THEN
+            MAJRAD = SRT.ELAMIN / XSCALE
+            MINRAD = SRT.ELBMIN / YSCALE
+
+            MODE='AND'
+            EXC=.TRUE.
+
+            CALL ARX_ELLIPSE(ARDID,0,MODE,EXC,XC,YC,MAJRAD,MINRAD,
+     :                                                ANGLE,STATUS)
+
+         ENDIF
+*
+      ELSEIF(INDEX(SRT.SHAPE, 'C') .NE. 0 .OR.
+     &              INDEX(SRT.SHAPE, 'A' ) .NE. 0) THEN
+*
+         RAD = SRT.ELAMAX / XSCALE
+*
+         MODE='ADD'
+         EXC=.FALSE.
+
+         CALL ARX_CIRCLE(ARDID,0,MODE,EXC,XC,YC,RAD,STATUS)
+
+*   Set the interior region bad if this is an annulus
+         IF (SRT.ELAMIN .GT. 0.0) THEN
+            RAD = SRT.ELAMIN / XSCALE
+*
+            MODE='AND'
+            EXC=.TRUE.
+            CALL ARX_CIRCLE(ARDID,0,MODE,EXC,XC,YC,RAD,STATUS)
+
+         ENDIF
+*
+      ELSEIF(INDEX(SRT.SHAPE, 'R') .NE. 0) THEN
+
+         XWID=SRT.ELAMAX * 2. / XSCALE
+         YWID=SRT.ELBMAX * 2. / YSCALE
+
+         MODE='ADD'
+         EXC=.FALSE.
+
+         CALL ARX_BOX(ARDID,0,MODE,EXC,XC,YC,XWID,YWID,STATUS)
+
+*
+*   Set the interior region bad if this is an annulus
+         IF (SRT.ELAMIN .GT. 0.0) THEN
+            XWID=SRT.ELAMIN * 2. / XSCALE
+            YWID=SRT.ELBMIN * 2. / YSCALE
+
+            MODE='AND'
+            EXC=.TRUE.
+
+            CALL ARX_BOX(ARDID,0,MODE,EXC,XC,YC,XWID,YWID,STATUS)
+
+         ENDIF
+*
+      ENDIF
+
+
+*  set mask
+      BASE(1)=1.0
+      BASE(2)=1.0
+      SCALE(1)=1.0
+      SCALE(2)=1.0
+      UNITS(1)='PIXEL'
+      UNITS(2)='PIXEL'
+      DIMS(1)=DIM1
+      DIMS(2)=DIM2
+      CALL ARX_MASK(ARDID,DIMS,BASE,SCALE,UNITS,AMASK,STATUS)
+
+*  close ARD description
+      CALL ARX_CLOSE(ARDID,STATUS)
+
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRTSORT_MASK',STATUS)
+      ENDIF
+*
+      END
+
+*+XRTSORT_PHOTONCNT   - Sorts XRT raw data into a binned data array
+      SUBROUTINE XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAXLIM, STATUS)
+*    Description :
+*        Finds the maximum number of photons which could be contained
+*        in any event list given the sort ranges chosen. Note this number
+*        is subsequently used to create the event lists and is a gross
+*        over-estimation of the actual size needed.
+*    History :
+*     2-May-1990   original (LTVAD::RDS)
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Status :
+      INTEGER STATUS
+*    Structures :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_HEAD/ HEAD                      ! Header values
+*
+      RECORD /XRT_SCFDEF/ SRT                     ! Source sorting parameters
+      RECORD /XRT_SCFDEF/ BSRT                    ! Bckgnd sorting parameters
+*
+*    Import-Export :
+*    Export :
+      INTEGER MAXLIM                              ! Maximum size of event lists
+*    Local constants :
+*    Local variables :
+      INTEGER END_XMAP,END_YMAP                   ! Last pixel of current map
+      INTEGER MAP                                 ! Map number
+      INTEGER NINMAP
+*-
+*
+* Zero the photon event counter
+      MAXLIM=0
+*
+*   Loop over maps
+      DO MAP=1,HEAD.ISMTNU
+*
+         END_XMAP = HEAD.XSMAP(MAP) + HEAD.IFDSZX/REAL(HEAD.ISMNUX)
+         END_YMAP = HEAD.YSMAP(MAP) + HEAD.IFDSZY/REAL(HEAD.ISMNUY)
+*
+*     Check if the map is within either sort box
+         IF ( (SRT.MIN_X .LE. END_XMAP .AND. SRT.MAX_X .GE.
+     &        HEAD.XSMAP(MAP) .AND. SRT.MIN_Y .LE. END_YMAP .AND.
+     &        SRT.MAX_Y .GE. HEAD.YSMAP(MAP)) .OR. (SRT.BCKGND
+     &          .AND. BSRT.MIN_X .LE. END_XMAP .AND. BSRT.MAX_X .GE.
+     &        HEAD.XSMAP(MAP) .AND. BSRT.MIN_Y .LE. END_YMAP .AND.
+     &        BSRT.MAX_Y .GE. HEAD.YSMAP(MAP)) ) THEN
+*
+*     Add the number of photons in this map to the total
+              IF (MAP .EQ. HEAD.ISMTNU) THEN
+                 NINMAP = HEAD.IEVTNU - (HEAD.EVSTART(HEAD.ISMTNU)-1)
+              ELSE
+                 NINMAP = HEAD.EVSTART(MAP+1)-HEAD.EVSTART(MAP)
+              ENDIF
+*
+              MAXLIM = MAXLIM + NINMAP
+*
+C              WRITE(*,*)MAP,NINMAP,MAXLIM
+         ENDIF
+*
+      ENDDO           ! Loop over all maps
+*
+      END
+
+*+XRTSORT_RANGESELECT	Obtains sorting options from the user
+      SUBROUTINE XRTSORT_RANGESELECT(HEAD, SRT, BSRT, SDIM, BDIM,
+     &                                    NRBIN, NAZBIN, STATUS)
+*
+* Description :
+*       Gets all sorting criteria from the user.
+*
+* Environment parameters :
+*  DATASET              Output files required Event or Binned
+*  RANGES               Property ranges to change
+*                                   (x=1,y=2,xdet=3,ydet=4,t=5,s=6,e=7)
+*  XSTART               Minimum value of X in degrees
+*  XSTOP                Maximum value of X in degrees
+*  YSTART               Minimum value of Y in degrees
+*  YSTOP                Maximum value of Y in degrees
+*  TSTART               Minimum value of T in seconds
+*  TSTOP                Maximum value of T in seconds
+*  MINPH                Minimum value of PHA channel
+*  MAXPH                Maximum value of PHA channel
+*  MINEN                Minimum value of energy
+*  MAXEN                Maximum value of energy
+*  BIN_AXES             Axes to use in the binned data array
+*  SHAPE                Shape of the source and bckgnd areas
+*  GRP_RA               RA of the centre of the source box
+*  GRP_DEC              DEC of the centre of the source box
+*  GRP_SWIDTH           Width of the source box
+*  GRP_SHEIGHT          Height of the source box
+*  RADIUS               Radius of source box if circular shape
+*  NXBIN                X bin width for source and background (pix)
+*  NYBIN                Y bin widths for source and bckgnd
+*  TIMBIN               The width of the time bin
+*  ENBIN                The width of the energy bin
+*  PHBIN                The width of the Pha channel
+* Method :
+*                      Coordinate systems
+*
+*       MPE raw pixels         US/RDF raw pixels          axis coords
+*
+* -ve ------------------  +ve ------------------   +ve -------------------
+*     |                |      |                |       |                 |
+*     |                |      |                |       |                 |
+*     |                |      |                |       |                 |
+*  0  -                -      |                |   0.0 -                 -
+*     |                |      |                |       |                 |
+*     |                |      |                |       |                 |
+*     |                |      |                |       |                 |
+* +ve --------|---------    1 ------------------   -ve ---------|---------
+*    -ve      0       +ve     1              +ve      +ve      0.0      -ve
+*
+*
+* Deficiencies :
+* Bugs :
+* Authors :
+*     Richard Saxton
+*     Robert Vallance
+* History :
+*     Closely based on EXOLESORT_RANGESELECT   7 Dec 87: original (LTVAD::RDS)
+*     Original 7-Nov 1988      (LTVAD::RDS)
+*     Real one 10-Apr-1990      (LTVAD::RDS)
+*     Allows a background annulus to be selected 10-Sep-1990      (LTVAD::RDS)
+*     25 Aug 93: traps PHA channel=0 (RJV)
+*      4 Apr 95: allows ARD input (RJV)
+* Type Definitions :
+      IMPLICIT NONE
+* Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+* Structures:
+      INCLUDE 'INC_XRTSRT'                      ! Sorting struc. incl. MXTIME
+      INCLUDE 'INC_XRTHEAD'
+* Import :
+      RECORD /XRT_HEAD/ HEAD
+      RECORD /XRT_SCFDEF/ SRT, BSRT
+* Export :
+      INTEGER SDIM(8)                           ! Dimensions of source array
+      INTEGER BDIM(8)                           ! Dimensions of bckgnd array
+      INTEGER MDIM(2)				! Dimensions of spatial masks
+      INTEGER NRBIN                             ! Number of radial bins
+      INTEGER NAZBIN                            ! Number of azimuthal bins
+      INTEGER SMPTR,BMPTR			! Pointers to spatial masks
+* Status :
+      INTEGER STATUS
+* Local constants :
+        DOUBLE PRECISION DTOR,RTOD
+	    PARAMETER (DTOR=3.14159265/180.,RTOD=1.0/DTOR)
+        INTEGER MAXRAW
+            PARAMETER (MAXRAW=500)
+        INTEGER MXRNG
+            PARAMETER (MXRNG=250)
+        REAL TOL
+            PARAMETER (TOL=1.0/3600)  ! Set tolerance to one arcsecond
+* Local variables :
+        CHARACTER*132 TIMSTRING       ! Time ranges
+        CHARACTER*30 C1,C2            ! Default time range
+        CHARACTER*10 RANGES,BIN_AXES  ! Axes codes for choosing range and data
+        DOUBLE PRECISION RARAD        ! RA pointing direction in radians
+        DOUBLE PRECISION DECRAD       ! DEC pointing direction in radians
+        DOUBLE PRECISION DROLL        ! Roll angle of spacecraft (radians)
+        DOUBLE PRECISION CTOS(3,3)    ! S/C to celestial conversion matrix
+        REAL GRP_SWIDTH,GRP_SHEIGHT   ! Size of source box
+        REAL GRP_BWIDTH,GRP_BHEIGHT   ! Size of bckgnd box
+        REAL SRAD1                    ! Inner radius of source box (pixels)
+        REAL SRAD2                    ! Outer radius of source box (pixels)
+        REAL BRADIN                   ! Inner radius of bckgnd annulus (degs)
+        REAL BRADOUT                  ! Outer radius of bckgnd annulus (degs)
+        REAL ELAMIN,ELAMAX            ! Elliptic 'X' axis min and max
+        REAL ELBMAX                   ! Elliptic 'Y' axis max
+        REAL EXMAX,EYMAX              ! Max. axis lengths for an ellipse
+        REAL VC(3),VS(3)              ! Used in transforming input pixels
+        REAL SMAXT                    ! Max. time
+        REAL CBORDX,CBORDY            ! Default distance for box size
+        REAL BBORDX,BBORDY            ! Border distance for bckgnd box
+        REAL TIMBIN                   ! Bin width for time axis
+        REAL PTOD                     ! Conversion of pixels to degrees
+        REAL PTOR                     ! Conversion of pixels to radians
+        REAL XW,YW		      ! Position in world coords
+        REAL BXW,BYW		      ! Position in world coords
+        REAL XWIDW,YWIDW,RADW	      ! Other parameters in world coords.
+        REAL BXWIDW,BYWIDW,BRADW      ! Other parameters in world coords.
+        REAL IRADW,ORADW	      ! Inner and outer radii in world coords.
+        REAL BIRADW,BORADW	      ! Inner and outer radii in world coords.
+        REAL ANGLE,BANGLE	      ! Orientation  angle of ellipse
+        INTEGER K1,K2                 !
+        INTEGER BX_HWIDTH,BY_HWIDTH   ! Width of box in pixels
+        INTEGER BCKGND_X,BCKGND_Y     ! Background box centre
+        INTEGER X_HWIDTH,Y_HWIDTH     ! Widths of source box in pixels
+        INTEGER SOURCE_X,SOURCE_Y     ! Centre of source box in pixels
+        INTEGER NREBINX,NREBINY
+        INTEGER NXBIN,NYBIN           ! No of X and Y pixel bins
+        INTEGER NREBXD,NREBYD
+        INTEGER NXDBIN,NYDBIN         ! No of X and Y detector bins
+        INTEGER J,LP
+        INTEGER ENBIN                 ! Bin width for energy axis
+        INTEGER PHBIN                 ! Bin width for PHA channel axis
+        INTEGER MFACT                 ! Y orientation factor (-1 or +1)
+        LOGICAL ANNULAR		      ! Background is annular
+        LOGICAL JUMPOUT
+* Function declarations :
+        INTEGER CHR_LEN
+*
+* Statement functions :
+        INTEGER NPIX
+        REAL D
+*
+*       IPIX(D)=1024+NINT(D/PTOD)
+*
+        NPIX(D)=NINT(0.5*D/PTOD-0.5)
+*
+* Local data :
+*-
+* Check status :
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+* Set a factor for dealing with different orientations of y-axes in raw data
+      IF (HEAD.ORIGIN.EQ.'MPE') THEN
+         MFACT = -1
+      ELSE
+         MFACT = 1
+      ENDIF
+*
+* Calculate pixel size in degrees
+      PTOD = HEAD.PIXEL/3600.0
+*
+* Store pixel conversion factor
+      SRT.PTOD = PTOD
+      BSRT.PTOD = PTOD
+*
+* Calculate conversion factor from pixels to radians
+      PTOR=PTOD*DTOR
+*
+* Generate the attitude matrix of the spacecraft
+      RARAD =  HEAD.AXIS_RA * DTOR
+      DECRAD = HEAD.AXIS_DEC * DTOR
+*
+*   Convert the roll angle to radians. NB: the +90.0 is a fiddle to get it
+*   right for now, I'm not sure where the screw up is.
+      DROLL = (HEAD.ROLLCI + 90.0) * DTOR
+*
+      CALL CONV_GENDMAT(RARAD, DECRAD, DROLL, CTOS)
+*
+      JUMPOUT = .FALSE.
+      DO WHILE (.NOT. JUMPOUT)
+*
+* Ask which properties will be used as binning axes in the output file.
+         IF (SRT.DTYPE.EQ.'BinDS')THEN
+*
+            SRT.NAXES=0
+*
+            CALL MSG_BLNK()
+            CALL MSG_PRNT('Binned dataset selection')
+            CALL MSG_PRNT('--------------------------')
+            CALL MSG_PRNT('1 - XPIX')
+            CALL MSG_PRNT('2 - YPIX')
+            CALL MSG_PRNT('3 - XDET')
+            CALL MSG_PRNT('4 - YDET')
+            CALL MSG_PRNT('5 - Time')
+            CALL MSG_PRNT('6 - PHA channel')
+            CALL MSG_PRNT('7 - Corrected PHA channel')
+            CALL MSG_PRNT('8 - Radial')
+*
+            CALL USI_GET0C('BIN_AXES', BIN_AXES, STATUS)
+*
+            IF (STATUS .NE. SAI__OK) GOTO 999
+*
+         ELSE
+*
+            BIN_AXES='          '
+*
+         ENDIF
+*
+*   Check that the axes chosen are consistent
+         IF ( INDEX( BIN_AXES, '8') .EQ. 0 .OR.
+     &          (INDEX( BIN_AXES, '1') .EQ. 0 .AND.
+     &                        INDEX( BIN_AXES, '2') .EQ. 0) ) THEN
+*
+            JUMPOUT = .TRUE.
+         ELSE
+            CALL MSG_PRNT('You cant have a radial and spatial axis')
+            CALL USI_CANCL('BIN_AXES', STATUS)
+            GOTO 999
+         ENDIF
+*
+      ENDDO
+*
+* Get Source box information from the user
+      JUMPOUT=.FALSE.
+      DO WHILE (.NOT.JUMPOUT)
+*
+         CALL USI_GET0C('SHAPE', SRT.SHAPE, STATUS)
+         CALL CHR_UCASE(SRT.SHAPE)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+	 IF (INDEX('RCAEI', SRT.SHAPE) .EQ. 0) THEN
+	    CALL USI_CANCL('SHAPE',STATUS)
+         ELSE
+	    JUMPOUT=.TRUE.
+         ENDIF
+*
+      ENDDO
+*
+*   Get centre of source box in RA and DEC degrees
+*   Set centre of the field as default
+      CALL USI_DEF0D('GRP_RA', HEAD.AXIS_RA, STATUS)
+      CALL USI_DEF0D('GRP_DEC', HEAD.AXIS_DEC, STATUS)
+*
+      CALL USI_GET0D('GRP_RA', SRT.FIELD_RA, STATUS)
+      CALL USI_GET0D('GRP_DEC', SRT.FIELD_DEC, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Calculate azimuth and elevation for the source box in raw pixels
+      CALL CONV_CONA2V(REAL(SRT.FIELD_RA)*REAL(DTOR),
+     &                           REAL(SRT.FIELD_DEC)*REAL(DTOR), VC)
+*
+      DO J = 1,3
+         VS(J) = VC(1)*CTOS(1,J)+VC(2)*CTOS(2,J)+VC(3)*CTOS(3,J)
+      END DO
+*
+      SOURCE_X = NINT( -VS(3) / PTOR)
+      SOURCE_Y = NINT( -VS(2) / PTOR) * MFACT
+*
+*    Add the sky pixel centre to the source centre
+      SOURCE_X = SOURCE_X + HEAD.SKYCX
+      SOURCE_Y = SOURCE_Y + HEAD.SKYCY
+*
+*
+*   Get extent of area depending on shape
+*   Find the closest distance to each border
+      CBORDX=MIN( ABS(SOURCE_X-HEAD.XSTART), ABS(SOURCE_X-HEAD.XEND) )
+     &                                   * PTOD * 2.0
+      CBORDY=MIN( ABS(SOURCE_Y-HEAD.YSTART), ABS(SOURCE_Y-HEAD.YEND) )
+     &                                   * PTOD * 2.0
+
+*  get the centre in world (axis) coords.
+      XW=-(SOURCE_X-HEAD.SKYCX)*PTOD
+      YW=(SOURCE_Y-HEAD.SKYCY)*PTOD*MFACT
+
+*  get ID for ARD description of sort region
+      CALL ARX_OPEN('WRITE',SRT.ARDID,STATUS)
+
+
+*  Import region description (ARD)
+      IF (SRT.SHAPE .EQ. 'I') THEN
+
+*  get ARD file
+        CALL ARX_READ('ARD',SRT.ARDID,STATUS)
+
+        X_HWIDTH=NPIX(CBORDX)
+        Y_HWIDTH=NPIX(CBORDY)
+        SRT.PHI=0.0
+        SRT.ELAMIN=0.0
+        SRT.ELBMIN=0.0
+        SRT.ELAMAX=X_HWIDTH
+        SRT.ELBMAX=Y_HWIDTH
+
+
+*  Rectangle
+      ELSEIF (SRT.SHAPE .EQ. 'R') THEN
+
+	 CALL USI_DEF0R('GRP_SWIDTH', CBORDX, STATUS)
+	 CALL USI_DEF0R('GRP_SHEIGHT', CBORDY, STATUS)
+	 CALL USI_GET0R('GRP_SWIDTH', GRP_SWIDTH, STATUS)
+	 CALL USI_GET0R('GRP_SHEIGHT', GRP_SHEIGHT, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Convert to nearest whole pixels
+         X_HWIDTH = NPIX(GRP_SWIDTH)
+	 Y_HWIDTH = NPIX(GRP_SHEIGHT)
+
+*   and back to world coords.
+         XWIDW=2.0*X_HWIDTH*PTOD
+         YWIDW=2.0*Y_HWIDTH*PTOD
+*
+*   Set sort ranges
+         SRT.PHI=0.0
+         SRT.ELAMIN=0.0
+         SRT.ELBMIN=0.0
+         SRT.ELAMAX=X_HWIDTH
+         SRT.ELBMAX=Y_HWIDTH
+
+*  store ARD description
+         CALL ARX_BOX(SRT.ARDID,0,'ADD',.FALSE.,XW,YW,XWIDW,YWIDW,
+     :                                                     STATUS)
+*
+*   Circular area
+      ELSEIF (SRT.SHAPE .EQ. 'C') THEN
+*
+	 CALL USI_DEF0R('RADIUS', MIN(CBORDX,CBORDY)/2.0, STATUS)
+	 CALL USI_GET0R('RADIUS', SRAD2, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*     Make sure the user hasn't requested the whole universe
+         SRAD2 = MIN(SRAD2,MIN(CBORDX,CBORDY)/2.0)
+*
+*     Convert this radius into raw pixels, in elliptical coordinates
+*     and set orientation to zero
+	 SRT.ELAMIN = 0.0
+	 SRT.ELAMAX = REAL(NINT(SRAD2 / PTOD - 0.5))
+         SRT.ELBMIN = 0.0
+         SRT.ELBMAX = SRT.ELAMAX
+         SRT.PHI = 0.0
+*
+	 X_HWIDTH = SRT.ELAMAX
+	 Y_HWIDTH = SRT.ELAMAX
+*
+*   back to world coords
+         RADW=SRT.ELAMAX*PTOD
+
+*   store ARD description
+         CALL ARX_CIRCLE(SRT.ARDID,0,'ADD',.FALSE.,XW,YW,RADW,STATUS)
+
+*   Get box inner and outer radii for an annular box
+      ELSEIF (SRT.SHAPE .EQ. 'A') THEN
+*
+	 CALL USI_GET0R('RADINN', SRAD1, STATUS)
+	 CALL USI_DEF0R('RADOUT', MIN(CBORDX,CBORDY)/2.0, STATUS)
+	 CALL USI_GET0R('RADOUT', SRAD2, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*     Make sure the user hasn't requested the whole universe
+         SRAD2 = MIN(SRAD2,MIN(CBORDX,CBORDY)/2.0)
+*
+*     Convert radial inputs into whole raw pixels in elliptic coords
+         SRT.ELAMIN = REAL(NINT(SRAD1 / PTOD))
+         SRT.ELAMAX = REAL(NINT(SRAD2 / PTOD))
+         SRT.ELBMIN = SRT.ELAMIN
+         SRT.ELBMAX = SRT.ELAMAX
+         SRT.PHI=0.0
+*
+*   and back to world coords
+         IRADW=SRT.ELAMIN*PTOD
+         ORADW=SRT.ELAMAX*PTOD
+
+*   store ARD description
+         CALL ARX_ANNULUS(SRT.ARDID,0,'ADD',.FALSE.,XW,YW,
+     :                                  IRADW,ORADW,STATUS)
+
+	 X_HWIDTH = SRT.ELAMAX
+	 Y_HWIDTH = SRT.ELAMAX
+*
+*   Get ellipse parameters for an elliptical box
+      ELSEIF (SRT.SHAPE .EQ. 'E') THEN
+*
+*      Get orientation. +ve is anticlockwise from east
+	 CALL USI_GET0R('ORIENT', ANGLE, STATUS)
+*
+*      Convert orientation angle to radians
+         SRT.PHI = ANGLE * DTOR
+*
+*      Find cos and sine of orientation
+         SRT.COSPHI = COS(SRT.PHI)
+         SRT.SINPHI = SIN(SRT.PHI)
+*
+*      Get inner value for X axis (semi-major) of ellipse
+	 CALL USI_GET0R('EXINN', ELAMIN, STATUS)
+*
+*      Get outer radii - jumpout when they are not too big
+         JUMPOUT = .FALSE.
+         DO WHILE (.NOT. JUMPOUT)
+*
+            CALL USI_GET0R('EXOUT', ELAMAX, STATUS)
+*
+            CALL USI_GET0R('EYOUT', ELBMAX, STATUS)
+*
+            IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*     Check user hasn't set the outer radii too large
+*      Get outer value for X axis (semi-major) of ellipse
+            EXMAX=SQRT((ELAMAX*SRT.COSPHI)**2 + (ELBMAX*SRT.SINPHI)**2)
+            EYMAX=SQRT((ELAMAX*SRT.SINPHI)**2 + (ELBMAX*SRT.COSPHI)**2)
+*
+*     Check user hasn't set the outer radii too large
+            IF (EXMAX .GT. CBORDX/2.0 .OR. EYMAX .GT. CBORDY/2.0) THEN
+               CALL MSG_PRNT('Outer axes extend beyond the edge of '/
+     &                    /'the field - please reduce them')
+               CALL USI_CANCL('EXOUT', STATUS)
+               CALL USI_CANCL('EYOUT', STATUS)
+            ELSE
+               JUMPOUT=.TRUE.
+            ENDIF
+         ENDDO
+*
+*      Convert to pixels
+         SRT.ELAMIN = REAL(NINT(ELAMIN / PTOD))
+         SRT.ELAMAX = REAL(NINT(ELAMAX / PTOD))
+         SRT.ELBMAX = REAL(NINT(ELBMAX / PTOD))
+*
+*      Calculate the inner Y axis
+         SRT.ELBMIN = SRT.ELAMIN * SRT.ELBMAX / SRT.ELAMAX
+
+*   convert back to world coords and store ARD description
+         XWIDW=SRT.ELAMAX*PTOD
+         YWIDW=SRT.ELBMAX*PTOD
+         CALL ARX_ELLIPSE(SRT.ARDID,0,'ADD',.FALSE.,XW,YW,
+     :                             XWIDW,YWIDW,ANGLE,STATUS)
+         IF ((SRT.ELAMIN).GT.0.0.AND.(SRT.ELBMIN).GT.0.0) THEN
+           XWIDW=SRT.ELAMIN*PTOD
+           YWIDW=SRT.ELBMIN*PTOD
+           CALL ARX_ELLIPSE(SRT.ARDID,0,'AND',.TRUE.,XW,YW,
+     :                               XWIDW,YWIDW,ANGLE,STATUS)
+         ENDIF
+*
+*      Calculate maximum X and Y half widths for this ellipse
+	 X_HWIDTH = SQRT( (SRT.ELAMAX * SRT.COSPHI) ** 2 +
+     &                           (SRT.ELBMAX * SRT.SINPHI) ** 2 )
+	 Y_HWIDTH = SQRT( (SRT.ELAMAX * SRT.SINPHI) ** 2 +
+     &                           (SRT.ELBMAX * SRT.COSPHI) ** 2 )
+*
+      ENDIF
+*
+*   Put in a modification which restricts the PH range of the corrected
+*   amplitude data to be >=1 and <=256, if a spectrum is being produced.
+      IF ( INDEX(BIN_AXES,'7') .NE. 0) THEN
+
+        IF ( HEAD.CEND .GT. 256 ) THEN
+          CALL MSG_PRNT(' ')
+          CALL MSG_SETI('CMAX',HEAD.CEND)
+          CALL MSG_PRNT('** WARNING: This observation contains data '/
+     &      /'up to PHA=^CMAX. ONLY the first 256 '/
+     &      /'channels can be analysed in a spectrum **')
+          CALL MSG_PRNT(' ')
+          HEAD.CEND = MIN(HEAD.CEND, 256)
+        ENDIF
+        IF (HEAD.CSTART .LE. 0) THEN
+          CALL MSG_PRNT(' ')
+          CALL MSG_SETI('CMIN',HEAD.CSTART)
+          CALL MSG_PRNT('** WARNING: Illegal lower channel number - '/
+     &       /'^CMIN - substituting 1')
+        ENDIF
+      ENDIF
+*
+* Display data ranges
+      WRITE (*,*) '   Data array axes'
+      WRITE (*,*) ' *******************'
+      WRITE (*,1010)3,' XDET:',HEAD.XDSTART,HEAD.XDEND,' (pixels)'
+      WRITE (*,1010)4,' YDET:',HEAD.YDSTART,HEAD.YDEND,' (pixels)'
+      WRITE (*,1000)5,' Time:',HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),
+     &                                           ' (seconds)'
+      WRITE (*,1010)6,' PHA channel:',HEAD.ASTART,HEAD.AEND,' (chn.)'
+      WRITE (*,1010)7,' Corr. PHA chan.',HEAD.CSTART,HEAD.CEND,' (chn.)'
+*
+1000  FORMAT(5X,I1,')',A,F12.3,' to ',F12.3,A)
+1010  FORMAT(5X,I1,')',A,I7,' to ',I7,A)
+*
+      CALL USI_DEF0I('XDSTART', HEAD.XDSTART, STATUS)
+      CALL USI_DEF0I('XDEND', HEAD.XDEND, STATUS)
+      CALL USI_DEF0I('YDSTART', HEAD.YDSTART, STATUS)
+      CALL USI_DEF0I('YDEND', HEAD.YDEND, STATUS)
+*
+      CALL CHR_RTOC(HEAD.TSTART(1), C1, K1)
+      CALL CHR_RTOC(HEAD.TEND(HEAD.NTRANGE), C2, K2)
+      TIMSTRING = C1(1:K1) // ':' // C2(1:K2)
+*
+      CALL USI_DEF0C('TIMRANGE', TIMSTRING, STATUS)
+      CALL USI_DEF0I('MINPH', HEAD.ASTART, STATUS)
+      CALL USI_DEF0I('MAXPH', HEAD.AEND, STATUS)
+      CALL USI_DEF0I('MINEN', HEAD.CSTART, STATUS)
+      CALL USI_DEF0I('MAXEN', HEAD.CEND, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Select ranges to change (3-7)
+      CALL USI_GET0C('RANGES',RANGES,STATUS)
+*
+*   Use default ranges if a null (!) has been entered
+      IF (STATUS .EQ. PAR__NULL) CALL ERR_ANNUL(STATUS)
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Detector X
+      IF (INDEX(RANGES,'3') .NE. 0) THEN
+         CALL USI_GET0I('XDSTART',SRT.MIN_XD,STATUS)
+         CALL USI_GET0I('XDEND', SRT.MAX_XD, STATUS)
+      ELSE
+         SRT.MIN_XD = HEAD.XDSTART
+         SRT.MAX_XD = HEAD.XDEND
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Detector Y
+      IF (INDEX(RANGES,'4') .NE. 0) THEN
+         CALL USI_GET0I('YDSTART',SRT.MIN_YD,STATUS)
+         CALL USI_GET0I('YDEND', SRT.MAX_YD, STATUS)
+      ELSE
+         SRT.MIN_YD = HEAD.YDSTART
+         SRT.MAX_YD = HEAD.YDEND
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Time:
+      IF (INDEX(RANGES,'5') .NE. 0) THEN
+*
+         JUMPOUT = .FALSE.
+         DO WHILE (.NOT. JUMPOUT)
+*
+*      Time range may be input as either a string of start and stop
+*      times or a text file of times. The times may be expressed as offsets
+*      from time zero or as MJDs in which case they are prefixed wih an 'M'.
+            CALL USI_GET0C('TIMRANGE',TIMSTRING,STATUS)
+*
+*      Decode the timestring into a sequence of start and stop times
+            CALL UTIL_TDECODE(TIMSTRING, HEAD.BASE_MJD, MXTIME,
+     &                      SRT.NTIME, SRT.MIN_T, SRT.MAX_T, STATUS)
+*
+            IF (STATUS .NE. SAI__OK) GOTO 999
+*
+C*      Make sure that there's only one time range if time is an axis
+C            IF (INDEX(BIN_AXES, '5') .NE. 0 .AND. SRT.NTIME .GT. 1) THEN
+C               CALL MSG_PRNT(' If time is used as an output axis it '/
+C     &                      /'may only have one time range')
+C               CALL USI_CANCL('TIMRANGE', STATUS)
+C            ELSE
+               JUMPOUT= .TRUE.
+C            ENDIF
+         ENDDO
+*
+      ELSE
+         SRT.NTIME=1
+         SRT.MIN_T(1) = HEAD.TSTART(1)
+         SRT.MAX_T(1) = HEAD.TEND(HEAD.NTRANGE)
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   PH:
+      IF (INDEX(RANGES,'6') .NE. 0) THEN
+         CALL USI_GET0I('MINPH', SRT.MIN_PH, STATUS)
+	 CALL USI_GET0I('MAXPH', SRT.MAX_PH, STATUS)
+      ELSE
+         SRT.MIN_PH=HEAD.ASTART
+         SRT.MAX_PH=HEAD.AEND
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*
+*  Energy:
+      IF (INDEX(RANGES,'7') .NE. 0) THEN
+         CALL USI_GET0I('MINEN', SRT.MIN_EN, STATUS)
+         CALL USI_GET0I('MAXEN', SRT.MAX_EN, STATUS)
+      ELSE
+         SRT.MIN_EN=HEAD.CSTART
+         SRT.MAX_EN=HEAD.CEND
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Display the default quality limits and get new ones if these aren't ok
+      CALL XRTSORT_GETQLIM(HEAD, SRT, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Select bin widths for axes properties
+* Calculate X and Y extremes
+*
+      IF ( INDEX(BIN_AXES,'1') .NE. 0) THEN
+*
+* Tell user how many old pixels in axis
+         CALL MSG_SETI('XPIX',2*X_HWIDTH)
+         CALL MSG_OUT(' ',' There are ^XPIX old pixels within'//
+     &                                 ' the X range selected',STATUS)
+*
+         CALL USI_GET0I('NXBIN', NXBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Calculate number of old pixels per new pixel
+         NREBINX=NINT(2.0*REAL(X_HWIDTH)/REAL(NXBIN))
+*
+         SRT.MIN_X = SOURCE_X-INT(REAL(NREBINX)*REAL(NXBIN)/2.0 )
+*
+* Make the maximum 1 higher if odd no. of input pixels
+         SRT.MAX_X =SOURCE_X+NINT(REAL(NREBINX)*REAL(NXBIN)/2.0 +
+     &                                0.4) - 1
+*
+* Make sure you haven't gone over the edge
+         SRT.MIN_X = MAX(SRT.MIN_X, HEAD.XSTART)
+         SRT.MAX_X = MIN(SRT.MAX_X, HEAD.XEND)
+*
+         CALL MSG_SETI('NXBIN',NXBIN)
+         CALL MSG_SETI('NREB',NREBINX)
+         CALL MSG_SETI('SPIX',SRT.MIN_X)
+         CALL MSG_PRNT('There will be ^NXBIN X bins, each of '//
+     &                     '^NREB raw pixels, starting from ^SPIX')
+*
+         SDIM(1)=NXBIN
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=1
+*
+      ELSE
+*
+         SDIM(1)=1
+         NREBINX=1
+         SRT.MIN_X = MAX(SOURCE_X-X_HWIDTH, HEAD.XSTART)
+         SRT.MAX_X = MIN(SOURCE_X+X_HWIDTH, HEAD.XEND)
+*
+      ENDIF
+*
+      IF ( INDEX(BIN_AXES,'2') .NE. 0) THEN
+*
+         CALL MSG_SETI('YPIX',2*Y_HWIDTH)
+         CALL MSG_OUT(' ',' There are ^YPIX old pixels within'//
+     &                                 ' the Y range selected',STATUS)
+*
+         CALL USI_GET0I('NYBIN', NYBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Calculate number of old pixels per new pixel
+         NREBINY=NINT(2.0*REAL(Y_HWIDTH)/REAL(NYBIN))
+*
+         SRT.MIN_Y=SOURCE_Y-INT(REAL(NREBINY)*REAL(NYBIN)/2.0)
+         SRT.MAX_Y=SOURCE_Y+NINT(REAL(NREBINY)*REAL(NYBIN)/2.0 +
+     &                                        0.4) - 1
+*
+* Make sure you haven't gone over the edge
+         SRT.MIN_Y = MAX(SRT.MIN_Y, HEAD.YSTART)
+         SRT.MAX_Y = MIN(SRT.MAX_Y, HEAD.YEND)
+
+         CALL MSG_SETI('NYBIN',NYBIN)
+         CALL MSG_SETI('NREB',NREBINY)
+         CALL MSG_SETI('SPIX',SRT.MIN_Y)
+         CALL MSG_PRNT('There will be ^NYBIN Y bins, each of '//
+     &                         '^NREB raw pixels, starting from ^SPIX')
+*
+         SDIM(2)=NYBIN
+*
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=2
+*
+      ELSE
+*
+         SDIM(2)=1
+         NREBINY=1
+         SRT.MIN_Y = MAX(SOURCE_Y-Y_HWIDTH, HEAD.YSTART)
+         SRT.MAX_Y = MIN(SOURCE_Y+Y_HWIDTH, HEAD.YEND)
+*
+      ENDIF
+*
+      IF ( INDEX(BIN_AXES,'8') .NE. 0) THEN
+*
+*     Get number of radial bins
+         CALL USI_GET0I('NRBIN', NRBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+C         RBIN = (SRT.RADIN - SRT.RADOUT) / REAL(NRBIN)
+*
+C         CALL MSG_SETI('NRBIN',NRBIN)
+C         CALL MSG_SETI('RBIN',RBIN)
+C         CALL MSG_SETI('SPIX',SRT.RADIN)
+C         CALL MSG_PRNT('There will be ^NRBIN radial bins, each of '//
+C     &                         '^RBIN degrees starting from ^SPIX')
+*
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=8
+*
+*   Set the first dimension to be the number of radial bins.
+         SDIM(1)=NRBIN
+*
+      ELSE
+         NRBIN=1
+      ENDIF
+*
+* Detector pixels
+      IF ( INDEX(BIN_AXES,'3') .NE. 0) THEN
+*
+* Tell user how many old pixels in axis
+         CALL MSG_SETI('XDET',SRT.MAX_XD-SRT.MIN_XD+1)
+         CALL MSG_OUT(' ',' There are ^XDET old pixels within'//
+     &                      ' the X detector range selected',STATUS)
+*
+         CALL USI_GET0I('NXDBIN', NXDBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Calculate number of old pixels per new pixel
+         NREBXD=NINT((SRT.MAX_XD - SRT.MIN_XD + 1) / REAL(NXDBIN))
+*
+         SRT.MIN_XD = (SRT.MAX_XD + SRT.MIN_XD)/2.0 -
+     &                    INT(REAL(NREBXD)*REAL(NXDBIN)/2.0 )
+*
+* Make the maximum 1 higher if odd no. of input pixels
+         SRT.MAX_XD = (SRT.MAX_XD + SRT.MIN_XD)/2.0 +
+     &                  NINT(REAL(NREBXD)*REAL(NXDBIN)/2.0 + 0.4) - 1
+         CALL MSG_SETI('NXDBIN',NXDBIN)
+         CALL MSG_SETI('NREB',NREBXD)
+         CALL MSG_SETI('SPIX',SRT.MIN_XD)
+         CALL MSG_PRNT('There will be ^NXDBIN X detector bins, of '//
+     &                     '^NREB raw pixels, starting from ^SPIX')
+*
+         SDIM(3)=NXDBIN
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=3
+*
+      ELSE
+*
+         SDIM(3)=1
+         NREBXD=1
+*
+      ENDIF
+*
+* Y detector:
+      IF ( INDEX(BIN_AXES,'4') .NE. 0) THEN
+*
+* Tell user how many old pixels in axis
+         CALL MSG_SETI('YDET',SRT.MAX_YD-SRT.MIN_YD+1)
+         CALL MSG_OUT(' ',' There are ^YDET old pixels within'//
+     &                      ' the Y detector range selected',STATUS)
+*
+         CALL USI_GET0I('NYDBIN', NYDBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Calculate number of old pixels per new pixel
+         NREBYD=NINT((SRT.MAX_YD - SRT.MIN_YD + 1) / REAL(NYDBIN))
+*
+         SRT.MIN_YD = (SRT.MAX_YD + SRT.MIN_YD)/2.0 -
+     &                    INT(REAL(NREBYD)*REAL(NYDBIN)/2.0 )
+*
+* Make the maximum 1 higher if odd no. of input pixels
+         SRT.MAX_YD = (SRT.MAX_YD + SRT.MIN_YD)/2.0 +
+     &                  NINT(REAL(NREBYD)*REAL(NYDBIN)/2.0 + 0.4) - 1
+         CALL MSG_SETI('NYDBIN',NYDBIN)
+         CALL MSG_SETI('NREB',NREBYD)
+         CALL MSG_SETI('SPIX',SRT.MIN_YD)
+         CALL MSG_PRNT('There will be ^NYDBIN Y detector bins, of '//
+     &                     '^NREB raw pixels, starting from ^SPIX')
+*
+         SDIM(4)=NYDBIN
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=4
+*
+      ELSE
+*
+         SDIM(4)=1
+         NREBYD=1
+*
+      ENDIF
+*
+      IF ( INDEX(BIN_AXES,'5') .NE. 0) THEN
+*
+         CALL USI_GET0R('TIMBIN', TIMBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+         SDIM(5)=INT((SRT.MAX_T(SRT.NTIME)-SRT.MIN_T(1))/TIMBIN)
+*
+* Need to restrict the allowed time ranges to the new max. value.
+         SMAXT=SRT.MIN_T(1) + INT(REAL(SDIM(5))*TIMBIN)
+*
+*   Check which srt range is greater than this
+         DO LP=1,SRT.NTIME
+*
+            IF (SRT.MAX_T(LP) .GT. SMAXT) THEN
+               IF (SRT.MIN_T(LP) .LE. SMAXT) THEN
+                  SRT.MAX_T(LP) = SMAXT
+                  SRT.NTIME = LP
+                  GOTO 100
+               ELSE
+                  IF (LP.GT.1) SRT.NTIME = LP-1
+                  GOTO 100
+               ENDIF
+            ENDIF
+         ENDDO
+*
+100      CONTINUE
+*
+         CALL MSG_SETI('NTBIN',SDIM(5))
+         CALL MSG_SETR('TIMBIN',TIMBIN)
+         CALL MSG_SETR('STIM',REAL(SRT.MIN_T(1)))
+         CALL MSG_PRNT('There will be ^NTBIN Time bins, each '//
+     &                       'of ^TIMBIN seconds, starting from ^STIM')
+*
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=5
+*
+      ELSE
+         SDIM(5)=1
+      ENDIF
+*
+      IF ( INDEX(BIN_AXES,'6') .NE. 0) THEN
+*
+         CALL USI_GET0I('PHBIN', PHBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Make sure PH binsize makes sense
+         PHBIN = MAX(1,PHBIN)
+         PHBIN = MIN( (SRT.MAX_PH-SRT.MIN_PH+1), PHBIN )
+*
+*   Calculate number of PH bins in output file and recalculate maximum
+         SDIM(6)=INT((SRT.MAX_PH-SRT.MIN_PH+1)/PHBIN)
+         SRT.MAX_PH=PHBIN*SDIM(6)+SRT.MIN_PH-1
+*
+         CALL MSG_SETI('NPBIN',SDIM(6))
+         CALL MSG_SETI('PHBIN',PHBIN)
+         CALL MSG_SETI('SPH',SRT.MIN_PH)
+         CALL MSG_PRNT('There will be ^NPBIN PH bins, each '//
+     &          'of ^PHBIN raw channels, starting from ^SPH')
+*
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=6
+*
+      ELSE
+         SDIM(6)=1
+      ENDIF
+*
+      IF ( INDEX(BIN_AXES,'7') .NE. 0) THEN
+*
+         CALL USI_GET0I('ENBIN', ENBIN, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*   Make sure energy binsize makes sense
+         ENBIN = MAX(1,ENBIN)
+         ENBIN = MIN( (SRT.MAX_EN-SRT.MIN_EN+1), ENBIN )
+*
+*   Calculate number of PH bins in output file and recalculate maximum
+         SDIM(7)=INT((SRT.MAX_EN-SRT.MIN_EN+1)/ENBIN)
+         SRT.MAX_EN=ENBIN*SDIM(7)+SRT.MIN_EN-1
+*
+         CALL MSG_SETI('NEBIN',SDIM(7))
+         CALL MSG_SETI('ENBIN',ENBIN)
+         CALL MSG_SETI('SEN',SRT.MIN_EN)
+         CALL MSG_PRNT('There will be ^NEBIN energy bins, each '//
+     &          'of ^ENBIN raw channels, starting from ^SEN')
+*
+         SRT.NAXES=SRT.NAXES+1
+         SRT.BINAXIS(SRT.NAXES)=7
+*
+      ELSE
+         SDIM(7)=1
+      ENDIF
+*
+* Set number of azimuthal bins to 1 for now
+      NAZBIN=1
+*
+* Calculate the centre X and Y value in degrees
+      SRT.XCENT = - ((SRT.MIN_X + SRT.MAX_X) / 2.0 - HEAD.SKYCX) * PTOD
+      SRT.YCENT = MFACT * ((SRT.MIN_Y + SRT.MAX_Y) / 2.0 - HEAD.SKYCY)
+     &                                      * PTOD
+*
+* The outer X,Y values may have changed due to rebinning. If so
+* recalculate them.
+      IF (SDIM(1) .GT. 1 .OR. SDIM(2) .GT. 1 ) THEN
+         IF (SRT.SHAPE .NE. 'E') THEN
+            SRT.ELAMAX = ABS(SRT.MAX_X - (SRT.MIN_X + SRT.MAX_X)/2.0)
+            SRT.ELBMAX = ABS(SRT.MAX_Y - (SRT.MIN_Y + SRT.MAX_Y)/2.0)
+         ELSE
+C????            SRT.ELAMAX = SRT.ELAMAX * SRT.MAX_X / X_HWIDTH
+C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
+         ENDIF
+      ENDIF
+*
+* Calculate cos and sine of the orientation
+      SRT.COSPHI = COS(SRT.PHI)
+      SRT.SINPHI = SIN(SRT.PHI)
+
+* Calculate tot. no of elements
+      SRT.NDATA=SDIM(1)*SDIM(2)*SDIM(3)*SDIM(4)*SDIM(5)*SDIM(6)*SDIM(7)
+     &                      *NRBIN*NAZBIN
+*
+* Is a background file wanted ? Not possible if source file contains
+* radial bins.
+      IF ( INDEX(BIN_AXES,'8') .EQ. 0) THEN
+         CALL USI_GET0L('BACK', SRT.BCKGND, STATUS)
+      ELSE
+         SRT.BCKGND = .FALSE.
+      ENDIF
+*
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* Get RA and DEC of background box in degrees.
+      IF (SRT.BCKGND) THEN
+*
+         CALL USI_DEF0D('GRP_RAB', SRT.FIELD_RA, STATUS)
+	 CALL USI_DEF0D('GRP_DECB', SRT.FIELD_DEC, STATUS)
+	 CALL USI_GET0D('GRP_RAB', BSRT.FIELD_RA, STATUS)
+	 CALL USI_GET0D('GRP_DECB', BSRT.FIELD_DEC, STATUS)
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+	 CALL CONV_CONA2V( REAL(BSRT.FIELD_RA)*REAL(DTOR),
+     &                REAL(BSRT.FIELD_DEC)*REAL(DTOR), VC )
+	 DO J = 1,3
+	    VS(J) = VC(1)*CTOS(1,J)+VC(2)*CTOS(2,J)+VC(3)*CTOS(3,J)
+	 END DO
+*
+* Calculate the celestial X and Y pixels.
+	 BCKGND_X = NINT( -VS(3) / PTOR ) + HEAD.SKYCX
+	 BCKGND_Y = NINT( -VS(2) / PTOR ) * MFACT + HEAD.SKYCY
+*
+*
+* Calculate the closest background borders
+         BBORDX=MIN( ABS(BCKGND_X-HEAD.XSTART), ABS(BCKGND_X-HEAD.XEND))
+     &                                   * PTOD * 2.0
+         BBORDY=MIN( ABS(BCKGND_Y-HEAD.YSTART), ABS(BCKGND_Y-HEAD.YEND))
+     &                                   * PTOD * 2.0
+
+         BXW=-(BCKGND_X-HEAD.SKYCX)*PTOD
+         BYW=(BCKGND_Y-HEAD.SKYCY)*PTOD*MFACT
+*
+* Set background SHAPE variable
+         BSRT.SHAPE = SRT.SHAPE
+         CALL ARX_OPEN('WRITE',BSRT.ARDID,STATUS)
+
+*
+* Get extent of area depending on shape
+*
+* Import ARD file
+         IF (SRT.SHAPE .EQ. 'I') THEN
+
+           CALL ARX_READ('BARD',BSRT.ARDID,STATUS)
+
+           BX_HWIDTH=NPIX(CBORDX)
+           BY_HWIDTH=NPIX(CBORDY)
+           BSRT.PHI=0.0
+           BSRT.ELAMIN=0.0
+           BSRT.ELBMIN=0.0
+           BSRT.ELAMAX=BX_HWIDTH
+           BSRT.ELBMAX=BY_HWIDTH
+
+	 ELSEIF (SRT.SHAPE .EQ. 'R') THEN
+	    CALL USI_GET0R('GRP_BWIDTH', GRP_BWIDTH, STATUS)
+	    CALL USI_GET0R('GRP_BHEIGHT', GRP_BHEIGHT, STATUS)
+*
+*  Convert to nearest whole pixels
+	    BX_HWIDTH = NPIX(GRP_BWIDTH)
+	    BY_HWIDTH = NPIX(GRP_BHEIGHT)
+
+*  And back to world coords.
+            BXWIDW=2.0*BX_HWIDTH*PTOD
+            BYWIDW=2.0*BY_HWIDTH*PTOD
+*
+*  Check if this is a rectangular annulus
+            IF (ABS(BSRT.FIELD_RA-SRT.FIELD_RA) .LT. 0.001 .AND.
+     &          ABS(BSRT.FIELD_DEC-SRT.FIELD_DEC) .LT. 0.001) THEN
+*
+               CALL ARX_BOX(BSRT.ARDID,0,'ADD',.FALSE.,BXW,BYW,
+     :                                     BXWIDW,BYWIDW,STATUS)
+               CALL ARX_BOX(BSRT.ARDID,0,'AND',.TRUE.,XW,YW,
+     :                                     XWIDW,YWIDW,STATUS)
+
+*     Set sort parameters
+               BSRT.ELAMIN = X_HWIDTH
+               BSRT.ELBMIN = Y_HWIDTH
+               BSRT.ELAMAX = BX_HWIDTH
+               BSRT.ELBMAX = BY_HWIDTH
+*
+            ELSE
+*
+               CALL ARX_BOX(BSRT.ARDID,0,'ADD',.FALSE.,BXW,BYW,
+     :                                     BXWIDW,BYWIDW,STATUS)
+
+               BSRT.ELAMIN = 0.0
+               BSRT.ELBMIN = 0.0
+               BSRT.ELAMAX = BX_HWIDTH
+               BSRT.ELBMAX = BY_HWIDTH
+*
+            ENDIF
+*
+	 ELSEIF (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A') THEN
+*
+*     If an annulus is wanted (i.e. the centre of the background box is
+*     the same as that of the source box) then set the default for the
+*     inner radius of the background annulus to the outer radius of the
+*     source box.
+            IF (ABS(BSRT.FIELD_RA-SRT.FIELD_RA) .LT. 0.001 .AND.
+     &          ABS(BSRT.FIELD_DEC-SRT.FIELD_DEC) .LT. 0.001) THEN
+
+	       CALL USI_DEF0R('BRADINN', SRAD2, STATUS)
+               BSRT.SHAPE = 'A'
+            ELSE
+	       CALL  USI_DEF0R('BRADINN', 0.0, STATUS)
+*
+*  Calculate distance of background box centre from the edge
+            ENDIF
+*
+            CALL USI_DEF0R('BRADOUT', MIN(BBORDX,BBORDY)/2.0, STATUS)
+*
+	    CALL USI_GET0R('BRADINN', BRADIN, STATUS)
+	    CALL USI_GET0R('BRADOUT', BRADOUT, STATUS)
+*
+            IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*     Check user hasn't set the outer radius too large
+            IF (BRADOUT .GT. MIN(BBORDX,BBORDY)/2.0) THEN
+               BRADOUT = MIN(BBORDX,BBORDY)/2.0
+*
+               CALL MSG_SETR('OUT',BRADOUT)
+               CALL MSG_PRNT('Reset outer background radius to ^OUT')
+            ENDIF
+*
+
+	    BSRT.ELAMAX = REAL(NINT(BRADOUT / PTOD))
+	    BSRT.ELAMIN = REAL(NINT(BRADIN / PTOD))
+            BSRT.ELBMIN = BSRT.ELAMIN
+            BSRT.ELBMAX = BSRT.ELAMAX
+	    BX_HWIDTH = BSRT.ELAMAX
+	    BY_HWIDTH = BSRT.ELAMAX
+*
+            BIRADW=BSRT.ELAMIN*PTOD
+            BORADW=BSRT.ELAMAX*PTOD
+
+            CALL ARX_ANNULUS(BSRT.ARDID,0,'ADD',.FALSE.,BXW,BYW,
+     :                                      BIRADW,BORADW,STATUS)
+
+         ELSEIF (SRT.SHAPE .EQ. 'E') THEN
+*
+            ANNULAR= (ABS(BSRT.FIELD_RA-SRT.FIELD_RA) .LT. 0.001 .AND.
+     &          ABS(BSRT.FIELD_DEC-SRT.FIELD_DEC) .LT. 0.001)
+
+            IF (ANNULAR) THEN
+
+*     Set some parameters if background box is an annular ellipse
+*
+	       CALL USI_DEF0R('BEXINN', ELAMAX, STATUS)
+*
+*        Background orientation equals source orientation
+               BSRT.PHI = SRT.PHI
+               BANGLE=ANGLE
+
+            ELSE
+*
+*       Get orientation. +ve is anticlockwise from east
+	       CALL USI_GET0R('BORIENT', BSRT.PHI, STATUS)
+*
+	       CALL USI_DEF0R('BEXINN', 0.0, STATUS)
+*
+*       Convert the angle to radians
+               BSRT.PHI = BSRT.PHI * DTOR
+*
+            ENDIF
+*
+*      Find cos and sine of orientation
+            BSRT.COSPHI = COS(BSRT.PHI)
+            BSRT.SINPHI = SIN(BSRT.PHI)
+*
+*      Get inner value for X axis (semi-major) of ellipse
+	    CALL USI_GET0R('BEXINN', ELAMIN, STATUS)
+*
+*      Get outer radii - jumpout when they are not too big
+            JUMPOUT = .FALSE.
+            DO WHILE (.NOT. JUMPOUT)
+*
+               CALL USI_GET0R('BEXOUT', ELAMAX, STATUS)
+*
+*      Set default if poss.
+               IF (SRT.ELAMAX .GT. 0) THEN
+                  ELBMAX = SRT.ELBMAX * ELAMAX / SRT.ELAMAX
+	          CALL USI_DEF0R('BEYOUT', ELBMAX, STATUS)
+               ENDIF
+*
+               CALL USI_GET0R('BEYOUT', ELBMAX, STATUS)
+*
+               IF (STATUS .NE. SAI__OK) GOTO 999
+*
+*     Check user hasn't set the outer radii too large
+*      Get outer value for X axis (semi-major) of ellipse
+               EXMAX=SQRT((ELAMAX*BSRT.COSPHI)**2 +
+     &                                  (ELBMAX*BSRT.SINPHI)**2)
+               EYMAX=SQRT((ELAMAX*BSRT.SINPHI)**2 +
+     &                                  (ELBMAX*BSRT.COSPHI)**2)
+*
+*     Check user hasn't set the outer radii too large
+               IF (EXMAX .GT. BBORDX/2.0 .OR. EYMAX .GT. BBORDY/2.0)THEN
+                  CALL MSG_PRNT('Outer axes extend beyond the edge of '/
+     &                    /'the field - please reduce them')
+                  CALL USI_CANCL('BEXOUT', STATUS)
+                  CALL USI_CANCL('BEYOUT', STATUS)
+               ELSE
+                  JUMPOUT=.TRUE.
+               ENDIF
+            ENDDO
+*
+*      Convert to pixels
+            BSRT.ELAMIN = REAL(NINT(ELAMIN / PTOD))
+            BSRT.ELAMAX = REAL(NINT(ELAMAX / PTOD))
+            BSRT.ELBMAX = REAL(NINT(ELBMAX / PTOD))
+*
+*      Calculate the inner Y axis
+            BSRT.ELBMIN = BSRT.ELAMIN * BSRT.ELBMAX / BSRT.ELAMAX
+*
+*      Calculate maximum X and Y half widths for this ellipse
+	    BX_HWIDTH = SQRT( (BSRT.ELAMAX*BSRT.COSPHI) ** 2 +
+     &                             (BSRT.ELBMAX*BSRT.SINPHI) ** 2 )
+	    BY_HWIDTH = SQRT( (BSRT.ELAMAX*BSRT.SINPHI) ** 2 +
+     &                             (BSRT.ELBMAX*BSRT.COSPHI) ** 2 )
+*
+            BXWIDW=BSRT.ELAMAX*PTOD
+            BYWIDW=BSRT.ELBMAX*PTOD
+
+            CALL ARX_ELLIPSE(BSRT.ARDID,0,'ADD',.FALSE.,BXW,BYW,
+     :                               BXWIDW,BYWIDW,BANGLE,STATUS)
+            IF (ANNULAR) THEN
+              CALL ARX_ELLIPSE(BSRT.ARDID,0,'AND',.TRUE.,XW,YW,
+     :                                 XWIDW,YWIDW,ANGLE,STATUS)
+            ENDIF
+	 END IF
+*
+         IF (STATUS .NE. SAI__OK) GOTO 999
+*
+* If image axes have been binned calculate background box. Binning factor is
+* the same as for the source box
+*
+         IF (INDEX(BIN_AXES,'1') .NE. 0) THEN
+*
+             BDIM(1)=INT(BX_HWIDTH*2/NREBINX)
+             BSRT.MIN_X=BCKGND_X-(NREBINX*BDIM(1))/2
+             BSRT.MAX_X=BCKGND_X+NINT(REAL(NREBINX)*REAL(BDIM(1))/2.0
+     &                                 + 0.4)
+         ELSE
+             BDIM(1)=1
+             BSRT.MIN_X=BCKGND_X-BX_HWIDTH
+             BSRT.MAX_X=BCKGND_X+BX_HWIDTH
+*
+         ENDIF
+*
+* Make sure you haven't gone over the edge
+         BSRT.MIN_X = MAX(BSRT.MIN_X, HEAD.XSTART)
+         BSRT.MAX_X = MIN(BSRT.MAX_X, HEAD.XEND)
+
+         IF (INDEX(BIN_AXES,'2') .NE. 0) THEN
+*
+             BDIM(2)=INT(BY_HWIDTH*2/NREBINY)
+             BSRT.MIN_Y=BCKGND_Y-INT(REAL(NREBINY)*REAL(BDIM(2))/2.0)
+             BSRT.MAX_Y=BCKGND_Y+NINT(REAL(NREBINY)*REAL(BDIM(2))/2.0
+     &                                    + 0.4)
+*
+         ELSE
+             BDIM(2)=1
+             BSRT.MIN_Y=BCKGND_Y-BY_HWIDTH
+             BSRT.MAX_Y=BCKGND_Y+BY_HWIDTH
+
+         ENDIF
+*
+* Make sure you haven't gone over the edge
+         BSRT.MIN_Y = MAX(BSRT.MIN_Y, HEAD.YSTART)
+         SRT.MAX_Y = MIN(SRT.MAX_Y, HEAD.YEND)
+
+* Set time and sumsig for background same as source.
+         BSRT.MIN_XD=SRT.MIN_XD
+         BSRT.MIN_YD=SRT.MIN_YD
+         BSRT.MIN_PH=SRT.MIN_PH
+         BSRT.MIN_EN=SRT.MIN_EN
+*
+         BSRT.MAX_XD=SRT.MAX_XD
+         BSRT.MAX_YD=SRT.MAX_YD
+         BSRT.MAX_PH=SRT.MAX_PH
+         BSRT.MAX_EN=SRT.MAX_EN
+*
+         BSRT.NTIME = SRT.NTIME
+*
+         DO LP=1,BSRT.NTIME
+            BSRT.MIN_T(LP)=SRT.MIN_T(LP)
+            BSRT.MAX_T(LP)=SRT.MAX_T(LP)
+         ENDDO
+*
+         BDIM(3)=SDIM(3)
+         BDIM(4)=SDIM(4)
+         BDIM(5)=SDIM(5)
+         BDIM(6)=SDIM(6)
+         BDIM(7)=SDIM(7)
+*
+*  Set axes components the same as for source
+         BSRT.NAXES=SRT.NAXES
+*
+         DO LP=1,8
+            BSRT.BINAXIS(LP)=SRT.BINAXIS(LP)
+         ENDDO
+*
+* Calculate the centre X and Y value in degrees
+         BSRT.XCENT = - ((BSRT.MIN_X + BSRT.MAX_X) / 2.0 - HEAD.SKYCX)
+     &                                                        * PTOD
+         BSRT.YCENT = ((BSRT.MIN_Y + BSRT.MAX_Y) / 2.0 - HEAD.SKYCY)
+     &                * PTOD * MFACT
+*
+* The outer X,Y values may have changed due to rebinning. If so
+* recalculate them
+         IF (SDIM(1) .GT. 1 .OR. SDIM(2) .GT. 1) THEN
+            IF (BSRT.SHAPE .NE. 'E') THEN
+               BSRT.ELAMAX = ABS(BSRT.MAX_X - (BSRT.MIN_X +
+     &                                          BSRT.MAX_X)/2.0)
+               BSRT.ELBMAX = ABS(BSRT.MAX_Y - (BSRT.MIN_Y +
+     &                                          BSRT.MAX_Y)/2.0)
+            ELSE
+               BSRT.ELAMAX = BSRT.ELAMAX * ABS(BSRT.MAX_X -
+     &             (BSRT.MIN_X + BSRT.MAX_X) / 2.0 ) / BX_HWIDTH
+               BSRT.ELBMAX = BSRT.ELBMAX * ABS(BSRT.MAX_X -
+     &             (BSRT.MIN_X + BSRT.MAX_X) / 2.0 ) / BX_HWIDTH
+            ENDIF
+         ENDIF
+*
+* Calculate cos and sine of the orientation
+         BSRT.COSPHI = COS(BSRT.PHI)
+         BSRT.SINPHI = SIN(BSRT.PHI)
+*
+      ELSE
+*
+*  Set background dimensions to one
+         DO LP=1,7
+            BDIM(LP)=1
+         ENDDO
+      ENDIF
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRTSORT_RANGESELECT',STATUS)
+      ENDIF
+*
+      END
+
+
+
+*+XRTSORT_SORT_BIN- Sorts rationalised XRT raw data into a binned data array
+      SUBROUTINE XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM1, SDIM2,
+     &           SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDIM1,
+     &           BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
+     &           NRBIN, NAZBIN, MDIM1,MDIM2,MRES,SMASK, BMASK,
+     &           ELIPA2, ELIPB2, SDATA, BDATA, SQUAL, BQUAL, STATUS)
+*    Description :
+*        Sorts events from an XRT hds event datafile into a temporary
+*       array of 7 dimensions.
+*    History :
+*     2-Nov-1988   original (LTVAD::RDS)
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'QUAL_PAR'
+*    Global parameters
+*     ROOTNAME  - hds events filename
+*     DIFFILE   - hds diff events filename
+*    Status :
+      INTEGER STATUS
+*    Structures :
+      INCLUDE 'INC_XRTSRT'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_HEAD/ HEAD                      ! Header values
+*
+      RECORD /XRT_SCFDEF/ SRT                     ! Source sorting parameters
+      RECORD /XRT_SCFDEF/ BSRT                    ! Bckgnd sorting parameters
+      INTEGER SDIM1,SDIM2,SDIM3,SDIM4,SDIM5       ! Dimensions of source array
+      INTEGER SDIM6,SDIM7                         ! Dimensions of source array
+      INTEGER BDIM1,BDIM2,BDIM3,BDIM4,BDIM5       ! Dimensions of bckgnd array
+      INTEGER BDIM6,BDIM7                         ! Dimensions of bckgnd array
+      INTEGER NRBIN                               ! Number of radial bins
+      INTEGER NAZBIN                              ! Number of azimuthal bins
+      INTEGER MDIM1,MDIM2			  ! Dimensions of spatial mask
+      REAL MRES					  ! Resolution of mask
+      INTEGER SMASK(MDIM1,MDIM2)                  ! Source spatial mask
+      INTEGER BMASK(MDIM1,MDIM2)                  ! Bckgnd spatial mask
+*
+*    Import-Export :
+      REAL ELIPA2(NRBIN)                          ! Square of elliptical
+                                                  ! X axes (for each rad. bin)
+      REAL ELIPB2(NRBIN)                          ! Square of elliptical Y axes
+      REAL SDATA(SDIM1,SDIM2,SDIM3,SDIM4,SDIM5,SDIM6,SDIM7)  ! S array
+      REAL BDATA(BDIM1,BDIM2,BDIM3,BDIM4,BDIM5,BDIM6,BDIM7)  ! b array
+      BYTE SQUAL(SDIM1,SDIM2,SDIM3,SDIM4,SDIM5,SDIM6,SDIM7)  ! S quality
+      BYTE BQUAL(BDIM1,BDIM2,BDIM3,BDIM4,BDIM5,BDIM6,BDIM7)  ! B quality
+*    Export :
+*    Functions :
+      INTEGER CHR_LEN
+         EXTERNAL CHR_LEN
+*    Local constants :
+      INTEGER MAXBAD
+         PARAMETER (MAXBAD=1000)                  ! Max no. of bad time periods
+*    Local variables :
+      CHARACTER*20 EXT                            ! File extension name
+      CHARACTER*80 DNAME                    ! Names of files
+      REAL STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
+      REAL XWIDTH,YWIDTH,TWIDTH,EWIDTH,PWIDTH     ! Binwidth of each axis
+      REAL BXWIDTH,BYWIDTH                        ! Binwidth in backgnd box
+      REAL XDWID,YDWID                            ! Width of detector axes
+      REAL ELAWID,ELBWID                          ! Binwidth of elliptic axes
+      REAL T1,T2                                  ! Lower and upper limits of
+*                                                 ! a time bin
+      INTEGER NBAD                                ! Number of bad time ranges
+      INTEGER TLP,LP1,LP2,LP3,LP4,LP6,LP7,INLP,LP
+      INTEGER BADEV                               ! No of events in hotspots
+      LOGICAL QVAL
+      CHARACTER*(DAT__SZLOC) ELOC,DLOC          ! Locators to datafiles
+      CHARACTER*(DAT__SZLOC) LOCA(7),SLOCA(7)   ! Locators to data arrays
+      INTEGER PTRA(7),NELEMS     ! Pointer to mapped arrays and item count
+      INTEGER IX,UPPER,LOWER     ! number of indexes and ranges
+*
+* Set events in hotspots counter to zero
+      BADEV = 0
+*
+* Calculate bin widths for each axis. NB: SDIM1 can refer to the no. of
+* radial bins.
+      IF (NRBIN .EQ. 1) THEN
+         XWIDTH = (SRT.MAX_X - SRT.MIN_X + 1) / REAL(SDIM1)
+         YWIDTH = (SRT.MAX_Y - SRT.MIN_Y + 1) / REAL(SDIM2)
+      ELSE
+         XWIDTH = (SRT.MAX_X - SRT.MIN_X + 1) / 1.0
+         YWIDTH = (SRT.MAX_Y - SRT.MIN_Y + 1) / 1.0
+      ENDIF
+*
+      IF (SDIM1 .EQ. 1 .AND. SDIM2 .EQ. 1) THEN
+         BXWIDTH = (BSRT.MAX_X - BSRT.MIN_X + 1) / REAL(BDIM1)
+         BYWIDTH = (BSRT.MAX_Y - BSRT.MIN_Y + 1) / REAL(BDIM2)
+      ELSE
+         BXWIDTH=XWIDTH
+         BYWIDTH=YWIDTH
+      ENDIF
+*
+      XDWID = (SRT.MAX_XD - SRT.MIN_XD + 1) / REAL(SDIM3)
+      YDWID = (SRT.MAX_YD - SRT.MIN_YD + 1) / REAL(SDIM4)
+      TWIDTH = (SRT.MAX_T(SRT.NTIME) - SRT.MIN_T(1)) / REAL(SDIM5)
+      PWIDTH = (SRT.MAX_PH - SRT.MIN_PH + 1) / REAL(SDIM6)
+      EWIDTH = (SRT.MAX_EN - SRT.MIN_EN + 1) / REAL(SDIM7)
+*
+* Generate the squares of the elliptical minor and major axes
+* for each radial bin (Max values).
+      IF (NRBIN .GT. 1) THEN
+*   Calculate binwidths for elliptical minor and major axes
+         ELAWID = (SRT.ELAMAX - SRT.ELAMIN) / REAL(NRBIN)
+         ELBWID = (SRT.ELBMAX - SRT.ELBMIN) / REAL(NRBIN)
+*
+         DO LP=1,NRBIN
+            ELIPA2(LP) = (SRT.ELAMIN + (LP) * ELAWID) **2
+            ELIPB2(LP) = (SRT.ELBMIN + (LP) * ELBWID) **2
+         ENDDO
+      ENDIF
+*
+*    Open observation event file STDEVT
+      CALL RAT_HDLOOKUP(HEAD,'STDEVT','EXTNAME',EXT,STATUS)
+      CALL HDS_OPEN(SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT,
+     &              'READONLY',ELOC,STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 999
+
+***   Generate index into events
+C     CALL RAT_INDX_COORD(HEAD,SRT,BSRT,EINDEX,STATUS)
+
+***   Open quality file if wanted and get array of bad times for this obs.
+      IF (SRT.QUAL_MORE .OR. SRT.QUAL_LESS) THEN
+C         CALL XRTSORT_BADTIME(SRT,OBS,MAXBAD,NBAD,STBAD,ENBAD,STATUS)
+C         IF (STATUS .NE. SAI__OK) GOTO 999
+      ENDIF
+
+***   Have the quality constraints been relaxed ?
+      IF (SRT.QUAL_LESS) THEN
+
+***      Open observation diff evenfile
+         CALL RAT_HDLOOKUP(HEAD,'REJEVT','EXTNAME',EXT,STATUS)
+         CALL USI_DEF0C('DIFFILE',SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))
+     &                  //EXT,STATUS)
+         CALL USI_GET0C('DIFFILE',DNAME,STATUS)
+         CALL HDS_OPEN(DNAME,'READONLY',DLOC,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+      ENDIF
+
+***   Locate the various data arrays
+      CALL RAT_FINDEVE(HEAD.ORIGIN,HEAD.DETECTOR,ELOC,LOCA,STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 999
+
+***   For each index entry
+      DO IX = 1,1
+         LOWER = 1
+         UPPER = HEAD.IEVTNU
+
+***      map the event data arrays into memory
+         CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
+     &      NELEMS,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+
+***      Check them against the sort parameters
+         CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),%val(PTRA(2)),
+     &      %val(PTRA(3)), %val(PTRA(4)), %val(PTRA(5)), %val(PTRA(6)),
+     &      %val(PTRA(7)), NELEMS, SDATA, SDIM1, SDIM2,
+     &      SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
+     &      BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
+     &      MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &      SRT.QUAL_MORE, MAXBAD, NBAD, STBAD, ENBAD, XWIDTH, YWIDTH,
+     &      XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
+     &      BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
+
+***      unmap the arrays & memory
+         CALL RAT_UNMAPEVE(SLOCA, STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+      ENDDO
+
+***   annul the array locators
+      CALL RAT_ANNULEVE(LOCA, STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 999
+
+***   Same for the diff data?
+      IF (SRT.QUAL_LESS) THEN
+***      Locate the various data arrays
+         CALL RAT_FINDEVE(HEAD.ORIGIN,HEAD.DETECTOR,DLOC,LOCA,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+
+***      Find the size of the diff events
+         CALL CMP_SIZE(DLOC,'TIME',UPPER,STATUS)
+         DO IX = 1,1
+            LOWER = 1
+
+***         map the diff event data arrays into memory
+            CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
+     &         NELEMS,STATUS)
+            IF (STATUS.NE.SAI__OK) GOTO 999
+
+***         Check them against the sort parameters
+            CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),
+     &         %val(PTRA(2)),
+     &         %val(PTRA(3)),%val(PTRA(4)),%val(PTRA(5)), %val(PTRA(6)),
+     &         %val(PTRA(7)), NELEMS, SDATA, SDIM1, SDIM2,
+     &         SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
+     &         BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
+     &         MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &         SRT.QUAL_MORE, MAXBAD, NBAD,STBAD, ENBAD, XWIDTH, YWIDTH,
+     &         XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
+     &         BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
+
+***         unmap the arrays & memory
+            CALL RAT_UNMAPEVE(SLOCA, STATUS)
+            IF (STATUS.NE.SAI__OK) GOTO 999
+         ENDDO
+
+***      annul the array locators
+         CALL RAT_ANNULEVE(LOCA, STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+      ENDIF
+
+      IF ( INDEX(HEAD.DETECTOR, 'HRI') .NE. 0) THEN
+         CALL MSG_SETI('BAD', BADEV)
+         CALL MSG_PRNT('Rejected ^BAD events found in '/
+     &                                /'hotspots/deadspots')
+      ENDIF
+
+***  Set quality values for each pixel
+***   Loop over each time bin
+      DO TLP=1,SDIM5
+***      Calculate lower and upper times of this bin
+         T1=SRT.MIN_T(1) + TWIDTH * (TLP-1.0)
+         T2=SRT.MIN_T(1) + TWIDTH * TLP
+
+***      Test if this bin was within any of the on times of the instrument
+***      Set the quality value to 0 if the bin is good or 1 if it is bad.
+         QVAL=.FALSE.
+         DO INLP=1,HEAD.NTRANGE
+            IF (HEAD.TSTART(INLP).LT.T2.AND.
+     &                         HEAD.TEND(INLP).GT.T1) THEN
+               QVAL = .TRUE.
+               GOTO 100
+            ENDIF
+         ENDDO
+
+100      CONTINUE
+
+***      If the time is within the pre-selection windows - check if it
+***      is within the windows selected in XSORT
+         IF (QVAL) THEN
+*
+            QVAL=.FALSE.
+            DO INLP=1,SRT.NTIME
+               IF ( SRT.MIN_T(INLP) .LT. T2 .AND.
+     &                         SRT.MAX_T(INLP) .GT. T1 ) THEN
+                  QVAL = .TRUE.
+                  GOTO 110
+               ENDIF
+            ENDDO
+         ENDIF
+*
+110      CONTINUE
+*
+*     Loop over the remaining dimensions of the source and background arrays
+         DO LP7=1,SDIM7
+           DO LP6=1,SDIM6
+            DO LP4=1,SDIM4
+             DO LP3=1,SDIM3
+
+*       If an image then use spatial mask as well
+               IF (SDIM1.GT.1.AND.SDIM2.GT.1.AND.NRBIN.EQ.1) THEN
+                 DO LP2=1,SDIM2
+                    DO LP1=1,SDIM1
+                       IF (.NOT. QVAL .OR. SMASK(LP1,LP2).EQ.0) THEN
+                         SQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=
+     :                                                  QUAL__MISSING
+                       ENDIF
+                    ENDDO
+                 ENDDO
+               ELSE
+                 DO LP2=1,SDIM2
+                    DO LP1=1,SDIM1
+                       IF (.NOT. QVAL) THEN
+                         SQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=
+     :                                                  QUAL__MISSING
+                       ENDIF
+                    ENDDO
+                 ENDDO
+               ENDIF
+***            Background quality
+               IF (SRT.BCKGND) THEN
+                 IF (BDIM1.GT.1.AND.BDIM2.GT.1.AND.NRBIN.EQ.1) THEN
+                   DO LP2=1,BDIM2
+                     DO LP1=1,BDIM1
+                       IF (.NOT. QVAL .OR. BMASK(LP1,LP2).EQ.0) THEN
+                         BQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=
+     :                                                QUAL__MISSING
+                       ENDIF
+                     ENDDO
+                   ENDDO
+                 ELSE
+                   DO LP2=1,BDIM2
+                     DO LP1=1,BDIM1
+                       IF (.NOT. QVAL) THEN
+                         BQUAL(LP1,LP2,LP3,LP4,TLP,LP6,LP7)=
+     :                                                QUAL__MISSING
+                       ENDIF
+                     ENDDO
+                   ENDDO
+                 ENDIF
+               ENDIF
+
+            ENDDO
+           ENDDO
+          ENDDO
+         ENDDO
+      ENDDO
+
+***   Close any opened files
+      CALL HDS_CLOSE(ELOC, STATUS)
+      IF (SRT.QUAL_LESS) CALL HDS_CLOSE(DLOC, STATUS)
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRTSORT_SORT_BIN',STATUS)
+      ENDIF
+*
+      END
+
+
+*+XRTSORT_DOIT_BIN     checks mapped events against sort parameters
+      SUBROUTINE XRTSORT_DOIT_BIN(HEAD, SRT, BSRT, TIME, XPIX, YPIX,
+     &              XDET,
+     &              YDET, AMPL, CAMPL, NELEMS, SDATA, SDIM1, SDIM2,
+     &              SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
+     &              BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
+     &              MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &              QCHECK, MAXBAD, NBAD, STBAD, ENBAD, XWIDTH, YWIDTH,
+     &              XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
+     &              BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
+*    Description :
+*    Type definitions :
+      IMPLICIT NONE
+*    Structure definitions :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'INC_XRTSRT'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_HEAD/ HEAD            ! HEADER values
+      RECORD /XRT_SCFDEF/ SRT, BSRT     ! Sort parameters
+      INTEGER NELEMS			! length of data arrays
+      DOUBLE PRECISION TIME(NELEMS)     ! Event times
+      INTEGER XPIX(NELEMS), YPIX(NELEMS)  ! Array of coordinates
+      INTEGER XDET(NELEMS), YDET(NELEMS)  ! Array of detector coords
+      INTEGER AMPL(NELEMS), CAMPL(NELEMS) ! Array of photon events
+      INTEGER SDIM1, SDIM2, SDIM3, SDIM4, SDIM5, SDIM6, SDIM7
+      INTEGER BDIM1, BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7
+      LOGICAL QCHECK                    ! Check quality of each event
+      INTEGER MAXBAD,NBAD               ! Dimension & NUMBER of bad arrays
+      REAL STBAD(MAXBAD),ENBAD(MAXBAD)  ! Start & End times of bad data
+      REAL XWIDTH,YWIDTH,TWIDTH,PWIDTH,EWIDTH     ! Bin widths of axes
+      REAL XDWID,YDWID                  ! Bin widths of detector axes
+      REAL BXWIDTH, BYWIDTH             ! Width of bckgnd im pixels
+      INTEGER NRBIN                     ! Number of output radial bins
+      INTEGER NAZBIN                    ! Number of output azim. bins
+      REAL ELIPA2(NRBIN),ELIPB2(NRBIN)  ! Squares of elliptic axes
+      INTEGER MDIM1,MDIM2		! Dimensions of spatial mask
+      REAL MRES				! Resolution of mask
+      INTEGER SMASK(MDIM1,MDIM2)	! Source mask
+      INTEGER BMASK(MDIM1,MDIM2)	! Background mask
+*    Import-Export :
+      REAL SDATA(SDIM1,SDIM2,SDIM3,SDIM4,SDIM5,SDIM6,SDIM7)   ! Source array
+      REAL BDATA(BDIM1,BDIM2,BDIM3,BDIM4,BDIM5,BDIM6,BDIM7)   ! Source array
+      INTEGER BADEV                               ! No of events in hotspots
+*    Functions :
+      LOGICAL XRT_HSPOT
+        EXTERNAL XRT_HSPOT
+*    Local constants :
+*    Local variables :
+      INTEGER BLP,TLP
+      INTEGER XEV,YEV,XDEV,YDEV,AEV,CEV
+      DOUBLE PRECISION TEV,BSCTIM
+      INTEGER EL1,EL2,EL3,EL4,EL5,EL6,EL7
+      INTEGER MEL1,MEL2
+      INTEGER SCEN_X,SCEN_Y                  ! Centre pixel position of src box
+      INTEGER BCEN_X,BCEN_Y                  ! Centre pixel position of bck box
+      INTEGER SAVE_YMIN,SAVE_YMAX
+*
+      REAL SAMIN2,SAMAX2,SBMIN2,SBMAX2       ! Squares of the min. and max.
+*                                            ! values for the source ellip axes.
+      REAL BAMIN2,BAMAX2,BBMIN2,BBMAX2       !    Same for the background.
+      REAL SA2B2I,SA2B2O                     ! Product of the squares of the
+*                                            ! inner and outer source axes
+      REAL BA2B2I,BA2B2O                     ! Product of the squares of the
+*                                            ! inner and outer background axes
+      REAL SDIFFX,SDIFFY                     ! X,Y offset from box centre (pix)
+      REAL BDIFFX,BDIFFY                     !    Same for the background
+      REAL SELPX,SELPY                       ! X,Y position in elliptical cords
+      REAL BELPX,BELPY                       !   same for the background box
+      REAL SELPX2,SELPY2                     ! Square of the photon X,Y pos.
+*                                            ! in source box elliptical coords
+      REAL BELPX2,BELPY2                     ! Square of the photon X,Y pos.
+*                                            ! in bckgnd box elliptical coords
+      REAL SCPHI,SSPHI                       ! Cos and Sine of src angle
+      REAL BCPHI,BSPHI                       ! Cos and Sine of bck angle
+*
+      LOGICAL LHRI                           ! Is it an HRI file ?
+      LOGICAL TOK                            ! Is this event within time ranges?
+      LOGICAL OK
+      LOGICAL MOK			     ! Event within masked region
+      INTEGER IX,YMAX                        ! Counter
+*-
+      SAVE_YMIN = SRT.MIN_Y
+      SAVE_YMAX = SRT.MAX_Y
+
+      YMAX = HEAD.YEND
+
+C      IF (.NOT. LMPE) THEN
+C         SRT.MIN_Y = YMAX - SRT.MIN_Y + 1
+C         SRT.MAX_Y = YMAX - SRT.MAX_Y + 1
+C      ENDIF
+
+***   Test if this is an HRI file
+      IF (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0) LHRI = .TRUE.
+
+***   Calculate the pixel centres of each box
+      SCEN_X = (SRT.MIN_X + SRT.MAX_X) / 2.0
+      SCEN_Y = (SRT.MIN_Y + SRT.MAX_Y) / 2.0
+      BCEN_X = (BSRT.MIN_X + BSRT.MAX_X) / 2.0
+      BCEN_Y = (BSRT.MIN_Y + BSRT.MAX_Y) / 2.0
+
+      BSCTIM = HEAD.BASE_SCTIME
+
+***   Calculate the squares of the elliptical axis - if any
+      IF (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
+     &                              SRT.SHAPE .EQ. 'E') THEN
+         SAMIN2 = SRT.ELAMIN **2
+         SAMAX2 = SRT.ELAMAX **2
+         SBMIN2 = SRT.ELBMIN **2
+         SBMAX2 = SRT.ELBMAX **2
+         BAMIN2 = BSRT.ELAMIN **2
+         BAMAX2 = BSRT.ELAMAX **2
+         BBMIN2 = BSRT.ELBMIN **2
+         BBMAX2 = BSRT.ELBMAX **2
+
+***      Calculate the product of the squares of the two elliptical axes
+         SA2B2I = SAMIN2 * SBMIN2
+         SA2B2O = SAMAX2 * SBMAX2
+         BA2B2I = BAMIN2 * BBMIN2
+         BA2B2O = BAMAX2 * BBMAX2
+
+***      Set a local cos and sin of the orientation angle for speed
+         SCPHI = SRT.COSPHI
+         SSPHI = SRT.SINPHI
+         BCPHI = BSRT.COSPHI
+         BSPHI = BSRT.SINPHI
+      ENDIF
+
+***   Loop over each element in arrays
+      DO IX = 1,NELEMS
+***      Copy event to simpler variables
+         TEV = TIME(IX) - BSCTIM
+         XEV = XPIX(IX)
+         YEV = YPIX(IX)
+         XDEV = XDET(IX)
+         YDEV = YDET(IX)
+         AEV = AMPL(IX)
+         CEV = CAMPL(IX)
+***      Fix for HRI no corrected events. set to value '1'
+         IF (LHRI) CEV = 1
+
+***      Check if this event is from an HRI hotspot or deadspot
+         IF (.NOT. LHRI .OR. XRT_HSPOT(HEAD, XEV, YEV)) THEN
+
+***         If the source box is circular, annular or elliptical, calculate
+***         various numbers.
+            IF (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
+     &                              SRT.SHAPE .EQ. 'E') THEN
+
+***             calculate the offset in X and Y celestial pixels from the
+***             source box centre
+                SDIFFX = XEV - SCEN_X
+                SDIFFY = YEV - SCEN_Y
+
+***             calculate the position in elliptical coordinates - source box
+***             NB: This also handles circles
+                SELPX = SDIFFX * SCPHI + SDIFFY * SSPHI
+                SELPY = - SDIFFX * SSPHI + SDIFFY * SCPHI
+                SELPX2 = SELPX * SELPX
+                SELPY2 = SELPY * SELPY
+
+***             calculate the position in elliptical coordinates - backgnd box
+                IF (SRT.BCKGND) THEN
+
+
+***                calculate the offset in X and Y celestial pixels from the
+***                background box centre
+                   BDIFFX = XEV - BCEN_X
+                   BDIFFY = YEV - BCEN_Y
+
+                   BELPX = BDIFFX * BCPHI + BDIFFY * BSPHI
+                   BELPY = - BDIFFX * BSPHI + BDIFFY * BCPHI
+                   BELPX2 = BELPX * BELPX
+                   BELPY2 = BELPY * BELPY
+
+                ENDIF
+             ENDIF
+
+***          Check if each event is within the ranges selected
+***          Time range:
+             TOK = .FALSE.
+             DO TLP=1,SRT.NTIME
+                IF (SRT.MIN_T(TLP) .LE. TEV .AND. SRT.MAX_T(TLP)
+     &                      .GE. TEV) THEN
+                   TOK = .TRUE.
+                   GOTO 100
+                ENDIF
+             ENDDO
+*
+100          CONTINUE
+*
+             IF (TOK) THEN
+*
+             IF (SRT.MIN_PH .LE. AEV .AND.SRT.MAX_PH .GE. AEV) THEN
+*
+             IF (SRT.MIN_EN .LE. CEV .AND.SRT.MAX_EN .GE. CEV) THEN
+*
+             IF (SRT.MIN_XD .LE. XDEV .AND.SRT.MAX_XD .GE. XDEV) THEN
+*
+             IF (SRT.MIN_YD .LE. YDEV .AND.SRT.MAX_YD .GE. YDEV) THEN
+*
+*     If quality limits have been made more strict then check quality
+               OK = .TRUE.
+*
+               IF (QCHECK) THEN
+*
+*         See if this time is within one of the bad times
+                  DO BLP=1,NBAD
+                     IF (TEV .GE. STBAD(BLP) .AND.
+     &                                      TEV .LE. ENBAD(BLP)) THEN
+*           Set flag false and exit loop
+                        OK=.FALSE.
+                        GOTO 10
+                     ENDIF
+                  ENDDO
+*
+10                CONTINUE
+*
+               ENDIF
+*
+               IF (OK) THEN
+*
+*             Check if event is within the source box. Circles are tested
+*             as a special case of the elliptical box
+                  IF ( (SRT.SHAPE .EQ. 'R' .AND.
+     &              (SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV) .AND.
+     &              (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
+     &                                  .OR.
+     &              ( (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
+     &                              SRT.SHAPE .EQ. 'E') .AND.
+     &              ((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I .AND.
+     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))
+     &                       .OR.SRT.SHAPE.EQ.'I') THEN
+*
+*             Calculate position of data in array
+*               The first two dimensions of the array can be either
+*               X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
+*               the user selection.
+                    IF (SDIM1.GT.1.AND.SDIM2.GT.1.AND.NRBIN.EQ.1) THEN
+*
+*                 X,Y bins:
+                      EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
+*
+*                 Calculate Y element according to orientation of raw pixels
+                      IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                         EL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
+                      ELSE
+                         EL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
+                      ENDIF
+                      MEL1=EL1
+                      MEL2=EL2
+*
+                    ELSE
+
+*                   No spatial axes
+                      IF (SDIM1.EQ.1.AND.SDIM2.EQ.1) THEN
+
+                        EL1=1
+                        EL2=1
+
+*                   Radial distribution
+                      ELSE
+
+*                 Calculate the radial (and azimuthal) bin by checking
+*                 each bin individually (how else ??)
+                        DO EL1=1,NRBIN
+*
+                           IF (( SELPX2 / ELIPA2(EL1) +
+     &                         SELPY2 / ELIPB2(EL1) ) .LE. 1.0) GOTO 110
+                        ENDDO
+*
+*                 This error message should never be activated
+                        CALL MSG_PRNT('Error calculating elliptical - '/
+     &                             /'bin refer to author')
+*
+110                     CONTINUE
+*
+*                 Set azimuthal bin to zero for now
+                        EL2=1
+*
+                      ENDIF
+
+*                   Find position within spatial mask
+                      MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+                      IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                        MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+                      ELSE
+                        MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
+                      ENDIF
+
+
+                    ENDIF
+*
+*               Calculate the other elements
+                    EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
+                    EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
+                    EL5=MIN((INT((TEV-SRT.MIN_T(1))/TWIDTH) + 1), SDIM5)
+                    EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
+                    EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
+*
+                    IF (SRT.SHAPE.EQ.'I') THEN
+                      MOK=(SMASK(MEL1,MEL2).NE.0)
+                    ELSE
+                      MOK=.TRUE.
+                    ENDIF
+
+                    IF (MOK) THEN
+                      SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
+     &                      SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
+                    ENDIF
+*
+                   ENDIF
+
+*             Check if event is within the background box
+                   IF ( SRT.BCKGND .AND. (BSRT.SHAPE .EQ. 'R' .AND.
+     &             (BSRT.MIN_X .LE. XEV .AND. BSRT.MAX_X .GE. XEV) .AND.
+     &             (BSRT.MIN_Y .LE. YEV .AND. BSRT.MAX_Y .GE. YEV))
+     &                             .OR.
+     &             ( (BSRT.SHAPE .EQ. 'C' .OR. BSRT.SHAPE .EQ. 'A' .OR.
+     &                              BSRT.SHAPE .EQ. 'E') .AND.
+     &             ( (BELPX2*BBMIN2 + BELPY2*BAMIN2) .GE. BA2B2I .AND.
+     &               (BELPX2*BBMAX2 + BELPY2*BAMAX2) .LE. BA2B2O)
+     &                             .OR.BSRT.SHAPE.EQ.'I')) THEN
+*
+*                Calculate position of data in array
+*                NB: no polar bins in background
+                      IF (BDIM1.GT.1.AND.BDIM2.GT.1) THEN
+                        EL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
+
+*                 Calculate Y element depending on orientation of raw pixels
+                        IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                           EL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
+                        ELSE
+                           EL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
+                        ENDIF
+*
+                        MEL1=EL1
+                        MEL2=EL2
+
+                      ELSE
+
+                        EL1=1
+                        EL2=1
+
+*                   Find position within spatial mask
+                        MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+                        IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                          MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+                        ELSE
+                          MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
+                        ENDIF
+
+                      ENDIF
+
+                      EL3=INT((XDEV-BSRT.MIN_XD)/XDWID) + 1
+                      EL4=INT((YDEV-BSRT.MIN_YD)/YDWID) + 1
+                      EL5=INT((TEV-BSRT.MIN_T(1))/TWIDTH) + 1
+                      EL6=INT((AEV-BSRT.MIN_PH)/PWIDTH) + 1
+                      EL7=INT((CEV-BSRT.MIN_EN)/EWIDTH) + 1
+*
+                      IF (BSRT.SHAPE.EQ.'I') THEN
+                        MOK=(BMASK(MEL1,MEL2).NE.0)
+                      ELSE
+                        MOK=.TRUE.
+                      ENDIF
+
+                      IF (MOK) THEN
+                        BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
+     &                   BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
+                      ENDIF
+
+                   ENDIF
+                ENDIF
+              ENDIF
+            ENDIF
+           ENDIF
+           ENDIF
+           ENDIF
+          ELSE
+            BADEV = BADEV + 1
+          ENDIF      ! Hotspot ?
+      ENDDO       ! Loop over all records in map
+*
+999   CONTINUE
+*
+      SRT.MIN_Y = SAVE_YMIN
+      SRT.MAX_Y = SAVE_YMAX
+*
+      END
+
+*+XRTSORT_SORT_EVE - Sorts XRT data into a binned data array
+      SUBROUTINE XRTSORT_SORT_EVE(HEAD,SRT,BSRT,MAXLIM, EVE_X, EVE_Y,
+     &                 EVE_XD, EVE_YD, EVE_T, EVE_P, EVE_E, BEVE_X,
+     &                 BEVE_Y, BEVE_XD, BEVE_YD, BEVE_T,
+     &                 BEVE_P, BEVE_E, TOTEV_SRC, TOTEV_BCK, STATUS)
+*    Description :
+*        Sorts raw events from an XRT event datafile into event lists
+*    History :
+*     2-Nov-1988   original (LTVAD::RDS)
+*     6-May-1993   now uses double prec. time lists (RDS)
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Status :
+      INTEGER STATUS
+*    Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_SCFDEF/ SRT,BSRT                ! Sort control structures
+      RECORD /XRT_HEAD/ HEAD
+      INTEGER MAXLIM                              ! Maximum number of events
+*    Import-Export :
+      REAL EVE_X(MAXLIM)
+      REAL EVE_Y(MAXLIM)
+      INTEGER EVE_XD(MAXLIM)
+      INTEGER EVE_YD(MAXLIM)
+      DOUBLE PRECISION EVE_T(MAXLIM)
+      INTEGER EVE_P(MAXLIM)
+      INTEGER EVE_E(MAXLIM)
+      REAL BEVE_X(MAXLIM)
+      REAL BEVE_Y(MAXLIM)
+      INTEGER BEVE_XD(MAXLIM)
+      INTEGER BEVE_YD(MAXLIM)
+      DOUBLE PRECISION BEVE_T(MAXLIM)
+      INTEGER BEVE_P(MAXLIM)
+      INTEGER BEVE_E(MAXLIM)
+*    Export :
+      INTEGER TOTEV_SRC, TOTEV_BCK                ! Number of events put into
+*                                                 ! source and bckgnd lists.
+*    Functions :
+      INTEGER CHR_LEN
+         EXTERNAL CHR_LEN
+*    Local constants :
+      INTEGER MAXBAD
+         PARAMETER (MAXBAD=1000)                  ! Max no. of bad time periods
+*    Local variables :
+      CHARACTER*20 EXT
+      REAL STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
+      INTEGER NBAD                                ! Number of bad time periods
+      INTEGER BADEV                               ! Number of pixels in hotspots
+      CHARACTER*80 DNAME                    ! Names of files
+      CHARACTER*(DAT__SZLOC) ELOC,DLOC          ! Locators to datafiles
+      CHARACTER*(DAT__SZLOC) LOCA(7),SLOCA(7)   ! Locators to data arrays
+      INTEGER PTRA(7),NELEMS     ! Pointer to mapped arrays and item count
+      INTEGER IX,UPPER,LOWER     ! number of indexes and ranges
+*
+*-
+***   Initialise hotspot counter
+      BADEV = 0
+*
+*    Open observation event file STDEVT from INC_RDF
+      CALL RAT_HDLOOKUP(HEAD,'STDEVT','EXTNAME',EXT,STATUS)
+      CALL HDS_OPEN(SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT,
+     &              'READONLY',ELOC,STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 999
+
+***   Generate index into events
+C     CALL RAT_INDX_COORD(HEAD,SRT,BSRT,INDEX,STATUS)
+
+***   Open quality file if wanted and get array of bad times for this obs.
+      IF (SRT.QUAL_MORE .OR. SRT.QUAL_LESS) THEN
+C         CALL XRTSORT_BADTIME(SRT,OBS,MAXBAD,NBAD,STBAD,ENBAD,STATUS)
+C         IF (STATUS .NE. SAI__OK) GOTO 999
+      ENDIF
+
+***   Have the quality constraints been relaxed ?
+      IF (SRT.QUAL_LESS) THEN
+
+***      Open observation diff evenfile
+         CALL RAT_HDLOOKUP(HEAD,'REJEVT','EXTNAME',EXT,STATUS)
+         CALL USI_DEF0C('DIFFILE',SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))
+     &                  //EXT,STATUS)
+         CALL USI_GET0C('DIFFILE',DNAME,STATUS)
+         CALL HDS_OPEN(DNAME,'READONLY',DLOC,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+      ENDIF
+
+***   Locate the various data arrays
+      CALL RAT_FINDEVE(HEAD.ORIGIN,HEAD.DETECTOR,ELOC,LOCA,STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 999
+
+***   For each index entry
+      DO IX = 1,1
+         LOWER = 1
+         UPPER = HEAD.IEVTNU
+
+***      map the event data arrays into memory
+         CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
+     &      NELEMS,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+
+***      Check them against the sort parameters
+         CALL XRTSORT_DOIT_EVE(HEAD, SRT, BSRT,%val(PTRA(1)),
+     &      %val(PTRA(2)),
+     &      %val(PTRA(3)), %val(PTRA(4)), %val(PTRA(5)), %val(PTRA(6)),
+     &      %val(PTRA(7)), NELEMS, MAXLIM, EVE_X, EVE_Y, EVE_XD, EVE_YD,
+     &      EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y, BEVE_XD, BEVE_YD,
+     &      BEVE_T, BEVE_P, BEVE_E, TOTEV_SRC, TOTEV_BCK, SRT.QUAL_MORE,
+     &      MAXBAD, NBAD, STBAD, ENBAD, BADEV)
+
+***      unmap the arrays & memory
+         CALL RAT_UNMAPEVE(SLOCA, STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+      ENDDO
+
+***   annul the array locators
+      CALL RAT_ANNULEVE(LOCA, STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 999
+
+***   Same for the diff data
+      IF (SRT.QUAL_LESS) THEN
+
+***      Locate the various data arrays
+         CALL RAT_FINDEVE(HEAD.ORIGIN,HEAD.DETECTOR,DLOC,LOCA,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+
+***      Find the size of the diff events
+         CALL CMP_SIZE(DLOC,'TIME',UPPER,STATUS)
+         DO IX = 1,1
+            LOWER = 1
+
+***         map the diff event data arrays into memory
+            CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
+     &         NELEMS,STATUS)
+            IF (STATUS.NE.SAI__OK) GOTO 999
+
+***         Check them against the sort parameters
+            CALL XRTSORT_DOIT_EVE(HEAD,SRT,BSRT,%val(PTRA(1)),
+     &         %val(PTRA(2)),
+     &         %val(PTRA(3)),%val(PTRA(4)),%val(PTRA(5)), %val(PTRA(6)),
+     &         %val(PTRA(7)),NELEMS,MAXLIM,EVE_X, EVE_Y, EVE_XD, EVE_YD,
+     &         EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y, BEVE_XD, BEVE_YD,
+     &         BEVE_T, BEVE_P,BEVE_E,TOTEV_SRC,TOTEV_BCK, SRT.QUAL_MORE,
+     &         MAXBAD, NBAD, STBAD, ENBAD, BADEV)
+
+***         unmap the arrays & memory
+            CALL RAT_UNMAPEVE(SLOCA, STATUS)
+            IF (STATUS.NE.SAI__OK) GOTO 999
+         ENDDO
+
+***      annul the array locators
+         CALL RAT_ANNULEVE(LOCA, STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 999
+      ENDIF
+
+      IF (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0) THEN
+         CALL MSG_SETI('BAD', BADEV)
+         CALL MSG_PRNT('Rejected ^BAD events found in '/
+     &                             /'hotspots/deadspots')
+      ENDIF
+
+***   Close the files
+      CALL HDS_CLOSE(ELOC, STATUS)
+      IF (SRT.QUAL_LESS) CALL HDS_CLOSE(DLOC, STATUS)
+
+999   CONTINUE
+
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRTSORT_SORT_EVE',STATUS)
+      ENDIF
+
+      END
+
+*+XRTSORT_DOIT_EVE    Sorts XRT events into event lists
+      SUBROUTINE XRTSORT_DOIT_EVE(HEAD, SRT, BSRT, TIME, XPIX, YPIX,
+     &              XDET,
+     &              YDET, AMPL, CAMPL, NELEMS, MAXLIM, EVE_X, EVE_Y,
+     &              EVE_XD, EVE_YD, EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y,
+     &              BEVE_XD, BEVE_YD, BEVE_T, BEVE_P, BEVE_E, TOTEV_SRC,
+     &              TOTEV_BCK, QCHECK, MAXBAD, NBAD, STBAD, ENBAD,
+     &              BADEV)
+*    Description :
+*    History :
+*     date:  original (LTVAD::RDS)
+*    Type definitions :
+      IMPLICIT NONE
+*    Structure definitions :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTHEAD'
+*    Import :
+      RECORD /XRT_HEAD/ HEAD                      ! Header values
+      RECORD /XRT_SCFDEF/ SRT                     ! Source sorting parameters
+      RECORD /XRT_SCFDEF/ BSRT                    ! Bckgnd sorting parameters
+      INTEGER NELEMS			  ! Number of array elements
+      DOUBLE PRECISION TIME(NELEMS)       ! Event times
+      INTEGER XPIX(NELEMS), YPIX(NELEMS)  ! Array of coordinates
+      INTEGER XDET(NELEMS), YDET(NELEMS)  ! Array of detector coords
+      INTEGER AMPL(NELEMS), CAMPL(NELEMS) ! Array of photon events
+      LOGICAL QCHECK                              ! Check quality values ?
+      INTEGER MAXBAD                              ! Dimension of bad arrays
+      INTEGER NBAD
+      REAL STBAD(MAXBAD)                          ! Start of bad period
+      REAL ENBAD(MAXBAD)                          ! End of bad period
+      INTEGER MAXLIM                              ! Event list max extent
+*    Import-Export :
+      REAL EVE_X(MAXLIM),EVE_Y(MAXLIM)
+      INTEGER EVE_XD(MAXLIM),EVE_YD(MAXLIM)
+      INTEGER EVE_P(MAXLIM),EVE_E(MAXLIM)         ! Source lists
+      DOUBLE PRECISION EVE_T(MAXLIM)
+      REAL BEVE_X(MAXLIM),BEVE_Y(MAXLIM)
+      INTEGER BEVE_XD(MAXLIM),BEVE_YD(MAXLIM)
+      INTEGER BEVE_P(MAXLIM),BEVE_E(MAXLIM)       ! Bckgnd event lists
+      DOUBLE PRECISION BEVE_T(MAXLIM)             ! Bckgnd event lists
+*
+      INTEGER TOTEV_SRC                           ! Number of source events
+      INTEGER TOTEV_BCK                           ! Number of bckgnd events
+      INTEGER BADEV                               ! Number of events in hotspots
+*    Functions :
+      INTEGER XRT_HSPOT
+         EXTERNAL XRT_HSPOT
+*    Local constants :
+*     <local constants defined by PARAMETER>
+*    Local variables :
+      INTEGER BLP,TLP
+      INTEGER XEV,YEV,XDEV,YDEV,AEV,CEV
+      DOUBLE PRECISION TEV
+      INTEGER SCEN_X,SCEN_Y                        ! Pixel centre of src box
+      INTEGER BCEN_X,BCEN_Y                        ! Pixel centre of src box
+      REAL SAMIN2,SAMAX2,SBMIN2,SBMAX2       ! Squares of the min. and max.
+*                                            ! values for the source ellip axes.
+      REAL BAMIN2,BAMAX2,BBMIN2,BBMAX2       !    Same for the background.
+      REAL SA2B2I,SA2B2O                     ! Product of the squares of the
+*                                            ! inner and outer source axes
+      REAL BA2B2I,BA2B2O                     ! Product of the squares of the
+*                                            ! inner and outer background axes
+      REAL SDIFFX,SDIFFY                     ! X,Y offset from box centre (pix)
+      REAL BDIFFX,BDIFFY                     !    Same for the background
+      REAL SELPX2,SELPY2                     ! Square of the photon X,Y pos.
+*                                            ! in source box elliptical coords
+      REAL BELPX2,BELPY2                     ! Square of the photon X,Y pos.
+*                                            ! in bckgnd box elliptical coords
+      REAL SCPHI,SSPHI                       ! Cos and Sine of src orientation
+      REAL BCPHI,BSPHI                       ! Cos and Sine of bck orientation
+      REAL HPIX60                            ! Pixel size in arcmins
+*
+      LOGICAL LHRI                           ! Is detector the HRI ?
+      LOGICAL TOK                            ! Is this event within time ranges?
+      LOGICAL OK
+      INTEGER IX
+*-
+      IF (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0) THEN
+         LHRI = .TRUE.
+      ELSE
+         LHRI = .FALSE.
+      ENDIF
+
+***   Calculate the box pixel centres
+      SCEN_X = (SRT.MIN_X + SRT.MAX_X) / 2.0
+      SCEN_Y = (SRT.MIN_Y + SRT.MAX_Y) / 2.0
+      BCEN_X = (BSRT.MIN_X + BSRT.MAX_X) / 2.0
+      BCEN_Y = (BSRT.MIN_Y + BSRT.MAX_Y) / 2.0
+
+***   Calculate pixel size in arcmins
+      HPIX60 = HEAD.PIXEL / 60.0
+
+***   Calculate the squares of the elliptical axis - if any
+      IF (INDEX('CAE', SRT.SHAPE) .NE. 0) THEN
+         SAMIN2 = SRT.ELAMIN **2
+         SAMAX2 = SRT.ELAMAX **2
+         SBMIN2 = SRT.ELBMIN **2
+         SBMAX2 = SRT.ELBMAX **2
+         BAMIN2 = BSRT.ELAMIN **2
+         BAMAX2 = BSRT.ELAMAX **2
+         BBMIN2 = BSRT.ELBMIN **2
+         BBMAX2 = BSRT.ELBMAX **2
+
+***      Calculate the product of the squares of the two elliptical axes
+         SA2B2I = SAMIN2 * SBMIN2
+         SA2B2O = SAMAX2 * SBMAX2
+         BA2B2I = BAMIN2 * BBMIN2
+         BA2B2O = BAMAX2 * BBMAX2
+
+***      Set a local cos and sin of the orientation angle for speed
+         SCPHI = SRT.COSPHI
+         SSPHI = SRT.SINPHI
+         BCPHI = BSRT.COSPHI
+         BSPHI = BSRT.SINPHI
+      ENDIF
+
+***   Loop over each input record
+      DO IX = 1, NELEMS
+
+***      Copy event to simpler variables
+         TEV=TIME(IX) - HEAD.BASE_SCTIME
+         XEV=XPIX(IX)
+         YEV=YPIX(IX)
+         XDEV=XDET(IX)
+         YDEV=YDET(IX)
+         AEV=AMPL(IX)
+         CEV=CAMPL(IX)
+***      Fix for HRI no corrected events. set to value '1'
+         IF (LHRI) CEV = 1
+
+***      Test if this is from an HRI hotspot or deadspot
+         IF (.NOT. LHRI .OR. XRT_HSPOT(HEAD, XEV, YEV)) THEN
+
+***         If the source box is circular, annular or elliptical, calculate
+***         various numbers.
+            IF (INDEX('CAE', SRT.SHAPE) .NE. 0) THEN
+
+***            calculate the offset in X and Y celestial pixels from the
+***            source box centre
+               SDIFFX = XEV - SCEN_X
+               SDIFFY = YEV - SCEN_Y
+
+***            calculate the offset in X and Y celestial pixels from the
+***            background box centre
+               BDIFFX = XEV - BCEN_X
+               BDIFFY = YEV - BCEN_Y
+
+***            calculate the position in elliptical coordinates - source box
+***            NB: This also handles circles
+               SELPX2 = (SDIFFX * SCPHI + SDIFFY * SSPHI) ** 2
+               SELPY2 = (SDIFFX * SSPHI + SDIFFY * SCPHI) ** 2
+
+***            calculate the position in elliptical coordinates - backgnd box
+               BELPX2 = (BDIFFX * BCPHI + BDIFFY * BSPHI) ** 2
+               BELPY2 = (BDIFFX * BSPHI + BDIFFY * BCPHI) ** 2
+
+            ENDIF
+
+***         Check if each event is within the ranges selected
+***         Time range:
+            TOK = .FALSE.
+            DO TLP=1,SRT.NTIME
+               IF (SRT.MIN_T(TLP) .LE. TEV .AND. SRT.MAX_T(TLP)
+     &                      .GE. TEV) TOK = .TRUE.
+            ENDDO
+
+            IF (TOK) THEN
+
+            IF (SRT.MIN_PH .LE. AEV .AND.SRT.MAX_PH .GE. AEV) THEN
+
+            IF (SRT.MIN_EN .LE. CEV .AND.SRT.MAX_EN .GE. CEV) THEN
+
+            IF (SRT.MIN_XD .LE. XDEV .AND.SRT.MAX_XD .GE. XDEV) THEN
+
+            IF (SRT.MIN_YD .LE. YDEV .AND.SRT.MAX_YD .GE. YDEV) THEN
+
+***            If quality limits have been made more strict then check quality
+               OK = .TRUE.
+
+               IF (QCHECK) THEN
+
+***               See if this time is within one of the bad times
+                  DO BLP=1,NBAD
+                     IF (TEV.GE.STBAD(BLP).AND.TEV.LE.ENBAD(BLP)) THEN
+***                    Set flag false and exit loop
+                       OK=.FALSE.
+                       GOTO 10
+                     ENDIF
+                  ENDDO
+
+10                CONTINUE
+
+               ENDIF
+
+***            Is quality ok ?
+               IF (OK) THEN
+
+***               Check if event is within the source box
+                  IF ( (SRT.SHAPE .EQ. 'R' .AND.
+     &               (SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV) .AND.
+     &               (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
+     &                                  .OR.
+     &               ((INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) .AND.
+     &               ((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I .AND.
+     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))) THEN
+
+                     TOTEV_SRC=TOTEV_SRC+1
+
+                     EVE_X(TOTEV_SRC)=-(XEV - HEAD.SKYCX)*HPIX60
+                     EVE_Y(TOTEV_SRC)=-(YEV - HEAD.SKYCY)*HPIX60
+                     EVE_XD(TOTEV_SRC)=XDEV
+                     EVE_YD(TOTEV_SRC)=YDEV
+                     EVE_T(TOTEV_SRC)=TEV
+                     EVE_P(TOTEV_SRC)=AEV
+                     EVE_E(TOTEV_SRC)=CEV
+
+***               Check if event is within the bckgnd box
+                  ELSEIF ( SRT.BCKGND .AND. (SRT.SHAPE .EQ. 'R' .AND.
+     &               (BSRT.MIN_X.LE.XEV .AND. BSRT.MAX_X.GE.XEV).AND.
+     &               (BSRT.MIN_Y.LE.YEV .AND. BSRT.MAX_Y.GE.YEV))
+     &                             .OR.
+     &               ((INDEX( 'CAE', BSRT.SHAPE ) .NE. 0) .AND.
+     &               ((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I .AND.
+     &               (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O))) THEN
+
+                     TOTEV_BCK=TOTEV_BCK+1
+
+                     BEVE_X(TOTEV_BCK)=-XEV*HPIX60
+                     BEVE_Y(TOTEV_BCK)=-YEV*HPIX60
+                     BEVE_XD(TOTEV_BCK)=XDEV
+                     BEVE_YD(TOTEV_BCK)=YDEV
+                     BEVE_T(TOTEV_BCK)=TEV
+                     BEVE_P(TOTEV_BCK)=AEV
+                     BEVE_E(TOTEV_BCK)=CEV
+
+                  ENDIF
+               ENDIF
+            ENDIF
+            ENDIF
+            ENDIF
+            ENDIF
+            ENDIF
+         ELSE
+           BADEV = BADEV + 1
+         ENDIF
+      ENDDO
+
+999   CONTINUE
+
+      END
+
+
+
+
+
+*+XRTSORT_WRISORT    Writes the sorting conditions into a SORT box.
+      SUBROUTINE XRTSORT_WRISORT(LOC, ASRT, STATUS)
+*    Description :
+*      Writes the sorting conditions used to produce the binned dataset into
+*     a .SORT box which it creates.
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     R.D.Saxton   (LTVAD::RDS)
+*    History :
+*     7-Jul-1990           original  (LTVAD::RDS)
+*    17-Apr-1991           changed to handle just one sort box  (LTVAD::RDS)
+*    26-Apr-1991           spatial sort completely revised
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Global variables :
+      INCLUDE 'XRTLIB(INC_XRTSRT)'
+*    Import :
+      CHARACTER*(DAT__SZLOC) LOC       ! Locator to file
+*
+      RECORD /XRT_SCFDEF/ ASRT         ! Sort block for file
+*    Status :
+      INTEGER STATUS
+*    Local constants :
+      REAL RTOD
+            PARAMETER (RTOD = 180.0 / 3.1415493)
+*    Local variables :
+      CHARACTER*(DAT__SZLOC) ILOC,LOCS,LOCSS,LOCSC
+      CHARACTER*(DAT__SZLOC) LOCX,LOCXC,LOCY,LOCYC
+      CHARACTER*(DAT__SZLOC) LOCT,LOCTC,LOCP,LOCPC
+*-
+      IF (STATUS .NE. SAI__OK) RETURN
+*
+* Create SORT extension in file
+      CALL BDA_LOCINSTR(LOC, ILOC, STATUS)
+      CALL DAT_NEW(ILOC,'SORT','EXTN',0,0,STATUS)
+      CALL DAT_FIND(ILOC,'SORT',LOCS,STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','Error creating SORT extension',STATUS)
+         GOTO 999
+      ENDIF
+*
+* Create spatial box
+      CALL DAT_NEW(LOCS,'SPACE','SPACE',1,1,STATUS)
+      CALL DAT_FIND(LOCS,'SPACE',LOCSS,STATUS)
+      CALL DAT_CELL(LOCSS,1,1,LOCSC,STATUS)
+*
+* Write shape element
+      CALL HDX_PUTC(LOCSC,'SHAPE',1,ASRT.SHAPE,STATUS)
+*
+* Write orientation
+      CALL HDX_PUTR(LOCSC,'PHI',1,ASRT.PHI*RTOD,STATUS)
+*
+* Write X and Y centre
+      CALL HDX_PUTR(LOCSC,'XCENT',1,ASRT.XCENT,STATUS)
+      CALL HDX_PUTR(LOCSC,'YCENT',1,ASRT.YCENT,STATUS)
+*
+* Write X and Y axis min and max radii. NB: This applies to every shape in
+* our limited book, i.e. rectangles,circles,annuli and ellipses
+      CALL HDX_PUTR(LOCSC,'XINNER',1,ASRT.ELAMIN * ASRT.PTOD,STATUS)
+      CALL HDX_PUTR(LOCSC,'XOUTER',1,ASRT.ELAMAX * ASRT.PTOD,STATUS)
+      CALL HDX_PUTR(LOCSC,'YINNER',1,ASRT.ELBMIN * ASRT.PTOD,STATUS)
+      CALL HDX_PUTR(LOCSC,'YOUTER',1,ASRT.ELBMAX * ASRT.PTOD,STATUS)
+*
+      CALL DAT_ANNUL(LOCSC, STATUS)
+      CALL DAT_ANNUL(LOCSS, STATUS)
+*
+* Check spatial region was written ok.
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','Error writing X and Y sort ranges',STATUS)
+         GOTO 999
+      ENDIF
+
+* Create X detector element and write it
+      CALL DAT_NEW(LOCS,'XDET','XDET',1,1,STATUS)
+      CALL DAT_FIND(LOCS,'XDET',LOCX,STATUS)
+
+      CALL DAT_CELL(LOCX,1,1,LOCXC,STATUS)
+      CALL HDX_PUTI(LOCXC,'START',1,ASRT.MIN_XD,STATUS)
+      CALL HDX_PUTI(LOCXC,'STOP',1,ASRT.MAX_XD,STATUS)
+*
+      CALL DAT_ANNUL(LOCXC, STATUS)
+      CALL DAT_ANNUL(LOCX, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','Error writing X det. sort range',STATUS)
+         GOTO 999
+      ENDIF
+
+* Create Y element and write it
+      CALL DAT_NEW(LOCS,'YDET','YDET',1,1,STATUS)
+      CALL DAT_FIND(LOCS,'YDET',LOCY,STATUS)
+
+      CALL DAT_CELL(LOCY,1,1,LOCYC,STATUS)
+      CALL HDX_PUTI(LOCYC,'START',1,ASRT.MIN_YD,STATUS)
+      CALL HDX_PUTI(LOCYC,'STOP',1,ASRT.MAX_YD,STATUS)
+*
+      CALL DAT_ANNUL(LOCYC, STATUS)
+      CALL DAT_ANNUL(LOCY, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','Error writing Y det. sort range',STATUS)
+         GOTO 999
+      ENDIF
+
+* Create Time element and write it
+      CALL DAT_NEW(LOCS,'TIME','TIME',1,1,STATUS)
+      CALL DAT_FIND(LOCS,'TIME',LOCT,STATUS)
+*
+      CALL DAT_CELL(LOCT,1,1,LOCTC,STATUS)
+      CALL HDX_PUTR(LOCTC,'START',ASRT.NTIME,ASRT.MIN_T,STATUS)
+      CALL HDX_PUTR(LOCTC,'STOP',ASRT.NTIME,ASRT.MAX_T,STATUS)
+*
+      CALL DAT_ANNUL(LOCTC, STATUS)
+      CALL DAT_ANNUL(LOCT, STATUS)
+*
+* Create Sumsig element and write it
+      CALL DAT_NEW(LOCS,'PH_CHANNEL','PH_CHANNEL',1,1,STATUS)
+      CALL DAT_FIND(LOCS,'PH_CHANNEL',LOCP,STATUS)
+
+      CALL DAT_CELL(LOCP,1,1,LOCPC,STATUS)
+      CALL HDX_PUTI(LOCPC,'START',1,ASRT.MIN_PH,STATUS)
+      CALL HDX_PUTI(LOCPC,'STOP',1,ASRT.MAX_PH,STATUS)
+*
+      CALL DAT_ANNUL(LOCPC, STATUS)
+      CALL DAT_ANNUL(LOCP, STATUS)
+*
+*   Create corrected PH chanel element and write it
+      CALL DAT_NEW(LOCS,'ENERGY','ENERGY',1,1,STATUS)
+      CALL DAT_FIND(LOCS,'ENERGY',LOCP,STATUS)
+
+      CALL DAT_CELL(LOCP,1,1,LOCPC,STATUS)
+      CALL HDX_PUTI(LOCPC,'START',1,ASRT.MIN_EN,STATUS)
+      CALL HDX_PUTI(LOCPC,'STOP',1,ASRT.MAX_EN,STATUS)
+*
+      CALL DAT_ANNUL(LOCPC, STATUS)
+      CALL DAT_ANNUL(LOCP, STATUS)
+*
+      CALL DAT_ANNUL(LOCS, STATUS)
+*
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('Error writing SORT structure in '/
+     &                   /'background file')
+      ENDIF
+*
+999   CONTINUE
+*
+      IF (STATUS .NE. SAI__OK) THEN
+          CALL MSG_OUT(' ','from XRTSORT_WRISORT',STATUS)
+      ENDIF
+*
+      END
