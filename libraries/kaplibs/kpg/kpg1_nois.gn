@@ -45,7 +45,9 @@
 *  History:
 *     1991 April 25 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 January 10 (MJC):
+*        Replaced NAG calls.  Used commenting modern style.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -60,86 +62,75 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
-      LOGICAL
-     :  BAD
-
-      INTEGER
-     :  EL
-
-      <TYPE>
-     :  VARNCE( EL )
+      LOGICAL BAD
+      INTEGER EL
+      <TYPE> VARNCE( EL )
 
 *  Arguments Given and Returned:
-      <TYPE>
-     :  ARRAY( EL )
+      <TYPE> ARRAY( EL )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL G05DDF
-      DOUBLE PRECISION G05DDF    ! NAG random-number generator with
+      EXTERNAL PDA_RNNOR
+      REAL PDA_RNNOR             ! PDA random-number generator with
                                  ! Normal distribution for one value
 
 *  Local Variables:
-      INTEGER
-     :  I                        ! Loop counter
-
-      DOUBLE PRECISION
-     :  SIGMA                    ! Standard deviation
+      INTEGER I                  ! Loop counter
+      INTEGER SEED               ! Random-number seed
+      REAL SIGMA                 ! Standard deviation
+      INTEGER TICKS              ! Clock ticks to randomize initial seed
 
 *  Internal References:
-      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
-      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
 
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise the random-number generator.
+*  Initialise the random number generator seed to a non-repeatable
+*  value.
+      CALL PSX_TIME( TICKS, STATUS )
+      SEED = ( TICKS / 4 ) * 4 + 1
+      CALL PDA_RNSED( SEED )
 
-      CALL G05CCF
-
-*    There are two processing loops depending on whether there might be
-*    bad values present.
-
+*  There are two processing loops depending on whether there might be
+*  bad values present.
       IF ( BAD ) THEN
 
-         DO  I = 1, EL
+         DO I = 1, EL
 
-*          Check for a bad data-array value or a bad data value.  In
-*          this case noise cannot be added to the data array, so set it
-*          bad.
-
+*  Check for a bad data-array value or a bad data value.  In this case
+*  noise cannot be added to the data array, so set it bad.
             IF ( ARRAY( I ) .EQ. VAL__BAD<T> .OR.
      :           VARNCE( I ) .EQ. VAL__BAD<T> ) THEN
                ARRAY( I ) = VAL__BAD<T>
 
             ELSE
 
-*             Find the sigma of the Normal distribution at the element.
+*  Find the  of the Normal distribution at the element.
+               SIGMA = SQRT( NUM_<T>TOR( VARNCE( I ) ) )
 
-               SIGMA = SQRT( NUM_<T>TOD( VARNCE( I ) ) )
-
-*             Generate the random noise.  There is no offset.
-
+*  Generate the random noise.  There is no offset.
                ARRAY( I ) = ARRAY( I ) +
-     :                      NUM_DTO<T>( G05DDF( 0.0D0, SIGMA ) )
+     :                      NUM_RTO<T>( PDA_RNNOR( 0.0, SIGMA ) )
             END IF
          END DO
+
       ELSE
+
          DO  I = 1, EL
 
-*          Find the sigma of the Normal distribution at the element.
+*  Find the sigma of the Normal distribution at the element.
+            SIGMA = SQRT( NUM_<T>TOR( VARNCE( I ) ) )
 
-            SIGMA = SQRT( NUM_<T>TOD( VARNCE( I ) ) )
-
-*          Generate the random noise.  There is no offset.
-
+*  Generate the random noise.  There is no offset.
             ARRAY( I ) = ARRAY( I ) +
-     :                   NUM_DTO<T>( G05DDF( 0.0D0, SIGMA ) )
+     :                   NUM_RTO<T>( PDA_RNNOR( 0.0, SIGMA ) )
          END DO
       END IF
 
