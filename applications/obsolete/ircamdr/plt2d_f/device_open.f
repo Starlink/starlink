@@ -144,7 +144,7 @@
 
 * get the color capabilities of the device
 	CALL GQCF( WKSTN_SEQ, ERRIND, NCOLI, COLA, NPCI)
-!	type *, 'from gqcf-ncoli, npci = ', ncoli, npci
+!	print *, 'from gqcf-ncoli, npci = ', ncoli, npci
 	NCOLI = NPCI
 
 * setup maximum and minimum color indices for image display
@@ -174,9 +174,11 @@
 	    MINIMCOL = 1
 	  END IF
 	END IF
-	TYPE *, ' '
-	TYPE *, 'Maximum number of colour cells available = ', 
-     :	        ( MAXIMCOL-MINIMCOL+1)
+	CALL MSG_BLANK ( STATUS )
+	CALL MSG_SETI( 'AVAIL', MAXIMCOL-MINIMCOL+1)
+	CALL MSG_OUT('NCELL', 
+     :          'Maximum number of colour cells available = ^AVAIL', 
+     :	        STATUS)
 
 * store range of pens used for line graphics in parameter system
 	CALL PAR_PUT0I( 'LPENMIN', MAXIMCOL+1, STATUS)
