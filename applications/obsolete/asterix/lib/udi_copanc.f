@@ -94,13 +94,32 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			UDI0_COPANC
+
 *  Local Variables:
       INTEGER			ARGS(5)			! Method arguments
+      INTEGER			DID			! Dummy return value
       INTEGER			OARG			! Ignored method result
+
+      LOGICAL			FIRST			! First time through?
+        SAVE			FIRST
+
+*  Local Data:
+      DATA			FIRST/.TRUE./
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First item through?
+      IF ( FIRST ) THEN
+        CALL ADI_DEFMTH( 'CopyAncillary(_,_FITSfile,_,_HDSfile,_CHAR)',
+     :                   UDI0_COPANC, DID, STATUS )
+        CALL ADI_DEFMTH( 'CopyAncillary(_,_HDSfile,_,_FITSfile,_CHAR)',
+     :                   UDI0_COPANC, DID, STATUS )
+        FIRST = .FALSE.
+      END IF
 
 *  Get file identifiers for each input
       ARGS(1) = IFID
