@@ -2941,6 +2941,18 @@ OUTLIST = FILENAME (Write)
    by commas.
    [*]
 3 USECOMP
+3 OVERRIDE
+OVERRIDE = LOGICAL (Read)
+   This parameter controls whether to continue and create an
+   incomplete solution. Such solutions will result when only a
+   subset of the input position lists have been matched. 
+
+   This situation would ideally indicate that one, or more, of the
+   input lists are from positions not coincident with the others, in
+   which case it is perfectly legimate to proceed, however, the more
+   likely scenario is that they have too few positions and have
+   consequently been rejected.
+   [TRUE]
 USECOMP = LOGICAL (Read)
    This parameter specifies whether the completeness value will
    be used to weight the number of matches between a pair, when

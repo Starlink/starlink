@@ -151,6 +151,17 @@
 *        These may use indirection elements as well as names separated
 *        by commas.
 *        [*]
+*     OVERRIDE = LOGICAL (Read)
+*        This parameter controls whether to continue and create an
+*        incomplete solution. Such solutions will result when only a
+*        subset of the input position lists have been matched.
+*
+*        This situation would ideally indicate that one, or more, of the
+*        input lists are from positions not coincident with the others,
+*        in which case it is perfectly legimate to proceed, however, the
+*        more likely scenario is that they have too few positions and
+*        have consequently been rejected.  
+*        [TRUE]
 *     USECOM = LOGICAL (Read)
 *        This parameter specifies whether the completeness value will
 *        be used to weight the number of matches between a pair, when
@@ -309,6 +320,9 @@
 *        Changed to open input formatted files as required (rather than
 *        all at once). This works around the FIO limit of 40 open files
 *        and achieves the CCDPACK limit of 100 instead.
+*     16-DEC-1998 (PDRAPER):
+*        Added OVERRIDE parameter to control the behaviour when
+*        only some of the datasets are paired.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -397,6 +411,8 @@
       LOGICAL NDFS              ! True if position list names are stored in NDF extensions
       LOGICAL OK                ! Match is ok
       LOGICAL USECOM            ! Use completeness measure as a weight
+      LOGICAL OVERRD            ! True if partial selection is allowed
+      LOGICAL PAIRED( CCD1__MXNDF ) ! Whether list is paired with someone
 *.
 
 *  Check inherited global status.
@@ -445,7 +461,12 @@
       FSAFE = .FALSE.
       IF ( FAST ) CALL PAR_GET0L( 'FAILSAFE', FSAFE, STATUS )
 
-*  Name of the positions lists and labels.
+*  See if we should continue with registration if only a few of the 
+*  datasets have been matched.
+      OVERRD = .FALSE.
+      CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
+
+*  Output names of the positions lists and labels.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
@@ -852,20 +873,47 @@
  3    CONTINUE    
                   
 *  Comment on the success or overwise of the intercomparisons. If no
-*  intercomparisons were successful set status and abort, otherwise
-*  push on to check the connectivity of graph of intercomparisons.
-      IF ( NMATCH .LT. NOPEN - 1 ) THEN
+*  intercomparisons were successful set status and abort, otherwise, if
+*  requested, push on to check the connectivity of graph of
+*  intercomparisons. To make this test definitive we need to check all
+*  lists, as some may be matched more than once.
+      DO 10 I = 1, NOPEN
+         PAIRED( I ) = .FALSE.
+ 10   CONTINUE
+      COUNT = 0
+      DO 8 I = 1, NOPEN - 1
+         DO 9 J = I + 1, NOPEN 
+            COUNT = COUNT + 1
+            IF ( NMAT( COUNT ) .NE. 0 ) THEN
+               PAIRED( I ) = .TRUE.
+               PAIRED( J ) = .TRUE.
+            END IF
+ 9       CONTINUE
+ 8    CONTINUE
+      OK = .TRUE.
+      DO 11 I = 1, NOPEN
+         IF ( .NOT. PAIRED( I ) ) OK = .FALSE.
+ 11   CONTINUE
+      IF ( .NOT. OK ) THEN
          IF ( NMATCH .EQ. 0 ) THEN
             STATUS = SAI__ERROR
             CALL CCD1_ERREP( 'TOTAL_FAILURE',
      :'  No positions were matched between any dataset', STATUS )
             GO TO 99
          ELSE     
-            CALL CCD1_MSG( ' ', ' ', STATUS )
-            CALL CCD1_MSG( ' ',
+            IF ( OVERRD ) THEN 
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+               CALL CCD1_MSG( ' ',
      :'  Warning - not all position datasets have been successfully'//
-     :' matched. Continuing those which have.', STATUS) 
-            CALL CCD1_MSG( ' ', ' ', STATUS )
+     :' matched. Continuing with those that have.', STATUS) 
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+            ELSE
+               STATUS = SAI__ERROR
+               CALL CCD1_ERREP( 'TOTAL_FAILURE',
+     :'  Not all position datasets have been successfully matched', 
+     :                          STATUS )
+               GO TO 99
+            END IF
          END IF   
       END IF      
                   
@@ -1032,7 +1080,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL CCD1_ERREP( 'FINDOFF_ERR',
-     :   'FINDOFF: Error determining positions matches',
+     :   'FINDOFF: Error determining position list matches',
      :   STATUS )
       END IF
 

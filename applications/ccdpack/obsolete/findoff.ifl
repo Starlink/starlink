@@ -157,5 +157,15 @@ interface FINDOFF
      helpkey  '*'
    endparameter
 
+   parameter OVERRIDE
+      type    _LOGICAL
+      access  READ
+      vpath   'DEFAULT'
+      ppath   'DEFAULT'
+      default TRUE
+      prompt  'Continue if solution is incomplete'
+      helpkey  '*'
+   endparameter
+
 endinterface
 # $Id$

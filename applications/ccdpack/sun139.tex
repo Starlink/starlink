@@ -6728,6 +6728,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          \xroutine{CCDSETUP} then that value will be used.
          [TRUE]
       }
+
       \sstsubsection{
          OUTLIST = FILENAME (Write)
       } {
@@ -6751,6 +6752,20 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          by commas.
          [$*$]
       }
+      \sstsubsection{
+         OVERRIDE = LOGICAL (Read)
+      } {
+        This parameter controls whether to continue and create an
+        incomplete solution. Such solutions will result when only a
+        subset of the input position lists have been matched. 
+
+        This situation would ideally indicate that one, or more, of the
+        input lists are from positions not coincident with the others, in
+        which case it is perfectly legimate to proceed, however, the more
+        likely scenario is that they have too few positions and have
+        consequently been rejected.
+        [TRUE]
+     }
       \sstsubsection{
          USECOMP = LOGICAL (Read)
       } {
