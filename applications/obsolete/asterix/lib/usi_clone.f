@@ -105,7 +105,7 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*200		FNAME			! Input object
+      CHARACTER*200		FNAME, LFILE		! Input object
       CHARACTER*50		LCLASS			! Local copy of CLASS
 
       INTEGER			EP, PPOS		! Character pointers
@@ -145,8 +145,8 @@
         IF ( PPOS .EQ. 0 ) THEN
           CALL ADI_FCLONE( IFID, FNAME, LCLASS, ID, STATUS )
         ELSE
-          CALL ADI_FCLONE( IFID, FNAME(:MAX(1,CHR_LEN(FNAME)))/
-     :                         /OUT(PPOS:), LCLASS, ID, STATUS )
+          LFILE = FNAME(:MAX(1,CHR_LEN(FNAME)))//OUT(PPOS:)
+          CALL ADI_FCLONE( IFID, LFILE, LCLASS, ID, STATUS )
         END IF
 
 *    Store in common

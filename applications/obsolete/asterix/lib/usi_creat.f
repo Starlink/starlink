@@ -104,7 +104,7 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*200		FNAME			! Input object
+      CHARACTER*200		FNAME,LFILE		! Input object
 
       INTEGER			EP, PPOS		! Character pointers
 *.
@@ -124,13 +124,13 @@
       CALL USI_GET0C( OUT(:EP), FNAME, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      If caller specified a representation on the parameter, glue it
-*      on to the file name
+*    If caller specified a representation on the parameter, glue it
+*    on to the file name
         IF ( PPOS .EQ. 0 ) THEN
           CALL ADI_FCREAT( FNAME, BASEID, ID, STATUS )
         ELSE
-          CALL ADI_FCREAT( FNAME(:MAX(1,CHR_LEN(FNAME)))//OUT(PPOS:),
-     :                     BASEID, ID, STATUS )
+          LFILE = FNAME(:MAX(1,CHR_LEN(FNAME)))//OUT(PPOS:)
+          CALL ADI_FCREAT( LFILE, BASEID, ID, STATUS )
         END IF
 
 *    Store in common
