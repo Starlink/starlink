@@ -5009,7 +5009,7 @@ c        REAL XX,XP,YP
 *    Local Constants :
 *    Local variables :
       REAL XCORN,YCORN,XWID,YWID
-      CHARACTER*1 CH
+      CHARACTER CH*1,OPT*8
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
       LOGICAL FOK
@@ -5021,24 +5021,30 @@ c        REAL XX,XP,YP
 *  GUI mode
         IF (I_GUI) THEN
 
-*  try input from cursor
-          I_FORM=.FALSE.
-          CALL MSG_PRNT(' ')
-          XC=I_X
-          YC=I_Y
-          CALL MSG_PRNT('Select centre...')
-          CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
-          IF (FLAG.EQ.3) THEN
+*  form input?
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+          IF (OPT(:4).EQ.'FORM') THEN
             I_FORM=.TRUE.
           ELSE
-            CALL PGPOINT(1,XC,YC,2)
-            CALL MSG_PRNT('Select any corner...')
-            XCORN=XC
-            YCORN=YC
-            CALL IMG_GUICURS(XCORN,YCORN,FLAG,STATUS)
-            DX=ABS(XCORN-XC)
-            DY=ABS(YCORN-YC)
-            I_FORM=(FLAG.EQ.3)
+*  try input from cursor
+            I_FORM=.FALSE.
+            XC=I_X
+            YC=I_Y
+            CALL IMG_NBPUT0C('HELP','Select centre',STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
+            IF (FLAG.EQ.3) THEN
+              I_FORM=.TRUE.
+            ELSE
+              CALL PGPOINT(1,XC,YC,2)
+              CALL IMG_NBPUT0C('HELP','Select any corner',STATUS)
+              XCORN=XC
+              YCORN=YC
+              CALL IMG_GUICURS(XCORN,YCORN,FLAG,STATUS)
+              DX=ABS(XCORN-XC)
+              DY=ABS(YCORN-YC)
+              CALL IMG_NBPUT0C('HELP',' ',STATUS)
+              I_FORM=(FLAG.EQ.3)
+            ENDIF
           ENDIF
 
 *  form input
@@ -5129,7 +5135,7 @@ c        REAL XX,XP,YP
       REAL PI,DTOR
       PARAMETER (PI=3.14159265,DTOR=PI/180.0)
 *    Local variables :
-      CHARACTER*1 CH
+      CHARACTER CH*1,OPT*8
       REAL PXCENT,PYCENT
       REAL XEND,YEND
       REAL PXEND,PYEND
@@ -5153,71 +5159,79 @@ c        REAL XX,XP,YP
 *  GUI mode
         IF (I_GUI) THEN
 
-          I_FORM=.FALSE.
-          XCENT=I_X
-          YCENT=I_Y
-          CALL MSG_PRNT('Select centre...')
-          CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
-          IF (FLAG.EQ.1) THEN
-            CALL PGPOINT(1,XCENT,YCENT,2)
-            CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
-            CALL MSG_PRNT('Select end...')
-            XEND=XCENT
-            YEND=YCENT
-            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
+*  form input?
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+          IF (OPT(:4).EQ.'FORM') THEN
+            I_FORM=.TRUE.
+          ELSE
+*  try for cursor input
+            I_FORM=.FALSE.
+            XCENT=I_X
+            YCENT=I_Y
+            CALL IMG_NBPUT0C('HELP','Select centre',STATUS)
+            CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
             IF (FLAG.EQ.1) THEN
-              CALL PGPOINT(1,XEND,YEND,2)
-              CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
+              CALL PGPOINT(1,XCENT,YCENT,2)
+              CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+              CALL IMG_NBPUT0C('HELP','Select end',STATUS)
+              XEND=XCENT
+              YEND=YCENT
+              CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
+              IF (FLAG.EQ.1) THEN
+                CALL PGPOINT(1,XEND,YEND,2)
+                CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
 
 *  calculate other end and draw centre line
-              XOEND=2.0*XCENT-XEND
-              YOEND=2.0*YCENT-YEND
-              CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
-              CALL PGPOINT(1,XOEND,YOEND,2)
-              CALL PGQLS(LS)
-              CALL PGSLS(2)
-              CALL PGDRAW(XEND,YEND)
-              CALL MSG_PRNT('Select width...')
-              XWID=XCENT
-              YWID=YCENT
-              CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
-              IF (FLAG.EQ.1) THEN
-                CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
+                XOEND=2.0*XCENT-XEND
+                YOEND=2.0*YCENT-YEND
+                CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
+                CALL PGPOINT(1,XOEND,YOEND,2)
+                CALL PGQLS(LS)
+                CALL PGSLS(2)
+                CALL PGDRAW(XEND,YEND)
+                CALL IMG_NBPUT0C('HELP','Select width',STATUS)
+                XWID=XCENT
+                YWID=YCENT
+                CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
+                IF (FLAG.EQ.1) THEN
+                  CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
+                  CALL IMG_NBPUT0C('HELP',' ',STATUS)
 
 *  calc length
-                LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
-                PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
-                PHLEN=MAX(1.0,PHLEN)
-                PLENGTH=PHLEN*2.0
+                  LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+                  PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
+                  PHLEN=MAX(1.0,PHLEN)
+                  PLENGTH=PHLEN*2.0
 
 *  calc angle
-                ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+                  ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
 
 *  calc width (pixels)
-                D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
-                ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
-                BETA=ALPHA-ANGLE
-                PHWID=ABS(D*SIN(BETA))
-                PHWID=MAX(0.5,PHWID)
-                PWIDTH=PHWID*2.0
+                  D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
+                  ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
+                  BETA=ALPHA-ANGLE
+                  PHWID=ABS(D*SIN(BETA))
+                  PHWID=MAX(0.5,PHWID)
+                  PWIDTH=PHWID*2.0
 *  calc width (world coords)
-                ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
-                A=SQRT(ASQ)
-                BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
-                B=SQRT(BSQ)
-                CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
-                ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
-                WIDTH=2.0*A*SIN(ALPHA)
+                  ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
+                  A=SQRT(ASQ)
+                  BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
+                  B=SQRT(BSQ)
+                  CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
+                  ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
+                  WIDTH=2.0*A*SIN(ALPHA)
+
+                ELSEIF (FLAG.EQ.3) THEN
+                  I_FORM=.TRUE.
+                ENDIF
 
               ELSEIF (FLAG.EQ.3) THEN
                 I_FORM=.TRUE.
               ENDIF
-
             ELSEIF (FLAG.EQ.3) THEN
               I_FORM=.TRUE.
             ENDIF
-          ELSEIF (FLAG.EQ.3) THEN
-            I_FORM=.TRUE.
           ENDIF
 
 *  get input from form
@@ -5593,6 +5607,7 @@ c        REAL XX,XP,YP
               CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
               IF (FLAG.EQ.1) THEN
                 RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+                CALL IMG_NBPUT0C('HELP',' ',STATUS)
               ELSEIF (FLAG.EQ.3) THEN
                 I_FORM=.TRUE.
               ENDIF
@@ -5697,7 +5712,7 @@ c        REAL XX,XP,YP
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*1 CH
+      CHARACTER CH*1,OPT*8
       REAL XR,YR
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
@@ -5708,32 +5723,39 @@ c        REAL XX,XP,YP
 *  GUI mode
         IF (I_GUI) THEN
 
+*  form input?
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+          IF (OPT(:4).EQ.'FORM') THEN
+            I_FORM=.TRUE.
+          ELSE
 *  try getting input from cursor
-          I_FORM=.FALSE.
-          XC=I_X
-          YC=I_Y
-          CALL MSG_PRNT('Select centre...')
-          CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
-          IF (FLAG.EQ.1) THEN
-            CALL PGPOINT(1,XC,YC,2)
-            CALL MSG_PRNT('Select inner radius...')
-            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+            I_FORM=.FALSE.
+            XC=I_X
+            YC=I_Y
+            CALL IMG_NBPUT0C('HELP','Select centre',STATUS)
+            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
             IF (FLAG.EQ.1) THEN
-              IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-              CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
-              CALL MSG_PRNT('Select outer radius...')
+              CALL PGPOINT(1,XC,YC,2)
+              CALL IMG_NBPUT0C('HELP','Select inner radius',STATUS)
               CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
               IF (FLAG.EQ.1) THEN
-                ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-                CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
+                IRAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+                CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
+                CALL IMG_NBPUT0C('HELP','Select outer radius',STATUS)
+                CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
+                IF (FLAG.EQ.1) THEN
+                  ORAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+                  CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
+                  CALL IMG_NBPUT0C('HELP',' ',STATUS)
+                  ELSEIF (FLAG.EQ.3) THEN
+                  I_FORM=.TRUE.
+                ENDIF
               ELSEIF (FLAG.EQ.3) THEN
                 I_FORM=.TRUE.
               ENDIF
             ELSEIF (FLAG.EQ.3) THEN
               I_FORM=.TRUE.
             ENDIF
-          ELSEIF (FLAG.EQ.3) THEN
-            I_FORM=.TRUE.
           ENDIF
 
 *  form input
