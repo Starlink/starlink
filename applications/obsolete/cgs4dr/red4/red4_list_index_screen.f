@@ -148,7 +148,7 @@
 *             Write out the contents of the record (ignoring
 *             any format conversion errors), in the required
 *             output format.
-               LINE = ' '
+               CALL CHR_FILL( ' ', LINE )
                IF ( OFORMAT .EQ. 2 ) THEN
                   WRITE( LINE, 2)
      :             OBSREC.OBSERVATION(1:14), 
