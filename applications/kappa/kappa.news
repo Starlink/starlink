@@ -7,18 +7,19 @@
    - The following new commands have been added: ARDPLOT, COLLAPSE,
    LUTWARM, OUTLINE, PERMAXES.
 
-   - New features have been added and major changes made to the following 
-   commands to enable them to make full use of WCS information, the NDF 
-   structure, or to use PGPLOT for graphics. These changes may potentially 
-   require changes to any scripts, etc, which use these commands. See the 
-   "Release Notes" section SUN/95 for details: ARDGEN, ARDMASK, CREFRAME,
-   GDSTATE, GLITCH, HISTAT, IDSTATE, PICIN, PICCUR, PICTRANS, SEGMENT,
-   ZAPLIN.
+   - New features have been added and major changes made to the following
+   commands to enable them to make full use of WCS information, the NDF
+   structure, or to use PGPLOT for graphics. These changes may
+   potentially require changes to any scripts, etc, which use these
+   commands. See the "Release Notes" section SUN/95 for details: ARDGEN,
+   ARDMASK, CREFRAME, GDSTATE, GLITCH, HISTAT, IDSTATE, PICIN, PICCUR,
+   PICTRANS, SEGMENT, ZAPLIN.
 
-   - More minor changes, such as new features, etc, have been made to the 
+   - More minor changes, such as new features, etc, have been made to the
    following commands (existing scripts should not require any changes):
-   COMPAVE, COMPADD, CONTOUR, ELPROF, FITSIN, FITSDIN, GAUSMOOTH, HISTOGRAM,
-   LOOK, NDFCOPY, PSF, SETAXIS, SURFIT, THRESH, WCSALIGN.
+   COMPAVE, COMPADD, CONTOUR, DISPLAY, ELPROF, FITSIN, FITSDIN,
+   GAUSMOOTH, HISTOGRAM, LOOK, LUTVIEW, NDFCOPY, PSF, SETAXIS, SURFIT,
+   THRESH, WCSALIGN.
 
    - The following obsolete commands have been removed from KAPPA -
    alternatives are indicate in SUN/95:
