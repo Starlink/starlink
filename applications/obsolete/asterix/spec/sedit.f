@@ -95,11 +95,14 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Start ASTERIX
+      CALL AST_INIT()
+
 *    Version
       CALL MSG_PRNT( VERSION )
 
 *    Form or retrieve fit_model object
-      CALL DAT_EXIST('FIT_MOD','UPDATE',FLOC,STATUS)
+      CALL USI_DEXIST('FIT_MOD','UPDATE',FLOC,STATUS)
 
       IF ( STATUS .EQ. PAR__ERROR ) THEN
 
@@ -312,7 +315,8 @@
       END DO
 
 *    Exit
- 99   CALL AST_ERR( STATUS )
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
