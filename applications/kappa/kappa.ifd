@@ -4720,6 +4720,15 @@ package kappa {
             helpkey *
           }
 
+         parameter xmap {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Mapping of X axis onto screen}
+            ppath DEFAULT
+            default Default
+            helpkey *
+         }
+
          parameter xright {
             position 5
             type LITERAL
@@ -4749,14 +4758,14 @@ package kappa {
             helpkey *
           }
 
-         parameter ylog {
-            type _LOGICAL
-            prompt {Is the logarithm of the data to be displayed?}
+         parameter ymap {
+            type LITERAL
             vpath DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
+            prompt {Mapping of Y axis onto screen}
+            ppath DEFAULT
+            default Linear
             helpkey *
-          }
+         }
 
          parameter ysigma {
             type _REAL

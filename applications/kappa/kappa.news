@@ -1,18 +1,34 @@
-1 KAPPA_Version_1.1-2
+1 KAPPA_Version_1.2
 
-   A new release of KAPPA (v1.1-3) has been made. The main changes are:
-
-
+   A new release of KAPPA (v1.2) has been made. The main changes are:
 
 
-   A new release of KAPPA (v1.1-2) has been made. The main changes are:
+ o The graphics system now supports the use of graphical escape sequences
+ to control the attributes (placement, size, colour, etc) of sub-strings
+ within labels or titles. See the section "Graphical Escape Sequences" in
+ SUN95 for more information.
 
-   - Modified COLLAPSE so that output variances can be created for any
-   size of input array when using the median estimator.
+ o Celestial positions can now be formatted so that the sub-fields are
+ separated by appropriate small super-script characters ("h", "m",
+ "s", etc) when included within a plot. This facility is controlled by
+ the new "g" option within the Format attribute of the relevant axis
+ (see section "Using World Co-ordinate Systems" in SUN95).
 
-   - Bug in APERADD has been fixed which caused the value of the DIAM 
-   parameter to be used as the radius of the aperture instead of the diameter.
+ o LINPLOT:
+    - New parameters XMAP and YMAP have been added to control the 
+    mapping of each axis onto the screen. These can, for instance, 
+    produce logarithmic axes.
+    - The YLOG parameter has been removed. Using a value of "ValueLog" 
+    for parameter YMAP will produce the same effect as setting YLOG 
+    to TRUE.
 
-   For complete details of all changes, see the "Release Notes" appendix in 
-   SUN/95. 
+ o Modified COLLAPSE so that output variances can be created for any
+ size of input array when using the median estimator.
+
+ o A bug in APERADD has been fixed which caused the value of the DIAM
+ parameter to be used as the radius of the aperture instead of the
+ diameter.
+
+ For complete details of all changes, see the "Release Notes" appendix in
+ SUN/95.
 
