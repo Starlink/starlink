@@ -41,6 +41,7 @@
 *                        selection. (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     14 Dec 94 : V1.8-1 Display ties (DJA)
+*     24 Apr 95 : V1.8-2 Use ADI to store locators (DJA)
 *
 *    Type Definitions :
 *
@@ -76,6 +77,7 @@
       CHARACTER*(DAT__SZTYP) 	TYP              	! Object type
 
       INTEGER                	COMP(NPAMAX)     	! List of components
+      INTEGER			FID			! Fit model dataset id
       INTEGER                	IOPT             	! Integer key code
       INTEGER                	NLEV             	! Number of levels from HDS_TRACE
       INTEGER                	OCH              	! Output channel id
@@ -90,7 +92,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION            	! Version id
-        PARAMETER               ( VERSION = 'SEDIT Version 1.8-1' )
+        PARAMETER               ( VERSION = 'SEDIT Version 1.8-2' )
 *-
 
 *    Check status
@@ -109,11 +111,12 @@
 
 *      Object doesn't exist - Create it
         CALL ERR_ANNUL(STATUS)
-        CALL USI_ASSOCO( 'MODEL','FIT_MODEL',FLOC,STATUS)
+        CALL USI_TASSOCO( 'MODEL','FIT_MODEL',FID,STATUS)
+        CALL ADI1_GETLOC( FID, FLOC, STATUS )
         CALL DAT_NEWC(FLOC,'SPEC',80,0,0,STATUS)
         CALL DAT_NEWC(FLOC,'POLISH',80,0,0,STATUS)
         CALL DAT_NEW(FLOC,'NCOMP','_INTEGER',0,0,STATUS)
-        SNEW=.TRUE.
+        SNEW = .TRUE.
 
       ELSE IF ( STATUS .NE. PAR__NULL ) THEN
 
@@ -124,6 +127,7 @@
           CALL ERR_REP( ' ', 'Not a fit_model data object', STATUS )
         END IF
         SNEW = .FALSE.
+        CALL ADI1_PUTLOC( FLOC, FID, STATUS )
 
       END IF
       IF (STATUS.NE.SAI__OK) GOTO 99
@@ -158,7 +162,7 @@
 
 *    Declare file to user :
       IF ( SCREEN ) THEN
-        CALL HDS_TRACE( FLOC, NLEV, PATH, FILE, STATUS )
+        CALL ADI_FTRACE( FID, NLEV, PATH, FILE, STATUS )
         CALL TSM_PUTSSTRAT( W_STATUS, FILE(:CHR_LEN(FILE)), TSM__BOLD,
      :                                                  9, 1, STATUS )
         CALL TSM_REFRESH( W_STATUS, STATUS )
@@ -167,21 +171,21 @@
       END IF
 
 *    History file entry :
-      CALL HIST_ADD( FLOC, VERSION, STATUS )
+      CALL HSI_ADD( FID, VERSION, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    No existing model, so ask the user to input one :
       IF ( SNEW ) THEN
         CALL SEDIT_NEWMOD( FLOC, STATUS )
         IF ( SCREEN ) THEN
-          CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, 6, STATUS )
+          CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, 6, STATUS )
         ELSE
-          CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, -1, STATUS )
+          CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, -1, STATUS )
         END IF
       ELSE
 
 *      Display component parameters
-        CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, 6, STATUS )
+        CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, 6, STATUS )
 
 *      Bad model?
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -257,7 +261,7 @@
            CALL AIO_WRITE( OCH, 'Input model file:- ^NAME', STATUS )
 
 *         List parameters
-           CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, OCH, STATUS )
+           CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, OCH, STATUS )
 
 *         Tidy up unit
            CALL AIO_CLOSE( OCH, STATUS )
@@ -266,7 +270,7 @@
 *       List parameters to screen
          ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_L) .OR.
      :             (IOPT .EQ. TSM__K_LOWERCASE_L) ) THEN
-           CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, 6, STATUS )
+           CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, 6, STATUS )
 
 *       New parameters
          ELSE IF ( CHR_SIMLR(OPTION,'NP') ) THEN
@@ -673,7 +677,7 @@
 
 
 *+  SEDIT_LISTPAR - List parameters to a logical unit
-      SUBROUTINE SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, OCH, STATUS )
+      SUBROUTINE SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, OCH, STATUS )
 *
 *    Description :
 *
@@ -697,7 +701,7 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC) FLOC               ! Locator to fit_model object
+      INTEGER			FID			! Fit model dataset
       INTEGER PARTOT                            ! Total number of parameters
       INTEGER COMP(NPAMAX)                      ! Component of pmodel i
       INTEGER PAR(NPAMAX)                       ! Parameter of pmodel i
@@ -713,6 +717,7 @@
 *
 *    Local varaiables :
 *
+      CHARACTER*(DAT__SZLOC) FLOC               ! Locator to fit_model object
       CHARACTER*(DAT__SZLOC) MLOC		! Locator to pmodels
       CHARACTER*(DAT__SZLOC) MILOC		! Locator to pmodel i
       CHARACTER*(DAT__SZLOC) MIPLOC		! Locator to parameters of
@@ -743,6 +748,9 @@
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Extract locator
+      CALL ADI1_GETLOC( FID, FLOC, STATUS )
 
 *    Display existing model :
       CALL CMP_GET0C(FLOC,'SPEC',MODSPEC,STATUS)
