@@ -80,20 +80,7 @@
           ZMAX=RVAL
         ENDIF
         ZRAN=ZMAX-ZMIN
-        IF (ZRAN.LT.0.0) THEN
-          IA=0
-          SCALING='NONE'
-        ELSEIF (ZRAN.EQ.0.0) THEN
-          IF (ZMIN.GT.DMAX) THEN
-            IA=1
-            SCALING='NONE'
-          ELSEIF (ZMAX.LT.DMIN) THEN
-            IA=0
-            SCALING='NONE'
-          ENDIF
-        ELSE
-          MONO=.FALSE.
-        ENDIF
+
 
 *  get colour capability of device
         CALL GDV_COLOURS(BG,FIRST,LAST,STATUS)
@@ -104,6 +91,28 @@
         ELSE
           COLOUR=.TRUE.
         ENDIF
+
+*  has a single colour been requested?
+        IF (ZMAX.LT.ZMIN) THEN
+          IA=0
+          SCALING='NONE'
+        ELSEIF (ZMIN.GT.DMAX) THEN
+          IA=1
+          SCALING='NONE'
+        ELSEIF (ZMIN.EQ.DMAX) THEN
+          IA=LAST
+          SCALING='NONE'
+        ELSEIF (ZMAX.LT.DMIN) THEN
+          IA=0
+          SCALING='NONE'
+        ELSEIF (ZMAX.EQ.DMIN) THEN
+          IA=FIRST
+          SCALING='NONE'
+        ELSEIF (ZMIN.EQ.ZMAX) THEN
+          IA=FIRST+NINT((ZMIN-DMIN)/(DMAX-DMIN)*(LAST-FIRST))
+          SCALING='NONE'
+        ENDIF
+
 
         IF (SCALING.EQ.'HIS') THEN
           CALL GFX_PIXELQ_HIST1(Z,NX,NY,Q,MASK,ZMIN,ZMAX,FIRST,LAST,
