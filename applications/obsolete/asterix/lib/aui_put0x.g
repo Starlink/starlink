@@ -89,11 +89,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
 
-*  Global Variables:
-      INCLUDE 'AUI_CMN'                 ! ASTERIX AUI common block
-*       AUI_INIT = LOGICAL (given)
-*         AUI class definitions loaded?
-
 *  Arguments Given:
       INTEGER			ID			! Dataset identifier
       CHARACTER*(*)		NAME			! Attribute name
@@ -103,31 +98,20 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			ARGS(3)			! Method arguments
-      INTEGER			OARG			! Method result
+      INTEGER			VARG			! Temp object
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check initialised
-      IF ( .NOT. AUI_INIT ) CALL AUI0_INIT( STATUS )
-
-*  First method argument is the dataset id
-      ARGS(1) = ID
-
-*  Create ADI object describing name
-      CALL ADI_NEWV0C( NAME, ARGS(2), STATUS )
-
 *  Create ADI object describing value
-      CALL ADI_NEWV0<T>( VALUE, ARGS(3), STATUS )
+      CALL ADI_NEWV0<T>( VALUE, VARG, STATUS )
 
-*  Invoke method
-      CALL ADI_EXEC( 'WriteAux', 3, ARGS, OARG, STATUS )
+*  Write the value
+      CALL AUI_PUTID( ID, NAME, VARG, STATUS )
 
-*  Destroy temporary objects
-      CALL ADI_ERASE( ARGS(2), STATUS )
-      CALL ADI_ERASE( ARGS(3), STATUS )
+*  Destroy temporary object
+      CALL ADI_ERASE( VARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'AUI_PUT0<T>', STATUS )
