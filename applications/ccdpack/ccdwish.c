@@ -297,22 +297,16 @@
 */
       int ifd;                       /* File descriptor of downward pipe */
       int ofd;                       /* File descriptor of upward pipe */
-      char *pslash;                  /* Pointer to last '/' in command name */
+      char *ccddir;                  /* CCDPACK_DIR value */
 
-/* Set the TCLLIBPATH environment variable to hold the name of the directory
-   in which the wish binary is resident.  This will cause the autoloader
-   to look there for various library files. */
-      strcpy( buffer, argv[ 0 ] );
-      pslash = rindex( buffer, '/' );
-      if ( pslash == NULL ) {
-         getcwd( buffer, BUFLENG );
+/* Set the TCL library environment variables to the same value as CCDPACK_DIR.
+   This will cause the autoloader to look there for various library files. */
+      ccddir = getenv( "CCDPACK_DIR" );
+      if ( ccddir != NULL ) {
+         setenv( "TCLLIBPATH", buffer, 0 );
+         setenv( "ITCL_LIBRARY", buffer, 0 );
+         setenv( "ITK_LIBRARY", buffer, 0 );
       }
-      else {
-         *pslash = '\0';
-      }
-      setenv( "TCLLIBPATH", buffer, 0 );
-      setenv( "ITCL_LIBRARY", buffer, 0 );
-      setenv( "ITK_LIBRARY", buffer, 0 );
 
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
    If we have something which looks like a flag but is not of this form,
