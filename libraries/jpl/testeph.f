@@ -125,7 +125,7 @@ C
 C       OPEN INPUT FILE 'TESTEPHINPUT', CONTAINING JPL VALUES
 C
       OPEN(UNIT=8,
-     *     FILE='TESTEPHINPUT',
+     *     FILE='testephinput.dat',
      *     FORM='FORMATTED',
      *     ACCESS='SEQUENTIAL',
      *     STATUS='OLD')
