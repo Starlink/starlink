@@ -383,7 +383,7 @@ c$$$      endif
 *     xv = integer(n) (given)
 *     yv = integer(n) (given)
 *       img(i) is the data for point (xv(i),yv(i))
-*     driftscale = real(gau2maxfits) (given)
+*     driftscale = rdoubleprecision(gau2maxfits) (given)
 *       The scalings for the drift calculation.  See gau2_vetodrift for
 *       details. 
 *     liv = integer (given)
@@ -420,7 +420,7 @@ c$$$      endif
 *   arguments
       integer liv, lv, n, l, p
       doubleprecision a(n,l),da(n,p),x(p),xinit(p),c(l),v(lv),img(n)
-      real driftscale(5*gau2maxfits)
+      doubleprecision driftscale(5*gau2maxfits)
       integer iv(liv), in(2,p), xv(n), yv(n), status
       
 *   For a description of the parameters in gau2par, see gau_par
