@@ -256,7 +256,6 @@
       DOUBLE PRECISION DVAL
       REAL RVAL
       INTEGER IVAL,I
-      LOGICAL HOK
       LOGICAL THERE
       LOGICAL SET
 
@@ -268,7 +267,7 @@
      :                'D POSITION_ANGLE','I EQUINOX',
      :                'C BASE_DATE',	 'I BASE_MJD',
      :                'D BASE_UTC',	 'D BASE_TAI',
-     :		      'R OBS_LENGTH',	 'R EXPOSURE_TIME'
+     :		      'R OBS_LENGTH',	 'R EXPOSURE_TIME'/
 *-
 
 *    Check status
