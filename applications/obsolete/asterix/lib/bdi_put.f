@@ -172,7 +172,7 @@
 *    Extract data from return value
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
-          CALL ERR_REP( 'BDI_PUT_1', 'Unable to get item ^ITEM',
+          CALL ERR_REP( 'BDI_PUT_1', 'Unable to put item ^ITEM',
      :                    STATUS )
         END IF
 
