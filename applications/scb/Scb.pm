@@ -1,3 +1,13 @@
+#!/usr/local/bin/perl -w
+
+package libscb;
+require Exporter;
+@ISA = qw/Exporter/;
+@EXPORT = qw/tarxf popd pushd/;
+
+use Cwd;
+
+
 sub tarxf {
 
 #  Extracts from a (optionally compressed) tar archive.
@@ -76,6 +86,5 @@ sub popd {
    my $dir = pop @dirstack;
    chdir $dir or die "Couldn't change directory to $dir\n";
 }
-
 
 1;
