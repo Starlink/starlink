@@ -89,6 +89,8 @@
 *        Added check for normal scores with a population of 2. 
 *        The second score isn't calculated as it is the negative
 *        of the first score.
+*     20-APR-1998 (DSB):
+*        Error reported if NSET is bigger than CCD1__MXNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -135,6 +137,17 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Report an error if NSET is too big.
+      IF( NSET .GT. CCD1__MXNDF ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'N', NSET )
+         CALL MSG_SETI( 'SZ', CCD1__MXNDF )
+         CALL ERR_REP( 'CCD1_ORVAR_1', 'Cannot combine ^N (>^SZ) '//
+     :                 'vectors with variances. Use the MEAN method '//
+     :                 'instead.', STATUS )
+         GO TO 999
+      END IF
+
 *  Loop for all possible values of the ordered set size.
       DO 1  I = 1, NSET
          IF( I .EQ. 1 ) THEN
@@ -172,5 +185,8 @@
  3          CONTINUE
          END IF
  1    CONTINUE
+
+ 999  CONTINUE
+
       END
 * $Id$
