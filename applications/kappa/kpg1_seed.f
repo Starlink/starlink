@@ -57,6 +57,9 @@
                                  ! the time ticks
       PARAMETER ( NORM = 86400 )
 
+*  External References:
+      REAL SLA_RANDOM
+
 *  Local Variables:
       INTEGER NTICKS             ! Number of computer clock ticks
       INTEGER PID                ! Process id.
