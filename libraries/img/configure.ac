@@ -31,7 +31,7 @@ STAR_DECLARE_DEPENDENCIES(link, ndf)
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun160)
+STAR_LATEX_DOCUMENTATION(sun160,sun160.htx_tar)
 
 dnl    There is a .msg file in this directory, and this adds Makefile
 dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
@@ -41,6 +41,9 @@ STAR_MESSGEN(img_err.msg)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
+
+dnl    Define GC for the Starlink generic pre-processor.
+
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
