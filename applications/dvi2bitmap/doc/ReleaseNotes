@@ -9,6 +9,8 @@ see the benefit in most cases.
 <p>That made it easy to support changing the foreground and background
 colours for output text, so I did that as an encore.
 
+<p>Added the `strut' special.
+
 <subsect id=rn-0.7 export>Release 0.7
 
 <p>Version number fiddling: this is still beta software, and as such
