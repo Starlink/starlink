@@ -171,10 +171,10 @@ AC_SUBST(AM_LDFLAGS)
 # Avoid doing anything if $STARLINK was unset above.
 if test -n "$STARLINK"; then
     if test "$STARLINK" != "per_dir_PREFIX"; then
-        AM_CPPFLAGS="$AM_CFLAGS -I[]per_dir_PREFIX/include"
+        AM_CPPFLAGS="$AM_CPPFLAGS -I[]per_dir_PREFIX/include"
         AM_LDFLAGS="$AM_LDFLAGS -L[]per_dir_PREFIX/lib"
     fi
-    AM_CPPFLAGS="$AM_CFLAGS -I[]per_dir_PREFIX/include"
+    AM_CPPFLAGS="$AM_CPPFLAGS -I[]per_dir_PREFIX/include"
     AM_LDFLAGS="$AM_LDFLAGS -L$STARLINK/lib"
 fi
 
