@@ -824,7 +824,7 @@
      :            'CRPIX2  = 100',
      :            'CRVAL1  = 71.619724',
      :            'CRVAL2  = 42.971835',
-     :            'CROTA1  = 0.0',
+     :            '  ',
      :            'CDELT1  = 0.6',
      :            'CDELT2  = 0.6' /
 
@@ -853,7 +853,6 @@
       if( ast_getc( box1, 'system', status ) .ne. 'ICRS' ) 
      :        call stopit( status, 'box1 system is not ICRS' )
 
-
       call ast_setc( box1, 'system', 'galactic', status )
 
       perm(1)=2
@@ -873,10 +872,7 @@
       if( yout(2) .ne. AST__BAD ) call stopit( status, 'error 3' )
       if( xout(2) .ne. AST__BAD ) call stopit( status, 'error 4' )
 
-
-
       box2 = ast_simplify( box1, status )
-
 
       call ast_setc( box1, 'system', 'icrs', status )
       call ast_permaxes( box1, perm, status )
@@ -893,7 +889,7 @@
       end if
 
       if( ast_getc( box1, 'System', status ) .ne. 'ICRS' ) then
-         call stopit( status, 'Box1 system is not ICRS' )
+         call stopit( status, 'Box1(b) system is not ICRS' )
       end if
 
       if( ast_getc( box1, 'Equinox', status ) .ne. '2000.0' ) then
@@ -1282,8 +1278,8 @@ C
       call ast_setc( box2, 'skyrefis', 'pole', status )
       box2 = ast_Simplify( box2, status )
 
-      if( .NOT. hasframeset( box2, status ) ) then
-         call stopit( status, 'ast_mapregion: Box2 has no '//
+      if( hasframeset( box2, status ) ) then
+         call stopit( status, 'ast_mapregion: Box2 has '//
      :               'FrameSet (B)' )
       end if
 
@@ -1415,7 +1411,7 @@ C
       cards(4) = 'CRPIX2  = 20'
       cards(5) = 'CRVAL1  = 0.0'
       cards(6) = 'CRVAL2  = 0.0'
-      cards(7) = 'CROTA1  = 0.0'
+      cards(7) = '   '
       cards(8) = 'CDELT1  = 1.6'
       cards(9) = 'CDELT2  = 1.6'
 
@@ -1722,8 +1718,8 @@ C
       cards(5) = 'CRVAL1  = 0.0'
       cards(6) = 'CRVAL2  = 0.0'
       cards(7) = 'CROTA1  = 30.0'
-      cards(8) = 'CDELT1  = 1.6'
-      cards(9) = 'CDELT2  = 1.6'
+      cards(8) = 'CDELT1  = -0.00001'
+      cards(9) = 'CDELT2  = 0.00001'
 
       fc = ast_fitschan( ast_null, ast_null, ' ', status )
       do i = 1, 9
@@ -1732,20 +1728,28 @@ C
       call ast_clear( fc, 'card', status )
       fs = ast_read( fc, status )
 
+      bfrm = ast_getFrame( fs, AST__BASE, status )
+
+      p1(1) = 0.0
+      p1(2) = 0.0
+      p2(1) = 0.1
+      unc = ast_circle( bfrm, 1, p1, p2, AST__NULL, ' ', status )
+
       p1( 1 ) = 100.0; /* Pix_X at centre /
       p1( 2 ) = 150.0; /* Pix_Y at centre /
       p2( 1 ) = 150.0; /* Pix_X at corner /
       p2( 2 ) = 170.0; /* Pix_Y at corner /
 
-      bfrm = ast_getFrame( fs, AST__BASE, status )
       box1 = ast_box( bfrm, 0, p1, p2, AST__NULL, ' ', status )
 
       cfrm = ast_getFrame( fs, AST__CURRENT, status )
       map = ast_getmapping( fs, AST__BASE, AST__CURRENT, status )
       reg1 = ast_mapregion( box1, map, cfrm, status )
       
-      call ast_show( reg1, status )
-
+      if( hasFrameSet( reg1, status ) ) call stopit( status, 
+     :                                            'Box: poly simp 1' )
+      if( .not. ast_isapolygon( reg1, status) ) call stopit( status, 
+     :                                            'Box: poly simp 2' )
 
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'Box tests failed'
@@ -3092,7 +3096,7 @@ C
       character text*(*)
       integer obj, status, next, end, ch, result, ll, overlap
       external mysource, mysink
-      character buf*25000
+      character buf*45000
 
       common /ss1/ buf 
       common /ss2/ next, end, ll
@@ -3102,7 +3106,7 @@ C
       ch = ast_channel( mysource, mysink, ' ', status )
 
 
-      ll = 110
+      ll = 160
       next = 1
       if( ast_write( ch, obj, status ) .ne.1 ) then
          write(*,*) text
@@ -3137,7 +3141,7 @@ C
       include 'SAE_PAR'
       include 'AST_PAR'
       integer status, next, end, ll
-      character buf*25000
+      character buf*45000
 
       common /ss1/ buf 
       common /ss2/ next, end, ll
@@ -3159,7 +3163,7 @@ C
       include 'SAE_PAR'
       include 'AST_PAR'
       integer status, next, end, f, l, ll
-      character buf*25000
+      character buf*45000
       character line*1000
 
       common /ss1/ buf 
@@ -3173,13 +3177,13 @@ C
       buf( next : ) = line( f : l )
       l = l - f + 1
 
-      if( next + ll - 1 .ge. 25000 ) then
+      if( next + ll - 1 .ge. 45000 ) then
          write(*,*)
          call stopit( status, 'Buffer overflow in mysink!!' )
       else if( l .gt. ll ) then
          write(*,*)
          write(*,*) buf( next : next + l)
-         write(*,*) 'Line length ',l
+         write(*,*) 'Line length ',l,' greater than ',ll
          call stopit( status, 'Line overflow in mysink!!' )
       else 
          end = next + l
