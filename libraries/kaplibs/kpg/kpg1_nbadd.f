@@ -6,6 +6,9 @@
 *  Purpose:
 *     Finds the number of bad values in an array.
  
+*  Description:
+*     Finds the number of bad values in a 1-D array.
+ 
 *  Language:
 *     Starlink Fortran 77
  

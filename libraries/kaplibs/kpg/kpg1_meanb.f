@@ -6,6 +6,9 @@
 *  Purpose:
 *     Finds the mean of the good data values in an array.
  
+*  Desciption:
+*     Finds the mean of the good data values in a 1-D array.
+
 *  Language:
 *     Starlink Fortran 77
  

@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_H2AST( DATA, ILINE, LINE, STATUS )
 *+
-* Name:
+*  Name:
 *     KPG1_H2AST
 
 *  Purpose:

@@ -6,6 +6,10 @@
 *  Purpose:
 *     Transposes a 2-d array.
  
+*  Description:
+*     Creates a new 2-d array containing a transposed copy of the supplied
+*     array. 
+
 *  Language:
 *     Starlink Fortran 77
  
