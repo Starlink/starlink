@@ -226,6 +226,8 @@
 #        Cosmetics and Linux support.
 #     17-SEP-1998 (TIMJ):
 #        Add MSG_PAR dependency
+#     26-APR-2001 (TIMJ):
+#        Use $COMPRESS
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -365,6 +367,13 @@ TAR_OUT = pax -r -f
 
 AR_IN = ar -r
 
+#  Command to compress the tar files and the suffix used for the
+#  compression system. The compress command must send the output
+#  to standard out.
+
+COMPRESS = gzip -c --best
+COMPSFX  = gz
+
 #  ADAM monolith linker command.
 
 ALINK = $(STAR_BIN)/alink
@@ -403,7 +412,7 @@ PKG_LINK = FLUXES
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.1-1
+PKG_VERS = 1.1-2
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -430,7 +439,7 @@ STARTUP_SCRIPT = fluxes.csh fluxnow.csh
 
 #  Link script.  This script does not form part of the package but is 
 #  required for building it.  It will not be installed.
- 
+
 LINK_SCRIPT = $(PKG_NAME)_link_adam
 
 #  Startup ICL script.  This is the file that must be loaded by ICL
@@ -1191,19 +1200,19 @@ do_test:
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
 
-export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)
 	@ echo
 	@ echo \
 '*** Export copy of the built $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX): $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1213,10 +1222,10 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX); then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX); else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -1226,19 +1235,19 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
 
-export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)
 	@ echo
 	@ echo \
 '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX): $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1248,11 +1257,11 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX); then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX); else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
            $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -1262,24 +1271,24 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  This target depends on the resulting compressed tar file being up to
 #  date.
 
-export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)
 	@ echo
 	@ echo \
 '*** Export copy of the $(PACK_NAME) package source is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
 
-$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME).tar.$(COMPSFX): $(SOURCE_FILES)
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX); then \
+           rm -f $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX); else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
