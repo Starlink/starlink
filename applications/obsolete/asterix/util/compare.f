@@ -1,23 +1,57 @@
-*+  COMPARE - Chi-squared comparison of model array and data array
       SUBROUTINE COMPARE( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     COMPARE
+
+*  Purpose:
+*     Chi-squared comparison of model array and data array
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL COMPARE( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Calculates the chi-squared fit of a data array to a model array. The
 *     resulting chi-squared value is listed, together with the normalization
 *     factor which brings the model into closest agreement with the data.
-*
-*    Parameters :
-*
-*     DATA=UNIV(W)
-*      	    Dataset containing data values
-*     MODEL=UNIV(R)
-*           Dataset containing model values
-*     POISSON=LOGICAL(R)
-*           Poisson data errors to be assumed
-*
-*    Method :
-*
+
+*  Usage:
+*     compare {parameter_usage}
+
+*  Environment Parameters:
+*     DATA = CHAR(read)
+*      	 Dataset containing data values
+*     MODEL = CHAR (read)
+*        Dataset containing model values
+*     POISSON = LOGICAL (read)
+*        Poisson data errors to be assumed
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     Chi-squared is calculated as    Sum[(data-model)**2/variance] ,
 *     where variance is the variance of the data, unless the model array also
 *     has a VARIANCE component, in which case it is the sum of the model and
@@ -29,56 +63,87 @@
 *     (i.e. model is assumed to be independent of data).
 *     Bad quality data points are excluded from the statistic, but the model
 *     array is assumed to be 100% good.
-*
-*    Deficiencies :
-*    Bugs :
-*
-*    Authors :
-*
-*     Trevor Ponman  (BHVAD::TJP)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     28 Apr 86 :         Original (BHVAD::TJP)
-*     28 May 86 :         Option of unit errors (TJP)
-*     14 Dec 88 : V1.0-1  Asterix88 upgrade (DJA)
-*     18 Nov 90 : V1.3-0  Minor bug fix (DJA)
-*     20 Mar 92 : V1.6-0  Uses quality properly. Calculations done using
-*                         variance rather than error. Checkjs zero
-*                         variance explicitly. (DJA)
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     12 Jan 95 : V1.8-1  Updated data interfaces. Removed report of type (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     compare, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     28 Apr 1986 V0.6-0 (TJP):
+*        Original version.
+*     28 May 1986 V1.0-0 (TJP):
+*        Option of unit errors
+*     14 Dec 1988 V1.0-1 (DJA):
+*        Asterix88 upgrade
+*     18 Nov 1990 V1.3-0 (DJA):
+*        Minor bug fix
+*     20 Mar 1992 V1.6-0 (DJA):
+*        Uses quality properly. Calculations done using variance rather than
+*        error. Checks zero variance explicitly.
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      4 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'COMPARE Version V2.0-0' )
+
+*  Local Variables:
       REAL                   	FACTOR          ! Renormalization factor for model
       REAL                   	S               	! Chi-squared fit
       REAL                   	SNEW            ! Chi-squared for scaled model
       REAL                   	ZEQUIV          	! Equivalent normal z
 
       INTEGER			DFID			! Data file id
-      INTEGER                	DIMS(ADI__MXDIM)	! Dimensions of a dataset
       INTEGER                	DPTR             	! Pointer to data array
       INTEGER                	DQPTR           	! Data quality
       INTEGER                	DVPTR           	! Data variance
       INTEGER			MFID			! Model file id
       INTEGER                	MPTR            	! Model data
       INTEGER                	MVPTR           	! Model variance
-      INTEGER                	NDIM            	! # dimensions
       INTEGER                	NDOF            ! # degrees of freedom for S
       INTEGER                	NELD            	! # data elements
       INTEGER                	NELM            	! # model elements
@@ -88,48 +153,38 @@
       LOGICAL                	OK              	! Data item acceptable
       LOGICAL                	QUAL            	! Data quality present
       LOGICAL                	POISS           	! Assume Poisson errors
-      LOGICAL                	SOMEBAD         	! Any bad quality points ?
-*
-*    Version :
-*
-      CHARACTER*30           VERSION
-         PARAMETER           (VERSION = 'COMPARE Version 1.8-1')
-*-
+*.
 
-*    Version announcement
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Start up Asterix
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Get the data
-      CALL USI_TASSOCI( 'DATA', '*', 'READ', DFID, STATUS )
-      CALL BDI_CHKDATA( DFID, OK, NDIM, DIMS, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-      IF ( OK ) THEN
-        CALL ARR_SUMDIM( NDIM, DIMS, NELD )
-      ELSE
+*  Get the data
+      CALL USI_ASSOC( 'DATA', 'BinDS|Array', 'READ', DFID, STATUS )
+      CALL BDI_CHK( DFID, 'Data', OK, STATUS )
+      CALL BDI_GETNEL( DFID, NELD, STATUS )
+      IF ( .NOT. OK ) THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP( ' ', 'Numeric data required.', STATUS )
-	GOTO 99
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get the model
-      CALL USI_TASSOCI( 'MODEL', '*', 'READ', MFID, STATUS )
-
-      CALL BDI_CHKDATA( MFID, OK, NDIM, DIMS, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-      IF ( OK ) THEN
-        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
-      ELSE
+*  Get the model
+      CALL USI_ASSOC( 'MODEL', 'BinDS|Array', 'READ', MFID, STATUS )
+      CALL BDI_CHK( MFID, 'Data', OK, STATUS )
+      CALL BDI_GETNEL( DFID, NELM, STATUS )
+      IF ( .NOT. OK ) THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP( ' ', 'Numeric data required.', STATUS )
-	GO TO 99
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check sizes compatible
+*  Check sizes compatible
       IF ( NELD .NE. NELM ) THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP( ' ','Data and model arrays are of'
@@ -137,23 +192,24 @@
 	GOTO 99
       END IF
 
-*    Model
-      CALL BDI_MAPDATA( MFID, 'READ', MPTR, STATUS )
-      CALL BDI_CHKVAR( MFID, MOD_ERR, NDIM, DIMS, STATUS )
+*  Model
+      CALL BDI_MAPR( MFID, 'Data', 'READ', MPTR, STATUS )
+      CALL BDI_CHK( MFID, 'Variance', MOD_ERR, STATUS )
       IF ( MOD_ERR ) THEN
-        CALL BDI_MAPVAR( MFID, 'READ', MVPTR, STATUS )
+        CALL BDI_MAPR( MFID, 'Variance', 'READ', MVPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*    Data
-      CALL BDI_MAPDATA( DFID, 'READ', DPTR, STATUS )
-      CALL BDI_CHKVAR( DFID, OK, NDIM, DIMS, STATUS )
+*  Data
+      CALL BDI_MAPR( DFID, 'Data', 'READ', DPTR, STATUS )
+      CALL BDI_CHK( DFID, 'Variance', OK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( OK ) THEN
-        CALL BDI_MAPVAR( DFID, 'READ', DVPTR, STATUS )
+        CALL BDI_MAPR( DFID, 'Variance', 'READ', DVPTR, STATUS )
+
       ELSE
 
-*      No existing errors - options are Poisson errors or unit errors
+*    No existing errors - options are Poisson errors or unit errors
 	CALL USI_GET0L( 'POISSON', POISS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -168,25 +224,21 @@
 
       END IF
 
-*    Data quality present?
-      CALL BDI_CHKQUAL( DFID, QUAL, NDIM, DIMS, STATUS )
+*  Data quality present?
+      CALL BDI_CHK( DFID, 'Quality', QUAL, STATUS )
       IF ( QUAL ) THEN
-        CALL BDI_MAPLQUAL( DFID, 'READ', SOMEBAD, DQPTR, STATUS )
-        IF ( .NOT. SOMEBAD ) THEN
-          CALL BDI_UNMAPLQUAL( DFID, STATUS )
-          QUAL = .FALSE.
-        END IF
+        CALL BDI_MAPL( DFID, 'LogicalQuality', 'READ', DQPTR, STATUS )
       END IF
 
-*    Calculate chi-squared fit, renormalization factor, and improved fit
+*  Calculate chi-squared fit, renormalization factor, and improved fit
       CALL COMPARE_CHIFIT( NELM, %VAL(DPTR), %VAL(DVPTR), QUAL,
      :           %VAL(DQPTR), %VAL(MPTR), MOD_ERR, %VAL(MVPTR),
      :                     S, NDOF, FACTOR, SNEW, NZV, STATUS )
 
-*    Find equivalent normal z
+*  Find equivalent normal z
       ZEQUIV = SQRT(2*S)-SQRT(2.0*NDOF-1)
 
-*    Output results to terminal
+*  Output results to terminal
       CALL MSG_PRNT( ' ' )
       CALL MSG_SETI( 'NDOF', NDOF )
       CALL MSG_PRNT( '^NDOF good data values ( = d.o.f )' )
@@ -208,11 +260,7 @@
 
       CALL MSG_PRNT( 'New equiv. normal z : ^NEQZ' )
 
-*    Release dataset
-      CALL BDI_RELEASE( DFID, STATUS )
-      CALL BDI_RELEASE( MFID, STATUS )
-
-*    Tidy up and exit
+*  Tidy up and exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -240,7 +288,6 @@
 *    History :
 *
 *     29 Apr 86 : Original (?)
-*
 *     20 Mar 92 : Tidied (BHVAD::DJA)
 *
 *    Type definitions :

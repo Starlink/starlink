@@ -127,7 +127,6 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER WPTR
       INTEGER NVAL,TIMID
       LOGICAL OK
 *-
@@ -155,7 +154,6 @@
         CALL DYN_MAPR(1,T_NVAL,T_WPTR,STATUS)
         CALL BDI_AXGET1R( FID, 1, 'WIDTH', T_NVAL, %VAL(T_WPTR),
      :                    NVAL, STATUS )
-        CALL ARR_COP1R(T_NVAL,%VAL(WPTR),%VAL(T_WPTR),STATUS)
 
 *  axis ancilliaries
         CALL BDI_AXGET0L(FID,1,'Normalised',T_NORM,STATUS)
