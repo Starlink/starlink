@@ -74,7 +74,7 @@ dnl rm -f conftest*
 AC_PATH_PROG(PERL, perl)
 
 dnl   Checks for header files.
-AC_CHECK_HEADERS(assert.h unistd.h)
+AC_CHECK_HEADERS(assert.h unistd.h fcntl.h)
 
 dnl   I don't use HAVE_STDLIB_H, but kpathsea does
 AC_CHECK_HEADERS(stdlib.h)
@@ -84,7 +84,7 @@ dnl   strstream
 AC_CHECK_HEADERS(sstream)
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(pipe)
+AC_CHECK_FUNCS(pipe snprintf)
 dnl   getopt_long.c uses (and provides a replacement for)
 dnl   this glibc utility function
 AC_CHECK_FUNCS(__strchrnul)
