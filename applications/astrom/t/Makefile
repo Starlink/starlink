@@ -11,13 +11,14 @@
 # variables.
 FC=f77
 FFLAGS=
+ADDLIBS=
 
 test: fitsdump
 	./runtests
 
 # Utility to dump fits files, for diffing
 fitsdump: fitsdump.f
-	$(FC) $(FFLAGS) -o fitsdump fitsdump.f -L/star/lib -lcfitsio
+	$(FC) $(FFLAGS) -o fitsdump fitsdump.f -L/star/lib -lcfitsio $(ADDLIBS)
 
 clean:
 	rm -f *~ *.run *.stderr *.stdout *.tmp *.delete
