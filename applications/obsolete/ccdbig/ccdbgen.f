@@ -141,6 +141,8 @@
 *  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN
+      REAL PDA_RAND
+      EXTERNAL PDA_RAND
 
 *  Local Variables:
       CHARACTER * ( 10 ) TYPE   ! Foreign data type
@@ -177,6 +179,10 @@
       INTEGER NRET              ! Number of returns
       INTEGER NVAL              ! Number of values per record
       INTEGER PLACE             ! Place to hold NDF
+      INTEGER SEEDB             ! Random number seed for bias frame
+      INTEGER SEEDF             ! Random number seed for flat frame
+      INTEGER SEEDI             ! Initial random number seed
+      INTEGER SEEDO             ! Random number seed for object frame
       INTEGER UBND( 2, CCD1__MXNDF ) ! Bounds of NDF
       INTEGER WID1              ! Width of bias strip
       INTEGER WID2              ! Width of bias strip
@@ -204,6 +210,7 @@
      :'TELESCOP= ''CCDPACK SPECIAL   '' /',
      :'END' /
 
+      DATA SEEDI /44441/
 *.
 
 *  Check inherited global status.
@@ -217,6 +224,9 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
+
+*  Initialise random number generation.
+      CALL PDA_RNSED( SEEDI )
 
 *  Say what we're about.
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -288,7 +298,7 @@
       CALL PAR_GET0C( 'TYPE', TYPE, STATUS )
       IF ( TYPE .EQ. '.sdf' .OR. TYPE .EQ. '.SDF' ) TYPE = ' '
 
-*  Get flags telling which frames to produce
+*  Get flags telling which frames to produce.
       CALL PAR_GET0L( 'BIAS', BIAS, STATUS )
       CALL PAR_GET0L( 'FLAT', FLAT, STATUS )
 
@@ -321,6 +331,11 @@
          IAT = 10
          CALL CHR_PUTI( DIMS( 2 ), BLOCK( 9 ), IAT )
 
+*  Generate new random number seeds for object, bias and flat noise.
+         SEEDO = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
+         SEEDB = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
+         SEEDF = INT( 1E6 * PDA_RAND( 0 ) ) * 4 + 1
+         
 *  Object frame.
 
 *    Get the frame.
@@ -344,13 +359,14 @@ C         CALL NDF_HCRE( IDO, STATUS )
      :                   STATUS )
 
 *    Add noise to it.
+         CALL PDA_RNSED( SEEDO )
          CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
 
 *    Multiply data by the flatfield.
-         CALL VEC_MULR( .FALSE., EL, %VAL( IPFF ), %VAL( IPOBJ ),
-     :                 %VAL( IPWRK ), IERR, NERR, STATUS )
+         CALL CCD1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), STATUS )
 
 *    Add bias to it.
+         CALL CCD1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
 
 *    Include FITS block.
          CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -378,10 +394,10 @@ C            CALL NDF_HCRE( IDB, STATUS )
      :                    STATUS )
 
 *    Clear data.
+            CALL CCG1_STVR( 0.0, EL, %VAL( IPBIA ), STATUS )
 
 *    Add bias to it.
-         [  CALL CCG1_STVR( 100.0, EL, %VAL( IPBIA ), STATUS ) ]
-         [  CALL CCD1_ANOI( %VAL( IPBIA ), EL, 1.0, STATUS )   ]
+         CALL CCD1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -411,12 +427,18 @@ C            CALL NDF_HCRE( IDF, STATUS )
      :                    STATUS )
 
 *    Assign a constant value to all elments.
+            CALL CCG1_STVR( 1000.0, EL, %VAL( IPFF ), STATUS )
 
 *    Multiply by flatfield.
+            CALL CCD1_FLMUL( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), 
+     :                       STATUS )
 
 *    Add noise.
+            CALL PDA_RNSED( SEEDF )
+            CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 1.0, STATUS )
 
 *    Add bias to it.
+            CALL CCD1_ABIA( %VAL( IPOBJ ), EL, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -457,4 +479,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdgenerate.f,v 1.1 1998/06/15 09:53:31 mbt Exp mbt $
+* $Id: ccdgenerate.f,v 1.3 1998/06/15 11:41:41 mbt Exp mbt $
