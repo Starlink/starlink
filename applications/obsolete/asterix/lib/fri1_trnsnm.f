@@ -125,6 +125,9 @@
 *    Concatenate REF to logical name
         NAME = ROBJ(:RLEN)//'REF'
 
+*    Convert to upper case
+        CA;; CHR_UCASE( NAME )
+
 *  Duff string?
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
         STATUS = SAI__ERROR
