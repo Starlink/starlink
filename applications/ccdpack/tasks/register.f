@@ -748,7 +748,7 @@
 
 *  Ensure that its DATA component is in a defined state.
                 CALL NDF_MAP( IDWCS, 'DATA', '_INTEGER', 'WRITE/BAD',
-     :                        IPDUM, ELDUM, STATUS );
+     :                        IPDUM, ELDUM, STATUS )
                 CALL NDF_UNMAP( IDWCS, 'DATA', STATUS )
 
 *  Assign informative values to its character components.
