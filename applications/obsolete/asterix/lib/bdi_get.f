@@ -118,14 +118,12 @@
       EXTERNAL			BDI0_BLK		! Ensures inclusion
 
 *  Local Variables:
-      CHARACTER*20		LITEM			! Local item name
-
-      INTEGER			ARGS(3)			! Function args
       INTEGER			C1, C2			! Character pointers
       INTEGER			CURELM			! Current o/p element
       INTEGER			ESIZE			! Element size
+      INTEGER			FC			! 1st non _ in TYPE
       INTEGER			IITEM			! Item counter
-      INTEGER			LITL			! Used length of LITEM
+      INTEGER			LID			! Linked data object
       INTEGER			NELM			! Max elements per item
       INTEGER			OARG			! Return value
 *.
@@ -136,11 +134,8 @@
 *  Check initialised
       IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
 
-*  First function argument is the identifier
-      ARGS(1) = ID
-
 *  Second is the linked file object
-      CALL ADI_GETLINK( ID, ARGS(2), STATUS )
+      CALL ADI_GETLINK( ID, LID, STATUS )
 
 *  Current element in output buffer
       CURELM = 1
@@ -151,41 +146,25 @@
 *  Number of output data elements user has supplied per item
       CALL ARR_SUMDIM( NDIM, DIMX, NELM )
 
+*  First significant character of TYPE
+      FC = 1
+      IF ( TYPE(1:1) .EQ. '_' ) FC = 2
+
 *  Loop over items while more of them and status is ok
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-*    Check item name is valid, and make a local copy. Removes any
-*    special item names such as E_Axis_Label.
-        CALL BDI0_CHKITM( ID, ITEMS(C1:C2), LITEM, LITL, STATUS )
-
-*    Check that item can be mapped
-        CALL BDI0_CHKOP( LITEM(:LITL), 'Get', STATUS )
-
-*    Construct string for this item
-        CALL ADI_NEWV0C( LITEM(:LITL), ARGS(3), STATUS )
-
-*    Invoke the function
-        CALL ADI_FEXEC( 'FileItemGet', 3, ARGS, OARG, STATUS )
+*    Get an ADI object holding the objec tdata
+        CALL BDI_GET1( ID, LID, ITEMS(C1:C2), OARG, STATUS )
 
 *    Extract data from return value
         IF ( (STATUS .EQ. SAI__OK) .AND. (OARG.NE.ADI__NULLID) ) THEN
 
-          CALL ADI_GET( OARG, TYPE, NDIM, DIMX, DATA(CURELM),
+          CALL ADI_GET( OARG, TYPE(FC:), NDIM, DIMX, DATA(CURELM),
      :                    DIMS, STATUS )
           CALL ADI_ERASE( OARG, STATUS )
 
-        ELSE IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
-          CALL ERR_REP( 'BDI_GET_1', 'Unable to get item ^ITEM',
-     :                    STATUS )
-
         END IF
-
-*    Release the item string
-        CALL ERR_BEGIN( STATUS )
-        CALL ADI_ERASE( ARGS(3), STATUS )
-        CALL ERR_END( STATUS )
 
 *    Advance pointer into output buffer
         CURELM = CURELM + NELM * ESIZE
@@ -197,5 +176,189 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_GET', STATUS )
+
+      END
+
+
+
+      SUBROUTINE BDI_GET1( ID, LID, ITEM, DID, STATUS )
+*+
+*  Name:
+*     BDI_GET1
+
+*  Purpose:
+*     Get the named item as an ADI object
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI_GET1( ID, LID, ITEM, DID, STATUS )
+
+*  Description:
+*     Retrieves the item specified by the ITEM string as an ADI object
+
+*  Arguments:
+*     ID = INTEGER (given)
+*        ADI identifier of BinDS, Array or Scalar object, or derivatives
+*        thereof
+*     LID = INTEGER (given)
+*        Object ID is linked to
+*     ITEM = CHARACTER*(*) (given)
+*        Single item to be retrieved
+*     DID = INTEGER (returned)
+*        The ADI object containing the item data
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'QUAL_PAR'
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER		        ID, LID
+      CHARACTER*(*)		ITEM
+
+*  Arguments Returned:
+      INTEGER			DID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_INSET
+        LOGICAL			CHR_INSET
+
+*  Local Variables:
+      CHARACTER*20		LITEM			! Local item name
+
+      INTEGER			ARGS(3)			! Function args
+      INTEGER			LITL			! Used length of LITEM
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First function argument is the identifier, second is linked object
+      ARGS(1) = ID
+      ARGS(2) = LID
+
+*  Check item name is valid, and make a local copy. Removes any
+*  special item names such as E_Axis_Label.
+      CALL BDI0_CHKITM( ID, ITEM, LITEM, LITL, STATUS )
+
+*  Check that the GET operation is allowed on this item
+      CALL BDI0_CHKOP( LITEM(:LITL), 'Get', STATUS )
+
+*  Construct string for this item
+      CALL ADI_NEWV0C( LITEM(:LITL), ARGS(3), STATUS )
+
+*  Start new error context to protect caller from errors we cancel
+      CALL ERR_BEGIN( STATUS )
+
+*  Invoke the function
+      CALL ADI_FEXEC( 'FileItemGet', 3, ARGS, DID, STATUS )
+
+*  If we failed to get the data, see if its one of the items which we
+*  can default
+      IF ( STATUS .NE. SAI__OK ) THEN
+
+*    All text items just get defaulted to blank
+        IF ( CHR_INSET( 'Title,Units,Label', LITEM(:LITL) ) .OR.
+     :       CHR_INSET( 'Units,Label', LITEM(MAX(1,LITL-4):LITL) )
+     :     ) THEN
+
+          CALL ERR_ANNUL( STATUS )
+          CALL ADI_NEWV0C( ' ', DID, STATUS )
+
+*    Axis normalisations default to false
+        ELSE IF ( LITEM(MAX(1,LITL-9):LITL) .EQ. 'Normalised' ) THEN
+
+          CALL ERR_ANNUL( STATUS )
+          CALL ADI_NEWV0L( .FALSE., DID, STATUS )
+
+*    Quality mask defaults to all bits set
+        ELSE IF ( LITEM(:LITL) .EQ. 'QualityMask' ) THEN
+
+          CALL ERR_ANNUL( STATUS )
+          CALL ADI_NEWV0I( 255, DID, STATUS )
+
+*    Otherwise report error
+        ELSE
+          CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
+          CALL ERR_REP( 'BDI_GET_1', 'Unable to get item ^ITEM',
+     :                    STATUS )
+
+        END IF
+
+      END IF
+
+*  Release the error context
+      CALL ERR_END( STATUS )
+
+*  Release the item string
+      CALL ADI_ERASE( ARGS(3), STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_GET1', STATUS )
 
       END

@@ -1,262 +1,288 @@
-*+  EXPORT - Write contents of a dataset, optionall with IMPORT keywords
       SUBROUTINE EXPORT( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     EXPORT
+
+*  Purpose:
+*     Write contents of a dataset to ascii, optionally with IMPORT keywords
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL EXPORT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Writes out all the useful axis, data, error, variance and quality
 *     values of a dataset to a specified text file. EXPORT also optionally
 *     writes a header for use with the IMPORT program.
-*
-*    Environment parameters :
-*
-*     INP = UNIV(R)
-*       The input binned dataset, may be primitive
-*     OUT = FILE(W)
-*       The output text file
-*     IMPREAD = LOGICAL(R)
-*       Write IMPORT compatible header?
-*
-*    Method :
-*     <description of how the application works - for programmer info>
-*    Deficiencies :
-*    Bugs :
-*
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      2 Mar 92 : V1.6-0  Original (DJA)
-*      6 Aug 92 : V1.6-1  Fixed bug wiudth scalar axis widths (DJA)
-*     25 Feb 94 : V1.7-0  Use BIT_ routines to do bit manipulations (DJA)
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     15 Jan 95 : V1.8-1  New data interfaces (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      CHARACTER*80            LABEL                  ! Data label
-      CHARACTER*80            STRING                 ! Utility string
-      CHARACTER*80            TITLE                  ! Dataset title
-      CHARACTER*(ADI__SZTYP)  TYPE                   ! Input dataset type
-      CHARACTER*80            UNITS                  ! Data units
 
-      REAL                    ABASE, ASCALE          ! Regular axis values
-      REAL                    AWIDTH(ADI__MXDIM)     ! Axis width values if reg
+*  Usage:
+*     export {parameter_usage}
 
-      INTEGER                 APTR(ADI__MXDIM)       ! Axis data ptr
-      INTEGER                 AWPTR(ADI__MXDIM)      ! Axis width ptr
-      INTEGER                 DIMS(ADI__MXDIM)       ! Dimensions
-      INTEGER                 DPTR                   ! Ptr to data
-      INTEGER                 IAX                    ! Loop over axes
-      INTEGER			IFID			! Input file identifier
-      INTEGER                 IMASK                  ! Input quality mask
-      INTEGER                 NAX                    ! Number of axes
-      INTEGER                 NCHAR                  ! # char used in STRING
-      INTEGER                 NDIM                   ! Dimensionality
-      INTEGER                 NVAL                   ! Axis dimension
-      INTEGER                 QDIMS(ADI__MXDIM)      ! QUALITY dimensions
-      INTEGER                 QNDIM                  ! QUALITY dimensionality
-      INTEGER                 QPTR                   ! Ptr to quality
-      INTEGER                 OFD                    ! Output FIO descriptor
-      INTEGER                 VDIMS(ADI__MXDIM)      ! VARIANCE dimensions
-      INTEGER                 VNDIM                  ! VARIANCE dimensionality
-      INTEGER                 VPTR                   ! Ptr to variance
+*  Environment Parameters:
+*     INP = LITERAL (read)
+*        The input binned dataset, may be primitive
+*     OUT = LITERAL (read)
+*        The output text file
+*     IMPREAD = LOGICAL (read)
+*        Write IMPORT compatible header?
 
-      BYTE                    QMASK                  ! Input quality mask
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
 
-      LOGICAL                 AOK(ADI__MXDIM)        ! Axis ok?
-      LOGICAL                 ANORM                  ! Axis normalised?
-      LOGICAL                 AREG(ADI__MXDIM)       ! Axis regular?
-      LOGICAL                 AWOK(ADI__MXDIM)       ! Axis widths ok?
-      LOGICAL                 AWUNIF(ADI__MXDIM)     ! Axis widths uniform?
-      LOGICAL                 DECREASING             ! Axis values decreasing?
-      LOGICAL                 DOK                    ! DATA ok?
-      LOGICAL                 EOK                    ! ERRORS ok?
-      LOGICAL                 IMPREAD                ! IMPORT readable
-      LOGICAL                 INPRIM                 ! Input is primitive?
-      LOGICAL                 QOK                    ! QUALITY ok?
-      LOGICAL                 VOK                    ! VARIANCE ok?
-*
-*    Version :
-*
-      CHARACTER*30 VERSION
-        PARAMETER (VERSION = 'EXPORT Version 1.8-1')
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     export, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      2 Mar 1992 V1.6-0 (DJA):
+*        Original version.
+*      6 Aug 1992 V1.6-1 (DJA):
+*        Fixed bug wiudth scalar axis widths
+*     25 Feb 1994 V1.7-0 (DJA):
+*        Use BIT_ routines to do bit manipulations
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     15 Jan 1995 V1.8-1 (DJA):
+*        New data interfaces
+*     12 Sep 1995 V2.0-0 (DJA):
+*        Full ADI port.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'EXPORT Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*80              LABUN(2)                ! Label & units
+      CHARACTER*80              STRING                  ! Utility string
+      CHARACTER*80              TITLE                   ! Dataset title
+      CHARACTER*20              TYPE                    ! Input dataset type
+
+      REAL                      AV1, AV2                ! First 2 axis values
+
+      INTEGER                   APTR(ADI__MXDIM)        ! Axis data ptr
+      INTEGER                   AWPTR(ADI__MXDIM)       ! Axis width ptr
+      INTEGER                   DIMS(ADI__MXDIM)        ! Dimensions
+      INTEGER                   DPTR                    ! Ptr to data
+      INTEGER                   IAX                     ! Loop over axes
+      INTEGER			IFID			! Input file identifier
+      INTEGER                   IMASK                   ! Input quality mask
+      INTEGER                   NAX                     ! Number of axes
+      INTEGER                   NCHAR                   ! # char used in STRING
+      INTEGER                   NDIM                    ! Dimensionality
+      INTEGER                   QPTR                    ! Ptr to quality
+      INTEGER                   OFD                     ! Output FIO descriptor
+      INTEGER                   VPTR                    ! Ptr to variance
+
+      LOGICAL                   AOK(ADI__MXDIM)         ! Axis ok?
+      LOGICAL                   ANORM                   ! Axis normalised?
+      LOGICAL                   AWOK(ADI__MXDIM)        ! Axis widths ok?
+      LOGICAL                   DECREASING              ! Axis values decreasing?
+      LOGICAL                   DOK                     ! DATA ok?
+      LOGICAL                   EOK                     ! ERRORS ok?
+      LOGICAL                   IMPREAD                 ! IMPORT readable
+      LOGICAL			OK			! Validity check
+      LOGICAL                   QOK                     ! QUALITY ok?
+      LOGICAL                   VOK                     ! VARIANCE ok?
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Start up ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Get input object
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
+*  Get input dataset
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-      CALL BDI_TYPE( IFID, TYPE, STATUS )
 
-*    Get output filename
+*  Get output file
       CALL FIO_ASSOC( 'OUT', 'WRITE', 'LIST', 0, OFD, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Write IMPORT readable keywords?
+*  Write IMPORT readable keywords?
       CALL USI_GET0L( 'IMPREAD', IMPREAD, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*   Find out about dataset
-
-*    First the data
-      CALL BDI_CHKDATA( IFID, DOK, NDIM, DIMS, STATUS )
+*  First the data
+      CALL BDI_CHK( IFID, 'Data', DOK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. DOK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'No data present in $INP', STATUS )
         GOTO 99
       ELSE
-        CALL BDI_MAPDATA( IFID, 'READ', DPTR, STATUS )
+        CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
       END IF
 
-*    Other data items
-      IF ( INPRIM ) THEN
+*  Check QUALITY
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
+      IF ( QOK ) THEN
+        CALL BDI_GET0I( IFID, 'QualityMask', IMASK, STATUS )
+        CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
+      END IF
+
+*  Check VARIANCE
+      EOK = .FALSE.
+      CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
+      IF ( VOK ) THEN
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', VPTR, STATUS )
+      END IF
+
+*  Any axes?
+      CALL BDI_CHK( IFID, 'Axes', OK, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( .NOT. OK ) THEN
+        CALL MSG_PRNT( 'WARNING : No axes present in input' )
         NAX = 0
-        QOK = .FALSE.
-        EOK = .FALSE.
-        VOK = .FALSE.
 
       ELSE
 
-        EOK = .FALSE.
+*    Get info for each axis
+        DO IAX = 1, NDIM
 
-*      Check QUALITY
-        CALL BDI_CHKQUAL( IFID, QOK, QNDIM, QDIMS, STATUS )
-        IF ( QOK ) THEN
-          CALL BDI_GETMASK( IFID, QMASK, STATUS )
-          CALL BDI_MAPQUAL( IFID, 'READ', QPTR, STATUS )
-        END IF
+*      Axis data present?
+          CALL BDI_AXCHK( IFID, IAX, 'Data', AOK(IAX), STATUS )
+          IF ( AOK(IAX) ) THEN
 
-*      Check VARIANCE
-        CALL BDI_CHKVAR( IFID, VOK, VNDIM, VDIMS, STATUS )
-        IF ( VOK ) THEN
-          CALL BDI_MAPVAR( IFID, 'READ', VPTR, STATUS )
-        END IF
+*        Axis data values
+            CALL BDI_AXMAPR( IFID, IAX, 'Data', 'READ', APTR(IAX),
+     :                       STATUS )
 
-*      Any axes?
-        CALL BDI_CHKAXES( IFID, NAX, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-        IF ( NAX .EQ. 0 ) THEN
-          CALL MSG_PRNT( 'WARNING : No axes present in structured'/
-     :                                                /' dataset' )
-        ELSE
-
-*        Get info for each
-          DO IAX = 1, NAX
-            CALL BDI_CHKAXIS( IFID, IAX, AOK(IAX), STATUS )
-            IF ( AOK(IAX) ) THEN
-
-*            Axis data values
-              CALL BDI_CHKAXVAL( IFID, IAX, AOK(IAX), AREG(IAX),
-     :                                           NVAL, STATUS )
-              CALL BDI_MAPAXVAL( IFID, 'READ', IAX, APTR(IAX),
-     :                                                STATUS )
-
-*            Normal widths?
-              CALL BDI_CHKAXWID( IFID, IAX, AWOK(IAX), AWUNIF(IAX),
-     :                                               NVAL, STATUS )
-              IF ( AWOK(IAX) ) THEN
-                IF ( AWUNIF(IAX) ) THEN
-                  CALL BDI_GETAXWID( IFID, IAX, AWIDTH(IAX), STATUS )
-                ELSE
-                  CALL BDI_MAPAXWID( IFID, 'READ', IAX, AWPTR(IAX),
-     :                                                     STATUS )
-                END IF
-              END IF
-
+*        Axis widths?
+            CALL BDI_AXCHK( IFID, IAX, 'Width', AWOK(IAX), STATUS )
+            IF ( AWOK(IAX) ) THEN
+              CALL BDI_AXMAPR( IFID, IAX, 'Width', 'READ',
+     :                             AWPTR(IAX), STATUS )
             END IF
-          END DO
 
-        END IF
+          END IF
+        END DO
+
       END IF
 
-*    Write IMPORT readable header?
+*  Write IMPORT readable header?
       IF ( IMPREAD ) THEN
 
-*      Construct TOPLEVEL component
+*    Construct TOPLEVEL component
+        CALL ADI_TYPE( IFID, TYPE, STATUS )
+        CALL BDI_GET0C( IFID, 'Title', TITLE, STATUS )
         CALL EXPORT_SET( 'TYPE', TYPE )
-        CALL BDI_GETTITLE( IFID, TITLE, STATUS )
         CALL EXPORT_SET( 'TITLE', TITLE )
         CALL EXPORT_WRITE( OFD, 'TOPLEVEL ^TYPE ^TITLE', STATUS )
 
-*      For each dimension
+*    For each dimension
         DO IAX = 1, NDIM
 
-*        Everything ok?
+*      Everything ok?
           IF ( AOK(IAX) ) THEN
 
-*          Put LABEL token
-            CALL BDI_GETAXLABEL( IFID, IAX, LABEL, STATUS )
-            CALL EXPORT_SET( 'LABEL', LABEL )
+*        Get axis label and units
+            CALL BDI_AXGET0C( IFID, IAX, 'Label,Units', LABUN, STATUS )
 
-*          Put UNITS token
-            CALL BDI_GETAXUNITS( IFID, IAX, UNITS, STATUS )
-            CALL EXPORT_SET( 'UNITS', UNITS )
-
-*          Put NORM token
-            CALL BDI_GETAXNORM( IFID, IAX, ANORM, STATUS )
+*        Put NORM token
+            CALL BDI_AXGET0L( IFID, IAX, 'Normalised', ANORM, STATUS )
             IF ( ANORM ) THEN
               CALL MSG_SETC( 'NORM', 'NORM' )
             ELSE
               CALL MSG_SETC( 'NORM', ' ' )
             END IF
 
-*          Put DECREASING token if needed
-            IF ( AREG(IAX) ) THEN
-              CALL BDI_GETAXVAL( IFID, IAX, ABASE, ASCALE, NVAL,
-     :                                                  STATUS )
-              DECREASING = (ASCALE.LT.0.0)
-            ELSE
-              DECREASING = .FALSE.
+*        Put DECREASING token if needed
+            DECREASING = .FALSE.
+            IF ( DIMS(IAX) .GT. 1 ) THEN
+              CALL ARR_ELEM1R( APTR(IAX), DIMS(IAX), 1, AV1, STATUS )
+              CALL ARR_ELEM1R( APTR(IAX), DIMS(IAX), 2, AV2, STATUS )
+              DECREASING = ( AV2 .LT. AV1 )
             END IF
+
+*        Set the tokens
+            CALL EXPORT_SET( 'LABEL', LABUN(1) )
+            CALL EXPORT_SET( 'UNITS', LABUN(2) )
             IF ( DECREASING ) THEN
               CALL MSG_SETC( 'DECREASING', 'DECREASING' )
             ELSE
               CALL MSG_SETC( 'DECREASING', ' ' )
             END IF
 
-*          Scalar axis widths?
-            IF ( AWOK(IAX) .AND. AWUNIF(IAX) ) THEN
-              CALL CHR_RTOC( AWIDTH(IAX), STRING, NCHAR )
-              CALL EXPORT_SET( 'SCALAR_WIDTH', STRING(:NCHAR) )
-            ELSE
-              CALL EXPORT_SET( 'SCALAR_WIDTH', ' ' )
-            END IF
-
-*          Write the descriptor
+*        Write the descriptor
             CALL EXPORT_WRITE( OFD, 'AXIS ^LABEL ^UNITS ^NORM'/
-     :                   /' ^SCALAR_WIDTH ^DECREASING', STATUS )
+     :                         /' ^DECREASING', STATUS )
 
-*          Width descriptor?
-            IF ( AWOK(IAX) .AND. .NOT. AWUNIF(IAX) ) THEN
+*        Width descriptor?
+            IF ( AWOK(IAX) ) THEN
               CALL EXPORT_WRITE( OFD, 'WIDTH', STATUS )
             END IF
 
-*        Otherwsie write dummy axis
+*      Otherwise write dummy axis
           ELSE
             CALL EXPORT_WRITE( OFD, 'AXIS', STATUS )
 
@@ -264,29 +290,20 @@
 
         END DO
 
-*      Reset uniform axis widths
-        DO IAX = 1, NDIM
-          IF ( AWOK(IAX) .AND. AWUNIF(IAX) ) THEN
-            AWOK(IAX) = .FALSE.
-          END IF
-        END DO
-
-*      The data
-        CALL BDI_GETLABEL( IFID, LABEL, STATUS )
-        CALL EXPORT_SET( 'LABEL', LABEL )
-        CALL BDI_GETUNITS( IFID, UNITS, STATUS )
-        CALL EXPORT_SET( 'UNITS', UNITS )
+*    The data
+        CALL BDI_GET0C( IFID, 'Label,Units', LABUN, STATUS )
+        CALL EXPORT_SET( 'LABEL', LABUN(1) )
+        CALL EXPORT_SET( 'UNITS', LABUN(2) )
         CALL EXPORT_WRITE( OFD, 'DATA ^LABEL ^UNITS', STATUS )
 
-*      Quality
+*    Quality
         IF ( QOK ) THEN
-          IMASK = QMASK
           CALL CHR_ITOC( IMASK, STRING, NCHAR )
           CALL EXPORT_SET( 'MASK', STRING(:NCHAR) )
           CALL EXPORT_WRITE( OFD, 'QUALITY ^MASK', STATUS )
         END IF
 
-*      Asymmetric errors if present
+*    Asymmetric errors if present
         IF ( EOK ) THEN
           CALL EXPORT_WRITE( OFD, 'LOERROR', STATUS )
           CALL EXPORT_WRITE( OFD, 'UPERROR', STATUS )
@@ -296,27 +313,27 @@
 
       END IF
 
-*    Pad dimensions to 7D
+*  Pad dimensions to 7D
       CALL AR7_PAD( NDIM, DIMS, STATUS )
       DO IAX = NDIM+1, ADI__MXDIM
         AOK(IAX) = .FALSE.
         AWOK(IAX) = .FALSE.
       END DO
 
-*    Write data values
+*  Write data values
       CALL EXPORT_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4), DIMS(5),
      :                 DIMS(6), DIMS(7), NDIM,
      :                 AOK, APTR, AWOK, AWPTR,
      :                 DOK, %VAL(DPTR), QOK, %VAL(QPTR),
      :                 VOK, %VAL(VPTR), OFD, STATUS )
 
-*    Release input
-      CALL BDI_RELEASE( IFID, STATUS )
+*  Release input
+      CALL USI_CANCL( 'INP', STATUS )
 
-*    Close output file
+*  Close output file
       CALL FIO_CLOSE( OFD, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -675,13 +692,13 @@
       INTEGER                BLEN            ! Chars used in BUF
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Expand text
+*  Expand text
       CALL MSG_MAKE( TEXT, BUF, BLEN )
 
-*    Write text
+*  Write text
       CALL FIO_WRITE( FD, BUF(:BLEN), STATUS )
 
       END
