@@ -187,7 +187,7 @@ $atools->contactw || die "Error launching atools -- timeout";
 
 #$moggy = Moggy->new('usno@eso');
 $moggy = Moggy->new ('dummy@home',
-		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/test/local.config');
+		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
 		     #'file:///scratch/goedel/norman/playpen/test.config');
 
 # Obtain a catalogue covering the same part of the sky as the NDF.
