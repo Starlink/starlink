@@ -484,7 +484,7 @@ PTR F77_EXTERNAL_NAME(math_setrndstate)( PTR arg_state )
    pointer if the front one has wrapped.  Returns a 31-bit random number.  */
 
 F77_INTEGER_FUNCTION(math_irnd)()
-{
+  {
   if (rand_type == TYPE_0)
     {
       state[0] = ((state[0] * 1103515245) + 12345) & LONG_MAX;
@@ -510,10 +510,4 @@ F77_INTEGER_FUNCTION(math_irnd)()
 	}
       return i;
     }
-}
-
-
-F77_REAL_FUNCTION(math_rnd)()
-  {
-  return ((float) F77_CALL(math_irnd)())/((float) LONG_MAX);
   }
