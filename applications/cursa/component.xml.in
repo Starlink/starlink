@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>applications/kappa</path>
+  <path>applications/cursa</path>
   <description>CURSA - Catalogue and Table Manipulation Applications</description>
   <abstract><p>
 CURSA is a package of Starlink applications for manipulating astronomical
