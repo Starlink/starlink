@@ -1,5 +1,5 @@
-      SUBROUTINE CCG1_WTM3D( ORDDAT, WEIGHT, VAR, NENT, USED, COVAR,
-     :                         RESULT, RESVAR, STATUS )
+      SUBROUTINE CCG1_WTM3D( CALCMV, ORDDAT, WEIGHT, VAR, NENT, USED, 
+     :                       COVAR, RESULT, RESVAR, STATUS )
 *+
 *  Name:
 *     CCG1_WTM3D
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL CCG1_WTM3D( ORDDAT, WEIGHT, VAR, NENT, USED, COVAR,
-*                         RESULT, RESVAR, STATUS )
+*      CALL CCG1_WTM3D( CALCMV, ORDDAT, WEIGHT, VAR, NENT, USED, COVAR,
+*                       RESULT, RESVAR, STATUS )
 
 *  Description:
 *     This routine finds a value which can be associated with the half-
@@ -33,6 +33,11 @@
 *     variance.
 
 *  Arguments:
+*     CALCMV = LOGICAL (Given)
+*        If .FALSE. then the output variances are estimated by scaling
+*        the variance on the weighted mean (rather than the weighted median) 
+*        by Pi/2. Otherwise, the output variances are calculated using the
+*        COVEC array.
 *     ARR( NENT ) = DOUBLE PRECISION (Given)
 *        The list of ordered data for which the weighted median is
 *        required
@@ -47,7 +52,7 @@
 *        true in this array, otherwise the array is set to false.
 *     COVAR( * ) = DOUBLE PRECISION (Given)
 *        The packed variance-covariance matrix of the order statistics
-*        from a normal distribution of size NENT.
+*        from a normal distribution of size NENT. Not used if CALCMV is .FALSE.
 *     RESULT = DOUBLE PRECISION (Returned)
 *        The weighted median
 *     RESVAR = DOUBLE PRECISION (Returned)
@@ -77,6 +82,8 @@
 *        Added used array.
 *     27-MAY-1992 (PDRAPER):
 *        Added direct variance estimates.
+*     27-AUG-2003 (DSB):
+*        Added argument CALCMV.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -183,37 +190,45 @@
 * Interpolate between data values
          RESULT = D1 * W1 + D2 * W2
 
-*  Sum the relevant ordered statistic variances and covariances.
-*  weighting accordingly.
-         VSUM = 0.0D0
-         DO 3 K = LBND, UBND
-            IF( K .EQ. LBND ) THEN
-               IW = W1
-            ELSE
-               IW = W2
-            END IF
-            DO 4 J = K, UBND
-               IF( J .EQ. LBND ) THEN
-                  JW = W1
+*  If required, sum the relevant ordered statistic variances and 
+*  covariances weighting accordingly.
+         IF( CALCMV ) THEN 
+            VSUM = 0.0D0
+            DO 3 K = LBND, UBND
+               IF( K .EQ. LBND ) THEN
+                  IW = W1
                ELSE
-                  JW = W2
+                  IW = W2
                END IF
+               DO 4 J = K, UBND
+                  IF( J .EQ. LBND ) THEN
+                     JW = W1
+                  ELSE
+                     JW = W2
+                  END IF
 
 *  Sum variances and twice covariances ( off diagonal elements ).
-               IF( K .EQ. J ) THEN
-                  VSUM = VSUM + IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
-               ELSE
-                  VSUM = VSUM +
-     :                   2.0D0 * IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
-               END IF
- 4          CONTINUE
- 3       CONTINUE
+                  IF( K .EQ. J ) THEN
+                     VSUM = VSUM + IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
+                  ELSE
+                     VSUM = VSUM +
+     :                      2.0D0 * IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
+                  END IF
+ 4             CONTINUE
+ 3          CONTINUE
 
 *  Right make the new variance estimate. Use the sum of variances
 *  and covariances of the order statistic of the `trimmed' sample size
 *  Sample variance changes to NENT * VAR to represent total variance
 *  of original data.
-         RESVAR = VAR * NENT * VSUM
+            RESVAR = VAR * NENT * VSUM
+
+*  If we are estimating the variance on the basis of the variance of the
+*  mean, calculate the estimate.
+         ELSE
+            RESVAR = PIBY2/TOTWT
+         END IF
+
       END IF
       END
 * $Id$

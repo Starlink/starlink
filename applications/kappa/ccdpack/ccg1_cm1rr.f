@@ -51,6 +51,7 @@
 *        8  = MINMAX MEAN
 *        9  = BROADENED MEDIAN
 *        10 = SIGMA CLIPPED MEDIAN
+*        300 = Median, but estimating variance from mean variance.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
@@ -76,7 +77,7 @@
 *        Workspace for order statistics calculations.
 *     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        Workspace for storing ordered statistics variace-covariance
-*        matrix.
+*        matrix. Not used for IMETHs 1, 2 or 300.
 *     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        The actual number of contributing pixels from each input line
 *        to the output line.
@@ -128,6 +129,10 @@
 *        Added unweighted mean method.
 *     1-NOV-2002 (DSB):
 *        Added workspace argument to CCD1_ORVAR.
+*     27-AUG-2003 (DSB):
+*        Added IMETH 300 to provide a means of estimating the output
+*        variances for large samples, for which the memory requirements
+*        for the COVEC array would be too large.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -182,7 +187,7 @@
 *  for the order statistics of a normal popl with up to NLINE members.
 *  This also sets up the scale factor for converting mean variances to
 *  median variances.
-      IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) THEN
+      IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) THEN
           CALL PSX_CALLOC( NLINES*NLINES, '_DOUBLE', IPW1, STATUS )
           CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, %VAL( IPW1 ), 
      :                     STATUS )
@@ -202,12 +207,12 @@
          CALL CCG1_MER1R( STACK, NPIX, NLINES, VARS, MINPIX,
      :                      RESULT, RESVAR, NCON, STATUS )
 
-      ELSE IF ( IMETH .EQ. 3 ) THEN
+      ELSE IF ( IMETH .EQ. 3 .OR. IMETH .EQ. 300 ) THEN
 
 *  Forming the weighted median.
-         CALL CCG1_MDR1R( STACK, NPIX, NLINES, VARS, MINPIX, COVEC,
-     :                      NMAT, RESULT, RESVAR, WRK1, WRK2, NCON,
-     :                      POINT, USED, STATUS )
+         CALL CCG1_MDR1R( ( IMETH .EQ. 3 ), STACK, NPIX, NLINES, VARS, 
+     :                    MINPIX, COVEC, NMAT, RESULT, RESVAR, WRK1, 
+     :                    WRK2, NCON, POINT, USED, STATUS )
 
       ELSE IF ( IMETH .EQ. 4 ) THEN
 

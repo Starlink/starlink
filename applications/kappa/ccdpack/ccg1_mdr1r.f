@@ -1,6 +1,6 @@
-      SUBROUTINE CCG1_MDR1R( STACK, NPIX, NLINES, VARS, MINPIX,
-     :                         COVEC, NMAT, RESULT, RESVAR, WRK1,
-     :                         WRK2, NCON, POINT, USED, STATUS )
+      SUBROUTINE CCG1_MDR1R( CALCMV, STACK, NPIX, NLINES, VARS, MINPIX,
+     :                       COVEC, NMAT, RESULT, RESVAR, WRK1, WRK2, 
+     :                       NCON, POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_MDR1
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_MDR1( STACK, NPIX, NLINES, VARS, MINPIX, COVEC, NMAT,
-*                     RESULT, RESVAR, WRK1, WRK2, NCON, POINT, USED,
-*                     STATUS )
+*     CALL CCG1_MDR1R( CALCMV, STACK, NPIX, NLINES, VARS, MINPIX,
+*                      COVEC, NMAT, RESULT, RESVAR, WRK1, WRK2, 
+*                      NCON, POINT, USED, STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)
@@ -24,6 +24,11 @@
 *     output means are returned in the array RESULT.
 
 *  Arguments:
+*     CALCMV = LOGICAL (Given)
+*        If .FALSE. then the output variances are estimated by scaling
+*        the variance on the weighted mean (rather than the weighted median) 
+*        by Pi/2. Otherwise, the output variances are calculated using the
+*        COVEC array.
 *     STACK( NPIX, NLINES ) = REAL (Given)
 *        The array of lines which are to be combined into a single line.
 *     NPIX = INTEGER (Given)
@@ -38,7 +43,7 @@
 *     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
 *        The packed variance-covariance matrix of the order statistics
 *        from a normal distribution of sizes up to NLINES, produced by
-*        CCD1_ORVAR.
+*        CCD1_ORVAR. Not used if CALCMV is .FALSE.
 *     NMAT = INTEGER (Given)
 *        Size of the first dimension of COVEC.
 *     RESULT( NPIX ) = REAL (Returned)
@@ -67,6 +72,8 @@
 *  History:
 *     20-MAY-1992 (PDRAPER):
 *        Original version.
+*     27-AUG-2003 (DSB):
+*        Added argument CALCMV.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -178,8 +185,13 @@
             CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Find the weighted median.
-            CALL CCG1_WTM3R( WRK1, WRK2, SVAR, NGOOD, USED,
-     :                       COVEC( 1, NGOOD ), VAL, VAR, STATUS )
+            IF( CALCMV ) THEN
+               CALL CCG1_WTM3R( CALCMV, WRK1, WRK2, SVAR, NGOOD, USED,
+     :                          COVEC( 1, NGOOD ), VAL, VAR, STATUS )
+            ELSE
+               CALL CCG1_WTM3R( CALCMV, WRK1, WRK2, SVAR, NGOOD, USED,
+     :                          COVEC, VAL, VAR, STATUS )
+            END IF
 
 *  Update the used line counters.
             DO 3 J = 1, NGOOD

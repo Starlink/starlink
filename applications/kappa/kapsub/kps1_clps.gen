@@ -84,6 +84,10 @@
 *     14-DEC-2001 (DSB):
 *        Renamed weighted mean method as WMEAN, and add unweighted method
 *        MEAN.
+*     27-AUG-2003 (DSB):
+*        To avoid impractical memory requirements, estimate the output median 
+*        variances rather than calculating them properly for sample sizes 
+*        larger than 300.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -285,9 +289,19 @@
 *  First deal with cases where input variances are available.
 *  Output variances are generated based on these input variances.
       IF( VAR ) THEN
+
+*  If we are using a median estimator, and we are producing output
+*  variances, and the input image is big, we will estimate the variance
+*  on the median rather than calculating it properly. This is because the 
+*  memory requirements for the covariance array becomes huge for large 
+*  images. "Median with estimated variances" is treated as a new IMETH
+*  value, 300.
+         IF( IMETH .EQ. 3 .AND. NLIN .LT. 300 ) IMETH = 300
+
+*  Allocate memory
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN*( NLIN + 1 )/2 
-         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) THEN
+         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) THEN
             CALL PSX_CALLOC( NLIN*NMAT, '_DOUBLE', IPCOV, STATUS )
          ELSE
             IPCOV = IPPP
@@ -312,12 +326,12 @@
      :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
      :                       %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
      :                       %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                       %VAL (IPUSED ), STATUS )
+     :                       %VAL(IPUSED ), STATUS )
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
-         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) CALL PSX_FREE( IPCOV, 
-     :                                                        STATUS )
+         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) 
+     :          CALL PSX_FREE( IPCOV, STATUS )
 
 *  Now deal with cases where input variances are not available. No output
 *  variances will be created.
@@ -348,6 +362,9 @@
          CALL PSX_FREE( IPVAR, STATUS )
 
       END IF
+
+*  If required, 
+
 
 *  Free the remaining work space.
       CALL PSX_FREE( IPWRK1, STATUS )
