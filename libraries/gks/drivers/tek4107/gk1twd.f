@@ -41,6 +41,7 @@ C# IL>=a, OL>=0
 *                     well as predefined ones (S79).
 *     25/10/89  RMK   In GK1TRO, use MOD to ensure that colour indices
 *                     are valid (S350).
+*     16/07/92  DLT   Add starlink escape.
 *
 *  ARGUMENTS
 *  ---------
@@ -146,6 +147,11 @@ C# IL>=a, OL>=0
 *     text
       INTEGER ICHX
       REAL RCHHX,RCHHY,RCHWX,RCHWY,RCHRX,RCHRY
+*  Starlink no screen clear escape
+      INTEGER INOCLR
+      SAVE INOCLR
+      DATA INOCLR/GNO/
+
       DATA ITXF /1,1/,
      :     ITXP /GSTRP,GCHARP/
       DATA RENEW /27,75,78,48/
@@ -213,7 +219,7 @@ C# IL>=a, OL>=0
 * Initialise device
           CALL GK1TID
 * Erase screen
-          CALL GK1TCL
+          IF (INOCLR.EQ.GNO) CALL GK1TCL
         ENDIF
       ENDIF
       KWI1 = GOUTIN
@@ -319,6 +325,12 @@ C# IL>=a, OL>=0
 
 * Escape
   110 CONTINUE
+* Starlink no screen clear escape
+      IF (KWI1.EQ.-3) THEN
+         INOCLR = KWI2
+         GOTO 9999
+      END IF
+
       KERROR = 180
       GOTO 9999
 
