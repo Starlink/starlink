@@ -546,7 +546,7 @@ MISC_FILES = gsd2_copya.out gsd2_nativx.out README
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun229.tex
-HYPERTEXT_DOCS = sun229.htx_tar
+HYPERTEXT_DOCS = sun229.htx
 
 #  List of documentation files.
 
