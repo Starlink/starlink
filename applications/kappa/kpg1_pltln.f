@@ -126,6 +126,8 @@
 *     9-DEC-1998 (DSB):
 *        Check X and Y against AST__BAD before checking that there
 *        is at least one point within the plot.
+*     17-JUN-1999 (DSB):
+*        Call to PGEBUF added to end the PGPLOT buffering context.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -688,6 +690,6 @@
       CALL AST_SETI( IPLOT, 'STYLE(CURVES)', CVSTY0, STATUS )
 
 *  End the PGPLOT buffering context.
-      CALL PGBBUF
+      CALL PGEBUF
 
       END

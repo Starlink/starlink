@@ -84,7 +84,7 @@ F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
    AstChannel *chan;
    Tcl_Interp *interp = NULL;
    char *fname = NULL;
-   char *script = NULL;
+   char script[1024];
    int i;
    int j;
    int n;                      
@@ -161,7 +161,7 @@ F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
       }
 
 /* Execute the TCL script. This should be $KAPPA_DIR/tkast.tcl */
-      script = Envir( "KAPPA_DIR", STATUS );
+      (void) strcpy( script, Envir( "KAPPA_DIR", STATUS ) );
       if( *STATUS == SAI__OK ){
          (void) strcpy( script + strlen( script ), "/tkast.tcl" );
 

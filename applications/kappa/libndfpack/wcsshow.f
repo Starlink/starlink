@@ -21,12 +21,12 @@
 
 *  Description:
 *     This application allows you to examine an AST Object stored in a
-*     specified NDF or HDS object. The structure can be dumped to a text
-*     file, or a Graphical User Interface can be used to navigate through 
-*     the structure (see parameter LOGFILE). A new FrameSet can also be 
-*     stored in the WCS component of the NDF (see parameter NEWWCS). This
-*     allows an NDF WCS component to be dumped to a text file, edited, and
-*     then restored to the NDF.
+*     specified NDF or HDS object, or a catalogue. The structure can be 
+*     dumped to a text file, or a Graphical User Interface can be used 
+*     to navigate through the structure (see parameter LOGFILE). A new 
+*     FrameSet can also be stored in the WCS component of an NDF (see 
+*     parameter NEWWCS). This allows an NDF WCS component to be dumped 
+*     to a text file, edited, and then restored to the NDF.
 *
 *     The GUI main window contains the attribute values of the supplied AST 
 *     Object. Only those associated with the Object's class are displayed
@@ -43,6 +43,12 @@
 *     wcsshow ndf object logfile newwcs full quiet
 
 *  ADAM Parameters:
+*     CAT = FILENAME (Read)
+*        A catalogue containing a positions list such as produced by 
+*        applications LISTMAKE, CURSOR, etc. If supplied, the WCS
+*        Information in the catalogue is displayed. If a null (!) is
+*        supplied, the WCS information in the NDF specified by parameter 
+*        NDF is displayed. [!]
 *     FULL = _INTEGER (Read)
 *        This parameter is a three-state flag and takes values of -1, 0 or
 *        +1. It controls the amount of information included in the output 
@@ -62,7 +68,8 @@
 *        null (!) value is supplied, then the parameter OBJECT is used to
 *        specify the AST Object to display. Update access is required to
 *        the NDF if a value is given for parameter NEWWCS. Otherwise, only
-*        read access is required.
+*        read access is required. Only accessed if a null (!) value is 
+*        supplied for CAT.
 *     NEWWCS = GROUP (Read)
 *        A group expression giving a dump of an AST FrameSet which
 *        is to be stored as the WCS component in the NDF given by parameter 
@@ -74,9 +81,9 @@
 *        new FrameSet (after being stored in the NDF and retrieved). [!]
 *     OBJECT = LITERAL (Read)
 *        The HDS object containing the AST Object to display. Only
-*        accessed if parameter NDF is null. It must have an HDS type 
-*        of WCS, must be scalar, and must contain a single 1-D array component 
-*        with name DATA and type _CHAR.
+*        accessed if parameters NDF and CAT are null. It must have an HDS 
+*        type of WCS, must be scalar, and must contain a single 1-D array 
+*        component with name DATA and type _CHAR.
 *     QUIET = _LOGICAL (Read)
 *        If TRUE, then the structure of the AST Object is not displayed
 *        (using the Tk GUI). Other functions are unaffected. The dynamic
@@ -106,6 +113,8 @@
 *        Original version.
 *     5-OCT-1998 (DSB):
 *        Added parameter NDF.
+*     22-JUN-1999 (DSB):
+*        Added parameter CAT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,6 +129,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants 
       INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
@@ -141,10 +151,12 @@
 
 *  Local Variables:
       CHARACTER ACCESS*6
+      CHARACTER CNAME*128        
       CHARACTER LOC*(DAT__SZLOC)
       CHARACTER LOGFNM*(GRP__SZFNM)
       CHARACTER TITLE*255
       INTEGER CHAN
+      INTEGER CI
       INTEGER FULL
       INTEGER IAST
       INTEGER IGRP
@@ -152,6 +164,7 @@
       INTEGER SIZE
       INTEGER TLEN
       LOGICAL QUIET
+*.
 
 *  Check inherited status.      
       IF( STATUS .NE. SAI__OK ) RETURN
@@ -183,11 +196,48 @@
 *  Initially assume that the Object should be displayed in the GUI.
       QUIET = .FALSE.
 
-*  Get an NDF identifier.
-      CALL NDF_ASSOC( 'NDF', ACCESS, INDF, STATUS )
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to open an input catalogue. Annull the error if a null value
+*  is suplied.
+      CALL KPG1_CTASS( 'CAT', 'READ', CI, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  Otherwise, reset the pointer for the next item of textual information to 
+*  be read from the catalogue, and get an AST Object from the catalogue.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         CALL CAT_RSTXT( CI, STATUS )
+         CALL KPG1_RCATW( CI, IAST, STATUS )
+
+*  If no Object was found, report an error.
+         IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+            CALL CAT_TIQAC( CI, 'NAME', CNAME, STATUS )
+            CALL CAT_TRLSE( CI, STATUS )
+
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'CAT', CNAME )
+            CALL ERR_REP( 'WCSSHOW_ERR1', 'Supplied catalogue '//
+     :                    '''^CAT'' contains no WCS information.', 
+     :                    STATUS )
+            GO TO 999
+         END IF
+
+*  Release the catalogue identifier.
+         CALL CAT_TRLSE( CI, STATUS )
+
+      END IF
+
+*  If no catalogue was supplied, get an NDF identifier.
+      IF( IAST .EQ. AST__NULL ) THEN
+         CALL NDF_ASSOC( 'NDF', ACCESS, INDF, STATUS )
+      ELSE
+         INDF = NDF__NOID
+      END IF
 
 *  If succesful...
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF( INDF .NE. NDF__NOID ) THEN
 
 *  If a value was given for NEWWCS, assume the the Object is not to be 
 *  displayed.
@@ -239,9 +289,6 @@
 *  Delete the group.
             CALL GRP_DELET( IGRP, STATUS )
 
-*  If a null value was supplied for NEWWCS, annul the error.
-         ELSE IF( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
          END IF
 
 *  Get a pointer to the NDFs WCS FrameSet.
@@ -253,10 +300,10 @@
 *  Annul the NDF identifier.
          CALL NDF_ANNUL( INDF, STATUS )
 
-*  If a null value was supplied for NDF, annull the error and use
+*  If no NDF or catalogue was supplied, annull any PAR__NULL error and use
 *  parameter OBJECT to get the AST Object to display.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN      
-         CALL ERR_ANNUL( STATUS )
+      ELSE IF( IAST .EQ. AST__NULL ) THEN      
+         IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
 *  Get a locator to the HDS object.
          CALL DAT_ASSOC( 'OBJECT', 'READ', LOC, STATUS )
@@ -283,7 +330,7 @@
       IF( STATUS .EQ. SAI__OK ) THEN
          QUIET = .TRUE.
 
-*  Create THE GRP to act as a temporary staging post for the file.
+*  Create a group to act as a temporary staging post for the file.
          CALL GRP_NEW( ' ', IGRP, STATUS )
 
 *  Create an AST Channel which can be used to write the Object description

@@ -113,6 +113,9 @@
 *  History:
 *     30-JUN-1998 (DSB):
 *        Original version.
+*     22-JUN-1999 (DSB):
+*        Remove call to NDF_SECT which set the pixel bounds fo all
+*        insignificant axes to (1:1).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -168,7 +171,7 @@
       INTEGER INPRM( NDF__MXDIM )  ! Input axis permutation array
       INTEGER INDFS                ! NDF section identifier
       INTEGER IPIX                 ! Index of original PIXEL Frame in IWCS
-      INTEGER IUP                  ! Highest significant axis index
+      INTEGER NBAX                 ! Number of axes in GRID Frame
       INTEGER J                    ! Axis index
       INTEGER LBND( NDF__MXDIM )   ! Original NDF bounds
       INTEGER NC                   ! No. of characters in text buffer
@@ -212,28 +215,23 @@
 *  Obtain the bounds of the NDF.  
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
-*  Return the bounds of the chosen pixel axes. Also note the highest 
-*  significant axis index.
-      IUP = 0
+*  Return the bounds of the chosen pixel axes. 
       DO I = 1, NDIM
          SLBND( I ) = LBND( SDIM( I ) )
          SUBND( I ) = UBND( SDIM( I ) )
-         IUP = MAX( IUP, SDIM( I ) )
       END DO
          
-*  Get an NDF section. This will include or exclude any trailing
-*  insignificant axes, as required.
-      CALL NDF_SECT( INDF, IUP, LBND, UBND, INDFS, STATUS )
-
 *  Get a pointer to the WCS FrameSet.
-      CALL KPG1_GTWCS( INDFS, IWCS, STATUS )
+      CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  Re-map the Base (GRID) Frame by selecting the chosen axes.
 *  ==========================================================
+*  Save the number of axes in the Base Frame.
+      NBAX = AST_GETI( IWCS, 'NIN', STATUS ) 
 
 *  If the Base Frame has the wrong number of axes, create a new Base
 *  Frame by picking axes from the original.
-      IF( IUP .NE. NDIM ) THEN
+      IF( NBAX .NE. NDIM ) THEN
 
 *  Create a new GRID Frame with NDIM axes.
          NEWBAS = AST_FRAME( NDIM, 'DOMAIN=GRID', STATUS )
@@ -277,10 +275,10 @@
          END DO
 
 *  Create a PermMap which goes from this new NDIM-dimensional GRID Frame 
-*  to the original IUP-dimensional GRID Frame. First, initialise the axis 
+*  to the original NBAX-dimensional GRID Frame. First, initialise the axis 
 *  permutation arrays so that all input and output axes take the value of 
 *  the first constant supplied to AST_PERMMAP (i.e. 1.0).
-         DO I = 1, IUP
+         DO I = 1, NBAX
             OUTPRM( I ) = -1
          END DO
 
@@ -291,14 +289,14 @@
 *  Now over-write elements of the axis permutation arrays which correspond to 
 *  genuine axes.
          DO I = 1, NDIM
-            IF( SDIM( I ) .LE. IUP ) THEN
+            IF( SDIM( I ) .LE. NBAX ) THEN
                INPRM( I ) = SDIM( I )
                OUTPRM( SDIM( I ) ) = I
             END IF 
          END DO
 
 *  Create the PermMap.
-         PMAP = AST_PERMMAP( NDIM, INPRM, IUP, OUTPRM, 1.0D0, ' ', 
+         PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, 1.0D0, ' ', 
      :                       STATUS ) 
 
 *  Create a new FrameSet holding just the new GRID Frame.
@@ -335,7 +333,7 @@
 
 *  If the PIXEL Frame has the wrong number of axes, create a new PIXEL
 *  Frame by picking axes from the original.
-      IF( IUP .NE. NDIM ) THEN
+      IF( NBAX .NE. NDIM ) THEN
 
 *  Create a new PIXEL Frame with NDIM axes.
          NEWPIX = AST_FRAME( NDIM, 'DOMAIN=PIXEL', STATUS )
@@ -385,11 +383,11 @@
          END DO
 
 *  Create a PermMap which goes from this new NDIM-dimensional PIXEL Frame 
-*  to the original IUP-dimensional PIXEL Frame. First, initialise the axis 
+*  to the original NBAX-dimensional PIXEL Frame. First, initialise the axis 
 *  permutation arrays so that all input and output axes take the value of 
 *  the corresponding axis lower bound. Nagative values index the array of
 *  constants set up above.
-         DO I = 1, IUP
+         DO I = 1, NBAX
             OUTPRM( I ) = -I
          END DO
 
@@ -400,14 +398,14 @@
 *  Now over-write elements of the axis permutation arrays which correspond to 
 *  genuine axes.
          DO I = 1, NDIM
-            IF( SDIM( I ) .LE. IUP ) THEN
+            IF( SDIM( I ) .LE. NBAX ) THEN
                INPRM( I ) = SDIM( I )
                OUTPRM( SDIM( I ) ) = I
             END IF 
          END DO
 
 *  Create the PermMap.
-         PMAP = AST_PERMMAP( NDIM, INPRM, IUP, OUTPRM, CONST, ' ', 
+         PMAP = AST_PERMMAP( NDIM, INPRM, NBAX, OUTPRM, CONST, ' ', 
      :                       STATUS ) 
 
 *  Find the original PIXEL Frame, and change its Domain to NDF_PIXEL.
@@ -536,7 +534,7 @@
       CALL NDF_CGET( INDF, 'TITLE', TTL, STATUS )
       IF( TTL .NE. ' ' .AND. 
      :    .NOT. AST_TEST( IWCS, 'TITLE', STATUS ) ) THEN
-         CALL AST_SETC( IWCS, 'TITLE', TTL( : CHR_LEN( TTL ) ), STATUS )
+         CALL AST_SETC( IWCS, 'TITLE', TTL, STATUS )
       END IF
 
 *  Report an error if the inverse mapping is required, but is not

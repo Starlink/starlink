@@ -21,8 +21,10 @@
 *     1) The domain of the Current Frame in IWCS2, if not blank.
 *     2) The domain specified by argument DOMAIN, if not blank. If DOMAIN
 *        is blank, "AGI_WORLD" is used.
-*     3) "GRID"
-*     4) Any other suitable Frame.
+*     3) "SKY"
+*     4) "PIXEL"
+*     5) "GRID"
+*     6) Any other suitable Frame.
 *
 *     An error is reported if alignment is not possible, and a message 
 *     identifying the alignment Frame is displayed if alignment is possible.
@@ -53,6 +55,8 @@
 *  History:
 *     17-SEP-1998 (DSB):
 *        Original version.
+*     22-JUN-1999 (DSB):
+*        Added SKY and PIXEL before GRID is Domain search path.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -133,7 +137,7 @@
          CALL CHR_APPND( 'AGI_WORLD', DOMLST, IAT )
       END IF
 
-      CALL CHR_APPND( ',GRID, ', DOMLST, IAT )
+      CALL CHR_APPND( ',SKY,PIXEL,GRID, ', DOMLST, IAT )
 
 *  Attempt to align the FrameSets. If succesfull, a new FrameSet is 
 *  returned describing the relationship between the Current Frames in 
