@@ -1,7 +1,7 @@
 INTERFACE ASHOW
 
   PARAMETER INP
-    TYPE 'CHAR'
+    TYPE 'LITERAL'
     PROMPT 'Dataset name'
     HELP 'The name of any HDS or FITS dataset'
     POSITION 1
