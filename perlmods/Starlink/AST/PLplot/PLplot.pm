@@ -306,14 +306,14 @@ sub _GTxExt {
   
   # initalise @$xb and @$yb
   my ( @xb, @yb );
-  $xb[0] = $x;
-  $yb[0] = $y;
-  $xb[1] = $x;
-  $yb[1] = $y;
-  $xb[2] = $x;
-  $yb[2] = $y;
-  $xb[3] = $x;
-  $yb[3] = $y;
+  $xb[0] = $x-0.01;
+  $yb[0] = $y-0.01;
+  $xb[1] = $x-0.01;
+  $yb[1] = $y+0.01;
+  $xb[2] = $x+0.01;
+  $yb[2] = $y+0.01;
+  $xb[3] = $x+0.01;
+  $yb[3] = $y-0.01;
    
   # Return
   _GFlush();
