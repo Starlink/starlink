@@ -35,7 +35,7 @@
   "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
     Continuous-tone Still Images (JPEG)//EN">
 <!NOTATION EPS      PUBLIC
-  "+//ISBN 0-201-18127-4::Adobe//NOTATION PostScript Language Ref. Manual//EN">
+  "+//ISBN 0-201-18127::Adobe//NOTATION PostScript Language Ref. Manual//EN">
 <!NOTATION GIF89a   PUBLIC
   "-//CompuServe//NOTATION Graphics Interchange Format 89a//EN">
 <!notation linespecific system
@@ -46,12 +46,32 @@
 	   8879, 9.2), which can therefore be included directly within
 	   figurecontent element -->
 
+<!-- Declare an attribute for the latexgraphics notation.  If there is
+     indeed a need for this (and it's not implemented at present),
+     then it can be used as follows.  In the DTD subset, declare an
+     entity as follows:
+
+       <!doctype ... [
+       ...
+       <!entity % notations-subset 
+          PUBLIC "-//Starlink//DTD Notation Declarations//EN">
+       %notations-subset;
+       <!entity ltx-file system "things.tex" 
+          ndata latexgraphics [ package=stuff ]>
+       ...
+       ]>
+
+     indicating that the ltx-file entity requires the `stuff' package
+     to work.  This has to be done in this rather roundabout way, since
+     there's no way to refer to data attributes in an element
+     attribute.
+     -->
 <!attlist #notation latexgraphics
 	package		-- LaTeX packages required for this to be processed --
 		cdata
 		#implied
 	>
 
-<!-- Define this parameter entity so we can avoid reading this a 
+<!-- Define this parameter entity so we can avoid reading this entity a 
      second time -->
 <!entity % notations-read "IGNORE">
