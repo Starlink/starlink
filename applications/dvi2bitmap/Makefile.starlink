@@ -682,13 +682,14 @@ install:
 	    cp $$f $(INSTALL_BIN); 					\
 	done
 #	# Unpack and install dvi2bitmap_doc.tar
-#	# dvi2bitmap_doc.tar contains directory dvi2bitmap_doc.
-	test -d $(INSTALL_DOCS) || mkdir -p $(INSTALL_DOCS)
+#	# dvi2bitmap_doc.tar contains directory `doc'.
+	test -d $(INSTALL_DOCS)/ssn71.htx || mkdir -p $(INSTALL_DOCS)/ssn71.htx
 	$(TAR_OUT) dvi2bitmap_doc.tar
-	(cd dvi2bitmap_doc && $(TAR_IN) - *) | \
-		(cd $(INSTALL_DOCS) && $(TAR_OUT_PIPE) -)
-	rm -Rf dvi2bitmap_doc
-	- which hlink >/dev/null && hlink $(INSTALL_DOCS)
+	(cd doc && $(TAR_IN) - *) | \
+		(cd $(INSTALL_DOCS)/ssn71.htx && $(TAR_OUT_PIPE) -)
+	mv $(INSTALL_DOCS)/ssn71.htx/dvi2bitmap.tex $(INSTALL_DOCS)/ssn71.tex
+	rm -Rf doc
+	- which hlink >/dev/null && hlink $(INSTALL_DOCS)/ssn71.htx
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
 	chmod 644 $(DATE_STAMP)
