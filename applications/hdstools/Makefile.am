@@ -59,7 +59,7 @@ hdstools.hlp: $(hdstools_mon_TASKS:=.f) hdstools_master.hlp
 	@HLIB@ $<
 
 # Rule for creating various components from the ifd file.
-hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
+hdstools.csh hdstools.icl $(hdstools_mon_TASKS:=.ifl): hdstools.ifd
 	@IFD2STAR@ hdstools
 
 ##  Things for distribution that are not picked up otherwise.
@@ -69,6 +69,14 @@ EXTRA_DIST = $(HELP_SOURCES)
 BUILT_SOURCES = hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:=.ifl)
 
 ##  Simple check.
-TESTS = htest.sh
+edit = sed \
+        -e 's,@bindir\@,$(bindir),g'
 
-check_SCRIPTS = htest.sh
+TESTS = htest
+
+htest: htest.in
+        -rm -f htest.tmp htest
+        $(edit) \
+        $(srcdir)/htest.in >htest.tmp
+        mv htest.tmp htest
+        chmod 0755 htest
