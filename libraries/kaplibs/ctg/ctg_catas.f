@@ -113,10 +113,14 @@
 *  Open the catalogue.
       CALL CAT_TOPEN( NAME, 'OLD', MODE, CI, STATUS )
 
-*  If an error occured, add context information.
+*  If an error occured, release the catalogue and add context information.
  999  CONTINUE
 
       IF ( STATUS .NE. SAI__OK ) THEN
+
+         CALL ERR_BEGIN( STATUS )
+         CALL CAT_TRLSE( CI, STATUS )
+         CALL ERR_END( STATUS )
 
          IF( NAME .NE. ' ' ) THEN
             CALL MSG_SETC( 'NAME', NAME )

@@ -259,12 +259,12 @@
             CALL GRP_PUT( IGRPT, 1, TYP, 0, STATUS )
             CALL GRP_PUT( IGRPH, 1, EXT, 0, STATUS )
 
-*  Release the catalogue identifier.
-            CALL ERR_BEGIN( STATUS )
-            CALL CAT_TRLSE( CI, STATUS ) 
-            CALL ERR_END( STATUS )
-
          END IF
+
+*  Release the catalogue identifier.
+         CALL ERR_BEGIN( STATUS )
+         CALL CAT_TRLSE( CI, STATUS ) 
+         CALL ERR_END( STATUS )
 
 *  Annul any error which has occurred so that any remaining names can be
 *  checked.
