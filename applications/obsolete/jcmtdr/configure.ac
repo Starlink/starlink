@@ -32,10 +32,13 @@ dnl    links to: chr, mers, fio, psx, task.
 STAR_DECLARE_DEPENDENCIES([build], [sla hlp ndf prm fio gsd pda figaro kaplibs])
 dnl    No use dependencies
 
-dnl STAR_LATEX_DOCUMENTATION(sun95 sun221)
+dnl    Define the documents (subdirs)
+STAR_LATEX_DOCUMENTATION(sun132/ sc1/)
 
-AC_CONFIG_SUBDIRS([subs applic])
+dnl    But we also need to define the docs subdirs
+DOCS_SUBDIRS="sun132 sc1"
+AC_SUBST(DOCS_SUBDIRS)
 
-AC_CONFIG_FILES(Makefile component.xml jcmtdr.ifd)
+AC_CONFIG_FILES(Makefile applic/Makefile subs/Makefile docs/Makefile docs/sc1/Makefile docs/sun132/Makefile component.xml jcmtdr.ifd)
 
 AC_OUTPUT
