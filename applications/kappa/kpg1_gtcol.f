@@ -109,12 +109,12 @@
 
 *  MIN causes the minimum value to be used, namely '/'.  This requests
 *  the lowest non-reserved colour.
-      IF ( COLOUR .EQ. '/' ) THEN
+      IF ( COLOUR .EQ. '/' .OR. COLOUR .EQ. 'MIN' ) THEN
          COLIND = LP
 
 *  MAX causes the maximum value to be used, namely '{'.  This requests
 *  the highest non-reserved colour.
-      ELSE IF ( COLOUR .EQ. '{' ) THEN
+      ELSE IF ( COLOUR .EQ. '{' .OR. COLOUR .EQ. 'MAX' ) THEN
          COLIND = UP
 
 *  See whether it is an integer.
