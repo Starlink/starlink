@@ -156,8 +156,11 @@ attributes with ENTITY declared values.  Should I worry about those?
 (define (make-manifest #!optional (nd (current-node)))
   (if (and %html-manifest% (not suppress-manifest))
       (let ((element-list (append (chunk-element-list)
-				  (list (normalize "figurecontent")
-					(normalize "backmatter"))))
+				  (list (normalize "figure")
+					(normalize "backmatter")
+					(normalize "m")
+					(normalize "mequation")
+					(normalize "meqnarray"))))
 	    (rde (document-element nd)))
 	(make entity system-id: %html-manifest%
 	      (with-mode make-manifest-mode
@@ -194,16 +197,32 @@ attributes with ENTITY declared values.  Should I worry about those?
 "))
 	  (empty-sosofo))))
 
+  ;; The selection here should match the processing in slmisc.dsl
+  (element figure
+    (let* ((kids (children (current-node)))
+	   (content (get-best-figurecontent
+		     (select-elements kids (normalize "figurecontent"))
+		     '("GIF89A" "JPEG"))))
+      (if content
+	  (process-node-list content)
+	  (empty-sosofo))))
   (element figurecontent
-    (let* ((image-ents (attribute-string (normalize "image")
-                                         (current-node)))
-           (best-ent (and image-ents
-                          (get-sysid-by-notation image-ents
-                                                 '("JPEG" "GIF87A")))))
-      (if best-ent
-          (make formatting-instruction data: (string-append best-ent "
+    (let* ((image-ent (attribute-string (normalize "image")
+					(current-node))))
+      (if image-ent
+	  (make fi data: (string-append (entity-system-id image-ent) "
 "))
-          (empty-sosofo)))))
+	  (empty-sosofo))))
+  (element m
+    (make fi data: (string-append (img-equation-sysid (current-node)) "
+")))
+  (element mequation
+    (make fi data: (string-append (img-equation-sysid (current-node)) "
+")))
+  (element meqnarray
+    (make fi data: (string-append (img-equation-sysid (current-node)) "
+")))
+  )
 
 <codegroup>
 <title>The default rule
