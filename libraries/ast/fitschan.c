@@ -15699,7 +15699,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Loop round all co-ordinate versions (0-9) */
    primpc = NULL;
-   for( s = ' '; s < sup && astOK; s++ ){      
+   for( s = ' '; s <= sup && astOK; s++ ){      
       is = s - 'A' + 1;
 
 /* Assume the Frame can be created succesfully. */

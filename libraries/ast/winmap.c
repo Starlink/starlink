@@ -33,7 +33,7 @@ f     The WinMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2003 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: David Berry (Starlink)
@@ -683,8 +683,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *map2;     /* Pointer to replacement Mapping */
    AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstMapping *nc[2];    /* Copies of neighbouring Mappings to merge */
-   AstMapping *smc0;     /* Simplied Mapping */
-   AstMapping *smc1;     /* Simplied Mapping */
+   AstMapping *smc0;     /* Simplified Mapping */
+   AstMapping *smc1;     /* Simplified Mapping */
+   AstMapping *simp1;    /* Simplified Mapping */
+   AstMapping *simp2;    /* Simplified Mapping */
    AstMatrixMap *mtr;    /* Pointer to replacement MatrixMap */
    AstWinMap *newwm2;    /* Second component WinMap */
    AstWinMap *newwm;     /* Pointer to replacement WinMap */
@@ -712,6 +714,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int old_winv;         /* original Invert value for supplied WinMap */
    int result;           /* Result value to return */
    int ser;              /* Are Mappings applied in series? */
+   int simpler;          /* Is the resulting Mapping simpler than original? */
    int swap;             /* Is there an advantage in swapping mappings? */
    int swaphi;           /* Can WinMap be swapped with higher neighbour? */
    int swaplo;           /* Can WinMap be swapped with lower neighbour? */
@@ -955,15 +958,36 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                }
                newwm = astAnnul( newwm );
                newwm2 = astAnnul( newwm2 );
-               
-/* Combine the two series CmpMap into a single parallel CmpMap. */
-               map2 = (AstMapping *) astCmpMap( nc[ 0 ], nc[ 1 ], 0, "" );
-               nc[ 0 ] = astAnnul( nc[ 0 ] );
-               nc[ 1 ] = astAnnul( nc[ 1 ] );
+
+/* Attempt to simplify each of the two new series CmpMaps. If neither of
+   them simplify then there is no point in doing the current merger. In fact
+   it would be dangerous to do so since we may end up in an infinite loop
+   where the resulting parallel CmpMap gets converted back into the
+   existing series CmpMap by the CmpMap MapMerge method, and then back
+   again by this method, etc. */
+               simp1 = astSimplify( nc[ 0 ] );
+               simp2 = astSimplify( nc[ 1 ] );
+
+/* Test if either could be simplified by checking if its pointer value
+   has changed. */
+               simpler = ( simp1 != nc[ 0 ] ) || ( simp2 != nc[ 1 ] );
+
+/* If either CmpMap was simplified, then combine the two series CmpMap into 
+   a single parallel CmpMap. */
+               if( simpler ) {
+                  map2 = (AstMapping *) astCmpMap( simp1, simp2, 0, "" );
+               }
 
 /* Re-instate the original Invert attributes in the two component Mappings. */
                astSetInvert( mc[ 0 ], inc[ 2 ] );
                astSetInvert( mc[ 1 ], inc[ 3 ] );
+
+/* Free resources. */
+               simp1 = astAnnul( simp1 );
+               simp2 = astAnnul( simp2 );
+               nc[ 0 ] = astAnnul( nc[ 0 ] );
+               nc[ 1 ] = astAnnul( nc[ 1 ] );
+
             }
 
 /* Free resources. */
