@@ -151,6 +151,7 @@ sub index_gen;
 sub indexinc_dir;
 sub indexinc_list;
 sub write_entry;
+sub uniq;
 
 #  Set up scratch directory.
 
@@ -199,14 +200,16 @@ $verbose = 0;
 #  Currently, a task is identified as the text of any entry in a .hlp file
 #  for which a module of the same name exists in the same package.
 
-my $line;
+my ($line, $module);
 open TASKS, ">$taskfile" or die "Couldn't open $taskfile\n";
 foreach $pack (sort keys %tasks) {
    $npackages++;
    $line = "$pack:";
-   foreach $task (sort @{$tasks{$pack}}) {
-      if ($locate{$task}) {
-         foreach $path (split ' ', $locate{$task}) {
+   foreach $task (uniq sort @{$tasks{$pack}}) {
+      $module = $task;
+      $module .= '_' unless ($locate{$module});
+      if ($locate{$module}) {
+         foreach $path (split ' ', $locate{$module}) {
             if (starpack ($path) eq $pack) {
                $line .= " $task";
                next;
@@ -214,10 +217,8 @@ foreach $pack (sort keys %tasks) {
          }
       }
    }
-   if ($line =~ / /) {
-      print TASKS "$line\n";
-      print       "$line\n" if $verbose;
-   }
+   print TASKS "$line\n";
+   print       "$line\n" if $verbose;
 }
 close TASKS;
 
@@ -297,6 +298,18 @@ sub index_pack {
    else {
       die "Arguments must be package tar files or directories\n";
    }
+
+#  Look for task candidates in the $bindir/$package directory.
+
+   my $file;
+   if (-d "$bindir/$package") {
+      pushd "$bindir/$package";
+      foreach $file (glob "*") {
+         push @{$tasks{$package}}, $file if (-x $file);
+      }
+      popd;
+   }
+   
 }
  
 
@@ -481,13 +494,9 @@ sub index_hlp {
 #  by this routine is only used to generate the top-level menu for the
 #  browser if no module name is entered.
 
-#  Note help sublibraries (@-lines) are not yet supported; any help files
-#  which are split into different .hlp files will turn up looking like
-#  different packages.
-
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname .hlp file.
+   my $path = shift;      #  Logical pathname of .hlp file.
    my $file = shift;      #  .hlp file in current directory to be indexed.
 
    open HLP, $file or die "Couldn't open $file in directory ".cwd."\n";
@@ -506,7 +515,7 @@ sub index_hlp {
          $baselevel = $level;
       }
       if ($level == $baselevel+1) {
-         push @{$tasks{$package}}, $topic;
+         push @{$tasks{$package}}, lc ($topic);
       }
    }
    close HLP;
@@ -632,6 +641,20 @@ sub write_entry {
    if ($verbose) {
       printf "%-20s =>  %s\n", $name, $location;
    }
+}
+
+
+########################################################################
+sub uniq {
+
+#  Removes adjacent duplicate values from a list.
+
+   my ($last, $val, @ans);
+   foreach $val (@_) {
+      push (@ans, $val) unless ($last && $val eq $last);
+      $last = $val;
+   }
+   return @ans;
 }
 
 
