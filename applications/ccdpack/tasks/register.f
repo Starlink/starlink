@@ -916,8 +916,18 @@
 *  Write modified WCS component back to NDF.
                      CALL NDF_PTWCS( IWCS, ID, STATUS )
 
-*  Output to the user the mapping between the new CCD_Reg domain frame 
-*  and the previous current frame.
+*  Get a mapping between the original Current frame and the CCD_Reg
+*  domain frame (which is now the current frame of IWCS).  This 
+*  is output to the user to indicate how far wrong the registration
+*  implied by the original state of the NDFs was.
+                     FSMAP = AST_CONVERT( FRCUR, IWCS, ' ', STATUS )
+                     MAP = AST_GETMAPPING( FSMAP, AST__BASE, 
+     :                                     AST__CURRENT, STATUS )
+
+*  Report the name of the NDF and which frames the mapping is between, 
+*  and output the mapping coefficients to the user.
+                     CALL NDF_MSG( 'NDF', ID )
+                     CALL CCD1_MSG( ' ', '  ^NDF:', STATUS ) 
                      CALL MSG_SETC( 'DOM1', 
      :                              AST_GETC( FRCUR, 'Domain', 
      :                                        STATUS ) )
@@ -927,17 +937,8 @@
                      CALL CCD1_MSG( ' ', 
      : '    Domain ^DOM1 (Current) -> Domain ^DOM2', STATUS )
 
-*  Get a mapping between the original Current frame and the CCD_Reg
-*  domain frame (which is now the current frame of IWCS).
-                     FSMAP = AST_CONVERT( FRCUR, IWCS, ' ', STATUS )
-                     MAP = AST_GETMAPPING( FSMAP, AST__BASE, 
-     :                                     AST__CURRENT, STATUS )
-
-*  Report the name of the NDF, and output the mapping to the user.
-                     CALL NDF_MSG( 'NDF', ID )
-                     CALL CCD1_MSG( ' ', '  ^NDF:', STATUS ) 
-                     CALL CCD1_MSG( ' ', ' ', STATUS )
                      CALL CCD1_TCOUT( MAP, STATUS )
+                     CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  End this AST context.
                      CALL AST_END( STATUS )
