@@ -108,9 +108,11 @@
       CHARACTER*300		CVAL			! Transfer value
 
       INTEGER			CLEN			! Length of CVAL used
+      INTEGER			CSTAT			! CHR status
       INTEGER			FSTAT			! FTOOLS status
       INTEGER			NTRY			! Number of tries
-	integer cstat
+
+      LOGICAL			OK			!
 *.
 
 *  Check inherited global status.
@@ -119,8 +121,9 @@
 *  Read text string
       CLEN = 0
       NTRY = 0
+      OK = .FALSE.
       DO WHILE ( (CLEN.EQ.0) .AND. (NTRY.LT.MAXTRY)
-     :                  .AND. (STATUS.EQ.SAI__OK) )
+     :                  .AND. (STATUS.EQ.SAI__OK) .AND. .NOT. OK )
 
 *    Get value from environment
         CALL UCLGST( PAR, CVAL, FSTAT )
@@ -141,7 +144,6 @@
 
         ELSE
           CALL CHR_CTO<T>( CVAL, VALUE, CSTAT )
-	print *,cstat
 
         END IF
 
@@ -150,6 +152,8 @@
      :       (STATUS.NE.PAR__ABORT) .AND. (NTRY .LT. MAXTRY) ) THEN
           CALL ERR_ANNUL( STATUS )
           CLEN = 0
+        ELSE
+          OK = .TRUE.
         END IF
 
       END DO
