@@ -549,13 +549,6 @@
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOL_IN, STATUS)
 
-*  calculate the apparent RA and Dec of the object for the time of the
-*  observation
-
-      CALL SCULIB_CALC_APPARENT (LONG_RAD, LAT_RAD, LONG2_RAD,
-     :  LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), CENTRE_COORDS, UT1, 
-     :  MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
-
 *  map the various components of the data array and check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
@@ -577,6 +570,15 @@
      :          (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('NDIM', NDIM)
+* Get the start LST
+      CALL ARY_FIND (IN_SCUCDX_LOC, 'LST_STRT', IN_LST_STRT_ARY,
+     :     STATUS)
+      CALL ARY_DIM (IN_LST_STRT_ARY, MAXDIM, DIM, NDIM, STATUS)
+      CALL ARY_MAP (IN_LST_STRT_ARY, '_DOUBLE', 'READ', 
+     :     IN_LST_STRT_PTR, ITEMP, STATUS)
+
+
+      CALL ARY_ANNUL (IN_LST_STRT_ARY, STATUS)
                CALL MSG_SETI ('DIM1', DIM(1))
                CALL MSG_SETI ('DIM2', DIM(2))
                CALL MSG_SETI ('DIM3', DIM(3))
@@ -708,6 +710,16 @@
       CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
      :  'exposure(s) in ^N_I integration(s) in '//
      :  '^N_M measurement(s)', STATUS)
+
+
+*  calculate the apparent RA and Dec of the object for the time of the
+*  observation
+
+      CALL SCULIB_CALC_APPARENT (LONG_RAD, LAT_RAD, LONG2_RAD,
+     :     LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), CENTRE_COORDS, 
+     :     %VAL(IN_LST_STRT_PTR), UT1, 
+     :     MJD1, MJD2, RA_CENTRE, DEC_CENTRE, ROTATION, STATUS)
+
 
 *  If the sampling was done by jiggling the secondary then read in the
 *  relevant jiggle information
