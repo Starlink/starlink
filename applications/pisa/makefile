@@ -925,12 +925,14 @@ install:
 #
 #  Install the public scripts, giving them world execute permission.
 #  Modify any position dependent references.
-	for f in $(PUBLIC_SCRIPTS); do \
-           sed < $$f \
-	      -e 's:$${INSTALL}:$(INSTALL):g' \
-	      -e 's:(INSTALL):$(INSTALL):g' \
-	      > $(INSTALL_BIN)/$$f; \
-	   chmod 755 $(INSTALL_BIN)/$$f;\
+	for f in $(PUBLIC_SCRIPTS) ""; do \
+           if test -n "$$f"; then \
+              sed < $$f \
+	         -e 's:$${INSTALL}:$(INSTALL):g' \
+	         -e 's:(INSTALL):$(INSTALL):g' \
+	         > $(INSTALL_BIN)/$$f; \
+              chmod 755 $(INSTALL_BIN)/$$f;\
+           else :; fi;\
         done
 #
 #  Install the monoliths, giving them world execute permission.
@@ -1107,12 +1109,13 @@ do_deinstall:
 #
 #  Deinstall the public script files, if installed versions exist.
 #  These files may have been edited so restore the originals.
-	- for f in $(PUBLIC_SCRIPTS); do \
-           if test -f $(INSTALL_BIN)/$$f; then \
-	      rm -f $$f; \
-	      rm -f $(INSTALL_BIN)/$$f; \
-	      $(MAKE) $$f; \
-           else :; fi ;\
+	- for f in $(PUBLIC_SCRIPTS) ""; do \
+           if test -n "$$f"; then \
+              if test -f $(INSTALL_BIN)/$$f; then \
+              rm -f $(INSTALL_BIN)/$$f; \
+           else :; fi;\
+           $(MAKE) $$f;\
+           else :; fi;\
 	done
 #
 #  Deinstall the monolith, if an installed version exists.
@@ -1358,7 +1361,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
-           $(DATE_STAMP) .BUILT \
+           $(DATA_FILES) $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
