@@ -286,7 +286,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .@FPP_COMPILE_EXT@ .@FPP_PREPROCESS_EXT@ .f .fpp .lo .o .obj
+.SUFFIXES: .tex .dvi .ps .htx_tar .@FPP_COMPILE_EXT@ .@FPP_PREPROCESS_EXT@ .f .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -543,8 +543,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -822,11 +821,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
 	uninstall-binSCRIPTS uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-stardocsSTARDATA
 
-.fpp.f:
 
 #  Rule for building the demonstration library.
 demo.shl: demo.hlp crehlp
-	$(LINK) demo.hlp fort.1
+	$(LN_S) demo.hlp fort.1
 	./crehlp
 	rm fort.1
 	mv fort.2 demo.shl
