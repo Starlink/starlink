@@ -10,6 +10,7 @@
 *      14 Dec 93 : Added fields for spatial response handling (DJA)
 *      29 Jan 94 : Added PSFINIT flag (DJA)
 *      10 Mar 94 : Last structures removed (DJA)
+*      23 Mar 95 : Split initialisation in two (DJA)
 *-
 
       INTEGER                   PSF_E_NONE        	! Energy modes
@@ -24,6 +25,7 @@
 
 *    Psf system initialised
       LOGICAL                 	PSFINIT			! System initialised?
+      LOGICAL                 	PSFLIBINIT		! Library system init?
 
 *    Spatial model
       LOGICAL		        SM_SIZEDEF(PSF_NMAX) 	! Model extent defined?
