@@ -5806,7 +5806,7 @@ screen or paper has a length of 1.0 (the scales on both axes are equal).
 
 \item [NDC] -- similar to BASEPIC but specifies positions in a
 normalised co-ordinate system in which the bottom left corner has
-co-ordinates (0~,0) and the top right corner has co-ordinates (1,~1).
+co-ordinates (0,~0) and the top right corner has co-ordinates (1,~1).
 Thus, for a non-square device the scales on the two axes will be different.
 
 \item [CURPIC] -- similar to BASEPIC except that it covers only the
@@ -6329,7 +6329,7 @@ system spanning the BASE picture (\emph{i.e.} the entire graphics device).  The
 units on both axes are set so that either the width or the
 height of the graphics device, which-ever is smaller, is set to 1.0
 (put another way, a unit square would fit in the picture and span the
-shorter axis).  The bottom left corner of the graphics device is $(0,0)$.
+shorter axis).  The bottom left corner of the graphics device is (0,~0).
 
 \item [NDC] --- Normalised Device Co-ordinates, which are similar to BASEPIC
 but specifies positions in a normalised co-ordinate system in which
@@ -6339,7 +6339,7 @@ the two axes will be different.
 
 \item [CURPIC] --- similar to BASEPIC except that it covers only the
 specified picture.  Thus, the bottom left corner of the each picture is 
-at $(0,0)$ and the shorter dimension of each picture has length 1.0.
+at (0,~0) and the shorter dimension of each picture has length 1.0.
 
 \end{description}
 
@@ -7061,7 +7061,7 @@ as indicated in Figure~\latexelsehtml{\ref{fi:pixco}}{2}).
 
 \emph{Grid co-ordinates} are floating point values which are similar to
 pixel co-ordinates except that the origin is fixed so that the first
-pixel on an axis is centred at a grid co-ordinate value of $1.0$, no matter
+pixel on an axis is centred at a grid co-ordinate value of 1.0, no matter
 what the pixel origin is.  This corresponds to the FITS idea of `pixel 
 co-ordinates' (FITS makes no provision for an arbitrary pixel
 origin).  When a section is extracted from an array, the grid co-ordinates
@@ -7573,7 +7573,7 @@ SpecFrame (and should usually not be changed).  The MAPTYPE and FRAME
 parameters indicate that this new SpecFrame should be connected to the
 existing AXIS Frame using a UnitMap---\emph{i.e.} the frequency values held
 within the AXIS structure are identical to the frequency values described
-by the Specframe.
+by the SpecFrame.
 
 The above setting for the ATTRS parameter gives the bare minimum of
 information---there are several other items of information which
@@ -8211,8 +8211,8 @@ attribute of the sky Frame, we could say:
       suitable default is supplied, depending on whether or not the 
       Frame is a \xref{SkyFrame}{sun210}{SkyFrame}.
 
-      The default for simple Frames is the string {\tt "Axis <$n$>"}, where 
-      {\tt <$n$>} is {\tt 1}, {\tt 2}, \emph{etc.} for each successive axis.
+      The default for simple Frames is the string {\tt "Axis <{\tt{n}}>"}, where 
+      {\tt <${\tt{n}}$>} is {\tt 1}, {\tt 2}, \emph{etc.} for each successive axis.
 
       The default labels for specialised Frames (SkyFrames,
       \xref{SpecFrames}{sun210}{SpecFrame}, \emph{etc.}) depend on the
@@ -8375,6 +8375,7 @@ attribute of the sky Frame, we could say:
    }
 }
 
+\pagebreak
 \sstattribute{
    SourceVRF
 }{
@@ -8510,8 +8511,8 @@ attribute of the sky Frame, we could say:
       suitable default is supplied.
 
       The default {\att Symbol} value supplied for simple Frames is the
-      string ``$<${\tt Domain}$>$$<${\tt n}$>$'', where 
-      $<${\tt n}$>$ is {\tt 1}, {\tt 2}, \emph{etc.} for successive
+      string ``$<${\tt Domain}$>$$<${\tt{n}}$>$'', where 
+      $<${\tt{n}}$>$ is {\tt 1}, {\tt 2}, \emph{etc.} for successive
       axes, and $<$Domain$>$ is the value of the Frame's \htmlattref{Domain}{Domain}~
       attribute (truncated if necessary so that the final string
       does not exceed 15 characters).  If no {\att Domain} value has been
@@ -11805,7 +11806,7 @@ picture.}
 \menuitem{CONVOLVE}{
  Convolves a pair of one- or two-dimensional NDFs together.}
 \menuitem{COPYBAD}{
- Copies the bad pixel mask from one NDF to another.}
+ Copies the bad-pixel mask from one NDF to another.}
 \menuitem{CREFRAME}{
  Generates a test two-dimensional NDF from a  selection of several types.}
 \menuitem{CSUB}{
@@ -11837,7 +11838,7 @@ picture.}
 \menuitem{FILLBAD}{
  Removes regions of bad values from a two-dimensional NDF.}
 \menuitem{FITSDIN}{
- Reads a FITS disc file composed of simple, group or table objects.}
+ Reads a {\FITSref}~ disc file composed of simple, group or table objects.}
 \menuitem{FITSEDIT}{
  Edits the FITS extension of an NDF.}
 \menuitem{FITSEXIST}{
@@ -11847,7 +11848,7 @@ picture.}
 \menuitem{FITSHEAD}{
  Lists the headers of FITS files.}
 \menuitem{FITSIMP}{
- Imports FITS information into an NDF extension.}
+ Imports FITS information into an NDF \htmlref{extension}{se:fitsairlock}.}
 \menuitem{FITSIN}{
  Reads a FITS tape composed of simple, group or table files.}
 \menuitem{FITSLIST}{
@@ -11873,17 +11874,17 @@ picture.}
 \menuitem{GDNAMES}{
  Shows which graphics devices are available.}
 \menuitem{GDSET}{
- Selects a current graphics device.}
+ Selects a \htmlref{current graphics device}{se:devglobal}.}
 \menuitem{GDSTATE}{
  Shows the current status of a graphics device.}
 \menuitem{GLITCH}{
  Replaces bad pixels in a two-dimensional image with  the local median.}
 \menuitem{GLOBALS}{
- Displays the values of the \KAPPA\ global parameters.}
+ Displays the values of the \KAPPA\ \htmlref{global parameters}{se:parglobals}.}
 \menuitem{HISCOM}{
  Adds commentary to the history of an NDF.}
 \menuitem{HISLIST}{
- Lists NDF history records.}
+ Lists NDF \htmlref{history records}{se:ndfhistory}.}
 \menuitem{HISSET}{
  Sets the NDF history update mode.}
 \menuitem{HISTAT}{
@@ -11915,7 +11916,7 @@ picture.}
 \menuitem{LUCY}{
  Performs a Richardson-Lucy deconvolution of a one- or two-dimensional array.}
 \menuitem{LUTABLE}{
- Manipulates an graphics device colour table.}
+ Manipulates an graphics device \htmlref{colour table}{se:coltab}.}
 \menuitem{LUTBGYRW}{
  Loads the {\it BGYRW} \htmlref{lookup table}{se:lookuptables}.}
 \menuitem{LUTCOL}{
@@ -11969,7 +11970,7 @@ picture.}
 \menuitem{NATIVE}{
  Converts an HDS object to native machine data representation.}
 \menuitem{NDFCOPY}{
- Copies an NDF (or NDF section) to a new location.}
+ Copies an NDF (or \htmlref{NDF section}{se:ndfsect}) to a new location.}
 \menuitem{NDFTRACE}{
  Displays the attributes of an NDF data structure.}
 \menuitem{NOGLOBALS}{
@@ -11985,7 +11986,7 @@ picture.}
 \menuitem{OUTSET}{
  Sets pixels outside a specified  circle in a two-dimensional NDF to a specified value.}
 \menuitem{PALDEF}{
- Loads the default palette to a colour table.}
+ Loads the default \htmlref{palette}{se:palette}~ to a colour table.}
 \menuitem{PALENTRY}{
  Enters a colour into an graphics device's palette.}
 \menuitem{PALREAD}{
@@ -11993,13 +11994,13 @@ picture.}
 \menuitem{PALSAVE}{
  Saves the current palette of a colour table to an NDF.}
 \menuitem{PARGET}{
- Obtains the value or values of an application parameter.}
+ Obtains the value or values of an \htmlref{application parameter}{se:parout}.}
 \menuitem{PASTE}{
  Pastes a series of NDFs upon each other.}
 \menuitem{PERMAXES}{
  Permutes the axes of an NDF.}
 \menuitem{PICBASE}{
- Selects the BASE picture from the graphics database.}
+ Selects the BASE picture from the \htmlref{graphics database}{se:agitate}.}
 \menuitem{PICCUR}{
  Uses a cursor to select the current picture.}
 \menuitem{PICDATA}{
@@ -12039,11 +12040,11 @@ picture.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
 \menuitem{QUALTOBAD}{
- Assigns bad values to pixels with given qualities.}
+ Assigns \htmlref{bad values}{se:masking}~ to pixels with given qualities.}
 \menuitem{REGRID}{
  Uses an arbitrary mapping to regrid an NDF.}
 \menuitem{REMQUAL}{
- Removes named qualities stored in an NDF QUALITY component.}
+ Removes \htmlref{named qualities}{se:qnames}~ stored in an NDF \htmlref{QUALITY component}{apndf:quality}.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -12055,7 +12056,7 @@ picture.}
 \menuitem{SEGMENT}{
  Copies polygonal segments from one NDF to another.}
 \menuitem{SETAXIS}{
- Sets values for an axis array component within an NDF data structure.}
+ Sets values for an \htmlref{axis array component}{apndf:axis}~ within an NDF data structure.}
 \menuitem{SETBAD}{
  Sets new \htmlref{bad-pixel flag}{setbad:badpixelflag}~ values for an NDF.}
 \menuitem{SETBB}{
@@ -12063,31 +12064,31 @@ picture.}
 \menuitem{SETBOUND}{
  Sets new bounds for an NDF.}
 \menuitem{SETEXT}{
- Manipulates the contents of a specified NDF extension.}
+ Manipulates the contents of a specified \htmlref{NDF extension}{apndf:extensions}.}
 \menuitem{SETLABEL}{
- Sets a new label for an NDF data structure.}
+ Sets a new \htmlref{label}{apndf:label}~ for an NDF data structure.}
 \menuitem{SETMAGIC}{
  Replaces all occurrences of a given value in an NDF array with the bad value.}
 \menuitem{SETNORM}{
  Sets a new value for one or all of an NDF's axis-normalisation flags.}
 \menuitem{SETORIGIN}{
- Sets a new pixel origin for an NDF.}
+ Sets a new \htmlref{pixel origin}{apndf:origin}~ for an NDF.}
 \menuitem{SETQUAL}{
- Assigns a specified quality to selected pixels within an NDF.}
+ Assigns a specified \htmlref{quality}{se:qualitymask} to selected pixels within an NDF.}
 \menuitem{SETSKY}{
- Stores WCS Information in an NDF.}
+ Stores \htmlref{WCS Information}{se:wcsuse}~ in an NDF.}
 \menuitem{SETTITLE}{
- Sets a new title for an NDF data structure.}
+ Sets a new \htmlref{title}{apndf:title} for an NDF data structure.}
 \menuitem{SETTYPE}{
- Sets a new numeric type for the data and variance components of an NDF.}
+ Sets a new numeric type for the DATA and VARIANCE components of an NDF.}
 \menuitem{SETUNITS}{
- Sets a new units value for an NDF data structure.}
+ Sets a new \htmlref{units}{apndf:units} value for an NDF data structure.}
 \menuitem{SETVAR}{
- Sets new values for the variance component of an NDF data structure.}
+ Sets new values for the \htmlref{VARIANCE component}{apndf:variance}~ of an NDF data structure.}
 \menuitem{SHADOW}{
  Enhances edges in a two-dimensional NDF using a shadow effect.}
 \menuitem{SHOWQUAL}{
- Displays the named qualities stored in an NDF QUALITY component.}
+ Displays the named qualities stored in an NDF \htmlref{QUALITY component}{apndf:quality}.}
 \menuitem{SLIDE}{
  Shifts pixels in an NDF by a given amount along each axis.}
 \menuitem{SQORST}{
@@ -12105,13 +12106,13 @@ picture.}
 \menuitem{TRANDAT}{
  Converts free-format text data into an NDF.}
 \menuitem{TRIG}{
- Performs a trigonometric  transformation on an NDF.}
+ Performs a trigonometric transformation on an NDF.}
 \menuitem{VECPLOT}{
  Plots a two-dimensional vector map.}
 \menuitem{KAPVERSION}{
  Checks the version number of the installed package.}
 \menuitem{WCSADD}{
-Creates a Mapping and optionally adds a \htmlref{new co-ordinate Frame}{se:domains} into the WCS component of an NDF.}
+Creates a Mapping and optionally adds a \htmlref{new co-ordinate Frame}{se:domains}~ into the WCS component of an NDF.}
 \menuitem{WCSALIGN}{
 Aligns a group of NDFs using WCS information.}
 \menuitem{WCSATTRIB}{
@@ -12156,11 +12157,11 @@ functions as follows.
 \classitem{CREFRAME}
  Generates a test two-dimensional NDF from a selection of several types.
 \classitem{FITSDIN}
- Reads a FITS disc file composed of simple, group or table objects.
+ Reads a {\FITSref}~ disc file composed of simple, group or table objects.
 \classitem{FITSHEAD}
  Lists the headers of FITS files.
 \classitem{FITSIMP}
- Imports FITS information into an NDF extension.
+ Imports FITS information into an \htmlref{NDF extension}{apndf:extensions}.
 \classitem{FITSIN}
  Reads a FITS tape composed of simple, group or table files.
 \classitem{MATHS}
@@ -12271,7 +12272,7 @@ functions as follows.
 \item {\large\bf Lookup/Colour tables}
 \begin{description}
 \classitem{LUTABLE}
- Manipulates an graphics device colour table.
+ Manipulates an graphics device \htmlref{colour table}{se:coltab}.
 \classitem{LUTBGYRW}
  Loads the {\it BGYRW\/} \htmlref{lookup table}{se:lookuptables}.
 \classitem{LUTCOL}
@@ -12312,7 +12313,7 @@ functions as follows.
 \item {\large\bf Output}
 \begin{description}
 \classitem{ARDPLOT}
- Plots the boundaries of regions described in an ARD file over an existing picture.
+ Plots the boundaries of regions described in an \htmlref{ARD file}{se:ardwork}~ over an existing picture.
 \classitem{CONTOUR}
  Contours a two-dimensional NDF.
 \classitem{DISPLAY}
@@ -12344,7 +12345,7 @@ functions as follows.
 \item {\large\bf Palette}
 \begin{description}
 \classitem{PALDEF}
- Loads the default palette to a colour table.
+ Loads the default \htmlref{palette}{se:palette}~ to a colour table.
 \classitem{PALENTRY}
  Enters a colour into an graphics device's palette.
 \classitem{PALREAD}
@@ -12448,7 +12449,7 @@ functions as follows.
 \classitem{MANIC}
  Converts all or part of an NDF from one dimensionality to another.
 \classitem{NDFCOPY}
- Copies an NDF (or NDF section) to a new location.
+ Copies an NDF (or \htmlref{NDF section}{se:ndfsect}) to a new location.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{PROFILE}
@@ -12505,9 +12506,9 @@ functions as follows.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{QUALTOBAD}
- Assigns bad values to pixels with given qualities.
+ Assigns \htmlref{bad values}{se:masking}~ to pixels with given qualities.
 \classitem{REMQUAL}
- Removes named qualities stored in an NDF QUALITY component.
+ Removes \htmlref{named qualities}{se:qnames}~ stored in an NDF QUALITY component.
 \classitem{SETBAD}
  Sets new \htmlref{bad-pixel flag}{setbad:badpixelflag}~ values for an NDF.
 \classitem{SETBB}
@@ -12517,11 +12518,11 @@ functions as follows.
 \classitem{SETQUAL}
  Assigns a specified quality to selected pixels within an NDF.
 \classitem{SETTYPE}
- Sets a new numeric type for the data and variance components of an NDF.
+ Sets a new numeric type for the DATA and VARIANCE components of an NDF.
 \classitem{SETVAR}
- Sets new values for the variance component of an NDF data structure.
+ Sets new values for the \htmlref{VARIANCE component}{apndf:variance}~ of an NDF data structure.
 \classitem{SHOWQUAL}
- Displays the named qualities stored in an NDF QUALITY component.
+ Displays the named qualities stored in an NDF \htmlref{QUALITY component}{apndf:quality}.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -12536,7 +12537,7 @@ functions as follows.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{SETAXIS}
- Sets values for an axis array component within an NDF data structure.
+ Sets values for an \htmlref{axis array component}{apndf:axis} within an NDF data structure.
 \classitem{SETNORM}
  Sets a new value for one or all of an NDF's axis-normalisation flags.
 \end{description}
@@ -12545,18 +12546,18 @@ functions as follows.
 \item {\large\bf NDF character components}
 \begin{description}
 \classitem{SETLABEL}
- Sets a new label for an NDF data structure.
+ Sets a new \htmlref{label}{apndf:label}~ for an NDF data structure.
 \classitem{SETTITLE}
- Sets a new title for an NDF data structure.
+ Sets a new \htmlref{title}{apndf:title}~ for an NDF data structure.
 \classitem{SETUNITS}
- Sets a new units value for an NDF data structure.
+ Sets a new \htmlref{units}{apndf:units}~ value for an NDF data structure.
 \end{description}
 \vspace*{0.7ex}
 %
 \item {\large\bf NDF extensions}
 \begin{description}
 \classitem{FITSEDIT}
- Edits the FITS extension of an NDF.
+ Edits the \htmlref{FITS extension}{se:fitsairlock}~ of an NDF.
 \classitem{FITSEXIST}
  Inquires whether or not a keyword exists in a FITS extension.
 \classitem{FITSEXP}
@@ -12572,7 +12573,7 @@ functions as follows.
 \classitem{FITSWRITE}
  Writes a new keyword to the FITS extension.
 \classitem{SETEXT}
- Manipulates the contents of a specified NDF extension.
+ Manipulates the contents of a specified NDF \htmlref{extension}{apndf:extensions}.
 \classitem{SETSKY}
  Stores \htmlref{WCS}{apndf:wcs}~ Information in an NDF.
 \end{description}
@@ -12581,9 +12582,9 @@ functions as follows.
 \item {\large\bf NDF History}
 \begin{description}
 \classitem{HISCOM}
- Adds commentary to the history of an NDF.
+ Adds commentary to the \htmlref{history}{se:ndfhistory} of an NDF.
 \classitem{HISLIST}
- Lists NDF history records.
+ Lists NDF \htmlref{history records}{apndf:history}.
 \classitem{HISSET}
  Sets the NDF history update mode.
 \end{description}
@@ -12595,12 +12596,12 @@ functions as follows.
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
 \classitem{WCSADD}
-Creates a Mapping and optionally adds a new co-ordinate Frame into the 
+Creates a Mapping and optionally adds a new \htmlref{co-ordinate Frame}{se:domains}~ into the 
 WCS component of an NDF.
 \classitem{WCSALIGN}
- Aligns a group of NDFs using \htmlref{WCS}{apndf:wcs}~ information.
+ Aligns a group of NDFs using \htmlref{WCS information}{se:wcsuse}.
 \classitem{WCSATTRIB}
- Manages attribute values associated with the WCS component of an NDF.
+ Manages attribute values associated with the \htmlref{WCS component}{apndf:wcs}~ of an NDF.
 \classitem{WCSCOPY}
  Copies WCS information from one NDF to another.
 \classitem{WCSFRAME}
@@ -12620,13 +12621,13 @@ WCS component of an NDF.
 \classitem{ARDGEN}
  Creates a text file describing selected regions of an image.
 \classitem{ARDMASK}
- Uses an ARD file to set some pixels of an NDF to be bad.
+ Uses an \htmlref{ARD file}{se:ardwork}~ to set some pixels of an NDF to be bad.
 \classitem{ARDPLOT}
  Plots the boundaries of regions described in an ARD file over an existing picture.
 \classitem{CHPIX}
  Replaces the values of selected pixels in an NDF.
 \classitem{COPYBAD}
- Copies the bad pixel mask from one NDF to another.
+ Copies the \htmlref{bad-pixel}{se:masking}~ mask from one NDF to another.
 \classitem{ERRCLIP}
  Removes pixels with large errors from an NDF.
 \classitem{FFCLEAN}
@@ -12636,7 +12637,7 @@ WCS component of an NDF.
 \classitem{GLITCH}
  Replaces bad pixels in a two-dimensional image with the local median.
 \classitem{NOMAGIC}
- Replaces all occurrences of magic value pixels in an NDF array with
+ Replaces all occurrences of \htmlref{magic-value}{se:masking}~ pixels in an NDF array with
  a new value.
 \classitem{OUTSET}
  Sets pixels outside a specified circle in a two-dimensional NDF to a specified
@@ -12748,7 +12749,7 @@ WCS component of an NDF.
 \classitem{CALC}
  Evaluates a mathematical expression.
 \classitem{PARGET}
- Obtains the value or values of an application parameter.
+ Obtains the value or values of an \htmlref{application parameter}{se:parout}.
 \end{description}
 \end{description}
 
@@ -12766,15 +12767,15 @@ WCS component of an NDF.
 %
 \begin{description}
 \classitem{GLOBALS}
- Displays the values of the \KAPPA\ global parameters.
+ Displays the values of the \KAPPA\ \htmlref{global parameters}{se:parglobals}.
 \classitem{FITSEXIST}
  Inquires whether or not a keyword exists in a FITS extension.
 \classitem{FITSLIST}
- Lists the FITS extension of an NDF.
+ Lists the \htmlref{FITS extension}{se:fitsairlock}~ of an NDF.
 \classitem{FITSVAL}
  Reports the value of a keyword in the FITS extension.
 \classitem{NDFTRACE}
- Displays the attributes of an NDF data structure.
+ Displays the attributes of an \htmlref{NDF data structure}{ap:NDFformat}.
 \classitem{NOGLOBALS}
  Resets the \KAPPA\ global parameters.
 \end{description}
@@ -13340,7 +13341,7 @@ KAPPA: \htmlref{STATS}{STATS},
          region.  The pixels included in the resulting region depend on
          which of the following operators is selected.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "AND"} --- Pixels are included if they are in both of the regions
@@ -13374,7 +13375,7 @@ KAPPA: \htmlref{STATS}{STATS},
          when the application starts up).  It determines what to do
          next.  The following options are available:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Combine"} --- Combine two previously defined regions into a
@@ -13470,7 +13471,7 @@ KAPPA: \htmlref{STATS}{STATS},
          parameter OPTION.  The currently available shapes are listed
          below.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Box"} --- A rectangular box with sides parallel to the
@@ -13555,7 +13556,7 @@ KAPPA: \htmlref{STATS}{STATS},
          The arguments for the textual description of each shape are as
          follows :
 
-            \sstitemlist{
+            \ssthitemlist{
 
                \sstitem
                   {\tt "Box"} --- The co-ordinates of the centre, followed by the
@@ -13824,7 +13825,9 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          reported).
 
          The appearance of the plotted curves is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc}. {\tt [}current value{\tt{]}}
+         \htmlattref{Colour(Curves)}{Colour(element)},
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc}. 
+         {\tt [}current value{\tt{]}}
       }
    }
    \sstexamples{
@@ -14596,12 +14599,12 @@ KAPPA: \htmlref{MATHS}{MATHS}.
       \sstsubsection{
          Q = NDF (Write)
       }{
-         An output NDF holding the normalised Stokes parameter, $Q$. {\tt [!]}
+         An output NDF holding the normalised Stokes parameter, \textit{Q}. {\tt [!]}
       }
       \sstsubsection{
          U = NDF (Write)
       }{
-         An output NDF holding the normalised Stokes parameter, $U$. {\tt [!]}
+         An output NDF holding the normalised Stokes parameter, \textit{U}. {\tt [!]}
       }
       \sstsubsection{
          THETA = NDF (Write)
@@ -14640,7 +14643,7 @@ KAPPA: \htmlref{MATHS}{MATHS}.
       \sstexamplesubsection{
          calpol m51\_0 m51\_45 m51\_90 m51\_135 q=m51\_q p=m51\_p
       }{
-         This example produces NDFs holding the Stokes $Q$ and $U$
+         This example produces NDFs holding the Stokes \textit{Q} and \textit{U}
          parameters, again based on the four NDFs M51\_0, m51\_45, m51\_90
          and m51\_135.
       }
@@ -14849,10 +14852,10 @@ KAPPA: \htmlref{ADD}{ADD},
          OUTCAT.  The string supplied for CATFRAME can be one of the
          following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
-            A Domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
 
             \sstitem
             An integer value giving the index of the required Frame.
@@ -14955,7 +14958,7 @@ KAPPA: \htmlref{ADD}{ADD},
          marker type given by parameter MARKER.  It can take any of the
          following values:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Initial"}:  The position of the cursor when the mouse button is
@@ -15002,7 +15005,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The \htmlref{mode}{se:interaction} in which the initial co-ordinates 
          are to be obtained.  The   supplied string can be one of the following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Interface"}: positions are obtained using parameter INIT.
@@ -15615,7 +15618,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The colour with which to mark any bad (\emph{i.e.} missing) pixels in the
          display.  There are a number of options described below.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "MAX"} --- The maximum \htmlref{colour index}{se:coltab} used for the display of the image.
@@ -16072,7 +16075,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          within the input NDF (also see parameter TRIM).  It can take any
          of the following values:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "ORIGIN"} --- The compression boxes are placed so that the
@@ -16330,7 +16333,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          within the input NDF (also see parameter TRIM).  It can take any
          of the following values:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "ORIGIN"} --- The compression boxes are placed so that the
@@ -16855,19 +16858,29 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          attributes.  Any unrecognised attributes are ignored (no error is
          reported).
 
-         The heading in the key can be changed by setting a value for the
-         Title attribute (the supplied heading is split into lines of no more
-         than 17 characters).  The appearance of the heading is controlled
-         by attributes Colour(Title), Font(Title), \emph{etc}.  The appearance of
-         the contour indices is controlled by attributes Colour(TextLab),
-         Font(TextLab), \emph{etc.} (the synonym Index can be used in place of
-         TextLab).  The appearance of the contour values is controlled by
-         attributes Colour(NumLab), Font(NumLab), \emph{etc.} (the synonym Value
-         can be used in place of NumLab).  Contour indices are formatted
-         using attributes Format(1), Digits(1), \emph{etc.} (the synonym Index can
-         be used in place of value 1).  Contour values are formatted
-         using attributes Format(2), \emph{etc.} (the synonym Value can be used in
-         place of the value 2). {\tt [}current value{\tt{]}}
+         The heading in the key can be changed by setting a value for
+	 the Title attribute (the supplied heading is split into lines
+	 of no more than 17 characters).  The appearance of the
+	 heading is controlled by attributes
+	 \htmlattref{Colour(Title)}{Colour(element)},
+	 \htmlattref{Font(Title)}{Font(element)}, \emph{etc}.  The
+	 appearance of the contour indices is controlled by attributes
+	 \htmlattref{Colour(TextLab)}{Colour(element)},
+	 \htmlattref{Font(TextLab)}{Font(element)}, \emph{etc.} (the
+	 synonym {\att Index} can be used in place of
+	 \htmlattref{TextLab}{TextLab(axis)}). The appearance of the
+	 contour values is controlled by attributes {\att
+	 Colour(NumLab)}, {\att Font(NumLab)}, \emph{etc.} (the
+	 synonym {\att Value} can be used in place of 
+         \htmlattref{NumLab}{NumLab(axis)}).
+	 Contour indices are formatted using attributes
+	 \htmlattref{Format(1)}{Format(axis)},
+	 \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc.} (the
+	 synonym {\att Index} can be used in place of value 1).
+	 Contour values are formatted using attributes {\att
+	 Format(2)}, \emph{etc.} (the synonym {\att Value} can be used
+	 in place of the value 2). {\tt [}current value{\tt{]}}
+
       }
       \sstsubsection{
          LABPOS = \_REAL() (Read)
@@ -16905,7 +16918,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       }{
          The method used to select the contour levels.  The options are:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
               {\tt "Area"} --- The contours enclose areas of the array for which
@@ -17036,10 +17049,11 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          reported).
 
          The appearance of the contours is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Contours may be
-         used in place of Curves).  The contour appearance established in
-         this way may be modified using parameters PENS, PENROT and DASHED.
-         {\tt [}current value{\tt{]}}
+         \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Contours} may be used in place of {\att Curves}).  The contour
+         appearance established in  this way may be modified using parameters
+         PENS, PENROT and DASHED.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          USEAXIS = \htmlref{GROUP}{se:groups} (Read)
@@ -17049,9 +17063,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          supplied specifying the two axes which are to be used when annotating
          and aligning the contour map.  Each axis can be specified either by
          its integer index within the current Frame (in the range 1 to the
-         number of axes in the current Frame), or by its Symbol attribute.  A
-         list of acceptable values is displayed if an illegal value is
-         supplied.  If a null ({\tt{!}}) value is supplied, the axes with the same
+         number of axes in the current Frame), or by its
+         \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable 
+         values is displayed if an illegal value is supplied.  If a null
+         ({\tt{!}}) value is supplied, the axes with the same
          indices as the two significant NDF pixel axes are used. {\tt [!]}
       }
    }
@@ -17101,7 +17116,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       }{
          As above except that the current graphics device is used, pens
          are cycled automatically, and the appearance of the axes is read
-         from text file {\tt mysty}.  The plotting attribute Grid is set
+         from text file {\tt mysty}.  The plotting attribute \htmlattref{Grid}{Grid}~ is set
          explicitly to 1 to ensure that a co-ordinate grid is drawn over
          the plot.  The text file {\tt mysty} could, for instance, contain the
          two lines {\tt "Title=NGC6872 at 25 microns"} and {\tt "grid=0"}. 
@@ -17165,7 +17180,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          the annotated axes.  If the NDF does not have a Title component, then
          the default title is taken from current co-ordinate Frame stored in the
          \htmlref{WCS}{apndf:wcs} component of the NDF.  This
-         default may be overridden by specifying a value for the Title
+         default may be overridden by specifying a value for the \htmlattref{Title}{plotel:Title}~
          attribute using the STYLE parameter.
 
          \sstitem
@@ -17503,7 +17518,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
          Radial distribution of the Gaussians to be used (GS mode).
          Alternatives weightings are:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "FIX"} --- Fixed distance.
@@ -17573,7 +17588,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
       }{
          The form of the data to be generated.  The options are as follows.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "RR"} --- Uniform noise between 0 and 1.
@@ -17805,10 +17820,10 @@ KAPPA: \htmlref{ADD}{ADD},
          OUTCAT.  The string supplied for CATFRAME can be one of the
          following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
-            A Domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
 
             \sstitem
             An integer value giving the index of the required Frame.
@@ -17878,10 +17893,10 @@ KAPPA: \htmlref{ADD}{ADD},
          any of the co-ordinate Frames stored with each picture.  The
          string supplied for FRAME can be one of the following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.  The special domains
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.  The special domains
             AGI\_WORLD and AGI\_DATA are used to refer to the world and data
             co-ordinate system stored in the AGI graphics database.  They can
             be useful if no WCS information was store with the picture when
@@ -17971,7 +17986,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The method used to select the pictures in which cursor positions are
          to be reported.  There are three options:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Current"} --- reports positions within the current picture in the
@@ -18025,7 +18040,7 @@ KAPPA: \htmlref{ADD}{ADD},
          (colour, size, \emph{etc.}) is controlled by the STYLE parameter.  PLOT
          can take any of the following values:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "None"} --- No graphics are produced.
@@ -18139,9 +18154,11 @@ KAPPA: \htmlref{ADD}{ADD},
          reported).
 
          In addition to the attributes which control the appearance of
-         the graphics (Colour, Font, \emph{etc.}), the following attributes may
+         the graphics (\htmlattref{Colour}{Colour(element)}, \htmlattref{Font}{Font(element)}, \emph{etc.}), the following attributes may
          be set in order to control the appearance of the formatted axis
-         values reported on the screen: Format, Digits, Symbol, Unit.  These
+         values reported on the screen: \htmlattref{Format}{Format(axis)}, 
+         \htmlattref{Digits}{Digits/Digits(axis)}, \htmlattref{Symbol}{Symbol(axis)},
+         \htmlattref{Unit}{Unit(axis)}.  These
          may be suffixed with an axis number (\emph{e.g.} {\tt "Digits(2)"}) to refer to
          the values displayed for a specific axis. {\tt [}current value{\tt{]}}
       }
@@ -18330,7 +18347,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          The colour with which to mark any bad (\emph{i.e.} missing) pixels in the
          display.  There are a number of options described below.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "MAX"} --- The maximum \htmlref{colour index}{se:coltab} used for the display of the image.
@@ -18570,7 +18587,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          The method by which the maximum and minimum data values to be
          displayed are chosen.  The options are:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Faint"} --- The image is scaled between the mean data value minus
@@ -18765,10 +18782,10 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          Displays the current NDF data component with annotated axes
          after clearing the current picture on the current graphics device
          device.  The appearance of the axes is specified in the text
-         file {\tt sty}, but this is modified by setting the Grid attribute
+         file {\tt sty}, but this is modified by setting the \htmlattref{Grid}{Grid}~ attribute
          to 1 so that a co-ordinate grid is drawn across the plot.  The
          margins around the image containing the axes are made slightly
-         wider than normal.  The scaling is between the -1 and $+$7 standard
+         wider than normal.  The scaling is between the $-Â$1 and $+$7 standard
          deviations of the image around its mean.  The scaled data are
          stored in an NDF called video.
       }
@@ -18823,8 +18840,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          The Title component in the NDF is used as the default title for
          the annotated axes.  If the NDF does not have a Title component, then
          the default title is taken from current co-ordinate Frame in the NDF.  This
-         default may be overridden by specifying a value for the Title
-         attribute using the STYLE parameter.
+         default may be overridden by specifying a value for the 
+         \htmlattref{Title}{plotel:Title}~ attribute using the STYLE parameter.
 
          \sstitem
          The application stores a number of pictures in the graphics
@@ -19040,10 +19057,10 @@ KAPPA: \htmlref{ADD}{ADD},
          some other  Frame, the required Frame should be specified using this
          parameter.  The string supplied for FRAME can be one of the following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
 
             \sstitem
             An integer value giving the index of the required Frame.
@@ -19074,7 +19091,7 @@ KAPPA: \htmlref{ADD}{ADD},
          will be supplied (see parameter ORIGIN).  The following Frames will
          always be available:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "GRAPHICS"} --- gives positions in millimetres from the bottom left
@@ -19150,24 +19167,26 @@ KAPPA: \htmlref{ADD}{ADD},
          reported).
 
          The appearance of the arrows is controlled by the attributes
-         Colour(Axes), Width(Axes), \emph{etc.} (the synonym Arrows may be
-         used in place of Axes).
+         \htmlattref{Colour(Axes)}{Colour(element)}, 
+         \htmlattref{Width(Axes)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Arrows} may be used in place of {\att Axes}).
 
          The text of the label to draw against each arrow is specified by
-         the Symbol(1) and Symbol(2) attributes.  These default to the
+         the {\att Symbol(1)} and {\att Symbol(2)} attributes.  These default to the
          corresponding attributes of the underlying picture.  The
          appearance of these labels can be controlled using the attributes
-         Font(TextLab), Size(TextLab), \emph{etc}.  The gap between the end of the
+         \htmlattref{Font(TextLab)}{Font(element)}, 
+         \htmlattref{Size(TextLab)}{Size(element)}, \emph{etc}.  The gap between the end of the
          arrow and the corresponding label can be controlled using attribute
-         TextLabGap.  The drawing of labels can be suppressed using
-         attribute TextLab.   {\tt [}current value{\tt{]}}
+         \htmlattref{TextLabGap}{TextLabGap(axis)}.  The drawing of labels can be suppressed using
+         attribute \htmlattref{TextLab}{TextLab(axis)}.   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          USEAXIS = GROUP (Read)
       }{
          USEAXIS is only accessed if the co-ordinate Frame selected using
          parameter FRAME has more than two axes.  A group of two strings should
-         be supplied specifying the two axes to which the 2 drawn arrows should
+         be supplied specifying the two axes to which the two drawn arrows should
          refer.  Each axis can be specified either by its integer index within
          the Frame (in the range 1 to the number of axes in the current Frame),
          or by its symbol string.  A list of acceptable values is displayed if
@@ -19345,11 +19364,12 @@ KAPPA: \htmlref{ADD}{ADD},
          attributes.  Any unrecognised attributes are ignored (no error is
          reported).
 
-         The attributes {\tt Colour(Curves)}, {\tt Width(Curves)}, \emph{etc.}, can be used
-         to specify the style for the lines ({\tt "Lines"} is recognised as a
-         synonym for {\tt "Curves"}).  These values apply to all
+         The attributes \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.}, can be used
+         to specify the style for the lines ({\att Lines} is recognised as a
+         synonym for {\att Curves}).  These values apply to all
          lines unless subsequent attributes override them.  Attributes for
-         individual clipping levels can be given by replacing {\tt "Curves"} above
+         individual clipping levels can be given by replacing {\att Curves} above
          by a string of the form {\tt "Nsig$<$i$>$"} where {\tt "$<$i$>$"} is an integer
          index into the list of clipping levels supplied for parameter
          NSIGMA.  Thus, {\tt "Colour(Nsig1)"} will set the colour for the lines
@@ -20449,6 +20469,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          The progress of the iterations is reported.
       }
    }
+   \pagebreak
    \sstdiytopic{
       Timing
    }{
@@ -20575,7 +20596,9 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       }{
          Determines which FITS keywords should be used to define the
          world co-ordinate systems to be stored in the NDF's \htmlref{WCS}{apndf:wcs}
-         component.  The allowed values (case-insensitive) are:
+         component.  The allowed values (case-insensitive) are as
+         follows.
+
          \ssthitemlist{
 
          \sstitem
@@ -20590,7 +20613,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
             {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
             encoding scheme described in the paper ``Representation of
 	    celestial coordinates in FITS'' \newline
-   (\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+            (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
             {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). \newline
 
             It is very similar to FITS-IRAF but supports a wider range of
@@ -20813,7 +20836,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          appended by the set of group parameters.  The group parameters
          are evaluated using their scales and offsets, and made to look
          like FITS cards, whose keywords are derived from the values of
-         PTYPE$m$ in the main header.  ($m$ is the number of the group
+         PTYPE\textit{m} in the main header.  (\textit{m} is the number of the group
          parameter.) The same format is used in the log file.
 
          \sstitem
@@ -21433,7 +21456,8 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
       }{
          Determines which FITS keywords should be used to define the
          world co-ordinate systems to be stored in the NDF's \htmlref{WCS}{apndf:wcs}
-         component.  The allowed values (case-insensitive) are:
+         component.  The allowed values (case-insensitive) are as follows.
+
          \ssthitemlist{
 
          \sstitem
@@ -21448,7 +21472,7 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
             {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
             encoding scheme described in the paper ``Representation of
 	    celestial coordinates in FITS'' \newline
-   (\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+            (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
             {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). \newline
 
             It is very similar to FITS-IRAF but supports a wider range of
@@ -21708,7 +21732,7 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
          appended by the set of group parameters.  The group parameters
          are evaluated using their scales and offsets, and made to look
          like FITS cards, whose keywords are derived from the values of
-         PTYPE$m$ in the main header.  ($m$ is the number of the group
+         PTYPE\textit{m} in the main header.  (\textit{m} is the number of the group
          parameter.) The same format is used in the log file.
 
          \sstitem
@@ -23656,10 +23680,10 @@ KAPPA: \htmlref{GDSET}{GDSET},
          current picture.  The string supplied for FRAME can be one of the
          following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC}{se:resdoms}.
+            A \htmlref{domain name}{re:domains}~ such as \htmlref{SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC}{se:resdoms}.
             The special domain AGI\_WORLD is used to refer to the world co-ordinate
             system stored in the AGI graphics database.  This can be useful if
             no WCS information was store with the picture when it was created.
@@ -23718,11 +23742,15 @@ KAPPA: \htmlref{GDSET}{GDSET},
          reported).
 
          The appearance of the outline is controlled by the attributes
-         Colour(Border), Width(Border), \emph{etc.} (the synonym {\tt "Outline"} may be
-         used in place of {\tt "Border"}).  In addition, the following attributes
+         \htmlattref{Colour(Border)}{Colour(element)}, \latexonly{\goodbreak} 
+         \htmlattref{Width(Border)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Outline} may be used in place of {\att Border}).  In addition, 
+         the following attributes
          may be set in order to control the appearance of the formatted axis
-         values reported on the screen: Format, Digits, Symbol, Unit.  These
-         may be suffixed with an axis number (\emph{e.g.} {\tt "Digits(2)"}) to refer to
+         values reported on the screen: \htmlattref{Format}{Format(axis)}, 
+         \htmlattref{Digits}{Digits/Digits(axis)},
+         \htmlattref{Symbol}{Symbol(axis)}, \htmlattref{Unit}{Unit(axis)}.  These
+         may be suffixed with an axis number (\emph{e.g.} {\att Digits(2)}) to refer to
          the values displayed for a specific axis. {\tt [}current value{\tt{]}}
       }
    }
@@ -23917,7 +23945,7 @@ KAPPA: \htmlref{GDSET}{GDSET},
          The method used to obtain the positions of the pixels to be
          replaced.  The supplied string can be one of the following:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Bad"} --- The bad pixels in the input NDF are used.
@@ -24178,7 +24206,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          BRIEF = \_LOGICAL (Read)
       }{
          This controls whether a summary or the full history information
-         is reported.  BRIEF={\tt TRUE} requests that only the date and
+         is reported.\latexonly{\goodbreak}  BRIEF={\tt TRUE} requests that only the date and
          application name in each history record is listed.  BRIEF={\tt FALSE}
          causes the task to report the history text in addition.
          {\tt [FALSE]}
@@ -24796,8 +24824,8 @@ scaling limits are used for both images.
             range are set to the specified percentiles of the data.  For
             instance, if the value {\tt "Per,10,99"} is supplied, then the lowest
             10\% and highest 1\% of the data values are excluded from the
-            histogram.  If only one value, $p1$, is supplied, the second
-            value, $p2$, defaults to (100 - $p1$).  If no values are supplied,
+            histogram.  If only one value, \textit{p}1, is supplied, the second
+            value, $p2$, defaults to (100 - \textit{p}1).  If no values are supplied,
             the values default to {\tt "5,95"}.  Values must be in the range 0 to
             100.
 
@@ -24860,8 +24888,10 @@ scaling limits are used for both images.
          (no error is reported).
 
          The appearance of the histogram curve is controlled by the
-         attributes Colour(Curves), Width(Curves), {\em{etc}}.  (The synonym
-         Line may be used in place of Curves.)   {\tt [}current value{\tt{]}}
+         attributes \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, {\em{etc}}.  (The 
+         synonym {\att Line} may be used in place of {\att Curves}.)
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -25498,7 +25528,7 @@ plot (6k).
       \sstexamplesubsection{
          laplace a 10 b
       }{
-         This subtracts 10 Laplacians from the NDF called a, to make the
+         This subtracts ten Laplacians from the NDF called a, to make the
          NDF called b.  NDF b inherits its title from a.
       }
    }
@@ -25612,18 +25642,18 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          limits (see parameter ALIGN).  Thus you can generate a composite
          plot within a single set of axes, say using different colours or
          modes to distinguish data from different datasets.  Note,
-         alignment between the two plots is controlled by the AlignSystem
+         alignment between the two plots is controlled by the {\att AlignSystem}
          attribute of the data being displayed.  For instance, if you have
          an existing plot showing a spectrum plotted against radio
          velocity and you overlay another spectrum, also in radio velocity
          but with a different rest frequency, the appearance of the final
-         plot will depend on the value of the AlignSystem attribute of the
-         second spectrum.  If AlignSystem is {\tt "Wavelen"} (this is the default)
+         plot will depend on the value of the {\att AlignSystem} attribute of the
+         second spectrum.  If {\att AlignSystem} is {\tt "Wavelen"} (this is the default)
          then the two spectra will be aligned in wavelength, but if
-         AlignSystem is {\tt "vrad"} they will be aligned in radio velocity.
+         {\tt AlignSystem} is {\tt "vrad"} they will be aligned in radio velocity.
          There will be no difference in effect between these two forms of
          alignment unless the rest frequency is different in the two
-         spectra.  Likewise, the AlignStdOfRest attribute of the second
+         spectra.  Likewise, the {\att AlignStdOfRest} attribute of the second
          spectrum control's the standard of rest in which alignment occurs.
          These attributes (like all other attributes) may be examined and
          modified using \htmlref{WCSATTRIB}{WCSATTRIB}.
@@ -25838,9 +25868,9 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             \sstitem
             {\tt "Bars"} --- Bars with serifs (\emph{i.e.} cross pieces at each end) are
             drawn joining the \textit{x} error limits and the \textit{y} error limits.  The plotting
-            attribute {\tt "Size(ErrBars)"} (see parameter STYLE) can be used to
+            attribute \htmlattref{Size(ErrBars)}{Size(element)}~ (see parameter STYLE) can be used to
             control the size of these serifs (the attribute value should be
-            a magnification factor - 1.0 gives default serifs).
+            a magnification factor --- 1.0 gives default serifs).
 
             \sstitem
             {\tt "Cross"} --- San-serif bars are drawn joining the \textit{x} error limits and
@@ -25854,8 +25884,9 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          The length of the error bars can be controlled using parameters
          XSIGMA and YSIGMA.  The colour, line width and line style used to
          draw them can be controlled using the plotting attributes
-         {\tt "Colour(ErrBars)"}, {\tt "Width(ErrBars)"} and {\tt "Style(ErrBars)"} (see
-         parameter STYLE).  SHAPE is only accessed when parameter ERRBAR
+         {\att Colour(ErrBars)}, {\att Width(ErrBars)} and 
+         \htmlattref{Style(ErrBars)}{Style(element)}~ 
+         (see parameter STYLE).  SHAPE is only accessed when parameter ERRBAR
          is {\tt TRUE}.    {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -25886,12 +25917,15 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          reported).
 
          The appearance of the data values is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Lines may be used
-         in place of Curves).  The appearance of markers used if parameter
-         MODE is set to {\tt "Point"}, {\tt "Mark"} or {\tt "Chain"} is controlled by
-         Colour(Markers), Width(Markers), \emph{etc.} (the synonym Symbols may be
-         used in place of Markers).  The appearance of the error symbols is
-         controlled using Colour(ErrBars), Width(ErrBars), \emph{etc}, (see
+         \htmlattref{Colour(Curves)}{Colour(element)},
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Lines} may be used in place of {\att Curves}).  The appearance 
+         of markers used if parameter MODE is set to {\tt "Point"}, 
+         {\tt "Mark"} or {\tt "Chain"} is controlled by
+         {\att Colour(Markers)}, {\att Width(Markers)}, \emph{etc.} (the 
+         synonym {\att Symbols} may be used in place of {\att Markers}).  The 
+         appearance of the error symbols is
+         controlled using {\att Colour(ErrBars)}, {\att Width(ErrBars)}, \emph{etc}, (see
          parameter SHAPE).   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -26271,7 +26305,8 @@ plot (10k).
          then the positions are assumed to be two-dimensional celestial co-ordinates
          in the specified system.  Otherwise, the given string is used as a Domain
          name without any interpretation.  Any string may be supplied, but normally
-         one of the standard Domain names, such as GRID, PIXEL, GRAPHICS
+         one of the standard \htmlref{Domain names}{se:domains}, such as 
+         \htmlref{GRID, PIXEL, GRAPHICS}{se:resdoms}~ 
          should be given.  Parameter DIM is used to determine the number
          of axes in the Frame.  This parameter is only accessed if the
          parameter NDF is given a null value.
@@ -26557,7 +26592,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          \ssthitemlist{
 
             \sstitem
-            A Domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
 
             \sstitem
             An integer value giving the index of the required Frame.
@@ -26613,10 +26648,11 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          If {\tt TRUE} the positions are labelled with the corresponding integer
          identifiers on the graphics device specified by parameter DEVICE.
          The offset from each position to the centre of the corresponding
-         label is controlled using the {\tt "NumLabGap(1)"} and {\tt "NumLabGap(2)"}
-         plotting attributes, and the appearance of the labels is
-         controlled using attributes {\tt "Colour(NumLab)"}, {\tt "Size(NumLab)"}, \emph{etc}.
-         These attributes may be specified using parameter STYLE. {\tt [FALSE]}
+         label is controlled using the \htmlattref{NumLabGap(1)}{NumLabGap(axis)}~
+         and {\att NumLabGap(2)} plotting attributes, and the appearance of the 
+         labels is controlled using attributes \htmlattref{Colour(NumLab)}{Colour(element)}, 
+         \htmlattref{Size(NumLab)}{Size(element)}, \emph{etc}.  These attributes
+         may be specified using parameter STYLE. {\tt [FALSE]}
       }
       \sstsubsection{
          LAST = \_INTEGER (Read)
@@ -26803,10 +26839,11 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          reported).
 
          In addition to the attributes which control the appearance of
-         the graphics (Colour, Font, \emph{etc.}), the following attributes may
+         the graphics (\htmlattref{Colour}{Colour(element)}, \htmlattref{Font}{Font(element)}, \emph{etc.}), the following attributes may
          be set in order to control the appearance of the formatted axis
-         values reported on the screen: Format, Digits, Symbol, Unit.  These
-         may be suffixed with an axis number (\emph{e.g.} {\tt "Digits(2)"}) to refer to
+         values reported on the screen: \htmlattref{Format}{Format(axis)}, \htmlattref{Digits}{Digits/Digits(axis)}, 
+         \htmlattref{Symbol}{Symbol(axis)}, \htmlattref{Unit}{Unit(axis)}.  These
+         may be suffixed with an axis number (\emph{e.g.} {\att Digits(2)}) to refer to
          the values displayed for a specific axis. {\tt [}current value{\tt{]}}
       }
    }
@@ -26854,8 +26891,8 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          in text file {\tt stars\_2.txt} in their original co-ordinate Frame.  By
          default, five digits are used to format axis-1 values, and seven to format 
          axis-2 values.  These defaults are overridden if the attributes
-         Format(1) and/or Format(2) are assigned values in the description
-         of the current Frame stored in the positions list.
+         \htmlattref{Format(1)}{Format(axis)}~ and/or {\att Format(2)} are assigned 
+         values in the description of the current Frame stored in the positions list.
       }
       \sstexamplesubsection{
          listshow s.txt plot=marker marker=3 style="colour(marker)=red,size=2"
@@ -27337,8 +27374,8 @@ KAPPA: \htmlref{LOG10}{LOG10},
          attributes.  Any unrecognised attributes are ignored (no error is
          reported).
 
-         Data values are formatted using attributes Format(1) and Digits(1).
-         {\tt [}current value{\tt{]}}
+         Data values are formatted using attributes \htmlattref{Format(1)}{Format(axis)}
+         and  \htmlattref{Digits(1)}{Digits/Digits(axis)}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          UBOUND = LITERAL (Read)
@@ -27429,7 +27466,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
          COFRAME or WCS statements within the description (see SUN/183).
          For instance, starting the description with the text
          {\tt "COFRAME(PIXEL)"} will indicate that positions are specified in
-         pixel co-ordinates.  The statement {\tt "COFRAME(SKY,System=FK5)"} would
+         pixel co-ordinates.  The statement \latexonly{\goodbreak}{\tt "COFRAME(SKY,System=FK5)"} would
          indicate that positions are specified in RA/DEC (FK5,J2000).  If
          no such statements are included, then a default co-ordinate system
          is used as specified in the parameter description above.
@@ -28547,7 +28584,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          the square root of the variance values to be used).  If {\tt "Quality"} is
          specified, then the quality values are treated as numerical values (in
          the range 0 to 255).  The dynamic default is obtained from global
-         parameter COMP which is set by applications such as KAPPA:DISPLAY. {\tt []}
+         parameter COMP which is set by applications such as KDISPLAY. {\tt []}
       }
       \sstsubsection{
          CURPIC = \_LOGICAL (Read)
@@ -28724,7 +28761,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 
          Axis 1 is always the \emph{data value} axis, whether it is displayed
          horizontally or vertically.  So for instance, to set the label
-         for the data value axis, assign a value to {\tt "Label(1)"} in the
+         for the data value axis, assign a value to {\att Label(1)} in the
          supplied style.
 
          To get a ramp key (the default), specify {\tt "form=ramp"}.  To
@@ -30557,14 +30594,18 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          The heading in the key can be changed by setting a value for the
          Title attribute (the supplied heading is split into lines of no more
          than 17 characters).  The appearance of the heading is controlled
-         by attributes Colour(Title), Font(Title), \emph{etc}.  The appearance of
-         the curve labels is controlled by attributes Colour(TextLab),
-         Font(TextLab), \emph{etc.} (the synonym Labels can be used in place of
-         TextLab).  The appearance of the offset values is controlled by
-         attributes Colour(NumLab), Font(NumLab), \emph{etc.} (the synonym Offset
-         can be used in place of NumLab).  Offset values are formatted
-         using attributes Format(2), \emph{etc.} (the synonym Offset can be used in
-         place of the value 2). {\tt [}current value{\tt{]}}
+         by attributes \htmlattref{Colour(Title)}{Colour(element)}, 
+         \htmlattref{Font(Title)}{Font(element)}, \emph{etc}.  The appearance of 
+         the curve labels is controlled by attributes 
+         {\att Colour(TextLab)}, {Font(TextLab)}, \emph{etc.} (the synonym 
+         {\att Labels} can be used in place of \htmlattref{TextLab}{TextLab(axis)}).  The 
+         appearance of the offset values is controlled by attributes
+         {\att Colour(NumLab)}, {\att Font(NumLab)}, \emph{etc.} (the 
+         synonym {\att Offset} can be used in place of 
+         \htmlattref{NumLab}{NumLab(axis)}).  Offset values
+         are formatted using attributes {\att Format(2)}, \emph{etc.} (the 
+         synonym {\att Offset} can be used in place of the value 2).
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          LABELS = LITERAL (Read)
@@ -30770,22 +30811,26 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          reported).
 
          The appearance of the data curves is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Lines may be used
-         in place of Curves).  The appearance of markers used if parameter
-         MODE is set to {\tt "Point"}, {\tt "Mark"} or {\tt "Chain"} is controlled by
-         Colour(Markers), Width(Markers), \emph{etc.} (the synonym Symbols may be
-         used in place of Markers).  The appearance of the error bars is
-         controlled using Colour(ErrBars), Width(ErrBars), \emph{etc.} (see
-         parameter ERRBAR).  The appearance of the zero point markers is
-         controlled using Colour(ZeroMark), Size(ZeroMark), \emph{etc}.  The
-         appearance of the curve labels is controlled using Colour(Labels),
-         Size(Labels), \emph{etc}.  LabPos(Left) controls the horizontal position
+         \htmlattref{Colour(Curves)}{Colour(element)},
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Lines} may be used in place of {\att Curves}).  The appearance 
+         of markers used if parameter MODE is set to {\tt "Point"}, {\tt "Mark"} 
+         or {\tt "Chain"} is controlled by {\att Colour(Markers)}, 
+         {\att Width(Markers)}, \emph{etc.} (the synonym {\att Symbols} may 
+         be used in place of {\att Markers}).  The appearance of the
+         error bars is  controlled using {\att Colour(ErrBars)}, 
+         {\att Width(ErrBars)}, \emph{etc.} (see parameter ERRBAR).  The appearance of 
+         the zero point markers is controlled using {\att Colour(ZeroMark)}, 
+         {\att Size(ZeroMark}),  \emph{etc}.  The appearance of the curve labels is
+         controlled using {\att Colour(Labels)}, {\att Size(Labels)}, \emph{etc}. 
+         {\att LabPos(Left)} controls the horizontal position
          of the in-line curve label (see parameter LINLAB), and
-         LabPos(Right) controls the horizontal position of the curve
+         {\att LabPos(Right)} controls the horizontal position of the curve
          label associated with the right hand zero point marker (see
-         parameter ZMARK).  LabPos without any qualifier is equivalent to
-         LabPos(Left).  LabPos values are floating point, with 0.0 meaning
-         the left edge of the plotting area, and 1.0 the right edge. Values
+         parameter ZMARK).  {\att LabPos} without any qualifier is equivalent to
+         {\att LabPos(Left)}.  {\att LabPos} values are floating point, with 
+         {\tt 0.0} meaning
+         the left edge of the plotting area, and {\tt 1.0} the right edge. Values
          outside the range 0 to 1 may be used. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -31815,7 +31860,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          \sstitem
          If the WCS component of the NDF is undefined, then an attempt is
          made to find WCS information from two other sources: first, an
-         \xref{IRAS90 astrometry structure}{sun163}{}~, and secondly, 
+         \xref{IRAS90 astrometry structure}{sun163}{}, and secondly, 
          the \htmlref{FITS extension}{se:fitsairlock}.  If
          either of these sources yield usable WCS information, then it is
          displayed in the same way as the NDF WCS component.  Other 
@@ -32199,14 +32244,16 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          reported).
 
          The appearance of the best fitting straight line is controlled by
-         the attributes Colour(Curves), Width(Curves), \emph{etc.} (the synonym Line
-         may be used in place of Curves).  The appearance of markers is
-         controlled by Colour(Markers), Width(Markers), \emph{etc.} (the synonym
-         Symbols may be used in place of Markers).  The appearance of the
-         error bars is controlled using Colour(ErrBars), Width(ErrBars),
-         \emph{etc}.  Note, Size(ErrBars) controls the length of the serifs (\emph{i.e.}
-         the cross pieces at each end of the error bar), and defaults to
-         1.0. {\tt [}current value{\tt{]}}
+         the attributes \latexonly{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym {\att Line}
+         may be used in place of {\att Curves}).  The appearance of markers is
+         controlled by {\att Colour(Markers)}, {\att Width(Markers)}, 
+         \emph{etc.} (the synonym {\att Symbols} may be used in place of
+         {\att Markers}).  The appearance of the error bars is controlled
+         using {\att Colour(ErrBars)}, {\att Width(ErrBars)}, 
+         \emph{etc}.  Note, \htmlattref{Size(ErrBars)}{Size(element)}~ controls 
+         the length of the serifs (\emph{i.e.} the cross pieces at each end of the 
+         error bar), and defaults to 1.0. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -32577,7 +32624,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          reported).
 
          The appearance of the outline is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc}. {\tt [}current value{\tt{]}}
+         \htmlattref{Colour(Curves)}{Colour(element)}, \htmlattref{Width(Curves)}{Width(element)}, \emph{etc}. {\tt [}current value{\tt{]}}
       }
    }
    \sstdiytopic{
@@ -32989,7 +33036,7 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 \htmlref{PALREAD}{PALREAD}.
    }
 }
-\newpage
+
 \sstroutine{
    PARGET
 }{
@@ -34101,7 +34148,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC}{se:resdoms}.
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC}{se:resdoms}.
             the special domain AGI\_WORLD is used to refer to the world co-ordinate
             system stored in the AGI graphics database.  This can be useful if
             no WCS information was store with the picture when it was created.
@@ -34571,7 +34618,7 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
          \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC}{se:resdoms}.
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC}{se:resdoms}.
 
             \sstitem
             An integer value giving the index of the required Frame within
@@ -35051,7 +35098,7 @@ KAPPA: \htmlref{ADD}{ADD},
          \ssthitemlist{
 
             \sstitem
-            A Domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
+            A \htmlref{Domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.
 
             \sstitem
             An integer value giving the index of the required Frame.
@@ -35507,10 +35554,12 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          reported).
 
          The appearance of the model curve is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Line may be used
-         in place of Curves).  The appearance of the markers representing
-         the real data is controlled by Colour(Markers), Width(Markers),
-         \emph{etc.} (the synonym Symbols may be used in place of Markers).
+         \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Line} may be used in place of {\att Curves}).  The appearance of the 
+         markers representing the real data is controlled by {\att Colour(Markers)}, 
+         {\att Width(Markers)},
+         \emph{etc.} (the synonym {\att Symbols} may be used in place of {\att Markers}).
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -35529,7 +35578,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          determining distances, reporting positions, \emph{etc}.  Each axis can be
          specified either by its integer index within the current Frame (in
          the range 1 to the number of axes in the current Frame), or by its
-         Symbol attribute.  A list of acceptable values is displayed if an
+         \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed if an
          illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the
          axes with the same indices as the two significant NDF pixel axes are
          used. {\tt [!]}
@@ -35667,7 +35716,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          \sstitem
          The method to calculate the fit is as follows:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
                Marginal profiles of each star image are formed in four
@@ -36275,7 +36324,7 @@ KAPPA: \htmlref{FLIP}{FLIP},
          The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all extensions are
          propagated.  \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE parameter.  DATA,
          \htmlref{VARIANCE}{apndf:variance}~ and \htmlref{WCS}{apndf:wcs} are propagated after appropriate modification.  The
-         \htmlref{QUALITY}{apndf:quality}~ component is also propagated if Nearest Neighbour
+         \htmlref{QUALITY}{apndf:quality}~ component is also propagated if nearest-neighbour
          interpolation is being used.  The \htmlref{AXIS}{apndf:axis}~ component is not propagated.
 
          \sstitem
@@ -36428,7 +36477,7 @@ KAPPA: \htmlref{CHAIN}{CHAIN},
          This routine correctly processes the DATA, \htmlref{QUALITY}{apndf:quality},
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}, components of an NDF
          data structure and propagates all \htmlref{extensions}{apndf:extensions}.  \htmlref{WCS}{apndf:wcs} and \htmlref{AXIS}{apndf:axis}~ 
- information is lost.
+         information is lost.
 
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
@@ -36901,9 +36950,11 @@ KAPPA: \htmlref{FLIP}{FLIP},
          attributes.  Any unrecognised attributes are ignored (no error is
          reported).
 
-         The appearance of markers is controlled by Colour(Markers),
-         Width(Markers), \emph{etc.} (the synonym Symbols may be used in place
-         of Markers). {\tt [}current value{\tt{]}}
+         The appearance of markers is controlled by 
+         \htmlattref{Colour(Markers)}{Colour(element)},
+         \htmlattref{Width(Markers)}{Width(element)}, \emph{etc.} (the synonym 
+         {\att Symbols} may be used in place
+         of {\att Markers}). {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          XLEFT = \_REAL (Read)
@@ -37260,11 +37311,13 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          reported).
 
          The appearance of the lines forming the edges of each polygon is
-         controlled by the attributes Colour(Curves), Width(Curves), \emph{etc.}
-         (either of the synonyms Lines and Edges may be used in place of
-         Curves).  The appearance of the vertex markers is controlled by the
-         attributes Colour(Markers), Size(Markers), \emph{etc.} (the synonyms
-         Vertices may be used in place of Markers).  {\tt [}current value{\tt{]}}
+         controlled by the attributes \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.}
+         (either of the synonyms {\att Lines} and {\att Edges} may be used in place of
+         {\att Curves}).  The appearance of the vertex markers is controlled by the
+         attributes {\att Colour(Markers)}, 
+         \htmlattref{Size(Markers)}{Size(element)}, \emph{etc.} (the synonyms
+         {\att Vertices} may be used in place of {\att Markers}).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          USEAXIS = \htmlref{GROUP}{se:groups} (Read)
@@ -37275,7 +37328,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          supplied polygons are defined.  Each axis can be specified either
          by its integer index within the current Frame of the output NDF
          (in the range 1 to the number of axes in the current Frame), or
-         by its Symbol attribute.  A list of acceptable values is displayed
+         by its \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed
          if an illegal value is supplied.  If a null ({\tt{!}}) value is supplied,
          the axes with the same indices as the first two significant NDF pixel
          axes are used. {\tt [!]}
@@ -38098,6 +38151,7 @@ KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
       options may be executed at once, making it easier to modify
       several extension components interactively in one go.
    }
+   \latexonly{\pagebreak}
    \sstusage{
       setext ndf xname option cname 
         $\left\{ {\begin{tabular}{l}
@@ -38462,7 +38516,8 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 }{
    \sstdescription{
       This routine sets a new value for one or all the normalisation
-      flags in an \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in
+      flags in an \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ 
+      \latexonly{\goodbreak} data structure.  The NDF is accessed in
       update mode.  This flag determines how the NDF's data and
       variance arrays behave when the associated axis information is
       modified.
@@ -38885,7 +38940,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
    }
    \sstusage{
       setsky ndf positions coords epoch [projtype] [lon] [lat]
-             [refcode] [pixelsize] [orient] [tilt] [logfile]
+             [refcode] \latexonly{\goodbreak} [pixelsize] [orient] [tilt] [logfile]
    }
    \sstparameters{
       \sstsubsection{
@@ -41501,24 +41556,28 @@ KAPPA: \htmlref{ADD}{ADD},
          attributes.  Any unrecognised attributes are ignored (no error is
          reported).
 
-         The appearance of the text in the key is controlled using {\tt "String"}
-         attributes (\emph{e.g.} COLOUR(STRINGS), FONT(STRINGS); the synonym
-         TEXT can be used in place of STRINGS).  Note, the Size attribute
-         specifies the size of key text relative to the size of the numerical
-         labels on the vector map axes.  Thus a value of 2.0 for Size will
-         result in text which is twice the size of the numerical axis labels.
-         The appearance of the example vector is controlled using {\tt "Curve"}
-         attributes (\emph{e.g.} COLOUR(CURVES); the synonym VECTOR can be
-         used in place of CURVES).  The numerical scale value is formatted as
-         an axis 1 value (using attributes FORMAT(1), DIGITS(1), \emph{etc}; the
-         synonym SCALE can be used in place of the value 1).  The length of
-         the example vector is formatted as an axis 2 value (using attribute
-         FORMAT(2), \emph{etc}; the synonym VECTOR can be used in place of the
-         value 2).  The vertical space between lines in the key can be
-         controlled using attribute TextLabGap.  A value of {\tt 1.0} is used if
-         no value is set for this attribute, and produces default vertical
-         spacing. Values larger than 1.0 increase the vertical space, and
-         values less than 1.0 decrease the vertical space. {\tt [}current value{\tt{]}}
+         The appearance of the text in the key is controlled using {\att String} 
+         attributes (\emph{e.g.} {\att Colour(Strings)}, 
+         \htmlattref{Font(Strings)}{Font(element)}; the 
+         synonym {\att Text} can be used in place of {\att Strings}).  Note, the 
+         \htmlattref{Size}{Size(element)}~ attribute specifies the size of key
+	 text relative to the size of the numerical labels on the vector-map
+	 axes.  Thus a value of {\tt 2.0} for {\att Size} will result in text which is
+	 twice the size of the numerical axis labels. The appearance of the
+	 example vector is controlled using {\att Curve} attributes
+	 (\emph{e.g.} \htmlattref{Colour(Curves)}{Colour(element)}; the synonym {\att Vector} can be
+	 used in place of {\att Curves}).  The numerical scale value is
+	 formatted as an axis 1 value (using attributes \htmlattref{Format(1)}{Format(axis)},
+	  \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc}; the synonym {\att Scale} can be used in
+	 place of the value 1).  The length of the example vector is formatted
+	 as an axis 2 value (using attribute {\att Format(2)}, \emph{etc}; the
+	 synonym {\att Vector} can be used in place of the value 2).  The
+	 vertical space between lines in the key can be controlled using
+	 attribute \htmlattref{TextLabGap}{TextLabGap(axis)}.  A value of {\tt 1.0} is used if no
+	 value is set for this attribute, and produces default vertical
+	 spacing. Values larger than 1.0 increase the vertical space, and
+	 values less than 1.0 decrease the vertical space. {\tt [}current
+	 value{\tt{]}}
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -41594,8 +41653,10 @@ KAPPA: \htmlref{ADD}{ADD},
          reported).
 
          The appearance of the vectors is controlled by the attributes
-         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Vectors may be
-         used in place of Curves). {\tt [}current value{\tt{]}}
+         \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the 
+         synonym {\att Vectors} may be
+         used in place of {\att Curves}). {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
@@ -41613,7 +41674,8 @@ KAPPA: \htmlref{ADD}{ADD},
          supplied specifying the two axes which are to be used when annotating
          and aligning the vector map.  Each axis can be specified either by
          its integer index within the current Frame (in the range 1 to the
-         number of axes in the current Frame), or by its Symbol attribute.  A
+         number of axes in the current Frame), or by its 
+         \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A
          list of acceptable values is displayed if an illegal value is
          supplied.  If a null ({\tt{!}}) value is supplied, the axes with the same
          indices as the two significant NDF pixel axes are used. {\tt [!]}
@@ -41659,7 +41721,7 @@ KAPPA: \htmlref{ADD}{ADD},
          Title component, then the default title is taken from current 
          co-ordinate Frame stored in the \htmlref{WCS}{apndf:wcs} component 
          of the NDF.  This default may be overridden by specifying
-         a value for the Title attribute using the STYLE parameter.
+         a value for the \htmlattref{Title}{plotel:Title}~ attribute using the STYLE parameter.
 
          \sstitem
          The application stores a number of pictures in the 
@@ -41721,7 +41783,8 @@ plot (7k).
       using parameter FRMTYPE (the default is to simply copy the basis Frame).
       Attributes which have been assigned an explicit value in the basis Frame
       are transfered to the new Frame (but only if they are relevant to the
-      type of the new Frame).  The value of the {\att Domain} attribute for the new
+      type of the new Frame).  The value of the
+      \htmlattref{Domain}{Domain}~ attribute for the new
       Frame can be specified using parameter DOMAIN.  Other attribute values
       for the new Frame may be specified using parameters ATTRS.  The new
       Frame becomes the current co-ordinate Frame in the NDF.
@@ -41783,10 +41846,8 @@ plot (7k).
          in conjunction with the CENTRE parameter, this defines the
          forward transformation to be used as follows:
 
-         \begin{eqnarray*}
-                 XX & = & X + D * (X - C1) * ( (X - C1)**2 + (Y - C2)**2 ) \\
-                 YY & = & Y + D * (Y - C2) * ( (X - C1)**2 + (Y - C2)**2 )
-         \end{eqnarray*}
+         \[    XX = X + D * (X - C1) * ( (X - C1)**2 + (Y - C2)**2 ) \]
+         \[    YY = Y + D * (Y - C2) * ( (X - C1)**2 + (Y - C2)**2 ) \]
 
          where ($X$,$Y$) are the input co-ordinates, ($XX$,$YY$) the output
          co-ordinates, $D$ is DISCO, and $C1$ and $C2$ are the two elements of
@@ -41795,7 +41856,7 @@ plot (7k).
       \sstsubsection{
          DOMAIN = LITERAL (Read)
       }{
-         The value for the Domain attribute for the new Frame.  Care should be
+         The value for the {\att Domain} attribute for the new Frame.  Care should be
          taken to ensure that domain names are used consistently.  This
          will usually mean avoiding any domain names which are already in
          use within the WCS component, particularly the 
@@ -41843,7 +41904,7 @@ plot (7k).
          \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.  The two
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.  The two
             {\tt "pseudo-domains"} WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -41970,7 +42031,7 @@ plot (7k).
       \sstsubsection{
          SIMPFI = \_LOGICAL (Read)
       }{
-         The value of the Mapping's SimpFI attribute (whether it is
+         The value of the Mapping's {\att SimpFI} attribute (whether it is
          legitimate to simplify the forward followed by the inverse
          transformation to a unit transformation).  Only used when
          MAPTYPE={\tt "MATH"}.  {\tt [TRUE]}
@@ -41978,7 +42039,7 @@ plot (7k).
       \sstsubsection{
          SIMPIF = \_LOGICAL (Read)
       }{
-         The value of the Mapping's SimpIF attribute (whether it is
+         The value of the Mapping's {\att SimpIF} attribute (whether it is
          legitimate to simplify the inverse followed by the forward
          transformation to a unit transformation).  Only used when
          MAPTYPE={\tt "MATH"}.  {\tt [TRUE]}
@@ -41997,22 +42058,16 @@ plot (7k).
          \begin{itemize}
 
             \item one-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X 
-            \end{eqnarray*}
+             \[  U = TR(1) + TR(2)*X  \]
 
             \item two-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X + TR(3)*Y \\
-               V & = & TR(4) + TR(5)*X + TR(6)*Y
-            \end{eqnarray*}
+             \[  U = TR(1) + TR(2)*X + TR(3)*Y \]
+             \[  V = TR(4) + TR(5)*X + TR(6)*Y \]
 
             \item three-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z \\
-               V & = & TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z \\
-               W & = & TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
-            \end{eqnarray*}
+             \[  U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z \]
+             \[  V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z \]
+             \[  W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z \]
 
          \end{itemize}
 
@@ -42066,7 +42121,7 @@ plot (7k).
          change of units is achieved by multiplying the old Frame axis 1
          values by 2.0626E5.  The values on the second axis are copied
          without change.  You could then use application WCSATTRIB to set
-         the {\tt "Unit"} attribute for axis 1 of the new Frame to {\tt "AU"}.
+         the \htmlattref{Unit}{Unit(axis)}~ attribute for axis 1 of the new Frame to {\tt "AU"}.
       }
       \sstexamplesubsection{
          wcsadd my\_data dist-lum dist(au)-lum diag diag=[2.0626E5,1]
@@ -42174,7 +42229,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       that the output NDF just encloses the entire area covered by the
       corresponding input NDF. Using the first method will ensure that
       all output NDFs have the same pixel
-      \htmlref{origin}{apndf:origin}~, and so the resulting
+      \htmlref{origin}{apndf:origin}, and so the resulting
       NDFs can be directly compared.  However, this may result in the
       output NDFs being larger than necessary.  In general, the second
       method results in smaller NDFs being produced, in less time.
@@ -42496,9 +42551,10 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       Note, the attributes of the PIXEL, GRID and AXIS Frames are managed
       internally by the NDF library.  They may be examined using this
       application, but an error is reported if any attempt is made to
-      change them.  The exception to this is that the DOMAIN attribute may
+      change them.  The exception to this is that the
+      \htmlattref{Domain}{Domain}~ attribute may
       be changed, resulting in a copy of the Frame being added to the WCS
-      compnent of the NDF with the new Domain name.  The AXIS Frame is
+      component of the NDF with the new Domain name.  The AXIS Frame is
       derived from the AXIS structures within the NDF, so the AXLABEL
       and AXUNITS commands may be used to change the axis label or units
       string for the AXIS Frame.
@@ -42556,11 +42612,11 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          REMAP = \_LOGICAL (Read)
       }{
          Only accessed if MODE is {\tt "Set"}.  If REMAP is {\tt TRUE}, then the
-         Mappings which connect the current Frame to the other Frames
+         \htmlref{Mappings}{se:curframe}~ which connect the current Frame to the other Frames
          within the \htmlref{WCS FrameSet}{se:curframe}~ will be modified (if necessary) to
          maintain the FrameSet integrity.  For instance, if the current
          Frame of the NDF represents FK5 RA and DEC, and you change
-         System from {\tt "FK5"} to {\tt "Galactic"}, then the Mappings which connect
+         {\att System} from {\tt "FK5"} to {\tt "Galactic"}, then the Mappings which connect
          the SKY Frame to the other Frames (\emph{e.g.} PIXEL, AXIS) will
          be modified so that each pixel corresponds to the correct
          Galactic co-ordinates.  If REMAP is {\tt FALSE}, then the Mappings will
@@ -42587,7 +42643,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       \sstexamplesubsection{
          wcsattrib my\_spec set System freq
       }{
-         This sets the System attribute of the current co-ordinate Frame in
+         This sets the \htmlattref{System}{System}~ attribute of the current co-ordinate Frame in
          the NDF called my\_Spec so that the Frame represents frequency
          (this assumes the current Frame is a
          \xref{SpecFrame}{sun210}{SpecFrame}).  The Mappings
@@ -42597,19 +42653,19 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       \sstexamplesubsection{
          wcsattrib ngc5128 set title "Polarization map of Centaurus-A"
       }{
-         This sets the Title attribute of the current co-ordinate Frame in
+         This sets the \htmlattref{Title}{Title}~ attribute of the current co-ordinate Frame in
          the NDF called ngc5128 to the string {\tt "Polarization map of Centaurus-A"}.
       }
       \sstexamplesubsection{
          wcsattrib my\_data set domain saved\_pixel
       }{
-         This sets the Domain attribute of the current co-ordinate Frame in
+         This sets the {\att Domain} attribute of the current co-ordinate Frame in
          the NDF called my\_data to the string SAVED\_PIXEL.
       }
       \sstexamplesubsection{
          wcsattrib my\_data set format(1) "\%10.5G"
       }{
-         This sets the Format attribute for axis 1 in the current co-ordinate
+         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 1 in the current co-ordinate
          Frame in the NDF called my\_data, so that axis values are
          formated as floating point values using a minimum field width of
          ten characters, and displaying five significant figures.  An exponent is
@@ -42618,7 +42674,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
       }{
-         This sets the Format attribute for axis 2 in the current co-ordinate
+         This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 2 in the current co-ordinate
          Frame in the NDF called ngc5128, so that axis values are formated as
          separate degrees, minutes and seconds field, separated by blanks.
          The seconds field has two decimal places.  This assumes the current
@@ -42634,21 +42690,22 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
       \sstexamplesubsection{
          wcsattrib my\_data test label(1)
       }{
-         This displays {\tt "TRUE"} if a value has been set for the Label
-         attribute for the first axis of the current co-ordinate Frame in
+         This displays {\tt "TRUE"} if a value has been set for the
+         \htmlattref{Label}{Label(axis)}~ attribute for the first axis of the
+         current co-ordinate Frame in
          the NDF called my\_data, and {\tt "FALSE"} otherwise.
       }
       \sstexamplesubsection{
          wcsattrib my\_data clear label(1)
       }{
-         This clears the Label attribute for the first axis of the current
+         This clears the {\att Label} attribute for the first axis of the current
          co-ordinate Frame in the NDF called my\_data.  It reverts to its
          default value.
       }
       \sstexamplesubsection{
          wcsattrib my\_data set equinox J2000 remap=no
       }{
-         This assumes that the Equinox attribute for the current
+         This assumes that the \htmlattref{Equinox}{Equinox}~ attribute for the current
          co-ordinate Frame within NDF {\tt "my\_data"} has been set to some
          incorrect value, which needs to be corrected to {\tt "J2000"}.  The
          REMAP parameter is set {\tt FALSE}, which prevents the inter-Frame
@@ -42742,22 +42799,16 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          \begin{itemize}
 
             \item one-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X 
-            \end{eqnarray*}
+             \[  U = TR(1) + TR(2)*X  \]
 
             \item two-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X + TR(3)*Y \\
-               V & = & TR(4) + TR(5)*X + TR(6)*Y
-            \end{eqnarray*}
+             \[  U = TR(1) + TR(2)*X + TR(3)*Y \]
+             \[  V = TR(4) + TR(5)*X + TR(6)*Y \]
 
             \item three-dimensional:
-            \begin{eqnarray*}
-               U & = & TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z \\
-               V & = & TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z \\
-               W & = & TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
-            \end{eqnarray*}
+             \[  U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z \]
+             \[  V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z \]
+             \[  W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z \]
 
          \end{itemize}
 
@@ -42782,13 +42833,12 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
         called m51, producing a new NDF called m51\_sqorst.  It is assumed
         that this SQORST-like application does not propagate WCS and also
         resets the pixel origin to [1,~1].  In fact, this is what
-        \htmlref{SQORST}{SQOORST} actually did, prior to \KAPPA\ version 1.0. 
-        This example shows 
-        how WCSCOPY can be used to rectify this by copying the WCS component
-        from the original NDF m51 to the squashed NDF m51\_sqorst,
+        \htmlref{SQORST}{SQORST} actually did, prior to \KAPPA\ version 1.0. 
+        This example shows how WCSCOPY can be used to rectify this by copying
+        the WCS component from the original NDF m51 to the squashed NDF m51\_sqorst,
         modifying it in the process to take account of both the
         squashing and the resetting of the pixel origin produced by
-        \htmlref{SQORST}{SQORST}.  To do this, you need to work out the 
+        SQORST.  To do this, you need to work out the 
         transformation in pixel co-ordinates produced by SQORST, and specify
         this when running WCSCOPY using the TR parameter.  Let's assume the first
         axis of NDF m51 has pixel index bounds of I1:I2 (these values
@@ -42842,9 +42892,9 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          The pixel indices of the bottom left pixel in an NDF is called
          the \emph{pixel origin} of the NDF, and can take any value.  The pixel
          origin can be examined using application NDFTRACE and set using
-         application SETORIGIN.  WCSCOPY takes account of the pixel origins in
-         the two NDFs when modifying the WCS component.  Thus, if a null
-         value is given for parameter TR, the supplied WCS component may still
+         application \htmlref{SETORIGIN}{SETORIGIN}.  WCSCOPY takes account of the 
+         pixel origins in the two NDFs when modifying the WCS component.  Thus, if 
+         a null value is given for parameter TR, the supplied WCS component may still
          be modified if the two NDFs have different pixel origins.
       }
    }
@@ -42901,7 +42951,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          \ssthitemlist{
 
             \sstitem
-            A domain name such as SKY, SPECTRUM, AXIS, PIXEL.  The two
+            A \htmlref{domain name}{se:domains}~ such as SKY, SPECTRUM, AXIS, PIXEL.  The two
             `pseudo-domains' WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -42914,7 +42964,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             An IRAS90 \emph{Sky Co-ordinate System} (SCS) values such as
             {\tt "EQUAT(J2000)"} (see \xref{SUN/163}{sun163}{}).  Using an SCS value
             is equivalent to specifying {\tt "SKY"} for this parameter and then setting
-            the System attribute (to {\tt "FK5"}, {\tt "Galactic"}, \emph{etc.}) using \KAPPA\ command
+            the \htmlattref{System}{System}~ attribute (to {\tt "FK5"}, 
+            {\tt "Galactic"}, \emph{etc.}) using \KAPPA\ command
             WCSATTRIB.  The specific system used to describe positions in other
             Domains (SPECTRUM, for instance) must be set using WCSATTRIB.
          }
@@ -42940,7 +42991,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          Frame in the NDF m51 (if available).  The specific celestial
          co-ordinate system (FK5, Galactic, \emph{etc.}) will depend on the contents
          of the WCS component of the NDF, but may be changed by setting a
-         new value for the System attribute using the WCSATTRIB command.
+         new value for the \htmlattref{System}{System}~ attribute using the 
+         WCSATTRIB command.
       }
       \sstexamplesubsection{
          wcsframe m51 spectral
@@ -42949,7 +43001,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          Frame in the NDF m51 (if available).  The specific spectral
          co-ordinate system (wavelength, frequency, \emph{etc.}) will depend on the
          contents of the WCS component of the NDF, but may be changed by
-         setting a new value for the System attribute using the WCSATTRIB
+         setting a new value for the {\att System} attribute using the WCSATTRIB
          command.
       }
       \sstexamplesubsection{
@@ -43013,7 +43065,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 }{
    \sstdescription{
       This application allows you to remove one or more \htmlref{co-ordinate Frames}{se:domains}~ 
-      from the \htmlref{WCS}{apndf:wcs} component in an \NDFref{NDF}.  The indices of any remaining Frames
+      from the \htmlref{WCS}{apndf:wcs}~ component in an \NDFref{NDF}.  The indices of any remaining Frames
       are `shuffled down' to fill the gaps left by the removed Frames.
    }
    \sstusage{
@@ -43073,25 +43125,25 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    Examine the internal structure of a WCS description.
 }{
    \sstdescription{
-      This application allows you to examine \htmlref{WCS}{apndf:wcs} 
+      This application allows you to examine \htmlref{WCS}{se:wcsuse}~
       information (represented by an AST Object) stored in a
       specified \NDFref{NDF} or \HDSref\ object, or a catalogue.  The structure can be
       dumped to a text file, or a Graphical User Interface can be used
       to navigate through the structure (see parameter LOGFILE).  A new
-      FrameSet can also be stored in the WCS component of an NDF (see
-      parameter NEWWCS).  This allows an NDF WCS component to be dumped
-      to a text file, edited, and then restored to the NDF.
+      FrameSet can also be stored in the \htmlref{WCS component}{apndf:wcs}~
+      of an NDF (see parameter NEWWCS).  This allows an NDF WCS component to
+      be dumped to a text file, edited, and then restored to the NDF.
 
-      The GUI main window contains the attribute values of the supplied AST
-      Object.  Only those associated with the Object's class are displayed
-      initially, but attributes of the Objects parent classes can be
-      displayed by clicking one of the class button to the top left of the
-      window.
+      The GUI main window contains the attribute values of the
+      supplied \xref{AST Object}{sun210}{Object}.  Only those
+      associated with the Object's class are displayed initially, but
+      attributes of the Objects parent classes can be displayed by
+      clicking one of the class button to the top left of the window.
 
-      If the Object contains attributes which are themselves AST Objects
-      (such as the Frames within a FrameSet), then new windows can be
-      created to examine these attributes by clicking over the attribute
-      name.
+      If the Object contains \htmlref{attributes}{se:frmatt}~ which are
+      themselves AST Objects (such as the Frames within a 
+      \htmlref{FrameSet}{se:curframe}), then  new windows can be created
+      to examine these attributes by clicking over the attribute name.
    }
    \sstusage{
       wcsshow ndf object logfile newwcs full quiet
@@ -43101,16 +43153,16 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          CAT = FILENAME (Read)
       }{
          A catalogue containing a positions list such as produced by
-         applications LISTMAKE, CURSOR.  If supplied, the WCS
-         Information in the catalogue is displayed.  If a null ({\tt{!}}) is
-         supplied, the WCS information in the NDF specified by parameter
-         NDF is displayed. {\tt [!]}
+         applications \htmlref{LISTMAKE}{LISTMAKE}, \htmlref{CURSOR}{CURSOR}.  
+         If supplied, the WCS Information in the catalogue is displayed.  If a
+         null ({\tt{!}}) is supplied, the WCS information in the NDF
+         specified by parameter NDF is displayed. {\tt [!]}
       }
       \sstsubsection{
          FULL = \_INTEGER (Read)
       }{
-         This parameter is a three-state flag and takes values of -1, 0 or
-         $+$1.  It controls the amount of information included in the output
+         This parameter is a three-state flag and takes values of {\tt -1},
+         {\tt 0}, or {\tt +1}.  It controls the amount of information included in the output
          generated by this application.  If FULL is zero, then a modest
          amount of non-essential but useful information will be included
          in the output.  If FULL is negative, all non-essential information
@@ -43188,7 +43240,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsshow object="$\sim$/agi\_starprog.agi\_3800\_1.picture(4).more.ast\_plot"
       }{
-         Displays the AST Plot stored in the AGI database with X windows
+         Displays the AST Plot stored in the \htmlref{AGI database}{se:agitidy}~ with X windows
          picture number 4.
       }
    }
@@ -43201,7 +43253,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    \sstdescription{
       This application transforms a position from one \NDFref{NDF} \htmlref{co-ordinate Frame}{se:domains}~ 
       to another.  The input and output Frames may be chosen freely from the
-      Frames available in the \htmlref{WCS}{apndf:wcs} component of the supplied NDF.  The
+      Frames available in the \htmlref{WCS component}{apndf:wcs}~ of the supplied NDF.  The
       transformed position is formatted for display and written to the screen
       and also to an output parameter.
    }
@@ -43242,7 +43294,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          \ssthitemlist{
 
             \sstitem
-            A domain name such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.  The two
+            A \htmlref{domain name}{se:domains}~ such as \htmlref{SKY, AXIS, PIXEL}{se:resdoms}.  The two
             `pseudo-domains' WORLD and DATA may be supplied and will be
             translated into PIXEL and AXIS respectively, so long as the WCS
             component of the NDF does not contain Frames with these domains.
@@ -43278,7 +43330,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 
             \sstitem
             An IRAS90 \emph{Sky Co-ordinate System} (SCS) values such as
-            {\tt "EQUAT(J2000)"} (see \xref{SUN/163}{sun163}{}).
+            {\tt "EQUAT(J2000)"} (see SUN/163).
          }
       }
       \sstsubsection{
@@ -43407,7 +43459,7 @@ KAPPA: \htmlref{LISTMAKE}{LISTMAKE},
          IN = NDF (Read)
       }{
          The input \NDFref{NDF} containing the observed data.  This image may
-         contain bad values, in which case the bad values will be
+         contain \htmlref{bad values}{se:masking}, in which case the bad values will be
          replaced by zero before applying the filter.  The resulting
          filtered image is normalised by dividing each pixel value by
          the corresponding weight of the good input pixels.  These
@@ -43518,9 +43570,9 @@ KAPPA: \htmlref{LISTMAKE}{LISTMAKE},
       \sstsubsection{
          XCENTRE = \_INTEGER (Read)
       }{
-         The \textit{x} pixel index of the centre of the PSF within the supplied
-         PSF array.  The suggested default is the middle pixel (rounded
-         down if there are an even number of pixels per line).
+         The \textit{x} \htmlref{pixel index}{se:pixgrd}~ of the centre of the
+         PSF within the supplied PSF array.  The suggested default is the 
+         middle pixel (rounded down if there are an even number of pixels per line).
       }
       \sstsubsection{
          YCENTRE = \_INTEGER (Read)
@@ -43689,7 +43741,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          accessed if parameter MODE is set to {\tt "Cursor"} or {\tt "Interface"}.
          The options are:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Lines"} --- Replaces lines of pixels between the \textit{y} values
@@ -43737,10 +43789,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       \sstsubsection{
          MODE = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
-         The method used to obtain the bounds of the areas to be replaced.
+         The \htmlref{method}{se:interaction}~ used to obtain the bounds of the areas to be replaced.
          The supplied string can be one of the following options.
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Interface"} --- Bounds are obtained using parameters COLUMNS,
@@ -43751,7 +43803,8 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             {\tt "Cursor"} --- Bounds are obtained using the graphics cursor of the
             device specified by parameter DEVICE.  The type of area to be
             replaced is specified using parameter LINCOL.  The WCS
-            information stored with the picture in the graphics database is
+            information stored with the picture in the
+            \htmlref{graphics database}{se:agitate}~ is
             used to map the supplied cursor positions into the pixel
             co-ordinate Frame of the input NDF.  A message is displayed
             indicating the co-ordinate Frame in which the picture and the
@@ -43789,7 +43842,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          controlled by the STYLE parameter.  PLOT can take any of the
          following values:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
             {\tt "Adapt"} --- Causes {\tt "Box"} to be used if a region is being
@@ -43847,12 +43900,15 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          reported).
 
          The appearance of vertical and horizontal lines is controlled by
-         the attributes Colour(Curves), Width(Curves), \emph{etc.} (the synonym
-         Lines may be used in place of Curves).  The appearance of boxes
-         is controlled by the attributes Colour(Border), Size(Border), \emph{etc}
-         (the synonym Box may be used in place of Border).  The appearance
-         of markers is controlled by attributes Colour(Markers),
-         Size(Markers), \emph{etc}. {\tt [}current value{\tt{]}}
+         the attributes \latexonly{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)}, 
+         \htmlattref{Width(Curves)}{Width(element)}, 
+         \emph{etc.} (the synonym {\att Lines} may be used in place of 
+         {\att Curves}).  The appearance of boxes is controlled by the 
+         attributes {\att Colour(Border)}, 
+         \htmlattref{Size(Border)}{Size(element)}, \emph{etc.}
+         (the synonym {\att Box} may be used in place of Border).  The appearance
+         of markers is controlled by attributes {\att Colour(Markers)},
+         {\att Size(Markers)}, \emph{etc}. {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -43869,7 +43925,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          areas to be replaced.  Each axis can be specified either
          by its integer index within the current Frame of the output NDF
          (in the range 1 to the number of axes in the current Frame), or
-         by its Symbol attribute.  A list of acceptable values is displayed
+         by its \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed
          if an illegal value is supplied.  If a null ({\tt{!}}) value is supplied,
          the axes with the same indices as the first two significant NDF pixel
          axes are used. {\tt [!]}
@@ -43880,10 +43936,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          The method used to choose the replacement pixel values.  It
          should be one of:
 
-         \sstitemlist{
+         \ssthitemlist{
 
             \sstitem
-            {\tt "Bad"} --- Replace the selected pixels by bad values.
+            {\tt "Bad"} --- Replace the selected pixels by \htmlref{bad values}{se:masking}.
 
             \sstitem
             {\tt "Linear"} --- Replace the selected pixels using linear
@@ -43966,7 +44022,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          co-ordinate Frame of the input NDF.
 
          \sstitem
-         If the input NDF is a section of an NDF with a higher
+         If the input NDF is a \htmlref{section of an NDF}{se:ndfsect}~ with a higher
          dimensionality, the {\tt "lines"} and {\tt "columns"} are with respect to the
          two-dimensional section, and do not necessarily refer to the first
          and second dimensions of the NDF as a whole.  See the {\tt "Examples"}.
@@ -44371,7 +44427,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
       Here, we first calculate three intermediate results ($R$, $ROUT$
       and $THETA$) and then use these to calculate the final results ($XOUT$
       and $YOUT$).  The MathMap knows that only the final two results
-      constitute values for the output variables because its Nout attribute
+      constitute values for the output variables because its {\att Nout} attribute
       is set to 2.  You may define as many intermediate variables in this
       way as you choose.  Having defined a variable, you may then refer to it
       on the right of any subsequent expressions.
@@ -45298,7 +45354,7 @@ is needed urgently.
 
   \item [\htmlref{NOGLOBALS}{NOGLOBALS}]  Resets the \KAPPA global parameters.
 
-  \item [\htmlref{OVCLEAR}{OVCLEAR}]  Clears the current image-overlay device (without
+  \item [\xref{OVCLEAR}{sun239}{OVCLEAR}]  Clears the current image-overlay device (without
     purging the graphics database), with an option to clear just the
     current picture.
 
@@ -45309,7 +45365,7 @@ is needed urgently.
   \item  CLEANER writes the \htmlref{bad-pixel flag}{apndf:quality}.
 
   \item  \htmlref{CONTOUR}{CONTOUR}, \htmlref{DISPLAY}{DISPLAY},
-    \htmlref{GREYPLOT}{GREYPLOT}, \htmlref{TURBOCONT}{TURBOCONT}
+    \xref{GREYPLOT}{sun239}{GREYPLOT}, \xref{TURBOCONT}{sun239}{TURBOCONT}
     each has a new FILL parameter that permits the maximum-sized
     plots, ignoring any restriction on square pixels.  It is useful
     for displaying images with markedly different dimensions, such as
@@ -45328,7 +45384,7 @@ is needed urgently.
     smoothing kernels, though the default still produces a
     circularly symmetric filter.
 
-  \item  \htmlref{INSPECT}{INSPECT} uses the existing
+  \item  \xref{INSPECT}{sun239}{INSPECT} uses the existing
     \htmlref{palette}{se:palette}~ for its annotations in cursor mode.
 
   \item  \htmlref{MLINPLOT}{MLINPLOT} has a KEY parameter so that the
@@ -45340,7 +45396,7 @@ is needed urgently.
 
   \item  \htmlref{PICLIST}{PICLIST} indicates the current picture.
 
-  \item  \htmlref{SNAPSHOT}{SNAPSHOT} parameter ODEVICE suggested default is the current
+  \item  \xref{SNAPSHOT}{sun239}{SNAPSHOT} parameter ODEVICE suggested default is the current
     value of the parameter.  There is a new defaulted parameter
     PLANES that enables snapshots of just the base or the overlay
     for X-windows.  The default behaviour is to capture all planes,
@@ -45557,13 +45613,13 @@ and hypertext.
     various astrometric tasks such as plotting axes and overlay grids in
     sky co-ordinates.
 
-  \item [\htmlref{TRANINVERT}{TRANINVERT}]  Inverts a transformation
+  \item [\xref{TRANINVERT}{sun239}{TRANINVERT}]  Inverts a transformation
    stored in a \xref{TRANSFORM}{sun61}{} structure within an existing HDS file.
 
-  \item [\htmlref{TRANJOIN}{TRANJOIN}]  Joins two transformation stored
+  \item [\xref{TRANJOIN}{sun239}{TRANJOIN}]  Joins two transformation stored
     in the TRANSFORM format.
 
-  \item [\htmlref{TRANMAKE}{TRANMAKE}]  Makes a transformation structure
+  \item [\xref{TRANMAKE}{sun239}{TRANMAKE}]  Makes a transformation structure
     from supplied forward and inverse mappings.  The structure can
     have classification qualifiers and a comment.  The mappings are
     defined using Fortran-like expressions, and may include
@@ -45572,13 +45628,13 @@ and hypertext.
     the six-term linear which encompasses shift of origin, rotation,
     magnification, and shear.
 
-  \item [\htmlref{TRANSFORMER}{TRANSFORMER}]  Applies a transformation
+  \item [\xref{TRANSFORMER}{sun239}{TRANSFORMER}]  Applies a transformation
     stored in TRANSFORM structure to an NDF by resampling.  There is
     full control of the shape, origin, and co-ordinate limits of the
     transformed NDF.  The resampling use either linear interpolation or
     the nearest-neighbour method.
 
-  \item [\htmlref{TRANTRACE}{TRANTRACE}]  Lists the contents of a
+  \item [\xref{TRANTRACE}{sun239}{TRANTRACE}]  Lists the contents of a
     TRANSFORM structure.
 
   \item [\htmlref{VECPLOT}{VECPLOT}]  Plots a two-dimensional vector map
@@ -45641,7 +45697,7 @@ and hypertext.
      replaces the capability of STATS2D.
   \item [THRESH0]  The THRESH0 operation can easily be performed
      by \htmlref{THRESH}{THRESH}.
-  \item [TWEAK]  Use \htmlref{LUTTWEAK}{LUTTWEAK}.
+  \item [TWEAK]  Use \xref{LUTTWEAK}{sun239}{LUTTWEAK}.
   \end{description}
 
   To prevent command-name clashes with \Figaroref\ and C-shell
@@ -45690,7 +45746,7 @@ the NDF\_ library feature much-improved documentation.
     deciding whether each output pixel is good or bad, and permit
     weighting using the variance information of the input NDF.
 
-  \item \htmlref{CONTOVER}{CONTOVER} works with MATRIX\_PRINTER class
+  \item \xref{CONTOVER}{sun239}{CONTOVER} works with MATRIX\_PRINTER class
     devices so can be used to generate composite hardcopy plots.
 
   \item  \htmlref{CURSOR}{CURSOR} no longer changes the current picture
@@ -45740,7 +45796,7 @@ the NDF\_ library feature much-improved documentation.
     {\tt FALSE}); and/or plotted, with several parameters available for
     controlling the appearance of the graphics.
 
-  \item  In \htmlref{INSPECT}{INSPECT} the defaults for parameters
+  \item  In \xref{INSPECT}{sun239}{INSPECT} the defaults for parameters
     HISTOGRAM and SLICE have changed to null, meaning do not produce
     an output NDF.  Cursor mode using a workstation or X-terminal is
     fully controllable using the mouse buttons; pressing the mouse
@@ -45751,8 +45807,8 @@ the NDF\_ library feature much-improved documentation.
     FULL={\tt TRUE} or 24 if FULL={\tt FALSE}).  Works directly on
     double-precision NDFs for the histogram equalisation.
 
-  \item  \htmlref{LUTHILITE}{LUTHILITE}, \htmlref{LUTROT}{LUTROT},
-    \htmlref{LUTTWEAK}{LUTTWEAK} have a FULL parameter to allow
+  \item  \xref{LUTHILITE}{sun239}{LUTHILITE}, \xref{LUTROT}{sun239}{LUTROT},
+    \xref{LUTTWEAK}{sun239}{LUTTWEAK} have a FULL parameter to allow
     manipulation of the full colour table.
 
   \item  \htmlref{LUTSAVE}{LUTSAVE} now creates NDF with data array
@@ -45867,13 +45923,13 @@ withdrawn, two to enable \KAPPA\ to be NAG-free.
 
   \item  Improved the documentation: clarified and reduced the usage of
     the term `magic pixel'; added more warnings about metacharacters in
-    C-shell usage; updated the related applications; extended the FITS
-    airlock to include the new editing commands; added a new section
-    on bad-pixel removal; and corrected various typographical errors,
-    mostly in the reference section.
+    C-shell usage; updated the related applications; extended the 
+    \htmlref{FITS airlock}{se:fitsairlock} to include the new editing
+    commands; added a new section on bad-pixel removal; and corrected
+    various typographical errors, mostly in the reference section.
 
-  \item  The reference dataset in the AGI database may be a foreign file
-    and/or include an NDF section.
+  \item  The reference dataset in the \htmlref{AGI database}{se:agitate}~ may 
+    be a foreign file and/or include an NDF section.
 
   \item Several tasks use a faster method of managing workspace.
 
@@ -45944,8 +46000,8 @@ withdrawn, two to enable \KAPPA\ to be NAG-free.
 \begin{itemize}
   \item  Examples added to \htmlref{CHPIX}{CHPIX} documentation.
 
-  \item  \htmlref{CONTOVER}{CONTOVER}, \htmlref{CONTOUR}{CONTOUR},
-    and \htmlref{TURBOCONT}{TURBOCONT} have had several improvements.  There are
+  \item  \xref{CONTOVER}{sun239}{CONTOVER}, \htmlref{CONTOUR}{CONTOUR},
+    and \xref{TURBOCONT}{sun239}{TURBOCONT} have had several improvements.  There are
     two new methods for selecting the contour heights using percentiles
     (MODE={\tt "Equalised"} and {\tt "Percentiles"}).  There is a CONCOL parameter
     for selecting the colour of the contours.  Dashed contours may be
@@ -45957,7 +46013,7 @@ withdrawn, two to enable \KAPPA\ to be NAG-free.
 
   \item  The smoothed contouring and annotation facilities in CONTOUR
     have been withdrawn, possibly temporarily, as they called NAG
-    graphics routines.  Thus parameters ANNOTA, \htmlref{LABEL}{apndf:label}FREQ, MAXRES,
+    graphics routines.  Thus parameters ANNOTA, LABELFREQ, MAXRES,
     NOISY, RESOLUTION, and SMOOTHING are no longer available.
 
   \item  CONTOUR has a new parameter---STATS---which, if set to
@@ -46027,7 +46083,7 @@ withdrawn, two to enable \KAPPA\ to be NAG-free.
     and there is an additional example.
 
   \item  Relaxed the limits of parameter UCOORD in
-    \htmlref{TRANSFORMER}{TRANSFORMER}.
+    \xref{TRANSFORMER}{sun239}{TRANSFORMER}.
 
 \end{itemize}
 
@@ -46083,7 +46139,7 @@ to terminate if the specified parameter is an array with only a single
 element.
   \item \htmlref{ROTATE}{ROTATE} bug fixed which prevented two-dimensional slices
 from \textit{n}-dimensional cubes being processed.
-  \item  \htmlref{TRANMAKE}{TRANMAKE} no longer reports a compilation error 
+  \item  \xref{TRANMAKE}{sun239}{TRANMAKE} no longer reports a compilation error 
 if a null value is given for parameter CLASS.
 \end{itemize}
 
@@ -46146,11 +46202,13 @@ PICDEF can now be used to do this, using the new SIZE parameter.  A picture
 of the required size should be created before running the appropriate 
 plotting application.
 
-Section \ref{se:agitate} of SUN/95 ``Graphics Database'' has been
+\latexelsehtml{Section~\ref{se:agitate} of SUN/95}{The section} ``Graphics Database'' has been
 completely re-written to illustrate the new WCS facilities of the AGI
-graphics database.  In addition, two new sections have been added, section
-\ref{se:wcsuse} describing the use of WCS information within NDFs, and
-section \ref{se:style} the use of graphical style parameters.
+graphics database.  In addition, two new sections have been added:
+\latexelsehtml{Section~\ref{se:wcsuse}}{\htmlref{``Using World
+Co-ordinate Systems''}{se:wcsuse}} describes the use of WCS information 
+within NDFs, and \latexelsehtml{Section~\ref{se:style}}{\htmlref{``Plotting 
+Styles and Attributes''}{se:style}} relates the use of graphical style parameters.
 
 \subsection{Modified applications}
    \begin{description}
@@ -46209,28 +46267,29 @@ section \ref{se:style} the use of graphical style parameters.
 
                \begin{description}
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-                                   value for the plotting attribute {\tt 
-                                   Label(1)}.
+                                   value for the plotting attribute 
+                                   \htmlattref{Label(1)}{Label(axis)}.
                   \item[BORDER] -- Set AXES=TRUE, and suppress everything
                                    but the border by setting suitable plotting 
                                    attributes (\emph{e.g.} {\tt MajTickLen=0, 
                                    MinTickLen=0, TextLab=0} \emph{etc.}).
-                  \item[CONCOL] -- Use the {\tt Colour(Cont)} plotting 
+                  \item[CONCOL] -- Use the \htmlattref{Colour(Cont)}{Colour(element)}~ plotting 
                                    attribute (or parameter PENS).
                   \item[COSYS] -- Use application WCSFRAME to set the required 
                                   co-ordinate Frame first.
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and
+                                   \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                   \item[PXSIZE] -- Create the picture first using PICDEF,
                                    specifying the required picture size using 
                                    the new parameter SIZE.
                   \item[PYSIZE] -- See PXSIZE.
-                  \item[THICK] -- Use the {\tt Width} plotting attributes.
+                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                \end{description}
 
             \item The following new parameters have been added: KEYPOS, 
@@ -46272,7 +46331,7 @@ section \ref{se:style} the use of graphical style parameters.
             \item The following parameters have been removed: 
                \begin{description}
                   \item [COLOUR] -- Use the STYLE parameter to specify values
-                                    for the {\tt Colour} plotting attributes.
+                                    for the \htmlattref{Colour}{Colour(element)} plotting attributes.
                   \item [COSYS] -- Use parameter FRAME.
                   \item [DOUBLE] -- Double precision is now always used.
                   \item [XC] -- Use parameters LASTPOS and LASTDIM.
@@ -46316,24 +46375,23 @@ section \ref{se:style} the use of graphical style parameters.
 
                \begin{description}
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-                                   value for the plotting attribute {\tt 
-                                   Label(1)}.
-                  \item[BCOLOUR] -- Use the {\tt Colour(Border)} plotting 
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  \item[BCOLOUR] -- Use the \htmlattref{Colour(Border)}{Colour(element)}~ plotting 
                                    attribute.
-                  \item[BWIDTH] -- Use the {\tt Width(Border)} plotting 
+                  \item[BWIDTH] -- Use the \htmlattref{Width(Border)}{Width(element)}~ plotting 
                                    attribute.
                   \item[COSYS] -- Use application WCSFRAME to set the required 
                                   co-ordinate Frame first.
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                   \item[SQUASH] -- Specify the required scale factors explicitly 
                                    using parameters XMAGN and YMAGN.
-                  \item[THICK] -- Use the {\tt Width} plotting attributes.
+                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                \end{description}
 
             \item The following new parameters have been added: BORSTYLE, 
@@ -46397,25 +46455,27 @@ section \ref{se:style} the use of graphical style parameters.
             \item The following parameters have been removed: 
 
                \begin{description}
-                  \item[ABSLAB] -- Use the STYLE parameter to specify a value for the plotting attribute {\tt Label(1)}.
+                  \item[ABSLAB] -- Use the STYLE parameter to specify a value
+                                   for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
                   \item[ABSLIM] -- Use parameters YBOT and YTOP.
                   \item[AXLIM] -- Use parameter ALIGN.
                   \item[COSYS] -- Use application WCSFRAME to set the required co-ordinate Frame first.
-                  \item[ERRCOL] -- Use the {\tt Colour(ErrBars)} plotting attribute.
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
-                  \item[LINCOL] -- Use the {\tt Colour(Lines)} plotting attribute.
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
+                  \item[ERRCOL] -- Use the \htmlattref{Colour(ErrBars)}{Colour(element)}~ plotting attribute.
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[LINCOL] -- Use the {\att Colour(Lines)} plotting attribute.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
                   \item[ORDLIM] -- Use parameters XLEFT and XRIGHT.
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} plotting attributes.
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                                   \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                   \item[PXSIZE] -- Create the picture first using PICDEF,
                                    specifying the required picture size using 
                                    the new parameter SIZE.
                   \item[PYSIZE] -- See PXSIZE.
-                  \item[SYMCOL] -- Use the {\tt Colour(Symbols)} plotting attribute.
-                  \item[THICK] -- Use the {\tt Width} plotting attributes.
+                  \item[SYMCOL] -- Use the {\att Colour(Symbols)} plotting attribute.
+                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                   \item[XLOG] -- Logarithmic \textit{x} axes are not currently supported.
                \end{description}
 
@@ -46552,56 +46612,57 @@ section \ref{se:style} the use of graphical style parameters.
  the following bugs have been fixed:
 
 \begin{itemize}
-\item ARDMASK now sets the bad pixel flag in the output NDF so that 
+\item \htmlref{ARDMASK}{ARDMASK}~ now sets the bad pixel flag in the output NDF so that 
     other applications interpret the selected pixels as bad.
 
-\item COMPAVE now traps zero variance values, preventing a divide by 
+\item \htmlref{COMPAVE}{COMPAVE}~ now traps zero variance values, preventing a divide by 
     zero error.
 
-\item CONTOUR no longer draws contours in the background colour if the
+\item \htmlref{CONTOUR}{CONTOUR}~ no longer draws contours in the background colour if the
     requested contour colour is not available on the selected device.
     This previously could cause contours to be invisible when using a
     monochrome PostScript device.
 
+\item CONTOUR no longer core dumps if an abort ({\tt{!!}}) is given for
+    parameter PERCENTILES.
+ 
 \item History information written to NDFs now contain the up-to-date
     \KAPPA\ package version number.
 
-\item DISPLAY now uses independent compression factors for both axes.
+\item \htmlref{DISPLAY}{DISPLAY}~ now uses independent compression factors for both axes.
     Previously, an inappropriate compression factor could be used for 
     one of the axes if the lengths of the two axes were very different.
     Also, the default value for MARGIN used when annotated axes are 
     produced, has been changed from 0.16 to 0.2 in order to avoid 
     clipping of labels on certain devices.
 
-\item Trailing spaces are now stripped from the Title attribute of the 
+\item Trailing spaces are now stripped from the \htmlattref{Title}{Title}~ attribute of the 
     current WCS Frame.
 
-\item A bug in MATHS which could cause zero variances to be produced sometimes
+\item A bug in \htmlref{MATHS}{MATHS}~ which could cause zero variances to be produced sometimes
     when using double precision data has been fixed.
 
-\item NOMAGIC and FILLBAD now set the bad bits flag in the output NDF to
+\item \htmlref{NOMAGIC}{NOMAGIC}~ and \htmlref{FILLBAD}{FILLBAD}~ now
+    set the \htmlref{bad-bits flag}{se:qualitymask}~ in the output NDF to
     zero.  Previously, NDFs containing QUALITY arrays could still seems
     to contain bad pixels after running NOMAGIC or FILLBAD.  This no
     longer happens.
 
-\item WCSREMOVE now issues a warning instead of aborting if an attempt is 
+\item \htmlref{WCSREMOVE}{WCSREMOVE} now issues a warning instead of aborting if an attempt is 
     made to remove the Base Frame of the WCS FrameSet.
 
-\item NATIVE now correctly replaces IEEE NaN and Inf values by Starlink bad
+\item \htmlref{NATIVE}{NATIVE}~ now correctly replaces IEEE NaN and Inf values by Starlink bad
     values on Solaris systems.
 
 \item The global parameter POSITIONS\_LIST has been replaced by CATALOGUE.
 
-\item CONTOUR no longer core dumps if an abort ({\tt{!!}}) is given for
-    parameter PERCENTILES.
- 
 \end{itemize}
 \end{htmlonly}
 
 \section{Release Notes---V0.14-5}
 
 More applications have been changed to enable them to make use
-of the NDF \htmlref{WCS}{apndf:wcs} component, which stores descriptions of world
+of the NDF \htmlref{WCS}{apndf:wcs}~ component, which stores descriptions of world
 co-ordinate systems within NDF data structures.  More graphics 
 applications have also been changed to use the STYLE parameter 
 system introduced in V0.13 to control the detailed appearance of
@@ -46692,7 +46753,7 @@ The following applications have been modified:
 	 co-ordinates in the output NDF if the lower bounds of the input
 	 NDF were not (1,~1).
 
-      \item [\htmlref{CONTOVER}{CONTOVER}] \mbox{}
+      \item [\xref{CONTOVER}{sun239}{CONTOVER}] \mbox{}
          CONTOVER has been scheduled for withdrawl at the next release of
          \KAPPA, and a warning message is now displayed every time
          CONTOVER is run.  Use {\tt "contour clear=no"} instead to draw a contour
@@ -46721,10 +46782,12 @@ The following applications have been modified:
 
                \begin{description}
                   \item[LINESTYLE] -- Use the STYLE parameter to specify a
-                                   value for the plotting attribute {\tt 
-                                   Style(Lines)}.
-                  \item[SIGCOL] -- Use the {\tt Colour(Lines)} plotting attributes.
-                  \item[THICK]  -- Use the {\tt Width(Lines)} plotting attributes.
+                                   value for the plotting attribute 
+                                   \htmlattref{Style(Lines)}{Style(element)}.
+                  \item[SIGCOL] -- Use the \htmlattref{Colour(Lines)}{Colour(element)}~
+                                   plotting attributes.
+                  \item[THICK]  -- Use the \htmlattref{Width(Lines)}{Width(element)}~ 
+                                   plotting attributes. 
                \end{description}
 
             \item The following new parameters have been added: STYLE.
@@ -46744,7 +46807,7 @@ The following applications have been modified:
          A new output parameter EXISTS has been added to store the result
          of the final "Exist" operation.
 
-      \item [\htmlref{GREYPLOT}{GREYPLOT}] \mbox{}
+      \item [\xref{GREYPLOT}{sun239}{GREYPLOT}] \mbox{}
          GREYPLOT has been scheduled for withdrawl at the next release of
          \KAPPA, and a warning message is now displayed every time
          GREYPLOT is run.  DISPLAY can now produce a key to the colour
@@ -46762,19 +46825,18 @@ The following applications have been modified:
 
                \begin{description}
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-                                   value for the plotting attribute {\tt 
-                                   Label(1)}.
-                  \item[FONT]   -- Use the {\tt Font} plotting attributes.
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  \item[FONT]   -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                   \item[PXSIZE] -- Create the picture first with the
                                    required picture size using PICDEF.
                   \item[PYSIZE] -- See PXSIZE.
-                  \item[THICK]  -- Use the {\tt Width} plotting attributes.
+                  \item[THICK]  -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
                \end{description}
 
             \item The following new parameters have been added: AXES, MARGIN, 
@@ -46893,31 +46955,31 @@ The following applications have been modified:
                \begin{description}
 
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-		  value for the plotting attribute {\tt Label(1)}.
+		  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
 
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
 
-                  \item[LBSIZE] -- Use the {\tt Size(Labels)} plotting
-		  attribute.
+                  \item[LBSIZE] -- Use the \htmlattref{Size(Labels)}{Size(element)}~ 
+                                   plotting attribute.
 
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
 
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
 
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
 
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt
-		  MinTickLen} plotting attributes.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                                   \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
 
                   \item[PXSIZE] -- Create the picture first using PICDEF,
 		  the required picture size using the SIZE.
 
                   \item[PYSIZE] -- See PXSIZE.
 
-                  \item[TICLN] -- Use the {\tt MajTickLen} and {\tt
-		  MinTickLen} plotting attributes.
+                  \item[TICLN] -- Use the \htmlattref{MajTickLen}{MajTickLen}~ and 
+                                  \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
                   \item[XLOG] -- Logarithmic \textit{x} axes are not currently
 		  supported.
@@ -46927,7 +46989,7 @@ The following applications have been modified:
                \end{description}
 
             \item The following new parameters have been added: AXES,
-            ERRBAR, FREQ, KEYPOS, KEYSTYLE, \htmlref{LABEL}{apndf:label}S, MARGIN, MARKER, MODE, 
+            ERRBAR, FREQ, KEYPOS, KEYSTYLE, LABELS, MARGIN, MARKER, MODE, 
             PENS, SIGMA, STYLE, USEAXIS, XLEFT, XRIGHT, YBOT, YTOP, ZMARK.
          
             \item The following parameters have been modified:
@@ -46966,15 +47028,15 @@ The following applications have been modified:
 
                \begin{description}
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-                                   value for the plotting attribute {\tt 
-                                   Label(1)}.
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                                   \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PTITLE] -- Use the {\tt Title} plotting attribute.
+                  \item[PTITLE] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                \end{description}
 
             \item The following new parameters have been added: AXES, MARGIN, 
@@ -47040,22 +47102,21 @@ The following applications have been modified:
                \begin{description}
 
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-		  value for the plotting attribute {\tt Label(1)}.
+		  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
 
                   \item[COSYS] -- Use application WCSFRAME to set the required
                                   co-ordinate Frame first.
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
 
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
 
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
 
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
 
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt
-		  MinTickLen} plotting attributes.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
 
                   \item[PXSIZE] -- Create the picture first using PICDEF,
 		  the required picture size using the SIZE.
@@ -47108,7 +47169,7 @@ The following applications have been modified:
             Negative rotation angles are now accepted.
          \end{itemize}
 
-      \item [\htmlref{TURBOCONT}{TURBOCONT}] \mbox{}
+      \item [\xref{TURBOCONT}{sun239}{TURBOCONT}] \mbox{}
          TURBOCONT has been scheduled for withdrawl at the next release of
          \KAPPA, and a warning message is now displayed every time
          TURBOCONT is run.  To retain TURBOCONT would require it to be
@@ -47143,27 +47204,28 @@ The following applications have been modified:
 
                \begin{description}
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-                                   value for the plotting attribute {\tt 
-                                   Label(1)}.
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
                   \item[BORDER] -- Set AXES={\tt TRUE}, and suppress everything
                                    but the border by setting suitable plotting 
                                    attributes (\emph{e.g.} {\tt MajTickLen=0, 
                                    MinTickLen=0, TextLab=0} \emph{etc.}).
                   \item[COSYS] -- Use application WCSFRAME to set the required 
                                    co-ordinate Frame first.
-                  \item[FONT] -- Use the {\tt Font} plotting attributes.
-                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
-                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
-                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
-                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                  \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] -- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] -- Use the {\att MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\att Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use \htmlattref{MajTickLen}{MajTickLen}~ and 
+                                   \htmlattref{MinTickLen}{MinTickLen}~ 
                                    plotting attributes.
-                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
                   \item[PXSIZE] -- Create the picture first using PICDEF,
                                    specifying the required picture size using 
                                    the new parameter SIZE.
                   \item[PYSIZE] -- See PXSIZE.
-                  \item[THICK] -- Use the {\tt Width} plotting attributes.
-                  \item[VECCOL] -- Use the {\tt Colour(vectors)} plotting attributes.
+                  \item[THICK] -- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[VECCOL] -- Use the \htmlattref{Colour(vectors)}{Colour(element)}~ 
+                                   plotting attributes.
                   \item[VTYPE] -- Use the new parameter ARROW.
                \end{description}
 
@@ -47217,9 +47279,9 @@ of an application, if the invocations occurred within one second of each
 other.  For instance, if \htmlref{CREFRAME}{CREFRAME} were used twice to
 create two small frames of Gaussian noise with no delay inbetween, then the
 resulting images could previously have been identical.  Another affected
-application is CENTROID -- estimates of the variance of the centroid positions
-will now be rather different because previous estimates were based on 
-correlated random shifts.
+application is \htmlref{CENTROID}{CENTROID}; estimates of the variance of
+the centroid positionswill now be rather different because previous estimates 
+were based on correlated random shifts.
 
 \item Several significant memory leaks have been fixed.
 
@@ -47233,9 +47295,10 @@ applications.  See \latexelsehtml{Section~\ref{se:styles}}
 
 \item The following applications have been converted to use the GKS version of 
 \PGPLOT\  instead of SGS/NCAR (there are no changes in functionality): 
-\htmlref{GDNAMES}{GDNAMES}, \htmlref{GDCLEAR}{GDCLEAR}, \htmlref{IDCLEAR}{IDCLEAR},
-\htmlref{OVCLEAR}{OVCLEAR}, \htmlref{GDSET}{GDSET}, \htmlref{IDSET}{IDSET},
-\htmlref{OVSET}{OVSET}, \htmlref{PALENTRY}{PALENTRY}, \htmlref{PALDEF}{PALDEF},
+\htmlref{GDNAMES}{GDNAMES}, \htmlref{GDCLEAR}{GDCLEAR}, 
+\xref{IDCLEAR}{sun239}{IDCLEAR}, \xref{OVCLEAR}{sun239}{OVCLEAR}, 
+\htmlref{GDSET}{GDSET}, \xref{IDSET}{sun239}{IDSET},
+\xref{OVSET}{sun239}{OVSET}, \htmlref{PALENTRY}{PALENTRY}, \htmlref{PALDEF}{PALDEF},
 \htmlref{PALSAVE}{PALSAVE}, \htmlref{PALREAD}{PALREAD}.
 
 \item The implementation of dynamic defaults for parameters has been changed.
@@ -47408,7 +47471,7 @@ The following applications have been modified:
             \item The NUMBIN parameter has been removed.
          \end{itemize}
 
-   \item [\htmlref{IDSTATE}{IDSTATE}] The changes made to GDSTATE have
+   \item [\xref{IDSTATE}{sun239}{IDSTATE}] The changes made to GDSTATE have
    also been made to IDSTATE.
 
    \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
@@ -47468,7 +47531,7 @@ The following applications have been modified:
                runnning SEGMENT.
 
                \item[COLOUR] -- Use the new STYLE parameter to set the
-               Colour attribute.
+               \htmlattref{Colour}{Colour(element)}~ attribute.
 
                \item[COSYS] -- Use application WCSFRAME to set the required 
                                co-ordinate Frame first.
@@ -47559,8 +47622,9 @@ The following applications have been modified:
 
 \begin{itemize}
 
-\item The previously undocumented plotting attribute ``{\tt TextBackColour}''
-has been included in \hyperref{the section on ``Plotting Styles and 
+\item The previously undocumented plotting attribute
+\htmlattref{TextBackColour}{TextBackColour}~ has been included in 
+\hyperref{the section on ``Plotting Styles and 
 Attributes''}{Section}{}{se:style}.  This attributes controls the
 background colour to use when drawing text strings within a plot.  It can be 
 set to a specified colour, or can be set to produce a transparent
@@ -47613,8 +47677,8 @@ The following applications have been modified:
 	       change attribute values in any of the Frames which are
 	       managed internally by the NDF library (that is, Frames
 	       with Domains PIXEL, AXIS and GRID).  The exception to this
-               is that the Domain attribute itself may be changed, thereby 
-               adding a new Frame to the WCS component.
+               is that the \htmlattref{Domain}{Domain}~ attribute itself may 
+               be changed, thereby adding a new Frame to the WCS component.
       \end{itemize}
 
 \end{description}
@@ -47760,7 +47824,7 @@ The following applications have been modified:
           controlled using the STYLE parameter.
       \end{itemize}
 
-   \item [\htmlref{NORMALIZE}{NROMALIZE}] \mbox{}
+   \item [\htmlref{NORMALIZE}{NORMALIZE}] \mbox{}
       \begin{itemize}
          \item The MINPIX parameter now has a default of 2, making it
           much less likely that bins will be rejected from the fit.
@@ -47841,13 +47905,13 @@ internal subroutine libraries have been removed from \KAPPA\ and are now
 distributed as a separate software item called KAPLIBS (see SUN/238):
 
 \begin{itemize}
-\item libaif.a   
-\item libctg.a   
-\item libfits.a  
-\item libira.a
-\item libkapgen.a
-\item libkapgrf.a (contains grf\_kappa.o)
-\item liblpg.a
+\item {\tt libaif.a}
+\item {\tt libctg.a}
+\item {\tt libfits.a}
+\item {\tt libira.a}
+\item {\tt libkapgen.a}
+\item {\tt libkapgrf.a} (contains {\tt grf\_kappa}
+\item {\tt liblpg.a}
 \end{itemize}
 
 If you have applications which used to link against any of these
@@ -47947,13 +48011,14 @@ The following new applications have been added:
       table in many ways.
    \item[\htmlref{QUALTOBAD}{QUALTOBAD}] \mbox{}
       Sets pixels bad in an NDF if they have a given combination of
-      bits set in the QUALITY component.
+      bits set in the \htmlref{QUALITY component}{apndf:quality}.
    \item [\htmlref{REGRID}{REGRID}] \mbox{}
       Applies an arbitrary geometrical transformation to an NDF.  This is a 
-      WCS-aware replacement for the old TRANSFORMER command.
+      WCS-aware replacement for the old
+      \xref{TRANSFORMER}{sun239}{TRANSFORMER} command.
    \item[\htmlref{REMQUAL}{REMQUAL}] \mbox{}
-      Remove names for quality bits in an NDF.  The names removed are those
-      stored previously in the NDF using SETQUAL.
+      Remove \htmlref{names for quality bits}{se:qnames}~ in an NDF.  The 
+      names removed are those stored previously in the NDF using SETQUAL.
    \item[\htmlref{SETQUAL}{SETQUAL}] \mbox{}
       Assigns meaningful names for the quality bits in an NDF and also
       sets the corresponding bit for selected pixels in the NDF.
@@ -48136,7 +48201,7 @@ The following applications have been modified:
 \section{Release Notes---V1.1}
 The tutorial parts of SUN/95 have been modified to include reference to
 a new class of \htmlref{co-ordinate Frame}{se:domains}~ called a
-\xref{`SpecFrame'}{sun210}{SpecFrame}~, which can be used to describe
+\xref{`SpecFrame'}{sun210}{SpecFrame}, which can be used to describe
 spectral axes within the \htmlref{WCS}{apndf:wcs}~ component of an NDF.
 
 \subsection{Modified Commands}
@@ -48413,7 +48478,7 @@ functions as follows.
 \classitem{LUTABLE}
  Manipulates an graphics device colour table.
 \classitem{LUTBGYRW}
- Loads the {\it BGYRW\/} \htmlref{lookup table}{se:lookuptables}~.
+ Loads the {\it BGYRW\/} \htmlref{lookup table}{se:lookuptables}.
 \classitem{LUTCOL}
  Loads the standard colour lookup table.
 \classitem{LUTCOLD}
@@ -48762,7 +48827,7 @@ functions as follows.
 \classitem{CHPIX}
  Replaces the values of selected pixels in an NDF.
 \classitem{COPYBAD}
- Copies the bad pixel mask from one NDF to another.
+ Copies the bad-pixel mask  from one NDF to another.
 \classitem{ERRCLIP}
  Removes pixels with large errors from an NDF.
 \classitem{FFCLEAN}
