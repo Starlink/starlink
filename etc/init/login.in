@@ -186,6 +186,12 @@ if ( -e @bindir@/ccdpack/ccdpack.csh ) then
 endif
 
 #
+#  CHART
+if ( -e @bindir@/chart/chart ) then
+   setenv CHART_DIR @bindir@/chart
+endif
+
+#
 #  CGS4DR
 if ( -e @bindir@/cgs4dr/cgs4dr ) then
    setenv CGS4DR_ROOT @bindir@/cgs4dr
