@@ -12,15 +12,13 @@ rv_x_LDADD = `sla_link`
 # The xrv script needs to have installation locations edited into it
 # Can not be done during configure since @bindir@ gets converted
 # to ${exec_prefix}/bin
-# Note that xrv looks for the expectk binary in
-# $STARCONF_DEFAULT_STARLINK whereas it expects rv to be
-# in $STARCONF_DEFAULT_PREFIX. (ie $STARLINK vs $INSTALL).
-# For now, assume everything is in $INSTALL.
-
+# expectk is picked up from the path using STAR_CHECK_PROGS
+# Note that this may be a different location to where xrv is installed.
 # This really needs to happen at install time
 
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@EXPECTK\@,$(EXPECTK),g' \
 	-e 's,@starbindir\@,$(bindir),g'
 
 xrv: xrv.in

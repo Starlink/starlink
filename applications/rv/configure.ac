@@ -22,7 +22,7 @@ dnl    Probably should look for any expectk in the PATH rather than
 dnl    assuming the Starlink location. Note that this path should be
 dnl    fully qualified and inserted into xrv.in. Currently we assume
 dnl    expectk is in the install bin directory
-AC_PATH_PROG(PROG_EXPECTK, expectk)
+STAR_CHECK_PROGS([expectk])
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 

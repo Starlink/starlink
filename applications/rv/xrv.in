@@ -1,4 +1,4 @@
-#!@starbindir@/expectk 
+#!@EXPECTK@ 
 #  @edited_input@
 #+
 #  Name:
@@ -14,6 +14,7 @@
 #  Authors:
 #     CAC: C.A.Clayton (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #
 #  History:
 #     02-OCT-1995 (CAC):
@@ -27,6 +28,8 @@
 #     14-JUN-1996 (CAC):
 #        Ported to Tk4.0. Removed dependancy on XADAM by including
 #        relevant procedures in this file.
+#     14-MAR-2004 (TIMJ):
+#        Autoconf substitution version
 #
 #  Bugs:
 #     {note_any_bugs_here}
