@@ -1,74 +1,64 @@
 
-##testing check_kwd_list
+##testing check_obsdata_kwd
 
-test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
+test -n "$AUTOASTROM_DIR" || AUTOASTROM_DIR=..
 test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
 
 export AUTOASTROM_DIR;
 exec $PERLBIN <<'EOD';
 
-#use NDF qw(fits_get_nth_item);
-
 use lib "$ENV{AUTOASTROM_DIR}";
-use autoastrom qw(check_kwd_list);
+use autoastrom qw(check_obsdata_kwd);
 
 my $testres;
-%goodkws = (
-	    'ra' => '\s*[+-]?\d{1,3}((:\d{1,2}){0,2}(\.\d+)?)\s*',
-	    'dec' => '\s*[+-]?\d{1,2}((:\d{1,2}){0,2}(\.\d+)?)\s*',
-	    'scale' => '\s*\d+(\.\d+)?\s*',
-	    'invert' => '\s*[01]\s*',
-	    'pa' => '\s*[+-]?\d+(\.\d+)?\s*',
-	    'source' => '(AST|FITS|AST:FITS|FITS:AST)',
-	    'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
-	    'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?)\s*',
-	    'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
-	    'col' => '\s*\d+\s*'
-	   );
-
-sub check_fails {
-    my $testkw = shift;
-    print "testing";
-    foreach my $k (keys(%$testkw)) { print " $k=", $testkw->{$k}; }
-    print "\t ";
-    my $testres = check_kwd_list ($testkw, \%goodkws);
-    printf ("%s\n", (defined($testres)
-		     ? "ok -- keyword <$testres> failed"
-		     : "BAD -- didn't fail"));
-    return;
-}
 
 
 print "valid cases: ";
-$testres = check_kwd_list ({'ra' => '17:27:10.94',
-			    'ra' => '+210',
-			    'dec' => '74:31:58.00',
-			    'dec' => '-12:34:56 ',
-			    'scale' => '0.33',
-			    'invert' => '  1   ',
-			    'pa' => '88.7',
-			    'pa' => ' -88.7   ',
-			    'source' => 'AST',
-			    'time' => '1984:01 20:16:00.1',
-			    'time' => '19 13',
-			    'time' => '1999.9999',
-			    'obs' => 'AAT',
-			    'obs' => '149:04.0 -31 16.6',
-			    'obs' => '149:04.0 -31:16.6 1164',
-			    'obs' => '-149:04 31:16 1164',
-			    'met' => '278 1000.1',
-			    'met' => '278.9',
-			    'col' => '600',
-			   }, \%goodkws);
+%okkws = ( 'ra' => '17:27:10.94',
+	   'ra' => '+210',
+	   'dec' => '74:31:58.00',
+	   'dec' => '-12:34:56 ',
+	   'scale' => '0.33',
+	   'invert' => '  1   ',
+	   'pa' => '88.7',
+	   'pa' => ' -88.7   ',
+	   'source' => 'AST',
+	   'source' => '  user :Ast: fits  ',
+	   'time' => '1984:01 20:16:00.1',
+	   'time' => '19 13',
+	   'time' => '1999.9999',
+	   'obs' => 'AAT',
+	   'obs' => '149:04.0 -31 16.6',
+	   'obs' => '149:04.0 -31:16.6 1164',
+	   'obs' => '-149:04 31:16 1164',
+	   'met' => '278 1000.1',
+	   'met' => '278.9',
+	   'col' => '600',
+	 );
+$testres = check_obsdata_kwd (%okkws);
 printf ("%s\n", (defined($testres) ? "BAD -- $testres didn't match" : "ok"));
 
 check_fails ({'pa' => '88.7:8'}); # must be decimal angle
 check_fails ({'time' => '12:34 56'}); # time is full UT or sidereal, neither with seconds
+check_fails ({'source' => 'fits:something:user'}); # invalid keyword
 check_fails ({'obs' => 'Anglo-Austrailian'});
 check_fails ({'obs' => '12:34:56 78:90:12'}); # lat and long to minutes only
-check_fails ({'met' => '1 2 3'});
+check_fails ({'obs' => 'AAT', 'met' => '1 2 3'});
 check_fails ({'col' => 'Red'});	# must be wavelength
 check_fails ({'wonky' => 'nothing'}); # bad keyword
+
+sub check_fails {
+    my $testkw = shift;
+    print "fail? ";
+    foreach my $k (keys(%$testkw)) { print " $k=", $testkw->{$k}; }
+    print "\t ";
+    my $testres = check_obsdata_kwd (%$testkw);
+    #my $testres = check_kwd_list ($testkw, \%goodkws);
+    printf ("%s\n", (defined($testres)
+		     ? "ok -- <$testres> failed"
+		     : "BAD -- didn't fail"));
+    return;
+}
 
 exit 0;
 EOD;

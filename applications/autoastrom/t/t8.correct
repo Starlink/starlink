@@ -1,8 +1,9 @@
 valid cases: ok
-testing pa=88.7:8	 ok -- keyword <pa=88.7:8> failed
-testing time=12:34 56	 ok -- keyword <time=12:34 56> failed
-testing obs=Anglo-Austrailian	 ok -- keyword <obs=Anglo-Austrailian> failed
-testing obs=12:34:56 78:90:12	 ok -- keyword <obs=12:34:56 78:90:12> failed
-testing met=1 2 3	 ok -- keyword <met=1 2 3> failed
-testing col=Red	 ok -- keyword <col=Red> failed
-testing wonky=nothing	 ok -- keyword <nothing> failed
+fail?  pa=88.7:8	 ok -- <pa=88.7:8> failed
+fail?  time=12:34 56	 ok -- <time=12:34 56> failed
+fail?  source=fits:something:user	 ok -- <source=fits:something:user> failed
+fail?  obs=Anglo-Austrailian	 ok -- <obs=Anglo-Austrailian> failed
+fail?  obs=12:34:56 78:90:12	 ok -- <obs=12:34:56 78:90:12> failed
+fail?  obs=AAT met=1 2 3	 ok -- <met=1 2 3> failed
+fail?  col=Red	 ok -- <col=Red> failed
+fail?  wonky=nothing	 ok -- <nothing> failed
