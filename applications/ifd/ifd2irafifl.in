@@ -36,6 +36,8 @@ proc executable_start_hook {name} {
 
     puts "Creating $name.ifl"
     set mon_ifl [open $name.ifl w]
+    fconfigure $mon_ifl -translation lf
+
     puts $mon_ifl "monolith [string toupper $name]"
     puts $mon_ifl "# ADAM Interface file for IRAF use"
     puts $mon_ifl "# Created automatically from $Ifd using ifd2star"

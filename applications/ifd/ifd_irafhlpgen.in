@@ -38,9 +38,12 @@ set package_hlp [open ${package}.hlp r]
 #  Create the output files.
 
 set package_hd [open ${package}.hd w]
+fconfigure $package_hd -translation lf
 set _package_hd [open _${package}.hd w]
+fconfigure $_package_hd -translation lf
 set root [open root.hd w]
 set package_men [open ${package}.men w]
+fconfigure $package_men -translation lf
 
 #  Create sub-directory.
 
@@ -136,6 +139,7 @@ while { ![eof  $package_hlp] } {
 
 #  Open the task .hlp file.
     set hlp [open doc/${task}.hlp w]
+    fconfigure $hlp -translation lf
 
 #  Write the .help directive.
     puts $hlp ".help $task Starlink $package"

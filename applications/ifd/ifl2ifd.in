@@ -208,6 +208,7 @@ proc endmonolith {} {
 }
 
 set ifd [open [lindex $argv 0].ifd w]
+fconfigure $ifd -translation lf
 set input [open [lindex $argv 0].ifl r]
 set linenum 0
 write "package [lindex $argv 0] \{"

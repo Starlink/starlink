@@ -115,8 +115,12 @@ proc package_start_hook {name} {
    puts "Creating $name.csh"
    puts "Creating $name.sh"
    set pkg_icl [open $name.icl w]
+   fconfigure $pkg_icl -translation lf
    set pkg_csh [open $name.csh w]
+   fconfigure $pkg_csh -translation lf
    set pkg_sh [open $name.sh w]
+   fconfigure $pkg_sh -translation lf
+
    puts $pkg_icl "\{ ICL initialisation for package [string toupper $name]"
    puts $pkg_icl "\{ Created automatically from $Ifd using ifd2star"
    puts $pkg_icl "\{ $Date"
@@ -205,6 +209,8 @@ proc executable_start_hook {name} {
 
    puts "Creating $name.ifl"
    set mon_ifl [open $name.ifl w]
+   fconfigure $mon_ifl -translation lf
+
    puts $mon_ifl "monolith [string toupper $name]"
    puts $mon_ifl "# ADAM Interface file"
    puts $mon_ifl "# Created automatically from $Ifd using ifd2star"
@@ -228,6 +234,8 @@ proc action_start_hook {name} {
 
    puts "Creating $name.ifl"
    set task_ifl [open $name.ifl w]
+   fconfigure $task_ifl -translation lf
+
    puts $mon_ifl "interface [string toupper $name]"
    puts $task_ifl "interface [string toupper $name]"
    puts $task_ifl "# ADAM Interface file"

@@ -109,6 +109,8 @@ proc package_start_hook {name} {
 # Create the package initialisation script.
     puts "Creating $name.cl"
     set packageIniScript [open $name.cl w]
+    fconfigure $packageIniScript -translation lf
+
     puts $packageIniScript "# IRAF package initialisation script for the \
 	ADAM $name package"
     puts $packageIniScript "# Created automatically from $Ifd using ifd2iraf"
@@ -120,6 +122,8 @@ proc package_start_hook {name} {
 # Create the package parameter file
     puts "Creating $name.par"
     set packageParFile [open $name.par w]
+    fconfigure $packageParFile -translation lf
+
     puts $packageParFile "# Package parameters for the $name package"
     puts $packageParFile "# Created automatically from $Ifd using ifd2iraf"
 }
@@ -144,6 +148,8 @@ proc executable_start_hook {name} {
     global Ifd
     puts "Creating $name.tcl"
     set exeTclScript [open $name.tcl w]
+    fconfigure $exeTclScript -translation lf
+
     puts $exeTclScript \
 	"\# Output parameter definitions for the $name package"
     puts $exeTclScript "# Created automatically from $Ifd using ifd2iraf"
@@ -175,6 +181,7 @@ proc action_start_hook {name} {
     global parFile
     puts "Creating $name.par"
     set parFile [open $name.par w]
+    fconfigure $parFile -translation lf
 }
 proc action_end_hook {name} {
     global Current
@@ -391,6 +398,8 @@ proc task_end_hook {action} {
 # Partype(parname)
        set taskParFile [open $action.par r]
        set commandParFile [open $Current(command).par w]
+       fconfigure $commandParFile -translation lf
+
        puts "Creating $Current(command).par"
        while {[gets $taskParFile line] >= 0} {
           set record [split $line ,]
@@ -419,6 +428,8 @@ proc task_end_hook {action} {
 
 # Create an auxiliary script to run the given task with the given parameters
     set auxScript [open $Current(command).cl w]
+    fconfigure $auxScript -translation lfx
+
     puts "Creating auxiliary script $Current(command).cl"
     puts $auxScript \
       "procedure $Current(command)( [join $Inheritpars {, }] )"
