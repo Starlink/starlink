@@ -1,0 +1,49 @@
+## IRAF2NDF - Converts an IRAF image to an NDF.
+
+#+
+#  Name:
+#     IRAF2NDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-AUG-1992 (RAHM):
+#     	 Original version.
+#     1993 July 22 (MJC):
+#     	 Added help library.  Used global association for OUT.  Renamed
+#	 the parameters to IN and OUT.  Removed unused parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface IRAF2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      IN            # The input IRAF name
+      position    1
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of IRAF image to be converted'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT           # The output NDF
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+endinterface
+
