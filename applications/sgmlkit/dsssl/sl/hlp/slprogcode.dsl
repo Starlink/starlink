@@ -1,8 +1,10 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
 
+<![ IGNORE [   -- These are not currently used --
    <!ENTITY lib.dsl       SYSTEM "../lib/sllib-jade-1.2.1.dsl">
    <!ENTITY common.dsl    SYSTEM "../common/slcommon.dsl">
    <!ENTITY dblib.dsl     SYSTEM "../lib/dblib.dsl">
+]]>
 
 ]>
 
@@ -69,6 +71,13 @@
       (define (request rq)
          (make sequence
             (literal ".")
+            (make formatting-instruction data: rq)
+            (newline)))
+
+;  Output a non-breaking nroff request.
+      (define (request-nobreak rq)
+         (make sequence
+            (literal "'")
             (make formatting-instruction data: rq)
             (newline)))
 
@@ -728,10 +737,21 @@
             (request "sp")
             (request "LP")
             (process-children-normal)
+            (newline)
+            (make formatting-instruction data: (string #\\ #\0))
             (newline)))
 
       (element dd
-         (indent-block (process-children-normal)))
+         (if (attribute-string (normalize "compact") (parent (current-node)))
+             (make sequence 
+                (request-nobreak "in +3")
+                (request-nobreak "ba +3")
+                (process-pblock)
+                (newline)
+                (request "ba -3")
+                (request "LP"))
+             (indent-block (process-children-normal))))
+             
 
 ;  Unordered list elements.
       (element ul
@@ -741,8 +761,7 @@
          (make sequence
             (request "bu")
             (process-pblock)
-            (if (attribute-string (normalize "compact")
-                                             (parent (current-node)))
+            (if (attribute-string (normalize "compact") (parent (current-node)))
                 (empty-sosofo)
                 (request "sp"))
             (newline)))
