@@ -429,7 +429,7 @@
       CALL CCD1_FRDM( IWCS( REFPOS ), 'PIXEL', JREF, STATUS )
 
 *  Construct the output registration frame as a doctored copy of the 
-*  Current frame of the reference NDF.
+*  reference frame of the reference NDF.
       OUTFR = AST_COPY( AST_GETFRAME( IWCS( REFPOS ), JREF, STATUS ),
      :                  STATUS )
       CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
