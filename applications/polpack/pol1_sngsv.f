@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
+      SUBROUTINE POL1_SNGSV( NNDF, INDFIN, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, TVAR, NREJ, IGRP2, TOL, TRIM, INDFO, 
      :                       INDFC, MAXIT, NSIGMA, ILEVEL, HW, SETVAR, 
      :                       MNFRAC, DEZERO, ZERO, STATUS )
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
+*     CALL POL1_SNGSV( NNDF, INDFIN, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
 *                      TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, MAXIT, NSIGMA,
 *                      ILEVEL, HW, SETVAR, MNFRAC, DEZERO, ZERO, STATUS )
 
@@ -32,11 +32,10 @@
 *     repeated up to MAXIT times (see also TOL).
 
 *  Arguments:
-*     IGRP1 = INTEGER (Given)
-*        A GRP identifier for the group containing the input NDF names. 
-*        These should be aligned pixel-for-pixel.
 *     NNDF = INTEGER (Given)
 *        The number of input NDFs in the supplied group.
+*     INDFIN( NNDF ) = INTEGER (Given)
+*        An array of identifiers for the input NDF sections.
 *     WSCH = INTEGER (Given)
 *        The scheme to use for selecting the weights for input intensity
 *        values:
@@ -158,8 +157,8 @@
       INCLUDE 'PRM_PAR'          ! VAL constants
 
 *  Arguments Given:
-      INTEGER IGRP1
       INTEGER NNDF
+      INTEGER INDFIN( NNDF )
       INTEGER WSCH
       LOGICAL OUTVAR
       REAL PHI( NNDF )
@@ -355,7 +354,7 @@
 *  the same variance at any given pixel position. IPIE1 and IPIE2 are used 
 *  as temporary work space.
          IF( WSCH .EQ. 2 ) THEN 
-            CALL POL1_SNGVN( NNDF, IGRP1, ILEVEL, T, PHI, EPS, EL, HW,
+            CALL POL1_SNGVN( NNDF, INDFIN, ILEVEL, T, PHI, EPS, EL, HW,
      :                       DEZERO, DIMST, %VAL( IPDOUT ), NDIMI, 
      :                       LBNDI, UBNDI, %VAL( IPIE1 ), TVAR, 
      :                       %VAL( IPVEST ), %VAL( IPIE2 ), ZERO, 
@@ -401,14 +400,8 @@
 *  Loop round each NDF.
       DO I = 1, NNDF
 
-*  Begin an NDF context.
-         CALL NDF_BEGIN
-
 *  Get the current input NDF identifier.
-         CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
-
-*  Get a section from it which matches the output NDF.
-         CALL NDF_SECT( INDF, NDIMI, LBNDI, UBNDI, INDFS, STATUS ) 
+         CALL NDF_CLONE( INDFIN( I ), INDFS, STATUS )
 
 *  Map the data array.
          CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'READ', IPDIN, EL, 
@@ -431,7 +424,7 @@
 *  from the intensity values implied by the current smoothed Stokes vectors. 
 *  On the zeroth iteration (when no Stokes vectors are available), all 
 *  intensity values are accepted.
-         CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, %VAL( IPDIN ), 
+         CALL POL1_SNGCT( INDFS, ILEVEL, ITER, EL, %VAL( IPDIN ), 
      :                    %VAL( IPVIN ), T( I ), PHI( I ), EPS( I ), 
      :                    ZERO( I ), DIMST, %VAL( IPDOUT ), 
      :                    NSIGMA, TVAR( I ), TOL, DEZERO, CONV, 
@@ -449,8 +442,8 @@
      :                                                   %VAL( IPMT33 ), 
      :                   %VAL( IPN ), STATUS )
 
-*  End the NDF context.
-         CALL NDF_END( STATUS )
+*  Annul the NDF identifier.
+         CALL NDF_ANNUL( INDFS, STATUS )
 
       END DO
 
@@ -522,32 +515,40 @@
      :                                      STATUS )
 
          DO I = 1, NNDF
-            CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF, STATUS )
-            CALL NDF_MSG( 'NDF', INDF )
-
-            CALL NDF_ISACC( INDF, 'WRITE', CANDO, STATUS ) 
+            CALL NDF_ISACC( INDFIN( I ), 'WRITE', CANDO, STATUS ) 
 
             IF( .NOT. CANDO ) THEN
+               CALL NDF_MSG( 'NDF', INDFIN( I ) )
                IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG2', 
      :                    '   ^NDF : (NDF is write protected)', STATUS )
 
-            ELSE IF( TVAR( I ) .GT. 0.0 .AND. 
-     :           TVAR( I ) .NE. VAL__BADR ) THEN
-               CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVIN, 
-     :                       EL, STATUS )
-               CALL MSG_SETR( 'VAR', TVAR( I ) )
-               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG3', 
-     :                    '   ^NDF : ^VAR', STATUS )
-               CALL POL1_FILLR( TVAR( I ), EL, %VAL( IPVIN ), STATUS )
+            ELSE 
+               CALL NDF_CLONE( INDFIN( I ), INDFS, STATUS )
+               CALL NDF_MAP( INDFS, 'VARIANCE', '_REAL', 'UPDATE', 
+     :                       IPVIN, EL, STATUS )
 
-            ELSE
-               CALL NDF_RESET( INDF, 'VARIANCE', STATUS )
-               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG4', 
+               IF( TVAR( I ) .GT. 0.0 .AND. 
+     :             TVAR( I ) .NE. VAL__BADR ) THEN
+                  CALL NDF_MSG( 'NDF', INDFS )
+                  CALL MSG_SETR( 'VAR', TVAR( I ) )
+                  IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG3', 
+     :                       '   ^NDF : ^VAR', STATUS )
+                  CALL POL1_FILLR( TVAR( I ), EL, %VAL( IPVIN ), 
+     :                             STATUS )
+
+               ELSE
+                  CALL NDF_MSG( 'NDF', INDFS )
+                  IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG4', 
      :                    '   ^NDF : (undefined)', STATUS )
+                  CALL POL1_FILLR( VAL__BADR, EL, %VAL( IPVIN ), 
+     :                             STATUS )
+
+               END IF
+   
+               CALL NDF_ANNUL( INDFS, STATUS )
 
             END IF
-   
-            CALL NDF_ANNUL( INDF, STATUS )
+
          END DO
 
       END IF
