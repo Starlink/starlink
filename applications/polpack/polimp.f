@@ -49,7 +49,7 @@
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        A group of data files. This may take the form of a comma separated 
-*        list of file names , or any of the other forms described in the help 
+*        list of file names, or any of the other forms described in the help 
 *        on "Group Expressions".
 *     NAMELIST = LITERAL (Read)
 *        The name of a file to create containing a list of the successfully 
@@ -77,8 +77,13 @@
 *              WPLATE?  PPCKWPLT
 *              VERSION? PPCKVERS
 *
-*        See the topic "Table Format" for information on how to create 
-*        translation tables. [!]
+*        See the topic "Table Format" for information on how 
+*        to create translation tables. 
+*
+*        Note, the ANGROT value is not stored explicitly as a
+*        separate item in the POLPACK extension. Instead, it is used to
+*        create a new co-ordinate Frame (with domain POLANAL) in the NDF's 
+*        WCS information. [!]
 
 *  Table Format:
 *     The import control (translation) table is an ordinary text file

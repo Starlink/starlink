@@ -46,7 +46,8 @@
 *     ANGROT = _REAL (Read)
 *        The anti-clockwise angle from the first (X) pixel axis of each
 *        image to the polarimeter reference direction, in degrees. The
-*        supplied value is used to create a new Frame within the WCS
+*        supplied value is not stored explicitly within the POLPACK 
+*        extension. Instead, it is used to create a new Frame within the WCS
 *        component of the NDF. This Frame is given the Domain name POLANAL
 *        and its first axis corresponds to the reference direction. If a
 *        null (!) value is supplied for this parameter, any image which

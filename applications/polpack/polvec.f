@@ -68,7 +68,7 @@
 *           reference direction to the plane of polarization - in degrees).
 *           - PI -- The polarized intensity.
 *
-*        If VAR is TRUE, then the catalogue will also contain 
+*        If VARIANCE is TRUE, then the catalogue will also contain 
 *        additional columns giving the standard deviation on each of the 
 *        tabulated values (excluding the X and Y columns). The names of 
 *        these columns will be formed by prepending the letter D to the
