@@ -8,7 +8,7 @@
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub ira_sub kapgen_sub \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub \
-kappa_iraf
+kappa_iraf ndg_sub
 
 # The names of all the tar files containing system-specific files:
 TAR_FILES_B = kappa_data_alpha_OSF1 kappa_data_ix86_Linux \
@@ -20,7 +20,7 @@ colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd irg_err irg_err.h \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
-ira_err
+ira_err ndg_com ndg_const ndg_err
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -45,6 +45,11 @@ IRM_SUB = irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
 irm_delob.f irm_gropn.f irm_hmenu.f irm_mline.f irm_stats.f irm_staxs.f \
 irm_stgrd.f irm_stlmt.f irm_stlog.f irm_stmap.f irm_stnul.f irm_stpen.f \
 irm_stpha.f irm_table.f irm_tmenu.f irm_vmenu.f 
+
+# The contents of the ndg_sub.tar file:
+NDG_SUB = ndg1_expan.f ndg1_lasto.f ndg1_ndfch.f ndg_annul.f ndg_asexp.f \
+ndg_assoc.f ndg_creat.f ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f \
+ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f ndg1_wild.c
 
 # The contents of the ira_sub.tar file:
 IRA_SUB = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
@@ -95,7 +100,7 @@ kpg1_filli.f kpg1_fillr.f kpg1_fillw.f kpg1_fillub.f kpg1_filluw.f \
 kpg1_flasb.f kpg1_flasd.f kpg1_flasi.f kpg1_flasr.f kpg1_flasw.f \
 kpg1_flcod.f kpg1_flcor.f kpg1_flipb.f kpg1_flipd.f kpg1_flipi.f \
 kpg1_flipr.f kpg1_flipub.f kpg1_flipuw.f kpg1_flipw.f kpg1_frpic.f \
-kpg1_fspec.f kpg1_gaufb.f kpg1_gaufd.f kpg1_gaufi.f kpg1_gaufr.f \
+kpg1_gaufb.f kpg1_gaufd.f kpg1_gaufi.f kpg1_gaufr.f \
 kpg1_gaufub.f kpg1_gaufuw.f kpg1_gaufw.f kpg1_gausd.f kpg1_gausr.f \
 kpg1_gaxlb.f kpg1_gca.f kpg1_getim.f kpg1_getyp.f kpg1_ghstb.f \
 kpg1_ghstd.f kpg1_ghsti.f kpg1_ghstr.f kpg1_ghstub.f kpg1_ghstuw.f \
@@ -124,12 +129,12 @@ kpg1_monor.f kpg1_mthed.f kpg1_mther.f kpg1_muld.f kpg1_muli.f \
 kpg1_mulr.f kpg1_mxmeb.f kpg1_mxmed.f kpg1_mxmei.f kpg1_mxmer.f \
 kpg1_mxmeub.f kpg1_mxmeuw.f kpg1_mxmew.f kpg1_mxmnb.f kpg1_mxmnd.f \
 kpg1_mxmni.f kpg1_mxmnr.f kpg1_mxmnub.f kpg1_mxmnuw.f kpg1_mxmnw.f \
-kpg1_nacvt.f kpg1_nagtc.f kpg1_naptc.f kpg1_ncaxs.f kpg1_ndfch.f \
+kpg1_nacvt.f kpg1_nagtc.f kpg1_naptc.f kpg1_ncaxs.f \
 kpg1_nmcol.f kpg1_noisb.f kpg1_noisd.f kpg1_noisi.f kpg1_noisr.f \
 kpg1_noisub.f kpg1_noisuw.f kpg1_noisw.f kpg1_nthmb.f kpg1_nthmd.f \
 kpg1_nthmi.f kpg1_nthmr.f kpg1_nthmub.f kpg1_nthmuw.f kpg1_nthmw.f \
 kpg1_numbb.f kpg1_numbd.f kpg1_numbi.f kpg1_numbr.f kpg1_numbub.f \
-kpg1_numbuw.f kpg1_numbw.f kpg1_numfl.f kpg1_nwild.f kpg1_palci.f \
+kpg1_numbuw.f kpg1_numbw.f kpg1_numfl.f kpg1_palci.f \
 kpg1_pastb.f kpg1_pastd.f kpg1_pasti.f kpg1_pastr.f kpg1_pastub.f \
 kpg1_pastuw.f kpg1_pastw.f kpg1_pl2ge.f kpg1_pl2pu.f kpg1_poisb.f \
 kpg1_poisd.f kpg1_poisi.f kpg1_poisr.f kpg1_poisub.f kpg1_poisuw.f \
@@ -164,7 +169,7 @@ kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f \
 kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f normal.f \
 nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
 kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f kpg1_asprp.f kpg1_ieeer.c \
-kpg1_ieeed.c kpg1_map.f
+kpg1_ieeed.c kpg1_map.f kpg1_wgndf.f kpg1_rgndf.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
@@ -401,14 +406,14 @@ UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(IRM_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
 $(KAPPA_IFLS) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
-$(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS)
+$(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS) $(NDG_SUB)
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_agi1.eps \
 sun95_agi2.eps sun95_agi3.eps sun95_agi4.eps sun95_agi5.eps \
 sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps sun95.htx_tar kappa.news \
 aif_sub.tar fts_sub.tar ira_sub.tar irm_sub.tar kapgen_sub.tar kappa_sub.tar \
-kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
+ndg_sub.tar kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
 kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
 

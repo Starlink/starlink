@@ -171,6 +171,8 @@
 *        parameter and renaming NDF to IN.  Better propagation of NDF
 *        components.  Improved the table formatting.  Made efficiency
 *        improvements.  Replaced SUBSAMPLE parameter with NSAMPLE.
+*     7-OCT-1998 (DSB):
+*        Changed (irg based) KPG1_NWILD call to (ndg based) KPG1_RGNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -269,7 +271,7 @@
       CALL NDF_BEGIN
 
 *  Obtain a list of NDFs of recognised foreign data files.
-      CALL KPG1_NWILD( 'IN', NFILES, IGRP, STATUS )
+      CALL KPG1_RGNDF( 'IN', 0, 0, ' ', IGRP, NFILES, STATUS )
 
 *  Abort if no files were found.  Make a helpful contextual error
 *  report.
