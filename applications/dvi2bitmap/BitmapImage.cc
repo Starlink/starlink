@@ -49,11 +49,14 @@ verbosities BitmapImage::verbosity_ = normal;
 BitmapImage::BitmapImage(const int w, const int h, const int bpp)
     : w_(w), h_(h), bpp_(bpp),
       bitmap_(0), allocBitmap_(0), myBitmap_(false), bitmapRows_(0),
-      isTransparent_(false),
-      fg_red_(0), fg_green_(0), fg_blue_(0),
-      bg_red_(255), bg_green_(255), bg_blue_(255)
-
+      isTransparent_(false)
 {
+      fg_.red = 0;
+      fg_.green = 0;
+      fg_.blue = 0;
+      bg_.red = 255;
+      bg_.green = 255;
+      bg_.blue = 255;    
 }
 
 BitmapImage::~BitmapImage ()

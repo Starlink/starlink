@@ -36,8 +36,11 @@ class Bitmap {
     void crop (Margin spec, int pixels, bool absolute=false);
     void blur ();
     void setTransparent(const bool sw) { transparent_ = sw; }
-    void setRGB (const bool def, const bool fg,
-		 const Byte r, const Byte g, const Byte b);
+    typedef struct BitmapColour_s {
+	Byte red, green, blue;
+    } BitmapColour;
+    void setRGB (const bool fg, const BitmapColour*);
+    static void setDefaultRGB (const bool fg, const BitmapColour*);
     void scaleDown (const int factor);
     // If the bounding-box variables have their initial impossible values,
     // then either nothing has been written to the bitmap, or it was
@@ -80,10 +83,12 @@ class Bitmap {
     static bool cropMarginAbsDefault[4];
     bool cropMarginAbs[4];
     bool transparent_;		// make bg transparent if poss.
-    Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
+    //Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
+    BitmapColour fg_, bg_;
     bool customRGB_;		// have custom colours been set?
-    static Byte def_fg_red_, def_fg_green_, def_fg_blue_,
-	def_bg_red_, def_bg_green_, def_bg_blue_;
+    //static Byte def_fg_red_, def_fg_green_, def_fg_blue_,
+    //def_bg_red_, def_bg_green_, def_bg_blue_;
+    static BitmapColour def_fg_, def_bg_;
     static bool def_customRGB_;
     int bpp_;			// bits-per-pixel
     Byte max_colour_;		// ==> max colour index (must fit into

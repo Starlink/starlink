@@ -166,9 +166,9 @@ void PNGBitmap::write (const string filename)
 	    // 0..(2^bpp_-1).  Note that the input bitmap is coded in
 	    // terms of high=black, so invert this in this palette.
 	    int maxcolour = (1<<bpp_)-1;
-	    int diffred   = fg_red_   - bg_red_;
-	    int diffgreen = fg_green_ - bg_green_;
-	    int diffblue  = fg_blue_  - bg_blue_;
+	    int diffred   = fg_.red   - bg_.red;
+	    int diffgreen = fg_.green - bg_.green;
+	    int diffblue  = fg_.blue  - bg_.blue;
 
 	    palettes_[bpp_] = new png_color[maxcolour+1];
 
@@ -203,20 +203,20 @@ void PNGBitmap::write (const string filename)
 		    float sqrat = sqrt(rat);
 		    trans_[bpp_][i] = iround (sqrat*255);
 		    palettes_[bpp_][i].red
-			= iround (bg_red_   + sqrat*diffred);
+			= iround (bg_.red   + sqrat*diffred);
 		    palettes_[bpp_][i].green
-			= iround (bg_green_ + sqrat*diffgreen);
+			= iround (bg_.green + sqrat*diffgreen);
 		    palettes_[bpp_][i].blue
-			= iround (bg_blue_  + sqrat*diffblue);
+			= iround (bg_.blue  + sqrat*diffblue);
 		}
 		else 
 		{
 		    palettes_[bpp_][i].red
-			= bg_red_   + iround(rat*diffred);
+			= bg_.red   + iround(rat*diffred);
 		    palettes_[bpp_][i].green
-			= bg_green_ + iround(rat*diffgreen);
+			= bg_.green + iround(rat*diffgreen);
 		    palettes_[bpp_][i].blue
-			= bg_blue_  + iround(rat*diffblue);
+			= bg_.blue  + iround(rat*diffblue);
 		}
 	    }
 	    if (verbosity_ > normal)
@@ -251,9 +251,9 @@ void PNGBitmap::write (const string filename)
 
 	// Fill in the bKGD chunk, just for completeness
 	png_color_16 bKGD_colour;
-	bKGD_colour.red   = bg_red_;
-	bKGD_colour.green = bg_green_;
-	bKGD_colour.blue  = bg_blue_;
+	bKGD_colour.red   = bg_.red;
+	bKGD_colour.green = bg_.green;
+	bKGD_colour.blue  = bg_.blue;
 	png_set_bKGD (png_ptr_, info_ptr_, &bKGD_colour);
     }
 

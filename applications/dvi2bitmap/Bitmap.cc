@@ -31,12 +31,14 @@
 verbosities Bitmap::verbosity_ = normal;
 int  Bitmap::cropMarginDefault[4] = { 0, 0, 0, 0 };
 bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
-Byte Bitmap::def_fg_red_   = 0;
-Byte Bitmap::def_fg_green_ = 0;
-Byte Bitmap::def_fg_blue_  = 0;
-Byte Bitmap::def_bg_red_   = 255;
-Byte Bitmap::def_bg_green_ = 255;
-Byte Bitmap::def_bg_blue_  = 255;
+//Byte Bitmap::def_fg_red_   = 0;
+//Byte Bitmap::def_fg_green_ = 0;
+//Byte Bitmap::def_fg_blue_  = 0;
+//Byte Bitmap::def_bg_red_   = 255;
+//Byte Bitmap::def_bg_green_ = 255;
+//Byte Bitmap::def_bg_blue_  = 255;
+Bitmap::BitmapColour Bitmap::def_fg_ = {  0,   0,   0};
+Bitmap::BitmapColour Bitmap::def_bg_ = {255, 255, 255};
 bool Bitmap::def_customRGB_ = false;
 
 
@@ -75,19 +77,20 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
 
     if (def_customRGB_)
     {
-	fg_red_   = def_fg_red_;
-	fg_green_ = def_fg_green_;
-	fg_blue_  = def_fg_blue_;
-	bg_red_   = def_bg_red_;
-	bg_green_ = def_bg_green_;
-	bg_blue_  = def_bg_blue_;
-	cerr << "Bitmap constructor: Custom RGB:"
-	     << static_cast<int>(fg_red_) << ','
-	     << static_cast<int>(fg_green_) << ','
-	     << static_cast<int>(fg_blue_) << '/'
-	     << static_cast<int>(bg_red_) << ','
-	     << static_cast<int>(bg_green_) << ','
-	     << static_cast<int>(bg_blue_) << '\n';
+	fg_.red   = def_fg_.red;
+	fg_.green = def_fg_.green;
+	fg_.blue  = def_fg_.blue;
+	bg_.red   = def_bg_.red;
+	bg_.green = def_bg_.green;
+	bg_.blue  = def_bg_.blue;
+	if (verbosity_ > normal)
+	    cerr << "Bitmap constructor: Custom RGB:"
+		 << static_cast<int>(fg_.red) << ','
+		 << static_cast<int>(fg_.green) << ','
+		 << static_cast<int>(fg_.blue) << '/'
+		 << static_cast<int>(bg_.red) << ','
+		 << static_cast<int>(bg_.green) << ','
+		 << static_cast<int>(bg_.blue) << '\n';
 	customRGB_ = true;
     }
 
@@ -484,14 +487,14 @@ void Bitmap::write (const string filename, const string format)
     {
 	if (verbosity_ > normal)
 	    cerr << "Bitmap: custom RGB: "
-		 << static_cast<int>(fg_red_) << ','
-		 << static_cast<int>(fg_green_) << ','
-		 << static_cast<int>(fg_blue_) << '/'
-		 << static_cast<int>(bg_red_) << ','
-		 << static_cast<int>(bg_green_) << ','
-		 << static_cast<int>(bg_blue_) << '\n';
-	bi->setRGB (true,  fg_red_, fg_green_, fg_blue_);
-	bi->setRGB (false, bg_red_, bg_green_, bg_blue_);
+		 << static_cast<int>(fg_.red) << ','
+		 << static_cast<int>(fg_.green) << ','
+		 << static_cast<int>(fg_.blue) << '/'
+		 << static_cast<int>(bg_.red) << ','
+		 << static_cast<int>(bg_.green) << ','
+		 << static_cast<int>(bg_.blue) << '\n';
+	bi->setRGB (true,  &fg_);
+	bi->setRGB (false, &bg_);
     }
     string fileext = bi->fileExtension();
     string outfilename = filename;
@@ -508,31 +511,44 @@ void Bitmap::write (const string filename, const string format)
 }
 
 
-void Bitmap::setRGB (const bool def, const bool fg,
-		     const Byte r, const Byte g, const Byte b) {
-    cerr << "setRGB: "
-	 << "def=" << def
-	 << " fg=" << fg
-	 << "RGB="
-	 << static_cast<int>(r) << ','
-	 << static_cast<int>(g) << ','
-	 << static_cast<int>(b) << '\n';
-    if (def)
-    {
-	if (fg)
-	{
-	    def_fg_red_ = r; def_fg_green_ = g; def_fg_blue_ = b;
-	} else {
-	    def_bg_red_ = r; def_bg_green_ = g; def_bg_blue_ = b;
-	}
-	def_customRGB_ = true;
-    }
-
+void Bitmap::setRGB (const bool fg, const BitmapColour* rgb) {
+    if (verbosity_ > normal)
+	cerr << "setRGB: "
+	     << " fg=" << fg
+	     << " RGB="
+	     << static_cast<int>(rgb->red) << ','
+	     << static_cast<int>(rgb->green) << ','
+	     << static_cast<int>(rgb->blue) << '\n';
     if (fg)
     {
-	fg_red_ = r; fg_green_ = g; fg_blue_ = b;
+	fg_.red = rgb->red;
+	fg_.green = rgb->green;
+	fg_.blue = rgb->blue;
     } else {
-	bg_red_ = r; bg_green_ = g; bg_blue_ = b;
+	bg_.red = rgb->red;
+	bg_.green = rgb->green;
+	bg_.blue = rgb->blue;
     }
     customRGB_ = true;
+}
+
+void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
+    if (verbosity_ > normal)
+	cerr << "setDefaultRGB: "
+	     << " fg=" << fg
+	     << " RGB="
+	     << static_cast<int>(rgb->red) << ','
+	     << static_cast<int>(rgb->green) << ','
+	     << static_cast<int>(rgb->blue) << '\n';
+    if (fg)
+    {
+	def_fg_.red = rgb->red;
+	def_fg_.green = rgb->green;
+	def_fg_.blue = rgb->blue;
+    } else {
+	def_bg_.red = rgb->red;
+	def_bg_.green = rgb->green;
+	def_bg_.blue = rgb->blue;
+    }
+    def_customRGB_ = true;
 }

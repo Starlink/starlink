@@ -9,6 +9,7 @@
 
 #include "dvi2bitmap.h"
 #include "verbosity.h"
+#include "Bitmap.h"		// for BitmapColour
 
 class BitmapImage {
  public:
@@ -18,12 +19,14 @@ class BitmapImage {
     void setBitmapRow (const Byte *B);
     //virtual void setColourTable (???) = 0;
     void setTransparent (const bool sw) { isTransparent_ = sw; };
-    void setRGB (const bool fg, const Byte r, const Byte g, const Byte b) {
+    void setRGB (const bool fg, const Bitmap::BitmapColour* rgb) {
 	if (fg)
 	{
-	    fg_red_ = r; fg_green_ = g; fg_blue_ = b;
-	} else {
-	    bg_red_ = r; bg_green_ = g; bg_blue_ = b;
+	    fg_.red=rgb->red; fg_.green=rgb->green; fg_.blue=rgb->blue;
+	}
+	else
+	{
+	    bg_.red=rgb->red; bg_.green=rgb->green; bg_.blue=rgb->blue;
 	}
     };
     virtual void write (const string filename) = 0;
@@ -51,7 +54,8 @@ class BitmapImage {
     bool myBitmap_;
     int bitmapRows_;
     bool isTransparent_;
-    Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
+    //Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
+    Bitmap::BitmapColour fg_, bg_;
 
     static const string *softwareversion;
     static const string *inputfilename;
