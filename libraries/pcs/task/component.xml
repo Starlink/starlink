@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="task">
+  <version>2.0</version>
+  <path>libraries/pcs/task</path>
+  <description>TASK -- an interface between the
+  application code and the DTASK layer</description>
+  <abstract><p>This library provides an interface between the
+      application code and the DTASK layer so that an application can
+      find out some information about its own status. It also enables
+      programs to control other co-operating programs using the ADAM
+      message protocol and includes subroutines for encoding and
+      decoding data values in messages.  For examples of use, see
+      SUN/134.</p></abstract>
+  <dependencies>
+    <build> sae adam dtask messys subpar messgen</build>
+    <use> chr dtask ems mers string subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29, with examples in SUN/134</p></notes>
+</component>

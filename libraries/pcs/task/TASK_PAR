@@ -1,0 +1,8 @@
+*+  TASK_PAR - global constants for TASK library
+*
+*   History :
+*    23.04.1991: original (REVAD::BDK)
+*-
+
+      INTEGER TASK__MAXSUB             ! maximum number of active 
+      PARAMETER ( TASK__MAXSUB = 100 ) ! subsidiary actions

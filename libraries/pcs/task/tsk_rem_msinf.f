@@ -1,0 +1,98 @@
+*+  TASK_REMOVE_MESSINFO - remove entry from list of active subsidiary actions
+      SUBROUTINE TASK_REMOVE_MESSINFO ( PATH, MESSID, STATUS )
+*    Description :
+*     Removes an entry from the list of active subsidiary actions. This simply
+*     involves searching the list for an entry with a matching path and message
+*     id and, if found, removing it. Entries are not checked for ownership
+*     by the current action.
+*    Invocation :
+*     CALL TASK_REMOVE_MESSINFO ( PATH, MESSID, STATUS )
+*    Parameters :
+*     PATH=INTEGER (given)
+*           The path identifying the subsidiary task
+*     MESSID=INTEGER (given)
+*           The message id identifying the action in the subsidiary task
+*     STATUS=INTEGER
+*    Method :
+*     Search list for entry with matching path and message id.
+*     Set action pointer to -1 (unused).
+*     If this was last used entry, set topmost -1's to 0 (end of list).
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*     W.F.Lupton (AAOEPP::WFL)
+*    History :
+*     29.04.1989:  original (AAOEPP::WFL)
+*     23.04.1991:  rearrange INCLUDE files (REVAD::BDK)
+*     23.04.1991:  set MESACTPTR(I)=0 if the entry is at the end of the 
+*                  storage arrays (REVAD::BDK)
+*     06.05.1991:  remove ADAMDEFNS (REVAD::BDK)
+*      4.10.1992:  add PAR_PAR for porting (RLVAD::AJC)
+*     24.08.1993:  Use SUBPAR_SYS not PAR_PAR (RLVAD::AJC)
+*    endhistory
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'SUBPAR_SYS'
+      INCLUDE 'MESSYS_LEN'
+      INCLUDE 'TASK_PAR'
+
+*    Import :
+      INTEGER PATH        ! the path identifying the subsidiary task
+      INTEGER MESSID      ! the message id'ing the action in the subsidiary task
+
+*    Status :
+      INTEGER STATUS
+
+*    Global variables :
+      INCLUDE 'TASK_CMN'
+
+*    Local variables :
+      INTEGER I           ! counter
+      LOGICAL DONE        ! whether have removed entry to the list
+*-
+      IF ( STATUS .NE. SAI__OK ) RETURN
+*
+*    Cycle through the list until find matching entry or find a zero action
+*    pointer (which indicates end of list).
+*
+      I = 0
+      DONE = .FALSE.
+      DO WHILE ( ( I .LT. TASK__MAXSUB ) .AND. ( .NOT. DONE ) )
+         I = I + 1
+*
+*    If find a zero action pointer, set adjacent -1 (unused) pointers to
+*    zero too, and exit from the loop.
+*
+         IF ( MESACTPTR(I) .EQ. 0 ) THEN
+            I = I - 1
+            DO WHILE ( ( I .GT. 0 ) .AND. ( MESACTPTR(I) .EQ. -1 ) )
+               MESACTPTR(I) = 0
+               I = I - 1
+            ENDDO
+            DONE = .TRUE.
+*
+*    If find a matching entry, clear its action pointer to -1 (unused).
+*    Continue, in case there are duplicate entries (and so that the above
+*    logic gets a chance to operate).
+*
+         ELSE IF ( ( MESPATH(I) .EQ. PATH ) .AND.
+     :    ( MESMESSID(I) .EQ. MESSID ) ) THEN
+            IF ( I .EQ. TASK__MAXSUB ) THEN
+*
+*            Entry is at the very end of the arrays. Need to restart 
+*            high water mark. Decrement I to force going around the loop 
+*            again.
+*
+               MESACTPTR(I) = 0
+               I = I - 1
+            ELSE
+               MESACTPTR(I) = -1
+            ENDIF
+         ENDIF
+      ENDDO
+
+      END

@@ -1,0 +1,78 @@
+*+  TASK_CMN - common blocks for TASK library
+*
+*    Authors :
+*     W.F.Lupton (AAOEPP::WFL)
+*    History :
+*     29.04.1989:  original (AAOEPP::WFL)
+*     30.04.1989:  distinguish between input and output VALUEs (AAOEPP::WFL)
+*     23.04.1991:  merge into a single INCLUDE file (REVAD::BDK)
+*     06.05.1991:  store CURACTNAME, use PAR__SZNAM, have 
+*                  separate common block for characters (REVAD::BDK)
+*     13.05.1991:  store INTRUPT_FLAG (REVAD::BDK)
+*     24.05.1991:  remove CURMESVALUE (REVAD::BDK)
+*     12.06.1991:  only store one value string, CURACTVALUE (REVAD::BDK)
+*     22.08.1991:  store application requests (REVAD::BDK)
+*     24.08.1993:  use subpar not par includes (RLVAD::AJC)
+*    endhistory
+*-
+
+*
+*    TASK_CURCOM - current d-task action common block
+*     Holds details of the current d-task action, ie the one on whose
+*     behalf the current call to ACT has been made.
+*
+      INTEGER CURACTPTR                    ! action pointer for current
+                                           ! action 
+      INTEGER CURMESPATH                   ! message path resulting in
+                                           ! current entry 
+      INTEGER CURMESMESSID                 ! message id resulting in
+                                           ! current entry 
+      INTEGER CURMESCONTEXT                ! context in message
+                                           ! resulting in entry 
+
+      INTEGER CURMESSTATUS                 ! status in message resulting
+                                           ! in entry 
+      INTEGER CURACTCONTEXT                ! context for current action
+      INTEGER CURACTNAMECODE               ! name code for current
+                                           ! action 
+      INTEGER CURACTSEQ                    ! sequence number for current
+                                           ! action 
+
+      INTEGER CURACTDELAY                  ! delay before next entry
+      INTEGER CURACTREQUEST                ! request for rescheduling
+
+      CHARACTER*(SUBPAR__NAMELEN) CURACTNAME    ! current action name 
+      CHARACTER*(SUBPAR__NAMELEN) CURMESNAME    ! action name in message
+                                           ! resulting in entry 
+
+      CHARACTER*(MSG_VAL_LEN) CURACTVALUE  ! value string for current
+                                           ! action 
+
+      COMMON / TASK_CURCOM / CURACTPTR, CURMESPATH, CURMESMESSID,
+     :  CURMESCONTEXT, CURMESSTATUS, CURACTCONTEXT, CURACTNAMECODE,
+     :  CURACTSEQ, CURACTDELAY, CURACTREQUEST
+
+      COMMON / TASK_CURCOM_C / CURACTNAME, CURMESNAME, CURACTVALUE
+*
+*   TASK_MESCOM.INC - active subsidiary task action common block
+*     Holds details of active actions that have been initiated in subsidiary
+*     tasks. If an incoming message corresponds to one of the actions described
+*     in this common block, it will result in an entry to ACT.
+*
+      INTEGER MESACTPTR(TASK__MAXSUB)      ! action pointer for initiating action
+      INTEGER MESPATH(TASK__MAXSUB)        ! message path for initiated action
+      INTEGER MESMESSID(TASK__MAXSUB)      ! message id for initiated action
+
+      COMMON / TASK_MESCOM / MESACTPTR, MESPATH, MESMESSID
+
+*
+*   TASK_ASTCOM - common block for holding AST interrupt flag
+*
+      LOGICAL INTRUPT_FLAG                 ! flag set by TASK_ASTSIGNAL
+
+      COMMON / TASK_ASTCOM / INTRUPT_FLAG
+
+      SAVE / TASK_CURCOM /
+      SAVE / TASK_CURCOM_C /
+      SAVE / TASK_MESCOM /
+      SAVE / TASK_ASTCOM /
