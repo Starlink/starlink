@@ -1,0 +1,435 @@
+*+  ROTNRS - rotates an image through an angle not divisible by 90.0
+*            degrees
+
+      SUBROUTINE ROTNRS ( INARR, IDIM1, IDIM2, ODIM1, ODIM2, ANGLE,
+     :                    NNMETH, OUTARR, STATUS )
+*
+*    Description :
+*
+*     This routine takes an input array and rotates it clockwise by
+*     an angle between 0.0 and 90.0 degrees into the output array.
+*     Two alternative methods are available to derive output pixel
+*     values from the input array:
+*       a) nearest neighbour (the default), and 
+*       b) bilinear interpolation. 
+*
+*     In option a) the value of the pixel in the input array which is
+*     nearest to the calculated pre-transform position becomes the
+*     value assigned to output pixel.  This prevents gaps forming in
+*     the output array due to real-to-integer truncation when
+*     transforming old to new pixels. This may lead to the occasional
+*     instance where two adjacent pixels in the new array are
+*     calculated to have come from the same pixel in the old array.
+*     This implies some slight degradation of resolution.
+*
+*     In option b) the output pixel value is obtained via bilinear
+*     interpolation of the four input pixels surrounding the transformed
+*     co-ordinate. This is slower than option a) but produces a more
+*     accurate result. Allowance is made for invalid pixels, which are
+*     excluded from the calculations.  If the nearest input pixel or
+*     all four surrounding input pixels are invalid, the output pixel
+*     is made invalid.
+*
+*    Invocation :
+*
+*     CALL ROTNRS( INARR, IDIM1, IDIM2, ODIM1, ODIM2, ANGLE, NNMETH,
+*    :             OUTARR, STATUS )
+*
+*    Arguments :
+*
+*     INARR( IDIM1, IDIM2 )  =  REAL ( READ )
+*         Input array
+*     IDIM1 = INTEGER( READ )
+*         The first dimension of the input 2-d array.
+*     IDIM2 = INTEGER( READ )
+*         The second dimension of the input 2-d array.
+*     ODIM1 = INTEGER( READ )
+*         The first dimension of the output 2-d array.
+*     ODIM2 = INTEGER( READ )
+*         The second dimension of the output 2-d array.
+*     ANGLE  =  REAL ( READ )
+*         Rotation angle in degrees
+*     NNMETH =  LOGICAL ( READ )
+*         If true the nearest-neighbour method of computing output
+*           pixels is used
+*     OUTARR( ODIM1, ODIM2 )  =  REAL ( WRITE )
+*         Output array
+*     STATUS  =  INTEGER ( READ )
+*         Global status parameter
+*
+*    Method :
+*
+*     If status not o.k. - return
+*     Set up co-ordinates of the two array centres
+*     Compute sine and cosine of the angle of rotation
+*     If nearest-neighbour method required then
+*        For all lines in output array
+*           Compute y distance of current line from output array centre
+*           For all pixels in current line in output array
+*              Compute x distance of current line from output array
+*                centre
+*              Get the co-ordinates in the input array from which the
+*                current output-array co-ordinates have been transformed
+*              If this point exists in the input array then
+*                 Set output array pixel to that value
+*              Else
+*                 Output array pixel is invalid
+*              Endif
+*           Endfor
+*        Endfor
+*     Else
+*        For all lines in output array
+*           Compute y distance of current line from output array centre
+*           For all pixels in current line in output array
+*              Compute x distance of current line from output array
+*                centre
+*              Get the co-ordinates in the input array from which the
+*                current output-array co-ordinates have been transformed
+*              Compute nearest-neighbour (integer) pixel co-ordinates in
+*                the input array
+*              If this point does not exist in the input array then
+*                 Output array pixel is invalid
+*              Else
+*                 Store the four surrounding pixels
+*                 If the nearest-neighbour pixel is invalid or all four
+*                   surrounding pixels are invalid then
+*                    Output array pixel is invalid
+*                 Else
+*                    Compute the fractional-pixel displacements of the
+*                      interpolation point
+*                    Initialise summation variables
+*                    For each valid surrounding pixel 
+*                       Find the bilinear weighting factor
+*                       Increment the sum of the weighted pixel values
+*                         and the sum of weights
+*                       Output array pixel value is the weighted mean
+*                    Endfor
+*                 Endif
+*              Endif
+*           Endfor
+*        Endfor
+*     Endif
+*     Return
+*
+*    Bugs :
+*
+*     None known.
+*
+*    Authors :
+*
+*     Mark McCaughrean UoE ( REVA::MJM )
+*     Konrad Flamm UoE ( REVA::MJM )
+*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
+*
+*    History :
+*
+*     14-11-1985 : First implementation for ROTATE (REVA::MJM)
+*     1986 Sep 9 : Completed the prologue, reordered arguments (3rd to
+*                  5th), added bad-pixel handling and nearly conformed 
+*                  to Starlink standards (RL.STAR::CUR).
+*     1988 Jun 24: Added bilinear-interpolation option and therefore
+*                  extra argument NNMETH (RL.STAR::CUR).
+*     1989 Aug  7: Passed array dimensions as separate variables
+*                  (RL.STAR::CUR).
+*
+*    Type definitions :
+
+      IMPLICIT  NONE           ! no implicit typing allowed
+
+*    Global constants :
+
+      INCLUDE  'SAE_PAR'       ! SSE global definitions
+      INCLUDE  'BAD_PAR'       ! Magic-value definitions
+
+*    Import :
+
+      INTEGER
+     :    IDIM1, IDIM2,
+     :    ODIM1, ODIM2
+
+      REAL
+     :    INARR( IDIM1, IDIM2 ),
+     :    ANGLE
+
+      LOGICAL
+     :    NNMETH
+
+*    Export :
+
+      REAL
+     :    OUTARR( ODIM1, ODIM2 )
+
+*    Status :
+
+      INTEGER  STATUS
+
+*    Local constants :
+
+      REAL DGTORD              ! Degrees to radians
+      PARAMETER ( DGTORD = 0.01745329 )
+
+*    Local variables :
+
+      INTEGER
+     :    IIP,                 ! x pixel in input array corresponding
+                               ! to the current output array pixel
+     :    IJP,                 ! y pixel in input array corresponding
+                               ! to the current output array pixel
+     :    I, J                 ! Array counters
+
+      REAL
+     :    ICX,                 ! x co-ordinate of input array centre
+     :    ICY,                 ! y     "       "   "     "      "
+     :    OCX,                 ! x     "       " output  "      "
+     :    OCY,                 ! y     "       "    "    "      "
+     :    XO,                  ! x co-ordinate in input array
+                               ! corresponding to the current output
+                               ! array pixel
+     :    YO,                  ! y co-ordinate in input array
+                               ! corresponding to the current output
+                               ! array pixel
+     :    RI,                  ! Real x distance of current output
+                               ! array pixel from output array centre
+     :    RJ,                  ! Real y distance of current output
+                               ! array pixel from output array centre
+     :    RIP,                 ! Real x distance of corresponding input
+                               ! array point from input array centre
+     :    RJP,                 ! Real y distance of corresponding input
+                               ! array point from input array centre
+     :    CANGLE,              ! Cosine of the rotation angle
+     :    SANGLE,              ! Sine of the rotation angle
+     :    XDIST,               ! Fractional pixel displacement of
+                               ! the interpolation point
+     :    YDIST,               ! Fractional pixel displacement of
+                               ! the interpolation point
+     :    SUM,                 ! Sum of weighted surrounding pixels
+     :    VAL1,                ! Bottom-left point surrounding
+                               ! the point to be interpolated
+     :    VAL2,                ! Bottom-right point
+     :    VAL3,                ! Top-left point
+     :    VAL4,                ! Top-right point
+     :    WEIGHT,              ! Weight of a pixel for interpolation
+     :    WTSUM                ! Sum of weights
+
+*-
+*    check status on entry - return if not o.k.
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+  
+*    set up the real co-ordinates of the two array centres
+
+      ICX = REAL( IDIM1 ) / 2.0
+      ICY = REAL( IDIM2 ) / 2.0
+      OCX = REAL( ODIM1 ) / 2.0
+      OCY = REAL( ODIM2 ) / 2.0
+
+*    set up the sine and cosine of the rotation angle
+
+      CANGLE = COS( DGTORD * ANGLE )
+      SANGLE = SIN( DGTORD * ANGLE )
+
+*    nearest-neighbour method
+
+      IF ( NNMETH ) THEN
+
+*       loop round each line in the output array
+
+         DO  J = 1, ODIM2
+
+*          set up real y distance of current line from output array
+*          centre
+
+            RJ = REAL( J ) - 0.5 - OCY
+
+*          loop round each pixel in current line
+
+            DO  I = 1, ODIM1
+
+*             set up real x distance of current point from output array
+*             centre
+
+               RI = REAL( I ) - 0.5 - OCX
+
+*             get the real co-ordinates in the input array from which
+*             the current output array co-ordinates have been
+*             transformed
+
+               CALL OCOORD( RI, RJ, CANGLE, SANGLE, RIP, RJP, STATUS )
+
+*             convert these real distances into integer pixel
+*             co-ordinates (e.g.: 56,45) - add the input array centre
+*             co-ordinate first, then another 0.5, and then take the
+*             nearest integer
+
+               IIP = NINT( RIP + ICX + 0.5 )
+               IJP = NINT( RJP + ICY + 0.5 )
+
+*             now determine if this calculated point exists in the input
+*             array - if so, set output array pixel to that value; if
+*             not, set output array pixel invalid
+
+               IF ( IIP .GE. 1 .AND. IIP .LE. IDIM1 .AND.
+     :              IJP .GE. 1 .AND. IJP .LE. IDIM2 ) THEN
+
+                  OUTARR( I, J ) = INARR( IIP, IJP )
+
+               ELSE
+
+                  OUTARR( I, J ) = VAL__BADR
+
+               END IF
+
+*          end of loops for all columns and lines of output array
+
+            END DO
+         END DO
+
+*    the bilinear-interpolation method
+
+      ELSE
+
+*       loop round each line in the output array
+
+         DO  J = 1, ODIM2
+
+*          set up real y distance of current line from output array
+*          centre
+
+            RJ = REAL( J ) - 0.5 - OCY
+
+*          loop round each pixel in current line
+
+            DO  I = 1, ODIM1
+
+*             set up real x distance of current point from output array
+*             centre
+
+               RI = REAL( I ) - 0.5 - OCX
+
+*             get the real co-ordinates in the input array from which
+*             the current output array co-ordinates have been
+*             transformed
+
+               CALL OCOORD( RI, RJ, CANGLE, SANGLE, RIP, RJP, STATUS )
+
+*             convert these distances into pixel co-ordinates
+
+               XO = RIP + ICX + 0.5 
+               YO = RJP + ICY + 0.5 
+
+*             convert pixel co-ordinates into integers
+
+               IIP = NINT( XO )
+               IJP = NINT( YO )
+
+*             now determine if this calculated point exists in the input
+*             array - if not, set output array pixel invalid
+
+               IF ( IIP .LT. 1 .OR. IIP .GE. IDIM1 .OR.
+     :              IJP .LT. 1 .OR. IJP .GE. IDIM2 ) THEN
+
+                  OUTARR( I, J ) = VAL__BADR
+
+*             interpolate to obtain output pixel value
+
+               ELSE
+
+*                get the four surrounding points in the data array
+
+                  VAL1 = INARR( IIP, IJP )
+                  VAL2 = INARR( IIP + 1, IJP )
+                  VAL3 = INARR( IIP, IJP + 1 )
+                  VAL4 = INARR( IIP + 1, IJP + 1 )
+
+*                output pixel is made invalid if nearest input pixel is
+*                invalid, or all four surrounding pixels are invalid
+
+                  IF ( INARR( IIP, IJP ) .EQ. VAL__BADR .OR.
+     :                 (  VAL1 .EQ. VAL__BADR .AND.
+     :                    VAL2 .EQ. VAL__BADR .AND.
+     :                    VAL3 .EQ. VAL__BADR .AND.
+     :                    VAL4 .EQ. VAL__BADR )  ) THEN
+
+                     OUTARR( I, J ) = VAL__BADR
+
+*                Otherwise continue with interpolation
+
+                  ELSE
+
+*                   evaluate the fractional-pixel displacements of the
+*                   interpolation point.
+
+                     XDIST = XO - REAL( IIP )
+                     YDIST = YO - REAL( IJP )
+
+*                   Initialise sums for forming weighted mean
+
+                     SUM = 0.0
+                     WTSUM = 0.0
+ 
+*                   Form weighted mean of adjacent four pixels, checking
+*                   that each lies within the input image and is not
+*                   invalid
+ 
+                     IF ( VAL1 .NE. VAL__BADR ) THEN
+
+*                     Weight is calculated from the x,y shift from
+*                     integer pixel locations. Bilinear interpolation
+*                     is used. First the bottom-left pixel...
+
+                        WEIGHT = ( 1.0 - XDIST ) * ( 1.0 - YDIST )
+                        SUM = SUM + VAL1 * WEIGHT
+                        WTSUM = WTSUM + WEIGHT
+                     END IF
+
+*                   bottom right...
+ 
+                     IF ( VAL2 .NE. VAL__BADR ) THEN
+                        WEIGHT = XDIST * ( 1.0 - YDIST )
+                        SUM = SUM + VAL2 * WEIGHT
+                        WTSUM = WTSUM + WEIGHT
+                     END IF
+
+*                   top left...
+
+                     IF ( VAL3 .NE. VAL__BADR ) THEN
+                        WEIGHT = ( 1.0 - XDIST ) * YDIST
+                        SUM = SUM + VAL3 * WEIGHT
+                        WTSUM = WTSUM + WEIGHT
+                     END IF
+
+*                   top right...
+ 
+                     IF ( VAL4 .NE. VAL__BADR ) THEN
+                        WEIGHT = XDIST * YDIST
+                        SUM = SUM + VAL4 * WEIGHT
+                        WTSUM = WTSUM + WEIGHT
+                     END IF
+  
+*                   Assign weighted mean to output pixel (WTSUM cannot
+*                   be zero, since at least 1 input pixel must be valid)
+
+                     OUTARR( I, J ) = SUM / WTSUM
+
+*                end of are-input-data-invalid check
+
+                  END IF
+
+*             end of transformed-output-pixel-is-not-in-input-array
+*             check
+
+               END IF
+
+*          end of loops for all columns and lines of output array
+
+            END DO
+         END DO
+
+*    end of nearest-neighbour-or-bilinear-interpolation check
+
+      END IF
+
+*    that's it - return
+
+      END
+
