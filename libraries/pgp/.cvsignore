@@ -1,3 +1,14 @@
+PGP_ERR
+blah.pl
+check_errcode.pl
+core.9619
+fac_1508_err
+grfont.dat
+pack
+pgp_err.h
+starconf.status
+sun15.ps
+sun15.dvi
 *.lo
 *.la
 Makefile

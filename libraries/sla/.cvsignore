@@ -1,3 +1,6 @@
+sun67.ps
+sun67.dvi
+config.h
 *.lo
 *.la
 Makefile

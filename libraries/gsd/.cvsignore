@@ -1,3 +1,14 @@
+config.h
+config.h.in
+core.*
+gsd2_testcp
+gsd_print
+gsd_test
+gsd_test.lis
+makefile.oldmk
+starconf.status
+sun229.ps
+sun229.dvi
 *.lo
 *.la
 Makefile

@@ -1,3 +1,5 @@
+NBS_ERR
+config.h
 *.lo
 *.la
 Makefile

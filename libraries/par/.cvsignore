@@ -1,3 +1,8 @@
+PAR_ERR
+fac_190_err
+par_err.h
+sun114.ps
+sun114.dvi
 *.lo
 *.la
 Makefile
