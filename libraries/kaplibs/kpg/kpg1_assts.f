@@ -156,8 +156,8 @@
      :             STATUS .EQ. AST__OPT .OR.
      :             STATUS .EQ. AST__NOWRT )
 
-*  If no report is wanted, annul the error.
-         IF( .NOT. REPORT ) CALL ERR_ANNUL( STATUS )
+*  If no report is wanted, annul "bad attribute" error. 
+         IF( .NOT. REPORT .AND. BADAT ) CALL ERR_ANNUL( STATUS )
 
       END IF
 
