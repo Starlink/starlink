@@ -902,7 +902,7 @@ void Bitmap::scaleDown (const int factor)
  * Writes the bitmap out to the specified file.  The
  * <code>format</code> parameter specifies the format of this file,
  * and should be one of the bitmap types listed in the sequence
- * starting with {@link BitmapImage.firstBitmapImageFormat}; if this
+ * starting with {@link BitmapImage#firstBitmapImageFormat}; if this
  * is not available, we try writing out in the default format, and if
  * that fails in turn (something is clearly badly wrong) we throw an
  * error.
