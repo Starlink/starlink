@@ -7,10 +7,10 @@
 *     Multiply a <TYPE> array by a constant
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
-*     CALL ARR_MULT1R( N, IN, CONST, OUT, STATUS )
+*     CALL ARR_MULT1<T>( N, IN, CONST, OUT, STATUS )
 
 *  Description:
 *     Multiplies the input array by a constant, creating an output
@@ -54,13 +54,13 @@
 *     {routine_timing}
 
 *  References:
-*     {routine_references}...
+*     ARR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/arr.html
 
 *  Keywords:
 *     package:arr, usage:public, arrays, arithmetic
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)

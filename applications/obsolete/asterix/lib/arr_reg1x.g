@@ -32,13 +32,13 @@
 *        {routine_example_description}
 
 *  References:
-*     {routine_references}...
+*     ARR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/arr.html
 
 *  Keywords:
 *     package:arr, usage:public, arrays, initialisation
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     TJP: Trevor Ponman (University of Birmingham)
