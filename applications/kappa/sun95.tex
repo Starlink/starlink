@@ -38112,7 +38112,7 @@ SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
 
 \section{Release Notes---V0.13}
 Several applications have been changed to enable them to make use of the
-NDF WCS component, which stores descriptions of world coordinate systems 
+NDF WCS component, which stores descriptions of world co-ordinate systems 
 within NDF data structures. In some cases, this has involved major
 changes, including the removal of existing parameters and the addition of
 new parameters.
@@ -38133,19 +38133,19 @@ be found, any FITS header cards in the FITS extension will be used.
 Applications which write WCS information to an NDF will always write it
 in the form of a WCS component.
 
-One of the major changes is that graphics applications which previously had 
+One of the major changes is that some graphics applications which previously had 
 many parameters to control the appearance of the plot (ABSLAB, ORDLAB,
 FONT, PLTITL, etc), now use a single STYLE parameter instead. The value
 supplied for a STYLE parameter should be a group of {\em plotting
 attributes}. Defaults for unspecified plotting attributes are read from the
 text file \verb+$KAPPA_DIR/style.def+. A different defaults file may be
-specified by assigning the name of the defaults file to the environment
-variable {\tt KAPPA\_STYLE}.
+specified by setting the environment variable {\tt KAPPA\_STYLE} to hold
+the name of the defaults file to use.
 
 Another major change is that the new and modified applications no longer
 use the global COSYS parameter to select \emph{data} (i.e. axis) or
-\emph{world} (i.e. pixel) co-ordinates. Instead, each NDF carries around
-with it knowledge of several co-ordinate ``Frames'', one of which is
+\emph{world} (i.e. pixel) co-ordinates. Instead, each NDF carries knowledge 
+around with it of several co-ordinate ``Frames'', one of which is
 nominated as the \emph{current} co-ordinate Frame. This information is
 stored in the WCS component of each NDF. All interaction with a given NDF
 uses the current co-ordinate Frame when referring to positions within the
@@ -38169,7 +38169,7 @@ plotting application.
                   pixel origin. The compression is now centred on the
                   origin of pixel co-ordinates (previously the lower left
                   corner of the output NDF was assigned the arbitrary
-                  pixel indices \[1,1,..\] irrespective of the origin of
+                  pixel indices $[1,1,...]$ irrespective of the origin of
                   the supplied NDF).
          \end{itemize}
 
@@ -38187,13 +38187,13 @@ plotting application.
 
       \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
          \begin{itemize}
+            \item Axes are now annotated with values in the current co-ordinate
+                  Frame of the supplied NDF.
             \item Information describing the co-ordinate Frames available
                   in the supplied NDF is stored with the DATA picture in 
                   the AGI graphics database.
-            \item Axes are now annotated with values in the current co-ordinate
-                  Frame of the supplied NDF.
             \item If the screen is not cleared before plotting a contour
-                  map (i.e. by setting the parameter CLEAR to FALSE), then
+                  map (i.e. if the parameter CLEAR is set to FALSE), then
                   an attempt will be made to align the new contour map 
                   spatially with any existing DATA picture. This alignment
                   occurs by preference in the current co-ordinate Frame
@@ -38265,12 +38265,12 @@ plotting application.
 
       \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{} 
          \begin{itemize}
+            \item Axes are now annotated with values in the current co-ordinate
+                  Frame of the supplied NDF.
+
             \item Information describing the co-ordinate Frames available
                   in the supplied NDF is stored with the DATA picture in 
                   the AGI graphics database.
-
-            \item Axes are now annotated with values in the current co-ordinate
-                  Frame of the supplied NDF.
 
             \item There is now much greater control over the appearance
                   of the axes or border. This is provided through the STYLE and
@@ -38292,10 +38292,12 @@ plotting application.
                                TRUE) instead of FALSE.
                   \item [BORDER] The default value is now the current value 
                                (initially FALSE) instead of FALSE.
-                  \item [CENTRE] This is now a literal string value which
-                               supplies the co-ordinates of the central
-                               point within the current co-ordinate Frame
-                               of the NDF.
+                  \item [CENTRE] This is now a literal string value 
+                               which should be given the formatted 
+                               co-ordinates of the position to put at the
+                               centre of the picture. These co-ordinates
+                               should be expressed within the current 
+                               co-ordinate Frame of the NDF.
                   \item [FILL] The default value is now TRUE if the input
                                NDF is 1-dimensional, and FALSE otherwise.
                   \item [XMAGN] This used to be the number of device
@@ -38319,10 +38321,12 @@ plotting application.
                   the position of each pixel within the original 2-d image.
 
             \item The horizontal axis is now annotated using the 
-                  current co-ordinate Frame of the supplied NDF. A
-                  specific axis within the current Frame may be used,
-                  or alternaively, the distance from the starting point
-                  may be used.
+                  current co-ordinate Frame of the supplied NDF. If this
+                  has more than one dimension, then the horizontal axis 
+                  can be annotated using any specified axis in the
+                  current Frame. Alternatively, the distance from the starting 
+                  point to each position on the horizontal axis may be
+                  used for the annotation.
 
             \item There is now much greater control over the appearance
                   of the plot. This is provided through the STYLE
@@ -38360,7 +38364,7 @@ plotting application.
             \item Any floating point NaN or Inf values in the supplied
                   HDS object are now converted to the appropriate Starlink 
                   bad value. This occurs even if the object already has
-                  the appropriate primative data representation for the
+                  the appropriate primitive data representation for the
                   machine in use.
          \end{itemize}
 
@@ -38409,14 +38413,15 @@ plotting application.
          In addition to numerical axis values, they also contain an
          integer identifier for each position, and comments describing the
          available co-ordinate Frames. The positions are supplied by the
-         user in a file or in response to parameter prompts. 
+         user in a file or in response to parameter prompts. Alternatively,
+         the pixel centres in a specified NDF may be used.
 
-   \item [\htmlref{LISTSHOW}{LISTSHOW}] Shows the positions
+   \item [\htmlref{LISTSHOW}{LISTSHOW}] Shows a sub-set of the positions
          contained within a \emph{positions list} text file, in any 
          of the co-ordinate Frames described within the file. It can also
-         extract a subset of the positions and write it to a new
+         write the selected positions to a new
          positions list. The positions are displayed on the screen, and
-         can also be marker on the current graphics device in a variety
+         can also be marked on the current graphics device in a variety
          of ways.
 
    \item [\htmlref{PROFILE}{PROFILE}] Produces a 1-dimensional NDF
