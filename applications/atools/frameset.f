@@ -98,6 +98,9 @@
 *  Status:
       INTEGER STATUS
 
+*  External References:
+      EXTERNAL AST_ISAFRAME
+
 *  Local Variables:
       INTEGER RESULT
       INTEGER FRAME
