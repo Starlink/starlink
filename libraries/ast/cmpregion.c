@@ -1641,6 +1641,14 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 *     - A NULL pointer value will be returned if this function is
 *     invoked with the AST error status set, or if it should fail for
 *     any reason.
+
+*  Deficiencies:
+*     - Currently, this function does not attempt to map the component
+*     Regions into the current Frame of the parent Region structure.
+*     Both components should be mapped into the current Frame, and if the
+*     resulting base->current Mappings in *both* remapped component Regions are
+*     UnitMaps, then a new CmpRegion should be created from the re-mapped
+*     Regions.
 */
 
 /* Local Variables: */
