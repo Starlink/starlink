@@ -23,7 +23,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 AC_CHECK_HEADERS([jpeglib.h])
 AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
-STAR_DECLARE_DEPENDENCIES(build, [ems gwm mers nbs pcs sae starx tcl tk])
+STAR_DECLARE_DEPENDENCIES(build, [ems gwm mers nbs jpeg pcs sae starx tcl tk])
 
 STAR_LATEX_DOCUMENTATION([sun186 sun219])
 
