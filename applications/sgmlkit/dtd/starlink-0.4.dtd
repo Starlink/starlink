@@ -124,39 +124,30 @@
 		#fixed "docsumma"
 	>
 
-<!--========== Notations ==========
+<!--========== Notations ==========-->
+<!--
+  Read in the set of defined notations.
 
-  TeX and LaTeX notations defined using the ISBN prefix, as defined in
-  ISO/IEC 9070:1991, `Information Technology - SGML support facilities
-  - Registration procedures for public text owner identifiers'
+  These are kept in a separate file, because one of the notations (at
+  present) defines data attributes (see 8879, Sect. 11.4).  If we want
+  to define, in the DTD subset, entities which use any of these
+  attributes, the notation declaration must come first (see
+  Sect. 11.4.1.2, whereas notation definitions can be used before they
+  are defined (Sect. 11.4.1.1)).  We can arrange this by explicitly
+  reading in the notation declarations in the DTD subset using the
+  formula below.  This is certainly a bit clunky, but clear.
 
-  JPEG notation from the recommendations in ISO/IEC JTC1/WG4 N1958:
-  `Information Processing - Text and office systems - Using SGML
-  Public Identifiers for Specifying Data Notations'.  GIF, EPS and
-  linespecific notations from DocBook's dbnotn.mod module.
+  The subset defines the entity %notations-read to be IGNORE, so that
+  the subset isn't read twice.
 -->
-<!notation tex   public 
-  "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
-<!notation latex public 
-  "+//ISBN 0-201-52983//NOTATION LaTeX: A document preparation system//EN">
-<!notation latexpicture public
-  "+//ISBN 0-201-52983//NOTATION LaTeX picture environment//EN">
-<!notation metapost public
-  "+//IDN cm.bell-labs.com/who/hobby/MetaPost.html//NOTATION MetaPost//EN">
-<!NOTATION JPEG     PUBLIC 
-  "ISO/IEC 10918:1993//NOTATION Digital Compression and Coding of
-    Continuous-tone Still Images (JPEG)//EN">
-<!NOTATION EPS      PUBLIC
-  "+//ISBN 0-201-18127-4::Adobe//NOTATION PostScript Language Ref. Manual//EN">
-<!NOTATION GIF87a   PUBLIC
-  "-//CompuServe//NOTATION Graphics Interchange Format 87a//EN">
-<!notation linespecific system
-  "line ends and leading white space must be preserved in output">
+<!entity % notations-read "INCLUDE">
+<![ %notations-read [
 
-<!entity % text.figure.notations 'linespecific | latexpicture | metapost'
-	-- Figure notations which use only SGML characters (terminology? see
-	   8879, 9.2), which can therefore be included directly within
-	   figurecontent element -->
+<!entity % notations-subset 
+  PUBLIC "-//Starlink//DTD Notation Declarations//EN">
+%notations-subset;
+
+]]>
 
 <!--========== Parameter entities for configuration ==========-->
 <!entity % DocClass "SUN">
@@ -846,8 +837,8 @@
 		(numbered | unnumbered)
 		unnumbered
 	notation	-- the notation: fixed as LaTeX --
-		notation(latex) 
-		#fixed latex
+		notation(latexmaths) 
+		#fixed latexmaths
 	>
 ]]>
 <!element MEQNARRAY	- - (mline+)>
@@ -863,8 +854,8 @@
 <!element M		- - (#pcdata)>
 <!attlist (m | mline | mequation)
 	notation	-- the notation: fixed as LaTeX --
-		notation(latex) 
-		#fixed latex
+		notation(latexmaths) 
+		#fixed latexmaths
 	>
 
 
