@@ -1,9 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
-dnl    Initialisation: package name and version number, this isn't actually
-dnl    photom of course, but we need to declare it as such so it gets installed
-dnl    in the correct place.
+dnl    Initialisation: package name and version number
 AC_INIT(photom, 1.9-0, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
@@ -13,7 +11,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([photomhelp.f])
+AC_CONFIG_SRCDIR([photom_mon.f])
 
  
 dnl    Include defaults for Starlink configurations
@@ -31,21 +29,23 @@ dnl    we need to link against this library, it will be included by default
 dnl    if it exists in this case.
 AC_CHECK_LIB(cc_dynamic, restFP)
 
+dnl dependances on starlink packages
+STAR_DECLARE_DEPENDENCIES(build, [ard fio grp ndf agi sgs pgp gns gks])
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl    Need "hlib" command to build the help library.
-STAR_CHECK_PROGS(hlib)
-
-dnl    We're building a help library here, so tell the configure system 
-dnl    about it so it'll build and install correctly
-STAR_HELP_FILES(photomhelp.shl)
+dnl    We have a SUN document, we should probably tell people its there
+STAR_LATEX_DOCUMENTATION(sun45)
+STAR_DOC_FILES(sun45fig.ps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile component.xml)
+
+dnl    Need to go into sub directories
+AC_CONFIG_SUBDIRS([subs tasks help])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

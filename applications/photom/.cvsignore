@@ -17,3 +17,12 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
+photom_mon
+testphotom
+sun45.aux
+sun45.htx
+sun45.htx_tar
+sun45.log
+sun45.ps
+sun45.toc
+*.ifc
