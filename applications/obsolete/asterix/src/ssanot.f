@@ -34,6 +34,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     15 Feb 95 : V1.8-1 Use BDI and WCI for coord stuff (DJA)
 *      4 Oct 95 : V2.0-0 Full ADI port (DJA)
+*      9 Feb 96 : V2.0-1 Removed SSI_ASSOCI (DJA)
 *
 *    Type definitions :
 *
@@ -83,14 +84,13 @@
 
       LOGICAL               	SSET, BSET              ! Plot attributes set
       LOGICAL               	ERR_OK                  ! Positional errors there?
-      LOGICAL               	IS_SET                  ! Is the SSDS a set?
       LOGICAL               	MULTI                   ! Input is multi-graph?
       LOGICAL               	OK                      ! Validity test
 *
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSANOT Version 2.0-0' )
+        PARAMETER           ( VERSION = 'SSANOT Version 2.0-1' )
 *-
 
 *  Check status
@@ -107,7 +107,7 @@
      :                STATUS )
 
 *  Get source list
-      CALL SSI_ASSOCI( 'LIST', 'READ', SID, IS_SET, STATUS )
+      CALL USI_ASSOC( 'LIST', 'SSDSset|SSDS', 'READ', SID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get number of sources in source list
