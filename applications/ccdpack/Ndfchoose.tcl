@@ -616,6 +616,9 @@
 #-----------------------------------------------------------------------
 #  Should be called if some of the displayed (selected) plot or info
 #  windows may have become out of date.
+         update idletasks
+         set oldbind [ bind $itk_interior <Configure> ]
+         bind $itk_interior <Configure> ""
          foreach slot { A B } {
             if { $inview($slot) == $slot } {
                ndfselect $slot 0
@@ -623,6 +626,9 @@
                ndfselect $slot $inview($slot)
             }
          }
+         wm geometry $itk_interior ""
+         update idletasks
+         bind $itk_interior <Configure> $oldbind
       }
 
 
@@ -696,7 +702,7 @@
                          [ winfo reqheight $itk_interior ] ]
          if { $xinc != 0 || $yinc != 0 } {
             set oldbind [ bind $itk_interior <Configure> ]
-            bind $itk_interior ""
+            bind $itk_interior <Configure> ""
             configure -viewport [ list [ expr [ lindex $viewport 0 ] + $xinc ] \
                                        [ expr [ lindex $viewport 1 ] + $yinc ] ]
             update idletasks
