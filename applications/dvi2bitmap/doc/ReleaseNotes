@@ -1,3 +1,9 @@
+<subsect id=rn-0.9-4 export>Release 0.9-4
+
+<p>No functionality change.  The only difference from release 0.9-4 is
+to the packaging for Starlink nodes (added a working <code/export_run>
+target).
+
 <subsect id=rn-0.9-3 export>Release 0.9-3
 
 <p>No significant added functionality to the main program, but:
