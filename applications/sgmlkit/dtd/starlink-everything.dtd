@@ -10,5 +10,5 @@
 <!entity % Feature.Everything 'include'>
 
 <!entity % Starlink.general
-	public "-//Starlink//DTD Starlink General//EN">
+	public "-//Starlink//DTD Starlink General 0.4//EN">
 %Starlink.general;
