@@ -39,7 +39,6 @@
 *    Global constants :
 *
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 	INCLUDE 'PRM_PAR'
 	INCLUDE 'FIT_PAR'
 *    Structure definitions :
@@ -156,7 +155,6 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	IMPLICIT NONE
 *    Global constants :
 	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
 *    Import :
         INTEGER			DID			! Dataset id
 	INTEGER NDS			! Current dataset number
@@ -176,7 +174,6 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	INTEGER N			! Current bound number
 	INTEGER NVAL			! No of values
 
-	LOGICAL UNIF			! Uniform sized axis bins?
 	LOGICAL WID			! Axis width available?
 *-
 
@@ -188,10 +185,12 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
       DO AXNO = 1, NMDIM
 
 *    Get axis values
-	  CALL BDI_MAPAXVAL( DID,'READ',AXNO,AXPTR,STATUS)
-	  IF(STATUS.NE.SAI__OK)THEN
-*       No axis data available, assume spot values 0,1,2,3,4... (i.e. both
-*       sets of bounds the same)
+        CALL BDI_AXMAPR( DID, AXNO, 'Data', 'READ, AXPTR, STATUS )
+
+	IF(STATUS.NE.SAI__OK)THEN
+
+*     No axis data available, assume spot values 0,1,2,3,4... (i.e. both
+*     sets of bounds the same)
 	    CALL ERR_ANNUL(STATUS)
 	    CALL ARR_REG1R(0.0,1.0,IDIMM(AXNO),LBOUND(N),STATUS)
 	    CALL ARR_REG1R(0.0,1.0,IDIMM(AXNO),UBOUND(N),STATUS)
@@ -201,16 +200,10 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	  ELSE
 
 *    Get axis bin size info
-	    CALL BDI_CHKAXWID(DID,AXNO,WID,UNIF,NVAL,STATUS)
-	    IF(WID)THEN
-	      CALL BDI_MAPAXWID( DID,'READ',AXNO,AXWPTR,STATUS)
-	      IF((.NOT.UNIF).AND.(NVAL.NE.IDIMM(AXNO)))THEN
-	        CALL MSG_SETI('NDS',NDS)
-	        CALL MSG_OUT(' ','Axis width array is wrong size in'//
-     :          ' dataset ^NDS - not used',STATUS)
-	        WID=.FALSE.
-	      ENDIF
-	    ENDIF
+	    CALL BDI_AXCHK( DID, AXNO, 'Width', WID, STATUS )
+	    IF ( WID ) THEN
+	      CALL BDI_AXMAPR( DID, AXNO, 'Width', 'READ',AXWPTR,STATUS)
+	    END IF
 
 *    Set up bounds
 	    CALL FIT_PREDSET_AXBOUND_SET(IDIMM(AXNO),%VAL(AXPTR),WID,
