@@ -14,7 +14,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-dnl AC_CONFIG_SRCDIR([gks_err.msg])
+dnl AC_CONFIG_SRCDIR([pgplot_link])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
@@ -25,23 +25,14 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
-dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
-
-dnl    Declare the build and use dependencies for this package
-dnl STAR_DECLARE_DEPENDENCIES(build, [cnf])
-dnl STAR_DECLARE_DEPENDENCIES(link,  [gwm ems])
-
-dnl    List the sun/ssn/... numbers which document this package and
-dnl    which are present as .tex files in this directory.
-dnl    STAR_LATEX_DOCUMENTATION(sun83)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile])
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([src drivers drivers fonts cpg])
+AC_CONFIG_SUBDIRS([src drivers fonts cpg])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
