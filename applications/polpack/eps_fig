@@ -18,7 +18,7 @@ contour "stk(,,1)" noclear noaxes mode=perc percentiles=\[30,60,80,93,99.9\] nok
 "style='width=1,style=1,colour=black'"
 
 polplot noclear noaxes cat=stk3 vscale=10 keyvec=5 \
-   "keystyle='width=2,size=1.0,colour=black,width(vec)=4'" "style='width(vec)=4'"
+   "keystyle='width=2,size=1.0,colour=black,width(vec)=2'" "style='width(vec)=2'"
 
 psmerge -e gks74.ps gks74.ps.1 gks74.ps.2 > cont.eps
 ghostview cont.eps 
