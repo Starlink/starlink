@@ -25,7 +25,7 @@
 *     at the difference between the pixels nearest to each chop
 *     beam. This calculates a middle beam response. (ie the response
 *     at each pixel is the difference between the L and the R
-*     beams.
+*     beams).
 *
 *     This task can be used to generate test data for REMDBM.
 
@@ -44,7 +44,7 @@
 *        VERBOSE. Default is NORM.
 *     OUT = NDF (Write)
 *        Output Dual beam image. Default output name is input name
-*        + _dbm_int(pa)_int(chop). 
+*        plus _dbm_int(pa)_int(chop). 
 *     PA = REAL (Read)
 *        Position angle of chop throw. Positive is anti-clockwise starting
 *        from North. The angle should be specified in degrees.
@@ -69,6 +69,8 @@
 *     - A variance array is created if present in the input image.
 *     - If a quality array is present in the input image it is used
 *       to generate a bad pixel mask in the output image and is removed.
+*     - Bad pixels in the input image are treated as zeroes for the
+*       dual beam calculation.
 
 *  Related Applications:
 *     SURF: REMDBM
@@ -78,6 +80,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  1999/06/19 03:01:49  timj
+*     Minor doc patch
+*
 *     Revision 1.5  1999/06/17 03:24:31  timj
 *     Rewrite fits entries if they already exist.
 *
