@@ -1,0 +1,138 @@
+setenv dtor 1.7453293E-2
+setenv noise 0.2
+setenv size 200
+
+# Define the polarisation parameters.
+setenv ii 100
+setenv p 0.01
+setenv th 0.0
+
+# Define the polarimeter constants.
+setenv f 0.98
+setenv ea 1.00
+setenv eb 0.98
+setenv ec 1.02
+setenv ed 1.1
+
+# Create an image of total intensity. This is a smooth ramp function, varying 
+# from 0.5*$ii to 1.5*$ii. Varying intensity is needed since the image 
+# comparison algorithm used in polcal fails if the images are flat.
+maths "exp=0.5*pa+pa*xa/pb+xb*0" pa=$ii pb=$size out=iii lbound=\[1,1\] ubound=\[$size,$size\] accept
+
+# Get images of the polarised intensity, Q and U.
+cmult in=iii scalar=$p out=piii
+cmult in=piii scalar=`calc "exp=cos(2*pb*pc)" pb=$th pc=$dtor` out=qqq
+cmult in=piii scalar=`calc "exp=sin(2*pb*pc)" pb=$th pc=$dtor` out=uuu
+
+# Get images of the the 4 waveplate intensities, applying exposure factors.
+add in1=iii in2=qqq out=temp
+cmult in=temp scalar=0.5 out=i0
+sub in1=iii in2=qqq out=temp
+cmult in=temp scalar=0.5 out=i45
+add in1=iii in2=uuu out=temp
+cmult in=temp scalar=0.5 out=i225
+sub in1=iii in2=uuu out=temp
+cmult in=temp scalar=0.5 out=i675
+
+#  The above are used as the O-ray images. Create the E-ray images
+#  by scaling these by the F factor,and exposure factors.
+cmult in=i0 scalar=`calc exp="pa*pb" pa=$f pb=$eb` out=ei0
+cmult in=i45 scalar=`calc exp="pa*pb" pa=$f pb=$ea` out=ei45
+cmult in=i225 scalar=`calc exp="pa*pb" pa=$f pb=$ed` out=ei225
+cmult in=i675 scalar=`calc exp="pa*pb" pa=$f pb=$ec` out=ei675
+
+# Apply the exposure factors to the O-ray images.
+cmult in=i0 scalar=$ea out=oi0
+cmult in=i45 scalar=$eb out=oi45
+cmult in=i225 scalar=$ec out=oi225
+cmult in=i675 scalar=$ed out=oi675
+
+# Create 8 independant gaussian noise fields which can be added into the 
+# intensity images. Pause for 2 seconds between  each call to creframe
+# to ensure that a different seed is used for the random number generator.
+# (The seed depends on the system time to the nearest second).
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n1
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n2
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n3
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n4
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n5
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n6
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n7
+sleep 2
+creframe xdim=$size ydim=$size typed=gn mean=0 sigma=$noise outpic=n8
+
+# Add these noise fields onto the four intensity images, and set up their
+# variance components.
+setenv var `calc "exp=pa*pa" pa=$noise`
+
+add in1=oi0 in2=n1 out=i0o
+setvar i0o "$var"
+
+add in1=ei0 in2=n2 out=i0e
+setvar i0e "$var"
+
+add in1=oi45 in2=n3 out=i45o
+setvar i45o "$var"
+
+add in1=ei45 in2=n4 out=i45e
+setvar i45e "$var"
+
+add in1=oi225 in2=n5 out=i225o
+setvar i225o "$var"
+
+add in1=ei225 in2=n6 out=i225e
+setvar i225e "$var"
+
+add in1=oi675 in2=n7 out=i675o
+setvar i675o "$var"
+
+add in1=ei675 in2=n8 out=i675e
+setvar i675e "$var"
+
+# Set up the correct polpack extension items.
+setext i0o POLPACK put WPLATE "ctype=_REAL" cvalue=0.0 shape=0 noloop xtype=POLPACK 
+setext i0o POLPACK put RAY "ctype=_CHAR*1" cvalue=O shape=0 noloop xtype=POLPACK 
+setext i0o POLPACK put IMGID "ctype=_CHAR" cvalue=A shape=0 noloop xtype=POLPACK 
+setext i45e POLPACK put WPLATE "ctype=_REAL" cvalue=0.0 shape=0 noloop xtype=POLPACK 
+setext i45e POLPACK put RAY "ctype=_CHAR*1" cvalue=E shape=0 noloop xtype=POLPACK 
+setext i45e POLPACK put IMGID "ctype=_CHAR" cvalue=A shape=0 noloop xtype=POLPACK 
+
+setext i45o POLPACK put WPLATE "ctype=_REAL" cvalue=45.0 shape=0 noloop xtype=POLPACK 
+setext i45o POLPACK put RAY "ctype=_CHAR*1" cvalue=O shape=0 noloop xtype=POLPACK 
+setext i45o POLPACK put IMGID "ctype=_CHAR" cvalue=B shape=0 noloop xtype=POLPACK 
+setext i0e POLPACK put WPLATE "ctype=_REAL" cvalue=45.0 shape=0 noloop xtype=POLPACK 
+setext i0e POLPACK put RAY "ctype=_CHAR*1" cvalue=E shape=0 noloop xtype=POLPACK 
+setext i0e POLPACK put IMGID "ctype=_CHAR" cvalue=B shape=0 noloop xtype=POLPACK 
+
+setext i225o POLPACK put WPLATE "ctype=_REAL" cvalue=22.5 shape=0 noloop xtype=POLPACK 
+setext i225o POLPACK put RAY "ctype=_CHAR*1" cvalue=O shape=0 noloop xtype=POLPACK 
+setext i225o POLPACK put IMGID "ctype=_CHAR" cvalue=C shape=0 noloop xtype=POLPACK 
+setext i675e POLPACK put WPLATE "ctype=_REAL" cvalue=22.5 shape=0 noloop xtype=POLPACK 
+setext i675e POLPACK put RAY "ctype=_CHAR*1" cvalue=E shape=0 noloop xtype=POLPACK 
+setext i675e POLPACK put IMGID "ctype=_CHAR" cvalue=C shape=0 noloop xtype=POLPACK 
+
+setext i675o POLPACK put WPLATE "ctype=_REAL" cvalue=67.5 shape=0 noloop xtype=POLPACK 
+setext i675o POLPACK put RAY "ctype=_CHAR*1" cvalue=O shape=0 noloop xtype=POLPACK 
+setext i675o POLPACK put IMGID "ctype=_CHAR" cvalue=D shape=0 noloop xtype=POLPACK 
+setext i225e POLPACK put WPLATE "ctype=_REAL" cvalue=67.5 shape=0 noloop xtype=POLPACK 
+setext i225e POLPACK put RAY "ctype=_CHAR*1" cvalue=E shape=0 noloop xtype=POLPACK 
+setext i225e POLPACK put IMGID "ctype=_CHAR" cvalue=D shape=0 noloop xtype=POLPACK 
+
+# Calculate the Stokes parameters.
+polcal in='"i0?,i45?,i225?,i675?"' pmode=lin out=cube
+
+# Calculate the polarisation vectors
+polvec in=cube i=i p=p theta=th ip=pi
+
+# Finished.
+echo "Polarisation angles (degrees) in th.sdf"
+echo "Polarised intensity in pi.sdf"
+echo "Fractional polarisations in p.sdf"
+echo "Measured total intensity in i.sdf"
+echo "Real total intensity in iii.sdf"
