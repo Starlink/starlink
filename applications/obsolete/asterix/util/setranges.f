@@ -153,7 +153,7 @@
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Numeric data object required', STATUS )
       END IF
-      CALL BDA_MAPR( VFID, 'Data', 'READ', VALPTR, STATUS )
+      CALL BDI_MAPR( VFID, 'Data', 'READ', VALPTR, STATUS )
 
 *  Now the range object - if not primitive then check for the case where
 *  we have a spaced data array.
@@ -168,7 +168,7 @@
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Numeric data object required', STATUS )
       END IF
-      CALL BDA_MAPR( RFID, 'Data', 'READ', RNGPTR, STATUS )
+      CALL BDI_MAPR( RFID, 'Data', 'READ', RNGPTR, STATUS )
 
 *  Check data objects have same shape
       IF ( VALVAL .NE. RNGVAL ) THEN
