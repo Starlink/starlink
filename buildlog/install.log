@@ -282,7 +282,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jul 2, 2003 4:15:06 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jul 3, 2003 4:15:22 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -674,7 +674,6 @@ dist:
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 435 files to /apps/cvsbuild/java/source/splat/docs/splat
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -740,7 +739,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 48 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 49 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -843,10 +842,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
+     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -871,4 +870,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 45 seconds
+Total time: 46 seconds

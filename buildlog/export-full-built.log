@@ -129,6 +129,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -418,7 +419,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jul 2, 2003 4:36:20 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jul 3, 2003 4:36:37 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1491,8 +1492,8 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
-    [javac] Compiling 34 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 63 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 35 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 65 files to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
 
@@ -1523,7 +1524,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 48 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 49 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -1716,10 +1717,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
+     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -2523,4 +2524,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 51 seconds
+Total time: 4 minutes 49 seconds
