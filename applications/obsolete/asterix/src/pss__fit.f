@@ -1387,7 +1387,6 @@
       REAL			ERR
       REAL                     	SCALE                   ! Axis scale value
       REAL                     	LB(PSS__FITNPAR)        ! Copies of IN_LB
-      REAL			SPARR(2)		! Spaced array values
       REAL                     	UB(PSS__FITNPAR)        ! Copies of IN_UB
 
       INTEGER			BDID			! O/p binned object
@@ -1606,16 +1605,10 @@
         CALL BDI_AXPUT0C( GID, FAX, 'Units', IM_UNITS, STATUS )
       END IF
       IF ( XAX .GT. 0 ) THEN
-        SPARR(1) = AXV(1,GAX(XAX).BASE)
-        SPARR(2) = GAX(XAX).SCALE/AX_TOR(1)
-        CALL BDI_AXPUT1R( GID, XAX, 'SpacedData', 2, SPARR, STATUS )
         CALL BDI_AXPUT0C( GID, XAX, 'Label', AX_LABEL(1), STATUS )
         CALL BDI_AXPUT0C( GID, XAX, 'Units', AX_UNITS(1), STATUS )
       END IF
       IF ( YAX .GT. 0 ) THEN
-        SPARR(1) = AXV(2,GAX(YAX).BASE)
-        SPARR(2) = GAX(YAX).SCALE/AX_TOR(2)
-        CALL BDI_AXPUT1R( GID, YAX, 'SpacedData', 2, SPARR, STATUS )
         CALL BDI_AXPUT0C( GID, YAX, 'Label', AX_LABEL(2), STATUS )
         CALL BDI_AXPUT0C( GID, YAX, 'Units', AX_UNITS(2), STATUS )
       END IF
