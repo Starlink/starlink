@@ -117,7 +117,6 @@
       INTEGER P_OUTV                    ! Pointer to OUT's variance array
       INTEGER P_REF                     ! Pointer to REF's data array
       INTEGER REF                       ! Identifier for REF (input)
-      LOGICAL BAD                       ! Bad pixels present ?
       LOGICAL VAR                       ! Varience array present in IN ?
 
 *  Check inherited global status.
