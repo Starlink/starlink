@@ -15,8 +15,8 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #     Shell script
 #
 #  <purpose>
-#     Generate HTML or LaTeX files from an SGML source file, marked up using
-#     one of the Starlink DTDs.
+#     Generate HTML or LaTeX files from an SGM or XML source file,
+#     marked up using one of the Starlink DTDs.
 #
 #  <description>
 #     Given a single argument, specifying an SGML source file, this
@@ -29,7 +29,13 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #  <argumentlist>
 #     <parameter>arg1
 #     <type>filename
-#     <description>SGML file to be processed.
+#     <description>SGML or XML file to be processed.  The input file
+#	is taken to be SGML or XML depending on whether its file
+#	extension is <code>.sgml</code> or <code>.xml</code>.  There
+#	is not, at present, any other way of forcing this.  If there's 
+#	no extension, or the script doesn't recognise the extension,
+#	it takes a guess at SGML; if that was a bad move, you'll soon
+#	know about it.
 #
 #  <diytopic>Options
 #     <dl>
@@ -126,7 +132,8 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #-
 
 LIBDIR=${STARLINK_SGML_DIR}/lib
-DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
+STARLINKDECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
+XMLDECL=${STARLINK_SGML_DIR}/dtd/xml.decl
 ICONTARBALL=${STARLINK_SGML_DIR}/lib/icons.tar
 STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
 
@@ -146,6 +153,12 @@ TARGETFORMAT=0			# html
 OPTIONS=
 
 DEBUGGING=false
+# A file MANIFEST is always generated, and only files listed in this
+# are included in the final tarball.  If USEMANIFEST is true, then the
+# manifest written by the jade run is used as the basis for this
+# generated manifest; if false, then everything in the work directory
+# is scooped up, junk and all.  Since the jade manifest is now reliable,
+# this option is almost completely redundant.
 USEMANIFEST=true
 VERBOSE=true
 NORMTYPE=simplenorm  # simple normalisation by default
@@ -259,7 +272,27 @@ if [ ! -r $SGMLSRC ]; then
     exit 1
 fi
 
+srcext=`expr $SGMLSRC : '.*\(\.[a-z]*\)$'`
+case $srcext in
+    .sgml) usedecl=$STARLINKDECL
+	srctype=SGML
+	;;
+    .xml)  usedecl=$XMLDECL
+	srctype=XML
+	;;
+    *) echo "$PROGNAME:W: I don't recognise the file extension $srcext. Guessing..."
+	usedecl=$SGMLDECL
+	srctype=SGML
+	;;
+esac
+
+# Get the basename of the input file (simulate basename)
+srcroot=`echo $SGMLSRC | sed -e 's+^\(.*/\)\?\(.*\)\.[a-zA-Z0-9]*$+\2+'`
+    
 $VERBOSE && echo "$PROGNAME:I: Processing $SGMLSRC..."
+$VERBOSE && echo "$PROGNAME:I: filename root is $srcroot"
+$VERBOSE && echo "$PROGNAME:I: processing as $srctype"
+
 case $TARGETFORMAT in
     0)  $VERBOSE && echo "$PROGNAME:I: Target HTML...";
 	PACKAGEEXT='.htx' ;;
@@ -272,12 +305,12 @@ esac
 # been set by options above.
 SRCDIR=`dirname $SGMLSRC`
 test -n "$PACKAGEDIR" \
-    || PACKAGEDIR=`basename $SGMLSRC | sed 's/\(\.sgml\)\?$/'$PACKAGEEXT/`
+    || PACKAGEDIR=`basename $SGMLSRC | sed s/$srcext\$/$PACKAGEEXT/`
 
 # Make sure the TARNAME variable has been set, and make sure it's
-# an abosulte pathname
+# an absolute pathname
 test -n "$TARNAME" \
-    || TARNAME=`echo $SGMLSRC | sed 's/\(\.sgml\)\?$/.tar/'`
+    || TARNAME=`echo $SGMLSRC | sed s/$srcext\$/.tar/`
 TARNAME=`expr $TARNAME : '\(/.*\)' \| $PWD/$TARNAME`
 
 
@@ -355,7 +388,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     $VERBOSE && echo "$PROGNAME:I: Pre-processing..."
     $run $JADE -t sgml -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
-	    $DECL $SGMLSRC \
+	    $usedecl $SGMLSRC \
 	    > $tempdest
     test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
 
@@ -408,7 +441,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     $VERBOSE && echo "$PROGNAME:I: Generating output..."
     $run $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/sl.dsl#html \
-	    $DECL $SGMLSRC \
+	    $usedecl $SGMLSRC \
 	    > $tempdest
 
     # create the file named MANIFEST, removing duplicates (ie, some gifs)
@@ -420,6 +453,15 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
     fi
 	
+    # Copy index.html to $srcroot.html (latter required by HTX system)
+    if test -e $srcroot.html; then
+        $VERBOSE && echo "$PROGNAME:W: file $srcroot.html already exists.  Odd"
+    else
+        $VERBOSE && echo "$PROGNAME:I: copying index.html to $srcroot.html"
+        cp index.html $srcroot.html
+    fi
+    echo $srcroot.html >> MANIFEST
+
 
 elif [ $TARGETFORMAT -eq 1 ]; then
     # Generate LaTeX
@@ -441,7 +483,7 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 
     $run $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	-d $STYLESHEET/latex/slback.dsl#back.main \
-	$DECL $SGMLSRC \
+	$usedecl $SGMLSRC \
 	> $tempdest
     test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
 
@@ -453,7 +495,7 @@ elif [ $TARGETFORMAT -eq 1 ]; then
     # Generate the final file
     $run $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	    -d $STYLESHEET/latex/sl.dsl#latex \
-	    $DECL $SGMLSRC \
+	    $usedecl $SGMLSRC \
 	    > $tempdest
 
     if $USEMANIFEST; then
@@ -494,7 +536,7 @@ if [ -r MANIFEST -o -n "$run" ]; then
 		simplenorm)
 		    sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f ;;
 		sgmlnorm)
-		    $run $SGMLNORM -d $DECL $f >$PACKAGEDIR/$f \
+		    $run $SGMLNORM -d $usedecl $f >$PACKAGEDIR/$f \
 			2>>$PACKAGEDIR/sgmlnorm.errors ;;
 		*)
 		    echo "$PROGNAME:W: Impossible normtype=$NORMTYPE.  Doing simple copy"
