@@ -7,13 +7,11 @@
 *
 *    Environment parameters :
 *
-*     MODEL=UNIV(U)
+*     MODEL = UNIV(U)
 *		Object containing model (existing or not)
-*     OVERRIDE=LOGICAL(R)
-*		Overwrite existing model specification?
-*     MODEL_SPEC=LITERAL(R)
+*     SPEC = LITERAL(R)
 *		String containing specification of composite model
-*     VALUES=LITERAL(R)
+*     VALUES = LITERAL(R)
 *               String containing parameter value/limits
 *
 *    Deficiencies :
@@ -40,6 +38,8 @@
 *     14 Dec 94 : V1.8-1 Display ties (DJA)
 *     24 Apr 95 : V1.8-2 Use ADI to store locators (DJA)
 *     11 Jan 1996 : V1.8-3 TSM removed (DJA)
+*     17 Jan 1996 V1.8-4 (DJA):
+*        Various changes to USI usage
 *
 *    Type Definitions :
 *
@@ -48,6 +48,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
@@ -85,7 +86,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION            	! Version id
-        PARAMETER               ( VERSION = 'SEDIT Version 1.8-3' )
+        PARAMETER               ( VERSION = 'SEDIT Version 1.8-4' )
 *-
 
 *    Check status
@@ -97,35 +98,44 @@
 *    Version
       CALL MSG_PRNT( VERSION )
 
-*    Form or retrieve fit_model object
-      CALL USI_DEXIST('MODEL','UPDATE',FLOC,STATUS)
+*  Associate input
+      CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', FID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
 
-      IF ( STATUS .EQ. PAR__ERROR ) THEN
+*    User abort
+        IF ( (STATUS.EQ.PAR__NULL) .OR. (STATUS.EQ.PAR__ABORT) ) THEN
+          GOTO 99
 
-*      Object doesn't exist - Create it
-        CALL ERR_ANNUL(STATUS)
-        CALL USI_TASSOCO( 'MODEL','FIT_MODEL',FID,STATUS)
+*    Didn't exist
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+          SNEW = .TRUE.
+          CALL USI_CREAT( 'MODEL', ADI__NULLID, FID, STATUS )
+          CALL ADI1_GETLOC( FID, FLOC, STATUS )
+          CALL DAT_RETYP( FLOC, 'FIT_MODEL', STATUS )
+          CALL DAT_NEWC(FLOC,'SPEC',80,0,0,STATUS)
+          CALL DAT_NEWC(FLOC,'POLISH',80,0,0,STATUS)
+          CALL DAT_NEW(FLOC,'NCOMP','_INTEGER',0,0,STATUS)
+
+        END IF
+
+*  Opened ok?
+      ELSE
+
+*    Test type
         CALL ADI1_GETLOC( FID, FLOC, STATUS )
-        CALL DAT_NEWC(FLOC,'SPEC',80,0,0,STATUS)
-        CALL DAT_NEWC(FLOC,'POLISH',80,0,0,STATUS)
-        CALL DAT_NEW(FLOC,'NCOMP','_INTEGER',0,0,STATUS)
-        SNEW = .TRUE.
-
-      ELSE IF ( STATUS .NE. PAR__NULL ) THEN
-
-*      Object already exists, so check it :
-        CALL DAT_TYPE(FLOC,TYP,STATUS)
+        CALL DAT_TYPE( FLOC, TYP, STATUS )
         IF ( TYP .NE. 'FIT_MODEL' ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Not a fit_model data object', STATUS )
+          GOTO 99
         END IF
         SNEW = .FALSE.
-        CALL ADI1_PUTLOC( FLOC, FID, STATUS )
 
       END IF
-      IF (STATUS.NE.SAI__OK) GOTO 99
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Declare file to user :
+*  Declare file to user :
       CALL DISP_FILENAM( FID, 'Model', STATUS )
 
 *    History file entry :
@@ -281,7 +291,6 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Delete old model if found :
-      CALL USI_DASSOC( 'MODEL', 'WRITE', FLOC, STATUS )
       CALL DAT_THERE( FLOC, 'PMODEL', THERE, STATUS )
       IF ( THERE ) THEN
         CALL DAT_ERASE( FLOC, 'PMODEL', STATUS )
@@ -296,8 +305,8 @@
 
 *    Display menu and enter new model
       CALL FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-      CALL USI_GET0C('MODEL_SPEC',MODSPEC,STATUS)
-      CALL USI_CANCL('MODEL_SPEC',STATUS)
+      CALL USI_GET0C('SPEC',MODSPEC,STATUS)
+      CALL USI_CANCL('SPEC',STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Extract model components and check them :
@@ -342,7 +351,7 @@
 	       CALL ERR_REP('UNREC_MOD','Unrecognised model component ^UMOD',
      :         STATUS)
 	       CALL ERR_FLUSH(STATUS)
-	       CALL USI_CANCL('MODEL_SPEC',STATUS)
+	       CALL USI_CANCL('SPEC',STATUS)
                GOTO 99
             END IF
          END IF
@@ -352,7 +361,7 @@
       IF (NLB.NE.NRB.OR.NMCOMP.NE.NOP+1) THEN
         CALL ERR_REP('BAD_SYN','Bad model syntax',STATUS)
         CALL ERR_FLUSH(STATUS)
-        CALL USI_CANCL('MODEL_SPEC',STATUS)
+        CALL USI_CANCL('SPEC',STATUS)
         GOTO 99
       END IF
 
@@ -362,7 +371,6 @@
 
 *    Write components to fit_model object :
       CALL DAT_NEW(FLOC,'PMODEL','PRIM_MODEL',1,NMCOMP,STATUS)
-      CALL USI_DASSOC('MODEL','UPDATE',FLOC,STATUS)
       CALL CMP_PUT0C(FLOC,'SPEC',MODSPEC,STATUS)
       CALL CMP_PUT0C(FLOC,'POLISH',POLISH,STATUS)
       CALL CMP_PUT0I(FLOC,'NCOMP',NMCOMP,STATUS)
