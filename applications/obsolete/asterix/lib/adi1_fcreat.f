@@ -134,6 +134,7 @@
 *      Get object class
         IF ( (ID.NE.ADI__NULLID) .AND. .NOT. DERVD ) THEN
           CALL ADI_TYPE( ID, HTYPE, STATUS )
+
         END IF
 
         NDIM = 0

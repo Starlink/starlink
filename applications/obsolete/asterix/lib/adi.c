@@ -82,7 +82,6 @@
  *
  *     does adix_name work on slices/cells,putid'd objects?
  *     encapsulate global variables in a ADIinterpreter object
- *     method specialiation on linking class, eg. Write(RMF,Array->HDSfile)
  *     remove direct references to stderr in err.lib
  *     argument default values
  *     where to trap Print(stream,obj) method creation by
@@ -3042,14 +3041,14 @@ void ADIkrnlLocDat( ADIobj *id, char *name, int nlen, int flgs,
   ADIlogical    iscreate =              /* Create access requested? */
 		    (flgs & DA__CREATE);
 
-/* Check inherited global status on entry */
-  _chk_stat;
-
-/* Default field values
+/* Default field values */
   objreq->data = id;
   objreq->parent = ADI__nullid;
   objreq->name = ADI__nullid;
   objreq->lentry = NULL;
+
+/* Check inherited global status on entry */
+  _chk_stat;
 
 /* Decide on component access type from name string. Note we can't */
 /* distinguish between class members and structure components yet */
@@ -4559,6 +4558,7 @@ void adix_putid( ADIobj id, char *name, int nlen, ADIobj value,
       if ( _han_ref(value) == 1 ) {
 	_han_pid(value) = objreq.parent;
 	_han_name(value) = objreq.name;
+
 	}
 
       if ( _valid_q(objreq.parent) )
