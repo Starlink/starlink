@@ -1,0 +1,116 @@
+.help kappa Starlink kappa
+.nf
+KAPPA---the Kernel APplication PAckage---comprises general-purpose
+applications, particularly for image processing, data visualisation,
+and manipulating components in the Starlink standard data format:
+the NDF.  KAPPA provides facilities that integrate with specialised
+packages such as CCDPACK, ESP, Figaro, IRAS90, JCMTDR, PHOTOM, PISA,
+SPECDRE, and TSP.  Topic "Role of KAPPA" explains this more fully.
+
+KAPPA commands are available from both the UNIX C-shell (and
+variants) and from the ICL command language.  The "Functionality"
+topics summarise the specific data-processing facilities, and
+general processing style of KAPPA.  
+
+Type ? to see the main help topics.
+
+
+Functionality_Commands
+
+Currently, KAPPA has about 180 commands in total, and provides
+the following facilities for data processing:
+
+  o FITS readers that generate NDFs and text tables, and the import
+    and export of ancillary data through the NDF FITS extension;
+  o generation of test data, and NDF creation from text files;
+  o setting and examining NDF components;
+  o definition or calculation of a sky co-ordinate system for use in
+    conjunction with IRAS90 tools;
+  o arithmetic including a powerful application that handles
+    expressions;
+  o pixel and region editing, including polygons and circles; 
+    re-flagging of bad pixels by value or by median filtering; and 
+    pasting arrays over others;
+  o masking of regions, and of pixels whose variances are too large;
+  o configuration change: flip, rotate, shift, subset, change
+    dimensionality;
+  o forming image mosaics; normalisation of NDF pairs;
+  o compression and expansion of images;
+  o generalised resampling of NDFs using arbitrary transformations;
+  o filtering: box, Gaussian, and median smoothing; very efficient
+    Fourier transform, convolution;
+  o deconvolution: maximum-entropy, Lucy-Richardson, Wiener filter;
+  o two-dimensional-surface fitting;
+  o statistics including ordered statistics, histogram; pixel-by-pixel
+    statistics over a sequence of images;
+  o inspection of image values;
+  o centroids of features, particularly stars; stellar PSF fitting;
+  o detail enhancement using histogram equalisation and Laplacian
+    convolution, edge enhancement via a shadow effect, thresholding;
+  o calculation of polarimetry images;
+
+There are also many applications for data visualisation:
+
+  o use of the graphics database, AGI, to pass information about
+    pictures between tasks; tools for the creation, labelling,
+    selection of pictures, and obtaining world and data co-ordinate
+    information from them;
+  o image and greyscale plots with a selection of scaling modes and
+    many options such as axes;
+  o creation, selection, saving and manipulation of colour tables and
+    palettes (for axes, annotation, coloured markers and borders);
+  o snapshot of an image display to hardcopy;
+  o blinking and visibility of image-display planes; and
+  o line graphics: contouring, including overlay; columnar and
+    hidden-line plots of images; histogram; line plots of
+    1-dimensional arrays, and multiple-line plot of images; pie
+    sections and slices through an image; vector plot of image; all
+    of which offer some control of the appearance of plots.
+
+
+Functionality_General
+
+KAPPA handles bad pixels, and processes quality, variance, and other
+information stored within NDFs (cf. topic "Data_Structures" and
+SUN/33).  Although oriented to image processing, many commands will
+work on NDFs of arbitrary dimension and others operate on both
+spectra and images.  In order to achieve generality KAPPA does not
+process non-standard extensions; however, it does not lose
+non-standard ancillary data since it copies extensions to any NDFs
+that it creates.
+
+KAPPA can also process data in other formats, such as FITS and IRAF,
+using an automatic-data conversion facility (SUN/55, SSN/20).  For
+historical reasons, 21 commands in KAPPA still use the old IMAGE
+format (see topic "Data_Structures IMAGE_format"), which does not
+include all the features of the NDF.  A low-priority conversion
+process is underway to transform the remaining to use the NDF-access
+interface (SUN/33).  Once completed KAPPA can finally reach version
+1.0.  See the specifications of individual KAPPA applications for
+details of which applications use the NDF.
+
+Although oriented to image processing, many commands will work on NDFs
+of arbitrary dimension and others operate on both spectra and images.
+Many applications handle all non-complex data types directly, for
+efficient memory and disc usage.  Those that do not will usually
+undergo automatic data conversion to produce the desired result.
+
+KAPPA's graphics are device independent.  X-windows and overlays are
+supported.
+
+
+Requests
+
+KAPPA is continuing to be developed and additional applications
+functionality are envisaged, particularly a graphical-user interface
+for image processing.  [If you wish to suggest new tasks or
+enhancements to existing ones please contact the author.  Small jobs
+may be undertaken quite quickly.  Requests involving substantial
+pieces of work need to gain the support of others to be included in
+Starlink's software plans, and so the best way to influence the
+priority given to KAPPA is to contact the chairman of the Image
+Processing Software Strategy Group.  The Starlink World Wide Web
+pages will periodically contain news of plans and work in progress.]
+KAPPA also receives a high level of support, and bug reports are
+dealt with promptly.
+.endhelp
