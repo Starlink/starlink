@@ -84,7 +84,9 @@
 *     OUT = NDF (Write)
 *        For REBIN this is the name of the NDF that will contain the rebinned 
 *        map. For BOLREBIN or INTREBIN this is the name of the HDS container 
-*        file.
+*        file. In REBIN, if a null response is given, the task will 
+*        immediately exit with good status -- this can be used to
+*        determine the size of the output map without actually regridding it.
 *     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
@@ -117,6 +119,12 @@
 *        The name of the first NDF to be rebinned. The name may also be the
 *        name of an ASCII text file containing NDF and parameter values.
 *        See the notes. REF can include a SCUBA section.
+*     REFPIX( 2 ) = INTEGER (Read)
+*        The coordinate of the reference pixel in the output data
+*        array. This corresponds to the pixel associated with the
+*        specified RA/Dec centre. Default is to use the middle pixel
+*        if a size is specified or the optimal pixel if the default
+*        size is used (see the SIZE parameter).
 *     SHIFT_DX = REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinte frame.
@@ -213,6 +221,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.63  1999/06/16 21:08:41  timj
+*     Add REFPIX and allow OUT=! to be okay
+*
 *     Revision 1.62  1999/05/15 01:50:38  timj
 *     Add TRIM.
 *     Change reference pixel.
@@ -506,6 +517,7 @@ c
       LOGICAL          DEFOUT          ! Take default output files for DESPIKE
       LOGICAL          DESPIKE         ! Is this the despike task
       LOGICAL          DOLOOP          ! Loop for input data
+      LOGICAL          DOREBIN         ! True if we are rebinning the data
       DOUBLE PRECISION DTEMP           ! Scratch double
       INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          FD              ! File descriptor
@@ -695,6 +707,7 @@ c
       DESPIKE  = .FALSE.
       CALCSKY  = .FALSE.
       QMF = .TRUE.
+      DOREBIN  = .TRUE.
 
 
 * Setup taskname (can never have BOLREBIN and INTREBIN)
@@ -1837,6 +1850,27 @@ c
 
             N_PIXELS = MAP_SIZE(1) * MAP_SIZE(2)
 
+*     Allow for the reference pixel to be redefined - this is required
+*     since sometimes the required size if equal to the actual size
+*     but we *want* the ref pixel to be in the middle of the map 
+*     (eg for scan map reduction) - provide the actual value as the
+*     default modified to the centre if the size was different
+
+*     Subvert UBND for now
+            UBND(1) = I_CENTRE
+            UBND(2) = J_CENTRE
+            LBND(1) = 1
+            LBND(2) = 1
+
+*     Note that we use a different range for each value
+
+            CALL PAR_GRM1I('REFPIX', 2, UBND, LBND, MAP_SIZE,
+     :           .TRUE., UBND, STATUS)
+
+*     Copy the result back to I, J
+            I_CENTRE = UBND(1)
+            J_CENTRE = UBND(2)
+
 *     Now that the size of the map is determined we have to work out whether
 *     we are rebinning all integrations into one image (REBIN/BOLREBIN) or 
 *     into separate images (INTREBIN).
@@ -1952,10 +1986,14 @@ c
      :                       STATUS) 
                         CALL NDF_SECT(ITEMP, 2, LBND, UBND,
      :                       SECNDF, STATUS)
-*     Ask for the new file name
-                        CALL NDF_PROP(SECNDF,
+*     Ask for the new file name - NULL response indicates 
+*     that we should only calculate the map size
+                        IF (STATUS .EQ. SAI__OK) THEN
+                           CALL NDF_PROP(SECNDF,
      :                       'NOEXTENSION(SCUCD,FIGARO,SCUBA,REDS,FITS)'
-     :                       ,'OUT',OUT_NDF, STATUS)
+     :                        ,'OUT',OUT_NDF, STATUS)
+                           IF (STATUS .EQ. PAR__NULL) DOREBIN = .FALSE.
+                        END IF
                         CALL NDF_ANNUL(SECNDF, STATUS)
                         CALL NDF_ANNUL(ITEMP, STATUS)
 
@@ -1963,8 +2001,12 @@ c
 *     Multiple input images so just create a file via the parameter
 *     system
 
-                        CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, 
-     :                       OUT_NDF, STATUS)
+                        IF (STATUS .EQ. SAI__OK) THEN
+                           CALL NDF_CREAT ('OUT', '_REAL', 2, LBND,UBND, 
+     :                          OUT_NDF, STATUS)
+                           IF (STATUS .EQ. PAR__NULL) DOREBIN = .FALSE.
+                        END IF
+
                      END IF
                   END IF
 
@@ -2301,6 +2343,18 @@ c
 *     This is the end of the BOLOMETER looping
 
       END IF   ! This is the end of the EXTRACT_DATA bypass
+
+*     If we are running rebin and finish with DOREBIN=FALSE
+*     and STATUS=PAR__ANNUL, then this indicates that we are simply
+*     running REBIN to determine the map size and not to regrid
+
+      IF (TSKNAME .EQ. 'REBIN' .AND. .NOT.DOREBIN .AND. 
+     :     STATUS .EQ. PAR__NULL) THEN
+         CALL ERR_ANNUL(STATUS)
+         CALL MSG_SETC('TSK',TSKNAME)
+         CALL MSG_OUTIF(MSG__NORM, ' ','^TSK: Null response to'//
+     :        ' parameter OUT - not regridding', STATUS)
+      END IF
 
 *  now finish off
 
