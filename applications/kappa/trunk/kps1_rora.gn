@@ -1,45 +1,51 @@
-*+  ROTAS2 - rotate subsection of array by 90, 180 or 270 degrees
+      SUBROUTINE KPS1_RORA<T>( NUMRA, XSIZE, YSIZE, XEXT, YEXT, ARRAY,
+     :                         STATUS )
+*+
+*  Name:
+*     KPS1_RORAx
 
-      SUBROUTINE ROTAS2( NUMRA, XSIZE, YSIZE, XEXT, YEXT, ARRAY,
-     :                   STATUS )
-*
-*    Description :
-*
-*     The XEXT by YEXT section of the input array ARRAY, of dimensions
-*     XSIZE, YSIZE, is rotated through NUMRA right angles in the
-*     clockwise direction. ARRAY will hold the rotated data on exit from
-*     the routine.
-*     An immediate return will occur if STATUS has an error value on
-*     entry.
-*
-*    Invocation :
-*
-*      CALL ROTAS2( NUMRA, XSIZE, YSIZE, XEXT, YEXT, ARRAY, STATUS )
-*
-*    Arguments :
-*
-*     NUMRA = INTEGER( READ )
-*           Number of right-angles through which the data array will be
-*           rotated.
-*     XSIZE = INTEGER( READ )
-*           First dimension of the data array to be rotated.
-*     YSIZE = INTEGER( READ )
-*           Second dimension of the data array to be rotated.
-*     XEXT = INTEGER( READ )
-*           First dimension extent of the data array to be rotated.
-*     YEXT = INTEGER( READ )
-*           Second dimension extent of the data array to be rotated.
-*     ARRAY( XSIZE, YSIZE ) = REAL( UPDATE )
-*           Contains data to be rotated on entry to the routine and is
-*           returned containing the rotated data.
-*     STATUS = INTEGER( UPDATE )
-*           This is the global status, if this variable has an error
-*           value on entry then an immediate return will occur. If the
-*           number of right-angles to rotate is not 1,2 or 3 the STATUS
-*           is set to SAI__ERROR and an error is reported.
-*
-*    Method :
-*
+*  Purpose:
+*     Rotates a subsection of 2-dimnensional array by 90, 180 or 270
+*     degrees.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_RORAx( NUMRA, XSIZE, YSIZE, XEXT, YEXT, ARRAY, STATUS )
+
+*  Description:
+*     The XEXT by YEXT section of the input 2-dimensional array ARRAY,
+*     of dimensions XSIZE, YSIZE, is rotated through NUMRA right angles
+*     in the clockwise direction.  ARRAY will hold the rotated data on
+*     exit from the routine.
+
+*  Arguments:
+*     NUMRA = INTEGER (Given)
+*        Number of right-angles through which the data array will be
+*        rotated.
+*     XSIZE = INTEGER (Given)
+*        First dimension of the data array to be rotated.
+*     YSIZE = INTEGER (Given)
+*        Second dimension of the data array to be rotated.
+*     XEXT = INTEGER (Given)
+*        First dimension extent of the data array to be rotated.
+*     YEXT = INTEGER (Given)
+*        Second dimension extent of the data array to be rotated.
+*     ARRAY( XSIZE, YSIZE ) = ? (Given and Returned)
+*        Contains data to be rotated on entry to the routine and is
+*        returned containing the rotated data.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRAY argument must have the data type specified.
+*     - If the number of right-angles for rotation is not 1, 2, or 3
+*     then STATUS will be set to SAI__ERROR and an error reported.
+
+*  Algorithm:
 *     If no error on entry then
 *        If no. of right angles to rotate is 1 then
 *           Perform 90 degree rotate clockwise
@@ -89,152 +95,158 @@
 *                 and   yswap is the maximum extent to be rotated +1 - y
 *              End for
 *           End for
-*        Else 
+*        Else
 *           Number of right angles to rotate is incorrect
 *           Set status and report error
 *        Endif
 *     Endif
-*
-*    Authors :
-*
-*     Dave Baines (ROE::ASOC5)
-*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     27/07/1983  : Original version                 (ROE::ASOC5)
-*     17/02/1984  : Documentation brought up to date (ROE::ASOC5)
-*     1986 Sep 9  : Renamed parameters section to arguments and tidied
-*                   (RL.STAR::CUR).
-*     1988 Jun 22 : Added identification to error reporting
-*                   (RL.STAR::CUR).
-*
-*    Type Definitions :
 
-      IMPLICIT NONE
+*  Authors:
+*     DB: Dave Baines (ROE)
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
 
-*    Global constants :
+*  History:
+*     27/07/1983 (DB):
+*        Original version.
+*     17/02/1984 (DB):
+*        Documentation brought up to date.
+*     1986 September 9 (MJC):
+*        Renamed parameters section to arguments and tidied.
+*     1988 Jun 22 (MJC):
+*        Added identification to error reporting plus an
+*        extra status check.
+*     1989 August 7 (MJC):
+*        Passed array dimensions as separate variables.
+*     1995 May 16 (MJC):
+*        Made generic from ROTAS2.  Used an SST prologue and modern
+*        variable declarations.
+*     {enter_further_changes_here}
 
-      INCLUDE 'SAE_PAR'
+*  Bugs:
+*     {note_any_bugs_here}
 
-*    Import :
-
-      INTEGER
-     :  XSIZE,
-     :  YSIZE,
-     :  XEXT,
-     :  YEXT,
-     :  NUMRA
-
-*    Import-Export :
-
-      REAL
-     :  ARRAY( XSIZE, YSIZE )
-
-*    Status :
-
-      INTEGER STATUS
-
-*    Local variables :
-
-      INTEGER
-     :  MRANGE, ! maximum of XEXT and YEXT
-     :  HRANGE, ! half of MRANGE, i.e. half of max. extent to be rotated
-     :  X,      ! index to array element, first dimension
-     :  Y,      !   "    "   "      "     second    "
-     :  XSWAP,  !   "    " rotated element position, first dimension
-     :  YSWAP   !   "    "    "       "        "     second dimension
-
-      REAL
-     :  SAVE    ! saves a value from array during the rotate
 *-
 
-*    check for error on entry
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing allowed
 
-      IF( STATUS .EQ. SAI__OK ) THEN
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! SAE global constants
 
-         IF( NUMRA .EQ. 1 ) THEN
+*  Arguments Given:
+      INTEGER XSIZE
+      INTEGER YSIZE
+      INTEGER XEXT
+      INTEGER YEXT
+      INTEGER NUMRA
 
-*          rotate 90 degrees clockwise
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( XSIZE, YSIZE )
 
-            MRANGE = MAX( XEXT, YEXT )
-            HRANGE = MRANGE / 2
-            DO  X = 1 , HRANGE
-               XSWAP = MRANGE + 1 - X
+*  Status:
+      INTEGER STATUS             ! Global status
 
-               DO  Y = X, MRANGE-X
-                  YSWAP = MRANGE + 1 - Y
+*  Local Variables:
+      INTEGER HRANGE             ! Half of MRANGE, i.e. half of max.
+                                 ! extent to be rotated
+      INTEGER MRANGE             ! Maximum of XEXT and YEXT
+      <LTYPE> SAVE               ! Saves a value from array during the
+                                 ! rotation
+      INTEGER X                  ! Index to array element, first  dim
+      INTEGER XSWAP              ! Index to rotated element position,
+                                 ! first dimension
+      INTEGER Y                  ! Index to array element, second  "
+      INTEGER YSWAP              ! Index to rotated element position,
+                                 ! second dimension
+*.
 
-                  SAVE = ARRAY( XSWAP, Y )
-                  ARRAY( XSWAP, Y ) = ARRAY( YSWAP, XSWAP )
-                  ARRAY( YSWAP, XSWAP ) = ARRAY( X, YSWAP )
-                  ARRAY( X, YSWAP ) = ARRAY( Y, X )
-                  ARRAY( Y, X ) = SAVE
-               END DO
+*  Check the global inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( NUMRA .EQ. 1 ) THEN
+
+*  Rotate 90 degrees clockwise.
+*  ============================
+         MRANGE = MAX( XEXT, YEXT )
+         HRANGE = MRANGE / 2
+         DO X = 1 , HRANGE
+            XSWAP = MRANGE + 1 - X
+
+            DO Y = X, MRANGE - X
+               YSWAP = MRANGE + 1 - Y
+
+*  Swap the values using an intermediate variable.
+               SAVE = ARRAY( XSWAP, Y )
+               ARRAY( XSWAP, Y ) = ARRAY( YSWAP, XSWAP )
+               ARRAY( YSWAP, XSWAP ) = ARRAY( X, YSWAP )
+               ARRAY( X, YSWAP ) = ARRAY( Y, X )
+               ARRAY( Y, X ) = SAVE
             END DO
+         END DO
 
-         ELSEIF( NUMRA .EQ. 2 ) THEN
+      ELSE IF ( NUMRA .EQ. 2 ) THEN
 
-*          rotate through 180 degrees
+*  Rotate through 180 degrees.
+*  ===========================
+         HRANGE = YEXT / 2
+         DO Y = 1, HRANGE
+            YSWAP = YEXT + 1 - Y
 
-            HRANGE = YEXT / 2
-            DO  Y = 1, HRANGE
-               YSWAP = YEXT + 1 - Y
+            DO X = 1, XEXT
+               XSWAP = XEXT + 1 - X
 
-               DO  X = 1, XEXT
-                  XSWAP = XEXT + 1 - X
-
-                  SAVE = ARRAY( X, Y )
-                  ARRAY( X, Y ) = ARRAY( XSWAP, YSWAP )
-                  ARRAY( XSWAP, YSWAP ) = SAVE
-               END DO
+*  Swap the values using an intermediate variable.
+               SAVE = ARRAY( X, Y )
+               ARRAY( X, Y ) = ARRAY( XSWAP, YSWAP )
+               ARRAY( XSWAP, YSWAP ) = SAVE
             END DO
+         END DO
 
-*          check for an odd Y dimension, have an extra row to rotate
+*  Check for an odd Y dimension.  If there is one, there is an extra
+*  row to rotate.
+         IF ( MOD( YEXT, 2 ) .NE. 0 ) THEN
 
-            IF( MOD( YEXT, 2 ) .NE. 0 ) THEN
+            Y = HRANGE + 1
+            DO X = 1, XEXT / 2
+               XSWAP = XEXT + 1 - X
 
-               Y = HRANGE + 1
-               DO  X = 1, XEXT/2
-                  XSWAP = XEXT + 1 - X
-
-                  SAVE = ARRAY( X, Y )
-                  ARRAY( X, Y ) = ARRAY( XSWAP, Y )
-                  ARRAY( XSWAP, Y ) = SAVE
-               END DO
-            END IF
-
-         ELSEIF( NUMRA .EQ. 3 ) THEN
-
-*          rotate 90 degrees anticlockwise, equivalent to 270 degrees
-*          clockwise
-
-            MRANGE = MAX( XEXT, YEXT )
-            HRANGE = MRANGE / 2
-            DO  X = 1, HRANGE
-               XSWAP = MRANGE + 1 - X
-
-               DO  Y = X, MRANGE - X
-                  YSWAP = MRANGE + 1 - Y
-
-                  SAVE = ARRAY( Y, X )
-                  ARRAY( Y, X ) = ARRAY( X, YSWAP )
-                  ARRAY( X, YSWAP ) = ARRAY( YSWAP, XSWAP )
-                  ARRAY( YSWAP, XSWAP ) = ARRAY( XSWAP, Y )
-                  ARRAY( XSWAP, Y ) = SAVE
-               END DO
+*  Swap the values using an intermediate variable.
+               SAVE = ARRAY( X, Y )
+               ARRAY( X, Y ) = ARRAY( XSWAP, Y )
+               ARRAY( XSWAP, Y ) = SAVE
             END DO
-         ELSE
-
-*          no. of clockwise right-angles to be rotated wrong so report
-*          error
-
-            STATUS = SAI__ERROR
-            CALL MSG_SETI( 'NUMRA', NUMRA )
-            CALL ERR_REP( 'ERR_ROTAS2_MRANGL',
-     :        'ROTAS2: In routine ROTAS2 number of right-angles to '/
-     :        /'rotate cannot be ^NUMRA', STATUS )
          END IF
+
+      ELSE IF ( NUMRA .EQ. 3 ) THEN
+
+*  Rotate 90 degrees anticlockwise, equivalent to 270 degrees clockwise.
+*  =====================================================================
+         MRANGE = MAX( XEXT, YEXT )
+         HRANGE = MRANGE / 2
+         DO  X = 1, HRANGE
+            XSWAP = MRANGE + 1 - X
+
+            DO  Y = X, MRANGE - X
+               YSWAP = MRANGE + 1 - Y
+
+*  Swap the values using an intermediate variable.
+               SAVE = ARRAY( Y, X )
+               ARRAY( Y, X ) = ARRAY( X, YSWAP )
+               ARRAY( X, YSWAP ) = ARRAY( YSWAP, XSWAP )
+               ARRAY( YSWAP, XSWAP ) = ARRAY( XSWAP, Y )
+               ARRAY( XSWAP, Y ) = SAVE
+            END DO
+         END DO
+      ELSE
+
+*  Number of clockwise right-angles to be rotated is wrong so report an
+*  error.
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NUMRA', NUMRA )
+         CALL ERR_REP( 'KPS1_RORAx_MRANGL',
+     :     'KPS1_RORAx: The number of right-angle rotations cannot be '/
+     :     /'^NUMRA (programming error).', STATUS )
       END IF
 
       END
