@@ -1656,8 +1656,8 @@ sub generate_astrom ($) {
                dec2sex($projpole[1],'dec',':'))
                 if $verbose;
 	}
-	$projpolesex[0] = dec2sex ($projpole[0], 0);
-        $projpolesex[1] = dec2sex ($projpole[1], 1);
+	$projpolesex[0] = dec2sex ($projpole[0], 'ra');
+        $projpolesex[1] = dec2sex ($projpole[1], 'dec');
     }
 
     # Write the ASTROM plate centre line
