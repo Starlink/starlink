@@ -30,6 +30,7 @@ STAR_FC_LIBRARY_LDFLAGS
 
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION(sun50, [sun50.ps sun50.htx_tar sun50.tex])
+STAR_CHECK_PROGS(star2html)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
