@@ -301,7 +301,7 @@ EXTRA_DIST = ast_par.source
 # files, it's more robust to distribute makeh and make ast.h on the
 # build host.
 ast.h: $(AST_H_FILES) ast_err.h makeh
-	@PERL@ ./makeh $(AST_H_FILES) >$@
+	@PERL@ ./makeh -s $(srcdir) $(AST_H_FILES) >$@
 
 # AST_ERR and ast_err.h are `generated source files', and so must be
 # generated before any other compilations are done.  Note that these
