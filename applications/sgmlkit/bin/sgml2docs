@@ -34,11 +34,14 @@
 #
 #  Options:
 #     --html: generate HTML (the default)
+#     --htmlsingle: generate HTML in a single file
 #     --latex: generate LaTeX
 #     --package-dir my-dir: package up the generated files into a
 #           directory called `my-dir'.
 #     --tarball my.tar: bundle the package-dir into a tarball named `my.tar'
 #     --jadeflags flags: add the given flags to the invocation of Jade
+#     --help: display usage
+#     --debug: do some debugging.  Specifically, don't tidy up at end.
 #
 #  Authors:
 #     NG: Norman Gray (Starlink, Glasgow)
@@ -61,29 +64,42 @@ BIBTEX=bibtex
 
 TARGETFORMAT=0			# html
 
+DEBUGGING=false
+
 tidy-up ()
 {
-    if [ -w "$WORKDIR" ]; then
-	rm -Rf $WORKDIR
-    fi
-    if [ -d "$WORKDIR" ]; then
-	echo "Couldn't delete work directory $WORKDIR"
+    if $DEBUGGING; then
+	echo "Work directory $WORKDIR not deleted"
+    else
+	if [ -w "$WORKDIR" ]; then
+	    rm -Rf $WORKDIR
+	fi
+	if [ -d "$WORKDIR" ]; then
+	    echo "Couldn't delete work directory $WORKDIR"
+	fi
     fi
 }
 trap tidy-up 0
 
 # Start parsing the arguments
 
-USAGE="Usage: $0 [--latex] [--html] [--package-dir directory] [--tarball file.tar] [--jadeflags flags] sgml-file"
+USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
+	[--package-dir directory] [--tarball file.tar] [--jadeflags flags]\
+	[--help]\
+	sgml-file"
 
 PROGNAME=`basename $0`
 while [ $# -gt 0 ]; do
     case $1 in
 	--html) TARGETFORMAT=0 ;;
 	--latex) TARGETFORMAT=1 ;;
+	--htmlsingle) TARGETFORMAT=0; 
+	    JADEFLAGS="$JADEFLAGS -V nochunks -isingle.file" ;;
 	--package-dir) PACKAGEDIR=$2; shift ;;
 	--tarball) TARNAME=$2; shift ;;
 	--jadeflags) JADEFLAGS=$2; shift ;;
+	--help) echo $USAGE; exit 0;;
+	--debug) DEBUGGING=true ;;
 	-*) echo $USAGE; exit 1 ;;
 	*) SGMLSRC=$1 ;;
     esac
@@ -126,6 +142,10 @@ WORKDIR=/tmp/$PROGNAME.$$
 if [ -d $WORKDIR -o -f $WORKDIR ]; then
 	echo "$0: temp dir $WORKDIR already exists - not overwriting"
 	exit 1
+fi
+
+if $DEBUGGING; then
+	echo "WORKDIR=$WORKDIR
 fi
 
 mkdir -p $WORKDIR
@@ -189,7 +209,9 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	    $DECL $SGMLSRC \
 	    > tmp.stamp
 
-    test -r HTML.manifest && ln -s HTML.manifest MANIFEST
+    # create the file named MANIFEST, removing duplicates (ie, some gifs)
+    # from generated manifest file
+    test -r HTML.manifest && sort HTML.manifest | uniq > MANIFEST
 
 elif [ $TARGETFORMAT -eq 1 ]; then
 
