@@ -86,6 +86,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.21  1997/09/04 19:40:53  timj
+*     Use SCULIB_GET_FILENAME
+*
 *     Revision 1.20  1997/06/27 23:16:39  timj
 *     Tweak the header.
 *
@@ -204,7 +207,6 @@ c
       INTEGER       IN_DATA_PTR  ! Pointer to D array
       INTEGER       IN_VAR_PTR   ! Pointer to V array
       INTEGER       IN_QUAL_PTR  ! Pointer to Q array
-      INTEGER       IPAR         ! Parameter ID
       INTEGER       IPOSN        ! Position in string
       INTEGER       ITEMP        ! Temporary integer
       INTEGER       LBND(MAXBOLS)! Lower bound of output array
@@ -281,8 +283,7 @@ c
          
 *     Read in the GLOBAL value first
          IF (FILE .EQ. 1) THEN
-            CALL SUBPAR_FINDPAR( 'DUMMY', IPAR, STATUS)
-            CALL SUBPAR_GETNAME(IPAR, FILENAME, STATUS)
+            CALL SCULIB_GET_FILENAME('DUMMY', FILENAME, STATUS)
             CALL PAR_DEF0C('IN', FILENAME, STATUS)
          ELSE
 *           Make sure the parameter is cancelled and DEFAULT (NULL) used
