@@ -24,8 +24,4 @@ t/xread.t
 t/xwrite.t
 test.sdf
 typemap
-PDL/Makefile.PL
-PDL/NDF.pm
-PDL/README
-PDL/Changes
 ExtUtils/F77.pm
