@@ -1,28 +1,106 @@
-      SUBROUTINE SCULIB_WTFN_REGRID_2 (DIAMETER, RES, IN_DATA,
+      SUBROUTINE SCULIB_WTFN_REGRID_2 (RES, IN_DATA,
      :     IN_VARIANCE, WEIGHT, USEVARWT, VARWT, X, Y, NPIX, 
      :     PIXSPACE, NI, NJ, ICEN, JCEN, 
      :     TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
-     :     CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
+     :     CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
 *  Name:
 *     SCULIB_WTFN_REGRID_2
 
 *  Purpose:
+*     Perform convolution
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_WTFN_REGRID_2 (DIAMETER, RES, IN_DATA, IN_VARIANCE,
+*     SUBROUTINE SCULIB_WTFN_REGRID_2 (RES, IN_DATA, IN_VARIANCE,
 *    :  WEIGHT, USEVARWT, VARWT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM,
-*    :  CONV_WEIGHT, STATUS)
+*    :  CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
 *  Description:
+*     This routine convolves the input data with a weighting function
+*     onto a regularly spaced output grid.
+*     The weighting function is stored in a lookup table indexed
+*     by the square of the distance and is parametrized by RES,
+*     WEIGHTSIZE, SCLSZ and WTFN.
+*     Here is a description:
+*     This is an image space implementation of fourier techniques.
+*     In Fourier terms the technique could be described
+*     as follows:-
+*
+*     1. Do a 2-d discrete Fourier transform of the data points. The result
+*     is a repeating pattern made up of copies of the transform of
+*     the map as a continuous function, each copied displaced from its
+*     neighbours by 1/dx, where dx is the sample spacing of the input points
+*     (assumed equal in x and y). Different copies of the 'continuous map' 
+*     transforms will overlap ('alias') if there is any power in the 
+*     map at frequencies greater than 1/(2dx). It is not possible to unravel
+*     aliased spectra and this constraint leads to the Nyquist sampling
+*     criterion.
+*
+*     2. We want to derive the 'continuous map' so that map values on the new
+*     grid mesh can be derived. Do this by multiplying the transform of the
+*     data by a function that has zero value beyond a radius of 0.5/dx from the
+*     origin. This will get rid of all the repeats in the pattern and leave
+*     just the transform of the 'continuous map'.
+*
+*     3. Do an inverse FT on the remaining transform for the points where you
+*     wish the resampled points to be (note: FFTs implicitly assume that the
+*     data being transformed DO repeat ad infinitum so we'd have to be careful
+*     when using them to do this).
+*
+*     The analogue of these process steps in image space is as follows:
+*
+*     1. Nothing.
+*     2. Convolve the input data with the FT of the function used to isolate
+*     the 'continuous map' transform.
+*     3. Nothing.
+
+*     If the method is done properly, the rebinned map is in fact the map on
+*     the new sample mesh that has the same FT as the continuous function
+*     going through the original sample points.
+*
+*     Convolution Functions
+*     ---------------------
+*
+*     Bessel 
+*     For good data and with no time constraint on reduction the best
+*     convolution function would be one whose FT is a flat-topped cylinder in
+*     frequency space, centred on the origin and of a radius such that
+*     frequencies to which the telescope is not sensitive are set to zero.
+*     Unfortunately, this function is a Bessel function, which extends to
+*     infinity along both axes and has significant power out to a large radius.
+*     To work correctly this would require an infinite map and infinite
+*     computing time. However, a truncated Bessel function should work well on
+*     a large map, except near the edges. Edge effects can be removed by
+*     pretending that the map extends further - of course, this only works if
+*     you know what data the pretend map area should contain, i.e. zeros. 
+*     
+*     Another problem with a Bessel function arises from the fact that it does
+*     truncate the FT of the map sharply. If the data are good then there 
+*     should be nothing but noise power at the truncation radius and the 
+*     truncation of the FT should have no serious effect. However, if the data
+*     has spikes (power at all frequencies in the FT) or suffers from seeing 
+*     effects such that the data as measured DO have power beyond the 
+*     truncation radius, then this will cause ringing in the rebinned map.
+*     
+*     Gaussian 
+*     In fact, any function that is finite in frequency space will have
+*     infinite extent in image space (I think). As such they will all
+*     drag in some power from the aliased versions of the map transform
+*     and all suffer from edge effects and large compute times. Some are
+*     worse than others, however. For example, a Gaussian can have most
+*     of its power concentrated over a much smaller footprint than a
+*     Bessel function, so the convolution calculation will be much
+*     faster. It is also more robust in the presence of spikes and
+*     seeing problems because it does not truncate the map FT as sharply
+*     as the Bessel function - such effects give rise to smoother
+*     defects in the rebinned map though the defects will still BE
+*     there.
 
 *  Arguments:
-*     DIAMETER                       = REAL (given)
-*        size of dish
 *     RES                            = INTEGER (Given)
 *        number of resolution elements per scale length
 *     IN_DATA (NPIX)                   = REAL (Given)
@@ -63,6 +141,8 @@
 *        the convolution weight for each output pixel.
 *     WEIGHTSIZE                       = INTEGER (Given)
 *        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 1 for LINEAR)
+*     SCLSZ                            = REAL
+*        1 scale length in the same units as PIXSPACE
 *     WTFN (RES * RES * WEIGHTSIZE * WEIGHTSIZE) = REAL (Given)
 *        convolution weighting function
 *     STATUS                           = INTEGER (Given and Returned)
@@ -85,31 +165,31 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
 
 *  Arguments Given:
-      REAL DIAMETER
       INTEGER RES
       INTEGER NPIX
-      REAL IN_DATA (NPIX)
-      REAL IN_VARIANCE (NPIX)
-      REAL WEIGHT
-      REAL WWEIGHT
+      REAL    IN_DATA (NPIX)
+      REAL    IN_VARIANCE (NPIX)
+      REAL    WEIGHT
+      REAL    WWEIGHT
       DOUBLE PRECISION X(NPIX)
       DOUBLE PRECISION Y(NPIX)
-      REAL PIXSPACE
+      REAL    PIXSPACE
       INTEGER NI
       INTEGER NJ
       INTEGER ICEN
       INTEGER JCEN
-      REAL TOTAL_WEIGHT (NI,NJ)
+      REAL    SCLSZ
+      REAL    TOTAL_WEIGHT (NI,NJ)
       LOGICAL USEVARWT
-      REAL WAVELENGTH
+      REAL    WAVELENGTH
       INTEGER WEIGHTSIZE
-      REAL VARWT(NPIX)
-      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
+      REAL    VARWT(NPIX)
+      REAL    WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
 
 *  Arguments Returned:
-      REAL CONV_DATA_SUM (NI, NJ)
-      REAL CONV_VARIANCE_SUM (NI, NJ)
-      REAL CONV_WEIGHT (NI, NJ)
+      REAL    CONV_DATA_SUM (NI, NJ)
+      REAL    CONV_VARIANCE_SUM (NI, NJ)
+      REAL    CONV_WEIGHT (NI, NJ)
 
 *  Status:
       INTEGER STATUS  
@@ -143,11 +223,11 @@
       
       INTEGER FILTER1_SQ
       INTEGER  FILTER_RAD_SQ
-      REAL SCALE
-      REAL SCALESQ
-      REAL RES_SCAL
-      REAL RAD_OV_SCAL
-      REAL SMALL
+      REAL    SCALE
+      REAL    SCALESQ
+      REAL    RES_SCAL
+      REAL    RAD_OV_SCAL
+      REAL    SMALL
 *   local data
 *.
 
@@ -169,8 +249,9 @@
 
 *  ..extent of convolution function in units of output pixels
 
-      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-      SCALE = 1.0 / RES_ELEMENT
+*      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
+*      SCALE = 1.0 / RES_ELEMENT
+      SCALE = 1.0 / SCLSZ
 
       SCALESQ = SCALE * SCALE
       
@@ -178,7 +259,7 @@
       RES_SCAL = REAL(FILTER1_SQ) * SCALESQ
 
 
-      RTEMP = REAL(WEIGHTSIZE) * RES_ELEMENT / PIXSPACE
+      RTEMP = REAL(WEIGHTSIZE) * SCLSZ / PIXSPACE
       PIX_RANGE = INT (RTEMP) + 1
 
 *  now do the convolution, looping over the input pixels
