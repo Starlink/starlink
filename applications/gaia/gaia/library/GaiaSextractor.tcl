@@ -61,6 +61,9 @@
 #        Original version.
 #     25-MAY-1999 (PDRAPER):
 #        Updated for 2.0.19. Added BACK_TYPE, BACK_VALUE and THRESH_TYPE.
+#     22-MAY-2000 (PDRAPER):
+#        Added RAD_TYPE and RAD_THRESH changes. Includes plotting of 
+#        RAD0 through RAD15 circles.
 #     {enter_further_changes_here}
 
 #-
@@ -445,7 +448,7 @@ itcl::class gaia::GaiaSextractor {
          }
       } else {
          #  Reveal all pages.
-         for {set i 0} {$i < 7} {incr i} {
+         for {set i 0} {$i < 8} {incr i} {
             if { !$revealed_($i) } {
                set revealed_($i) 1
                set child [$itk_component(notebook) childsite $i]
@@ -655,7 +658,7 @@ itcl::class gaia::GaiaSextractor {
       if { $values_($this,draw_kron_ellipses) } {
          foreach param "$commoncols_ $kroncols_" {
             set columns_($this,$param) 1
-            if { $revealed_(6) } {
+            if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state disabled
             }
          }
@@ -667,7 +670,7 @@ itcl::class gaia::GaiaSextractor {
          }
          foreach param $names {
             set columns_($this,$param) 0
-            if { $revealed_(6) } {
+            if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state normal
             }
          }
@@ -677,7 +680,7 @@ itcl::class gaia::GaiaSextractor {
       if { $values_($this,draw_iso_ellipses) } {
          foreach param "$commoncols_ $isocols_" {
             set columns_($this,$param) 1
-            if { $revealed_(6) } {
+            if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state disabled
             }
          }
@@ -689,7 +692,7 @@ itcl::class gaia::GaiaSextractor {
          }
          foreach param $names {
             set columns_($this,$param) 0
-            if { $revealed_(6) } {
+            if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state normal
             }
          }
@@ -700,7 +703,7 @@ itcl::class gaia::GaiaSextractor {
    protected method fix_safe_columns_ {} {
       foreach param "$safecols_" {
          set columns_($this,$param) 1
-         if { $revealed_(6) } {
+         if { $revealed_(7) } {
             $colparent_.[string tolower $param] configure -state disabled
          }
       }
@@ -2713,10 +2716,6 @@ itcl::class gaia::GaiaSextractor {
    }
    protected variable commoncols_ {
       ELONGATION THETA_IMAGE
-   }
-   protected variable radiicols_ {
-      RAD0 RAD1 RAD2 RAD3 RAD4 RAD5 RAD6 RAD7 RAD8 RAD9 RAD10 RAD11
-      RAD12 RAD13 RAD14 RAD15
    }
 
    #  Columns we always generate -- need to plot positions somehow.
