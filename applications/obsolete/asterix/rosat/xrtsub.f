@@ -71,11 +71,7 @@
       INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*    Structure definitions :
-
-      INCLUDE 'INC_CORR'
-*
-      RECORD /CORR/ SHEAD, BHEAD                  ! Contains auxiliary info.
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *                                                 ! for source and bckgnd files
 *    Status :
       INTEGER STATUS
@@ -139,7 +135,7 @@
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTSUB Version 2.2-0')
+      PARAMETER (VERSION = 'XRTSUB Version 2.2-1')
 *-
       CALL AST_INIT
 *
@@ -158,12 +154,12 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 * Check source file is XRT and get pointing position
-      CALL XRTSUB_GETPOS( OID, SHEAD, STATUS )
+      CALL XRTSUB_GETPOS( OID,1, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Read source data from copied input file
-      CALL XRTSUB_GETDATA( OID, 'UPDATE', SHEAD, SDIM, SORD,
+      CALL XRTSUB_GETDATA( OID, 'UPDATE', 1, SDIM, SORD,
      &                  SDPNTR, TSDPNTR, SLVAR, SVPNTR, TSVPNTR,
      &                  SLQUAL, SQPNTR, TSQPNTR, SMASK, SREORD, STATUS)
 *
@@ -173,28 +169,28 @@
       NSIZE=SDIM(1)*SDIM(2)*SDIM(3)*SDIM(4)*SDIM(5)
 *
 * Get pointing position of background file
-      CALL XRTSUB_GETPOS( BID, BHEAD, STATUS )
+      CALL XRTSUB_GETPOS( BID, 2, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-      CALL XRTSUB_GETDATA( BID, 'READ', BHEAD, BDIM, BORD, BDPNTR,
+      CALL XRTSUB_GETDATA( BID, 'READ', 2, BDIM, BORD, BDPNTR,
      &                TBDPNTR, BLVAR, BVPNTR, TBVPNTR,
      &                BLQUAL, BQPNTR, TBQPNTR, BMASK, BREORD, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Calculate the background area
-      CALL XRT_CALCAREA(BHEAD, BLQUAL, BDIM(1), BDIM(2), BDIM(3),
+      CALL XRT_CALCAREA(2, BLQUAL, BDIM(1), BDIM(2), BDIM(3),
      &                 BDIM(4), BDIM(5), %val(BQPNTR), BMASK, BAREA)
 *
 * Check source and background observations are compatible  i.e. taken over
 * the same time and sumsig ranges
-      CALL XRTSUB_COMPAT(SHEAD, SDIM, BHEAD, BDIM, STATUS)
+      CALL XRTSUB_COMPAT(SDIM, BDIM, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Find if the data is HRI or PSPC
-      IF (INDEX(SHEAD.DET, 'HRI') .NE. 0) THEN
+      IF (INDEX(CHEAD_DET, 'HRI') .NE. 0) THEN
          LHRI = .TRUE.
       ELSE
          LHRI = .FALSE.
@@ -231,10 +227,10 @@
 *   Get effective area filename
 *   Select the default efective area file (dependent on the date of the
 *   observation)
-         IF (INDEX(SHEAD.DET, 'PSPCB') .NE. 0) THEN
+         IF (INDEX(CHEAD_DET, 'PSPCB') .NE. 0) THEN
             EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcb_eff'
             CALL USI_DEF0C('EFFILE', EFILE, STATUS)
-         ELSEIF (INDEX(SHEAD.DET, 'PSPCC') .NE. 0) THEN
+         ELSEIF (INDEX(CHEAD_DET, 'PSPCC') .NE. 0) THEN
             EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcc_eff'
             CALL USI_DEF0C('EFFILE', EFILE, STATUS)
          ENDIF
@@ -254,11 +250,10 @@
       ENDIF
 *
 * Get rootname of calibration files
-      CALL USI_GET0C('RTNAME', SHEAD.RTNAME, STATUS)
+      CALL USI_GET0C('RTNAME', CHEAD_RTNAME, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-      BHEAD.RTNAME = SHEAD.RTNAME
 *
 * Give the option of producing an output background file, which is
 * the extrapolated background counts in the source box
@@ -297,8 +292,7 @@
 
 *
 *    Calculate the difference in areas between the source and background boxes.
-      CALL XRTSUB_BACKNORM(SHEAD, BHEAD, SDIM(1), SDIM(5),
-     &                                      BAREA, %val(APNTR))
+      CALL XRTSUB_BACKNORM(SDIM(1), SDIM(5), BAREA, %val(APNTR))
 
 *
 *    Calculate the difference in instrument response at the source and bkgnd
@@ -327,7 +321,7 @@
 *
 
 *   Calculate the position correction array
-         CALL XRTSUB_POSCORR( SID, SHEAD, BHEAD, RLOC, ELOC, SORD(4),
+         CALL XRTSUB_POSCORR( SID, RLOC, ELOC, SORD(4),
      &                           BDIM(4), SDIM(5), %val(PCPNTR), STATUS)
 *
       ELSE
@@ -366,7 +360,7 @@
 
 * Get the particle counts at this position
       IF (LPART) THEN
-         CALL XRTSUB_PARTCNT( BID, BHEAD, BAREA, BDIM(3), BDIM(4),
+         CALL XRTSUB_PARTCNT( BID, 2, BAREA, BDIM(3), BDIM(4),
      &           %val(PPAR1), %val(PPAR2), %val(PPAR3), STATUS)
 *
 
@@ -423,7 +417,7 @@
       IF (SDIM(1) .EQ. 1 .AND. SDIM(2) .EQ. 1) THEN
 *
 *      Fill the subtraction array using the background counts
-         CALL XRTSUB_FILLSUB(SHEAD, BHEAD, BDIM(1), BDIM(2), BDIM(3),
+         CALL XRTSUB_FILLSUB( BDIM(1), BDIM(2), BDIM(3),
      &        BDIM(4), SDIM(5), %val(BDPNTR), %val(BVPNTR),
      &        %val(BQPNTR), BMASK,
      &        %val(APNTR), %val(PCPNTR), LPART, %val(PPAR1),
@@ -448,7 +442,7 @@
 *
 
 *   Sum up the original background data in each PHA bin
-         CALL XRTSUB_IMDATA(BHEAD, BDIM(1), BDIM(2), BDIM(3), BDIM(4),
+         CALL XRTSUB_IMDATA( BDIM(1), BDIM(2), BDIM(3), BDIM(4),
      &         BDIM(5), %val(BDPNTR), %val(BVPNTR), %val(BQPNTR),
      &         BMASK, LPART, %val(PPAR1),
      &         %val(PPAR2), %val(PPAR3), %val(APNTR), %val(PBDSUM),
@@ -484,12 +478,12 @@
 *   Produce the background image from the background file and
 *   the vignetting function
          IF (LHRI) THEN
-            CALL XRTSUB_HRICBIM(SHEAD, BHEAD, ELOC, SDIM(1), SDIM(2),
+            CALL XRTSUB_HRICBIM( ELOC, SDIM(1), SDIM(2),
      &         SDIM(4), BDIM(4), %val(PBDSUM), %val(PBVSUM),
      &         %val(PPE1), %val(PPE2), %val(PPE3), %val(EPHPTR),
      &         BVDEF, %val(SUBD), %val(SUBV), STATUS)
          ELSE
-            CALL XRTSUB_CBIMAGE(SHEAD, BHEAD, ELOC, SDIM(1), SDIM(2),
+            CALL XRTSUB_CBIMAGE( ELOC, SDIM(1), SDIM(2),
      &         SDIM(4), BDIM(4), %val(PBDSUM), %val(PBVSUM),
      &         %val(PPE1), %val(PPE2), %val(PPE3), %val(EPHPTR),
      &         BVDEF, %val(SUBD), %val(SUBV), STATUS)
@@ -645,8 +639,7 @@
 
 
 *+XRTSUB_BACKNORM   Finds factor to multiply background data by.
-      SUBROUTINE XRTSUB_BACKNORM(SHEAD, BHEAD, SNX, RDIM,
-     &                                        BAREA, CFACTOR)
+      SUBROUTINE XRTSUB_BACKNORM(SNX, RDIM,BAREA, CFACTOR)
 *    Description :
 *     The ratio of the source and background box areas is used to
 *     calculate a normalisation factor for the background count rate.
@@ -661,12 +654,9 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'QUAL_PAR'
-*    Structure definition :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ SHEAD                 ! Header structure for source data
-      RECORD /CORR/ BHEAD                 ! Header structure for bckgnd data
 *
       INTEGER SNX                         ! Number of X bins in source array
       INTEGER RDIM                        ! Number of radial bins in src. array
@@ -696,25 +686,25 @@
 *       If more than one X,Y element then area is one pixel.
          IF (SNX .GT. 1) THEN
 *
-            SAREA = ABS( SHEAD.XSCALE * SHEAD.YSCALE )
+            SAREA = ABS( CHEAD_XSCALE(1)*CHEAD_YSCALE(1) )
 *
          ELSE
 *
 *       Calculate inner and outer radii for this radial bin
-            XINC = (SHEAD.XOUTER - SHEAD.XINNER) / REAL(RDIM)
-            RXINN = SHEAD.XINNER + XINC * REAL(RLP-1.0)
+            XINC = (CHEAD_XOUTER(1) - CHEAD_XINNER(1)) / REAL(RDIM)
+            RXINN = CHEAD_XINNER(1) + XINC * REAL(RLP-1.0)
             RXOUT = RXINN + XINC
 *
-            YINC = (SHEAD.YOUTER - SHEAD.YINNER) / REAL(RDIM)
-            RYINN = SHEAD.YINNER + YINC * REAL(RLP-1.0)
+            YINC = (CHEAD_YOUTER(1) - CHEAD_YINNER(1)) / REAL(RDIM)
+            RYINN = CHEAD_YINNER(1) + YINC * REAL(RLP-1.0)
             RYOUT = RYINN + YINC
 *
-            IF (SHEAD.SHAPE(1:1) .EQ. 'R') THEN
+            IF (CHEAD_SHAPE(1)(1:1) .EQ. 'R') THEN
 *
 *      Square box:
                SAREA = 4.0 * ( RXOUT * RYOUT - RXINN * RYINN )
 *
-            ELSEIF (INDEX ('CAE', SHEAD.SHAPE(1:1)) .NE. 0) THEN
+            ELSEIF (INDEX ('CAE', CHEAD_SHAPE(1)(1:1)) .NE. 0) THEN
 *
 *      Circle, ellipse or annulus
                SAREA = PI * ( RXOUT * RYOUT - RXINN * RYINN )
@@ -752,7 +742,7 @@ D        write(*,*) ' Norm. factor = ',	cfactor(RLP), SAREA, BAREA
       END
 
 *+XRTSUB_CBIMAGE  -  Produce image
-      SUBROUTINE XRTSUB_CBIMAGE(SHEAD, BHEAD, ELOC, NX, NY, NE, BNE,
+      SUBROUTINE XRTSUB_CBIMAGE( ELOC, NX, NY, NE, BNE,
      &                    BPHOT, BVAR, PE1, PE2, PE3, EPHA, VVAL,
      &                    BIDATA, BIVAR, STATUS)
 *    Description :
@@ -779,11 +769,8 @@ D        write(*,*) ' Norm. factor = ',	cfactor(RLP), SAREA, BAREA
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ SHEAD                  ! Header info for source file
-      RECORD /CORR/ BHEAD                  ! Header info for bckgnd file
       CHARACTER*(DAT__SZLOC) ELOC          ! Locator to eff. area file
       INTEGER NX,NY,NE                     ! Dimensions of data array
       INTEGER BNE                          ! Size of bckgnd energy axis
@@ -836,13 +823,13 @@ D        write(*,*) ' Norm. factor = ',	cfactor(RLP), SAREA, BAREA
       ENDIF
 *
 *  Set X,Y axis values
-      XCENT = SHEAD.XCENT*60.
-      YCENT = SHEAD.YCENT*60.
-      XSCALE = SHEAD.XSCALE*60.
-      YSCALE = SHEAD.YSCALE*60.
+      XCENT = CHEAD_XCENT(1)*60.
+      YCENT = CHEAD_YCENT(1)*60.
+      XSCALE = CHEAD_XSCALE(1)*60.
+      YSCALE = CHEAD_YSCALE(1)*60.
 *
 * Set a logical depending on whether the PSPC detebtor is PSPCB or PSPCC
-      IF (INDEX(SHEAD.DET, 'PSPCB') .NE. 0) THEN
+      IF (INDEX(CHEAD_DET, 'PSPCB') .NE. 0) THEN
          DETB = .TRUE.
       ELSE
          DETB = .FALSE.
@@ -868,9 +855,9 @@ D        write(*,*) ' Norm. factor = ',	cfactor(RLP), SAREA, BAREA
 
          DO LPO=1,NANG
 *
-           IF (BHEAD.OFFAX .LT. ANGLE(LPO)) THEN
+           IF (CHEAD_OFFAX(2) .LT. ANGLE(LPO)) THEN
               TOP = LPO
-              FRAC = (BHEAD.OFFAX-ANGLE(LPO-1)) /
+              FRAC = (CHEAD_OFFAX(2)-ANGLE(LPO-1)) /
      &                          (ANGLE(LPO)-ANGLE(LPO-1))
               GOTO 100
            ENDIF
@@ -890,7 +877,7 @@ D        write(*,*) ' Norm. factor = ',	cfactor(RLP), SAREA, BAREA
 *
 *    Outside the cal info.
          ELSEIF (TOP .EQ. 0) THEN
-            BRESP = REFF(NANG) + (BHEAD.OFFAX - ANGLE(NANG)) /
+            BRESP = REFF(NANG) + (CHEAD_OFFAX(2) - ANGLE(NANG)) /
      &                (ANGLE(NANG) - ANGLE(NANG-1)) *
      &                    (REFF(NANG)-REFF(NANG-1))
          ENDIF
@@ -951,11 +938,11 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
                IF (DETB) THEN
                   CFACT =(1.02E-4 + 3.3E-5 * exp(- (AXOFF - 20.6)**2
      &                    / 12.8 )) / (1.02E-4 + 3.3E-5 *
-     &                         exp(- (BHEAD.OFFAX - 20.6)**2 / 12.8))
+     &                      exp(- (CHEAD_OFFAX(2) - 20.6)**2 / 12.8))
 *            Detector C :
                ELSE
                   CFACT = (8.42E-5 + 3.95E-7 * AXOFF) /
-     &                          (8.42E-5 + 3.95E-7 * BHEAD.OFFAX)
+     &                        (8.42E-5 + 3.95E-7 * CHEAD_OFFAX(2))
                ENDIF
 *
                BPART = PE1(LPE) * CFACT + PE2(LPE) + PE3(LPE)
@@ -1110,7 +1097,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_COMPAT   Checks if source and background data are compatible
-      SUBROUTINE XRTSUB_COMPAT(SHEAD, SDIM, BHEAD, BDIM, STATUS)
+      SUBROUTINE XRTSUB_COMPAT(SDIM, BDIM, STATUS)
 *    Description :
 *    Environment parameters :
 *    Method :
@@ -1147,14 +1134,11 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ SHEAD                    ! Header of source file
 *
       INTEGER SDIM(DAT__MXDIM)               ! Dimensions of source data
 *
-      RECORD /CORR/ BHEAD                    ! Header of background file
 *
       INTEGER BDIM(DAT__MXDIM)               ! Dimensions of bckgnd data
 *    Import-Export :
@@ -1187,8 +1171,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       IF (SDIM(3) .GT. 1) THEN
 *
 *   Check if source and background files have compatible time axes
-         IF (SHEAD.TMIN(1) .NE. BHEAD.TMIN(1)
-     &       .OR. SHEAD.TSCALE(1) .NE. BHEAD.TSCALE(1)) THEN
+         IF (CHEAD_TMIN(1,1) .NE. CHEAD_TMIN(1,2)
+     &       .OR. CHEAD_TSCALE(1,1) .NE. CHEAD_TSCALE(1,2)) THEN
 *
             CALL MSG_PRNT('*Error: Source and background file Time '/
      &                   /'axes are incompatible*')
@@ -1199,8 +1183,9 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ELSE
 *
 *   Check if source and background files have been taken over different times
-         IF (SHEAD.TMIN(1) .NE. BHEAD.TMIN(1) .OR.
-     &    SHEAD.TMAX(SHEAD.NTRANGE) .NE. BHEAD.TMAX(BHEAD.NTRANGE)) THEN
+         IF (CHEAD_TMIN(1,1) .NE. CHEAD_TMIN(1,2) .OR.
+     &    CHEAD_TMAX(CHEAD_NTRANGE(1),1) .NE.
+     :         CHEAD_TMAX(CHEAD_NTRANGE(2),2)) THEN
 *
             CALL MSG_PRNT('Warning: Source and background files '/
      &                   /'have been taken over different TIME range')
@@ -1212,8 +1197,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       IF (SDIM(4) .GT. 1) THEN
 *
 *   Check if source and background files have compatible corrected PH axes
-         IF (SHEAD.PMIN(1) .NE. BHEAD.PMIN(1)
-     &       .OR. SHEAD.PSCALE .NE. BHEAD.PSCALE) THEN
+         IF (CHEAD_PMIN(1,1) .NE. CHEAD_PMIN(1,2)
+     &       .OR. CHEAD_PSCALE(1) .NE. CHEAD_PSCALE(2)) THEN
 *
             CALL MSG_PRNT('*Error: Source and background file '/
      &                   /'CORR_PH axes are incompatible*')
@@ -1224,8 +1209,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ELSE
 *
 *   Check if source and background files have been taken over different PH range
-         IF (SHEAD.PMIN(1) .NE. BHEAD.PMIN(1) .OR.
-     &                     SHEAD.PMAX(1) .NE. BHEAD.PMAX(1)) THEN
+         IF (CHEAD_PMIN(1,1) .NE. CHEAD_PMIN(1,2) .OR.
+     &              CHEAD_PMAX(1,1) .NE. CHEAD_PMAX(1,2)) THEN
 *
             CALL MSG_PRNT('Error: Source and background files '/
      &                 /'have been taken over different CORR_PH range')
@@ -1297,7 +1282,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_FILLSUB   Creates subtraction array
-      SUBROUTINE XRTSUB_FILLSUB(SHEAD, BHEAD, XDIM, YDIM, TDIM, EDIM,
+      SUBROUTINE XRTSUB_FILLSUB( XDIM, YDIM, TDIM, EDIM,
      &       RDIM, BARRAY, BVAR, BQUAL, BMASK, CFACTOR, PFACTOR,
      &       LPART, PART1, PART2, PART3, VVAL, SARRAY, SVAR)
 *    Description :
@@ -1316,10 +1301,9 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       IMPLICIT NONE
 *    Global parameters :
       INCLUDE 'QUAL_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ SHEAD, BHEAD             ! Header stuff
       INTEGER XDIM,YDIM,TDIM,EDIM            ! Dimensions of background array
 *                                            ! X=no of x elements etc...
       INTEGER RDIM                           ! No of radial bins in source data
@@ -1357,7 +1341,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       PARTSUM=0.0
       EVSUM=0.0
 *
-      IF (INDEX(SHEAD.DET, 'PSPCB') .NE. 0) THEN
+      IF (INDEX(CHEAD_DET, 'PSPCB') .NE. 0) THEN
          DETB = .TRUE.
       ELSE
          DETB = .FALSE.
@@ -1367,7 +1351,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       DO RLP = 1,RDIM
 *
 *    Find the off-axis angle of this radial bin
-         CALL XRTSUB_OFFAX(RDIM, RLP, SHEAD)
+         CALL XRTSUB_OFFAX(RDIM, RLP, 1)
 *
          DO ELP=1,EDIM
             DO TLP = 1,TDIM
@@ -1396,7 +1380,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
                BPHOTON = (BSUM - PARTOT) * PFACTOR(ELP,RLP)
 *
 *     Correct particle bckgnd for positional effects
-               CALL XRT_PARTS(DETB, BHEAD.OFFAX, SHEAD.OFFAX,
+               CALL XRT_PARTS(DETB, CHEAD_OFFAX(2), CHEAD_OFFAX(1),
      &            PART1(TLP,ELP), PART2(TLP,ELP), PART3(TLP,ELP), BPART)
 *
 *     Normalise with the box areas
@@ -1448,7 +1432,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_GETDATA    Maps the data array and reorders if necessary
-      SUBROUTINE XRTSUB_GETDATA(IFID, MODE, HEAD, ODIMS, ORDER,
+      SUBROUTINE XRTSUB_GETDATA(IFID, MODE, IDS, ODIMS, ORDER,
      &                      DPNTR,TDPNTR, LVAR, VPNTR, TVPNTR, LQUAL,
      &                         QPNTR, TQPNTR, MASK, LREORD, STATUS)
 *    Description :
@@ -1485,14 +1469,12 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      INTEGER			IFID			! Input file id
+      INTEGER			IFID     ! Input file id
       CHARACTER*(*) MODE		 ! Access mode
+      INTEGER IDS                        ! 1=src 2=bgnd
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Export :
       INTEGER ODIMS(DAT__MXDIM)          ! Dimensions of array
       INTEGER ORDER(7)                   ! The order of the new axes
@@ -1733,7 +1715,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ENDIF
 *
 * Get the sort ranges
-      CALL XRT_GETSORT( IFID, HEAD, STATUS)
+      CALL XRT_GETSORT( IFID, IDS, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -1742,23 +1724,26 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 * Mean off axis angle in a circular box centred at 0,0 is area
 * weighted and becomes  offaxis angle = sqrt( (outer**2 + inner**2) / 2 )
 
-      IF (HEAD.SHAPE .EQ. 'C' .AND. ABS(HEAD.XCENT) .LT. 0.001
-     &                    .AND. ABS(HEAD.YCENT) .LT. 0.001) THEN
+      IF (CHEAD_SHAPE(IDS).EQ.'C'.AND.ABS(CHEAD_XCENT(IDS)) .LT. 0.001
+     &                    .AND. ABS(CHEAD_YCENT(IDS)) .LT. 0.001) THEN
 *
-         HEAD.OFFAX = SQRT(( HEAD.XOUTER**2 + HEAD.XINNER**2 )
-     &                                                / 2.0) * 60.
+         CHEAD_OFFAX(IDS) = SQRT((CHEAD_XOUTER(IDS)**2 +
+     :                      CHEAD_XINNER(IDS)**2 ) / 2.0) * 60.
       ENDIF
 *
 * Set scale factors
-      HEAD.XSCALE = 2.0 * HEAD.XOUTER / ODIMS(1)
-      HEAD.YSCALE = 2.0 * HEAD.YOUTER / ODIMS(2)
+      CHEAD_XSCALE(IDS) = 2.0 * CHEAD_XOUTER(IDS) / ODIMS(1)
+      CHEAD_YSCALE(IDS) = 2.0 * CHEAD_YOUTER(IDS) / ODIMS(2)
 *
-      HEAD.PSCALE = (HEAD.PMAX(1) - HEAD.PMIN(1) + 1) / ODIMS(4)
+      CHEAD_PSCALE(IDS) = (CHEAD_PMAX(1,IDS) - CHEAD_PMIN(1,IDS)+ 1)
+     :                                                    / ODIMS(4)
 *
-      HEAD.TSCALE(1) = (HEAD.TMAX(HEAD.NTRANGE) - HEAD.TMIN(1))
+      CHEAD_TSCALE(1,IDS) =
+     :   (CHEAD_TMAX(CHEAD_NTRANGE(IDS),IDS) - CHEAD_TMIN(1,IDS))
      &                                                 / ODIMS(3)
 *
-      IF (HEAD.NTRANGE .EQ. 2) HEAD.TSCALE(2)=HEAD.TSCALE(1)
+      IF (CHEAD_NTRANGE(IDS) .EQ. 2)
+     :            CHEAD_TSCALE(2,IDS)=CHEAD_TSCALE(1,IDS)
 *
 999   CONTINUE
 *
@@ -1800,7 +1785,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_GETPOS Gets position information from an XRT datafile
-      SUBROUTINE XRTSUB_GETPOS( IFID, HEAD, STATUS)
+      SUBROUTINE XRTSUB_GETPOS( IFID, IDS, STATUS)
 *    Description :
 *     Finds the pointing position of the file and checks if its an LE file
 *    Deficiencies :
@@ -1817,12 +1802,11 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'MATH_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER			IFID			! Input file id
+      INTEGER                   IDS                     ! 1=src 2=bgnd
 *    Export :
-      RECORD /CORR/ HEAD                           ! Header structure
 *    Status :
       INTEGER STATUS
 *
@@ -1858,9 +1842,9 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *
 * Get the RA, DEC and position angle of the pointing direction of the
 * spacecraft
-      CALL CMP_GET0D(HLOC, 'AXIS_RA', HEAD.RA, STATUS)
-      CALL CMP_GET0D(HLOC, 'AXIS_DEC', HEAD.DEC, STATUS)
-      CALL CMP_GET0D(HLOC, 'POSITION_ANGLE', HEAD.ROLL, STATUS)
+      CALL CMP_GET0D(HLOC, 'AXIS_RA', CHEAD_RA(IDS), STATUS)
+      CALL CMP_GET0D(HLOC, 'AXIS_DEC', CHEAD_DEC(IDS), STATUS)
+      CALL CMP_GET0D(HLOC, 'POSITION_ANGLE', CHEAD_ROLL(IDS), STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error getting spacecraft pointing direction')
@@ -1868,9 +1852,9 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ENDIF
 
 *    Convert to radians
-      HEAD.RA = HEAD.RA * MATH__DTOR
-      HEAD.DEC = HEAD.DEC * MATH__DTOR
-      HEAD.ROLL = HEAD.ROLL * MATH__DTOR
+      CHEAD_RA(IDS) = CHEAD_RA(IDS) * MATH__DTOR
+      CHEAD_DEC(IDS) = CHEAD_DEC(IDS) * MATH__DTOR
+      CHEAD_ROLL(IDS) = CHEAD_ROLL(IDS) * MATH__DTOR
 
  999  IF (STATUS .NE. SAI__OK) THEN
           CALL ERR_REP(' ','from XRT_GETPOS',STATUS)
@@ -1879,7 +1863,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_HRICBIM  -  Produce image
-      SUBROUTINE XRTSUB_HRICBIM(SHEAD, BHEAD, ELOC, NX, NY, NE, BNE,
+      SUBROUTINE XRTSUB_HRICBIM( ELOC, NX, NY, NE, BNE,
      &                    BPHOT, BVAR, PE1, PE2, PE3, EPHA, VVAL,
      &                    BIDATA, BIVAR, STATUS)
 *    Description :
@@ -1904,11 +1888,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+C      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ SHEAD                  ! Header info for source file
-      RECORD /CORR/ BHEAD                  ! Header info for bckgnd file
       INTEGER NX,NY,NE                     ! Dimensions of data array
       INTEGER BNE                          ! Size of bckgnd energy axis
       CHARACTER*(DAT__SZLOC) ELOC          ! Locator to eff. area file
@@ -1946,11 +1927,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *
 C      ENDIF
 *
-*  Set X,Y axis values
-C      XCENT = SHEAD.XCENT*60.
-C      YCENT = SHEAD.YCENT*60.
-C      XSCALE = SHEAD.XSCALE*60.
-C      YSCALE = SHEAD.YSCALE*60.
 *
 * Set the energy index to one if the source file was a single image
       IF (NE .EQ. 1) EDIM =1
@@ -1996,7 +1972,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       END
 
 *+XRTSUB_IMDATA - Prepares background data to be turned into an image array
-      SUBROUTINE XRTSUB_IMDATA(BHEAD, NX, NY, NT, NE, NR, BDATA,
+      SUBROUTINE XRTSUB_IMDATA( NX, NY, NT, NE, NR, BDATA,
      &             BVARIN, BQUAL, BMASK, LPART, PART1, PART2, PART3,
      &             CFACTOR, BPHOT, BVAROUT, PE1, PE2, PE3)
 *    Description :
@@ -2007,10 +1983,9 @@ C      YSCALE = SHEAD.YSCALE*60.
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'QUAL_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+C      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ BHEAD                     ! Background header info.
       INTEGER NX,NY,NT,NE,NR                  ! Data dimensions
       REAL BDATA(NX,NY,NT,NE,NR)              ! Bckgnd data
       REAL BVARIN(NX,NY,NT,NE,NR)             ! Bckgnd variance
@@ -2114,7 +2089,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       END
 
 *+XRTSUB_OFFAX - Calculates distance in arcmins from centre of field
-      SUBROUTINE XRTSUB_OFFAX(RDIM, RLP, HEAD)
+      SUBROUTINE XRTSUB_OFFAX(RDIM, RLP, IDS)
 *    Description :
 *     Calculates the mean off-axis angle of a source/backgnd box.
 *     Based on XRT_OFFAX, but with the addition of treating a circular
@@ -2124,13 +2099,13 @@ C      YSCALE = SHEAD.YSCALE*60.
 *     original 6-1-1993  (LTVAD::RDS)
 *    Type definitions :
       IMPLICIT NONE
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER RDIM                        ! Number of radial bins in file
       INTEGER RLP                         ! Radial bin wanted
+      INTEGER IDS
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Export :
 *    Local constants :
 *     <local constants defined by PARAMETER>
@@ -2141,41 +2116,42 @@ C      YSCALE = SHEAD.YSCALE*60.
       REAL XPOS1,XPOS2,YPOS1,YPOS2        ! Used in calc of off-axis pos.
 *-
 *   Calculate the off axis angle of this radial bin
-      XINC = (HEAD.XOUTER - HEAD.XINNER) / REAL(RDIM)
-      RXINN = HEAD.XINNER + XINC * REAL(RLP-1.0)
+      XINC = (CHEAD_XOUTER(IDS) - CHEAD_XINNER(IDS)) / REAL(RDIM)
+      RXINN = CHEAD_XINNER(IDS) + XINC * REAL(RLP-1.0)
       RXOUT = RXINN + XINC
 *
-      YINC = (HEAD.YOUTER - HEAD.YINNER) / REAL(RDIM)
-      RYINN = HEAD.YINNER + YINC * REAL(RLP-1.0)
+      YINC = (CHEAD_YOUTER(IDS) - CHEAD_YINNER(IDS)) / REAL(RDIM)
+      RYINN = CHEAD_YINNER(IDS) + YINC * REAL(RLP-1.0)
       RYOUT = RYINN + YINC
 *
 *   Offset is the average of four offsets
-      XPOS1 = HEAD.XCENT + ( RXINN + (RXOUT - RXINN) / 2.0 )
-      XPOS2 = HEAD.XCENT - ( RXINN + (RXOUT - RXINN) / 2.0 )
-      YPOS1 = HEAD.YCENT + ( RYINN + (RYOUT - RYINN) / 2.0 )
-      YPOS2 = HEAD.YCENT - ( RYINN + (RYOUT - RYINN) / 2.0 )
+      XPOS1 = CHEAD_XCENT(IDS) + ( RXINN + (RXOUT - RXINN) / 2.0 )
+      XPOS2 = CHEAD_XCENT(IDS) - ( RXINN + (RXOUT - RXINN) / 2.0 )
+      YPOS1 = CHEAD_YCENT(IDS) + ( RYINN + (RYOUT - RYINN) / 2.0 )
+      YPOS2 = CHEAD_YCENT(IDS) - ( RYINN + (RYOUT - RYINN) / 2.0 )
 *
-      OFF1 = SQRT(XPOS1**2 + HEAD.YCENT**2)
-      OFF2 = SQRT(XPOS2**2 + HEAD.YCENT**2)
-      OFF3 = SQRT(YPOS1**2 + HEAD.XCENT**2)
-      OFF4 = SQRT(YPOS2**2 + HEAD.XCENT**2)
+      OFF1 = SQRT(XPOS1**2 + CHEAD_YCENT(IDS)**2)
+      OFF2 = SQRT(XPOS2**2 + CHEAD_YCENT(IDS)**2)
+      OFF3 = SQRT(YPOS1**2 + CHEAD_XCENT(IDS)**2)
+      OFF4 = SQRT(YPOS2**2 + CHEAD_XCENT(IDS)**2)
 *
 *   Off-axis angle is the average offset in arcmins
-      HEAD.OFFAX = (OFF1 + OFF2 + OFF3 + OFF4) * 60.0 / 4.0
+      CHEAD_OFFAX(IDS) = (OFF1 + OFF2 + OFF3 + OFF4) * 60.0 / 4.0
 *
 *   Special case for circular box centred at 0,0. Here the average
 *   offset is weighted by the area of the box and so the mean
 *   offaxis angle = sqrt( (outer**2 + inner**2) / 2 )
-      IF (HEAD.SHAPE .EQ. 'C' .AND. ABS(HEAD.XCENT) .LT. 0.001
-     &                    .AND. ABS(HEAD.YCENT) .LT. 0.001) THEN
+      IF (CHEAD_SHAPE(IDS) .EQ. 'C'
+     :                    .AND. ABS(CHEAD_XCENT(IDS)) .LT. 0.001
+     &                    .AND. ABS(CHEAD_YCENT(IDS)) .LT. 0.001) THEN
 *
-         HEAD.OFFAX = SQRT(( RXOUT**2 + RXINN**2 ) / 2.0) * 60.
+         CHEAD_OFFAX(IDS) = SQRT(( RXOUT**2 + RXINN**2 ) / 2.0) * 60.
       ENDIF
 
       END
 
 *+ XRTSUB_PARTCNT - Estimate the particle count in each time bin.
-      SUBROUTINE XRTSUB_PARTCNT( FID, HEAD, AREA, NT, NE, PART1,
+      SUBROUTINE XRTSUB_PARTCNT( FID, IDS, AREA, NT, NE, PART1,
      &                                        PART2, PART3, STATUS)
 *    Description :
 *     Estimates the number of particles likely to be found in the
@@ -2224,12 +2200,12 @@ C      YSCALE = SHEAD.YSCALE*60.
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTHEAD'                ! Gives the MAXRAN constant
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
+      INCLUDE 'XRTHEAD_CMN'                ! Gives the MAXRAN constant
 *    Import :
       INTEGER			FID			! File identifier
-      RECORD /CORR/ HEAD         ! Header stuff
+      INTEGER IDS
       REAL AREA                  ! Area of the background box (ARCMIN**2)
       INTEGER NT,NE              ! Dimensions
 *    Import-Export :
@@ -2295,16 +2271,11 @@ C      YSCALE = SHEAD.YSCALE*60.
 *   Create work space to hold the raw selection times
       CALL DYN_MAPD(1, MAXRAN*2, SPTR, STATUS)
 *   Get raw selection times from the header file
-** THIS BIT HAS BEEN MODIFIED TO COPE WITH MPE-OMD stuff
-      IF (RAWDAT .EQ. 'OMD') THEN
-         CALL XRT_RAWTIM(HEAD.RTNAME, NSEL, %val(SPTR), STATUS)
-      ELSE
-         CALL RAT_RAWTIM(HEAD.RTNAME, NSEL, %val(SPTR), STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL ERR_ANNUL(STATUS)
-            CALL MSG_PRNT('Using alternate header (.hdr)')
-            CALL XRT_RAWTIM(HEAD.RTNAME, NSEL, %val(SPTR), STATUS)
-         ENDIF
+      CALL RAT_RAWTIM(CHEAD_RTNAME, NSEL, %val(SPTR), STATUS)
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_ANNUL(STATUS)
+         CALL MSG_PRNT('Using alternate header (.hdr)')
+         CALL XRT_RAWTIM(CHEAD_RTNAME, NSEL, %val(SPTR), STATUS)
       ENDIF
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -2312,9 +2283,9 @@ C      YSCALE = SHEAD.YSCALE*60.
 
 
 * Get master veto rate times and values for the PSPC
-      IF (INDEX(HEAD.DET, 'PSPC') .NE. 0) THEN
+      IF (INDEX(CHEAD_DET, 'PSPC') .NE. 0) THEN
 *
-         CALL XRT_GETMVR(RAWDAT, HEAD.RTNAME, ERLOC, NMVTIM,
+         CALL XRT_GETMVR(RAWDAT, CHEAD_RTNAME, ERLOC, NMVTIM,
      &                      TPNTR, MPNTR, AVMVR, STATUS)
 *
       ENDIF
@@ -2341,7 +2312,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 * Try and get the spacecraft clock basetime - needed to decode the
 * MVR times. If MVR data was ok
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL CMP_GET0R(ILOC, 'SC_BASE', HEAD.SCBASE, STATUS)
+         CALL CMP_GET0R(ILOC, 'SC_BASE', CHEAD_SCBASE(IDS), STATUS)
 *
 *   Output message if this failed
          IF (STATUS .NE. SAI__OK) THEN
@@ -2369,7 +2340,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *
 *
 *   Create the array of user selection times
-      CALL DYN_MAPD(1, HEAD.NTRANGE*2, UPTR, STATUS)
+      CALL DYN_MAPD(1, CHEAD_NTRANGE(IDS)*2, UPTR, STATUS)
 *
 *   Make a dynamic array to hold the join of these two arrays
       CALL DYN_MAPD(1, MAXRAN*2, LPTR, STATUS)
@@ -2384,21 +2355,22 @@ C      YSCALE = SHEAD.YSCALE*60.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%
 *   Put user selection times into one array
-      CALL XRT_LIVEWIND(HEAD.NTRANGE, HEAD.TMIN, HEAD.TMAX, %val(UPTR))
+      CALL XRT_LIVEWIND(CHEAD_NTRANGE,CHEAD_TMIN(1,IDS),
+     :                         CHEAD_TMAX(1,IDS), %val(UPTR))
 *
 *   Merge these with the user selection times in the sort box
-      CALL XRT_TIMSET(MAXRAN*2, NSEL, %val(SPTR), HEAD.NTRANGE*2,
-     &                HEAD.NTRANGE*2, %val(UPTR), MAXRAN*2, NRAW,
+      CALL XRT_TIMSET(MAXRAN*2, NSEL, %val(SPTR), CHEAD_NTRANGE(IDS)*2,
+     &                CHEAD_NTRANGE(IDS)*2, %val(UPTR), MAXRAN*2, NRAW,
      &                %val(LPTR), OVRLAP)
 *
 * Calculate the positional correction factors.
 * Head.offax should be in arcmins.
       IF (PDATE .EQ. 1) THEN
-         PC1 = 8.42E-5 + 3.95E-7 * HEAD.OFFAX
+         PC1 = 8.42E-5 + 3.95E-7 * CHEAD_OFFAX(IDS)
       ELSEIF (PDATE .EQ. 2 .OR. PDATE .EQ. 3) THEN
-         PC1 = 9.79E-5 + 3.18E-7 * HEAD.OFFAX
+         PC1 = 9.79E-5 + 3.18E-7 * CHEAD_OFFAX(IDS)
       ELSE
-         PC1 = 9.22E-5 + 2.99E-7 * HEAD.OFFAX
+         PC1 = 9.22E-5 + 2.99E-7 * CHEAD_OFFAX(IDS)
       ENDIF
 *
 * The external components are flat over the field of view
@@ -2412,8 +2384,8 @@ C      YSCALE = SHEAD.YSCALE*60.
       DO ELP=1,NE
 *
 *   Calculate first and last PH channels in this energy bin ( and add 0.5 )
-         FCHAN = HEAD.PMIN(1) + (ELP-1) * HEAD.PSCALE
-         LCHAN = HEAD.PMIN(1) + (ELP) * HEAD.PSCALE - 1
+         FCHAN = CHEAD_PMIN(1,IDS) + (ELP-1) * CHEAD_PSCALE(IDS)
+         LCHAN = CHEAD_PMIN(1,IDS) + (ELP) * CHEAD_PSCALE(IDS) - 1
 *
 *   Add the spectral contribution for each PH channel in this bin
          SC1(ELP)=0.0
@@ -2458,8 +2430,8 @@ C      YSCALE = SHEAD.YSCALE*60.
       DO TLP=1,NT
 *
 *      Calculate the exposure time in this time bin
-         TBIN(1) = HEAD.TMIN(1) + (TLP-1) * HEAD.TSCALE(1)
-         TBIN(2) = HEAD.TMIN(1) + TLP * HEAD.TSCALE(1)
+         TBIN(1) = CHEAD_TMIN(1,IDS) + (TLP-1) * CHEAD_TSCALE(1,IDS)
+         TBIN(2) = CHEAD_TMIN(1,IDS) + TLP * CHEAD_TSCALE(1,IDS)
 *
 *      Find where this overlaps the live_time array
          CALL XRT_TIMSET(2, 2, TBIN, MAXRAN*2, NRAW*2, %val(LPTR),
@@ -2470,7 +2442,8 @@ C      YSCALE = SHEAD.YSCALE*60.
          IF ( NOVR .GT. 0 ) THEN
 *
 *        Search through MVR array for data in these time windows.
-           CALL XRTSUB_PARTCNT_MVR(NMVTIM, %val(TPNTR), HEAD.SCBASE,
+           CALL XRTSUB_PARTCNT_MVR(NMVTIM,%val(TPNTR),
+     :               CHEAD_SCBASE(IDS),
      &                   %val(MPNTR), MAXRAN*2, NOVR, %val(TJPTR),
      &                                         AVMVR, MSAVE, MVMEAN)
 *
@@ -2778,8 +2751,8 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       END
 
 *+XRTSUB_POSCORR   Calcs. corrections for different box positions
-      SUBROUTINE XRTSUB_POSCORR( SFID, SHEAD, BHEAD, RLOC, ELOC,
-     &                            EAX, EDIM, RDIM, PFACTOR, STATUS)
+      SUBROUTINE XRTSUB_POSCORR( SFID,  RLOC, ELOC,
+     &                   EAX, EDIM, RDIM, PFACTOR, STATUS)
 *    Description :
 *       Calculates the ratio of the instrument response at the
 *       positions of the source and background boxes. This is an energy
@@ -2809,12 +2782,9 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER			SFID			! Source file id
-      RECORD /CORR/ SHEAD                 ! Header info for source file
-      RECORD /CORR/ BHEAD                 ! Header info for bkgnd file
       CHARACTER*(DAT__SZLOC) RLOC         ! Locator to the response file
       CHARACTER*(DAT__SZLOC) ELOC         ! Effective area file Locator
       INTEGER EAX                         ! Axis number of Corr PH axis
@@ -2927,19 +2897,18 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       ENDIF
 *
 * Get the effective area as a function of energy for the background file
-      CALL XRT_VIGNET(BHEAD, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
+      CALL XRT_VIGNET(2, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
      &                .FALSE., EDIM, %val(BPNTR), BCORR, VFLAG, STATUS)
 *
 * Loop over each radial bin
       DO RLP=1,RDIM
 *
 *   Calculate the off axis angle of this radial bin. Write into SHEAD
-         CALL XRTSUB_OFFAX(RDIM, RLP, SHEAD)
+         CALL XRTSUB_OFFAX(RDIM, RLP, 1)
 *
-D      WRITE(*,*) SHEAD.OFFAX
 *
 *   Get the effective area as a function of energy for the source file
-         CALL XRT_VIGNET(SHEAD, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
+         CALL XRT_VIGNET(1, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
      &              .FALSE., EDIM, %val(SPNTR), SCORR, VFLAG, STATUS)
 *
 *   If the above produced an error don't do the correction
@@ -3236,7 +3205,7 @@ D      WRITE(*,*) SHEAD.OFFAX
 
 
 *+XRT_CALCAREA - Calculate area of a box
-      SUBROUTINE XRT_CALCAREA(HEAD, LQUAL, NX, NY, NT, NE,
+      SUBROUTINE XRT_CALCAREA(IDS, LQUAL, NX, NY, NT, NE,
      &                                    NR, QUAL, MASK, AREA)
 *    Description :
 *    History :
@@ -3244,10 +3213,9 @@ D      WRITE(*,*) SHEAD.OFFAX
       IMPLICIT NONE
 *    Global variables :
       INCLUDE 'QUAL_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ HEAD                ! Header structure
+      INTEGER IDS
       LOGICAL LQUAL                     ! Is quality available ?
       INTEGER NX,NY,NT,NE,NR            ! Dimensions of quality array
       BYTE QUAL(NX,NY,NT,NE,NR)         ! Quality
@@ -3268,17 +3236,17 @@ D      WRITE(*,*) SHEAD.OFFAX
 * calculate the geometric area
       IF (.NOT. LQUAL .OR. (NX.EQ.1 .AND. NY.EQ.1) ) THEN
 *
-         IF (HEAD.SHAPE(1:1) .EQ. 'R') THEN
+         IF (CHEAD_SHAPE(IDS)(1:1) .EQ. 'R') THEN
 *
 *   Square box:
-            AREA = 4.0 * ( HEAD.XOUTER * HEAD.YOUTER -
-     &                     HEAD.XINNER * HEAD.YINNER )
+            AREA = 4.0 * ( CHEAD_XOUTER(IDS) * CHEAD_YOUTER(IDS) -
+     &                     CHEAD_XINNER(IDS) * CHEAD_YINNER(IDS) )
 *
-         ELSEIF (INDEX ('CAE', HEAD.SHAPE(1:1)) .NE. 0) THEN
+         ELSEIF (INDEX ('CAE', CHEAD_SHAPE(IDS)(1:1)) .NE. 0) THEN
 *
 *   Circle, ellipse or annulus
-            AREA = PI * ( HEAD.XOUTER * HEAD.YOUTER -
-     &                             HEAD.XINNER * HEAD.YINNER )
+            AREA = PI * ( CHEAD_XOUTER(IDS) * CHEAD_YOUTER(IDS) -
+     &                       CHEAD_XINNER(IDS) * CHEAD_YINNER(IDS) )
 *
          ENDIF
 *
@@ -3298,8 +3266,10 @@ D      WRITE(*,*) SHEAD.OFFAX
 *
 *       Sum the offset angles of each GOOD pixel. (Relies on the X axis
 *       increasing from right to lef and Y increasing from bottom to top !)
-                  XOFF = HEAD.XCENT - (NX/2.0 - LPX) * HEAD.XSCALE
-                  YOFF = HEAD.YCENT + (NY/2.0 - LPY) * HEAD.YSCALE
+                  XOFF = CHEAD_XCENT(IDS) - (NX/2.0 - LPX) *
+     :                                     CHEAD_XSCALE(IDS)
+                  YOFF = CHEAD_YCENT(IDS) + (NY/2.0 - LPY) *
+     :                                     CHEAD_YSCALE(IDS)
                   AXOFF = AXOFF + SQRT(XOFF*XOFF + YOFF*YOFF)
 *
                ENDIF
@@ -3314,10 +3284,10 @@ D      WRITE(*,*) SHEAD.OFFAX
          ENDIF
 *
 *   Modify the off-axis value
-         HEAD.OFFAX = AXOFF / REAL(PCOUNT) * 60.
+         CHEAD_OFFAX(IDS) = AXOFF / REAL(PCOUNT) * 60.
 *
 *   Multiply by the area of a pixel in square degrees.
-         AREA = PCOUNT * HEAD.XSCALE * HEAD.YSCALE
+         AREA = PCOUNT * CHEAD_XSCALE(IDS) * CHEAD_YSCALE(IDS)
 *
       ENDIF
 *

@@ -24,6 +24,7 @@
 *                          e.g. 200 days. (RDS)
 *         Apr 94 : V1.7-0  RATionalised for new release of asterix (LTVAD::JKA)
 *      20 May 94 : V1.7-1  Use AIO for output (DJA)
+*       6 Apr 98 : V2.2-1  Removed structures (rjv)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -31,8 +32,8 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
+      INCLUDE 'XRTSRT_CMN'
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
       INTEGER                 STATUS
 *    Functions :
@@ -40,14 +41,11 @@
         EXTERNAL CHR_LEN
 *    Local Constants :
       CHARACTER*30            VERSION
-         PARAMETER          ( VERSION = 'SHOWXRT Version 2.2-0')
+         PARAMETER          ( VERSION = 'SHOWXRT Version 2.2-1')
       INTEGER MAXRAW
          PARAMETER          ( MAXRAW = 20 )
 
 *    Local variables :
-      RECORD /XRT_HEAD/ HEAD         ! Observation header information
-      RECORD /XRT_SCFDEF/ SRT        ! Sort info.
-      CHARACTER*30 VERS              ! SASS version date
       LOGICAL LSHOW,LTIME
 *-
 *   Version anouncement
@@ -58,17 +56,11 @@
 *
 *     Get directory name from user and display the available observations.
 *     Get rootname of file wanted.
-      CALL XSORT_FILESELECT(SRT, HEAD, STATUS)
+      CALL XRTSORT_FILESELECT(STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-      CALL CHR_UCASE(HEAD.ORIGIN)
-      IF (HEAD.ORIGIN.EQ.'OMD') THEN
-*      Read header info from the corresponding .HDR file
-         CALL XRT_RDHEAD( .TRUE., SRT, HEAD, VERS, STATUS)
-      ELSE
-         CALL RAT_GETXRTHEAD(SRT.ROOTNAME, HEAD, STATUS)
-      ENDIF
+      CALL RAT_GETXRTHEAD(SRT_ROOTNAME, STATUS)
 
 *   Produce an observation summary ?
       CALL USI_GET0L('SHOWOBS', LSHOW, STATUS)
@@ -77,7 +69,7 @@
       CALL USI_GET0L('TIMLIST', LTIME, STATUS)
 
 *   Write observation description
-      CALL SHOWXRT_OUT(LSHOW, LTIME, HEAD, STATUS)
+      CALL SHOWXRT_OUT(LSHOW, LTIME,  STATUS)
 
  999  CALL AST_CLOSE
       CALL AST_ERR( STATUS )
@@ -86,19 +78,18 @@
 
 
 *+  SHOWXRT_OUT - Outputs description of observation
-      SUBROUTINE SHOWXRT_OUT(LSHOW, LTIME, HEAD,  STATUS)
+      SUBROUTINE SHOWXRT_OUT(LSHOW, LTIME,   STATUS)
 *    Description :
 *    History :
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Import :
       LOGICAL LSHOW                      ! Produce an observation summary ?
       LOGICAL LTIME                      ! Produce a list of On/OFF times ?
-      RECORD /XRT_HEAD/ HEAD
 *    Import-Export :
 *     <declarations and descriptions for imported/exported arguments>
 *    Export :
@@ -136,15 +127,15 @@
         IF (STATUS .NE. SAI__OK) GOTO 999
 
 *      Convert base time to character string
-        CALL CONV_MJDDAT(HEAD.BASE_MJD, TSTRING1)
+        CALL CONV_MJDDAT(HEAD_BASE_MJD, TSTRING1)
 
 *      Convert end time to char. string
-        ENDMJD = HEAD.BASE_MJD + HEAD.TEND(HEAD.NTRANGE) / 86400.
+        ENDMJD = HEAD_BASE_MJD + HEAD_TEND(HEAD_NTRANGE) / 86400.
         CALL CONV_MJDDAT(ENDMJD, TSTRING2)
 
 *      Output general info.
         CALL AIO_BLNK( AID, STATUS )
-        WRITE( SBUF,1010) HEAD.OBSERVER, HEAD.TITLE, HEAD.FILTER
+        WRITE( SBUF,1010) HEAD_OBSERVER, HEAD_TITLE, HEAD_FILTER
  1010   FORMAT( 1X, 'ROR_ID: ',A12,2X,'TARGET :',A12,'FILTER :', A8 )
         CALL AIO_WRITE( AID, SBUF, STATUS )
         CALL AIO_BLNK( AID, STATUS )
@@ -154,12 +145,12 @@
 
 *      Write SASS version id.
         CALL AIO_BLNK( AID, STATUS )
-        CALL MSG_SETC( 'SASS', HEAD.SASS_DATE )
+        CALL MSG_SETC( 'SASS', HEAD_SASS_DATE )
         CALL AIO_WRITE( AID, ' SASS version: ^SASS', STATUS )
         CALL AIO_BLNK( AID, STATUS )
 
 *      Write detector ID
-        CALL MSG_SETC( 'DET', HEAD.DETECTOR )
+        CALL MSG_SETC( 'DET', HEAD_DETECTOR )
         CALL AIO_WRITE( AID, ' Detector : ^DET', STATUS )
         CALL AIO_BLNK( AID, STATUS )
 
@@ -171,17 +162,17 @@
         CALL AIO_WRITE( AID, '      ON        OFF     Duration',
      :                  STATUS )
         EXPOS = 0.0D0
-        DO LP=1,HEAD.NTRANGE
-          WRITE(SBUF,1020)HEAD.TSTART(LP),HEAD.TEND(LP),
-     :                  (HEAD.TEND(LP)-HEAD.TSTART(LP))
+        DO LP=1,HEAD_NTRANGE
+          WRITE(SBUF,1020)HEAD_TSTART(LP),HEAD_TEND(LP),
+     :                  (HEAD_TEND(LP)-HEAD_TSTART(LP))
           CALL AIO_WRITE( AID, SBUF, STATUS )
-          EXPOS = EXPOS + HEAD.TEND(LP) - HEAD.TSTART(LP)
+          EXPOS = EXPOS + HEAD_TEND(LP) - HEAD_TSTART(LP)
         END DO
  1020   FORMAT(2X, F10.1, X, F10.1, X, F10.1)
         CALL AIO_BLNK( AID, STATUS )
 
 *      Write exposure time
-        WRITE( SBUF,1030) HEAD.TEND(HEAD.NTRANGE) / 86400.0D0
+        WRITE( SBUF,1030) HEAD_TEND(HEAD_NTRANGE) / 86400.0D0
  1030   FORMAT(1X,'Total elapsed time (days):',F7.2)
         CALL AIO_WRITE( AID, SBUF, STATUS )
         CALL MSG_SETR( 'EXP', EXPOS )
@@ -190,8 +181,8 @@
         CALL AIO_BLNK( AID, STATUS )
 
 *      Write RA and DEC of observation
-        RA = HEAD.AXIS_RA * DTOR
-        DEC = HEAD.AXIS_DEC * DTOR
+        RA = HEAD_AXIS_RA * DTOR
+        DEC = HEAD_AXIS_DEC * DTOR
         CALL STR_RRADTOC( RA, 'HH:MM:SS.S', RASTRING, STATUS )
         CALL STR_RRADTOC( DEC, 'SDD:MM:SS', DECSTRING, STATUS )
         CALL MSG_SETC( 'RA', RASTRING )
@@ -217,9 +208,9 @@
 *   Open the output file
          OPEN(UNIT=MUNIT, FILE='XRT_TIMES.LIS', STATUS='NEW')
 *
-         DO LP=1,HEAD.NTRANGE
-            SMJD = HEAD.BASE_MJD + HEAD.TSTART(LP)/86400.0D0
-            EMJD = HEAD.BASE_MJD + HEAD.TEND(LP)/86400.0D0
+         DO LP=1,HEAD_NTRANGE
+            SMJD = HEAD_BASE_MJD + HEAD_TSTART(LP)/86400.0D0
+            EMJD = HEAD_BASE_MJD + HEAD_TEND(LP)/86400.0D0
 *
 *    Convert start and stop time to an MJD and put an M in front of it.
             WRITE(CSTRING1, FMT='(E23.15)')SMJD

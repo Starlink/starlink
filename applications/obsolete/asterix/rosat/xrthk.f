@@ -17,6 +17,7 @@
 *     21-Feb-1994  (1.6-3) RDF file names and column names (LTVAD::JKA)
 *     24-Apr-1994  (1.7-0) for new release of asterix
 *     27-May-1994  Opens output textfile with STATUS="UNKNOWN"
+*      6 Apr 98 V 2.2-1 Structures removed (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -24,10 +25,8 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
+      INCLUDE 'XRTSRT_CMN'
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -38,12 +37,9 @@
 *    Local variables :
       CHARACTER*20 EXT                          ! filename extension
       CHARACTER*20 COL                          ! HDS column/array name
-      RECORD /XRT_SCFDEF/ SRT
-      RECORD /XRT_HEAD/ HEAD
 *
       CHARACTER*7 PARAM                         ! Name of ADAM HK parameter
       CHARACTER*6 PARMIN,PARMAX                 ! Name of ADAM min,max params
-      CHARACTER*40 VERS                         !
       CHARACTER*23 CSTRING1,CSTRING2            ! MJD strings
       CHARACTER*60 ERFILE                       ! Name of eventrate file
       CHARACTER*60 ATTFIL                       ! Name of attitude file
@@ -89,32 +85,25 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTHK Version 2.2-0')
+      PARAMETER (VERSION = 'XRTHK Version 2.2-1')
 *-
       CALL AST_INIT(STATUS)
       CALL MSG_PRNT(VERSION)
 *
 *     Get directory name from user and display the available observations.
 *     Get rootname of file wanted.
-      CALL XSORT_FILESELECT(SRT, HEAD, STATUS)
+      CALL XRTSORT_FILESELECT( STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 
-      CALL CHR_UCASE(HEAD.ORIGIN)
-      IF (HEAD.ORIGIN.EQ.'OMD') THEN
-*      Read header info from the corresponding .HDR file
-         CALL XRT_RDHEAD( .TRUE., SRT, HEAD, VERS, STATUS)
-         LMPE = .TRUE.
-      ELSE
-         CALL RAT_GETXRTHEAD(SRT.ROOTNAME, HEAD, STATUS)
-         LMPE = .FALSE.
-      ENDIF
+      CALL RAT_GETXRTHEAD(SRT_ROOTNAME,  STATUS)
+      LMPE = .FALSE.
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Attempt to open the eventrate file
-      CALL RAT_HDLOOKUP(HEAD,'EVRATE','EXTNAME',EXT,STATUS)
-      ERFILE = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
+      CALL RAT_HDLOOKUP('EVRATE','EXTNAME',EXT,STATUS)
+      ERFILE = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
 *
       CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
 *
@@ -131,7 +120,7 @@
          LEVR = .TRUE.
 *
 *   Read eventrates times
-         CALL RAT_HDLOOKUP(HEAD,'EVRATE','TIME',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','TIME',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, EVTLOC, STATUS)
          CALL DAT_SIZE(EVTLOC, ENTIM, STATUS)
 *
@@ -146,8 +135,8 @@
       ENDIF
 *
 * Attempt to open the attitude file
-      CALL RAT_HDLOOKUP(HEAD,'ASPECT','EXTNAME',EXT,STATUS)
-      ATTFIL = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
+      CALL RAT_HDLOOKUP('ASPECT','EXTNAME',EXT,STATUS)
+      ATTFIL = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
 *
       CALL HDS_OPEN(ATTFIL, 'READ', ATTLOC, STATUS)
 *
@@ -164,7 +153,7 @@
          LATT = .TRUE.
 *
 *   Read attitude times
-         CALL RAT_HDLOOKUP(HEAD,'ASPECT','TIME',COL,STATUS)
+         CALL RAT_HDLOOKUP('ASPECT','TIME',COL,STATUS)
          CALL DAT_FIND(ATTLOC, COL, AFTLOC, STATUS)
          CALL DAT_SIZE(AFTLOC, ANTIM, STATUS)
 *
@@ -195,17 +184,16 @@
       ENDIF
 *
 *   Fill the ON-OFF times array from the TIM_SEL values
-      CALL XRTHK_FILLTIM(HEAD, %val(OPNTR))
+      CALL XRTHK_FILLTIM( %val(OPNTR))
 *
 *   Calculate the total exposure time in the TIM_SEL structure
       EXPO_TIM=0.0D0
-      DO LP=1,HEAD.NTRANGE
+      DO LP=1,HEAD_NTRANGE
 *
-         EXPO_TIM = EXPO_TIM + HEAD.TEND(LP) - HEAD.TSTART(LP)
+         EXPO_TIM = EXPO_TIM + HEAD_TEND(LP) - HEAD_TSTART(LP)
 *
       ENDDO
 *
-D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *   Initialise the BAD and GOOD window counters
       NBAD = 0
       NGOOD = 0
@@ -214,22 +202,22 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       CALL MSG_PRNT('  ')
       CALL MSG_PRNT('Typical parameters to sort on :')
       CALL MSG_PRNT('  ')
-      CALL RAT_HDLOOKUP(HEAD,'EVRATE','MVRATE',COL,STATUS)
+      CALL RAT_HDLOOKUP('EVRATE','MVRATE',COL,STATUS)
       CALL MSG_SETC('MVR',COL)
       CALL MSG_PRNT('   Master veto rate : ^MVR')
-      CALL RAT_HDLOOKUP(HEAD,'ASPECT','ASPERR',COL,STATUS)
+      CALL RAT_HDLOOKUP('ASPECT','ASPERR',COL,STATUS)
       CALL MSG_SETC('ASP',COL)
       CALL MSG_PRNT('   Aspect error : ^ASP')
-      CALL RAT_HDLOOKUP(HEAD,'EVRATE','XACC',COL,STATUS)
+      CALL RAT_HDLOOKUP('EVRATE','XACC',COL,STATUS)
       CALL MSG_SETC('AXE',COL)
       CALL MSG_PRNT('   Accepted event rate : ^AXE')
       CALL MSG_PRNT('  ')
 *
 *     set the default to "MASTER VETO" else "ASPECT ERROR" (this is
 *     arbitrary, but ASPECT ERROR does appear in both PSPC and HRI datasets)
-      CALL RAT_HDLOOKUP(HEAD,'EVRATE','MVRATE',COL,STATUS)
+      CALL RAT_HDLOOKUP('EVRATE','MVRATE',COL,STATUS)
       IF (COL.EQ.' ')
-     &    CALL RAT_HDLOOKUP(HEAD,'ASPECT','ASPERR',COL,STATUS)
+     &    CALL RAT_HDLOOKUP('ASPECT','ASPERR',COL,STATUS)
       CALL USI_DEF0C('HKPAR1',COL,STATUS)
 *   Loop over parameter selection
       DO PLP = 1,10
@@ -352,13 +340,13 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *      Calculate times when the data is bad. NB: The output
 *      array TBAD is updated to take into account overlapping
 *      times.
-         CALL XRTHK_BADTIMES(HEAD, EXPO_TIM, %val(OPNTR), NTIM,
+         CALL XRTHK_BADTIMES( EXPO_TIM, %val(OPNTR), NTIM,
      &                       %val(TPNTR), %val(PNTR), HKMIN, HKMAX,
      &                     INTERVAL, %val(WPNTR), NBAD, TBAD, STATUS)
 *
 *      Convert the BAD TIME windows into a set of good times in MJD format
          IF (NBAD .GT. 0) THEN
-            CALL XRTHK_GOODTIMES(HEAD, NBAD, TBAD,
+            CALL XRTHK_GOODTIMES( NBAD, TBAD,
      &          %val(WPNTR), %val(W2PNTR), EXPO_TIM, NGOOD, TGOOD)
          ENDIF
 *
@@ -380,7 +368,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 * Merge the output GOOD times with the TIM_SEL values and convert to MJD
 * format
-      CALL XRTHK_GOODMJD(HEAD, %val(OPNTR), %val(W2PNTR),
+      CALL XRTHK_GOODMJD( %val(OPNTR), %val(W2PNTR),
      &                               EXPO_TIM, NGOOD, TGOOD)
 *
 * Get a filename from the parameter system
@@ -429,7 +417,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       END
 ***********************************************************************
 *+XRTHK_BADTIMES  -  calculates the good time windows from HK params.
-      SUBROUTINE XRTHK_BADTIMES(HEAD, EXPO_TIM, OARR, NTIM, TIME,
+      SUBROUTINE XRTHK_BADTIMES( EXPO_TIM, OARR, NTIM, TIME,
      &                 HKVAL, HKMIN, HKMAX, INTERVAL, TOUT, NBAD,
      &                 TBAD, STATUS)
 *    Description :
@@ -444,12 +432,11 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definition :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
       INTEGER STATUS
 *    Import :
-      RECORD /XRT_HEAD/ HEAD                     ! Defines MAXRAN
 *
       DOUBLE PRECISION EXPO_TIM                  ! Total time in TIM_SEL
       DOUBLE PRECISION OARR(MAXRAN*2)            ! ON-OFF TIM_SEL times
@@ -480,9 +467,9 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 * Check if the HK data is complete
       IF (TIME(1) .GT. (OARR(1) + 10.)) THEN
          CALL MSG_PRNT('** The HK file is incomplete **')
-         CALL MSG_SETI('T1',NINT(HEAD.TSTART(1)+HEAD.BASE_SCTIME))
+         CALL MSG_SETI('T1',NINT(HEAD_TSTART(1)+HEAD_BASE_SCTIME))
          CALL MSG_SETI('T2',
-     :      NINT(HEAD.TEND(HEAD.NTRANGE)+HEAD.BASE_SCTIME))
+     :      NINT(HEAD_TEND(HEAD_NTRANGE)+HEAD_BASE_SCTIME))
          CALL MSG_PRNT('   data time range: ^T1 to ^T2 ')
          CALL MSG_SETI('T1',NINT(TIME(1)))
          CALL MSG_SETI('T2',NINT(TIME(NTIM)))
@@ -497,7 +484,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       NEW = .TRUE.
 *
 * Set the last time value
-      LAST = HEAD.BASE_SCTIME
+      LAST = HEAD_BASE_SCTIME
 *
       DO LP=1,NTIM
 *
@@ -585,7 +572,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 *   Calculate the overlapping time between this set of BAD windows and the
 *   TIM_SEL values. Use NOUT and TOUT as dummy arrays
-         CALL XRT_TIMSET(MAXRAN*2, HEAD.NTRANGE*2, OARR, MAXRAN*2,
+         CALL XRT_TIMSET(MAXRAN*2, HEAD_NTRANGE*2, OARR, MAXRAN*2,
      &                        NBAD*2, TBAD, MAXRAN*2, NOUT, TOUT, OVR)
 *
 *   Tell user what percentage of the total exposure time has been
@@ -610,7 +597,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 
 ***********************************************************************
 *+XRTHK_GOODTIMES  -  calculates the good time windows from the bad
-      SUBROUTINE XRTHK_GOODTIMES(HEAD, NBAD, TBAD, TFIRST, TOUT,
+      SUBROUTINE XRTHK_GOODTIMES( NBAD, TBAD, TFIRST, TOUT,
      &                                     EXPO_TIM, NGOOD, TGOOD)
 *    Description :
 *     Takes a series of BAD time windows to be excluded in S/C clock
@@ -620,11 +607,10 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
 *    Import :
-      RECORD /XRT_HEAD/ HEAD                     ! Header records
 *
       INTEGER NBAD                               ! No. of bad time windows
       DOUBLE PRECISION TBAD(MAXRAN*2)            ! Bad times (s/c clock units)
@@ -647,9 +633,9 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *-
 * Convert bad windows to good windows
 *   Is the first data section good ?
-      IF (TBAD(1) .GT. HEAD.BASE_SCTIME) THEN
+      IF (TBAD(1) .GT. HEAD_BASE_SCTIME) THEN
 *
-         TFIRST(1) = HEAD.BASE_SCTIME
+         TFIRST(1) = HEAD_BASE_SCTIME
          GST = 2
          BST = 1
 *
@@ -659,8 +645,8 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       ENDIF
 *
 *   Is the last data section good ?
-      SCEND = (HEAD.END_MJD - HEAD.BASE_MJD) *  86400.0
-     &                                   + HEAD.BASE_SCTIME
+      SCEND = (HEAD_END_MJD - HEAD_BASE_MJD) *  86400.0
+     &                                   + HEAD_BASE_SCTIME
 *
       IF (TBAD(NBAD*2) .GE. SCEND) THEN
          BEN = NBAD*2 - 1
@@ -715,7 +701,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       END
 ***********************************************************************
 *+XRTHK_GOODMJD -  converts good times to MJD format
-      SUBROUTINE XRTHK_GOODMJD(HEAD, OARR, TOUT, EXPO_TIM,
+      SUBROUTINE XRTHK_GOODMJD( OARR, TOUT, EXPO_TIM,
      &                                          NGOOD, TGOOD)
 *    Description :
 *     Takes a series of GOOD time windows, merges them with the
@@ -726,11 +712,10 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
 *    Import :
-      RECORD /XRT_HEAD/ HEAD                     ! Header records
 *
       DOUBLE PRECISION OARR(MAXRAN*2)            ! TIM_SEL values
       DOUBLE PRECISION TOUT(MAXRAN*2)            ! TIM_SEL values
@@ -749,7 +734,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *-
 *   Merge the GOOD windows with the TIM_SEL values
       CALL XRT_TIMSET(MAXRAN*2, NGOOD*2, TGOOD, MAXRAN*2,
-     &              HEAD.NTRANGE*2, OARR, MAXRAN*2, NOUT, TOUT, OVR)
+     &              HEAD_NTRANGE*2, OARR, MAXRAN*2, NOUT, TOUT, OVR)
 *
 *   Set the number of good windows
       NGOOD = NOUT
@@ -775,14 +760,14 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 *   Convert values to MJD
       DO LP=1,NGOOD*2
-         TGOOD(LP) = HEAD.BASE_MJD + (TGOOD(LP) - HEAD.BASE_SCTIME)
+         TGOOD(LP) = HEAD_BASE_MJD + (TGOOD(LP) - HEAD_BASE_SCTIME)
      &                             / 86400.0D0
       ENDDO
 *
       END
 ***********************************************************************
 *+XRTHK_FILLTIM  -  fill ON-OFF array from TIM_SEL values
-      SUBROUTINE XRTHK_FILLTIM(HEAD, OARR)
+      SUBROUTINE XRTHK_FILLTIM( OARR)
 *    Description :
 *     Sets an array of s/c clock times derived from the TIM_SEL values
 *     in the .HDR file
@@ -791,11 +776,10 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
 *    Import :
-      RECORD /XRT_HEAD/ HEAD                     ! Header records
 *
 *    Import-Export :
 *    Export :
@@ -805,9 +789,9 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *    Local variables :
       INTEGER LP
 *-
-      DO LP=1,HEAD.NTRANGE
-         OARR(1+(LP-1)*2) = HEAD.TSTART(LP) + HEAD.BASE_SCTIME
-         OARR(2*LP) = HEAD.TEND(LP) + HEAD.BASE_SCTIME
+      DO LP=1,HEAD_NTRANGE
+         OARR(1+(LP-1)*2) = HEAD_TSTART(LP) + HEAD_BASE_SCTIME
+         OARR(2*LP) = HEAD_TEND(LP) + HEAD_BASE_SCTIME
       ENDDO
 *
       END

@@ -60,10 +60,10 @@
       INCLUDE 'MATH_PAR'
       INCLUDE 'PAR_ERR'
 *
-*    Structure definitions :
+*    Global variables :
 *
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
+      INCLUDE 'XRTSRT_CMN'
+      INCLUDE 'XRTHEAD_CMN'
 *
 *    Status :
 *
@@ -85,8 +85,6 @@
 *
 *    Local variables :
 *
-      RECORD /XRT_SCFDEF/    	SRT
-      RECORD /XRT_HEAD/      	HEAD
 
       CHARACTER*(DAT__SZNAM)    ACOL 			! FITS column name
       CHARACTER*132		ATTFIL			! Attitude file name
@@ -98,7 +96,6 @@
       CHARACTER*79		LINE			! Output text
       CHARACTER*(DAT__SZNAM)    TCOL 			! TIME column name
       CHARACTER 		TIMEFILE*80		! Good times list
-      CHARACTER*40           	VERS                  	! SASS version
 
       DOUBLE PRECISION 		DSCS			! Spacecraft clock
 
@@ -185,7 +182,7 @@ c	From INTEGER to improve exposure time evaluation
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.2-0')
+        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.2-1')
 *-
 
 *    Initialise Asterix
@@ -196,29 +193,25 @@ c	From INTEGER to improve exposure time evaluation
 
 *    Get directory name from user and display the available observations.
 *    Get rootname of file wanted.
-      CALL XSORT_FILESELECT( SRT, HEAD, STATUS )
+      CALL XRTSORT_FILESELECT(  STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Read the header
-      IF ( CHR_SIMLR(HEAD.ORIGIN,'OMD') ) THEN
-        CALL XRT_RDHEAD( .TRUE., SRT, HEAD, VERS, STATUS )
-      ELSE
-        CALL RAT_GETXRTHEAD( SRT.ROOTNAME, HEAD, STATUS )
-      END IF
+      CALL RAT_GETXRTHEAD( SRT_ROOTNAME, STATUS )
 
 *    Create output file
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
 *    Get observation start time
-      BASESC = HEAD.BASE_SCTIME
+      BASESC = HEAD_BASE_SCTIME
 
 *    Choose detector number
-      IF ( CHR_SIMLR(HEAD.DETECTOR,'PSPCB') ) THEN
+      IF ( CHR_SIMLR(HEAD_DETECTOR,'PSPCB') ) THEN
         IDET = 2
-      ELSE IF ( CHR_SIMLR(HEAD.DETECTOR,'PSPCC') ) THEN
+      ELSE IF ( CHR_SIMLR(HEAD_DETECTOR,'PSPCC') ) THEN
         IDET = 1
       ELSE
-        IF ( HEAD.BASE_MJD .LT. JAN26_1991 ) THEN
+        IF ( HEAD_BASE_MJD .LT. JAN26_1991 ) THEN
           IDET = 1
           CALL MSG_SETC( 'D', 'C' )
         ELSE
@@ -243,7 +236,7 @@ c	From INTEGER to improve exposure time evaluation
       ELSE
 
 *      Decode good times file
-        CALL UTIL_TDECODE( TIMEFILE, HEAD.BASE_MJD, MAXGTIME,
+        CALL UTIL_TDECODE( TIMEFILE, HEAD_BASE_MJD, MAXGTIME,
      :                      NACTGTIME, GSTART, GEND, STATUS )
 
 *      Convert to spacecraft clock
@@ -342,22 +335,22 @@ c	From INTEGER to improve exposure time evaluation
       END DO
 
 *    Attempt to open the attitude file
-      CALL RAT_HDLOOKUP( HEAD, 'ASPDATA', 'EXTNAME', EXT, STATUS )
-      ATTFIL = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
+      CALL RAT_HDLOOKUP(  'ASPDATA', 'EXTNAME', EXT, STATUS )
+      ATTFIL = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
       CALL HDS_OPEN( ATTFIL, 'READ', ATTLOC, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Identify the TIME column
-        CALL RAT_HDLOOKUP( HEAD, 'ASPDATA', 'TIME', TCOL, STATUS )
+        CALL RAT_HDLOOKUP(  'ASPDATA', 'TIME', TCOL, STATUS )
         CALL CMP_SHAPE( ATTLOC, TCOL, 1, NATTREC, ANDIM, STATUS )
         CALL CMP_MAPV( ATTLOC, TCOL, '_DOUBLE', 'READ', ATT_T_PTR,
      :                 NATTREC, STATUS )
 
 *      The X and Y offsets. In RDF the values have been renamed and
 *      gratuitously divided by 7200
-        CALL RAT_HDLOOKUP( HEAD, 'ASPDATA', 'XOFFSET', ACOL, STATUS )
-        IF ( HEAD.ORIGIN(1:3) .EQ. 'RDF' ) THEN
+        CALL RAT_HDLOOKUP(  'ASPDATA', 'XOFFSET', ACOL, STATUS )
+        IF ( HEAD_ORIGIN(1:3) .EQ. 'RDF' ) THEN
           CALL CMP_MAPV( ATTLOC, ACOL, '_REAL', 'READ', TEMP_PTR,
      :                   NATTREC, STATUS )
           CALL DYN_MAPI( 1, NATTREC, ATT_X_PTR, STATUS )
@@ -367,8 +360,8 @@ c	From INTEGER to improve exposure time evaluation
           CALL CMP_MAPV( ATTLOC, ACOL, '_INTEGER', 'READ', ATT_X_PTR,
      :                   NATTREC, STATUS )
         END IF
-        CALL RAT_HDLOOKUP( HEAD, 'ASPDATA', 'YOFFSET', ACOL, STATUS )
-        IF ( HEAD.ORIGIN(1:3) .EQ. 'RDF' ) THEN
+        CALL RAT_HDLOOKUP(  'ASPDATA', 'YOFFSET', ACOL, STATUS )
+        IF ( HEAD_ORIGIN(1:3) .EQ. 'RDF' ) THEN
           CALL CMP_MAPV( ATTLOC, ACOL, '_REAL', 'READ', TEMP_PTR,
      :                   NATTREC, STATUS )
           CALL DYN_MAPI( 1, NATTREC, ATT_Y_PTR, STATUS )
@@ -380,8 +373,8 @@ c	From INTEGER to improve exposure time evaluation
         END IF
 
 *      Roll angle
-        CALL RAT_HDLOOKUP( HEAD, 'ASPDATA', 'ROLL', ACOL, STATUS )
-        IF ( HEAD.ORIGIN(1:3) .EQ. 'RDF' ) THEN
+        CALL RAT_HDLOOKUP(  'ASPDATA', 'ROLL', ACOL, STATUS )
+        IF ( HEAD_ORIGIN(1:3) .EQ. 'RDF' ) THEN
           CALL CMP_MAPV( ATTLOC, ACOL, '_REAL', 'READ', TEMP_PTR,
      :                   NATTREC, STATUS )
           CALL DYN_MAPI( 1, NATTREC, ATT_R_PTR, STATUS )
@@ -398,31 +391,31 @@ c	From INTEGER to improve exposure time evaluation
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Attempt to open the eventrate file
-      CALL RAT_HDLOOKUP( HEAD, 'EVRATE', 'EXTNAME', EXT, STATUS )
-      EVRFIL = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
+      CALL RAT_HDLOOKUP(  'EVRATE', 'EXTNAME', EXT, STATUS )
+      EVRFIL = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
       CALL HDS_OPEN( EVRFIL, 'READ', EVRLOC, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Identify and map the time column
-        CALL RAT_HDLOOKUP( HEAD, 'EVRATE', 'TIME', TCOL, STATUS )
+        CALL RAT_HDLOOKUP(  'EVRATE', 'TIME', TCOL, STATUS )
         CALL CMP_SHAPE( EVRLOC, TCOL, 1, NEVRREC, ANDIM, STATUS )
         CALL CMP_MAPV( EVRLOC, TCOL, '_INTEGER', 'READ',
      :                 EVR_T_PTR, NEVRREC, STATUS )
 
-        CALL RAT_HDLOOKUP( HEAD, 'EVRATE', 'XTRANSM', ACOL, STATUS )
+        CALL RAT_HDLOOKUP(  'EVRATE', 'XTRANSM', ACOL, STATUS )
         CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
      :                 EVR_AEXE_PTR, NEVRREC, STATUS )
 
-        CALL RAT_HDLOOKUP( HEAD, 'EVRATE', 'A1_AL', ACOL, STATUS )
+        CALL RAT_HDLOOKUP(  'EVRATE', 'A1_AL', ACOL, STATUS )
         CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
      :                 EVR_A1LL_PTR, NEVRREC, STATUS )
 
-        CALL RAT_HDLOOKUP( HEAD, 'EVRATE', 'XACC', ACOL, STATUS )
+        CALL RAT_HDLOOKUP(  'EVRATE', 'XACC', ACOL, STATUS )
         CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
      :                 EVR_AXE_PTR, NEVRREC, STATUS )
 
-        CALL RAT_HDLOOKUP( HEAD, 'EVRATE', 'MVRATE', ACOL, STATUS )
+        CALL RAT_HDLOOKUP(  'EVRATE', 'MVRATE', ACOL, STATUS )
         CALL CMP_MAPV( EVRLOC, ACOL, '_INTEGER', 'READ',
      :                 EVR_MV_PTR, NEVRREC, STATUS )
 

@@ -674,7 +674,7 @@
       REAL RP1,RP2                ! Radii to interpolate between
       INTEGER ELP,FLP             ! Fraction loop and Energy loop variables
 *    Local data :
-      INCLUDE 'INC_GETPSF_DATA'   ! Includes the data values for
+      INCLUDE 'XRTPSF_INC'        ! Includes the data values for
 *                                 ! ENERGY,FRAC,TELRAD and DETRAD
 *                                 ! and the constants MAXENG and MAXFRAC
 *-
@@ -789,7 +789,7 @@ C         ENDIF
       END
 
 *+XRT_GETSORT  - Gets sort parameters from a file
-      SUBROUTINE XRT_GETSORT( IFID, HEAD, STATUS)
+      SUBROUTINE XRT_GETSORT( IFID, IDS, STATUS)
 *    Description :
 *      Gets sorting ranges from an XRT SORT box
 *    Environment parameters :
@@ -806,12 +806,11 @@ C         ENDIF
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      INTEGER			IFID	      		! Input file id
+      INTEGER			IFID	    ! Input file id
+      INTEGER                   IDS         ! 1=src  2=bckgnd
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -835,7 +834,7 @@ C         ENDIF
       CALL ADI1_LOCINSTR( IFID, .FALSE., ILOC, STATUS )
 
 * Get detector type i.e. PSPC or HRI
-      CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
+      CALL CMP_GET0C(ILOC, 'DETECTOR', CHEAD_DET, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('*Error reading instrument type*')
@@ -846,9 +845,9 @@ C         ENDIF
 * this case the only way to tell is from the observation date.
 * Before Jan 26th 1991 is 'C' and after is 'B'.
 *   Test if the detector string is ok.
-      IF ( (INDEX(HEAD.DET, 'HRI') .EQ. 0) .AND.
-     &       (INDEX(HEAD.DET, 'PSPCB') .EQ. 0) .AND.
-     &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
+      IF ( (INDEX(CHEAD_DET, 'HRI') .EQ. 0) .AND.
+     &       (INDEX(CHEAD_DET, 'PSPCB') .EQ. 0) .AND.
+     &           (INDEX(CHEAD_DET, 'PSPCC') .EQ. 0) ) THEN
 *
 * Get locator to the instrument box
         CALL ADI1_LOCHEAD( IFID, .FALSE., HLOC, STATUS )
@@ -866,9 +865,9 @@ C         ENDIF
 *
 *      Compare the MJD of the observation to the switch over point
          IF (MDATE .LE. MSWITCH) THEN
-            HEAD.DET = 'PSPCC'
+            CHEAD_DET = 'PSPCC'
          ELSE
-            HEAD.DET = 'PSPCB'
+            CHEAD_DET = 'PSPCB'
          ENDIF
 *
       ENDIF
@@ -887,18 +886,18 @@ C         ENDIF
       IF (NEW) THEN
 *
 *      Read from the new definition of the SORT box
-         CALL XRT_GETSORT_NEWSPACE(SLOC, HEAD, STATUS)
+         CALL XRT_GETSORT_NEWSPACE(SLOC, IDS, STATUS)
 *
       ELSE
 *
 *      Read from the old definition of the SORT box
-         CALL XRT_GETSORT_OLDSPACE(SLOC, HEAD, STATUS)
+         CALL XRT_GETSORT_OLDSPACE(SLOC, IDS, STATUS)
       ENDIF
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *   Calculate the off axis angle of the collection box
-      CALL XRT_OFFAX(1, 1, HEAD)
+      CALL XRT_OFFAX(1, 1, IDS)
 *
 *   Time range
       CALL DAT_FIND(SLOC, 'TIME', TLOC, STATUS)
@@ -918,16 +917,18 @@ C         ENDIF
          CALL DAT_CELL(TLOC, 1, LP, CLOC, STATUS)
 *
 *   Find size of START array - if single element, need to do a GET0R.
-         CALL CMP_SIZE(CLOC, 'START', HEAD.NTRANGE, STATUS)
+         CALL CMP_SIZE(CLOC, 'START', CHEAD_NTRANGE(IDS), STATUS)
 *
-         IF (HEAD.NTRANGE .GT. 1) THEN
-            CALL CMP_GET1D(CLOC, 'START', MAXtRNG, HEAD.TMIN,
-     &                                     HEAD.NTRANGE, STATUS)
-            CALL CMP_GET1D(CLOC, 'STOP', MAXtRNG, HEAD.TMAX,
-     &                                     HEAD.NTRANGE, STATUS)
+         IF (CHEAD_NTRANGE(IDS) .GT. 1) THEN
+            CALL CMP_GET1D(CLOC, 'START', MAXtRNG,
+     :                          CHEAD_TMIN(1,IDS),
+     &                        CHEAD_NTRANGE(IDS), STATUS)
+            CALL CMP_GET1D(CLOC, 'STOP', MAXtRNG,
+     :                          CHEAD_TMAX(1,IDS),
+     &                        CHEAD_NTRANGE(IDS), STATUS)
          ELSE
-            CALL CMP_GET0D(CLOC, 'START', HEAD.TMIN(1), STATUS)
-            CALL CMP_GET0D(CLOC, 'STOP', HEAD.TMAX(1), STATUS)
+            CALL CMP_GET0D(CLOC, 'START', CHEAD_TMIN(1,IDS), STATUS)
+            CALL CMP_GET0D(CLOC, 'STOP', CHEAD_TMAX(1,IDS), STATUS)
          ENDIF
 *
          CALL DAT_ANNUL(CLOC, STATUS)
@@ -942,14 +943,14 @@ C         ENDIF
       ENDIF
 *
 * Get energy channel information if this is a PSPC file
-      IF (INDEX(HEAD.DET, 'PSPC') .NE. 0) THEN
+      IF (INDEX(CHEAD_DET, 'PSPC') .NE. 0) THEN
 *
 *   Corrected PH channel
          CALL DAT_FIND(SLOC, 'ENERGY', PLOC, STATUS)
          CALL DAT_CELL(PLOC, 1, 1, CLOC, STATUS)
 *
-         CALL CMP_GET0R(CLOC, 'START', HEAD.PMIN, STATUS)
-         CALL CMP_GET0R(CLOC, 'STOP', HEAD.PMAX, STATUS)
+         CALL CMP_GET0R(CLOC, 'START', CHEAD_PMIN(1,IDS), STATUS)
+         CALL CMP_GET0R(CLOC, 'STOP', CHEAD_PMAX(1,IDS), STATUS)
 *
          CALL DAT_ANNUL(CLOC, STATUS)
          CALL DAT_ANNUL(PLOC, STATUS)
@@ -966,8 +967,8 @@ C         ENDIF
          CALL DAT_FIND(SLOC, 'PH_CHANNEL', PLOC, STATUS)
          CALL DAT_CELL(PLOC, 1, 1, CLOC, STATUS)
 *
-         CALL CMP_GET0R(CLOC, 'START', HEAD.PMIN, STATUS)
-         CALL CMP_GET0R(CLOC, 'STOP', HEAD.PMAX, STATUS)
+         CALL CMP_GET0R(CLOC, 'START', CHEAD_PMIN(1,IDS), STATUS)
+         CALL CMP_GET0R(CLOC, 'STOP', CHEAD_PMAX(1,IDS), STATUS)
 *
          CALL DAT_ANNUL(CLOC, STATUS)
          CALL DAT_ANNUL(PLOC, STATUS)
@@ -995,7 +996,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 
 *+ XRT_GETSORT_NEWSPACE - reads new style spatial sort info.
-      SUBROUTINE XRT_GETSORT_NEWSPACE(SLOC, HEAD, STATUS)
+      SUBROUTINE XRT_GETSORT_NEWSPACE(SLOC, IDS, STATUS)
 *    Description :
 *      Reads spatial sort infotmation from the SORT box. Uses the
 *      old style SORT box
@@ -1017,12 +1018,12 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       CHARACTER*(DAT__SZLOC) SLOC       ! Locator to SORT box
+      INTEGER IDS
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1050,7 +1051,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL DAT_CELL(SSLOC, 1, 1, CLOC, STATUS)
 
 *   Get the shape of the box
-      CALL CMP_GET0C(CLOC, 'SHAPE', HEAD.SHAPE, STATUS)
+      CALL CMP_GET0C(CLOC, 'SHAPE', CHEAD_SHAPE(IDS), STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error obtaining box shape')
@@ -1058,28 +1059,28 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       ENDIF
 *
 *   Get the orientation of the box - if an ellipse
-      IF (HEAD.SHAPE .EQ. 'E') THEN
-         CALL CMP_GET0C(CLOC, 'PHI', HEAD.PHI, STATUS)
+      IF (CHEAD_SHAPE(IDS) .EQ. 'E') THEN
+         CALL CMP_GET0C(CLOC, 'PHI', CHEAD_PHI(IDS), STATUS)
 *
 *      Assume an orientation of zero if there is a problem
          IF (STATUS .NE. SAI__OK) THEN
             CALL ERR_ANNUL(STATUS)
             CALL MSG_PRNT('Assuming ellipse orientation of zero')
-            HEAD.PHI=0.0
+            CHEAD_PHI(IDS)=0.0
          ENDIF
       ENDIF
 *
 *   Get the box centre
-      CALL CMP_GET0R(CLOC, 'XCENT', HEAD.XCENT, STATUS)
-      CALL CMP_GET0R(CLOC, 'YCENT', HEAD.YCENT, STATUS)
+      CALL CMP_GET0R(CLOC, 'XCENT', CHEAD_XCENT(IDS), STATUS)
+      CALL CMP_GET0R(CLOC, 'YCENT', CHEAD_YCENT(IDS), STATUS)
 *
 *   Get the inner radii
-      CALL CMP_GET0R(CLOC, 'XINNER', HEAD.XINNER, STATUS)
-      CALL CMP_GET0R(CLOC, 'YINNER', HEAD.YINNER, STATUS)
+      CALL CMP_GET0R(CLOC, 'XINNER', CHEAD_XINNER(IDS), STATUS)
+      CALL CMP_GET0R(CLOC, 'YINNER', CHEAD_YINNER(IDS), STATUS)
 *
 *   Get the outer radii
-      CALL CMP_GET0R(CLOC, 'XOUTER', HEAD.XOUTER, STATUS)
-      CALL CMP_GET0R(CLOC, 'YOUTER', HEAD.YOUTER, STATUS)
+      CALL CMP_GET0R(CLOC, 'XOUTER', CHEAD_XOUTER(IDS), STATUS)
+      CALL CMP_GET0R(CLOC, 'YOUTER', CHEAD_YOUTER(IDS), STATUS)
 *
 *   Annul cell locator
       CALL DAT_ANNUL(CLOC, STATUS)
@@ -1099,7 +1100,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 
 *+ XRT_GETSORT_OLDSPACE - reads old style spatial sort info.
-      SUBROUTINE XRT_GETSORT_OLDSPACE(SLOC, HEAD, STATUS)
+      SUBROUTINE XRT_GETSORT_OLDSPACE(SLOC, IDS, STATUS)
 *    Description :
 *      Reads spatial sort infotmation from the SORT box. Uses the
 *      old style SORT box
@@ -1121,12 +1122,12 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       CHARACTER*(DAT__SZLOC)SLOC       ! Locator to SORT box
+      INTEGER IDS
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1140,7 +1141,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Local data :
 *
 *   Get the shape of the box
-      CALL CMP_GET0C(SLOC, 'SHAPE', HEAD.SHAPE, STATUS)
+      CALL CMP_GET0C(SLOC, 'SHAPE', CHEAD_SHAPE(IDS), STATUS)
 *
 *   Get the X axis range
       CALL DAT_FIND(SLOC, 'X', XLOC, STATUS)
@@ -1160,7 +1161,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL DAT_ANNUL(XLOC, STATUS)
 *
 *   Set X centre value
-      HEAD.XCENT = (XMIN(1) + XMAX(NRANGE)) / 2.0
+      CHEAD_XCENT(IDS) = (XMIN(1) + XMAX(NRANGE)) / 2.0
 *
 *   Y range
       CALL DAT_FIND(SLOC, 'Y', YLOC, STATUS)
@@ -1185,18 +1186,18 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       ENDIF
 *
 *   Set Y centre value
-      HEAD.YCENT = (YMIN(1) + YMAX(NRANGE)) / 2.0
+      CHEAD_YCENT(IDS) = (YMIN(1) + YMAX(NRANGE)) / 2.0
 *
 *   Calculate inner radii
       IF (NRANGE .EQ. 1) THEN
 *
-         HEAD.XINNER=0.0
-         HEAD.YINNER=0.0
+         CHEAD_XINNER(IDS)=0.0
+         CHEAD_YINNER(IDS)=0.0
 *
       ELSEIF (NRANGE .EQ. 2) THEN
 *
-         HEAD.XINNER = ABS(HEAD.XCENT - XMAX(1))
-         HEAD.YINNER = ABS(HEAD.YCENT - YMAX(1))
+         CHEAD_XINNER(IDS) = ABS(CHEAD_XCENT(IDS) - XMAX(1))
+         CHEAD_YINNER(IDS) = ABS(CHEAD_YCENT(IDS) - YMAX(1))
 *
       ELSE
          CALL MSG_PRNT(' Cant understand spatial region in sort box')
@@ -1204,8 +1205,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       ENDIF
 *
 *   Calculate outer radii
-      HEAD.XOUTER = ABS(HEAD.XCENT - XMIN(1))
-      HEAD.YOUTER = ABS(HEAD.YCENT - YMIN(1))
+      CHEAD_XOUTER(IDS) = ABS(CHEAD_XCENT(IDS) - XMIN(1))
+      CHEAD_YOUTER(IDS) = ABS(CHEAD_YCENT(IDS) - YMIN(1))
 *
 999   CONTINUE
 *
@@ -1217,7 +1218,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 
 *+ XRT_GETSEL - Gets event selection parameters from a file
-      SUBROUTINE XRT_GETSEL(ID, HEAD, STATUS)
+      SUBROUTINE XRT_GETSEL(ID, IDS, STATUS)
 *    Description :
 *    Method :
 *    Authors :
@@ -1227,12 +1228,12 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER ID				 ! ID of input file
+      INTEGER IDS
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1253,7 +1254,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL ADI1_LOCINSTR( ID, .FALSE., ILOC, STATUS )
 
 *  Get detector type i.e. PSPC or HRI
-      CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
+      CALL CMP_GET0C(ILOC, 'DETECTOR', CHEAD_DET, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('*Error reading instrument type*')
@@ -1264,9 +1265,9 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 * this case the only way to tell is from the observation date.
 * Before Jan 26th 1991 is 'C' and after is 'B'.
 *   Test if the detector string is ok.
-      IF ( (INDEX(HEAD.DET, 'HRI') .EQ. 0) .AND.
-     &       (INDEX(HEAD.DET, 'PSPCB') .EQ. 0) .AND.
-     &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
+      IF ( (INDEX(CHEAD_DET, 'HRI') .EQ. 0) .AND.
+     &       (INDEX(CHEAD_DET, 'PSPCB') .EQ. 0) .AND.
+     &           (INDEX(CHEAD_DET, 'PSPCC') .EQ. 0) ) THEN
 *
 *      Get the observation date as an MJD (use MJDs to compare dates)
          CALL ADI1_LOCHEAD( ID, .FALSE., HLOC, STATUS )
@@ -1284,9 +1285,9 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *
 *      Compare the MJD of the observation to the switch over point
          IF (MDATE .LE. MSWITCH) THEN
-            HEAD.DET = 'PSPCC'
+            CHEAD_DET = 'PSPCC'
          ELSE
-            HEAD.DET = 'PSPCB'
+            CHEAD_DET = 'PSPCB'
          ENDIF
 *
       ENDIF
@@ -1319,12 +1320,12 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
         IF (SNAME.EQ.'SPACE') THEN
 
-          CALL XRT_GETSEL_ARD(SIID,HEAD,STATUS)
+          CALL XRT_GETSEL_ARD(SIID,IDS,STATUS)
 
         ELSEIF (SNAME.EQ.'TIME') THEN
 
-          CALL XRT_GETSEL_RANGED(SIID,HEAD.NTRANGE,HEAD.TMIN,HEAD.TMAX,
-     :                                                         STATUS)
+          CALL XRT_GETSEL_RANGED(SIID,CHEAD_NTRANGE(IDS),
+     :       CHEAD_TMIN(1,IDS),CHEAD_TMAX(1,IDS),STATUS)
           IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error accessing time range'/
      :                     /' information from file')
@@ -1333,8 +1334,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
         ELSEIF (SNAME.EQ.'ENERGY') THEN
 
-          CALL XRT_GETSEL_RANGER(SIID,HEAD.NPRANGE,HEAD.PMIN,HEAD.PMAX,
-     :                                                         STATUS)
+          CALL XRT_GETSEL_RANGER(SIID,CHEAD_NPRANGE(IDS),
+     :        CHEAD_PMIN(1,IDS),CHEAD_PMAX(1,IDS),STATUS)
 
           IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error accessing corrected PH range'/
@@ -1346,7 +1347,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
         ELSEIF (SNAME.EQ.'PH_CHANNEL') THEN
 
           CALL XRT_GETSEL_RANGER(SIID,
-     :                  HEAD.NUPRANGE,HEAD.UPMIN,HEAD.UPMAX,STATUS)
+     :     CHEAD_NUPRANGE(IDS),CHEAD_UPMIN(1,IDS),
+     :                   CHEAD_UPMAX(1,IDS),STATUS)
 
           IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error accessing raw PH range'/
@@ -1368,7 +1370,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       CALL ADI_ERASE( SELID, STATUS )
 
 *   Calculate the off axis angle of the collection box
-      CALL XRT_OFFAX(1, 1, HEAD)
+      CALL XRT_OFFAX(1, 1, IDS)
 *
 *
 999   CONTINUE
@@ -1478,16 +1480,16 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 
 *+
-      SUBROUTINE XRT_GETSEL_ARD(SIID,HEAD,STATUS)
+      SUBROUTINE XRT_GETSEL_ARD(SIID,IDS,STATUS)
 
       IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 
       INTEGER SIID
-      RECORD /CORR/ HEAD
+      INTEGER IDS
 
       INTEGER STATUS
 
@@ -1502,67 +1504,67 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
       CALL ADI_CGET0I( SIID, 'GRPID', ARDID, STATUS )
 
-      CALL ARX_COPY(ARDID,1,HEAD.ARDID,1,STATUS)
+      CALL ARX_COPY(ARDID,1,CHEAD_ARDID(IDS),1,STATUS)
 
       CALL ARX_QSHAPE(ARDID,SHAPE,PAR,STATUS)
 
       IF (SHAPE.EQ.'CIRCLE') THEN
-        HEAD.SHAPE='C'
-        HEAD.XCENT=PAR(1)
-        HEAD.YCENT=PAR(2)
-        HEAD.PHI=0.0
-        HEAD.XINNER=0.0
-        HEAD.YINNER=0.0
-        HEAD.XOUTER=PAR(3)
-        HEAD.YOUTER=PAR(3)
+        CHEAD_SHAPE(IDS)='C'
+        CHEAD_XCENT(IDS)=PAR(1)
+        CHEAD_YCENT(IDS)=PAR(2)
+        CHEAD_PHI(IDS)=0.0
+        CHEAD_XINNER(IDS)=0.0
+        CHEAD_YINNER(IDS)=0.0
+        CHEAD_XOUTER(IDS)=PAR(3)
+        CHEAD_YOUTER(IDS)=PAR(3)
       ELSEIF (SHAPE.EQ.'BOX') THEN
-        HEAD.SHAPE='R'
-        HEAD.XCENT=PAR(1)
-        HEAD.YCENT=PAR(2)
-        HEAD.PHI=0.0
-        HEAD.XINNER=0.0
-        HEAD.YINNER=0.0
-        HEAD.XOUTER=PAR(3)/2.0
-        HEAD.YOUTER=PAR(4)/2.0
+        CHEAD_SHAPE(IDS)='R'
+        CHEAD_XCENT(IDS)=PAR(1)
+        CHEAD_YCENT(IDS)=PAR(2)
+        CHEAD_PHI(IDS)=0.0
+        CHEAD_XINNER(IDS)=0.0
+        CHEAD_YINNER(IDS)=0.0
+        CHEAD_XOUTER(IDS)=PAR(3)/2.0
+        CHEAD_YOUTER(IDS)=PAR(4)/2.0
       ELSEIF (SHAPE.EQ.'ELLIPSE') THEN
-        HEAD.SHAPE='E'
-        HEAD.XCENT=PAR(1)
-        HEAD.YCENT=PAR(2)
-        HEAD.PHI=PAR(3)
-        HEAD.XINNER=0.0
-        HEAD.YINNER=0.0
-        HEAD.XOUTER=PAR(4)
-        HEAD.YOUTER=PAR(5)
+        CHEAD_SHAPE(IDS)='E'
+        CHEAD_XCENT(IDS)=PAR(1)
+        CHEAD_YCENT(IDS)=PAR(2)
+        CHEAD_PHI(IDS)=PAR(3)
+        CHEAD_XINNER(IDS)=0.0
+        CHEAD_YINNER(IDS)=0.0
+        CHEAD_XOUTER(IDS)=PAR(4)
+        CHEAD_YOUTER(IDS)=PAR(5)
       ELSEIF (SHAPE.EQ.'ANNULUS') THEN
-        HEAD.SHAPE='A'
-        HEAD.XCENT=PAR(1)
-        HEAD.YCENT=PAR(2)
-        HEAD.PHI=0.0
-        HEAD.XINNER=PAR(3)
-        HEAD.YINNER=PAR(3)
-        HEAD.XOUTER=PAR(4)
-        HEAD.YOUTER=PAR(4)
+        CHEAD_SHAPE(IDS)='A'
+        CHEAD_XCENT(IDS)=PAR(1)
+        CHEAD_YCENT(IDS)=PAR(2)
+        CHEAD_PHI(IDS)=0.0
+        CHEAD_XINNER(IDS)=PAR(3)
+        CHEAD_YINNER(IDS)=PAR(3)
+        CHEAD_XOUTER(IDS)=PAR(4)
+        CHEAD_YOUTER(IDS)=PAR(4)
       ELSEIF (SHAPE.EQ.'ANNULARBOX') THEN
-        HEAD.SHAPE='R'
-        HEAD.XCENT=PAR(1)
-        HEAD.YCENT=PAR(2)
-        HEAD.PHI=0.0
-        HEAD.XINNER=PAR(3)/2.0
-        HEAD.YINNER=PAR(4)/2.0
-        HEAD.XOUTER=PAR(5)/2.0
-        HEAD.YOUTER=PAR(6)/2.0
+        CHEAD_SHAPE(IDS)='R'
+        CHEAD_XCENT(IDS)=PAR(1)
+        CHEAD_YCENT(IDS)=PAR(2)
+        CHEAD_PHI(IDS)=0.0
+        CHEAD_XINNER(IDS)=PAR(3)/2.0
+        CHEAD_YINNER(IDS)=PAR(4)/2.0
+        CHEAD_XOUTER(IDS)=PAR(5)/2.0
+        CHEAD_YOUTER(IDS)=PAR(6)/2.0
       ELSEIF (SHAPE.EQ.'ANNULARELLIPSE') THEN
-        HEAD.SHAPE='E'
-        HEAD.XCENT=PAR(1)
-        HEAD.YCENT=PAR(2)
-        HEAD.PHI=PAR(3)
-        HEAD.XINNER=PAR(4)
-        HEAD.YINNER=PAR(5)
-        HEAD.XOUTER=PAR(6)
-        HEAD.YOUTER=PAR(7)
+        CHEAD_SHAPE(IDS)='E'
+        CHEAD_XCENT(IDS)=PAR(1)
+        CHEAD_YCENT(IDS)=PAR(2)
+        CHEAD_PHI(IDS)=PAR(3)
+        CHEAD_XINNER(IDS)=PAR(4)
+        CHEAD_YINNER(IDS)=PAR(5)
+        CHEAD_XOUTER(IDS)=PAR(6)
+        CHEAD_YOUTER(IDS)=PAR(7)
 
       ELSE
-        HEAD.SHAPE='D'
+        CHEAD_SHAPE(IDS)='D'
 
       ENDIF
 
@@ -1657,7 +1659,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 	END
 
 *+  XRT_HSPOT - Checks if photon comes from a hotspot/deadspot
-	LOGICAL FUNCTION XRT_HSPOT(HEAD, XEV, YEV)
+	LOGICAL FUNCTION XRT_HSPOT(XEV, YEV)
 *    Description :
 *     Compares event position with a list of hotspot positions.
 *     Currently only works with HRI hotspots/deadspots
@@ -1673,10 +1675,9 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD' ! Header variables
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Import :
-      RECORD /XRT_HEAD/ HEAD        ! Header info
       INTEGER XEV,YEV               ! Detector coordinates of event
 *    Local constants :
 *     <local constants defined by PARAMETER>
@@ -1689,12 +1690,12 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       XRT_HSPOT = .TRUE.
 
 * Check if this event is within a hotspot radius
-      DO LP=1,HEAD.NSPOT
+      DO LP=1,HEAD_NSPOT
 *
-         DIST = SQRT( REAL(HEAD.XSPOT(LP) - XEV)**2 +
-     &                     REAL(HEAD.YSPOT(LP) - YEV)**2 )
+         DIST = SQRT( REAL(HEAD_XSPOT(LP) - XEV)**2 +
+     &                     REAL(HEAD_YSPOT(LP) - YEV)**2 )
 *
-         IF (DIST .LE. REAL(HEAD.SPOTRAD(LP))) THEN
+         IF (DIST .LE. REAL(HEAD_SPOTRAD(LP))) THEN
             XRT_HSPOT = .FALSE.
             GOTO 999
          ENDIF
@@ -1708,7 +1709,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 
 *+XRT_IMVIG  - Finds vignetting correction for XRT images
-      SUBROUTINE XRT_IMVIG(HEAD, ELOC, NENERGY, ENERGY, NX, NY, NP,
+      SUBROUTINE XRT_IMVIG(IDS, ELOC, NENERGY, ENERGY, NX, NY, NP,
      &                        EPHBIN, DISPLAY, VCORR, VFLAG, STATUS)
 *    Description :
 *    Environment parameters :
@@ -1724,12 +1725,12 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Status :
       INTEGER STATUS
 *    Import :
-      RECORD /CORR/ HEAD
+      INTEGER IDS                      ! 1=src   2=bckgnd
       CHARACTER*(DAT__SZLOC) ELOC      ! Locator to effective area file
       INTEGER NENERGY
       REAL ENERGY(NENERGY)
@@ -1758,8 +1759,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       VFLAG = .FALSE.
 
 * Determine which detector
-      PSPC=((HEAD.DET(:4)).EQ.'PSPC')
-      HRI=((HEAD.DET(:3)).EQ.'HRI')
+      PSPC=((CHEAD_DET(:4)).EQ.'PSPC')
+      HRI=((CHEAD_DET(:3)).EQ.'HRI')
 *
 
       IF (PSPC) THEN
@@ -1795,14 +1796,14 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
         IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *  Calculate the interpolated effective areas
-        CALL XRT_IMVIG_PSPC(HEAD, NEFF, NX, NY, NP, MAXANG, ANGLE,
+        CALL XRT_IMVIG_PSPC(IDS, NEFF, NX, NY, NP, MAXANG, ANGLE,
      &                       %val(EFBPTR), DISPLAY, VCORR, STATUS)
 *
         VFLAG=.TRUE.
 
       ELSEIF (HRI) THEN
 
-        CALL XRT_IMVIG_HRI(HEAD, NX, NY, DISPLAY, VCORR, STATUS)
+        CALL XRT_IMVIG_HRI(IDS, NX, NY, DISPLAY, VCORR, STATUS)
 
         VFLAG=.TRUE.
 
@@ -1818,7 +1819,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 
 
 *+XRT_IMVIG_PSPC    -   Calculates the vignetting correction for PSPC
-      SUBROUTINE XRT_IMVIG_PSPC(HEAD, NEFF, NX, NY, NP, MAXANG,
+      SUBROUTINE XRT_IMVIG_PSPC(IDS, NEFF, NX, NY, NP, MAXANG,
      &                            ANGLE, BIGEFF, DISPLAY, VCORR, STATUS)
 *    Description :
 *     <description of what the subroutine does>
@@ -1829,10 +1830,10 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ HEAD
+      INTEGER IDS
       INTEGER NEFF                        ! No. of off-axis angle arrays
       INTEGER NX,NY                       ! Image dimensions
       INTEGER NP                          ! Number of pulse height bins in file
@@ -1858,19 +1859,19 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
       IF (STATUS.NE.SAI__OK) RETURN
 
 * Initialise :
-      XCENT = HEAD.XCENT
-      YCENT = HEAD.YCENT
-      XSCALE = HEAD.XSCALE
-      YSCALE = HEAD.YSCALE
+      XCENT = CHEAD_XCENT(IDS)
+      YCENT = CHEAD_YCENT(IDS)
+      XSCALE = CHEAD_XSCALE(IDS)
+      YSCALE = CHEAD_YSCALE(IDS)
 *
 * Loop over each image pixel
       DO XLP=1,NX
        DO YLP=1,NY
 *
 *    Calculate off axis angle in arcmins
-          XOFF = HEAD.XCENT + (XLP-NX/2.0) * HEAD.XSCALE
-          YOFF = HEAD.YCENT + (YLP-NY/2.0) * HEAD.YSCALE
-          HEAD.OFFAX = SQRT(XOFF*XOFF + YOFF*YOFF) * 60.0
+          XOFF = CHEAD_XCENT(IDS) + (XLP-NX/2.0) * CHEAD_XSCALE(IDS)
+          YOFF = CHEAD_YCENT(IDS) + (YLP-NY/2.0) * CHEAD_YSCALE(IDS)
+          CHEAD_OFFAX(IDS) = SQRT(XOFF*XOFF + YOFF*YOFF) * 60.0
 *
 D          WRITE(1,*)HEAD.OFFAX
 *
@@ -1879,9 +1880,10 @@ D          WRITE(1,*)HEAD.OFFAX
           TOP = 0
           DO LP=1,NEFF
 *
-            IF (HEAD.OFFAX .LT. ANGLE(LP)) THEN
+            IF (CHEAD_OFFAX(IDS) .LT. ANGLE(LP)) THEN
                TOP = LP
-               FRAC = (HEAD.OFFAX-ANGLE(LP-1)) / (ANGLE(LP)-ANGLE(LP-1))
+               FRAC = (CHEAD_OFFAX(IDS)-ANGLE(LP-1)) /
+     :                          (ANGLE(LP)-ANGLE(LP-1))
                GOTO 100
             ENDIF
 *
@@ -1931,7 +1933,7 @@ D          WRITE(1,*)HEAD.OFFAX
 
 
 *+XRT_IMVIG_HRI    -   Calculates the vignetting correction for HRI
-      SUBROUTINE XRT_IMVIG_HRI(HEAD, NX, NY, DISPLAY, VCORR, STATUS)
+      SUBROUTINE XRT_IMVIG_HRI(IDS, NX, NY, DISPLAY, VCORR, STATUS)
 *    Description :
 *    History :
 *    Type definitions :
@@ -1939,10 +1941,10 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ HEAD
+      INTEGER IDS
       INTEGER NX,NY                       ! Image dimensions
       LOGICAL DISPLAY                     ! Display result on screen ?
 *    Import-Export :
@@ -1960,10 +1962,10 @@ D          WRITE(1,*)HEAD.OFFAX
       IF (STATUS.NE.SAI__OK) RETURN
 
 * Initialise :
-      XCENT = HEAD.XCENT
-      YCENT = HEAD.YCENT
-      XSCALE = HEAD.XSCALE
-      YSCALE = HEAD.YSCALE
+      XCENT = CHEAD_XCENT(IDS)
+      YCENT = CHEAD_YCENT(IDS)
+      XSCALE = CHEAD_XSCALE(IDS)
+      YSCALE = CHEAD_YSCALE(IDS)
 *
       VTOT=0.0
       QTOT=0.0
@@ -2241,20 +2243,20 @@ D          WRITE(1,*)HEAD.OFFAX
 
 
 *+XRT_OFFAX - Calculates distance in arcmins from centre of field
-      SUBROUTINE XRT_OFFAX(RDIM, RLP, HEAD)
+      SUBROUTINE XRT_OFFAX(RDIM, RLP, IDS)
 *    Description :
 *     <description of what the subroutine does>
 *    History :
 *     original 22-5-1991  (LTVAD::RDS)
 *    Type definitions :
       IMPLICIT NONE
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER RDIM                        ! Number of radial bins in file
       INTEGER RLP                         ! Radial bin wanted
+      INTEGER IDS
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Export :
 *    Local constants :
 *     <local constants defined by PARAMETER>
@@ -2265,27 +2267,27 @@ D          WRITE(1,*)HEAD.OFFAX
       REAL XPOS1,XPOS2,YPOS1,YPOS2        ! Used in calc of off-axis pos.
 *-
 *   Calculate the off axis angle of this radial bin
-      XINC = (HEAD.XOUTER - HEAD.XINNER) / REAL(RDIM)
-      RXINN = HEAD.XINNER + XINC * REAL(RLP-1.0)
+      XINC = (CHEAD_XOUTER(IDS) - CHEAD_XINNER(IDS)) / REAL(RDIM)
+      RXINN = CHEAD_XINNER(IDS) + XINC * REAL(RLP-1.0)
       RXOUT = RXINN + XINC
 *
-      YINC = (HEAD.YOUTER - HEAD.YINNER) / REAL(RDIM)
-      RYINN = HEAD.YINNER + YINC * REAL(RLP-1.0)
+      YINC = (CHEAD_YOUTER(IDS) - CHEAD_YINNER(IDS)) / REAL(RDIM)
+      RYINN = CHEAD_YINNER(IDS) + YINC * REAL(RLP-1.0)
       RYOUT = RYINN + YINC
 *
 *   Offset is the average of four offsets
-      XPOS1 = HEAD.XCENT + ( RXINN + (RXOUT - RXINN) / 2.0 )
-      XPOS2 = HEAD.XCENT - ( RXINN + (RXOUT - RXINN) / 2.0 )
-      YPOS1 = HEAD.YCENT + ( RYINN + (RYOUT - RYINN) / 2.0 )
-      YPOS2 = HEAD.YCENT - ( RYINN + (RYOUT - RYINN) / 2.0 )
+      XPOS1 = CHEAD_XCENT(IDS) + ( RXINN + (RXOUT - RXINN) / 2.0 )
+      XPOS2 = CHEAD_XCENT(IDS) - ( RXINN + (RXOUT - RXINN) / 2.0 )
+      YPOS1 = CHEAD_YCENT(IDS) + ( RYINN + (RYOUT - RYINN) / 2.0 )
+      YPOS2 = CHEAD_YCENT(IDS) - ( RYINN + (RYOUT - RYINN) / 2.0 )
 *
-      OFF1 = SQRT(XPOS1**2 + HEAD.YCENT**2)
-      OFF2 = SQRT(XPOS2**2 + HEAD.YCENT**2)
-      OFF3 = SQRT(YPOS1**2 + HEAD.XCENT**2)
-      OFF4 = SQRT(YPOS2**2 + HEAD.XCENT**2)
+      OFF1 = SQRT(XPOS1**2 + CHEAD_YCENT(IDS)**2)
+      OFF2 = SQRT(XPOS2**2 + CHEAD_YCENT(IDS)**2)
+      OFF3 = SQRT(YPOS1**2 + CHEAD_XCENT(IDS)**2)
+      OFF4 = SQRT(YPOS2**2 + CHEAD_XCENT(IDS)**2)
 *
 *   Off-axis angle is the average offset in arcmins
-      HEAD.OFFAX = (OFF1 + OFF2 + OFF3 + OFF4) * 60.0 / 4.0
+      CHEAD_OFFAX(IDS) = (OFF1 + OFF2 + OFF3 + OFF4) * 60.0 / 4.0
 *
       END
 
@@ -2393,7 +2395,7 @@ D          WRITE(1,*)HEAD.OFFAX
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'INC_XRTHEAD'   ! Gets the max time ranges constant
+      INCLUDE 'XRTHEAD_CMN'   ! Gets the max time ranges constant
 * Import :
       CHARACTER*(*) RTNAME            ! Rootname for cal files
 * Import-Export :
@@ -2546,428 +2548,9 @@ D          WRITE(1,*)HEAD.OFFAX
 *
       END
 
-*+XRT_RDHEAD   Reads a text header file associated with an XRT observation
-	SUBROUTINE XRT_RDHEAD(DISP, SRT, HEAD, VERS, STATUS)
-*
-* Description :
-*        This routine finds the times and status of each observation
-*       these are output to the calling routine along with auxilliary
-*       information, which will be written into the header variable.
-* Environment parameters :
-* Method :
-* Deficiencies :
-*    The initial simulated tape had the components AMP_SEL and CAM_SEL
-*    in the header giving the ranges of raw and corrected amplitude
-*    channels present in the data. The tape of real data uses
-*    RAW_SEL and AMP_SEL. Because of the ambiguity in the AMP_SEL record
-*    this routine will no longer work on the simulated data
-* Bugs :
-* Authors :
-*     Richard Saxton
-* History :
-*     5-Jul-1990   Original
-*    29-Feb-1994 Adjusted to eliminate unwanted spaces before details (JKA)
-*    22-Apr-1994 Opens the header file as READONLY (jka)
-* Type Definitions :
-      IMPLICIT NONE
-* Global constants :
-      INCLUDE 'SAE_PAR'
-* Structure definitions :
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
-* Import :
-      LOGICAL DISP                    ! Display observation info ?
-      RECORD /XRT_SCFDEF/ SRT         ! Sort control structure
-* Import-Export :
-      RECORD /XRT_HEAD/ HEAD   ! Header structure for subsequent use
-*                                     ! and dummy header structure
-* Export :
-      CHARACTER*(*) VERS              ! SASS version date
-* Status :
-      INTEGER STATUS
-* Function declarations :
-      INTEGER CHR_LEN
-        EXTERNAL CHR_LEN
-* Local constants :
-* Local variables :
-      CHARACTER*100 HFILE             ! HEADER File name
-      CHARACTER*132 STRING            ! Record from file
-      CHARACTER*8 CH8                 ! Dummy character variable
-      CHARACTER*30 RASTRING           ! String for RA
-      CHARACTER*30 DECSTRING          ! String for DEC
-      CHARACTER*30 ROLLSTRING         ! String for ROLL
-      CHARACTER*80 DATE               ! String for date
-      CHARACTER*50 PIXSTRING          ! String for pixel size
-      CHARACTER*3 MONTH               ! Month as a character string
-      CHARACTER*80 LABSTRING          ! String for labels
-      CHARACTER*80 TIME               ! Time string
-      CHARACTER*80 TIMSTRING          ! Time string
-      CHARACTER*80 AMPSTRING
-      CHARACTER*72 STRING72
-      CHARACTER*100 STRING100
-      CHARACTER*1 SIGN
-      REAL XSIZE,YSIZE
-      INTEGER IERR                    ! IOSTAT variable
-      INTEGER HRS,MIN,DEG,ISEC
-      DOUBLE PRECISION SC_END         ! Final spacecraft time
-      REAL SEC
-      DOUBLE PRECISION ONOFF(MAXRAN*2)! Time ranges used to select data
-      DOUBLE PRECISION  END_MJD       ! MJD of end time
-      INTEGER LP,K,K2,I
-      INTEGER LEFT,NT
-      INTEGER HUNIT                   ! Logical unit for header file
-      INTEGER YEAR,IMONTH,DAY         ! Start date
-      INTEGER IMJD1                   ! MJD of Start date
-      INTEGER IMJD2                   ! MJD of end date
-      INTEGER KR
-
-      DOUBLE PRECISION MJDBIT         ! Fraction of day
-      REAL R1,R2                      ! Real variables
-*
-      LOGICAL ISMNUX,ISMNUY,DET,TARGET
-      LOGICAL OBSERV,LRA,LDEC,LROLL,LDATE
-      LOGICAL UT,TLEN,ARANGE,CRANGE,FILT,CLOCK
-      LOGICAL PIXRAN,DETRAN,EVMAP,PIXSIZ
-      LOGICAL JUMPOUT
-*
-*-
-* Check status :
-      IF (STATUS .NE. SAI__OK) RETURN
-*
-* Open header file
-      HFILE=SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//'.hdr'
-*
-      CALL FIO_GUNIT(HUNIT, STATUS)
-*
-      OPEN(HUNIT, READONLY, FILE=HFILE, STATUS='OLD', IOSTAT=IERR)
-*
-      IF (IERR .NE. 0) THEN
-         CALL MSG_SETC('HFILE', HFILE)
-         CALL MSG_PRNT('Error opening header file ^HFILE')
-         STATUS=SAI__ERROR
-         GOTO 999
-      ENDIF
-*
-* Read header info
-      JUMPOUT = .FALSE.
-      DO WHILE (.NOT. JUMPOUT)
-*
-         READ(HUNIT, FMT='(A)', END=100, ERR=100)STRING
-*
-         IF (INDEX(STRING(1:30), 'NO_SM_X') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8, I)', END=100)CH8, HEAD.ISMNUX
-            ISMNUX=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'NO_SM_Y') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8, I)', END=100)CH8, HEAD.ISMNUY
-            ISMNUY=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'NAXIS2') .NE. 0) THEN
-            READ(STRING(15:50), *)HEAD.IEVTNU
-C This part added for completeness
-         ELSEIF (INDEX(STRING(1:30), 'MISSION_ID') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8,1X, A)', END=100)CH8, HEAD.OBSERVATORY
-         ELSEIF (INDEX(STRING(1:30), 'TELESCOPE_ID') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8,1X, A)', END=100)CH8, HEAD.INSTRUMENT
-C ---
-         ELSEIF (INDEX(STRING(1:30), 'DETECTOR_ID') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8,1X, A)', END=100)CH8, HEAD.DETECTOR
-            DET=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'FILTER_ID') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8,1X, A)', END=100)CH8, HEAD.FILTER
-            FILT=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'TARGET_ID') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8,1X, A)', END=100)CH8, HEAD.TARGET
-            TARGET=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'SKY_PIX_SIZE') .NE. 0) THEN
-            READ(HUNIT, FMT='(A)', END=100)PIXSTRING
-            READ(PIXSTRING(8:50), *)HEAD.PIXEL
-            PIXSIZ=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'OBS_ID') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8, A)', END=100)CH8, HEAD.OBSERVER
-            OBSERV=.TRUE.
-*
-*    REM: Files from AO-1 onwards use LAT and LONG for DEC and RA
-         ELSEIF (INDEX(STRING(1:30), 'POINT_RA') .NE. 0 .OR.
-     &           INDEX(STRING(1:30), 'POINT_LONG') .NE. 0 ) THEN
-            READ(HUNIT, FMT='(A)', END=100)RASTRING
-            K=INDEX(RASTRING(8:30), 'H') + 7
-            READ(RASTRING(K-2:K+7),FMT='(I2,X,I2,X,F4.1)')HRS,MIN,SEC
-            HEAD.AXIS_RA = HRS*15.0 + MIN*15.0/60.0 + SEC*15.0/3600.
-            LRA=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'POINT_DEC') .NE. 0 .OR.
-     &           INDEX(STRING(1:30), 'POINT_LAT') .NE. 0) THEN
-            READ(HUNIT, FMT='(A)', END=100)DECSTRING
-            K=INDEX(DECSTRING, 'D')
-            READ(DECSTRING(K-3:K+5),FMT='(A1,I2,X,I2,X,I2)')
-     &                                            SIGN,DEG,MIN,ISEC
-            HEAD.AXIS_DEC = DEG + MIN/60.0 + ISEC/3600.
-            IF (SIGN .EQ. '-') HEAD.AXIS_DEC = -HEAD.AXIS_DEC
-            LDEC=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'XPIX_TO_NORTH') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8, A)', END=100)CH8, ROLLSTRING
-            KR=INDEX(ROLLSTRING, 'D')
-*
-* Read roll angle in degrees
-            IF (KR . EQ. 0) THEN
-               READ(ROLLSTRING, *)HEAD.ROLLCI
-            ELSE
-               READ(ROLLSTRING(1:KR-1), *)HEAD.ROLLCI
-            ENDIF
-*
-*      Convert roll angle to Asterx standard
-            HEAD.ROLLCI = 90.0 - HEAD.ROLLCI
-            LROLL=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'OBS_TITLE') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8, A80)', END=100)CH8, HEAD.TITLE
-            OBSERV=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'OBS_DATE') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)DATE
-*
-*       Convert first date in date string to an MJD
-            K=INDEX(DATE, '-')
-            READ(DATE(K+5:K+8), FMT='(I4)')YEAR
-*
-*       The year must be in the form 1990 - so add 1900 if 90.
-            IF (YEAR .GT. 3000) YEAR = YEAR/100. + 1900
-*
-            MONTH=DATE(K+1:K+3)
-            CALL CONV_MONTH(MONTH,IMONTH,STATUS)
-*
-            IF (STATUS .EQ. SAI__OK) THEN
-               READ(DATE(K-2:K-1), FMT='(I2)')DAY
-               CALL CONV_YMDMJD(YEAR, IMONTH, DAY, IMJD1)
-               LDATE=.TRUE.
-            ELSE
-               CALL MSG_PRNT('*Couldnt understand month string*')
-               LDATE=.FALSE.
-            ENDIF
-*
-*       Convert second date in date string to an MJD
-            K2=INDEX(DATE(K+8:80), '-') + K+7
-            READ(DATE(K2+5:K2+8), FMT='(I4)')YEAR
-
-*       The year must be in the form 1990 - so add 1900 if 90.
-            IF (YEAR .GT. 3000) YEAR = YEAR/100. + 1900
-*
-            MONTH=DATE(K2+1:K2+3)
-            CALL CONV_MONTH(MONTH,IMONTH,STATUS)
-*
-            IF (STATUS .EQ. SAI__OK) THEN
-               READ(DATE(K2-2:K2-1), FMT='(I2)')DAY
-               CALL CONV_YMDMJD(YEAR, IMONTH, DAY, IMJD2)
-               LDATE=.TRUE.
-            ELSE
-               CALL MSG_PRNT('*Couldnt understand month string*')
-               LDATE=.FALSE.
-            ENDIF
-*
-         ELSEIF (INDEX(STRING(1:30), 'OBS_UT') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)TIME
-            K=INDEX(TIME, ':')
-            READ(TIME(K-2:K-1), FMT='(I2)')HRS
-            READ(TIME(K+1:K+2), FMT='(I2)')MIN
-            READ(TIME(K+4:K+12), *)SEC
-            MJDBIT=HRS*3600.0 + MIN*60.0 + SEC
-            HEAD.BASE_MJD=DBLE(IMJD1) + MJDBIT/86400.0
-            UT=.TRUE.
-*
-*      Calculate the end UT time
-            K2=INDEX(TIME(K+12:80), ':') + K+11
-            READ(TIME(K2-2:K2-1), FMT='(I2)')HRS
-            READ(TIME(K2+1:K2+2), FMT='(I2)')MIN
-            READ(TIME(K2+4:K2+12), *)SEC
-            MJDBIT=HRS*3600.0 + MIN*60.0 + SEC
-            END_MJD=DBLE(IMJD2) + MJDBIT/86400.0
-            HEAD.END_MJD = END_MJD
-*
-         ELSEIF (INDEX(STRING(1:30), 'OBS_CLOCK') .NE. 0) THEN
-            READ(HUNIT, FMT='(A8, A)', END=100)CH8,TIMSTRING
-            READ(TIMSTRING, *)HEAD.BASE_SCTIME,SC_END
-            CLOCK=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'TLABL') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)LABSTRING
-            IF (INDEX(LABSTRING, 'XPIX') .NE. 0) THEN
-               HEAD.XPUNITS=LABSTRING(26:36)
-            ELSEIF (INDEX(LABSTRING, 'YPIX') .NE. 0) THEN
-               HEAD.YPUNITS=LABSTRING(26:36)
-            ENDIF
-         ELSEIF (INDEX(STRING(1:30), 'RAW_SEL') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)AMPSTRING
-            READ(AMPSTRING(8:80), *)R1,R2
-            HEAD.ASTART=INT(R1)
-            HEAD.AEND=INT(R2)
-            ARANGE=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'AMP_SEL') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)AMPSTRING
-            READ(AMPSTRING(8:80), *)R1,R2
-            HEAD.CSTART=INT(R1)
-            HEAD.CEND=INT(R2)
-            CRANGE=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'TIM_SEL') .NE. 0) THEN
-            READ(STRING(46:48), FMT='(I3)', END=100)NT
-*
-            IF (NT .EQ. 0) THEN
-               CALL MSG_PRNT('Error deciphering time range')
-               TLEN=.FALSE.
-*
-            ELSEIF (NT .GT. MAXRAN*2) THEN
-               CALL MSG_PRNT('Maximum number of time ranges in'/
-     &                        /' header has been exceeded')
-               TLEN=.FALSE.
-            ELSE
-*
-*      Read in times used to select data. Note this assumes that there are
-*      three times per line which may not always be true
-              DO LP=1,INT(NT/3.0)
-                 READ(HUNIT, FMT='(A8,A72)', END=100)CH8,STRING72
-                 READ(STRING72,*) (ONOFF((LP-1)*3+I), I=1,3)
-              ENDDO
-*
-              LEFT=NT-INT(NT/3.0)*3
-*
-              IF (LEFT .GT. 0) THEN
-                 READ(HUNIT, FMT='(A8,A72)', END=100)CH8,STRING72
-                 READ(STRING72,*) (ONOFF((LP-1)*3 + I), I=1,LEFT)
-              ENDIF
-*
-              HEAD.NTRANGE = NT / 2
-*
-              DO LP=1,HEAD.NTRANGE
-                 HEAD.TSTART(LP)=ONOFF((LP-1)*2+1) - HEAD.BASE_SCTIME
-                 HEAD.TEND(LP)=ONOFF(LP*2) - HEAD.BASE_SCTIME
-              ENDDO
-              TLEN=.TRUE.
-
-            ENDIF
-*
-         ELSEIF (INDEX(STRING(1:30), 'SKY_FIELD') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)AMPSTRING
-            READ(AMPSTRING(8:80), *)HEAD.XSTART,HEAD.YSTART,HEAD.XEND,
-     &                                                      HEAD.YEND
-            HEAD.IFDSZX = HEAD.XEND - HEAD.XSTART
-            HEAD.IFDSZY = HEAD.YEND - HEAD.YSTART
-
-            PIXRAN=.TRUE.
-*
-*   Get sky pixel centre
-         ELSEIF (INDEX(STRING(1:30), 'SKY_CEN_X') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)AMPSTRING
-            READ(AMPSTRING(8:80), *)HEAD.SKYCX
-*
-         ELSEIF (INDEX(STRING(1:30), 'SKY_CEN_Y') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)AMPSTRING
-            READ(AMPSTRING(8:80), *)HEAD.SKYCY
-*
-         ELSEIF (INDEX(STRING(1:30), 'DET_FIELD') .NE. 0) THEN
-            READ(HUNIT, FMT='(A80)', END=100)AMPSTRING
-            READ(AMPSTRING(8:80), *)HEAD.XDSTART,HEAD.YDSTART,
-     &                                          HEAD.XDEND,HEAD.YDEND
-            DETRAN=.TRUE.
-         ELSEIF (INDEX(STRING(1:30), 'OBS_PROC_DATIM') .NE. 0) THEN
-            READ(HUNIT, FMT='(7X,A30)', END=100)VERS
-            HEAD.SASS_DATE = VERS(1:CHR_LEN(VERS))
-         ELSEIF (INDEX(STRING(1:30), 'START_SM') .NE. 0) THEN
-*
-*  Read in small map pointers
-            HEAD.ISMTNU=HEAD.ISMNUX*HEAD.ISMNUY
-            R1 = HEAD.ISMTNU / 7.0
-*
-            DO LP=1,INT(R1)
-               READ(HUNIT, FMT='(A100)', END=100)STRING100
-               READ(STRING100(8:100), *)( HEAD.EVSTART(I),
-     &                  I = (1+(LP-1)*7), (LP*7) )
-            ENDDO
-
-            IF (MOD(R1,1.0) .NE. 0.0) THEN
-               READ(HUNIT, FMT='(A100)', END=100)STRING100
-               READ(STRING100(8:100), *)( HEAD.EVSTART(I),
-     &                  I = (1+(LP-1)*7), HEAD.ISMTNU )
-            ENDIF
-
-            EVMAP=.TRUE.
-*
-         ENDIF
-*
-        ENDDO
-*
-100     CONTINUE
-*
-* Check all info was obtained from header
-        IF (.NOT. ISMNUX .OR. .NOT. ISMNUY) THEN
-           CALL MSG_PRNT('Couldnt find number of small maps in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. DET) THEN
-           CALL MSG_PRNT('Couldnt find detector name in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. LRA .OR. .NOT. LDEC .OR. .NOT. LROLL) THEN
-           CALL MSG_PRNT('Couldnt find all attitude info. in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. LDATE .OR. .NOT. UT ) THEN
-           CALL MSG_PRNT('Couldnt find start time info. in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. TLEN .OR. .NOT. CLOCK ) THEN
-           CALL MSG_PRNT('Couldnt find time range in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. ARANGE .OR. .NOT. CRANGE) THEN
-           CALL MSG_PRNT('Couldnt find amp channel range in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. PIXRAN .OR. .NOT. DETRAN) THEN
-           CALL MSG_PRNT('Couldnt find X, Y range in header')
-           STATUS=SAI__ERROR
-        ELSEIF (.NOT. PIXSIZ) THEN
-           CALL MSG_PRNT('Couldnt find pixel size in header')
-           CALL MSG_PRNT('assuming raw pixel width is 1 arcsec')
-           HEAD.PIXEL=1.0
-        ELSEIF (.NOT. EVMAP) THEN
-           CALL MSG_PRNT('Couldnt find event map index in header')
-           STATUS=SAI__ERROR
-        ENDIF
-*
-* Calculate the conversion factor between spacecraft time and UT
-        HEAD.SCCONV = (END_MJD - HEAD.BASE_MJD) * 86400.0D0 /
-     &                            (SC_END - HEAD.BASE_SCTIME)
-* Create array of small map start positions
-        XSIZE = HEAD.IFDSZX / REAL(HEAD.ISMNUX)
-        YSIZE = HEAD.IFDSZY / REAL(HEAD.ISMNUY)
-
-        DO LP=1,HEAD.ISMTNU
-           HEAD.XSMAP(LP) = HEAD.XSTART + MOD((LP-1), HEAD.ISMNUX)
-     &                                                      * XSIZE
-           HEAD.YSMAP(LP) = HEAD.YSTART + INT((LP-1) / HEAD.ISMNUY)
-     &                                                      * YSIZE
-        ENDDO
-*
-C fill in target if blank
-        IF (HEAD.TARGET.EQ.' '.AND.OBSERV) THEN
-           HEAD.TARGET = HEAD.TITLE
-        ENDIF
-
-* Display info about this observation
-        IF (DISP) THEN
-
-           CALL MSG_PRNT(' ')
-           CALL MSG_PRNT(' OBSERVATION    DATA-STARTS     DATA-ENDS  '/
-     &        /' EVENTS   FILT_STAT')
-*
-           WRITE(*,1000)HEAD.TARGET(1:10),HEAD.TSTART(1),
-     &        HEAD.TEND(HEAD.NTRANGE),HEAD.IEVTNU,HEAD.FILTER(1:10)
-
-1000       FORMAT(X,A10,4X,F10.1,6X,F10.1,3X,I7,4X,A10)
-*
-        ENDIF
-*
-999     CONTINUE
-*
-        CALL FIO_PUNIT(HUNIT, STATUS)
-        CLOSE(HUNIT)
-*
-        IF (STATUS .NE. SAI__OK) THEN
-           CALL ERR_REP(' ','from XRT_RDHEAD',STATUS)
-        ENDIF
-*
-        END
 
 *+ XRT_RDHOTSPOT - Reads HOTSPOT file
-      SUBROUTINE XRT_RDHOTSPOT(RTNAME, HEAD, STATUS)
+      SUBROUTINE XRT_RDHOTSPOT(RTNAME, STATUS)
 *    Description :
 *     Reads hotspot file into a header structure
 *    Method :
@@ -2984,11 +2567,10 @@ C fill in target if blank
 *    Global variables :
 *     <global variables held in named COMMON>
 *    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+      INCLUDE 'XRTHEAD_CMN'
 *    Import :
       CHARACTER*(*) RTNAME                     ! Rootname of data files
 *    Import-Export :
-      RECORD /XRT_HEAD/ HEAD
 *    Export :
 *     <declarations and descriptions for exported arguments>
 *    Status :
@@ -3006,10 +2588,10 @@ C fill in target if blank
 *     <any DATA initialisations for local variables>
 *-
 * Just return if PSPC data
-      IF (INDEX(HEAD.DETECTOR, 'HRI') .EQ. 0) GOTO 999
+      IF (INDEX(HEAD_DETECTOR, 'HRI') .EQ. 0) GOTO 999
 *
 * Attempt to open the hotmap file
-      CALL RAT_HDLOOKUP(HEAD,'HOTSPOT','EXTNAME',EXT,STATUS)
+      CALL RAT_HDLOOKUP('HOTSPOT','EXTNAME',EXT,STATUS)
       FNAME = RTNAME(1:CHR_LEN(RTNAME)) // EXT
 *
       CALL HDS_OPEN(FNAME, 'READ', HLOC, STATUS)
@@ -3018,25 +2600,25 @@ C fill in target if blank
          CALL MSG_SETC('HOT', FNAME)
          CALL MSG_PRNT('Warning: cannot open hotspot file ^HOT')
          CALL MSG_PRNT('         will assume no hotspots')
-         HEAD.NSPOT=0
+         HEAD_NSPOT=0
          CALL ERR_ANNUL(STATUS)
          GOTO 999
       ENDIF
 *
 * Read in arrays
-      CALL RAT_HDLOOKUP(HEAD,'HOTSPOT','XSPOT',COL,STATUS)
-      CALL CMP_GET1I(HLOC,COL,MAXSPOT,HEAD.XSPOT,HEAD.NSPOT, STATUS)
+      CALL RAT_HDLOOKUP('HOTSPOT','XSPOT',COL,STATUS)
+      CALL CMP_GET1I(HLOC,COL,MAXSPOT,HEAD_XSPOT,HEAD_NSPOT, STATUS)
 
-      CALL RAT_HDLOOKUP(HEAD,'HOTSPOT','YSPOT',COL,STATUS)
-      CALL CMP_GET1I(HLOC,COL,MAXSPOT,HEAD.YSPOT,HEAD.NSPOT, STATUS)
+      CALL RAT_HDLOOKUP('HOTSPOT','YSPOT',COL,STATUS)
+      CALL CMP_GET1I(HLOC,COL,MAXSPOT,HEAD_YSPOT,HEAD_NSPOT, STATUS)
 
-      CALL RAT_HDLOOKUP(HEAD,'HOTSPOT','SPOTRAD',COL,STATUS)
-      CALL CMP_GET1I(HLOC,COL,MAXSPOT,HEAD.SPOTRAD,HEAD.NSPOT, STATUS)
+      CALL RAT_HDLOOKUP('HOTSPOT','SPOTRAD',COL,STATUS)
+      CALL CMP_GET1I(HLOC,COL,MAXSPOT,HEAD_SPOTRAD,HEAD_NSPOT, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Cannot find arrays in HOTSPOT file')
          CALL MSG_PRNT('Will assume there are no hotspots')
-         HEAD.NSPOT=0
+         HEAD_NSPOT=0
          CALL ERR_ANNUL(STATUS)
       ENDIF
 *
@@ -3343,7 +2925,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 	END
 
 *+ XRT_VIGNET - Finds vignetting correction for XRT datafiles
-      SUBROUTINE XRT_VIGNET(HEAD, ELOC, NENERGY, ENERGY, MEAN_EN,
+      SUBROUTINE XRT_VIGNET(IDS, ELOC, NENERGY, ENERGY, MEAN_EN,
      &                     DISPLAY, NP, VCORR, VSING, VFLAG, STATUS)
 *    Description :
 *     <description of what the application does - for user info>
@@ -3365,12 +2947,12 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Status :
       INTEGER STATUS
 *    Import :
-      RECORD /CORR/ HEAD
+      INTEGER IDS                      ! 1=src  2=bckgnd
       CHARACTER*(DAT__SZLOC) ELOC      ! Locator to effective area file
       INTEGER NENERGY
       REAL ENERGY(NENERGY)
@@ -3414,8 +2996,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       VFLAG = .FALSE.
 
 * Determine which detector
-      PSPC=((HEAD.DET(:4)).EQ.'PSPC')
-      HRI=((HEAD.DET(:3)).EQ.'HRI')
+      PSPC=((CHEAD_DET(:4)).EQ.'PSPC')
+      HRI=((CHEAD_DET(:3)).EQ.'HRI')
 *
 *
       IF (PSPC) THEN
@@ -3439,9 +3021,10 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
         TOP = 0
         DO LP=1,NEFF
 *
-           IF (HEAD.OFFAX .LT. ANGLE(LP)) THEN
+           IF (CHEAD_OFFAX(IDS) .LT. ANGLE(LP)) THEN
               TOP = LP
-              FRAC = (HEAD.OFFAX-ANGLE(LP-1)) / (ANGLE(LP)-ANGLE(LP-1))
+              FRAC = (CHEAD_OFFAX(IDS)-ANGLE(LP-1)) /
+     :                         (ANGLE(LP)-ANGLE(LP-1))
               GOTO 100
            ENDIF
 *
@@ -3537,7 +3120,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *
 *  Are filter corrections required. For now, no correction for anything
 *  other than spectra.
-        IF (NP .GT. 1 .AND. INDEX(HEAD.FILTER, 'BORON') .GT. 0) THEN
+        IF (NP .GT. 1 .AND. INDEX(CHEAD_FILTER, 'BORON') .GT. 0)
+     :                                                       THEN
 *
 *    Get filter correction array
            CALL DAT_FIND(ELOC, 'FILTER_1', FTLOC, STATUS)
@@ -3571,7 +3155,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *
       ELSEIF (HRI) THEN
 
-        CALL XRT_VIGNET_HRI(HEAD.OFFAX,HVIG,HQE,VCORR,VSING,STATUS)
+        CALL XRT_VIGNET_HRI(CHEAD_OFFAX(IDS),HVIG,HQE,VCORR,VSING,
+     :                                                     STATUS)
 
         VFLAG=.TRUE.
 

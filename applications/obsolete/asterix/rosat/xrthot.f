@@ -214,8 +214,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
 
-*  Structure Definitions :
-      INCLUDE 'INC_XRTHEAD'
+*  Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 
 *  Arguments Given:
       CHARACTER*(*)		FNAME, RTNAME
@@ -229,10 +229,9 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'XRTHOT Version 2.2-0' )
+        PARAMETER		( VERSION = 'XRTHOT Version 2.2-1' )
 
 *  Local Variables:
-      RECORD /XRT_HEAD/ 	HEAD			! ROSAT header object
 
       CHARACTER*80		HNAME			! Header file name
 
@@ -278,19 +277,19 @@
       END IF
 
 *  Read the header infotmation
-      CALL RAT_GETXRTHEAD( RTNAME, HEAD, STATUS )
+      CALL RAT_GETXRTHEAD( RTNAME, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Write spot values into the appropriate arrays
-      HEAD.NSPOT = NSPOT / 3
-      DO LP = 1, HEAD.NSPOT
-        HEAD.XSPOT(LP) = SPOTS(1+(LP-1)*3)
-        HEAD.YSPOT(LP) = SPOTS(2+(LP-1)*3)
-        HEAD.SPOTRAD(LP) = SPOTS(LP*3)
+      HEAD_NSPOT = NSPOT / 3
+      DO LP = 1, HEAD_NSPOT
+        HEAD_XSPOT(LP) = SPOTS(1+(LP-1)*3)
+        HEAD_YSPOT(LP) = SPOTS(2+(LP-1)*3)
+        HEAD_SPOTRAD(LP) = SPOTS(LP*3)
       END DO
 
 *  Inform user of hotspots found
-      CALL MSG_SETI( 'NSPOT', HEAD.NSPOT )
+      CALL MSG_SETI( 'NSPOT', HEAD_NSPOT )
       CALL MSG_PRNT( '^NSPOT hotspots/deadspots in field of view' )
 
 *  Open the header file for update
@@ -302,7 +301,7 @@
       END IF
 
 *  Write the header structure into the header file
-      CALL RAT_PUTHEAD( HID, 'HEAD', HEAD, STATUS )
+      CALL RAT_PUTHEAD( HID, 'HEAD', STATUS )
 
 *  Update the history information
       CALL HSI_ADD( HID, VERSION, STATUS )

@@ -53,6 +53,7 @@
 *      9 May 95 : V1.8-1 Updated access to SSDS files (DJA)
 *      8 Aug 95 : V1.8-2 Added check for objects outside exposure map (DJA)
 *      4 Dec 1995 : V1.8-3 Use BDI for effective area access (DJA)
+*      6 Apr 98 : V2.2-1 Structures removed (rjv)
 *
 *    Type Definitions :
 *
@@ -115,7 +116,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XPSSCORR Version rbtest' )
+        PARAMETER 		( VERSION = 'XPSSCORR Version 2.2-1' )
 *-
 
 *    Check status
@@ -444,8 +445,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *     <specification of FORTRAN structures>
 *    Import :
       CHARACTER*(DAT__SZLOC) RLOC    ! Locator to response file
@@ -472,7 +473,6 @@
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
-      RECORD /CORR/ HEAD                   ! Header structure
       INTEGER ELP                          ! Loop over flux errors
       INTEGER SLP                          ! Loop over sources
       INTEGER NENERGY                      ! No. of energies
@@ -507,10 +507,10 @@
       CALL DYN_MAPR(1, NENERGY, DUMMY, STATUS)
 *
 * Find the effective area for this energy in the field centre
-      HEAD.DET = 'PSPC'
-      HEAD.OFFAX=0.0
+      CHEAD_DET = 'PSPC'
+      CHEAD_OFFAX(1)=0.0
 *
-      CALL XRT_VIGNET(HEAD, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
+      CALL XRT_VIGNET(1, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
      &                 .FALSE., 1, %val(DUMMY), VZERO, VFLAG, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -519,10 +519,10 @@
       DO SLP=1,NSRC
 *
 *      Calculate off axis angle in arcminutes
-         HEAD.OFFAX = SQRT( XPOS(SLP)**2 + YPOS(SLP)**2 ) * 60.
+         CHEAD_OFFAX(1) = SQRT( XPOS(SLP)**2 + YPOS(SLP)**2 ) * 60.
 *
 *      Calc. effective area for this source
-         CALL XRT_VIGNET(HEAD, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
+         CALL XRT_VIGNET(1, ELOC, NENERGY, %val(EPNTR), MEAN_EN,
      &                 .FALSE., 1, %val(DUMMY), VSING, VFLAG, STATUS)
 
          IF (STATUS.NE.SAI__OK) GOTO 999
@@ -718,8 +718,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
 *     <specification of FORTRAN structures>
 *    Import :
       INTEGER NSRC                ! Number of sources

@@ -66,6 +66,7 @@
 *    15 Feb 95    V1.8-0  Option not to do exposure correction (RJV)
 *     9 Oct 95    V1.8-1  Fixed cock-up with effective exposure (RJV)
 *    11 Jan 1996 V1.8-2 Some ADI connversion (DJA)
+*    25 Mar 1998 V2.2-1 removed structures (rjv)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -74,7 +75,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Status :
@@ -86,7 +87,6 @@
       INTEGER	MAXRNG
 	PARAMETER (MAXRNG=2000)
 *    Local variables :
-      RECORD /CORR/ HEAD                  ! Header information
 *
       LOGICAL OVER                        ! Overwrite the input file ?
 
@@ -149,7 +149,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTCORR Version 2.2-0')
+      PARAMETER (VERSION = 'XRTCORR Version 2.2-1')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
@@ -173,14 +173,14 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *  Read header information into a structured array
-      CALL XRTCORR_GETHEAD( OFID, HEAD, STATUS)
+      CALL XRTCORR_GETHEAD( OFID,  STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Find dimensions of data array and map it. The data array is reordered
 *    in this routine so that the axes are in the order X,Y,Time,corrected
 *    amplitude. If variance or quality arrays are not found they are
 *    created. Also gets further XRT specific header info.
-      CALL XRTCORR_GETDATA( OFID, HEAD, DIMS, ORDER, DPNTR,
+      CALL XRTCORR_GETDATA( OFID,  DIMS, ORDER, DPNTR,
      &             TDPNTR, VPNTR, TVPNTR, QPNTR, TQPNTR, MASK, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -193,7 +193,7 @@
       NR=DIMS(5)
 *
 * Is it HRI data ?
-      IF (INDEX(HEAD.DET, 'HRI') .NE. 0) THEN
+      IF (INDEX(CHEAD_DET, 'HRI') .NE. 0) THEN
          LHRI = .TRUE.
       ELSE
          LHRI = .FALSE.
@@ -234,10 +234,10 @@
 *   observation and detector)
       IF (.NOT.LHRI) THEN
 
-        IF (INDEX(HEAD.DET, 'PSPCB') .NE. 0) THEN
+        IF (INDEX(CHEAD_DET, 'PSPCB') .NE. 0) THEN
            EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcb_eff'
            CALL USI_DEF0C('EFFILE', EFILE, STATUS)
-        ELSEIF (INDEX(HEAD.DET, 'PSPCC') .NE. 0) THEN
+        ELSEIF (INDEX(CHEAD_DET, 'PSPCC') .NE. 0) THEN
            EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcc_eff'
            CALL USI_DEF0C('EFFILE', EFILE, STATUS)
         ENDIF
@@ -258,7 +258,7 @@
 *
 *
 *    Get rootname of calibration files
-      CALL USI_GET0C('RTNAME', HEAD.RTNAME, STATUS)
+      CALL USI_GET0C('RTNAME', CHEAD_RTNAME, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -267,16 +267,12 @@
       CALL DAT_THERE(ILOC, 'RAWDATA', THERE, STATUS)
 *
       IF (THERE) THEN
-         CALL CMP_GET0C(ILOC, 'RAWDATA', HEAD.ORIGIN, STATUS)
+         CALL CMP_GET0C(ILOC, 'RAWDATA', CHEAD_ORIGIN, STATUS)
       ELSE
-         HEAD.ORIGIN = 'OMD'
+         CALL MSG_PRNT('!Data format unrecognised')
+         GOTO 999
       ENDIF
 *
-*  If status has gone bad - reset and assume raw data is MPE data
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_ANNUL(STATUS)
-         HEAD.ORIGIN = 'OMD'
-      ENDIF
 
 *  Map an array to take the energies at each pulse height channel
       CALL DYN_MAPR(1, NP, EPHPTR, STATUS)
@@ -378,10 +374,10 @@
 *     Calc the dead times
 
          IF (LHRI) THEN
-           CALL XRTCORR_DTIME_HRI(HEAD,NT,%val(DQPNTR),%val(CDPNTR),
+           CALL XRTCORR_DTIME_HRI(NT,%val(DQPNTR),%val(CDPNTR),
      &                                                  DFLAG,STATUS)
          ELSE
-           CALL XRTCORR_DTIME_PSPC(HEAD,NT,%val(DQPNTR),%val(CDPNTR),
+           CALL XRTCORR_DTIME_PSPC(NT,%val(DQPNTR),%val(CDPNTR),
      &                                                  DFLAG,STATUS)
          ENDIF
       ELSE
@@ -401,14 +397,14 @@
          IF (NX .EQ. 1 .AND. NY .EQ. 1) THEN
 *
 *       calc. separate vignetting correction for each radial bin
-            CALL XRTCORR_GETVIG(HEAD, ELOC, NENERGY, %val(EPNTR),
+            CALL XRTCORR_GETVIG( ELOC, NENERGY, %val(EPNTR),
      &               MEAN_ENERGY, NR, NP, %val(TCVPTR), VSING,
      &                    %val(CVPNTR), %val(PVSING), VFLAG, STATUS)
 *
          ELSE
 *
 *       calc. vignetting correction for each image/spectral bin
-            CALL XRT_IMVIG(HEAD, ELOC, NENERGY, %val(EPNTR),
+            CALL XRT_IMVIG(1, ELOC, NENERGY, %val(EPNTR),
      &               NX, NY, NP, %val(EPHPTR), .TRUE.,
      &                    %val(CIVPNTR), VFLAG, STATUS)
 *
@@ -436,13 +432,13 @@
 *
 *    If we are correcting radial bins or an annular box - point spread
 *    corrections are undefined - so ban them !!
-      IF (NR .GT. 1 .OR. HEAD.SHAPE .EQ. 'A') LPCORR = .FALSE.
+      IF (NR .GT. 1 .OR. CHEAD_SHAPE(1) .EQ. 'A') LPCORR = .FALSE.
 *
 *    Calculate PSF correction if wanted
       IF (LPCORR .AND. .NOT. LHRI) THEN
 *
          IF (NX .EQ. 1 .AND. NY .EQ. 1) THEN
-            CALL XRTCORR_PSF(HEAD, NENERGY, %val(EPNTR), MEAN_ENERGY,
+            CALL XRTCORR_PSF( NENERGY, %val(EPNTR), MEAN_ENERGY,
      &                                NP, %val(CPPNTR), PSING, STATUS)
          ELSE
             PSING=1.0
@@ -503,7 +499,7 @@
         ENDIF
 *
 *  Calculate the exposure in each time bin.
-        CALL XRTCORR_CALCEXP(HEAD, NT, %val(LPNTR), %val(SXPNTR),
+        CALL XRTCORR_CALCEXP( NT, %val(LPNTR), %val(SXPNTR),
      &                             %val(EXPNTR), %val(DXPNTR), STATUS)
 *
         IF (STATUS .NE. SAI__OK) GOTO 999
@@ -527,7 +523,7 @@
 
 * correct data array, variance and set quality bad if no
 * exposure in a given bin.
-      CALL XRTCORR_DOIT( OFID, HEAD, NX, NY, NT, NP, NR, NWIRE,
+      CALL XRTCORR_DOIT( OFID,  NX, NY, NT, NP, NR, NWIRE,
      &          NTHRESH, %val(CDPNTR), %val(PVSING), PSING,
      &          %val(CIVPNTR), %val(CTPNTR), %val(CWPNTR), %val(DXPNTR),
      &          %val(DPNTR), %val(VPNTR), %val(QPNTR),STATUS)
@@ -607,7 +603,7 @@
 
 
 *+  XRTCORR_CALCEXP - Calculates exposure time in each time bin
-      SUBROUTINE XRTCORR_CALCEXP(HEAD, NT, WORK, START, END,
+      SUBROUTINE XRTCORR_CALCEXP( NT, WORK, START, END,
      &                            EXPOS, STATUS)
 *    Description :
 *     <description of what the subroutine does - for user info>
@@ -632,12 +628,10 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
+      INCLUDE 'XRTHEAD_CMN'
 *    Import :
-      RECORD /CORR/ HEAD                 !Source file header info
       INTEGER NT                         !Number of time bins
       DOUBLE PRECISION WORK(MAXRAN*2)    !Workspace array
 *    Import-Export :
@@ -652,12 +646,9 @@
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
-      RECORD /XRT_SCFDEF/ SRT            !Sort control structure
-      RECORD /XRT_HEAD/ RAWHD            !Raw data header structure
 *
       DOUBLE PRECISION TBIT
       INTEGER TLP,LP2
-      CHARACTER*50 VERS                  !SASS processing version date
       INTEGER SPTR,UPTR                  !Pointers to time arrays
       INTEGER NRAW
       DOUBLE PRECISION OVRLAP
@@ -667,37 +658,24 @@
 * Exposure time is exposure time of the whole file if there is one time bin
       IF (NT .EQ. 1) THEN
 *
-         EXPOS(1)=HEAD.EXPOS
-         START(1)=HEAD.TMIN(1)
-         END(1)=HEAD.TMAX(HEAD.NTRANGE)
+         EXPOS(1)=CHEAD_EXPOS(1)
+         START(1)=CHEAD_TMIN(1,1)
+         END(1)=CHEAD_TMAX(CHEAD_NTRANGE(1),1)
 *
       ELSE
 *
-         IF (HEAD.ORIGIN .EQ. 'OMD') THEN
-*           Read the MPE style header
-            SRT.ROOTNAME=HEAD.RTNAME
-*
-            CALL XRT_RDHEAD(.FALSE., SRT, RAWHD, VERS, STATUS)
-*
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL MSG_PRNT('Error reading header file')
-               GOTO 999
-            ENDIF
-*
-         ELSE
 *          Read header infor from rationalised fits data
-           CALL RAT_GETXRTHEAD(HEAD.RTNAME, RAWHD, STATUS)
-         ENDIF
+         CALL RAT_GETXRTHEAD(CHEAD_RTNAME, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *   Combine the times from the header with the times over which the data
 *   was sorted.
 *     Create work space to hold the raw selection times
-         CALL DYN_MAPD(1, RAWHD.NTRANGE*2, SPTR, STATUS)
+         CALL DYN_MAPD(1, HEAD_NTRANGE*2, SPTR, STATUS)
 *
 *     Create the array of user selection times
-         CALL DYN_MAPD(1, HEAD.NTRANGE*2, UPTR, STATUS)
+         CALL DYN_MAPD(1, CHEAD_NTRANGE(1)*2, UPTR, STATUS)
 *
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping dynamic memory')
@@ -705,16 +683,16 @@
          ENDIF
 *
 *     Put SASS selection times into one array
-         CALL XRT_LIVEWIND(RAWHD.NTRANGE, RAWHD.TSTART,
-     &                                 RAWHD.TEND, %val(SPTR))
+         CALL XRT_LIVEWIND(HEAD_NTRANGE, HEAD_TSTART,
+     &                                 HEAD_TEND, %val(SPTR))
 *
 *     Put user selection times into one array
-         CALL XRT_LIVEWIND(HEAD.NTRANGE, HEAD.TMIN,
-     &                                 HEAD.TMAX, %val(UPTR))
+         CALL XRT_LIVEWIND(CHEAD_NTRANGE(1), CHEAD_TMIN(1,1),
+     &                                 CHEAD_TMAX(1,1), %val(UPTR))
 *
 *     Merge these with the user selection times in the sort box
-         CALL XRT_TIMSET(RAWHD.NTRANGE*2, RAWHD.NTRANGE*2, %val(SPTR),
-     &                HEAD.NTRANGE*2, HEAD.NTRANGE*2, %val(UPTR),
+         CALL XRT_TIMSET(HEAD_NTRANGE*2, HEAD_NTRANGE*2, %val(SPTR),
+     &             CHEAD_NTRANGE(1)*2, CHEAD_NTRANGE(1)*2, %val(UPTR),
      &                MAXRAN*2, NRAW, WORK, OVRLAP)
 *
 * Calculate the exposure time in each bin
@@ -723,8 +701,8 @@
             EXPOS(TLP) = 0.0D0
 *
 *    Find upper and lower values of this time bin
-            START(TLP) = HEAD.TMIN(1) + HEAD.TSCALE(1) * (TLP-1)
-            END(TLP) = HEAD.TMIN(1) + HEAD.TSCALE(1) * TLP
+            START(TLP) = CHEAD_TMIN(1,1)+CHEAD_TSCALE(1,1)*(TLP-1)
+            END(TLP) = CHEAD_TMIN(1,1)+CHEAD_TSCALE(1,1) * TLP
 *
 *    Loop over each time segment from the input file header
             DO LP2=1,NRAW
@@ -749,7 +727,7 @@ D            WRITE(3,*)EXPOS(TLP)
       END
 
 *+  XRTCORR_DTIME_PSPC - Calculates dead time correction per time bin
-      SUBROUTINE XRTCORR_DTIME_PSPC(HEAD,NT,QUAL,DCORR,DFLAG,STATUS)
+      SUBROUTINE XRTCORR_DTIME_PSPC(NT,QUAL,DCORR,DFLAG,STATUS)
 *    Description :
 *     Calculates the dead time correction for each time bin in the input
 *     datafile. Finds the mean event rate received by the detector
@@ -764,16 +742,12 @@ D            WRITE(3,*)EXPOS(TLP)
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables : :
+      INCLUDE 'XRT_CORR_SUB_CMN'
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
       INTEGER STATUS
 *    Import :
-      RECORD /CORR/ HEAD            ! Header from file
-      RECORD /XRT_HEAD/ XRTHDR      ! header to get origin
-      RECORD /XRT_SCFDEF/ SRT         ! Sort control structure
       INTEGER NT                    ! Number of time bins in input file
       BYTE QUAL(NT)                 ! Quality of each time bin
 *    Import-Export :
@@ -793,19 +767,13 @@ D            WRITE(3,*)EXPOS(TLP)
       INTEGER EV_TPNTR                       !Eventrate time array
       INTEGER EV1_PNTR,EV2_PNTR,EV3_PNTR     !Eventrate arrays
       INTEGER W1PNTR,W2PNTR,W3PNTR,W4PNTR    !Workspace pointers
-      CHARACTER*80 VERS
 *-
 
 * Get data origin
-      IF (HEAD.ORIGIN.EQ.'OMD') THEN
-         SRT.ROOTNAME = HEAD.RTNAME
-         CALL XRT_RDHEAD(.FALSE.,SRT,XRTHDR,VERS,STATUS)
-      ELSE
-         CALL RAT_GETXRTHEAD(HEAD.RTNAME,XRTHDR,STATUS)
-      ENDIF
+      CALL RAT_GETXRTHEAD(CHEAD_RTNAME,STATUS)
 * Open eventrate file
-      CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','EXTNAME',EXT,STATUS)
-      ERFILE = HEAD.RTNAME(1:CHR_LEN(HEAD.RTNAME))//EXT
+      CALL RAT_HDLOOKUP('EVRATE','EXTNAME',EXT,STATUS)
+      ERFILE = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME))//EXT
 *
       CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
 *
@@ -818,7 +786,7 @@ D            WRITE(3,*)EXPOS(TLP)
       ELSE
 *
 *   Read eventrates as a function of time
-         CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','TIME',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','TIME',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, TLOC, STATUS)
          CALL DAT_SIZE(TLOC, NTIMES, STATUS)
 *
@@ -830,15 +798,15 @@ D            WRITE(3,*)EXPOS(TLP)
          ENDIF
 *
 *   Map the eventrates
-         CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','A2_AL',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','A2_AL',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, ALOC1, STATUS)
          CALL DAT_MAPR(ALOC1, 'READ', 1, NTIMES, EV1_PNTR, STATUS)
 *
-         CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','XACC',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','XACC',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, ALOC2, STATUS)
          CALL DAT_MAPR(ALOC2, 'READ', 1, NTIMES, EV2_PNTR, STATUS)
 *
-         CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','XTRANSM',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','XTRANSM',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, ALOC3, STATUS)
          CALL DAT_MAPR(ALOC3, 'READ', 1, NTIMES, EV3_PNTR, STATUS)
 *
@@ -853,7 +821,7 @@ D            WRITE(3,*)EXPOS(TLP)
          CALL DYN_MAPI(1, NT, W4PNTR, STATUS)
 *
 *  Calculate the correction for each time bin
-         CALL XRTCORR_DTIME_PSPC_DOIT(HEAD, NTIMES, %val(EV_TPNTR),
+         CALL XRTCORR_DTIME_PSPC_DOIT( NTIMES, %val(EV_TPNTR),
      &         %val(EV1_PNTR), %val(EV2_PNTR), %val(EV3_PNTR), NT,
      &         QUAL, %val(W1PNTR), %val(W2PNTR), %val(W3PNTR),
      &                                 %val(W4PNTR), DCORR, STATUS)
@@ -886,7 +854,7 @@ D            WRITE(3,*)EXPOS(TLP)
       END
 
 *+  XRTCORR_DTIME_PSPC_DOIT - Calcs. dead time correction for each time bin
-      SUBROUTINE XRTCORR_DTIME_PSPC_DOIT(HEAD,NTIMES,EVTIM,A1LL,AXE,
+      SUBROUTINE XRTCORR_DTIME_PSPC_DOIT(NTIMES,EVTIM,A1LL,AXE,
      &                                   AEXE,NT,QUAL,TOTA1LL,TOTAXE,
      &                                    TOTAEXE,COUNT,DCORR,STATUS)
 *    Description :
@@ -911,10 +879,9 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'               !Quality values
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ HEAD               !Header structure for input file
 *
       INTEGER NTIMES                   !Number of eventrate records
       DOUBLE PRECISION EVTIM(NTIMES)   !Times of event rates
@@ -960,13 +927,14 @@ D            WRITE(3,*)EXPOS(TLP)
       DO LP=1,NTIMES
 *
 *   Convert the eventrate time into UT.
-         ETIM = EVTIM(LP) - HEAD.SCBASE
+         ETIM = EVTIM(LP) - CHEAD_SCBASE(1)
 *
-         IF (ETIM .GE. HEAD.TMIN(1) .AND.
-     &       ETIM .LE. HEAD.TMAX(HEAD.NTRANGE)) THEN
+         IF (ETIM .GE. CHEAD_TMIN(1,1) .AND.
+     &       ETIM .LE. CHEAD_TMAX(CHEAD_NTRANGE(1),1)) THEN
 *
 *      Calculate time axis bin number
-            TBIN = INT( (ETIM - HEAD.TMIN(1)) / HEAD.TSCALE(1) + 1.0D0 )
+            TBIN = INT( (ETIM - CHEAD_TMIN(1,1))/CHEAD_TSCALE(1,1)
+     :                                                      + 1.0D0 )
             TBIN = MIN(TBIN, NT)
 *
 *      Add up eventrates for this time bin
@@ -1046,7 +1014,7 @@ D            WRITE(3,*)EXPOS(TLP)
 
 
 *+  XRTCORR_DTIME_HRI - Calculates dead time correction per time bin
-      SUBROUTINE XRTCORR_DTIME_HRI(HEAD, NT, QUAL, DCORR, DFLAG, STATUS)
+      SUBROUTINE XRTCORR_DTIME_HRI( NT, QUAL, DCORR, DFLAG, STATUS)
 *    Description :
 *     Calculates the dead time correction for each time bin in the input
 *     datafile. Finds the mean event rate received by the detector
@@ -1058,16 +1026,12 @@ D            WRITE(3,*)EXPOS(TLP)
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
-      INCLUDE 'INC_XRTSRT'
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
       INTEGER STATUS
 *    Import :
-      RECORD /CORR/ HEAD            ! Header from file
-      RECORD /XRT_HEAD/ XRTHDR      ! header to get origin
-      RECORD /XRT_SCFDEF/ SRT         ! Sort control structure
       INTEGER NT                    ! Number of time bins in input file
       BYTE QUAL(NT)                 ! Quality of each time bin
 *    Import-Export :
@@ -1086,19 +1050,13 @@ D            WRITE(3,*)EXPOS(TLP)
       INTEGER T_PNTR                         !Eventrate time array
       INTEGER PS_PNTR                        !Primary eventrate array
       INTEGER W1PNTR,W2PNTR                  !Workspace pointers
-      CHARACTER*80 VERS
 *-
 
 * Get data origin
-      IF (HEAD.ORIGIN.EQ.'OMD') THEN
-         SRT.ROOTNAME = HEAD.RTNAME
-         CALL XRT_RDHEAD(.FALSE.,SRT,XRTHDR,VERS,STATUS)
-      ELSE
-         CALL RAT_GETXRTHEAD(HEAD.RTNAME,XRTHDR,STATUS)
-      ENDIF
+      CALL RAT_GETXRTHEAD(CHEAD_RTNAME,STATUS)
 * Open eventrate file
-      CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','EXTNAME',EXT,STATUS)
-      ERFILE = HEAD.RTNAME(1:CHR_LEN(HEAD.RTNAME))//EXT
+      CALL RAT_HDLOOKUP('EVRATE','EXTNAME',EXT,STATUS)
+      ERFILE = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME))//EXT
 *
       CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
 *
@@ -1111,7 +1069,7 @@ D            WRITE(3,*)EXPOS(TLP)
       ELSE
 *
 *   Read eventrates as a function of time
-         CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','TIME',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','TIME',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, TLOC, STATUS)
          CALL DAT_SIZE(TLOC, NTIMES, STATUS)
 *
@@ -1123,11 +1081,11 @@ D            WRITE(3,*)EXPOS(TLP)
          ENDIF
 *
 *   Map the eventrates
-         CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','PS_VALID',COL,STATUS)
+         CALL RAT_HDLOOKUP('EVRATE','PS_VALID',COL,STATUS)
          CALL DAT_FIND(ERLOC, COL, PSLOC, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
            STATUS = SAI__OK
-           CALL RAT_HDLOOKUP(XRTHDR,'EVRATE','ACCEPTED',COL,STATUS)
+           CALL RAT_HDLOOKUP('EVRATE','ACCEPTED',COL,STATUS)
            CALL DAT_FIND(ERLOC, COL, PSLOC, STATUS)
          END IF
          CALL DAT_MAPR(PSLOC, 'READ', 1, NTIMES, PS_PNTR, STATUS)
@@ -1143,7 +1101,7 @@ D            WRITE(3,*)EXPOS(TLP)
 *
 *
 *  Calculate the correction for each time bin
-         CALL XRTCORR_DTIME_HRI_DOIT(HEAD, NTIMES, %val(T_PNTR),
+         CALL XRTCORR_DTIME_HRI_DOIT( NTIMES, %val(T_PNTR),
      &         %val(PS_PNTR), NT,QUAL,%val(W1PNTR),%val(W2PNTR),
      &                                              DCORR,STATUS)
 *
@@ -1175,7 +1133,7 @@ D            WRITE(3,*)EXPOS(TLP)
 
 
 *+  XRTCORR_DTIME_HRI_DOIT - Calcs. dead time correction for each time bin
-      SUBROUTINE XRTCORR_DTIME_HRI_DOIT(HEAD,NTIMES,EVTIM,RATE,
+      SUBROUTINE XRTCORR_DTIME_HRI_DOIT(NTIMES,EVTIM,RATE,
      &                                      NT,QUAL,TOTAL,COUNT,
      &                                              DCORR,STATUS)
 *    Description :
@@ -1191,10 +1149,9 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'               !Quality values
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ HEAD               !Header structure for input file
 *
       INTEGER NTIMES                   !Number of eventrate records
       DOUBLE PRECISION EVTIM(NTIMES)   !Times of event rates
@@ -1233,13 +1190,14 @@ D            WRITE(3,*)EXPOS(TLP)
       DO LP=1,NTIMES
 *
 *   Convert the eventrate time into UT.
-         ETIM = EVTIM(LP) - HEAD.SCBASE
+         ETIM = EVTIM(LP) - CHEAD_SCBASE(1)
 *
-         IF (ETIM .GE. HEAD.TMIN(1) .AND.
-     &       ETIM .LE. HEAD.TMAX(HEAD.NTRANGE)) THEN
+         IF (ETIM .GE. CHEAD_TMIN(1,1) .AND.
+     &       ETIM .LE. CHEAD_TMAX(CHEAD_NTRANGE(1),1)) THEN
 *
 *      Calculate time axis bin number
-            TBIN = INT( (ETIM - HEAD.TMIN(1)) / HEAD.TSCALE(1) + 1.0D0 )
+            TBIN = INT( (ETIM - CHEAD_TMIN(1,1)) /
+     :                       CHEAD_TSCALE(1,1) + 1.0D0 )
             TBIN = MIN(TBIN, NT)
 *
 *      Add up eventrates for this time bin
@@ -1392,7 +1350,7 @@ D        WRITE(*,*) RLP
       END
 
 *+  XRTCORR_DOIT - apply corrections to an XRT data array
-      SUBROUTINE XRTCORR_DOIT( FID, HEAD, NX, NY, NT, NP, NR,
+      SUBROUTINE XRTCORR_DOIT( FID,  NX, NY, NT, NP, NR,
      &                    NWIRE, NTHRESH, DCORR, VCORR, PCORR, VIMCOR,
      &                    TCORR, WCORR, EXPOS, DATA, VAR, QUAL, STATUS)
 *    Description :
@@ -1407,13 +1365,11 @@ D        WRITE(*,*) RLP
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
-*    Structure definitions
-      INCLUDE 'INC_CORR'
+*    Global variables :
 *    Status :
       INTEGER STATUS
 *    Import :
       INTEGER			FID			! Output file id
-      RECORD /CORR/ HEAD              ! Header info. for file
       INTEGER NX,NY,NT,NP,NR          ! Dimensions of data array
       INTEGER NWIRE                   ! Dimensions of wire factor
       INTEGER NTHRESH                 ! Dimensions of thresholding factor
@@ -1498,7 +1454,7 @@ D        WRITE(*,*) RLP
       END
 
 *+XRTCORR_GETDATA    Maps the data array and reorders if necessary
-      SUBROUTINE XRTCORR_GETDATA(IFID, HEAD, ODIMS, ORDER, DPNTR,
+      SUBROUTINE XRTCORR_GETDATA(IFID, ODIMS, ORDER, DPNTR,
      &              TDPNTR, VPNTR, TVPNTR, QPNTR, TQPNTR, MASK, STATUS)
 *    Description :
 *      Maps the data_array and puts it in the axis order, X,Y,Time,CPHA
@@ -1529,12 +1485,11 @@ D        WRITE(*,*) RLP
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER			IFID			! Input file id
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Export :
       INTEGER ODIMS(DAT__MXDIM)          ! Dimensions of array
       INTEGER ORDER(7)                   ! The order of the new axes
@@ -1787,30 +1742,30 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Get the sort ranges
-      CALL XRT_GETSORT( IFID, HEAD, STATUS)
+      CALL XRT_GETSORT( IFID, 1, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Set scale factors for X, Y ranges
       IF (ODIMS(1) .EQ. 1) THEN
-         HEAD.XSCALE = 2.0 * HEAD.XOUTER / ODIMS(1)
-         HEAD.YSCALE = 2.0 * HEAD.YOUTER / ODIMS(2)
+         CHEAD_XSCALE(1) = 2.0 * CHEAD_XOUTER(1) / ODIMS(1)
+         CHEAD_YSCALE(1) = 2.0 * CHEAD_YOUTER(1) / ODIMS(2)
       ELSE
 *
 * Get pixel widths from the axes
         CALL BDI_AXGET1R( IFID, ORDER(1), 'SpacedData', 2, SPARR,
      :                    IDUM, STATUS )
-        HEAD.XSCALE = SPARR(2)
+        CHEAD_XSCALE(1) = SPARR(2)
         CALL BDI_AXGET1R( IFID, ORDER(2), 'SpacedData', 2, SPARR,
      :                    IDUM, STATUS )
-        HEAD.YSCALE = SPARR(2)
+        CHEAD_YSCALE(1) = SPARR(2)
 
       ENDIF
 *
-      HEAD.TSCALE(1) = (HEAD.TMAX(HEAD.NTRANGE) - HEAD.TMIN(1))
-     &                                                 / ODIMS(3)
+      CHEAD_TSCALE(1,1) = (CHEAD_TMAX(CHEAD_NTRANGE(1),1) -
+     :                          CHEAD_TMIN(1,1)) / ODIMS(3)
 *
-      IF (HEAD.NTRANGE .EQ. 2) HEAD.TSCALE(2)=HEAD.TSCALE(1)
+      IF (CHEAD_NTRANGE(1) .EQ. 2) CHEAD_TSCALE(2,1)=CHEAD_TSCALE(1,1)
 *
 999   CONTINUE
 *
@@ -2033,7 +1988,7 @@ D        WRITE(*,*) RLP
       END
 
 *+ XRTCORR_GETHEAD - Gets header info. from the input datafile
-      SUBROUTINE XRTCORR_GETHEAD( IFID, HEAD, STATUS )
+      SUBROUTINE XRTCORR_GETHEAD( IFID,  STATUS )
 *    Description :
 *    Environment parameters :
 *    Method :
@@ -2048,12 +2003,11 @@ D        WRITE(*,*) RLP
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
       INTEGER			IFID			! input file id
 *    Import-Export :
-      RECORD /CORR/ HEAD
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -2094,7 +2048,7 @@ D        WRITE(*,*) RLP
       CALL DAT_ANNUL(PLOC, STATUS)
 *
 * Get exposure time
-      CALL CMP_GET0D(HLOC, 'EXPOSURE_TIME', HEAD.EXPOS, STATUS)
+      CALL CMP_GET0D(HLOC, 'EXPOSURE_TIME', CHEAD_EXPOS(1),STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error obtaining exposure time from datafile')
@@ -2105,7 +2059,7 @@ D        WRITE(*,*) RLP
       CALL ADI1_LOCINSTR( IFID, .FALSE., ILOC, STATUS )
 
 * Get detector type
-      CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
+      CALL CMP_GET0C(ILOC, 'DETECTOR', CHEAD_DET, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error accessing DETECTOR object')
@@ -2113,7 +2067,7 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Read in the base time in spacecraft clock units
-      CALL CMP_GET0D(ILOC, 'SC_BASE', HEAD.SCBASE, STATUS)
+      CALL CMP_GET0D(ILOC, 'SC_BASE', CHEAD_SCBASE(1), STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error reading base s/c clock time')
@@ -2121,8 +2075,8 @@ D        WRITE(*,*) RLP
       ENDIF
 *
 * Get filter status if PSPC image
-      IF (INDEX (HEAD.DET, 'PSPC') .NE. 0) THEN
-         CALL CMP_GET0C(ILOC, 'FILTER', HEAD.FILTER, STATUS)
+      IF (INDEX (CHEAD_DET, 'PSPC') .NE. 0) THEN
+         CALL CMP_GET0C(ILOC, 'FILTER', CHEAD_FILTER, STATUS)
 *
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error accessing FILTER object')
@@ -2138,7 +2092,7 @@ D        WRITE(*,*) RLP
       END
 
 *+  XRTCORR_GETVIG - Gets vignetting corections
-      SUBROUTINE XRTCORR_GETVIG(HEAD, ELOC, NENERGY, ENERGY,
+      SUBROUTINE XRTCORR_GETVIG( ELOC, NENERGY, ENERGY,
      &             MEAN_ENERGY, NR, NP, VCORR, VSING, RVCORR, RVSING,
      &             VFLAG, STATUS)
 *    Description :
@@ -2157,9 +2111,8 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions :
-      INCLUDE 'INC_CORR'
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Import :
-      RECORD /CORR/ HEAD                   ! Header structure
       CHARACTER*(DAT__SZLOC) ELOC          ! Locator to eff. area file
       INTEGER NENERGY                      ! No. of energies
       REAL ENERGY(NENERGY)                 ! Trial energies
@@ -2200,21 +2153,21 @@ D        WRITE(*,*) RLP
       DO RLP=1,NR
 *
 *      Calculate off axis angle
-         CALL XRT_OFFAX(NR, RLP, HEAD)
+         CALL XRT_OFFAX(NR, RLP, 1)
 *
 *      If the box is circular and centred on the optical axis, the
 *      angle to use for the vignetting correction depends on the
 *      distribution of counts in the box. By default the correction
 *      is calculated at a point midway between the inner and outer
 *      radii. Allow the user the option of overriding this.
-c         IF (HEAD.SHAPE .EQ. 'C' .AND. ABS(HEAD.XCENT) .LT. 0.001
-c     &                .AND. ABS(HEAD.YCENT) .LT. 0.001) THEN
+c         IF (CHEAD_SHAPE(1) .EQ. 'C' .AND. ABS(CHEAD_XCENT(1) .LT. 0.001
+c     &                .AND. ABS(CHEAD_YCENT(1)) .LT. 0.001) THEN
             IVAR = MIN(RLP,10)
             CALL CHR_ITOC(IVAR, CRLP, NCHAR)
             PARAM = 'OFFAX' // CRLP(1:NCHAR)
 *
-            CALL USI_DEF0R(PARAM, HEAD.OFFAX, STATUS)
-            CALL USI_GET0R(PARAM, HEAD.OFFAX, STATUS)
+            CALL USI_DEF0R(PARAM, CHEAD_OFFAX(1), STATUS)
+            CALL USI_GET0R(PARAM, CHEAD_OFFAX(1), STATUS)
 
             CALL USI_CANCL(PARAM, STATUS)
 *
@@ -2223,7 +2176,7 @@ c         ENDIF
 
 *
 *      Calc. vignetting correction for each energy at this off axis angle.
-         CALL XRT_VIGNET(HEAD, ELOC, NENERGY, ENERGY, MEAN_ENERGY,
+         CALL XRT_VIGNET(1, ELOC, NENERGY, ENERGY, MEAN_ENERGY,
      &                 .TRUE., NP, VCORR, VSING, VFLAG, STATUS)
 *
 *      Copy the corrections for this radial bin into the large
@@ -2343,7 +2296,7 @@ C
       END
 
 *+XRTCORR_PSF   Calculates point spread corrections
-      SUBROUTINE XRTCORR_PSF(HEAD, NENERGY, ENERGY, MEAN_EN,
+      SUBROUTINE XRTCORR_PSF( NENERGY, ENERGY, MEAN_EN,
      &                               NP, PCORR, PSING, STATUS)
 *    Description :
 *     Calculates the correction for a series of energies for the fraction
@@ -2360,12 +2313,11 @@ C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *
-*    Structure definitions :
-      INCLUDE 'INC_CORR'
+*    Global variables :
+      INCLUDE 'XRT_CORR_SUB_CMN'
 *    Status :
       INTEGER STATUS
 *    Import :
-      RECORD /CORR/ HEAD               !Header record
       INTEGER NENERGY                  !Number of trial energies
       REAL ENERGY(NENERGY)             !Trial energies
       REAL MEAN_EN                     !Mean photon energy
@@ -2393,13 +2345,13 @@ C
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 * Calculate mean box radius
-      RAD = (HEAD.XOUTER + HEAD.YOUTER) * 3600. / 2.0
+      RAD = (CHEAD_XOUTER(1) + CHEAD_YOUTER(1)) * 3600. / 2.0
 *
 * Use mean photon energy if not a spectral file
       IF (NP .EQ. 1) THEN
 *
 *   Calculate PSF FWHM
-         CALL XRT_FWHM(HEAD.OFFAX, MEAN_EN, FWHM)
+         CALL XRT_FWHM(CHEAD_OFFAX(1), MEAN_EN, FWHM)
 *
          ALPHA = 4.0 * LOG(2.0) / ( FWHM * FWHM )
 *
@@ -2415,7 +2367,7 @@ C
          DO ELP=1,NENERGY
 *
 *   Calculate PSF FWHM
-            CALL XRT_FWHM(HEAD.OFFAX, ENERGY(ELP), FWHM)
+            CALL XRT_FWHM(CHEAD_OFFAX(1), ENERGY(ELP), FWHM)
 *
             ALPHA = 4.0 * LOG(2.0) / ( FWHM * FWHM )
 *

@@ -29,6 +29,7 @@
 *        Use HSI rather than HIST
 *     18 Dec 1995 V2.0-0 (DJA):
 *        ADI port. Split in two for cleaner XRTCONV interface
+*      7 Apr 98 V2.2-1 Removed Structures (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -79,8 +80,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
 *    Import:
       CHARACTER*(*)	INP,ORIGIN,HNAME
 *    Status :
@@ -89,7 +89,6 @@
       INTEGER CHR_LEN
         EXTERNAL CHR_LEN
 *    Local variables :
-      RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       CHARACTER*(DAT__SZLOC) LOC                  ! Locator to HDS file
       INTEGER IUNIT,OFID,IFID
       INTEGER ISTAT
@@ -111,7 +110,7 @@
 
 *  Get header information from file
       CALL ADI2_GETLUN( IFID, IUNIT, STATUS )
-      CALL RAT_RDHEAD( IUNIT, ORIGIN, HEAD, ISTAT )
+      CALL RAT_RDHEAD( IUNIT, ORIGIN, ISTAT )
       IF ( ISTAT .NE. 0 ) THEN
         CALL MSG_SETC( 'FNAM', INP )
         CALL MSG_PRNT( '** Error reading header info from ^FNAM **' )
@@ -135,7 +134,7 @@
       CALL HDX_PUTC( LOC, 'SRCFILE', 1, INP(1:CHR_LEN(INP)), STATUS )
 
 *  Create and map the HEAD structure
-      CALL RAT_PUTHEAD( OFID, 'HEAD', HEAD, STATUS )
+      CALL RAT_PUTHEAD( OFID, 'HEAD', STATUS )
 
 *  Create and map the index structure
       CALL RAT_PUTINDEX( OFID, 'INDEX', INDEX, STATUS )

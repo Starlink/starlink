@@ -28,14 +28,15 @@
 *                 roll angle on. 0 roll is now valid.
 *      20-Jun-94: (v1.7-3)workaround for bug in CHR_RTOC (uses DTOC)
 *       2 Feb 95: v1.8-0  upgrade to new ARD (RJV)
+*       7 Apr 98: v2.2-1  removed structures (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
-*    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -44,7 +45,6 @@
       EXTERNAL IMG_ISOPEN
         LOGICAL IMG_ISOPEN
 *    Local variables :
-      RECORD /XRT_HEAD/ HEAD          ! Header structure for subsequent use
       CHARACTER CH
       CHARACTER MODE                    ! Operation mode C or I
       CHARACTER*80 TEXT
@@ -81,7 +81,7 @@
       INTEGER ARDID
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XSPOKES Version 2.2-0')
+      PARAMETER (VERSION = 'XSPOKES Version 2.2-2')
 *-
       CALL AST_INIT()
       CALL MSG_PRNT(VERSION)
@@ -162,10 +162,10 @@
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *        Open the header file to get the origins of the data
-         CALL RAT_GETXRTHEAD(ROOTNAME,HEAD,STATUS)
+         CALL RAT_GETXRTHEAD(ROOTNAME,STATUS)
 *
 *        build the attitude file name
-         CALL RAT_HDLOOKUP(HEAD,'ASPDATA','EXTNAME',EXT,STATUS)
+         CALL RAT_HDLOOKUP('ASPDATA','EXTNAME',EXT,STATUS)
          ATTFIL = ROOTNAME(1:CHR_LEN(ROOTNAME))//EXT
 *
 *        set the default filename
@@ -183,14 +183,14 @@
          ENDIF
 *
 *  get the mean roll angle and times from the system
-         CALL RAT_HDLOOKUP(HEAD,'ASPDATA','ROLL',ROLL,STATUS)
+         CALL RAT_HDLOOKUP('ASPDATA','ROLL',ROLL,STATUS)
          CALL CMP_MAPV(ALOC,ROLL,'_REAL','READ',RPNTR,NVALS,STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_SETC('ARR',ROLL)
             CALL MSG_PRNT('** Error accessing ROLL angle array ^ARR **')
             GOTO 999
          ENDIF
-         CALL RAT_HDLOOKUP(HEAD,'ASPDATA','TIME',TIME,STATUS)
+         CALL RAT_HDLOOKUP('ASPDATA','TIME',TIME,STATUS)
          CALL CMP_MAPV(ALOC,TIME,'_DOUBLE','READ',TPNTR,NVALS,STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_SETC('ARR',TIME)
@@ -201,7 +201,7 @@
 *  find the mean roll angle - file is often corrupted so need to
 *  ignore zeroes in the file (this could of course bias the result if
 *  the roll angle is actually close to zero).
-         CALL XSPOKES_MEANROLL(HEAD, NVALS, %val(TPNTR), %val(RPNTR),
+         CALL XSPOKES_MEANROLL( NVALS, %val(TPNTR), %val(RPNTR),
      &                                                   RMEAN, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
@@ -369,7 +369,7 @@
       END
 
 *+ XSPOKES_MEANROLL - calculates the mean roll angle
-      SUBROUTINE XSPOKES_MEANROLL(HEAD,NVALS,TIME,ROLL,MEANROLL,STATUS)
+      SUBROUTINE XSPOKES_MEANROLL(NVALS,TIME,ROLL,MEANROLL,STATUS)
 *    Description :
 *    Method :
 *    History :
@@ -378,10 +378,9 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
-*    Structure definitions:
-      INCLUDE 'INC_XRTHEAD'
+*    Global variables :
+      INCLUDE 'XRTHEAD_CMN'
 *    Import :
-      RECORD /XRT_HEAD/ HEAD
       INTEGER NVALS
       DOUBLE PRECISION TIME(NVALS)
       REAL ROLL(NVALS)
@@ -410,8 +409,8 @@
 *     Time range may be input as either a string of start and stop
 *     times or a text file of times. The times may be expressed as offsets
 *     from time zero or as MJDs in which case they are prefixed wih an 'M'.
-      START = HEAD.TSTART(1)
-      STOP = HEAD.TEND(HEAD.NTRANGE)
+      START = HEAD_TSTART(1)
+      STOP = HEAD_TEND(HEAD_NTRANGE)
       CALL CHR_DTOC(START, C1, K1)
       CALL CHR_DTOC(STOP, C2, K2)
       TIMSTRING = C1(1:K1) // ':' // C2(1:K2)
@@ -419,14 +418,14 @@
       CALL USI_GET0C('TIMRANGE',TIMSTRING,STATUS)
 *
 *     Decode the timestring into a sequence of start and stop times
-      CALL UTIL_TDECODE(TIMSTRING, HEAD.BASE_MJD, MXTIME,
+      CALL UTIL_TDECODE(TIMSTRING, HEAD_BASE_MJD, MXTIME,
      &                      NTIME, TMIN, TMAX, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 
       DO LP = 1, NVALS
          DO TP = 1, NTIME
-            TOFFSET = TIME(LP) - HEAD.BASE_SCTIME
+            TOFFSET = TIME(LP) - HEAD_BASE_SCTIME
             IF ((TOFFSET.GT.TMIN(TP)).AND.(TOFFSET.LT.TMAX(TP))) THEN
                RTOT = RTOT + ROLL(LP)
                CNT = CNT + 1
@@ -437,7 +436,7 @@
       IF (CNT .GE. 1) THEN
          MEANROLL = RTOT / CNT
 *  convert mean roll to degrees and to the convention of west=+90.
-         IF (HEAD.ORIGIN.EQ.'RDF')
+         IF (HEAD_ORIGIN.EQ.'RDF')
      &      MEANROLL = (MEANROLL + 180.0) * 7200.0     ! degrees to Arcmin/2
          MEANROLL = 270. - (MEANROLL / 7200.0)         ! Arcmin/2 to degrees
          IF (MEANROLL.LT.0.0) MEANROLL = MEANROLL + 360.0
