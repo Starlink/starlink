@@ -1084,7 +1084,7 @@ TclX_AppendObjResult TCL_VARARGS_DEF (Tcl_Interp *, arg1)
     resultPtr = Tcl_GetObjResult (interp);
 
     if (Tcl_IsShared(resultPtr)) {
-        resultPtr = Tcl_NewStringObj(0, NULL);
+        resultPtr = Tcl_NewStringObj(0, 0);
         Tcl_SetObjResult(interp, resultPtr);
     }
 
