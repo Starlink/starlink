@@ -1,7 +1,5 @@
 *+  BSUB_CMN - Common block definition for BSUB
 *-
-	CHARACTER*(DAT__SZLOC) LOCMORE  !MORE structure locator
-
 	INTEGER PSF_X, PSF_Y		!PSF dimensions
 
 	INTEGER NPIX_R_PSF		!no of pixels with R_PSF
@@ -29,4 +27,4 @@
 	COMMON /BSUB_CMN/R_PSF,R_80,DETECTION_THRESH,
      &  PSF_X,PSF_Y,PSFHAN,PSF_INTEGRAL,PSF_MAX,NPIX_R_PSF,
      &  NHISTORY,NHISTMAX,MAX_HIST,HISTORY,CONST,SLOPE,
-     &  R_90,LOUD,LOCMORE
+     &  R_90,LOUD
