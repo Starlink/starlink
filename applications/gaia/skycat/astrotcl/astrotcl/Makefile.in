@@ -66,7 +66,7 @@ demo_wish    = bin/astrotcl_wish
 INCLUDES     = -I. -Isrc $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 
 # compiler flags
-CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+CC_SWITCHES  = $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 # local library base names
 ASTROTCL_LIB  = astrotcl
