@@ -145,22 +145,38 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
-*     MARKSTYLE = LITERAL (Read and Write)
+*     MARKSTYLE1 = LITERAL (Read and Write)
 *        A string indicating how markers are initially to be plotted in
-*        the aligner widget.  It consists of a comma-separated list of
-*        "attribute=value" type strings.  The available attributes are:
+*        the aligner widget to represent points on the left hand image.
+*        It consists of a comma-separated list of "attribute=value" 
+*        type strings.  The available attributes are:
 *           - colour     -- Colour of the marker in Xwindows format.
 *           - size       -- Approximate height of the marker in pixels.
 *           - thickness  -- Approximate thickness of lines in pixels.
 *           - shape      -- One of Plus, Cross, Circle, Square, Diamond.
-*           - showindex  -- 1 to show index numbers, 0 not to do so.
 *
 *        This parameter only gives the initial marker type; it can be
 *        changed interactively while the program is running.
 *        If specifying this value on the command line, it is not
 *        necessary to give values for all the attributes; missing ones
 *        will be given sensible defaults.
-*        [""]
+*        ["shape=plus"]
+*     MARKSTYLE2 = LITERAL (Read and Write)
+*        A string indicating how markers are initially to be plotted in
+*        the aligner widget to represent points on the right hand image.
+*        It consists of a comma-separated list of "attribute=value" 
+*        type strings.  The available attributes are:
+*           - colour     -- Colour of the marker in Xwindows format.
+*           - size       -- Approximate height of the marker in pixels.
+*           - thickness  -- Approximate thickness of lines in pixels.
+*           - shape      -- One of Plus, Cross, Circle, Square, Diamond.
+*
+*        This parameter only gives the initial marker type; it can be
+*        changed interactively while the program is running.
+*        If specifying this value on the command line, it is not
+*        necessary to give values for all the attributes; missing ones
+*        will be given sensible defaults.
+*        ["shape=circle"]
 *     MAXCANV = _INTEGER (Read and Write)
 *        A value in pixels for the maximum initial X or Y dimension of 
 *        the region in which the image is displayed.  Note this is the      
@@ -305,14 +321,14 @@
 *        percentile, which shows bright detail well.
 *
 *     pairndf in="data1,data2" outlist="d1-pos,d2-pos" zoom=2 maxcanv=0
-*             markstyle="shape=circle,size=8,thickness=1,colour=HotPink"
+*             markstyle1="shape=circle,size=8,thickness=1,colour=HotPink"
 *        Only the two images data1 and data2 will be aligned, and the 
 *        corresponding sets of positions will be written to the
 *        files d1-pos and d2-pos.  The images will initially be 
 *        displayed for alignment at a magnification of two screen 
 *        pixels to each data pixel, even if that results in a very 
-*        large display area.  During alignment, marked points will be
-*        shown as little pink circles.
+*        large display area.  During alignment, marked points on the
+*        left hand image will be shown as little pink circles.
 
 *  Notes:
 *     - NDF extension items. 
@@ -360,13 +376,14 @@
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *
-*     Some of the parameters (MARKSTYLE, MAXCANV, PERCENTILES, PREVX, 
-*     PREVY, WINX, WINY)  give initial values for quantities which can 
-*     be modified while the program is running.  Although these may be 
-*     specified on the command line, it is normally easier to start 
-*     the program up and modify them using the graphical user interface.
-*     If the program exits normally, their values at the end of the run 
-*     will be used as defaults next time the program starts up.
+*     Some of the parameters (MARKSTYLE1, MARKSTYLE2, MAXCANV, 
+*     PERCENTILES, PREVX, PREVY, WINX, WINY)  give initial values for 
+*     quantities which can be modified while the program is running.
+*     Although these may be specified on the command line, it is 
+*     normally easier to start the program up and modify them using 
+*     the graphical user interface.  If the program exits normally, 
+*     their values at the end of the run will be used as defaults 
+*     next time the program starts up.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -401,6 +418,8 @@
 *        lists at all.
 *     11-JUL-2001 (MBT):
 *        Added new TOLER parameter.
+*     18-JUL-2001 (MBT):
+*        Changed the way that centroiding is done.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -424,7 +443,8 @@
 
 *  Local Variables:
       CHARACTER * ( 80 ) FNAME  ! Filename
-      CHARACTER * ( 132 ) MSTYLE ! Marker style string
+      CHARACTER * ( 132 ) MSTYA ! Marker style string A
+      CHARACTER * ( 132 ) MSTYB ! Marker style string B
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for writing output lines
       DOUBLE PRECISION PERCNT( 2 ) ! Percentile values for display
       DOUBLE PRECISION PSIZE    ! Pixel size in current coords
@@ -518,7 +538,8 @@
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_GET0I( 'PREVX', PRVDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'PREVY', PRVDIM( 2 ), STATUS )
-      CALL PAR_GET0C( 'MARKSTYLE', MSTYLE, STATUS )
+      CALL PAR_GET0C( 'MARKSTYLE1', MSTYA, STATUS )
+      CALL PAR_GET0C( 'MARKSTYLE2', MSTYB, STATUS )
 
 *  Get a list of NDF names.
       CALL CCD1_NDFGL( 'IN', 2, CCD1__MXNDF, NDFGR, NNDF, STATUS )
@@ -552,8 +573,8 @@
 *  list of pairings with associated offsets.
       CALL CCD1_PNDF( NDFGR, NSET, IMEM, IMEMOF, SNAMGR, PERCNT, 
      :                .NOT. CHOOSR, ZOOM, MAXCNV, WINDIM, PRVDIM,
-     :                MSTYLE, COUNT, NODES, NMAT, XOFF, YOFF, IPX1, 
-     :                IPY1, IPX2, IPY2, STATUS )
+     :                MSTYA, MSTYB, COUNT, NODES, NMAT, XOFF, YOFF,
+     :                IPX1, IPY1, IPX2, IPY2, STATUS )
 
 *  Release resources.
       CALL CCD1_GRDEL( SNAMGR, STATUS )
@@ -771,7 +792,8 @@
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_PUT0I( 'PREVX', PRVDIM( 1 ), STATUS )
       CALL PAR_PUT0I( 'PREVY', PRVDIM( 2 ), STATUS )
-      CALL PAR_PUT0C( 'MARKSTYLE', MSTYLE, STATUS )
+      CALL PAR_PUT0C( 'MARKSTYLE1', MSTYA, STATUS )
+      CALL PAR_PUT0C( 'MARKSTYLE2', MSTYB, STATUS )
 
 *  Exit label.
  99   CONTINUE

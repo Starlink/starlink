@@ -6973,8 +6973,8 @@ The CCDPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          MARKSTYLE = LITERAL (Read and Write)
       }{
-         A string indicating how markers are initially to be plotted on
-         the image.  It consists of a comma-separated list of
+         A string indicating how markers are initially to be plotted in
+         the aligner widget.  It consists of a comma-separated list of
          {\tt "}attribute=value{\tt "} type strings.  The available attributes are:
          \sstitemlist{
 
@@ -6989,6 +6989,9 @@ The CCDPACK routine descriptions are contained in the following pages.
 
             \sstitem
                shape      -- One of Plus, Cross, Circle, Square, Diamond.
+
+            \sstitem
+               showindex  -- 1 to show index numbers, 0 not to do so.
 
          }
          This parameter only gives the initial marker type; it can be
@@ -12192,8 +12195,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
       \sstexamplesubsection{
          idicurs in=gc6253 readlist inlist=found.lis outlist=out.lis
-      }{
               markstyle={\tt "}colour=skyblue,showindex=0{\tt "}
+      }{
          The image gc6253 will be displayed, with the points stored in
          the position list {\tt '}found.lis{\tt '} already plotted on it.  These
          may be added to, moved and deleted, and the resulting list
@@ -15167,11 +15170,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [BOTH]
       }
       \sstsubsection{
-         MARKSTYLE = LITERAL (Read and Write)
+         MARKSTYLE1 = LITERAL (Read and Write)
       }{
-         A string indicating how markers are initially to be plotted in
-         the aligner widget.  It consists of a comma-separated list of
-         {\tt "}attribute=value{\tt "} type strings.  The available attributes are:
+         A string indicating how markers are initially to be plotted in the
+         aligner widget to represent points on the left hand image.
+         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type 
+         strings.  The available attributes are:
          \sstitemlist{
 
             \sstitem
@@ -15186,8 +15190,34 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                shape      -- One of Plus, Cross, Circle, Square, Diamond.
 
+         }
+         This parameter only gives the initial marker type; it can be
+         changed interactively while the program is running.
+         If specifying this value on the command line, it is not
+         necessary to give values for all the attributes; missing ones
+         will be given sensible defaults.
+         [{\tt "}shape=plus{\tt "}]
+      }
+      \sstsubsection{
+         MARKSTYLE2 = LITERAL (Read and Write)
+      }{
+         A string indicating how markers are initially to be plotted in the
+         aligner widget to represent points on the right hand image.
+         It consists of a comma-separated list of {\tt "}attribute=value{\tt "} type 
+         strings.  The available attributes are:
+         \sstitemlist{
+
             \sstitem
-               showindex  -- 1 to show index numbers, 0 not to do so.
+               colour     -- Colour of the marker in Xwindows format.
+
+            \sstitem
+               size       -- Approximate height of the marker in pixels.
+
+            \sstitem
+               thickness  -- Approximate thickness of lines in pixels.
+
+            \sstitem
+               shape      -- One of Plus, Cross, Circle, Square, Diamond.
 
          }
          This parameter only gives the initial marker type; it can be
@@ -15195,7 +15225,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          If specifying this value on the command line, it is not
          necessary to give values for all the attributes; missing ones
          will be given sensible defaults.
-         [{\tt "}{\tt "}]
+         [{\tt "}shape=circle{\tt "}]
       }
       \sstsubsection{
          MAXCANV = \_INTEGER (Read and Write)
@@ -15377,15 +15407,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          pairndf in={\tt "}data1,data2{\tt "} outlist={\tt "}d1-pos,d2-pos{\tt "} zoom=2 maxcanv=0
-              markstyle={\tt "}shape=circle,size=8,thickness=1,colour=HotPink{\tt "}
+              markstyle1={\tt "}shape=circle,size=8,thickness=1,colour=HotPink{\tt "}
       }{
          Only the two images data1 and data2 will be aligned, and the
          corresponding sets of positions will be written to the
          files d1-pos and d2-pos.  The images will initially be
          displayed for alignment at a magnification of two screen
          pixels to each data pixel, even if that results in a very
-         large display area.  During alignment, marked points will be
-         shown as little pink circles.
+         large display area.  During alignment, marked points on the
+         left hand image will be shown as little pink circles.
       }
    }
    \sstdiytopic{
@@ -15456,9 +15486,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
 
-      Some of the parameters (MARKSTYLE, MAXCANV, PERCENTILES, PREVX,
-      PREVY, WINX, WINY)  give initial values for quantities which can
-      be modified while the program is running.  Although these may be
+      Some of the parameters (MARKSTYLE1, MARKSTYLE2, MAXCANV, PERCENTILES,
+      PREVX, PREVY, WINX, WINY)  give initial values for quantities which
+      can be modified while the program is running.  Although these may be
       specified on the command line, it is normally easier to start
       the program up and modify them using the graphical user interface.
       If the program exits normally, their values at the end of the run
