@@ -99,7 +99,7 @@
       INTEGER NROWS                                ! Fits table, no of rows
       INTEGER NHDU                                 ! Fits header, unit
       INTEGER VARIDAT                              ! Fitsio variable
-      INTEGER TFIELDS            ! Fits header, no fields per rows
+      INTEGER IFIELD,TFIELDS            ! Fits header, no fields per rows
       INTEGER BLOCK
 
       CHARACTER*20  EXTNAME                         ! File extension name
@@ -328,11 +328,33 @@
          EXPO_TIM = EXPO_TIM + HEAD_TEND(LP) - HEAD_TSTART(LP)
 *
       ENDDO
+
+*  Display available parameters
+      CALL MSG_PRNT('Available parameters are:')
+      IF ( LEVR ) THEN
+*  EVRATE extension
+        CALL FTMAHD(IUNIT, EVNHDU, TTYPE, STATUS)
+        CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
+        DO IFIELD=1,TFIELDS
+          CALL MSG_PRNT('    '//TTYPE(IFIELD))
+        ENDDO
+      ENDIF
+      IF ( LATT) THEN
+*  ASPECT extension
+        CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
+        CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
+        DO IFIELD=1,TFIELDS
+          CALL MSG_PRNT('    '//TTYPE(IFIELD))
+        ENDDO
+      ENDIF
+
 *
 *   Initialise the BAD and GOOD window counters
       NBAD = 0
       NGOOD = 0
-*
+
 *  Suggest RDF Master veto rate.
       COL = 'MV_ACO'
       CALL USI_DEF0C('HKPAR1',COL,STATUS)
