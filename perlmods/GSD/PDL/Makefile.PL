@@ -1,8 +1,8 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    'NAME'      => 'PDL::IO::GSD',
-    'VERSION_FROM' => 'GSD.pm', # finds $VERSION
+    'NAME'      => 'GSD::PDL',
+    'VERSION_FROM' => 'PDL.pm', # finds $VERSION
     dist          => { COMPRESS => "gzip -9f" },
     );
 
