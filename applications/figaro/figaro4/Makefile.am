@@ -10,7 +10,7 @@ figaro4_SOURCES = figaro4.f \
 
 figaro4_TASKS = \
 arcdisp arcgendb arcident arclocat ascin ascout bbody correl editext \
-evalfit figaro4 fillcube fitbb fitgauss fitpoly fittri grow moments \
+evalfit fillcube fitbb fitgauss fitpoly fittri grow moments \
 movie resamp speccont specgrid specplot subset xtract 
 
 figaro4_LDADD = $(LDADD) \
@@ -20,5 +20,8 @@ figaro4_LDADD = $(LDADD) \
 ../work/libwork.la \
 ../util/libutil.la \
 ../sploop/libsploop.la \
-`../figaro_link_adam`
+$(EXTERNAL_LIBS)
 
+
+EXTERNAL_LIBS = `pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
+         `fio_link_adam`
