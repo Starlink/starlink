@@ -98,6 +98,9 @@ LD_FLAGS=@LD_FLAGS@
 LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@ -L$(LIBDIR)
 LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
 
+# Extension for executables
+EXEEXT=@EXEEXT@
+
 # ------------------------------------------------------------------------
 #       Libraries required to link against Fortran source code
 #       using a C++ compiler.
@@ -120,7 +123,7 @@ DEMO_WISH = bin/gaia_wish
 DEMO_TCL = bin/gaia_tcl
 
 #  GAIA monolith
-GAIAMON = bin/gaiaMon
+GAIAMON = bin/gaiaMon$(EXEEXT)
 
 #  Tasks in GAIA monolith.
 GAIA_TASKS = ardstat asc2tab autocrop cat2tab tab2asc tab2cat 
@@ -160,7 +163,7 @@ $(DEMO_WISH): normallib tkAppInit.o FORCE
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
-	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
+	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(DEMO_TCL): normallib tclAppInit.o FORCE
@@ -174,11 +177,11 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
 	$(ALINK) gaiaMon.c $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) \
-	   `fio_link` `ard_link_adam` `ndf_link_adam` `cat_link`
+	   `fio_link_adam` `ard_link_adam` `ndf_link_adam` `cat_link_adam`
 	if test -f $(GAIAMON); then \
 	   $(RM) $(GAIAMON);\
 	fi
-	mv gaiaMon $(GAIAMON)
+	mv gaiaMon$(EXEEXT) $(GAIAMON)
 	for f in gaiaMon $(IFC_FILES) ""; do \
 	   if test -f "$${f}.ifl"; then \
 	      $(COMPIFL) $$f; \
