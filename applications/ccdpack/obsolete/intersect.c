@@ -54,6 +54,7 @@
 typedef double  tPointi[DIM];   /* type integer point */
 typedef double  tPointd[DIM];   /* type double point */
 typedef tPointi tPolygoni[PMAX];/* type integer polygon */
+int     LeftOn( tPointi a, tPointi b, tPointi c );
 int     Left( tPointi a, tPointi b, tPointi c );
 void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m, tPointd *Z, int *pnz );
 
@@ -115,10 +116,23 @@ void preverse( int n, tPolygoni poly );
 
 /* Check that both polygons are defined in a clockwise direction, which is
    required for the intersection algorithm.  If not, reverse the order of
-   the vertices.  We make the assumption that they are in fact convex. */
+   the vertices. */
       for ( i = 0; i < 2; i++ ) {
          if ( ! Left( poly[ i ][ 0 ], poly[ i ][ 1 ], poly[ i ][ 2 ] ) ) {
             preverse( nvertex[ i ], poly[ i ] );
+         }
+      }
+
+/* Check that each of the polygons we now have is convex. */
+      for ( i = 0; i < 2; i++ ) {
+         for ( j = 0; j < nvertex[ i ] - 2; j++ ) {
+            if ( ! LeftOn( poly[ i ][ j ], poly[ i ][ j + 1 ], 
+                           poly[ i ][ j + 2 ] ) ) {
+               Tcl_SetObjResult( interp, 
+                                 Tcl_NewStringObj( "Polygon is not convex"
+                                                   " - cannot proceed", -1 ) );
+               return TCL_ERROR;
+            }
          }
       }
 
