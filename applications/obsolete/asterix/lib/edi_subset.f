@@ -148,7 +148,7 @@
 
 *    Count non-zeros
         CCOUNT = 0
-        DO I = 1, NIN
+        DO I = 1, EVENTS
           IF ( SEL(I) .NE. 0 ) CCOUNT = CCOUNT + 1
         END DO
         CALL ARR_SELEM1I( CBPTR, NBLK, IBLOCK, CCOUNT, STATUS )
@@ -174,10 +174,26 @@
 *    Create the list
         CALL EDI_CREAT( OFID, OLID, STATUS )
 
+*    Map output event list
+        CALL EDI_MAP( OFID, LNAME, MTYPE, 'WRITE', 0, 0, ODPTR, STATUS )
+
+*    Does list have vector quantum?
+        CALL ADI_THERE( LID, 'Quantum', QVEC, STATUS )
+        IF ( QVEC ) THEN
+          CALL ADI_CGET0L( LID, 'VectorQuantum', QVEC, STATUS )
+
+*      Map if present
+          IF ( QVEC ) THEN
+            CALL EDI_QMAP( OFID, LNAME, MTYPE, 'WRITE', 0, 0,
+     :                     OQPTR, STATUS )
+          END IF
+
+        END IF
+
 *    Loop over blocks
         OFFSET = 0
         BSTART = 1
-        DO IBLOCK = 1, EVENTS/BLOCKSIZE + 1
+        DO IBLOCK = 1, NBLK
 
 *      End of the block
           BEND = MIN(BSTART + BLOCKSIZE -1, EVENTS)
@@ -190,40 +206,28 @@
 *      Map the input event block
           CALL EDI_MAP( IFID, LNAME, MTYPE, 'READ', BSTART, BEND,
      :                  ADPTR, STATUS )
-          CALL EDI_MAP( OFID, LNAME, MTYPE, 'WRITE', OFFSET + 1,
-     :                  OFFSET + CCOUNT, ODPTR, STATUS )
-
-*      Does list have vector quantum?
-          CALL ADI_THERE( LID, 'Quantum', QVEC, STATUS )
-          IF ( QVEC ) THEN
-            CALL ADI_CGET0L( LID, 'VectorQuantum', QVEC, STATUS )
-          END IF
 
 *      Ditto the quantum
           IF ( QVEC ) THEN
             CALL EDI_QMAP( IFID, LNAME, MTYPE, 'READ', BSTART, BEND,
      :                  AQPTR, STATUS )
-            CALL EDI_QMAP( OFID, LNAME, MTYPE, 'WRITE', OFFSET + 1,
-     :                  OFFSET + CCOUNT, OQPTR, STATUS )
           END IF
 
 *      Copy the data
           IF ( MTYPE(1:1) .EQ. 'D' ) THEN
             CALL EDI_SUBSET_COPD( BLEN, %VAL(ADPTR), QVEC, %VAL(AQPTR),
-     :                  SEL(BSTART), %VAL(ODPTR), %VAL(OQPTR), STATUS )
+     :                  SEL(BSTART), %VAL(ODPTR+OFFSET*VAL__NBD),
+     :                  %VAL(OQPTR), STATUS )
           ELSE
             CALL EDI_SUBSET_COPI( BLEN, %VAL(ADPTR), QVEC, %VAL(AQPTR),
-     :                  SEL(BSTART), %VAL(ODPTR), %VAL(OQPTR), STATUS )
+     :                  SEL(BSTART), %VAL(ODPTR+OFFSET*VAL__NBI),
+     :                  %VAL(OQPTR), STATUS )
           END IF
 
-*      Unmap the slices
+*      Unmap the input data block
           CALL EDI_UNMAP( IFID, LNAME, STATUS )
-          CALL EDI_UNMAP( OFID, LNAME, STATUS )
-
-*      Annul vector quantum slices
           IF ( QVEC ) THEN
             CALL EDI_QUNMAP( IFID, LNAME, STATUS )
-            CALL EDI_QUNMAP( OFID, LNAME, STATUS )
           END IF
 
 *      Adjust output pointer
@@ -232,6 +236,12 @@
 
 *    Next block
         END DO
+
+*    Unmap output data
+        CALL EDI_UNMAP( OFID, LNAME, STATUS )
+        IF ( QVEC ) THEN
+          CALL EDI_QUNMAP( OFID, LNAME, STATUS )
+        END IF
 
 *  Next list
       END DO
