@@ -68,7 +68,7 @@ echomopsetup () { echo "ECHOMOP version @PACKAGE_VERSION@ is already set up"; }
 #
 echhelp () { ${ECHOMOP_EXEC}/echhelp; }
 #  We have to be a little cunning to run the csh demo...
-ech_demo () { echo "source ${ECHOMOP_EXEC}/echomop.csh; source ${ECHOMOP_DEMO}/ech_demo.csh" | csh }
+ech_demo () { echo "source ${ECHOMOP_EXEC}/echomop.csh; source ${ECHOMOP_DEMO}/ech_demo.csh" | csh; }
 ech_locate () { ${ECHOMOP_EXEC}/ech_ftrdb; }
 ech_locate () { ${ECHOMOP_EXEC}/ech_locate; }
 ech_trace () { ${ECHOMOP_EXEC}/ech_trace; }
@@ -109,7 +109,7 @@ ech_decimg () { ${ECHOMOP_EXEC}/ech_decimg; }
 echbrowse () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
 echwww () { "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"; }
 ECHMENU () { ${ECHOMOP_EXEC}/echmenu; }
-ECH_DEMO () { echo "source ${ECHOMOP_EXEC}/echomop.csh; source ${ECHOMOP_DEMO}/ech_demo.csh" | csh }
+ECH_DEMO () { echo "source ${ECHOMOP_EXEC}/echomop.csh; source ${ECHOMOP_DEMO}/ech_demo.csh" | csh; }
 ECH_LOCATE () { ${ECHOMOP_EXEC}/ech_locate; }
 ECH_FTRDB () { ${ECHOMOP_EXEC}/ech_ftrdb; }
 ECH_TRACE () { ${ECHOMOP_EXEC}/ech_trace; }
