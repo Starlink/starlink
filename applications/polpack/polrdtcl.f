@@ -38,11 +38,13 @@
 *        stored in the output catalogue.
 *     OUT = LITERAL (Read)
 *        The name of the output catalogue.
+*     TRANS = _LOGICAL (Read)
+*        If TRUE, translate column names as specified by parameters I,
+*        DI, Q, DQ, etc. Otherwise, these parameters are ignored. [FALSE]
 *     I = LITERAL (Read)
 *        The name of the column within REF holding the I data. The 
 *        corresponding column in the output catalogue will be re-named as
-*        "I". To avoid any renaming of columns, retain the default value 
-*        for all the following parameters. ["I"]
+*        "I". ["I"]
 *     DI = LITERAL (Read)
 *        The name of the column within REF holding the DI data. ["DI"]
 *     Q = LITERAL (Read)
@@ -104,6 +106,7 @@
       INTEGER CIREF              ! CAT identifier for reference catalogue
       INTEGER IWCS               ! Pointer to AST Object
       LOGICAL DONE               ! Finish looping?
+      LOGICAL TRANS              ! Translate column names?
       LOGICAL VERB               ! Verose errors required?
 *.
 
@@ -119,28 +122,33 @@
 *  Open the reference catalogue.
       CALL CTG_ASSO1( 'REF', VERB, 'READ', CIREF, FIELDS, STATUS )
 
-*  Get the names of the columns holding the Stokes parameters and their
-*  errors.
-      CALL PAR_GET0C( 'I', I, STATUS )
-      CALL PAR_GET0C( 'Q', Q, STATUS )
-      CALL PAR_GET0C( 'U', U, STATUS )
-      CALL PAR_GET0C( 'V', V, STATUS )
-      CALL PAR_GET0C( 'DI', DI, STATUS )
-      CALL PAR_GET0C( 'DQ', DQ, STATUS )
-      CALL PAR_GET0C( 'DU', DU, STATUS )
-      CALL PAR_GET0C( 'DV', DV, STATUS )
+*  See if column names are to be translated.
+      CALL PAR_GET0L( 'TRANS', TRANS, STATUS )
+
+*  If so, get the names of the columns holding the Stokes parameters and 
+*  their errors.
+      IF( TRANS ) THEN
+         CALL PAR_GET0C( 'I', I, STATUS )
+         CALL PAR_GET0C( 'Q', Q, STATUS )
+         CALL PAR_GET0C( 'U', U, STATUS )
+         CALL PAR_GET0C( 'V', V, STATUS )
+         CALL PAR_GET0C( 'DI', DI, STATUS )
+         CALL PAR_GET0C( 'DQ', DQ, STATUS )
+         CALL PAR_GET0C( 'DU', DU, STATUS )
+         CALL PAR_GET0C( 'DV', DV, STATUS )
+      END IF
 
 *  Create the output catalogue, propagating all meta data from the 
 *  reference catalogue.
-      CALL POL1_CTPRP( 'OUT', CIREF, I, Q, U, V, DI, DQ, DU, DV, CIOUT, 
-     :                 STATUS )
+      CALL POL1_CTPRP( 'OUT', CIREF, TRANS, I, Q, U, V, DI, DQ, DU, DV, 
+     :                 CIOUT, STATUS )
 
 *  Get the name of the input text file.
       CALL PAR_GET0C( 'IN', FILE, STATUS )
 
 *  Copy all data from the input text file tot he output catalogue.
-      CALL POL1_RDTCL( FILE, CIREF, CIOUT, I, Q, U, V, DI, DQ, DU, DV, 
-     :                 STATUS )
+      CALL POL1_RDTCL( FILE, CIREF, CIOUT, TRANS, I, Q, U, V, DI, DQ, 
+     :                 DU, DV, STATUS )
 
 *  Reset the pointer for the next item of textual information to be read
 *  from the reference catalogue.

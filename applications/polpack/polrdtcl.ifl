@@ -46,6 +46,14 @@ interface POLRDTCL
       helpkey     '*'
    endparameter
 
+   parameter      TRANS
+      type        _LOGICAL
+      prompt      'Translate column names?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
    parameter      I
       type        LITERAL
       prompt      'I column name'

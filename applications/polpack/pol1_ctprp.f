@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_CTPRP( PARAM, CI1, I, Q, U, V, DI, DQ, DU, DV, 
-     :                       CI2, STATUS )
+      SUBROUTINE POL1_CTPRP( PARAM, CI1, TRANS, I, Q, U, V, DI, DQ, 
+     :                       DU, DV, CI2, STATUS )
 *+
 *  Name:
 *     POL1_CTPRP
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_CTPRP( PARAM, CI1,  I, Q, U, V, DI, DQ, DU, DV, CI2, 
-*                      STATUS )
+*     CALL POL1_CTPRP( PARAM, CI1, TRANS, I, Q, U, V, DI, DQ, DU, DV, 
+*                      CI2, STATUS )
 
 *  Description:
 *     This routine creates a new catalogue using the supplied environment
@@ -30,6 +30,9 @@
 *        The name of the environment parameter to use.
 *     CI1 = INTEGER (Given)
 *        A CAT identifier for an existing catalogue.
+*     TRANS = LOGICAL (Read)
+*        Translate column names given by parameters I, DI, etc, into the
+*        equivalent standard POLPACK column names?
 *     I = CHARACTER * ( * ) (Given) 
 *        The name of the column within CI1 containing I values.
 *     Q = CHARACTER * ( * ) (Given) 
@@ -78,6 +81,7 @@
 *  Arguments Given:
       CHARACTER PARAM*(*)
       INTEGER CI1
+      LOGICAL TRANS
       CHARACTER I*(*)
       CHARACTER Q*(*)
       CHARACTER U*(*)
@@ -244,22 +248,24 @@
             END IF
 
 *  Translate foreign column names into polpack column names.
-            IF( NAME .EQ. I ) THEN
-               NAME = 'I'
-            ELSE IF( NAME .EQ. Q ) THEN
-               NAME = 'Q'
-            ELSE IF( NAME .EQ. U ) THEN
-               NAME = 'U'
-            ELSE IF( NAME .EQ. V ) THEN
-               NAME = 'V'
-            ELSE IF( NAME .EQ. DI ) THEN
-               NAME = 'DI'
-            ELSE IF( NAME .EQ. DQ ) THEN
-               NAME = 'DQ'
-            ELSE IF( NAME .EQ. DU ) THEN
-               NAME = 'DU'
-            ELSE IF( NAME .EQ. DV ) THEN
-               NAME = 'DV'
+            IF( TRANS ) THEN
+               IF( NAME .EQ. I ) THEN
+                  NAME = 'I'
+               ELSE IF( NAME .EQ. Q ) THEN
+                  NAME = 'Q'
+               ELSE IF( NAME .EQ. U ) THEN
+                  NAME = 'U'
+               ELSE IF( NAME .EQ. V ) THEN
+                  NAME = 'V'
+               ELSE IF( NAME .EQ. DI ) THEN
+                  NAME = 'DI'
+               ELSE IF( NAME .EQ. DQ ) THEN
+                  NAME = 'DQ'
+               ELSE IF( NAME .EQ. DU ) THEN
+                  NAME = 'DU'
+               ELSE IF( NAME .EQ. DV ) THEN
+                  NAME = 'DV'
+               END IF
             END IF
 
 *  Create the output column.

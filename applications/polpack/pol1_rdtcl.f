@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_RDTCL( FILE, CIREF, CIOUT, I, Q, U, V, DI, DQ, DU, 
-     :                       DV, STATUS )
+      SUBROUTINE POL1_RDTCL( FILE, CIREF, CIOUT, TRANS, I, Q, U, V, 
+     :                       DI, DQ, DU, DV, STATUS )
 *+
 *  Name:
 *     POL1_RDTCL
@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     POL1_RDTCL( FILE, CIREF, CIOUT, I, Q, U, V, DI, DQ, DU, DV, STATUS )
+*     POL1_RDTCL( FILE, CIREF, CIOUT, TRANS, I, Q, U, V, DI, DQ, DU, 
+*                 DV, STATUS )
 
 *  Description:
 *     This routine reads a Tcl list holding the column data in a 
@@ -25,6 +26,9 @@
 *        A CAT identifier for the reference catalogue.
 *     CIOUT = INTEGER (Given)
 *        A CAT identifier for the output catalogue.
+*     TRANS = LOGICAL (Read)
+*        Translate column names given by parameters I, DI, etc, into the
+*        equivalent standard POLPACK column names?
 *     I = CHARACTER * ( * ) (Given) 
 *        The name of the column within CI1 containing I values.
 *     Q = CHARACTER * ( * ) (Given) 
@@ -73,6 +77,7 @@
       CHARACTER FILE*(*)
       INTEGER CIREF
       INTEGER CIOUT
+      LOGICAL TRANS
       CHARACTER I*(*)
       CHARACTER Q*(*)
       CHARACTER U*(*)
@@ -137,23 +142,27 @@
       DO L = 1, NCOLCI
          CALL CAT_TNDNT( CIOUT, CAT__FITYP, L, GI( L ), STATUS ) 
          CALL CAT_TIQAC( GI( L ), 'NAME', CNAMCI( L ), STATUS ) 
-         IF( CNAMCI( L ) .EQ. 'I' ) THEN
-            CNAMCI( L ) = I
-         ELSE IF( CNAMCI( L ) .EQ. 'Q' ) THEN
-            CNAMCI( L ) = Q
-         ELSE IF( CNAMCI( L ) .EQ. 'U' ) THEN
-            CNAMCI( L ) = U
-         ELSE IF( CNAMCI( L ) .EQ. 'V' ) THEN
-            CNAMCI( L ) = V
-         ELSE IF( CNAMCI( L ) .EQ. 'DI' ) THEN
-            CNAMCI( L ) = DI
-         ELSE IF( CNAMCI( L ) .EQ. 'DQ' ) THEN
-            CNAMCI( L ) = DQ
-         ELSE IF( CNAMCI( L ) .EQ. 'DU' ) THEN
-            CNAMCI( L ) = DU
-         ELSE IF( CNAMCI( L ) .EQ. 'DV' ) THEN
-            CNAMCI( L ) = DV
+
+         IF( TRANS ) THEN 
+            IF( CNAMCI( L ) .EQ. 'I' ) THEN
+               CNAMCI( L ) = I
+            ELSE IF( CNAMCI( L ) .EQ. 'Q' ) THEN
+               CNAMCI( L ) = Q
+            ELSE IF( CNAMCI( L ) .EQ. 'U' ) THEN
+               CNAMCI( L ) = U
+            ELSE IF( CNAMCI( L ) .EQ. 'V' ) THEN
+               CNAMCI( L ) = V
+            ELSE IF( CNAMCI( L ) .EQ. 'DI' ) THEN
+               CNAMCI( L ) = DI
+            ELSE IF( CNAMCI( L ) .EQ. 'DQ' ) THEN
+               CNAMCI( L ) = DQ
+            ELSE IF( CNAMCI( L ) .EQ. 'DU' ) THEN
+               CNAMCI( L ) = DU
+            ELSE IF( CNAMCI( L ) .EQ. 'DV' ) THEN
+               CNAMCI( L ) = DV
+            END IF
          END IF
+
       END DO
 
 *  Create a Tcl interpreter and execute the script in the supplied file.

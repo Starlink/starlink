@@ -74,6 +74,9 @@
 *        if none is provided.
 *     OUT = LITERAL (Read)
 *        The name of the output text file.
+*     TRANS = _LOGICAL (Read)
+*        If TRUE, translate column names as specified by parameters I,
+*        DI, Q, DQ, etc. Otherwise, these parameters are ignored. [FALSE]
 *     I = LITERAL (Read)
 *        The name to be given to the column within the output text file 
 *        holding the I data. To avoid any renaming of columns, retain the 
@@ -210,6 +213,7 @@
       LOGICAL GOTRD              ! Will o/p catalogue have RA and DEC columns?
       LOGICAL MAKERD             ! Will we be creating new RA/DEC o/p columns?
       LOGICAL NULL               ! Is the stored value null?
+      LOGICAL TRANS              ! Translate column names?
       LOGICAL VERB               ! Verose errors required?
       REAL LBND( 2 )             ! Lower bounds of X/Y bounding box
       REAL UBND( 2 )             ! Upper bounds of X/Y bounding box
@@ -581,16 +585,21 @@
       CALL CHR_PUTI( NCOL, TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-*  Get the names of the output columns to hold the Stokes parameters and 
+*  See if column names are to be translated.
+      CALL PAR_GET0L( 'TRANS', TRANS, STATUS )
+
+*  If so, get the names of the columns holding the Stokes parameters and 
 *  their errors.
-      CALL PAR_GET0C( 'I', I, STATUS )
-      CALL PAR_GET0C( 'Q', Q, STATUS )
-      CALL PAR_GET0C( 'U', U, STATUS )
-      CALL PAR_GET0C( 'V', V, STATUS )
-      CALL PAR_GET0C( 'DI', DI, STATUS )
-      CALL PAR_GET0C( 'DQ', DQ, STATUS )
-      CALL PAR_GET0C( 'DU', DU, STATUS )
-      CALL PAR_GET0C( 'DV', DV, STATUS )
+      IF( TRANS ) THEN
+         CALL PAR_GET0C( 'I', I, STATUS )
+         CALL PAR_GET0C( 'Q', Q, STATUS )
+         CALL PAR_GET0C( 'U', U, STATUS )
+         CALL PAR_GET0C( 'V', V, STATUS )
+         CALL PAR_GET0C( 'DI', DI, STATUS )
+         CALL PAR_GET0C( 'DQ', DQ, STATUS )
+         CALL PAR_GET0C( 'DU', DU, STATUS )
+         CALL PAR_GET0C( 'DV', DV, STATUS )
+      END IF
 
 *  Write a list of the column headings out to the text file, translating
 *  the column names.
@@ -600,7 +609,9 @@
          TEXT = '   '
          IAT = 3
 
-         IF( HEAD( ICOL ) .EQ. 'I' ) THEN 
+         IF( .NOT. TRANS ) THEN 
+            H = HEAD( ICOL ) 
+         ELSE IF( HEAD( ICOL ) .EQ. 'I' ) THEN 
             H = I
          ELSE IF( HEAD( ICOL ) .EQ. 'DI' ) THEN 
             H = DI
