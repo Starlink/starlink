@@ -32,6 +32,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -46,6 +47,8 @@
 #      2-SEP-1999 (AJC):
 #        Add CNF library (used by C interface)
 #        and PSX and CHR library
+#      8-JUL-2004 (TIMJ):
+#        Only have a single adam err library now.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -53,7 +56,7 @@
 
 #-
 
-      echo -lerr -lerr_adam `psx_link_adam` `chr_link_adam` `cnf_link_adam` \
+      echo -lerr_adam `psx_link_adam` `chr_link_adam` `cnf_link_adam` \
            `ems_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

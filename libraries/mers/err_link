@@ -29,6 +29,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -44,6 +45,8 @@
 #        Added cnf library
 #     13-SEP-1999 (AJC)
 #        Added PSX and CHR library
+#      8-JUL-2004 (TIMJ):
+#        Remove liberr
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -51,7 +54,7 @@
 
 #-
 
-      echo -lerr -lerr_standalone `psx_link` `cnf_link` `chr_link` `ems_link` \
+      echo -lerr_standalone `psx_link` `cnf_link` `chr_link` `ems_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

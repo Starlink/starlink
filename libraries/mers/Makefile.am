@@ -7,7 +7,8 @@ include_HEADERS = \
         err_err.h err_par.h msg_err.h msg_par.h \
         merswrap.h mers.h
 
-lib_LTLIBRARIES = liberr.la liberr_standalone.la liberr_adam.la
+lib_LTLIBRARIES = liberr_standalone.la liberr_adam.la
+noinst_LTLIBRARIES = liberr.la
 
 liberr_la_SOURCES = \
 	$(F_ROUTINES) \
@@ -22,15 +23,14 @@ liberr_standalone_la_SOURCES = \
 	$(C_INTERFACE_STAND) \
 	$(F_ROUTINES_UT) \
 	$(PRIVATE_INCLUDES)
+liberr_standalone_la_LIBADD = liberr.la
 
 liberr_adam_la_SOURCES = \
 	$(F_ROUTINES_ADAM) \
 	$(C_INTERFACE_ADAM) \
 	$(F_ROUTINES_UT) \
 	$(PRIVATE_INCLUDES)
-
-
-
+liberr_adam_la_LIBADD = liberr.la
 
 F_ROUTINES = err1_bell.f err1_print.f err_annul.f err_begin.f err_end.f \
              err_facer.f err_fioer.f err_flbel.f err_flush.f err_level.f \
@@ -41,7 +41,7 @@ F_ROUTINES = err1_bell.f err1_print.f err_annul.f err_begin.f err_end.f \
              msg_outif.f msg_renew.f msg_setc.f msg_setd.f msg_seti.f \
              msg_setl.f msg_setr.f msg_tune.f \
              msg1_gtinf.f msg1_gtwsz.f msg1_gtstm.f msg1_ptinf.f
-             
+
 
 F_ROUTINES_STAND = msg1_form_stand.f msg_sync_stand.f
 
