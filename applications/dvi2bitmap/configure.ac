@@ -458,6 +458,16 @@ AC_ARG_WITH(path-seps,
     test -n "$COLON" && AC_DEFINE_UNQUOTED(SRCHPATH_SEP,'$COLON')
   fi)
 
+dnl   Since the sgmlkit component depends on this one, we will lose if we
+dnl   allow the documentation declaration to declare its dependency on
+dnl   the sgmlkit component.  So omit this by default, unless the special
+dnl   --enable-ssn71 option is added.
+AC_ARG_ENABLE(ssn71,
+    AS_HELP_STRING([--enable-ssn71],
+                   [build the documentation (omitted by default)]),
+    [STAR_XML_DOCUMENTATION(ssn71)],
+    [STAR@&t@_XML_DOCUMENTATION=
+     AC_SUBST(STAR@&t@_XML_DOCUMENTATION)])
 
 
 dnl   DOXYGEN_OUTPUT_DIRECTORY is the directory into which Doxygen
@@ -466,6 +476,7 @@ AC_SUBST(DOXYGEN_OUTPUT_DIRECTORY)
 DOXYGEN_OUTPUT_DIRECTORY="doc_libdvi2bitmap"
 
 AC_CONFIG_HEADER(config.h)
-AC_CONFIG_FILES([Makefile test/Makefile component.xml Doxyfile version.h])
+AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile component.xml
+                 Doxyfile version.h])
 AC_OUTPUT
 
