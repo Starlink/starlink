@@ -108,3 +108,12 @@ dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 	(cd $(distdir)/extract; make distclean);
 	(cd $(distdir)/sextractor; make distclean);
+
+##  During PREDIST we need to create the hypertext documentation using
+##  star2html. Doesn't seem to be a hook so we can configure the .htx
+##  directory (need to add some extra documents), so override the 
+##  .tex.htx_tar rule.
+.tex.htx_tar:
+	- @STAR2HTML@ $<
+	cp -p mud165.ps sex1_doc.ps sexpaper.ps sun226fig.gif sun226.htx
+	tar cf $@ ${<:.tex=.htx}

@@ -43,6 +43,9 @@ STAR_DECLARE_DEPENDENCIES(link,  ndf)
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun226, [sun226.tex sun226.ps sun226.htx_tar])
+STAR_CHECK_PROGS( star2html )
+
+STAR_DOC_FILES([mud165.ps extractor.news sun226fig.ps])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
