@@ -109,6 +109,8 @@
 *        Original version.
 *     3-DEC-1997 (DSB):
 *        CCDPACK version modified for use in POLPACK.
+*     30-MAR-1999 (DSB):
+*        Delete GRP groups created within this routine before returning.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -822,4 +824,8 @@
 
 *  Exit in a hurry label.
  99   CONTINUE
+
+*  Delete the GRP group storing any character values.
+      CALL GRP_DELET( CHRGRP, STATUS )
+
       END
