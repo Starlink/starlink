@@ -343,7 +343,7 @@
 *  check for QUALITY
 	CALL BDI_CHK( ID, 'Quality', QOK, STATUS )
 	IF ( QOK ) THEN
-	  CALL BDI_MAPR( ID, 'Quality', 'READ', QPTR, STATUS )
+	  CALL BDI_MAP( ID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
 	  CALL BDI_GET( ID, 'QualityMask', 'UBYTE', 0, 0, MASK, IDUM,
      :                  STATUS )
 	ENDIF
