@@ -695,8 +695,8 @@
 *  We need to pad the lower bounds because of the way the drizzling 
 *  alogrithm works, see ccd1_dodiz.f for details
          DO IDIM = 1, NVIN
-            ASTART( IDIM ) = DBLE( ILBND( IDIM ) - 1 )
-            AEND( IDIM ) = DBLE( IUBND( IDIM ) )
+            ASTART( IDIM ) = DBLE( ILBND( IDIM ) - 1 ) - PIXFRAC * 0.5D0
+            AEND( IDIM ) = DBLE( IUBND( IDIM ) ) + PIXFRAC * 0.5D0
          END DO        
 
 *  Change the current mapping MAP to include the a multiplicative 
