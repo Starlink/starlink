@@ -1366,6 +1366,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -1377,13 +1378,16 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
-		$(MANIFEST)/sla \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd applications/photom \
 	  && $(MAKE_CPT)
 
