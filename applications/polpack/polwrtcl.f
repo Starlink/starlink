@@ -59,6 +59,7 @@
 *      secpix_  : An estimate of the pixel size in arcseconds
 *      equinox_ : The equinox for the RA and DEC values in the file 
 *                 (e.g. "2000" - may be blank)
+*      epoch_   : The epoch of observation for the RA and DEC values 
 *      fmts_    : A list of Tcl formats specifications, one for each column.
 *                 Column values are formatted with this format.
 *      hfmts_   : A list of Tcl formats specifications, one for each column.
@@ -146,6 +147,7 @@
       CHARACTER HEAD( MXCOL + 2 )*15! Column names within the output catalogue
       CHARACTER TEXT*512         ! O/p text buffer
       DOUBLE PRECISION DEQN      ! Input equinox
+      DOUBLE PRECISION DEPOCH    ! Epoch
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
       INTEGER DECCOL            ! Index of DEC column within output catalogue 
@@ -289,6 +291,16 @@
 *  If the catalogue contains columns holding RA/DEC coordinates...
       IF( RACOL .GT. 0 .AND. DECCOL .GT. 0 ) THEN
 
+*  See if the catalogue contains an EPOCH parameter. 
+         CALL CAT_TIDNT( CI, 'EPOCH', GI, STATUS ) 
+         IF( STATUS .EQ. CAT__NOCMP ) THEN
+            CALL ERR_ANNUL( STATUS )
+            EPOCH = ' '
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            CALL CAT_EGT0F( GI, EPOCH, NULL, STATUS )
+            CALL CAT_TRLSE( GI, STATUS )
+         END IF                     
+
 *  Get their equinox from the catalogue EQUINOX parameter. Assume default if 
 *  no value is available.
          CALL CAT_TIDNT( CI, 'EQUINOX', GI, STATUS ) 
@@ -363,16 +375,13 @@
 *  Set the equinox of the SkyFrame.
                      CALL AST_SETC( SKYFRM, 'EQUINOX', EQN, STATUS )
 
-*  See if the catalogue contains an EPOCH parameter. If so, copy its
-*  value to the SkyFrame.
-                     CALL CAT_TIDNT( CI, 'EPOCH', GI, STATUS ) 
-                     IF( STATUS .EQ. CAT__NOCMP ) THEN
-                        CALL ERR_ANNUL( STATUS )
-                     ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                        CALL CAT_EGT0F( GI, EPOCH, NULL, STATUS )
-                        CALL CAT_TRLSE( GI, STATUS )
+*  If the catalogue contains an EPOCH parameter, copy its value to the 
+*  SkyFrame. Otherwise, retrieve the default epoch value.
+                     IF( EPOCH .NE. ' ' ) THEN
                         CALL AST_SETC( SKYFRM, 'EPOCH', EPOCH, STATUS )
-                     END IF                     
+                     ELSE
+                        EPOCH = AST_GETC( SKYFRM, 'EPOCH', STATUS )
+                     END IF
 
 *  Find a Mapping from the supplied system to the required system.
                      FS = AST_FINDFRAME( SKYFRM, AST_SKYFRAME( 
@@ -437,6 +446,9 @@
 
 *  If succesfull...
             IF( FS .NE. AST__NULL ) THEN
+
+*  Get the epoch of the SkyFrame.
+               EPOCH = AST_GETC( FS, 'EPOCH', STATUS )
 
 *  Get the Mapping from X/Y to RA/DEC.
                MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, 
@@ -602,6 +614,17 @@
       TEXT = 'set equinox_ '
       IAT = 13
       CALL CHR_PUTD( DEQNOX, TEXT, IAT )
+      CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
+*  Write out the epoch.
+      TEXT = 'set epoch_ "'
+      IAT = 12
+      IF( EPOCH .NE. ' ' ) THEN
+         CALL CHR_PUTC( EPOCH, TEXT, IAT )
+      ELSE
+         IAT = IAT + 1
+      END IF
+      CALL CHR_PUTC( '"', TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Determine the size of each batch.
