@@ -608,7 +608,6 @@ D	        type*,'  energy bounds values dont agree'
       PARAMETER (SZ2=1.258)             ! as used in SPEC_BR
       REAL EM10				! EM of 1E60 cm**-3 at 10 kpc in
       PARAMETER (EM10=8.35774E13)	! units of cm**-6*cm**3/cm**2
-
 *-
 
 * Abundance/scaling correction
@@ -648,8 +647,14 @@ D	        type*,'  energy bounds values dont agree'
 
 *    Global constants
       INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'USER_ERR'
+
+*
+*    Global variables :
+*
+        INCLUDE 'SPEC_CMN_RZ'
 
 *    Import
 	INTEGER NDS			! dataset number
@@ -682,7 +687,7 @@ D	        type*,'  energy bounds values dont agree'
                                         ! between BT1 and BT2
 	REAL EM1,EM2,EM3,EM4		! Four emissivity values for interpoln
 *
-*    Global variables :
+*    Local data:
 *
         INCLUDE 'SPEC_CMN_RZ'
 	LOGICAL FIRSTHERE		! first time in this subroutine
