@@ -1,33 +1,141 @@
 .\" $Id$
-.TH DVI2BITMAP 1 "April 2000"
+.TH DVI2BITMAP 1 "Feburary 2003"
 .SH NAME
 dvi2bitmap
 .SH SYNOPSIS
-.B dvi2bitmap 
-    [\-b(h|w) size] [\-bp a4|a4l|usletter...]
-    [\-[Cc][lrtb] size]
-    [\-fp PKpath ] [\-fm mfmode] [\-fg] [\-fG]
-    [\-g[dpribmg]] [\-m magmag ] [\-n[n]]
-    [\-l num] [\-p num] [\-pp ranges] [\-o outfile-pattern]
-    [\-P[bBtTcC]] [\-q[q]] [\-Q[FfGgtbp]]
-    [\-r resolution] [\-R[fb] int,int,int] [\-s scale-factor]
-    [\-t xbm|gif|png|xpm] [\-V]
-    dvi-file
+.B dvi2bitmap
+[flags] dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
 system, converting each page to a single bitmap.
 .PP
-This man-page documents dvi2bitmap version
+This man-page documents 
+.I dvi2bitmap
+version
 .\" %%VERSION%%
-.I "0.9-7p1"
+.I "0.10b1"
 .PP
 This program is intended to conform to the DVI processing standard.
 .PP
 The principal documentation for this package is in the HTML document
 distributed with it.  This man-page may differ from the documentation there.
 .SS OPTIONS
+.PP
+Various of the options below have common syntax features.
 .TP
-.I "\-bh size, \-bw size"
+.I [keyword-value-list]
+This indicates a sequence of
+.I keyword=value
+pairs, separated by commas.  Not all keywords necessarily have a
+value.
+.TP
+.I [boolean]
+This can be `yes', `true' or `on' indicating
+.I true
+, or `no', `false' or `off' indicating
+.I false.
+.PP
+The options are as follows:
+.TP
+.I "-c, --crop=[keyword-value-pairs]"
+.\" .I "\-c[edge] dimen, \-C[edge] dimen"
+The 
+.I "--crop"
+option allows you to control how the
+generated bitmaps are cropped before they are written.  The keywords
+are `left', `right', `top', 
+`bottom' and `all', and the value in each case is the number of pixels
+to leave as a margin.  If the
+keywords `relative' (default) or `absolute' are present, they refer to
+all of the keywords following: if the crop is specified as `relative',
+then the values specify the number of pixels to leave around the
+blackened pixels of the text; if the crop is `absolute', then it
+specifies the position of the crop (in pixels) from the left or top
+edge of the `page'.  The specification 
+.I "--crop=absolute,all=dimen"
+, which would set all
+the crops to the same position, is silly, and so is forbidden.
+.IP
+The conversion from points to pixels takes account of the
+magnification set in the 
+.I "--magnification"
+option, if that's been specified
+already, but it doesn't notice if that's set after this option, and it
+takes no account of any magnification in the DVI file. 
+.P{
+See below for TeX 
+.I "\especial"
+commands which set this within the TeX file.
+.TP
+.I "-F, --font-search=[keyword-value-list]"
+Specifies how 
+.I dvi2bitmap
+is to find the fonts it needs.  Keywords are as follows:
+.IP
+.I path[=list]
+: use the given colon-separated list of filesystem paths to search for PK
+fonts, or enable using the default path, if the list is
+missing.  The default path is given by the environment variable
+.I DVI2BITMAP_PK_PATH.
+See also the discussion of font searching below.
+.IP
+.I kpathsea
+: enable using the
+.I kpathsea
+library to find fonts.  If the program was not built against the
+.I kpathsea
+library, this option has no effect.
+.IP
+.I command[=script]
+: enable using the given script to
+find fonts.  If the argument is missing, this enables using the script
+configured into the program at compile-time.  This script is any
+program which will search the filesystem and produce a single line on
+output, giving the full path to the specified font.  For example, this
+might be given as
+.I "kpsewhich pk %f.%dpk"
+to run the
+.I kpsewhich
+program.  The command name is a font-string
+template, as described below.
+.IP
+If the program does not find a font using whichever methods have
+been enabled then, following the pattern of
+.I dvips
+and other DVIware, it writes a file
+.I missfont.log
+in the current directory, containing commands which you can use to generate
+the fonts immediately or later.
+.IP
+.I none
+: disable all font-searching.  The result is that
+only the
+.I missfont.log
+file is written.
+.IP
+Each of the keywords can be prefixed by `no' to turn off the
+corresponding option -- thus
+.I --font-search=nopath,nokpathsea,nocommand
+has the same effect as
+.I --font-search=none
+.TP
+.I "-G, --font-gen=[boolean]"
+Switch automatic generation of fonts off and on.
+The default is set at compile time.
+.TP
+.I "-g, --debug=[spec]"
+Switch on debugging.  The
+.I [spec]
+is a list of letters indicating what to debug, as follows.
+You may trace DVI file parsing
+(`d'), PK file parsing (`p'), font rasterdata parsing (`r'), input
+(`i'), bitmap generation (`b') or the main program (`m').  Adding an
+extra `g' increases still further the amount of debugging code.  The
+debugging information may be uninformative or unintelligible; it might
+even crash the program (mention that to me).
+.TP
+.I "\-h, \-\-height=size; \-w, \-\-width=size"
+.\" .I "\-bh size, \-bw size"
 Specify the height and width of the canvas on which the output
 bitmap is painted.  The program tries to make an estimate of this
 based on information within the DVI file, but it can't efficiently get
@@ -39,105 +147,41 @@ you'll need to specify a bitmap size.  The numbers
 .I "(1183,1072)...(4134,6255)"
 are the coordinates of the top-left and
 bottom-right of the bitmap: in this case 
-.I "\-bh 6300 \-bw 4200"
-would suffice.  Note that the `h' in 
-.I "\-bh"
-stands for height, not horizontal!  At some point, I'd like to make the bitmap
+.I "\-\-height=6300 \-\-width=4200"
+would suffice.  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.
 .TP
-.I "\-bp papersize"
-Set the initial size of the bitmap to be one of the paper sizes
-returned by
-.I "\-Qp."
-This is useful either to make sure that
-there is enough room on the initial bitmap, to avoid the warning
-above, or, along with the
-.I "\-PC"
-option, to force the output bitmap to be a certain size.
+.I "-l, --end-page"
+See option 
+.I "--start-page"
 .TP
-.I "\-c[edge] dimen, \-C[edge] dimen"
-The 
-.I "\-c"
-and
-.I "\-C"
-options allow you to control how the
-generated bitmaps are cropped before they are written.  The
-.I "[edge]"
-may be one of `l', `r', `t' or `b', referring to the
-left, right, top and bottom edge of the bitmap, or be missing, in
-which case it refers to all four sides.  In the case of the 
-.I "\-c"
-option, this sets the crop to be
-.I "dimen"
-points from the specified edge of the
-bounding box of the blackened pixels; in the case of the 
-.I "\-C"
-option, it sets it to be 
-.I "dimen"
-points from the left or top of
-the `page'.  The specification 
-.I "\-C dimen"
-, which would set all
-the crops to the same position, is silly, and so is forbidden.
-.IP
-The conversion from points to pixels takes account of the
-magnification set in the 
-.I "\-m"
-option, if that's been specified
-already, but it doesn't notice if that's set after this option, and it
-takes no account of any magnification in the DVI file. 
-.P{
-See below for TeX 
-.I "\especial"
-commands which set this within the TeX file.
-.TP
-.I "\-fp font-path"
-Specifies the path to the PK fonts which dvi2bitmap will use.  See
-also the discussion of font searching below.
-.TP
-.I "\-fm mode"
+.I "-M, --font-mode=[mode]"
 Set the MetaFont mode which is used for generating font files.  The
 default is 
 .I "ibmvga."
 If you set this, you will probably have to set the resolution to a consistent
 number.
 .TP
-.I "\-fg, \-fG"
-Switch automatic generation of fonts off and on, respectively.  The
-default is set at compile time.
-.TP
-.I "\-g(d|p|r|i|b|m|g)"
-Switch on debugging.  The options are to trace DVI file parsing
-(`d'), PK file parsing (`p'), font rasterdata parsing (`r'), input
-(`i'), bitmap generation (`b') or the main program (`m').  Adding an
-extra `g' increases still further the amount of debugging code.  The
-debugging information may be uninformative or unintelligible; it might
-even crash the program (mention that to me).
-.TP
-.I "-l pagenum"
-See option 
-.I "\-p"
-.TP
-.I "\-m magnification"
+.I "-m, --magnification=[number]"
 The TeX magnification parameter which is used when processing the DVI
 file. It is a float, with 1.0 corresponding to no magnification (the
 default).  This interacts with the resolution as follows: if you
-specify a resolution of 100, and a magnification of 2, then dvi2bitmap
+specify a resolution of 100, and a magnification of 2, then
+.I dvi2bitmap
 will search for PK files at 200 dpi.
 .TP
-.I "\-n"
+.I "-n, --preamble-only"
 Do not actually process the DVI file, but read the DVI pre- and
 postamble.  Useful in conjunction with the 
-.I "\-Qf"
-option.  If this option is present, then the program returns non-zero
-if any fonts were missing.
+.I "--query"
+options.  If this option is present, then the program returns non-zero
+if any fonts were missing.  The 
+.I "-n"
+is for brevity and consistency with other tools -- the behaviour can
+be more rationally specified as
+.I "--process=preamble-only"
 .TP
-.I "\-nn"
-Do not process a DVI file at all, and do not require one to be
-present on the command line.  Useful with some of options
-.I "\-Q."
-.TP
-.I "\-o output"
+.I "-o, --output=[filename-pattern]"
 Choose the output filename pattern.  The value is a 
 `printf' formatting string, with a single
 .I "%d"
@@ -149,25 +193,35 @@ embedded in the DVI file (see below).  If there is no
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 .TP
-.I "\-p pnum, \-l lnum, \-pp pagelist"
+.I "-p, --start-page=num"
+.TP
+.I "-l, --end-page=num"
+.TP
+.I "-P, --page-range=[spec]"
 These select page ranges, using a slight extension of the notation
 used by 
 .I "dvips"
-(and the same option letters).
+(and the same option letters, except that 
+.I dvips
+uses 
+.I -pp
+instead of
+.I -P
+).
 .IP
 The
-.I "\-p"
+.I "--start-page=snum"
 and
-.I "\-l"
+.I "--end-page=enum"
 options take single page numbers; if
 either of these is given, then the program will process pages from
 page 
-.I "pnum"
+.I "snum"
 to page 
-.I "lnum"
+.I "enum"
 , with the defaults being the
 corresponding extremes.  The 
-.I "pagelist"
+.I "[spec]"
 consists of a
 comma-separated sequence of page numbers and ranges (
 .I "a-b"
@@ -177,29 +231,28 @@ end pages) are processed.  Any of these specifications may be prefixed
 by either
 .I "="
 or
-.I ":n,"
+.I ":n:"
 In the former case, DVI page
-numbers are used rather than TeX
-.I "\ecount"
-registers; in the latter case, the program examines the 
+numbers are used rather than the TeX
+.I "\ecount0"
+register; in the latter case, the program examines the 
 .I "\ecountn"
-register
-rather than the default 
+register rather than the default 
 .I "\ecount0"
 .IP
 You can specify both of these prefixes one or more times, but you
 cannot mix the 
-.I "\-p"
+.I "--start-page"
 and 
-.I "\-l"
+.I "--end-page"
 options with the 
-.I "\-pp"
+.I "--page-range"
 option.  The program will respect only the last 
-.I "-p"
+.I "--start-page"
 and
-.I "\-l"
+.I "--end-page"
 options, but the 
-.I "\-pp"
+.I "--page-range"
 options are cumulative.  There
 may be no spaces in the 
 .I "pagelist."
@@ -207,52 +260,209 @@ The page numbers may be negative.
 .IP
 Examples:
 .IP
-.I "dvi2bitmap \-pp 3,6\-10 ..."
+.I "dvi2bitmap \--page-range=3,6\-10 ..."
 .IP
 process only the specified pages
 .IP
-.I "dvi2bitmap \-pp :2,1 ..."
+.I "dvi2bitmap \--page-range=:2:1 ..."
 .IP
 process only pages where
 .I "\ecount2"
 was 1.
 .TP
-.I "\-P[BbTtCc]"
-Specifies processing of the output bitmap.
+.I "-Q, --query=[keyword-list]"
+Query various things.  The available possibilities are as
+follows.  The results of each of the queries is printed on a line by
+itself, prefixed by a `Q', the keyword and a space, so that, for
+example, each of the lines produced by the
+.I "--query=missing-fonts"
+option would start
+.I "Qmissing-fonts cmbx10 110 ..."
 .IP
-.I "\-Pb"
-blurs the bitmap, making a half-hearted attempt to make a
+Some of these options (
+.I --query=missing-fonts
+and
+.I --query=missing-fontgen
+) are probably most
+useful with the
+.I "\-n"
+or
+.I --process=preamble-only
+options, to investigate a DVI file before processing.  Others (
+.I --query=types
+and 
+.I --query=paper
+) are probably useful only
+with
+.I --process=options-only.
+The option
+.I "--query=bitmaps"
+is only useful if you do actually generate bitmaps.
+For consistency (and so you don't have to remember which
+ones do which), the appropriate
+.I --process
+option is 
+.I not
+implied in any of them, and you have to give it explicitly.
+.TP
+.I --query=bitmaps
+Prints on stdout a line for each bitmap it generates, giving the
+filename, horizontal size, and vertical size, in pixels.
+.TP
+.I "-Qf, --query=missing-fonts"
+Show missing fonts.
+The program writes on standard output one line per missing font,
+starting with
+.I "Qf"
+or
+.I "Qmissing-fonts"
+(depending on which of the variants was given -- the shorter ones are
+less mnemonic, but more convenient to parse in scripts), then five fields: the
+font name, the DPI value it was looking for, the base-DPI of the font,
+the magnification factor, and a dummy metafont mode.  This output
+might be massaged for use with the mktexpk (TeXLive) or MakeTeXPK
+(teTeX) scripts to generate the required fonts, but
+.I "--query=missing-fontgen"
+is more straightforward.
+.TP
+.I "-QF, --query=all-fonts"
+As for
+.I "--query=missing-fonts"
+except that found fonts are also listed, all prefixed by
+.I "Qall-fonts"
+.TP
+.I "-Qg, --query=missing-fontgen"
+As for
+.I "--query=missing-fonts"
+, except that the output consists of the string
+.I "Qmissing-fontgen"
+followed by a 
+.I "mktexpk"
+or
+.I "MakeTeXPK"
+command which can be used to generate the font.
+.TP
+.I "-QG, --query=all-fontgen"
+As for
+.I --query=missing-fonts
+, except that font-generation commands for found fonts are also
+listed, prefixed by
+.I "Qall-fontgen."
+.IP
+Only one of
+.I --query=missing-fonts
+,
+.I --query=all-fonts
+,
+.I --query=missing-fontgen
+and
+.I --query=all-fontgen
+should be specified -- if more than one appears, only the last
+one is respected.
+.TP
+.I --query=paper
+Show the list of paper sizes which are predefined for the
+.I --paper-size
+option.
+.TP
+.I --query=types
+List the output image formats which the program can generate, on
+stdout, separated by whitespace.  The first output format is the default.
+.TP
+.I "-r, --resolution=[number]"
+Specifies the output resolution, in pixels-per-inch.  This is used
+when deciding which PK files to use. The default is 110, which matches
+the default 
+.I "ibmvga"
+metafont mode.
+.TP
+.I "-R, --colours=[keyword-value-pairs], --colors=[keyword-value-pairs]"
+Specifies the foreground or background colours, as RGB triples.  The
+keywords are either
+.I foreground
+or
+.I background
+, and the values are a triple of integers separated by slashes, for example
+.I "--colours=foreground=127/127/255"
+The integers must be in the range [0,255], and can
+be specified in decimal, octal or hex (for example
+.I "127=0177=0x7f"
+), or else the whole spec may be of the form
+.I "#rrggbb"
+, where `rr', `gg' and `bb' are each a pair of hex digits.
+.TP
+.I "-s, --scalefactor=[number]"
+Reduces the linear size of the output bitmap by a factor
+.I "scalefactor"
+(default 1).
+.TP
+.I "-T, --output=type=[type]"
+Choose the output format, which can be
+.I "png"
+,
+.I "gif"
+,
+.I "xpm"
+or
+.I "xbm."
+The program generates XBM bitmaps by 
+default, and has simple support for XPM.  The GIF and PNG options may
+not be available if they weren't selected when the program was configured.
+.TP
+.I "\-t, \-\-paper-size=papersize"
+Set the initial size of the bitmap to be one of the paper sizes
+returned by
+.I "\-\-query=paper."
+This is useful either to make sure that
+there is enough room on the initial bitmap, to avoid the warning
+above, or, along with the
+.I "\-\-process=crop=no"
+option, to force the output bitmap to be a certain size.
+.TP
+.I "-v, --verbose=[quiet|silent]"
+Quiet mode suppresses some chatter, and silent mode suppresses
+chatter, and does not display warnings or errors either.
+.TP
+.I "-V, --version"
+Display the version number and compilation options, and exit.
+.TP
+.I "-X, --process=[keyword-value-list]"
+Specifies the processing to be done.
+Keywords are as follows
+.IP
+.I options-only=[boolean]
+: if true, then do not process a DVI file at all, and do not require one to be
+present on the command line.  Useful with some of the
+.I "--query"
+options.
+.IP
+.I preamble-only=[boolean]
+: if true, then only examine the preamble (and therefore necessarily
+also the postamble) of the DVI file.
+.IP
+.I blur=[boolean]
+: if true, blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
 generated, a better way is to use the
-.I "\-m"
+.I "--magnification"
 option to magnify the DVI file, and then the
-.I "\-s"
+.I "--scale"
 option to scale it back down to the correct size.
 .IP
-The 
-.I "\-Pt"
-option makes the output bitmap have a transparent background, if
+.I transparency=[boolean]
+: if true, this makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
-.I "\-t"
+.I "--output-type"
 .IP
-The
-.I "\-Pc"
-option specifies that you want the output bitmap to
-be cropped.  This is done by default, so you'll more often use the
-.I "\-PC"
-option to specify that you do not want the output
-cropped (for example, if you're using the
-.I "\-bp"
+.I crop=[boolean]
+: if true, specifies that you want the output bitmap to
+be cropped.  This is true by default, so you'll most often use the
+.I "crop=false"
+to specify that you do not want the output cropped
+(for example, if you're using the
+.I "--paper-size"
 option and want the output to stay the specified size).
-.IP
-The options
-.I "\-PB"
-,
-.I "\-PC"
-and
-.I "\-PT"
-disable blurring, cropping and transparency, respectively.
 .IP
 By default, bitmaps are not blurred, are cropped, and are transparent
 if possible.
@@ -268,148 +478,9 @@ information, but probably progressively worse the further the
 background moves from this.  I suppose, but can't at present check,
 that this implies that you should choose a mid-grey background colour
 when making such transparent PNGs.  I'd welcome advice on this point.
-.TP
-.I "\-q"
-Quiet mode -- suppress some chatter.
-.TP
-.I "\-qq"
-Silent mode -- do not display warnings or errors.
-.TP
-.I "\-Q..."
-Query various things.  The available possibilities are as
-follows.  Each of these lines is printed on a line by itself, prefixed
-by the option letters and a space, so that, for example, each of the
-lines produced by the
-.I "\-QF"
-option would start
-.I "QF cmbx10 110 ..."
-.IP
-Some of these options (
-.I "\-Qf"
-and
-.I "\-Qg"
-) are probably most
-useful with the
-.I "\-n"
-option, to investigate a DVI file before processing.  Others (
-.I "\-Qt"
-and 
-.I "\-Qp"
-) are probably useful only
-with
-.I "\-nn."
-.I "\-Qb"
-is only useful if you do actually generate bitmaps.
-For consistency (and so you don't have to remember which
-ones do which), neither
-.I "\-n"
-nor
-.I "\-nn"
-is implied in any of them, and you have to give it explicitly.
-.TP
-.I "\-Qb"
-Prints on stdout a line for each bitmap it generates, giving the
-filename, horizontal size, and vertical size, in pixels.
-.TP
-.I "\-Qf"
-Show missing fonts.
-The program writes on standard output one line per missing font,
-starting with
-.I "Qf"
-, then five fields: the 
-font name, the DPI value it was looking for, the base-DPI of the font,
-the magnification factor, and a dummy metafont mode.
-This output might be massaged for use with the mktexpk (TeXLive) or
-MakeTeXPK (teTeX) scripts to generate the required fonts, but
-.I "\-Qg"
-is more straightforward.
-.TP
-.I "\-QF"
-As for
-.I "\-Qf"
-except that found fonts are also listed, prefixed by
-.I "QF"
-.TP
-.I "\-Qg"
-As for
-.I "\-Qf"
-, except that the output consists of the string
-.I "Qg"
-followed by a 
-.I "mktexpk"
-or
-.I "MakeTeXPK"
-command which can be used to generate the font.
-.TP
-.I "\-QG"
-As for
-.I "\-Qf"
-, except that found fonts are also listed, prefixed by
-.I "QG"
-Only one of 
-.I "\-Qf"
-,
-.I "\-QF"
-,
-.I "\-Qg"
-and
-.I "\-QG"
-should be specified -- if more than one appears, only the last
-one is respected.
-.TP
-.I "\-Qp"
-Show the list of paper sizes which are predefined for the
-.I "\-bp"
-option.
-.TP
-.I "\-Qt"
-List the output image formats which the program can generate, on
-stdout, separated by whitespace.  The first output format is the default.
-.TP
-.I "\-r resolution"
-Specifies the output resolution, in pixels-per-inch.  This is used
-when deciding which PK files to use. The default is 110, which matches
-the default 
-.I "ibmvga"
-metafont mode.
-.TP 
-.I "\-R[fb] int,int,int"
-Specifies the foreground (
-.I "\-Rf"
-) or background (
-.I "\-Rb"
-)
-colour, as an RGB triple (
-.I "\-R"
-stands for RGB:
-.I "\-c"
-was already in use).  The integers must be in the range [0,255], and can
-be specified in decimal, octal or hex (ie, 
-.I "127=0177=0x7f"
-).
-.TP
-.I "\-s scalefactor"
-Reduces the linear size of the output bitmap by a factor
-.I "scalefactor"
-(default 1).
-.TP
-.I "\-t type"
-Choose the output format, which can be
-.I "png"
-,
-.I "gif"
-,
-.I "xpm"
-or
-.I "xbm."
-The program generates XBM bitmaps by 
-default, and has simple support for XPM.  The GIF and PNG options may
-not be available if they weren't selected when the program was configured.
-.TP
-.I "\-V"
-Display the version number and compilation options, and exit.
 .SH "DVI specials"
-dvi2bitmap recognises several DVI special commands, and emits a
+.I dvi2bitmap
+recognises several DVI special commands, and emits a
 warning if it finds any others.
 .PP
 The syntax of the special commands is 
@@ -474,7 +545,7 @@ bounding box.
 Set the default image format, which should be one of the keywords
 `xbm', `xpm', `gif', `png'.  This is equivalent to specifying the image
 format through the 
-.I -t
+.I --output-type
 option.
 .IP
 The keyword is just 
@@ -575,17 +646,49 @@ Exception: If the
 option is present, then the program returns success only if
 .I all
 fonts are present.
+.SH FONT STRING TEMPLATES
+The search-path and font-finder routes use font-string templates.
+Here, the components of a font file name, or a font-finding command,
+are specified using placeholders like
+.I %f.
+You may use
+.TS
+center ;
+c	l .
+Code	Substitution
+%M	mode (eg. ibmvga)
+%f	font name (eg. cmr10)
+%d	dpi (eg. 330)
+%b	base dpi (eg. 110)
+%m	magnification (eg. 3)
+%%	%
+.TE
+Thus, using these values as an example, if one of the entries in
+.I DVI2BITMAP_PK_PATH
+were 
+.I /var/tmp/%M/%f.%dpk
+, this would expand into
+.I /var/tmp/ibmvga/cmr10.330pk
+Alternatively, if we had given the font-finder script as 
+.I /usr/local/teTeX/bin/kpsewhich pk %f.%dpk
+, then
+.I dvi2bitmap
+would have executed the command
+.I ".../kpsewhich pk cmr10.330pk"
+, which would have returned with a suitable font path.
 .SH EXAMPLES
-% dvi2bitmap -r 110 -m 2 -s 2 -t gif hello.dvi
+% dvi2bitmap --resolution=110 --magnification=2 \e
+    --scale=2 --output-type=gif hello.dvi
 .PP
 This converts the file hello.dvi to a GIF bitmap.  It first sets the
 magnification factor to 2, so that the program uses a double-size font
 (eg, .../cmr10.220pk), then scales the bitmap down by a factor of 2 to
 obtain a bitmap of the correct size.
 .PP
-% dvi2bitmap -n -Qf -r 110 -m 1.5 -q hello.dvi
+% dvi2bitmap -n --query=missing-fonts --resolution=110 \e
+    --magnification=1.5 --verbose=quiet hello.dvi
 .br
-cmr10 165 110 1.5 localfont
+Qmissing-fonts cmr10 165 110 1.5 localfont
 .PP
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
@@ -594,7 +697,7 @@ font files.
 .PP
 How you generate fonts depends on your TeX distribution.  As explained
 above, you can determine which fonts you need using the 
-.I "\-l"
+.I "\--query=missing-fonts"
 option.  The teTeX and TeXLive TeX distributions include scripts to
 generate fonts for you; if you have a different distribution, there
 might be a similar script for you to use, or you might have to do it
@@ -635,7 +738,7 @@ the directories specified in this list, then the kpathsea library is
 used, if support for that was available at compile-time.
 .PP
 This variable is overridden by the 
-.I "\-f"
+.I "\--font-path"
 option.
 .PP
 If the program was compiled with support for the kpathsea library,
@@ -662,9 +765,6 @@ Available on CTAN, in directory
 .I /tex-archive/dviware/driv-standard.
 This incorporates sections of the DVItype documentation.
 .SH BUGS
-There are way too many options.  I'd better switch to using 
-.I "getopts"
-as soon as I get the chance.
 .PP
 If the program doesn't conform to the DVI Driver Standard, please let
 me know.

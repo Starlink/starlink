@@ -1,6 +1,29 @@
-// Part of dvi2bitmap.
-// Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
-// See file LICENCE for conditions.
+//    This file is part of dvi2bitmap.
+//    Copyright 1999--2002, Council for the Central Laboratory of the Research Councils
+//    
+//    This program is part of the Starlink Software Distribution: see
+//    http://www.starlink.ac.uk 
+//
+//    dvi2bitmap is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    dvi2bitmap is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with dvi2bitmap; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    The General Public License is distributed along with this
+//    program in the file LICENCE.
+//
+//    Author: Norman Gray <norman@astro.gla.ac.uk>
+//    $Id$
+
 
 static const char RCSID[] =
 	"$Id$";
@@ -32,6 +55,9 @@ static const char RCSID[] =
 #include <stdarg.h>
 #include <ctype.h>
 #endif
+
+#include <unistd.h>		// for getsubopt
+#include "getopt_long.h"
 
 #if HAVE_STD_NAMESPACE
 using std::cout;
@@ -83,7 +109,7 @@ bool process_special (DviFile *, string specialString,
 		      Bitmap*, bitmap_info&);
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
-bool parseRGB (Bitmap::BitmapColour&, char*);
+bool parse_boolean_string(char *s);
 void Usage (void);
 char *progname;
 
@@ -98,9 +124,10 @@ int bitmapW = -1;
 int resolution = PkFont::dpiBase();// in pixels-per-inch
 int oneInch = resolution;
 
-#define FONT_CMDS 4
-#define FONT_INCFOUND 2
 #define FONT_SHOW 1
+#define FONT_INCFOUND 2
+#define FONT_CMDS 4
+#define FONT_LONG_DISPLAY 8
 
 int main (int argc, char **argv)
 {
@@ -130,7 +157,39 @@ int main (int argc, char **argv)
 	{ (char*)"usletter",	8.5*oneInch,	8.5*oneInch,	}, // 8.5x11in
     };
     int npapersizes = sizeof(papersizes)/sizeof(papersizes[0]);
-	
+
+    // option parsing with getopt_long
+    int optch;
+    extern char *optarg;
+    struct option long_options[] = {
+	{ "crop",          1, 0, 'c' },
+	{ "font-search",   1, 0, 'F' },
+	{ "debug",         1, 0, 'g' },
+	{ "font-gen",      1, 0, 'G' },
+	{ "height",        1, 0, 'h' },
+	{ "end-page",      1, 0, 'l' },
+	{ "magnification", 1, 0, 'm' },
+	{ "font-mode",     1, 0, 'M' },
+	{ "preamble-only", 0, 0, 'n' },
+	{ "output",        1, 0, 'o' },
+	{ "start-page",    1, 0, 'p' },
+	{ "page-range",    1, 0, 'P' },
+	{ "query",         1, 0, 'Q' },
+	{ "resolution",    1, 0, 'r' },
+	{ "colours",       1, 0, 'R' },
+	{ "colors",        1, 0, 'R' },	// synonym
+	{ "scale",         1, 0, 's' },
+	{ "paper-size",    1, 0, 't' },
+	{ "output-type",   1, 0, 'T' },
+	{ "verbose",       1, 0, 'v' },
+	{ "version",       0, 0, 'V' },
+	{ "width",         1, 0, 'w' },
+	{ "process",       1, 0, 'X' },
+	{ 0,               0, 0, 0   }
+    };
+    // should generate this from long_options
+    char *short_options = "c:F:g:G:h:l:M:no:p:P:Q:r:R:s:t:T:v:Vw:X:";
+    
 
     progname = argv[0];
 
@@ -145,263 +204,287 @@ int main (int argc, char **argv)
 
     bool absCrop = false;
 
-    for (argc--, argv++; argc>0; argc--, argv++)
-	if (**argv == '-')
-	    switch (*++*argv)
+    while ((optch = getopt_long(argc, argv, short_options, long_options, 0))
+	   != -1) {
+	
+	switch (optch) {
+	  case 'c':		// --crop
 	    {
-	      case 'b':
-		switch (*++*argv)
-		{
-		  case 'h':
-		    argc--, argv++; if (argc <= 0) Usage();
-		    bitmapH = atoi (*argv);
-		    break;
-		  case 'w':
-		    argc--, argv++; if (argc <= 0) Usage();
-		    bitmapW = atoi (*argv);
-		    break;
-		  case 'p':
-		    argc--, argv++; if (argc <= 0) Usage();
-		    // Note that the functionality here will vary
-		    // depending on whether the magmag is set before
-		    // or after this option, and it'll take no
-		    // account of variations of the magnification
-		    // within the DVI file.
-		    int i;
-		    for (i = 0; i<npapersizes; i++)
-			if (strcmp (*argv, papersizes[i].name) == 0)
-			{
-			    bitmapH
-				= static_cast<int>(magmag*papersizes[i].h+0.5);
-			    bitmapW
-				= static_cast<int>(magmag*papersizes[i].w+0.5);
-			    break;
-			}
-		    if (i == npapersizes)
-			cerr << "-bs " << *argv
-			     << " not recognised.  See -Qp" << endl;
-		    else
-			if (verbosity > normal)
-			    cerr << "Papersize " << *argv
-				 << ": H=" << bitmapH
-				 << " W=" << bitmapW
-				 << endl;
-		    break;
-		    
-		  default:
-		    Usage();
-		    break;
-		}
-		break;
-	      case 'C':		// absolute crop
-		absCrop = true;
-		// FALL THROUGH
-	      case 'c':		// crop
-	      {
-		  char c = *++*argv;
-		  argc--, argv++; if (argc <= 0) Usage();
-		  // get dimension, and convert points to pixels.
-		  // Note that the functionality here will vary
-		  // depending on whether the magmag is set before
-		  // or after this option, and it'll take no
-		  // account of variations of the magnification
-		  // within the DVI file.
-		  int cropmargin = static_cast<int>(magmag*atof(*argv)/72.0*resolution);
-		  switch (c)
-		  {
-		    case 'l':
-		      Bitmap::cropDefault(Bitmap::Left,	  cropmargin, absCrop);
-		      break;
-		    case 'r':
-		      Bitmap::cropDefault(Bitmap::Right,  cropmargin, absCrop);
-		      break;
-		    case 't':
-		      Bitmap::cropDefault(Bitmap::Top,	  cropmargin, absCrop);
-		      break;
-		    case 'b':
-		      Bitmap::cropDefault(Bitmap::Bottom, cropmargin, absCrop);
-		      break;
-		    case '\0':
-		      if (absCrop) // don't want this!
-			  Usage();
-		      Bitmap::cropDefault(Bitmap::All,	  cropmargin, false);
-		      break;
-		    default:
-		      Usage();
-		  }
-		  break;
-	      }
-	      case 'f':
-		{
-		    char sel = *++*argv;
-		    argc--, argv++;
-		    if (argc <= 0)
-			Usage();
-		    switch (sel)
-		    {
-		      case '\0':
-		      case 'p':	// -fp set PK font path
-			PkFont::setFontPath(*argv);
-			break;
-		      case 'm':	// -fm set PK font generation mode
-			PkFont::setMissingFontMode (*argv);
-			break;
-		      case 'g':	// -fg switch off font generation
-			// FIXME: to be consistent with -P, options
-			// -fg and -fG should be the other way
-			// around.  Change in next version.
-			PkFont::setMakeFonts (false);
-			break;
-		      case 'G':	// -fG switch on font generation
-			PkFont::setMakeFonts (true);
-			break;
-		      default:
-			Usage();
-			break;
+		// get dimension, and convert points to pixels.
+		// Note that the functionality here will vary
+		// depending on whether the magmag is set before
+		// or after this option, and it'll take no
+		// account of variations of the magnification
+		// within the DVI file.
+		char *options = optarg;
+		char *value;
+		char *tokens[] = {
+		    "left", "right", "top", "bottom", "all",
+		    "absolute", "relative",
+		    NULL
+		};
+		bool absCrop = false;
+		bool haveValue;
+		int cropmargin;
+		while (*options) {
+		    int suboptch = getsubopt(&options, tokens, &value);
+		    if (!value)	// no option value: should be absolute/relative
+			haveValue = false;
+		    else {
+			cropmargin
+				= static_cast<int>(magmag*atof(value)/72.0
+						   *resolution);
+			haveValue = true;
 		    }
-		    break;
-		}
-	      case 'g':		// debugging...
-		{
-		    verbosities debuglevel = debug;
-		    for (++*argv; **argv != '\0'; ++*argv)
-			switch (**argv)
-			{
-			  case 'd': // debug DVI file
-			    DviFile::verbosity(debuglevel);
-			    break;
-			  case 'p': // debug PK file (and kpathsea)
-			    PkFont::verbosity(debuglevel);
-			    break;
-			  case 'r': // debug rasterdata parsing
-			    PkRasterdata::verbosity(debuglevel);
-			    break;
-			  case 'i': // debug input
-			    InputByteStream::verbosity(debuglevel);
-			    break;
-			  case 'b': // debug bitmap
-			    Bitmap::verbosity(debuglevel);
-			    BitmapImage::verbosity(debuglevel);
-			    break;
-			  case 'm': // debug main program
-			    verbosity = debuglevel;
-			    break;
-			  case 'u': // debug utility functions
-			    Util::verbosity(debuglevel);
-			    break;
-			  case 'g':
-			    if (debuglevel == debug)
-				debuglevel = everything;
-			    break;
-			  default:
+
+		    cerr << "crop: margin=" << suboptch << ", size="
+			 << (haveValue ? cropmargin : -1)
+			 << ", abs=" << absCrop << endl;
+
+		    switch(suboptch) {
+		      case 0:	// left
+			if (!haveValue) Usage();
+			Bitmap::cropDefault
+				(Bitmap::Left,   cropmargin, absCrop);
+			break;
+		      case 1:	// right
+			if (!haveValue) Usage();
+			Bitmap::cropDefault
+				(Bitmap::Right,  cropmargin, absCrop);
+			break;
+		      case 2:	// top
+			if (!haveValue) Usage();
+			Bitmap::cropDefault
+				(Bitmap::Top,    cropmargin, absCrop);
+			break;
+		      case 3:	// bottom
+			if (!haveValue) Usage();
+			Bitmap::cropDefault
+				(Bitmap::Bottom, cropmargin, absCrop);
+			break;
+		      case 4:	// all
+			if (!haveValue) Usage();
+			if (absCrop) // don't want this!
 			    Usage();
-			}
-		}
-		break;
-	      // case 'l': see below
-	      case 'm':		// set magnification
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		magmag = atof (*argv);
-		break;
-	      case 'n':		// don't actually process the DVI file
-		switch (*++*argv)
-		{
-		  case '\0':
-		    processing_ = preamble_only;
-		    PkFont::setMakeFonts (false);
-		    break;
-		  case 'n':	// do nothing -- don't even look for a DVI file
-		    processing_ = options_only;
-		    break;
-		  case 'f':
-		    // FIXME: remove this option in the next version
-		    // (degenerate with -fg) 
-		    PkFont::setMakeFonts (false);
-		    break;
-		  default:
-		    Usage();
-		    break;
-		}
-		break;
-	      case 'o':		// set output filename pattern
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		bm.ofile_pattern = *argv;
-		break;
-	      case 'P':		// process the bitmap...
-		while (*++*argv != '\0')
-		    switch (**argv)
-		    {
-		      case 'b':	// blur bitmap
-			bm.blur_bitmap = true;
+			Bitmap::cropDefault
+				(Bitmap::All,    cropmargin, false);
 			break;
-		      case 'B':	// don't
-			bm.blur_bitmap = false;
+		      case 5:	// absolute
+			if (haveValue) Usage();
+			absCrop = true;
 			break;
-		      case 't':	// make bitmap transparent
-			bm.make_transparent = true;
+		      case 6:	// relative
+			if (haveValue) Usage();
+			absCrop = false;
 			break;
-		      case 'T':	// don't
-			bm.make_transparent = false;
-			break;
-		      case 'c':	// crop bitmap
-			bm.crop_bitmap = true;
-			break;
-		      case 'C':	// don't
-			bm.crop_bitmap = false;
-			break;
-		      default:
+		      case -1:
 			Usage();
 			break;
+		      default:
+			throw DviBug("Impossible crop suboption " + suboptch);
 		    }
-		break;
-	      case 'l':		// set page range
-	      case 'p':
-		if (argc <= 1)
-		    Usage();
-		if (! PR.addSpec (argv[0], argv[1]))
-		    Usage();
-		argc--, argv++;
-		break;
-	      case 'q':		// run quietly
-		verbosity = quiet;
-		if (*++*argv == 'q') // run very quietly
-		    verbosity = silent;
-		DviFile::verbosity(verbosity);
-		PkFont::verbosity(verbosity);
-		PkRasterdata::verbosity(verbosity);
-		InputByteStream::verbosity(verbosity);
-		Bitmap::verbosity(verbosity);
-		BitmapImage::verbosity(verbosity);
-		Util::verbosity(verbosity);
-		break;
-	      case 'Q':		// various queries
-		while (*++*argv != '\0')
-		    switch (**argv)
-		    {
-		      case 'F':		// show missing fonts
-			show_font_list = (FONT_SHOW | FONT_INCFOUND);
+		}
+	    }
+	    break;
+
+	  case 'F':		// --font-search
+	    {
+		char *options = optarg;
+		char *value;
+		char *tokens[] = {
+		    "path", "nopath",
+		    "command", "nocommand",
+		    "kpathsea", "nokpathsea",
+		    "none",
+		    NULL,
+		};
+		while (*options) {
+		    int suboptch = getsubopt(&options, tokens, &value);
+		    switch (suboptch) {
+		      case 0:	// path
+			PkFont::setFontSearchPath(value); // value may be 0
+			break;
+		      case 1:	// nopath
+			PkFont::setFontSearchPath(false);
 			break;
 
-		      case 'f':
+		      case 2:	// command
+			PkFont::setFontSearchCommand(value); // value may be 0
+			break;
+		      case 3:	// nocommand
+			PkFont::setFontSearchCommand(false);
+			break;
+
+		      case 4:	// kpathsea
+			// any argument is permitted but ignored
+			PkFont::setFontSearchKpse(true);
+			break;
+		      case 5:	// nokpathsea
+			PkFont::setFontSearchKpse(false);
+			break;
+
+		      case 6:	// none
+			PkFont::setFontSearchPath(false);
+			PkFont::setFontSearchKpse(false);
+			PkFont::setFontSearchCommand(false);
+			break;
+			
+		      default:
+			Usage();
+		    }
+		}
+	    }
+	    break;
+
+	  case 'G':		// --font-gen
+	    PkFont::setMakeFonts (parse_boolean_string(optarg));
+	    cerr << "font-gen=" << parse_boolean_string(optarg) << endl;
+	    break;
+
+	  case 'g':		// --debug
+	    {
+		char *o = optarg;
+		verbosities debuglevel = debug;
+		for (; *o != '\0'; ++o) {
+		    switch (*o)
+		    {
+		      case 'd': // debug DVI file
+			DviFile::verbosity(debuglevel);
+			break;
+		      case 'p': // debug PK file (and kpathsea)
+			PkFont::verbosity(debuglevel);
+			break;
+		      case 'r': // debug rasterdata parsing
+			PkRasterdata::verbosity(debuglevel);
+			break;
+		      case 'i': // debug input
+			InputByteStream::verbosity(debuglevel);
+			break;
+		      case 'b': // debug bitmap
+			Bitmap::verbosity(debuglevel);
+			BitmapImage::verbosity(debuglevel);
+			break;
+		      case 'm': // debug main program
+			verbosity = debuglevel;
+			break;
+		      case 'u': // debug utility functions
+			Util::verbosity(debuglevel);
+			break;
+		      case 'g':
+			if (debuglevel == debug)
+			    debuglevel = everything;
+			break;
+		      default:
+			Usage();
+		    }
+		}
+	    }
+	    break;
+
+	  case 'h':		// --height
+	    bitmapH = atoi(optarg);
+	    break;
+
+	  case 'l':		// --end-page
+	  case 'p':		// --start-page
+	  case 'P':		// --page-range
+	    {
+		if (! PR.addSpec(optch, optarg))
+		    Usage();
+		// DEBUG
+		int tcounts[] = { 3, 0, 0, 0, 0, 0, 0, 0, 0, 0,};
+		for (int ti=0; ti<5; ti++)
+		    cerr << "Page " << ti << ": "
+			 << (PR.isSelected(ti, tcounts) ? "yes" : "no")
+			 << endl;
+		// ENDDEBUG			
+	    }
+	    break;
+
+	  case 'M':		// --font-mode
+	    PkFont::setMissingFontMode (optarg);
+	    break;
+
+	  case 'm':		// --magnification
+	    magmag = atof (optarg);
+	    cerr << "magnification=" << magmag << endl;
+	    break;
+
+	  case 'n':		// --preamble-only
+	    // don't actually process the DVI file
+	    processing_ = preamble_only;
+	    PkFont::setMakeFonts(false);
+	    break;
+
+	  case 'o':		// --output
+	    bm.ofile_pattern = optarg;
+	    break;
+
+	    // case 'p', 'P': see 'l'
+
+	  case 'Q':		// --query
+	    {
+		char *options = optarg;
+		char *value;
+		char *tokens[] = {
+		    "missing-fonts", "f",
+		    "all-fonts", "F",
+		    "missing-fontgen", "g",
+		    "all-fontgen", "G",
+		    "bitmaps", "paper", "types",
+		    NULL
+		};
+		int cropmargin;
+		while (*options) {
+		    int suboptch = getsubopt(&options, tokens, &value);
+		    if (value)	// no values
+			Usage();
+		    switch (suboptch)
+		    {
+		      case 0:	// missing-fonts
+			show_font_list = (FONT_SHOW | FONT_LONG_DISPLAY);
+			break;
+		      case 1:	// f
 			show_font_list = FONT_SHOW;
 			break;
-
-		      case 'G':
+		      case 2:	// all-fonts
+			show_font_list = (FONT_SHOW | FONT_INCFOUND
+					  | FONT_LONG_DISPLAY);
+			break;
+		      case 3:	// F
+			show_font_list = (FONT_SHOW | FONT_INCFOUND);
+			break;
+		      case 4:	// missing-fontgen
+			show_font_list = (FONT_SHOW | FONT_CMDS
+					  | FONT_LONG_DISPLAY );
+			break;
+		      case 5:	// g
+			show_font_list = (FONT_SHOW | FONT_CMDS);
+			break;
+		      case 6:	// all-fontgen
+			show_font_list
+			    = (FONT_SHOW | FONT_INCFOUND | FONT_CMDS
+			       | FONT_LONG_DISPLAY );
+			break;
+		      case 7:	// G
 			show_font_list
 			    = (FONT_SHOW | FONT_INCFOUND | FONT_CMDS);
 			break;
 
-		      case 'g':
-			show_font_list = (FONT_SHOW | FONT_CMDS);
+		      case 8:	// bitmaps
+			Bitmap::logBitmapInfo (true);
 			break;
 
-		      case 't':	// show file types
+		      case 9:	// paper
+			cout << "Qpaper";
+			for (int i=0; i<npapersizes; i++)
+			    cout << ' ' << papersizes[i].name;
+			cout << endl;
+			break;
+
+		      case 10:	// types
 			{
-			    cout << "Qt ";
+			    cout << "Qtypes ";
 			    const char *ft
 				= BitmapImage::firstBitmapImageFormat();
 			    cout << ft;
@@ -412,132 +495,230 @@ int main (int argc, char **argv)
 				ft = BitmapImage::nextBitmapImageFormat();
 			    }
 			    cout << endl;
-			    // FIXME: remove the following line at the
-			    // next version change.  Change behaviour
-			    // so that -Qt does not automatically exit.
-			    processing_ = options_only;
-			    break;
 			}
-
-		      case 'b':	// show bitmap info
-			Bitmap::logBitmapInfo (true);
 			break;
 
-		      case 'p':	// show `paper sizes'
-			cout << "Qp";
-			for (int i=0; i<npapersizes; i++)
-			    cout << ' ' << papersizes[i].name;
-			cout << endl;
-			break;
-
-		      default:
+		      case -1:
 			Usage();
 			break;
+		      default:
+			throw DviBug("Impossible query suboption " + suboptch);
 		    }
-		break;
-	      case 'r':		// set resolution
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		PkFont::setResolution (atoi(*argv));
-		resolution = PkFont::dpiBase();
-		break;
-	      case 'R':		// set colours
+		}
+	    }
+	    break;
+
+	  case 'r':		// --resolution
+	    PkFont::setResolution (atoi(optarg));
+	    resolution = PkFont::dpiBase();
+	    cerr << "resolution=" << resolution << endl;
+	    break;
+
+	  case 'R':		// --colours, --colors
+	    {
+		char *options = optarg;
+		char *value;
+		char *tokens[] = {
+		    "foreground", "background", NULL
+		};
+		int cropmargin;
 		char c;
-		c = *++*argv;
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		if (c == 'f' || c == 'b')
-		{
+		while (*options) {
+		    int fb = getsubopt(&options, tokens, &value);
+		    cerr << "R: fb=" << fb
+			 << " value=" << (value ? value : "<null>") << endl;
 		    Bitmap::BitmapColour rgb;
-		    if (parseRGB(rgb, *argv))
-			Bitmap::setDefaultRGB (c=='f', &rgb);
+		    if (!value)
+			Usage();
+		    if (Util::parseRGB(rgb, value)) {
+			Bitmap::setDefaultRGB (fb==0, &rgb);
+			cerr << "rgb"
+			     << (fb==0 ? "(foreground)" : "(background)")
+			     << (int)rgb.red << ','
+			     << (int)rgb.green << ','
+			     << (int)rgb.blue << endl;
+		    }
 		    else
 			Usage();
 		}
-		else
-		    Usage();
-		break;		    
-	      case 's':		// scale down
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		bm.bitmap_scale_factor = atoi (*argv);
-		break;
-	      case 't':		// set output file type
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		bm.ofile_type = *argv;
-		if (! BitmapImage::supportedBitmapImage (bm.ofile_type))
+	    }
+	    break;		    
+
+	  case 's':		// --scale
+	    bm.bitmap_scale_factor = atoi (optarg);
+	    cerr << "scale-factor=" << bm.bitmap_scale_factor << endl;
+	    break;
+
+	  case 't':		// --paper-size
+	    // Note that the functionality here will vary
+	    // depending on whether the magmag is set before
+	    // or after this option, and it'll take no
+	    // account of variations of the magnification
+	    // within the DVI file.
+	    int i;
+	    for (i = 0; i<npapersizes; i++)
+		if (strcmp (optarg, papersizes[i].name) == 0)
 		{
-		    bm.ofile_type
-			= BitmapImage::firstBitmapImageFormat();
-		    cerr << "Unsupported image type "
-			 << *argv
-			 << ": using "
-			 << bm.ofile_type
-			 << " instead" << endl;
+		    cerr << "papersize=" << papersizes[i].name << endl;
+		    bitmapH
+			    = static_cast<int>(magmag*papersizes[i].h+0.5);
+		    bitmapW
+			    = static_cast<int>(magmag*papersizes[i].w+0.5);
+		    break;
 		}
-		break;
+	    if (i == npapersizes)
+		cerr << "--paper-size=" << optarg
+		     << " not recognised.  See -Qp XXX" << endl;
+	    else
+		if (verbosity > normal)
+		    cerr << "Papersize " << optarg
+			 << ": H=" << bitmapH
+			 << " W=" << bitmapW
+			 << endl;
+	    break;
 
-	      case 'V':		// display version
-		cout << version_string << endl << "Options:" << endl;
+	  case 'T':		// --output-type
+	    bm.ofile_type = optarg;
+	    if (! BitmapImage::supportedBitmapImage (bm.ofile_type))
+	    {
+		bm.ofile_type
+			= BitmapImage::firstBitmapImageFormat();
+		cerr << "Unsupported image type "
+		     << optarg
+		     << ": using "
+		     << bm.ofile_type
+		     << " instead" << endl;
+	    }
+	    break;
 
-		cout << "ENABLE_GIF           "
-		     << (ENABLE_GIF ? "yes" : "no") << endl;
-		cout << "ENABLE_PNG           "
-		     << (ENABLE_PNG ? "yes" : "no") << endl;
+	  case 'V':		// --version
+	    cout << version_string << endl << "Options:" << endl;
+
+	    cout << "ENABLE_GIF           "
+		 << (ENABLE_GIF ? "yes" : "no") << endl;
+	    cout << "ENABLE_PNG           "
+		 << (ENABLE_PNG ? "yes" : "no") << endl;
 #if ENABLE_PNG
-		cout << "  libpng: "
-		     << PNGBitmap::version_string() << endl;
+	    cout << "  libpng: "
+		 << PNGBitmap::version_string() << endl;
 #endif
 
-		cout << "ENABLE_KPATHSEA      "
-		     << (ENABLE_KPATHSEA ? "yes" : "no") << endl;
+	    cout << "ENABLE_KPATHSEA      "
+		 << (ENABLE_KPATHSEA ? "yes" : "no") << endl;
 #if ENABLE_KPATHSEA
-		cout << "  libkpathsea: "
-		     << kpathsea::version_string() << endl;
+	    cout << "  libkpathsea: "
+		 << kpathsea::version_string() << endl;
 #endif
 #ifdef DEFAULT_TEXMFCNF
-		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << endl;
+	    cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << endl;
 #endif
 #ifdef FAKE_PROGNAME
-		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << endl;
+	    cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << endl;
 #endif
 #ifdef FONT_SEARCH_SCRIPT
-		cout << "FONT_SEARCH_SCRIPT   " << FONT_SEARCH_SCRIPT << endl;
+	    cout << "FONT_SEARCH_SCRIPT   " << FONT_SEARCH_SCRIPT << endl;
 #endif
 
 #ifdef FONT_GEN_TEMPLATE
-		cout << "FONT_GEN_TEMPLATE    " << FONT_GEN_TEMPLATE << endl;
+	    cout << "FONT_GEN_TEMPLATE    " << FONT_GEN_TEMPLATE << endl;
 #else
-		cout << "Font generation disabled" << endl;
+	    cout << "Font generation disabled" << endl;
 #endif
 #ifdef DEFAULT_MFMODE
-		cout << "  DEFAULT_MFMODE=" << DEFAULT_MFMODE << endl;
+	    cout << "  DEFAULT_MFMODE=" << DEFAULT_MFMODE << endl;
 #endif
 #ifdef DEFAULT_RESOLUTION
-		cout << "  DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << endl;
+	    cout << "  DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << endl;
 #endif
 
-		cout << RCSID << endl;
-		processing_ = options_only; // ...and exit
-		break;
+	    cout << RCSID << endl;
+	    processing_ = options_only; // ...and exit
+	    break;
 
-	      default:
+	  case 'v':		// --verbose
+	    if (strcmp(optarg, "quiet") == 0)
+		verbosity = quiet;
+	    else if (strcmp(optarg, "silent") == 0)
+		verbosity = silent;
+	    else
 		Usage();
+	    
+	    DviFile::verbosity(verbosity);
+	    PkFont::verbosity(verbosity);
+	    PkRasterdata::verbosity(verbosity);
+	    InputByteStream::verbosity(verbosity);
+	    Bitmap::verbosity(verbosity);
+	    BitmapImage::verbosity(verbosity);
+	    Util::verbosity(verbosity);
+	    break;
+
+	  case 'w':		// --width
+	    bitmapW = atoi(optarg);
+	    break;
+
+	  case 'X':		// --process
+	    {
+		char *options = optarg;
+		char *value;
+		char *tokens[] = {
+		    "options-only", "preamble-only",
+		    "blur", "transparent", "crop",
+		    NULL
+		};
+		int cropmargin;
+		while (*options) {
+		    int suboptch = getsubopt(&options, tokens, &value);
+		    switch (suboptch)
+		    {
+		      case 0:	// options-only
+			if (!value || parse_boolean_string(value))
+			    processing_ = options_only;
+			break;
+		      case 1:	// preamble-only
+			if (!value || parse_boolean_string(value))
+			    processing_ = preamble_only; // equiv -n
+			break;
+		      case 2:	// blur
+			bm.blur_bitmap
+				= (!value || parse_boolean_string(value));
+			break;
+		      case 3:	// transparent
+			bm.make_transparent
+				= (!value || parse_boolean_string(value));
+			break;
+		      case 4:	// crop
+			bm.crop_bitmap 
+				= (!value || parse_boolean_string(value));
+			break;
+		      case -1:
+			Usage();
+			break;
+		      default:	// eh?
+			throw DviBug("Impossible process suboption "+suboptch);
+		    }
+		}
+
+// 		cerr << "processing: " << processing_
+// 		     << " blur:" << bm.blur_bitmap
+// 		     << " transparent:" << bm.make_transparent
+// 		     << " crop:" << bm.crop_bitmap
+// 		     << endl;
 	    }
-	else
-	{
-	    if (dviname.length() != 0)
-		Usage();
-	    dviname = *argv;
+	    break;
+	    
+	  default:
+	    Usage();
 	}
-
+    }
+    
     if (processing_ == options_only)
 	exit (0);
+
+    argc -= optind;
+    argv += optind;
+    if (argc != 1)
+	Usage();
+    dviname = *argv;
 
     // Insist we have a DVI file specified.
     if (dviname.length() == 0)
@@ -597,7 +778,8 @@ int main (int argc, char **argv)
 	    else		// flag at least one missing
 		all_fonts_present = false;
 
-	    if (show_font_list & FONT_SHOW)
+	    if (show_font_list & FONT_SHOW) {
+		bool fld = (show_font_list & FONT_LONG_DISPLAY);
 		if (show_font_list & FONT_CMDS)
 		{
 		    if ((show_font_list & FONT_INCFOUND) || !f->loaded())
@@ -608,7 +790,10 @@ int main (int argc, char **argv)
 			string cmd = f->fontgenCommand();
 			if (cmd.length() == 0)
 			    throw DviError ("configuration problem: I can't create a font-generation command");
-			cout << (f->loaded() ? "QG " : "Qg ")
+			//cout << (f->loaded() ? "QG " : "Qg ")
+			cout << (f->loaded()
+				 ? (fld ? "Qall-fontgen " : "Qg ")
+				 : (fld ? "Qmissing-fontgen " : "Qg "))
 			     << f->fontgenCommand()
 			     << endl;
 		    }
@@ -619,7 +804,10 @@ int main (int argc, char **argv)
 			// If f->loaded() is true, then we're here
 			// because FONT_INCFOUND was set, so indicate
 			// this in the output.
-			cout << (f->loaded() ? "QF " : "Qf ");
+			//cout << (f->loaded() ? "QF " : "Qf ");
+			cout << (f->loaded()
+				 ? (fld ? "Qall-fonts " : "QF ")
+				 : (fld ? "Qmissing-fonts " : "Qf "));
 
 			// write out font name, dpi, base-dpi, mag and MF mode
 			cout << f->name() << ' '
@@ -635,6 +823,7 @@ int main (int argc, char **argv)
 			}
 			cout << endl;
 		    }
+	    }
 	}
 
 
@@ -1158,43 +1347,24 @@ string_list& tokenise_string (string str)
     return *l;
 }
 
-bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
+// Return true if the string is "yes", "true", "on",
+// false if "no", "false", "off".  
+// Return false if it doesn't match anything.
+bool parse_boolean_string(char *s) 
 {
-    char *p;
-    rgb.red = static_cast<Byte>(strtol (s, &p, 0));
-    if (p == s)			// no digit
-	return false;
-    if (*p == '\0')		// end of string
-	return false;
-    s = p;
-    while (!isxdigit(*s))
-    {
-	if (*s == '\0') return false;
-	s++;
-    }
-
-    rgb.green = static_cast<Byte>(strtol (s, &p, 0));
-    if (p == s)			// no digit
-	return false;
-    if (*p == '\0')		// end of string
-	return false;
-    s = p;
-    while (!isxdigit(*s))
-    {
-	if (*s == '\0') return false;
-	s++;
-    }
-
-    rgb.blue = static_cast<Byte>(strtol (s, &p, 0));
-    if (p == s)			// no digit
-	return false;
-
-    return true;
+    if (strcmp(s, "yes") == 0)   return true;
+    if (strcmp(s, "no") == 0)    return false;
+    if (strcmp(s, "true") == 0)  return true;
+    if (strcmp(s, "false") == 0) return false;
+    if (strcmp(s, "on") == 0)    return true;
+    if (strcmp(s, "off") == 0)   return false;
+    return false;
 }
-
 
 void Usage (void)
 {
+    cerr << "Usage: " << progname << " [flags...] filename" << endl;
+#if 0
     cerr << "Usage: " << progname << " [-b(h|w) size] [-bp a4|a4l|usletter...]" << endl <<
 "        [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]" << endl <<
 "        [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]" << endl <<
@@ -1222,5 +1392,6 @@ void Usage (void)
 "  -Q   query: f=missing fonts, g=missing font commands (F, G=all fonts)" << endl <<
 "       t=supported output types, b=output bitmap names, p=paper sizes in -bp" << endl <<
 "  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)" << endl;
+#endif
     exit (1);
 }

@@ -98,6 +98,12 @@ appropriate.</px></distribution>
 <px>Minor documentation updates.</px>
 </change>
 
+<distribution string="0.10b1" date="13-Feb-2003" author=ng
+	versionid='v0-10-0-1'>
+<px>Major changes to options.  Supports external programs to find
+fonts.</px>
+</distribution>
+
 </history>
 
 <copyright>
@@ -148,14 +154,7 @@ make things a little clearer.</update>
 
 <p>Synopsis:
 <verbatim>
-dvi2bitmap 
-        [-b(h|w) size] [-bp a4|a4l|usletter...]
-        [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]
-        [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]
-        [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]
-        [-r resolution] [-R[fb] int,int,int] [-s scale-factor]
-        [-t xbm|gif|png|xpm] [-V]
-    dvi-file
+dvi2bitmap [flags] dvi-file
 </verbatim>
 
 <p>This program is intended to conform to the DVI processing standard.
@@ -196,261 +195,383 @@ new -L and -LL options.</update>
 Changed -Q into -qq, and -L into -Qf.</update>
 <update versionid="v0-9-5">Added -bp, -Qp, -PC</update>
 <update versionid="v0-9-5-1">Mentioned that the -gp option also debugs 
-kpathsea.
+kpathsea.</update>
+<update versionid="v0-10-0-1">Completely new option specs</update>
 
-<p><dl>
-<dt><code>-bh size, -bw size</code>
-<dd>Specify the height and width of the canvas on which the output
+<p>Various of the options below have common syntax features.
+<dl>
+<dt><code>[keyword-value-list]</code></dt>
+<dd>This indicates a sequence of
+<code>keyword=value</code>
+pairs, separated by commas.  Not all keywords necessarily have a
+value.</dd>
+
+<dt><code>[boolean]</code></dt>
+<dd>This can be `yes', `true' or `on' indicating
+<em>true</em>; or `no', `false' or `off' indicating
+<em>false</em>.</dd>
+
+</dl>
+
+<p>The options are as follows:
+
+<dl>
+
+<dt><code>-c, --crop=[keyword-value-pairs]</code></dt>
+
+<dd><p>The <code>&ddash;crop</code> option allows you to control how
+the generated bitmaps are cropped before they are written.  The
+keywords are `left', `right', `top', `bottom' and `all', and the value
+in each case is the number of pixels to leave as a margin.  If the
+keywords `relative' (default) or `absolute' are present, they refer to
+all of the keywords following: if the crop is specified as `relative',
+then the values specify the number of pixels to leave around the
+blackened pixels of the text; if the crop is `absolute', then it
+specifies the position of the crop (in pixels) from the left or top
+edge of the `page'.  The specification
+<code>&ddash;&ddash;crop=absolute,all=dimen</code>, which would set all the
+crops to the same position, is silly, and so is forbidden.</p>
+
+<p>The conversion from points to pixels takes account of the
+magnification set in the <code>&ddash;magnification</code> option, if
+that's been specified already, but it doesn't notice if that's set
+after this option, and it takes no account of any magnification in the
+DVI file.</p>
+
+<p>See <ref id=usage.special/> for &tex; <code/\special> commands which
+set this within the &tex; file.</p>
+
+<p>See below for TeX <code>\special</code> commands which set this
+within the TeX file.</p>
+</dd>
+
+<dt id=usage.options.fp><code>-F, &ddash;font-search=[keyword-value-list]</code></dt>
+
+<dd><p>Specifies how <code>dvi2bitmap</code> is to find the fonts it
+needs.  Keywords are as follows:</p>
+
+<p><code>path[=list]</code>: use the given list of filesystem paths to
+search for PK fonts, or enable using the default path, if
+<code>=path</code> is missing.  The default path is given by the
+environment variable <code>DVI2BITMAP_PK_PATH</code>.  See also the
+discussion of font searching below.</p>
+
+<p><code>kpathsea</code>: enable using the <code>kpathsea</code>
+library to find fonts.  If the program was not built against the
+<code>kpathsea</code> library, this option has no effect.</p>
+
+<p><code>command[=script]</code>: enable using the given script to
+find fonts.  If the argument is missing, this enables using the script
+configured into the program at compile-time.  This script is any
+program which will search the filesystem and produce a single line on
+output, giving the full path to the specified font.  For example, this
+might be given as <code>kpsewhich pk %f.%dpk</code> to run the
+<code>kpsewhich</code> program.  The command name is a font-string
+template, as described <ref id=usage.fonts.template>elsewhere</ref>.</p>
+
+<p>If the program does not find a font using whichever methods have
+been enabled then, following the pattern of <code>dvips</code> and
+other DVIware, it writes a file <code>missfont.log</code> in the
+current directory, containing commands which you can use to generate
+the fonts immediately or later.</p>
+
+<p><code>none</code>: disable all font-searching.  The result is that
+only the <code>missfont.log</code> file is written.</p>
+
+<p>Each of the keywords can be prefixed by `no' to turn off the
+corresponding option -- thus
+<code>&ddash;font-search=nopath,nokpathsea,nocommand</code> has the
+same effect as <code>&ddash;font-search=none</code>.</p>
+
+</dd>
+
+<dt><code>-G, &ddash;font-gen=[boolean]</code></dt>
+
+<dd><p>Switch automatic generation of fonts off and on.  The default
+is set at compile time.</p></dd>
+
+<dt id=usage.options.g><code>-g, &ddash;debug=[spec]</code></dt>
+
+<dd><p>Switch on debugging.  The <code>[spec]</code> is a list of
+letters indicating what to debug, as follows.  You may trace DVI file
+parsing (`d'), PK file parsing (`p'), font rasterdata parsing (`r'),
+input (`i'), bitmap generation (`b') or the main program (`m').
+Adding an extra `g' increases still further the amount of debugging
+code.  The debugging information may be uninformative or
+unintelligible; it might even crash the program (mention that to
+me).</p></dd>
+
+<dt><code>-h, &ddash;height=size; -w, &ddash;width=size</code></dt>
+
+<dd><p>Specify the height and width of the canvas on which the output
 bitmap is painted.  The program tries to make an estimate of this
 based on information within the DVI file, but it can't efficiently get
 all the information it needs, so sometimes the estimate is wrong.  If
-you get a warning message like <code>Warning: p.12: bitmap too big:
-occupies (1183,1072)...(4134,6255).  Requested 4100x6200</code>, then 
+you get a warning message like 
+<code>Warning: p.12: bitmap too big: occupies (1183,1072)...(4134,6255). Requested 4100x6200</code>
+then 
 you'll need to specify a bitmap size.  The numbers
-<code>(1183,1072)...(4134,6255)</code> are the coordinates of the top-left and
-bottom-right of the bitmap: in this case <code>-bh 6300 -bw
-4200</code> would suffice.  Note that the `h' in <code>-bh</code> stands for
-height, not horizontal!  At some point, I'd like to make the bitmap
-`expandable', obviating the need for these options.
+<code>(1183,1072)...(4134,6255)</code>
+are the coordinates of the top-left and
+bottom-right of the bitmap: in this case 
+<code>&ddash;height=6300 &ddash;width=4200</code>
+would suffice.  At some point, I'd like to make the bitmap
+`expandable', obviating the need for these options.</p></dd>
 
-<dt><code>-bp papersize</code>
-<dd>Set the initial size of the bitmap to be one of the paper sizes
-returned by <code>-Qp</code>.  This is useful either to make sure that
-there is enough room on the initial bitmap, to avoid the warning
-above, or, along with the <code/-PC> option, to force the output
-bitmap to be a certain size.
+<dt><code>-l, &ddash;end-page</code></dt>
 
-<dt><code>-c[edge] dimen, -C[edge] dimen</code>
-<dd>The <code/-c> and <code/-C> options allow you to control how the
-generated bitmaps are cropped before they are written.  The
-<code/[edge]> may be one of `l', `r', `t' or `b', referring to the
-left, right, top and bottom edge of the bitmap, or be missing, in
-which case it refers to all four sides.  In the case of the <code/-c>
-option, this sets the crop to be <code/dimen> points from the
-specified edge of the
-bounding box of the blackened pixels; in the case of the <code/-C>
-option, it sets it to be <code/dimen> points from the left or top of
-the `page'.  The specification <code/-C dimen>, which would set all
-the crops to the same position, is silly, and so is forbidden.
-<p>The conversion from points to pixels takes account of the
-magnification set in the <code/-m> option, if that's been specified
-already, but it doesn't notice if that's set after this option, and it
-takes no account of any magnification in the DVI file. 
-<p>See <ref id=usage.special/> for &tex; <code/\special> commands which
-set this within the &tex; file.
+<dd><p>See option <code>&ddash;start-page</code></p></dd>
 
-<dt id=usage.options.fp><code>-fp font-path</code>
-<dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
-also <ref id=usage.fonts/>.
+<dt id=usage.options.fm><code>-M, &ddash;font-mode=[mode]</code></dt>
 
-<dt id=usage.options.fm><code>-fm mode</code>
-<dd>Specify the MetaFont mode which is to be used when generating fonts.
-The default is <code/ibmvga>, but see
-<code/&ddash;enable-fontgen> in <ref id=install.nonstarlink/>.
+<dd><p>Set the MetaFont mode which is used for generating font files.
+The default is <code>ibmvga.</code> If you set this, you will probably
+have to set the resolution to a consistent number.</p></dd>
 
-<dt><code/-fg>
-<dd>Switch off automatic font-generation.
+<dt><code>-m, &ddash;magnification=[number]</code></dt>
 
-<dt><code/-fG>
-<dd>Switch on automatic font-generation.
-
-<dt id=usage.options.g><code/-g(d|p|r|i|b|m|g)>
-<dd>Switch on debugging.  The options are to trace DVI file parsing
-(`d'), PK file parsing and kpathsea if installed (`p'),
-font rasterdata parsing (`r'), input
-(`i'), bitmap generation (`b') or the main program (`m').  Adding an
-extra `g' increases still further the amount of debugging code.  The
-debugging information may be uninformative or unintelligible; it might
-even crash the program (mention that to me).
-
-<dt><code>-l pagenum</code>
-<dd>See option <code/-p>
-
-<dt><code>-m magnification</code>
-<dd>The &tex; magnification parameter which is used when processing the DVI
+<dd><p>The TeX magnification parameter which is used when processing the DVI
 file. It is a float, with 1.0 corresponding to no magnification (the
 default).  This interacts with the resolution as follows: if you
-specify a resolution of 100, and a magnification of 2, then dvi2bitmap
-will search for PK files at 200 dpi.
+specify a resolution of 100, and a magnification of 2, then
+<code>dvi2bitmap</code>
+will search for PK files at 200 dpi.</p></dd>
 
-<dt><code>-n</code>
-<dd>Do not actually process the DVI file, but read the DVI pre- and
-postamble.  Useful in conjunction with the <code/-Qf> and <code/-Qg>
+<dt><code>-n, &ddash;preamble-only</code></dt>
+
+<dd><p>Do not actually process the DVI file, but read the DVI pre- and
+postamble.  Useful in conjunction with the <code>&ddash;query</code>
 options.  If this option is present, then the program returns non-zero
-if any fonts were missing (see also <ref id=usage.exit/>).
+if any fonts were missing (see also <ref id=usage.exit/>).  The
+<code>-n</code> is for brevity and consistency with other tools -- the
+behaviour can be more rationally specified as
+<code>&ddash;process=preamble-only</code></p></dd>
 
-<dt><code/-nn>
-<dd>Do not process a DVI file at all, and do not require one to be
-present on the command line.  Useful with some of options <code/-Q>.
+<dt><code>-o, &ddash;output=[filename-pattern]</code></dt>
 
-<dt><code>-o output</code>
-<dd>Choose the output filename pattern.  The value is a 
-`printf' formatting string, with a single <code>%d</code>
-formatting descriptor, which will be replaced in output filenames
-with the page number.  This can be overridden on a per-page basis by
-a &tex; <code/\special> embedded in the DVI file (see <ref
-id=usage.special.opf/> in <ref id=usage.special/>).  If there is no 
-file extension, or if it does not match the output type, a suitable file
-extension will be added.
+<dd><p>Choose the output filename pattern.  The value is a `printf'
+formatting string, with a single <code>%d</code> formatting
+descriptor, which will be replaced in output filenames with the page
+number.  This can be overridden on a per-page basis by a TeX
+<code>\special</code> embedded in the DVI file (see <ref
+id=usage.special.opf/> in <ref id=usage.special/>).  If there is no
+file extension, or if it does not match the output type, a suitable
+file extension will be added.</p></dd>
 
-<dt><code/-p pnum>, <code/-l lnum>, <code/-pp pagelist>
-<dd>These select page ranges, using a slight extension of the notation
-used by <code/dvips> (and the same option letters).
+<dt><code>-p, &ddash;start-page=num</code>,
+<code>-l, &ddash;end-page=num</code>,
+<code>-P, &ddash;page-range=[spec]</code></dt>
 
-<p>The <code/-p> and <code/-l> options take single page numbers; if
+<dd><p>These select page ranges, using a slight extension of the
+notation used by <code>dvips</code> (and the same option letters,
+except that <code>dvips</code> uses <code>-pp</code> instead of
+<code>-P</code>).</p>
+
+<p>The <code>&ddash;start-page=snum</code> and
+<code>&ddash;end-page=enum</code> options take single page numbers; if
 either of these is given, then the program will process pages from
-page <code/pnum> to page <code/lnum>, with the defaults being the
-corresponding extremes.  The <code/pagelist> consists of a
-comma-separated sequence of page numbers and ranges (<code/a-b>); only
-those pages, and the pages falling in those ranges (inclusive of the
-end pages) are processed.  Any of these specifications may be prefixed
-by either `<code/=>' or `<code/:n,>'.  In the former case, DVI page
-numbers are used rather than &tex; <code/\count> registers; in the
-latter case, the program examines the <code/\count><m/n> register
-rather than the default <code/\count0>.
+page <code>snum</code> to page <code>enum</code>, with the defaults
+being the corresponding extremes.  The <code>[spec]</code> consists of
+a comma-separated sequence of page numbers and ranges
+(<code>a-b</code>); only those pages, and the pages falling in those
+ranges (inclusive of the end pages) are processed.  Any of these
+specifications may be prefixed by either <code>=</code> or
+<code>:n:</code>.  In the former case, DVI page numbers are used
+rather than the TeX <code>\count</code><em>0</em> register; in the
+latter case, the program examines the <code>\count</code><em>n</em>
+register rather than the default <code>\count</code><em>0</em></p>
 
 <p>You can specify both of these prefixes one or more times, but you
-cannot mix the <code/-p> and <code/-l> options with the <code/-pp>
-option.  The program will respect only the last <code/-p> and
-<code/-l> options, but the <code/-pp> options are cumulative.  There
-may be no spaces in the <code/pagelist>.  The page numbers may be
-negative.
+cannot mix the <code>&ddash;start-page</code> and
+<code>&ddash;end-page</code> options with the
+<code>&ddash;page-range</code> option.  The program will respect only
+the last <code>&ddash;start-page</code> and
+<code>&ddash;end-page</code> options, but the
+<code>&ddash;page-range</code> options are cumulative.  There may be
+no spaces in the <code>pagelist</code>.  The page numbers may be
+negative.</p>
 
-<p><update versionid="v0-7">
-Mentioned PNG option</update>Examples:
+<p>Examples:
 <verbatim>
-dvi2bitmap -pp 3,6-10 ... # process only the specified pages
-dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
+dvi2bitmap &ddash;page-range=3,6-10 ...
 </verbatim>
+process only the specified pages</p>
 
-<dt><code/-P[BbTtCc]>
-<dd><p><update versionid=v0-8>Added -PB and -PT</update><update
-versionid=v0-9-5>Added -PC</update>Specifies
-processing of the output bitmap. 
-<p><code/-Pb> blurs the bitmap, making a half-hearted attempt to make a
-low-resolution bitmap look better.  This really isn't up to much -- if
-you have the fonts available, or are prepared to wait for them to be
-generated, a better way is to use the <code/-m> option to magnify the
-DVI file, and then the <code/-s> option to scale it back down to the
-correct size.
-<p>The <code/-Pt> option makes the output bitmap have a transparent
-background, if 
-that's supported by the particular format you choose using option
-<code/-t>.
-<p>The <code/-Pc> option specifies that you want the output bitmap to
-be cropped.  This is done by default, so you'll more often use the
-<code/-PC> option to specify that you <em/don't> want the output
-cropped (for example, if you're using the <code/-bp> option and want
-the output to stay the specified size).
-<p>The options <code/-PB>, <code/-PC> and <code/-PT> disable blurring,
-cropping, and transparency, respectively.
-<p>By default, bitmaps are not blurred, are cropped, and are
-transparent if possible.
-<p>For PNG files, the output bitmap uses a
-palette plus an alpha channel; these are calculated in such a way that
-if you display the resulting bitmap on the same colour background as
-<code/dvi2bitmap> was using (which is white by default, but can be
-specified using the <ref id=usage.special.fg>background special</>) then
-the result should look identical to the result with no transparency
-information, but probably progressively worse the further the
-background moves from this.  I suppose, but can't at present check,
-that this implies that you should choose a mid-grey background colour
-when making such transparent PNGs.  I'd welcome advice on this point.
+<p>
+<verbatim>
+dvi2bitmap &ddash;page-range=:2:1 ...
+</verbatim>
+process only pages where
+<code>\count2</code>
+was 1.</p></dd>
 
-<dt><code/-q>
-<dd>Quiet mode -- suppress chatter.  This also suppresses warnings.
+<dt id=usage.options.q><code>-Q, &ddash;query=[keyword-list]</code></dt>
 
-<dt><code/-qq>
-<dd>Silent mode -- suppress errors as well.
+<dd><p>Query various things.  The available possibilities are as
+given below.  The results of each of the queries is printed on a line by
+itself, prefixed by a `Q', the keyword and a space, so that, for
+example, each of the lines produced by the
+<code>&ddash;query=missing-fonts</code>
+option would start
+<code>Qmissing-fonts cmbx10 110 ...</code></p>
 
-<dt id=usage.options.q><code/-Q...>
-<dd><p><update versionid="v0-9">
-Added -Qb, and add extra field to output, so that output from
-different -Q options can be separated out.
-</update>
-<update versionid='v0-9-3'>Added documentation of -QG and -Qg</update>
+<p>Some of these options (<code>&ddash;query=missing-fonts</code> and
+<code>&ddash;query=missing-fontgen</code>) are probably most useful
+with the <code>-n</code> or <code>&ddash;process=preamble-only</code>
+options, to investigate a DVI file before processing.  Others
+(<code>&ddash;query=types</code> and <code>&ddash;query=paper</code>)
+are probably useful only with
+<code>&ddash;process=options-only</code>.  The option
+<code>&ddash;query=bitmaps</code> is only useful if you do actually
+generate bitmaps.  For consistency (and so you don't have to remember
+which ones do which), the appropriate <code>&ddash;process</code>
+option is <em>not</em> implied in any of them, and you have to give it
+explicitly.</p></dd>
 
-Query various things.  The available possibilities are as
-follows.  Each of these lines is printed on a line by itself, prefixed
-by the option letters and a space, so that, for example, each of the
-lines produced by the <code/-QF> option would start <code/QF cmbx10
-110 ...>.
+<dt><code>&ddash;query=bitmaps</code></dt>
+<dd>Prints on stdout a line for each bitmap it generates, giving the
+filename, horizontal size, and vertical size, in pixels.</dd>
 
-<p>Some of these options (<code/-Qf>, <code/-Qg>) are probably most
-useful with the <code/-n> option, to investigate a DVI file before
-processing.  Others (<code/-Qt>, <code/-Qp>) are probably useful only
-with <code/-nn>.  <code/-Qb> is only useful if you do actually
-generate bitmaps.  For consistency (and so you don't have to remember which
-ones do which), neither <code/-n> nor <code/-nn> is implied in any of
-them, and you have to give it explicitly.
-  <dl>
-  <dt><code/-Qb>
-  <dd>Prints on stdout a line for each bitmap it generates, giving the
-  filename, horizontal size, and vertical size, in pixels.
+<dt><code>-Qf, &ddash;query=missing-fonts</code></dt>
 
-  <dt><code>-Qf</code>
-  <dd>Show missing fonts.
-  The program writes on standard output one line per missing font,
-  starting with `<code/Qf>', then five fields: the 
-  font name, the DPI value it was looking for, the base-DPI of the
-  font, the magnification factor, and a dummy metafont mode.  This
-  output might be massaged for use with the mktexpk (TeXLive) or
-  MakeTeXPK (teTeX) scripts to generate the required fonts, but
-  <code/-Qg> is more straightforward.
+<dd>Show missing fonts.  The program writes on standard output one
+line per missing font, starting with <code>Qf</code> or
+<code>Qmissing-fonts</code> (depending on which of the variants was
+given -- the shorter ones are less mnemonic, but more convenient to
+parse in scripts), then five fields: the font name, the DPI value it
+was looking for, the base-DPI of the font, the magnification factor,
+and a dummy metafont mode.  This output might be massaged for use with
+the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to generate the
+required fonts, but <code>&ddash;query=missing-fontgen</code> is more
+straightforward.</dd>
 
-  <dt><code/-QF>
-  <dd>As for <code/-Qf>, except that found fonts are also listed,
-  prefixed by `<code/QF>'.
+<dt><code>-QF, &ddash;query=all-fonts</code></dt>
+<dd>As for <code>&ddash;query=missing-fonts</code> except that found
+fonts are also listed, all prefixed by <code>Qall-fonts</code></dd>
 
-  <dt><code/-Qg>
-  <dd>As for <code/-Qf>, except that the output consists of the string
-  `<code/Qg>' followed by a <code/mktexpk> or <code/MakeTeXPK> command
-  which can be used to generate the font.
+<dt><code>-Qg, &ddash;query=missing-fontgen</code></dt>
 
-  <dt><code/-QG>
-  <dd>As for <code/-Qf>, except that found fonts are also listed,
-  prefixed by `<code/QG>'.  Only one of 
-  <code/-Qf>, <code/-QF>, <code/-Qg> and <code/-QG> should be specified
-  -- if more than one appears, only the last one is respected.
+<dd>As for <code>&ddash;query=missing-fonts</code>, except that the
+output consists of the string <code>Qmissing-fontgen</code> followed
+by a <code>mktexpk</code> or <code>MakeTeXPK</code> command which can
+be used to generate the font.</dd>
 
-  <dt><code/-Qp>
-  <dd>Show the list of paper sizes which are predefined for the
-  <code/-bp> option.
+<dt><code>-QG, &ddash;query=all-fontgen</code></dt>
 
-  <dt><code/-Qt>
-  <dd>List the output image formats which the program can generate, on
-  stdout, separated by whitespace.  The first output format is the default.
+<dd>As for <code>&ddash;query=missing-fonts</code>, except that
+font-generation commands for found fonts are also listed, prefixed by
+<code>Qall-fontgen.</code></dd>
 
-  </dl>
+<dt>Note</dt>
 
-<dt><code/-r resolution>
+<dd>Only one of <code>&ddash;query=missing-fonts</code>,
+<code>&ddash;query=all-fonts</code>,
+<code>&ddash;query=missing-fontgen</code> and
+<code>&ddash;query=all-fontgen</code> should be specified -- if more
+than one appears, only the last one is respected.</dd>
+
+<dt><code>&ddash;query=paper</code></dt>
+<dd>Show the list of paper sizes which are predefined for the
+<code>&ddash;paper-size</code> option.</dd>
+
+<dt><code>&ddash;query=types</code></dt>
+<dd>List the output image formats which the program can generate, on
+stdout, separated by whitespace.  The first output format is the default.</dd>
+
+<dt><code>-r, &ddash;resolution=[number]</code></dt>
 <dd>Specifies the output resolution, in pixels-per-inch.  This is used
-when deciding which PK files to use.  The default is 110, but see
-<code/&ddash;enable-fontgen> in <ref id=install.nonstarlink/>.
+when deciding which PK files to use. The default is 110, which matches
+the default <code>ibmvga</code> metafont mode.</dd>
 
-<dt id=usage.options.r><code/-R[fb] int,int,int>
-<dd><p><update versionid="v0-9">
-Add -Rf, -Rb options, to set colours on the command line.
-</update>
-Specifies the foreground (<code/-Rf>) or background (<code/-Rb>)
-colour, as an RGB triple (<code/-R> stands for RGB: <code/-c> was
-already in use).  The integers must be in the range [0,255], and can
-be specified in decimal, octal or hex (ie, <code/127=0177=0x7f>).
+<dt id=usage.options.r><code>-R, &ddash;colours=[keyword-value-list], &ddash;colors=[keyword-value-pairs]</code></dt>
 
-<dt><code/-s scalefactor>
+<dd><p>Specifies the foreground or background colours, as RGB triples.
+The keywords are either <code>foreground</code> or
+<code>background</code>, and the values are a triple of integers
+separated by slashes, for example
+<code>&ddash;colours=foreground=127/127/255</code>.  The integers must
+be in the range [0,255], and can be specified in decimal, octal or hex
+(for example <code>127=0177=0x7f</code>), or else the whole spec may
+be of the form <code>#rrggbb</code>, where `rr', `gg' and `bb' are
+each a pair of hex digits.</p></dd>
+
+<dt><code>-s, &ddash;scalefactor=[number]</code></dt>
 <dd>Reduces the linear size of the output bitmap by a factor
-<code/scalefactor> (default 1).
+<code>scalefactor</code> (default 1).</dd>
 
-<dt><code/-t type>
-<dd>Choose the output format, which can be <code/png>, <code/xbm>,
-<code/xpm> or <code/gif>.  The GIF and PNG options may not be
-available if they weren't selected when the program was configured.
-The XPM support is only partial -- it doesn't use the XPM library.
+<dt><code>-T, &ddash;output=type=[type]</code></dt>
 
-<dt><code/-V>
-<dd>Display the version number and compilation options, and exit.
+<dd>Choose the output format, which can be <code>png</code>,
+<code>gif</code>, <code>xpm</code> or <code>xbm</code>.  The program
+generates XBM bitmaps by default, and has simple support for XPM.  The
+GIF and PNG options may not be available if they weren't selected when
+the program was configured.</dd>
+
+<dt><code>\-t, \-\-paper-size=papersize</code></dt>
+
+<dd>Set the initial size of the bitmap to be one of the paper sizes
+returned by <code>&ddash;query=paper</code>.  This is useful either to
+make sure that there is enough room on the initial bitmap, to avoid
+the warning above, or, along with the
+<code>&ddash;process=crop=no</code> option, to force the output bitmap
+to be a certain size.</dd>
+
+<dt><code>-v, &ddash;verbose=[quiet|silent]</code></dt>
+<dd>Quiet mode suppresses some chatter, and silent mode suppresses
+chatter, and does not display warnings or errors either.</dd>
+
+<dt><code>-V, &ddash;version</code></dt>
+<dd>Display the version number and compilation options, and exit.</dd>
+
+<dt><code>-X, &ddash;process=[keyword-value-list]</code></dt>
+<dd><p>Specifies the processing to be done.  Keywords are as follows:</p>
+
+<p><code>options-only=[boolean]</code>: if true, then do not process a
+DVI file at all, and do not require one to be present on the command
+line.  Useful with some of the <code>&ddash;query</code> options.</p>
+
+<p><code>preamble-only=[boolean]</code>: if true, then only examine
+the preamble (and therefore necessarily also the postamble) of the DVI
+file.</p>
+
+<p><code>blur=[boolean]</code>: if true, blurs the bitmap, making a
+half-hearted attempt to make a low-resolution bitmap look better.
+This really isn't up to much -- if you have the fonts available, or
+are prepared to wait for them to be generated, a better way is to use
+the <code>&ddash;magnification</code> option to magnify the DVI file,
+and then the <code>&ddash;scale</code> option to scale it back down to
+the correct size.</p>
+
+<p><code>transparency=[boolean]</code>: if true, this makes the output
+bitmap have a transparent background, if that's supported by the
+particular format you choose using option
+<code>&ddash;output-type</code></p>
+
+<p><code>crop=[boolean]</code>: if true, specifies that you want the
+output bitmap to be cropped.  This is true by default, so you'll most
+often use the <code>crop=false</code> to specify that you do not want
+the output cropped (for example, if you're using the
+<code>&ddash;paper-size</code> option and want the output to stay the
+specified size).</p>
+
+<p>By default, bitmaps are not blurred, are cropped, and are
+transparent if possible.</p>
+
+<p>For PNG files, the output bitmap uses a palette plus an alpha
+channel; these are calculated in such a way that if you display the
+resulting bitmap on the same colour background as
+<code>dvi2bitmap</code> was using (which is white by default, but can
+be specified using the <ref id=usage.special.fg>`background'
+special</ref>) then the result should look identical to the result
+with no transparency information, but probably progressively worse the
+further the background moves from this.  I suppose, but can't at
+present check, that this implies that you should choose a mid-grey
+background colour when making such transparent PNGs.  I'd welcome
+advice on this point.</p></dd>
 
 </dl>
+</sect>
+
 
 <subsect id=usage.special export>DVI specials
 <update versionid="upd5">
@@ -675,30 +796,6 @@ worry about where fonts live.  The <code/kpathsea> library is
 generally integrated with the font-generation commands, and can be
 queried using the <code/kpsewhich> command.
 
-<p>The search-path and font-finder routes use font-string templates.
-Here, the components of a font file name, or a font-finding command,
-are specified using placeholders like <code>%f</code>.  You may use
-<tabular>
-<tgroup cols=2>
-<tbody>
-<row><entry><entry>
-<row><entry><code>%M</code><entry>mode (eg. ibmvga)
-<row><entry><code>%f</code><entry>font name (eg. cmr10)
-<row><entry><code>%d</code><entry>dpi (eg. 330)
-<row><entry><code>%b</code><entry>base dpi (eg. 110)
-<row><entry><code>%m</code><entry>magnification (eg. 3)
-<row><entry><code>%%</code><entry>%
-</tbody>
-</tabular>
-Thus, using these values as an example, if one of the entries in
-<code>DVI2BITMAP_PK_PATH</code> were 
-<code type=fspath>/var/tmp/%M/%f.%dpk</code>, this would expand into
-<code type=fspath>/var/tmp/ibmvga/cmr10.330pk</code>.  Alternatively,
-if we had given the font-finder script as 
-<code>/usr/local/teTeX/bin/kpsewhich pk %f.%dpk</code>, the
-<code/dvi2bitmap> would have executed the command <code>.../kpsewhich
-pk cmr10.330pk</code>, which would have returned with a suitable font path.
-
 
 <![ IGNORE [
 <!-- THIS ADVICE IS USEFUL, BUT OUT OF DATE -->
@@ -723,6 +820,8 @@ depending on whether you're using a sh-type shell (<code/sh> or
 that you enabled (or at least, did not disable) font-generation at
 configure-time, <code/dvi2bitmap> should generate missing fonts in
 future, and place them in this same directory.
+
+<p>XXX describe <code>&ddash;with-fontfinder</code> option.
 
 <p>How do you build that first font?  Try running <code/dvi2bitmap> on
 a simple DVI file, with the options <code/-n -Qg>: that makes
@@ -932,6 +1031,32 @@ build the software the Starlink way, using the <code/mk> script (see
 script is really just a driver for the Makefile within the tar file,
 you should get the same results both ways.
 
+<subsubsect id=usage.fonts.template>Font-string templates
+
+<p>The search-path and font-finder routes use font-string templates.
+Here, the components of a font file name, or a font-finding command,
+are specified using placeholders like <code>%f</code>.  You may use
+<tabular>
+<tgroup cols=2>
+<tbody>
+<row><entry><code>%M</code><entry>mode (eg. ibmvga)
+<row><entry><code>%f</code><entry>font name (eg. cmr10)
+<row><entry><code>%d</code><entry>dpi (eg. 330)
+<row><entry><code>%b</code><entry>base dpi (eg. 110)
+<row><entry><code>%m</code><entry>magnification (eg. 3)
+<row><entry><code>%%</code><entry>%
+</tbody>
+</tabular>
+Thus, using these values as an example, if one of the entries in
+<code>DVI2BITMAP_PK_PATH</code> were 
+<code type=fspath>/var/tmp/%M/%f.%dpk</code>, this would expand into
+<code type=fspath>/var/tmp/ibmvga/cmr10.330pk</code>.  Alternatively,
+if we had given the font-finder script as 
+<code>/usr/local/teTeX/bin/kpsewhich pk %f.%dpk</code>, the
+<code/dvi2bitmap> would have executed the command <code>.../kpsewhich
+pk cmr10.330pk</code>, which would have returned with a suitable font path.
+
+
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
   Added instructions on configuring in support for the kpathsea
@@ -1027,7 +1152,7 @@ do so using the MetaFont mode <code/ibmvga>, which has a resolution of
 <p>You can give an argument to this command, which specifies a
 command-line which will build and install a required font, and return
 its path on standard output.  This uses the font-string template
-described in <ref id=usage.fonts.finding/>.  You could duplicate the
+described in <ref id=usage.fonts.template/>.  You could duplicate the
 default (the <code/mktexpk> script if present) with the option
 <verbatim>
 --enable-fontgen='&lt;path>mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f'
@@ -1078,7 +1203,7 @@ options to the compiled program (<ref id=usage.options/>).
 to use the <code/kpathsea> library if possible, but if this is
 difficult, then you can specify a script to run to find fonts.  This
 uses the font-string template described in <ref
-id=usage.fonts.finding/>.  To use the standard <code/kpsewhich>
+id=usage.fonts.template/>.  To use the standard <code/kpsewhich>
 command, for example, you could give the option
 <verbatim>
 --with-fontfinder='/usr/local/teTeX/bin/kpsewhich pk %f.%dpk'
@@ -1290,6 +1415,10 @@ have enabled.
 <ul>
 <li>There are an <em/awful> lot of options, aren't there.
 <li>Support PBM graphics.
+<li>I'd like to turn the whole thing into a shareable library,
+and document the API properly.  This would allow more interesting uses
+of the functionality this provides.  However, I'm scared of
+<code>libtool</code>: any brave souls out there?
 <li>Ermmm, any suggestions?
 
 </ul>
