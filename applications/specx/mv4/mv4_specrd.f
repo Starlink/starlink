@@ -30,6 +30,7 @@
 *  Authors:
 *     rp: Rachael Padman (UCB, MRAO)
 *     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -37,6 +38,11 @@
 *        Original version.
 *     31 Aug 1994 (hme):
 *        NDF/HDS-based sparse cube.
+*     10 June 2003 (timj):
+*        Compare index number to number of spectra in map
+*        and reject if the index is too high. This was added
+*        because some people have maps where NSPEC is not equal
+*        to the number of spectra in the map itself!
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +119,16 @@
       REAL MEMCUB( NPTS1, MSTEP, NSTEP )
 
       INTEGER K
+
+*     Sanity check to make sure we do not have a reference in the
+*     LUT that exceeds the actual number of spectra.
+*     Note that this can not check the case where NSPEC itself
+*     is greater than the number of spectra in the file.
+      IF ( IDXNUM .GT. NSPEC ) THEN
+         PRINT *,'Request for spectrum #',IDXNUM,
+     +        ' but map only contains ',NSPEC,' spectra'
+         RETURN
+      END IF
 
       DO 2 K = 1, NPTS1
          IF ( FILDAT(K, IDXNUM) .EQ. VAL__BADR ) THEN
