@@ -1775,16 +1775,15 @@
 
 *  Create components with dimensions calculated
       IF ( USE_DATA ) THEN
-        CALL BDI_MAPR( OFID, 'Data', 'WRITE', PTR_DATA, STATUS )
-        CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_DATA), STATUS )
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', PTR_DATA, STATUS )
       END IF
       IF ( USE_VAR ) THEN
         IF ( ERROR_TO_VAR ) THEN
-          CALL BDI_MAPR( OFID, 'Error', 'WRITE', PTR_VAR, STATUS )
+          CALL BDI_MAPR( OFID, 'Error', 'WRITE/ZERO', PTR_VAR, STATUS )
         ELSE
-          CALL BDI_MAPR( OFID, 'Variance', 'WRITE', PTR_VAR, STATUS )
+          CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', PTR_VAR,
+     :                   STATUS )
         END IF
-        CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_VAR), STATUS )
       END IF
 
 *  QUALITY descriptor present?
@@ -1808,10 +1807,10 @@
       END IF
 
       IF ( USE_LOERR ) THEN
-        CALL BDI_MAPR( OFID, 'LoError', 'WRITE', PTR_LOERR, STATUS )
-        CALL BDI_MAPR( OFID, 'HiError', 'WRITE', PTR_UPERR, STATUS )
-        CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_LOERR), STATUS )
-        CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_UPERR), STATUS )
+        CALL BDI_MAPR( OFID, 'LoError', 'WRITE/ZERO', PTR_LOERR,
+     :                 STATUS )
+        CALL BDI_MAPR( OFID, 'HiError', 'WRITE/ZERO', PTR_UPERR,
+     :                 STATUS )
       END IF
 
 *  Check case where no axis data
