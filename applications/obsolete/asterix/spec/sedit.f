@@ -167,7 +167,7 @@
      :                                                  9, 1, STATUS )
         CALL TSM_REFRESH( W_STATUS, STATUS )
       ELSE
-        CALL DISP_FILENAM( FLOC, 'Model', STATUS )
+        CALL DISP_FILENAM( FID, 'Model', STATUS )
       END IF
 
 *    History file entry :

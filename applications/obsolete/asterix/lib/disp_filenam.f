@@ -1,5 +1,5 @@
 *+  DISP_FILENAM - Displays filename on terminal for user info
-      SUBROUTINE DISP_FILENAM(XLOC,STRNG,STATUS)
+      SUBROUTINE DISP_FILENAM( FID,STRNG,STATUS)
 *    Description :
 *     Performs HDS_TRACE on object with locator XLOC and writes results
 *     to terminal. STRNG is a descriptive string to preface the filename,
@@ -17,11 +17,9 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
-      CHARACTER*(DAT__SZLOC) XLOC      ! Locator to container file
-      CHARACTER*(*)           STRNG    ! Nature of object (eg Input, Output)
+      INTEGER			FID			! Dataset id
+      CHARACTER*(*)           	STRNG    ! Nature of object (eg Input, Output)
 *    Import-Export :
 *    Export :
 *    Status :
@@ -32,8 +30,6 @@
       CHARACTER*200          PATH      ! Path name of object within
                                        ! the container file.
       INTEGER                LEVELS    ! # levels in input
-*    Internal References :
-*    Local data :
 *-
 
 * Status check
@@ -42,7 +38,7 @@
 * Display details of file to user
 
 *   First get container file...
-      CALL HDS_TRACE( XLOC, LEVELS, PATH, FILE, STATUS )
+      CALL ADI_FTRACE( FID, LEVELS, PATH, FILE, STATUS )
       CALL MSG_SETC('STRNG',STRNG)
       CALL MSG_SETC('FILE',FILE)
       CALL MSG_PRNT( '^STRNG file :- ^FILE' )
@@ -55,7 +51,7 @@
 
 * Report error
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( 'EXERR', 'from DISP_FILENAM', STATUS )
+        CALL AST_REXIT( 'DISP_FILENAM', STATUS )
       END IF
 
       END
