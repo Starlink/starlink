@@ -145,7 +145,7 @@
       EXTERNAL			MATH_EXPD
         DOUBLE PRECISION	MATH_EXPD
       EXTERNAL			MATH_EXPR
-        DOUBLE PRECISION	MATH_EXPR
+        REAL			MATH_EXPR
 
 *  Local Constants:
       REAL                     	A1, A2, A3              ! Relative contributions
