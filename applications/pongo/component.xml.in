@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/pongo</path>
+  <description>PONGO - a suite of commands for interactively plotting data stored in text files</description>
+  <abstract><p>
+PONGO is a set of commands for interactively plotting data stored
+in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
+package. 
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Paul Harrison</name>
+    </person>
+    <person>
+      <name>Paul Rees</name>
+    </person>
+    <person>
+      <uname>pwd</uname>
+      <name>Peter W. Draper</name>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+    <person>
+      <uname>aa</uname>
+      <name>Alasdair Allan</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
