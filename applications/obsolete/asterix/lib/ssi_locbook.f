@@ -37,7 +37,7 @@
 *
 *    Local variables :
 *
-      INTEGER ID
+      INTEGER ID,BID
 *-
 
       IF(STATUS.EQ.SAI__OK) THEN
