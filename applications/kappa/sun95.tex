@@ -15212,6 +15212,84 @@ default value.
       }
    }
 }
+
+\sstroutine{
+   COPYBAD
+}{
+   Copies bad pixels from one NDF file to another
+}{
+   \sstdescription{
+      This application copies bad pixels from one NDF file to another. It
+      takes in two NDFs (parameters IN and REF), and creates a third
+      (parameter OUT) which is a copy of IN, except that any pixel which
+      is set bad in the DATA array of REF, is also set bad in the DATA
+      and VARIANCE (if available) arrays in OUT.
+   }
+   \sstusage{
+      copybad in ref out title
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         NDF containing the data to be copied to OUT.
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         NDF containing the bad pixels to be copied to OUT.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         copybad in=a ref=b out=c title={\tt "}New image{\tt "}
+      }{
+         This creates a NDF called c, which is a copy of the NDF called a.
+         Any bad pixels present in the NDF called b are copied into the
+         corresponding positions in c (non-bad pixels in b are ignored).
+         The title of c is {\tt "}New image{\tt "}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the two input NDFs have different pixel-index bounds, then
+         they will be trimmed to match before being processed.  An error
+         will result if they have no pixels in common.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: SUBSTITUTE, NOMAGIC, FILLBAD, PASTE, GLITCH.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the WCS, AXIS, DATA, QUALITY,
+         LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
+         structure and propagates all extensions.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
+
 \manroutine {{\manheadstyle{CREFRAME}}}{ Generates a test 2-d data array from a
   selection of several types.}
 \begin{manroutinedescription}
@@ -15320,83 +15398,6 @@ default value.
   Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
 \end{manroutinedescription}
 
-\sstroutine{
-   COPYBAD
-}{
-   Copies bad pixels from one NDF file to another
-}{
-   \sstdescription{
-      This application copies bad pixels from one NDF file to another. It
-      takes in two NDFs (parameters IN and REF), and creates a third
-      (parameter OUT) which is a copy of IN, except that any pixel which
-      is set bad in the DATA array of REF, is also set bad in the DATA
-      and VARIANCE (if available) arrays in OUT.
-   }
-   \sstusage{
-      copybad in ref out title
-   }
-   \sstparameters{
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         NDF containing the data to be copied to OUT.
-      }
-      \sstsubsection{
-         REF = NDF (Read)
-      }{
-         NDF containing the bad pixels to be copied to OUT.
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         The output NDF.
-      }
-      \sstsubsection{
-         TITLE = LITERAL (Read)
-      }{
-         Value for the title of the output NDF.  A null value will cause
-         the title of the NDF supplied for parameter IN to be used
-         instead. {\tt [!]}
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         copybad in=a ref=b out=c title={\tt "}New image{\tt "}
-      }{
-         This creates a NDF called c, which is a copy of the NDF called a.
-         Any bad pixels present in the NDF called b are copied into the
-         corresponding positions in c (non-bad pixels in b are ignored).
-         The title of c is {\tt "}New image{\tt "}.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If the two input NDFs have different pixel-index bounds, then
-         they will be trimmed to match before being processed.  An error
-         will result if they have no pixels in common.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: SUBSTITUTE, NOMAGIC, FILLBAD, PASTE, GLITCH.
-   }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         This routine correctly processes the WCS, AXIS, DATA, QUALITY,
-         LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
-         structure and propagates all extensions.
-
-         \sstitem
-         All non-complex numeric data types can be handled.
-      }
-   }
-}
- 
 \sstroutine{
    CRELUT
 }{
@@ -23867,7 +23868,7 @@ plot (6k).
          is {\tt TRUE}, then the bounds of the new plot are set equal to
          the bounds of the existing plot (on both axes), and parameters
          XLEFT, XRIGHT, YBOT and YTOP are ignored. This parameter is only
-         accessed if parameter CLEAR is {\tt TRUE}, and if there is another line
+         accessed if parameter CLEAR is {\tt FALSE}, and if there is another line
          plot within the current picture. The dynamic default is to align
          the plots if the labels on the horizontal axes are the same, and
          not to align the plots if the labels are different. {\tt []}
