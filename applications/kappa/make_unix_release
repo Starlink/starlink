@@ -36,16 +36,6 @@
       cd ${REL_DIR}
       echo "Moved to $PWD"
 
-#  See if the hypertext documents are to be re-created.
-#      echo -n "Re-create kappa.htx? (y/n): "
-#      set ans = $<
-#      if( $ans == "y" ) then
-#         star2html sun95.tex
-#         tar -cvhf ./sun95.htx_tar sun95.htx/*
-#         rm -rf sun95.htx
-#         mv ./sun95.htx_tar ${KAPPA_DEV}/..
-#      endif
-
 #  Expand any generic source files.
       foreach file (`grp generic_sources`)
          echo "Expanding generic source file $file"
@@ -67,11 +57,7 @@
 #  process groups of NDFs).
       set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
       if( "$n" != "" ) then
-         echo "The following files contain references to NDF parameter routines or"
-         echo "to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines??"
-         echo $n
-         echo -n "Continue? (Y/N): "
-         set ans = $<
+         set ans = `confirm "The following files contain references to NDF parameter routines or to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines?\n$n"`
          if( "$ans" == "n" || "$ans" == "N" ) then
             exit
          endif
@@ -170,12 +156,7 @@ FOO4
       rm kapiraf 
 
 #  Ask the user to execute the script on sa1. Why wont rsh do this?
-      echo " "
-      echo " "
-      echo "  Now log into sa1 and do 'source kapiraf'"
-      echo " "
-      echo -n "Press RETURN to continue ..."
-      set ans = $<
+      alert "\n  Now log into sa1 and do 'source kapiraf'\nPress OK to continue ..."
 
 #  Now FTP the helpdb.mip file back from sa1.
       ftp -v sa1 << FOO5
