@@ -226,7 +226,7 @@ ADIobj lstx_append( ADIobj lst1, ADIobj lst2, ADIstatus status )
  */
 void lstx_sperase( ADIobj *list, ADIstatus status )
   {
-  ADIobj curp = list;
+  ADIobj curp = *list;
 
   while ( _valid_q(curp) ) {
     _CAR(curp) = ADI__nullid;
@@ -238,7 +238,7 @@ void lstx_sperase( ADIobj *list, ADIstatus status )
 
 void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
   {
-  ADIobj curp  = *list;
+  ADIobj curp = list;
   ADIobj *ipoint = list;
   ADIobj	test = -1;
 
