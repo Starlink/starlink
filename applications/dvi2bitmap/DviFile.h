@@ -90,7 +90,7 @@ public:
      * @return the previous verbosity level
      */
     static verbosities verbosity (const verbosities level) {
-	enum verbosities oldv;
+	enum verbosities oldv = verbosity_;
 	verbosity_ = level;
 	return oldv;
     }
