@@ -88,7 +88,7 @@
 *     K.F.Hartley ( RGVAD::KFH )
 *     A.P.Horsfield ( RGVAD::KFH )
 *     S.Chan ( RGVAD::KFH )
-*     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
+*     Malcolm Currie  STARLINK (RAL::CUR)
 *
 *    History :
 *
@@ -101,11 +101,14 @@
 *                  removed PAR calls - parameters now supplied as 
 *                  arguments; removed tabs; relocated 'local' variables
 *                  to import etc.; corrected error-handling and tidied
-*                  (RL.STAR::CUR).
-*     1988 Jun 22: Added identification to error reporting
-*                   (RL.STAR::CUR).
+*                  (RAL::CUR).
+*     1988 Jun 22: Added identification to error reporting (RAL::CUR).
 *     1989 Aug  7: Passed array dimensions as separate variables
-*                  (RL.STAR::CUR).
+*                  (RAL::CUR).
+*     1990 Apr  7: Constrained the fit to lie in the defined bounds so
+*                  that evaluating the root of the quadratic equation
+*                  does not result in an undefined value, and improved
+*                  the commentary (RAL::CUR).
 *
 *    Type Definitions :
 
@@ -392,22 +395,33 @@
 
       C0 = POLCO( 0 )
 
+*    Even distribution.
+
       IF ( SHADE .EQ. 0.0 ) THEN
 
 *       Assign colours to the pens in such a way that they are
 *       used in equal amounts in the displayed image.
 
          DO  I = 0, NINTS-1, 1
- 
+
+*          Constrain the fit beyond the 2- and 96-per-cent limits.
+
             IF ( I .LT. LOWER ) THEN
                TEMP = 0.0D0
             ELSEIF ( I .GT. UPPER ) THEN
                TEMP = 1.0D0 - C0
             ELSE
+
+*             Evaluate the polynomial fit to the normalised cumulative
+*             histogram, allowing for the offset.
+
                TEMP = ( POLCO( 0 ) + XI * ( POLCO( 1 ) + XI *
      :                ( POLCO( 2 ) + XI * ( POLCO( 3 ) + XI *
      :                ( POLCO( 4 ) + XI * ( POLCO( 5 ) + XI *
      :                ( POLCO( 6 ) ) ) ) ) ) ) ) - C0
+
+*             Move to the next data value.
+
                XI = XI + STEP
             END IF
 
@@ -424,17 +438,34 @@
 
          DO  I = 0, NINTS - 1, 1
   
+*          Constrain the fit beyond the 2- and 96-per-cent limits.
+
             IF ( I .LT. LOWER ) THEN
                TEMP = 0.0D0
             ELSEIF ( I .GT. UPPER ) THEN
                TEMP = 1.0D0 - C0
             ELSE
+
+*             Evaluate the polynomial fit to the normalised cumulative
+*             histogram, allowing for the offset.
+
                TEMP = ( POLCO( 0 ) + XI * ( POLCO( 1 ) + XI * 
      :                ( POLCO( 2 ) + XI * ( POLCO( 3 ) + XI * 
      :                ( POLCO( 4 ) + XI * ( POLCO( 5 ) + XI * 
      :                ( POLCO( 6 ) ) ) ) ) ) ) ) - C0
+
+*             Ensure that the fitted value lies in the physical region.
+
+               TEMP = MIN( MAX ( 0.0D0, TEMP ), 1.0D0 - C0 )
+ 
+*             Move to the next data value.
+
                XI = XI + STEP
             END IF
+
+*          Solve the quadratic equation that arises from integrating
+*          the required cumulative histogram form, as given by the
+*          linear equation SHADE * PEN + C0 - SHADE/2.
 
             PENS( I ) = MIN( MAX( INT( REAL( NINTS ) * ( -A/SHADE
      :                  + SQRT( A * A + 2.0D0 * SHADE * TEMP ) /
@@ -446,4 +477,3 @@
  999  CONTINUE
 
       END
-
