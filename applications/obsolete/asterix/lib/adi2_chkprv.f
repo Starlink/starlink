@@ -102,6 +102,7 @@
       INTEGER			IHDU			! Loop over HDUs
       INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU count
+      INTEGER			NKEY			! Keyword count
       INTEGER			OHID			! Old HDU object
 
       LOGICAL			CREATED			! HDU already created?
@@ -154,6 +155,13 @@
               END IF
               CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
               CALL ADI_CPUT0L( OHID, '.CREATED', .TRUE., STATUS )
+
+*          Reserve some keyword space too
+              CALL ADI_NCMP( OHID, NKEY, STATUS )
+              IF ( NKEY .GT. 0 ) THEN
+                CALL FTHDEF( LUN, NKEY, STATUS )
+              END IF
+
             END IF
 
 *        There is no definition, however, so create a default one
