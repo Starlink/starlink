@@ -65,9 +65,9 @@
 *     KAPPA: COMPADD, COMPAVE, COMPICK.
 
 *  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
-*     data structure and propagates all extensions. 
+*     -  This routine processes the WCS, AXIS, DATA, QUALITY, VARIANCE, 
+*     LABEL, TITLE, UNITS, and HISTORY, components of an NDF data structure 
+*     and propagates all extensions. 
 *     -  The AXIS centre, width and variance values in the output are
 *     formed by duplicating the corresponding input AXIS values. 
 *     -  All non-complex numeric data types can be handled.
@@ -87,6 +87,9 @@
 *     16-JUL-1999 (TDCA):
 *        Expansion now takes place around point (0,0) in pixel
 *        co-ordinates in order, so origin information is not lost.
+*     27-SEP-2001 (DSB):
+*        Corrected bugs in the choice of pixel origin, so that origin
+*        information is not lost.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -155,8 +158,13 @@
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*  Inquire the dimensions of the NDF.
-      CALL NDF_DIM( NDFI, NDF__MXDIM, IDIMS, NDIM, STATUS )
+*  Inquire the bounds of the NDF.
+      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
+
+*  Store the dimensions of th einput NDF.
+      DO I = 1, NDIM
+         IDIMS ( I ) = UBNDI( I ) - LBNDI( I ) + 1    
+      END DO
 
 *  Obtain the expansion factors.
 *  =============================
@@ -216,11 +224,12 @@
 
 *  Work out the size of the output array from the input array
 *  dimensions and the expansion factor.  Also derive bounds for the
-*  output array.  These are somewhat arbitrary.
+*  output array.  These retain origin information by imagining the
+*  expansion takes place about the origin of pixel coordinates.
       DO I = 1, NDIM
          ODIMS( I ) = IDIMS( I ) * EXPAND( I )
-         LBNDO( I ) = 1
-         UBNDO( I ) = ODIMS( I )
+         LBNDO( I ) = ( LBNDI( I ) - 1 )* EXPAND( I ) + 1
+         UBNDO( I ) = LBNDO( I ) + ODIMS( I ) - 1
       END DO
 
 *  Report the new dimensions.
@@ -579,8 +588,6 @@
          MATRIX( I ) = 0.0
       END DO
 
-      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
-
       DO I = 1, NDIM
          OFFSET( I ) = DBLE( LBNDO( I ) - 1 ) - EXPAND( I )*
      :                 DBLE( LBNDI( I ) - 1 )
@@ -589,14 +596,6 @@
 
 *  Propagate the WCS component.
       CALL KPG1_ASPRP( NDIM, NDFI, NDFO, MATRIX, OFFSET, STATUS )
-
-*  Calculate required shift to ensure expansion is around point
-*  (0,0) in pixel co-ordinates, and apply it to the output NDF.
-      DO I = 1, NDIM
-         ISHIFT( I ) = LBNDI( I ) * EXPAND( I )
-      ENDDO
-
-      CALL NDF_SHIFT( NDIM, ISHIFT, NDFO, STATUS )
 
 *  Come here if something has gone wrong.
   999 CONTINUE
