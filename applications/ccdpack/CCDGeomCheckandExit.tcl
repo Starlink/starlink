@@ -30,6 +30,7 @@ proc CCDGeomCheckandExit {} {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -37,6 +38,8 @@ proc CCDGeomCheckandExit {} {
 #     	 Original version.
 #     16-APR-1997 (PDRAPER):
 #        Added traps for bias strip extents set to 0.
+#     4-JUL-2001 (MBT):
+#        Upgraded for use with Sets.
 #     {enter_further_changes_here}
 
 #-
@@ -44,6 +47,7 @@ proc CCDGeomCheckandExit {} {
 #  Global variables.
    global BBOX
    global CCDglobalpars
+   global CCDgloprefix
 #.
 
 #  Check that BBOX exists.
@@ -76,7 +80,7 @@ proc CCDGeomCheckandExit {} {
             CCDIssueInfo \
                "Warning: useful CCD area extends outside of the image"
          }
-         set CCDglobalpars(EXTENT) "$exmin,$exmax,$eymin,$eymax"
+         set CCDglobalpars(${CCDgloprefix}EXTENT) "$exmin,$exmax,$eymin,$eymax"
       }
 
 #  Start to check bias strips.
@@ -163,17 +167,18 @@ proc CCDGeomCheckandExit {} {
 #  What is the readout direction?
             if { $b1aspect < 1 } {
                set direction X
-               set CCDglobalpars(DIRECTION) X
+               set CCDglobalpars(${CCDgloprefix}DIRECTION) X
 
 #  Find the maximum and minimum to check against image size.
                if { $havebias2 } {
                   set max [CCDMax $b1x1 $b1x2 $b2x1 $b2x2]
                   set min [CCDMin $b1x1 $b1x2 $b2x1 $b2x2]
-                  set CCDglobalpars(BOUNDS) "$b1x1,$b1x2,$b2x1,$b2x2"
+                  set CCDglobalpars(${CCDgloprefix}BOUNDS) \
+                      "$b1x1,$b1x2,$b2x1,$b2x2"
                } else {
                   set max [CCDMax $b1x1 $b1x2]
                   set min [CCDMin $b1x1 $b1x2]
-                  set CCDglobalpars(BOUNDS) "$b1x1,$b1x2"
+                  set CCDglobalpars(${CCDgloprefix}BOUNDS) "$b1x1,$b1x2"
                }
 
 #  Compare these with image. Allow failure as software will cope
@@ -185,15 +190,16 @@ proc CCDGeomCheckandExit {} {
                }
             } else {
                set direction Y
-               set CCDglobalpars(DIRECTION) Y
+               set CCDglobalpars(${CCDgloprefix}DIRECTION) Y
                if { $havebias2 } {
                   set max [CCDMax $b1y1 $b1y2 $b2y1 $b2y2]
                   set min [CCDMin $b1y1 $b1y2 $b2y1 $b2y2]
-                  set CCDglobalpars(BOUNDS) "$b1y1,$b1y2,$b2y1,$b2y2"
+                  set CCDglobalpars(${CCDgloprefix}BOUNDS) \
+                      "$b1y1,$b1y2,$b2y1,$b2y2"
                } else {
                   set max [CCDMax $b1y1 $b1y2]
                   set min [CCDMin $b1y1 $b1y2]
-                  set CCDglobalpars(BOUNDS) "$b1y1,$b1y2"
+                  set CCDglobalpars(${CCDgloprefix}BOUNDS) "$b1y1,$b1y2"
                }
 
 #  Compare these with image. Allow failure as software will cope
