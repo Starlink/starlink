@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 ##  EXTRACTOR is a little different in that it uses two pre-existing
-##  directories (which are automake/autoconfed using the SExtractor 
+##  directories (which are automake/autoconfed using the SExtractor
 ##  methodology). These do most of the work, this is just a wrapper
 ##  for extracting the parts needed and building the EXTRACTOR atask
 ##  and finally installing.
@@ -18,7 +18,7 @@ libfits_a_SOURCES =
 extractor_SOURCES =
 sex_SOURCES =
 
-## Require the extractor library and sex binary to be built sources. 
+## Require the extractor library and sex binary to be built sources.
 ## These are actually created in sub-directories, so we need a target to get
 ## them into the local dependencies.
 
@@ -43,7 +43,7 @@ dist_pkgdata_DATA = \
 ## Local rules for building the (pre-configured) sub-directories and
 ## extracting the required products. When developing you need to use the
 ## makefiles in the sub-directories and return to this level to complete the
-## build. 
+## build.
 
 #  EXTRACTOR needs the libextractor.a and libfits.a libraries.
 
@@ -82,16 +82,29 @@ distclean-local:
 
 ##  Link the main extractor program as an atask. Note this isn't a monolith so
 ##  we cannot use the MONOLITH builtin rules.
-extractor: extract
+extractor: libextractor.a libfits.a
 	@ALINK@ extractor.o -o extractor libextractor.a libfits.a \
 		$(ADDLIBS) `ndf_link_adam`
 
-extractor.ifl:
+extractor.ifl: extract/src/extractor.ifl
 	cp -p extract/src/extractor.ifl .
 
-extractor.icl:
+extractor.icl: extract/src/extractor.icl
 	cp -p extract/src/extractor.icl .
 
 #  Rule IFL to IFC compilation.
 .ifl.ifc:
 	@COMPIFL@ $<
+
+## Clean up extra generated files.
+MAINTAINERCLEANFILES = extractor.icl extractor.ifl extractor.ifc
+
+##  Need all the source code in the sub-directories.
+EXTRA_DIST = extract sextractor extractor.csh extractor.news
+
+##  Before distributing subdirectories we need to clean then up (we get all
+##  the files in these directories). Also remove the CVS trace.
+dist-hook:
+	rm -rf `find $(distdir) -name CVS`
+	(cd $(distdir)/extract; make distclean);
+	(cd $(distdir)/sextractor; make distclean);
