@@ -96,6 +96,10 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			CHR_LEN
+	INTEGER			CHR_LEN
+
 *  Local Variables:
       CHARACTER*8		HDU			! HDU name
       CHARACTER*20		HDUTYPE			! HDU type
@@ -136,7 +140,7 @@
           WRITE( STR, '(A,I1.1)' ) '.HDU_', IHDU
           CALL ADI_CGET0C( FID, STR, HDU, STATUS )
         END IF
-        CALL ADI2_LOCHDU( FID, HDU, OHID, STATUS )
+        CALL ADI2_LOCHDU( FID, HDU(:max(1,CHR_LEN(HDU))), OHID, STATUS )
 
 *    Is the definition incomplete?
         CALL ADI_CGET0L( OHID, '.DEF_END', DEFEND, STATUS )
@@ -173,14 +177,23 @@
 
 *          Reserve some keyword space too
               CALL ADI_NCMP( OHID, NKEY, STATUS )
-              IF ( NKEY .GT. 0 ) THEN
-                CALL FTHDEF( LUN, NKEY, STATUS )
-              END IF
+
+            ELSE
+              NKEY = 0
 
             END IF
 
 *        There is no definition, however, so create a default one
             CALL FTPHPR( LUN, .TRUE., 8, 0, 0, 0, 1, .TRUE., FSTAT )
+
+*        Reserve keyword space?
+            IF ( NKEY .GT. 0 ) THEN
+              CALL FTHDEF( LUN, NKEY, FSTAT )
+            END IF
+	    CALL FTRDEF( LUN, FSTAT )
+            IF ( FSTAT .NE. 0 ) THEN
+              CALL ADI2_FITERP( FSTAT, STATUS )
+            END IF
 
 *        Mark as defined
             CALL ADI_CPUT0L( OHID, '.DEF_END', .TRUE., STATUS )
