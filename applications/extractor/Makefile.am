@@ -8,14 +8,18 @@
 
 bin_SCRIPTS = extractor.csh extractor.icl extractor.ifc
 
-bin_PROGRAMS = extractor sex
+bin_MONOLITHS = extractor
+extractor_SOURCES = extract/src/extractor.c
+extractor_TASKS =
+extractor_LDADD = $(LDADD) libextractor.a libfits.a `ndf_link_adam`
+
+bin_PROGRAMS = sex
 
 noinst_LIBRARIES = libextractor.a libfits.a
 
 ##  There are no local sources for these libraries and programs.
 libextractor_a_SOURCES =
 libfits_a_SOURCES =
-extractor_SOURCES =
 sex_SOURCES =
 
 ## Require the extractor library and sex binary to be built sources.
@@ -81,12 +85,6 @@ clean-local:
 distclean-local:
 	(cd extract; make distclean )
 	(cd sextractor; make distclean )
-
-##  Link the main extractor program as an atask. Note this isn't a monolith so
-##  we cannot use the MONOLITH builtin rules.
-extractor: libextractor.a libfits.a
-	@ALINK@ extractor.o -o extractor libextractor.a libfits.a \
-		$(ADDLIBS) `ndf_link_adam`
 
 extractor.ifl: extract/src/extractor.ifl
 	cp -p extract/src/extractor.ifl .
