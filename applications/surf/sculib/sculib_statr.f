@@ -126,8 +126,10 @@
 *     Find Standard deviation and mean and median if there is some good data
       IF (NGOOD .GT. 0) THEN
 
-*     Sort good data (with Kappa routine)
-         CALL KPG1_QSRTR(N_POS, 1, NGOOD, QSORT, STATUS)
+*     Sort good data into ascending order (with PDA routine)
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL PDA_QSAR(N_POS, QSORT)
+         END IF
 
 *     Median
          MIDPOINT = NGOOD / 2
