@@ -1,0 +1,14 @@
+interface ILOAD1D
+  parameter INP
+    position 1
+    type 'LITERAL'
+    prompt '1D data'
+    help 'Name of data file'
+  endparameter
+  parameter GCB
+    type '_LOGICAL'
+    default N
+    prompt 'Load Graphics Control Block'
+    help 'Load Grafix Control Block from file - or clear if none there'
+  endparameter
+endinterface
