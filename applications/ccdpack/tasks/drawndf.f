@@ -225,6 +225,9 @@
 *  History:
 *     22-DEC-2000 (MBT):
 *        Original version.
+*     29-JAN-2001 (MBT):
+*        Modified so that it writes the whole frameset from each NDF into
+*        the AGI database, not just the GRID frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -272,11 +275,16 @@
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
       INTEGER JCOM               ! Index of common frame in global FSET
+      INTEGER JBAS               ! Index of Base frame in frameset
+      INTEGER JCUR               ! Index of Current frame in frameset
+      INTEGER JGRID( CCD1__MXNDF ) ! Relative frame indices of Grid-like frames
       INTEGER LBGCOL             ! Label text background colour
       INTEGER LMGID              ! Labelling mode option GRP identifier
       INTEGER LOCOL              ! Lowest colour index available
       INTEGER LW                 ! Normal plotting line width
       INTEGER MAP                ! AST identifier for a mapping
+      INTEGER MAPICK             ! AST identifier for picked frames mapping
+      INTEGER MAPU               ! AST identifier for unit mapping
       INTEGER MLW                ! Line width for drawing origin dot
       INTEGER NAXES              ! Number of axes (dimensions) in a frame
       INTEGER NDIM               ! Number of returned dimensions
@@ -405,7 +413,7 @@
 *  Get label orientation option.
          CALL PAR_GET0L( 'LABUP', LABUP, STATUS )
 
-*  Get and the label positioning option.  If LABUP is TRUE,
+*  Get the label positioning option.  If LABUP is TRUE,
 *  then just use positioning of 'CC' unless the parameter has been
 *  explicitly supplied on the command line.
          IF ( LABUP ) THEN 
@@ -474,6 +482,10 @@
 *  as the common frame.
       JCOM = AST_GETI( FSET, 'Base', STATUS )
 
+*  Create a UnitMap suitable for gluing similar frames to this one.
+      MAPU = AST_UNITMAP( AST_GETI( FSET, 'Naxes', STATUS ), ' ',
+     :                    STATUS )
+
 *  Prepare for summary output to the user.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       BUFFER = ' '
@@ -510,10 +522,8 @@
             GO TO 99
          END IF
 
-*  Get the Base (GRID-domain) frame of the NDF, and the mapping into it
-*  from the Current (common) coordinate system.
+*  Get the Base (GRID-domain) frame of the NDF.
          FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-         MAP = AST_GETMAPPING( IWCS, AST__CURRENT, AST__BASE, STATUS )
 
 *  Check it has the right number of dimensions.  If it has too few, 
 *  then bail out.  If it has too many, then generate a new frame and
@@ -531,7 +541,12 @@
             CALL MSG_SETI( 'IG', NAXES - 2 )
             CALL CCD1_MSG( ' ', '  Warning: Ignoring ^IG axes in NDF '
      :                  // '^NDF', STATUS )
-            FRM = AST_PICKAXES( FRM, 2, PAXES, MAP, STATUS )
+            FRM = AST_PICKAXES( FRM, 2, PAXES, MAPICK, STATUS )
+            JCUR = AST_GETI( IWCS, 'Current', STATUS )
+            CALL AST_ADDFRAME( IWCS, AST__BASE, MAPICK, FRM, STATUS )
+            CALL AST_SETI( IWCS, 'Base', AST_GETI( IWCS, 'Current', 
+     :                                             STATUS ), STATUS )
+            CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
          END IF
 
 *  Get the NDF extent in its Base (GRID-domain) frame.
@@ -549,16 +564,15 @@
          BUFFER( 40: ) = DMN
          CALL CCD1_MSG( ' ', BUFFER( 1:CHR_LEN( BUFFER ) ), STATUS )
 
-*  Change the Domain of the Base frame; this doesn't make any difference
-*  to this application (this time round), but the resulting global
-*  frameset will get written into the AGI database, where having a 
-*  lot of frames all called GRID is unlikely to be a good thing.
-         CALL AST_SETC( FRM, 'Domain', 'CCD_GRID-' // NDFNAM, STATUS )
+*  Work out where the GRID-domain frame will be in relation to the
+*  common frame when it is added to the global frameset.
+         JBAS = AST_GETI( IWCS, 'Base', STATUS )
+         JCUR = AST_GETI( FSET, 'Current', STATUS )
+         JGRID( I ) = JCUR + JBAS - JCOM
 
-*  Add the Base (GRID-domain) frame of the NDF to the global frameset,
-*  using the correct mapping from the common coordinate system.
-*  Note the index of this frame within the frameset will be JCOM + I.
-         CALL AST_ADDFRAME( FSET, JCOM, MAP, FRM, STATUS )
+*  Add the new frameset into the global one.  It will have a unit 
+*  mapping from its Current frame to the common frame.
+         CALL AST_ADDFRAME( FSET, JCOM, MAPU, IWCS, STATUS )
 
 *  Release the NDF.
          CALL NDF_ANNUL( INDF, STATUS )
@@ -619,7 +633,8 @@ c        CALL PGSCLP( 0 )
 
 *  Find a bounding box which will contain the data array of this NDF in 
 *  the common frame.
-            MAP = AST_GETMAPPING( FSET, JCOM + I, JCOM, STATUS )
+            MAP = AST_GETMAPPING( FSET, JCOM + JGRID( I ), JCOM,
+     :                            STATUS )
             GUBND( 1 ) = DBLE( DIMS( 1, I ) ) + 0.5D0
             GUBND( 2 ) = DBLE( DIMS( 2, I ) ) + 0.5D0
             DO J = 1, 2
@@ -763,7 +778,7 @@ c        CALL PGSCLP( 0 )
 
 *  Set the Current frame of the Plot object to the GRID-like coordinate 
 *  system of this NDF.
-         CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
+         CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
 
 *  Plot a marker at the origin of each outline.
          IF ( LABDOT ) THEN
@@ -800,7 +815,7 @@ c        CALL PGSCLP( 0 )
 
 *  Set the Current frame of the Plot object to the GRID-like coordinate 
 *  system of this NDF.
-            CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
+            CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
 
 *  Set the near, centre, and far edge grid coordinates.
             XN = 0.5D0
@@ -910,7 +925,7 @@ c        CALL PGSCLP( 0 )
             CALL PGSTBG( LBGCOL )
             CALL AST_SETI( PLOT, 'Current', AST__BASE, STATUS )
             CALL AST_TEXT( PLOT, BUFFER( :BL ), TPOS, UP, JUST, STATUS )
-            CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
+            CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
             CALL PGSTBG( BGCOL )
          END DO
       END IF
