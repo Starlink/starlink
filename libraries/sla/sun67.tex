@@ -6,12 +6,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun67.61}
-\newcommand{\stardocnumber}    {67.61}
+\newcommand{\stardocsource}    {sun67.64}
+\newcommand{\stardocnumber}    {67.64}
 \newcommand{\stardocauthors}   {P.\,T.\,Wallace}
-\newcommand{\stardocdate}      {5 March 2003}
+\newcommand{\stardocdate}      {4 February 2004}
 \newcommand{\stardoctitle}     {SLALIB --- Positional Astronomy Library}
-\newcommand{\stardocversion}   {2.4-12}
+\newcommand{\stardocversion}   {2.4-13}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 
@@ -1105,7 +1105,7 @@ as described in SUN/202.)
 %-----------------------------------------------------------------------
 \routine{SLA\_AOP}{Apparent to Observed}
 {
- \action{Apparent to observed place, for optical sources distant from
+ \action{Apparent to observed place, for sources distant from
          the solar system.}
  \call{CALL sla\_AOP (\vtop{
          \hbox{RAP, DAP, DATE, DUT, ELONGM, PHIM, HM, XP, YP,}
@@ -5761,8 +5761,8 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         by the present routine into an FK5 J2000 mean place, by
         allowing for the Sun's gravitational lens effect, annual
         aberration, nutation and precession.  Should FK4 B1950
-        coordinates be needed, the routines sla\_FK524 {\it etc.}\ will also
-        need to be applied.
+        coordinates be required, the routines sla\_FK524 {\it etc.}\ will also
+        have to be applied.
   \item To convert to apparent \radec\ the coordinates read from a
         real telescope, corrections would have to be applied for
         encoder zero points, gear and encoder errors, tube flexure,
@@ -5904,8 +5904,8 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         by the present routine into an FK5 J2000 mean place, by
         allowing for the Sun's gravitational lens effect, annual
         aberration, nutation and precession.  Should FK4 B1950
-        coordinates be needed, the routines sla\_FK524 {\it etc.}\ will also
-        need to be applied.
+        coordinates be required, the routines sla\_FK524 {\it etc.}\ will also
+        have to be applied.
   \item To convert to apparent \radec\ the coordinates read from a
         real telescope, corrections would have to be applied for
         encoder zero points, gear and encoder errors, tube flexure,
@@ -11632,7 +11632,7 @@ in 2\,BC, which is a star-of-Bethlehem candidate:
 
       *        Correct from EMB to Earth
                   DO I=1,3
-                     PV(I)=PVE(I)-0.012150581D0*PVM(I)
+                     PVE(I)=PVE(I)-0.012150581D0*PVM(I)
                   END DO
 
       *        Sun to Venus
@@ -11692,12 +11692,12 @@ The output produced (the Ephemeris Time on the day in question, and
 the closest approach in arcseconds) is as follows:
 \goodbreak
 \begin{verbatim}
-      21:19  33.7
+      21:16  33.3
 \end{verbatim}
 \goodbreak
-For comparison, accurate predictions based on the JPL DE\,102 ephemeris
-give a separation about \arcseci{8} less than
-the above estimate, occurring about half an hour earlier
+For comparison, accurate JPL predictions
+give a separation \arcseci{7} less than
+the above estimate, occurring $27^{\rm m}$ earlier
 (see {\it Sky and Telescope,}\/ April~1987, p\,357).
 
 The following program demonstrates
@@ -11744,7 +11744,7 @@ sla\_RDPLAN.
                   CALL sla_DAFIN(B,I,PHI,J)
 
       *        Loop planet by planet
-                  DO NP=0,8
+                  DO NP=0,9
 
       *           Get RA,Dec and diameter
                      CALL sla_RDPLAN(DJM,NP,ELONG,PHI,RA,DEC,DIAM)
@@ -11776,16 +11776,16 @@ and the position of Preston, UK.):
 \end{verbatim}
 produces the following report:
 \begin{verbatim}
-      Sun       06 28 14.03  +23 17 17.5  1887.8
-      Mercury   08 08 58.62  +19 20 57.3     9.3
-      Venus     09 38 53.64  +15 35 32.9    22.8
-      Moon      06 28 18.30  +23 18 37.3  1903.9
-      Mars      09 06 49.34  +17 52 26.7     4.0
-      Jupiter   00 11 12.06  -00 10 57.5    41.1
-      Saturn    16 01 43.34  -18 36 55.9    18.2
-      Uranus    00 13 33.53  +00 39 36.0     3.5
-      Neptune   09 49 35.75  +13 38 40.8     2.2
-      Pluto     07 05 29.50  +21 25 04.2      .1
+      Sun       06 28 14.03  +23 17 17.3  1887.8
+      Mercury   08 08 58.60  +19 20 57.1     9.3
+      Venus     09 38 53.61  +15 35 32.8    22.8
+      Moon      06 28 15.95  +23 17 21.3  1902.3
+      Mars      09 06 49.34  +17 52 26.6     4.0
+      Jupiter   00 11 12.08  -00 10 57.5    41.1
+      Saturn    16 01 43.35  -18 36 55.9    18.2
+      Uranus    00 13 33.54  +00 39 36.1     3.5
+      Neptune   09 49 35.76  +13 38 40.8     2.2
+      Pluto     07 05 29.51  +21 25 04.2      .1
 \end{verbatim}
 Inspection of the Sun and Moon data reveals that
 a total solar eclipse is in progress.
