@@ -33,7 +33,7 @@
 ^buildsupport/starconf	mail -s "CVS commit: buildsupport" stardev@jiscmail.ac.uk
 # Toby White is working on autoconf, too
 ^thirdparty/fsf/autoconf	mail -s "CVS commit: autotools" stardev@jiscmail.ac.uk, tow21@cam.ac.uk
-^thirdparty/fsf/libtool         (echo "====";date --utc '+d=%Y-%m-%dT%k:%M:%S';echo "p=%p";echo "c=%c";echo "u=${USER}";echo "v=%{sVv}";sed 's/^/-/';) >>$CVSROOT/CVSROOT/star-commitlog
+^thirdparty/fsf/libtool         (echo "====";date --utc '+d=%%Y-%%m-%%dT%%k:%%M:%%S';echo p=%p;echo c=%c;echo u=${USER};echo v=%{sVv};sed 's/^/-/';) >>$CVSROOT/CVSROOT/star-commitlog
 ^thirdparty/fsf		mail -s "CVS commit: autotools" stardev@jiscmail.ac.uk
 #
 ^java/source/hdx	mail -s "CVS commit: %p" norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
