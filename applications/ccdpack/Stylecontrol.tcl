@@ -59,25 +59,15 @@
             frame [ childsite ].control
          }
          itk_component add style {
-            button $itk_component(control).style \
-               -text "Style" \
-               -command [ code $this dodialog ]
+            menubutton $itk_component(control).style \
+               -relief raised \
+               -menu $itk_component(control).style.menu \
+               -text "Style"
          }
          pack $itk_component(style)
-         pack $itk_component(control)
-
-         itk_component add styledialog {
-            iwidgets::dialog $itk_interior.styledialog \
-               -modality application
-         } {
-            usual 
-            ignore -modality
-         }
-         
-         $itk_component(styledialog) delete Help
-         $itk_component(styledialog) delete Apply
-         itk_component add checkbox {
-            iwidgets::checkbox [ $itk_component(styledialog) childsite ].cb
+         set menubutton $itk_component(style)
+         itk_component add menu {
+            menu $menubutton.menu
          }
          lappend atts { drawaxes "Draw axes" "drawaxes=0" "drawaxes=1" }
          lappend atts { grid "Draw grid" "grid=0" "grid=1" }
@@ -88,14 +78,18 @@
             set text [ lindex $att 1 ]
             set no [ lindex $att 2 ]
             set yes [ lindex $att 3 ]
-            $itk_component(checkbox) add $name \
-                -text $text \
-                -command update
             set elements($i,0) $no
             set elements($i,1) $yes
+            $itk_component(menu) add checkbutton \
+               -label $text \
+               -variable [ scope elvar($i) ] \
+               -onvalue $yes \
+               -offvalue $no \
+               -command [ code $this setval ]
             incr i
          }
-         pack $itk_component(checkbox)
+         pack $itk_component(control)
+
          eval itk_initialize $args
          configure -value $value
       }
@@ -127,13 +121,13 @@
 
 #  If we have been given a value for the style, modify the current status
 #  of the checkbuttons to reflect this.
-         set els [ split $value "," ]
-         set last [ $itk_component(checkbox) index end ]
-         for { set i 0 } { $i <= $last } { incr i } {
-            if { [ lsearch -exact $els $elements($i,0) ] > -1 } {
-               $itk_component(checkbox) deselect $i
-            } elseif { [ lsearch -exact $els $elements($i,1) ] > -1 } {
-               $itk_component(checkbox) select $i
+         set last [ $itk_component(menu) index end ]
+         foreach el [ split $value "," ] {
+            for { set i 1 } { $i <= $last } { incr i } {
+               if { $el == [ $itk_component(menu) entrycget $i -onvalue ] || \
+                    $el == [ $itk_component(menu) entrycget $i -offvalue ] } {
+                  set elvar([ expr $i - 1 ]) $el
+               }
             }
          }
       }
@@ -145,27 +139,24 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      private method dodialog {} {
+      private method setval {} {
 #-----------------------------------------------------------------------
-         if { [ $itk_component(styledialog) activate ] } {
-            set last [ $itk_component(checkbox) index end ]
-            set value ""
-            for { set i 0 } { $i <= $last } { incr i } {
-               if { $i > 0 } {
-                  append value ","
-               }
-               append value $elements($i,[ $itk_component(checkbox) get $i ])
-            }
+         set val ""
+         for { set i 0 } { $i < [ array size elvar ] } { incr i } {
+            append val "$elvar($i),"
          }
-         configure -value $value
+         regsub {,$} $val {} val
+         configure -value $val
       }
+
 
 
 ########################################################################
 #  Private variables.
 ########################################################################
 
-      private variable elements     ;# Style elements
+      private variable elements     ;# Style element configuration
+      private variable elvar        ;# Values of style elements
 
    }
 
