@@ -4678,14 +4678,14 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 
 /* Return 5 if the two Regions are equal using the private Equal method. 
    Do not use the protected interface since that may have been extended. */
-   if( Equal( this, that ) ) {
+   if( Equal( (AstObject *) this, (AstObject *) that ) ) {
       return 5;
 
 /* Return 6 if the two Regions are equal using the Equal method after
    temporarily negating the first. */
    } else {
       astNegate( this );
-      result = Equal( this, that );
+      result = Equal( (AstObject *) this, (AstObject *) that );
       astNegate( this );
       if( result ) return 6;
    }
