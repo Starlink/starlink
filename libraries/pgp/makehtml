@@ -1,0 +1,155 @@
+#!/bin/sh --     # perl
+eval 'exec `which perl` -S $0 ${1+"$@"}'
+  if 0;
+
+$, = ' ';		# set output field separator
+$\ = "\n";		# set output record separator
+
+@files = @ARGV;
+
+print <<'EOD';
+\begin{rawhtml}
+<HTML>
+<HEAD><TITLE>PGPLOT Subroutine Descriptions</TITLE></HEAD>
+<BODY>
+
+<H2>Introduction</H2>
+
+This appendix includes a list of all the PGPLOT subroutines,
+and then gives detailed instructions for the use of each routine in
+Fortran programs. The subroutine descriptions are in alphabetical order.
+
+<H2>Arguments</H2>
+
+The subroutine descriptions indicate the data type of each
+argument. When arguments are described as ``input'', they may be
+replaced with constants or expressions in the <CODE>CALL</CODE>
+statement, but make sure that the constant or expression has the
+correct data type.
+
+<DL><DT><CODE>INTEGER</CODE> arguments:
+<DD>these should be declared
+<CODE>INTEGER</CODE> or <CODE>INTEGER*4</CODE> in the calling program,
+not <CODE>INTEGER*2</CODE>.
+
+<DT><CODE>REAL</CODE> arguments:
+<DD>these should be declared
+<CODE>REAL</CODE> or <CODE>REAL*4</CODE> in the calling program, not
+<CODE>REAL*8</CODE> or <CODE>DOUBLE PRECISION</CODE>.
+
+<DT><CODE>LOGICAL</CODE> arguments:
+<DD>these should be declared
+<CODE>LOGICAL</CODE> or <CODE>LOGICAL*4</CODE> in the calling program.
+
+<DT><CODE>CHARACTER</CODE> arguments:
+<DD> any valid Fortran
+<CODE>CHARACTER</CODE> variable may be used (declared
+<CODE>CHARACTER*n</CODE> for some integer <CODE>n</CODE>).
+
+</DL>
+
+<H2>Index of Routines</H2>
+
+<EM>Version 5.1.1</EM><P>
+
+EOD
+
+# Extract documentation from pgplot source code: output index of routines
+print '<UL>';
+while (<>) {
+    chop;	# strip record separator
+    if (/^C\*/) {
+      ($module, $rest) = split (' ', $_, 2);
+      $module = substr($module, 2);
+      print "<LI><A HREF=\"#$module\">$module</A> $rest";
+      $ref{$module} = "<A href=\"#$module\">$module</A>";
+      push (@modules, $module);
+    }
+}
+
+# reverse sort so that modules with the same first few characters occur
+# longest to shortest.
+@modules = sort {length($b) <=> length($a)} @modules;
+
+print '</UL>';
+
+# Extract documentation from pgplot source code: output HTML code
+
+@ARGV = @files;
+while (<>)
+{
+    s/\&/\&amp\;/g;
+    s/\>/\&gt\;/g;
+    s/\</\&lt\;/g;
+  chop;				# strip record separator
+
+  /^C\*/ && do
+  {
+    print '';
+
+    print '<HR>';
+    ($module, $rest) = split (' ', substr($_, 2), 2);
+    print "<H2><A NAME=\"$module\">$module</A><A NAME=\"xref_$module\"> </A>$rest</H2>";
+    next;
+  };
+
+  /^C\+/ && do
+  {
+    print '<PRE>' if $echo == 0;
+    $echo = 1;
+    print &Getline0();
+    next;
+  };
+
+  /^C--/ && do
+  {
+    print '</PRE>' if $echo == 1;
+    $echo = 0;
+    next;
+  };
+
+  next if ! $echo;
+
+  /^C/ && do
+  {
+    # replace module names with links.  when a module name is recognized,
+    # it's replaced by a tag in the line to avoid multiple recognitions
+    # (by modules which have similar substrings).  the tags are replaced
+    # by the actual links after all identifications have been made.
+    # it'd be cheaper to have the tags be variables that could be
+    # interpolated, but there's no guarantee that the rest of the text
+    # wouldn't be adversely affected. thus, a set of replacements is
+    # created and then eval'd
+    $line = substr($_, 2);
+    $reps = 0;
+    $repstr = '';
+    foreach $module (@modules)
+    {
+      $start = index($line, $module);
+      next if $start == -1;
+      $tag = sprintf("REPLACE<%04d>", $reps);
+      $line = join('', substr($line, 0, $start), $tag,
+		   substr($line, $start+length($module)));
+      $repstr .= "\$line =~ s:$tag:$ref{$module}:;\n";
+      ++$reps;
+    }
+    eval $repstr if $repstr ne '';
+    print $line;
+    next;
+  };
+
+  print;
+}
+
+print <<'EOD';
+<HR>
+</BODY></HTML>
+\end{rawhtml}
+EOD
+
+sub Getline0 {
+    if ($getline_ok = (($_ = <>) ne '')) {
+	chop;	# strip record separator
+    }
+    $_;
+}

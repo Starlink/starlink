@@ -1,0 +1,48 @@
+PGPLOT has been updated to PGPLOT V5.1.1. There are a number of new routines
+but, as yet, no printed manual. However, a hypertext version of the
+version 5 manual is available on the world wide web at:
+
+	http://astro.caltech.edu/~tjp/pgplot/
+
+Also, the hypertext version of the Starlink User Note (SUN/15) that can
+be reached via Starlink Project web server (http://www.star.rl.ac.uk)
+contains descriptions of all the PGPLOT routines.
+
+The following is extracted from the pgplot release notes of versions since the
+last Starlink release:
+
+Version 5.0.2
+-------------
+Routine PGQCS has a new option to determine the character height in world
+coordinates, and a bug that would give wrong values on devices with non-square
+pixels has been corrected.
+
+Routine PGTBOX has a new option `X' to label the HH field modulo 24. Thus, a
+label such as 25h 10m would come out as 1h 10m.
+
+A new escape sequence, \., has been added for a centered dot (·).
+
+Version 5.1.0
+-------------
+  1. A major change in this version allows a program to have more than one
+     PGPLOT device open at once. The devices can be of the same type, e.g.,
+     two windows on an X-window workstation, or of different types, e.g., a
+     Tektronix terminal emulator and a PostScript file. Up to 8 devices may
+     be open at once. To support this new feature, four new routines have
+     been added: PGOPEN, PGQID, PGSLCT, and PGCLOS, and many routines have
+     been modified internally.
+
+Version 5.1.1
+-------------
+   * PGOPEN, PGBEG: a device specification like '? ' (question mark with one
+     or more trailing spaces) causes PGOPEN to issue a blank prompt for
+     device specification. This was an unintended change in 5.1.0, and has
+     been fixed in version 5.1.1.
+
+   * PGBEG: in version 5.1.0, the ordering of panels changed from row order
+     to column order. The way the sign of the NXSUB argument was interpreted
+     was precisely the opposite of the documented interpretation (NXSUB > 0
+     should give row order, and < 0 should give column order). PGSUBP has
+     always been wrong, but PGBEG acquired the incorrect behavior in version
+     5.1.0. Both PGBEG and PGSUBP now behave as documented.
+

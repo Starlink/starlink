@@ -1,0 +1,609 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+
+% Variable part - replace [xxx] as appropriate.
+% \newcommand{\stardocnumber}    {Draft - 15.8}
+\newcommand{\stardocnumber}    {15.8}
+\newcommand{\stardocauthors}   {D L Terrett, M J Bly}
+\newcommand{\stardocdate}      {25 February 1999}
+\newcommand{\stardoctitle}     {PGPLOT --- Graphics Subroutine Library}
+\newcommand{\stardocversion}   {v5.1.1/v5.2.0}
+\newcommand{\stardocmanual}    {User's Guide}
+\newcommand{\stardocabstract}  {PGPLOT is the \emph{de facto} standard plotting
+library in Astronomy.  Starlink supports both the original `Native' version and the GKS-based `Starlink' version.  This document describes their use on 
+Starlink systems.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{\xlabel{introduction}Introduction}
+\label{introduction}
+
+PGPLOT is a high level graphics package for plotting X \emph{versus} Y
+plots, functions, histograms, bar charts, contour maps and images.
+Complete diagrams can be produced with a minimal number of subroutine
+calls, but control over colour, lines-style, character font,
+\emph{etc},.\ is available if required.  The package was written (by Dr
+T J Pearson of the Caltech astronomy department) with astronomical
+applications in mind and has become a \textit{de facto} standard for
+graphics in astronomy world wide.
+
+The package exists in two versions: the original or `Native' version
+which uses the low level graphics package GRPCKG which was also
+written at Caltech, and a version developed by Starlink, in
+collaboration with Dr Pearson, which uses GKS.  The two versions have
+identical subroutine interfaces and in most cases, applications can be 
+moved from one version to the other simply by re-linking.
+
+Starlink supports both the `Native' version and the `Starlink' version
+which co-exist on Starlink systems.  Most packages available in the
+Starlink Software Collection currently use the Starlink version but
+work is currently underway to replace this with the Native version.
+
+The current Native PGPLOT is version 5.2.0.
+The current Starlink PGPLOT is based on PGPLOT Version 5.1.1.
+
+The main source of information on using PGPLOT is the PGPLOT manual.
+The manual for version 5 is still in preparation but a hypertext version
+can be found at:
+\begin{quote}
+\texttt{\htmladdnormallink{http://astro.caltech.edu/\~{}tjp/pgplot/}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
+\end{quote}
+
+This describes the original GRPCKG \emph{Native-PGPLOT} version but the
+majority of the manual applies equally to both versions.
+
+When using the GKS \emph{Starlink-PGPLOT} version the following
+sections of the manual should be ignored and the information in this
+user note used instead:
+
+\begin{itemize}
+\item Using PGPLOT (chapter 1)
+\item Graphics Devices (chapter1)
+\item Compiling and Running the Program (chapter 2)
+\item Appendix D --- Supported Devices
+\item Appendix E --- Writing a Device Handler
+\item Appendix F --- Installation Instructions
+\item Appendix G --- Porting PGPLOT
+\end{itemize}
+
+\section{\xlabel{native-pgplot}Native-PGPLOT}
+\label{native-pgplot}
+
+Readers interested in the Starlink-PGPLOT version should refer to 
+section~\latexhtml{\ref{starlink-pgplot}} %%
+{\htmlref{\emph{Starlink-PGPLOT}}{starlink-pgplot}}.
+
+\subsection{\xlabel{using_the_native_version}Using the Native version}
+\label{using_the_native_version}
+
+To link a program with the Native-PGPLOT library, use the following:
+
+\begin{quote}
+\texttt{\% f77 \emph{prog.f} -L/star/lib `pgplot\_link`}
+\end{quote}
+
+It is currently not possible to use Native PGPLOT with ADAM applications
+though in future this facility will be provided.
+
+\subsection{\xlabel{native-pgplot_device_names}Native-PGPLOT device names}
+\label{native-pgplot_device_names}
+
+Native-PGPLOT device names are described in the PGPLOT manual.  The
+Native-PGPLOT device names are not the same as those used for other
+Starlink graphics and it does not support the Starlink device name system.
+However, substantially the same graphics device types are available
+(Xwindows, Postscript).  
+
+It should be noted that the two PGPLOT systems have different Xwindows
+device drivers which do not interact -- hence a program using
+Starlink-PGPLOT and drawing to the `\texttt{xwindows}' device will not draw 
+in the same display window as a Native-PGPLOT program drawing to the 
+`\texttt{/XWIN}' device.
+
+\subsection{\xlabel{native_pgplot_examples}Native-PGPLOT examples}
+\label{native_pgplot_examples}
+
+\begin{quote}
+\emph{ On non-Starlink systems you may have to replace \texttt{/star} by 
+some other path name to locate the files referred to in this section.}
+\end{quote}
+
+Binaries of the example programs can be found in
+\texttt{/star/bin/examples/pgplot}.
+They can be run with a command such as:
+
+\begin{quote}
+\texttt{/star/bin/examples/pgplot/pgdemo{\emph{n}}}
+\end{quote}
+
+where \texttt{\emph{n}} is between 1 and 17, provided that they have 
+been installed.  (They may not have been in order to save disk space).
+
+\section{\xlabel{starlink-pgplot}Starlink-PGPLOT}
+\label{starlink-pgplot}
+
+Readers interested in the Native-PGPLOT version should refer to 
+section~\latexhtml{\ref{native-pgplot}} %%
+{\htmlref{\emph{Native-PGPLOT}}{native-pgplot}}.
+
+\subsection{\xlabel{using_the_gks_version}Using the GKS version}
+\label{using_the_gks_version}
+
+There are two ways in which the GKS version of PGPLOT can be used:
+     
+\begin{enumerate}
+
+\item As a self contained graphics package where \emph{all} graphics, including
+opening and closing the workstation, is done with PGPLOT. Programs written in
+this way can be run with other implementations of PGPLOT. Such programs
+are linked with the command:
+
+\begin{quote}
+\texttt{\% f77 \emph{prog.f} -L/star/lib `pgp\_link`}
+\end{quote}
+
+\item To plot a picture in the current viewport of an already open GKS
+workstation (see \latexhtml{section~\ref{plotting_in_the_current_viewport}} %%
+{\htmlref{Plotting in the current viewport}{plotting_in_the_current_viewport}}). 
+\end{enumerate}
+
+To use PGPLOT in an ADAM application, consult the 
+\xref{\emph{ADAM Graphics Programmer's Guide}}{sun113}{} (SUN/113).
+
+\subsection{\xlabel{starlink-pgplot_device_names}Starlink-PGPLOT device names}
+\label{starlink-pgplot_device_names}
+
+Any graphics device supported by GKS can be used with Starlink PGPLOT
+and device names are translated using the graphics name service
+described in \xref{\emph{GNS -- Graphics Name
+Service}}{sun57}{GKSWorkstationNames} (SUN/57).  Device names
+containing a `\texttt{/}' character (such as UNIX file names) must be
+surrounded by quote (`\texttt{"}') characters.
+
+If a question mark is typed in response to the prompt from
+\xref{\texttt{PGBEG}}{sun15}{PGBEG}, a list of those workstation names
+defined on your system will be listed on the terminal.
+
+On some hard copy devices the output from a PGPLOT program is a file
+and some further action (such as printing the file) is required to
+produce a plot.  If you are unfamiliar with a particular device,
+consult \xref{SUN/83}{sun83}{}.
+
+If one of the metafile workstations is selected the metafile can be
+tailored for a particular real workstation type by appending
+\texttt{/TARGET=\emph{workstation}} to the device specification.  The
+default target is the monochrome A4 Postscript workstation. The
+resulting metafile can be played back on any workstation but will be
+tailored with respect to such things as resolution, number of colour
+indices, etc. for the selected target.
+
+The device name syntax described in the PGPLOT manual is also
+supported; when using this form of device name, the device type is
+specified using a GNS workstation name.
+
+\subsection{\xlabel{starlink-pgplot_examples}Starlink-PGPLOT examples}
+\label{starlink-pgplot_examples}
+
+\begin{quote}
+\emph{ On non-Starlink systems you may have to replace \texttt{/star} by 
+some other path name to locate the files referred to in this section.}
+\end{quote}
+
+The directory \texttt{/star/examples/pgp} contains the source of a
+number of example programs which demonstrate most of the features of
+PGPLOT.  Binaries of the example programs can be found in
+\texttt{/star/bin/examples/pgp}.
+
+They can be run with a command such as:
+
+\begin{quote}
+\texttt{/star/bin/examples/pgp/pgdemo{\emph{n}}}
+\end{quote}
+
+where \texttt{\emph{n}} is between 1 and 14, provided that they have
+been installed.  (They may not have been in order to save disk space).
+
+\subsection{\xlabel{plotting_in_the_current_viewport} %%
+Plotting in the current viewport}
+\label{plotting_in_the_current_viewport}
+\label{viewport}
+
+PGPLOT can be used to plot a picture in the current viewport on an
+already open GKS workstation. When used in this way, the second
+argument to \xref{\texttt{PGBEG}}{sun15}{PGBEG} (normally the workstation
+name) is a GKS workstation identifier (encoded as a character string).
+PGPLOT then behaves as if the region of the display surface defined by
+the current viewport is a complete workstation.  When
+\xref{\texttt{PGEND}}{sun15}{PGEND} is called the workstation is not closed
+but the state of GKS is restored to what it was at the time that
+\texttt{PGBEG} was called.
+
+PGPLOT assumes that it has exclusive control over the GKS and so the only
+graphics calls allowed between \texttt{PGBEG} and \texttt{PGEND} are PGPLOT
+routines and GKS inquiry routines. 
+
+The following simple example is a subroutine that uses PGPLOT to draw an X, Y
+plot in an SGS zone.
+\begin{small}
+\begin{verbatim}
+            SUBROUTINE XYPLOT (IZONE, X, Y, N, XLO, XHI, YLO, YHI, ISTAT)
+      *++
+      *
+      *   XYPLOT   Draw X,Y plot in an SGS zone.
+      *
+      *   Description:
+      *                                                                      
+      *      Uses PGPLOT to draw an X,Y plot of the real arrays X & Y in the 
+      *      region of the display surface defined be the specified SGS zone.
+      *
+      *   Input arguments:
+      *
+      *      IZONE    INTEGER         SGS zone identifier
+      *      X        REAL(N)         X values of data points
+      *      Y        REAL(N)         Y   "    "    "    "
+      *      N        INTEGER         Number of data points
+      *      XLO      REAL            Lower X axis limit
+      *      XHI      REAL            Higher X  "    "
+      *      YLO      REAL            Lower Y  "     "
+      *      YHI      REAL            Higher Y  "    "
+      *
+      *   Output arguments:
+      *
+      *      ISTAT    INTEGER         SGS status
+      *
+      *   Side effects:
+      *
+      *      The specified SGS zone is selected.
+      *++
+            IMPLICIT NONE
+            INTEGER  IZONE, N, ISTAT, PGSTAT
+            REAL     X(N), Y(N), XLO, XHI, YLO, YHI
+
+            CHARACTER*10 WKID
+            INTEGER IWKID
+
+            INTEGER PGBEG
+
+
+      *  Select the specified SGS zone.
+            CALL SGS_SELZ(IZONE, ISTAT)
+            IF (ISTAT.EQ.0) THEN
+
+      *     Inquire the GKS workstation identifier of the current zone.
+               CALL SGS_ICURW(IWKID)
+
+      *     Encode workstation id as a character string.
+               WRITE(UNIT=WKID, FMT='(I10)') IWKID
+
+      *     Open PGPLOT
+               PGSTAT = PGBEG(0, WKID, 1, 1)
+               IF (PGSTAT.EQ.1) THEN
+
+      *     Define axis limits.
+                  CALL PGENV(XLO, XHI, YLO, YHI, 0, 0)
+
+      *     Plot the data.
+                  CALL PGPT(N, X, Y, 2)
+
+      *     Close down PGPLOT.
+                  CALL PGEND
+               END IF
+            END IF
+            END
+\end{verbatim}                                                         
+\end{small}
+
+Because other plotting packages may have plotted on the same physical device,
+there are some restrictions when using PGPLOT in this way:
+
+\begin{itemize}
+\item \xref{\texttt{PGVSIZ}}{sun15}{PGVSIZ} cannot be used.
+
+\item \xref{\texttt{PGPAGE}}{sun15}{PGPAGE} will never clear the
+screen.  If the display surface has been divided into sub-pictures
+\texttt{PGPAGE} will move to the next sub-picture in the usual way.
+
+\item On devices with fixed colour tables, the default PGPLOT colour
+table will not be set up by \xref{\texttt{PGBEG}}{sun15}{PGBEG} unless the
+display surface is empty.
+
+\end{itemize}
+
+\section{\xlabel{other_differences}Other Differences}
+\label{other_differences}
+
+In general the two versions produce nearly identical results when run on 
+the same device but the following differences should be noted:
+
+\begin{itemize}
+\item The GKS version of \xref{\texttt{PGPAGE}}{sun15}{PGPAGE} cannot be 
+used to make the display surface larger than the default size provided by 
+\xref{\texttt{PGBEG}}{sun15}{PGBEG}.
+\item The GKS version of \texttt{PGBEG} clears the display surface immediately
+instead of waiting until the first vector is plotted.
+\end{itemize}
+
+\section{\xlabel{support}Support}
+\label{support}
+
+PGPLOT is Starlink supported software and bugs should be reported through the
+usual channels and not by contacting Dr Pearson directly. Problems with the GKS
+specific code will be dealt with by Starlink but all changes to the code which
+is common to the two versions of PGPLOT must be made in collaboration with Dr
+Pearson.
+
+The mixing of calls to PGPLOT and GKS routines is not supported except as
+described in \hyperref{this section}{section~}{}{viewport}, and neither
+version supports the calling of GRPCKG routines directly. Existing programs
+that call GRPCKG should be re-written to call the equivalent PGPLOT routines.
+
+\begin{htmlonly}
+\appendix
+\section{Subroutine Descriptions}
+\include pgplot.html
+\end{htmlonly}
+
+% ? End of main text
+\end{document}
