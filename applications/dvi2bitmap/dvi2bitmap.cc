@@ -54,6 +54,7 @@ static const char RCSID[] =
 #include <ctype.h>
 #endif
 
+#include <bitset>
 #include <unistd.h>		// for getsubopt
 #include "getopt_long.h"
 
@@ -62,6 +63,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::vector;
+using std::bitset;
 #endif
 
 #include "DviFile.h"
@@ -103,6 +105,7 @@ void process_dvi_file (DviFile *, bitmap_info&, int resolution,
 		       PageRange&);
 bool process_special (DviFile *, string specialString,
 		      Bitmap*, bitmap_info&);
+string substitute_ofn_pattern(string pattern, int pagenum);
 string get_ofn_pattern (string dviname);
 bool parse_boolean_string(char *s, bool *ok=0);
 void Usage (const char*);
@@ -128,23 +131,27 @@ int bitmapW = -1;
 int resolution = PkFont::dpiBase();// in pixels-per-inch
 int oneInch = resolution;
 
-#define FONT_SHOW 1
-#define FONT_INCFOUND 2
-#define FONT_CMDS 4
-#define FONT_LONG_DISPLAY 8
 
 int main (int argc, char **argv)
 {
     string dviname;
+    bool dviname_is_seekable = true;
     double magmag = 1.0;	// magnification of file magnification factor
-    unsigned int show_font_list = 0;
+    enum { font_show, font_incfound, font_cmds, font_long_display } fontflags;
+    bitset<8> show_font_info;	// all zero
     bitmap_info bm;
-    // Usual processing is process_dvi.  preamble_only exits after
-    // checking the preamble (and thus checking fonts).  options_only
-    // merely processes the options and then exits.
-    enum { process_dvi, preamble_only, options_only } processing_ =process_dvi;
+    // Which elements of the DVI file should we process.  process_dvi
+    // indicates that we should process the body of the DVI file, and
+    // process_preamble and process_postamble indicate that we should
+    // process the corresponding element.
+    enum { process_dvi, process_preamble, process_postamble } processflags;
+    bitset<8> processing_;
+    processing_.set(process_dvi);
+    processing_.set(process_preamble);
+    processing_.set(process_postamble);
+    
     bool all_fonts_present = true;
-    bool no_font_present = true;
+    bool no_font_present = false;
     PageRange PR;
 
 
@@ -185,6 +192,8 @@ int main (int argc, char **argv)
 	{ (char*)"colors",        1, 0, 'R' },	// synonym
 	{ (char*)"scaledown",     1, 0, 's' },
 	{ (char*)"paper-size",    1, 0, 't' },
+#define OPT_PIPE 1
+	{ (char*)"pipe",	  0, 0, OPT_PIPE },
 	{ (char*)"output-type",   1, 0, 'T' },
 	{ (char*)"verbose",       1, 0, 'v' },
 	{ (char*)"version",       0, 0, 'V' },
@@ -213,6 +222,10 @@ int main (int argc, char **argv)
 	   != -1) {
 	
 	switch (optch) {
+	  case OPT_PIPE:	// --pipe
+	    dviname_is_seekable = false;
+	    break;
+
 	  case 'c':		// --crop
 	    {
 		// get dimension, and convert points to pixels.
@@ -466,7 +479,8 @@ int main (int argc, char **argv)
 
 	  case 'n':		// --preamble-only
 	    // don't actually process the DVI file
-	    processing_ = preamble_only;
+	    processing_.reset(process_dvi);
+	    processing_.reset(process_postamble);
 	    PkFont::setFontgen(false);
 	    break;
 
@@ -498,33 +512,48 @@ int main (int argc, char **argv)
 		    switch (suboptch)
 		    {
 		      case 0:	// missing-fonts
-			show_font_list = (FONT_SHOW | FONT_LONG_DISPLAY);
+			show_font_info.set(font_show);
+			show_font_info.set(font_long_display);
+			PkFont::setFontgen(false);
 			break;
 		      case 1:	// f
-			show_font_list = FONT_SHOW;
+			show_font_info.set(font_show);
+			PkFont::setFontgen(false);
 			break;
 		      case 2:	// all-fonts
-			show_font_list = (FONT_SHOW | FONT_INCFOUND
-					  | FONT_LONG_DISPLAY);
+			show_font_info.set(font_show);
+			show_font_info.set(font_incfound);
+			show_font_info.set(font_long_display);
+			PkFont::setFontgen(false);
 			break;
 		      case 3:	// F
-			show_font_list = (FONT_SHOW | FONT_INCFOUND);
+			show_font_info.set(font_show);
+			show_font_info.set(font_incfound);
+			PkFont::setFontgen(false);
 			break;
 		      case 4:	// missing-fontgen
-			show_font_list = (FONT_SHOW | FONT_CMDS
-					  | FONT_LONG_DISPLAY );
+			show_font_info.set(font_show);
+			show_font_info.set(font_cmds);
+			show_font_info.set(font_long_display);
+			PkFont::setFontgen(false);
 			break;
 		      case 5:	// g
-			show_font_list = (FONT_SHOW | FONT_CMDS);
+			show_font_info.set(font_show);
+			show_font_info.set(font_cmds);
+			PkFont::setFontgen(false);
 			break;
 		      case 6:	// all-fontgen
-			show_font_list
-			    = (FONT_SHOW | FONT_INCFOUND | FONT_CMDS
-			       | FONT_LONG_DISPLAY );
+			show_font_info.set(font_show);
+			show_font_info.set(font_incfound);
+			show_font_info.set(font_cmds);
+			show_font_info.set(font_long_display);
+			PkFont::setFontgen(false);
 			break;
 		      case 7:	// G
-			show_font_list
-			    = (FONT_SHOW | FONT_INCFOUND | FONT_CMDS);
+			show_font_info.set(font_show);
+			show_font_info.set(font_incfound);
+			show_font_info.set(font_cmds);
+			PkFont::setFontgen(false);
 			break;
 
 		      case 8:	// bitmaps
@@ -688,7 +717,7 @@ int main (int argc, char **argv)
 #endif
 
 	    cout << RCSID << endl;
-	    processing_ = options_only; // ...and exit
+	    processing_.reset(); // do no further processing
 	    break;
 
 	  case 'v':		// --verbose
@@ -716,38 +745,75 @@ int main (int argc, char **argv)
 	    {
 		char *options = optarg;
 		char *value;
+		// There is no reason why the user should switch off
+		// process_preamble, so it is not (documented as)
+		// possible to do this below.
 		char *tokens[] = {
-		    (char*)"options-only", (char*)"preamble-only",
-		    (char*)"blur",
-		    (char*)"transparent",
-		    (char*)"crop",
+		    (char*)"dvi",		// 0
+		    (char*)"nodvi",		// 1
+		    (char*)"XXXpreamble",		// 2
+		    (char*)"XXXnopreamble",	// 3
+		    (char*)"postamble",		// 4
+		    (char*)"nopostamble",	// 5
+		    (char*)"blur",		// 6
+		    (char*)"noblur",		// 7
+		    (char*)"transparent",	// 8
+		    (char*)"notransparent",	// 9
+		    (char*)"crop",		// 10
+		    (char*)"nocrop",		// 11
+		    (char*)"preamble-only",	// 12
 		    NULL
 		};
 		int cropmargin;
 		while (*options) {
 		    int suboptch = getsubopt(&options, tokens, &value);
+		    if (value)	// no values
+			Usage("--process keywords do not take values");
 		    switch (suboptch)
 		    {
-		      case 0:	// options-only
-			if (!value || parse_boolean_string(value))
-			    processing_ = options_only;
+		      case 0:	// dvi
+			processing_.set(process_dvi);
 			break;
-		      case 1:	// preamble-only
-			if (!value || parse_boolean_string(value))
-			    processing_ = preamble_only; // equiv -n
+		      case 1:	// nodvi
+			processing_.reset(process_dvi);
 			break;
-		      case 2:	// blur
-			bm.blur_bitmap
-				= (!value || parse_boolean_string(value));
+		      case 2:	// preamble
+			processing_.set(process_preamble);
 			break;
-		      case 3:	// transparent
-			bm.make_transparent
-				= (!value || parse_boolean_string(value));
+		      case 3:	// nopreamble
+			processing_.reset(process_preamble);
 			break;
-		      case 4:	// crop
-			bm.crop_bitmap 
-				= (!value || parse_boolean_string(value));
+		      case 4:	// postamble
+			processing_.set(process_postamble);
 			break;
+		      case 5:	// nopostamble
+			processing_.reset(process_postamble);
+			break;
+		      case 12:	// preamble-only
+			processing_.reset(); // reset everything
+			break;
+
+		      case 6:	// blur
+			bm.blur_bitmap = true;
+			break;
+		      case 7:	// noblur
+			bm.blur_bitmap = false;
+			break;
+
+		      case 8:	// transparent
+			bm.make_transparent = true;
+			break;
+		      case 9:	// notransparent
+			bm.make_transparent = false;
+			break;
+
+		      case 10:	// crop
+			bm.crop_bitmap = true;
+			break;
+		      case 11:	// nocrop
+			bm.crop_bitmap = false;
+			break;
+			
 		      case -1:
 			Usage("bad process keyword");
 			break;
@@ -760,7 +826,7 @@ int main (int argc, char **argv)
 
           case '?':             // --help
             show_help();
-            processing_ = options_only; // ...and exit
+	    processing_.reset(); // clear all
             break;
 	    
 	  default:
@@ -768,7 +834,7 @@ int main (int argc, char **argv)
 	}
     }
     
-    if (processing_ == options_only)
+    if (processing_.none())
 	exit (0);
 
     argc -= optind;
@@ -786,7 +852,7 @@ int main (int argc, char **argv)
 	cout << "This is " << version_string << endl;
 
     if (bm.ofile_pattern.length() == 0)
-	bm.ofile_pattern = get_ofn_pattern (dviname);
+	bm.ofile_pattern = get_ofn_pattern(dviname == "-" ? "stdin" : dviname);
     if (bm.ofile_pattern.length() == 0)
     {
 	if (verbosity > silent)
@@ -797,7 +863,9 @@ int main (int argc, char **argv)
 
     try
     {
-	DviFile *dvif = new DviFile(dviname, resolution, magmag);
+	DviFile *dvif = new DviFile(dviname, resolution, magmag,
+				    processing_.test(process_postamble),
+				    dviname_is_seekable);
 	if (dvif->eof())
 	{
 	    if (verbosity > silent)
@@ -826,12 +894,10 @@ int main (int argc, char **argv)
 		else		// flag at least one missing
 		    all_fonts_present = false;
 
-		if (show_font_list & FONT_SHOW) {
-		    bool fld = (show_font_list & FONT_LONG_DISPLAY);
-		    if (show_font_list & FONT_CMDS)
-		    {
-			if ((show_font_list & FONT_INCFOUND) || !f->loaded())
-			{
+		if (show_font_info.test(font_show)) {
+		    bool fld = show_font_info.test(font_long_display);
+		    if (show_font_info.test(font_cmds)) {
+			if (show_font_info.test(font_incfound) || !f->loaded()) {
 			    // If f->loaded() is true, then we're here
 			    // because FONT_INCFOUND was set, so indicate
 			    // this in the output.
@@ -842,11 +908,11 @@ int main (int argc, char **argv)
 			    cout << (f->loaded()
 				     ? (fld ? "Qall-fontgen " : "Qg ")
 				     : (fld ? "Qmissing-fontgen " : "Qg "))
-				 << f->fontgenCommand()
+				 << cmd
 				 << endl;
 			}
 		    } else {
-			if ((show_font_list & FONT_INCFOUND) || !f->loaded())
+			if (show_font_info.test(font_incfound) || !f->loaded())
 			{
 			    // If f->loaded() is true, then we're here
 			    // because FONT_INCFOUND was set, so indicate
@@ -875,23 +941,23 @@ int main (int argc, char **argv)
 	    }
 	} else {
 	    // haven't read postamble
-	    if (show_font_list != 0) {
+	    if (show_font_info.any()) {
 		cerr << "Font information requested, but DVI postamble suppressed" << endl;
 		no_font_present = true;
+	    } else {
+		all_fonts_present = true; // ...effectively
+		no_font_present = false;
 	    }
 	}
 
-	if (processing_ == process_dvi)
-	{
-	    if (no_font_present) // give up!
-	    {
+	if (processing_.test(process_dvi)) {
+	    if (no_font_present) { // give up!
 		if (verbosity > silent)
 		    cerr << progname << ": no fonts found!  Giving up" << endl;
-	    }
-	    else
+	    } else {
 		process_dvi_file (dvif, bm, resolution, PR);
+	    }
 	}
-
     }
     catch (DviBug& e)
     {
@@ -909,7 +975,9 @@ int main (int argc, char **argv)
     // Or put another way: exit zero if (a) we were processing the DVI
     // file normally and we found at least one font, or (b) we were
     // just checking the preamble and we found _all_ the fonts.
-    if (no_font_present || (processing_==preamble_only && !all_fonts_present))
+//    if (no_font_present || (processing_==preamble_only && !all_fonts_present))
+    if (no_font_present
+	|| (!processing_.test(process_dvi) && !all_fonts_present))
 	exit (1);
     else
 	exit (0);
@@ -1015,11 +1083,6 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		    if (bitmap != 0 && !bitmap->empty())
 			// shouldn't happen, but just in case
 			bitmap->clear();
-// 		    if (bitmap != 0) // just in case
-// 		    {
-// 			delete bitmap;
-// 			bitmap = 0;
-// 		    }
 		} else {
 		    if (bitmap == 0)
 			throw DviBug ("bitmap uninitialised at page end");
@@ -1062,9 +1125,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			}
 			if (b.ofile_name.length() == 0)
 			{
-			    char fnb[100];
-			    sprintf (fnb, b.ofile_pattern.c_str(), pagenum);
-			    string output_filename = fnb;
+			    string output_filename
+				    = substitute_ofn_pattern(b.ofile_pattern,
+							     pagenum);
 			    bitmap->write (output_filename, b.ofile_type);
 			}
 			else
@@ -1073,8 +1136,6 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		    b.ofile_name = "";
 
 		    bitmap->clear();
-// 		    delete bitmap;
-// 		    bitmap = 0;
 
 		    if (verbosity > quiet)
 		    {
@@ -1366,6 +1427,33 @@ bool process_special (DviFile *dvif, string specialString,
 	cerr << "Warning: unrecognised special: " << specialString << endl;
 
     return stringOK;
+}
+
+string substitute_ofn_pattern(string pattern, int pagenum)
+{
+    static char *buf = 0;
+    static int buflen = 50;
+
+    if (buf == 0)
+	buf = new char[buflen];
+#ifdef HAVE_SNPRINTF
+    int wanted = snprintf(buf, buflen, pattern.c_str(), pagenum);
+    if (wanted >= buflen) {
+	delete[] buf;
+	buflen = wanted+10;	// ...just because
+	buf = new char[buflen];
+	snprintf(buf, buflen, pattern.c_str(), pagenum);
+    }
+#else
+    if (pattern.length() + 12 > buflen) {
+	// 12 is longer than the longest integer
+	delete[] buf;
+	buflen = pattern.length() + 20;	// be generous
+	buf = new char[buflen];
+    }
+    sprintf(buf, pattern.c_str(), pagenum);
+#endif
+    return buf;
 }
 
 string get_ofn_pattern (string dviname)
