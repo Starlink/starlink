@@ -2564,7 +2564,7 @@ static AstMapping *CelestialAxes( AstFrameSet *fs, double *dim, int *wperm,
                maxm = GetMaxJM( &(store->pv), s );
                for( m = 0; m <= maxm; m++ ){
                   val = GetItem( &(store->pv), fits_ilat, m, s, NULL, method, class );
-                  SetItem( &(store->pv), fits_ilat, 0, s, 
+                  SetItem( &(store->pv), fits_ilat, m, s, 
                            GetItem( &(store->pv), fits_ilon, m, s, NULL, 
                            method, class ) );
                   SetItem( &(store->pv), fits_ilon, m, s, val );
@@ -8032,7 +8032,7 @@ static char GetMaxS( double ****item ){
       if( si == 0 ) {
          ret = ' ';
       } else {
-         ret = 'A' + si + 1;
+         ret = 'A' + si - 1;
       }
    }
 
@@ -18270,6 +18270,10 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    axlon = astGetWcsAxis( map2, 0 );
    axlat = astGetWcsAxis( map2, 1 );
 
+/* Store the indices of the FITS WCS axes for longitude and latitude */
+   fits_ilon = wperm[ ilon ];
+   fits_ilat = wperm[ ilat ];
+
 /* To find the longitude and latitude of the celestial north pole in native 
    spherical coordinates, we will transform the coords of the celestial north 
    pole into spherical cords using the inverse of "map2", and if the resulting
@@ -18302,10 +18306,6 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
       pset2 = astPointSet( 1, nax, "" );
       ptr2 = astGetPoints( pset2 );
       if( astOK ) {
-
-/* Store the indices of the FITS WCS axes for longitude and latitude */
-         fits_ilon = wperm[ ilon ];
-         fits_ilat = wperm[ ilat ];
 
 /* Calculate the longitude and latitude of the celestial north pole 
    in native spherical coordinates (using the inverse of map3). These 
@@ -18374,6 +18374,14 @@ static void SkyPole( AstWcsMap *map2, AstMapping *map3, int ilon, int ilat,
    SetItem( &(store->lonpole), 0, 0, s, lonpole );
    SetItem( &(store->latpole), 0, 0, s, latpole );
 
+/* FITS-WCS paper 2 recommends putting a copy of LONPOLE and LATPOLE in
+   projection parameters 3 and 4 associated with the longitude axis. Only do
+   this if the projection is not TPN (since this projection uses these
+   parameters for other purposes). */
+   if( astGetWcsType( map2 ) != AST__TPN ) {
+      SetItem( &(store->pv), fits_ilon, 3, s, lonpole );
+      SetItem( &(store->pv), fits_ilon, 4, s, latpole );
+   }
 }
 
 static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
