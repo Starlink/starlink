@@ -400,6 +400,11 @@ static AstMapping *CanMerge( AstMapping *map1, int inv1, AstMapping *map2,
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   gmap = NULL;
+   invert_result = 0;
+
 /* Initialise the zoom factor of the adjacent ZoomMap to indicate
    that we have not yet found an adjacent ZoomMap. */
    z = AST__BAD;
@@ -997,6 +1002,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   i1 = -1;
+   i2 = -1;
 
 /* See if the GrismMap can be merged with the Mappings on either side of it 
    in the list. This can only be done in series for a GrismMap. */

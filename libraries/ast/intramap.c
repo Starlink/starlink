@@ -1235,6 +1235,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Further initialisation. */
    new = NULL;
    simpler = 0;
+   nin1 = -1;
 
 /* We will only handle the case of IntraMaps in series and will
    consider merging the nominated IntraMap with the Mapping which
@@ -2294,6 +2295,11 @@ AstIntraMap *astInitIntraMap_( void *mem, size_t size, int init,
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   found = 0;
+   ifun = 0;
 
 /* If necessary, initialise the virtual function table. */
    if ( init ) astInitIntraMapVtab( vtab, name );

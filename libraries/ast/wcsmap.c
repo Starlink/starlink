@@ -71,7 +71,7 @@ f     The WcsMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -330,8 +330,11 @@ void astClear##attr##_( AstWcsMap *this, int axis ) { \
 static type Get##attr( AstWcsMap *this, int axis ) { \
    type result;                  /* Result to be returned */ \
 \
+/* Initialise */ \
+   result = (bad_value); \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return (bad_value); \
+   if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
@@ -510,8 +513,11 @@ void astSet##attr##_( AstWcsMap *this, int axis, type value ) { \
 static int Test##attr( AstWcsMap *this, int axis ) { \
    int result;                   /* Value to return */ \
 \
+/* Initialise */ \
+   result = 0; \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return 0; \
+   if ( !astOK ) return result; \
 \
 \
 /* Validate the axis index. */ \
@@ -2458,6 +2464,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   i1 = 0;
+   i2 = 0;
+
 /* Get the number of axes for the WcsMap. */
    nin = astGetNin( ( *map_list )[ where ] );
 
@@ -2786,6 +2797,10 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 
 /* Check the global error status and the supplied pointers. */
    if ( !astOK || !outperm || !inperm || !consts ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   nc = 0;
 
 /* Get the number of input and output axes for the supplied PermMap. */
    nin = astGetNin( map );
@@ -3642,6 +3657,11 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   newpm = NULL;
+   newwm = NULL;
 
 /* Store pointers to the supplied WcsMap and the PermMap. */
    wm = (AstWcsMap *) maps[ iwm ];

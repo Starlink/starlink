@@ -32,7 +32,7 @@ f     The ZoomMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -519,6 +519,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Further initialisation. */
    new = NULL;
+   ngone = 0;
+   simpler = 0;
 
 /* In series. */
 /* ---------- */

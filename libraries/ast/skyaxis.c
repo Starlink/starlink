@@ -20,7 +20,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *     The SkyAxis class inherits from the Axis class.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -3376,6 +3376,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
       nfield = 0;
       sep_used = '\0';
       suffix_sep = 0;
+      sep_len = 0;
       for ( ifield = 0; ifield < 3; ifield++ ) {
 
 /* Set the default field value. */

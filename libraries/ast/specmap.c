@@ -59,7 +59,7 @@ c     - astSpecAdd: Add a celestial coordinate conversion to an SpecMap
 f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)
@@ -1187,6 +1187,11 @@ static int FrameChange( int cvt_code, int np, double *ra, double *dec, double *f
 
 /* Check inherited status. */
    if( !astOK ) return 0;
+
+/* Initialise */
+   cvtFunc = NULL;
+   fcorr = NULL;
+   sign = 0;
 
 /* Set the return value to indicate that the supplied conversion code 
    represents a change of rest-frame. */

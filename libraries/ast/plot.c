@@ -190,7 +190,7 @@ c     - Title: The Plot title drawn using astGrid
 f     - Title: The Plot title drawn using AST_GRID
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -710,8 +710,11 @@ void astClear##attr##_( AstPlot *this, int axis ) { \
 static type Get##attr( AstPlot *this, int axis ) { \
    type result;                  /* Result to be returned */ \
 \
+/* Initialise */ \
+   result = (bad_value); \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return (bad_value); \
+   if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
@@ -890,9 +893,11 @@ void astSet##attr##_( AstPlot *this, int axis, type value ) { \
 static int Test##attr( AstPlot *this, int axis ) { \
    int result;                   /* Value to return */ \
 \
-/* Check the global error status. */ \
-   if ( !astOK ) return 0; \
+/* Initialise */ \
+   result = 0; \
 \
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
@@ -988,8 +993,11 @@ static type GetUsed##attr( AstPlot *, int ); \
 static type GetUsed##attr( AstPlot *this, int axis ) { \
    type result;                  /* Result to be returned */ \
 \
+/* Initialise */ \
+   result = (bad_value); \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return (bad_value); \
+   if ( !astOK ) return result; \
 \
 /* Validate the axis index. */ \
    if( axis < 0 || axis >= nval ){ \
@@ -6323,6 +6331,10 @@ f     (e.g. using AST_TRAN2), any clipped output points are assigned
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   ifrm = 0;
+
 /* Get a pointer to the FrameSet at the start of the Plot. */
    fset = (AstFrameSet *) this;
 
@@ -7504,6 +7516,14 @@ static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 
 /* Check inherited global status. */
    if( !astOK ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   dl = 0.0;
+   xam = 0.0;
+   xbm = 0.0;
+   yam = 0.0;
+   ybm = 0.0;
 
 /* Store the shifts in x and y. */
    dx = xb - xa;
@@ -9120,6 +9140,14 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Check the global status. */
    if( !astOK ) return;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   a = NULL;
+   delta1 = 0.0;
+   delta2 = 0.0;
+   lblat2 = 0.0;
+   uy = 0.0;
+
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
@@ -9720,6 +9748,11 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 /* Check the global status. */
    if( !astOK ) return 0;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   xref = 0.0;
+   yref = 0.0;
+
 /* See if escape sequences in text strings are to be interpreted. */
    esc = astGetEscape( this );
 
@@ -10251,6 +10284,13 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* Check the global status. */
    if( !astOK ) return 0;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   pp2 = 0.0;
+   pv1 = 0.0;
+   pv2 = 0.0;
+   plarger = 0;
 
 /* See if the major ticks on the other axis are logarithmically or
    linearly spaced. */
@@ -10889,6 +10929,7 @@ int astFindEscape_( const char *text, int *type, int *value, int *nc ){
    *type = GRF__ESPER;
    *value = 0;
    *nc = 0;
+   perc = NULL;
 
 /* Check inherited status and supplied pointer. */
    if( !astOK || !text ) return result;
@@ -11114,6 +11155,11 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   nsame = 0;
+   use_nfill = 0;
+
 /* Decide where to put the first major tick. Use any value supplied by
    the caller. Otherwise put it an integral number of gaps away from the
    origin. This would result in the origin being at a major tick mark. */
@@ -11326,6 +11372,10 @@ static int FindMajTicks2( int nfill, double gap, double centre, int ngood,
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   nticks = 0;
+
 /* Reserve memory to hold a reasonable number of tick mark axis values.
    This memory is later extended as necessary. */
    ticks = (double *) astMalloc( sizeof(double)*( 6*nfill + 14 ) );
@@ -11472,9 +11522,10 @@ static int FindDPTZ( AstFrame *fr, int axis, const char *fmt,
 /* Initialise */
    *ndp = 0;
    *ntz = 0;
+   result = 0;
 
 /* Check inherited status */
-   if( !astOK ) return 0;
+   if( !astOK ) return result;
 
 /* Split the label up into fields. */
    nf = astFields( fr, axis, fmt, text, MAXFLD, fields, nc, &junk );
@@ -11759,6 +11810,10 @@ static AstFrameSet *Fset2D( AstFrameSet *fset, int ifrm ) {
 
 /* Check the inherited status. */
    if( !astOK ) return NULL;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   map = NULL;
 
 /* Get a pointer to the requested Frame in the supplied FrameSet. */
    frm = astGetFrame( fset, ifrm );
@@ -13792,6 +13847,15 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 /* Check the global error status. */
    if ( !astOK ) return 0.0;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   maxv = 0.0;
+   minv = 0.0;
+   used_cen = 0.0;
+   used_gap = 0.0;
+   ihi = 0;
+   ilo = 0;
+
 /* If this is the first call to this function, do some initialisation. */
    if( !pset ){
 
@@ -14216,6 +14280,15 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 
 /* Check the global error status. */
    if ( !astOK ) return 0.0;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   ptr1 = NULL;
+   frac = 0.0;
+   xmax = 0.0;
+   xmin = 0.0;
+   ymax = 0.0;
+   ymin = 0.0;
 
 /* Get the Mapping from base (graphics) to current (physical) Frame in the 
    supplied Plot. */
@@ -14974,6 +15047,10 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   wrapper = NULL;
 
 /* Store the current method and class for inclusion in error messages
    generated by lower level functions. */
@@ -16275,6 +16352,13 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 /* Check the global status. */
    if( !astOK ) return 0;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   dx1 = 0.0;
+   dx2 = 0.0;
+   dy1 = 0.0;
+   dy2 = 0.0;
+
 /* Initialise the returned value to indicate that the vector can not
    be found. */
    ret = 0;
@@ -17169,8 +17253,11 @@ static int IsASkyFrame( AstObject *obj ) {
    int ret;        
    AstFrame *frm;  
 
+/* initialise */
+   ret = 0;
+
 /* Check the global status. */
-   if( !astOK ) return 0;
+   if( !astOK ) return ret;
 
 /* If the Object is a SkyFrame, return 1. */
    if( astIsASkyFrame( obj ) ) {
@@ -19811,6 +19898,10 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 /* Return without action if an error has occurred, or there are no labels to 
    draw. */
    if( !astOK || nlab == 0 || !list || !astGetNumLab( this, axis ) ) return;
+ 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   rootoff = 0;
 
 /* Get the number of bounding boxes describing the labels already drawn
    (this will be non-zero only if this is the second axis to be labelled). */
@@ -23040,6 +23131,12 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Initialise the returned pointer. */
    ret = NULL;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   bot_digits = 0;
+   old_digits = 0;
+   top_digits = 0;
+
 /* Store the supplied value of cen. */
    cen0 = cen ? *cen : AST__BAD ;
 
@@ -23421,6 +23518,13 @@ static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, i
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   x0 = 0;
+   y0 = 0;
+   i0 = 0;
+   j0  = 0;
 
 /* Initialise the returned flags to indicate that the good/bad boundary
    does not intersect any of the edges. */
@@ -24267,6 +24371,10 @@ static double Typical( int n, double *value, double lolim, double hilim,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   ibin = 0;
 
 /* Find the minimum and maximum value in the supplied array, which are
    also within the supplied limits. Also store the first good value 
@@ -25989,6 +26097,10 @@ AstPlot *astPlot_( void *frame_void, const float *graphbox,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   new = NULL;
+
 /* Obtain and validate a pointer to any supplied Frame structure. */
    if( frame_void ){
       frame = astCheckFrame( frame_void );
@@ -26130,6 +26242,11 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   fset = NULL;
+   mess = NULL;
 
 /* If necessary, initialise the virtual function table. */
    if ( init ) astInitPlotVtab( vtab, name );
@@ -27343,6 +27460,10 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   new = NULL;
 
 /* Obtain a Frame pointer from any ID supplied and validate the
    pointer to ensure it identifies a valid Frame. */

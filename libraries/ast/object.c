@@ -4420,6 +4420,7 @@ AstObject *astMakeId_( AstObject *this ) {
 
 /* Initialise. */
    id = astI2P( 0 );
+   ihandle = 0;
 
 /* Check the global error status. */
    if ( astOK ) {

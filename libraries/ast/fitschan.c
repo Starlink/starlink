@@ -1887,6 +1887,10 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 /* Check the inherited status. */
    if( !astOK ) return 0;
 
+/* Initialise */
+   specunit = "";
+   specfactor = 1.0;
+
 /* First check that the values in the FitsStore conform to the
    requirements of the AIPS encoding. Assume they do to begin with. */
    ok = 1;
@@ -2421,6 +2425,11 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
+
+/* Initialise */
+   specunit = "";
+   specfactor = 1.0;
+   maxm = 0;
 
 /* First check that the values in the FitsStore conform to the
    requirements of the AIPS++ encoding. Assume they do to begin with. */
@@ -3947,6 +3956,10 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Check the inherited status. */
    if( !astOK ) return 0;
+
+/* Initialise */ 
+   specfactor = 1.0;
+   srcsys = "";
 
 /* First check that the values in the FitsStore conform to the
    requirements of the CLASS encoding. Assume they do not to begin with. */
@@ -6120,7 +6133,7 @@ static void DSBSetUp( AstFitsChan *this, FitsStore *store,
    rest of the observer. First note the orignal standard of rest and then
    set it to source. */
    sorset = astTestStdOfRest( dsb );
-   if( sorset ) oldsor = astGetStdOfRest( dsb );
+   oldsor = sorset ? astGetStdOfRest( dsb ) : AST__NOSOR;
    astSetStdOfRest( dsb, AST__SCSOR );
 
 /* Now take a copy of the SpecFrame and set it to use the standard of

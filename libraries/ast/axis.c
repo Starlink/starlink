@@ -599,7 +599,7 @@ static const char *AxisFormat( AstAxis *this, double value ) {
 /* Initialise. */
    result = NULL;
    nc = 0;
-   x = AST__BAD;
+   x = value;
 
 /* Check if a bad coordinate value was supplied and return a pointer to an
    appropriate string if necessary. */
@@ -637,8 +637,8 @@ static const char *AxisFormat( AstAxis *this, double value ) {
 
 /* If log format is required, find the value of the exponent "x", and
    initialise the returned string to hold the exponent and the graphical
-   escape sequence which produces a superscript. */
-         nc = 0;
+   escape sequence which produces a superscript. Otherwise just format the 
+   supplied value. */
          if( log ) {
    
             if( sign ) {
@@ -661,10 +661,6 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    
             nc += sprintf( buff + nc, "%s", 
                            astEscapes( -1 ) ? log_esc : log_txt );
-
-/* Otherwise just format the supplied value. */
-         } else {
-            x = value;
          }
       }
 

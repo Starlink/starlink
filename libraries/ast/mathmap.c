@@ -48,7 +48,7 @@ f     The MathMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -796,6 +796,7 @@ static void CompileExpression( const char *method, const char *class,
    nsym = 0;
    opensym = NULL;
    symlist = NULL;
+   sym = 0;
 
 /* The first symbol to be encountered must not look like an operator
    from the left. It may be a unary + or - operator. */
@@ -1136,6 +1137,7 @@ static void CompileMapping( const char *method, const char *class,
    *invcon = NULL;
    *fwdstack = 0;
    *invstack = 0;
+   nvar = 0;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1501,7 +1503,6 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    double frac2;                 /* Second (maybe normalised) fraction */
    double frac;                  /* Sole normalised fraction */
    double newexp;                /* New power of 2 exponent value */
-   double pi;                    /* Value of PI */
    double ran;                   /* Random number */
    double result;                /* Function result value */
    double unscale;               /* Factor for removing scaling */
@@ -1525,6 +1526,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    int tos;                      /* Top of stack index */
    static double d2r;            /* Degrees to radians conversion factor */
    static double log2;           /* Natural logarithm of 2.0 */
+   static double pi;             /* Value of PI */
    static double r2d;            /* Radians to degrees conversion factor */
    static double rsafe_sq;       /* Reciprocal of "safe_sq" */
    static double safe_sq;        /* Huge value that can safely be squared */
@@ -2666,6 +2668,7 @@ static void ExtractExpressions( const char *method, const char *class,
 
 /* Further initialisation. */
    nud = 0;
+   iud = 0;
       
 /* Allocate and initialise memory for the returned array of pointers. */
    MALLOC_POINTER_ARRAY( *exprs, char *, nfun )
@@ -3526,6 +3529,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   mathmap1 = NULL;
+   mathmap2 = NULL;
+   imap1 = 0;
+   imap2 = 0;
+   invert1 = 0;
+   invert2 = 0;
+   nfwd1 = 0;
+   nin1 = 0;
+   ninv1 = 0;
 
 /* MathMaps are only worth simplifying if they occur in series. */
    simplify = series;
@@ -4673,6 +4688,10 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 
 /* Check the global error status. */
    if ( !astOK ) return NULL;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   work = NULL;
 
 /* Obtain a pointer to the MathMap. */
    this = (AstMathMap *) map;

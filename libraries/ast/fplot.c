@@ -370,10 +370,11 @@ F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
       } else if( ifun == AST__GSCALES ) {
          wrapper = (AstGrfWrap) FGScalesWrapper;
 
-      } else if( astOK ) {
-         astError( AST__INTER, "%s(%s): AST internal programming error - "
-                   "Grf function id %d not yet supported.", method, class,
-                   ifun );
+      } else {
+         wrapper = (AstGrfWrap) FGFlushWrapper;
+         if( astOK ) astError( AST__INTER, "%s(%s): AST internal programming "
+                   "error - Grf function id %d not yet supported.", method, 
+                   class, ifun );
       }
       astGrfWrapper( astI2P( *THIS ), name, wrapper );
    )

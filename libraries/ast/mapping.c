@@ -657,6 +657,10 @@ static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   pset2 = NULL;
+
 /* If required, initialise things. */
    if( ax1 == -1 ) {
       for( i = 0; i < MAX_CACHE; i++ ) {
@@ -1493,6 +1497,12 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    nmin = 0;
    nsame_max = 0;
    nsame_min = 0;
+   pset_in = NULL;
+   pset_out = NULL;
+   ptr_in = NULL;
+   ptr_out = NULL;
+   oversize = 0;
+   bad = 0;
 
 /* Extract the number of input coordinates for the Mapping function
    and allocate workspace. */
@@ -2318,6 +2328,12 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 \
 /* Further initialisation. */ \
    kerror = 0; \
+   sum_var = 0; \
+   val = 0; \
+   val_var = 0; \
+   wtsum = 0; \
+   bad = 0; \
+   bad_var = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
@@ -3314,6 +3330,14 @@ static int InterpolateLinear##X( int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
 \
+/* Initialise variables to avoid "used of uninitialised variable" \
+   messages from dumb compilers. */ \
+   sum = 0; \
+   sum_var = 0; \
+   wtsum = 0; \
+   bad = 0; \
+   bad_var = 0; \
+\
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
@@ -4111,6 +4135,11 @@ static int InterpolateNearest##X( int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
 \
+/* Initialise variables to avoid "used of uninitialised variable" \
+   messages from dumb compilers. */ \
+   bad = 0; \
+   off_in = 0; \
+\
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
@@ -4653,6 +4682,15 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
+\
+/* Initialise variables to avoid "used of uninitialised variable" \
+   messages from dumb compilers. */ \
+   val = 0; \
+   val_var = 0; \
+   sum_var = 0; \
+   wtsum = 0; \
+   bad = 0; \
+   bad_var = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
@@ -5538,6 +5576,8 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
 
 /* Further initialisation. */
    linear = 1;
+   grad = NULL;
+   zero = NULL;
 
 /* Allocate space for the fit coefficients. The fit goes from the output
    space of the Mapping (which has "nout" axes) to the input space of the
@@ -9040,6 +9080,10 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Further initialisation. */
    pset_in = NULL;
+   ptr_in = NULL;
+   neighb = 0;
+   gifunc = NULL;
+   kernel = NULL;
 
 /* Calculate the number of output points, as given by the product of
    the output grid dimensions. */
@@ -10707,6 +10751,10 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    int origin;                   /* Origin lies within bounds? */
    int point;                    /* Loop counter for points */
    
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   pset_out = NULL;
+
 /* Obtain the number of coordinate axes and calculate the number of
    points required in order to place one at every corner of the
    constrained region of the coordinate space. */

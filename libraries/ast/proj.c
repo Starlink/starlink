@@ -49,8 +49,12 @@
 *        are not needed by AST) in order to avoid clash with similar names
 *        in other modules imported as part of other software systems (e.g. 
 *        SkyCat).
-*     - astZPNfwd: Loop from prj->n to zero, not from MAXPAR to zero.
-*     - astZPNfwd: Only return "2" if prj->n is larger than 2.
+*     -  astZPNfwd: Loop from prj->n to zero, not from MAXPAR to zero.
+*     -  astZPNfwd: Only return "2" if prj->n is larger than 2.
+*     -  Lots of variables are initialised to null values in order to
+*        avoid "use of uninitialised variable" messages from compilers which 
+*        are not clever enough to work out that the uninitialised variable is 
+*        not in fact ever used. 
 
 *=============================================================================
 *
@@ -3509,6 +3513,11 @@ double *x, *y;
    double cthe, l, m, n, rho, x0, xf, y0, yf;
    const double tol = 1.0e-12;
 
+   x0 = 0.0;
+   xf = 0.0;
+   y0 = 0.0;
+   yf = 0.0;
+
    if (prj->flag != WCS__TSC) {
       if (astTSCset(prj)) return 1;
    }
@@ -3738,6 +3747,11 @@ double *x, *y;
    const float c20 = -0.178251207466;
    const float c02 =  0.106959469314;
 
+   eta = 0.0;
+   xi = 0.0;
+   x0 = 0.0;
+   y0 = 0.0;
+
    if (prj->flag != WCS__CSC) {
       if (astCSCset(prj)) return 1;
    }
@@ -3883,6 +3897,10 @@ double *phi, *theta;
    const float p05 = -0.63915306;
    const float p15 =  0.52032238;
    const float p06 =  0.14381585;
+
+   l = 0.0;
+   m = 0.0;
+   n = 0.0;
 
    if (prj->flag != WCS__CSC) {
       if (astCSCset(prj)) return 1;
@@ -4037,6 +4055,13 @@ double *x, *y;
    int   face;
    double cthe, eta, l, m, n, omega, p, rho, rhu, t, tau, x0, xf, xi, y0, yf;
    const double tol = 1.0e-12;
+
+   eta = 0.0;
+   x0 = 0.0;
+   xf = 0.0;
+   xi = 0.0;
+   y0 = 0.0;
+   yf = 0.0;
 
    if (prj->flag != WCS__QSC) {
       if (astQSCset(prj)) return 1;
@@ -4210,6 +4235,10 @@ double *phi, *theta;
    int   direct, face;
    double l, m, n, omega, rho, rhu, tau, xf, yf, w;
    const double tol = 1.0e-12;
+
+   l = 0.0;
+   m = 0.0;
+   n = 0.0;
 
    if (prj->flag != WCS__QSC) {
       if (astQSCset(prj)) return 1;

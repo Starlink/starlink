@@ -33,7 +33,7 @@ f     The PermMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -479,6 +479,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Further initialisation. */
    con = NULL;
    inperm = outperm = NULL;
+   ncon = 0;
+   permmap = NULL;
 
 /* In series. */
 /* ---------- */

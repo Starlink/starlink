@@ -51,7 +51,7 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *     which are applicable to all SpecFrames.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: David Berry (Starlink)
@@ -441,6 +441,10 @@ static double GetImagFreq( AstDSBSpecFrame *this ) {
 
 /* Check the global error status. */
    if ( !astOK ) return AST__BAD;
+
+/* Initialise */
+   oldsb = 0;
+   oldsor = 0;
 
 /* Save the original value of the StdOfRest attribute and set it
    temporarily to SOURCE. */

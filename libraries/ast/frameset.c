@@ -1081,6 +1081,15 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   inode_map = NULL;
+   next_map = NULL;
+   inode_invert = 0;
+   next = 0;
+   next_invert = 0;
+   next_link = 0;
+
 /* Validate and translate the Frame index supplied. */
    iframe = astValidateFrameIndex( this, iframe, "astAddFrame" );
 
@@ -2346,8 +2355,11 @@ static AstFrameSet *ConvertX( AstFrame *to, AstFrame *from,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Further initialisation. */
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
    result_map = NULL;
+   iframe_from = 0;
+   iframe_to = 0;
 
 /* Determine the number of Frames in "from" and the indices of its
    base and current Frames. Use values of 1 if "from" is a Frame and
@@ -2863,6 +2875,10 @@ static AstFrameSet *FindFrame( AstFrame *target_frame, AstFrame *template,
 
 /* Check the global error status. */
    if ( !astOK ) return result;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   target_index = 0;
 
 /* Obtain a pointer to the target FrameSet structure. */
    target = (AstFrameSet *) target_frame;
@@ -3559,8 +3575,11 @@ static int GetBase( AstFrameSet *this ) {
    int invert;                   /* FrameSet is inverted? */
    int result;                   /* Value to return */
 
+/* Initialise */
+   result = 0;
+
 /* Check the global error status. */
-   if ( !astOK ) return 0;
+   if ( !astOK ) return result;
 
 /* Determine if the FrameSet has been inverted. */
    invert = astGetInvert( this );
@@ -3625,8 +3644,11 @@ static int GetCurrent( AstFrameSet *this ) {
    int invert;                   /* FrameSet is inverted? */
    int result;                   /* Value to return */
 
+/* Initialise */
+   result = 0;
+
 /* Check the global error status. */
-   if ( !astOK ) return 0;
+   if ( !astOK ) return result;
 
 /* Determine if the FrameSet has been inverted. */
    invert = astGetInvert( this );

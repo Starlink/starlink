@@ -31,7 +31,7 @@ f     The MatrixMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -503,6 +503,10 @@ static void CompressMatrix( AstMatrixMap *this ){
 
 /* Check the global error status. */
    if ( !astOK || !this ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   new_inv = 0;
 
 /* Get the dimensions of the forward matrix. */
    if( astGetInvert( this ) ){
@@ -1374,6 +1378,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   i1 = 0;
+   i2 = 0;
+   neighbour = 0;
+
 /* Get the Invert attribute for the specified mapping. */
    invert = astGetInvert( ( *map_list )[ where ] );
 
@@ -2067,6 +2077,11 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm  ){
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   mmnew = NULL;
+   pmnew = NULL;
 
 /* Store pointers to the supplied PermMap and the MatrixMap. */
    pm = (AstPermMap *) maps[ 1 - imm ];
@@ -3128,13 +3143,13 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 /* Use the PermMap to transform these positions in the forward direction. */
    (void) astTransform( map, pset1, 1, pset2 );
 
+/* No constant axis valeus found yet. */
+   nc = 0;
+
 /* Look at the mapped positions to determine the output axis permutation
    array. */
    ptr2 = astGetPoints( pset2 );
    if( astOK ){
-
-/* No constant axis valeus found yet. */
-      nc = 0;
 
 /* Do each output axis. */
       for( i = 0; i < nout; i++ ){

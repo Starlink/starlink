@@ -290,8 +290,11 @@ static type Get##attr( AstSkyFrame *this, int axis ) { \
    int axis_p;                   /* Permuted axis index */ \
    type result;                  /* Result to be returned */ \
 \
+/* Initialise */\
+   result = (bad_value); \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return (bad_value); \
+   if ( !astOK ) return result; \
 \
 /* Validate and permute the axis index. */ \
    axis_p = astValidateAxis( this, axis, "astGet" #attr ); \
@@ -465,8 +468,11 @@ static int Test##attr( AstSkyFrame *this, int axis ) { \
    int result;                   /* Value to return */ \
    int axis_p;                   /* Permuted axis index */ \
 \
+/* Initialise */ \
+   result =0; \
+\
 /* Check the global error status. */ \
-   if ( !astOK ) return 0; \
+   if ( !astOK ) return result; \
 \
 /* Validate and permute the axis index. */ \
    axis_p = astValidateAxis( this, axis, "astTest" #attr ); \
@@ -1571,6 +1577,9 @@ static int GetDirection( AstFrame *this_frame, int axis ) {
 
 /* Initialise. */
    result = 0;
+   as_time_set = 0;
+   is_latitude = 0;
+   is_latitude_set = 0;
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -2001,6 +2010,9 @@ static const char *GetFormat( AstFrame *this_frame, int axis ) {
 
 /* Initialise. */
    result = NULL;
+   as_time_set = 0;
+   is_latitude = 0;
+   is_latitude_set = 0;
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -2724,6 +2736,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 
 /* Initialise. */
    result = NULL;
+   pos = 0;
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -3311,6 +3324,13 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* Initialise the returned values. */
    match = 1;
    *map = NULL;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   epoch_B = 0.0;
+   epoch_J = 0.0;
+   equinox_B = 0.0;
+   equinox_J = 0.0;
 
 /* If both systems are unknown, assume they are the same. Return a UnitMap.
    We need to do this, otherwise a simple change of Title (for instance)
@@ -3909,6 +3929,10 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Check the global error status. */
    if ( !astOK ) return match;
+
+/* Initialise variables to avoid "used of uninitialised variable"
+   messages from dumb compilers. */
+   swap = 0;
 
 /* Obtain a pointer to the template SkyFrame structure. */
    template = (AstSkyFrame *) template_frame;
@@ -4757,6 +4781,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
 /* Indicate that we do not need to reset the System attribute of the
    template. */
    reset_system = 0;
+   new_system = AST__UNKNOWN;
 
 /* If the result Frame is a SkyFrame, we must test to see if overlaying its
    System attribute will change the type of sky coordinate system it

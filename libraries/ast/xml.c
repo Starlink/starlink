@@ -10,7 +10,7 @@
 *     reading and writing functions for the XmlChan class.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)
@@ -726,6 +726,9 @@ void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
 /* Check the global error status. */
    if( !astOK ) return;
 
+/* Initialise */
+   oldattr = NULL;
+
 /* Clean the value text. */
    my_value = CleanText( value );
 
@@ -889,6 +892,9 @@ void astXmlAddCharData_( AstXmlParent *this, int where, const char *text ){
 
 /* Check the global error status. */
    if( !astOK ) return;
+
+/* Initialise */
+   new = NULL;
 
 /* Clean the text by replacing "\r\n" by "\n". */
    my_text = CleanText( text );
@@ -1183,6 +1189,9 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri ){
 
 /* Check the global error status. */
    if( !astOK ) return;
+
+/* Initialise */
+   oldns = NULL;
 
 /* Store the used length of the namespace prefix. */
    nc = prefix ? astChrLen( prefix ) : 0;   
@@ -2406,6 +2415,9 @@ void astXmlRemoveAttr_( AstXmlElement *this, const char *name,
 /* Check the global error status. */
    if( !astOK ) return;
 
+/* Initialise */
+   oldattr = NULL;
+
 /* Create a new XmlAttribute with blank value. */
    attr = NewAttribute( name, "", prefix );
    if( astOK ) {
@@ -2557,6 +2569,9 @@ void astXmlRemoveURI_( AstXmlElement *this, const char *prefix ){
 
 /* Check the global error status. */
    if( !astOK ) return;
+
+/* Initialise */
+    oldns = NULL;
 
 /* Create a new XmlNamespace with blank URI. */
    ns = NewNamespace( prefix, "" );
@@ -3399,6 +3414,7 @@ static void *Delete( void *obj_ptr ){
 
 /* Initialise */
    result = NULL;
+   ok = 0;
 
 /* Check we have an XmlObject. */
    if( !astXmlCheckType( obj_ptr, AST__XMLOBJECT ) ) return result;
@@ -3407,7 +3423,6 @@ static void *Delete( void *obj_ptr ){
    obj = (AstXmlObject *) obj_ptr;
    parent = obj->parent;
    if( parent ) {
-      ok = 0;
 
 /* First deal with cases where we are deleting items from a document. */
       if( astXmlCheckType( parent, AST__XMLDOC ) ) {
@@ -5184,6 +5199,7 @@ static char *RemoveEscapes( const char *text ){
 
 /* Initialise */
    result = NULL;
+   nc = 0;
 
 /* Return if the pointer is NULL or if an error has occurred. */
    if( !astOK || !text ) return result;
@@ -5800,6 +5816,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 
 /* Initialise */
    result = NULL;
+   elem = NULL;
 
 /* Check the global error status. */
    if( !astOK ) return result;

@@ -16,7 +16,7 @@
 *     astUnitLabel: Returns a label for a given unit symbol.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -641,6 +641,8 @@ static int ComplicateTree( UnitNode **node ) {
 
 /* Initiallially, we have no replacement node. */
    newnode = NULL;
+   node1 = NULL;
+   node3 = NULL;
 
 /* Complicate the sub-trees corresponding to the arguments of the node at
    the head of the supplied tree. */
@@ -1390,6 +1392,7 @@ static void FixConstants( UnitNode **node, int unity ) {
 
 /* Initiallially, we have no replacement node */
    newnode = NULL;
+   newcon = AST__BAD;
 
 /* There is nothing to fix if the node has no arguments. */
    if( (*node)->narg > 0 ) {
@@ -2043,6 +2046,7 @@ static UnitNode *InvertTree( UnitNode *fwdnode, UnitNode *src ) {
 
 /* Initiallially, we have no replacement node */
    newnode = NULL;
+   nextnode = NULL;
 
 /* Save the op code at the head of the forward tree. */
    fop = fwdnode->opcode;
@@ -2817,6 +2821,7 @@ static UnitNode *MakeLabelTree( const char *lab, int nc ){
 
 /* Initialise */
    result = NULL;
+   oplen = 0;
 
 /* Check the global error status, and that we have a string. */
    if ( !astOK || !lab || !nc ) return result;
@@ -3460,6 +3465,7 @@ static UnitNode *NewNode( UnitNode *old, Oper code ) {
 
 /* Initialise. */
    result = NULL;
+   args = NULL;
 
 /* Check the inherited status. */
    if( !astOK ) return result;
@@ -4370,7 +4376,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    Mapping, try again with the units swapped, and note that the final
    Mapping should be inverted before being used. */
       for( ipass = 0; ipass < 2; ipass++ ){
-         if( ipass = 1 ) {
+         if( ipass == 1 ) {
             tmp = in_tree;            
             in_tree = out_tree;            
             out_tree = tmp;
