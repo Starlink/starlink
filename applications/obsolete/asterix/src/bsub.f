@@ -675,7 +675,6 @@ C	   END IF
 *
 *  the detection threshold significance for other, weaker sources, can
 *  now be entered as a user input
-*
 	CALL MSG_PRNT(' ')
 	CALL USI_GET0R('SOURCE_THRESH',DETECTION_THRESH,STATUS)
 	IF(STATUS.NE.SAI__OK)THEN
@@ -683,13 +682,12 @@ C	   END IF
 	ENDIF
 
 	NHISTORY=NHISTORY+1
-	WRITE(TEXT,'(''Threshold for source detection is '',
-     &1PG8.1)')DETECTION_THRESH
+	WRITE(TEXT,'(''Threshold for source detection is '',1PG8.1)')
+     :             DETECTION_THRESH
 	HISTORY(NHISTORY)=TEXT
-*
+
 *  The image will be divided into boxes. The user specifies an initial trial
 *  box size
-*
 	BOXSIZE=0
 
 	CALL MSG_PRNT(' ')
