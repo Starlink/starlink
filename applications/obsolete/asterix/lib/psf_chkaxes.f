@@ -22,6 +22,7 @@
 *     17 Feb 94 : Allocate psf instance if not done externally (DJA)
 *     30 Jun 94 : Improved default behaviour to trap case where no
 *                 axis labels present (DJA)
+*     10 Apr 95 : Added PI to list of allowable energy axis names (DJA)
 *
 *    Type definitions :
 *
@@ -187,7 +188,7 @@
      :                 (NDIM.EQ.2) ) THEN
                 Y_AX = IAX
               ELSE IF ( (E_AX.EQ.0) .AND.
-     :             CHR_INSET( 'CORR_PH_CH,PULSE_HEIGHT,'/
+     :             CHR_INSET( 'CORR_PH_CH,PULSE_HEIGHT,PI,'/
      :                        /'PULSE_HEIGHT_CH,ENERGY',
      :                        LABEL(:WE) ) .OR.
      :             (INDEX(LABEL,'PHA').NE.0) ) THEN
