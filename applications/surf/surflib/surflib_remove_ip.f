@@ -20,16 +20,16 @@
 *     Remove the instrumental polarisation signal from the data
 *     The following formula is used:
 *
-*     New flux = Measured flux * (1 - %age IP )
+*     New flux = Measured flux * (1 - fractional IP )
 *
-*     IP = %age polarisation * (1 + cos (4*waveplate - 2* IP angle))
+*     IP = fractional polarisation * (1 + cos (4*waveplate - 2* IP angle))
 *
-*     where %age polarisation and IP angle vary linearly with
+*     where fractional polarisation and IP angle vary linearly with
 *     elevation.
 *
 *     This is an approximation of 
 *
-*       Actual flux = measured flux - mean flux * %age IP
+*       Actual flux = measured flux - mean flux * frac IP
 *
 *     where 
 *
@@ -97,6 +97,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.5  2003/04/07 23:48:35  timj
+*     Change %age to 'frac' in documentation header
+*
 *     Revision 1.4  2003/04/03 03:19:09  timj
 *     Calculation now fixed to S(meas)*(1-P(1+cos[])
 *

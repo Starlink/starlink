@@ -23,16 +23,16 @@
 *     This task calculates and removes the instrumental polarisation
 *     signal from SCUBA polarimeter data.
 *
-*       Actual flux = measured flux * ( 1 - %age IP)
+*       Actual flux = measured flux * ( 1 - fractional IP)
 *
 *     where IP = P * (1 + cos (4 WP - 2 THETA ))
-*     and P is the (elevation dependent) instrumental percentage
+*     and P is the (elevation dependent) instrumental fractional
 *     polarisation, WP is the position angle of the wave plate and
 *     THETA is the (elevation dependant) position angle of the IP.
 *
 *     This is an approximation of 
 *
-*       Actual flux = measured flux - mean flux * %age IP
+*       Actual flux = measured flux - mean flux * frac IP
 *
 *     where 
 *
@@ -40,7 +40,7 @@
 *
 *     and we have assumed that the instrumental polarisation is small
 *     such that the measured flux and the mean fluxed are
-*     approximately equal. This is approximation is required since
+*     approximately equal. This approximation is required since
 *     the mean flux can not be calculated trivially since the
 *     bolometers are jiggling on and off the source.
 
@@ -78,6 +78,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.9  2003/04/07 23:48:34  timj
+*     Change %age to 'frac' in documentation header
+*
 *     Revision 1.8  2003/04/03 03:19:09  timj
 *     Calculation now fixed to S(meas)*(1-P(1+cos[])
 *
