@@ -63,6 +63,13 @@ following steps are required:
 
       % ./configure -C   # -C means caching results
       % make world
+ 
+ - If you wish to disable the building of shared libraries you should
+ 
+      % ./configure -C --disable-shared
+      
+   currently (as of 27-Jun-04) this is necessary for the build to work
+   under Mac OSX.
 
  - If you wish to build only as far as a given component, then specify
    it by giving the name of the associated `manifest' file.
