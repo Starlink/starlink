@@ -50,6 +50,9 @@
 *    History :
 *     $Id$
 *     $Log$
+*     Revision 1.3  1997/11/19 02:26:45  timj
+*     Make sure there is a space between the equals and the number.
+*
 *     Revision 1.2  1997/11/19 01:23:41  timj
 *     Update header
 *
@@ -142,8 +145,8 @@
 *  reset the value, padding out the string with blanks
 
                         CALL CHR_RTOC (VALUE, STEMP, ITEMP)
-                        CALL CHR_TERM (JPOS-IPOS-1, STEMP)
-                        FITS (I)(IPOS+1:JPOS-1) = STEMP (:JPOS-IPOS-1)
+                        CALL CHR_TERM (CHR_LEN(STEMP), STEMP)
+                        FITS (I)(IPOS+2:JPOS-1) = STEMP (:JPOS-IPOS-2)
                      END IF
                   END IF
                END IF
