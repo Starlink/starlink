@@ -43,11 +43,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -62,6 +65,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER LOCS*(*)
@@ -113,7 +117,8 @@
          IF( BIT .LE. IRQ__QBITS ) THEN
 
 *  Count the number of pixels which do and do not have the quality.
-            CALL IRQ1_QCNT( BIT, NEL, %VAL( PNT ), SET( BIT ), CLEAR,
+            CALL IRQ1_QCNT( BIT, NEL, %VAL( CNF_PVAL( PNT ) ), 
+     :                      SET( BIT ), CLEAR,
      :                      STATUS )
 
 *  If no such bit exists, set the count to zero.

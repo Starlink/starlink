@@ -60,6 +60,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +68,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,6 +88,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -159,9 +163,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1B( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
@@ -234,6 +241,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -241,6 +249,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -259,6 +269,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -333,9 +344,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1UB( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
@@ -408,6 +422,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -415,6 +430,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -433,6 +450,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -507,9 +525,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1D( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
@@ -582,6 +603,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -589,6 +611,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -607,6 +631,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -681,9 +706,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1I( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
@@ -756,6 +784,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -763,6 +792,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -781,6 +812,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -855,9 +887,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1R( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
@@ -930,6 +965,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -937,6 +973,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -955,6 +993,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -1029,9 +1068,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1W( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
@@ -1104,6 +1146,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -1111,6 +1154,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Made generic.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -1129,6 +1174,7 @@
 
 *  Global Variables:
       INCLUDE 'IRQ_COM'          ! IRQ common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        QCM_INDF( IRQ__MAXQ ) = INTEGER (Read)
 *           Cloned NDF identifiers for the NDFs to which each quality
 *           expression refers.
@@ -1203,9 +1249,12 @@
 *  Create the pixel mask.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL IRQ1_SBAD1UW( HELD, QCM_NMASK( IDQ ),
-     :                    %VAL( QCM_MSPNT( IDQ ) ), QCM_NOPC( IDQ ),
-     :                    %VAL( QCM_OPPNT( IDQ ) ), QCM_MXSTK( IDQ ),
-     :                    SIZE, %VAL( QPNT ), %VAL( WPNT ), VEC,
+     :                    %VAL( CNF_PVAL( QCM_MSPNT( IDQ ) ) ), 
+     :                    QCM_NOPC( IDQ ),
+     :                    %VAL( CNF_PVAL( QCM_OPPNT( IDQ ) ) ), 
+     :                    QCM_MXSTK( IDQ ),
+     :                    SIZE, %VAL( CNF_PVAL( QPNT ) ), 
+     :                    %VAL( CNF_PVAL( WPNT ) ), VEC,
      :                    ALLBAD, NOBAD, STATUS )
       END IF
 
