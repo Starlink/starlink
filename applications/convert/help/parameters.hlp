@@ -10,26 +10,23 @@ of what follows is applicable to any ADAM application.
 2 Defaults
 Command-line values are used mostly for those parameters that are
 normally defaulted by the application.   Defaulted parameters enable
-applications to have many options, say for controlling the
-appearance of some graphical output, without making routine
-operations tedious because of a large number of prompts. The values
-of normally defaulted parameters are given in the help for each
-parameter within each application. They are enclosed in square
-brackets at the end of the parameter description for NDF
-applications.
+applications to have many options, say for controlling the format of
+the output file, without making routine operations tedious because
+of a large number of prompts.  The values of normally defaulted
+parameters are given in the help for each parameter within each
+application. They are enclosed in square brackets at the end of the
+parameter descriptions. 
  
-     ICL> HELP NDF2DST PARAM *
+     ICL> HELP NDF2DST PARAM * 
  
-gives details of all parameters in application NDF2DST.  The values
-of parameters that are normally defaulted appear at the end of the
-parameter description within square brackets. If you want to override
-one of these defaults, then you must specify the parameter's value on
-the command line.
+gives details of all parameters in application NDF2DST. If you want
+to override one of these defaults, then you must specify the
+parameter's value on the command line. 
 
 When you are prompted you will usually be given a suggested default
 value in / / delimiters.  You can choose to accept the default by
-pressing carriage return.  For example, 64 is the suggested value
-below.
+pressing carriage return.  For example, FALSE is the suggested
+value below.
  
      DESCRIP - Write the BDF descriptors to the screen? /FALSE/ >
  
@@ -53,8 +50,6 @@ you must enter @234, otherwise ADAM will think you are giving the
 integer 234.  Note that the file extension must not be included
 when giving the name of an NDF file.  Otherwise HDS will look
 for an object called SDF within the file. 
-
-Responses to prompts are case insensitive. 
 
 The default value can be edited to save typing by first pressing the
 <TAB> key. The editor behaves like the DCL command-line editor.
@@ -83,7 +78,23 @@ global parameter with the name of the NDF it has just made.
 
 All global parameters are stored in HDS file ADAM_USER:GLOBAL.SDF.
 
-2 Abort and Null
+2 Strings
+The apostrophes around strings given in response to prompts for a
+character parameter can be omitted. Responses to prompts are case
+insensitive. 
+
+2 Arrays
+If a parameter requires an array of values, the series should be in
+brackets separated by commas or spaces.  For example, 
+
+     SHAPE - Shape of the output NDF > [3,5,4]
+
+would input three values: 3, 5 and 4 into the integer parameter SHAPE.
+There is one exception where you can omit the brackets---a fairly common
+one---and that is in response to a prompt for a one-dimensional array as
+above. 
+
+2 Abort_and_Null
 Responding to a prompt with a null value ! will not necessarily
 cause the application to abort, but it can force a suitable default
 to be used, where this is the most-sensible action.
@@ -98,21 +109,23 @@ corrupted.
 To get help about a parameter enter ?.  This will give access to the
 help-library information for that parameter, for example,
  
-     TYPE - Interim data type required /'R'/ > ?
+     RECLEN - Maximum recordsize of the ASCII file. /512/ > ?
 
-     NDF2BDF
+     NDF2ASCII
 
        Parameters
 
-         TYPE = LITERAL (Read)
-            The data type of the output BDF.  It must be one of the
-            following Interim types: "SB", "SW", "R", "SL", "DP", "UB",
-            "UW" corresponding to signed byte, signed word, real, signed
-            longword, double precision, unsigned byte, unsigned word.
-            See SUN/4 for further details.  The default is the type
-            corresponding to that of the NDF.  []
+         RECLEN = _INTEGER (Read)
+            The maximum record length in bytes of the output file.  This
+            must be between 32 and 32766.  The lower limit is further
+            increased to 80 when there is a FITS header to be copied.  It
+            is only used when FIXED is FALSE and will default to the
+            current value, or 512 if there is no current value.  When
+            FIXED is TRUE the application creates data records whose
+            length is the product of the number of bytes per value plus
+            one (for the space), times the number of values per record. []
 
-     TYPE - Interim data type required /'R'/ >
+     RECLEN - Maximum recordsize of the ASCII file. /512/ > 
  
 and then immediately reprompt you for the parameter.  There are
 occasions when information about the parameter is insufficient; you
@@ -142,11 +155,11 @@ little as a single character.  Here is an example:
             unambiguous abbreviation may be given.  The default is the
             type corresponding to that of the BDF.  []
  
-where a _R would be sufficient to select the _REAL type, but at
+where an _R would be sufficient to select the _REAL type, but at
 least two characters would be needed if you wanted unsigned byte
 or unsigned word.
 
-2 Logical names
+2 Logical_names
 From DCL, ordinary process logical names may be used as normal.
 However, logical names to be used by applications (including CONVERT)
 from within ICL must be defined with the /JOB qualifier. Thus if
@@ -229,7 +242,7 @@ command line.
 The ACCEPT keyword forces the parameter system to accept the
 suggested default values for every application parameter.  In other
 words, those parameters which would normally be prompted with a
-value between `/ /' delimeters take the value between those
+value between `/ /' delimiters take the value between those
 delimiters.  Parameters that are normally defaulted behave as
 normal.  The ACCEPT keyword needs to be used with care because not
 every parameter has a default, and therefore must be given on the
@@ -238,6 +251,6 @@ command line for the application to work properly.
 There is a shorthand for ACCEPT---a backslash at the end of the
 command line.  For example,
 
-     $ dipso2ndf \
+     $ unf2ndf \
  
-though this is not a particularly useful it this case.
+though you would still be prompted for the name of output NDF.
