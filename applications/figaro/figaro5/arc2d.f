@@ -1,0 +1,342 @@
+      subroutine arc2d( STATUS )
+*+
+* Name:
+*    ARC2D
+
+* Invocation:
+*    CALL ARC2D( STATUS )
+*
+* Purpose:
+*   Wavelength calibration
+
+* Description:
+*     This program controls both 1D and 2D wavlength calibration and
+*   can operate either in BATCH or INTERACTIVE modes.
+*     The philosophy behind it is somewhat different to those presented
+*   in the existing SPICA/SDRSYS and FIGARO software in many respects.
+*   In particular its exclusive use of gausian fitting of arclines, its
+*   demand for "intellegent" users, who can decide which lines they want
+*   to use initially and then allow them to make objective assesments of
+*   which,if any are erroneous. Typical diagnostic information given are
+*   plots of residuals from the fit versus line width,flux and position.
+*   This is all made possible by the use of the Gaussian fitting.
+*     The least squares polynomial fitting allows weights to be included
+*   for each line(again derived from the formal Gaussian fits).Thus it
+*   is possible to constrain the polynomial in difficult regions
+*   eg "the 5100 gap" without distorting the global fit.
+
+* Parameters:
+*    IMAGE = FILE (Read)
+*        Name of image for input
+*          This should be a file containing an arc spectrum.
+*    ARC_OPTS = CHARACTER (Read)
+*        Enter arc fit option
+*          NEW    : set up a new wavelength calibration
+*          REPEAT : Itterate on previous calibration
+*          CLONE  : CLone a previous calibration
+*    YSTART = INTEGER (Read)
+*        analysis lower limit
+*            The data between the limits ystart and yend is extracted
+*            and the resultant spectrum is used to locate the lines.
+*    YEND = INTEGER (Read)
+*        analysis upper limit
+*            The data between the limits ystart and yend is extracted
+*            and the resultant spectrum is used to locate the lines.
+*    YBLOCK = INTEGER (Read)
+*        Enter analysis x-sect width
+*            Each window is of this width (except perhaphs the final one).
+*    ITERATION = INTEGER*2 (Read)
+*        New value of iteration
+*    ORDER = INTEGER (Read)
+*        order for polynomial fitting
+*          This is for the continuity correction of the data. Idealy the
+*          arc should have been pre-processed with ARCSDI, so a low
+*          order e.g. 2 should be used.
+*    MAXLINES = INTEGER (Read)
+*        Maximum number of lines to allow room for
+*          This must be greater than or equal to the number of lines
+*          fitted, so room should be allowed in case any more are
+*          to be added later.
+*    CLFILE = FILE (Read)
+*        Name of image for cloning from
+*          This should be a file containing an arc spectrum.
+*    TOLS = CHARACTER (Read)
+*        For use in batch only
+*    KEEP_ITT = LOGICAL (Read)
+*        keep itteration files'
+*    PRFITS = LOGICAL (Read)
+*        Print out details of fitting
+
+* Files:
+*     NAME                  PURPOSE
+*  (image).IAR Stores polynomial coefficients, for use by ISCRUNCH.
+*  IMAGE       The arc data.  This should be a FIGARO data file with
+*              a data array. If there is a data array for the first
+*              axis the information it contains will be used during
+*              the program.
+*
+* Subroutines/functions referenced:
+*    APPLY_TOLS         : Apply tolerances
+*    ARCFIT             : this does the actual fitting of polynomials
+*                         in the channel direction (wavelength as a
+*                         function of channel number). Either the line
+*                         positions or the positions interpolated by
+*                         control_cpoly_w may be used.
+*    ARC_WINDOW         : Find line centres by fitting Gaussians
+*    CLGRAP             : Close graphics
+*    CONTIN_CORR        : this fits polynomials in the x-sect direction
+*                         (i.e. along the lines), so as to remove
+*                         discontinuities due to noise. It then set the
+*                         results from this into the .RES.DATA structure
+*                         for use by arcfit.
+*    GET_LINE_IDS       : This obtains the line ids etc., if in new or
+*                         clone mode. Otherwise it simply maps the data
+*                         file with some checking.
+*    TWO_OPEN           : Open input file and get its dimensions etc.
+*    GETVM              : Get virtual memory
+*    IROUTP             : this outputs the results of the fitting by
+*                         arcfit to a file for use by ISCRUNCH, and
+*                         also a summary to the terminal. This was
+*                         copied from the FIGARO IARC program.
+*    LOOK               : Output values of main results array
+*    UNMAP_RES          : Unmap results  structure
+*
+*
+*    DSA_FREE_WORKSPACE : Free workspace
+*    DSA_CLOSE          : Close DSA system
+*    PAR_QUEST          : Obtain YES/NO response from user
+*    PAR_WRUSER         : Write character string to user
+*
+* Authors:
+*   DJA: D.J.Axon Manchester
+*   TNW: T.N.Wilkins Manchester, Cambridge from 2/89
+*   AJH: A.J. Holloway Manchester 97+
+
+* History:
+*   Altered TNW 4/7/88 to have separate routine
+*   for main menu and 4/8/88 to use virtual mem for arcfit a lot more.
+*   ACCEPTFITS flag added 26/9/88 TNW
+*   Altered to use GET_LINE_IDS TNW 3/10/88, tidied 5/10/88
+*   Character workspace passed for ARCFIT TNW 11/10/88
+*   PARDESCR added to arguments of SHOW_DIAGNOSIS 20/7/89 TNW
+*   Changes to character mapping/VM TNW 18/9/89
+*   TNW 21/9/89, more moved to GET_LINE_IDS
+*   TNW 8/12/89, arc_window called directly
+*    "  1-10/7/91 Changes for new results structure
+*   AJH Oct 1997 Included PDA required variables
+*-
+* _____________________________________________________________________
+      implicit none
+*
+* include common blocks
+*
+      integer status
+      include 'arc_dims'
+*
+*  integer
+*
+      integer norder
+
+* max order of polynomial
+
+      integer MAX_KPLUS1
+      parameter (MAX_KPLUS1 = 10)
+
+* PDA required vars
+
+      integer maxnpts
+      parameter (maxnpts = 2048)
+      double precision athree(3*maxnpts + 3*max_kplus1,50)
+*      double precision athre2(3*maxnpts + 3*max_kplus1,50)
+* pointers
+
+
+* to coeffs of poly fits in channel direction
+
+      integer coptr
+      integer slot
+      integer w1ptr,w2ptr,w3ptr,w4ptr,w5ptr,w6ptr,w7ptr,w8ptr,w9ptr
+      integer w10ptr,w11ptr,w12ptr,nbytes,nels,w13ptr
+
+      real rmsmax
+      integer nfits
+      logical acceptfits
+*
+      logical polydata
+      integer iopt
+      logical loop
+      include 'SAE_PAR'
+      include 'PRM_PAR'
+      include 'bytesdef'
+      character dynamic_chars
+      include 'dynamic_memory_inc'
+      equivalence (dynamic_mem,dynamic_chars)
+      logical par_quest
+      integer chr_len
+*
+* data statement
+*
+      data norder/3/
+* -------------------------------------------------------------------
+      status = SAI__OK
+
+* increased TNW 30/11/89 from 13 to 14
+
+      mxpars = 7
+      nyp = 20
+      polydata = .false.
+
+* Perform initialisation and get line identifications
+
+      call get_line_ids(.true.,status)
+      if(status.ne.SAI__OK) goto 500
+
+* interogate the data cube. Apply tols if required
+
+      loop=.true.
+      do while(loop)
+
+        if(batch) then
+          iopt = 7
+        else
+          call arcmenu(spdim1,iopt,status)
+        end if
+
+* Look at values of cube
+
+        if(status.ne.SAI__OK) then
+
+          goto 500
+
+        else if(iopt.eq.1) then
+
+          call look(%VAL(d_rptr),.false.,%VAL(staptr)
+     :                  ,%VAL(d_vptr))
+
+* Plots
+
+        else if ((iopt.eq.2).or.(iopt.eq.3)) then
+
+          call shdiagnosis((iopt.eq.2),.false.,status)
+
+* Apply tols if required
+
+        else if(iopt.eq.4) then
+
+          call apply_tols(.true.,status)
+
+        else if (iopt.eq.5) then
+
+          loop=.false.
+
+        else if (iopt.eq.6) then
+
+*   Fit arc line positions and wavelength with a polynomial (in channel
+* direction).
+
+*   Get workspace (d):
+*     W1(LINE_COUNT)
+*     W2(LINE_COUNT)
+*     W3(LINE_COUNT)
+*     W4(MAX_KPLUS1)
+*     W5(MAX_KPLUS1,MAX_KPLUS1)
+*     W6(MAX_KPLUS1)
+*     W7(LINE_COUNT)
+*     W8(LINE_COUNT)
+*     W9(LINE_COUNT)
+*     W10(LINE_COUNT) (r)
+*     W11(LINE_COUNT) (r)
+*     W12(LINE_COUNT)
+*     COPTR (11*SPDIM1)
+*     W13PTR(LINE_COUNT) (l)
+
+          nels = (7*line_count+ MAX_KPLUS1*MAX_KPLUS1 + MAX_KPLUS1*2
+     :             + spdim1*11) * VAL__NBD
+     :             + (VAL__NBR*2+BYTES_LOGICAL)*line_count
+          call getvm(nels,w1ptr,slot,status)
+          if(status.ne.SAI__OK) goto 500
+          w2ptr = w1ptr + line_count*VAL__NBD
+          w3ptr = w2ptr + line_count*VAL__NBD
+          w4ptr = w3ptr + line_count*VAL__NBD
+          w5ptr = w4ptr + MAX_KPLUS1*VAL__NBD
+          w6ptr = w5ptr + MAX_KPLUS1*MAX_KPLUS1*VAL__NBD
+          w7ptr = w6ptr + MAX_KPLUS1*VAL__NBD
+          w8ptr = w7ptr + line_count*VAL__NBD
+          w9ptr = w8ptr + line_count*VAL__NBD
+          w10ptr = w9ptr + line_count*VAL__NBD
+          w11ptr = w10ptr + line_count*VAL__NBR
+          w12ptr = w11ptr + line_count*VAL__NBR
+          coptr = w12ptr + line_count*VAL__NBD
+          w13ptr = coptr + 11*spdim1*VAL__NBD
+
+* fit polynomials
+
+          call arcfit(norder,%VAL(d_rptr),%VAL(d_vptr),
+     :                %VAL(staptr),%VAL(d_wptr),
+     :                %VAL(d_aptr),dynamic_mem(coptr),rmsmax,
+     :                nfits,dynamic_mem(w1ptr),dynamic_mem(w2ptr),
+     :        dynamic_mem(w3ptr),dynamic_mem(w4ptr),dynamic_mem(w5ptr),
+     :        dynamic_mem(w6ptr),dynamic_mem(w7ptr),dynamic_mem(w8ptr)
+     :                ,dynamic_mem(w9ptr),dynamic_mem(w10ptr),
+     :                dynamic_mem(w11ptr),dynamic_mem(w12ptr),polydata,
+     :                acceptfits,dynamic_mem(w13ptr),status,
+     :                maxnpts)
+
+          if(acceptfits) then
+            if(par_quest('Fits OK?',.true.)) then
+
+* Output results to file and to terminal
+
+              call iroutp(datafile(:chr_len(datafile))//'.iar',
+     :            datafile,wavdim,spdim1,dynamic_mem(coptr),norder
+     :            ,nfits,rmsmax,status)
+            end if
+          end if
+
+* Free workspace
+
+          call dsa_free_workspace(slot,status)
+
+        else if(iopt.eq.7) then
+
+          call getwork(2*line_count,'float',w1ptr,slot,status)
+          if(status.ne.SAI__OK) goto 500
+          w2ptr = w1ptr + line_count * VAL__NBR
+          call arc_window(dynamic_mem(d_xptr),%VAL(d_tlptr),
+*     :        dynamic_mem(d_trptr),dynamic_chars(idsptr:idsend),
+     :        %VAL(d_trptr),idstring,
+     :        dynamic_mem(w1ptr),dynamic_mem(w2ptr),status)
+          call dsa_free_workspace(slot,status)
+          if(batch) then
+            call apply_tols(.true.,status)
+            loop = .false.
+          end if
+
+        else if(iopt.eq.8) then
+
+          call setup_arc(status)
+
+        else
+
+*      Get workspace:
+*         W1PTR(20,LINE_COUNT) (d):
+*         W2PTR(2,LINE_COUNT)  (d):
+*         W3PTR(LINE_COUNT)    (l):
+
+          nbytes = line_count * (VAL__NBD*(22)+BYTES_LOGICAL)
+          call getvm(nbytes,w1ptr,slot,status)
+          if(status.ne.SAI__OK) goto 500
+          w2ptr = w1ptr + 20*VAL__NBD*line_count
+          w3ptr = w2ptr + VAL__NBD*line_count*2
+
+          call contin_corr(dynamic_mem(w1ptr),dynamic_mem(w2ptr),
+     :         dynamic_mem(w3ptr),polydata,status,athree,maxnpts)
+
+          call dsa_free_workspace(slot,status)
+        end if
+      end do
+      call clgrap
+      call unmap_res(status)
+  500 continue
+      call dsa_close(status)
+      end
