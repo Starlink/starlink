@@ -4,12 +4,6 @@
 //
 // $Id$
 
-// TO DO: Support transparency.  That might involve using an alpha
-// channel rather than simply setting a transparent pixel (which looks
-// wrong when combined with some smoothing).  That in turn might
-// require using a greyscale palette, which might make things more
-// complicated still.  Sigh....
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -33,6 +27,7 @@ png_structp PNGBitmap::png_ptr_ = 0;
 png_infop PNGBitmap::info_ptr_ = 0;
 // Following two must have indexes 1..8 (for up to 8 bpp bit depth),
 // be initialised to zero, and have the same length.
+// Static, so not deleted in destructor.
 png_color *PNGBitmap::palettes_[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 png_byte *PNGBitmap::trans_[]     = { 0, 0, 0, 0, 0, 0, 0, 0, 0  };
 
@@ -52,6 +47,7 @@ PNGBitmap::~PNGBitmap()
 {
     if (png_ptr_ != 0)
 	png_destroy_write_struct (&png_ptr_, (!info_ptr_ ? 0 : &info_ptr_));
+    /*
     int npalettes = sizeof(palettes_)/sizeof(palettes_[0]);
     for (int i=0; i<npalettes; i++)
     {
@@ -62,6 +58,7 @@ PNGBitmap::~PNGBitmap()
 	    // isTransparent_ is true.
 	    delete[] trans_[i];
     }
+    */
 }
 
 inline int iround (float f)
@@ -148,7 +145,7 @@ void PNGBitmap::write (const string filename)
 	;
 
     if (verbosity_ > normal)
-	cout << "Initialising png_set_IHDR: w="<<w_
+	cerr << "Initialising png_set_IHDR: w="<<w_
 	     << " h=" << h_
 	     << " bpp=" << bpp_
 	     << " png_bitdepth=" << png_bitdepth
@@ -169,16 +166,6 @@ void PNGBitmap::write (const string filename)
 	    // 0..(2^bpp_-1).  Note that the input bitmap is coded in
 	    // terms of high=black, so invert this in this palette.
 	    int maxcolour = (1<<bpp_)-1;
-	    /*
-	    png_color fgpx;
-	    png_color bgpx;
-	    fg_red_   = fg_red_;
-	    fg_green_ = fg_green_;
-	    fg_blue_  = fg_blue_;
-	    bg_red_   = bg_red_;
-	    bg_green_ = bg_green_;
-	    bg_blue_  = bg_blue_;
-	    */
 	    int diffred   = fg_red_   - bg_red_;
 	    int diffgreen = fg_green_ - bg_green_;
 	    int diffblue  = fg_blue_  - bg_blue_;
@@ -192,13 +179,45 @@ void PNGBitmap::write (const string filename)
 	    {
 		float rat = static_cast<float>(i)/maxcolour;
 		if (isTransparent_)
-		    trans_[bpp_][i] = iround (rat*255);
-		palettes_[bpp_][i].red
-		    = bg_red_   + iround(rat*diffred);
-		palettes_[bpp_][i].green
-		    = bg_green_ + iround(rat*diffgreen);
-		palettes_[bpp_][i].blue
-		    = bg_blue_  + iround(rat*diffblue);
+		{
+		    // A linear alpha function (iround(rat*255)) is
+		    // the obvious thing here, but when an image is
+		    // displayed against a white background, this
+		    // effectively makes the palette quadratic, and so
+		    // makes the image look very jaggy.
+		    //
+		    // Given foreground colour f, background colour b,
+		    // and rat in [0,1], we want the resulting
+		    // intensity to be I=p_0=b+rat(f-b), as in the
+		    // non-alpha case.  With an alpha function a, and
+		    // palette p_a, displayed against a background of
+		    // colour b, I suppose we'll have I=(1-a)b+a p_a
+		    // (yes?), which equals p_0 if p_a=b+rat/a(f-b).
+		    // So choosing an alpha function a=sqrt(rat) makes
+		    // p_a=b+sqrt(rat)(f-b).
+		    //
+		    // Note that this shows that transparency
+		    // information is optimal for only one background
+		    // colour.
+		    //trans_[bpp_][i] = iround (rat*255);
+		    float sqrat = sqrt(rat);
+		    trans_[bpp_][i] = iround (sqrat*255);
+		    palettes_[bpp_][i].red
+			= iround (bg_red_   + sqrat*diffred);
+		    palettes_[bpp_][i].green
+			= iround (bg_green_ + sqrat*diffgreen);
+		    palettes_[bpp_][i].blue
+			= iround (bg_blue_  + sqrat*diffblue);
+		}
+		else 
+		{
+		    palettes_[bpp_][i].red
+			= bg_red_   + iround(rat*diffred);
+		    palettes_[bpp_][i].green
+			= bg_green_ + iround(rat*diffgreen);
+		    palettes_[bpp_][i].blue
+			= bg_blue_  + iround(rat*diffblue);
+		}
 	    }
 	    if (verbosity_ > normal)
 	    {
@@ -230,9 +249,12 @@ void PNGBitmap::write (const string filename)
 			  trans_[bpp_], (1<<bpp_),
 			  0);
 
-	png_color_16 white;
-	white.index = 0;
-	png_set_bKGD (png_ptr_, info_ptr_, &white);
+	// Fill in the bKGD chunk, just for completeness
+	png_color_16 bKGD_colour;
+	bKGD_colour.red   = bg_red_;
+	bKGD_colour.green = bg_green_;
+	bKGD_colour.blue  = bg_blue_;
+	png_set_bKGD (png_ptr_, info_ptr_, &bKGD_colour);
     }
 
     time_t sectime = time(0);
