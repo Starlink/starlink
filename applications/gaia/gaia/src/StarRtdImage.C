@@ -279,6 +279,7 @@ public:
     { "globalstats",   &StarRtdImage::globalstatsCmd,   2, 2 },
     { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
     { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
+    { "ndf",           &StarRtdImage::ndfCmd,           1, 3 },
     { "origin",        &StarRtdImage::originCmd,        2, 2 },
     { "percentiles",   &StarRtdImage::percentCmd,       1, 1 },
     { "plotgrid",      &StarRtdImage::plotgridCmd,      0, 2 },
@@ -6099,6 +6100,90 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
     }
     return TCL_OK;
 }
+
+//+
+//   StarRtdImage::ndfCmd
+//
+//   Purpose:
+//      Provide direct access to NDFs. Used for querying the underlying NDF
+//      without the 2D bias of the mainstream NDF access codes.
+//
+//   Arguments:
+//      First argument is the action to take and can be one of:
+//         open - open an NDF by name. The second argument is the name
+//                returns the NDF identifier if successful.
+//         close - close a previously opened NDF. Second argument is the NDF
+//                 identifier. 
+//         query - make a query about an NDF. Second argument is the NDF
+//                 identifier and the third the query type. Currently only
+//                 "bounds" is supported. The result of this is a list of
+//                 pairs of lower and upper bounds.
+//
+//-
+int StarRtdImage::ndfCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::ndfCmd" << endl;
+#endif
+    int result = TCL_OK;
+    char *error_mess;
+    int ndfid;
+
+    if ( strcmp( "open", argv[0] ) == 0 ) {
+        result = gaiaSimpleOpenNDF( argv[1], &ndfid, &error_mess );
+        if ( result == TCL_OK ) {
+            set_result( ndfid );
+        }
+        else {
+            error( error_mess );
+            free( error_mess );
+        }
+
+    }
+    else if ( strcmp( "close", argv[0] ) == 0 ) {
+        if ( Tcl_GetInt( interp_, argv[1], &ndfid ) == TCL_OK ) {
+            result = gaiaSimpleCloseNDF( &ndfid );
+        }
+        else {
+            result = TCL_ERROR;
+            error( argv[1], ": is not an integer" );
+        }
+    }
+    else if ( strcmp( "query", argv[0] ) == 0 ) {
+        if ( Tcl_GetInt( interp_, argv[1], &ndfid ) == TCL_OK ) {
+            int lbnd[7];
+            int ubnd[7];
+            int ndim;
+            result = gaiaSimpleQueryBounds( ndfid, 7, lbnd, ubnd, 
+                                            &ndim, &error_mess );
+            if ( result == TCL_OK ) {
+                // Create the result list.
+                set_result( lbnd[0] );
+                append_element( ubnd[0] );
+                for ( int i = 1; i < ndim; i++ ) {
+                    append_element( lbnd[i] );
+                    append_element( ubnd[i] );
+                }
+            }
+            else {
+                error( error_mess );
+                free( error_mess );
+            }
+        }
+        else {
+            result = TCL_ERROR;
+            error( argv[1], ": is not an integer" );
+        }
+    }
+    else {
+        result = TCL_ERROR;
+        error( argv[0], ":Unknown ndf subcommand" );
+    }
+    return result;
+}
+
+
+
 
 //  ==================================
 //  UKIRT quick look member functions.

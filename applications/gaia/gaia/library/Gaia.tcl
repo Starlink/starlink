@@ -451,6 +451,11 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-s> [code $image_ save_as]
       catch {$m delete "Save region as..."}
 
+      set index [$m index "Reopen"]
+      insert_menuitem $m $index command "Open cube..." \
+         {Open a cube and display image sections from it} \
+         -command [code $this make_toolbox opencube 0 1]
+
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
 	 -label "Close Window" \
@@ -1103,6 +1108,17 @@ itcl::class gaia::Gaia {
             -image $image_ \
             -transient $itk_option(-transient_tools) \
             -number $clone_
+      }
+   }
+
+   #  Create the startup options toolbox.
+   public method make_opencube_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaNDFCube $w_.\#auto \
+            -gaia $w_ \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -filter_types $itk_option(-file_types) \
       }
    }
 

@@ -69,6 +69,22 @@ extern "C" {
    /*  Get readonly status of component */
    int gaiaGetReadMNDF( const void *handle, int index );
 
+/*
+ *  Straight-forward NDF access, with no 2D bias.
+ *  =============================================
+ *  These are only used to query NDF bounds, so that we can section up cubes.
+ */
+
+    /* Open an NDF and return the identifier */
+    int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess );
+
+    /* Close an NDF */
+    int gaiaSimpleCloseNDF( int *ndfid );
+
+    /* Query the pixel bounds of an opened NDF */
+    int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
+                               int *ndim, char **error_mess );
+
 #ifdef __cplusplus
 }
 #endif

@@ -98,6 +98,9 @@ itcl::class gaia::LabelFileChooser {
       }
       if {[$w activate]} {
          configure -value [$w get]
+         if { "$itk_option(-command)" != "" } {
+            command_proc_ $itk_option(-command)
+         }
       }
       destroy $w
    }

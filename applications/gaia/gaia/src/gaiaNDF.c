@@ -720,10 +720,10 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     int status = SAI__OK;
     int type;
     int width;
-    
+
     /*  Mark the error stack */
     emsMark();
-    
+
     /*  Check that we're not going to have problems with the name
         length */
     if ( strlen( name ) > MAXNDFNAME ) {
@@ -732,11 +732,11 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                  "(limit is %d characters)", MAXNDFNAME );
         return 0;
     }
-    
+
     /*  Attempt to open the given name as an NDF */
     if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
                         &ndfid, &emess ) ) {
-        
+
         /*  Name is an NDF. Need a HDS path to its top-level so we can
             check for other NDFs at this level, also need to check for the
             existence of other displayables in the NDF */
@@ -744,11 +744,11 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         head = (NDFinfo *) malloc( sizeof( NDFinfo ) );
         setState( head, ndfid, name, type, width, height, header, hlen,
                   &status );
-        
+
         /*  Get the locator to the NDF and hence to its parent. */
         ndfLoc( ndfid, "READ", tmploc, &status );
         datParen( tmploc, baseloc, &status );
-        
+
         /*  See if the NDF has a slice. If so all components and NDFs in
             this file will also have that slice applied */
         left = strrchr( name, '(');
@@ -760,7 +760,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
             slice[0] = '\0';
         }
         if ( status == DAT__OBJIN ) {
-            
+
             /*  At top level, so no parent available */
             emsAnnul( &status );
             datClone( tmploc, baseloc, &status );
@@ -794,10 +794,10 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
             *path = '\0';  /*  Remove "." from filename, rest is HDS path */
             path++;
         }
-        
+
         /*  Attempt to open the file and obtain a base locator. */
         hdsOpen( filename, "READ", tmploc, &status );
-        
+
         /*  Now look for the object specified by the PATH */
         if ( path && status == SAI__OK ) {
             datFind( tmploc, path, baseloc, &status );
@@ -813,19 +813,19 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
             emess = NULL;
         }
         free( filename );
-        
+
         /*  Top level container file, so safe to strip .sdf from name
          *  (if this was an NDF then .sdf.gz might be used).
          */
         istop = 1;
-        
+
         /*
          *  No slice for plain top-level.
          */
         slice[0] = '\0';
     }
     if ( status == SAI__OK && datValid( baseloc, &status ) ) {
-        
+
         /*  Look for additional NDFs at baseloc, ignore tmploc which is
          *  NDF itself (or baseloc).
          */
@@ -836,14 +836,14 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         first = 1;
         for ( i = 1; i <= ncomp; i++ ) {
             datIndex( baseloc, i, newloc, &status );
-            
+
             /*  Get full name of component and see if it is an NDF */
             hdsTrace( newloc, &level, ndfpath, MAXNDFNAME, ndffile,
                       MAXNDFNAME, &status );
-            
+
             ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
             if ( ftype ) *ftype = '\0';
-            
+
             path = strstr( ndfpath, "." );  /* Now find first component */
             if ( path == NULL ) {           /* and remove it (not used as */
                 strcat( ndffile, "." );      /* part of NDF name) */
@@ -856,13 +856,13 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                 strcat( ndffile, slice );    /*  Add the NDF slice, if set */
                 strcat( path, slice );
             }
-            
+
             /*  Attempt to open NDF to see if it exists (could check for
                 DATA_ARRAY component) */
             emess = NULL;
             if ( gaiaAccessNDF( ndffile, &type, &width, &height,
                                 &header, &hlen, &ndfid, &emess ) ) {
-                
+
                 /*  Check that this isn't the base NDF by another name */
                 if ( ndfid != 0 && baseid != 0 ) {
                     ndfSame( baseid, ndfid, &same, &isect, &status );
@@ -900,18 +900,18 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
             }
             datAnnul( newloc, &status );
         }
-        
+
         /*  Release locators */
         datAnnul( baseloc, &status );
         datAnnul( tmploc, &status );
     }
     else {
-        
+
         /* Invalid locator with no error message? */
         if ( status == SAI__OK && ! emess ) {
             emess = strdup( "Invalid base locator for this NDF" );
         }
-        
+
         /*  Initialisation failed (no such NDF, or container file/path
          *  doesn't have any NDFs in it).
          */
@@ -925,11 +925,11 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         emsRlse();
         return 0;
     }
-    
+
     /*  Return list of NDFinfos */
     *handle = head;
     emsRlse();
-    
+
     /*  No error messages should get past here! */
     if ( emess ) {
         free( emess );
@@ -1077,7 +1077,7 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
                                      error_mess );
        }
    }
-   
+
    /*  Arrive here only when NDF isn't available */
    *error_mess = strdup( "No such NDF is available" );
    return 0;
@@ -1164,7 +1164,7 @@ void gaiaReleaseMNDF( const void *handle )
        /* Free the NDFinfo structure that stored these */
        next = current->next;
        free( current );
-       
+
        /* And process next in chain */
        current = next;
    }
@@ -1226,7 +1226,7 @@ void *gaiaCloneMNDF( void *handle )
 
             /*  And copy the headers. */
             newState->header = cnfCreat( current->hlen * 80 );
-            memcpy( newState->header, current->header, 
+            memcpy( newState->header, current->header,
                     current->hlen * 80 );
 
             /*  And add this to the new super structure. */
@@ -1649,4 +1649,63 @@ static int datValid( const char *loc, int *status )
    F77_IMPORT_LOGICAL( freply, reply );
    F77_IMPORT_INTEGER( fstatus, *status );
    return reply;
+}
+
+
+/*
+ *  =============================================
+ *  Straight-forward NDF access, with no 2D bias.
+ *  =============================================
+ *
+ *  These are only used to query NDF bounds, so that we can section up cubes.
+ */
+
+/**
+ * Open an NDF and return the identifier.
+ */
+int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess )
+{
+    int place;
+    int status = SAI__OK;
+
+    emsMark();
+    ndfOpen( DAT__ROOT, ndfname, "READ", "OLD", ndfid, &place, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = errMessage( &status );
+        ndfid = NDF__NOID;
+        emsRlse();
+        return 1;
+    }
+    return 0;
+}
+
+/**
+ * Close an NDF.
+ */
+int gaiaSimpleCloseNDF( int *ndfid )
+{
+    int status = SAI__OK;
+    emsMark();
+    ndfAnnul( ndfid, &status );
+    emsRlse();
+    return 0;
+}
+
+/**
+ * Query the bounds of an NDF.
+ */
+int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
+                           int *ndim, char **error_mess )
+{
+    int status = SAI__OK;
+    emsMark();
+    ndfBound( ndfid, ndimx, lbnd, ubnd, ndim, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = errMessage( &status );
+        ndfid = NDF__NOID;
+        emsRlse();
+        return 1;
+    }
+    emsRlse();
+    return 0;
 }

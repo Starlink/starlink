@@ -276,6 +276,9 @@ class StarRtdImage : public Skycat {
    //  Set the always merge attribute.
    int astalwaysmergeCmd( int argc, char *argv[] );
 
+   //  Direct NDF access.
+   int ndfCmd( int argc, char *argv[] );
+
  protected:
 
    //  Pointer to structure that holds the image configuration options.
