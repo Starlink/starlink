@@ -29,6 +29,12 @@
 *     order, and will minimise the subsequent access time on the new
 *     machine.  Conversion is performed by modifying the data in situ.
 *     No separate output file is produced.
+*
+*     This application can also be used to replace any IEEE floating point 
+*     NaN or Inf values in an HDS object with the appropriate Starlink 
+*     bad value. This conversion is performed even if the data values
+*     within the object are already represented using the appropriate
+*     native data representation for the machine in use.
 
 *  Usage:
 *     native object
@@ -54,6 +60,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +69,8 @@
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Sorted the variable
 *        declarations.
+*     12-OCT-1998 (DSB):
+*        Added prologue comment about conversion of NaN and Inf values.
 *     {enter_further_changes_here}
 
 *  Bugs:
