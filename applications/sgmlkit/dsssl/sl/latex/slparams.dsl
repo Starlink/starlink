@@ -80,11 +80,11 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\setcounter{tocdepth}{2}
 %
 \\makeatletter
-% Catcode all specials to other, and add discretionary hyphenation for
-% dots and slashes within URLs and paths.  There's no need for any
-% `namespace' prefix - we're writing a document here, not a package.
-% However, for clarity, all the `user visible' commands here have at
-% least one uppercase letter.
+<!-- Catcode all specials to other, and add discretionary hyphenation for
+     dots and slashes within URLs and paths.  There's no need for any
+     `namespace' prefix - we're writing a document here, not a package.
+     However, for clarity, all the `user visible' commands here have at
+     least one uppercase letter. -->
 \\def\\p@thdots{\\discretionary{.}{}{.}}
 \\def\\p@thslash{\\hskip 0pt plus 0.5pt
 	\\discretionary{/}{}{/}\\hskip 0pt plus 0.5pt\\relax }
@@ -99,13 +99,14 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\def\\verbatim@font{\\normalfont\\small\\ttfamily}
 \\def\\UrlFootnote{\\begingroup\\p@thcats\\@urlfootnote}
 \\def\\@urlfootnote#1{\\footnote{\\raggedright\\verbatim@font #1}\\endgroup}
-% Formatting of individual elements
+<!-- % Formatting of individual elements -->
 \\let\\Code\\texttt
 \\let\\Kbd\\texttt
 \\newcommand\\Quote[1]{`#1'}
 \\let\\Strong\\textbf
 \\let\\Cite\\textit
-% Title page.  No error checking - assume the stylesheet takes care of this
+<!-- Title page. 
+     No error checking - assume the stylesheet takes care of this -->
 \\let\\@Abstract\\@empty
 \\long\\def\\setAbstract#1{\\def\\@Abstract{#1}}
 \\let\\@Title\\@empty
@@ -163,6 +164,7 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\newenvironment{VersoTitlepage}{\\clearpage\\hbox{}\\vfill}{%
   \\ifx\\@Copyright\\@empty\\else
     \\par\\vspace{2ex}\\copyright \\@Copyright\\fi}
+<!--
 %% Generate the TOC in a single LaTeX pass.
 %% This should be generic enough that LOT and LOF should be similar
 %%\\newcommand\\TableOfContents{\\clearpage\\tableofcontents}
@@ -183,6 +185,7 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 % TOC etc appear at _end_ of document, with correct page numbers.
 % Use standard aux-file mechanism.  Indirection isn't necessary here, but
 % too complicated to replace.
+-->
 \\def\\@OpenTocFile#1{\\expandafter\\newwrite\\csname tf@#1\\endcsname
   \\immediate\\openout\\csname tf@#1\\endcsname \\jobname.#1 \\relax}
 \\newcommand\\TableOfContents{\\cleardoublepage
@@ -196,9 +199,10 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
    \\immediate\\write\\csname tf@#1\\endcsname{\\the\\@temptokena}%
   }}
 \\newcommand\\WriteReadTableOfContents{% append command to end of .aux file
-  \\hbox{}% Following write must not be immediate (or else out of sequence), 
-  % but it gets skipped if there's nothing on the page.  This can cause
-  % blank pages, though.
+  \\hbox{}%
+<!-- Following write must not be immediate (or else out of sequence), 
+     but it gets skipped if there's nothing on the page.  This can cause
+     blank pages, though. -->
   \\write\\@mainaux{\\string\\ReadTableOfContents}}
 \\newcommand\\ReadTableOfContents{%
   \\@ifundefined{@TocStartPage}\\relax  % this is beginning of a second pass
@@ -221,10 +225,27 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
        \\@input{\\jobname.lot}}%
     \\clearpage  % flush pages
     }}
-% replace \\caption, and hence table/figure counter and assoc mechanisms
+<!-- replace \\caption, and hence table/figure counter and assoc mechanisms -->
 \\def\\Caption#1#2{\\expandafter\\def\\csname fnum@\\@captype\\endcsname{#1}%
   \\expandafter\\def\\csname the\\@captype\\endcsname{#2}%
   \\@dblarg{\\@caption\\@captype}}
+<!-- Set equation number -->
+\\newif\\if@SetEqnNum\\@SetEqnNumfalse
+\\def\\SetEqnNum#1{\\global\\def\\Eqn@Number{#1}\\global\\@SetEqnNumtrue}
+\\def\\@eqnnum{{\\normalfont \\normalcolor (\\Eqn@Number)}}
+\\def\\equation{$$}
+\\def\\endequation{\\if@SetEqnNum\\eqno \\hbox{\\@eqnnum}\\global\\@SetEqnNumfalse\\fi 
+    $$\\@ignoretrue}
+\\def\\@@eqncr{\\let\\reserved@a\\relax
+    \\ifcase\\@eqcnt \\def\\reserved@a{& & &}\\or \\def\\reserved@a{& &}%
+     \\or \\def\\reserved@a{&}\\else
+       \\let\\reserved@a\\@empty
+       \\@latex@error{Too many columns in eqnarray environment}\\@ehc\\fi
+     \\reserved@a \\if@SetEqnNum\\@eqnnum\\global\\@SetEqnNumfalse\\fi
+     \\global\\@eqcnt\\z@\\cr}
+% Make \\nonumber a no-op, so it can't cause confusion
+\\let\\nonumber\\relax
+\\def\\Eqnref#1{Eqn.~(#1)}
 %\\catcode`\\^^M=10 % make end-of-line a space
 \\makeatother
 ")
