@@ -41,7 +41,7 @@
         CALL DAT_THERE(LOC,'INDEX',THERE,STATUS)
 *  create index if not already there
         IF (.NOT.THERE) THEN
-          CALL DAT_NEW(LOC,'INDEX','_CHAR*75',1,NINDX,STATUS)
+          CALL DAT_NEW(LOC,'INDEX','_CHAR*128',1,NINDX,STATUS)
           CALL DAT_FIND(LOC,'INDEX',ILOC,STATUS)
         ELSE
           CALL DAT_FIND(LOC,'INDEX',ILOC,STATUS)
