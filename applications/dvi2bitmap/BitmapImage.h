@@ -7,7 +7,7 @@
 #ifndef BITMAPIMAGE_HEADER_READ
 #define BITMAPIMAGE_HEADER_READ 1
 
-#include "dvi2bitmap.h"
+#include "Byte.h"
 #include "verbosity.h"
 #include "Bitmap.h"		// for BitmapColour
 
