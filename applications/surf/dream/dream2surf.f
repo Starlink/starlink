@@ -52,6 +52,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1998/06/24 19:26:03  timj
+*     Finally get jiggle pattern to work for new format sol files.
+*
 *     Revision 1.2  1998/06/19 19:28:26  timj
 *     First released version
 *
@@ -268,17 +271,21 @@
       CALL CHR_ITOC(GR_DD, CTEMP, ITEMP)
       CALL CHR_APPND(CTEMP,STEMP,IPOSN)
 
-*     Append DREAM signature
-      CALL CHR_APPND('_drm_', STEMP, IPOSN)
-
 *     Find observation number from filename
 *     Assumes string of form xxx_NNNN
 
       ITEMP = CHR_LEN ( SOLVE_DATA )
       RUNNO = SOLVE_DATA(ITEMP-3:)
 
+*     Append an _
+      CALL CHR_APPND('_', STEMP, IPOSN)
+
 *     Append run number to out
       CALL CHR_APPND(RUNNO, STEMP, IPOSN)
+
+*     Append DREAM signature
+      CALL CHR_APPND('_drm', STEMP, IPOSN)
+
 
 *     Set default
       CALL PAR_DEF0C('OUT', STEMP, STATUS)
@@ -482,17 +489,27 @@
 *     Now loop over jiggle positions and store the relevant
 *     ones (> -1)
 
-      DO I = 0, MAX_PIX - 1
+*     SURF requires that bolometer coordinates are derived by
+*          Xpos = Bol_Xpos - Jigl_X
+*          Ypos = Bol_Ypos - Jigl_Y
+*
+*     DREAM currently assumes
+*          Xpos = -Bol_Xpos + Jigl_X
+*          Ypos =  Bol_Ypos - Jigl_Y
 
-         IF (INT_POS(I) .NE. -1) THEN
+*     I end up doing this
+*          Invert x positions in flatfield (nasty)
+*          Negate jiggle position for X and Y
 
-*     Position in the jiggle pattern is determined from INT_POS
-            JIGL_X(INT_POS(I)+1) = JIG_X(I)
-            JIGL_Y(INT_POS(I)+1) = JIG_Y(I)
-            
+      ITEMP = 0
+      DO I = 0, MAX_PIX  - 1
+         IF (INT_POS(I) .NE. - 1) THEN 
+            ITEMP = ITEMP + 1
+            JIGL_X(ITEMP) = JIG_X(I)
+            JIGL_Y(ITEMP) = JIG_Y(I)
          END IF
-
       END DO
+
 
 *     Write the jiggle pattern to the extensions
       CALL CMP_PUT1R(OUT_SCUCD_LOC, 'JIGL_X', NPIX, JIGL_X, STATUS)
@@ -908,6 +925,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1998/06/24 19:26:03  timj
+*     Finally get jiggle pattern to work for new format sol files.
+*
 *     Revision 1.2  1998/06/19 19:28:26  timj
 *     First released version
 *
@@ -1029,6 +1049,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1998/06/24 19:26:03  timj
+*     Finally get jiggle pattern to work for new format sol files.
+*
 *     Revision 1.2  1998/06/19 19:28:26  timj
 *     First released version
 *
