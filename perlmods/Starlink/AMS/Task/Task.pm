@@ -8,7 +8,7 @@ Starlink::AMS::Task - perl module to load and communicate with ADAM monoliths
 
   use Starlink::AMS::Task;
 
-  $kappa = new Starlink::ADAMTASK("name","monolith_image");
+  $kappa = new Starlink::AMS::Task("name","monolith_image");
   $status = $kappa->obeyw("task", "params");
   $status = $kappa->set("task","param","value");
   ($status, $value) = $kappa->get("task","param");
@@ -66,7 +66,7 @@ fails then undef is returned (which will not be an object reference).
 
 =cut
 
-# NEW - create a new instance of Starlink::ADAMTASK
+# NEW - create a new instance of Starlink::AMS::Task
  
 sub new {
  
