@@ -262,6 +262,120 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 
 /* Member functions. */
 /* ================= */
+/*
+*++
+*  Name:
+c     astUkern1
+f     AST_UKERN1
+
+*  Purpose:
+*     1-dimensional sub-pixel interpolation kernel.
+
+*  Type:
+*     Fictitious function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astUkern1( double offset, const double params[], int flags,
+c                     double *value )
+f     CALL AST_UKERN1( OFFSET, PARAMS, FLAGS, VALUE, STATUS )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+c     This is a fictitious function which does not actually
+c     exist. Instead, this description constitutes a template so that
+c     you may implement a function with this interface for yourself
+c     (and give it any name you wish). A pointer to such a function
+c     may be passed via the "finterp" parameter of the astResample<X>
+c     functions (q.v.) in order to supply a 1-dimensional
+c     interpolation kernel to the algorithm which performs sub-pixel
+c     interpolation during resampling of gridded data (you must also
+c     set the "interp" parameter of astResample<X> to the value
+c     AST__UKERN1). This allows you to use your own interpolation
+c     kernel in addition to those which are pre-defined.
+f     This is a fictitious routine which does not actually
+f     exist. Instead, this description constitutes a template so that
+f     you may implement a routine with this interface for yourself
+f     (and give it any name you wish). Such a routine
+f     may be passed via the FINTERP argument of the AST_RESAMPLE<X>
+f     functions (q.v.) in order to supply a 1-dimensional
+f     interpolation kernel to the algorithm which performs sub-pixel
+f     interpolation during resampling of gridded data (you must also
+f     set the INTERP argument of AST_RESAMPLE<X> to the value
+f     AST__UKERN1). This allows you to use your own interpolation
+f     kernel in addition to those which are pre-defined.
+*
+c     The function calculates the value of a 1-dimensional sub-pixel
+f     The routine calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. This determines how the weight given to
+*     neighbouring pixels in calculating an interpolated value depends
+*     on the pixel's offset from the interpolation point. In more than
+*     one dimension, the weight assigned to a pixel is formed by
+*     evaluating this 1-dimensional kernel using the offset along each
+*     dimension in turn. The product of the returned values is then
+*     used as the pixel weight.
+
+*  Parameters:
+c     offset
+f     OFFSET = DOUBLE PRECISION (Given)
+*        This will be the offset of the pixel from the interpolation
+*        point, measured in pixels. This value may be positive or
+*        negative, but for most practical interpolation schemes its
+*        sign should be ignored.
+c     params
+f     PARAMS( * ) = DOUBLE PRECISION (Given)
+c        This will be a pointer to the same array as was given via the
+c        "params" parameter of astResample<X>. You may use this to
+f        This will be the same array as was given via the
+f        PARAMS argument of AST_RESAMPLE<X>. You may use this to
+*        pass any additional parameter values required by your kernel,
+c        but note that params[0] will already have been used to specify
+f        but note that PARAMS(1) will already have been used to specify
+*        the number of neighbouring pixels which contribute to the
+*        interpolated value.
+c     flags
+f     FLAGS = INTEGER (Given)
+c        This will be the same value as was given via the "flags"
+c        parameter of astResample<X>. You may test this value to
+f        This will be the same value as was given via the FLAGS
+f        argument of AST_RESAMPLE<X>. You may test this value to
+*        provide additional control over the operation of your
+c        function. Note that the special flag values AST__URESAMP1, 2,
+f        routine. Note that the special flag values AST__URESAMP1, 2,
+*        3 & 4 are reserved for you to use for your own purposes and
+*        will not clash with other pre-defined flag
+c        values (see astResample<X>).
+f        values (see AST_RESAMPLE<X>).
+c     value
+f     VALUE = DOUBLE PRECISION (Returned)
+c        Pointer to a double to receive the calculated kernal value,
+f        The calculated kernal value,
+*        which may be positive or negative.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - Not all functions make good interpolation kernels. In general,
+*     acceptable kernels tend to be symmetrical about zero, to have a
+*     positive peak (usually unity) at zero, and to evaluate to zero
+*     whenever the pixel offset has any other integral value (this
+*     last property ensures that the interpolated values pass through
+*     the original data). An interpolation kernel may or may not have
+*     regions with negative values. You should consult a good book on
+*     image processing for more details.
+c     - If an error occurs within this function, it should use
+c     astSetStatus to set the AST error status to an error value.
+c     This will cause an immediate return from astResample<X>.
+f     - If an error occurs within this routine, it should set the
+f     STATUS argument to an error value before returning. This will
+f     cause an immediate return from AST_RESAMPLE<X>.
+*--
+*/
+/* Note the above is just a description to act as a template. The
+   function does not actually exist. */
+
 static void SincSinc( double x, const double params[], int flags, double *result ) {
    static int init = 0;
    static double pi;
@@ -9088,7 +9202,7 @@ c     functions (q.v.) in order to perform sub-pixel interpolation
 c     during resampling of gridded data (you must also set the
 c     "interp" parameter of astResample<X> to the value
 c     AST__UINTERP). This allows you to use your own interpolation
-c     algorithms in addition to those which are pre-defined.
+c     algorithm in addition to those which are pre-defined.
 f     This is a fictitious routine which does not actually
 f     exist. Instead, this description constitutes a template so that
 f     you may implement a routine with this interface for yourself
@@ -9098,7 +9212,7 @@ f     functions (q.v.) in order to perform sub-pixel interpolation
 f     during resampling of gridded data (you must also set the
 f     INTERP argument of AST_RESAMPLE<X> to the value
 f     AST__UINTERP). This allows you to use your own interpolation
-f     algorithms in addition to those which are pre-defined.
+f     algorithm in addition to those which are pre-defined.
 *
 c     The function interpolates an input grid of data (and,
 f     The routine interpolates an input grid of data (and,
