@@ -64,7 +64,7 @@ HMS::HMS(double val)
        dd = v + 0.000000000001;
     }
     else {
-       dd = v + 0.0000000001    
+       dd = v + 0.0000000001; 
     } 
     hours_ = (int)dd;
     md = (dd - hours_) * 60.;
