@@ -31,6 +31,7 @@ C     Declare other stuff
      >        CLEANSIZE,NO,
 !     >        summysumsum,
      >        OLDNO,NIPPLE
+      INTEGER LUN1, LUN2
       REAL SCALE,ZERO,X,Y,XO,YO,PIXSCALE,SKY,SKYSIGMA,FLUX,
      >     MAGNITUDE,D,DIA,FLUXCHECK1,FLUXCHECK2,
 !     >     ERR,
@@ -68,13 +69,14 @@ C     Take cleaning square to have side of 45 pixels
       CLEANSIZE=(2*CLEANRAD)+1
 
 C     Read in seeing profile, inserting it into a 45x45 array for simplicity
-   
-      OPEN(UNIT=1,FILE='STARARRAY.DAT',STATUS='OLD')
+
+      CALL FIO_OPEN( 'stararray.dat', 'READ', 'NONE', 0, LUN1, STATUS)
       DO J=1,45
          DO I=1,45
-           READ(1,*)STARARRAY(I,J)
+           READ(LUN1,*)STARARRAY(I,J)
          ENDDO
       ENDDO
+      CALL FIO_CLOSE( LUN1, STATUS )
 
 C     -------------------------------------------------------
 
@@ -246,16 +248,16 @@ C     Write radial profiles
       CALL PGEND
 
 C     Write out bollocks to data file for straight line fitting
-
-      OPEN(UNIT=10,FILE='PROFILE.DAT',STATUS='NEW')
+      CALL FIO_OPEN( 'profile.dat', 'WRITE', 'NONE', 0, LUN2, STATUS)
   
       DO I=2,35
          SURFSIG(I)=((SURFBRIGHT(I)-SURFUP(I))+
      >              (SURFDOWN(I)-SURFBRIGHT(I)))/2.0
          RADIUS(I)=(RADIUS(I)+AXRAT*RADIUS(I))/2.0
-         WRITE(10,*)RADIUS(I),SURFBRIGHT(I),SURFUP(I),
+         WRITE(LUN2,*)RADIUS(I),SURFBRIGHT(I),SURFUP(I),
      >              SURFDOWN(I)
       ENDDO
+      CALL FIO_CLOSE( LUN2, STATUS )
 
 C     Write out cleaned and uncleaned images into two quadrants of a big frame
 
