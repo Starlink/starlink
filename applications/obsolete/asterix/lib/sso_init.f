@@ -46,6 +46,6 @@
       END DO
 
 *  Mark initialised
-      CALL AST_SPKGI( SSO_PKG )
+      CALL AST_SPKGI( SSO__PKG )
 
       END

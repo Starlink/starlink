@@ -54,7 +54,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Initialise yet?
-        IF ( .NOT. AST_QPKGI( SSO_PKG ) ) CALL SSO_INIT( STATUS )
+        IF ( .NOT. AST_QPKGI( SSO__PKG ) ) CALL SSO_INIT( STATUS )
 
 *      Search for locator in table
         N = 0
