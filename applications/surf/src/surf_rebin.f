@@ -194,6 +194,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.49  1998/03/24 01:23:31  timj
+*     Initialise pointer variables.
+*     Fix memory leak for OUT_WEIGHT_PTR.
+*
 *     Revision 1.48  1998/03/24 00:26:02  timj
 *     Add support for BOLWT
 *
@@ -1439,6 +1443,12 @@ c
 
 
 *     Get memory for the output grid
+                  OUT_DATA_PTR = 0
+                  OUT_DATA_END = 0
+                  OUT_VARIANCE_PTR = 0
+                  OUT_VARIANCE_END = 0
+                  OUT_QUALITY_PTR = 0
+                  OUT_QUALITY_END = 0
                   CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
      :                 OUT_DATA_PTR, OUT_DATA_END, STATUS)
                   CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
@@ -1459,6 +1469,8 @@ c
 
 
 *     Get some memory for the weights array and fill with zeroes
+                  OUT_WEIGHT_PTR = 0
+                  OUT_WEIGHT_END = 0
                   CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
      :                 OUT_WEIGHT_PTR, OUT_WEIGHT_END, STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
@@ -1546,7 +1558,7 @@ c
      :                 OUT_DATA_END, STATUS)
                   CALL SCULIB_FREE('OUT_VARIANCE', OUT_VARIANCE_PTR,
      :                 OUT_VARIANCE_END, STATUS)
-                  CALL SCULIB_FREE('OUT_VARIANCE', OUT_QUALITY_PTR,
+                  CALL SCULIB_FREE('OUT_QUALITY', OUT_QUALITY_PTR,
      :                 OUT_QUALITY_END, STATUS)
 
 *     and a title
@@ -1595,11 +1607,12 @@ c
                      CALL NDF_UNMAP(OUT_WEIGHT_NDF, '*', STATUS)
                      CALL NDF_ANNUL(OUT_WEIGHT_NDF, STATUS)
 
+                  END IF
 
-*     Free the weights array
+*     Free the weights array (this has to happen regardless
+*     of whether we stored the weights or not.
                      CALL SCULIB_FREE('WEIGHTS', OUT_WEIGHT_PTR,
      :                    OUT_WEIGHT_END, STATUS)
-                  END IF
 
 *     Now store the TIMEs array if required
                   CALL PAR_GET0L('TIMES', TIMES, STATUS)
@@ -1616,6 +1629,9 @@ c
                      CALL NDF_MAP(OUT_WEIGHT_NDF, 'DATA', '_INTEGER', 
      :                 'WRITE/ZERO', NDF_PTR, ITEMP, STATUS)
 
+                     
+                     OUT_QUALITY_PTR = 0
+                     OUT_QUALITY_END = 0
                      CALL SCULIB_MALLOC((N_PIXELS * VAL__NBUB),
      :                    OUT_QUALITY_PTR, OUT_QUALITY_END,
      :                    STATUS)
@@ -1628,6 +1644,8 @@ c
                      END IF
 
                      DO I = 1, FILE
+                        IJ_PTR = 0
+                        IJ_PTR_END = 0
                         CALL SCULIB_MALLOC(( 2 * N_PTS(I) * VAL__NBI),
      :                       IJ_PTR, IJ_PTR_END, STATUS)
 
