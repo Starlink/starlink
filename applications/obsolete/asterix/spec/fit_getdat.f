@@ -30,9 +30,15 @@
 *     present then the model and data spaces are assumed to be identical.
 
 *  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
+*     ID = INTEGER (given)
+*        Top level fit dataset, either an SDATA file or a fit source file
+*     GENUS = CHARACTER*(*) (given)
+*        The fit genus
+*     FSTAT = INTEGER (given)
+*        Fit statistic code, either FIT__CHISQ or FIT__LOGL
+*     WORKSPACE = LOGICAL (given)
+*        Set up workspace for minimisation?
+*     STATUS = INTEGER (given and returned)
 *        The global status.
 
 *  Examples:
@@ -143,6 +149,8 @@
 *        Store background locator in dataset structure
 *     10 Mar 1995 (DJA):
 *        Adapted from old FIT_DATINGET. PRO_ -> PRF_ etc
+*      1 Aug 1995 (DJA):
+*        Added ability to read vignetting file.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -203,7 +211,6 @@
 	CHARACTER*5 SNAME		! Select component name
 	CHARACTER*2 FILENO		! File number
 	CHARACTER*2 SPECH		! Spectrum number (within set)
-	BYTE MASK			! Quality mask byte
 	LOGICAL LOG			! General purpose logical
 	LOGICAL REF			! Input from reference file?
 	LOGICAL OK			! Data present and defined?
@@ -218,13 +225,21 @@
 	LOGICAL BGCOR			! Has b/g data been exposure corrected?
 
       REAL			RSUM			! Real SSCALE
+      REAL 			TEFF			! Effective exposure time
 
       INTEGER			BFID(NDSMAX)		! Bgnd datasets
       INTEGER			DCFID(NDSMAX)		! Source datasets
+      INTEGER 			I			! Index
+      INTEGER			NVDIM			! Vignetting dim'ality
+      INTEGER 			PTR			! General pointer
       INTEGER			TIMID			! Timing info
+      INTEGER			VDIMS(ADI__MXDIM)	! Vignetting dims
+      INTEGER			VFID(NDSMAX)		! Vignetting datasets
 
-	INTEGER PTR			! General mapping pointer
-	INTEGER I			! Index
+      BYTE 			MASK			! Quality mask byte
+
+      LOGICAL			VIG			! Vignetting present?
+
 	INTEGER NDSC			! No of dataset container files
 	INTEGER NDSTOP			! NDS at end of current container
 	INTEGER SETSIZE			! No of spectra in spectral set
@@ -244,7 +259,6 @@
 	INTEGER DETSEL(NDETMAX,NDSCMAX)	! Detectors selected from set
         INTEGER SPECNO			! Current spectrum no (from set)
 	INTEGER IERR,NERR		! Error arguments for VEC_* routines
-	REAL TEFF			! Effective exposure time
 *.
 
 *  Check inherited global status.
@@ -275,7 +289,7 @@
 
 *       Spectral set?
 	  CALL SPEC_SETSEARCH(DCLOC(NDSC),SPECSET(NDSC),STATUS)
-	  IF(SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
+	  IF (SPECSET(1)) DETNO(1)=0		! Flag to use all spectra
 	ELSE
 
 *    Multiple input containers, find how many & get locators
@@ -285,37 +299,37 @@
 	  DO I=1,NCOMP
 	    CALL DAT_INDEX(ILOC,I,LOC,STATUS)
 	    CALL DAT_TYPE(LOC,TYPE,STATUS)
-	    IF(TYPE.EQ.'REFERENCE_OBJ')THEN
+	    IF (TYPE.EQ.'REFERENCE_OBJ') THEN
 	      NDSC=NDSC+1
 	      CALL REF_GET(LOC,'READ',DCLOC(NDSC),STATUS)
               CALL ADI1_PUTLOC( DCLOC(NDSC), DCFID(NDSC), STATUS )
 
 *       Spectral set?
 	      CALL SPEC_SETSEARCH(DCLOC(NDSC),SPECSET(NDSC),STATUS)
-	      IF(SPECSET(NDSC))THEN
+	      IF (SPECSET(NDSC)) THEN
 *         Find which spectra are to be used
 	        CALL DAT_NAME(LOC,NAME,STATUS)	! Name should be REFnnn
 	        SNAME='SEL'//NAME(4:CHR_LEN(NAME))
 	        CALL CMP_GET1I(ILOC,SNAME,NDETMAX,DETSEL(1,NDSC),
      :          DETNO(NDSC),STATUS)
-	        IF(STATUS.NE.SAI__OK)THEN
+	        IF (STATUS.NE.SAI__OK) THEN
 	          CALL ERR_ANNUL(STATUS)
 	          DETNO(NDSC)=0			! Flag for `all spectra'
-	        ENDIF
-	      ENDIF
-	    ENDIF
+	        END IF
+	      END IF
+	    END IF
 	    CALL DAT_ANNUL(LOC,STATUS)
-	  ENDDO
-	ENDIF
-	IF(STATUS.NE.SAI__OK) GOTO 99
+	  END DO
+	END IF
+	IF (STATUS.NE.SAI__OK) GOTO 99
 
 * Abort if maximum permitted number of datasets is exceeded
-	IF(NDSC.GT.NDSMAX)THEN
+	IF (NDSC.GT.NDSMAX) THEN
 	  STATUS=SAI__ERROR
 	  CALL ERR_REP('BADNDS','Maximum number of input datasets exceeded',
      :    STATUS)
 	  GOTO 99
-	ENDIF
+	END IF
 
 * Loop through dataset containers
 	NGOOD=0
@@ -324,31 +338,66 @@
 	DO N=1,NDSC
 
 *    Get dataset container file name and display
-	  IF(NDSC.EQ.1)THEN
+	  IF (NDSC.EQ.1) THEN
 	    CALL UTIL_SHOW(DCLOC(N),'Dataset',FILE,NAME,I,STATUS)
 	  ELSE
 	    CALL CHR_ITOC(N,FILENO,NCH)
 	    CALL UTIL_SHOW(DCLOC(N),'Dataset '//FILENO(1:NCH),FILE,
      :      NAME,NCH,STATUS)
-	  ENDIF
-	  IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+	  END IF
+	  IF (STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
 
 *    Check main data array
 	  CALL BDI_CHKDATA(DCFID(N),OK,NDIM,DIMS,STATUS)
-	  IF(STATUS.NE.SAI__OK) GOTO 99
-	  IF(.NOT.OK)THEN
+	  IF (STATUS.NE.SAI__OK) GOTO 99
+	  IF (.NOT.OK) THEN
 	    STATUS=SAI__ERROR
 	    CALL ERR_REP('BADDAT','Error accessing data array',STATUS)
 	    GOTO 99
-	  ENDIF
+	  END IF
 
 *      Check that spectrum is exposure corrected (i.e in ct/s)
           CALL PRF_GET( DCFID(N), 'CORRECTED.EXPOSURE', LOG, STATUS )
-	  IF(.NOT.LOG)THEN
+	  IF (.NOT.LOG) THEN
 	    CALL MSG_PRNT(' ')
 	    CALL MSG_PRNT('!! Warning - data must be corrected to ct/s')
 	    CALL MSG_PRNT(' ')
-	  ENDIF
+	  END IF
+
+*      Check existance of vignetting data
+          CALL FRI_CHK( DCFID(N), 'VIGN', VIG, STATUS )
+          IF ( VIG ) THEN
+
+*        Open vignetting data
+            CALL FRI_FOPEN( DCFID(N), 'VIGN', '*', 'READ', VFID(N),
+     :                      STATUS )
+
+	    IF ( STATUS .NE. SAI__OK ) THEN
+	      CALL ERR_ANNUL( STATUS )
+	      VIG = .FALSE.
+            END IF
+
+          END IF
+
+*      Check that vignetting data array is same size as main data array
+	  IF ( VIG ) THEN
+	    CALL BDI_CHKDATA( VFID(N), OK, NVDIM, VDIMS, STATUS )
+	    IF (STATUS.NE.SAI__OK) THEN
+	      CALL ERR_FLUSH(STATUS)
+	      VIG=.FALSE.
+	    ELSE IF (.NOT.OK) THEN
+	      CALL MSG_PRNT('Error accessing vignetting data array')
+	      VIG=.FALSE.
+            END IF
+	    IF (NVDIM.EQ.NDIM) THEN
+	      DO I=1,NDIM
+	        IF (VDIMS(I).NE.DIMS(I)) VIG=.FALSE.
+	      END DO
+            ELSE
+	      VIG=.FALSE.
+	    END IF
+
+          END IF
 
 *      Likelihood case?
 	  IF ( LIKSTAT ) THEN
@@ -357,13 +406,13 @@
             CALL TCI_GETID( DCFID(N), TIMID, STATUS )
             CALL ADI_CGET0R( TIMID, 'EffExposure', TEFF, STATUS )
 
-	    IF(STATUS.EQ.SAI__OK)THEN
+	    IF (STATUS.EQ.SAI__OK) THEN
 	      CALL MSG_SETR('TEFF',TEFF)
 	      CALL MSG_PRNT('    Effective exposure time ^TEFF')
 	    ELSE
 	      CALL ERR_ANNUL(STATUS)
               CALL ADI_CGET0R( TIMID, 'Exposure', TEFF, STATUS )
-	      IF(STATUS.EQ.SAI__OK)THEN
+	      IF (STATUS.EQ.SAI__OK) THEN
 	        CALL MSG_SETR('TEFF',TEFF)
 	        CALL MSG_PRNT('Effective exposure time not found - '//
      :          'using EXPOSURE_TIME value of ^TEFF')
@@ -371,17 +420,17 @@
 	        CALL ERR_REP(' ','No exposure times found in dataset',
      :          STATUS)
 	        GOTO 99
-	      ENDIF
-	    ENDIF
+	      END IF
+	    END IF
             CALL ADI_ERASE( TIMID, STATUS )
 
-*      Have data been b/g subtracted?
+*        Have data been b/g subtracted?
             CALL PRF_GET( DCFID(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
 	    IF ( BGSUB ) THEN
 	      CALL MSG_PRNT('    Background-subtracted data')
 	    ELSE
 	      CALL MSG_PRNT('    Not background-subtracted')
-	    ENDIF
+	    END IF
 
 *        Check existance of b/g data
             CALL FRI_CHK( DCFID(N), 'BGND', BG, STATUS )
@@ -402,36 +451,36 @@
 *      Check that background data array is same size as main data array
 	    IF ( BG ) THEN
 	      CALL BDI_CHKDATA( BFID(N), OK, NBDIM, BDIMS, STATUS )
-	      IF(STATUS.NE.SAI__OK)THEN
+	      IF (STATUS.NE.SAI__OK) THEN
 	        CALL ERR_FLUSH(STATUS)
 	        BG=.FALSE.
-	      ELSE IF(.NOT.OK)THEN
+	      ELSE IF (.NOT.OK) THEN
 	        CALL MSG_PRNT('Error accessing b/g data array')
 	        BG=.FALSE.
-	      ENDIF
-	      IF(NBDIM.EQ.NDIM)THEN
+	      END IF
+	      IF (NBDIM.EQ.NDIM) THEN
 	        DO I=1,NDIM
-	          IF(BDIMS(I).NE.DIMS(I)) BG=.FALSE.
-	        ENDDO
+	          IF (BDIMS(I).NE.DIMS(I)) BG=.FALSE.
+	        END DO
 	      ELSE
 	        BG=.FALSE.
-	      ENDIF
+	      END IF
 
 *         Warn user and exit if it doesn't match
-	      IF(.NOT.BG)THEN
+	      IF (.NOT.BG) THEN
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP(' ','Background array does not match'//
      :          ' data array',STATUS)
 	        GOTO 99
-	      ENDIF
+	      END IF
 
 *      Abort if b/g has been subtracted, but is not available
-	      IF(BGSUB.AND.(.NOT.BG))THEN
+	      IF (BGSUB.AND.(.NOT.BG)) THEN
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP('NOBG','Subtracted background data is'//
      :          ' not available',STATUS)
 	        GOTO 99
-	      ENDIF
+	      END IF
 
 *      Has background been exposure corrected? (We will require raw count
 *                               contribution from b/g expected in the data)
@@ -440,48 +489,48 @@
 
 	    END IF
 
-	    IF(.NOT.BG)THEN
+	    IF (.NOT.BG) THEN
 	      CALL MSG_PRNT('    No background data found -'//
      :        ' assumed negligible')
-	    ENDIF
-	  ENDIF
+	    END IF
+	  END IF
 
 *    Is container a spectral set?
-	  IF(SPECSET(N))THEN
+	  IF (SPECSET(N)) THEN
 
 *    Spectral set - find number of component spectra
-	    IF(NDIM.NE.2)THEN
+	    IF (NDIM.NE.2) THEN
 	      STATUS=SAI__ERROR
 	      CALL ERR_REP('BADDIM','Spectral set has incorrect '//
      :        'dimensionality',STATUS)
-	    ENDIF
-	    IF(STATUS.NE.SAI__OK) GOTO 99
+	    END IF
+	    IF (STATUS.NE.SAI__OK) GOTO 99
 	    CALL MSG_SETI('NSPEC',DIMS(2))
 	    CALL MSG_PRNT('Spectral set containing ^NSPEC spectra')
-	    IF(DETNO(N).GT.0)THEN
-	      IF(DETNO(N).LT.DIMS(2))THEN
+	    IF (DETNO(N).GT.0) THEN
+	      IF (DETNO(N).LT.DIMS(2)) THEN
 	        SETSIZE=DETNO(N)
 	      ELSE
 	        SETSIZE=DIMS(2)
 	        DETNO(N)=0		! Flag for `use all spectra'
-	      ENDIF
-	      IF(SETSIZE.EQ.1)THEN
+	      END IF
+	      IF (SETSIZE.EQ.1) THEN
 	        WRITE(*,100) (DETSEL(I,N),I=1,SETSIZE)
  100	        FORMAT(' Using component number: ',I3)
 	      ELSE
 	        WRITE(*,110) (DETSEL(I,N),I=1,SETSIZE)
  110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
-	      ENDIF
+	      END IF
 	    ELSE
 	      SETSIZE = DIMS(2)
 	      CALL MSG_PRNT( 'Using all spectra' )
-	    ENDIF
+	    END IF
 	    CALL BDA_UNMAP(DCLOC(N),STATUS)
 	  ELSE
 
 *    Not a spectral set
 	    SETSIZE=1
-	  ENDIF
+	  END IF
 
 *    Loop through component spectra required from a given dataset
 	  INDEX=0
@@ -490,35 +539,35 @@
 	    NDS=NDS+1
 
 *       Abort if maximum permitted number of datasets is exceeded
-	    IF(NDS.GT.NDSMAX)THEN
+	    IF (NDS.GT.NDSMAX) THEN
 	      STATUS=SAI__ERROR
 	      CALL ERR_REP('BADNDS','Maximum number of input datasets '//
      :        'exceeded',STATUS)
 	      GOTO 99
-	    ENDIF
+	    END IF
 
 *       Set up name, locator and set position
             CALL ADI_CLONE( DCFID(N), OBDAT(NDS).D_ID, STATUS )
 
-	    IF(SPECSET(N))THEN
+	    IF (SPECSET(N)) THEN
 	      INDEX=INDEX+1
-	      IF(DETNO(N).GT.0)THEN
+	      IF (DETNO(N).GT.0) THEN
 	        SPECNO=DETSEL(INDEX,N)
 	      ELSE
 	        SPECNO=INDEX
-	      ENDIF
+	      END IF
 	      CALL CHR_ITOC(SPECNO,SPECH,NCH)
 	      OBDAT(NDS).DATNAME=FILE(1:CHR_LEN(FILE))//' Spectrum '/
      :                         /SPECH
 	    ELSE
 	      SPECNO=0
 	      OBDAT(NDS).DATNAME=FILE
-	    ENDIF
+	    END IF
 	    OBDAT(NDS).SETINDEX=SPECNO
 D	    print *,'index,specno:- ',index,specno
 
 *       Find and map data array
-	    IF(SPECSET(N))THEN
+	    IF (SPECSET(N)) THEN
 
 *          Map slice for spectral set
 	      LDIM(1)=1
@@ -543,29 +592,29 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	      DO I=1,OBDAT(NDS).NDIM
 	        OBDAT(NDS).IDIM(I)=DIMS(I)
 	        OBDAT(NDS).NDAT=OBDAT(NDS).NDAT*DIMS(I)
-	      ENDDO
+	      END DO
 	      CALL BDI_MAPDATA(OBDAT(NDS).D_ID,'READ',OBDAT(NDS).DPTR,
      :        STATUS)
-	      IF(STATUS.NE.SAI__OK) GOTO 99
+	      IF (STATUS.NE.SAI__OK) GOTO 99
 
 	    END IF
 
 *         For likelihood case scale to give raw counts, & accumulate SSCALE
-	    IF(LIKSTAT)THEN
+	    IF (LIKSTAT) THEN
 	      PTR=OBDAT(NDS).DPTR
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).DPTR,STATUS)
 	      CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :        %VAL(OBDAT(NDS).DPTR),STATUS)
-	      IF(STATUS.NE.SAI__OK) GOTO 99
+	      IF (STATUS.NE.SAI__OK) GOTO 99
 	      CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,%VAL(OBDAT(NDS).DPTR))
-	    ENDIF
+	    END IF
 
 *       Map variance and quality and use to set up array of data weights
 
 *          Get variance (slice in case of spectral set)
 	    CALL BDI_CHKVAR(OBDAT(NDS).D_ID,OK,NDIM,DIMS,STATUS)
-	    IF(OK)THEN
-	      IF(SPECSET(N))THEN
+	    IF (OK) THEN
+	      IF (SPECSET(N)) THEN
 	        CALL BDA_LOCVAR( DCLOC(N), CLOC, STATUS )
 	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SVLOC(NDS),STATUS)
 	        CALL DAT_MAPV(SVLOC(NDS),'_REAL','READ',OBDAT(NDS).VPTR,
@@ -573,23 +622,23 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	      ELSE
 	        CALL BDI_MAPVAR(OBDAT(NDS).D_ID,'READ',
      :          OBDAT(NDS).VPTR,STATUS)
-	      ENDIF
+	      END IF
 	    ELSE
-	      IF(WEIGHTS)THEN
+	      IF (WEIGHTS) THEN
 	        CALL MSG_SETI('NDS',NDS)
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP( ' ', 'No error information available '//
      :          'in dataset ^NDS',STATUS)
 	      ELSE
 	        OBDAT(NDS).VPTR=0			! Flag
-	      ENDIF
-	    ENDIF
-	    IF(STATUS.NE.SAI__OK) GOTO 99
+	      END IF
+	    END IF
+	    IF (STATUS.NE.SAI__OK) GOTO 99
 
 *          Get quality
 	    CALL BDI_CHKQUAL(OBDAT(NDS).D_ID,QUAL,NDIM,DIMS,STATUS)
-	    IF(QUAL)THEN
-	      IF(SPECSET(N))THEN
+	    IF (QUAL) THEN
+	      IF (SPECSET(N)) THEN
 	        CALL BDI_GETMASK(OBDAT(NDS).D_ID,MASK,STATUS)
 	        CALL BDA_LOCQUAL( DCLOC(N), CLOC, STATUS )
 	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SQLOC(NDS),STATUS)
@@ -600,7 +649,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	      ELSE
 	        CALL BDI_MAPLQUAL(OBDAT(NDS).D_ID,'READ',BAD,
      :          OBDAT(NDS).QPTR,STATUS)
-	      ENDIF
+	      END IF
 
 *         Set quality flag if bad values are present
 	      OBDAT(NDS).QFLAG = BAD
@@ -608,13 +657,13 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	    ELSE
 	      OBDAT(NDS).QFLAG=.FALSE.
 	      OBDAT(NDS).QPTR=0
-	    ENDIF
+	    END IF
 
-	    IF(STATUS.NE.SAI__OK)THEN
+	    IF (STATUS.NE.SAI__OK) THEN
 D	      call err_flush(status)
 	      CALL ERR_ANNUL(STATUS)
 	      QUAL=.FALSE.
-	    ENDIF
+	    END IF
 D	    print *,'datget;ndim,ndat,qual:',obdat(nds).ndim,
 D    :      obdat(nds).ndat,qual
 D	    print *,'qual,qflag,qptr : ',qual,obdat(nds).qflag,obdat(nds).qptr
@@ -634,39 +683,52 @@ D	    print *,'ldim,udim :',ldim,udim
             END IF
 
 *          Map weights as 1D array
-	    IF(WEIGHTS)THEN
+	    IF (WEIGHTS) THEN
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).WPTR,STATUS)
-	      IF(STATUS.NE.SAI__OK) GOTO 99
+	      IF (STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
 	      OBDAT(NDS).WPTR=0				! Flag
-	    ENDIF
+	    END IF
 
 *          Enter weights (=inverse variances)
 	    CALL FIT_GETDAT_WTS(WEIGHTS,OBDAT(NDS).NDAT,
      :      %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
      :      %VAL(OBDAT(NDS).WPTR),NGDAT)
-	    IF(NGDAT.EQ.0)THEN
+	    IF (NGDAT.EQ.0) THEN
 	      CALL MSG_SETI('NDS',NDS)
 	      STATUS=SAI__ERROR
 	      CALL ERR_REP('NO_GOOD','No good data in dataset ^NDS',STATUS)
 	      GOTO 99
 	    ELSE
 	      NGOOD=NGOOD+NGDAT
-	    ENDIF
+	    END IF
 
-*          Default value for background object
+*        Default value for vignetting object
+            OBDAT(NDS).V_ID = ADI__NULLID
+            IF ( VIG ) THEN
+
+*        Store identifier
+              OBDAT(NDS).V_ID = VFID(N)
+
+*        Map vignetting array
+              CALL BDI_MAPDATA( VFID(N), 'READ', OBDAT(N).VIGPTR,
+     :                          STATUS )
+
+            END IF
+
+*        Default value for background object
             OBDAT(NDS).B_ID = ADI__NULLID
 
-*       For likelihood case, Set up OBDAT.TEFF and get background data
-	    IF(LIKSTAT)THEN
+*        For likelihood case, Set up OBDAT.TEFF and get background data
+	    IF (LIKSTAT) THEN
 	      OBDAT(NDS).TEFF=TEFF
-	      IF(BG)THEN
+	      IF (BG) THEN
 
 *              Store background object
                 OBDAT(NDS).B_ID = BFID(N)
 
 *         Find and map b/g data array
-	        IF(SPECSET(N))THEN
+	        IF (SPECSET(N)) THEN
 
 *           Map slice for b/g spectral set
 	          CALL BDA_LOCDATA(BLOC(N),CLOC,STATUS)
@@ -679,26 +741,26 @@ D	    print *,'ldim,udim :',ldim,udim
 *           Simple BDI_ map for straight b/g spectrum
 	          CALL BDI_MAPDATA( BFID(N), 'READ', OBDAT(NDS).BPTR,
      :                              STATUS )
-	          IF(STATUS.NE.SAI__OK) GOTO 99
+	          IF (STATUS.NE.SAI__OK) GOTO 99
 
-	        ENDIF
+	        END IF
 
 *           Scale b/g to give raw counts if it has been exposure corrected
-	        IF(BGCOR)THEN
+	        IF (BGCOR) THEN
 	          PTR=OBDAT(NDS).BPTR
 	          CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
 	          CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :            %VAL(OBDAT(NDS).BPTR),STATUS)
-	          IF(STATUS.NE.SAI__OK) GOTO 99
+	          IF (STATUS.NE.SAI__OK) GOTO 99
 	          CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,%VAL(OBDAT(NDS).BPTR))
-	        ENDIF
+	        END IF
 
 *            If b/g has been subtracted then add it back into data and SSCALE
-	        IF(BGSUB)THEN
+	        IF ( BGSUB ) THEN
 	          CALL VEC_ADDR(.FALSE.,OBDAT(N).NDAT,%VAL(OBDAT(N).BPTR),
      :            %VAL(OBDAT(N).DPTR),%VAL(OBDAT(N).DPTR),IERR,NERR,
      :            STATUS)
-	        ENDIF
+	        END IF
 
 *            Accumulate counts for data in likelihood case. Use quality if
 *            present in input data (rather than bgnd)
@@ -717,8 +779,8 @@ D	    print *,'ldim,udim :',ldim,udim
 	        CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
 	        CALL ARR_INIT1R(0.0,OBDAT(NDS).NDAT,
      :                      %VAL(OBDAT(NDS).BPTR),STATUS)
-	      ENDIF
-	    ENDIF
+	      END IF
+	    END IF
 
 *............ OBDAT set up ..............................................
 
@@ -729,19 +791,19 @@ D	    print *,'ldim,udim :',ldim,udim
 *      Look for instrument response, set up INSTR if found, and report
 	      CALL FIT_GETINS( OBDAT(NDS).D_ID, SPECNO,
      :               PREDDAT(NDS).CONVOLVE, INSTR(NDS), STATUS )
-	      IF(STATUS.NE.SAI__OK) GOTO 99
+	      IF (STATUS.NE.SAI__OK) GOTO 99
             END IF
 
-	    IF(PREDDAT(NDS).CONVOLVE)THEN
+	    IF (PREDDAT(NDS).CONVOLVE) THEN
 
 *      Check that data are 1D
-	      IF(OBDAT(NDS).NDIM.GT.1)THEN
+	      IF (OBDAT(NDS).NDIM.GT.1) THEN
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP('BAD_DIM','Convolution with instrument response'
      :          //' is only supported for 1D data at present',STATUS)
 	        GOTO 99
-	      ENDIF
-	    ENDIF
+	      END IF
+	    END IF
 
 *      Find remaining components of PREDDAT(NDS)
 	  CALL FIT_PREDSET( OBDAT(NDS).D_ID, NDS, WORKSPACE,
@@ -751,7 +813,7 @@ D	    print *,'ldim,udim :',ldim,udim
 
       END DO
 
-*  Set up ADI stuff
+*  Exit point
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_GETDAT', STATUS )
       END IF
@@ -781,7 +843,7 @@ D	    print *,'ldim,udim :',ldim,udim
 
 	DO I=1,NDAT
           IF ( QUAL(I) ) COUNTS=COUNTS+NINT(DATA(I))
-	ENDDO
+	END DO
 	END
 
 
@@ -817,38 +879,38 @@ D	    print *,'ldim,udim :',ldim,udim
 	NGOOD=0
 
 * Set up weights
-	IF(WEIGHTS)THEN
-	  IF(QUAL)THEN
+	IF (WEIGHTS) THEN
+	  IF (QUAL) THEN
 	    DO I=1,NDAT
-	      IF(QARR(I).AND.VARR(I).GT.0.0)THEN
+	      IF (QARR(I).AND.VARR(I).GT.0.0) THEN
 	        WTARR(I)=1.0/VARR(I)
 	        NGOOD=NGOOD+1
 	      ELSE
 	        WTARR(I)=0.0
-	      ENDIF
-	    ENDDO
+	      END IF
+	    END DO
 	  ELSE
 	    DO I=1,NDAT
-	      IF(VARR(I).GT.0.0)THEN
+	      IF (VARR(I).GT.0.0) THEN
 	        WTARR(I)=1.0/VARR(I)
 	        NGOOD=NGOOD+1
 	      ELSE
 	        WTARR(I)=0.0
-	      ENDIF
-	    ENDDO
-	  ENDIF
+	      END IF
+	    END DO
+	  END IF
 
 * No weights to be set up
 	ELSE
-	  IF(QUAL)THEN
+	  IF ( QUAL ) THEN
 	    DO I=1,NDAT
-	      IF(QARR(I))THEN
+	      IF (QARR(I)) THEN
 	        NGOOD=NGOOD+1
-	      ENDIF
-	    ENDDO
+	      END IF
+	    END DO
 	  ELSE
 	    NGOOD=NGOOD+NDAT
-	  ENDIF
-	ENDIF
+	  END IF
+	END IF
 
 	END
