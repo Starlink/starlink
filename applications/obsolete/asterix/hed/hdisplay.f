@@ -60,7 +60,6 @@
 
       INTEGER DIMS(DAT__MXDIM)             ! Dimensions
       INTEGER DEFWIDTH                     ! Output width
-      INTEGER IDIM                         ! Loop over dimensions
       INTEGER NDIM                         ! Dimensionality
       INTEGER			OCH			! Output channel id
       INTEGER RANGES(2,DAT__MXDIM)         ! Ranges to be output
