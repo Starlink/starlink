@@ -583,6 +583,7 @@
       INTEGER NB
       REAL XP1,XP2,YP1,YP2
       REAL XW,YW
+      REAL XWOLD,YWOLD
       REAL XW1,XW2,YW1,YW2
       REAL SCVAL,VAL,VAL2
       REAL XC,YC,DX,DY
@@ -594,6 +595,10 @@
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
+
+*  store current position
+        XWOLD=I_X
+        YWOLD=I_Y
 
 *  locate noticeboard items
         CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
@@ -648,9 +653,12 @@
 
         ENDDO
 
-        IF (FLAG.EQ.1) THEN
-          CALL IMG_SETPOS(XW,YW,STATUS)
+        IF (FLAG.NE.1) THEN
+          XW=XWOLD
+          YW=YWOLD
         ENDIF
+
+        CALL IMG_SETPOS(XW,YW,STATUS)
 
 
       ENDIF
