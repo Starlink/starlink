@@ -1,0 +1,349 @@
+      SUBROUTINE KPG1_FLASB( BAD, DIM1, DIM2, INARR, LOWPEN, HIPEN,
+     :                        INVERT, POSTIV, OUTARR, STATUS )
+*+
+*  Name:
+*     KPG1_FLASx
+ 
+*  Purpose:
+*     Flashes image into a cell array.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation
+*     CALL KPG1_FLASx( BAD, DIM1, DIM2, INARR, LOWPEN, HIPEN, INVERT,
+*    :                 POSTIV, OUTARR, STATUS )
+ 
+*  Description:
+*     This subroutine converts a BYTE 2-d array into an
+*     integer cell array without scaling it.  However, the cell array
+*     is computed by modulo arithmetic between the lowest and highest
+*     colour indices, or the complement of this should a negative
+*     scaling be required. The image is normally inverted for output on
+*     an image display, though this can be overridden.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If true bad pixels will be processed.  This should not be set
+*        to false unless the input array contains no bad pixels.
+*     DIM1 = INTEGER (Given)
+*        The first dimension of the 2-d array.
+*     DIM2 = INTEGER (Given)
+*        The second dimension of the 2-d array.
+*     INARR( DIM1, DIM2 ) = ? (Given)
+*        The array of data to be flashed.
+*     LOWPEN = INTEGER (Given)
+*        The lowest colour index to be used in case smaller values have
+*        been reserved for annotation.
+*     HIPEN = INTEGER (Given)
+*        The highest colour index to be used.  Normally this is the
+*        number of greyscale intensities available on the chosen device.
+*     INVERT = LOGICAL (Given)
+*        True if the image is to be inverted for display.
+*     POSTIV = LOGICAL (Given)
+*        True if the display of the image is to be positive.
+*     OUTARR( DIM1, DIM2 ) = INTEGER (Returned)
+*        The cell array.
+*     STATUS = INTEGER (Given)
+*        Value of the status on entering this subroutine.
+ 
+*  Notes:
+*     -  There is a routine for five numeric data types: replace "x" in
+*     the routine name by B, D, I, R, or W as appropriate.  The array
+*     supplied to the routine must have the data type specified.
+*     -  The array is normally inverted so that the image will appear
+*     the correct way round when displayed as the GKS routine
+*     to display the image inverts it.
+ 
+*  Authors:
+*     MJC: Malcolm J. Currie  (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     1990 July 19  (MJC):
+*        Original version.
+*     1991 April 8 (MJC):
+*        Corrected the modulo arithmetic for negative case.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+ 
+*  Arguments Given:
+      INTEGER
+     :  DIM1, DIM2,
+     :  LOWPEN,
+     :  HIPEN
+ 
+      BYTE
+     :  INARR( DIM1, DIM2 )
+ 
+      LOGICAL
+     :  BAD,
+     :  INVERT,
+     :  POSTIV
+ 
+*  Arguments Returned:
+      INTEGER
+     :  OUTARR( DIM1, DIM2 )
+ 
+*  Status:
+      INTEGER STATUS
+ 
+*  Local Variables:
+      INTEGER
+     :  I, J, K,               ! General variables
+     :  LOWP                   ! Lowest colour index subject to
+                               ! non-negative constraint
+ 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEC_B'    ! NUM declarations for functions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_B'    ! NUM definitions for functions
+ 
+*.
+ 
+*    Check inherited global status.
+ 
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*    The lowest pen cannot be negative, or equal to the last pen or
+*    background pen (zero).
+ 
+      LOWP = MIN( MAX( 1, LOWPEN ), HIPEN - 1 )
+ 
+*    Bad pixels will be checked.
+*    ===========================
+ 
+      IF ( BAD ) THEN
+ 
+*        Positive plot.
+ 
+         IF ( POSTIV ) THEN
+ 
+*          Invert and copy image.
+*          ======================
+ 
+            IF ( INVERT ) THEN
+               DO  I = 1, DIM2, 1
+ 
+                  K = ( DIM2 + 1 ) - I
+ 
+                  DO  J = 1, DIM1, 1
+ 
+*                    Set bad pixels to lowest colour index.
+ 
+                     IF ( INARR( J, K ) .EQ. VAL__BADB ) THEN
+                        OUTARR( J, I ) = LOWPEN
+                     ELSE
+ 
+*                      Cycle around multiples of the number of
+*                      available colour indices allowing for the offset.
+ 
+                        OUTARR( J, I ) = LOWP + MOD( NUM_BTOI(
+     :                                   NUM_NINTB( INARR( J, K ) ) ),
+     :                                   HIPEN - LOWP + 1 )
+                     END IF
+                  END DO
+               END DO
+ 
+            ELSE
+ 
+*             Copy image without inversion.
+*             =============================
+ 
+               DO  I = 1, DIM2, 1
+                  DO  J = 1, DIM1, 1
+ 
+*                   Set bad pixels to the lowest colour index.
+ 
+                     IF ( INARR( J, I ) .EQ. VAL__BADB ) THEN
+                        OUTARR( J, I ) = LOWPEN
+                     ELSE
+ 
+*                      Cycle around multiples of the number of
+*                      available colour indices allowing for the offset.
+ 
+                        OUTARR( J, I ) = LOWP + MOD( NUM_BTOI(
+     :                                   NUM_NINTB( INARR( J, I ) ) ),
+     :                                   HIPEN - LOWP + 1 )
+                     END IF
+                  END DO
+               END DO
+ 
+            END IF
+ 
+*       Negative plot.
+*       ==============
+ 
+         ELSE
+ 
+*          Invert and copy image.
+*          ======================
+ 
+            IF ( INVERT ) THEN
+               DO  I = 1, DIM2, 1
+ 
+                  K = ( DIM2+1 ) - I
+ 
+                  DO  J = 1, DIM1, 1
+ 
+*                   Set invalid pixels to highest colour index.
+ 
+                     IF ( INARR( J, K ) .EQ. VAL__BADB ) THEN
+                        OUTARR( J, I ) = HIPEN
+                     ELSE
+ 
+*                      Cycle around multiples of the number of
+*                      available colour indices allowing for the offset.
+ 
+                        OUTARR( J, I ) = HIPEN - MOD( NUM_BTOI(
+     :                                   NUM_NINTB( INARR( J, K ) ) ),
+     :                                   HIPEN - LOWP + 1 )
+                     END IF
+                  END DO
+               END DO
+ 
+            ELSE
+ 
+*             Copy image without inversion.
+*             =============================
+ 
+               DO  I = 1, DIM2, 1
+                  DO  J = 1, DIM1, 1
+ 
+*                   Set invalid pixels to highest colour index.
+ 
+                     IF ( INARR( J, I ) .EQ. VAL__BADB ) THEN
+                        OUTARR( J, I ) = HIPEN
+                     ELSE
+ 
+*                      Cycle around multiples of the number of
+*                      available colour indices allowing for the offset.
+ 
+                        OUTARR( J, I ) = HIPEN - MOD( NUM_BTOI(
+     :                                   NUM_NINTB( INARR( J, I ) ) ),
+     :                                   HIPEN - LOWP + 1 )
+                     END IF
+                  END DO
+               END DO
+ 
+*          End of check for inversion.
+ 
+            END IF
+ 
+*       End of check for positive or negative.
+ 
+         END IF
+ 
+*    Bad pixels will not be checked.
+*    ===============================
+ 
+      ELSE
+ 
+*        Positive plot.
+ 
+         IF ( POSTIV ) THEN
+ 
+*          Invert and copy image.
+*          ======================
+ 
+            IF ( INVERT ) THEN
+               DO  I = 1, DIM2, 1
+ 
+                  K = ( DIM2 + 1 ) - I
+ 
+                  DO  J = 1, DIM1, 1
+ 
+*                   Cycle around multiples of the number of
+*                   available colour indices allowing for the offset.
+ 
+                     OUTARR( J, I ) = LOWP + MOD( NUM_BTOI(
+     :                                NUM_NINTB( INARR( J, K ) ) ),
+     :                                HIPEN - LOWP + 1 )
+                  END DO
+               END DO
+ 
+            ELSE
+ 
+*             Copy image without inversion.
+*             =============================
+ 
+               DO  I = 1, DIM2, 1
+                  DO  J = 1, DIM1, 1
+ 
+*                   Cycle around multiples of the number of
+*                   available colour indices allowing for the offset.
+ 
+                     OUTARR( J, I ) = LOWP + MOD( NUM_BTOI(
+     :                                NUM_NINTB( INARR( J, I ) ) ),
+     :                                HIPEN - LOWP + 1 )
+                  END DO
+               END DO
+ 
+            END IF
+ 
+*       Negative plot.
+*       ==============
+ 
+         ELSE
+ 
+*          Invert and copy image.
+*          ======================
+ 
+            IF ( INVERT ) THEN
+               DO  I = 1, DIM2, 1
+ 
+                  K = ( DIM2+1 ) - I
+ 
+                  DO  J = 1, DIM1, 1
+ 
+*                   Cycle around multiples of the number of
+*                   available colour indices allowing for the offset.
+ 
+                     OUTARR( J, I ) = HIPEN - MOD( NUM_BTOI(
+     :                                NUM_NINTB( INARR( J, K ) ) ),
+     :                                HIPEN - LOWP + 1 )
+                  END DO
+               END DO
+ 
+            ELSE
+ 
+*             Copy image without inversion.
+*             =============================
+ 
+               DO  I = 1, DIM2, 1
+                  DO  J = 1, DIM1, 1
+ 
+*                   Cycle around multiples of the number of
+*                   available colour indices allowing for the offset.
+ 
+                     OUTARR( J, I ) = HIPEN - MOD( NUM_BTOI(
+     :                                NUM_NINTB( INARR( J, I ) ) ),
+     :                                HIPEN - LOWP + 1 )
+                  END DO
+               END DO
+ 
+*          End of check for inversion.
+ 
+            END IF
+ 
+*       End of check for positive or negative.
+ 
+         END IF
+ 
+*    End of check for bad-pixel testing.
+ 
+      END IF
+ 
+      END

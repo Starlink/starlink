@@ -1,0 +1,109 @@
+      SUBROUTINE KPG1_VEC2N( NVEC, VEC, NDIM, LBND, UBND, IDIM, STATUS )
+*+
+*  Name:
+*     KPG1_VEC2N
+
+*  Purpose:
+*     Convert vectorised array indices into N-dimensional form.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_VEC2N( NVEC, VEC, NDIM, LBND, UBND, IDIM, STATUS )
+
+*  Description:
+*     This routine converts pixel indices which refer to a pixel in a
+*     vectorised array into sets of indices which identify the same
+*     pixel when the array is regarded as N-dimensional, with specified
+*     lower and upper pixel-index bounds for each dimension.
+
+*  Arguments:
+*     NVEC = INTEGER (Given)
+*        Number of vectorised array indices to convert.
+*     VEC( NVEC ) = INTEGER (Given)
+*        Array of vectorised pixel indices to be converted.
+*     NDIM = INTEGER (Given)
+*        Number of array dimensions.
+*     LBND( NDIM ) = INTEGER (Given)
+*        Lower pixel-index bounds for each array dimension.
+*     UBND( NDIM ) = INTEGER (Given)
+*        Upper pixel-index bounds for each array dimension.
+*     IDIM( NDIM, NVEC ) = INTEGER (Returned)
+*        Returns a set of NDIM pixel-indices for each vectorised index
+*        supplied.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     The maximum number of dimensions which can be handled by this
+*     routine is equal to the symbolic constant NDF__MXDIM.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-MAR-1991 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+
+*  Arguments Given:
+      INTEGER NVEC
+      INTEGER VEC( NVEC )
+      INTEGER NDIM
+      INTEGER LBND( NDIM )
+      INTEGER UBND( NDIM )
+
+*  Arguments Returned:
+      INTEGER IDIM( NDIM, NVEC )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter for dimensions
+      INTEGER IVEC               ! Variable for address calculation
+      INTEGER J                  ! Loop counter for input values
+      INTEGER STRIDE( NDF__MXDIM ) ! Stride of each dimension
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop to find the stride for each dimension of the N-dimensional
+*  array.
+      STRIDE( 1 ) = 1
+      DO 1 I = 1, NDIM - 1
+         STRIDE( I + 1 ) = STRIDE( I ) * ( UBND( I ) - LBND( I ) + 1 )
+ 1    CONTINUE
+
+*  Loop through all the vectorised indices to be converted.
+      DO 3 J = 1, NVEC
+
+*  Calculate the zero-based index in each dimension, updating IVEC as
+*  the calculation proceeds.
+         IVEC = VEC( J ) - 1
+         DO 2 I = NDIM, 1, -1
+            IDIM( I, J ) = IVEC / STRIDE( I )
+            IVEC = IVEC - IDIM( I, J ) * STRIDE( I )
+
+*  Add the lower bound of the N-dimensional array to each result.
+            IDIM( I, J ) = IDIM ( I, J ) + LBND( I )
+ 2       CONTINUE
+ 3    CONTINUE
+
+      END

@@ -1,0 +1,280 @@
+      SUBROUTINE KPG1_AKERR( IBOX, JBOX, WEIGHT, SAMBAD, WLIM, NX, NY,
+     :                         BAD, VAR, A, B, BADOUT, STATUS )
+*+
+*  Name:
+*     KPG1_AKERx
+ 
+*  Purpose:
+*     Smooth a 2-dimensional array using an arbitrary rectangular
+*     kernel.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation
+*     CALL KPG1_AKERx( IBOX, JBOX, WEIGHT, SAMBAD, WLIM, NX, NY,
+*                      BAD, VAR, A, B, BADOUT, STATUS )
+ 
+*  Description:
+*     The routine smooths the array A using an arbitrary smoothing
+*     kernel, and returns the result in the array B.
+ 
+*  Arguments:
+*     IBOX = INTEGER (Given)
+*        Half-size, in pixels along the x axis, of the box over which
+*        the smoothing will be applied (the actual box used has an edge
+*        which is 2*IBOX+1 pixels long). This defines the region within
+*        which the smoothing function is non-zero.
+*     JBOX = INTEGER (Given)
+*        Half-size, in pixels along the y axis, of the box over which
+*        the smoothing will be applied (the actual box used has an edge
+*        which is 2*JBOX+1 pixels long). This defines the region within
+*        which the smoothing function is non-zero.
+*     WEIGHT( 2 * IBOX + 1, 2 * JBOX + 1 ) = ? (Given)
+*        The weighting kernel.  It need not be normalised to one, but
+*        this is strongly preferred since it reduces the chance of
+*        overflows.
+*     SAMBAD = LOGICAL (Given)
+*        If a .TRUE. value is given, then any "bad" pixels in the input
+*        array A will be propagated to the output array B (output
+*        values will be calculated for all other output pixels). If a
+*        .FALSE. value is given, then the WLIM argument is used to
+*        determine which output pixels will be bad (if any). This
+*        argument is not relevant if BAD is .FALSE..
+*     WLIM = ? (Given)
+*        The minimum weighting that can be used to compute a smoothed
+*        output pixel if SAMBAD is .FALSE..  Any output pixels falling
+*        short of the specified weight will be set to the bad value
+*        (invalid pixels carry no weight, others have Gaussian weights
+*        about the central pixel).  The value must be greater than 0.0
+*        and should be less than or equal to 1.0. This argument is not
+*        used if SAMBAD is .TRUE. or if BAD is .FALSE..
+*     NX = INTEGER (Given)
+*        First dimension of the 2-d array A.
+*     NY = INTEGER (Given)
+*        Second dimension of the 2-d array A.
+*     BAD = LOGICAL (Given)
+*        Whether it is necessary to check for bad pixels in the input
+*        array A.
+*     VAR = LOGICAL (Given)
+*        If a .FALSE. value is given for this argument, then smoothing
+*        will be performed as if the array supplied (A) is an array of
+*        data and the PSF will be used directly as specified. If a
+*        .TRUE. value is given, then smoothing will be applied as if
+*        the array is an array of variance values associated with an
+*        array of data; in this case, the effective PSF will be reduced
+*        in width by a factor 2 and the mean output values will be
+*        reduced to reflect the variance-reducing effect of smoothing.
+*     A( NX, NY ) = ? (Given)
+*        Array containing the input image to be smoothed.
+*     B( NX, NY ) = ? (Returned)
+*        Array containing the input image after smoothing.
+*     BADOUT = LOGICAL (Returned)
+*        Whether there are bad pixel values in the output array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There are routines for processing double precision and real data.
+*     Replace "x" in the routine name by D or R as appropriate. The
+*     data types of the WLIM, A, B, and WEIGHT arguments must match the
+*     routine used.
+*     -  This routine should not be used for symmetric kernels because
+*     there are faster algorithms for handling these special cases.
+ 
+*  Authors:
+*     MJC: Malcolm Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     1992 November 13 (MJC):
+*        Original version.
+*     {enter_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+ 
+*  Arguments Given:
+      INTEGER IBOX
+      INTEGER JBOX
+      REAL WEIGHT( -IBOX : IBOX, -JBOX : JBOX )
+      LOGICAL SAMBAD
+      REAL WLIM
+      INTEGER NX
+      INTEGER NY
+      LOGICAL BAD
+      LOGICAL VAR
+      REAL A( NX, NY )
+ 
+*  Arguments Returned:
+      REAL B( NX, NY )
+      LOGICAL BADOUT
+ 
+*  Status:
+      INTEGER STATUS
+ 
+*  Local Variables:
+      REAL BWSUM               ! Sum of weights of bad pixels
+      REAL SUM                 ! Sum of weighted array values
+      REAL WSUM                ! Sum of weights
+      REAL WT1                 ! Pixel weight
+      REAL WT2                 ! Weight for summing pixels
+      INTEGER IIX                ! Loop counter for summing over pixels
+      INTEGER IIY                ! Loop counter for summing over lines
+      INTEGER IX                 ! First array index
+      INTEGER IY                 ! Second array index
+ 
+*.
+ 
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Initialise returned flag.
+      BADOUT = .FALSE.
+ 
+*  Bad pixels may be present.
+      IF ( BAD ) THEN
+ 
+*  Loop to process each output image pixel.
+*  ========================================
+*
+*  Loop around each line of the array.
+         DO IY = 1, NY
+ 
+*  Loop around each pixel of this line.
+            DO IX = 1, NX
+ 
+*  Test if input bad pixels are to be propagated to the output array.
+*  If they are we merely assign a bad value to the output array.
+*  Record that the output array has at least one bad value.
+               IF ( SAMBAD .AND. A( IX, IY ) .EQ. VAL__BADR ) THEN
+                  B( IX, IY ) = VAL__BADR
+                  BADOUT =.TRUE.
+               ELSE
+ 
+*  Initialise the sum of the output value and of the weights, and of the
+*  weights of the bad pixels.
+                  SUM = 0.0E0
+                  WSUM = 0.0E0
+                  BWSUM = 0.0E0
+ 
+*  Loop through all the pixels of the kernel which contribute to the
+*  current output pixel.  Obtain the weight for each of these pixels,
+*  and also form the square of this weight if smoothing a variance
+*  array.
+                  DO IIY = MAX( 1, IY - JBOX ), MIN( NY, IY + JBOX )
+                     DO IIX = MAX( 1, IX - IBOX ), MIN( NX, IX + IBOX )
+                        WT1 = WEIGHT( IIX - IX, IIY - IY )
+                        IF ( VAR ) THEN
+                           WT2 = WT1 * WT1
+                        ELSE
+                           WT2 = WT1
+                        END IF
+ 
+*  Form the sums.
+                        IF ( A( IIX, IIY ) .NE. VAL__BADR ) THEN
+                           SUM = SUM + WT2 * A( IIX, IIY )
+                           WSUM = WSUM + WT2
+                        ELSE
+                           BWSUM = BWSUM + WT2
+                        END IF
+                     END DO
+                  END DO
+ 
+*  Calculate the smoothed output-pixel value.
+*  ==========================================
+ 
+*  There are a number of cases.  We have already dealt with bad-pixel
+*  propagation, so the current pixel is good when the bad-pixel
+*  propagation flag is true.  Also check that the weights are positive.
+*  If they are not we are forced to assign a bad value to the output
+*  pixel, and set the bad-pixel flag.
+                  IF ( SAMBAD ) THEN
+                     IF ( WSUM .GT. 0 ) THEN
+                        B( IX, IY ) = SUM / WSUM
+                     ELSE
+                        B( IX, IY ) = VAL__BADR
+                        BADOUT = .TRUE.
+                     END IF
+ 
+*  Test that there is sufficient weight used to form the sum.  If there
+*  is, a good output pixel is formed; if there isn't a bad output value
+*  is assigned.  Note WLIM is the fractional weight of the available
+*  pixels.  The reason behind this is to prevent bad pixels being formed
+*  at the edges simply because only a fraction of the kernel is within
+*  the data array.
+                  ELSE
+                     IF ( WSUM / ( WSUM + BWSUM ) .GT. WLIM ) THEN
+                        B( IX, IY ) = SUM / WSUM
+                     ELSE
+                        B( IX, IY ) = VAL__BADR
+                        BADOUT = .TRUE.
+                     END IF
+                  END IF
+               END IF
+            END DO
+         END DO
+ 
+*  The input array contains no bad pixels.  Therefore none can be
+*  propagated.
+      ELSE
+ 
+*  Loop to process each output image pixel.
+*  ========================================
+*
+*  Loop around each line of the array.
+         DO IY = 1, NY
+ 
+*  Loop around each pixel of this line.
+            DO IX = 1, NX
+ 
+*  Initialise the sum of the output value and of the weights.
+               SUM = 0.0E0
+               WSUM = 0.0E0
+ 
+*  Loop through all the pixels of the kernel which contribute to the
+*  current output pixel.  Obtain the weight for each of these pixels,
+*  and also form the square of this weight if smoothing a variance
+*  array.
+               DO IIY = MAX( 1, IY - JBOX ), MIN( NY, IY + JBOX )
+                  DO IIX = MAX( 1, IX - IBOX ), MIN( NX, IX + IBOX )
+                     WT1 = WEIGHT( IIX - IX, IIY - IY )
+                     IF ( VAR ) THEN
+                        WT2 = WT1 * WT1
+                     ELSE
+                        WT2 = WT1
+                     END IF
+ 
+*  Form the sums.
+                     SUM = SUM + WT2 * A( IIX, IIY )
+                     WSUM = WSUM + WT2
+                  END DO
+               END DO
+ 
+*  Calculate the smoothed output-pixel value.
+*  ==========================================
+ 
+*  Check that the weights are positive.  If they are not we are forced
+*  to assign a bad value to the output pixel, and set the bad-pixel
+*  flag.
+               IF ( WSUM .GT. 0 ) THEN
+                  B( IX, IY ) = SUM / WSUM
+               ELSE
+                  B( IX, IY ) = VAL__BADR
+                  BADOUT = .TRUE.
+               END IF
+ 
+            END DO
+         END DO
+      END IF
+ 
+      END

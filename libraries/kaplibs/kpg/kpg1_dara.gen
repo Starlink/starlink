@@ -1,0 +1,675 @@
+      SUBROUTINE KPG1_DARA<T>( PARAM, EL, ARRAY, METHDS, BAD,
+     :                         LOWER, UPPER, STATUS )
+*+
+*  Name:
+*     KPG1_DARA<T>
+
+*  Purpose:
+*     Determine the data limits for an array using a variety of methods.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_DARA<T>( PARAM, EL, ARRAY, METHDS, BAD, LOWER,
+*                      UPPER, STATUS )
+
+*  Description:
+*     This routine derives a data range applicable to the supplied array.
+*     It is intended to be used to specify the data limits for histogram
+*     plots and scaling data for image display.  There is a variety of
+*     methods available to derive the limits, of which a subset of
+*     appropriate methods can be defined by argument METHOD.
+
+*     The method is selected by the user through the literal parameter
+*     specified by PARAM.  The supplied string should consist of up to
+*     three sub-strings or elements, separated by commas.  In all but
+*     one method, the first element must specify the method to use.  If
+*     supplied, the other two elements should be numerical values as
+*     described below (default values will be used if these elements are
+*     not provided).  The following options are available.
+*
+*        - "Extended" -- LOWER and UPPER are returned equal to the
+*        lowest and highest supplied data values, extended to give a
+*        margin of 2.5% of the total data range at each end.
+*
+*        - "Extended,10,5" -- Like "Extended", except the margins at the 
+*        two ends are specified as a pair of numerical value in the
+*        second and third elements of the array.  These values are 
+*        percentages of the total data range.  So, "Extended,10,5"
+*        includes a margin of 10% of the total data range in LOWER, and
+*        5% in UPPER.  If only one numerical value is given, the same 
+*        value is used for both limits.  If no value is given, both
+*        limits default to 2.5.  "Range" is equivalent to
+*        "Extended,0,0".
+*
+*        - "Faint" -- The scaling is between the mean data value minus 
+*        one standard deviation and the mean data value plus seven 
+*        standard deviations.  This is retained for historical reasons.
+*
+*        - "Limit" --  Allows user to supply explicit lower and upper
+*        limiting values.  For example, "Limit,10,20" would set the lower
+*        limit to 10 and its upper limit to 20.  For compatibility
+*        reasons and for ease of use, this routine permits the omission
+*        of the method.  Thus "10,20" is equivalent to the previous
+*        example.  The upper limit may be numerically smaller than the
+*        lower limit, as might be needed for display scaling.  If fewer
+*        than two numerical values are supplied, the "Range" method is
+*        adopted.  The limits must be within the allowed range for the
+*        data type of the ARRAY argument.
+*
+*        - "Percentiles,5,95" -- The second and third elements of the
+*        array are interpreted as percentiles.  For instance,
+*        "Perc,5,95" causes 5% of the data points to be below LOWER, and
+*        10% to be above the UPPER.  If only 1 value (p1) is supplied,
+*        the other one, p2, defaults to (100 - p1).  If no values are
+*        supplied, p1 and p2 default to 5 and 95 respectively.  Values
+*        must be in the range 0 to 100.
+*        
+*        - "Range" -- LOWER and UPPER are returned equal to the lowest
+*        and highest supplied array values.
+*
+*        - "Sigmas,2,3" -- The second and third elements of the array 
+*        are interpreted as multiples of the standard deviation of the
+*        data values.  For instance, "S,2,3" causes the LOWER to be the
+*        mean of the data values, minus two sigma, and UPPER to be the
+*        mean plus three sigma.  If only 1 value is supplied, the same
+*        value is used for both limits.  If no values are supplied, both
+*        values default to 3.0.
+*              
+*     The above method names can be abbreviated to one character.
+*
+*     If the parameter name is supplied as blank, then "Range" is
+*     assumed (i.e. LOWER and UPPER are chosen so that the
+*     encompasses the entire data range).
+*
+*     The extreme values are reported unless the limits parameter PARAM
+*     is specified on the command line.  In this case extreme values
+*     are only calculated where necessary for the chosen method.
+*
+*  Arguments:
+*     PARAM = CHARACTER * ( * ) (Given)
+*        The name of the parameter to use to get the method for chosing
+*        the default limits for the axis. May be blank.
+*     EL = INTEGER (Given)
+*        The number of elements of the array to be analysed.
+*     ARRAY( EL ) = <TYPE> (Given)
+*        The array for which the chosen statistics are required.
+*     METHDS = CHARACTER * ( * ) (Given)
+*        A comma-separated list of methods by which the data limits may
+*        be specified.  Different tasks may require only a subset of
+*        the methods available.  The allowed methods are "Faint",
+*        "Extended", "Limit", "Percentiles", "Range", and "Sigmas".
+*        See the description for details of these methods.
+*     BAD = LOGICAL (Given and Returned)
+*        True when bad pixels may be present.
+*     LOWER = DOUBLE PRECISION (Returned)
+*        The lower limit.
+*     UPPER = DOUBLE PRECISION (Returned)
+*        The upper limit.
+*     STATUS = INTEGER( Given & Returned )
+*        Global status.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (JAC)
+*     {enter_new_authors_here}
+
+*  History:
+*     2000 February 17 (MJC):
+*        Original version, based on KPG1_PLRAx and KPG1_GRLM2.
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE definitions
+      INCLUDE 'PAR_ERR'        ! PAR__ error definitions
+      INCLUDE 'MSG_PAR'        ! MSG__ definitions
+      INCLUDE 'PRM_PAR'        ! VAL__ definitions
+      INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
+
+*  Arguments Given:
+      CHARACTER * ( * ) PARAM
+      INTEGER EL
+      <TYPE> ARRAY( EL )
+      CHARACTER * ( * ) METHDS
+
+*  Arguments Given and Returned:
+      LOGICAL BAD
+
+*  Arguments Returned:
+      DOUBLE PRECISION LOWER
+      DOUBLE PRECISION UPPER
+
+*  Status:
+      INTEGER STATUS
+
+*  External References:
+      EXTERNAL CHR_INSET       ! String is member of a set?
+      LOGICAL CHR_INSET
+
+*  Local Constants:
+      INTEGER NUMBIN           ! Number of bins in histogram
+      PARAMETER( NUMBIN = 2048 ) ! should be enough
+
+      INTEGER NOMETH           ! Number of methods for defining limits
+      PARAMETER( NOMETH = 6 )
+
+      INTEGER NPRCTL           ! Maximum number of percentiles
+      PARAMETER( NPRCTL = 2 )
+
+*  Local Variables:
+      <LTYPE> MAXV             ! Minimum value in the array
+      <LTYPE> MINV             ! Maximum value in the array
+      CHARACTER BUFFER*80      ! Buffer for formatting output
+      CHARACTER PVALS( 3 )*20  ! Parameter values
+      CHARACTER VAMETH*60      ! Comma-separated list of valid selected methods
+      DOUBLE PRECISION DMAX    ! Maximum value
+      DOUBLE PRECISION DMAXC   ! Maximum value after clipping (not used)
+      DOUBLE PRECISION DMIN    ! Minimum value
+      DOUBLE PRECISION DMINC   ! Minimum value after clipping (not used)
+      DOUBLE PRECISION DRMAX   ! Maximum possible value
+      DOUBLE PRECISION DRMIN   ! Minimum possible value
+      DOUBLE PRECISION MEAN    ! Mean of array
+      DOUBLE PRECISION MEANC   ! Clipped mean of array
+      DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
+      DOUBLE PRECISION RANGE   ! Range of data values
+      DOUBLE PRECISION STDEV   ! Standard deviation of array
+      DOUBLE PRECISION STDEVC  ! Clipped standard deviation (not used)
+      DOUBLE PRECISION SUM     ! Sum of array
+      DOUBLE PRECISION SUMC    ! Clipped sum of array (not used)
+      DOUBLE PRECISION V1      ! First supplied numerical parameter value
+      DOUBLE PRECISION V2      ! Second supplied numerical parameter value
+      INTEGER ACTIVE           ! The %PARAM parameter state
+      INTEGER I                ! Loop counter
+      INTEGER IMAX             ! Index of maximum value (not used)
+      INTEGER IMAXC            ! Index of maximum value after clipping (not used)
+      INTEGER IMIN             ! Index of minimum value (not used)
+      INTEGER IMINC            ! Clipped index, minimum value (not used)
+      INTEGER INE              ! Index to first numerical element
+      INTEGER MAXPOS           ! Position of the maximum (not used)
+      INTEGER MINPOS           ! Position of the minimum (not used)
+      INTEGER NC               ! Number of characters in message
+      INTEGER NCVM             ! Number of characters of valid methods
+      INTEGER NGOOD            ! Number of good values (not used)
+      INTEGER NGOODC           ! Clipped number of good values (not used)
+      INTEGER NINVAL           ! Number of bad values in the input array
+      INTEGER NVAL             ! Number of parameter values supplied
+      LOGICAL FNDRNG           ! Find the data range?
+      LOGICAL INRANG           ! Supplied data values are in range?
+      LOGICAL ISMETH           ! Does method list include at least one valid method name?
+      REAL CLFRAC( NPRCTL )    ! Clipped percentiles
+      REAL DUMMY               ! Used to swap percentiles
+      REAL PERCNT( NPRCTL )    ! Percentiles
+
+*  Local Data:
+      CHARACTER * ( 12 ) OPTION( NOMETH ) ! Allowed methods
+      DATA OPTION / 'Extended', 'Faint', 'Limit', 'Percentiles',
+     :              'Range', 'Sigmas' /
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+
+*.
+
+*  Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Validate the list of methods.
+*  =============================
+
+*  Initialise the string to hold the list of valid methods and a
+*  character counter.
+      VAMETH = ' '
+      NCVM = 0
+
+*  First possibility is a blank value, requesting all available
+*  options.
+      IF ( METHDS .EQ. ' ' ) THEN
+         DO I = 1, NOMETH
+            CALL CHR_APPND( OPTION( I ), VAMETH, NCVM )
+            CALL CHR_APPND( ',', VAMETH, NCVM )
+         END DO
+
+*  Trim off the trailing comma.
+         NCVM = NCVM - 1
+      ELSE
+
+*  Form a new comma-separated list of options including only those
+*  supported by this routine.  Note when there is a match.
+         ISMETH = .FALSE.
+         DO I = 1, NOMETH
+            IF ( CHR_INSET( METHDS, OPTION( I ) ) ) THEN
+               CALL CHR_APPND( OPTION( I ), VAMETH, NCVM )
+               CALL CHR_APPND( ',', VAMETH, NCVM )
+               ISMETH = .TRUE.
+            END IF
+         END DO
+
+*  If none of the options are available, report the error and exit.
+         IF ( .NOT. ISMETH ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'M', METHDS )
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR1',
+     :        'KPG1_DARA<T>: Programming error.  None of the methods '/
+     :        /'(^M) to determine data limits are recognised.', STATUS )
+            GO TO 999
+         END IF
+
+*  Trim off the trailing comma.
+         NCVM = NCVM - 1
+      END IF
+
+*  Report the data range limits to help the user.
+*  ==============================================
+
+*  Determine whether or not the data limit parameter has been specified
+*  on the command line.  If so, we don't need to calculate the maximum
+*  and minimum values when they are not required.
+      CALL LPG_STATE( PARAM, ACTIVE, STATUS )
+      FNDRNG = ACTIVE .NE. SUBPAR__ACTIVE
+      IF ( FNDRNG ) THEN
+
+*  Obtain the maximum and minimum values to be used as dynamic defaults.
+         CALL KPG1_MXMN<T>( BAD, EL, ARRAY, NINVAL, MAXV, MINV,
+     :                      MAXPOS, MINPOS, STATUS )
+
+*  Make double-precision extreme values.
+         DMIN = NUM_<T>TOD( MINV )
+         DMAX = NUM_<T>TOD( MAXV )
+
+*  The number of bad pixels has been counted so it might be possible to 
+*  save future processing.
+         BAD = BAD .OR. ( NINVAL .EQ. 0 )
+
+*  Report the extreme values.
+         NC = 0
+         CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
+         CALL CHR_PUTD( DMIN, BUFFER, NC )
+         CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
+         CALL CHR_PUTD( DMAX, BUFFER, NC )
+         CALL MSG_OUTIF( MSG__NORM, 'EXTREMES', BUFFER( :NC ),
+     :                   STATUS )
+      END IF
+
+*  Set the extreme values.
+      DRMIN = NUM_<T>TOD( VAL__MIN<T> )
+      DRMAX = NUM_<T>TOD( VAL__MAX<T> )
+
+*  Obtain the method.
+*  ==================
+
+*  If no parameter has been given, pretend we get the value "Range"
+*  from the user.
+      IF ( PARAM .EQ. ' ' ) THEN
+         PVALS( 1 ) = 'RANGE'
+         NVAL = 1
+
+*  Otherwise, get an array containing strings or numerical values.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         CALL KPG1_MIXVD( PARAM, 3, VAL__MIND, VAL__MAXD,
+     :                    VAMETH( : NCVM ), PVALS, NVAL, STATUS ) 
+
+*  If a NULL value was supplied, cancel the error and use RANGE.
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            PVALS( 1 ) = 'RANGE'
+            NVAL = 1
+         END IF
+
+*  Abort if an error has occurred.
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
+      END IF      
+
+*  Validate the string obtained.
+*  =============================
+
+*  Is it a limit numerical?
+*  ------------------------
+
+*  Check for a method name.  Values would follow the method.  If there
+*  is no method name, just Limit numerical values, the index of the
+*  first number is one, not two. 
+      ISMETH = CHR_INSET( VAMETH( :NCVM ), PVALS( 1 ) )
+      IF ( ISMETH ) THEN
+         INE = 2
+      ELSE
+         INE = 1
+      END IF
+
+*  Range and Faint
+*  ---------------
+
+*  These are straightforward.  They have no numerical arguments.  Thus
+*  only superfluous values need cause an error.
+      IF ( PVALS( 1 ) .EQ. 'RANGE' .OR. PVALS( 1 ) .EQ. 'FAINT' ) THEN
+
+*  It is an error if any extra values were supplied.
+         IF ( NVAL .GT. 1 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'P', PARAM )
+            CALL MSG_SETC( 'M', PVALS( 1 ) )
+            CALL MSG_SETC( 'V', PVALS( 2 ) )
+
+*  Report the error, listing the additional value.
+            IF ( NVAL .EQ. 2 ) THEN
+               CALL ERR_REP( 'KPG1_DARA<T>_ERR6',
+     :           'Extra value (^V) supplied after ''^M'' for '/
+     :           /'parameter %^P.', STATUS )
+
+*  Form a comma-separated list of values in a token.
+            ELSE
+               DO I = 3, NVAL
+                  CALL MSG_SETC( 'V', ',' )
+                  CALL MSG_SETC( 'V', PVALS( I ) )
+               END DO
+   
+*  Report the error, listing the additional values.
+               CALL ERR_REP( 'KPG1_DARA<T>_ERR7',
+     :           'Extra values (^V) supplied after ''RANGE'' for '/
+     :           /'parameter %^P.', STATUS )
+            END IF
+            GO TO 999
+         END IF
+
+         IF ( PVALS( 1 ) .EQ. 'RANGE' ) THEN
+
+*  Replace the supplied parameter value by converting "Range" to
+*  "Extended,0".
+            PVALS( 1 ) = 'EXTENDED'
+            PVALS( 2 ) = '0.0'
+            NVAL = 2
+         ELSE
+
+*  Replace the supplied parameter value, converting "Faint" to
+*  "Sigmas,-1,7"
+            PVALS( 1 ) = 'SIGMAS'
+            PVALS( 2 ) = '1.0'
+            PVALS( 3 ) = '7.0'
+            NVAL = 3
+
+         END IF
+
+*  Look for superfluous values for other methods.
+*  ----------------------------------------------
+
+*  Deal with all the options which have optional numerical arguments.
+      ELSE
+
+*  It is an error if any extra values were supplied.
+         IF ( NVAL .GT. INE + 1 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'P', PARAM )
+            IF ( ISMETH ) THEN
+               CALL MSG_SETC( 'M', PVALS( 1 ) )
+            ELSE
+               CALL MSG_SETC( 'M', 'Limit' )
+            END IF
+            CALL MSG_SETC( 'V', PVALS( INE + 1 ) )
+
+*  Report the error, listing the additional value.
+            IF ( NVAL .EQ. INE + 1 ) THEN
+               CALL ERR_REP( 'KPG1_DARA<T>_ERR6',
+     :           'Extra value (^V) supplied after ''^M'' for '/
+     :           /'parameter %^P.', STATUS )
+
+*  Form a comma-separated list of values in a token.
+            ELSE
+               DO I = INE + 2, NVAL
+                  CALL MSG_SETC( 'V', ',' )
+                  CALL MSG_SETC( 'V', PVALS( I ) )
+               END DO
+   
+*  Report the error, listing the additional values.
+               CALL ERR_REP( 'KPG1_DARA<T>_ERR7',
+     :           'Extra values (^V) supplied after ''^M'' for '/
+     :           /'parameter %^P.', STATUS )
+            END IF
+            GO TO 999
+         END IF
+
+*  Check number of limits.
+*  -----------------------
+
+*  Limit method is altered to Range if if fewer than two limits
+*  were supplied.  Check that the required
+*  pair are present.
+         IF ( PVALS( 1 ) .EQ. 'LIMIT' .OR. .NOT. ISMETH ) THEN
+
+*  Check that two limits were supplied.  If not, use the equivalent
+*  of the Range method.
+            IF ( NVAL .LT. INE + 1 ) THEN
+               PVALS( 1 ) = 'EXTENDED'
+               PVALS( 2 ) = '0.0'
+               NVAL = 2
+            END IF
+         END IF
+      END IF
+
+*  Convert numerical elements to floating-point form.
+*  --------------------------------------------------
+
+*  Report an error if either the second or third values is not
+*  numerical.
+      V1 = VAL__BADD
+      V2 = VAL__BADD
+
+      IF ( NVAL .GE. INE .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL CHR_CTOD( PVALS( INE ), V1, STATUS )
+
+         IF ( STATUS .NE. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'P', PARAM )
+            CALL MSG_SETC( 'V', PVALS( INE ) )
+            CALL MSG_SETC( 'V1', PVALS( INE + 1 ) )
+   
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR4',
+     :        'Non-numeric value (^V1) supplied after ''^V'' for '/
+     :        /'parameter %^P.', STATUS )
+            GO TO 999
+         END IF
+      END IF
+   
+      IF ( NVAL .GE. INE + 1 .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL CHR_CTOD( PVALS( INE + 1 ), V2, STATUS )
+   
+         IF ( STATUS .NE. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'P', PARAM )
+            CALL MSG_SETC( 'V', PVALS( INE ) )
+            CALL MSG_SETC( 'V2', PVALS( INE + 2 ) )
+   
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR4',
+     :        'Non-numeric value (^V2) supplied after ''^V'' for '/
+     :        /'parameter %^P.', STATUS )
+            GO TO 999
+         END IF
+      END IF
+ 
+*  Check the range of values.
+*  --------------------------
+
+*  It's always hard to decide what limits to impose upon user-supplied
+*  values.  Here the restrictions are not especailly stringent. 
+*  "Limit" values should lie within the range of allowed values for the
+*  data type of the array.
+      INRANG = .TRUE.
+      IF ( PVALS( 1 ) . EQ. 'LIMIT' .OR. .NOT. ISMETH ) THEN
+
+*  Check that the supplied first value is within the allowed range.
+         IF ( ( V1 .LT. DRMIN .OR. V1 .GT. DRMAX ) .AND.
+     :        NVAL .GE. INE ) THEN
+            INRANG = .FALSE.
+            STATUS = SAI__ERROR
+            CALL MSG_SETD( 'V1', V1 )
+            CALL MSG_SETC( 'P', PARAM )
+            CALL MSG_SETD( 'L', DRMIN )
+            CALL MSG_SETD( 'U', DRMAX )
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR5',
+     :       'Limit (^V1) supplied through parameter %^P lies outside '/
+     :       /'the dynamic range (^L to ^U) of <HTYPE> data.', STATUS )
+         END IF
+
+*  Repeat the check, this time for the second value.
+         IF ( ( V2 .LT. DRMIN .OR. V2 .GT. DRMAX ) .AND.
+     :        NVAL .GT. INE ) THEN
+            INRANG = .FALSE.
+            STATUS = SAI__ERROR
+            CALL MSG_SETD( 'V2', V2 )
+            CALL MSG_SETC( 'P', PARAM )
+            CALL MSG_SETD( 'L', DRMIN )
+            CALL MSG_SETD( 'U', DRMAX )
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR5',
+     :       'Limit (^V2) supplied through parameter %^P lies outside '/
+     :       /'the dynamic range (^L to ^U) of <HTYPE> data.', STATUS )
+         END IF
+
+*  Replace the supplied parameter value.
+         PVALS( 1 ) = 'LIMIT'
+
+*  Prevent percentiles outside the 0 to 100 range, as they're meaning
+*  is undefined.
+      ELSE IF ( PVALS( 1 ) .EQ. 'PERCENTILES' ) THEN
+
+         IF ( ( V1 .LT. 0.0D0 .OR. V1 .GT. 100.0D0 ) .AND.
+     :        NVAL .GT. 1 ) THEN
+            INRANG = .FALSE.
+            STATUS = SAI__ERROR
+            CALL MSG_SETD( 'V1', V1 )
+            CALL MSG_SETC( 'P', PARAM )
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR5',
+     :        'Limit (^V1) supplied through parameter %^P lies '/
+     :        /'outside the percentile range (0 to 100).', STATUS )
+         END IF
+
+         IF ( ( V2 .LT. 0.0D0 .OR. V2 .GT. 100.0D0 ) .AND.
+     :        NVAL .GT. 2 ) THEN
+            INRANG = .FALSE.
+            STATUS = SAI__ERROR
+            CALL MSG_SETD( 'V2', V2 )
+            CALL MSG_SETC( 'P', PARAM )
+            CALL ERR_REP( 'KPG1_DARA<T>_ERR5',
+     :        'Limit (^V2) supplied through parameter %^P lies '/
+     :        /'outside the percentile range (0 to 100).',
+     :      STATUS )
+         END IF
+      END IF
+      IF ( .NOT. INRANG ) GO TO 999
+
+*  Obtain the limits by the chosen method.
+*  =======================================
+
+*  Limit
+*  -----
+      IF ( PVALS( 1 ) .EQ. 'LIMIT' ) THEN
+
+*  Simply assign the extracted values to return.
+         LOWER = V1
+         UPPER = V2
+
+*  Sigmas
+*  ------
+      ELSE IF ( PVALS( 1 ) .EQ. 'SIGMAS' ) THEN
+
+*  Allow for missing values.  The default is +/-3 sigma when no limits
+*  are given, and to make symmetrical limits when only one is given.
+         IF ( NVAL .EQ. 1 ) THEN
+            V1 = 3.0D0
+            V2 = 3.0D0
+         ELSE IF ( NVAL .EQ. 2 ) THEN
+            V2 = V1
+         END IF
+
+*  Find the mean and standard deviation, without clipping.
+         CALL KPG1_STAT<T>( BAD, EL, ARRAY, 0, 0.0, NGOOD, IMIN, DMIN,
+     :                    IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, IMINC,
+     :                    DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
+     :                    STATUS )
+
+*  Calculate the upper and lower limits between which the image will
+*  be scaled.  These may be constrained by the extreme values for the
+*  data type.
+         LOWER = MAX( MEAN - V1 * STDEV, NUM_<T>TOD( VAL__MIN<T> ) )
+         UPPER = MIN( MEAN + V2 * STDEV, NUM_<T>TOD( VAL__MAX<T> ) )
+
+*  Do scaling with percentile limits.
+*  ----------------------------------
+      ELSE IF ( PVALS( 1 ) .EQ. 'PERCENTILES' ) THEN
+
+*  Allow for missing values.  The default is 5 to 95 percentiles when
+*  no limits are supplied, and to make symmetrical limits when only one
+*  is given.
+         IF ( NVAL .EQ. 1 ) THEN
+            V1 = 5.0D0
+            V2 = 95.0D0
+         ELSE IF ( NVAL .EQ. 2 ) THEN
+            V2 = 100.0D0 - V1
+         END IF
+
+*  Convert percentiles to fractions.  The lower percentile must be
+*  the first index.
+         PERCNT( 1 ) = DBLE( MIN( V1, V2 ) ) * 0.01
+         PERCNT( 2 ) = DBLE( MAX( V1, V2 ) ) * 0.01
+
+*  Obtain the percentiles using a fine histogram with iterations
+*  if there are extreme outliers.
+         CALL KPG1_FRAC<T>( EL, ARRAY, NPRCTL, PERCNT, BAD, CLFRAC,
+     :                     PERVAL, STATUS )
+
+*  Swap the percentiles back if they were flipped.
+         IF ( V2 .LT. V1 ) THEN
+            DUMMY = PERVAL( 1 )
+            PERVAL( 1 ) = PERVAL( 2 )
+            PERVAL( 2 ) = DUMMY
+         END IF
+
+*  Store the values in the returned arguments.
+         LOWER = PERVAL( 1 )
+         UPPER = PERVAL( 2 )
+
+*  Extended (Range) and others.
+*  ----------------------------
+      ELSE IF ( PVALS( 1 ) .EQ. 'EXTENDED' ) THEN
+
+*  Obtain the maximum and minimum values if not already known.
+         IF ( .NOT. FNDRNG ) THEN
+            CALL KPG1_MXMN<T>( BAD, EL, ARRAY, NINVAL,
+     :                         MAXV, MINV, MAXPOS, MINPOS, STATUS )
+
+*  Make double-precision extreme values.
+            DMIN = NUM_<T>TOD( MINV )
+            DMAX = NUM_<T>TOD( MAXV )
+
+*  The number of bad pixels has been counted so it might be
+*  possible to save future processing.
+            BAD = BAD .OR. ( NINVAL .EQ. 0 )
+         END IF
+
+*  Find the data range.  No protection here against very large values.
+         RANGE = DMAX - DMIN
+
+*  Implement defaults for any missing numerical values. 
+         IF ( V1 .EQ. VAL__BADD ) V1 = 2.5
+         IF ( V2 .EQ. VAL__BADD ) V2 = V1
+
+*  Extend the range by the required amount at each end.
+         LOWER = DMIN - RANGE * V1 * 0.01
+         UPPER = DMAX + RANGE * V2 * 0.01
+
+      END IF
+
+*  Report the calculated data limits.
+      IF ( PVALS( 1 ) .EQ. 'EXTENDED' .OR. PVALS( 1 ) .EQ. 'SIGMAS' .OR.
+     :     PVALS( 1 ) .EQ. 'PERCENTILES' ) THEN
+         CALL MSG_SETD( 'MINVAL', LOWER )
+         CALL MSG_SETD( 'MAXVAL', UPPER )
+         CALL MSG_OUTIF( MSG__NORM, 'PVLOHI', 'Data limits are '/
+     :                   /'from ^MINVAL to ^MAXVAL.', STATUS )
+      END IF
+
+ 999  CONTINUE
+
+      END

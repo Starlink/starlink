@@ -1,0 +1,146 @@
+      SUBROUTINE KPG1_HSFLR( FD, NUMBIN, HIST, HRMIN, HRMAX, STATUS )
+*+
+*  Name:
+*     KPG1_HSFLx
+ 
+*  Purpose:
+*     Writes an histogram to a Fortran formatted file.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_HSFLx( FD, NUMBIN, HIST, HRMIN, HRMAX, STATUS )
+ 
+*  Description:
+*     This routine writes an histogram to a Fortran ASCII file.
+ 
+*  Arguments:
+*     FD = INTEGER (Given)
+*        Fortran file descriptor as provided by FIO.
+*     NUMBIN = INTEGER (Given)
+*        The number of bins in the histogram.
+*     HIST( NUMBIN ) = INTEGER (Given)
+*        The array holding the histogram.
+*     HRMIN = ? (Given)
+*        The minimum data value that could be included within the
+*        histogram.
+*     HRMAX = ? (Given)
+*        The maximum data value that could be included within the
+*        histogram.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There is a routine for the following numeric data types:
+*     replace "x" in the routine name by D or R as appropriate.  The
+*     extreme values of the histogram must have the data type
+*     specified.
+ 
+*  Prior Requirements:
+*     The Fortran file must all ready be opened and should have a record
+*     length of at least 52 characters.
+ 
+*  Algorithm:
+*     -  If there are insufficient bins report an error and exit.
+*     -  Calculate the binsize.
+*     -  Write the title to the file.  For each histogram bin write the
+*     range and number in the bin to the file.
+ 
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     1990 March 12 (MJC):
+*        Original version called HSTFL.
+*     1992 March 9 (MJC):
+*        Made generic, and reordered the NUMBIN argument.  Used SST
+*        prologue.
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE            ! No default typing allowed
+ 
+*    Global constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE definitions
+ 
+*  Arguments Given:
+      INTEGER
+     :  FD,
+     :  NUMBIN,
+     :  HIST( NUMBIN )
+ 
+      REAL
+     :  HRMIN,
+     :  HRMAX
+ 
+*  Status:
+      INTEGER STATUS
+ 
+*  Local Variables:
+      REAL
+     :  NBINWD,                ! Width of the report bins
+     :  RANGE                  ! The difference between the maximum
+                               ! and the minimum values
+ 
+      INTEGER
+     :  K                      ! Loop counter
+ 
+      CHARACTER
+     :  TEXT * ( 51 )          ! Buffer containing the range and number
+                               ! of the histogram bin
+ 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+ 
+*.
+ 
+*  If the status is bad, then return
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  Check that the number of bins is valid.
+      IF ( NUMBIN .LT. 1 ) THEN
+ 
+*  Report error and set a bad status.
+         CALL MSG_SETI( 'NUMBIN', NUMBIN )
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_HSFLx_ISFBIN',
+     :     'KPG1_HSFLx: Insufficient bins (^NUMBIN) in the histogram.',
+     :     STATUS )
+      ELSE
+ 
+*  Calculate the size of the bins for the report.
+         RANGE = HRMAX - HRMIN
+         NBINWD = RANGE / NUM_ITOR( NUMBIN )
+ 
+*  Write the title of the histogram.  Leave a blank line to delineate
+*  the histogram and to separate the title from the body of the
+*  histogram tabulation.
+         CALL FIO_WRITE( FD, ' ', STATUS )
+         CALL FIO_WRITE( FD, '                Histogram', STATUS )
+         CALL FIO_WRITE( FD, ' ', STATUS )
+ 
+*  Report the histogram itself.  Use an internal write to place the
+*  values in neat columns. I8 should be adequate for ~30000 pixels
+*  square images.
+         DO  K = 1, NUMBIN, 1
+ 
+            WRITE ( TEXT, 10 ) HRMIN + NUM_ITOR( K-1 ) * NBINWD,
+     :              HRMIN + NUM_ITOR( K ) * NBINWD, HIST( K )
+  10        FORMAT( ' ', 1PG15.7, ' to ', 1PG15.7, ' ', I8, ' pixels' )
+            CALL FIO_WRITE( FD, TEXT, STATUS )
+ 
+         END DO
+ 
+*   Leave a blank line to delineate the histogram, in case further text
+*   is appended to the file.
+         CALL FIO_WRITE( FD, ' ', STATUS )
+      END IF
+ 
+      END

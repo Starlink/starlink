@@ -1,0 +1,77 @@
+/*
+*  Name:
+*     KPG1_IEEER
+
+*  Purpose:
+*     A Fortran callable function to convert NaN and Inf values to a
+*     specified other value.
+
+*  Language:
+*     C
+
+*  Invocation:
+*     CALL KPG1_IEEER( EL, VAL, IN, OUT )
+
+*  Description:
+*     The routine uses the finite() system call to check each value in
+*     in the suppled data array. Any values which are found to be Inf or
+*     NaN are replaced by the supplied constant value in the output array.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of elements in the data array.
+*     VAL = REAL (Given)
+*        The value with which to replace any NaN or Inf values.
+*     IN( EL ) = REAL (Given)
+*        The input data array.
+*     OUT( EL ) = REAL (Returned)
+*        The output data array.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-JUN-1998 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*- 
+*/
+#include <math.h>
+#include "f77.h"
+
+F77_SUBROUTINE(kpg1_ieeer)( INTEGER(el), REAL(val), REAL_ARRAY(in),
+                            REAL_ARRAY(out) )
+{
+
+   GENPTR_INTEGER(el)
+   GENPTR_INTEGER(val)
+   GENPTR_REAL_ARRAY(in)
+   GENPTR_REAL_ARRAY(out)
+
+   float *pin, *pout, *end;
+ 
+/* Store a pointer to the first element not in the input array. */
+   end = in + (*el);
+
+/* Initialise a pointer to the first element in the output array. */
+   pout = out;
+
+/* Loop round every element in the input array. */
+   for( pin = in; pin < end; pin++ ) {
+
+/* If this element is not finite (i.e. if it is a NaN or an Inf) replace
+   it with the supplied replacement value in the output array. Otherwise,
+   store the input value in the output array. Increment the pointer to the
+   next element of the output array. */
+      if( !finite( (double) *pin ) ) {
+         *(pout++) = *val;
+      } else {
+         *(pout++) = *pin;
+      }
+   }
+}
