@@ -132,13 +132,13 @@ alias ascii2ndf       ${CONVERT_DIR}/ascii2ndf
 
 alias cubehelp        ${DATACUBE_DIR}/datacube_help
 
-#  Set DATACUBE_HLP
+#  Set DATACUBE_HELP
 
-setenv DATACUBE_HLP   ${DATACUBE_DIR}/../../help/datacube/datacube
+setenv DATACUBE_HELP   ${DATACUBE_DIR}/../../help/datacube/datacube
 
 #if ($#argv == 0 || $1 != "-quiet") then  
       echo " "
-      echo "   DATACUBE applications are now available -- (Version PKG_VERS)"
+      echo "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
       echo "    Support is available by emailing datacube@star.rl.ac.uk"
       echo " "
       echo "        Type cubehelp for help on DATACUBE commands."

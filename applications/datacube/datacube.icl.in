@@ -10,7 +10,7 @@ defhelp ripper       $DATACUBE_HELP
 { Print welcome message
 {
 print " "
-print "   DATACUBE commands are now available - (Version PKG_VERS)"
+print "   DATACUBE commands are now available - (Version @PACKAGE_VERSION@)"
 print " "
 print "   For help use the command 'help datacube'"
 print " "
