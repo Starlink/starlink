@@ -152,22 +152,6 @@ picstruct	*inheritfield(picstruct *infield, int flags)
   field->compress_type = COMPRESS_NONE;
   field->file = 0;            /*  PWD: was NULL, file reused as position;*/
 
-/* Allocate space for the frame-buffer */
-  if (flags ^ FLAG_FIELD)
-    {
-    if (!(field->strip=(PIXTYPE *)malloc(field->stripheight*field->width
-        *sizeof(PIXTYPE))))
-      error(EXIT_FAILURE,"Not enough memory for the image buffer of ",
-	field->rfilename);
-    }
-  else
-    {
-    if (!(field->fstrip=(FLAGTYPE *)malloc(field->stripheight*field->width
-        *sizeof(FLAGTYPE))))
-      error(EXIT_FAILURE,"Not enough memory for the flag buffer of ",
-	field->rfilename);
-    }
-
   return field;
   }
 
