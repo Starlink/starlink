@@ -2,6 +2,9 @@
 # Top level bootstrap file.
 # This is not a standard starconf bootstrap file.
 
+# Echo a command then run it, terminating the script if the command fails
+echorun() { echo $*; eval $* || exit 1; }
+
 # Starconf uses the value of STARCONF_DEFAULT_{PREFIX,STARLINK}
 # during its configuration.  We setthese here, unless they're set
 # in the environment.  Starconf's configure.ac sets these anyway, and
@@ -52,22 +55,18 @@ PATH=$BUILDSUPPORT_PREFIX/bin:$PATH
 tempmakefile=Makefile.tmp
 rm -f $tempmakefile
 
-# Make sure that Makefile.dependencies is newer than Makefile.in -- if
-# not, then make tries to rebuild it, which fails at bootstrap time
-# because GenerateDependencies cannot be built yet (unconfigured)
-touch Makefile.dependencies
-
-# Same for the componentinfo.dtd.  Link to the uninstalled version of the file
+# Make sure that componentinfo.dtd exists.
+# Link to the uninstalled version of the file.
 # (we just have to hope that `ln -s' works on this platform...).
 test -f componentinfo.dtd || 
-    ln -s buildsupport/starconf/componentinfo.dtd componentinfo.dtd
+    echorun ln -s buildsupport/starconf/componentinfo.dtd componentinfo.dtd
 
 # Create the $STARCONF_DEFAULT_PREFIX/bin directory if we can, but
 # don't worry if we can't.  If this exists, then the starconf
 # installation adds convenience links from there to some of its
 # applications in $BUILDSUPPORT_PREFIX/bin.
 test -d $STARCONF_DEFAULT_PREFIX/bin || \
-    mkdir -p $STARCONF_DEFAULT_PREFIX/bin
+    echorun mkdir -p $STARCONF_DEFAULT_PREFIX/bin
 
 sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 (
@@ -98,9 +97,6 @@ sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 ) || { echo "Failed to make buildsupport"; exit 1; }
 rm -f $tempmakefile
 
-
-# Echo a command then run it, terminating the script if the command fails
-echorun() { echo $*; eval $* || exit 1; }
 
 
 # Bootstrap any child directories (before running autoreconf).  Each
