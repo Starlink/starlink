@@ -6,6 +6,10 @@ interface IPOSIT
     prompt 'Entry mode'
     help 'Enter list of positions, individually or from a text or source file'
   endparameter
+  parameter APPEND
+    type '_LOGICAL'
+    prompt 'Append to existing positions'
+  endparameter
   parameter SEL
     type '_LOGICAL'
     default N
