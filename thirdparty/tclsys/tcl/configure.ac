@@ -8,10 +8,10 @@ AC_PREREQ(2.50)
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
-AC_CONFIG_SRCDIR([license.terms])
-
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
+
+AC_PROG_MAKE_SET
 
 dnl    To configure Tcl, run ./configure in the `unix' directory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
