@@ -44,6 +44,7 @@ C     P = 11   RESERVED
 
       IMPLICIT INTEGER (S)
 
+      INCLUDE 'SAE_PAR'
       INCLUDE 'MAG_ERR'
 
       INTEGER CHAN                 ! Tape descriptor
@@ -53,6 +54,7 @@ C     P = 11   RESERVED
       INTEGER STATUS               ! Global status
       CHARACTER*72 MSG
 
+      MTREAD = 0
 C
 C     TRAP RESERVED OPTIONS
 C
@@ -203,10 +205,10 @@ C     IF P < 0 REWIND ON LINE
         CALL ERR_FLUSH(STATUS)
         CALL ERR_ANNUL(STATUS)
         CALL MAG_ANNUL(CHAN, STATUS)
-        REWIND=-1
+        MTREWIND=-1
         RETURN
       ELSE
-        REWIND=0
+        MTREWIND=0
         CALL MAG_ANNUL(CHAN, STATUS)
         RETURN
       END IF
@@ -265,7 +267,7 @@ C
         IA(J+1)=NT
   140   CONTINUE
       ENDIF
-      CALL MAG_WRITE(CHAN, M, IA, M, IOSB, STATUS ) 
+      CALL MAG_WRITE(CHAN, M, IA, IOSB, STATUS ) 
       IF(STATUS .NE. SAI__OK) THEN
         CALL ERR_REP('ERR', MSG, STATUS )
         CALL ERR_FLUSH(STATUS)
