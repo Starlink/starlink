@@ -91,7 +91,7 @@
 
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'UNITMAP_ERR', 'Error creating a new Frame.',
+         CALL ERR_REP( 'UNITMAP_ERR', 'Error creating a new UnitMap.',
      :                 STATUS )
       END IF
 
