@@ -23973,7 +23973,9 @@ Usage:
 Description:
 
    This application re-orders the pixel axes of an NDF, together with
-   all related information.
+   all related information (AXIS structures, and the axes of all 
+   coordinate Frames stored in the WCS component of the NDF).
+
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
@@ -24004,6 +24006,17 @@ permaxes a b [3,1,2]
    corresponds to axis 3 in the input 3-dimension NDF called "a",
    axis 2 corresponds to input axis 1, axis 3 corresponds to input
    axis 2.
+2 Notes
+
+- If any WCS coordinate Frame has more axes then the number of pixel
+axes in the NDF, then the high numbered surplus axes in the WCS Frame 
+are left unchanged.
+
+- If any WCS coordinate Frame has fewer axes then the number of pixel
+axes in the NDF, then the Frame is left unchanged if the specified
+permutation would change any of the high numbered surplus pixel axes.
+A warning message is issued if this occurs.
+
 2 Related_Applications
    KAPPA: ROTATE, FLIP; Figaro: IREVX, IREVY, IROT90.
 2 Authors

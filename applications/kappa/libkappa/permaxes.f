@@ -21,7 +21,8 @@
 
 *  Description:
 *     This application re-orders the pixel axes of an NDF, together with
-*     all related information.
+*     all related information (AXIS structures, and the axes of all 
+*     coordinate Frames stored in the WCS component of the NDF).
 
 *  Usage:
 *     permaxes in out perm
@@ -41,6 +42,15 @@
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
 *        of the NDF supplied for parameter IN to be used instead. [!]
+
+*  Notes:
+*     - If any WCS coordinate Frame has more axes then the number of pixel
+*     axes in the NDF, then the high numbered surplus axes in the WCS Frame 
+*     are left unchanged.
+*     - If any WCS coordinate Frame has fewer axes then the number of pixel
+*     axes in the NDF, then the Frame is left unchanged if the specified
+*     permutation would change any of the high numbered surplus pixel axes.
+*     A warning message is issued if this occurs.
 
 *  Examples:
 *     permaxes a b [2,1]
@@ -71,6 +81,8 @@
 *  History:
 *     6-FEB-2001 (DSB):
 *        Original version.
+*     15-MAR-2001 (DSB):
+*        Take surplus axes into account.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +106,7 @@
       CHARACTER ACCOMP( 2 )*5    ! Axis character components to process
       CHARACTER ACOMP( 3 )*8     ! Axis array components to process
       CHARACTER COMP( 3 )*8      ! Array components to process
+      CHARACTER DOM*30           ! Frame domain
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the NDF array
       CHARACTER TYPE*( NDF__SZTYP ) ! Array component numeric type
       CHARACTER VALUE*80         ! Axis character component value
@@ -116,6 +129,8 @@
       INTEGER J                  ! Axis index
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds in input
       INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds in output
+      INTEGER MINAX              ! Minimum allowed number of Frame axes
+      INTEGER NAX                ! Number of Frame axes
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NERR               ! Number of numerical errors
       INTEGER PERM( NDF__MXDIM ) ! Axis permutation array
@@ -363,7 +378,7 @@
 *  AST_PERMAXES on the Frame) is better because the FrameSet class
 *  includes code for automatically modifying the Mappings in the FrameSet to
 *  take account of any changes in the Frames properties ("integrity
-*  checking). If we used AST_PERMAXES on the Frame instead of the
+*  checking"). If we used AST_PERMAXES on the Frame instead of the
 *  FrameSet, we would have to manually remap each frame using a PermMap.
 
 *  Get the output WCS FrameSet.
@@ -373,6 +388,22 @@
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
       IBASE = AST_GETI( IWCS, 'BASE', STATUS )
 
+*  Pad the permutation array with values which leave any surplus WCS axes
+*  unchanged.
+      DO I = NDIM + 1, NDF__MXDIM
+         PERM( I ) = I
+      END DO
+
+*  Find the lowest number of axes allowed in a WCS Frame for the
+*  permutation to be possible. This is just equal to the index of the 
+*  highest changed pixel axis.
+      MINAX = 0
+      DO I = 1, NDIM 
+         IF( PERM( I ) .NE. I ) THEN
+            MINAX = I
+         END IF
+      END DO
+
 *  Loop round each Frame in the FrameSet, ignoring the Base Frame.
       DO I = 1, AST_GETI ( IWCS, 'NFRAME', STATUS )
          IF( I .NE. IBASE ) THEN
@@ -380,8 +411,30 @@
 *  Make this Frame Current.
             CALL AST_SETI( IWCS, 'CURRENT', I, STATUS )
 
-*  Permute the order of the axes in the current Frame.
-            CALL AST_PERMAXES( IWCS, PERM, STATUS ) 
+*  Get the number of axes in the Frame.
+            NAX = AST_GETI( IWCS, 'NOUT', STATUS ) 
+
+*  If there not enough WCS axes, issue a warning and do not permute the 
+*  axes.
+            IF( NAX .LT. MINAX ) THEN
+               DOM = AST_GETC( IWCS, 'DOMAIN', STATUS )
+               CALL MSG_SETI( 'I', I )
+               CALL MSG_SETI( 'N', NAX )
+               IF( DOM .NE. ' ' ) THEN 
+                  CALL MSG_SETC( 'D', DOM )
+                  CALL MSG_OUT( 'PERMAXES_MSG1', 'WCS frame number ^I'//
+     :                          '(^D) has only ^N axes and so cannot '//
+     :                          'be permuted.', STATUS )
+               ELSE
+                  CALL MSG_OUT( 'PERMAXES_MSG2', 'WCS frame number ^I'//
+     :                          'has only ^N axes and so cannot be '//
+     :                          'permuted.', STATUS )
+               END IF
+
+*  Otherwise, permute the order of the axes in the current Frame.
+            ELSE
+               CALL AST_PERMAXES( IWCS, PERM, STATUS ) 
+            END IF
 
          END IF
       END DO

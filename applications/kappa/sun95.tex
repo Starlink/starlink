@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.16}
 \newcommand{\stardocnumber}    {95.16}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {27 February 2001}
+\newcommand{\stardocdate}      {15 March 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.16}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -33157,8 +33157,9 @@ plot (9k).
    Permute an NDF{\tt '}s pixel axes
 }{
    \sstdescription{
-      This application re-orders the pixel axes of an NDF, together with
-      all related information.
+     This application re-orders the pixel axes of an NDF, together with
+     all related information (AXIS structures, and the axes of all 
+     coordinate Frames stored in the WCS component of the NDF).
    }
    \sstusage{
       permaxes in out perm
@@ -33205,6 +33206,20 @@ plot (9k).
          corresponds to axis 3 in the input 3-dimension NDF called {\tt "}a{\tt "},
          axis 2 corresponds to input axis 1, axis 3 corresponds to input
          axis 2.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+         \sstitem
+         If any WCS coordinate Frame has more axes then the number of
+	 pixel axes in the NDF, then the high numbered surplus axes in
+	 the WCS Frame are left unchanged.
+
+         \sstitem
+         If any WCS coordinate Frame has fewer axes then the number of
+	 pixel axes in the NDF, then the Frame is left unchanged if the
+	 specified permutation would change any of the high numbered
+	 surplus pixel axes. A warning message is issued if this occurs.
       }
    }
    \sstdiytopic{
