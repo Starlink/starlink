@@ -119,13 +119,20 @@
      :                STATUS )
       END IF
 
+*  For zero pointer return zero length
+      IF (PTR.EQ.0) THEN
+        SIZE=0
+
+      ELSE
 *  Locate the memory
-      CALL DYN0_FIND( PTR, SLOT, STATUS )
+        CALL DYN0_FIND( PTR, SLOT, STATUS )
 
 *  Return the number of items
-      IF ( STATUS .EQ. SAI__OK ) THEN
-        SIZE = DYS_NITEM(SLOT)
-      END IF
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          SIZE = DYS_NITEM(SLOT)
+        END IF
+
+      ENDIF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'DYN_SIZE', STATUS )
