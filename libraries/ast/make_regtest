@@ -76,9 +76,9 @@
 # The whole header string cannot be longer than 80 characters (plus
 # a few extra for the double up single quotes added above) so two 
 # lines should always be sufficient.
-      if( length > 50 ) {
-         print "            CARD = '",substr($_,0,50),"' //\n";
-         print "     :             '",substr($_,50),"'\n";
+      if( length > 45 ) {
+         print "            CARD = '",substr($_,0,45),"'//\n";
+         print "     :        '",substr($_,45),"'\n";
       } else {
          print "            CARD = '$_'\n";
       }
