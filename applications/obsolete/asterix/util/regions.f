@@ -31,8 +31,7 @@
 *  History:
 *     19-MAR-1992  - Original version.
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     {enter_changes_here}
-
+*      1 Feb 95 : V1.8-1 Upgrade to new ARD (RJV)
 *  Bugs:
 *     {note_any_bugs_here}
 *-
@@ -48,22 +47,22 @@
 
 *  External References:
       INTEGER CHR_LEN
-      EXTERNAL CHR_LEN
 
 *  Local constants :
       INTEGER MAXLST
         PARAMETER (MAXLST = 20)
 *  Local Variables:
-      CHARACTER*80 STRING                ! An ARD record
+      CHARACTER*80 TEXT                  ! ARD text
       CHARACTER*80 AFILE                 ! ARD filename
       CHARACTER*20 SHAPE                 ! Shape of structure
       CHARACTER*2 CLP                    ! The loop variable as a character
       CHARACTER*3 XPARAM,YPARAM          ! Parameter variables
 
+      INTEGER ARDID			 ! GRP id for ARD text
       INTEGER AUNIT                      ! Logical unit of ARD file
       INTEGER OUNIT                      ! Logical unit of old ARD file
       INTEGER NLIST                      ! No. of arguments for a shape.
-      INTEGER LP,NCHAR,NPTS              !
+      INTEGER LP,NCHAR,NPTS,L            !
 
       LOGICAL JUMPOUT                    ! Leave big loop ?
       LOGICAL LEAVE                      ! Leave loop ?
@@ -88,6 +87,9 @@
 
 *  Start ASTERIX
       CALL AST_INIT()
+
+*  get id for ARD text
+      CALL ARX_OPEN('WRITE',ARDID,STATUS)
 
 *  Enquire whether a new ARD file is to be created
       CALL USI_GET0L('NEW', LNEW, STATUS)
@@ -144,9 +146,8 @@
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'BOX', MAXLST,
-     &                                   LIST, NLIST, STATUS)
+*       add description into ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'BOX',NLIST,LIST,STATUS)
 
 *    CIRCLE:
          ELSEIF (INDEX(SHAPE, 'CIRCLE') .NE. 0) THEN
@@ -165,9 +166,8 @@
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'CIRCLE', MAXLST,
-     &                                    LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'CIRCLE',NLIST,LIST,STATUS)
 
 *    ELLIPSE:
          ELSEIF (INDEX(SHAPE, 'ELLIPSE') .NE. 0) THEN
@@ -192,9 +192,9 @@
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'ELLIPSE', MAXLST,
-     &                                       LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'ELLIPSE',NLIST,LIST,
+     :                                                     STATUS)
 
 *    POLYGON:
          ELSEIF (INDEX(SHAPE, 'POLYGON') .NE. 0) THEN
@@ -241,9 +241,9 @@
 *       Set the number of trailing values in the command variable
             NLIST = NPTS * 2
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'POLYGON', MAXLST,
-     &                                     LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'POLYGON',NLIST,LIST,
+     :                                                     STATUS)
 
 *    COLUMN:
          ELSEIF (INDEX(SHAPE, 'COLUMN') .NE. 0) THEN
@@ -284,9 +284,9 @@
 
             ENDDO
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'COLUMN', MAXLST,
-     &                                      LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'COLUMN',NLIST,LIST,
+     :                                                    STATUS)
 
 *    ROW:
          ELSEIF (INDEX(SHAPE, 'ROW') .NE. 0) THEN
@@ -328,9 +328,8 @@
 
             ENDDO
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'ROW', MAXLST,
-     &                                     LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'ROW',NLIST,LIST,STATUS)
 
 *    LINE:
          ELSEIF (INDEX(SHAPE, 'LINE') .NE. 0) THEN
@@ -347,9 +346,8 @@
             CALL USI_CANCL('YEND1', STATUS)
             CALL USI_CANCL('YEND2', STATUS)
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'LINE', MAXLST,
-     &                                    LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'LINE',NLIST,LIST,STATUS)
 
 *    PIXELS:
          ELSEIF (INDEX(SHAPE, 'PIXEL') .NE. 0) THEN
@@ -395,9 +393,8 @@
 
             NLIST = NPTS * 2
 
-*       Write description into ARD file
-            CALL AWR_GEN(AUNIT, EXCLUDE, 'PIXEL', MAXLST,
-     &                                   LIST, NLIST, STATUS)
+*       add description to ARD text
+            CALL ARX_GENPUT(ARDID,0,EXCLUDE,'PIXEL',NLIST,LIST,STATUS)
 
 *    ANNULUS:
          ELSEIF (INDEX(SHAPE, 'ANNULUS') .NE. 0) THEN
@@ -416,16 +413,36 @@
 
             IF (STATUS .NE. SAI__OK) GOTO 999
 
-*       Write description into ARD file
-            CALL AWR_ANN(AUNIT, EXCLUDE, XCENT, YCENT, ORAD,
-     &                               XCENT, YCENT, IRAD, STATUS)
+*       add description to ARD text
+            IF (EXCLUDE) THEN
+              TEXT=' .NOT. (CIRCLE( '
+            ELSE
+              TEXT=' (CIRCLE( '
+            ENDIF
+            L=CHR_LEN(TEXT)
 
-*    NDF:
-C         ELSEIF (INDEX(SHAPE, 'NDF') .NE. 0) THEN
-C
-C  I DONT KNOW WHAT TO DO HERE - ALL YOURS PETER.
-*       Write description into ARD file
-C            CALL AWR_NDF( )
+            CALL MSG_SETR('XC',XCENT)
+            CALL MSG_SETR('YC',YCENT)
+            CALL MSG_SETR('RAD',ORAD)
+            CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
+
+            CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
+
+
+            TEXT='     .AND..NOT.CIRCLE('
+            L=CHR_LEN(TEXT)
+
+            CALL MSG_SETR('XC',XCENT)
+            CALL MSG_SETR('YC',YCENT)
+            CALL MSG_SETR('RAD',IRAD)
+            CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD ))',TEXT,L)
+            IF (EXCLUDE) THEN
+              L=L+1
+              TEXT(L:)=')'
+            ENDIF
+
+            CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
+
 
 
          ELSE
@@ -448,7 +465,9 @@ C            CALL AWR_NDF( )
 
       ENDDO
 
-*   Close the ARD file
+*   Write out text and close the ARD file
+      CALL ARX_WRITEF(ARDID,AUNIT,STATUS)
+      CALL ARX_CLOSE(ARDID,STATUS)
       CALL FIO_CLOSE(AUNIT, STATUS)
 
 999   CALL AST_CLOSE()
