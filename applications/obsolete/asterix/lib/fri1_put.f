@@ -242,7 +242,7 @@
       CALL DAT_THERE( LOC, CNAME, THERE, STATUS )
       IF ( THERE ) THEN
         CALL MSG_SETC( 'NAME', CNAME )
-        IF ( ARGS(3) .EQ. ADI__NULLID ) THEN
+        IF ( REFID .EQ. ADI__NULLID ) THEN
           CALL MSG_PRNT( 'Deleting existing ^NAME reference...' )
         ELSE
           CALL MSG_PRNT( 'Replacing existing ^NAME reference...' )

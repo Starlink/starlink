@@ -99,8 +99,6 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	TLOC			! HDS file locator
       CHARACTER*6		CNAM			! Component  name
-
-      INTEGER			IREF			! Reference number
 *.
 
 *  Check inherited global status.
@@ -109,11 +107,8 @@
 *  Get top-level locator
       CALL ADI1_GETLOC( ARGS(1), TLOC, STATUS )
 
-*  The number of the reference
-      CALL ADI_GET0I( ARGS(2), IREF, STATUS )
-
 *  Construct the component name
-      WRITE( CNAM, '(A3,I3.3)' ) 'SEL', IREF
+      CALL FSI1_NAME( ARGS(2), 'SEL', CNAM, STATUS )
 
 *  Copy the data
       CALL ADI1_CCA2HI( ARGS(3), ' ', TLOC, CNAM, STATUS )

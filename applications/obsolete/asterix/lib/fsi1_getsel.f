@@ -101,8 +101,6 @@
       CHARACTER*(DAT__SZLOC)    TLOC                    ! HDS file locator
       CHARACTER*6               CNAM                    ! Component  name
 
-      INTEGER                   IREF                    ! Reference number
-
       LOGICAL			THERE			! CNAM exists in TLOC?
 *.
 
@@ -112,11 +110,8 @@
 *  Get top-level locator
       CALL ADI1_GETLOC( ARGS(1), TLOC, STATUS )
 
-*  The number of the reference
-      CALL ADI_GET0I( ARGS(2), IREF, STATUS )
-
 *  Construct the component name
-      WRITE( CNAM, '(A3,I3.3)' ) 'SEL', IREF
+      CALL FSI1_NAME( ARGS(2), 'SEL', CNAM, STATUS )
 
 *  Copy the HDS data to the ADI object
       CALL DAT_THERE( TLOC, CNAM, STATUS )
