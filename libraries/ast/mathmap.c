@@ -11,15 +11,26 @@ c     astMathMap
 f     AST_MATHMAP
 
 *  Description:
-*     A MathMap is a Mapping which allows you to specify a set of forward
-*     and/or inverse transformation functions using arithmetic operations
-*     and mathematical functions similar to those available in C. The
-*     MathMap interprets these functions at run-time, whenever its forward
-*     or inverse transformation is required. Because the functions are not
-*     compiled in the normal sense, they may be used to describe Mappings in
-*     a transportable manner (unlike an IntraMap). A MathMap therefore
-*     provides a very flexible way of defining new Mappings whose description
-*     may be stored as part of a dataset and interpreted by other programs.
+c     A MathMap is a Mapping which allows you to specify a set of forward
+c     and/or inverse transformation functions using arithmetic operations
+c     and mathematical functions similar to those available in C. The
+c     MathMap interprets these functions at run-time, whenever its forward
+c     or inverse transformation is required. Because the functions are not
+c     compiled in the normal sense (unlike an IntraMap), they may be used to
+c     describe coordinate transformations in a transportable manner. A
+c     MathMap therefore provides a flexible way of defining new types of
+c     Mapping whose descriptions may be stored as part of a dataset and
+c     interpreted by other programs.
+f     A MathMap is a Mapping which allows you to specify a set of forward
+f     and/or inverse transformation functions using arithmetic operations
+f     and mathematical functions similar to those available in Fortran. The
+f     MathMap interprets these functions at run-time, whenever its forward
+f     or inverse transformation is required. Because the functions are not
+f     compiled in the normal sense (unlike an IntraMap), they may be used to
+f     describe coordinate transformations in a transportable manner. A
+f     MathMap therefore provides a flexible way of defining new types of
+f     Mapping whose descriptions may be stored as part of a dataset and
+f     interpreted by other programs.
 
 *  Inheritance:
 *     The MathMap class inherits from the Mapping class.
@@ -27,7 +38,6 @@ f     AST_MATHMAP
 *  Attributes:
 *     In addition to those attributes common to all Mappings, every
 *     MathMap also has the following attributes:
-*
 *     - Seed: Random number seed
 *     - SimpFI: Forward-inverse MathMap pairs simplify?
 *     - SimpIF: Inverse-forward MathMap pairs simplify?
@@ -4931,6 +4941,42 @@ static void ValidateSymbol( const char *method, const char *class,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+/*
+*att++
+*  Name:
+*     Seed
+
+*  Purpose:
+*     Random number seed for a MathMap.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute, which may take any integer value, determines the
+*     sequence of random numbers produced by the random number functions in
+*     MathMap expressions. It is set to an unpredictable default value when
+*     a MathMap is created, so that by default each MathMap uses a different
+*     set of random numbers.
+*
+*     If required, you may set this Seed attribute to a value of your
+*     choosing in order to produce repeatable behaviour from the random
+*     number functions. You may also enquire the Seed value (e.g. if an
+*     initially unpredictable value has been used) and then use it to
+*     reproduce the resulting sequence of random numbers, either from the
+*     same MathMap or from another one.
+*
+*     Clearing the Seed attribute gives it a new unpredictable default
+*     value.
+
+*  Applicability:
+*     MathMap
+*        All MathMaps have this attribute.
+*att--
+*/
 /* Clear the Seed value by setting it to a new unpredictable value
    produced by DefaultSeed and clearing the "seed_set" flag in the
    MathMap's random number generator context. Also clear the "active"
@@ -4955,7 +5001,66 @@ astMAKE_SET(MathMap,Seed,int,rcontext.seed,( this->rcontext.seed_set = 1,
 /* Test the "seed_set" flag in the random number generator context. */
 astMAKE_TEST(MathMap,Seed,( this->rcontext.seed_set ))
 
+/*
+*att++
+*  Name:
+*     SimpFI
 
+*  Purpose:
+*     Forward-inverse MathMap pairs simplify?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+c     This attribute should be set to a non-zero value if applying a
+c     MathMap's forward transformation, followed immediately by the matching
+c     inverse transformation will always restore the original set of
+c     coordinates. It indicates that AST may replace such a sequence of
+c     operations by an identity Mapping (a UnitMap) if it is encountered
+c     while simplifying a compound Mapping (e.g. using astSimplify).
+f     This attribute should be set to a non-zero value if applying a
+f     MathMap's forward transformation, followed immediately by the matching
+f     inverse transformation will always restore the original set of
+f     coordinates. It indicates that AST may replace such a sequence of
+f     operations by an identity Mapping (a UnitMap) if it is encountered
+f     while simplifying a compound Mapping (e.g. using AST_SIMPLIFY).
+*
+*     By default, the SimpFI attribute is zero, so that AST will not perform
+*     this simplification unless you have set SimpFI to indicate that it is
+*     safe to do so.
+
+*  Applicability:
+*     MathMap
+*        All MathMaps have this attribute.
+
+*  Notes:
+*     - For simplification to occur, the two MathMaps must be in series and
+*     be identical (with textually identical transformation
+*     functions). Functional equivalence is not sufficient.
+*     - The consent of both MathMaps is required before simplification can
+*     take place. If either has a SimpFI value of zero, then simplification
+*     will not occur.
+*     - The SimpFI attribute controls simplification only in the case where
+*     a MathMap's forward transformation is followed by the matching inverse
+*     transformation. It does not apply if an inverse transformation is
+*     followed by a forward transformation. This latter case is controlled
+*     by the SimpIF attribute.
+c     - The "forward" and "inverse" transformations referred to are those
+c     defined when the MathMap is created (corresponding to the "fwd" and
+c     "inv" parameters of its constructor function). If the MathMap is
+c     inverted (i.e. its Invert attribute is non-zero), then the role of the
+c     SimpFI and SimpIF attributes will be interchanged.
+f     - The "forward" and "inverse" transformations referred to are those
+f     defined when the MathMap is created (corresponding to the FWD and
+f     INV arguments of its constructor function). If the MathMap is
+f     inverted (i.e. its Invert attribute is non-zero), then the role of the
+f     SimpFI and SimpIF attributes will be interchanged.
+*att--
+*/
 /* Clear the SimpFI value by setting it to -INT_MAX. */
 astMAKE_CLEAR(MathMap,SimpFI,simp_fi,-INT_MAX)
 
@@ -4969,7 +5074,66 @@ astMAKE_SET(MathMap,SimpFI,int,simp_fi,( value != 0 ))
 /* The SimpFI value is set if it is not -INT_MAX. */
 astMAKE_TEST(MathMap,SimpFI,( this->simp_fi != -INT_MAX ))
 
+/*
+*att++
+*  Name:
+*     SimpIF
 
+*  Purpose:
+*     Inverse-forward MathMap pairs simplify?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+c     This attribute should be set to a non-zero value if applying a
+c     MathMap's inverse transformation, followed immediately by the matching
+c     forward transformation will always restore the original set of
+c     coordinates. It indicates that AST may replace such a sequence of
+c     operations by an identity Mapping (a UnitMap) if it is encountered
+c     while simplifying a compound Mapping (e.g. using astSimplify).
+f     This attribute should be set to a non-zero value if applying a
+f     MathMap's inverse transformation, followed immediately by the matching
+f     forward transformation will always restore the original set of
+f     coordinates. It indicates that AST may replace such a sequence of
+f     operations by an identity Mapping (a UnitMap) if it is encountered
+f     while simplifying a compound Mapping (e.g. using AST_SIMPLIFY).
+*
+*     By default, the SimpIF attribute is zero, so that AST will not perform
+*     this simplification unless you have set SimpIF to indicate that it is
+*     safe to do so.
+
+*  Applicability:
+*     MathMap
+*        All MathMaps have this attribute.
+
+*  Notes:
+*     - For simplification to occur, the two MathMaps must be in series and
+*     be identical (with textually identical transformation
+*     functions). Functional equivalence is not sufficient.
+*     - The consent of both MathMaps is required before simplification can
+*     take place. If either has a SimpIF value of zero, then simplification
+*     will not occur.
+*     - The SimpIF attribute controls simplification only in the case where
+*     a MathMap's inverse transformation is followed by the matching forward
+*     transformation. It does not apply if a forward transformation is
+*     followed by an inverse transformation. This latter case is controlled
+*     by the SimpFI attribute.
+c     - The "forward" and "inverse" transformations referred to are those
+c     defined when the MathMap is created (corresponding to the "fwd" and
+c     "inv" parameters of its constructor function). If the MathMap is
+c     inverted (i.e. its Invert attribute is non-zero), then the role of the
+c     SimpFI and SimpIF attributes will be interchanged.
+f     - The "forward" and "inverse" transformations referred to are those
+f     defined when the MathMap is created (corresponding to the FWD and
+f     INV arguments of its constructor function). If the MathMap is
+f     inverted (i.e. its Invert attribute is non-zero), then the role of the
+f     SimpFI and SimpIF attributes will be interchanged.
+*att--
+*/
 /* Clear the SimpIF value by setting it to -INT_MAX. */
 astMAKE_CLEAR(MathMap,SimpIF,simp_if,-INT_MAX)
 
@@ -5479,7 +5643,8 @@ f     NFWD = INTEGER
 c        This must be at least equal to "nout", but may be increased to
 f        This must be at least equal to NOUT, but may be increased to
 *        accommodate any additional expressions which define intermediate
-*        variables for the forward transformation.
+*        variables for the forward transformation (see the "Calculating
+*        Intermediate Values" section below).
 c     fwd
 f     FWD = CHARACTER * ( * )( NFWD )
 c        An array (with "nfwd" elements) of pointers to null terminated strings
@@ -5493,7 +5658,8 @@ f     NINV = INTEGER
 c        This must be at least equal to "nin", but may be increased to
 f        This must be at least equal to NIN, but may be increased to
 *        accommodate any additional expressions which define intermediate
-*        variables for the inverse transformation.
+*        variables for the inverse transformation (see the "Calculating
+*        Intermediate Values" section below).
 c     inv
 f     INV = CHARACTER * ( * )( NINV )
 c        An array (with "ninv" elements) of pointers to null terminated strings
@@ -5533,9 +5699,9 @@ f     AST_MATHMAP = INTEGER
 *  Defining Transformation Functions:
 c     A MathMap's transformation functions are supplied as a set of
 c     expressions in an array of character strings. Normally you would
-c     supply the same number of expressions for the forward transformation
-c     as there are output variables (given by the MathMap's Nout
-c     attribute). For instance, if Nout is 2 you might use:
+c     supply the same number of expressions for the forward transformation,
+c     via the "fwd" parameter, as there are output variables (given by the
+c     MathMap's Nout attribute). For instance, if Nout is 2 you might use:
 c     - "r = sqrt( x * x + y * y )"
 c     - "theta = atan2( y, x )"
 c
@@ -5546,9 +5712,9 @@ c     and those that appear on the right ("x" and "y") are references to
 c     input variables.
 f     A MathMap's transformation functions are supplied as a set of
 f     expressions in an array of character strings. Normally you would
-f     supply the same number of expressions for the forward transformation
-f     as there are output variables (given by the MathMap's Nout
-f     attribute). For instance, if Nout is 2 you might use:
+f     supply the same number of expressions for the forward transformation,
+f     via the FWD argument, as there are output variables (given by the
+f     MathMap's Nout attribute). For instance, if Nout is 2 you might use:
 f     - 'R = SQRT( X * X + Y * Y )'
 f     - 'THETA = ATAN2( Y, X )'
 f
@@ -5558,67 +5724,61 @@ f     expression (R and THETA) provide names for the output variables and
 f     those that appear on the right (X and Y) are references to input
 f     variables.
 *
-c     In the same manner, the number of expressions for the inverse
-c     transformation would normally match the number of MathMap input
+c     To complement this, you must also supply expressions for the inverse
+c     transformation via the "inv" parameter.  In this case, the number of
+c     expressions given would normally match the number of MathMap input
 c     coordinates (given by the Nin attribute).  If Nin is 2, you might use:
 c     - "x = r * cos( theta )"
-c     - "y = r * sin( theta )"}
+c     - "y = r * sin( theta )"
 c
-c     which expresses the inverse transformation from polar to Cartesian
+c     which expresses the transformation from polar to Cartesian
 c     coordinates. Note that here the input variables ("x" and "y") are
 c     named on the left of each expression, and the output variables ("r"
 c     and "theta") are referenced on the right.
-f     In the same manner, the number of expressions for the inverse
-f     transformation would normally match the number of MathMap input
+f     To complement this, you must also supply expressions for the inverse
+f     transformation via the INV argument.  In this case, the number of
+f     expressions given would normally match the number of MathMap input
 f     coordinates (given by the Nin attribute).  If Nin is 2, you might use:
 f     - 'X = R * COS( THETA )'
 f     - 'Y = R * SIN( THETA )'
 f
-f     which expresses the inverse transformation from polar to Cartesian
+f     which expresses the transformation from polar to Cartesian
 f     coordinates. Note that here the input variables (X and Y) are named on
 f     the left of each expression, and the output variables (R and THETA)
 f     are referenced on the right.
 *
-c     Normally, you cannot refer to a variable on the right of an expression
-c     unless it is named on the left of an expression in the complementary
-c     set of functions. This means that if you wish to leave one of the
-c     transformations undefined, you must supply dummy expressions which
-c     name each of the output (or input) variables.  For example, you might
-c     use:
+*     Normally, you cannot refer to a variable on the right of an expression
+*     unless it is named on the left of an expression in the complementary
+*     set of functions. Therefore both sets of functions (forward and
+*     inverse) must be formulated using the same consistent set of variable
+*     names. This means that if you wish to leave one of the transformations
+*     undefined, you must supply dummy expressions which simply name each of
+*     the output (or input) variables.  For example, you might use:
 c     - "x"
 c     - "y"
-c
-c     for the inverse transformation above in order to name the input
-c     variables but without defining an inverse transformation.
-f     Normally, you cannot refer to a variable on the right of an expression
-f     unless it is named on the left of an expression in the complementary
-f     set of functions. This means that if you wish to leave one of the
-f     transformations undefined, you must supply dummy expressions which
-f     name each of the output (or input) variables.  For example, you might
-f     use:
 f     - 'X'
 f     - 'Y'
-f
-f     for the inverse transformation above in order to name the input
-f     variables but without defining an inverse transformation.
+*
+*     for the inverse transformation above, which serves to name the input
+*     variables but without defining an inverse transformation.
 
 *  Calculating Intermediate Values:
-c     It is sometimes useful to calculate intermediate results and then to
+c     It is sometimes useful to calculate intermediate values and then to
 c     use these in the final expressions for the output (or input)
 c     variables. This may be done by supplying additional expressions for
 c     the forward (or inverse) transformation functions. For instance, the
-c     following array of five expressions describes 2-dimensional barrel
+c     following array of five expressions describes 2-dimensional pin-cushion
 c     distortion:
 c     - "r = sqrt( xin * xin + yin * yin )"
 c     - "rout = r * ( 1 + 0.1 * r * r )"
 c     - "theta = atan2( yin, xin )"
 c     - "xout = rout * cos( theta )"
 c     - "yout = rout * sin( theta )"
-f     It is sometimes useful to calculate intermediate results and then to
+f     It is sometimes useful to calculate intermediate values and then to
 f     use these in the final expressions for the output (or input)
 f     variables. This may be done by supplying additional expressions for
 f     the forward (or inverse) transformation functions. For instance, the
-f     following array of five expressions describes 2-dimensional barrel
+f     following array of five expressions describes 2-dimensional pin-cushion
 f     distortion:
 f     - 'R = SQRT( XIN * XIN + YIN * YIN )'
 f     - 'ROUT = R * ( 1 + 0.1 * R * R )'
@@ -5626,14 +5786,14 @@ f     - 'THETA = ATAN2( YIN, XIN )',
 f     - 'XOUT = ROUT * COS( THETA )'
 f     - 'YOUT = ROUT * SIN( THETA )'
 *
-c     Note how we first calculate three intermediate results ("r", "rout"
+c     Here, we first calculate three intermediate results ("r", "rout"
 c     and "theta") and then use these to calculate the final results ("xout"
 c     and "yout"). The MathMap knows that only the final two results
 c     constitute values for the output variables because its Nout attribute
 c     is set to 2. You may define as many intermediate variables in this
 c     way as you choose. Having defined a variable, you may then refer to it
 c     on the right of any subsequent expressions.
-f     Note how we first calculate three intermediate results (R, ROUT
+f     Here, we first calculate three intermediate results (R, ROUT
 f     and THETA) and then use these to calculate the final results (XOUT
 f     and YOUT). The MathMap knows that only the final two results
 f     constitute values for the output variables because its Nout attribute
@@ -5641,16 +5801,18 @@ f     is set to 2. You may define as many intermediate variables in this
 f     way as you choose. Having defined a variable, you may then refer to it
 f     on the right of any subsequent expressions.
 *
-c     We could use a similar technique to define the inverse transformation,
-c     but may only refer to the output variables "xout" and "yout" in the
-c     expressions we use. The intermediate variables "r", "rout" and "theta"
-c     (above) are private to the forward transformation and may not be
-c     referenced by the inverse transformation.
-f     We could use a similar technique to define the inverse transformation,
-f     but may only refer to the output variables XOUT and YOUT in the
-f     expressions we use. The intermediate variables R, ROUT and THETA
-f     (above) are private to the forward transformation and may not be
-f     referenced by the inverse transformation.
+c     Note that when defining the inverse transformation you may only refer
+c     to the output variables "xout" and "yout".  The intermediate variables
+c     "r", "rout" and "theta" (above) are private to the forward
+c     transformation and may not be referenced by the inverse
+c     transformation. The inverse transformation may, however, define its
+c     own private intermediate variables.
+f     Note that when defining the inverse transformation you may only refer
+f     to the output variables XOUT and YOUT. The intermediate variables R,
+f     ROUT and THETA (above) are private to the forward transformation and
+f     may not be referenced by the inverse transformation. The inverse
+f     transformation may, however, define its own private intermediate
+f     variables.
 
 *  Expression Syntax:
 c     The expressions given for the forward and inverse transformations
@@ -5659,17 +5821,20 @@ c     extensions for compatibility with Fortran). They may contain
 c     references to variables and literal constants, together with
 c     arithmetic, boolean, relational and bitwise operators, and function
 c     invocations. A set of symbolic constants is also available. Each of
-c     these is described in detail below.
+c     these is described in detail below. Parentheses may be used to
+c     over-ride the normal order of evaluation. There is no built-in limit
+c     to the length of expressions and they are insensitive to case or the
+c     presence of additional white space.
 f     The expressions given for the forward and inverse transformations
 f     closely follow the syntax of Fortran (with some extensions for
 f     compatibility with the C language). They may contain references to
 f     variables and literal constants, together with arithmetic, logical,
 f     relational and bitwise operators, and function invocations. A set of
 f     symbolic constants is also available. Each of these is described in
-f     detail below.
-*
-*     There is no built-in limit to the length of expressions and they are
-*     insensitive to case or the presence of additional white space.
+f     detail below. Parentheses may be used to over-ride the normal order of
+f     evaluation. There is no built-in limit to the length of expressions
+f     and they are insensitive to case or the presence of additional white
+f     space.
 
 *  Variables:
 *     Variable names must begin with an alphabetic character and may contain
@@ -5691,11 +5856,11 @@ f     be used as a prefix.
 
 *  Propagation of Missing Data:
 *     Unless indicated otherwise, if any argument of a function or operator
-*     has the special value AST__BAD (indicating missing data), then the
-*     result of that function or operation is also AST__BAD, so that such
-*     values are propagated automatically through all operations performed
-*     by MathMap transformations.  The special value AST__BAD can be
-*     represented in expressions by the symbolic constant "<bad>".
+*     has the value AST__BAD (indicating missing data), then the result of
+*     that function or operation is also AST__BAD, so that such values are
+*     propagated automatically through all operations performed by MathMap
+*     transformations.  The special value AST__BAD can be represented in
+*     expressions by the symbolic constant "<bad>".
 *
 *     A <bad> result (i.e. equal to AST__BAD) is also produced in response
 *     to any numerical error (such as division by zero or numerical
@@ -5775,54 +5940,63 @@ f     - X1 .EQV. X2: Tests whether the logical states of X1 and X2
 f     (i.e. .TRUE./.FALSE.) are equal. It is the negative of the exclusive OR
 f     (XOR) function.  Tri-state logic is not used with this operator.
 c     - ! x: Boolean unary NOT operation, returning 1 if "x" is zero, and
-c     0 otherwise.
+c     0 otherwise. (The synonym ".not." is also provided for compatibility
+c     with Fortran.)
 f     - .NOT. X: Logical unary NOT operation, returning 1 if X is zero, and
-f     0 otherwise.
-c     - isbad(x): Returns a boolean result (0 or 1) indicating whether "x" is
-c     set to the <bad> data value AST__BAD.
-f     - ISBAD(X): Returns a logical result (0 or 1) indicating whether X is
-f     set to the <bad> data value AST__BAD.
+f     0 otherwise. (The synonym "!" is also provided for compatibility with
+f     C.)
 
 *  Relational Operators:
-*     Relational operators return the boolean result (0 or 1) of comparing
-*     the values of two floating pojnt values for equality or inequality. The
-*     value AST__BAD may also be returned if either argument is <bad>.
+c     Relational operators return the boolean result (0 or 1) of comparing
+c     the values of two floating point values for equality or inequality. The
+c     value AST__BAD may also be returned if either argument is <bad>.
+f     Relational operators return the logical result (0 or 1) of comparing
+f     the values of two floating point values for equality or inequality. The
+f     value AST__BAD may also be returned if either argument is <bad>.
 *
 *     The following relational operators are available:
-c     - x1 == x2: "x1" equals "x1"? (The synonym ".eq." is also provided for
-c     compatibility with Fortran.)
-f     - X1 .EQ. X2: X1 equals X2? (The synonym "==" is also provided for
-f     compatibility with C.)
-c     - x1 != x2: "x1" is unequal to "x2"? (The synonym ".ne." is also
-c     provided for compatibility with Fortran.)
-f     - X1 .NE. X2: X1 is unequal to X2? (The synonym "!=" is also
-f     provided for compatibility with C.)
-c     - x1 > x2: "x1" is greater than "x2"? (The synonym ".gt." is also
-c     provided for compatibility with Fortran.)
-f     - X1 > X2: X1 is greater than X2? (The synonym ">" is also
-f     provided for compatibility with C.)
-c     - x1 >= x2: "x1" is greater than or equal to "x2"? (The synonym ".ge."
-c     is also provided for compatibility with Fortran.)
-f     - X1 >= X2: X1 is greater than or equal to X2? (The synonym ">="
-f     is also provided for compatibility with C.)
-c     - x1 < x2: "x2" is less than "x2"? (The synonym ".gt." is also
-c     provided for compatibility with Fortran.)
-f     - X1 < X2: X1 is less than X2? (The synonym "<" is also
-f     provided for compatibility with C.)
-c     - x1 <= x2: "x1" is less than or equal to "x2"? (The synonym ".le." is
+c     - x1 == x2: Tests whether "x1" equals "x1". (The synonym ".eq." is
 c     also provided for compatibility with Fortran.)
-f     - X1 <= X2: X1 is less than or equal to X2? (The synonym "<=" is
+f     - X1 .EQ. X2: Tests whether X1 equals X2. (The synonym "==" is also
+f     provided for compatibility with C.)
+c     - x1 != x2: Tests whether "x1" is unequal to "x2". (The synonym ".ne."
+c     is also provided for compatibility with Fortran.)
+f     - X1 .NE. X2: Tests whether X1 is unequal to X2. (The synonym "!=" is
 f     also provided for compatibility with C.)
+c     - x1 > x2: Tests whether "x1" is greater than "x2". (The synonym
+c     ".gt." is also provided for compatibility with Fortran.)
+f     - X1 .GT. X2: Tests whether X1 is greater than X2. (The synonym ">" is
+f     also provided for compatibility with C.)
+c     - x1 >= x2: Tests whether "x1" is greater than or equal to "x2". (The
+c     synonym ".ge."  is also provided for compatibility with Fortran.)
+f     - X1 .GE. X2: Tests whether X1 is greater than or equal to X2. (The
+f     synonym ">=" is also provided for compatibility with C.)
+c     - x1 < x2: Tests whether "x1" is less than "x2". (The synonym ".lt."
+c     is also provided for compatibility with Fortran.)
+f     - X1 .LT. X2: Tests whether X1 is less than X2. (The synonym "<" is also
+f     provided for compatibility with C.)
+c     - x1 <= x2: Tests whether "x1" is less than or equal to "x2". (The
+c     synonym ".le." is also provided for compatibility with Fortran.)
+f     - X1 .LE. X2: Tests whether X1 is less than or equal to X2. (The synonym
+f     "<=" is also provided for compatibility with C.)
+*
+c     Note that relational operators cannot usefully be used to compare
+c     values with the <bad> value (representing missing data), because the
+c     result is always <bad>. The isbad() function should be used instead.
+f     Note that relational operators cannot usefully be used to compare
+f     values with the <bad> value (representing missing data), because the
+f     result is always <bad>. The ISBAD() function should be used instead.
 f
-f     Note that because logical operators can operate on floating point
-f     values, care must be taken to use parentheses in some cases where they
-f     would not be required in Fortran. For example, the expresssion:
+f     Note, also, that because logical operators can operate on floating
+f     point values, care must be taken to use parentheses in some cases
+f     where they would not normally be required in Fortran. For example,
+f     the expresssion:
 f     - .NOT. A .EQ. B
 f
 f     must be written:
 f     - .NOT. ( A .EQ. B )
 f
-f     if the .NOT. operator is not to associate with the variable A.
+f     to prevent the .NOT. operator from associating with the variable A.
 
 *  Bitwise Operators:
 c     The bitwise operators provided by C are often useful when operating on
@@ -5889,13 +6063,13 @@ c     because inverting the bits of a twos-complement fixed point binary
 c     number is equivalent to simply negating it. This differs from the
 c     pure integer case because bits to the right of the binary point are
 c     also inverted. To invert only those bits to the left of the binary
-c     point, use a bitwise exclusive OR with the value "-1" (i.e. "x^-1").
+c     point, use a bitwise exclusive OR with the value -1 (i.e. "x^-1").
 f     Note that no bit inversion operator is provided. This is
 f     because inverting the bits of a twos-complement fixed point binary
 f     number is equivalent to simply negating it. This differs from the
 f     pure integer case because bits to the right of the binary point are
 f     also inverted. To invert only those bits to the left of the binary
-f     point, use a bitwise exclusive OR with the value "-1" (i.e. "x^-1").
+f     point, use a bitwise exclusive OR with the value -1 (i.e. X^-1).
 
 *  Functions:
 *     The following functions are available:
@@ -6010,7 +6184,7 @@ c     floating point (double) value.
 f     - <dig>: Number of decimal digits of precision available in a
 f     floating point (double precision) value.
 *     - <e>: Base of natural logarithms.
-*     - <epsilon>: Smallest number such that 1.0+<epsilon> is
+*     - <epsilon>: Smallest positive number such that 1.0+<epsilon> is
 *     distinguishable from unity.
 c     - <mant_dig>: The number of base <radix> digits stored in the
 c     mantissa of a floating point (double) value.
@@ -6086,15 +6260,15 @@ c     not be subject to simplification (e.g. using astSimplify) because AST
 c     cannot know how different MathMaps will interact. However, in the
 c     special case where a MathMap occurs in series with its own inverse,
 c     then simplification may be possible. Whether simplification does, in
-c     fact, occur under these circumstances is controlled by the SimpFI and
-c     SimpIF attributes.
+c     fact, occur under these circumstances is controlled by the MathMap's
+c     SimpFI and SimpIF attributes.
 f     - Normally, compound Mappings (CmpMaps) which involve MathMaps will
 f     not be subject to simplification (e.g. using AST_SIMPLIFY) because AST
 f     cannot know how different MathMaps will interact. However, in the
 f     special case where a MathMap occurs in series with its own inverse,
 f     then simplification may be possible. Whether simplification does, in
-f     fact, occur under these circumstances is controlled by the SimpFI and
-f     SimpIF attributes.
+f     fact, occur under these circumstances is controlled by the MathMap's
+f     SimpFI and SimpIF attributes.
 *     - A null Object pointer (AST__NULL) will be returned if this
 c     function is invoked with the AST error status set, or if it
 f     function is invoked with STATUS set to an error value, or if it
