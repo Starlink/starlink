@@ -992,6 +992,10 @@
 
 /* Get the viewport size in pixels. */
          cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
+         xplo = (int) ( xplo + 0.5 );
+         xphi = (int) ( xphi + 0.5 );
+         yplo = (int) ( yplo + 0.5 );
+         yphi = (int) ( yphi + 0.5 );
 
 /* Close PGPLOT down for now. */
          cpgclos();
