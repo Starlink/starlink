@@ -1,9 +1,9 @@
-      SUBROUTINE KPS_$HSTC<T>( BAD, EL, ARRAY, LO, HI, LOWLIM, INVERT,
+      SUBROUTINE KPS1_HSTC<T>( BAD, EL, ARRAY, LO, HI, LOWLIM, INVERT,
      :                         HDIM1, HDIM2, MAXVAL, HIST, HSTARR,
      :                         STATUS )
 *+
 *  Name:
-*     KPS_$HSTCx
+*     KPS1_HSTCx
 
 *  Purpose:
 *     Generates a histogram of an array in the form of a cell array.
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$HSTCx( BAD, EL, ARRAY, LO, HI, LOWLIM, INVERT, HDIM1,
+*     CALL KPS1_HSTCx( BAD, EL, ARRAY, LO, HI, LOWLIM, INVERT, HDIM1,
 *                      HDIM2, MAXVAL, HIST, HSTARR, STATUS )
 
 *  Description:
@@ -175,7 +175,7 @@
 
 *    Generate the histogram between those bounds.
 
-      CALL KPG_$GHST<T>( BAD, EL, ARRAY, HDIM1, HIGH, LOW, HIST,
+      CALL KPG1_GHST<T>( BAD, EL, ARRAY, HDIM1, HIGH, LOW, HIST,
      :                   STATUS )
 
 *    Find the maximum value in the histogram.
