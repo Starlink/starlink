@@ -115,7 +115,7 @@ foreach $par (@parlist) {
 
 
 $exstat =
-  system("$root/linplot '$ndf' ordlim=true ordlow=$min ordupp=$max $modpars");
+  system("$root/linplot '$ndf' axlim=true ordlim='[$min,$max]' abslim=! $modpars");
 die "LINPLOT finished abnormally...stopping (status = $exstat)\n"
   if ($exstat != 0);
 
