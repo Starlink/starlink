@@ -22,7 +22,7 @@
 #
 #     This interface will work with native and Starlink versions of
 #     SExtractor (in fact it will work with both at the same
-#     time). The native version used during development was 2.0.15
+#     time). The native version used during development was 2.0.19
 
 #  Invocations:
 #
@@ -60,7 +60,7 @@
 #     25-AUG-1998 (PDRAPER):
 #        Original version.
 #     25-MAY-1999 (PDRAPER):
-#        Added BACK_TYPE, BACK_VALUE and THRESH_TYPE.
+#        Updated for 2.0.19. Added BACK_TYPE, BACK_VALUE and THRESH_TYPE.
 #     {enter_further_changes_here}
 
 #-
@@ -2160,6 +2160,15 @@ itcl::class gaia::GaiaSextractor {
          #  Do search to display symbols.
          $astrocat search
       }
+   }
+
+   #  Get the name of the catalogue window (used for demo control).
+   public method get_catname {} {
+       set name [get_catname_]
+       if { [info exists astrocatnames_($name)] } {
+	   return $astrocatnames_($name)
+       }
+       return ""
    }
 
    #  Wait for a command to return 1 (non-blocking?).

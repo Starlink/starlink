@@ -638,7 +638,7 @@ itcl::class gaia::StarArd {
          } else {
 
             # Create new clone window.
-            $itk_option(-gaia) clone "" $file -temporary 1
+            $itk_option(-gaia) newimage_clone $file -temporary 1
          }
       }
       blt::busy release $w_

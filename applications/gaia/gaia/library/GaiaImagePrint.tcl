@@ -74,16 +74,17 @@ itcl::class gaia::GaiaImagePrint {
    #  --------
 
    #  Override set_background to really set the background to the 
-   #  requested colour (rather than always white).
+   #  requested colour (rather than always white). Add a large
+   #  surround to remove edge problems.
    method set_background {} {
       set xlow  [$canvas_ canvasx 0]
       set ylow  [$canvas_ canvasy 0]
       set xhigh [$canvas_ canvasx [winfo width $canvas_]]
       set yhigh [$canvas_ canvasy [winfo height $canvas_]]
-      set xlow [expr round($xlow-1)]
-      set ylow [expr round($ylow-1)]
-      set xhigh [expr round($xhigh+1)]
-      set yhigh [expr round($yhigh+1)]
+      set xlow [expr round($xlow-100)]
+      set ylow [expr round($ylow-100)]
+      set xhigh [expr round($xhigh+100)]
+      set yhigh [expr round($yhigh+100)]
       $canvas_ create rectangle $xlow $ylow $xhigh $yhigh \
          -fill [$canvas_ cget -background] \
          -tags ${this}_back

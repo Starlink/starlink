@@ -347,11 +347,11 @@ itcl::class gaia::GaiaDemo {
  as part of the Starlink Software Collection for U.K. Astronomers. 
 
  GAIA provides most of the usual facilities of image display tools, 
- plus more astronomically useful ones such as aperture photometry,
+ plus more astronomically useful ones such as object photometry,
  arbitrary region analysis, celestial coordinate support (i.e.
  coordinate readout, calibration and modification), grid overlays,
- blink comparison, defect patching and the ability to query on-line
- (WWW) catalogues.
+ blink comparison, defect patching, contouring, object detection 
+ and the ability to query on-line (WWW) catalogues.
                     }
                display {
  During this demonstration GAIA will be controlled non-interactively.
@@ -465,8 +465,8 @@ itcl::class gaia::GaiaDemo {
   It will then show some basic operations, such modifying the 
   apparent detail through changing the minimum and maximum displayed
   values, rotation and flips for primitive reorientations and will 
-  finally cycle through a list of possible false colours tables and 
-  intensity transfer functions.
+  finally cycle through a list of some possible false colours tables 
+  and intensity transfer functions.
       }
       short_display {Displaying the image...}
       show_image_ ngc1275.fits 98 2
@@ -504,10 +504,11 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-imagetrans) update_trans
       short_display {Interchanged X and Y axes}
       refresh_
-
-      foreach cmap [$itk_option(-rtdimage) cmap list] {
+      #  Cycle through the front panel selections
+      foreach cmap "real.lasc ramp.lasc bgyrw.lasc heat.lasc pastel.lasc" {
 	 $itk_option(-rtdimage) cmap file $cmap
-	 foreach imap [$itk_option(-rtdimage) itt list] {
+         refresh_
+	 foreach imap "ramp.iasc equa.iasc log.iasc neg.iasc lasritt.iasc" {
             if { $imap != "null.iasc" } { 
                $itk_option(-gaiactrl) itt file $imap
                short_display "Cycling through tables... cmap: $cmap, itt: $imap"
@@ -795,7 +796,7 @@ itcl::class gaia::GaiaDemo {
       $toolbox close
    }
 
-   #  Do patch the image.
+   #  Patch the image.
    protected method patch_ {} {
       display {
 
@@ -837,6 +838,80 @@ itcl::class gaia::GaiaDemo {
       }
       $toolbox set_modified 0
       $toolbox close
+   }
+
+   #  Contouring.
+   protected method contour_ {} {
+      display {
+
+			      Contouring
+			      ==========
+
+ Contouring can be done of the displayed image, or any other image 
+ over the displayed image.
+
+ The first example shows an image contoured by its own data. The
+ following show contours derived from a radio image and an infrared
+ image.
+      }
+      short_display {Displaying an image...}
+      show_image_ m51_opt.sdf 98 1
+      global gaia_library
+      $itk_option(-gaiactrl) cmap file real.lasc
+      refresh_
+      short_display {Activating contour toolbox...}
+      $itk_option(-gaiamain) make_toolbox contour
+      set toolbox [$itk_option(-gaiamain) component contour]
+      $toolbox read_config $demo_dir_/m51_opt.cont
+      refresh_
+      move_to_side_ $toolbox
+      wait_ $readtime_
+      short_display {Contouring image...}
+      $toolbox redraw 1
+      wait_ $readtime_
+      short_display {Contouring radio image...}
+      $toolbox read_config $demo_dir_/m51_radio.cont
+      $toolbox redraw 1
+      wait_ $readtime_
+      short_display {Contouring infrared image...}
+      $toolbox read_config $demo_dir_/m51_iras.cont
+      $toolbox redraw 1
+      wait_ $readtime_
+      $toolbox close
+   }
+
+   #  Object detection
+   protected method detection_ {} {
+      display {
+
+		      Automated Object Detection
+		      ==========================
+
+ Automated object detection and analysis is performed using a toolbox
+ that controls the SExtractor (source extractor) program.
+
+ The results are shown in a catalogue window as detection ellipses. 
+
+      }
+      short_display {Displaying an image...}
+      show_image_ ngc1275.fits 90 2
+      global gaia_library
+      $itk_option(-gaiactrl) cmap file real.lasc
+      refresh_
+      short_display {Activating SExtractor toolbox...}
+      $itk_option(-gaiamain) make_toolbox sextractor
+      set toolbox [$itk_option(-gaiamain) component sextractor]
+      refresh_
+      move_to_side_ $toolbox
+      refresh_
+      wait_ $readtime_
+      short_display {Detecting images...}
+      $toolbox run
+      wait_ $readtime_
+      $toolbox close
+      set catname [$toolbox get_catname]
+      $catname close
+      $itk_option(-canvasdraw) clear
    }
 
    #  Blink images.
@@ -1400,10 +1475,11 @@ $catlist
    protected variable running_ 0
 
    #  List of all known demos.
-   protected variable demolist_ \
-      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-        blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
-        skycat_ archives_"
+    protected variable demolist_ contour_
+#    protected variable demolist_ \
+#        "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+#         contour_ detection_ blink_ grid_ astdefine_ astreference_ astrefine_ \
+#         astcopy_ skycat_ archives_"
    
    #  Interval to wait while reading text
    protected variable readtime_ 15000

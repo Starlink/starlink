@@ -145,7 +145,6 @@ itcl::class gaia::Gaia {
 
    #  Destructor:
    destructor {
-
       #  Clear up the images list (this isn't done correctly in
       #  SkyCat, it uses $w_ instead of $image_).
       global ::skycat_images
@@ -160,7 +159,7 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  XXX Quit the application. Really.... Rtd doesn't.
+   #  XXX Quit the application. Really.... Rtd doesn't have the exit.
    public method quit {} {
       delete object $this
       after idle exit
@@ -332,6 +331,18 @@ itcl::class gaia::Gaia {
       global ::skycat_images
       lappend skycat_images $itk_component(image)
    }
+   
+   #  Delete a window, needed to also clear up toolboxes, which
+   #  are not removed correctly.
+   public method delete_window {} {
+      foreach w [array name itk_component] {
+         if { [winfo exists $itk_component($w)] &&
+              [winfo toplevel $itk_component($w)] != "$w_" } {
+            destroy $itk_component($w)
+         }
+      }
+      delete object $w_
+   }
 
    #  Make changes to Skycat menus that we require.
    public method make_menu_changes {} {
@@ -346,8 +357,13 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-v> [code $image_ reopen]
       bind $w_  <Control-s> [code $image_ save_as]
       catch {$m delete "Save region as..."}
-      $m entryconfigure "Close" -label "Delete Window" -accelerator {Control-d}
-      bind $w_  <Control-d> "after idle destroy $w_"
+      
+      #  Close also needs the command changing to delete the object.
+      $m entryconfigure "Close" \
+	 -label "Delete Window" \
+	 -accelerator {Control-d} \
+	 -command [code $this delete_window]
+      bind $w_  <Control-d> [code $this delete_window]
       $m entryconfigure "Print..." -accelerator {Control-p}
       bind $w_  <Control-p> [code $image_ print]
       bind $w_  <Control-n> [code $this clone]
@@ -808,33 +824,27 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Make a new main window with the given name (this is essential)
-   #  This version stops the TopLevelWidget::start command froming
-   #  blocks (stopping the possibility of remotely determining when the
-   #  clone has been created). It also provides the ability to specify
-   #  the file name directly (thus replacing the command-line version)
-   #  and to gain access to an existing clone (by number).
+   #  Make a new main window with the given name, or the next in
+   #  sequence name. This version stops the TopLevelWidget::start
+   #  command from blocking (stopping the possibility of remotely
+   #  determining when the clone has been created). It also provides
+   #  the ability to specify the file name directly (thus replacing
+   #  the command-line version) and to gain access to an existing
+   #  clone (by number). Used for demo/remote control.
    public method noblock_clone {name {file ""} args} {
       global ::argv ::argc ::gaia_usage
+
+      #  Append any new args.
       set argv [concat $argv $args]
       set argc [llength $argv]
 
       #  If given the file replaces the one in the command-line args or
       #  is added to the list.
       if { $file != "" } {
-         global ::argv ::argc
-         set index [lsearch -exact $argv "-file"]
-         if { $index == -1 } {
-            lappend argv "-file"
-            lappend argv "$file"
-            incr argc 2
-         } else {
-            incr index
-            set argv [lreplace $argv $index $index $file]
-         }
+	 replace_image_ $file
       }
 
-      #  If named window already exists, just return.
+      #  If named window already exists, just configure file and return.
       if { [winfo exists $name] } {
           if { $file != "" } {
               $name open $file
@@ -843,6 +853,14 @@ itcl::class gaia::Gaia {
               eval $name configure $args
           }
           return $name
+      }
+
+      #  If name is "" then create a new name.
+      if { $name == "" } {
+	 set name "$prefix_[expr $clone_+1]"
+	 while { [winfo exists $name] } {
+	    set name "$prefix_[expr $clone_+1]"
+	 }
       }
 
       #  use the -noop option to avoid reloading the main image
@@ -857,18 +875,63 @@ itcl::class gaia::Gaia {
       return $name
    }
 
-   #  "Usual" clone method.
-   #  Make a new main window, named either the next in sequence or
-   #  using a given name.
-   method clone {args} {
+   #  Make a window clone, but display a new image.
+   public method newimage_clone {filename args} {
       global ::argv ::argc ::gaia_usage
       if { $args != {} } {
          set argv [concat $argv $args]
          set argc [llength $argv]
       }
-      # use the -noop option to avoid reloading the main image (part of $argv list)
+
+      #  Add the image name to replace the existing one.
+      replace_image_ $filename
+
+      #  And create the new clone.
+      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"]
+      return $prefix_[expr $clone_+1]
+   }
+
+   #  Standard clone method. Make a new main window, named either the
+   #  next in sequence or using a given name.
+   public method clone {args} {
+      global ::argv ::argc ::gaia_usage
+      if { $args != {} } {
+         set argv [concat $argv $args]
+         set argc [llength $argv]
+      }
+
+      #  Use the -noop option to avoid reloading the main image (part
+      #  of $argv list).
       after 0 [code util::TopLevelWidget::start gaia::Gaia "-noop" "$gaia_usage"]
       return $prefix_[expr $clone_+1]
+   }
+
+   #  Replace the existing image in the default args lists.
+   protected method replace_image_ {filename} {
+      global ::argv ::argc
+      set index [lsearch -exact $argv "-file"]
+      if { $index == -1 } {
+
+	 #  Filename may be unpaired with -file, so look for it.
+	 set newargv ""
+	 for {set i 0} {$i < $argc} {incr i} {
+	    set opt [lindex $argv $i]
+	    if {"[string index $opt 0]" == "-" && "$opt" != "-"} {
+	       set arg [lindex $argv [incr i]]
+	    } else {
+	       set arg "$filename"
+	       set opt "-file"
+	    }
+	    lappend newargv $opt $arg
+	 }
+	 set argv $newargv
+	 set argc [llength $argv]
+      } else {
+
+	 #  Has "-file" so just replace associated value.
+	 incr index
+	 set argv [lreplace $argv $index $index $filename]
+      }
    }
 
    #  Image has been cleared so reset any toolboxes that require it
@@ -960,17 +1023,17 @@ itcl::class gaia::Gaia {
          setup_starlink_env [file dirname [info nameofexecutable]]
       }
 
-      # set some application options
+      #  Set some application options
       tk appname GAIA
       set tk_strictMotif 1
       tk_focusFollowsMouse
       set tcl_precision 17
 
-      # insert some default options
+      #  Insert some default options
       set argv [linsert $argv 0 -disp_image_icon 1]
       set argc [llength $argv]
 
-      # start the application
+      #  Start the application
       util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
    }
 
@@ -1189,8 +1252,8 @@ proc false_tkwait {args} {
 #  reference to an astrocat instance that is never deleted (leaving a
 #  temporary file around at exit). Need to do this here to make sure
 #  that this code is used.
-itcl::body ::cat::AstroCat::new_catalog {name {id ""} 
-   {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"} 
+itcl::body ::cat::AstroCat::new_catalog {name {id ""}
+   {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"}
    {w ""}} {
    if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w] != 0} {
       return
@@ -1225,7 +1288,7 @@ itcl::body ::cat::AstroCat::new_catalog {name {id ""}
 itcl::body ::skycat::SkySearch::add_history {skycat filename} {
    set catalog $history_catalog_
    set image [$skycat get_image]
-	
+
    # make sure at least an empty catalog exists
    if {! [file exists $catalog] || [file size $catalog] == 0} {
       # If it doesn't exist yet, create an empty catalog file
@@ -1249,21 +1312,21 @@ itcl::body ::skycat::SkySearch::add_history {skycat filename} {
       # get the catalog into the list of known catalogs
       $astrocat_ open $catalog
    }
-   
+
    if {"$filename" == "" || [string first /tmp $filename] == 0 \
 	  || ! [file exists $filename]} {
       # ignore temporary and non-existant files
       return
    }
-   
+
    # add an entry for the given image and filename
    set id [file tail $filename]
    lassign [$image wcscenter] ra dec equinox
-   if { $ra == "" } { 
+   if { $ra == "" } {
       set ra "00:00:00"
       set dec "00:00:00"
    }
-   set object [$image fits get OBJECT] 
+   set object [$image fits get OBJECT]
    set naxis [$image fits get NAXIS]
    set naxis1 [$image fits get NAXIS1]
    set naxis2 [$image fits get NAXIS2]
@@ -1277,7 +1340,7 @@ itcl::body ::skycat::SkySearch::add_history {skycat filename} {
       set zoom 1
    }
    set timestamp [clock seconds]
-   
+
    # get full path name of file for preview URL
    if {"[string index $filename 0]" == "/"} {
       set fullpath $filename
@@ -1285,14 +1348,14 @@ itcl::body ::skycat::SkySearch::add_history {skycat filename} {
       set fullpath [pwd]/$filename
    }
    set preview file:$fullpath
-   
+
    set data [list [list $id $ra $dec $object $naxis $naxis1 $naxis2 $naxis3\
 		      $lowcut $highcut $colormap $itt $colorscale $zoom \
 		      $timestamp $preview]]
-   
+
    $astrocat_ open $catalog
    $astrocat_ save $catalog 1 $data $equinox
-   
+
    # update history catalog window, if it is showing
    set w [cat::AstroCat::get_instance [file tail $catalog]]
    if {"$w" != "" && [winfo viewable $w]} {

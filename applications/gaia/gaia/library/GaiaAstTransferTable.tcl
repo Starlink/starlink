@@ -357,7 +357,7 @@ itcl::class gaia::GaiaAstTransferTable {
    #  selection (since in principle the RA/Dec values could be
    #  obtained from a range of images and keeping track of all the
    #  markers could be a nightmare). Use same marker as X-Y
-   #  image. This uses a special tag "$this::ra_dec_tag".
+   #  image. This uses a special tag "$this_ra_dec_tag".
    public method redraw_radec {} {
       set row [$itk_component(table) get_selected]
       if { $row != {} } {
@@ -380,7 +380,7 @@ itcl::class gaia::GaiaAstTransferTable {
                   msg] == 0 } {
             $canvas create rtd_mark $x $y \
                -type $itk_option(-mtype) \
-               -tags "$this::ra_dec_tag" \
+	       -tags "${this}_ra_dec_tag" \
                -outline $itk_option(-mcolour) \
                -size $scale -fill $itk_option(-mfill) \
                -width $itk_option(-mwidth) \
@@ -396,7 +396,7 @@ itcl::class gaia::GaiaAstTransferTable {
    public method remove_radec {} {
       catch {
          set canvas [$target_ get_canvas]
-         $canvas delete "$this::ra_dec_tag"
+	 $canvas delete "${this}_ra_dec_tag"
       }
    }
 
