@@ -269,3 +269,113 @@ In addition, SUN/55 now describes how to convert NDFs to IDL format.
   o  Platform Support -- CONVERT is no longer supported on sunOS or
            Ultrix.  The VMS release is frozen at version 0.5.
 
+
+2 V1.0
+
+3 New_applications
+
+  o  DA2NDF -- This converts an unformatted stream file to
+     an NDF.  Such files will originate from C or Pascal unformatted
+     output (data streams), or from Fortran unformatted direct-access.
+
+  o  FITS2NDF -- This is a much improved reader compared with
+     KAPPA's FITSDIN.  It has support for binary table and image
+     extensions in the FITS file.  It recognises many special data
+     products too.  FITS2NDF can regenerate most NDFs from
+     files made by its sister application, NDF2FITS.
+
+  o  NDF2DA -- This provides the inverse operation to DA2NDF.
+     It permits you to process such files wuth standard packages
+     through the automatic-conversion system.
+
+3 Global_changes
+
+  o  Automatic Conversion -- There are two new formats defined that
+     operate within the NDF automatic format-conversion system.
+     GZIP is similar to COMPRESSED, as it operates on gzip-compressed
+     NDFs with extension .sdf.gz.  STREAM operates on Fortran
+     unformatted direct-access files or C unformatted data whose file
+     extension is .das.  FITS2NDF is used for the forward conversion
+     of FITS data instead of KAPPA's FITSDIN.  There are several
+     file-extension synonyms, mostly for FITS, and .str for STREAM
+     data.  The priority order in environment variables
+     NDF_FORMATS_IN and NDF_FORMATS_OUT has changed, with GASP
+     appearing later, and STREAM taking GASP's place.
+
+  o  Documentation -- The documentation has been updated to match this
+     version of the software.  Additional hyperlinks are introduced,
+     including ones for the related applications.  There are
+     additional notes in SUN/55 Appendix C.1 on how to process BDF
+     files on STADAT.  The messages in the startup scripts mention
+     how to obtain the hypertext documentation.
+
+  o  FITS keywords -- In several places, the CRTYPEn and CTYPEn
+     keywords were confused.  Likewise, a BUNITS keywords was
+     erroneously recognised instead of BUNIT.  The standard header
+     names are now used.  A new CUNITn keyword is added to store axis
+     units.  Some tasks omitted to write CRPIXn for linear axis centres
+     when the reference position was at the centre of the first
+     element.  The origin information is exported through LBOUNDn
+     keywords.
+
+  o  Linearity of axes -- The improved and more-robust KAPPA
+     subroutine is now used to test whether or not the elements of
+     axis-centre arrays are equally spaced.
+
+3 Changed_Applications
+
+  o  ASCII2NDF -- Made far more efficient, mostly due to a change in
+     the CHR library, but also because the maximum record length is
+     now reduced to 512 bytes.  The default RECLEN is 132.
+
+  o  DST2NDF -- Allows for non-standard .FITS structures.
+
+  o  GIF2NDF -- Removed the KAPPA dependency.  It uses one less
+     conversion stage, so is more efficient.  The documentation has
+     been improved .
+
+  o  IRAF2NDF --  This has undergone a major upgrade with support for
+     axis propagation from eleven variants, control of the
+     creation of NDF HISTORY records and FITS extension from the
+     headers in the file.  The documentation has been corrected and
+     improved.
+
+  o  NDF2ASCII --  Reduced the maximum record length to 512 bytes.
+     The default RECLEN is 132.
+
+  o  NDF2DST --  Moves imaginary component of a complex array to
+     .Z.IMAGINARY.  There is a simplified error message when the
+     FITS file already exists.
+
+     There was a bug, now fixed, which could result in .OBS and .Z
+     structures of the FIGARO extension being lost.  This occurred
+     when FIGARO extension components SECZ or TIME (for OBS), and
+     MAGFLAG or RANGE (for Z) were present and were physically
+     stored following their respective structure.
+
+  o  NDF2FITS -- BITPIX=-1 is allowed to enable the original FITS
+     data type to be restored during automatic conversion.  NDF2FITS
+     use a better algorithm to decide the required precision of
+     floating-point header values.
+
+     Sensible defaults are used for the scale and offset when
+     converting a constant floating-point array to an integer array
+     in the FITS file.
+
+     Extensions within 2dF NDFs are recognised, and appropriate
+     binary tables are created in the FITS file.
+
+  o  NDF2GIF -- It is now available for alpha_OSF1.
+
+  o  NDF2IRAF --  This has undergone a major upgrade with support for
+     axis propagation including a multispec format for non-linear
+     axis centres.  There is control of the export of NDF HISTORY
+     records and FITS extension information to the headers in the
+     IRAF file.  Header duplication is prevented.  The documentation
+     has been corrected and improved.  Parameter FILLBAD defaults to
+     0.  IRAF filenames are no longer converted to lowercase.
+
+  o  TIFF2NDF --  Removed KAPPA dependency.  It uses one less
+     conversion stage, so is more efficient.  It is now available for
+     alpha_OSF1.  Improved the documentation.
+
