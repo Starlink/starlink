@@ -56,7 +56,7 @@ to the appendices.  Generally tidying up for release.
 <distribution string="DR-0.3" date="15-JUN-1999" author="ng">
 More substantial release, CD candidate.
 
-<change date="22-JUN-1999">
+<change date="22-JUN-1999" versionid="post-0.3">
 Assorted tweaks, introduced since the release.
 </change>
 
@@ -2332,6 +2332,10 @@ id=appx.system.paramdsssl>).
 <sect id=final export>Finally
 
 <subsect id=final.development export>Further developments
+<update versionid="post-0.3">
+Added extended Oasis table support to the wish list.
+</update>
+
 
 <p>What's next?  This section contains rather miscellaneous ideas for
 further work.  They're ordered from most to least work, but on the
@@ -2357,7 +2361,13 @@ to support this and more in the SGML set.  This would involve
 finding a suitable SGML-aware search engine.  The <webref
 url="http://info.ox.ac.uk/bnc/sara/" >BNC's SARA server</webref> might
 be a possibility: I think it's free, but I haven't yet investigated
-the extent to which it's specific to the BNC, or to its windows client.
+the extent to which it's specific to the BNC, or to its windows
+client.
+
+<dt>Table support
+<dd>I'd like to support more of the Oasis table subset (see <ref
+id=str.tables>).  I can add support incrementally, as folk suggest
+priorities.
 
 <dt>CSS stylesheets
 <dd>At present, the formatting is controlled by the parameters file.
