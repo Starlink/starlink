@@ -40,7 +40,7 @@ done
 
 if [ -z "$KPW" ]; then
     echo "Couldn't find kpsewhich in $PATH"
-    exit 1
+#    exit 1
 fi
 
 # Force the output filename, and set what file we expect to be generated
@@ -117,20 +117,27 @@ else
 	    awk '/^Q[fF]/{printf "%s.%spk",$2,$3; exit}'`
 	echo
 	echo "Looking for font $fontname..."
-	fontnamepath=`$KPW pk $fontname`
-	if [ -n "$fontnamepath" ]; then
-	    echo
-	    echo "Found font $fontname in"
-	    echo "  " $fontnamepath
-	    echo "Good."
+	if test -n "$KPW"; then
+	    fontnamepath=`$KPW pk $fontname`
+	    if [ -n "$fontnamepath" ]; then
+		echo
+		echo "Found font $fontname in"
+		echo "  " $fontnamepath
+		echo "Good."
+	    else
+		echo "I thought I'd generated font $fontname,"
+		echo "but I (or rather kpsewhich) can't find it anywhere."
+		echo "This is most puzzling."
+		echo "Did the font-generation above work?"
+		echo "If it did work, why doesn't kpsewhich find the generated fonts?"
+		echo "There may be some problem with your TeX setup."
+		exit 1
+	    fi
 	else
-	    echo "I thought I'd generated font $fontname,"
-	    echo "but I (or rather kpsewhich) can't find it anywhere."
-	    echo "This is most puzzling."
-	    echo "Did the font-generation above work?"
-	    echo "If it did work, why doesn't kpsewhich find the generated fonts?"
-	    echo "There may be some problem with your TeX setup."
-	    exit 1
+	    # Couldn't find kpsewhich
+	    echo "dvi2bitmap appeared to work, but I can't find the"
+	    echo "application kpsewhich, so I have no way of verifying"
+	    echo "that the required font was in fact generated"
 	fi
 
 	d2bpkpath=`echo $fontnamepath | sed 's+/[^/]*$++'`
@@ -159,9 +166,10 @@ else
 	echo "Both use of the kpathsea library, and font-generation"
 	echo "are disabled."
 	if [ -s $tfile ]; then
-	    echo "For dvi2bitmap to work, you need to (somehow)"
+	    echo "For dvi2bitmap to work, you need to"
 	    echo "generate the following fonts:"
-	    awk '{printf "%s.%spk\n", $2, $3}' $tfile
+	    awk '{printf "  %s.%spk\n", $2, $3}' $tfile
+	    echo "perhaps using the mktexpk, MakeTeXPK or similar script".
 	    echo "Then point dvi2bitmap to the directory containing"
 	    echo "those fonts, using either the environment variable"
 	    echo "DVI2BITMAP_PK_PATH, or the --font-search=path option."
