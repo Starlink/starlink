@@ -78,7 +78,7 @@
       CHARACTER * ( * ) PNTIT
       INTEGER NDIM
       INTEGER DIMS( NDIM )
-      <TYPE> ARRAY
+      <TYPE> ARRAY( * )
       LOGICAL NULL
 
 *  Status:
