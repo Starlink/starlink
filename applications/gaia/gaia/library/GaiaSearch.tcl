@@ -393,7 +393,11 @@ itcl::class gaia::GaiaSearch {
          set notset 1
       }
 
-      set list [$astrocat_ query -id [file tail $filename]]
+      #  Catch problems with corrupted history files.
+      set list ""
+      catch {
+         set list [$astrocat_ query -id [file tail $filename]]
+      }
       if {[llength $list] == 0} {
          # not in catalog
          set notset 1
