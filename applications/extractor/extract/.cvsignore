@@ -19,5 +19,4 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
 config.h
