@@ -21,6 +21,9 @@
 #        Generated IFD file from IFL file.
 #     11-OCT-2000 (MBT):
 #        Modified to accommodate change from IDI to Tcl GUI.
+#     5-APR-2001 (MBT):
+#        Changed parameters around a fair bit, partly to accomodate Set
+#        upgrade.
 #     {enter_changes_here}
 
 #-
@@ -40,6 +43,7 @@
 
          parameter in {
                        # Single input group
+            position 1
             type LITERAL
             access READ
             repeated
@@ -123,6 +127,47 @@
             ppath CURRENT DEFAULT
             default {}
             prompt {String giving style of markers to plot}
+            helpkey *
+         }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_useset
+            default TRUE
+            prompt "Group lists by Set membership?[ccd_global]"
+            helpkey *
+         }
+
+         parameter extras {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Input extra frames in same sky position as IN list?}
+            helpkey *
+         }
+
+         parameter more {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            default !
+            prompt {Additional frames in the same position}
+            helpkey *
+         }
+
+         parameter refndf {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Additional reference frame}
             helpkey *
          }
 
