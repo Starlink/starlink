@@ -8,4 +8,6 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 # and distribute, the fac_nnn_err file.  This is done as a side-effect
 # of the declaration of *_MESSAGES, and the SAE_ERR file which is thus
 # generated is not used not installed.
-noinst_MESSAGES = SAE_ERR
+noinst_MESSAGES = SAI_ERR
+# The facility code within sae_err.msg is SAI, not the default.
+SAI_ERR_SOURCES = sae_err.msg
