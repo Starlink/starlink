@@ -2934,25 +2934,32 @@ c        INTEGER STATUS
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-      I1=I_NX
-      I2=1
-      J1=I_NY
-      J2=1
-      DO J=1,I_NY
-        DO I=1,I_NX
-          IF (REG(I,J).EQ.'01'X) THEN
-            I1=MIN(I1,I)
-            I2=MAX(I2,I)
-            J1=MIN(J1,J)
-            J2=MAX(J2,J)
-          ENDIF
-        ENDDO
-      ENDDO
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
+          I_IX1=1
+          I_IX2=I_NX
+          I_IY1=1
+          I_IY2=I_NY
+        ELSE
+          I1=I_NX
+          I2=1
+          J1=I_NY
+          J2=1
+          DO J=1,I_NY
+            DO I=1,I_NX
+              IF (REG(I,J).EQ.'01'X) THEN
+                I1=MIN(I1,I)
+                I2=MAX(I2,I)
+                J1=MIN(J1,J)
+                J2=MAX(J2,J)
+              ENDIF
+            ENDDO
+          ENDDO
+          I_IX1=I1
+          I_IX2=I2
+          I_IY1=J1
+          I_IY2=J2
 
-      I_IX1=I1
-      I_IX2=I2
-      I_IY1=J1
-      I_IY2=J2
+        ENDIF
 
       ENDIF
 
