@@ -91,11 +91,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'BDI_CMN'                                 ! BDI common block
-*       BDI_INIT = LOGICAL (given)
-*         BDI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID, NDIM, DIMS(*)
@@ -105,7 +101,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			BDI0_BLK		! Ensures inclusion
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
 
 *  Local Variables:
       INTEGER			C1, C2			! Character pointers
@@ -120,7 +117,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( BDI__PKG ) ) CALL BDI0_INIT( STATUS )
 
 *  Second is the linked file object
       CALL ADI_GETLINK( ID, LID, STATUS )

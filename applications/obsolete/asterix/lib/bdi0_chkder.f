@@ -17,9 +17,9 @@
 *     be of class Slice, or be a primitive numeric type.
 
 *  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
+*     ID = INTEGER (given)
+*        ADI identifier of object to be checked
+*     STATUS = INTEGER (given and returned)
 *        The global status.
 
 *  Examples:
@@ -82,11 +82,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'BDI_CMN'                                 ! BDI common block
-*       BDI_INIT = LOGICAL (given)
-*         BDI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID
@@ -95,14 +91,15 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			BDI0_BLK		! Ensures inclusion
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( BDI__PKG ) ) CALL BDI0_INIT( STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI0_CHKDER', STATUS )
