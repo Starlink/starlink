@@ -51,9 +51,15 @@ $!    1992 September 30 (MJC):
 $!       Used options file to reduce size of executables.
 $!    1993 July 30 (MJC):
 $!       Link with FIO explicitly, and released PAR library.
+$!    1993 August 21 (MJC):
+$!       Extract the monolith object module.
 $!    {enter_further_changes_here}
 $!
 $!-
+$!
+$!  Extract the module for monolith.
+$!
+$ LIBRARY/EXTRACT=CONVERT/OUTPUT=CONVERT CONVERT_DIR:CONVERT
 $!
 $!  Just link the top-level routine into all the relevant libraries
 $!  using the Adam command MLINK.
