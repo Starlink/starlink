@@ -102,7 +102,7 @@
           ELSEIF (MODE.EQ.'BOX') THEN
             CALL IREGION_BOX(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'POL') THEN
-            CALL IREGION_POLYGON(EXCLUDE,STATUS)
+            CALL IREGION_POLYGON(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ANN') THEN
             CALL IREGION_ANNULUS(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ELL') THEN
@@ -488,7 +488,7 @@
 
 
 *+
-      SUBROUTINE IREGION_POLYGON(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_POLYGON(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -503,23 +503,76 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
       INTEGER NVMAX
       PARAMETER (NVMAX=100)
 *    Local variables :
+      CHARACTER*80 TEXT
       REAL XV(NVMAX),YV(NVMAX)
       INTEGER NV
+      INTEGER L
+      INTEGER I
+      INTEGER NPAIR
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL IMG_GETPOLY(NVMAX,XV,YV,NV,STATUS)
         CALL IMG_SETPOLY(NV,XV,YV,EXCLUDE,STATUS)
+
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
+        ELSE
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (POLYGON( '
+        ELSE
+          TEXT(L:)=' POLYGON( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+        TEXT = ' '
+        L = 1
+        NPAIR=0
+
+
+        DO I=1,NV
+
+*  write each vertex allowing for line continuation
+          NPAIR=NPAIR+1
+          CALL MSG_SETR( 'X', X)
+          CALL MSG_SETR( 'Y', Y)
+          CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
+          IF (NPAIR.EQ.3.AND.I.LT.NV) THEN
+            CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+            TEXT = ' '
+            L = 1
+            NPAIR=0
+          ENDIF
+
+
+        ENDDO
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)='))'
+          L=L+1
+        ELSE
+          TEXT(L:L)=')'
+        ENDIF
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -831,19 +884,15 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER MPTR
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL DYN_MAPI(1,I_NX*I_NY,MPTR,STATUS)
-        CALL ARR_INIT1I(0.0,I_NX*I_NY,%val(MPTR),STATUS)
-        CALL IMG_GETARD('TEXT',%val(MPTR),STATUS)
-        CALL IMG_SETARD(%val(MPTR),EXCLUDE,STATUS)
-        CALL DYN_UNMAP(MPTR,STATUS)
+        CALL ARX_RESET(I_ARD_ID,STATUS)
+        CALL ARX_READ('TEXT',I_ARD_ID,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IREGION_ARD',STATUS)
+          CALL ERR_REP(' ','from IREGION_IMPORT',STATUS)
         ENDIF
 
       ENDIF
