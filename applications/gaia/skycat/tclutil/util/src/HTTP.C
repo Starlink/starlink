@@ -695,8 +695,6 @@ int HTTP::get(const char* url)
 
     // add newline after request and null terminate
     os << endl << ends;
-    cerr << "Sending request:" << endl;
-    cerr << req << endl;
 
     // send the request
     int n = strlen(req);
