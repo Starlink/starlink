@@ -126,6 +126,8 @@
 *        Added fast median.
 *     9-SEP-2002 (DSB):
 *        Added unweighted mean method.
+*     1-NOV-2002 (DSB):
+*        Added workspace argument to CCD1_ORVAR.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -169,6 +171,8 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Variables:
+      INTEGER IPW1               ! Work space pointer
 *.
 
 *  Check inherited global status.
@@ -179,7 +183,10 @@
 *  This also sets up the scale factor for converting mean variances to
 *  median variances.
       IF( IMETH .NE. 1 .AND. IMETH .NE. 2 ) THEN
-          CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, STATUS )
+          CALL PSX_CALLOC( NLINES*NLINES, '_DOUBLE', IPW1, STATUS )
+          CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, %VAL( IPW1 ), 
+     :                     STATUS )
+          CALL PSX_FREE( IPW1, STATUS )
       END IF
 
 *  Now branch for each method.

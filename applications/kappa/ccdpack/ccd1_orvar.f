@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_ORVAR( NSET, NBIG, PP, VEC, STATUS )
+      SUBROUTINE CCD1_ORVAR( NSET, NBIG, PP, VEC, MATRIX, STATUS )
 *+
 *  Name:
 *     CCD1_ORVAR
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_ORVAR( NSET, NBIG, PP, VEC, STATUS )
+*     CALL CCD1_ORVAR( NSET, NBIG, PP, VEC, MATRIX, STATUS )
 
 *  Description:
 *     The routine returns the variances and covariances of the order
@@ -37,6 +37,8 @@
 *        matrix packed by columns. Each triangle is packed into a
 *        single row. For each row element Vij is stored in
 *        VEC(i+j*(j-1)/2), for 1<=i<=j<=nset.
+*     MATRIX( NSET, NSET ) = DOUBLE PRECISION (Returned)
+*        Work space.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -46,8 +48,6 @@
 *     need to sum all the variances and twice the covariances and use
 *     these to modify the actual variance of the (unordered) data.
 *
-*     - It is assumed that NSET cannot be any larger than CCD1__MXNDF.    
-
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -68,6 +68,9 @@
 *        Added check for normal scores with a population of 2. 
 *        The second score isn't calculated as it is the negative
 *        of the first score.
+*     1-NOV-2002 (DSB):
+*        Add MATRIX workspace argument in order to remove limit that NSET 
+*        be no bigger than CCD1__MXNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION VEC( NBIG, NSET)
+      DOUBLE PRECISION MATRIX( NSET, NSET )
 
 *  Local Constants:
       DOUBLE PRECISION PIBY2
@@ -101,7 +105,6 @@
       EXTERNAL PDA_V11
 
 *  Local Variables:
-      DOUBLE PRECISION MATRIX( CCD1__MXNDF, CCD1__MXNDF ) ! Workspace
       DOUBLE PRECISION SUMSQ    ! Sum of squares
       DOUBLE PRECISION V11      ! Value of extreme variance (1,1)
       INTEGER I, J, K, L        ! Loop variables
@@ -136,7 +139,7 @@
 
 *  Get the covariance matrix for I*I.
             V11 = PDA_V11( I, IFAIL )
-            CALL PDA_COVMAT( MATRIX, I, CCD1__MXNDF, V11, PP( 1 ), 
+            CALL PDA_COVMAT( MATRIX, I, NSET, V11, PP( 1 ), 
      :                       PP( 2 ), SUMSQ, IFAIL)
 
 *  Now pack this into the output matrix in the form recognised by other
