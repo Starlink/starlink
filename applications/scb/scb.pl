@@ -182,41 +182,34 @@ error $usage if (%$rflag);
 $name     = $rarg->{'name'}     || '';
 $package  = $rarg->{'package'}  || '';
 $type     = $rarg->{'type'}     || '';
-$indexdir = $rarg->{'indexdir'} || '';
+$indexdir = $rarg->{'indexdir'} || $indexdir;
 
-#  If the indexdir parameter is specified, then indexes need to be read
-#  from a directory other than the default.
+#  Add specification of index directory to the retained arguments if it
+#  is not the default.
 
-if ($indexdir) {
+$retained{'indexdir'} = $rarg->{'indexdir'} if ($rarg->{'indexdir'});
 
 #  Set the basic href used for constructing hyperlinks to source files
-#  to include specification of the new index, so that it is inherited
-#  by files linked from this one.
+#  to include retained arguments, so that they are inherited by files 
+#  linked from this one.
 
-   $scb .= "indexdir=$indexdir&amp;";
-
-#  Some of the file location variables set in Scb.pm must be changed.
-#  Since Scb.pm is executed at compile time by the 'use' declaration,
-#  its execution cannot be deferred until $indexdir has been evaluated.
-#  Instead we execute it again here, but using 'do' which is a runtime
-#  command.  Executing it twice is rather inelegant, but the extra time
-#  taken should be minimal.  To prevent unwanted messages about 
-#  redefining functions, the $^W variable is temporarily unset.
-
-   $ENV{'SCB_INDEX'} = $indexdir;
-   local $^W = 0;
-   do 'Scb.pm';
+my ($key, $value);
+while (($key, $value) = each %retained) {
+   $scb .= "$key=$value" . '&amp;';
 }
 
 #  Initialise index objects containing locations of functions and files.
 
-$func_index = StarIndex->new($func_indexfile, 'read');
-$file_index = StarIndex->new($file_indexfile, 'read');
+my $iname;
+foreach $iname (@indexes) {
+   $index{$iname} = StarIndex->new("$indexdir/$iname", "read");
+}
 
 #  Read list of packages and tasks if it will be required.
 
 if (!$name || $type eq 'regex') {
    my $pack;
+   my $taskfile = "$indexdir/tasks";
    open TASKS, $taskfile or error "Failed to open $taskfile\n";
    while (<TASKS>) {
       ($pack, @tasks) = split;
@@ -252,9 +245,7 @@ if ($name && $type ne 'regex') {
 
    my $success = 0;
    my ($t, $n);
-   my @types = $type ? ($type) 
-                     : ($name =~ /\./ ? qw/file func/
-                                      : qw/func file/);
+   my @types = $type ? ($type) : @indexes;
    foreach $t (@types) {
       my @names = ($name);
       unless ($exact) {
@@ -275,7 +266,7 @@ if ($name && $type ne 'regex') {
          "This may be a result of a deficiency in the source
           code indexing program, or because the module you
           requested doesn't exist, or because the index 
-          database <code>$func_indexfile</code> has become out of date.";
+          databases in <code>$indexdir</code> have become out of date.";
    }
 }
 elsif ($name && $type eq 'regex') {
@@ -501,6 +492,13 @@ sub query_form {
       <form method=GET action='$self'>
    ";
 
+#  Record retained arguments so they are inherited by subsequent invocations.
+
+   my ($key, $value);
+   while (($key, $value) = each %retained) {
+      print "<input type=hidden name='$key' value='$value'>\n";
+   }
+
 #  Print query box for module.
 
    hprint "
@@ -509,24 +507,27 @@ sub query_form {
       <br>
    ";
 
-#  Print query box for type.
+#  Print radio buttons for type.
 
    my %radio;
-   $radio{'func'}  = "<input type=radio name=type value='func'>";
-   $radio{'file'}  = "<input type=radio name=type value='file'>";
-   $radio{''}      = "<input type=radio name=type value=''>";
-   $radio{'regex'} = "<input type=radio name=type value='regex'>";
+   my $iname;
+   foreach $iname (@indexes) {
+      my $textname = {func => "Routine", 
+                      file => "File"}->{$iname} || $iname;
+      $radio{$iname} = "<input type=radio name=type value='$iname'>"
+                     . "&nbsp;$textname";
+   }
+   $radio{''}      = "<input type=radio name=type value=''>"
+                   . "&nbsp;Either";
+   $radio{'regex'} = "<input type=radio name=type value='regex'>"
+                   . "&nbsp;Search&nbsp;term";
    $radio{$type} =~ s/>/ checked>/;
-   hprint "
-      Type of item:
-         $radio{'func'}&nbsp;Routine
-         $radio{'file'}&nbsp;File
-         $radio{''}&nbsp;Either
-         $radio{'regex'}&nbsp;Search&nbsp;term
-      <br>
-   ";
 
-#  Print query box for package.
+   print "Type of item:\n";
+   print join "\n", @radio{(@indexes, '', 'regex')};
+   print "\n<br>\n";
+
+#  Print select list for package.
 
    my $selected = $package ? '' : ' selected';
    hprint "
@@ -624,12 +625,12 @@ sub package_list {
 #     which tar file they are included in if that is preferred.
 
       my (%files, $file, $tarfile, $suffix);
-      while (($file, $loc) = $file_index->each($package)) {
+      while (($file, $loc) = $index{'file'}->each($package)) {
          $suffix = $tarfile = '';
          $suffix = $1 if ($file =~ m%(\.[^/>#]+)$%);
          push @{$files{$suffix}}, $file;  
 
-         # Could do this to group them by tarfile instaed if you wanted.
+         # Could do this to group them by tarfile instead if you wanted.
          # $tarfile = $1 if ($loc =~ m%([^/>#]+.tar)(?:\.[^/>#]*)?>[^/>#]+$%);
          # push @{$files{$tarfile}}, $file;
       }
@@ -696,7 +697,7 @@ sub package_list {
 
          hprint "
             <hr>
-            <a name='func'>
+            <a name='func'></a>
             <h3>Routines in package <b>$package</b>:</h3> 
          ";
 
@@ -705,7 +706,7 @@ sub package_list {
 
          my $loc;
          my (%modules, $mod, $prefix);
-         while (($mod, $loc) = $func_index->each($package)) {
+         while (($mod, $loc) = $index{'func'}->each($package)) {
             $prefix = '';
             $prefix = $1 if ($mod =~ /^([^_]*_)./);
             push @{$modules{$prefix}}, $mod;
@@ -751,7 +752,7 @@ sub package_list {
 
          hprint "
             <hr>
-            <a name='file'>
+            <a name='file'></a>
             <h3>Files in package <b>$package</b>:</h3>
          ";
 
@@ -856,15 +857,15 @@ sub search_keys {
 #  Initialise local variables.
 
    my (%match);
-   my ($name, $loc, $pack, $index, $indtext);
+   my ($name, $loc, $pack, $iname, $indtext);
 
 #  Find matching index entries.
 
-   foreach $index (qw/file func/) {
-      while (($name, $loc) = ${$index . '_index'}->each($package)) {
-         if ($name =~ m'$regex'io) {
+   foreach $iname (@indexes) {
+      while (($name, $loc) = $index{$iname}->each($package)) {
+         if ($name =~ m/$regex/io) {
             $pack = starpack $loc;
-            $match{$index}{$pack}{$name} = $loc;
+            $match{$iname}{$pack}{$name} = $loc;
          }
       }
    }
@@ -881,28 +882,28 @@ sub search_keys {
 
 #     Print list of matching index entries by index type and package.
 
-      foreach $index (sort keys %match) {
-         $indtext = {func => 'Routines', file => 'Files'}->{$index};
+      foreach $iname (sort keys %match) {
+         $indtext = {func => 'Routines', file => 'Files'}->{$iname};
          if ($html) {
             print "\n<h3>$indtext:</h3>\n";
          }
          else {
             print "\n$indtext:\n";
          }
-         foreach $pack (sort keys %{$match{$index}}) {
+         foreach $pack (sort keys %{$match{$iname}}) {
             print "<h4>$pack</h4>\n" if ($html && !$package);
-            foreach $name (sort keys %{$match{$index}{$pack}}) {
-               $loc = $match{$index}{$pack}{$name};
+            foreach $name (sort keys %{$match{$iname}{$pack}}) {
+               $loc = $match{$iname}{$pack}{$name};
                if ($html) {
-                  if ($index eq 'file') {
+                  if ($iname eq 'func') {
                      print
-                        "<a href='${scb}$name&$package&$type=file'>",
+                        "<a href='${scb}$name&$package&$type=func#$name'>",
                         "$name</a>",
                         "<br>\n";
                   }
-                  elsif ($index eq 'func') {
+                  else {
                      print
-                        "<a href='${scb}$name&$package&$type=func#$name'>",
+                        "<a href='${scb}$name&$package&$type=iname'>",
                         "$name</a>",
                         "<br>\n";
                   }
@@ -952,26 +953,6 @@ sub regex_validate {
 #     This routine checks that Perl thinks a regular expression is correct.
 #     If so, no action is taken.
 #     If not, the error() routine is called to give an informative error.
-#
-#     As well as correctness, the expression must be checked for security
-#     reasons.  In order to assess whether it matches the keys, a string
-#     like "$key =~ m%$regex%" must be executed.  This expression must not
-#     be allowed to execute arbitrary Perl code (like, for instance 
-#     'system "cat /etc/passwd";').
-#     Two things which could cause this are the following: interpolation
-#     of references, like:
-#
-#        $key =~ m%   @{[system "cat /etc/passwd"]};    %;
-#
-#     and inclusion of the delimiter character in the pattern, like:
-#
-#        $key =~ m%   %; system "cat /etc/passwd"; m%   %;
-#
-#     We defeat the first case by using the single quote character "'" as
-#     delimiter, which blocks any variable interpolation, and the second
-#     case by refusing any regular expression which contains the delimiter.
-#     Neither of these restrictions is likely to prevent legitimate
-#     attempts to match files or functions.
 
 #  Arguments:
 #     $regex = string.
@@ -1002,31 +983,15 @@ sub regex_validate {
 
    my $regex = shift;
 
-#  Prepare regular expression in a printable form.
+#  Evaluate the regular expression, and report if it generates an error.
 
-   my $prregex = $html ? demeta ($regex) : $regex;
-
-#  Evaluate the regular expression, and return if it generates no error.
-#  By using the single quote character "'" as delimiter, any variable
-#  interpolation into the regular expression is blocked.
-
-   my $delimiter = "'";
-
-#  Disallow tricky expressions containing the delimiter.
-
-   if (index ($regex, $delimiter) >= 0) {
-      error "Disallowed regular expression '$prregex'",
-         'You may not use the character "' . $delimiter . 
-         '" in the regular expression';
-   }
-
-#  Try out the regular expression to see if it generates an error.
-
-   my $evalstr = 'my $dummy = ""; $dummy =~ ';
-   $evalstr .= "m" . $delimiter . $regex . $delimiter;
-   eval $evalstr;
+   eval { "" =~ /$regex/ };
 
    if ($@) {
+
+#     Prepare regular expression in a printable form.
+
+      my $prregex = $html ? demeta ($regex) : $regex;
 
 #     Call error reporting routine.
 
@@ -1124,8 +1089,7 @@ sub get_module {
 
 #  Arguments:
 #     $type = string.
-#        Indicates the index to search.  'func' means  func_index, 
-#        and 'file' means file_index.
+#        Indicates the index to search.
 #     $name = string.
 #        Key in index.
 #     $package = string.
@@ -1160,13 +1124,7 @@ sub get_module {
 
 #  Get logical path name from database.  $locname is a global variable.
 
-   $locname = undef;
-   if ($type eq 'func') {
-      $locname = $func_index->get($name, packpref => $package);
-   }
-   elsif ($type eq 'file') {
-      $locname = $file_index->get($name, packpref => $package);
-   }
+   $locname = $index{$type}->get($name, packpref => $package);
 
 #  Return with fail status if no item of the requested name is indexed.
 
@@ -1185,7 +1143,7 @@ sub get_module {
    ($head, $tail) = ($1, $2);
 
    my ($file, $tarfile, $dir, $loc);
-   if ($loc = $file_index->get("$head#")) {
+   if ($loc = $index{'file'}->get("$head#")) {
       $file = ($loc =~ m%\.tar[^/>#]*$%) ? "$loc>$tail" : "$loc/$tail";
    }
    elsif (-d "$srcdir/$head") {
@@ -1199,7 +1157,7 @@ sub get_module {
    }
    else {
       error "Failed to interpret location $locname\n",
-         "Probably the index file is outdated or corrupted.\n";
+         "Probably the indexes in $indexdir are outdated or corrupted.\n";
    }
 
 #  Extract file from logical path.
@@ -1395,7 +1353,7 @@ sub output {
 
    open FILE, $file 
       or error "Failed to open $file\n",
-         "Probably the index file $func_indexfile is outdated or corrupted.\n";
+         "Probably the index files in $indexdir are outdated or corrupted.\n";
 
 #  In command line mode, print location of file to standard error.
 
@@ -1439,10 +1397,10 @@ sub output {
 
                            my $file = $1;
                            if ($file =~ /^[A-Z0-9_.-]*$/ && 
-                              !$file_index->get($file)) {
+                              !$index{'file'}->get($file)) {
                               $file =~ tr/A-Z/a-z/;
                            }
-                           if ($file_index->get($file)) {
+                           if ($index{'file'}->get($file)) {
                               $href = "${scb}$file&amp;$package&amp;type=file";
                            }
                         }
@@ -1450,7 +1408,7 @@ sub output {
 
 #                          Function reference: generate a type=func reference.
 
-                           $loc = $func_index->get($name);
+                           $loc = $index{'func'}->get($name);
                            if ($loc) {
                               if (index ($loc, $locname) >= 0) {
                                  $href = "#$name";
@@ -1949,7 +1907,7 @@ sub getdoctitles {
 
    while (<DOCSLIS>) {
       $doctype = (split)[0] || '';
-      if ($doctype =~ /^(SC|SG|SGP|SSN|SUN)$/) {
+      if ($doctype =~ /^(SC|SG|SGP|SSN|SUN|MUD)$/) {
 
 #        Lines in this stanza each describe a single document.  Field
 #        zero is of the form "document_number.revision_number", and 
@@ -2191,5 +2149,5 @@ sub hprint {
 
    print;
 }
-# $Id$
+
 # $Id$
