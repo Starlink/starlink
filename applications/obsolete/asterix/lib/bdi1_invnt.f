@@ -139,6 +139,8 @@
       CHARACTER*(DAT__SZLOC)	MLOC			! Quality mask
       CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
 
+      REAL			ASCALE			! Axis scale
+
       INTEGER			IAX			! Axis number
       INTEGER			IERR, NERR		! Error info from VEC_
       INTEGER			NELM			! # invented elements
@@ -150,6 +152,7 @@
       BYTE			MASK			! Quality mask
 
       LOGICAL			RMODE			! READ mode?
+      LOGICAL			STHERE			! Axis scale defined?
       LOGICAL			WMODE			! WRITE mode?
 *.
 
@@ -549,19 +552,37 @@
 *        Locate the BDI private storage for the item, creating if required
             CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
-*        Map it
-            CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
-     :                        PSID, PTR, NELM, STATUS )
+*        Is width defined by array type?
+            CALL DAT_TYPE( CLOC, TYPE, STATUS )
+            STHERE = .FALSE.
+            IF ( TYPE .EQ. 'ARRAY' ) THEN
+              CALL DAT_THERE( CLOC, 'SCALE', STHERE, STATUS )
+              IF ( STHERE ) THEN
+                CALL CMP_GET0R( CLOC, 'SCALE', ASCALE, STATUS )
+              END IF
+            END IF
 
 *        Create dynamic array
             CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
             CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
+*        Scalar width present?
+            IF ( STHERE ) THEN
+              CALL ARR_INIT1R( ASCALE, NELM, %VAL(WPTR), STATUS )
+
 *        Convert to values to half-widths
-            CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+            ELSE
+
+*          Map it
+              CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
+     :                          PSID, PTR, NELM, STATUS )
+              CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR),
+     :                              STATUS )
+              CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+
+            END IF
 
 *        Free mapped data
-            CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
             CALL ADI_UNMAP( ITID, WPTR, STATUS )
 
           END IF
@@ -1050,10 +1071,14 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Convert values to half-widths
-      DO I = 1, NVAL-1
-        HWIDTH(I) = ABS(VALUE(I+1)-VALUE(I))/2.0
-      END DO
-      HWIDTH(NVAL) = HWIDTH(NVAL-1)
+      IF ( NVAL .EQ. 1 ) THEN
+        DO I = 1, NVAL-1
+          HWIDTH(I) = ABS(VALUE(I+1)-VALUE(I))/2.0
+        END DO
+        HWIDTH(NVAL) = HWIDTH(NVAL-1)
+      ELSE
+        HWIDTH(NVAL) = 0.0
+      END IF
 
       END
 
