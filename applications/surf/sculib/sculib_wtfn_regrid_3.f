@@ -36,7 +36,7 @@
 *        the convolution sum for each output pixel.
 *     CONV_VARIANCE_SUM (NI,NJ)      = REAL (Given and returned)
 *        the convolved variance sum for each output pixel.
-*     CONV_QUALITY_SUM (NI,NJ)       = INTEGER (Given)
+*     CONV_QUALITY_SUM (NI,NJ)       = BYTE (Given)
 *        the quality on the convolution sum for each output pixel.
 *     CONV_WEIGHT (NI,NJ)            = REAL (Given and returned)
 *        the convolution weight for each output pixel.
@@ -70,7 +70,7 @@
 *  Arguments Returned:
       REAL CONV_DATA_SUM (NI, NJ)
       REAL CONV_VARIANCE_SUM (NI, NJ)
-      INTEGER CONV_QUALITY_SUM (NI, NJ)
+      BYTE CONV_QUALITY_SUM (NI, NJ)
       REAL CONV_WEIGHT (NI, NJ)
 
 *  Status:
