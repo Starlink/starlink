@@ -1,8 +1,28 @@
 \documentclass[twoside,11pt]{article}
-\usepackage{epsfig}
-\usepackage{rotating}
 
-%%%\documentstyle[11pt,psfig]{article}
+\usepackage{graphicx}
+%%\usepackage[draft]{graphicx}
+
+% +
+%  Name:
+%     sun216.tex
+%
+%  Purpose:
+%     SUN documentation for SURF (SUN/216)
+%
+%  Authors:
+%     Tim Jenness (JACH)
+%
+%  History:
+%     1997-1998 (TIMJ)
+%        Original versions
+%     1998 November 15th (TIMJ)
+%        Modify for release 1.3 of SURF   
+%     {Add further history here}
+%
+% -
+
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -14,12 +34,12 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {216.3}
+\newcommand{\stardocnumber}    {216.4}
 \newcommand{\stardocauthors}   {T. Jenness, J.~F. Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {15 June 1998}
+\newcommand{\stardocdate}      {15 November 1998}
 \newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
-\newcommand{\stardocversion}   {1.2}
+\newcommand{\stardocversion}   {1.3}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {%
 \scusoft\ is a set of ADAM tasks necessary for reducing demodulated 
@@ -51,6 +71,7 @@ descriptions of each task.
 \newcommand{\param}[1]{{\tt #1}}
 
 % Common tasks
+\newcommand{\renoise}{\htmlref{\task{reduce\_noise}}{REDUCE_NOISE}}
 \newcommand{\rebin}{\htmlref{\task{rebin}}{REBIN}}
 \newcommand{\bolrebin}{\htmlref{\task{bolrebin}}{BOLREBIN}}
 \newcommand{\intrebin}{\htmlref{\task{intrebin}}{INTREBIN}}
@@ -121,7 +142,7 @@ descriptions of each task.
 \newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
 \newcommand{\wdfits}{\xref{\task{wdfits}}{sun86}{WDFITS}}
 \newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
-\newcommand{\clean}{\xref{\task{clean}}{sun86}{CLEAN}}
+\newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
 \newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
 \newcommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
@@ -150,7 +171,32 @@ descriptions of each task.
 
 \newcommand{\text}[1]{{\small \tt #1}}
 
-% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     {Add further history here}
+%
+% -
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markboth{\stardocname}{\stardocname}
@@ -179,9 +225,9 @@ descriptions of each task.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
-%  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -216,7 +262,6 @@ descriptions of each task.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -227,30 +272,31 @@ descriptions of each task.
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -263,30 +309,287 @@ descriptions of each task.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+
+
+
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
 \renewcommand{\thepage}{\roman{page}}
-
-% quickdes For HTML
-\begin{htmlonly}
-\renewcommand{\quickdes}[3]{ \item[\htmlref{#1}{#1}:] {#2}}
-\end{htmlonly}
-
-
-
-%%%% START 
-
 \begin{document}
 \thispagestyle{empty}
+
+
 
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -298,18 +601,22 @@ descriptions of each task.
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   \epsfig{file=sun216_logo.eps,width=2.0in}
+   \includegraphics[width=2.0in]{sun216_logo.eps}
 
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
+   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\textbf \stardocversion \\ [4ex]}
+   {\Huge\textbf  \stardocmanual}
    \end{center}
    \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
 
 % ? Heading for abstract if used.
    \vspace{10mm}
    \begin{center}
-      {\Large\bf Abstract}
+      {\Large\textbf Abstract}
    \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
@@ -318,19 +625,19 @@ descriptions of each task.
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
       \stardoctitle\\
       \stardocversion\\
       \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-% ? Add picture here if required.
-   \epsfig{width=2.0in,file=sun216_logo.eps}
-
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+\includegraphics[width=2.0in]{sun216_logo.eps}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -354,299 +661,39 @@ descriptions of each task.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
 % ? New section for abstract if used.
-  \section{\xlabel{abstract}Abstract}
+
+  \section{\xlabel{abstract} Abstract }
+
 % ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %  ==================
+
 \stardocabstract
+
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
-   \listoftables
- \end{latexonly}
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 
-% +
-%  Name:
-%     SST.TEX
- 
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
- 
-%  Language:
-%     LaTeX
- 
-%  Type of Module:
-%     LaTeX data file.
- 
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
- 
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
- 
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
- 
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
- 
-%  Bugs:
-%     {note_any_bugs_here}
- 
-% -
- 
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
- 
-%  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
- 
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
- 
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
- 
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
- 
- 
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
- 
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
- 
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
- 
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
- 
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
- 
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
- 
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
- 
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
- 
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
- 
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
- 
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
- 
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
- 
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
- 
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
- 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
- 
-%  sstroutine.
-   \renewcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
- 
-%  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
- 
-%  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
- 
-%  sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
- 
-%  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
- 
-%  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
- 
-%  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
- 
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
- 
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
 
 \section{\xlabel{introduction}Introduction\label{introduction}}
 
@@ -679,7 +726,7 @@ package (note that nested NDFs are used - see Appendix \ref{filenames}).
 \begin{center}
 \begin{figure}
 \hspace*{20mm}
-\epsfig{file=sun216_arrays.eps,width=0.90\textheight,angle=90}
+\includegraphics[width=0.90\textheight,angle=90]{sun216_arrays.eps}
 \caption{The SCUBA arrays}
 \label{arrays}
 \end{figure}
@@ -688,11 +735,12 @@ package (note that nested NDFs are used - see Appendix \ref{filenames}).
 
 \begin{htmlonly}
 \begin{figure}
-\htmlimage{scale=0.65}
-\epsfig{file=sun216_arrays.eps,angle=90,width=3.0in,clip=}
+%%\htmlimage{scale=0.65}
+%%\epsfig{file=sun216_arrays.eps,angle=90,width=3.0in,clip=}
+\includegraphics[scale=0.65]{sun216_arrays.eps}
 \caption{The SCUBA arrays.}
-\end{figure}
 \label{arrays}
+\end{figure}
 
 \end{htmlonly}
 
@@ -948,6 +996,11 @@ This is the main imaging mode for sources which are smaller than the array
 ALIGN, FOCUS and POINTING) are reduced in the same way using \rebin\ to
 make the final image. [info on how a JIGGLE/MAP is taken - reference exposures
 and switches]
+
+\item {\bf NOISE}
+
+This is the mode used to measure the noise behaviour of the array. Data
+are reduced using \renoise. Noise data can be inspected with \scunoise.
 
 \item {\bf PHOTOM}
 
@@ -1422,9 +1475,10 @@ The data reduction process can be automated to a certain extent by using the
 expected by the \scusoft\ tasks.
 
 \begin{figure}
-\htmlimage{scale=0.9}
+%%\htmlimage{scale=0.9}
 \begin{center}
-\epsfig{width=5in,file=sun216_flow_photom.eps}
+%%\epsfig{width=5in,file=sun216_flow_photom.eps}
+\includegraphics[width=5in]{sun216_flow_photom.eps}
 \end{center}
 \caption{The \scusoft\ data reduction flow diagram for PHOTOM
 data. Optional tasks are
@@ -1435,9 +1489,10 @@ path and photometry data can follow the map path if necessary.
 \end{figure}
 
 \begin{figure}
-\htmlimage{scale=0.9}
+%%\htmlimage{scale=0.9}
 \begin{center}
-\epsfig{width=5in,file=sun216_flow_jig.eps}
+%%\epsfig{width=5in,file=sun216_flow_jig.eps}
+\includegraphics[width=5in]{sun216_flow_jig.eps}
 \end{center}
 \caption{The \scusoft\ data reduction flow diagram for Jiggle/map
 data. Optional tasks are
@@ -1448,8 +1503,9 @@ path and photometry data can follow the map path if necessary.
 \end{figure}
 
 \begin{figure}
-\htmlimage{scale=0.9}
-\epsfig{width=\textwidth,file=sun216_flow_scan.eps}
+%%\htmlimage{scale=0.9}
+%%\epsfig{width=\textwidth,file=sun216_flow_scan.eps}
+\includegraphics[width=\textwidth]{sun216_flow_scan.eps}
 \caption{The \scusoft\ data reduction flow diagram for Scan/map
 data. Optional tasks are
 indicated by dashed lines. Tasks annotated with a single asterisk 
@@ -1611,7 +1667,8 @@ SCULIB: fit for filter 850 and sub-instrument LONG_DC
 
 \begin{figure}
 \begin{center}
-\epsfig{width=4.0in,file=sun216_skydip.eps}
+%%\epsfig{width=4.0in,file=sun216_skydip.eps}
+\includegraphics[width=4in]{sun216_skydip.eps}
 \caption{The Skydip result for scan 54. The crosses are the measured
 sky temperatures and the line is the fitted model.}
 \label{skyfig}
@@ -1640,6 +1697,23 @@ An example of this can be found in \S\ref{skydips_eg}.
 The \sdip\ script can be used to automate the procedure of running
 \skydip\ and displaying the results with \Kappa's \linplot. More 
 information on skydipping can be found in Appendix \ref{skydips}.
+
+\subsection{Noise measurements}
+
+Noise observations are reduced on-line and written to an ASCII text file.
+In some cases this text file is not available and the \renoise\ task
+can be used to recreate it (as well as generating an NDF file containing
+the results) from the raw demodulated data file.
+
+\begin{myquote}
+\begin{verbatim}
+% reduce_noise 19981113_dem_0001
+SURF: Opening 19981113_dem_0001 in /scuba/observe/19981113/dem
+SURF: run 1 was a NOISE observation
+OUT - Name of container file to hold map and time-sequence data /'o1'/ > 
+FILE - Name of ASCII file to contain results summary /'noise_981113_1.dat'/ > 
+\end{verbatim}
+\end{myquote}
 
 \subsection{Common data reduction}
 
@@ -1776,8 +1850,9 @@ level has also been added back onto the data.
 
 \begin{figure}
 \begin{center}
-\htmlimage{scale=0.9}
-\epsfig{width=4.0in,height=4.0in, file=sun216_remsky.eps}
+%%\htmlimage{scale=0.9}
+%%\epsfig{width=4.0in,height=4.0in, file=sun216_remsky.eps}
+\includegraphics[width=5in,height=5in]{sun216_remsky.eps}
 \caption{The 3C279 data after processing through \ext\ and \remsky. The next
 stage is to regrid the data using \rebin. The source can clearly be seen 
 in bolometer 19 (H7). The negative stripes are indicating that the chop
@@ -1825,12 +1900,13 @@ exact location) so two interactive techniques are available:
 This script automates the \linplot-\chgqual\ cycle -- bolometers can be plotted 
 in turn, with spikes identified and removed, all within a few seconds.
 
-\item \Figaro\ \clean
+\item \Figaro\ \sclean
 
-The \clean\ task allows users to simply click on bad points to remove them.
-The main point to remember here is that the error and quality arrays are
-stripped from the output file and can not be used in further processing.  More
-details on using the \clean\ command can be found in the SCUBA cookbooks.
+The \sclean\ task allows users to simply click on bad points to remove them.
+This routine has been designed for SCUBA despking and therefore understands
+SCUBA quality. \sclean\ provides an integrated despiking environment showing
+the 2-D image and a 1-D slice, allowing points to be marked bad (or good)
+in either window. More information can be found in the \Figaro\ documentation.
 
 
 \end{enumerate}
@@ -2027,7 +2103,7 @@ used for moving sources (e.g.\ planets or comets) where the RA and Dec of the
 source is changing with time; offsets from this moving centre are calculated
 and no astrometry information is stored.  The remaining coordinate systems
 correct for source rotation and do have associated FITS
-World-Coordinate-Systems (WCS) astrometry information \cite{WCS}.
+World-Coordinate-Systems (WCS) astrometry information \cite{WCS,ast}.
 
 \item {\bf Map centre}
 
@@ -2103,8 +2179,9 @@ will be accessible as NDFs via test.h7, test.h8 etc (or test.i1, test.i2 for
 
 \begin{figure}
 \begin{center}
-\htmlimage{scale=0.9}
-\psfig{file=sun216_3c279.eps,width=\textwidth}
+%%\htmlimage{scale=0.9}
+%%\epsfig{file=sun216_3c279.eps,width=\textwidth}
+\includegraphics[width=\textwidth]{sun216_3c279.eps}
 \caption{A 850 micron image of 3C279 rebinned in RJ coordinates with the
 long wave array overlaid. The two negative sources indicate the nodding 
 and chopping that are part of a SCUBA jiggle/map.}
@@ -2214,10 +2291,18 @@ Additionally, \rebin\ creates the extensions necessary for use with
 
 In order to use packages such as {\sc iraf}, {\sc aips} or {\sc miriad} the
 data must first be converted to FITS format by using either the \Figaro\ task
-\wdfits\ or the \convert\ task \ndffits.  Both of these tasks
-derive their axes information from the AXIS components in the NDF (arcseconds
-offset from the map centre in this case) which contains no astrometry
-information. In order to propagate WCS astrometry information from the NDF
+\wdfits\ or the \convert\ task \ndffits. The \ndffits\ task is recommended
+since it can understand FITS tables, floating-point FITS, and the new
+AST extension \cite{ast}\footnote{As of release v1.3 it is no longer necessary 
+to remove the .AXIS extension before processing with \ndffits\ because 
+\rebin\ now writes WCS information using the AST library.}
+
+For images rebinned with an older version of SURF (pre-1.3) or if using
+\wdfits\ or  a 
+version of \convert\ that does not understand AST (pre-1.1) it is necessary
+to remove the AXIS components from the NDF before converting since the
+axis information (arcsec offsets from the map centre) takes priority.
+In order to propagate WCS astrometry information from the NDF
 FITS array into the FITS file the axis information must first be removed by
 using \Figaro's \delobj\ or \Kappa's \setaxis. For example, if the
 image is stored in file scuba\_image.sdf and we wish to convert this to an
@@ -2366,7 +2451,8 @@ given bolometer can be concatenated together using \scucat).
 
 \begin{figure}
 \begin{center}
-\epsfig{angle=270,width=5.0in,file=sun216_qdraw.eps}
+%%\epsfig{angle=270,width=5.0in,file=sun216_qdraw.eps}
+\includegraphics[angle=270,width=5in]{sun216_qdraw.eps}
 \caption{Photometry data of 3C279. This is the concatenated data from three
 separate observations.}
 \label{qdrawfig}
@@ -2467,7 +2553,8 @@ the same input data using \rebin).
 
 \begin{figure}
 \begin{center}
-\epsfig{width=5.0in,file=sun216_scansky.eps}
+%%\epsfig{width=5.0in,file=sun216_scansky.eps}
+\includegraphics[width=5.0in]{sun216_scansky.eps}
 \caption{Sky noise calculated by \task{calcsky} for a short interval
 of the M82 data.}
 \label{fig:scansky}
@@ -2551,7 +2638,8 @@ of four dual beam images of M82.
 
 \begin{figure}
 \begin{center}
-\epsfig{width=5.0in,file=sun216_4chops.eps}
+%%\epsfig{width=5.0in,file=sun216_4chops.eps}
+\includegraphics[width=\textwidth]{sun216_4chops.eps}
 \caption{4 dual beam images of M82. The chop throws are 20 arcsec
 RA chopping, 30 arcsec RA chopping, 20 arcsec dec chopping and
 30 arcsec dec chopping.
@@ -2603,7 +2691,8 @@ Fig.\ \ref{m82:final}.
 
 \begin{figure}
 \begin{center}
-\epsfig{width=4.0in,file=sun216_m82_remdbm.eps}
+%%\epsfig{width=4.0in,file=sun216_m82_remdbm.eps}
+\includegraphics[width=4in]{sun216_m82_remdbm.eps}
 \caption{Final image of M82 after single beam restoration.}
 \label{m82:final}
 \end{center}
@@ -2627,11 +2716,11 @@ Upgrades currently on the work list are:
 
 \item Enhancements to the reduction pipeline software (\scuquick), possibly
       including an X-windows interface. This is currently underway and is
-      based on the ORAC data reduction pipeline \cite{oracdr}; testing at the
-      telescope is planned for autumn 1998.
+      based on the ORAC data reduction pipeline \cite{oracdr}. Contact the
+      author if you are interested in testing the SCUBA pipeline.
 
-\item A task to fit Gaussians to dual-beam images. [This may well be
-implemented in a future release of \ESP\ \cite{esp} as an upgrade to the
+\item A task to fit Gaussians to dual-beam images. [This task is almost
+complete in version 0.9-5 of of \ESP\ \cite{esp} in the 
 \gaufit\ task]
 
 \end{itemize}
@@ -2641,6 +2730,40 @@ software please consult the \htmladdnormallinkfoot{SCUBA software
 wish-list}{http://www.jach.hawaii.edu/jcmt\_sw/bin/scuba\_wish.pl}.
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
+
+\subsection{Changes in Version 1.3}
+
+This is only a minor upgrade.
+
+\begin{description}
+
+\item[\textbf{New Tasks}] \mbox{}
+
+\begin{itemize}
+\item Noise data can now be processed with the \renoise\ task. 
+\end{itemize}
+
+\item[\textbf{Changes to existing tasks}] \mbox{}
+\begin{itemize}
+\item \scunoise\ has been modified so that it can read files generated by
+\renoise.
+\item Images produced by \rebin\ now include world-coordinate information via
+the AST library (WCS extension).
+\item The guard ring has been turned on for LINEAR and GAUSSIAN regridding.
+    (It had been turned off in v1.2). A new parameter (USEGRD) can be used
+    to turn the bolometer guard ring on or off.
+
+\end{itemize}
+
+\item[\textbf{Minor fixes}] \mbox{}
+\begin{itemize}
+\item \rebin\ can now combine 256 files.
+\item \sculog\ now formats the RA field correctly.
+\item The documentation has been updated to reflect the addition of \renoise\
+and the use of AST.
+\end{itemize}
+
+\end{description}
 
 \subsection{Changes in Version 1.2}
 
@@ -2992,6 +3115,11 @@ and Error Reporting Systems}, \xref{Starlink User Note 104}{sun104}{}
 Greisen~E.~W., Calabretta~M., 1996, {\it Representations of celestial
 coordinates in FITS}, {\it A\&A}, in prep.
 
+\bibitem{ast}
+Warren-Smith~R.~F., Berry~D.~S., 1998, \textit{AST -- A Library for Handling
+World Coordinate Systems in Astronomy},
+\xref{Starlink User Note 210}{sun210}{}
+
 \bibitem{hds}
 Warren-Smith~R.~F., Lawden~M.~D., 1995, {\it HDS -- Hierarchical Data System},
 \xref{Starlink User Note 92}{sun92}{}
@@ -3083,6 +3211,7 @@ Jenness~T., Bly~M.~J., 1998,
 \quickdes{POINTSUM}{Generate a summary of pointing observations}{surf:pointsum}
 \quickdes{QDRAW}{Plot photometry data (requires \Kappa).}{surf:qdraw}
 \quickdes{REBIN}{Rebin all data onto a rectangular grid}{surf:rebin}
+\quickdes{REDUCE\_NOISE}{Process raw noise data files}{surf:renoise}
 \quickdes{REDUCE\_SWITCH}{Convert raw demodulated data to standard format and
 process individual switches.}{surf:resw}
 \quickdes{REMDBM}{Remove dual beam signature from SCAN/MAP images (requires \Kappa).}{surf:remdbm}
@@ -3143,6 +3272,8 @@ observation  data.
 
 \item[\htmlref{EXTRACT\_FLAT}{EXTRACT_FLAT}:] Write the flatfield information
 to a text file.
+
+\item[\htmlref{REDUCE\_NOISE}{REDUCE_NOISE}:] Process demodulated noise data.
 
 \item[\htmlref{SCUHELP}{SCUHELP}:] Interactive help system.
 
@@ -3508,6 +3639,15 @@ The \scusoft\ routines are described in the following pages:
          The data can be accessed as OUT.more.reds.times. Default is FALSE. 
       }
       \sstsubsection{
+         USEGRD = LOGICAL (Read)
+      }{
+            Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
+      }
+      \sstsubsection{
          WEIGHT = REAL (Read)
       }{
          The relative weight that should be assigned to each dataset.
@@ -3556,7 +3696,7 @@ The \scusoft\ routines are described in the following pages:
       \sstitemlist{
 
          \sstitem
-         The application can read in up to 100 separate input datasets.
+         The application can read in up to 256 separate input datasets.
 
          \sstitem
          The output map will be large enough to include all data points.
@@ -4776,13 +4916,18 @@ proceeding.
          If the overlay comes up scrambled, delete the agi\_xxx files
            in your home directory and if that does not work also files like
            linplot.sdf in the /home/you/adam subdirectory.
+
+         \sstitem
+         Figaro's \sclean\ is a more efficient alternative.
+
       }
    }
    \sstdiytopic{
       Related Applications
    }{
       SURF: \pltbol, \rlinplot, \chgqual, \despike; \newline
-      \xref{KAPPA}{sun95}{}: \linplot, \cursor
+      \xref{KAPPA}{sun95}{}: \linplot, \cursor; \newline
+      \xref{FIGARO}{sun86}{}: \sclean
    }
    \sstbugs{
       Freezes when asked to plot a bad bolometer.
@@ -5009,7 +5154,7 @@ proceeding.
       \sstitemlist{
 
          \sstitem
-         The application can read in up to 100 separate input datasets.
+         The application can read in up to 256 separate input datasets.
 
          \sstitem
          No data is returned if the DATA or positions are bad.
@@ -5378,6 +5523,15 @@ proceeding.
          The data can be accessed as OUT.more.reds.times. Default is FALSE.
       }
       \sstsubsection{
+         USEGRD = LOGICAL (Read)
+      }{
+            Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
+      }
+      \sstsubsection{
          WEIGHT = REAL (Read)
       }{
          The relative weight that should be assigned to each dataset.
@@ -5426,7 +5580,7 @@ proceeding.
       \sstitemlist{
 
          \sstitem
-         The application can read in up to 100 separate input datasets.
+         The application can read in up to 256 separate input datasets.
 
          \sstitem
          The output map will be large enough to include all data points.
@@ -6443,6 +6597,15 @@ menu.
          The data can be accessed as OUT.more.reds.times. Default is FALSE.
       }
       \sstsubsection{
+         USEGRD = LOGICAL (Read)
+      }{
+            Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
+      }
+      \sstsubsection{
          WEIGHT = REAL (Read)
       }{
          The relative weight that should be assigned to each dataset.
@@ -6491,7 +6654,7 @@ menu.
       \sstitemlist{
 
          \sstitem
-         The application can read in up to 100 separate input datasets.
+         The application can read in up to 256 separate input datasets.
 
          \sstitem
          The output map will be large enough to include all data points.
@@ -6547,6 +6710,73 @@ menu.
       Related Applications
    }{
       SURF: \bolrebin, \intrebin, \scuquick, \extdata
+   }
+}
+
+\newpage
+\label{surf:renoise}
+\sstroutine{
+   REDUCE\_NOISE
+}{
+   Process demodulated noise data
+}{
+   \sstdescription{
+      This routine takes raw demodulated noise data and processes it.
+      NDF and ASCII results files are generated.
+
+      The output NDF file is a 2-D dataset with a chop signal and
+      calibrator signal per bolometer. The text file is similar
+      to the file generated by the real-time system.
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The name of the raw noise data file. A single number can be
+         supplied if SCUBA\_PREFIX is set. DATADIR is recognised.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF. This file is 2-dimensional. The first
+         dimension is bolometer number. The second dimension is
+         chop signal and calibrator signal (along with variances
+         and quality). If no output NDF is required a null value
+         can be given.
+      }
+      \sstsubsection{
+         FILE = FILENAME (Write)
+      }{
+         Output text file. Format is almost identical to that
+         generated by the real-time system. A null value can be
+         supplied to prevent a text file from being written. The
+         default output name is the same name as generated by the
+         on-line system (noise\_YYMMDD\_nr.dat)
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message output level. Default is NORM. Allowed values are
+         QUIET, NORMAL and VERBOSE.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         reduce\_noise 19981113\_dem\_0001 out\_noise !
+      }{
+         Read in observation 1 and write the output to an NDF
+         names out\_noise.sdf. Do not write a text file.
+      }
+      \sstexamplesubsection{
+         reduce\_noise {\tt '}3{\tt '} ! accept
+      }{
+         Process observation 3 but do not write an NDF output file.
+         Use the default file name for the text file.
+      }
+   }
+   \sstnotes{
+      Noise observations containing multiple measurements are condensed
+      into a single measurement.
    }
 }
 
@@ -9671,7 +9901,8 @@ CUNIT2  = 'deg     '           / physical units of axis 2
 
 \begin{figure}
 \begin{center}
-\epsfig{width=5.0in,file=sun216_despikemodes.eps}
+%%\epsfig{width=5.0in,file=sun216_despikemodes.eps}
+\includegraphics[width=5in]{sun216_despikemodes.eps}
 \caption{A schematic of the different display modes for \task{despike}. The
 start of each scan is represented by the letter \textbf{S} and the end by the
 letter \textbf{E}.}
@@ -9748,7 +9979,8 @@ transforming the data to 1-D (parameter \param{DMODE}).
 
 \begin{figure}
 \begin{center}
-\epsfig{width=5.0in,file=sun216_despike_eg.eps}
+%%\epsfig{width=5.0in,file=sun216_despike_eg.eps}
+\includegraphics[width=5in]{sun216_despike_eg.eps}
 \caption{Example despiking of a point source. The two outside lines on each
 diagram indicate the region outside which a spike would be found (the clipping
 envelope). The middle line indicates the median of the data in each cell.  The
@@ -9903,8 +10135,10 @@ T_COLD - Temperature of cold load for LONG_DC /55/ >
 
 \begin{figure}
 \begin{center}
-\epsfig{file=sun216_rawsdip.eps,width=2.6in}
-\epsfig{file=sun216_rawsdip2.eps,width=2.6in}
+%\epsfig{file=sun216_rawsdip.eps,width=2.6in}
+%\epsfig{file=sun216_rawsdip2.eps,width=2.6in}
+\includegraphics[width=2.6in]{sun216_rawsdip.eps}
+\includegraphics[width=2.6in]{sun216_rawsdip2.eps}
 \caption{Skydip data after processing with \resw\ (left) and after measurement 
 5 has been removed with \chgqual\ (right).}
 \label{rawsdip}
@@ -9984,7 +10218,8 @@ The fit is shown in Fig.\ \ref{fitsdip}. \skydip\ is the only task that can
 process raw demodulated data and data processed with \resw.
 \begin{figure}
 \begin{center}
-\epsfig{width=4.0in,file=sun216_fitsdip.eps,angle=-90}
+\includegraphics[width=4in,angle=-90]{sun216_fitsdip.eps}
+%%\epsfig{width=4.0in,file=sun216_fitsdip.eps,angle=-90}
 \caption{Skydip plus model without measurement 5}
 \label{fitsdip}
 \end{center}
@@ -10078,7 +10313,8 @@ on the correct, unshifted, calibrator signal.
  
 \begin{figure}
 \begin{center}
-\epsfig{file=sun216_shift_diag.eps,width=5.0in,angle=-90}
+%%\epsfig{file=sun216_shift_diag.eps,width=5.0in,angle=-90}
+\includegraphics[width=5in,angle=-90]{sun216_shift_diag.eps}
 \caption{The standard calibrator signal (solid line) with an overlay of a
 shifted calibrator signal (dashed). The A/D cards are indicated and a shift
 is clearly seen on card B.}
@@ -10201,7 +10437,7 @@ can also be obtained from
 The \sdip, \scuplot\ and \scupa\ scripts are written in C-shell.
 
 \scunoise\ is written in perl/Tk (version 800.001 or newer, available from
-\htmladdnormallink{CPAN}{http://www.perl.org/CPAN/}).
+\htmladdnormallinkfoot{CPAN}{http://www.cpan.org/}).
 
 Additionally, \qdraw, \sigclip, \sdip, \scuplot, \setbolwt, \remdbm\ and 
 \scupa\ require that \Kappa\ is installed.
