@@ -1,0 +1,118 @@
+      SUBROUTINE SLN_NEWREC( VERSION, SID, STATUS )
+*+
+*  Name:
+*     SLN_NEWREC
+
+*  Purpose:
+*     Create a new selection structure
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL SLN_NEWREC( VERSION, SID, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     VERSION = CHARACTER*(*) (given)
+*        Program version writing selection
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     SLN Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/sln.html
+
+*  Keywords:
+*     package:sln, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     4 Sep 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'SLN_CMN'                                 ! SLN common block
+*       SLN_INIT = LOGICAL (given)
+*         SLN class definitions loaded?
+
+*  Arguments Given:
+      CHARACTER*(*)		VERSION
+
+*  Arguments Returned:
+      INTEGER			SID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			SLN0_BLK		! Ensures inclusion
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check initialised
+      IF ( .NOT. SLN_INIT ) CALL SLN0_INIT( STATUS )
+
+*  Create the new object
+      CALL ADI_NEW0( 'SelectionRecord', SID, STATUS )
+
+*  Write the version
+      CALL ADI_CPUT0C( SID, 'Version', VERSION, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'SLN_NEWREC', STATUS )
+
+      END
