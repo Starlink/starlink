@@ -122,7 +122,7 @@
       ELSE IF ( STR_ABBREV( UNIT, 'RAD') ) THEN
         FACTOR = 1D0
 
-      ELSE IF ( STR-ABBREV( UNIT, 'PIX' ) ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'PIX' ) ) THEN
         FACTOR = 1D0
 
       ELSE
