@@ -1,6 +1,11 @@
 1 ARD_library
                                              Expires: ???
 
-A minor upgrade to the ARD library has been made. The current release
-(V1.0-3) fixes a bug which caused inappropriate error messages to be
-reported if a blank ARD expresson was supplied.
+A major upgrade to the ARD library has been made. The current release
+(V2.0) introduces new features which enable positions within ARD
+expressions to be supplied in a much wider range of coordinate systems
+than prevously. For instance, if there is an RA/DEC calibration 
+associated with the pixel array, then the ARD description can contain
+positions in any of the common celestial coordinate systems. 
+
+Full details are available in SUN/183.
