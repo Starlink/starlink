@@ -1,0 +1,56 @@
+1 GAIA update
+
+  The main change in this release is that GAIA has been updated
+  to include a new toolbox for controlling the EXTRACTOR/SExtractor
+  programs (see SUN/226).
+
+  This toolbox allows the interactive adjustment of most of
+  SExtractor's myriad detection and catalogue parameters. It can plot
+  the results as a series of detection ellipses over the image and
+  displays the contents of the output catalogue. The catalogue window
+  allows sorting and range selection, as well as interacting with the
+  display ellipses (so you can click on an ellipse and see the
+  associated values, or click on a catalogue row and see the
+  associated ellipse).
+
+  The catalogue handling of GAIA has also been extended to allow it to
+  read the formats used by the CURSA package (i.e. FITS-tables) and the
+  ASCII_HEAD format of SExtractor.
+
+  Other minor changes in this release include:
+
+     o The problem with restoring detached sky regions in the photometry
+       toolbox should now be fixed.
+
+     o Fixed fonts should now print correctly
+
+     o The blink toolbox now has control over which images are viewed
+       and an arrow cluster for controlling the mobile image position.
+
+     o The rotation limits in the "Type in known calibration..."
+       toolbox have been extended to -180 to +180 degrees 
+       (was 0 to 180).
+
+     o On-line help for the catalogue window has been added.
+
+     o The image regions toolbox has been extended to include a "clear"
+       button for the statistics output.
+
+     o Plotting catalogues with many thousands of entries has been
+       considerably speeded up.
+
+  To try out GAIA for yourself type the following command:
+
+      %  gaia [image_file]
+
+  from the C-shell. Or alternatively:
+
+      cl> gaia
+      cl> gaiadisp [image_file]
+
+  If you have any comments about GAIA then mail me at:
+
+      P.W.Draper@durham.ac.uk.
+
+  Peter Draper 30th November 1998.
+
