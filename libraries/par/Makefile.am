@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+bin_SCRIPTS = par_link_adam
+
 lib_LTLIBRARIES = libpar_adam.la
 libpar_adam_la_SOURCES = $(F_ROUTINES)
 
