@@ -71,6 +71,8 @@
 *     15-SEP-1997 (ACD)
 *        Added option AXES to control whether axis any information in
 *        the NDF is copied to the DX dataset.
+*     29-AUG-2004 (TIMJ)
+*        Do not directly compare logicals with TRUE/FALSE
 
 *-
 
@@ -143,7 +145,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
       
 *   Stop here if the Data component is undefined.
-      IF(FDATA.EQ..FALSE.) THEN
+      IF(.NOT.FDATA) THEN
          STATUS=SAI__ERROR         
          CALL ERR_REP(' ','No data component found.',STATUS)
          GOTO 9999
@@ -155,7 +157,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Stop here if the Data component is complex.
-      IF ((CDATA.EQ..TRUE.).OR.(CVARI.EQ..TRUE.)) THEN
+      IF ((CDATA).OR.(CVARI)) THEN
          STATUS=SAI__ERROR         
          CALL ERR_REP(' ','Complex data/variance values found.'
      :                    ,STATUS)
@@ -165,7 +167,7 @@
 *   Check to see if the command line defines the value of FVARI.
       CALL PAR_GET0L('PVAR',TEMPL,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (TEMPL.EQ..FALSE.) FVARI=.FALSE.
+      IF (TEMPL) FVARI=.FALSE.
 
 *   Get the pixel-index bounds of the NDF and store in LBND and UBND.
       CALL NDF_BOUND(NDF1,3,LBND,UBND,NDIM,STATUS)
@@ -223,7 +225,7 @@
 *   Check to see if the command line defines the value of PBAD.
       CALL PAR_GET0L('PBAD',TEMPL,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (TEMPL.EQ..FALSE.) FBAD=.FALSE.
+      IF (.NOT.TEMPL) FBAD=.FALSE.
 
 *   Check to see if the command line defines the value of AXES.
 *   This variable controls whether any axis information which may
@@ -312,11 +314,16 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
 *  History:
 *     12-OCT-1993 (GJP)
-*     (Original version)
- 
+*       (Original version)
+*     29-AURG-2004 (TIMJ)
+*       Declare logical variables as LOGICAL and not INTEGER
+*       Use LOGICALs are logicals and do not compare with .TRUE./.FALSE.
+*
+
 *  Bugs:
 *     None known.
  
@@ -334,9 +341,9 @@
 *  Arguments Given:
       CHARACTER *(NDF__SZTYP) VTSETD  ! Type of data in data          
       LOGICAL BMODE                   ! Is data to be stored as binary
-      INTEGER FAXIS                   ! Is the axis information present
-      INTEGER FBAD                    ! Are bad pixels present
-      INTEGER FVARI                   ! Variance component present?
+      LOGICAL FAXIS                   ! Is the axis information present
+      LOGICAL FBAD                    ! Are bad pixels present
+      LOGICAL FVARI                   ! Variance component present?
       INTEGER ELEMS                   ! Number of pixels 
       INTEGER LBND(NDF__MXDIM)        ! Lower limits of image world
                                       ! co-ordinate system
@@ -452,7 +459,7 @@
 
 *   Output the regular positions grid information. Object 1.
  
-      IF (FAXIS.EQ..FALSE.) THEN
+      IF (.NOT.FAXIS) THEN
 
 *      No axis information defined.
          CALL NDF2DX_POSNA(DEP,BMODE,FIOD,NDF1,NDIM,PRANGE,
@@ -2698,10 +2705,13 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
  
 *  History:
 *     12-OCT-1995 (GJP)
-*     (Original version)
+*       (Original version)
+*     29-AUG-2004 (TIMJ)
+*       Make sure that CHR_PUTD takes a DOUBLE argument.
  
 *  Bugs:
 *     None known.
@@ -2778,7 +2788,7 @@
 
 *            Construct a line.
                IF (DARRAY(I).EQ.VAL__BADD) THEN
-                  CALL CHR_PUTD(0.0,LINE,NC)
+                  CALL CHR_PUTD(0.0D0,LINE,NC)
                ELSE
                   CALL CHR_PUTD(DARRAY(I),LINE,NC)
                END IF
