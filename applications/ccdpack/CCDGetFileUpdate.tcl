@@ -26,6 +26,14 @@
 #        container file which is encountered is passed to ndgexpand
 #        in order to look inside it for NDF structures.
 
+#  Global variables:
+#     CCDcurrentdirectory = string (read)
+#        Name of the current directory.
+#     CCDndfcontainers = array (write)
+#        An array giving the name of the HDS container file for each 
+#        NDF which has been encountered (will only be affected if
+#        images is true).
+
 #  Implementation status:
 #     The images argument is only treated specially for HDS container
 #     files.  It would be nice to have it do the same thing for 
@@ -42,6 +50,7 @@
 
 #  Global parameters.
       global CCDcurrentdirectory
+      global CCDndfcontainers
 
 #.
 
@@ -78,20 +87,31 @@
       } 
 
 #  Now for normal file which do need the file filter.
-      foreach name [lsort [glob -nocomplain $newfiles ] ] {
-         if { ! [file isdirectory $name] } { 
+      foreach filename [lsort [glob -nocomplain $newfiles ] ] {
+         if { ! [file isdirectory $filename] } { 
 
 #  In general use the filename as it is, but in the case where we are
 #  specifically looking for images, treat HDS container files specially
 #  by passing them to ndgexpand.  This may find zero, one or more 
 #  NDF structures in each file.
-            if { $images && [ regsub {.sdf$} $name "" clipped ] } {
-               set namelist [ ndgexpand $clipped ]
+            if { $images && [ regsub {.sdf$} $filename "" clipped ] } {
+               set supdatalist [ ndgexpand -sup $clipped ]
+               foreach supdata $supdatalist {
+                  set hdspath [ lindex $supdata 1 ]
+                  set basename [ lindex $supdata 3 ]
+                  set dirname [ lindex $supdata 4 ]
+                  set ndfname [ lindex $supdata 5 ]
+                  set shortname "$basename$hdspath"
+                  set dir $CCDcurrentdirectory
+                  if { $dir == "/" } {
+                     set CCDndfcontainers($ndfname) "/$basename"
+                  } else {
+                     set CCDndfcontainers($ndfname) "$dir/$basename"
+                  }
+                  $namebox insert end $shortname
+               }
             } else {
-               set namelist $name
-            }
-            foreach iname $namelist {
-               set shortname [ file tail $iname ]
+               set shortname [ file tail $filename ]
                $namebox insert end $shortname
             }
          }
