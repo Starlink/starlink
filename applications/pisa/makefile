@@ -600,22 +600,16 @@ check_source: $(PKG_NAME)_source.tar $(PKG_NAME)_tasks.tar \
 	$(DOCUMENTATION) $(DATA_FILES)
 
 $(PKG_NAME)_tasks.tar:
-	co $(TASKSRC)
 	chmod 644 $(TASKSRC)
 	$(TAR_IN) pisa_tasks.tar $(TASKSRC)
-	@- rm -f $(TASKSRC)
 
 $(PKG_NAME).tar:
-	co $(SUBSRC)
 	chmod 644 $(SUBSRC)
 	$(TAR_IN) pisa_subs.tar $(SUBSRC)
-	@- rm -f $(SUBSRC)
 
 $(PKG_NAME)help.tar:
-	co $(HELPSRC)
 	chmod 644 $(HELPSRC)
 	$(TAR_IN) pisahelp.tar $(HELPSRC)
-	@- rm -f $(HELPSRC)
 
 MAIN_SOURCE = $(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) \
               $(MONO_SOURCE) $(HELP_SOURCES) $(MONO_IFL) $(STARTUP_SCRIPT) \
@@ -623,24 +617,18 @@ MAIN_SOURCE = $(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) \
 
 $(PKG_NAME)_source.tar:
 	@- rm -f $(PKG_NAME)_source.tar
-	co $(MAIN_SOURCE)
 	chmod 644 $(MAIN_SOURCE)
 	chmod 755 $(PUBLIC_SCRIPTS) $(LINK_SCRIPT)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(MAIN_SOURCE)
-	@- rm -f $(MAIN_SOURCE)
 
 $(DOCUMENTATION):
 	cp $(HOME)/pisa/extras/$(HYPERTEXT_DOCS:.htx=.htx_tar).gz ./
 	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar)
-	co $(LATEX_DOCS)
-	co $(PKG_NAME).news
 	chmod 644 $(LATEX_DOCS) $(PKG_NAME).news
 
 $(DATA_FILES):
 	cp $(HOME)/pisa/extras/frame.sdf.gz ./
 	gunzip frame.sdf.gz
-	co frame_stars.acc clustan.dat findinfo.dat \
-	   sizeinfo.dat peakinfo.dat
 	chmod 644 frame_stars.acc clustan.dat findinfo.dat \
 	         sizeinfo.dat peakinfo.dat
 
