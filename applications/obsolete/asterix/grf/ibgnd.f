@@ -1493,7 +1493,7 @@
           DO I = I1, I2
 
 *        If model pixel is potentially good
-            IF ( IDX(I,J) .EQ. 1 ) THEN
+            IF ( IDX(I,J) .GT. 0 ) THEN
 
 *          If pixel is in circle then ignore this point for sampling purposes
               IF ( IMG_INCIRC(I,J,X,Y,R) ) THEN
@@ -1693,7 +1693,7 @@
 *     Task subroutine
 
 *  Invocation:
-*     CALL IBGND_SETSAMP( NX, NY, X0, Y0, RBIN, IDX, STATUS )
+*     CALL IBGND_SETSAMP_RIDX( NX, NY, X0, Y0, RBIN, IDX, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -1703,7 +1703,7 @@
 *        Number of pixels in X axis
 *     NY = INTEGER (given)
 *        Number of pixels in Y axis
-*     IDX[NX,NY] = INTEGER (returned)
+*     IDX[NX,NY] = INTEGER (given and returned)
 *        -1 for outside region, 0 for bad quality, <sample> otherwise
 *     STATUS = INTEGER (given and returned)
 *        The global status.
@@ -1806,6 +1806,8 @@
             XW = I_XBASE + (I-1)*I_XSCALE
             R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
             IDX(I,J) = INT(R) + 1
+	ELSE
+	PRINT *,I,J,' bad ',idx(i,j)
           END IF
         END DO
       END DO
