@@ -18877,18 +18877,19 @@ assumed that the observer is at sea level).}
 the SpecFrame.}{Set from the Epoch attribute of the SpecFrame, if it has
 been set explicitly.}
 
-\fitskey{VSOURCE\emph{a}}{Used to set the SourceVel
-attribute of the SpecFrame (the SourceVRF attribute
-is first set to ``Topocentric'').}{Set from the SourceVel attribute of
-the SpecFrame, if it has been set explicitly (the SourceVRF
-attribute is set to ``Topocentric'' before getting the value of
-SourceVel).}
+\fitskey{SSYSSRC\emph{a}}{Used to set the SourceVRF attribute of the
+SpecFrame 
+(all systems are supported except CMBDIPOL).} {Set from the SourceVRF 
+attribute of the SpecFrame.}
 
 \fitskey{ZSOURCE\emph{a}}{Used to set the SourceVel
 attribute of the SpecFrame (the SourceVRF attribute
-is first set to ``Topocentric'' and the ZSOURCE value is converted to a
-topocentric apparent radial velocity).}{Never written (VSOURCE is written
-instead).}
+is first set to the system indicated by the SSYSSRC keyword, and the 
+ZSOURCE value is then converted to an apparent radial velocity and stored
+as the SourceVel attribute).}
+{Set from the SourceVel attribute of
+the SpecFrame, if it has been set explicitly (the SourceVel value is
+first converted from apparent radial velocity to redshift).}
 
 \fitskey{VELOSYS\emph{a}}{Ignored.}{Never written.}
 
