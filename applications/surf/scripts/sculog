@@ -21,6 +21,9 @@ use Cwd;
 # Command line arguments
 use Getopt::Long;
 
+# Robust way to get the program name without the directory
+use File::Basename;
+
 # Parse the command line options
 my ($h, $all, $summary, $begin, $end, $demod, $reduced, $nodatadir, 
     $whichmode);
@@ -41,9 +44,8 @@ $h = 1 unless $result == 1;  # Print help info if unknown option
 my $MAX_SUB = 5;
 
 # Work out what I have been called as
+my $prog = basename($0);
 
-my @parts = split(/\//, $0);
-my $prog = $parts[0];
 
 # Help information
 
@@ -290,6 +292,19 @@ foreach my $ddir (keys %files) {
 	  #######################
 	  # Calculate some things
 
+	  if ($fitsitem{'MODE'} eq 'SKYDIP') {
+	    if ($fitsitem{'SAM_MODE'} eq 'RASTER') {
+	      $sdip_mode = "RAST";
+	      $sdip_lmode = "RASTER"; # long version
+	      $sdip_smode = "R";  # Short version
+	    } else {
+	      $sdip_lmode = "      "; # Long version
+	      $sdip_mode = "NORM";
+	      $sdip_smode = " ";  # Short version
+	    }
+	  }
+
+
 	  $mean_air = ($fitsitem{'AMSTART'} + $fitsitem{'AMEND'}) / 2.0;
 	  $mean_hum = ($fitsitem{'HUMSTART'} + $fitsitem{'HUMEND'}) / 2.0;
 	  $mean_hum = sprintf("%d", $mean_hum);
@@ -311,7 +326,7 @@ foreach my $ddir (keys %files) {
 	  # (ie less than 1 hour old)
 	  # For now I will just give the value regardless
 	  $seedate = $fitsitem{'SEE_DATE'};
-    
+
 	  $seeing = $fitsitem{'SEEING'};
 	  $csotau = $fitsitem{'TAU_225'};
 
@@ -353,9 +368,9 @@ foreach my $ddir (keys %files) {
 	    $dec[0] = $dec_sign.$dec[0] if ($dec_sign eq '-');
 	    $ra[2] .= ".".pop(@ra);
 	    $dec[2] .= ".".pop(@dec);
-	    
+
 	  } else {
-	    
+
 	    # Read the requested map centre
 	    $lat = $fitsitem{'LAT'};
 	    $long = $fitsitem{'LONG'};
@@ -414,7 +429,7 @@ foreach my $ddir (keys %files) {
 	    }
 
 	  } elsif ($prog eq 'mapsum') {
-	    
+
 	    $^ = MAPSUM_TOP;
 
 	    # Only set if mode is recognised 
@@ -434,15 +449,13 @@ foreach my $ddir (keys %files) {
 		$~ = MAPSUM;
 	      }
 	    }
-	    
+
 	  } elsif ($prog eq 'skysum') {
-	    
+
 	    # This is the skydip summary mode
-	    
+
 	    $^ = SKYSUM_TOP;
-	    
 	    $~ = SKYSUM;
-	    
 
 	  } elsif ($summary) {
 
@@ -453,6 +466,9 @@ foreach my $ddir (keys %files) {
 		$~ = SHORT_NOISE;
 		
 	      } elsif ($fitsitem{'MODE'} eq 'SKYDIP') {
+
+		$fitsitem{'MODE'} = "RASTSDIP" 
+		  if ($fitsitem{SAM_MODE} eq 'RASTER');
 
 		$~ = SHORT_SKYDIP;
 
@@ -496,7 +512,7 @@ foreach my $ddir (keys %files) {
 	  }
 
 	  write;
-    
+
 	  # Read in HISTORY information if present and if we are using SCULOG
 	  if (!$summary && $prog eq 'sculog') {
 
@@ -811,8 +827,8 @@ $fitsitem{'OBSDEF'}, $fname
 
 ##### SKYDIP ########
 format SKYDIP =
-@<<<<              @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
-$fitsitem{'RUN'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+@<<<<  @<<<<<      @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $sdip_lmode, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
    Bolometers:   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Filter: @<<<<<<<
 $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
    Max EL: @<<  Min EL: @<< Integrations: @<<<<  Measurements: @<<<<
@@ -825,7 +841,7 @@ $fitsitem{'OBSDEF'}, $fname
 
 .
 
-##### SKYDIP ########
+##### NOISE ########
 format NOISE =
 @<<<< @<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $fitsitem{'OBJ_TYPE'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
@@ -979,8 +995,8 @@ $photom[3], $photom[4], $photom[5]
 
 format SKYDIP_SUM =
 **************
-@<<< @<<<<<< @<<<<<<<<< @>/@<<      @<<<<<<< @<<<<: @#.###          @<<<< @<<<<
-$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
+@<<< @<<<<<< @<<<<<<<<< @>/@<< @<<< @<<<<<<< @<<<<: @#.###          @<<<< @<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $sdip_mode, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
 ~                                            @<<<<  @<<<<<<
 $fitsitem{'SUB_2'}, $tauz[1]
 ~                                            @<<<<  @<<<<<<
@@ -1014,8 +1030,8 @@ format SKYSUM_TOP =
 
 
 format SKYSUM =
-@<<< @<<<<  @<<<<   @>/@<<   @<<<<<<<<   @<<<<    @#.###        @<<<< @<<<<
-$fitsitem{'RUN'}, $lst, $hst,$fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
+@<<< @<<<<  @<<<<   @>/@<<@   @<<<<<<<<   @<<<<    @#.###        @<<<< @<<<<
+$fitsitem{'RUN'}, $lst, $hst,$fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $sdip_rmode, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
 ~                                        @<<<<    @<<<<<<
 $fitsitem{'SUB_2'}, $tauz[1]
 ~                                        @<<<<    @<<<<<<

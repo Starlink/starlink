@@ -1,5 +1,7 @@
 2001-03-01  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* scripts/sculog: Add support for raster skydips
+
 	* sculib/sculib_skydip_temperatures.F
 	(SCULIB_SKYDIP_TEMPERATURES): Do not want to special-case when the
 	voltage is 0.0 since zero voltage has no special meaning. This is
