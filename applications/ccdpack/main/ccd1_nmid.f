@@ -1,4 +1,5 @@
-      SUBROUTINE CCD1_NMID( INDF, ID, JNDF, MATCH, STATUS )
+      SUBROUTINE CCD1_NMID( ID, JNDF, NCARD, IPFITS, SINDEX, MATCH,
+     :                      STATUS )
 *+
 *  Name:
 *     CCD1_NMID
@@ -10,11 +11,12 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_NMID( INDF, ID, JNDF, MATCH, STATUS )
+*     CALL CCD1_NMID( ID, JNDF, NCARD, IPFITS, SINDEX, MATCH, STATUS )
 
 *  Description:
-*     This routine checks a given NDF to see whether it matches the ID
-*     string.  The ID string is (of the same type as) that written by
+*     This routine checks the characteristics of a given NDF to see 
+*     whether it matches the ID string.  The ID string is 
+*     (of the same type as) that written by
 *     the ASTEXP task to the AST file identifying framesets, so that
 *     matching is in the sense defined by that task.  The ID string 
 *     consists of a keyword indicating the kind of test, followed by
@@ -29,15 +31,25 @@
 *        INDEX <number>
 *           An NDF matches this ID if the JNDF argument is equal to
 *           <number>.
+*        SET <number>
+*           An NDF matches this ID if its Set Index attribute is equal
+*           to <number>
 
 *  Arguments:
-*     INDF = INTEGER (Given)
-*        NDF identifier.
 *     ID = CHARACTER * ( * ) (Given)
 *        String identifying the NDF.
 *     JNDF = INTEGER (Given)
-*        Index of NDF in set being considered.  This is required so that
-*        the INDEX keyword type can work.
+*        Index of NDF in set being considered.  This is used if the ID
+*        is of type INDEX.
+*     NCARD = INTEGER (Given)
+*        The number of FITS header cards pointed to by IPFITS.  This is 
+*        used if the ID is of type FITS.
+*     IPFITS = INTEGER (Given)
+*        A pointer to an array of mapped FITS header cards.  This is 
+*        used if the ID is of type FITS.
+*     SINDEX = INTEGER (Given)
+*        The Set Index attribute of the NDF.  This is used if the ID is
+*        of type SET.
 *     MATCH = LOGICAL (Returned)
 *        Whether the NDF matches the given ID string.
 *     STATUS = INTEGER (Given and Returned)
@@ -53,6 +65,8 @@
 *  History:
 *     08-MAR-1999 (MBT):
 *        Original version.
+*     27-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -67,8 +81,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       
 *  Arguments Given:
-      INTEGER INDF
       INTEGER JNDF
+      INTEGER NCARD
+      INTEGER IPFITS
+      INTEGER SINDEX
       CHARACTER * ( * ) ID
       
 *  Arguments Returned:
@@ -80,9 +96,12 @@
 *  Local Variables:
       CHARACTER * ( 80 ) FTSVAL  ! Character value of FITS card
       INTEGER IAT                ! Position in string
+      INTEGER ICARD              ! Index of matched FITS card
+      INTEGER IS                 ! Chosen Set Index value
       INTEGER IWE                ! Position of word end
       INTEGER IWS                ! Position of word start
       INTEGER JFSET              ! Index of frameset
+      INTEGER JSET               ! Index of CCD_SET frameset
       
 *.
 
@@ -102,7 +121,8 @@
          IWS = IAT
          CALL CHR_FIWE( ID, IAT, STATUS )
          IWE = IAT
-         CALL CCD1_FTVAL( ID( IWS:IWE ), INDF, FTSVAL, STATUS )
+         CALL CCD1_FTGET( NCARD, IPFITS, 1, ID( IWS:IWE ), FTSVAL,
+     :                    ICARD, STATUS )
          IAT = IWE + 1
          CALL CHR_FIWS( ID, IAT, STATUS )
          MATCH = ID( IAT: ) .EQ. FTSVAL
@@ -116,6 +136,16 @@
          IWE = IAT
          CALL CHR_CTOI( ID( IWS:IWE ), JFSET, STATUS )
          MATCH = JFSET .EQ. JNDF
+
+*  SET type.
+      ELSE IF ( ID( IAT:IAT + 3 ) .EQ. 'SET ' ) THEN
+         IAT = IAT + 4
+         CALL CHR_FIWS( ID, IAT, STATUS )
+         IWS = IAT
+         CALL CHR_FIWE( ID, IAT, STATUS )
+         IWE = IAT
+         CALL CHR_CTOI( ID( IWS:IWE ), IS, STATUS )
+         MATCH = SINDEX .EQ. IS
 
 *  Unidintified ID string type
       ELSE
