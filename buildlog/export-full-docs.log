@@ -1962,6 +1962,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /star/starjava/bin
@@ -2346,4 +2347,4 @@ export-full-docs:
       [zip] Building zip: /star/sources/starjavaexport/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 29 seconds
+Total time: 5 minutes 17 seconds
