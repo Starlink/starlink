@@ -27,8 +27,6 @@
 *        The Stokes parameters.
 *     VSTOK( EL, 3 ) = REAL (Given)
 *        The variances for STOKES. Only accessed if VAR is TRUE.
-*     STOKES( EL ) = REAL (Given)
-*        The intensity values read from the input NDF.
 *     T = REAL (Given)
 *        The analyser transmission factor for the supplied array.
 *     EPS = REAL (Given)

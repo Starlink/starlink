@@ -4,7 +4,7 @@
 *     POLSIM
 
 *  Purpose:
-*     Produces intensity images corresponding to given Stokes vectors.
+*     Produces intensity data corresponding to given Stokes vectors.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,33 +20,34 @@
 *        The global status.
 
 *  Description:
-*     This application produces intensity images corresponding to given 
-*     Stokes vectors. A set of template input intensity images are
-*     supplied which define the pixel positions, analyser angles, efficiencies,
-*     transmissions, etc. The pixel values supplied in these templates are
-*     ignored. A set of corresponding output intensity images are created
-*     which inherit the properties of the input intensity images. The pixel
-*     values in these images are calculated using the supplied Stokes
-*     vectors, using the analyser properties defined in the input images.
+*     This application produces intensity data (either 2D images or 3D
+*     cubes) corresponding to given Stokes vectors. A set of template input 
+*     intensity images or cubes are supplied which define the pixel positions, 
+*     analyser angles, efficiencies, transmissions, etc. The pixel values 
+*     supplied in these templates are ignored. A set of corresponding output 
+*     intensity images or cubes are created which inherit the properties of 
+*     the input NDFs. The pixel values in these images are calculated using 
+*     the supplied Stokes vectors, using the analyser properties defined in 
+*     the input images.
 
 *  Usage:
 *     polsim cube in out
 
 *  ADAM Parameters:
 *     CUBE = NDF (Read)
-*        The name of the input 3D cube holding the Stokes parameters,
-*        such as produced by POLCAL.
+*        The name of the input NDF holding the Stokes parameters, such as 
+*        produced by POLCAL.
 *     IN = NDF (Read)
-*        A group specifying the names of the input intensity images. This
+*        A group specifying the names of the input intensity NDFs. This
 *        may take the form of a comma separated list, or any of the other 
 *        forms described in the help on "Group Expressions". These images
 *        must be aligned pixel-for-pixel with the Stokes vectors given by
 *        CUBE.
 *     OUT = NDF (Read)
-*        A group specifying the names of the output intensity images. 
+*        A group specifying the names of the output intensity NDFs. 
 *     QUIET = _LOGICAL (Read)
-*        If FALSE, then the name of each image will be displayed as it is
-*        processed. Otherwise, nothing is written to the screen. [FALSE] 
+*        If FALSE, then the name of each input NDF will be displayed as it
+*        is processed. Otherwise, nothing is written to the screen. [FALSE] 
 
 *  Examples:
 *     polsim cube "*_A" "*_sim"
@@ -60,7 +61,7 @@
 *        appended.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -69,6 +70,8 @@
 *  History:
 *     25-MAR-1999 (DSB):
 *        Original version.
+*     23-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -97,7 +100,6 @@
       CHARACTER STOKES*3         ! Identifiers for each plane of the input cube
       CHARACTER XLOC*(DAT__SZLOC)! Locator to POLPACK extension
       CHARACTER NDFNAM*(GRP__SZNAM)! Name of the NDF being processed
-      INTEGER DIM( 3 )           ! Dimensions of input cube
       INTEGER EL                 ! No. of mapped elements
       INTEGER IGRP1              ! GRP identifier for input images group      
       INTEGER IGRP2              ! GRP identifier for output images group      
@@ -109,14 +111,13 @@
       INTEGER IPVIN              ! Pointer to input VARIANCE array
       INTEGER IPVOUT             ! Pointer to output VARIANCE array
       INTEGER IWCS               ! Pointer to WCS FrameSet
-      INTEGER LBND( 3 )          ! Lower bounds of input cube
-      INTEGER NAMLEN             ! Length of name string
+      INTEGER LBND( 4 )          ! Lower bounds of input cube
       INTEGER NDFIN              ! NDF identifier for input intensity image
       INTEGER NDFOUT             ! NDF identifier for output intensity image
       INTEGER NDIM               ! No. of axes in input NDF
       INTEGER NNDF               ! No. of input images to process      
       INTEGER SIZEO              ! No. of output NDFs ( = NNDF )
-      INTEGER UBND( 3 )          ! Upper bounds of input cube
+      INTEGER UBND( 4 )          ! Upper bounds of input cube
       LOGICAL QUIET              ! Suppress screen output?
       LOGICAL THERE              ! Does item exists?
       LOGICAL VAR                ! Variances required flag
@@ -142,18 +143,15 @@
       CALL NDF_ASSOC( 'CUBE', 'READ', INDF1, STATUS )
 
 *  Get its bounds and dimensions.
-      CALL NDF_BOUND( INDF1, 3, LBND, UBND, NDIM, STATUS ) 
-      DIM( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
-      DIM( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
-      DIM( 3 ) = UBND( 3 ) - LBND( 3 ) + 1
+      CALL NDF_BOUND( INDF1, 4, LBND, UBND, NDIM, STATUS ) 
 
 *  Get the value of the STOKES component in the POLPACK extension. 
 *  This is a string in which each character identifies the corresponding
 *  plane in the DATA array.
       STOKES = ' '
       CALL NDF_XGT0C( INDF1, 'POLPACK', 'STOKES', STOKES, STATUS ) 
-      IF( ( NDIM .NE. 3 .OR. STOKES .EQ. ' ' ) .AND. 
-     :     STATUS .EQ. SAI__OK ) THEN
+      IF( ( ( NDIM .NE. 3 .AND. NDIM .NE. 4 ) .OR. STOKES .EQ. ' ' ) 
+     :     .AND. STATUS .EQ. SAI__OK ) THEN
          CALL NDF_MSG( 'NDF', INDF1 )
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLSIM_ERR1', '''^NDF'' does not contain '//
@@ -339,8 +337,8 @@
      :                   STATUS )
 
 *  Obtain a section from the output NDF with bounds equal to the input
-*  Stokes cube.
-         CALL NDF_SECT( NDFOUT, 2, LBND, UBND, INDFS, STATUS )
+*  Stokes cube (excluding the trailing Stokes axis).
+         CALL NDF_SECT( NDFOUT, NDIM - 1, LBND, UBND, INDFS, STATUS )
 
 *  Map the DATA and (if required) VARIANCE components of the output section.
          CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'WRITE', IPDOUT, EL, 
@@ -351,9 +349,8 @@
          END IF
 
 *  Generate the simulated intensity values for the current NDF.
-         CALL POL1_SIMCL( VAR, DIM( 1 )*DIM( 2 ), %VAL( IPDIN ),
-     :                    %VAL( IPVIN ), T, EPS, PHI, %VAL( IPDOUT ),
-     :                    %VAL( IPVOUT ), STATUS )
+         CALL POL1_SIMCL( VAR, EL, %VAL( IPDIN ), %VAL( IPVIN ), T, EPS,
+     :                    PHI, %VAL( IPDOUT ), %VAL( IPVOUT ), STATUS )
 
 *  End the NDF context.
          CALL NDF_END( STATUS )
