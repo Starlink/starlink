@@ -129,6 +129,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.15  1998/12/03 19:39:04  timj
+*     Check that the number of degrees of freedom is positive.
+*
 *     Revision 1.14  1998/10/02 00:49:38  timj
 *     Do not try to report the errors if the fit has failed
 *
@@ -389,6 +392,15 @@
          END IF
 
          FIT (3) = 0.5D0
+
+*     If the number of degrees of freedom is less than 1 then we
+*     have a problem (eg too few input points)
+         IF (NDEG .LE. 1 .AND. STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI('NDEG', NDEG)
+            CALL ERR_REP(' ','FIT_SKYDIP: Too few degrees of freedom '//
+     :           '(^NDEG)', STATUS)
+         END IF
 
 * some initial settings
 
