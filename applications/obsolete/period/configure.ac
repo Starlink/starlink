@@ -21,10 +21,11 @@ AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [sae psx cfitsio pgplot mers ], [link])
+STAR_DECLARE_DEPENDENCIES([build], [sae psx cfitsio pgplot mers], [link])
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
-STAR_LATEX_DOCUMENTATION([sun167 ssn25 period_history])
+dnl    STAR_LATEX_DOCUMENTATION([sun167 ssn25 period_history])
+STAR_LATEX_DOCUMENTATION([sun167 ssn25])
 
 AC_CONFIG_FILES([Makefile component.xml])
 

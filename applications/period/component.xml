@@ -26,7 +26,7 @@ A software package designed to search for periodicities in data.
       <uname>kpd</uname>
     </person>
   </developers>
-  <documentation> sun167 ssn25 period_history</documentation>
+  <documentation> sun167 ssn25</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
