@@ -6,7 +6,7 @@ bin_SCRIPTS = $(DYNSCRIPTS)
 bin_MONOLITHS = chart_mon
 chart_mon_SOURCES = chart_mon.f
 chart_mon_LDADD = applic/libapplic.la libchart/libchart.la \
-`sgs_link_adam` `chr_link_adam` `gks_link_adam`
+`sgs_link_adam` `chr_link_adam` `gks_link_adam` `pda_link_adam`
 
 chart_mon_TASKS = $(TASKS)
 

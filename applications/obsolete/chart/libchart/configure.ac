@@ -27,11 +27,6 @@ AC_FC_OPEN_SPECIFIERS(carriagecontrol='LIST')
 dnl    What unit does OPEN's recl specifier assume?
 AC_FC_RECL_UNIT
 
-dnl    Look for NAG
-AC_LANG_PUSH(Fortran)
-AC_CHECK_LIB(nag, m01dbf)
-AC_LANG_POP(Fortran)
-
 AC_CONFIG_FILES(Makefile)
 
 AC_OUTPUT

@@ -24,12 +24,6 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS(ifd2star)
 STAR_CHECK_PROGS(hlib)
 
-dnl    Look for NAG
-AC_LANG_PUSH(Fortran)
-AC_CHECK_LIB(nag, m01dbf)
-AC_LANG_POP(Fortran)
-
-
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
