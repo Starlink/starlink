@@ -62,6 +62,13 @@ touch Makefile.dependencies
 test -f componentinfo.dtd || 
     ln -s buildsupport/starconf/componentinfo.dtd componentinfo.dtd
 
+# Create the $STARCONF_DEFAULT_PREFIX/bin directory if we can, but
+# don't worry if we can't.  If this exists, then the starconf
+# installation adds convenience links from there to some of its
+# applications in $BUILDSUPPORT_PREFIX/bin.
+test -d $STARCONF_DEFAULT_PREFIX/bin || \
+    mkdir -p $STARCONF_DEFAULT_PREFIX/bin
+
 sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 (
 
