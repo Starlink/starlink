@@ -98,6 +98,10 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.18  2003/04/02 01:02:42  timj
+* - Units for FITS headers now appear at the start of the comment
+* - Use PSX_GMTIME rather than GMTIME
+*
 * Revision 1.17  2000/07/07 03:24:34  timj
 * Fix typo in FITS comment
 *
@@ -349,10 +353,10 @@
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'SYSTEM', SCS, 'sky coordinate system', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :        'LONG', OUT_LONG, 'centre longitude (radians)', 
+     :        'LONG', OUT_LONG, '[rad] centre longitude', 
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :        'LAT', OUT_LAT, 'centre latitude (radians)', STATUS)
+     :        'LAT', OUT_LAT, '[rad] centre latitude', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
      :        'EPOCH', OUT_EPOCH, 'epoch of map', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS,FITS,
@@ -374,12 +378,12 @@
 
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'WAVELEN', DBLE(WAVELENGTH) * 1.0D-6,
-     :     'Wavelength of the observation (metres)', STATUS)
+     :     '[m] Wavelength of the observation', STATUS)
 
       FREQ = VLIGHT * 1.0D6 / DBLE(WAVELENGTH)
 
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'FREQ', FREQ, 'Frequency of observation (Hz)', STATUS)
+     :     'FREQ', FREQ, '[Hz] Frequency of observation', STATUS)
       
 *     Write the FILTER name
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
@@ -391,12 +395,12 @@
       IF (ANGROT .NE. VAL__BADR) THEN
          CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
      :        'ANGROT', DBLE(ANGROT), 
-     :        'Angle between X-pixel axis and wplate 0 (deg)', STATUS)
+     :        '[deg] Angle between X-pixel axis and wplate 0', STATUS)
       END IF
       IF (WPLATE .NE. VAL__BADR) THEN
          CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
      :        'WPLATE', DBLE(WPLATE), 
-     :        'Wave-plate P.A. (anti-clockwise, degrees)',
+     :        '[deg] Wave-plate P.A. (anti-clockwise)',
      :        STATUS)
       END IF
 
@@ -412,7 +416,7 @@
 
       CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'SCUPIXSZ', DBLE(RTEMP), 
-     :     'Pixel size (arcsec)', STATUS)
+     :     '[arcsec] Pixel size', STATUS)
 
 *     Store the chop information
 
@@ -422,10 +426,10 @@
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CHOP_PA', DBLE(CHOP_PA), 
-     :        'Position angle of chop', STATUS)
+     :        '[deg] Position angle of chop', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CHOP_THR', DBLE(CHOP_THROW), 
-     :        'Size of chop throw (arcsec)', STATUS)
+     :        '[arcsec] Size of chop throw', STATUS)
       END IF
 
 *     Put in a DATE-OBS field, converting MJD to DATE
@@ -437,14 +441,14 @@
      :     STATUS)
 
 *     Put in a DATE field (the date the file was written)
-*     Problems are:
-*      - There is no PSX_GMTIME function !!!
-*      - Dont feel the need to call MJD_TO_DATEOBS since we PSX_GMTIME
+*      - Dont feel the need to call MJD_TO_DATEOBS since we know PSX_GMTIME
 *        gives the Y/M/D etc and we are now always going to be writing
 *        post-1999 FITS format since we cant go back in time!
-
       CALL PSX_TIME( NTICKS )   ! Time in seconds
-      CALL GMTIME( NTICKS, TARRAY ) ! Time array
+      CALL PSX_GMTIME( NTICKS, TARRAY(1), TARRAY(2), TARRAY(3),
+     :     TARRAY(4), TARRAY(5), TARRAY(6), TARRAY(7), TARRAY(8), 
+     :     ITEMP, STATUS )
+
       TARRAY(6) = TARRAY(6) + 1900 ! 4 digit year
       TARRAY(5) = TARRAY(5) + 1 ! Months start at 1 for SLA
 
@@ -481,10 +485,10 @@
          IF (OUT_COORDS.NE.'GA') THEN
             CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
      :           'OBSRA',OBSRA,
-     :           'RA of map centre (degrees; deprecated)', STATUS)
+     :           '[deg] RA of map centre (deprecated)', STATUS)
             CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 
      :           'OBSDEC', OBSDEC, 
-     :           'Dec. of map centre (degrees; deprecated)',
+     :           '[deg] Dec. of map centre (deprecated)',
      :           STATUS)
          END IF
 
@@ -494,10 +498,10 @@
      :        'CRPIX1', I_CENTRE, 'I of centre (ref) pixel', 
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CRVAL1', OBSRA, 'Map centre (degrees)', STATUS)
+     :        'CRVAL1', OBSRA, '[deg] Map centre', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CDELT1',DBLE(-FITS_OUT_PIXEL), 
-     :        'increment per pixel (degrees)', 
+     :        '[deg] increment per pixel',
      :        STATUS)
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CUNIT1', 'deg','physical units of axis 1', STATUS)
@@ -509,10 +513,10 @@
      :        'CRPIX2', J_CENTRE, 'J of centre (ref) pixel', 
      :        STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'CRVAL2', OBSDEC, 'Map centre (degrees)', STATUS)
+     :        'CRVAL2', OBSDEC, '[deg] Map centre', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CDELT2', DBLE(FITS_OUT_PIXEL), 
-     :        'increment per pixel (degrees)', 
+     :        '[deg] increment per pixel',
      :        STATUS)
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'CUNIT2','deg','physical units of axis 2', STATUS)
@@ -580,7 +584,5 @@
      :     OUT_FITSX_LOC, STATUS)
       CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
       CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
-
-
 
       END
