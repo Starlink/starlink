@@ -18,9 +18,11 @@
 *    Bugs :
 *    Authors :
 *     J.Lightfoot (REVAD::JFL)
+*     T.Jenness   (JACH)
 *    History :
 *     $Id$
 *     25.11.1992: Original version
+*     05.12.1996: Check for bad values
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -43,7 +45,11 @@
 *-
 
       DO I = 1, N
-         OUT (I) = IN (I) * RVAL
+         IF (IN(I) .NE. VAL__BADR) THEN
+            OUT (I) = IN (I) * RVAL
+         ELSE
+            OUT(I) = IN(I)
+         END IF
       END DO
 
       END
