@@ -26,10 +26,12 @@
 *           the NDF data array.
 *        o  For an NDF whose origin is not 1 along each axis, LBOUNDn
 *           cards are written. (These are not part of the standard.)
-*        o  The OBJECT, LABEL, and BUNITS keywords are derived from
+*        o  The OBJECT, LABEL, and BUNIT keywords are derived from
 *           the TITLE, LABEL, and UNITS NDF components.
-*        o  The CDELTn, CRVALn, CUNITn and CTYPEn keywords are
-*           derived from a set of linear NDF AXIS structures.
+*        o  The CDELTn, CRPIXn, CRVALn keywords are derived from a
+*           set of linear NDF AXIS structures.  Whenever the NDF AXIS
+*           structure contains units or a label CUNITn and CTYPEn
+*           keywords are created repsectively.
 *        o  DATE and ORIGIN cards are written.
 *        o  For integer DATA types a BLANK card is written using the
 *           standard bad value corresponding to the type of the FITS
@@ -143,6 +145,8 @@
       INTEGER   LBND( NDF__MXDIM ) ! NDF lower bounds
       LOGICAL   LINEAR            ! True if an axis is linear
       INTEGER   NCHAR             ! Length of a character string
+      INTEGER   NDECIM            ! Number of decimals to output to
+                                  ! header
       INTEGER   NDIM              ! Number of dimensions
       INTEGER   NELM              ! Number of elements
       REAL      START             ! Start value for an axis structure
@@ -211,16 +215,32 @@
 
 *  The axis structure is found, so map it using an appropriate data
 *  type.  Use _REAL for all but double-precision centres.  See if the
-*  axis is linear.  Derive the increment between values.
+*  axis is linear.
             IF ( ATYPE .EQ. '_DOUBLE' ) THEN
                CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL CON_AXLID( NELM, %VAL( APNTR( I ) ), DSTART,
-     :                          DEND, LINEAR, STATUS )
+               IF ( NELM .GT. 1 ) THEN
+                  CALL CON_AXLID( NELM, %VAL( APNTR( I ) ), DSTART,
+     :                            DEND, LINEAR, STATUS )
 
-               IF ( LINEAR ) THEN
-                  DINCRE = ( DEND - DSTART ) / DBLE( NELM - 1 )
+*  We can ignore bad status, but then we assume a non-linear axis.
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                     CALL ERR_ANNUL( STATUS )
+                     LINEAR = .FALSE.
+                  END IF
+
+*  Derive the increment between values.
+                  IF ( LINEAR ) THEN
+                     DINCRE = ( DEND - DSTART ) / DBLE( NELM - 1 )
+                  END IF
+
+*  Deal with the special case of a one-element axis.  Just obtain the
+*  start value.
+               ELSE
+                  DINCRE = 1.0D0
+                  CALL CON_AXBND( NELM, %VAL( APNTR( I ) ), DSTART,
+     :                            DEND, STATUS )
                END IF
 
 *  Repeat for all other axis-centre data types mapped as real.
@@ -228,11 +248,27 @@
                CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL CON_AXLIR( NELM, %VAL( APNTR( I ) ), START,
-     :                          END, LINEAR, STATUS )
+               IF ( NELM .GT. 1 ) THEN
+                  CALL CON_AXLIR( NELM, %VAL( APNTR( I ) ), START,
+     :                            END, LINEAR, STATUS )
 
-               IF ( LINEAR ) THEN
-                  INCREM = ( END - START ) / REAL( NELM - 1 )
+*  We can ignore bad status, but then we assume a non-linear axis.
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                     CALL ERR_ANNUL( STATUS )
+                     LINEAR = .FALSE.
+                  END IF
+
+*  Derive the increment between values.
+                  IF ( LINEAR ) THEN
+                     INCREM = ( END - START ) / REAL( NELM - 1 )
+                  END IF
+
+*  Deal with the special case of a one-element axis.  Just obtain the
+*  start value.
+               ELSE
+                  INCREM = 1.0
+                  CALL CON_AXBNR( NELM, %VAL( APNTR( I ) ), START, END,
+     :                            STATUS )
                END IF
             END IF
 
@@ -257,10 +293,12 @@
 *  for the maximum number of decimal places required for the
 *  appropriate data type.
                IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-                  CALL FTPKYD( FUNIT, KEYWRD, DSTART, VAL__SZD - 7,
+                 NDECIM = INT( -LOG10( VAL__EPSD ) )
+                  CALL FTPKYD( FUNIT, KEYWRD, DSTART, NDECIM,
      :                         'Co-ordinate value of axis '//C, FSTAT )
                ELSE
-                  CALL FTPKYE( FUNIT, KEYWRD, START, VAL__SZR - 7,
+                 NDECIM = INT( -LOG10( VAL__EPSR ) )
+                  CALL FTPKYE( FUNIT, KEYWRD, START, NDECIM,
      :                         'Co-ordinate value of axis '//C, FSTAT )
                END IF
 
@@ -274,11 +312,11 @@
 *  for the maximum number of decimal places required for the
 *  appropriate data type.
                IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-                  CALL FTPKYD( FUNIT, KEYWRD, DINCRE, VAL__SZD - 7,
+                  CALL FTPKYD( FUNIT, KEYWRD, DINCRE, NDECIM,
      :                         'Co-ordinate increment along axis '//C,
      :                         FSTAT )
                ELSE
-                  CALL FTPKYE( FUNIT, KEYWRD, INCREM, VAL__SZR - 7,
+                  CALL FTPKYE( FUNIT, KEYWRD, INCREM, NDECIM,
      :                         'Co-ordinate increment along axis '//C,
      :                         FSTAT )
                END IF
@@ -293,11 +331,11 @@
 *  for the maximum number of decimal places required for the
 *  appropriate data type.
                IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-                  CALL FTPKYD( FUNIT, KEYWRD, 1.0D0, VAL__SZD - 7,
+                  CALL FTPKYD( FUNIT, KEYWRD, 1.0D0, NDECIM,
      :                         'Reference pixel along axis '//C,
      :                         FSTAT )
                ELSE
-                  CALL FTPKYE( FUNIT, KEYWRD, 1.0, VAL__SZR - 7,
+                  CALL FTPKYE( FUNIT, KEYWRD, 1.0, NDECIM,
      :                         'Reference pixel along axis '//C,
      :                         FSTAT )
                END IF
@@ -320,7 +358,7 @@
 *  Remove unprintable characters that are not permitted in FITS.
                   CALL CHR_CLEAN( VALUE )
 
-*  Write the CRTYPEn card to the FITS header.
+*  Write the CTYPEn card to the FITS header.
                   CALL FTPKYS( FUNIT, KEYWRD,
      :                         VALUE( :MIN( SZVAL, NCHAR ) ),
      :                         'Label for axis '//C, FSTAT )
@@ -457,16 +495,16 @@
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )
 
 *  If an NDF label is found, this is copied to the FITS header card
-*  with keyword BUNITS.
+*  with keyword BUNIT.
       IF ( THERE ) THEN
          CALL NDF_CGET( NDF, 'UNITS', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'UNITS', NCHAR, STATUS )
-         KEYWRD = 'BUNITS  '
+         KEYWRD = 'BUNIT  '
 
 *  Remove unprintable characters that are not permitted in FITS.
          CALL CHR_CLEAN( VALUE )
 
-*  Write the BUNITS card to the FITS header.  68 is the maximum number
+*  Write the BUNIT card to the FITS header.  68 is the maximum number
 *  of characters that can be accommodated in a header card.
          CALL FTPKYS( FUNIT, KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
      :                'Units of the primary array', FSTAT )
