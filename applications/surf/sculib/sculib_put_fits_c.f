@@ -47,7 +47,7 @@
 *     T.Jenness (timj@jach.hawaii.edu)
 
 *  Copyright:
-*     Copyright (C) 1995-2000 Particle Physics and Astronomy
+*     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  Method:
@@ -61,6 +61,9 @@
 *     $Id$
 *     15-AUG-1995: original version
 *     $Log$
+*     Revision 1.8  2002/09/14 03:57:25  timj
+*     Fix uninitilaized variable warning
+*
 *     Revision 1.7  2000/07/10 21:09:31  timj
 *     Documentation tweaks for V1.6
 *
@@ -148,43 +151,57 @@
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_C: blank name given '//
      :     'for FITS item', STATUS)
-      ELSE IF (FITS(N_FITS) .NE. 'END' .AND. N_FITS .GT. 0) THEN
+      ELSE IF (N_FITS .LT. 0) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP(' ','SCULIB_PUT_FITS_C: Last card was not END',
-     :        STATUS)
+         CALL MSG_SETI('NF',N_FITS)
+         CALL ERR_REP (' ', 'SCULIB_PUT_FITS_C: N_FITS must be '//
+     :     'positive (N_FITS = ^N)', STATUS)
       ELSE
 
 *     If we have no entries, make sure we are using the first one
-         IF (N_FITS .EQ. 0) N_FITS = 1
+         IF (N_FITS .EQ. 0) THEN 
+            N_FITS = 1
+         ELSE IF (FITS(N_FITS) .NE. 'END') THEN
+*     Else warn if we have a FITS array that does not end in END
+*     Note that FITS(0) is undefined in FORTRAN so N_FITS must be
+*     greater than 0
+            STATUS = SAI__ERROR
+            CALL ERR_REP(' ','SCULIB_PUT_FITS_C: Last card was not END',
+     :           STATUS)
+         END IF
+
+         IF (STATUS .EQ. SAI__OK) THEN
 
 *     Copy in the name, value and comment, overwriting 'END' if
 *     necessary
-         FITS (N_FITS) = NAME
-         FITS (N_FITS)(9:11) = '= '''
-         FITS (N_FITS)(12:) = VALUE
+            FITS (N_FITS) = NAME
+            FITS (N_FITS)(9:11) = '= '''
+            FITS (N_FITS)(12:) = VALUE
 
-         NCHAR = CHR_LEN (VALUE)
-         IF (NCHAR .LT. 8) THEN
-            NCHAR = 8
-         ELSE IF (NCHAR .GT. 66) THEN
-            NCHAR = 66
-         END IF
-         FITS (N_FITS)(NCHAR+12:NCHAR+12) = ''''
+            NCHAR = CHR_LEN (VALUE)
+            IF (NCHAR .LT. 8) THEN
+               NCHAR = 8
+            ELSE IF (NCHAR .GT. 66) THEN
+               NCHAR = 66
+            END IF
+            FITS (N_FITS)(NCHAR+12:NCHAR+12) = ''''
 
-         CPTR = MAX (32,NCHAR+14)
+            CPTR = MAX (32,NCHAR+14)
 
 *     The fits string MUST include the comment character
-         FITS (N_FITS)(CPTR:CPTR) = '/'
+            FITS (N_FITS)(CPTR:CPTR) = '/'
 
-         IF (CPTR+2 .LE. 80) THEN
-            FITS (N_FITS)(CPTR+2:) = COMMENT
-         END IF
+            IF (CPTR+2 .LE. 80) THEN
+               FITS (N_FITS)(CPTR+2:) = COMMENT
+            END IF
 
 *     Increment the number of keywords
-         N_FITS = N_FITS + 1
+            N_FITS = N_FITS + 1
 
 *     Rewrite the END card
-         FITS(N_FITS) = 'END'
+            FITS(N_FITS) = 'END'
+
+         END IF
 
       END IF
       END

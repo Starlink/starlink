@@ -65,13 +65,16 @@
  
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.6  2002/09/14 03:57:41  timj
+*     Fix uninitilaized variable warning
+*
 *     Revision 1.5  1999/08/03 19:32:53  timj
 *     Add copyright message to header.
 *
@@ -259,9 +262,9 @@
 
 
 *     Calculate statistics of this exposure
-*     Use 3 sigma clipping by default (make this configurable?)
+*     Use 5 sigma clipping by default (make this configurable?)
 
-
+                        NSIGMA = 5.0
                         CALL SCULIB_STATR(N_SCAN, NSIGMA, 
      :                       %VAL(D_PTR), %VAL(Q_PTR), BADBIT,
      :                       NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
