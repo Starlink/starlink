@@ -6242,6 +6242,45 @@ package kappa {
 
       }
 
+      action permaxes {
+         helplib {$KAPPA_HELP}
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {Input NDF data structure}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output NDF data structure}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter perm {
+            position 3
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            prompt {Input axis for each output axis}
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath {DEFAULT }
+            prompt {Title for output NDF}
+            ppath CURRENT
+            default !
+            helpkey *
+          }
+      }
+
       action piccur {
          alias {picc(ur)}
 
@@ -18110,7 +18149,6 @@ iraf! {
          taskinherit pens
          taskinherit style
          taskparam clear=n
-         taskparam labout=y
          taskparam mode=bounds
          taskparam penrot=y
       }

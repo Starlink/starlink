@@ -362,6 +362,10 @@
          ELSE IF ( NAME .EQ. 'PASTE' ) THEN
             CALL PASTE ( STATUS )
 
+*  Permute NDF axes
+         ELSE IF ( NAME .EQ. 'PERMAXES' ) THEN
+            CALL PERMAXES ( STATUS )
+
 *  Expands an NDF by pixel duplication.
          ELSE IF ( NAME .EQ. 'PIXDUPE' ) THEN
             CALL PIXDUPE ( STATUS )

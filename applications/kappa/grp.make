@@ -240,7 +240,7 @@ fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
 gdset.par gdstate.par glitch.par globals.par greyplot.par hiscom.par \
 hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
 idinvisible.par idpazo.par idset.par idstate.par inspect.par div.par \
-log10.par pow.par kappa.par kstest.par laplace.par \
+log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
 luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
@@ -273,7 +273,7 @@ compick.hlp contour.hlp contover.hlp convolve.hlp creframe.hlp crelut.hlp \
 csub.hlp cursor.hlp custom_kappa.hlp data_structures.hlp display.hlp \
 div.hlp drawsig.hlp elprof.hlp erase.hlp errclip.hlp exp10.hlp expe.hlp \
 expon.hlp feedback.hlp ffclean.hlp fillbad.hlp fitsdin.hlp fitsedit.hlp \
-fitsexp.hlp fitsexist.hlp fitshead.hlp fitsimp.hlp fitsin.hlp \
+fitsexp.hlp fitsexist.hlp fitshead.hlp fitsimp.hlp fitsin.hlp permaxes.hlp \
 fitslist.hlp fitsmod.hlp fitstext.hlp fitsurface.hlp fitsval.hlp \
 fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
@@ -319,7 +319,7 @@ scupol_ang.sdf m31_issa_12a.sdf cobe.sdf ccdframec.FIT scumos.sdf
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl collapse.ifl \
 cadd.ifl calc.ifl calpol.ifl cdiv.ifl centroid.ifl chpix.ifl cmult.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl creframe.ifl csub.ifl \
-div.ifl errclip.ifl expon.ifl ffclean.ifl \
+div.ifl errclip.ifl expon.ifl ffclean.ifl permaxes.ifl \
 fillbad.ifl fitsurface.ifl flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
 globals.ifl histat.ifl histeq.ifl histogram.ifl kaphelp.ifl laplace.ifl \
 kstest.ifl logar.ifl look.ifl lucy.ifl manic.ifl \
@@ -352,7 +352,7 @@ KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
 calpol.f cdiv.f centroid.f chpix.f cmult.f compadd.f compave.f compick.f \
 convolve.f creframe.f csub.f kap_div.f errclip.f expon.f collapse.f \
 ffclean.f fillbad.f fitsurface.f flip.f fourier.f gausmooth.f glitch.f \
-globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f \
+globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f permaxes.f \
 kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
 median.f mosaic.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
 numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
@@ -373,11 +373,12 @@ kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f kps1_dsclb.f kps1_dscld.f \
 kps1_dscli.f kps1_dsclr.f kps1_dsclw.f kps1_stpab.f kps1_stpad.f \
 kps1_stpai.f kps1_stpar.f kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f \
 kps1_thgtb.f kps1_thgtd.f kps1_thgti.f kps1_thgtr.f kps1_thgtub.f \
-kps1_thgtuw.f kps1_thgtw.f 
+kps1_thgtuw.f kps1_thgtw.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f \
+kps1_prmxuw.f kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f
 
 # Generic source files needed for kapsub_sub.tar:
 KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen \
-kps1_stpa.gen kps1_thgt.gen
+kps1_stpa.gen kps1_thgt.gen kps1_prmx.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \

@@ -720,7 +720,7 @@ logar.f look.f lucy.f manic.f \
 makesurface.f maths.f median.f \
 mosaic.f mstats.f mult.f noglobals.f nomagic.f \
 normalize.f numb.f outset.f parget.f paste.f \
-pixdupe.f psf.f quilt.f rift.f \
+permaxes.f pixdupe.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
@@ -823,7 +823,8 @@ kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f \
 kps1_zpdec.f kps1_glibr.f kps1_gligt.f kps1_glidd.f kps1_gliwd.f \
 kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f kps1_clpsr.f \
-kps1_clpsd.f
+kps1_clpsd.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f kps1_prmxuw.f \
+kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -3491,6 +3492,13 @@ kps1_plmsk.o:	 SAE_PAR PRM_PAR
 kps1_prflt.o:	 SAE_PAR AST_PAR
 kps1_prfmk.o:	 SAE_PAR AST_PAR NDF_PAR
 kps1_prfsm.o:	 SAE_PAR PRM_PAR AST_PAR
+kps1_prmxb.o:    SAE_PAR NDF_PAR
+kps1_prmxd.o:    SAE_PAR NDF_PAR
+kps1_prmxi.o:    SAE_PAR NDF_PAR
+kps1_prmxr.o:    SAE_PAR NDF_PAR
+kps1_prmxub.o:    SAE_PAR NDF_PAR
+kps1_prmxuw.o:    SAE_PAR NDF_PAR
+kps1_prmxw.o:    SAE_PAR NDF_PAR
 kps1_psdim.o:	 SAE_PAR
 kps1_psevl.o:	 SAE_PAR PRM_PAR
 kps1_psplt.o:	 SAE_PAR PRM_PAR
@@ -3706,6 +3714,7 @@ palsave.o:	 SAE_PAR CTM_PAR
 parget.o:	 SAE_PAR DAT_PAR
 paste.o:	 SAE_PAR NDF_PAR PAR_ERR
 peepsb.o:	 SAE_PAR PRM_PAR
+permaxes.o:	 SAE_PAR NDF_PAR AST_PAR
 piccur.o:	 SAE_PAR DAT_PAR PAR_ERR AGI_ERR
 picdef.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
 picempty.o:	 SAE_PAR AGI_ERR
