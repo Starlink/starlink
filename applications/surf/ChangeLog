@@ -1,3 +1,15 @@
+2001-02-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_skydip.f: Support for raster skydips with new TCS
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): We do not
+	want to reverse the sign for SC data + SCUBA2MEM
+
+2001-01-31  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scusetenv.csh: A problem with 200101 settin semester to
+	m0b rather than m00b
+
 2000-10-30  Tim Jenness  <timj@jach.hawaii.edu>
 
 	********** V1.6-4 ***************

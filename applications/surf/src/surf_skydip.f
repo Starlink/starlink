@@ -151,6 +151,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.35  2001/02/22 02:49:56  timj
+*     Support raster skydips in new TCS
+*
 *     Revision 1.34  2000/06/16 01:25:16  timj
 *     Use new-format SCULIB_GET_MJD
 *
@@ -378,9 +381,6 @@ c
       INTEGER DUMMY_PTR                 ! Scratch space 4
       REAL    EL                        ! Elevation in radians used for loop
       REAL    EL0                       ! Elevation at start of measurement
-      REAL    EL1                       ! Elevation at T1
-      REAL    EL2                       ! Elevation at T2
-      REAL    ELEV                      ! Elevation of next integration
       REAL    ELEV_STEP                 ! Elevation increment
       REAL    END_EL                    ! End elevation of skydip
       REAL    EPOCH                     ! Julian epoch of observation
@@ -451,6 +451,7 @@ c
       REAL    REXISQ                    ! Reduced chi square
       REAL    RTEMP                     ! Temp real
       INTEGER RUN_NUMBER                ! run number of observation
+      REAL    SAM_DX                    ! Length of sample point for raster
       DOUBLE PRECISION SIGMA            ! Sigma of difference between model/dat
       LOGICAL SKYDIP                    ! .TRUE. if not RAW data
       INTEGER SLICE_PTR                 ! Pointer to start of slice
@@ -872,68 +873,75 @@ c
 
          IF (RASTER) THEN
 
-*     Read the EXP_TIME from the header
+*     For raster skydips the observation is split into N_MEASUREMENT
+*     equal chunks in ELEVATION. Each integration is taken at an
+*     elevation related to the start elevation and the sample
+*     size until the number of points are processed. The next measurement
+*     starts at the correct place and not from a location related to the
+*     end of the first measurement. This is bacuase the telescope may
+*     overrun slightly in order to record an integer number of integrations.
+
+*     Retrieve the PIXEL size from the header
             CALL SCULIB_GET_FITS_R(SCUBA__MAX_FITS, N_FITS,
-     :           FITS, 'EXP_TIME', EXPOSURE_TIME, STATUS)
+     :           FITS, 'SAM_DX', SAM_DX, STATUS)
 
-*     Calculate accelerations and decelerations
-*     and convert to airmass [this section from the on-line
-*     code, written by FJO]
+*     Convert it to radians
+            SAM_DX = SAM_DX / R2AS
 
-*     Convert END_EL and START_EL to RADIANS
+*     Convert start and end to radians
             START_EL = START_EL * DEG2RAD
             END_EL   = END_EL   * DEG2RAD
 
-*     set direction of slew
-*     and calculate elevation range covered for each
-*     measurement
-            ELEV_STEP = (END_EL - START_EL) / N_MEASUREMENTS
+*     Find the elevation increment for each measurement
+            ELEV_STEP = ( END_EL - START_EL ) / N_MEASUREMENTS
             FSIGN = 1.0
             IF (ELEV_STEP .LT. 0.0) FSIGN = -1.0
 
-*     determine time at end of phase 1 (maximum acceleration)
-            T1 = V_MAX / A_MAX
-            EL1 = 0.5 * V_MAX * T1
+*     Loop over each measurement calculating the correct
+*     positions
 
-*     determine time at end of phase 2 (coast at maximum velocity)
-            T2 = ABS(ELEV_STEP) / V_MAX
-            EL2 = EL1 + V_MAX * (T2 - T1)
-
-*     determine time at end of slew (maximum deceleration)
-            T3 = T1 + T2
-                     
             DO MEASUREMENT = 1, N_MEASUREMENTS
-*     set starting elevation
+
+*     Calculate start elevation
                EL0 = START_EL + (MEASUREMENT - 1) * ELEV_STEP
-               ELEV = EL0
 
-*     set starting time for measurement MEASUREMENT
-               T = 0.0
-
-*     set start of array offset for measurement MEASUREMENT
+*     Set offset into data array
                OFFSET = (MEASUREMENT - 1) * N_INTEGRATIONS
 
+*     Loop over each integration
                DO I = 1, N_INTEGRATIONS
 
-                  EL = REAL(PI/2.0D0) - ELEV
+*     Calculate the elevation of this integration
+*     Assume the middle of the sample is the relevant elevation
+*     for the read out
+                  EL = EL0 + ( (REAL(I-1)+0.5) * SAM_DX * FSIGN )
+                  
+*     Convert elevation to airmass
+                  EL = REAL(PI/2.0D0) - EL
                   CALL SCULIB_AIRMASS (EL, RTEMP, STATUS)
-                  DAIRMASST(OFFSET+I) = DBLE(RTEMP)
-                  DAIRMASS_TVAR(OFFSET+I) = 0.0D0
 
-*     determine next elevation
-                  T = T + EXPOSURE_TIME
-                  IF ((0.0 .LT. T) .AND. (T .LE. T1)) THEN
-                     ELEV = EL0 + FSIGN * 0.5 * A_MAX * T * T
-                  ELSE IF ((T1 .LT. T) .AND. (T .LE. T2)) THEN
-                     ELEV = EL0 + FSIGN * (EL1 + V_MAX * (T - T1))
-                  ELSE
-                     ELEV = EL0 + FSIGN
-     :                    * (EL2 + (V_MAX - 0.5 * A_MAX * (T - T2)) 
-     :                    * (T - T2))
+*     For information
+                  CALL MSG_SETI('M', MEASUREMENT)
+                  CALL MSG_SETI('INT', I)
+                  CALL MSG_SETR('EL',EL)
+                  CALL MSG_SETR('AM',RTEMP)
+                  CALL MSG_SETI('N', OFFSET+I)
+                  CALL MSG_OUTIF(MSG__VERB, ' ',
+     :                 ' Meas ^M, Int ^INT, Offset ^N El: '//
+     :                 '^EL Airmass: ^AM',
+     :                 STATUS)
+
+
+*     Store it in the airmass array
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     DAIRMASST(OFFSET+I) = DBLE(RTEMP)
+                     DAIRMASS_TVAR(OFFSET+I) = 0.0D0
                   END IF
+
                END DO
+
             END DO
-            
+
          ELSE
 
 *     Assume constant space between airmasses
