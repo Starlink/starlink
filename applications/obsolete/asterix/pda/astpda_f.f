@@ -529,25 +529,32 @@
       EXTERNAL			PDA_GAMMA
       DOUBLE PRECISION		PDA_GAMMA
 
-      INTEGER			I, I1, K1
+      INTEGER			I, J, KMAX
 
       IFAIL = 0
-
-      PEQK = 0.0D0
       PLEK = 0.0D0
       PGTK = 0.0D0
-      IF (L .LE. 0.0D0) THEN
+      PEQK = 0.0D0
+
+*   The maximum value for K, above which over/underflow will start to occur.
+*   The limit of 171 is for PDA_GAMMA returing zero.
+      KMAX = INT(63.57 + 477.5 * REAL(L)**-0.3597)
+
+      IF (K .GE. KMAX .OR. K .GE. 171) THEN
+        PLEK = 1.0D0
+      ELSE IF (L .LE. 0.0D0) THEN
         IFAIL = 1
       ELSE IF (K .LT. 0) THEN
         IFAIL = 2
       ELSE IF (L .GT. 1.0D6) THEN
         IFAIL = 3
       ELSE
-        K1 = K
-        PEQK = EXP(-L) * (L ** K1) / PDA_GAMMA(DBLE(K1+1))
+        J = K
+        PEQK = EXP(-L) * (L ** J) / PDA_GAMMA(DBLE(J+1), IFAIL)
         DO I = 0, K
-          I1 = I
-          PLEK = PLEK + (EXP(-L) * (L ** I1) / PDA_GAMMA(DBLE(I1+1)))
+          J = I
+          PLEK = PLEK +
+     :           (EXP(-L) * (L ** J) / PDA_GAMMA(DBLE(J+1), IFAIL))
         END DO
         PGTK = 1.0D0 - PLEK
       END IF

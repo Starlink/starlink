@@ -19,6 +19,7 @@
 
 double pochisq(double x, int df);
 double critchi(double p, int df);
+int is_inf(double x);
 
 /*
  *+
@@ -84,4 +85,18 @@ F77_DOUBLE_FUNCTION(pda_chidev)(DOUBLE(p), DOUBLE(df), INTEGER(ifail)) {
 		*ifail = 0;
 		return critchi(*p, ndf);
 	}
+}
+
+/*
+ *+
+ * Description:
+ *   Check the value of a number.
+ *   Retruns 1 if +Inf or -Inf, 0 otherwise
+ *-
+ */
+
+F77_LOGICAL_FUNCTION(is_inf)(DOUBLE(x)) {
+	GENPTR_DOUBLE(x)
+
+	return !finite(*x);
 }
