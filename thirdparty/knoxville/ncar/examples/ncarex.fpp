@@ -82,7 +82,11 @@
       CALL GACWK( IWKID )
 
 *  NCAR example to be run.
-      CALL prog_name ( IERR )
+#if USE_TAUTOG
+      CALL TAUTOG( IERR )
+#else
+#error "Must define correct example CFLAG switch"
+#endif
 
 *  Close the GKS workstation.
       CALL GDAWK( IWKID )
