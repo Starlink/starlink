@@ -394,7 +394,7 @@ PKG_LINK = ATOOLS
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0
+PKG_VERS = 1.1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -461,7 +461,7 @@ atl1_gtgrp.f atl1_rdgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
 atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
-atl1_rdch.f atl1_rdfch.f
+atl1_rdch.f atl1_rdfch.f kpg1_gtgrp.f
 
 F_SUB2 = 
 
@@ -1353,6 +1353,7 @@ atl1_assoc.o: SAE_PAR
 atl1_creat.o: SAE_PAR AST_PAR SAE_PAR FIO_ERR
 atl1_gtfrm.o: SAE_PAR AST_PAR
 atl1_gtgrp.o: SAE_PAR GRP_PAR
+kpg1_gtgrp.o: SAE_PAR GRP_PAR
 atl1_gtobj.o: SAE_PAR AST_PAR NDF_PAR 
 atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
 atl1_rdgrp.o: SAE_PAR GRP_PAR AST_PAR
