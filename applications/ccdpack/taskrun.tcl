@@ -89,6 +89,13 @@ this interface (probably programming error)."
       set TASK($app,output) ""
       set TASK($app,progress) 0
 
+#  Change the cursor to busy if required.
+      if { $window != "" } {
+         set curs [ $window cget -cursor ]
+         $window configure -cursor watch
+         puts "$window"
+      }
+
 #  Display a window if required.
       if { $message != "" } {
          set msgwin [ iwidgets::shell .wait -modality none ]
@@ -115,6 +122,11 @@ this interface (probably programming error)."
       if { $message != "" } {
          grab release $msgwin
          destroy $msgwin
+      }
+
+#  Reset the cursor if required.
+      if { $window != "" } {
+         $window configure -cursor $curs
       }
 }
 # $Id$

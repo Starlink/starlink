@@ -121,6 +121,7 @@
       while { [ array size done ] < $nndf } {
 
 #  Get the user to pick a pair of NDFs.
+         wm deiconify $chooser
          raise $chooser
          set pair ""
          while { [ llength $pair ] != 2 } {
@@ -162,10 +163,11 @@
 
 #  Load the NDF pair into the aligner widget and wait for the user to 
 #  select some positions in common.
+         wm withdraw $chooser
+         wm deiconify $aligner
          raise $aligner
          set percA [ $chooser percentiles $iA ]
          set percB [ $chooser percentiles $iB ]
-         puts "percs: $percA $percB"
          $aligner loadndf A $ndfs($iA) $percA $MAXCANV
          $aligner loadndf B $ndfs($iB) $percB $MAXCANV
          $aligner activate
@@ -230,6 +232,7 @@
          } else {
             ccdlog "    Images do not overlap - ignored."
          }
+         wm withdraw $aligner
       }
 
 #  Write the returned PAIRS list.

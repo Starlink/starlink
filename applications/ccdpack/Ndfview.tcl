@@ -227,6 +227,10 @@
             return
          }
 
+#  Set the cursor busy.
+         set curs [ $canvas cget -cursor ]
+         $canvas configure -cursor watch
+
 #  If the NDF has not been displayed before (but not if only its display
 #  attributes have changed) then update the title bar and info panel.
          if { ! [ array exists displayed ] || \
@@ -266,13 +270,16 @@
                margin=0 \
                style=\"tickall=1,drawtitle=0,$displaystyle\" \
                reset \
-            " "Displaying NDF $ndfname" $canvas
+            "
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
 
 #  Call any inherited 'display' method.
-         return [ chain ]
+         chain
+
+#  Return the cursor to its normal state.
+         $canvas configure -cursor $curs
       }
 
 

@@ -365,6 +365,10 @@
               $displayed(zoomfactor) == $zoomfactor } { 
             return
          }
+
+#  This may be time-consuming.  Set the busy cursor.
+         set curs [ $canvas cget -cursor ]
+         $canvas configure -cursor watch
              
 #  If this pair of NDFs has not been displayed before (but not if only
 #  the display characteristics have changed) then update the title bar.
@@ -425,7 +429,7 @@
                $ndf(B) CURRENT $xoff(B) $yoff(B) \
                [ lindex $percentiles(B) 0 ] [ lindex $percentiles(B) 1 ] \
          ]
-         $canvas create oval -5 -5 5 5 -fill yellow
+         # $canvas create oval -5 -5 5 5 -fill yellow
 
 #  Redraw any points in the points list.
          refreshpoints
@@ -442,6 +446,9 @@
             $canvas bind image$slot <ButtonRelease-1> \
                                     [ code $this image_release $slot %x %y ]
          }
+
+#  Unset the busy cursor.
+         $canvas configure -cursor $curs
       }
 
 
