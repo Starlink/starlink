@@ -86,11 +86,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'BDI_CMN'                                 ! BDI common block
-*       BDI_INIT = LOGICAL (given)
-*         BDI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID
@@ -100,7 +96,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			BDI0_BLK		! Ensures inclusion
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
@@ -112,7 +109,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( BDI__PKG ) ) CALL BDI0_INIT( STATUS )
 
 *  Validate the type, must be numeric
       CALL UDI0_CHKNTY( TYPE, LTYPE, STATUS )

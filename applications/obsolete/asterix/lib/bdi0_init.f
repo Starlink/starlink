@@ -79,16 +79,15 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'BDI_CMN'
-*       BDI_INIT = LOGICAL (returned)
-*         BDI system is initialised?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
+
       EXTERNAL			BDI0_SCARCHK
 
       EXTERNAL			BDI1_CHK
@@ -125,7 +124,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If not already initialised
-      IF ( .NOT. BDI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( BDI__PKG ) ) THEN
 
 *    Requires the data models package
         CALL ADI_REQPKG( 'dsmodels', STATUS )
@@ -223,7 +222,7 @@
      :                   BDI2_UNMAP, DID, STATUS )
 
 *    Mark as initialised
-        BDI_INIT = .TRUE.
+        CALL AST_SPKGI( BDI__PKG )
 
       END IF
 
