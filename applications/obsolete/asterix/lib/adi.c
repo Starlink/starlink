@@ -2093,11 +2093,13 @@ void adi_init( ADIstatus status )
     adic_defcls( "ADIbase", "", "OBJREF ADIlink", &DsysADIbase, status );
     adic_defcac( DsysADIbase, 32, status );
 
+/* Define command language */
+    ADIpkgInit( status );
+
 /* Install file system data extensions */
     ADIfsysInit( status );
 
 /* Install functions */
-    ADIpkgInit( status );
     ADIfuncInit( status );
 
 /* Define variables */
