@@ -39,6 +39,8 @@
 #        Add LOOP parameter
 #     1997 June 19 (TIMJ)
 #        Remove USE_SECTION
+#     1997 Spetember 4 (TIMJ)
+#        Change message in DUMMY
 #     {enter_further_changes_here}
 
 #-
@@ -79,7 +81,7 @@
          ACCESS 'READ'
          VPATH 'GLOBAL'
          ASSOCIATION '<-GLOBAL.DATA_ARRAY'
-         PROMPT 'Should never appear, eek'
+         PROMPT 'Please ignore (will only appear in prompt mode)'
       ENDPARAMETER
 
       PARAMETER MSG_FILTER
