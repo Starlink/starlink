@@ -1,6 +1,6 @@
       SUBROUTINE SST_MON( STATUS )
 *+
-* Name:
+*  Name:
 *    SST_MON
 
 *  Purpose:

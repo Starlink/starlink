@@ -1,6 +1,6 @@
       SUBROUTINE SST_SYSNM( SYSNAM, STATUS )
 *+
-* Name:
+*  Name:
 *    SST_SYSNM
 
 *  Purpose:
