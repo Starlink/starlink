@@ -2,7 +2,7 @@
 
      PARAMETER SOURCE
                POSITION 1
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Name of source file'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<-GLOBAL.BINDS'
@@ -12,7 +12,7 @@
 
      PARAMETER BCKGND
                POSITION 2
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Name of background datafile'
                PPATH   'GLOBAL,CURRENT'
                VPATH   'PROMPT'
@@ -22,7 +22,7 @@
 
      PARAMETER OUT
                POSITION 3
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Name of output file'
                PPATH   'CURRENT'
                ASSOCIATION '->GLOBAL.BINDS'
@@ -134,7 +134,7 @@ HELP 'Minimum value for bckgnd variance, usually used on zero pixels'
             ENDPARAMETER
 
      PARAMETER PART_FILE
-               TYPE    '_CHAR'
+               TYPE    'LITERAL'
                PROMPT  'Name of particle background file'
                PPATH   'DEFAULT'
                VPATH   'DEFAULT'
@@ -143,7 +143,7 @@ HELP 'Minimum value for bckgnd variance, usually used on zero pixels'
             ENDPARAMETER
 
      PARAMETER BGMODEL
-               TYPE    '_UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Name of background model file'
                PPATH   'DEFAULT'
                VPATH   'DEFAULT'
