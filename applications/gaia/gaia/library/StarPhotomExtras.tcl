@@ -6,7 +6,8 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Defines a class of object for controlling optional parameters.
+#     Defines a class of object for controlling optional photometry 
+#     parameters.
 
 #  Description:
 #     This class creates a mega-widget in its own top-level window. It

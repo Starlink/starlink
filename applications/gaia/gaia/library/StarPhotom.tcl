@@ -7,7 +7,7 @@
 
 #  Purpose:
 #     Creates an instance of a toolbox for controlling aperture
-#     photometry. It works as part of the GAIA.
+#     photometry.
 
 #  Description:
 #     This routine defines a class of object that creates a toolbox
@@ -25,8 +25,7 @@
 #     The photometry is actually done by the PHOTOM application
 #     AUTOPHOTOM and the output results from an analysis can be used
 #     to rerun the same measurements on other frames. Full control
-#     over the parameters of this application is also available
-#     (see menu Options - "Set additional parameters").
+#     over the parameters of this application is also available.
 #
 #     There are two fundermentally different modes used in this
 #     routine, the first use magnitudes for the output results

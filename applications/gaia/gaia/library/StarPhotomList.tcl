@@ -240,7 +240,7 @@ itcl::class gaia::StarPhotomList {
    #  Create a new StarPhotomObject with all the current
    #  configurations and an arbitrary name.
    method new_object {index} {
-      set object [StarPhotomObject \#auto \
+      set object [GaiaPhotomObject \#auto \
                      -index $index \
                      -major $semimajor \
                      -eccen $eccentricity \
@@ -544,7 +544,7 @@ itcl::class gaia::StarPhotomList {
    private method update_scrollbox_ {} {
       if { [winfo exists $scrollbox] } {
          $scrollbox clear all
-         $scrollbox insert 0 [gaia::StarPhotomObject::header short]
+         $scrollbox insert 0 [gaia::GaiaPhotomObject::header short]
          for { set i 0 } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
                $scrollbox insert end [$objects_($i) getvalues short]
