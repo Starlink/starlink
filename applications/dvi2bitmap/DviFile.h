@@ -1,5 +1,5 @@
-#ifndef DVI_FILE_LOADED
-#define DVI_FILE_LOADED 1
+#ifndef DVI_FILE_HEADER_READ
+#define DVI_FILE_HEADER_READ 1
 
 //#include <fstream>
 #include <string>
@@ -47,12 +47,14 @@ private:
 };
 
 
-enum dviEventTypes { setchar, setrule, fontdef, fontchange, special,
-		     page, preamble, endofdvi };
+// DviFileEvent is what is returned to the client from the DVI reading class.
+// Declare one derived class for each type of event.
 class DviFileEvent {
  public:
+    //        enum eventTypes { setchar, setrule, fontdef, fontchange, special,
+    //      page, preamble, endofdvi };
     unsigned char opcode;
-    dviEventTypes type;
+    //eventTypes type;
     virtual void debug() const;
 };
 class DviFileSetChar : public DviFileEvent {
@@ -60,14 +62,14 @@ class DviFileSetChar : public DviFileEvent {
     int charno;
     bool increaseH;		// true if we should increase h afterwards
     DviFile *dviFile;
-    DviFileSetChar(DviFile *dptr) : dviFile(dptr) { type = setchar; }
+    DviFileSetChar(DviFile *dptr) : dviFile(dptr) { }
     void debug() const;
 };
 class DviFileSetRule: public DviFileEvent {
  public:
     int a, b;
     bool increaseH;		// as with DviFileSetChar
-    DviFileSetRule() { type = setrule; }
+    DviFileSetRule() { }
     void debug() const;
 };
 class DviFileFontDef : public DviFileEvent {
@@ -75,19 +77,19 @@ class DviFileFontDef : public DviFileEvent {
     int number;
     unsigned int checksum, scale, size;
     string fontdir, fontname;
-    DviFileFontDef() { type = fontdef; }
+    DviFileFontDef() { }
     void debug() const;
 };
 class DviFileFontChange : public DviFileEvent {
  public:
     unsigned int number;
-    DviFileFontChange() { type = fontchange; }
+    DviFileFontChange() { }
     void debug() const;
 };
 class DviFileSpecial : public DviFileEvent {
  public:
     string specialString;
-    DviFileSpecial() { type = special; }
+    DviFileSpecial() { }
     void debug() const;
 };
 class DviFilePage : public DviFileEvent {
@@ -95,15 +97,17 @@ class DviFilePage : public DviFileEvent {
     bool isStart;		// true/false if this is a bop/eop
     signed int count[10];
     signed int previous;
-    DviFilePage() { type = page; }
+    DviFilePage() { }
     void debug() const;
 };
 class DviFilePreamble : public DviFileEvent {
  public:
     unsigned int dviType, num, den, mag;
     string comment;
-    DviFilePreamble() { type = preamble; }
+    DviFilePreamble() { }
     void debug() const;
 };
+class DviFilePostamble : public DviFileEvent {
+};
 
-#endif //#ifndef DVI_FILE_LOADED
+#endif //#ifndef DVI_FILE_HEADER_READ

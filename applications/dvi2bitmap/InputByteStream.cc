@@ -1,21 +1,39 @@
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 
-InputByteStream::InputByteStream (string s, int buflen=256)
-    : buflen_(buflen), eof_(false)
+// Open the requested file.  If preload is true, then open the file and
+// read it entire into memory, since the client will be seeking a lot.
+InputByteStream::InputByteStream (string s, bool preload=false)
+    : preloaded_(preload)
 {
-    buf_ = new IBSByte[buflen];
     fd_ = open (s.c_str(), O_RDONLY);
-    if (fd_ >= 0)
+    eof_ = (fd_ < 0);		// set true if open failed
+
+    if (!eof_)
     {
-	bufcontents_ = read (fd_, buf_, buflen_);
+	if (preload)
+	{
+	    struct stat S;
+	    if (fstat (fd_, &S))
+		throw DviError ("Can't stat open file");
+	    buflen_ = S.st_size;
+	    buf_ = new Byte[buflen_];
+	    int bufcontents = read (fd_, buf_, buflen_);
+	    if (bufcontents != buflen_)
+		throw DviError ("Couldn't preload file");
+	    eob_ = buf_ + bufcontents;
+	}
+	else
+	{
+	    buflen_ = 512;
+	    buf_ = new Byte[buflen_];
+	    eob_ = buf_;	// nothing read in yet - eob at start
+	}
 	p_ = buf_;
-	eof_ = (bufcontents_ == 0);
     }
-    else
-	eof_ = true;
 }
 
 InputByteStream::~InputByteStream ()
@@ -25,22 +43,70 @@ InputByteStream::~InputByteStream ()
     delete[] buf_;
 }
 
-unsigned char InputByteStream::getByte()
+Byte InputByteStream::getByte()
 {
     if (eof_)
 	return 0;
-    if (p_ == buf_ + bufcontents_)
+
+    if (p_ < buf_)
+	throw DviBug ("InputByteStream pointer before buffer start");
+    if (p_ > eob_)
+	throw DviBug ("InputByteStream pointer beyond EOF");
+
+    if (p_ == eob_)
     {
-	bufcontents_ = read (fd_, buf_, buflen_);
-	p_ = buf_;
-	eof_ = (bufcontents_ == 0);
+	if (preloaded_)		// end of buffer means end of file
+	    eof_ = true;
+	else
+	{
+	    int bufcontents = read (fd_, buf_, buflen_);
+	    eof_ = (bufcontents == 0);
+	    p_ = buf_;
+	    eob_ = buf_ + bufcontents;
+	}
     }
     return eof_ ? 0 : *p_++;
+}
+
+const Byte *InputByteStream::getBlock (unsigned int n)
+{
+    if (eof_)
+	return 0;
+
+    if (p_ < buf_)
+	throw DviBug ("InputByteStream pointer before buffer start");
+    if (p_ > eob_)
+	throw DviBug ("InputByteStream pointer beyond EOF");
+    if (p_+n > eob_)
+	throw DviBug ("InputByteStream getBlock requested beyond EOF");
+
+    return p_;
 }
 
 bool InputByteStream::eof()
 {
     return eof_;
+}
+
+void InputByteStream::seek (unsigned int pos)
+{
+    if (!preloaded_)
+	throw DviBug ("Can't seek non-preloaded file");
+    if (pos < 0 || pos > buflen_)
+	throw DviBug ("seek out of range");
+    p_ = buf_ + pos;
+}
+unsigned int InputByteStream::pos ()
+{
+    if (!preloaded_)
+	throw DviBug ("Can't get pos in non-preloaded file");
+    return p_ - buf_;
+}
+void InputByteStream::skip (unsigned int skipsize)
+{
+    if (!preloaded_)
+	throw DviBug ("Can't skip in non-preloaded file");
+    p_ += skipsize;
 }
 
 
@@ -64,7 +130,7 @@ bool InputByteStream::eof()
 signed int InputByteStream::getSIS(int n)
 {
     if (n<0 || n>4)
-	throw DviError("bad argument to getSIS", true);
+	throw DviBug("bad argument to getSIS");
     unsigned int t = getByte();
     unsigned int pow2 = 128;	// 2^7-1   is largest one-byte signed int
 				// 2^7=128 is most negative signed int
@@ -109,7 +175,7 @@ signed int InputByteStream::getSIU(int n)
 {
     // disallow n==4 - there are no unsigned 4-byte quantities in the DVI file
     if (n<0 || n>3)
-	throw DviError("bad argument to getSIU", true);
+	throw DviBug("bad argument to getSIU");
     unsigned int t = 0;
     for (; n>0; n--)
     {
@@ -122,7 +188,7 @@ signed int InputByteStream::getSIU(int n)
 unsigned int InputByteStream::getUIU(int n)
 {
     if (n<0 || n>4)
-	throw DviError("bad argument to getUIU", true);
+	throw DviBug("bad argument to getUIU");
     unsigned int t = 0;
     for (; n>0; n--)
     {

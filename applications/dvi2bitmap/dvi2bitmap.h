@@ -7,9 +7,15 @@ typedef unsigned char Byte;
 class DviError {
  public:
     string problem;
-    bool isBug;
-    DviError(string s, bool bug=false)
-	: problem(s), isBug(bug)
+    DviError(string s)
+	: problem(s)
+	{ }
+};
+class DviBug {
+ public:
+    string problem;
+    DviBug(string s)
+	: problem(s)
 	{ }
 };
 #endif // #ifdef DVI2GIF_HEADER_READ

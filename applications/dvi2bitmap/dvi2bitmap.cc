@@ -5,6 +5,7 @@
 #include <iostream>
 #include "dvi2bitmap.h"
 #include "DviFile.h"
+#include "PkFont.h"
 
 void Usage (void);
 char *progname;
@@ -26,17 +27,27 @@ main (int argc, char **argv)
     try
     {
 	DviFileEvent *ev;
+	DviFilePostamble *post;
 	do
 	{
 	    ev = dvif->getEvent();
 	    //cout << "Event " << ev->type << '\n';
 	    ev->debug();
+	    if (DviFileFontDef *fd = dynamic_cast<DviFileFontDef*>(ev))
+		PkFont *f = new PkFont(fd->checksum,
+				       fd->scale,
+				       fd->size,
+				       fd->fontname);
 	}
-	while (ev->type != endofdvi);
+	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }
     catch (DviError e)
     {
-	cout << (e.isBug ? "BUG" : "DVI error") << ": " << e.problem << '\n';
+	cout << "DVI error: " << e.problem << '\n';
+    }
+    catch (DviBug e)
+    {
+	cout << "BUG: " << e.problem << '\n';
     }
 
     exit (0);

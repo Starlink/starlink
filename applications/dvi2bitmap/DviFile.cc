@@ -30,7 +30,7 @@ DviFileEvent *DviFile::getEvent()
     static DviFileSpecial special;
     static DviFilePage page;
     static DviFilePreamble preamble;
-    static DviFileEvent endOfFile;
+    static DviFilePostamble postamble;
     DviFileEvent *gotEvent = 0;	// non-zero when we've got an event
     Byte opcode;
 
@@ -121,7 +121,7 @@ DviFileEvent *DviFile::getEvent()
 		page.isStart = false;
 		gotEvent = &page;
 		if (!posStack_.empty())
-		    throw DviError("EOP: position stack not empty");
+		    throw DviBug("EOP: position stack not empty");
 		break;
 	      case 141:		// push
 		{
@@ -357,16 +357,15 @@ DviFileEvent *DviFile::getEvent()
 		gotEvent = &preamble;
 		break;
 	      case 248:		// post
-		endOfFile.opcode = opcode;
-		endOfFile.type = endofdvi;
-		gotEvent = &endOfFile;
+		postamble.opcode = opcode;
+		gotEvent = &postamble;
 		break;
 	      case 249:		// post_post
 		// This shouldn't happen within getEvent
-		throw DviError("post_post found in getEvent",true);
+		throw DviBug("post_post found in getEvent");
 		break;
 	      default:
-		throw DviError("unrecognised opcode in getEvent",true);
+		throw DviBug("unrecognised opcode in getEvent");
 		break;
 	    }
 	}
@@ -380,7 +379,7 @@ DviFileEvent *DviFile::getEvent()
 Byte DviFile::getByte()
 {
     if (eof() || ibs_ == 0)
-	throw DviError ("Tried to getByte when no file open", true);
+	throw DviBug ("Tried to getByte when no file open");
     else
     {
 	return ibs_->getByte();
@@ -389,7 +388,7 @@ Byte DviFile::getByte()
 signed int DviFile::getSIU(int n)
 {
     if (eof() || ibs_ == 0)
-	throw DviError ("Tried to getSIU when no file open", true);
+	throw DviBug ("Tried to getSIU when no file open");
     else
     {
 	return ibs_->getSIU(n);
@@ -398,7 +397,7 @@ signed int DviFile::getSIU(int n)
 signed int DviFile::getSIS(int n)
 {
     if (eof() || ibs_ == 0)
-	throw DviError ("Tried to getSIS when no file open", true);
+	throw DviBug ("Tried to getSIS when no file open");
     else
     {
 	return ibs_->getSIS(n);
@@ -407,7 +406,7 @@ signed int DviFile::getSIS(int n)
 unsigned int DviFile::getUIU(int n)
 {
     if (eof() || ibs_ == 0)
-	throw DviError ("Tried to getUIU when no file open", true);
+	throw DviBug ("Tried to getUIU when no file open");
     else
     {
 	return ibs_->getUIU(n);
@@ -421,7 +420,7 @@ bool DviFile::eof()
 void DviFileEvent::debug ()
 const
 { 
-    cerr << 'E' << type << '/' << static_cast<unsigned int>(opcode) << '\n';
+    cerr << 'E' << static_cast<unsigned int>(opcode) << '\n';
 }
 void DviFileSetChar::debug ()
 const
@@ -474,14 +473,14 @@ void DviFile::PosStateStack::push(PosState *p)
 {
     if (i == size)
 	// call it a bug
-	throw DviError("Stack overflow",true);
+	throw DviBug("Stack overflow");
     s[i++] = p;
 }
 DviFile::PosState *DviFile::PosStateStack::pop()
 {
     if (i == 0)
 	// the DVI file's at fault, here
-	throw DviError("Stack underflow",false);
+	throw DviError("Stack underflow");
     return s[--i]; 
 }
 DviFile::PosStateStack::PosStateStack()
