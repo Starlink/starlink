@@ -14,11 +14,21 @@
 
 *  Description:
 *     This routine creates an AST channel for use within CCDPACK using 
-*     a given valid FIO file descriptor.  It is a wrapper for AST_CHANNEL 
+*     a given HDS locator.  It is a wrapper for AST_CHANNEL 
 *     whose purpose is to shield the calling routine from knowledge of 
 *     the source and sink routines and global variables required to 
 *     make this work.  The routine maps the data and sets up the common
 *     block for later use by CCD1_CASRC and CCD1_CASNK.
+*
+*     The routine should be entered with the locator LOC referring to
+*     a CHAR_ component of any (reasonable) length and any (reasonable)
+*     line length.  It should not be mapped on entry, but this routine
+*     will map it.  After data has been written to it using AST_WRITE
+*     (via CCD1_CASNK) the component will be mapped, and may have many 
+*     (up to half) blank, i.e.  space-filled, entries at the end of it,
+*     which the calling routine may wish to truncate.  After the is
+*     finished with, the locator should be annulled (which will unmap
+*     the character array) and the Channel should be annulled.
 
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
