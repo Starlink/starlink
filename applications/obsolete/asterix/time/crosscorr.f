@@ -60,9 +60,6 @@
 *    Function declarations :
       INTEGER CHR_LEN
 *    Local variables :
-      CHARACTER*80           LUNITS          ! Lag units
-      CHARACTER*80           YFILE,ZFILE     ! Input files
-      CHARACTER*80           YPATH,ZPATH     ! Input paths (within file)
       CHARACTER*80           STRING          ! Text string
       CHARACTER*80           TEXT(10)        ! History text
 
@@ -93,10 +90,10 @@
       INTEGER                NMAP            ! No.of values mapped
       INTEGER                BASEFILE        ! File # from which MORE/HIST taken
       INTEGER                QNDIM           ! Dimensionality of quality
-      INTEGER                QDIM(DAT__MXDIM)! Quality dimensions
+      INTEGER                QDIM(ADI__MXDIM)! Quality dimensions
       INTEGER                NLINE           ! Line no. of HISTORY text
       INTEGER                TEXTLEN         ! Length of text string
-      INTEGER                IDIM(DAT__MXDIM)! Size of each dimension
+      INTEGER                IDIM(ADI__MXDIM)! Size of each dimension
       INTEGER			XCID			! Output dataset id
       INTEGER			YFID			! 1st input id
       INTEGER			ZFID			! 2nd input id
