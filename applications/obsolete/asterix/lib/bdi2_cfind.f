@@ -288,6 +288,11 @@ c     LOGICAL			ISBIND			! Binned dataset
         CALL ADI2_CFIND( FITID, ' ', '.TITLE', ' ', CREATE,
      :                   DELETE, 'CHAR', 0, 0, DIDCRE, CACHEID,
      :                   STATUS )
+        IF ( CACHEID .EQ. ADI__NULLID ) THEN
+        CALL ADI2_CFIND( FITID, ' ', '.OBJECT', ' ', CREATE,
+     :                   DELETE, 'CHAR', 0, 0, DIDCRE, CACHEID,
+     :                   STATUS )
+        END IF
 
 *    Add extra info if we created the keyword
         IF ( DIDCRE ) THEN
@@ -343,15 +348,37 @@ c     LOGICAL			ISBIND			! Binned dataset
      :                     DELETE, 'CHAR', 0, 0, DIDCRE, CACHEID,
      :                     STATUS )
 
-*      If ROSAT image next best keyword and alter comment for value replacement
+*      Try the next best option...
           IF ( CACHEID .EQ. ADI__NULLID ) THEN
             CALL ADI2_CFIND( FITID, ' ', '.CRVAL'//CAX, ' ', CREATE,
-     :                       DELETE, 'CHAR', 0, 0, DIDCRE, CACHEID,
+     :                       DELETE, 'REAL', 0, 0, DIDCRE, CACHEID,
      :                       STATUS )
-            CALL ADI_CGET0C( CACHEID, 'Comment', UNITS, STATUS )
-            IF ( INDEX( UNITS, 'deg' ) .GT. 0 ) UNITS = 'degrees'
-            CALL ADI_CERASE( CACHEID, 'Value', STATUS )
-            CALL ADI_CNEWV0C( CACHEID, 'Value', UNITS, STATUS )
+
+*        Now try to guess the units
+            IF ( CACHEID .NE. ADI__NULLID ) THEN
+              CALL ADI_THERE( CACHEID, 'Comment', THERE, STATUS)
+              IF ( THERE ) THEN
+                CALL ADI_CGET0C( CACHEID, 'Comment', UNITS, STATUS )
+                IF ( INDEX( UNITS, 'deg' ) .GT. 0 ) THEN
+                  UNITS = 'degrees'
+                END IF
+              ELSE
+                UNITS = 'pixels'
+              END IF
+
+*        Erase old value and add new character string
+              CALL ADI_CERASE( CACHEID, 'Value', STATUS )
+              CALL ADI_CNEWV0C( CACHEID, 'Value', UNITS, STATUS )
+            ELSE
+
+*        Need a new cache object for units string
+              CALL ADI2_CFIND( FITID, ' ', '.BITPIX', ' ', CREATE,
+     :                         DELETE, 'INTEGER', 0, 0, DIDCRE, CACHEID,
+     :                         STATUS )
+              UNITS = 'pixels'
+              CALL ADI_CERASE( CACHEID, 'Value', STATUS )
+              CALL ADI_CNEWV0C( CACHEID, 'Value', UNITS, STATUS )
+            END IF
           END IF
 
 *      Add extra info if we created the keyword
