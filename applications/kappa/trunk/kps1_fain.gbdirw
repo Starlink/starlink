@@ -1,9 +1,9 @@
-      SUBROUTINE KPS_$FAIN<T>( BAD, DIM1, DIM2, INARR, SIGRNG, LOW,
+      SUBROUTINE KPS1_FAIN<T>( BAD, DIM1, DIM2, INARR, SIGRNG, LOW,
      :                        HIGH, BADVAL, INVERT, OUTARR, LOWER,
      :                        UPPER, STATUS )
 *+
 *  Name:
-*     KPS_$FAINx
+*     KPS1_FAINx
 
 *  Purpose:
 *     Scales an image to a range of standard deviations about the
@@ -14,7 +14,7 @@
 
 *  Invocation
 
-*     CALL KPS_$FAINx( BAD, DIM1, DIM2, INARR, SIGRNG, LOW, HIGH,
+*     CALL KPS1_FAINx( BAD, DIM1, DIM2, INARR, SIGRNG, LOW, HIGH,
 *    :                 BADVAL, INVERT, OUTARR, LOWER, UPPER, STATUS )
 
 *  Description:
@@ -188,7 +188,7 @@
 
          IF ( VALCNT .LT. 2 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPS_$FAINx_INSP',
+            CALL ERR_REP( 'KPS1_FAINx_INSP',
      :        'Insufficient valid pixels to calculate statistics',
      :        STATUS )
             GOTO 999
@@ -241,7 +241,7 @@
 
 *    Scale the values between the upper and lower pens.
 
-      CALL KPG_$ISCL<T>( BAD, DIM1, DIM2, INARR, INVERT, LOWER, UPPER,
+      CALL KPG1_ISCL<T>( BAD, DIM1, DIM2, INARR, INVERT, LOWER, UPPER,
      :                   LOW, HIGH, BADVAL, OUTARR, STATUS )
 
  999  CONTINUE
