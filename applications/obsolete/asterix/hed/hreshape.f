@@ -65,8 +65,6 @@
         ENDIF
       ENDIF
 
-      CALL DAT_ANNUL(LOC,STATUS)
-
       CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
