@@ -1,5 +1,7 @@
-\documentstyle[11pt]{article} 
+\documentclass[11pt]{article}
 \pagestyle{myheadings}
+
+\usepackage{graphicx}
 
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
@@ -45,9 +47,7 @@ DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
 \end{center}
 \vspace{5mm}
 
-\begin {picture}(160,160)
-\put(0,-130){\special{psfile=sun90-fig-1.ps}}
-\end {picture}
+\includegraphics[width=0.95\textwidth]{sun90-fig-1.eps}
 
 \newpage
 
@@ -956,10 +956,9 @@ in the previous section was used.
 Further copies can be obtained by running XYPLOT and replying with the 
 name of the example input file to the `Filename?' prompt.
 
-\begin {picture}(160,160)
-\put(0,-130){\special{psfile=sun90-fig-1.ps}}
-\end {picture}
-
+\begin{figure}
+\includegraphics[width=0.95\textwidth]{sun90-fig-1.eps}
+\end{figure}
 
 \section {Demonstration -- the SPEED Program} \label{demo2_sect}
 
@@ -1750,29 +1749,14 @@ Called:  AGGETI, AGSETI, SETER, PWRITX, PWRIT, GTNUM, KUPX, KUPY, CPUX, CPUY
 This routine uses characters outside the ANSI Fortran 77 character
 set.
 
-\newpage
-\begin {picture}(160,230)
-\put(-10,10){\special{psfile=sun90-fig-2.ps}}
-\end {picture}
+\includegraphics[height=0.95\textheight]{sun90-fig-2.eps}
 
-\newpage
-\begin {picture}(160,230)
-\put(-10,10){\special{psfile=sun90-fig-3.ps}}
-\end {picture}
+\includegraphics[height=0.95\textheight]{sun90-fig-3.eps}
 
-\newpage
-\begin {picture}(160,230)
-\put(-10,10){\special{psfile=sun90-fig-4.ps}}
-\end {picture}
+\includegraphics[height=0.95\textheight]{sun90-fig-4.eps}
 
-\newpage
-\begin {picture}(160,230)
-\put(-10,10){\special{psfile=sun90-fig-5.ps}}
-\end {picture}
+\includegraphics[height=0.95\textheight]{sun90-fig-5.eps}
 
-\newpage
-\begin {picture}(160,230)
-\put(-10,10){\special{psfile=sun90-fig-6.ps}}
-\end {picture}
+\includegraphics[height=0.95\textheight]{sun90-fig-6.eps}
 
 \end{document}
