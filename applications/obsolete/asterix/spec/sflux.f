@@ -1,91 +1,168 @@
-*+  SFLUX - Integrates energy and photon flux under a spectrum
       SUBROUTINE SFLUX( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     SFLUX
+
+*  Purpose:
+*     Integrates energy and photon flux under a spectrum
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL SFLUX( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Takes a fit_model data object and calculates the flux (ergs/cm**2/sec)
 *     and number of photons (photons/sec) between two entered energy limits.
 *     The number of energy channels between these limits used for integration
 *     is 1000 by default, but can be made up to 5000.
-*
-*    Parameters :
-*
-*     MODEL=UNIV(R)
-*            data object containing model spec
-*     Z=REAL(R)
-*            redshift to be applied to source spectrum
-*     NCH=INTEGER(R)
-*            number of channels for integral evaluation
-*     LEN=REAL(R)
-*            start energy for integral
-*     UEN=REAL(R)
-*            upper energy for integral
-*     SPLIT=LOGICAL(R)
-*            find fluxes in each model component
-*
-*    Method :
-*
+
+*  Usage:
+*     sflux {parameter_usage}
+
+*  Environment Parameters:
+*     MODEL = CHAR (read)
+*        Data object containing model spec
+*     Z = REAL (read)
+*        Redshift to be applied to source spectrum
+*     NCH = INTEGER (read)
+*        Number of channels for integral evaluation
+*     LEN = REAL (read)
+*        Start energy for integral
+*     UEN = REAL (read)
+*        Upper energy for integral
+*     SPLIT = LOGICAL (read)
+*        Find fluxes in each model component
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     Integration channels are spaced logarithmically in energy.
 *     If a non-zero redshift is specified, it is incorporated by scaling
 *     all the model space bounds by 1+z, to shift them into the source frame.
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Martin Watt (BHVAD:: MPW)
-*     Trevor Ponman (BHVAD::TJP)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     23 Oct 85 : Original (MPW)
-*      3 Jul 87 : V0.6-1 New fitting system (TJP)
-*      5 Nov 87 : V0.6-2 New FIT_MODGET interface (TJP)
-*     14 Dec 88 : V0.6-3 Further updates to subroutine calls (TJP)
-*     23 Feb 89 : FIT_MCALC interface slightly changed. V no. not changed (TJP)
-*     20 Jun 89 : V1.0-1 ASTERIX88 version, redshift included (TJP)
-*     14 Aug 90 : V1.0-2 Write output to parameters (RJV)
-*      5 Aug 91 : V1.5-1 INIT flag added (TJP)
-*     12 Jan 93 : V1.7-0 Missing AST_INIT added. Now finds fluxes in each
-*                        additive model component. (DJA)
-*      8 Sep 93 : V1.7-1 Added SPEC_INIT call and removed reference to
-*                        SPEC_CMN_RZ (DJA)
-*     24 Jan 94 : V1.7-2 SPLIT mode can now calculates unabsorbed fluxes in
-*                        additive model components. (DJA)
-*      8 Feb 94 : V1.7-3 More changes to FIT_MCALC interface (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     24 Apr 95 : V1.8-1 Updated data interface (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     sflux, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     MPW: Martin Watt (Spacelab 2, University of Birmingham)
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Oct 1985 V0.6-0 (MPW):
+*        Original version.
+*      3 Jul 1987 V0.6-1 (TJP):
+*        New fitting system
+*      5 Nov 1987 V0.6-2 (TJP):
+*        New FIT_MODGET interface
+*     14 Dec 1988 V0.6-3 (TJP):
+*        Further updates to subroutine calls
+*     23 Feb 1989 V0.6-4 (TJP):
+*        FIT_MCALC interface slightly changed
+*     20 Jun 1989 V1.0-1 (TJP):
+*        ASTERIX88 version, redshift included
+*     14 Aug 1990 V1.0-2 (RJV):
+*        Write output to parameters
+*      5 Aug 1991 V1.5-1 (TJP):
+*        INIT flag added
+*     12 Jan 1993 V1.7-0 (DJA):
+*        Missing AST_INIT added. Now finds fluxes in each
+*        additive model component
+*      8 Sep 1993 V1.7-1 (DJA):
+*        Added SPEC_INIT call and removed reference to SPEC_CMN_RZ
+*     24 Jan 1994 V1.7-2 (DJA):
+*        SPLIT mode can now calculates unabsorbed fluxes in
+*        additive model components.
+*      8 Feb 1994 V1.7-3 (DJA):
+*        More changes to FIT_MCALC interface
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      1 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIT_PAR'
-*
-*    Structure declarations:
-*
+
+*  Structure Definitions:
       INCLUDE 'FIT_STRUC'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local constants :
-*
-      INTEGER MAXEN
-	PARAMETER (MAXEN=5000)		! max number of energy channels
-      INTEGER MAXTERM			! Max no. additive terms
-        PARAMETER (MAXTERM=MAXCOMP)
-      INTEGER DEFAULT
-	PARAMETER (DEFAULT=1000)	! default number of energy channels
-*
-*    Local variables :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      [external_declaration]
+      {data_type} {external_name} ! [external_description]
+
+*  Local Constants:
+      INTEGER 			MAXEN			! max number of energy channels
+	PARAMETER 		( MAXEN = 5000 )
+
+      INTEGER 			MAXTERM			! Max no. additive terms
+        PARAMETER 		( MAXTERM = MAXCOMP )
+
+      INTEGER 			DEFAULT
+	PARAMETER 		( DEFAULT = 1000 )	! default number of energy channels
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'SFLUX Version V2.0-0' )
+
+*  Local Variables:
       RECORD /MODEL_SPEC/ MODEL      	! model specification
       RECORD /MODEL_SPEC/ TMODEL      	! Term model specification
 
@@ -121,134 +198,133 @@
 
       LOGICAL FROZEN(NPAMAX)         	! FROZEN facility
       LOGICAL SPLIT                     ! Split model into components?
-*
-*    Version :
-*
-      CHARACTER*30 VERSION
-	PARAMETER		( VERSION='SFLUX Version 1.8-1' )
-*-
+*.
 
-*    Version
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise ASTERIX
       CALL AST_INIT()
       CALL SPEC_INIT( STATUS )
 
-*    Model genus
-      MODEL.GENUS='SPEC'
+*  Model genus
+      MODEL.GENUS = 'SPEC'
 
-*    Read in the model to be fitted
-      CALL USI_TASSOCI( 'MODEL', '*', 'READ', MFID, STATUS )
-      CALL FIT_MODGET(MFID,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
-      IF ( STATUS.NE.SAI__OK ) GOTO 9000
+*  Read in the model to be fitted
+      CALL USI_ASSOC( 'MODEL', '*', 'READ', MFID, STATUS )
+      CALL FIT_MODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+     :                 FROZEN, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Look for redshift
+*  Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
 
-*    Enter no of energy channels
-      CALL USI_GET0I('NCH',NEN,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 9000
-      IF(NEN.GT.MAXEN) THEN
-	CALL MSG_SETI('MAXEN',MAXEN)
+*  Enter no of energy channels
+      CALL USI_GET0I( 'NCH', NEN, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( NEN .GT. MAXEN ) THEN
+	CALL MSG_SETI( 'MAXEN', MAXEN )
 	CALL MSG_PRNT( 'Using maximum of ^MAXEN channels' )
-	NEN=MAXEN
+	NEN = MAXEN
       END IF
 
-*    Enter energy range to be integrated
+*  Enter energy range to be integrated
       CALL MSG_PRNT( 'Enter energy limits in keV' )
-      CALL USI_GET0R('LEN',LENERGY,STATUS)
-      CALL USI_GET0R('UEN',UENERGY,STATUS)
-      IF(STATUS.NE.SAI__OK) GOTO 9000
+      CALL USI_GET0R( 'LEN', LENERGY, STATUS )
+      CALL USI_GET0R( 'UEN', UENERGY, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Apply redshift to required energy range
+*  Apply redshift to required energy range
       IF ( Z .GT. 0.0 ) THEN
         CALL SFIT_APPRED( Z, 1, LENERGY, UENERGY, STATUS )
       END IF
 
-*    Calculate energy boundaries for integration
-      LOWER=ALOG10(LENERGY)
-      UPPER=ALOG10(UENERGY)
-      STEP =(UPPER-LOWER)/REAL(NEN)
-      DO J=1,NEN
-        ELBOUND(J)=10.0**(LOWER+REAL(J-1)*STEP)
+*  Calculate energy boundaries for integration
+      LOWER = ALOG10(LENERGY)
+      UPPER = ALOG10(UENERGY)
+      STEP = (UPPER-LOWER)/REAL(NEN)
+      DO J = 1, NEN
+        ELBOUND(J) = 10.0**(LOWER+REAL(J-1)*STEP)
       END DO
-      DO J=1,NEN-1
-        EUBOUND(J)=ELBOUND(J+1)
-      ENDDO
-      EUBOUND(NEN)=10.0**(LOWER+REAL(NEN)*STEP)
+      DO J = 1, NEN-1
+        EUBOUND(J) = ELBOUND(J+1)
+      END DO
+      EUBOUND(NEN) = 10.0**(LOWER+REAL(NEN)*STEP)
 
-*    Calculate number of photons in each energy channel
+*  Calculate number of photons in each energy channel
       CALL DYN_MAPR( 1, NEN*MAXSTACK, STACKPTR, STATUS )
       CALL FIT_MCALC( MODEL, PARAM, 1, 1, NEN, NEN, NEN+1, ELBOUND,
      :                EUBOUND, %VAL(STACKPTR), FLUX, STATUS )
 
-*    Split model up
+*  Split model up
       IF ( MODEL.NCOMP .GT. 1 ) THEN
         CALL USI_GET0L( 'SPLIT', SPLIT, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 9000
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
       ELSE
         SPLIT = .FALSE.
       END IF
 
-*    Calculate energy and photon fluxes between the two energy values
+*  Calculate energy and photon fluxes between the two energy values
       CALL SFLUX_FLX( NEN, FLUX, ELBOUND, EUBOUND, PHOTONS, TOTFLX,
      :                                                     STATUS )
 
-*    Split up the model?
+*  Split up the model?
       IF ( SPLIT ) THEN
 
-*      Identify the additive terms in the model and their associated
-*      multiplicative components.
+*    Identify the additive terms in the model and their associated
+*    multiplicative components.
         CALL FIT_MSPECFLAT( MODEL, MAXTERM, NTERM, TERMS, SIGNS,
      :                      STATUS )
 
-*      Heading
+*    Heading
         CALL MSG_PRNT( '  Model Term              Photons/cm**2/sec  '/
      :                 /'Erg/cm**2/sec' )
 
-*      Loop over additive terms
+*    Loop over additive terms
         DO J = 1, NTERM
 
-*        Evaluate this term
+*      Evaluate this term
           CALL FIT_MCALCTERM( MODEL, NTERM, TERMS, SIGNS, J,
      :                        PARAM, 1, 1, NEN, NEN, NEN+1,
      :                        ELBOUND, EUBOUND, %VAL(STACKPTR),
      :                        TMODEL, FLUX, STATUS )
 
-*        Get energy and photon flux for this spectrum
+*      Get energy and photon flux for this spectrum
           CALL SFLUX_FLX( NEN, FLUX, ELBOUND, EUBOUND, TPHOTONS,
      :                    TTOTFLX, STATUS )
 
-*        Output text
+*      Output text
           WRITE( TXT, '(2X,A23,2(2X,1PG14.7))' )
      :                           TMODEL.SPEC, TPHOTONS, TTOTFLX
           CALL MSG_PRNT( TXT )
 
         END DO
 
-*      Write unattenuated flux if more than one multiplicative component
+*    Write unattenuated flux if more than one multiplicative component
         CALL MSG_BLNK()
 
       END IF
 
-*    Unmap model stack
+*  Unmap model stack
       CALL DYN_UNMAP( STACKPTR, STATUS )
 
-*    Print out results
+*  Print out results
       CALL MSG_SETR('TOTFLX',TOTFLX)
       CALL MSG_PRNT( 'Energy flux = ^TOTFLX ergs/cm**2/sec' )
       CALL MSG_SETR('PHOTONS',PHOTONS)
       CALL MSG_PRNT( 'Photon flux = ^PHOTONS photons/cm**2/sec' )
 
-*    Write output to environment
+*  Write output to environment
       CALL USI_PUT0R( 'EFLUX', TOTFLX, STATUS )
       CALL USI_PUT0R( 'PFLUX', PHOTONS, STATUS )
 
-*    Tidy up and exit
+*  Tidy up and exit
       CALL USI_ANNUL( 'MODEL', STATUS )
 
- 9000 CALL AST_CLOSE()
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -274,7 +350,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
