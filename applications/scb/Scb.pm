@@ -29,7 +29,7 @@ use Cwd;
 
 #  Directory locations.
 
-$main::srcdir = "/local/star/src/from-ussc";  # head of source tree
+$main::srcdir = "/local/star/sources";        # head of source tree
 $main::incdir = "/star/include";              # include directory
 
 #  Index file locations.
@@ -156,12 +156,13 @@ sub module_name {
       return undef if (/^\w*=/);        # Ignore assignments.
       s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
 
-      ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/;
+      ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(*,]+)/;
 
       if ($name && $filetype eq 'gen') {
          $name =~ s/</\&lt;/g;
          $name =~ s/>/\&gt;/g;
       }
+      $name = (lc $name) . "_" if ($name);
    }
 
 #  C source file.
@@ -180,7 +181,7 @@ sub module_name {
 
       ($type, $name) =
          /^\s*F77_(SUBROUTINE|[A-Z]+_FUNCTION|EXTERNAL_NAME) *\(\s*(\w+)\s*\)/;
-      $name =~ tr/a-z/A-Z/ if $name;
+      $name .= '_' if $name;
 
    }
 
