@@ -141,87 +141,91 @@ sub match_positions_match ($$$$$) {
     # implicit fork and returns pid zero in the child and non-zero in
     # the parent.  If the fork fails for any reason, then pid is returned
     # undefined.
+    #
+    # We don't have to worry about flushing bufferes prior to the
+    # fork.  It doesn't matter, since we capture the stdout from the
+    # child, and the match program doesn't write anything to stderr.
     my $matchresponse = '';
     my $line;
     my $pid = open (MATCHER, "-|");
     my $successfulmatch = 0;	# initialise false
-    if (defined($pid)) {
-	# The implicit fork worked
-	if ($pid) {
-	    # We're in the parent -- read output of $matchprog from
-	    # MATCHER.  The output may in principle be multi-line,
-	    # though a successful output is just a single line.
-	    while (defined($line = <MATCHER>)) {
-		chomp ($line);
-		$matchresponse .= "$line "; # add extra space instead
-                                            # of newline
-	    }
-	    close (MATCHER);
-	    # Parse the output of $matchprog.  A successful return
-	    # consists of a line starting `TRANS:'
-	    if ($matchresponse =~ /^TRANS/) {
-		printf STDERR ("%s: %s successful: response=%s\n",
-			       $myname, $matchprog, $matchresponse)
-		  if $verbose;
-		# Format is `TRANS: a=nnn b=nnn...'
-		my @valstrings = split (' ', $matchresponse);
-		my @vals = ();
-		shift (@valstrings); # shift off `TRANS:'
-		foreach my $v (@valstrings) {
-		    ($v =~ /^[a-z]=([-+.eE0-9]*)$/)
-		      || wmessage ('fatal',
-				   "match response malformed: $matchresponse");
-		    push (@vals, $1);
-		}
-		if ($verbose) {
-		    print STDERR "$myname: $matchprog returned...\n";
-		    my $coef = 'a';
-		    foreach my $vn (@vals) {
-			print STDERR "\t$coef = $vn\n";
-			$coef++;
-		    }
-		}
-		# Decompose the transform into scales and angles.
-		my @transcpts
-		  = decompose_transform ($vals[0], $vals[1], $vals[2],
-					 $vals[3], $vals[4], $vals[5]);
-		printf STDERR ("decompose_transform: xz=%f yz=%f sx=%f, sy=%f perp=%f orient=%f\n",
-			       $transcpts[0],
-			       $transcpts[1],
-			       $transcpts[2],
-			       $transcpts[3],
-			       $transcpts[4],
-			       $transcpts[5])
-		  if $verbose;
-		wmessage ('info',
-			  sprintf ("%s: transform scale %.1g, non-perpendicularity %.0f",
-				   $myname,
-				   sqrt(abs($transcpts[2]*$transcpts[3])),
-				   $transcpts[4]));
-		# Check the coefficients: the non-perpendicularity
-		# should be `small'.  How small is small?  I'm not
-		# sure, but if it's more than 10 degrees, we should
-		# probably at least warn about it.
-		if (abs($transcpts[4]) > 10) {
-		    wmessage ('warning',
-			      sprintf ("%s: match results skew (%.0f deg); but I'll use the matches anyway",
-				       $myname, $transcpts[4]));
-		}
-
-		$successfulmatch = 1;
-	    } else {
-		# Output of $matchprog wasn't what we were expecting
-		printf STDERR ("%s: %s: response = %s\n",
-			       $myname, $matchprog, $matchresponse)
-		  if $verbose;
-	    }
-	} else {
-	    # We're in the child -- exec $matchprog
-	    exec (@matchargs);
-	    wmessage ('fatal',
-		      "plugin-match-match: Failed to exec $matchprog");
-	    exit 1;		# just in case wmessage is not defined to exit
+    if ($pid) {
+	# The implicit fork worked, and
+	# we're in the parent -- read output of $matchprog from
+	# MATCHER.  The output may in principle be multi-line,
+	# though a successful output is just a single line.
+	while (defined($line = <MATCHER>)) {
+	    chomp ($line);
+	    $matchresponse .= "$line "; # add extra space instead
+	    # of newline
 	}
+	close (MATCHER);
+	# Parse the output of $matchprog.  A successful return
+	# consists of a line starting `TRANS:'
+	if ($matchresponse =~ /^TRANS/) {
+	    printf STDERR ("%s: %s successful: response=%s\n",
+			   $myname, $matchprog, $matchresponse)
+	      if $verbose;
+	    # Format is `TRANS: a=nnn b=nnn...'
+	    my @valstrings = split (' ', $matchresponse);
+	    my @vals = ();
+	    shift (@valstrings); # shift off `TRANS:'
+	    foreach my $v (@valstrings) {
+		($v =~ /^[a-z]=([-+.eE0-9]*)$/)
+		  || wmessage ('fatal',
+			       "match response malformed: $matchresponse");
+		push (@vals, $1);
+	    }
+	    if ($verbose) {
+		print STDERR "$myname: $matchprog returned...\n";
+		my $coef = 'a';
+		foreach my $vn (@vals) {
+		    print STDERR "\t$coef = $vn\n";
+		    $coef++;
+		}
+	    }
+	    # Decompose the transform into scales and angles.
+	    my @transcpts
+	      = decompose_transform ($vals[0], $vals[1], $vals[2],
+				     $vals[3], $vals[4], $vals[5]);
+	    printf STDERR ("decompose_transform: xz=%f yz=%f sx=%f, sy=%f perp=%f orient=%f\n",
+			   $transcpts[0],
+			   $transcpts[1],
+			   $transcpts[2],
+			   $transcpts[3],
+			   $transcpts[4],
+			   $transcpts[5])
+	      if $verbose;
+	    wmessage ('info',
+		      sprintf ("%s: transform scale %.1g, non-perpendicularity %.0f",
+			       $myname,
+			       sqrt(abs($transcpts[2]*$transcpts[3])),
+			       $transcpts[4]));
+	    # Check the coefficients: the non-perpendicularity
+	    # should be `small'.  How small is small?  I'm not
+	    # sure, but if it's more than 10 degrees, we should
+	    # probably at least warn about it.
+	    if (abs($transcpts[4]) > 10) {
+		wmessage ('warning',
+			  sprintf ("%s: match results skew (%.0f deg); but I'll use the matches anyway",
+				   $myname, $transcpts[4]));
+	    }
+	    
+	    $successfulmatch = 1;
+	} else {
+	    # Output of $matchprog wasn't what we were expecting
+	    printf STDERR ("%s: %s: response = %s\n",
+			   $myname, $matchprog, $matchresponse)
+	      if $verbose;
+	}
+    } elsif (defined($pid)) {
+	# $pid is defined but zero: we're in the child -- exec $matchprog
+	exec (@matchargs);
+	# We shouldn't get here
+	wmessage ('fatal',
+		  "plugin-match-match: Failed to exec $matchprog");
+	exit 1;			# belt _and_ braces,
+				# just in case wmessage is not defined to exit
     } else {
 	# $pid was undefined -- we couldn't fork
 	wmessage ('fatal',
