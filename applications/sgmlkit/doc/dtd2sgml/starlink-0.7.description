@@ -1742,6 +1742,68 @@ then this would resolve to the three media types <code>screen</code>,
 <code>3d-glasses</code> and <code>print</code>, and the content `Blah
 blah blah' would be included by the HTML and print down-converters.</p>
 </attribute>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Sat, 3 Jun 2000 15:16:31 +0100 (BST)</date>
+<subject>How do you say `everything else'?</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Sat Jun 03 15:16:33 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+span@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Sat, 03 Jun 2000 15:16:33 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12yEj2-0004Pf-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Sat, 03 Jun 2000 15:16:32 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12yEj1-0005c0-00 for sgml-starlink-0.7+span@astro.gla.ac.uk; Sat, 03 Jun 2000 15:16:31 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10006031458460.21375-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+At present, you can't say that one &lt;span&gt; is for everything _except_
+one media type.  For example, you could say
+
+&lt;span media='screen,print'&gt;&lt;m&gt;r^2=x^2+y^2&lt;/m&gt;&lt;/span&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+
+But that leaves you out in the cold if and when we implement a
+`3d-glasses' media type.  This is a limitation in the HTML4 definition
+of the span element, which I've merely copied.
+
+How about either (or both???) of:
+
+&lt;span media='!tty'&gt;&lt;m&gt;r^2=x^2+y^2&lt;/m&gt;&lt;/span&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+
+so that the first one matches whenever the media type is _not_ tty, or
+
+&lt;spanset&gt;
+&lt;span media='tty'&gt;&lt;code&gt;r**2 = x**2 + y**2&lt;/code&gt;&lt;/span&gt;
+&lt;span media='all'&gt;&lt;m&gt;r^2=x^2+y^2&lt;/m&gt;&lt;/span&gt;
+&lt;/spanset&gt;
+
+with the understanding that only the first matching span is selected.
+The &lt;spanset&gt; start tag looks like it would be omissable, but isn't.
+
+Of the two, the logic of the second appeals to me more, but the extra
+tag is ugly, and takes us away from the picture of the span element as
+a general-purpose mechanism (though currently used only for
+media-selection) for delimiting areas of text.  The first one
+wouldn't be hard to implement.
+
+While we're on the subject, how about a &lt;div&gt; element, functioning just
+like &lt;span&gt;, but at a higher level in the hierarchy, so that it can
+include sections and/or paragraphs?
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
 <!--splice:span-->
 </element>
 
