@@ -263,14 +263,14 @@ endif
 #  HDSTOOLS
 if ( -e @bindir@/hdstools/hdstools.csh ) then
    setenv HDSTOOLS_DIR @bindir@/hdstools
-   setenv HDSTOOLS_HELP @starhelpdir@/hdstools/hdstools.shl
+   setenv HDSTOOLS_HELP @starhelpdir@/hdstools/hdstools
 endif
 
 #
 #  HDSTRACE
 if ( -e @bindir@/hdstrace ) then
    setenv HDSTRACE_DIR @bindir@
-   setenv HDSTRACE_HELP @starhelpdir@/hdstrace.shl
+   setenv HDSTRACE_HELP @starhelpdir@/hdstrace
 endif
 
 #
