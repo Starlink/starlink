@@ -11,7 +11,6 @@
         PARAMETER    ( PSF_PSPC__VARP = 4 )
 
       LOGICAL                 RX_INIT 			! System initialised
-      CHARACTER*(DAT__SZLOC)  RX_LOC(PSF_NMAX)  	! Dataset locators
       INTEGER                 RX_OPTION(PSF_NMAX)	!
       REAL                    RX_ENERGY(PSF_NMAX)	!
       INTEGER                 RX_PHALO(PSF_NMAX)        !
@@ -19,7 +18,7 @@
       LOGICAL                 RX_PHA_DEF(PSF_NMAX)      ! Channel bounds defined
 
       LOGICAL                 RX_CB_OPEN
-      CHARACTER*(DAT__SZLOC)  RX_CB_LOC  		! Dataset locators
+      INTEGER			RX_CB_ID		! Cube identifier
       INTEGER                 RX_CB_PPTR, RX_CB_RPTR    ! Ptr to cube fields
       INTEGER                 RX_CB_NRBIN, RX_CB_NEBIN, ! Cube dimensions
      :                        RX_CB_NOBIN
@@ -33,5 +32,4 @@
      :                        RX_CB_PPTR, RX_CB_RPTR, RX_CB_NRBIN,
      :                        RX_CB_NEBIN, RX_CB_NOBIN, RX_CB_EAPTR,
      :                        RX_CB_EWPTR, RX_CB_OBASE, RX_CB_OSCALE,
-     :                        RX_CB_RPMIN
-      COMMON /PSF_XRT_CMNC/   RX_LOC, RX_CB_LOC
+     :                        RX_CB_RPMIN, RX_CB_ID
