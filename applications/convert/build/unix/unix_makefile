@@ -35,7 +35,7 @@
 #           the mk script and lists the targets provided.
 #
 #        archive
-#           Creates the source-file tar file.  It is not part of the 
+#           Creates the source-file tar files.  It is not part of the 
 #           standard set of Starlink targets, and it is provided for
 #           use during code development and the convenience for the
 #           programmer.
@@ -126,6 +126,8 @@
 #           Message and error reporting systems.
 #        fio
 #           Fortran input-output routines.
+#        fitsio
+#           FITS input-output (from Heasarch)
 #        grp
 #           Manipulation of groups of objects
 #        hds
@@ -251,6 +253,11 @@
 #        archive-target references.  Rearranged the dependencies for
 #        compactness, removed a block of duplicated dependencies, and
 #        added dependencies for new routines.
+#     1997 August 1 (MJC):
+#        V1.0.  Added DA2NDF, FITS2NDF, and NDF2DA.  Created new COF and
+#        COI libraries.  Updated the dependencies.  Added PUBLIC_TASKS
+#        macro.  Revised archive target to make four other tar files.
+#        Removed undocumented test-archive target.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -355,7 +362,7 @@ STAR_ETC = $(STARLINK)/etc
 STAR_HELP = $(STARLINK)/help
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
-FIG_SOURCE = $(STARLINK)/figaro
+FIG_SOURCE = $(STARLINK)/sources/figaro
 
 #  Pathname of the root directory beneath which the built files for
 #  this package should be installed for use.  This defaults to the
@@ -427,7 +434,7 @@ PKG_LINK = CONVERT
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.6-3, 1996 September
+PKG_VERS = 1.0, 1997 August
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -436,7 +443,16 @@ PKG_VERS = 0.6-3, 1996 September
 #  smaller source archives in place of one large one to speed up build
 #  times.
 
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
+   iraflibs_alpha_OSF1.tar iraflibs_ix86_Linux.tar iraflibs_sun4_Solaris.tar \
+   $(TEST_ARCHIVE)
+
+#  List of public task files.  These are task which form part of
+#  the package and will be required by users of it, but have been
+#  pre-built for a specified operating system.  They will be installed
+#  in the $(INSTALL_BIN) directory with execute permission set.
+
+PUBLIC_TASKS = tifftopnm
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -470,7 +486,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = hlpcmd.f
+PRIVATE_INCLUDES = hlpcmd.f coi_cmn.f cof_cmn.f
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -492,44 +508,141 @@ EXTERNAL_INCLUDES = SAE_PAR CHR_ERR CMP_ERR DAT_PAR DAT_ERR FIO_PAR \
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).  
 
-F_ROUTINES = \
-aif_antmp.f aif_ptfnm.f aif_temp.f \
+AIF_F_ROUTINES = \
+aif_antmp.f aif_getvm.f aif_ptfnm.f aif_temp.f
+
+COF_F_ROUTINES = \
+cof_2dfex.f \
+cof_2dfif.f \
+cof_2dfim.f \
+cof_atypc.f \
+cof_bn2ht.f \
+cof_bp2ht.f \
+cof_camaa.f \
+cof_camax.f \
+cof_chisr.f \
+cof_dateh.f \
+cof_dstyp.f \
 cof_escod.f cof_escoi.f cof_escor.f cof_escow.f \
+cof_exdim.f \
+cof_f2ndf.f \
+cof_fd2ht.f \
+cof_fhist.f \
 cof_fioer.f \
+cof_frmt.f \
+cof_ft2ne.f \
+cof_gkeyc.f cof_gkeyd.f cof_gkeyi.f cof_gkeyl.f cof_gkeyr.f \
 cof_h2bin.f \
+cof_halog.f \
+cof_hdate.f \
+cof_hdlog.f \
+cof_hecho.f \
 cof_ht2bn.f \
+cof_iuemx.f \
+cof_iueq.f \
+cof_iuesi.f \
+cof_lws1.f \
+cof_lws2.f \
+cof_lwsan.f \
+cof_mandh.f \
 cof_mxmnd.f cof_mxmni.f cof_mxmnr.f cof_mxmnw.f \
 cof_ndf2f.f \
+cof_ndfax.f \
+cof_ndfcc.f \
+cof_rhead.f \
+cof_sbnd.f \
+cof_scofd.f cof_scofi.f cof_scofr.f cof_scofw.f \
+cof_spec.f \
+cof_stypc.f \
+cof_stype.f \
+cof_swsaa.f \
+cof_t2hds.f \
 cof_thier.f \
 cof_typsz.f \
+cof_wfext.f \
+cof_wgbfe.f \
 cof_whead.f \
+cof_whisr.f \
 cof_wndfh.f \
+cof_wrtab.f
+
+COI_F_ROUTINES = \
+coi_alogd.f coi_alogr.f \
+coi_axexp.f \
+coi_aximp.f \
+coi_chevd.f coi_chevr.f \
+coi_chisr.f \
+coi_fhist.f \
+coi_filax.f \
+coi_fioer.f \
+coi_fkeyc.f \
+coi_ghead.f \
+coi_heads.f \
+coi_hecho.f \
+coi_leged.f coi_leger.f \
+coi_linax.f \
+coi_mulax.f \
+coi_sp1ed.f coi_sp1er.f \
+coi_sp3ed.f coi_sp3er.f \
+coi_specn.f \
+coi_wccat.f \
+coi_wcwrd.f \
+coi_whead.f \
+coi_whisr.f \
+coi_wms5d.f coi_wms5r.f \
+coi_wndfh.f
+
+CON_F_ROUTINES = \
 con_afhir.f \
+con_axbnd.f con_axbnr.f \
+con_axcod.f con_axcor.f \
+con_axgvd.f con_axgvr.f \
 con_axlid.f con_axlii.f con_axlir.f con_axliuw.f con_axliw.f \
 con_bitpx.f con_btypc.f \
 con_cd2ir.f con_cd2iw.f \
 con_chvai.f con_chvar.f con_chvaw.f \
 con_ci2dr.f con_ci2dw.f \
 con_cnlim.f con_d2nft.f con_dst2n.f \
+con_consb.f con_consd.f con_consi.f con_consl.f con_consr.f \
+            con_consub.f con_consuw.f con_consw.f \
+con_ekeyc.f con_ekeyd.f con_ekeyi.f con_ekeyl.f con_ekeyr.f \
+con_fkeyc.f \
+con_fkeyd.f con_fkeyi.f con_fkeyl.f con_fkeyr.f \
 con_ffrmt.f con_fill.f con_filld.f con_fitax.f con_ftype.f \
 con_gexch.f \
+con_gexrm.f \
 con_ghelp.f con_ghlpi.f \
 con_gkeyc.f con_gkeyd.f con_gkeyi.f con_gkeyl.f con_gkeyr.f \
 con_gslic.f \
 con_iaffd.f con_iaffi.f con_iaffr.f \
 con_ifufb.f con_ifufd.f con_ifufi.f con_ifufr.f con_ifufub.f \
             con_ifufuw.f con_ifufw.f \
+con_iudab.f con_iudad.f con_iudai.f con_iudar.f con_iudaub.f \
+            con_iudauw.f con_iudaw.f \
 con_lnear.f con_mandh.f con_move.f con_ndfcm.f \
 con_oaffd.f con_oaffi.f con_oaffr.f \
 con_ofufb.f con_ofufd.f con_ofufi.f con_ofufr.f con_ofufub.f \
             con_ofufuw.f con_ofufw.f \
+con_oudab.f con_oudad.f con_oudai.f con_oudar.f con_oudaub.f \
+            con_oudauw.f con_oudaw.f \
 con_pcard.f con_pfith.f \
 con_prsad.f con_prsai.f con_prsar.f \
 con_phlpo.f con_rgasp.f con_sclof.f \
 con_scrsz.f con_sphea.f con_sread.f \
+con_sgdig.f \
 con_ssazd.f con_ssazr.f \
+con_thrsb.f con_thrsd.f con_thrsi.f con_thrsr.f con_thrsub.f \
+            con_thrsuw.f con_thrsw.f \
+con_trcha.f \
 con_trndd.f con_trndi.f con_trndr.f \
-con_typsz.f con_wfman.f con_wgasp.f con_wrpgm.f con_wrtif.f
+con_typsz.f \
+con_wfman.f \
+con_wgasp.f \
+con_wrpgm.f \
+con_wrtif.f
+
+F_ROUTINES = $(AIF_F_ROUTINES) $(COF_F_ROUTINES) $(COI_F_ROUTINES) \
+             $(CON_F_ROUTINES)
 
 #  Note that we keep the SPP convert routines separate;
 #  they have no documententation.
@@ -551,7 +664,10 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = con_trmsz.c con_cclos.c con_copen.c con_cwrit.c con_cwri2.c
+CON_C_ROUTINES = con_cclos.c con_copen.c con_cwrit.c con_cwri2.c \
+             con_findf.c con_trmsz.c
+
+C_ROUTINES = $(CON_C_ROUTINES)
 
 #  Define the IRAF converters. This macro will be overridden by the mk
 #  script for platforms where they are not available.
@@ -563,10 +679,13 @@ IRAF_ATASKS_F = iraf2ndf.f ndf2iraf.f
 A_TASKS_F = \
    ascii2ndf.f \
    conhelp.f \
+   da2ndf.f \
    dst2ndf.f \
+   fits2ndf.f \
    gasp2ndf.f \
    ircam2ndf.f \
    ndf2ascii.f \
+   ndf2da.f \
    ndf2dst.f \
    ndf2fits.f \
    ndf2gasp.f \
@@ -591,6 +710,10 @@ HELP_SOURCES = $(PKG_NAME).hlp
 #  List of ancilliary data files.
 
 DATA_FILES =
+
+#  Name of test source and data archive.
+
+TEST_ARCHIVE = $(PKG_NAME)_test.tar
 
 #  Files needed to test the installation.
 
@@ -625,20 +748,23 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(A_TASKS) \
-$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT)
+$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) \
+$(PUBLIC_TASKS)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) HLPCMD
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) HLPCMD COF_CMN COI_CMN
 
 #  Rules to set up links to locate each of the above include files.
 
-SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
 CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 CMP_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
+COF_CMN:     cof_cmn.f;               $(LINK) $? $@
+COI_CMN:     coi_cmn.f;               $(LINK) $? $@
 DAT_ERR:     $(STAR_INC)/dat_err;     $(LINK) $? $@
 DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
 DTACODES:    dta/dtacodes;            $(LINK) $? $@
@@ -661,28 +787,43 @@ PSX_ERR:     $(STAR_INC)/psx_err;     $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(STARTUP_SCRIPT) $(ICL_SCRIPT) \
-$(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS)  $(PRIVATE_INCLUDES) $(LINK_SCRIPT) \
+$(STARTUP_SCRIPT) $(ICL_SCRIPT) $(LINK_SCRIPT) $(PUBLIC_TASKS) \
+$(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS)  $(PRIVATE_INCLUDES)  \
 $(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
 $(SPP_F_ROUTINES) \
 $(A_TASKS_F) $(IFL_FILES) \
-$(HELP_SOURCES) \
-$(TEST_FILES):
+$(HELP_SOURCES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+
+$(TEST_FILES):
+	$(TAR_OUT) $(PKG_NAME)_test.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(ROUTINE_OBJECT_FILES) \
+OBJECT_FILES = $(COF_OBJECT_FILES) \
+               $(COI_OBJECT_FILES) \
+               $(CON_OBJECT_FILES) \
                $(SPP_OBJECT_FILES) \
                $(A_TASKS_OBJECT_FILES)
-ROUTINE_OBJECT_FILES = $(F_ROUTINES:.f=.o) \
-                       $(PLATFORM_F:.f=.o) \
-                       $(BLOCK_DATA:.f=.o) \
-                       $(C_ROUTINES:.c=.o)
+
+COF_OBJECT_FILES = $(COF_F_ROUTINES:.f=.o)
+
+COI_OBJECT_FILES = $(COI_F_ROUTINES:.f=.o)
+
+CON_OBJECT_FILES = $(CON_F_ROUTINES:.f=.o) \
+                   $(AIF_F_ROUTINES:.f=.o) \
+                   $(PLATFORM_F:.f=.o) \
+                   $(BLOCK_DATA:.f=.o) \
+                   $(CON_C_ROUTINES:.c=.o)
+
 A_TASKS_OBJECT_FILES = $(A_TASKS_F:.f=.o)
+
 SPP_OBJECT_FILES = $(SPP_F_ROUTINES:.f=.o)
 
 .c.o:
@@ -693,10 +834,18 @@ SPP_OBJECT_FILES = $(SPP_F_ROUTINES:.f=.o)
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libcon.a libconspp.a
+OBJECT_LIBRARIES = libcoi.a libcof.a libcon.a libconspp.a
 
 #
-libcon.a: $(ROUTINE_OBJECT_FILES)
+libcof.a: $(COF_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libcoi.a: $(COI_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libcon.a: $(CON_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -711,7 +860,13 @@ IRAF_LIBRARIES = libimfort.a libos.a libsys.a libvops.a
 #  Rules for extracting platform specific files from the source
 #  archives.
 
-$(PLATFORM_F) $(IRAF_LIBRARIES):
+$(IRAF_LIBRARIES):
+	$(TAR_OUT) iraflibs_$(SYSTEM).tar $@_$(SOURCE_VARIANT)
+	@ if test -f $@_$(SOURCE_VARIANT); then :;\
+           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
+	mv $@_$(SOURCE_VARIANT) $@
+
+$(PLATFORM_F):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
 	@ if test -f $@_$(SOURCE_VARIANT); then :;\
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
@@ -720,57 +875,81 @@ $(PLATFORM_F) $(IRAF_LIBRARIES):
 #  Rules and dependencies for building the A-tasks.
 
 ascii2ndf: ascii2ndf.o $(OBJECT_LIBRARIES)
-	$(ALINK) ascii2ndf.o libcon.a `ndf_link_adam` `fio_link_adam`
+	$(ALINK) ascii2ndf.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
 
 conhelp: conhelp.o $(OBJECT_LIBRARIES)
-	$(ALINK) conhelp.o libcon.a  `hlp_link`
+	$(ALINK) conhelp.o libcon.a \
+           $(ADDLIBS) `hlp_link`
+
+da2ndf: da2ndf.o $(OBJECT_LIBRARIES)
+	$(ALINK) da2ndf.o libcof.a libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam` `prm_link_adam`
 
 dst2ndf: dst2ndf.o $(OBJECT_LIBRARIES)
-	$(ALINK) dst2ndf.o libcon.a  `ndf_link_adam` `prm_link_adam` \
-	                $(FIG_SOURCE)/libdta.a \
-	                $(FIG_SOURCE)/libich.a 
+	$(ALINK) dst2ndf.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `prm_link_adam` \
+	   $(FIG_SOURCE)/libdta.a $(FIG_SOURCE)/libich.a 
+
+fits2ndf: fits2ndf.o $(OBJECT_LIBRARIES)
+	$(ALINK) fits2ndf.o libcof.a libcon.a \
+           $(ADDLIBS) `fitsio_link` `ndf_link_adam` `grp_link_adam` \
+           `fio_link_adam` `prm_link_adam` `pda_link_adam`
 
 gasp2ndf: gasp2ndf.o $(OBJECT_LIBRARIES)
-	$(ALINK) gasp2ndf.o libcon.a  `ndf_link_adam` `fio_link_adam`
+	$(ALINK) gasp2ndf.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
 
 iraf2ndf: iraf2ndf.o $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES)
-	$(ALINK) iraf2ndf.o libcon.a libconspp.a \
-		libimfort.a libsys.a libvops.a libos.a \
-		 `ndf_link_adam` 
+	$(ALINK) iraf2ndf.o libcoi.a libcof.a libcon.a libconspp.a \
+           libimfort.a libsys.a libvops.a libos.a \
+           $(ADDLIBS) `ndf_link_adam` `prm_link_adam` 
 
 ircam2ndf: ircam2ndf.o $(OBJECT_LIBRARIES)
-	$(ALINK) ircam2ndf.o libcon.a  `ndf_link_adam`
+	$(ALINK) ircam2ndf.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam`
 
 ndf2ascii: ndf2ascii.o $(OBJECT_LIBRARIES)
-	$(ALINK) ndf2ascii.o libcon.a  `ndf_link_adam` `fio_link_adam`
+	$(ALINK) ndf2ascii.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
+
+ndf2da: ndf2da.o $(OBJECT_LIBRARIES)
+	$(ALINK) ndf2da.o libcof.a libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam` `prm_link_adam`
 
 ndf2dst: ndf2dst.o $(OBJECT_LIBRARIES)
-	$(ALINK) ndf2dst.o libcon.a  `ndf_link_adam` `prm_link_adam` 
+	$(ALINK) ndf2dst.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `prm_link_adam` 
 
 ndf2fits: ndf2fits.o $(OBJECT_LIBRARIES)
-	$(ALINK) ndf2fits.o libcon.a \
-                 `ndf_link_adam` `grp_link_adam` `fio_link_adam` \
-                 `fitsio_link`
+	$(ALINK) ndf2fits.o libcof.a libcon.a \
+           $(ADDLIBS) `fitsio_link` `ndf_link_adam` `grp_link_adam` \
+           `fio_link_adam` `prm_link_adam` 
 
 ndf2gasp: ndf2gasp.o $(OBJECT_LIBRARIES)
-	$(ALINK) ndf2gasp.o libcon.a  `ndf_link_adam` `fio_link_adam`
+	$(ALINK) ndf2gasp.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
 
 ndf2iraf: ndf2iraf.o $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES)
-	$(ALINK) ndf2iraf.o libcon.a libconspp.a \
-		libimfort.a libsys.a libvops.a libos.a \
-		 `ndf_link_adam` `prm_link_adam` 
+	$(ALINK) ndf2iraf.o libcoi.a libcof.a libcon.a libconspp.a \
+           libimfort.a libsys.a libvops.a libos.a \
+           $(ADDLIBS) `ndf_link_adam` `prm_link_adam` 
 
 ndf2pgm: ndf2pgm.o  $(OBJECT_LIBRARIES)
-	$(ALINK) ndf2pgm.o libcon.a `ndf_link_adam`
+	$(ALINK) ndf2pgm.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam`
 
 ndf2tiff: ndf2tiff.o
-	$(ALINK) ndf2tiff.o `ndf_link_adam` `fio_link_adam`
+	$(ALINK) ndf2tiff.o libcon.a \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
 
 ndf2unf: ndf2unf.o $(OBJECT_LIBRARIES)
-	$(ALINK) ndf2unf.o libcon.a  `ndf_link_adam` `fio_link_adam`
+	$(ALINK) ndf2unf.o libcon.a  \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
 
 unf2ndf: unf2ndf.o $(OBJECT_LIBRARIES)
-	$(ALINK) unf2ndf.o libcon.a  `ndf_link_adam` `fio_link_adam`
+	$(ALINK) unf2ndf.o libcon.a  \
+           $(ADDLIBS) `ndf_link_adam` `fio_link_adam`
 
 #  Rules for building the help libraries.
 
@@ -1002,7 +1181,7 @@ install:
         done
 #
 #  Install the tasks,giving them world execute permission.
-	for f in $(A_TASKS) ""; do \
+	for f in $(A_TASKS) $(PUBLIC_TASKS) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_BIN);\
               chmod 755 $(INSTALL_BIN)/$$f;\
@@ -1169,7 +1348,7 @@ do_deinstall:
         done
 #
 #  Deinstall the tasks, if an installed version exists.
-	- for f in $(A_TASKS) ""; do \
+	- for f in $(A_TASKS) $(PUBLIC_TASKS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
@@ -1300,7 +1479,6 @@ do_test: $(TEST_FILES)
 #
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
-
 #  Execute the test.  Remove the test data when done. 
 	$(INSTALL_BIN)/dst2ndf $(TEST_FILES:.dst=) $(TEST_FILES:.dst=)
 	$(STAR_BIN)/hdstrace $(TEST_FILES:.dst=)
@@ -1377,7 +1555,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
-           $(DATE_STAMP) .BUILT \
+           $(TEST_ARCHIVE) $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
@@ -1441,30 +1619,51 @@ unbuild: clean
 
 strip:
 	strip $(A_TASKS)
-	@ echo '*** A_tasks stripped'
+	@ echo '*** Executables stripped'
 
-#  archive: Create the source tar file.
-#  ------------------------------------
-#
-#  This is for development use.  It enables the source tar file to be
-#  created and updated(?).
+#-------------------------------------------------------------------------------
 
-archive:  $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
-          $(F_ROUTINES) $(PLATFORM_F_ROUTINES) $(SPP_F_ROUTINES) \
-          $(A_TASKS_F) $(C_ROUTINES) $(PUBLIC_INCLUDES) \
-          $(BLOCK_DATA) $(PRIVATE_INCLUDES) $(IRAF_LIBRARIES:.a=.*) \
-          $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(TEST_FILES) \
-          $(IFL_FILES) $(HELP_SOURCES)
-#
+#  Development targets and rules.
+#  ==============================
+
+#  Rule for building the source tar files.
+$(PKG_NAME)_source.tar:
 	$(TAR_IN) $(PKG_NAME)_source.tar \
                 $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
                 $(F_ROUTINES) $(PLATFORM_F_ROUTINES) $(SPP_F_ROUTINES) \
                 $(A_TASKS_F) $(C_ROUTINES) $(PUBLIC_INCLUDES) \
-                $(BLOCK_DATA) $(PRIVATE_INCLUDES) $(IRAF_LIBRARIES:.a=.*) \
-                $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(TEST_FILES) \
+                $(BLOCK_DATA) $(PRIVATE_INCLUDES) \
+                $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(PUBLIC_TASKS) \
                 $(IFL_FILES) $(HELP_SOURCES)
+
+iraflibs_alpha_OSF1.tar:
+	$(TAR_IN) iraflibs_alpha_OSF1.tar \
+                $(IRAF_LIBRARIES:.a=.a_alpha_OSF1)
+
+iraflibs_ix86_Linux.tar:
+	$(TAR_IN) iraflibs_ix86_Linux.tar \
+                $(IRAF_LIBRARIES:.a=.a_ix86_Linux)
+
+iraflibs_sun4_Solaris.tar:
+	$(TAR_IN) iraflibs_sun4_Solaris.tar \
+                $(IRAF_LIBRARIES:.a=.a_sun4_Solaris)
+
+$(PKG_NAME)_test.tar:
+	$(TAR_IN) $(PKG_NAME)_test.tar \
+                $(TEST_FILES)
+
+
+#  archive: Create the source tar files.
+#  -------------------------------------
 #
-	@ echo "   Build of the $(PKG_NAME)_source.tar file is complete"
+#  This is for development use.  It enables the source tar file to be
+#  created and updated(?).
+
+archive:  $(PKG_NAME)_source.tar iraflibs_alpha_OSF1.tar \
+          iraflibs_ix86_Linux.tar iraflibs_sun4_Solaris.tar \
+          $(PKG_NAME)_test.tar
+#
+	@ echo "   Build of the $(PACK_NAME) tar files is complete.
 
 #-------------------------------------------------------------------------------
 
@@ -1476,27 +1675,113 @@ archive:  $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
 #  files.
 
 aif_antmp.o:       SAE_PAR DAT_PAR
+aif_getvm.o:       SAE_PAR DAT_PAR
 aif_ptfnm.o:       SAE_PAR
 aif_temp.o:        SAE_PAR DAT_PAR
-ascii2ndf.o:       SAE_PAR DAT_PAR
-ascii2ndf.o:       NDF_PAR PRM_PAR
+ascii2ndf.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+cof_2dfex.o:       SAE_PAR DAT_PAR PRM_PAR
+cof_2dfif.o:       SAE_PAR DAT_PAR PRM_PAR
+cof_2dfim.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+cof_atypc.o:       SAE_PAR
+cof_bn2ht.o:       SAE_PAR
+cof_bp2ht.o:       SAE_PAR
+cof_camaa.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_camax.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_chisr.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_dateh.o:       SAE_PAR NDF_PAR
+cof_dstyp.o:       SAE_PAR PRM_PAR
 cof_escod.o:       SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 cof_escoi.o:       SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 cof_escor.o:       SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 cof_escow.o:       SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_exdim.o:       SAE_PAR DAT_PAR NDF_PAR
+cof_f2ndf.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+cof_fd2ht.o:       SAE_PAR
+cof_fhist.o:       SAE_PAR
 cof_fioer.o:       SAE_PAR
+cof_frmt.o:        SAE_PAR
+cof_ft2ne.o:       SAE_PAR DAT_PAR NDF_PAR
+cof_gkeyc.o:       SAE_PAR
+cof_gkeyd.o:       SAE_PAR
+cof_gkeyi.o:       SAE_PAR
+cof_gkeyl.o:       SAE_PAR
+cof_gkeyr.o:       SAE_PAR
 cof_h2bin.o:       SAE_PAR DAT_PAR DAT_ERR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_halog.o:       SAE_PAR
+cof_hdate.o:       SAE_PAR NDF_PAR
+cof_hdlog.o:       SAE_PAR
+cof_hecho.o:       SAE_PAR COF_CMN
 cof_ht2bn.o:       SAE_PAR
+cof_iuemx.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_iueq.o:        SAE_PAR
+cof_iuesi.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_lws1.o:        SAE_PAR PRM_PAR
+cof_lws2.o:        SAE_PAR PRM_PAR
+cof_lwsan.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_mandh.o:       SAE_PAR PRM_PAR
 cof_mxmnd.o:       SAE_PAR PRM_PAR
 cof_mxmni.o:       SAE_PAR PRM_PAR
 cof_mxmnr.o:       SAE_PAR PRM_PAR
 cof_mxmnw.o:       SAE_PAR PRM_PAR
 cof_ndf2f.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_ndfax.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+cof_ndfcc.o:       SAE_PAR NDF_PAR
+cof_rhead.o:       SAE_PAR
+cof_sbnd.o:        SAE_PAR NDF_PAR
+cof_scofd.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_scofi.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_scofr.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_scofw.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+cof_spec.o:        SAE_PAR NDF_PAR
+cof_stypc.o:       SAE_PAR
+cof_stype.o:       SAE_PAR
+cof_swsaa.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+cof_t2hds.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
 cof_thier.o:       SAE_PAR DAT_PAR
 cof_typsz.o:       SAE_PAR PRM_PAR
+cof_wfext.o:       SAE_PAR DAT_PAR
+cof_wgbfe.o:       SAE_PAR DAT_PAR PRM_PAR
 cof_whead.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+cof_whisr.o:       SAE_PAR NDF_PAR PRM_PAR COF_CMN
 cof_wndfh.o:       SAE_PAR NDF_PAR PRM_PAR
+cof_wrtab.o:       SAE_PAR DAT_PAR PRM_PAR NDF_PAR
+coi_alogd.o:        SAE_PAR
+coi_alogr.o:       SAE_PAR
+coi_axexp.o:       SAE_PAR PRM_PAR NDF_PAR
+coi_aximp.o:       SAE_PAR PRM_PAR NDF_PAR
+coi_chevd.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_chevr.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_chisr.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+coi_fhist.o:       SAE_PAR
+coi_filax.o:       SAE_PAR NDF_PAR PRM_PAR
+coi_fioer.o:       SAE_PAR
+coi_fkeyc.o:       SAE_PAR
+coi_ghead.o:       SAE_PAR
+coi_heads.o:       SAE_PAR DAT_PAR NDF_PAR MSG_PAR
+coi_hecho.o:       SAE_PAR COI_CMN
+coi_leged.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_leger.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_linax.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+coi_mulax.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+coi_sp1ed.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_sp1er.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_sp3ed.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_sp3er.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+coi_specn.o:       SAE_PAR
+coi_wccat.o:       SAE_PAR
+coi_wcwrd.o:       SAE_PAR
+coi_whead.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+coi_whisr.o:       SAE_PAR NDF_PAR PRM_PAR COI_CMN
+coi_wms5d.o:       SAE_PAR PRM_PAR
+coi_wms5r.o:       SAE_PAR PRM_PAR
+coi_wndfh.o:       SAE_PAR NDF_PAR PRM_PAR
 con_afhir.o:       SAE_PAR
+con_axbnd.o:       SAE_PAR
+con_axbnr.o:       SAE_PAR
+con_axcod.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_axcor.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_axgvd.o:       SAE_PAR
+con_axgvr.o:       SAE_PAR
 con_axlid.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_axlii.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_axlir.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
@@ -1512,14 +1797,27 @@ con_chvaw.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ci2dr.o:       SAE_PAR
 con_ci2dw.o:       SAE_PAR
 con_cnlim.o:       SAE_PAR PRM_PAR
+con_consd.o:       SAE_PAR
+con_consr.o:       SAE_PAR
 con_d2nft.o:       SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
-con_dst2n.o:       SAE_PAR DTACODES DYNAMIC_MEMORY
+con_dst2n.o:       SAE_PAR DTACODES DYNAMIC_MEMORY NUM_DEC_CVT NUM_DEF_CVT
+con_ekeyc.o:       SAE_PAR DAT_PAR
+con_ekeyd.o:       SAE_PAR DAT_PAR
+con_ekeyi.o:       SAE_PAR DAT_PAR
+con_ekeyi.o:       SAE_PAR DAT_PAR
+con_ekeyr.o:       SAE_PAR DAT_PAR
 con_ffrmt.o:       SAE_PAR
 con_fill.o:        SAE_PAR
 con_filld.o:       SAE_PAR
 con_fitax.o:       SAE_PAR DAT_PAR PRM_PAR
+con_fkeyc.o:       SAE_PAR
+con_fkeyd.o:       SAE_PAR
+con_fkeyi.o:       SAE_PAR
+con_fkeyl.o:       SAE_PAR
+con_fkeyr.o:       SAE_PAR
 con_ftype.o:       SAE_PAR
 con_gexch.o:       SAE_PAR
+con_gexrm.o:       SAE_PAR
 con_ghelp.o:       SAE_PAR HLPCMD
 con_ghlpi.o:       SAE_PAR HLPCMD
 con_gkeyc.o:       SAE_PAR
@@ -1538,6 +1836,13 @@ con_ifufr.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ifufub.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ifufuw.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ifufw.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudab.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudad.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudai.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudar.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudaub.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudauw.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_iudaw.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_lnear.o:       SAE_PAR PRM_PAR
 con_mandh.o:       SAE_PAR DAT_PAR PRM_PAR
 con_move.o:        SAE_PAR
@@ -1551,6 +1856,13 @@ con_ofufi.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ofufr.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT 
 con_ofufub.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_ofufuw.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudab.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudad.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudai.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudar.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudaub.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudauw.o:      SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+con_oudaw.o:       SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 con_pcard.o:       SAE_PAR
 con_pfith.o:       SAE_PAR DAT_PAR
 con_phlpo.o:       SAE_PAR HLPCMD
@@ -1560,27 +1872,39 @@ con_prsar.o:       SAE_PAR CHR_ERR
 con_rgasp.o:       SAE_PAR
 con_sclof.o:       SAE_PAR PRM_PAR
 con_scrsz.o:       SAE_PAR
+con_sgdig.o:       SAE_PAR
 con_sphea.o:       SAE_PAR NDF_PAR
 con_ssazr.o:       SAE_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
 con_ssazd.o:       SAE_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
-con_trndd.o:       SAE_PAR PRM_PAR
-con_trndi.o:       SAE_PAR PRM_PAR
-con_trndr.o:       SAE_PAR PRM_PAR
+con_thrsb.o:       SAE_PAR PRM_PAR
+con_thrsd.o:       SAE_PAR PRM_PAR
+con_thrsi.o:       SAE_PAR PRM_PAR
+con_thrsr.o:       SAE_PAR PRM_PAR
+con_thrsub.o:      SAE_PAR PRM_PAR
+con_thrsuw.o:      SAE_PAR PRM_PAR
+con_thrsw.o:       SAE_PAR PRM_PAR
+con_trcha.o:       SAE_PAR
+con_trndd.o:       SAE_PAR
+con_trndi.o:       SAE_PAR
+con_trndr.o:       SAE_PAR
 con_typsz.o:       SAE_PAR PRM_PAR NDF_PAR
 con_wfman.o:       SAE_PAR MSG_PAR
 con_wgasp.o:       SAE_PAR
 con_wrpgm.o:       SAE_PAR PRM_PAR
 con_wrtif.o:       SAE_PAR PRM_PAR
 conhelp.o:         SAE_PAR PAR_ERR
+da2ndf.o:          SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 dst2ndf.o:         SAE_PAR DAT_PAR
+fits2ndf.o:        SAE_PAR DAT_PAR PAR_ERR NDF_PAR FIO_PAR MSG_PAR GRP_PAR
 gasp2ndf.o:        SAE_PAR MSG_PAR PAR_PAR
-iraf2ndf.o:        SAE_PAR DAT_PAR DAT_ERR NDF_PAR PSX_ERR CMP_ERR MSG_PAR PRM_PAR
+iraf2ndf.o:        SAE_PAR NDF_PAR MSG_PAR PRM_PAR
 ircam2ndf.o:       SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 ndf2ascii.o:       SAE_PAR NDF_PAR DAT_PAR PRM_PAR
-ndf2dst.o:         SAE_PAR FIO_PAR NDF_PAR
+ndf2da.o:          SAE_PAR DAT_PAR NDF_PAR PRM_PAR
+ndf2dst.o:         SAE_PAR DAT_PAR FIO_PAR NDF_PAR
 ndf2fits.o:        SAE_PAR DAT_PAR DAT_ERR PAR_ERR NDF_PAR MSG_PAR GRP_PAR
 ndf2gasp.o:        SAE_PAR MSG_PAR NDF_PAR NDF_ERR PAR_ERR PRM_PAR
-ndf2iraf.o:        SAE_PAR DAT_PAR MSG_PAR NDF_PAR PAR_ERR NDF_ERR PRM_PAR
+ndf2iraf.o:        SAE_PAR MSG_PAR NDF_PAR PAR_ERR NDF_ERR PRM_PAR
 ndf2iraf.o:        NUM_DEC_CVT NUM_DEF_CVT
 ndf2unf.o:         SAE_PAR DAT_PAR NDF_PAR PRM_PAR
 unf2ndf.o:         SAE_PAR DAT_PAR NDF_PAR PRM_PAR
