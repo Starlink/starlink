@@ -130,6 +130,8 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #      than defaulted) copyright statement.
 #-
 
+: ${STARLINK_SGML_DIR=@STARLINK_SGML_DIR@}
+
 LIBDIR=${STARLINK_SGML_DIR}/lib
 STARLINKDECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
 XMLDECL=${STARLINK_SGML_DIR}/dtd/xml.decl
@@ -140,11 +142,11 @@ STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
 # Allow the names of the jade and sgmlnorm binaries to be overridden
 # (mostly for testing, though I can imagine _some_ production use of
 # this feature).
-test -n "$JADE"       || JADE=jade
-test -n "$SGMLNORM"   || SGMLNORM=sgmlnorm
+test -n "$JADE"       || JADE=@JADE@
+test -n "$SGMLNORM"   || SGMLNORM=@SGMLNORM@
 JADEFLAGS=
 test -n "$IMGEQ"      || IMGEQ=$LIBDIR/img-eqlist.pl
-test -n "$DVI2BITMAP" || DVI2BITMAP='dvi2bitmap'
+test -n "$DVI2BITMAP" || DVI2BITMAP=@DVI2BITMAP@
 test -n "$LATEX"      || LATEX=latex
 test -n "$BIBTEX"     || BIBTEX=bibtex
 
@@ -172,11 +174,12 @@ tempdest=tmp.stamp
 # depend rather heavily on the dvi2bitmap version, but on the other,
 # this logic is just begging to go wrong somewhere....
 #DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
-d2bv=`$DVI2BITMAP -V | sed -n '1s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\([^0-9]*\([0-9][0-9]*\)\)\?.*/\1 \2 \4 \3/p' | awk '{print $2}'`
+#d2bv=`$DVI2BITMAP -V | sed -n '1s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\([^0-9]*\([0-9][0-9]*\)\)\?.*/\1 \2 \4 \3/p' | awk '{print $2}'`
+d2bv=`$DVI2BITMAP -V | sed '1{s/^dvi2bitmap//;s/[^0-9]/ /g;q;}' | awk '{print $2}'`
 if [ $d2bv -ge 11 ]; then
     echo "Using $DVI2BITMAP"
 else
-    echo "Need dvi2bitmap version 0.11 or better, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
+    echo "Need dvi2bitmap version 0.11 or better, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed 1q`
     exit 1
 fi
 
@@ -212,9 +215,10 @@ while [ $# -gt 0 ]; do
     case $1 in
 	--html) TARGETFORMAT=0 ;;
 	--latex) TARGETFORMAT=1 ;;
+        --texml) TARGETFORMAT=2 ;;
 	--htmlsingle) TARGETFORMAT=0; 
 	    JADEFLAGS="$JADEFLAGS -V nochunks -isingle.file" ;;
-	--packagedir*) arg=`expr match $1 '.*=\(.*\)'`
+	--packagedir*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
 	    then 
 		PACKAGEDIR=$2; shift
@@ -222,7 +226,7 @@ while [ $# -gt 0 ]; do
 		PACKAGEDIR=$arg
 	    fi
 	    ;;
-	--tarball*) arg=`expr match $1 '.*=\(.*\)'`
+	--tarball*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
 	    then 
 		TARNAME=$2; shift
@@ -230,7 +234,7 @@ while [ $# -gt 0 ]; do
 		TARNAME=$arg
 	    fi
 	    ;;
-	--jadeflags*) arg=`expr match $1 '.*=\(.*\)'`
+	--jadeflags*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
 	    then 
 		JADEFLAGS="$JADEFLAGS $2"; shift
@@ -238,7 +242,7 @@ while [ $# -gt 0 ]; do
 		JADEFLAGS="$JADEFLAGS $arg"
 	    fi
 	    ;;
-	--options*) arg=`expr match $1 '.*=\(.*\)'`
+	--options*) arg=`expr $1 : '.*=\(.*\)'`
 	    if test -z "$arg"
 	    then 
 		OPTIONS=$2; shift
@@ -290,9 +294,9 @@ case $srcext in
 	;;
 esac
 
-# Get the basename of the input file (simulate basename)
-srcroot=`echo $SGMLSRC | sed -e 's+^\(.*/\)\?\(.*\)\.[a-zA-Z0-9]*$+\2+'`
-    
+# Get the basename of the input file, minus the extension
+srcroot=`expr x$SGMLSRC : x'.*/\([^/]*\)\.[^.]*$'`
+
 $VERBOSE && echo "$PROGNAME:I: Processing $SGMLSRC..."
 $VERBOSE && echo "$PROGNAME:I: filename root is $srcroot"
 $VERBOSE && echo "$PROGNAME:I: processing as $srctype"
@@ -302,6 +306,8 @@ case $TARGETFORMAT in
 	PACKAGEEXT='.htx' ;;
     1)  $VERBOSE && echo "$PROGNAME:I: Target LaTeX...";
 	PACKAGEEXT='.latex' ;;
+    2)  $VERBOSE && ECHO "$PROGNAME:I: Target TeXML...";
+        PACKAGEEXT='.texml' ;;
     *) echo $USAGE; exit 1 ;;
 esac
 
@@ -396,7 +402,15 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
 	    $usedecl $SGMLSRC \
 	    > $tempdest
-    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
+    if test -f $tempdest; then
+        ROOT=`awk -F: '{print $1}' $tempdest`
+    else
+        # An error of some kind, or we have option '-n' -- make dummy root
+        ROOT=ROOT
+    fi
+#    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
+    cp $tempdest TEMPDEST
+    echo "ROOT=$ROOT"
 
     # If there are no maths-mode elements, there's no list file generated.
     # Test if the file is of non-zero size, since <codecollection> is
@@ -521,6 +535,32 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
     fi
 
+elif [ $TARGETFORMAT -eq 2 ]; then
+    # Generate TeXML
+
+    $run $JADE -t xml -iHTML.entities -iOnly.paper $JADEFLAGS \
+        -d $STYLESHEET/texml/slback.dsl#back.main \
+        $usedecl $SGMLSRC \
+        > $tempdest
+    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
+
+    # If there was no backmatter, then don't invoke BibTeX
+    if [ -r $ROOT.latexbib.aux ]; then
+	BSTINPUTS=$LIBDIR $run $BIBTEX $ROOT.latexbib
+    fi
+
+    # Generate the XML file
+    $run $JADE -t xml -iHTML.entities -iOnly.paper $JADEFLAGS \
+        -d $STYLESHEET/texml/sl.dsl#texml \
+        $usedecl $SGMLSRC \
+        > $tempdest
+
+    if $USEMANIFEST; then
+        test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
+    else
+	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
+    fi
+
 else
 
     echo "$PROGNAME:E: Illegal TARGETFORMAT=$TARGETFORMAT !"
@@ -551,7 +591,13 @@ if [ -r MANIFEST -o -n "$run" ]; then
 		    cp $f $PACKAGEDIR/$f ;;
 
 		simplenorm)
-		    sed '/<[aA] *$/{:a;N;s/\n *>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f ;;
+		    sed '/<[aA] *$/{:a
+N
+s/\n *>/ >/
+t
+s/\n/ /
+b a
+}' $f >$PACKAGEDIR/$f ;;
 		sgmlnorm)
 		    $run $SGMLNORM -d $usedecl $f >$PACKAGEDIR/$f \
 			2>>$PACKAGEDIR/sgmlnorm.errors ;;

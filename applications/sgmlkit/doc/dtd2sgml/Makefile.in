@@ -11,12 +11,14 @@
 #     This directory contains the documentation for the DTD, massaged into
 #     a form which can be scooped into the main document SSN/70 in
 #     directory ../ssn70.  It has to be built when the distribution is
-#     being constructed, since (a) it includes hard-coded directory paths,
-#     and (b) it uses the perlSGML distribution.
+#     being constructed, since it uses the perlSGML distribution.
 #
-#        THE CONTENTS OF THIS DIRECTORY ARE NOT BUILDABLE AFTER DISTRIBUTION
+#        THE CONTENTS OF THIS DIRECTORY ARE NOT (necessarily)
+#        BUILDABLE AFTER DISTRIBUTION
 #
 #     This file is included in the distribution for information only.
+#     The perlSGML distribution is available from
+#     <http://search.cpan.org/~ehood/perlSGML.1997Sep18/>
 #
 #
 #
@@ -46,29 +48,37 @@
 #        Revised to include general-0.?.html and programcode-0.?.html targets
 #     5-Jun-2000 (NG):
 #        Revised to _remove_ the *.html targets
+#     22-Jun-2004 (NG):
+#        Autoconfed
 #
 #  RCS Id:
 #     $Id$
 #-
 
 
-PERLSGML_DIR=/home/norman/s/src/sgml/misc/lib
+JADE=@JADE@
+PERL=@PERL@
+PERLSGMLDIR=@PERLSGMLDIR@
+STARLINK_SGML_DIR=@STARLINK_SGML_DIR@
+
 DTDDIR=$(STARLINK_SGML_DIR)/dtd
 DECL=$(STARLINK_SGML_DIR)/dtd/xml.decl
+#DTDDIR=../../dtd
+#DECL=../../dtd/xml.decl
 
 %.dtdsummary: $(DTDDIR)/%.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	perl -I $(PERLSGML_DIR) dtd2sgml.pl $< >$@ 
+	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl $< >$@ 
 
 %.sgmltext: %.description
-	jade -t sgml -d dtd2sgml.dsl $(DECL) $< >$@
+	$(JADE) -t sgml -d dtd2sgml.dsl $(DECL) $< >$@
 
 # Handy target for producing a skeleton description of a DTD, to
 # start on the documentation task.
 %.description.skel:
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	perl -I $(PERLSGML_DIR) dtdskeleton.pl \
+	$(PERL) -I $(PERLSGMLDIR) dtdskeleton.pl \
 		$(DTDDIR)/$(@:.description.skel=.dtd) >$@
 
 
@@ -104,7 +114,7 @@ starlink-0.7.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.7.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
+	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl \
 		$< >$@
 
 # No longer used (here for reference)
@@ -112,7 +122,7 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.6.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
+	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl \
 		$< >$@
 
 

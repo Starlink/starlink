@@ -376,13 +376,14 @@ PKG_NAME = sgmlkit
 
 # %%VERSION%%
 # PKG_VERS = 0.7-13
-PKG_VERS = 0.7-13
+PKG_VERS = @PACKAGE_VERSION@
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
-#PUBLIC_SCRIPTS=
+#  This list should include *.py *.pyc, also
+PUBLIC_SCRIPTS=sgml2docs sgml2hlp sgml_set.csh sgml_set.sh
 
 #  List of files which need to be unpacked before the package can be installed.
 #  This is done in lieu of `building' the package
@@ -963,7 +964,7 @@ $(UNPACK_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar
 
 VERSION: configure.ac
-	echo 0.7-13>VERSION
+	echo @PACKAGE_VERSION@>VERSION
 
 #--------------------------------------------------------------------------
 
