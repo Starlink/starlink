@@ -4335,8 +4335,8 @@ selected like this:
 
 This section provides a brief explanation of what the CCDPACK
 reduction tasks 
-(\xroutine{MAKEBIAS}, \xroutine{MAKECAL}, \xroutine{MAKEFLAT})
-(\xroutine{DEBIAS}, \xroutine{CALCOR}, \xroutine{FLATCOR})
+(\xroutine{MAKEBIAS}, \xroutine{MAKECAL}, \xroutine{MAKEFLAT},
+\xroutine{DEBIAS}, \xroutine{CALCOR}, \xroutine{FLATCOR})
 do when they encounter input files with Set header information.
 It assumes that the USESET parameter is TRUE, which should be the
 case unless you have taken steps to set it FALSE using \xroutine{CCDSETUP}
@@ -4498,8 +4498,8 @@ images to the programs and they will do the right thing.
 
 \subsection{Some examples of Set use}
 
-Not very many of the {\bf Examples:} sections in Appendix 
-\S\ref{app:description} give explicit examples of using the commands
+Not very many of the ``Examples'' sections in Appendix 
+\ref{app:description} give explicit examples of using the commands
 with Sets.
 This is because for the most part the commands are invoked in 
 exactly the same way for data with Set headers as for data without them,
@@ -5855,7 +5855,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          It is however a text file, and if care is taken it may be
          edited by hand.  Removing entire framesets and modifying ID
          values or domain names may be done fairly easily, but care
-         should be taken (see \xref{SUN/210}{sun210}{ss:channels}) if any more involved changes
+         should be taken (see \xref{SUN/210}{sun210}{}) if any more involved changes
          are to be undertaken.  The format of the file is explained
          here.
 
@@ -6135,7 +6135,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          It is however a text file, and if care is taken it may be
          edited by hand.  Removing entire framesets and modifying ID
          values or domain names may be done fairly easily, but care
-         should be taken (see \xref{SUN/210}{sun210}{ss:channels}) if any more involved changes
+         should be taken (see \xref{SUN/210}{sun210}{}) if any more involved changes
          are to be undertaken.  The format of the file is explained
          here.
 
@@ -9486,7 +9486,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          This will attempt to plot boundaries of all the `ccd$*${\tt '} images
          aligned with whatever is already plotted on the graphics
-         device, for instance the result of a KAPPA \xroutine{DISPLAY}{sun95}{DISPLAY} command
+         device, for instance the result of a KAPPA \xref{DISPLAY}{sun95}{DISPLAY} command
          or of a previous call of \routine{DRAWNDF}.  Parts of the image outlines
          which fall outside the existing plot area will not be visible.
          If this is attempted when there is no existing picture on
@@ -9558,7 +9558,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          Display:
             The IMAGE display mode is not particularly sophisticated.
             If you wish to view a single image in its pixel coordinate
-            system, you may find KAPPA{\tt '}s \xroutine{DISPLAY}{sun95}{DISPLAY} program more versatile.
+            system, you may find KAPPA{\tt '}s \xref{DISPLAY}{sun95}{DISPLAY} program more versatile.
       }
    }
    \sstdiytopic{
@@ -14334,7 +14334,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          of NDF section specifiers from which to form the members of
          the newly created Set.  Each element may optionally be
          enclosed in parentheses, and should be of the form
-         explained in the {\tt "}\xref{NDF Sections}{sun33}{ss:ndfsections}{\tt "} section of \xref{SUN/33}{sun33}{};
+         explained in the {\tt "}\xref{NDF Sections}{sun33}{ndf_sections}{\tt "} section of \xref{SUN/33}{sun33}{};
          typically it will be of the form {\tt "}(xmin:xmax,ymin:ymax){\tt "}.
          Note that if supplying this parameter on the command line
          it will be necessary to include each element in quotes and
