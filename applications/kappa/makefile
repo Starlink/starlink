@@ -749,7 +749,7 @@ kps1_zprgd.f kps1_zprgb.f kps1_zprep.f kps1_zpabr.f kps1_zpabd.f laplsb.f \
 lccell.f linplt.f linset.f listsb.f lsfun1.f ma1to2.f ma1to3.f ma2to1.f \
 ma2to3.f ma3to1.f ma3to2.f maless.f mamore.f manyg.f masame.f med3d.f \
 medref.f medrep.f medset.f medwts.f medwv.f mfnext.f mfopen.f moscad.f \
-moscdv.f namsrv.f nmplot.f opus.f otstsb.f peepsb.f setcr.f setknt.f \
+moscdv.f namsrv.f kps1_nmplt.f opus.f otstsb.f peepsb.f setcr.f setknt.f \
 shifts.f shiftx.f shifty.f slc2t1.f slc2t3.f sqshs.f sqshx.f sqshy.f \
 stat3d.f statsb.f statv.f strx.f stry.f thrsr.f trgscl.f trigsb.f \
 tropus.f uput.f uget.f kps1_cpbd.f kps1_cpbr.f kps1_cpbi.f kps1_cpbw.f \
@@ -3522,7 +3522,7 @@ ndg_ndfas.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_ndfcr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_ndfpr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_test.o:	 SAE_PAR GRP_PAR
-nmplot.o:	 SAE_PAR PRM_PAR
+kps1_nmplt.o:	 SAE_PAR PRM_PAR
 noglobals.o:	 SAE_PAR DAT_PAR DAT_ERR
 nomagic.o:	 SAE_PAR NDF_PAR PAR_ERR MSG_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 normal.o:	 SAE_PAR

@@ -408,7 +408,7 @@ kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f kps1_zprgub.f \
 kps1_zprguw.f kps1_zprgw.f laplsb.f lccell.f linplt.f linset.f listsb.f \
 lsfun1.f ma1to2.f ma1to3.f ma2to1.f ma2to3.f ma3to1.f ma3to2.f maless.f \
 mamore.f manyg.f masame.f med3d.f medref.f medrep.f medset.f medwts.f \
-medwv.f mfnext.f mfopen.f moscad.f moscdv.f namsrv.f nmplot.f opus.f \
+medwv.f mfnext.f mfopen.f moscad.f moscdv.f namsrv.f opus.f \
 otstsb.f peepsb.f setcr.f setknt.f shifts.f shiftx.f shifty.f slc2t1.f \
 slc2t3.f sqshs.f sqshx.f sqshy.f stat3d.f statsb.f statv.f strx.f stry.f \
 thrsr.f trgscl.f trigsb.f tropus.f uget.f uput.f kps1_cntky.f \
@@ -419,7 +419,7 @@ kps1_wala0.f kps1_wala3.f kps1_wala4.f kps1_wala5.f kps1_wala6.f \
 kps1_cpbd.f kps1_cpbr.f kps1_cpbi.f kps1_cpbw.f kps1_cpbb.f kps1_cpbuw.f \
 kps1_cpbub.f kps1_curfm.f kps1_cenab.f kps1_cenad.f kps1_cenai.f kps1_cenar.f \
 kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f \
-kps1_censg.f kps1_censh.f
+kps1_censg.f kps1_censh.f kps1_nmplt.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
