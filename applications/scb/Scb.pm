@@ -19,6 +19,10 @@ require Exporter;
 @EXPORT = qw/tarxf popd pushd module_name starpack
              incdir srcdir indexfile taskfile/;
 
+#  Includes.
+
+use Cwd;
+
 ########################################################################
 #  Global variables.
 ########################################################################
@@ -30,9 +34,8 @@ $main::incdir = "/star/include";              # include directory
 
 #  Index file locations.
 
-$main::indexfile = "/local/devel/scb/index";
-$main::taskfile  = "/local/devel/scb/tasks";
-
+$main::indexfile = cwd . "/index";
+$main::taskfile  = cwd . "/tasks";
 
 
 ########################################################################
@@ -132,14 +135,14 @@ sub module_name {
 
 #  Arguments.
 
-   my $filetype = shift;      #  'f' for fortran, 'c' for C.
+   my $filetype = shift;      #  'f', 'gen', 'c' or 'h'
    local $_ = shift || $_;    #  $_ used if none specified.
 
    my ($type, $name);
 
 #  Fortran source file.
 
-   if ($filetype eq 'f') {
+   if ($filetype eq 'f' || $filetype eq 'gen') {
 
 #     Strip lines of syntactically uninteresting parts.
 
@@ -150,9 +153,15 @@ sub module_name {
       s/ //g;                           # Remove spaces.
       return (undef) unless ($_);       # Ignore empty lines.
       tr/a-z/A-Z/;                      # Fold case to upper.
+      return undef if (/^\w*=/);        # Ignore assignments.
       s/^$ftypdef//o if (/FUNCTION/);   # Discard leading type specifiers.
 
       ($type, $name) = /^(SUBROUTINE|FUNCTION|ENTRY|BLOCKDATA)([^(]+)/;
+
+      if ($name && $filetype eq 'gen') {
+         $name =~ s/</\&lt;/g;
+         $name =~ s/>/\&gt;/g;
+      }
    }
 
 #  C source file.
@@ -162,8 +171,9 @@ sub module_name {
 #     Very feeble attempt to strip comments.
 
       chomp;
-      s%/\*.*\*/%%g;       #  discard comments contained in this line.
-      s%/\*.*%%;           #  discard text from any comment which starts here.
+      s%^#.*%%g;           #  Discard preprocessor directives.
+      s%/\*.*\*/%%g;       #  Discard comments contained in this line.
+      s%/\*.*%%;           #  Discard text from any comment which starts here.
       return undef unless ($_);
 
 #     Check for macro flagging start of Fortran-callable routine.
@@ -187,10 +197,6 @@ sub starpack {
    return $1;
 }
 
-########################################################################
-# include for pushd and popd.
-
-use Cwd;
 
 ########################################################################
 sub pushd {
