@@ -222,107 +222,106 @@
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*     Check for bad quality
-         CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
-         IF ( QOK ) THEN
-           CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
-           CALL ARR_NBAD( DIMS(1), %VAL(QPTR), NBAD, STATUS )
-           IF ( NBAD .GT. 0 ) THEN
-             CALL MSG_SETI( 'NBAD', NBAD )
-             STATUS = SAI__ERROR
-             CALL ERR_REP( ' ', 'WARNING: There are ^NBAD quality '/
-     :                      /'points present, aborting...', STATUS )
-             GOTO 99
-           END IF
-         END IF
-
-*     Inform user about length of data set
-         CALL MSG_SETI( 'NDAT', DIMS(1) )
-         CALL MSG_PRNT( '^NDAT data points entered' )
-
-*     User input
-         CALL USI_GET0L( 'TRUNCATE', TRUNC, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-         IF ( TRUNC ) THEN
-            CALL TIM_TRUNC( DIMS(1), NTRUNC )
-            CALL MSG_SETI('NTRUNC', NTRUNC )
-            CALL MSG_PRNT( 'Truncated to ^NTRUNC values' )
-            DIMS(1) = NTRUNC
-         END IF
-
-*       User input
-         CALL USI_GET0L( 'TAPER', TAPER, STATUS )
-         IF ( .NOT. TAPER ) THEN
-            CALL USI_GET0L( 'REMOVE_MEAN', DEMEAN, STATUS )
-         END IF
-         IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-         CALL DYN_MAPR( 1, DIMS(1), DPTR, STATUS )
-
-         IF ( TAPER .OR. DEMEAN ) THEN
-
-*          Set up modified data array with mean subtracted
-            CALL POWER_MEANSUB( DIMS(1), %VAL(YPTR), %VAL(DPTR) )
-
-         ELSE
-
-*          Original array to be passed across
-            CALL ARR_COP1R( DIMS(1), %VAL(YPTR), %VAL(DPTR), STATUS )
-
-         END IF
-         IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*     Taper 10% of data at each end if required
-*     Should the fraction tapered be user selectable??
-         IF ( TAPER ) THEN
-           CALL ARR_TAPERR( DIMS(1), 0.1, %VAL(DPTR), STATUS )
-         END IF
-
-*     Compute power spectrum
-         CALL TIM_FPOWER( DIMS(1), %VAL(DPTR), NV, STATUS )
-
-*     Create components in output file.
-*     Start with the axis values
-         SPARR(1) = 0.0
-         SPARR(2) = 1.0 / ( REAL(DIMS(1)) * DX )
-         CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
-         CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
-         CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
-
-*     Create output data array
-         CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(DPTR), STATUS )
-
-*     Copy stuff from input
-         IF ( ISDS ) THEN
-
-*        The data units
-            CALL BDI_GETUNITS( IFID, UNITS, STATUS )
-            IF ( UNITS .GT. ' ' ) THEN
-              CALL MSG_SETC( 'UN', UNITS )
-              CALL MSG_MAKE( '(^UN)**2', UNITS, ULEN )
-              CALL BDI_PUT0C( OFID, 'Units', UNITS(:ULEN), STATUS )
-            END IF
-
-*        Frequency units
-            CALL BDI_AXGET0C( IFID, 1, 'Units', UNITS, STATUS)
-            IF ( UNITS .GT. ' ' ) THEN
-              CALL MSG_SETC( 'UN', UNITS )
-              CALL MSG_MAKE( '(^UN)**-1', UNITS, ULEN )
-              CALL BDI_AXPUT0C( OFID, 1, 'Units', UNITS(:ULEN), STATUS)
-            END IF
-
-            CALL BDI_COPY( IFID, 'Title', OFID, ' ', STATUS )
-
+*    Check for bad quality
+        CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
+        IF ( QOK ) THEN
+          CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
+          CALL ARR_NBAD( DIMS(1), %VAL(QPTR), NBAD, STATUS )
+          IF ( NBAD .GT. 0 ) THEN
+            CALL MSG_SETI( 'NBAD', NBAD )
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'WARNING: There are ^NBAD quality '/
+     :                     /'points present, aborting...', STATUS )
+            GOTO 99
           END IF
+        END IF
 
-*      Copy ancillaries
-          CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+*    Inform user about length of data set
+        CALL MSG_SETI( 'NDAT', DIMS(1) )
+        CALL MSG_PRNT( '^NDAT data points entered' )
 
-*      Copy History.
-          CALL HSI_COPY( IFID, OFID, STATUS )
+*    User input
+        CALL USI_GET0L( 'TRUNCATE', TRUNC, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+        IF ( TRUNC ) THEN
+          CALL TIM_TRUNC( DIMS(1), NTRUNC )
+          CALL MSG_SETI('NTRUNC', NTRUNC )
+          CALL MSG_PRNT( 'Truncated to ^NTRUNC values' )
+          DIMS(1) = NTRUNC
+        END IF
+
+*    User input
+        CALL USI_GET0L( 'TAPER', TAPER, STATUS )
+        IF ( .NOT. TAPER ) THEN
+          CALL USI_GET0L( 'REMOVE_MEAN', DEMEAN, STATUS )
+        END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Map space for output
+        CALL DYN_MAPR( 1, DIMS(1), DPTR, STATUS )
+
+        IF ( TAPER .OR. DEMEAN ) THEN
+
+*      Set up modified data array with mean subtracted
+          CALL POWER_MEANSUB( DIMS(1), %VAL(YPTR), %VAL(DPTR) )
+
+        ELSE
+
+*      Original array to be passed across
+          CALL ARR_COP1R( DIMS(1), %VAL(YPTR), %VAL(DPTR), STATUS )
 
         END IF
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Taper 10% of data at each end if required
+*    Should the fraction tapered be user selectable??
+        IF ( TAPER ) THEN
+          CALL ARR_TAPERR( DIMS(1), 0.1, %VAL(DPTR), STATUS )
+        END IF
+
+*    Compute power spectrum
+        CALL TIM_FPOWER( DIMS(1), %VAL(DPTR), NV, STATUS )
+
+*    Create components in output file.
+*    Start with the axis values
+        SPARR(1) = 0.0
+        SPARR(2) = 1.0 / ( REAL(DIMS(1)) * DX )
+        CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
+        CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
+
+*    Create output data array
+        CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(DPTR), STATUS )
+
+*    Copy stuff from input
+        IF ( ISDS ) THEN
+
+*      The data units
+          CALL BDI_GETUNITS( IFID, UNITS, STATUS )
+          IF ( UNITS .GT. ' ' ) THEN
+            CALL MSG_SETC( 'UN', UNITS )
+            CALL MSG_MAKE( '(^UN)**2', UNITS, ULEN )
+            CALL BDI_PUT0C( OFID, 'Units', UNITS(:ULEN), STATUS )
+          END IF
+
+*      Frequency units
+          CALL BDI_AXGET0C( IFID, 1, 'Units', UNITS, STATUS)
+          IF ( UNITS .GT. ' ' ) THEN
+            CALL MSG_SETC( 'UN', UNITS )
+            CALL MSG_MAKE( '(^UN)**-1', UNITS, ULEN )
+            CALL BDI_AXPUT0C( OFID, 1, 'Units', UNITS(:ULEN), STATUS)
+          END IF
+
+          CALL BDI_COPY( IFID, 'Title', OFID, ' ', STATUS )
+
+        END IF
+
+*    Copy ancillaries
+        CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+
+*    Copy History.
+        CALL HSI_COPY( IFID, OFID, STATUS )
 
 *    Add new history record. ! This should contain more info.
         CALL HSI_ADD( OFID, VERSION, STATUS )
