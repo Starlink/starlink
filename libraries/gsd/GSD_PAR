@@ -1,13 +1,41 @@
-*    GSDPARS
+*+
+*  Name:
+*     GSD_PAR
 
-* Copyright:
-*    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
-*    All Rights Reserved. 
+*  Purpose:
+*     Define the GSD__ public constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+ 
+*  Description:
+*     This file contains definitions of the public global constants used
+*     by the GSD_ system.
+ 
+*  Authors:
+*     HME: Horst Meyerdierks (UoE, Starlink)
+*     RPT: Remo Tilanus (JAC)
+*     TIMJ: Tim Jenness (JAC)
+
+*  History:
+*     13-MAR-2004 (TIMJ):
+*        Add standard prologue. Now force include of PRM_PAR.
+
+*  Copyright: 
+*     Copyright (C) 1994-1999,2004 Particle Physics and Astronomy
+*     Research Council.  All Rights Reserved.
+
+*-
+
+*  External Constants:
+      INCLUDE 'PRM_PAR'
 
 * 
-*    Parameter definitions for the GSD system
+*  Parameter definitions for the GSD system
 *
-*    Requires prior inclusion of PRM_PAR for the VAL__BADx.
 *
       INTEGER GSD__MAXFILE     ! Maximum number of GSD files open at any time
       PARAMETER (GSD__MAXFILE=100) 
