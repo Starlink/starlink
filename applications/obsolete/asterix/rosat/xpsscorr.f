@@ -52,6 +52,7 @@
 *                        HEAD.DET was also not being set up! (DJA)
 *      9 May 95 : V1.8-1 Updated access to SSDS files (DJA)
 *      8 Aug 95 : V1.8-2 Added check for objects outside exposure map (DJA)
+*      4 Dec 1995 : V1.8-3 Use BDI for effective area access (DJA)
 *
 *    Type Definitions :
 *
@@ -60,6 +61,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 *
 *    Status :
@@ -73,7 +75,6 @@
 *
       CHARACTER*(DAT__SZLOC) RLOC    ! Locator to response file
       CHARACTER*(DAT__SZLOC) ELOC    ! Locator to effective areas
-      CHARACTER*(DAT__SZLOC) EXLOC   ! Locator to exposure map
       CHARACTER*80 RFILE             ! Name of response file
       CHARACTER*80 EFILE             ! Name of eff. area file
       CHARACTER*80 EXPFIL            ! Name of exposure map
@@ -90,6 +91,7 @@
       INTEGER     ENDIM              ! Error dimensionality
       INTEGER     DDIM(2)            ! Error dimensionality
       INTEGER			DETID			! Detector details
+      INTEGER			EXFID			! Effectivearea file
       INTEGER			IFID			! Input dataset
       INTEGER     MDATE,MSWITCH ! MJDs
       INTEGER     NED                ! Number of error items per source
@@ -112,7 +114,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XPSSCORR version 1.8-2' )
+        PARAMETER 		( VERSION = 'XPSSCORR version 1.8-3' )
 *-
 
 *    Check status
@@ -393,23 +395,21 @@
             CALL USI_GET0C('EXPMAP', EXPFIL, STATUS)
 *
 *     Open effective areas file
-            CALL HDS_OPEN(EXPFIL, 'READ', EXLOC, STATUS)
-*
-            IF (STATUS .NE. SAI__OK) THEN
+            CALL ADI_FOPEN( EXPFIL, 'BinDS', 'READ', EXFID, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETC('EFF', EXPFIL)
                CALL MSG_PRNT('Error opening exposure map file ^EFF')
                GOTO 999
             ENDIF
 *
 *     Map the data array for the exposure map and get the axis values
-            CALL BDA_CHKDATA(EXLOC, OK, NEDIM, EXDIM, STATUS)
-*
-            CALL BDA_MAPDATA(EXLOC, 'READ', EXPTR, STATUS)
+            CALL BDI_CHK( EXFID, 'Data', OK, STATUS )
+            CALL BDI_GETSHP( EXFID, ADI__MXDIM, EXDIM, NEDIM, STATUS )
+            CALL BDI_MAPR( EXFID, 'Data', 'READ', EXPTR, STATUS)
 *
 *     Map the axes - NB: have to assume that the axis units are half arcsecs
-            CALL BDA_MAPAXVAL(EXLOC, 'READ', 1, EAPTR1, STATUS)
-            CALL BDA_MAPAXVAL(EXLOC, 'READ', 2, EAPTR2, STATUS)
-*
+            CALL BDI_AXMAPR( EXFID, 1, 'Data', 'READ', EAPTR1, STATUS)
+            CALL BDI_AXMAPR( EXFID, 2, 'Data', 'READ', EAPTR2, STATUS)
             IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
                CALL MSG_PRNT('** Error reading exposure map **')
                GOTO 999
