@@ -70,13 +70,16 @@
          BUNIT become the NDF label and units respectively.
 
          \sstitem
+         The pixel origin is set if any LBOUND$n$ headers are present.
+
+         \sstitem
          Lines from the IRAF image header file may be transferred to
          the FITS extension of the NDF, when PROFITS={\tt TRUE}.  Any
          compulsory FITS keywords that are missing are added.  Certain
          other keywords are not propagated.  These are the IRAF ``Mini
          World Coordinate System'' (MWCS) keywords WCSDIM, DC\_FLAG,
          WAT$d$\_$nnn$ ($d$ is dimension, $nnn$ is the line number).
-         Certain NDF-style HISTORY lines in the header may also
+         Certain NDF-style HISTORY lines in the header are also
          be ignored when PROHIS={\tt TRUE} (see two notes below).
 
          \sstitem
