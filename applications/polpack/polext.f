@@ -35,7 +35,9 @@
 *     in the POLPACK extension items of the supplied data files. New
 *     POLPACK extensions are created if necessary. If no new values are
 *     supplied for an item, the existing item values (if any) are retained. 
-*     The final contents of the POLPACK extension are then listed.
+*     The final contents of the POLPACK extension are then listed. The
+*     values (on exit) of the extension items in the last specified data 
+*     file are written to a set of output parameters.
 
 *  Usage:
 *     polext in 
@@ -124,6 +126,14 @@
 *        be either "O" or "E". The same value is stored in all supplied
 *        data files. If a null (!) value is supplied, any existing RAY
 *        values are left unchanged, but no new ones are added. [!]
+*     STOKES = LITERAL (Read)
+*        You should use this parameter only if the supplied data files 
+*        are 3D cubes containing Stokes vectors. It should be a string in 
+*        which each character indicates the quantity stored in the 
+*        corresponding plane of the cube (I, Q, U or V). The length of
+*        the string should equal the number of planes in the cube. If a 
+*        null (!) value is supplied, any existing STOKES values are left 
+*        unchanged, but no new ones are added. [!]
 *     T = _REAL (Read)
 *        The analyser transmission. This gives the transparency of the
 *        analyser to unpolarised light. A perfect polariser has a value of
@@ -134,6 +144,36 @@
 *        its existing value, and any other images are left with an
 *        undefined T value (this will cause a value of 1.0 to be used by
 *        POLCAL). [!]
+*     VANGROT = _REAL (Write)
+*        The ANGROT value stored in the last data file on exit will be 
+*        written to this output parameter. 
+*     VANLANG = _REAL (Write)
+*        The ANLANG value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VEPS = _REAL (Write)
+*        The EPS value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VFILTER = LITERAL (Write)
+*        The FILTER value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VIMGID = LITERAL (Write)
+*        The IMGID value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VRAY = LITERAL (Write)
+*        The RAY value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VSTOKES = LITERAL (Write)
+*        The STOKES value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VT = _REAL (Write)
+*        The T value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VWPLATE = _REAL (Write)
+*        The WPLATE value stored in the last data file on exit will be 
+*        written to this output parameter.
+*     VVERSION = LITERAL (Write)
+*        The POLPACK version number which created the last data file will be 
+*        written to this output parameter.
 *     WPLATE = _REAL (Read)
 *        The half-wave plate position, in degrees. Use parameter ANLANG if
 *        your polarimeter does not have a half-wave plate. The given value
@@ -176,6 +216,8 @@
 *        Added T, EPS and ANLANG. Removed restrictions on values of WPLATE.
 *     30-MAR-1999 (DSB):
 *        Fixed bug which prevented IMGID being changed.
+*     12-MAY-1999 (DSB):
+*        Added parameter STOKES, and output parameters.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -217,7 +259,9 @@
       CHARACTER POLLOC*( DAT__SZLOC )  ! Locator to POLPACK extension
       CHARACTER RAY*1                  ! Supplied ray indicator; "O" or "E"
       CHARACTER RY*1                   ! Ray indicator to store; "O" or "E"
-      CHARACTER STOKES*5               ! Current value of STOKES component
+      CHARACTER STO*5                  ! Current value of STOKES component
+      CHARACTER STOKES*5               ! Supplied value of STOKES component
+      CHARACTER VER*20                 ! VERSION value
       INTEGER ADDED              ! No. of elements added to a group
       INTEGER I                  ! Loop counter
       INTEGER IAT                ! No. of characters in buffer
@@ -244,6 +288,7 @@
       LOGICAL GOTIMG             ! Were any IMGID values given?
       LOGICAL GOTPOL             ! Does NDF contain a POLPACK extension?
       LOGICAL GOTRAY             ! Was a RAY value given?
+      LOGICAL GOTSTO             ! Was a STOKES value given?
       LOGICAL GOTT               ! Was a T value given?
       LOGICAL GOTWPL             ! Was a WPLATE value given?
       LOGICAL QUIET              ! Run silently?
@@ -444,6 +489,19 @@
          GOTRAY = .TRUE.
       END IF
 
+*  Get the STOKES value. Annul the error if a null (!) value was supplied,
+*  and set a flag indicating whether to store the STOKES value.
+      CALL PAR_GET0C( 'STOKES', STOKES, STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )    
+         GOTSTO = .FALSE.
+      ELSE
+         GOTSTO = .TRUE.
+         CALL CHR_RMBLK( STOKES )
+         CALL CHR_UCASE( STOKES ) 
+      END IF
+
 *  Create a group to hold the names of the NDFs which were processed
 *  successfully.
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
@@ -489,7 +547,7 @@
 
 *  If so, get the values of various components, establishing suitable
 *  defaults first.
-         STOKES = ' '
+         STO = ' '
          ANG = 0.0
          IMG = NDFNAM( MAX( 1, LNDF - IDLEN + 1 ) : LNDF )
          WPL = VAL__BADR
@@ -497,9 +555,10 @@
          T0 = VAL__BADR
          EPS0 = VAL__BADR
          ANA = VAL__BADR
+         VER = ' '
 
          IF( GOTPOL ) THEN
-            CALL NDF_XGT0C( INDF, 'POLPACK', 'STOKES', STOKES, STATUS )
+            CALL NDF_XGT0C( INDF, 'POLPACK', 'STOKES', STO, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'FILTER', FILT, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'IMGID', IMG, STATUS )
             CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPL, STATUS )
@@ -507,6 +566,7 @@
             CALL NDF_XGT0R( INDF, 'POLPACK', 'T', T0, STATUS )
             CALL NDF_XGT0R( INDF, 'POLPACK', 'EPS', EPS0, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'RAY', RY, STATUS )
+            CALL NDF_XGT0C( INDF, 'POLPACK', 'VERSION', VER, STATUS )
 
 *  The existing ANGROT value is obtained from the POLANAL WCS Frame.
             CALL POL1_GTANG( INDF, 0, IWCS, ANG, STATUS )
@@ -527,31 +587,69 @@
          IF( GOTT ) T0 = T
          IF( GOTEPS ) EPS0 = EPS
          IF( GOTANA ) ANA = ANLANG
+         IF( GOTSTO ) STO = STOKES 
 
-*  Store the values. First do Stokes vector cubes.
-         IF( STOKES .NE. ' ' ) THEN
+*  Store the values in the NDF. First do Stokes vector cubes.
+         IF( STO .NE. ' ' ) THEN
             CALL POL1_PTANG( ANG, IWCS, STATUS )
-            IF( FILT .NE. ' ' ) CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 
-     :                                          'FILTER', STATUS )
+
+            IF( FILT .NE. ' ' ) THEN
+               CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
+            END IF
+
+            CALL NDF_XPT0C( STO( : CHR_LEN( STO ) ), INDF, 'POLPACK', 
+     :                      'STOKES', STATUS )
 
 *  Now do intensity images. 
          ELSE
 
             CALL POL1_PTANG( ANG, IWCS, STATUS )
-            CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
-            CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', STATUS )
-            IF( WPL .NE. VAL__BADR ) CALL NDF_XPT0R( WPL, INDF, 
-     :                                     'POLPACK', 'WPLATE', STATUS )
-            IF( RY .NE. ' ' ) CALL NDF_XPT0C( RY, INDF, 'POLPACK', 
-     :                                        'RAY', STATUS )
-            IF( ANA .NE. VAL__BADR ) CALL NDF_XPT0R( ANA, INDF, 
-     :                                     'POLPACK', 'ANLANG', STATUS )
-            IF( T0 .NE. VAL__BADR ) CALL NDF_XPT0R( T0, INDF, 
-     :                                     'POLPACK', 'T', STATUS )
-            IF( EPS0 .NE. VAL__BADR ) CALL NDF_XPT0R( EPS0, INDF, 
-     :                                     'POLPACK', 'EPS', STATUS )
+
+            IF( FILT .NE. ' ' ) THEN
+               CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
+            END IF
+
+            IF( IMG .NE. ' ' ) THEN
+               CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', STATUS )
+            END IF
+
+            IF( WPL .NE. VAL__BADR ) THEN
+               CALL NDF_XPT0R( WPL, INDF, 'POLPACK', 'WPLATE', STATUS )
+            END IF
+
+            IF( RY .NE. ' ' ) THEN
+               CALL NDF_XPT0C( RY, INDF, 'POLPACK', 'RAY', STATUS )
+            END IF
+
+            IF( ANA .NE. VAL__BADR ) THEN
+               CALL NDF_XPT0R( ANA, INDF, 'POLPACK', 'ANLANG', STATUS )
+            END IF
+
+            IF( T0 .NE. VAL__BADR ) THEN
+               CALL NDF_XPT0R( T0, INDF, 'POLPACK', 'T', STATUS )
+            END IF
+
+            IF( EPS0 .NE. VAL__BADR ) THEN
+               CALL NDF_XPT0R( EPS0, INDF, 'POLPACK', 'EPS', STATUS )
+            END IF
 
          END IF
+
+*  Now store the parameter values.
+         CALL PAR_PUT0R( 'VANGROT', ANG, STATUS )
+         CALL PAR_PUT0R( 'VWPLATE', WPL, STATUS )
+         CALL PAR_PUT0C( 'VRAY', RY, STATUS )
+         CALL PAR_PUT0R( 'VANLANG', ANA, STATUS )
+         CALL PAR_PUT0R( 'VT', T0, STATUS )
+         CALL PAR_PUT0R( 'VEPS', EPS0, STATUS )
+         CALL PAR_PUT0C( 'VFILTER', FILT( : MAX( 1, CHR_LEN( FILT ) ) ), 
+     :                   STATUS )
+         CALL PAR_PUT0C( 'VSTOKES', STO( : MAX( 1, CHR_LEN( STO ) ) ),
+     :                   STATUS )
+         CALL PAR_PUT0C( 'VIMGID', IMG( : MAX( 1, CHR_LEN( IMG ) ) ),
+     :                   STATUS )
+         CALL PAR_PUT0C( 'VVERSION', VER( : MAX( 1, CHR_LEN( VER ) ) ),
+     :                   STATUS )
 
 *  Get a locator to the POLPACK extension.
          CALL NDF_XLOC( INDF, 'POLPACK', 'READ', POLLOC, STATUS )
