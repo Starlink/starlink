@@ -2,11 +2,23 @@
      :     N_SWITCHES,N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
      :     N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, POS_S, 
      :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS) 
-*     +
-*     Name:
+*+
+*  Name:
 *     SCULIB_DECODE_SPEC
 
-*     Purpose:
+*  Purpose:
+*     Decode SCUBA-style data specifications
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SCULIB_DECODE_SPEC (SPEC, DEMOD_POINTER, 
+*    :     N_SWITCHES,N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
+*    :     N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, POS_S, 
+*    :     SWITCH_S, EXP_S, INT_S, MEAS_S, BOL_S, STATUS)
+
+*  Description:
 *     This routine decodes a SCUBA-style data specification. The data-spec
 *     will be of the form {<component>;<component>;...}, where components
 *     are one of the following:-
@@ -27,28 +39,28 @@
 *     empty data-spec {} will return all components selected. Example
 *     data-specs are:-
 *     
-*     {}                        select all data
-*     {B7,12;P57}               select data for bolometers 7 and 12 at
-*     measurement position 57
-*     {S2;E1;I3:M2}             select data for all bolometers in
-*     switch 2 of exposure 1 of integration 3
-*     in measurement 2 of the observation
-*     {B29}                     select all data for bolometer 29
-*     {B29;E1}                  select data for bolometer 29 in the
-*     first exposure of each integration
+*       {}                        select all data
+*       {B7,12;P57}               select data for bolometers 7 and 12 at
+*                                 measurement position 57
+*       {S2;E1;I3:M2}             select data for all bolometers in
+*                                 switch 2 of exposure 1 of integration 3
+*                                 in measurement 2 of the observation
+*       {B29}                     select all data for bolometer 29
+*       {B29;E1}                  select data for bolometer 29 in the
+*                                 first exposure of each integration
 *     
 *     The data-spec is case-insensitive and blanks are ignored.
 *     
 *     Errors will occur:-
 *     
-*     If you attempt to select indices outside the dimensions input to
-*     the routine. 
+*       If you attempt to select indices outside the dimensions input to
+*       the routine. 
 *     
-*     If you attempt to select data both by position Pxxx and by switch
-*     Sxxx, exposure Exxx, integration Ixxx or measurement Mxxx.
+*       If you attempt to select data both by position Pxxx and by switch
+*       Sxxx, exposure Exxx, integration Ixxx or measurement Mxxx.
 *     
-*     If you attempt to select by switch Sxxx when the SWITCH_EXPECTED
-*     flag is input .FALSE.
+*       If you attempt to select by switch Sxxx when the SWITCH_EXPECTED
+*       flag is input .FALSE.
 *     
 *     Output consists of a flag POS_SELECTED, to say whether or not the
 *     data were selected by position, and mask arrays that are set
@@ -58,60 +70,58 @@
 *     however, the MEAS_S, INT_S, EXP_S and SWITCH_S arrays, which are
 *     masks for the measurement, integration, exposure and switch will not
 *     be set to sensible values if the data are position selected.  
-*     Language:
-*     Starlink Fortran 77
 
-*     Invocation:
-
-*     Description:
-
-*     Arguments:
+*  Arguments:
 *     N_SPEC                           = INTEGER (Given)
-*     Number of specifications supplied in SPEC
+*       Number of specifications supplied in SPEC
 *     SPEC( N_SPEC )                   = CHARACTER*(*) (Given)
-*     the specification to be decoded
+*       the specification to be decoded
 *     DEMOD_POINTER (N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,  N_MEASUREMENTS)
 *     = INTEGER (Given)
-*     the pointer to the location in the main data array of the data
-*     for each switch of the observation
+*       the pointer to the location in the main data array of the data
+*       for each switch of the observation
 *     N_SWITCHES                       = INTEGER (Given)
-*     the number of switches per exposure
+*       the number of switches per exposure
 *     N_EXPOSURES                      = INTEGER (Given)
-*     the number of exposures per integration
+*       the number of exposures per integration
 *     N_INTEGRATIONS                   = INTEGER (Given)
-*     the number of integrations per measurement
+*       the number of integrations per measurement
 *     N_MEASUREMENTS                   = INTEGER (Given)
-*     the number of measurements in the observation
+*       the number of measurements in the observation
 *     N_POS                            = INTEGER (Given)
-*     the number of positions measured in the observation
+*       the number of positions measured in the observation
 *     N_BOLS                           = INTEGER (Given)
-*     the number of bolometers measured in the observation
+*       the number of bolometers measured in the observation
 *     SWITCH_EXPECTED                  = LOGICAL (Given)
-*     .TRUE. if a switch component is allowed in the data-spec
+*       .TRUE. if a switch component is allowed in the data-spec
 *     POS_SELECTED                     = LOGICAL (Returned)
-*     .TRUE. if the P component is used in the data-spec
+*       .TRUE. if the P component is used in the data-spec
 *     POS_S (N_POS)                    = INTEGER (Returned)
-*     the position mask array; 1 for selected positions, 0 otherwise
+*       the position mask array; 1 for selected positions, 0 otherwise
 *     SWITCH_S (N_SWITCHES)            = INTEGER (Returned)
-*     the switch mask array; 1 for selected switches, 0 otherwise
+*       the switch mask array; 1 for selected switches, 0 otherwise
 *     EXP_S (N_EXPOSURES)              = INTEGER (Returned)
-*     the exposure mask array; 1 for selected exposures, 0 otherwise
+*       the exposure mask array; 1 for selected exposures, 0 otherwise
 *     INT_S (N_INTEGRATIONS)           = INTEGER (Returned)
-*     the integration mask array; 1 for selected integrations, 0
-*     otherwise
+*       the integration mask array; 1 for selected integrations, 0
+*       otherwise
 *     MEAS_S (N_MEASUREMENTS)          = INTEGER (Returned)
-*     the measurement mask array; 1 for selected measurements, 0
-*     otherwise
+*       the measurement mask array; 1 for selected measurements, 0
+*       otherwise
 *     BOL_S (N_BOLS)                   = INTEGER (Returned)
-*     the bolometer mask array; 1 for selected bolometers, 0 otherwise
+*       the bolometer mask array; 1 for selected bolometers, 0 otherwise
 *     STATUS                           = INTEGER (Given and Returned)
-*     The global status.
-*     Authors:
+*       The global status.
+
+*  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
 
-*     History:
+*  History:
 *     $Id$
 *     $Log$
+*     Revision 1.5  1999/07/29 23:44:25  timj
+*     Header tidy up.
+*
 *     Revision 1.4  1997/05/20 23:41:13  timj
 *     Forgot to delete var NSPEC
 *
@@ -126,18 +136,18 @@
 *     Initial revision
 *     
 
-*     Bugs:
+*  Bugs:
 
-*     -
+*-
       
-*     Type Definitions:
+*  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
-*     Global Constants:
+*  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'PRM_PAR'         ! for VAL__BADI
 
-*     Arguments Given:
+*  Arguments Given:
       CHARACTER*(*) SPEC
       INTEGER       N_SWITCHES
       INTEGER       N_EXPOSURES
@@ -149,7 +159,7 @@
       INTEGER       N_BOLS
       LOGICAL       SWITCH_EXPECTED
 
-*     Arguments Returned:
+*  Arguments Returned:
       LOGICAL       POS_SELECTED
       INTEGER       POS_S (N_POS)
       INTEGER       SWITCH_S (N_SWITCHES)
@@ -158,16 +168,16 @@
       INTEGER       MEAS_S (N_MEASUREMENTS)
       INTEGER       BOL_S (N_BOLS)
 
-*     Status:
+*  Status:
       INTEGER STATUS  
 
-*     External routines:
+*  External routines:
 
-*     Local Constants:
+*  Local Constants:
       INTEGER      MAX__COMP    ! max. number of components in
       PARAMETER (MAX__COMP = 8) ! spec
 
-*     Local Variables:
+*  Local Variables:
       LOGICAL      BOL_SELECTED ! .TRUE. if bolometers 
                                 ! selected
       CHARACTER*80 COMPONENT (MAX__COMP) ! components in spec
@@ -197,8 +207,7 @@
       INTEGER      SW           ! switch number in DO loop
       LOGICAL      SWITCH_SELECTED ! .TRUE. if switch specified
 
-*     local data
-*     .
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -69,6 +69,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/07/29 23:44:26  timj
+*     Header tidy up.
+*
 *     Revision 1.3  1997/07/17 02:16:36  timj
 *     Failed to allocate enough memory for multiple beam (PHOTOM) observations
 *     in the mask array.
@@ -84,16 +87,16 @@
 
 *  Bugs:
 
-*     -
+*-
       
-*     Type Definitions:
+*  Type Definitions:
       IMPLICIT NONE             ! No implicit typing
 
-*     Global Constants:
+*  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'PRM_PAR'         ! for VAL__BADI
 
-*     Arguments Given:
+*  Arguments Given:
       LOGICAL       USE_SECT
       CHARACTER*(*) TYPE
       INTEGER       N_SPEC
@@ -113,17 +116,17 @@
       LOGICAL       BIT_STATE
       INTEGER       BITNUM
 
-*     Arguments Given & Returned:
+*  Arguments Given & Returned:
       INTEGER       DATA_PTR
 
-*     Status:
+*  Status:
       INTEGER STATUS  
 
-*     External routines:
+*  External routines:
 
-*     Local Constants:
+*  Local Constants:
 
-*     Local Variables:
+*  Local Variables:
       LOGICAL BIT_SWITCH     ! .TRUE. to call SCULIB_BITON .FALSE. for BITOFF
       INTEGER BOL_S_PTR      ! Selected bolometer
       INTEGER BOL_S_END      ! End of selected bolometer
@@ -144,8 +147,7 @@
       INTEGER SW_S_END       ! end selected switches
       INTEGER SW_S_PTR       ! Selected switches
 
-*     local data
-*     .
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
