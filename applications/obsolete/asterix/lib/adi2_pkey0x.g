@@ -21,7 +21,7 @@
 *  Arguments:
 *     FID = INTEGER (given)
 *        ADI identifier of FITSfile object
-*     HDU = CHARSCTER*(*) (given)
+*     HDU = CHARACTER*(*) (given)
 *        Logical HDU whose keyword this is. Blank for primary
 *     KEY = CHARACTER*(*) (given)
 *        Name of the keyword. Same as the FITS keyword name, so should be
