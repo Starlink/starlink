@@ -3,7 +3,7 @@ automake.texi.
 
 
 
-   This manual is for GNU Automake (version 1.8.2-fpp1, 15 January
+   This manual is for GNU Automake (version 1.8.2-starlink, 15 January
 2004), a program which creates GNU standards-compliant Makefiles from
 template files.
 
@@ -40,7 +40,7 @@ GNU Automake
 
 
 
-   This manual is for GNU Automake (version 1.8.2-fpp1, 15 January
+   This manual is for GNU Automake (version 1.8.2-starlink, 15 January
 2004), a program which creates GNU standards-compliant Makefiles from
 template files.
 
