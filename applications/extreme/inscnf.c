@@ -4,13 +4,13 @@
 *     inscnf
 *
 *  Purpose:
-*     Interpolate CNF_PVAL calls round %VAL arguments where necessary.
+*     Wrap %VAL arguments with CNF_PVAL in Fortran.
 *
 *  Usage:
 *     inscnf [ in [ out ] ] 
 *
 *  Description:
-*     This short program is a filter which takes FORTRAN 77 source code
+*     This is a filter which takes FORTRAN 77 source code
 *     and modifies it so that text which is the argument of a %VAL 
 *     directive is wrapped in a call to CNF_PVAL; i.e. input text
 *
@@ -30,9 +30,10 @@
 *
 *     This is inserted after the last INCLUDE line which already exists
 *     in the program unit.  If there are no INCLUDE lines there, this
-*     line is not inserted, and a warning message is output.
+*     line is not inserted, and a warning message is printed to standard
+*     error.
 *
-*     Attention is paid to Fortran 77 source format, so that lines are
+*     Attention is paid to Fortran 77 source format, so that lines 
 *     more than 72 characters long are avoided (unless they were there
 *     in the first place).
 *
@@ -61,6 +62,12 @@
 *       - The argument of %VAL looks like an integer constant
 *       - The argument of %VAL looks like a Starlink-style symbolic 
 *         constant (has two adjacent underscore characters).
+*
+*  Notes:
+*     Although this program behaves as a filter, it is written on
+*     the assumption that it will be run on a file of a finite length:
+*     it may buffer large amounts of input before writing output, and
+*     it may not free up memory.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
