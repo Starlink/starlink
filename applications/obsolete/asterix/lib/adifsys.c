@@ -533,6 +533,11 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
 
   *rtn = adix_find( rid, name, nlen,   	/* Find member data identifier */
                     status );
+
+  if ( _null_q(*rtn) ) {
+    adic_setetc( "RTN", name, nlen );
+    adic_setecs( ADI__NOMTH, "No representation method for ^RTN", status );
+    }
   }
 
 
