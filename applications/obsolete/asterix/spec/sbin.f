@@ -10,6 +10,7 @@
 *      6 Nov 92 : V1.5-1 Max bin content changed to min (RJV)
 *     18 Nov 93 : V1.7-0 Added missing AST_INIT call (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     27 Mar 95 : V1.8-1 BIT_ used (RJV)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -179,6 +180,8 @@
       REAL OD(*),OA(*),OW(*),OV(*)
 *    Status :
       INTEGER STATUS
+*    Functions :
+      BYTE BIT_ANDUB
 *    Local variables :
       REAL TOT,VARTOT
       REAL LO,HI
@@ -198,7 +201,7 @@
         ENDIF
         DO WHILE (I.LE.IN)
           IF (QOK) THEN
-            GOOD=((IQ(I).AND.MASK).EQ.QUAL__GOOD)
+            GOOD=(BIT_ANDUB(IQ(I),MASK).EQ.QUAL__GOOD)
           ELSE
             GOOD=.TRUE.
           ENDIF
