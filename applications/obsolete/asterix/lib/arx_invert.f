@@ -48,8 +48,32 @@
       SUBROUTINE ARX_QSHAPE(ARDID,SHAPE,PAR,STATUS)
 *    Description :
 *      Analyses ARD text and picks out the simple shapes of
-*      CIRCLE, ELLIPSE, BOX or ANNULUS - everything else is
-*      returned as COMPLEX
+*      CIRCLE, ELLIPSE, BOX, ANNULUS(circular), ANNULARBOX
+*      and ANNULARELLIPSE - everything else is returned as COMPLEX
+*
+*      The returned parameters are as follows:
+*
+*      CIRCLE 1 x-cent    BOX 1 x-cent    ELLIPSE 1 x-cent
+*             2 y-cent        2 y-cent            2 y-cent
+*             3 radius        3 w-width           3 angle
+*                             4 y-width           4 semi-maj
+*                                                 5 semi-min
+*
+*      ANNULUS 1 x-cent          ANNULARBOX 1 x-cent
+*              2 y-cent                     2 y-cent
+*              3 inner-radius               3 inner-x-width
+*              4 outer-radius               4 inner-y-width
+*                                           5 outer-xwidth
+*                                           6 outer-ywidth
+*
+*      ANNULARELLIPSE 1 x-cent
+*                     2 y-cent
+*                     3 angle
+*                     4 inner-semi-maj
+*                     5 inner-semi-min
+*                     6 outer-semi-maj
+*                     7 outer-semi-min
+*
 *    Deficiencies :
 *    Bugs :
 *    Authors :
@@ -114,7 +138,12 @@
           SHAPE='ELLIPSE'
           C1=INDEX(TEXT,'(')
           C2=INDEX(TEXT(C1:),')')
-          READ(TEXT(C1+1:C2-1),*) PAR(1),PAR(2),PAR(3),PAR(4),PAR(5)
+          READ(TEXT(C1+1:C2-1),*) X1,Y1,XR1,YR1,A1
+          PAR(1)=X1
+          PAR(2)=Y1
+          PAR(3)=A1
+          PAR(4)=XR1
+          PAR(5)=YR1
 
 *  simple rectangular box
         ELSEIF (NBOX.EQ.1) THEN
