@@ -13,6 +13,9 @@ grf.h
 PGPLOT/PGPLOT.pm
 PGPLOT/Makefile.PL
 PGPLOT/t/pgplot.t
+Tk/Tk.pm
+Tk/Makefile.PL
+Tk/t/tk.t
 t/attrib.t
 t/channel.t
 t/fitschan.t
