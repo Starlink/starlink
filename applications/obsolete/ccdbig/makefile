@@ -269,6 +269,10 @@ AR_IN = ar -r
 
 ALINK = $(STAR_BIN)/alink
 
+#  Generic source code expander
+
+GENERIC = $(STAR_BIN)/generic
+
 #  Default file type extension for a shareable library and command for
 #  building a shareable library (the default acts as a null command).
 
@@ -329,7 +333,7 @@ LINK_SCRIPT = $(PKG_NAME)_link_adam
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR DAT_PAR
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR NDF_PAR PRM_PAR DCV_FUN
 
 #  List of private include files.  These are include files
 #  which form part of the package and are required in order to build
@@ -340,7 +344,7 @@ PRIVATE_INCLUDES = ccd1_par
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = ssn69.tex
-# HYPERTEXT_DOCS = ssn69.htx
+HYPERTEXT_DOCS = ssn69.htx
 
 #  List of documentation files.
 
@@ -356,9 +360,14 @@ TASKOBJ = $(TASKS:=.o)
 
 IFL_FILES = $(TASKS:=.ifl)
 
-SUBSRC = ccdb1_abia.f ccdb1_flmul.f
+SUBSRC = big1_abiat.f big1_anoit.f big1_flmult.f big1_objst.f big1_stvt.f \
+         pda_rnnor.f
+
+GENSRC = bgg1_abia.gen bgg1_anoi.gen bgg1_flmul.gen bgg1_objs.gen bgg1_stv.gen
 
 SUBOBJ = $(SUBSRC:.f=.o)
+
+GENOBJ = $(GENSRC:.gen=.o)
 
 #  List of data files.
 
@@ -366,7 +375,7 @@ DATA_FILES = ccdtest.ard ccdbig_obj.dat
 
 #  List of object files produced by compiling the source code.
 
-OBJECT_FILES = $(SUBOBJ) $(TASKOBJ)
+OBJECT_FILES = $(SUBOBJ) $(GENOBJ) $(TASKOBJ)
 
 #-------------------------------------------------------------------------------
 
@@ -401,6 +410,9 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_PAR
 
 SAE_PAR:        $(STAR_INC)/sae_par;      $(LINK) $? $@
 DAT_PAR:        $(STAR_INC)/dat_par;      $(LINK) $? $@
+NDF_PAR:        $(STAR_INC)/ndf_par;      $(LINK) $? $@
+PRM_PAR:        $(STAR_INC)/prm_par;      $(LINK) $? $@
+DCV_FUN:        $(STAR_INC)/dcv_fun;      $(LINK) $? $@
 CCD1_PAR:       ccd1_par;                 $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
@@ -435,7 +447,7 @@ check_source: $(SOURCE_FILES)
 
 #  Contents of the $(PKG_NAME)_source.tar archive.
 
-SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) \
+SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) $(DATA_FILES) \
                   $(SHELL_SCRIPTS) $(LINK_SCRIPT) $(PRIVATE_INCLUDES)
 
 #  Rules for building release files from RCS repository.
@@ -454,19 +466,27 @@ $(PKG_NAME)_source.tar:
 	$(TAR_IN) $(PKG_NAME)_source.tar $(SOURCE_CONTENTS)
 	rm -f $(SOURCE_CONTENTS)
 
+source_files:
+	co $(SOURCE_CONTENTS)
+
 #  Suffix rules.
 
 .f.o:
 	$(FC) $(FFLAGS) -c $<
+
+.gen.o:
+	$(GENERIC) -t wird $<
+	$(FC) $(FFLAGS) -c $(<:.gen=.f)
+	rm -f $(<:.gen=.f)
 
 #  Rules for compiling the tasks.
 
 CCDPACK_SOURCES = $(STAR_SOURCES)/ccdpack
 CCDPACK_LIBS = -lccdpack -lccdpack_gen -lccdpack_tasks
 
-$(TASKS): $(SUBOBJ) $(TASKOBJ) $(LINK_SCRIPT)
-	$(ALINK) $@.o $(SUBOBJ) -L$(CCDPACK_SOURCES) $(CCDPACK_LIBS) \
-                      `$(LINK_SCRIPT)`
+$(TASKS): $(SUBOBJ) $(TASKOBJ) $(GENOBJ) $(LINK_SCRIPT)
+	$(ALINK) $@.o $(SUBOBJ) $(GENOBJ) \
+                 -L$(CCDPACK_SOURCES) $(CCDPACK_LIBS) `$(LINK_SCRIPT)`
 
 #  Rules for compiling the interface files.
 
@@ -735,7 +755,7 @@ install:
 #
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
-	cp -p $(DATE_STAMP) $(INSTALL_DATES)
+	cp -pf $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
 	chmod 644 $(DATE_STAMP)
 	rm $(DATE_STAMP)
@@ -1000,7 +1020,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 
 clean:
 	rm -f $(INCLUDE_LINKS) $(IFC_FILES) $(OBJECT_FILES)
-	rm -f $(PRIVATE_INCLUDES) $(IFL_FILES) $(TASKSRC) $(SUBSRC)
+	rm -f $(PRIVATE_INCLUDES) $(IFL_FILES) $(TASKSRC) $(SUBSRC) $(GENSRC)
 	@ echo
 	@ echo '*** intermediate files removed.'
 	@ echo
@@ -1028,9 +1048,17 @@ strip:
 #  Include file dependencies.
 #  =========================
 
-ccdb1_abia.o: SAE_PAR
-ccdb1_flmul.o: SAE_PAR
-ccdbgen.o: SAE_PAR DAT_PAR CCD1_PAR
+bgg1_abia.o: DCV_FUN SAE_PAR
+bgg1_anoi.o: DCV_FUN SAE_PAR PRM_PAR
+bgg1_flmul.o: DCV_FUN SAE_PAR
+bgg1_objs.o: DCV_FUN SAE_PAR
+bgg1_stv.o: DCV_FUN SAE_PAR
+big1_abiat.o: SAE_PAR
+big1_anoit.o: SAE_PAR
+big1_flmult.o: SAE_PAR
+big1_objst.o: SAE_PAR
+big1_stvt.o: SAE_PAR
+ccdbgen.o: SAE_PAR DAT_PAR CCD1_PAR NDF_PAR
 
 #-------------------------------------------------------------------------------
 #
