@@ -5,11 +5,11 @@ AutoAstrometry of Mosaics
 %%VERSION%%    0.4
 
 
-This is a quick initial release of the autoastrometry package.
+This is a developers' release of the autoastrometry package.
 
-Documentation is in sun242.tar-htx
+Documentation, including release notes, is in sun242.tar-htx
 
 To build, give the sequence of commands
 
     ./mk build
-    ./mk test
+    ./mk install
