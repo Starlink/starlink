@@ -405,10 +405,6 @@ nbs_save_noticeboard(id, status)
 
 # Put a character variable
 # Do not allow character arrays
-# The complication here is that we need to make sure we
-# Overwrite the entire NBS entry. This means we have to fill the
-# Rest of the string with spaces after we have finished putting in the
-# String.
 # Always assume an offset of 0 for now
 
 void
@@ -421,16 +417,19 @@ nbs_put_value_c(id, string, status)
   int i;
   int maxbytes;
   int actbytes;
+  char space = '\0';
  CODE:
   offset = 0;
   nbc_get_size(id, &maxbytes, &actbytes, &status); /* Get the size */
   nbc_put_cvalue(id, offset, string, &status);     /* Put in the string */
 
-  /* Fill with spaces */
-  for (i=strlen(string); i < actbytes; i++)
+  /* Fill with spaces - not required now that I have fixed the get*/
+  /* for (i=strlen(string)+1; i <= actbytes; i++)
   {
-    nbc_put_value( id, i, 1, " ", &status);
-  }
+    printf("Looping %d...\n",i);
+    nbc_put_cvalue( id, i,&space, &status);
+  } 
+  */
 
  OUTPUT:
   status
@@ -458,7 +457,7 @@ nbs_put_value_i(id, nvals, value, status)
 
   if (status == 0) {
     /* Use sizeof */
-    items = actbytes / sizeof(int);
+    items = maxbytes / sizeof(int);
 
     /* Fix it so that number of items in noticeboard must be 
        equal to number of items in incoming array */
@@ -493,7 +492,7 @@ nbs_put_value_f(id, nvals, value, status)
 
   if (status == 0) {
     /* Use sizeof */
-    items = actbytes / sizeof(float);
+    items = maxbytes / sizeof(float);
 
     /* Fix it so that number of items in noticeboard must be 
        equal to number of items in incoming array */
@@ -527,7 +526,7 @@ nbs_put_value_d(id, nvals, value, status)
 
   if (status == 0) {
     /* We still assume 8 bytes for doubles - very lazy */
-    items = actbytes / sizeof(double);
+    items = maxbytes / sizeof(double);
 
     /* Fix it so that number of items in noticeboard must be 
        equal to number of items in incoming array */
@@ -561,7 +560,7 @@ nbs_put_value_l(id, nvals, value, status)
 
   if (status == 0) {
     /* We still assume 4 bytes for ints - very lazy */
-    items = actbytes / sizeof(int);
+    items = maxbytes / sizeof(int);
 
     /* Fix it so that number of items in noticeboard must be 
        equal to number of items in incoming array */
@@ -754,11 +753,14 @@ nbs_get_value_c(id, cvalue, status)
 
     /* Get some workspace the perl way */
     work = sv_2mortal(newSVpv("", 0));
-    SvGROW((SV*)work, actbytes);
+    SvGROW((SV*)work, actbytes+1);
     cvalue = SvPV(work,na);
 
     /* Get the value */
     nbc_get_value(id, 0, actbytes, cvalue, &actbytes, &status);
+
+    /* Add a null on the end */
+    *(cvalue+actbytes) = '\0';
 
   }  else {
     /* Protect against random stuff ending up in cvalue from an error */
