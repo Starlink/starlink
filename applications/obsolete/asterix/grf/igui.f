@@ -87,6 +87,7 @@
 *    Local constants :
 *    Local variables :
       INTEGER ID,SID,ITEMID
+      INTEGER GCBID
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -99,6 +100,11 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'MAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+
+*  create shadow of GCB
+        CALL NBS_DEFINE_STRUCTURE(ID,'GCB','GCB',GCBID,STATUS)
+        CALL GCB_CRESHADOW(GCBID,STATUS)
+
         CALL NBS_END_DEFINITION(NAME,'CREATE_NOTICEBOARD',STATUS)
 
 *  initialise
