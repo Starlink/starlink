@@ -21,11 +21,11 @@
 *     where the gradient is highest, with fast operation in large
 *     areas at large sigma values.
 *
-*     The spot value of the gaussian is found in each sub-pixel, the
+*     The spot value of the Lorentizian is found in each sub-pixel, the
 *     sum of the sub-pixels contributing to each major (ARRAY) pixel.
 *
 *     The case where the array centre coincides with the centre of
-*     the gaussian is handled separately as there is 4-fold symmetry
+*     the Lorentzian is handled separately as there is 4-fold symmetry
 *     about X and Y axes.
 *
 *    Deficiencies :
@@ -58,7 +58,7 @@
 *
 *    Export :
 *
-      REAL                      ARRAY(NX,NY)            ! Gaussian int surface
+      REAL                      ARRAY(NX,NY)            ! Lorentzian int surface
 *
 *    Status :
 *
@@ -66,15 +66,17 @@
 *
 *    Local constants :
 *
-      INTEGER                  SPIX
-        PARAMETER              ( SPIX = 5 )
+      INTEGER                   SPIX
+        PARAMETER               ( SPIX = 5 )
+      REAL			RLIM2			! Square of limit
+        PARAMETER		( RLIM2 = 100.0 )
 *
 *    Local variables :
 *
       REAL                      NORM               	! Normalisation constant
       REAL                      SDX, SDY                ! Sub-pixel bin sizes
       REAL                      SUM                     ! Cumulative value
-      REAL			WID2
+      REAL			WID2,R2
       REAL                      XNOR, YNOR              ! X,Y bits to NORM
       REAL                      XP0, YP0                ! Major pixel centre
       REAL                      XPS, YPS                ! Sub-pixel pixel centre
@@ -157,7 +159,10 @@
             DO II = 0, XSUB-1
 
 *            Value of Lorentzian
-              SUM = SUM + 1.0 / ((XPS/XWID)**2 + YPS2 + WID2)
+              R2 = (XPS/XWID)**2 + YPS2
+              IF ( R2 .LE. RLIM2 ) THEN
+                SUM = SUM + 1.0 / (R2 + WID2)
+              END IF
 
 *            Next sub-pixel
               XPS = XPS + SDX
