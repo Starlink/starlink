@@ -302,7 +302,6 @@
 
 *  Local Variables:
       CHARACTER*1		EFORM			! Form of epoch
-      CHARACTER*3		PRJ			! Projection name
       CHARACTER*20		RAS, DECS		! RA,DEC in strings
       CHARACTER*3		SYS			! Coord system name
 
