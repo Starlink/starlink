@@ -147,6 +147,8 @@
 *           Test class membership.
 *        astVersion
 *           Returns the AST library version number.
+*        astEscapes
+*           Remove escape sequences from returned text strings?
 *
 *     Protected:
 *        astCheckObject
@@ -219,13 +221,16 @@
 *        class implementations) are defined. This macro also affects
 *        the reporting of error context information, which is only
 *        provided for external calls to the AST library.
-*     astFORTRAN77
-*        If the astFORTRAN77 macro is defined, reporting of error
+*     astNOERR
+*        If the astNOERR macro is defined, reporting of error
 *        context information is suppressed. This is necessary when
-*        implementing the FORTRAN77 interface to the AST library, as
+*        implementing foreign language interfaces to the AST library, as
 *        otherwise the file names and line numbers given would refer
 *        to the interface implementation rather than the user's own
 *        code.
+*     astFORTRAN77
+*        Defining the astFORTRAN77 macro has the same effect as defining
+*        the astNOERR macro. 
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -258,6 +263,10 @@
 *     30-APR-2003 (DSB):
 *        Added macros AST__VMAJOR, AST__VMINOR and AST__RELEASE.
 *        Added astVersion function.
+*     7-FEB-2004 (DSB):
+*        Added astEscapes function.
+*     27-FEB-2004 (DSB):
+*        Added the astNOERR macro.
 *--
 */
 
@@ -357,9 +366,9 @@
    macro.
 
    Suppress reporting of the file and line number from internal code
-   and from the FORTRAN 77 interface by not using astAt in these
+   and from foreign language interfaces by not using astAt in these
    cases. */
-#if defined(astCLASS) || defined(astFORTRAN77)
+#if defined(astCLASS) || defined(astFORTRAN77) || defined(astNOERR)
 #define astINVOKE(rettype,function) astRet##rettype##_(function)
 #else
 #define astINVOKE(rettype,function) \
@@ -1065,9 +1074,9 @@ int astTest##attribute##_( Ast##class *this ) { \
 /* define macros containing the library major version, minor version and 
    release numbers. The values of these macros are edited in automatically
    when the AST release is prepared. */
-#define AST__VMAJOR <MAJOR_VERSION_NUMBER>
-#define AST__VMINOR <MINOR_VERSION_NUMBER>
-#define AST__RELEASE <RELEASE_NUMBER>
+#define AST__VMAJOR 3
+#define AST__VMINOR 2
+#define AST__RELEASE 4
 
 /* Type Definitions. */
 /* ================= */
@@ -1178,6 +1187,7 @@ AstObject *astMakeId_( AstObject * );
 AstObject *astMakePointer_( AstObject * );
 int astP2I_( AstObject * );
 int astVersion_( void );
+int astEscapes_( int );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
@@ -1271,6 +1281,7 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 #define astVersion astVersion_()
+#define astEscapes(int) astEscapes_(int)
 #define astI2P(integer) ((void *)astI2P_(integer))
 #define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer)))
 #define astMakePointer(id) ((void *)astMakePointer_((AstObject *)(id)))

@@ -43,6 +43,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *        - Changed private InitVtab method to protected astInitAxisVtab
 *        method.
 *        - Include descriptive label for units string within a Dump.
+*     24-JAN-2004 (DSB):
+*        - Added astAxisFields.
+*        - Added argument "fmt" to definition of AxisAbbrev.
+*     3-FEB-2004 (DSB):
+*        - Added "log" formatting using the "&" flag character in the
+*        Format string.  
 *class--
 */
 
@@ -96,6 +102,14 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
 
+/* Strings used as field delimiters when producing graphical labels.
+   These strings include escape sequences which the Plot class interprets
+   to produce super-scripts, sub-scripts, etc.*/
+static const char *log_esc  = "10%-%^50+%s70+";     
+
+/* Plain text equivalents. */
+static const char *log_txt  = "10^";     
+
 /* Define other static variables. */
 static char format_buff[ FORMAT_BUFF_LEN + 1 ]; /* Default Format string */
 
@@ -108,16 +122,18 @@ AstAxis *astAxisId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static const char *AxisAbbrev( AstAxis *, const char *, const char * );
+static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char * );
 static const char *AxisFormat( AstAxis *, double );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
 static const char *GetAxisSymbol( AstAxis * );
 static const char *GetAxisUnit( AstAxis * );
+static char *ParseAxisFormat( const char *, int *, int *, int * );
 static double AxisDistance( AstAxis *, double, double );
 static double AxisGap( AstAxis *, double, int * );
 static double AxisOffset( AstAxis *, double, double );
+static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisDigits( AstAxis * );
 static int GetAxisDirection( AstAxis * );
@@ -161,7 +177,7 @@ static void SetAxisBottom( AstAxis *, double );
 
 /* Member functions. */
 /* ================= */
-static const char *AxisAbbrev( AstAxis *this,
+static const char *AxisAbbrev( AstAxis *this, const char *fmt,
                                const char *str1, const char *str2 ) {
 /*
 *+
@@ -176,7 +192,7 @@ static const char *AxisAbbrev( AstAxis *this,
 
 *  Synopsis:
 *     #include "axis.h"
-*     const char *astAxisAbbrev( AstAxis *this,
+*     const char *astAxisAbbrev( AstAxis *this, const char *fmt,
 *                                const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -192,6 +208,9 @@ static const char *AxisAbbrev( AstAxis *this,
 *  Parameters:
 *     this
 *        Pointer to the Axis.
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format specifier used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
 *        first formatted value.
@@ -298,6 +317,220 @@ static double AxisDistance( AstAxis *this, double v1, double v2 ) {
    return result;
 }
 
+static int AxisFields( AstAxis *this, const char *fmt0, const char *str, 
+                       int maxfld, char **fields, int *nc, double *val ) {
+/*
+*  Name:
+*     astAxisFields
+
+*  Purpose:
+*     Identify numerical fields within a formatted Axis value.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int astAxisFields( AstAxis *this, const char *fmt0, const char *str, 
+*                        int maxfld, char **fields, int *nc, double *val ) 
+
+*  Class Membership:
+*     Axis member function.
+
+*  Description:
+*     This function identifies the numerical fields within an Axis value
+*     that have been formatted using astAxisFormat. It assumes that the
+*     value was formatted using the supplied format string. It also
+*     returns the equivalent floating point value.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     fmt0
+*        Pointer to a constant null-terminated string containing the
+*        format used when creating "str".
+*     str
+*        Pointer to a constant null-terminated string containing the
+*        formatted value.
+*     maxfld
+*        The maximum number of fields to identify within "str".
+*     fields
+*        A pointer to an array of at least "maxfld" character pointers. 
+*        Each element is returned holding a pointer to the start of the 
+*        corresponding field  in "str" (in the order in which they occur 
+*        within "str"), or NULL if no corresponding field can be found. 
+*     nc
+*        A pointer to an array of at least "maxfld" integers. Each
+*        element is returned holding the number of characters in the
+*        corresponding field, or zero if no corresponding field can be
+*        found.
+*     val
+*        Pointer to a location at which to store the value
+*        equivalent to the returned field values. If this is NULL, 
+*        it is ignored.
+
+*  Returned Value:
+*     The number of fields succesfully identified and returned.
+
+*  Notes:
+*     - Leading and trailing spaces are ignored.
+*     - If the formatted value is not consistent with the supplied format
+*     string, then a value of zero will be returned, "fields" will be
+*     returned holding NULLs, "nc" will be returned holding zeros, and
+*     "val" is returned holding VAL__BAD.
+*     - Fields are counted from the start of the formatted string. If the
+*     string contains more than "maxfld" fields, then trailing fields are
+*     ignored.
+*     - If this function is invoked with the global error status set, or 
+*     if it should fail for any reason, then a value of zero will be returned 
+*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     holding their supplied values
+
+*/
+
+/* Local Variables: */
+   const char *fmt;              /* Pointer to parsed Format string */
+   const char *log_del;          /* Pointer to delimiter string */
+   const char *p;                /* Pointer to next character */
+   double value;                 /* Equivalent radians value */
+   int ifld;                     /* Field index */
+   int len;                      /* Length of formatted string */
+   int log;                      /* Format as "10**x"? */
+   int n;                        /* Number of characters read */
+   int neg;                      /* Negate final value? */
+   int result;                   /* Result fields count to return */
+   int sign;                     /* Include leading sign in front of "10**x"? */
+   int space;                    /* Include leading space in front of "10**x"? */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise. */
+   result = 0;
+   for( ifld = 0; ifld < maxfld; ifld++ ) {
+      fields[ ifld ] = NULL;
+      nc[ ifld ] = 0;
+   }
+   if( val ) *val = AST__BAD;
+
+/* Parse the Format string. This returns a collection of flags indicating
+   if any AST specific formatting features are specified in the Format
+   string. It also returns a pointer to a new Format string which is a
+   standard C printf format specifier. Currently the only flags are "log"
+   which indicates if the value should be formatted as "10**x" using
+   the graphical escape sequences defined within the Plot class to produce 
+   "x" as a superscript of "10", "sign" which is used with log to indicate 
+   if a sign should always be included infront of the "10", and "space"
+   which indicates if a leading space should be included infronyt of "10" if
+   no sign is included. */
+   fmt = ParseAxisFormat( fmt0, &log, &sign, &space );
+   fmt = astFree( (void *) fmt );
+
+   if( astOK ) {
+
+/* Obtain the length of the formatted string. */
+      len = (int) strlen( str );
+
+/* First deal with "log" format. */
+      if( log ) {
+
+/* We need room for at least 2 fields. */
+         if( maxfld > 1 ) {
+
+/* Return a pointer to the first non-blank character. */
+            p = str;
+            while( *p == ' ' ) p++;
+            fields[ 0 ] = (char *) p;
+
+/* If the first non-blank character is a minus sign, note it and skip it. */
+            neg = 0;
+            if( *p == '-' ) {
+               neg = 1;
+               p++;
+
+/* If the first non-blank character is a plus sign, and skip it. */
+            } else if( *p == '+' ) {
+               p++;
+            }
+
+/* Select the delimter.*/
+            log_del = astEscapes( -1 ) ? log_esc : log_txt;
+
+/* Check the remaining string starts with the correct delimiter. If
+   so, store the number of characters in the first field and skip over the
+   delimiter. */
+            n = 0;
+            if( strstr( p, log_del ) == p ) {
+               nc[ 0 ] = p + 2  - fields[ 0 ];
+               p += strlen( log_del );
+
+/* Attempt to read a floating point value from the start of the remaining
+   string. */
+               if( 1 == sscanf( p, "%lg%n", &value, &n ) ) {
+
+/* If succesfull, store the returned values. */
+                  result = 2;
+                  fields[ 1 ] = (char *) p;
+                  nc[ 1 ] = n;
+                  if( val ) {
+                     *val = pow( 10.0, value );
+                     if( neg ) *val = -(*val);
+                  }
+
+/* Otherwise, see if the string starts with <bad> */
+               } else if( strstr( p, "<bad>" ) == p ) {
+
+/* If succesfull, store the returned values. */
+                  result = 2;
+                  fields[ 1 ] = (char *) p;
+                  nc[ 1 ] = 5;
+                  if( val ) *val = 0.0;
+               }
+
+/* Zero is never formatted as an exponent. If the string starts with zero, 
+   return a single zero field. */
+            } else if( 1 == sscanf( p, "%lg%n", &value, &n ) ) {
+               if( value == 0.0 ) {
+                  result = 1;
+                  nc[ 0 ] = p + n  - fields[ 0 ];
+                  if( val ) *val = 0.0;
+               }
+            }
+         }
+
+/* Now deal with normal decimal format */
+      } else {
+
+/* Attempt to read a floating point value from the formatted string. */
+         if ( n = 0,
+              ( 1 == sscanf( str, "%lg %n", &value, &n ) )
+              && ( n >= len ) && maxfld > 0 ) {
+
+/* If succesful, return a pointer to the first non-blank character. */
+            p = str;
+            while( *p == ' ' ) p++;
+            fields[ 0 ] = (char *) p;
+
+/* Find the last non-blank character. */
+            p += len;
+            while( p[ -1 ] == ' ' ) p--;
+
+/* Return the number of characters in the field. */
+            nc[ 0 ] = p - fields[ 0 ];
+
+/* Return the field value. */
+            if( val ) *val = value;
+
+/* Indicate that we are returning one field. */
+            result = 1;
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static const char *AxisFormat( AstAxis *this, double value ) {
 /*
 *+
@@ -348,9 +581,15 @@ static const char *AxisFormat( AstAxis *this, double value ) {
 #define BUFF_LEN 127            /* Maximum characters in result */
 
 /* Local Variables: */
-   const char *fmt;             /* Pointer to Format string */
+   const char *fmt0;            /* Pointer to original Format string */
+   const char *fmt;             /* Pointer to parsed Format string */
    const char *result;          /* Pointer to formatted value */
-   int nc;                      /* Number of characters written */
+   double x;                    /* The value to be formatted by sprintf */
+   int log;                     /* Format as "10**x"? */
+   int nc;                      /* Total number of characters written */
+   int ncc;                     /* Number of characters written */
+   int sign;                    /* Include leading sign in front of "10**x"? */
+   int space;                   /* Include leading space in front of "10**x"? */
    int stat;                    /* Value of errno after error */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
 
@@ -376,18 +615,73 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    the Axis astOverlay method when overlaying attributes on to another Axis
    object. */
    } else {
-      fmt = GetAxisFormat( this );
+      fmt0 = GetAxisFormat( this );
+
+/* Parse the Format string. This returns a collection of flags indicating
+   if any AST specific formatting features are specified in the Format
+   string. It also returns a pointer to a new Format string which is a
+   standard C printf format specifier. Currently the only flags are "log"
+   which indicates if the value should be formatted as "10**x" using
+   the graphical escape sequences defined within the Plot class to produce 
+   "x" as a superscript of "10", "sign" which is used with log to indicate 
+   if a sign should always be included infront of the "10", and "space"
+   which indicates if a leading space should be included infronyt of "10" if
+   no sign is included. */
+      fmt = ParseAxisFormat( fmt0, &log, &sign, &space );
+      if( astOK ) {
+
+/* Format zero normally. */
+         if( value == 0.0 ) log = 0;
+
+/* If log format is required, find the value of the exponent "x", and
+   initialise the returned string to hold the exponent and the graphical
+   escape sequence which produces a superscript. */
+         nc = 0;
+         if( log ) {
+   
+            if( sign ) {
+               buff[ 0 ] ='+';
+               nc = 1;
+   
+            } else if( space ) {
+               buff[ 0 ] =' ';
+               nc = 1;
+            }
+   
+            if( value > 0 ) {
+               x = log10( value );
+   
+            } else {
+               x = log10( -value );
+               buff[ 0 ] ='-';
+               nc = 1;
+            }
+   
+            nc += sprintf( buff + nc, "%s", 
+                           astEscapes( -1 ) ? log_esc : log_txt );
+
+/* Otherwise just format the supplied value. */
+         } else {
+            x = value;
+         }
+      }
 
 /* Clear errno and attempt to format the value as if the Format string were
    a standard "sprintf" format. */
       if ( astOK ) {
          errno = 0;
-         nc = sprintf( buff, fmt, value );
+         ncc = sprintf( buff + nc, fmt, x );
+         nc += ncc;
+
+/* If log format is being used, terminate the string with an escape
+   sequence which resets the graphical attributes to what they were at the
+   start of the string. */
+         if( log ) nc += sprintf( buff + nc, "%%+" );
 
 /* The possibilities for error detection are limited here, but check if an
    error value was returned and report an error. Include information from
    errno if it was set. */
-         if ( nc < 0 ) {
+         if ( ncc < 0 ) {
             stat = errno;
             astError( AST__FMTER, "astAxisFormat(%s): Error formatting a "
                       "coordinate value of %1.*G%s%s.", astGetClass( this ),
@@ -405,11 +699,15 @@ static const char *AxisFormat( AstAxis *this, double value ) {
                       DBL_DIG, value, BUFF_LEN );
             astError( AST__FMTER, "The format string was \"%s\".", fmt );
 
-/* If no error was detected, return a pointer to the buffer. */
+/* If succesfull, return a pointer to the buffer. */
          } else {
             result = buff;
          }
       }
+
+/* Free resources. */
+      fmt = astFree( (void *) fmt );
+
    }
 
 /* Return the result. */
@@ -1067,6 +1365,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
    vtab->AxisAbbrev = AxisAbbrev;
+   vtab->AxisFields = AxisFields;
    vtab->AxisFormat = AxisFormat;
    vtab->AxisDistance = AxisDistance;
    vtab->AxisOffset = AxisOffset;
@@ -1126,6 +1425,154 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    astSetDelete( vtab, Delete );
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Axis", "Coordinate axis" );
+}
+
+static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
+                              int *lspace ){
+/*
+*  Name:
+*     ParseAxisFormat
+
+*  Purpose:
+*     Parse the Format string for an Axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     char *ParseAxisFormat( const char *fmt0, int *log, int *sign, 
+*                            int *lspace )
+
+*  Class Membership:
+*     Axis member function 
+
+*  Description:
+*     This function returns a collection of flags indicating if any AST 
+*     specific formatting features are specified in the supplied Format
+*     string. It also returns a pointer to a new Format string which is a
+*     standard C printf format specifier. 
+
+*  Parameters:
+*     fmt0
+*        The value of the Format attribute.
+*     log
+*        Pointer to an integer in which to store a flag indicating if the 
+*        if the axis value should be formatted as "10**x" using the graphical 
+*        escape sequences defined within the Plot class to produce "x" as a 
+*        superscript of "10". A non-zero value will be returned if the
+*        supplied Format string has a '&' character in its printf <flags> 
+*        field (that is, between the leading '%' sign and the optional
+*        printf field width).
+*     sign
+*        Pointer to an integer in which to store a flag indicating if a
+*        sign character ('+' or '-') should always be included in front
+*        of the "10" if "log" is returned non-zero. If "log" is returned
+*        zero, then "sign" will also be zero. If "log" is non-zero, then
+*        a non-zero value for "sign" will be returned if the supplied Format 
+*        string has a '+' character in its printf <flags> field (that is, 
+*        between the leading '%' sign and the optional printf field width).
+*     lspace
+*        Pointer to an integer in which to store a flag indicating if a
+*        leading space should be included in front of the "10" if "log" is 
+*        returned non-zero and "sign" is returned zero. Otherwise, "lspace" 
+*        will also be zero. If "log" is non-zero, then a non-zero value for 
+*        "lspace" will be returned if the supplied Format string has a ' ' 
+*        character in its printf <flags> field (that is, between the leading 
+*        '%' sign and the optional printf field width).
+
+*  Returned Value:
+*     - Pointer to a dynamically allocated null-terminated string containing 
+*     the modified Format string. This will be a copy of the supplied
+*     Format string, but with any '&' flag removed. Any '+' or ' ' flag will
+*     also be removed if "log" is returned as non-zero.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   char *a;             /* Pointer to next char read from original format */
+   char *perc;          /* Pointer to percent sign */
+   char *result;        /* Pointer to the returned string */
+   int hash;            /* Was a '#' flag found? */
+   int len;             /* Used length of format string */
+   int minus;           /* Was a '-' flag found? */
+   int plus;            /* Was a '+' flag found? */
+   int space;           /* Was a ' ' flag found? */
+
+/* Initialise. */
+   result = NULL;
+   *log = 0;
+   *sign = 0;
+   *lspace = 0;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Take a copy of the supplied string. Check the pointer can be used
+   safely. */
+   len = astChrLen( fmt0 );
+   result = astStore( NULL, fmt0, len + 1 );
+   if( astOK ) {
+      result[ len ] = 0;
+
+/* Find the first percent sign. Do nothing if none is found. */
+      perc = strchr( result, '%' );
+      if( perc ) {   
+
+/* Check each character following the percent sign until one is found
+   which is not a legal printf flag, or a legal AST extension flag. Note
+   which ones are present. */
+         minus = 0;
+         plus = 0;
+         space = 0;
+         hash = 0;
+   
+         a = perc;
+         while( ++a ){
+            if( *a == '-' ){
+               minus = 1;
+            } else if( *a == '+' ){
+               plus = 1;
+            } else if( *a == ' ' ){
+               space = 1;
+            } else if( *a == '#' ){
+               hash = 1;
+            } else if( *a == '&' ){
+               *log = 1;
+            } else {
+               break;
+            }
+         }
+
+/* If no '&' flag was found just return the unaltered copy of the
+   supplied Format string. Otherwise, remove any '+' or ' ' flag. */
+         if( *log ) {
+            if( plus ) *sign = 1;
+            if( space ) *lspace = 1;
+
+/* Append any remaining flag characters to the output string. */
+            perc++;
+            if( minus ) *(perc++) = '-';
+            if( hash ) *(perc++) = '#';
+
+/* Copy the remaining characters down to fill up the gap left by the
+   removed flags. */
+            while( *a ) *(perc++) = *(a++);
+
+/* Terminate the returned string. */
+            *perc = 0;
+
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {
@@ -2181,10 +2628,10 @@ AstAxis *astLoadAxis_( void *mem, size_t size,
    automatically by the macros that implement the access functions themselves.
    Hence, we need only provide external interfaces for a few additional
    functions here. */
-const char *astAxisAbbrev_( AstAxis *this,
+const char *astAxisAbbrev_( AstAxis *this, const char *fmt,
                             const char *str1, const char *str2 ) {
    if ( !astOK ) return str2;
-   return (**astMEMBER(this,Axis,AxisAbbrev))( this, str1, str2 );
+   return (**astMEMBER(this,Axis,AxisAbbrev))( this, fmt, str1, str2 );
 }
 const char *astAxisFormat_( AstAxis *this, double value ) {
    if ( !astOK ) return NULL;
@@ -2214,3 +2661,13 @@ int astAxisUnformat_( AstAxis *this, const char *string, double *value ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Axis,AxisUnformat))( this, string, value );
 }
+int astAxisFields_( AstAxis *this, const char *fmt, const char *str, 
+                    int maxfld, char **fields, int *nc, double *val ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Axis,AxisFields))( this, fmt, str, maxfld,
+fields, nc, val );
+}
+
+
+
+

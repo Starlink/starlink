@@ -41,6 +41,7 @@ object.h \
       slamap.h \
       specmap.h \
       sphmap.h \
+      tranmap.h \
       unitmap.h \
       wcsmap.h \
       winmap.h \

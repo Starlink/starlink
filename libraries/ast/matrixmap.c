@@ -466,7 +466,6 @@ static void CompressMatrix( AstMatrixMap *this ){
    double *colmax;                /* Pointer to array holding column max values */
    double *fmat;                  /* Pointer to compressed forward matrix */
    double *rowmax;                /* Pointer to array holding row max values */
-   double minv;                   /* The smallest effective non-zero value */
    double mval;                   /* Matrix element value */
    int i;                         /* Loop count */
    int j;                         /* Loop count */

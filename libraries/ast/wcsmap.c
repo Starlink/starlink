@@ -152,6 +152,9 @@ f     The WcsMap class does not define any new routines beyond those
 *        fixed values for the projections defined in FITS-WCS paper II, rather
 *        than the user-defined values stored in projection parameter PVi_1 and 
 *        PVi_2 for the longitude axis.
+*     11-FEB-2004 (DSB):
+*        Corrected axis numbering when reporting missing keywords in
+*        Transform.
 *class--
 */
 
@@ -3331,13 +3334,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
        } else if ( status >= 400 ) {
           astError( AST__WCSPA, "astTransform(%s): Required projection "
                     "parameter PV%d_%d was not supplied for a %s "
-                    "projection.", astClass( this ), latax, status - 400,
+                    "projection.", astClass( this ), latax+1, status - 400,
                     FindPrjData( map->type )->desc  );
 
        } else if ( status >= 100 ) {
           astError( AST__WCSPA, "astTransform(%s): Required projection "
                     "parameter PV%d_%d was not supplied for a %s "
-                    "projection.", astClass( this ), lonax, status - 100,
+                    "projection.", astClass( this ), lonax+1, status - 100,
                     FindPrjData( map->type )->desc  );
        }
 

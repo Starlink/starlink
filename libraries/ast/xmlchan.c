@@ -36,8 +36,10 @@ f     encodings and the internal ASCII encoding. If no such routines
 *     In addition to those attributes common to all Channels, every
 *     XmlChan also has the following attributes:
 *
+*     - XmlFormat: System for formatting Objects as XML
 *     - XmlIndent: Controls output of indentation and line feeds
 *     - XmlLength: Controls output buffer length
+*     - XmlPrefix: The namespace prefix to use when writing
 
 *  Functions:
 c     The XmlChan class does not define any new functions beyond those
@@ -53,6 +55,12 @@ f     The XmlChan class does not define any new routines beyond those
 *  History:
 *     10-OCT-2003 (DSB):
 *        Original version.
+*     6-FEB-2004 (DSB):
+*        Added XmlPrefix and XmlFormat attributes.
+*     10-FEB-2004 (DSB):
+*        - Added debug conditional code to keep track of memory leaks.
+*        - Fixed bug which prevented more than 1 object being read from
+*        an XmlChan.
 *class--
 */
 
@@ -100,6 +108,15 @@ f     The XmlChan class does not define any new routines beyond those
 /* A string used to indicate atrue attribute value */
 #define TRUE "true"
 
+/* Format identifiers and strings */
+#define UNKNOWN_FORMAT  -1
+#define NATIVE_FORMAT    0
+#define QUOTED_FORMAT    1
+#define MAX_FORMAT       1
+#define UNKNOWN_STRING   "UNKNOWN"
+#define NATIVE_STRING    "NATIVE"
+#define QUOTED_STRING    "QUOTED"
+
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -144,6 +161,10 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static int (* parent_getfull)( AstChannel * );
 static int (* parent_getcomment)( AstChannel * );
 
+/* Text values used to represent XmlFormat values externally. These
+   should be in the order defined by the associated constants above. */
+static const char *xformat[2] = { NATIVE_STRING, QUOTED_STRING };
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -165,7 +186,6 @@ static AstObject *Read( AstChannel * );
 static AstObject *ReadObject( AstChannel *, const char *, AstObject * );
 static AstXmlElement *FindAttribute( AstXmlChan *, const char * );
 static AstXmlElement *FindObject( AstXmlChan *, const char * );
-static AstXmlElement *FindElement( AstXmlElement *, const char *, int );
 static AstXmlElement *ReadXmlText( AstXmlChan * );
 static AstXmlElement *Remove( AstXmlChan *, AstXmlElement * );
 static char *ReadString( AstChannel *, const char *, const char * );
@@ -175,6 +195,7 @@ static const char *GetAttrib( AstObject *, const char *);
 static const char *GetTag( AstXmlObject *, int );
 static const char *FindNextIsA( AstXmlElement *, int );
 static double ReadDouble( AstChannel *, const char *, double );
+static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int GetComment( AstChannel * );
 static int GetFull( AstChannel * );
 static int IsUsable( AstXmlElement * );
@@ -182,8 +203,10 @@ static int ReadInt( AstChannel *, const char *, int );
 static int TestAttrib( AstObject *, const char * );
 static int Use( AstXmlChan *, int, int );
 static int Ustrcmp( const char *, const char * );
+static int Ustrncmp( const char *, const char *, size_t );
 static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
+static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void OutputText( AstXmlChan *, const char *, int );
 static void ReadClassData( AstChannel *, const char * );
@@ -203,10 +226,20 @@ static void ClearXmlLength( AstXmlChan * );
 static void SetXmlLength( AstXmlChan *, int );
 static int GetXmlLength( AstXmlChan * );
 
+static int TestXmlFormat( AstXmlChan * );
+static void ClearXmlFormat( AstXmlChan * );
+static void SetXmlFormat( AstXmlChan *, int );
+static int GetXmlFormat( AstXmlChan * );
+
 static int TestXmlIndent( AstXmlChan * );
 static void ClearXmlIndent( AstXmlChan * );
 static void SetXmlIndent( AstXmlChan *, int );
 static int GetXmlIndent( AstXmlChan * );
+
+static int TestXmlPrefix( AstXmlChan * );
+static void ClearXmlPrefix( AstXmlChan * );
+static void SetXmlPrefix( AstXmlChan *, const char * );
+static const char * GetXmlPrefix( AstXmlChan * );
 
 
 /* Member functions. */
@@ -269,14 +302,26 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+
    vtab->SetXmlIndent = SetXmlIndent;
    vtab->ClearXmlIndent = ClearXmlIndent;
    vtab->TestXmlIndent = TestXmlIndent;
    vtab->GetXmlIndent = GetXmlIndent;
+
    vtab->SetXmlLength = SetXmlLength;
    vtab->ClearXmlLength = ClearXmlLength;
    vtab->TestXmlLength = TestXmlLength;
    vtab->GetXmlLength = GetXmlLength;
+
+   vtab->SetXmlFormat = SetXmlFormat;
+   vtab->ClearXmlFormat = ClearXmlFormat;
+   vtab->TestXmlFormat = TestXmlFormat;
+   vtab->GetXmlFormat = GetXmlFormat;
+
+   vtab->SetXmlPrefix = SetXmlPrefix;
+   vtab->ClearXmlPrefix = ClearXmlPrefix;
+   vtab->TestXmlPrefix = TestXmlPrefix;
+   vtab->GetXmlPrefix = GetXmlPrefix;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -317,6 +362,7 @@ void astInitXmlChanVtab_(  AstXmlChanVtab *vtab, const char *name ) {
 /* Declare the class dump, copy and delete functions.*/
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "XmlChan", "XML I/O channel" );
+   astSetDelete( vtab, Delete );
 
 }
 
@@ -372,6 +418,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* --------- */
    } else if ( !strcmp( attrib, "xmllength" ) ) {
       astClearXmlLength( this );
+
+/* XmlFormat */
+/* --------- */
+   } else if ( !strcmp( attrib, "xmlformat" ) ) {
+      astClearXmlFormat( this );
+
+/* XmlPrefix */
+/* --------- */
+   } else if ( !strcmp( attrib, "xmlprefix" ) ) {
+      astClearXmlPrefix( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -489,88 +545,6 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name ) {
    return result;
 }
 
-static AstXmlElement *FindElement( AstXmlElement *elem, const char *name,
-                                   int report ){
-/*
-*  Name:
-*     FindElement
-
-*  Purpose:
-*     Find the first element with a given name within a supplied element.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "xmlchan.h"
-*     AstXmlElement *FindElement( AstXmlElement *elem, const char *name,
-*                                 int report )
-
-*  Class Membership:
-*     XmlChan member function 
-
-*  Description:
-*     This function searches the content of the supplied element and
-*     returns a pointer to the first element with the given name. A NULL
-*     pointer is returned if no such element is found. Whether or not an
-*     error is reported in this case depends on the value supplied for 
-*     reporting.
-
-*  Parameters:
-*     elem 
-*        Pointer to the XmlElement to be searched.
-*     name
-*        Pointer to a null terminated string specifying the name of the
-*        element to be searched for.
-*     report
-*        Specifies whether an error should be reporte if the requested
-*        element is not found. If a non-zero value is supplied, then an
-*        error will be reported, otherwise no error is reported.
-
-*  Returned Value:
-*     A pointer to the found element, or NULL if no element was found.
-
-*  Notes:
-*     - A NULL pointer is returned if an error has already occurred, or
-*     if this function should fail for any reason.
-
-*/
-
-/* Local Variables: */
-   AstXmlContentItem *item;      /* Pointer to current content item */
-   AstXmlElement *result;        /* Pointer to the returned element */
-   int i;                        /* Index of current content item */
-   int nitem;                    /* No. of content items in supplied element */
-
-/* Initialise */
-   result = NULL;
-
-/* Check inherited status */
-   if( !astOK ) return result;
-
-/* Search all items of content within the supplied element, looking for
-   an element with the supplied name. */
-   nitem = astXmlGetNitem( elem );
-   for( i = 0; i < nitem; i++ ) {
-      item = astXmlGetItem( elem, i );      
-      if( astXmlCheckType( item, AST__XMLELEM ) && astOK &&
-          !strcmp( astXmlGetName( item ), name ) ){
-         result = (AstXmlElement *) item;
-         break;
-      }
-   }
-
-/* If no element was found, report an error if required. */
-   if( !result && report ) {
-      astError( AST__BADIN, "astRead(XmlChan): No \"<%s>\" element found "
-                "within the enclosing \"<%s>\" element.", name,
-                astXmlGetName( elem ) );
-   }
-
-/* Return the result */
-   return result;
-}
-
 static const char *FindNextIsA( AstXmlElement *elem, int start ) {
 /*
 *  Name:
@@ -629,8 +603,8 @@ static const char *FindNextIsA( AstXmlElement *elem, int start ) {
       if( astXmlCheckType( item, AST__XMLELEM ) ) {
          if( astOK && !strcmp( astXmlGetName( item ), ISA ) ) {
 
-/* The returned string is th evlaue of the "class" attribute of this
-   element. */
+/* The returned string is the value of the "class" attribute of this
+   element. */ 
             result = astXmlGetAttributeValue( item, "class" );
 
 /* Report an error if the element does not have a class attribute. */
@@ -638,8 +612,10 @@ static const char *FindNextIsA( AstXmlElement *elem, int start ) {
                astError( AST__BADIN, "astRead(XmlChan): The tag %s "
                          "does not include a \"class\" attribute.", 
                          GetTag( (AstXmlObject *) item, 1 ) );
-               break;
             }
+
+            break;
+
          }
       }
    }
@@ -755,6 +731,87 @@ static AstXmlElement *FindObject( AstXmlChan *this, const char *name ) {
    return result;
 }
 
+static int FindString( int n, const char *list[], const char *test, 
+                       const char *text, const char *method, 
+                       const char *class ){
+/*
+*  Name:
+*     FindString
+
+*  Purpose:
+*     Find a given string within an array of character strings.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "xmlchan.h"
+*     int FindString( int n, const char *list[], const char *test, 
+*                     const char *text, const char *method, const char *class )
+
+*  Class Membership:
+*     XmlChan method.
+
+*  Description:
+*     This function identifies a supplied string within a supplied
+*     array of valid strings, and returns the index of the string within
+*     the array. The test option may not be abbreviated, but case is
+*     insignificant.
+
+*  Parameters:
+*     n
+*        The number of strings in the array pointed to be "list".
+*     list
+*        A pointer to an array of legal character strings.
+*     test
+*        A candidate string.
+*     text
+*        A string giving a description of the object, parameter,
+*        attribute, etc, to which the test value refers.
+*        This is only for use in constructing error messages. It should
+*        start with a lower case letter.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     The index of the identified string within the supplied array, starting
+*     at zero.
+
+*  Notes:
+*     -  A value of -1 is returned if an error has already occurred, or
+*     if this function should fail for any reason (for instance if the
+*     supplied option is not specified in the supplied list). 
+
+*/
+
+/* Local Variables: */
+   int ret;                /* The returned index */
+
+/* Check global status. */
+   if( !astOK ) return -1;
+
+/* Compare the test string with each element of the supplied list. Leave
+   the loop when a match is found. */
+   for( ret = 0; ret < n; ret++ ) {
+      if( !Ustrcmp( test, list[ ret ] ) ) break;
+   }
+
+/* Report an error if the supplied test string does not match any element
+   in the supplied list. */
+   if( ret >= n && astOK ) {
+      astError( AST__RDERR, "%s(%s): Illegal value '%s' supplied for %s.",
+                method, class, test, text );
+      ret = -1;
+   }
+
+/* Return the answer. */
+   return ret;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -842,6 +899,27 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
       }
+
+/* XmlFormat */
+/* --------- */
+   } else if ( !strcmp( attrib, "xmlformat" ) ) {
+      ival = astGetXmlFormat( this );
+      if ( astOK ) {
+         if( ival == NATIVE_FORMAT ){
+            result = NATIVE_STRING;
+
+         } else if( ival == QUOTED_FORMAT ){
+            result = QUOTED_STRING;
+
+         } else {
+            result = UNKNOWN_STRING;
+         }
+      }
+
+/* XmlPrefix */
+/* --------- */
+   } else if ( !strcmp( attrib, "xmlprefix" ) ) {
+      result = astGetXmlPrefix( this );
 
 /* If the attribute name was not recognised, pass it on to the parent
    method for further interpretation. */
@@ -1429,6 +1507,7 @@ static AstObject *Read( AstChannel *this_channel ) {
    AstObject *new;               /* Pointer to returned Object */
    AstXmlChan *this;             /* Pointer to the XmlChan structure */
    AstXmlElement *elem;          /* XML element holding AST Object */
+   int def_fmt;                  /* Original default format */
 
 /* Initialise. */
    new = NULL;
@@ -1438,6 +1517,10 @@ static AstObject *Read( AstChannel *this_channel ) {
 
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_channel;
+
+/* Save the current default format, and then reset it to NATIVE */
+   def_fmt = this->formatdef;
+   this->formatdef = NATIVE_FORMAT;
 
 /* First we construct an in-memory XML representation of the data source,
    by reading text up to the end of the first element encountered from
@@ -1462,23 +1545,17 @@ static AstObject *Read( AstChannel *this_channel ) {
 /* Remove the element. This will cause an error to be reported if
    the element contains any items which have not been used. */
       elem = Remove( this, elem );
-
    }
 
 /* If an error has occurred, annul the document. */
    if( !astOK ) this->readcontext = astXmlAnnul( this->readcontext );
 
-/* Report an error if any XmlObjects remain in existence once the last
-   object has been read from the Xml source. */
-   if( !new && astXmlTrace(1) && astOK ) {
-      astError( AST__INTER, "astRead(XmlChan): %d XmlObjects remain in "
-                "existence after reading the entire source (internal "
-                "AST programming error).", astXmlTrace(3) );
-   }
-
 /* If an error occurred, clean up by deleting the new Object and
-   return a NULL pointer. */
-   if ( !astOK ) new = astDelete( new );
+   return a NULL pointer, and re-instate original default format. */
+   if ( !astOK ) {
+      new = astDelete( new );
+      this->formatdef = def_fmt;
+   }
 
 /* Return the pointer to the new Object. */
    return new;
@@ -1985,6 +2062,14 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
       if( value ) {
          result = astStore( NULL, value, strlen( value ) + 1 );
 
+/* If the new default for XmlFormat has not yet been set, note if this 
+   element contained a "quoted" attribute. */
+         if( this->formatdef == NATIVE_FORMAT ) {
+            if( astXmlGetAttributeValue( element, QUOTED ) ) {
+               this->formatdef = QUOTED_FORMAT;
+            }         
+         }
+
 /* Remove the _ATTRIBUTE element from the container. */
          element = Remove( this, element );
 
@@ -2068,9 +2153,7 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this ){
                                GetNextChar, this );
 
 /* If no usable element was found, annul the document. */
-   if( !result ) {
-      this->readcontext = astXmlAnnul( this->readcontext );
-   }
+   if( !result ) this->readcontext = astXmlAnnul( this->readcontext );
 
 /* Delete the returned element if an error has occurred. */
    if( !astOK ) result = astXmlAnnulTree( result );
@@ -2239,6 +2322,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by "astSscanf" */
+   int pr;                       /* Offset to start of string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2268,6 +2352,32 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == astSscanf( setting, "xmllength= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetXmlLength( this, ival );
+
+/* XmlFormat */
+/* ----------*/
+   } else if( nc = 0,
+        ( 0 == astSscanf( setting, "xmlformat=%n%*[^\n]%n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+
+      nc = astChrLen( setting + ival );
+
+      if( !Ustrncmp( setting + ival, NATIVE_STRING, nc ) ){
+         astSetXmlFormat( this, NATIVE_FORMAT );
+
+      } else if( !Ustrncmp( setting + ival, QUOTED_STRING, nc ) ){
+         astSetXmlFormat( this, QUOTED_FORMAT );
+
+      } else {
+         astError( AST__BADAT, "astSet(%s): Unknown XML format '%s' "
+                   "requested for a %s.", astGetClass( this ), setting + ival, 
+                   astGetClass( this ) );
+      }
+
+/* XmlPrefix */
+/* ----------*/
+   } else if ( nc = 0, ( 0 == astSscanf( setting, "xmlprefix=%n%*[^\n]%n", &pr, &nc ) )
+                && ( nc >= len ) ) {
+      astSetXmlPrefix( this, setting + pr );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -2447,6 +2557,16 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "xmllength" ) ) {
       result = astTestXmlLength( this );
 
+/* XmlFormat */
+/* --------- */
+   } else if ( !strcmp( attrib, "xmlformat" ) ) {
+      result = astTestXmlFormat( this );
+
+/* XmlPrefix */
+/* --------- */
+   } else if ( !strcmp( attrib, "xmlprefix" ) ) {
+      result = astTestXmlPrefix( this );
+
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
    } else {
@@ -2529,7 +2649,7 @@ static int Use( AstXmlChan *this, int set, int helpful ) {
 static int Ustrcmp( const char *a, const char *b ){
 /*
 *  Name:
-*     Ustrncmp
+*     Ustrcmp
 
 *  Purpose:
 *     A case blind version of strcmp.
@@ -2542,7 +2662,7 @@ static int Ustrcmp( const char *a, const char *b ){
 *     static int Ustrcmp( const char *a, const char *b )
 
 *  Class Membership:
-*     FitsChan member function.
+*     XmlChan member function.
 
 *  Description:
 *     Returns 0 if there are no differences between the two strings, and 1 
@@ -2578,6 +2698,93 @@ static int Ustrcmp( const char *a, const char *b ){
 
 /* Loop round each character. */
    while( 1 ){
+
+/* We leave the loop if either of the strings has been exhausted. */
+      if( !(*aa ) || !(*bb) ){
+
+/* If one of the strings has not been exhausted, indicate that the
+   strings are different. */
+         if( *aa || *bb ) ret = 1;
+
+/* Break out of the loop. */
+         break;
+
+/* If neither string has been exhausted, convert the next characters to
+   upper case and compare them, incrementing the pointers to the next
+   characters at the same time. If they are different, break out of the
+   loop. */
+      } else {
+
+         if( toupper( (int) *(aa++) ) != toupper( (int) *(bb++) ) ){
+            ret = 1;
+            break;
+         }
+
+      }
+
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
+static int Ustrncmp( const char *a, const char *b, size_t n ){
+/*
+*  Name:
+*     Ustrncmp
+
+*  Purpose:
+*     A case blind version of strncmp.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "xmlchan.h"
+*     static int Ustrncmp( const char *a, const char *b, size_t n )
+
+*  Class Membership:
+*     XmlChan member function.
+
+*  Description:
+*     Returns 0 if there are no differences between the first "n"
+*     characters of the two strings, and 1 otherwise. Comparisons are
+*     case blind.
+
+*  Parameters:
+*     a
+*        Pointer to first string.
+*     b
+*        Pointer to second string.
+*     n
+*        The maximum number of characters to compare.
+
+*  Returned Value:
+*     Zero if the strings match, otherwise one.
+
+*  Notes:
+*     -  This function does not consider the sign of the difference between
+*     the two strings, whereas "strncmp" does.
+*     -  This function attempts to execute even if an error has occurred. 
+
+*/
+
+/* Local Variables: */
+   const char *aa;         /* Pointer to next "a" character */
+   const char *bb;         /* Pointer to next "b" character */
+   int i;                  /* Character index */
+   int ret;                /* Returned value */
+
+/* Initialise the returned value to indicate that the strings match. */
+   ret = 0;
+
+/* Initialise pointers to the start of each string. */
+   aa = a;
+   bb = b;
+
+/* Compare up to "n" characters. */
+   for( i = 0; i < (int) n; i++ ){
 
 /* We leave the loop if either of the strings has been exhausted. */
       if( !(*aa ) || !(*bb) ){
@@ -2654,6 +2861,7 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
 /* Local Variables: */
    AstXmlChan *this;         /* A pointer to the XmlChan structure. */
    AstXmlElement *elem;      /* The XML element to hodl the new AST object */
+   const char *pref;         /* XML namespace prefix to use */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2675,14 +2883,18 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
    first. */
    this->write_isa = 0;
 
+/* Store the namespace prefix. */
+   pref = astGetXmlPrefix( this );
+
 /* Create a new XmlElement with a name equal to the AST class name of the
    object being dumped (and no namespace prefix), and add it into the
    current container (i.e. parent) element. */
-   elem = astXmlAddElement( this->container, class, NULL );
+   elem = astXmlAddElement( this->container, class, pref );
 
-/* If this is a top level container, store the default namespace URI for 
-   the element. */
-   if( !this->container ) astXmlAddURI( elem, NULL, AST__XMLNS );
+/* If this is a top level container, store the namespace URI for 
+   the element, either default or named depending on the value of
+   XmlPrefix. */
+   if( !this->container ) astXmlAddURI( elem, pref, AST__XMLNS );
 
 /* If non-blank, append a "Label" atttribute to the element holding the
    name of the object (stored in the XmlChan structure). */
@@ -2827,7 +3039,8 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
 
 /* Create a new XmlElement with a name of _ATTRIBUTE (and no namespace 
    prefix), and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, _ATTRIBUTE, NULL );
+         elem = astXmlAddElement( this->container, _ATTRIBUTE,
+                                  astGetXmlPrefix( this ) );
 
 /* Add a NAME attribute to this element containing the item name. */
          astXmlAddAttr( elem, NAME, name, NULL );
@@ -2905,13 +3118,18 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
    char *c;                      /* Pointer to start of next sub-string */
    char *text;                   /* Pointer to complete string */
    int mxlen;                    /* Max allowed length of text */
+
+#ifdef DEBUG
    int nobj;                     /* No. of XmlObjects in existence */
+#endif
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Save the number of XmlObjects currenyl in existenece. */
+#ifdef DEBUG
+/* Save the number of XmlObjects currently in existenece. */
    nobj = astXmlTrace(3);
+#endif
 
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_channel;
@@ -2964,12 +3182,15 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
             astXmlRemoveItem( this->container );
             this->container = astXmlAnnul( this->container );
 
+#ifdef DEBUG
 /* Report an error if there is a memory leak. */
             if( astXmlTrace(3) > nobj && astOK ) {
                astError( AST__INTER, "astWriteEnd(XmlChan): %d XmlObjects "
                          "remain in existence - should be %d (internal AST "
                          "programming error).", astXmlTrace(3), nobj );
             }
+#endif
+
          }
       }
 
@@ -3098,7 +3319,8 @@ static void WriteInt( AstChannel *this_channel, const char *name, int set, int h
 
 /* Create a new XmlElement with a name of _ATTRIBUTE (and no namespace 
    prefix), and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, _ATTRIBUTE, NULL );
+         elem = astXmlAddElement( this->container, _ATTRIBUTE,
+                                  astGetXmlPrefix( this ) );
 
 /* Add a NAME attribute to this element containing the item name. */
          astXmlAddAttr( elem, NAME, name, NULL );
@@ -3199,7 +3421,8 @@ static void WriteIsA( AstChannel *this_channel, const char *class,
 
 /* Create a new XmlElement with a name of "_isa" (and no namespace prefix), 
    and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, ISA, NULL );
+         elem = astXmlAddElement( this->container, ISA, 
+                                  astGetXmlPrefix( this ) );
 
 /* Add a "class" attribute to this element containing the class name. */
          astXmlAddAttr( elem, "class", class, NULL );
@@ -3466,14 +3689,17 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
 
 /* Create a new XmlElement with a name of _ATTRIBUTE (and no namespace 
    prefix), and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, _ATTRIBUTE, NULL );
+         elem = astXmlAddElement( this->container, _ATTRIBUTE,
+                                  astGetXmlPrefix( this ) );
 
 /* Add a NAME attribute to this element containing the item name. */
          astXmlAddAttr( elem, NAME, name, NULL );
 
-/* Add an attribute to indicate that this is a string value (mainly
-   included for compatibility with JNIAST). */
-         astXmlAddAttr( elem, QUOTED, TRUE, NULL );
+/* If we are using QUOTED format, add an attribute to indicate that this is a 
+   string value (mainly included for compatibility with JNIAST). */
+         if( astGetXmlFormat( this ) == QUOTED_FORMAT ) {
+            astXmlAddAttr( elem, QUOTED, TRUE, NULL );
+         }
 
 /* Add it the value to the element as the VALUE attribute. */
          astXmlAddAttr( elem, VALUE, value, NULL );
@@ -3506,6 +3732,94 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
    this class using the macros defined for this purpose in the
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
+
+/* XmlFormat */
+/* ========= */
+/*
+*att++
+*  Name:
+*     XmlFormat
+
+*  Purpose:
+*     System for formatting Objects as XML.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the formatting system to use when AST
+*     Objects are written out as XML through an XmlChan. It
+c     affects the behaviour of the astWrite function when
+f     affects the behaviour of the AST_WRITE routine  when
+*     they are used to transfer any AST Object to or from an external
+*     XML representation.
+*
+*     The XmlChan class allows AST objects to be represented in the form
+*     of XML in several ways (conventions) and the XmlFormat attribute is 
+*     used to specify which of these should be used. The formatting options 
+*     available are outlined in the "Formats Available" section below.
+*
+*     By default, an XmlChan will attempt to determine which format system
+*     is already in use, and will set the default XmlFormat value
+*     accordingly (so that subsequent I/O operations adopt the same
+*     conventions). It does this by looking for certain critical items
+*     which only occur in particular formats. For details of how this
+*     works, see the "Choice of Default Format" section below. If you wish
+*     to ensure that a particular format system is used, independently of
+*     any XML already read, you should set an explicit XmlFormat value
+*     yourself.
+*
+*  Formats Available:
+*     The XmlFormat attribute can take any of the following (case
+*     insensitive) string values to select the corresponding formatting
+*     system:
+*
+*     - "NATIVE": This is a direct conversion to XML of the heirarchical
+*     format used by a standard XML channel (and also by the NATIVE
+*     encoding of a FitsChan).
+*
+*     - "QUOTED": This is the same as NATIVE format except that extra
+*     information is included which allows client code to convert the
+*     XML into a form which can be read by a standard AST Channel. This
+*     extra information indicates which AST attribute values should be
+*     enclosed in quotes before being passed to a Channel. 
+
+*  Choice of Default Format;
+*     If the XmlFormat attribute of an XmlChan is not set, the default
+*     value it takes is determined by the presence of certain critical
+*     items within the document most recently read using 
+c     astRead.
+f     AST_READ.
+*     The sequence of decision used to arrive at the default value is as 
+*     follows:
+*
+*     - If the previous document read contained any elements in the AST
+*     namespace which had an associated XML attribute called "quoted", then
+*     the default value is QUOTED.
+*     - Otherwise, if none of these conditions is met (as would be the
+*     case if no document had yet been read), then NATIVE format is
+*     used.
+*
+*     Setting an explicit value for the XmlFormat attribute always
+*     over-rides this default behaviour.
+
+*  Applicability:
+*     XmlChan
+*        All XmlChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(XmlChan,XmlFormat,xmlformat,UNKNOWN_FORMAT)
+astMAKE_SET(XmlChan,XmlFormat,int,xmlformat,( 
+   value == NATIVE_FORMAT || 
+   value == QUOTED_FORMAT ? value : 
+   (astError( AST__BADAT, "astSetXmlFormat: Unknown XML formatting system %d "
+              "supplied.", value ), UNKNOWN_FORMAT )))
+astMAKE_TEST(XmlChan,XmlFormat,( this->xmlformat != UNKNOWN_FORMAT ))
+astMAKE_GET(XmlChan,XmlFormat,int,0,(this->xmlformat == UNKNOWN_FORMAT ? 
+                                this->formatdef : this->xmlformat))
 
 /*
 *att++
@@ -3580,6 +3894,46 @@ astMAKE_GET(XmlChan,XmlLength,int,0,( ( this->xmllength != -INT_MAX ) ? this->xm
 astMAKE_SET(XmlChan,XmlLength,int,xmllength,(value<0?0:value))
 astMAKE_TEST(XmlChan,XmlLength,( this->xmllength != -INT_MAX ))
 
+/*
+*att++
+*  Name:
+*     XmlPrefix
+
+*  Purpose:
+*     The namespace prefix to use when writing.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute is a string which is to be used as the namespace
+*     prefix for all XML elements created as a result of writing an AST
+*     Object out through an XmlChan. The URI associated with the namespace
+*     prefix is given by the symbolic constant AST__XMLNS defined in 
+f     AST_PAR.
+c     ast.h.
+*     A definition of the namespace prefix is included in each top-level
+*     element produced by the XmlChan.
+*
+*     The default value is a blank string which causes no prefix to be
+*     used. In this case each top-level element will set the default 
+*     namespace to be the value of AST__XMLNS.
+
+*  Applicability:
+*     Object
+*        All Objects have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(XmlChan,XmlPrefix,xmlprefix,astFree( this->xmlprefix ))
+astMAKE_GET(XmlChan,XmlPrefix,const char *,NULL,( this->xmlprefix ? this->xmlprefix : "" ))
+astMAKE_SET(XmlChan,XmlPrefix,const char *,xmlprefix,astStore( this->xmlprefix, value,
+                                                strlen( value ) + (size_t) 1 ))
+astMAKE_TEST(XmlChan,XmlPrefix,( this->xmlprefix != NULL ))
+
 
 /* Copy constructor. */
 /* ----------------- */
@@ -3630,11 +3984,54 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->write_isa = 0;       /* Write out the next "IsA" item? */
    out->reset_source = 1;    /* A new line should be read from the source */
    out->isa_class = NULL;    /* Class being loaded */
+
+/* Store a copy of the prefix string.*/
+   if ( in->xmlprefix ) out->xmlprefix = astStore( NULL, in->xmlprefix,
+                                           strlen( in->xmlprefix ) + (size_t) 1 );
 }
 
 
 /* Destructor. */
 /* ----------- */
+static void Delete( AstObject *obj ) {
+/*
+*  Name:
+*     Delete
+
+*  Purpose:
+*     Destructor for XmlChan objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Delete( AstObject *obj )
+
+*  Description:
+*     This function implements the destructor for XmlChan objects.
+
+*  Parameters:
+*     obj
+*        Pointer to the object to be deleted.
+
+*  Notes:
+*     This function attempts to execute even if the global error status is
+*     set.
+*/
+
+/* Local Variables: */
+   AstXmlChan *this;             /* Pointer to XmlChan */
+
+/* Obtain a pointer to the XmlChan structure. */
+   this = (AstXmlChan *) obj;
+
+/* Free any unread part of the document. */
+   this->readcontext = astXmlAnnul( this->readcontext );
+
+/* Free the memory used for the XmlPrefix string if necessary. */
+   this->xmlprefix = astFree( this->xmlprefix );
+
+}
 
 /* Dump function. */
 /* -------------- */
@@ -3666,6 +4063,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Local Variables: */
    AstXmlChan *this;            /* Pointer to the XmlChan structure */
    const char *class;           /* Class name */
+   const char *sval;            /* String attribute value */
    int ival;                    /* Integer attribute value */
    int set;                     /* Has the attribute got a set value? */
 
@@ -3698,6 +4096,22 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       ival = set ? GetXmlLength( this ) : astGetXmlLength( this );
       astWriteInt( channel, "XmlLen", set, 0, ival, "XML buffer length" );
 
+/* XmlFormat. */
+/* --------- */
+   set = TestXmlFormat( this );
+   ival = set ? GetXmlFormat( this ) : astGetXmlFormat( this );
+   if( ival > UNKNOWN_FORMAT && ival <= MAX_FORMAT ) {
+      astWriteString( channel, "XmlFmt", set, 1, xformat[ival], "Formatting system" );
+   } else {
+      astWriteString( channel, "XmlFmt", set, 1, UNKNOWN_STRING, "Formatting system" );
+   }
+
+/* XmlPrefix */
+/* --------- */
+      set = TestXmlPrefix( this );
+      sval = set ? GetXmlPrefix( this ) : astGetXmlPrefix( this );
+      astWriteString( channel, "XmlPrf", set, 1, sval,
+                      "Namespace prefix" );
 }
 
 
@@ -4148,7 +4562,7 @@ AstXmlChan *astInitXmlChan_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstXmlChan *astInitChannel( void *mem, size_t size, int init,
+*     AstXmlChan *astInitXmlChan( void *mem, size_t size, int init,
 *                                 AstXmlChanVtab *vtab, const char *name,
 *                                 const char *(* source)( void ),
 *                                 char *(* source_wrap)( const char *(*)( void ) ),
@@ -4292,6 +4706,9 @@ AstXmlChan *astInitXmlChan_( void *mem, size_t size, int init,
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmlindent = -1;      /* Indentat output? */
       new->xmllength = -INT_MAX;/* Buffer length */
+      new->xmlprefix = NULL;    /* Xml prefix */
+      new->xmlformat = UNKNOWN_FORMAT; /* Xml format */
+      new->formatdef = NATIVE_FORMAT;  /* Default Xml format */
       new->reset_source = 1;    /* A new line should be read from the source */
       new->isa_class = NULL;    /* Class being loaded */
 
@@ -4381,6 +4798,7 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
 
 /* Local Variables: */
    AstXmlChan *new;            /* Pointer to the new XmlChan */
+   char *text;                 /* Textual version of integer value */
 
 /* Initialise. */
    new = NULL;
@@ -4430,8 +4848,10 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmlindent = -1;      /* Indent output? */
       new->xmllength = -INT_MAX;/* Buffer length */
+      new->xmlprefix = NULL;    /* Xml prefix */
       new->reset_source = 1;    /* A new line should be read from the source */
       new->isa_class = NULL;    /* Class being loaded */
+      new->formatdef = NATIVE_FORMAT;  /* Default Xml format */
 
 /* Now restore presistent values. */
 
@@ -4442,6 +4862,23 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
 /* XmlLength */
 /* --------- */
       new->xmllength = astReadInt( channel, "xmllen", -INT_MAX );
+
+/* XmlPrefix */
+/* --------- */
+      new->xmlprefix = astReadString( channel, "xmlprf", NULL );
+
+/* XmlFormat. */
+/* --------- */
+      text = astReadString( channel, "xmlfmt", UNKNOWN_STRING );
+      if( strcmp( text, UNKNOWN_STRING ) ) {
+         new->xmlformat = FindString( MAX_FORMAT + 1, xformat, text, 
+                                     "the XmlChan component 'XmlFmt'", 
+                                     "astRead", astGetClass( channel ) );
+      } else {
+         new->xmlformat = UNKNOWN_FORMAT;
+      }
+      if ( TestXmlFormat( new ) ) SetXmlFormat( new, new->xmlformat );
+
    }
 
 /* If an error occurred, clean up by deleting the new XmlChan. */

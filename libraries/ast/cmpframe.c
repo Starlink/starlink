@@ -92,6 +92,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *     27-FEB-2003 (DSB):
 *        - Modify the default Domain name for a CmpFrame to be the
 *        domains of the two subFrames separated by a "-".
+*     24-JAN-2004 (DSB):
+*        o  Override the astFields method.
+*        o  Added argument "fmt" to Abbrev.
 *class--
 */
 
@@ -515,7 +518,7 @@ static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType GetSystem( AstFrame * );
 static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
-static const char *Abbrev( AstFrame *, int, const char *, const char * );
+static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
 static const char *Format( AstFrame *, int, double );
 static const char *GetDomain( AstFrame * );
 static const char *GetFormat( AstFrame *, int );
@@ -529,6 +532,7 @@ static double Angle( AstFrame *, const double[], const double[], const double[] 
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetEpoch( AstFrame * );
+static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int GenAxisSelection( int, int, int [] );
 static int GetDirection( AstFrame *, int );
 static int GetMaxAxes( AstFrame * );
@@ -582,7 +586,7 @@ static void SetAttrib( AstObject *, const char * );
 
 /* Member functions. */
 /* ================= */
-static const char *Abbrev( AstFrame *this_frame, int axis,
+static const char *Abbrev( AstFrame *this_frame, int axis,  const char *fmt,
                            const char *str1, const char *str2 ) {
 /*
 *  Name:
@@ -596,7 +600,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,
 
 *  Synopsis:
 *     #include "cmpframe.h"
-*     const char *Abbrev( AstFrame *this, int axis,
+*     const char *Abbrev( AstFrame *this, int axis,  const char *fmt,
 *                         const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -617,6 +621,9 @@ static const char *Abbrev( AstFrame *this_frame, int axis,
 *        The number of the CmpFrame axis for which the values have
 *        been formatted (axis numbering starts at zero for the first
 *        axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
 *        first formatted value.
@@ -680,7 +687,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,
       if ( !set ) astSetDigits( frame, astGetDigits( this ) );
 
 /* Invoke the Frame's astAbbrev method to perform the processing. */
-      result = astAbbrev( frame, axis, str1, str2 );
+      result = astAbbrev( frame, axis, fmt, str1, str2 );
 
 /* Clear Frame attributes which were temporarily over-ridden. */
       if ( !set ) astClearDigits( frame );
@@ -1456,6 +1463,123 @@ static double Distance( AstFrame *this_frame,
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
+}
+
+static int Fields( AstFrame *this_frame, int axis, const char *fmt, 
+                   const char *str, int maxfld, char **fields, 
+                   int *nc, double *val ) {
+/*
+*+
+*  Name:
+*     astFields
+
+*  Purpose:
+*     Identify numerical fields within a formatted CmpFrame axis value.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int astFields( AstFrame *this, int axis, const char *fmt, 
+*                    const char *str, int maxfld, char **fields, 
+*                    int *nc, double *val ) 
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astFields
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function identifies the numerical fields within a CmpFrame axis 
+*     value that has been formatted using astAxisFormat. It assumes that 
+*     the value was formatted using the supplied format string. It also
+*     returns the equivalent floating point value.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     axis
+*        The number of the CmpFrame axis for which the values have been
+*        formatted (axis numbering starts at zero for the first axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format used when creating "str".
+*     str
+*        Pointer to a constant null-terminated string containing the
+*        formatted value.
+*     maxfld
+*        The maximum number of fields to identify within "str".
+*     fields
+*        A pointer to an array of at least "maxfld" character pointers. 
+*        Each element is returned holding a pointer to the start of the 
+*        corresponding field  in "str" (in the order in which they occur 
+*        within "str"), or NULL if no corresponding field can be found. 
+*     nc
+*        A pointer to an array of at least "maxfld" integers. Each
+*        element is returned holding the number of characters in the
+*        corresponding field, or zero if no corresponding field can be
+*        found.
+*     val
+*        Pointer to a location at which to store the value
+*        equivalent to the returned field values. If this is NULL, 
+*        it is ignored.
+
+*  Returned Value:
+*     The number of fields succesfully identified and returned.
+
+*  Notes:
+*     - Leading and trailing spaces are ignored.
+*     - If the formatted value is not consistent with the supplied format
+*     string, then a value of zero will be returned, "fields" will be
+*     returned holding NULLs, "nc" will be returned holding zeros, and
+*     "val" is returned holding VAL__BAD.
+*     - Fields are counted from the start of the formatted string. If the
+*     string contains more than "maxfld" fields, then trailing fields are
+*     ignored.
+*     - If this function is invoked with the global error status set, or 
+*     if it should fail for any reason, then a value of zero will be returned 
+*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     holding their supplied values
+*-
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to CmpFrame structure */
+   AstFrame *frame;              /* Pointer to Frame containing axis */
+   int naxes1;                   /* Number of axes in frame1 */
+   int result;                   /* Result field count to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Validate and permute the axis index supplied. */
+   axis = astValidateAxis( this, axis, "astFields" );
+
+/* Determine the number of axes in the first component Frame. */
+   naxes1 = astGetNaxes( this->frame1 );
+   if ( astOK ) {
+
+/* Decide which component Frame contains the axis and adjust the axis
+   index if necessary. */
+      frame = ( axis < naxes1 ) ? this->frame1 : this->frame2;
+      axis = ( axis < naxes1 ) ? axis : axis - naxes1;
+
+/* Invoke the Frame's astFields method to perform the processing. */
+      result = astFields( frame, axis, fmt, str, maxfld, fields, 
+                          nc, val );
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
@@ -2806,6 +2930,7 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    frame->ClearUnit = ClearUnit;
    mapping->Decompose = Decompose;
    frame->Distance = Distance;
+   frame->Fields = Fields;
    frame->Format = Format;
    frame->Gap = Gap;
    frame->GetAxis = GetAxis;

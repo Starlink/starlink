@@ -21,6 +21,7 @@
 *     AST_COPY
 *     AST_DELETE
 *     AST_END
+*     AST_ESCAPES
 *     AST_EXEMPT
 *     AST_EXPORT
 *     AST_GET(C,D,I,L,R)
@@ -29,6 +30,7 @@
 *     AST_SET 
 *     AST_SET(C,D,I,L,R)
 *     AST_SHOW
+*     AST_VERSION 
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -47,6 +49,8 @@
 *        Add AST_EXEMPT function.
 *     30-APR-2003 (DSB):
 *        Add AST_VERSION function.
+*     7-FEB-2004 (DSB):
+*        Add AST_ESCAPES function.
 *-
 */
 
@@ -113,6 +117,18 @@ F77_INTEGER_FUNCTION(ast_clone)( INTEGER(THIS),
 F77_INTEGER_FUNCTION(ast_version)( ) {
    astAt( "AST_VERSION", NULL, 0 );
    return astVersion;
+}
+
+F77_INTEGER_FUNCTION(ast_escapes)( INTEGER(NEWVAL),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(NEWVAL)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_ESCAPES", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astEscapes( *NEWVAL );
+   )
+   return RESULT;
 }
 
 F77_INTEGER_FUNCTION(ast_copy)( INTEGER(THIS),

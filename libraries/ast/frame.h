@@ -288,6 +288,8 @@
 *           Clear the Unit attribute for a Frame axis.
 *        astConvertX
 *           Determine how to convert between two coordinate systems.
+*        astFields
+*           Identify the fields within a formatted Frame axis value.
 *        astGap
 *           Find a "nice" gap for tabulating Frame axis values.
 *        astGetAxis
@@ -492,6 +494,9 @@
 *        Added AlignSystem attribute.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitFrameVtab method.
+*     24-JAN-2004 (DSB):
+*        o  Added astFields.
+*        o  Added argument "fmt" to astAbbrev.
 *-
 */
 
@@ -577,7 +582,7 @@ typedef struct AstFrameVtab {
 /* Properties (e.g. methods) specific to this class. */
    AstAxis *(* GetAxis)( AstFrame *, int );
    AstFrame *(* PickAxes)( AstFrame *, int, const int[], AstMapping ** );
-   const char *(* Abbrev)( AstFrame *, int, const char *, const char * );
+   const char *(* Abbrev)( AstFrame *, int, const char *, const char *, const char * );
    const char *(* Format)( AstFrame *, int, double );
    const char *(* GetDomain)( AstFrame * );
    const char *(* GetFormat)( AstFrame *, int );
@@ -589,6 +594,7 @@ typedef struct AstFrameVtab {
    double (* Angle)( AstFrame *, const double[], const double[], const double[] );
    double (* Distance)( AstFrame *, const double[], const double[] );
    double (* Gap)( AstFrame *, int, double, int * );
+   int (* Fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
    double (* AxDistance)( AstFrame *, int, double, double );
    double (* AxOffset)( AstFrame *, int, double, double );
    int (* GetDigits)( AstFrame * );
@@ -764,7 +770,7 @@ void astPermAxesId_( AstFrame *, const int[] );
 #if defined(astCLASS)            /* Protected */
 AstAxis * astGetAxis_( AstFrame *, int );
 AstFrameSet *astConvertX_( AstFrame *, AstFrame *, const char * );
-const char *astAbbrev_( AstFrame *, int, const char *, const char * );
+const char *astAbbrev_( AstFrame *, int, const char *, const char *, const char * );
 const char *astGetDomain_( AstFrame * );
 const char *astGetFormat_( AstFrame *, int );
 const char *astGetLabel_( AstFrame *, int );
@@ -773,6 +779,7 @@ const char *astGetTitle_( AstFrame * );
 const char *astGetUnit_( AstFrame *, int );
 const int *astGetPerm_( AstFrame * );
 double astGap_( AstFrame *, int, double, int * );
+int astFields_( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 int astGetDigits_( AstFrame * );
 int astGetDirection_( AstFrame *, int );
 int astGetMatchEnd_( AstFrame * );
@@ -953,8 +960,10 @@ astINVOKE(V,astUnformatId_(astCheckFrame(this),axis,string,value))
 #endif
 
 #if defined(astCLASS)            /* Protected */
-#define astAbbrev(this,axis,str1,str2) \
-astINVOKE(V,astAbbrev_(astCheckFrame(this),axis,str1,str2))
+#define astAbbrev(this,axis,fmt,str1,str2) \
+astINVOKE(V,astAbbrev_(astCheckFrame(this),axis,fmt,str1,str2))
+#define astFields(this,axis,fmt,str,maxfld,fields,nc,val) \
+astINVOKE(V,astFields_(astCheckFrame(this),axis,fmt,str,maxfld,fields,nc,val))
 #define astCheckPerm(this,perm,method) \
 astINVOKE(V,astCheckPerm_(astCheckFrame(this),perm,method))
 #define astClearDigits(this) \

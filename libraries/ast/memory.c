@@ -41,6 +41,12 @@
 *     15-NOV-2002 (DSB):
 *        Moved ChrMatch from SkyFrame (etc) to here. Included stdio.h and
 *        ctype.h.
+*     10-FEB-2003 (DSB):
+*        Added facilities for detecting and tracing memory leaks. These
+*        are only included if AST is compiled with the -DDEBUG flag. 
+*     3-MAR-2004 (DSB):
+*        Modified astSscanf to avoid use of uninitialised values
+*        corresponding to "%n" fields in the format string.
 */
 
 /* Module Macros. */
@@ -83,15 +89,126 @@
 typedef struct Memory {
    unsigned long magic;
    size_t size;
+
+#ifdef DEBUG
+   int id;      /* A unique identifier for every allocated memory chunk */
+   int perm;    /* Is this chunk part of an acceptable once-off "memory leak"? */
+#endif
+
 } Memory;
+
+/* Module Variables. */
+/* ================= */
+#ifdef DEBUG
+static Memory **issued = NULL;
+static int nissued = 0;
+static int siz_issued = 0;
+static int next_id = 0;
+static int watch_id = 0;
+static int perm_mem = 0;
+#endif
 
 /* Prototypes for Private Functions. */
 /* ================================= */
 static int IsDynamic( void *ptr );
 static unsigned long Magic( void *ptr, size_t size );
 
+#ifdef DEBUG
+static void Issue( Memory *new );
+static void DeIssue( Memory *old );
+#endif
+
 /* Function implementations. */
 /* ========================= */
+char *astAppendString_( char *str1, int *nc, const char *str2 ) {
+/*
+*  Name:
+*     astAppendString
+
+*  Purpose:
+*     Append a string to another string which grows dynamically.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     char *astAppendString( char *str1, int *nc, const char *str2 )
+
+*  Description:
+*     This function appends one string to another dynamically
+*     allocated string, extending the dynamic string as necessary to
+*     accommodate the new characters (plus the final null).
+
+*  Parameters:
+*     str1
+*        Pointer to the null-terminated dynamic string, whose memory
+*        has been allocated using the AST memory allocation functions
+*        defined in "memory.h". If no space has yet been allocated for
+*        this string, a NULL pointer may be given and fresh space will
+*        be allocated by this function.
+*     nc
+*        Pointer to an integer containing the number of characters in
+*        the dynamic string (excluding the final null). This is used
+*        to save repeated searching of this string to determine its
+*        length and it defines the point where the new string will be
+*        appended. Its value is updated by this function to include
+*        the extra characters appended.
+*
+*        If "str1" is NULL, the initial value supplied for "*nc" will
+*        be ignored and zero will be used.
+*     str2
+*        Pointer to a constant null-terminated string, a copy of which
+*        is to be appended to "str1".
+
+*  Returned Value:
+*     A possibly new pointer to the dynamic string with the new string
+*     appended (its location in memory may have to change if it has to
+*     be extended, in which case the original memory is automatically
+*     freed by this function). When the string is no longer required,
+*     its memory should be freed using astFree.
+
+*  Notes:
+*     - If this function is invoked with the global error status set
+*     or if it should fail for any reason, then the returned pointer
+*     will be equal to "str1" and the dynamic string contents will be
+*     unchanged.
+*/
+
+/* Local Variables: */
+   char *result;                 /* Pointer value to return */
+   int len;                      /* Length of new string */
+
+/* Initialise. */
+   result = str1;
+
+/* If the first string pointer is NULL, also initialise the character
+   count to zero. */
+   if ( !str1 ) *nc = 0;
+
+/* Check the global error status. */
+   if ( !astOK || !str2 ) return result;
+
+/* Calculate the total string length once the two strings have been
+   concatenated. */
+   len = *nc + (int) strlen( str2 );
+
+/* Extend the first (dynamic) string to the required length, including
+   a final null. Save the resulting pointer, which will be
+   returned. */
+   result = astGrow( str1, len + 1, sizeof( char ) );
+
+/* If OK, append the second string and update the total character
+   count. */
+   if ( astOK ) {
+      (void) strcpy( result + *nc, str2 );
+      *nc = len;
+   }
+
+/* Return the result pointer. */
+   return result;
+}
+
 int astChrMatch_( const char *str1, const char *str2 ) {
 /*
 *+
@@ -282,6 +399,12 @@ void *astFree_( void *ptr ) {
       mem = ( (Memory *) ptr ) - 1;
       mem->magic = (unsigned long) 0;
       mem->size = (size_t) 0;
+
+#ifdef DEBUG
+      mem->id = 0;
+      mem->perm = perm_mem;
+      DeIssue( mem );
+#endif
 
 /* Free the allocated memory. */
       free( mem );
@@ -595,6 +718,12 @@ void *astMalloc_( size_t size ) {
          mem->magic = Magic( mem, size );
          mem->size = size;
 
+#ifdef DEBUG
+         mem->id = ++next_id;
+         mem->perm = perm_mem;
+         Issue( mem );
+#endif
+
 /* Increment the memory pointer to the start of the region of
    allocated memory to be used by the caller.*/
          mem++;
@@ -663,6 +792,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* Local Variables: */
    Memory *mem;                  /* Pointer to memory header */
+   Memory *oldmem;               /* Original pointer to memory header */
 
 /* Check the global error status. */
    if ( !astOK ) return ptr;
@@ -699,6 +829,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* Otherwise, reallocate the memory. */
          } else {
+            oldmem = mem;
             mem = realloc( mem, sizeof( Memory ) + size );
 
 /* If this failed, report an error and restore the original pointer
@@ -716,6 +847,15 @@ void *astRealloc_( void *ptr, size_t size ) {
             } else {
                mem->magic = Magic( mem, size );
                mem->size = size;
+
+#ifdef DEBUG
+               if( oldmem != mem ) {
+                  mem->id = ++next_id;
+                  DeIssue( oldmem );
+                  Issue( mem );
+               }
+#endif
+
                mem++;
             }
          }
@@ -1233,6 +1373,14 @@ int astSscanf_( const char *str, const char *fmt, ...) {
                   if ( nptr < VMAXFLD ) {
                      ptr[ nptr++ ] = va_arg( args, void *);
 
+/* If the current field specifier is "%n" the corresponding pointer
+   should be a pointer to an integer. We initialise the integer to zero.
+   We need to do this because sscanf does not include "%n" values in the
+   returned count of succesful conversions, and so there is no sure way
+   of knowing whether a value has been stored for a "%n" field, and so
+   whether it is safe to use it as an index into the supplied. */
+                     if( *c == 'n' ) *( (int *) ptr[ nptr - 1 ] ) = 0;
+
 	          } else {
                      astError( AST__INTER, "astSscanf: Format string " 
                                "'%s' contains more than %d fields "
@@ -1377,3 +1525,277 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    return ret;
 
 }
+
+#ifdef DEBUG
+
+static void Issue( Memory *new ) {
+/*
+*  Name:
+*     Issue
+
+*  Purpose:
+*     Note that a dynamic memory address has been issued.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void Issue( Memory *new )
+
+*  Description:
+*     This function stores a copy of the supplied pointer in a static 
+*     array, so that checks on memory leakage can be performed.
+
+*  Parameters:
+*     new
+*        The memory pointer.
+*/
+
+/* Local Variables: */
+   int i;
+   size_t old_size;
+   size_t new_size;
+   Memory **new_issued;
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Report an error if this is the memory chunk which is being watched
+   for. By setting a debugger breakpoint on astError_, you can identify
+   the moment when a chunk known to be part of a leak is first issued. */
+   if( new->id == watch_id ) {
+      astError( AST__INTER, "Issue(memory): The id %d has been issued to "
+                "memory address %p (internal AST programming error).", 
+                watch_id, new );
+      return;
+   }       
+
+/* Check the supplied object is not already on the list of issued
+   addresses. */
+   for( i = 0; i < nissued; i++ ) {
+      if( new == issued[ i ] ){
+         astError( AST__INTER, "Issue(memory): The memory address %p "
+                   "has already been issued (internal AST programming "
+                   "error).", new );
+         break;
+      }
+   }
+
+/* If OK, extend the list and add in the new address. */
+   if( astOK ) {
+      if( siz_issued - nissued < 5 ) {
+         old_size = siz_issued * sizeof( Memory * );
+         siz_issued += 100;
+         new_size = siz_issued * sizeof( Memory * );
+         new_issued = malloc( new_size );
+         if( new_issued ) {
+            if( issued ) {
+               memcpy( new_issued, issued, old_size );
+               free( issued );
+            }
+            issued = new_issued;
+         } else {
+            astError( AST__INTER, "Issue(memory): Failed to allocat %d "
+                      "bytes of memory.", new_size );
+         }
+      }
+      if( astOK ) issued[ nissued++ ] = new;
+   }
+}
+
+static void DeIssue( Memory *old ) {
+/*
+*  Name:
+*     Issue
+
+*  Purpose:
+*     Note that a dynamic memory address has been freed.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void DeIssue( Memory *old )
+
+*  Description:
+*     This function removes the supplied pointer from a static array,
+*     so that checks on memory leakage can be performed. AN error is
+*     reported if the supplied pointer has not previously been issued.
+
+*  Parameters:
+*     old
+*        The memory pointer.
+
+*  Notes:
+*     - This function attempts to execute even if an error has occurred.
+
+*/
+
+/* Local Variables: */
+   int i;
+   int ok;
+
+/* Check a pointer was supplied. */
+   if( !old ) return;
+
+/* Search for the supplied pointer in the list of issued addresses. */
+   ok = 0;
+   for( i = 0; i < nissued; i++ ) {
+      if( old == issued[ i ] ){
+
+/* When found, set it NULL. */
+         issued[ i ] = NULL;
+         ok =1;
+         break;
+      }
+   }
+
+/* If not found, report an error. */
+   if( !ok && astOK ) {
+      astError( AST__INTER, "DeIssue(memory): The memory address %p "
+                "was not issued by AST (internal AST programming "
+                "error).", old );
+   }
+}
+
+
+void astListIssued_( const char *label ) {
+/*
+*+
+*  Name:
+*     astListIssued
+
+*  Purpose:
+*     Display a list of the currently issued memory structures.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astListIssued( const char *label )
+
+*  Description:
+*     This function displays a list of the identifiers for all currently
+*     issued AST memory chunks. The list is written to standard output.
+
+*  Parameters:
+*     label
+*        A textual label to display before the memody id values (may be
+*        NULL).
+
+*  Notes:
+*     - This function attempts to execute even if an error has occurred.
+*-
+*/
+
+   int i;
+   int first;
+   Memory *list;
+
+   list = ( (Memory *) issued ) - 1;
+
+   if( label ) printf("%s: ", label );
+   first = 1;
+
+   for( i = 0; i < nissued; i++ ) {
+      if( issued[ i ] && !issued[ i ]->perm ) {
+         if( first ) {
+            printf("Currently issued AST memory chunks:\n");
+            first = 0;
+         }
+         printf( "%d ", issued[ i ]->id );
+      }
+   }      
+
+   if( first ) {
+      printf("There are currently no issued AST memory chunks.");
+   }
+   printf("\n");
+
+}
+
+void astSetWatchId_( int id ) {
+/*
+*+
+*  Name:
+*     astSetWatchId
+
+*  Purpose:
+*     Indicate an error is to be reported when a specified chunk is issued.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astSetWatchId( int id )
+
+*  Description:
+*     This function forces an error to be reported (via astError) when a
+*     specified memory chunk is issued. By setting a debugger breakpoint 
+*     on astError, the moment at which the specified memory chunk is
+*     issued can be trapped, and the cause of the memory allocation 
+*     determined by examining the call stack.
+
+*  Parameters:
+*     id
+*        The identifier of the chunk which is to be weatched for.
+
+*  Notes:
+*     - This function attempts to execute even if an error has occurred.
+*-
+*/
+   watch_id = id;
+}
+
+int astSetPermMem_( int perm ){
+/*
+*+
+*  Name:
+*     astSetPermMem
+
+*  Purpose:
+*     Indicate subsequent chunks are part of an acceptable memory leak.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astSetPermMem( int perm )
+
+*  Description:
+*     This function returns the current setting of the "perm" flag, and
+*     then stores the supplied value as the new value.
+*
+*     If the "perm" flag is set non-zero, then subsequently allocated 
+*     memory chunks are not added to the list of allocated memory chunks
+*     and so do not appear when astListIssued is called. The "perm" flag
+*     shoul dbe set non-zero before making any memory allocation which
+*     forms part of an acceptable once-off "memory leak". For instance,
+*     the memory used to hold pointers to destructors, dump functions and 
+*     copy constructors within the Object virtual function table is never
+*     released and forms part of an acceptable once-off memory leak.
+
+*  Parameters:
+*     perm
+*        The new value for the "perm" flag.
+
+*  Returned Value:
+*     The original value of the "perm" flag.
+
+*  Notes:
+*     - This function attempts to execute even if an error has occurred.
+*-
+*/
+   int old_perm;
+   old_perm = perm_mem;
+   perm_mem = perm;
+   return old_perm;
+}
+
+#endif
+

@@ -39,6 +39,7 @@ c     - astClone: Clone a pointer to an Object
 c     - astCopy: Copy an Object
 c     - astDelete: Delete an Object
 c     - astEnd: End an AST context
+c     - astEscapes: Control whether graphical escape sequences are removed
 c     - astExempt: Exempt an Object pointer from AST context handling
 c     - astExport: Export an Object pointer to an outer context
 c     - astGet<X>: Get an attribute value for an Object
@@ -56,6 +57,7 @@ f     - AST_CLONE: Clone a pointer to an Object
 f     - AST_COPY: Copy an Object
 f     - AST_DELETE: Delete an Object
 f     - AST_END: End an AST context
+f     - AST_ESCAPES: Control whether graphical escape sequences are removed
 f     - AST_EXEMPT: Exempt an Object pointer from AST context handling
 f     - AST_EXPORT: Export an Object pointer to an outer context
 f     - AST_GET<X>: Get an attribute value for an Object
@@ -113,6 +115,10 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitObjectVtab
 *        method.
+*     8-FEB-2004 (DSB):
+*        Added astEscapes.
+*     10-FEB-2004 (DSB):
+*        Added debug conditional code to keep track of memory leaks.
 *class--
 */
 
@@ -131,6 +137,7 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include "memory.h"              /* Memory allocation facilities */
 #include "channel.h"             /* I/O channels */
 #include "object.h"              /* Interface definition for this class */
+#include "plot.h"                /* Plot class (for astStripEscapes) */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -152,6 +159,11 @@ f     - AST_VERSION: Return the verson of the AST library being used.
    static variables. */
 static int class_init = 0;       /* Virtual function table initialised? */
 static AstObjectVtab class_vtab; /* Virtual function table */
+
+/* A flag which indicates if AST functions which return text strings
+   should retain any graphical escape sequences (as interpreted by the
+   Plot class). */
+static int retain_esc = 0;
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
@@ -928,6 +940,9 @@ static const char *Get( AstObject *this, const char *attrib ) {
    value formatted as a character string. */
       } else {
          result = astGetAttrib( this, buff );
+
+/* If required, strip out graphical escape sequences. */
+         if( !astEscapes( -1 ) ) result = astStripEscapes( result );
       }
    }
 
@@ -1746,8 +1761,16 @@ void astSetCopy_( AstObjectVtab *vtab,
 *-
 */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the global status. */
    if ( !astOK ) return;
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
 
 /* Expand the array of copy constructor pointers in the virtual function table
    (if necessary) to accommodate the new one. */
@@ -1759,6 +1782,11 @@ void astSetCopy_( AstObjectVtab *vtab,
    if ( astOK ) {
       vtab->copy[ vtab->ncopy++ ] = copy;
    }
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
 }
 
 void astSetDelete_( AstObjectVtab *vtab, void (* delete)( AstObject * ) ) {
@@ -1810,8 +1838,16 @@ void astSetDelete_( AstObjectVtab *vtab, void (* delete)( AstObject * ) ) {
 *-
 */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the global status. */
    if ( !astOK ) return;
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
 
 /* Expand the array of destructor pointers in the virtual function table (if
    necessary) to accommodate the new one. */
@@ -1823,6 +1859,11 @@ void astSetDelete_( AstObjectVtab *vtab, void (* delete)( AstObject * ) ) {
    if ( astOK ) {
       vtab->delete[ vtab->ndelete++ ] = delete;
    }
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
 }
 
 void astSetDump_( AstObjectVtab *vtab,
@@ -1882,8 +1923,16 @@ void astSetDump_( AstObjectVtab *vtab,
 *-
 */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the global error status. */
    if ( !astOK ) return;
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
 
 /* Expand the arrays of pointers to dump functions and related data in
    the virtual function table (if necessary) to accommodate the new
@@ -1903,6 +1952,11 @@ void astSetDump_( AstObjectVtab *vtab,
       vtab->dump_comment[ vtab->ndump ] = comment;
       vtab->ndump++;
    }
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
 }
 
 /*
@@ -3296,6 +3350,7 @@ void astExemptId_( AstObject * );
 void astExportId_( AstObject * );
 void astSetId_( void *, const char *, ... );
 int astVersion_( void );
+int astEscapes_( int );
 
 /* External Interface Functions. */
 /* ----------------------------- */
@@ -4211,6 +4266,10 @@ static void InitContext( void ) {
 *     - This function does nothing after the first successful invocation.
 */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -4218,7 +4277,17 @@ static void InitContext( void ) {
    if ( !active_handles ) {
 
 /* Allocate and initialise the "active_handles" array. */
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
       active_handles = astMalloc( sizeof( int ) );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
       if ( astOK ) active_handles[ 0 ] = -1;
    }
 }
@@ -4341,6 +4410,10 @@ AstObject *astMakeId_( AstObject *this ) {
    AstObject *id;                /* ID value to return */
    int ihandle;                  /* Handle offset */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Initialise. */
    id = astI2P( 0 );
 
@@ -4360,7 +4433,17 @@ AstObject *astMakeId_( AstObject *this ) {
 /* Otherwise, allocate a new Handle by extending the "handles" array
    and using the offset of the new element. */
          } else {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
             handles = astGrow( handles, nhandles + 1, sizeof( Handle ) );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
             if ( astOK ) ihandle = nhandles++;
          }
 
@@ -4708,4 +4791,80 @@ f        This routine applies to all Objects.
 */
 
    return AST__VMAJOR*1E6 + AST__VMINOR*1E3 + AST__RELEASE;
+}
+
+int astEscapes_( int new_value ) {
+/*
+*++
+*  Name:
+c     astEscapes
+f     AST_ESCAPES
+
+*  Purpose:
+*     Control whether graphical escape sequences are included in strings.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "object.h"
+c     int astEscapes( int new_value )
+f     RESULT = AST_ESCAPES( NEWVAL, STATUS )
+
+*  Class Membership:
+*     Object class function.
+
+*  Description:
+*     The Plot class defines a set of escape sequences which can be
+*     included within a text string in order to control the appearance of
+*     sub-strings within the text. See the Escape attribute for a
+*     description of these escape sequences. It is usually inappropriate 
+*     for AST to return strings containing such escape sequences when
+*     called by application code. For instance, an application which
+*     displays the value of the Title attribute of a Frame usually does
+*     not want the displayed string to include potentially long escape 
+*     sequences which a human read would have difficuly interpreting.
+*     Therefore the default behaviour is for AST to strip out such escape
+*     sequences when called by application code. This default behaviour
+*     can be changed using this function.
+
+*  Parameters:
+c     new_value
+f     NEWVAL = INTEGER (Given)
+*        A flag which indicates if escapes sequences should be included
+*        in returned strings. If zero is supplied, escape sequences will 
+*        be stripped out of all strings returned by any AST function. If 
+*        a positive value is supplied, then any escape sequences will be 
+*        retained in the value returned to the caller. If a negative
+*        value is supplied, the current value of the flag will be left 
+*        unchanged.
+
+*  Returned Value:
+c     astEscapes
+f     AST_ESCAPES = INTEGER
+*        The value of the flag on entry to this function.
+
+*  Applicability:
+*     Object
+c        This macro applies to all Objects.
+f        This routine applies to all Objects.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+
+*--
+*/
+   int old_val;
+
+   old_val = retain_esc;
+
+   if( new_value > 0 ) {
+      retain_esc = 1;
+
+   } else if( new_value == 0 ) {
+      retain_esc = 0;
+   }
+
+   return old_val;
 }

@@ -168,7 +168,7 @@ const double v;
 
 double astATan2d(y, x)
 
-double x, y;
+const double x, y;
 
 {
    if (y == 0.0) {

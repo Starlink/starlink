@@ -161,6 +161,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Allow Frame attribute names to include an axis specifier within
 *        GetAttrib, SetAttrib, TestAttrib and ClearAttrib (eg "Domain(1)"
 *        is now accepted as equivalent to "Domain").
+*     24-JAN-2004 (DSB):
+*        o  Added astFields.
+*        o  Added argument "fmt" to Abbrev.
 *class--
 */
 
@@ -608,7 +611,7 @@ static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char * );
 static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static char *CleanDomain( char * );
-static const char *Abbrev( AstFrame *, int, const char *, const char * );
+static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
 static const char *Format( AstFrame *, int, double );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetDomain( AstFrame * );
@@ -629,6 +632,7 @@ static int ConsistentMaxAxes( AstFrame *, int );
 static int ConsistentMinAxes( AstFrame *, int );
 static int DefaultMaxAxes( AstFrame * );
 static int DefaultMinAxes( AstFrame * );
+static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
 
@@ -736,7 +740,7 @@ static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 
 /* Member functions. */
 /* ================= */
-static const char *Abbrev( AstFrame *this, int axis,
+static const char *Abbrev( AstFrame *this, int axis,  const char *fmt, 
                            const char *str1, const char *str2 ) {
 /*
 *+
@@ -751,7 +755,7 @@ static const char *Abbrev( AstFrame *this, int axis,
 
 *  Synopsis:
 *     #include "frame.h"
-*     const char *astAbbrev( AstFrame *this, int axis,
+*     const char *astAbbrev( AstFrame *this, int axis, const char *fmt, 
 *                            const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -770,6 +774,9 @@ static const char *Abbrev( AstFrame *this, int axis,
 *     axis
 *        The number of the Frame axis for which the values have been
 *        formatted (axis numbering starts at zero for the first axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
 *        first formatted value.
@@ -813,7 +820,7 @@ static const char *Abbrev( AstFrame *this, int axis,
    ax = astGetAxis( this, axis );
 
 /* Invoke the Axis astAxisAbbrev method to perform the processing. */
-   result = astAxisAbbrev( ax, str1, str2 );
+   result = astAxisAbbrev( ax, fmt, str1, str2 );
 
 /* Annul the Axis pointer. */
    ax = astAnnul( ax );
@@ -1209,6 +1216,10 @@ f     This routine returns a signed value representing the axis increment
 c     this
 f     THIS = INTEGER (Given)
 *        Pointer to the Frame.
+c     axis
+f     AXIS = INTEGER (Given)
+*        The index of the axis to which the supplied values refer. The
+*        first axis has index 1.
 c     v1
 f     V1 = DOUBLE PRECISION (Given)
 *        The first axis value.
@@ -1292,6 +1303,10 @@ f     This routine returns an axis value formed by adding a signed axis
 c     this
 f     THIS = INTEGER (Given)
 *        Pointer to the Frame.
+c     axis
+f     AXIS = INTEGER (Given)
+*        The index of the axis to which the supplied values refer. The
+*        first axis has index 1.
 c     v1
 f     V1 = DOUBLE PRECISION (Given)
 *        The original axis value.
@@ -2735,6 +2750,111 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Take the square root to find the distance (if valid). */
       if ( result != AST__BAD ) result = sqrt( result );
    }
+
+/* Return the result. */
+   return result;
+}
+
+static int Fields( AstFrame *this, int axis, const char *fmt, 
+                   const char *str, int maxfld, char **fields, 
+                   int *nc, double *val ) {
+/*
+*+
+*  Name:
+*     astFields
+
+*  Purpose:
+*     Identify numerical fields within a formatted Axis value.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astFields( AstFrame *this, int axis, const char *fmt, 
+*                    const char *str, int maxfld, char **fields, 
+*                    int *nc, double *val ) 
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function identifies the numerical fields within a Frame axis 
+*     value that has been formatted using astAxisFormat. It assumes that 
+*     the value was formatted using the supplied format string. It also
+*     returns the equivalent floating point value.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the Frame axis for which the values have been
+*        formatted (axis numbering starts at zero for the first axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format used when creating "str".
+*     str
+*        Pointer to a constant null-terminated string containing the
+*        formatted value.
+*     maxfld
+*        The maximum number of fields to identify within "str".
+*     fields
+*        A pointer to an array of at least "maxfld" character pointers. 
+*        Each element is returned holding a pointer to the start of the 
+*        corresponding field  in "str" (in the order in which they occur 
+*        within "str"), or NULL if no corresponding field can be found. 
+*     nc
+*        A pointer to an array of at least "maxfld" integers. Each
+*        element is returned holding the number of characters in the
+*        corresponding field, or zero if no corresponding field can be
+*        found.
+*     val
+*        Pointer to a location at which to store the value
+*        equivalent to the returned field values. If this is NULL, 
+*        it is ignored.
+
+*  Returned Value:
+*     The number of fields succesfully identified and returned.
+
+*  Notes:
+*     - Leading and trailing spaces are ignored.
+*     - If the formatted value is not consistent with the supplied format
+*     string, then a value of zero will be returned, "fields" will be
+*     returned holding NULLs, "nc" will be returned holding zeros, and
+*     "val" is returned holding VAL__BAD.
+*     - Fields are counted from the start of the formatted string. If the
+*     string contains more than "maxfld" fields, then trailing fields are
+*     ignored.
+*     - If this function is invoked with the global error status set, or 
+*     if it should fail for any reason, then a value of zero will be returned 
+*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     holding their supplied values
+*-
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   int result;                   /* Result field count to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Validate the axis index and obtain a pointer to the required
+   Axis. */
+   (void) astValidateAxis( this, axis, "astFields" );
+   ax = astGetAxis( this, axis );
+
+/* Invoke the Axis astAxisFields method to perform the processing. */
+   result = astAxisFields( ax, fmt, str, maxfld, fields, nc, val );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
@@ -4250,6 +4370,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->ConvertX = ConvertX;
    vtab->Angle = Angle;
    vtab->Distance = Distance;
+   vtab->Fields = Fields;
    vtab->FindFrame = FindFrame;
    vtab->Format = Format;
    vtab->Gap = Gap;
@@ -4876,6 +4997,7 @@ f     This routine finds the Frame coordinate values of a point which
 c     this
 f     THIS = INTEGER (Given)
 *        Pointer to the Frame.
+c     point1
 f     POINT1( * ) = DOUBLE PRECISION (Given)
 c        An array of double, with one element for each Frame axis
 f        An array with one element for each Frame axis
@@ -8368,6 +8490,11 @@ c        this.
 *     - "l": Use a letter ("h"/"d", "m" or "s" as appropriate) to
 *     separate fields.
 *
+*     - "g": Use a letter and symbols to separate fields ("h"/"d", "m" or "s",
+*     etc, as appropriate), but include escape sequences in the formatted 
+*     value so that the Plot class will draw the separators as small
+*     super-scripts.
+*
 *     - "d": Include a degrees field. Expressing the angle purely in
 *     degrees is also the default if none of "h", "m", "s" or "t" are
 *     given.
@@ -10513,10 +10640,16 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-const char *astAbbrev_( AstFrame *this, int axis,
+const char *astAbbrev_( AstFrame *this, int axis, const char *fmt,
                         const char *str1, const char *str2 ) {
    if ( !astOK ) return str2;
-   return (**astMEMBER(this,Frame,Abbrev))( this, axis, str1, str2 );
+   return (**astMEMBER(this,Frame,Abbrev))( this, axis, fmt, str1, str2 );
+}
+int astFields_( AstFrame *this, int axis, const char *fmt, 
+                const char *str, int maxfld, char **fields, 
+                int *nc, double *val ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,Fields))( this, axis, fmt, str, maxfld, fields, nc, val );
 }
 void astCheckPerm_( AstFrame *this, const int *perm, const char *method ) {
    if ( !astOK ) return;

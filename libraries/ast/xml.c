@@ -20,6 +20,9 @@
 *        Original version.
 *     12-JAN-2004 (DSB):
 *        Major revisions.
+*     10-FEB-2004 (DSB):
+*        - Added debug conditional code to keep track of memory leaks.
+*        - Other minor bug fixes.
 */
 
 
@@ -143,7 +146,6 @@ static AstXmlPrologue *NewPrologue( AstXmlDocument * );
 static AstXmlNamespace *NewNamespace( const char *, const char * );
 static char *AppendChar( char *, int *, char );
 static char *AppendLine( char *, int *, const char *, int );
-static char *AppendString( char *, int *, const char * );
 static char *RemoveEscapes( const char * );
 static char *CleanText( const char * );
 static const char *AddEscapes( const char * );
@@ -231,7 +233,7 @@ static void AddContent( AstXmlParent *this, int where, AstXmlContentItem *item )
 *          3 - In the epilogue, after the root element.
 *     item
 *        Pointer to the content item to be added to the element. If
-*        "this" is an XmlELement, this can be a pointer to any of the 
+*        "this" is an XmlElement, this can be a pointer to any of the 
 *        following types: AstXmlElement, AstXmlWhite, AstXmlBlack, 
 *        AstXmlCDataSection, AstXmlComment, AstXmlPI. If "this" is a
 *        document, the list is restricted to: AstXmlWhite, AstXmlComment,
@@ -385,7 +387,7 @@ static const char *AddEscapes( const char *text ){
       d = result;
       while( *(++c) ) {
 
-/* We replace this character if it is a <, >, or ". */
+/* We replace this character if it is a <, >, ', &, or ". */
          if( *c == '<' ) {
             strcpy( d, "&lt;" );
             d += 4;
@@ -402,13 +404,7 @@ static const char *AddEscapes( const char *text ){
             strcpy( d, "&apos;" );
             d += 6;
 
-/* We also replace this character if it is a & which does not introduce
-   an entity or character reference. */
-         } else if( *c == '&' && 
-                    !isalpha( c[ 1 ] ) &&
-                    c[ 1 ] != '#' &&
-                    c[ 1 ] != '_' &&
-                    c[ 1 ] != ':' ) {
+         } else if( *c == '&' ) {
             strcpy( d, "&amp;" );
             d += 5;
 
@@ -455,12 +451,24 @@ static void AddObjectToList( AstXmlObject *obj ){
 *        A pointer to a new XmlObject.
 */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Return if the pointer is NULL or if an error has occurred. */
    if( !astOK || !obj ) return;
 
 /* Increment the number of objects in the list and increase the size of
    the list. */
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
    existing_objects = astGrow( existing_objects, ++nobj, sizeof( AstXmlObject *) );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* Add the new pointer to the end of the list. */
    existing_objects[ nobj - 1 ] = obj;
@@ -668,96 +676,7 @@ static char *AppendLine( char *str1, int *nc, const char *str2, int ind ) {
    for( j = 0; j < ind; j++ ) temp = AppendChar( temp, nc, ' ' );
 
 /* Append the supplied string. */
-   return AppendString( temp, nc, str2 );
-}
-
-static char *AppendString( char *str1, int *nc, const char *str2 ) {
-/*
-*  Name:
-*     AppendString
-
-*  Purpose:
-*     Append a string to another string which grows dynamically.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "xml.h"
-*     char *AppendString( char *str1, int *nc, const char *str2 )
-
-*  Description:
-*     This function appends one string to another dynamically
-*     allocated string, extending the dynamic string as necessary to
-*     accommodate the new characters (plus the final null).
-
-*  Parameters:
-*     str1
-*        Pointer to the null-terminated dynamic string, whose memory
-*        has been allocated using the AST memory allocation functions
-*        defined in "memory.h". If no space has yet been allocated for
-*        this string, a NULL pointer may be given and fresh space will
-*        be allocated by this function.
-*     nc
-*        Pointer to an integer containing the number of characters in
-*        the dynamic string (excluding the final null). This is used
-*        to save repeated searching of this string to determine its
-*        length and it defines the point where the new string will be
-*        appended. Its value is updated by this function to include
-*        the extra characters appended.
-*
-*        If "str1" is NULL, the initial value supplied for "*nc" will
-*        be ignored and zero will be used.
-*     str2
-*        Pointer to a constant null-terminated string, a copy of which
-*        is to be appended to "str1".
-
-*  Returned Value:
-*     A possibly new pointer to the dynamic string with the new string
-*     appended (its location in memory may have to change if it has to
-*     be extended, in which case the original memory is automatically
-*     freed by this function). When the string is no longer required,
-*     its memory should be freed using astFree.
-
-*  Notes:
-*     - If this function is invoked with the global error status set
-*     or if it should fail for any reason, then the returned pointer
-*     will be equal to "str1" and the dynamic string contents will be
-*     unchanged.
-*/
-
-/* Local Variables: */
-   char *result;                 /* Pointer value to return */
-   int len;                      /* Length of new string */
-
-/* Initialise. */
-   result = str1;
-
-/* If the first string pointer is NULL, also initialise the character
-   count to zero. */
-   if ( !str1 ) *nc = 0;
-
-/* Check the global error status. */
-   if ( !astOK || !str2 ) return result;
-
-/* Calculate the total string length once the two strings have been
-   concatenated. */
-   len = *nc + (int) strlen( str2 );
-
-/* Extend the first (dynamic) string to the required length, including
-   a final null. Save the resulting pointer, which will be
-   returned. */
-   result = astGrow( str1, len + 1, sizeof( char ) );
-
-/* If OK, append the second string and update the total character
-   count. */
-   if ( astOK ) {
-      (void) strcpy( result + *nc, str2 );
-      *nc = len;
-   }
-
-/* Return the result pointer. */
-   return result;
+   return astAppendString( temp, nc, str2 );
 }
 
 void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value, 
@@ -791,7 +710,7 @@ void astXmlAddAttr_( AstXmlElement *this, const char *name, const char *value,
 *     value 
 *        Pointer to a null terminated string containing the attribute value.
 *     prefix
-*        The namespace prefix for the attribute. May be NULL or empty, in
+*        The namespace prefix for the attribute. May be NULL or blank, in
 *        which case any prefix at the start of "name" is used.
 *-
 */
@@ -1104,7 +1023,7 @@ AstXmlElement *astXmlAddElement_( AstXmlElement *this, const char *name,
 *     name
 *        The name for the element.
 *     prefix
-*        The namespace prefix for the element. May be NULL or empty, in
+*        The namespace prefix for the element. May be NULL or blank, in
 *        which case any prefix at the start of "name" is used.
 
 *  Returned Value:
@@ -1245,7 +1164,7 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri ){
 *        The pointer to the element to be modified.
 *     prefix
 *        Pointer to a null terminated string containing the namespace 
-*        prefix. If this is NULL or empty, then the supplied URI is used 
+*        prefix. If this is NULL or blank, then the supplied URI is used 
 *        as the default namespace for this element and all child elements 
 *        (except for child elements which define their own default 
 *        namespace).
@@ -1265,8 +1184,8 @@ void astXmlAddURI_( AstXmlElement *this, const char *prefix, const char *uri ){
 /* Check the global error status. */
    if( !astOK ) return;
 
-/* Store the length of the namespace prefix. */
-   nc = prefix ? strlen( prefix ) : 0;   
+/* Store the used length of the namespace prefix. */
+   nc = prefix ? astChrLen( prefix ) : 0;   
 
 /* If no namespace prefix has been supplied, just change the default
    namespace URI. */
@@ -2472,7 +2391,7 @@ void astXmlRemoveAttr_( AstXmlElement *this, const char *name,
 *     name
 *        Pointer to a null terminated string containing the attribute name.
 *     prefix
-*        The namespace prefix for the attribute. May be NULL or empty, in
+*        The namespace prefix for the attribute. May be NULL or blank, in
 *        which case any prefix at the start of "name" is used.
 *-
 */
@@ -2970,8 +2889,8 @@ static void CheckPrefName( char *name, const char *noun, const char *method ){
 
 /* Check the string before the colon is a valid name. */
       temp = NULL;
-      temp = AppendString( temp, &nc, noun );
-      temp = AppendString( temp, &nc, " prefix" );
+      temp = astAppendString( temp, &nc, noun );
+      temp = astAppendString( temp, &nc, " prefix" );
       CheckName( name, temp, method, 0 );
       temp = astFree( temp );
 
@@ -3771,7 +3690,7 @@ static const char *Format( AstXmlObject *this, int ind ){
 /* If this is an element... */
    if( this->type == AST__XMLELEM ) {
       temp = FormatTag( this, 1 );
-      result = AppendString( result, &nc, temp );
+      result = astAppendString( result, &nc, temp );
       temp = astFree( (void *) temp );
 
       elem = (AstXmlElement *) this; 
@@ -3793,7 +3712,7 @@ static const char *Format( AstXmlObject *this, int ind ){
                      result = AppendLine( result, &nc, temp, 
                                           ( (ind > -1) ? ind + IND_INC : -1 ) );
                   } else {            
-                     result = AppendString( result, &nc, temp );
+                     result = astAppendString( result, &nc, temp );
                   }
                   temp = astFree( (void *) temp );
                }
@@ -3805,7 +3724,7 @@ static const char *Format( AstXmlObject *this, int ind ){
          if( ind > -1 ) {
             result = AppendLine( result, &nc, temp, ind );
          } else {            
-            result = AppendString( result, &nc, temp );
+            result = astAppendString( result, &nc, temp );
          }
          temp = astFree( (void *) temp );
 
@@ -3816,23 +3735,29 @@ static const char *Format( AstXmlObject *this, int ind ){
       attrib = (AstXmlAttribute *) this; 
 
       if( attrib->prefix ) {
-         result = AppendString( result, &nc, attrib->prefix );
-         result = AppendString( result, &nc, ":" );
+         result = astAppendString( result, &nc, attrib->prefix );
+         result = astAppendString( result, &nc, ":" );
       }
 
-      result = AppendString( result, &nc, attrib->name );
-      result = AppendString( result, &nc, "=\"" );
-      result = AppendString( result, &nc, AddEscapes( attrib->value ) );
-      result = AppendString( result, &nc, "\"" );
+      temp = AddEscapes( attrib->value );
+      result = astAppendString( result, &nc, attrib->name );
+      result = astAppendString( result, &nc, "=\"" );
+      result = astAppendString( result, &nc, temp );
+      result = astAppendString( result, &nc, "\"" );
+      temp = astFree( (void *) temp );
 
    } else if( type == AST__XMLWHITE ){
       white = (AstXmlWhite *) this; 
-      result = AppendString( result, &nc, AddEscapes( white->text ) );
+      temp = AddEscapes( white->text );
+      result = astAppendString( result, &nc, temp );
+      temp = astFree( (void *) temp );
 
    } else if( type == AST__XMLBLACK ){
       black = (AstXmlBlack *) this; 
-      result = AppendString( result, &nc, AddEscapes( black->text ) );
-
+      temp = AddEscapes( black->text );
+      result = astAppendString( result, &nc, temp );
+      temp = astFree( (void *) temp );
+ 
    } else if( type == AST__XMLCDATA || 
               type == AST__XMLCOM ||
               type == AST__XMLPI ||
@@ -3840,20 +3765,20 @@ static const char *Format( AstXmlObject *this, int ind ){
               type == AST__XMLDTD ){
 
       temp = FormatTag( this, 1 );
-      result = AppendString( result, &nc, temp );
+      result = astAppendString( result, &nc, temp );
       temp = astFree( (void *) temp );
 
    } else if( type == AST__XMLNAME ){
       ns = (AstXmlNamespace *) this;
-      result = AppendString( result, &nc, "xmlns:" );
-      result = AppendString( result, &nc, ns->prefix );
-      result = AppendString( result, &nc, "=\"" );
-      result = AppendString( result, &nc, ns->uri );
-      result = AppendString( result, &nc, "\"" );
+      result = astAppendString( result, &nc, "xmlns:" );
+      result = astAppendString( result, &nc, ns->prefix );
+      result = astAppendString( result, &nc, "=\"" );
+      result = astAppendString( result, &nc, ns->uri );
+      result = astAppendString( result, &nc, "\"" );
 
    } else if( type == AST__XMLPRO ){
       pro = (AstXmlPrologue *) this; 
-      result = AppendString( result, &nc, 
+      result = astAppendString( result, &nc, 
                              Format( (AstXmlObject *) pro->xmldecl, ind ) );
 
 /* Append all the miscalleneous items before the DTD. */
@@ -3863,7 +3788,7 @@ static const char *Format( AstXmlObject *this, int ind ){
             if( ind > -1 ) {
                result = AppendLine( result, &nc, temp, ind );
             } else {            
-               result = AppendString( result, &nc, temp );
+               result = astAppendString( result, &nc, temp );
             }
             temp = astFree( (void *) temp );
          }
@@ -3875,7 +3800,7 @@ static const char *Format( AstXmlObject *this, int ind ){
          if( ind > -1 ) {
             result = AppendLine( result, &nc, temp, ind );
          } else {            
-            result = AppendString( result, &nc, temp );
+            result = astAppendString( result, &nc, temp );
          }
          temp = astFree( (void *) temp );
       }
@@ -3887,7 +3812,7 @@ static const char *Format( AstXmlObject *this, int ind ){
             if( ind > -1 ) {
                result = AppendLine( result, &nc, temp, ind );
             } else {            
-               result = AppendString( result, &nc, temp );
+               result = astAppendString( result, &nc, temp );
             }
             temp = astFree( (void *) temp );
          }
@@ -3897,7 +3822,7 @@ static const char *Format( AstXmlObject *this, int ind ){
       doc = (AstXmlDocument *) this; 
 
 /* Format the prologue. */
-      result = AppendString( result, &nc, 
+      result = astAppendString( result, &nc, 
                              Format( (AstXmlObject *) doc->prolog, ind ) );
 
 /* Append the root element. */
@@ -3906,7 +3831,7 @@ static const char *Format( AstXmlObject *this, int ind ){
          if( ind > -1 ) {
             result = AppendLine( result, &nc, temp, ind );
          } else {            
-            result = AppendString( result, &nc, temp );
+            result = astAppendString( result, &nc, temp );
          }
          temp = astFree( (void *) temp );
       }
@@ -3918,7 +3843,7 @@ static const char *Format( AstXmlObject *this, int ind ){
             if( ind > -1 ) {
                result = AppendLine( result, &nc, temp, ind );
             } else {            
-               result = AppendString( result, &nc, temp );
+               result = astAppendString( result, &nc, temp );
             }
             temp = astFree( (void *) temp );
          }
@@ -4004,24 +3929,24 @@ static char *FormatTag( AstXmlObject *this, int opening ){
       elem = (AstXmlElement *) this; 
 
       if( opening ) {
-         result = AppendString( result, &nc, "<" );
+         result = astAppendString( result, &nc, "<" );
          if( elem->prefix ) {
-            result = AppendString( result, &nc, elem->prefix );
-            result = AppendString( result, &nc, ":" );
+            result = astAppendString( result, &nc, elem->prefix );
+            result = astAppendString( result, &nc, ":" );
          }
-         result = AppendString( result, &nc, elem->name );
+         result = astAppendString( result, &nc, elem->name );
    
          if( elem->defns ) {
-            result = AppendString( result, &nc, " xmlns=\"" );
-            result = AppendString( result, &nc, elem->defns );
-            result = AppendString( result, &nc, "\"" );
+            result = astAppendString( result, &nc, " xmlns=\"" );
+            result = astAppendString( result, &nc, elem->defns );
+            result = astAppendString( result, &nc, "\"" );
          }
    
          for( i = 0; i < elem->nnspref; i++ ) {
             temp = Format( (AstXmlObject *) elem->nsprefs[ i ], -1 );
             if( temp ) {
                result = AppendChar( result, &nc, ' ' );
-               result = AppendString( result, &nc, temp );
+               result = astAppendString( result, &nc, temp );
                temp = astFree( (void *) temp );
             }
          }
@@ -4030,78 +3955,78 @@ static char *FormatTag( AstXmlObject *this, int opening ){
             temp = Format( (AstXmlObject *) elem->attrs[ i ], -1 );
             if( temp ){
                result = AppendChar( result, &nc, ' ' );
-               result = AppendString( result, &nc, temp );
+               result = astAppendString( result, &nc, temp );
                temp = astFree( (void *) temp );
             }
          }
    
-         if( elem->nitem == 0 ) result = AppendString( result, &nc, "/" );
-         result = AppendString( result, &nc, ">" );
+         if( elem->nitem == 0 ) result = astAppendString( result, &nc, "/" );
+         result = astAppendString( result, &nc, ">" );
 
       } else if( elem->nitem > 0 ) {
-         result = AppendString( result, &nc, "</" );
+         result = astAppendString( result, &nc, "</" );
          if( elem->prefix ) {
-            result = AppendString( result, &nc, elem->prefix );
-            result = AppendString( result, &nc, ":" );
+            result = astAppendString( result, &nc, elem->prefix );
+            result = astAppendString( result, &nc, ":" );
          }
-         result = AppendString( result, &nc, elem->name );
-         result = AppendString( result, &nc, ">" );
+         result = astAppendString( result, &nc, elem->name );
+         result = astAppendString( result, &nc, ">" );
       }
       
    } else if( type == AST__XMLDTD ){
       dtd = (AstXmlDTDec *) this; 
       if( opening && dtd->name && dtd->name[0] ) {
-         result = AppendString( result, &nc, "<!DOCTYPE " );
-         result = AppendString( result, &nc, dtd->name );
+         result = astAppendString( result, &nc, "<!DOCTYPE " );
+         result = astAppendString( result, &nc, dtd->name );
          if( dtd->external && dtd->external[ 0 ] ) {
-            result = AppendString( result, &nc, " " );
-            result = AppendString( result, &nc, dtd->external );
+            result = astAppendString( result, &nc, " " );
+            result = astAppendString( result, &nc, dtd->external );
          }
          if( dtd->internal && dtd->internal[ 0 ] ) {
-            result = AppendString( result, &nc, " [" );
-            result = AppendString( result, &nc, dtd->internal );
-            result = AppendString( result, &nc, "]" );
+            result = astAppendString( result, &nc, " [" );
+            result = astAppendString( result, &nc, dtd->internal );
+            result = astAppendString( result, &nc, "]" );
          }
-         result = AppendString( result, &nc, ">" );
+         result = astAppendString( result, &nc, ">" );
       }
  
    } else if( type == AST__XMLCDATA ){
       if( opening ) {
          cdata = (AstXmlCDataSection *) this; 
-         result = AppendString( result, &nc, "<![CDATA[" );
-         result = AppendString( result, &nc, cdata->text );
-         result = AppendString( result, &nc, "]]>" );
+         result = astAppendString( result, &nc, "<![CDATA[" );
+         result = astAppendString( result, &nc, cdata->text );
+         result = astAppendString( result, &nc, "]]>" );
       }
  
    } else if( type == AST__XMLCOM ){
       if( opening ) {
          com = (AstXmlComment *) this; 
-         result = AppendString( result, &nc, "<!--" );
-         result = AppendString( result, &nc, com->text );
-         result = AppendString( result, &nc, "-->" );
+         result = astAppendString( result, &nc, "<!--" );
+         result = astAppendString( result, &nc, com->text );
+         result = astAppendString( result, &nc, "-->" );
       }
 
    } else if( type == AST__XMLPI ){
       pi = (AstXmlPI *) this; 
       if( opening ) {
-         result = AppendString( result, &nc, "<?" );
-         result = AppendString( result, &nc, pi->target );
+         result = astAppendString( result, &nc, "<?" );
+         result = astAppendString( result, &nc, pi->target );
          if( pi->text && pi->text[0] ) {
-            result = AppendString( result, &nc, " " );
-            result = AppendString( result, &nc, pi->text );
+            result = astAppendString( result, &nc, " " );
+            result = astAppendString( result, &nc, pi->text );
          }
-         result = AppendString( result, &nc, "?>" );
+         result = astAppendString( result, &nc, "?>" );
       }
 
    } else if( type == AST__XMLDEC ){
       xmlpi = (AstXmlDeclPI *) this; 
       if( opening && xmlpi->text && xmlpi->text[0] ) {
-         result = AppendString( result, &nc, "<?xml" );
+         result = astAppendString( result, &nc, "<?xml" );
          if( xmlpi->text && xmlpi->text[0] ) {
-            result = AppendString( result, &nc, " " );
-            result = AppendString( result, &nc, xmlpi->text );
+            result = astAppendString( result, &nc, " " );
+            result = astAppendString( result, &nc, xmlpi->text );
          }
-         result = AppendString( result, &nc, "?>" );
+         result = astAppendString( result, &nc, "?>" );
       }
    }
 
@@ -4143,7 +4068,7 @@ static void InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
 *     value
 *        The value for the attribute
 *     prefix
-*        The namespace prefix for the attribute. May be NULL or empty, in
+*        The namespace prefix for the attribute. May be NULL or blank, in
 *        which case any prefix at the start of "name" is used.
 */
 
@@ -4173,7 +4098,7 @@ static void InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
    newpref = (char *) prefix;
    colon = NULL;
 
-   if( !prefix || !prefix[ 0 ] ){
+   if( !prefix || astChrLen( prefix ) == 0 ){
       colon = strchr( name, ':' );
       if( colon ) {
          nc = colon - name;
@@ -4195,7 +4120,7 @@ static void InitXmlAttribute( AstXmlAttribute *new, int type, const char *name,
 
 /* Initialise the items specific to this class of structure. */
    new->name = astStore( NULL, newname, strlen( newname ) + 1 );
-   new->value = RemoveEscapes( value );
+   new->value = astStore( NULL, value, strlen( value ) + 1 );
    new->prefix = NULL;
    if( newpref ) {
       nc = strlen( newpref );
@@ -4318,7 +4243,7 @@ static void InitXmlWhite( AstXmlWhite *new, int type, const char *text ){
    }
 
 /* Initialise the items specific to this class of structure. */
-   new->text = RemoveEscapes( text );
+   new->text = astStore( NULL, text, strlen( text ) + 1 );
 }
 
 static void InitXmlBlack( AstXmlBlack *new, int type, const char *text ){
@@ -4366,7 +4291,7 @@ static void InitXmlBlack( AstXmlBlack *new, int type, const char *text ){
    if( !text ) text = "";
 
 /* Initialise the items specific to this class of structure. */
-   new->text = RemoveEscapes( text );
+   new->text = astStore( NULL, text, strlen( text ) + 1 );
 }
 
 static void InitXmlComment( AstXmlComment *new, int type, const char *text ){
@@ -4608,7 +4533,7 @@ static void InitXmlElement( AstXmlElement *new, int type, const char *name,
 *     name
 *        The name for the element.
 *     prefix
-*        The namespace prefix for the element. May be NULL or empty, in
+*        The namespace prefix for the element. May be NULL or blank, in
 *        which case any prefix at the start of "name" is used.
 */
 
@@ -4637,7 +4562,7 @@ static void InitXmlElement( AstXmlElement *new, int type, const char *name,
    newpref = (char *) prefix;
    colon = NULL;
 
-   if( !prefix || !prefix[ 0 ] ){
+   if( !prefix || astChrLen( prefix ) == 0 ){
       colon = strchr( name, ':' );
       if( colon ) {
          nc = colon - name;
@@ -5016,7 +4941,7 @@ static AstXmlAttribute *NewAttribute( const char *name, const char *value,
 *        Pointer to a null terminated string containing the attribute value.
 *     prefix
 *        Pointer to a null terminated string containing the attribute
-*        namespace prefix (may be NULL or empty).
+*        namespace prefix (may be NULL or blank).
 
 *  Returned Value:
 *     A pointer to the new structure is returned. 
@@ -5280,19 +5205,19 @@ static char *RemoveEscapes( const char *text ){
             rc = '&';
             nc= 4;
 
-         } else if( !strncmp( c, "&lt;", 5 ) ) {
+         } else if( !strncmp( c, "&lt;", 4 ) ) {
             rc = '<';
             nc= 3;
 
-         } else if( !strncmp( c, "&gt;", 5 ) ) {
+         } else if( !strncmp( c, "&gt;", 4 ) ) {
             rc = '>';
             nc= 3;
 
-         } else if( !strncmp( c, "&apos;", 5 ) ) {
+         } else if( !strncmp( c, "&apos;", 6 ) ) {
             rc = '\'';
             nc= 5;
 
-         } else if( !strncmp( c, "&quot;", 5 ) ) {
+         } else if( !strncmp( c, "&quot;", 6 ) ) {
             rc = '"';
             nc= 5;
 
@@ -5606,8 +5531,6 @@ int astXmlTrace( int show ){
       printf("\n");
    }
 
-   printf("\n>>> REMOVE CALLS TO astXmlTrace !!!\n\n");   
-
    astSetStatus( old_status );
 
    return result;
@@ -5861,6 +5784,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    char *text1;                 /* Pointer to dynamic string */
    char *text2;                 /* Pointer to another dynamic string */
    char *text3;                 /* Pointer to another dynamic string */
+   char *text4;                 /* Pointer to another dynamic string */
    char c;                      /* Current character read from source */
    char lc2;                    /* Last but one character read */
    char lc;                     /* Last character read */
@@ -5881,7 +5805,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    if( !astOK ) return result;
 
 /* If no XmlDocument was supplied, assume we are commencing to read a new
-   document from the begining. Create a a new XmlDocument to store the
+   document from the begining. Create a new XmlDocument to store the
    prologue, root element and epilogue, together with a pointer to the
    "current" element, i.e. the element whose content is currently being
    read. Also, since we have not yet asked the client if it is interested
@@ -5914,7 +5838,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 
 /* Otherwise, returning would result in returning a null pointer to the
    client even though the end of the document may not have been reached.
-   Revert to state 0 and search for further intersting elements. */
+   Revert to state 0 and search for further interesting elements. */
       } else {
          if( parent != (*doc)->root ) {
             (*doc)->current = (AstXmlElement *) ( (AstXmlObject *) parent )->parent;
@@ -6004,7 +5928,10 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 /* If we have a parent element, just add it to the element. */
                if( parent ) {
                   if( wanted > 0 ) {
-                     astXmlAddCharData( (AstXmlParent *) parent, 0, text1 );
+                     text4 = RemoveEscapes( text1 );
+                     astXmlAddCharData( (AstXmlParent *) parent, 0, text4 );
+                     text4 = astFree( text4 );
+
                   } else if( !skip ) {
                      astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
                                "the input data: \"%s\".", text1 );
@@ -6020,7 +5947,10 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                   } else {
                      where = 1;
                   }
-                  astXmlAddCharData( (AstXmlParent *) *doc, where, text1 );
+
+                  text4 = RemoveEscapes( text1 );
+                  astXmlAddCharData( (AstXmlParent *) *doc, where, text4 );
+                  text4 = astFree( text4 );
                }
 
                text1 = astFree( text1 );
@@ -6078,10 +6008,10 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             state = 8;
          } else if( c == 'D' ){
             state = 16;
-            text1 = AppendString( text1, &nc1, "<!D" );
+            text1 = astAppendString( text1, &nc1, "<!D" );
          } else if( c == '[' ){
             state = 9;
-            text1 = AppendString( text1, &nc1, "<![" );
+            text1 = astAppendString( text1, &nc1, "<![" );
          } else {
             astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
                       "starting with \"<!%c...\" encountered.", c );
@@ -6572,7 +6502,9 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                astXmlAddURI( elem, text1+6, text2 );
 
             } else {
-               astXmlAddAttr( elem, text1, text2, NULL );
+               text4 = RemoveEscapes( text2 );
+               astXmlAddAttr( elem, text1, text4, NULL );
+               text4 = astFree( text4 );
             }
 
             text1 = astFree( text1 );

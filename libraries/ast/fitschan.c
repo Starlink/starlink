@@ -22612,7 +22612,8 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    of pixel coords to celestial coords. Do this by using a WcsMap with no 
    projection. All axes will then be treated as linear and non-celestial. */
          if( latprj == AST__CAR && astGetCarLin( this ) ) {
-            map2 = (AstMapping *) astWcsMap( naxes, AST__WCSBAD, axlon, axlat, "" );
+            map2 = (AstMapping *) astWcsMap( naxes, AST__WCSBAD, axlon + 1, 
+                                             axlat + 1, "" );
 
 /* Now create a WinMap which adds on the CRVAL values to each axis. */
             ina = astMalloc( sizeof(double)*naxes );

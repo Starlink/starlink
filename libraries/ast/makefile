@@ -120,7 +120,7 @@
 #     the $(BLD_SHR) command is still preliminary.
 #
 #  Copyright:
-#     Copyright (C) 2003 Central Laboratory of the Research Councils
+#     <COPYRIGHT_STATEMENT>
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink)
@@ -383,7 +383,7 @@ frameset.h grismmap.h intramap.h loader.h lutmap.h mapping.h \
 mathmap.h matrixmap.h memory.h object.h pcdmap.h \
 permmap.h plot.h pointset.h polymap.h skyaxis.h skyframe.h specframe.h \
 specmap.h slamap.h sphmap.h unit.h unitmap.h wcsmap.h winmap.h \
-zoommap.h xml.h xmlchan.h shiftmap.h
+zoommap.h xml.h xmlchan.h shiftmap.h tranmap.h
 
 #  The following include files are associated with various externally
 #  supplied software items.
@@ -426,11 +426,11 @@ fdssmap.c ferror.c ffitschan.c fframe.c fframeset.c fgrismmap.c \
 fintramap.c fitschan.c flutmap.c fmapping.c fmathmap.c \
 fmatrixmap.c fobject.c fpcdmap.c fpermmap.c fplot.c \
 frame.c frameset.c fskyframe.c fspecframe.c fslamap.c fspecmap.c fsphmap.c \
-funitmap.c fwcsmap.c fwinmap.c fshiftmap.c fxmlchan.c fzoommap.c grismmap.c intramap.c \
+funitmap.c fwcsmap.c fwinmap.c ftranmap.c fshiftmap.c fxmlchan.c fzoommap.c grismmap.c intramap.c \
 loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
 memory.c object.c pcdmap.c permmap.c plot.c fpolymap.c polymap.c \
 pointset.c skyaxis.c skyframe.c specframe.c specmap.c slamap.c sphmap.c \
-unit.c unitmap.c wcsmap.c winmap.c shiftmap.c xml.c xmlchan.c zoommap.c 
+unit.c unitmap.c wcsmap.c tranmap.c winmap.c shiftmap.c xml.c xmlchan.c zoommap.c 
 
 
 #  The default error reporting module.
@@ -439,8 +439,16 @@ ERR_C_ROUTINES = err_null.c
 #  The error reporting module that uses EMS to deliver errors.
 EMS_C_ROUTINES = err_ems.c
 
-#  The default (null) graphics module.
-GRF_C_ROUTINES = grf_null.c
+#  The module containing null implementations of the graphics routines 
+#  required by AST V2.0
+GRF_2.0_C_ROUTINES = grf_2.0.c 
+
+#  The module containing null implementations of the graphics routines 
+#  added by AST V3.2 and not present in V2.0
+GRF_3.2_C_ROUTINES = grf_3.2.c 
+
+#  The default (null) graphics modules.
+GRF_C_ROUTINES = $(GRF_2.0_C_ROUTINES) $(GRF_3.2_C_ROUTINES)
 
 #  The graphics module that uses PGPLOT for graphical output.
 PGPLOT_C_ROUTINES = grf_pgplot.c
@@ -552,6 +560,8 @@ ERR_OBJECT_FILES = $(ERR_C_ROUTINES:.c=.o)
 
 EMS_OBJECT_FILES = $(EMS_C_ROUTINES:.c=.o)
 
+GRF_2.0_OBJECT_FILES = $(GRF_2.0_C_ROUTINES:.c=.o)
+GRF_3.2_OBJECT_FILES = $(GRF_3.2_C_ROUTINES:.c=.o)
 GRF_OBJECT_FILES = $(GRF_C_ROUTINES:.c=.o)
 
 PGPLOT_OBJECT_FILES = $(PGPLOT_C_ROUTINES:.c=.o)
@@ -567,8 +577,9 @@ WCSLIB_OBJECT_FILES = $(WCSLIB_C_ROUTINES:.c=.o)
 #  them.
 
 OBJECT_LIBRARIES = lib$(PKG_NAME).a \
-lib$(PKG_NAME)_ems.a lib$(PKG_NAME)_err.a lib$(PKG_NAME)_grf.a \
-lib$(PKG_NAME)_pgplot.a lib$(PKG_NAME)_slalib.a lib$(PKG_NAME)_wcslib.a
+lib$(PKG_NAME)_ems.a lib$(PKG_NAME)_err.a lib$(PKG_NAME)_grf_2.0.a \
+lib$(PKG_NAME)_grf_3.2.a lib$(PKG_NAME)_pgplot.a lib$(PKG_NAME)_slalib.a \
+lib$(PKG_NAME)_wcslib.a
 
 #  This library contains the main modules for the package.
 lib$(PKG_NAME).a: $(MAIN_OBJECT_FILES)
@@ -585,8 +596,15 @@ lib$(PKG_NAME)_ems.a: $(EMS_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
-#  This contains the default (null) graphics system.
-lib$(PKG_NAME)_grf.a: $(GRF_OBJECT_FILES)
+#  This contains null implementations of the graphics routines required by 
+#  AST V2.0
+lib$(PKG_NAME)_grf_2.0.a: $(GRF_2.0_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+#  This contains null implementations of the graphics routines added by 
+#  AST V3.2 which are not in AST V2.0.
+lib$(PKG_NAME)_grf_3.2.a: $(GRF_3.2_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
@@ -1314,6 +1332,8 @@ cmpframe.o: cmpframe.c error.h memory.h object.h channel.h mapping.h \
  cmpframe.h ast_err.h
 cmpmap.o: cmpmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h cmpmap.h ast_err.h
+tranmap.o: tranmap.c error.h memory.h object.h channel.h pointset.h \
+ mapping.h cmpmap.h tranmap.h ast_err.h
 dssmap.o: dssmap.c memory.h error.h object.h channel.h pointset.h \
  mapping.h fitschan.h wcsmap.h proj.h wcstrig.h wcsmath.h winmap.h dssmap.h \
  ast_err.h
@@ -1325,6 +1345,8 @@ fchannel.o: fchannel.c f77.h c2f77.h error.h memory.h channel.h \
 fcmpframe.o: fcmpframe.c f77.h c2f77.h error.h memory.h cmpframe.h \
  object.h channel.h frame.h axis.h mapping.h pointset.h frameset.h
 fcmpmap.o: fcmpmap.c f77.h c2f77.h error.h memory.h cmpmap.h mapping.h \
+ object.h channel.h pointset.h
+ftranmap.o: ftranmap.c f77.h c2f77.h error.h memory.h tranmap.h mapping.h \
  object.h channel.h pointset.h
 fdssmap.o: fdssmap.c f77.h c2f77.h error.h memory.h dssmap.h mapping.h \
  object.h channel.h pointset.h fitschan.h
@@ -1387,7 +1409,8 @@ fxmlchan.o: fxmlchan.c f77.h c2f77.h error.h memory.h xmlchan.h \
  channel.h object.h xml.h
 fzoommap.o: fzoommap.c f77.h c2f77.h error.h memory.h zoommap.h \
  mapping.h object.h channel.h pointset.h
-grf_null.o: grf_null.c grf.h error.h ast_err.h
+grf_2.0.o: grf_2.0.c grf.h error.h ast_err.h
+grf_3.2.o: grf_3.2.c grf.h error.h ast_err.h
 grf_pgplot.o: grf_pgplot.c f77.h c2f77.h pointset.h object.h error.h \
  channel.h memory.h grf.h ast_err.h
 grismmap.o: grismmap.c error.h memory.h object.h pointset.h mapping.h \
@@ -1400,7 +1423,7 @@ loader.o: loader.c axis.h object.h error.h channel.h cmpframe.h \
  frame.h mapping.h pointset.h frameset.h cmpmap.h dssmap.h fitschan.h \
  intramap.h loader.h lutmap.h mathmap.h matrixmap.h pcdmap.h permmap.h \
  plot.h skyaxis.h skyframe.h specframe.h slamap.h specmap.h sphmap.h unitmap.h wcsmap.h \
- proj.h wcstrig.h wcsmath.h shiftmap.h winmap.h zoommap.h ast_err.h unit.h
+ proj.h wcstrig.h wcsmath.h shiftmap.h winmap.h zoommap.h ast_err.h unit.h tranmap.h
 lutmap.o: lutmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h winmap.h lutmap.h ast_err.h
 mapping.o: mapping.c error.h memory.h object.h channel.h pointset.h \

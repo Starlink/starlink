@@ -47,6 +47,7 @@ fsphmap.c \
 funitmap.c \
 fwcsmap.c \
 fshiftmap.c \
+ftranmap.c \
 fwinmap.c \
 fxmlchan.c \
 fzoommap.c \
@@ -75,6 +76,7 @@ specframe.c \
 specmap.c \
 sphmap.c \
 tpn.c \
+tranmap.c \
 unit.c \
 unitmap.c \
 wcsmap.c \
@@ -132,6 +134,7 @@ slamap.h \
 specframe.h \
 specmap.h \
 sphmap.h \
+tranmap.h \
 unit.h \
 unitmap.h \
 wcsmap.h \

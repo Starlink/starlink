@@ -66,6 +66,11 @@ f     only within textual output (e.g. from AST_WRITE).
 *        method.
 *        - Modify DHmsGap to avoid decimal gap "4" which produces things
 *        like "0.0 0.4 0.8 1.2 1.6 2.0" ("4" replaced by "5").
+*     24-JAN-2004 (DSB):
+*        o  Added AxisFields.
+*        o  Added 'g' format character which produces graphical separators. 
+*        o  Modified AxisAbbrev to use AxisFields so that delimiters which 
+*           include digits can be recognised.
 *class--
 */
 
@@ -126,6 +131,17 @@ static double deg2rad;
 static double pi;
 static double piby2;
 
+
+/* Strings used as field delimiters when producing graphical labels.
+   These strings include escape sequences which the Plot class interprets
+   to produce super-scripts, suub-scripts, etc.*/
+static char *gh_delim  = "%-%^50+%s70+h%+";    /* Hours separator */
+static char *gm_delim  = "%-%^50+%s70+m%+";    /* Min.s separator */
+static char *gs_delim  = "%-%^50+%s70+s%+";    /* Sec.s separator */
+static char *gd_delim  = "%-%^53+%s60+o%+";    /* Deg.s separator */
+static char *gam_delim = "%-%^20+%s85+'%+";    /* Arc-min.s separator */
+static char *gas_delim = "%-%^20+%s85+\"%+";   /* Arc-sec.s separator */
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -135,7 +151,7 @@ AstSkyAxis *astSkyAxisId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static const char *AxisAbbrev( AstAxis *, const char *, const char * );
+static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char * );
 static const char *AxisFormat( AstAxis *, double );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetAxisFormat( AstAxis * );
@@ -150,6 +166,7 @@ static double AxisOffset( AstAxis *, double, double );
 static double DHmsGap( const char *, double, int * );
 static double GetAxisTop( AstAxis * );
 static double GetAxisBottom( AstAxis * );
+static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisAsTime( AstSkyAxis * );
 static int GetAxisDirection( AstAxis * );
@@ -175,7 +192,7 @@ static void SetAxisIsLatitude( AstSkyAxis *, int );
 
 /* Member functions. */
 /* ================= */
-static const char *AxisAbbrev( AstAxis *this_axis,
+static const char *AxisAbbrev( AstAxis *this_axis, const char *fmt,
                                const char *str1, const char *str2 ) {
 /*
 *  Name:
@@ -189,7 +206,7 @@ static const char *AxisAbbrev( AstAxis *this_axis,
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *AxisAbbrev( AstAxis *this,
+*     const char *AxisAbbrev( AstAxis *this, const char *fmt,
 *                             const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -198,14 +215,17 @@ static const char *AxisAbbrev( AstAxis *this_axis,
 
 *  Description:
 *     This function compares two SkyAxis values that have been
-*     formatted (using astAxisFormat) and determines if they have any
-*     redundant leading fields (i.e. leading fields in common which
-*     can be suppressed when tabulating the values or plotting them on
-*     the axis of a graph).
+*     formatted with the supplied format specifier (using astAxisFormat) 
+*     and determines if they have any redundant leading fields (i.e. 
+*     leading fields in common which can be suppressed when tabulating 
+*     the values or plotting them on the axis of a graph).
 
 *  Parameters:
 *     this
 *        Pointer to the SkyAxis.
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format specifier used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
 *        first formatted value.
@@ -224,19 +244,20 @@ static const char *AxisAbbrev( AstAxis *this_axis,
 *     end of this string.
 
 *  Notes:
-*     - This function assumes that the format specification used was
-*     the same when both values were formatted.
 *     - A pointer to the start of "str2" will be returned if this
 *     function is invoked with the global error status set, or if it
 *     should fail for any reason.
 */
 
 /* Local Variables: */
+   char *fld1[ 3 ];              /* Pointers to start of each field in str1 */
+   char *fld2[ 3 ];              /* Pointers to start of each field in str2 */
    const char *result;           /* Result pointer to return */
-   int delim1;                   /* First character is a delimiter? */
-   int delim2;                   /* Second character is a delimiter? */
-   int i;                        /* Loop counter for string characters */
-   int same;                     /* Same characters? */
+   int i;                        /* Loop counter for string fields */
+   int nf1;                      /* Number of fields found in str1 */
+   int nf2;                      /* Number of fields found in str2 */
+   int nc1[ 3 ];                 /* Length of each field in str1 */
+   int nc2[ 3 ];                 /* Length of each field in str2 */
 
 /* Initialise. */
    result = str2;
@@ -244,41 +265,28 @@ static const char *AxisAbbrev( AstAxis *this_axis,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Loop to inspect corresponding characters from each string. */
-   for ( i = 0; ; i++ ) {
+/* Find the fields within the two strings. */
+   nf1 = astAxisFields( this_axis, fmt, str1, 3, fld1, nc1, NULL );
+   nf2 = astAxisFields( this_axis, fmt, str2, 3, fld2, nc2, NULL );
 
-/* Determine if the two characters are the same and whether each is a
-   delimiter character. */
-      same = ( str1[ i ] == str2[ i ] );
-      delim1 = !strchr( "+-0123456789.", str1[ i ] );
-      delim2 = !strchr( "+-0123456789.", str2[ i ] );
+/* Loop to inspect corresponding fields from each string. */
+   for ( i = 0; i < nf1 && i < nf2; i++ ) {
 
-/* Test to see if the end of a field has been reached. This will be
-   the case if both strings contain the same delimiter character at
-   this point, or if either string terminates at this point while the
-   other one contains a delimiter, or if both strings terminate at
-   this point. */
-      if ( ( delim1 && same ) ||
-           ( !str1[ i ] && delim2 ) || ( !str2[ i ] && delim1 ) ||
-           ( !str1[ i ] && !str2[ i ] ) ) {
-
-/* Once the end of a field has been found, advance the result pointer
-   to the delimiter at its end in "str2". */
-         result = str2 + i;
-
-/* If the delimiter is not the end of the string, move on to the start
-   of the next field. */
-         if ( *result ) result++;
-
-/* If we have not found a delimiter in both strings, then check that
-   the two characters are the same. If not, we have a differing field,
-   so quit looping. */
-      } else if ( !same ) {
+/* If the fields are different, break out of the loop. */
+      if ( nc1[ i ] != nc2[ i ] || 
+           strncmp( fld1[ i ], fld2[ i ], nc1[ i ] ) ) {
          break;
-      }
 
-/* Quit looping once the end if either string is reached. */
-      if ( !str1[ i ] || !str2[ i ] ) break;
+/* Otherwise, move the returned poitner on to point to the start of the
+   next field in str2. If we are already at the last field in str2,
+   return a pointer to the terminating null. */
+      } else {
+         if ( i + 1 < nf2 ) {
+            result = fld2[ i + 1 ];
+         } else {
+            result = strchr( str2, '\0' );
+         }
+      }
    }
 
 /* Return the result. */
@@ -341,6 +349,316 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
 /* Check both axis values are OK, and form the returned increment,
    normalizing it into the range +PI to -PI. */
    if( v1 != AST__BAD && v2 != AST__BAD ) result = slaDrange( v2 - v1 );
+
+/* Return the result. */
+   return result;
+}
+
+static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str, 
+                       int maxfld, char **fields, int *nc, double *val ) {
+/*
+*  Name:
+*     astAxisFields
+
+*  Purpose:
+*     Identify numerical fields within a formatted SkyAxis value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     int AxisFields( AstAxis *this_axis, const char *fmt, const char *str, 
+*                     int maxfld, char **fields, int *nc, double *val ) 
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the protected astAxisFields
+*     method inherited from the Axis class).
+
+*  Description:
+*     This function identifies the numerical fields within a SkyAxis value
+*     that have been formatted using astAxisFormat. It assumes that the
+*     value was formatted using the supplied format string. It also
+*     returns the equivalent floating point value in radians.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyAxis.
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format used when creating "str".
+*     str
+*        Pointer to a constant null-terminated string containing the
+*        formatted value.
+*     maxfld
+*        The maximum number of fields to identify within "str".
+*     fields
+*        A pointer to an array of at least "maxfld" character pointers. 
+*        Each element is returned holding a pointer to the start of the 
+*        corresponding field  in "str" (in the order in which they occur 
+*        within "str"), or NULL if no corresponding field can be found. 
+*     nc
+*        A pointer to an array of at least "maxfld" integers. Each
+*        element is returned holding the number of characters in the
+*        corresponding field, or zero if no corresponding field can be
+*        found.
+*     val
+*        Pointer to a location at which to store the radians value
+*        equivalent to the returned field values. If this is NULL, 
+*        it is ignored.
+
+*  Returned Value:
+*     The number of fields succesfully identified and returned.
+
+*  Notes:
+*     - Leading and trailing spaces are ignored.
+*     - If the formatted value is not consistent with the supplied format
+*     string, then a value of zero will be returned, "fields" will be
+*     returned holding NULLs, "nc" will be returned holding zeros, and
+*     "val" is returned holding VAL__BAD.
+*     - Fields are counted from the start of the formatted string. If the
+*     string contains more than "maxfld" fields, then trailing fields are
+*     ignored.
+*     - If this function is invoked with the global error status set, or 
+*     if it should fail for any reason, then a value of zero will be returned 
+*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     holding their supplied values
+
+*/
+
+/* Local Variables: */
+   char sep;                     /* Field separator character */
+   char tbuf[2];                 /* Buffer for terminator string */
+   char *p;                      /* Pointer to next character */
+   char *t;                      /* Pointer to start of terminator string */
+   char *term;                   /* Pointer to terminator string */
+   double dval;                  /* Value read from string */
+   double value;                 /* Equivalent radians value */
+   int as_time;                  /* Format the value as a time? */
+   int dh;                       /* Hours field required? */
+   int ifld;                     /* Field index */
+   int lead_zero;                /* Add leading zeros? */
+   int min;                      /* Minutes field required? */
+   int ndp;                      /* Number of decimal places */
+   int ok;                       /* Value and format consistent? */
+   int plus;                     /* Add leading plus sign? */
+   int result;                   /* Result fields count to return */
+   int sec;                      /* Seconds field required? */
+   int sign;                     /* The sign of the radians value */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise. */
+   result = 0;
+   for( ifld = 0; ifld < maxfld; ifld++ ) {
+      fields[ ifld ] = NULL;
+      nc[ ifld ] = 0;
+   }
+   if( val ) *val = AST__BAD;
+
+/* Parse the format specifier. */
+   ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
+                   &ndp );
+
+/* Only proceed if the format was parsed succesfully, and the supplied arrays 
+   are not of zero size. */
+   if( astOK && maxfld > 0 ) {
+
+/* Indicate that we have not yet found any inconsistency between the 
+   formatted value and the forat string. */
+      ok = 1;
+
+/* Variable "p" points to the next character to be read from the
+   formatted string. Initialise it to point to the first non-space
+   character. */
+      p = (char *) str;
+      while( *p == ' ' ) p++;
+
+/* Note the start of the first field. */
+      fields[ 0 ] = p;
+
+/* If the first non-blank character is a + or - sign, skip it and note
+   the sign of the final value. */
+      sign = 1;
+      if( *p == '-' ) {
+         sign = -1;
+         p++;
+      } else if( *p == '+' ) {
+         p++;
+      }     
+
+/* Initialise the equivalent radian value. */
+      value = 0.0;
+
+/* If the format string specifies a degrees or hours field, it should be 
+   the first field. */
+      if( dh ) {
+
+/* If the format indicates that fields are separated by characters, or if
+   there is a minutes or seconds field, then the first field should end with 
+   the appropriate separator. In these cases locate the terminator,and
+   store the length of the first field. */
+         if( sep == 'l' || sep == 'g' || min || sec ) {
+
+            if( sep == 'l' ) {
+               term = as_time ? "h" : "d";
+      
+            } else if( sep == 'g' ) {
+               term = as_time ? gh_delim : gd_delim;
+   
+            } else {
+               tbuf[ 0 ] = sep;
+               tbuf[ 1 ] = '\0';
+               term = tbuf;
+            }
+
+            t = strstr( p, term );
+            if( t ) {
+               nc[ 0 ] = t - fields[ 0 ];
+            } else {
+               ok = 0;
+            }
+
+/* Move on to the first character following the terminator. */
+            p = t + strlen( term );
+
+/* In all other cases, the first field is the only field and is not
+   terminated. Note its length (ignoring trailing spaces). */
+         } else {
+            nc[ 0 ] = astChrLen( fields[ 0 ] );
+            p += nc[ result ];
+         }
+
+/* Read a numerical value from the first field. */
+         if( astSscanf( fields[ 0 ], "%lg", &dval ) ) {
+            value = fabs( dval );
+         } else {
+            ok = 0;
+         }
+
+/* Increment then number of returned fields if OK */
+         if( ok ) result++;
+
+      }
+
+/* If the format string specifies a minutes field, it should be the next
+   field. */
+      if( min && ok ) {
+
+/* Note the start of the next field. */
+         fields[ result ] = p;
+
+/* If the format indicates that fields are separated by characters, or if
+   there is a seconds field, then this field should end with the appropriate 
+   separator. In these cases locate the terminator,and store the length of 
+   this field. */
+         if( sep == 'l' || sep == 'g' || sec ) {
+            if( sep == 'l' ) {
+               term = "m";
+
+            } else if( sep == 'g' ) {
+               term = as_time ? gm_delim : gam_delim;
+
+            } else {
+               tbuf[ 0 ] = sep;
+               tbuf[ 1 ] = '\0';
+               term = tbuf;
+            }
+
+            t = strstr( p, term );
+            if( t ) {
+               nc[ result ] = t - fields[ result ];
+            } else {
+               ok = 0;
+            }
+
+/* Move on to the first character following the terminator. */
+            p = t + strlen( term );
+
+/* In all other cases, this field is not terminated. Note its length 
+   (ignoring trailing spaces). */
+         } else {
+            nc[ result ] = astChrLen( fields[ result ] );
+            p += nc[ result ];
+         }
+
+/* Read a numerical value from this field. */
+         if( astSscanf( fields[ result ], "%lg", &dval ) ) {
+            value += dval/60.0;
+         } else {
+            ok = 0;
+         }
+
+/* Increment then number of returned fields if OK */
+         if( ok ) result++;
+
+      }
+
+/* If the format string specifies a seconds field, it should be the next
+   field. */
+      if( sec && ok ) {
+
+/* Note the start of the next field. */
+         fields[ result ] = p;
+
+/* If the format indicates that fields are separated by characters, then this 
+   field should end with the appropriate separator. In this case locate the 
+   terminator,and store the length of this field. */
+         if( sep == 'l' || sep == 'g' ) {
+            if( sep == 'l' ) {
+               term = "s";
+            } else {
+               term = as_time ? gs_delim : gas_delim;
+            }
+
+            t = strstr( p, term );
+            if( t ) {
+               nc[ result ] = t - fields[ result ];
+            } else {
+               ok = 0;
+            }
+
+/* Move on to the first character following the terminator. */
+            p = t + strlen( term );
+
+/* In all other cases, this field is not terminated. Note its length 
+   (ignoring trailing spaces). */
+         } else {
+            nc[ result ] = astChrLen( fields[ result ] );
+            p += nc[ result ];
+         }
+
+/* Read a numerical value from this field. */
+         if( astSscanf( fields[ result ], "%lg", &dval ) ) {
+            value += dval/3600.0;
+         } else {
+            ok = 0;
+         }
+
+/* Increment then number of returned fields if OK */
+         if( ok ) result++;
+
+      }
+
+/* Check that nothing is left.*/
+      if( astChrLen( p ) > 0 ) ok = 0;
+
+/* If OK, convert the axis value to radians. */
+      if( ok ) {
+         if( val ) {
+            *val = sign*value*( as_time ? hr2rad : deg2rad );
+         }
+
+/* Otherwise, return zero. */
+      } else {
+         result = 0;
+         for( ifld = 0; ifld < maxfld; ifld++ ) {
+            fields[ ifld ] = NULL;
+            nc[ ifld ] = 0;
+         }
+      }
+   }
 
 /* Return the result. */
    return result;
@@ -856,6 +1174,11 @@ static const char *DHmsFormat( const char *fmt, double value ) {
 *     'l'
 *        Use a letter ('d'/'h', 'm' or 's' as appropriate) to separate
 *        and identify fields.
+*     'g'
+*        As 'l', but escape sequences are included in the returned
+*        character string which cause the separators ('h', 'd', 'm', etc)
+*        to be drawn as small super-scripts when plotted by the astText
+*        or astGrid.
 *     'd'
 *        Express the value as an angle and include a degrees
 *        field. Expressing the value as an angle is also the default
@@ -1113,15 +1436,19 @@ static const char *DHmsFormat( const char *fmt, double value ) {
 
 /* If letters are being used as field separators, and there are more
    fields to follow, append "d" or "h" as necessary. */
-            if ( ( sep == 'l' ) && ( min || sec ) ) {
-               buff[ pos++ ] = ( as_time ? 'h' : 'd' );
+            if ( min || sec ) {
+               if ( sep == 'l' ) {
+                  buff[ pos++ ] = ( as_time ? 'h' : 'd' );
+               } else if( sep == 'g' ) {
+                  pos += sprintf( buff + pos, "%s", as_time ? gh_delim : gd_delim );
+               } 
             }
          }
 
 /* If a minutes field is required, first add an appropriate non-letter
    field separator if needed. */
          if ( min ) {
-            if ( ( sep != 'l' ) && dh ) buff[ pos++ ] = sep;
+            if ( ( sep != 'l' && sep != 'g' ) && dh ) buff[ pos++ ] = sep;
 
 /* Then format the minutes field with a leading zero to make it two
    digits if necessary. */
@@ -1129,14 +1456,20 @@ static const char *DHmsFormat( const char *fmt, double value ) {
                             imin );
 
 /* If letters are being used as field separators, and there is another
-   field to follow, append "m". */
-            if ( ( sep == 'l' ) && sec ) buff[ pos++ ] = 'm';
+   field to follow, append the separator. */
+            if ( sec ) {
+               if ( sep == 'l' ) {
+                  buff[ pos++ ] = 'm';
+               } else if( sep == 'g' ) {
+                  pos += sprintf( buff + pos, "%s", as_time ? gm_delim : gam_delim );
+               }
+            }
          }
 
 /* Similarly, if a seconds field is required, first add an appropriate
    non-letter field separator if needed. */
          if ( sec ) {
-            if ( ( sep != 'l' ) && ( dh || min ) ) buff[ pos++ ] = sep;
+            if ( ( sep != 'l' && sep != 'g' ) && ( dh || min ) ) buff[ pos++ ] = sep;
 
 /* Then format the seconds field with a leading zero to make it two
    digits if necessary. */
@@ -1157,6 +1490,10 @@ static const char *DHmsFormat( const char *fmt, double value ) {
          if ( sep == 'l' ) {
             buff[ pos++ ] = ( sec ? 's' : ( min ? 'm' :
                                                   ( as_time ? 'h' : 'd' ) ) );
+         } else if ( sep == 'g' ) {
+            pos += sprintf( buff + pos, "%s", 
+                as_time ? ( sec ? gs_delim : ( min ? gm_delim : gh_delim ) ) : 
+                          ( sec ? gas_delim : ( min ? gam_delim : gd_delim ) ) );
          }
 
 /* Terminate the result string and return a pointer to it. */
@@ -1558,7 +1895,7 @@ static const char *DHmsUnit( const char *fmt, int output ) {
    "012d34m56s"), then the units will already be clear so return a
    pointer to an empty units string. */
    if ( astOK ) {
-      if ( output && sep == 'l' ) {
+      if ( output && ( sep == 'l' || sep == 'g' ) ) {
          result = "";
 
 /* Otherwise, if the units string is required to describe formatted
@@ -1584,7 +1921,7 @@ static const char *DHmsUnit( const char *fmt, int output ) {
 
 /* Decide which field separator to use (use a space if letters were
    requested since it is easier to input). */
-         if ( sep == 'l' ) sep = ' ';
+         if ( sep == 'l' || sep == 'g' ) sep = ' ';
 
 /* Start with the "ddd" or "hh" field, if required, and update the
    decimal places character appropriately. */
@@ -2409,6 +2746,7 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    axis->AxisAbbrev = AxisAbbrev;
+   axis->AxisFields = AxisFields;
    axis->AxisFormat = AxisFormat;
    axis->AxisGap = AxisGap;
    axis->AxisDistance = AxisDistance;
@@ -2471,7 +2809,9 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
 *        separate the fields.  The returned value will be one of ' '
 *        (use a blank as the separator), ':' (use a colon as the
 *        separator) or 'l' (use one of the letters "hdms" as
-*        appropriate).
+*        appropriate)  or 'g' (use one of the letters "hdms" but
+*        include suitable escape sequences to allow the Plot class to draw
+*        the letter as a small super-script).
 *     plus
 *        Pointer to an int in which a boolean value will be returned
 *        to indicate if a plus sign should be prefixed to positive
@@ -2545,7 +2885,8 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
             *lead_zero = 1;
             break;
 
-/* Set the required separator. */
+/* Set the required separator. Note we only use graphical separators if
+   astEscapes indicates that escape sequences are currently being used. */
          case 'I': case 'i':
             *sep = ':';
             break;
@@ -2554,6 +2895,9 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
             break;
          case 'L': case 'l':
             *sep = 'l';
+            break;
+         case 'G': case 'g':
+            *sep = astEscapes( -1 ) ? 'g' : 'l';
             break;
 
 /* Note if the value is to be formatted as a time (but not if a

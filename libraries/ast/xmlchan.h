@@ -79,6 +79,9 @@ typedef struct AstXmlChan {
    int write_isa;              /* Is the next "isA" really needed? */
    int xmlindent;              /* Indentat output? */
    int xmllength;              /* Buffer length */
+   int xmlformat;              /* Output format to use when writing */
+   int formatdef;              /* Default format */
+   char *xmlprefix;            /* Namespace prefix */
    int reset_source;           /* Read a new line from the source ? */
    const char *isa_class;      /* Class being loaded */
 } AstXmlChan;
@@ -106,6 +109,16 @@ typedef struct AstXmlChanVtab {
    int (* TestXmlLength)( AstXmlChan * );
    void (* ClearXmlLength)( AstXmlChan * );
    void (* SetXmlLength)( AstXmlChan *, int );
+
+   int (* GetXmlFormat)( AstXmlChan * );
+   int (* TestXmlFormat)( AstXmlChan * );
+   void (* ClearXmlFormat)( AstXmlChan * );
+   void (* SetXmlFormat)( AstXmlChan *, int );
+
+   const char * (* GetXmlPrefix)( AstXmlChan * );
+   int (* TestXmlPrefix)( AstXmlChan * );
+   void (* ClearXmlPrefix)( AstXmlChan * );
+   void (* SetXmlPrefix)( AstXmlChan *, const char * );
 
 } AstXmlChanVtab;
 #endif
@@ -165,6 +178,18 @@ int astGetXmlLength_( AstXmlChan * );
 int astTestXmlLength_( AstXmlChan * );
 void astClearXmlLength_( AstXmlChan * );
 void astSetXmlLength_( AstXmlChan *, int );
+
+int astGetXmlFormat_( AstXmlChan * );
+int astTestXmlFormat_( AstXmlChan * );
+void astClearXmlFormat_( AstXmlChan * );
+void astSetXmlFormat_( AstXmlChan *, int );
+
+const char * astGetXmlPrefix_( AstXmlChan * );
+int astTestXmlPrefix_( AstXmlChan * );
+void astClearXmlPrefix_( AstXmlChan * );
+void astSetXmlPrefix_( AstXmlChan *, const char * );
+
+
 #endif
 
 /* Function interfaces. */
@@ -224,6 +249,16 @@ astINVOKE(O,astLoadXmlChan_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astGetXmlLength(this) astINVOKE(V,astGetXmlLength_(astCheckXmlChan(this)))
 #define astSetXmlLength(this,xmllength) astINVOKE(V,astSetXmlLength_(astCheckXmlChan(this),xmllength))
 #define astTestXmlLength(this) astINVOKE(V,astTestXmlLength_(astCheckXmlChan(this)))
+
+#define astClearXmlFormat(this) astINVOKE(V,astClearXmlFormat_(astCheckXmlChan(this)))
+#define astGetXmlFormat(this) astINVOKE(V,astGetXmlFormat_(astCheckXmlChan(this)))
+#define astSetXmlFormat(this,xmlformat) astINVOKE(V,astSetXmlFormat_(astCheckXmlChan(this),xmlformat))
+#define astTestXmlFormat(this) astINVOKE(V,astTestXmlFormat_(astCheckXmlChan(this)))
+
+#define astClearXmlPrefix(this) astINVOKE(V,astClearXmlPrefix_(astCheckXmlChan(this)))
+#define astGetXmlPrefix(this) astINVOKE(V,astGetXmlPrefix_(astCheckXmlChan(this)))
+#define astSetXmlPrefix(this,xmlpref) astINVOKE(V,astSetXmlPrefix_(astCheckXmlChan(this),xmlpref))
+#define astTestXmlPrefix(this) astINVOKE(V,astTestXmlPrefix_(astCheckXmlChan(this)))
 
 #endif
 

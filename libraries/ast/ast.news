@@ -16,6 +16,56 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+ o  The Plot class now provides facilities for modifying the appearance of
+ sub-strings within text strings such as axis labels, titles, etc, by
+ producing super-scripts, sub-scripts, changing the font colour, size,
+ etc. See attribute Escape.
+
+ o  The default value of the Tol attribute of the Plot class has been
+ changed from 0.001 to 0.01. This should not usually cause any significant 
+ visible change to the plot, but should make the plotting faster. You may
+ need to set a lower value for Tol if you are producing a particularly
+ large plot.
+
+ o Some bugs have been fixed in the Plot class which could cause the
+ system to hang for a long time while drawing certain all-sky grids
+ (notable some of the FITS Quad-cube projections). 
+
+ o  The SkyAxis class has extended the Format attribute by the addition of
+ the "g" option. this option is similar to the older "l" option in that
+ it results in characters ("h", "m", "s", etc) being used as delimiters
+ between the sexagesimal fields of the celestial position. The difference
+ is that the "g" option includes graphics escape sequences in the
+ returned formatted string which result in the field delimiter characters
+ being drawn as super-scripts when plotted as numerical axis values by a
+ Plot.
+
+ o  The Plot class has been extended to include facilities for producing
+ logarithmic axes. See attributes LogPlot, LogTicks, LogGap and LogLabel.
+
+ o  New functions astGCap and astGScales have been added to the interface
+ defined by file grf.h. The ast_link command has been modified so that
+ the -mygrf switch loads dummy versions of the new grf functions. This
+ means that applications should continue to build without any change.
+ However, the facilities for interpreting escape sequences within strings
+ drawn by the Plot class will not be available unless the new grf
+ functions are implemented. If you choose to implement them, you
+ should modify your linking procedure to use the -grf switch in place of
+ the older -mygrf switch. See the description of the ast_link command for
+ details of the new switches. As of this version of AST, calls are made to
+ the astGQch function, and so any bugs in the implementation of astGQch may
+ cause spurious behaviour when plotting text strings.
+
+ o  A new class of Mapping, the TranMap, has been introduced. A TranMap
+ takes its forward transformation from an existing Mapping, and its
+ inverse transformation from another existing Mapping.
+
+ o  A bug has been fixed in WcsMap which caused error reports to include
+ erroneous axis numbers when referring to missing parameter values.
+
+Main Changes in Previous Version
+----------------------------
+
  o  Addition of a new class called XmlChan - a Channel which 
     reads and writes AST objects in the form of XML.
 

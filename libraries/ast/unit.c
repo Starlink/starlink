@@ -24,6 +24,8 @@
 *  History:
 *     10-DEC-2002 (DSB):
 *        Original version.
+*     10-FEB-2004 (DSB):
+*        Added debug conditional code to keep track of memory leaks.
 */
 
 /* Module Macros. */
@@ -2561,11 +2563,20 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
 /* Local Variables: */
    KnownUnit *result;
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the global error status. */
    if( !astOK ) return;
 
 /* Allocate memory for the structure, and check the returned pointer can
    be used safely. */
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
    result = astMalloc( sizeof( KnownUnit ) );
    if( astOK ) {
 
@@ -2583,6 +2594,10 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
    supplied. */
       result->head = exp ? CreateTree( exp ) : NULL;
    }
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* If an error has occurred, free any returned structure. */
    if( !astOK ) {

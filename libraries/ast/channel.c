@@ -199,7 +199,6 @@ static AstObject *Read( AstChannel * );
 static AstObject *ReadObject( AstChannel *, const char *, AstObject * );
 static Value *FreeValue( Value * );
 static Value *LookupValue( const char * );
-static char *AppendString( char *, int *, const char * );
 static char *InputTextItem( AstChannel * );
 static char *InputTextItem( AstChannel * );
 static char *ReadString( AstChannel *, const char *, const char * );
@@ -244,98 +243,6 @@ static void WriteString( AstChannel *, const char *, int, int, const char *, con
 
 /* Member functions. */
 /* ================= */
-static char *AppendString( char *str1, int *nc, const char *str2 ) {
-/*
-*  Name:
-*     AppendString
-
-*  Purpose:
-*     Append a string to another string which grows dynamically.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "channel.h"
-*     char *AppendString( char *str1, int *nc, const char *str2 )
-
-*  Class Membership:
-*     Channel member function.
-
-*  Description:
-*     This function appends one string to another dynamically
-*     allocated string, extending the dynamic string as necessary to
-*     accommodate the new characters (plus the final null).
-
-*  Parameters:
-*     str1
-*        Pointer to the null-terminated dynamic string, whose memory
-*        has been allocated using the AST memory allocation functions
-*        defined in "memory.h". If no space has yet been allocated for
-*        this string, a NULL pointer may be given and fresh space will
-*        be allocated by this function.
-*     nc
-*        Pointer to an integer containing the number of characters in
-*        the dynamic string (excluding the final null). This is used
-*        to save repeated searching of this string to determine its
-*        length and it defines the point where the new string will be
-*        appended. Its value is updated by this function to include
-*        the extra characters appended.
-*
-*        If "str1" is NULL, the initial value supplied for "*nc" will
-*        be ignored and zero will be used.
-*     str2
-*        Pointer to a constant null-terminated string, a copy of which
-*        is to be appended to "str1".
-
-*  Returned Value:
-*     A possibly new pointer to the dynamic string with the new string
-*     appended (its location in memory may have to change if it has to
-*     be extended, in which case the original memory is automatically
-*     freed by this function). When the string is no longer required,
-*     its memory should be freed using astFree.
-
-*  Notes:
-*     - If this function is invoked with the global error status set
-*     or if it should fail for any reason, then the returned pointer
-*     will be equal to "str1" and the dynamic string contents will be
-*     unchanged.
-*/
-
-/* Local Variables: */
-   char *result;                 /* Pointer value to return */
-   int len;                      /* Length of new string */
-
-/* Initialise. */
-   result = str1;
-
-/* If the first string pointer is NULL, also initialise the character
-   count to zero. */
-   if ( !str1 ) *nc = 0;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Calculate the total string length once the two strings have been
-   concatenated. */
-   len = *nc + (int) strlen( str2 );
-
-/* Extend the first (dynamic) string to the required length, including
-   a final null. Save the resulting pointer, which will be
-   returned. */
-   result = astGrow( str1, len + 1, sizeof( char ) );
-
-/* If OK, append the second string and update the total character
-   count. */
-   if ( astOK ) {
-      (void) strcpy( result + *nc, str2 );
-      *nc = len;
-   }
-
-/* Return the result pointer. */
-   return result;
-}
-
 static void AppendValue( Value *value, Value **head ) {
 /*
 *  Name:
@@ -3171,6 +3078,14 @@ f        invocation of AST_WRITE (normally, this will be one).
 c     with the AST error status set, or if it should fail for any
 f     with STATUS set to an error value, or if it should fail for any
 *     reason.
+*     - Invoking this function will usually cause the sink function 
+*     associated with the channel to be called in order to transfer a
+*     textual description of the supplied object to some external data
+*     store. However, the FitsChan class behaves differently. Invoking
+*     this function on a FitsChan causes new FITS header cards to be
+*     added to an internal buffer (the sink function is not invoked). 
+*     This buffer is written out through the sink function only when the 
+*     FitsChan is deleted.
 *--
 */
 
@@ -3242,19 +3157,19 @@ static void WriteBegin( AstChannel *this, const char *class,
 
 /* Start building a dynamic string with an initial space. Then add
    further spaces to suit the current indentation level. */
-   line = AppendString( NULL, &nc, " " );
+   line = astAppendString( NULL, &nc, " " );
    for ( i = 0; i < current_indent; i++ ) {
-      line = AppendString( line, &nc, " " );
+      line = astAppendString( line, &nc, " " );
    }
 
 /* Append the "Begin" keyword followed by the class name. */
-   line = AppendString( line, &nc, "Begin " );
-   line = AppendString( line, &nc, class );
+   line = astAppendString( line, &nc, "Begin " );
+   line = astAppendString( line, &nc, class );
 
 /* If required, also append the comment. */
    if ( astGetComment( this ) && *comment ) {
-      line = AppendString( line, &nc, " \t# " );
-      line = AppendString( line, &nc, comment );
+      line = astAppendString( line, &nc, " \t# " );
+      line = astAppendString( line, &nc, comment );
    }
 
 /* Write out the resulting line of text. */
@@ -3377,14 +3292,14 @@ static void WriteDouble( AstChannel *this, const char *name,
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
    current indentation level. */
-      line = AppendString( NULL, &nc, set ? " " : "#" );
+      line = astAppendString( NULL, &nc, set ? " " : "#" );
       for ( i = 0; i < current_indent; i++ ) {
-         line = AppendString( line, &nc, " " );
+         line = astAppendString( line, &nc, " " );
       }
 
 /* Append the name string followed by " = ". */
-      line = AppendString( line, &nc, name );
-      line = AppendString( line, &nc, " = " );
+      line = astAppendString( line, &nc, name );
+      line = astAppendString( line, &nc, " = " );
 
 /* Format the value as a string and append this. Make sure "-0" isn't
    produced. */
@@ -3393,12 +3308,12 @@ static void WriteDouble( AstChannel *this, const char *name,
          buff[ 0 ] = '0';
          buff[ 1 ] = '\0';
       }
-      line = AppendString( line, &nc, buff );
+      line = astAppendString( line, &nc, buff );
 
 /* If required, also append the comment. */
       if ( astGetComment( this ) && *comment ) {
-         line = AppendString( line, &nc, " \t# " );
-         line = AppendString( line, &nc, comment );
+         line = astAppendString( line, &nc, " \t# " );
+         line = astAppendString( line, &nc, comment );
       }
 
 /* Write out the resulting line of text. */
@@ -3460,14 +3375,14 @@ static void WriteEnd( AstChannel *this, const char *class ) {
 
 /* Start building a dynamic string with an initial space. Then add
    further spaces to suit the current indentation level. */
-   line = AppendString( NULL, &nc, " " );
+   line = astAppendString( NULL, &nc, " " );
    for ( i = 0; i < current_indent; i++ ) {
-      line = AppendString( line, &nc, " " );
+      line = astAppendString( line, &nc, " " );
    }
 
 /* Append the "End" keyword followed by the class name. */
-   line = AppendString( line, &nc, "End " );
-   line = AppendString( line, &nc, class );
+   line = astAppendString( line, &nc, "End " );
+   line = astAppendString( line, &nc, class );
 
 /* Write out the resulting line of text. */
    OutputTextItem( this, line );
@@ -3583,23 +3498,23 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
    current indentation level. */
-      line = AppendString( NULL, &nc, set ? " " : "#" );
+      line = astAppendString( NULL, &nc, set ? " " : "#" );
       for ( i = 0; i < current_indent; i++ ) {
-         line = AppendString( line, &nc, " " );
+         line = astAppendString( line, &nc, " " );
       }
 
 /* Append the name string followed by " = ". */
-      line = AppendString( line, &nc, name );
-      line = AppendString( line, &nc, " = " );
+      line = astAppendString( line, &nc, name );
+      line = astAppendString( line, &nc, " = " );
 
 /* Format the value as a decimal string and append this. */
       (void) sprintf( buff, "%d", value );
-      line = AppendString( line, &nc, buff );
+      line = astAppendString( line, &nc, buff );
 
 /* If required, also append the comment. */
       if ( astGetComment( this ) && *comment ) {
-         line = AppendString( line, &nc, " \t# " );
-         line = AppendString( line, &nc, comment );
+         line = astAppendString( line, &nc, " \t# " );
+         line = astAppendString( line, &nc, comment );
       }
 
 /* Write out the resulting line of text. */
@@ -3708,19 +3623,19 @@ static void WriteIsA( AstChannel *this, const char *class,
    further spaces to suit the current indentation level, but reduced
    by one to allow the "IsA" item to match the "Begin" and "End" items
    which enclose it. */
-      line = AppendString( NULL, &nc, " " );
+      line = astAppendString( NULL, &nc, " " );
       for ( i = 0; i < ( current_indent - INDENT_INC ); i++ ) {
-         line = AppendString( line, &nc, " " );
+         line = astAppendString( line, &nc, " " );
       }
 
 /* Append the "IsA" keyword followed by the class name. */
-      line = AppendString( line, &nc, "IsA " );
-      line = AppendString( line, &nc, class );
+      line = astAppendString( line, &nc, "IsA " );
+      line = astAppendString( line, &nc, class );
 
 /* If required, also append the comment. */
       if ( astGetComment( this ) && *comment ) {
-         line = AppendString( line, &nc, " \t# " );
-         line = AppendString( line, &nc, comment );
+         line = astAppendString( line, &nc, " \t# " );
+         line = astAppendString( line, &nc, comment );
       }
 
 /* Write out the resulting line of text. */
@@ -3838,21 +3753,21 @@ static void WriteObject( AstChannel *this, const char *name,
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
    current indentation level. */
-      line = AppendString( NULL, &nc, set ? " " : "#" );
+      line = astAppendString( NULL, &nc, set ? " " : "#" );
       for ( i = 0; i < current_indent; i++ ) {
-         line = AppendString( line, &nc, " " );
+         line = astAppendString( line, &nc, " " );
       }
 
 /* Append the name string followed by " =". The absence of a value on
    the right hand side indicates an Object value, whose definition
    follows. */
-      line = AppendString( line, &nc, name );
-      line = AppendString( line, &nc, " =" );
+      line = astAppendString( line, &nc, name );
+      line = astAppendString( line, &nc, " =" );
 
 /* If required, also append the comment. */
       if ( astGetComment( this ) && *comment ) {
-         line = AppendString( line, &nc, " \t# " );
-         line = AppendString( line, &nc, comment );
+         line = astAppendString( line, &nc, " \t# " );
+         line = astAppendString( line, &nc, comment );
       }
 
 /* Write out the resulting line of text. */
@@ -3979,16 +3894,16 @@ static void WriteString( AstChannel *this, const char *name,
 /* Start building a dynamic string with an initial space, or a comment
    character if "set" is zero. Then add further spaces to suit the
    current indentation level. */
-      line = AppendString( NULL, &nc, set ? " " : "#" );
+      line = astAppendString( NULL, &nc, set ? " " : "#" );
       for ( i = 0; i < current_indent; i++ ) {
-         line = AppendString( line, &nc, " " );
+         line = astAppendString( line, &nc, " " );
       }
 
 /* Append the name string followed by " = " and an opening quote
    character (the string will be quoted to protect leading and
    trailing spaces). */
-      line = AppendString( line, &nc, name );
-      line = AppendString( line, &nc, " = \"" );
+      line = astAppendString( line, &nc, name );
+      line = astAppendString( line, &nc, " = \"" );
 
 /* We now append the value string, but must inspect each character so
    that quotes (appearing inside quotes) can be doubled. Determine the
@@ -4019,12 +3934,12 @@ static void WriteString( AstChannel *this, const char *name,
       }
 
 /* Append the closing quote. */
-      line = AppendString( line, &nc, "\"" );
+      line = astAppendString( line, &nc, "\"" );
 
 /* If required, also append the comment. */
       if ( astGetComment( this ) && *comment ) {
-         line = AppendString( line, &nc, " \t# " );
-         line = AppendString( line, &nc, comment );
+         line = astAppendString( line, &nc, " \t# " );
+         line = astAppendString( line, &nc, comment );
       }
 
 /* Write out the resulting line of text. */

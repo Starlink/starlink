@@ -170,6 +170,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitFrameSetVtab
 *        method.
+*     24-JAN-2004 (DSB):
+*        o  Override the astFields method.
+*        o  Add argument "fmt" to Abbrev.
 *class--
 */
 
@@ -713,7 +716,7 @@ static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int );
 static AstMapping *GetMapping( AstFrameSet *, int, int );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static const char *Abbrev( AstFrame *, int, const char *, const char * );
+static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
 static const char *Format( AstFrame *, int, double );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetDomain( AstFrame * );
@@ -725,6 +728,7 @@ static const char *GetUnit( AstFrame *, int );
 static const int *GetPerm( AstFrame * );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
+static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int ForceCopy( AstFrameSet *, int );
 static int GetBase( AstFrameSet * );
 static int GetCurrent( AstFrameSet * );
@@ -846,7 +850,7 @@ static void SetAlignSystem( AstFrame *, AstSystemType );
 
 /* Member functions. */
 /* ================= */
-static const char *Abbrev( AstFrame *this_frame, int axis,
+static const char *Abbrev( AstFrame *this_frame, int axis, const char *fmt,
                            const char *str1, const char *str2 ) {
 /*
 *  Name:
@@ -860,7 +864,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,
 
 *  Synopsis:
 *     #include "frameset.h"
-*     const char *Abbrev( AstFrame *this, int axis,
+*     const char *Abbrev( AstFrame *this, int axis, const char *fmt,
 *                         const char *str1, const char *str2 )
 
 *  Class Membership:
@@ -881,6 +885,9 @@ static const char *Abbrev( AstFrame *this_frame, int axis,
 *        The number of the FrameSet axis for which the values have
 *        been formatted (axis numbering starts at zero for the first
 *        axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format specification used to format the two values.
 *     str1
 *        Pointer to a constant null-terminated string containing the
 *        first formatted value.
@@ -925,7 +932,7 @@ static const char *Abbrev( AstFrame *this_frame, int axis,
    Frame's astAbbrev method to perform the processing. Annul the Frame
    pointer afterwards. */
    fr = astGetFrame( this, AST__CURRENT );
-   result = astAbbrev( fr, axis, str1, str2 );
+   result = astAbbrev( fr, axis, fmt, str1, str2 );
    fr = astAnnul( fr );
 
 /* If an error occurred, clear the result. */
@@ -2237,6 +2244,112 @@ static double Distance( AstFrame *this_frame,
 
 /* If an error occurred, clear the result. */
    if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
+}
+
+static int Fields( AstFrame *this_frame, int axis, const char *fmt, 
+                   const char *str, int maxfld, char **fields, 
+                   int *nc, double *val ) {
+/*
+*+
+*  Name:
+*     astFields
+
+*  Purpose:
+*     Identify numerical fields within a formatted FrameSet axis value.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int astFields( AstFrame *this, int axis, const char *fmt, 
+*                    const char *str, int maxfld, char **fields, 
+*                    int *nc, double *val ) 
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astFields
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function identifies the numerical fields within a FrameSet axis 
+*     value that has been formatted using astAxisFormat. It assumes that 
+*     the value was formatted using the supplied format string. It also
+*     returns the equivalent floating point value.
+
+*  Parameters:
+*     this
+*        Pointer to the FrameSet.
+*     axis
+*        The number of the FrameSet axis for which the values have been
+*        formatted (axis numbering starts at zero for the first axis).
+*     fmt
+*        Pointer to a constant null-terminated string containing the
+*        format used when creating "str".
+*     str
+*        Pointer to a constant null-terminated string containing the
+*        formatted value.
+*     maxfld
+*        The maximum number of fields to identify within "str".
+*     fields
+*        A pointer to an array of at least "maxfld" character pointers. 
+*        Each element is returned holding a pointer to the start of the 
+*        corresponding field  in "str" (in the order in which they occur 
+*        within "str"), or NULL if no corresponding field can be found. 
+*     nc
+*        A pointer to an array of at least "maxfld" integers. Each
+*        element is returned holding the number of characters in the
+*        corresponding field, or zero if no corresponding field can be
+*        found.
+*     val
+*        Pointer to a location at which to store the value
+*        equivalent to the returned field values. If this is NULL, 
+*        it is ignored.
+
+*  Returned Value:
+*     The number of fields succesfully identified and returned.
+
+*  Notes:
+*     - Leading and trailing spaces are ignored.
+*     - If the formatted value is not consistent with the supplied format
+*     string, then a value of zero will be returned, "fields" will be
+*     returned holding NULLs, "nc" will be returned holding zeros, and
+*     "val" is returned holding VAL__BAD.
+*     - Fields are counted from the start of the formatted string. If the
+*     string contains more than "maxfld" fields, then trailing fields are
+*     ignored.
+*     - If this function is invoked with the global error status set, or 
+*     if it should fail for any reason, then a value of zero will be returned 
+*     as the function value, and "fields", "nc" and "val"  will be returned 
+*     holding their supplied values
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   int result;                   /* Result field count to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, "astFields" );
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astFields method to perform the processing. Annul the Frame
+   pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astFields( fr, axis, fmt, str, maxfld, fields, nc, val );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result. */
+   if ( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
@@ -3918,6 +4031,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->Convert = Convert;
    frame->ConvertX = ConvertX;
    frame->Distance = Distance;
+   frame->Fields = Fields;
    frame->FindFrame = FindFrame;
    frame->Format = Format;
    frame->Gap = Gap;

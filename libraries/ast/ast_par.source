@@ -345,3 +345,8 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  XmlChan class.
       INTEGER AST_XMLCHAN
       LOGICAL AST_ISAXMLCHAN
+
+*  TranMap class.
+      INTEGER AST_TRANMAP
+      LOGICAL AST_ISATRANMAP
+

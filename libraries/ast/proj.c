@@ -36,8 +36,6 @@
 *        been defined.
 *     -  Sine values which are slightly larger than 1.0 are now treated 
 *        as 1.0 in function astCYPrev.
-*     -  All local variables in the CSC projection functions converted
-*        from  single to double precision.
 *     -  The maximum number of projection parameters has been changed from 
 *        10 to 100.
 *     -  The maximum number of projection parameters is given by the 
@@ -51,6 +49,9 @@
 *        are not needed by AST) in order to avoid clash with similar names
 *        in other modules imported as part of other software systems (e.g. 
 *        SkyCat).
+*     - astZPNfwd: Loop from prj->n to zero, not from MAXPAR to zero.
+*     - astZPNfwd: Only return "2" if prj->n is larger than 2.
+
 *=============================================================================
 *
 *   C implementation of the spherical map projections recognized by the FITS
@@ -277,32 +278,32 @@ char pcodes[26][4] =
        "AIT", "BON", "PCO", "TSC", "CSC", "QSC"};
 */
 
-const int AZP = 101;
-const int SZP = 102;
-const int TAN = 103;
-const int STG = 104;
-const int SIN = 105;
-const int ARC = 106;
-const int ZPN = 107;
-const int ZEA = 108;
-const int AIR = 109;
-const int CYP = 201;
-const int CEA = 202;
-const int CAR = 203;
-const int MER = 204;
-const int SFL = 301;
-const int PAR = 302;
-const int MOL = 303;
-const int AIT = 401;
-const int COP = 501;
-const int COE = 502;
-const int COD = 503;
-const int COO = 504;
-const int BON = 601;
-const int PCO = 602;
-const int TSC = 701;
-const int CSC = 702;
-const int QSC = 703;
+const int WCS__AZP = 101;
+const int WCS__SZP = 102;
+const int WCS__TAN = 103;
+const int WCS__STG = 104;
+const int WCS__SIN = 105;
+const int WCS__ARC = 106;
+const int WCS__ZPN = 107;
+const int WCS__ZEA = 108;
+const int WCS__AIR = 109;
+const int WCS__CYP = 201;
+const int WCS__CEA = 202;
+const int WCS__CAR = 203;
+const int WCS__MER = 204;
+const int WCS__SFL = 301;
+const int WCS__PAR = 302;
+const int WCS__MOL = 303;
+const int WCS__AIT = 401;
+const int WCS__COP = 501;
+const int WCS__COE = 502;
+const int WCS__COD = 503;
+const int WCS__COO = 504;
+const int WCS__BON = 601;
+const int WCS__PCO = 602;
+const int WCS__TSC = 701;
+const int WCS__CSC = 702;
+const int WCS__QSC = 703;
 
 /* Map error number to error message for each function. */
 const char *astPRJset_errmsg[] = {
@@ -450,7 +451,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "AZP");
-   prj->flag   = copysign(AZP, prj->flag);
+   prj->flag   = copysign(WCS__AZP, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -496,7 +497,7 @@ double *x, *y;
 {
    double a, b, cphi, cthe, r, s, t;
 
-   if (abs(prj->flag) != AZP) {
+   if (abs(prj->flag) != WCS__AZP) {
       if (astAZPset(prj)) return 1;
    }
 
@@ -555,7 +556,7 @@ double *phi, *theta;
    double a, b, r, s, t, ycosg;
    const double tol = 1.0e-13;
 
-   if (abs(prj->flag) != AZP) {
+   if (abs(prj->flag) != WCS__AZP) {
       if (astAZPset(prj)) return 1;
    }
 
@@ -632,7 +633,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "SZP");
-   prj->flag   = copysign(SZP, prj->flag);
+   prj->flag   = copysign(WCS__SZP, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -675,7 +676,7 @@ double *x, *y;
 {
    double a, b, cphi, cthe, s, sphi, t;
 
-   if (abs(prj->flag) != SZP) {
+   if (abs(prj->flag) != WCS__SZP) {
       if (astSZPset(prj)) return 1;
    }
 
@@ -735,7 +736,7 @@ double *phi, *theta;
    double a, b, c, d, r2, sth1, sth2, sthe, sxy, t, x1, xp, y1, yp, z;
    const double tol = 1.0e-13;
 
-   if (abs(prj->flag) != SZP) {
+   if (abs(prj->flag) != WCS__SZP) {
       if (astSZPset(prj)) return 1;
    }
 
@@ -818,7 +819,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "TAN");
-   prj->flag   = copysign(TAN, prj->flag);
+   prj->flag   = copysign(WCS__TAN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -841,7 +842,7 @@ double *x, *y;
 {
    double r, s;
 
-   if (abs(prj->flag) != TAN) {
+   if (abs(prj->flag) != WCS__TAN) {
       if(astTANset(prj)) return 1;
    }
 
@@ -872,7 +873,7 @@ double *phi, *theta;
 {
    double r;
 
-   if (abs(prj->flag) != TAN) {
+   if (abs(prj->flag) != WCS__TAN) {
       if (astTANset(prj)) return 1;
    }
 
@@ -910,7 +911,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "STG");
-   prj->flag   =  STG;
+   prj->flag   =  WCS__STG;
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -940,7 +941,7 @@ double *x, *y;
 {
    double r, s;
 
-   if (prj->flag != STG) {
+   if (prj->flag != WCS__STG) {
       if (astSTGset(prj)) return 1;
    }
 
@@ -967,7 +968,7 @@ double *phi, *theta;
 {
    double r;
 
-   if (prj->flag != STG) {
+   if (prj->flag != WCS__STG) {
       if (astSTGset(prj)) return 1;
    }
 
@@ -1010,7 +1011,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "SIN");
-   prj->flag   = copysign(SIN, prj->flag);
+   prj->flag   = copysign(WCS__SIN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1038,7 +1039,7 @@ double *x, *y;
 {
    double cphi, cthe, sphi, t, z;
 
-   if (abs(prj->flag) != SIN) {
+   if (abs(prj->flag) != WCS__SIN) {
       if (astSINset(prj)) return 1;
    }
 
@@ -1091,7 +1092,7 @@ double *phi, *theta;
    const double tol = 1.0e-13;
    double a, b, c, d, r2, sth1, sth2, sthe, sxy, x0, x1, xp, y0, y1, yp, z;
 
-   if (abs(prj->flag) != SIN) {
+   if (abs(prj->flag) != WCS__SIN) {
       if (astSINset(prj)) return 1;
    }
 
@@ -1200,7 +1201,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "ARC");
-   prj->flag   =  ARC;
+   prj->flag   =  WCS__ARC;
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1230,7 +1231,7 @@ double *x, *y;
 {
    double r;
 
-   if (prj->flag != ARC) {
+   if (prj->flag != WCS__ARC) {
       if (astARCset(prj)) return 1;
    }
 
@@ -1252,7 +1253,7 @@ double *phi, *theta;
 {
    double r;
 
-   if (prj->flag != ARC) {
+   if (prj->flag != WCS__ARC) {
       if (astARCset(prj)) return 1;
    }
 
@@ -1298,7 +1299,7 @@ struct AstPrjPrm *prj;
    const double tol = 1.0e-13;
 
    strcpy(prj->code, "ZPN");
-   prj->flag   = copysign(ZPN, prj->flag);
+   prj->flag   = copysign(WCS__ZPN, prj->flag);
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1382,14 +1383,14 @@ double *x, *y;
    int   j;
    double r, s;
 
-   if (abs(prj->flag) != ZPN) {
+   if (abs(prj->flag) != WCS__ZPN) {
       if (astZPNset(prj)) return 1;
    }
 
    s = (90.0 - theta)*D2R;
 
    r = 0.0;
-   for (j = WCSLIB_MXPAR-1; j >= 0; j--) {
+   for (j = prj->n; j >= 0; j--) {
       r = r*s + prj->p[j];
    }
    r = prj->r0*r;
@@ -1397,7 +1398,7 @@ double *x, *y;
    *x =  r*astSind(phi);
    *y = -r*astCosd(phi);
 
-   if (prj->flag > 0 && s > prj->w[0]) {
+   if (prj->flag > 0 && s > prj->w[0] && prj->n > 2 ) {
       return 2;
    }
 
@@ -1417,7 +1418,7 @@ double *phi, *theta;
    double a, b, c, d, lambda, r, r1, r2, rt, zd, zd1, zd2;
    const double tol = 1.0e-13;
 
-   if (abs(prj->flag) != ZPN) {
+   if (abs(prj->flag) != WCS__ZPN) {
       if (astZPNset(prj)) return 1;
    }
 
@@ -1541,7 +1542,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "ZEA");
-   prj->flag   =  ZEA;
+   prj->flag   =  WCS__ZEA;
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1571,7 +1572,7 @@ double *x, *y;
 {
    double r;
 
-   if (prj->flag != ZEA) {
+   if (prj->flag != WCS__ZEA) {
       if (astZEAset(prj)) return 1;
    }
 
@@ -1594,7 +1595,7 @@ double *phi, *theta;
    double r, s;
    const double tol = 1.0e-12;
 
-   if (prj->flag != ZEA) {
+   if (prj->flag != WCS__ZEA) {
       if (astZEAset(prj)) return 1;
    }
 
@@ -1655,7 +1656,7 @@ struct AstPrjPrm *prj;
    double cxi;
 
    strcpy(prj->code, "AIR");
-   prj->flag   =  AIR;
+   prj->flag   =  WCS__AIR;
    prj->phi0   =  0.0;
    prj->theta0 = 90.0;
 
@@ -1695,7 +1696,7 @@ double *x, *y;
 {
    double cxi, r, txi, xi;
 
-   if (prj->flag != AIR) {
+   if (prj->flag != WCS__AIR) {
       if (astAIRset(prj)) return 1;
    }
 
@@ -1733,7 +1734,7 @@ double *phi, *theta;
    double cxi, lambda, r, r1, r2, rt, txi, x1, x2, xi;
    const double tol = 1.0e-12;
 
-   if (prj->flag != AIR) {
+   if (prj->flag != WCS__AIR) {
       if (astAIRset(prj)) return 1;
    }
 
@@ -1827,7 +1828,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "CYP");
-   prj->flag   = CYP;
+   prj->flag   = WCS__CYP;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -1880,7 +1881,7 @@ double *x, *y;
 {
    double s;
 
-   if (prj->flag != CYP) {
+   if (prj->flag != WCS__CYP) {
       if (astCYPset(prj)) return 1;
    }
 
@@ -1908,7 +1909,7 @@ double *phi, *theta;
    double a;
    const double tol = 1.0e-13;
 
-   if (prj->flag != CYP) {
+   if (prj->flag != WCS__CYP) {
       if (astCYPset(prj)) return 1;
    }
 
@@ -1962,7 +1963,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "CEA");
-   prj->flag   = CEA;
+   prj->flag   = WCS__CEA;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2000,7 +2001,7 @@ struct AstPrjPrm *prj;
 double *x, *y;
 
 {
-   if (prj->flag != CEA) {
+   if (prj->flag != WCS__CEA) {
       if (astCEAset(prj)) return 1;
    }
 
@@ -2022,7 +2023,7 @@ double *phi, *theta;
    double s;
    const double tol = 1.0e-13;
 
-   if (prj->flag != CEA) {
+   if (prj->flag != WCS__CEA) {
       if (astCEAset(prj)) return 1;
    }
 
@@ -2063,7 +2064,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "CAR");
-   prj->flag   = CAR;
+   prj->flag   = WCS__CAR;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2091,7 +2092,7 @@ struct AstPrjPrm *prj;
 double *x, *y;
 
 {
-   if (prj->flag != CAR) {
+   if (prj->flag != WCS__CAR) {
       if (astCARset(prj)) return 1;
    }
 
@@ -2110,7 +2111,7 @@ struct AstPrjPrm *prj;
 double *phi, *theta;
 
 {
-   if (prj->flag != CAR) {
+   if (prj->flag != WCS__CAR) {
       if (astCARset(prj)) return 1;
    }
 
@@ -2143,7 +2144,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "MER");
-   prj->flag   = MER;
+   prj->flag   = WCS__MER;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2171,7 +2172,7 @@ struct AstPrjPrm *prj;
 double *x, *y;
 
 {
-   if (prj->flag != MER) {
+   if (prj->flag != WCS__MER) {
       if (astMERset(prj)) return 1;
    }
 
@@ -2194,7 +2195,7 @@ struct AstPrjPrm *prj;
 double *phi, *theta;
 
 {
-   if (prj->flag != MER) {
+   if (prj->flag != WCS__MER) {
       if (astMERset(prj)) return 1;
    }
 
@@ -2227,7 +2228,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "SFL");
-   prj->flag   = SFL;
+   prj->flag   = WCS__SFL;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2255,7 +2256,7 @@ struct AstPrjPrm *prj;
 double *x, *y;
 
 {
-   if (prj->flag != SFL) {
+   if (prj->flag != WCS__SFL) {
       if (astSFLset(prj)) return 1;
    }
 
@@ -2276,7 +2277,7 @@ double *phi, *theta;
 {
    double w;
 
-   if (prj->flag != SFL) {
+   if (prj->flag != WCS__SFL) {
       if (astSFLset(prj)) return 1;
    }
 
@@ -2316,7 +2317,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "PAR");
-   prj->flag   = PAR;
+   prj->flag   = WCS__PAR;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2350,7 +2351,7 @@ double *x, *y;
 {
    double s;
 
-   if (prj->flag != PAR) {
+   if (prj->flag != WCS__PAR) {
       if (astPARset(prj)) return 1;
    }
 
@@ -2372,7 +2373,7 @@ double *phi, *theta;
 {
    double s, t;
 
-   if (prj->flag != PAR) {
+   if (prj->flag != WCS__PAR) {
       if (astPARset(prj)) return 1;
    }
 
@@ -2422,7 +2423,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "MOL");
-   prj->flag   = MOL;
+   prj->flag   = WCS__MOL;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2453,7 +2454,7 @@ double *x, *y;
    double gamma, resid, u, v, v0, v1;
    const double tol = 1.0e-13;
 
-   if (prj->flag != MOL) {
+   if (prj->flag != WCS__MOL) {
       if (astMOLset(prj)) return 1;
    }
 
@@ -2500,7 +2501,7 @@ double *phi, *theta;
    double s, y0, z;
    const double tol = 1.0e-12;
 
-   if (prj->flag != MOL) {
+   if (prj->flag != WCS__MOL) {
       if (astMOLset(prj)) return 1;
    }
 
@@ -2568,7 +2569,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "AIT");
-   prj->flag   = AIT;
+   prj->flag   = WCS__AIT;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -2596,7 +2597,7 @@ double *x, *y;
 {
    double cthe, w;
 
-   if (prj->flag != AIT) {
+   if (prj->flag != WCS__AIT) {
       if (astAITset(prj)) return 1;
    }
 
@@ -2620,7 +2621,7 @@ double *phi, *theta;
    double s, u, xp, yp, z;
    const double tol = 1.0e-13;
 
-   if (prj->flag != AIT) {
+   if (prj->flag != WCS__AIT) {
       if (astAITset(prj)) return 1;
    }
 
@@ -2686,7 +2687,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "COP");
-   prj->flag   = copysign(COP, prj->flag);
+   prj->flag   = copysign(WCS__COP, prj->flag);
    prj->phi0   = 0.0;
    prj->theta0 = prj->p[1];
 
@@ -2726,7 +2727,7 @@ double *x, *y;
 {
    double a, r, s, t;
 
-   if (abs(prj->flag) != COP) {
+   if (abs(prj->flag) != WCS__COP) {
       if (astCOPset(prj)) return 1;
    }
 
@@ -2760,7 +2761,7 @@ double *phi, *theta;
 {
    double a, dy, r;
 
-   if (abs(prj->flag) != COP) {
+   if (abs(prj->flag) != WCS__COP) {
       if (astCOPset(prj)) return 1;
    }
 
@@ -2817,7 +2818,7 @@ struct AstPrjPrm *prj;
    double theta1, theta2;
 
    strcpy(prj->code, "COE");
-   prj->flag   = COE;
+   prj->flag   = WCS__COE;
    prj->phi0   = 0.0;
    prj->theta0 = prj->p[1];
 
@@ -2859,7 +2860,7 @@ double *x, *y;
 {
    double a, r;
 
-   if (prj->flag != COE) {
+   if (prj->flag != WCS__COE) {
       if (astCOEset(prj)) return 1;
    }
 
@@ -2888,7 +2889,7 @@ double *phi, *theta;
    double a, dy, r, w;
    const double tol = 1.0e-12;
 
-   if (prj->flag != COE) {
+   if (prj->flag != WCS__COE) {
       if (astCOEset(prj)) return 1;
    }
 
@@ -2953,7 +2954,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "COD");
-   prj->flag   = COD;
+   prj->flag   = WCS__COD;
    prj->phi0   = 0.0;
    prj->theta0 = prj->p[1];
 
@@ -2990,7 +2991,7 @@ double *x, *y;
 {
    double a, r;
 
-   if (prj->flag != COD) {
+   if (prj->flag != WCS__COD) {
       if (astCODset(prj)) return 1;
    }
 
@@ -3014,7 +3015,7 @@ double *phi, *theta;
 {
    double a, dy, r;
 
-   if (prj->flag != COD) {
+   if (prj->flag != WCS__COD) {
       if (astCODset(prj)) return 1;
    }
 
@@ -3069,7 +3070,7 @@ struct AstPrjPrm *prj;
    double cos1, cos2, tan1, tan2, theta1, theta2;
 
    strcpy(prj->code, "COO");
-   prj->flag   = COO;
+   prj->flag   = WCS__COO;
    prj->phi0   = 0.0;
    prj->theta0 = prj->p[1];
 
@@ -3118,7 +3119,7 @@ double *x, *y;
 {
    double a, r;
 
-   if (prj->flag != COO) {
+   if (prj->flag != WCS__COO) {
       if (astCOOset(prj)) return 1;
    }
 
@@ -3150,7 +3151,7 @@ double *phi, *theta;
 {
    double a, dy, r;
 
-   if (prj->flag != COO) {
+   if (prj->flag != WCS__COO) {
       if (astCOOset(prj)) return 1;
    }
 
@@ -3204,7 +3205,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "BON");
-   prj->flag   = BON;
+   prj->flag   = WCS__BON;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -3239,7 +3240,7 @@ double *x, *y;
       return astSFLfwd(phi, theta, prj, x, y);
    }
 
-   if (prj->flag != BON) {
+   if (prj->flag != WCS__BON) {
       if (astBONset(prj)) return 1;
    }
 
@@ -3268,7 +3269,7 @@ double *phi, *theta;
       return astSFLrev(x, y, prj, phi, theta);
    }
 
-   if (prj->flag != BON) {
+   if (prj->flag != WCS__BON) {
       if (astBONset(prj)) return 1;
    }
 
@@ -3317,7 +3318,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "PCO");
-   prj->flag   = PCO;
+   prj->flag   = WCS__PCO;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -3349,7 +3350,7 @@ double *x, *y;
 {
    double a, cthe, cotthe, sthe;
 
-   if (prj->flag != PCO) {
+   if (prj->flag != WCS__PCO) {
       if (astPCOset(prj)) return 1;
    }
 
@@ -3382,7 +3383,7 @@ double *phi, *theta;
    double f, fneg, fpos, lambda, tanthe, theneg, thepos, w, xp, xx, ymthe, yp;
    const double tol = 1.0e-12;
 
-   if (prj->flag != PCO) {
+   if (prj->flag != WCS__PCO) {
       if (astPCOset(prj)) return 1;
    }
 
@@ -3476,7 +3477,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "TSC");
-   prj->flag   = TSC;
+   prj->flag   = WCS__TSC;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -3508,7 +3509,7 @@ double *x, *y;
    double cthe, l, m, n, rho, x0, xf, y0, yf;
    const double tol = 1.0e-12;
 
-   if (prj->flag != TSC) {
+   if (prj->flag != WCS__TSC) {
       if (astTSCset(prj)) return 1;
    }
 
@@ -3602,7 +3603,7 @@ double *phi, *theta;
 {
    double l, m, n, xf, yf;
 
-   if (prj->flag != TSC) {
+   if (prj->flag != WCS__TSC) {
       if (astTSCset(prj)) return 1;
    }
 
@@ -3691,7 +3692,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "CSC");
-   prj->flag   = CSC;
+   prj->flag   = WCS__CSC;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -3720,24 +3721,24 @@ double *x, *y;
 
 {
    int   face;
-   double cthe, eta, l, m, n, rho, xi;
-   const double tol = 1.0e-7;
+   float cthe, eta, l, m, n, rho, xi;
+   const float tol = 1.0e-7;
 
-   double a, a2, a2b2, a4, ab, b, b2, b4, ca2, cb2, x0, xf, y0, yf;
-   const double gstar  =  1.37484847732;
-   const double mm     =  0.004869491981;
-   const double gamma  = -0.13161671474;
-   const double omega1 = -0.159596235474;
-   const double d0  =  0.0759196200467;
-   const double d1  = -0.0217762490699;
-   const double c00 =  0.141189631152;
-   const double c10 =  0.0809701286525;
-   const double c01 = -0.281528535557;
-   const double c11 =  0.15384112876;
-   const double c20 = -0.178251207466;
-   const double c02 =  0.106959469314;
+   float a, a2, a2b2, a4, ab, b, b2, b4, ca2, cb2, x0, xf, y0, yf;
+   const float gstar  =  1.37484847732;
+   const float mm     =  0.004869491981;
+   const float gamma  = -0.13161671474;
+   const float omega1 = -0.159596235474;
+   const float d0  =  0.0759196200467;
+   const float d1  = -0.0217762490699;
+   const float c00 =  0.141189631152;
+   const float c10 =  0.0809701286525;
+   const float c01 = -0.281528535557;
+   const float c11 =  0.15384112876;
+   const float c20 = -0.178251207466;
+   const float c02 =  0.106959469314;
 
-   if (prj->flag != CSC) {
+   if (prj->flag != WCS__CSC) {
       if (astCSCset(prj)) return 1;
    }
 
@@ -3851,39 +3852,39 @@ double *phi, *theta;
 
 {
    int   face;
-   double l, m, n;
+   float l, m, n;
 
-   double     a, b, xf, xx, yf, yy, z0, z1, z2, z3, z4, z5, z6;
-   const double p00 = -0.27292696;
-   const double p10 = -0.07629969;
-   const double p20 = -0.22797056;
-   const double p30 =  0.54852384;
-   const double p40 = -0.62930065;
-   const double p50 =  0.25795794;
-   const double p60 =  0.02584375;
-   const double p01 = -0.02819452;
-   const double p11 = -0.01471565;
-   const double p21 =  0.48051509;
-   const double p31 = -1.74114454;
-   const double p41 =  1.71547508;
-   const double p51 = -0.53022337;
-   const double p02 =  0.27058160;
-   const double p12 = -0.56800938;
-   const double p22 =  0.30803317;
-   const double p32 =  0.98938102;
-   const double p42 = -0.83180469;
-   const double p03 = -0.60441560;
-   const double p13 =  1.50880086;
-   const double p23 = -0.93678576;
-   const double p33 =  0.08693841;
-   const double p04 =  0.93412077;
-   const double p14 = -1.41601920;
-   const double p24 =  0.33887446;
-   const double p05 = -0.63915306;
-   const double p15 =  0.52032238;
-   const double p06 =  0.14381585;
+   float     a, b, xf, xx, yf, yy, z0, z1, z2, z3, z4, z5, z6;
+   const float p00 = -0.27292696;
+   const float p10 = -0.07629969;
+   const float p20 = -0.22797056;
+   const float p30 =  0.54852384;
+   const float p40 = -0.62930065;
+   const float p50 =  0.25795794;
+   const float p60 =  0.02584375;
+   const float p01 = -0.02819452;
+   const float p11 = -0.01471565;
+   const float p21 =  0.48051509;
+   const float p31 = -1.74114454;
+   const float p41 =  1.71547508;
+   const float p51 = -0.53022337;
+   const float p02 =  0.27058160;
+   const float p12 = -0.56800938;
+   const float p22 =  0.30803317;
+   const float p32 =  0.98938102;
+   const float p42 = -0.83180469;
+   const float p03 = -0.60441560;
+   const float p13 =  1.50880086;
+   const float p23 = -0.93678576;
+   const float p33 =  0.08693841;
+   const float p04 =  0.93412077;
+   const float p14 = -1.41601920;
+   const float p24 =  0.33887446;
+   const float p05 = -0.63915306;
+   const float p15 =  0.52032238;
+   const float p06 =  0.14381585;
 
-   if (prj->flag != CSC) {
+   if (prj->flag != WCS__CSC) {
       if (astCSCset(prj)) return 1;
    }
 
@@ -4005,7 +4006,7 @@ struct AstPrjPrm *prj;
 
 {
    strcpy(prj->code, "QSC");
-   prj->flag   = QSC;
+   prj->flag   = WCS__QSC;
    prj->phi0   = 0.0;
    prj->theta0 = 0.0;
 
@@ -4037,7 +4038,7 @@ double *x, *y;
    double cthe, eta, l, m, n, omega, p, rho, rhu, t, tau, x0, xf, xi, y0, yf;
    const double tol = 1.0e-12;
 
-   if (prj->flag != QSC) {
+   if (prj->flag != WCS__QSC) {
       if (astQSCset(prj)) return 1;
    }
 
@@ -4210,7 +4211,7 @@ double *phi, *theta;
    double l, m, n, omega, rho, rhu, tau, xf, yf, w;
    const double tol = 1.0e-12;
 
-   if (prj->flag != QSC) {
+   if (prj->flag != WCS__QSC) {
       if (astQSCset(prj)) return 1;
    }
 

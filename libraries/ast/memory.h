@@ -22,6 +22,8 @@
 *        None.
 *
 *     Protected:
+*        astAppendString
+*           Append a string to another string which grows dynamically.
 *        astChrMatch
 *           Case-insensitive string comparison.
 *        astChrMatchN
@@ -101,6 +103,14 @@ void *astMalloc_( size_t );
 void *astRealloc_( void *, size_t );
 void *astStore_( void *, const void *, size_t );
 size_t astChrLen_( const char * );
+char *astAppendString_( char *, int *, const char * );
+
+#ifdef DEBUG
+void astListIssued_( const char *label );
+void astSetWatchId_( int id );
+int astSetPermMem_( int perm );
+#endif
+
 #endif
 
 /* Function interfaces. */
@@ -118,9 +128,17 @@ size_t astChrLen_( const char * );
 #define astRealloc(ptr,size) astRealloc_(ptr,size)
 #define astSizeOf(ptr) astSizeOf_(ptr)
 #define astStore(ptr,data,size) astStore_(ptr,data,size)
+#define astAppendString(ptr,len,text) astAppendString_(ptr,len,text)
 #define astString(chars,nchars) astString_(chars,nchars)
 #define astStringArray(chars,nel,len) astStringArray_(chars,nel,len)
 #define astChrLen(string) astChrLen_(string)
 #define astSscanf astSscanf_
 #endif
+
+#ifdef DEBUG
+#define astListIssued(label) astListIssued_(label)
+#define astSetWatchId(id) astSetWatchId_(id)
+#define astSetPermMem(perm) astSetPermMem_(perm)
+#endif
+
 #endif

@@ -91,6 +91,9 @@ static int FGLineWrapper( AstPlot *, int, const float *, const float * );
 static int FGMarkWrapper( AstPlot *, int, const float *, const float *, int );
 static int FGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int FGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
+static int FGCapWrapper( AstPlot *, int, int );
+static int FGQchWrapper( AstPlot *, float *, float * );
+static int FGScalesWrapper( AstPlot *, float *, float * );
 
 F77_LOGICAL_FUNCTION(ast_isaplot)( INTEGER(THIS),
                                    INTEGER(STATUS) ) {
@@ -342,16 +345,31 @@ F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME),
 
       if( ifun == AST__GATTR ) {
          wrapper = (AstGrfWrap) FGAttrWrapper;
+
       } else if( ifun == AST__GFLUSH ) {
          wrapper = (AstGrfWrap) FGFlushWrapper;
+
       } else if( ifun == AST__GLINE ) {
          wrapper = (AstGrfWrap) FGLineWrapper;
+
       } else if( ifun == AST__GMARK ) {
          wrapper = (AstGrfWrap) FGMarkWrapper;
+
       } else if( ifun == AST__GTEXT ) {
          wrapper = (AstGrfWrap) FGTextWrapper;
+
+      } else if( ifun == AST__GCAP ) {
+         wrapper = (AstGrfWrap) FGCapWrapper;
+
       } else if( ifun == AST__GTXEXT ) {
          wrapper = (AstGrfWrap) FGTxExtWrapper;
+
+      } else if( ifun == AST__GQCH ) {
+         wrapper = (AstGrfWrap) FGQchWrapper;
+
+      } else if( ifun == AST__GSCALES ) {
+         wrapper = (AstGrfWrap) FGScalesWrapper;
+
       } else if( astOK ) {
          astError( AST__INTER, "%s(%s): AST internal programming error - "
                    "Grf function id %d not yet supported.", method, class,
@@ -435,6 +453,14 @@ static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
                                       TRAIL_ARG(fjust) );
 }
 
+static int FGCapWrapper( AstPlot *this, int cap, int value ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( INTEGER(cap), INTEGER(value) ) )
+                  this->grffun[ AST__GCAP ])( 
+                                      INTEGER_ARG(&cap),
+                                      INTEGER_ARG(&value) );
+}
+
 static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
                            const char *just, float upx, float upy, float *xb, 
                            float *yb ) {
@@ -470,3 +496,14 @@ static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
                                                 TRAIL_ARG(fjust) );
 }
 
+static int FGQchWrapper( AstPlot *this, float *chv, float *chh ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( REAL(chv), REAL(chh) ) )
+                  this->grffun[ AST__GQCH ])( REAL_ARG(chv), REAL_ARG(chh) );
+}
+
+static int FGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( REAL(alpha), REAL(beta) ) )
+                  this->grffun[ AST__GSCALES ])( REAL_ARG(alpha), REAL_ARG(beta) );
+}

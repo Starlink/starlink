@@ -235,6 +235,35 @@ f        specified AST_SET sets the attribute for both axes to the supplied
 f        value, AST_CLEAR clears the attributes for both axes, AST_TEST
 f        tests the attribute for axis 1, and AST_GET gets the value for
 *        axis 1.
+*     LogPlot (int)
+*        This attribute controls the appearance of all graphics produced
+*	 by the Plot, by determining whether the axes of the plotting
+*	 surface are mapped logarithmically or linearly onto the base
+*	 Frame of the FrameSet supplied when the Plot was constructed. It
+*	 takes a separate value for each axis of the graphics coordinate
+*	 system (i.e. the base Frame in the Plot) so that, for instance,
+*	 the setting "LogPlot(2)=1" specifies that the second axis of the
+*	 graphics coordinate system (usually the vertical axis) should be
+*	 mapped logarithmically onto the second axis of the base Frame of
+*	 the FrameSet supplied when the Plot was constructed. See also the
+*	 LogGap attribute. If the LogPlot value of a Plot axis is
+*	 non-zero, it causes that axis to be mapped logarithmically,
+*	 otherwise (the default) the axis is mapped linearly.
+*     LogTicks (int)
+*        This attribute controls the appearance of an annotated coordinate
+*	 grid (drawn with the astGrid function) by determining whether the
+*	 major tick marks should be spaced logarithmically or linearly. It
+*	 takes a separate value for each physical axis of the Plot so
+*	 that, for instance, the setting "LogTicks(2)=1" specifies that
+*	 the major tick marks on the second axis should be spaced
+*	 logarithmically. If the LogTicks value for a physical axis is
+*	 non-zero, the major tick marks on that axis will be spaced
+*	 logarithmically (that is, there will be a constant ratio betwen
+*	 adjacent tick mark values). If the LogTicks value is zero, the
+*	 major tick marks will be evenly spaced (that is, there will be a
+*	 constant difference betwen adjacent tick mark values). The
+*	 default is to produce logarithmically spaced tick marks if the
+*	 corresponding LogPlot attribute is non-zero.
 *     MajTickLen(axis) (double)
 *        This attribute gives the length of the major tick marks drawn by
 c        function astGrid as a fraction of the minimum dimension of the 
@@ -540,6 +569,12 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        attribute Grf.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitPlotVtab method.
+*     13-JAN-2004 (DSB):
+*        Added bbox, logticks and logplot to the AstPlot structure. Added 
+*        LogPlot and LogTicks accessor methods.
+*     19-JAN-2004 (DSB):
+*        Added loggap and loglabel to the AstPlot structure. Added 
+*        LogGap and LogLabel accessor methods.
 *-
 */
 
@@ -558,13 +593,16 @@ f     - Strings: Text strings drawn using AST_TEXT
 #define AST__NPID      15   /* No. of different genuine plot object id's */
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
-#define AST__GFLUSH	1
-#define AST__GLINE	2
-#define AST__GMARK	3
+#define AST__GFLUSH	1   /* Note, if any items are added or changed here, */
+#define AST__GLINE	2   /* make sure that the astGrfFunID function is */
+#define AST__GMARK	3   /* updated in plot.c */
 #define AST__GTEXT	4
 #define AST__GTXEXT	5
+#define AST__GSCALES	6
+#define AST__GQCH	7
+#define AST__GCAP	8
 
-#define AST__NGRFFUN    6   /* No. of Grf functions used by Plot */
+#define AST__NGRFFUN    9   /* No. of Grf functions used by Plot */
 
 #if defined(astCLASS)       /* Protected */
 #define AST__MXBRK     100  /* Max. no. of breaks in a drawn curve */
@@ -590,7 +628,10 @@ typedef int (* AstGFlushFun)();
 typedef int (* AstGLineFun)( int, const float *, const float * );
 typedef int (* AstGMarkFun)( int, const float *, const float *, int );
 typedef int (* AstGTextFun)( const char *, float, float, const char *, float, float );
+typedef int (* AstGCapFun)( int, int );
 typedef int (* AstGTxExtFun)( const char *, float, float, const char *, float, float, float *, float * );
+typedef int (* AstGScalesFun)( float *, float * );
+typedef int (* AstGQchFun)( float *, float * );
 
 /* A general interface into which Grf Wrapper functions should be cast 
    before being passed as an argument to astGrfWrapper. */
@@ -602,7 +643,10 @@ typedef int (* AstGFlushWrap)( struct AstPlot * );
 typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float * );
 typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int );
 typedef int (* AstGTextWrap)( struct AstPlot *, const char *, float, float, const char *, float, float );
+typedef int (* AstGCapWrap)( struct AstPlot *, int, int );
 typedef int (* AstGTxExtWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
+typedef int (* AstGScalesWrap)( struct AstPlot *, float *, float * );
+typedef int (* AstGQchWrap)( struct AstPlot *, float *, float * );
 
 /* A structure in which a collection of Grf function pointers can be
    stored. */
@@ -613,8 +657,21 @@ typedef struct AstGrfPtrs {
    AstGLineWrap GLine;
    AstGMarkWrap GMark;
    AstGTextWrap GText;
+   AstGCapWrap GCap;
    AstGTxExtWrap GTxExt;
+   AstGScalesWrap GScales;
+   AstGQchWrap GQch;
 } AstGrfPtrs;
+
+/* Structure holding current graphical attribute values for text. */
+typedef struct AstGat {
+   float rise;
+   double size;
+   double width;
+   double col;
+   double font;
+   double style;
+} AstGat;
 
 /* Plot structure. */
 /* ------------------- */
@@ -630,6 +687,7 @@ typedef struct AstPlot {
    double *clip_ubnd;
    double centre[ 2 ];
    double gap[ 2 ];
+   double loggap[ 2 ];
    double labelat[ 2 ];
    double majticklen[ 2 ];
    double minticklen[ 2 ];
@@ -640,6 +698,7 @@ typedef struct AstPlot {
    double tol;
    double ucentre[ 2 ];
    double ugap[ 2 ];
+   double uloggap[ 2 ];
    double ulblat[ 2 ];
    double umjtkln[ 2 ];
    double width[ AST__NPID ];
@@ -647,6 +706,7 @@ typedef struct AstPlot {
    double xlo;
    double yhi;
    double ylo;
+   double bbox[ 4 ];
    int border;
    int clip_axes;
    int clip_frame;
@@ -673,20 +733,30 @@ typedef struct AstPlot {
    int ugrid;
    int ulbling;
    int ulbunit[ 2 ];
+   int ulgtk[ 2 ];
+   int ulglb[ 2 ];
    int umintk[ 2 ];
    int utxtlb[ 2 ];
    int xrev;
    int yrev;      
    int ink;
+   int logplot[ 2 ];
+   int logticks[ 2 ];
+   int loglabel[ 2 ];
    AstGrfFun grffun[AST__NGRFFUN];
    AstGAttrWrap GAttr;
    AstGFlushWrap GFlush;
    AstGLineWrap GLine;
    AstGMarkWrap GMark;
    AstGTextWrap GText;
+   AstGCapWrap GCap;
    AstGTxExtWrap GTxExt;
+   AstGScalesWrap GScales;
+   AstGQchWrap GQch;
    AstGrfPtrs *grfstack;
    int grfnstack;
+   AstGat **gat;
+   int ngat;
 
 } AstPlot;
 
@@ -756,6 +826,18 @@ typedef struct AstPlotVtab {
    int (* TestLabelUp)( AstPlot *, int );
    void (* SetLabelUp)( AstPlot *, int, int );
    void (* ClearLabelUp)( AstPlot *, int );
+   int (* GetLogPlot)( AstPlot *, int );
+   int (* TestLogPlot)( AstPlot *, int );
+   void (* SetLogPlot)( AstPlot *, int, int );
+   void (* ClearLogPlot)( AstPlot *, int );
+   int (* GetLogTicks)( AstPlot *, int );
+   int (* TestLogTicks)( AstPlot *, int );
+   void (* SetLogTicks)( AstPlot *, int, int );
+   void (* ClearLogTicks)( AstPlot *, int );
+   int (* GetLogLabel)( AstPlot *, int );
+   int (* TestLogLabel)( AstPlot *, int );
+   void (* SetLogLabel)( AstPlot *, int, int );
+   void (* ClearLogLabel)( AstPlot *, int );
    int (* GetDrawAxes)( AstPlot *, int );
    int (* TestDrawAxes)( AstPlot *, int );
    void (* SetDrawAxes)( AstPlot *, int, int );
@@ -796,6 +878,10 @@ typedef struct AstPlotVtab {
    int (* TestGap)( AstPlot *, int  );
    void (* SetGap)( AstPlot *, int, double );
    void (* ClearGap)( AstPlot *, int );
+   double (* GetLogGap)( AstPlot *, int  );
+   int (* TestLogGap)( AstPlot *, int  );
+   void (* SetLogGap)( AstPlot *, int, double );
+   void (* ClearLogGap)( AstPlot *, int );
    double (* GetCentre)( AstPlot *, int  );
    int (* TestCentre)( AstPlot *, int  );
    void (* SetCentre)( AstPlot *, int, double );
@@ -878,6 +964,8 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+   const char *astStripEscapes_( const char * );
+   int astFindEscape_( const char *, int *, int *, int * );
    int astBorder_( AstPlot * );
    void astBoundingBox_( AstPlot *, float[2], float[2] );
    void astClip_( AstPlot *, int, const double [], const double [] );
@@ -943,6 +1031,21 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    void astSetLabelUp_( AstPlot *, int, int );
    void astClearLabelUp_( AstPlot *, int );
 
+   int astGetLogPlot_( AstPlot *, int );
+   int astTestLogPlot_( AstPlot *, int );
+   void astSetLogPlot_( AstPlot *, int, int );
+   void astClearLogPlot_( AstPlot *, int );
+
+   int astGetLogTicks_( AstPlot *, int );
+   int astTestLogTicks_( AstPlot *, int );
+   void astSetLogTicks_( AstPlot *, int, int );
+   void astClearLogTicks_( AstPlot *, int );
+
+   int astGetLogLabel_( AstPlot *, int );
+   int astTestLogLabel_( AstPlot *, int );
+   void astSetLogLabel_( AstPlot *, int, int );
+   void astClearLogLabel_( AstPlot *, int );
+
    int astGetDrawAxes_( AstPlot *, int );
    int astTestDrawAxes_( AstPlot *, int );
    void astSetDrawAxes_( AstPlot *, int, int );
@@ -962,6 +1065,11 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    int astTestGap_( AstPlot *, int  );
    void astSetGap_( AstPlot *, int, double );
    void astClearGap_( AstPlot *, int );
+
+   double astGetLogGap_( AstPlot *, int  );
+   int astTestLogGap_( AstPlot *, int  );
+   void astSetLogGap_( AstPlot *, int, double );
+   void astClearLogGap_( AstPlot *, int );
 
    double astGetCentre_( AstPlot *, int  );
    int astTestCentre_( AstPlot *, int  );
@@ -1139,6 +1247,8 @@ astINVOKE(V,astGrfPop_(astCheckPlot(this)))
 
 
 #define astGrfFunID astGrfFunID_
+#define astFindEscape astFindEscape_
+#define astStripEscapes(text) astStripEscapes_(text)
 
 #define astGrfWrapper(this,name,wrapper) \
 astINVOKE(V,astGrfWrapper_(astCheckPlot(this),name,wrapper))
@@ -1265,6 +1375,15 @@ astINVOKE(V,astSetGap_(astCheckPlot(this),axis,gap))
 #define astTestGap(this,axis) \
 astINVOKE(V,astTestGap_(astCheckPlot(this),axis))
 
+#define astClearLogGap(this,axis) \
+astINVOKE(V,astClearLogGap_(astCheckPlot(this),axis))
+#define astGetLogGap(this,axis) \
+astINVOKE(V,astGetLogGap_(astCheckPlot(this),axis))
+#define astSetLogGap(this,axis,gap) \
+astINVOKE(V,astSetLogGap_(astCheckPlot(this),axis,gap))
+#define astTestLogGap(this,axis) \
+astINVOKE(V,astTestLogGap_(astCheckPlot(this),axis))
+
 #define astClearCentre(this,axis) \
 astINVOKE(V,astClearCentre_(astCheckPlot(this),axis))
 #define astGetCentre(this,axis) \
@@ -1363,6 +1482,33 @@ astINVOKE(V,astGetLabelUp_(astCheckPlot(this),axis))
 astINVOKE(V,astSetLabelUp_(astCheckPlot(this),axis,labelup))
 #define astTestLabelUp(this,axis) \
 astINVOKE(V,astTestLabelUp_(astCheckPlot(this),axis))
+
+#define astClearLogPlot(this,axis) \
+astINVOKE(V,astClearLogPlot_(astCheckPlot(this),axis))
+#define astGetLogPlot(this,axis) \
+astINVOKE(V,astGetLogPlot_(astCheckPlot(this),axis))
+#define astSetLogPlot(this,axis,logplot) \
+astINVOKE(V,astSetLogPlot_(astCheckPlot(this),axis,logplot))
+#define astTestLogPlot(this,axis) \
+astINVOKE(V,astTestLogPlot_(astCheckPlot(this),axis))
+
+#define astClearLogTicks(this,axis) \
+astINVOKE(V,astClearLogTicks_(astCheckPlot(this),axis))
+#define astGetLogTicks(this,axis) \
+astINVOKE(V,astGetLogTicks_(astCheckPlot(this),axis))
+#define astSetLogTicks(this,axis,logticks) \
+astINVOKE(V,astSetLogTicks_(astCheckPlot(this),axis,logticks))
+#define astTestLogTicks(this,axis) \
+astINVOKE(V,astTestLogTicks_(astCheckPlot(this),axis))
+
+#define astClearLogLabel(this,axis) \
+astINVOKE(V,astClearLogLabel_(astCheckPlot(this),axis))
+#define astGetLogLabel(this,axis) \
+astINVOKE(V,astGetLogLabel_(astCheckPlot(this),axis))
+#define astSetLogLabel(this,axis,loglabel) \
+astINVOKE(V,astSetLogLabel_(astCheckPlot(this),axis,loglabel))
+#define astTestLogLabel(this,axis) \
+astINVOKE(V,astTestLogLabel_(astCheckPlot(this),axis))
 
 #define astClearTextLab(this,axis) \
 astINVOKE(V,astClearTextLab_(astCheckPlot(this),axis))

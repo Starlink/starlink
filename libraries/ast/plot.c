@@ -74,9 +74,10 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     - Colour(element): Colour index for a Plot element
 *     - DrawAxes(axis): Draw axes for a Plot?
 *     - DrawTitle: Draw a title for a Plot?
+*     - Escape: Allow changes of character attributes within strings?
 *     - Edge(axis): Which edges to label in a Plot
 *     - Font(element): Character font for a Plot element
-*     - Gap(axis): Interval between major axis values of a Plot
+*     - Gap(axis): Interval between linearly spaced major axis values 
 *     - Grf: Select the graphics interface to use.
 *     - Grid: Draw grid lines for a Plot?
 *     - Invisible: Draw graphics in invisible ink?
@@ -84,6 +85,9 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     - LabelUnits(axis): Use axis unit descriptions in a Plot?
 *     - LabelUp(axis): Draw numerical Plot labels upright?
 *     - Labelling: Label and tick placement option for a Plot
+*     - LogGap(axis): Interval between logarithmically spaced major axis values 
+*     - LogPlot(axis): Map the plot onto the screen logarithmically?
+*     - LogTicks(axis): Space the major tick marks logarithmically?
 *     - MajTickLen(axis): Length of major tick marks for a Plot
 *     - MinTickLen(axis): Length of minor tick marks for a Plot
 *     - MinTick(axis): Density of minor tick marks for a Plot
@@ -424,6 +428,62 @@ f     - Title: The Plot title drawn using AST_GRID
 *        values (the supplied values may be clustered around 0 and 2*PI if the
 *        field is centred on the origin, resulting in the mean being at about 
 *        1.PI and therefore inappropriate).
+*     13-JAN-2004 (DSB):
+*        - Added LogPlot attribute, and the facility for mapping the base 
+*        coordinate system logarithmically onto the plotting area instead of 
+*        linearly.
+*        - Added LogTicks attribute, and the facility for spacing the
+*        major tick marks logarithmically instead of linearly.
+*        - Added LogGap attribute, and the facility for storing separate
+*        gap sizes for linear and log tick spacing.
+*     15-JAN-2004 (DSB):
+*        - Added LogLabel attribute.
+*        - Re-instated the inclusion of escape sequences in strings (see 
+*        function GrText). 
+*     12-FEB-2004 (DSB):
+*        - RightVector: Corrected usage of chh and chv.
+*        - GQch and GScales: Check that values returned by grf module are
+*          usable.
+*        - DrawAxis: Extend axis section by one section (if possible) at
+*        each end (overcomes problems where the axis does not reach a pole).
+*        - DrawAxis: Check axis does not extend beyond a pole.
+*        - Labels: Correct logic of loop which plots interior labels
+*        (previously it missed out labels if there were only 3)
+*        - Allow for some rounding error in FindMajTicks when comparing an
+*        axis value with a loweror upper axis limit.
+*     19-FEB-2004 (DSB):
+*        - Reduced the dynamic range restriction for log ticks from 2 decades 
+*        to 1.
+*        - Temporarily clear any error status before re-instating the
+*        original Format in TickMarks. 
+*        - Add LogTicks to the GetAttrib function so that the value of the 
+*        LogTicks attribute can be got by the public.
+*        - Modify Crv to include a check that he vector scale has not
+*        changed much between adjacent segments.
+*        - Modify Crv so that a segment is only subdivided if at least
+*        half of the subsegments are longer than the shortest significant 
+*        length. Also put a restriction on subdivision so that
+*        subdivision only occurs if the bounding box of the segment being 
+*        sub-divided is smaller than the bounding box of its parent
+*        segment.
+*     27-FEB-2004 (DSB):
+*        - Reduce the default Tol value from 0.001 to 0.01 in order to
+*        speed up curve drawing..
+*        - Use 0.1*Tol in Boundary because the boundary tracing algorithm
+*        seems to produce much worse visible errors than it should do for a 
+*        given Tol.
+*     2-MAR-2004 (DSB):
+*        - Corrected handling of bounding boxes in Crv so that
+*        subdivision is allowed if the bounding box shrinks on only 1 axis 
+*        (previously required shrinkage on both axes but this fails if
+*        all the points are on a horizontal or vertical line).
+*        - Modified FindMajTicks to use a better algorithm for finding an
+*        appropriate nfill value (previously logplot=1 axes could have
+*        unfilled holes at the high end).
+*        - Modified GetTicks so that FindMajTicks is not called
+*        repeatedly with the same gap size.
+*        - Modify AxPlot/Map1 so that the axis curve is sampled logarithmically 
+*        if the corresponding axis is mapped logarithmically.
 *class--
 */
 
@@ -444,7 +504,7 @@ f     - Title: The Plot title drawn using AST_GRID
 /* Values for constants used in this class. */
 #define CRV_NSEG       14 /* No. of curve segments drawn by function Crv */
 #define CRV_NPNT       15 /* CRV_NSEG plus one */
-#define CRV_MXBRK     100 /* Max. no. of breaks allowed in a plotted curve */
+#define CRV_MXBRK    1000 /* Max. no. of breaks allowed in a plotted curve */
 #define CRV_MXENT      10 /* Max. no. of recursive entries into function Crv */
 #define POLY_MAX     1000 /* Max. no. of points in a poly line */
 #define MAJTICKS_OPT   10 /* Optimum number of major axiss or grid lines */
@@ -855,7 +915,7 @@ int astTest##attr##_( AstPlot *this, int axis ) { \
 *     Private macro.
 
 *  Synopsis:
-*     MAKE_GET3(attr,type,bad_value,assign,nval)
+*     MAKE_GET3(attr,attr,type,bad_value,assign,nval)
 
 *  Class Membership:
 *     Defined by the Plot class.
@@ -878,7 +938,8 @@ int astTest##attr##_( AstPlot *this, int axis ) { \
 *  Parameters:
 *     attr
 *        The name of the attribute whose value is to be obtained, as it
-*        appears in the function name (e.g. Label in "astGetLabel").
+*        appears in the function name (e.g. Label in "astGetLabel"). The
+*        string "Used" is added on to the front of the supplied value.
 *     type
 *        The C type of the attribute.
 *     bad_value
@@ -903,8 +964,8 @@ int astTest##attr##_( AstPlot *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static type Get##attr( AstPlot *, int ); \
-static type Get##attr( AstPlot *this, int axis ) { \
+static type GetUsed##attr( AstPlot *, int ); \
+static type GetUsed##attr( AstPlot *this, int axis ) { \
    type result;                  /* Result to be returned */ \
 \
 /* Check the global error status. */ \
@@ -914,11 +975,15 @@ static type Get##attr( AstPlot *this, int axis ) { \
    if( axis < 0 || axis >= nval ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
-                "astGet" #attr, astGetClass( this ), \
+                "astGetUsed" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
 \
-/* Re-calculate dynamic defaults by going through the motions of drawing \
-   the grid. Nothing is actually drawn because we set the protected \
+/* If the attribute is set, use its normal accessor. */\
+   } else if( astTest##attr( this, axis ) ) {\
+      result = astGet##attr( this, axis );\
+\
+/* Otherwise, re-calculate dynamic defaults by going through the motions of \
+   drawing the grid. Nothing is actually drawn because we set the protected \
    attribute Ink to zero first. The calculated values are stored in the \
    Plot structure. */ \
    } else { \
@@ -966,9 +1031,10 @@ static type Get##attr( AstPlot *this, int axis ) { \
 *     multi-valued attribute for a Plot.
 
 *  Parameters:
-*      attr
-*         The name of the attribute to be set, as it appears in the function
-*         name (e.g. Label in "astSetLabelAt").
+ *     attr
+*        The name of the attribute whose value is to be obtained, as it
+*        appears in the function name (e.g. Label in "astSetLabel"). The
+*        string "Used" is added on to the front of the supplied value.
 *      type
 *         The C type of the attribute.
 *      component
@@ -993,8 +1059,8 @@ static type Get##attr( AstPlot *this, int axis ) { \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
-static void Set##attr( AstPlot *, int, type ); \
-static void Set##attr( AstPlot *this, int axis, type value ) { \
+static void SetUsed##attr( AstPlot *, int, type ); \
+static void SetUsed##attr( AstPlot *this, int axis, type value ) { \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -1003,7 +1069,7 @@ static void Set##attr( AstPlot *this, int axis, type value ) { \
    if( axis < 0 || axis >= nval ){ \
       astError( AST__AXIIN, "%s(%s): Index (%d) is invalid for attribute " \
                 #attr " - it should be in the range 1 to %d.", \
-                "astSet" #attr, astGetClass( this ), \
+                "astSetUsed" #attr, astGetClass( this ), \
                 axis + 1, nval ); \
 \
 /* Store the new value in the structure component. */ \
@@ -1176,7 +1242,9 @@ static void Set##attribute( Ast##class *this, type value ) { \
 #include "skyaxis.h"             /* Sky coordinate axes */
 #include "skyframe.h"            /* Sky coordinate frames */
 #include "winmap.h"              /* Scale and shift mappings */
+#include "mathmap.h"             /* Algebraic mappings */
 #include "wcsmap.h"              /* FITS-WCS projectsions */
+#include "unitmap.h"             /* Unit mappings */
 #include "permmap.h"             /* Axis permutations */
 
 
@@ -1254,6 +1322,7 @@ static void (* parent_setattrib)( AstObject *, const char * );
 /* Variables used to pass information to the curve drawing functions. See 
    the prologues of functions Crv and CrvLine for details. */
 static double Crv_limit;
+static double Crv_scerr;
 static double Crv_tol;
 static double Crv_ux0;
 static double Crv_uy0;
@@ -1299,9 +1368,10 @@ static AstPlot      *Map1_plot = NULL;
 static AstMapping   *Map1_map = NULL; 
 static AstFrame     *Map1_frame = NULL; 
 static const double *Map1_origin = NULL; 
-static double        Map1_scale;
+static double        Map1_length;
 static int           Map1_axis;
 static int           Map1_norm;
+static int           Map1_log;
 
 /* Variables used by function Map2. See the prologue of Map2 for details. */
 static int           Map2_ncoord;       
@@ -1436,6 +1506,11 @@ static int TestMajTickLen( AstPlot *, int );
 static void ClearMajTickLen( AstPlot *, int );
 static void SetMajTickLen( AstPlot *, int, double );
 
+static double GetLogGap( AstPlot *, int );
+static int TestLogGap( AstPlot *, int );
+static void ClearLogGap( AstPlot *, int );
+static void SetLogGap( AstPlot *, int, double );
+
 static double GetTitleGap( AstPlot * );
 static int TestTitleGap( AstPlot * );
 static void ClearTitleGap( AstPlot * );
@@ -1455,6 +1530,21 @@ static int GetLabelUp( AstPlot *, int );
 static int TestLabelUp( AstPlot *, int );
 static void ClearLabelUp( AstPlot *, int );
 static void SetLabelUp( AstPlot *, int, int );
+
+static int GetLogPlot( AstPlot *, int );
+static int TestLogPlot( AstPlot *, int );
+static void ClearLogPlot( AstPlot *, int );
+static void SetLogPlot( AstPlot *, int, int );
+
+static int GetLogTicks( AstPlot *, int );
+static int TestLogTicks( AstPlot *, int );
+static void ClearLogTicks( AstPlot *, int );
+static void SetLogTicks( AstPlot *, int, int );
+
+static int GetLogLabel( AstPlot *, int );
+static int TestLogLabel( AstPlot *, int );
+static void ClearLogLabel( AstPlot *, int );
+static void SetLogLabel( AstPlot *, int, int );
 
 static int GetNumLab( AstPlot *, int );
 static int TestNumLab( AstPlot *, int );
@@ -1506,12 +1596,6 @@ static int TestAttrib( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void SetAttrib( AstObject *, const char * );
 
-#if 0
-/* ENABLE-ESCAPE - Add the following prototype when escape sequences
-   are enabled. */
-static int DrawText( AstPlot *, int, const char *, float, float, const char *, float, float, const char *, const char * );
-#endif
-
 static AstFrameSet *Fset2D( AstFrameSet *, int );
 static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char * );
 static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char * );
@@ -1524,20 +1608,23 @@ static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const cha
 static char **CheckLabels2( AstFrame *, int, double *, int, char **, double );
 static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
+static const char *JustMB( AstPlot *, int, const char *, float *, float *, float, float, const char *, float, float, float, float, float *, float *, const char *, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
-static double GetTicks( AstPlot *, int, double *, double, double **, int *, int *, int, int *, double *, const char *, const char * );
-static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
+static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, int *, double *, const char *, const char * );
 static double GetUseSize( AstPlot *, int );
 static double GetUseWidth( AstPlot *, int );
+static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
 static double Typical( int, double *, double, double );
 static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
-static int BoxText( AstPlot *, int, const char *, float, float, const char *, float, float, float *, float *, const char *, const char * );
 static int CGAttrWrapper( AstPlot *, int, double, double *, int );
+static int CGScalesWrapper( AstPlot *, float *, float * );
 static int CGFlushWrapper( AstPlot * );
 static int CGLineWrapper( AstPlot *, int, const float *, const float * );
 static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
+static int CGCapWrapper( AstPlot *, int, int );
+static int CGQchWrapper( AstPlot *, float *, float * );
 static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
 static int CheckLabels( AstFrame *, int, double *, int, int, char **, double );
@@ -1551,10 +1638,15 @@ static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, cons
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
 static int FindMajTicks( AstMapping *, AstFrame *, int, double, double , double *, int, double *, double ** );
 static int FindMajTicks2( int, double, double, int, double *, double ** );
+static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FullForm( const char *, const char *, const char *, const char *, const char * );
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
-static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
+static int GetUseColour( AstPlot *, int );
+static int GetUseFont( AstPlot *, int );
+static int GetUseStyle( AstPlot *, int );
+static int HasEscapes( const char * );
+static int IdFind( int, int *, int * );
 static int Inside( int, float *, float *, float, float);
 static int IsASkyFrame( AstObject * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
@@ -1563,10 +1655,7 @@ static int TestUseFont( AstPlot *, int );
 static int TestUseSize( AstPlot *, int );
 static int TestUseStyle( AstPlot *, int );
 static int TestUseWidth( AstPlot *, int );
-static int GetUseColour( AstPlot *, int );
-static int GetUseFont( AstPlot *, int );
-static int GetUseStyle( AstPlot *, int );
-static int IdFind( int, int *, int * );
+static int ToggleLogLin( AstPlot *, int, int, const char * );
 static int Ustrcmp( const char *, const char * );
 static int Ustrncmp( const char *, const char *, size_t );
 static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
@@ -1577,18 +1666,22 @@ static void BoundingBox( AstPlot *, float[2], float[2] );
 static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
 static void Copy( const AstObject *, AstObject * );
-static void Crv( AstPlot *this, double *, double *, double *, int, const char *, const char * );
+static void Crv( AstPlot *this, double *, double *, double *, int, double *, const char *, const char * );
 static void CrvLine( AstPlot *this, double, double, double, double, const char *, const char * );
 static void Curve( AstPlot *, const double [], const double [] );
 static void CurvePlot( AstPlot *, const double *, const double *, int , CurveData *, const char *, const char * );
 static void Delete( AstObject * );
 static void DrawAxis( AstPlot *, TickInfo **, double *, double *, const char *, const char *);
+static void DrawText( AstPlot *, int, int, const char *, float, float, const char *, float, float, float *, float *, float *, const char *, const char * );
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void GAttr( AstPlot *, int, double, double *, int, const char *, const char * );
+static void GScales( AstPlot *, float *, float *, const char *, const char *  );
 static void GFlush( AstPlot *, const char *, const char * );
 static void GLine( AstPlot *, int, const float *, const float *, const char *, const char * );
 static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char * );
+static void GQch( AstPlot *, float *, float *, const char *, const char *  );
+static int GCap( AstPlot *, int, int );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GenCurve( AstPlot *, AstMapping * );
@@ -1599,25 +1692,29 @@ static void GrfSet( AstPlot *, const char *,  AstGrfFun );
 static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap );
 static void Grid( AstPlot * );
 static void GridLine( AstPlot *, int, const double [], double );
+static void InterpEscape( AstPlot *, int, double, float *, float *, float, float, float, float, const char *, float *, double, double, double, double, double, const char *, const char * );
 static void Labelat( AstPlot *, TickInfo **, CurveData **, double *, const char *, const char * );
 static void Labels( AstPlot *, TickInfo **, CurveData **, double *, double *, const char *, const char * );
 static void LinePlot( AstPlot *, double, double, double, double, int, CurveData *, const char *, const char * );
 static void Map1( int, double *, double *, double *, const char *, const char * );
-static void slowNorm( double **, AstPointSet *, double *, double *, double *, double *, int, const char *, const char * );
 static void Map2( int, double *, double *, double *, const char *, const char * );
 static void Map3( int, double *, double *, double *, const char *, const char * );
 static void Map4( int, double *, double *, double *, const char *, const char * );
 static void Mark( AstPlot *, int, int, int, const double *, int );
 static void Norm1( AstMapping *, int, int, double *, double );
 static void Opoly( AstPlot *, const char *, const char * );
-static void PlotLabels( AstPlot *, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
+static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
 static void PolyCurve( AstPlot *, int, int, int, const double * );
+static void PushGat( AstPlot *, float, const char *, const char * );
+static int PopGat( AstPlot *, float *, const char *, const char * );
 static void PurgeCdata( CurveData * );
 static void RemoveFrame( AstFrameSet *, int );
+static void RightVector( AstPlot *, float *, float *, float *, float *, const char *, const char * );
 static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
 static void TextLabels( AstPlot *, int, int *, const char *, const char *);
 static void Ticker( AstPlot *, int, int, double, double *, double, const char *, const char *);
 static void TraceBorder( AstPlot *, double **, double **, int, int *, const char *, const char * );
+static void UpdateConcat( float *, float *, float, float, float, float, float *, float *, float, float, float *, float *, float *, float * );
 void GrfAttrs( AstPlot *, int, int, int, const char *, const char * );
 
 /* Functions which access class attributes. */
@@ -1653,8 +1750,8 @@ void GrfAttrs( AstPlot *, int, int, int, const char *, const char * );
 *
 *     The Tol value should be given as a fraction of the minimum
 *     dimension of the plotting area, and should lie in the range
-c     from 1.0e-7 to 1.0. By default, a value of 0.001 is used.
-f     from 1.0E-7 to 1.0. By default, a value of 0.001 is used.
+c     from 1.0e-7 to 1.0. By default, a value of 0.01 is used.
+f     from 1.0E-7 to 1.0. By default, a value of 0.01 is used.
 
 *  Applicability:
 *     Plot
@@ -1662,9 +1759,9 @@ f     from 1.0E-7 to 1.0. By default, a value of 0.001 is used.
 *att--
 */
 /* The plotting tolerance. Has a value of -1.0 when not set yielding a 
-default value of 0.001. Usable values are in the range 1.0E-7 to 1.0. */
+default value of 0.01. Usable values are in the range 1.0E-7 to 1.0. */
 astMAKE_CLEAR(Plot,Tol,tol,-1.0)
-astMAKE_GET(Plot,Tol,double,0.001,(this->tol == -1.0 ? 0.001 : this->tol))
+astMAKE_GET(Plot,Tol,double,0.01,(this->tol == -1.0 ? 0.01 : this->tol))
 astMAKE_SET(Plot,Tol,double,tol,MIN(MAX(value,1.0E-7),1.0))
 astMAKE_TEST(Plot,Tol,( this->tol != -1.0 ))
 
@@ -2112,19 +2209,13 @@ MAKE_SET(DrawAxes,int,drawaxes,( value ? 1 : 0 ),2)
 
 /* Escape. */
 /* ------- */
-
-/* The facilities for including escape sequences in formated strings and
-   axis values are not yet available in AST. Until they are, this attribute 
-   is not made available to the public. When required, add "*att++" and
-   "*att--" at the start and end of the prologue, and reinstate the
-   correct call to astMAKE_GET which follows. (ENABLE-ESCAPE) */
-
 /*
+*att++
 *  Name:
 *     Escape
 
 *  Purpose:
-*     Interpret escape sequences within text strings?
+*     Allow changes of character attributes within strings?
 
 *  Type:
 *     Public attribute.
@@ -2143,6 +2234,9 @@ f     numerical labels drawn by the AST_GRID and AST_TEXT functions,
 *     If the Escape value of a Plot is one (the default), then any
 *     escape sequences in text strings produce the effects described
 *     below when printed. Otherwise, they are printed literally.
+*
+c     See also the astEscapes function.
+f     See also the AST_ESCAPES function.
 
 *  Escape Sequences:
 *     Escape sequences are introduced into the text string by a percent 
@@ -2174,6 +2268,11 @@ f     numerical labels drawn by the AST_GRID and AST_TEXT functions,
 *                 so that a value of "100" corresponds to the height of 
 *                 "normal" text.
 *
+*       %<...+  - Move backwards before drawing subsequent characters.
+*                 The digits "..." give the size of the movement, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text.
+*
 *       %s...+  - Change the Size attribute for subsequent characters. The
 *                 digits "..." give the new Size as a fraction of the 
 *                 "normal" Size, scaled so that a value of "100" corresponds 
@@ -2186,7 +2285,7 @@ f     numerical labels drawn by the AST_GRID and AST_TEXT functions,
 *                 "normal" Width, scaled so that a value of "100" corresponds 
 *                 to 1.0;
 *
-*       %w+     - Reset the Wize attribute to its "normal" value.
+*       %w+     - Reset the Size attribute to its "normal" value.
 *
 *       %f...+  - Change the Font attribute for subsequent characters. The
 *                 digits "..." give the new Font value.
@@ -2203,21 +2302,20 @@ f     numerical labels drawn by the AST_GRID and AST_TEXT functions,
 *
 *       %t+     - Reset the Style attribute to its "normal" value.
 *
-*       %+      - Reset all attributes to their "normal" values.
+*       %-      - Push the current graphics attribute values onto the top of 
+*                 the stack (see "%+").
+*
+*       %+      - Pop attributes values of the top the stack (see "%-"). If
+*                 the stack is empty, "normal" attribute values are restored.
 
 *  Applicability:
 *     Plot
 *        All Plots have this attribute.
-
+*att--
 */
+
 /* Has a value of -1 when not set yeilding a default of 1. */
-
-/* Use the following call to astMAKE_GET once the Escape attribute has
-   been enabled (ENABLE-ESCAPE). 
 astMAKE_GET(Plot,Escape,int,1,(this->escape == -1 ? 1 : this->escape))
-   */
-
-astMAKE_GET(Plot,Escape,int,0,0)
 astMAKE_CLEAR(Plot,Escape,escape,-1)
 astMAKE_SET(Plot,Escape,int,escape,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,Escape,( this->escape != -1 ))
@@ -2287,8 +2385,8 @@ MAKE_GET(LabelAt,double,AST__BAD,this->labelat[axis],2)
 MAKE_SET(LabelAt,double,labelat,value,2)
 MAKE_TEST(LabelAt,( this->labelat[axis] != AST__BAD ),2)
 
-MAKE_GET3(UsedLabelAt,double,AST__BAD,this->ulblat[axis],2)
-MAKE_SET3(UsedLabelAt,double,ulblat,value,2)
+MAKE_GET3(LabelAt,double,AST__BAD,this->ulblat[axis],2)
+MAKE_SET3(LabelAt,double,ulblat,value,2)
 
 /* Centre(axis). */
 /* ------------ */
@@ -2300,8 +2398,8 @@ MAKE_GET(Centre,double,AST__BAD,this->centre[axis],2)
 MAKE_SET(Centre,double,centre,value,2)
 MAKE_TEST(Centre,( this->centre[axis] != AST__BAD ),2)
 
-MAKE_GET3(UsedCentre,double,AST__BAD,this->ucentre[axis],2)
-MAKE_SET3(UsedCentre,double,ucentre,value,2)
+MAKE_GET3(Centre,double,AST__BAD,this->ucentre[axis],2)
+MAKE_SET3(Centre,double,ucentre,value,2)
 
 /* Ink */
 /* --- */
@@ -2320,7 +2418,7 @@ astMAKE_TEST(Plot,Ink,( this->ink != -1 ))
 *     Gap(axis)
 
 *  Purpose:
-*     Interval between major axis values of a Plot.
+*     Interval between linearly spaced major axis values of a Plot.
 
 *  Type:
 *     Public attribute.
@@ -2332,11 +2430,14 @@ astMAKE_TEST(Plot,Ink,( this->ink != -1 ))
 *     This attribute controls the appearance of an annotated
 c     coordinate grid (drawn with the astGrid function) by determining
 f     coordinate grid (drawn with the AST_GRID routine) by determining
-*     the interval between the "major" axis values of a Plot, at which
-*     (for example) major tick marks are drawn. It takes a separate
+*     the linear interval between the "major" axis values of a Plot, at
+*     which (for example) major tick marks are drawn. It takes a separate
 *     value for each physical axis of the Plot so that, for instance,
-*     the setting "Gap(2)=3.0" specifies the interval between major
-*     values along the second axis.
+*     the setting "Gap(2)=3.0" specifies the difference between adjacent major
+*     values along the second axis. The Gap attribute is only used when
+*     the LogTicks attribute indicates that the spacing between major axis
+*     values is to be linear. If major axis values are logarithmically spaced 
+*     then the gap is specified using attribute LogGap.
 *
 *     The Gap value supplied will usually be rounded to the nearest
 *     "nice" value, suitable (e.g.) for generating axis labels, before
@@ -2368,8 +2469,248 @@ MAKE_SET(Gap,double,gap,value,2)
 MAKE_TEST(Gap,( this->gap[axis] != AST__BAD ),2)
 MAKE_GET(Gap,double,AST__BAD,this->gap[axis],2)
 
-MAKE_SET3(UsedGap,double,ugap,value,2)
-MAKE_GET3(UsedGap,double,AST__BAD,this->ugap[axis],2)
+MAKE_SET3(Gap,double,ugap,value,2)
+MAKE_GET3(Gap,double,AST__BAD,this->ugap[axis],2)
+
+/* LogGap(axis). */
+/* ---------- */
+/*
+*att++
+*  Name:
+*     LogGap(axis)
+
+*  Purpose:
+*     Interval between major axis values of a Plot.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute controls the appearance of an annotated
+c     coordinate grid (drawn with the astGrid function) by determining
+f     coordinate grid (drawn with the AST_GRID routine) by determining
+*     the logarithmic interval between the "major" axis values of a Plot, at
+*     which (for example) major tick marks are drawn. It takes a separate
+*     value for each physical axis of the Plot so that, for instance,
+*     the setting "LogGap(2)=100.0" specifies the ratio between adjacent major
+*     values along the second axis. The LogGap attribute is only used when
+*     the LogTicks attribute indicates that the spacing between major axis
+*     values is to be logarithmic. If major axis values are linearly spaced 
+*     then the gap is specified using attribute Gap.
+*
+*     The LogGap value supplied will be rounded to the nearest power of 10.
+*     The reciprocal of the supplied value may be used if this is necessary 
+*     to produce usable major axis values. If a zero or negative value is 
+*     supplied, an error will be reported when the grid is drawn. The default 
+*     behaviour is for the Plot to generate its own LogGap value when 
+*     required, based on the range of axis values to be represented.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - The LogGap value is a ratio between axis values and is therefore
+*     dimensionless.
+*     - If no axis is specified, (e.g. "LogGap" instead of "LogGap(2)"),
+*     then a "set" or "clear" operation will affect the attribute
+*     value of all the Plot axes, while a "get" or "test" operation
+*     will use just the LogGap(1) value.
+*att--
+*/
+/* The logarithmic gap between tick marks on each axis. AST__BAD is stored if 
+   no value has been supplied, resulting in default values being found. */
+MAKE_CLEAR(LogGap,loggap,AST__BAD,2)
+MAKE_SET(LogGap,double,loggap,value,2)
+MAKE_TEST(LogGap,( this->loggap[axis] != AST__BAD ),2)
+MAKE_GET(LogGap,double,AST__BAD,this->loggap[axis],2)
+
+MAKE_SET3(LogGap,double,uloggap,value,2)
+MAKE_GET3(LogGap,double,AST__BAD,this->uloggap[axis],2)
+
+/* LogPlot. */
+/* -------  */
+/*
+*att++
+*  Name:
+*     LogPlot(axis)
+
+*  Purpose:
+*     Map the plot logarithmically onto the screen?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean). 
+
+*  Description:
+*     This attribute controls the appearance of all graphics produced by
+*     the Plot, by determining whether the axes of the plotting surface
+*     are mapped logarithmically or linearly onto the base Frame of the 
+*     FrameSet supplied when the Plot was constructed. It takes a separate 
+*     value for each axis of the graphics coordinate system (i.e. the
+*     base Frame in the Plot) so that, for instance, the setting
+*     "LogPlot(2)=1" specifies that the second axis of the graphics
+*     coordinate system (usually the vertical axis) should be mapped
+*     logarithmically onto the second axis of the base Frame of the
+*     FrameSet supplied when the Plot was constructed. 
+*
+*     If the LogPlot value of a Plot axis is non-zero, it causes that
+*     axis to be mapped logarithmically, otherwise (the default) the axis
+*     is mapped linearly.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - The setting of the LogPlot attribute provides the default value
+*     for the related LogTicks attribute. By selecting suitable values for 
+*     LogPlot and LogTicks, it is possible to have tick marks which are evenly 
+*     spaced in value but which are mapped logarithmically onto the screen 
+*     (and vice-versa).
+*     - An axis may only be mapped logarithmically if the visible part of
+*     the axis does not include the value zero. The visible part of the
+*     axis is that part which is mapped onto the plotting area, and is
+*     measured within the base Frame of the FrameSet which was supplied when
+*     the Plot was constructed. Any attempt to set LogPlot to a non-zero value 
+*     will be ignored (without error) if the visible part of the axis 
+*     includes the value zero
+*     - If no axis is specified, (e.g. "LogPlot" instead of
+*     "LogPlot(2)"), then a "set" or "clear" operation will affect the
+*     attribute value of all the Plot axes, while a "get" or "test"
+*     operation will use just the LogPlot(1) value.
+*att--
+*/
+/* Are plot axes to be mapped logarithmically? Has a value of -1 when 
+not set yielding a value of 0 (no) for both axes. */
+MAKE_GET(LogPlot,int,0,( this->logplot[axis] == -1 ? 0 : this->logplot[axis] ),2)
+MAKE_TEST(LogPlot,( this->logplot[axis] != -1 ),2)
+
+/* LogTicks. */
+/* -------  */
+/*
+*att++
+*  Name:
+*     LogTicks(axis)
+
+*  Purpose:
+*     Space the major tick marks logarithmically?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean). 
+
+*  Description:
+*     This attribute controls the appearance of an annotated
+c     coordinate grid (drawn with the astGrid function) by determining
+f     coordinate grid (drawn with the AST_GRID routine) by determining
+*     whether the major tick marks should be spaced logarithmically or 
+*     linearly in axis value. It takes a separate value for each physical 
+*     axis of the Plot so that, for instance, the setting "LogTicks(2)=1" 
+*     specifies that the major tick marks on the second axis should be 
+*     spaced logarithmically.
+*
+*     If the LogTicks value for a physical axis is non-zero, the major
+*     tick marks on that axis will be spaced logarithmically (that is,
+*     there will be a constant ratio between the axis values at adjacent 
+*     major tick marks). An error will be reported if the dynamic range of 
+*     the axis (the ratio of the largest to smallest displayed axis value) 
+*     is less than 10.0. If the LogTicks value is zero, the major tick marks 
+*     will be evenly spaced (that is, there will be a constant difference 
+*     between the axis values at adjacent major tick marks). The default is 
+*     to produce logarithmically spaced tick marks if the corresponding 
+*     LogPlot attribute is non-zero and the ratio of maximum axis value
+*     to minimum axis value is 100 or more. If either of these conditions
+*     is not met, the default is to produce linearly spaced tick marks.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - The setting of the LogTicks attribute does not affect the mapping
+*     of the plot onto the screen, which is controlled by attribute LogPlot.
+*     By selecting suitable values for LogPlot and LogTicks, it is possible to 
+*     have tick marks which are evenly spaced in value but which are mapped 
+*     logarithmically onto the screen (and vica-versa).
+*     - An error will be reported when drawing an annotated axis grid if
+*     the visible part of the physical axis includes the value zero.
+*     - If no axis is specified, (e.g. "LogTicks" instead of
+*     "LogTicks(2)"), then a "set" or "clear" operation will affect the
+*     attribute value of all the Plot axes, while a "get" or "test"
+*     operation will use just the LogTicks(1) value.
+*att--
+*/
+/* Are ticksto be spaced logarithmically? Has a value of -1 when 
+   not set, yeielding a default value equal to the corresponding
+   LogPlot value. */
+MAKE_CLEAR(LogTicks,logticks,-1,2)
+MAKE_GET(LogTicks,int,0,( this->logticks[axis] == -1 ? astGetLogPlot(this,axis) : this->logticks[axis] ),2)
+MAKE_TEST(LogTicks,( this->logticks[axis] != -1 ),2)
+MAKE_SET(LogTicks,int,logticks,( value ? 1 : 0 ),2)
+
+MAKE_SET3(LogTicks,int,ulgtk,value,2)
+MAKE_GET3(LogTicks,int,0,this->ulgtk[axis],2)
+
+/* LogLabel. */
+/* --------  */
+/*
+*att++
+*  Name:
+*     LogLabel(axis)
+
+*  Purpose:
+*     Use exponential format for numerical axis labels?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean). 
+
+*  Description:
+*     This attribute controls the appearance of an annotated
+c     coordinate grid (drawn with the astGrid function) by determining
+f     coordinate grid (drawn with the AST_GRID routine) by determining
+*     whether the numerical axis labels should be in normal decimal form
+*     or should be represented as 10 raised to the appropriate power.
+*     That is, an axis value of 1000.0 will be drawn as "1000.0" if
+*     LogLabel is zero, but as "10^3" if LogLabel is non-zero. If
+*     graphical escape sequences are supported (see attribute Escape), 
+*     the power in such exponential labels will be drawn as a small 
+*     superscript instead of using a "^" character to represent
+*     exponentiation.
+*
+*     The default is to produce exponential labels if the major tick
+*     marks are logarithmically spaced (see the LogTicks attribute).
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - If no axis is specified, (e.g. "LogLabel" instead of
+*     "LogLabel(2)"), then a "set" or "clear" operation will affect the
+*     attribute value of all the Plot axes, while a "get" or "test"
+*     operation will use just the LogLabel(1) value.
+*att--
+*/
+/* Are labels to be drawn as 10**x? Has a value of -1 when not set, yeielding 
+   a default value equal to the corresponding LogTicks value. */
+MAKE_CLEAR(LogLabel,loglabel,-1,2)
+MAKE_GET(LogLabel,int,0,( this->loglabel[axis] == -1 ? astGetLogTicks(this,axis) : this->loglabel[axis] ),2)
+MAKE_TEST(LogLabel,( this->loglabel[axis] != -1 ),2)
+MAKE_SET(LogLabel,int,loglabel,( value ? 1 : 0 ),2)
+
+MAKE_SET3(LogLabel,int,ulglb,value,2)
+MAKE_GET3(LogLabel,int,0,this->ulglb[axis],2)
 
 /* MajTickLen. */
 /* ----------- */
@@ -2427,8 +2768,8 @@ MAKE_SET(MajTickLen,double,majticklen,value,2)
 MAKE_TEST(MajTickLen,( this->majticklen[axis] != AST__BAD ),2)
 MAKE_GET(MajTickLen,double,0.0,( this->majticklen[axis] == AST__BAD ? 0.015 : this->majticklen[axis]),2)
 
-MAKE_SET3(UsedMajTickLen,double,umjtkln,value,2)
-MAKE_GET3(UsedMajTickLen,double,0.0,this->umjtkln[axis],2)
+MAKE_SET3(MajTickLen,double,umjtkln,value,2)
+MAKE_GET3(MajTickLen,double,0.0,this->umjtkln[axis],2)
 
 /* TitleGap. */
 /* --------- */
@@ -2634,8 +2975,8 @@ MAKE_GET(Edge,int,0,( this->edge[axis] == -1 ? (axis?LEFT:BOTTOM) : this->edge[a
 MAKE_SET(Edge,int,edge,(abs( value % 4 )),2)
 MAKE_TEST(Edge,( this->edge[axis] != -1 ),2)
 
-MAKE_GET3(UsedEdge,int,0,this->uedge[axis],2)
-MAKE_SET3(UsedEdge,int,uedge,(abs( value % 4 )),2)
+MAKE_GET3(Edge,int,0,this->uedge[axis],2)
+MAKE_SET3(Edge,int,uedge,(abs( value % 4 )),2)
 
 /* NumLab. */
 /* -------- */
@@ -2792,8 +3133,8 @@ MAKE_GET(MinTick,int,1,( this->mintick[axis] == -1 ? 1 : this->mintick[axis] ),2
 MAKE_TEST(MinTick,( this->mintick[axis] != -1 ),2)
 MAKE_SET(MinTick,int,mintick,( (value < 1)? 1 : value ),2)
 
-MAKE_GET3(UsedMinTick,int,1,this->umintk[axis],2)
-MAKE_SET3(UsedMinTick,int,umintk,( (value < 1)? 1 : value ),2)
+MAKE_GET3(MinTick,int,1,this->umintk[axis],2)
+MAKE_SET3(MinTick,int,umintk,( (value < 1)? 1 : value ),2)
 
 /* TextLab. */
 /* --------- */
@@ -2852,8 +3193,8 @@ MAKE_GET(TextLab,int,1,( this->textlab[axis] == -1 ? 1 : this->textlab[axis] ),2
 MAKE_TEST(TextLab,( this->textlab[axis] != -1 ),2)
 MAKE_SET(TextLab,int,textlab,( value ? 1 : 0 ),2)
 
-MAKE_GET3(UsedTextLab,int,1,this->utxtlb[axis],2)
-MAKE_SET3(UsedTextLab,int,utxtlb,( value ? 1 : 0 ),2)
+MAKE_GET3(TextLab,int,1,this->utxtlb[axis],2)
+MAKE_SET3(TextLab,int,utxtlb,( value ? 1 : 0 ),2)
 
 /* TextLabGap. */
 /* ----------- */
@@ -2971,8 +3312,8 @@ MAKE_CLEAR(LabelUnits,labelunits,-1,2)
 MAKE_TEST(LabelUnits,( this->labelunits[axis] != -1 ),2)
 MAKE_SET(LabelUnits,int,labelunits,( value ? 1 : 0 ),2)
 
-MAKE_GET3(UsedLabelUnits,int,1,this->ulbunit[axis],2)
-MAKE_SET3(UsedLabelUnits,int,ulbunit,( value ? 1 : 0 ),2)
+MAKE_GET3(LabelUnits,int,1,this->ulbunit[axis],2)
+MAKE_SET3(LabelUnits,int,ulbunit,( value ? 1 : 0 ),2)
 
 /* Style. */
 /* ------ */
@@ -3517,6 +3858,13 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+#ifdef CRV_TRACE
+   printf("AXPLOT: axis %d, start (%.*g,%.*g), length %.*g\n",
+          axis, DBL_DIG, start[0], DBL_DIG, start[1], DBL_DIG, length );
+   getchar();
+#endif
+
+
 /* Initialise any supplied cdata structure to hold safe values. */
    if( cdata ){
       cdata->length = 0.0;
@@ -3559,16 +3907,19 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
    Frame). */
       Map1_ncoord = naxes;
 
+/* See if tick marks are logarithmically or linearly spaced. */
+      Map1_log = astGetLogTicks( this, axis );
+
 /* A pointer to the Plot, the Current Frame and the Mapping. */
       Map1_plot = this;
       Map1_frame = astGetFrame( this, AST__CURRENT );
       Map1_map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
-/* The physical coordinates at the start of the curve. */
+/* Physical coords at the start of the curve (dist=0). */
       Map1_origin = start;
 
-/* The scale factor to convert "dist" values into physical axis values. */
-      Map1_scale = length;
+/* Length of the curve. */
+      Map1_length = length;
 
 /* The index of the axis which the curve follows. */
       Map1_axis = axis;
@@ -3581,6 +3932,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
                                    this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
       Crv_ux0 = AST__BAD;    
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
@@ -3605,7 +3958,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map1 to draw the curve. */
-      Crv( this, d, x, y, 0, method, class );
+      Crv( this, d, x, y, 0, NULL, method, class );
 
 /* End the current poly line. */
       Opoly( this, method, class );
@@ -3769,8 +4122,12 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
    physical coordinates have been found. */
    ret = 0;
 
-/* Store the fractional plotting tolerance. */
-   tol = astGetTol( this );
+/* Store the fractional plotting tolerance. The following algorithm seems
+   not to be calibrated corectly in terms of tol (i.e. the visible errors
+   for a given tol are much larger than the value of tolwould imply.
+   Therefore we introduce a factor which seems to bring the calibration
+   to something more reasonable. */
+   tol = 0.1*astGetTol( this );
 
 /* Extract the mapping from the Plot. */
    map = astGetMapping( this, AST__BASE, AST__CURRENT );
@@ -4413,205 +4770,6 @@ static int BoxCheck( float *bx, float *by, float *cx, float *cy ) {
    return ret;
 }
 
-static int BoxText( AstPlot *this, int esc, const char *text, float x, float y, 
-                    const char *just, float upx, float upy, float *xbn, float *ybn,
-                    const char *method, const char *class ){
-/*
-*+
-*  Name:
-*     BoxText
-
-*  Purpose:
-*     Find the bounding box enclosing a text string, potentially including 
-*     superscripts and subscripts.
-
-*  Synopsis:
-*     #include "plot.h"
-*     int BoxText( AstPlot *this, int esc, const char *text, float x, float y,
-*                  const char *just, float upx, float upy, float *xbn, 
-*                  float *ybn, const char *method, const char *class )
-
-*  Description:
-*     This function returns the bounding box which would enclosed the 
-*     supplied text, if it were to be drawn. The returned box optionally 
-*     includes super-scripts and sub-scripts implied by any escape sequences 
-*     in the string. 
-
-*  Parameters:
-*     this
-*        The plot.
-*     esc
-*        Should escape sequences be interpreted? They will be printed
-*        literally otherwise.
-*     text 
-*        Pointer to a null-terminated character string to be displayed.
-*     x
-*        The graphics X coordinate of the label's reference point.
-*     y
-*        The graphics Y coordinate of the label's reference point.
-*     just
-*        Pointer to a null-terminated character string identifying the
-*        reference point for the text being drawn. The first character
-*        in this string identifies the reference position in the "up"
-*        direction and may be "B", "C" or "T" (for bottom, centre or
-*        top). The second character identifies the side-to-side
-*        reference position and may be "L", "C" or "R" (for left,
-*        centre or right). The string is case-insensitive, and only
-*        the first two characters are significant.
-*     upx
-*        The x component of the up-vector for the text. Positive values
-*        always refer to displacements from left to right on the screen, 
-*        even if the graphics x axis increases in the opposite sense.
-*     upy
-*        The y component of the up-vector for the text. Positive values
-*        always refer to displacements from left to right on the screen, 
-*        even if the graphics y axis increases in the opposite sense.
-*     xbn
-*        An array in which is returned the x coordinates at the corners
-*        of the bounding box. If "esc" is non-zero, then these corners
-*        are in the order; bottom-left, bottom-right, top-right, top-left.
-*        If "esc" is zero, the order is not specified.
-*     ybn
-*        An array in which is returned the Y coordinates at the corners
-*        of the bounding box (see xbn).
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class 
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-
-*  Returned Value:
-*     Zero for failure, one for success.
-
-*  Notes:
-*     -  The "B" option for the justification in the "up" direction refers
-*     to the base-line on which the text is written. Some characters
-*     ("y", "p", "g", etc) descend below this line. In addition, if the
-*     supplied text string includes any escape sequences which produce 
-*     sub-scripts, then these will also descend below the base-line. To
-*     justify the bottom of the entire string (instead of just the
-*     base-line), specify "D" instead of "B" in the justification string.
-*     -  The "T" option for the justification in the "up" direction refers
-*     to the top of the tallest characters. However, if the supplied text 
-*     string includes any escape sequences which produce super-scripts, 
-*     then these may extend above this line. To justify the top of the 
-*     entire string (including super-scripts), specify "U" instead of "T" 
-*     in the justification string.
-*     -  See function GrText for details of the supported escape sequences.
-*     -  Both "upx" and "upy" being zero causes an error.
-*-
-*/
-
-
-/* Local Variables: */
-   char lj[3];          /* Local version of justification string. */
-   int bbclip;          /* GrText to return bounding box of "normal" text? */
-   int ret;             /* Returned status */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Assume success. */
-   ret = 1;
-
-/* Fill in any missing parts of the justification string. */
-   if( just ){
-      if( just[ 0 ] == 'T' || just[ 0 ] == 'C' || just[ 0 ] == 'B' ||
-          just[ 0 ] == 'U' || just[ 0 ] == 'D' ){
-         lj[ 0 ] = just[ 0 ];
-      } else {
-         lj[ 0 ] = 'C';
-      }
-
-      if( just[ 1 ] == 'L' || just[ 1 ] == 'C' || just[ 1 ] == 'R' ){
-         lj[ 1 ] = just[ 1 ];
-      } else {
-         lj[ 1 ] = 'C';
-      }
-
-   } else {
-      lj[ 0 ] = 'C';
-      lj[ 1 ] = 'C';
-   }
-
-   lj[2] = 0;
-
-/* Only proceed if some text has been supplied. */
-   if( text ) {
-
-/* The basic drawing function GrText assumes BL justification. If this is
-   the requested justification, just call GrText to get the bounds of the 
-   text. */
-      if( lj[0] == 'B' && lj[1] == 'L' ) {
-         ret = GrText( this, esc, text, 0, 0, x, y, upx, upy, xbn, ybn, 
-                       method, class );
-
-/* Otherwise, we need to determine the correct BL position which will
-   give the requested justfication. This involves calling GrText twice;
-   once (with ink switched off) to find the size of the text string, and
-   once to find the required bounding box. */
-      } else {
-
-/* The vertical justification options "U" and "D" refer to the top or bottom 
-   of the whole bounding box (including sub-scripts, super-scripts, etc ). If
-   either of these have been requested, convert them into the equivalent
-   options refering to the "normal" text bounding box (i.e. "T" or "B"),
-   and set a flag indicating that the bounding box returned by GrText
-   should not be clipped. */
-         if( lj[0] == 'U' ) {
-            lj[0] = 'T';   
-            bbclip = 0;
-      
-         } else if( lj[0] == 'D' ) {
-            lj[0] = 'B';   
-            bbclip = 0;
-      
-         } else {
-            bbclip = 1;
-         }
-
-/* Get the bounding box enclosing the text produced if the bottom left corner 
-   of the bounding box is placed at the supplied reference position. This box 
-   is clipped to exclude super-scripts and sub-scripts if "bbclip" is
-   non-zero. */
-         ret = GrText( this, esc, text, 0, bbclip, x, y, upx, upy, xbn, ybn, 
-                       method, class );
-         if( ret ) {
-
-/* Find the position of the bottom left corner of the bounding box which
-   produces the required justification. */
-            if( lj[0] == 'C' ) {
-               x += 0.5*( xbn[0] - xbn[3] );
-               y += 0.5*( ybn[0] - ybn[3] );
-   
-            } else if( lj[0] == 'T' ) {
-               x += xbn[0] - xbn[3];
-               y += ybn[0] - ybn[3];
-            }
-   
-            if( lj[1] == 'C' ) {
-               x += 0.5*( xbn[0] - xbn[1] );
-               y += 0.5*( ybn[0] - ybn[1] );
-
-            } else if( lj[1] == 'R' ) {
-               x += xbn[0] - xbn[1];
-               y += ybn[0] - ybn[1];
-            }
-
-/* Get the unclipped bounding box for the text putting the bottom left 
-   corner of the normal text at the modified reference position. */
-            ret = GrText( this, esc, text, 0, 0, x, y, upx, upy, xbn, ybn, 
-                          method, class );
-         }
-      }
-   }
-
-/* Return the status. */
-   return ret;
-
-}
-
 static void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class ){
 /*
 *  Name:
@@ -4657,6 +4815,48 @@ static void Bpoly( AstPlot *this, float x, float y, const char *method, const ch
 /* Add the supplied point into the buffer. */
    Apoly( this, x, y, method, class );
 
+}
+
+
+static int CGCapWrapper( AstPlot *this, int cap, int value ) {
+/*
+*
+*  Name:
+*     CGCapWrapper
+
+*  Purpose:
+*     Call a C implementation of the GCap Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGCapWrapper( AstPlot *this, int cap, int value )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GCap
+*     grf function to enquire or set a graphics attribute value. 
+
+*  Parameters:
+*     this
+*        The Plot.
+*     cap
+*        The capability to be inquired aboue.
+*     value
+*        The value ot assign to the capability.
+
+*  Returned Value:
+*     Non-zero if the grf module is capabale of performing the action
+*     requested by "cap".
+
+*/
+
+   if( !astOK ) return 0;
+   return ( (AstGCapFun) this->grffun[ AST__GCAP ] )( cap, value );
 }
 
 static int CGAttrWrapper( AstPlot *this, int attr, double value, 
@@ -4963,6 +5163,82 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
    if ( !astOK ) return 0;
    return ( (AstGTxExtFun) this->grffun[ AST__GTXEXT ])( text, x, y, just, upx,
                                                          upy, xb, yb );
+}
+
+static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
+/*
+*
+*  Name:
+*     CGQchWrapper
+
+*  Purpose:
+*     Call a C implementation of the GQch Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGQchWrapper( AstPlot *this, float *chv, float *chh )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GQch
+*     grf function to find the extent of a text string.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     chv
+*        A pointer to the double which is to receive the height of
+*        characters drawn vertically. This will be an increment in the X
+*        axis
+*     chh
+*        A pointer to the double which is to receive the height of
+*        characters drawn vertically. This will be an increment in the Y
+*        axis
+*/
+   if ( !astOK ) return 0;
+   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( chv, chh );
+}
+
+static int CGScalesWrapper( AstPlot *this, float *alpha, float *beta ) {
+/*
+*
+*  Name:
+*     CGScalesWrapper
+
+*  Purpose:
+*     Call a C implementation of the GScales Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGScalesWrapper( AstPlot *this, float *alpha, float *beta )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GScales
+*     grf function to find the extent of a text string.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     alpha
+*        A pointer to the location at which to return the scale for the
+*        X axis (i.e. Xnorm = alpha*Xworld).
+*     beta
+*        A pointer to the location at which to return the scale for the
+*        Y axis (i.e. Ynorm = beta*Yworld).
+*/
+   if ( !astOK ) return 0;
+   return ( (AstGScalesFun) this->grffun[ AST__GSCALES ])( alpha, beta );
 }
 
 static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
@@ -5500,6 +5776,45 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       astClearLabelUp( this, axis - 1 );
 
+/* LogPlot */
+/* ------- */
+   } else if ( !strcmp( attrib, "logplot" ) ) {
+      astClearLogPlot( this, 0 );
+      astClearLogPlot( this, 1 );
+
+/* LogPlot(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "logplot(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearLogPlot( this, axis - 1 );
+
+/* LogTicks */
+/* ------- */
+   } else if ( !strcmp( attrib, "logticks" ) ) {
+      astClearLogTicks( this, 0 );
+      astClearLogTicks( this, 1 );
+
+/* LogTicks(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "logticks(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearLogTicks( this, axis - 1 );
+
+/* LogLabel */
+/* ------- */
+   } else if ( !strcmp( attrib, "loglabel" ) ) {
+      astClearLogLabel( this, 0 );
+      astClearLogLabel( this, 1 );
+
+/* LogLabel(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "loglabel(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearLogLabel( this, axis - 1 );
+
 /* NumLab. */
 /* ---------- */
    } else if ( !strcmp( attrib, "numlab" ) ) {
@@ -5669,6 +5984,19 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       astClearGap( this, axis - 1 );
 
+/* LogGap. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "loggap" ) ) {
+      astClearLogGap( this, 0 );
+      astClearLogGap( this, 1 );
+
+/* LogGap(axis). */
+/* ----------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "loggap(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearLogGap( this, axis - 1 );
+
 /* NumLabGap. */
 /* ---------- */
    } else if ( !strcmp( attrib, "numlabgap" ) ) {
@@ -5790,6 +6118,69 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
       (*parent_clearattrib)( this_object, attrib );
    }
 }
+
+static void ClearLogPlot( AstPlot *this, int axis ){
+/*
+*
+*  Name:
+*     ClearLogPlot
+
+*  Purpose:
+*     Clear the value for a LogPlot attribute
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void ClearLogPlot( AstPlot *this, int axis )
+
+*  Class Membership:
+*     Plot member function 
+
+*  Description:
+*     Assigns the default value to the LogPlot attribute of the specified 
+*     axis, and also re-maps the base Frame of the Plot if necessary.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     axis
+*        Zero based axis index.
+
+*/
+
+/* Local Variables: */
+   int oldval;           /* Original value of the attribute */
+   int newval;           /* Cleared (default) value of the attribute */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Validate the axis index. */ 
+   if( axis < 0 || axis >= 2 ){ 
+      astError( AST__AXIIN, "astClearLogPlot(%s): Index (%d) is invalid for "
+                "attribute LogPlot - it should be in the range 1 to 2.", 
+                astGetClass( this ), axis + 1 ); 
+
+/* Do nothing if the attribute is not currently set. */
+   } else if( astTestLogPlot( this, axis ) ){
+
+/* Get the original value of the attribute. clear the value, and then get
+   the new (default) value. */
+      oldval = this->logplot[ axis ];
+      this->logplot[ axis ] = -1;
+      newval = astGetLogPlot( this, axis );
+
+/* If the effective value has changed, attempt to remap the axis. If this
+   fails, re-instate the original value. */
+      if( ( oldval != 0 ) != ( newval != 0 ) ) {
+         if( !ToggleLogLin( this, axis, oldval, "astClearLogPlot" ) ) {
+            this->logplot[ axis ] = oldval;
+         }
+      }
+   }
+} 
 
 static void Clip( AstPlot *this, int iframe, const double lbnd[], 
                   const double ubnd[] ){
@@ -6293,8 +6684,8 @@ static int Cross( float ax, float ay, float bx, float by,
    return ret;
 }
 
-static void Crv( AstPlot *this, double *d, double *x, double *y, 
-                 int skipbad, const char *method, const char *class ){
+static void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad, 
+                 double *box, const char *method, const char *class ){
 /*
 *  Name:
 *     Crv
@@ -6308,7 +6699,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 *  Synopsis:
 *     #include "plot.h"
 *     void Crv( AstPlot *this, double *d, double *x, double *y, int skipbad,
-*               const char *method, const char *class  )
+*               double *box, const char *method, const char *class  )
 
 *  Class Membership:
 *     Plot member function.
@@ -6362,6 +6753,11 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 *        some good points between the supplied bad points, and therefore
 *        this function will attempt to sub-divide the supplied points.
 *        Should be supplied as zero on the initial invocation.
+*     box
+*        Pointer to an array of 4 doubles houlding a bounding box within
+*        which the current segment must reside if it is to be sub-divided.
+*        Supplied in the order xlo, xhi, ylo, yhi. May be NULL in which
+*        case, no check is made on the bounding box.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -6384,11 +6780,24 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 *     Crv_limit = double (Read)
 *        The square of the maximum acceptable residual between the 
 *        drawn curve and the true curve, in graphics coordinates.
+*     Crv_scerr = double (Read)
+*        If the ratio of the lengths of adjacent sub-segments is larger
+*        than Crv_scerr,then the seub-segments will be sub-divided. Note,
+*        if either axis is mapped logarithmically onto the screen, then 
+*        there will naturally be large changes in scale. Crv_scerr should 
+*        always be larger than 1.0.
 *     Crv_map = void (*)( int n, double *dd, double *xx, double *yy,
 *                         const char *method, const char *class ) (Read)
 *        A pointer to a function which can be called to map "n" distances 
 *        along the curve (supplied in "dd") into graphics coordinates 
 *        (stored in "xx" and "yy"). See function "Map1" as an example.
+
+*  Notes:
+*     - The CRV_TRACE conditional compilation blocks in this function
+*     provide code which displays the recursive entries made to this 
+*     function (and also pauses on initial entry until return is pressed).
+*     It is useful for investigating the details of the drawing of a 
+*     curve.
 
 */
 
@@ -6399,6 +6808,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    double *py;            /* Pointer to next sub-segment y coord. */
    double *xx;            /* Pointer to array holding sub-segment x coord.s */
    double *yy;            /* Pointer to array holding sub-segment x coord.s */
+   double bbox[4];        /* Bounding box for this segment */
    double dl2[ CRV_NSEG ];/* Squred segment lengths */
    double dx[ CRV_NSEG ]; /* X increment along each segment */
    double dy[ CRV_NSEG ]; /* Y increment along each segment */
@@ -6412,8 +6822,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    static double cosang;  /* Cosine of angle between adjacent segments */
    static double d0;      /* Distance to start of first sub-segment */
    static double delta;   /* Distance between adjacent sub-segments */
-   static double dl2_max; /* Maximum squred segment length */
    static double dl;      /* Segment length in graphics coordinates */
+   static double dll;     /* Segment length for previous segment */
    static double last_x;  /* Graphics X at the end of the previous segment */
    static double last_y;  /* Graphics Y at the end of the previous segment */
    static double limit2;  /* Shortest acceptable squared segment length */
@@ -6424,15 +6834,21 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    static double vxl;     /* X component of unit vector for previous segment */
    static double vy;      /* Y component of unit vector for current segment */
    static double vyl;     /* Y component of unit vector for previous segment */
+   static int *seg0;      /* Pointer to current segment OK flag */
+   static int *segm;      /* Pointer to previous segment OK flag */
+   static int *segp;      /* Pointer to next segment OK flag */
    static int all_bad;    /* Are all supplied positions bad or clipped?  */
    static int el;         /* Total sub-segment count */
    static int j;          /* Sub-segment index */
    static int last_ok;    /* Was the previous position defined? */
    static int nel;        /* Total number of sub-segments */
+   static int nlong;      /* No.of segments longer than limit2 */
    static int nseg;       /* Number of segments being sub-divided */
-   static int *seg0;      /* Pointer to current segment OK flag */
-   static int *segm;      /* Pointer to previous segment OK flag */
-   static int *segp;      /* Pointer to next segment OK flag */
+   static int nshort;     /* No.of segments shorter than limit2 */
+
+#ifdef CRV_TRACE
+   static int levels[100];
+#endif
 
 /* Check inherited status */
    if( !astOK ) return;                 
@@ -6441,10 +6857,24 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    sub-segment in graphics coordinates. If any segment is less than
    this minimum length, then recursion will stop and the curve will
    be assumed to be dis-continuous. */
-   if( !Crv_nent ) limit2 = 2.0*Crv_limit/(CRV_NSEG*CRV_NSEG);
+   if( !Crv_nent ) {
+      limit2 = 20.0*Crv_limit/(CRV_NSEG*CRV_NSEG);
+
+#ifdef CRV_TRACE
+      levels[ 0 ] = 0;
+#endif
+   }
+
 
 /* Increment the number of entries into this function. */
    Crv_nent++;
+
+#ifdef CRV_TRACE
+   for( i = 0; i < Crv_nent; i++ ) {
+      printf("%d ",levels[ i ] );
+   }
+   printf("\n");
+#endif
 
 /* ======================================================================
    The first section of this function sets up some arrays holding 
@@ -6470,6 +6900,12 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
       all_bad = 1;
    }
 
+/* Initialise the bouding box for the this segment. */
+   bbox[ 0 ] = DBL_MAX;
+   bbox[ 1 ] = -DBL_MAX;
+   bbox[ 2 ] = DBL_MAX;
+   bbox[ 3 ] = -DBL_MAX;
+
 /* Store pointers to the X and Y values for the "current position". This
    is the position at the end of the current segment. This is initially 
    the second tabulated point. */
@@ -6482,14 +6918,21 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    pdy = dy;
    pdl2 = dl2;
 
-/* Initialise the largest squared length value. */
-   dl2_max = 0.0;
+/* Initialise the number of long and short segments. */
+   nlong = 0;
+   nshort = 0;
 
 /* Loop round each segment. */
    for( i = 0; i < CRV_NSEG; i++ ){
 
 /* If the tabulated point marking the end of the segment is good... */
       if( *px != AST__BAD && *py != AST__BAD ){
+
+/* Update the bounding box. */
+         if( *px < bbox[ 0 ] ) bbox[ 0 ] = *px;
+         if( *px > bbox[ 1 ] ) bbox[ 1 ] = *px;
+         if( *py < bbox[ 2 ] ) bbox[ 2 ] = *py;
+         if( *py > bbox[ 3 ] ) bbox[ 3 ] = *py;
 
 /* If the point is within the plotting area, set the "all_bad" flag to
    indicate that at least 1 point is within the plotting area. */
@@ -6507,8 +6950,13 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
             *(pdy++) = t2;
             *(pdl2++) = t3;
 
-/* Update the maximum squared length. */
-            if( t3 > dl2_max ) dl2_max = t3;
+/* Count the number of segments which are, and are not, shorter than the
+   minimum significant length. */
+            if( t3 > limit2 ) {
+               nlong++;
+            } else {
+               nshort++;
+            }
 
 /* If the start was bad, the length of the segment is not defined so store 
    bad values. */
@@ -6536,8 +6984,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
          last_ok = 0;
          px++;
          py++;
-       }
-   
+      }
    }
 
 /* ======================================================================
@@ -6551,6 +6998,9 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    of the previous segment is undefined. */
    vxl = Crv_ux0;
    vyl = Crv_uy0;
+
+/* The length of the previous segment is initially bad. */
+   dll = AST__BAD;
 
 /* Set up some pointers used to walk through the arrays holding the lengths
    of each segment. */
@@ -6585,10 +7035,23 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
                seg_ok[ i ] = 0;
                if( i > 0 ) seg_ok[ i - 1 ] = 0;
 
+
 /* If the angle between this segment and the previous segment is not too
-   high, the segment can be drawn as a straight line. */
+   high, check that the scale has not changed too much. */
             } else {
-               seg_ok[ i ] = 1;
+
+/* If the scale (=vector length) has changed a lot, set a flag to indicate
+   that the segment cannot be drawn as a single line. Also, set the flag for 
+   the previous segment as well. */
+               if( dll != AST__BAD && ( dl < dll/Crv_scerr || dl > dll*Crv_scerr ) ) {
+                  seg_ok[ i ] = 0;
+                  if( i > 0 ) seg_ok[ i - 1 ] = 0;
+
+/* If the orientation and scale of this segment has not changed much from
+   the previous segment, the segment can be drawn as a straight line. */
+               } else {
+                  seg_ok[ i ] = 1;
+               }
             }
 
 /* If no unit vector is available for the previous segment, then assume
@@ -6602,6 +7065,9 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
          vxl = vx;
          vyl = vy;      
 
+/* Save the length if the current segment for use next time. */
+         dll = dl;
+
 /* If the length of the current segment is undefined, or zero, we cannot
    draw it as a single line. Also, there is no direction vector to pass
    on to the next time, so set them bad. */
@@ -6609,6 +7075,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
          seg_ok[ i ] = 0;
          vxl = AST__BAD;
          vyl = AST__BAD;      
+         dll = AST__BAD;
       }
 
 /* Point to the next segment. */
@@ -6648,14 +7115,23 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 
 /* If we have made the maximum number of recursive entries into this
    function, or if every supplied point was bad or outside the plotting
-   area, or if all the segments were very short in graphics space, we will 
+   area, or if most of the segments were very short in graphics space, we will 
    not be attempting to subdivide any segments which cannot be drawn directly 
    as a straight line. If "skipbad" was supplied as zero, we ignore the 
    restriction which says that we must have some good points (since we
    may find some good poits by a further sub-division). */
    subdivide = ( Crv_nent < CRV_MXENT && 
                  ( !all_bad || !skipbad ) &&
-                 dl2_max > limit2 );
+                 nlong > nshort );
+
+/* We do not sub-divide if the bounding box of the supplied points
+   is not at least 10% smaller than the supplied bouding box on either axis. */
+   if( box && bbox[ 0 ] != DBL_MAX ) {
+      if( bbox[ 1 ] - bbox[ 0 ] > 0.9*( box[ 1 ] - box[ 0 ] ) &&
+          bbox[ 3 ] - bbox[ 2 ] > 0.9*( box[ 3 ] - box[ 2 ] ) ) {
+         subdivide = 0;
+      }
+   }
 
 /* Initialise some pointers to the data defineding the subsegments. */
    dd = NULL;
@@ -6731,7 +7207,12 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    further sub-divisions if it too finds all graphics positions to be bad or
    outside the plot. */
          } else if( subdivide ) {
-            Crv( this, pd, px, py, all_bad, method, class );
+
+#ifdef CRV_TRACE
+            levels[ Crv_nent ] = i;
+#endif
+
+            Crv( this, pd, px, py, all_bad, bbox, method, class );
             pd += CRV_NSEG + 1;
             px += CRV_NSEG + 1;
             py += CRV_NSEG + 1;
@@ -7428,6 +7909,8 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
                                    this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
       Crv_ux0 = AST__BAD;    
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
@@ -7452,7 +7935,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map3 to draw the curve. */
-      Crv( this, d, x, y, 0, method, class );
+      Crv( this, d, x, y, 0, NULL, method, class );
 
 /* End the current poly line. */
       Opoly( this, method, class );
@@ -7533,9 +8016,16 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 *     The values are found by first obtaining a grid of points spread over
 *     the region containing good physical coordinates. The physical
 *     coordinate values (non-normalized) for each axis are sorted into 
-*     increasing order and a set of quantile axis values found. The median 
-*     of the gaps between these quantiles is returned as the default gap 
-*     for the axis. 
+*     increasing order. 
+*
+*     For linearly spaced tick marks, a set of quantile axis values is then 
+*     found, and the median of the gaps between these quantiles is returned 
+*     as the default gap for the axis. 
+*
+*     For logarithmically spaced tick marks, the returned gap size is the
+*     ratio between adjacent tick mark values, chosen to give an optimal
+*     number of ticks between the maximum and minimum axis values found in 
+*     the grid.
 
 *  Parameters:
 *     this
@@ -7580,12 +8070,17 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
    AstPointSet *pset2;        /* Pointer to PointSet holding physical coords */
    double **ptr1;             /* Pointer to graphics axis values */
    double **ptr2;             /* Pointer to physical axis values */
+   double dran;               /* Dynamic range */
+   double maxv;               /* Maximum axis value */
+   double minv;               /* Minimum axis value */
    double qgap[ MAJTICKS_OPT ];/* Gaps between physical coordinate quantiles */
    int dim;                   /* Dimension of grid */
    int dk;                    /* The number of points between quantiles */
    int i;                     /* The quantile index */
    int j;                     /* Axis index */
    int k;                     /* Index into the sorted array of axis values */
+   int logticks;              /* Logarithmically spaced tick marks? */
+   int n;                     /* Target number fo ticks */
    int psize;                 /* Total number of axis value */
 
 /* Initialise the returned values. */
@@ -7632,30 +8127,87 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
          break;
       }
 
-/* Find the gaps between adjacent evenly spaced quantiles. The number of 
-   quantiles used equals the optimal number of major tick marks. */
-      dk = (int)( (double)ngood[ j ]/MAJTICKS_OPT );
-      i = 0;
-      for( k = dk; k < ngood[ j ] && i < MAJTICKS_OPT; k += dk ){
-         qgap[ i++ ] = ptr2[ j ][ k ] - ptr2[ j ][ k - dk ];
+/* Get the maximum and minimum axis value */
+      minv = ptr2[ j ][ 0 ];
+      maxv = ptr2[ j ][ ngood[ j ] - 1 ];
+
+/* See if ticks on this axis are spaced linearly or logarithmicly. If a
+   value has been set for LogTicks used it, otherwise find a default value.
+   The default is 0 unless LogPlot is non-zero, the axis range does not
+   encompass zero and and the dynamic range is 100 or more. Set this
+   default value explicitly so that later functions will pick it up (it will 
+   be cleared at the end of the astGrid function). */
+      if( astTestLogTicks( this, j ) ) {
+         logticks = astGetLogTicks( this, j );
+      } else {
+         logticks = 0;    
+         if( astGetLogPlot( this, j ) && minv*maxv > 0.0 ) {
+            dran = maxv/minv;
+            if( dran >= 100.0 || dran <= 0.01 ) logticks = 1;
+         }
+         astSetLogTicks( this, j, logticks );
       }
 
+/* If no value has been supplied for LogLabel use the value of LogTicks
+   as the default. */
+      if( !astTestLogLabel( this, j ) ) astSetLogLabel( this, j, logticks );
+
+/* For linear gaps, find the gaps between adjacent evenly spaced quantiles. 
+   The number of quantiles used equals the optimal number of major tick  
+   marks. */
+      if( !logticks ) {
+         dk = (int)( (double)ngood[ j ]/MAJTICKS_OPT );
+         i = 0;
+         for( k = dk; k < ngood[ j ] && i < MAJTICKS_OPT; k += dk ){
+            qgap[ i++ ] = ptr2[ j ][ k ] - ptr2[ j ][ k - dk ];
+         }
+
 /* Find the median of the gaps between adjacent quantiles. */
-      qsort( (void *) qgap, (size_t) i, sizeof(double), Compared );
-      gaps[ j ] = qgap[ i/2 ];
+         qsort( (void *) qgap, (size_t) i, sizeof(double), Compared );
+         gaps[ j ] = qgap[ i/2 ];
 
 /* If the test gap size is zero, use a fraction of the total range. Report
    an error if the total range is zero. */
-      if( gaps[ j ] <= 0.0 ){
-         gaps[ j ] = ( ptr2[ j ][ ngood[ j ] - 1 ] - ptr2[ j ][ 0 ] )/MAJTICKS_OPT;;
          if( gaps[ j ] <= 0.0 ){
+            gaps[ j ] = ( ptr2[ j ][ ngood[ j ] - 1 ] - ptr2[ j ][ 0 ] )/MAJTICKS_OPT;;
+            if( gaps[ j ] <= 0.0 ){
+               astError( AST__VSMAL, "%s(%s): The range of coordinate values "
+                         "covered by axis %d is too small to plot.", method, 
+                         class, j + 1 );
+            }
+         }
+
+/* For logarithmic gaps, use the Nth root of the ratio of the maximum and
+   minimum data value found. */
+      } else if( astOK ) {
+
+/* Report an error if the max and min values are of opposite signs or
+   zero or equal. */
+         if( maxv*minv <= 0.0 ) {               
+            astError( AST__ZERAX, "%s(%s): The range of coordinate values "
+                         "covered by axis %d includes the origin and so "
+                         "logarithmic ticks cannot be produced.", method, 
+                         class, j + 1 );
+
+         } else if( maxv == minv ) {               
             astError( AST__VSMAL, "%s(%s): The range of coordinate values "
                       "covered by axis %d is too small to plot.", method, 
                       class, j + 1 );
+
+/* Otherwise find the gap to use. */
+         } else {
+
+/* Store the maximum and minimum number of major tick marks along each
+   axis. These numbers are reduced if only a small part of the plotting
+   area contains valid coordinates, so that the tick marks do not end up
+   to close together. */
+            n = (int) ( 0.5 + MAJTICKS_OPT*sqrt( *frac ) );
+            if( n < 5 ) n = 5;
+
+/* Choose a gap size which makes this many gaps. */
+            gaps[ j ] = pow( maxv/minv, 1.0/( n - 1.0 ) );
          }
-
-      }
-
+      }      
    }
 
 /* Annul the PointSet holding Graphics coordinates. */
@@ -7734,12 +8286,19 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 */
 
 /* Local Variables: */
+   AstFrame *frm;         /* Pointer to current Frame */
    CurveData cdata;       /* Somewhere to put the unneeded curve information */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    double *value;         /* Current tick value */
+   double bot;            /* Lowest axis value to be displayed */
+   double diff;           /* Difference between adjacent tick marks */
+   double udiff;          /* Used section length */
    double start[ 2 ];     /* The start of the curve in physical coordinates */
+   double tmp;            /* Temporary storage */
+   double top;            /* Highest axis value to be displayed */
    int axis;              /* Current axis index */
    int axisid;            /* ID value for current axis plotting attributes */
+   int logticks;          /* Are major ticks spaced logarithmically? */
    int tick;              /* Current tick index */
 
 /* Check the global status. */
@@ -7747,6 +8306,9 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 
 /* Not the id value for the first axis. */
    axisid = AXIS1_ID;
+
+/* Get a pointer to the current Frame. */
+   frm = astGetFrame( this, AST__CURRENT );
 
 /* Consider drawing a curve parallel to each axis in turn. */
    for( axis = 0; axis < 2; axis++ ){
@@ -7762,6 +8324,15 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    area, we do not need to draw the curves. */
          if( labelat[ axis ] != AST__BAD ){
 
+/* Get the max and min values allowed on this axis. */
+            bot = astGetBottom( frm, axis );
+            top = astGetTop( frm, axis );
+            if( bot > top ) {
+               tmp = top;
+               top = bot;
+               bot = tmp;
+            }      
+
 /* Get a pointer to the structure containing information describing the 
    positions of the major tick marks along the current axis. */  
             info = grid[ axis ];
@@ -7769,15 +8340,60 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 /* Get a pointer to the axis value at the first major tick mark. */
             value = info->ticks;
 
-/* Loop round all ticks. */
-            for( tick = 0; tick < info->nmajor; tick++ ){
+/* See if the major tick marks are logarithmically spaced on this axis. */
+            logticks = astGetLogTicks( this, axis );
 
+/* Initialise the difference between major tick marks. */
+            diff = logticks ? 0.0 : gap[ axis ];
+
+/* Loop round all ticks. */
+            for( tick = 0; tick < info->nmajor; tick++, value++ ){
+
+/* Update the difference between major tick marks if we are producing
+   logarithmically spaced ticks (in which "gap" is a ratio, not a
+   difference). */
+               if( logticks ) diff = (*value)*( gap[ axis ] - 1.0 );
+
+/* Note the starting point for this section. */
+               start[ axis ] = *value;
+               start[ 1 - axis ] = labelat[ axis ];
+
+/* If this is the first tick, draw an axis section going "backwards" in
+   case the first tick isn't at the lower visible bound. Limit the length
+   of this backwards section so that it does not extend beyond the minimum
+   axis value. */
+               if( tick == 0 ) {
+                  udiff = *value - bot;
+                  if( udiff > diff ) udiff = diff;
+                  if( udiff > 0.0 ) {
+                     AxPlot( this, axis, start, -udiff, 1, &cdata, method, 
+                             class );
+                  }
+               }
+
+/* Limit the length of the section so that it does not extend beyond the
+   maximum axis value. */
+               udiff = ( *value + diff > top ) ? top - *value : diff;
+
+/* Do not draw zero length sections. */
+               if( udiff > 0.0 ) {
+ 
 /* Draw a curve parallel to the current axis, starting at the tick mark,
    with length equal to the gap between tick marks. Do not draw sections
    of the curve which are outside the primary domains of the physical axes. */
-               start[ axis ] = *(value++);
-               start[ 1 - axis ] = labelat[ axis ];
-               AxPlot( this, axis, start, gap[ axis ], 1, &cdata, method, 
+                  AxPlot( this, axis, start, udiff, 1, &cdata, method, 
+                          class );
+               }
+
+            }
+
+/* Once the last section has been drawn, draw another axis section in case the 
+   last tick isn't at the upper visible bound. Limit the length of this 
+   section so that it does not extend beyond the maximum axis value. */
+            udiff = top - start[ axis ];
+            if( udiff > diff ) udiff = diff;
+            if( udiff > 0.0 ) {
+               AxPlot( this, axis, start, udiff, 1, &cdata, method, 
                        class );
             }
          }
@@ -7791,8 +8407,8 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 
    }
 
-/* Return. */
-   return;
+/* Free the pointer to the current Frame. */
+   frm = astAnnul( frm );
 
 }
 
@@ -7947,8 +8563,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    major tick values (which may cause AST__BAD tick mark values). */
             if( total_length == 0.0 && astOK ) {
                astError( AST__INTER, "%s(%s): No grid curves can be drawn for "
-                         "axis %d (internal AST programming error).", method, 
-                         class, i + 1 );
+                         "axis %d.", method, class, i + 1 );
             }
 
          }
@@ -7965,14 +8580,11 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 
 }
 
-#if 0
-/* ENABLE-ESCAPE - Add the following function when escape sequences
-   are enabled. */
-static int DrawText( AstPlot *this, int esc, const char *text, float x, float y, 
-                     const char *just, float upx, float upy, const char *method, 
-                     const char *class ){
+static void DrawText( AstPlot *this, int ink, int esc, const char *text, 
+                      float x, float y, const char *just, float upx, 
+                      float upy, float *xbn, float *ybn, float *drop,
+                      const char *method, const char *class ){
 /*
-*+
 *  Name:
 *     DrawText
 
@@ -7982,21 +8594,22 @@ static int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
 
 *  Synopsis:
 *     #include "plot.h"
-*     int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
-*                   const char *just, float upx, float upy, const char *method,
-*                   const char *class )
+*     void DrawText( AstPlot *this, int ink, int esc, const char *text, 
+*                    float x, float y, const char *just, float upx, 
+*                    float upy, float *xbn, float *ybn, float *drop,
+*                    const char *method, const char *class )
 
 *  Description:
 *     This function displays a character string at a given position
 *     using a specified up-vector, optionally interpreting any Plot escape 
-*     sequences contained within the text. The justification is specified
-*     by the caller, and refers to the edges of the bounding box
-*     enclosing the "normal" text (i.e. super-scripts and sub-scripts may
-*     extend above or below the bounding box used).
+*     sequences contained within the text. It also returns its bounding
+*     box.
 
 *  Parameters:
 *     this
 *        The plot.
+*     ink
+*        If zero, nothing is drawn but the bounding box is still returned.
 *     esc
 *        Should escape sequences be interpreted? They will be printed
 *        literally otherwise.
@@ -8010,9 +8623,8 @@ static int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
 *        Pointer to a null-terminated character string identifying the
 *        reference point for the text being drawn. The first character in
 *        this string identifies the reference position in the "up" direction
-*        and may be "B", "C" or "T" (for bottom, centre or top - two
-*        other legal characters, "D" and "U" are described in the Notes 
-*        below). The second character identifies the side-to-side reference 
+*        and may be "M", "B", "C" or "T" (for bottom, baseline, centre or
+*        top). The second character identifies the side-to-side reference 
 *        position and may be "L", "C" or "R" (for left, centre or right). The 
 *        string is case-insensitive, and only the first two characters are 
 *        significant.
@@ -8024,6 +8636,17 @@ static int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
 *        The y component of the up-vector for the text. Positive values
 *        always refer to displacements from left to right on the screen, 
 *        even if the graphics y axis increases in the opposite sense.
+*     xbn
+*        An array in which is returned the x coordinates at the corners
+*        of the bounding box. The order is: bottom left, top left, top
+*        right, bottom right.
+*     ybn
+*        An array in which is returned the Y coordinates at the corners
+*        of the bounding box (see xbn).
+*     drop
+*        Address of a float in which to return the distance between the
+*        bottom of the bounding box and the baseline of normal text. May
+*        be NULL.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -8031,147 +8654,307 @@ static int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
 
-*  Returned Value:
-*     Zero for failure, one for success.
-
 *  Notes:
-*     -  At the moment, this function draws all strings with BL
-*     justification. If this is not the requested justification then 
-*     the supplied reference position is modified so that BL justification
-*     gives the correct positioning. This causes problems in GAIA when 
-*     zooming. This is because GAIA zooms the reference positions but not the 
-*     text size, resulting in the text drifting to the bottom left. For
-*     this reason, GText is currently used instead of this function 
-*     (DrawText) throughout the Plot class.
 *     -  The "B" option for the justification in the "up" direction refers
 *     to the base-line on which the text is written. Some characters
 *     ("y", "p", "g", etc) descend below this line. In addition, if the
 *     supplied text string includes any escape sequences which produce 
 *     sub-scripts, then these will also descend below the base-line. To
 *     justify the bottom of the entire string (instead of just the
-*     base-line), specify "D" instead of "B" in the justification string.
-*     -  The "T" option for the justification in the "up" direction refers
-*     to the top of the tallest characters. However, if the supplied text 
-*     string includes any escape sequences which produce super-scripts, 
-*     then these may extend above this line. To justify the top of the 
-*     entire string (including super-scripts), specify "U" instead of "T" 
-*     in the justification string.
-*     -  See function GrText for details of the supported escape sequences.
-*     -  Any graphics within the rotated box enclosing the text are
-*     erased if argument ink is non-zero.
-*     -  Both "upx" and "upy" being zero causes an error.
-*-
+*     base-line), specify "M" instead of "B" in the justification string.
+*     -  See function astFindEscape for details of the supported escape 
+*     sequences.
 */
 
 
 /* Local Variables: */
-   char lj[3];          /* Local version of justification string. */
-   float xbn[ 4 ];      /* X at corners of bounding box */
-   float ybn[ 4 ];      /* Y at corners of bounding box */
-   int bbclip;          /* GrText to return bounding box of "normal" text? */
-   int ret;             /* Returned status */
+   char *a;
+   char *lt;
+   char cc;
+   const char *lj;
+   double ncol;
+   double nfont;
+   double nsize;
+   double nstyle;
+   double nwidth;
+   float alpha_hi;
+   float alpha_lo;
+   float beta_lo;
+   float beta_hi;
+   float cy;
+   float cx;
+   float dy;
+   float dx;
+   float height;
+   float ly;
+   float lx;
+   float rx;
+   float rlen;
+   float rise;
+   float rxu;
+   float ryu;
+   float ry;
+   float tdrop;
+   float tybn[ 4 ];
+   float txbn[ 4 ];
+   float ulen;
+   float uyu;
+   float uxu;
+   float uy;
+   float ux;
+   float width;
+   float x0;
+   float y0;
+   int estype;
+   int esval;
+   int got_esc;
+   int grfcap;
+   int i;        
+   int nc;
 
-/* Check the global error status. */
-   if ( !astOK ) return 0;
+/* Check the global error status, and that we have something to plot, and
+   the reference position is good, and that the up vector is not zero. */
+   if ( !astOK || !text || !text[ 0 ] ||  x == AST__BAD || y == AST__BAD ||
+        ( upx == 0.0 && upy == 0.0 ) ) return;
 
-/* Assume success. */
-   ret = 1;
+/* Get an up vector which refers to the graphics coordinates in their correct 
+   senses (the supplied values are reversed if the corresponding axis is 
+   reversed). */
+   ux = ( this->xrev ) ? -upx : upx;
+   uy = ( this->yrev ) ? -upy : upy;
 
-/* Fill in any missing parts of the justification string. */
-   if( just ){
-      if( just[ 0 ] == 'T' || just[ 0 ] == 'C' || just[ 0 ] == 'B' ||
-          just[ 0 ] == 'U' || just[ 0 ] == 'D' ){
-         lj[ 0 ] = just[ 0 ];
-      } else {
-         lj[ 0 ] = 'C';
-      }
+/* Find a vector which points from left to right along the text 
+   baseline, taking account of any difference in the scales of the x 
+   and y axes (is possible). This also scales the up vector so that it 
+   has a length equal to the height of normal text, and scales the right 
+   vector to have the same length (on the screen) as the up vector. */ 
+   RightVector( this, &ux, &uy, &rx, &ry, method, class );
 
-      if( just[ 1 ] == 'L' || just[ 1 ] == 'C' || just[ 1 ] == 'R' ){
-         lj[ 1 ] = just[ 1 ];
-      } else {
-         lj[ 1 ] = 'C';
-      }
+/* Create a unit right vector. */
+   rlen = sqrt( rx*rx + ry*ry ); 
+   rxu = rx/rlen; 
+   ryu = ry/rlen; 
 
-   } else {
-      lj[ 0 ] = 'C';
-      lj[ 1 ] = 'C';
-   }
+/* Create a unit up vector. */
+   ulen = sqrt( ux*ux + uy*uy ); 
+   uxu = ux/ulen; 
+   uyu = uy/ulen; 
 
-   lj[2] = 0;
+/* Some older GRF modules cannot plot strings with vertical justification
+   of "M". Check the capabilities of the grf module, and, if necessary,
+   modify the justification and the coords of the reference point to use 
+   "B" instead of "M". This call also returns us the coords at the left
+   end of the baseline of normal text. */
+   lx = x;
+   ly = y;
+   lj = JustMB( this, esc, text, &lx, &ly, upx, upy, just, uxu, uyu, rxu,
+                ryu, &x0, &y0, method, class );
 
-/* Only proceed if there is some text to draw. */
-   if( text ) {
+/* Initialise the horizontal and verical limits of the total bounding box. */
+   alpha_lo = FLT_MAX;
+   alpha_hi = -FLT_MAX;
+   beta_lo = FLT_MAX;
+   beta_hi = -FLT_MAX;
 
-/* The basic drawing function GrText assumes BL justification. If this is
-   the requested justification, just call GrText to draw the text. */
-      if( lj[0] == 'B' && lj[1] == 'L' ) {
-         ret = GrText( this, esc, text, 1, 1, x, y, upx, upy, xbn, ybn, method, class );
+/* Tell the grf module whether or not to interpret escape sequences,and
+   also note if the grf module is capable of interpreting escape
+   sequences. */
+   grfcap = GCap( this, GRF__ESC, esc );
 
-/* Otherwise, we need to determine the correct BL position which will
-   give the requested justfication. This involves calling GrText twice;
-   once (with ink switched off) to find the size of the text string, and
-   once to draw it.  */
-      } else {
+/* If escape sequences are being interpreted and the string contains some
+   escape sequences, but the grf module cannot interpret escape sequences,
+   split the supplied text up into sub-strings delimited by escape sequences 
+   and plot each sub-string individually, modifying the reference point and 
+   graphics attributes as indicated by the escape sequences. */
+   if( esc && HasEscapes( text ) && !grfcap ) {   
 
-/* The vertical justification options "U" and "D" refer to the top or bottom 
-   of the whole bounding box (including sub-scripts, super-scripts, etc ). If
-   either of these have been requested, convert them into the equivalent
-   options refering to the "normal" text bounding box (i.e. "T" or "B"),
-   and set a flag indicating that the bounding box returned by GrText
-   should not be clipped. */
-         if( lj[0] == 'U' ) {
-            lj[0] = 'T';   
-            bbclip = 0;
-      
-         } else if( lj[0] == 'D' ) {
-            lj[0] = 'B';   
-            bbclip = 0;
-      
+/* Take a copy of the supplied text so that we can temporarily terminate
+   each sub-string by poking a null (0) character into it. */
+      lt = (char *) astStore( NULL, (void *) text, strlen( text ) + 1 );
+
+/* Indicate that the current baseline is at its normal height. */
+      rise = 0.0;
+
+/* Get the graphical attribute values for normal text. */
+      GAttr( this, GRF__SIZE, AST__BAD, &nsize, GRF__TEXT, method, class );
+      GAttr( this, GRF__WIDTH, AST__BAD, &nwidth, GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, AST__BAD, &nfont, GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, AST__BAD, &nstyle, GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, AST__BAD, &ncol, GRF__TEXT, method, class );
+
+/* The "concatenation point" (cx,cy) is the point where the normal baseline 
+   crosses the left hand edge of the substring bounding box. Initialise
+   this to the left edge of the first substring. */
+      cx = x0;
+      cy = y0;
+
+/* Loop round the whole string, drawing each sub-string. */
+      a = lt;
+      while( *a ) {
+
+/* Examine the start of the remaining string and note if it begins with 
+   an escape sequence. If so, the type and value of the escape sequnece 
+   is returned. In either case the number of characters to the next
+   delimiter is returned. */
+         got_esc = astFindEscape( a, &estype, &esval, &nc );
+
+/* If the string starts with an escaped percent sign, modify things so that
+   we can draw the percent sign with the normal text drawing code below. */
+         if( got_esc && estype == GRF__ESPER ) {
+            got_esc = 0;
+            a++;
+            nc = 1;
+         }
+
+/* If the string starts with any other escape sequence, modify the graphics 
+   attributes and concatenation point as required by the escape sequence. */
+         if( got_esc ) {
+            InterpEscape( this, estype, (double) esval, &cx, &cy, ux, uy, 
+                          rx, ry, lj, &rise, nsize, nstyle, nwidth, ncol, 
+                          nfont, method, class );
+
+/* If the remaining string starts with normal text, draw it. */
          } else {
-            bbclip = 1;
+
+/* Temporarily terminate the sub-string which ends with the next escape
+   sequence. */
+            cc = a[ nc ];
+            a[ nc ] = 0;
+
+/* We now have to decide on the reference point for this sub-string. If
+   the justification is "BL" then the reference point is just the current 
+   concatenation point. */
+            if( lj[ 0 ] == 'B' && lj[ 1 ] == 'L' ) {
+               lx = cx;
+               ly = cy;
+
+/* Otherwise, the reference point is offset from the concatenation point.
+   It would be simpler to draw all substrings with "BL" justification but 
+   this causes problems with some grf modules (such as GAIA) which zoom
+   the display by modifying the position of text strings without also
+   modifying the size of text strings. Using the correct reference point
+   for all sub-strings minimises the drift which occurs when such a grf
+   modules zooms the display. */
+            } else {
+
+/* Find the width and height of this substring, and the distance between the 
+   bottom of the bounding box and the baseline (the drop). We do this
+   by calling this function recursively, using "BL" justification to
+   avoid infinite recursion. */
+               DrawText( this, 0, esc, a, cx, cy, "BL", upx, upy, txbn, tybn, 
+                         &tdrop, method, class );
+
+               dx = txbn[ 0 ] - txbn[ 3 ];
+               dy = tybn[ 0 ] - tybn[ 3 ];
+               width = sqrt( dx*dx + dy*dy );
+
+               dx = txbn[ 0 ] - txbn[ 1 ];
+               dy = tybn[ 0 ] - tybn[ 1 ];
+               height = sqrt( dx*dx + dy*dy );
+
+/* First move right from the concatenation point by a fraction of the width 
+   of the substring (0.5 for "C" and 1.0 for "R"). */
+               if( lj[ 1 ] == 'C' ) {
+                  width *= 0.5;
+               } else if( lj[ 1 ] != 'R' ) {
+                  width = 0;
+               }
+               lx = cx + rxu*width;
+               ly = cy + ryu*width;
+
+/* Now move vertically by an amount which produes the requested vertical
+   justification. */
+               if( lj[ 0 ] == 'T' ) {
+                  height -= tdrop;
+                  lx += height*uxu;
+                  ly += height*uyu;
+
+               } else if( lj[ 0 ] == 'C' ) {
+                  height = 0.5*height - tdrop;
+                  lx += height*uxu;
+                  ly += height*uyu;
+
+               } else if( lj[ 0 ] == 'M' ) {
+                  lx -= tdrop*uxu;
+                  ly -= tdrop*uyu;
+               }            
+            }
+
+/* Draw it, and then find its real bounding box (i.e. using the correct
+   reference position found above). */
+            if( ink ) GText( this, a, lx, ly, lj, upx, upy, method, class );
+            GTxExt( this, a, lx, ly, lj, upx, upy, txbn, tybn, method, class );
+
+/* Re-instate the orignal value of the terminator character.*/
+            a[ nc ] = cc;
+
+/* Move the concatenation point to the right (i.e. in the direction of the text
+   baseline) by an amount equal to the width of the bounding box. Also 
+   update the total bounding box limits.*/
+            UpdateConcat( txbn, tybn, ux, uy, rx, ry, &cx, &cy, 
+                           x0, y0, &alpha_lo, &alpha_hi, &beta_lo, &beta_hi );
          }
 
-/* Get the bounding box enclosing the text produced if the bottom left corner 
-   of the bounding box is placed at the supplied reference position. This box 
-   is clipped to exclude super-scripts and sub-scripts if "bbclip" is
-   non-zero. */
-         ret = GrText( this, esc, text, 0, bbclip, x, y, upx, upy, xbn, ybn, 
-                       method, class );
-         if( ret ) {
-
-/* Find the position of the bottom left corner of the bounding box which
-   produces the required justification. */
-            if( lj[0] == 'C' ) {
-               x += 0.5*( xbn[0] - xbn[3] );
-               y += 0.5*( ybn[0] - ybn[3] );
-   
-            } else if( lj[0] == 'T' ) {
-               x += xbn[0] - xbn[3];
-               y += ybn[0] - ybn[3];
-            }
-   
-            if( lj[1] == 'C' ) {
-               x += 0.5*( xbn[0] - xbn[1] );
-               y += 0.5*( ybn[0] - ybn[1] );
-
-            } else if( lj[1] == 'R' ) {
-               x += xbn[0] - xbn[1];
-               y += ybn[0] - ybn[1];
-            }
-
-/* Draw the text putting the bottom left corner of the bounding box at the
-   modified reference position. */
-            ret = GrText( this, esc, text, 1, 1, x, y, upx, upy, xbn, ybn, 
-                          method, class );
-         }
+/* Move on to the next character. */
+         a += nc;
       }
+
+/* Free resources. */
+      lt = astFree( lt );
+
+/* Reset all attributes to their normal values. */
+      GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, ncol, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
+
+/* If any escape sequences can be interpreted by the grf module, just pass 
+   the text string on to the grf module. */
+   } else {
+      if( ink ) GText( this, text, lx, ly, lj, upx, upy, method, class );
+      GTxExt( this, text, lx, ly, lj, upx, upy, txbn, tybn, method, class );
+
+/* The corners in the bounding box returned by GTxExt are in no
+   particular order. But this function is contracted to return them 
+   in a specified order. So we use UpdateConcat to find the verical and
+   horizontal limits of the box in a form which can be used to produce
+   the correct order. UpdateConcat will also update the concatenation point,
+   but that is irrelevant in this context. */
+      UpdateConcat( txbn, tybn, ux, uy, rx, ry, &lx, &ly, x0, y0, &alpha_lo, 
+                     &alpha_hi, &beta_lo, &beta_hi );
    }
 
-/* Return the status. */
-   return ret;
+/* Return the total bounding box,in the order bottom left, topleft, top
+   right, bottom right. */
+   xbn[ 0 ] = x0 + alpha_lo*ux + beta_lo*rx;
+   ybn[ 0 ] = y0 + alpha_lo*uy + beta_lo*ry;
 
+   xbn[ 1 ] = x0 + alpha_hi*ux + beta_lo*rx;
+   ybn[ 1 ] = y0 + alpha_hi*uy + beta_lo*ry;
+
+   xbn[ 2 ] = x0 + alpha_hi*ux + beta_hi*rx;
+   ybn[ 2 ] = y0 + alpha_hi*uy + beta_hi*ry;
+
+   xbn[ 3 ] = x0 + alpha_lo*ux + beta_hi*rx;
+   ybn[ 3 ] = y0 + alpha_lo*uy + beta_hi*ry;
+
+/* Return the drop. */
+   if( drop ) *drop =  -alpha_lo*ulen;
+
+/* Free memory.*/
+   lj = astFree( (void *) lj );
+
+/* If OK, update the box containing all drawn graphics primitives. */
+   if( ink && astOK ) {
+      for( i = 0; i < 4; i++ ){
+         Boxp_lbnd[ 0 ] = MIN( xbn[ i ], Boxp_lbnd[ 0 ] );
+         Boxp_ubnd[ 0 ] = MAX( xbn[ i ], Boxp_ubnd[ 0 ] );
+         Boxp_lbnd[ 1 ] = MIN( ybn[ i ], Boxp_lbnd[ 1 ] );
+         Boxp_ubnd[ 1 ] = MAX( ybn[ i ], Boxp_ubnd[ 1 ] );
+      }
+   }
 }
-#endif
 
 static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid, 
                        double *labelat, double *gap, const char *method, 
@@ -8233,7 +9016,9 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 *        AST__BAD should be supplied.
 *     gap
 *        Pointer to array of two values holding the gap between major
-*        tick marks on the two axes.
+*        tick marks on the two axes. This will be the difference between,
+*        or the ratio of, adjacent tick mark values, depending on the
+*        setting of the LogTicks attribute.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -8264,7 +9049,11 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    double *y;             /* Pointer to next Y value */
    double *yc;            /* Pointer to next clipped Y value */
    double a0;             /* Physical axis value at base of tick */
-   double delta;          /* Increment along current axis between minor ticks */
+   double axmax;          /* Upper axis limit */
+   double axmin;          /* Lower axis limit */
+   double delta1;         /* Increment between minor ticks above major tick */
+   double delta2;         /* Increment between minor ticks below major tick */
+   double diff;           /* Difference between adjacent major ticks */
    double dl2;            /* Squared increment between points */
    double dl2_limit;      /* Minimum usable squared increment between points */
    double dl;             /* Increment between points */
@@ -8282,6 +9071,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    double mntklen;        /* Length of minor tick marks */
    double ux;             /* X component of unit vector along tick mark */
    double uy;             /* Y component of unit vector along tick mark */
+   double val;            /* Major axis value */
    double x0;             /* X at base of tick */
    double x1;             /* X at end of tick */
    double x2;             /* Clipped X at base of tick */
@@ -8296,6 +9086,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    int first;             /* Is this the first tick to be drawn? */
    int gelid;             /* ID for next graphical element to be drawn */
    int i;                 /* Minor tick mark index */
+   int logticks;          /* Are major tick marks logarithmically spaced? */
    int major;             /* Are major tick marks required? */
    int minhi;             /* Highest minor tick mark index */
    int minlo;             /* Lowest minor tick mark index */
@@ -8369,8 +9160,13 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
             minlo = ( 1 - info->nminor )/2;
             minhi = info->nminor/2;
 
-/* Store the gap between minor tick marks. */
-            delta = gap[ axis ]/(double)info->nminor;
+/* If major ticks are linear, store the difference between minor tick marks. 
+   This value will be the same for all major ticks. */
+            logticks = astGetLogTicks( this, axis );
+            if( !logticks ) {
+               delta1 = gap[ axis ]/(double)info->nminor;
+               delta2 = delta1;
+            }
 
 /* Loop round until all ticks have been done. */
             for( tick = 0; tick < info->nmajor; tick++ ){
@@ -8384,8 +9180,21 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* If ticks are being put at minor tick values... */
                if( minor ){
 
+/* If major ticks are logarithmic, store the difference between minor tick 
+   marks. This value will be different for each major tick. Also, since
+   the minor ticks are drawn on either side of the major tick, the minor 
+   tick spacing above the major tick will be different to that below the
+   minor tick when using logarathmic ticks. "delta1" is the minor gap
+   above the major value, and "delta2" is the minor gap below the major
+   value. */
+                  if( logticks ) {
+                     delta1 = (*value) * ( gap[ axis ] - 1.0 )/
+                                         (double)info->nminor;
+                     delta2 = delta1 / gap[ axis ];
+                  } 
+
 /* Store the axis value at the first minor tick mark. */
-                  minval = *value + minlo*delta;
+                  minval = *value + minlo*delta2;
 
 /* Loop round all the minor tick marks, storing the physical coordinates
    defining the tick mark. */
@@ -8399,7 +9208,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                                    method, class );
 
 /* Get the axis value at the next minor tick mark. */
-                     minval += delta;
+                     minval += ( i < 0 ) ? delta2 : delta1;
    
                   }
 
@@ -8482,7 +9291,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Get the maximum number of tick marks to be drawn on this axis. */
          ntot = 0;
          if( major ) ntot = info->nmajor;
-         if( minor ) ntot += ( info->nmajor - 1 )*( info->nminor - 1 );
+         if( minor ) ntot += ( info->nmajor + 1 )*( info->nminor - 1 );
 
 /* Pass on to the next axis if no ticks are to be drawn. */
          if( ntot ) {
@@ -8502,50 +9311,89 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Store pointers to the next point on each axis. "a" always refers to the
    current axis. Also store the value on the other axis at which the tick
    marks starts, and another value on the other axis which is used to
-   defined the tick mark directions. Also store the increment in axis
-   value between minor tick marks. */
+   defined the tick mark directions. */
                a = ptr1[ axis ];    
                b = ptr1[ 1 - axis ];    
                majflag = majflags;
                lblat = labelat[ axis ];
-               lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
-               delta = gap[ axis  ]/(double)info->nminor;
+
+/* Store another value on the other axis which is used to defined the tick 
+   mark directions, and the difference between minor tick marks. For
+   linearly spaced tick marks these values will be the same for all major 
+   ticks. Minor ticks are always drawn above the correponding major
+   value (i.e. minlo == 1 ) and so we do not need to set delta2. */
+               logticks = astGetLogTicks( this, axis );
+               if( !logticks ) {
+                  lblat2 = labelat[ axis ] + 0.2*gap[ 1 - axis ];
+                  delta1 = gap[ axis  ]/(double)info->nminor;
+               }
 
 /* Store the indicies of the first and last minor tick marks, relative to
    a major tick mark. */
                minlo = 1;
                minhi = info->nminor - 1;
 
-/* Loop round until all ticks have been done. */
+/* Get the axis limits. */
+               axmin = astGetBottom( frame, axis );
+               axmax = astGetTop( frame, axis );
+
+/* Loop round until all ticks have been done. We include a hypothetical tick 
+   at index -1 (i.e. one gap below the first listed tick value) in order
+   to get minor tick marks below the first major tick. But the
+   hypothetical major tick value is not included in the list of major tick 
+   values to draw. */
                lasttick = info->nmajor - 1;
-               for( tick = 0; tick <= lasttick; tick++ ){
+               for( tick = -1; tick <= lasttick; tick++ ){
+
+/* Get the major tick value. */
+                  if( tick == -1 ) {
+                     if( !logticks ) {
+                        val = (*value) - gap[ axis ];
+                     }else {
+                        val = (*value)/gap[ axis ];
+                     }
+                  } else {
+                     val = *(value++);
+                  }
+
+/* Now find the value on the other axis which is used to defined the tick 
+   mark directions, and the difference between minor tick marks, in the
+   case of logarithmically spaced tick marks. These values will be 
+   different for every major tick. Minor ticks are always drawn above the 
+   correponding major value (i.e. minlo == 1 ) and so we do not need to set 
+   delta2. */
+                  if( logticks ) {
+                     diff = val * ( gap[ axis ] - 1.0 );
+                     lblat2 = labelat[ axis ] + 0.2*diff;
+                     delta1 = diff / (double)info->nminor;
+                  }
 
 /* If major tick marks are required, store the physical coordinates at the 
    start of the major tick mark, and at a point a little way up the major 
    tick mark. */
-                  if( major ){
-                     *(a++) = *value;
+                  if( major && tick > -1 ){
+                     *(a++) = val;
                      *(b++) = lblat;
-                     *(a++) = *value;
+                     *(a++) = val;
                      *(b++) = lblat2;
                      *(majflag++) = 1;
                   }
 
 /* If minor tick marks are required, store the points defining the minor tick 
-   marks on either side of this major tick mark. Do not place minor tick
-   marks beyond the last major tick mark. */
-                  if( minor && tick < lasttick ){
+   marks on either side of this major tick mark. */
+                  if( minor ){
 
 /* Store the axis value at the first minor tick mark. */
-                     minval = *value + minlo*delta;
+                     minval = val + minlo*delta1;
 
 /* Loop round all the minor tick marks, storing the physical coordinates
    defining the tick mark. */
                      for( i = minlo; i <= minhi; i++ ){
 
 /* Do not do the minor tick mark with index zero, since this corresponds
-   to the position of the major tick mark. */
-                        if( i ){
+   to the position of the major tick mark. Do not do any minor ticks that
+   are outside the axis range. */
+                        if( i && minval >= axmin && minval <= axmax ){
                            *(a++) = minval;
                            *(b++) = lblat;
                            *(a++) = minval;
@@ -8554,12 +9402,9 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                         }
 
 /* Get the axis value at the next minor tick mark. */
-                        minval += delta;
+                        minval += delta1;
                      }
                   } 
-
-/* Point to the next major tick value. */
-                  value++;
                }
             }
 
@@ -8829,6 +9674,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    int edge;              /* The edge to be labelled */
    int edgeax;            /* Index of axis parallel to the labelled edge */
    int edgelabs;          /* Can edge labels be produced? */
+   int esc;               /* INterpret escape sequences? */
    int gelid;             /* ID for next graphical element to be drawn */
    int naxlab;            /* Number of edge labels */
    int maxlab;            /* Number of distinct edge labels */
@@ -8840,6 +9686,9 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 
 /* Check the global status. */
    if( !astOK ) return 0;
+
+/* See if escape sequences in text strings are to be interpreted. */
+   esc = astGetEscape( this );
 
 /* Initialise the returned flag to indicate that edge labels cannot be 
    produced. */
@@ -9101,9 +9950,11 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    and where the labels would be drawn. We now take the decision as to
    whether there are enough of these labels to make edge labelling
    feasable. If so, we carry on and draw the labels. There need to be 
-   at least 3 labels on each axis...
+   at least 3 labels on each axis for linear tick spaciong and 2 for log 
+   tick spacing...
    ================================================================= */   
-   if( astOK && medge[ 0 ] > 2 && medge[ 1 ] > 2 ){
+   if( astOK && medge[ 0 ] > ( astGetLogTicks( this, 0 ) ? 1 : 2 )
+             && medge[ 1 ] > ( astGetLogTicks( this, 1 ) ? 1 : 2 ) ){
 
 /* Set the returned flag to indicate that edge labelling is being used. */
       edgelabs = 1;
@@ -9127,7 +9978,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 
 /* Plot them. */
          info = grid[ axis ];
-         PlotLabels( this, frame, axis, llist[ axis ], info->fmt, 
+         PlotLabels( this, esc, frame, axis, llist[ axis ], info->fmt, 
                      nedge[ axis ], &box, method, class );
 
 /* Re-establish the original graphical attributes. */
@@ -9334,6 +10185,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
    int i;                     /* Edge sample index */
    int iter;                  /* Iteration index */
    int larger;                /* Is current axis value larger than target? */
+   int logticks;              /* Are major ticks logarithmically spaced? */
    int ncross;                /* No. of crossings */
    int ndisc;                 /* No. of discontinuities along the edge */
    int nsum;                  /* Number of values summed in "sum" */
@@ -9356,6 +10208,10 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* Check the global status. */
    if( !astOK ) return 0;
+
+/* See if the major ticks on the other axis are logarithmically or
+   linearly spaced. */
+   logticks = astGetLogTicks( this, 1 - axis );
 
 /* Ensure that "edge" is in the range 0 - 3. */
    edge = edge % 4;
@@ -9512,6 +10368,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
             for( i = 0; i < EDGETICKS_DIM; i++ ){
                if( *p1 != AST__BAD && *p2 != AST__BAD ){
+                  if( logticks ) offset = 0.2*(*p2)*( gap[ 1 -axis ] - 1.0 );
                   *(q2++) = *p2 + offset;
                } else {               
                   *(q2++) = AST__BAD;
@@ -9845,6 +10702,255 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 }
 
+int astFindEscape_( const char *text, int *type, int *value, int *nc ){
+/*
+*+
+*  Name:
+*     astFindEscape
+
+*  Purpose:
+*     Check if a string starts with a graphics escape sequence.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int astFindEscape( const char *text, int *type, int *value, int *nc )
+
+*  Description:
+*     This function returns a flag indiciating if the first character in
+*     the supplied string is the start of a graphics escape sequence. If
+*     so, the type and associated value (if any) of the escape sequence
+*     are returned in "type" and "value", and the number of characters
+*     occupied by the escape sequence is returned in "nc". If the
+*     supplied text string does not begin with an escape sequence, the
+*     number of characters before the first escape sequence is returned in 
+*     "nc" (the length of the string is returned in "nc" if the string
+*     contains no escape sequences).
+*
+*     This function can be used by grf modules which wish to implement
+*     interpretation of escape sequences internally, rather than allowing the
+*     Plot class to do the interpretation.
+
+*  Parameters:
+*     text
+*        Pointer to the string to be checked.
+*     type
+*        Pointer to a location at which to return the type of escape
+*        sequence. Each type is identified by a symbolic constant defined
+*        in grf.h. The returned value is undefined if the supplied text
+*        does not begin with an escape sequence.
+*     value
+*        Pointer to a lcation at which to return the integer value
+*        associated with the escape sequence. All usable values will be
+*        positive. Zero is returned if the escape sequence has no associated 
+*        integer. A value of -1 indicates that the attribute identified by 
+*        "type" should be reset to its "normal" value (as established using 
+*        the astGAttr function, etc). The returned value is undefined if the 
+*        supplied text does not begin with an escape sequence.
+*     nc
+*        Pointer to a location at which to return the number of
+*        characters read by this call. If the text starts with an escape
+*        sequence, the returned value will be the number of characters in
+*        the escape sequence. Otherwise, the returned value will be the
+*        number of characters prior to the first escape sequence, or the 
+*        length of the supplied text if no escape sequence is found.
+
+*  Returned Value:
+*     A non-zero value is returned if the supplied text starts with a
+*     graphics escape sequence, and zero is returned otherwise.
+
+*  Escape Sequences:
+*     Escape sequences are introduced into the text string by a percent 
+*     "%" character. The following escape sequences are currently recognised 
+*     ("..." represents a string of one or more decimal digits):
+*
+*       %%      - Print a literal "%" character.
+*
+*       %^...+  - Draw subsequent characters as super-scripts. The digits
+*                 "..." give the distance from the base-line of "normal" 
+*                 text to the base-line of the super-script text, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text.
+*       %^+     - Draw subsequent characters with the normal base-line.
+*
+*       %v...+  - Draw subsequent characters as sub-scripts. The digits
+*                 "..." give the distance from the base-line of "normal" 
+*                 text to the base-line of the sub-script text, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text.
+*
+*       %v+     - Draw subsequent characters with the normal base-line
+*                 (equivalent to %^+).
+*
+*       %>...+  - Leave a gap before drawing subsequent characters.
+*                 The digits "..." give the size of the gap, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text.
+*
+*       %<...+  - Move backwards before drawing subsequent characters.
+*                 The digits "..." give the size of the movement, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text.
+*
+*       %s...+  - Change the Size attribute for subsequent characters. The
+*                 digits "..." give the new Size as a fraction of the 
+*                 "normal" Size, scaled so that a value of "100" corresponds 
+*                 to 1.0;
+*
+*       %s+     - Reset the Size attribute to its "normal" value.
+*
+*       %w...+  - Change the Width attribute for subsequent characters. The
+*                 digits "..." give the new width as a fraction of the 
+*                 "normal" Width, scaled so that a value of "100" corresponds 
+*                 to 1.0;
+*
+*       %w+     - Reset the Size attribute to its "normal" value.
+*
+*       %f...+  - Change the Font attribute for subsequent characters. The
+*                 digits "..." give the new Font value.
+*
+*       %f+     - Reset the Font attribute to its "normal" value.
+*
+*       %c...+  - Change the Colour attribute for subsequent characters. The
+*                 digits "..." give the new Colour value.
+*
+*       %c+     - Reset the Colour attribute to its "normal" value.
+*
+*       %t...+  - Change the Style attribute for subsequent characters. The
+*                 digits "..." give the new Style value.
+*
+*       %t+     - Reset the Style attribute to its "normal" value.
+*
+*       %-      - Push the current graphics attribute values onto the top of 
+*                 the stack (see "%+").
+*
+*       %+      - Pop attributes values of the top the stack (see "%-"). If
+*                 the stack is empty, "normal" attribute values are restored.
+
+*  Notes:
+*     -  Zero is returned if an error has already occurred.
+*-
+*/
+
+/* Local Variables: */
+   int result;
+   const char *a;
+   const char *b;
+   int nd;
+   const char *perc;
+
+/* Initialise */
+   result = 0;
+   *type = GRF__ESPER;
+   *value = 0;
+   *nc = 0;
+
+/* Check inherited status and supplied pointer. */
+   if( !astOK || !text ) return result;
+
+/* Loop round, looking for percent signs. Break out of the loop when a 
+   complete escape sequence has been found and read, leaving the "b" pointer
+   pointing to the first character following the escape sequence. */
+   b = NULL;
+   a = text;
+   while( ( a = strchr( a, '%' ) ) ) {
+      perc = a;
+
+/* Compare the following character to each known escape sequence type. */
+      a++;
+      if( *a == '%') {
+         *type = GRF__ESPER;
+         b = a + 1;
+         break;
+
+      } else if( *a == '^') {
+         *type = GRF__ESSUP;
+
+      } else if( *a == 'v') {
+         *type = GRF__ESSUB;
+
+      } else if( *a == '>') {
+         *type = GRF__ESGAP;
+
+      } else if( *a == '<') {
+         *type = GRF__ESBAC;
+
+      } else if( *a == 's') {
+         *type = GRF__ESSIZ;
+
+      } else if( *a == 'w') {
+         *type = GRF__ESWID;
+
+      } else if( *a == 'f') {
+         *type = GRF__ESFON;
+
+      } else if( *a == 'c') {
+         *type = GRF__ESCOL;
+
+      } else if( *a == 't') {
+         *type = GRF__ESSTY;
+
+      } else if( *a == '-') {
+         *type = GRF__ESPSH;
+         b = a + 1;
+         break;
+
+      } else if( *a == '+') {
+         *type = GRF__ESPOP;
+         b = a + 1;
+         break;
+
+/* If the next character is illegal, skip to the next percent sign. */
+      } else {
+         continue;
+      }
+
+/* The escape sequence looks legal so far, so move on to the next
+   character (if any). */
+      if( *(++a) ){
+
+/* If the next character is a "+" sign, the attribute needs to be reset
+   to its "normal" value. Indicate this by returning a value of "-1" (all
+   usable values will be positive). */            
+         if( *a == '+' ) {
+            *value = -1;
+            b = a + 1;
+            break;
+
+/* Otherwise, to be a legal escape sequence, this character must be the
+   first in a sequence of digits, terminated by a "+" sign.*/
+         } else if( (nd = 0, astSscanf( a, "%d%n+", value, &nd ))) {
+            b = a + nd + 1;
+            break;
+         } 
+      }
+   }
+
+/* Was a usable escape sequence found at the start of the supplied text?
+   If so, return a function value of 1 and store the number of characters in
+   the escape sequence. */
+   if( b && perc == text ) {
+      result = 1;
+      *nc = b - perc;
+
+/* Otherwise, return the preset function value of zero. If an escape
+   sequence was found later in the text, return the number of characters
+   prior to the escape sequence. */
+   } else if( b ) {
+      *nc = perc - text;
+
+/* Otherwise, if no escape sequence was found, return the length of the
+   supplied text. */
+   } else {
+      *nc = strlen( text );
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis, 
                          double refval, double gap, double *cen, int ngood, 
                          double *data, double **tick_data ){
@@ -9941,15 +11047,21 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    double *r;         /* Pointer to next tick value to be read */
    double *ticks;     /* Pointer to the axis values at the major tick marks */
    double *w;         /* Pointer to last tick value to be written */
-   double centre;     /* The axis value at the first tick mark */
-   double f;          /* The nearest acceptable tick mark index */
    double bot;        /* Lowest axis value to be displayed */
+   double centre;     /* The axis value at the first tick mark */
+   double delta;      /* A safe distance from an axis limit */
+   double f;          /* The nearest acceptable tick mark index */
    double tmp;        /* Temporary storage */
    double top;        /* Highest axis value to be displayed */
+   int inc;           /* This times increase in nticks */
    int k;             /* Tick mark index */
+   int linc;          /* Last times increase in nticks */
    int lnfill;        /* Last used value for nfill */
    int nfill;         /* No of tick marks to extend by at edges of coverage */
+   int nsame;         /* Number of equal inc values there have been */
    int nticks;        /* Number of major tick marks used */
+   int ntnew;         /* This times new value of nticks */
+   int use_nfill;     /* nfill value which started this run of equal inc values */
 
 /* Initialise the returned pointer. */
    *tick_data = NULL;
@@ -9968,21 +11080,61 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    }
 
 /* Find the number of candidate tick marks assuming an nfill value of 1. */
-   nticks = FindMajTicks2( 1, gap, centre, ngood, data, &ticks );
-   lnfill = 1;
+   nfill = 1;
+   nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
 
-/* Now find the tick marks again using an nfill value equal to 10% of the
-   number of ticks returned when nfill=1 was used. Do this iteratively
-   until the number of tick marks stops increasing. */
-   nfill = (int) (0.1*(double) nticks );
-   while( nticks < 2000 && nfill > lnfill && astOK ) {
+/* Loop round increasing the nfill value until an unreasonably large value 
+   of nfill is reached. The loop will exit early via a breal statement when 
+   all small holes in the axis coeerage are filled in. */
+   lnfill = nfill;
+   linc = -100000;
+   while( nfill < 100 && astOK ){
+
+/* Increment the number of ticks added as "padding" at the edges of any
+   gaps in the coverage of axis values. */
+      nfill++;
+
+/* Form a new set of tick mark values using this new nfill value */
       ticks = (double *) astFree( (void *) ticks );
-      nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
-      lnfill = nfill;
-      nfill = (int) (0.1*(double) nticks );
+      ntnew = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
+
+/* We need to know if the rate of increase of nticks has settled down to
+   a constant value. Inititially increasing nfill will cause the total
+   number of ticks (nticks) to increase rapidly. But this rate of
+   increase will get less as any small gaps in axis coverage are filled in.
+   We break out of the while loop when the rate of increase has settled
+   down to a constant value (indicating that only very large holes are left
+   in the axis coverage). Find the increase in the number of ticks caused by 
+   the increase in the nfill value made in this loop. If this increase is the 
+   same as the increase caused by the previous loop, increment the number of 
+   equal increases there have been. If the increase is different to last time, 
+   reset the number of equal increases to zero. */
+      inc = ntnew - nticks;
+      if( inc == linc ) {
+         nsame++;
+      } else {
+         nsame = 0;
+         use_nfill = nfill;
+      }
+
+/* If the past 3 increases in nfill has not caused any change in the rate
+   of increase of nticks, then re-create the ticks for the value of nfill
+   which started the current run of equal increment values, and leave the 
+   loop. */
+      if( nsame == 3 ) {
+         ticks = (double *) astFree( (void *) ticks );
+         nticks = FindMajTicks2( use_nfill, gap, centre, ngood, data, &ticks );
+         break;         
+      }
+
+/* Save this times values for use in the next loop. */
+      linc = inc;
+      nticks = ntnew;
    }
 
-/* Remove ticks which are not within the axis ranges to be displayed. */
+/* Remove ticks which are not within the axis ranges to be displayed.
+   Ticks which are very close to the limit are moved to a safe (but
+   visually negligable) distance away from the limit). */
    bot = astGetBottom( frame, axis );
    top = astGetTop( frame, axis );
    if( bot > top ) {
@@ -9990,9 +11142,18 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
       top = bot;
       bot = tmp;
    }      
+   delta = 0.05*gap;
    r = ticks;
    for( k = 0; k < nticks; k++ ){
-      if( *r != AST__BAD && ( *r < bot || *r > top ) ) *r = AST__BAD;
+      if( *r != AST__BAD ) {
+         if( fabs( *r - bot ) < delta ) {
+            *r = bot + delta;
+         } else if( fabs( *r - top ) < delta ) {
+            *r = top - delta;
+         } else if( *r < bot || *r > top ) {
+            *r = AST__BAD;
+         }
+      }
       r++;
    }
 
@@ -10197,6 +11358,124 @@ static int FindMajTicks2( int nfill, double gap, double centre, int ngood,
 /* Return the number of major ticks. */
    return nticks;
 
+}
+
+static int FindDPTZ( AstFrame *fr, int axis, const char *fmt, 
+                      const char *text, int *ndp, int *ntz ) {
+/*
+*  Name:
+*     FindDPTZ
+
+*  Purpose:
+*     Find the number of decimal places and trailing zeros in a label.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int FindDPTZ( AstFrame *fr, int axis, const char *fmt, 
+*                   const char *text, int *ndp, int *ntz ) 
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     The supplied label is split into fields using the astFields method of
+*     the supplied frame. The number of decimal places in the last
+*     field is returned in *ndp, and the total number of trailing zeros
+*     (excluding exponents) is returned in *ntz.
+
+*  Parameters:
+*     fr
+*        The frame.
+*     axis
+*        The axis index to which the label applies.
+*     fmt
+*        The format string used to format the label.
+*     text
+*        The text of the label.
+*     ndp
+*        Pointer to an int in which to return the number of decimal
+*        places in the final field.
+*     ntz
+*        Pointer to an int in which to return the number of trailing zeros.
+
+*  Returned Value:
+*     Non-zero if and only if a non-zero digit is found in any field.
+
+*/
+
+/* Local Constants: */
+#define MAXFLD 10
+
+/* Local Variables: */
+   char *fields[ MAXFLD ];
+   const char *a;
+   const char *dot;
+   const char *ff; 
+   double junk;
+   int fnc;
+   int i;
+   int j;               
+   int l;
+   int mxnd;
+   int nc[ MAXFLD ];
+   int nf;
+   int result;
+
+/* Initialise */
+   *ndp = 0;
+   *ntz = 0;
+
+/* Check inherited status */
+   if( !astOK ) return 0;
+
+/* Split the label up into fields. */
+   nf = astFields( fr, axis, fmt, text, MAXFLD, fields, nc, &junk );
+   if( nf > 0 ) {
+
+/* Search the last fields (assumed to be the least significant) for a
+   decimal point. */
+      ff = fields[ nf - 1 ];
+      fnc = nc[ nf - 1 ];
+      dot = strchr( ff, '.' );
+      if( dot && ( ff - dot >= fnc ) ) dot = NULL;
+
+/* Find the number of digits following the decimal point. */
+      if( dot ) {
+         *ndp = strspn( dot + 1, "0123456789" );
+         mxnd = fnc - ( dot - ff ) - 1;
+         if( *ndp > mxnd ) *ndp =  mxnd;
+      } else {
+         *ndp = 0;
+      }      
+
+/* Loop through all the fields, from least significant to most significant,
+   counting the number of trailing zeros. */
+      *ntz = 0;
+      for( i = nf - 1; i >= 0; i-- ) {
+         l = strspn( fields[ i ], "-+0123456789." );
+         if( l > nc[ i ] ) l = nc[ i ];
+         a = fields[ i ] + l - 1;
+         for( j = l - 1; j >= 0; j--,a-- ){
+            if( *a == '0' ) {
+               (*ntz)++;
+            } else if( isdigit( *a ) ) {
+               result = 1;
+               break;
+            }
+         }
+         if( j >= 0 ) break;      
+      }
+   }
+
+/* Return the result. */
+   return result;
+
+/* Undefine local constants: */
+#undef MAXFLD
+   
 }
 
 static int FindString( int n, const char *list[], const char *test, 
@@ -10676,8 +11955,8 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 /* Local Variables: */
    int status;          /* Status retruned from Grf function */
 
-/* Check the global error status. */
-   if ( !astOK ) return;
+/* Check the global error status. Also return if there is nothing to do. */
+   if ( !astOK || ( !old_value && value == AST__BAD ) ) return;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
@@ -10698,6 +11977,151 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
                 class );
    }
 
+}
+
+static void GScales( AstPlot *this, float *alpha, float *beta,
+                      const char *method, const char *class ) {
+/*
+*
+*  Name:
+*     GScales
+
+*  Purpose:
+*     Call the GScales Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GScales( AstPlot *this, float *alpha, float *beta,
+*                    const char *method, const char *class )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GScales grf function, either calling the 
+*     version registered using astGrfSet, or the version in the linked grf 
+*     module. The linked version is used if the Grf attribute is zero, or if 
+*     no function has been registered for GScales using astGrfSet.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     alpha
+*        A pointer to the location at which to return the scale for the
+*        X axis (i.e. Xnorm = alpha*Xworld).
+*     beta
+*        A pointer to the location at which to return the scale for the
+*        Y axis (i.e. Ynorm = beta*Yworld).
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfSet (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GSCALES ] ) {
+      status = ( *( this->GScales ) )( this, alpha, beta );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGScales( alpha, beta );
+   }
+
+/* Check neither value is zero. */
+   if( status && ( *alpha == 0.0 || *beta == 0.0 ) ) {
+      astError( AST__GRFER, "astGScales: Returned axis scales are %g and %g " 
+                "but zero is illegal!", *alpha, *beta );
+      status = 0;
+   }
+
+/* Report an error if anything went wrong, and return safe values. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGScales. ", method, 
+                class );
+      *alpha = 1.0;
+      *beta = 1.0;      
+   }
+
+}
+
+static int GCap( AstPlot *this, int cap, int value ){
+/*
+*
+*  Name:
+*     GCap
+
+*  Purpose:
+*     Call the GCap Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int GCap( AstPlot *this, int cap, int value )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GCap grf function to inquire a capability
+*     of the grf module, either calling the version registered using 
+*     astGrfSet, or the version in the linked grf module. The linked 
+*     version is used if the Grf attribute is zero, or if no function 
+*     has been registered for GCap using astGrfSet.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     cap
+*        The capability to be inquired aboue.
+*     value
+*        The value ot assign to the capability.
+
+*  Returned Value:
+*     Non-zero if the grf module is capabale of performing the action
+*     requested by "cap".
+
+*/
+
+/* Local Variables: */
+   int result;          /* Value retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfSet (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GCAP ] ) {
+      result = ( *( this->GCap ) )( this, cap, value );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      result = astGCap( cap, value );
+
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static void GenCurve( AstPlot *this, AstMapping *map ){
@@ -10813,6 +12237,8 @@ f        The global status.
                                    this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
       Crv_ux0 = AST__BAD;    
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
@@ -10837,7 +12263,7 @@ f        The global status.
       Map4( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map4 to draw the curve. */
-      Crv( this, d, x, y, 0, method, class );
+      Crv( this, d, x, y, 0, NULL, method, class );
 
 /* End the current poly line. */
       Opoly( this, method, class );
@@ -11220,6 +12646,89 @@ static void GMark( AstPlot *this, int n, const float *x,
 
 }
 
+static void GQch( AstPlot *this, float *chv, float *chh, const char *method, 
+                  const char *class ) {
+/*
+*
+*  Name:
+*     GQch
+
+*  Purpose:
+*     Call the GQch Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GQch( AstPlot *this, float *chv, float *chh, const char *method, 
+*                const char *class )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GQch grf function, either calling the 
+*     version registered using astGrfSet, or the version in the linked grf 
+*     module. The linked version is used if the Grf attribute is zero, or if 
+*     no function has been registered for GQch using astGrfSet.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     chv
+*        A pointer to the double which is to receive the height of
+*        characters drawn with a vertical baseline . This will be an 
+*        increment in the X axis.
+*     chh
+*        A pointer to the double which is to receive the height of
+*        characters drawn with a horizontal baseline. This will be an 
+*        increment in the Y axis.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfSet (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GQCH ] ) {
+      status = ( *( this->GQch ) )( this, chv, chh );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGQch( chv, chh );
+   }
+
+/* Check neither value is zero. */
+   if( status && ( *chh == 0.0 || *chv == 0.0 ) ) {
+      astError( AST__GRFER, "astGQch: Returned text heights are %g and %g " 
+                "but zero is illegal!", *chv, *chh );
+      status = 0;
+   }
+
+/* Report an error if anything went wrong, and return safe values. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGQch. ", method, 
+                class );
+      *chh = 1.0;
+      *chv = 1.0;
+   }
+
+}
+
 static void GText( AstPlot *this, const char *text, float x, float y,      
                    const char *just, float upx, float upy,
                    const char *method, const char *class ) {
@@ -11292,9 +12801,6 @@ static void GText( AstPlot *this, const char *text, float x, float y,
 
 /* Local Variables: */
    int status;          /* Status retruned from Grf function */
-   float xbn[ 4 ];      /* X coords at corners of new bounding box */
-   float ybn[ 4 ];      /* Y coords at corners of new bounding box */
-   int i;               /* Loop count */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -11320,31 +12826,13 @@ static void GText( AstPlot *this, const char *text, float x, float y,
    if( !status ) {
       astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", method, 
                 class );
-
-/* Otherwise, update the box containing all drawn graphics primitives. */
-   } else {
-
-/* Get the bounds of the box containing the new text. */
-      BoxText( this, 0, text, x, y, just, upx, upy, xbn, ybn,
-               method, class );
-
-/* Extend the bounds of the global bounding box held externally to include 
-   the new box. */
-      if( astOK ){
-         for( i = 0; i < 4; i++ ){
-            Boxp_lbnd[ 0 ] = MIN( xbn[ i ], Boxp_lbnd[ 0 ] );
-            Boxp_ubnd[ 0 ] = MAX( xbn[ i ], Boxp_ubnd[ 0 ] );
-            Boxp_lbnd[ 1 ] = MIN( ybn[ i ], Boxp_lbnd[ 1 ] );
-            Boxp_ubnd[ 1 ] = MAX( ybn[ i ], Boxp_ubnd[ 1 ] );
-         }
-      }
    }
 
 }
 
 static void GTxExt( AstPlot *this, const char *text, float x, float y,      
-                    const char *just, float upx, float upy, float *xb, 
-                    float *yb, const char *method, const char *class ) {
+                    const char *just, float upx, float upy, float *xbn, 
+                    float *ybn, const char *method, const char *class ) {
 /*
 *
 *  Name:
@@ -11359,8 +12847,8 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 *  Synopsis:
 *     #include "plot.h"
 *     void GTxExt( AstPlot *this, const char *text, float x, float y,      
-*                 const char *just, float upx, float upy, float *xb, 
-*                 float *yb, const char *method, const char *class )
+*                 const char *just, float upx, float upy, float *xbn, 
+*                 float *ybn, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot private function.
@@ -11403,10 +12891,10 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 *        coordinates. If necessary the supplied value should be negated
 *        to ensure that positive values always refer to displacements from 
 *        bottom to top on the screen.
-*     xb
+*     xbn
 *        An array of 4 elements in which to return the x coordinate of
 *        each corner of the bounding box.
-*     yb
+*     ybn
 *        An array of 4 elements in which to return the y coordinate of
 *        each corner of the bounding box.
 *     method
@@ -11415,6 +12903,9 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
+
+*  Notes:
+*     - The corners are returned in no particular order.
 
 */
 
@@ -11430,12 +12921,12 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
    language in which the function is written. */
    if( astGetGrf( this ) && this->grffun[ AST__GTXEXT ] ) {
       status = ( *( this->GTxExt ) )( this, text, x, y, just, upx, upy,
-                                      xb, yb );
+                                      xbn, ybn );
 
 /* Otherwise, use the function in the external Grf module, selected at
    link-time using ast_link options.*/
    } else {
-      status = astGTxExt( text, x, y, just, upx, upy, xb, yb );
+      status = astGTxExt( text, x, y, just, upx, upy, xbn, ybn );
    }
 
 /* Report an error if anything went wrong. */
@@ -11443,7 +12934,6 @@ static void GTxExt( AstPlot *this, const char *text, float x, float y,
       astError( AST__GRFER, "%s(%s): Graphics error in astGTxExt. ", method, 
                 class );
    }
-
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -11663,6 +13153,26 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* LogGap. */
+/* ---- */
+   } else if ( !strcmp( attrib, "loggap" ) ) {
+      dval = GetUsedLogGap( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
+/* LogGap(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "loggap(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      dval = GetUsedLogGap( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
 /* NumLabGap. */
 /* -------- */
    } else if ( !strcmp( attrib, "numlabgap" ) ) {
@@ -11718,6 +13228,66 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetLabelUp( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* LogPlot. */
+/* -------- */
+   } else if ( !strcmp( attrib, "logplot" ) ) {
+      ival = astGetLogPlot( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* LogPlot(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "logplot(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      ival = astGetLogPlot( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* LogLabel. */
+/* -------- */
+   } else if ( !strcmp( attrib, "loglabel" ) ) {
+      ival = GetUsedLogLabel( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* LogLabel(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "loglabel(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      ival = GetUsedLogLabel( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* LogTicks. */
+/* -------- */
+   } else if ( !strcmp( attrib, "logticks" ) ) {
+      ival = GetUsedLogTicks( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* LogTicks(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "logticks(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      ival = GetUsedLogTicks( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -12034,24 +13604,23 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
-static double GetTicks( AstPlot *this, int axis, double *cen, double gap, 
-                      double **ticks, int *nmajor, int *nminor, int format_set,
-                      int *inval, double *refval, const char *method, 
-                      const char *class ){
+static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks, 
+                        int *nmajor, int *nminor, int format_set, int *inval, 
+                        double *refval, const char *method, const char *class ){
 /*
 *  Name:
 *     GetTicks
 
 *  Purpose:
-*     Obtain a list of tick mark values for a single axis in a 2-D 
-*     physical coordinate Frame.
+*     Obtain a list of logarithmically or linearly spaced tick mark values for 
+*     a single axis in a 2-D physical coordinate Frame.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "plot.h"
-*     double GetTicks( AstPlot *this, int axis, double *cen, double gap, 
+*     double GetTicks( AstPlot *this, int axis, double *cen, 
 *                      double **ticks, int *nmajor, int *nminor, 
 *                      int format_set, int *inval, double *refval, 
 *                      const char *method, const char *class )
@@ -12060,14 +13629,15 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 *     Plot member function.
 
 *  Description:
-*     An initial guess is made at a gap size, and the number of major
-*     tick marks which would result from using the gap is found. If this
-*     number is not within acceptable limits the gap size is changed, and
-*     the process is repeated. If this fails to produce a satisfactory
-*     result after 10 attempts, the most recent gap sizes are used anyway.
+*     For linearly spaced major ticks the "gap" returned by this function 
+*     is the constant difference between adjacent major tick marks. For 
+*     logarithmically spaced major ticks the "gap" returned by this 
+*     function is the constant ratio between adjacent major tick marks.
 *
-*     The positioning of the gaps can be specified explicitly by the
-*     caller, or they can be found automatically.
+*     If a gap size has been specified using attribute Gap (or LogGap for
+*     logarithmic ticks) supplied, the specified value is returned, and used
+*     to determine the tick values. If no gap size is supplied, a default
+*     gap size is used and returned.
 
 *  Parameters:
 *     this
@@ -12078,12 +13648,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 *        Pointer to the supplied axis value at which to put a single 
 *        central tick. Other ticks will be placed evenly on either side 
 *        of this tick. If AST__BAD is provided, a value will be used 
-*        which would put a tick at an axis value of zero. The used value
+*        which would put a tick at an axis value of one. The used value
 *        is returned.
-*     gap
-*        The supplied values for the gaps between ticks on the axis. If
-*        this is AST__BAD a suitable default value will be used, and
-*        returned as the functiuon value.
 *     ticks
 *        Pointer to a place at which to return a pointer to the memory in 
 *        which are stored the tick values to be used. This pointer should be 
@@ -12098,8 +13664,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 *        This is one more than the number of minor tick marks.
 *     format_set
 *        Indicates if an explicit format has been set for the axis. If
-*        not, "cen" is always assumed to be AST__BAD, and any supplied
-*        value for "gap" is rounded to the nearest "nice" value. This has
+*        not, "cen" is always assumed to be AST__BAD, and any specified 
+*        Gap value is rounded to the nearest "nice" value. This has
 *        to be done because the algorithm for choosing a format avoiding
 *        unnecessary precision only works if the gap size causes 1 digit to
 *        change between adjacent labels.
@@ -12135,11 +13701,22 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 */
 
 /* Local Variables: */
-   int i;                    /* Axis index */
+   double *tick;             /* Pointer to next tick value */
    double cen0;              /* Supplied value of cen */
+   double dran;              /* Dynamic range of axis values */
    double frac;              /* Fraction of plot area holding good coords */
+   double gap;               /* Supplied value for Gap or LogGap */
+   double log_used_gap;      /* Log10( the used gap size ) */
+   double maxv;              /* Max axis value */
+   double minv;              /* Min axis value */
+   double new_used_gap;      /* New value for the used gap size */
    double test_gap;          /* Trial gap size */
+   double used_cen;          /* Used value of cen */
    double used_gap;          /* The used gap size */
+   int findcen;              /* Find a new centre value? */
+   int i;                    /* Axis index */
+   int ihi;                  /* Highest tick mark index */
+   int ilo;                  /* Lowest tick mark index */
 
    static AstFrame *frame;          /* Pointer to the current Frame */
    static AstMapping *map;          /* Pointer to Base->Current Mapping */
@@ -12160,9 +13737,9 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 /* If a NULL pointer has been supplied for "this", release the resources
    allocated on the first call to this function, and return. */
    if( !this ){
-      map = astAnnul( map );
-      pset = astAnnul( pset );
-      frame = astAnnul( frame );
+      if( map ) map = astAnnul( map );
+      if( pset ) pset = astAnnul( pset );
+      if( frame ) frame = astAnnul( frame );
       return 0.0;
    }
 
@@ -12188,7 +13765,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
    to close together. */
       maxticks = (int) ( 0.5 + MAJTICKS_MAX*sqrt( frac ) );
       mintick = (int) ( 0.5 + MAJTICKS_MIN*sqrt( frac ) );
-      if( mintick < 5 ) mintick = 5;
+      if( mintick < 3 ) mintick = 3;
       if( maxticks < 8 ) maxticks = 8;
       if( maxticks < mintick ) maxticks = mintick;
 
@@ -12201,6 +13778,16 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
       }
    }
 
+/* See if the user has specified a gap size. The default for astGetLogTicks is 
+   determined in DefGaps, so we can now decide whether to use attribute Gap 
+   or LogGap to get the user-supplied gap size. Obtain the requested gap 
+   attribute values for both physical axes. */
+   if( astGetLogTicks( this, axis ) ) {
+      gap = astGetLogGap( this, axis );
+   } else {
+      gap = astGetGap( this, axis );
+   }
+
 /* Return the flag indicating if any regions of invalid physical coordinates 
    were found. */
    *inval = bad;
@@ -12208,79 +13795,272 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 /* Return the typical value on the other axis. */
    *refval = typval[ 1 - axis ];
 
-/* Store the supplied valeu of cen. */
-   cen0 = ( cen ) ? *cen : AST__BAD;
+/* Find the maximum and minimum value in the plotting area. DefGap will
+   have reported an error if minv*maxv is negative or zero. */
+   if( astOK ) {
+      maxv = ptr[ axis ][ ngood[ axis ] - 1 ];
+      minv = ptr[ axis ][ 0 ];
+   }
 
-/* If no format has been set for the axis, ensure AST__BAD is used for cen. */
-   if( !format_set ) cen0 = AST__BAD;
+/* First deal with logarithmically spaced ticks. */
+   dran = ( minv != 0.0 ) ? maxv/minv : 0.0;
+   if( astGetLogTicks( this, axis ) ) {
+
+/* If the ratio of max and min data value is not larger than 10, report an 
+   error. */
+      dran = ( minv != 0.0 ) ? maxv/minv :0.0;
+      if( dran < 10.0 && dran > 0.1 ) {
+         astError( AST__VSMAL, "%s(%s): Cannot produce logarithmically "
+                   "spaced major tick marks on axis %d since the dynamic "
+                   "range of the axis is too small.", method, class, axis + 1 );
+      }
+
+/* Should we find a new value for "cen"? */
+      findcen = !cen || *cen == AST__BAD || !format_set;
 
 /* Try to find a "nice" gap size, so long as the caller has not supplied
    a gap size. The default gap size obtained above is our initial guess. */
-   if( gap == AST__BAD ){
+      if( gap == AST__BAD && astOK ){
 
-/* Start of using the default gap found during the initialisation. */
-      test_gap = defgaps[ axis ];
+/* Start off using the default gap found during the initialisation. */
+         test_gap = defgaps[ axis ];
 
 /* Loop round until a gap size is found which gives an acceptable number
    of tick marks. Upto 10 gap sizes are tried. */
-      for( i = 0; i < 10 && astOK; i++ ){
+         for( i = 0; i < 10 && astOK; i++ ){
 
 /* Find a "nice" gap size close to the current test gap size. Also find
-   the number of minor tick marks to use with the nice gap size. */
-         used_gap = astGap( frame, axis, test_gap, nminor );
+   the number of minor tick marks to use with the nice gap size. Gaps for
+   logarithmic axes are always powers of ten. */
+            log_used_gap = (int) ( log10( test_gap ) + 0.5 );
+            if( log_used_gap == 0.0 ) {
+               log_used_gap = ( test_gap > 1.0 ) ? 1.0 : -1.0;
+            }
+            *nminor = 9;
+            used_gap = pow( 10.0, log_used_gap );
 
-/* Find the number and positions of major tick marks which would result
-   from using this gap size. Annul the memory used to hold any previous tick 
-   data first. */
-         if( *ticks ) *ticks = astFree( *ticks );
-         if( cen ) *cen = cen0;
-         *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
-                                 ngood[ axis ], ptr[ axis ], ticks );
+/* If no value has been supplied for *cen, choose a value which would put
+   a major tick mark at the value 1 (or -1), and which is mid way between 
+   the maximum and minimum axis value. */
+            if( findcen ) {
+               used_cen = pow( used_gap, (int) ( 0.5*log10( maxv*minv ) /
+                                                 log_used_gap ) ); 
+               if( maxv < 0 ) used_cen = -used_cen;
+            } else {
+               used_cen = *cen;
+            }
+
+/* Find the index of the highest tick which is not larger than the lowest
+   axis value. */
+            if( log_used_gap > 0.0 ) {
+               ilo = floor(  log10( minv/used_cen )/log_used_gap );         
+            } else {
+               ilo = ceil(  log10( minv/used_cen )/log_used_gap );         
+            }
+
+/* Find the index of the lowest tick which is not less than the highest
+   axis value. */
+            if( log_used_gap > 0.0 ) {
+               ihi = ceil(  log10( maxv/used_cen )/log_used_gap );         
+            } else {
+               ihi = floor(  log10( maxv/used_cen )/log_used_gap );         
+            }
+
+/* Find the total number of tick marks. */
+            *nmajor = ihi - ilo + 1;
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
    gap was too large to produce any ticks, try using half the gap size. */
-         if( *nmajor == 0 ) {
-            test_gap *= 0.5;
+            if( *nmajor <= 0 ) {
+               test_gap = sqrt( test_gap );
 
 /* If there were some ticks, but not enough, decrease the gap size in
    proportion to the shortfall. */
-         } else if( *nmajor < mintick ){
-            test_gap *= (double)( *nmajor )/(double)( mintick );
+            } else if( *nmajor < mintick ){
+               test_gap = pow( test_gap, (double)( *nmajor )/(double)( mintick ) );
 
 /* If there were too many ticks, increase the gap size in proportion to the 
    excess. */
-         } else if( *nmajor > maxticks ){
-            test_gap *= (double)( *nmajor )/(double)( maxticks );
+            } else if( *nmajor > maxticks ){
+               test_gap = pow( test_gap, (double)( *nmajor )/(double)( maxticks ) );
 
 /* If the number of ticks is acceptable, break out of the loop early.*/
-         } else {
-            break;
+            } else {
+               break;
+            }
          }
 
-      }
+/* Increase the tick coverage by one at each end to cover up the gaps. */
+         ilo--;
+         ihi++;
+         *nmajor += 2;   
 
 /* If an explicit gap size was supplied, use it. */
+      } else if( astOK ) {
+
+/* Check it is usable. */
+         if( gap == 0.0 && astOK ) {
+            astError( AST__ATTIN, "%s(%s): Invalid value zero given for "
+                      "attribute LogGap(%d).", method, class, axis + 1 );
+
+         } else if( gap < 0.0 && astOK ) {
+            astError( AST__ATTIN, "%s(%s): Invalid negative value %f given for "
+                      "attribute LogGap(%d).", method, class, gap, axis + 1 );
+
+/* If necessary, take its reciprocal in order to ensure that the absolute
+   tick mark values get smaller or larger as required. */
+         } else {
+
+            used_gap = gap;
+            if( fabs( maxv ) < fabs( minv ) ) {
+               if( gap > 1.0 ) used_gap = 1.0/gap;
+            } else {
+               if( gap < 1.0 ) used_gap = 1.0/gap;
+            }
+
+/* Find the nearest power of 10 ( do not allow 10**0 (=1.0) to be used). */
+            log_used_gap = (int) ( log10( used_gap ) + 0.5 );
+            if( log_used_gap == 0.0 ) {
+              log_used_gap = ( gap > 1.0 ) ? 1.0 : -1.0;
+            }
+            used_gap = pow( 10.0, log_used_gap );
+
+/* We always use 9 minor intervals. */         
+            *nminor = 9;
+
+/* If no value has been supplied for *cen, choose a value which would put
+   a major tick mark at the value 1 (or -1), and which is mid way between 
+   the maximum and minimum axis value. */
+            if( findcen ) {
+               used_cen = pow( used_gap, (int) ( 0.5*log10( maxv*minv ) /
+                                                 log_used_gap ) ); 
+               if( maxv < 0 ) used_cen = -used_cen;
+            } else {
+               used_cen = *cen;
+            }
+
+/* Find the index of the highest tick which is not larger than the lowest
+   axis value. */
+            if( log_used_gap > 0.0 ) {
+               ilo = floor(  log10( minv/used_cen )/log_used_gap );         
+            } else {
+               ilo = ceil(  log10( minv/used_cen )/log_used_gap );         
+            }
+
+/* Find the index of the lowest tick which is not less than the highest
+   axis value. */
+            if( log_used_gap > 0.0 ) {
+               ihi = ceil(  log10( maxv/used_cen )/log_used_gap );         
+            } else {
+               ihi = floor(  log10( maxv/used_cen )/log_used_gap );         
+            }
+
+/* Find the total number of tick marks. */
+            *nmajor = ihi - ilo + 1;
+            if( *nmajor < 2 && astOK ) {
+               astError( AST__ATTIN, "%s(%s): Unusable value %f given for "
+                      "attribute LogGap(%d).", method, class, gap, axis + 1 );
+
+            }
+         }
+      }
+
+/* Allocate memory to hold the tick values themselves. */
+      *ticks = (double *) astMalloc( sizeof( double )*( *nmajor ) );
+      if( astOK ) {
+
+/* Store them. */
+         tick = *ticks;
+         for( i = ilo; i <= ihi; i++, tick++ ) {
+            *tick = used_cen*pow( used_gap, i );
+         }
+      }
+
+/* Store returned centre value. */
+      if( cen ) *cen = used_cen;
+
+/* Now deal with linearly spaced ticks */
    } else {
+
+/* Store the supplied value of cen. */
+      cen0 = ( cen ) ? *cen : AST__BAD;
+
+/* If no format has been set for the axis, ensure AST__BAD is used for cen. */
+      if( !format_set ) cen0 = AST__BAD;
+
+/* Try to find a "nice" gap size, so long as the caller has not supplied
+   a gap size. The default gap size obtained above is our initial guess. */
+      if( gap == AST__BAD ){
+
+/* Start of using the default gap found during the initialisation. */
+         test_gap = defgaps[ axis ];
+         used_gap = 0.0;
+
+/* Loop round until a gap size is found which gives an acceptable number
+   of tick marks. Upto 10 gap sizes are tried. */
+         for( i = 0; i < 10 && astOK; i++ ){
+
+/* Find a "nice" gap size close to the current test gap size. Also find
+   the number of minor tick marks to use with the nice gap size. */
+            new_used_gap = astGap( frame, axis, test_gap, nminor );
+
+/* Find the number and positions of major tick marks which would result
+   from using this gap size. Annul the memory used to hold any previous tick 
+   data first. Only do this if the gap being used has actually changed,
+   otherwise we just retain the values created from the previous run with
+   this gap size. */
+            if( new_used_gap != used_gap ) {
+               used_gap = new_used_gap;
+               if( *ticks ) *ticks = astFree( *ticks );
+               if( cen ) *cen = cen0;
+               *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
+                                       ngood[ axis ], ptr[ axis ], ticks );
+            }
+
+/* If the number of ticks is unacceptable, try a different gap size. If the
+   gap was too large to produce any ticks, try using half the gap size. */
+            if( *nmajor == 0 ) {
+               test_gap *= 0.5;
+
+/* If there were some ticks, but not enough, decrease the gap size in
+   proportion to the shortfall. */
+            } else if( *nmajor < mintick ){
+               test_gap *= (double)( *nmajor )/(double)( mintick );
+
+/* If there were too many ticks, increase the gap size in proportion to the 
+   excess. */
+            } else if( *nmajor > maxticks ){
+               test_gap *= (double)( *nmajor )/(double)( maxticks );
+
+/* If the number of ticks is acceptable, break out of the loop early.*/
+            } else {
+               break;
+            }
+   
+         }
+
+/* If an explicit gap size was supplied, use it. */
+      } else {
 
 /* Find a likely value for the number of minor tick marks to use, and find
    a nice gap close to the supplied gap (unless an explicit format has
    been set). */
-      if( format_set ){
-         used_gap = gap;
-         (void) astGap( frame, axis, gap, nminor );
-      } else {
-         used_gap = astGap( frame, axis, gap, nminor );
-      }
+         if( format_set ){
+            used_gap = gap;
+            (void) astGap( frame, axis, used_gap, nminor );
+         } else {
+            used_gap = astGap( frame, axis, gap, nminor );
+         }
 
 /* Find where the major ticks should be put. */
-      if( cen ) *cen = cen0;
-      *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
-                              ngood[ axis ], ptr[ axis ], ticks );
-
+         if( cen ) *cen = cen0;
+         *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
+                                 ngood[ axis ], ptr[ axis ], ticks );
+      }
    }
 
 /* Report an error if no ticks can be found. */
-   if( *nmajor == 0 ) {
+   if( *nmajor == 0 && astOK ) {
       astError( AST__GRFER, "%s(%s): Cannot find any usable tick mark values. ", method, 
                 class );
    }
@@ -12457,7 +14237,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    }
 
 /* Store approximate fraction of the plotting area containing good
-   physical cooridnates. */
+   physical coordinates. */
    if( astOK ) {
       frac =  ( (double) ngood )/(double)( (*dim)*(*dim) );
 
@@ -12684,7 +14464,10 @@ c     - This function returns without action if there are no snapshots to
          this->GLine = newframe->GLine;
          this->GMark = newframe->GMark;
          this->GText = newframe->GText;
+         this->GCap = newframe->GCap;
          this->GTxExt = newframe->GTxExt;
+         this->GScales = newframe->GScales;
+         this->GQch = newframe->GQch;
       }
    }
 }
@@ -12772,7 +14555,10 @@ f        The global status.
       newframe->GLine = this->GLine;
       newframe->GMark = this->GMark;
       newframe->GText = this->GText;
+      newframe->GCap = this->GCap;
       newframe->GTxExt = this->GTxExt;
+      newframe->GQch = this->GQch;
+      newframe->GScales = this->GScales;
    }
 }
 
@@ -12827,26 +14613,29 @@ f     THIS = INTEGER (Given)
 c     name 
 f     NAME = CHARACTER * ( * ) (Given)
 c        A name indicating the graphics function to be replaced.
-c        Six graphics functions are used in total by the
+c        Various graphics functions are used by the
 c        Plot class, and any combination of them may be supplied by calling
 c        this function once for each function to be replaced. If any of the 
-c        six graphics functions are not replaced in this way, the 
+c        graphics functions are not replaced in this way, the 
 c        corresponding functions in the graphics interface selected at 
 c        link-time (using the ast_link command) are used. The allowed
 c        names are: 
 f        A name indicating the graphics routine to be replaced.
-f        Six graphics routines are used in total by the
+f        Various graphics routines are used by the
 f        Plot class, and any combination of them may be supplied by calling
 f        this routine once for each routine to be replaced. If any of the 
-f        six graphics routines are not replaced in this way, the 
+f        graphics routines are not replaced in this way, the 
 f        corresponding routines in the graphics interface selected at 
 f        link-time (using the ast_link command) are used. The allowed
-f        names are: 
+f        function names are: 
 *
 *        - Attr -  Enquire or set a graphics attribute value
+*        - Cap -  Inquire a capability
 *        - Flush - Flush all pending graphics to the output device
 *        - Line - Draw a polyline (i.e. a set of connected lines)
 *        - Mark -  Draw a set of markers
+*        - Qch -  Return the character height in world coordinates
+*        - Scales -  Get the axis scales
 *        - Text - Draw a character string
 *        - TxExt -  Get the extent of a character string
 *        
@@ -12875,8 +14664,9 @@ f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
 *  Function Interfaces:
-*     All the functions listed below should return an integer value of
-*     0 if an error occurs, and 1 otherwise. All x and y values refer
+*     All the functions listed below (except for "Cap") should return an 
+*     integer value of 0 if an error occurs, and 1 otherwise. All x and y 
+*     values refer
 f     to "graphics cordinates" as defined by the GRAPHBOX parameter of
 f     the AST_PLOT call which created the Plot.
 c     to "graphics cordinates" as defined by the graphbox parameter of
@@ -12917,6 +14707,65 @@ f       Identified by the following values defined in GRF_PAR:
 *       GRF__MARK,
 *       GRF__TEXT.
 
+*  Cap:
+*     The "Cap" function is called to determine if the grf module has a 
+*     given capability, as indicated by the "cap" argument:
+*
+c     int Cap( int cap, int value )
+f     INTEGER FUNCTION CAP( CAP, VALUE )
+*
+c     - cap - 
+f     - CAP = INTEGER (Given)
+*        The capability being inquired about. This will be one of the
+c        following constants defined in grf.h:
+f        following constants defined in GRF_PAR:
+*
+*        GRF__SCALES: This function should return a non-zero value if the
+*        "Scales" function is implemented, and zero otherwise. The supplied 
+c        "value" argument should be ignored.
+f        VALUE argument should be ignored.
+*
+*        GRF__MJUST: This function should return a non-zero value if 
+*        the "Text" and "TxExt" functions recognise "M" as a 
+*        character in the justification string. If the first character of
+*        a justification string is "M", then the text should be justified
+*        with the given reference point at the bottom of the bounding box. 
+*        This is different to "B" justification, which requests that the
+*        reference point be put on the baseline of the text, since some 
+*        characters hang down below the baseline. If the "Text" or
+*        "TxExt" function cannot differentiate between "M" and "B",
+*        then this function should return zero, in which case "M"
+*        justification will never be requested by Plot. The supplied
+c        "value" argument should be ignored.
+f        VALUE argument should be ignored.
+*
+*        GRF__ESC: This function should return a non-zero value if the
+*        "Text" and "TxExt" functions can recognise and interpret
+*        graphics escape sequences within the supplied string (see
+*        attribute Escape). Zero should be returned if escape sequences 
+*        cannot be interpreted (in which case the Plot class will interpret 
+c        them itself if needed). The supplied "value" argument should be 
+f        them itself if needed). The supplied VALUE argument should be 
+*        ignored only if escape sequences cannot be interpreted by "Text" and 
+c        "TxExt". Otherwise, "value" indicates whether "Text" and "TxExt" 
+c        should interpret escape sequences in subsequent calls. If "value" is 
+f        "TxExt". Otherwise, VALUE indicates whether "Text" and "TxExt" 
+f        should interpret escape sequences in subsequent calls. If VALUE is 
+*        non-zero then escape sequences should be interpreted by "Text" and
+*        "TxExt". Otherwise, they should be drawn as literal text.
+*
+c     - value - 
+f     - VALUE = INTEGER (Given)
+c        The use of this parameter depends on the value of "cap" as
+f        The use of this parameter depends on the value of CAP as
+*        described above.
+
+*     - Returned Function Value: 
+c        The value returned by the function depends on the value of "cap"
+f        The value returned by the function depends on the value of CAP
+*        as described above. Zero should be returned if the supplied 
+*        capability is not recognised.
+
 *  Flush:
 *     The "Flush" function ensures that the display device is up-to-date,
 *     by flushing any pending graphics to the output device. It
@@ -12956,6 +14805,41 @@ c     - type - An integer which can be used to indicate the type of marker
 c       symbol required.
 f     - TYPE = INTEGER (Given) - An integer which can be used to indicate 
 f       the type of marker symbol required.
+
+*  Qch:
+*     The "Qch" function returns the heights of characters drawn vertically 
+*     and horizontally in graphics coordinates. It requires the following 
+*     interface:
+*
+c     int Qch( float *chv, float *chh )
+f     INTEGER FUNCTION QCH( CHV, CHH )
+*
+c     - chv - A pointer to the float which is to receive the height of
+f     - CHV = REAL (Returned) The height of
+*     characters drawn with a vertical baseline. This will be an 
+*     increment in the X axis.
+c     - chh - A pointer to the float which is to receive the height of
+f     - CHH = REAL (Returned) The height of
+*     characters drawn with a horizontal baseline. This will be an 
+*     increment in the Y axis.
+
+*  Scales:
+*     The "Scales" function returns two values (one for each axis) which 
+*     scale increments on the corresponding axis into a "normal" coordinate
+*     system in which: 1) the axes have equal scale in terms of (for instance)
+*     millimetres per unit distance, 2) X values increase from left to
+*     right, and 3) Y values increase from bottom to top. It requires the 
+*     following interface:
+*
+c     int Scales( float *alpha, float *beta )
+f     INTEGER FUNCTION SCALES( ALPHA, BETA )
+*
+c     - alpha - A pointer to the float which is to receive the
+f     - ALPHA = REAL (Returned) The 
+*     scale for the X axis (i.e. Xnorm = alpha*Xworld).
+c     - beta - A pointer to the float which is to receive the
+f     - BETA = REAL (Returned) The 
+*     scale for the Y axis (i.e. Ynorm = beta*Yworld).
 
 *  Text:
 *     The "Text" function displays a character string at a given
@@ -13080,8 +14964,17 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
       } else if( ifun == AST__GTEXT ) {
          wrapper = (AstGrfWrap) CGTextWrapper;
 
+      } else if( ifun == AST__GCAP ) {
+         wrapper = (AstGrfWrap) CGCapWrapper;
+
       } else if( ifun == AST__GTXEXT ) {
          wrapper = (AstGrfWrap) CGTxExtWrapper;
+
+      } else if( ifun == AST__GSCALES ) {
+         wrapper = (AstGrfWrap) CGScalesWrapper;
+
+      } else if( ifun == AST__GQCH ) {
+         wrapper = (AstGrfWrap) CGQchWrapper;
 
       } else if( astOK ) {
          astError( AST__INTER, "%s(%s): AST internal programming error - "
@@ -13121,7 +15014,7 @@ int astGrfFunID_( const char *name, const char *method, const char *class ) {
 *     name 
 *        The grf function name. Any unambiguous abbreviation will do.
 *        Case is ignored. The full list of grf function names is:
-*        "Attr Flush Line Mark Text TxExt". See grf_pgplot.c
+*        "Attr Scales Flush Line Mark Qch Text TxExt". See grf_pgplot.c
 *        for details of these functions.
 *     method
 *        Pointer to a string holding the name of the calling method.
@@ -13131,7 +15024,10 @@ int astGrfFunID_( const char *name, const char *method, const char *class ) {
 *        This is only for use in constructing error messages.
 
 */
-   return FullForm( "Attr Flush Line Mark Text TxExt", name, 
+
+/* Note that the list of identifiers here must be in the same order as the
+   sorted values of the constants AST__GATTR, AST__GFLUSH, etc */
+   return FullForm( "Attr Flush Line Mark Text TxExt Scales Qch Cap", name, 
                     "Grf function name (programming error)", method, class );
 }
 
@@ -13338,8 +15234,17 @@ static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper ) {
    } else if( ifun == AST__GTEXT ) {
       this->GText = (AstGTextWrap) wrapper;
 
+   } else if( ifun == AST__GCAP ) {
+      this->GCap = (AstGCapWrap) wrapper;
+
    } else if( ifun == AST__GTXEXT ) {
       this->GTxExt = (AstGTxExtWrap) wrapper;
+
+   } else if( ifun == AST__GSCALES ) {
+      this->GScales = (AstGScalesWrap) wrapper;
+
+   } else if( ifun == AST__GQCH ) {
+      this->GQch = (AstGQchWrap) wrapper;
 
    } else if( astOK ) {
       astError( AST__INTER, "%s(%s): AST internal programming error - "
@@ -13409,8 +15314,11 @@ f        The global status.
    int drawgrid;           /* Is a grid of lines to be drawn? */
    int clredge;            /* Clear the Edge attributes before returning? */
    int edgeticks;          /* Draw labels round edges of plotting area? */
+   int escs;               /* Original astEscapes value */
    int ink;                /* Draw the grid with visible ink? */
    int inval;              /* Were areas of invalid coordinates found? */
+   int loglabelset[2];     /* Were the LogLabel attributes set initially? */
+   int logticksset[2];     /* Were the LogTicks attributes set initially? */
    int naxes;              /* No. of axes in the base or current Frame */
    int oldedge0;           /* Default value for Edge(1) */
    int oldedge1;           /* Default value for Edge(2) */
@@ -13430,6 +15338,17 @@ f        The global status.
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", method, class, naxes, class );
    } 
+
+/* Ensure AST functions included graphical escape sequences in any
+   returned text strings. */
+   escs = astEscapes( 1 );
+
+/* Note if attributes which have complex dynamic defaults are set
+   initially. */
+   logticksset[0] = astTestLogTicks( this_nd, 0 );
+   logticksset[1] = astTestLogTicks( this_nd, 1 );
+   loglabelset[0] = astTestLogLabel( this_nd, 0 );
+   loglabelset[1] = astTestLogLabel( this_nd, 1 );
 
 /* Get a Plot with a 2D (or 1D) current Frame. */
    this = (AstPlot *) Fset2D( (AstFrameSet *) this_nd, AST__CURRENT );
@@ -13454,10 +15373,8 @@ f        The global status.
    Box_ubnd[ 0 ] = FLT_MIN;
    Box_ubnd[ 1 ] = FLT_MIN;
 
-/* Obtain the requested gap and centre attribute values for both physical 
-   axes. */
+/* Obtain the requested centre attribute values for both physical axes. */
    for( axis = 0; axis < 2; axis++ ){
-      gap[ axis ] = astGetGap( this, axis );
       cen[ axis ] = astGetCentre( this, axis );
    }
 
@@ -13584,7 +15501,14 @@ f        The global status.
    defaults. Check the global status to ensure the pointer "grid" can be
    used without the possibility of a segmentation violation. */
    for( axis = 0; axis < 2 && astOK ; axis++ ) {
-      SetUsedGap( this_nd, axis, gap[ axis ] );
+      SetUsedLogTicks( this_nd, axis, astGetLogTicks( this, axis ) );
+      SetUsedLogLabel( this_nd, axis, astGetLogLabel( this, axis ) );
+
+      if( astGetLogTicks( this, axis ) ) {
+         SetUsedLogGap( this_nd, axis, gap[ axis ] );
+      } else {
+         SetUsedGap( this_nd, axis, gap[ axis ] );
+      }
       SetUsedCentre( this_nd, axis, cen[ axis ] );
       SetUsedEdge( this_nd, axis, astGetEdge( this, axis ) );
       SetUsedLabelAt( this_nd, axis, labelat[ axis ] );
@@ -13616,14 +15540,23 @@ f        The global status.
 /* Free the memory used to hold information about the tick marks. */
    grid = CleanGrid( grid );
 
-/* If required clear the Edge attributes. */
+/* If required clear attributes. */
    if( clredge ) {
       astClearEdge( this, 0 );
       astClearEdge( this, 1 );
    }
 
+   if( !logticksset[ 0 ] ) astClearLogTicks( this, 0 );
+   if( !logticksset[ 1 ] ) astClearLogTicks( this, 1 );
+   if( !loglabelset[ 0 ] ) astClearLogLabel( this, 0 );
+   if( !loglabelset[ 1 ] ) astClearLogLabel( this, 1 );
+
 /* Free the 2D Plot. */
    this = astAnnul( this );
+
+/* Restore the original value of the flag which says whether graphical 
+   escape sequences should be incldued in any returned text strings. */
+   astEscapes( escs );
 
 /* Copy the total bounding box to the box which is returned by
    astBoundingBox. */
@@ -13823,6 +15756,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    int i;                 /* Tick mark index */
    int j;                 /* Axis index */
    int k;                 /* Section index */
+   int logticks[ 2 ];     /* Uses logarithmicaly spaced tick marks? */
    int nticks;            /* Number of tick marks */
 
 /* Check the global status. */
@@ -13831,19 +15765,25 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 /* Get memory to hold two TickInfo pointers. */
    info = (TickInfo **) astMalloc( 2*sizeof( TickInfo *) );
 
-/* If succesful, initialise the two pointers. */
+/* If succesfull... */
    if( astOK ){
+
+/* Initialise the two pointers. */
       info[ 0 ] = NULL;
       info[ 1 ] = NULL;
 
 /* Obtain the tick mark values, and the corresponding formatted labels for
    each axis. */
       for( j = 0; j < 2; j++ ){
-         info[ j ] = TickMarks( this, j, cen + j, gap + j, inval, method, class );
+         info[ j ] = TickMarks( this, j, cen + j, gap + j, inval, method, 
+                                class );
+         logticks[ j ] = astGetLogTicks( this, j );
       }
 
 /* Release the resources allocated in the first call to TickMarks. */
-      (void) TickMarks( NULL, 0, NULL, gap, NULL, method, class );
+      for( j = 0; j < 2; j++ ){
+         (void) TickMarks( NULL, j, NULL, gap, NULL, method, class );
+      }
 
 /* Each major tick value for axis "j" may be marked with a curve parallel
    to axis "1-j" drawn across the entire plotting area. We need to decide
@@ -13867,72 +15807,125 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 /* Get the current frame. */
       fr = astGetFrame( this, AST__CURRENT );
 
-/* Find the start and length of each section of the curve for each tick
-   mark on axis "j". */
-      for( j = 0; j < 2 && astOK; j++ ){
+/* If either axis has log tick spacing, use the simple approach which
+   assumes that each curve has only one section. */
+      if( logticks[ 0 ] || logticks[ 1 ] ) {
+
+/* Find the start and length of the curve for each tick mark on axis "j". */
+         for( j = 0; j < 2 && astOK; j++ ){
 
 /* Find the axis range to display on the other axis. */
-         bot = astGetBottom( fr, 1 - j );
-         top = astGetTop( fr, 1 - j );
-         if( bot > top ) {
-            tmp = top;
-            top = bot;
-            bot = tmp;
-         }      
+            bot = astGetBottom( fr, 1 - j );
+            top = astGetTop( fr, 1 - j );
+            if( bot > top ) {
+               tmp = top;
+               top = bot;
+               bot = tmp;
+            }      
 
 /* Get a pointer to the major tick mark values on the other axis ("1-j"), 
    together with the number of them. */
-         ticks = info[ 1 - j ]->ticks;
-         nticks = info[ 1 - j ]->nmajor;
+            ticks = info[ 1 - j ]->ticks;
+            nticks = info[ 1 - j ]->nmajor;
+
+/* Reserve memory to hold the starts and lengths of each section of the 
+   grid line marking the major ticks on the axis "j". There will only be
+   one section. */
+            starts = (double *) astMalloc( sizeof(double) );
+            lengths = (double *) astMalloc( sizeof(double) );
+            info[ j ]->start = starts;
+            info[ j ]->length = lengths;
+
+/* Check that the pointers can be used. */
+            if( astOK ) {
+
+/* The section starts one gap below the first tick. Limit it to the
+   displayed range of the axis. */
+               starts[ 0 ] = MIN( top, MAX( bot, ticks[ 0 ]/gap[ 1 - j ] ) );
+
+/* The section ends one gap above the first tick. Limit it to the
+   displayed range of the axis. */
+               end = MIN( top, MAX( bot, ticks[ nticks - 1 ]*gap[ 1 - j ] ) );
+
+/* Store the length of the section. */
+               lengths[ 0 ] = end - starts[ 0 ];
+
+/* Store the number of sections in the returned structure. */
+               info[ 0 ]->nsect = 1;
+      
+            }
+         }   
+
+/* If both axes have linear tick spacing, use the complete approach. */
+      } else {
+
+/* Find the start and length of each section of the curve for each tick
+   mark on axis "j". */
+         for( j = 0; j < 2 && astOK; j++ ){
+
+/* Find the axis range to display on the other axis. */
+            bot = astGetBottom( fr, 1 - j );
+            top = astGetTop( fr, 1 - j );
+            if( bot > top ) {
+               tmp = top;
+               top = bot;
+               bot = tmp;
+            }      
+
+/* Get a pointer to the major tick mark values on the other axis ("1-j"), 
+   together with the number of them. */
+            ticks = info[ 1 - j ]->ticks;
+            nticks = info[ 1 - j ]->nmajor;
 
 /* Reserve memory to hold the starts and lengths of each section of the 
    grid line marking the major ticks on the axis "j". The allocated
    arrays are the largest that could possibly be needed (i.e. if every
    tick mark starts a new section). */
-         starts = (double *) astMalloc( sizeof(double)*(size_t) nticks );
-         lengths = (double *) astMalloc( sizeof(double)*(size_t) nticks );
-         info[ j ]->start = starts;
-         info[ j ]->length = lengths;
+            starts = (double *) astMalloc( sizeof(double)*(size_t) nticks );
+            lengths = (double *) astMalloc( sizeof(double)*(size_t) nticks );
+            info[ j ]->start = starts;
+            info[ j ]->length = lengths;
 
 /* Check that the pointers can be used. */
-         if( astOK ) {
+            if( astOK ) {
 
 /* Loop round each of the major tick marks on axis "1-j". */
-            k = 0;
-            i = 0;
-            while( i < nticks ){
+               k = 0;
+               i = 0;
+               while( i < nticks ){
 
 /* Record the start of the next section of the grid lines. */
-               starts[ k ] = ticks[ i++ ];
+                  starts[ k ] = ticks[ i++ ];
 
 /* Tick marks should be regularly spaced by the values in "gap". Check each 
    tick mark until a missing tick mark is  found. The section ends at the 
    start of the gap. */
-               while( i < nticks && 
-                      ( ticks[ i ] - ticks[ i - 1 ] ) < 1.5*gap[ 1 - j ] ) i++;
+                  while( i < nticks && 
+                         ( ticks[ i ] - ticks[ i - 1 ] ) < 1.5*gap[ 1 - j ] ) i++;
 
 /* Record the length of the section. */
-               lengths[ k ] = ticks[ i - 1 ] - starts[ k ];   
+                  lengths[ k ] = ticks[ i - 1 ] - starts[ k ];   
 
 /* The section is extended at start and end by one gap in order to "cover
    up the joins". Limit this to the displayed range of the axis. */
-               starts[ k ] -= gap[ 1 - j];
-               lengths[ k ] += 2.0*gap[ 1 - j ]; 
+                  starts[ k ] -= gap[ 1 - j];
+                  lengths[ k ] += 2.0*gap[ 1 - j ]; 
 
 /* Limit the start and end to the displayed range of the axis. */
-               end = starts[ k ] + lengths[ k ];
-               starts[ k ] = MIN( top, MAX( bot, starts[ k ] ) );
-               lengths[ k ] = MIN( top, MAX( bot, end ) ) - starts[ k ];
+                  end = starts[ k ] + lengths[ k ];
+                  starts[ k ] = MIN( top, MAX( bot, starts[ k ] ) );
+                  lengths[ k ] = MIN( top, MAX( bot, end ) ) - starts[ k ];
 
 /* Increment the number of sections. */
-               k++;
-            }
+                  k++;
+               }
 
 /* Store the number of sections in the returned structure. */
-            info[j]->nsect = k;
+               info[j]->nsect = k;
       
-         }
-      }   
+            }
+         }   
+      }
 
 /* Annull the current frame. */
       fr = astAnnul( fr );
@@ -14096,612 +16089,6 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
 
 /* Return. */
    return;
-
-}
-
-static int GrText( AstPlot *this, int esc, const char *text, int ink, 
-                   int bbclip, float x, float y, float upx, float upy, 
-                   float *xbn, float *ybn, const char *method, 
-                   const char *class ){
-/*
-*+
-*  Name:
-*     GrText
-
-*  Purpose:
-*     Draw a character string, potentially including superscripts and
-*     subscripts.
-
-*  Synopsis:
-*     #include "plot.h"
-*     int GrText( AstPlot *this, int esc, const char *text, int ink, 
-*                 int bbclip, float x, float y, float upx, float upy, 
-*                 float *xbn, float *ybn, const char *method, 
-*                 const char *class )
-
-*  Description:
-*     This function displays a character string at a given position
-*     using a specified up-vector, optionally interpreting any Plot escape 
-*     sequences contained within the text. The bounding box enclosing the
-*     text is returned, optionally clipped at the top and bottom of the 
-*     "normal" text (i.e. text as determined by the current Plot attribute 
-*     settings). The position of the text is determined by supplying the 
-*     coordinates of the bottom left corner of this bounding box.
-
-*  Parameters:
-*     this
-*        The plot.
-*     esc
-*        Should escape sequences be interpreted? They will be printed
-*        literally otherwise.
-*     text 
-*        Pointer to a null-terminated character string to be displayed.
-*     ink
-*        If zero, no text is drawn on the screen, but the bounding box is
-*        still returned.
-*     bbclip
-*        If non-zero, then the top and bottom edges of the returned bounding 
-*        box are determined by the "normal" text. This may result in 
-*        super-scripts and sub-scripts extending above or below the bounding 
-*        box. The width of the bounding box always encloses all text.
-*     x 
-*        The x coordinate at the left hand end of the base-line for
-*        "normal" text.
-*     y 
-*        The y coordinate at the left hand end of the base-line for
-*        "normal" text.
-*     upx
-*        The x component of the up-vector for the text. Positive values
-*        always refer to displacements from left to right on the screen, 
-*        even if the graphics x axis increases in the opposite sense.
-*     upy
-*        The y component of the up-vector for the text. Positive values
-*        always refer to displacements from left to right on the screen, 
-*        even if the graphics y axis increases in the opposite sense.
-*     xbn
-*        An array in which is returned the x coordinates at the corners
-*        of the bounding box. If "esc" is non-zero, then these corners
-*        are in the order; bottom-left, bottom-right, top-right, top-left.
-*        If "esc" is zero, the order is not specified.
-*     ybn
-*        An array in which is returned the Y coordinates at the corners
-*        of the bounding box (see xbn).
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class 
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-
-*  Returned Value:
-*     Zero for failure, one for success.
-
-*  Escape Sequences:
-*     Escape sequences are introduced into the text string by a percent 
-*     "%" character. The following escape sequences are currently recognised 
-*     ("..." represents a string of one or more decimal digits):
-*
-*       %%      - Print a literal "%" character.
-*
-*       %^...+  - Draw subsequent characters as super-scripts. The digits
-*                 "..." give the distance from the base-line of "normal" 
-*                 text to the base-line of the super-script text, scaled 
-*                 so that a value of "100" corresponds to the height of 
-*                 "normal" text.
-*       %^+     - Draw subsequent characters with the normal base-line.
-*
-*       %v...+  - Draw subsequent characters as sub-scripts. The digits
-*                 "..." give the distance from the base-line of "normal" 
-*                 text to the base-line of the sub-script text, scaled 
-*                 so that a value of "100" corresponds to the height of 
-*                 "normal" text.
-*
-*       %v+     - Draw subsequent characters with the normal base-line
-*                 (equivalent to %^+).
-*
-*       %>...+  - Leave a gap before drawing subsequent characters.
-*                 The digits "..." give the size of the gap, scaled 
-*                 so that a value of "100" corresponds to the height of 
-*                 "normal" text.
-*
-*       %s...+  - Change the Size attribute for subsequent characters. The
-*                 digits "..." give the new Size as a fraction of the 
-*                 "normal" Size, scaled so that a value of "100" corresponds 
-*                 to 1.0;
-*
-*       %s+     - Reset the Size attribute to its "normal" value.
-*
-*       %w...+  - Change the Width attribute for subsequent characters. The
-*                 digits "..." give the new width as a fraction of the 
-*                 "normal" Width, scaled so that a value of "100" corresponds 
-*                 to 1.0;
-*
-*       %w+     - Reset the Wize attribute to its "normal" value.
-*
-*       %f...+  - Change the Font attribute for subsequent characters. The
-*                 digits "..." give the new Font value.
-*
-*       %f+     - Reset the Font attribute to its "normal" value.
-*
-*       %c...+  - Change the Colour attribute for subsequent characters. The
-*                 digits "..." give the new Colour value.
-*
-*       %c+     - Reset the Colour attribute to its "normal" value.
-*
-*       %t...+  - Change the Style attribute for subsequent characters. The
-*                 digits "..." give the new Style value.
-*
-*       %t+     - Reset the Style attribute to its "normal" value.
-*
-*       %+      - Reset all attributes to their "normal" values.
-
-*  Notes:
-*     -  Any graphics within the rotated box enclosing the text are
-*     erased if argument ink is non-zero.
-*     -  Both "upx" and "upy" being zero causes an error.
-*-
-*/
-
-/* Local Variables: */
-   char *ltext;		/* Pointer to local copy of text */
-   char *p;		/* Pointer to start of current sub-string */
-   char *pp;		/* Pointer to next character */
-   char *sl;		/* Pointer to start of next sub-string */
-   char *t;		/* Pointer to next character */
-   char et;		/* Character at start of the next sub-string */
-   char oc;		/* Old sub-string termination character */
-   double a;            
-   double b;            
-   double bot;          /* Fractional height to bottom of bounding box */
-   double h;		/* Height of plotted text */
-   double hd;		/* Height from text base-line to box bottom. */
-   double hu;		/* Height from text base-line to box top. */
-   double l;		/* Length of supplied up-vector */
-   double ncolour;      /* Colour attribute value on entry */
-   double nfont;        /* Font attribute value on entry */
-   double nl;		/* Character height in world coordinates */
-   double nsize;	/* Size attribute for normal text */
-   double nstyle;       /* Style attribute value on entry */
-   double nwidth;       /* Width attribute value on entry */
-   double off;          /* Fractional height to baseline */
-   double test;         /* Height from base-line to corner i */
-   double top;          /* Fractional height to top of bounding box */
-   double tw;           /* Total width of bounding box */
-   double ux;		/* X comp. of graphics up-vector */
-   double uxn;		/* X comp. of unit graphics up-vector */
-   double uy;		/* Y comp. of graphics up-vector */
-   double uyn;		/* Y comp. of unit graphics up-vector */
-   double vx;		/* X comp. of graphics base-vector */
-   double vy;		/* Y comp. of graphics base-vector */
-   double w;		/* Width of plotted text */
-   double x0;		/* X at bottom left corner of sub-string */
-   double xbase;	/* X at base-line at start of sub-string */
-   double y0;		/* Y at bottom left corner of sub-string */
-   double ybase;	/* Y at base-line at start of sub-string */
-   float alpha;         /* Scale factor for X axis */
-   float beta;          /* Scale factor for Y axis */
-   float chh;		/* Size in world coords of a horizontal character */
-   float chv;		/* Size in world coords of a vertical character */
-   float txbn[ 4 ];     /* X at corners of sub-string bounding box */
-   float tybn[ 4 ];     /* Y at corners of sub-string bounding box */
-   float xr;            /* World X value at sub-string reference point */
-   float yr;            /* World Y value at sub-string reference point */
-   int dd;              /* Escape sequence argument value */
-   int i;               /* Corner index */
-   int n;               /* No. of characters in sub-string */
-   int nc;              /* No. of digits read from escape sequence */
-   int nesc;            /* No. of characters in escape sequence */
-   int ret;             /* Returned status */
-
-/* Check the global error status. */
-   if ( !astOK ) return 0;
-
-/* Assume success. */
-   ret = 1;
-
-/* First deal with cases where any escape sequences are to be interpreted. */
-   if( esc && text ) {
-
-/* Get the scales on the two world coordinate axes. */
-
-/* NOTE --- The facility for including escape characters is currently
-   disabled. When it is enabled, the following lines of code should be
-   replaced by the following block which ic currently commented out. 
-   (ENABLE-ESCAPE) */
-      if ( 1 ) {
-         alpha = 1.0;
-         beta = 1.0;
-         ux = 0.0;
-         uy = 0.0;
-         vx = 0.0;
-         vy = 0.0;
-
-/*
-      GAxScale( this, &alpha, &beta, method, class );
-
-*/
-
-/* Ensure that the supplied up-vector refers to world coordinate axes in
-   their correct senses. */
-      } else {
-         ux = ( this->xrev ) ? -upx : upx;
-         uy = ( this->yrev ) ? -upy : upy;
-
-/* Convert the up-vector into "standard" system in which the axes have
-   equal scales, and increase left-to-right, bottom-to-top. */
-         ux *= alpha;
-         uy *= beta;
-
-/* Normalise this up-vector. */
-         l = sqrt( ux*ux + uy*uy );
-         if( l <= 0.0 ) {
-           ux = 0.0;
-           uy = 1.0;
-         } else {
-           ux /= l;
-           uy /= l;
-         }
-
-/* Get the vector along the base-line of the text, by rotating the 
-   up-vector by 90 degrees clockwise. */
-         vx = uy;   
-         vy = -ux;
-      }      
-
-/* Take a copy of the supplied string. */
-      ltext = (char *) astStore( NULL, (void *) text, strlen( text ) + 1 );
-
-/* Store the position on the base-line of the "normal" characters  which is 
-   at the start of the next sub-string, relative to the supplied reference 
-   position. */
-      xbase = 0.0;
-      ybase = 0.0;
-
-/* Store the position of the bottom left corner of the next sub-string. */
-      x0 = xbase;
-      y0 = ybase;
-
-/* Get the attributes for "normal" characters. */
-      GAttr( this, GRF__SIZE, AST__BAD, &nsize, GRF__TEXT, method, class );
-      GAttr( this, GRF__WIDTH, AST__BAD, &nwidth, GRF__TEXT, method, class );
-      GAttr( this, GRF__FONT, AST__BAD, &nfont, GRF__TEXT, method, class );
-      GAttr( this, GRF__STYLE, AST__BAD, &nstyle, GRF__TEXT, method, class );
-      GAttr( this, GRF__COLOUR, AST__BAD, &ncolour, GRF__TEXT, method, class );
-
-/* Find the height in "standard" coordinates of "normal" text draw with the 
-   requested up-vector. */
-/*
-      GQch( this, &chv, &chh, method, class );
-
-Remove the following assignments to chv and chh when this code is
-uncommented!
-*/
-      chv = 0.0;
-      chh = 0.0;
-      a = beta*chh*ux;
-      b = alpha*chv*uy;
-      nl = sqrt( a*a + b*b );
-
-/* Save a copy of the unit up-vector. */
-      uxn = ux;
-      uyn = uy;
-
-/* Scale the up-vector so that its length is equal to the height of 
-   "normal" text with the specified up-vector. */
-      ux *= nl;
-      uy *= nl;
-
-/* Initialise the base-line offset for "normal" text, and the fractional 
-   height to the top and bottom of the un-clipped bounding box. */
-      off = 0.0;
-      bot = 0.0;
-      top = 0.0;
-
-/* Initialise a pointer to the next character to be read from the text
-   string. */
-      p = ltext;
-
-/* Initialise the total width of the string to zero. */
-      tw = 0.0;
-
-/* Loop until the whole string has been printed. */
-      while( p && *p ) {
-
-/* Loop until the start of a new sub-string is found. Variable p points
-   to the first character in the sub-string. Variable sl ends up pointing 
-   at the first character in the next substring. Variable nesc ends up
-   holding the number of escape characters to skip in the subsequent
-   sub-string. */
-         pp = p;
-         while( 1 ) {
-
-/* Find the next occurrence of the escape character. */
-            sl = strchr( pp, '%' );
-
-/* If no more escape characters were found, print up to the end of the
-   whole string. */
-            if( !sl ) {
-               et = 0;
-               nesc = 0;
-               sl = strchr( pp, 0 );
-               break;
-            }
-
-/* Get the character following the next escape character. */
-            et = *(sl + 1);
-
-/* If the escape character is the last character in the string, print up
-   to the end of the whole string. */
-            if( !et ) {
-               sl++;
-               nesc = 0;
-               break;
-
-/* If this is an escaped percent, shuffle the contents of the string
-   down one character to over-write the escape character, and continue to
-   find the next escape character. */
-            } else if( et == '%' ) {
-               t = sl;
-               while ( *(t++) ) *( t - 1 ) = *t;
-               pp++;
-
-/* If this is a "reset all" escape sequence, set the number of characters
-   to be skipped, and leave the loop. */
-            } else if( et == '+' ) {
-               nesc = 2;
-               break;
-
-/* If this is an attribute setting escape sequence... */
-            } else if( et == 's' || et == '^' || et == 'v' || et == '>' ||
-                       et == 'w' || et == 'f' || et == 'c' || et == 't' ) {
-
-/* If the following character is a "+", set the new value for the attribute
-   to INT_MAX to indicate that the "normal" value is to be used. */
-              if( *( sl + 2 ) == '+' ) {
-                  dd = INT_MAX;
-                  nesc = 3;
-                  break;
-
-/* Otherwise, extract any digits following the escape character. If a
-   valid digits field is found, store the number of characters in the escape
-   sequence and leave the loop. */
-               } else if( (nc = 0, astSscanf( sl + 2, "%d%n", &dd, &nc )) &&
-                          *(sl + 2 + nc) == '+' ){
-                  nesc = nc + 3;
-                  break;
-
-/* If the digits field could not be read, print the whole escape sequence
-   literally. */
-               } else {
-                  pp++;
-               }
-
-/* Skip over unrecognised escape sequence, printing them literally. */
-            } else {
-              pp++;
-            }
-         }
-
-/* Find the number of characters in the next sub-string. */
-         n = sl - p;
-
-/* Print the sub-string if it has non-zero length. */
-         if( n > 0 ) {
-
-/* Get the reference position in world coordinates. */
-            xr = x + ( x0/alpha );
-            yr = y + ( y0/beta );
-
-/* Temporarily terminate the sub-string. */
-            oc = *sl;
-            *sl = 0;            
-
-/* Draw the sub-string (if required). */
-            if( ink ) {
-               GText( this, p, xr, yr, "BL", upx, upy, method, class );
-            }
-
-/* Find the bounding box of the sub-string. */
-            GTxExt( this, p, xr, yr, "BL", upx, upy, txbn, tybn, method, class );
-
-/* Convert the bounding box positions into "standard" coordinates
-   relative to the left hand end of the text base-line. */
-            for( i = 0; i < 4; i++ ){
-               txbn[ i ] = ( txbn[ i ] - x ) * alpha;
-               tybn[ i ] = ( tybn[ i ] - y ) * beta;
-            }
-
-/* Find the height of the top and bottom of the bounding box above and
-   below the text base-line. */
-            hu = -FLT_MAX;
-            hd = FLT_MAX;
-            for( i = 0; i < 4; i++ ){
-               test = uxn*( txbn[ i ] - x0 ) + uyn*( tybn[ i ] - y0 );
-               if( test > hu ) hu = test;
-               if( test < hd ) hd = test;
-            }
-
-/* Find the total height of the bounding box. */
-            h = hu - hd;
-
-/* Find the width of the bounding box. */
-            w = 0.0;
-            for( i = 0; i < 4; i++ ){
-               test = vx*( txbn[ i ] - x0 ) + vy*( tybn[ i ] - y0 );
-               if( test > w ) w = test;
-            }
-  
-/* Find the position on the base-line of the normal characters which is
-   at the end of the sub-string just drawn. */
-            xbase += vx*w;
-            ybase += vy*w;
-
-/* Initialise the coordinates of the bottom left corner of the next
-   sub-string to be on the "normal" base-line. */
-            x0 = xbase;
-            y0 = ybase;
-
-/* Update the width of the total bounding box. */
-            tw += w;
-
-/* Update the fractional height to the top and bottom of the 
-   total bounding box. */
-            top = MAX( top, off + hu/nl );
-            bot = MIN( bot, off + hd/nl );
-
-/* Reinstate the original escape character. */
-            *sl = oc;
-         }
-
-/* Increment the pointer to the start of the next sub-string, skipping
-   the escape sequence characters. */
-         p = sl + nesc;
-
-/* Leave the loop if the end of the string has been reached. */
-         if( !et ) {
-            break;
-
-/* If required, leave a gap before the next character. */
-         } else if( et == '>' ) {         
-            if( dd != INT_MAX ) {
-
-/* Find the width of the gap and increment the total width of the string. */
-               w = nl*( (double) dd )/100.0;
-               tw += w;
-
-/* Move on the position for the next character. */
-               xbase += vx*w;
-               ybase += vy*w;
-               x0 += vx*w;
-               y0 += vy*w;
-
-            }
-
-/* For up super-scripts and sub-scripts, set up the coordinates of the 
-   bottom left corner of the next sub-string. This is offset away from 
-   [xbase,ybase] in the direction of the up-vector. */
-         } else if( et == '^' ) {         
-            if( dd != INT_MAX ) {
-               off = dd/100.0;
-            } else {
-               off = 0.0;
-            }
-            x0 += ux*off;
-            y0 += uy*off;
-
-         } else if( et == 'v' ) {         
-            if( dd != INT_MAX ) {
-               off = -dd/100.0;
-            } else {
-               off = 0.0;
-            }
-            x0 += ux*off;
-            y0 += uy*off;
-
-/* For size changes, set the new size as a fraction of the normal size. */
-         } else if( et == 's' ) {         
-            if( dd != INT_MAX ) {
-               GAttr( this, GRF__SIZE, ((double) dd/100.0)*nsize, NULL, GRF__TEXT, method, class );
-            } else {
-               GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
-            }
-
-/* For width changes, set the new width as a fraction of the normal width. */
-         } else if( et == 'w' ) {         
-            if( dd != INT_MAX ) {
-               GAttr( this, GRF__WIDTH, ((double) dd/100.0)*nwidth, NULL, GRF__TEXT, method, class );
-            } else {
-               GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
-            }
-
-/* For font changes, set the new font. */
-         } else if( et == 'f' ) {         
-            if( dd != INT_MAX ) {
-               GAttr( this, GRF__FONT, (double) dd, NULL, GRF__TEXT, method, class );
-            } else {
-               GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
-            }
-
-/* For colour changes, set the new colour. */
-         } else if( et == 'c' ) {         
-            if( dd != INT_MAX ) {
-               GAttr( this, GRF__COLOUR, (double) dd, NULL, GRF__TEXT, method, class );
-            } else {
-               GAttr( this, GRF__COLOUR, ncolour, NULL, GRF__TEXT, method, class );
-            }
-
-/* For style changes, set the new style. */
-         } else if( et == 't' ) {         
-            if( dd != INT_MAX ) {
-               GAttr( this, GRF__STYLE, (double) dd, NULL, GRF__TEXT, method, class );
-            } else {
-               GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
-            }
-
-/* Reset everything if required. */
-         } else if( et == '+' ) {         
-            off = 0.0;
-            x0 = xbase;
-            y0 = ybase;
-            GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
-            GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
-            GAttr( this, GRF__COLOUR, ncolour, NULL, GRF__TEXT, method, class );
-            GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
-            GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
-         }
-      }
-
-/* Convert the up and base-line vectors back into world coordinates. */
-      ux /= alpha;
-      uy /= beta;
-      vx /= alpha;
-      vy /= beta;
-   
-/* Set up the returned bounding box. */
-      if( bbclip ) {
-         xbn[ 0 ] = x;
-         ybn[ 0 ] = y;
-         xbn[ 1 ] = x + tw*vx;
-         ybn[ 1 ] = y + tw*vy;
-         xbn[ 2 ] = x + ux + tw*vx;
-         ybn[ 2 ] = y + uy + tw*vy;
-         xbn[ 3 ] = x + ux;
-         ybn[ 3 ] = y + uy;
-
-      } else {
-         xbn[ 0 ] = x + bot*ux;
-         ybn[ 0 ] = y + bot*uy;
-         xbn[ 1 ] = x + bot*ux + tw*vx;
-         ybn[ 1 ] = y + bot*uy + tw*vy;
-         xbn[ 2 ] = x + top*ux + tw*vx;
-         ybn[ 2 ] = y + top*uy + tw*vy;
-         xbn[ 3 ] = x + top*ux;
-         ybn[ 3 ] = y + top*uy;
-      }
-
-/* Ensure any future text comes out with "normal" attributes. */
-      GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__COLOUR, ncolour, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
-      GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
-
-/* Free the local copy of the supplied string. */
-      ltext = (char *) astFree( (void *) ltext );
-
-/* If escape sequences are to be printed literally, just display
-   the text as supplied. */
-   } else {
-      if( ink ) {
-         GText( this, text, x, y, "BL", upx, upy, method, class );
-      }
-
-/* Find the bounding box of the text. */
-      GTxExt( this, text, x, y, "BL", upx, upy, xbn, ybn, method, class );
-   }
-
-/* Return the status. */
-   return ret;
 
 }
 
@@ -14999,6 +16386,65 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 
 }
 
+static int HasEscapes( const char *text ) {
+/*
+*  Name:
+*     HasEscapes
+
+*  Purpose:
+*     Check if a text string contains any escape sequences.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int HasEscapes( const char *text ) 
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function checks if a text string contains any escape sequences
+*     (see attribute Escape).
+
+*  Parameters:
+*     text 
+*        The text to check.
+
+*  Returned:
+*     Non-zero if any escape sequences are found in the text. Zero
+*     otherwise.
+
+*/
+
+/* Local Variables: */
+   int result;
+   int type;
+   int value;
+   int nc;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status and the supplied pointer. */
+   if ( !astOK || ! text ) return result;
+
+/* Does the string begin with an escape sequence? */
+   if( astFindEscape( text, &type, &value, &nc ) ){
+      result = 1;
+
+/* If not, there must be an escape sequence later in the string if the 
+   number of characters skipped by the above call to astFindEscape is less
+   than the length of the string. */
+   } else if( nc < strlen( text ) ) {
+      result = 1;
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static int IdFind( int id, int *id1, int *id2 ) {
 /*
 *  Name:
@@ -15213,6 +16659,18 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetLabelUp = SetLabelUp;
    vtab->GetLabelUp = GetLabelUp;
    vtab->TestLabelUp = TestLabelUp;
+   vtab->ClearLogPlot = ClearLogPlot;
+   vtab->SetLogPlot = SetLogPlot;
+   vtab->GetLogPlot = GetLogPlot;
+   vtab->TestLogPlot = TestLogPlot;
+   vtab->ClearLogTicks = ClearLogTicks;
+   vtab->SetLogTicks = SetLogTicks;
+   vtab->GetLogTicks = GetLogTicks;
+   vtab->TestLogTicks = TestLogTicks;
+   vtab->ClearLogLabel = ClearLogLabel;
+   vtab->SetLogLabel = SetLogLabel;
+   vtab->GetLogLabel = GetLogLabel;
+   vtab->TestLogLabel = TestLogLabel;
    vtab->ClearDrawAxes = ClearDrawAxes;
    vtab->SetDrawAxes = SetDrawAxes;
    vtab->GetDrawAxes = GetDrawAxes;
@@ -15229,6 +16687,10 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetMajTickLen = SetMajTickLen;
    vtab->GetMajTickLen = GetMajTickLen;
    vtab->TestMajTickLen = TestMajTickLen;
+   vtab->ClearLogGap = ClearLogGap;
+   vtab->SetLogGap = SetLogGap;
+   vtab->GetLogGap = GetLogGap;
+   vtab->TestLogGap = TestLogGap;
    vtab->ClearTitleGap = ClearTitleGap;
    vtab->SetTitleGap = SetTitleGap;
    vtab->GetTitleGap = GetTitleGap;
@@ -15442,6 +16904,187 @@ static int Inside( int n, float *cx, float *cy, float x, float y ){
 
 }
 
+static void InterpEscape( AstPlot *this, int type, double value, float *x, 
+                          float *y, float ux, float uy, float rx, float ry, 
+                          const char *just, float *rise, double nsize, 
+                          double nstyle, double nwidth, double ncol, 
+                          double nfont, const char *method, const char *class ){
+/*
+*  Name:
+*     InterpEscape
+
+*  Purpose:
+*     Prepare things for drawing the next part of a string which includes
+*     graphics escape sequences.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void InterpEscape( AstPlot *this, int type, double value, float *x, 
+*                        float *y, float ux, float uy, float rx, float ry, 
+*                        const char *just, float *rise, double nsize, 
+*                        double nstyle, double nwidth, double ncol, 
+*                        double nfont, const char *method, const char *class )
+
+*  Description:
+*     This function modifies the current graphics attributes, the supplied 
+*     reference position, in preparation for drawing another sub-string 
+*     from a string containing graphics escape sequences. The type and 
+*     value of an escape sequence preceededing the substring is supplied.
+*     Note, this function ignored escape sequences which represent an
+*     escaped percent sign. Such escape sequences are drawn as normal
+*     text by the claling function.
+
+*  Parameters:
+*     this
+*        The plot.
+*     type
+*        The type of escape sequence. Each type is identified by a symbolic 
+*        constant defined in grf.h.
+*     value
+*        The value associated with the escape sequence. All usable values
+*        will be positive. A value of -1 shold be supplied if the attribute 
+*        identified by "type" should be reset to its "normal" value (as 
+*        established using the astGAttr function, etc).
+*     x 
+*        Pointer to a double holding the x coordinate at the concatenation
+*        point. This will be modified on exit if the escape sequence
+*        requires it.
+*     y 
+*        Pointer to a double holding the y coordinate at the concatenation
+*        point. This will be modified on exit if the escape sequence
+*        requires it.
+*     ux
+*        The x component of the up-vector for the text, in graphics coords.
+*        The length of this vector should be equal to the height of normal 
+*        text drawn with this up-vector.
+*     uy
+*        The y component of the up-vector for the text. See "ux".
+*     rx
+*        The x component of the right-vector for the text. The length of this 
+*        vector should be equal to the height of normal text drawn with the 
+*        supplied up-vector.
+*     ry
+*        The y component of the right-vector for the text. see "rx".
+*     just
+*        The justification being used for each substring.
+*     rise 
+*        Pointer to a float holding the height of the current baseline
+*        above the normal baseline, given as a percentage of the height of
+*        normal text. May be negative for sub-scripts. May be modified on 
+*        exit if the escape sequence effects the height of the baseline.
+*     nsize
+*        The size of normal text.
+*     nstyle
+*        The style of normal text.
+*     nwidth
+*        The width of normal text.
+*     ncol
+*        The colour of normal text.
+*     nfont
+*        The font of normal text.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   float new_rise;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Type GRF__ESSUP: Move the concatenation point in the up direction, and
+   update the current baseline height. If the value is -1, then reset the
+   baseline to its normal height. */
+   if( type == GRF__ESSUP ) {
+      if( value > 0 ) {
+         *x += 0.01*ux*( value - *rise );
+         *y += 0.01*uy*( value - *rise );
+         *rise = value;
+      } else {
+         *x -= 0.01*ux*(*rise);
+         *y -= 0.01*uy*(*rise);
+         *rise = 0;
+      }
+
+/* Type GRF__ESSUB: Move the concatenation point in the down direction, and
+   update the current baseline height. If the value is -1, then reset the
+   baseline to its normal height. */
+   } else if( type == GRF__ESSUB ) {
+      if( value > 0 ) {
+         *x -= 0.01*ux*( value + *rise );
+         *y -= 0.01*uy*( value + *rise );
+         *rise = -value;
+      } else {
+         *x -= 0.01*ux*(*rise);
+         *y -= 0.01*uy*(*rise);
+         *rise = 0;
+      }
+
+/* Type GRF__ESGAP: Move the concatenation point to the right. */
+   } else if( type == GRF__ESGAP ) {
+      *x += 0.01*rx*value;
+      *y += 0.01*ry*value;
+
+/* Type GRF__ESBAC: Move the concatenation point to the left. */
+   } else if( type == GRF__ESBAC ) {
+      *x -= 0.01*rx*value;
+      *y -= 0.01*ry*value;
+
+/* Type GRF__ESSIZ: Change the text size. */
+   } else if( type == GRF__ESSIZ ) {
+      if( value < 0 ) value = 100.0;
+      GAttr( this, GRF__SIZE, 0.01*value*nsize, NULL, GRF__TEXT, 
+             method, class );
+
+/* Type GRF__ESWID: Change the text width. */
+   } else if( type == GRF__ESWID ) {
+      if( value < 0 ) value = 100.0;
+      GAttr( this, GRF__WIDTH, 0.01*value*nwidth, NULL, GRF__TEXT, 
+             method, class );
+
+/* Type GRF__ESFON: Change the text font. */
+   } else if( type == GRF__ESFON ) {
+      if( value < 0 ) value = nfont;
+      GAttr( this, GRF__FONT, value, NULL, GRF__TEXT, method, class );
+
+/* Type GRF__ESCOL: Change the text colour. */
+   } else if( type == GRF__ESCOL ) {
+      if( value < 0 ) value = ncol;
+      GAttr( this, GRF__COLOUR, value, NULL, GRF__TEXT, method, class );
+
+/* Type GRF__ESSTY: Change the text style. */
+   } else if( type == GRF__ESSTY ) {
+      if( value < 0 ) value = nstyle;
+      GAttr( this, GRF__STYLE, value, NULL, GRF__TEXT, method, class );
+
+/* Type GRF__ESPSH: Push current attributes onto a stack. */
+   } else if( type == GRF__ESPSH ) {
+      PushGat( this, *rise, method, class );
+
+/* Type GRF__ESSTY: Reset everything to normal. */
+   } else if( type == GRF__ESPOP ) {
+
+      if( !PopGat( this, &new_rise, method, class ) ) {
+         new_rise = 0.0;
+         GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
+         GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
+         GAttr( this, GRF__COLOUR, ncol, NULL, GRF__TEXT, method, class );
+         GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
+         GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
+      }
+
+      *x -= 0.01*ux*( *rise - new_rise );
+      *y -= 0.01*uy*( *rise - new_rise );
+      *rise = new_rise;
+
+   }
+}
+
 static int IsASkyFrame( AstObject *obj ) {
 /*
 *  Name:
@@ -15495,6 +17138,244 @@ static int IsASkyFrame( AstObject *obj ) {
 /* Return the answer. */
    return ret;
 
+}
+
+static const char *JustMB( AstPlot *this, int esc, const char *text, float *x, 
+                           float *y, float upx, float upy, const char *just, 
+                           float uxu, float uyu, float rxu, float ryu, 
+                           float *x0, float *y0, const char *method, 
+                           const char *class ){
+/*
+*  Name:
+*     JustMB
+
+*  Purpose:
+*     Modifies a "M" vertical reference point to be a "B" reference point,
+*     if necessary.
+
+*  Synopsis:
+*     #include "plot.h"
+*     const char *JustMB( AstPlot *this, int esc, const char *text, float *x, 
+*                         float *y, float upx, float upy, const char *just, 
+*                         float uxu, float uyu, float rxu, float ryu, 
+*                         float *x0, float *y0, const char *method, 
+*                         const char *class )
+
+*  Description:
+*     This function is used to modify the reference point and justification 
+*     of a string by converting the vertical "M" justification option (which
+*     indicates that the reference point refers to the bottom of the
+*     bounding box) into a corresponding "B" option (which indicates that
+*     the reference point refers to the text baseline). The reference
+*     point is modified accordingly. 
+*
+*     This is only done if the grf module does not support "M"
+*     justification. Otherwise, the supplied justification string and
+*     reference point coordinates are returned unchanged.
+
+*  Parameters:
+*     this
+*        The plot.
+*     esc
+*        Should escape sequences be interpreted? They will be printed
+*        literally otherwise.
+*     text 
+*        Pointer to a null-terminated character string to be displayed.
+*     x 
+*        Pointer to a double holding the x coordinate at the reference
+*        point. This is modified on exit if the supplied "just" string
+*        indicates that the supplied value refers to the bottom of the
+*        bounding box, and the grf module does not support such
+*        justification. In this case, the returned value is a point on 
+*        the baseline of the text which would result in the bottom of 
+*        the bounding box being at the supplied position.
+*     y 
+*        Pointer to a double holding the y coordinate at the reference
+*        point. This is modified on exit if the supplied "just" string
+*        indicates that the supplied value refers to the bottom of the
+*        bounding box, and the grf module does not support such
+*        justification. In this case, the returned value is a point on 
+*        the baseline of the text which would result in the bottom of 
+*        the bounding box being at the supplied position.
+*     upx
+*        The x component of the up-vector for the text. Positive values
+*        always refer to displacements from left to right on the screen, 
+*        even if the graphics x axis increases in the opposite sense.
+*     upy
+*        The y component of the up-vector for the text. Positive values
+*        always refer to displacements from left to right on the screen, 
+*        even if the graphics y axis increases in the opposite sense.
+*     just
+*        A character string which specifies the location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. The first character may be 'T' for "top",
+*        'C' for "centre", 'B' for "baseline" or "M" for "bottom", and 
+*        specifies the vertical location of the reference position. Note, 
+*        "baseline" corresponds to the base-line of normal text,and "M"
+*        corresponds to the bottom of the bounding box. Some characters 
+*        (eg "y", "g", "p", etc) and sub-scripts descend below the base-line.
+*        The second character may be 'L' for "left", 'C' for "centre", or 'R' 
+*        for "right", and specifies the horizontal location of the 
+*        reference position. If the string has less than 2 characters
+*        then 'C' is used for the missing characters. 
+*     uxu
+*        X component of normalised up-vector, in graphics coords.
+*     uyu
+*        Y component of normalised up-vector, in graphics coords.
+*     rxu
+*        X component of normalised right-vector, in graphics coords.
+*     ryu
+*        Y component of normalised right-vector, in graphics coords.
+*     x0
+*        Address of a float at which to return the x coordinate at the
+*        left end of the baseline of the whole string. 
+*     y0
+*        Address of a float at which to return the y coordinate at the
+*        left end of the baseline of the whole string. 
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated string which contains the 
+*     justification to use in future. This pointer should be freed using
+*     astFree when no longer needed. This string will contain a full 
+*     upper-case justification string which can be used by the current 
+*     grf module.
+
+*  Notes;
+*     - NULL is returned if an error has occurred.    
+
+*/
+
+/* Local Variables: */
+   char cc;
+   float drop;
+   float dx;
+   float dy;
+   float f;
+   float height;
+   float width;
+   float xbn[ 4 ];
+   float ybn[ 4 ];
+   int called;
+   char *result;
+
+/* Check inherited status */
+   if( !astOK ) return NULL;
+
+/* Allocate memory for the returned string. */
+   result = astMalloc( sizeof( char )*3 );
+   if( astOK ) {
+
+/* Fill in any missing parts of the justification string. */
+      if( just ){
+         cc = toupper( just[ 0 ] );
+         result[ 0 ] = ( cc == 'T' || cc == 'C' || cc == 'B' || cc == 'M' ) ? cc : 'C';
+   
+         cc = toupper( just[ 1 ] );
+         result[ 1 ] = ( cc == 'L' || cc == 'C' || cc == 'R' ) ? cc : 'C';
+   
+      } else {
+         result[ 0 ] = 'C';
+         result[ 1 ] = 'C';
+      }
+   
+      result[ 2 ] = 0;
+
+/* Indicate that DrawText has not been called. */
+     called = 0;
+
+/* The justfication need not be changed unless the requested vertical 
+   justification is "bottom" (m), AND the grf module does not support "M" 
+   justification. */
+      if( ( result[ 0 ] == 'M' ) && !GCap( this, GRF__MJUST, 1 ) ){
+
+/* Find the bounding box which would result from putting the left end of
+   the baseline at the specified position. */
+         DrawText( this, 0, esc, text, *x, *y, "BL", upx, upy, xbn, ybn, 
+                   &drop, method, class );
+
+/* Indicate that DrawText has not been called. */
+         called = 1;
+
+/* Get the vector from the bottom left corner of the bounding box to the 
+   reference point (on the base-line), and add this vector on to the reference
+   point. */
+         *x += *x - xbn[ 0 ];
+         *y += *y - ybn[ 0 ];
+
+/* Modified the returned justification string. */
+         result[ 0 ] = 'B';
+      }
+
+/* If the returned justification is "BL", then the left end of the
+   baseline is just the returned reference point. */
+      if( result[ 0 ] == 'B' && result[ 1 ] == 'L' ) {
+         *x0 = *x;
+         *y0 = *y;
+
+/* Otherwise, we work out the coords of the left end of the baseline from
+   the values returned by DrawText above. Call DrawText now if it was not
+   called above. */
+      } else {
+         if( ! called ) {
+            DrawText( this, 0, esc, text, *x, *y, "BL", upx, upy, xbn, ybn, 
+                      &drop, method, class );
+         }
+
+/* Find the height and width of the bounding box. */
+         dx = xbn[ 0 ] - xbn[ 3 ];
+         dy = ybn[ 0 ] - ybn[ 3 ];
+         width = sqrt( dx*dx + dy*dy );
+   
+         dx = xbn[ 0 ] - xbn[ 1 ];
+         dy = ybn[ 0 ] - ybn[ 1 ];
+         height = sqrt( dx*dx + dy*dy );
+
+/* For "C" and "R" horizontal justification we first need to move the 
+   returned reference point left by 0.5 or 1.0 times the width of the whole
+   string respectively. */
+         if( result[ 1 ] == 'C' ) {
+            f = 0.5;
+   
+         } else if( result[ 1 ] == 'R' ) {
+            f = 1.0;
+   
+         } else {
+            f = 0.0;
+         }
+   
+         f *= width;
+   
+         *x0 = *x - f*rxu;
+         *y0 = *y - f*ryu;
+
+/* Unless the vertical justification is "B", we also need to move the
+   concatenation point vertically to put it on the baseline. */
+         if( result[ 0 ] == 'T' ) {
+            f = height - drop;
+
+         } else if( result[ 0 ] == 'C' ) {
+            f = 0.5*height - drop;
+   
+         } else if( result[ 0 ] == 'M' ) {
+            f = -drop;
+   
+         } else {
+            f = 0.0;
+         }            
+   
+         *x0 -= f*uxu;
+         *y0 -= f*uyu;
+      }
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static void Labelat( AstPlot *this, TickInfo **grid, CurveData **cdata, 
@@ -15810,6 +17691,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    const char *text;      /* Pointer to label text */
    double *used;          /* Pointer to list of used label values */
    double *value;         /* Current tick value */
+   double diff;           /* Difference between adjacent major tick marks */
    double dx2;            /* Text base-line X component after axis reversal */
    double dx;             /* Text base-line X component */
    double dy2;            /* Text base-line Y component after axis reversal */
@@ -15826,9 +17708,11 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    double val[ 2 ];       /* Physical coordinates */
    float *box;            /* Pointer to array of label bounding boxes */
    int axis;              /* Current axis index */
+   int esc;               /* Interpret escape sequences? */
    int flag;              /* Flag indicating which way the base-vector points */
    int iused;             /* Index into list of used axis values */
    int last;              /* The index of the last tick to use */
+   int logticks;          /* ARe major ticks spaced logarithmically? */
    int nlab;              /* The number of labels to be plotted */
    int nused;             /* Number of used axis values */
    int t0;                /* Index of central tick */
@@ -15839,6 +17723,9 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* Check the global status. */
    if( !astOK ) return;
+
+/* See if escape sequences in text strings are to be interpreted */
+   esc = astGetEscape( this );
 
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
@@ -15873,6 +17760,9 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
+
+/* See of major ticks are spaced logarithmically on this axis. */
+         logticks = astGetLogTicks( this, axis );
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -15940,10 +17830,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* Loop round until all ticks have been done. */
             last = info->nmajor - 1;
-            while( tick > 0 && astOK ){
-
-/* Increment the tick index. */
-               tick += tinc;
+            while( (tick += tinc) >= 0 && astOK ){
 
 /* If we have done the highest tick index, start again at the tick just
    below middle, and work done towards index zero. */
@@ -15956,10 +17843,17 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
                val[ axis ] = value[ tick ];
                val[ 1 - axis ] = labelat[ axis ];
 
+/* Store the difference between this tick and the next. */
+               if( logticks ) {
+                  diff = value[ tick ]*( gap[ axis ] - 1.0 );
+               } else {
+                  diff = gap[ axis ];
+               }
+
 /* See if this axis value has already been used. */
                for( iused = 0; iused < nused; iused++ ){
                   if( fabs( val[ axis ] - used[ iused ] ) <
-                      1.0E-3*gap[ axis ] ) break;
+                      1.0E-3*diff ) break;
                }
 
 /* If the axis value has already been used, don't use it again. */
@@ -15974,7 +17868,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    coordinates at the point being labelled, and the tangent-vector parallel
    to the axis being labelled. If the tangent vector is not defined, then 
    the tangent vector used for the previous label is re-used. */
-                  GVec( this, mapping, val, axis, 0.01*gap[ axis ], &pset1, 
+                  GVec( this, mapping, val, axis, 0.01*diff, &pset1, 
                         &pset2, &gx, &gy, &dx, &dy, &flag, method, class );
 
 /* If we now have a tangent vector and good graphics coordinates for the 
@@ -16081,7 +17975,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 /* If any labels were stored, draw the text strings, and then release the
    memory used to hold the text, etc. */
             if( nlab > 0 ) {
-               PlotLabels( this, frame, axis, labellist, info->fmt, nlab, 
+               PlotLabels( this, esc, frame, axis, labellist, info->fmt, nlab, 
                            &box, method, class );
                ll = labellist;
                for( tick = 0; tick < nlab; tick ++ ) {
@@ -16201,6 +18095,8 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Set up the external variables used by the Crv and CrvLine function (see 
    their prologues for details). */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
    Crv_ux0 = AST__BAD;
    Crv_limit = 0.5*tol*tol;
    Crv_tol = tol;
@@ -16253,7 +18149,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Use Crv and Map2 to draw the intersection of the straight line with
    the region containing valid physical coordinates. */
-   Crv( this, d, x, y, 0, method, class );
+   Crv( this, d, x, y, 0, NULL, method, class );
 
 /* End the current poly line. */
    Opoly( this, method, class );
@@ -16461,9 +18357,10 @@ static void Map1( int n, double *dist, double *x, double *y,
 *        A pointer to an array holding "n" distances. A "dist" value of
 *        zero corresponds to the starting position supplied in external 
 *        variable Map1_origin. A "dist" value of one corresponds to the 
-*        finishing position which is a distance Map1_scale away from 
+*        finishing position which is a distance Map1_length away from 
 *        Map1_origin, moving in the positive direction of the axis given 
-*        by Map1_axis.
+*        by Map1_axis. "dist" values can be either linearly or
+*        logarithmically related to axis values (see Map1_log).
 *     x
 *        A pointer to an array in which to store the "n" graphics X 
 *        coordinate values corresponding to the positions in "dist".
@@ -16478,6 +18375,9 @@ static void Map1( int n, double *dist, double *x, double *y,
 *        This is only for use in constructing error messages.
 
 *  External Variables:
+*     Map1_log = int (Read)
+*        If zero, then "dist" in learly related to axis value. Otherwise
+*        it is linearly related to log10(axis value).
 *     Map1_ncoord = int (Read)
 *        The number of axes in the physical coordinate system.
 *     Map1_axis = int (Read)
@@ -16486,7 +18386,7 @@ static void Map1( int n, double *dist, double *x, double *y,
 *     Map1_origin = const double * (Read)
 *        A pointer to an array holding the physical coordinate value on 
 *        each axis at the start of the curve (i.e. at dist = 0.0).
-*     Map1_scale = double (Read)
+*     Map1_length = double (Read)
 *        The scale factor to convert "dist" values into increments
 *        along the physical axis given by Map1_axis.
 *     Map1_plot = AstPlot * (Read)
@@ -16525,7 +18425,9 @@ static void Map1( int n, double *dist, double *x, double *y,
    static double *ptr2[ 2 ] = {NULL,NULL}; /* Pointers to graphics coord data */
    static double *work1 = NULL;      /* Pointer to work space */
    static double *work2 = NULL;      /* Pointer to work space */
-   static double axorig;             /* Physical axis value at start of curve */
+   static double axorig;             /* Distance offset */
+   static double axscale;            /* Distance scale */
+   static int neg;                   /* Negate axis values? */
    static int nl = 0;                /* No. of points in pset1 and pset2 */
 
 /* If zero points were supplied, release any PointSets and work space which 
@@ -16579,8 +18481,19 @@ static void Map1( int n, double *dist, double *x, double *y,
             for( j = 0; j < n; j++ ) *(p++) = axval;
          }           
 
-/* Store the starting value for the axis being followed. */
-         axorig = Map1_origin[ Map1_axis ];
+/* Store the scale and offset to apply to the "dist" values. If Map1_log is
+   zero (linear axes) then applying these values gives axis value directly.
+   If Map1_log is non-zero (log axes) then applying these values gives
+   log10( axis value). */
+         if( Map1_log ) {
+            neg = ( Map1_origin[ Map1_axis ] < 0 );
+            axorig = log10( fabs( Map1_origin[ Map1_axis ] ) );
+            axscale = log10( fabs( Map1_origin[ Map1_axis ] + 
+                                   Map1_length ) ) - axorig;
+         } else {
+            axorig = Map1_origin[ Map1_axis ];
+            axscale = Map1_length;
+         }
        }
     }
 
@@ -16591,7 +18504,13 @@ static void Map1( int n, double *dist, double *x, double *y,
    in the range [0,1] to a physical coordinate and storing in PointSet 1. */
       p = pax;
       for( i = 0; i < n; i++){
-         *(p++) = axorig + Map1_scale*dist[ i ];
+         *(p++) = axorig + axscale*dist[ i ];
+      }
+      if( Map1_log ) {
+         p = pax;
+         for( i = 0; i < n; i++,p++ ){
+            *p = neg ? -pow( 10.0, *p ) : pow( 10.0, *p );
+         }
       }
 
 /* Store pointers to the results arrays in PointSet 2. */
@@ -16618,20 +18537,6 @@ static void Map1( int n, double *dist, double *x, double *y,
                }
             }
          }
-
-/* The above code is not fool-proof since it only checks for redundancy 
-   produced by the Frame geometry, and ignored the possiblity of
-   redundancy being introduced by the base->current Mapping. For instance
-   if the current Frame is a simple Frame and the Mapping is a
-   Cartesian->Polar mapping, then each graphics position will correspond
-   to many different current Frame positions (all ofset by 2PI from each
-   other along the azimuthal axis). The following function call checks
-   for this sort of redundancy as well, but makes the plotting of grids much
-   slower since it involves may transformations. This is why it is
-   currently commented out. */
-/*         slowNorm( ptr1, pset2, work1, work2, x, y, n, method, class );
-*/
-
       }
    }
    
@@ -16639,90 +18544,6 @@ static void Map1( int n, double *dist, double *x, double *y,
    return;
 
 }
-
-
-
-static void slowNorm( double **ptr1, AstPointSet *pset2, double *work1, 
-                      double *work2, double *x, double *y, int n,
-                      const char *method, const char *class ) {
-
-   AstPointSet *pset3;
-   double **ptr3, lim, dst;
-   int i, changed, nchanged, bad, j;
-
-/* Transform graphics coords back to physical coords, without normalizing the
-   results using astNorm. */
-   pset3 = Trans( Map1_plot, Map1_frame, Map1_map, pset2, 1, NULL, 0, method, class );
-   ptr3 = astGetPoints( pset3 );
-   if( astOK ) {
-
-/* Check each of these re-created physical coords. If
-   any are not the same as the original physical coords, set the
-   corresponding graphics coords bad. */
-      for( i = 0; i < n; i++){
-         nchanged = 0;
-         changed = 0;
-         bad = 0;
-         for( j = 0; j < Map1_ncoord; j++){
-
-            if( ptr1[j][i] == AST__BAD || ptr3[j][i] == AST__BAD ) {
-               bad = 1;
-               break;
-
-            } else if( !EQUAL( ptr1[j][i], ptr3[j][i] ) ) {
-               nchanged++;
-               changed = j;
-            }
-            work1[ j ] = work2[ j ] = ptr3[ j ][ i ];
-         }
-
-/* Reject the position if *any* axis is bad, or more than one axis has
-   changed. */
-         if( bad || nchanged > 1 ) {
-            x[ i ] = AST__BAD;
-            y[ i ] = AST__BAD;
-
-/* If just one axis has changed, this may be because we are at a
-   singularity (like the poles in a celestial coord system) at which
-   an axis value is undefined (e.g. RA is undefined at the equatorial 
-   poles). */
-         } if( nchanged == 1 ) {
-
-/* Modify the value on the axis which has changed. The size of the 
-   modification is unimportant. We choose to modify the axis to the
-   mean of the original and changed values. */
-            work2[ changed ] = 0.5*( ptr1[changed][i] + ptr3[changed][i] );
-
-/* Find the geodesic distance from the modified position to the original
-   position. If this is not significantly different to zero, then the 
-   modification to the axis value has not changed the position in physical 
-   space, and so we are at a singularity. Do not reject the tick value in 
-   this case. As our "significant distance" we take a small fraction of 
-   the largest of the axis values. */
-            dst = astDistance( Map1_frame, work1, work2 );
-
-            lim = fabs( work1[0] );
-            for( j = 1; j < Map1_ncoord; j++ ) {
-               lim = MAX( fabs( work1[j] ), lim );
-            }
-            lim *= 1.0E5*DBL_EPSILON;
-
-            if( dst > lim ) {
-               x[ i ] = AST__BAD;
-               y[ i ] = AST__BAD;
-            }
-         }
-      }
-   }
-   
-/* Return. */
-   return;
-
-}
-
-
-
-
 
 static void Map2( int n, double *dist, double *x, double *y, 
                   const char *method, const char *class ){
@@ -17502,6 +19323,8 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 /* Transform the Base Frame positions back into the Current Frame. */
    (void) astTransform( map, pset2, 1, pset1 );
 
+
+
 /* If good, store these values back in the supplied array. */
    if( astOK ) {
       a = ptr1[ axis ];
@@ -17555,12 +19378,13 @@ static void Opoly( AstPlot *this, const char *method, const char *class ){
 /* Check the global status. */
    if( !astOK ) return;
 
-/* Draw the poly-line. */
-   GLine( this, Poly_n, Poly_x, Poly_y, method, class );
+/* Draw the poly-line if needed. */
+   if( Poly_n > 0 ) {
+      GLine( this, Poly_n, Poly_x, Poly_y, method, class );
 
 /* Indicate that the poly-line buffer is now empty. */
-   Poly_n = 0;
-
+      Poly_n = 0;
+   }
 }
 
 static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x, 
@@ -17708,8 +19532,8 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
    if( !astOK ) return ret;
 
 /* Get the bounds of the box containing the new label. */
-   BoxText( this, esc, text, x, y,  just, upx, upy, xbn, ybn,
-            method, class );
+   DrawText( this, 0, esc, text, x, y, just, upx, upy, xbn, ybn, NULL,
+             method, class );
 
 /* If the bounding box was obtained succesfully... */
    if( astOK ) {
@@ -17760,7 +19584,7 @@ static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x,
 
 }
 
-static void PlotLabels( AstPlot *this, AstFrame *frame, int axis, 
+static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis, 
                         LabelList *list, char *fmt, int nlab, float **box, 
                         const char *method, const char *class ) {
 /*
@@ -17776,7 +19600,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void AstPlot *this, AstFrame *frame, int axis, 
+*     void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis, 
 *                      LabelList *list, char *fmt, int nlab, float **box, 
 *                      const char *method, const char *class ) 
 
@@ -17792,6 +19616,8 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 *  Parameters:
 *     this
 *        A pointer to the Plot.
+*     esc
+*        Interpret escape sequences in labels?
 *     frame
 *        A pointer to the current Frame of the Plot.
 *     axis
@@ -17823,9 +19649,6 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    LabelList *ll;         /* Pointer to next label structure */
    LabelList *llhi;       /* Pointer to higher neighbouring label structure */
    LabelList *lllo;       /* Pointer to lower neighbouring label structure */
-   char *a;               /* Pointer to next character */
-   char *b;               /* Pointer to next character */
-   char *c;               /* Pointer to next character */
    char *text;            /* Pointer to label text */
    const char *texthi;    /* Pointer to text abbreviated with higher neighbour */
    const char *textlo;    /* Pointer to text abbreviated with lower neighbour */
@@ -17846,6 +19669,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    int nexti;             /* Index of next label to retain */
    int nz;                /* Number of trailing zeros in this label */
    int nzmax;             /* Max. number of trailing zeros */
+   int odd;               /* DO we have a strange axis? */
    int olap;              /* Any overlap found? */
    int prio;              /* Current priority */
    int root;              /* Index of unabbreviated label */
@@ -17895,20 +19719,8 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    ll = list - 1;
    for( i = 0; i < nlab; i++ ) {
       ll++;
-      c = strchr( ll->text, '.' );
-      if( c && ll->priority > -1 ) {
-         b = c + 1;
-         while( ( c = strchr( b, '.' ) ) ) b = c + 1;
-
-         a = strchr( b, 'E' );
-         if( !a ) a = strchr( b, 'e' );
-         if( a ) {
-            dp = a - b;
-         } else {
-            dp = strlen( b );
-         }
-         if( dp > mxdp ) mxdp = dp;
-      }
+      FindDPTZ( frame, axis, fmt, ll->text, &dp, &nz );
+      if( dp > mxdp ) mxdp = dp;
    }
 
 /* Find the highest priority label (the "root" label). This label is
@@ -17930,38 +19742,14 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       ll++;
       if( ll->priority > -1 ) {
          text = ll->text;
-         nz = 0;
 
-/* Get a pointer to the final decimal point. */
-         b = strchr( text, '.' );
-         while( b && ( c = strchr( b + 1, '.' ) ) ) b = c;
+/* Find the number of decimal places and the number of trailing zeros in
+   this label. Note if a non-zero digit was found in the label. */
+         found = FindDPTZ( frame, axis, fmt, text, &dp, &nz );
 
-/* Get a pointer to the first character beyond the end of the string, ignoring 
-   any exponent. */
-         a = strchr( text, 'E' );
-         if( !a ) a = strchr( text, 'e' );
-         if( !a ) a = text + strlen( text );
-
-/* Initialise the number of trailing zeros to be the difference between
-   the number of decimal places in this label and the maximum numberof
-   decimal places in any label. */
-         if( b && mxdp != -1 ) {
-            dp = a - b - 1;
-            nz = mxdp - dp;
-         } else {
-            nz = mxdp;
-         }
-
-/* Now add on any actual trailing zeros in the label. Note if a non-zero 
-   digit was found in the label. */
-         found = 0;
-         for( a = a-1; a >= text; a-- ) {
-            if( isdigit( (int) *a ) && *a != '0' ) {
-               found = 1;
-               break;
-            }
-            nz++;
-         }
+/* Add on some extra trailing zeros to make the number of decimal places
+   up to the maximum value. */
+         nz += mxdp - dp;
 
 /* Store the priority for this label. */
          ll->priority = nz;
@@ -17994,7 +19782,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
             if( !root_found ) {
 
-               if( axis == 0 || !Overlap( this, -1, 0, ll->text, (float) ll->x, 
+               if( axis == 0 || !Overlap( this, -1, esc, ll->text, (float) ll->x, 
                                           (float) ll->y, ll->just, 
                                           (float) ll->upx, (float) ll->upy, box,
                                           method, class ) ) {
@@ -18007,7 +19795,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
                }
 
 /* Reset the list of bounding boxes to exclude any box added above. */
-               Overlap( this, nbox, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, 
+               Overlap( this, nbox, esc, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, 
                         method, class );
 
             }
@@ -18037,7 +19825,8 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    this until no further labels are removed. */
    jgap = 1;
    olap = 1;
-   while( olap ) {
+   odd = 0;
+   while( olap && !odd ) {
 
 /* We now attempt to abbreviate the remaining labels (i.e. those which
    have not been rejected on an earlier pass through this loop). Labels
@@ -18103,19 +19892,19 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 /* If only one of these two neighbouring labels was found, we abbreviate the 
    current label by comparing it with the one found neighbouring label. */
                if( !lllo ) {
-                  ll->atext = astAbbrev( frame, axis, llhi->text, ll->text );
+                  ll->atext = astAbbrev( frame, axis, fmt, llhi->text, ll->text );
                   if( !(ll->atext)[0] ) ll->atext = ll->text;
 
                } else if( !llhi ) {
-                  ll->atext = astAbbrev( frame, axis, lllo->text, ll->text );
+                  ll->atext = astAbbrev( frame, axis, fmt, lllo->text, ll->text );
                   if( !(ll->atext)[0] ) ll->atext = ll->text;
 
 /* If two neighbouring labels were found, we abbreviate the current label
    by comparing it with both neighbouring labels, and choosing the shorter
    abbreviation. */
                } else {
-                  textlo = astAbbrev( frame, axis, lllo->text, ll->text );
-                  texthi = astAbbrev( frame, axis, llhi->text, ll->text );
+                  textlo = astAbbrev( frame, axis, fmt, lllo->text, ll->text );
+                  texthi = astAbbrev( frame, axis, fmt, llhi->text, ll->text );
 
                   lolen = strlen( textlo );
                   hilen = strlen( texthi );
@@ -18133,7 +19922,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 /* Find the bounding box of the root label and add it to the list of bounding 
    boxes. */
       ll = list + root;
-      olap = Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+      olap = Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
                       ll->just, (float) ll->upx, (float) ll->upy, box, 
                       method, class );
 
@@ -18143,7 +19932,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       for( i = root + 1; i < nlab; i++ ) {
          ll++;
          if( ll->priority >= 0 ) {
-            if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+            if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
                          ll->just, (float) ll->upx, (float) ll->upy, box, 
                          method, class ) ){
                olap++;
@@ -18156,7 +19945,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       for( i = root - 1; i >= 0; i-- ) {
          ll--;
          if( ll->priority >= 0 ) {
-            if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+            if( Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
                          ll->just, (float) ll->upx, (float) ll->upy, box, 
                          method, class ) ){
                olap++;
@@ -18168,10 +19957,23 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    since it is probably caused by the crossing of the two axes. */
       if( axis == 1 && olap == 1 ) olap = 0;
 
+/* If we are now only plotting every 3rd label, and there are still
+   overlapping labels, then we must have a very odd axis (such as 
+   logarithmically spaced ticks on a linearly mapped axis). In this case,
+   we will re-instate the orignal label priorities and then leave this
+   loop so that we attempt to plot all labels. Also retain original
+   priorities if the axis is mapped logarithmically onto the screen. */
+      if( olap && ( jgap == 3 || astGetLogPlot( this, axis ) ) ){
+         jgap = 0;
+         odd = 1;
+      } else { 
+         odd = 0;
+      }     
+
 /* If any labels overlapped, re-instate the priority of all previously
    excluded labels (using the copy of the label's real priority stored in 
    "saved_prio"), and then remove labels (by setting their priorities
-   negative) to increase the gap between labes, and try again. */
+   negative) to increase the gap between labels, and try again. */
       if( olap ) {
          jgap++;
 
@@ -18201,7 +20003,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       }
 
 /* Rest the list of bounding boxes to exclude the boxes added above. */
-      Overlap( this, nbox, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, method, 
+      Overlap( this, nbox, esc, NULL, 0.0, 0.0, NULL, 0.0, 0.0, box, method, 
                class );
    }
  
@@ -18214,28 +20016,15 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 /* Check that this label does not overlap any labels drawn for previous
    axes (we know from the above processing that it will not overlap any
    other label on the current axis). */
-         if( !Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+         if( !Overlap( this, -1, esc, ll->atext, (float) ll->x, (float) ll->y, 
                        ll->just, (float) ll->upx, (float) ll->upy, box, 
                        method, class ) ) {
 
-
-/* Draw the abbreviated label text. */
-            GText( this, ll->atext, (float) ll->x, (float) ll->y, ll->just, 
-                   (float) ll->upx, (float) ll->upy, method, class );
-
-/* Get the bounds of the box containing the new label. */
-            BoxText( this, 0, ll->atext, (float) ll->x, (float) ll->y, 
-                     ll->just, (float) ll->upx, (float) ll->upy, xbn,
-                     ybn, method, class );
-
-/* Extend the bounds of the global bounding box held externally to include 
-   the new box. */
-            for( j = 0; j < 4; j++ ){
-               Box_lbnd[ 0 ] = MIN( xbn[ j ], Box_lbnd[ 0 ] );
-               Box_ubnd[ 0 ] = MAX( xbn[ j ], Box_ubnd[ 0 ] );
-               Box_lbnd[ 1 ] = MIN( ybn[ j ], Box_lbnd[ 1 ] );
-               Box_ubnd[ 1 ] = MAX( ybn[ j ], Box_ubnd[ 1 ] );
-            }
+/* Draw the abbreviated label text, and get the bounds of the box containing 
+   the new label. */
+            DrawText( this, 1, esc, ll->atext, (float) ll->x, (float) ll->y, 
+                      ll->just, (float) ll->upx, (float) ll->upy, xbn, ybn, 
+                      NULL, method, class );
          }
       }
    }
@@ -18410,6 +20199,8 @@ f        The global status.
                                    this->yhi - this->ylo );
 
 /* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_scerr = ( astGetLogPlot( this, 0 ) || 
+                    astGetLogPlot( this, 1 ) ) ? 100.0 : 5.0;
       Crv_tol = tol;
       Crv_limit = 0.5*tol*tol;
       Crv_map = Map3;
@@ -18492,7 +20283,7 @@ f        The global status.
                Map3( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map3 to draw the curve segment. */
-               Crv( this, d, x, y, 0, method, class );
+               Crv( this, d, x, y, 0, NULL, method, class );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -18548,6 +20339,165 @@ f        The global status.
 /* Return. */
    return;
 
+}
+
+static int PopGat( AstPlot *this, float *rise, const char *method, 
+                   const char *class  ) {
+/*
+*  Name:
+*     PopGat
+
+*  Purpose:
+*     Pop current graphical attributes for text from a stack.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int PopGat( AstPlot *this, float *rise, const char *method, 
+*                 const char *class )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function restores the current graphical attributes for text 
+*     from the values on a stack. Current attributes are left unchanged if 
+*     the stack is empty.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     rise
+*        Pointer to a location at which to return thhe height of the baseline 
+*        above the normal baseline, expressed as a percentage of the normal 
+*        character height.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     Returns zero if the stack is empty, and 1 otherwise.
+
+*/
+
+/* Local Variables: */
+   AstGat *gat;
+   int result;
+
+/* Initialise */
+   result = 0;
+
+/* Check inherited status */
+   if( !astOK ) return result; 
+
+/* Check there is at least one AstGat structure on the stack. */
+   if( this->ngat ) {
+
+/* Decrement the number of entries in the stack, and get a pointer to the 
+   AstGat structure. Nullify the pointer on the stack. */
+      gat = (this->gat)[ --(this->ngat) ];
+      (this->gat)[ this->ngat ] = NULL;
+
+/* Restore the values in the AstGat structure */
+      *rise = gat->rise;
+      GAttr( this, GRF__SIZE, gat->size, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__WIDTH, gat->width, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, gat->col, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, gat->font, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, gat->style, NULL, GRF__TEXT, method, class );
+
+/* Free the AstGat structure. */
+      gat = astFree( gat );
+
+/* Indicate success.*/
+      result = 1;
+   }
+
+/* Return the result. */
+   return result;
+
+}
+
+
+static void PushGat( AstPlot *this, float rise, const char *method, 
+                     const char *class ) {
+/*
+*  Name:
+*     PushGat
+
+*  Purpose:
+*     Push current graphical attributes for text onto a stack.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void PushGat( AstPlot *this, float rise, const char *method, 
+*                   const char *class )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function stores the current graphical attributes for text 
+*     on a stack.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     rise
+*        The height of the baseline above the normal baseline, expressed
+*        as a percentage of the normal character height.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   AstGat *new_gat;
+
+/* Check inherited status */
+   if( !astOK ) return;                 
+
+/* Allocate memory for a new AstGat structure to store the graphical
+   attributes. */
+   new_gat = astMalloc( sizeof( AstGat ) );
+   if( astOK ) {
+
+/* Store the height of the current baseline above the normal baseline,
+   expressed as a percentage of a normal character height. */
+      new_gat->rise = rise;
+
+/* Store the current graphical attribute values. */
+      GAttr( this, GRF__SIZE, AST__BAD, &(new_gat->size), GRF__TEXT, method, class );
+      GAttr( this, GRF__WIDTH, AST__BAD, &(new_gat->width), GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, AST__BAD, &(new_gat->font), GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, AST__BAD, &(new_gat->style), GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, AST__BAD, &(new_gat->col), GRF__TEXT, method, class );
+
+/* Increment the number of AstGat structures on the stack.*/
+      this->ngat++;
+
+/* Extend the array of AstGat pointers in the Plot structure so that there
+   is room for the new one. */
+      this->gat = (AstGat **) astGrow( this->gat, this->ngat, sizeof( AstGat * ) );
+      if( astOK ) {
+
+/* Store the new pointer. */
+         (this->gat)[ this->ngat - 1 ] = new_gat;
+
+      }
+   }
 }
 
 static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
@@ -18617,6 +20567,121 @@ static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
          astClip( this, AST__NOFRAME, NULL, NULL );
       }
    }
+}
+
+static void RightVector( AstPlot *this, float *ux, float *uy, float *rx, 
+                         float *ry, const char *method, const char *class ){
+/*
+*  Name:
+*     RightVector
+
+*  Purpose:
+*     Return a vector in the direction of the base line of normal text.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void RightVector( AstPlot *this, float *ux, float *uy, float *rx, 
+*                       float *ry, const char *method, const char *class )
+
+*  Description:
+*     This function returns a vector which points from left to right along 
+*     the text baseline, taking account of any difference in the scales of 
+*     the x and y axes. It also scales the supplied up vector so that it has 
+*     a length equal to the height of normal text, and scales the returned
+*     right vector to have the same length (on the screen) as the up vector. 
+
+*  Parameters:
+*     this
+*        The plot.
+*     ux
+*        Pointer to a float holding the x component of the up-vector for the 
+*        text, in graphics coords. Scaled on exit so that the up vector has 
+*        length equal to the height of normal text.
+*     uy
+*        Pointer to a float holding the y component of the up-vector for the 
+*        text, in graphics coords. Scaled on exit so that the up vector has 
+*        length equal to the height of normal text.
+*     rx 
+*        Pointer to a double in which will be put the x component of a
+*        vector parallel to the baseline of normal text.
+*     ry
+*        Pointer to a double in which will be put the y component of a
+*        vector parallel to the baseline of normal text.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+
+/* Local Variables: */
+   float alpha;         /* Scale factor for X axis */
+   float beta;          /* Scale factor for Y axis */
+   float chv;
+   float chh;
+   float l;             /* Normalisation constant */
+   float a;            
+   float b;            
+   float nl;		/* Character height in standard coordinates */
+
+/* Check inherited status */
+   if( !astOK ) return;
+
+/* Find the scale factors for the two axes which scale graphics coordinates
+   into a "standard" coordinate system in which: 1) the axes have equal scale 
+   in terms of (for instance) millimetres per unit distance, 2) X values 
+   increase from left to right, 3) Y values increase from bottom to top. 
+   If the grf moduleis not capable of giving us this information, then
+   just assume the the axes are equally scaled, except for any axis
+   reversal indicated in the supplied Plot. */
+   if( GCap( this, GRF__SCALES, 1 ) ) {
+      GScales( this, &alpha, &beta, method, class );
+   } else {
+      alpha = ( this->xrev ) ? -1.0 : 1.0;
+      beta = ( this->yrev ) ? -1.0 : 1.0;
+   }
+
+/* Convert the up-vector into "standard" system in which the axes have
+   equal scales, and increase left-to-right, bottom-to-top. */
+   *ux *= alpha;
+   *uy *= beta;
+
+/* Normalise this up-vector. */
+   l = sqrt( (*ux)*(*ux) + (*uy)*(*uy) );
+   if( l <= 0.0 ) {
+     *ux = 0.0;
+     *uy = 1.0;
+   } else {
+     *ux /= l;
+     *uy /= l;
+   }
+
+/* Find the height in "standard" coordinates of "normal" text draw with the 
+   requested up-vector. */
+   GQch( this, &chv, &chh, method, class );
+   a = (*ux)/(chv*alpha);
+   b = (*uy)/(chh*beta);
+   nl = 1.0/sqrt( a*a + b*b );
+
+/* Scale the up-vector so that is has length equal to the height of "normal" 
+   text with the specified up-vector. */
+   *ux *= nl;
+   *uy *= nl;
+
+/* Get the vector along the base-line of the text, by rotating the 
+   up-vector by 90 degrees clockwise. */
+   *rx = *uy;   
+   *ry = -*ux;
+
+/* Convert both vectors back from standard coords to normal world coords */
+   *ux /= alpha;
+   *uy /= beta;
+   *rx /= alpha;
+   *ry /= beta;
+
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {
@@ -18817,6 +20882,22 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       astSetGap( this, axis - 1, dval );
 
+/* LogGap. */
+/* ---- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "loggap= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLogGap( this, 0, dval );
+      astSetLogGap( this, 1, dval );
+
+/* LogGap(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "loggap(%d)= %lg %n",
+                              &axis, &dval, &nc ) )
+               && ( nc >= len ) ) {
+      astSetLogGap( this, axis - 1, dval );
+
 /* NumLabGap. */
 /* -------- */
    } else if ( nc = 0,
@@ -18864,6 +20945,54 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetLabelUp( this, axis - 1, ival );
+
+/* LogPlot. */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "logplot= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLogPlot( this, 0, ival );
+      astSetLogPlot( this, 1, ival );
+
+/* LogPlot(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "logplot(%d)= %d %n",
+                              &axis, &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetLogPlot( this, axis - 1, ival );
+
+/* LogTicks. */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "logticks= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLogTicks( this, 0, ival );
+      astSetLogTicks( this, 1, ival );
+
+/* LogTicks(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "logticks(%d)= %d %n",
+                              &axis, &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetLogTicks( this, axis - 1, ival );
+
+/* LogLabel. */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "loglabel= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLogLabel( this, 0, ival );
+      astSetLogLabel( this, 1, ival );
+
+/* LogLabel(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "loglabel(%d)= %d %n",
+                              &axis, &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetLogLabel( this, axis - 1, ival );
 
 /* NumLab. */
 /* -------- */
@@ -19094,6 +21223,169 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Undefine macros local to this function. */
 #undef MATCH
+}
+
+static void SetLogPlot( AstPlot *this, int axis, int ival ){
+/*
+*
+*  Name:
+*     SetLogPlot
+
+*  Purpose:
+*     Set a new value for a LogPlot attribute
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void SetLogPlot( AstPlot *this, int axis, int ival )
+
+*  Class Membership:
+*     Plot member function 
+
+*  Description:
+*     Assigns a new value to the LogPlot attribute of the specified axis,
+*     and also re-maps the base Frame of the Plot if necessary.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     axis
+*        Zero based axis index.
+*     ival
+*        The new value for the ogPlot attribute.
+
+*/
+
+/* Local Variables: */
+   int oldval;              /* Original attribute value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Validate the axis index. */ 
+   if( axis < 0 || axis >= 2 ){ 
+      astError( AST__AXIIN, "astSetLogPlot(%s): Index (%d) is invalid for "
+                "attribute LogPlot - it should be in the range 1 to 2.", 
+                astGetClass( this ), axis + 1 ); 
+
+/* If the axis index is OK, store the original attribute value. We use
+   astGetLogPlot to get the value rather than directly accessing
+   "this->logplot" in order to get the any default value in the case of
+   no value having been set. */
+   } else {
+      oldval = astGetLogPlot( this, axis );
+
+/* If the current attribute value will change, attempt to re-map the plot 
+   axis. If the attempt succeeds, toggle the current attribute value. */
+      if( ( ival != 0 ) != ( oldval != 0 ) ){
+         if( ToggleLogLin( this, axis, oldval, "astSetLogPlot" ) ){
+            this->logplot[ axis ] = ( !oldval );
+         }
+
+/* If the current attribute value will not change, just store the supplied 
+   value (this is not redundant because it may cause a previously defaulted 
+   value to become an explicitly set value ). */
+      } else {
+         this->logplot[ axis ] = oldval;
+      }
+   }
+} 
+
+const char *astStripEscapes_( const char *text ) {
+/*
+*+
+*  Name:
+*     astStripEscapes
+
+*  Purpose:
+*     Remove escape sequences from a string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     const char *astStripEscapes( const char *text )
+
+*  Description:
+*     This function modifies the supplied string by removing any
+*     graphical escape sequences.
+
+*  Parameters:
+*     text
+*        Pointer to the string to be checked.
+
+*  Returned Value:
+*     Pointer to the modified string. If no escape sequences were found
+*     in the supplied string,then a copy of the supplied pointer is
+*     returned. Otherwise, the pointer will point to a static buffer 
+*     holding the modified text. This text will be over-written by
+*     subsequent invocations of this function.
+
+*-
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 50              /* Max. characters in result buffer */
+
+/* Local Variables: */
+   const char *a;
+   char *b;
+   int nc;
+   int ncc;
+   int type;
+   int value;
+   const char *result;
+   static char buff[ BUFF_LEN + 1 ];
+
+/* Initialise */
+   result= text;
+
+/* Check inherited status and supplied pointer. Also return if the 
+   string contains no escape sequences. */
+   if( !astOK || !text || !HasEscapes( text ) ) return result;
+
+/* Initialise a pointer to the next character to be read from the
+   supplied string. */
+   a = text;
+
+/* Initialise a pointer to the next character to be written to the
+   returned string. */
+   b = buff;
+
+/* Note the available space left in the buffer. */
+   ncc = BUFF_LEN;
+
+/* Loop until all the string has been read, or the buffer is full. */
+   while( *a && ncc > 0 ){
+
+/* If the remaining string starts with an escape sequence, increment the
+   read point by the length of the escape sequence, but leave the write
+   pointer where it is. */
+      if( astFindEscape( a, &type, &value, &nc ) ) {
+         a += nc;
+
+/* If the remaining string does not start with an escape sequence, copy
+   the following text from the read position to the write position. */
+      } else {
+         if( nc > ncc ) nc = ncc;
+         memcpy( b, a, sizeof( char )*nc );
+         a += nc;
+         b += nc;
+         ncc -= nc;
+      }
+   }
+
+/* Terminate the returned string. */
+   *b = 0;
+
+/* Return the result.*/
+   return buff;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
 }
 
 static int swapEdges( AstPlot *this, TickInfo **grid, CurveData **cdata ) {
@@ -19353,6 +21645,18 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       result = astTestGap( this, axis - 1 );
 
+/* LogGap. */
+/* ---- */
+   } else if ( !strcmp( attrib, "loggap" ) ) {
+      result = astTestLogGap( this, 0 );
+
+/* LogGap(axis). */
+/* ---------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "loggap(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestLogGap( this, axis - 1 );
+
 /* NumLabGap. */
 /* --------- */
    } else if ( !strcmp( attrib, "numlabgap" ) ) {
@@ -19388,6 +21692,42 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestLabelUp( this, axis - 1 );
+
+/* LogPlot. */
+/* -------- */
+   } else if ( !strcmp( attrib, "logplot" ) ) {
+      result = astTestLogPlot( this, 0 );
+
+/* LogPlot(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "logplot(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestLogPlot( this, axis - 1 );
+
+/* LogTicks. */
+/* -------- */
+   } else if ( !strcmp( attrib, "logticks" ) ) {
+      result = astTestLogTicks( this, 0 );
+
+/* LogTicks(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "logticks(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestLogTicks( this, axis - 1 );
+
+/* LogLabel. */
+/* -------- */
+   } else if ( !strcmp( attrib, "loglabel" ) ) {
+      result = astTestLogLabel( this, 0 );
+
+/* LogLabel(axis). */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "loglabel(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestLogLabel( this, axis - 1 );
 
 /* NumLab. */
 /* -------- */
@@ -19609,13 +21949,13 @@ c        Pointer to a null-terminated character string identifying the
 f        A character string identifying the
 *        reference point for the text being drawn. The first character in
 *        this string identifies the reference position in the "up" direction
-*        and may be "B", "C" or "T". The second character identifies the 
-*        side-to-side reference position and may be "L", "C" or "R" (for 
-*        left, centre or right). The string is case-insensitive, and only 
-*        the first two characters are significant.
+*        and may be "B" (baseline), "C" (centre), "T" (top) or "M" (bottom). 
+*        The second character identifies the side-to-side reference position 
+*        and may be "L" (left), "C" (centre) or "R" (right ). The string is 
+*        case-insensitive, and only the first two characters are significant.
 *
-*        For example, a value of "BL" means that the bottom left point
-*        of the original (un-rotated) text is to be drawn at the
+*        For example, a value of "BL" means that the left end of the
+*        baseline of the original (un-rotated) text is to be drawn at the
 c        position given by "pos".
 f        position given by POS.
 
@@ -19648,7 +21988,10 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    char ljust[3];          /* Upper case copy of "just" */
    char *ltext;            /* Local copy of "text" excluding trailing spaces */
    double **ptr2;          /* Pointer to graphics positions */
+   float xbn[ 4 ];         /* X coords of text bounding box. */
+   float ybn[ 4 ];         /* Y coord of text bounding box. */
    int axis;               /* Axis index */
+   int escs;               /* Original astEscapes value */
    int naxes;              /* No. of axes in the base Frame */
    int ncoord;             /* No. of axes in the current Frame */
    int ulen;               /* Length of "text" excluding trailing spaces */
@@ -19668,6 +22011,10 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", method, class, naxes, class );
    } 
+
+/* Ensure AST functions included graphical escape sequences in any
+   returned text strings. */
+   escs = astEscapes( 1 );
 
 /* Initialise the bounding box for primatives produced by this call. */
    Boxp_lbnd[ 0 ] = FLT_MAX;
@@ -19730,15 +22077,9 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
       if( ptr2[0][0] != AST__BAD && ptr2[1][0] != AST__BAD ){
 
 /* Draw the text string. */
-         GText( this, ltext, (float) ptr2[0][0], (float) ptr2[1][0], ljust, 
-                   up[ 0 ], up[ 1 ], method, class );
-
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-         DrawText( this, astGetEscape( this ), ltext, (float) ptr2[0][0],
-                   (float) ptr2[1][0], ljust, up[ 0 ], up[ 1 ], method, 
-                   class );
-*/
+         DrawText( this, 1, astGetEscape( this ), ltext, (float) ptr2[0][0],
+                   (float) ptr2[1][0], ljust, up[ 0 ], up[ 1 ], xbn, ybn,
+                   NULL, method, class );
       }
 
 /* Free the local copy of the string. */
@@ -19755,6 +22096,10 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 
 /* Re-establish the original graphical attributes. */
    GrfAttrs( this, TEXT_ID, 0, GRF__TEXT, method, class );
+
+/* Restore the original value of the flag which says whether graphical 
+   escape sequences should be incldued in any returned text strings. */
+   astEscapes( escs );
 
 /* Return */
    return;
@@ -19826,7 +22171,6 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
    int edge;               /* Edge to be labelled */
    int esc;                /* Interpret escape sequences? */
    int gelid;              /* ID for next graphical element to be drawn */
-   int i;                  /* Corner index */
    int tlen;               /* No. of characetsr in label */
    int ulen;               /* No. of characetsr in units */
 
@@ -19934,15 +22278,9 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
             upx = -1.0;
             upy = 0.0;
 
-/* Justify the bottom of the bounding box. */
-            just = "BC";
-
-/* ENABLE-ESCAPE - replace the above assignment to "just" with the
-   following assignment... */
-
 /* Justify the bottom of the whole bounding box (not just the text
    base-line). */
-/*            just = "DC"; */
+            just = "MC"; 
 
 /* Set the x reference position just outside the box enclosing all the
    graphics drawn so far. The reference point refers to the centre of the
@@ -19963,8 +22301,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
          } else if( edge == 1 ){
             upx = 0.0;
             upy = 1.0;
-            just = "BC";
-/* ENABLE-ESCAPE just = "DC"; */
+            just = "MC"; 
             if( this->yrev ){
                yref = ylo - txtgap;
             } else {
@@ -19977,8 +22314,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
          } else if( edge == 2 ){
             upx = 1.0;
             upy = 0.0;
-            just = "BC";
-/* ENABLE-ESCAPE just = "DC"; */
+            just = "MC"; 
             if( this->xrev ){
                xref = xlo - txtgap; 
             } else {
@@ -19991,8 +22327,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
          } else {
             upx = 0.0;
             upy = 1.0;
-            just = "TC";
-/* ENABLE-ESCAPE just = "UC"; */
+            just = "TC"; 
             if( this->yrev ){
                yref = yhi + txtgap;
             } else {
@@ -20003,28 +22338,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
          }
 
 /* Display the label. */
-         GText( this, text, xref, yref, just, upx, upy, method, class );
-
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-         DrawText( this, esc, text, xref, yref, just,
-                   upx, upy, method, class );
-*/
-
-/* Get the bounds of the box containing the new label. */
-         BoxText( this, esc, text, xref, yref, just, upx, upy, xbn, ybn,
-                  method, class );
-
-/* Extend the bounds of the global bounding box held externally to include 
-   the new box. */
-         if( astOK ){
-            for( i = 0; i < 4; i++ ){
-               Box_lbnd[ 0 ] = MIN( xbn[ i ], Box_lbnd[ 0 ] );
-               Box_ubnd[ 0 ] = MAX( xbn[ i ], Box_ubnd[ 0 ] );
-               Box_lbnd[ 1 ] = MIN( ybn[ i ], Box_lbnd[ 1 ] );
-               Box_ubnd[ 1 ] = MAX( ybn[ i ], Box_ubnd[ 1 ] );
-            }
-         }
+         DrawText( this, 1, esc, text, xref, yref, just,
+                   upx, upy, xbn, ybn, NULL, method, class );
 
 /* Release the memory allocated to store the axis label;. */
          new_text = (char *) astFree( (void *) new_text );
@@ -20088,13 +22403,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 
 /* Display the title. Justify the bottom of the whole bounding box (not 
    just the text base-line). */
-      GText( this, text, xref, yref, "BC", 0.0F, 1.0F, method, class );
-
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-      DrawText( this, esc, text, xref, yref, "DC", 0.0F, 1.0F,
-                method, class );
-*/
+      DrawText( this, 1, esc, text, xref, yref, "MC", 0.0F, 1.0F,
+                xbn, ybn, NULL, method, class );
 
 /* Re-establish the original graphical attributes. */
       GrfAttrs( this, TITLE_ID, 0, GRF__TEXT, method, class );
@@ -20107,6 +22417,193 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* Return. */
    return;
 
+}
+
+static void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
+                           float rx, float ry, float *x, float *y,
+                           float x0, float y0, float *alpha_lo, 
+                           float *alpha_hi, float *beta_lo, float *beta_hi ){
+
+/*
+*  Name:
+*     UpdateConcat
+
+*  Purpose:
+*     Update the concatenation point for a text string in preparation for
+*     appending another string.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void UpdateConcat( float *xbn, float *ybn, float ux, float uy,
+*                         float rx, float ry, float *x, float *y,
+*                         float x0, float y0, float *alpha_lo, 
+*                         float *alpha_hi, float *beta_lo, float *beta_hi )
+
+*  Description:
+*     This function modifies the supplied concatenation point (x,y) by moving
+*     it to the right along the baseline of the text by an amount equal
+*     to the width of the supplied sub-string bounding box. It also updates 
+*     the supplied total bounding box so that it includes the supplied
+*     sub-string bounding box.
+
+*  Parameters:
+*     xbn
+*        Pointer to an array holding the x coord at the four corners of
+*        the sub-string bounding box.
+*     ybn
+*        Pointer to an array holding the y coord at the four corners of
+*        the sub-string bounding box.
+*     ux
+*        The x component of the up-vector for the text, in graphics coords.
+*        The length of this vector should be equal to the height of normal 
+*        text drawn with this up-vector.
+*     uy
+*        The y component of the up-vector for the text. See "ux".
+*     rx
+*        The x component of the right-vector for the text. The length of this 
+*        vector should be equal to the height of normal text drawn with the 
+*        supplied up-vector.
+*     ry
+*        The y component of the right-vector for the text. see "rx".
+*     x
+*        Pointer to a float holding the x coord of the concatenation point 
+*        of the text just drawn. This is changed on exit so that the next
+*        string will be appended to the end of the text just drawn.
+*     y
+*        Pointer to a float holding the y coord of the concatenation point 
+*        of the text just drawn. This is changed on exit so that the next
+*        string will be appended to the end of the text just drawn.
+*     x0
+*        The X coord at the left end of the baseline of the total string.
+*     y0
+*        The Y coord at the left end of the baseline of the total string.
+*     alpha_lo
+*        Pointer to a double holding a value which gives the position of the 
+*        bottom edge of the total bounding box. The value is such that
+*        (x0,y0) + alpha_lo*(ux,uy) is a point on the bottom edge of the
+*        total bounding box. The returned value is updated so that the
+*        total bounding box includes the supplied sub-string bounding box.
+*     alpha_hi
+*        Pointer to a double holding a value which gives the position of the 
+*        top edge of the total bounding box. The value is such that
+*        (x0,y0) + alpha_hi*(ux,uy) is a point on the top edge of the
+*        total bounding box. The returned value is updated so that the
+*        total bounding box includes the supplied sub-string bounding box.
+*     beta_lo
+*        Pointer to a double holding a value which gives the position of the 
+*        left edge of the total bounding box. The value is such that
+*        (x0,y0) + beta_lo*(rx,ry) is a point on the left edge of the
+*        total bounding box. The returned value is updated so that the
+*        total bounding box includes the supplied sub-string bounding box.
+*     beta_hi
+*        Pointer to a double holding a value which gives the position of the 
+*        right edge of the total bounding box. The value is such that
+*        (x0,y0) + beta_hi*(rx,ry) is a point on the right edge of the
+*        total bounding box. The returned value is updated so that the
+*        total bounding box includes the supplied sub-string bounding box.
+
+*/
+
+/* Local Variables: */
+   float ahi;
+   float alo;
+   float alpha;
+   float beta;
+   float bhi;
+   float blo;
+   float denom;
+   float dx;
+   float dy;
+   float xc;
+   float yc;
+   int ic;        
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Check the supplied up and right vectors are not parallel. */
+   denom = ux*ry - uy*rx;
+   if( denom != 0.0 ) {
+
+/* Get the coords at the centre of the sub-string bounding box. */
+      xc = ( xbn[ 0 ] + xbn[ 1 ] + xbn[ 2 ] + xbn[ 3 ] )/4.0;
+      yc = ( ybn[ 0 ] + ybn[ 1 ] + ybn[ 2 ] + ybn[ 3 ] )/4.0;
+
+/* For each of the 4 corners of the sub-string bounding box, we consider the 
+   vector from the centre of the bounding box to the corner. We want to express
+   this vector, vx, as a sum of a vector in the up direction and a vector 
+   in the right direction:
+
+      vx = alpha*ux + beta+rx
+      vy = alpha*uy + beta+ry
+
+   where alpha and beta are constants which are different for each
+   corner vector. We also want to find the minimum and maximum alpha and
+   beta covered by the box. First initialise the limits. */
+      alo = 0.0;
+      ahi = 0.0;
+      blo = 0.0;
+      bhi = 0.0;
+
+/* Now find alpha and beta for each of the four corners. */
+      for( ic = 0; ic < 4; ic++ ) {
+         dx = xbn[ ic ] - xc;
+         dy = ybn[ ic ] - yc;
+         alpha = ( dx*ry - dy*rx ) /denom;
+         beta = ( dy*ux - dx*uy ) /denom;
+
+/* Extend the bounds in alpha and beta. */
+         if( alpha < alo ) alo = alpha;                  
+         if( alpha > ahi ) ahi = alpha;                  
+         if( beta < blo ) blo = beta;
+         if( beta > bhi ) bhi = beta;
+
+/* The bottom left corner has negative values for both alpha and beta.
+   Commence the process of updating the concatenation point by subtracting off
+   the coordinates at the bottom left corner. */
+         if( alpha < 0.0 ) {      
+            if( beta < 0.0 ) {      
+               *x -= xbn[ ic ];
+               *y -= ybn[ ic ];
+
+/* The bottom right corner has negative alpha and positive beta. Complete
+   the process of updating the concatenation point by adding on the 
+   coordinates at the bottom right corner. */
+            } else {
+               *x += xbn[ ic ];
+               *y += ybn[ ic ];
+            }
+         }
+      }
+
+/* Also express the vector from (x0,y0) to (xc,yc) as a sum of a vector 
+   in the up direction and a vector in the right direction:
+
+      xc - x0 = alpha*ux + beta*rx
+      yc - y0 = alpha*uy + beta*ry
+
+   Find alpha and beta. */
+
+      dx = xc - x0;
+      dy = yc - y0;
+      alpha = ( dx*ry - dy*rx ) /denom;
+      beta = ( dy*ux - dx*uy ) /denom;
+
+/* We can now express the vector from (x0,y0) to each of the 4 corners as
+   a sum of alpha*up and beta*right. Form the bounds of the sub-string in 
+   terms of up-vectors and right vectors from (x0,y0) instead of from the
+   centre of the box. */
+      alo += alpha;
+      ahi += alpha;
+      blo += beta;
+      bhi += beta;
+
+/* Extend the supplied alpha and beta bounding box to include these limits. */
+      if( alo < *alpha_lo ) *alpha_lo = alo;
+      if( ahi > *alpha_hi ) *alpha_hi = ahi;
+      if( blo < *beta_lo ) *beta_lo = blo;
+      if( bhi > *beta_hi ) *beta_hi = bhi;
+   }
 }
 
 static void Ticker( AstPlot *this, int edge, int axis, double value,
@@ -20336,7 +22833,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 *     -  This function allocates some static resources on its first
 *     invocation, which should be released when no longer needed, or when
 *     a different Plot is supplied, by calling this function with a NULL 
-*     pointer for parameter "this". All other parameters are ignored.
+*     pointer for parameter "this". All other parameters (except axis) are 
+*     ignored.
 *     -  This function assumes that the physical coordinate system is 2 
 *     dimensional, and it should not be used if this is not the case.
 *     -  An error is reported if the region containing valid physical
@@ -20345,35 +22843,45 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 *     for any reason, then a NULL pointer is returned.
 */
 
+/* Local Constants: */
+#define MAXFLD 10
+
 /* Local Variables: */
    AstAxis *ax;        /* Pointer to the axis. */
    AstFrame *frame;    /* Pointer to the current Frame in the Plot */
    TickInfo *ret;      /* Pointer to the returned structure. */
    char **labels;      /* Pointer to list of formatted labels */
    char **new;         /* Pointer to list of shortened formatted labels */
+   char *fields[ MAXFLD ]; /* Pointers to starts of fields in a label */
    const char *fmt;    /* Format string actually used */
    const char *old_format; /* Original Format string */
    double *ticks;      /* Pointer to major tick mark values */
    double cen0;        /* Supplied value of cen */
+   double junk;        /* Unused value */
    double refval;      /* Value for other axis to use when normalizing */
    double used_gap;    /* The gap size actually used */
    int axdigset;       /* Was the Axis Digits attribute set originally? */
-   int frdigset;       /* Was the Frame Digits attribute set originally? */
+   int bot_digits;     /* Digits value which makes labels as short as possible */
    int dig_low;        /* The lowest value to use for Digits */
    int digits;         /* New Digits value */
+   int fmtset;         /* Was a format set? */
+   int frdigset;       /* Was the Frame Digits attribute set originally? */
    int i;              /* Tick index. */
+   int nc[ MAXFLD ];   /* Lengths of fields in a label */
+   int nf;             /* Number of fields in a label */
    int nmajor;         /* No. of major tick marks */
    int nminor;         /* No. of minor tick marks */
    int ok;             /* Are all adjacent labels different? */
    int old_digits;     /* Original Digits value (-1 if not set) */
    int req_digits;     /* Original Digits value (default value if not set) */
-   int bot_digits;     /* Digits value which makes labels as short as possible */
+   int status;         /* Original AST status */
    int top_digits;     /* Digits value needed to make all labels different */
+   
 
 /* If a NULL pointer has been supplied for "this", release the resources
    allocated within GetTicks, and return. */
    if( !this ){
-      (void) GetTicks( NULL, 0, NULL, 0.0, &ticks, &nmajor, &nminor, 
+      (void) GetTicks( NULL, axis, NULL, &ticks, &nmajor, &nminor, 
                        0, inval, &refval, method, class );
       return NULL;
    }      
@@ -20400,6 +22908,42 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Get a pointer to the axis. */
    ax = astGetAxis( frame, axis );
 
+/* Get an initial set of tick mark values. This also establishes defaults for 
+   LogTicks and LogLabel attributes. */
+   used_gap = GetTicks( this, axis, cen, &ticks, &nmajor, &nminor, 1, 
+                        inval, &refval, method, class );
+
+/* Save a copy of the Frame's Format value, if set. */
+   fmtset = astTestFormat( frame, axis );
+   if( fmtset ) {
+      fmt = astGetFormat( frame, axis );
+      old_format = (const char *) astStore( NULL, (void *) fmt, strlen(fmt) + 1 );
+   } else {
+      old_format = NULL;
+   }
+
+/* See if exponential labels using superscript powers are required.  */
+   if( astGetLogLabel( this, axis ) && astGetEscape( this ) &&
+       GCap( this, GRF__SCALES, 1 ) ) {
+
+/* Temporarily use a format of "%&g" to get "10**x" style axis labels,
+   with super-scripted "x". */
+      astSetFormat( frame, axis, "%&g" );
+
+/* Not all subclasses of Frame support this format specified, so format a 
+   test value, and see if it has two fields, the first of which is "10".
+   If not, we cannot use log labels so re-instate the original format. */
+      nf = astFields( frame, axis, "%&g", astFormat( frame, axis, 1.0E4 ),
+                      MAXFLD, fields, nc, &junk );
+      if( nf != 2 || nc[ 0 ] != 2 || strncmp( fields[ 0 ], "10", 2 ) ) {
+         if( fmtset ) {
+            astSetFormat( frame, axis, old_format );
+         } else {
+            astClearFormat( frame, axis );
+         }
+      }
+   }
+
 /* See if a value has been set for the axis Digits. */
    axdigset = astTestAxisDigits( ax );
 
@@ -20409,17 +22953,14 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* If the axis Format string or Digits value, or the Frame Digits value, is 
    set, we should attempt to use them, so that the user's attempts to get a 
    specific result are not foiled. */
-   if( astTestFormat( frame, axis ) || axdigset || frdigset ){
-
-/* Get a set of tick mark values. */
-      used_gap = GetTicks( this, axis, cen, *gap, &ticks, &nmajor, &nminor, 1, 
-                           inval, &refval, method, class );
+   if( fmtset || axdigset || frdigset ){
 
 /* Reserve memory to hold pointers to the formatted labels. */
       labels = (char **) astMalloc( sizeof(char *)*(size_t)nmajor );
 
-/* See if there are any adjacent labels which are identical. If there are
-   not, the labels are formatted and returned in "labels". */
+/* See if the initial tick marks found above wouldproduce any adjacent labels 
+   which are identical. If there are not, the labels are formatted and 
+   returned in "labels". */
       fmt = astGetFormat( frame, axis );
       ok = CheckLabels( frame, axis, ticks, nmajor, 1, labels, refval );
 
@@ -20431,15 +22972,9 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    necessary. */
    if( !ok ){
 
-/* Save a copy of the Frame's Format value, if set, and then clear it so
-   that the Digits value will be used to determine the default format. */
-      if( astTestFormat( frame, axis ) ) {
-         fmt = astGetFormat( frame, axis );
-         old_format = (const char *) astStore( NULL, (void *) fmt, strlen(fmt) + 1 );
-         astClearFormat( frame, axis );
-      } else {
-         old_format = NULL;
-      }
+/* Clear the Frame's Format value, if set, so that the Digits value will be 
+   used to determine the default format. */
+      if( fmtset ) astClearFormat( frame, axis );
 
 /* If a value has been set for the axis Digits or the Frame Digits, get it. 
    Otherwise set the value to -1. */
@@ -20467,7 +23002,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
          
 /* Get a set of tick mark values. */
          if( cen ) *cen = cen0;
-         used_gap = GetTicks( this, axis, cen, *gap, &ticks, &nmajor, &nminor,
+         used_gap = GetTicks( this, axis, cen, &ticks, &nmajor, &nminor,
                               0, inval, &refval, method, class );
 
 /* Expand the memory holding the pointers to the formatted labels. */
@@ -20567,6 +23102,17 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
    }
 
+/* Ensure the original axis format is re-instated (even if an error has
+   occurred). */
+   status = astStatus;
+   astClearStatus;
+   if( fmtset ) {
+      astSetFormat( frame, axis, old_format );
+   } else {
+      astClearFormat( frame, axis );
+   }
+   astSetStatus( status );
+
 /* Annul the pointer to the Axis. */
    ax = astAnnul( ax );
 
@@ -20599,7 +23145,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
 /* If no suitable labels were found report an error. */
    } else if( astOK ){
-      if( astTestFormat( frame, axis ) ){
+      if( fmtset ){
          astError( AST__PLFMT, "%s(%s): No numerical labels can be produced "
                    "for axis %d using the supplied %s format string '%s'.",
                    method, class, axis + 1, astGetClass( frame ), 
@@ -20629,6 +23175,9 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
 /* Return the structure. */
    return ret;
+
+/* Undefine local constants. */
+#undef MAXFLD
 
 }
 
@@ -21537,6 +24086,7 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
    int i;                 /* Loop count */
    int ibin;              /* Bin index */
    int maxcnt;            /* Maximum no. of values in any bin */
+   int nc;                /* Total number of points in histogram */
    int nbin;              /* No. of bins in histogram */
    int ngood;             /* No. of good values supplied */
  
@@ -21588,6 +24138,7 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
 /* Form the histogram. Form the mean data value at the same time. */
             mean = 0.0;
             a = value;
+            nc = 0;
             for( i = 0; i < n; i++, a++ ){
                if( *a != AST__BAD ) {
                   if( *a >= lolim && *a <= hilim ) {
@@ -21595,6 +24146,7 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
                      ibin = (int) ( ( *a - minval )/ delta );
                      if( ibin == nbin ) ibin--;
                      hist[ ibin ]++;
+                     nc++;
                   }
                }
             }
@@ -21622,12 +24174,15 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
 /* Free the histogram memory. */
             hist = astFree( hist );
 
+
 /* Call this function recursively to refine the value, restricting
    attention to those data values which are within the range of the bin
    found above. */
-            minval += ibin*delta;
-            maxval = minval + delta;
-            result = Typical( n, value, minval, maxval );
+            if( maxcnt < nc && ibin*delta > 1000.0*DBL_EPSILON*fabs(maxval) ) {
+               minval += ibin*delta;
+               maxval = minval + delta;
+               result = Typical( n, value, minval, maxval );
+            }
          }
       }
    }
@@ -22226,6 +24781,181 @@ static int TestUseWidth( AstPlot *this, int id ) {
 
 }
 
+static int ToggleLogLin( AstPlot *this, int axis, int islog, 
+                         const char *method ){
+/*
+*
+*  Name:
+*     ToggleLogLin
+
+*  Purpose:
+*     Toggle the nature of the Plot axis mapping.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int ToggleLogLin( AstPlot *this, int axis, int islog, 
+*                       const char *method )
+
+*  Class Membership:
+*     Plot member function 
+
+*  Description:
+*     Each axis in the graphics Frame of a Plot can be mapped linearly or
+*     logarithmically onto the corresponding axis in the base Frame of
+*     the FrameSet supplied whtn the Plot was constructed. This function
+*     toggles the nature of the specified axis; if it is currently
+*     logarithmic it becomes linear, and if it is linear it becomes
+*     logarithmic.
+*
+*     If the Frame canot be re-maped (for instance because the visible
+*     part of the axis includes the value zero), then zero is returned
+*     but no error is reported.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     axis
+*        Zero based axis index.
+*     islog
+*        Is the axis currently logarithmic? If so, this function remaps
+*        it so that it is linear (and vice-versa).
+*     method
+*        Pointer to a null-terminated string holding the name of the calling 
+*        method (only used within error mesages).
+
+*  Returned Value:
+*     Non-zero if the attempt to re-map the graphics Frame was succesful,
+*     zero otherwise.
+
+*/
+
+/* Local Variables: */
+   AstCmpMap *remap1;   /* 1D Mapping to re-map the graphics Frame */
+   AstCmpMap *remap2;   /* 2D Mapping to re-map the graphics Frame */
+   AstMathMap *logmap;  /* 1D Logarithmic axis Mapping */
+   AstUnitMap *unitmap;  /* 1D Unit mapping */
+   AstWinMap *linmap;   /* 1D Linear axis Mapping */
+   char fwdexp[ 25 + 2*DBL_DIG ];  /* Forward log mapping expression */
+   char invexp[ 28 + 2*DBL_DIG ];  /* Inverse log mapping expression */
+   const char *fwd[1];  /* Pointer to pass to MathMap constructor */
+   const char *inv[1];  /* Pointer to pass to MathMap constructor */
+   double a;            /* Constant for log expression */
+   double b1;           /* Original base Frame axis value at first edge */
+   double b2;           /* Original base Frame axis value at second edge */
+   double b;            /* Constant for log expression */
+   double c;            /* Constant for log expression */
+   double g1;           /* Graphics axis value at first edge */
+   double g2;           /* Graphics axis value at second edge */
+   int result;          /* Returned value */
+
+/* Inotialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the corresponding axis limits in the graphics coordinate system
+   and the original base Frame coordinate system. */
+   if( axis == 0 ) {
+      if( this->xrev ) {
+         g1 = this->xhi;
+         g2 = this->xlo;
+      } else {
+         g1 = this->xlo;
+         g2 = this->xhi;
+      }
+      b1 = this->bbox[ 0 ];
+      b2 = this->bbox[ 2 ];
+
+   } else {
+      if( this->yrev ) {
+         g1 = this->yhi;
+         g2 = this->ylo;
+      } else {
+         g1 = this->ylo;
+         g2 = this->yhi;
+      }
+      b1 = this->bbox[ 1 ];
+      b2 = this->bbox[ 3 ];
+   }
+
+/* Check the limits are usable (e.g. the base Frame values will be bad 
+   if this Plot was restored from a dump of a Plot created before the
+   LogPlot attributes were added). */
+   if( b1 != AST__BAD && b2 != AST__BAD && g1 != g2 && b1 != b2 &&
+       b1*b2 > 0.0 ) {
+
+/* Form the 1D Mapping which maps the specified axis linearly onto the plotting
+   surface. The forward transformation goes from graphics to base Frame. */
+      linmap = astWinMap( 1, &g1, &g2, &b1, &b2, "" );
+
+/* Form the 1D Mapping which maps the specified axis logarithmically onto the 
+   plotting surface. The forward transformation goes from graphics to base 
+   Frame. */
+      c = log10( b1/b2 );
+      a = ( g1 - g2 )/c;
+
+      if( b1 > 0.0 ) {
+         b = ( g2*log10( b1 ) - g1*log10( b2 ) )/c;
+         (void) sprintf( invexp, "g=%.*g*log10(b)+%.*g", DBL_DIG, a, DBL_DIG, b );
+         (void) sprintf( fwdexp, "b=pow(10,(g-%.*g)/%.*g)", DBL_DIG, b, DBL_DIG, a );
+
+      } else {
+         b = ( g2*log10( -b1 ) - g1*log10( -b2 ) )/c;
+         (void) sprintf( invexp, "g=%.*g*log10(-b)+%.*g", DBL_DIG, a, DBL_DIG, b );
+         (void) sprintf( fwdexp, "b=-pow(10,(g-%.*g)/%.*g)", DBL_DIG, b, DBL_DIG, a );
+      }
+
+      fwd[ 0 ] = (const char *) fwdexp;
+      inv[ 0 ] = (const char *) invexp;
+      logmap = astMathMap( 1, 1, 1, fwd, 1, inv, "SimpFI=1,SimpIF=1" );
+
+/* If the axis was previously logarithmic, get the Mapping with which to remap 
+   the graphics Frame so that it becomes linearly related to the base Frame 
+   in the FrameSet supplied when the Plot was constructed. */
+      if( islog ) {
+         astInvert( linmap );
+         remap1 = astCmpMap( logmap, linmap, 1, "" );
+
+/* If the axis was previously linear, store the new value and get the Mapping 
+   with which to remap the graphics Frame so that it becomes logarithmically 
+   related to the base Frame in the FrameSet supplied when the Plot was 
+   constructed. */
+      } else {
+         astInvert( logmap );
+         remap1 = astCmpMap( linmap, logmap, 1, "" );
+      }
+
+/* Add a 1D UnitMap to map the unaltered mapping. */
+      unitmap = astUnitMap( 1, "" );
+      if( axis == 0 ) {
+         remap2 = astCmpMap( remap1, unitmap, 0, "" );
+      } else {
+         remap2 = astCmpMap( unitmap, remap1, 0, "" );
+      }     
+      
+/* Remap the base (graphics) Frame in the Plot. */
+      astRemapFrame( this, AST__BASE, remap2 );
+
+/* Free resources. */
+      remap1 = astAnnul( remap1 );
+      remap2 = astAnnul( remap2 );
+      logmap = astAnnul( logmap );
+      linmap = astAnnul( linmap );
+      unitmap = astAnnul( unitmap );
+
+/* Indicate success. */
+      if( astOK ) result = 1;
+
+   } 
+
+/* Return the result. */
+   return result;
+} 
+
 static int Ustrcmp( const char *a, const char *b ){
 /*
 *  Name:
@@ -22427,6 +25157,7 @@ static void Delete( AstObject *obj ) {
 
 /* Local Variables: */
    AstPlot *this;               /* Pointer to Plot */
+   int i;
 
 /* Obtain a pointer to the Plot structure. */
    this = (AstPlot *) obj;
@@ -22438,6 +25169,10 @@ static void Delete( AstObject *obj ) {
 /* Free the Grf function stack */
    this->grfstack = (AstGrfPtrs *) astFree( (void *) this->grfstack );
 
+/* Free the graphics attribute stack. */
+   for( i = this->ngat - 1; i >= 0; i-- ) {
+     this->gat[ i ] = astFree( this->gat[ i ] );
+   }
 }
 
 /* Copy constructor. */
@@ -22484,6 +25219,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    the output Plot. */
    out->clip_lbnd = NULL;
    out->clip_ubnd = NULL;
+   out->gat = NULL;
+   out->ngat = 0;
 
 /* Copy the clipping bounds arrays. */
    out->clip_lbnd = (double *) astStore( NULL, (void *) in->clip_lbnd,
@@ -22617,14 +25354,9 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Escape. */
 /* ------- */
-/* NOTE - this attribute is not currently used. The following code should
-   be uncommented when facilities exist in the rest of AST to support its
-   use. (ENABLE-ESCAPE) */
-   /*
    set = TestEscape( this );
    ival = set ? GetEscape( this ) : astGetEscape( this );
    astWriteInt( channel, "Escape", set, 1, ival, "Interpret escape sequences?" );
-   */
 
 /* LabelAt(axis). */
 /* -------------- */
@@ -22657,7 +25389,21 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
          dval = astGetGap( this, axis );
          if( dval != AST__BAD ){
             (void) sprintf( buff, "Gap%d", axis + 1 );
-            astWriteDouble( channel, buff, set, 0, dval, "Gap between ticks" );
+            astWriteDouble( channel, buff, set, 0, dval, "Difference between ticks" );
+         }
+      }
+   }
+
+/* LogGap(axis). */
+/* ------------- */
+/* Discovering the default value requires a lot of calculation. Only
+   write out this attribute if an explicit value has been set. */
+   for( axis = 0; axis < 2; axis++ ){
+      if( astTestLogGap( this, axis ) ) {
+         dval = astGetLogGap( this, axis );
+         if( dval != AST__BAD ){
+            (void) sprintf( buff, "LgGap%d", axis + 1 );
+            astWriteDouble( channel, buff, set, 0, dval, "Ratio between ticks" );
          }
       }
    }
@@ -22691,6 +25437,33 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       ival = set ? GetLabelUp( this, axis ) : astGetLabelUp( this, axis );
       (void) sprintf( buff, "LblUp%d", axis + 1 );
       astWriteInt( channel, buff, set, 1, ival, "Draw numerical labels upright?" );
+   }
+
+/* LogPlot(axis). */
+/* -------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestLogPlot( this, axis );
+      ival = set ? GetLogPlot( this, axis ) : astGetLogPlot( this, axis );
+      (void) sprintf( buff, "LgPlt%d", axis + 1 );
+      astWriteInt( channel, buff, set, 1, ival, "Map plot axis logarithmically?" );
+   }
+
+/* LogTicks(axis). */
+/* -------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestLogTicks( this, axis );
+      ival = set ? GetLogTicks( this, axis ) : astGetLogTicks( this, axis );
+      (void) sprintf( buff, "LgTck%d", axis + 1 );
+      astWriteInt( channel, buff, set, 1, ival, "Space ticks logarithmically?" );
+   }
+
+/* LogLabel(axis). */
+/* -------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestLogLabel( this, axis );
+      ival = set ? GetLogLabel( this, axis ) : astGetLogLabel( this, axis );
+      (void) sprintf( buff, "LgLbl%d", axis + 1 );
+      astWriteInt( channel, buff, set, 1, ival, "Scientific notation for labels?" );
    }
 
 /* NumLab(axis). */
@@ -22874,7 +25647,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                    "Index of clipping Frame" );
    }
 
-/* The bounds of the plotting area. */   
+/* The bounds of the plotting area in graphics coords. */   
    astWriteDouble( channel, "Xlo", 1, 1, this->xlo,
                    "Lower X bound of plotting area" );
    astWriteDouble( channel, "Ylo", 1, 1, this->ylo,
@@ -22887,6 +25660,17 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Axis reversal flags. */
    astWriteInt( channel, "Xrev", 1, 0, this->xrev, "X axis reversed?" );
    astWriteInt( channel, "Yrev", 1, 0, this->yrev, "Y axis reversed?" );
+
+/* The bounds of the plotting area in the base Frame of the FrameSet
+   supplied when the Plot was constructed. */   
+   astWriteDouble( channel, "Xb1", 1, 1, this->bbox[ 0 ],
+                   "Lower X bound of supplied base Frame" );
+   astWriteDouble( channel, "Yb1", 1, 1, this->bbox[ 1 ],
+                   "Lower Y bound of supplied base Frame" );
+   astWriteDouble( channel, "Xb2", 1, 1, this->bbox[ 2 ],
+                   "Upper X bound of supplied base Frame" );
+   astWriteDouble( channel, "Yb2", 1, 1, this->bbox[ 3 ],
+                   "Upper Y bound of supplied base Frame" );
 
 /* Return. */
    return;
@@ -23130,12 +25914,12 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 */
 
 /* Local Variables: */
-   AstPlot *new;                /* Pointer to new Plot */
    AstFrame *baseframe;         /* Pointer to base frame */
    AstFrame *graphicsframe;     /* Pointer to graphics frame */
    AstFrameSet *fset0;          /* The n-D FrameSet to be annotated */
    AstFrameSet *fset;           /* The 2-D FrameSet to be annotated */
-   AstWinMap *winmap;           /* Mapping which scales and shifts coords */
+   AstPlot *new;                /* Pointer to new Plot */
+   AstWinMap *map;              /* Mapping for converting bbox -> gbox */
    char *mess;                  /* Pointer to a descriptive message */
    double gbox[ 4 ];            /* Double precision version of "graphbox" */
    int axis;                    /* Axis index, 0 or 1 */
@@ -23261,34 +26045,6 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       gbox[ 2 ] = (double) graphbox[ 2 ];
       gbox[ 3 ] = (double) graphbox[ 3 ];
 
-/* Create a mapping which describes the transformation from graphics 
-   coordinates to the base (pixel) frame of the supplied FrameSet. This 
-   will be a scale and shift on each axis, and is implemented as a WinMap. */
-      winmap = astWinMap( 2, gbox, gbox + 2, basebox, basebox + 2, "" );
-
-/* Get the index of the current (physical) and base (pixel) Frames in 
-   the supplied FrameSet. */
-      bi = astGetBase( fset );
-      ci = astGetCurrent( fset );
-
-/* Temporarily set the current Frame to be the pixel frame. */
-      astSetCurrent( fset, bi );
-
-/* Add the supplied FrameSet into the Plot (i.e. FrameSet) created 
-   earlier. This leaves the graphics frame with index 1 in the 
-   returned  Plot. */
-      astAddFrame( (AstFrameSet *) new, 1, winmap, fset );
-
-/* Set the current Frame in the Plot to be the physical coordinate Frame 
-   (with index incremented by one because the graphics Frame has been added). */
-      astSetCurrent( (AstFrameSet *) new, ci + 1 );
-
-/* Re-establish the original current Frame in the supplied FrameSet. */
-      astSetCurrent( fset, ci );
-
-/* Annul the mapping */
-      winmap = astAnnul( winmap );
-
 /* Store the bounds in graphics coordinates of the clipping box, ensuring
    that the low bound is lower than the high bound. Set flags to indicate
    if the supplied bounds has to be reversed to do this (some graphics
@@ -23312,6 +26068,40 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
          new->ylo = gbox[ 3 ];
          new->yrev = 1;
       }
+
+/* Store the bounds of the Plot within the base Frame of the supplied
+   FrameSet. */
+      new->bbox[ 0 ] = basebox[ 0 ];
+      new->bbox[ 1 ] = basebox[ 1 ];
+      new->bbox[ 2 ] = basebox[ 2 ];
+      new->bbox[ 3 ] = basebox[ 3 ];
+
+/* We initially assume that the base Frame of the supplied FrameSet is
+   mapped lineary onto the graphics frame. This may be changed later by
+   assigning values to the LogPlot attributes. Create a WinMap which 
+   maps the base box (within the base Frame of the supplied FrameSet) 
+   onto the graphics box. */
+      map = astWinMap( 2, gbox, gbox + 2, basebox, basebox + 2, "" );
+
+/* Get the index of the current (physical) and base (pixel) Frames in 
+   the supplied FrameSet. */
+      bi = astGetBase( fset );
+      ci = astGetCurrent( fset );
+
+/* Temporarily set the current Frame to be the pixel frame. */
+      astSetCurrent( fset, bi );
+
+/* Add the supplied FrameSet into the Plot (i.e. FrameSet) created 
+   earlier. This leaves the graphics frame with index 1 in the 
+   returned  Plot. We use the linear mapping initially. */
+      astAddFrame( (AstFrameSet *) new, 1, map, fset );
+
+/* Set the current Frame in the Plot to be the physical coordinate Frame 
+   (with index incremented by one because the graphics Frame has been added). */
+      astSetCurrent( (AstFrameSet *) new, ci + 1 );
+
+/* Re-establish the original current Frame in the supplied FrameSet. */
+      astSetCurrent( fset, ci );
 
 /* Store a value of -1.0 for Tol to indicate that no value has yet been
    set. This will cause a default value of 0.001 to be used. */
@@ -23363,7 +26153,10 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       new->GLine = CGLineWrapper;
       new->GMark = CGMarkWrapper;
       new->GText = CGTextWrapper;
+      new->GCap = CGCapWrapper;
       new->GTxExt = CGTxExtWrapper;
+      new->GScales = CGScalesWrapper;
+      new->GQch = CGQchWrapper;
 
       for( i = 0; i < AST__NGRFFUN; i++ ) new->grffun[i] = NULL;
       new->grfstack = NULL;
@@ -23441,6 +26234,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    found automatically by default. */
       new->gap[ 0 ] = AST__BAD;
       new->gap[ 1 ] = AST__BAD;
+      new->loggap[ 0 ] = AST__BAD;
+      new->loggap[ 1 ] = AST__BAD;
       new->mintick[ 0 ] = -1;
       new->mintick[ 1 ] = -1;
 
@@ -23461,9 +26256,21 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
          new->size[ id ] = AST__BAD;
       }
 
+/* Log/lin attributes. Default value is to use linear axes. */
+      new->logplot[ 0 ] = -1;
+      new->logplot[ 1 ] = -1;
+
+      new->logticks[ 0 ] = -1;
+      new->logticks[ 1 ] = -1;
+
+      new->loglabel[ 0 ] = -1;
+      new->loglabel[ 1 ] = -1;
+
 /* Initialise the components used to store the values actually used
    for attributes which have dynamic defaults. */
       for( axis = 0; axis < 2; axis++ ) {
+         new->ulglb[ axis ] = new->loglabel[ axis ];
+         new->ulgtk[ axis ] = new->logticks[ axis ];
          new->ugap[ axis ] = new->gap[ axis ];
          new->ucentre[ axis ] = new->centre[ axis ];
          new->uedge[ axis ] = new->edge[ axis ];
@@ -23480,6 +26287,11 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 
 /* Initialise the protected Ink attribute so that visible ink is used. */
       new->ink = -1;
+
+/* A stack of AstGat pointers used to store the graphical attributes for
+   text within strings which include graphical escape sequences. */
+      new->gat = NULL;
+      new->ngat = 0;
 
    }
 
@@ -23668,6 +26480,33 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
                                                      new->labelup[ axis ] );
       }
 
+/* LogPlot(axis). */
+/* -------------- */
+      for( axis = 0; axis < 2; axis++ ){
+         (void) sprintf( buff, "lgplt%d", axis + 1 );
+         new->logplot[ axis ] = astReadInt( channel, buff, -1 );
+         if ( TestLogPlot( new, axis ) ) SetLogPlot( new, axis,
+                                                     new->logplot[ axis ] );
+      }
+
+/* LogTicks(axis). */
+/* -------------- */
+      for( axis = 0; axis < 2; axis++ ){
+         (void) sprintf( buff, "lgtck%d", axis + 1 );
+         new->logticks[ axis ] = astReadInt( channel, buff, -1 );
+         if ( TestLogTicks( new, axis ) ) SetLogTicks( new, axis,
+                                                       new->logticks[ axis ] );
+      }
+
+/* LogLabel(axis). */
+/* -------------- */
+      for( axis = 0; axis < 2; axis++ ){
+         (void) sprintf( buff, "lglbl%d", axis + 1 );
+         new->loglabel[ axis ] = astReadInt( channel, buff, -1 );
+         if ( TestLogLabel( new, axis ) ) SetLogLabel( new, axis,
+                                                       new->loglabel[ axis ] );
+      }
+
 /* DrawAxes. */
 /* --------- */
       new->drawaxes[ 0 ] = astReadInt( channel, "drwaxs", -1 );
@@ -23689,13 +26528,8 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
 
 /* Escape. */
 /* ------- */
-/* NOTE - this attribute is not currently used. The following code should
-   be uncommented when facilities exist in the rest of AST to support its
-   use. (ENABLE-ESCAPE) */
-   /*
       new->escape = astReadInt( channel, "escape", -1 );
       if ( TestEscape( new ) ) SetEscape( new, new->escape );
-   */
 
 /* LabelAt(axis). */
 /* -------------- */
@@ -23721,6 +26555,14 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          (void) sprintf( buff, "gap%d", axis + 1 );
          new->gap[ axis ] = astReadDouble( channel, buff, AST__BAD );
          if ( TestGap( new, axis ) ) SetGap( new, axis, new->gap[ axis ] );
+      }
+
+/* LogGap(axis). */
+/* ------------- */
+      for( axis = 0; axis < 2; axis++ ){
+         (void) sprintf( buff, "lggap%d", axis + 1 );
+         new->loggap[ axis ] = astReadDouble( channel, buff, AST__BAD );
+         if ( TestLogGap( new, axis ) ) SetLogGap( new, axis, new->loggap[ axis ] );
       }
 
 /* NumLabGap(axis). */
@@ -23932,7 +26774,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          new->clip_ubnd = NULL;
       }
 
-/* The bounds of the plotting area. */   
+/* The bounds of the plotting area in graphics coords. */   
       new->xlo = astReadDouble( channel, "xlo", 0.0 );
       new->xhi = astReadDouble( channel, "xhi", 1.0 );
       new->ylo = astReadDouble( channel, "ylo", 0.0 );
@@ -23942,6 +26784,13 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->xrev = astReadInt( channel, "xrev", 0 );
       new->yrev = astReadInt( channel, "yrev", 0 );
 
+/* The bounds of the plotting area in the base Frame of the FrameSet
+   supplied when the Plot was constructed. */   
+      new->bbox[ 0 ] = astReadDouble( channel, "xb1", AST__BAD );
+      new->bbox[ 1 ] = astReadDouble( channel, "yb1", AST__BAD );
+      new->bbox[ 2 ] = astReadDouble( channel, "xb2", AST__BAD );
+      new->bbox[ 3 ] = astReadDouble( channel, "yb2", AST__BAD );
+
 /* Grf. */
       new->grf = -1;
       new->GAttr = CGAttrWrapper;
@@ -23949,10 +26798,18 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
       new->GLine = CGLineWrapper;
       new->GMark = CGMarkWrapper;
       new->GText = CGTextWrapper;
+      new->GCap = CGCapWrapper;
       new->GTxExt = CGTxExtWrapper;
+      new->GScales = CGScalesWrapper;
+      new->GQch = CGQchWrapper;
       for( i = 0; i < AST__NGRFFUN; i++ ) new->grffun[i] = NULL;
       new->grfstack = NULL;
       new->grfnstack = 0;
+
+/* A stack of AstGat pointers used to store the graphical attributes for
+   text within strings which include graphical escape sequences. */
+      new->gat = NULL;
+      new->ngat = 0;
 
 /* If an error occurred, clean up by deleting the new Plot. */
       if ( !astOK ) new = astDelete( new );
@@ -24055,6 +26912,16 @@ void astGrfPop_( AstPlot *this ){
 void astGrfWrapper_( AstPlot *this, const char *name, AstGrfWrap wrapper ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,GrfWrapper))(this,name,wrapper);
+}
+
+void astSetLogPlot_( AstPlot *this, int axis, int value ) { 
+   if ( !astOK ) return; 
+   (**astMEMBER(this,Plot,SetLogPlot))( this, axis, value ); 
+}
+
+void astClearLogPlot_( AstPlot *this, int axis ) { 
+   if ( !astOK ) return; 
+   (**astMEMBER(this,Plot,ClearLogPlot))( this, axis ); 
 }
 
 /* Special public interface functions. */
@@ -24308,3 +27175,27 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

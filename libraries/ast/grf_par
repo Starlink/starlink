@@ -57,3 +57,51 @@
       INTEGER GRF__NATTR 
       PARAMETER ( GRF__NATTR = 5 )
 
+*  Values identifying capabilities.
+      INTEGER GRF__ESC 
+      PARAMETER ( GRF__ESC = 0 )
+
+      INTEGER GRF__MJUST 
+      PARAMETER ( GRF__MJUST = 1 )
+
+      INTEGER GRF__SCALES
+      PARAMETER ( GRF__SCALES = 2 )
+
+* Values identifying types of graphics escape sequence
+      INTEGER GRF__ESPER
+      PARAMETER ( GRF__ESPER = 1 )
+
+      INTEGER GRF__ESSUP
+      PARAMETER ( GRF__ESSUP = 2 )
+
+      INTEGER GRF__ESSUB
+      PARAMETER ( GRF__ESSUB = 3 )
+
+      INTEGER GRF__ESGAP
+      PARAMETER ( GRF__ESGAP = 4 )
+
+      INTEGER GRF__ESBAC
+      PARAMETER ( GRF__ESBAC = 5 )
+
+      INTEGER GRF__ESSIZ
+      PARAMETER ( GRF__ESSIZ = 6 )
+
+      INTEGER GRF__ESWID
+      PARAMETER ( GRF__ESWID = 7 )
+
+      INTEGER GRF__ESFON
+      PARAMETER ( GRF__ESFON = 8 )
+
+      INTEGER GRF__ESCOL
+      PARAMETER ( GRF__ESCOL = 9 )
+
+      INTEGER GRF__ESSTY
+      PARAMETER ( GRF__ESSTY = 10 )
+
+      INTEGER GRF__ESPOP
+      PARAMETER ( GRF__ESPOP = 11 )
+
+      INTEGER GRF__ESPSH
+      PARAMETER ( GRF__ESPSH = 12 )
+
+

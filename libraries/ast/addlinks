@@ -34,6 +34,8 @@
    }
 
 #  Loop through the input data.
+   $sdiy = 0;
+   $inr = 0;
    $source_line = 10;
    $verbatim = 0;
    while ( <> ) {
@@ -43,6 +45,35 @@
       ( $ss ) = /^ *\\subsection\{/;     # Latex subsection
       ( $sss ) = /^ *\\subsubsection\{/; # Latex subsubsection
       ( $sr ) = /^ *\\sstroutine\{/;     # SST routine description
+
+#  We only consider sst diytopic sections to be of significance if they 
+#  introduce a listing of attributes or Functions. This is so that these 
+#  sections always contain links. SO if the previous line was a diytopic 
+#  line, see if this line contains the single word "Attributes" or 
+#  "Functions"
+      if( $sdiy ) {
+         ( $attrfun ) = /^ *(Attributes|Functions) *$/;
+         $linkatfun = 0;               
+         $sdiy = 0;
+      } else {
+         ( $sdiy ) = /^ *\\sstdiytopic\{/;  
+      }
+
+# Do not make links in the introductory text in an Attributes or
+# Functions DIY section.
+      if( $attrfun ) {
+         if( /^ *\\sstitemlist\{/ ) { $linkatfun = 1 };
+      } else {
+         $linkatfun = 0;               
+      }
+
+#  Watch for the end of the list of attributes or functions.
+      if( $attrfun ) {
+         if( /^ *\} *$/ ) {
+            $attrfun = 0;
+            $linkatfun = 0;
+         }
+      }
 
 #  Note if a new section has started.
       $sx = ( $s || $ss || $sss || $sr );
@@ -73,6 +104,7 @@
 
 #  Consider generating a link for each label matched.
       for $label ( @match ) {
+         $label_q = quotemeta( $label );
 
 #  In an SST routine description, extract the name of the routine from
 #  the second source line and mark the label of that name "used". This
@@ -84,18 +116,28 @@
              s/$/\\sstlabel{$label_x}/;
          }
 
+#  If we are in a Functions or Attributes section, see if the match occurs
+#  at the start of the line and is followed by a colon. If it is, it is the 
+#  name of the main Function or Attribute being described and so should be 
+#  linkified.
+         $atfun = ( $linkatfun && ( /^ *$label_q:/ ) );
+
 #  Check if a link should be made. Omit links in "verbatim" environments,
 #  in any line which starts a new section (because labels don't work properly
 #  if they get into the table of contents), in the 4th line of an SST
 #  routine description (because these also go into the TOC), or if the label
-#  has already been used in this section. Note each label which is used.
-         if ( !$verbatim &&
-              !$sx &&
-              !( $inr && ( $source_line == 4 ) ) &&
-              !$used{ $label }++ )  {
+#  has already been used in this section. We always linkify any match if it 
+#  is in a list of Function or Attribute descriptions, if it is at the start 
+#  of the line  and is followed by a colon.
+         if ( $atfun || ( !$verbatim &&
+                          !$sx &&
+                          !( $inr && ( $source_line == 4 ) ) &&
+                          !$used{ $label } ) )  {
+
+# Increment the number of usages of this label.
+            $used{ $label }++;
 
 #  Labels must be whole words unless they start/end without an alphanumeric.
-            $label_q = quotemeta( $label );
             if ( $label =~ m/^\w/ ) { $label_q = "\\b" . $label_q };
             if ( $label =~ m/\w$/ ) { $label_q = $label_q . "\\b" };
 

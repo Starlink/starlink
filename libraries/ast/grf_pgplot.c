@@ -42,6 +42,9 @@
 *        o  Changed interpretation of the Width attribute from inches, to
 *        a multiple of a small line width.
 *        o  Wrapper for pgplot F77 subroutine PGQVSZ added.
+*     30-JAN-2004 (DSB):
+*        o  Added GCap
+*        o  Renamed GAxScale as GScales
 */
 
 /* Macros */
@@ -159,6 +162,175 @@ int astGFlush( void ){
 
    ccpgupdt();
    return 1;
+}
+
+int astGCap( int cap, int value ){
+/*
+*+
+*  Name:
+*     astGCap
+
+*  Purpose:
+*     Indicate if this grf module has a given capability.
+
+*  Synopsis:
+*     #include "grf.h"
+*     int astGCap( int cap, int value )
+
+*  Description:
+*     This function is called by the AST Plot class to determine if the
+*     grf module has a given capability, as indicated by the "cap"
+*     argument.
+
+*  Parameters:
+*     cap
+*        The capability being inquired about. This will be one of the
+*        following constants defined in grf.h:
+*        
+*        GRF__SCALES: This function should return a non-zero value if 
+*        it implements the astGScales function, and zero otherwise. The 
+*        supplied "value" argument should be ignored.
+*
+*        GRF__MJUST: This function should return a non-zero value if 
+*        the astGText and astGTxExt functions recognise "M" as a 
+*        character in the justification string. If the first character of
+*        a justification string is "M", then the text should be justified
+*        with the given reference point at the bottom of the bounding box. 
+*        This is different to "B" justification, which requests that the
+*        reference point be put on the baseline of the text, since some 
+*        characters hang down below the baseline. If the astGText or
+*        astGTxExt function cannot differentiate between "M" and "B",
+*        then this function should return zero, in which case "M"
+*        justification will never be requested by Plot. The supplied
+*        "value" argument should be ignored.
+*
+*        GRF__ESC: This function should return a non-zero value if the
+*        astGText and astGTxExt functions can recognise and interpret
+*        graphics escape sequences within the supplied string. These
+*        escape sequences are described below. Zero should be returned 
+*        if escape sequences cannot be interpreted (in which case the
+*        Plot class will interpret them itself if needed). The supplied
+*        "value" argument should be ignored only if escape sequences cannot 
+*        be interpreted by astGText and astGTxExt. Otherwise, "value"
+*        indicates whether astGText and astGTxExt should interpret escape
+*        sequences in subsequent calls. If "value" is non-zero then
+*        escape sequences should be interpreted by astGText and
+*        astGTxExt. Otherwise, they should be drawn as literal text.
+
+*  Returned Value:
+*     The return value, as described above. Zero should be returned if
+*     the supplied capability is not recognised.
+
+*  Escape Sequences:
+*     Escape sequences are introduced into the text string by a percent 
+*     "%" character. The following escape sequences are currently recognised 
+*     ("..." represents a string of one or more decimal digits):
+*
+*       %%      - Print a literal "%" character (type GRF__ESPER ).
+*
+*       %^...+  - Draw subsequent characters as super-scripts. The digits
+*                 "..." give the distance from the base-line of "normal" 
+*                 text to the base-line of the super-script text, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text (type GRF__ESSUP ).
+*       %^+     - Draw subsequent characters with the normal base-line.
+*
+*       %v...+  - Draw subsequent characters as sub-scripts. The digits
+*                 "..." give the distance from the base-line of "normal" 
+*                 text to the base-line of the sub-script text, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text (type GRF__ESSUB ).
+*
+*       %v+     - Draw subsequent characters with the normal base-line
+*                 (equivalent to %^+).
+*
+*       %>...+  - Leave a gap before drawing subsequent characters.
+*                 The digits "..." give the size of the gap, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text (type GRF__ESGAP ).
+*
+*       %<...+  - Move backwards before drawing subsequent characters.
+*                 The digits "..." give the size of the movement, scaled 
+*                 so that a value of "100" corresponds to the height of 
+*                 "normal" text (type GRF_ESBAC).
+*
+*       %s...+  - Change the Size attribute for subsequent characters. The
+*                 digits "..." give the new Size as a fraction of the 
+*                 "normal" Size, scaled so that a value of "100" corresponds 
+*                 to 1.0  (type GRF__ESSIZ ).
+*
+*       %s+     - Reset the Size attribute to its "normal" value.
+*
+*       %w...+  - Change the Width attribute for subsequent characters. The
+*                 digits "..." give the new width as a fraction of the 
+*                 "normal" Width, scaled so that a value of "100" corresponds 
+*                 to 1.0  (type GRF__ESWID ).
+*
+*       %w+     - Reset the Size attribute to its "normal" value.
+*
+*       %f...+  - Change the Font attribute for subsequent characters. The
+*                 digits "..." give the new Font value  (type GRF__ESFON ).
+*
+*       %f+     - Reset the Font attribute to its "normal" value.
+*
+*       %c...+  - Change the Colour attribute for subsequent characters. The
+*                 digits "..." give the new Colour value  (type GRF__ESCOL ).
+*
+*       %c+     - Reset the Colour attribute to its "normal" value.
+*
+*       %t...+  - Change the Style attribute for subsequent characters. The
+*                 digits "..." give the new Style value  (type GRF__ESSTY ). 
+*
+*       %t+     - Reset the Style attribute to its "normal" value.
+*
+*       %-      - Push the current graphics attribute values onto the top of 
+*                 the stack - see "%+" (type GRF__ESPSH).
+*
+*       %+      - Pop attributes values of the top the stack - see "%-". If
+*                 the stack is empty, "normal" attribute values are restored
+*                 (type GRF__ESPOP).
+*     
+*     The astFindEscape function (in libast.a) can be used to locate escape 
+*     sequences within a text string. It has the following signature:
+*
+*     #include "plot.h"
+*     int astFindEscape( const char *text, int *type, int *value, int *nc )
+*
+*     Parameters:
+*        text
+*           Pointer to the string to be checked.
+*        type
+*           Pointer to a location at which to return the type of escape
+*           sequence. Each type is identified by a symbolic constant defined
+*           in grf.h and is indicated in the above section. The returned value 
+*           is undefined if the supplied text does not begin with an escape 
+*           sequence.
+*        value
+*           Pointer to a lcation at which to return the integer value
+*           associated with the escape sequence. All usable values will be
+*           positive. Zero is returned if the escape sequence has no associated
+*           integer. A value of -1 indicates that the attribute identified by 
+*           "type" should be reset to its "normal" value (as established using 
+*           the astGAttr function, etc). The returned value is undefined if 
+*           the supplied text does not begin with an escape sequence.
+*        nc
+*           Pointer to a location at which to return the number of
+*           characters read by this call. If the text starts with an escape
+*           sequence, the returned value will be the number of characters in
+*           the escape sequence. Otherwise, the returned value will be the
+*           number of characters prior to the first escape sequence, or the 
+*           length of the supplied text if no escape sequence is found.
+      
+*     Returned Value:
+*        A non-zero value is returned if the supplied text starts with a
+*        graphics escape sequence, and zero is returned otherwise.
+
+*-
+*/
+
+   int result = 0;
+   if( cap == GRF__SCALES ) result = 1;
+   return result;
 }
 
 int astGLine( int n, const float *x, const float *y ){
@@ -338,7 +510,7 @@ int astGText( const char *text, float x, float y, const char *just,
 /* Find the conversion factors between increment in world coordinate axes, 
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
-      if( !astGAxScale( &alpha, &beta ) ) return 0;
+      if( !astGScales( &alpha, &beta ) ) return 0;
 
 /* If either axis is reversed, reverse the supplied up-vector components
    so that they refer to the world-coordinates axes. */
@@ -409,18 +581,18 @@ int astGText( const char *text, float x, float y, const char *just,
    return 1;
 }               
 
-int astGAxScale( float *alpha, float *beta ){
+int astGScales( float *alpha, float *beta ){
 /*
 *+
 *  Name:
-*     astGAxScale
+*     astGScales
 
 *  Purpose:
 *     Get the axis scales.
 
 *  Synopsis:
 *     #include "grf.h"
-*     int astGAxScale( float *alpha, float *beta )
+*     int astGScales( float *alpha, float *beta )
 
 *  Description:
 *     This function returns two values (one for each axis) which scale
@@ -462,7 +634,7 @@ int astGAxScale( float *alpha, float *beta ){
       *beta = ( ny2 - ny1 ) / ( wy2 - wy1 );
       ret = 1;
    } else {
-      astError( AST__GRFER, "astGAxScale: The graphics window or viewport has zero size." );
+      astError( AST__GRFER, "astGScales: The graphics window or viewport has zero size." );
       ret = 0;
    }
 
@@ -584,7 +756,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 /* Find the conversion factors between increment in world coordinate axes, 
    and the corresponding increments in millimetres ( Xmm = alpha*Xworld,
    Ymm = beta*Yworld ). */
-      if( !astGAxScale( &alpha, &beta ) ) return 0;
+      if( !astGScales( &alpha, &beta ) ) return 0;
 
 /* If either axis is reversed, reverse the supplied up-vector components
    so that they refer to the world-coordinates axes. */
