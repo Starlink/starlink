@@ -147,6 +147,7 @@
       bind .qman.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
 
       .qman.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $QmanTask $cmd"
+      .qman.mb.file.menu add command -underline 0 -label Print -command "cgs4drPrint $QmanTask"
       .qman.mb.options.menu add cascade -underline 0 -label "Enter / Remove ..." -menu .qman.mb.options.menu.enter
       .qman.mb.options.menu.enter add command -underline 4 -label "End Group" -command "qmanEGroup $QmanTask"
       .qman.mb.options.menu.enter add command -underline 4 -label "End Range" -command "qmanERange $QmanTask"
@@ -213,6 +214,7 @@
       bind .p4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
 
       .p4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $P4Task $cmd"
+      .p4.mb.file.menu add command -underline 0 -label Print -command "cgs4drPrint $P4Task"
       .p4.mb.options.menu add cascade -underline 7 -label "Colour Manipulation" -menu .p4.mb.options.menu.colours
       .p4.mb.options.menu.colours add command -underline 4 -label "Set Look-Up-Table" -command "p4Lut $P4Task"
       .p4.mb.options.menu.colours add command -underline 4 -label "Set Widget Colours" -command "p4Colours $P4Task"
@@ -281,6 +283,7 @@
       bind .red4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
 
       .red4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $Red4Task $cmd"
+      .red4.mb.file.menu add command -underline 0 -label Print -command "cgs4drPrint $Red4Task"
       .red4.mb.options.menu add checkbutton -underline 0 -label "Verbose Output" -variable Red4Widgets(VERBOSE)
       .red4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $Red4Task"
       .red4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $Red4Task"
@@ -336,6 +339,7 @@
       bind .cred4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
 
       .cred4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $Cred4Task $cmd"
+      .cred4.mb.file.menu add command -underline 0 -label Print -command "cgs4drPrint $Cred4Task"
       .cred4.mb.options.menu add command -underline 0 -label "List Masks" -command "cred4ListMasks $Cred4Task"
       .cred4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $Cred4Task $Cred4NoticeBoard"
       .cred4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $Cred4Task $Cred4NoticeBoard"
