@@ -82,7 +82,8 @@ INCLUDES	= -I../include  \
                   -I../../skycat/cat/astrocat/include \
                   -I../../skycat/cat/tclcat/include \
                   -I../../skycat/tclutil/tix/unix \
-	          $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
+	          $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) \
+	          $(ADDINCS) -I$(STAR_INC)
 
 DEFINES         = \
                 -DGAIA_VERSION=\"@GAIA_VERSION@\" \
