@@ -20,6 +20,9 @@
 *     sets up constants for the maximum and minimum values of the
 *     resulting integral types.
 *
+*     This file should therefore be included after limits.h, if the
+*     constants INT_BIG_MAX etc are required.
+*
 *  Author:
 *     MBT: Mark Taylor (Starlink)
 *

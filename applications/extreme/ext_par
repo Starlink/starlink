@@ -26,5 +26,6 @@
 
 *  Long integer constant of with value zero.
       INTEGER * 8 EXT__ZERO
+      PARAMETER( EXT__ZERO = 0 )
 
 * $Id$
