@@ -61,7 +61,7 @@
 *        take the form of a comma separated list of identifiers, or any of 
 *        the other forms described in the help on "Group Expressions". A 
 *        separate, unique, non-blank identifier should be supplied for each 
-*        data file specified by parameter IN, in the saem order as the data 
+*        data file specified by parameter IN, in the same order as the data 
 *        files. If a null (!) value is supplied, then any existing IMGID
 *        values in the POLPACK extensions are retained. Default values 
 *        equal to the name of the data file are used if there is no 
