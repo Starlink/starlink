@@ -121,6 +121,7 @@
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
 *    Local variables :
+      BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
       DOUBLE PRECISION BOL_DEC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! apparent Dec of the bolometers at
@@ -339,6 +340,9 @@
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', INDF, STATUS)
+
+* Get the bad bit mask
+      CALL NDF_BB(INDF, BADBIT, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -1413,7 +1417,8 @@
      :                    %val(OUT_DATA_PTR + DATA_OFFSET * VAL__NBR), 
      :                    %val(OUT_VARIANCE_PTR+DATA_OFFSET*VAL__NBR),
      :                    %val(OUT_QUALITY_PTR +DATA_OFFSET*VAL__NBI),
-     :                    BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ, STATUS)
+     :                    BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ, BADBIT,
+     :                    STATUS)
                      END DO
                   END DO
                END DO
@@ -1430,26 +1435,32 @@
          CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
          CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
 
-      CALL NDF_AMAP (OUTNDF, 'CENTRE', 2, '_REAL', 'WRITE',
-     :  OUT_A_PTR, ITEMP, STATUS)
-      IF (STATUS .EQ. SAI__OK) THEN
+         CALL NDF_AMAP (OUTNDF, 'CENTRE', 2, '_REAL', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
 
-         POSITION = 0
+            POSITION = 0
 
-         DO I = 1, N_MEASUREMENTS * N_INTEGRATIONS
-            DO J = 1, JIGGLE_COUNT
-               RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
-               CALL SCULIB_CFILLR(1,RTEMP,
-     :              %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
-               POSITION = POSITION + 1
+            DO I = 1, N_MEASUREMENTS * N_INTEGRATIONS
+               DO J = 1, JIGGLE_COUNT
+                  RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
+                  CALL SCULIB_CFILLR(1,RTEMP,
+     :                 %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
+                  POSITION = POSITION + 1
+               END DO
             END DO
-         END DO
+            
+         END IF
+         CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
+         
+         CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
 
-      END IF
-      CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
+* and a title
 
-      CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
-
+         CALL NDF_CPUT(OBJECT, OUTNDF, 'Title', STATUS)
+         CALL NDF_CPUT('Volts', OUTNDF, 'UNITS', STATUS)
+         CALL NDF_CPUT('Extinction corrected',OUTNDF, 'LAB', STATUS)
+ 
 *  unmap the main data array
 
          CALL NDF_UNMAP (OUTNDF, '*', STATUS)
