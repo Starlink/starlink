@@ -572,7 +572,7 @@
       DO P = 1, NPAGE
 
 *      Find last field on this page
-        JFLD = IFLD
+        JFLD = IFLD + 1
         FOUND = .FALSE.
         DO WHILE ( (JFLD.LE.NFLD) .AND. .NOT. FOUND )
           IF ( JFLD .GT. 1 ) THEN
