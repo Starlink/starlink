@@ -296,6 +296,8 @@ f     using AST_GRID
 *     16-AUG-2001 (DSB):
 *        Remove the check for very short segments introduced above, as it 
 *        caused south pole tan projection to include some spurious lines.
+*     20-SEP-2001 (DSB):
+*        Initialize baseframe to NULL in astInitPlot (prevents segvios).
 *class--
 */
 
@@ -21044,6 +21046,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 
 /* Initialise. */
    new = NULL;
+   baseframe = NULL;
 
 /* First of all we need to ensure that we have a FrameSet and a base 
    Frame on which to base the new Plot. If a NULL Frame pointer was 
