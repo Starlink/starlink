@@ -2069,7 +2069,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
          } else if ( system == AST__AIRWAVE ) {
             TRANSFORM_0( "AWTOFR" )
 
-/* If the target system is relative, we first need to convert to relativistic 
+/* If the target system is relative, we first need to convert to apparent radial 
    velocity, and then to frequency using the rest frequency. Report an
    error if the rest frequency is undefined. */
          } else {
@@ -2112,7 +2112,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
          }
       }
 
-/* Now if the alignment system is relativistic velocity, convert from  
+/* Now if the alignment system is apparent radial velocity, convert from  
    frequency to relativisitic velocity. */
       if( align_sys == AST__VREL ) {
          if( rest_freq != AST__BAD ) {
@@ -2148,7 +2148,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
          } else if ( system == AST__AIRWAVE ) {
             TRANSFORM_0( "AWTOFR" )
 
-/* If the target system is relative, we first need to convert to relativistic 
+/* If the target system is relative, we first need to convert to apparent radial 
    velocity, and then to frequency using the rest frequency. Report an
    error if the rest frequency is undefined. */
          } else if( system != AST__FREQ ) {
@@ -2178,11 +2178,11 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
             }
          }
 
-/* If the alignment system is relativistic velocity, convert to relativistic
+/* If the alignment system is apparent radial velocity, convert to apparent radial
    velocity. */
       } else {
 
-/* If the target system is relative, we can convert directly to relativistic 
+/* If the target system is relative, we can convert directly to apparent radial 
    velocity. */
          if ( system == AST__VRADIO ) {
             TRANSFORM_0( "VRTOVL" )
@@ -2197,7 +2197,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
             TRANSFORM_0( "BTTOVL" )
 
 /* If the target system is absolute, we first need to convert to frequency
-   and then to relativistic velocity using the rest frequency. Report an
+   and then to apparent radial velocity using the rest frequency. Report an
    error if the rest frequency is undefined. */
          } else if( system != AST__VREL ) {
             if ( system == AST__ENERGY ) {
@@ -2286,7 +2286,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
          } else if ( system == AST__AIRWAVE ) {
             TRANSFORM_0( "FRTOAW" )
 
-/* If the result system is relative, we first need to convert to relativistic 
+/* If the result system is relative, we first need to convert to apparent radial 
    velocity from frequency using the rest frequency. Report an error if the 
    rest frequency is undefined. */
          } else {
@@ -2302,7 +2302,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                }
             }
 
-/* Now convert from relativistic velocity to the required result system. */
+/* Now convert from apparent radial velocity to the required result system. */
             if ( system == AST__VRADIO ) {
                TRANSFORM_0( "VLTOVR" )
    
@@ -2339,7 +2339,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
          } else if ( system == AST__AIRWAVE ) {
             TRANSFORM_0( "FRTOAW" )
 
-/* If the result system is relative, we first need to convert to relativistic 
+/* If the result system is relative, we first need to convert to apparent radial 
    velocity using the rest frequency. Report an error if the rest frequency 
    is undefined. */
          } else if( system != AST__FREQ ) {
@@ -2355,7 +2355,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                }
             }
 
-/* Then convert from relativistic velocity to the required result system. */
+/* Then convert from apparent radial velocity to the required result system. */
             if ( system == AST__VRADIO ) {
                TRANSFORM_0( "VLTOVR" )
    
@@ -2370,11 +2370,11 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
             }
          }
 
-/* If the alignment system is relativistic velocity... */
+/* If the alignment system is apparent radial velocity... */
       } else {
 
 /* If the result system is relative, we can convert directly from
-   relativistic velocity. */
+   apparent radial velocity. */
          if ( system == AST__VRADIO ) {
             TRANSFORM_0( "VLTOVR" )
 
@@ -4379,7 +4379,7 @@ static const char *SystemLabel( AstSystemType system ) {
       break;
 
    case AST__VREL:
-      result = "relativistic velocity";
+      result = "apparent radial velocity";
       break;
    }
 
@@ -4761,7 +4761,7 @@ f     When AST_FindFrame or AST_CONVERT is used on two SpecFrames (potentially
 *     following steps in the indicated order:
 *
 *     - Map values from the system used by the target (wavelength,
-*     relativistic velocity, etc) to the system specified by the
+*     apparent radial velocity, etc) to the system specified by the
 *     AlignSystem attribute, using the target's rest frequency if necessary.
 *
 *     - Map these values from the target's standard of rest to the standard of
@@ -6132,7 +6132,7 @@ f     FRAME = AST_SPECFRAME( ' ', STATUS )
 *        alignment.
 c     frame = astSpecFrame( "System=VELO, RestFreq=1.0E15, StdOfRest=LSRK" );
 f     FRAME = AST_SPECFRAME( 'System=VELO, RestFreq=1.0E15, StdOfRest=LSRK', STATUS )
-*        Creates a SpecFrame describing a relativistic velocity ("VELO") axis 
+*        Creates a SpecFrame describing a apparent radial velocity ("VELO") axis 
 *        with rest frequency 1.0E15 Hz (about 3000 Angstroms), measured
 *        in the kinematic Local Standard of Rest ("LSRK"). Since the
 *        source position has not been specified (using attributes RefRA and 

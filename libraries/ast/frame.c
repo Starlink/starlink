@@ -9192,7 +9192,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *     SpecFrame
 *        The SpecFrame class supports the following System values and
 *        associated spectral coordinate systems (the default is "WAVE" -
-*        wavelength):
+*        wavelength). They are all defined in FITS-WCS paper III:
 *
 *        - "FREQ": Frequency (GHz)
 *        - "ENER" or "ENERGY": Energy (J)
@@ -9203,7 +9203,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        - "VOPT" or "VOPTICAL": Optical velocity (km/s)
 *        - "ZOPT" or "REDSHIFT": Reshift (dimensionless)
 *        - "BETA": Beta factor (dimensionless)
-*        - "VELO" or "VREL": Relativistic velocity (km/s)
+*        - "VELO" or "VREL": Apparent radial ("relativistic") velocity (km/s)
 *
 *        The default value for the Unit attribute for each system is shown
 *        in parentheses. Note that the default value for the ActiveUnit flag
