@@ -10,7 +10,7 @@ KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch \
 kaplibs_test.f kaplibs_test.ifl
 
 # The source RCS files needed to create the kpg_source.tar file:
-KPG_SOURCES = $(KPG_NONGEN) $(KPG_GEN) kpg_ast kpg_par 
+KPG_SOURCES = $(KPG_NONGEN) $(KPG_GEN) kpg_ast kpg_par hlpcmd
 
 # Generic source files needed for kpg_source.tar:
 KPG_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \

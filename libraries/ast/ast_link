@@ -133,7 +133,7 @@
 #  file name to standard output. Otherwise, it outputs nothing.
       find() { IFS=':'; for d in $PATH; do f="${d:=.}/${1}"
                   test -x "${f}" -a ! -d "${f}" && echo "${f}" && break
-               done 
+               done;
              }
 
 #  Initialise linking options.

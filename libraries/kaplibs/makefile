@@ -458,7 +458,7 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
-KPG_PRIVATE_INCLUDES = kpg_ast kpg_par
+KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
                    $(KPG_PRIVATE_INCLUDES) 
@@ -706,7 +706,7 @@ IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM
 CTG_INCLUDE_LINKS = CTG_ERR CTG_CONST
 LPG_INCLUDE_LINKS = LPG_CONST LPG_COM
 FTS_INCLUDE_LINKS = FTS_PAR
-KPG_INCLUDE_LINKS = KPG_PAR KPG_AST
+KPG_INCLUDE_LINKS = KPG_PAR KPG_AST HLPCMD
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
                 $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) $(KPG_INCLUDE_LINKS) 
 
@@ -721,6 +721,7 @@ LPG_CONST:   lpg_const;           $(LINK) $? $@
 LPG_COM:     lpg_com;             $(LINK) $? $@
 FTS_PAR:     fts_par;             $(LINK) $? $@
 KPG_PAR:     kpg_par;             $(LINK) $? $@
+HLPCMD:      hlpcmd;              $(LINK) $? $@
 KPG_AST:     kpg_ast;             $(LINK) $? $@
 
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
