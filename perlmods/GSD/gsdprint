@@ -57,6 +57,9 @@ pod2usage(-verbose => 2) if $man;
     exit;
 };
 
+# Check if we are called gsdformat
+$formatted = 1 if $0 =~ /gsdformat/;
+
 # Need to read in the formatting info if required
 my (%jcmtname,%jcmtcomment);
 rdgsdinfo(\%jcmtname, \%jcmtcomment) if ($formatted || $list);
