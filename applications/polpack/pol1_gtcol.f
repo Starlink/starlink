@@ -82,9 +82,9 @@
          IF( REPORT .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'N', GNAME )
-            CALL ERR_REPORT( 'POL1_GTCOL_ERR1', 'A column name for '//
-     :                       '^N values is required but has not been '//
-     :                       'specified.', STATUS )
+            CALL ERR_REP( 'POL1_GTCOL_ERR1', 'A column name for '//
+     :                    '^N values is required but has not been '//
+     :                    'specified.', STATUS )
          END IF     
 
 *  Otherwise...
@@ -102,9 +102,9 @@
             IF( REPORT ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'N', ENAME )
-               CALL ERR_REPORT( 'POL1_GTCOL_ERR2', 'A column named '//
-     :                           '''^N'' is required but is not '//
-     :                           'available in the catalogue.', STATUS )
+               CALL ERR_REP( 'POL1_GTCOL_ERR2', 'A column named '//
+     :                       '''^N'' is required but is not '//
+     :                       'available in the catalogue.', STATUS )
             END IF     
 
          END IF

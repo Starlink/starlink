@@ -101,9 +101,9 @@
          IF( REPORT .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'N', FNAME )
-            CALL ERR_REPORT( 'POL1_CNEWS_ERR1', 'A column name for '//
-     :                       '^N values is required but has not been '//
-     :                       'specified.', STATUS )
+            CALL ERR_REP( 'POL1_CNEWS_ERR1', 'A column name for '//
+     :                    '^N values is required but has not been '//
+     :                    'specified.', STATUS )
          END IF     
 
 *  Otherwise, create the column.
