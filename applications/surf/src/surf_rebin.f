@@ -45,7 +45,7 @@
 *  Usage:
 *     Invoked via the REBIN command.
 
-*  ADAM arameters:
+*  ADAM parameters:
 *     REF = NDF (Read)
 *        The name of the first NDf to be rebinned. [Global]
 *     IN = NDF (Read)
@@ -103,10 +103,13 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.14  1996/11/02 00:52:10  timj
-*     Use NDF_ASSOC and REF parameter.
-*     Tweak the header
+*     Revision 1.15  1996/11/02 01:22:19  timj
+*     Tweak 'arameters' in header
 *
+c Revision 1.14  1996/11/02  00:52:10  timj
+c Use NDF_ASSOC and REF parameter.
+c Tweak the header
+c
 c Revision 1.13  1996/11/01  00:19:49  timj
 c Add default for OUT_OBJECT.
 c Add RD to IRAS90 output and pass current EPOCH to FITS header.
