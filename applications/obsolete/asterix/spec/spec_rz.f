@@ -257,23 +257,23 @@
         INCLUDE 'SPEC_CMN_RZ'
 *-
 
-* reset logical for new invocation of SFIT
-	IF(S_FIRST) THEN
-	  S_FIRST=.FALSE.
-	  MAXDATASET=0
-	END IF
+*  Reset logical for new invocation of SFIT
+      IF ( S_FIRST ) THEN
+	S_FIRST=.FALSE.
+	MAXDATASET=0
+      END IF
 
-* See if this dataset has been passed before
-	IF(NDS.GT.MAXDATASET) THEN
+*  See if this dataset has been passed before
+      IF ( NDS .GT. MAXDATASET ) THEN
 
-*        reset maximum dataset number
-	  MAXDATASET=NDS
+*    Reset maximum dataset number
+	MAXDATASET = NDS
 
-*        set logical to indicate compact grid detected
-	  SMALLGRID(NDS)=.FALSE.
+*    Set logical to indicate compact grid detected
+	SMALLGRID(NDS) = .FALSE.
 
-*        to find the appropriate response, get the instrument name for this dataset
-	  CALL UTIL_FINDFILE('SPEC_DIR','rz*.sdf',MAXFILES,FILES,NFOUND,
+*    To find the appropriate response, get the instrument name for this dataset
+	CALL UTIL_FINDFILE('SPEC_DIR','rz*.sdf',MAXFILES,FILES,NFOUND,
      :                                                           STATUS)
 
 *        loop until a matching grid is found
@@ -281,7 +281,6 @@
 	  DO WHILE(.NOT.SMALLGRID(NDS) .AND. I.LT.NFOUND)
 
 	   I=I+1
-D	   type*,'file found:',i,files(i)
 
 *          open each file in turn
             CALL HDS_OPEN(FILES(I),'READ',S_RZLOC(NDS),STATUS)
@@ -378,7 +377,6 @@ D	        type*,'  energy bounds values dont agree'
 
 *      end of code executed first time only for each dataset to be fitted
 	END IF
-
 
 *    Calculate the two nearest continuum temperature values
       IF ( TEMP .LT. TMIN ) THEN
@@ -516,7 +514,7 @@ D	        type*,'  energy bounds values dont agree'
 
       END
 
-	options /extend_source
+
 *+  SPEC_RZ_ADDBR - Adds bremsstrahlung to high energy bins
        SUBROUTINE SPEC_RZ_ADDBR(NEN,BREMSTART,BREMS,EMISS)
 
@@ -536,7 +534,6 @@ D	        type*,'  energy bounds values dont agree'
 
 *     Global constants :
        INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *     Import :
        INTEGER NEN                ! Number of instrument energy channels
@@ -560,7 +557,6 @@ D	        type*,'  energy bounds values dont agree'
        END
 
 
-	options /extend_source
 *+  SPEC_RZ_CORRBR- Corrects the BR normalisation
        SUBROUTINE SPEC_RZ_CORRBR(NEN,ELBOUND,EUBOUND,PARAM,BREMS,STATUS)
 
@@ -590,7 +586,6 @@ D	        type*,'  energy bounds values dont agree'
 
 *     Global constants
        INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *     Import:
        INTEGER NEN
@@ -617,16 +612,16 @@ D	        type*,'  energy bounds values dont agree'
 *-
 
 * Abundance/scaling correction
-       ABCOR=((1+0.34+0.113*PARAM(3)))/SZ2
+     ABCOR=((1+0.34+0.113*PARAM(3)))/SZ2
 
-       DO I=1,NEN
-          BREMS(I)=BREMS(I)*ABCOR*1E23/(PARAM(1)*EM10)
-       ENDDO
+     DO I = 1, NEN
+        BREMS(I)=BREMS(I)*ABCOR*1E23/(PARAM(1)*EM10)
+     END DO
 
-*     Exit
-       IF(STATUS.NE.SAI__OK) CALL ERR_REP('E','FROM SPEC_RZ_CORRBR',
-     :                                                       STATUS)
-       END
+*  Exit
+     IF(STATUS.NE.SAI__OK) CALL AST_REXIT( 'SPEC_RZ_CORRBR', STATUS )
+
+     END
 
 
 
@@ -653,7 +648,6 @@ D	        type*,'  energy bounds values dont agree'
 
 *    Global constants
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'USER_ERR'
 
