@@ -6732,8 +6732,8 @@ static void RegSetAttrib( AstRegion *this, const char *setting,
    }
 
 /* Apply the appropriate attribute setting to the base Frame. This time
-   ensure that any error caused by the attribute setting is annulled. Also
-   apply it to any uncertainty Region (the current Frameof hte
+   ensure that any error caused by the attribute setting is annulled. 
+   Also apply it to any uncertainty Region (the current Frame of the
    uncertainty Region is assumed to be equivalent to the base Frame of the
    parent Region). */
    frm = astGetFrame( this->frameset, AST__BASE );

@@ -115,6 +115,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *     29-MAR-2005 (DSB):
 *        Override astSetEpoch and astClearEpoch by implementations which
 *        propagate the changed epoch value to the component Frames.
+*     5-APR-2005 (DSB):
+*        Correct error checking in Clear/Get/Set/TestAttrib.
 *class--
 */
 
@@ -1146,34 +1148,35 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            if( astOK ) {
 
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
-            sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
+               sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
 
 /* Attempt to access the attribute. */
-            astClearAttrib( pfrm, buf2 );
+               astClearAttrib( pfrm, buf2 );
 
 /* Indicate success. */
-            if( astOK ) {
-               ok = 1;
-
-/* Otherwise clear the status value, and try again without any axis index. */
-            } else {               
-               astClearStatus;
-               astClearAttrib( pfrm, buf1 );
-
-/* Indicate success, or clear the status value. */
                if( astOK ) {
                   ok = 1;
-               } else {
-                  astClearStatus;
-               }
-            }
 
+/* Otherwise clear the status value, and try again without any axis index. */
+               } else {               
+                  astClearStatus;
+                  astClearAttrib( pfrm, buf1 );
+
+/* Indicate success, or clear the status value. */
+                  if( astOK ) {
+                     ok = 1;
+                  } else {
+                     astClearStatus;
+                  }
+               }
 
 /* Free the primary frame pointer. */
-            pfrm = astAnnul( pfrm );
+               pfrm = astAnnul( pfrm );
+            }
 
 /* If the attribute is not qualified by an axis index, try accessing it
    using the primary Frame of each axis in turn. */
@@ -2032,34 +2035,35 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            if( astOK ) {
 
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
-            sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
+               sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
 
 /* Attempt to access the attribute. */
-            result = astGetAttrib( pfrm, buf2 );
-
+               result = astGetAttrib( pfrm, buf2 );
+   
 /* Indicate success. */
-            if( astOK ) {
-               ok = 1;
-
-/* Otherwise clear the status value, and try again without any axis index. */
-            } else {               
-               astClearStatus;
-               result = astGetAttrib( pfrm, buf1 );
-
-/* Indicate success, or clear the status value. */
                if( astOK ) {
                   ok = 1;
-               } else {
+   
+/* Otherwise clear the status value, and try again without any axis index. */
+               } else {               
                   astClearStatus;
+                  result = astGetAttrib( pfrm, buf1 );
+   
+/* Indicate success, or clear the status value. */
+                  if( astOK ) {
+                     ok = 1;
+                  } else {
+                     astClearStatus;
+                  }
                }
-            }
-
-
+   
 /* Free the primary frame pointer. */
-            pfrm = astAnnul( pfrm );
+               pfrm = astAnnul( pfrm );
+            }
 
 /* If the attribute is not qualified by an axis index, try accessing it
    using the primary Frame of each axis in turn. */
@@ -5944,34 +5948,36 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            if( astOK ) {
 
 /* Create a new setting with the same name but with the axis index
    appropriate to the primary Frame. */
-            sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, setting+value );
-
+               sprintf( buf2, "%s(%d)=%s", buf1, paxis + 1, setting+value );
+   
 /* Attempt to access the attribute. */
-            astSetAttrib( pfrm, buf2 );
-
-/* Indicate success. */
-            if( astOK ) {
-               ok = 1;
-
-/* Otherwise clear the status value, and try again without any axis index. */
-            } else {               
-               astClearStatus;
-               sprintf( buf2, "%s=%s", buf1, setting+value );
                astSetAttrib( pfrm, buf2 );
-
-/* Indicate success, or clear the status value. */
+   
+/* Indicate success. */
                if( astOK ) {
                   ok = 1;
-               } else {
+   
+/* Otherwise clear the status value, and try again without any axis index. */
+               } else {               
                   astClearStatus;
+                  sprintf( buf2, "%s=%s", buf1, setting+value );
+                  astSetAttrib( pfrm, buf2 );
+   
+/* Indicate success, or clear the status value. */
+                  if( astOK ) {
+                     ok = 1;
+                  } else {
+                     astClearStatus;
+                  }
                }
-            }
-
+   
 /* Free the primary frame pointer. */
-            pfrm = astAnnul( pfrm );
+               pfrm = astAnnul( pfrm );
+            }
 
 /* If the attribute is not qualified by an axis index, try accessing it
    using the primary Frame of each axis in turn. */
@@ -7040,34 +7046,35 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Find the primary Frame containing the specified axis. */
             astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            if( astOK ) {
 
 /* Create a new attribute with the same name but with the axis index
    appropriate to the primary Frame. */
-            sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
+               sprintf( buf2, "%s(%d)", buf1, paxis + 1 );
 
 /* Attempt to access the attribute. */
-            result = astTestAttrib( pfrm, buf2 );
+               result = astTestAttrib( pfrm, buf2 );
 
 /* Indicate success. */
-            if( astOK ) {
-               ok = 1;
-
-/* Otherwise clear the status value, and try again without any axis index. */
-            } else {               
-               astClearStatus;
-               result = astTestAttrib( pfrm, buf1 );
-
-/* Indicate success, or clear the status value. */
                if( astOK ) {
                   ok = 1;
-               } else {
-                  astClearStatus;
-               }
-            }
 
+/* Otherwise clear the status value, and try again without any axis index. */
+               } else {               
+                  astClearStatus;
+                  result = astTestAttrib( pfrm, buf1 );
+
+/* Indicate success, or clear the status value. */
+                  if( astOK ) {
+                     ok = 1;
+                  } else {
+                     astClearStatus;
+                  }
+               }
 
 /* Free the primary frame pointer. */
-            pfrm = astAnnul( pfrm );
+               pfrm = astAnnul( pfrm );
+            }
 
 /* If the attribute is not qualified by an axis index, try accessing it
    using the primary Frame of each axis in turn. */

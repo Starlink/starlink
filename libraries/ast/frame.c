@@ -188,6 +188,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     23-MAR-2005 (DSB):
 *        - GetActiveUnit: Always return zero if the Frame contains any
 *        SkyAxes. 
+*     5-APR-2005 (DSB):
+*        Correct error checking in Clear/Get/Set/TestAttrib.
 *class--
 */
 
@@ -1857,51 +1859,53 @@ L1:
 
 /* Obtain a pointer to the Axis object. */
       ax = astGetAxis( this, axis - 1 );
+      if( astOK ) {
 
 /* Assume that we will be able to use the attribute name. */
-      used = 1;
+         used = 1;
 
 /* Temporarily switch off error reporting so that if the following attempt 
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
    ignored, in particularly they are not deferred for later delivery. */
-      oldrep = astReporting( 0 );
+         oldrep = astReporting( 0 );
 
 /* Use the Axis astClearAttrib method to clear the attribute value. */
-      astClearAttrib( ax, axis_attrib );
+         astClearAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
    the attribute name was not recognised, clear the status so that we can 
    try to interpret the attribute name as an attribute of the primary Frame 
    containing the specified axis. */
-      if( astStatus == AST__BADAT ) {
-         astClearStatus;
+         if( astStatus == AST__BADAT ) {
+            astClearStatus;
 
 /* Find the primary Frame containing the specified axis. */
-         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
 /* Attempt to clear the attribute as an attribute of the primary Frame. */
-         astClearAttrib( pfrm, axis_attrib );
+            astClearAttrib( pfrm, axis_attrib );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute name. */
-         if( !astOK ) {
-            astClearStatus;
-            used = 0;
-         }
+            if( !astOK ) {
+               astClearStatus;
+               used = 0;
+            }
 
 /* Annul the primary Frame pointer. */
-         pfrm = astAnnul( pfrm );
-      }
+            pfrm = astAnnul( pfrm );
+         }
 
 /* Re-instate the original error reporting state. */
-      astReporting( oldrep );
+         astReporting( oldrep );
 
 /* If we could not use the attribute name, attempt to clear the axis 
    attribute again, this time retaining the error report. This is done 
    to ensure the user gets an appropriate error message. */
-      if( !used ) astClearAttrib( ax, axis_attrib );
+         if( !used ) astClearAttrib( ax, axis_attrib );
+      }
 
 /* Annul the Axis pointer and free the memory holding the attribute
    name. */
@@ -3978,6 +3982,9 @@ L1:
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
 
+/* Save the number of axes in the Frame for later use. */
+   naxes = astGetNaxes( this );
+
 /* Compare "attrib" with each recognised attribute name in turn,
    obtaining the value of the required attribute. If necessary, write
    the value into "buff" as a null-terminated string in an appropriate
@@ -4110,11 +4117,8 @@ L1:
 /* Naxes. */
 /* -----_ */
    } else if ( !strcmp( attrib, "naxes" ) ) {
-      naxes = astGetNaxes( this );
-      if ( astOK ) {
-         (void) sprintf( buff, "%d", naxes );
-         result = buff;
-      }
+      (void) sprintf( buff, "%d", naxes );
+      result = buff;
 
 /* Permute. */
 /* -------- */
@@ -4203,51 +4207,53 @@ L1:
 
 /* Obtain a pointer to the Axis object. */
       ax = astGetAxis( this, axis - 1 );
+      if( astOK ) {
 
 /* Assume that we will be able to use the attribute name. */
-      used = 1;
+         used = 1;
 
 /* Temporarily switch off error reporting so that if the following attempt 
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
    ignored, in particularly they are not deferred for later delivery. */
-      oldrep = astReporting( 0 );
+         oldrep = astReporting( 0 );
 
 /* Use the Axis astGetAttrib method to obtain the result. */
-      result = astGetAttrib( ax, axis_attrib );
+         result = astGetAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
    the attribute name was not recognised, clear the status so that we can 
    try to interpret the attribute name as an attribute of the primary Frame 
    containing the specified axis. */
-      if( astStatus == AST__BADAT ) {
-         astClearStatus;
+         if( astStatus == AST__BADAT ) {
+            astClearStatus;
 
 /* Find the primary Frame containing the specified axis. */
-         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
 /* Attempt to use the Axis astGetAttrib method to obtain the result. */
-         result = astGetAttrib( pfrm, axis_attrib );
+            result = astGetAttrib( pfrm, axis_attrib );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute name. */
-         if( !astOK ) {
-            astClearStatus;
-            used = 0;
-         }
+            if( !astOK ) {
+               astClearStatus;
+               used = 0;
+            }
 
 /* Annul the primary Frame pointer. */
-         pfrm = astAnnul( pfrm );
-      }
+            pfrm = astAnnul( pfrm );
+         }
 
 /* Re-instate the original error reporting state. */
-      astReporting( oldrep );
+         astReporting( oldrep );
 
 /* If we could not use the attribute name, attempt to get the axis 
    attribute again, this time retaining the error report. This is done 
    to ensure the user gets an appropriate error message. */
-      if( !used ) result = astGetAttrib( ax, axis_attrib );
+         if( !used ) result = astGetAttrib( ax, axis_attrib );
+      }
 
 /* Annul the Axis pointer and free the memory holding the attribute
    name. */
@@ -4259,7 +4265,7 @@ L1:
 /* If the attribute is still not recognised, and the Frame has only 1 axis,
    and the attribute name does not already include an axis specifier, try 
    again after appending "(1)" to the end of the attribute name. */
-   } else if( !has_axis && astGetNaxes( this ) == 1 ) {
+   } else if( !has_axis && naxes == 1 ) {
 
 /* Take a copy of the supplied name, allowing 3 extra characters for the
    axis specifier "(1)". */
@@ -7916,52 +7922,54 @@ L1:
 
 /* Obtain a pointer to the Axis object. */
          ax = astGetAxis( this, axis - 1 );
+         if( astOK ) {
 
 /* Assume that we will be able to use the setting. */
-         used = 1;
+            used = 1;
 
 /* Temporarily switch off error reporting so that if the following attempt 
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
    ignored, in particularly they are not deferred for later delivery. */
-         oldrep = astReporting( 0 );
+            oldrep = astReporting( 0 );
 
 /* Use the Axis astSetAttrib method
    to set the value. */
-         astSetAttrib( ax, axis_setting );
+            astSetAttrib( ax, axis_setting );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
    the attribute name was not recognised, clear the status so that we can 
    try to interpret the attribute name as an attribute of the primary Frame 
    containing the specified axis. */
-         if( astStatus == AST__BADAT ) {
-            astClearStatus;
+            if( astStatus == AST__BADAT ) {
+               astClearStatus;
 
 /* Find the primary Frame containing the specified axis. */
-            astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+               astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
 /* Attempt to set the attribute within the primary Frame. */
-            astSetAttrib( pfrm, axis_setting );
+               astSetAttrib( pfrm, axis_setting );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute setting. */
-            if( !astOK ) {
-               astClearStatus;
-               used = 0;
-            }
+               if( !astOK ) {
+                  astClearStatus;
+                  used = 0;
+               }
 
 /* Free the setting string, and annul the primary Frame pointer. */
-            pfrm = astAnnul( pfrm );
-         }
+               pfrm = astAnnul( pfrm );
+            }
 
 /* Re-instate the original error reporting state. */
-         astReporting( oldrep );
+            astReporting( oldrep );
 
 /* If we could not use the setting, attempt to set the axis attribute again,
    this time retaining the error report. This is done to ensure the user
    gets an appropriate error message. */
-         if( !used ) astSetAttrib( ax, axis_setting );
+            if( !used ) astSetAttrib( ax, axis_setting );
+         }
 
 /* Annul the Axis pointer and free the memory holding the attribute
    setting. */
@@ -8886,51 +8894,53 @@ L1:
 
 /* Obtain a pointer to the Axis object. */
       ax = astGetAxis( this, axis - 1 );
+      if( astOK ) {
 
 /* Assume that we will be able to use the attribute name. */
-      used = 1;
+         used = 1;
 
 /* Temporarily switch off error reporting so that if the following attempt 
    to access the axis attribute fails, we can try to interpret the
    attribute name as an attribute of the primary Frame containing the
    specified axis. Any errors reported in this context will simply be
    ignored, in particularly they are not deferred for later delivery. */
-      oldrep = astReporting( 0 );
+         oldrep = astReporting( 0 );
 
 /* Use the Axis astTestAttrib method to test the attribute value. */
-      result = astTestAttrib( ax, axis_attrib );
+         result = astTestAttrib( ax, axis_attrib );
 
 /* If the above call failed with a status of AST__BADAT, indicating that
    the attribute name was not recognised, clear the status so that we can 
    try to interpret the attribute name as an attribute of the primary Frame 
    containing the specified axis. */
-      if( astStatus == AST__BADAT ) {
-         astClearStatus;
+         if( astStatus == AST__BADAT ) {
+            astClearStatus;
 
 /* Find the primary Frame containing the specified axis. */
-         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+            astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
 
 /* Attempt to test the attribute as an attribute of the primary Frame. */
-         result = astTestAttrib( pfrm, axis_attrib );
+            result = astTestAttrib( pfrm, axis_attrib );
 
 /* If this failed, clear the status and indicate that we have not managed to 
    use the attribute name. */
-         if( !astOK ) {
-            astClearStatus;
-            used = 0;
-         }
+            if( !astOK ) {
+               astClearStatus;
+               used = 0;
+            }
 
 /* Annul the primary Frame pointer. */
-         pfrm = astAnnul( pfrm );
-      }
+            pfrm = astAnnul( pfrm );
+         }
 
 /* Re-instate the original error reporting state. */
-      astReporting( oldrep );
+         astReporting( oldrep );
 
 /* If we could not use the attribute name, attempt to test the axis 
    attribute again, this time retaining the error report. This is done 
    to ensure the user gets an appropriate error message. */
-      if( !used ) result = astTestAttrib( ax, axis_attrib );
+         if( !used ) result = astTestAttrib( ax, axis_attrib );
+      }
 
 /* Annul the Axis pointer and free the memory holding the attribute
    name. */
