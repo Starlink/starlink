@@ -140,6 +140,7 @@ use Automake::Rule;
 use Automake::RuleDef;
 use Automake::Wrap 'makefile_wrap';
 use File::Basename;
+use Cwd qw( cwd );
 use Carp;
 
 ## ----------- ##
@@ -4374,10 +4375,10 @@ sub handle_install ()
   # to use to install the component in a staging directory.
   my $make_cmd = $starlink_seen_features{'special-install'};
 
-  # If $standard_manifest is true, use the standard way of creating and
-  # installing a manifest; if false, use the command in
+  # If $special_manifest is false, use the standard way of creating and
+  # installing a manifest; if true, use the command in
   # STAR_SPECIAL_INSTALL_COMMAND.
-  my $standard_manifest = 1;
+  my $special_manifest = 0;
   if ($make_cmd)
     {
       # Substitute prefix _and_ exec_prefix: some older Makefile.in files
@@ -4386,7 +4387,7 @@ sub handle_install ()
         {
           # The macro argument is collapsed onto a single line by the
           # "autoconf --trace" command within &scan_autoconf_traces.
-          $standard_manifest = 0;
+          $special_manifest = 1;
         }
       else
         {
@@ -4399,6 +4400,41 @@ sub handle_install ()
       $make_cmd = '';
     }
 
+  if ($manifestdir && ! -f 'component.xml.in')
+    {
+      # This is apparently not a component directory (that is, it is
+      # either the child of such a directory or, less likely, the parent of
+      # such a directory and things have got very confused), but
+      # STAR_MANIFEST_DIR is defined, either explicitly, or more likely
+      # implicitly through STAR_DEFAULTS.  We do _not_ wish to make an
+      # install target which installs a manifest, here, since the manifest
+      # will be constructed by the appropriate target in our parent.  The
+      # install-manifest target in lib/am/install.am should guard against
+      # that situation, but it seems safest to avoid having the manifest
+      # code there at all.
+      #
+      # Should we warn about this, however, just in case the user has
+      # forgotten to reread the documentation recently?  No -- that would
+      # be irritating, eventually.
+      $manifestdir = 0;
+    }
+
+  if ($special_manifest && !$manifestdir)
+    {
+      # Ooops.  We're not making a manifest (possibly becaue we've just
+      # turned that off), but the user has asked for a non-standard install,
+      # presumably deliberately.  That's wrong, and we should warn
+      # about this.
+      print STDERR "We are not making a manifest in directory " . cwd() . "\n"
+        . "(probably because there is no component.xml.in file present),\n"
+        . "but macro STAR_SPECIAL_INSTALL_COMMAND was present in configure.ac.\n"
+        . "That's wrong, and the macro has been IGNORED.\n";
+      $special_manifest = 0;
+      $make_cmd = '';
+    }
+
+    
+
   $output_rules .= &file_contents
     ('install',
      new Automake::Location,
@@ -4410,7 +4446,7 @@ sub handle_install ()
 			     ? ' installdirs-local' : ''),
      am__installdirs => variable_value ('am__installdirs') || '',
      INSTALLMANIFEST => $manifestdir,
-     STANDARDMANIFEST => $standard_manifest,
+     STANDARDMANIFEST => !$special_manifest,
      MANIFESTMAKEINSTALL => $make_cmd
     );
 }
