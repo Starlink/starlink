@@ -216,6 +216,7 @@ bool PageRange::addSpec (const char type, const char *spec)
 	    last_ = atoi (spec);
 	    rangeType_ = oneRange;
 	}
+	break;
 
       default:
 	parseOK = false;
