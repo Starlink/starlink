@@ -584,7 +584,7 @@ itcl::class gaia::GaiaPolData {
       close $fd
 
       return  $newfile
-}
+   }
 
 #  Get a GaiaApp which provides access to a specified polpack command.
 #  ------------------------------------------------------------------

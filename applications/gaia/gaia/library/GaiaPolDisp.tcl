@@ -2071,12 +2071,12 @@ itcl::class gaia::GaiaPolDisp {
       }
    }
 
-proc StackDump {} {
-   for {set i 1} { $i < [info level] } { incr i} {
-      puts [info level $i]
+   proc StackDump {} {
+      for {set i 1} { $i < [info level] } { incr i} {
+         puts [info level $i]
+      }
+      puts " "
    }
-   puts " "
-}
 
 #  Options:
 #  ========
