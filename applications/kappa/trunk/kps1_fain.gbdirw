@@ -1,7 +1,6 @@
-
       SUBROUTINE KPS_$FAIN<T>( BAD, DIM1, DIM2, INARR, SIGRNG, LOW,
-     :                        HIGH, INVERT, OUTARR, LOWER, UPPER,
-     :                        STATUS )
+     :                        HIGH, BADVAL, INVERT, OUTARR, LOWER,
+     :                        UPPER, STATUS )
 *+
 *  Name:
 *     KPS_$FAINx
@@ -16,7 +15,7 @@
 *  Invocation
 
 *     CALL KPS_$FAINx( BAD, DIM1, DIM2, INARR, SIGRNG, LOW, HIGH,
-*    :                 INVERT, OUTARR, LOWER, UPPER, STATUS )
+*    :                 BADVAL, INVERT, OUTARR, LOWER, UPPER, STATUS )
 
 *  Description:
 *     This routine scales a 2-d array such that the lower and upper
@@ -47,9 +46,11 @@
 *        value is in the first element, the scaling will have negative
 *        polarity.
 *     LOW = INTEGER (Given)
-*        The lower limit for scaling (usually a graphics pen number).
+*        The lower limit for scaling (usually a graphics colour index).
 *     HIGH = INTEGER (Given)
-*        The upper limit for scaling (usually a graphics pen number).
+*        The upper limit for scaling (usually a graphics colour index).
+*     BADVAL = INTEGER (Given)
+*         The value to be assigned to bad pixels in the scaled array.
 *     INVERT = LOGICAL (Given)
 *        True if the image is to be inverted for display.
 *     OUTARR( DIM1, DIM2 ) = INTEGER (Returned)
@@ -63,8 +64,9 @@
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I as appropriate. The array and limits
-*     supplied to the routine must have the data type specified.
+*     the routine name by B, D, I, R, or W as appropriate. The array
+*     and limits supplied to the routine must have the data type
+*     specified.
 *     -  The array is normally inverted so that the image will appear
 *     the correct way round when displayed as the GKS routine
 *     to display the image inverts it.
@@ -76,7 +78,7 @@
 *     - Derive the scaling limits.
 *     - The scaled image is then produced with or without inversion,
 *       and with or without bad-pixel checking via a subroutine. Bad
-*       are set to the maximum pen number.
+*       pixels are set to defined value.
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -85,6 +87,8 @@
 *  History:
 *     1990 July 19 (MJC):
 *        Original version.
+*     1991 July 23 (MJC):
+*        Added BADVAL argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,7 +107,8 @@
       INTEGER
      :  DIM1, DIM2,
      :  HIGH,
-     :  LOW
+     :  LOW,
+     :  BADVAL
 
       LOGICAL
      :  BAD,
@@ -229,15 +234,15 @@
 
 *    Report the scaling limits.
 
-      CALL MSG_SET<T>( 'MINVAL', LOWER )
-      CALL MSG_SET<T>( 'MAXVAL', UPPER )
+      CALL MSG_SETD( 'MINVAL', NUM_<T>TOD( LOWER ) )
+      CALL MSG_SETD( 'MAXVAL', NUM_<T>TOD( UPPER ) )
       CALL MSG_OUT( 'PVLO', 'Data will be scaled from ^MINVAL to '/
      :              /'^MAXVAL.', STATUS )
 
 *    Scale the values between the upper and lower pens.
 
       CALL KPG_$ISCL<T>( BAD, DIM1, DIM2, INARR, INVERT, LOWER, UPPER,
-     :                   LOW, HIGH, OUTARR, STATUS )
+     :                   LOW, HIGH, BADVAL, OUTARR, STATUS )
 
  999  CONTINUE
 
