@@ -53,6 +53,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *        Added support for INES IUE spectra.
 *     2003 Sep 29 (MJC):
 *        Added support for AAO/UKST 6dF data.
+*     2004 Sep 10 (TIMJ):
+*        Initialise some variables for FITSIO
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,6 +123,10 @@
 
 *  Initialise the returned value.
       NAME = ' '
+
+*  Initialise some variables in case the compiler doesn't
+      TELPRE = .FALSE.
+      TELESC = ' '
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.

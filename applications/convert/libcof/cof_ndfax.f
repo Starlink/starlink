@@ -57,6 +57,9 @@
 *        present to define the nth axis's axis centres.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning by initialising strings before sending them
+*        to FITSIO
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,6 +141,11 @@
       
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+
+*  Initialise
+      UNITS = ' '
+      VALUE = ' '
+      COMENT = ' '
 
 *  Create a default axis system in case only some of the FITS axes are
 *  defined in the headers.
