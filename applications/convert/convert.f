@@ -37,6 +37,8 @@
 *        Minor tidying and comments added.
 *     1992 September 22 (MJC):
 *        Added ASCII2NDF, NDF2ASCII, NDF2IRAF, NDF2UNF, UNF2NDF.
+*     1993 September 15 (MJC):
+*        Added GASP2NDF, IRAF2NDF, IRCAM2NDF, NDF2GASP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +84,18 @@
       ELSE IF ( ACTION .EQ. 'DST2NDF' ) THEN
          CALL DST2NDF( STATUS )
 
+*  Converts an image in GASP format to an NDF.
+      ELSE IF ( ACTION .EQ. 'GASP2NDF' ) THEN
+         CALL GASP2NDF( STATUS )
+
+*  Converts an IRAF image to an NDF.
+      ELSE IF ( ACTION .EQ. 'IRAF2NDF' ) THEN
+         CALL IRAF2NDF( STATUS )
+
+*  Converts an IRCAM data file to a series of NDFs.
+      ELSE IF ( ACTION .EQ. 'IRCAM2NDF' ) THEN
+         CALL IRCAM2NDF( STATUS )
+
 *  Converts an NDF to an ASCII file.
       ELSE IF ( ACTION .EQ. 'NDF2ASCII' ) THEN
          CALL NDF2ASCII( STATUS )
@@ -98,7 +112,7 @@
       ELSE IF ( ACTION .EQ. 'NDF2DST' ) THEN
          CALL NDF2DST( STATUS )
 
-*  Converts an NDF to an IRAF (OIF) image.
+*  Converts an NDF to an IRAF image.
       ELSE IF ( ACTION .EQ. 'NDF2IRAF' ) THEN
          CALL NDF2IRAF( STATUS )
 
