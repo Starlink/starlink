@@ -141,21 +141,21 @@
                $Menu add command \
                   -label $label \
                   -command "$Oldthis clear 0 end
-                            $Oldthis insert 0 "$label"
+                            $Oldthis insert 0 \"$label\"
                            "
             }
             1 {
                $Menu add command \
                   -label $label \
                   -command "$Oldthis clear 0 end
-                            $Oldthis insert 0 "$args"
+                            $Oldthis insert 0 \"$args\"
                            "
             }
             2 {
                $Menu add command \
                   -label $label \
                   -command "$Oldthis clear 0 end
-                            $Oldthis insert 0 "[lindex $args 0]"
+                            $Oldthis insert 0 \"[lindex $args 0]\"
                             [lindex $args 1]
                            "
             }

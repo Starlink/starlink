@@ -400,7 +400,7 @@
 #  Get value from a cell.
       method getcell { row col } {
          set row [_index $row 0 0]
-         return [$Entreis($row,$col) get]
+         return [$Entries($row,$col) get]
       }
 
 #  Enable insertion state for methods for rows, columns and cells.
@@ -441,7 +441,7 @@
             } else {
                set istate ""
                for { set i 0 } { $i < $columns } { incr i } {
-                  set cellstate [$Entreis($i,$row) cget -state]
+                  set cellstate [$Entries($i,$row) cget -state]
                   if { $i == 0 } {
                      set istate $cellstate
                   } else {
@@ -827,7 +827,7 @@
          set curwin [winfo containing $state(x) $state(y)]
          set row ""
          if { $curwin != "" } {
-            regsub {[0-9]*$} $curwin row
+            regexp {[0-9]*$} $curwin row
          } else {
             set cy [winfo y $oldthis.canvas]
             if { $state(y) < $cy } {
@@ -951,7 +951,7 @@
 #  Need to delete some.
                   for { set i $rows } { $i < $havrows($j) } { incr i } {
                      destroy [CCDPathOf $Entries($j,$i)]
-                     unset $Entries($j,$i)
+                     unset Entries($j,$i)
                      set state($i) 0
                   }
                   set havrows($j) $rows

@@ -214,7 +214,7 @@
 #  possible in listbox.
       CCDCcdWidget Fitsbox fitsbox \
          Ccd_scrollbox $Lefttop.fitsbox -singleselect true
-      CCDCcd_choice Fitsextract fitsextract \
+      CCDCcdWidget Fitsextract fitsextract \
          Ccd_choice $Lefttop.extract -standard 0
 
 #  Right frame for fits extension items (and types).
@@ -368,15 +368,15 @@
 #  this as the current FITS item. Set up drag of button one to follow
 #  the selection.
       $Fitsbox  bind list <Button-1> \
-         "$Fitsname.entry delete 0 end
+         "$Fitsname clear 0 end
 	  set index \[ %W nearest %y \]
           $Fitsname insert 0 \[ %W get \$index \]
           %W select anchor \$index
          "
       $Fitsbox bind list <B1-Motion> \
-         "$Fitsname.entry delete 0 end
+         "$Fitsname clear 0 end
 	  set index \[ %W nearest %y \]
-          $Fitsname.entry insert 0 \[ %W get \$index \]
+          $Fitsname insert 0 \[ %W get \$index \]
           %W select anchor \$index
          "
 
@@ -396,8 +396,8 @@
 #  them to the table.
       $Fitschoice addbutton {Add} \
          "global ict_modified
-	  set item \[ $Fitsname.entry get \]
-	  set type \[ $Fitstype.entry get \]
+	  set item \[ $Fitsname get \]
+	  set type \[ $Fitstype get \]
 	  if { \"\$type\" != \"_CHAR\" &&
                \"\$type\" != \"_INTEGER\" &&
                \"\$type\" != \"_LOGICAL\" &&
