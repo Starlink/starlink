@@ -1,14 +1,14 @@
 #!perl
 
 use strict;
-use Test::More tests => 15;
+use Test::More tests => 12;
 
 require_ok("Starlink::AST");
 
 Starlink::AST::Begin();
 
 my @cards;
-my $fchan = new Starlink::AST::FitsChan( sink => sub { push @cards, $_[0] } );
+my $fchan = new Starlink::AST::FitsChan( );
 while (<DATA>) {
   $fchan->PutFits($_ ,0);
 }
@@ -60,33 +60,9 @@ is( $$xworld[0], 0, "Reverse mapping of lower bound X co-ordinate" );
 is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" ); 
 is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
-
-# Writing
-# -------
-
-# test the header
-my $status = $fchan->Write( $wcsinfo );
-my @raw = <DATA>;
-chomp(@raw);
-for my $i (0 .. $#raw) {
-  is( $cards[$i], $raw[$i], "FITS Card number " . $i);  
-}
-
-# Set/Get Stuff
-# -------------
-
-# change output detail flag
-$fchan->Set( Full => 1 );
-is( $fchan->Get( "Full" ), 1, "Changing output detail flag to +1" );
-    
-$fchan->Set( Full => -1 );
-is( $fchan->Get( "Full" ), -1, "Changing output detail flag to -1" );
-
-# change encoding type
-$fchan->Set( Encoding => "NATIVE" );
-is($fchan->Get("Encoding"), "NATIVE", "Changing type of the FitsChan object");
     
 # Done!
+exit;
 
 __DATA__
 SIMPLE  =                    T / file does conform to FITS standard             

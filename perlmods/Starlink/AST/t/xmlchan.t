@@ -25,8 +25,10 @@ ok(1, "Write complete");
 
 # Try again, but storing to an array
 my @cards;
+{
 $ch = new Starlink::AST::XmlChan ( sink => sub {push(@cards, $_[0]) } );
 $ch->Write( $obj );
+}
 
 for (@cards) {
   print "# $_\n";
