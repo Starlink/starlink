@@ -24,7 +24,7 @@
 
 #  Form list of graphics libraries.
       if test "${nogks}" = 'y'; then 
-         echo -lkapgen -lira -lirq -llpg -lctg -lfits -laif -lkapgrf \
+         echo -lkapgen -lira -lirq -llpg -lctg -lctm -lfits -laif -lkapgrf \
            `cat_link` `ndg_link` \
            `ndf_link` `ast_link -ems -grf` \
            `agp_link` `fio_link` \
@@ -36,7 +36,7 @@
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       else
-         echo -lkapgen -lira -lirq -llpg -lctg -lfits -laif -lkapgrf \
+         echo -lkapgen -lira -lirq -llpg -lctg -lctm -lfits -laif -lkapgrf \
            `cat_link` `snx_link` \
            `sgs_link` `ndg_link` \
            `gks_link` `gns_link` \

@@ -18,7 +18,7 @@ dnl    Other options here, such as
 dnl STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar])
+STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar gks gns idi agi ast cat ndg hds chr fio grp ndf prm par psx tclsys])
 STAR_DECLARE_DEPENDENCIES(link, [cat mers pcs subpar psx ndg ndf ast agi fio grp trn prm mag psx pda pgplot])
 
 dnl    List the sun/ssn/... numbers which document this package and
@@ -30,8 +30,7 @@ dnl    List the set of active subdirectories.
 dnl    This must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-dnl AC_CONFIG_SUBDIRS(aif ctm fts grf ira irq kpg )
-AC_CONFIG_SUBDIRS(aif ctm)
+AC_CONFIG_SUBDIRS(aif ctm ira kpg)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
