@@ -58,9 +58,9 @@ bool action {yes,prompt="Use CCDPACK global variables"}
 begin
    bool laction
    laction = action
-   set CCDPACK_GLOBALS=lact
+   reset CCDPACK_GLOBALS=(laction)
    print (" ")
-   if ( lact ) {
+   if ( laction ) {
       print ("Global variables will now be used. Use the commands:")
       print (" ")
       print ("   CCDSETUP, CCDSHOW and CCDCLEAR.")
@@ -76,4 +76,5 @@ begin
    print (" ")
    print ("Remember to restart any CCDPACK tasks already running.")
    print (" ")
+   keep
 end
