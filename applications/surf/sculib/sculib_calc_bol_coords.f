@@ -2,7 +2,7 @@
      :  DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y,
      :  ROTATION, N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
-     :  U4_CENTRE, X_BOL, Y_BOL, STATUS)
+     :  U4_CENTRE, X_BOL, Y_BOL, ELEVATION, PAR_ANGLE, STATUS)
 *+
 *  Name:
 *     SCULIB_CALC_BOL_COORDS
@@ -17,11 +17,11 @@
 *     SCULIB subroutine
  
 *  Invocation:
-*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS, RA_CENTRE, DEC_CENTRE, LST,
+*     CALL SCULIB_CALC_BOL_COORS (OUT_COORDS,RA_CENTRE, DEC_CENTRE, LST,
 *    :  LAT_OBS, OFFSET_COORDS, OFFSET_X, OFFSET_Y, ROTATION, 
 *    :  N_POINT, MAX_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
 *    :  NUM_CHAN, NUM_ADC, N_BOL, BOL_CHAN, BOL_ADC, U3, U4, U3_CENTRE,
-*    :  U4_CENTRE, X_BOL, Y_BOL, STATUS)
+*    :  U4_CENTRE, X_BOL, Y_BOL, ELEVATION, PAR_ANGLE, STATUS)
 
 *  Arguments:
 *     OUT_COORDS = CHARACTER * (*) (Given)
@@ -79,6 +79,10 @@
 *        the X offset (apparent RA or X) of the bolometer (radians)
 *     Y_BOL (N_BOL)        = DOUBLE PRECISION (Returned)
 *        the Y offset (apparent dec or Y) of the bolometer (radians)
+*     ELEVATION       = DOUBLE (Returned)
+*        elevation of each position
+*     PAR_ANGLE       = DOUBLE (Returned)
+*        parallactic angle of each position
 *     STATUS                 = INTEGER (Given and returned)
 *        The global status
 
@@ -134,13 +138,13 @@
 
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 
 *    Import :
       INTEGER          MAX_POINT
       INTEGER          NUM_CHAN
       INTEGER          NUM_ADC
       INTEGER          N_BOL
-
       INTEGER          BOL_CHAN (N_BOL)
       INTEGER          BOL_ADC (N_BOL)
       DOUBLE PRECISION DEC_CENTRE
@@ -163,8 +167,11 @@
 
 *    Import-Export :
 *    Export :
+      DOUBLE PRECISION ELEVATION
+      DOUBLE PRECISION PAR_ANGLE
       DOUBLE PRECISION X_BOL (N_BOL)
       DOUBLE PRECISION Y_BOL (N_BOL)
+
 *    Status :
       INTEGER          STATUS
 *    External references :
@@ -264,8 +271,6 @@
      :     'OUT_COORDS - ^COORDS', STATUS)
       END IF
 
-
-
 *  calculate the pointing offset for the time of the measurement
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -313,16 +318,22 @@
      :     COS (LAT_OBS) * COS (DEC_CENTRE) * COS (HOUR_ANGLE)
          E = ASIN (SIN_E)
 
+         ELEVATION = E
+
 *  and the parallactic angle
 
          IF (COS(DEC_CENTRE) .EQ. 0.0D0) THEN
             Q = PI - HOUR_ANGLE
             SIN_Q = SIN (Q)
             COS_Q = COS (Q)
+            PAR_ANGLE = Q
+
          ELSE
             SIN_Q = SIN (HOUR_ANGLE) * COS (LAT_OBS) / COS (E)
             COS_Q = (SIN (LAT_OBS) - SIN (DEC_CENTRE) * SIN_E) /
      :        (COS (DEC_CENTRE) * COS(E))
+            PAR_ANGLE = ASIN(SIN_Q)
+
          END IF
       END IF
 
