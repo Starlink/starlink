@@ -1,10 +1,10 @@
-      SUBROUTINE REDS_REBIN (TSKNAME, STATUS)
+      SUBROUTINE SURF_REBIN (TSKNAME, STATUS)
 *+
 *  Name:
 *     (BOL|INT)REBIN
 
 *  Purpose:
-*     routine to rebin demodulated SCUBA data onto output map
+*     Rebin demodulated SCUBA data onto output map
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL REDS_REBIN (TSKNAME, STATUS)
+*     CALL SURF_REBIN (TSKNAME, STATUS)
 
 *  Arguments:
 *     TSKNAME = CHARACTER * () (Given)
@@ -28,26 +28,26 @@
 *     Currently convolution by weighting functions and splines are 
 *     supported.
 *     - Weighting functions:
-*     Currently linear and bessel weighting functions are supported.
-*     The width of the Bessel function is such that it should preserve all
-*     spatial information obtained by the telescope at the wavelength of
-*     observation, but suppress higher spatial frequencies. To minimise edge
-*     effects the Bessel function is truncated at a radius of 10 half-widths
-*     from the centre, and apodized over its outer third by a cosine function.
-*     Viewed in frequency space the method consists of Fourier transforming 
-*     the input dataset(s), multiplying the transform by a cylindrical top-hat
-*     (the F.T. of the Bessel function), then transforming back into image
-*     space.
-*     A linear weighting function is also available which works out
-*     to one half-width - this has the advantage that it is much faster to
-*     process and is much less susceptible to edge effects. 
+*       Currently linear and bessel weighting functions are supported.
+*       The width of the Bessel function is such that it should preserve all
+*       spatial information obtained by the telescope at the wavelength of
+*       observation, but suppress higher spatial frequencies. To minimise edge
+*       effects the Bessel function is truncated at a radius of 10 half-widths
+*       from the centre, and apodized over its outer third by a cosine 
+*       function. Viewed in frequency space the method consists of Fourier 
+*       transforming the input dataset(s), multiplying the transform by a 
+*       cylindrical top-hat (the F.T. of the Bessel function), 
+*       then transforming back into image space.
+*       A linear weighting function is also available which works out
+*       to one half-width - this has the advantage that it is much faster to
+*       process and is much less susceptible to edge effects. 
 *
-*     -Splines:
-*     Additionally, spline interpolation and smoothing routines are also
-*     available. Note that the spline routines work on each integration
-*     in turn, whereas the weighting function routines work on all the input
-*     data in one go. At present the spline routines are experimental and
-*     comments are welcomed.
+*     - Splines:
+*       Additionally, spline interpolation and smoothing routines are also
+*       available. Note that the spline routines work on each integration
+*       in turn, whereas the weighting function routines work on all the input
+*       data in one go. At present the spline routines are experimental and
+*       comments are welcomed.
 
 *     If this task is invoked as BOLREBIN then a separate map will be made
 *     of each bolometer. The output file will contain an NDF for each 
@@ -62,25 +62,27 @@
 *     rebin
 
 *  ADAM parameters:
-*     IN = NDF (Read)
+*     IN = CHAR (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
-*        IN can be a SCUBA section.
+*        IN can include a SCUBA section.
 *        Like the REF parameter this parameter accepts a text file.
-*     LAT_OUT = _CHAR (Read)
+*     LAT_OUT = CHAR (Read)
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
-*     LONG_OUT = _CHAR (Read)
+*     LONG_OUT = CHAR (Read)
 *        The longitude of the output map centre. The supplied default value 
 *        is that of the map centre of the first map.
 *     LOOP = LOGICAL (Read)
 *        Task will ask for multiple input files if true. Only REF is read
 *        if noloop.
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level. Default is NORM.
 *     OUT = NDF (Write)
 *        For REBIN this is the name of the NDF that will contain the rebinned 
 *        map. For BOLREBIN or INTREBIN this is the name of the HDS container 
 *        file.
-*     OUT_COORDS = _CHAR (Read)
+*     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
 *        - AZ:  Azimuth/elevation offsets 
@@ -92,11 +94,11 @@
 *        - GA:  Galactic coordinates (J2000)
 *
 *        For RD current epoch is taken from the first input file.
-*     OUT_OBJECT = _CHAR (Read)
+*     OUT_OBJECT = CHAR (Read)
 *        The name of the object (ie the NDF title).
-*     PIXSIZE_OUT = _REAL (Read)
+*     PIXSIZE_OUT = REAL (Read)
 *        Size of pixels in the output map. Units are arcsec.
-*     REBIN_METHOD = _CHAR (Read)
+*     REBIN_METHOD = CHAR (Read)
 *        The rebin method to be used. A number of regridding methods are
 *        available:
 *        - LINEAR:  Linear weighting function
@@ -107,21 +109,21 @@
 *
 *        Please refer to the PDA documentation (SUN/194) for more information
 *        on the spline fitting algorithms.
-*     REF = NDF (Read)
+*     REF = CHAR (Read)
 *        The name of the first NDF to be rebinned. The name may also be the
 *        name of an ASCII text file containing NDF and parameter values.
-*        See the notes. REF can be a SCUBA section.
-*     SHIFT_DX = _REAL (Read)
+*        See the notes. REF can include a SCUBA section.
+*     SHIFT_DX = REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinte frame.
-*     SHIFT_DY = _REAL (Read)
+*     SHIFT_DY = REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinate frame.
-*     USE_SECTION = _LOGICAL (Read)
+*     USE_SECTION = LOGICAL (Read)
 *        If you wish to discard the data specified by the SCUBA Section
 *        then select 'no'. If you wish to rebin a map using only
 *        the specified section select 'yes'.
-*     WEIGHT = _REAL (Read)
+*     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 
 *  Examples:
@@ -168,6 +170,9 @@
 *     convert it to NDF format before processing -- this is probably not
 *     what you want.
 
+*  Related Applications:
+*     SURF: SCUQUICK, EXTRACT_DATA
+
 
 *  Authors :
 *     JFL: J.Lightfoot (ROE)
@@ -177,6 +182,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.36  1997/06/12 23:53:28  timj
+*     Change name to SURF (and calls to SURF_)
+*     Update documentation
+*     Fix I=1,MAX_FILES freeing bug
+*
 *     Revision 1.35  1997/06/05 22:56:33  timj
 *     Reset pointers if good status.
 *
@@ -282,7 +292,7 @@ c
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'PAR_ERR'                ! for PAR__ constants
       INCLUDE 'PAR_PAR'                ! for PAR__ constants
-      INCLUDE 'REDS_SYS'               ! REDS definitions
+      INCLUDE 'SURF_PAR'               ! REDS definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
 
 * Arguments Given:
@@ -441,7 +451,7 @@ c
       INTEGER          OUT_WEIGHT_NDF  ! NDF identifier for weight array
       INTEGER          OUT_WEIGHT_PTR  ! Pointer to mapped weights array
       REAL             PARS(3)         ! Dummy array of parameter values
-      LOGICAL          PAR4            ! 4th dummy parameter fro REDS_RECURSE
+      LOGICAL          PAR4            ! 4th dummy parameter fro SURF_RECURSE
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
       LOGICAL          READING         ! .TRUE. while reading input files
@@ -653,7 +663,7 @@ c
             RLEV = 1 ! Set recursion level
             NPARS = 0 ! No parameters set before entry
 
-            CALL  REDS_RECURSE_READ( RLEV, IN, MAX_FILE,
+            CALL  SURF_RECURSE_READ( RLEV, IN, MAX_FILE,
      :           OUT_COORDS, FILE, N_BOL, N_POS, 
      :           N_INTS, IN_UT1, IN_RA_CEN, 
      :           IN_DEC_CEN, WAVELENGTH, 
@@ -923,7 +933,7 @@ c
             END IF
 
 *     Write out the data
-            CALL REDS_WRITE_DATA( FD, N_POS(I) * N_BOL(I), 
+            CALL SURF_WRITE_DATA( FD, N_POS(I) * N_BOL(I), 
      :           %VAL(IN_DATA_PTR(I)), %VAL(IN_VARIANCE_PTR(I)),
      :           %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)),
      :           STATUS)
@@ -950,7 +960,7 @@ c
 *  create the output file that will contain the reduced data in NDFs
  
          CALL PAR_GET0C ('OUT', OUT, STATUS)
-         CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
+         CALL HDS_NEW (OUT, OUT, 'SURF_BOLMAPS', 0, 0, OUT_LOC, STATUS)
 
       END IF
 
@@ -1180,7 +1190,7 @@ c
 *     Also create and map associated NDF of weights for each pixel
 *     as an NDF in the REDS extension
 
-                  CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION',
+                  CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
      :                 0, 0, OUT_REDSX_LOC, STATUS)
 
                   CALL NDF_PLACE (OUT_REDSX_LOC, 'WEIGHTS', PLACE, 
@@ -1267,7 +1277,7 @@ c
                   
 *     Now write the axis
 
-                  CALL REDS_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
+                  CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
      :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
      :                 NX_OUT, NY_OUT, STATUS )
@@ -1302,7 +1312,7 @@ c
 
 *  now finish off
 
-      DO I = 1, MAX_FILE
+      DO I = 1, FILE
          CALL SCULIB_FREE ('IN_DATA', IN_DATA_PTR(I),
      :        IN_DATA_END(I), STATUS)
          CALL SCULIB_FREE ('IN_VARIANCE', IN_VARIANCE_PTR(I),
