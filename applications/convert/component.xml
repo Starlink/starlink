@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="convert">
+  <version>1.5-4</version>
+  <path>applications/convert</path>
+  <description>CONVERT -- format-conversion package</description>
+  <abstract><p>
+The CONVERT package contains utilities for converting data files between
+Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
+Starlink applications, and a number of other common data formats.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>figaro</build><build>ast</build><build>sae</build><build>chr</build><build>hds</build><build>fio</build><build>cnf</build><build>grp</build><build>mers</build><build>prm</build><build>ndf</build><build>ndg</build><build>par</build><build>psx</build><build>subpar</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm J. Currie</name>
+      <uname>mjc</uname>
+    </person>
+    <person>
+      <name>G.J.Privett</name>
+    </person>
+    <person>
+      <name>A.J.Chipperfield</name>
+    </person>
+    <person>
+      <name>D.S.Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>A.C.Davenhall</name>
+      <uname>acd</uname>
+    </person>
+  </developers>
+  <documentation> sun55</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
