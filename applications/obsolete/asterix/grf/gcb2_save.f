@@ -85,6 +85,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GCB_PAR'
+
+*  Global Variables:
+      INCLUDE 'GCB_CMN'                                 ! GCB globals
+*        G_MEMPTR = INTEGER (given)
+*           Active GCB data area
+*        G_VERSION = REAL (given)
+*           GCB version number
 
 *  Arguments Given:
       INTEGER                   NARG                    ! # arguments
