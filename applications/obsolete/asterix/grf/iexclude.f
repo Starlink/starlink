@@ -678,7 +678,7 @@
       REAL                XMIN,XMAX
       REAL                YMIN,YMAX
 
-      INTEGER             AFD                        ! ARD FIO descriptor
+      INTEGER             FID                        ! ARD FIO descriptor
       INTEGER             I,J
       INTEGER             I1,I2,J1,J2
       INTEGER             IV                         ! Loop over vertices
@@ -688,7 +688,7 @@
 
       LOGICAL             FLAG
       LOGICAL             DAT                        ! change data
-      LOGICAL		  EXIST			     ! ARD already exists
+      LOGICAL		  THERE			     ! ARD already exists
       LOGICAL             APPEND                     ! Append to ARD file?
       LOGICAL             ARD                        ! Working in ARD file mode?
       LOGICAL             FIRST                      ! First row to be done yet?
@@ -720,8 +720,26 @@
         CALL USI_GET0L('ARD',ARD,STATUS)
         IF (ARD) THEN
 
-*        Open for APPEND access?
-          CALL USI_GET0L( 'APPEND', APPEND, STATUS )
+*        Get file name
+          CALL USI_GET0C('FILE',ARDFILE,STATUS)
+          INQUIRE(FILE=ARDFILE,EXIST=THERE)
+
+          IF (THERE) THEN
+
+*          Open for APPEND access?
+            CALL USI_GET0L( 'APPEND', APPEND, STATUS )
+
+            IF (APPEND) THEN
+              CALL FIO_OPEN(ARDFILE,'APPEND','LIST',0,FID,STATUS)
+            ELSE
+              CALL FIO_OPEN(ARDFILE,'UPDATE','LIST',0,FID,STATUS)
+            ENDIF
+
+          ELSE
+            CALL FIO_OPEN(ARDFILE,'WRITE','LIST',0,FID,STATUS)
+
+          ENDIF
+
 
 *        Open group for storing AD text
           CALL ARX_OPEN('WRITE',GRPID,STATUS)
@@ -854,11 +872,9 @@
 
 
 *        Write ARD text to file and close group
-          IF (APPEND) THEN
-            CALL ARX_APPEND('FILE',GRPID,STATUS)
-          ELSE
-            CALL ARX_WRITE('FILE',GRPID,STATUS)
-          ENDIF
+          CALL ARX_WRITEF(GRPID,FID,STATUS)
+
+          CALL FIO_CLOSE(FID,STATUS)
 
           CALL ARX_CLOSE(GRPID,STATUS)
 
