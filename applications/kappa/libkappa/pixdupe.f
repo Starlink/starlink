@@ -74,11 +74,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 April 28 (MJC):
 *        Original NDF version.
+*     11-JUN-1998 (DSB):
+*        Added propagation of the NDF WCS component.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -99,6 +102,8 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix component of linear mapping
+      DOUBLE PRECISION OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
       INTEGER ACTVAL             ! Actual number of compression factors
       INTEGER AEXPND( NDF__MXDIM ) ! Axis expansion factors
       INTEGER AIDIMS( NDF__MXDIM ) ! Axis expansion dimensions of input
@@ -558,6 +563,22 @@
             END IF
          END DO
       END IF
+
+*  Propagate the WCS component, incorporating a linear mapping between
+*  pixel coordinates. This mapping is described by a matrix and an offset
+*  vector. Set these up. 
+      DO I = 1, NDIM*NDIM
+         MATRIX( I ) = 0.0
+      END DO
+
+      DO I = 1, NDIM
+         OFFSET( I ) = DBLE( LBNDO( I ) - 1 ) - EXPAND( I )*
+     :                 DBLE( LBND( I ) - 1 )
+         MATRIX( NDIM*( I - 1 ) + I ) = DBLE( EXPAND( I ) )
+      END DO
+
+*  Propagate the WCS component.
+      CALL KPG1_ASPRP( NDIM, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
 *  Come here if something has gone wrong.
   999 CONTINUE
