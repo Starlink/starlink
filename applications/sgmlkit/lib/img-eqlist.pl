@@ -45,7 +45,7 @@ $infile = $ARGV[0];
 $eqcount = '001';
 
 %eqtypes = ( 'start-inline' => '$',
-	     'end-inline' => '$',
+	     'end-inline' => '$\special{dvi2bitmap crop all 0}',
 	     'start-equation' => '\begin{equation}',
 	     'end-equation' => '\end{equation}',
 	     'start-eqnarray' => '\begin{eqnarray}',
@@ -62,6 +62,8 @@ open (LATEXOUT, ">$filenameroot.imgeq.tex")
 print LATEXOUT <<'EOT';
 \documentclass[fleqn]{article}
 \pagestyle{empty}
+\oddsidemargin=10pt
+\hoffset=0pt
 \mathindent=2cm
 \makeatletter
 \newif\if@SetEqnNum\@SetEqnNumfalse
@@ -88,6 +90,7 @@ print LATEXOUT <<'EOT';
      \global\@eqcnt\z@\cr}
 \makeatother
 \begin{document}
+\special{dvi2bitmap default crop all 10 absolute crop left 0}
 EOT
 
 print SGMLOUT "<!doctype img-eqlist system 'img-eqlist'>\n<img-eqlist>\n";
