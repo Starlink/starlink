@@ -225,6 +225,7 @@ c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
 *  Local Variables:
       CHARACTER*100 		FILE			! File name for HDS_TRACE
       CHARACTER*2 		SPECH			! Spectrum number (within set)
+      CHARACTER*24		STR
 
       REAL			RSUM			! Real SSCALE
       REAL 			TEFF			! Effective exposure time
@@ -543,12 +544,12 @@ c DCFID(I)
 	        DETNO(N)=0		! Flag for `use all spectra'
 	      END IF
 	      IF (SETSIZE.EQ.1) THEN
-	        WRITE(*,100) (DETSEL(I,N),I=1,SETSIZE)
+	        WRITE(*,100) DETSEL(1,N)
  100	        FORMAT(' Using component number: ',I3)
 	      ELSE
-	        WRITE(*,110) (DETSEL(I,N),I=1,SETSIZE)
- 110	        FORMAT(' Using numbers: ',(I3))
-c110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
+                WRITE(STR,110) '('' Using numbers: '',',SETSIZE,'I3)'
+ 110            FORMAT(A,I1,A)
+                WRITE(*,STR) (DETSEL(I,N),I=1,SETSIZE)
 	      END IF
 	    ELSE
 	      SETSIZE = DIMS(2)
