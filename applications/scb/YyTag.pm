@@ -120,7 +120,7 @@ sub dotag {
 
    if ( $pid == 0 ) {
       close STDIN;
-      open (STDIN, "<& " . fileno ($fhin)) or die "Failed to reopen file\n";
+      open (STDIN, "<&" . fileno ($fhin)) or die "Failed to reopen file: $!\n";
       exec $tagprog or die "Failed to exec $tagprog\n";
    }
 
