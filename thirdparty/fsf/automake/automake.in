@@ -3750,10 +3750,23 @@ sub handle_dist ()
     if rule 'dist-hook';
   $transform{'DIST-TARGETS'} = join(' ', @dist_targets);
 
+  my $starlink_rules = defined $starlink_seen_features{star_defaults};
+
   $output_rules .= &file_contents ('distdir',
 				   new Automake::Location,
-				   %transform);
-  &handle_starlink_dist;
+				   %transform,
+                                   'STAREXTRA' => ($starlink_rules
+                                                   ? '$(STAR_EXTRA_DIST)'
+                                                   : ''));
+
+  # Handle extra distribution features required for Starlink code,
+  # but not if the macro STAR_DEFAULTS wasn't seen.  This will be the case
+  # if we're configuring thirdparty code, which we typically do not intend
+  # to distribute.  This might need to become finer-grained, but the
+  # original prompt for this was to stop @STAR_EXTRA_DIST@ being
+  # generated when running automake on the libtool Makefile.am.
+  &handle_starlink_dist
+    if $starlink_rules;
 }
 
 
