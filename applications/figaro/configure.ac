@@ -22,8 +22,11 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_MAKE_SET
 
-dnl     Dependences on Starlink packages
+dnl    Dependences on Starlink packages
 STAR_DECLARE_DEPENDENCIES(build, [pda agi grp ndf fio])
+
+dnl     Needs hlib to build the help library.
+STAR_CHECK_PROGS(hlib)
 
 dnl    We have a SUN document, so we should probably tell people it's there.
 STAR_LATEX_DOCUMENTATION(sun86)
