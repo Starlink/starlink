@@ -43,6 +43,8 @@
 *         If true you will be prompted for pointing corrections.
 *     IN = NDF (Read)
 *         Name of NDF to change.
+*     MSG_FILTER = _CHAR (Read)
+*         Message filter level. (Default is NORM)
 *     POINT_DAZ = _REAL (Read)
 *         The Azimuth pointing correction (arcsec).
 *     POINT_DEL = _REAL (Read)
@@ -74,19 +76,25 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'REDS_SYS'                         ! REDS constants
-*    Import :
-*    Import-Export :
-*    Export :
+      INCLUDE 'MSG_PAR'                          ! MSG__ constants
+
+*    Import:
+*    Import-Export:
+*    Export:
+
 *    Status :
       INTEGER STATUS
-*    External references :
+
+*    External references:
 
 *    Global variables :
-*    Local Constants :
+
+*    Local Constants:
       INTEGER          MAX__DIM                  ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)                   ! array
       CHARACTER * 15   TSKNAME                   ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_POINTING')  
+
 *    Local variables :
       LOGICAL          CHANGE_POINT              ! .TRUE. if the user wants
                                                  ! to change the pointing
@@ -142,6 +150,9 @@
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 * initialise some flags and locators
 
@@ -243,8 +254,9 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation of '//
-     :     '^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
+     :     STATUS)
 
 *     pointing corrections for MAP observations
 
@@ -271,8 +283,10 @@
             END IF
          END DO
          CALL MSG_SETC ('END_LST', STEMP)
-
-         CALL MSG_OUT (' ', 'REDS: observation started at LST '//
+         CALL MSG_SETC('PKG', PACKAGE)
+         
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: observation started at LST '//
      :        '^START_LST and ended at ^END_LST', STATUS)
 
 *     find and report the nature of any current pointing correction
@@ -295,10 +309,14 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
             IF (N_POINT .EQ. 0) THEN
-               CALL MSG_OUT (' ', 'REDS: no pointing corrections found',
+               CALL MSG_SETC('PKG', PACKAGE)
+               CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :              '^PKG: no pointing corrections found',
      :              STATUS)
             ELSE
-               CALL MSG_OUT (' ', 'REDS: the following pointing '//
+               CALL MSG_SETC('PKG', PACKAGE)
+               CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :              '^PKG: the following pointing '//
      :              'corrections currently apply (LST dAZ dEL):-', 
      :              STATUS)
 
@@ -318,7 +336,8 @@
                   CALL MSG_SETR ('DAZ', POINT_DAZ(I))
                   CALL MSG_SETR ('DEL', POINT_DEL(I))
 
-                  CALL MSG_OUT (' ', ' - ^LST    ^DAZ ^DEL', STATUS)
+                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :                 ' - ^LST    ^DAZ ^DEL', STATUS)
                END DO
 
             END IF
@@ -396,9 +415,12 @@
                CALL DAT_ERASE(IN_REDSX_LOC, 'POINT_LST', STATUS)
                CALL DAT_ERASE(IN_REDSX_LOC, 'POINT_DAZ', STATUS)
                CALL DAT_ERASE(IN_REDSX_LOC, 'POINT_DEL', STATUS)
-               IF (STATUS .EQ. SAI__OK) CALL MSG_OUT('POINT',
-     :              'Erasing pointing corrections', 
-     :              STATUS)
+               IF (STATUS .EQ. SAI__OK) THEN 
+                  CALL MSG_SETC('PKG', PACKAGE)
+                  CALL MSG_OUTIF(MSG__NORM, 'POINT',
+     :                 '^PKG: Erasing pointing corrections', 
+     :                 STATUS)
+               END IF
 
             END IF
          ELSE
