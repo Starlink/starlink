@@ -16,6 +16,7 @@ MANIFEST=$(prefix)/manifests
 #     No pseudo-components such as pcs, installing which actually installs
 #         multiple components, with some being potentially out of
 #         dependency order.
+#     Obsolete components
 ALL_TARGETS = \
 	$(MANIFEST)/adam \
 	$(MANIFEST)/agi \
@@ -87,10 +88,6 @@ ALL_TARGETS = \
 	$(MANIFEST)/trn \
 	$(MANIFEST)/xdisplay
 
-
-# Targets present in tree, but excluded from list
-#   adamnet -- obsolete
-
 # The other important target is `buildsupport', the dependencies of
 # which are defined in the Makefile.dependencies which is included below.
 
@@ -149,15 +146,15 @@ world: $(ALL_TARGETS)
 # Makefile.dependencies, so that it can be successfully included in
 # this Makefile.
 #
-# Make the componentset.xml by concatenating all the component.xml files
-# we can find.  Sort the list of files to make the order
+# We make the componentset.xml by concatenating all the component.xml
+# files we can find.  Sort the list of files to make the order
 # deterministic.  The removal of the DOCTYPE lines and PIs is
 # admittedly lame, but good enough for the moment.
 #
 # componentset.xml `really' depends on all the component.xml files
 # below it, but don't state this, for the reason explained above.
-# If you add a component, then delete componentset.xml here and
-# remake Makefile.dependencies. 
+# If you add a component or changes a component's dependencies,
+# then delete Makefile.dependencies here and remake it.
 #
 Makefile.dependencies:
 	rm -f componentset.xml Makefile.dependencies Makefile.dependencies.tmp
@@ -203,9 +200,8 @@ buildsupport/starconf/configure: $(MANIFEST)/automake $(MANIFEST)/autoconf
 # Disable `make install' from this directory
 install install-manifest:
 	@ echo "To install a component, go to its directory and type"
-	@ echo "  'make install' or 'make install-manifest' there."
-	@ echo "Or delete its manifest from $(MANIFEST), "
-	@ echo "  and make $(MANIFEST)/<component-name>".
+	@ echo "  'make install' there.  Or delete its manifest from"
+	@ echo "  $(MANIFEST), and make $(MANIFEST)/<component-name>".
 	@ echo "To install the whole tree, type 'make world'."
 
 clean: clean-recursive
