@@ -15,8 +15,8 @@ pisa_mon_SOURCES = \
 
 pisa_mon_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
 
-pisa_mon_TASKS = pisafind pisaplot pisafit pisapeak pisamatch pisacut \
- pisagen pisaknn addnoise pisagrey pisa2ard pisa2cat
+pisa_mon_TASKS = addnoise pisa2ard pisacut pisafind pisafit pisagen \
+ pisagrey pisaknn pisamatch pisapeak pisaplot pisa2cat
 
 pisa_mon4_SOURCES = \
         pisa_mon4.f \
