@@ -14,6 +14,8 @@
 #  History:
 #     24-FEB-1998 (DSB):
 #     	 Original version.
+#     6-AUG-1998 (DSB):
+#        Changed default for LBND and UBND to !.
 #     {enter_further_changes_here}
 
 #-
@@ -177,8 +179,9 @@ interface POLPLOT
    parameter      LBND
       type        '_REAL'
       prompt      'Co-ordinates at lower left corner of plotting area'
-      vpath       'DYNAMIC'
-      ppath       'DYNAMIC'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
       helpkey     '*'
    endparameter
 
@@ -219,8 +222,9 @@ interface POLPLOT
    parameter      UBND
       type        '_REAL'
       prompt      'Co-ordinates at upper right corner of plotting area'
-      vpath       'DYNAMIC'
-      ppath       'DYNAMIC'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
       helpkey     '*'
    endparameter
 

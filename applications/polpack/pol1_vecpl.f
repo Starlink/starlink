@@ -16,7 +16,7 @@
 *                      ANGROT, DSCALE, AHSIZE, JUST, NEGATE, STATUS )
 
 *  Description:
-*     The supplied vectors are plotted.
+*     The supplied vectors are plotted within the current PGPLOT window.
 
 *  Arguments:
 *     NVEC = INTEGER (Given)
@@ -68,7 +68,9 @@
 *  History:
 *     24-FEB-1998 (DSB):
 *        Original version.
-
+*     6-AUG-1998 (DSB):
+*        PGPLOT viewport reduced slightly in order to avoid vectors
+*        over-writing the border.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,11 +111,55 @@
       INTEGER NPLOT              ! No. of vectors plotted
       REAL VECANG                ! Vector position angle in radians
       REAL VECLEN                ! Vector length in pixels
-      
+      REAL D                     ! Change to axis extent
+      REAL X1                    ! X coordinate at bottom left corner      
+      REAL X2                    ! X coordinate at top right corner      
+      REAL Y1                    ! Y coordinate at bottom left corner      
+      REAL Y2                    ! Y coordinate at top right corner      
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First of all, reduce the extent of the PGPLOT viewport slightly so that
+*  vectors are not plotted right up to the border. Otherwise, vectors 
+*  intersect the border.
+*  ========================================================================
+
+*  Get the bounds of the PGPLOT viewport in normalised device coordinates.
+      CALL PGQVP( 0, X1, X2, Y1, Y2 )      
+
+*  Change these bounds so that they cover the central 98% of the original 
+*  viewport.
+      D = 0.01*( X2 - X1 )
+      X2 = X2 - D
+      X1 = X1 + D
+
+      D = 0.01*( Y2 - Y1 )
+      Y2 = Y2 - D
+      Y1 = Y1 + D
+
+*  Establish the new viewport.
+      CALL PGSVP( X1, X2, Y1, Y2 )
+
+*  Now change the bounds of the world coordinates window which is visible
+*  through this viewport. Get the original window.
+      CALL PGQWIN( X1, X2, Y1, Y2 )
+
+*  Reduce the bounds.
+      D = 0.01*( X2 - X1 )
+      X2 = X2 - D
+      X1 = X1 + D
+
+      D = 0.01*( Y2 - Y1 )
+      Y2 = Y2 - D
+      Y1 = Y1 + D
+
+*  Establish the new window.
+      CALL PGSWIN( X1, X2, Y1, Y2 )
+
+*  Now draw the vectors.
+*  =====================
 
 *  Initialise the count of plotted vectors.
       NPLOT = 0

@@ -442,7 +442,7 @@ kpg1_wwrt.f kps1_vecky.f pol1_vecpl.f polplot.f kpg1_rdast.f kpg1_wrast.f \
 kpg1_short.f kpg1_isscs.f kpg1_h2ast.f kpg1_ast2h.f kpg1_chscs.f \
 kpg1_seteq.f kpg1_asget.f kpg1_wcatw.f pol1_squar.f pol1_clcnt.f \
 pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f kpg1_odrst.f kpg1_asrep.f \
-ccd1_repc.f 
+ccd1_repc.f pol1_rmbnd.f kpg1_gtctw.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -1526,6 +1526,7 @@ kpg1_gdsav.o:	SAE_PAR AST_PAR DAT_PAR AGI_PAR
 kpg1_grpsz.o:	SAE_PAR GRP_PAR
 kpg1_gtcol.o:	SAE_PAR
 kpg1_gtcta.o:	SAE_PAR AST_PAR CAT_PAR
+kpg1_gtctw.o:	SAE_PAR AST_PAR CAT_PAR
 kpg1_gtctc.o:	SAE_PAR CAT_PAR CAT_ERR PAR_ERR
 kpg1_gtfrm.o:	SAE_PAR AST_PAR GRP_PAR NDF_PAR PAR_ERR
 kpg1_gtgrp.o:	SAE_PAR GRP_PAR PAR_ERR
@@ -1647,6 +1648,8 @@ pol1_mkcat.o:	CAT_PAR
 pol1_mkcat.o:	SAE_PAR
 pol1_plvec.o:	PRM_PAR
 pol1_plvec.o:	SAE_PAR
+pol1_rmbnd.o:	SAE_PAR
+pol1_rmbnd.o:	PRM_PAR
 pol1_setft.o: 	DAT_PAR
 pol1_setft.o: 	SAE_PAR
 pol1_stats.o:	PRM_PAR

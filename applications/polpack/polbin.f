@@ -89,7 +89,10 @@
 
 *  History:
 *     26-MAR-1998 (DSB):
-*        Original version, derived from kappa:vecplot.
+*        Original version.
+*     6-AUG-1998 (DSB):
+*        Use KPG1_GTCTW instead of KPG1_GTCTA (which has changed its
+*        behaviour).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,7 +207,6 @@
       INTEGER NYBIN              ! No. of output bins along Y axis
       LOGICAL CIRC               ! Doing circular polarimetry?
       LOGICAL DEBIAS             ! Statistical de-biassing required?
-      LOGICAL GOTWCS             ! Was a FrameSet read from the input catalogue?
       LOGICAL NULL1              ! Null value flag
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
@@ -669,7 +671,7 @@
 *  information will be copied unchanged to the output catalogue when the
 *  output catalogue is closed. Report an error if no WCS information is
 *  available in the input catalogue.
-      CALL KPG1_GTCTA( ' ', CIIN, 0, GI, GOTWCS, IWCS, STATUS )
+      CALL KPG1_GTCTW( CIIN, IWCS, STATUS )
       IF( IWCS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLBIN_1', 'No usable WCS coordinate system '//

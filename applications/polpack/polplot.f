@@ -258,6 +258,9 @@
 *  History:
 *     5-FEB-1998 (DSB):
 *        Original version, derived from kappa:vecplot.
+*     5-AUG-1998 (DSB):
+*        Correct the DOMAIN passed to KPG1_PLOT so that it refers to the 
+*        Base Frame of the WCS info, instead of the Current Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -273,6 +276,7 @@
       INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
+      INCLUDE 'PAR_ERR'          ! PAR_ error constants 
 
 *  Status:
       INTEGER STATUS
@@ -301,17 +305,16 @@
       DOUBLE PRECISION DMINC     ! Min. pixel value after clipping
       DOUBLE PRECISION DX        ! Extension of X axis
       DOUBLE PRECISION DY        ! Extension of Y axis
+      DOUBLE PRECISION LBND      ! Lower axis bound
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
-      DOUBLE PRECISION SXHI      ! Upper bound of used region of X axis 
-      DOUBLE PRECISION SXLO      ! Lower bound of used region of X axis 
-      DOUBLE PRECISION SYHI      ! Upper bound of used region of Y axis 
-      DOUBLE PRECISION SYLO      ! Lower bound of used region of Y axis 
+      DOUBLE PRECISION UBND      ! Upper axis bound
       INTEGER CI                 ! CAT catalogue identifier
+      INTEGER FRM                ! Frame pointer
       INTEGER GI                 ! CAT column identifier
       INTEGER GIANG              ! CAT identifier for ANG column
       INTEGER GIMAG              ! CAT identifier for MAG column
@@ -320,6 +323,7 @@
       INTEGER GIY                ! CAT identifier for X column
       INTEGER I                  ! Loop count
       INTEGER ICAT               ! Index of (X,Y) Frame in IWCS and IPLOT
+      INTEGER IFRM               ! Frame index
       INTEGER IMAX               ! Vector index of max. pixel
       INTEGER IMAXC              ! Vector index of max. clipped pixel
       INTEGER IMIN               ! Vector index of min. pixel
@@ -336,6 +340,7 @@
       INTEGER IPX2               ! Pointer to array holding vector X positions
       INTEGER IPY2               ! Pointer to array holding vector Y positions
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
+      INTEGER MAP                ! Mapping pointer
       INTEGER MAXPOS             ! Position of maximum value
       INTEGER MINPOS             ! Position of minimum value
       INTEGER NBAD               ! No. of bad values
@@ -346,6 +351,7 @@
       INTEGER NGOODC             ! No. valid pixels after clipping
       INTEGER NGX                ! No. of good vector X values
       INTEGER NGY                ! No. of good vector Y values
+      INTEGER NIN                ! No. of positions in user-specified bounds
       INTEGER NKP                ! No. of values supplied for parameter KEYPOS
       INTEGER NVEC               ! No. of vectors in catalogue
       INTEGER VCI                ! Vector colour index
@@ -477,45 +483,71 @@
      :                 '(^NAME) contains no data.', STATUS )
       END IF
 
-*  Find the spatial bounds of the data in pixel coordinates.
-*  =========================================================
+*  Remove data outside user-specified bounds.
+*  ==========================================
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the lower and upper bounds of the area to be included in the plot,
+*  in terms of the COLX and COLY values.
+      CALL PAR_EXACR( 'LBND', 2, BLO, STATUS )
+      CALL PAR_EXACR( 'UBND', 2, BHI, STATUS )
+
+*  If a null value was supplied, the entire data set is used...
+      IF( STATUS .EQ. PAR__NULL ) THEN
+
+*  Annul the error.
+         CALL ERR_ANNUL( STATUS )
+
 *  Find the maximum and minimum X value.
-      CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC, %VAL( IPX ), NBAD, SXHI,
-     :                  SXLO, MAXPOS, MINPOS, STATUS )
+         CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC, %VAL( IPX ), NBAD, 
+     :                    UBND, LBND, MAXPOS, MINPOS, STATUS )
+         BHI( 1 ) = REAL( UBND )
+         BLO( 1 ) = REAL( LBND )
 
 *  Find the maximum and minimum Y value.
-      CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC, %VAL( IPY ), NBAD, SYHI,
-     :                  SYLO, MAXPOS, MINPOS, STATUS )
+         CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC, %VAL( IPY ), NBAD, 
+     :                    UBND, LBND, MAXPOS, MINPOS, STATUS )
+         BHI( 2 ) = REAL( UBND )
+         BLO( 2 ) = REAL( LBND )
 
-*  Extend these values slightly at each border.
-      DX = 0.005*( SXHI - SXLO )
-      DY = 0.005*( SYHI - SYLO )
-      BLO( 1 ) = SXLO - DX
-      BLO( 2 ) = SYLO - DY
-      BHI( 1 ) = SXHI + DX
-      BHI( 2 ) = SYHI + DY
+*  Extend these bounds slightly.
+         DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )         
+         BLO( 1 ) = BLO( 1 ) - DX
+         BHI( 1 ) = BHI( 1 ) + DX
 
-*  Allow the user to over-ride these values. 
-      CALL PAR_GDR1R( 'LBND', 2, BLO, -VAL__MAXR, VAL__MAXR, .FALSE.,
-     :                BLO, STATUS )
-      CALL PAR_GDR1R( 'UBND', 2, BHI, -VAL__MAXR, VAL__MAXR, .FALSE.,
-     :                BHI, STATUS )
+         DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )         
+         BLO( 2 ) = BLO( 2 ) - DY
+         BHI( 2 ) = BHI( 2 ) + DY
 
-*  Produce double precision versions of these for use with AST.
-      BOX( 1 ) = DBLE( BLO( 1 ) )
-      BOX( 2 ) = DBLE( BLO( 2 ) )
-      BOX( 3 ) = DBLE( BHI( 1 ) )
-      BOX( 4 ) = DBLE( BHI( 2 ) )
+*  Otherwise ensure the bounds are the correct way round.
+      ELSE
+         IF( BLO( 1 ) .GT. BHI( 1 ) ) THEN
+            DUMMY = BLO( 1 )
+            BLO( 1 ) = BHI( 1 )
+            BHI( 1 ) = DUMMY
+         END IF
 
-*  Get the aspect ratio of the box (assuming equal scales on each axis).
-      ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
+         IF( BLO( 2 ) .GT. BHI( 2 ) ) THEN
+            DUMMY = BLO( 2 )
+            BLO( 2 ) = BHI( 2 )
+            BHI( 2 ) = DUMMY
+         END IF
+
+      END IF
+
+*  Remove any positions outside these bounds. This also shuffles bad 
+*  positions to the end, and counts the number of good positions.
+      CALL POL1_RMBND( NVEC, BLO, BHI, %VAL( IPMAG ), %VAL( IPANG ), 
+     :                 %VAL( IPX ), %VAL( IPY ), NIN, STATUS )
 
 *  Find a representative data value.
 *  =================================
 *  Obtain a "typical" data value from the magnitude column. This will be
 *  used to define the default vector scaling. First, compute the
 *  statistics. Remove abberant values by sigma clipping 4 times.
-      CALL KPG1_STATR( ( NGMAG .LT. NVEC ), NVEC, %VAL( IPMAG ), 4, 
+      CALL KPG1_STATR( ( NIN .LT. NVEC ), NIN, %VAL( IPMAG ), 4, 
      :                 CLIP, NGOOD, IMIN, DMIN, IMAX, DMAX, SUM, MEAN, 
      :                 STDEV, NGOODC, IMINC, DMINC, IMAXC, DMAXC, SUMC, 
      :                 MEANC, STDEVC, STATUS )
@@ -549,15 +581,80 @@
 *  parameter COSYS.
       GIS( 1 ) = GIX
       GIS( 2 ) = GIY
-      CALL KPG1_GTCTA( 'COSYS', CI, 2, GIS, THERE, IWCS, STATUS )
+      CALL KPG1_GTCTA( 'COSYS', CI, 2, GIS, IWCS, STATUS )
 
 *  Get the index of the Frame corresponding to the catalogue columns 
 *  specifying the vector positions (i.e. the Base Frame in the above
 *  FrameSet).
       ICAT = AST_GETI( IWCS, 'BASE', STATUS )
 
-*  Get the Domain in which the vector positions are defined.
-      DOMAIN = AST_GETC( IWCS, 'DOMAIN', STATUS )
+*  Look for a 2D PIXEL Frame in the FrameSet.
+      IFRM = AST__NOFRAME
+      DO I = 1, AST_GETI( IWCS, 'NFRAME', STATUS )
+         FRM = AST_GETFRAME( IWCS, I, STATUS )
+         IF( AST_GETI( FRM, 'NAXES', STATUS ) .EQ. 2 .AND.
+     :       AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 'PIXEL' ) THEN
+            IFRM = I
+         END IF
+         CALL AST_ANNUL( FRM, STATUS )           
+      END DO
+
+*  If a 2D PIXEL Frame was found...
+      IF( IFRM .NE. AST__NOFRAME ) THEN
+
+*  The extent of the Plot will be specified in the PIXEL Frame.
+         DOMAIN = 'PIXEL'
+
+*  We now need to find the extent of the data in the PIXEL Frame (BLO and
+*  BHI currently contain the extent of the data in the Base Frame). Get 
+*  the Mapping from the Base Frame to the 2D PIXEL Frame.
+         MAP = AST_GETMAPPING( IWCS, AST__BASE, IFRM, STATUS )      
+
+*  If this Mapping is not a UnitMap, transform the supplied catalogue 
+*  positions into PIXEL positions using this Mapping.
+         IF( .NOT. AST_ISAUNITMAP( MAP, STATUS ) ) THEN
+            CALL AST_TRAN2( MAP, NIN, %VAL( IPX ), %VAL( IPY ), .TRUE.,
+     :                      %VAL( IPX2 ), %VAL( IPY2 ), STATUS ) 
+
+*  Find the maximum and minimum X PIXEL value.
+            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, %VAL( IPX2 ), NBAD, 
+     :                      UBND, LBND,  MAXPOS, MINPOS, STATUS )
+            BHI( 1 ) = REAL( UBND )
+            BLO( 1 ) = REAL( LBND )
+
+*  Find the maximum and minimum Y PIXEL value.
+            CALL KPG1_MXMND( ( NIN .LT. NVEC ), NIN, %VAL( IPY2 ), NBAD, 
+     :                      UBND, LBND, MAXPOS, MINPOS, STATUS )
+            BHI( 2 ) = REAL( UBND )
+            BLO( 2 ) = REAL( LBND )
+
+*  Extend these bounds slightly.
+            DX = 0.005*( BHI ( 1 ) - BLO( 1 ) )         
+            BLO( 1 ) = BLO( 1 ) - DX
+            BHI( 1 ) = BHI( 1 ) + DX
+   
+            DY = 0.005*( BHI ( 2 ) - BLO( 2 ) )         
+            BLO( 2 ) = BLO( 2 ) - DY
+            BHI( 2 ) = BHI( 2 ) + DY
+         END IF
+
+*  If no 2D PIXEL Frame was found...
+      ELSE
+
+*  The extent of the Plot will be specified in the BASE Frame. BLO and
+*  BHI already contain the extent of the data in the Base Frame.
+         DOMAIN = AST_GETC( AST_GETFRAME( IWCS, ICAT, STATUS ),
+     :                      'DOMAIN', STATUS )
+      END IF
+
+*  Produce double precision versions of the bounds for use with AST.
+      BOX( 1 ) = DBLE( BLO( 1 ) )
+      BOX( 2 ) = DBLE( BLO( 2 ) )
+      BOX( 3 ) = DBLE( BHI( 1 ) )
+      BOX( 4 ) = DBLE( BHI( 2 ) )
+
+*  Get the aspect ratio of the box (assuming equal scales on each axis).
+      ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
 
 *  Establish a synonym of VECTORS (minimum abbreviation VEC) for the AST 
 *  graphical element name CURVES.
@@ -647,17 +744,13 @@
 *  First draw the axes if required.
       IF ( AXES ) CALL AST_GRID( IPLOT, STATUS )
 
-*  Modify the Plot so that the Current Frame corresponds to the coordinates
-*  specified in the X and Y catalogue columns.
-      CALL AST_SETI( IPLOT, 'CURRENT', ICAT, STATUS )
+*  Get the Mapping from the Frame in which catalogue positions are stored,
+*  to graphics world coordinates.
+      MAP = AST_GETMAPPING( IPLOT, ICAT, AST__BASE, STATUS )
 
-*  Set up clipping which results in vectors outside the supplied bounds
-*  being ignored.
-      CALL AST_CLIP( IPLOT, AST__CURRENT, BOX( 1 ), BOX( 3 ), STATUS ) 
-
-*  Use the inverse of the Plot as a Mapping to transform the (x,y) positions 
-*  in the catalogue into graphics world coordinates.
-      CALL AST_TRAN2( IPLOT, NVEC, %VAL( IPX ), %VAL( IPY ), .FALSE.,
+*  Use this Mapping to transform the (x,y) positions in the catalogue 
+*  into graphics world coordinates.
+      CALL AST_TRAN2( MAP, NIN, %VAL( IPX ), %VAL( IPY ), .TRUE.,
      :                %VAL( IPX2 ), %VAL( IPY2 ), STATUS ) 
 
 *  Set the appearance of lines drawn using PGPLOT so that they mimic 
@@ -665,7 +758,7 @@
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 
 *  Plot the vectors.
-      CALL POL1_VECPL( NVEC, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
+      CALL POL1_VECPL( NIN, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
      :                 %VAL( IPANG ), ANGFAC, ANGROT, DSCALE, AHSIZE, 
      :                 JUST, NEGATE, STATUS )
 

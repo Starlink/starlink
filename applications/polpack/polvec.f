@@ -170,6 +170,8 @@
 *        Added parameter Q, U and V.
 *     30-JUN-1998 (DSB):
 *        Set TR array if no bining is used.
+*     8-AUG-1998 (DSB):
+*        Make the PIXEL Frame the Base Frame in the catalogue WCS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -185,6 +187,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -199,6 +202,7 @@
       INTEGER DIM( 3 )           ! Dimensions of input Stokes cube
       INTEGER EL                 ! No. of elements in mapped arrays
       INTEGER I                  ! Loop count
+      INTEGER ICURR              ! Index of PIXEL Frame
       INTEGER INDF1              ! Identifier for input Stokes cube
       INTEGER INDFI              ! Identifier for total intensity output
       INTEGER INDFIP             ! Identifier for polarised int. output
@@ -236,6 +240,7 @@
       INTEGER NVAL               ! No. of values obtained
       INTEGER NXBIN              ! No. of bins along X axis
       INTEGER NYBIN              ! No. of bins along Y axis
+      INTEGER TEMP               ! Pointer to FrameSet
       INTEGER UBND( 3 )          ! Upper bounds of input NDF
       INTEGER WKBNSZ             ! Size of workspace for binned data
       LOGICAL BINNING            ! Is any binning taking place?
@@ -641,6 +646,30 @@
 *  Get the units string from the input cube.
       UNITS = ' '
       CALL NDF_CGET( INDF1, 'UNITS', UNITS, STATUS ) 
+
+*  The WCS information stored in the catalogue must have the PIXEL Frame
+*  as the Base Frame, since these are the coordinates stored in the X and
+*  Y columns...
+
+*  Note, the Current Frame index.
+      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  Find the PIXEL Frame and make it the Current Frame.
+      TEMP = AST_FINDFRAME( IWCS, AST_FRAME( 2, ' ', STATUS ),
+     :                      'PIXEL', STATUS )
+
+*  If found, Annull the returned FrameSet.
+      IF( TEMP .NE. AST__NULL ) THEN
+         CALL AST_ANNUL( TEMP, STATUS )
+
+*  Make the PIXEL Frame, the Base Frame.
+         CALL AST_SETI( IWCS, 'BASE', 
+     :                  AST_GETI( IWCS, 'CURRENT', STATUS ), STATUS )
+
+*  Re-instate the original Current Frame.
+         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+
+      END IF
  
 *  Create the catalogue.
       CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 

@@ -24,7 +24,7 @@
 *     the planes in the input cube are presumed to be aligned, axis 3
 *     is ignored. A new 2D PIXEL Frame is added to the FrameSet assuming
 *     pixel indices equals grid indices. Finally the original GRID and 
-*     PIXEL Frames are removed from the FrameSet.
+*     PIXEL Frames are removed.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -56,6 +56,8 @@
 *        Changed the corners of the box used to define the WinMap so
 *        that it never has zero area. Supplied "1.0D0" instead of "1.0"
 *        as constant value to AST_PERMMAP.
+*     5-AUG-1998 (DSB):
+*        Re-instate original Current Frame after adding new PIXEL Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +96,7 @@
       INTEGER INPERM( 3 )        ! O/p axis mapping to each i/p axis
       INTEGER OUTPERM( 2 )       ! I/p axis mapping to each o/p axis
       INTEGER PERM               ! Pointer to a PermMap
+      INTEGER TEMP               ! Pointer to FrameSet
       INTEGER WIN                ! Pointer to a WinMap
 *.
 
@@ -146,7 +149,7 @@
       CALL AST_SETC( FRM, 'Unit(1)', 'pixel', STATUS )
       CALL AST_SETC( FRM, 'Unit(2)', 'pixel', STATUS )
 
-*  Save the indices of the Base and Current Frames.
+*  Save the indices of the Base (i.e. GRID) and Current Frames.
       IBASE = AST_GETI( IWCS, 'BASE', STATUS )
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
@@ -163,19 +166,27 @@
       CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )      
       CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )      
 
-*  Delete the original 3D GRID Frame. 
-c      CALL AST_REMOVEFRAME( IWCS, IBASE, STATUS ) 
-      CALL AST_SETC( AST_GETFRAME( IWCS, IBASE, STATUS ),
-     :               'Domain', 'OLDGRID', STATUS )
+*  Find the 3D PIXEL Frame within the WCS FrameSet. It becomes the
+*  Current Frame.
+      TEMP = AST_FINDFRAME( IWCS, AST_FRAME( 3, ' ', STATUS ), 'PIXEL',
+     :                      STATUS )
 
-*  Find the index of the 3D PIXEL Frame.
-      CALL KPG1_ASFFR( IWCS, AST_FRAME( 3, ' ', STATUS ), 'PIXEL',
-     :                 IPIX, STATUS )
+*  Report an error if no PIXEL Frame was found. Otherwise, annul the
+*  returned FrameSet.
+      IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL NDF_MSG( 'NDF', INDF )
+         CALL ERR_REP( 'POL1_GTWCS_1', 'No PIXEL Frame found in WCS '//
+     :                'component of ^NDF (possible programming error).',
+     :                STATUS )
+      ELSE 
+         CALL AST_ANNUL( TEMP, STATUS )
+      END IF
 
-*  Delete the original 3D PIXEL Frame. 
-c      CALL AST_REMOVEFRAME( IWCS, IPIX, STATUS ) 
-      CALL AST_SETC( AST_GETFRAME( IWCS, IPIX, STATUS ),
-     :               'Domain', 'OLDPIXEL', STATUS )
+*  Get the index of the 3D PIXEL Frame, and re-instate the original
+*  Current Frame.
+      IPIX = AST_GETI( IWCS, 'CURRENT', STATUS )
+      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )      
 
 *  Create a new 2D PIXEL Frame.
       FRM = AST_FRAME( 2, 'DOMAIN=PIXEL', STATUS ) 
@@ -204,6 +215,21 @@ c      CALL AST_REMOVEFRAME( IWCS, IPIX, STATUS )
 *  Add the new 2D PIXEL Frame into the FrameSet, connecting it to
 *  the base (i.e. GRID) Frame using the mapping created above.
       CALL AST_ADDFRAME( IWCS, AST__BASE, WIN, FRM, STATUS ) 
+
+*  If the original Current Frame was the 3D Grid Frame, make the 2D GRID
+*  Frame the Current Frame.
+      IF( ICURR .EQ. IBASE ) THEN
+         CALL AST_SETI( IWCS, 'CURRENT', INEW, STATUS )
+
+*  If the original Current Frame was the 3D PIXEL Frame, leave the 2D PIXEL
+*  as the Current Frame. Otherwise, reinstate the original Current Frame.
+      ELSE IF( ICURR .NE. IPIX ) THEN
+         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+      END IF
+
+*  Remove the original 3D GRID and PIXEL Frames, highest index first.
+      CALL AST_REMOVEFRAME( IWCS, MAX( IBASE, IPIX ), STATUS )
+      CALL AST_REMOVEFRAME( IWCS, MIN( IBASE, IPIX ), STATUS )
 
 *  Export the identifier for the returned FrameSets to the next higher
 *  context level. This means it will not be annulled by the following
