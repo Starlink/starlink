@@ -1,0 +1,11 @@
+This directory holds obsolete files from CCDPACK.
+
+It has all the files from the original RCS repository for CCDPACK which
+never made it into the autoconfed version.  Some of these files 
+were used in the last non-autoconfed release (many of them related
+to IRAF compatibility) and some of them have been absent from the
+built version for many years.  All are left here in case they may
+be of historical use or value at some time in the future.
+
+Mark Taylor
+6-JUL-2004
