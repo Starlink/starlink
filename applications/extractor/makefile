@@ -75,10 +75,10 @@
 #        export_run
 #           Produces an export copy of the built package suitable for
 #           passing to another user.  A compressed tar file is created
-#           in the $EXPORT directory containing copies of the built 
-#           files for the package (the current directory is used by 
+#           in the $EXPORT directory containing copies of the built
+#           files for the package (the current directory is used by
 #           default if the environment variable EXPORT is not defined).
-#           The package should normally be built, installed and tested 
+#           The package should normally be built, installed and tested
 #           (see above) before using this target.  After unpacking the
 #           exported file on a similar machine, the recipient may simply
 #           install it for use.
@@ -114,7 +114,7 @@
 #        MERS
 #           Message and Error System
 #        NDF
-#           N-d File 
+#           N-d File
 #        HDS
 #           Hierarchical data system
 #        PCS
@@ -138,6 +138,7 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
+#     PWD: P.W.Draper (Starlink, Durham University)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -222,6 +223,8 @@
 #        Added handling for `Conditions of Use' file.
 #     20-NOV-1998 (AJC):
 #        Modify for EXTRACTOR
+#     24-NOV-1998 (PWD):
+#        Changed for EXTRACTOR v1.0 (now includes native build).
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -382,7 +385,7 @@ PACK_NAME = EXTRACTOR
 PKG_NAME = extractor
 
 #  Prefix for the package in upper-case as used in include file links.
-PKG_LINK = 
+PKG_LINK =
 
 #  Version number (as in the documentation - i.e. not the same thing
 #  as the shared library version number).
@@ -399,7 +402,7 @@ PKG_VERS = 1.0
 
 #  List the source subdirectories
 
-SOURCE_DIRS = wcs wcsmod
+SOURCE_DIRS = wcs wcsmod sextractor
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -409,7 +412,7 @@ SOURCE_DIRS = wcs wcsmod
 #  times.
 
 SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME)_config.tar \
-               makefile mk $(DOCUMENTATION)
+               sextractor_source.tar makefile mk $(DOCUMENTATION)
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -419,23 +422,23 @@ SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME)_config.tar \
 PUBLIC_SCRIPTS =
 
 #  Startup script.  This is the file that must be executed (sourced)
-#  by a user of this package in order to define appropriate aliases 
-#  and environment variables.  It is listed separately from the public 
+#  by a user of this package in order to define appropriate aliases
+#  and environment variables.  It is listed separately from the public
 #  scripts as it is edited by the installation procedure.
 
-STARTUP_SCRIPT = $(PKG_NAME).csh 
+STARTUP_SCRIPT = $(PKG_NAME).csh
 
-#  Link script.  This script does not form part of the package but is 
+#  Link script.  This script does not form part of the package but is
 #  required for building it.  It will not be installed.
- 
+
 LINK_SCRIPT =
 
 #  Startup ICL script.  This is the file that must be loaded by ICL
 #  for a user of this package,  in order to define the package command
-#  set within ICL.  It is listed separately from the public scripts as 
+#  set within ICL.  It is listed separately from the public scripts as
 #  it is edited by the installation procedure.
 
-ICL_SCRIPT = $(PKG_NAME).icl 
+ICL_SCRIPT = $(PKG_NAME).icl
 
 #  List of private include files.  These are include files
 #  which form part of the package and are required in order to build
@@ -463,23 +466,22 @@ I_SUB3 = wcsmod/cel.h wcsmod/lin.h wcsmod/proj.h wcsmod/wcs.h wcsmod/wcstrig.h
 
 EXTERNAL_INCLUDES = sae_par.h dat_par.h par.h merswrap.h ndf.h ast.h
 
-
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
-#  routines and the main routine, which are treated separately).  
+#  routines and the main routine, which are treated separately).
 
-F_ROUTINES = 
+F_ROUTINES =
 
 #  List of Fortran BLOCK DATA routines.
 
-BLOCK_DATA = 
+BLOCK_DATA =
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
 #  given here are the general version of the file, e.g. pkg_open.f.  The
 #  names in the tar file will be pkg_open.f_sun4, pkg_open.f_mips, etc.
 
-PLATFORM_F = 
+PLATFORM_F =
 
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
@@ -514,9 +516,13 @@ MONOLITH = ${PKG_NAME}
 
 MONO_IFL = $(PKG_NAME).ifl
 
+#  SExtractor native binary.
+
+NATIVE_BINARY = sex
+
 #  List of help library sources.
 
-HELP_SOURCES = 
+HELP_SOURCES =
 
 #  List of directories for ancilliary data files.
 
@@ -528,8 +534,8 @@ TEST_FILES =
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = 
-HYPERTEXT_DOCS = 
+LATEX_DOCS =
+HYPERTEXT_DOCS =
 
 #  List of documentation files.
 
@@ -560,7 +566,8 @@ LICENCE = $(PACK_NAME)_CONDITIONS
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
-$(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT)
+              $(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT) \
+              $(STARTUP_SCRIPT) $(NATIVE_BINARY)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -646,6 +653,15 @@ libsub2.a: $(O_SUB2)
 $(MONOLITH): $(MONO_SOURCE) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_SOURCE) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
             $(ADDLIBS) `ndf_link_adam`
+
+#  Rule and dependencies for build the native binary.
+$(NATIVE_BINARY): sextractor_source.tar
+	- mkdir sextractor
+	(cd sextractor ;\
+	 $(TAR_OUT) ../sextractor_source.tar ;\
+	 cd source ;\
+	 make SEXMACHINE=$(SYSTEM) ;\
+	 cp -p sex ../..)
 
 #  Rules for building the help libraries.
 
@@ -862,7 +878,7 @@ install:
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
 #
-#  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the 
+#  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the
 #  package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 #
@@ -876,8 +892,8 @@ install:
            else :; fi;\
         done
 #
-#  Install the monolith, giving it world execute permission.
-	for f in $(MONOLITH) ""; do \
+#  Install the monolith and native binary, giving them world execute permission.
+	for f in $(MONOLITH) $(NATIVE_BINARY) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_BIN);\
               chmod 755 $(INSTALL_BIN)/$$f;\
@@ -896,7 +912,7 @@ install:
            else :; fi;\
         done
 #
-#  Install the configuration files directory, giving world read access to 
+#  Install the configuration files directory, giving world read access to
 #  all the files
 	for f in $(CONFIG_DIR) ""; do \
            if test -n "$$f"; then \
@@ -926,7 +942,7 @@ install:
         done
 #
 #  Install the package startup script.  The package version number,
-#  the name of the directory containing the installed binaries and 
+#  the name of the directory containing the installed binaries and
 #  interface files, and the name of the directory containing the help
 #  libraries must be edited into this, and execute permission given.
 #  Leave the original file in place.
@@ -938,7 +954,7 @@ install:
            chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
         else :; fi
 #
-#  Install the package ICL script.  The package version number must be 
+#  Install the package ICL script.  The package version number must be
 #  edited into this, and read permission given.  Leave the original file
 #  in place.
 	if test -n "$(ICL_SCRIPT)"; then \
@@ -996,7 +1012,7 @@ install:
 #  files and returning them to the source directory.
 
 #  The deinstall target checks that the package is installed in the INSTALL
-#  directory.  If so, it causes the do_deinstall target to be made which 
+#  directory.  If so, it causes the do_deinstall target to be made which
 #  performs the deinstallation.
 
 deinstall:
@@ -1049,8 +1065,8 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Deinstall the monolith, if an installed version exists.
-	- for f in $(MONOLITH) ""; do \
+#  Deinstall the monolith and native binary, if installed versions exists.
+	- for f in $(MONOLITH) $(NATIVE_BINARY) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
@@ -1069,8 +1085,8 @@ do_deinstall:
 #
 #  Deinstall the configuration file directory , if installed versions exist.
 	- for f in $(CONFIG_DIR) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f -r $(INSTALL_BIN)/$$f;\
+           if test -n "$$f" -a -d $(INSTALL_BIN)/$$f; then \
+              rm -r -f $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
 #
@@ -1332,7 +1348,7 @@ unbuild: clean
 #  -------------------------------------------------
 
 strip:
-	strip $(MONOLITH)
+	strip $(MONOLITH) $(NATIVE_BINARY)
 	@ echo
 	@ echo '*** Binaries stripped'
 	@ echo
