@@ -397,8 +397,7 @@ OBJECT_FILES = $(SUBOBJ) $(GENOBJ) $(TASKOBJ)
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(LINK_SCRIPT) \
-              $(SHELL_SCRIPTS) $(TASKS) $(DATA_FILES) $(IFC_FILES)
+BUILT_FILES = $(SHELL_SCRIPTS) $(TASKS) $(DATA_FILES) $(IFC_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
