@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/gsd</path>
+  <description>Global Section Datafile (GSD) access library</description>
+  <abstract><p>This library provides read-only access to GSD files created at the James Clerk Maxwell Telescope. It is mainly useful for accessing JCMT archive data.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Remo P J Tilanus</name>
+      <uname>rpt</uname>
+    </person>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>Jon Fairclough</name>
+      <uname>jhf</uname>
+    </person>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>t.jenness@jach.hawaii.edu</email>
+    </person>
+    <person>
+      <name>Rachel Padman</name>
+      <uname>rp</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
