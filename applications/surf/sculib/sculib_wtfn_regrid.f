@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_WTFN_REGRID( USEGRD, N_MAPS, N_PTS, WTFNRAD, 
-     :     WTFNRES, WEIGHTSIZE, SCALE, DIAMETER, WAVELENGTH, PXSIZE, 
+     :     WTFNRES, WEIGHTSIZE, SCALE, PXSIZE, 
      :     NX_OUT,  NY_OUT,  I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, 
      :     N_BOL, MAX_BOLS, DATA_PTR, VAR_PTR, 
      :     XPOS_PTR, YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
@@ -16,7 +16,7 @@
  
 *  Invocation:
 *     CALL SCULIB_WTFN_REGRID(USEGRD, N_MAPS, N_PTS, WTFNRAD, WTFNRES,
-*    :     WEIGHTSIZE, SCALE, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
+*    :     WEIGHTSIZE, SCALE, PXSIZE, NX_OUT, NY_OUT, 
 *    :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, N_BOL, MAX_BOLS,
 *    :     DATA_PTR, VAR_PTR, 
 *    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
@@ -110,10 +110,6 @@
 *        Radius of supplied weighting function
 *     SCALE = REAL (Given)
 *        Size of a scale length in the same units as PXSIZE
-*     DIAMETER = REAL (Given)
-*        Diameter of telescope in metres
-*     WAVELENGTH = REAL (Given)
-*        Wavelength of map in microns
 *     PXSIZE = REAL (Given)
 *        Pixel size in radians
 *     NX_OUT = INTEGER (Given)
@@ -164,6 +160,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.8  2005/03/23 03:48:21  timj
+*     No longer use wavelength + diameter for determining resolution element. Use
+*     scale+weightsize throughout
+*
 *     Revision 1.7  2004/09/01 00:42:14  timj
 *     use CNF_PVAL
 *
@@ -193,7 +193,6 @@
       INTEGER MAX_BOLS
       REAL    BOLWT(MAX_BOLS, N_MAPS)
       INTEGER DATA_PTR(N_MAPS)
-      REAL    DIAMETER
       INTEGER I_CENTRE
       INTEGER J_CENTRE
       INTEGER N_BOL (N_MAPS)
@@ -203,7 +202,6 @@
       REAL    PXSIZE
       REAL    SCALE
       INTEGER VAR_PTR(N_MAPS)
-      REAL    WAVELENGTH
       REAL    WEIGHT(N_MAPS)
       INTEGER WEIGHTSIZE
       INTEGER WTFNRAD
@@ -283,11 +281,11 @@
 *     each output pixel
 
       DO I = 1, N_MAPS
-         CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT(I), 
+         CALL SCULIB_WTFN_REGRID_1 (WEIGHT(I), 
      :        %VAL(CNF_PVAL(DATA_PTR(I))),
      :        %VAL(CNF_PVAL(XPOS_PTR(I))), %VAL(CNF_PVAL(YPOS_PTR(I))),
      :        N_PTS(I), DBLE(PXSIZE), NX_OUT, 
-     :        NY_OUT, I_CENTRE, J_CENTRE, 
+     :        NY_OUT, I_CENTRE, J_CENTRE, WEIGHTSIZE, SCALE,
      :        %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
      :        %VAL(CNF_PVAL(REGRID1_PTR)), STATUS)
       END DO
@@ -343,8 +341,7 @@
                   DATA_OFFSET = ((K-1) * N_BOL(I)) + (J-1)
 
                   CALL VEC_RTOR(.FALSE., 1, BOLWT(J,I),
-     :                 
-     :   %VAL(CNF_PVAL(BOLWT_PTR) + (DATA_OFFSET * VAL__NBR)),
+     :                 %VAL(CNF_PVAL(BOLWT_PTR)+(DATA_OFFSET*VAL__NBR)),
      :                 IERR, NERR, STATUS)
 
                END DO
@@ -360,7 +357,7 @@
      :        %VAL(CNF_PVAL(XPOS_PTR(I))), %VAL(CNF_PVAL(YPOS_PTR(I))),
      :        N_PTS(I), PXSIZE, NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
-     :        WAVELENGTH, OUT_DATA, OUT_VARIANCE,
+     :        OUT_DATA, OUT_VARIANCE,
      :        CONV_WEIGHT, WEIGHTSIZE, SCALE, WTFN, STATUS)
 
 
@@ -382,7 +379,6 @@
       CALL SCULIB_WTFN_REGRID_3 (USEGRD, WTFNRES, PXSIZE, 
      :     NX_OUT, NY_OUT,
      :     I_CENTRE, J_CENTRE, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)), 
-     :     WAVELENGTH,
      :     OUT_DATA, OUT_VARIANCE,
      :     OUT_QUALITY, CONV_WEIGHT, WEIGHTSIZE, SCALE,
      :     WTFN, STATUS)

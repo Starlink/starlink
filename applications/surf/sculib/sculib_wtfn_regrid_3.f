@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_WTFN_REGRID_3 (USEGUARD, RES, PIXSPACE, NI,NJ,
-     :     ICEN, JCEN, TOT_WEIGHT_IN, WAVELENGTH, CONV_DATA_SUM, 
+     :     ICEN, JCEN, TOT_WEIGHT_IN, CONV_DATA_SUM, 
      :     CONV_VARIANCE_SUM, CONV_QUALITY_SUM, CONV_WEIGHT, 
      :     WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL SCULIB_WTFN_REGRID_3 (METHOD,RES,PIXSPACE, NI, NJ, ICEN, JCEN, 
-*    :  TOT_WEIGHT_IN, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
+*    :  TOT_WEIGHT_IN, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
 *    :  CONV_QUALITY_SUM, CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
 *  Description:
@@ -52,8 +52,6 @@
 *        the y index of the centre of the output array.
 *     TOT_WEIGHT_IN (NI, NJ)         = REAL (Given)
 *        the `total weight' of each output pixel.
-*     WAVELENGTH                     = REAL (Given)
-*        the wavelength at which the maps was made (microns).
 *     CONV_DATA_SUM (NI,NJ)          = REAL (Given and returned)
 *        the convolution sum for each output pixel.
 *     CONV_VARIANCE_SUM (NI,NJ)      = REAL (Given and returned)
@@ -82,6 +80,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.9  2005/03/23 03:48:22  timj
+*     No longer use wavelength + diameter for determining resolution element. Use
+*     scale+weightsize throughout
+*
 *     Revision 1.8  1999/08/06 02:24:53  timj
 *     Tweak headers for use with PROLAT.
 *
@@ -108,7 +110,6 @@
       INTEGER JCEN
       REAL    SCLSZ
       REAL    TOT_WEIGHT_IN (NI, NJ)
-      REAL    WAVELENGTH
       INTEGER WEIGHTSIZE
       REAL    WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
 
@@ -185,8 +186,6 @@
 
 *  ..extent of convolution function in units of output pixels
     
-*      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-*      SCALE = 1.0 / RES_ELEMENT
          SCALE = 1.0 / SCLSZ
 
          SCALESQ = SCALE * SCALE

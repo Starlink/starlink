@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_WTFN_REGRID_2 (RES, IN_DATA,
      :     IN_VARIANCE, WEIGHT, USEVARWT, VARWT, X, Y, NPIX, 
      :     PIXSPACE, NI, NJ, ICEN, JCEN, 
-     :     TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
+     :     TOTAL_WEIGHT, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
      :     CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
 *  Name:
@@ -16,7 +16,7 @@
 *  Invocation:
 *     CALL SCULIB_WTFN_REGRID_2 (RES, IN_DATA, IN_VARIANCE,
 *    :  WEIGHT, USEVARWT, VARWT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
-*    :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM,
+*    :  TOTAL_WEIGHT, CONV_DATA_SUM, CONV_VARIANCE_SUM,
 *    :  CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
 *  Description:
@@ -125,8 +125,6 @@
 *        the y index of the centre of the output array.
 *     TOTAL_WEIGHT (NI,NJ)             = REAL (Given)
 *        the `total weight' of each output pixel.
-*     WAVELENGTH                       = REAL (Given)
-*        the wavelength at which the maps were made (microns).
 *     CONV_DATA_SUM (NI,NJ)            = REAL (Given and returned)
 *        the convolution sum for each output pixel.
 *     CONV_VARIANCE_SUM (NI,NJ)        = REAL (Given and returned)
@@ -134,7 +132,8 @@
 *     CONV_WEIGHT (NI,NJ)              = REAL (Given and returned)
 *        the convolution weight for each output pixel.
 *     WEIGHTSIZE                       = INTEGER (Given)
-*        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 1 for LINEAR)
+*        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL,
+*        1 for LINEAR)
 *     SCLSZ                            = REAL
 *        1 scale length in the same units as PIXSPACE
 *     WTFN (RES * RES * WEIGHTSIZE * WEIGHTSIZE) = REAL (Given)
@@ -152,6 +151,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.15  2005/03/23 03:48:21  timj
+*     No longer use wavelength + diameter for determining resolution element. Use
+*     scale+weightsize throughout
+*
 *     Revision 1.14  1999/08/19 03:37:33  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -188,7 +191,6 @@
       REAL    SCLSZ
       REAL    TOTAL_WEIGHT (NI,NJ)
       LOGICAL USEVARWT
-      REAL    WAVELENGTH
       INTEGER WEIGHTSIZE
       REAL    VARWT(NPIX)
       REAL    WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
@@ -256,8 +258,6 @@
 
 *  ..extent of convolution function in units of output pixels
 
-*      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-*      SCALE = 1.0 / RES_ELEMENT
       SCALE = 1.0 / SCLSZ
 
       SCALESQ = SCALE * SCALE

@@ -1,6 +1,6 @@
-      SUBROUTINE SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT,
-     :     IN_DATA, X, Y, NPIX, 
-     :     PIXSPACE, NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
+      SUBROUTINE SCULIB_WTFN_REGRID_1 (WEIGHT,
+     :     IN_DATA, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN,
+     :     WEIGHTSIZE, SCLSZ, AV_WEIGHT, SCRATCH, STATUS)
 *+
 *  Name:
 *     SCULIB_WTFN_REGRID_1
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT,
-*    :     IN_DATA, X, Y, NPIX, 
-*    :     PIXSPACE, NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
+*     CALL SCULIB_WTFN_REGRID_1 (WEIGHT, IN_DATA, X, Y, NPIX, 
+*    :     PIXSPACE, NI, NJ, ICEN, JCEN, WEIGHTSIZE, SCLSZ,
+*    :     AV_WEIGHT, SCRATCH, STATUS)
 
 *  Description:
 *     This routine performs two tasks:
@@ -27,10 +27,6 @@
 *        1 elsewhere.
 
 *  Arguments:
-*     DIAMETER = REAL (Given)
-*        Diameter of telescope
-*     WAVELENGTH = REAL (Given)
-*        Wavelength of the observation
 *     WEIGHT = REAL (Given)
 *        The weight of the input dataset.
 *     IN_DATA (NPIX)                   = REAL (Given)
@@ -51,6 +47,11 @@
 *        the x index of the centre of the output array
 *     JCEN = INTEGER (Given)
 *        the y index of the centre of the output array
+*     WEIGHTSIZE                       = INTEGER (Given)
+*        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 
+*        1 for LINEAR)
+*     SCLSZ                            = REAL
+*        1 scale length in the same units as PIXSPACE
 *     AV_WEIGHT (NI, NJ) = REAL (Given and Returned)
 *        Given as a workspace array
 *     SCRATCH (NI, NJ) = INTEGER (Returned)
@@ -68,6 +69,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.8  2005/03/23 03:48:21  timj
+*     No longer use wavelength + diameter for determining resolution element. Use
+*     scale+weightsize throughout
+*
 *     Revision 1.7  1999/08/19 03:37:32  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -88,7 +93,6 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
 
 *  Arguments Given:
-      REAL DIAMETER
       REAL WEIGHT
       INTEGER NPIX
       REAL IN_DATA(NPIX)
@@ -99,7 +103,8 @@
       INTEGER JCEN
       INTEGER NI
       INTEGER NJ
-      REAL WAVELENGTH
+      REAL    SCLSZ
+      INTEGER WEIGHTSIZE
 
 *  Arguments Returned:
       REAL AV_WEIGHT (NI, NJ)
@@ -122,7 +127,6 @@
       REAL RDIST                                 ! Size in pixels of res el
       REAL RDIST_SQ                              ! RDIST squared
       INTEGER PIX_RANGE                          ! Pixel range
-      REAL RES_ELEMENT                           ! Resolution element
       
 *   local data
 *.
@@ -135,8 +139,7 @@
       YINC = PIXSPACE
 
 *  find the size of the resolution element in pixels
-      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
-      RDIST = RES_ELEMENT / PIXSPACE
+      RDIST = REAL(WEIGHTSIZE) * SCLSZ / REAL(PIXSPACE)
       PIX_RANGE = INT (RDIST) + 1
       RDIST_SQ = RDIST * RDIST
 
