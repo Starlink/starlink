@@ -252,7 +252,6 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         CALL ARR_RANG1R(I_N_1D,%VAL(I_DPTR_1D),I_Y1_1D,I_Y2_1D,STATUS)
         I_Y2_1D=I_Y2_1D*1.1
 
-        CALL GDV_CLEAR(STATUS)
 
 *  uncache 1D GCB
         CALL IMG_1DGCB(STATUS)
@@ -264,6 +263,7 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         CALL GCB_SETL('POINT_FLAG',.FALSE.,STATUS)
 
         IF (PLOT) THEN
+          CALL GDV_CLEAR(STATUS)
           CALL IMG_PLOT(STATUS)
 
 *  flag current plotting status
