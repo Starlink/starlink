@@ -202,8 +202,8 @@
       INTEGER			BINID			! O/p BinDS object
       INTEGER       		DIMS(3)    		! Input dimensions
       INTEGER       		IDPTR               	! Input data
+      INTEGER			IDUM			! BDI_GET dummy arg
       INTEGER			IFID			! Input dataset id
-      INTEGER			IMASK			! Integer of BADBITS
       INTEGER       		IVPTR               	! input variance
       INTEGER       		IQPTR               	! Input quality
       INTEGER       		INELM               	! Input # elements
@@ -287,13 +287,11 @@
         END IF
 
 *    Attempt to get badbits value
-        CALL BDI_GET0I( IFID, 'QualityMask', IMASK, STATUS )
+        CALL BDI_GET( IFID, 'QualityMask', 'UBYTE', 0, 0, BADBITS,
+     :                IDUM, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           BADBITS = QUAL__MASK
-          IMASK = BADBITS
-        ELSE
-          BADBITS = IMASK
         END IF
 
       END IF
@@ -441,7 +439,7 @@
       CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
 
 *  Write in badbits mask
-      CALL BDI_PUT0I( OFID, 'QualityMask', IMASK, STATUS )
+      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, BADBITS, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error creating output data, variance'/
      :                   /' and quality')
