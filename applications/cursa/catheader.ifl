@@ -1,0 +1,102 @@
+#+
+#  Name:
+#     CATHEADER.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     16/9/94 (ACD): Original version.
+#     19/4/95 (ACD): First stable version.
+#     25/6/99 (ACD): Added global access for catalogue names.
+#     21/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#     1/11/01 (ACD): Added parameters DETAIL, ROWS, COLS, PARS and NAMES.
+#        Also made FILE hidden.
+#-
+
+interface CATHEADER
+
+#   helplib '[help_library_specification]'
+
+   parameter CATALOGUE       # Name of the catalogue.
+      position 1
+      keyword  CATALOGUE
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSACAT'
+      prompt   'catalogue:'
+      help     'Give the name of the catalogue.'
+   endparameter
+
+   parameter FILE            # Flag; write output to file?
+      position 2
+      keyword  FILE
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Write output to a file?'
+      help     'T - write output to file;  F - do not write it.'
+   endparameter
+
+   parameter DETAIL          # Flag specifying the details to be displayed.
+      position 3
+      keyword  DETAIL
+      type     _CHAR
+      access   READ
+      default  'SUMMARY'
+      vpath    'DEFAULT'
+      prompt   'Details required:'
+      help     'One of: SUMMARY, COLUMNS, PARAMETERS, TEXT, AST, FULL.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 4
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+   parameter ROWS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1
+      Association '->GLOBAL.CURSA_ROWS'
+   endparameter
+
+   parameter COLS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1
+      Association '->GLOBAL.CURSA_COLUMNS'
+   endparameter
+
+   parameter PARS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1
+      Association '->GLOBAL.CURSA_PARAMS'
+   endparameter
+
+   parameter NAMES
+      type     '_CHAR'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  ' '
+      Association '->GLOBAL.CURSA_NAMES'
+   endparameter
+
+endinterface

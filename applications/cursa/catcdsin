@@ -1,0 +1,1420 @@
+#!PERL
+#+
+#  Name:
+#     CATCDSIN
+#  Purpose:
+#     Convert a CDS ReadMe file into a CURSA STL description file.
+#  Language:
+#     Perl 5.
+#  Type of Module:
+#     Perl script.
+#  Invocation:
+#     catcdsin
+#  Arguments:
+#     None.
+#  Description:
+#     This application converts a CDS ReadMe file into a CURSA STL
+#     description file.
+#
+#     The text versions of catalogues obtained from the CDS are usually
+#     accompanied by a description file which documents their contents.
+#     This description file is usually called ReadMe and contains a
+#     description in a standard form.  catcdsin interprets the contents
+#     of a CDS ReadMe file and uses them to construct a CURSA STL
+#     description file for the catalogue.  catcdsin does not alter the
+#     catalogue data file itself: both the ReadMe file and the STL
+#     description file constructed from it refer to the same catalogue
+#     file.
+#
+#     CDS ReadMe files can (and often do) contain descriptions of more
+#     than one catalogue (usually these will be closely related
+#     catalogues or tables; perhaps a main catalogue and a table of
+#     notes).  catcdsin creates a separate STL description file for
+#     every catalogue found in the ReadMe file.
+#
+#     The names of the catalogue files are included in the ReadMe
+#     file and STL description file names are constructed from them;
+#     the user cannot specify the description file names.  However,
+#     there are several options which can be specified.  By default
+#     catcdsin reads a file called ReadMe, though a different name can
+#     be given.  By default catcdsin attempts to interpret columns
+#     of angles in the ReadMe file and construct valid STL angular
+#     column descriptions from them, though this behaviour can be
+#     suppressed.  Optionally, parameters specifying the equinox and
+#     epoch of the coordinates can be added to the STL description
+#     files.
+#  Usage:
+#     catcdsin
+#  ADAM Parameters:
+#     INFILE  =  CHARACTER  (read)
+#        The name of the CDS ReadMe (or description) file which is
+#        to be processed (default = ReadMe).
+#     ANGLES  =  CHARACTER  (read)
+#        Determines whether STL angular column descriptions (which
+#        CURSA can interpret) are to be constructed from angular
+#        columns in the CDS description.  Typically the latter will
+#        comprise separate columns for the sexagesimal hours, degrees,
+#        minutes and seconds.  The options are:
+#        Y  -  yes; construct STL angular column descriptions (default),
+#        N  -  no; copy the columns unaltered from the CDS ReadMe file.
+#     EQUINOX  =  CHARACTER  (read)
+#        Equinox of the catalogue coordinates.  If specified, an EQUINOX
+#        parameter with the given value is written to the STL description.
+#        If omitted no EQUINOX parameter is written.
+#     EPOCH  =  CHARACTER  (read)
+#        Epoch of the catalogue coordinates.  If specified, an EPOCH
+#        parameter with the given value is written to the STL description.
+#        If omitted no EPOCH parameter is written.
+#     TEXT  =  CHARACTER  (read)
+#        Flag indicating whether the entire CDS ReadMe file is to be
+#        copied to the STL description as textual information.  The
+#        valid responses are:
+#        A or C -  all or comments; copy the ReadMe file (default),
+#        N  -  none; do not copy the ReadMe file.
+#  Examples:
+#     catcdsin
+#        A CDS ReadMe file called ReadMe will be processed.  catcdsin
+#        will attempt to construct STL angular column descriptions
+#        from any columns of angles in the file.
+#     catcdsin  infile=cdsdesc.lis
+#        A CDS ReadMe file called cdsdesc.lis will be processed.
+#     catcdsin  angles=no
+#        File ReadMe will be processed, but the column descriptions will
+#        be copied unaltered, with no attempt to interpret columns of
+#        angles.
+#     catcdsin  equinox=J2000  epoch=J1995.3
+#        File ReadMe will be processed.  Parameters corresponding to
+#        the given equinox and epoch will be written to the STL
+#        description file.  Note that either, both or neither of the
+#        equinox and epoch can be specified.
+#     catcdsin  text=none
+#        File ReadMe will be processed.  However, the ReadMe file will
+#        not be copied to the STL description as textual information.
+#  Algorithm:
+#     Initialise the command line and other variables.
+#     Obtain the command line options.
+#     Attempt to read and parse the CDS ReadMe file.
+#     Construct the column details using the details obtained from
+#     the ReadMe file.
+#     Write the description file.
+#     Report any error.
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     6/8/98  (ACD): Original version.
+#     21/8/98 (ACD): First stable version.
+#     19/1/99 (ACD): Added error reporting in the cases where an invalid
+#        description file contains either no proper catalogue definition
+#        or no column definitions.
+#     26/7/00 ACD): Removed the 'Bugs' section from the prologue.  Moved
+#        the 'Global Variables' section out of the prologue proper to
+#        avoid confusing the automatic documentation tool.
+#-
+#  Global Variables:
+#     All the variables are global.  However, the following variables
+#     and arrays are particularly important for passing information
+#     between subroutines.
+#
+#     Catalogue details:
+#       numCats
+#          Number of catalogues found in the ReadMe file.
+#       totalColumns
+#          Total number of columns in all the catalogues.
+#
+#       catNames[$numCats]
+#          File name for each catalogue.
+#       catStartColumn[$numCats]
+#          First column corresponding to each in the list of all
+#          columns.
+#       catNumberOfColumns[$numCats]
+#          Number of columns in each catalogue.
+#
+#     Column details:
+#       columnName[$totalColumns]
+#          CDS colunm name.
+#       stlColumnName[$totalColumns]
+#          STL column name.
+#       includeColumn[$totalColumns]
+#          Flag indicating whether the column is to be included in the
+#          STL description.
+#       startPosition[$totalColumns]
+#          Start position for the column in each data record.
+#       width[$totalColumns]
+#          Width of the column in each data record.
+#       decimalPlaces[$totalColumns]
+#          No. of decimal places to which the column is to be displayed.
+#          Zero for LOGICAL, INTEGER and CHARACTER columns.
+#       dataType[$totalColumns]
+#          STL data type for the column.
+#       externalFormat[$totalColumns]
+#          STL external format for the column (= the CDS format).
+#       tableFormat[$totalColumns]
+#          STL table format for the column.
+#       units[$totalColumns]
+#          Units for the column.
+#       comments[$totalColumns]
+#          Descriptive comments.
+#
+#     Additional STL columns for sexagesimal angles.
+#       angleColumns
+#          Number of addtional columns of angles in the current catalogue.
+#       angleName[$angleColumns]
+#          Name of the column.
+#       angleStartPosition[$angleColumns]
+#          Start position for the angle column in each data record.
+#       angleTableFormat[$angleColumns]
+#          STL table format for the column (will be a sexagesimal
+#          specifier).
+#       angleUnits[$angleColumns]
+#          Units for the column.
+#       angleComments[$angleColumns]
+#          Descriptive comments.
+#
+#     Copy of the ReadMe file:
+#       lineCount
+#          Number of lines in the ReadMe file.
+#       readMeCopy[$lineCount]
+#          Copy of the ReadMe file.
+#.
+
+#
+#  Initialise the command line and other variables.
+
+    $status = 0;
+    $statusMessage = "Success.";
+
+    $true = 1;
+    $false = 0;
+
+    $interpretAngles = $true;
+    $copyText = $true;
+
+    $cdsReadMeFile = "ReadMe";
+    $equinox = "NONE";
+    $epoch = "NONE";
+
+    $status = &GetCommandLineArgs();
+
+#   print  "interpretAngles: $interpretAngles \n";
+#   print  "copyText: $copyText \n";
+#   print  "cdsReadMeFile: $cdsReadMeFile \n";
+#   print  "equinox: $equinox \n";
+#   print  "epoch: $epoch \n";
+
+#
+#  Attempt to read and parse the CDS ReadMe file.
+
+    $status = &ReadAndParseCdsFile();
+
+#
+#  Construct the column details using the details obtained from the
+#  ReadMe file.
+
+    $status = &ConstructColumnDetails();
+
+#
+#  Write an STL description file for every catalogue in the
+#  description file.
+
+    $status = &WriteStlDescriptions();
+
+#
+#  Report any error.
+
+    if ($status != 0)
+    {  print "! (**ERROR**) $statusMessage \n";
+    }
+
+
+#
+# Functions.........................................................
+
+#
+# Obtain and parse the command line arguments.
+#
+# Algorithm:
+#  Get the number of command line arguments.
+#  For every command line argument
+#    If the argument contains an equals sign then
+#      Extract the argument name.
+#      Extract the argument value.
+#      Force the argument name into upper case.
+#      Check for the permitted argument names and set the corresponding
+#      variables appropriately.
+#    else
+#      If it is the first argument then
+#        Adopt the argument as the file name.
+#      end if
+#    end if
+#  end for
+#
+#  Note that for the equinox and epoch the value is forced into upper
+#  case and illegal characters are removed.
+
+sub GetCommandLineArgs
+{  if ($status == 0)
+   {
+
+#
+#    Get the number of command line arguments.
+
+      $numArgs = 1 + $#ARGV;
+
+#
+#    Examine every argument.
+
+      for ($currentArg = 0; $currentArg < $numArgs; $currentArg++)
+      {
+
+#
+#       Check whether the argument contains an equals sign.
+
+         $equalPos = index($ARGV[$currentArg], "=");
+
+         if ($equalPos > -1)
+         { 
+
+#
+#          Extract the argument name and value.
+
+            $argName = substr($ARGV[$currentArg], 0, $equalPos );
+            $argValue = substr($ARGV[$currentArg], $equalPos + 1, 99);
+
+#
+#          Force the argument name into upper case.
+
+            $argName = "\U$argName";
+
+#
+#          Check for the permitted argument names and set the
+#          corresponding variables appropriately.
+
+            if ($argName eq "ANGLES")
+            {  if (substr($argValue, 0, 1) eq "N"  ||
+                   substr($argValue, 0, 1) eq "n")
+               {  $interpretAngles = $false;
+               }
+            }
+            elsif ($argName eq "TEXT")
+            {  if (substr($argValue, 0, 1) eq "N"  ||
+                   substr($argValue, 0, 1) eq "n")
+               {  $copyText = $false;
+               }
+            }
+            elsif ($argName eq "INFILE")
+            {  $cdsReadMeFile = $argValue;
+            }
+            elsif ($argName eq "EQUINOX")
+            {  $equinox = "\U$argValue";
+               $equinox =~ s/\W//g;
+            }
+            elsif ($argName eq "EPOCH")
+            {  $epoch = "\U$argValue";
+               $epoch =~ s/\W//g;
+            }
+         }
+         else
+         {
+
+#
+#          The argument does not contain an equal sign.  If it is
+#          the first argument then adopt the value as the file name.
+#          Otherwise ignore it.
+
+            if ($currentArg == 0)
+            {  $cdsReadMeFile = $ARGV[$currentArg];
+            }
+         }
+      }
+   }
+   $status;
+}
+
+
+#
+# Read and parse the CDS ReadMe file.
+#
+# Algorithm:
+#  Initialise the number of catalogues.
+#  Attempt to open the ReadMe file.
+#  If ok then
+#    Set the state to 'not columns'.
+#    Do while (more records to be read)
+#      Increment the number of lines read.
+#      Add the current line to the copy of the ReadMe file.
+#      If the line is introducing a new catalogue then
+#        Increment the number of catalogues.
+#        Initialise the details of the catalogue.
+#        Set the state to new catalogue.
+#      end if
+#      If the state is 'new catalogue' then
+#        If the current line is a line of dashes then
+#          Set the state to 'column headings'.
+#        end if
+#      end if
+#      If the state is 'column headings' then
+#        If the current line is a line of dashes then
+#          Set the state to 'reading columns'.
+#        end if
+#      end if
+#      If the state is 'reading columns' then
+#        If the current line is a line of dashes then
+#          Set the remaining details for the current catalogue.
+#          Set the state to 'not columns'.
+#        else
+#          If the first twenty lines are not blank then
+#            Decode the column details, as appropriate.
+#          end if
+#        end if
+#      end if
+#    end do
+#    Close the file.
+#    If either no catalogues or no columns were found then set the status.
+#  else
+#    Set the status; failed to open file.
+#  end if
+
+sub ReadAndParseCdsFile
+{  if ($status == 0)
+   {
+
+#
+#    Initialise the number of catalogues.
+
+      $numCats = -1;
+
+#
+#    Define the various 'parse states' which the routine can be
+#    in whilst it is reading a record from the ReadMe file.
+
+      $notColumns = 1;
+      $newCatalogue = 2;
+      $columnHeadings = 3;
+      $readingColumns = 4;
+
+#
+#    Attempt to open the ReadMe file and proceed if ok.
+
+      $openStatus = open (CDS, $cdsReadMeFile);
+      if ($openStatus != 0)
+      {
+
+#
+#       Initialise the parse state and also perform various other
+#       initialisations.
+
+         $parseState = $notColumns;
+
+         $lineCount = -1;
+         $totalColumns = -1;
+
+#
+#       Loop reading lines from the ReadMe file.
+
+         while (<CDS>)
+         {  chop($_);
+            $currentLine = $_;
+
+#
+#          Increment the number of lines read and add the current line
+#          to the copy of the ReadMe file.
+
+            $lineCount = $lineCount + 1;
+            $readMeCopy[$lineCount] = $currentLine;
+
+#
+#          Check if the line is introducing a new catalogue.
+
+            if (substr($currentLine, 0, 24) eq "Byte-by-byte Description")
+            {
+
+#
+#             Increment the number of catalogues.
+
+               $numCats = $numCats + 1;
+
+#
+#             Initialise the details of the catalogue.
+
+               @words = split (/\s+/, $currentLine);
+               $catNames[$numCats] = $words[$#words];
+
+               $catStartColumn[$numCats] = $totalColumns + 1;
+               $currentColumns = 0;
+
+#
+#             Set the state to new catalogue.
+
+               $newParseState = $newCatalogue;
+            }
+
+#
+#          If the parse state is 'new catalogue' and line of
+#          dashes is read then set the state to 'column headings'.
+
+            if ($parseState == $newCatalogue)
+            {  if (substr($currentLine, 0, 10) eq "----------")
+               {  $newParseState = $columnHeadings;
+               }
+            }
+
+#
+#          If the parse state is 'column headings' and line of
+#          dashes is read then set the state to 'reading columns'.
+
+            if ($parseState == $columnHeadings)
+            {  if (substr($currentLine, 0, 10) eq "----------")
+               {  $newParseState = $readingColumns;
+               }
+            }
+
+#
+#          If the parse state is 'reading columns' then process the
+#          line.
+
+            if ($parseState == $readingColumns)
+            {
+
+#
+#             If the current line is a line of dashes then set the
+#             state to 'not columns'.  Otherwise interpret the
+#             column details.
+
+               if (substr($currentLine, 0, 10) eq "----------")
+               {  $newParseState = $notColumns;
+                  $catNumberOfColumns[$numCats] = $currentColumns;
+               }
+               else
+               {
+
+#
+#                Interpret the column details.
+#
+#                First check if the first twenty characters are blank.
+#                If so then the line is a continued comment and is
+#                ignored.
+
+                  $firstwenty = substr($currentLine, 0, 20);
+
+                  if ($firstwenty =~ /\S+/)
+                  {
+
+#
+#                   Increment the number of columns.
+
+                     $totalColumns = $totalColumns + 1;
+                     $currentColumns = $currentColumns  + 1;
+
+#
+#                   Find the first occurence of '-'.  If it occurs in
+#                   the first ten characters then insert an extra space
+#                   after it.
+
+                     $dashpos = index($currentLine, "-");
+
+                     if ($dashpos < 11  &&  $dashpos > -1)
+                     {  $temp = substr($currentLine, 0, $dashpos + 1) . " " .
+                                substr($currentLine, $dashpos + 1, 99);
+                        $currentLine = $temp;
+                     }
+
+#
+#                   Split the string into its constituent words,
+#                   explicitly excluding any leading blanks.
+
+                     $startPos = -1;
+                     $currentPos = -1;
+
+                     while ($startPos < 0)
+                     {  $currentPos = $currentPos + 1;
+                        if (substr($currentLine, $currentPos, 1) ne " ")
+                        {  $startPos = $currentPos;
+                        }
+                     }
+
+                     @words = split(/\s+/, substr($currentLine, $startPos, 99) );
+
+#
+#                   Check whether there is a '-' in the first word and
+#                   interpret the line accordingly.
+
+                     $dashpos = index($words[0], "-");
+
+                     if ($dashpos > -1)
+                     {  $columnName[$totalColumns] = $words[4];
+                        $startPosition[$totalColumns] = $words[0];
+                        $externalFormat[$totalColumns] = $words[2];
+                        $units[$totalColumns] = $words[3];
+
+                        shift(@words); shift(@words); shift(@words);
+                        shift(@words); shift(@words);
+
+                        $comments[$totalColumns] = join(" ",@words);
+                     }
+                     else
+                     {  $columnName[$totalColumns] = $words[3];
+                        $startPosition[$totalColumns] = $words[0];
+                        $externalFormat[$totalColumns] = $words[1];
+                        $units[$totalColumns] = $words[2];
+
+                        shift(@words); shift(@words); shift(@words);
+                        shift(@words);
+
+                        $comments[$totalColumns] = join(" ",@words);
+                     }
+
+#
+#                   Initialise additional arrays describing the column.
+#                   These arrays might subsequently be modified if the
+#                   column is an angle.
+
+                     $includeColumn[$totalColumns] = $true;
+                     $tableFormat[$totalColumns] = "skip";
+                  }
+               }
+            }
+
+#
+#          Copy the new parse state to the parse state.
+
+            $parseState = $newParseState;
+         }
+
+#
+#       Close the ReadMe file.
+
+         close (CDS);
+
+#
+#       If either no catalogues or no columns were found then set the status.
+
+         if ($totalColumns < 0)
+         {  $status = 1;
+            $statusMessage =
+              "No columns were found; check the description file.";
+         }
+
+         if ($numCats < 0)
+         {  $status = 1;
+            $statusMessage =
+              "Mandatory line \"Byte-by-byte Description of file\" was not found;\n! check the description file.";
+         }
+
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "Failed to open the CDS ReadMe file.";
+      }
+   }
+   $status;
+}
+
+
+#
+# Construct the STL column details from the details read from the
+# CDS ReadMe file.
+#
+# Algorithm:
+#  For every column
+#    Convert the column name to upper case.
+#    Replace any illegal characters in the column name.
+#    Remove any illegal characters from the start position.
+#    Convert the external format into upper case.
+#    Determine the data type and width from the external format.
+#    Replace any single quotes in the comments.
+#  end for
+
+sub ConstructColumnDetails
+{  if ($status == 0)
+   {
+
+#
+#    Process all the columns.
+
+      for ($currentColumn = 0; $currentColumn < $totalColumns + 1;
+           $currentColumn++)
+      {
+
+#
+#       Convert the column name to upper case.
+
+         $stlColumnName[$currentColumn] = "\U$columnName[$currentColumn]";
+
+#
+#       Replace any illegal characters in the column name with an
+#       underscore.
+
+         $stlColumnName[$currentColumn] =~ s/\W/_/g;
+
+#
+#       Remove any illegal characters from the start position.  Note
+#       that there is likely to be an extraneous "-" which must be
+#       removed.
+
+         $startPosition[$currentColumn] =~ s/\D/ /g;
+
+#
+#       Convert the external format into upper case.
+
+         $externalFormat[$currentColumn] =
+           "\U$externalFormat[$currentColumn]";
+
+#
+#       Determine the data type and width from the external format.
+#
+#       First, determine the data type.
+
+         $currentFormat = $externalFormat[$currentColumn];
+
+         if (index($currentFormat, "A") > -1)
+         {  $currentType = "CHAR*";
+         }
+         elsif (index($currentFormat, "I") > -1)
+         {  $currentType = "INTEGER";
+         }
+         elsif (index($currentFormat, "F") > -1)
+         {  $currentType = "DOUBLE";
+         }
+         elsif (index($currentFormat, "E") > -1)
+         {  $currentType = "REAL";
+         }
+         elsif (index($currentFormat, "D") > -1)
+         {  $currentType = "DOUBLE";
+         }
+         elsif (index($currentFormat, "L") > -1)
+         {  $currentType = "LOGICAL";
+         }
+         else
+         {  $status = 1;
+            $statusMessage = "Format for column $columnName[$currentColumn]"
+                             . " is illegal: $currentFormat \n";
+         }
+
+#
+#       Now determine the column width and the number of decimal
+#       places with which it is stored.
+
+         if ($currentType eq "CHAR*"    ||
+             $currentType eq "INTEGER"  ||
+             $currentType eq "LOGICAL")
+         {  $temp = $currentFormat;
+            $temp =~ s/\D/ /g;
+            $width[$currentColumn] = $temp;
+
+            $decimalPlaces[$currentColumn] = 0;
+         }
+         elsif ($currentType eq "DOUBLE"    ||
+                $currentType eq "REAL")
+         {  $dotpos = index($currentFormat, ".");
+            if ($dotpos > -1)
+            {  $temp = substr($currentFormat, 0, $dotpos);
+               $temp =~ s/\D/ /g;
+               $width[$currentColumn] = $temp;
+
+               $temp = substr($currentFormat,  $dotpos + 1, 99);
+               $temp =~ s/\D/ /g;
+               $decimalPlaces[$currentColumn] = $temp;
+            }
+            else
+            {  $width[$currentColumn] = 0;
+               $decimalPlaces[$currentColumn] = 0;
+            }
+         }
+
+#
+#       Add the width to the character type for CHARACTER columns.
+
+         if ($currentType eq "CHAR*")
+         {  $currentType = $currentType . $width[$currentColumn];
+            $currentType =~ s/\s//g;
+         }
+
+         $dataType[$currentColumn] = $currentType;
+
+#
+#       Replace any quotes in the comments.
+
+         $comments[$currentColumn] =~ s/'/_/g;
+         $comments[$currentColumn] =~ s/`/_/g;
+         $comments[$currentColumn] =~ s/"/_/g;
+      }
+
+   }
+   $status;
+}
+
+
+#
+# Write STL description files for all the catalogues found in the
+# ReadMe file.
+#
+# Algorithm:
+#  Get the system date.
+#  For every catalogue
+#    Initialise the 'got coordinates' flag.
+#    Create the name of the STL description file.
+#    Attempt to open the file.
+#    If ok then
+#      Write the description header.
+#      If angles are to be interpretted then
+#        Assemble the details of any columns of angles.
+#        Write the details of any columns of angles.
+#      end if
+#      Write the details of the remaining columns.
+#      Write the equinox and epoch as required.
+#      If required then
+#        Write the textual information.
+#      end if
+#      Write the catalogue directives.
+#      Close the description file.
+#    else
+#      Report a message.
+#      Set the status.
+#    end if
+
+sub WriteStlDescriptions
+{  if ($status == 0)
+   {
+
+#
+#    Get the system date.
+
+      $date = `date`;
+      chop($date);
+
+#
+#    Write a description file for every catalogue found in the ReadMe
+#    file.
+
+      for ($currentCat = 0; $currentCat < $numCats + 1; $currentCat++)
+      {
+
+#
+#       Create the name of the STL description file.
+
+         $currentCatFile = $catNames[$currentCat];
+
+         $dotpos = index($currentCatFile, ".");
+
+         if ($dotpos > -1)
+         {  $currentCatName = substr($currentCatFile, 0, $dotpos);
+         }
+         else
+         {  $currentCatName = $currentCatFile;
+         }
+
+         $descriptionFileName = $currentCatName . ".TXT";
+
+#
+#       Attempt to open the file and proceed if ok.
+
+         $openStatus = open (STL, ">" . $descriptionFileName);
+         if ($openStatus != 0)
+         {
+
+#
+#          Initialise the 'got coordinates' flag.  This flag is
+#          used to control whether any equinox and epoch parameters are
+#          written to the STL description.  If angles are being
+#          reformatted then the parameters are written only to
+#          catalogues which have been found to contain coordinates.
+#          If angles are not being reformatted then the parameters
+#          are always written.
+
+            if ($interpretAngles == $true)
+            {  $gotCoords = $false;
+            }
+            else
+            {  $gotCoords = $true;
+            }
+
+#
+#          Write the description header.
+
+
+            @words = split(/\s+/, $readMeCopy[0]);
+            $words[0] = $words[0] . ":";
+            $title = join(" ",@words);
+
+            print STL "!+ \n";
+            print STL "!  Catalogue: $currentCatName \n";
+            print STL "!\n";
+            print STL "!  $title\n";
+            print STL "!\n";
+            print STL "!  This catalogue is formatted as a CURSA ";
+            print STL    "small text list (STL).\n";
+            print STL "!  For a description of this format see ";
+            print STL    "Starlink User Note 190 or URL\n";
+            print STL "!  http://www.roe.ac.uk/acdwww/cursa/home.html.\n";
+            print STL "!-\n\n";
+
+            $startColumn = $catStartColumn[$currentCat];
+            $stopColumn = $startColumn + $catNumberOfColumns[$currentCat];
+
+#
+#          Check whether columns of angles are to be interpretted.
+
+            if ($interpretAngles == $true)
+            {
+
+#
+#             Assemble the details of any columns of angles.
+
+               $status = &AssembleAngleDetails();
+
+#
+#             Write the details of any columns of angles.
+
+               for ($currentColumn = 0;
+                    $currentColumn < $angleColumns + 1;
+                    $currentColumn++)
+               {  print STL "C $angleName[$currentColumn]  DOUBLE";
+                  print STL "  $angleStartPosition[$currentColumn]";
+                  print STL "  UNITS='$angleUnits[$currentColumn]'\n";
+
+                  print STL ":  TBLFMT='$angleTableFormat[$currentColumn]' \n";
+
+                  print STL ":  COMMENTS='$angleComments[$currentColumn]' \n";
+               }
+            }
+
+#
+#          Write the details of the remaining columns.
+
+            for ($currentColumn = $startColumn;
+                 $currentColumn < $stopColumn;
+                 $currentColumn++)
+            {  if ($includeColumn[$currentColumn] == $true)
+               {  print STL "C $stlColumnName[$currentColumn]";
+                  print STL "  $dataType[$currentColumn]";
+                  print STL "  $startPosition[$currentColumn]";
+                  print STL "  EXFMT='$externalFormat[$currentColumn]'";
+                  if ($units[$currentColumn] ne "---")
+                  {  print STL "  UNITS='$units[$currentColumn]'";
+                  }
+                  print STL "\n";
+
+                  if ($tableFormat[$currentColumn] ne "skip")
+                  {  print STL ":  TBLFMT='$tableFormat[$currentColumn]' \n";
+                  }
+
+                  print STL ":  COMMENTS='$comments[$currentColumn]' \n";
+               }
+            }
+
+#
+#          Write the equinox and epoch parameters as required.
+
+            if ($gotCoords == $true)
+            {  if ($equinox ne "NONE"  ||  $epoch ne "NONE")
+               {  print STL "\n";
+               }
+               if ($equinox ne "NONE")
+               {  print STL "P EQUINOX  CHAR*10  '$equinox'\n";
+               }
+               if ($epoch ne "NONE")
+               {  print STL "P EPOCH    CHAR*10  '$epoch'\n";
+               }
+            }
+
+#
+#          If required then write the textual information.
+
+            if ($copyText == $true)
+            {  print STL "\n";
+               print STL "T This STL description of the catalogue was ";
+               print STL "created from the CDS ReadMe\n";
+               print STL "T file on $date (local time).\n";
+               print STL "T\n";
+               print STL "T A copy of the original ReadMe file follows.\n";
+               print STL "T\n";
+
+               for ($line = 0; $line < $lineCount; $line++)
+               {  print STL "T $readMeCopy[$line]\n";
+               }
+            }
+
+#
+#          Write the catalogue directives.
+
+            print STL "\n";
+            print STL "D  FILE='$currentCatFile'    ";
+            print STL "! File holding the table.\n";
+
+            print STL "D  POSITION=CHARACTER  ";
+            print STL "! Table is fixed-format.\n";
+
+#
+#          Close the description file.
+
+            close (STL);
+
+            print "Created description file $descriptionFileName \n";
+
+         }
+         else
+         {
+
+#
+#          Failed to open the STL description file.  Report a message
+#          and set the status.
+
+            print "Failed to open description file $$descriptionFileName\n";
+
+            $status = 1;
+            $statusMessage = "Failed to write description file.";
+         }
+      }
+
+   }
+   $status;
+}
+
+#
+# Assemble or modify the details for any columns of angles.
+#
+# Algorithm:
+#  For every column read from the CDS ReadMe file, check the name
+#  against the CDS reserved names and modify the column details as
+#  appropriate.
+
+sub AssembleAngleDetails
+{  if ($status == 0)
+   {
+
+#
+#    Initialise the number of new angular columns.
+
+      $angleColumns = -1;
+
+#
+#    Examine all the columns read from the ReadMe file.
+
+      for ($currentColumn = $startColumn;
+           $currentColumn < $stopColumn;
+           $currentColumn++)
+      {
+
+#
+#       Check for the various cases of columns of angles with special
+#       names.
+
+         if ($columnName[$currentColumn] eq "RAh"      ||
+             $columnName[$currentColumn] eq "RA2000h"  ||
+             $columnName[$currentColumn] eq "RA1950h")
+         {  
+
+#
+#          Case of separate sexagesimal hours for the Right Ascension.
+#          In this case a new column is created.  Two sets of names
+#          are checked: RAx and RA2000x.
+
+            if ($columnName[$currentColumn] eq "RAh")
+            {  $RACol = "RA";
+               $RAMin = "RAm";
+               $RASec = "RAs";
+               $RAComments = "Right Ascension";
+            }
+            elsif ($columnName[$currentColumn] eq "RA2000h")
+            {  $RACol = "RA2000";
+               $RAMin = "RA2000m";
+               $RASec = "RA2000s";
+               $RAComments = "Right Ascension (2000)";
+            }
+            else
+            {  $RACol = "RA1950";
+               $RAMin = "RA1950m";
+               $RASec = "RA1950s";
+               $RAComments = "Right Ascension (1950)";
+            }
+
+            $includeColumn[$currentColumn] = $false;
+
+            $angleColumns = $angleColumns + 1;
+
+            $angleName[$angleColumns] = $RACol;
+            $angleComments[$angleColumns] = $RAComments;
+            $angleStartPosition[$angleColumns] = 
+              $startPosition[$currentColumn];
+
+            if ($decimalPlaces[$currentColumn] == 0)
+            {  $angleUnits[$angleColumns] = "RADIANS{H}";
+            }
+            else
+            {  $angleUnits[$angleColumns] = "RADIANS{H." .
+                 $decimalPlaces[$currentColumn] . "}";
+            }
+
+            $format = "HOURS{" . $externalFormat[$currentColumn];
+
+            if ($columnName[$currentColumn + 1] eq $RAMin)
+            {  $includeColumn[$currentColumn + 1] = $false;
+
+               $space = $startPosition[$currentColumn + 1] -
+                        $startPosition[$currentColumn] -
+                        $width[$currentColumn];
+
+               if ($space > 0)
+               {  $format = $format . "," . $space . "X";
+               }
+
+               $format = $format . "," . $externalFormat[$currentColumn + 1];
+
+               if ($decimalPlaces[$currentColumn + 1] == 0)
+               {  $angleUnits[$angleColumns] = "RADIANS{HM}";
+               }
+               else
+               {  $angleUnits[$angleColumns] = "RADIANS{HM." .
+                    $decimalPlaces[$currentColumn + 1] . "}";
+               }
+            }
+
+            if ($columnName[$currentColumn + 2] eq $RASec)
+            {  $includeColumn[$currentColumn + 2] = $false;
+
+               $space = $startPosition[$currentColumn + 2] -
+                        $startPosition[$currentColumn + 1] -
+                        $width[$currentColumn + 1];
+
+               if ($space > 0)
+               {  $format = $format . "," . $space . "X";
+               }
+
+               $format = $format . "," . $externalFormat[$currentColumn + 2];
+
+               if ($decimalPlaces[$currentColumn + 2] == 0)
+               {  $angleUnits[$angleColumns] = "RADIANS{HMS}";
+               }
+               else
+               {  $angleUnits[$angleColumns] = "RADIANS{HMS." .
+                    $decimalPlaces[$currentColumn + 2] . "}";
+               }
+            }
+
+            $format = $format . "}";
+
+            $angleTableFormat[$angleColumns] = $format;
+
+            $gotCoords = $true;
+         }
+         elsif ($columnName[$currentColumn] eq "DEd"     ||
+                $columnName[$currentColumn] eq "DE2000d" ||
+                $columnName[$currentColumn] eq "DE1950d")
+         {
+
+#
+#          Case of separate sexagesimal degrees for the Declination.
+#          In this case a new column is created.  Two sets of names
+#          are checked: DEx and DE2000x.
+
+            if ($columnName[$currentColumn] eq "DEd")
+            {  $DECol = "DEC";
+               $DESign = "DE-";
+               $DEMin = "DEm";
+               $DESec = "DEs";
+               $DEComments = "Declination";
+            }
+            elsif ($columnName[$currentColumn] eq "DE2000d")
+            {  $DECol = "DEC2000";
+               $DESign = "DE2000-";
+               $DEMin = "DE2000m";
+               $DESec = "DE2000s";
+               $DEComments = "Declination (2000)";
+            }
+            else
+            {  $DECol = "DEC1950";
+               $DESign = "DE1950-";
+               $DEMin = "DE1950m";
+               $DESec = "DE1950s";
+               $DEComments = "Declination (1950)";
+            }
+
+            $includeColumn[$currentColumn] = $false;
+
+            $angleColumns = $angleColumns + 1;
+
+            $angleName[$angleColumns] = $DECol;
+            $angleComments[$angleColumns] = $DEComments;
+            $angleStartPosition[$angleColumns] = 
+              $startPosition[$currentColumn];
+
+            if ($decimalPlaces[$currentColumn] == 0)
+            {  $angleUnits[$angleColumns] = "RADIANS{D}";
+            }
+            else
+            {  $angleUnits[$angleColumns] = "RADIANS{D." .
+                 $decimalPlaces[$currentColumn] . "}";
+            }
+
+            $format = "DEGREES{";
+
+            if ($currentColumn > 0)
+            {  if ($columnName[$currentColumn - 1] eq $DESign)
+               {  $includeColumn[$currentColumn - 1] = $false;
+
+                  $space = $startPosition[$currentColumn] -
+                           $startPosition[$currentColumn - 1] -
+                           $width[$currentColumn - 1];
+
+                  if ($space > 0)
+                  {  $format = $format . "," . $space . "X";
+                  }
+
+                  $format = $format .
+                            $externalFormat[$currentColumn - 1] . ",";
+
+                  $angleStartPosition[$angleColumns] = 
+                     $startPosition[$currentColumn - 1];
+               }
+            }
+
+            $format = $format . $externalFormat[$currentColumn];
+
+            if ($columnName[$currentColumn + 1] eq $DEMin)
+            {  $includeColumn[$currentColumn + 1] = $false;
+
+               $space = $startPosition[$currentColumn + 1] -
+                        $startPosition[$currentColumn] -
+                        $width[$currentColumn];
+
+               if ($space > 0)
+               {  $format = $format . "," . $space . "X";
+               }
+
+               $format = $format . "," . $externalFormat[$currentColumn + 1];
+
+               if ($decimalPlaces[$currentColumn + 1] == 0)
+               {  $angleUnits[$angleColumns] = "RADIANS{DM}";
+               }
+               else
+               {  $angleUnits[$angleColumns] = "RADIANS{DM." .
+                    $decimalPlaces[$currentColumn + 1] . "}";
+               }
+            }
+
+            if ($columnName[$currentColumn + 2] eq $DESec)
+            {  $includeColumn[$currentColumn + 2] = $false;
+
+               $space = $startPosition[$currentColumn + 2] -
+                        $startPosition[$currentColumn + 1] -
+                        $width[$currentColumn + 1];
+
+               if ($space > 0)
+               {  $format = $format . "," . $space . "X";
+               }
+
+               $format = $format . "," . $externalFormat[$currentColumn + 2];
+
+               if ($decimalPlaces[$currentColumn + 2] == 0)
+               {  $angleUnits[$angleColumns] = "RADIANS{DMS}";
+               }
+               else
+               {  $angleUnits[$angleColumns] = "RADIANS{DMS." .
+                    $decimalPlaces[$currentColumn + 2] . "}";
+               }
+            }
+
+            $format = $format . "}";
+
+            $angleTableFormat[$angleColumns] = $format;
+
+            $gotCoords = $true;
+         }
+         elsif ($columnName[$currentColumn] eq "RAdeg")
+         {
+
+#
+#          Case of Right Ascension in decimal degrees.
+
+            if ($decimalPlaces[$currentColumn] == 0)
+            {  $units[$currentColumn] = "RADIANS{D}";
+            }
+            else
+            {  $units[$currentColumn] = "RADIANS{D." .
+                 $decimalPlaces[$currentColumn] . "}";
+            }
+
+            $tableFormat[$currentColumn] = "DEGREES{" .
+              $externalFormat[$currentColumn] . "}";
+
+            $gotCoords = $true;
+         }
+         elsif ($columnName[$currentColumn] eq "RAdeg")
+         {
+
+#
+#          Case of Declination in decimal degrees.
+
+            if ($decimalPlaces[$currentColumn] == 0)
+            {  $units[$currentColumn] = "RADIANS{D}";
+            }
+            else
+            {  $units[$currentColumn] = "RADIANS{D." .
+                 $decimalPlaces[$currentColumn] . "}";
+            }
+
+            $tableFormat[$currentColumn] = "DEGREES{" .
+              $externalFormat[$currentColumn] . "}";
+
+            $gotCoords = $true;
+         }
+         elsif ($columnName[$currentColumn] eq "RArad")
+         {
+
+#
+#          Case of Right Ascension in radians.
+
+            $units[$currentColumn] = "RADIANS{HOURS}";
+
+            $gotCoords = $true;
+         }
+         elsif ($columnName[$currentColumn] eq "DErad")
+         {
+
+#
+#          Case of Declination in radians.
+
+            $units[$currentColumn] = "RADIANS{DEGREES}";
+
+            $gotCoords = $true;
+         }
+         elsif ($columnName[$currentColumn] eq "GLON"  ||
+                $columnName[$currentColumn] eq "GLAT"  ||
+                $columnName[$currentColumn] eq "ELON"  ||
+                $columnName[$currentColumn] eq "ELAT")
+         {
+
+#
+#          Case of Galactic or Ecliptic longitude or latitude in degrees.
+
+
+            if ($decimalPlaces[$currentColumn] == 0)
+            {  $units[$currentColumn] = "RADIANS{D}";
+            }
+            else
+            {  $units[$currentColumn] = "RADIANS{D." .
+                 $decimalPlaces[$currentColumn] . "}";
+            }
+
+            $tableFormat[$currentColumn] = "DEGREES{" .
+              $externalFormat[$currentColumn] . "}";
+
+            $gotCoords = $true;
+         }
+         else
+         {
+
+#
+#          Trap any remaining columns with standard angular units.
+#          Such columns might be, for example, position angles,
+#          angular sizes etc.  There are no special restrictions on
+#          the names of these columns.
+
+#          ... degrees.
+
+            if ($units[$currentColumn] eq "deg")
+            {  if ($decimalPlaces[$currentColumn] == 0)
+               {  $units[$currentColumn] = "RADIANS{D}";
+               }
+               else
+               {  $units[$currentColumn] = "RADIANS{D." .
+                    $decimalPlaces[$currentColumn] . "}";
+               }
+
+               $tableFormat[$currentColumn] = "DEGREES{" .
+                 $externalFormat[$currentColumn] . "}";
+
+               $gotCoords = $true;
+            }
+
+#          ... minutes of arc.
+
+            elsif ($units[$currentColumn] eq "arcmin")
+            {  if ($decimalPlaces[$currentColumn] == 0)
+               {  $units[$currentColumn] = "RADIANS{ARCMIN}";
+               }
+               else
+               {  $units[$currentColumn] = "RADIANS{ARCMIN." .
+                    $decimalPlaces[$currentColumn] . "}";
+               }
+
+               $tableFormat[$currentColumn] = "ARCMIN{" .
+                 $externalFormat[$currentColumn] . "}";
+
+               $gotCoords = $true;
+            }
+
+#          ... seconds of arc.
+
+            elsif ($units[$currentColumn] eq "arcsec")
+            {  if ($decimalPlaces[$currentColumn] == 0)
+               {  $units[$currentColumn] = "RADIANS{ARCSEC}";
+               }
+               else
+               {  $units[$currentColumn] = "RADIANS{ARCSEC." .
+                    $decimalPlaces[$currentColumn] . "}";
+               }
+
+               $tableFormat[$currentColumn] = "ARCSEC{" .
+                 $externalFormat[$currentColumn] . "}";
+
+               $gotCoords = $true;
+            }
+
+#          ... hours.
+
+            elsif ($units[$currentColumn] eq "h")
+            {  if ($decimalPlaces[$currentColumn] == 0)
+               {  $units[$currentColumn] = "RADIANS{H}";
+               }
+               else
+               {  $units[$currentColumn] = "RADIANS{H." .
+                    $decimalPlaces[$currentColumn] . "}";
+               }
+
+               $tableFormat[$currentColumn] = "HOURS{" .
+                 $externalFormat[$currentColumn] . "}";
+
+               $gotCoords = $true;
+            }
+
+#          ... minutes of time.
+
+            elsif ($units[$currentColumn] eq "min")
+            {  if ($decimalPlaces[$currentColumn] == 0)
+               {  $units[$currentColumn] = "RADIANS{TIMEMIN}";
+               }
+               else
+               {  $units[$currentColumn] = "RADIANS{TIMEMIN." .
+                    $decimalPlaces[$currentColumn] . "}";
+               }
+
+               $tableFormat[$currentColumn] = "TIMEMIN{" .
+                 $externalFormat[$currentColumn] . "}";
+
+               $gotCoords = $true;
+            }
+
+#          ... seconds of time.
+
+            elsif ($units[$currentColumn] eq "s")
+            {  if ($decimalPlaces[$currentColumn] == 0)
+               {  $units[$currentColumn] = "RADIANS{TIMESEC}";
+               }
+               else
+               {  $units[$currentColumn] = "RADIANS{TIMESEC." .
+                    $decimalPlaces[$currentColumn] . "}";
+               }
+
+               $tableFormat[$currentColumn] = "TIMESEC{" .
+                 $externalFormat[$currentColumn] . "}";
+
+               $gotCoords = $true;
+            }
+
+         }
+      }
+
+   }
+   $status;
+}

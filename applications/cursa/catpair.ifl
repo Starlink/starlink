@@ -1,0 +1,234 @@
+#+
+#  Name:
+#     CATPAIR.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     14/2/95 (ACD): Original version.
+#     1/3/95  (ACD): First stable version.
+#     27/8/96 (ACD): Changed parameters for handling textual information.
+#     25/6/99 (ACD): Added global access for catalogue names.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATPAIR
+
+#   helplib '[help_library_specification]'
+
+   parameter PRIMARY       # Name of the primary input catalogue.
+      position 1
+      keyword  PRIMARY
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Primary catalogue:'
+      help     'Give the name of the primary input catalogue.'
+   endparameter
+
+   parameter SECOND        # Name of the secondary input catalogue.
+      position 2
+      keyword  SECOND
+      type     _CHAR
+      access   READ
+      prompt   'Secondary catalogue:'
+      help     'Give the name of the secondary input catalogue.'
+   endparameter
+
+   parameter OUTPUT        # Name of the output paired catalogue.
+      position 3
+      keyword  OUTPUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output paired catalogue.'
+   endparameter
+
+   parameter CRDTYP        # The type of coordinates.
+      position 4
+      keyword  CRDTYP
+      type     _CHAR
+      access   READ
+      default  'S'
+      prompt   'Give the type of coordinates to be paired:'
+      help     'C - Cartesian,   S - spherical-polar (eg. R.A. and Dec.)'
+   endparameter
+
+   parameter PCRD1         # First primary coordinate.
+      position 5
+      keyword  PCRD1
+      type     _CHAR
+      access   READ
+      prompt   'First primary coordinate:'
+      help     'First coord. in primary for pairing (eg. a R.A. or X).'
+   endparameter
+
+   parameter PCRD2         # Second primary coordinate.
+      position 6
+      keyword  PCRD2
+      type     _CHAR
+      access   READ
+      prompt   'Second primary coordinate:'
+      help     'Second coord. in primary for pairing (eg. a Dec. or Y).'
+   endparameter
+
+   parameter SCRD1         # First secondary coordinate.
+      position 7
+      keyword  SCRD1
+      type     _CHAR
+      access   READ
+      prompt   'First secondary coordinate:'
+      help     'First coord. in secondary for pairing (eg. a R.A. or X).'
+   endparameter
+
+   parameter SCRD2         # Second secondary coordinate.
+      position 8
+      keyword  SCRD2
+      type     _CHAR
+      access   READ
+      prompt   'Second secondary coordinate:'
+      help     'Second coord. in secondary for pairing (eg. a Dec. or Y).'
+   endparameter
+
+   parameter PDIST         # Expression for critical distance.
+      position 9
+      keyword  PDIST
+      type     _CHAR
+      access   READ
+      prompt   'Maximum separation for objects to pair:'
+      help     'May be: a constant, primary column name or primary expression.'
+   endparameter
+
+   parameter PRTYP         # Set of paired rows to be produced.
+      position 10
+      keyword  PRTYP
+      type     _CHAR
+      access   READ
+      default  'C'
+      prompt   'Required set:'
+      help     'Give one of: C, P, M, R or A.'
+   endparameter
+
+   parameter MULTP         # Include multiple matches in the primary?
+      position 11
+      keyword  MULTP
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Include primary multiple matches?'
+      help     'Include multiple matches in the primary in the output catalogue?'
+   endparameter
+
+   parameter MULTS         # Include multiple matches in the secondary?
+      position 12
+      keyword  MULTS
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      prompt   'Include secondary multiple matches?'
+      help     'Include multiple matches in the secondary in the output catalogue?'
+   endparameter
+
+   parameter ALLCOL        # Copy all the columns from both input catalogues?
+      position 13
+      keyword  ALLCOL
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Copy all the columns?'
+      help     'Copy all the columns from both input cats. (answer yes if in doubt)?'
+   endparameter
+
+   parameter SPCOL        # Include special columns in the output catalogue?
+      position 14         # (These columns give details of the paired objects.)
+      keyword  SPCOL
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      vpath    'DEFAULT'
+      prompt   'Special columns?'
+      help     'Include special columns (answer yes if in doubt)?'
+   endparameter
+
+   parameter PRMPAR        # Copy parameters from the primary.
+      position 15
+      keyword  PRMPAR
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Copy primary parameters?'
+      help     'Copy parameters in the primary to the output catalogue?'
+   endparameter
+
+   parameter SECPAR        # Copy parameters from the secondary.
+      position 16
+      keyword  SECPAR
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      prompt   'Copy secondary parameters?'
+      help     'Copy parameters in the secondary to the output catalogue?'
+   endparameter
+
+   parameter PTEXT         # Copy textual information from the primary.
+      position 17
+      keyword  PTEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      prompt   'Copy text from primary?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter STEXT         # Copy textual information from the secondary.
+      position 18
+      keyword  STEXT
+      type     _CHAR
+      access   READ
+      default  'N'
+      prompt   'Copy text from secondary?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter TEXT          # Add comments describing the pairing.
+      position 19
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'Y'
+      vpath    'DEFAULT'
+      prompt   'Add comments summarising the pairing?'
+      help     'Y - yes,   N - no.'
+   endparameter
+
+   parameter COLBUF        # Set of paired rows to be produced.
+      position 20
+      keyword  COLBUF
+      type     _CHAR
+      access   READ
+      prompt   'Column:'
+      help     'Enter the name of the required column, ''END'' to finish.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 21
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

@@ -1,0 +1,93 @@
+#+
+#  Name:
+#     CATCHART.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     18/8/96 (ACD): Original version.
+#     3/6/97  (ACD): Converted for CURSA.
+#     6/6/97  (ACD): First stable version.
+#     25/6/99 (ACD): Added global access for catalogue names.
+#     26/7/00 (ACD): Removed entries for QUERYRA, QUERYDEC and QUERYRAD.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#     20/4/01 (ACD): Removed parameters EQUINOX and EPOCH and added TITLE.
+#     24/4/01 (ACD): Removed duplicate item from parameter GRPLST.
+#-
+
+interface CATCHART
+
+#   helplib '[help_library_specification]'
+
+   parameter GRPHDV          # Name of the graphics device.
+      position 1
+      keyword  GRPHDV
+      type     _CHAR
+      access   READ
+      default  'xwindows'
+      prompt   'Graphics device:'
+      help     'Give the name of the graphics device (postscript: ps_l or pscol_l).'
+   endparameter
+
+   parameter MCENTRE         # Flag; plot a central cross?
+      position 2
+      keyword  MCENTRE
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      vpath    'DEFAULT'
+      prompt   'Central cross?'
+      help     'Plot a central cross?
+   endparameter
+
+   parameter MULTIPLE         # Flag; plot multiple lists.
+      position 3
+      keyword  MULTIPLE
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'Plot multiple lists?'
+      help     'FALSE to plot one list,  TRUE for several.'
+   endparameter
+
+   parameter GRPLST          # Name of the target list.
+      position 4
+      keyword  GRPLST
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Target list:'
+      help     'Give the name of the target list, QUIT to exit.'
+   endparameter
+
+   parameter TITLE                     # Chart title.
+      position 5
+      keyword  TITLE
+      type     _CHAR
+      access   READ
+      default  ' '
+      vpath    'DEFAULT'
+      prompt   'Plot title:'
+      help     'Enter the title to be displayed on the chart.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 6
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

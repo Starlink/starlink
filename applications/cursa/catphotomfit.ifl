@@ -1,0 +1,196 @@
+#+
+#  Name:
+#     CATPHOTOMFIT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     8/5/97   (ACD): Original version.
+#     12/10/97 (ACD): First stable version.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATPHOTOMFIT
+
+#   helplib '[help_library_specification]'
+
+   parameter FIXED       # Flag; are any of the coefficients fixed?
+      position 1
+      keyword  FIXED
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Are any of the coefficients fixed?'
+      help     'Enter Y if any of the coefficients are fixed.'
+   endparameter
+
+   parameter ZENITHDIST  # Flag; compute air mass from the zenith distance?
+      position 2
+      keyword  ZENITHDIST
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Air mass from zenith distance?'
+      help     'Compute the air mass from the observed zenith distance?'
+   endparameter
+
+   parameter FZEROP      # Flag; is the zero point fixed?
+      position 3
+      keyword  FZEROP
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      prompt   'Is the zero point fixed?
+      help     'Enter Y if you wish to specify the zero point.'
+   endparameter
+
+   parameter ZEROP       # Zero point.
+      position 4
+      keyword  ZEROP
+      type     _DOUBLE
+      access   READ
+      prompt   'Zero point:'
+      help     'Give the fixed value for the zero point.'
+   endparameter
+
+   parameter FATMOS      # Flag; is the atmospheric extinction fixed?
+      position 5
+      keyword  FATMOS
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      prompt   'Is the atmospheric extinction fixed?
+      help     'Enter Y if you wish to specify the atmospheric extinction .'
+   endparameter
+
+   parameter ATMOS       # Atmospheric extinction.
+      position 6
+      keyword  ATMOS
+      type     _DOUBLE
+      access   READ
+      prompt   'Atmospheric extinction:'
+      help     'Give the fixed value for the atmospheric extinction.'
+   endparameter
+
+   parameter RESID       # Flag; are the residuals to be listed?
+      position 7
+      keyword  RESID
+      type     _LOGICAL
+      access   READ
+      default  'Y'
+      vpath    'DEFAULT'
+      prompt   'Are any of the residuals to be listed?'
+      help     'Enter N to suppress the table of residuals.'
+   endparameter
+
+   parameter CATALOGUE   # Name of the catalogue.
+      position 8
+      keyword  CATALOGUE
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSACAT'
+      prompt   'catalogue:'
+      help     'Give the name of the catalogue of standard and instrumental magnitudes.'
+   endparameter
+
+   parameter NAME        # Standard star names.
+      position 9
+      keyword  NAME
+      type     _CHAR
+      access   READ
+      default  'NAME'
+      prompt   'Star name column:'
+      help     'Give the star name column or NONE for none.'
+   endparameter
+
+   parameter INCLUDE     # Column of 'include in fit' flags.
+      position 10
+      keyword  INCLUDE
+      type     _CHAR
+      access   READ
+      default  'INCL'
+      prompt   'Include in fit column:'
+      help     'Give the name of the "include in fit" column or ALL to include all stars.'
+   endparameter
+
+   parameter CATMAG      # Catalogue magnitude.
+      position 11
+      keyword  CATMAG
+      type     _CHAR
+      access   READ
+      default  'MCAT'
+      prompt   'Catalogue magnitude column:'
+      help     'Enter a column name or expression for the catalogue magnitude.'
+   endparameter
+
+   parameter INSMAG      # Instrumental magnitude.
+      position 12
+      keyword  INSMAG
+      type     _CHAR
+      access   READ
+      default  'MINST'
+      prompt   'Instrumental magnitude column:'
+      help     'Enter a column name or expression for the instrumental magnitude.'
+   endparameter
+
+   parameter AIRMASS     # Air mass.
+      position 13
+      keyword  AIRMASS
+      type     _CHAR
+      access   READ
+      default  'AIRMASS'
+      prompt   'Air mass column:'
+      help     'Enter a column name or expression for the air mass.'
+   endparameter
+
+   parameter ZENDST     # Observed zenith distance.
+      position 14
+      keyword  ZENDST
+      type     _CHAR
+      access   READ
+      default  'ZENDIST'
+      prompt   'Zenith distance column:'
+      help     'Enter a column name or expression for the zenith distance.'
+   endparameter
+
+   parameter INSCON      # Arbitrary instrumental magnitude constant.
+      position 15
+      keyword  INSCON
+      type     _DOUBLE
+      access   READ
+      default  30.0
+      prompt   'Instrumental magnitude constant:'
+      help     'Give the arbitrary constant previously added to the instrumental magnitude.'
+   endparameter
+
+   parameter FILNME      # Name of transform. coeffs. file.
+      position 16
+      keyword  FILNME
+      type     _CHAR
+      access   READ
+      prompt   'Transform. coeffs. file:'
+      help     'Give the name of the file to contain the transformation coefficients.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 17
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

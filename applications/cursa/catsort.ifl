@@ -1,0 +1,89 @@
+#+
+#  Name:
+#     CATSORT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     24/11/94 (ACD): Original version.
+#     20/4/95  (ACD): First stable version.
+#     26/8/96  (ACD): Added parameter TEXT.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATSORT
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN                   # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT                  # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter FNAME                   # Name of the sort column.
+      position 3
+      keyword  FNAME
+      type     _CHAR
+      access   READ
+      prompt   'Sort column:'
+      help    'Give the column the output catalogue is to be sorted on.'
+   endparameter
+
+   parameter ORDER                   # Order for the new catalogue.
+      position 4
+      keyword  ORDER
+      type     _CHAR
+      access   READ
+      default  'ascending'
+      prompt   'Sort order:'
+      help     'Order for the new catalogue: (a)scending or (d)escending.'
+   endparameter
+
+   parameter TEXT                    # Copy textual information.
+      position 5
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 6
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

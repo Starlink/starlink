@@ -1,0 +1,445 @@
+#+
+#  Name:
+#     CATCOORD.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     1/6/97   (ACD):  Original version.
+#     21/5/98  (ACD): Modified for additional output coordinates:
+#        observed, equatorial, local equatorial, horizon, and
+#        supergalactic.
+#     26/11/98 (ACD): Commented out references to observed, local
+#        equatorial and horizon coordinates (because I was not
+#        satisfied that they had been adequately tested).
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATCOORD
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN            # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT           # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter EPOCHI           # Input epoch.
+      position 3
+      keyword  EPOCHI
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Input epoch:'
+      help     'Give the epoch of the input catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter EQUINI           # Input equinox.
+      position 4
+      keyword  EQUINI
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Input equinox:'
+      help     'Give the equinox of the input catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter RAIN             # Input Right Ascension.
+      position 5
+      keyword  RAIN
+      type     _CHAR
+      access   READ
+      default  'RA'
+      prompt   'Input Right Ascension Column:'
+      help     'Name of column containing Right Ascension in input catalogue.'
+   endparameter
+
+   parameter DECIN            # Input Declination.
+      position 6
+      keyword  DECIN
+      type     _CHAR
+      access   READ
+      default  'DEC'
+      prompt   'Input Declination Column:'
+      help     'Name of column containing Declination in input catalogue.'
+   endparameter
+
+   parameter FULL             # Flag; full input coordinates to be used?
+      position 7
+      keyword  FULL
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Full input coordinates?'
+      help     'Are full input coordinates (proper motions etc.) to be used?'
+   endparameter
+
+   parameter PMRA             # Input proper motion in Right Ascension.
+      position 8
+      keyword  PMRA
+      type     _CHAR
+      access   READ
+      default  'PMRA'
+      prompt   'Input Right Ascension proper motion column:'
+      help     'Name of column with input Right Ascension proper motion.'
+   endparameter
+
+   parameter PMDE             # Input proper motion in Declination.
+      position 9
+      keyword  PMDE
+      type     _CHAR
+      access   READ
+      default  'PMDE'
+      prompt   'Input Declination proper motion column:'
+      help     'Name of column with input Declination proper motion.'
+   endparameter
+
+   parameter PLX              # Input parallax.
+      position 10
+      keyword  PLX
+      type     _CHAR
+      access   READ
+      default  'PLX'
+      prompt   'Input parallax column:'
+      help     'Name of column with input parallax.'
+   endparameter
+
+   parameter RV               # Input radial velocity.
+      position 11
+      keyword  RV
+      type     _CHAR
+      access   READ
+      default  'RV'
+      prompt   'Input radial velocity column:'
+      help     'Name of column with input radial velocity.'
+   endparameter
+
+   parameter COORDS         # Type of coordinates required.
+      position 12
+      keyword  COORDS
+      type     _CHAR
+      access   READ
+      default  'equatorial'
+      vpath    'DEFAULT'
+      prompt   'Type of output coordinates?'
+#      help     'Give one of: equatorial, observed, local, horizon, galactic, supergalactic.'
+      help     'Give one of: equatorial, galactic, supergalactic.'
+   endparameter
+
+   parameter EQUINO           # Output equinox.
+      position 13
+      keyword  EQUINO
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Output equinox:'
+      help     'Give the equinox of the Output catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter EPOCHO           # Output epoch.
+      position 14
+      keyword  EPOCHO
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Output epoch:'
+      help     'Give the epoch of the Output catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter RAOUT            # Output Right Ascension.
+      position 15
+      keyword  RAOUT
+      type     _CHAR
+      access   READ
+      default  'RA'
+      prompt   'Output Right Ascension Column:'
+      help     'Name of column containing Right Ascension in Output catalogue.'
+   endparameter
+
+   parameter DECOUT           # Output Declination.
+      position 16
+      keyword  DECOUT
+      type     _CHAR
+      access   READ
+      default  'DEC'
+      prompt   'Output Declination Column:'
+      help     'Name of column containing Declination in output catalogue.'
+   endparameter
+
+   parameter RAOBS            # Output Observed Right Ascension.
+      position 17
+      keyword  RAOBS
+      type     _CHAR
+      access   READ
+      default  'RAOBS'
+      prompt   'Output Observed Right Ascension Column:'
+      help     'Name of column containing Observed Right Ascension in Output catalogue.'
+   endparameter
+
+   parameter DECOBS           # Output Observed Declination.
+      position 18
+      keyword  DECOUT
+      type     _CHAR
+      access   READ
+      default  'DECOBS'
+      prompt   'Output Observed Declination Column:'
+      help     'Name of column containing Observed Declination in output catalogue.'
+   endparameter
+
+   parameter HALCL            # Output Observed Hour Angle.
+      position 19
+      keyword  HALCL
+      type     _CHAR
+      access   READ
+      default  'HALCL'
+      prompt   'Output Observed Hour Angle Column:'
+      help     'Name of column containing Observed Hour Angle in Output catalogue.'
+   endparameter
+
+   parameter DECLCL           # Output Observed Declination.
+      position 20
+      keyword  DECLCL
+      type     _CHAR
+      access   READ
+      default  'DECLCL'
+      prompt   'Output Observed Declination Column:'
+      help     'Name of column containing Observed Declination in output catalogue.'
+   endparameter
+
+   parameter AZ            # Output Observed Azimuth.
+      position 21
+      keyword  AZ
+      type     _CHAR
+      access   READ
+      default  'AZ'
+      prompt   'Output Observed Azimuth Column:'
+      help     'Name of column containing Observed Azimuth in Output catalogue.'
+   endparameter
+
+   parameter ZENDIST           # Output Observed Declination.
+      position 22
+      keyword  ZENDIST
+      type     _CHAR
+      access   READ
+      default  'ZENDIST'
+      prompt   'Output Observed Zenith Distance Column:'
+      help     'Name of column containing Observed Zenith Distance in output catalogue.'
+   endparameter
+
+   parameter L                # Output Galactic longitude.
+      position 23
+      keyword  L
+      type     _CHAR
+      access   READ
+      default  'L'
+      prompt   'Output Galactic longitude Column:'
+      help     'Name of column containing Galactic longitude in Output catalogue.'
+   endparameter
+
+   parameter B                # Output Galactic latitude.
+      position 24
+      keyword  B
+      type     _CHAR
+      access   READ
+      default  'B'
+      prompt   'Output Galactic latitude Column:'
+      help     'Name of column containing Galactic latitude in output catalogue.'
+   endparameter
+
+   parameter SGL                # Output Supergalactic longitude.
+      position 25
+      keyword  SGL
+      type     _CHAR
+      access   READ
+      default  'SGL'
+      prompt   'Output supergalactic longitude Column:'
+      help     'Name of column containing supergalactic longitude in Output catalogue.'
+   endparameter
+
+   parameter SGB                # Output Supergalactic slatitude.
+      position 26
+      keyword  SGB
+      type     _CHAR
+      access   READ
+      default  'SGB'
+      prompt   'Output supergalactic latitude Column:'
+      help     'Name of column containing Supergalactic latitude in output catalogue.'
+   endparameter
+
+   parameter TSCOPE                  # Name of the telescope required.
+      position 27
+      keyword  TSCOPE
+      type     _CHAR
+      access   READ
+      default  'UKST'
+      prompt   'Telescope:'
+      help     'Give name of telescope or ! to be prompted for details explicitly.'
+   endparameter
+
+   parameter LONG                   # Telescope longitude
+      position 28
+      keyword  LONG
+      type     _DOUBLE
+      access   READ
+      default  '-149.07022222'
+      prompt   'Telescope longitude (radians, west positive):'
+      vpath    'prompt,default'
+      help     'The default corresponds to the UK schmidt.'
+   endparameter
+
+   parameter LAT                    # Telescope latitude
+      position 29
+      keyword  LAT
+      type     _DOUBLE
+      access   READ
+      default  '-39.74388889'
+      prompt   'Telescope latitude (radians, north positive):'
+      vpath    'prompt,default'
+      help     'The default corresponds to the UK schmidt.'
+   endparameter
+
+   parameter HEIGHT                  # Telescope height above sea level.
+      position 30
+      keyword  HEIGHT
+      type     _DOUBLE
+      access   READ
+      default  '1145.0'
+      prompt   'Telescope height above sea level (metres):'
+      vpath    'prompt,default'
+      help     'The default corresponds to the UK schmidt.'
+   endparameter
+
+   parameter UTMJD             # Modified Julian Date.
+      position 31
+      keyword  UTMJD
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      prompt   'Julian date:'
+      help     'UTC of the observation, expressed as an MJD.'
+   endparameter
+
+   parameter UTDATE                # UT date of exposure.
+      position 32
+      keyword  UTDATE
+      type     '_CHAR'
+      ppath    'CURRENT'
+      access   READ
+      prompt   'UT date:'
+      help     'UT date of exposure ("yymmdd", eg. "870815").'
+   endparameter
+
+   parameter LST                   # Local sidereal time
+      position 33
+      keyword  LST
+      type     '_CHAR'
+      ppath    'CURRENT'
+      access   READ
+      prompt   'Local sidereal time:'
+      help     'Local sidereal time, start of exposure ("hhmm", eg. "0110").'
+   endparameter
+
+   parameter TEMP            # Local ambient temperature.
+      position 34
+      keyword  TEMP
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '273.155'
+      prompt   'Temperature:'
+      help     'Local ambient temperature (Kelvin).'
+   endparameter
+
+   parameter ATMOSP          # Local atmospheric pressure.
+      position 35
+      keyword  ATMOSP
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '1013.25'
+      prompt   'Pressure:'
+      help     'Local atmospheric pressure (mB).'
+   endparameter
+
+   parameter HUMID           # Local relative humidity.
+      position 36
+      keyword  HUMID
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '0.5'
+      prompt   'Humidity:'
+      help     'Local relative humidity (in the range 0.0 - 1.0).'
+   endparameter
+
+   parameter WAVE            # Effective wavelength.
+      position 37
+      keyword  WAVE
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '4500'
+      prompt   'Wavelength:'
+      help     'Effective wavelength of the plate/filter (Angstrom).'
+   endparameter
+
+   parameter TROPL           # Tropospheric lapse rate.
+      position 38
+      keyword  TROPL
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '0.0065'
+      prompt   'Tropospheric lapse rate:'
+      help     'Tropospheric lapse rate (degrees K per metre).'
+   endparameter
+
+   parameter TEXT             # Flag; copy textual information?
+      position 39
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 40
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

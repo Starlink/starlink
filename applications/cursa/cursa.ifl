@@ -1,0 +1,2200 @@
+monolith cursa
+#+
+#  Name:
+#     CATCHART.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     18/8/96 (ACD): Original version.
+#     3/6/97  (ACD): Converted for CURSA.
+#     6/6/97  (ACD): First stable version.
+#     25/6/99 (ACD): Added global access for catalogue names.
+#     26/7/00 (ACD): Removed entries for QUERYRA, QUERYDEC and QUERYRAD.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#     20/4/01 (ACD): Removed parameters EQUINOX and EPOCH and added TITLE.
+#     24/4/01 (ACD): Removed duplicate item from parameter GRPLST.
+#-
+
+interface CATCHART
+
+#   helplib '[help_library_specification]'
+
+   parameter GRPHDV          # Name of the graphics device.
+      position 1
+      keyword  GRPHDV
+      type     _CHAR
+      access   READ
+      default  'xwindows'
+      prompt   'Graphics device:'
+      help     'Give the name of the graphics device (postscript: ps_l or pscol_l).'
+   endparameter
+
+   parameter MCENTRE         # Flag; plot a central cross?
+      position 2
+      keyword  MCENTRE
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      vpath    'DEFAULT'
+      prompt   'Central cross?'
+      help     'Plot a central cross?
+   endparameter
+
+   parameter MULTIPLE         # Flag; plot multiple lists.
+      position 3
+      keyword  MULTIPLE
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'Plot multiple lists?'
+      help     'FALSE to plot one list,  TRUE for several.'
+   endparameter
+
+   parameter GRPLST          # Name of the target list.
+      position 4
+      keyword  GRPLST
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Target list:'
+      help     'Give the name of the target list, QUIT to exit.'
+   endparameter
+
+   parameter TITLE                     # Chart title.
+      position 5
+      keyword  TITLE
+      type     _CHAR
+      access   READ
+      default  ' '
+      vpath    'DEFAULT'
+      prompt   'Plot title:'
+      help     'Enter the title to be displayed on the chart.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 6
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATCHARTRN.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     12/8/96 (ACD): Original version.
+#     6/6/97  (ACD): Converted for CURSA.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#     9/5/01  (ACD): Added ppath for parameter GTFILE.
+#-
+
+interface CATCHARTRN
+
+#   helplib '[help_library_specification]'
+
+   parameter GTFILE          # Name of the graphics translation file.
+      position 1
+      keyword  GTFILE
+      type     _CHAR
+      ppath    'CURRENT'
+      access   READ
+      prompt   'Graphics translation file:'
+      help     'Give the name of the graphics translation file.'
+   endparameter
+
+   parameter CATIN           # Name of the input target list.
+      position 2
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input target list:'
+      help     'Give the name of the input target list.'
+   endparameter
+
+   parameter CATOUT          # Name of the output graphics attribute list.
+      position 3
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT''
+      prompt   'Output graphics attribute list:'
+      help     'Give the name of the output graphics attribute list.'
+   endparameter
+
+   parameter TEXT                    # Copy textual information.
+      position 4
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 5
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATCOORD.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     1/6/97   (ACD):  Original version.
+#     21/5/98  (ACD): Modified for additional output coordinates:
+#        observed, equatorial, local equatorial, horizon, and
+#        supergalactic.
+#     26/11/98 (ACD): Commented out references to observed, local
+#        equatorial and horizon coordinates (because I was not
+#        satisfied that they had been adequately tested).
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATCOORD
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN            # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT           # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter EPOCHI           # Input epoch.
+      position 3
+      keyword  EPOCHI
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Input epoch:'
+      help     'Give the epoch of the input catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter EQUINI           # Input equinox.
+      position 4
+      keyword  EQUINI
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Input equinox:'
+      help     'Give the equinox of the input catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter RAIN             # Input Right Ascension.
+      position 5
+      keyword  RAIN
+      type     _CHAR
+      access   READ
+      default  'RA'
+      prompt   'Input Right Ascension Column:'
+      help     'Name of column containing Right Ascension in input catalogue.'
+   endparameter
+
+   parameter DECIN            # Input Declination.
+      position 6
+      keyword  DECIN
+      type     _CHAR
+      access   READ
+      default  'DEC'
+      prompt   'Input Declination Column:'
+      help     'Name of column containing Declination in input catalogue.'
+   endparameter
+
+   parameter FULL             # Flag; full input coordinates to be used?
+      position 7
+      keyword  FULL
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Full input coordinates?'
+      help     'Are full input coordinates (proper motions etc.) to be used?'
+   endparameter
+
+   parameter PMRA             # Input proper motion in Right Ascension.
+      position 8
+      keyword  PMRA
+      type     _CHAR
+      access   READ
+      default  'PMRA'
+      prompt   'Input Right Ascension proper motion column:'
+      help     'Name of column with input Right Ascension proper motion.'
+   endparameter
+
+   parameter PMDE             # Input proper motion in Declination.
+      position 9
+      keyword  PMDE
+      type     _CHAR
+      access   READ
+      default  'PMDE'
+      prompt   'Input Declination proper motion column:'
+      help     'Name of column with input Declination proper motion.'
+   endparameter
+
+   parameter PLX              # Input parallax.
+      position 10
+      keyword  PLX
+      type     _CHAR
+      access   READ
+      default  'PLX'
+      prompt   'Input parallax column:'
+      help     'Name of column with input parallax.'
+   endparameter
+
+   parameter RV               # Input radial velocity.
+      position 11
+      keyword  RV
+      type     _CHAR
+      access   READ
+      default  'RV'
+      prompt   'Input radial velocity column:'
+      help     'Name of column with input radial velocity.'
+   endparameter
+
+   parameter COORDS         # Type of coordinates required.
+      position 12
+      keyword  COORDS
+      type     _CHAR
+      access   READ
+      default  'equatorial'
+      vpath    'DEFAULT'
+      prompt   'Type of output coordinates?'
+#      help     'Give one of: equatorial, observed, local, horizon, galactic, supergalactic.'
+      help     'Give one of: equatorial, galactic, supergalactic.'
+   endparameter
+
+   parameter EQUINO           # Output equinox.
+      position 13
+      keyword  EQUINO
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Output equinox:'
+      help     'Give the equinox of the Output catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter EPOCHO           # Output epoch.
+      position 14
+      keyword  EPOCHO
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Output epoch:'
+      help     'Give the epoch of the Output catalogue, eg: J2000, B1950.'
+   endparameter
+
+   parameter RAOUT            # Output Right Ascension.
+      position 15
+      keyword  RAOUT
+      type     _CHAR
+      access   READ
+      default  'RA'
+      prompt   'Output Right Ascension Column:'
+      help     'Name of column containing Right Ascension in Output catalogue.'
+   endparameter
+
+   parameter DECOUT           # Output Declination.
+      position 16
+      keyword  DECOUT
+      type     _CHAR
+      access   READ
+      default  'DEC'
+      prompt   'Output Declination Column:'
+      help     'Name of column containing Declination in output catalogue.'
+   endparameter
+
+   parameter RAOBS            # Output Observed Right Ascension.
+      position 17
+      keyword  RAOBS
+      type     _CHAR
+      access   READ
+      default  'RAOBS'
+      prompt   'Output Observed Right Ascension Column:'
+      help     'Name of column containing Observed Right Ascension in Output catalogue.'
+   endparameter
+
+   parameter DECOBS           # Output Observed Declination.
+      position 18
+      keyword  DECOUT
+      type     _CHAR
+      access   READ
+      default  'DECOBS'
+      prompt   'Output Observed Declination Column:'
+      help     'Name of column containing Observed Declination in output catalogue.'
+   endparameter
+
+   parameter HALCL            # Output Observed Hour Angle.
+      position 19
+      keyword  HALCL
+      type     _CHAR
+      access   READ
+      default  'HALCL'
+      prompt   'Output Observed Hour Angle Column:'
+      help     'Name of column containing Observed Hour Angle in Output catalogue.'
+   endparameter
+
+   parameter DECLCL           # Output Observed Declination.
+      position 20
+      keyword  DECLCL
+      type     _CHAR
+      access   READ
+      default  'DECLCL'
+      prompt   'Output Observed Declination Column:'
+      help     'Name of column containing Observed Declination in output catalogue.'
+   endparameter
+
+   parameter AZ            # Output Observed Azimuth.
+      position 21
+      keyword  AZ
+      type     _CHAR
+      access   READ
+      default  'AZ'
+      prompt   'Output Observed Azimuth Column:'
+      help     'Name of column containing Observed Azimuth in Output catalogue.'
+   endparameter
+
+   parameter ZENDIST           # Output Observed Declination.
+      position 22
+      keyword  ZENDIST
+      type     _CHAR
+      access   READ
+      default  'ZENDIST'
+      prompt   'Output Observed Zenith Distance Column:'
+      help     'Name of column containing Observed Zenith Distance in output catalogue.'
+   endparameter
+
+   parameter L                # Output Galactic longitude.
+      position 23
+      keyword  L
+      type     _CHAR
+      access   READ
+      default  'L'
+      prompt   'Output Galactic longitude Column:'
+      help     'Name of column containing Galactic longitude in Output catalogue.'
+   endparameter
+
+   parameter B                # Output Galactic latitude.
+      position 24
+      keyword  B
+      type     _CHAR
+      access   READ
+      default  'B'
+      prompt   'Output Galactic latitude Column:'
+      help     'Name of column containing Galactic latitude in output catalogue.'
+   endparameter
+
+   parameter SGL                # Output Supergalactic longitude.
+      position 25
+      keyword  SGL
+      type     _CHAR
+      access   READ
+      default  'SGL'
+      prompt   'Output supergalactic longitude Column:'
+      help     'Name of column containing supergalactic longitude in Output catalogue.'
+   endparameter
+
+   parameter SGB                # Output Supergalactic slatitude.
+      position 26
+      keyword  SGB
+      type     _CHAR
+      access   READ
+      default  'SGB'
+      prompt   'Output supergalactic latitude Column:'
+      help     'Name of column containing Supergalactic latitude in output catalogue.'
+   endparameter
+
+   parameter TSCOPE                  # Name of the telescope required.
+      position 27
+      keyword  TSCOPE
+      type     _CHAR
+      access   READ
+      default  'UKST'
+      prompt   'Telescope:'
+      help     'Give name of telescope or ! to be prompted for details explicitly.'
+   endparameter
+
+   parameter LONG                   # Telescope longitude
+      position 28
+      keyword  LONG
+      type     _DOUBLE
+      access   READ
+      default  '-149.07022222'
+      prompt   'Telescope longitude (radians, west positive):'
+      vpath    'prompt,default'
+      help     'The default corresponds to the UK schmidt.'
+   endparameter
+
+   parameter LAT                    # Telescope latitude
+      position 29
+      keyword  LAT
+      type     _DOUBLE
+      access   READ
+      default  '-39.74388889'
+      prompt   'Telescope latitude (radians, north positive):'
+      vpath    'prompt,default'
+      help     'The default corresponds to the UK schmidt.'
+   endparameter
+
+   parameter HEIGHT                  # Telescope height above sea level.
+      position 30
+      keyword  HEIGHT
+      type     _DOUBLE
+      access   READ
+      default  '1145.0'
+      prompt   'Telescope height above sea level (metres):'
+      vpath    'prompt,default'
+      help     'The default corresponds to the UK schmidt.'
+   endparameter
+
+   parameter UTMJD             # Modified Julian Date.
+      position 31
+      keyword  UTMJD
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      prompt   'Julian date:'
+      help     'UTC of the observation, expressed as an MJD.'
+   endparameter
+
+   parameter UTDATE                # UT date of exposure.
+      position 32
+      keyword  UTDATE
+      type     '_CHAR'
+      ppath    'CURRENT'
+      access   READ
+      prompt   'UT date:'
+      help     'UT date of exposure ("yymmdd", eg. "870815").'
+   endparameter
+
+   parameter LST                   # Local sidereal time
+      position 33
+      keyword  LST
+      type     '_CHAR'
+      ppath    'CURRENT'
+      access   READ
+      prompt   'Local sidereal time:'
+      help     'Local sidereal time, start of exposure ("hhmm", eg. "0110").'
+   endparameter
+
+   parameter TEMP            # Local ambient temperature.
+      position 34
+      keyword  TEMP
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '273.155'
+      prompt   'Temperature:'
+      help     'Local ambient temperature (Kelvin).'
+   endparameter
+
+   parameter ATMOSP          # Local atmospheric pressure.
+      position 35
+      keyword  ATMOSP
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '1013.25'
+      prompt   'Pressure:'
+      help     'Local atmospheric pressure (mB).'
+   endparameter
+
+   parameter HUMID           # Local relative humidity.
+      position 36
+      keyword  HUMID
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '0.5'
+      prompt   'Humidity:'
+      help     'Local relative humidity (in the range 0.0 - 1.0).'
+   endparameter
+
+   parameter WAVE            # Effective wavelength.
+      position 37
+      keyword  WAVE
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '4500'
+      prompt   'Wavelength:'
+      help     'Effective wavelength of the plate/filter (Angstrom).'
+   endparameter
+
+   parameter TROPL           # Tropospheric lapse rate.
+      position 38
+      keyword  TROPL
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,DEFAULT'
+      access   READ
+      default  '0.0065'
+      prompt   'Tropospheric lapse rate:'
+      help     'Tropospheric lapse rate (degrees K per metre).'
+   endparameter
+
+   parameter TEXT             # Flag; copy textual information?
+      position 39
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 40
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATCOPY.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     28/11/94 (ACD): Original version.
+#     19/4/95  (ACD): First stable version.
+#     26/8/96  (ACD): Added parameter TEXT.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#     10/4/01  (ACD): Added COPYPAR, PFILTER and ADDPAR.
+#     24/4/01  (ACD): Corrected default for PFILTER.
+#     26/4/01  (ACD): Added PNAME, PARTYP, PCSIZE, PVALUE, PUNITS and PCOMM.
+#-
+
+interface CATCOPY
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN           # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT          # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter COPYPAR         # Flag defining which parameters to copy.
+      position 3
+      keyword  COPYPAR
+      type     _CHAR
+      access   READ
+      default  'All'
+      vpath    'DEFAULT'
+      prompt   'Parameters to copy?'
+      help     'A - all,   F - Filter some out,   N - none.'
+   endparameter
+
+   parameter PFILTER         # List of parameters to be filtered out.
+      position 4
+      keyword  PFILTER
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameters to filter out?'
+      help  'Comma-separated list of parameters to filter out (ie. not copy).'
+   endparameter
+
+   parameter ADDPAR          # Flag; new parameters to be added?
+      position 5
+      keyword  ADDPAR
+      type     _LOGICAL
+      access   READ
+      default  false
+      vpath    'DEFAULT'
+      prompt   'Add another parameter?'
+      help     'Is another parameter to be added?'
+   endparameter
+
+   parameter   PNAME         # Name of the new parameter.
+      position 6
+      keyword  PNAME
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter name:'
+      help     'Give the name of the new parameter.'
+   endparameter
+
+   parameter PARTYP          # Data type of the new parameter.
+      position 7
+      keyword  PARTYP
+      type     _CHAR
+      access   READ
+      default  'CHAR'
+      vpath    'PROMPT'
+      prompt   'Parameter type:'
+      help  'Data type of parameter: REAL, DOUBLE, INTEGER, LOGICAL or CHAR.'
+   endparameter
+
+   parameter PCSIZE          # Size of the new character parameter.
+      position 8
+      keyword  PCSIZE
+      type     _INTEGER
+      access   READ
+      default  60
+      vpath    'PROMPT'
+      prompt   'Parameter character size:'
+      help  'Give the size of the new character parameter.'
+   endparameter
+
+   parameter PVALUE          # Value of the new parameter.
+      position 9
+      keyword  PVALUE
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter value:'
+      help  'Give the value of the new parameter.'
+   endparameter
+
+   parameter  PUNITS         # Units of the new parameter.
+      position 10
+      keyword  PUNITS
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter units:'
+      help  'Give the units of the new parameter.'
+   endparameter
+
+   parameter PCOMM           # Comments describing the new parameter.
+      position 11
+      keyword  PCOMM
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter comments:'
+      help  'Give the comments describing the new parameter.'
+   endparameter
+
+   parameter TEXT            # Copy textual information.
+      position 12
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 13
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATGRID.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     24/6/99 (ACD): Original version.
+#     25/6/99 (ACD): First stable version.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATGRID
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN                   # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter NDIM                     # Number of dimensions in output grid.
+      position 2
+      keyword  NDIM
+      type     _INTEGER
+      access   READ
+      default  2
+      range 1,3
+      prompt   'Grid dimensionality:'
+      help     'Number of dimensions in the output grid (1 - 3).'
+   endparameter
+
+   parameter COLX                   # Name of the X-axis column.
+      position 3
+      keyword  COLX
+      type     _CHAR
+      access   READ
+      prompt   'Column for X-axis:'
+      help    'Name of the column to be used for X-axis of the grid.'
+   endparameter
+
+   parameter XBINS                     # Number of bins in X-axis.
+      position 4
+      keyword  XBINS
+      type     _INTEGER
+      access   READ
+      default  50
+      range 1,10000
+      prompt   'No. of bins in X:'
+      help     'Number of bins in the grid along the X-axis.'
+   endparameter
+
+   parameter COLY                   # Name of the Y-axis column.
+      position 5
+      keyword  COLY
+      type     _CHAR
+      access   READ
+      prompt   'Column for Y-axis:'
+      help    'Name of the column to be used for Y-axis of the grid.'
+   endparameter
+
+   parameter YBINS                     # Number of bins in Y-axis.
+      position 6
+      keyword  YBINS
+      type     _INTEGER
+      access   READ
+      default  50
+      range 1,10000
+      prompt   'No. of bins in Y:'
+      help     'Number of bins in the grid along the Y-axis.'
+   endparameter
+
+   parameter COLZ                   # Name of the Z-axis column.
+      position 7
+      keyword  COLZ
+      type     _CHAR
+      access   READ
+      prompt   'Column for Z-axis:'
+      help    'Name of the column to be used for Z-axis of the grid.'
+   endparameter
+
+   parameter ZBINS                     # Number of bins in Z-axis.
+      position 8
+      keyword  ZBINS
+      type     _INTEGER
+      access   READ
+      default  50
+      range 1,10000
+      prompt   'No. of bins in Z:'
+      help     'Number of bins in the grid along the Z-axis.'
+   endparameter
+
+   parameter GRID                     # Name of the output grid.
+      position 9
+      keyword  GRID
+      type     'NDF'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Output grid:'
+      help     'Give the name of the output data grid or histogram.'
+#     helpkey  '*'
+   endparameter
+
+   parameter NORMAL                  # Flag; normalise the grid?
+      position 10
+      keyword  NORMAL
+      type     _LOGICAL
+      access   READ
+      default  'FALSE'
+      vpath    'DEFAULT'
+      prompt   'Normalise?'
+      help     'Normalise the grid values?'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 11
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATGSCIN.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     10/5/95 (ACD): Original version.
+#     26/8/96 (ACD): Added parameter TEXT.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATGSCIN
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN                   # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue (a HST GSC region).'
+   endparameter
+
+   parameter TEXT                    # Copy textual information.
+      position 2
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 3
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATHEADER.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     16/9/94 (ACD): Original version.
+#     19/4/95 (ACD): First stable version.
+#     25/6/99 (ACD): Added global access for catalogue names.
+#     21/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#     1/11/01 (ACD): Added parameters DETAIL, ROWS, COLS, PARS and NAMES.
+#        Also made FILE hidden.
+#-
+
+interface CATHEADER
+
+#   helplib '[help_library_specification]'
+
+   parameter CATALOGUE       # Name of the catalogue.
+      position 1
+      keyword  CATALOGUE
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSACAT'
+      prompt   'catalogue:'
+      help     'Give the name of the catalogue.'
+   endparameter
+
+   parameter FILE            # Flag; write output to file?
+      position 2
+      keyword  FILE
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Write output to a file?'
+      help     'T - write output to file;  F - do not write it.'
+   endparameter
+
+   parameter DETAIL          # Flag specifying the details to be displayed.
+      position 3
+      keyword  DETAIL
+      type     _CHAR
+      access   READ
+      default  'SUMMARY'
+      vpath    'DEFAULT'
+      prompt   'Details required:'
+      help     'One of: SUMMARY, COLUMNS, PARAMETERS, TEXT, AST, FULL.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 4
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+   parameter ROWS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1
+      Association '->GLOBAL.CURSA_ROWS'
+   endparameter
+
+   parameter COLS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1
+      Association '->GLOBAL.CURSA_COLUMNS'
+   endparameter
+
+   parameter PARS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1
+      Association '->GLOBAL.CURSA_PARAMS'
+   endparameter
+
+   parameter NAMES
+      type     '_CHAR'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  ' '
+      Association '->GLOBAL.CURSA_NAMES'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATPAIR.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     14/2/95 (ACD): Original version.
+#     1/3/95  (ACD): First stable version.
+#     27/8/96 (ACD): Changed parameters for handling textual information.
+#     25/6/99 (ACD): Added global access for catalogue names.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATPAIR
+
+#   helplib '[help_library_specification]'
+
+   parameter PRIMARY       # Name of the primary input catalogue.
+      position 1
+      keyword  PRIMARY
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Primary catalogue:'
+      help     'Give the name of the primary input catalogue.'
+   endparameter
+
+   parameter SECOND        # Name of the secondary input catalogue.
+      position 2
+      keyword  SECOND
+      type     _CHAR
+      access   READ
+      prompt   'Secondary catalogue:'
+      help     'Give the name of the secondary input catalogue.'
+   endparameter
+
+   parameter OUTPUT        # Name of the output paired catalogue.
+      position 3
+      keyword  OUTPUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output paired catalogue.'
+   endparameter
+
+   parameter CRDTYP        # The type of coordinates.
+      position 4
+      keyword  CRDTYP
+      type     _CHAR
+      access   READ
+      default  'S'
+      prompt   'Give the type of coordinates to be paired:'
+      help     'C - Cartesian,   S - spherical-polar (eg. R.A. and Dec.)'
+   endparameter
+
+   parameter PCRD1         # First primary coordinate.
+      position 5
+      keyword  PCRD1
+      type     _CHAR
+      access   READ
+      prompt   'First primary coordinate:'
+      help     'First coord. in primary for pairing (eg. a R.A. or X).'
+   endparameter
+
+   parameter PCRD2         # Second primary coordinate.
+      position 6
+      keyword  PCRD2
+      type     _CHAR
+      access   READ
+      prompt   'Second primary coordinate:'
+      help     'Second coord. in primary for pairing (eg. a Dec. or Y).'
+   endparameter
+
+   parameter SCRD1         # First secondary coordinate.
+      position 7
+      keyword  SCRD1
+      type     _CHAR
+      access   READ
+      prompt   'First secondary coordinate:'
+      help     'First coord. in secondary for pairing (eg. a R.A. or X).'
+   endparameter
+
+   parameter SCRD2         # Second secondary coordinate.
+      position 8
+      keyword  SCRD2
+      type     _CHAR
+      access   READ
+      prompt   'Second secondary coordinate:'
+      help     'Second coord. in secondary for pairing (eg. a Dec. or Y).'
+   endparameter
+
+   parameter PDIST         # Expression for critical distance.
+      position 9
+      keyword  PDIST
+      type     _CHAR
+      access   READ
+      prompt   'Maximum separation for objects to pair:'
+      help     'May be: a constant, primary column name or primary expression.'
+   endparameter
+
+   parameter PRTYP         # Set of paired rows to be produced.
+      position 10
+      keyword  PRTYP
+      type     _CHAR
+      access   READ
+      default  'C'
+      prompt   'Required set:'
+      help     'Give one of: C, P, M, R or A.'
+   endparameter
+
+   parameter MULTP         # Include multiple matches in the primary?
+      position 11
+      keyword  MULTP
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Include primary multiple matches?'
+      help     'Include multiple matches in the primary in the output catalogue?'
+   endparameter
+
+   parameter MULTS         # Include multiple matches in the secondary?
+      position 12
+      keyword  MULTS
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      prompt   'Include secondary multiple matches?'
+      help     'Include multiple matches in the secondary in the output catalogue?'
+   endparameter
+
+   parameter ALLCOL        # Copy all the columns from both input catalogues?
+      position 13
+      keyword  ALLCOL
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Copy all the columns?'
+      help     'Copy all the columns from both input cats. (answer yes if in doubt)?'
+   endparameter
+
+   parameter SPCOL        # Include special columns in the output catalogue?
+      position 14         # (These columns give details of the paired objects.)
+      keyword  SPCOL
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      vpath    'DEFAULT'
+      prompt   'Special columns?'
+      help     'Include special columns (answer yes if in doubt)?'
+   endparameter
+
+   parameter PRMPAR        # Copy parameters from the primary.
+      position 15
+      keyword  PRMPAR
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Copy primary parameters?'
+      help     'Copy parameters in the primary to the output catalogue?'
+   endparameter
+
+   parameter SECPAR        # Copy parameters from the secondary.
+      position 16
+      keyword  SECPAR
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      prompt   'Copy secondary parameters?'
+      help     'Copy parameters in the secondary to the output catalogue?'
+   endparameter
+
+   parameter PTEXT         # Copy textual information from the primary.
+      position 17
+      keyword  PTEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      prompt   'Copy text from primary?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter STEXT         # Copy textual information from the secondary.
+      position 18
+      keyword  STEXT
+      type     _CHAR
+      access   READ
+      default  'N'
+      prompt   'Copy text from secondary?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter TEXT          # Add comments describing the pairing.
+      position 19
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'Y'
+      vpath    'DEFAULT'
+      prompt   'Add comments summarising the pairing?'
+      help     'Y - yes,   N - no.'
+   endparameter
+
+   parameter COLBUF        # Set of paired rows to be produced.
+      position 20
+      keyword  COLBUF
+      type     _CHAR
+      access   READ
+      prompt   'Column:'
+      help     'Enter the name of the required column, ''END'' to finish.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 21
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATPHOTOMFIT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     8/5/97   (ACD): Original version.
+#     12/10/97 (ACD): First stable version.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATPHOTOMFIT
+
+#   helplib '[help_library_specification]'
+
+   parameter FIXED       # Flag; are any of the coefficients fixed?
+      position 1
+      keyword  FIXED
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Are any of the coefficients fixed?'
+      help     'Enter Y if any of the coefficients are fixed.'
+   endparameter
+
+   parameter ZENITHDIST  # Flag; compute air mass from the zenith distance?
+      position 2
+      keyword  ZENITHDIST
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Air mass from zenith distance?'
+      help     'Compute the air mass from the observed zenith distance?'
+   endparameter
+
+   parameter FZEROP      # Flag; is the zero point fixed?
+      position 3
+      keyword  FZEROP
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      prompt   'Is the zero point fixed?
+      help     'Enter Y if you wish to specify the zero point.'
+   endparameter
+
+   parameter ZEROP       # Zero point.
+      position 4
+      keyword  ZEROP
+      type     _DOUBLE
+      access   READ
+      prompt   'Zero point:'
+      help     'Give the fixed value for the zero point.'
+   endparameter
+
+   parameter FATMOS      # Flag; is the atmospheric extinction fixed?
+      position 5
+      keyword  FATMOS
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      prompt   'Is the atmospheric extinction fixed?
+      help     'Enter Y if you wish to specify the atmospheric extinction .'
+   endparameter
+
+   parameter ATMOS       # Atmospheric extinction.
+      position 6
+      keyword  ATMOS
+      type     _DOUBLE
+      access   READ
+      prompt   'Atmospheric extinction:'
+      help     'Give the fixed value for the atmospheric extinction.'
+   endparameter
+
+   parameter RESID       # Flag; are the residuals to be listed?
+      position 7
+      keyword  RESID
+      type     _LOGICAL
+      access   READ
+      default  'Y'
+      vpath    'DEFAULT'
+      prompt   'Are any of the residuals to be listed?'
+      help     'Enter N to suppress the table of residuals.'
+   endparameter
+
+   parameter CATALOGUE   # Name of the catalogue.
+      position 8
+      keyword  CATALOGUE
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSACAT'
+      prompt   'catalogue:'
+      help     'Give the name of the catalogue of standard and instrumental magnitudes.'
+   endparameter
+
+   parameter NAME        # Standard star names.
+      position 9
+      keyword  NAME
+      type     _CHAR
+      access   READ
+      default  'NAME'
+      prompt   'Star name column:'
+      help     'Give the star name column or NONE for none.'
+   endparameter
+
+   parameter INCLUDE     # Column of 'include in fit' flags.
+      position 10
+      keyword  INCLUDE
+      type     _CHAR
+      access   READ
+      default  'INCL'
+      prompt   'Include in fit column:'
+      help     'Give the name of the "include in fit" column or ALL to include all stars.'
+   endparameter
+
+   parameter CATMAG      # Catalogue magnitude.
+      position 11
+      keyword  CATMAG
+      type     _CHAR
+      access   READ
+      default  'MCAT'
+      prompt   'Catalogue magnitude column:'
+      help     'Enter a column name or expression for the catalogue magnitude.'
+   endparameter
+
+   parameter INSMAG      # Instrumental magnitude.
+      position 12
+      keyword  INSMAG
+      type     _CHAR
+      access   READ
+      default  'MINST'
+      prompt   'Instrumental magnitude column:'
+      help     'Enter a column name or expression for the instrumental magnitude.'
+   endparameter
+
+   parameter AIRMASS     # Air mass.
+      position 13
+      keyword  AIRMASS
+      type     _CHAR
+      access   READ
+      default  'AIRMASS'
+      prompt   'Air mass column:'
+      help     'Enter a column name or expression for the air mass.'
+   endparameter
+
+   parameter ZENDST     # Observed zenith distance.
+      position 14
+      keyword  ZENDST
+      type     _CHAR
+      access   READ
+      default  'ZENDIST'
+      prompt   'Zenith distance column:'
+      help     'Enter a column name or expression for the zenith distance.'
+   endparameter
+
+   parameter INSCON      # Arbitrary instrumental magnitude constant.
+      position 15
+      keyword  INSCON
+      type     _DOUBLE
+      access   READ
+      default  30.0
+      prompt   'Instrumental magnitude constant:'
+      help     'Give the arbitrary constant previously added to the instrumental magnitude.'
+   endparameter
+
+   parameter FILNME      # Name of transform. coeffs. file.
+      position 16
+      keyword  FILNME
+      type     _CHAR
+      access   READ
+      prompt   'Transform. coeffs. file:'
+      help     'Give the name of the file to contain the transformation coefficients.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 17
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATPHOTOMLST.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     7/10/97 (ACD): Original version.
+#-
+
+interface CATPHOTOMLST
+
+#   helplib '[help_library_specification]'
+
+   parameter FILNME      # Name of transform. coeffs. file.
+      position 1
+      keyword  FILNME
+      type     _CHAR
+      access   READ
+      prompt   'Transform. coeffs. file:'
+      help     'Give the name of the file of transformation coefficients.'
+   endparameter
+
+   parameter DECPL       # Number of decimal places.
+      position 2
+      keyword  DECPL
+      type     _INTEGER
+      access   READ
+      default  6
+      vpath    'DEFAULT'
+      prompt   'Decimal places:'
+      help     'Enter the number of decimal places for displaying the coefficients.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATPHOTOMTRN.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     7/10/97  (ACD): Original version.
+#     12/10/97 (ACD): First stable version.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATPHOTOMTRN
+
+#   helplib '[help_library_specification]'
+
+   parameter ZENITHDIST  # Flag; compute air mass from the zenith distance?
+      position 1
+      keyword  ZENITHDIST
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Air mass from zenith distance?'
+      help     'Compute the air mass from the observed zenith distance?'
+   endparameter
+
+   parameter FILNME      # Name of transform. coeffs. file.
+      position 2
+      keyword  FILNME
+      type     _CHAR
+      access   READ
+      prompt   'Transform. coeffs. file:'
+      help     'Give the name of the file of transformation coefficients.'
+   endparameter
+
+   parameter INSCON      # Arbitrary instrumental magnitude constant.
+      position 3
+      keyword  INSCON
+      type     _DOUBLE
+      access   READ
+      prompt   'Instrumental magnitude constant:'
+      help     'Give the arbitrary constant previously added to the instrumental magnitude.'
+   endparameter
+
+   parameter CATIN       # Name of the input catalogue.
+      position 4
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT      # Name of the output catalogue.
+      position 5
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter INSMAG      # Instrumental magnitude.
+      position 6
+      keyword  INSMAG
+      type     _CHAR
+      access   READ
+      default  'MINST'
+      prompt   'Instrumental magnitude column:'
+      help     'Enter a column name or expression for the instrumental magnitude.'
+   endparameter
+
+   parameter AIRMASS     # Air mass.
+      position 7
+      keyword  AIRMASS
+      type     _CHAR
+      access   READ
+      default  'AIRMASS'
+      prompt   'Air mass column:'
+      help     'Enter a column name or expression for the air mass.'
+   endparameter
+
+   parameter ZENDST     # Observed zenith distance.
+      position 8
+      keyword  ZENDST
+      type     _CHAR
+      access   READ
+      default  'ZENDIST'
+      prompt   'Zenith distance column:'
+      help     'Enter a column name or expression for the zenith distance.'
+   endparameter
+
+   parameter CALMAG      # Calibrated magnitude.
+      position 9
+      keyword  CALMAG
+      type     _CHAR
+      access   READ
+      default  'MCAT'
+      prompt   'Calibrated magnitude column:'
+      help     'Enter a column name for the calibrated magnitude.'
+   endparameter
+
+   parameter TEXT        # Flag; copy textual information?
+      position 10
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 11
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATSELECT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     12/6/96  (ACD): Original version.
+#     29/1/97  (ACD): First stable version.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     17/9/99  (ACD): Added NOROWS and NUMSEL
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATSELECT
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN            # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT           # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue of selected objects.'
+   endparameter
+
+   parameter CATREJ           # Name of the catalogue of rejects.
+      position 3
+      keyword  CATREJ
+      type     _CHAR
+      access   READ
+      prompt   'Rejects catalogue:'
+      help     'Give the name of the output catalogue of rejected objects.'
+   endparameter
+
+   parameter SELTYP           # Type of selection.
+      position 4
+      keyword  SELTYP
+      type     _CHAR
+      access   READ
+      default  ' '
+      prompt   'Selection type:'
+      help     'Enter the required type of selection ("H" for a list).'
+   endparameter
+
+#
+# Coordinate transformation before making the selection is not yet
+# implemented, so TRNFRM is temporarily set to 'FALSE' here in order
+# to avoid prompting the user.  To restore prompting the user remove
+# the 'vpath' line.
+
+   parameter TRNFRM           # Flag: transform values before selection?
+      position 5
+      keyword  TRNFRM
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'Transform?'
+      help     'Transform criteria to catalogue system before selection?'
+   endparameter
+
+#
+# Target lists are an un-necessary complication in CURSA v2.1 (since
+# the finding chart software is not released with it).  Hence the
+# TARGET parameter is hidden.  To restore prompting the user remove the
+# 'vpath' line.
+
+   parameter TARGET           # Flag: write catalogue or target list?
+      position 6
+      keyword  TARGET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'Output a target list?'
+      help     'Output the selection as a target list?'
+   endparameter
+
+   parameter TEXT             # Copy textual information.
+      position 7
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter REJCAT           # Flag: produce catalogue of rejects?
+      position 8
+      keyword  REJCAT
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      prompt   'Rejects catalogue?'
+      help     'Produce a second output catalogue containing the rejected objects?'
+   endparameter
+
+   parameter EXPR             # Selection expression.
+      position 9
+      keyword  EXPR
+      type     _CHAR
+      access   READ
+      prompt   'Selection expression:'
+      help     'Enter an expression defining the required selection.'
+   endparameter
+
+   parameter PNAME            # Name of column or parameter
+      position 10
+      keyword  PNAME
+      type     _CHAR
+      access   READ
+      prompt   'Column or parameter:'
+      help     'Enter the name of column or parameter.'
+   endparameter
+
+   parameter MINRNG           # Minimum for range selection.
+      position 11
+      keyword  MINRNG
+      type     _CHAR
+      access   READ
+      prompt   'Range minimum:'
+      help     'Enter minimum value of the required range.'
+   endparameter
+
+   parameter MAXRNG           # Maximum for range selection.
+      position 12
+      keyword  MAXRNG
+      type     _CHAR
+      access   READ
+      prompt   'Range maximum:'
+      help     'Enter maximum value of the required range.'
+   endparameter
+
+   parameter FREQ             # Frequency for selecting objects.
+      position 13
+      keyword  FREQ
+      type     _INTEGER
+      access   READ
+      prompt   'Frequency:'
+      help     'Every FREQth object will be selected.'
+   endparameter
+
+   parameter XCOL      # X coordinate column from input catalogue.
+      position 14
+      keyword  XCOL
+      type     _CHAR
+      access   READ
+      prompt   'X input column:'
+      help     'Enter X coordinate column from input catalogue.'
+   endparameter
+
+   parameter YCOL      # Y coordinate column from input catalogue.
+      position 15
+      keyword  YCOL
+      type     _CHAR
+      access   READ
+      prompt   'Y input column:'
+      help     'Enter Y coordinate column from input catalogue.'
+   endparameter
+
+   parameter CATPOLY   # Name of the polygon catalogue.
+      position 16
+      keyword  CATPOLY
+      type     _CHAR
+      access   READ
+      prompt   'Polygon catalogue:'
+      help     'Give the name of the catalogue containing the polygon.'
+   endparameter
+
+   parameter XPLCOL    # X coordinate column from polygon catalogue.
+      position 17
+      keyword  XPLCOL
+      type     _CHAR
+      access   READ
+      prompt   'X polygon column:'
+      help     'Enter X coordinate column from polygon catalogue.'
+   endparameter
+
+   parameter YPLCOL    # Y coordinate column from polygon catalogue.
+      position 18
+      keyword  YPLCOL
+      type     _CHAR
+      access   READ
+      prompt   'Y polygon column:'
+      help     'Enter Y coordinate column from polygon catalogue.'
+   endparameter
+
+   parameter INSIDE    # Flag: select objects inside or outside the polygon.
+      position 19
+      keyword  INSIDE
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Select objects inside the polygon?'
+      help     'The objects either inside or outside the polygon may be selected.'
+   endparameter
+
+   parameter XMIN      # X minimum for rectangular selection.
+      position 20
+      keyword  XMIN
+      type     _CHAR
+      access   READ
+      prompt   'X minimum:'
+      help     'Minimum X value for the required rectangle.'
+   endparameter
+
+   parameter XMAX      # X maximum for rectangular selection.
+      position 21
+      keyword  XMAX
+      type     _CHAR
+      access   READ
+      prompt   'X maximum:'
+      help     'Maximum X value for the required rectangle.'
+   endparameter
+
+   parameter YMIN      # Y minimum for rectangular selection.
+      position 22
+      keyword  YMIN
+      type     _CHAR
+      access   READ
+      prompt   'Y minimum:'
+      help     'Minimum Y value for the required rectangle.'
+   endparameter
+
+   parameter YMAX      # Y maximum for rectangular selection.
+      position 23
+      keyword  YMAX
+      type     _CHAR
+      access   READ
+      prompt   'Y maximum:'
+      help     'Maximum Y value for the required rectangle.'
+   endparameter
+
+   parameter RACOL      # RA coordinate column from input catalogue.
+      position 24
+      keyword  RACOL
+      type     _CHAR
+      access   READ
+      prompt   'RA column:'
+      help     'Enter Right Ascension column from input catalogue.'
+   endparameter
+
+   parameter DCCOL      # Dec. coordinate column from input catalogue.
+      position 25
+      keyword  DCCOL
+      type     _CHAR
+      access   READ
+      prompt   'Dec. column:'
+      help     'Enter Declination column from input catalogue.'
+   endparameter
+
+   parameter RACEN      # RA Centre.
+      position 26
+      keyword  RACEN
+      type     _CHAR
+      access   READ
+      prompt   'RA centre:'
+      help     'Central Right Ascension in sexagesimal hours (eg. 10:30:15).'
+   endparameter
+
+   parameter DCCEN      # Dec. Centre.
+      position 27
+      keyword  DCCEN
+      type     _CHAR
+      access   READ
+      prompt   'Dec. centre:'
+      help     'Central Declination in sexagesimal degrees (eg. -33:30:15.2).'
+   endparameter
+
+   parameter RADIUS      # Radius.
+      position 28
+      keyword  RADIUS
+      type     _CHAR
+      access   READ
+      prompt   'Radius:'
+      help     'Selection radius in sexagesimal arcmin. and arcsec. (eg. 2:0 for 2 arcmin.).'
+   endparameter
+
+   parameter EQUINX      # Equinox of catalogue coordinates.
+      position 29
+      keyword  EQUINX
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Equinox:'
+      help     'The equinox of the catalogue coordinates (eg. J2000).'
+   endparameter
+
+   parameter EPOCH       # Epoch of catalogue coordinates.
+      position 30
+      keyword  EPOCH
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Epoch:'
+      help     'The epoch of the catalogue coordinates (eg. J1995.36).'
+   endparameter
+
+   parameter RAC         # Column holding Right Ascension.
+      position 31
+      keyword  RAC
+      type     _CHAR
+      access   READ
+      prompt   'Right Ascension:'
+      help     'Enter the name of the Right Ascension column.'
+   endparameter
+
+   parameter DECC        # Column holding Declination.
+      position 32
+      keyword  DECC
+      type     _CHAR
+      access   READ
+      prompt   'Declination:'
+      help     'Enter the name of the Declination column.'
+   endparameter
+
+   parameter PMRAC       # Column holding Right Ascension proper motion.
+      position 33
+      keyword  PMRAC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Proper motion in Right Ascension:'
+      help     'Name of the proper motion in Right Ascension column (radians/year).'
+   endparameter
+
+   parameter PMDEC       # Column holding Declination proper motion.
+      position 34
+      keyword  PMDEC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Proper motion in Declination:'
+      help     'Name of the proper motion in Declination column (radians/year).'
+   endparameter
+
+   parameter PLXC        # Column holding parallax.
+      position 35
+      keyword  PLXC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Parallax:'
+      help     'Name of the parallax column (radians).'
+   endparameter
+
+   parameter RVC         # Column holding radial velocity.
+      position 36
+      keyword  RVC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Radial velocity:'
+      help     'Name of the radial velocity column (Km/sec).'
+   endparameter
+
+   parameter LABELC      # Column holding label.
+      position 37
+      keyword  LABELC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Label:'
+      help     'Name of the column used to label objects on plots.'
+   endparameter
+
+   parameter NOROWS     # Is no rows being selected to be considered an error?
+      position 38
+      keyword  NOROWS
+      type     _LOGICAL
+      access   READ
+      default  false
+      vpath    'DEFAULT'
+      prompt   'No rows an error?'
+      help     'Is no rows being selected to be considered an error?'
+   endparameter
+
+   parameter NUMSEL     # Number of rows selected.
+      position 39
+      keyword  NUMSEL
+      type     _INTEGER
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 40
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CATSORT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     24/11/94 (ACD): Original version.
+#     20/4/95  (ACD): First stable version.
+#     26/8/96  (ACD): Added parameter TEXT.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATSORT
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN                   # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT                  # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter FNAME                   # Name of the sort column.
+      position 3
+      keyword  FNAME
+      type     _CHAR
+      access   READ
+      prompt   'Sort column:'
+      help    'Give the column the output catalogue is to be sorted on.'
+   endparameter
+
+   parameter ORDER                   # Order for the new catalogue.
+      position 4
+      keyword  ORDER
+      type     _CHAR
+      access   READ
+      default  'ascending'
+      prompt   'Sort order:'
+      help     'Order for the new catalogue: (a)scending or (d)escending.'
+   endparameter
+
+   parameter TEXT                    # Copy textual information.
+      position 5
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 6
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface
+endmonolith

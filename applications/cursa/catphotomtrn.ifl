@@ -1,0 +1,138 @@
+#+
+#  Name:
+#     CATPHOTOMTRN.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     7/10/97  (ACD): Original version.
+#     12/10/97 (ACD): First stable version.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATPHOTOMTRN
+
+#   helplib '[help_library_specification]'
+
+   parameter ZENITHDIST  # Flag; compute air mass from the zenith distance?
+      position 1
+      keyword  ZENITHDIST
+      type     _LOGICAL
+      access   READ
+      default  'n'
+      vpath    'DEFAULT'
+      prompt   'Air mass from zenith distance?'
+      help     'Compute the air mass from the observed zenith distance?'
+   endparameter
+
+   parameter FILNME      # Name of transform. coeffs. file.
+      position 2
+      keyword  FILNME
+      type     _CHAR
+      access   READ
+      prompt   'Transform. coeffs. file:'
+      help     'Give the name of the file of transformation coefficients.'
+   endparameter
+
+   parameter INSCON      # Arbitrary instrumental magnitude constant.
+      position 3
+      keyword  INSCON
+      type     _DOUBLE
+      access   READ
+      prompt   'Instrumental magnitude constant:'
+      help     'Give the arbitrary constant previously added to the instrumental magnitude.'
+   endparameter
+
+   parameter CATIN       # Name of the input catalogue.
+      position 4
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT      # Name of the output catalogue.
+      position 5
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter INSMAG      # Instrumental magnitude.
+      position 6
+      keyword  INSMAG
+      type     _CHAR
+      access   READ
+      default  'MINST'
+      prompt   'Instrumental magnitude column:'
+      help     'Enter a column name or expression for the instrumental magnitude.'
+   endparameter
+
+   parameter AIRMASS     # Air mass.
+      position 7
+      keyword  AIRMASS
+      type     _CHAR
+      access   READ
+      default  'AIRMASS'
+      prompt   'Air mass column:'
+      help     'Enter a column name or expression for the air mass.'
+   endparameter
+
+   parameter ZENDST     # Observed zenith distance.
+      position 8
+      keyword  ZENDST
+      type     _CHAR
+      access   READ
+      default  'ZENDIST'
+      prompt   'Zenith distance column:'
+      help     'Enter a column name or expression for the zenith distance.'
+   endparameter
+
+   parameter CALMAG      # Calibrated magnitude.
+      position 9
+      keyword  CALMAG
+      type     _CHAR
+      access   READ
+      default  'MCAT'
+      prompt   'Calibrated magnitude column:'
+      help     'Enter a column name for the calibrated magnitude.'
+   endparameter
+
+   parameter TEXT        # Flag; copy textual information?
+      position 10
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 11
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

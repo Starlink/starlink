@@ -1,0 +1,138 @@
+#+
+#  Name:
+#     CATGRID.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     24/6/99 (ACD): Original version.
+#     25/6/99 (ACD): First stable version.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATGRID
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN                   # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter NDIM                     # Number of dimensions in output grid.
+      position 2
+      keyword  NDIM
+      type     _INTEGER
+      access   READ
+      default  2
+      range 1,3
+      prompt   'Grid dimensionality:'
+      help     'Number of dimensions in the output grid (1 - 3).'
+   endparameter
+
+   parameter COLX                   # Name of the X-axis column.
+      position 3
+      keyword  COLX
+      type     _CHAR
+      access   READ
+      prompt   'Column for X-axis:'
+      help    'Name of the column to be used for X-axis of the grid.'
+   endparameter
+
+   parameter XBINS                     # Number of bins in X-axis.
+      position 4
+      keyword  XBINS
+      type     _INTEGER
+      access   READ
+      default  50
+      range 1,10000
+      prompt   'No. of bins in X:'
+      help     'Number of bins in the grid along the X-axis.'
+   endparameter
+
+   parameter COLY                   # Name of the Y-axis column.
+      position 5
+      keyword  COLY
+      type     _CHAR
+      access   READ
+      prompt   'Column for Y-axis:'
+      help    'Name of the column to be used for Y-axis of the grid.'
+   endparameter
+
+   parameter YBINS                     # Number of bins in Y-axis.
+      position 6
+      keyword  YBINS
+      type     _INTEGER
+      access   READ
+      default  50
+      range 1,10000
+      prompt   'No. of bins in Y:'
+      help     'Number of bins in the grid along the Y-axis.'
+   endparameter
+
+   parameter COLZ                   # Name of the Z-axis column.
+      position 7
+      keyword  COLZ
+      type     _CHAR
+      access   READ
+      prompt   'Column for Z-axis:'
+      help    'Name of the column to be used for Z-axis of the grid.'
+   endparameter
+
+   parameter ZBINS                     # Number of bins in Z-axis.
+      position 8
+      keyword  ZBINS
+      type     _INTEGER
+      access   READ
+      default  50
+      range 1,10000
+      prompt   'No. of bins in Z:'
+      help     'Number of bins in the grid along the Z-axis.'
+   endparameter
+
+   parameter GRID                     # Name of the output grid.
+      position 9
+      keyword  GRID
+      type     'NDF'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Output grid:'
+      help     'Give the name of the output data grid or histogram.'
+#     helpkey  '*'
+   endparameter
+
+   parameter NORMAL                  # Flag; normalise the grid?
+      position 10
+      keyword  NORMAL
+      type     _LOGICAL
+      access   READ
+      default  'FALSE'
+      vpath    'DEFAULT'
+      prompt   'Normalise?'
+      help     'Normalise the grid values?'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 11
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

@@ -1,0 +1,80 @@
+#+
+#  Name:
+#     CATCHARTRN.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     12/8/96 (ACD): Original version.
+#     6/6/97  (ACD): Converted for CURSA.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01 (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#     9/5/01  (ACD): Added ppath for parameter GTFILE.
+#-
+
+interface CATCHARTRN
+
+#   helplib '[help_library_specification]'
+
+   parameter GTFILE          # Name of the graphics translation file.
+      position 1
+      keyword  GTFILE
+      type     _CHAR
+      ppath    'CURRENT'
+      access   READ
+      prompt   'Graphics translation file:'
+      help     'Give the name of the graphics translation file.'
+   endparameter
+
+   parameter CATIN           # Name of the input target list.
+      position 2
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input target list:'
+      help     'Give the name of the input target list.'
+   endparameter
+
+   parameter CATOUT          # Name of the output graphics attribute list.
+      position 3
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT''
+      prompt   'Output graphics attribute list:'
+      help     'Give the name of the output graphics attribute list.'
+   endparameter
+
+   parameter TEXT                    # Copy textual information.
+      position 4
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 5
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

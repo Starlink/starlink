@@ -1,0 +1,422 @@
+#+
+#  Name:
+#     CATSELECT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     12/6/96  (ACD): Original version.
+#     29/1/97  (ACD): First stable version.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     17/9/99  (ACD): Added NOROWS and NUMSEL
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATSELECT
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN            # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT           # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue of selected objects.'
+   endparameter
+
+   parameter CATREJ           # Name of the catalogue of rejects.
+      position 3
+      keyword  CATREJ
+      type     _CHAR
+      access   READ
+      prompt   'Rejects catalogue:'
+      help     'Give the name of the output catalogue of rejected objects.'
+   endparameter
+
+   parameter SELTYP           # Type of selection.
+      position 4
+      keyword  SELTYP
+      type     _CHAR
+      access   READ
+      default  ' '
+      prompt   'Selection type:'
+      help     'Enter the required type of selection ("H" for a list).'
+   endparameter
+
+#
+# Coordinate transformation before making the selection is not yet
+# implemented, so TRNFRM is temporarily set to 'FALSE' here in order
+# to avoid prompting the user.  To restore prompting the user remove
+# the 'vpath' line.
+
+   parameter TRNFRM           # Flag: transform values before selection?
+      position 5
+      keyword  TRNFRM
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'Transform?'
+      help     'Transform criteria to catalogue system before selection?'
+   endparameter
+
+#
+# Target lists are an un-necessary complication in CURSA v2.1 (since
+# the finding chart software is not released with it).  Hence the
+# TARGET parameter is hidden.  To restore prompting the user remove the
+# 'vpath' line.
+
+   parameter TARGET           # Flag: write catalogue or target list?
+      position 6
+      keyword  TARGET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'Output a target list?'
+      help     'Output the selection as a target list?'
+   endparameter
+
+   parameter TEXT             # Copy textual information.
+      position 7
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter REJCAT           # Flag: produce catalogue of rejects?
+      position 8
+      keyword  REJCAT
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      prompt   'Rejects catalogue?'
+      help     'Produce a second output catalogue containing the rejected objects?'
+   endparameter
+
+   parameter EXPR             # Selection expression.
+      position 9
+      keyword  EXPR
+      type     _CHAR
+      access   READ
+      prompt   'Selection expression:'
+      help     'Enter an expression defining the required selection.'
+   endparameter
+
+   parameter PNAME            # Name of column or parameter
+      position 10
+      keyword  PNAME
+      type     _CHAR
+      access   READ
+      prompt   'Column or parameter:'
+      help     'Enter the name of column or parameter.'
+   endparameter
+
+   parameter MINRNG           # Minimum for range selection.
+      position 11
+      keyword  MINRNG
+      type     _CHAR
+      access   READ
+      prompt   'Range minimum:'
+      help     'Enter minimum value of the required range.'
+   endparameter
+
+   parameter MAXRNG           # Maximum for range selection.
+      position 12
+      keyword  MAXRNG
+      type     _CHAR
+      access   READ
+      prompt   'Range maximum:'
+      help     'Enter maximum value of the required range.'
+   endparameter
+
+   parameter FREQ             # Frequency for selecting objects.
+      position 13
+      keyword  FREQ
+      type     _INTEGER
+      access   READ
+      prompt   'Frequency:'
+      help     'Every FREQth object will be selected.'
+   endparameter
+
+   parameter XCOL      # X coordinate column from input catalogue.
+      position 14
+      keyword  XCOL
+      type     _CHAR
+      access   READ
+      prompt   'X input column:'
+      help     'Enter X coordinate column from input catalogue.'
+   endparameter
+
+   parameter YCOL      # Y coordinate column from input catalogue.
+      position 15
+      keyword  YCOL
+      type     _CHAR
+      access   READ
+      prompt   'Y input column:'
+      help     'Enter Y coordinate column from input catalogue.'
+   endparameter
+
+   parameter CATPOLY   # Name of the polygon catalogue.
+      position 16
+      keyword  CATPOLY
+      type     _CHAR
+      access   READ
+      prompt   'Polygon catalogue:'
+      help     'Give the name of the catalogue containing the polygon.'
+   endparameter
+
+   parameter XPLCOL    # X coordinate column from polygon catalogue.
+      position 17
+      keyword  XPLCOL
+      type     _CHAR
+      access   READ
+      prompt   'X polygon column:'
+      help     'Enter X coordinate column from polygon catalogue.'
+   endparameter
+
+   parameter YPLCOL    # Y coordinate column from polygon catalogue.
+      position 18
+      keyword  YPLCOL
+      type     _CHAR
+      access   READ
+      prompt   'Y polygon column:'
+      help     'Enter Y coordinate column from polygon catalogue.'
+   endparameter
+
+   parameter INSIDE    # Flag: select objects inside or outside the polygon.
+      position 19
+      keyword  INSIDE
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Select objects inside the polygon?'
+      help     'The objects either inside or outside the polygon may be selected.'
+   endparameter
+
+   parameter XMIN      # X minimum for rectangular selection.
+      position 20
+      keyword  XMIN
+      type     _CHAR
+      access   READ
+      prompt   'X minimum:'
+      help     'Minimum X value for the required rectangle.'
+   endparameter
+
+   parameter XMAX      # X maximum for rectangular selection.
+      position 21
+      keyword  XMAX
+      type     _CHAR
+      access   READ
+      prompt   'X maximum:'
+      help     'Maximum X value for the required rectangle.'
+   endparameter
+
+   parameter YMIN      # Y minimum for rectangular selection.
+      position 22
+      keyword  YMIN
+      type     _CHAR
+      access   READ
+      prompt   'Y minimum:'
+      help     'Minimum Y value for the required rectangle.'
+   endparameter
+
+   parameter YMAX      # Y maximum for rectangular selection.
+      position 23
+      keyword  YMAX
+      type     _CHAR
+      access   READ
+      prompt   'Y maximum:'
+      help     'Maximum Y value for the required rectangle.'
+   endparameter
+
+   parameter RACOL      # RA coordinate column from input catalogue.
+      position 24
+      keyword  RACOL
+      type     _CHAR
+      access   READ
+      prompt   'RA column:'
+      help     'Enter Right Ascension column from input catalogue.'
+   endparameter
+
+   parameter DCCOL      # Dec. coordinate column from input catalogue.
+      position 25
+      keyword  DCCOL
+      type     _CHAR
+      access   READ
+      prompt   'Dec. column:'
+      help     'Enter Declination column from input catalogue.'
+   endparameter
+
+   parameter RACEN      # RA Centre.
+      position 26
+      keyword  RACEN
+      type     _CHAR
+      access   READ
+      prompt   'RA centre:'
+      help     'Central Right Ascension in sexagesimal hours (eg. 10:30:15).'
+   endparameter
+
+   parameter DCCEN      # Dec. Centre.
+      position 27
+      keyword  DCCEN
+      type     _CHAR
+      access   READ
+      prompt   'Dec. centre:'
+      help     'Central Declination in sexagesimal degrees (eg. -33:30:15.2).'
+   endparameter
+
+   parameter RADIUS      # Radius.
+      position 28
+      keyword  RADIUS
+      type     _CHAR
+      access   READ
+      prompt   'Radius:'
+      help     'Selection radius in sexagesimal arcmin. and arcsec. (eg. 2:0 for 2 arcmin.).'
+   endparameter
+
+   parameter EQUINX      # Equinox of catalogue coordinates.
+      position 29
+      keyword  EQUINX
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Equinox:'
+      help     'The equinox of the catalogue coordinates (eg. J2000).'
+   endparameter
+
+   parameter EPOCH       # Epoch of catalogue coordinates.
+      position 30
+      keyword  EPOCH
+      type     _CHAR
+      access   READ
+      default  'J2000'
+      prompt   'Epoch:'
+      help     'The epoch of the catalogue coordinates (eg. J1995.36).'
+   endparameter
+
+   parameter RAC         # Column holding Right Ascension.
+      position 31
+      keyword  RAC
+      type     _CHAR
+      access   READ
+      prompt   'Right Ascension:'
+      help     'Enter the name of the Right Ascension column.'
+   endparameter
+
+   parameter DECC        # Column holding Declination.
+      position 32
+      keyword  DECC
+      type     _CHAR
+      access   READ
+      prompt   'Declination:'
+      help     'Enter the name of the Declination column.'
+   endparameter
+
+   parameter PMRAC       # Column holding Right Ascension proper motion.
+      position 33
+      keyword  PMRAC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Proper motion in Right Ascension:'
+      help     'Name of the proper motion in Right Ascension column (radians/year).'
+   endparameter
+
+   parameter PMDEC       # Column holding Declination proper motion.
+      position 34
+      keyword  PMDEC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Proper motion in Declination:'
+      help     'Name of the proper motion in Declination column (radians/year).'
+   endparameter
+
+   parameter PLXC        # Column holding parallax.
+      position 35
+      keyword  PLXC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Parallax:'
+      help     'Name of the parallax column (radians).'
+   endparameter
+
+   parameter RVC         # Column holding radial velocity.
+      position 36
+      keyword  RVC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Radial velocity:'
+      help     'Name of the radial velocity column (Km/sec).'
+   endparameter
+
+   parameter LABELC      # Column holding label.
+      position 37
+      keyword  LABELC
+      type     _CHAR
+      access   READ
+      default  'none'
+      prompt   'Label:'
+      help     'Name of the column used to label objects on plots.'
+   endparameter
+
+   parameter NOROWS     # Is no rows being selected to be considered an error?
+      position 38
+      keyword  NOROWS
+      type     _LOGICAL
+      access   READ
+      default  false
+      vpath    'DEFAULT'
+      prompt   'No rows an error?'
+      help     'Is no rows being selected to be considered an error?'
+   endparameter
+
+   parameter NUMSEL     # Number of rows selected.
+      position 39
+      keyword  NUMSEL
+      type     _INTEGER
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 40
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

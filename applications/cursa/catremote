@@ -1,0 +1,1882 @@
+#!PERL
+#+
+#  Name:
+#     CATREMOTE
+#  Purpose:
+#     A simple script to query remote catalogues.
+#  Language:
+#     Perl 5.
+#  Type of Module:
+#     Perl script (with interaction via the command-line).
+#  Description:
+#     catremote is a tool for querying remote astronomical catalogues,
+#     databases and archives via the Internet.  It allows remote
+#     catalogues to be queried and the resulting table saved as a local
+#     file written in the Tab-Separated Table (TST) format.  It also
+#     provides a number of related auxiliary functions.
+#
+#     catremote has several different modes of usage, each providing a
+#     different function.  The modes are:
+#
+#     list    - list the catalogues currently available,
+#
+#     details - show details of a named catalogue,
+#
+#     query   - submit a query to a remote catalogue and retrieve the results,
+#
+#     name    - resolve an object name into coordinates,
+#
+#     help    - list the modes available.
+#
+#     There is an introduction to using catremote in SUN/190 and it is
+#     comprehensively documented in SSN/76.
+#  Usage:
+#     Arguments for catremote can be specified on the command line.
+#     If arguments other than the first are omitted then they will usually
+#     be prompted for.  The first argument is the mode of operation and
+#     its value determines the other arguments which are required.  The
+#     arguments for the various modes are:
+#
+#      catremote list    server-type
+#
+#      catremote details db-name
+#
+#      catremote query   db-name alpha delta radius additional-condition
+#
+#      catremote name    db-name object-name
+#
+#      catremote help
+#
+#     The individual arguments are described in the `Arguments' section.
+#     If the mode is omitted then  'help' mode is assumed.
+#
+#     In addition to the command-line arguments, catremote takes some
+#     input from Unix shell environment variables and these variables can
+#     be used to control its behaviour.
+#  Arguments:
+#     mode (read)
+#        The mode in which catremote is to be used.  One of: list,
+#        details, query, name or help.
+#     server-type (read)
+#        The server type of the catalogues to be listed in 'list' mode.
+#        One of: all, catalog, archive, namesvr, imagesvr, local or
+#        directory.  See SSN/76 for further details.
+#     db-name (read)
+#        The name of the remote catalogue (or database) to be queried.
+#     alpha (read)
+#        The Central Right Ascension of the query.  The value should be
+#        for equinox J2000 and given in sexagesimal hours with a colon
+#        (':') as the separator.  For example: 12:30:00.
+#     delta (read)
+#        The central Declination of the query.  The value should be for
+#        equinox J2000 and given in sexagesimal degrees with a colon (':')
+#        as the separator.  Southern Declinations are negative.  For
+#        example: 30:23:00.
+#     radius (read)
+#        The radius of the query in minutes of arc.
+#     additional-condition (read)
+#        Any additional condition applied to the query.  Catalogues vary
+#        in which, if any, additional queries they support.  See SSN/76
+#        for further details.
+#     object-name (read)
+#        The name of an astronomical object which is to be resolved when
+#        catremote is being used in 'name' mode.  It should be entered
+#        without embedded spaces.  The case of letters (upper or lower) is
+#        not usually significant.  That is, case is not significant for
+#        the usual name resolver database, simbad_ns@eso, and probably
+#        will not be significant for other name resolvers.  For example:
+#        NGC3379.
+#  Environment Variables:
+#     CATREM_URLREADER (read)
+#        catremote uses a separate program to submit the URL constituting
+#        a query to the server and return the table of results.  This
+#        environment variable specifies the program to be used.  See
+#        SSN/76 for further details.  (Mandatory.)
+#
+#     CATREM_CONFIG (read)
+#        This environment variable specifies the configuration file to be
+#        used.  It should be set to either the URL (for a remote file) or
+#        the local file name, including a directory specification (for a
+#        local file).  Configuration files mediate the interaction between
+#        catremote and the remote catalogue; see SSN/76 for further
+#        details.  (Mandatory.)
+#
+#     CATREM_MAXOBJ (read)
+#        The maximum number of objects which the returned table is allowed
+#        to contain.
+#
+#     CATREM_ECHOURL (read)
+#        This environment controls whether the URL representing the query
+#        submitted to the remote catalogue is also displayed to the user.
+#        The default is 'no'; to see the URL set CATREM_ECHOURL to 'yes'.
+#        Seeing the URL is potentially useful when debugging configuration
+#        files and remote catalogue servers but is not usually required
+#        for normal operation.
+#  Examples:
+#     catremote
+#     catremote help
+#        List the various modes in which catremote may be used.
+#     catremote list
+#        List all the catalogues and databases in the current configuration
+#        file.
+#     catremote list namesvr
+#        List all the name servers (that is, databases of server type
+#        'namesvr') in the current configuration file.
+#     catremote details usno@eso
+#        Show details of the USNO PMM astrometric catalogue (whose name
+#        is 'usno@eso').
+#     catremote query usno@eso 12:15:00 30:30:00 10
+#        Find all the objects in the USNO PMM which lie within ten minutes
+#        of arc of Right Ascension 12:15:00.0 (sexagesimal hours) and
+#        Declination 30:30:00.0 (sexagesimal degrees, both J2000).  The
+#        objects selected will be saved as a catalogue called 
+#        usno_eso_121500_303000.tab created in your current directory.
+#        This catalogue will be written in the Tab-Separated Table (TST)
+#        format.
+#     catremote query usno@eso 12:15:00 30:30:00 10 14,16
+#        Find all the objects in the USNO PMM which lie within ten minutes
+#        of arc of Right Ascension 12:15:00.0 (sexagesimal hours) and
+#        Declination 30:30:00.0 (sexagesimal degrees, both J2000) which
+#        also lie in the magnitude range 14 to 16.
+#     catremote name simbad_ns@eso ngc3379
+#        Find the equatorial coordinates of the galaxy NGC 3379.  The
+#        coordinates returned are for equinox J2000.
+#  Algorithm:
+#     Initialise the status.
+#     Obtain the maximum number of rows which can be returned.
+#     Attempt to obtain the URL reader.
+#     If ok then
+#       Attempt to obtain the configuration file.
+#       If ok then
+#         Determine the number of input arguments.
+#         If none were supplied then
+#           Set the mode to 'help'.
+#         else
+#           Adopt the first argument as the mode.
+#         end if
+#         If the mode is 'list' then
+#           Obtain the type of databases to be listed.
+#           List summary details for all databases of the given type.
+#         else if the mode is 'details' then
+#           Obtain the short name of the catalogue.
+#           Attempt to list the details of the catalogue.
+#         else if the mode is 'query' then
+#           Obtain the short name of the catalogue.
+#           Obtain the central Right Ascension and Declination.
+#           Obtain the radius.
+#           Obtain any additional condition for the query.
+#           Attempt to assemble and submit the query, retrieve the results
+#           and write them to a file.
+#         else if the mode is 'name' then
+#           Obtain the short name of the catalogue.
+#           Obtain the name of the object.
+#           Attempt to resolve the name.
+#         else
+#           List instructions on using the program.
+#         end if
+#       end if
+#     else
+#       Set the status: no URL reader defined.
+#     end if
+#     Report any error.
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     12/5/00  (ACD): Original version.
+#     21/10/00 (ACD): First stable version.
+#     2/5/01   (ACD): Changed the generation of the file name so that
+#        any minus sign in the Declination is replaced by a letter 'm'.
+#     24/5/01  (ACD): Cosmetic changes to the prologue comments.
+#  Bugs:
+#     None known
+#  Libraries required:
+#     None.
+#-
+
+#
+#  Initialise the status.
+
+    $status = 0;
+    $statusMessage = "success.";
+
+#
+#  Obtain the maximum number of rows which can be returned.
+
+    $maxObjects = $ENV{"CATREM_MAXOBJ"};
+#    print "maxObjects: $maxObjects \n";
+    if ($maxObjects == /\D/)
+    {  $maxObjects = 1000;
+       print "!(Info.) ";
+       print "Maximum number of retrieved objects set to $maxObjects.\n";
+    }
+
+#
+#  Attempt to obtain the URL reader from the corresponding environment
+#  variable and proceed if ok.
+
+    $URLReader = $ENV{"CATREM_URLREADER"};
+#    print "URLReader: $URLReader \n";
+    if ($URLReader == /\S/)
+    {
+
+#
+#     Set the flag indicating that warning messages are not to be reported
+#     if unrecognised keywords are encountered.
+
+       $keywordCheck = 0;
+
+#
+#     Attempt to read the configuration file and proceed if ok.
+
+       $status = &ObtainConfigFile;
+       if ($status == 0)
+       {
+
+#
+#        If any input arguments were supplied then adopt the first as the
+#        mode; otherwise set the mode to 'list'.  The first character
+#        of the first argument is enough to determine the mode.
+
+          if ($#ARGV >= 0)
+          {  if ($ARGV[0] =~ /^l/)
+             {  $mode = "list";
+             }
+             elsif ($ARGV[0] =~ /^d/)
+             {  $mode = "details";
+             }
+             elsif ($ARGV[0] =~ /^q/)
+             {  $mode = "query";
+             }
+             elsif ($ARGV[0] =~ /^n/)
+             {  $mode = "name";
+             }
+             elsif ($ARGV[0] =~ /^h/)
+             {  $mode = "help";
+             }
+             else
+             {  $mode = "unrecognised";
+             }
+          }
+          else
+          {  $mode = "help";
+          }
+
+#
+#        Check for the various modes.
+#
+#        list: list a summary of either all the databases in the configuration
+#        file, or all the databases of a given type.
+
+          if ($mode eq "list")
+          {  
+
+#
+#           Obtain the type of databases required.  Note that this value
+#           can only be specified on the command line.
+
+             if ($#ARGV >= 1)
+             {  $databaseType = $ARGV[1];
+             }
+             else
+             {  $databaseType = "all";
+             }
+             $databaseType =~ s/^\s*//;
+             $databaseType =~ s/\s*$//;
+          
+             for ($loop = 0; $loop <= $numDatabases; $loop++)
+             {  if ($databaseType eq "all")
+                {  $listThisDatabase = 1;
+                }
+                else
+                {  if ($serv_type[$loop] eq $databaseType)
+                   {  $listThisDatabase = 1;
+                   }
+                   else
+                   {  $listThisDatabase = 0;
+                   }
+                }
+
+                if ($listThisDatabase == 1)
+                {   print "$short_name[$loop]  ";
+                    print "$serv_type[$loop]  ";
+                    print "$long_name[$loop] \n";
+                }
+             }
+          }
+
+#
+#        details: list details for an individual database.
+
+          elsif ($mode eq "details")
+          {
+
+#
+#           Obtain the name of the catalogue.
+
+             if ($#ARGV >= 1)
+             {  $catName = $ARGV[1];
+             }
+             else
+             {  print "Name of the remote catalogue: ";
+                $catName = <STDIN>;
+             }
+             $catName =~ s/^\s*//;
+             $catName =~ s/\s*$//;
+
+#
+#           Attempt to list the details.
+
+             $status = &ListCatDetails;
+          }
+
+#
+#        query: query a remote database.
+
+          elsif ($mode eq "query")
+          {
+
+#
+#           Obtain the name of the catalogue, the central Right Ascension
+#           and Declination, the radius and any other details.
+
+             if ($#ARGV >= 1)
+             {  $catName = $ARGV[1];
+             }
+             else
+             {  print "Name of the remote catalogue: ";
+                $catName = <STDIN>;
+             }
+             $catName =~ s/^\s*//;
+             $catName =~ s/\s*$//;
+
+             if ($#ARGV >= 2)
+             {  $queryRA = $ARGV[2];
+             }
+             else
+             {  print "Right Ascension of the query centre ([h]h:mm:ss):";
+                $queryRA = <STDIN>;
+             }
+             $queryRA =~ s/^\s*//;
+             $queryRA =~ s/\s*$//;
+
+             if ($#ARGV >= 3)
+             {  $queryDec = $ARGV[3];
+             }
+             else
+             {  print "Declination of the query centre ([sdd]d:mm:ss):";
+                $queryDec = <STDIN>;
+             }
+             $queryDec =~ s/^\s*//;
+             $queryDec =~ s/\s*$//;
+
+             if ($#ARGV >= 4)
+             {  $queryRadius = $ARGV[4];
+             }
+             else
+             {  print "Radius of the query (arcminutes):";
+                $queryRadius = <STDIN>;
+             }
+             $queryRadius =~ s/^\s*//;
+             $queryRadius =~ s/\s*$//;
+
+#
+#           Obtain any additional condition for the query.  Note that
+#           such a condition can only be supplied on the command line
+#           and is never prompted for.
+
+             if ($#ARGV >= 5)
+             {  $queryCond = $ARGV[5];
+             }
+             else
+             {  $queryCond = "";
+             }
+             $queryCond =~ s/^\s*//;
+             $queryCond =~ s/\s*$//;
+
+#
+#           Assemble and submit the query, then retrieve the results and
+#           write them to a file.
+
+             $status = &MakeRemQuery;
+          }
+
+#
+#        name: obtain the celestial coordinates corresponding to a
+#        given object name.
+
+          elsif ($mode eq "name")
+          {
+
+#
+#           Obtain the name of the name server and then the object
+#           name to be resolved into coordinates.
+
+             if ($#ARGV >= 1)
+             {  $catName = $ARGV[1];
+             }
+             else
+             {  print "Name of the remote name server: ";
+                $catName = <STDIN>;
+             }
+             $catName =~ s/^\s*//;
+             $catName =~ s/\s*$//;
+
+             if ($#ARGV >= 2)
+             {  $objectName = $ARGV[2];
+             }
+             else
+             {  print "Object name: ";
+                $objectName = <STDIN>;
+             }
+             $objectName =~ s/^\s*//;
+             $objectName =~ s/\s*$//;
+
+#
+#           Attempt to obtain the coordinates of the named object.
+
+             $status = &ResolveObjectName;
+          }
+
+#
+#        Unrecognised mode: list some usage instructions.
+
+          else
+          {  print "Usage:- \n";
+             print "  catremote         - show this help information, \n";
+             print "  catremote help    - show this help information, \n";
+             print "  catremote list    - list all catalogues currently known, \n";
+             print "  catremote details - list details of a catalogue, \n";
+             print "  catremote query   - query a remote catalogue, \n";
+             print "  catremote name    - find coordinates of named object. \n";
+          }
+       }
+    }
+    else
+    {  $status = 1;
+       $statusMessage = "URL reader not defined.";
+    }
+
+#
+#  Report any error.
+
+    if ($status != 0)
+    {  print "! Failure: $statusMessage \n";
+    }
+
+#
+# Functions.........................................................
+
+#
+#  List details of an individual catalogue.
+#
+#  Algorithm:
+#     Initialise the catalogue index.
+#     For every catalogue
+#       If the catalogue name matches the current short name then
+#         Set the catalogue index to the current catalogue.
+#       end if
+#     end for
+#     If a catalogue was found then
+#       List details for the catalogue.
+#     else
+#       Set the status.
+#     end if
+
+sub ListCatDetails
+{  if ($status == 0)
+   {
+
+#
+#    Initialise the catalogue index.
+
+      $catIndex = -1;
+
+#
+#    Attempt to find the given name amongst the list of known short
+#    names.
+
+      for ($loop = 0; $loop <= $numDatabases; $loop++)
+      {  if ($catName eq $short_name[$loop])
+         {  $catIndex = $loop;
+         }
+      }
+
+#
+#    If a catalogue was found then list its details; otherwise set the
+#    status.
+
+      if ($catIndex > -1)
+      {  print "short_name:  $short_name[$catIndex] \n";
+         print "serv_type:   $serv_type[$catIndex] \n";
+         print "long_name:   $long_name[$catIndex] \n";
+         print "url:         $url[$catIndex] \n";
+         print "search_cols: $search_cols[$catIndex] \n";
+         print "help:        $help[$catIndex] \n";
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "unknown catalogue, $catName";
+      }
+   }
+   $status;
+}
+
+
+#
+#  Assemble and submit the query, then retrieve the results and write
+#  them to a file.
+#
+#  Algorithm:
+#     Initialise the catalogue index.
+#     For every catalogue
+#       If the catalogue name matches the current short name then
+#         Set the catalogue index to the current catalogue.
+#       end if
+#     end for
+#     If a catalogue was found then
+#       Obtain the URL.
+#       Ensure that the Declination is signed.
+#       Substitute the Right Ascension, Declination and radius to
+#       assemble the query.
+#       Substitute the remaining tokens.
+#       Attempt to retrieve the table.
+#       If ok then
+#         Assemble the file name for the table.
+#         Attempt to write the file.
+#         If ok then
+#           Display success message.
+#         end if
+#       end if
+#     else
+#       Set the status.
+#     end if
+
+sub MakeRemQuery
+{  if ($status == 0)
+   {
+
+#
+#    Initialise the catalogue index.
+
+      $catIndex = -1;
+
+#
+#    Attempt to find the given name amongst the list of known short
+#    names.
+
+      for ($loop = 0; $loop <= $numDatabases; $loop++)
+      {  if ($catName eq $short_name[$loop])
+         {  $catIndex = $loop;
+         }
+      }
+
+#
+#    Proceed if the catalogue was found.
+
+      if ($catIndex > -1)
+      {
+
+#
+#       Obtain the URL of the database.
+
+         $query = $url[$catIndex];
+
+#
+#       Ensure that the Declination is signed.  A signed Declination
+#       is required for some of the formats used to pass the query
+#       to servers.
+
+         $pluspos = index($queryDec, "+");
+         $minuspos = index($queryDec, "-");
+
+         if ($pluspos != 0  &  $minuspos != 0)
+         {  $queryDec = "+" . $queryDec;
+         }
+
+#
+#       Substitute the Right Ascension, Declination and radius to
+#       assemble the query.  Various related tokens are also substituted.
+#       %x and %y are substituted with the Right Ascension and Declination.
+#       %h and %w are calculated by doubling the radius.
+
+         $query =~ s/%ra/$queryRA/;
+         $query =~ s/%dec/$queryDec/;
+
+         $query =~ s/%x/$queryRA/;
+         $query =~ s/%y/$queryDec/;
+
+         $query =~ s/%r2/$queryRadius/;
+         $query =~ s/%r1/0/;
+         $query =~ s/%r/$queryRadius/;
+
+         $side = $queryRadius * 2;
+         $query =~ s/%w/$side/;
+         $query =~ s/%h/$side/;
+
+#
+#       Substitute any additional condition.  
+#
+#       The additional query is optional.  If present it can have
+#       one of three forms.  If the form is:
+#
+#         column-name=value-1,value-2
+#
+#       then token %cond is substituted.  If the form is either of:
+#
+#         value-1
+#         value-1,value-2
+#
+#       then the values are assumed to be magnitudes and the token
+#       %m1, %m2 and %m are substituted.
+
+         if ($queryCond ne "")
+         {  $equalpos = index($queryCond, "=");
+
+            if ($equalpos > -1)
+            {  $query =~ s/%cond/$queryCond/;
+
+               $query =~ s/%m1/-5.0/;
+               $query =~ s/%m2/30.0/;
+               $query =~ s/%m/30.0/;
+            }
+            else
+            {  $commapos = index($queryCond, ",");
+               if ($commapos > -1)
+               {  $mag1 = substr($queryCond, 0, $commapos);
+                  $mag2 = substr($queryCond, $commapos + 1, 300);
+               }
+               else
+               {  $mag1 = -5.0;
+                  $mag2 = $queryCond
+               }
+
+               $query =~ s/%m1/$mag1/;
+               $query =~ s/%m2/$mag2/;
+               $query =~ s/%m/$mag2/;
+
+               $query =~ s/%cond//;
+            }
+         }
+         else
+         {  $query =~ s/%cond//;
+
+            $query =~ s/%m1/-5.0/;
+            $query =~ s/%m2/30.0/;
+            $query =~ s/%m/30.0/;
+         }
+
+#
+#       Substitute the maximum number of objects.
+
+         $query =~ s/%n/$maxObjects/;
+
+#
+#       Substitute the tokens that the user cannot set using catremote
+#       with default values.
+
+         $query =~ s/%mime-type/text\/plain/;
+         $query =~ s/%cols//;
+         $query =~ s/%id//;
+         $query =~ s/%sort//;
+         $query =~ s/%sortorder/increasing/;
+
+#
+#       Attempt to retrieve the table and proceed if ok.
+
+         $status = &RetrieveTable;
+         if ($status == 0)
+         {
+
+#
+#          Assemble the file name for the table, attempt to write the
+#          table and if all is ok then display a success message.
+
+            $status = &AssembleTableFileName;
+            $status = &WriteTableFile;
+
+            if ($status == 0)
+            {  print "!(Info.) ";
+               print "Catalogue $tableFileName written successfully.\n";
+            }
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "unknown catalogue, $catName";
+      }
+   }
+   $status;
+}
+
+
+#
+#  Attempt to retrieve the subset the rows in a remote database which
+#  satisfy a given query.  The query is submitted as a URL and the
+#  table of results retrieved.
+#
+#  Algorithm:
+#     Assemble the command to retrieve the table.
+#     Attempt to submit the query and open the returned table as a
+#     file-handle.
+#     If ok then
+#       Read the table.
+#       Close the file handle.
+#       If any lines were read then
+#         Chop the lines.
+#       else
+#         Set the status.
+#       end if
+#     else
+#       Set the status.
+#     end if
+
+sub RetrieveTable
+{  if ($status == 0)
+   {  
+
+#
+#    Assemble the command to retrieve the configuration file and
+#    echo it if required.
+
+      $command = "$URLReader '$query'";
+
+      if ($ENV{"CATREM_ECHOURL"} eq "yes")
+      {  print "!(Info.) Command: $command\n";
+      }
+
+#
+#    Attempt to submit the query and retrieve the returned table as a
+#    file-handle and proceed if ok.
+
+      $openStatus = open (TABLE, "$command |");
+      if ($openStatus != 0)
+      {
+
+#
+#       Read the table and then close the file-handle.
+
+         @table = <TABLE>;
+         $tableLines = $#table;
+#         print "tableLines: $tableLines \n";
+
+         close (TABLE);
+
+#
+#       If any lines were read then chop them; otherwise set the Status.
+
+         if ($tableLines > 0)
+         {  for ($loop = 0; $loop < $tableLines; $loop++)
+            {  chop($table[$loop]);
+            }
+
+#
+#          Check that the last line contains tabs and characters other
+#          than dashes; if this is the case then there is a reasonable
+#          chance that a genuine table has been returned.
+
+            $lastLine = $table[$tableLines-1];
+#            print "lastLine: $lastLine\n";
+
+            $tabpos = index($lastLine, "\t");
+#            print "tabpos: $tabpos\n";
+
+            if ($tabpos > -1)
+            {  $lastLine =~ s/\t//g;
+               $lastLine =~ s/-//g;
+
+#               print "lastLine: $lastLine\n";
+
+               if ($lastLine eq "")
+               {  $status = 1;
+                  $statusMessage = "no objects found in the region specified.";
+               }
+            }
+            else
+            {  $status = 1;
+               $statusMessage = "no objects found in the region specified.";
+            }
+         }
+         else
+         {  $status = 1;
+            $statusMessage = "empty table returned.";
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "inaccessible URL $query";
+      }   
+   }
+   $status;
+}
+
+
+#
+#  Write the retrieved table to a file.
+#
+#  Algorithm:
+#     Attempt to open the table to hold the file.
+#     If ok then
+#       Write header details to the file.
+#       Write the retrieved table to the file.
+#       Close the file.
+#     else
+#       Set the status.
+#     end if
+
+sub WriteTableFile
+{  if ($status == 0)
+   {
+
+#
+#    Attempt to open the table to hold the file and proceed if ok.
+
+      $openStatus = open (TABLEFILE, ">$tableFileName");
+      if ($openStatus != 0)
+      {
+
+#
+#       Write header details to the file.
+#
+#       First the preamble.
+
+         print TABLEFILE "Subset of remote database ";
+         print TABLEFILE "$short_name[$catIndex] \n\n";
+
+         if ($copyright[$catIndex] ne "<undefined>")
+         {  print TABLEFILE " Copyright details: $copyright[$catIndex] \n";
+            print TABLEFILE "\n";
+         }
+
+         print TABLEFILE "# This catalogue is formatted as a ";
+         print TABLEFILE "Tab-Separated Table (TST) \n";
+         print TABLEFILE "# For a description of this format see ";
+         print TABLEFILE "Starlink User Note 190 or URL \n";
+         print TABLEFILE "# http://www.starlink.rl.ac.uk/cursa/ \n\n";
+
+#
+#       A description of the selection as text.
+
+         print TABLEFILE "Selected objects lie within the circular region ";
+         print TABLEFILE "of sky: \n";
+         print TABLEFILE "Centre  Right Ascension $queryRA,  ";
+         print TABLEFILE "Declination $queryDec,  ";
+         print TABLEFILE "equinox 2000.\n";
+         print TABLEFILE "Radius  $queryRadius minutes of arc. \n\n";
+
+#
+#       Query details as parameters.
+
+         print TABLEFILE
+           "# Parameters corresponding to the query: \n";
+         print TABLEFILE "QUERYRA: $queryRA \n";
+         print TABLEFILE "QUERYDEC: $queryDec \n";
+         print TABLEFILE "QUERYRAD: $queryRadius \n";
+
+         print TABLEFILE
+           "# Parameters from catalogue entry in configuration file: \n";
+
+         if ($symbol[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "symbol: $symbol[$catIndex] \n";
+         }
+
+         if ($id_col[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "id_col: $id_col[$catIndex] \n";
+         }
+
+         if ($ra_col[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "ra_col: $ra_col[$catIndex] \n";
+         }
+
+         if ($dec_col[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "dec_col: $dec_col[$catIndex] \n";
+         }
+
+         if ($x_col[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "x_col: $x_col[$catIndex] \n";
+         }
+
+         if ($y_col[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "y_col: $y_col[$catIndex] \n";
+         }
+
+         if ($help[$catIndex] ne "<undefined>")
+         {  print TABLEFILE "help: $help[$catIndex] \n";
+         }
+
+         print TABLEFILE
+           "# End of configuration file parameters. \n\n";
+
+#
+#       Write the retrieved table to the file.
+
+         for ($loop = 0; $loop < $tableLines; $loop++)
+         {  print TABLEFILE "$table[$loop]\n";
+         }
+
+#
+#       Close the file.
+
+         close (TABLEFILE);
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "unable to open file $tableFileName";
+      }
+   }
+   $status;
+}
+
+
+#
+#  Assemble the file name to be used for the table of results.
+#
+#  Algorithm:
+#     Copy the database name to the file name.
+#     Replace the `@' (and any other non-alphanumeric characters) in
+#     database name with an underscore.
+#     Extract the integer part of the Right Ascension.
+#     Remove the colon sexagesimal separator.
+#     Extract the integer part of the Declination.
+#     Remove the colon sexagesimal separator.
+#     Assemble the file name.
+
+sub AssembleTableFileName
+{  if ($status == 0)
+   {
+
+#
+#    Copy the database name to the file name and replace the `@' (and any
+#    other non-alphanumeric characters) in database name with an
+#    underscore.
+
+      $tableFileName = $catName;
+      $tableFileName =~ s/\W/_/g;
+
+#
+#    Extract the integer part of the Right Ascension and remove the
+#    colon sexagesimal separator (for safety any non-alphanumeric
+#    characters are removed).
+
+      $dotpos = index($queryRA, ".");
+      if ($dotpos > -1)
+      {  $intRA = substr($queryRA, 0, $dotpos);
+      }
+      else
+      {  $intRA = $queryRA;
+      }
+
+      $intRA =~ s/\W//g;
+
+#
+#    Extract the integer part of the Declination and remove the
+#    colon sexagesimal separator (for safety any non-alphanumeric
+#    characters are removed).
+
+      $dotpos = index($queryDec, ".");
+      if ($dotpos > -1)
+      {  $intDec = substr($queryDec, 0, $dotpos);
+      }
+      else
+      {  $intDec = $queryDec;
+      }
+
+      $intDec =~ s/\W//g;
+
+#
+#    Assemble the file name.  Any minus sign in the Declination is
+#    replaced with a letter 'm'.
+
+      $minuspos = index($queryDec, "-");
+      if ($minuspos < 0)
+      {  $tableFileName = $tableFileName . "_" . $intRA . "_" . $intDec
+                          . ".tab";
+      }
+      else
+      {  $tableFileName = $tableFileName . "_" . $intRA . "_m" . $intDec
+                          . ".tab";
+      }
+
+#      print "tableFileName $tableFileName \n";
+   }
+   $status;
+}
+
+#
+#  Attempt to 'resolve' the name of an astronomical object by obtaining
+#  its coordinates.  A query is assembled which includes the name and
+#  submitted as a URL to a name resolver.  If the name is resolved the
+#  results will be returned as a table of at least one row.  This
+#  table is parsed and the coordinates determined.
+#
+#  Algorithm:
+#     Initialise the catalogue index.
+#     For every catalogue
+#       If the catalogue name matches the current short name then
+#         Set the catalogue index to the current catalogue.
+#       end if
+#     end for
+#     If a catalogue was found then
+#       Obtain the URL.
+#       Substitute the object name.
+#       Substitute the other takens,
+#       Attempt to retrieve the table.
+#       If ok then
+#         Parse the table for the coordinates and any URL.
+#       end if
+#     else
+#       Set the status.
+#     end if
+
+sub ResolveObjectName
+{  if ($status == 0)
+   {
+
+#
+#    Initialise the catalogue index.
+
+      $catIndex = -1;
+
+#
+#    Attempt to find the given name amongst the list of known short
+#    names.
+
+      for ($loop = 0; $loop <= $numDatabases; $loop++)
+      {  if ($catName eq $short_name[$loop])
+         {  $catIndex = $loop;
+         }
+      }
+
+#
+#    Proceed if the catalogue was found.
+
+      if ($catIndex > -1)
+      {
+
+#
+#       Obtain the URL of the database.
+
+         $query = $url[$catIndex];
+
+#
+#       Substitute the object name.
+
+         $query =~ s/%id/$objectName/;
+
+#
+#       Substitute the maximum number of rows which can be returned.
+
+         $query =~ s/%n/$maxObjects/;
+
+#
+#       Substitute the remaining tokens.
+
+         $query =~ s/%ra/00:00:00/;
+         $query =~ s/%dec/00:00:00/;
+
+         $query =~ s/%x/0/;
+         $query =~ s/%y/0/;
+
+         $query =~ s/%r2/0/;
+         $query =~ s/%r1/0/;
+         $query =~ s/%r/0/;
+
+         $query =~ s/%w/0/;
+         $query =~ s/%h/0/;
+
+         $query =~ s/%mime-type/text\/plain/;
+         $query =~ s/%m1/-5.0/;
+         $query =~ s/%m2/30.0/;
+         $query =~ s/%m/30.0/;
+         $query =~ s/%cols//;
+         $query =~ s/%sort//;
+         $query =~ s/%sortorder/increasing/;
+
+         $query =~ s/%cond//;
+
+         $query =~ s/\s//;
+
+#         print "query: $query after-query \n";
+
+#
+#       Attempt to retrieve the table and if ok obtain the coordinates
+#       and any URL in it.
+
+         $status = &RetrieveTable;
+         if ($status == 0)
+         {  $status = &GetObjectCoords;
+         }
+         else
+         {  $statusMessage = "unable to resolve object name.";
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "unknown name resolver, $catName";
+      }
+   }
+   $status;
+}
+
+
+#
+#  Get the coordinates from the returned table.
+
+sub GetObjectCoords
+{  if ($status == 0)
+   {
+
+#
+#    Split the last line in the returned table into its component
+#    fields.
+
+      $lastLine = $tableLines - 1;
+      @fields = split(/\t/, $table[$lastLine]);
+
+#
+#    Proceed if the line contains at least three fields.
+
+      if ($#fields >= 2)
+      {
+
+#
+#       Extract the Right Ascension and Declination, which are assumed
+#       to be in, respectively, the second and third fields.
+
+         $objRA = $fields[1];
+         $objDec = $fields[2];
+
+#
+#       If the values have been returned in decimal degrees then convert
+#       them to sexagesimal hours or degrees.  (Note if the values are
+#       in decimal degrees they will not contain a colon (`:').)
+
+         $colpos = index($objRA, ":");
+         if ($colpos == -1)
+         {  $objRA = $objRA / 15.0;
+            $dispRA = &DecToSexag($objRA);
+         }
+         else
+         {  $dispRA = $objRA;
+         }
+
+         $colpos = index($objDec, ":");
+         if ($colpos == -1)
+         {  $dispDec = &DecToSexag($objDec);
+         }
+         else
+         {  $dispDec = $objDec;
+         }
+
+#
+#       Print out the values.
+
+         print "Right Ascension: $dispRA \n";
+         print "Declination: $dispDec \n";
+      }
+      else
+      {
+
+#
+#       Failed to split the line into fields.  Set the status and
+#       adopt the line as an error message (which is a bit dubious,
+#       but probably ok and works for the SIMBAD name resolver).
+
+         $status = 1;
+         $statusMessage = $table[$lastLine];
+      }
+   }
+   $status;
+}
+
+
+#
+#  Convert a decimal to sexagesimal value.
+#
+#  Note that this routine returns a sexagesimal value, not a status.
+#
+#  Algorithm:
+#     Determine the sign.
+#     Obtain the absolute value.
+#     Extract the integer part.
+#     Multiply the remainder by 60.
+#     Extract the integer part as the minutes.
+#     Multiply the remainder by 60.
+#     Extract the integer part as the seconds.
+#     If the remainder is greater than a half then
+#       Increment the number of seconds.
+#       If the number of seconds is greater than or equal to 60 then
+#         Set the number of seconds to zero.
+#         Increment the number of minutes.
+#         If the number of minutes is greater than or equal to 60 then
+#           Set the number of minutes to zero.
+#           Increment the integer part.
+#         end if
+#       end if
+#     end if
+
+sub DecToSexag
+{  if ($status == 0)
+   {  $decValue = @_[0];
+#      print "decValue: $decValue \n";
+
+      if ($decValue < 0)
+      {  $sign = "-";
+      }
+      else
+      {  $sign = "+";
+      }
+
+      $decValue = abs $decValue;
+
+      $intPart = int $decValue;
+      $rem = ($decValue - $intPart) * 60.0;
+
+      $min = int $rem;
+      $rem = ($rem - $min) * 60.0;
+
+      $sec = int $rem;
+      $rem = $rem - $sec;
+
+      if ($rem >= 0.5)
+      {  $sec = $sec + 1;
+         if ($sec >= 60)
+         {  $sec = 0;
+            $min = $min + 1;
+            if ($min >= 60)
+            {  $min = 0;
+               $intPart = $intPart + 1;
+            }
+         }
+      }
+
+      $sexagValue = $sign . $intPart . ":";
+
+      if ($min < 10)
+      {  $sexagValue = $sexagValue . "0";
+      }
+      $sexagValue = $sexagValue . $min . ":";
+
+      if ($sec < 10)
+      {  $sexagValue = $sexagValue . "0";
+      }
+      $sexagValue = $sexagValue . $sec;
+
+   }
+   $sexagValue;
+}
+
+
+#
+# ..................................................................
+#
+# All the following routines are concerned with obtaining and parsing
+# configuration files.
+#
+#
+#  Attempt to obtain the configuration file.
+#
+#  It may either be read from a local file or retrieved via the Web.
+#  Once obtained it is parsed.
+#
+#  Algorithm:
+#     Obtain the value of the environment variable containing the name
+#     of the configuration file.
+#     If the value is not null then
+#       If the name contains "http" then
+#         Attempt to retrieve the configuration file via the Web.
+#       else
+#         Attempt to read the configuration file from a local file.
+#       end if
+#       If ok then
+#         Attempt to parse the configuration file.
+#       end if
+#     else
+#       Set the return status.
+#     end if
+
+sub ObtainConfigFile
+{  if ($status == 0)
+   {
+
+#
+#    Obtain the value of the environment variable containing the name
+#    of the configuration file.
+
+      $configFileName = $ENV{"CATREM_CONFIG"};
+#      print "configFileName: $configFileName \n";
+
+#
+#    Proceed if the value is not blank.
+
+      if ($configFileName =~ /\S/)
+      {
+
+#
+#       If the configuration file name contains the substring "http"
+#       then attempt to retrieve it via the Web; otherwise attempt
+#       to read it as a local file.
+
+         $httpfound = index($configFileName, "http");
+
+         if ($httpfound > -1)
+         {  $status = &RetrieveConfigFile;
+         }
+         else
+         {  $status = &ReadConfigFile;
+         }
+
+#
+#       If all is ok then attempt to parse the configuration file.
+
+         if ($status == 0)
+         {  $status = &ParseConfigFile;
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "configuration file not specified.";
+      }
+   }
+   $status;
+}
+
+
+#
+#  Attempt to retrieve the configuration file via the Web.
+#
+#  Algorithm:
+#     Assemble the command to retrieve the configuration file.
+#     Attempt to open the remote configuration file as a file-handle.
+#     If ok then
+#       Read the configuration file.
+#       Close the file handle.
+#       If any lines were read then
+#         Chop the lines.
+#         Remove any leading spaces.
+#       else
+#         Set the status.
+#       end if
+#     else
+#       Set the status.
+#     end if
+
+sub RetrieveConfigFile
+{  if ($status == 0)
+   {  
+
+#
+#    Assemble the command to retrieve the configuration file and
+#    echo it if required.
+      $command = "$URLReader $configFileName";
+
+      if ($ENV{"CATREM_ECHOURL"} eq "yes")
+      {  print "! Command: $command\n";
+      }
+
+#
+#    Attempt to open the remote configuration file as a file-handle and
+#    proceed if ok.
+
+      $openStatus = open (CONFIG, "$command |");
+      if ($openStatus != 0)
+      {
+
+#
+#       Read the configuration file and then close the file-handle.
+
+         @config = <CONFIG>;
+         $configLines = $#config;
+#         print "configLines: $configLines \n";
+
+         close (CONFIG);
+
+#
+#       If any lines were read then chop the lines and remove any leading
+#       spaces; otherwise set the Status.
+
+         if ($configLines > 0)
+         {  for ($loop = 0; $loop < $configLines; $loop++)
+            {  chop($config[$loop]);
+               $config[$loop] =~ s/\t/ /;
+               $config[$loop] =~ s/\s*//;
+            }
+         }
+         else
+         {  $status = 1;
+            $statusMessage = "empty configuration file.";
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "failed to access the configuration file.";
+      }   
+   }
+   $status;
+}
+
+
+#
+# Read the configuration file from a local file.
+
+sub ReadConfigFile
+{  if ($status == 0)
+   {  $configLines = -1;
+
+#
+#    Open and read the file.
+
+      $openStatus = open (CONFIG, "$configFileName");
+      if ($openStatus != 0)
+      {  while (<CONFIG>)
+         {  $currentLine = $_;
+            chop($currentLine);
+            $currentLine =~ s/\t/ /;
+            $currentLine =~ s/\s*//;
+
+            $configLines = $configLines + 1;
+            $config[$configLines] = $currentLine;
+         }
+
+         close (CONFIG);
+
+#
+#       Set the status if no lines were read.
+
+         if ($configLines < 0)
+         {  $status = 1;
+            $statusMessage = "empty configuration file.";
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "failed to open the configuration file.";
+      }   
+   }
+   $status;
+}
+
+
+#
+#  Parse the configuration file.
+#
+#  Algorithm:
+#   Initialise the list of recognised-but-unused keywords.
+#   Initialise the number of databases.
+#   For every line in the configuration file
+#     If the line is neither a blank nor a comment then
+#     Attempt to split the line into keyword and value
+#     If ok then
+#       Remove the leading spaces from the keyword and value.
+#       If the keyword is serv_type then
+#         Increment the number of databases.
+#         Set the server type.
+#         Initialise all the other keywords.
+#       else if the keyword is ... any other keyword then
+#         If any the number of the current database is defined then
+#           If the keyword is undefined then
+#             Set the keyword value.
+#           else
+#             Report error: multiple definition of keyword.
+#           end if
+#         else
+#           Report error: first keyword is not serv_type.
+#         end if
+#       end if
+#     end if
+#   end do
+#   For every database
+#     For each mandatory keyword
+#       If the keyword is undefined
+#         Report error: mandatory keyword is missing.
+#       end if
+#     end do
+#   end do
+#   If an eror occurred then
+#     Set the error message text.
+#   end if
+
+sub ParseConfigFile
+{  if ($status == 0)
+   {  
+
+#
+#    Initialise the list of recognised-but-unused keywords from
+#    the appropriate environment variable.
+
+      @knownKeywords = ("sort_cols","sort_order","show_cols","is_tcs",
+        "backup1","backup2");
+
+#
+#    Initialise the number of databases.
+
+      $numDatabases = -1;
+
+#
+#    Examine every line in the configuration file.
+
+      for ($line = 0; $line <= $configLines; $line++)
+      {  $cfgline = $line + 1;
+         $currentLine = $config[$line];
+
+#
+#       Proceed if the line is neither blank nor a comment (indicated
+#       by starting with '#').
+
+         if ($currentLine =~ /\S/)
+         {  $hashPos = index($currentLine, "#");
+            if ($hashPos == -1)
+            {
+
+#
+#             Attempt to split the line into keyword and value.  The
+#             keyword should end in a colon (':').
+
+               $colonPos = index($currentLine, ":");
+               if ($colonPos > -1)
+               {
+
+#
+#                A keyword was found.  Extract the keyword and value
+#                and remove any leading spaces.
+
+                  $keyword = substr($currentLine, 0, $colonPos);
+                  $value = substr($currentLine, $colonPos+1, 300);
+
+                  $keyword =~ s/ *//;
+                  $value =~ s/ *//;
+
+#                  print "keyword: $keyword value: $value hello \n";
+
+#
+#                Check for the various keywords.
+#
+#                serv_type
+
+                  if ($keyword eq "serv_type")
+                  {
+
+#
+#                   Increment the number of databases.
+
+                     $numDatabases = $numDatabases + 1;
+
+#
+#                   Set the server type.
+
+                     $serv_type[$numDatabases] = $value;
+
+#
+#                   Initialise all the other keywords.
+
+                     $long_name[$numDatabases] = "<undefined>";
+                     $short_name[$numDatabases] = "<undefined>";
+                     $url[$numDatabases] = "<undefined>";
+                     $symbol[$numDatabases] = "<undefined>";
+                     $copyright[$numDatabases] = "<undefined>";
+                     $search_cols[$numDatabases] = "<undefined>";
+                     $id_col[$numDatabases] = "<undefined>";
+                     $ra_col[$numDatabases] = "<undefined>";
+                     $dec_col[$numDatabases] = "<undefined>";
+                     $x_col[$numDatabases] = "<undefined>";
+                     $y_col[$numDatabases] = "<undefined>";
+                     $help[$numDatabases] = "<undefined>";
+                  }
+
+#
+#                Check for the remaining keywords.  For each check for
+#                various error conditions and if ok then set the keyword;
+#                otherwise set the status.
+#
+#                long_name
+
+                  elsif ($keyword eq "long_name")
+                  {  $check = &CheckKeyword("long_name",@long_name);
+                     if ($check == 0)
+                     {  $long_name[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                short_name
+
+                  elsif ($keyword eq "short_name")
+                  {  $check = &CheckKeyword("short_name",@short_name);
+                     if ($check == 0)
+                     {  $short_name[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                url
+
+                  elsif ($keyword eq "url")
+                  {  $check = &CheckKeyword("url",@url);
+                     if ($check == 0)
+                     {  $url[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                symbol
+
+                  elsif ($keyword eq "symbol")
+                  {  $check = &CheckKeyword("symbol",@symbol);
+                     if ($check == 0)
+                     {  $symbol[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                copyright
+
+                  elsif ($keyword eq "copyright")
+                  {  $check = &CheckKeyword("copyright",@copyright);
+                     if ($check == 0)
+                     {  $copyright[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                search_cols
+
+                  elsif ($keyword eq "search_cols")
+                  {  $check = &CheckKeyword("search_cols",@search_cols);
+                     if ($check == 0)
+                     {  $search_cols[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                id_col
+
+                  elsif ($keyword eq "id_col")
+                  {  $check = &CheckKeyword("id_col",@id_col);
+                     if ($check == 0)
+                     {  $id_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                ra_col
+
+                  elsif ($keyword eq "ra_col")
+                  {  $check = &CheckKeyword("ra_col",@ra_col);
+                     if ($check == 0)
+                     {  $ra_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                dec_col
+
+                  elsif ($keyword eq "dec_col")
+                  {  $check = &CheckKeyword("dec_col",@dec_col);
+                     if ($check == 0)
+                     {  $dec_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                x_col
+
+                  elsif ($keyword eq "x_col")
+                  {  $check = &CheckKeyword("x_col",@x_col);
+                     if ($check == 0)
+                     {  $x_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                y_col
+
+                  elsif ($keyword eq "y_col")
+                  {  $check = &CheckKeyword("y_col",@y_col);
+                     if ($check == 0)
+                     {  $y_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                help
+
+                  elsif ($keyword eq "help")
+                  {  $check = &CheckKeyword("help",@help);
+                     if ($check == 0)
+                     {  $help[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                Check for other recognised keywords, if required.
+
+                  else
+                  {  if ($keywordCheck == 1)
+                     {  $recognisedKeyword = 1;
+
+                        for ($loop = 0; $loop < $#knownKeywords; $loop++)
+                        {  if ($keyword eq $knownKeywords[$loop])
+                           {  $recognisedKeyword = 0;
+                           }
+                        }
+
+                        if ($recognisedKeyword == 1)
+                        {  print "! Warning, line $cfgline, ";
+                           print "unrecognised keyword: $keyword \n";
+                        }
+                     }
+                  }
+
+               }
+               else
+               {  print "! Line $cfgline: bad line (missing colon):- \n";
+                  print "!  $currentLine \n";
+
+                  $status = 1;
+               }
+            }
+         }
+      }
+
+#
+#    Check every database to ensure that the mandatory keywords are
+#    defined.
+
+      for ($dbase = 0; $dbase <= $numDatabases; $dbase++)
+      {  $dbcount = $dbase + 1;
+
+         if ($long_name[$dbase] eq "<undefined>")
+         {  print "! Database $dbcount ";
+            print "($short_name[$dbase]): ";
+            print "mandatory keyword long_name omitted. \n";
+
+            $status = 1;
+         }
+         elsif ($short_name[$dbase] eq "<undefined>")
+         {  print "! Database $dbcount: ";
+            print "mandatory keyword short_name omitted. \n";
+
+            $status = 1;
+         }
+         elsif ($url[$dbase] eq "<undefined>")
+         {  print "! Database $dbcount ";
+            print "($short_name[$dbase]): ";
+            print "mandatory keyword url omitted. \n";
+
+            $status = 1;
+         }
+      }
+
+#
+#    Set the status message if an error occurred.
+
+      if ($status != 0)
+      {  $statusMessage = "bad configuration file.";
+      }
+   }
+   $status;
+}
+
+#
+#  Perform a series of checks prior to setting the value of a keyword.
+#
+#  Given:
+#   The array of values for which the keyword to be set.
+#
+#  Note that this routine attempts to execute irrespective of the
+#  running status.
+
+sub CheckKeyword
+{  
+
+#  Initialise the check status to ok.
+
+    $check = 0;
+
+#
+#  First check that at least one database is defined.
+   
+    if ($numDatabases == -1)
+    {  print "! Line $cfgline: keyword serv_type missing. \n";
+
+       $check = 1;
+    }
+    else
+    {
+
+#
+#     Check that the given keyword is not already defined for the
+#     current database.
+
+       if (@_[$numDatabases + 1] ne "<undefined>")
+       {  print "! Line $cfgline, database $numDatabases: ";
+          print "multiple definition of keyword ";
+          print "@_[0]. \n";
+
+          $check = 1;
+       }
+       else
+       {
+
+#
+#        Check that the value is not blank.
+
+          if ($value =~ /\S/)
+          {  $isSpace = 1;
+          }
+          else
+          {  $isSpace = 0;
+          }
+
+          if ($isSpace == 0)
+          {  print "! Line $cfgline, database $numDatabases: ";
+             print "missing value for keyword ";
+             print "@_[0]. \n";
+
+             $check = 1;
+          }
+       }
+    }
+
+#
+#  Set the return value.
+
+    $check;
+}

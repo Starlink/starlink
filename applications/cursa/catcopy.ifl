@@ -1,0 +1,172 @@
+#+
+#  Name:
+#     CATCOPY.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     28/11/94 (ACD): Original version.
+#     19/4/95  (ACD): First stable version.
+#     26/8/96  (ACD): Added parameter TEXT.
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#     10/4/01  (ACD): Added COPYPAR, PFILTER and ADDPAR.
+#     24/4/01  (ACD): Corrected default for PFILTER.
+#     26/4/01  (ACD): Added PNAME, PARTYP, PCSIZE, PVALUE, PUNITS and PCOMM.
+#-
+
+interface CATCOPY
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN           # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue.'
+   endparameter
+
+   parameter CATOUT          # Name of the output catalogue.
+      position 2
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Output catalogue:'
+      help     'Give the name of the output catalogue.'
+   endparameter
+
+   parameter COPYPAR         # Flag defining which parameters to copy.
+      position 3
+      keyword  COPYPAR
+      type     _CHAR
+      access   READ
+      default  'All'
+      vpath    'DEFAULT'
+      prompt   'Parameters to copy?'
+      help     'A - all,   F - Filter some out,   N - none.'
+   endparameter
+
+   parameter PFILTER         # List of parameters to be filtered out.
+      position 4
+      keyword  PFILTER
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameters to filter out?'
+      help  'Comma-separated list of parameters to filter out (ie. not copy).'
+   endparameter
+
+   parameter ADDPAR          # Flag; new parameters to be added?
+      position 5
+      keyword  ADDPAR
+      type     _LOGICAL
+      access   READ
+      default  false
+      vpath    'DEFAULT'
+      prompt   'Add another parameter?'
+      help     'Is another parameter to be added?'
+   endparameter
+
+   parameter   PNAME         # Name of the new parameter.
+      position 6
+      keyword  PNAME
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter name:'
+      help     'Give the name of the new parameter.'
+   endparameter
+
+   parameter PARTYP          # Data type of the new parameter.
+      position 7
+      keyword  PARTYP
+      type     _CHAR
+      access   READ
+      default  'CHAR'
+      vpath    'PROMPT'
+      prompt   'Parameter type:'
+      help  'Data type of parameter: REAL, DOUBLE, INTEGER, LOGICAL or CHAR.'
+   endparameter
+
+   parameter PCSIZE          # Size of the new character parameter.
+      position 8
+      keyword  PCSIZE
+      type     _INTEGER
+      access   READ
+      default  60
+      vpath    'PROMPT'
+      prompt   'Parameter character size:'
+      help  'Give the size of the new character parameter.'
+   endparameter
+
+   parameter PVALUE          # Value of the new parameter.
+      position 9
+      keyword  PVALUE
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter value:'
+      help  'Give the value of the new parameter.'
+   endparameter
+
+   parameter  PUNITS         # Units of the new parameter.
+      position 10
+      keyword  PUNITS
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter units:'
+      help  'Give the units of the new parameter.'
+   endparameter
+
+   parameter PCOMM           # Comments describing the new parameter.
+      position 11
+      keyword  PCOMM
+      type     _CHAR
+      access   READ
+      default  ''
+      vpath    'PROMPT'
+      prompt   'Parameter comments:'
+      help  'Give the comments describing the new parameter.'
+   endparameter
+
+   parameter TEXT            # Copy textual information.
+      position 12
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 13
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

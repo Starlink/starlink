@@ -1,0 +1,52 @@
+#+
+#  Name:
+#     CATGSCIN.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     10/5/95 (ACD): Original version.
+#     26/8/96 (ACD): Added parameter TEXT.
+#     5/4/01  (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATGSCIN
+
+#   helplib '[help_library_specification]'
+
+   parameter CATIN                   # Name of the input catalogue.
+      position 1
+      keyword  CATIN
+      type     _CHAR
+      access   READ
+      prompt   'Input catalogue:'
+      help     'Give the name of the input catalogue (a HST GSC region).'
+   endparameter
+
+   parameter TEXT                    # Copy textual information.
+      position 2
+      keyword  TEXT
+      type     _CHAR
+      access   READ
+      default  'C'
+      vpath    'DEFAULT'
+      prompt   'Header text to copy?'
+      help     'A - all,   C - comments (and history) only,   N - none.'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 3
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+endinterface

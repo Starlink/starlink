@@ -1,0 +1,37 @@
+#+
+#  Name:
+#     CATPHOTOMLST.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     7/10/97 (ACD): Original version.
+#-
+
+interface CATPHOTOMLST
+
+#   helplib '[help_library_specification]'
+
+   parameter FILNME      # Name of transform. coeffs. file.
+      position 1
+      keyword  FILNME
+      type     _CHAR
+      access   READ
+      prompt   'Transform. coeffs. file:'
+      help     'Give the name of the file of transformation coefficients.'
+   endparameter
+
+   parameter DECPL       # Number of decimal places.
+      position 2
+      keyword  DECPL
+      type     _INTEGER
+      access   READ
+      default  6
+      vpath    'DEFAULT'
+      prompt   'Decimal places:'
+      help     'Enter the number of decimal places for displaying the coefficients.'
+   endparameter
+
+endinterface

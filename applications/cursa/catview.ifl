@@ -1,0 +1,850 @@
+#+
+#  Name:
+#     CATVIEW.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     27/4/94  (ACD): Original version.
+#     20/3/95  (ACD): First stable version.
+#     12/6/96  (ACD): Corrected application name in 'interface'.
+#     22/11/96 (ACD): Improved help for parameter SHT.
+#     29/11/96 (ACD): Added entries for computing column statistics.
+#     7/11/97  (ACD): Added default for ANGRPN.
+#     10/7/98  (ACD): Added entries for plotting scatter-plots.
+#     20/11/98 (ACD): Converted scatterplot ranges from REAL to CHARACTER.
+#     21/6/99  (ACD): Added entry FPRINT
+#     25/6/99  (ACD): Added global access for catalogue names.
+#     15/9/99  (ACD): Added entries for plotting histograms.
+#     2/12/99  (ACD): Made GUI a hidden, command-line parameter.
+#     22/3/01  (ACD): Corrected global access for catalogue names.
+#     5/4/01   (ACD): Added quiet mode parameter QUIET.
+#-
+
+interface CATVIEW
+
+#   helplib '[help_library_specification]'
+
+   parameter CNAME                   # Catalogue name.
+      position 1
+      keyword  CNAME
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '<-GLOBAL.CURSACAT'
+      prompt   'Catalogue name:'
+      help     'Give the name of the catalogue to be reported.'
+   endparameter
+
+   parameter ACTION                  # Action name.
+      position 2
+      keyword  ACTION
+      type     _CHAR
+      access   READ
+      default  ' '
+      prompt   'Action:'
+      help     'Enter required action; HELP for a list of options.'
+   endparameter
+
+   parameter CMPLST                  # Component list.
+      position 3
+      keyword  CMPLST
+      type     _CHAR
+      access   READ
+      prompt   'Columns to be listed:'
+      help 'Enter list of columns and expressions, separated by semi-colons.'
+   endparameter
+
+   parameter SELNO                   # Selection number.
+      position 4
+      keyword  SELNO
+      type     _INTEGER
+      access   READ
+      prompt   'Selection:'
+      help     'Enter the number of the required selection.'
+   endparameter
+
+   parameter EXPR                    # Selection expression.
+      position 5
+      keyword  EXPR
+      type     _CHAR
+      access   READ
+      prompt   'Selection expression:'
+      help     'Enter an expression defining the required selection.'
+   endparameter
+
+   parameter MINRNG                   # Minimum for range selection.
+      position 6
+      keyword  MINRNG
+      type     _CHAR
+      access   READ
+      prompt   'Range minimum:'
+      help     'Enter minimum value of the required range.'
+   endparameter
+
+   parameter MAXRNG                   # Maximum for range selection.
+      position 7
+      keyword  MAXRNG
+      type     _CHAR
+      access   READ
+      prompt   'Range maximum:'
+      help     'Enter maximum value of the required range.'
+   endparameter
+
+   parameter ROWNO                    # Required current row number.
+      position 8
+      keyword  ROWNO
+      type     _INTEGER
+      access   READ
+      default  1
+      prompt   'Row number:'
+      help     'Enter the required row number in the current selection.'
+   endparameter
+
+   parameter FIRSTR                   # First row to be listed.
+      position 9
+      keyword  FIRSTR
+      type     _INTEGER
+      access   READ
+      default  1
+      prompt   'First row:'
+      help     'Enter the first row to be listed in the current selection.'
+   endparameter
+
+   parameter LASTR                    # Last row to be listed.
+      position 10
+      keyword  LASTR
+      type     _INTEGER
+      access   READ
+      default  0
+      prompt   'Last row:'
+      help     'Enter the last row to be listed (0 = last in the current selection).'
+   endparameter
+
+   parameter FLNAME                    # Name of output text file.
+      position 11
+      keyword  FLNAME
+      type     _CHAR
+      access   READ
+      prompt   'File name:'
+      help     'Enter the name of the output text file.'
+   endparameter
+
+   parameter CATOUT                    # Name of output catalogue
+      position 12
+      keyword  CATOUT
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'GLOBAL'
+      association  '->GLOBAL.CURSACAT'
+      prompt   'Catalogue:'
+      help     'Enter the name of the output catalogue.'
+   endparameter
+
+   parameter CFLAG                     # Flag save all or chosen columns?
+      position 13
+      keyword  CFLAG
+      type     _LOGICAL
+      access   READ
+      prompt   'Columns to be saved:'
+      help     'true - all columns;  false - only currently chosen.'
+   endparameter
+
+   parameter TFLAG                     # Flag save header text?
+      position 14
+      keyword  TFLAG
+      type     _LOGICAL
+      access   READ
+      prompt   'Save header text from base catalogue?'
+      help     'true - save header;  false - do not save text.'
+   endparameter
+
+   parameter COMM                      # Comments for output catalogue
+      position 15
+      keyword  COMM
+      type     _CHAR
+      access   READ
+      prompt   'Comments:'
+      help     'Enter comments to annotate the new catalogue.'
+   endparameter
+
+   parameter PNAME                     # Name of column or parameter
+      position 16
+      keyword  PNAME
+      type     _CHAR
+      access   READ
+      prompt   'Column or parameter:'
+      help     'Enter the name of column or parameter.'
+   endparameter
+
+   parameter UNITS                     # New units.
+      position 17
+      keyword  UNITS
+      type     _CHAR
+      access   READ
+      prompt   'Units:'
+      help     'Enter the new units for the column or parameter.'
+   endparameter
+
+   parameter EXFMT                     # New external format.
+      position 18
+      keyword  EXFMT
+      type     _CHAR
+      access   READ
+      prompt   'External format:'
+      help     'Enter the new external format for the column or parameter.'
+   endparameter
+
+   parameter SWID                      # Screen width.
+      position 19
+      keyword  SWID
+      type     _INTEGER
+      access   READ
+      default  80
+      prompt   'Screen width:'
+      help     'Enter the screen width in characters.'
+   endparameter
+
+   parameter SHT                       # Screen height.
+      position 20
+      keyword  SHT
+      type     _INTEGER
+      access   READ
+      default  24
+      prompt   'Screen height:'
+      help     'Enter the screen height in number of lines.'
+   endparameter
+
+   parameter SEQNO                     # Flag; list sequence no?
+      position 21
+      keyword  SEQNO
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Sequence number?'
+      help     'Should a sequence number be listed with each row?'
+   endparameter
+
+   parameter NLIST                     # Number of lines output by LIST.
+      position 22
+      keyword  NLIST
+      type     _INTEGER
+      access   READ
+      default  21
+      prompt   'Number of lines to output:'
+      help     'Enter the number of lines for LIST to output; -1 for them all'
+   endparameter
+
+   parameter ANGRPN                  # Flag for representation of angles.
+      position 23
+      keyword  ANGRPN
+      type     _CHAR
+      access   READ
+      default  'SEXAGESIMAL'
+      prompt   'Representation of angles:'
+      help     'SEXAGESIMAL - sexagesimal hours or degrees, RADIANS - radians.'
+   endparameter
+
+   parameter ANGRF               # Flag; reformat UNITS attribute for angles?
+      position 24
+      keyword  ANGRF
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'ANGRF?'
+      help     'Reformat the UNITS attribute for angles?'
+   endparameter
+
+   parameter GUI                     # Flag; applicating running from GUI?
+      position 25
+      keyword  GUI
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'DEFAULT'
+      prompt   'GUI?'
+      help     'Is the application being run from a GUI?'
+   endparameter
+
+   parameter FPRINT                  # Flag; applicating running from GUI?
+      position 26
+      keyword  FPRINT
+      type     _LOGICAL
+      access   READ
+      default  TRUE
+      prompt   'Print file?'
+      help     'Is a print or data file to be created?'
+   endparameter
+
+   parameter FPGSZE                    # Page size (number of lines)
+      position 27
+      keyword  FPGSZE
+      type     _INTEGER
+      access   READ
+      default  60
+      prompt   'Page size:'
+      help     'Enter the number of lines in a page of output.'
+   endparameter
+
+   parameter FWID                      # Output file width.
+      position 28
+      keyword  FWID
+      type     _INTEGER
+      access   READ
+      default  132
+      prompt   'File width:'
+      help     'Enter the width of line in the output file, in characters.'
+   endparameter
+
+   parameter FSUMM                     # Text file: summary flag.
+      position 29
+      keyword  FSUMM
+      type     _CHAR
+      access   READ
+      prompt   'Include summary in text file?'
+      help     'A = absent, F = include summary.'
+   endparameter
+
+   parameter FCOL                      # Text file: columns flag.
+      position 30
+      keyword  FCOL
+      type     _CHAR
+      access   READ
+      prompt   'Include column details in text file?'
+      help     'A = absent, S = summary only, F = full details.'
+   endparameter
+
+   parameter FPAR                      # Text file: parameters flag.
+      position 31
+      keyword  FPAR
+      type     _CHAR
+      access   READ
+      prompt   'Include parameter details in text file?'
+      help     'A = absent, S = summary only, F = full details.'
+   endparameter
+
+   parameter FTXT                      # Text file: header text flag.
+      position 32
+      keyword  FTXT
+      type     _CHAR
+      access   READ
+      prompt   'Include header text in text file?'
+      help     'A = absent, F = include full text.'
+   endparameter
+
+   parameter FTABL                     # Text file: table flag.
+      position 33
+      keyword  FTABL
+      type     _CHAR
+      access   READ
+      prompt   'Include data table in text file?'
+      help     'A = absent, S = columns only, F = Columns and headings.'
+   endparameter
+
+   parameter CMPSTT                    # Column list.
+      position 34
+      keyword  CMPSTT
+      type     _CHAR
+      access   READ
+      prompt   'Columns required:'
+      help 'Enter list of columns, separated by semi-colons.'
+   endparameter
+
+   parameter DECPL                     # Number of decimal places.
+      position 35
+      keyword  DECPL
+      type     _INTEGER
+      access   READ
+      default  3
+      prompt   'Decimal places:'
+      help     'Enter the number of decimal places for displaying statistics.'
+   endparameter
+
+   parameter SFNAME                    # Name of output text file.
+      position 36
+      keyword  SFNAME
+      type     _CHAR
+      access   READ
+      default  'NONE'
+      prompt   'File name:'
+      help     'Enter the name of the output statistics file or NONE.'
+   endparameter
+
+   parameter GRPHDV                    # Name of the graphics device.
+      position 37
+      keyword  GRPHDV
+      type     _CHAR
+      access   READ
+      default  'xwindows'
+      prompt   'Graphics device:'
+      help     'Give the name of the graphics device (postscript: ps_l or pscol_l).'
+   endparameter
+
+   parameter TITLE                     # Scatterplot title.
+      position 38
+      keyword  TITLE
+      type     _CHAR
+      access   READ
+      default  'NONE'
+      prompt   'Plot title:'
+      help     'Enter the title to be displayed on the plot.'
+   endparameter
+
+   parameter XEXPR                     # X-axis expression.
+      position 39
+      keyword  XEXPR
+      type     _CHAR
+      access   READ
+      prompt   'X-axis:'
+      help     'Enter column or expression defining the X-axis.'
+   endparameter
+
+   parameter YEXPR                     # Y-axis expression.
+      position 40
+      keyword  YEXPR
+      type     _CHAR
+      access   READ
+      prompt   'Y-axis:'
+      help     'Enter column or expression defining the Y-axis.'
+   endparameter
+
+   parameter AUTOSCL                   # Flag: auto-scale axis limits?
+      position 41
+      keyword  AUTOSCL
+      type     _LOGICAL
+      access   READ
+      default  true
+      prompt   'Auto-scale axes?'
+      help     'true - auto-scale axes;  false - do not auto-scale axes.'
+   endparameter
+
+   parameter CXMIN                     # Minimum of X axis.
+      position 42
+      keyword  CXMIN
+      type     _CHAR
+      access   READ
+      prompt   'X minimum:'
+      help     'Minimum value to be plotted on X axis.'
+   endparameter
+
+   parameter CXMAX                     # Maximum of X axis.
+      position 43
+      keyword  CXMAX
+      type     _CHAR
+      access   READ
+      prompt   'X maximum:'
+      help     'Maximum value to be plotted on X axis.'
+   endparameter
+
+   parameter CYMIN                     # Minimum of Y axis.
+      position 44
+      keyword  CYMIN
+      type     _CHAR
+      access   READ
+      prompt   'Y minimum:'
+      help     'Minimum value to be plotted on Y axis.'
+   endparameter
+
+   parameter CYMAX                     # Maximum of Y axis.
+      position 45
+      keyword  CYMAX
+      type     _CHAR
+      access   READ
+      prompt   'Y maximum:'
+      help     'Maximum value to be plotted on Y axis.'
+   endparameter
+
+   parameter PLTSYM                    # Scatter-plot plotting symbol.
+      position 46
+      keyword  PLTSYM
+      type     _CHAR
+      access   READ
+      default  'FILLEDCIRCLE'
+      prompt   'Plotting symbol:'
+      help     'Plotting symbol to be used in scatter-plot.'
+   endparameter
+
+   parameter COLOUR              # Scatter-plot plotting symbol colour.
+      position 47
+      keyword  COLOUR
+      type     _CHAR
+      access   READ
+      default  'DEFAULT'
+      prompt   'Symbol colour:'
+      help     'Colour of the plotting symbols to be used in scatter-plot.'
+   endparameter
+
+   parameter BINSP               # Flag: histogram bin specification.
+      position 48
+      keyword  BINSP
+      type     _LOGICAL
+      access   READ
+      default  false
+      prompt   'Histogram bin specification?'
+      help     'true - by bin width;  false - by number of bins.'
+   endparameter
+
+   parameter BINDET               # Flag: histogram bin details.
+      position 49
+      keyword  BINDET
+      type     _REAL
+      access   READ
+      default  40
+      prompt   'Histogram bin details:'
+      help     'Bin width or number of bins.'
+   endparameter
+
+   parameter NORML               # Flag: normalise histogram?
+      position 50
+      keyword  NORML
+      type     _LOGICAL
+      access   READ
+      default  false
+      prompt   'Normalise histogram?'
+      help     'Is the histogram to be normalised?'
+   endparameter
+
+   parameter QUIET           # Flag: operate in a quiet mode?
+      position 51
+      keyword  QUIET
+      type     _LOGICAL
+      access   READ
+      default  FALSE
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL'
+      association  '<->GLOBAL.CURSAQUIET'
+      prompt   'Quiet mode?'
+      help     'Operate in a quiet mode where warnings are suppressed.'
+   endparameter
+
+#
+# List of actions supported by catview.
+
+action OPEN
+   obey 
+     needs QUIET
+     needs GUI
+     needs CNAME
+   endobey
+endaction
+
+action SHOWCOL
+   obey 
+     needs QUIET
+     needs GUI
+   endobey
+endaction
+
+action DETCOL
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SHOWPAR
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action DETPAR
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SHOWTXT
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SHOWROWS
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SETCMP
+   obey 
+     needs QUIET
+     needs GUI 
+     needs CMPLST
+   endobey
+endaction
+
+action SHOWSEL
+   obey
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action CHOSEL
+   obey
+     needs QUIET
+     needs GUI 
+     needs SELNO
+   endobey
+endaction
+
+action SETSEL
+   obey 
+     needs QUIET
+     needs GUI 
+     needs EXPR
+   endobey
+endaction
+
+action SHOWRNG
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SETRNG
+   obey 
+     needs QUIET
+     needs GUI 
+     needs PNAME
+     needs MINRNG
+     needs MAXRNG
+   endobey
+endaction
+
+action SETROW
+   obey 
+     needs QUIET
+     needs GUI 
+     needs ROWNO
+   endobey
+endaction
+
+action LIST
+   obey
+     needs QUIET
+     needs GUI
+   endobey
+endaction
+
+action PREV
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SETSTAT
+   obey 
+     needs QUIET
+     needs GUI 
+     needs CMPSTT
+   endobey
+endaction
+
+action SETDECPL
+   obey 
+     needs QUIET
+     needs GUI 
+     needs DECPL
+   endobey
+endaction
+
+action STATS
+   obey 
+     needs QUIET
+     needs GUI 
+     needs SFNAME
+   endobey
+endaction
+
+action SCOPEN
+   obey 
+     needs QUIET
+     needs GUI 
+     needs GRPHDV
+     needs TITLE
+     needs XEXPR
+     needs YEXPR
+   endobey
+endaction
+
+action SCRANGE
+   obey 
+     needs QUIET
+     needs GUI 
+     needs AUTOSCL
+     needs CXMIN
+     needs CXMAX
+     needs CYMIN
+     needs CYMAX
+   endobey
+endaction
+
+action SCPLOT
+   obey 
+     needs QUIET
+     needs GUI 
+     needs PLTSYM
+     needs COLOUR
+   endobey
+endaction
+
+action SCSHRNG
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action SCLOSE
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action HSOPEN
+   obey 
+     needs QUIET
+     needs GUI 
+     needs GRPHDV
+     needs TITLE
+     needs XEXPR
+   endobey
+endaction
+
+action HSRANGE
+   obey 
+     needs QUIET
+     needs GUI 
+     needs AUTOSCL
+     needs CXMIN
+     needs CXMAX
+     needs BINSP
+     needs BINDET
+     needs NORML
+   endobey
+endaction
+
+action HSPLOT
+   obey 
+     needs QUIET
+     needs GUI
+     needs COLOUR
+   endobey
+endaction
+
+action HSSHRNG
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action HSCLOSE
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action FILE
+   obey 
+     needs QUIET
+     needs GUI 
+     needs FIRSTR
+     needs LASTR
+     needs FLNAME
+   endobey
+endaction
+
+action SAVECAT
+   obey 
+     needs QUIET
+     needs GUI 
+     needs CATOUT
+     needs CFLAG
+     needs TFLAG
+     needs COMM
+   endobey
+endaction
+
+action SHOWFMT
+   obey 
+     needs QUIET
+     needs GUI 
+     needs PNAME
+   endobey
+endaction
+
+action SETFMT
+   obey 
+     needs QUIET
+     needs GUI 
+     needs PNAME
+     needs UNITS
+     needs EXFMT
+   endobey
+endaction
+
+action SETCONF
+   obey 
+     needs QUIET
+     needs GUI 
+     needs SWID
+     needs SHT
+     needs SEQNO
+     needs NLIST
+     needs ANGRPN
+     needs ANGRF
+   endobey
+endaction
+
+action SETFILE
+   obey 
+     needs QUIET
+     needs GUI 
+     needs FPRINT
+     needs FPGSZE
+     needs FWID
+     needs FSUMM
+     needs FCOL
+     needs FPAR
+     needs FTXT
+     needs FTABL
+   endobey
+endaction
+
+action COLNAME
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action HELP
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+action EXIT
+   obey 
+     needs QUIET
+     needs GUI 
+   endobey
+endaction
+
+endinterface
