@@ -26,9 +26,11 @@
 *
 *     Additionally, references to the limit.h macros INT_MAX, INT_MIN 
 *     and UINT_MAX are replaced by INT_BIG_MAX, INT_BIG_MIN and 
-*     UINT_BIG_MAX respectively.  These may be defined on the compiler
-*     command line, or using a suitable header file (extreme.h), which
-*     would sensibly be included immediately after limit.h.
+*     UINT_BIG_MAX respectively.  If any of these substitutions are
+*     made, then a line '#include "extreme.h"' is added after the 
+*     '#include <limits.h>' line which is presumably in the file.
+*     If <limits.h> is not included in the input file, a warning is
+*     written to standard error.
 *
 *     Explicit declarations which are implicitly of type int will have
 *     an INT_BIG token inserted - for instance `static x, y;' will be
@@ -579,6 +581,7 @@
       int j;
       int lastspc;
       int leng = 0;
+      int limline = 0;
       int lost;
       int nlittok;
       int padding;
@@ -588,8 +591,10 @@
       int tn;
       int tbufsiz = 0;
       int tok;
+      int usedlimits = 0;
       char c;
       char c1;
+      char *cbuf;
       char *interp;
       char line[ 100 ];
       char *stlit;
@@ -647,12 +652,27 @@
             }
 
 /* Check for and change occurrences of symbolic constants. */
-         if ( idmatch( tbuf + i, "INT_MAX" ) )
+         if ( idmatch( tbuf + i, "INT_MAX" ) ) {
             subst( tbuf + i, "INT_BIG_MAX" );
-         if ( idmatch( tbuf + i, "INT_MIN" ) )
+            usedlimits = 1;
+         }
+         if ( idmatch( tbuf + i, "INT_MIN" ) ) {
             subst( tbuf + i, "INT_BIG_MIN" );
-         if ( idmatch( tbuf + i, "UINT_MAX" ) )
+            usedlimits = 1;
+         }
+         if ( idmatch( tbuf + i, "UINT_MAX" ) ) {
             subst( tbuf + i, "UINT_BIG_MAX" );
+            usedlimits = 1;
+         }
+
+/* Check for, and record position of, inclusion of the limits.h header file.
+   This is a good place to include extreme.h if it is needed. */
+         if ( tokmatch( tbuf + i, 
+                        CPP_INCLUDE, '<', IDENTIFIER, '.', IDENTIFIER, '>', 0 ) 
+              && idmatch( tbuf + i + 2, "limits" ) 
+              && idmatch( tbuf + i + 4, "h" ) ) {
+            limline = i + 6;
+         }
 
 /* Check for and warn about variable argument lists. */
          if ( t == DOTDOTDOT && t1 == ')' ) {
@@ -800,6 +820,33 @@
                warn = "Format string non-literal";
             }
             if ( *warn ) comment( tbuf + i, warn );
+         }
+      }
+
+/* If we have used any of the macros defined in extreme.h, we should 
+   arrange for inclusion of that at a place already identified. */
+      if ( usedlimits ) {
+         if ( limline ) {
+            char *incline = "#include \"extreme.h\"\n";
+            char *pc;
+            char *qc;
+
+            cbuf = memok( malloc( strlen( tbuf[ limline ].string ) + 
+                                  strlen( incline ) + 1 ) );
+            pc = tbuf[ limline ].string;
+            tbuf[ limline ].string = cbuf;
+            qc = cbuf;
+            while ( *(qc++) = *(pc++) ) {
+               if ( pc - 1 == tbuf[ limline ].strmat )
+                  tbuf[ limline ].strmat = qc - 1;
+               if ( pc[ -1 ] == '\n' && *incline ) {
+                  while ( *(qc++) = *(incline++) );
+                  qc--;
+               }
+            }
+         }
+         else {
+            fprintf( stderr, "%s: Nowhere to include \"extreme.h\"\n", name );
          }
       }
 
