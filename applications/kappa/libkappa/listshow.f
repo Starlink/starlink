@@ -40,7 +40,11 @@
 *     picture specified by parameter NAME. If possible, this alignment occurs 
 *     within the  co-ordinate Frame specified using parameter FRAME. If this 
 *     is not possible, alignment may occur in some other suitable Frame. A 
-*     message is displayed indicating the Frame in which alignment occurred.
+*     message is displayed indicating the Frame in which alignment occurred
+*     if parameter QUIET is set to FALSE. If the supplied positions are 
+*     aligned succesfully with a picture, then the range of Frames in which 
+*     the positions may be reported on the screen is extended to include all 
+*     those associated with the picture.
 
 *  Usage:
 *     listshow incat [frame] [first] [last] [plot] [device]
@@ -89,7 +93,11 @@
 *        If a null value (!) is supplied, positions are reported in the 
 *        co-ordinate Frame which was current when the positions list was 
 *        created. The user is re-prompted if the specified Frame is not
-*        available within the positions list. [!]
+*        available within the positions list. The range of Frames available
+*        will include all those read from the supplied positions list. In 
+*        addition, if the positions are being marked on a graphics device
+*        (see parameter PLOT), then all the Frames associated with the
+*        picture specified by parameter NAME will also be available. [!]
 *     GEODESIC = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Poly". It specifies whether the curves drawn between
@@ -300,6 +308,7 @@
       CHARACTER TEXT*(GRP__SZNAM)! Text buffer
       CHARACTER TITLE*80         ! Title from positions list
       INTEGER BFRM               ! Copy of original Frame 
+      INTEGER BINDEX             ! Frame index for supplied positions
       INTEGER F                  ! Index of first non-blank character
       INTEGER FIRST              ! Lowest position identifier to display
       INTEGER FSTPOS             ! Position of lowest identifier
@@ -324,6 +333,7 @@
       INTEGER LSTPOS             ! Position of highest identifier
       INTEGER MAP                ! AST pointer to original -> requested mapping
       INTEGER NBAX               ! No. of axes in original Frame
+      INTEGER NFRM               ! Number of Frames in Plot
       INTEGER NDISP              ! Number of selected positions
       INTEGER NINVAL             ! No. of invalid identifiers
       INTEGER NPOS               ! Total number of positions
@@ -419,8 +429,102 @@
 
       END IF
 
-*  Take a copy of the Base Frame in which the positions are defined.
+*  Take a copy of the Base Frame in which the positions are defined. Also
+*  note its index.
       BFRM = AST_COPY( AST_GETFRAME( IWCS, AST__BASE, STATUS ), STATUS )
+      BINDEX = AST_GETI( IWCS, 'BASE', STATUS )
+
+*  If we have access to a graphics picture, add in any co-ordinate Frames
+*  stored in the picture.
+*  ======================================================================
+
+*  If the positions are being displayed on the screen...
+      IF( ( PLOT .NE. 'NONE' .OR. LABEL ) .AND. 
+     :    STATUS .EQ. SAI__OK ) THEN
+
+*  Open the graphics device for plotting with PGPLOT, obtaining an
+*  identifier for the current AGI picture.
+         CALL AGP_ASSOC( 'DEVICE', 'UPDATE', ' ', .FALSE., IPIC0, 
+     :                   STATUS )
+
+*  If the device could not be opened, cancel the parameter association
+*  so that a different device will be used next time. Otherwise, the
+*  association is retained so that the same device will be used.
+         IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT .AND.
+     :      STATUS .NE. PAR__NULL ) THEN
+            CALL ERR_BEGIN( STATUS )
+            CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
+            CALL ERR_BEGIN( STATUS )
+         END IF
+
+*  PGPLOT resets the colour palette when the device is opened. Therefore we
+*  need to re-instate the colour palette set by the user, reading it from
+*  the HDS file kappa-palette.sdf in the users adam directory.
+         CALL KPG1_PLLOD( STATUS )
+
+*  Get the name of the picture to use, convert to upper case and remove 
+*  blanks.
+         CALL PAR_GET0C( 'NAME', PICNAM, STATUS )
+         CALL CHR_UCASE( PICNAM )
+         CALL CHR_RMBLK( PICNAM )
+
+*  If a null value was supplied, annul the error and use the current
+*  picture.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IPIC = IPIC0
+
+*  If the string BASE was supplied, use the BASE picture.
+         ELSE IF( PICNAM .EQ. 'BASE' ) THEN
+            CALL AGI_IBASE( IPIC, STATUS )
+            CALL AGI_SELP( IPIC, STATUS )
+
+*  Otherwise...
+         ELSE
+
+*  See if the current picture has the specified name or contains a picture
+*  with the specified NAME. If found, the picture becomes the current picture 
+*  and its AGI id is returned. If not found an error will be reported.
+            CALL KPG1_AGFND( PICNAM, IPIC, STATUS )
+
+*  If no picture was found, annul the error and use the original current 
+*  picture.
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               IPIC = IPIC0
+            END IF
+
+         END IF
+
+*  Set the PGPLOT viewport and AST Plot for the current picture.
+*  The PGPLOT viewport is set equal to the selected picture, with 
+*  world co-ordinates giving millimetres from the bottom left corner 
+*  of the view surface. The returned Plot may include a Frame with 
+*  Domain AGI_DATA representing AGI DATA co-ordinates (defined by a 
+*  TRANSFORM structure stored with the picture in the database).
+         CALL KPG1_GDGET( -1, AST__NULL, .TRUE., IPLOT, STATUS )
+
+*  Note the number of Frame sin the Plot.
+         NFRM = AST_GETI( IPLOT, 'NFRAME', STATUS )
+
+*  Merge the FrameSet read from the positions list with the Plot 
+*  obtained from the AGI database, aligning them in a suitable common 
+*  Frame. By preference, the Current Frame in the positions list is
+*  used. The Current Frame in the FrameSet becomes the Current 
+*  Frame in the Plot
+         CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', QUIET, 2, STATUS )
+
+*  Use the merged plot instead of the FrameSet.
+         CALL AST_ANNUL( IWCS, STATUS )
+         IWCS = AST_CLONE( IPLOT, STATUS )
+
+*  Modify BINDEX so that it gives the index within IPLOT of the Frame in 
+*  which positions were supplied. The Frames in IWCS are added onto the
+*  end of the Plot by KPG1_ASMRG, so the index just increases by the number
+*  of Frames in the Plot.
+         BINDEX = BINDEX + NFRM
+         
+      END IF
 
 *  Set the Current Frame in the FrameSet to the requested Frame. If the
 *  requested Frame is not available in the positions list, re-prompt for 
@@ -435,7 +539,7 @@
       NRAX = AST_GETI( IWCS, 'NAXES', STATUS )
 
 *  Get the Mapping which produces positions in the required Frame. 
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT,
+      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, BINDEX, AST__CURRENT,
      :                                    STATUS ), STATUS )
 
 *  Abort if an error occurred.
@@ -501,11 +605,11 @@
 *  Create an output positions list if required.
       IF( TITLE .EQ. ' ' ) THEN
          CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, %VAL( IPW1 ),
-     :                    AST__BASE, IWCS, 'Output from LISTSHOW', 
+     :                    BINDEX, IWCS, 'Output from LISTSHOW', 
      :                    0, %VAL( IPW0 ), .TRUE., STATUS )
       ELSE
          CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, %VAL( IPW1 ),
-     :                    AST__BASE, IWCS, TITLE, 
+     :                    BINDEX, IWCS, TITLE, 
      :                    0, %VAL( IPW0 ), .TRUE., STATUS )
       END IF
 
@@ -568,29 +672,10 @@
 
       END IF
 
-*  Produce any required graphics or labels.
+*  Produce any required graphics or labels. The device was opened earlier
+*  and a Plot created (now pointed to by IWCS).
       IF( ( PLOT .NE. 'NONE' .OR. LABEL ) .AND. 
      :    STATUS .EQ. SAI__OK ) THEN
-
-*  Open the graphics device for plotting with PGPLOT, obtaining an
-*  identifier for the current AGI picture.
-         CALL AGP_ASSOC( 'DEVICE', 'UPDATE', ' ', .FALSE., IPIC0, 
-     :                   STATUS )
-
-*  If the device could not be opened, cancel the parameter association
-*  so that a different device will be used next time. Otherwise, the
-*  association is retained so that the same device will be used.
-         IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT .AND.
-     :      STATUS .NE. PAR__NULL ) THEN
-            CALL ERR_BEGIN( STATUS )
-            CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
-            CALL ERR_BEGIN( STATUS )
-         END IF
-
-*  PGPLOT resets the colour palette when the device is opened. Therefore we
-*  need to re-instate the colour palette set by the user, reading it from
-*  the HDS file kappa-palette.sdf in the users adam directory.
-         CALL KPG1_PLLOD( STATUS )
 
 *  KPS1_LSHPL may need work space to hold the GRAPHICS positions.
          CALL PSX_CALLOC( 2*NDISP, '_DOUBLE', IPW3, STATUS )
@@ -598,60 +683,11 @@
 *  Abort the graphics section if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 998
 
-*  Get the name of the picture to use, convert to upper case and remove 
-*  blanks.
-         CALL PAR_GET0C( 'NAME', PICNAM, STATUS )
-         CALL CHR_UCASE( PICNAM )
-         CALL CHR_RMBLK( PICNAM )
-
-*  If a null value was supplied, annul the error and use the current
-*  picture.
-         IF( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            IPIC = IPIC0
-
-*  If the string BASE was supplied, use the BASE picture.
-         ELSE IF( PICNAM .EQ. 'BASE' ) THEN
-            CALL AGI_IBASE( IPIC, STATUS )
-            CALL AGI_SELP( IPIC, STATUS )
-
-*  Otherwise...
-         ELSE
-
-*  See if the current picture has the specified name or contains a picture
-*  with the specified NAME. If found, the picture becomes the current picture 
-*  and its AGI id is returned. If not found an error will be reported.
-            CALL KPG1_AGFND( PICNAM, IPIC, STATUS )
-
-*  If no picture was found, annul the error and use the original current 
-*  picture.
-            IF( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_ANNUL( STATUS )
-               IPIC = IPIC0
-            END IF
-
-         END IF
-
-*  Set the PGPLOT viewport and AST Plot for the current picture.
-*  The PGPLOT viewport is set equal to the selected picture, with 
-*  world co-ordinates giving millimetres from the bottom left corner 
-*  of the view surface. The returned Plot may include a Frame with 
-*  Domain AGI_DATA representing AGI DATA co-ordinates (defined by a 
-*  TRANSFORM structure stored with the picture in the database).
-         CALL KPG1_GDGET( -1, AST__NULL, .TRUE., IPLOT, STATUS )
-
-*  Merge the FrameSet read from the positions list with the Plot 
-*  obtained from the AGI database, aligning them in a suitable common 
-*  Frame. By preference, the Current Frame in the positions list is
-*  used. The Current Frame in the FrameSet becomes the Current 
-*  Frame in the Plot
-         CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', QUIET, 2, STATUS )
-
 *  Set the plotting style.
-         CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IPLOT, STATUS )
+         CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IWCS, STATUS )
 
 *  Produce the graphics.
-         CALL KPS1_LSHPL( IPLOT, NDISP, NRAX, %VAL( IPW2 ), PLOT,
+         CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( IPW2 ), PLOT,
      :                    GEO, IMARK, CLOSE, LABEL, IGRP2, %VAL( IPID ), 
      :                    %VAL( IPW3 ), STATUS )
 

@@ -17119,13 +17119,15 @@ Description:
    axis values can be controlled using parameter STYLE.
 
    Graphics may also be drawn marking the selected positions (see
-   parameters PLOT and LABEL). If a DATA picture can be found on the
-   specified graphics device, the supplied positions are aligned with the
-   DATA picture. If no DATA picture is found, positions are aligned with
-   the current picture. If possible, this alignment occurs within the
-   co-ordinate Frame specified using parameter FRAME. If this is not
-   possible, alignment may occur in some other suitable Frame. A message
-   is displayed indicating the Frame in which alignment occurred.
+   parameters PLOT and LABEL). The supplied positions are aligned with
+   the picture specified by parameter NAME. If possible, this alignment
+   occurs within the co-ordinate Frame specified using parameter FRAME.
+   If this is not possible, alignment may occur in some other suitable
+   Frame. A message is displayed indicating the Frame in which alignment
+   occurred if parameter QUIET is set to FALSE. If the supplied positions
+   are aligned succesfully with a picture, then the range of Frames in
+   which the positions may be reported on the screen is extended to
+   include all those associated with the picture.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 CLOSE
@@ -17178,7 +17180,11 @@ FRAME = LITERAL (Read)
    If a null value (!) is supplied, positions are reported in the
    co-ordinate Frame which was current when the positions list was
    created. The user is re-prompted if the specified Frame is not
-   available within the positions list. [!]
+   available within the positions list. The range of Frames available
+   will include all those read from the supplied positions list. In
+   addition, if the positions are being marked on a graphics device (see
+   parameter PLOT), then all the Frames associated with the picture
+   specified by parameter NAME will also be available. [!]
 3 GEODESIC
 GEODESIC = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
