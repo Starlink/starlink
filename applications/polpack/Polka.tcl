@@ -735,10 +735,18 @@
 # Add menu items to the Dump and Restore sub-menus.
    $dumpmenu add command -label "Everything " -command {Dump ""} -accelerator "Ctrl-d"
    $dumpmenu add command -label "Masks Only  " -command {DumpMask ""} 
+   $dumpmenu add command -label "Displayed image" -command {DumpImage ""} 
+   MenuHelp $dumpmenu "Everything " ".  Dump feature positions, mappings and masks for all images, plus all option settings, to a text file."
+   MenuHelp $dumpmenu "Masks Only  " ".  Dump the O and E ray masks for the reference image to a text file."
+   MenuHelp $dumpmenu "Displayed image" ".  Dump feature positions and masks for the displayed image to a text file."
    bind . <Control-d> {Dump ""}
 
    $restmenu add command -label "Everything " -command {Restore ""} -accelerator "Ctrl-r"
    $restmenu add command -label "Masks Only  " -command {RestoreMask ""} 
+   $restmenu add command -label "Displayed image" -command {RestoreImage ""} 
+   MenuHelp $restmenu "Everything " ".  Restore feature positions, mappings and masks for all images, plus all option settings, from a text file."
+   MenuHelp $restmenu "Masks Only  " ".  Restore the O and E ray masks for the reference image from a text file."
+   MenuHelp $restmenu "Displayed image" ".  Restore feature positions and masks for the displayed image from a text file."
    bind . <Control-r> {Restore ""}
 
 # Add menu items to the Effects menu.

@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, TVAR, IGRP2, INDFO, INDFC, NITER, 
-     :                       NSIGMA, ILEVEL, HW, STATUS )
+     :                       NSIGMA, ILEVEL, HW, SETVAR, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
 *                      TVAR, IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
-*                      HW, STATUS )
+*                      HW, SETVAR, STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -98,6 +98,10 @@
 *        The half size of the box to use when smoothing STokes vectors
 *        prior to estimating input variances (in pixels). The full size
 *        used is 2*HW + 1.
+*     SETVAR = LOGICAL (Given)
+*        If TRUE, and if WSCH is 2, then a constant value is stored in the 
+*        VARIANCE component of each input NDF on exit. This constant value 
+*        is the mean variance estimated in the image.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -143,6 +147,7 @@
       REAL NSIGMA
       INTEGER ILEVEL
       INTEGER HW
+      LOGICAL SETVAR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -185,7 +190,7 @@
       INTEGER NEL                ! No. of elements in whole output NDF
       INTEGER NW                 ! No. of elements in work array
       INTEGER UBND( 3 )          ! Upper bounds of output NDF
-
+      LOGICAL CANDO              ! Is write access available?
 *.
 
 *  Check the inherited global status.
@@ -391,6 +396,46 @@
          IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
          GO TO 10
       END IF
+
+*  If required set the VARIANCE component of each input NDF to the mean
+*  variance found above.
+      IF( SETVAR .AND. WSCH .EQ. 2 .AND. STATUS .EQ. SAI__OK ) THEN
+
+         IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG1', 
+     :           ' Storing constant VARIANCE values in the input NDFs:', 
+     :                                      STATUS )
+
+         DO I = 1, NNDF
+            CALL NDG_NDFAS( IGRP1, I, 'UPDATE', INDF, STATUS )
+            CALL NDF_MSG( 'NDF', INDF )
+
+            CALL NDF_ISACC( INDF, 'WRITE', CANDO, STATUS ) 
+
+            IF( .NOT. CANDO ) THEN
+               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG2', 
+     :                    '   ^NDF : (NDF is write protected)', STATUS )
+
+            ELSE IF( TVAR( I ) .GT. 0.0 .AND. 
+     :           TVAR( I ) .NE. VAL__BADR ) THEN
+               CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'WRITE', IPVIN, 
+     :                       EL, STATUS )
+               CALL MSG_SETR( 'VAR', TVAR( I ) )
+               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG3', 
+     :                    '   ^NDF : ^VAR', STATUS )
+               CALL POL1_FILLR( TVAR( I ), EL, %VAL( IPVIN ), STATUS )
+
+            ELSE
+               CALL NDF_RESET( INDF, 'VARIANCE', STATUS )
+               IF( ILEVEL .GT. 0 ) CALL MSG_OUT( 'POL1_SNGSV_MSG4', 
+     :                    '   ^NDF : (undefined)', STATUS )
+
+            END IF
+   
+            CALL NDF_ANNUL( INDF, STATUS )
+         END DO
+
+      END IF
+
 
 *  Tidy up
 *  =======

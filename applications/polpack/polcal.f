@@ -70,10 +70,12 @@
 *        adopted (in dual-beam mode). A value of 2 produces more verbose 
 *        output including details of each iteration in the iterative
 *        processes used by both dual and single beam modes. [1]
-*     IN = NDF (Read)
+*     IN = NDF (Update)
 *        A group specifying the names of the input intensity images. This
 *        may take the form of a comma separated list, or any of the other 
-*        forms described in the help on "Group Expressions".
+*        forms described in the help on "Group Expressions". Read access
+*        only is required unless the SETVAR parameter is assigned a TRUE
+*        value.
 *     MAXIT = _INTEGER (Read)
 *        This parameter is only accessed by the dual-beam algorithm. It
 *        specifies the maximum number of iterations to be used when 
@@ -116,6 +118,13 @@
 *        circular mode, the only legal values for the POLPACK extension 
 *        item "WPLATE" are 0.0 and 45.0. Currently, the single-beam algorithm 
 *        can only perform linear polarimetry. [LINEAR]
+*     SETVAR = _REAL (Read)
+*        This parameter is only accessed by the single-beam algorithm.
+*        If a TRUE value is supplied for SETVAR, and if the variances in 
+*        the input images are being estimated (see parameter WEIGHTS), then
+*        the final mean variance estimate found for each input image will
+*        be stored as a constant value in the VARIANCE component of the input 
+*        image. [FALSE]
 *     SKYSUP = _REAL (Read)
 *        This parameter is only accessed by the dual-beam algorithm. It is
 *        a positive "sky noise suppression factor" used to control the

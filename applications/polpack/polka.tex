@@ -823,7 +823,7 @@ termination of POLKA, and the creation of the output images. They are:
 \subsubsection {\mylabel{POLKA_DUMP}{\em Dump}} 
 Dumps information describing supplied features and masks to a text file 
 on disk which can be restore in a subsequent run of POLKA, using the 
-\htmlref{{\em Restore}}{POLKA_RESTORE} command. There are two
+\htmlref{{\em Restore}}{POLKA_RESTORE} command. There are three
 options:
 
 \begin{description}
@@ -839,9 +839,14 @@ which existed when the dump file was created.
 and $E$ ray masks from the first (reference) image. This can be useful
 as a means of saving masks to be re-used in several different runs.
 
+\item [{\em Displayed image}] - Creates a new text file holding the
+feature positions, the $O$ and $E$ ray masks and the sky area masks from the 
+currently displayed image. This can be useful if you want to re-use the
+same image in several runs.
+
 \end{description}
 
-In either case, you supply the name of the text file in a simple dialog
+In all cases, you supply the name of the text file in a simple dialog
 box (you are asked for confirmation if you specify the name of an
 existing file).
 
@@ -855,7 +860,7 @@ have been saved.
 \subsubsection {\mylabel{POLKA_RESTORE}{\em Restore}} 
 This restores features lists, masks, mappings, etc, from a text file
 created earlier using the \htmlref{{\em Dump}}{POLKA_DUMP} command.
-\htmlref{{\em Restore}}{POLKA_RESTORE} command. There are two
+\htmlref{{\em Restore}}{POLKA_RESTORE} command. There are three
 options:
 
 \begin{description}
@@ -869,6 +874,9 @@ file, then the extra images are left unchanged.
 
 \item [{\em Masks Only}] - Reads an $O$ and an $E$ ray mask from the supplied
 file, and assigns them to all images, replacing any existing masks.
+
+\item [{\em Displayed Image}] - Restores feature positions, masks, and
+sky areas for the currently displayed image, replacing any existing values. 
 
 \end{description}
 

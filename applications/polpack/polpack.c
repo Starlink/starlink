@@ -61,10 +61,11 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
                         INTEGER(SKYPAR), INTEGER(IGRP4), LOGICAL(DBEAM),
-                        CHARACTER(MODE), LOGICAL(POL), INTEGER(STATUS) 
+                        CHARACTER(MODE), LOGICAL(POL), CHARACTER(REFIM), 
+                        INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
-                        TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) ){
+                        TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) TRAIL(REFIM) ){
 /*
 *  Name:
 *     doplka
@@ -155,6 +156,9 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     POL = LOGICAL (Given)
 *        Are we processing polarimeter data? This controls the types of 
 *        mappings available.
+*     REFIM = CHARACTER (Given)
+*        The name of the reference image. If blank, then the first image
+*        in IGRP1 will be used.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -209,6 +213,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_LOGICAL(POL)
    GENPTR_INTEGER(STATUS)
    GENPTR_CHARACTER(MODE)
+   GENPTR_CHARACTER(REFIM)
 
 #define BUFLEN 512
 
@@ -247,11 +252,20 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       return;
    } 
 
+/* If a reference image was supplied store its name, in the "in_list"
+   variable. Also set REFONLY. */
+   if( cnf_lenf( REFIM, REFIM_length ) > 0 ) {
+      SetSVar( fd, "in_list", REFIM, REFIM_length, STATUS );
+      SetVar( fd, "REFONLY", "1", 0, STATUS );
+   } else {
+      SetVar( fd, "REFONLY", "0", 0, STATUS );
+   }
+
 /* Get the number of images to process. */
    F77_CALL(grp_grpsz)( INTEGER_ARG(IGRP1), INTEGER_ARG(&size),
                         INTEGER_ARG(STATUS) );
 
-/* Store the name of the input images in the file as variable "in_list". */
+/* Append the name of the input images in the file to variable "in_list". */
    for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
       name = GetName( *IGRP1, i, STATUS );
       SetVar( fd, "in_list", name, 1, STATUS );

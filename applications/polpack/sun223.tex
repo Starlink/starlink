@@ -21,7 +21,20 @@
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
-calculation of Stokes parameters, and display of vector maps.}
+calculation of Stokes parameters, and display of vector maps.
+\newpage
+\begin{center}
+\vspace*{3in}
+\parbox{5in}{
+{\large
+\emph{The polarization map on the front cover shows 850 $\mu$m dust grain 
+emission in the cloud core W3. The map shows large scale magnetic fields
+in this region of high-mass star-formation. The data were obtained with
+the SCUBA polarimeter on the James Clerk Maxwell Telescope  (operated by 
+the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
+}}}
+\end{center}
+}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -234,6 +247,7 @@ calculation of Stokes parameters, and display of vector maps.}
 \renewcommand{\dash}{-}
 \end{htmlonly}
 \newcommand{\STARURL}{http://www.starlink.rl.ac.uk}
+\newcommand{\TCLURL}{http://www.scriptics.com/}
 \newcommand{\IRAFURL}{http://www.starlink.rl.ac.uk/iraf/web/iraf-homepage.html}
 \newcommand{\STORE}{http://www.starlink.rl.ac.uk/cgi-bin/storetop}
 
@@ -533,7 +547,7 @@ calculation of Stokes parameters, and display of vector maps.}
 
 % ? Add picture here if required for the LaTeX version.
    \begin{center}
-   \includegraphics[clip,scale=0.6]{sun223_figures/map2.eps}
+   \includegraphics[clip,scale=1.0]{sun223_figures/fig.eps}
    \end{center}
 % ? End of picture
 
@@ -555,7 +569,7 @@ calculation of Stokes parameters, and display of vector maps.}
       \stardocmanual
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-   \htmlfig{map2}{map2.gif}{}
+   \htmlfig{map2}{fig.gif}{}
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
    \stardoccategory\ \stardocnumber \\
@@ -1358,7 +1372,8 @@ command:
 \end{myquote}
 
 This command must be issued before attempting to use any POLPACK
-applications. 
+applications. POLPACK is also available from the \xref{ICL}{sg5}{}
+\latexonly{(see SG/5)} command language, and the IRAF cl.
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -1893,52 +1908,6 @@ These are just a few examples of the possibilities for varying the above
 recipe. Familiarity with the parameters of the relevant KAPPA and POLPACK
 applications will suggest many more.
 
-As a final  example, the map displayed on the front of this document was
-created using the following script:
-
-\begin{myquote}
-\begin{verbatim}
-   % rm gks*.ps* total.ps
-   % gdset epsfcol_p
-   % gdclear
-   % picdef mode=cc fraction=0.55 nooutline
-   % contour nokey noaxes noborder "ndf=sm(150:221,100:190)" mode=per \
-             percentiles=\[60,70,80,90,99\]
-   % piclist picnum=1
-   % polplot noclear style=^style.dat bincat vscale=7 keyvec=10 \
-             keystyle=^keystyle.dat keypos=0.06
-   % psmerge gks74.ps.5 gks74.ps.4 > total.ps
-   % ghostview total.ps
-\end{verbatim}
-\end{myquote}
-
-The text file \texttt{style.dat} specifies the style with which to draw the 
-vector map, and contains:
-
-\begin{myquote}
-\begin{verbatim}
-   colour(vec)=red
-   colour(border)=blue
-   colour(ticks)=blue
-   title=Polarization map
-   size(title)=2.5
-   textlabgap=0.07
-   titlegap=0.07
-   labelunits=0
-\end{verbatim}
-\end{myquote}
-
-The text file \texttt{keystyle.dat} specifies the style with which to draw the 
-vector key, and contains:
-
-\begin{myquote}
-\begin{verbatim}
-size=1.8
-\end{verbatim}
-\end{myquote}
-
-
-
 \subsection{\xlabel{gettinghelp}Getting Help}
 Information describing all POLPACK commands is available in several forms: 
 \begin{itemize}
@@ -2069,6 +2038,87 @@ quoted strings \texttt{""} and vector braces \texttt{[ ]} must be protected
 by using either the escape character {\small \verb+\+} or by single
 quotes (wild-card characters must be protected as these are expanded
 internally by POLPACK, rather than by the shell).
+
+\section{Running from the IRAF cl}
+POLPACK is written for the \xref{Starlink software environment}{sg5}{},
+but may also be run from the \htmladdnormallink{IRAF}{\IRAFURL} cl,
+reading and writing IRAF \texttt{.imh} image files using the `on-the-fly'
+data-conversion facilities described \hyperref{here} {in section }{}
+{SEC:CONVERT}.
+
+Assuming that all the \htmlref{required software}{required_software}
+has been installed in the \xref{recommended way}{sun217}
+{installing_the_starlink_software} and IRAF initialised as usual, the 
+POLPACK may be loaded at the cl prompt by:
+
+\begin{myquote} 
+\begin{verbatim}
+cl> polpack
+\end{verbatim} 
+\end{myquote}
+
+the menu of commands will be displayed as for normal IRAF packages and
+applications are invoked and help obtained in the normal way. However,
+the IRAF Cl is not the Starlink software environment, and you will find
+some differences in the way POLPACK behaves when run from the two
+environments (other than the obvious ones like the way parameters are
+prompted for). These include:
+
+\begin{itemize}
+
+\item The \htmlref{POLHELP}{POLHELP} command is not available. Use the
+IRAF help system instead.
+
+\item In transforming data from NDF to IRAF format, some information may
+be lost. In particular, any VARIANCE component in an NDF will be lost and
+so variance estimates will not be made by POLPACK. Also, bad pixels
+within NDFs will be replaced by the value zero when converted to IRAF
+format.
+
+\item Some of the Starlink packages which you may be used to using with
+POLPACK may not be available under IRAF. For instance, at the moment the
+\xref{CURSA}{sun190}{} package which can be used to manipulate catalogues of
+polarization vectors is not available under IRAF.
+
+\end{itemize}
+
+The experienced IRAF user will also detected some differences between the
+way POLPACK runs under cl and the way standard IRAF packages run under cl
+\dash\ in the areas of graphics and parameter handling for instance. Some
+general guidance on running Starlink applications from IRAF cl is given in 
+\xref{SUN/217}{sun217}{}. A description, intended for programmers, of the 
+way Starlink packages are set up for use with IRAF, and some technical 
+detail about how the system works is in \xref{SSN/35}{ssn35}{}.
+
+\subsection{Required Software}
+To run POLPACK applications from IRAF cl you will require the following
+Starlink software items in addition to POLPACK:
+
+\begin{description}
+
+\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability 
+infrastructure.
+
+\item[\xref{TCLSYS}{sun200}{}] The Starlink distribution of 
+\htmladdnormallink{Tcl}{\TCLURL} and associated items. 
+
+\item[\xref{STARTCL}{sun186}{}] Starlink extensions to Tcl \dash\ including
+the TCL/GWM Xdisplay Widget.
+
+\item[RUNTIME] Miscellaneous items of software required by most applications
+at runtime.
+
+\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the 
+automatic data-conversion facilities are to be used.
+
+\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during 
+installation of Starlink software.
+
+\end{description}
+
+More details on this, including how to obtain and install the software are in
+\xref{SUN/217}{sun217}{installing_the_starlink_software}
+\latexonly{ Appendix A}.
 
 \section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
 Several of the POLPACK applications have parameters which are described
@@ -2705,11 +2755,13 @@ for NDF applications.
          processes used by both dual and single beam modes. [1]
       }
       \sstsubsection{
-         IN = NDF (Read)
+         IN = NDF (Update)
       }{
          A group specifying the names of the input intensity images. This
-         may take the form of a comma separated list, or any of the other
-         forms described in the help on {\tt "}Group Expressions{\tt "}.
+         may take the form of a comma separated list, or any of the other 
+         forms described in the help on ``Group Expressions''. Read access
+         only is required unless the SETVAR parameter is assigned a TRUE
+         value.
       }
       \sstsubsection{
          MAXIT = \_INTEGER (Read)
@@ -2767,6 +2819,16 @@ for NDF applications.
          circular mode, the only legal values for the POLPACK extension
          item {\tt "}WPLATE{\tt "} are 0.0 and 45.0. Currently, the single-beam algorithm
          can only perform linear polarimetry. [LINEAR]
+      }
+      \sstsubsection{
+         SETVAR = \_REAL (Read)
+      }{
+         This parameter is only accessed by the single-beam algorithm.
+         If a TRUE value is supplied for SETVAR, and if the variances in 
+         the input images are being estimated (see parameter WEIGHTS), then
+         the final mean variance estimate found for each input image will
+         be stored as a constant value in the VARIANCE component of the input 
+         image. [FALSE]
       }
       \sstsubsection{
          SKYSUP = \_REAL (Read)
@@ -5866,17 +5928,20 @@ estimate of the mean noise level in each input image. Note, though, that
 these RMS values are not used in the above algorithm, which gives equal
 weight to all input images. 
 
-You may want to run POLCAL twice; the first time just to estimate the mean
-noise level in each input image, and the second time to use these mean
-noise levels to calculate the Stokes vectors. The first time you set
-parameter WEIGHTS to 3, to cause the input variances to be estimated.
-You then use the KAPPA application \xref{SETVAR}{sun95}{SETVAR} 
-to set the variances in each input image to the constant value
-displayed by the final iteration of POLCAL. You then re-run POLCAL
+There is an option for POLCAL to store these mean variance values in the
+VARIANCE components of the input images (see parameter SETVAR). If this
+option is selected, the VARIANCE array in each input image is filled with 
+a constant value equal to the mean variance in the image estimated on the
+final iteration.
+
+So you may want to run POLCAL twice; the first time just to estimate the
+mean noise level in each input image, and the second time to use these
+mean noise levels to calculate the Stokes vectors. The first time you set
+parameter WEIGHTS to 3 and SETVAR to TRUE, causing the input variances to
+be estimated and stored in the input images. You then re-run POLCAL
 setting parameter WEIGHTS to 1 in order to use these variances. This
 would then produce Stokes vectors in which the better input images have
 higher weight.
-
 
 \subsection{Using POLSIM to Investigate Noise Characteristics}
 The \htmlref{POLSIM}{POLSIM} application is a useful tool for
@@ -5952,10 +6017,14 @@ single-beam data.
 single-beam mode.
 
 \item POLPACK (including \htmlref{POLKA}{POLKA}) may now be used from the
-ICL command language.
+ICL and IRAF cl command languages.
 
 \item The NEWCOLMAP parameter has been removed from \htmlref{POLKA}{POLKA}.
 POLKA will now use a private colour map automatically when necessary.
+
+\item The Dump and Restore commands in the \htmlref{POLKA}{POLKA} File menu
+now have an option to dump and restore the feature positions, masks and sky 
+areas for the display image alone to a text file.
 
 \item A new command called \htmlref{POLSIM}{POLSIM} has been added, which
 creates simulated intensity data from a cube of Stokes vectors and a set

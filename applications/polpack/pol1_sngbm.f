@@ -40,6 +40,10 @@
 *        This parameter is not prompted for if NITER is zero. [3.0]
 *     OUT = NDF (Write)
 *        The output NDF holding the Stokes vector cube.
+*     SETVAR = _LOGICAL (Read)
+*        Should the mean variance estmate in each input NDF be stored
+*        as a constant value in the VARIANCE component of each input NDF?
+*        Only accessed if input variances are being estimated.
 *     SMBOX = _INTEGER (Read)
 *        The size of the box to use when smoothing Stokes vectors prior to
 *        estimating the input variances (in pixels). Only accessed if input 
@@ -137,6 +141,7 @@
       INTEGER WSCH               ! Weighting scheme to use
       LOGICAL INVAR              ! Use input variances?
       LOGICAL OUTVAR             ! Create output variances?
+      LOGICAL SETVAR             ! Store input variance estimates?
       REAL ANGROT                ! ACW angle from +X to o/p ref. direction
       REAL NSIGMA                ! Rejection threshold
 *.
@@ -340,19 +345,22 @@
       END IF
 
 *  Get the size of the box to use when smoothing Stokes vectors prior to 
-*  estimating input variances.
+*  estimating input variances. Also see if the estimated variances should
+*  be stored in the input NDFs. 
       IF( WSCH .EQ. 2 ) THEN
          CALL PAR_GET0I( 'SMBOX', SMBOX, STATUS )
          SMBOX = MAX( 0, SMBOX )
+         CALL PAR_GET0L( 'SETVAR', SETVAR, STATUS )
       ELSE
          SMBOX = 1
+         SETVAR = .FALSE.
       END IF
 
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), IGRP2, INDFO, INDFC, NITER, 
-     :                 NSIGMA, ILEVEL, SMBOX/2, STATUS )
+     :                 NSIGMA, ILEVEL, SMBOX/2, SETVAR, STATUS )
 
 *  Tidy up.
 *  ========

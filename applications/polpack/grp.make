@@ -8,7 +8,7 @@
 #  .eps files holding figures used in sun223
 FIGS = grids.eps dataflow.eps optical.eps extract.eps polext.eps \
 polka.eps map2.eps gaia1.eps gaia2.eps gaia3.eps effan.eps \
-quadfit.eps varest.eps singopt.eps 
+quadfit.eps varest.eps singopt.eps fig.eps
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.

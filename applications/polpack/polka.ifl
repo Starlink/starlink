@@ -217,6 +217,16 @@ interface POLKA
       helpkey  '*'
    endparameter
 
+   parameter REFIN 
+      type     NDF
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Reference frame'
+      helpkey  '*'
+   endparameter
+
    parameter SELCOL
       type     LITERAL
       access   UPDATE

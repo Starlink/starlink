@@ -3429,7 +3429,7 @@ proc Dump {file} {
 #     Dump
 #
 #  Purpose:
-#     Dump the current positions lists. masks, and options to a text file 
+#     Dump the current positions lists, masks, and options to a text file 
 #     which can be restored later (using procedure Restore).
 #
 #  Arguments:
@@ -3536,6 +3536,93 @@ proc Dump {file} {
       foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL PSF_SIZE INTERP FITTYPE OEFITTYPE SKYPAR VIEW XHAIR SKYOFF HAREA SAREA" {
          upvar #0 $var gvar
          puts $fd [list $var $gvar]
+      }
+
+# Close the output dump file.
+      close $fd
+
+# Indicate a dump was made.
+      set ret 1
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+   }
+
+   return $ret
+}
+
+proc DumpImage {file} {
+#+
+#  Name:
+#     DumpImage
+#
+#  Purpose:
+#     Dump the current positions list and masks for the displayed image to a 
+#     text file which can be restored later (using procedure Restore).
+#
+#  Arguments:
+#     file 
+#        If supplied non-blank, then the dump is written to the specified
+#        file (any existing file with the same name is over-written).
+#        Otherwise, the user is asked to supply a file name.
+#
+#
+#  Returned Value:
+#     1 if a succesful dump was performed, zero otherwise.
+#
+#-
+   global E_RAY_FEATURES 
+   global E_RAY_MASK
+   global IMAGE_DISP
+   global O_RAY_FEATURES 
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
+   global PNTPX
+   global PNTPY
+   global PNTNXT
+   global PNTLBL
+   global PNTTAG
+
+# Assume no dump is made.
+   set ret 0
+
+# Open the supplied file, or open a file specified by the user.
+   if { $file != "" } {
+      if { [catch { set fd [open $file "w"]} ] } {
+         set ok 0
+      } {
+         set ok 1
+      }
+
+   } {
+      set ok [OpenFile "w" "Dump output file" \
+                           "Give name of dump file to create:" file fd] 
+   }
+
+# Only proceed if a file was opened.
+   if { $ok } {
+
+# Tell the user what is happening.
+      set told [SetInfo "Dumping image positions list and masks to disk..." 0]
+
+# Loop round all images...
+      set image $IMAGE_DISP
+
+# Loop round each object type...
+      foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                           $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Write out the number of posisions in this list.
+         puts $fd [llength $PNTPX($image,$object)]
+
+# Write out the arrays holding information describing the list.
+         puts $fd $PNTPX($image,$object)
+         puts $fd $PNTPY($image,$object)
+         puts $fd $PNTNXT($image,$object)
+         puts $fd $PNTLBL($image,$object)
+         puts $fd $PNTTAG($image,$object)
       }
 
 # Close the output dump file.
@@ -10438,6 +10525,158 @@ proc Restore {file} {
 
 }
 
+proc RestoreImage {file} {
+#+
+#  Name:
+#     RestoreImage
+#
+#  Purpose:
+#     Restore positions lists and masks for the currently displayed image.
+#
+#  Arguments:
+#     file 
+#        If supplied non-blank, then the dump is read from the specified
+#        file. Otherwise, the user is asked to supply a file name.
+#
+#
+#  Returned Value:
+#     1 if a succesful dump was performed, zero otherwise.
+#-
+   global E_RAY_FEATURES 
+   global E_RAY_MASK
+   global IMAGE_DISP
+   global O_RAY_FEATURES 
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
+   global PNTCY
+   global PNTCX
+   global PNTID
+   global PNTNXT
+   global PNTVID
+   global PNTLBL
+
+# Open an existing dump file, either the supplied one, or one specified by
+# the user.
+   if { $file != "" } {
+      set backup 1
+      if { [catch {set fd [open $file "r"]} mess] } {
+         Message "Could not restore original positions lists and masks.\n\n\"$mess\"."
+         set ok 0
+      } {
+         set ok 1
+      }
+      set info "Restoring original positions lists and masks."
+   } {
+      set backup 0
+      set ok [OpenFile "r" "Dump file" "Give name of dump file to read:" file fd]
+      set info "Restoring positions lists and masks for currently displayed image from disk."
+   }
+
+# Only proceed if a file was opened.
+   if { $ok } {
+
+# Tell the user what is happening.
+      set told [SetInfo $info 0]
+
+# Set a flag indicating that the supplied file is a valid dump file.
+      set bad 0
+
+# If the user supplied the dump file, dump the current positions, masks, etc, 
+# so that they can be restored if anything goes wrong. Abort if the dump fails.
+      if { !$backup } {
+         set safefile [UniqueFile]
+         if { ![DumpImage $safefile] } {
+            Message "Unable to create backup dump of current positions."
+            set bad 1
+         }
+      }
+
+# Check that no error has occured and sve the name of the currently
+# displayed image.
+      if { !$bad } { 
+         set image $IMAGE_DISP
+
+# Loop round each object type...
+         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                              $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Delete the existing positions.
+            while { [NumPosn "" $image $object] > 0 } {
+               DelPosn 0 0 $image $object
+            }
+
+# Get the number of positions in this list ($npnt).
+            if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
+               set bad 1
+            } 
+
+# Read the arrays holding information describing the list.
+            foreach item "PX PY NXT LBL TAG" {
+               set aryname "PNT${item}"
+               upvar #0 $aryname ary 
+
+               if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
+                  set bad 1
+               } 
+
+# Store the new array values.
+               if { !$bad } {
+                  set ary($image,$object) $line
+               } {
+                  set ary($image,$object) ""
+               }
+            }
+
+#  The rest is only done if the Object was restired succesfully.
+            if { !$bad } {
+
+#  Set up the arrays holding the number of times each label is used.
+               foreach lbl $PNTLBL($image,$object) {
+                  Labels $lbl 1
+               }
+
+# Initialise the other required arrays to indicate that nothing is
+# currently drawn.
+               catch { unset PNTID($image,$object) }
+               catch { unset PNTCX($image,$object) }
+               catch { unset PNTCY($image,$object) }
+               catch { unset PNTVID($image,$object) }
+               foreach nxt $PNTNXT($image,$object) {
+                  lappend PNTID($image,$object) -1
+                  lappend PNTCX($image,$object) ""
+                  lappend PNTCY($image,$object) ""
+                  if { $nxt == "" } {
+                     lappend PNTVID($image,$object) ""
+                  } {
+                     lappend PNTVID($image,$object) -1
+                  }
+               }            
+            }
+         }
+      }
+
+# Close the dump file.
+      close $fd
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+#  If the specified file was bad, try restoring the dump saved at the start
+#  of this procedure. Do not do this if we are already restoring a saved
+#  "backup" dump.
+      if { $bad && !$backup } { 
+         Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
+         RestoreImage $safefile
+      }
+
+#  Re-display the reference and current objects.
+      UpdateDisplay ref
+
+   }
+
+}
+
 proc RestoreMask {file} {
 #+
 #  Name:
@@ -10667,6 +10906,11 @@ proc Save {} {
 #     POLMODE (Read)
 #        'Linear' or 'Circular'; indicates the type of polarisation for
 #        which Stokes parameters should be created.
+#     REFONLY (Read)
+#        Is the first image in the IMAGES list purely a reference image
+#        for aligning the other images? If so, no output images will be
+#        created from it and it will not be included in the calculation
+#        of the Stokes parameters.
 #     RESAVE (Read and Write)
 #        Set to zero if the the mappings and masks have not changed since
 #        the last time the output images were saved. Set to a non-zero
@@ -10715,6 +10959,7 @@ proc Save {} {
    global POLMODE
    global POLPACK_DIR
    global POLY
+   global REFONLY
    global RESAVE
    global SAFE
    global SIMAGE
@@ -10815,6 +11060,11 @@ proc Save {} {
          }
 
          foreach image $IMAGES {
+            
+# Ignore the first image if it used purely as a reference "pasteboard"
+# and is not to be included in the output data sets.
+            if { $REFONLY && $image == $im0 } continue
+
             regsub -all {\.} $image "" ni
             set ni [string tolower $ni]
             set fr [frame $imlist.$ni -background $back]
@@ -10827,6 +11077,7 @@ proc Save {} {
             set tick($image) [label $fr.tick -foreground $back \
                               -background $back -bitmap @$POLPACK_DIR/tick.bit]
             pack $tick($image) -side right
+
          }
 
          set image ""
@@ -10953,6 +11204,12 @@ proc Save {} {
 
 # Extract the image name section string from the image-section string.
             GetSec $imsec image section
+
+# Ignore the first image if it used purely as a reference "pasteboard"
+# and is not to be included in the output data sets.
+            if { $REFONLY && $image == $im0 } continue
+
+# Display the current image name.
             set SIMAGE $image
 
 # Highlight the image's label in red in the progress dialog box.
@@ -11231,10 +11488,14 @@ proc Save {} {
       Message "The registered images could not be saved." 
       set CANCEL_OP 0
       foreach image $IMAGES {
+
+         if { $REFONLY && $image == $im0 } continue
+
          foreach ray $rays {
             set file $OUTIMS($image,$ray)
             catch "exec rm -f ${file}.*"
          }
+
       }
 
 # If no error occurred, indicate that the output images do not need to
