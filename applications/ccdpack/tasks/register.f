@@ -79,6 +79,8 @@
 *        See SUN/61 Appendix B for details of transformation
 *        classification and a table of classifications of common
 *        mappings.
+*
+*        This parameter is ignored unless OUTFORMAT=TRANSFORM.
 *     CLASSIFY = _LOGICAL (Read)
 *        If TRUE then this indicates that you want to classify the
 *        transform. Classifying a transformation can help in later
@@ -87,6 +89,8 @@
 *        in SUN/61 which should be consulted before using this option.
 *        Linear transformations are classified by this routine directly
 *        and do not use this parameter.
+*
+*        This parameter is ignored unless OUTFORMAT=TRANSFORM.
 *        [FALSE]
 *     FA-FZ = LITERAL (Read)
 *        These parameters supply the values of "sub-expressions" used in
@@ -101,6 +105,8 @@
 *           YINV > PA*SIND(FB/PA)*YY/FB
 *           FA > SQRT(X*X+Y*Y)
 *           FB > SQRT(XX*XX+YY*YY)
+*
+*        This parameter is ignored unless OUTFORMAT=TRANSFORM.
 *     FITTYPE = _INTEGER (Read)
 *        The type of fit which should be used when determining the
 *        transformation between the input positions lists. This may take
@@ -213,8 +219,8 @@
 *                          .MORE.CCDPACK extension of the NDF
 *
 *        If WCS is chosen, then a new frame, with a Domain value given
-*        by OUTDOMAIN, is inserted into the WCS extension of the NDF
-*        (a new WCS extension is created if none previously existed).
+*        by OUTDOMAIN, is inserted into the WCS component of the NDF
+*        (a new WCS component is created if none previously existed).
 *        A mapping between this and the 'PIXEL' domain is defined,
 *        which is the unit mapping in the case that the NDF in question
 *        is the reference set.  If any frame in the domain OUTDOMAIN
@@ -259,6 +265,19 @@
 *        If PLACEIN is given as "FILE" then the value of this parameter
 *        specifies the name of the container file to be used to store
 *        the resultant transformation structures.
+*     USEWCS = _LOGICAL (Read)
+*        This parameter specifies whether the coordinates in the 
+*        position lists should be transformed from Pixel coordinates 
+*        into the coordinates of the Current frame of the WCS 
+*        component of the associated NDF before use.  It should
+*        normally be set TRUE, in which case the transformation type
+*        set by the FITTYPE parameter is the type which will be fit
+*        between the Current coordinate frames of the NDFs.  
+*        Otherwise the fit will be between the Pixel coordinate 
+*        frames.
+*
+*        This parameter is ignored if NDFNAMES is not TRUE.
+*        [TRUE]
 *     XFOR = LITERAL (Read)
 *        If FITTYPE=6 then this parameter specifies the parameterised
 *        algebraic expression to be used as the forward X
@@ -315,11 +334,13 @@
 *        In this example all the NDFs in the current directory are
 *        accessed and their associated position lists are opened.
 *        A global fit between all the datasets is then performed
-*        which results in estimates for the offsets from the first input
-*        NDF's position.  The results are then coded as new frames, 
-*        given the domain name 'CCD_REG' in the WCS component of the
-*        NDFs.  Actual registration of the images can then be achieved
-*        by aligning all the NDFs in the CCD_REG domain.
+*        which results in estimates for the offsets from the first
+*        input NDF's position.  These offsets are between the Current
+*        coordinate frames of the NDFs.  The results are then coded 
+*        as new frames, with the domain name 'CCD_REG', in the WCS 
+*        component of the NDFs.  Actual registration of the images 
+*        can then be achieved by aligning all the NDFs in the CCD_REG 
+*        domain.
 *
 *     register inlist='*' trtype=5 outdomain=result-set1
 *        This example works as above but this time the global
@@ -331,7 +352,8 @@
 *        In this example a solid body fit is performed between the
 *        position lists associated with the NDFs myndf1 and myndf2.
 *        The reference positions are chosen to be those associated with
-*        myndf2.
+*        myndf2, so that the CCD_REG frame coordinates will be the
+*        same as the Current frame in NDF myndf2.
 *
 *     register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
 *        In this example the position lists associated with the NDFs
@@ -350,7 +372,7 @@
 *
 *     register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
 *              yfor='pe+pf*x+pg*y+ph*x*y'
-*        In this example an non-linear transformation is fit between the
+*        In this example a non-linear transformation is fit between the
 *        positions associated with the NDFs ndf1 and ndf2. This analysis
 *        may help in determining whether a 6-parameter fit is good
 *        enough, or if you just want to transform positions. A problem
@@ -401,6 +423,9 @@
 *       Files with EXTERNAL format may be used with this application but
 *       all positions have to be present in all lists, no missing
 *       positions are allowed.
+*
+*       In all cases, the coordinates in position lists are pixel
+*       coordinates.
 *
 *     - NDF extension items.
 *
@@ -462,6 +487,8 @@
 *        around the FIO limit of 40 open file.
 *     11-MAR-1999 (MBT):
 *        Changed to use WCS components as well as TRANSFORM structures.
+*     21-MAY-1999 (MBT):
+*        Added USEWCS parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -495,8 +522,12 @@
       CHARACTER * ( 16 ) INAME  ! Name for object in container file
       CHARACTER * ( 12 ) OUTFM  ! Output format (WCS or TRANSFORM)
       CHARACTER * ( 4 ) PLACE   ! Place to store transformations
-      CHARACTER * ( AST__SZCHR) OUTDM ! Name of domain for new output WCS frame
+      CHARACTER * ( AST__SZCHR ) OUTDM ! Name of domain for new output WCS frame
+      CHARACTER * ( AST__SZCHR ) DMN ! Current domain of WCS component
+      CHARACTER * ( AST__SZCHR ) DMN1 ! Current domain of first WCS component
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for reading data
+      CHARACTER * ( CCD1__BLEN ) LINE1 ! Output buffer
+      CHARACTER * ( CCD1__BLEN ) LINE2 ! Output buffer
       CHARACTER * ( CCD1__MTRNP ) ALPBET ! Characters which may follow P to indicate a parameter
       CHARACTER * ( CCD1__STRNP ) NAME ! Parameter name
       CHARACTER * ( CCD1__STRNP ) NTEMP ! Parameter name
@@ -540,14 +571,20 @@
       INTEGER IPWY              ! Pointer to Y positions workspace
       INTEGER IPX               ! Pointer to X positions workspace
       INTEGER IPXR              ! Pointer to X positions workspace
+      INTEGER IPXRT             ! Pointer to temporary X positions
+      INTEGER IPXT              ! Pointer to temporary X positions
       INTEGER IPY               ! Pointer to Y positions workspace
       INTEGER IPYR              ! Pointer to Y positions workspace
+      INTEGER IPYRT             ! Pointer to temporary Y positions
+      INTEGER IPYT              ! Pointer to temporary Y positions
       INTEGER IWCS              ! AST pointer to WCS component of NDF
       INTEGER J                 ! Loop variable
       INTEGER JCUR              ! Incdex of (original) Current frame in frameset
       INTEGER JPIX              ! Index of Pixel domain frame in frameset
       INTEGER JREG              ! Index of OUTDM domain frame in frameset
+      INTEGER MAPS( CCD1__MXLIS + 1 ) ! AST Mapping from current to pixel frames
       INTEGER MAPTFM            ! AST pointer for Pixel - OUTDM mapping
+      INTEGER MAP1              ! Temporary AST mapping
       INTEGER MAXIN             ! Maximum number of input lists
       INTEGER MININ             ! Minimum number of input lists
       INTEGER NCLASS            ! Number of classifications
@@ -570,6 +607,7 @@
       INTEGER YFORL             ! Length of Y mapping string
       INTEGER YINVL             ! Length of Y mapping string
       LOGICAL CLASS( TRN__MXCLS ) ! Classification values
+      LOGICAL DIFDMN            ! True if not all domains are the same
       LOGICAL DOCLAS            ! Perform a classification of general transformation
       LOGICAL FULL              ! True if a full general transformation is used
       LOGICAL HAVXXF            ! Flags indicating that mapping
@@ -583,6 +621,7 @@
       LOGICAL NDFS              ! True if list names came from NDF extensions
       LOGICAL THERE             ! Flag indicating presence of object
       LOGICAL OUTREF            ! Output reference required
+      LOGICAL USEWCS            ! Are we transforming to current frame
 
 *  Local Data:
       DATA ALPBET/ 'ABCDEFGHIJKLNMOPQRSTUVWXYZ' /
@@ -622,6 +661,13 @@
       NDFS = .TRUE.
       CALL PAR_GET0L( 'NDFNAMES', NDFS, STATUS )
 
+*  See if we will transform position lists using WCS components.
+      USEWCS = .FALSE.
+      IF ( NDFS ) THEN
+         USEWCS = .TRUE.
+         CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
+      END IF
+
 *  Get the names of all the input lists.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', MININ, MAXIN,
@@ -635,6 +681,56 @@
          CALL ERR_ANNUL( STATUS )
       END IF
 
+*  Write the names of the associated NDFs out to the user.
+      IF ( NDFS ) THEN 
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         LINE1 = '    NDFs containing position lists'
+         LINE2 = '    ------------------------------'
+         IF ( USEWCS ) THEN
+            LINE1( 45: ) = 'Current domain'
+            LINE2( 45: ) = '--------------'
+         END IF
+         CALL CCD1_MSG( ' ', LINE1, STATUS )
+         CALL CCD1_MSG( ' ', LINE2, STATUS )
+         DIFDMN = .FALSE.
+
+         DO 17 I = 1, NOPEN
+
+*  Get World Coordinate System information from NDFs.
+            IF ( USEWCS ) THEN
+
+*  Get pointer to WCS frameset.
+               CALL IRG_NDFEX( NDFGR, I, ID, STATUS )
+               CALL CCD1_GTWCS( ID, IWCS, STATUS )
+               CALL NDF_ANNUL( ID, STATUS )
+
+*  Get Current domain of frameset, and check against previous one.
+               DMN = AST_GETC( IWCS, 'Domain', STATUS )
+               IF ( I .EQ. 1 ) THEN
+                  DMN1 = DMN
+               ELSE IF ( DMN .NE. DMN1 ) THEN
+                  DIFDMN = .TRUE.
+               END IF
+
+*  Get a mapping from the position list as read (PIXEL-domain
+*  coordinates) to the values to be used for comparison (coordinates
+*  of the Current domain of each NDF).
+               JCUR = AST_GETI( IWCS, 'Current', STATUS )
+               CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+               MAP1 = AST_GETMAPPING( IWCS, JPIX, JCUR, STATUS )
+               MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
+            END IF
+
+*  Write message about NDF name and domain.
+            CALL IRH_GET( NDFGR, I, 1, FNAME, STATUS )
+            CALL MSG_SETC( 'FNAME', FNAME )
+            CALL MSG_SETI( 'N', I )
+            CALL MSG_LOAD( ' ', '  ^N) ^FNAME', LINE, IAT, STATUS )
+            IF ( USEWCS ) LINE( MAX( 45, IAT + 2 ): ) = DMN
+            CALL CCD1_MSG( ' ', LINE, STATUS )
+ 17      CONTINUE
+      END IF
+
 *  Get the position of the reference set in the input lists.
       IPREF = 1
       CALL PAR_GET0I( 'REFPOS', IPREF, STATUS )
@@ -642,8 +738,8 @@
 
 *  Get all the names of the input lists and report them.
       CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_MSG( ' ', '    Input lists:', STATUS )
-      CALL CCD1_MSG( ' ', '    ------------', STATUS )
+      CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
+      CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
       DO 6 I = 1, NOPEN
          CALL IRH_GET( FIOGR, I, 1, FNAME( I ), STATUS )
          CALL MSG_SETC( 'FNAME', FNAME( I ) )
@@ -659,17 +755,6 @@
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ',
      :'  Position list names extracted from NDF extensions.', STATUS )
-
-*  Write the names of the associated NDFs out to the user.
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ', '    Associated NDFs:', STATUS )
-         CALL CCD1_MSG( ' ', '    ----------------', STATUS )
-         DO 17 I = 1, NOPEN
-            CALL IRH_GET( NDFGR, I, 1, NDFNAM, STATUS )
-            CALL MSG_SETC( 'FNAME', NDFNAM )
-            CALL MSG_SETI( 'N', I )
-            CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
- 17      CONTINUE
       END IF
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
@@ -786,6 +871,15 @@
       CALL MSG_SETC( 'LINE', LINE )
       CALL CCD1_MSG( ' ', '  Registering using a ^LINE', STATUS )
 
+*  Report how position list coordinates are interpreted.
+      IF ( USEWCS ) THEN
+         CALL CCD1_MSG( ' ', '  Coordinates will be remapped to'//
+     :   ' Current frame before use', STATUS )
+      ELSE
+         CALL CCD1_MSG( ' ', '  Pixel coordinates will be used'//
+     :   ' direct', STATUS )
+      END IF
+
 *  Report where the transformation structures will be stored.
       IF ( PLACE .EQ. 'NDF' ) THEN
          IF ( OUTFM .EQ. 'WCS' ) THEN
@@ -830,6 +924,10 @@
          CALL CCD1_MALL( NTOT, '_DOUBLE', IPWX, STATUS )
          CALL CCD1_MALL( NTOT, '_DOUBLE', IPWY, STATUS )
          CALL CCD1_MALL( NTOT, '_INTEGER', IPWID, STATUS )
+         IF ( USEWCS ) THEN
+            CALL CCD1_MALL( NTOT, '_DOUBLE', IPXT, STATUS )
+            CALL CCD1_MALL( NTOT, '_DOUBLE', IPYT, STATUS )
+         END IF
 
 *  Split data and transfer into lists, append all positions and
 *  identifiers into one.
@@ -839,10 +937,23 @@
      :                      1, %VAL( IPWX ), STATUS )
             CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ),
      :                      2, %VAL( IPWY ), STATUS )
-            CALL CCG1_LAPND( %VAL( IPWX ), NREC( I ), IP, %VAL( IPX ),
-     :                       STATUS )
-            CALL CCG1_LAPND( %VAL( IPWY ), NREC( I ), IP, %VAL( IPY ),
-     :                       STATUS )
+
+*  Either just copy the coordinates or transform them using the WCS
+*  component of the associated NDF.
+            IF ( USEWCS ) THEN
+               CALL AST_TRAN2( MAPS( I ), NREC( I ), %VAL( IPWX ),
+     :                         %VAL( IPWY ), .TRUE., %VAL( IPXT ),
+     :                         %VAL( IPYT ), STATUS )
+               CALL CCG1_LAPND( %VAL( IPXT ), NREC( I ), IP,
+     :                          %VAL( IPX ), STATUS )
+               CALL CCG1_LAPND( %VAL( IPYT ), NREC( I ), IP, 
+     :                          %VAL( IPY ), STATUS )
+            ELSE
+               CALL CCG1_LAPND( %VAL( IPWX ), NREC( I ), IP, 
+     :                          %VAL( IPX ), STATUS )
+               CALL CCG1_LAPND( %VAL( IPWY ), NREC( I ), IP, 
+     :                          %VAL( IPY ), STATUS )
+            END IF
             CALL CCG1_LAPNI( %VAL( IPIND( I ) ), NREC( I ), IP,
      :                       %VAL( IPID ), STATUS )
             IP = IP + NREC( I )
@@ -859,29 +970,6 @@
 *  Store the transformation information.
          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Prepare to output mappings between (previous) current frames and
-*  OUTDM domain frames.
-            IF ( OUTFM .EQ. 'WCS' ) THEN
-               CALL CCD1_MSG( ' ', ' ', STATUS )
-               CALL MSG_SETC( 'OUTDM', OUTDM )
-               CALL CCD1_MSG( ' ', '    Transformation coefficients '//
-     :'(mappings between Current and ^OUTDM frames)', STATUS )
-               CALL CCD1_MSG( ' ', '    ----------------------------'//
-     :'---------------------------------------------', STATUS )
-               CALL CCD1_MSG( ' ', '      '//
-     : 'The following are linear approximations to the mappings',
-     :                        STATUS )
-               CALL MSG_SETC( 'OUTDM', OUTDM )
-               CALL CCD1_MSG( ' ', '      '//
-     : 'between the original Current and new ^OUTDM frames.', STATUS )
-               CALL CCD1_MSG( ' ', '      '//
-     : 'The difference between them indicates the error in the ',
-     :                        STATUS )
-               CALL CCD1_MSG( ' ', '      '//
-     : 'alignment implied by the supplied WCS components.', STATUS )
-               CALL CCD1_MSG( ' ', ' ', STATUS )
-            END IF
-
 *  Loop over each data set.
             DO 7 I = 1, NOPEN
 
@@ -895,8 +983,7 @@
 *  Begin new AST context.
                      CALL AST_BEGIN( STATUS )
 
-*  Get the existing WCS component of the NDF, or generate a new one if
-*  none previously existed.
+*  Get the WCS component of the NDF.
                      CALL CCD1_GTWCS( ID, IWCS, STATUS )
 
 *  Get the original current frame index for future use.
@@ -905,9 +992,6 @@
 *  Generate a mapping representing the linear transformation.
                      CALL CCD1_LNMAP( TR( 1, I ), MAPTFM, STATUS )
 
-*  Get the index of the Pixel domain frame in the WCS component.
-                     CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-
 *  Generate a frame in domain called OUTDM, the purpose of which is to 
 *  group the frames produced by this application.
                      FRREG = AST_FRAME( 2, ' ', STATUS )
@@ -915,40 +999,19 @@
                      CALL AST_SETC( FRREG, 'Title', 
      :                              'Alignment by REGISTER', STATUS )
 
+*  Ensure the Current frame is the one relative to which we've got the 
+*  mapping.
+                     IF ( .NOT. USEWCS ) THEN
+                        CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+                     END IF
+                     
 *  Add the OUTDM domain frame, with the appropriate mapping, to the 
 *  WCS component of the NDF.  This will become the current frame.
-                     CALL AST_ADDFRAME( IWCS, JPIX, MAPTFM, FRREG, 
-     :                                  STATUS )
+                     CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM, 
+     :                                  FRREG, STATUS )
 
 *  Get the index of the OUTDM frame.
                      JREG = AST_GETI( IWCS, 'Current', STATUS )
-
-*  Prepare to output a linear approximation to the mapping between the
-*  original Current frame and the OUTDM domain frame.  This gives an 
-*  indication of how far wrong the original alignment was.  First report 
-*  the name of the NDF and which frames the mapping is between. 
-                     CALL NDF_MSG( 'NDF', ID )
-                     CALL CCD1_MSG( ' ', '  ^NDF:', STATUS ) 
-                     CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
-                     CALL MSG_SETC( 'DMCUR', AST_GETC( IWCS, 'Domain', 
-     :                                                 STATUS ) )
-                     CALL MSG_SETC( 'OUTDM', OUTDM )
-                     CALL CCD1_MSG( ' ', 
-     : '    Domain ^DMCUR (Current) -> Domain ^OUTDM', STATUS )
-
-*  Obtain the mapping coefficients and output them to the user, unless
-*  there is a problem.
-                     IF ( STATUS .NE. SAI__OK ) GO TO 99
-                     CALL CCD1_LNAPX( ID, IWCS, JCUR, JREG, TRCR,
-     :                                STATUS )
-                     IF ( STATUS .EQ. SAI__OK ) THEN
-                        CALL CCD1_TROUT( TRCR, STATUS )
-                     ELSE
-                        CALL ERR_ANNUL( STATUS )
-                        CALL CCD1_MSG( ' ', 
-     :'    Linear approximation to transformation failed.', STATUS )
-                     END IF
-                     CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Now remove any previously existing frames in the OUTDM domain;
 *  the output frameset should contain only one, to prevent confusion
@@ -1023,9 +1086,20 @@
 *  Do we need to write an output reference set?
          IF ( OUTREF ) THEN
 
-*  Write it.
-            CALL CCD1_WRIXY( FDREFO, %VAL( IPIDR ), %VAL( IPXR ),
-     :                       %VAL( IPYR ), NOUT, LINE, CCD1__BLEN,
+*  Write it.  If the coordinates were transformed from pixel coordinates
+*  in the first place they will need to be transformed back.
+            IF ( USEWCS ) THEN
+               CALL CCD1_MALL( NOUT, '_DOUBLE', IPXT, STATUS )
+               CALL CCD1_MALL( NOUT, '_DOUBLE', IPYT, STATUS )
+               CALL AST_TRAN2( MAPS( IPREF ), NOUT, %VAL( IPXR ),
+     :                         %VAL( IPYR ), .FALSE., %VAL( IPXT ),
+     :                         %VAL( IPYT ), STATUS )
+            ELSE
+               IPXT = IPXR
+               IPYT = IPYR
+            END IF
+            CALL CCD1_WRIXY( FDREFO, %VAL( IPIDR ), %VAL( IPXT ),
+     :                       %VAL( IPYT ), NOUT, LINE, CCD1__BLEN,
      :                       STATUS )
 
 *  Tell user we have done so.
@@ -1222,6 +1296,24 @@
          CALL CCD1_LEXT( %VAL( IPDAT( 2 ) ), NREC( 2 ), NVAL( 2 ),
      :                   2, %VAL( IPYR ), STATUS )
 
+*  Transform them into the correct coordinates if necessary.
+         IF ( USEWCS ) THEN 
+            CALL CCD1_MALL( NREC( 1 ), '_DOUBLE', IPXT, STATUS )
+            CALL CCD1_MALL( NREC( 1 ), '_DOUBLE', IPYT, STATUS )
+            CALL CCD1_MALL( NREC( 2 ), '_DOUBLE', IPXRT, STATUS )
+            CALL CCD1_MALL( NREC( 2 ), '_DOUBLE', IPYRT, STATUS )
+            CALL AST_TRAN2( MAPS( 1 ), NREC( 1 ), %VAL( IPX ), 
+     :                      %VAL( IPY ), .TRUE., %VAL( IPXT ),
+     :                      %VAL( IPYT ), STATUS )
+            CALL AST_TRAN2( MAPS( 2 ), NREC( 2 ), %VAL( IPXR ),
+     :                      %VAL( IPYR ), .TRUE., %VAL( IPXRT ),
+     :                      %VAL( IPYRT ), STATUS )
+            IPX = IPXT
+            IPY = IPYT
+            IPXR = IPXRT
+            IPYR = IPYRT
+         END IF
+        
 *  Do the transformation fit. If a reference list has been given then we
 *  want to work out the transformation from the other list (stored in
 *  position 1) to this. If two lists have been given the first list is
