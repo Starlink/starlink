@@ -35,7 +35,8 @@ FILES        = \
  GaiaEspSelectObject.tcl StarKeywordFile.tcl StarLabelCheckLabel.tcl \
  StarLabelWidgetChild.tcl StarSTLFile.tcl GaiaEspSelectList.tcl \
  GaiaEspSelectListEditor.tcl GaiaEsp.tcl \
- GaiaTabStops.tcl \
+ GaiaTabStops.tcl GaiaPosTable.tcl GaiaTextImport.tcl \
+ GaiaPositions.tcl GaiaAstTransform.tcl \
  gaia2astrom.tcl gaiaMain.tcl \
  gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
@@ -43,7 +44,7 @@ FILES        = \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
  StarAstSystem.hlp StarBlink.hlp GaiaPatch.hlp GaiaApPhotom.hlp \
  GaiaOptPhotom.hlp GaiaContour.hlp GaiaAstTransfer.hlp \
- GaiaEsp.hlp \
+ GaiaEsp.hlp GaiaPositions.hlp GaiaAstTransform.hlp \
  skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
  adamtask.tcl
 
