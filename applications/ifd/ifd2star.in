@@ -1,4 +1,4 @@
-#! @TCLSH@
+#! @STARTCLSH@
 #
 # This script converts an interface definition (ifd) file to one or more
 #  ADAM interface (ifl) files.
