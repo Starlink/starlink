@@ -69,11 +69,18 @@
 #define MACHINE ULTRIX
 #define BYTESWAPPED TRUE
  
-#elif defined(__i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) 
+#elif defined(__i386) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__)
 
 /*  IBM PC */
 #define MACHINE IBMPC
 #define BYTESWAPPED TRUE
+
+#elif defined(__x86_64)
+
+/*  AMD64 */
+#define MACHINE IBMPC
+#define BYTESWAPPED TRUE
+#define LONGSIZE 64
 
 #elif defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
 
