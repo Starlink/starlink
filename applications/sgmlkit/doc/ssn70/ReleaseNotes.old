@@ -601,10 +601,12 @@ include a list of elements:
 </verbatim>
 This is both perfectly generic, and usefully visible.
 
+<!-- The referenced section has been deleted
 <dt>Development of the programcode DTD
 <dd>As discussed in <ref id=doccode.devel />, I am uncertain of the
 optimal balance between flexibility and structure in the programcode
 DTD.  We need to reach a consensus on this before the structure is frozen.
+-->
 
 <dt>Bugs in Jade's LaTeX back-end
 <dd>There's a deficiency in the &latex; back-end I added to

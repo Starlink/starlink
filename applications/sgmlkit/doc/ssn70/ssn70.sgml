@@ -133,6 +133,13 @@ There will be a proper distribution before 1 June.
 <px>First real release to programmers not directly concerned with the
 SGML project.
 
+<distribution string='DR-0.7-8' date='23-Aug-2000' author=ng
+versionid='v0-7-8'>
+<px>RCS $Id$
+<px>This release took a couple of goes to get right&ellip;.  But I
+took the opportunity of reading through the text, correcting and
+updating things here and there.
+
 </history>
 
 <coverimage>
@@ -184,20 +191,20 @@ particularly tight document structure.  At the same time it has
 
 <p>Although this system can help with many of the tasks involved in
 document creation, it cannot write the document for you (shame!).  For
-advice on that, documents such as <docxref doc=sgp28> are still vital.
+advice on that, documents such as <docxref doc=sgp28/> are still vital.
 
-<p>This document is organised as follows.  In <ref id=sgml/>, I
+<p>This document is organised as follows.  In <ref id=sgml/>, we
 discuss SGML in general terms, describing its general structure and
-aims, describing how to read a Document Type Definition (DTD), and
-pointing to sources of information.  In <ref id=markup/>, I describe
+aims, why it was chosen as the format for the Starlink document set, and
+pointing to sources of information.  In <ref id=markup/>, we describe
 how you would go about actually writing a document, describing the
 structure of Starlink documents which is crystallised in the
-specification of this set.  In <ref id=structure/>, I describe the
+specification of this set.  In <ref id=structure/>, we describe the
 structure of the document DTD, and the categories of elements you will use.
-In <ref id=doccode/>, I describe the
+In <ref id=doccode/>, we describe the
 support which exists to support documentation of source code, allowing
 you to maintain detailed routine documentation along with the routine
-source code.  In <ref id=processing/>, I describe the details of how
+source code.  In <ref id=processing/>, we describe the details of how
 you transform your document from SGML to an output format.  In 
 <ref id=upconvert/> we describe how to transform a document from
 <code/star2html> format to an SGML document.
@@ -233,7 +240,7 @@ help is through markup systems such as <code/runoff> (or its
 variants), or &tex, or &latex;.  The last of these three has served
 Starlink very well, and even survived the conversion of Starlink's
 document set to hypertext, through the tool <code/Star2HTML> (see <docxref
-doc=sun199>), but the problems of the &latex system illustrate the
+doc=sun199/>), but the problems of the &latex system illustrate the
 advantages of the SGML approach quite well.
 <dl>
 <dt>LaTeX templates are ill-defined
@@ -243,7 +250,7 @@ advantages of the SGML approach quite well.
 <dd>What is a Starlink document?  Although Starlink distributes
 templates for the principal document types (for example in
 <code>/star/docs/sun.tex</code>), and distributes style guides such as
-<docxref doc=sgp28>, there is no way either of mandating that certain
+<docxref doc=sgp28/>, there is no way either of mandating that certain
 elements, such as a document number, actually appear, nor of ensuring
 that other features, such as raw &tex, do not.  This means that
 document authors can never quite be sure that they have produced a
@@ -320,6 +327,14 @@ that if and when a replacement comes along, it will have good support.
 
 </dl>
 
+<p>The most eligible candidite for a replacement for SGML is XML.
+XML is a cut-down version of SGML, omitting rarely-used or
+dispensable features, but preserving many of its strengths (<ref
+id=final.xml/>).  The only serious disadvantage of XML, from our point
+of view, is its verbosity, since it has discarded SGML's markup
+minimisation features (<ref id=markup.min/>), and so can be tediously
+verbose to type.
+
 <subsect id=what.sgml export>What is SGML?
 
 <p>SGML is a metalanguage: that is, a language for writing languages
@@ -388,20 +403,6 @@ with the current &latex; system.  &latex; is marvellous -- this system
 uses it as a back-end print formatter -- but it's not ideal for a
 large and various document set.
 
-<subsubsect id=faq.xml>What about XML?
-
-<p>XML is a cut-down version of SGML, omitting rarely-used or
-dispensable features, but preserving many of its strengths (
-<ref id=final.xml/>).  I have, however, used several of these omitted
-features in this application.  Some of these features, such as markup
-minimisation (<ref id=markup.min/>) are not vital, and would simply be
-inconvenient to lose, but others such as SGML's support for
-subdocuments would radically change (for the worse) the nature of the
-application's support for complicated documents.
-
-<p>I would like to support XML in future, if there's development time
-available.
-
 <sect id=markup export>Marking up your document
 
 <p>In this section I will introduce you to SGML from the point of view
@@ -453,7 +454,8 @@ such as a sequence of characters (`Norman Gray') in the case of the
 <code/author> element, or further elements (the <code/version> element)
 in the case of the <code/history> element.  Elements are delimited by
 `opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
-like <code>&lt;/abstract&gt;</code>.<note>There is a difference
+like <code>&lt;/abstract&gt;</code>.<note>Note for pedants: There is a
+difference 
 between `elements' and `element types': the former are things which
 appear in documents, with data in them; the latter are the abstract
 things defined by the DTD.  The distinction is not particularly
@@ -543,16 +545,19 @@ this, since it seems to make the document look less cluttered, and so
 I have designed the DTD to support this quite extensively.  The
 minimisation is completely optional, however, and you may insert all
 the tags if you prefer.  SGML-aware editors (see <ref id=editors/>)
-typically insert all tags.  See also <ref id=markup.min/>.
+typically insert all tags.  See also <ref id=markup.min/>.  XML omits
+this markup-minimisation feature.
 
 <p>You can see from <ref id=fig.simplesun2/> that the `top-level'
 element of this document is <code/sun>.  The top-level element of SSN
 documents is <code/ssn>, and similarly for the other Starlink document
 types (see <ref id=str.structure/>).  These different document types
 are broadly the same, but the 
-SSN document type does not include elements for documenting
+SSN document type does not, by default, include elements for documenting
 programming code, and the MUD document type has a <code/docdate>
-element instead of a <code/docnumber> and a <code/history>.  The SUN
+element instead of a <code/docnumber> and a <code/history>.  A
+particular document can re-enable such omitted features using the
+mechanism in <ref id=str.structure/>.  The SUN
 document type is the most general.  The top-level <code/sun> element
 has only two `children', <code/docinfo>, which contains the document
 information such as its author, number, and so on, and <code/docbody>,
@@ -562,8 +567,8 @@ which contains the actual content of the document.
 
 <p>Entity references are a mechanism for referring to characters, or
 longer pieces of text, which you cannot type on your keyboard, which
-must be escaped from the parser, or which you simply want to
-abbreviate.
+must be escaped from the parser, which must be read from external
+files, or which you simply want to abbreviate.
 
 <p>A reference to an entity <code/amp> is of the form
 <code/&amp;amp;>.  It is prefixed by the character <code/&amp> and
@@ -609,19 +614,20 @@ given in <ref id=table.entities/>.
 
 <p>Certain of these entities are used sufficiently often that there
 are `short references' declared for them: you can type `<code/_>'
-instead of <code/&amp;underscore;> (unsurprisingly), `<code/&ddash>' for
-a punctuation dash (this is currently set to <code/&amp;endash;>, but
-could conceivably change to <code/&amp;emdash;> if we make a
+instead of `<code/&amp;underscore;>' (unsurprisingly), `<code/&ddash>' for
+a punctuation dash (this is currently set to `<code/&amp;endash;>', but
+could conceivably change to `<code/&amp;emdash;>' if we make a
 typographic decision on that score), `<code/&quot>' instead of
-<code/&amp;quot;> and `<code/&tilde>' instead of
-<code/&amp;nbsp;>.  These short references work within paragraphs, but
-not within maths or verbatim elements within them.
+`<code/&amp;quot;>' and `<code/&tilde>' instead of
+`<code/&amp;nbsp;>'.  These short references work within paragraphs;
+inside maths elements, all these characters should function as normal,
+and you only need to escape the characters `&amp;', `&gt;' and `&lt;'.
 
 <p>For more details on entities, see <ref id=sgml.entities/>.
 
 <subsect id=markup.dtdsubset export>Defining entities
 
-<p>As explained in section <ref id=markup.entities/>, there are a
+<p>As explained in <ref id=markup.entities/>, there are a
 number of predefined entities which you can refer to in your
 documents.  These are defined either for general convenience or
 because, as in the case of <code>&lt</code> and <code>&amp</code>,
@@ -633,7 +639,7 @@ would have to define an entity to refer to other files, or to other
 SGML documents.
 
 <p>You define entities in a section of the document which rejoices in
-the name of the `document type declaration subset'.  This is a
+the name of the `internal declaration subset'.  This is a
 fragment of SGML markup which is presented within the
 <code>&lt;!DOCTYPE></code> declaration, which is formally read before
 the reading of the actual DTD the declaration refers to.  There are
@@ -647,7 +653,8 @@ entities.  For more details about the DTD subset, see
 <p>The DTD subset is the only place you can define entities -- the
 <code>&lt;!ENTITY...></code> declaration is forbidden in the body of
 the document.  While this is occasionally inconvenient, it helps keep
-all the document's monkey-business in one place.
+all the document's monkey-business in one place, and helps make future
+processing that little bit more sane.
 
 <subsubsect>Referring to text
 
@@ -702,12 +709,12 @@ between the entity name and the file name.  These entity declarations
 have extra information, however, indicating that their <em/notation>
 is <code/eps> and <code/gif87a> respectively.  The system currently
 recognises these notations, plus `jpeg'.  You would refer to these
-entities in an attribute of a <code/figurecontent> element.  For more
-details on how to refer to figure files, see <ref id=str.figures/>, and
-for the list of allowable notations, see the <code/figurecontent>
-documetation in <ref id=el.sun.figurecontent/>.
+entities in an attribute of a <code/figurecontent> element.  For an
+overview of figure files, see <ref id=str.figures/>, and
+for more details and the list of allowable notations, see the
+<code/figurecontent> documetation in <ref id=el.sun.figurecontent/>.
 
-<p>The last entity is different in two ways.  Firstly, it does not refer
+<p>The last entity above is different in two ways.  Firstly, it does not refer
 to a system identifier, but to a <em/public identifier>.  The SGML
 system maps this identifier into a file using some internal database.
 Note that the reference to the DTD, <code>"-//Starlink//DTD Starlink
@@ -777,11 +784,12 @@ amount you have to type.  Instead of typing <code>&lt;em&gt;emphasised
 text&lt;/em></code>, you can type just <code>&lt;em/emphasised
 text&gt;</code>.<note>Note that this is different from the default
 SGML minimisation, which would have <code>&lt;em/emphasised
-text/</code> -- in order to be able to write <code>&lt;ref/&gt;</code>
+text/</code> -- in order to be able to write XML-style
+<code>&lt;ref/&gt;</code>
 for empty elements, we had to change the form of this particular
 minimisation option.  This much is a convenient shortcut. SGML defines
 other tag minimisation locutions, so that
-<code>&lt;p&lt;em/emph/&lt;/></code> is legal.  This rarely improves
+<code>&lt;p&lt;em/emph>&lt;/></code> is legal.  This rarely improves
 readability, can get you into terrible messes, and is part of the
 `parser hell' which XML was designed to avoid.  I mention it purely
 for completeness; some of these rather more extreme minimisation
@@ -892,7 +900,8 @@ only in webpages. &rsqbrack;&rsqbrack;>
 
 <p>It is, I hope, clear that you could get yourself in a terrible mess
 here, and create a document which is only valid for some settings of
-the entities.  Take care that your document remains valid for all
+the entities.  Please use this feature with restraint: take care that
+your document remains valid for all
 settings, <em/including> the case where both entities are set to `IGNORE'.
 
 
@@ -906,18 +915,19 @@ HTML.  This uses the script <code/sgml2docs>.  If the document is in a
 file <code/sun1234.sgml>, give the command <kbd/sgml2docs
 sun1234.sgml>, which will transform your document into a collection of
 HTML files, and package them up into a tar-file by the name of
-<code/sun1234.tar-htx>.  Alternatively, give the command
+<code/sun1234.tar>.  Alternatively, give the command
 <kbd/sgml2docs --latex sun1234.sgml>, which will transform your
 document into a &latex; file, and place it, and any figures required
-for processing into a file <code/sun1234.tar-latex>.  See <ref
-id=proc.sgml2docs/> for further details.
+for processing into a file <code/sun1234.tar> (note that the same
+output filename is used for both formats, by default).  See <ref
+id=proc.sgml2docs/> for further details and options.
 
 <p>Another way of processing your document is to run the underlying
 parser on the document -- this is the most efficient way of checking
 that your document is valid, in the sense that it conforms to the DTD
 is claims to.  Give the command <kbd>parse -s sun1234.sgml</kbd> (see
 the detailed documentation for the <coderef id=parse
-collection=upconvprogs>parse</coderef> script).  This invokes the
+collection=upconvprogs>parse script</>).  This invokes the
 <code/nsgmls> parser, and, with the <code/-s> option, suppresses all
 output except warnings and error messages.  This means that for a
 valid document, you should see precisely no output from this command.
@@ -935,7 +945,7 @@ you want to do that.  For example, <webref
 url='http://www.cpan.org/modules/by-module/SGMLS/'
 ><code>SGMLSpm</code></webref> will parse this output format and allow
 you to process SGML documents using Perl.  The crucial thing in this
-case is the final line in the output, which should be a single `C'
+case is the final line in the output, which should be a single `<code/C>'
 command, indicating that the document conforms to its DTD.
 
 <p>If you want to try normalising your document, give the command
@@ -972,6 +982,7 @@ document by including as much element and attribute detail as you can.
 </caption>
 <tabular>
 <tgroup cols="2">
+<colspec colnum=2 colwidth="*">
 <thead><row><entry>Group<entry>Elements
 <tbody>
 <row>
@@ -1224,7 +1235,8 @@ invoking the SSN DTD (for example) as follows
   <!ENTITY % Feature.Routinelist 'INCLUDE'>
 ]>
 ]]></verbatim>
-Note that the entity names are case-sensitive.
+Note that the entity names are case-sensitive, and note the space
+after the `<code/%>' sign.
 
 <p>The top-level element in the document contains two elements, 
 <ref id=el.sun.docinfo>docinfo</ref> and
@@ -1235,13 +1247,10 @@ document.  The docinfo elements should be self-explanatory, with the
 exception of the history element, which is discussed in 
 <ref id=str.history/>.
 
-<p>The docbody element contains all the text of the document,
-optionally preceded by paragraphs and tables.  Any document appendices
-are gathered together in a single 
+<p>The docbody element contains all the text of the document.
+Any document appendices are gathered together in a single 
 <ref id=el.sun.appendices>appendices</ref> element, with each appendix in a
-<ref id=el.sun.sect>sect</ref> element, optionally preceded by a 
-<ref id=el.sun.routinelist>routinelist</ref> element (see
-<ref id=str.code/>), if the specific DTD allows that.
+<ref id=el.sun.sect>sect</ref> element.
 
 <p>Material such as a bibliography and endnotes do not go in an
 appendix, but in a separate backmatter element (see 
@@ -1349,8 +1358,9 @@ element contains one or more
 <ref id='el.sun.codecollection'>codecollection</>
 elements.
 
-<p>The routinelist element must be the first child of the 
-<ref id=el.sun.appendices>appendices</ref> element, and contains one or
+<p>The routinelist element can be included in any of the sectioning
+elements of <ref id=str.sect/>, and replaces any other content that
+section might have.  It contains one or
 more codecollection elements, each of which makes a link between the
 general documentation and a specific file marked up using the
 <code/programcode> DTD.  See <ref id=doccode/> for details.
@@ -1370,8 +1380,8 @@ general documentation and a specific file marked up using the
 
 <p>In a large document which will be revised in future, it is
 important to preserve some document history.  This means that readers
-can check which version of a document, and find what features of it
-have changed since the last version they are familiar with.
+can check which version of a document they are reading, and find what
+parts of it have changed since the last version they are familiar with.
 
 <p>The history element, within in the docinfo element (see 
 <ref id=str.structure/>), records the history of the document.  It is
@@ -1380,8 +1390,8 @@ omitted, the <ref id=el.sun.docdate>docdate</ref> element is
 required instead.
 
 <p>The history of a document is composed of a sequence of versions,
-changes, and distributions.  A document has a version number of the
-form <code/docnumber.docversion-release>.  The document number is the
+distributions and changes.  A document has a version number of the
+form <code/docnumber.docversion-distribution>.  The document number is the
 number declared in the <ref id=el.sun.docnumber>docnumber</ref>
 element, as assigned by the Starlink librarian.  The document version
 indicates which edit of the document this is -- a significant update
@@ -1392,21 +1402,22 @@ document.
 <p>Each of the three elements has paragraph content, to record brief notes
 about the change or distribution.
 
-<p>A version of a document (marked by a 
-<ref id=el.sun.version>version</ref> element in the history) is a significant release of a
-document, perhaps describing new functionality in a package.  The
-number attribute gives the version number to be attached to the
-document.
+<p>A version of a document (marked by a <ref
+id=el.sun.version>version</ref> element in the history) is a
+significant release of a document, perhaps describing new
+functionality in a package.  The number attribute gives the version
+number to be attached to the document.
 
 <p>A distribution of a document (marked by a 
 <ref id=el.sun.distribution>distribution</ref> element in the history) is
 a less significant update to a document, perhaps for distribution to
 readers for comments.  The <code/string> attribute is a label for the
-distribution, and could be something like `draft1' or `comments-13'.
+distribution, and could be something like `draft1' or `comments-13',
+or `DR-0.7-8'.
 
 <p>Other changes to the document are labelled by a 
 <ref id=el.sun.change>change</ref> element.  These record an edit of a
-document without a corresponding change to an version number.
+document without a corresponding change to a version number.
 
 <p>The <ref id=el.sun.distribution>distribution</ref> and 
 <ref id=el.sun.change>change</ref> elements have an optional
@@ -1464,10 +1475,10 @@ element, based on the type and name of that element, and will make a
 link to it if the output format allows that.  If the element has any
 content, this will be used as the link text; if it has no content, the
 link text will be generated, as something like `Section xxx'.
-For example,
-the above link to the ref element's documentation was specified as
+For example, there is a link, above, to the ref element's
+documentation, which was specified in this document's source as
 <code>&lt;ref id=el.sun.ref>ref&lt;/ref></code>, but I could have
-written just <code>&lt;ref id=el.sun.ref>&lt;/></code> to get <ref id=el.sun.ref/>.
+written just <code>&lt;ref id=el.sun.ref/></code> to get <ref id=el.sun.ref/>.
 
 <p>The <ref id=el.sun.docxref>docxref</ref> element refers to all or
 part of another Starlink document.  To use this, you must declare an
@@ -1481,14 +1492,14 @@ entity which refers to the document as follows:
 ]>
 </verbatim>
 Once you have done that, you can refer to that document with a docxref
-element, <code>&lt;docxref doc=otherdoc></code>.  If you wish, you can
+element, <code>&lt;docxref doc=otherdoc/></code>.  If you wish, you can
 refer to a specific ID within that document using the `loc'
 attribute.  
 
-<p>In general, the SGML kit will be set up so that this `formal public
+<p>In future, the SGML kit will be set up so that this `formal public
 identifier' (FPI) will map to a summary document which will allow the
 SGML system to effectively query the target document.  At present,
-however (release DR-0.6), it has been decided to distribute the kit
+however (release DR-0.7), it has been decided to distribute the kit
 with these document summaries missing, and so the down-converters have
 been written so that they fail gracefully and silently in this case,
 and generate a link to the Starlink documents available at RAL <em/if>
@@ -1503,7 +1514,7 @@ others may only link to IDs which you have exported from your
 document.  You export an ID by giving the attribute `export' alongside
 the `id' attribute.  To ensure that there is a rich field of targets
 for other documents (see also <docxref doc=sun188
-loc=establishing_cross_references>), most of the Starlink document
+loc=establishing_cross_references/>), most of the Starlink document
 types enforce a `link policy' (see the `EnforceLinkPolicy' feature in
 <ref id=str.structure/>), requiring that <em/all> sect and subsect
 elements (at least) have both the `id' and `export' attributes
@@ -1542,11 +1553,11 @@ element would often be useful here, but url and webref might be.
 <p>You may include images and other figures within your document using
 the figure element.  A figure consists of a caption, optionally
 followed by a sequence of figurecontent elements, optionally followed
-by a single block of PX elements.  You provide a figurecontent element
-for each alternative figure format you provide.  The processing system
-selects a usable format from; not all processors can use all formats,
-so that it would be desirable to provide an image in both EPS and GIF
-format, if you can.
+by a single block of px elements.  You provide a
+figurecontent element for each alternative figure format you provide.
+The processing system selects a usable format from those available;
+not all processors can use all formats, so that it would be desirable
+to provide an image in both EPS and GIF format, if you can.
 
 <p>You can provide paragraphs of text (perhaps containing a 
 <ref id=el.sun.verbatim>verbatim</ref> element) as figure content.
@@ -1582,19 +1593,19 @@ which can be referred to from elsewhere.
 element, but it is also permissible within ordinary paragraphs.  Note,
 however, that the tabular element does not necessarily have a
 linebreak before and after it in this case.  If you want the tabular
-to go on a line by itself (which will usually be the case, you should
+to go on a line by itself (which will usually be the case), you should
 include it within a <ref id='el.sun.blockquote' >blockquote</ref>
 element.
 
-<p><update versionid="post-0.2">Corrected Oasis URL</update>
-The Starlink DTDs use the <webref
-url='http://www.oasis-open.org/html/a503.htm' >Oasis
-Exchange Table Model</webref> as the basis for their tables.  Even
-though it is only a portable subset of a more elaborate standard (the
+<p><update versionid="post-0.2">Corrected Oasis URL</update> The
+Starlink DTDs use the `Oasis Exchange Table Model' (OASIS document
+<webref url='http://www.oasis-open.org/html/a503.htm' >OASIS
+TR9503:1995</webref>) as the basis for their tables.  Even though it
+is only a portable subset of a more elaborate standard (the
 industry-standard CALS table model), there is more in the table model
 than has yet been implemented in the Starlink application.  You may
 use in your documents all of the elements and attributes in the Oasis
-model, but some of the lesser-used attributes are not recognised.
+model, but some of the lesser-used attributes are not supported.
 
 <p>The support for Oasis table attributes is as shown in 
 <ref id=table.oasis/>.
@@ -1605,6 +1616,8 @@ Support for Oasis table attributes in Starlink DTDs
 <tabular>
 <tgroup cols="3" align=center>
 <colspec colnum=1 align=left>
+<colspec colnum=2 colwidth="*">
+<colspec colnum=3 colwidth="*">
 <thead>
 <row>
 <entry>Element<entry>Supported<entry>Unsupported
@@ -1618,8 +1631,8 @@ Support for Oasis table attributes in Starlink DTDs
 <row>
 <entry>tbody<entry>(none)<entry>valign
 <row>
-<entry>colspec<entry>align, colname, colnum, colsep, rowsep
-	<entry>char, charoff, colwidth
+<entry>colspec<entry>align, colname, colnum, colsep, rowsep, colwidth
+	<entry>char, charoff
 <row>
 <entry>row<entry>rowsep<entry>valign
 <row>
@@ -1655,15 +1668,17 @@ given priority.
 ]]></verbatim>
 You specify an ID for the table, and optionally also the `export'
 attribute, in the table start tag.  A tabular can have a number of
-groups of rows, specified by tgroup elements, and it is in the
-start-tag of that element that you specify the number of columns in
+groups of rows, contained within tgroup elements, and it is in the
+start-tag of the tgroup element that you specify the number of columns in
 rows in that group.  A group of rows consists of an optional group of
 heading rows, followed by one or more groups of body rows.  Each row
 consists of a sequence of entry elements.
 
-<p>For more detailed documentation, including documentation of the
-currently unsupported features, see the Oasis documentation referred
-to above.
+<p>For more detailed documentation on the tabular element, see <ref
+id=el.sun.tabular/> and the documentation of the other tabular
+elements.  For alternative documentation, including documentation of
+the currently unsupported features, see the Oasis document referred to
+above.
 
 <subsect id=str.text export>Text markup
 <update versionid="v0.6">Added paragraph describing ANGLE element</update>
@@ -1677,7 +1692,7 @@ that there are a few elements (index, note and draftnote) which may
 not appear.
 
 <p>The paragraph elements have an `id' attribute, which allows you to
-refer to them using a REF element (see <ref id=el.sun.ref/>).  This
+refer to them using a ref element (see <ref id=el.sun.ref/>).  This
 reference will, however, typically be a reference to the section which
 contains the paragraph rather than to the paragraph specifically.
 This is an instance of the more general warning that you should 
@@ -1744,6 +1759,23 @@ and dd elements within the description list must be paired.
 DTD designed to document astronomical software, there is a special
 element for referring to astronomical angles.  This is an empty
 element, with the components of the angle specified as attributes.
+See <ref id='el.sun.angle' />.
+
+<p>For example:
+<verbatim>&lt;angle angle=45 minutes=30 seconds=10 fraction=0/&gt; is
+an angle in 
+degrees (the default), and &lt;angle unit=hours angle=6 minutes=45/&gt; is
+an angle in hours, with the number of seconds and fractions of seconds
+omitted.  An angle like &lt;angle angle=1000 fraction=10/&gt; is
+syntactically acceptable, but astronomical nonsense.
+</verbatim>
+This produces: <angle angle=45 minutes=30 seconds=10 fraction=0/> is
+an angle in 
+degrees (the default), and <angle unit=hours angle=6 minutes=45/> is
+an angle in hours, with the number of seconds and fractions of seconds
+omitted.  An angle like <angle angle=1000 fraction=10/> is
+syntactically acceptable, but astronomical nonsense.
+
 
 <subsect id=str.maths export>Maths
 <update versionid="v0-4">Slight edit to discuss new mline and mlabel
@@ -1759,7 +1791,7 @@ elements</update>
 
 <p>All the maths in Starlink documents uses &latex;
 notation.<note>MathML was considered, but is neither well-supported in
-browsers, nor designed to be easily written by hand</note>  The `m'
+browsers, nor designed to be easily written by hand.</note>  The `m'
 element is equivalent to <code/&dollar;...&dollar>, `mequation' is
 equivalent to <code>\begin{equation} ... \end{equation}</code> and
 `meqnarray' is equivalent
@@ -1802,20 +1834,20 @@ spaces in maths mode anyway.
 
 <p>If you need or wish to make some definitions which are to be
 effective in all sucessive maths elements -- for example you want to
-write the abbreviation
-<code>\\def\\degs{^\\circ}</code> -- you can put them in an
-<ref id=el.sun.mdefs>mdefs</ref> element.  This sits between or before paragraphs.
+write the abbreviation <code>\def\degs{^\circ}</code> -- you can put
+them in an <ref id=el.sun.mdefs>mdefs</ref> element.  This sits
+between or before paragraphs.
 
-<p>The contents of the <code/mdefs> element are processed as arbitrary LaTeX.
-However, you should not include anything other than definition
-commands and possibly other parameters to do with the layout of maths,
-and specifically you should write nothing which creates any output.
-Although this element is processed fairly straightforwardly when
-generating LaTeX output, the content is moved around quite a lot when
-producing HTML output, and hacky fiddling here has the potential to
-mess up your document in the present and, what is much worse,
-<em>become wrong</em> when processed by a later version of the
-down-converter.  In other words: <em>Do Not Hack This!</em></p>
+<p>The contents of the <code/mdefs> element are processed as arbitrary
+&latex;.  However, you should not include anything other than
+definition commands and possibly other parameters to do with the
+layout of maths, and specifically you should write nothing which
+creates any output.  Although this element is processed fairly
+straightforwardly when generating &latex; output, the content is moved
+around quite a lot when producing HTML output, and hacky fiddling here
+has the potential to mess up your document in the present and, what is
+much worse, <em>become wrong</em> when processed by a later version of
+the down-converter.  In other words: <em>Do Not Hack This!</em></p>
 
 
 <subsect id=str.span export>Output depending on media type
@@ -1855,11 +1887,11 @@ associating documentation directly with program code, and associating
 that detailed documentation with user documents.
 
 <p>As described in <ref id=str.code/>, the Starlink General DTD has an
-appendix element <ref id=el.sun.routinelist>routinelist</ref>,
-containing one or more 
-<ref id=el.sun.codecollection>codecollection</ref> elements.  Each of these latter elements makes
-a link between the documentation and a document marked up using the
-programcode DTD, which I will now describe.
+element <ref id=el.sun.routinelist>routinelist</ref>, containing one
+or more <ref id=el.sun.codecollection >codecollection</ref> elements.
+Each of these latter elements makes a link between the documentation
+and a document marked up using the programcode DTD, which I will now
+describe.
 
 <p>If you wish to refer to some element within the codecollection, say
 a function to which you gave the ID <code/myfunc> by specifying an
@@ -1867,11 +1899,11 @@ a function to which you gave the ID <code/myfunc> by specifying an
 <ref id=el.programcode.routinename>routinename</ref> programcode
 element, you do so <foreign/via> the `codecollection' element.  You
 make the reference using the <ref id=el.sun.coderef>coderef</ref>
-element, which takes two (required) attributes: an ID for the
-`codecollection' which contains the programcode file, and name of the
-ID within that file.  For example (assume entities `myfiles' and
-`origfiles' have been declared as subdocuments, referring to
-programcode documents):
+element, which takes two attributes: an ID for the
+`codecollection' which contains the programcode file, and (required)
+the name of the ID within that file.  For example (assume entities
+`myfiles' and `origfiles' have been declared as subdocuments,
+referring to programcode documents):
 <verbatim><![CDATA[
 <p>See also
 <coderef collection=mystuff id=myfunc>my funky function</coderef>, 
@@ -1891,14 +1923,13 @@ namespacing, so that you don't have to worry about having to give
 different IDs to functions in different collections of code.
 
 <p>The programcode document -- the document marked up using the
-programcode DTD, pointed to by the main documentation -- may be
-compilable source code, with the markup suitably commented out of
-sight of the compiler; it may be a skeleton document which includes
-separate source files into itself; or it may be a non-compilable
-document maintained separately or generated from idiolectal source
-markup by some sed or Perl magic.  It makes no difference to the SGML
-parser, but gives the code author flexibility in deciding how much,
-and what, markup to allow into their code comments.
+programcode DTD, pointed to by the main documentation -- may be a
+conventional SGML document, maintained separately or generated from
+idiolectal source markup by some sed or Perl magic, or it may be a
+skeleton document which includes separate (compilable) source files
+into itself.  It makes no difference to the SGML parser, but gives the
+code author flexibility in deciding how much, and what, markup to
+allow into their code comments.
 
 <p>There are distinct document type declarations for the different
 supported languages, although they use the same underlying markup.
@@ -1925,29 +1956,31 @@ That, however, is a project for another time.
 
 <p>Let us start in the traditional way, with a (sort of) `hello world'
 program:
-<verbatim><![CDATA[
-<!DOCTYPE programcode PUBLIC '-//Starlink//DTD Fortran Source Code 0.2//EN'>
-<PROGRAMCODE>
-<DOCBLOCK>
-<title>Test program
-<authorlist>
-<author id=ng affiliation='Starlink, Glasgow'><NAME>Norman
-
-<codegroup><DOCBLOCK><TITLE>Test function
-
+<verbatim><![ CDATA [
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD Fortran Source Code 0.7//EN">
+<title>The `hello world' program
+<codegroup>
+<title>Group title
+<description>First test program
 <routine>
-<ROUTINEPROLOGUE>
-<routinename><NAME>helloworld
-<description><P>Greets the world with a sunny hello
-<returnvalue type=string>Suitably formatted greeting
-<argumentlist>
-<parameter given><NAME>language
-  <type>enumerated list<description><P>Selects the language to use.
-  Allowed values are english and sanskrit.
-</ARGUMENTLIST>
-<authorlist><authorref id=ng>
-</ROUTINEPROLOGUE>
-<codebody empty>
+<codeopener>
+      subroutine helloworld (language)
+<routineprologue>
+   <routinename id=hi1>
+     helloworld
+   <description>
+     Greets the world with a sunny hello
+   <argumentlist>
+   <parameter given>
+     <name>language
+     <type>_integer</type>
+     <description>Selects the language to use.
+     0=english, 1=sanskrit.
+   <authorlist>
+   <author id=ng affiliation='Glasgow'>Norman Gray
+<codebody>
+      write (*,*) 'ack!'
+      end
 ]]></verbatim>
 
 <p>This is, obviously, not a compilable Fortran program, but it is a
@@ -1958,25 +1991,66 @@ output of some script which extracts documentation from compilable
 source code files.
 
 <p>As mentioned above, the programcode DTD allow you to make heavy use
-of SGML tag omission features.  All the capitalised tags in this
-example are omissable: removing them tips the balance back to the
-healthy side of more text than markup.  The Fortran code DTD allows
-further abbreviation, and we shall see that the content of the `func'
-element could be represented as:
+of SGML tag omission features.  As well as the usual such features,
+the Fortran code DTD allows further abbreviation, and we shall see
+that the above program could be represented as:
 <verbatim><![CDATA[
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD Fortran Source Code 0.7//EN">
+<title>The `hello world' program
+<codegroup>
+<title>Group title
+<description>First test program
+<routine>
+<codeopener>
+      subroutine helloworld (language)
 *+
-* <routinename>helloworld
-* <description>Greets the world with a sunny hello
-* <returnvalue type=string>Suitably formatted greeting
-* <argumentlist>
-* <parameter given>
-*   language = enumerated list
+*   <routinename id=hi1>
+*     helloworld
+*   <description>
+*     Greets the world with a sunny hello
+*   <argumentlist>
+*   <parameter given>
+*     language = _integer
 *     Selects the language to use.
-*     Allowed values are english and sanskrit.
-* <authorlist><authorref id=ng>
+*     0=english, 1=sanskrit.
+*   <authorlist>
+*   <author id=ng affiliation='Glasgow'>Norman Gray
 *-
-      (function source code goes here)
+      write (*,*) 'ack!'
+      end
 ]]></verbatim>
+All the material after the <code/&lt;codeopener&gt;> start-tag is
+compilable Fortran, and might well be read in, using an entity (<ref
+id=markup.files/>), from the routine source code.  The fully
+normalised version of this document (modulo a few spaces) is in <ref
+id=fig.normprog/>.
+<figure float id=fig.normprog alt="Normalised programcode document">
+<caption>A programcode document with all tags in place, the normalised
+version of the fortrancode document in the text.</caption>
+<px>
+<verbatim><![ CDATA [
+<programcode><docblock>
+<title>The `hello world' program</title></docblock>
+<codegroup><docblock><title>Group title</title>
+<description><p>First test program</p></description></docblock>
+<routine>
+<codeopener>      subroutine helloworld (language)</codeopener>
+<routineprologue>
+<routinename id="hi1"><name>helloworld</name></routinename>
+<description><p>Greets the world with a sunny hello</p></description>
+<argumentlist>
+<parameter given>
+<name>language </name>
+<type> _integer</type>
+<description><p>Selects the language to use.  0=english, 1=sanskrit.</p>
+</description></parameter></argumentlist>
+<authorlist>
+<author id="ng" affiliation="Glasgow"><name>Norman Gray</name></author>
+</authorlist></routineprologue>
+<codebody>      write (*,*) 'ack!'
+      end</codebody>
+</routine></codegroup></programcode>
+]]></verbatim></px></figure>
 
 <p><update versionid="post-0.2">Added a note pointing out
 that returnvalue and argumentlist have optional `none'
@@ -2486,37 +2560,39 @@ our `hello world' example into two files, a skeleton file holding the
 general structure, and including an entity which refers to the source
 code:
 <verbatim><![CDATA[
-<!DOCTYPE programcode PUBLIC '-//Starlink//DTD Fortran Source Code 0.2//EN' [
- <!ENTITY ptest-source SYSTEM 'ptest.for'>
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD Fortran Source Code 0.7//EN" [
+  <!ENTITY ptest-source SYSTEM 'ptest.f'>
 ]>
-
-<title>Test program
-<authorlist>
-<author id=ng affiliation='Starlink, Glasgow'>Norman
-
-<codegroup>Test function
-
+<title>The `hello world' program
+<codegroup>
+<title>Group title
+<description>First test program
+<routine>
+<codeopener>
 &ptest-source;
 ]]></verbatim>
 and a separate file, <code/ptest.for>, containing just the source code:
 <verbatim><![CDATA[
+      subroutine helloworld (language)
 *+
-* <routinename>helloworld
-* <description>Greets the world with a sunny hello
-* <returnvalue type=string>Suitably formatted greeting
-* <parameter given>
-*   language = enumerated list
+*   <routinename id=hi1>
+*     helloworld
+*   <description>
+*     Greets the world with a sunny hello
+*   <argumentlist>
+*   <parameter given>
+*     language = _integer
 *     Selects the language to use.
-*     Allowed values are english and sanskrit
-* <authorlist><authorref id=ng>
+*     0=english, 1=sanskrit.
+*   <authorlist>
+*   <author id=ng affiliation='Glasgow'>Norman Gray
 *-
-      write (*,*) 'hello'
+      write (*,*) 'ack!'
+      end
 ]]></verbatim>
 
-<p>Note that in this case the source-code file refers to its author
-only through the authorref element, pointing to the author
-element and its associated author metadata in the main file.
-
+<!-- Omit this section - more chatty and provisional than appropriate -->
+<![ IGNORE [
 <subsect id=doccode.devel export>Development of the programcode DTD
 
 <p>As you can see from the programcode structure in 
@@ -2595,6 +2671,8 @@ makes it easy to write powerful downstream tools in the future.
 <p>It is clear that a balance has to be struck here, and that my own
 taste would not be universal.  I'm open to suggestion.
 
+]]>
+
 <sect id=processing export>Processing your document
 
 <p>SGML documents are processed using a suite of free tools produced
@@ -2641,63 +2719,18 @@ discussion of very simple processing.</update>
 
 <p>You should use the command <code/sgml2docs> to process your SGML
 documents.  See <coderef collection=supportprogs
-id=sgml2docs>sgml2docs</coderef> for detailed documentation.
+id=sgml2docs/> for detailed documentation, or give the command
+<kbd/sgml2docs --help> for a quick summary.
 
-<![IGNORE[
-<p>Given a single argument, specifying an SGML source file, the script
-uses the Starlink DSSSL stylesheets to process this into a
-collection of HTML files and GIFs, or &latex; and EPS files
-places them in a subdirectory named after the source file, and
-then creates a tarball in the source directory holding the
-generated files.
-
-<p>It requires that the environment variable <code/STARLINK_SGML_DIR> is
-properly set, pointing to the root of the Starlink SGML kit.  It
-also requires that dvi2bitmap is in the <code/PATH>.
-The script creates a work directory and does its processing
-there.  If it is necessary to run Bib&tex;, it will be done with
-that temporary directory as the current directory, so that it
-might be necessary to set <code/BIBINPUTS> (for example) to let the
-system find the bibliography database.
-
-<p>The program takes a single argument, the SGML file to be processed.
-
-There are several script options:
-<dl compact>
-<dt><code/--html>
-<dd>Generate HTML (the default).
-<dt><code/--htmlsingle>
-<dd>Generate HTML, but in a single file rather than a collection.
-<dt><code/--latex>
-<dd>Generate &latex;.
-<dt><code/--packagedir my-dir>
-<dd>Package up the generated files into a directory called `my-dir'.
-<dt><code/--tarball my.tar>
-<dd>Bundle the package-dir into a tarball named `my.tar'.  If you do
-not give an absolute pathname, it will be located relative to the
-current directory.
-<dt><code/--jadeflags flags>
-<dd>Pass the given flags to Jade.
-<dt><code/--options opt,opt,...>
-<dd>Set options (see below).
-<dt><code/--help>
-<dd>Show brief usage instructions.
-<dt><code/--version>
-<dd>Display the version of the script, and exit.
-<dt><code/--debug>
-<dd>Don't delete the working directory at the end (allows you to explore).
-</dl>
-]]>
-
-<p>The final option, <code/--jadeflags>, allows you to do some limited
-customisation of the output.  See <ref id=appx.system.paramdsssl/>.
-Jade flags can most conveniently be set using options, using the
-<code/--options> argument.  There are no options (yet) for the HTML
-output, but the &latex; output has options <code/cts-sect> (do not
-start a new page with each new section), <code/cts-appx> (same, for
-appendices), and <code/onepass> (produce output which needs
-only a single pass through &latex;, which means that the
-table-of-contents ends up printed last, requiring trivial
+<p>The <code/sgml2docs> option <code/--jadeflags> allows you to do
+some limited customisation of the output.  See <ref
+id=appx.system.paramdsssl/>.  There are some groups of Jade flags
+which can more conveniently be set using options, using the
+<code/--options> argument.  The &latex; output has options
+<code/cts-sect> (do not start a new page with each new section),
+<code/cts-appx> (same, for appendices), and <code/onepass> (produce
+output which needs only a single pass through &latex;, which means
+that the table-of-contents ends up printed last, requiring trivial
 rearrangement).
 
 
@@ -2711,7 +2744,7 @@ which will typically contain the marked up prologues of a set of
 user-level tasks in a package,
 into a <code/.hlp> file, which can be processed into a Starlink help library
 using the <code/HLIB> program documented in
-<docxref doc="sun124" text="SUN/124">.
+<docxref doc="sun124" text="SUN/124"/>.
 
 <p>The program takes as arguments the name of any file(s) consituting
 the SGML programcode document, and writes the resulting help text
@@ -2751,6 +2784,9 @@ See also the notes in the
 <coderef collection=supportprogs id=sgml2xml>detailed
 documentation</coderef>.
 
+
+<!-- Too long redundant: remove -->
+<![ IGNORE [
 <subsect id=proc.makefile export>Processing documents -- using the Makefile
 <update versionid="v0.6">Makefile approach no longer supported</update>
 
@@ -2911,6 +2947,7 @@ convenience.
 a manifest of the files which make a complete set.  The names of the
 manifest files can be configured as parameters (see 
 <ref id=appx.system.paramdsssl/>).
+]]>
 
 <subsect id=editors export>Editors
 
@@ -3330,7 +3367,7 @@ code2sgml -c c2sconfig -D this.f that.f other.f > routines.sgml
 <li>The resulting SGML document can now be used for generating 
 both the descriptions of commands or routines in the SUN
 and, if applicable, Starlink <code>.hlp</code> 
-files for use by the HLP system (<docxref doc=sun124 text='SUN/124'>).
+files for use by the HLP system (<docxref doc=sun124 text='SUN/124'/>).
 Because of the way that the files have been generated, they
 will contain only ASCII-like content.
 If you want to include more sophisticated content,
@@ -3475,7 +3512,7 @@ could be a smallish task or a huge one, depending on what we wanted to do.
 <dt>Searching
 <dd>I'd like to support sophisticated searching.  The Starlink HTX
 system allows some context-based searching (see <docxref
-doc="sun188" loc='searching_for_information'>), and it should be easy
+doc="sun188" loc='searching_for_information'/>), and it should be easy
 to support this and more in the SGML set.  This would involve
 finding a suitable SGML-aware search engine.  The <webref
 url="http://info.ox.ac.uk/bnc/sara/" >BNC's SARA server</webref> might
@@ -3658,11 +3695,6 @@ Corp</webref>.
 <p>The DSSSL code started off heavily based on Norman Walsh's <webref
 url="http://nwalsh.com/docbook/dsssl/" >DocBook
 DSSSL stylesheets</webref>.
-
-<p>Mark Taylor provided a great deal of elaborate criticism of the DTD
-structure.  Though I haven't agreed with all his suggestions, future
-users of this kit have a lot to thank him for in terms of the
-flexibility and usability of the DTD.
 
 <p>We should like to thank Rodney Warren-Smith, Martin Bly, Peter
 Draper and David Berry for detailed discussions and criticisms in
@@ -4480,12 +4512,12 @@ the system, as well as going beyond the current, and adequate, HTX
 model.
 
 <p>The current SGML set uses Star2html and HTX.  Star2html (see <docxref
-doc=sun199>) generates a distributable document set with correct
+doc=sun199/>) generates a distributable document set with correct
 internal cross-references, and `best guess', but possibly broken,
 external ones.  These references are then patched up in a separate
 installation phase, being edited by a copy of HTX primed with
 appropriate local knowledge (see <docxref doc=sun188
-loc=how_linking_works>).
+loc=how_linking_works/>).
 
 <p>The aim of the current set is to produce documents which are in
 their final form, and can be moved to their final location without
@@ -4499,7 +4531,7 @@ convenient parameterisation.
 the current set is intended to be used with HTX, and is claimed
 to be compatible with it.  It produces links in the format recognised
 by HTX, as described (or defined?) in <docxref doc=sun188
-loc=referring_to_targets>.  Note two points, however.  
+loc=referring_to_targets/>.  Note two points, however.  
 
 <ul>
 <li>The generated
@@ -4535,15 +4567,21 @@ generate them as the interface.
 
 <subsect id=appx.system.dssslcode export>The DSSSL source code
 
-<routinelist>
-<p>The following sections document some of the more important DSSSL
-style sheets
+<![ %Only.paper; [
+<p>The online version of this document, not subject to space constraints,
+includes documentation for a number of internal functions and
+parameters of interest only to maintainers of the DSSSL code set.
+]]>
 
-<codecollection doc="dsssl.params">
 <![ %Only.web [
 <!-- These are long-winded, and not terribly useful to the general
      reader.  Since they're all tiny, as well, they take up a _lot_ of
      paper. -->
+<routinelist>
+<p>The following sections document some of the more important DSSSL
+style sheets.
+
+<codecollection doc="dsssl.params">
 <codecollection doc="dsssl.common">
 <codecollection doc="dsssl.lib">
 ]]>

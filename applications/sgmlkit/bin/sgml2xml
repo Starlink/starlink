@@ -103,6 +103,9 @@ $ident_string = 'Starlink SGML Kit, release ((PKG_VERS))';
 #
 #  <diytopic>Notes
 #
+#    <p><code>sx</> is available as part of James Clark's <webref
+#    url='http://www.jclark.com/sp/' >SP</> package.
+#
 #    <p>References to `productions' are to the productions of the 
 #    SGML standard.
 #    See <url>http://www.tiac.net/users/bingham/sgmlsyn/sgmlsyn.htm</url> for a

@@ -25,7 +25,8 @@
 as an hour angle.  All the attributes are (syntactically) individually
 omissable: the system does not perform any check that the
 supplied value is reasonable.
-<example>&lt;angle angle=45 minutes=30 seconds=10 fraction=0/&gt; is an angle in
+<example>&lt;angle angle=45 minutes=30 seconds=10 fraction=0/&gt; is
+an angle in 
 degrees (the default), and &lt;angle unit=hours angle=6 minutes=45/&gt; is
 an angle in hours, with the number of seconds and fractions of seconds
 omitted.  An angle like &lt;angle angle=1000 fraction=10/&gt; is
@@ -279,35 +280,65 @@ left-aligned except the third one, say, then you would specify left
 alignment in the <elemref gi="tgroup"/> start-tag, and give a <elemref gi="colspec" self="self"/> element like <code>&lt;colspec colnum=3
 align=center&gt;</code>.
 </p>
+
 <attribute name="align">
 <p>Default alignment of entries in cells.</p>
 </attribute>
+
 <attribute name="char">
 <p>Alignment character (<em>not supported</em>).</p>
 </attribute>
+
 <attribute name="charoff">
 <p>Alignment character (<em>not supported</em>).</p>
 </attribute>
+
 <attribute name="colname">
 <p>A name for this column.  An <elemref gi="entry"/> element may refer to
 a column by name in a `colname' or `namest' attribute.</p>
 </attribute>
+
 <attribute name="colnum">
 <p>This column's number.  If this is omitted, the column's number is
 taken to be one greater than the previous column, with the first
 column being taken to be number 1.</p>
 </attribute>
 <attribute name="colsep">
-<p>The default value of the colsep attribute for entries in this <elemref gi="tgroup"/>. </p>
+<p>The default value of the colsep attribute for entries in this
+<elemref gi="tgroup"/>.</p>
 </attribute>
-<attribute name="colwidth">
-<p>The width of this column (<em>not supported</em>).</p>
-</attribute>
-<attribute name="rowsep">
-<p>The default value of the rowsep attribute for entries in this <elemref gi="tgroup"/>.
 
-</p>
+<attribute name="colwidth">
+<p>The width of this column.  You specify the width as a
+length like `&lt;number>&lt;dimension>', where `&lt;number>' is a positive
+integer or floating point number, and `&lt;dimension>' is one of the
+units `pt' (points), `cm', `mm', `pi' (picas), `in' or `*'.  The unit
+`*' is a proportional measure which corresponds to the length
+`pagewidth/numcols' in the case of a table with `numcols' columns.  If
+there is a number but no unit, the unit is taken to be `pt'; and
+the specifications "" (the empty string) and "*" are both taken to be
+`1*'.</p>
+
+<p>NOTE: The <webref url='http://www.oasis-open.org/html/a503.htm'
+>OASIS spec</webref> has a rather elaborate definition of the
+`proportional measure'.  The definition of this measure implemented in
+the current version of the software and described above is broadly
+consistent in spirit with this, but different in details, so you
+should not rely too much on these details, in case the implementation
+is tightened at some point in future.  In any case, the appearance
+of tables will tend to be rather different in the HTML and LaTeX
+versions of the output.  The main present practical effect of the
+colspec attribute is that, if it is present, then the corresponding
+column is line-wrapped in the LaTeX output, which does not otherwise
+happen.</p>
+
 </attribute>
+
+<attribute name="rowsep">
+<p>The default value of the rowsep attribute for entries in this
+<elemref gi="tgroup"/>.</p>
+</attribute>
+
 </element>
 
 
@@ -1323,12 +1354,12 @@ specified by this element.</p>
 <p>The default alignment of columns</p>
 </attribute>
 <attribute name="colsep">
-<p>If given and non-zero, then separate columns with lines (default taken
-from <elemref gi="tabular"/> element).</p>
+<p>If given and non-zero, then separate columns with vertical lines
+(default taken from <elemref gi="tabular"/> element).</p>
 </attribute>
 <attribute name="rowsep">
-<p>If given and non-zero, then separate rows with lines (default taken
-from <elemref gi="tabular"/> element).
+<p>If given and non-zero, then separate rows with horizontal lines
+(default taken from <elemref gi="tabular"/> element).
 </p>
 </attribute>
 </element>

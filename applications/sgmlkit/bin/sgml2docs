@@ -30,13 +30,19 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #  <diytopic>Options
 #     <dl>
 #     <dt>--html<dd>generate HTML (the default).
-#     <dt>--htmlsingle<dd>generate HTML in a single file.
+#     <dt>--htmlsingle<dd>generate HTML in a single file.  Not really
+#           supported, so not often tested.
 #     <dt>--latex<dd>generate LaTeX.
 #     <dt>--packagedir my-dir<dd>package up the generated files into a
-#           directory called `my-dir'.
+#           directory called `my-dir'.  The default directory is based
+#           on the input filename.
 #     <dt>--tarball my.tar<dd>bundle the package-dir into a tarball
-#           named `my.tar'
-#     <dt>--jadeflags flags<dd>add the given flags to the invocation of Jade.
+#           named `my.tar'.  The default tarball name is based
+#           on the input filename.
+#     <dt>--jadeflags flags<dd>add the given flags to the invocation
+#           of Jade.  See the
+#           <webref url='http://www.jclark.com/jade/' 
+#           >Jade documentation</webref> for details.
 #     <dt>--ignore-manifest<dd>Do not use the generated manifest when
 #           bundling up files, but instead just bundle everything in
 #           sight.  You will need to use this only if there is some
@@ -60,7 +66,7 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #	    be enough for HTX, but isn't bulletproof; the full
 #	    normalisation, using the <code>sgmlnorm</> application
 #	    should indeed be bulletproof, but is also rather slow.
-#	    the default is currently <code>nonorm</>, but might well
+#	    the default is currently <code>simplenorm</>, but might well
 #	    change in future.
 #     <dt>--help<dd>display usage and exit.
 #     <dt>--version<dd>display version and exit.
@@ -76,7 +82,7 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #       This converts the document <code>docfile.sgml</> to a set of
 #       HTML files, bundling the result into a tarball
 #       <code>mydocs.tar</>, rather than the default based on the
-#       source file's document class and number.
+#       source file's name.
 #     <example>
 #       sgml2docs --latex --options cts-sect,cts-appx docfile.sgml
 #     <examplenote>
@@ -86,7 +92,9 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #  <diytopic>Environment
 #     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</> is
 #     properly set, pointing to the root of the Starlink SGML kit.  It
-#     also requires that dvi2bitmap is in the <code>PATH</>.
+#     also requires that <code>dvi2bitmap</> is in the <code>PATH</>  The
+#     script is currently rather sensitive to the available version of
+#     <code>dvi2bitmap</>, and does a rather cautious check.
 #
 #     <p>The script creates a work directory and does its processing
 #     there.  If it is necessary to run BibTeX, it will be done with
@@ -134,7 +142,7 @@ tempdest=tmp.stamp
 #DVI2BITMAPVERSION=`$DVI2BITMAP -V|sed -n '1s/^[^ ]* *\([^ ]*\).*$/\1/p'`
 # I'm in two minds about how elaborate this is.  On one hand, there
 # are significant issues about version skew, since this script does
-# depend rathe heavily on the dvi2bitmap version, but on the other,
+# depend rather heavily on the dvi2bitmap version, but on the other,
 # this logic is just begging to go wrong somewhere....
 DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
 if [ $DVI2BITMAPVERSION -lt 9 ]; then
