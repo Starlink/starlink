@@ -3671,8 +3671,8 @@ proc Effects {im effect nodisp} {
 # in list "ims".
             set exp $MEXP
             set ims ""
-            while { [regexp -nocase -indices {(^|[^A-Z])(I[A-Z])([^A-Z]|$)} $exp match s im e] } {
-               lappend ims [string range $exp [lindex $im 0] [lindex $im 1]]
+            while { [regexp -nocase -indices {(^|[^A-Z])(I[A-Z])([^A-Z]|$)} $exp match s imt e] } {
+               lappend ims [string range $exp [lindex $imt 0] [lindex $imt 1]]
                set exp "[string range $exp 0 [lindex $s 1]][string range $exp [lindex $e 0] end]"
             }
    
@@ -3719,14 +3719,14 @@ proc Effects {im effect nodisp} {
                set nstack [llength $IMAGE_STACK($im)]
                scan a %c a
 
-               foreach im $ims {
-                  if { [regexp -nocase {I(.)} $im match letter] } {
+               foreach imt $ims {
+                  if { [regexp -nocase {I(.)} $imt match letter] } {
                      set letter [string tolower $letter]
                      scan $letter %c letter
                      set index [expr $letter - $a]
    
                      if { $index < $nstack } {
-                        append impar " $im=[lindex $IMAGE_STACK($im) $index] "
+                        append impar " $imt=[lindex $IMAGE_STACK($im) $index] "
                      } {
                         Message "There are insufficient images on the stack to perform the requested Maths effect."
                         set update 0
@@ -3766,6 +3766,20 @@ proc Effects {im effect nodisp} {
             set update 0
          }
    
+#---------------------------------------------------------------
+# Sky subtraction - Estimate the sky background based on the current sky
+# areas or supplied sky frames, and subtract it from the displayed image.
+      } elseif { $effect == "Sky Subtraction" } {
+
+         set file [SkySub $image $im]
+         if { $file == "" } {
+            set update 0
+            set desc ""
+            set ok 0
+         } {
+            set desc "Sky subtraction"
+         }
+
 #---------------------------------------------------------------
 # Smooth - Apply gaussian smoothing.
       } elseif { $effect == "Smooth" } {
@@ -9241,7 +9255,7 @@ proc Save {} {
 
 # Make the "header information" label (and associated tick mark) in the 
 # progress dialog box revert to black.
-                  Wop $hilab configure -foreground red 
+                  Wop $hilab configure -foreground black
                   Wop $hitick($ray) configure -foreground black
                   update idletasks
 
@@ -10763,7 +10777,7 @@ proc SkySub {data image args} {
 
 # Issue a warning if the sky areas have not been identified.
          if { ![CreateMask $image $skyobj] } {
-            Message "The ${ray}-ray areas containing sky have not been supplied."
+            Message "The ${ray}-ray areas containing sky have not been identified."
             set ok 0
             break
          }
@@ -10846,35 +10860,12 @@ proc SkySub {data image args} {
          }
       }
 
-# See if there are any bad pixels in the image.
-      if { $ok } {
-         if { [Obey kappa stats "ndf=$sky"] } {
-            set numbad [GetParam kappa stats:numbad]
-         } {
-            set ok 0
-         }
-      }
-
-# Fill any bad values in the sky fit using a smooth function. If there
-# are no bad values in the image then FILLBAD will report an error. We
-# can handle this case ismply by passing the input image straight through
-# to the output.
-      if { $ok } {
-         if { $numbad > 0 } { 
-            set fsky [UniqueFile]
-            if { ![Obey kappa fillbad "in=$sky out=$fsky" noreport] } {
-               set ok 0
-            }
-         } {
-            set fsky $sky
-         }
-
 # Subtract the sky image from the supplied data.
+      if { $ok } {
          set ssimage [UniqueFile]
-         if { ![Obey kappa sub "in1=$data in2=$fsky out=$ssimage"] } {
+         if { ![Obey kappa sub "in1=$data in2=$sky out=$ssimage"] } {
             set ok 0
          }
-
       }
 
 # If a progress report is required, stop the "sky subtraction" label

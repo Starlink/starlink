@@ -541,13 +541,13 @@
    MenuHelp $filemenu "Quit        " ".  Quit the application, thowing away the current image registration information."
 
 # Add menu items to the Effects menu.
-   foreach effect [list Align Fill Filter Log Maths Negate Smooth Threshold] {
-      $EFFECTSMENU add command -label $effect -command "Effects \$IMAGE_DISP $effect 0"
+   foreach effect [list Align Fill Filter Log Maths Negate "Sky Subtraction" Smooth Threshold] {
+      $EFFECTSMENU add command -label $effect -command "Effects \$IMAGE_DISP \"$effect\" 0"
    }
    $EFFECTSMENU add separator
-   $EFFECTSMENU add command -label "Show Effects" -command {Effects Show}
-   $EFFECTSMENU add command -label "Undo" -command {Effects Undo} -state disabled
-   $EFFECTSMENU add command -label "Undo All" -command {Effects "Undo All"} -state disabled
+   $EFFECTSMENU add command -label "Show Effects" -command {Effects $IMAGE_DISP Show 0}
+   $EFFECTSMENU add command -label "Undo" -command {Effects $IMAGE_DISP Undo 0} -state disabled
+   $EFFECTSMENU add command -label "Undo All" -command {Effects $IMAGE_DISP "Undo All" 0} -state disabled
    
    MenuHelp $EFFECTSMENU "Align"     ".  Align the displayed image with another specified image using the current mappings (if available)."
    MenuHelp $EFFECTSMENU "Fill"      ".  Replace any missing pixels with a constant value or smoothly varying surface."
@@ -555,6 +555,7 @@
    MenuHelp $EFFECTSMENU "Log"       ".  Take the logarithm (base 10) of the currently displayed image (the minimum value in the image is first subtracted from the image to remove negative values)."
    MenuHelp $EFFECTSMENU "Maths"     ".  Apply an arbitrary algebraic expression to one or more of the previously displayed images."
    MenuHelp $EFFECTSMENU "Negate"    ".  Multiply the currently displayed image by -1.0."
+   MenuHelp $EFFECTSMENU "Sky Subtraction" ".  Estimate the sky background based on the current sky areas or supplied sky frames, and subtract it from the displayed image."
    MenuHelp $EFFECTSMENU "Smooth"    ".  Apply Gaussian smoothing to the displayed image."
    MenuHelp $EFFECTSMENU "Threshold" ".  Remove values outside a given range from the displayed image."
    MenuHelp $EFFECTSMENU "Undo"      ".  Undo the most recent effect for the currently diplayed image."
