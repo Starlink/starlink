@@ -156,6 +156,7 @@
         CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
 
 *    Mark HDU data area as undefined
+        CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
         CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
         CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
 
