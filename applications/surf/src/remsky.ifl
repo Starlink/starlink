@@ -1,0 +1,54 @@
+## REMSKY - Remove sky noise and constant offset from data
+ 
+#+
+#  Name:
+#     REMSKY.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1996 November 17 (TIMJ)
+#        Original Version
+#     {enter_further_changes_here}
+ 
+#-
+
+
+   INTERFACE REMSKY
+
+      HELPLIB 'SCUBA_HELP:'
+
+      PARAMETER BOLOMETERS
+         TYPE    '_CHAR'
+         PROMPT  'The Sky bolometers, [a1,a2] for an array'
+	HELPKEY '*'
+      ENDPARAMETER
+ 
+      PARAMETER IN
+	 POSITION 1
+         TYPE    'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of input file containing demodulated map data'
+	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER   OUT
+         POSITION 2
+         PROMPT   'Name of output file'
+         TYPE     'FILENAME'
+         ACCESS   'WRITE'
+         VPATH    'PROMPT'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+ 
+   ENDINTERFACE
+
