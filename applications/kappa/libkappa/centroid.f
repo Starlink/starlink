@@ -329,6 +329,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -349,6 +350,8 @@
 *        Many major changes to make use of AST/PGPLOT.
 *     13-DEC-2001 (DSB):
 *        Added parameters CATFRAME and CATEPOCH.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -366,6 +369,7 @@
       INCLUDE 'NDF_PAR'        ! NDF definitions
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER  STATUS
@@ -867,12 +871,16 @@
 
 *  Find the centroids and errors, and display them.
          CALL KPS1_CENBT( INDF, CERROR, MAP3, MAP1, MAP2, CFRM, NPOS, 
-     :                    NAXC, NAXIN, %VAL( IPIN ), CAT, %VAL( IPID ), 
+     :                    NAXC, NAXIN, %VAL( CNF_PVAL( IPIN ) ), CAT, 
+     :                    %VAL( CNF_PVAL( IPID ) ),
      :                    LOGPOS, FDL, QUIET, NSIM, NDIMS, SLBND, SUBND, 
      :                    SEARCH, POSTVE, GUESS, MXSHFT, MXITER, OUTCO, 
-     :                    FDO, TOLER, TITLE, NSIM*NPOS, %VAL( IPW1 ), 
-     :                    %VAL( IPW2 ), %VAL( IPOUT ), %VAL( IPW3 ), 
-     :                    %VAL( IPW4 ), STATUS ) 
+     :                    FDO, TOLER, TITLE, NSIM*NPOS, 
+     :                    %VAL( CNF_PVAL( IPW1 ) ),
+     :                    %VAL( CNF_PVAL( IPW2 ) ), 
+     :                    %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    %VAL( CNF_PVAL( IPW3 ) ),
+     :                    %VAL( CNF_PVAL( IPW4 ) ), STATUS )
 
 *  Free the work arrays.
          CALL PSX_FREE( IPW1, STATUS )
@@ -898,8 +906,10 @@
      :                    CURSOR, MARK, IMARK, NAXC, NAXIN, LOGPOS, FDL, 
      :                    QUIET, NSIM, NDIMS, SLBND, SUBND, SEARCH, 
      :                    POSTVE, GUESS, MXSHFT, MXITER, OUTCO, FDO, 
-     :                    TOLER, TITLE, MPOS, %VAL( IPOUT ), NPOS, 
-     :                    %VAL( IPW1 ), %VAL( IPW2 ), STATUS ) 
+     :                    TOLER, TITLE, MPOS, %VAL( CNF_PVAL( IPOUT ) ), 
+     :                    NPOS,
+     :                    %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Free the work arrays.
          IF( CERROR ) THEN
@@ -932,8 +942,10 @@
 
 *  Create the output positions list if there are any positions ot output.
       IF( NPOS .GT. 0 ) THEN
-         CALL KPG1_WRLST( 'OUTCAT', MPOS, NPOS, NAXC, %VAL( IPOUT ),
-     :                    AST__CURRENT, IWCS, TITLE, ID0, %VAL( IPID ), 
+         CALL KPG1_WRLST( 'OUTCAT', MPOS, NPOS, NAXC, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ),
+     :                    AST__CURRENT, IWCS, TITLE, ID0, 
+     :                    %VAL( CNF_PVAL( IPID ) ),
      :                    .TRUE., STATUS )
       END IF
 

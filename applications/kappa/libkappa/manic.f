@@ -129,6 +129,7 @@
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -145,6 +146,8 @@
 *        output, because the old system did not take account of the fact
 *        that HDS locators for NDF components can become incorrect if the
 *        NDF is changed (because certain NDF calls create new HDS objects).
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes}
 
 *  Bugs:
@@ -161,6 +164,7 @@
       INCLUDE  'NDF_PAR'       ! NDF constants
       INCLUDE  'DAT_PAR'       ! HDS system constants
       INCLUDE  'PRM_PAR'       ! VAL constants
+      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -562,39 +566,53 @@
 
 *  Do the data pixel copying.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_MANIB( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                    %VAL( IPDO ), STATUS )
+         CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                    NDIMO, DIMO,
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                     AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                     %VAL( IPDO ), STATUS )
+         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                     NDIMO, DIMO,
+     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                     %VAL( CNF_PVAL( IPWKE ) ),
+     :                     %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_MANIW( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                    %VAL( IPDO ), STATUS )
+         CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                    NDIMO, DIMO,
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                     AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                     %VAL( IPDO ), STATUS )
+         CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                     NDIMO, DIMO,
+     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                     %VAL( CNF_PVAL( IPWKE ) ),
+     :                     %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_MANII( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                    %VAL( IPDO ), STATUS )
+         CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                    NDIMO, DIMO,
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_MANIR( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                    %VAL( IPDO ), STATUS )
+         CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                    NDIMO, DIMO,
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_MANID( NDIMI, DIMI, %VAL( IPDI ), NDIMO, DIMO,
-     :                    AXES, %VAL( IPWKC ), %VAL( IPWKE ),
-     :                    %VAL( IPDO ), STATUS )
+         CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ), 
+     :                    NDIMO, DIMO,
+     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
       END IF
 
 *  Unmap the data arrays.
@@ -616,39 +634,53 @@
 
 *  Do the variance pixel copying.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_MANIB( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                       %VAL( IPVO ), STATUS )
+            CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                       NDIMO, DIMO,
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                        AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                        %VAL( IPVO ), STATUS )
+            CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                        NDIMO, DIMO,
+     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                        %VAL( CNF_PVAL( IPWKE ) ),
+     :                        %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_MANIW( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                       %VAL( IPVO ), STATUS )
+            CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                       NDIMO, DIMO,
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                        AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                        %VAL( IPVO ), STATUS )
+            CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                        NDIMO, DIMO,
+     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                        %VAL( CNF_PVAL( IPWKE ) ),
+     :                        %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_MANII( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                       %VAL( IPVO ), STATUS )
+            CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                       NDIMO, DIMO,
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_MANIR( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                       %VAL( IPVO ), STATUS )
+            CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                       NDIMO, DIMO,
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_MANID( NDIMI, DIMI, %VAL( IPVI ), NDIMO, DIMO,
-     :                       AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                       %VAL( IPVO ), STATUS )
+            CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ), 
+     :                       NDIMO, DIMO,
+     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
          END IF
 
 *  Unmap the variance arrays.
@@ -669,9 +701,11 @@
      :                 STATUS )
 
 *  Do the quality pixel copying.
-         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( IPQI ), NDIMO, DIMO,
-     :                     AXES, %VAL( IPWKC ), %VAL( IPWKE ), 
-     :                     %VAL( IPQO ), STATUS )
+         CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPQI ) ), 
+     :                     NDIMO, DIMO,
+     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ), 
+     :                     %VAL( CNF_PVAL( IPWKE ) ),
+     :                     %VAL( CNF_PVAL( IPQO ) ), STATUS )
 
 *  Unmap the quality arrays.
          CALL NDF_UNMAP( INDF1, 'QUALITY', STATUS )

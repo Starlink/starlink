@@ -61,11 +61,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-NOV-2001 (DSB):
 *        Original NDF version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,6 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -143,14 +147,18 @@
 *  Select the appropriate routine for the data type being processed and
 *  create the output values.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_POWD( BAD, VAR, POWER, EL, %VAL( IPIN( 1 ) ), 
-     :                   %VAL( IPIN( 2 ) ), %VAL( IPOUT( 1 ) ), 
-     :                   %VAL( IPOUT( 2 ) ), NBAD, STATUS )
+         CALL KPG1_POWD( BAD, VAR, POWER, EL, 
+     :                   %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( IPOUT( 2 ) ) ), NBAD, STATUS )
  
       ELSE 
-         CALL KPG1_POWR( BAD, VAR, POWER, EL, %VAL( IPIN( 1 ) ), 
-     :                   %VAL( IPIN( 2 ) ), %VAL( IPOUT( 1 ) ), 
-     :                   %VAL( IPOUT( 2 ) ), NBAD, STATUS )
+         CALL KPG1_POWR( BAD, VAR, POWER, EL, 
+     :                   %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                   %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( IPOUT( 2 ) ) ), NBAD, STATUS )
  
       END IF
 

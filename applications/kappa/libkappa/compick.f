@@ -111,6 +111,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -124,6 +125,8 @@
 *     12-OCT-1998 (DSB):
 *        Changed the way in which the bounds of the output image are
 *        determined so that pixel origin information is retained.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,6 +142,7 @@
       INCLUDE  'PAR_ERR'       ! Parameter-system errors
       INCLUDE  'NDF_PAR'       ! NDF_ public constants
       INCLUDE  'PRM_PAR'       ! VAL__ constants
+      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -344,32 +348,46 @@
 *  Compress the input array to make the output array by selecting
 *  elements at equal intervals.
       IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CMPKR( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                    ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKR( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    COMPRS,
+     :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CMPKB( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                    ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKB( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    COMPRS,
+     :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CMPKD( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                    ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKD( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    COMPRS,
+     :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CMPKI( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                    ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKI( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    COMPRS,
+     :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CMPKUB( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                     ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKUB( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     COMPRS,
+     :                     ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CMPKUW( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                     ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKUW( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     COMPRS,
+     :                     ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CMPKW( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                    ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKW( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    COMPRS,
+     :                    ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
       END IF
 
 *    Tidy the data arrays.
@@ -396,32 +414,46 @@
 *  Compress the input array to make the output array by selecting
 *  elements at equal intervals.
          IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMPKR( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                       ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKR( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_CMPKB( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                       ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKB( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMPKD( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                       ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKD( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_CMPKI( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                       ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKI( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_CMPKUB( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                        ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKUB( NDIM, IDIMS, 
+     :                        %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                        ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                        STATUS )
 
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_CMPKUW( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                        ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKUW( NDIM, IDIMS, 
+     :                        %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                        ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                        STATUS )
 
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_CMPKW( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                       ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPG1_CMPKW( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), COMPRS,
+     :                       ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
          END IF
 
 *    Tidy the variance arrays.
@@ -445,8 +477,10 @@
 
 *  Compress the input array to make the output array by selecting
 *  elements at equal intervals.
-         CALL KPG1_CMPKUB( NDIM, IDIMS, %VAL( PNTRI( 1 ) ), COMPRS,
-     :                     ORIGIN, %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_CMPKUB( NDIM, IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     COMPRS,
+     :                     ORIGIN, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     STATUS )
 
 *    Tidy the quality arrays.
          CALL NDF_UNMAP( NDFI, 'Quality', STATUS )
@@ -478,39 +512,41 @@
 *  1-dimensional, so pass just the required dimension, compression
 *  factor and origin.
             IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_CMPKR( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKR( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                          %VAL( PNTRO( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_CMPKB( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKB( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                          %VAL( PNTRO( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_CMPKD( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKD( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                          %VAL( PNTRO( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_CMPKI( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKI( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                          %VAL( PNTRO( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_CMPKUB( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKUB( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                           %VAL( PNTRO( 1 ) ), STATUS )
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           STATUS )
 
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_CMPKUW( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKUW( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                           COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                           %VAL( PNTRO( 1 ) ), STATUS )
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           STATUS )
 
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_CMPKW( 1, ELA, %VAL( PNTRI( 1 ) ),
+               CALL KPG1_CMPKW( 1, ELA, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                          %VAL( PNTRO( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
             END IF
 
 *    Tidy the centre arrays.
@@ -544,39 +580,53 @@
 *  1-dimensional, so pass just the required dimension, compression
 *  factor and origin.
                IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMPKR( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKR( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_CMPKB( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKB( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMPKD( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKD( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_CMPKI( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKI( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_CMPKUB( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKUB( 1, ELA, 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                              %VAL( PNTRO( 1 ) ), STATUS )
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
 
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_CMPKUW( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKUW( 1, ELA, 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                              %VAL( PNTRO( 1 ) ), STATUS )
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
 
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_CMPKW( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKW( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                END IF
 
@@ -612,39 +662,53 @@
 *  1-dimensional, so pass just the required dimension, compression
 *  factor and origin.
                IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMPKR( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKR( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_CMPKB( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKB( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMPKD( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKD( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_CMPKI( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKI( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
 
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_CMPKUB( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKUB( 1, ELA, 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                              %VAL( PNTRO( 1 ) ), STATUS )
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
 
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_CMPKUW( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKUW( 1, ELA, 
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                              COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                              %VAL( PNTRO( 1 ) ), STATUS )
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
 
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_CMPKW( 1, ELA, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMPKW( 1, ELA, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             COMPRS( IAXIS ), ORIGIN( IAXIS ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
 *  Tidy the variance arrays.

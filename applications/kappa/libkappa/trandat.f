@@ -252,6 +252,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -272,6 +273,8 @@
 *        primitive NDFs.
 *     1996 November 14 (MJC):
 *        Added a final error report, and improved the documentation.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -288,6 +291,7 @@
       INCLUDE 'PRM_PAR'          ! Magic-value definitions
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'FIO_ERR'          ! Fortran-I/O-system errors
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -553,20 +557,23 @@
 *  Choose the appropriate routine for each data type.
             IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_TRDRD( FD, WDIMSC( 1 ), WDIMSC( 2 ), POSCOD,
-     :                          COUNT, %VAL( WPNTRC( 1 ) ),
-     :                          %VAL( WPNTRV( 1 ) ), LBND, UBND, CMPLET,
+     :                          COUNT, %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                          LBND, UBND, CMPLET,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPS1_TRDRI( FD, WDIMSC( 1 ), WDIMSC( 2 ), POSCOD,
-     :                          COUNT, %VAL( WPNTRC( 1 ) ),
-     :                          %VAL( WPNTRV( 1 ) ), LBND, UBND, CMPLET,
+     :                          COUNT, %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                          LBND, UBND, CMPLET,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_TRDRR( FD, WDIMSC( 1 ), WDIMSC( 2 ), POSCOD,
-     :                          COUNT, %VAL( WPNTRC( 1 ) ),
-     :                          %VAL( WPNTRV( 1 ) ), LBND, UBND, CMPLET,
+     :                          COUNT, %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                          LBND, UBND, CMPLET,
      :                          STATUS )
             END IF
 
@@ -668,19 +675,25 @@
 *  the input data, given co-ordinate information.  Choose the
 *  appropriate one for the data type.
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_TRNVD( NDIMS, ODIMS, COUNT, %VAL( WPNTRC( 1 ) ),
-     :                       %VAL( WPNTRV( 1 ) ), PSCALE, LBND,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPS1_TRNVD( NDIMS, ODIMS, COUNT, 
+     :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                       PSCALE, LBND,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_TRNVI( NDIMS, ODIMS, COUNT, %VAL( WPNTRC( 1 ) ),
-     :                       %VAL( WPNTRV( 1 ) ), PSCALE, LBND,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPS1_TRNVI( NDIMS, ODIMS, COUNT, 
+     :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                       PSCALE, LBND,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_TRNVR( NDIMS, ODIMS, COUNT, %VAL( WPNTRC( 1 ) ),
-     :                       %VAL( WPNTRV( 1 ) ), PSCALE, LBND,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPS1_TRNVR( NDIMS, ODIMS, COUNT, 
+     :                       %VAL( CNF_PVAL( WPNTRC( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( WPNTRV( 1 ) ) ), 
+     :                       PSCALE, LBND,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          END IF
 
@@ -697,7 +710,7 @@
             CALL KPG1_SSCOF( ODIMS( I ), DBLE( PSCALE( I ) ),
      :                       DBLE( LBND( I ) ) +
      :                       0.5D0 * DBLE( PSCALE( I ) ),
-     :                       %VAL( AXPNTR( 1 ) ), STATUS )
+     :                       %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), STATUS )
 
 *  Unmap the axis centres.
             CALL NDF_AUNMP( NDFOUT, 'Centre', I, STATUS )
@@ -707,13 +720,16 @@
 *  Append sequentially each value to the vector.  Choose the
 *  appropriate subroutine for the data type.
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_TRNDD( FD, NELM, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPS1_TRNDD( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_TRNDI( FD, NELM, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPS1_TRNDI( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_TRNDR( FD, NELM, %VAL( PNTRO( 1 ) ), STATUS )
+            CALL KPS1_TRNDR( FD, NELM, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          END IF
       END IF

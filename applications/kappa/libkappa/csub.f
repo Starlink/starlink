@@ -62,6 +62,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@
 *        Added Related Applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +90,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -135,32 +139,41 @@
 *  Select the appropriate routine for the data type being processed and
 *  subtract the constant from the data array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CSUBB( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CSUBUB( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                     %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                     CONST,
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CSUBD( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CSUBI( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CSUBR( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CSUBW( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CSUBUW( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                     %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CSUBUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                     CONST,
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     NERR, STATUS )
       END IF
 
 *  See if there may be bad pixels in the output data array and set the

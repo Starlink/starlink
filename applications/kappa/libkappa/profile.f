@@ -207,6 +207,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -216,6 +217,8 @@
 *        Added NULL argument to KPG1_GTPOS call.
 *     13-DEC-2001 (DSB):
 *        Added parameters CATFRAME and CATEPOCH.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -232,6 +235,7 @@
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'PAR_PAR'          ! PAR constants
       INCLUDE 'AST_PAR'          ! AST constants and function declaraions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -423,8 +427,10 @@
          MAPIN = AST_SIMPLIFY( MAPIN, STATUS )
 
 *  Map the positions read from the positions list using this Mapping.
-        CALL AST_TRANN( MAPIN, NPOS, NAXIN, NPOS, %VAL( IPW1 ),
-     :                  .TRUE., NCAX, NPOS, %VAL( IPFIL ), STATUS ) 
+        CALL AST_TRANN( MAPIN, NPOS, NAXIN, NPOS, 
+     :                  %VAL( CNF_PVAL( IPW1 ) ),
+     :                  .TRUE., NCAX, NPOS, %VAL( CNF_PVAL( IPFIL ) ), 
+     :                  STATUS )
 
 *  If no positions were obtained using INCAT, use START and FINISH instead.
       ELSE 
@@ -523,15 +529,20 @@
 *  which the Base Frame has been re-mapped to represent the 1-d GRID 
 *  co-ordinate in the 1-d array.
       IF( USEFIL ) THEN
-         CALL KPS1_PRFMK( MODE, NDIM, DIM, %VAL( IPDAT ), VAR, 
-     :                    %VAL( IPVAR ), IWCS, NCAX, NPOS, NPOS, 
-     :                    %VAL( IPFIL ), GEO, 0, %VAL( IPID ), 
+         CALL KPS1_PRFMK( MODE, NDIM, DIM, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                    VAR,
+     :                    %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    IWCS, NCAX, NPOS, NPOS,
+     :                    %VAL( CNF_PVAL( IPFIL ) ), GEO, 0, 
+     :                    %VAL( CNF_PVAL( IPID ) ),
      :                    'OUTCAT', TITLE( : LTTL ), NP, IPPDAT,
      :                    IPPVAR, BADD, BADV, STATUS )
 
       ELSE
-         CALL KPS1_PRFMK( MODE, NDIM, DIM, %VAL( IPDAT ), VAR, 
-     :                    %VAL( IPVAR ), IWCS, NCAX, NPOS, NPOS, ENDS, 
+         CALL KPS1_PRFMK( MODE, NDIM, DIM, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                    VAR,
+     :                    %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    IWCS, NCAX, NPOS, NPOS, ENDS,
      :                    GEO, 1, 0, 'OUTCAT', TITLE( : LTTL ), NP, 
      :                    IPPDAT, IPPVAR, BADD, BADV, STATUS )
       END IF
@@ -565,10 +576,12 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999      
 
 *  Copy the DATA and (if required) variance components into the output.
-      CALL VEC_DTOD( BADD, NP, %VAL( IPPDAT ), %VAL( IPDOUT ), IERR,
+      CALL VEC_DTOD( BADD, NP, %VAL( CNF_PVAL( IPPDAT ) ), 
+     :               %VAL( CNF_PVAL( IPDOUT ) ), IERR,
      :                  NERR, STATUS )
       IF( VAR ) THEN
-         CALL VEC_DTOD( BADV, NP, %VAL( IPPVAR ), %VAL( IPVOUT ), 
+         CALL VEC_DTOD( BADV, NP, %VAL( CNF_PVAL( IPPVAR ) ), 
+     :                  %VAL( CNF_PVAL( IPVOUT ) ),
      :                  IERR, NERR, STATUS )
       END IF
 

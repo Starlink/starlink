@@ -218,6 +218,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -230,6 +231,8 @@
 *        reporting conditional.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -247,6 +250,7 @@
       INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -386,8 +390,9 @@
 *  internal array files will be padded with a margin of this size to
 *  reduce edge effects caused by wrap-around in the convolution
 *  routines.
-      CALL KPG1_PSFSR( %VAL( IPN2 ), DIMS2( 1 ), DIMS2( 2 ),
-     :                 %VAL( IPW0 ), WDIMS( 1 ), WDIMS( 2 ), THRESH,
+      CALL KPG1_PSFSR( %VAL( CNF_PVAL( IPN2 ) ), DIMS2( 1 ), DIMS2( 2 ),
+     :                 %VAL( CNF_PVAL( IPW0 ) ), 
+     :                 WDIMS( 1 ), WDIMS( 2 ), THRESH,
      :                 4, PSFXSZ, PSFYSZ, STATUS )
 
 *  Release work space used by KPG1_PSFSR.
@@ -423,9 +428,11 @@
 
 *  Store the FFT of the PSF in the internal array <3>. Internal array
 *  <2> is used as work space. 
-      CALL KPS1_WIEFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( IPN2 ), NPIX, NLIN,
+      CALL KPS1_WIEFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( CNF_PVAL( IPN2 ) ), 
+     :                 NPIX, NLIN,
      :                 XCEN - SLBND2( 1 ) + 1, YCEN - SLBND2( 2 ) + 1,
-     :                 %VAL( IP3 ), %VAL( IP2 ), STATUS )
+     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 STATUS )
 
 *  Release the NDF holding the PSF array.
       CALL NDF_ANNUL( INDF2, STATUS )      
@@ -461,7 +468,8 @@
 *  indicating if any bad values were found.
       CALL PSX_CALLOC( N, '_REAL', IP4, STATUS )
       CALL KPS1_WIECP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                 %VAL( IPN1 ), NPIX, NLIN, %VAL( IP4 ), MEANO,
+     :                 %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN, 
+     :                 %VAL( CNF_PVAL( IP4 ) ), MEANO,
      :                 MEANO2, BAD1, STATUS )
 
 *  Abort if there is no good data in the input array.
@@ -477,7 +485,8 @@
 
 *  Find a rough estimate of the standard deviation of the noise in the
 *  input array. 
-      CALL KPS1_WIECS( DIMS1( 1 ), DIMS1( 2 ), %VAL( IPN1 ), STDEV,
+      CALL KPS1_WIECS( DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN1 ) ), 
+     :                 STDEV,
      :                 STATUS )
 
 *  Unmap the DATA array.  This is done to keep the use of virtual
@@ -526,7 +535,7 @@
      :     '  Using a constant model power of ^PG', STATUS )
 
 *  Fill internal file 6 with the constant model-power value.
-         CALL KPG1_FILLR( PG, N, %VAL( IP6 ), STATUS )      
+         CALL KPG1_FILLR( PG, N, %VAL( CNF_PVAL( IP6 ) ), STATUS )
 
 *  If an NDF model was supplied, get its bounds.
       ELSE
@@ -548,7 +557,8 @@
 *  squared model value are returned, together with a flag indicating if
 *  any bad values were found.
          CALL KPS1_WIECP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( IPN3S ), NPIX, NLIN, %VAL( IP6 ),
+     :                    %VAL( CNF_PVAL( IPN3S ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IP6 ) ),
      :                    MEANM, MEANM2, BAD3, STATUS )
 
 *  Abort if there is no good data in the model array.
@@ -574,8 +584,10 @@
 *  mean model value before the operation begins.  File 2 is used as work
 *  space.
          CALL PSX_CALLOC( N, '_REAL', IP5, STATUS )      
-         CALL KPS1_WIEPW( N, NPIX, NLIN, MEANM, BAD3, %VAL( IP6 ), 
-     :                    %VAL( IP2 ), %VAL( IP5 ), STATUS )
+         CALL KPS1_WIEPW( N, NPIX, NLIN, MEANM, BAD3, 
+     :                    %VAL( CNF_PVAL( IP6 ) ),
+     :                    %VAL( CNF_PVAL( IP2 ) ), 
+     :                    %VAL( CNF_PVAL( IP5 ) ), STATUS )
          CALL PSX_FREE( IP5, STATUS )
 
 *  If a constant model power was given, assume that the noise power has
@@ -606,13 +618,17 @@
 *  ===============================
 
 *  Construct the filter.  Its FFT is returned in file 3.
-      CALL KPS1_WIEFL( N, NPIX, NLIN, PN, QUIET, %VAL( IP6 ),
-     :                 %VAL( IP3 ), %VAL( IP2 ), STATUS )
+      CALL KPS1_WIEFL( N, NPIX, NLIN, PN, QUIET, 
+     :                 %VAL( CNF_PVAL( IP6 ) ),
+     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 STATUS )
       
 *  Apply the filter to the supplied input image.  The filtered image is
 *  returned in file 4.
-      CALL KPS1_WIEAP( BAD1, WLIM, N, NPIX, NLIN, %VAL( IP3 ),
-     :                 %VAL( IP4 ), %VAL( IP2 ), %VAL( IP6 ), STATUS )
+      CALL KPS1_WIEAP( BAD1, WLIM, N, NPIX, NLIN, 
+     :                 %VAL( CNF_PVAL( IP3 ) ),
+     :                 %VAL( CNF_PVAL( IP4 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 %VAL( CNF_PVAL( IP6 ) ), STATUS )
 
 *  Create the output NDF containing the filter image.
 *  ==================================================
@@ -625,8 +641,10 @@
      :              STATUS )
 
 *  Copy the reconstructed array to the output DATA array.
-      CALL KPS1_WIEOU( NPIX, NLIN, %VAL( IP4 ), XMARG, YMARG, 
-     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( IPN4 ), BAD4, 
+      CALL KPS1_WIEOU( NPIX, NLIN, %VAL( CNF_PVAL( IP4 ) ), 
+     :                 XMARG, YMARG,
+     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN4 ) ), 
+     :                 BAD4,
      :                 STATUS )
 
 *  Create a WIENER extension in the output NDF, and add a logical

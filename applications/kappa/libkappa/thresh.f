@@ -124,6 +124,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -141,6 +142,8 @@
 *        of data values.
 *     6-JUL-2001 (DSB):
 *        Correct setting of bad pixel flag in output.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,6 +160,7 @@
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'PRM_PAR'        ! Magic-value constants
       INCLUDE 'MSG_PAR'        ! Message constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -294,8 +298,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSR( BPFLAG, EL, %VAL( PNTRI( 1 ) ), RTHRLO,
-     :                    RTHRHI, RNEWLO, RNEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSR( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    RTHRLO,
+     :                    RTHRHI, RNEWLO, RNEWHI, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -306,8 +312,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSB( BPFLAG, EL, %VAL( PNTRI( 1 ) ), BTHRLO,
-     :                    BTHRHI, BNEWLO, BNEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSB( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    BTHRLO,
+     :                    BTHRHI, BNEWLO, BNEWHI, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
@@ -318,8 +326,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSD( BPFLAG, EL, %VAL( PNTRI( 1 ) ), DTHRLO,
-     :                    DTHRHI, DNEWLO, DNEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSD( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    DTHRLO,
+     :                    DTHRHI, DNEWLO, DNEWHI, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
@@ -330,8 +340,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSI( BPFLAG, EL, %VAL( PNTRI( 1 ) ), ITHRLO,
-     :                    ITHRHI, INEWLO, INEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSI( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    ITHRLO,
+     :                    ITHRHI, INEWLO, INEWHI, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
@@ -342,8 +354,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSUB( BPFLAG, EL, %VAL( PNTRI( 1 ) ), BTHRLO,
-     :                     BTHRHI, BNEWLO, BNEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSUB( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     BTHRLO,
+     :                     BTHRHI, BNEWLO, BNEWHI, 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     NREPLO, NREPHI, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
@@ -354,8 +368,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSUW( BPFLAG, EL, %VAL( PNTRI( 1 ) ), WTHRLO,
-     :                     WTHRHI, WNEWLO, WNEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSUW( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     WTHRLO,
+     :                     WTHRHI, WNEWLO, WNEWHI, 
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                     NREPLO, NREPHI, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
@@ -366,8 +382,10 @@
 
 *  Replace the values in the output array outside the range with the
 *  new values, otherwise copy from the input to the output NDF.
-         CALL KPG1_THRSW( BPFLAG, EL, %VAL( PNTRI( 1 ) ), WTHRLO,
-     :                    WTHRHI, WNEWLO, WNEWHI, %VAL( PNTRO( 1 ) ),
+         CALL KPG1_THRSW( BPFLAG, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    WTHRLO,
+     :                    WTHRHI, WNEWLO, WNEWHI, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                    NREPLO, NREPHI, STATUS )
 
       END IF

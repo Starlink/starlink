@@ -122,11 +122,15 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     7-MAY-2000 (DSB):
 *        First NDF version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_new_bugs_here}
@@ -142,6 +146,7 @@
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'AST_PAR'        ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -274,8 +279,9 @@
          CALL PSX_CALLOC( 2*NPOS, '_DOUBLE', IPPIX, STATUS )
 
 *  Transform the supplied Current Frame positions into the PIXEL Frame.
-         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS, %VAL( IPPOS ), .TRUE.,
-     :                   2, NPOS, %VAL( IPPIX ), STATUS ) 
+         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS, 
+     :                   %VAL( CNF_PVAL( IPPOS ) ), .TRUE.,
+     :                   2, NPOS, %VAL( CNF_PVAL( IPPIX ) ), STATUS )
 
 *  Free the memory holding the supplied positions and identifiers.
          CALL PSX_FREE( IPPOS, STATUS )
@@ -299,8 +305,9 @@
          CALL PSX_CALLOC( 2*NPOS, '_DOUBLE', IPPIX, STATUS )
 
 *  Transform the supplied Current Frame positions into the PIXEL Frame.
-         CALL AST_TRANN( MAP, NPOS, NAX, NPOS, %VAL( IPPOS ), .TRUE.,
-     :                   2, NPOS, %VAL( IPPIX ), STATUS ) 
+         CALL AST_TRANN( MAP, NPOS, NAX, NPOS, 
+     :                   %VAL( CNF_PVAL( IPPOS ) ), .TRUE.,
+     :                   2, NPOS, %VAL( CNF_PVAL( IPPIX ) ), STATUS )
 
 *  Free the memory holding the supplied positions.
          CALL PSX_FREE( IPPOS, STATUS )
@@ -312,7 +319,8 @@
 *  positions, and then get them.
       ELSE IF( MODE .EQ. 'INTERFACE' ) THEN
          CALL PSX_CALLOC( MAXPIX*2, '_DOUBLE', IPPIX, STATUS )
-         CALL KPS1_GLIGT( IWCS, IPIX, 'PIXPOS', MAXPIX, %VAL( IPPIX ),
+         CALL KPS1_GLIGT( IWCS, IPIX, 'PIXPOS', MAXPIX, 
+     :                    %VAL( CNF_PVAL( IPPIX ) ),
      :                    NPOS, STATUS )
 
 *  The stride between axis values is MAXPIX.
@@ -322,12 +330,14 @@
       ELSE
          IF( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_GLIBR( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                       SUBND( 2 ), %VAL( IPDIN ), IPPIX, NPOS, 
+     :                       SUBND( 2 ), %VAL( CNF_PVAL( IPDIN ) ), 
+     :                       IPPIX, NPOS,
      :                       STATUS ) 
    
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_GLIBD( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                       SUBND( 2 ), %VAL( IPDIN ), IPPIX, NPOS, 
+     :                       SUBND( 2 ), %VAL( CNF_PVAL( IPDIN ) ), 
+     :                       IPPIX, NPOS,
      :                       STATUS ) 
    
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
@@ -348,15 +358,21 @@
 *  Do the work, using a subroutine for each different data type.
          IF( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_GLIWR( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                    SUBND( 2 ), VAR, NPOS, INDIM, %VAL( IPPIX ), 
-     :                    %VAL( IPDIN ), %VAL( IPVIN ), %VAL( IPDOUT ), 
-     :                    %VAL( IPVOUT ), NREP, STATUS )
+     :                    SUBND( 2 ), VAR, NPOS, INDIM, 
+     :                    %VAL( CNF_PVAL( IPPIX ) ),
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    %VAL( CNF_PVAL( IPVIN ) ), 
+     :                    %VAL( CNF_PVAL( IPDOUT ) ),
+     :                    %VAL( CNF_PVAL( IPVOUT ) ), NREP, STATUS )
 
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_GLIWD( SLBND( 1 ), SLBND( 2 ), SUBND( 1 ), 
-     :                    SUBND( 2 ), VAR, NPOS, INDIM, %VAL( IPPIX ), 
-     :                    %VAL( IPDIN ), %VAL( IPVIN ), %VAL( IPDOUT ), 
-     :                    %VAL( IPVOUT ), NREP, STATUS )
+     :                    SUBND( 2 ), VAR, NPOS, INDIM, 
+     :                    %VAL( CNF_PVAL( IPPIX ) ),
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    %VAL( CNF_PVAL( IPVIN ) ), 
+     :                    %VAL( CNF_PVAL( IPDOUT ) ),
+     :                    %VAL( CNF_PVAL( IPVOUT ) ), NREP, STATUS )
 
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR

@@ -65,6 +65,7 @@
 *  Authors:
 *    TDCA: Tim D.C. Ash(STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -93,6 +94,8 @@
 *        - Correct mapping mode for output NDF from WRITE to UPDATE.
 *     20-MAY-2003 (DSB):
 *        - Set BAD-PIXEL flag in output NDF.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! Standard SAE constants
       INCLUDE 'NDF_PAR'                 ! NDF_ public constants
+      INCLUDE 'CNF_PAR'                 ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS                    ! Global status
@@ -161,32 +165,39 @@
 
 *  Select the appropriate routine to copy the bad pixels.
       IF ( TY_IN .EQ. '_INTEGER' ) THEN
-         CALL KPS1_CPBI( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBI( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                   %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
-         CALL KPS1_CPBR( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBR( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                   %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_CPBD( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBD( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                   %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN
-         CALL KPS1_CPBB( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBB( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                   %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
-         CALL KPS1_CPBUB( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBUB( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                    %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_WORD' ) THEN
-         CALL KPS1_CPBW( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBW( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                   %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN
-         CALL KPS1_CPBUW( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
-     :                   %VAL( P_OUTV ), NBAD, STATUS )
+         CALL KPS1_CPBUW( NEL, VAR, %VAL( CNF_PVAL( P_REF ) ), 
+     :                    %VAL( CNF_PVAL( P_OUT ) ),
+     :                   %VAL( CNF_PVAL( P_OUTV ) ), NBAD, STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR

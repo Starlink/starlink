@@ -108,6 +108,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -115,6 +116,8 @@
 *        Original version.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,6 +183,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'    ! Definitions of conversion routines
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *.
 
@@ -335,8 +339,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAR( EL, %VAL( PNTRI( 1 ) ), RSUVAL, RNUVAL,
-     :                          %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          RSUVAL, RNUVAL,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
 
@@ -370,8 +376,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAB( EL, %VAL( PNTRI( 1 ) ), BSUVAL, BNUVAL,
-     :                          %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          BSUVAL, BNUVAL,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
@@ -396,8 +404,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAD( EL, %VAL( PNTRI( 1 ) ), REPVAL, NEWVAL,
-     :                          %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          REPVAL, NEWVAL,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
@@ -431,8 +441,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAI( EL, %VAL( PNTRI( 1 ) ), ISUVAL, INUVAL,
-     :                          %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ISUVAL, INUVAL,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
 
@@ -466,8 +478,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAUB( EL, %VAL( PNTRI( 1 ) ), BSUVAL, BNUVAL,
-     :                           %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           BSUVAL, BNUVAL,
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
 
@@ -501,8 +515,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAUW( EL, %VAL( PNTRI( 1 ) ), WSUVAL, WNUVAL,
-     :                           %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           WSUVAL, WNUVAL,
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                           NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
@@ -536,8 +552,10 @@
 
 *  Replace the values in the output array, otherwise copy from the
 *  input to the output NDF.
-               CALL KPG1_CHVAW( EL, %VAL( PNTRI( 1 ) ), WSUVAL, WNUVAL,
-     :                          %VAL( PNTRO( 1 ) ), NREP, STATUS )
+               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          WSUVAL, WNUVAL,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                          NREP, STATUS )
 
             END IF
 

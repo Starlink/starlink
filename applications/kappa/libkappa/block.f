@@ -146,6 +146,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -172,6 +173,8 @@
 *        estimator was selected.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,6 +191,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PAR_ERR'          ! Parameter system error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -336,14 +340,20 @@
 
          IF ( ESTIM .EQ. 'MEAN' ) THEN
             CALL KPG1_BLOCR( BAD, SAMBAD, .FALSE., DIM( 1 ), DIM( 2 ),
-     :                       %VAL( PNTR1( 1 ) ), IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( PNTR2( 1 ) ), BADOUT, 
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                       IBOX( 1 ), IBOX( 2 ),
+     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                       BADOUT,
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          ELSE
             CALL KPG1_BMEDR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( PNTR1( 1 ) ), IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( PNTR2( 1 ) ), BADOUT, 
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                       IBOX( 1 ), IBOX( 2 ),
+     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                       BADOUT,
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF    
 
 *  Double precision
@@ -351,14 +361,20 @@
 
          IF ( ESTIM .EQ. 'MEAN' ) THEN
             CALL KPG1_BLOCD( BAD, SAMBAD, .FALSE., DIM( 1 ), DIM( 2 ),
-     :                       %VAL( PNTR1( 1 ) ), IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( PNTR2( 1 ) ), BADOUT, 
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                       IBOX( 1 ), IBOX( 2 ),
+     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                       BADOUT,
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          ELSE
             CALL KPG1_BMEDD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( PNTR1( 1 ) ), IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( PNTR2( 1 ) ), BADOUT, 
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                       IBOX( 1 ), IBOX( 2 ),
+     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                       BADOUT,
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF    
 
       END IF
@@ -372,15 +388,21 @@
       IF ( VAR .AND. ESTIM .EQ. 'MEAN' ) THEN
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_BLOCR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( PNTR1( 2 ) ), IBOX( 1 ), IBOX( 2 ), 
-     :                       NLIM, %VAL( PNTR2( 2 ) ), BADOUT,
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       IBOX( 1 ), IBOX( 2 ),
+     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       BADOUT,
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_BLOCD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( PNTR1( 2 ) ), IBOX( 1 ), IBOX( 2 ), 
-     :                       NLIM, %VAL( PNTR2( 2 ) ), BADOUT,
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       IBOX( 1 ), IBOX( 2 ),
+     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       BADOUT,
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF
 
 *  Indicate whether or not the output variance array has bad pixels.

@@ -307,6 +307,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -332,6 +333,8 @@
 *     15-JAN-2000 (DSB):
 *        Big changes to use PGPLOT, and to allow positions to be
 *        specified in the current Frame of the output NDF.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -349,6 +352,7 @@
       INCLUDE 'PAR_PAR'          ! PAR_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'AST_PAR'          ! AST_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -986,7 +990,8 @@
 *  Transform the supplied positions into the current Frame of the output
 *  NDF.
                   CALL AST_TRANN( CMAP, NVERT, CATNAX, NVERT,
-     :                            %VAL( IPIN ), .TRUE., NAX, MXVERT, 
+     :                            %VAL( CNF_PVAL( IPIN ) ), 
+     :                            .TRUE., NAX, MXVERT,
      :                            CVERT, STATUS )
 
 *  Free the memory holding the positions and identifiers read from the
@@ -1042,7 +1047,8 @@
 
 *  Copy the supplied positions into the work array.
                   CALL AST_TRANN( AST_UNITMAP( NAX, ' ', STATUS ), 
-     :                            NVERT, NAX, NVERT, %VAL( IPIN ),
+     :                            NVERT, NAX, NVERT, 
+     :                            %VAL( CNF_PVAL( IPIN ) ),
      :                            .TRUE., NAX, MXVERT, CVERT, STATUS )
 
 *  Free the memory holding the positions read from the file.
@@ -1175,7 +1181,7 @@
 *  Now insert this polygon into the mask.
                CALL KPS1_PLMSK( NPOLY, SLBND( 1 ), SUBND( 1 ), 
      :                          SLBND( 2 ), SUBND( 2 ), NGOOD, X, Y, 
-     :                          %VAL( IPMASK ), STATUS )
+     :                          %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  Increment the number of polygons accessed so far.
                NPOLY = NPOLY + 1
@@ -1325,7 +1331,8 @@
 *  dimensions.
          CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'DATA', IDTYPE, GOT1,
      :                    GOT2, PAX, SLBND( 1 ), SUBND( 1 ),
-     :                    SLBND( 2 ), SUBND( 2 ), %VAL( IPMASK ),
+     :                    SLBND( 2 ), SUBND( 2 ), 
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
      :                    VAL__BADD, STATUS )
 
 *  Now copy VARIANCE values if necessary, filling missing values with
@@ -1333,7 +1340,8 @@
          IF ( VAR3 ) THEN
             CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'VARIANCE', IVTYPE,
      :                       VAR1, VAR2, PAX, SLBND( 1 ), SUBND( 1 ),
-     :                       SLBND( 2 ), SUBND( 2 ), %VAL( IPMASK ),
+     :                       SLBND( 2 ), SUBND( 2 ), 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       VAL__BADD, STATUS )
          END IF
 
@@ -1342,7 +1350,8 @@
          IF ( QUAL3 ) THEN
             CALL KPS1_PLCPY( INDF1, INDF2, INDF3, 'QUALITY', '_UBYTE',
      :                       QUAL1, QUAL2, PAX, SLBND( 1 ), SUBND( 1 ),
-     :                       SLBND( 2 ), SUBND( 2 ), %VAL( IPMASK ),
+     :                       SLBND( 2 ), SUBND( 2 ), 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       0.0D0, STATUS )
          END IF
 

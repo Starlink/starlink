@@ -169,6 +169,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -180,6 +181,8 @@
 *     14-DEC-2001 (DSB):
 *        Renamed wieghted mean estimator as "Wmean" and added new
 *        unweighted mean estimator "Mean".
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes}
 
 *  Bugs:
@@ -196,6 +199,7 @@
       INCLUDE  'NDF_PAR'       ! NDF_ public constants
       INCLUDE  'DAT_PAR'       ! HDS public constants
       INCLUDE  'AST_PAR'       ! AST constants and functions
+      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -686,17 +690,23 @@
 *  Now do the work, using a routine appropriate to the numeric type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
-     :                    LBND, UBND, %VAL( IPIN( 1 ) ), 
-     :                    %VAL( IPIN( 2 ) ), NDIMO, LBNDO, UBNDO, 
-     :                    %VAL( IPOUT( 1 ) ), %VAL( IPOUT( 2 ) ), 
-     :                    %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
+     :                    LBND, UBND, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                    NDIMO, LBNDO, UBNDO,
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                    %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
-     :                    LBND, UBND, %VAL( IPIN( 1 ) ), 
-     :                    %VAL( IPIN( 2 ) ), NDIMO, LBNDO, UBNDO, 
-     :                    %VAL( IPOUT( 1 ) ), %VAL( IPOUT( 2 ) ), 
-     :                    %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
+     :                    LBND, UBND, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                    NDIMO, LBNDO, UBNDO,
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                    %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR

@@ -82,6 +82,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +93,8 @@
 *        library.
 *     11-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,6 +108,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -189,32 +193,41 @@
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
             IF ( TYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_FLIPB( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                          %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPB( NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_FLIPUB( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                           %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPUB( NDIM, DIM, 
+     :                           %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                           %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                           STATUS )
  
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_FLIPD( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                          %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPD( NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_FLIPI( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                          %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPI( NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_FLIPR( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                          %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPR( NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_FLIPW( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                          %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPW( NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                          %VAL( CNF_PVAL( PNTR2( 1 ) ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_FLIPUW( NDIM, DIM, %VAL( PNTR1( 1 ) ), IDIM,
-     :                           %VAL( PNTR2( 1 ) ), STATUS )
+               CALL KPG1_FLIPUW( NDIM, DIM, 
+     :                           %VAL( CNF_PVAL( PNTR1( 1 ) ) ), IDIM,
+     :                           %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                           STATUS )
             END IF
 
 *  If a quality array is being processed, then transfer the quality
@@ -264,32 +277,46 @@
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
                IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_FLIPB( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                             1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPB( 1, DIM( IDIM ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_FLIPUB( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                              1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPUB( 1, DIM( IDIM ), 
+     :                              %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                              1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                              STATUS )
  
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_FLIPD( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                             1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPD( 1, DIM( IDIM ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_FLIPI( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                             1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPI( 1, DIM( IDIM ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_FLIPR( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                             1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPR( 1, DIM( IDIM ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_FLIPW( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                             1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPW( 1, DIM( IDIM ), 
+     :                             %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                             1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_FLIPUW( 1, DIM( IDIM ), %VAL( PNTR1( 1 ) ),
-     :                              1, %VAL( PNTR2( 1 ) ), STATUS )
+                  CALL KPG1_FLIPUW( 1, DIM( IDIM ), 
+     :                              %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                              1, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                              STATUS )
                END IF
 
 *  Unmap the input and output axis arrays.

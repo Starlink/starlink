@@ -152,6 +152,7 @@
 *     MJC: Malcolm Currie (Starlink, RAL)
 *     AALLAN: Alasdair Allan (Starlink, University of Exeter)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -160,6 +161,8 @@
 *     11-SEP-2001 (DSB):
 *        Removed nested status checks, standardize layout of local variable
 *        declarations, remove unused variables and include files, etc.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,6 +179,7 @@
       INCLUDE 'DAT_PAR'           ! Data system constants
       INCLUDE 'PAR_ERR'           ! Parameter system errors
       INCLUDE 'PRM_PAR'           ! VAL__ constants
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 
 *  Status:
       INTEGER  STATUS
@@ -418,14 +422,16 @@
          CALL KPS1_CREMG( ODIMS( 1 ), ODIMS( 2 ), MAX, MIN, BCKGRD, 
      :                    NGAUSS, SEEING, DISTRB, BADPIX, FRACTN, 
      :                    BADCOL, BADROW, .NOT. QUIET, 'LOGFILE', 
-     :                    'OUTCAT', VARS, %VAL( IPDAT ), 
-     :                    %VAL( IPVAR ), %VAL( IPWORK ), STATUS )
+     :                    'OUTCAT', VARS, %VAL( CNF_PVAL( IPDAT ) ),
+     :                    %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    %VAL( CNF_PVAL( IPWORK ) ), STATUS )
          CALL PSX_FREE( IPWORK, STATUS )
 
       ELSE
          CALL KPS1_CRETS( ODIMS( 1 ), ODIMS( 2 ), MODE, MEAN, HIGH, 
-     :                    LOW, DIRN, SIGMA, VARS, %VAL( IPDAT ), 
-     :                    %VAL( IPVAR ), STATUS )
+     :                    LOW, DIRN, SIGMA, VARS, 
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    %VAL( CNF_PVAL( IPVAR ) ), STATUS )
       END IF
 
 *  Tidy up.

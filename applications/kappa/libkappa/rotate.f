@@ -145,6 +145,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +163,8 @@
 *        Tidied up the above TDCA changes.
 *     15-FEB-2002 (DSB):
 *        Added option to rotate north to vertical.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -178,6 +181,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ errors
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -547,45 +551,59 @@
 *  the nearest-neighbour method, depending on its numeric type.
                IF ( TYPE .EQ. '_BYTE' ) THEN
                   CALL KPS1_RONNB( DIMSI( 1 ), DIMSI( 2 ),
-     :                             %VAL( PNTRI( 1 ) ), ANGLE,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             ANGLE,
      :                             DIMSO( 1 ), DIMSO( 2 ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPS1_RONND( DIMSI( 1 ), DIMSI( 2 ),
-     :                             %VAL( PNTRI( 1 ) ), ANGLE,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             ANGLE,
      :                             DIMSO( 1 ), DIMSO( 2 ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                   CALL KPS1_RONNI( DIMSI( 1 ), DIMSI( 2 ),
-     :                             %VAL( PNTRI( 1 ) ), ANGLE,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             ANGLE,
      :                             DIMSO( 1 ), DIMSO( 2 ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                   CALL KPS1_RONNR( DIMSI( 1 ), DIMSI( 2 ),
-     :                             %VAL( PNTRI( 1 ) ), ANGLE,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             ANGLE,
      :                             DIMSO( 1 ), DIMSO( 2 ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
  
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                   CALL KPS1_RONNUB( DIMSI( 1 ), DIMSI( 2 ),
-     :                              %VAL( PNTRI( 1 ) ), ANGLE,
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              ANGLE,
      :                              DIMSO( 1 ), DIMSO( 2 ),
-     :                              %VAL( PNTRO( 1 ) ), STATUS )
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
  
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                   CALL KPS1_RONNUW( DIMSI( 1 ), DIMSI( 2 ),
-     :                              %VAL( PNTRI( 1 ) ), ANGLE,
+     :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              ANGLE,
      :                              DIMSO( 1 ), DIMSO( 2 ),
-     :                              %VAL( PNTRO( 1 ) ), STATUS )
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
 
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                   CALL KPS1_RONNW( DIMSI( 1 ), DIMSI( 2 ),
-     :                             %VAL( PNTRI( 1 ) ), ANGLE,
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             ANGLE,
      :                             DIMSO( 1 ), DIMSO( 2 ),
-     :                             %VAL( PNTRO( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             STATUS )
  
                END IF
 
@@ -637,16 +655,20 @@
 *  Call the appropriate routine to generate the output array using
 *  the nearest-neighbour method, depending on its numeric type.
          IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_ROLIR( DIMSI( 1 ), DIMSI( 2 ), %VAL( PNTRI( 1 ) ),
-     :                       VAR, %VAL( PNTRI( 2 ) ), ANGLE, DIMSO( 1 ),
-     :                       DIMSO( 2 ), %VAL( PNTRO( 1 ) ),
-     :                       %VAL( PNTRO( 2 ) ), STATUS )
+            CALL KPS1_ROLIR( DIMSI( 1 ), DIMSI( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       ANGLE, DIMSO( 1 ),
+     :                       DIMSO( 2 ), %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), STATUS )
  
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_ROLID( DIMSI( 1 ), DIMSI( 2 ), %VAL( PNTRI( 1 ) ),
-     :                       VAR, %VAL( PNTRI( 2 ) ), ANGLE, DIMSO( 1 ),
-     :                       DIMSO( 2 ), %VAL( PNTRO( 1 ) ),
-     :                       %VAL( PNTRO( 2 ) ), STATUS )
+            CALL KPS1_ROLID( DIMSI( 1 ), DIMSI( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       ANGLE, DIMSO( 1 ),
+     :                       DIMSO( 2 ), %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), STATUS )
          END IF
 
 *  Set the bad-pixel flag to indicate that bad values may be present
@@ -684,8 +706,10 @@
 *  Assign the QUALITY array using the nearest-neghbour technique.  This
 *  is an approximation to retain quality information.
             CALL KPS1_RONNUB( DIMSI( 1 ), DIMSI( 2 ),
-     :                        %VAL( PNTRI( 1 ) ), ANGLE, DIMSO( 1 ),
-     :                        DIMSO( 2 ), %VAL( PNTRO( 1 ) ), STATUS )
+     :                        %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                        ANGLE, DIMSO( 1 ),
+     :                        DIMSO( 2 ), 
+     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
  
 *  Transfer the quality component's bad-bits value.
             CALL NDF_BB( NDFI, BB, STATUS )
@@ -745,37 +769,44 @@
                   IF ( TYPE .EQ. '_BYTE' ) THEN
                      CALL KPS1_RORAB( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_RORAD( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_RORAI( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_RORAR( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                      CALL KPS1_RORAUB( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                      CALL KPS1_RORAUW( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                      CALL KPS1_RORAW( NUMRA, DIMSO( 1 ), DIMSO( 2 ),
      :                                DIMSO( 1 ), DIMSO( 2 ),
-     :                                %VAL( PNTRO( 1 ) ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                   END IF
 
@@ -795,23 +826,32 @@
                   IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPS1_ROBLD( NUMRA, LONG, SHORT, ROTSZE,
      :                                XLARGE, DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( PNTRI( 1 ) ), DIMSO( 1 ),
-     :                                DIMSO( 2 ), %VAL( PNTRO( 1 ) ),
-     :                                %VAL( WKPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                DIMSO( 1 ),
+     :                                DIMSO( 2 ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( WKPNTR ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                      CALL KPS1_ROBLI( NUMRA, LONG, SHORT, ROTSZE,
      :                                XLARGE, DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( PNTRI( 1 ) ), DIMSO( 1 ),
-     :                                DIMSO( 2 ), %VAL( PNTRO( 1 ) ),
-     :                                %VAL( WKPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                DIMSO( 1 ),
+     :                                DIMSO( 2 ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( WKPNTR ) ), 
+     :                                STATUS )
  
                   ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPS1_ROBLR( NUMRA, LONG, SHORT, ROTSZE,
      :                                XLARGE, DIMSI( 1 ), DIMSI( 2 ),
-     :                                %VAL( PNTRI( 1 ) ), DIMSO( 1 ),
-     :                                DIMSO( 2 ), %VAL( PNTRO( 1 ) ),
-     :                                %VAL( WKPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                DIMSO( 1 ),
+     :                                DIMSO( 2 ), 
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                                %VAL( CNF_PVAL( WKPNTR ) ), 
+     :                                STATUS )
                   END IF
  
 *  Tidy up the workspace
@@ -881,32 +921,53 @@
 *  numeric type.
                   IF ( NUMRA .EQ. 1 .OR. NUMRA .EQ. 2 ) THEN
                      IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL KPG1_FLIPB( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPB( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                        CALL KPG1_FLIPUB( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPUB( 1, EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL KPG1_FLIPD( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPD( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL KPG1_FLIPI( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPI( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL KPG1_FLIPR( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPR( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
   
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL KPG1_FLIPW( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPW( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                        CALL KPG1_FLIPUW( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPUW( 1, EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
                      END IF
 
                   ELSE
@@ -915,40 +976,52 @@
 *  numeric type.  There will be no conversion errors so no need to check
 *  the returned IERR and NERR.
                      IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL VEC_BTOB( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_BTOB( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL VEC_DTOD( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_DTOD( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL VEC_ITOI( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_ITOI( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL VEC_RTOR( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_RTOR( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL VEC_UBTOUB( .FALSE., EL,
-     :                                   %VAL( PNTRI( 1 ) ),
-     :                                   %VAL( PNTRO( 1 ) ), IERR, NERR,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL VEC_UWTOUW( .FALSE., EL,
-     :                                   %VAL( PNTRI( 1 ) ),
-     :                                   %VAL( PNTRO( 1 ) ), IERR, NERR,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL VEC_WTOW( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_WTOW( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      END IF
@@ -995,32 +1068,52 @@
 *  numeric type.
                   IF ( NUMRA .EQ. 3 .OR. NUMRA .EQ. 2 ) THEN
                      IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL KPG1_FLIPB( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPB( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                        CALL KPG1_FLIPUB( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPUB( 1, EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL KPG1_FLIPD( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPD( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                1, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                STATUS )
  
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL KPG1_FLIPI( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPI( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL KPG1_FLIPR( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPR( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
   
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL KPG1_FLIPW( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPW( 1, EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                        CALL KPG1_FLIPUW( 1, EL, %VAL( PNTRI( 1 ) ),
-     :                                   1, %VAL( PNTRO( 1 ) ), STATUS )
+                        CALL KPG1_FLIPUW( 1, EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   1, 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   STATUS )
                      END IF
 
                   ELSE
@@ -1029,41 +1122,53 @@
 *  numeric type.  There will be no conversion errors so no need to check
 *  the returned IERR and NERR.
                      IF ( TYPE .EQ. '_BYTE' ) THEN
-                        CALL VEC_BTOB( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_BTOB( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
 
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                        CALL VEC_DTOD( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_DTOD( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                        CALL VEC_ITOI( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_ITOI( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                        CALL VEC_RTOR( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_RTOR( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL VEC_UBTOUB( .FALSE., EL,
-     :                                   %VAL( PNTRI( 1 ) ),
-     :                                   %VAL( PNTRO( 1 ) ), IERR, NERR,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL VEC_UWTOUW( .FALSE., EL,
-     :                                   %VAL( PNTRI( 1 ) ),
-     :                                   %VAL( PNTRO( 1 ) ), IERR, NERR,
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                        CALL VEC_WTOW( .FALSE., EL, %VAL( PNTRI( 1 ) ),
-     :                                 %VAL( PNTRO( 1 ) ), IERR, NERR,
+                        CALL VEC_WTOW( .FALSE., EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 IERR, NERR,
      :                                 STATUS )
 
                      END IF

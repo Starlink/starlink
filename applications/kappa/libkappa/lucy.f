@@ -266,6 +266,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -277,6 +278,8 @@
 *        and made stylistic changes.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -293,6 +296,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'MSG_PAR'          ! Message-system constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -434,8 +438,9 @@
 *  internal array files will be padded with a margin of this size to
 *  reduce edge effects caused by wrap-around in the convolution
 *  routines.
-      CALL KPG1_PSFSR( %VAL( IPN2 ), DIMS2( 1 ), DIMS2( 2 ),
-     :                 %VAL( IPW0 ), WDIMS( 1 ), WDIMS( 2 ), THRESH,
+      CALL KPG1_PSFSR( %VAL( CNF_PVAL( IPN2 ) ), DIMS2( 1 ), DIMS2( 2 ),
+     :                 %VAL( CNF_PVAL( IPW0 ) ), 
+     :                 WDIMS( 1 ), WDIMS( 2 ), THRESH,
      :                 4, PSFXSZ, PSFYSZ, STATUS )
 
 *  Release work space used by KPG1_PSFSR.
@@ -468,9 +473,11 @@
 
 *  Store the FFT of the PSF in the internal array <3>.  Internal array
 *  <2> is used as work space. 
-      CALL KPS1_LUCFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( IPN2 ), NPIX, NLIN,
+      CALL KPS1_LUCFP( DIMS2( 1 ), DIMS2( 2 ), %VAL( CNF_PVAL( IPN2 ) ), 
+     :                 NPIX, NLIN,
      :                 XCEN - SLBND2( 1 ) + 1, YCEN - SLBND2( 2 ) + 1,
-     :                 %VAL( IP3 ), %VAL( IP2 ), STATUS )
+     :                 %VAL( CNF_PVAL( IP3 ) ), %VAL( CNF_PVAL( IP2 ) ), 
+     :                 STATUS )
 
 *  Release the NDF holding the PSF array.
       CALL NDF_ANNUL( INDF2, STATUS )      
@@ -499,7 +506,8 @@
 *  edge pixels.  The mean observed data value is returned.
       CALL PSX_CALLOC( N, '_REAL', IP4, STATUS )
       CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                 %VAL( IPN1 ), NPIX, NLIN, %VAL( IP4 ), MEANO,
+     :                 %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN, 
+     :                 %VAL( CNF_PVAL( IP4 ) ), MEANO,
      :                 STATUS )
 
 *  Abort if there are no good data in the input array.
@@ -511,7 +519,8 @@
       END IF
 
 *  Find a rough estimate of the noise in the input array. 
-      CALL KPS1_LUCCS( DIMS1( 1 ), DIMS1( 2 ), %VAL( IPN1 ), STDEV,
+      CALL KPS1_LUCCS( DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN1 ) ), 
+     :                 STDEV,
      :                 STATUS )
 
 *  Unmap the DATA array.  This is done to keep the use of virtual memory
@@ -560,7 +569,8 @@
 *  allowing for the calculated margin.  The margins are filled by
 *  replicating the edge values.  The mean variance value is returned.
          CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( IPN1 ), NPIX, NLIN, %VAL( IP8 ),
+     :                    %VAL( CNF_PVAL( IPN1 ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IP8 ) ),
      :                    MEANV, STATUS )
 
 *  Abort if there are no good data in the variance array.
@@ -589,7 +599,8 @@
      :                   /'noise value of ^SIGMA.', STATUS )
 
 *  Fill internal file 8 with the variance value.
-         CALL KPG1_FILLR( STDEV * STDEV, N, %VAL( IP8 ), STATUS )
+         CALL KPG1_FILLR( STDEV * STDEV, N, %VAL( CNF_PVAL( IP8 ) ), 
+     :                    STATUS )
 
       END IF
 
@@ -613,7 +624,7 @@
          CALL PAR_GET0R( 'BACKVAL', BCKVAL, STATUS )
 
 *  Fill internal file 6 with the supplied constant-background value.
-         CALL KPG1_FILLR( BCKVAL, N, %VAL( IP6 ), STATUS )         
+         CALL KPG1_FILLR( BCKVAL, N, %VAL( CNF_PVAL( IP6 ) ), STATUS )
 
 *  If an NDF background was supplied, get its bounds.
       ELSE
@@ -633,7 +644,8 @@
 *  Copy it to the centre of internal file 6.  The margins are filled by
 *  replicating the edge values.  The mean background value is returned.
          CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( IPN3S ), NPIX, NLIN, %VAL( IP6 ),
+     :                    %VAL( CNF_PVAL( IPN3S ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IP6 ) ),
      :                    MEANB, STATUS )
          
 *  Abort if there is no good data in the background array.
@@ -666,7 +678,8 @@
 *  in internal file 1.
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         CALL KPG1_FILLR( MEANO - MEANB, N, %VAL( IP1 ), STATUS )         
+         CALL KPG1_FILLR( MEANO - MEANB, N, %VAL( CNF_PVAL( IP1 ) ), 
+     :                    STATUS )
 
 *  If a starting NDF was supplied, get its bounds.
       ELSE
@@ -687,7 +700,8 @@
 *  replication the edge values.  The mean value in the supplied array
 *  is returned.
          CALL KPS1_LUCCP( XMARG, YMARG, DIMS1( 1 ), DIMS1( 2 ),
-     :                    %VAL( IPN4S ), NPIX, NLIN, %VAL( IP1 ),
+     :                    %VAL( CNF_PVAL( IPN4S ) ), NPIX, NLIN, 
+     :                    %VAL( CNF_PVAL( IP1 ) ),
      :                    MEANI, STATUS )
          
 *  Abort if there are no good data in the input array.
@@ -728,9 +742,12 @@
 
 *  Do the deconvolution.
       CALL KPS1_LUCY( N, NPIX, NLIN, XMARG, YMARG, AIM, NITER, CHIFAC,
-     :                WLIM, SNYDER, %VAL( IP3 ), %VAL( IP4 ), 
-     :                %VAL( IP6 ), %VAL( IP8 ), %VAL( IP1 ), 
-     :                %VAL( IP2 ), %VAL( IP5 ), %VAL( IP7 ), STATUS )
+     :                WLIM, SNYDER, %VAL( CNF_PVAL( IP3 ) ), 
+     :                %VAL( CNF_PVAL( IP4 ) ),
+     :                %VAL( CNF_PVAL( IP6 ) ), %VAL( CNF_PVAL( IP8 ) ), 
+     :                %VAL( CNF_PVAL( IP1 ) ),
+     :                %VAL( CNF_PVAL( IP2 ) ), %VAL( CNF_PVAL( IP5 ) ), 
+     :                %VAL( CNF_PVAL( IP7 ) ), STATUS )
 
 *  Create the output NDF, and map the DATA array.
       CALL LPG_PROP( INDF1, 'WCS,AXIS,QUALITY,UNITS', 'OUT', INDF5,
@@ -739,8 +756,10 @@
      :              STATUS )
 
 *  Copy the reconstructed array to the output DATA array.
-      CALL KPS1_LUCOU( NPIX, NLIN, %VAL( IP1 ), XMARG, YMARG, 
-     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( IPN5 ), BAD5, 
+      CALL KPS1_LUCOU( NPIX, NLIN, %VAL( CNF_PVAL( IP1 ) ), 
+     :                 XMARG, YMARG,
+     :                 DIMS1( 1 ), DIMS1( 2 ), %VAL( CNF_PVAL( IPN5 ) ), 
+     :                 BAD5,
      :                 STATUS )
 
 *  Set the bad pixel flag in the output NDF.

@@ -308,6 +308,7 @@
 *     MJM: Mark McCaughrean (UoE)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -369,6 +370,8 @@
 *     15-APR-2004 (DSB):
 *        Correct use of LINCOL to suppress looping if supplied on command
 *        line.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -387,6 +390,7 @@
       INCLUDE 'FIO_ERR'        ! FIO error definitions
       INCLUDE 'AST_PAR'        ! AST constants and function declarations
       INCLUDE 'PRM_PAR'        ! VAL__ contants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -816,32 +820,41 @@
 *  Fill the workspace with variance data of the appropriate type.
 *  Variance is taken to be the absolute data value.
          IF( ITYPE .EQ. '_REAL' ) THEN
-            CALL VEC_ABSR( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                     %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSR( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
-            CALL VEC_ABSB( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                     %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSB( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_ABSD( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                     %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSD( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL VEC_ABSI( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                     %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSI( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL VEC_ABSUB( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                      %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSUB( BAD( 1 ), EL, 
+     :                      %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                      IERR, NERR, STATUS )
 
          ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
-            CALL VEC_ABSUW( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                      %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSUW( BAD( 1 ), EL, 
+     :                      %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                      IERR, NERR, STATUS )
 
          ELSE IF( ITYPE .EQ. '_WORD' ) THEN
-            CALL VEC_ABSW( BAD( 1 ), EL, %VAL( IPOUT( 1 ) ),
-     :                     %VAL( IPOUT( 2 ) ), IERR, NERR, STATUS )
+            CALL VEC_ABSW( BAD( 1 ), EL, %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          END IF
       END IF
@@ -1177,74 +1190,88 @@
 *  Replace the region by bad values, if required.
                IF( ZBAD ) THEN
                   CALL BAD2DR( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( IPOUT( 1 ) ), STATUS )
+     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
 
 *  Or, linearly or bi-linearly interpolate across the pixels to be zapped.
                ELSE 
                   CALL KPS1_ZPRGR( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, %VAL( IPOUT( 2 ) ),
-     :                             %VAL( IPOUT( 1 ) ), STATUS )
+     :                             NOISE, 
+     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
 *  Do the same for other data types.
             ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
                IF( ZBAD ) THEN
                   CALL BAD2DB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( IPOUT( 1 ) ), STATUS )
+     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
                ELSE 
                   CALL KPS1_ZPRGB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, %VAL( IPOUT( 2 ) ),
-     :                             %VAL( IPOUT( 1 ) ), STATUS )
+     :                             NOISE, 
+     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                IF( ZBAD ) THEN
                   CALL BAD2DD( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( IPOUT( 1 ) ), STATUS )
+     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
                ELSE 
                   CALL KPS1_ZPRGD( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, %VAL( IPOUT( 2 ) ),
-     :                             %VAL( IPOUT( 1 ) ), STATUS )
+     :                             NOISE, 
+     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
             ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
                IF( ZBAD ) THEN
                   CALL BAD2DI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( IPOUT( 1 ) ), STATUS )
+     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
                ELSE 
                   CALL KPS1_ZPRGI( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, %VAL( IPOUT( 2 ) ),
-     :                             %VAL( IPOUT( 1 ) ), STATUS )
+     :                             NOISE, 
+     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
             ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
                IF( ZBAD ) THEN
                   CALL BAD2DUB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                          %VAL( IPOUT( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
                ELSE 
                   CALL KPS1_ZPRGUB( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                              NOISE, %VAL( IPOUT( 2 ) ),
-     :                              %VAL( IPOUT( 1 ) ), STATUS )
+     :                              NOISE, 
+     :                              %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                              %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                              STATUS )
                END IF
 
             ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
                IF( ZBAD ) THEN
                   CALL BAD2DUW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                          %VAL( IPOUT( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
                ELSE 
                   CALL KPS1_ZPRGUW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                              NOISE, %VAL( IPOUT( 2 ) ),
-     :                              %VAL( IPOUT( 1 ) ), STATUS )
+     :                              NOISE, 
+     :                              %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                              %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                              STATUS )
                END IF
 
             ELSE IF( ITYPE .EQ. '_WORD' ) THEN
                IF( ZBAD ) THEN
                   CALL BAD2DW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                         %VAL( IPOUT( 1 ) ), STATUS )
+     :                         %VAL( CNF_PVAL( IPOUT( 1 ) ) ), STATUS )
                ELSE 
                   CALL KPS1_ZPRGW( DIMS( 1 ), DIMS( 2 ), ZLBND, ZUBND,
-     :                             NOISE, %VAL( IPOUT( 2 ) ),
-     :                             %VAL( IPOUT( 1 ) ), STATUS )
+     :                             NOISE, 
+     :                             %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                             %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
             END IF

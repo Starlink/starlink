@@ -270,6 +270,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -300,6 +301,8 @@
 *        picture.
 *     15-AUG-2001 (DSB):
 *        Changed default for MINPIX to [2].
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -315,6 +318,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error constants
       INCLUDE 'PRM_PAR'          ! Data-type constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -440,7 +444,7 @@
 
 *  Get maximum and minimum values in the data array of the IN2 NDF 
 *  section.
-      CALL KPG1_MXMNR( BAD, NELS, %VAL( PNT2S( 1 ) ), NBAD2,
+      CALL KPG1_MXMNR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ), NBAD2,
      :                 MAX2, MIN2, MAXPOS, MINPOS, STATUS )
       BAD = NBAD2 .NE. 0
 
@@ -457,12 +461,14 @@
       END IF
 
 *  Generate the histogram of the section of IN2.
-      CALL KPG1_GHSTR( BAD, NELS, %VAL( PNT2S( 1 ) ), HISIZE,
-     :                 MAX2, MIN2, %VAL( PNTW0 ), STATUS )
+      CALL KPG1_GHSTR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 
+     :                 HISIZE,
+     :                 MAX2, MIN2, %VAL( CNF_PVAL( PNTW0 ) ), STATUS )
 
 *  Find the data values in IN2 which correspond to the required
 *  percentage histogram points.
-      CALL KPG1_HSTFR( HISIZE, %VAL( PNTW0 ), MAX2, MIN2, 2, PCRANG,
+      CALL KPG1_HSTFR( HISIZE, %VAL( CNF_PVAL( PNTW0 ) ), 
+     :                 MAX2, MIN2, 2, PCRANG,
      :                 DRDEF, STATUS )
 
 *  Unmap and release the temporary work space used to hold the 
@@ -506,10 +512,13 @@
 
 *  Call KPS1_NMPLT to calculate the linear function which normalises IN1 to
 *  IN2.
-      CALL KPS1_NMPLT( %VAL( PNT2S( 1 ) ), %VAL( PNT1S( 1 ) ), NELS,
+      CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 
+     :                 %VAL( CNF_PVAL( PNT1S( 1 ) ) ), NELS,
      :             DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
-     :             MINPIX, NDF2S, NDF1S, %VAL( PNTW1 ), %VAL( PNTW2 ),
-     :             %VAL( PNTW3 ), %VAL( PNTW4 ), %VAL( PNTW5 ), 
+     :             MINPIX, NDF2S, NDF1S, %VAL( CNF_PVAL( PNTW1 ) ), 
+     :             %VAL( CNF_PVAL( PNTW2 ) ),
+     :             %VAL( CNF_PVAL( PNTW3 ) ), %VAL( CNF_PVAL( PNTW4 ) ), 
+     :             %VAL( CNF_PVAL( PNTW5 ) ),
      :             SLOPE, OFFSET, STATUS )
 
 *  Unmap and release the temporary work space.
@@ -550,9 +559,9 @@
 
 *  Produce the output data array by applying the inverse of the 
 *  calculated normalisation function to the IN1 data array.
-         CALL KPG1_SCLOF( %VAL( PNT1BD( 1 ) ), NEL1B,
+         CALL KPG1_SCLOF( %VAL( CNF_PVAL( PNT1BD( 1 ) ) ), NEL1B,
      :                    DBLE( 1.0 / SLOPE ), DBLE( -OFFSET / SLOPE ),
-     :                    %VAL( PNTOD( 1 ) ), BAD, STATUS )
+     :                    %VAL( CNF_PVAL( PNTOD( 1 ) ) ), BAD, STATUS )
 
 *  Set the bad pixel flag for the output data array.
           CALL NDF_SBAD( BAD, NDFOUT, 'Data', STATUS )
@@ -576,9 +585,10 @@
 
             IF ( STATUS .NE. SAI__OK ) GOTO 999
        
-            CALL KPG1_SCLOF( %VAL( PNT1BV( 1 ) ), NEL1B, 
+            CALL KPG1_SCLOF( %VAL( CNF_PVAL( PNT1BV( 1 ) ) ), NEL1B,
      :                       DBLE( 1.0 / SLOPE**2 ), 0.0D0, 
-     :                       %VAL( PNTOV( 1 ) ), BAD, STATUS )
+     :                       %VAL( CNF_PVAL( PNTOV( 1 ) ) ), 
+     :                       BAD, STATUS )
 
 *  Set the bad pixel flag for the output variance array.
             CALL NDF_SBAD( BAD, NDFOUT, 'Variance', STATUS )

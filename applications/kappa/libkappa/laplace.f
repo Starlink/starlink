@@ -63,11 +63,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     26-NOV-2001 (DSB):
 *        Original NDF version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +84,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -169,37 +173,44 @@
 *  multiply the data array by the constant.
       IF( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_LAPLB( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
  
       ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_LAPLUB( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                     %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                     %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                     %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                     NBAD, STATUS )
  
       ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_LAPLD( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
  
       ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_LAPLI( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
  
       ELSE IF( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_LAPLR( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
  
       ELSE IF( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_LAPLW( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
  
       ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_LAPLUW( .FALSE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                    %VAL( IPIN( 1 ) ), N, %VAL( IPOUT( 1 ) ), 
+     :                    %VAL( CNF_PVAL( IPIN( 1 ) ) ), N, 
+     :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
      :                    NBAD, STATUS )
  
       END IF
@@ -221,37 +232,44 @@
 *  multiply the variance array by the squared constant.
          IF( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPS1_LAPLB( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
  
          ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPS1_LAPLUB( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                        %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                        %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                        %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                        NBAD, STATUS )
  
          ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_LAPLD( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
  
          ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPS1_LAPLI( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
  
          ELSE IF( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_LAPLR( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
  
          ELSE IF( ITYPE .EQ. '_WORD' ) THEN
             CALL KPS1_LAPLW( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       NBAD, STATUS )
  
          ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPS1_LAPLUW( .TRUE., BAD, DIM( 1 ), DIM( 2 ), 
-     :                        %VAL( IPIN( 2 ) ), N, %VAL( IPOUT( 2 ) ), 
+     :                        %VAL( CNF_PVAL( IPIN( 2 ) ) ), N, 
+     :                        %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                        NBAD, STATUS )
  
          END IF

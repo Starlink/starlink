@@ -345,6 +345,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -391,6 +392,8 @@
 *        Added propagation of the WCS component.
 *     29-NOV-2001 (DSB):
 *        Corrected argument list for KPS1_MEMNM.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

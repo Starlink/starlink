@@ -120,6 +120,7 @@
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -133,6 +134,8 @@
 *        example, and a list of related applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,6 +150,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -248,7 +252,8 @@
 *  Get the approximate width of the PSF along both array axes.
 *  Internal arrays will be padded with a blank margin of this size to
 *  reduce edge effects caused by wrap-around in the convolution.
-      CALL KPG1_PSFSD( %VAL( IP2 ), DIM2( 1 ), DIM2( 2 ), %VAL( IPW1 ),
+      CALL KPG1_PSFSD( %VAL( CNF_PVAL( IP2 ) ), DIM2( 1 ), DIM2( 2 ), 
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 W1DIM( 1 ), W1DIM( 2 ), PSFFRA, 1, PSFXSZ,
      :                 PSFYSZ, STATUS )
 
@@ -308,13 +313,18 @@
      :                 STATUS )
 
 *  Call a lower level routine to do the work.
-      CALL KPS1_CNVLV( VAR, DIM1( 1 ), DIM1( 2 ), %VAL( IP1( 1 ) ), 
-     :                 %VAL( IP1( 2 ) ), DIM2( 1 ), DIM2( 2 ), 
-     :                 %VAL( IP2 ), XCEN - SLBND2( 1 ) + 1, 
+      CALL KPS1_CNVLV( VAR, DIM1( 1 ), DIM1( 2 ), 
+     :                 %VAL( CNF_PVAL( IP1( 1 ) ) ),
+     :                 %VAL( CNF_PVAL( IP1( 2 ) ) ), 
+     :                 DIM2( 1 ), DIM2( 2 ),
+     :                 %VAL( CNF_PVAL( IP2 ) ), XCEN - SLBND2( 1 ) + 1,
      :                 YCEN - SLBND2( 2 ) + 1, NPIX, NLIN, WLIM, 
-     :                 %VAL( IP3( 1 ) ), %VAL( IP3( 2 ) ), BAD,
-     :                 %VAL( IPW2 ), %VAL( IPW3 ), %VAL( IPW4 ),
-     :                 %VAL( IPW5 ), STATUS )
+     :                 %VAL( CNF_PVAL( IP3( 1 ) ) ), 
+     :                 %VAL( CNF_PVAL( IP3( 2 ) ) ), BAD,
+     :                 %VAL( CNF_PVAL( IPW2 ) ), 
+     :                 %VAL( CNF_PVAL( IPW3 ) ), 
+     :                 %VAL( CNF_PVAL( IPW4 ) ),
+     :                 %VAL( CNF_PVAL( IPW5 ) ), STATUS )
 
 *  Set the bad pixel flags for the output NDF components.
       CALL NDF_SBAD( BAD, INDF3, 'DATA', STATUS )

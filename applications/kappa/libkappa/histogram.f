@@ -236,6 +236,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -263,6 +264,8 @@
 *        by which to specify the data-value limits of the histogram.
 *        Moved the reporting the data range and obtaining the RANGE
 *        parameter to a subroutine.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -342,6 +345,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -384,37 +388,37 @@
 *  the data-value scaling limits are double precision for all
 *  data types.
       IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_DARAR( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAR( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    'Limit,Percentiles,Range,Sigmas', BAD,
      :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_DARAD( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAD( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    'Limit,Percentiles,Range,Sigmas', BAD,
      :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_DARAI( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAI( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    'Limit,Percentiles,Range,Sigmas', BAD,
      :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_DARAW( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAW( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    'Limit,Percentiles,Range,Sigmas', BAD,
      :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_DARAB( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAB( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    'Limit,Percentiles,Range,Sigmas', BAD,
      :                    DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_DARAUB( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAUB( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     'Limit,Percentiles,Range,Sigmas', BAD,
      :                     DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_DARAUW( 'RANGE', EL, %VAL( PNTR( 1 ) ), 
+         CALL KPG1_DARAUW( 'RANGE', EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                     'Limit,Percentiles,Range,Sigmas', BAD,
      :                     DRANGE( 1 ), DRANGE( 2 ), STATUS )
 
@@ -505,18 +509,21 @@
       IF ( TYPE .EQ. '_BYTE' ) THEN
 
 *  Compute the histogram.
-         CALL KPG1_GHSTB( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
+         CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMBIN,
      :                    NUM_DTOB( DRANGE( 2 ) ),
-     :                    NUM_DTOB( DRANGE( 1 ) ), %VAL( HPNTR ),
+     :                    NUM_DTOB( DRANGE( 1 ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( HPNTR ), REAL( DRANGE( 1 ) ),
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
@@ -524,35 +531,42 @@
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
  
 *  Compute the histogram.
-         CALL KPG1_GHSTD( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
-     :                    DRANGE( 2 ), DRANGE( 1 ), %VAL( HPNTR ),
+         CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMBIN,
+     :                    DRANGE( 2 ), DRANGE( 1 ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSD( NUMBIN, %VAL( HPNTR ), DRANGE( 1 ),
+         CALL KPG1_HSDSD( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    DRANGE( 1 ),
      :                    DRANGE( 2 ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLD( IFIL, NUMBIN, %VAL( HPNTR ), DRANGE( 1 ),
+            CALL KPG1_HSFLD( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                       DRANGE( 1 ),
      :                       DRANGE( 2 ), STATUS )
          END IF
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
  
 *  Compute the histogram.
-         CALL KPG1_GHSTI( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
+         CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMBIN,
      :                    NUM_DTOI( DRANGE( 2 ) ),
-     :                    NUM_DTOI( DRANGE( 1 ) ), %VAL( HPNTR ),
+     :                    NUM_DTOI( DRANGE( 1 ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( HPNTR ), REAL( DRANGE( 1 ) ),
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
@@ -560,17 +574,19 @@
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
 
 *  Compute the histogram.
-         CALL KPG1_GHSTR( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
+         CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMBIN,
      :                    REAL( DRANGE( 2 ) ), REAL( DRANGE( 1 ) ),
-     :                    %VAL( HPNTR ), STATUS )
+     :                    %VAL( CNF_PVAL( HPNTR ) ), STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( HPNTR ), REAL( DRANGE( 1 ) ),
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
@@ -578,18 +594,21 @@
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
  
 *  Compute the histogram.
-         CALL KPG1_GHSTUB( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
+         CALL KPG1_GHSTUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                     NUMBIN,
      :                     NUM_DTOUB( DRANGE( 2 ) ),
-     :                     NUM_DTOUB( DRANGE( 1 ) ), %VAL( HPNTR ),
+     :                     NUM_DTOUB( DRANGE( 1 ) ), 
+     :                     %VAL( CNF_PVAL( HPNTR ) ),
      :                     STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( HPNTR ), REAL( DRANGE( 1 ) ),
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
@@ -597,18 +616,21 @@
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
 
 *  Compute the histogram.
-         CALL KPG1_GHSTUW( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
+         CALL KPG1_GHSTUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                     NUMBIN,
      :                     NUM_DTOUW( DRANGE( 2 ) ),
-     :                     NUM_DTOUW( DRANGE( 1 ) ), %VAL( HPNTR ),
+     :                     NUM_DTOUW( DRANGE( 1 ) ), 
+     :                     %VAL( CNF_PVAL( HPNTR ) ),
      :                     STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( HPNTR ), REAL( DRANGE( 1 ) ),
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
@@ -616,18 +638,21 @@
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
  
 *  Compute the histogram.
-         CALL KPG1_GHSTW( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN,
+         CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMBIN,
      :                    NUM_DTOW( DRANGE( 2 ) ),
-     :                    NUM_DTOW( DRANGE( 1 ) ), %VAL( HPNTR ),
+     :                    NUM_DTOW( DRANGE( 1 ) ), 
+     :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
 
 *  Report the histogram.
-         CALL KPG1_HSDSR( NUMBIN, %VAL( HPNTR ), REAL( DRANGE( 1 ) ),
+         CALL KPG1_HSDSR( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    REAL( DRANGE( 1 ) ),
      :                    REAL( DRANGE( 2 ) ), STATUS )
 
 *  Write the histogram to the log file.
          IF ( LOGFIL ) THEN
-            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( HPNTR ),
+            CALL KPG1_HSFLR( IFIL, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
      :                       REAL( DRANGE( 1 ) ), REAL( DRANGE( 2 ) ),
      :                       STATUS )
          END IF
@@ -675,7 +700,7 @@
 *  Find the range of the numbers in the histogram bins.  Empty bins
 *  will be filled with zero, so no need to check for bad values.
       BAD = .FALSE.
-      CALL KPG1_MXMNI( BAD, NUMBIN, %VAL( HPNTR ), NINVAL,
+      CALL KPG1_MXMNI( BAD, NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), NINVAL,
      :                 MAXH, MINH, MAXPOS, MINPOS, STATUS )
 
 *  Obtain a range for the X axis, but since graphics is involved
@@ -693,8 +718,10 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the x-y points at the centre of each bin in the histogram.
-         CALL KPG1_HSTLO( NUMBIN, %VAL( HPNTR ), MINIM, MAXIM, 
-     :                    XLOG, YLOG, %VAL( HPPTR1 ), %VAL( HPPTR2 ), 
+         CALL KPG1_HSTLO( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    MINIM, MAXIM,
+     :                    XLOG, YLOG, %VAL( CNF_PVAL( HPPTR1 ) ), 
+     :                    %VAL( CNF_PVAL( HPPTR2 ) ),
      :                    STATUS )
 
 *  Plot the histogram.
@@ -703,7 +730,8 @@
 *  Plot the locus just computed within annotated axes.  Both axes'
 *  limits are defined. Use a default value of 0.0 for the bottom of the
 *  vertical axis.
-         CALL KPG1_GRAPH( NUMBIN, %VAL( HPPTR1 ), %VAL( HPPTR2 ), 
+         CALL KPG1_GRAPH( NUMBIN, %VAL( CNF_PVAL( HPPTR1 ) ), 
+     :                    %VAL( CNF_PVAL( HPPTR2 ) ),
      :                    0.0, 0.0,  XL, YL, 'Histogram plot', 'XDATA',
      :                    'YDATA', 1, .TRUE., VAL__BADR, VAL__BADR, 
      :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE., 
@@ -741,8 +769,9 @@
      :              NUMBIN, STATUS )
 
 *  Write the slice to the NDF.
-      CALL VEC_ITOI( .FALSE., NUMBIN, %VAL( HPNTR ),
-     :               %VAL( OUTPTR( 1 ) ), IERR, NERR, STATUS )
+      CALL VEC_ITOI( .FALSE., NUMBIN, %VAL( CNF_PVAL( HPNTR ) ),
+     :               %VAL( CNF_PVAL( OUTPTR( 1 ) ) ), 
+     :               IERR, NERR, STATUS )
 
 *  Unmap the histogram.
       CALL NDF_UNMAP( NDFO, 'Data', STATUS )
@@ -781,7 +810,7 @@
       BINWID = ( MAXIM - MINIM ) / REAL( NUMBIN )
       CALL KPG1_SSCOF( NUMBIN, DBLE( BINWID ),
      :                 DBLE( MINIM + 0.5 * BINWID ),
-     :                 %VAL( AXPNTR( 1 ) ), STATUS )
+     :                 %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), STATUS )
 
 *  Handle the null case invisibly.
       IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )

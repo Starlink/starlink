@@ -148,6 +148,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -167,6 +168,8 @@
 *        Added code to set badbits mask to zero.
 *     3-SEP-2002 (DSB):
 *        Do not report an error if the input has no bad pixels.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -246,6 +249,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'    ! Definitions of conversion routines
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *.
 
@@ -444,8 +448,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAR( EL, %VAL( PNTRI( 1 ) ), VAL__BADR,
-     :                             RSUVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             VAL__BADR,
+     :                             RSUVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -459,24 +465,29 @@
      :                COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAR( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAR( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADR, RSDVAL**2, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAR( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAR( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADR, RSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
  
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1R( EL, %VAL( PNTRI( 1 ) ), VAL__BADR,
+                     CALL KPS1_NOM1R( EL, 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                VAL__BADR,
      :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( PNTRO( 1 ) ), NREP, STATUS )
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               NREP, STATUS )
                   END IF                     
 
                END IF
@@ -527,8 +538,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAB( EL, %VAL( PNTRI( 1 ) ), VAL__BADB,
-     :                             BSUVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             VAL__BADB,
+     :                             BSUVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -542,24 +555,29 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAB( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAB( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADB, BSDVAL*BSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAB( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAB( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADB, BSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
  
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1B( EL, %VAL( PNTRI( 1 ) ), VAL__BADB,
+                     CALL KPS1_NOM1B( EL, 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                VAL__BADB,
      :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( PNTRO( 1 ) ), NREP, STATUS )
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               NREP, STATUS )
                   END IF                     
 
                END IF
@@ -604,8 +622,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAD( EL, %VAL( PNTRI( 1 ) ), VAL__BADD,
-     :                             REPVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             VAL__BADD,
+     :                             REPVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -618,24 +638,29 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAD( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAD( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADD, SIGMA*SIGMA, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAD( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAD( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADD, SIGMA, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1D( EL, %VAL( PNTRI( 1 ) ), VAL__BADD,
+                     CALL KPS1_NOM1D( EL, 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                VAL__BADD,
      :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( PNTRO( 1 ) ), NREP, STATUS )
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               NREP, STATUS )
                   END IF                     
 
                END IF
@@ -686,8 +711,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAI( EL, %VAL( PNTRI( 1 ) ), VAL__BADI,
-     :                             ISUVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             VAL__BADI,
+     :                             ISUVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -700,24 +727,29 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAI( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAI( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADI, ISDVAL*ISDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAI( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAI( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADI, ISDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1I( EL, %VAL( PNTRI( 1 ) ), VAL__BADI,
+                     CALL KPS1_NOM1I( EL, 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                                VAL__BADI,
      :                               REPVAL, SIGMA, MINREP, MAXREP, 
-     :                               %VAL( PNTRO( 1 ) ), NREP, STATUS )
+     :                               %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                               NREP, STATUS )
                   END IF                     
 
                END IF
@@ -768,8 +800,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAUB( EL, %VAL( PNTRI( 1 ) ), VAL__BADUB,
-     :                             BSUVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              VAL__BADUB,
+     :                             BSUVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -782,25 +816,29 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAUB( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAUB( EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADUB, BSDVAL*BSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAUB( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAUB( EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADUB, BSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1UB( EL, %VAL( PNTRI( 1 ) ),
+                     CALL KPS1_NOM1UB( EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                 VAL__BADUB, REPVAL, SIGMA,
      :                                 MINREP, MAXREP, 
-     :                                 %VAL( PNTRO( 1 ) ), NREP, 
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 NREP,
      :                                 STATUS )
                   END IF                     
 
@@ -852,8 +890,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAUW( EL, %VAL( PNTRI( 1 ) ), VAL__BADUW,
-     :                             WSUVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                              VAL__BADUW,
+     :                             WSUVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -866,25 +906,29 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAUW( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAUW( EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADUW, WSDVAL*WSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAUW( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAUW( EL, 
+     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADUW, WSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1UW( EL, %VAL( PNTRI( 1 ) ),
+                     CALL KPS1_NOM1UW( EL, 
+     :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                 VAL__BADUW, REPVAL, SIGMA,
      :                                 MINREP, MAXREP, 
-     :                                 %VAL( PNTRO( 1 ) ), NREP, 
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 NREP,
      :                                 STATUS )
                   END IF                     
 
@@ -936,8 +980,10 @@
 *  the input to the output NDF. First deal with cases where bad values
 *  are to be replaced by a constant value.
                IF ( SIGMA .EQ. 0.0D0 ) THEN
-                  CALL KPG1_CHVAW( EL, %VAL( PNTRI( 1 ) ), VAL__BADW,
-     :                             WSUVAL, %VAL( PNTRO( 1 ) ), NREP,
+                  CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                             VAL__BADW,
+     :                             WSUVAL, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                             STATUS )
 
 *  Now deal with cases where random values are to be used.
@@ -950,25 +996,29 @@
      :                 COMP( I ) .NE. 'Data' ) THEN
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
-                        CALL KPG1_CHVAW( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAW( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADW, WSDVAL*WSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
  
                      ELSE IF ( COMP( I ) .EQ. 'Error' ) THEN
-                        CALL KPG1_CHVAW( EL, %VAL( PNTRI( 1 ) ), 
+                        CALL KPG1_CHVAW( EL, 
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   VAL__BADW, WSDVAL, 
-     :                                   %VAL( PNTRO( 1 ) ),
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   NREP, STATUS )
                      ENDIF
 
 *  Otherwise, replace bad values with random samples taken from a
 *  normal distribution.
                   ELSE
-                     CALL KPS1_NOM1W( EL, %VAL( PNTRI( 1 ) ),
+                     CALL KPS1_NOM1W( EL, 
+     :                                %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                VAL__BADW, REPVAL, SIGMA,
      :                                MINREP, MAXREP, 
-     :                                %VAL( PNTRO( 1 ) ), NREP,
+     :                                %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                NREP,
      :                                STATUS )
                   END IF                     
 

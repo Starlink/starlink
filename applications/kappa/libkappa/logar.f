@@ -64,6 +64,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,8 @@
 *        Added WCS propagation.
 *     1-OCT-1999 (DSB):
 *        Changed to use LPG to access NDFs.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +90,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! VAL_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -166,39 +170,53 @@
 *  Select the appropriate routine for the data type being processed and
 *  add the constant to the data array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_LOGAB( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_LOGAUB( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAUB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_LOGAD( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_LOGAI( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_LOGAR( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_LOGAW( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_LOGAUW( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
-     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
-     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+         CALL KPG1_LOGAUW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), VAR,
+     :                    %VAL( CNF_PVAL( PNTRI( 2 ) ) ), BASE, 
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                    NERR, NERRV, STATUS )
       END IF
 
 *  See if there may be bad pixels in the output data array and set the

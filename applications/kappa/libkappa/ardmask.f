@@ -97,6 +97,7 @@
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -126,6 +127,8 @@
 *        files.
 *     30-NOV-2001 (DSB):
 *        Added parameters COMP, CONST and INSIDE.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -141,6 +144,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constant
       INCLUDE 'GRP_PAR'          ! GRP_ data constants
       INCLUDE 'PRM_PAR'          ! VAL_ data constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
                
 *  Status:     
       INTEGER STATUS             ! Global status
@@ -242,7 +246,8 @@
 *  ignored because we have previously called ARD_WCS.
       REGVAL = 2
       CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :               %VAL( CNF_PVAL( IPMASK ) ), 
+     :               LBNDI, UBNDI, LBNDE, UBNDE,
      :               STATUS )
        
 *  Propagate the bits of the source NDF required.
@@ -271,32 +276,39 @@
 *  Correct the output image to have bad pixels where indicated on the
 *  mask.  Call the appropriate routine for the data type.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMR( BAD, CONST, INSIDE, EL, 
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMB( BAD, CONST, INSIDE, EL, 
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMD( BAD, CONST, INSIDE, EL, 
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMI( BAD, CONST, INSIDE, EL, 
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMUB( BAD, CONST, INSIDE, EL, 
+     :                     %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMUW( BAD, CONST, INSIDE, EL, 
+     :                     %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, %VAL( IPMASK ), 
-     :                    %VAL( IPOUT ), STATUS )
+         CALL KPS1_ARDMW( BAD, CONST, INSIDE, EL, 
+     :                    %VAL( CNF_PVAL( IPMASK ) ),
+     :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
       END IF
 

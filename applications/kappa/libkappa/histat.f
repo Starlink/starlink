@@ -159,6 +159,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry STARLINK
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -173,6 +174,8 @@
 *        the median and percentiles.
 *     6-AUG-2004 (DSB):
 *        Display current Frame WCS coords at max and min pixel positions.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -189,6 +192,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
       INCLUDE 'MSG_PAR'          ! Message constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -373,37 +377,44 @@
 *  Call the appropriate routine to compute the histogram and hence the
 *  statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_HSTAB( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_HSTAUB( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                     NUMPER, PERCNT,
      :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_HSTAD( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_HSTAI( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_HSTAR( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_HSTAW( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPER, PERCNT,
      :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_HSTAUW( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+         CALL KPG1_HSTAUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                     NUMPER, PERCNT,
      :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
      :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
       END IF

@@ -103,6 +103,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -113,6 +114,8 @@
 *        Made messages conditional.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,6 +180,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'    ! Definitions of conversion routines
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *.
 
@@ -319,8 +323,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAR( EL, %VAL( PNTRI( 1 ) ), RSUVAL,
-     :                          VAL__BADR, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          RSUVAL,
+     :                          VAL__BADR, 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
@@ -341,8 +347,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAB( EL, %VAL( PNTRI( 1 ) ), BSUVAL,
-     :                          VAL__BADB, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          BSUVAL,
+     :                          VAL__BADB, 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
@@ -359,8 +367,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAD( EL, %VAL( PNTRI( 1 ) ), REPVAL,
-     :                          VAL__BADD, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAD( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          REPVAL,
+     :                          VAL__BADD, 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
@@ -381,8 +391,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAI( EL, %VAL( PNTRI( 1 ) ), ISUVAL,
-     :                          VAL__BADI, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ISUVAL,
+     :                          VAL__BADI, 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
@@ -403,8 +415,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAUB( EL, %VAL( PNTRI( 1 ) ), BSUVAL,
-     :                           VAL__BADUB, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAUB( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           BSUVAL,
+     :                           VAL__BADUB, 
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
@@ -425,8 +439,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAUW( EL, %VAL( PNTRI( 1 ) ), WSUVAL,
-     :                           VAL__BADUW, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAUW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           WSUVAL,
+     :                           VAL__BADUW, 
+     :                           %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
@@ -447,8 +463,10 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-               CALL KPG1_CHVAW( EL, %VAL( PNTRI( 1 ) ), WSUVAL,
-     :                          VAL__BADW, %VAL( PNTRO( 1 ) ), NREP,
+               CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          WSUVAL,
+     :                          VAL__BADW, 
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), NREP,
      :                          STATUS )
             END IF
 

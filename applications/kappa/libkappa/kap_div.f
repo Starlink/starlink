@@ -72,6 +72,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *        Added Related Applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -170,17 +174,23 @@
 *  Real data...
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPG1_DIVR( BAD, VAR, EL,
-     :                   %VAL( PNTR1( 1 ) ), %VAL( PNTR1( 2 ) ),
-     :                   %VAL( PNTR2( 1 ) ), %VAL( PNTR2( 2 ) ),
-     :                   %VAL( PNTR3( 1 ) ), %VAL( PNTR3( 2 ) ),
+     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 2 ) ) ),
      :                   NERR, STATUS )
 
 *  Double precision data...
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_DIVD( BAD, VAR, EL,
-     :                   %VAL( PNTR1( 1 ) ), %VAL( PNTR1( 2 ) ),
-     :                   %VAL( PNTR2( 1 ) ), %VAL( PNTR2( 2 ) ),
-     :                   %VAL( PNTR3( 1 ) ), %VAL( PNTR3( 2 ) ),
+     :                   %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 2 ) ) ),
      :                   NERR, STATUS )
       END IF
 

@@ -175,6 +175,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -190,6 +191,8 @@
 *        Badbits mask set to zero.
 *     23-MARCH-2001 (DSB):
 *        Reset the smoothing size before processing each block.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -205,6 +208,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -440,7 +444,8 @@
          IF( VAR ) THEN
 
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_MXMNR( .TRUE., EL, %VAL( PNTRI( 2 ) ), NVBAD,
+               CALL KPG1_MXMNR( .TRUE., EL, 
+     :                          %VAL( CNF_PVAL( PNTRI( 2 ) ) ), NVBAD,
      :                          RMXV, RMNV, MXVP, MNVP, STATUS )
 
                IF( RMXV .NE. VAL__BADR ) THEN
@@ -450,7 +455,8 @@
                END IF
 
             ELSE 
-               CALL KPG1_MXMND( .TRUE., EL, %VAL( PNTRI( 2 ) ), NVBAD,
+               CALL KPG1_MXMND( .TRUE., EL, 
+     :                          %VAL( CNF_PVAL( PNTRI( 2 ) ) ), NVBAD,
      :                          DMXV, DMNV, MXVP, MNVP, STATUS )
             END IF
 
@@ -499,20 +505,30 @@
 *  Reject pixels deviating from their local mean by more than the
 *  threshold calling the routine of the appropriate data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_BAFIR( DIM( 1 ), DIM( 2 ), %VAL( PNTRI( 1 ) ),
-     :                       VAR, %VAL( PNTRI( 2 ) ), NITER, SIZEF,
-     :                       CNGMAX, CNGRMS, NBAD, %VAL( PNTRO( 1 ) ),
-     :                       %VAL( PNTRO( 2 ) ), %VAL( PNTW1 ),
-     :                       %VAL( PNTW2 ), %VAL( PNTW3 ),
-     :                       %VAL( PNTW4 ), STATUS )
+            CALL KPS1_BAFIR( DIM( 1 ), DIM( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       NITER, SIZEF,
+     :                       CNGMAX, CNGRMS, NBAD, 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTW1 ) ),
+     :                       %VAL( CNF_PVAL( PNTW2 ) ), 
+     :                       %VAL( CNF_PVAL( PNTW3 ) ),
+     :                       %VAL( CNF_PVAL( PNTW4 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_BAFID( DIM( 1 ), DIM( 2 ), %VAL( PNTRI( 1 ) ),
-     :                       VAR, %VAL( PNTRI( 2 ) ), NITER, SIZEF,
-     :                       CNGMAX, CNGRMS, NBAD, %VAL( PNTRO( 1 ) ),
-     :                       %VAL( PNTRO( 2 ) ), %VAL( PNTW1 ),
-     :                       %VAL( PNTW2 ), %VAL( PNTW3 ),
-     :                       %VAL( PNTW4 ), STATUS )
+            CALL KPS1_BAFID( DIM( 1 ), DIM( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       VAR, %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       NITER, SIZEF,
+     :                       CNGMAX, CNGRMS, NBAD, 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTW1 ) ),
+     :                       %VAL( CNF_PVAL( PNTW2 ) ), 
+     :                       %VAL( CNF_PVAL( PNTW3 ) ),
+     :                       %VAL( CNF_PVAL( PNTW4 ) ), STATUS )
 
          END IF
 

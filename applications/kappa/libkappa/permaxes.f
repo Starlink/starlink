@@ -76,6 +76,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,6 +84,8 @@
 *        Original version.
 *     15-MAR-2001 (DSB):
 *        Take surplus axes into account.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -219,32 +223,39 @@
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
             IF ( TYPE .EQ. '_BYTE' ) THEN
-               CALL KPS1_PRMXB( NDIM, DIM, DIMO, PERM, %VAL( IP1 ), 
-     :                          %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXB( NDIM, DIM, DIMO, PERM, 
+     :                          %VAL( CNF_PVAL( IP1 ) ),
+     :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-               CALL KPS1_PRMXUB( NDIM, DIM, DIMO, PERM, %VAL( IP1 ),
-     :                           %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXUB( NDIM, DIM, DIMO, PERM, 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
+     :                           %VAL( CNF_PVAL( IP2 ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_PRMXD( NDIM, DIM, DIMO, PERM, %VAL( IP1 ),
-     :                          %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXD( NDIM, DIM, DIMO, PERM, 
+     :                          %VAL( CNF_PVAL( IP1 ) ),
+     :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL KPS1_PRMXI( NDIM, DIM, DIMO, PERM, %VAL( IP1 ),
-     :                          %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXI( NDIM, DIM, DIMO, PERM, 
+     :                          %VAL( CNF_PVAL( IP1 ) ),
+     :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_PRMXR( NDIM, DIM, DIMO, PERM, %VAL( IP1 ),
-     :                          %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXR( NDIM, DIM, DIMO, PERM, 
+     :                          %VAL( CNF_PVAL( IP1 ) ),
+     :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL KPS1_PRMXW( NDIM, DIM, DIMO, PERM, %VAL( IP1 ),
-     :                          %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXW( NDIM, DIM, DIMO, PERM, 
+     :                          %VAL( CNF_PVAL( IP1 ) ),
+     :                          %VAL( CNF_PVAL( IP2 ) ), STATUS )
  
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-               CALL KPS1_PRMXUW( NDIM, DIM, DIMO, PERM, %VAL( IP1 ),
-     :                           %VAL( IP2 ), STATUS )
+               CALL KPS1_PRMXUW( NDIM, DIM, DIMO, PERM, 
+     :                           %VAL( CNF_PVAL( IP1 ) ),
+     :                           %VAL( CNF_PVAL( IP2 ) ), STATUS )
             END IF
 
 *  If a quality array is being processed, then transfer the quality
@@ -298,32 +309,39 @@
 *  Call the appropriate routine to process the array, depending on its
 *  numeric type.
                IF ( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( .FALSE., EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( .FALSE., EL, %VAL( IP1 ), 
-     :                             %VAL( IP2 ), IERR, NERR, STATUS )
+                  CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+     :                             %VAL( CNF_PVAL( IP2 ) ), 
+     :                             IERR, NERR, STATUS )
  
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
 
                ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( .FALSE., EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
  
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( .FALSE., EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
  
                ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( .FALSE., EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
  
                ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( .FALSE., EL, %VAL( IP1 ), 
-     :                             %VAL( IP2 ), IERR, NERR, STATUS )
+                  CALL VEC_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL( IP1 ) ),
+     :                             %VAL( CNF_PVAL( IP2 ) ), 
+     :                             IERR, NERR, STATUS )
 
                END IF
 

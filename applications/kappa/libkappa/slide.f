@@ -155,6 +155,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PAR_ERR'          ! Parameter system error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -451,58 +452,72 @@
 *  Perform the resampling according to data type.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          NBAD = AST_RESAMPLEB( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADB, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          NBAD = AST_RESAMPLEUB( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                          %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                          %VAL( CNF_PVAL( IPDATI ) ), 
+     :                          %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                          VAL__BADUB, NDIM, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          NBAD = AST_RESAMPLEW( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADW, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          NBAD = AST_RESAMPLEUW( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                          %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                          %VAL( CNF_PVAL( IPDATI ) ), 
+     :                          %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                          VAL__BADUW, NDIM, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                          UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                          %VAL( CNF_PVAL( IPVARO ) ),
      :                          STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          NBAD = AST_RESAMPLEI( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADI, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          NBAD = AST_RESAMPLER( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADR, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          NBAD = AST_RESAMPLED( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         %VAL( CNF_PVAL( IPDATI ) ), 
+     :                         %VAL( CNF_PVAL( IPVARI ) ), INTERP,
      :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
      :                         VAL__BADD, NDIM, LBNDO, UBNDO, LBNDO,
-     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         UBNDO, %VAL( CNF_PVAL( IPDATO ) ), 
+     :                         %VAL( CNF_PVAL( IPVARO ) ),
      :                         STATUS )
       END IF
 
@@ -528,10 +543,12 @@
 
 *  Do the resampling.
          NBAD = AST_RESAMPLEUB( MAPHIO, NDIM, LBNDI, UBNDI,
-     :                          %VAL( IPQUAI ), %VAL( IPQUAI ), INTERP,
+     :                          %VAL( CNF_PVAL( IPQUAI ) ), 
+     :                          %VAL( CNF_PVAL( IPQUAI ) ), INTERP,
      :                          AST_NULL, PARAMS, 0, TOL, MAXPIX,
      :                          VAL__BADUB, NDIM, LBNDO, UBNDO, LBNDO,
-     :                          UBNDO, %VAL( IPQUAO ), %VAL( IPQUAO ),
+     :                          UBNDO, %VAL( CNF_PVAL( IPQUAO ) ), 
+     :                          %VAL( CNF_PVAL( IPQUAO ) ),
      :                          STATUS )
 
       END IF
@@ -578,65 +595,79 @@
 *  Perform the resampling according to data type.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
                NBAD = AST_RESAMPLEB( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADB, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                NBAD = AST_RESAMPLEUB( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADUB, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                NBAD = AST_RESAMPLEW( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADW, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                NBAD = AST_RESAMPLEUW( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADUW, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                NBAD = AST_RESAMPLEI( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADI, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                NBAD = AST_RESAMPLER( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADR, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
       
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                NBAD = AST_RESAMPLED( MAPA, 1, LBNDI( I ), UBNDI( I ),
-     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               %VAL( CNF_PVAL( IPAI ) ), 
+     :                               %VAL( CNF_PVAL( IPAI ) ), INTERP,
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
      :                               MAXPIX, VAL__BADD, 1, LBNDO( I ), 
      :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
-     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ), 
+     :                               %VAL( CNF_PVAL( IPAO ) ),
      :                               STATUS )
             END IF
 

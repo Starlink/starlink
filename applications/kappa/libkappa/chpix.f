@@ -98,6 +98,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -108,6 +109,8 @@
 *        _INTEGER when calling PAR_MIX0I.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -160,6 +163,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -278,7 +282,8 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLR( RVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLR( RVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       STATUS )
 
 *  Double precision
 *  ----------------
@@ -295,7 +300,8 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLD( DVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLD( DVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       STATUS )
 
 *  Integer
 *  -------
@@ -312,7 +318,8 @@
             END IF
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLI( IVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLI( IVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       STATUS )
 
 *  Byte
 *  ----
@@ -331,7 +338,8 @@
             BVALUE = NUM_ITOB( IVALUE )
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLB( BVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       STATUS )
 
 *  Unsigned Byte
 *  -------------
@@ -350,7 +358,8 @@
             BVALUE = NUM_ITOUB( IVALUE )
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLUB( BVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLUB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                        STATUS )
 
 *  Word
 *  ----
@@ -369,7 +378,8 @@
             WVALUE = NUM_ITOW( IVALUE )
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLW( WVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       STATUS )
 
 *  Unsigned Word
 *  -------------
@@ -388,7 +398,8 @@
             WVALUE = NUM_ITOUW( IVALUE )
 
 *  Fill the array with the constant.
-            CALL KPG1_FILLUW( WVALUE, EL, %VAL( PNTR( 1 ) ), STATUS )
+            CALL KPG1_FILLUW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                        STATUS )
          END IF
 
 *  Unmap and annul the section so that it gets written back to the

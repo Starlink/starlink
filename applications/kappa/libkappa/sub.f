@@ -68,6 +68,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,6 +81,8 @@
 *        Added Related Applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,6 +96,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -154,38 +158,45 @@
 *  Select the appropriate routine for the data type being processed and
 *  subtract the data arrays.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL VEC_SUBB( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                  %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL VEC_SUBUB( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                   %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   IERR, NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL VEC_SUBD( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                  %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL VEC_SUBI( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                  %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL VEC_SUBR( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                  %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL VEC_SUBW( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                  %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                  %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                  IERR, NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL VEC_SUBUW( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                   %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+         CALL VEC_SUBUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                   %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                   IERR, NERR, STATUS )
       END IF
 
@@ -222,38 +233,45 @@
 
 *  Select the appropriate routine to add the input variance arrays.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL VEC_ADDB( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                     %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL VEC_ADDUB( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                      %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                      IERR, NERR, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_ADDD( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                     %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL VEC_ADDI( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                     %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL VEC_ADDR( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                     %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL VEC_ADDW( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                     %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                     IERR, NERR, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL VEC_ADDUW( BAD, EL, %VAL( PNTR1( 1 ) ),
-     :                      %VAL( PNTR2( 1 ) ), %VAL( PNTR3( 1 ) ),
+            CALL VEC_ADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                      %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                      %VAL( CNF_PVAL( PNTR3( 1 ) ) ),
      :                      IERR, NERR, STATUS )
          END IF
 

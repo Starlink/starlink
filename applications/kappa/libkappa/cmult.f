@@ -64,6 +64,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +78,8 @@
 *        Added Related Applications.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +93,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -155,32 +159,41 @@
 *  Select the appropriate routine for the data type being processed and
 *  multiply the data array by the constant.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CMULB( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CMULUB( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                     %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                     CONST,
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     NBAD, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CMULD( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CMULI( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CMULR( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CMULW( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NBAD, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CMULUW( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                     %VAL( PNTR2( 1 ) ), NBAD, STATUS )
+         CALL KPG1_CMULUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                     CONST,
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     NBAD, STATUS )
  
       END IF
 
@@ -203,32 +216,46 @@
 *  Select the appropriate routine for the data type being processed and
 *  multiply the variance array by the squared constant.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_CMULB( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                       %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       CONST,
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       NBAD, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_CMULUB( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                        %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                        CONST,
+     :                        %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                        NBAD, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMULD( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                       %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       CONST,
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       NBAD, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_CMULI( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                       %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       CONST,
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       NBAD, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMULR( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                       %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       CONST,
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       NBAD, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_CMULW( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                       %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                       CONST,
+     :                       %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                       NBAD, STATUS )
  
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_CMULUW( BAD, EL, %VAL( PNTR1( 2 ) ), CONST,
-     :                        %VAL( PNTR2( 2 ) ), NBAD, STATUS )
+            CALL KPG1_CMULUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                        CONST,
+     :                        %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                        NBAD, STATUS )
  
          END IF
 

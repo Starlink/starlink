@@ -175,11 +175,14 @@
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     26-NOV-2001 (MBT):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes}
 
 *  Bugs:
@@ -195,6 +198,7 @@
       INCLUDE  'AST_PAR'       ! AST constants and functions
       INCLUDE  'NDF_PAR'       ! NDF constants
       INCLUDE  'DAT_PAR'       ! HDS system constants
+      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -264,7 +268,8 @@
          CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
 
 *  Get the pixels from which to calculate the statistics.
-         CALL KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, %VAL( IPDAT ),
+         CALL KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, 
+     :                  %VAL( CNF_PVAL( IPDAT ) ),
      :                  STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -275,14 +280,16 @@
 *  (Note: the first argument should properly be .FALSE., but this 
 *  currently falls foul of a bug in KPG1_MEDUD.  This version is
 *  correct, and is hardly a performance bottleneck).
-            CALL KPG1_MEDUD( .TRUE., NGOOD, %VAL( IPDAT ), MED,
+            CALL KPG1_MEDUD( .TRUE., NGOOD, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                       MED,
      :                       NGOOD1, STATUS )
 
 *  And calculate the mean and variance.
             SUM = 0D0
             SUM2 = 0D0
             DO I = 1, NGOOD
-               CALL KPG1_RETRD( NGOOD, I, %VAL( IPDAT ), DATUM, STATUS )
+               CALL KPG1_RETRD( NGOOD, I, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                          DATUM, STATUS )
                SUM = SUM + DATUM
                SUM2 = SUM2 + DATUM * DATUM
             END DO
@@ -341,7 +348,8 @@
 
 *  Map pixel-matched requested components of all the NDFs.
          CALL KPS1_MSA( IGRP, NNDF, COMP, STRIM, 'OUT', ITYPE,
-     :                  %VAL( IPNDF ), %VAL( IPPTR ), ONDF, STATUS )
+     :                  %VAL( CNF_PVAL( IPNDF ) ), 
+     :                  %VAL( CNF_PVAL( IPPTR ) ), ONDF, STATUS )
 
 *  Get a title for it from the parameter system.
          CALL NDF_CINP( 'TITLE', ONDF, 'Title', STATUS )
@@ -362,11 +370,13 @@
 
 *  Get the median.
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_MEDR( NNDF, EL, %VAL( IPPTR ), %VAL( IPWORK ),
-     :                         %VAL( IPODAT ), STATUS )
+               CALL KPS1_MEDR( NNDF, EL, %VAL( CNF_PVAL( IPPTR ) ), 
+     :                         %VAL( CNF_PVAL( IPWORK ) ),
+     :                         %VAL( CNF_PVAL( IPODAT ) ), STATUS )
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_MEDD( NNDF, EL, %VAL( IPPTR ), %VAL( IPWORK ),
-     :                         %VAL( IPODAT ), STATUS )
+               CALL KPS1_MEDD( NNDF, EL, %VAL( CNF_PVAL( IPPTR ) ), 
+     :                         %VAL( CNF_PVAL( IPWORK ) ),
+     :                         %VAL( CNF_PVAL( IPODAT ) ), STATUS )
             END IF
 
 *  Release the workspace.
@@ -375,11 +385,13 @@
 *  Otherwise calculate the mean and variance.
          ELSE
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_MMVR( NNDF, EL, %VAL( IPPTR ), %VAL( IPODAT ),
-     :                         %VAL( IPOVAR ), STATUS )
+               CALL KPS1_MMVR( NNDF, EL, %VAL( CNF_PVAL( IPPTR ) ), 
+     :                         %VAL( CNF_PVAL( IPODAT ) ),
+     :                         %VAL( CNF_PVAL( IPOVAR ) ), STATUS )
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_MMVD( NNDF, EL, %VAL( IPPTR ), %VAL( IPODAT ),
-     :                         %VAL( IPOVAR ), STATUS )
+               CALL KPS1_MMVD( NNDF, EL, %VAL( CNF_PVAL( IPPTR ) ), 
+     :                         %VAL( CNF_PVAL( IPODAT ) ),
+     :                         %VAL( CNF_PVAL( IPOVAR ) ), STATUS )
             END IF
          END IF
 

@@ -152,6 +152,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -165,6 +166,8 @@
 *        parameter names consistent.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,6 +181,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -587,17 +591,30 @@
 *  ============================
 
 *  Call the routine to do the work.
-      CALL KPS1_PLCLC( EL, %VAL( IPDIN( 1 ) ), %VAL( IPDIN( 2 ) ),
-     :                 %VAL( IPDIN( 3 ) ), %VAL( IPDIN( 4 ) ),
-     :                 %VAL( IPVIN( 1 ) ), %VAL( IPVIN( 2 ) ),
-     :                 %VAL( IPVIN( 3 ) ), %VAL( IPVIN( 4 ) ), DEBIAS,
+      CALL KPS1_PLCLC( EL, %VAL( CNF_PVAL( IPDIN( 1 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPDIN( 2 ) ) ),
+     :                 %VAL( CNF_PVAL( IPDIN( 3 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPDIN( 4 ) ) ),
+     :                 %VAL( CNF_PVAL( IPVIN( 1 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN( 2 ) ) ),
+     :                 %VAL( CNF_PVAL( IPVIN( 3 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN( 4 ) ) ), DEBIAS,
      :                 VAR, MAKEI, MAKEQ, MAKEU, MAKEP, MAKET, MAKEIP,
-     :                 MAKEIA, MAKEIB, %VAL( IPI ), %VAL( IPQ ),
-     :                 %VAL( IPU ), %VAL( IPP ), %VAL( IPT ),
-     :                 %VAL( IPIP ),%VAL( IPIA ), %VAL( IPIB ),
-     :                 %VAL( IPIV ), %VAL( IPQV ), %VAL( IPUV ),
-     :                 %VAL( IPPV ), %VAL( IPTV ), %VAL( IPIPV ),
-     :                 %VAL( IPIAV ), %VAL( IPIBV ), STATUS )
+     :                 MAKEIA, MAKEIB, %VAL( CNF_PVAL( IPI ) ), 
+     :                 %VAL( CNF_PVAL( IPQ ) ),
+     :                 %VAL( CNF_PVAL( IPU ) ), %VAL( CNF_PVAL( IPP ) ), 
+     :                 %VAL( CNF_PVAL( IPT ) ),
+     :                 %VAL( CNF_PVAL( IPIP ) ),
+     :                 %VAL( CNF_PVAL( IPIA ) ), 
+     :                 %VAL( CNF_PVAL( IPIB ) ),
+     :                 %VAL( CNF_PVAL( IPIV ) ), 
+     :                 %VAL( CNF_PVAL( IPQV ) ), 
+     :                 %VAL( CNF_PVAL( IPUV ) ),
+     :                 %VAL( CNF_PVAL( IPPV ) ), 
+     :                 %VAL( CNF_PVAL( IPTV ) ), 
+     :                 %VAL( CNF_PVAL( IPIPV ) ),
+     :                 %VAL( CNF_PVAL( IPIAV ) ), 
+     :                 %VAL( CNF_PVAL( IPIBV ) ), STATUS )
 
 *  Closedown.
 *  ==========

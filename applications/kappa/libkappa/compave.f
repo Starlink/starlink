@@ -191,6 +191,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -216,6 +217,8 @@
 *        introduced if the lower bounds of the input NDF were not (1,1) ).
 *     25-APR-2000 (DSB):
 *        Added parameters TRIM and ALIGN.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes}
 
 *  Bugs:
@@ -231,6 +234,7 @@
       INCLUDE  'PAR_ERR'       ! Parameter-system errors
       INCLUDE  'NDF_PAR'       ! NDF_ public constants
       INCLUDE  'PRM_PAR'       ! Primdat public constants
+      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -568,29 +572,41 @@
 *  whether there is variance or not, and the implementation type.
       IF ( VAR ) THEN
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMVVR( NDIM, IDIMS, %VAL( PNTRI( 1 ) ),
-     :                       %VAL( PNTRI( 2 ) ), COMPRS, NLIM,
-     :                       WEIGHT, %VAL( PNTRO( 1 ) ),
-     :                       %VAL( PNTRO( 2 ) ), %VAL( WPNTR1 ),
-     :                       %VAL( WPNTR2 ), STATUS )
+            CALL KPG1_CMVVR( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       COMPRS, NLIM,
+     :                       WEIGHT, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMVVD( NDIM, IDIMS, %VAL( PNTRI( 1 ) ),
-     :                       %VAL( PNTRI( 2 ) ), COMPRS, NLIM,
-     :                       WEIGHT, %VAL( PNTRO( 1 ) ),
-     :                       %VAL( PNTRO( 2 ) ), %VAL( WPNTR1 ),
-     :                       %VAL( WPNTR2 ), STATUS )
+            CALL KPG1_CMVVD( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                       COMPRS, NLIM,
+     :                       WEIGHT, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF
       ELSE
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CMAVR( NDIM, IDIMS, %VAL( PNTRI( 1 ) ),
-     :                       COMPRS, NLIM, %VAL( PNTRO( 1 ) ),
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+            CALL KPG1_CMAVR( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       COMPRS, NLIM, 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CMAVD( NDIM, IDIMS, %VAL( PNTRI( 1 ) ),
-     :                       COMPRS, NLIM, %VAL( PNTRO( 1 ) ),
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR2 ), STATUS )
+            CALL KPG1_CMAVD( NDIM, IDIMS, 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       COMPRS, NLIM, 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
          END IF
       END IF
 
@@ -683,30 +699,44 @@
 *  NDF_AMTYP is written then this will have to change.
             IF ( AVAR ) THEN
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMVVR( 2, ADIMS, %VAL( PNTRI( 1 ) ),
-     :                             %VAL( PNTRI( 2 ) ), ACOMPR,
-     :                             NLIM, AXWT, %VAL( PNTRO( 1 ) ),
-     :                             %VAL( PNTRO( 2 ) ), %VAL( WPNTR1 ),
-     :                             %VAL( WPNTR2 ), STATUS )
+                  CALL KPG1_CMVVR( 2, ADIMS, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                             ACOMPR,
+     :                             NLIM, AXWT, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMVVD( 2, ADIMS, %VAL( PNTRI( 1 ) ),
-     :                             %VAL( PNTRI( 2 ) ), ACOMPR,
-     :                             NLIM, AXWT, %VAL( PNTRO( 1 ) ),
-     :                             %VAL( PNTRO( 2 ) ), %VAL( WPNTR1 ),
-     :                             %VAL( WPNTR2 ), STATUS )
+                  CALL KPG1_CMVVD( 2, ADIMS, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( PNTRI( 2 ) ) ), 
+     :                             ACOMPR,
+     :                             NLIM, AXWT, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( PNTRO( 2 ) ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                END IF
             ELSE
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMAVR( 2, ADIMS, %VAL( PNTRI( 1 ) ),
-     :                             ACOMPR, NLIM, %VAL( PNTRO( 1 ) ),
-     :                             %VAL( WPNTR1 ), %VAL( WPNTR2 ),
+                  CALL KPG1_CMAVR( 2, ADIMS, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             ACOMPR, NLIM, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMAVD( 2, ADIMS, %VAL( PNTRI( 1 ) ),
-     :                             ACOMPR, NLIM, %VAL( PNTRO( 1 ) ),
-     :                             %VAL( WPNTR1 ), %VAL( WPNTR2 ),
+                  CALL KPG1_CMAVD( 2, ADIMS, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                             ACOMPR, NLIM, 
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ),
      :                             STATUS )
                END IF
             END IF
@@ -765,16 +795,20 @@
 *  NDF_AMTYP is written then this will have to change.  The widths are
 *  normalised in case there are undefined widths present.
                IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_CMADR( 2, ADIMS, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMADR( 2, ADIMS, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ACOMPR, NLIM, .TRUE.,
-     :                             %VAL( PNTRO( 1 ) ), %VAL( WPNTR1 ),
-     :                             %VAL( WPNTR2 ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_CMADD( 2, ADIMS, %VAL( PNTRI( 1 ) ),
+                  CALL KPG1_CMADD( 2, ADIMS, 
+     :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                             ACOMPR, NLIM, .TRUE.,
-     :                             %VAL( PNTRO( 1 ) ), %VAL( WPNTR1 ),
-     :                             %VAL( WPNTR2 ), STATUS )
+     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                             %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                             %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
                END IF
 
 *  Tidy the axis-width arrays.

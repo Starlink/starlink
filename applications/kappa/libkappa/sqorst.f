@@ -160,6 +160,7 @@
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -169,6 +170,8 @@
 *        Added propagation of QUALITY and AXIS.
 *     3-SEP-2002 (DSB):
 *        Avoid use of PSX_CALLOC since it cannot handle all HDS data types.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *-
@@ -182,6 +185,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PAR_ERR'          ! PAR system error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -563,85 +567,134 @@
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPS1_RS1B( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPS1_RS1UB( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPS1_RS1W( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPS1_RS1UW( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPS1_RS1I( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPS1_RS1R( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL KPS1_RS1D( NDIM, I, DIM1, DIM2, INTERP, PARAMS,
      :                            HASVAR, HASQUA, HASAXI, 
-     :                            %VAL( IPDAT1 ), %VAL( IPVAR1 ), 
-     :                            %VAL( IPQUA1 ), %VAL( IPAXI ), BAD, 
-     :                            %VAL( IPWD1 ), %VAL( IPWV1 ), 
-     :                            %VAL( IPWQ1 ), %VAL( IPWD2 ),
-     :                            %VAL( IPWV2 ), %VAL( IPWQ2 ),
-     :                            %VAL( IPDAT2 ), %VAL( IPVAR2 ), 
-     :                            %VAL( IPQUA2 ), %VAL( IPAXO ), 
+     :                            %VAL( CNF_PVAL( IPDAT1 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR1 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA1 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXI ) ), BAD,
+     :                            %VAL( CNF_PVAL( IPWD1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWV1 ) ),
+     :                            %VAL( CNF_PVAL( IPWQ1 ) ), 
+     :                            %VAL( CNF_PVAL( IPWD2 ) ),
+     :                            %VAL( CNF_PVAL( IPWV2 ) ), 
+     :                            %VAL( CNF_PVAL( IPWQ2 ) ),
+     :                            %VAL( CNF_PVAL( IPDAT2 ) ), 
+     :                            %VAL( CNF_PVAL( IPVAR2 ) ),
+     :                            %VAL( CNF_PVAL( IPQUA2 ) ), 
+     :                            %VAL( CNF_PVAL( IPAXO ) ),
      :                            STATUS )
                END IF
 
@@ -713,26 +766,33 @@
 
 *  Copy the data array across.
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_CPNDB( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                       %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDB( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                       1, EL,
+     :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                        %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                        1, EL,
+     :                        %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_CPNDW( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                       %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDW( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                       1, EL,
+     :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_CPNDUW( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                        %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDUW( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                        1, EL,
+     :                        %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_CPNDI( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                       %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                       1, EL,
+     :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_CPNDR( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                       %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                       1, EL,
+     :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_CPNDD( 1, 1, EL, %VAL( IPDATI ), 1, EL, 
-     :                       %VAL( IPDATO ), EL2, STATUS )
+            CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( IPDATI ) ), 
+     :                       1, EL,
+     :                       %VAL( CNF_PVAL( IPDATO ) ), EL2, STATUS )
          END IF
 
 *  Unmap the data arrays.
@@ -748,26 +808,40 @@
 
 *  Copy the variance array across.
             IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL KPG1_CPNDB( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                          %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDB( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL KPG1_CPNDUB( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                           %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                           1, EL,
+     :                           %VAL( CNF_PVAL( IPVARO ) ), 
+     :                           EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-               CALL KPG1_CPNDW( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                          %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDW( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-               CALL KPG1_CPNDUW( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                           %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDUW( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                           1, EL,
+     :                           %VAL( CNF_PVAL( IPVARO ) ), 
+     :                           EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL KPG1_CPNDI( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                          %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDI( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_CPNDR( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                          %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDR( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          EL2, STATUS )
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_CPNDD( 1, 1, EL, %VAL( IPVARI ), 1, EL,
-     :                          %VAL( IPVARO ), EL2, STATUS )
+               CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( IPVARI ) ), 
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( IPVARO ) ), 
+     :                          EL2, STATUS )
             END IF
 
 *  Unmap the variance arrays.
@@ -783,8 +857,9 @@
      :                    EL, STATUS )
 
 *  Copy the quality array across.
-            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( IPQUAI ), 1, EL,
-     :                        %VAL( IPQUAO ), EL2, STATUS )
+            CALL KPG1_CPNDUB( 1, 1, EL, %VAL( CNF_PVAL( IPQUAI ) ), 
+     :                        1, EL,
+     :                        %VAL( CNF_PVAL( IPQUAO ) ), EL2, STATUS )
 
 *  Unmap the quality arrays.
             CALL NDF_UNMAP( NDFI, 'QUALITY', STATUS )

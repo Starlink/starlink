@@ -186,6 +186,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -193,6 +194,8 @@
 *        Original NDF version.
 *     24-NOV-2003 (DSB):
 *        Use 0.5*DIAM to create the ARD circle (previously used DIAM).
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -210,6 +213,7 @@
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
                
 *  Status:     
       INTEGER STATUS             ! Global status
@@ -375,7 +379,8 @@
 *  ignored because we have previously called ARD_WCS.
       REGVAL = 2
       CALL ARD_WORK( IGRP, NDIM, SLBND, SUBND, TRCOEF, .FALSE., REGVAL,
-     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :               %VAL( CNF_PVAL( IPMASK ) ), 
+     :               LBNDI, UBNDI, LBNDE, UBNDE,
      :               STATUS )
        
 *  Create a section from the input NDF which just encloses the aperture.
@@ -393,44 +398,59 @@
 *  Copy the section of the mask array which just encloses the aperture
 *  into a new mask array.
       CALL PSX_CALLOC( EL, '_INTEGER', IPMSK2, STATUS )
-      CALL KPG1_CPNDI( NDIM, SLBND, SUBND, %VAL( IPMASK ), LBNDI, UBNDI, 
-     :                 %VAL( IPMSK2 ), EL, STATUS )   
+      CALL KPG1_CPNDI( NDIM, SLBND, SUBND, %VAL( CNF_PVAL( IPMASK ) ), 
+     :                 LBNDI, UBNDI,
+     :                 %VAL( CNF_PVAL( IPMSK2 ) ), EL, STATUS )
 
 *  Calculate the required statistics. Call the appropriate routine for the 
 *  data type.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_APADR( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADR( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_APADB( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADB( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_APADD( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADD( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_APADI( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADI( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_APADUB( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADUB( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                     %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_APADUW( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADUW( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                     %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       ELSE IF( TYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_APADW( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
-     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+         CALL KPS1_APADW( WEIGHT, EL, %VAL( CNF_PVAL( IPMSK2 ) ), 
+     :                    %VAL( CNF_PVAL( IPDAT ) ),
+     :                    VAR, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                    NGOOD, MEAN, SGMEAN, TOT,
      :                    SGTOT, NUMPIX, SIGMA, STATUS )
 
       END IF

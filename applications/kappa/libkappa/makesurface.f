@@ -132,6 +132,7 @@
 *     SMB: Steven M. Beard (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -155,6 +156,8 @@
 *        workspace by PSX for efficiency.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,6 +174,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error codes
       INCLUDE 'PRM_PAR'          ! VAL__ definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -386,9 +390,11 @@
      :                                 STATUS )
 
 *  Determine the bounds of the axes of the template NDF.
-                        CALL KPG1_AXBND( XDIM, %VAL( XPTR ), XMIN, XMAX,
+                        CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ), 
+     :                                   XMIN, XMAX,
      :                                   STATUS )
-                        CALL KPG1_AXBND( YDIM, %val( YPTR ), YMIN, YMAX,
+                        CALL KPG1_AXBND( YDIM, %val( cnf_pval( YPTR ) ), 
+     :                                   YMIN, YMAX,
      :                                   STATUS )
 
                      ELSE
@@ -400,10 +406,12 @@
 *  Fill the work arrays with pixel co-ordinates.
                         CALL KPG1_SSAZD( XDIM, 1.0D0,
      :                                   DBLE( LBND( 1 ) ) - 0.5D0,
-     :                                   %VAL( XPTR ) , STATUS )
+     :                                   %VAL( CNF_PVAL( XPTR ) ) , 
+     :                                   STATUS )
                         CALL KPG1_SSAZD( YDIM, 1.0D0,
      :                                   DBLE( LBND( 2 ) ) - 0.5D0,
-     :                                   %VAL( YPTR ) , STATUS )
+     :                                   %VAL( CNF_PVAL( YPTR ) ) , 
+     :                                   STATUS )
 
 *  Record that there is workspace to free.
                         OBWORK = .TRUE.
@@ -546,20 +554,24 @@
 *  Fill the axis arrays with appropriate values.
                      IF ( XDIM .EQ. 1 )  THEN
                         CALL KPG1_SSAZD( XDIM, 0.0D0, XMIN,
-     :                                   %VAL( XPTR ), STATUS )
+     :                                   %VAL( CNF_PVAL( XPTR ) ), 
+     :                                   STATUS )
                      ELSE
                         CALL KPG1_SSAZD( XDIM, ( XMAX - XMIN ) /
      :                                   DBLE( XDIM - 1 ), XMIN,
-     :                                   %VAL( XPTR ), STATUS )
+     :                                   %VAL( CNF_PVAL( XPTR ) ), 
+     :                                   STATUS )
                      END IF
 
                      IF ( YDIM .EQ. 1 )  THEN
                         CALL KPG1_SSAZD( YDIM, 0.0D0, YMIN,
-     :                                   %VAL( YPTR ), STATUS )
+     :                                   %VAL( CNF_PVAL( YPTR ) ), 
+     :                                   STATUS )
                      ELSE
                         CALL KPG1_SSAZD( YDIM, ( YMAX - YMIN ) /
      :                                   DBLE( YDIM - 1 ), YMIN,
-     :                                   %VAL( YPTR ), STATUS )
+     :                                   %VAL( CNF_PVAL( YPTR ) ), 
+     :                                   STATUS )
                      END IF
                   END IF
 
@@ -633,38 +645,52 @@
 *  Calculate the polynomial at each pixel, calling the routine of the
 *  appropriate data type.
                      IF ( ITYPE .EQ. '_REAL' ) THEN
-                        CALL KPS1_MSPAR( XDIM, YDIM, %VAL( XPTR ),
-     :                                   PXMIN, PXMAX, %VAL( YPTR ),
+                        CALL KPS1_MSPAR( XDIM, YDIM, 
+     :                                   %VAL( CNF_PVAL( XPTR ) ),
+     :                                   PXMIN, PXMAX, 
+     :                                   %VAL( CNF_PVAL( YPTR ) ),
      :                                   PYMIN, PYMAX, NXPAR, NYPAR,
-     :                                   MCHOEF, CHCOEF, %VAL( WPTR ),
-     :                                   %VAL( DPTR( 1 ) ), STATUS )
+     :                                   MCHOEF, CHCOEF, 
+     :                                   %VAL( CNF_PVAL( WPTR ) ),
+     :                                   %VAL( CNF_PVAL( DPTR( 1 ) ) ), 
+     :                                   STATUS )
 
                      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                        CALL KPS1_MSPAD( XDIM, YDIM, %VAL( XPTR ),
-     :                                   PXMIN, PXMAX, %VAL( YPTR ),
+                        CALL KPS1_MSPAD( XDIM, YDIM, 
+     :                                   %VAL( CNF_PVAL( XPTR ) ),
+     :                                   PXMIN, PXMAX, 
+     :                                   %VAL( CNF_PVAL( YPTR ) ),
      :                                   PYMIN, PYMAX, NXPAR, NYPAR,
-     :                                   MCHOEF, CHCOEF, %VAL( WPTR ),
-     :                                   %VAL( DPTR( 1 ) ), STATUS )
+     :                                   MCHOEF, CHCOEF, 
+     :                                   %VAL( CNF_PVAL( WPTR ) ),
+     :                                   %VAL( CNF_PVAL( DPTR( 1 ) ) ), 
+     :                                   STATUS )
                      END IF
 
 *  Create the variance array.
                      IF ( CREVAR ) THEN
 
                         IF ( ITYPE .EQ. '_REAL' ) THEN
-                           CALL KPS1_MSPAR( XDIM, YDIM, %VAL( XPTR ),
-     :                                      PXMIN, PXMAX, %VAL( YPTR ),
+                           CALL KPS1_MSPAR( XDIM, YDIM, 
+     :                                      %VAL( CNF_PVAL( XPTR ) ),
+     :                                      PXMIN, PXMAX, 
+     :                                      %VAL( CNF_PVAL( YPTR ) ),
      :                                      PYMIN, PYMAX, NXPAR, NYPAR,
      :                                      MCHOEF, VARIAN,
-     :                                      %VAL( WPTR ),
-     :                                      %VAL( DPTR( 2 ) ), STATUS )
+     :                                      %VAL( CNF_PVAL( WPTR ) ),
+     :                                      
+     :   %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
 
                         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                           CALL KPS1_MSPAD( XDIM, YDIM, %VAL( XPTR ),
-     :                                      PXMIN, PXMAX, %VAL( YPTR ),
+                           CALL KPS1_MSPAD( XDIM, YDIM, 
+     :                                      %VAL( CNF_PVAL( XPTR ) ),
+     :                                      PXMIN, PXMAX, 
+     :                                      %VAL( CNF_PVAL( YPTR ) ),
      :                                      PYMIN, PYMAX, NXPAR, NYPAR,
      :                                      MCHOEF, VARIAN,
-     :                                      %VAL( WPTR ),
-     :                                      %VAL( DPTR( 2 ) ), STATUS )
+     :                                      %VAL( CNF_PVAL( WPTR ) ),
+     :                                      
+     :   %VAL( CNF_PVAL( DPTR( 2 ) ) ), STATUS )
                         END IF
 
                      END IF

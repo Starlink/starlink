@@ -158,6 +158,7 @@
 *  Authors:
 *     TIMJ: T. Jenness (JACH)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -174,6 +175,8 @@
 *     7-OCT-1998 (DSB):
 *        Changed (irg based) KPG1_NWILD call to (ndg based) KPG1_RGNDF.
 *        Also changed to display the NDF name if the NDF Title is blank.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,6 +195,7 @@
       INCLUDE 'GRP_PAR'          ! GRP__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER          STATUS    ! Global status
@@ -407,9 +411,10 @@
 
 *  Need to go through the chosen array and possibly the variance array
 *  to extract good data.
-            CALL KPG1_KGODR( ISVAR, EL, %VAL( INPTR( 1 ) ), 
-     :                       %VAL( INPTR( 2 ) ), NGOOD( I ),
-     :                       %VAL( GDPTR( I ) ), %VAL( GVPTR( I ) ),
+            CALL KPG1_KGODR( ISVAR, EL, %VAL( CNF_PVAL( INPTR( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( INPTR( 2 ) ) ), NGOOD( I ),
+     :                       %VAL( CNF_PVAL( GDPTR( I ) ) ), 
+     :                       %VAL( CNF_PVAL( GVPTR( I ) ) ),
      :                       STATUS )
 
 * Write out some information.
@@ -444,12 +449,12 @@
 
 *  Store the reference sample
       NKEPT = NGOOD( 1 )
-      CALL VEC_RTOR( .FALSE., NKEPT, %VAL( GDPTR( 1 ) ),
-     :               %VAL( KSDPTR ), IERR, NERR, STATUS )
+      CALL VEC_RTOR( .FALSE., NKEPT, %VAL( CNF_PVAL( GDPTR( 1 ) ) ),
+     :               %VAL( CNF_PVAL( KSDPTR ) ), IERR, NERR, STATUS )
 
       IF ( USEVAR ) THEN
-         CALL VEC_RTOR( .FALSE., NKEPT, %VAL( GVPTR( 1 ) ),
-     :                  %VAL( KSVPTR ), IERR, NERR, STATUS )
+         CALL VEC_RTOR( .FALSE., NKEPT, %VAL( CNF_PVAL( GVPTR( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( KSVPTR ) ), IERR, NERR, STATUS )
       END IF
 
 * Set up the scratch output dummy arrays (for sorted data).
@@ -465,19 +470,25 @@
          CALL PSX_MALLOC( NPTS * VAL__NBR, WNPTR, STATUS )
 
 * Now compare the two samples.
-         CALL KPS1_KS2TR( NKEPT, NPTS, %VAL( KSDPTR ),
-     :                    %VAL( GDPTR( I ) ), D( I - 1 ), PROB( I - 1 ),
-     :                    %VAL( WPTR ), %VAL( WNPTR ), STATUS )
+         CALL KPS1_KS2TR( NKEPT, NPTS, %VAL( CNF_PVAL( KSDPTR ) ),
+     :                    %VAL( CNF_PVAL( GDPTR( I ) ) ), 
+     :                    D( I - 1 ), PROB( I - 1 ),
+     :                    %VAL( CNF_PVAL( WPTR ) ), 
+     :                    %VAL( CNF_PVAL( WNPTR ) ), STATUS )
 
 *  If they are from the same sample then copy them.
          IF ( PROB( I - 1 ) .GT. LIMIT ) THEN
-            CALL VEC_RTOR( .FALSE., NPTS, %VAL( GDPTR( I ) ), 
-     :                     %VAL( KSDPTR + NKEPT * VAL__NBR ),
+            CALL VEC_RTOR( .FALSE., NPTS, 
+     :                     %VAL( CNF_PVAL( GDPTR( I ) ) ),
+     :                     
+     :   %VAL( CNF_PVAL( KSDPTR + NKEPT * VAL__NBR ) ),
      :                     IERR, NERR, STATUS )
 
             IF ( USEVAR ) THEN
-               CALL VEC_RTOR( .FALSE., NPTS, %VAL( GVPTR( I ) ), 
-     :                        %VAL( KSVPTR + NKEPT * VAL__NBR ),
+               CALL VEC_RTOR( .FALSE., NPTS, 
+     :                        %VAL( CNF_PVAL( GVPTR( I ) ) ),
+     :                        
+     :   %VAL( CNF_PVAL( KSVPTR + NKEPT * VAL__NBR ) ),
      :                        IERR, NERR, STATUS )
             END IF
 
@@ -555,7 +566,7 @@
          NCLIP = 0
          CLIP( 1 ) = 0
 
-         CALL KPG1_STATR( .FALSE., NKEPT, %VAL( KSDPTR ),
+         CALL KPG1_STATR( .FALSE., NKEPT, %VAL( CNF_PVAL( KSDPTR ) ),
      :                    NCLIP, CLIP( I ), ITEMP, IMIN( 1 ), DMIN,
      :                    IMAX( 1 ), DMAX, SUM, MEAN, STDEV, ITEMP,
      :                    IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
@@ -598,8 +609,9 @@
             CALL KPG1_MAP( NDFO, 'DATA', '_REAL', 'WRITE', 
      :                    OUTPTR( 1 ), ITEMP, STATUS )
 
-            CALL VEC_RTOR( .FALSE., NKEPT, %VAL( KSDPTR ), 
-     :                     %VAL( OUTPTR( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_RTOR( .FALSE., NKEPT, %VAL( CNF_PVAL( KSDPTR ) ),
+     :                     %VAL( CNF_PVAL( OUTPTR( 1 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
 *  Map the variance array.  Copy the processed variance to the output
 *  file.
@@ -607,8 +619,10 @@
                CALL KPG1_MAP( NDFO, 'VARIANCE', '_REAL', 'WRITE',
      :                       OUTPTR( 2 ), ITEMP, STATUS )
 
-               CALL VEC_RTOR( .FALSE., NKEPT, %VAL( KSVPTR ), 
-     :                        %VAL( OUTPTR( 2 ) ), IERR, NERR, STATUS )
+               CALL VEC_RTOR( .FALSE., NKEPT, 
+     :                        %VAL( CNF_PVAL( KSVPTR ) ),
+     :                        %VAL( CNF_PVAL( OUTPTR( 2 ) ) ), 
+     :                        IERR, NERR, STATUS )
             END IF
 
 *  We do not write any axis information since this cannot be known

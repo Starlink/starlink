@@ -324,6 +324,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -382,6 +383,8 @@
 *     13-AUG-2001 (DSB):
 *        Corrected size of work arrays IPW3 and IPW4 so that no segvio
 *        occurs if the OUT image is not square.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -398,6 +401,7 @@
       INCLUDE 'PRM_PAR'        ! VAL__ constants
       INCLUDE 'PAR_ERR'        ! PAR error constants
       INCLUDE 'AST_PAR'        ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS           ! Global status
@@ -647,8 +651,9 @@
 
 *  Transform the supplied positions to the PIXEL Frame of the NDF. Store
 *  them in the above work space.
-      CALL AST_TRANN( MAP3, NPOS, NAXIN, NPOS, %VAL( IPIN ), .TRUE., 
-     :                NDIM, NPOS, %VAL( IPW1 ), STATUS ) 
+      CALL AST_TRANN( MAP3, NPOS, NAXIN, NPOS, %VAL( CNF_PVAL( IPIN ) ), 
+     :                .TRUE.,
+     :                NDIM, NPOS, %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
 *  Obtain the search area size and, the range of radii to be used in
 *  the profile fit, in units of sigma.  Note the upper limit of the
@@ -684,72 +689,93 @@
 *  appropriate data type.  Plot the results as required.
       IF( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_SPARR( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPS1_SPARB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_SPARD( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPS1_SPARI( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPS1_SPARUW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPS1_SPARUB( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       ELSE IF( ITYPE .EQ. '_WORD' ) THEN
          CALL KPS1_SPARW( CFRM, MAP1, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( IPDIN ), SLBND, ISIZE, RANGE, GAUSS, 
-     :                    NPOS, %VAL( IPW1 ), LOGPOS,
+     :                    %VAL( CNF_PVAL( IPDIN ) ), 
+     :                    SLBND, ISIZE, RANGE, GAUSS,
+     :                    NPOS, %VAL( CNF_PVAL( IPW1 ) ), LOGPOS,
      :                    FDL, 'MINOR', 'AXISR', 'ORIENT', 'FWHM', 
-     :                    'GAMMA', 'AMP1', %VAL( IPID ), GOTID, NM, 
+     :                    'GAMMA', 'AMP1', %VAL( CNF_PVAL( IPID ) ), 
+     :                    GOTID, NM,
      :                    UNITS, AXISR, 
-     :                    THETA, FWHM, GAMMA, PSFSIZ, %VAL( IPW2 ), 
+     :                    THETA, FWHM, GAMMA, PSFSIZ, 
+     :                    %VAL( CNF_PVAL( IPW2 ) ),
      :                    PX, PY, AMP, STATUS )
 
       END IF
@@ -818,10 +844,11 @@
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL KPS1_PSEVL( AMP, AXISR, THETA, FWHM, GAMMA, LBND( 1 ), 
      :                    UBND( 1 ), LBND( 2 ), UBND( 2 ), PX, PY,
-     :                    %VAL( IPPSF ), STATUS )
+     :                    %VAL( CNF_PVAL( IPPSF ) ), STATUS )
 
 *  Add an OFFSET Frame to the WCS information in the output NDF.
-         CALL KPS1_PSWCS( INDF2, LBND, UBND, %VAL( IPW3 ), %VAL( IPW4 ), 
+         CALL KPS1_PSWCS( INDF2, LBND, UBND, %VAL( CNF_PVAL( IPW3 ) ), 
+     :                    %VAL( CNF_PVAL( IPW4 ) ),
      :                    STATUS )      
 
 *  Store a title.

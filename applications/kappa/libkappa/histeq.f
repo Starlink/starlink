@@ -88,6 +88,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -98,6 +99,8 @@
 *        usage.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,6 +115,7 @@
       INCLUDE 'SAE_PAR'          ! Global environment definitions
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -187,39 +191,53 @@
 *  Process the array using the appropriate implementation data type.
 *  =================================================================
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_HSTQR( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                    %VAL( HPNTR ), %VAL( MPNTR ),
-     :                    %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    NUMBIN,
+     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( MPNTR ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_HSTQB( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                    %VAL( HPNTR ), %VAL( MPNTR ),
-     :                    %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    NUMBIN,
+     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( MPNTR ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_HSTQD( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                    %VAL( HPNTR ), %VAL( MPNTR ),
-     :                    %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    NUMBIN,
+     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( MPNTR ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_HSTQI( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                    %VAL( HPNTR ), %VAL( MPNTR ),
-     :                    %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    NUMBIN,
+     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( MPNTR ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_HSTQUB( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                     %VAL( HPNTR ), %VAL( MPNTR ),
-     :                     %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQUB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     NUMBIN,
+     :                     %VAL( CNF_PVAL( HPNTR ) ), 
+     :                     %VAL( CNF_PVAL( MPNTR ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_HSTQUW( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                     %VAL( HPNTR ), %VAL( MPNTR ),
-     :                     %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQUW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                     NUMBIN,
+     :                     %VAL( CNF_PVAL( HPNTR ) ), 
+     :                     %VAL( CNF_PVAL( MPNTR ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_HSTQW( BAD, EL, %VAL( PNTRI( 1 ) ), NUMBIN,
-     :                    %VAL( HPNTR ), %VAL( MPNTR ),
-     :                    %VAL( PNTRO( 1 ) ), STATUS )
+         CALL KPG1_HSTQW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                    NUMBIN,
+     :                    %VAL( CNF_PVAL( HPNTR ) ), 
+     :                    %VAL( CNF_PVAL( MPNTR ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
       END IF
 

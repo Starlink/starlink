@@ -159,6 +159,7 @@
 *  Authors:
 *     SMB: Steven M. Beard (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -195,6 +196,8 @@
 *     27-AUG-2003 (DSB):
 *        Check that the values obtained for XMAX, XMIN, YMAX and YMIN are
 *        usable. 
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -212,6 +215,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PRM_PAR'          ! Magic-value definitions (VAL__BADx)
       INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global Status
@@ -441,9 +445,9 @@
 
 *  Fill the work arrays with pixel co-ordinates.
             CALL KPG1_SSAZD( XDIM, 1.0D0, DBLE( LBND( 1 ) ) - 0.5D0,
-     :                       %VAL( AXPTR ) , STATUS )
+     :                       %VAL( CNF_PVAL( AXPTR ) ) , STATUS )
             CALL KPG1_SSAZD( YDIM, 1.0D0, DBLE( LBND( 2 ) ) - 0.5D0,
-     :                       %VAL( AYPTR ) , STATUS )
+     :                       %VAL( CNF_PVAL( AYPTR ) ) , STATUS )
          END IF
 
 *  Map some DOUBLE PRECISION workspace to hold the x and y
@@ -492,19 +496,27 @@
 *  Convert the information contained in the data and axes arrays into a
 *  list of co-ordinates, values and weights.
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_XYZWR( XDIM, YDIM, %VAL( DPTR ), %VAL( AXPTR ),
-     :                          %VAL( AYPTR ), BAD, VARWTS,
-     :                          %VAL( VPTR ), DSIZE, %VAL( XPTR ),
-     :                          %VAL( YPTR ), %VAL( ZPTR ),
-     :                          %VAL( WPTR ), NGOOD, XMIN, XMAX, YMIN,
+               CALL KPG1_XYZWR( XDIM, YDIM, %VAL( CNF_PVAL( DPTR ) ), 
+     :                          %VAL( CNF_PVAL( AXPTR ) ),
+     :                          %VAL( CNF_PVAL( AYPTR ) ), BAD, VARWTS,
+     :                          %VAL( CNF_PVAL( VPTR ) ), DSIZE, 
+     :                          %VAL( CNF_PVAL( XPTR ) ),
+     :                          %VAL( CNF_PVAL( YPTR ) ), 
+     :                          %VAL( CNF_PVAL( ZPTR ) ),
+     :                          %VAL( CNF_PVAL( WPTR ) ), 
+     :                          NGOOD, XMIN, XMAX, YMIN,
      :                          YMAX, STATUS )
 
             ELSE
-               CALL KPG1_XYZWD( XDIM, YDIM, %VAL( DPTR ), %VAL( AXPTR ),
-     :                          %VAL( AYPTR ), BAD, VARWTS,
-     :                          %VAL( VPTR ), DSIZE, %VAL( XPTR ),
-     :                          %VAL( YPTR ), %VAL( ZPTR ),
-     :                          %VAL( WPTR ), NGOOD, XMIN, XMAX, YMIN,
+               CALL KPG1_XYZWD( XDIM, YDIM, %VAL( CNF_PVAL( DPTR ) ), 
+     :                          %VAL( CNF_PVAL( AXPTR ) ),
+     :                          %VAL( CNF_PVAL( AYPTR ) ), BAD, VARWTS,
+     :                          %VAL( CNF_PVAL( VPTR ) ), DSIZE, 
+     :                          %VAL( CNF_PVAL( XPTR ) ),
+     :                          %VAL( CNF_PVAL( YPTR ) ), 
+     :                          %VAL( CNF_PVAL( ZPTR ) ),
+     :                          %VAL( CNF_PVAL( WPTR ) ), 
+     :                          NGOOD, XMIN, XMAX, YMIN,
      :                          YMAX, STATUS )
             END IF
 
@@ -527,21 +539,30 @@
 *  Fit a polynomial surface to the data.
                CALL KPS1_FSPF2( XMIN, XMAX, YMIN, YMAX, NXPAR, NYPAR,
      :                         .FALSE., NGOOD, MPCOEF, DSIZE,
-     :                         %VAL( XPTR ), %VAL( YPTR ), %VAL( ZPTR ),
-     :                         %VAL( WPTR ), %VAL( APTR ), %VAL( MPTR ),
-     :                         %VAL( CPTR ), CHCOEF, VARIAN, NCOEF,
+     :                         %VAL( CNF_PVAL( XPTR ) ), 
+     :                         %VAL( CNF_PVAL( YPTR ) ), 
+     :                         %VAL( CNF_PVAL( ZPTR ) ),
+     :                         %VAL( CNF_PVAL( WPTR ) ), 
+     :                         %VAL( CNF_PVAL( APTR ) ), 
+     :                         %VAL( CNF_PVAL( MPTR ) ),
+     :                         %VAL( CNF_PVAL( CPTR ) ), 
+     :                         CHCOEF, VARIAN, NCOEF,
      :                         STATUS )
 
 *  Evaluate the surface at each bin and obtain the RMS error and the
 *  residuals of the fit.
-               CALL KPS1_FSPE2( NGOOD, %VAL( XPTR ), %VAL( YPTR ),
-     :                          %VAL( ZPTR ), XMIN, XMAX, YMIN, YMAX,
+               CALL KPS1_FSPE2( NGOOD, %VAL( CNF_PVAL( XPTR ) ), 
+     :                          %VAL( CNF_PVAL( YPTR ) ),
+     :                          %VAL( CNF_PVAL( ZPTR ) ), 
+     :                          XMIN, XMAX, YMIN, YMAX,
      :                          NXPAR, NYPAR, MCHOEF, CHCOEF, NCOEF,
-     :                          %VAL( FTPTR ), %VAL( RSPTR ), DRMS,
+     :                          %VAL( CNF_PVAL( FTPTR ) ), 
+     :                          %VAL( CNF_PVAL( RSPTR ) ), DRMS,
      :                          STATUS )
 
 *  Determine the maximum absolute residual.
-               CALL KPG1_MXMND( BAD, NGOOD, %VAL( RSPTR ), NINVAL,
+               CALL KPG1_MXMND( BAD, NGOOD, %VAL( CNF_PVAL( RSPTR ) ), 
+     :                          NINVAL,
      :                          MAXMUM, MINMUM, MAXPOS, MINPOS, STATUS )
                RSMAX = MAX( ABS( MAXMUM ), ABS( MINMUM ) )
                RMS = SNGL( DRMS )

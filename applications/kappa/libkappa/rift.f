@@ -87,6 +87,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -98,6 +99,8 @@
 *        and Implementation Status.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,6 +115,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -192,32 +196,41 @@
 *  Select the appropriate routine for the data type being processed and
 *  add the constant to the data array.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_CADDB( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_CADDUB( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                     %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDUB( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                     CONST,
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CADDD( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDD( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_CADDI( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDI( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_CADDR( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDR( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_CADDW( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                    %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                    CONST,
+     :                    %VAL( CNF_PVAL( PNTR2( 1 ) ) ), NERR, STATUS )
  
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_CADDUW( BAD, EL, %VAL( PNTR1( 1 ) ), CONST,
-     :                     %VAL( PNTR2( 1 ) ), NERR, STATUS )
+         CALL KPG1_CADDUW( BAD, EL, %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                     CONST,
+     :                     %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                     NERR, STATUS )
       END IF
 
 *  See if there may be bad pixels in the output data array and set the

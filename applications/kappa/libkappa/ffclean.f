@@ -132,6 +132,7 @@
 *     RFWS: R. F. Warren-Smith (STARLINK)
 *     WG: Wei Gong  (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -158,6 +159,8 @@
 *        usage.  Added Related Applications and additional commentary.
 *        Changed the default of TITLE to null.  Used PSX to obtain
 *        workspace.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,6 +176,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRM public constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -443,20 +447,28 @@
 *  Reject pixels deviating from their local mean by more than the
 *  threshold calling the routine of the appropriate data type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_CFF2R( DIM( 1 ), DIM( 2 ), %VAL( PNTIN( 1 ) ), VAR,
-     :                    NVAR, %VAL( PNTIN( 2 ) ), BOX, NCLIP, CLIP,
-     :                    THRESH, ILEVEL, SAMBAD, NLIM, %VAL( PNTINW ),
-     :                    %VAL( PNTOUT( 1 ) ), %VAL( PNTOUT( 2 ) ),
-     :                    NGOOD, SIGMA, %VAL( PNTAS( 1 ) ),
-     :                    %VAL( PNTNS( 1 ) ), STATUS )
+         CALL KPS1_CFF2R( DIM( 1 ), DIM( 2 ), 
+     :                    %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
+     :                    NVAR, %VAL( CNF_PVAL( PNTIN( 2 ) ) ), 
+     :                    BOX, NCLIP, CLIP,
+     :                    THRESH, ILEVEL, SAMBAD, NLIM, 
+     :                    %VAL( CNF_PVAL( PNTINW ) ),
+     :                    %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ),
+     :                    NGOOD, SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_CFF2D( DIM( 1 ), DIM( 2 ), %VAL( PNTIN( 1 ) ), VAR,
-     :                    NVAR, %VAL( PNTIN( 2 ) ), BOX, NCLIP, CLIP,
-     :                    DTHRES, ILEVEL, SAMBAD, NLIM, %VAL( PNTINW ),
-     :                    %VAL( PNTOUT( 1 ) ), %VAL( PNTOUT( 2 ) ),
-     :                    NGOOD, SIGMA, %VAL( PNTAS( 1 ) ),
-     :                    %VAL( PNTNS( 1 ) ), STATUS )
+         CALL KPS1_CFF2D( DIM( 1 ), DIM( 2 ), 
+     :                    %VAL( CNF_PVAL( PNTIN( 1 ) ) ), VAR,
+     :                    NVAR, %VAL( CNF_PVAL( PNTIN( 2 ) ) ), 
+     :                    BOX, NCLIP, CLIP,
+     :                    DTHRES, ILEVEL, SAMBAD, NLIM, 
+     :                    %VAL( CNF_PVAL( PNTINW ) ),
+     :                    %VAL( CNF_PVAL( PNTOUT( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( PNTOUT( 2 ) ) ),
+     :                    NGOOD, SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
 
       END IF
 

@@ -232,6 +232,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -241,6 +242,8 @@
 *        Added NULL argument to KPG1_GTPOS call.
 *     13-DEC-2001 (DSB):
 *        Added parameters CATFRAME and CATEPOCH.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -256,6 +259,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -396,11 +400,13 @@
 
 *  Map the input Base Frame positions into the required Frame using this 
 *  Mapping.
-         CALL AST_TRANN( MAP, NPIN, NAXIN, NPIN, %VAL( IPIN ), .TRUE.,
-     :                   NAX, NPIN, %VAL( IPW1 ), STATUS ) 
+         CALL AST_TRANN( MAP, NPIN, NAXIN, NPIN, 
+     :                   %VAL( CNF_PVAL( IPIN ) ), .TRUE.,
+     :                   NAX, NPIN, %VAL( CNF_PVAL( IPW1 ) ), STATUS )
 
 *  Find the maximum identifier value in the input list.
-         CALL KPG1_MXMNI( .FALSE., NPIN, %VAL( IPIDIN ), IVAL, ID0, 
+         CALL KPG1_MXMNI( .FALSE., NPIN, %VAL( CNF_PVAL( IPIDIN ) ), 
+     :                    IVAL, ID0,
      :                    IVAL, IVAL, IVAL, STATUS )
 
 *  The first supplied position will have an identifier one more than the
@@ -448,7 +454,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Store the pixel centres in IPFIL.
-         CALL KPS1_LMKPC( NDIM, DIM, NP, %VAL( IPFIL ), STATUS )
+         CALL KPS1_LMKPC( NDIM, DIM, NP, %VAL( CNF_PVAL( IPFIL ) ), 
+     :                    STATUS )
 
 *  Indicate that we should use the IPFIL pointer.
          USEFIL = .TRUE.
@@ -507,9 +514,10 @@
 *  Copy any input positions and identifiers into the list, starting at 
 *  element 1.
       IF( NPIN .GT. 0 ) THEN
-         CALL KPS1_LMKST( NAX, NPIN, NPIN, %VAL( IPW1 ), 0, 
-     :                    %VAL( IPIDIN ), 1, NPOUT, %VAL( IPPOS ), 
-     :                    %VAL( IPID ), STATUS )
+         CALL KPS1_LMKST( NAX, NPIN, NPIN, %VAL( CNF_PVAL( IPW1 ) ), 0,
+     :                    %VAL( CNF_PVAL( IPIDIN ) ), 1, NPOUT, 
+     :                    %VAL( CNF_PVAL( IPPOS ) ),
+     :                    %VAL( CNF_PVAL( IPID ) ), STATUS )
       END IF
 
 *  Copy any new positions into the list, following the input positions.
@@ -517,12 +525,14 @@
 *  the input positions list.
       IF( NP .GT. 0 ) THEN
          IF( USEFIL ) THEN
-            CALL KPS1_LMKST( NAX, NP, NP, %VAL( IPFIL ), ID0, 0, 
-     :                       NPIN + 1, NPOUT, %VAL( IPPOS ), 
-     :                       %VAL( IPID ), STATUS )
+            CALL KPS1_LMKST( NAX, NP, NP, %VAL( CNF_PVAL( IPFIL ) ), 
+     :                       ID0, 0,
+     :                       NPIN + 1, NPOUT, %VAL( CNF_PVAL( IPPOS ) ),
+     :                       %VAL( CNF_PVAL( IPID ) ), STATUS )
          ELSE
             CALL KPS1_LMKST( NAX, NP, MXPOS, POS, ID0, 0, NPIN + 1,
-     :                       NPOUT, %VAL( IPPOS ), %VAL( IPID ), 
+     :                       NPOUT, %VAL( CNF_PVAL( IPPOS ) ), 
+     :                       %VAL( CNF_PVAL( IPID ) ),
      :                       STATUS )
          END IF
       END IF
@@ -547,8 +557,9 @@
       CALL AST_SETI( IWCS, 'CURRENT', ICURR0, STATUS )
 
 *  Create the output positions list.
-      CALL KPG1_WRLST( 'OUTCAT', NPOUT, NPOUT, NAX, %VAL( IPPOS ),
-     :                 IFRM, IWCS, TITLE, 0, %VAL( IPID ), 
+      CALL KPG1_WRLST( 'OUTCAT', NPOUT, NPOUT, NAX, 
+     :                 %VAL( CNF_PVAL( IPPOS ) ),
+     :                 IFRM, IWCS, TITLE, 0, %VAL( CNF_PVAL( IPID ) ),
      :                 .FALSE., STATUS )
 
 *  Shutdown procedure.

@@ -80,6 +80,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,6 +95,8 @@
 *        declaration and other minor stylistic changes.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,6 +111,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'MSG_PAR'          ! Message-system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -191,9 +195,11 @@
      :              EL, STATUS )
 
 *  Store values in the output arrays.
-      CALL KPS1_ERRCL( LIMIT, MODE, EL, %VAL( IPIN( 1 ) ),
-     :                 %VAL( IPIN( 2 ) ), %VAL( IPOUT( 1 ) ),
-     :                 %VAL( IPOUT( 2 ) ), BAD, NBAD, STATUS )
+      CALL KPS1_ERRCL( LIMIT, MODE, EL, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                 %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPOUT( 1 ) ) ),
+     :                 %VAL( CNF_PVAL( IPOUT( 2 ) ) ), 
+     :                 BAD, NBAD, STATUS )
 
 *  Set the bad pixel flags in the output NDF.
       CALL NDF_SBAD( BAD, INDF2, 'DATA', STATUS )

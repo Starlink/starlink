@@ -186,6 +186,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK).
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -197,6 +198,8 @@
 *        Replace AIF_FLNAM calls with NDF_MSG.
 *     12-APR-2000 (DSB):
 *        Added parameter RMS.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -214,6 +217,7 @@
       INCLUDE 'PRM_PAR'          ! Magic-value definitions
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -1064,34 +1068,50 @@
 *  implementation type.
       IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          IF ( LOTHRS .OR. HITHRS ) THEN
-            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
-     :                       WLIMIT, MAXBIN, %VAL( BINPTR ),
-     :                       %VAL( TBNPTR ), %VAL( XPTR ), %VAL( YPTR ),
-     :                       %VAL( ZPTR ), %VAL( WPTR ), NBIN, STATUS )
+     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
+     :                       %VAL( CNF_PVAL( TBNPTR ) ), 
+     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ),
+     :                       %VAL( CNF_PVAL( ZPTR ) ), 
+     :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          ELSE
-            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUBID( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
-     :                       WLIMIT, MAXBIN, %VAL( BINPTR ), DUMMY,
-     :                       %VAL( XPTR ), %VAL( YPTR ), %VAL( ZPTR ),
-     :                       %VAL( WPTR ), NBIN, STATUS )
+     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ), 
+     :                       DUMMY,
+     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
+     :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          END IF
 
 *  Spline is single precision.
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
  
          IF ( LOTHRS .OR. HITHRS ) THEN
-            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
-     :                       WLIMIT, MAXBIN, %VAL( BINPTR ),
-     :                       %VAL( TBNPTR ), %VAL( XPTR ), %VAL( YPTR ),
-     :                       %VAL( ZPTR ), %VAL( WPTR ), NBIN, STATUS )
+     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ),
+     :                       %VAL( CNF_PVAL( TBNPTR ) ), 
+     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ),
+     :                       %VAL( CNF_PVAL( ZPTR ) ), 
+     :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          ELSE
-            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUBIR( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, ESTIMA, NCLIP, CLIP, THRLO, THRHI,
-     :                       WLIMIT, MAXBIN, %VAL( BINPTR ), DUMMY,
-     :                       %VAL( XPTR ), %VAL( YPTR ), %VAL( ZPTR ),
-     :                       %VAL( WPTR ), NBIN, STATUS )
+     :                       WLIMIT, MAXBIN, %VAL( CNF_PVAL( BINPTR ) ), 
+     :                       DUMMY,
+     :                       %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
+     :                       %VAL( CNF_PVAL( WPTR ) ), NBIN, STATUS )
          END IF
 
       END IF
@@ -1117,8 +1137,9 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
-     :               NBIN, %VAL( XPTR ), %VAL( YPTR ),
-     :               %VAL( ZPTR ), BINNED, STATUS )
+     :               NBIN, %VAL( CNF_PVAL( XPTR ) ), 
+     :               %VAL( CNF_PVAL( YPTR ) ),
+     :               %VAL( CNF_PVAL( ZPTR ) ), BINNED, STATUS )
 
 *  Write it out to the log file, already opened, hence the junk name.
          CALL LISTSB( BINNED, MXBIN, MXBIN, 1, 1, NX, NY,
@@ -1132,8 +1153,9 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ),
-     :               NBIN, %VAL( XPTR ), %VAL( YPTR ),
-     :               %VAL( WPTR ), BINNED, STATUS )
+     :               NBIN, %VAL( CNF_PVAL( XPTR ) ), 
+     :               %VAL( CNF_PVAL( YPTR ) ),
+     :               %VAL( CNF_PVAL( WPTR ) ), BINNED, STATUS )
 
 *  Write it out to the log file, already opened, hence the junk name.
          CALL LISTSB( BINNED, MXBIN, MXBIN, 1, 1, NX, NY,
@@ -1158,9 +1180,13 @@
 
 *  Fit the polynomial surface to the binned array.
             CALL KPS1_SUPF( DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
-     :                      FIRST, NBIN, MPCOEF, MAXBIN, %VAL( XPTR ),
-     :                      %VAL( YPTR ), %VAL( ZPTR ), %VAL( WPTR ),
-     :                      %VAL( NEQPTR ), CHCOEF, NCOEF, STATUS )
+     :                      FIRST, NBIN, MPCOEF, MAXBIN, 
+     :                      %VAL( CNF_PVAL( XPTR ) ),
+     :                      %VAL( CNF_PVAL( YPTR ) ), 
+     :                      %VAL( CNF_PVAL( ZPTR ) ), 
+     :                      %VAL( CNF_PVAL( WPTR ) ),
+     :                      %VAL( CNF_PVAL( NEQPTR ) ), 
+     :                      CHCOEF, NCOEF, STATUS )
             FIRST = .FALSE.
 
 *  Evaluate and log the the rms error of the fit.
@@ -1168,10 +1194,13 @@
 
 *  Evaluate the surface at each bin and obtain the rms error of the
 *  fit.
-            CALL KPS1_SUPEB( %VAL( XPTR ), %VAL( YPTR ), %VAL( ZPTR ),
+            CALL KPS1_SUPEB( %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       NBIN, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
      :                       NYPAR, MCHOEF, CHCOEF, NCOEF,
-     :                       %VAL( FITPTR ), %VAL( RESPTR ), RMS,
+     :                       %VAL( CNF_PVAL( FITPTR ) ), 
+     :                       %VAL( CNF_PVAL( RESPTR ) ), RMS,
      :                       STATUS )
 
 *  Report the latest rms error.  It should be decreasing each cycle.
@@ -1197,9 +1226,12 @@
 *  Remove deviant bins from the fit by deriving the residuals to the
 *  fit.
                NELM = NBIN
-               CALL KPS1_SUCLD( NELM, %VAL( FITPTR ), RMS, CLIPF( M+1 ),
-     :                          %VAL( XPTR ), %VAL( YPTR ),
-     :                          %VAL( ZPTR ), %VAL( WPTR ), NBIN,
+               CALL KPS1_SUCLD( NELM, %VAL( CNF_PVAL( FITPTR ) ), 
+     :                          RMS, CLIPF( M+1 ),
+     :                          %VAL( CNF_PVAL( XPTR ) ), 
+     :                          %VAL( CNF_PVAL( YPTR ) ),
+     :                          %VAL( CNF_PVAL( ZPTR ) ), 
+     :                          %VAL( CNF_PVAL( WPTR ) ), NBIN,
      :                          STATUS )
 
 *  Report the progress of the clipping.
@@ -1225,18 +1257,23 @@
          IF ( ALL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Evaluate the polynomial for each pixel a line at time.
-            CALL KPS1_SUPEV( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUPEV( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       DXMIN, DXMAX, DYMIN, DYMAX, NXPAR, NYPAR,
-     :                       MCHOEF, CHCOEF, NCOEF, %VAL( LINPTR ),
-     :                       %VAL( PNTRO( 1 ) ), RMSF, STATUS )
+     :                       MCHOEF, CHCOEF, NCOEF, 
+     :                       %VAL( CNF_PVAL( LINPTR ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       RMSF, STATUS )
          ELSE
 
 *  Evaluate the polynomial at the bin corners, and obtain the pixel
 *  values by bi-linear interpolation.
-            CALL KPS1_SUPEI( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUPEI( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, DXMIN, DXMAX, DYMIN, DYMAX, NXPAR,
      :                       NYPAR, MCHOEF, CHCOEF, NCOEF,
-     :                       %VAL( PNTRO( 1 ) ), RMSF, STATUS )
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       RMSF, STATUS )
          END IF
 
 *  Fit a bi-cubic spline.
@@ -1264,10 +1301,15 @@
 *  Fit the bi-cubic-spline surface to the binned array.
             CALL KPS1_SUSF( NXKNOT, NYKNOT, XMIN, XMAX, YMIN, YMAX,
      :                      MTKNOT, FIRST, NWS, NLWS, NIWS, MAXBIN,
-     :                      %VAL( XPTR ), %VAL( YPTR ), %VAL( ZPTR ),
-     :                      %VAL( WPTR ), %VAL( GPTR ), NBIN,
-     :                      XKNOT, YKNOT, %VAL( SWPTR ), %VAL( SLWPTR ),
-     :                      %VAL( SIWPTR ), COEFF, NCOEF, SCALE,
+     :                      %VAL( CNF_PVAL( XPTR ) ), 
+     :                      %VAL( CNF_PVAL( YPTR ) ), 
+     :                      %VAL( CNF_PVAL( ZPTR ) ),
+     :                      %VAL( CNF_PVAL( WPTR ) ), 
+     :                      %VAL( CNF_PVAL( GPTR ) ), NBIN,
+     :                      XKNOT, YKNOT, %VAL( CNF_PVAL( SWPTR ) ), 
+     :                      %VAL( CNF_PVAL( SLWPTR ) ),
+     :                      %VAL( CNF_PVAL( SIWPTR ) ), 
+     :                      COEFF, NCOEF, SCALE,
      :                      STATUS )
 
             FIRST = .FALSE.
@@ -1290,10 +1332,12 @@
 *  Evaluate the surface at each bin and obtain the rms error of the
 *  fit. -1 prevent re-scaling because clipping below needs to work with
 *  the scaled fit (if there has been any scaling).
-            CALL KPS1_SUSEB( %VAL( XPTR ), %VAL( YPTR ), %VAL( ZPTR ),
+            CALL KPS1_SUSEB( %VAL( CNF_PVAL( XPTR ) ), 
+     :                       %VAL( CNF_PVAL( YPTR ) ), 
+     :                       %VAL( CNF_PVAL( ZPTR ) ),
      :                       NELM, NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF,
-     :                       COEFF, DSCALE, %VAL( FITPTR ),
-     :                       %VAL( RESPTR ), RMS, STATUS )
+     :                       COEFF, DSCALE, %VAL( CNF_PVAL( FITPTR ) ),
+     :                       %VAL( CNF_PVAL( RESPTR ) ), RMS, STATUS )
 
 *  Report the latest rms error. It should be decreasing each cycle.
 *  Note the RMS is already scaled correctly at this point during the
@@ -1323,9 +1367,12 @@
 
 *  Remove deviant bins from the fit by deriving the residuals to the
 *  fit.
-               CALL KPS1_SUCLR( NELM, %VAL( FITPTR ), RMS, CLIPF( M+1 ),
-     :                          %VAL( XPTR ), %VAL( YPTR ),
-     :                          %VAL( ZPTR ), %VAL( WPTR ), NBIN,
+               CALL KPS1_SUCLR( NELM, %VAL( CNF_PVAL( FITPTR ) ), 
+     :                          RMS, CLIPF( M+1 ),
+     :                          %VAL( CNF_PVAL( XPTR ) ), 
+     :                          %VAL( CNF_PVAL( YPTR ) ),
+     :                          %VAL( CNF_PVAL( ZPTR ) ), 
+     :                          %VAL( CNF_PVAL( WPTR ) ), NBIN,
      :                          STATUS )
 
 *  Report the progress of the clipping.
@@ -1351,18 +1398,23 @@
          IF ( ALL .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Evaluate the polynomial for each pixel a line at time.
-            CALL KPS1_SUSEV( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUSEV( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       NXKNOT, NYKNOT, XKNOT, YKNOT, NCOEF, COEFF,
-     :                       SCALE, NPOINT, %VAL( PANPTR ),
-     :                       %VAL( LINPTR ), %VAL( SEVPTR ),
-     :                       %VAL( PNTRO( 1 ) ), RMSF, STATUS )
+     :                       SCALE, NPOINT, %VAL( CNF_PVAL( PANPTR ) ),
+     :                       %VAL( CNF_PVAL( LINPTR ) ), 
+     :                       %VAL( CNF_PVAL( SEVPTR ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       RMSF, STATUS )
          ELSE
 
 *  Evaluate the polynomial at the bin corners, and obtain the pixel
 *  values by bi-linear interpolation.
-            CALL KPS1_SUSEI( DIMS( 1 ), DIMS( 2 ), %VAL( PNTRI( 1 ) ),
+            CALL KPS1_SUSEI( DIMS( 1 ), DIMS( 2 ), 
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                       IX, IY, NXKNOT, NYKNOT, XKNOT, YKNOT,
-     :                       NCOEF, COEFF, SCALE, %VAL( PNTRO( 1 ) ),
+     :                       NCOEF, COEFF, SCALE, 
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                       RMSF, STATUS )
          END IF
 
@@ -1383,7 +1435,8 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
-     :               %VAL( XPTR ), %VAL( YPTR ), %VAL( FITPTR ),
+     :               %VAL( CNF_PVAL( XPTR ) ), %VAL( CNF_PVAL( YPTR ) ), 
+     :               %VAL( CNF_PVAL( FITPTR ) ),
      :               BINNED, STATUS )
 
 *  Write it out to the log file, already opened, hence the junk name.
@@ -1398,7 +1451,8 @@
 
 *  First convert the x-y list of binned values into a full array.
          CALL LD2AR( MXBIN, NY, REAL( IX ), REAL( IY ), NBIN,
-     :               %VAL( XPTR ), %VAL( YPTR ), %VAL( RESPTR ),
+     :               %VAL( CNF_PVAL( XPTR ) ), %VAL( CNF_PVAL( YPTR ) ), 
+     :               %VAL( CNF_PVAL( RESPTR ) ),
      :               BINNED, STATUS )
 
 *  Write it out to the log file, already opened, hence the junk name.

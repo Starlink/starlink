@@ -98,6 +98,7 @@
   
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -105,6 +106,8 @@
 *        Original NDF version.
 *     1995 January 16 (MJC):
 *        Replaced AIF by PAR.  Added ERROR option to parameter COMP.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,6 +187,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'      ! Definitions of conversion routines
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -268,7 +272,8 @@
          RVALUE = VAL_DTOR( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBR( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBR( BAD, VABS, ABOVE, EL, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    RVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for
@@ -295,7 +300,8 @@
          BVALUE = VAL_DTOB( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBB( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBB( BAD, VABS, ABOVE, EL, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    BVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for
@@ -317,7 +323,8 @@
      :                   DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBD( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBD( BAD, VABS, ABOVE, EL, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    DVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for
@@ -344,7 +351,8 @@
          IVALUE = VAL_DTOI( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBI( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBI( BAD, VABS, ABOVE, EL, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    IVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for
@@ -366,7 +374,8 @@
          BVALUE = VAL_DTOUB( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBUB( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBUB( BAD, VABS, ABOVE, EL, 
+     :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     BVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for
@@ -388,7 +397,8 @@
          WVALUE = VAL_DTOUW( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBUW( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBUW( BAD, VABS, ABOVE, EL, 
+     :                     %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                     WVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for
@@ -415,7 +425,8 @@
          WVALUE = VAL_DTOW( .FALSE., DVALUE, STATUS )
 
 *  Call routine to count up the values.
-         CALL KPG1_NUMBW( BAD, VABS, ABOVE, EL, %VAL( PNTRI( 1 ) ),
+         CALL KPG1_NUMBW( BAD, VABS, ABOVE, EL, 
+     :                    %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                    WVALUE, NUMBER, STATUS )
 
 *  Make a common character version later be passed to a token for

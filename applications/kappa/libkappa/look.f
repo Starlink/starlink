@@ -240,11 +240,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-OCT-2001 (DSB):
 *        Original NDF/AST version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -261,6 +264,7 @@
       INCLUDE 'AST_PAR'        ! AST constants and functions
       INCLUDE 'GRP_PAR'        ! GRP constants 
       INCLUDE 'NDF_PAR'        ! NDF constants 
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -536,8 +540,10 @@
 
 *  Produce the listing.
          CALL KPS1_LOOK( FRM, RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), 
-     :                   RUBND( 2 ), %VAL( IPDAT ), QUIET, LOG, FDL, 
-     :                   %VAL( IPLINE ), FORMAT, MAXLEN, VALUE, 
+     :                   RUBND( 2 ), %VAL( CNF_PVAL( IPDAT ) ), 
+     :                   QUIET, LOG, FDL,
+     :                   %VAL( CNF_PVAL( IPLINE ) ), 
+     :                   FORMAT, MAXLEN, VALUE,
      :                   STATUS, %VAL( MAXLEN ) )
 
 *  Annull the temporary resources.

@@ -166,6 +166,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -198,6 +199,8 @@
 *        Corrected argument list for KPS1_PSEVL.
 *     19-APR-2000 (DSB):
 *        Increased upper limit on FWHM from 100 to 10000.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -213,6 +216,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -468,15 +472,20 @@
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
      :                       DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
-     :                       %VAL( PNTR1( 1 ) ), %VAL( PNTR2( 1 ) ),
-     :                       BADOUT, %VAL( WPNTR1 ), %VAL( WPNTR2 ),
-     :                       %VAL( WPNTR3 ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
+     :                       BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                       %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
-     :                       DIM( 2 ), BAD, .FALSE., %VAL( PNTR1( 1 ) ),
-     :                       %VAL( PNTR2( 1 ) ), BADOUT, %VAL( WPNTR1 ),
-     :                       %VAL( WPNTR2 ), %VAL( WPNTR3 ), STATUS )
+     :                       DIM( 2 ), BAD, .FALSE., 
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ), BADOUT, 
+     :                       %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                       %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                       %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
          END IF
 
 *  Set the output bad-pixel flag of the data array.
@@ -487,16 +496,20 @@
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_GAUSR( SIGMA, IBOX, SAMBAD, SNGL( WLIM ),
      :                          DIM( 1 ), DIM( 2 ), BAD, .TRUE.,
-     :                          %VAL( PNTR1( 2 ) ), %VAL( PNTR2( 2 ) ),
-     :                          BADOUT, %VAL( WPNTR1 ), %VAL( WPNTR2 ),
-     :                          %VAL( WPNTR3 ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
+     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_GAUSD( SIGMA, IBOX, SAMBAD, WLIM, DIM( 1 ),
      :                          DIM( 2 ), BAD, .TRUE.,
-     :                          %VAL( PNTR1( 2 ) ), %VAL( PNTR2( 2 ) ),
-     :                          BADOUT, %VAL( WPNTR1 ), %VAL( WPNTR2 ),
-     :                           %VAL( WPNTR3 ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ),
+     :                          BADOUT, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ),
+     :                           %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
             END IF
 
 *  Set the output bad-pixel flag of the variance array.
@@ -525,7 +538,7 @@
          CALL KPS1_PSEVL( AXISR, RORI, MIN( FWHM( 1 ), FWHM( 2 ) ),
      :                    2.0, 1, 2 * IBOX + 1, 1, 2 * JBOX + 1,
      :                    REAL( IBOX )+0.5, REAL( JBOX )+0.5, 
-     :                    %VAL( WPNTR1 ), STATUS )
+     :                    %VAL( CNF_PVAL( WPNTR1 ) ), STATUS )
 
          IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
@@ -534,22 +547,27 @@
             CALL PSX_CALLOC( WDIM, ITYPE, WPNTR2, STATUS )
 
 *  Make a double-precision copy of the array of weights.
-            CALL VEC_RTOD( .FALSE., WDIM, %VAL( WPNTR1 ),
-     :                     %VAL( WPNTR2 ), IERR, NERR, STATUS )
+            CALL VEC_RTOD( .FALSE., WDIM, %VAL( CNF_PVAL( WPNTR1 ) ),
+     :                     %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                     IERR, NERR, STATUS )
          END IF
 
 *  Apply smoothing to the mapped data array, using the appropriate
 *  numeric type of processing.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_AKERR( IBOX, JBOX, %VAL( WPNTR1 ), SAMBAD,
+            CALL KPG1_AKERR( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                       SAMBAD,
      :                       SNGL( WLIM ), DIM( 1 ), DIM( 2 ), BAD,
-     :                       .FALSE., %VAL( PNTR1( 1 ) ),
-     :                       %VAL( PNTR2( 1 ) ), BADOUT, STATUS )
+     :                       .FALSE., %VAL( CNF_PVAL( PNTR1( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                       BADOUT, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_AKERD( IBOX, JBOX, %VAL( WPNTR2 ), SAMBAD,
+            CALL KPG1_AKERD( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                       SAMBAD,
      :                       WLIM, DIM( 1 ), DIM( 2 ), BAD, .FALSE.,
-     :                       %VAL( PNTR1( 1 ) ), %VAL( PNTR2( 1 ) ),
+     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( PNTR2( 1 ) ) ),
      :                       BADOUT, STATUS )
          END IF
 
@@ -559,16 +577,20 @@
 *  If a variance array is present, then also apply smoothing to it.
          IF ( VAR ) THEN
             IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPG1_AKERR( IBOX, JBOX, %VAL( WPNTR1 ), SAMBAD,
+               CALL KPG1_AKERR( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          SAMBAD,
      :                          SNGL( WLIM ), DIM( 1 ), DIM( 2 ), BAD,
-     :                          .TRUE., %VAL( PNTR1( 2 ) ),
-     :                          %VAL( PNTR2( 2 ) ), BADOUT, STATUS )
+     :                          .TRUE., %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                          BADOUT, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_AKERD( IBOX, JBOX, %VAL( WPNTR2 ), SAMBAD,
+               CALL KPG1_AKERD( IBOX, JBOX, %VAL( CNF_PVAL( WPNTR2 ) ), 
+     :                          SAMBAD,
      :                          WLIM, DIM( 1 ), DIM( 2 ), BAD,
-     :                          .TRUE., %VAL( PNTR1( 2 ) ),
-     :                          %VAL( PNTR2( 2 ) ), BADOUT, STATUS )
+     :                          .TRUE., %VAL( CNF_PVAL( PNTR1( 2 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                          BADOUT, STATUS )
             END IF
 
 *  Set the output bad-pixel flag of the variance array.

@@ -336,6 +336,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -347,6 +348,8 @@
 *        Add TOKEN arg in call to KPG1_ASFRM.
 *     13-DEC-2001 (DSB):
 *        Added parameters CATFRAME and CATEPOCH.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -363,6 +366,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -612,7 +616,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the maximum and minimum position identifiers.
-      CALL KPG1_MXMNI( .FALSE., NPOS, %VAL( IPID ), NINVAL, LAST, 
+      CALL KPG1_MXMNI( .FALSE., NPOS, %VAL( CNF_PVAL( IPID ) ), 
+     :                 NINVAL, LAST,
      :                 FIRST, LSTPOS, FSTPOS, STATUS )
 
 *  Get the first position identifier to be displayed. Use a dynamic
@@ -627,7 +632,8 @@
 
 *  Count the number of positions within the supplied range of position
 *  identifiers.
-      CALL KPS1_LSHCT( NPOS, %VAL( IPID ), FIRST, LAST, NDISP, STATUS )
+      CALL KPS1_LSHCT( NPOS, %VAL( CNF_PVAL( IPID ) ), 
+     :                 FIRST, LAST, NDISP, STATUS )
 
 *  Give a suitable message, store zero for NUMBER, and abort if no
 *  positions were selected.
@@ -660,27 +666,34 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the selected positions and identifiers into the work arrays.
-      CALL KPS1_LSHCP( FIRST, LAST, NPOS, NBAX, %VAL( IPPOS ), 
-     :                 %VAL( IPID ), NDISP, %VAL( IPW0 ), %VAL( IPW1 ),
+      CALL KPS1_LSHCP( FIRST, LAST, NPOS, NBAX, 
+     :                 %VAL( CNF_PVAL( IPPOS ) ),
+     :                 %VAL( CNF_PVAL( IPID ) ), NDISP, 
+     :                 %VAL( CNF_PVAL( IPW0 ) ), 
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 STATUS )
 
 *  Map the positions from the original Frame into the requested Frame.
-      CALL AST_TRANN( MAP, NDISP, NBAX, NDISP, %VAL( IPW1 ), .TRUE.,
-     :                NRAX, NDISP, %VAL( IPW2 ), STATUS ) 
+      CALL AST_TRANN( MAP, NDISP, NBAX, NDISP, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                .TRUE.,
+     :                NRAX, NDISP, %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Create an output positions list if required.
       IF( TITLE .EQ. ' ' ) THEN
-         CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, %VAL( IPW1 ),
+         CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, 
+     :                    %VAL( CNF_PVAL( IPW1 ) ),
      :                    BINDEX, IWCS, 'Output from LISTSHOW', 
-     :                    0, %VAL( IPW0 ), .TRUE., STATUS )
+     :                    0, %VAL( CNF_PVAL( IPW0 ) ), .TRUE., STATUS )
       ELSE
-         CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, %VAL( IPW1 ),
+         CALL KPG1_WRLST( 'OUTCAT', NDISP, NDISP, NBAX, 
+     :                    %VAL( CNF_PVAL( IPW1 ) ),
      :                    BINDEX, IWCS, TITLE, 
-     :                    0, %VAL( IPW0 ), .TRUE., STATUS )
+     :                    0, %VAL( CNF_PVAL( IPW0 ) ), .TRUE., STATUS )
       END IF
 
 *  Write the mapped values to the output parameter.
-      CALL PAR_PUT1D( 'POSNS', NDISP*NRAX, %VAL( IPW2 ), STATUS )
+      CALL PAR_PUT1D( 'POSNS', NDISP*NRAX, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                STATUS )
 
 *  Write the number of selected positions to NUMBER.
       CALL PAR_PUT0I( 'NUMBER', NDISP, STATUS )
@@ -699,7 +712,8 @@
 
 *  Format the positions and identifiers, and store them in the group.
       CALL KPS1_LSHFM( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ), 
-     :                 NDISP, NRAX, %VAL( IPW0 ), %VAL( IPW2 ), IGRP1,
+     :                 NDISP, NRAX, %VAL( CNF_PVAL( IPW0 ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ), IGRP1,
      :                 STATUS )
 
 *  Save the number of positions in the list.
@@ -748,9 +762,11 @@
          IF( STATUS .NE. SAI__OK ) GO TO 998
 
 *  Produce the graphics.
-         CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( IPW2 ), PLOT,
+         CALL KPS1_LSHPL( IWCS, NDISP, NRAX, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                    PLOT,
      :                    GEO, IMARK, CLOSE, LABEL, IGRP2, JUST, 
-     :                    %VAL( IPID ), %VAL( IPW3 ), STATUS )
+     :                    %VAL( CNF_PVAL( IPID ) ), 
+     :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
 
 *  Free work space used by KPS1_LSHPL.
