@@ -77,14 +77,14 @@ $file =~ s/\.sdf//;
 if ($file =~ /^\d+/) {
 
   # Need to check $sub
-  unless (defined $sub) {
+  unless (defined $opt_sub) {
     $sub = "lon";
     print "using default sub-instrument: lon\n";
   }
 
   $run_no = $file; # This is the run number
 
-  $file = "o${file}_${sub}_pht";
+  $file = "o${file}_${opt_sub}_pht";
 }
 
 print "Reading from file $file\n";
