@@ -346,6 +346,10 @@ foreach $scufile (@sortndf) {
       @ra = split(/:/,$long);
       @dec = split(/:/,$lat);
 
+      # Remove spurious leading zeroes and plus signs
+      $ra[0] *= 1.0;
+      $dec[0] *= 1.0;
+
     }
 
     # Read EQUINOX
