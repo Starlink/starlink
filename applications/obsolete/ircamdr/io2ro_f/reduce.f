@@ -97,19 +97,19 @@
 *       see if O file exists
 
 	L1 = CHR_LEN(ONAME)
-	type *, 'search name = ', oname(1:l1)//'.sdf'
+	PRINT *, 'search name = ', oname(1:l1)//'.sdf'
         INQUIRE( FILE=ONAME(1:L1)//'.sdf', EXIST=O_OK )
     
 *     If file isn't found allow for possibility of upper case or
 *     mixed case filenames
 
-        IF ( O_OK .EQ. .FALSE. ) THEN
+        IF ( .NOT. O_OK ) THEN
 
 *          CALL CHR_UCASE( ONAME )
 	  L1 = CHR_LEN(ONAME)
           INQUIRE( FILE=ONAME(1:L1)//'.sdf', EXIST=O_OK )
          
-          IF ( O_OK .EQ. .FALSE. ) THEN 
+          IF ( .NOT. O_OK ) THEN 
 	    L1 = CHR_LEN(ONAME)
             INQUIRE( FILE=ONAME(1:L1)//'.SDF', EXIST=O_OK )
           END IF
@@ -134,13 +134,13 @@
 *         If file isn't found allow for possibility of upper case or
 *         mixed case filenames
 
-            IF ( INT_OK .EQ. .FALSE. ) THEN
+            IF ( .NOT. INT_OK ) THEN
 
 *              CALL CHR_UCASE( INAME )
 	      L1 = CHR_LEN(INAME)
               INQUIRE( FILE=INAME(1:L1)//'.sdf', EXIST=INT_OK )
 
-              IF ( INT_OK .EQ. .FALSE. ) THEN
+              IF ( .NOT. INT_OK ) THEN
 	        L1 = CHR_LEN(INAME)
                 INQUIRE( FILE=INAME(1:L1)//'.SDF', EXIST=INT_OK )
               END IF
