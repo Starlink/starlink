@@ -153,10 +153,6 @@ my $cmdlineobsdata = undef;	# Source for WCS information.  Can be
 my $matchplugin = undef;	# Name of plugin which is to be used
                                 # to do the matching.  Default if undefined.
 
-# my %filterdefects;
-# $filterdefects{filter} = 1;	# A reference to a hash which contains
-#                                 # the filterdefects keywords -- see
-#                                 # below.  Enabled by default.
 my %filterdefects = ();
 
 
@@ -346,7 +342,6 @@ verbosity ($verbose);
 reuse_files() if $tempDir;
 
 if (defined($optionset{defects})) {
-#    $filterdefects{filter} = 1;	# switch on filtering
     foreach my $p (split (/ *, */, $optionset{defects})) {
         # Make sure this _doesn't_ match leading `--'.  That way, if
         # someone omits an option argument and the following option is
@@ -382,17 +377,6 @@ if (defined($optionset{defects})) {
                   $badkwd, $filterdefects{$badkwd});
     }
 }
-# if ($verbose) {
-#     if ($filterdefects{filter} == 1) {
-# 	print STDERR "Filterdefects: ";
-# 	foreach my $k (keys %filterdefects) {
-# 	    printf STDERR " %s->%s", $k, $filterdefects{$k};
-# 	}
-# 	print STDERR "\n";
-#     } else {
-# 	print STDERR "No filterdefects\n";
-#     }
-# }
 
 # Generate a temporary file name, if it wasn't set
 defined($tempDir) || ($tempDir = "$ENV{AUTOASTROM_TEMPDIR}/autoastrom-$$");
@@ -462,7 +446,7 @@ $ENV{NDF_FORMATS_IN} = 'FITS(.fits),FITS(.fit),FITS(.fts),FITS(.FITS),FITS(.FIT)
 $ENV{NDF_FROM_FITS} = "$ENV{CONVERT_DIR}/convertndf from '^fmt' '^dir' '^name' '^type' '^fxs' '^ndf'";
 $ENV{NDF_TEMP_FITS} = 'temp_fits_^name^fxscl';
 
-# temp NDF debugging switch
+# DEBUG: uncomment this to debug NDF interactions
 #$ENV{NDF_SHCVT} = 1;
 
 
@@ -647,27 +631,17 @@ foreach my $wcssource (split(/\s*:\s*/, $obsdata{source})) {
     }
 }
 
-
-
-
-
+# Did we find any WCS information?
 defined($NDFinfo->{wcs})
     || wmessage ('fatal', "No WCS information available in NDF <$NDF>");
 
-
-# The following test would be irrelvant or wrong if the calibration is
-# being taken from a FITS file.  Is it necessary?  Omit it for the moment.
-#if (! $NDFinfo->{hassky}) {
-#    print STDERR "The NDF $NDF does not appear to have a SKY domain.\nYou need to do at least an approximate calibration first\n";
-#    exit 1;
-#}
 
 
 # Find the moggy program.  Searching for it like this gives us a
 # little more flexibility in installation locations (and means that
 # the system will work for testing in its build directory).
 my $moggylocation = undef;
-foreach my $loc ("$ENV{AUTOASTROM_DIR}/moggy", 
+foreach my $loc ("$ENV{AUTOASTROM_DIR}/moggy",
 	      "$ENV{AUTOASTROM_DIR}/moggy/moggy") {
     if (-f $loc && -x $loc) {
 	$moggylocation = $loc;
@@ -675,6 +649,11 @@ foreach my $loc ("$ENV{AUTOASTROM_DIR}/moggy",
     }
 }
 defined ($moggylocation) || wmessage ('fatal', "Can't locate moggy program");
+
+
+
+# All the argument parsing and setup has been done now.
+
 
 
 # Debugging/testing: if --dump=filename has been specified, then dump the
@@ -723,11 +702,9 @@ if ($dumpstatefile) {
     print D "NDFinfo hash:\n";
     foreach my $k (sort(keys(%$NDFinfo))) {
         my $v = $NDFinfo->{$k};
-	#my $reftype = ref($NDFinfo->{$k});
         my $reftype = ref($v);
 	if ($reftype eq '') {
 	    print D "\$NDFinfo->{$k}=$v\n";
-	    #print D "\$NDFinfo->{$k}=$NDFinfo->{$k}\n";
 	} else {
 	    print D "\$NDFinfo->{$k}: ref to $reftype";
             if ($reftype eq 'ARRAY') {
@@ -736,11 +713,6 @@ if ($dumpstatefile) {
                 printf D (" (%d keys)", scalar(keys(%$v)));
             }
             print D "\n";
-# 	    if ($reftype eq 'ARRAY') {
-# 		foreach my $kv (@{$NDFinfo->{$k}}) {
-# 		    printf D ("    %s\n", $kv);
-# 		}
-# 	    }
 	}
     }
     exit 0;
@@ -756,6 +728,7 @@ if ($dumpstatefile) {
 $helpers{moggy} = Moggy->new($esocatname, $skycatconfig, $moggylocation);
 #$moggy = Moggy->new ('dummy@home',
 #		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
+# DEBUG: uncomment this to debug the interaction with the Moggy subsystem
 #$helpers{moggy}->debug('moggy asthandler cataloguehandler');
 
 
@@ -773,9 +746,6 @@ my $catcathash = get_catalogue ($helpers{moggy}, %$NDFinfo, $maxobj, $tempDir);
 defined($catcathash)
   || wmessage ('fatal', "Catalogue query failed");
 
-# my $catcathash = { 'catalogue' => $catcat,
-#                    'provenance' => $esocatname,
-#                  };
 my $catcat = $catcathash->{catalogue};
 
 # write an NDF which has the columns (number, ra/rad, dec/rad, ra/deg,
@@ -835,11 +805,13 @@ if ($verbose) {
 	print STDERR "\t$k = ", $CCDcathash->{$k}, "\n";
     }
 }
-#$CCDcat = $CCDcathash->{catalogue};
 wmessage ('info', "Object extraction successful");
 
-# $CCDcat is now an array containing hashes of x, y, etc,
+
+
+# $CCDcathash->{catalogue} is now an array containing hashes of x, y, etc,
 # for the objects detected on the CCD.
+
 
 
 # We run ASTROM $iterationsleft times.  We may stop the loop from
@@ -857,9 +829,7 @@ my $iterationsleft = 7;
 # has a valid initial value, @$CAT, obtained from get_catalogue()
 # above, but this is changed below to a new reference star
 # catalogue, by converting $refstarndf, below.
-my $refstarndf = 'X';		# Ref. star pixel coordinates...
-#my @matchincat = @$CAT;		# ...as a catalogue array, input to
-                                # match_positions.
+my $refstarndf = 'X';		# Ref. star pixel coordinates
 my $astromfits = 'X';		# WCS information obtained by ASTROM.
 
 
@@ -889,7 +859,6 @@ my $astromfits = 'X';		# WCS information obtained by ASTROM.
 my @astromnterms = (9);
 #my @astromnterms = (7, 9);
 my $ntermidx = 0;	# Index into @astromnterms
-#my $ntermidx = $#astromnterms;	# Index into @astromnterms
 
 my %lastastrom;			# Hash holding the results of the last
                                 # (successful) ASTROM run.
@@ -915,12 +884,6 @@ while ($iterno < $iterationsleft) {
 			 %$catcathash,
 			 %paramhash,
 			 $tfile);
-#     my ($ccdlist, $catlist, $matchworked)
-#       = match_positions (\%helpers,
-# 			 @$CCDcat,
-# 			 @matchincat,
-# 			 \%paramhash,
-# 			 $tfile);
 
      if (! $matchworked) {
  	# The match didn't work.  That's most commonly because the
@@ -938,12 +901,6 @@ while ($iterno < $iterationsleft) {
 			     %$catcathash,
 			     %paramhash,
  			     $tfile);
-#  	($ccdlist, $catlist, $matchworked)
-#  	  = match_positions (\%helpers,
-#  			     @$CCDcat,
-# 			     @matchincat,
-# 			     \%paramhash,
-#  			     $tfile);
      }
 
     ($matchworked && $#{$ccdlist} >= 0 && $#{$catlist} >= 0)
@@ -951,7 +908,6 @@ while ($iterno < $iterationsleft) {
 	# Nahhh, something more substantial is wrong.  Give up.
 	wmessage ('warning', "I can't match position lists.  Giving up.");
 	print STDERR "I can't match position lists.  Giving up.\n" if $verbose;
-	$iterationsleft = 0;	# Redundant (given `last' below), but neat.
 	last;			# JUMP OUT of the loop
     };
 
@@ -959,7 +915,7 @@ while ($iterno < $iterationsleft) {
         open (MPL, ">$matchcatalogue") || do {
             wmessage('warning',
                      "Can't write match position list $matchcatalogue");
-            last;
+            last;               # JUMP OUT
         };
         print MPL "# 1 NUMBER Running object number\n# 2 X_WORLD\n# 3 Y_WORLD\n# 4 X_IMAGE\n# 5 Y_IMAGE\n";
         for (my $i=0; $i<=$#{$catlist}; $i++) {
@@ -1069,7 +1025,7 @@ while ($iterno < $iterationsleft) {
         wmessage ('warning',
                   "ASTROM failed on iteration %d: OK, using results of previous iteration",
                   $iterno);
-        last;                   # JUMP OUT of loop
+        last;                   # JUMP OUT
         # We can press ahead with the WCS information we found the last
         # time round the loop.  It's odd that ASTROM failed this time, but
         # it sometimes seems to give up, suddenly, on the last iteration!
@@ -1111,7 +1067,6 @@ while ($iterno < $iterationsleft) {
     # When we created $CATNDF earlier, we put in six columns -- read
     # these out of the transformed NDF.
     my $refstararr = ndf2twodarray ($refstarndf);
-    #@matchincat = ();		# erase previous values
     my @newcat;
     foreach my $r (@$refstararr) {
 	my %t;
