@@ -1,8 +1,15 @@
-1 CONVERT_Version_1.5-4
-  Added IRAF compatibility libs for Linux systems. Convert should now
-  build on any ix86 Linux platform. 
+1 CONVERT_Version_1.5-5
 
-  Added FITS-AIPS++ encoding to FITS2NDF and NDF2FITS.
+ Added FITS-AIPS++ encoding to FITS2NDF and NDF2FITS.
+
+ Clarified the description of UNF2NDF parameter TYPE so that it
+ is clear that the type given should also be of the input data, not 
+ just the output NDF.
+
+
+1 CONVERT_Version_1.5-4
+ Added IRAF compatibility libs for Linux systems. Convert should now
+ build on any ix86 Linux platform. 
 
 
 1 CONVERT_Version_1.5

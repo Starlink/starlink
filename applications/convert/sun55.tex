@@ -5843,7 +5843,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstsubsection{
          TYPE = LITERAL (Read)
       }{
-         The data type of the output NDF.  It must be one of the
+         The data type of the input file and output NDF.  
+         It must be one of the
          following HDS types: \texttt{"\_BYTE"}, \texttt{"\_WORD"},
          \texttt{"\_REAL"},
          \texttt{"\_INTEGER"}, \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"},
@@ -5853,7 +5854,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          An unambiguous abbreviation may be given.  TYPE is ignored when
          COMP = \texttt{"Quality"} since the QUALITY component must comprise
          unsigned bytes (equivalent to TYPE = \texttt{"\_UBYTE"}) to be a valid
-         NDF. The suggested default is the current value.  TYPE is only
+         NDF. The suggested default is the current value.  TYPE is also only
          accessed when FITS is \texttt{FALSE}. \texttt{["\_REAL"]}
       }
    }

@@ -66,16 +66,16 @@
 *        input file before finding the data array or FITS-like header.
 *        [0]
 *     TYPE = LITERAL (Read)
-*        The data type of the output NDF.  It must be one of the
-*        following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
+*        The data type of the input file and output NDF. It must be one
+*        of the following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
 *        "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
 *        signed word, real, integer, double precision, unsigned byte,
 *        and unsigned word.  See SUN/92 for further details.  An
 *        unambiguous abbreviation may be given.  TYPE is ignored when
 *        COMP = "Quality" since the QUALITY component must comprise
 *        unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
-*        NDF. The suggested default is the current value.  TYPE is only
-*        accessed when FITS is FALSE. ["_REAL"]
+*        NDF. The suggested default is the current value.  TYPE is 
+*        also only accessed when FITS is FALSE. ["_REAL"]
 
 *  Examples:
 *     unf2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
@@ -186,7 +186,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -230,7 +230,7 @@
       INTEGER HDNUM( MAXHDR )    ! Number of headers cards in each
                                  ! header section in the sub-file
       INTEGER HPNTR              ! Pointer to the mapped header array
-      INTEGER HSTART( MAXHDR )   ! Start card number of each header 
+      INTEGER HSTART( MAXHDR )   ! Start card number of each header
                                  ! section of the sub-file in the full
                                  ! header
       INTEGER I                  ! Loop counter
@@ -516,7 +516,7 @@
       END IF
 
 *  End the NDF context.
-  970 CONTINUE  
+  970 CONTINUE
       CALL NDF_END( STATUS )
 
 *  Tidy workspace used to obtain the FITS headers.
