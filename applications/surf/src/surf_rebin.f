@@ -241,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.69  1999/07/15 20:27:38  timj
+*     First stab at improving external model input
+*
 *     Revision 1.68  1999/07/14 20:13:29  timj
 *     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
 *     a parameter.
@@ -562,6 +565,8 @@ c
                                        ! names of input files read
       CHARACTER*80     FITS(SCUBA__MAX_FITS, MAX_FILE)
                                        ! FITS entries for each file
+      LOGICAL          HAVE_MODEL      ! .TRUE. if CALCSKY is using a 
+                                       ! source model
       CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
                                        ! in units of hours rather than degrees
@@ -569,6 +574,7 @@ c
       INTEGER          IERR            ! For VEC copies
       INTEGER          IJ_PTR_END      ! End of scratch pointer
       INTEGER          IJ_PTR          ! Scratch pointer
+      INTEGER          IMNDF           ! NDF id for CALCSKY source model
       CHARACTER*256    IN              ! input filename and data-spec
       CHARACTER*20     INSTRUMENT      ! Name of instrument that took the data
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
@@ -620,6 +626,13 @@ c
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
                                        ! measured positions are calculated
+      DOUBLE PRECISION MODEL_DEC_CEN   ! centre DEC of CALCSKY model 
+                                       ! (radians)
+      CHARACTER*80     MODEL_FITS(SCUBA__MAX_FITS) 
+                                       ! FITS entreis in CALCSKY model
+      DOUBLE PRECISION MODEL_RA_CEN    ! centre RA of CALCSKY model
+                                       ! (radians)
+      CHARACTER*(DAT__SZLOC) M_FITSX_LOC ! locator to model FITS array
       INTEGER          NDF_PTR         ! Pointer to mapped NDF array
       INTEGER          NERR            ! For VEC copies
       REAL             NEWPA           ! New chop pa
@@ -634,6 +647,7 @@ c
       INTEGER          N_INTS(MAX_FILE)! Number of integrations per input file
       INTEGER          NINTS(MAX_FILE) ! N_INTS for INTREBIN support
       INTEGER          N_MEAS(MAX_FILE)! Number of measurements per input file
+      INTEGER          N_M_FITS        ! Number of FITS entries in the model
       INTEGER          N_PIXELS        ! Number of pixels in output map
       INTEGER          N_POS (MAX_FILE)! number of positions measured in input
                                        ! files
@@ -783,6 +797,49 @@ c
          CALL MSG_OUTIF(MSG__VERB, ' ', '^PKG: Calculating sky',
      :        STATUS)
 
+*  check if a source model is to be used. If it is then use its
+*  centre RA and Dec.
+
+         HAVE_MODEL = .FALSE.
+         CALL NDF_ASSOC ('MODEL', 'READ', IMNDF, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            HAVE_MODEL = .TRUE.             
+
+*  read FITS header
+            CALL NDF_XLOC (IMNDF, 'FITS', 'READ', M_FITSX_LOC,
+     :           STATUS)
+            CALL DAT_SIZE (M_FITSX_LOC, ITEMP, STATUS)
+            IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
+               IF (STATUS .EQ. SAI__OK) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC ('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: model file '//
+     :                 'contains too many FITS items', STATUS)
+               END IF
+            END IF
+
+            CALL DAT_GET1C (M_FITSX_LOC, SCUBA__MAX_FITS, MODEL_FITS,
+     :           N_M_FITS, STATUS)
+            CALL DAT_ANNUL (M_FITSX_LOC, STATUS)
+
+*     read centre coords, long and lat centre of model map
+*     Eventually we should be able to read full WCS info from header
+*     and convert to JCMT coordinate frames -- would put it in a
+*     subroutine of course...
+
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_M_FITS,
+     :           MODEL_FITS, 'SCUPROJ', OUT_COORDS, STATUS)
+            print *, 'cproj ', out_coords
+            CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
+     :           MODEL_FITS, 'LONG', MODEL_RA_CEN, STATUS)
+            CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
+     :           MODEL_FITS, 'LAT', MODEL_DEC_CEN, STATUS)
+            print *, model_ra_cen, model_dec_cen 
+         END IF
+
+*  close the model file
+         CALL NDF_ANNUL (IMNDF, STATUS)
+
       ELSE
 
 *     Regridding
@@ -793,13 +850,17 @@ c
 
       END IF
 
-*  get the output coordinate system and set the default centre of the
-*  output map
-* This needs to be done in advance of reading files as sme systems
-* do not need to convert coordinate systems to apparent RA,Dec (eg NA)
+*     get the output coordinate system and set the default centre of the
+*     output map
+*     This needs to be done in advance of reading files as some systems
+*     do not need to convert coordinate systems to apparent RA,Dec (eg NA).
+*     It does not need to be done if we've already read the coords from
+*     a source model in CALCSKY.
 
-      CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',.TRUE.,
-     :     OUT_COORDS, STATUS)
+      IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN 
+         CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',
+     :     .TRUE., OUT_COORDS, STATUS)
+      END IF
 
       HOURS = .TRUE.
       IF (OUT_COORDS .EQ. 'RB') THEN
@@ -1139,8 +1200,8 @@ c
      :     'LAT-OBS', LAT_OBS, STATUS)
       LAT_OBS = LAT_OBS * PI / 180.0D0
 
-*     If we are just despiking we don't need to ask about the
-*     coordinates
+*     If we are just despiking or calcsky-ing we don't need to ask about
+*     the coordinates
 
          IF (.NOT.DESPIKE .AND. .NOT.CALCSKY) THEN
 
@@ -1158,12 +1219,20 @@ c
 *     Probably want a separate rotation sub
 
 *     Convert the input coordinates to the output coordinates
-*     and use them as the default.
+*     and use them as the default. If we have a CALCSKY model
+*     we already know the OUT_LONG and OUT_LAT
 
-            CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
-     :           MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
+            IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN
+               CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
+     :              MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
+            ELSE
+               OUT_LONG = MODEL_RA_CEN
+               OUT_LAT  = MODEL_DEC_CEN
+            END IF
 
 *     calculate the apparent RA,Dec of the selected output centre
+*     (Hopefully this will provide the same values for OUT_RA_CEN
+*     and OUT_DEC_CEN) as were supplied to SCULIB_CALC_OUTPUT_COORDS)
 
             CALL SCULIB_CALC_APPARENT (LAT_OBS, OUT_LONG, OUT_LAT,0.0D0,
      :           0.0D0, 0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 

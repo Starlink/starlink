@@ -163,6 +163,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.4  1999/07/15 20:27:39  timj
+*     First stab at improving external model input
+*
 *     Revision 1.3  1998/06/16 04:51:57  timj
 *     Add examples.
 *
@@ -228,7 +231,6 @@
       INTEGER BIN_POS_END                   ! End of BIN_POS
       INTEGER BOX_DIV                       ! Box size div by 2
       BYTE    BTEMP                         ! Temporary byte
-      INTEGER DIMS ( 2 )                    ! Dimensions of input image
       CHARACTER * (80) FITS (SCUBA__MAX_FITS) ! FITS info
       CHARACTER * (DAT__SZLOC) FITSX_LOC    ! Locator to FITS
       INTEGER GRID_END                      ! End of scratch array
@@ -250,6 +252,7 @@
       INTEGER JPOS_PTR                      ! J positions in lookup table
       INTEGER JMAX                          ! J pos of hist max
       INTEGER K                             ! Loop counter
+      INTEGER LBND ( 2 )                    ! lower bounds of data array
       DOUBLE PRECISION MEAN                 ! Mean of sky
       DOUBLE PRECISION MEDIAN               ! Median of sky
       INTEGER NGOOD                         ! Number of good sky points
@@ -265,21 +268,20 @@
       REAL    RTEMP                         ! Scratch real
       INTEGER SCRATCH_END                   ! Scratch space
       INTEGER SCRATCH_PTR                   ! Scratch space
-      INTEGER SCRATCH2_END                   ! Scratch space
-      INTEGER SCRATCH2_PTR                   ! Scratch space
-      INTEGER SCRATCHUB_END                   ! Scratch space
-      INTEGER SCRATCHUB_PTR                   ! Scratch space
+      INTEGER SCRATCH2_END                  ! Scratch space
+      INTEGER SCRATCH2_PTR                  ! Scratch space
+      INTEGER SCRATCHUB_END                 ! Scratch space
+      INTEGER SCRATCHUB_PTR                 ! Scratch space
       CHARACTER * (10) SMODE                ! Smoothing mode
       INTEGER STATS_END                     ! End of STATS_PTR
       INTEGER STATS_PTR                     ! Bin statistics
-      DOUBLE PRECISION STDEV       ! Standard deviation
-      DOUBLE PRECISION SUM         ! Sum of data
-      DOUBLE PRECISION SUMSQ       ! Sum of squares data
+      DOUBLE PRECISION STDEV                ! Standard deviation
+      DOUBLE PRECISION SUM                  ! Sum of data
+      DOUBLE PRECISION SUMSQ                ! Sum of squares data
       INTEGER TOT_PTS                       ! Total number of points to despike
+      INTEGER UBND(2)                       ! Upper bounds of data array
       CHARACTER * (10) UMODE                ! Pixel unwrapping mode
 
-      INTEGER UBND(2)
-      INTEGER LBND(2)
       INTEGER GRPNTR
       INTEGER GRNDF
 
@@ -317,6 +319,8 @@
 *     Note that this model image must cover the full region covered
 *     by the data (although pixel scale is not important since I can read
 *     that from the header)
+*     It is possible that the model has been requested earlier so this
+*     parameter request will not actual result in a prompt.
 
       HAVE_MODEL = .FALSE.
       IF (STATUS .EQ. SAI__OK) THEN
@@ -349,6 +353,40 @@
 
             OUT_PIXEL = PIXELSZ / R2AS
 
+*     Get the size of the image and the indices of the reference pixel
+            CALL NDF_BOUND (IMNDF, 2, LBND, UBND, ITEMP, STATUS)
+            NX = UBND(1) - LBND(1) + 1
+            NY = UBND(2) - LBND(2) + 1
+
+            IF (ITEMP .NE. 2) THEN
+               IF (STATUS .EQ. SAI__OK) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL ERR_REP(' ','^TASK: Model image is not '//
+     :              '2-dimensional', STATUS)
+               END IF
+            END IF
+
+*     For new SURF tasks the reference pixel is defined by the
+*     pixel coordinate frame 0,0. For older SURF we can read the
+*     FITS header. The safest thing to do is to read the FITS
+*     header first and then try the pixel origin.
+
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL SCULIB_GET_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CRPIX1', ICEN, STATUS)
+               CALL SCULIB_GET_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'CRPIX2', JCEN, STATUS)
+
+*     Status bad - resort to calculating it from the bounds
+               IF (STATUS .NE. SAI__OK) THEN
+                  CALL ERR_ANNUL(STATUS)
+                  ICEN = 1 - LBND(1)
+                  JCEN = 1 - LBND(1)
+               END IF
+
+            END IF
+
 *     If a null is returned then assume that the user wants to
 *     derive the source signal in this routine
 *     Calculate ourselves
@@ -363,41 +401,16 @@
             
             OUT_PIXEL = (WAVELENGTH * 1.0E-6 / DIAMETER) / 4.0
 
-         END IF
-
-      END IF
-
 *     Now find out how big an output grid is needed
 
-      CALL SURFLIB_CALC_OUTPUT_GRID(N_FILES, N_PTS, OUT_PIXEL,
-     :     BOL_RA_PTR, BOL_DEC_PTR, NX, NY, ICEN, JCEN, STATUS)
-
-*     If we are reading in an image, compare grid size.
-*     Raise an error if they are different. (ie somebody rebinned
-*     a subset -- dont want to handle that possibility at the moment)
-*     Also dont check that reference pixel is correct
-
-      IF (HAVE_MODEL .AND. STATUS .EQ. SAI__OK) THEN
-         
-*     Get dims
-         CALL NDF_DIM(IMNDF, 2, DIMS, ITEMP, STATUS)
-
-         IF (ITEMP .NE. 2 .OR. DIMS(1) .NE. NX .OR. 
-     :        DIMS(2) .NE. NY) THEN
-
-            STATUS = SAI__ERROR
-            CALL MSG_SETI('DX', DIMS(1))
-            CALL MSG_SETI('DY', DIMS(2))
-            CALL MSG_SETI('NX', NX)
-            CALL MSG_SETI('NY', NY)
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP(' ','^TASK: Dims of input Image (^DX, ^DY) '//
-     :           'do not match calculated extent of data (^NX, ^NY)',
-     :           STATUS)
+            CALL SURFLIB_CALC_OUTPUT_GRID(N_FILES, N_PTS, OUT_PIXEL,
+     :        BOL_RA_PTR, BOL_DEC_PTR, NX, NY, ICEN, JCEN, STATUS)
 
          END IF
 
       END IF
+
+      PRINT *, 'grid ', nx, ny, icen, jcen
 
 
 *     The first run through simply stores an I,J for each of the TOT_PTS
