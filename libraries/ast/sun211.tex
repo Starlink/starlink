@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {211.4}
+\newcommand{\stardocnumber}    {211.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {15th June 1999}
+\newcommand{\stardocdate}      {16th September 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -25,7 +25,7 @@
 \newcommand{\stardoccopyright} {Copyright (C) 1999 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
-\newcommand{\stardocversion}   {V1.3}
+\newcommand{\stardocversion}   {V1.4}
 \newcommand{\stardocmanual}    {Programmer's Guide\\(C Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (C Version)}
 \newcommand{\stardocabstract}  {
@@ -266,10 +266,10 @@ environment-independent.
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -2774,7 +2774,7 @@ Strictly, there is a C pointer mis-match here, but it is ignored
 because the operation makes perfect sense to AST.
 
 {\bf{There is an important exception to this, however, in that
-constructor functions always return strongly-types pointers.}}  What
+constructor functions always return strongly-typed pointers.}}  What
 we mean by this is that the returned pointer is never implicitly cast
 to void$*$. You must therefore match pointer types when you initially
 create an Object using its constructor, such as in the following:
@@ -4520,7 +4520,7 @@ trace out a great circle.
 \subsection{\label{ss:framedomains}The Domain Attribute}
 
 The \htmlref{Domain}{Domain} attribute is one of the most important properties of a
-\htmlref{Frame}{Frame} although the concept it expresses can sometimes seem a little
+\htmlref{Frame}{Frame}, although the concept it expresses can sometimes seem a little
 subtle.  We will introduce it here, but its true value will probably
 not become apparent until later (\secref{ss:framesetconverting}).
 
@@ -8863,10 +8863,9 @@ essential.
 
 The first stage in creating an \htmlref{IntraMap}{IntraMap} is to write the coordinate
 transformation function. This should have a calling interface like the
-\htmlref{astTranP}{astTranP} function provided by AST ({\em{q.v.}}), except that the first
-parameter (the \htmlref{Mapping}{Mapping} pointer) is not required and should be
-omitted. Here is a simple example of a suitable transformation
-function which transforms coordinates by squaring them:
+\htmlref{astTranP}{astTranP} function provided by AST ({\em{q.v.}}). Here is a simple
+example of a suitable transformation function which transforms
+coordinates by squaring them:
 \xlabel{SqrTran}
 
 \begin{quote}
@@ -8875,8 +8874,9 @@ function which transforms coordinates by squaring them:
 #include "ast.h"
 #include <math.h>
 
-void SqrTran( int npoint, int ncoord_in, const double *ptr_in[],
-              int forward, int ncoord_out, double *ptr_out[] ) {
+void SqrTran( AstMapping *this, int npoint, int ncoord_in,
+              const double *ptr_in[], int forward, int ncoord_out,
+              double *ptr_out[] ) {
    int point, coord;
    double x;
 
@@ -8935,15 +8935,16 @@ must be available in every program which uses it.
 Generally, it is not a good idea to retain context information within
 a transformation function. That is, it should transform each set of
 coordinates as a single point and retain no memory of the points it
-has transformed before. Partly, this is in order to conform with the
-AST model of a Mapping, but you may also run into trouble if you use
-the same transformation function with several IntraMaps, since it will
-not be able to tell when you have swapped to use a different one.
+has transformed before. This is in order to conform with the AST model
+of a \htmlref{Mapping}{Mapping}.
 
 If an error occurs within a transformation function, it should use the
 \htmlref{astSetStatus}{astSetStatus} function (\secref{ss:errordetection}) to set the AST
 status to an error value before returning. This will alert AST to the
-error, causing it to abort the current operation.
+error, causing it to abort the current operation. The error value
+AST\_\_ITFER is available for this purpose, but other values may also
+be used ({\em{e.g.}}\ if you wish to distinguish different types of
+error).
 
 \subsection{\label{ss:registeringintramaps}Registering a Transformation Function}
 
@@ -8954,7 +8955,7 @@ is to register it with AST. Registration is performed using
 \begin{quote}
 \small
 \begin{verbatim}
-void SqrTran( int, int, const double *[], int, int, double *[] );
+void SqrTran( AstMapping *, int, int, const double *[], int, int, double *[] );
 
 const char *author, *contact, *purpose;
 
@@ -8962,7 +8963,7 @@ const char *author, *contact, *purpose;
 
 purpose = "Square each coordinate value";
 author =  "R.F. Warren-Smith & D.S. Berry";
-contact = "http://star-www.rl.ac.uk/cgi-bin/htxserver/sun211.htx/?xref_SqrTran";
+contact = "http://www.starlink.rl.ac.uk/cgi-bin/htxserver/sun211.htx/?xref_SqrTran";
 
 astIntraReg( "SqrTran", 2, 2, SqrTran, 0, purpose, author, contact );
 \end{verbatim}
@@ -9054,7 +9055,8 @@ numbers given when the transformation function was registered.
 
 The final argument is the usual attribute initialisation string. You
 may set attribute values for an IntraMap in exactly the same way as
-for any other \htmlref{Mapping}{Mapping} (\secref{ss:settingattributes}).
+for any other \htmlref{Mapping}{Mapping} (\secref{ss:settingattributes}, and also see
+\secref{ss:intraflag}).
 
 \subsection{\label{ss:restrictedintramaps}Restricted Implementations of Transformation Functions}
 
@@ -9066,8 +9068,9 @@ function. Consider the following, for example:
 \begin{quote}
 \small
 \begin{verbatim}
-void Poly3Tran( int npoint, int ncoord_in, const double *ptr_in[],
-                int forward, int ncoord_out, double *ptr_out[] ) {
+void Poly3Tran( AstMapping *this, int npoint, int ncoord_in,
+                const double *ptr_in[], int forward, int ncoord_out,
+                double *ptr_out[] ) {
    double x;
    int point;
 
@@ -9090,7 +9093,7 @@ indicated via the ``flags'' argument to \htmlref{astIntraReg}{astIntraReg}, as f
 \begin{quote}
 \small
 \begin{verbatim}
-void Poly3Tran( int, int, const double *[], int, int, double *[] );
+void Poly3Tran( AstMapping *, int, int, const double *[], int, int, double *[] );
 
 ...
 
@@ -9161,6 +9164,50 @@ important, it would be worth adding a check within the transformation
 function itself, so that the error would be detected when it came to
 be used.
 
+\subsection{\label{ss:intraflag}Adapting a Transformation Function to Individual IntraMaps}
+
+In the examples given so far, our coordinate transformation functions
+have not made use of the ``this'' pointer passed to them (which
+identifies the \htmlref{IntraMap}{IntraMap} whose transformation we are implementing). In
+practice, this will often be the case. However, the presence of the
+``this'' pointer allows the transformation function to invoke any
+other AST function on the IntraMap, and this permits enquiries about
+its attributes. The transformation function's behaviour can therefore
+be modified according to any attribute values which are set. This
+turns out to be a useful thing to do, so each IntraMap has a special
+\htmlref{IntraFlag}{IntraFlag} attribute reserved for exactly this purpose.
+
+Consider, for instance, the case where the transformation function has
+access to several alternative sets of internally-stored data which it
+may apply to perform its transformation. Rather than implement many
+different versions of the transformation function, you may switch
+between them by setting a value for the IntraFlag attribute when you
+create an instance of an IntraMap, for example:
+
+\begin{quote}
+\small
+\begin{verbatim}
+intramap1 = astIntraMap( "MyTran", 2, 2, "IntraFlag=A" );
+intramap2 = astIntraMap( "MyTran", 2, 2, "IntraFlag=B" );
+\end{verbatim}
+\normalsize
+\end{quote}
+
+The transformation function may then enquire the value of the IntraFlag
+attribute ({\em{e.g.}}\ using astGetC and passing it the ``this''
+pointer) and use whichever dataset is required for that particular
+IntraMap.
+
+This approach is particularly useful when the number of possible
+transformations is unbounded or not known in advance, in which case
+the IntraFlag attribute may be used to hold numerical values encoded
+as part of a character string (effectively using them as data for the
+IntraMap). It is also superior to the use of a global switch for
+communication ({\em{e.g.}}\ setting an index to select the ``current''
+data before using the IntraMap), because it continues to work when
+several IntraMaps are embedded within a more complex compound \htmlref{Mapping}{Mapping},
+when you may have no control over the order in which they are used.
+
 \subsection{\xlabel{MaxTran}\label{ss:simplifyingintramaps}Simplifying IntraMaps}
 
 A notable disadvantage of IntraMaps is that they are ``black boxes''
@@ -9189,8 +9236,9 @@ transformation function, for example:
 \begin{quote}
 \small
 \begin{verbatim}
-void MaxTran( int npoint, int ncoord_in, const double *ptr_in[],
-              int forward, int ncoord_out, double *ptr_out[] ) {
+void MaxTran( AstMapping *this, int npoint, int ncoord_in,
+              const double *ptr_in[], int forward, int ncoord_out,
+              double *ptr_out[] ) {
    double hi, x;
    int coord, point;
 
@@ -9243,7 +9291,7 @@ we might use:
 \begin{quote}
 \small
 \begin{verbatim}
-void MaxTran( int, int, const double *[], int, int, double *[] );
+void MaxTran( AstMapping *, int, int, const double *[], int, int, double *[] );
 
 ...
 
@@ -13026,9 +13074,9 @@ Object            - Base class for all AST Objects
    }
    \sstsynopsis{
       astIntraReg( const char $*$name, int nin, int nout,
-                   void ($*$ tran)( int, int, const double $*$[], int, int,
-                                  double $*$[] ), unsigned int flags,
-                   const char $*$purpose, const char $*$author,
+                   void ($*$ tran)( AstMapping $*$, int, int, const double $*$[],
+                                  int, int, double $*$[] ),
+                   unsigned int flags, const char $*$purpose, const char $*$author,
                    const char $*$contact )
    }
    \sstparameters{
@@ -13064,8 +13112,7 @@ Object            - Base class for all AST Objects
          Pointer to the transformation function to be registered.
          This function should perform whatever coordinate
          transformations are required and should have an interface
-         like \htmlref{astTranP}{astTranP}, except that the first parameter (the Mapping
-         pointer) is not required and should be omitted.
+         like \htmlref{astTranP}{astTranP} (q.v.).
       }
       \sstsubsection{
          flags
@@ -13107,14 +13154,14 @@ Object            - Base class for all AST Objects
 
          \sstitem
          Beware that an external representation of an IntraMap (created
+         by writing it to a Channel) will not include the coordinate
+         transformation function which it uses, so will only refer to the
+         function by its name (as assigned using astIntraReg).
          Consequently, the external representation cannot be utilised by
          another program unless that program has also registered the same
-         by writing it to a Channel) will not include the coordinate
-         function by its name (as assigned using astIntraReg).
+         transformation function with the same name using an identical
          invocation of astIntraReg. If no such registration has been
          performed, then attempting to read the external representation
-         transformation function which it uses, so will only refer to the
-         transformation function with the same name using an identical
          will result in an error.
 
          \sstitem
@@ -19293,6 +19340,48 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   IntraFlag\sstlabel{IntraFlag}
+}{
+   IntraMap identification string
+}{
+   \sstdescription{
+      This attribute allows an \htmlref{IntraMap}{IntraMap} to be flagged so that it is
+      distinguishable from other IntraMaps. The transformation function
+      associated with the IntraMap may then enquire the value of this
+      attribute and adapt the transformation it provides according to the
+      particular IntraMap involved.
+
+      Although this is a string attribute, it may often be useful to store
+      numerical values here, encoded as a character string, and to use these
+      as data within the transformation function. Note, however, that this
+      mechanism is not suitable for transferring large amounts of data (more
+      than about 1000 characters) to an IntraMap. For that purpose, global
+      variables are recommended, although the IntraFlag value can be used to
+      supplement this approach. The default IntraFlag value is an empty
+      string.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         IntraMap
+      }{
+         All IntraMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A pair of IntraMaps whose transformations may potentially cancel
+         cannot be simplified to produce a \htmlref{UnitMap}{UnitMap} (e.g. using \htmlref{astSimplify}{astSimplify})
+         unless they have the same IntraFlag values. The test for equality is
+         case-sensitive.
+      }
+   }
+}
+\sstroutine{
    Invert\sstlabel{Invert}
 }{
    Mapping inversion flag
@@ -21963,8 +22052,14 @@ Object            - Base class for all AST Objects
    \sstdiytopic{
       Attributes
    }{
-      The IntraMap class does not define any new attributes beyond
-      those which are applicable to all Mappings.
+      In addition to those attributes common to all Mappings, every
+      IntraMap also has the following attributes:
+
+      \sstitemlist{
+
+         \sstitem
+         \htmlref{IntraFlag}{IntraFlag}: IntraMap identification string
+      }
    }
    \sstdiytopic{
       Functions
@@ -23316,11 +23411,11 @@ to think that conversion between a \htmlref{CmpFrame}{CmpFrame} and another Fram
 possible when, in fact, it wasn't.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.3}
+\subsection{Changes Introduced in V1.3}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.2 and V1.3 (the
-current version):
+The following describes the most significant changes which occurred in
+the AST library between versions V1.2 and V1.3 (not the most recent
+version):
 
 \begin{enumerate}
 \item A new set of functions, \htmlref{astResample$<$X$>$}{astResampleX}, has been introduced to
@@ -23364,6 +23459,31 @@ compound Mappings, including fixes for several bugs which could cause
 indefinite looping or unwanted error messages.
 
 \item Some memory leaks have been fixed.
+
+\item A small number of documentation errors have been corrected.
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.4}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.3 and V1.4 (the
+current version):
+
+\begin{enumerate}
+\item {\bf{WARNING---INCOMPATIBLE CHANGE.}} Transformation functions
+used with the \htmlref{IntraMap}{IntraMap} class (see, for example, \htmlref{astIntraReg}{astIntraReg}) now
+require a ``this'' pointer as their first parameter. {\bf{Existing
+implementations will not continue to work correctly with this version
+of AST unless this parameter is added.}} There is no need for existing
+software to make use of this pointer, but it must be present.
+
+This change has been introduced so that transformation functions can gain
+access to IntraMap attributes.
+
+\item A new \htmlref{IntraFlag}{IntraFlag} attribute has been added to the IntraMap
+class. This allows the transformation functions used by IntraMaps to
+adapt to produce the required transformation on a per-IntraMap basis
+(\secref{ss:intraflag}).
 
 \item A small number of documentation errors have been corrected.
 \end{enumerate}

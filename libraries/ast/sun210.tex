@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {210.4}
+\newcommand{\stardocnumber}    {210.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {15th June 1999}
+\newcommand{\stardocdate}      {16th September 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -25,7 +25,7 @@
 \newcommand{\stardoccopyright} {Copyright (C) 1999 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
-\newcommand{\stardocversion}   {V1.3}
+\newcommand{\stardocversion}   {V1.4}
 \newcommand{\stardocmanual}    {Programmer's Guide\\(Fortran Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (Fortran Version)}
 \newcommand{\stardocabstract}  {
@@ -265,10 +265,10 @@ environment-independent.
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -4154,7 +4154,7 @@ great circle.
 \subsection{\label{ss:framedomains}The Domain Attribute}
 
 The \htmlref{Domain}{Domain} attribute is one of the most important properties of a
-\htmlref{Frame}{Frame} although the concept it expresses can sometimes seem a little
+\htmlref{Frame}{Frame}, although the concept it expresses can sometimes seem a little
 subtle.  We will introduce it here, but its true value will probably
 not become apparent until later (\secref{ss:framesetconverting}).
 
@@ -8428,17 +8428,16 @@ essential.
 
 The first stage in creating an \htmlref{IntraMap}{IntraMap} is to write the coordinate
 transformation routine. This should have a calling interface like the
-\htmlref{AST\_TRANN}{AST_TRANN} function provided by AST ({\em{q.v.}}), except that the
-first argument (the \htmlref{Mapping}{Mapping} pointer) is not required and should be
-omitted. Here is a simple example of a suitable transformation routine
-which transforms coordinates by squaring them:
+\htmlref{AST\_TRANN}{AST_TRANN} function provided by AST ({\em{q.v.}}). Here is a simple
+example of a suitable transformation routine which transforms
+coordinates by squaring them:
 \xlabel{SqrTran}
 
 \small
 \begin{verbatim}
-      SUBROUTINE SQRTRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
+      SUBROUTINE SQRTRAN( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
     :                     NCOORD_OUT, OUTDIM, OUT, STATUS )
-      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
+      INTEGER THIS, NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
       DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
       LOGICAL FORWARD
 
@@ -8508,14 +8507,16 @@ which uses it.
 Generally, it is not a good idea to retain context information within
 a transformation routine. That is, it should transform each set of
 coordinates as a single point and retain no memory of the points it
-has transformed before. Partly, this is in order to conform with the
-AST model of a Mapping, but you may also run into trouble if you use
-the same transformation routine with several IntraMaps, since it will
-not be able to tell when you have swapped to use a different one.
+has transformed before. This is in order to conform with the AST model
+of a \htmlref{Mapping}{Mapping}.
 
 If an error occurs within a transformation routine, it should set its
 STATUS argument to an error value before returning. This will alert
-AST to the error, causing it to abort the current operation.
+AST to the error, causing it to abort the current operation. The error
+value AST\_\_ITFER is available for this purpose, but other values may
+also be used ({\em{e.g.}}\ if you wish to distinguish different types
+of error). The AST\_\_ITFER error value is defined in the AST\_ERR
+include file.
 
 \subsection{\label{ss:registeringintramaps}Registering a Transformation Routine}
 
@@ -8533,7 +8534,7 @@ is to register it with AST. Registration is performed using
 
       PURPOSE = 'Square each coordinate value'
       AUTHOR  = 'R.F. Warren-Smith & D.S. Berry'
-      CONTACT = 'http://star-www.rl.ac.uk/cgi-bin/htxserver/' //
+      CONTACT = 'http://www.starlink.rl.ac.uk/cgi-bin/htxserver/' //
                 'sun210.htx/?xref_SqrTran'
 
       CALL AST_INTRAREG( 'SqrTran', 2, 2, SQRTRAN, 0,
@@ -8623,7 +8624,8 @@ numbers given when the transformation routine was registered.
 
 The penultimate argument is the usual attribute initialisation
 string. You may set attribute values for an IntraMap in exactly the
-same way as for any other \htmlref{Mapping}{Mapping} (\secref{ss:settingattributes}).
+same way as for any other \htmlref{Mapping}{Mapping} (\secref{ss:settingattributes}, and
+also see \secref{ss:intraflag}).
 
 \subsection{\label{ss:restrictedintramaps}Restricted Implementations of Transformation Routines}
 
@@ -8634,9 +8636,9 @@ the following, for example:
 
 \small
 \begin{verbatim}
-      SUBROUTINE POLY3TRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                      NCOORD_OUT, OUTDIM, OUT, STATUS
-      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS,
+      SUBROUTINE POLY3TRAN( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
+     :                      NCOORD_OUT, OUTDIM, OUT, STATUS )
+      INTEGER THIS, NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
       DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
       LOGICAL FORWARD
 
@@ -8729,6 +8731,48 @@ important, it would be worth adding a check within the transformation
 routine itself, so that the error would be detected when it came to be
 used.
 
+\subsection{\label{ss:intraflag}Adapting a Transformation Routine to Individual IntraMaps}
+
+In the examples given so far, our coordinate transformation routines
+have not made use of the THIS pointer passed to them (which identifies
+the \htmlref{IntraMap}{IntraMap} whose transformation we are implementing). In practice,
+this will often be the case. However, the presence of the THIS pointer
+allows the transformation routine to invoke any other AST routine on
+the IntraMap, and this permits enquiries about its attributes. The
+transformation routine's behaviour can therefore be modified according
+to any attribute values which are set. This turns out to be a useful
+thing to do, so each IntraMap has a special \htmlref{IntraFlag}{IntraFlag} attribute reserved
+for exactly this purpose.
+
+Consider, for instance, the case where the transformation routine has
+access to several alternative sets of internally-stored data which it
+may apply to perform its transformation. Rather than implement many
+different versions of the transformation routine, you may switch
+between them by setting a value for the IntraFlag attribute when you
+create an instance of an IntraMap, for example:
+
+\small
+\begin{verbatim}
+      INTRAMAP1 = AST_INTRAMAP( 'MyTran', 2, 2, 'IntraFlag=A', STATUS )
+      INTRAMAP2 = AST_INTRAMAP( 'MyTran', 2, 2, 'IntraFlag=B', STATUS )
+\end{verbatim}
+\normalsize
+
+The transformation routine may then enquire the value of the IntraFlag
+attribute ({\em{e.g.}}\ using AST\_GETC and passing it the THIS
+pointer) and use whichever dataset is required for that particular
+IntraMap.
+
+This approach is particularly useful when the number of possible
+transformations is unbounded or not known in advance, in which case
+the IntraFlag attribute may be used to hold numerical values encoded
+as part of a character string (effectively using them as data for the
+IntraMap). It is also superior to the use of a global switch for
+communication ({\em{e.g.}}\ setting an index to select the ``current''
+data before using the IntraMap), because it continues to work when
+several IntraMaps are embedded within a more complex compound \htmlref{Mapping}{Mapping},
+when you may have no control over the order in which they are used.
+
 \subsection{\xlabel{MaxTran}\label{ss:simplifyingintramaps}Simplifying IntraMaps}
 
 A notable disadvantage of IntraMaps is that they are ``black boxes''
@@ -8756,9 +8800,9 @@ transformation routine, for example:
 
 \small
 \begin{verbatim}
-      SUBROUTINE MAXTRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                     NCOORD_OUT, OUTDIM, OUT, STATUS )
-      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
+      SUBROUTINE MAXTRAN( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
+     :                    NCOORD_OUT, OUTDIM, OUT, STATUS )
+      INTEGER THIS, NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
       DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
       LOGICAL FORWARD
 
@@ -12720,9 +12764,7 @@ Object            - Base class for all AST Objects
       }{
          The transformation routine to be registered.  This routine
          should perform whatever coordinate transformations are
-         required and should have an interface like \htmlref{AST\_TRANN}{AST_TRANN}, except
-         that the first argument (the Mapping pointer) is not required
-         and should be omitted.
+         required and should have an interface like \htmlref{AST\_TRANN}{AST_TRANN} (q.v.).
 
          This transformation routine must also appear in an EXTERNAL
          statement in the routine which calls AST\_INTRAREG.
@@ -18722,6 +18764,48 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   IntraFlag\sstlabel{IntraFlag}
+}{
+   IntraMap identification string
+}{
+   \sstdescription{
+      This attribute allows an \htmlref{IntraMap}{IntraMap} to be flagged so that it is
+      distinguishable from other IntraMaps. The transformation routine
+      associated with the IntraMap may then enquire the value of this
+      attribute and adapt the transformation it provides according to the
+      particular IntraMap involved.
+
+      Although this is a string attribute, it may often be useful to store
+      numerical values here, encoded as a character string, and to use these
+      as data within the transformation routine. Note, however, that this
+      mechanism is not suitable for transferring large amounts of data (more
+      than about 1000 characters) to an IntraMap. For that purpose, global
+      variables are recommended, although the IntraFlag value can be used to
+      supplement this approach. The default IntraFlag value is an empty
+      string.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         IntraMap
+      }{
+         All IntraMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A pair of IntraMaps whose transformations may potentially cancel
+         cannot be simplified to produce a \htmlref{UnitMap}{UnitMap} (e.g. using \htmlref{AST\_SIMPLIFY}{AST_SIMPLIFY})
+         unless they have the same IntraFlag values. The test for equality is
+         case-sensitive.
+      }
+   }
+}
+\sstroutine{
    Invert\sstlabel{Invert}
 }{
    Mapping inversion flag
@@ -21392,8 +21476,14 @@ Object            - Base class for all AST Objects
    \sstdiytopic{
       Attributes
    }{
-      The IntraMap class does not define any new attributes beyond
-      those which are applicable to all Mappings.
+      In addition to those attributes common to all Mappings, every
+      IntraMap also has the following attributes:
+
+      \sstitemlist{
+
+         \sstitem
+         \htmlref{IntraFlag}{IntraFlag}: IntraMap identification string
+      }
    }
    \sstdiytopic{
       Functions
@@ -22740,11 +22830,11 @@ to think that conversion between a \htmlref{CmpFrame}{CmpFrame} and another Fram
 possible when, in fact, it wasn't.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.3}
+\subsection{Changes Introduced in V1.3}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.2 and V1.3 (the
-current version):
+The following describes the most significant changes which occurred in
+the AST library between versions V1.2 and V1.3 (not the most recent
+version):
 
 \begin{enumerate}
 \item A new set of functions, \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX}, has been introduced to
@@ -22788,6 +22878,31 @@ compound Mappings, including fixes for several bugs which could cause
 indefinite looping or unwanted error messages.
 
 \item Some memory leaks have been fixed.
+
+\item A small number of documentation errors have been corrected.
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.4}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.3 and V1.4 (the
+current version):
+
+\begin{enumerate}
+\item {\bf{WARNING---INCOMPATIBLE CHANGE.}} Transformation routines
+used with the \htmlref{IntraMap}{IntraMap} class (see, for example, \htmlref{AST\_INTRAREG}{AST_INTRAREG}) now
+require a THIS pointer as their first argument. {\bf{Existing
+implementations will not continue to work correctly with this version
+of AST unless this argument is added.}} There is no need for existing
+software to make use of this pointer, but it must be present.
+
+This change has been introduced so that transformation functions can gain
+access to IntraMap attributes.
+
+\item A new \htmlref{IntraFlag}{IntraFlag} attribute has been added to the IntraMap
+class. This allows the transformation routines used by IntraMaps to
+adapt to produce the required transformation on a per-IntraMap basis
+(\secref{ss:intraflag}).
 
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
