@@ -56,7 +56,7 @@
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'THAW Version 2.1-0')
+	PARAMETER		(VERSION = 'THAW Version 2.1-0b')
 *-
 
 * Version not announced (neater)

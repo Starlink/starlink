@@ -156,7 +156,7 @@
 	PARAMETER 		( DEFAULT = 1000 )	! default number of energy channels
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SFLUX Version 2.1-0' )
+        PARAMETER		( VERSION = 'SFLUX Version 2.1-0b' )
 
 *  Local Variables:
       RECORD /MODEL_SPEC/ MODEL      	! model specification

@@ -143,7 +143,7 @@
         PARAMETER               ( MAXHTEXT = 8 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'CORRECT Version 2.1-0' )
+        PARAMETER		( VERSION = 'CORRECT Version 2.1-0b' )
 
 *  Local Variables:
       CHARACTER*80		HTXT(MAXHTEXT)		! History text

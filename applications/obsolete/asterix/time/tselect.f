@@ -26,7 +26,7 @@
       LOGICAL LEFT,RIGHT
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TSELECT Version 2.1-0')
+      PARAMETER (VERSION = 'TSELECT Version 2.1-0b')
 *-
       CALL MSG_PRNT(VERSION)
 

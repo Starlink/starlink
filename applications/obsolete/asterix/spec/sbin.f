@@ -122,7 +122,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SBIN Version 2.1-0' )
+        PARAMETER		( VERSION = 'SBIN Version 2.1-0b' )
 
 *  Local Variables:
       REAL 			SUM			! Data sum

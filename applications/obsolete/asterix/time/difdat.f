@@ -73,7 +73,7 @@
 
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER  (VERSION='DIFDAT Version 2.1-0')
+	PARAMETER  (VERSION='DIFDAT Version 2.1-0b')
 *-
 
 *  Version

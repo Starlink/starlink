@@ -96,7 +96,7 @@
 *    Version id :
 *
       CHARACTER*21		VERSION
-        PARAMETER           	( VERSION = 'SINFIT Version 2.1-0' )
+        PARAMETER           	( VERSION = 'SINFIT Version 2.1-0b' )
 *-
 
 *  Check status.

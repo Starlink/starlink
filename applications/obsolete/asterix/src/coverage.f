@@ -114,7 +114,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'COVERAGE Version 2.1-0' )
+        PARAMETER		( VERSION = 'COVERAGE Version 2.1-0b' )
 
 *  Local Variables:
       REAL                      DMAX, DMIN              ! Range in data

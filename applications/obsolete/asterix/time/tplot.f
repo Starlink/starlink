@@ -21,7 +21,7 @@
 *    Local variables :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TPLOT Version 2.1-0')
+      PARAMETER (VERSION = 'TPLOT Version 2.1-0b')
 *-
       CALL MSG_PRNT(VERSION)
 

@@ -88,7 +88,7 @@
 *
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TIMSIM Version 2.1-0')
+      PARAMETER (VERSION = 'TIMSIM Version 2.1-0b')
 *-
 
 *    Check status
