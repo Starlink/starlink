@@ -5862,8 +5862,8 @@ f     only in the Fortran interface to AST).
 *     those which attempt to preserve sharp features. The latter will
 *     often tend to introduce unwanted oscillations, typically visible
 *     as "ringing" around sharp features and edges, especially if the
-*     data are under-sampled (i.e. the sharpest features are less than
-*     about two pixels across). In practice, a good interpolation
+*     data are under-sampled (i.e. if the sharpest features are less
+*     than about two pixels across). In practice, a good interpolation
 *     scheme is likely to be a compromise and may exhibit some aspects
 *     of both these features.
 *
