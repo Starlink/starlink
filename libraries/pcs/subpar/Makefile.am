@@ -1,27 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = subpar_link_adam
+dist_bin_SCRIPTS = subpar_link_adam
 
-## List headers which are to be installed -- these are built first if necessary
-##
-# Note that we are also installing the PRIVATE_INCLUDES (so they're
-# not really private after all).  This is because other library
-# components in the PCS group need to refer to these files, in order to
-# coordinate their definitions with SUBPAR.  In the previous build
-# system this was done by copying or linking files between different
-# parts of the build tree, but this seems fragile.  Instead, have this
-# file install these `private' includes along with the `public' ones,
-# and add prominent notes to the `private' ones to warn users away
-# from including them directly.
-#
-# An alternative is to install them somewhere special, but that's
-# significant added complication to deal with a problem that's
-# unlikely to be severe anyway.
-include_HEADERS = $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES)
+include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = SUBPAR_ERR subpar_err.h
 
-lib_LTLIBRARIES = libsubpar_adam.la
-libsubpar_adam_la_SOURCES =	\
+noinst_LTLIBRARIES = libsubpar_convenience.la
+libsubpar_convenience_la_SOURCES =	\
 	$(F_ROUTINES)		\
 	$(FPP_ROUTINES)		\
 	$(C_ROUTINES)		\
@@ -217,7 +202,9 @@ C_ROUTINES = sup_admus.c \
              sup_mkdir.c \
              sup_trmsz.c
 
+# SUBPAR_{CMN,PARERR,SYS} are private to subpar, but they're used additionally
+# by parsecon, dtask and task, by adding a -I../subpar.
 PUBLIC_INCLUDES = SUBPAR_PAR
-PRIVATE_INCLUDES = SUBPAR_CMN SUBPAR_SYS SUBPAR_PARERR
+PRIVATE_INCLUDES = SUBPAR_CMN SUBPAR_PARERR SUBPAR_SYS
 
 BUILT_SOURCES = $(include_MESSAGES)
