@@ -55,10 +55,6 @@ Description:
    an overlapping region which you wish to align, and click the
    "Use this pair" button.  The aligner window will then appear,
    displaying the two images which you have selected.
-   The images will appear in their correct orientation in the chooser
-   window, but each is scaled to fill half of the panel, so if
-   they are a different shapes or sizes from each other then
-   the scales may not match.
 
    In the aligner window you can drag either of these images around
    the display region by holding down mouse button 1 (usually the
@@ -68,16 +64,33 @@ Description:
    their pixels will be averaged.  If they are not correctly
    positioned, you can move them again.  Once you are happy that
    they are aligned about right, then click in the overlap region
-   to mark features which appear in both images - these will be
-   centroided to get an accurate alignment.  During this
+   to mark features which appear in both images.  During this
    part you mark points by clicking with mouse button 1 (usually
    the left one) and you can remove them by clicking with button 3
-   (usually the right one).  The window can be resized, the
-   magnification can be changed using the "Zoom" control, and the
-   display region scrolled using the scrollbars.  When you have aligned
-   the images and marked shared features, or if you decide that
-   the pair cannot be satisfactorily registered, click the "Done"
-   button.
+   (usually the right one).
+
+   When you add a point by clicking it will be centroided on both
+   images, and two markers plotted, one for each centroided position.
+   If a centroidable object near that point cannot be identified
+   on both images the program will not allow you to mark a point
+   there.  However, note that the centroiding algorithm is
+   capable of locating spurious objects from noise, so the fact
+   that a point can be marked does not indicate that a real
+   feature exists on both images.  By looking at the two markers
+   it should be possible to see whether a real feature has been
+   located.  Though the two markers do not need to be exactly
+   concentric (REGISTER can take care of that later), the offset
+   between them should be similar to that of other marked objects
+   nearby in the overlap region.  If you do not think the same
+   object has been identified in both images, you should remove
+   this point (with mouse button 3).
+
+   The aligner window can be resized, the magnification changed
+   using the "Zoom" control, the display region scrolled using
+   the scrollbars, and the shape and colour of the point markers
+   selected.  When you have aligned the images and marked shared
+   features, or if you decide that the pair cannot be satisfactorily
+   registered, click the "Done" button.
 
    You will then be returned to the chooser window to select another
    pair and repeat the process.  After the first time however,
