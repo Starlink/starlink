@@ -863,6 +863,13 @@ do_test:
         echo " " && \
         $(INSTALL_BIN)/scbindex.pl scb_test.tar && \
         echo " " && \
+        echo "scbcp.pl: Copy indices to new directory" && \
+        mkdir $$SCB_INDEX/junk && \
+        $(INSTALL_BIN)/scbcp.pl $$SCB_INDEX $$SCB_INDEX/junk && \
+        echo " " && \
+        echo "dbmcat.pl: Print index file contents" && \
+        $(INSTALL_BIN)/dbmcat.pl $$SCB_INDEX/junk/func && \
+        echo " " && \
         echo "scb.pl:  Extracting test files" && \
         echo " " && \
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw_  type=func >/dev/null && \
