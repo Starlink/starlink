@@ -278,31 +278,44 @@
 
             TOT_PTS = (INT_NEXT - INT_START) * N_BOLS(NMAP)
 
+*     Check that this number is valid (ie greater than MIN__NPTS)
+
+            IF (TOT_PTS .GE. MIN__NPTS) THEN
+
 *     Allocate workspace for good data
 
-            CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_DATA_PTR, 
-     :           GOOD_DATA_END, STATUS)
-            CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_VAR_PTR, 
-     :           GOOD_VAR_END, STATUS)
-            CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_X_PTR, 
-     :           GOOD_X_END, STATUS)
-            CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_Y_PTR, 
-     :           GOOD_Y_END, STATUS)
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_DATA_PTR, 
+     :              GOOD_DATA_END, STATUS)
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_VAR_PTR, 
+     :              GOOD_VAR_END, STATUS)
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_X_PTR, 
+     :              GOOD_X_END, STATUS)
+               CALL SCULIB_MALLOC(VAL__NBR * TOT_PTS, GOOD_Y_PTR, 
+     :              GOOD_Y_END, STATUS)
 
 *     Copy all data for this integration to a work array as long as
 *     the data are GOOD since the interpolation routine does not 
 *     understand VAL__BADR.
 *     Note that the XY data are no longer DOUBLE on return.
 
-            DATA_OFFSET = (INT_START - 1) * N_BOLS(NMAP)
+               DATA_OFFSET = (INT_START - 1) * N_BOLS(NMAP)
+               
+               CALL SCULIB_COPY_GOOD(TOT_PTS, %VAL(DATA_PTR(NMAP) + 
+     :              DATA_OFFSET * VAL__NBR), 
+     :              %VAL(VAR_PTR(NMAP) + DATA_OFFSET * VAL__NBR),
+     :              %VAL(XPOS_PTR(NMAP) + DATA_OFFSET * VAL__NBD),
+     :              %VAL(YPOS_PTR(NMAP) + DATA_OFFSET * VAL__NBD),NGOOD,
+     :              %VAL(GOOD_DATA_PTR), %VAL(GOOD_VAR_PTR), 
+     :              %VAL(GOOD_X_PTR), %VAL(GOOD_Y_PTR), STATUS)
+               
+            ELSE
+               
+*     Set NGOOD to zero so that the following logic can take
+*     care of deciding whether we wish to proceed with the regrid.
+*     This will stop the IF..THEN nesting getting out of hand.
+               NGOOD = 0
 
-            CALL SCULIB_COPY_GOOD(TOT_PTS, %VAL(DATA_PTR(NMAP) + 
-     :           DATA_OFFSET * VAL__NBR), 
-     :           %VAL(VAR_PTR(NMAP) + DATA_OFFSET * VAL__NBR),
-     :           %VAL(XPOS_PTR(NMAP) + DATA_OFFSET * VAL__NBD),
-     :           %VAL(YPOS_PTR(NMAP) + DATA_OFFSET * VAL__NBD), NGOOD,
-     :           %VAL(GOOD_DATA_PTR), %VAL(GOOD_VAR_PTR), 
-     :           %VAL(GOOD_X_PTR), %VAL(GOOD_Y_PTR), STATUS)
+            END IF
 
 *     If there are too few points left after removing bad we need to
 *     stop processing this particular integration
