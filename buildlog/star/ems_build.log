@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e build
+make: *** Warning: File `makefile' has modification time in the future (2003-05-01 11:11:23 > 2002-10-10 04:00:33.510225)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/ems'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-05-01 11:11:23 > 2002-10-10 04:00:33.518519)
 tar -xf ems_source.tar ems_link
 tar -xf ems_source.tar ems_link_adam
 tar -xf ems_source.tar ems.h
@@ -35,6 +37,7 @@ tar -xf ems_source.tar emsRenew.c
 tar -xf ems_source.tar ems_toktb.h
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c emsRenew.c
 tar -xf ems_source.tar emsRep.c
+tar: emsRep.c: time stamp 2003-03-05 14:51:42 is 12657068 s in the future
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c emsRep.c
 tar -xf ems_source.tar emsRlse.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c emsRlse.c
@@ -93,6 +96,7 @@ gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Putc.c
 tar -xf ems_source.tar ems1Rform.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Rform.c
 tar -xf ems_source.tar ems1Serr.c
+tar: ems1Serr.c: time stamp 2003-04-30 17:22:55 is 17500940 s in the future
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Serr.c
 tar -xf ems_source.tar ems1Starf.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems1Starf.c
@@ -127,6 +131,7 @@ gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems_rep.c
 tar -xf ems_source.tar ems_rlse.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems_rlse.c
 tar -xf ems_source.tar ems_setc.c
+tar: ems_setc.c: time stamp 2003-01-02 15:21:34 is 7302058 s in the future
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems_setc.c
 tar -xf ems_source.tar ems_setd.c
 gcc -I/apps/cvsbuild/star/include -I/apps/cvsbuild/star/include -O -c ems_setd.c
@@ -153,7 +158,9 @@ touch libemsf.so
 f() { ld -shared -soname $1 -o $1 $2;}; f libemsf.so 'ems_annul.o ems_begin.o ems_eload.o ems_end.o ems_expnd.o ems_facer.o ems_level.o ems_mark.o ems_mload.o ems_renew.o ems_rep.o ems_rlse.o ems_setc.o ems_setd.o ems_seti.o ems_setl.o ems_setr.o ems_stat.o ems_syser.o ems_tune.o  ems_fioer.o' '-L/apps/cvsbuild/star/lib'
 tar -xf ems_source.tar ems_dev
 tar -xf ems_source.tar fac_104_err
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/ems'
 
 *** The EMS package has been built
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

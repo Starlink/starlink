@@ -1,9 +1,12 @@
 mk: Environment variables defined for ix86_Linux system
 make -e build
+make: *** Warning: File `makefile' has modification time in the future (2003-04-14 16:34:01 > 2002-10-10 04:00:38.999361)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/psx'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-04-14 16:34:01 > 2002-10-10 04:00:39.006213)
 tar -xf psx_source.tar psx_link
 tar -xf psx_source.tar psx_link_adam
 tar -xf psx_source.tar psx_err
+tar: psx_err: time stamp 2003-04-14 16:42:06 is 16116087 s in the future
 tar -xf psx_source.tar psx1_init_rtl.c
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx1_init_rtl.c
 tar -xf psx_source.tar psx1_rep_c.c
@@ -12,11 +15,13 @@ tar -xf psx_source.tar psx_asctime.c
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_asctime.c
 tar -xf psx_source.tar psx_calloc.c
 tar -xf psx_source.tar psx_err.h
+tar: psx_err.h: time stamp 2003-04-14 16:42:09 is 16116090 s in the future
 tar -xf psx_source.tar psx1.h
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_calloc.c
 tar -xf psx_source.tar psx_ctime.c
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_ctime.c
 tar -xf psx_source.tar psx_cuserid.c
+tar: psx_cuserid.c: time stamp 2003-04-14 16:35:58 is 16115719 s in the future
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_cuserid.c
 tar -xf psx_source.tar psx_free.c
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_free.c
@@ -43,6 +48,7 @@ gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_local
 tar -xf psx_source.tar psx_malloc.c
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_malloc.c
 tar -xf psx_source.tar psx_putenv.c
+tar: psx_putenv.c: time stamp 2003-04-14 16:32:40 is 16115521 s in the future
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_putenv.c
 tar -xf psx_source.tar psx_rand.c
 gcc -I/apps/cvsbuild/star/include -D_needs_cuserid -DHAVE_SETENV -O -c psx_rand.c
@@ -62,7 +68,10 @@ touch libpsx.so
 f() { ld -shared -soname $1 -o $1 $2;}; f libpsx.so '   psx1_init_rtl.o psx1_rep_c.o psx_asctime.o psx_calloc.o psx_ctime.o psx_cuserid.o psx_free.o psx_getegid.o psx_getenv.o psx_geteuid.o psx_getgid.o psx_getpid.o psx_getppid.o psx_getuid.o psx_gmtime.o psx_isatty.o psx_localtime.o psx_malloc.o psx_putenv.o psx_rand.o psx_realloc.o psx_srand.o psx_time.o psx_ttyname.o psx_uname.o' '-L/apps/cvsbuild/star/lib -lems'
 tar -xf psx_source.tar psx_dev
 tar -xf psx_source.tar fac_1510_err
+tar: fac_1510_err: time stamp 2003-04-14 16:42:00 is 16116080 s in the future
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/psx'
 
 *** The PSX package has been built
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

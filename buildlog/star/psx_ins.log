@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e install
+make: *** Warning: File `makefile' has modification time in the future (2003-04-14 16:34:01 > 2002-10-10 04:00:40.156081)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/psx'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-04-14 16:34:01 > 2002-10-10 04:00:40.164701)
 for f in psx_link psx_link_adam ""; do \
            if test -n "$f"; then \
               cp -p $f /apps/cvsbuild/star/bin;\
@@ -65,6 +67,95 @@ if test -n "sun121.htx"; then \
            export HTX_PATH;\
            /apps/cvsbuild/star/bin/hlink /apps/cvsbuild/star/docs /apps/cvsbuild/star/help;\
         fi;
+tar: sun121.htx/TMP: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/WARNINGS: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/sun121.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node1.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node2.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node3.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node4.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node5.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node6.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node7.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node8.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node9.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node10.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node11.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node12.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node13.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node14.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node15.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node16.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node17.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node18.html: time stamp 2003-04-11 14:48:22 is 15850062 s in the future
+tar: sun121.htx/node19.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node20.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node21.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node22.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node23.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node24.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node25.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node26.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node27.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node28.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node29.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node30.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node31.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node32.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node33.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node34.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node35.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node36.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node37.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node38.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node39.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node40.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node41.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node42.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node43.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node44.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node45.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node46.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node47.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node48.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node49.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/node50.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/cross_ref_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/up_motif_gr.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/up_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/next_motif_gr.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/previous_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/previous_motif_gr.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/next_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/internals.pl: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/labels.pl: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/sun121.css: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/blueball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/change_begin.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/change_begin_right.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/change_delete.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/change_delete_right.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/change_end.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/change_end_right.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/contents_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/contents.xbm: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/foot_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/greenball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/icons.html: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/image.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/index_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/invis_anchor.xbm: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/next_group_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/next_group_motif_gr.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/orangeball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/pinkball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/purpleball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/previous_group_motif.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/previous_group_motif_gr.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/redball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/whiteball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx/yellowball.gif: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
+tar: sun121.htx: time stamp 2003-04-11 14:48:23 is 15850063 s in the future
 Updating index file for document: sun121
 2 hypertext documents need re-linking
    updating cross-references in document sun121 (6 files to modify)...
@@ -78,7 +169,9 @@ chmod 444 /apps/cvsbuild/star/dates/psx_datestamp
 chmod 644 psx_datestamp
 rm psx_datestamp
 ln -s /apps/cvsbuild/star/dates/psx_datestamp psx_datestamp
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/psx'
 
 *** The PSX package has been installed in directory /apps/cvsbuild/star
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e install
+make: *** Warning: File `makefile' has modification time in the future (2003-05-01 11:11:23 > 2002-10-10 04:00:37.241432)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/ems'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-05-01 11:11:23 > 2002-10-10 04:00:37.251839)
 for f in ems_link ems_link_adam ""; do \
            if test -n "$f"; then \
               cp -p $f /apps/cvsbuild/star/bin;\
@@ -77,7 +79,9 @@ chmod 444 /apps/cvsbuild/star/dates/ems_datestamp
 chmod 644 ems_datestamp
 rm ems_datestamp
 ln -s /apps/cvsbuild/star/dates/ems_datestamp ems_datestamp
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/ems'
 
 *** The EMS package has been installed in directory /apps/cvsbuild/star
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

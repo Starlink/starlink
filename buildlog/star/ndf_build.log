@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e build
+make: *** Warning: File `makefile' has modification time in the future (2002-11-29 14:28:02 > 2002-10-10 04:04:20.479732)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/ndf'
+make[1]: *** Warning: File `makefile' has modification time in the future (2002-11-29 14:28:02 > 2002-10-10 04:04:20.506647)
 tar -xf ndf_source.tar ndf_link
 tar -xf ndf_source.tar ndf_link_adam
 tar -xf ndf_source.tar ndf_err
@@ -981,7 +983,9 @@ f() { ld -shared -soname $1 -o $1 $2;}; f libndf_adam.so \
                           -lerr_adam -lems -lchr -lprm'
 tar -xf ndf_source.tar ndf_dev
 tar -xf ndf_source.tar fac_1506_err
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/ndf'
 
 *** The NDF package has been built
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e install
+make: *** Warning: File `makefile' has modification time in the future (2003-07-22 15:33:52 > 2002-10-10 04:00:06.747013)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/htx'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-07-22 15:33:52 > 2002-10-10 04:00:06.754888)
 mkdir -p /apps/cvsbuild/star/bin ; chmod 755 /apps/cvsbuild/star/bin
 mkdir -p /apps/cvsbuild/star/bin/htx-scripts ; chmod 755 /apps/cvsbuild/star/bin/htx-scripts
 mkdir -p /apps/cvsbuild/star/dates ; chmod 755 /apps/cvsbuild/star/dates
@@ -64,7 +66,9 @@ chmod 444 /apps/cvsbuild/star/dates/htx_datestamp
 chmod 644 htx_datestamp
 rm htx_datestamp
 ln -s /apps/cvsbuild/star/dates/htx_datestamp htx_datestamp
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/htx'
 
 *** The HTX package has been installed in directory /apps/cvsbuild/star
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

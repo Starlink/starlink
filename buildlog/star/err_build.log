@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e build
+make: *** Warning: File `makefile' has modification time in the future (2003-01-06 17:41:36 > 2002-10-10 04:02:10.327398)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/err'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-01-06 17:41:36 > 2002-10-10 04:02:10.340155)
 tar -xf err_source.tar err_link
 tar -xf err_source.tar err_link_adam
 tar -xf err_source.tar err_err
@@ -147,6 +149,7 @@ g77 -fno-second-underscore -O -c msg1_genv_adam.f
 tar -xf err_source.tar msg1_gkey_adam.f
 g77 -fno-second-underscore -O -c msg1_gkey_adam.f
 tar -xf err_source.tar msg1_gref_adam.f
+tar: msg1_gref_adam.f: time stamp 2003-01-06 17:32:55 is 7655443 s in the future
 g77 -fno-second-underscore -O -c msg1_gref_adam.f
 tar -xf err_source.tar msg1_print_adam.f
 g77 -fno-second-underscore -O -c msg1_print_adam.f
@@ -169,7 +172,9 @@ f() { ld -shared -soname $1 -o $1 $2;}; f liberr_adam.so 'err1_prerr_adam.o err_
 tar -xf err_source.tar err_dev
 tar -xf err_source.tar fac_102_err
 tar -xf err_source.tar fac_103_err
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/err'
 
 *** The MERS package has been built
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

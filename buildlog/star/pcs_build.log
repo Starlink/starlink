@@ -1,22 +1,28 @@
 mk: Environment variables defined for ix86_Linux system
 make -e build
+make: *** Warning: File `makefile' has modification time in the future (2003-07-17 10:08:28 > 2002-10-10 04:01:33.16888)
 cd lex; ./mk build
 mk: Environment variables defined for ix86_Linux system
 make -e build
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-04-17 10:54:06 > 2002-10-10 04:01:33.196254)
 make[2]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
+make[2]: *** Warning: File `makefile' has modification time in the future (2003-04-17 10:54:06 > 2002-10-10 04:01:33.20233)
 tar -xf lex_source.tar lex_link_adam
 tar -xf lex_source.tar lex_err
 tar -xf lex_source.tar lex_par
+tar: lex_par: time stamp 2003-01-06 10:56:32 is 7631699 s in the future
 tar -xf lex_source.tar lex_cmdline.f
 ln -fs /apps/cvsbuild/star/include/sae_par SAE_PAR
 g77 -fno-second-underscore -O -fPIC -c lex_cmdline.f
 tar -xf lex_source.tar lex_cmdset.f
+tar: lex_cmdset.f: time stamp 2003-01-06 10:56:42 is 7631709 s in the future
 ln -fs lex_par LEX_PAR
 g77 -fno-second-underscore -O -fPIC -c lex_cmdset.f
 tar -xf lex_source.tar lex_init.f
 g77 -fno-second-underscore -O -fPIC -c lex_init.f
 tar -xf lex_source.tar lex_parse.f
+tar: lex_parse.f: time stamp 2003-04-17 10:53:50 is 16354337 s in the future
 ln -fs lex_err LEX_ERR
 g77 -fno-second-underscore -O -fPIC -c lex_parse.f
 tar -xf lex_source.tar lex_set.f
@@ -27,10 +33,12 @@ touch liblex_adam.so
 f() { ld -shared -soname $1 -o $1 $2;}; f liblex_adam.so ' lex_cmdline.o lex_cmdset.o lex_init.o lex_parse.o lex_set.o  ' \
           '-L/apps/cvsbuild/star/lib -L/apps/cvsbuild/star/lib `./lex_link_adam`'
 tar -xf lex_source.tar lex_dev
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
 make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
 
 *** The LEX package has been built
 
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
 cd string; ./mk build
 mk: Environment variables defined for ix86_Linux system
@@ -210,7 +218,9 @@ cd subpar; ./mk build
 mk: Environment variables defined for ix86_Linux system
 make -e build
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-01-06 10:16:33 > 2002-10-10 04:01:36.854915)
 make[2]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
+make[2]: *** Warning: File `makefile' has modification time in the future (2003-01-06 10:16:33 > 2002-10-10 04:01:36.873975)
 tar -xf subpar_source.tar subpar_link_adam
 tar -xf subpar_source.tar subpar_err
 tar -xf subpar_source.tar subpar_par
@@ -393,6 +403,7 @@ g77 -fno-second-underscore -O -fPIC -c sup_getvr.f
 tar -xf subpar_source.tar sup_getvl.f
 g77 -fno-second-underscore -O -fPIC -c sup_getvl.f
 tar -xf subpar_source.tar sup_gref.f
+tar: sup_gref.f: time stamp 2003-01-06 10:09:35 is 7628874 s in the future
 g77 -fno-second-underscore -O -fPIC -c sup_gref.f
 tar -xf subpar_source.tar sup_hdsarr.f
 g77 -fno-second-underscore -O -fPIC -c sup_hdsarr.f
@@ -617,10 +628,12 @@ touch libsubpar_adam.so
 f() { ld -shared -soname $1 -o $1 $2;}; f libsubpar_adam.so ' sup_accpt.o sup_accpt1.o sup_actdcl.o sup_activ.o sup_actname.o sup_array.o sup_assoc.o sup_bascopy.o sup_cancl.o sup_canloc.o sup_checkname.o sup_cmdline.o sup_cmdpar.o sup_convals.o sup_creat.o sup_credyn.o sup_crint.o sup_ctype.o sup_curloc.o sup_curname.o sup_cursav.o sup_curval.o sup_deact.o sup_def0c.o sup_def0d.o sup_def0i.o sup_def0l.o sup_def0r.o sup_def1c.o sup_def1d.o sup_def1i.o sup_def1l.o sup_def1r.o sup_defnc.o sup_defnd.o sup_defni.o sup_defnl.o sup_defnr.o sup_datdef.o sup_datfind.o sup_delet.o sup_eflsh.o sup_enquote.o sup_exhandler.o sup_exist.o sup_fetchc.o sup_fetchd.o sup_fetchi.o sup_fetchl.o sup_fetchr.o sup_findact.o sup_findhds.o sup_findkey.o sup_findpar.o sup_fprompt.o sup_get.o sup_get0c.o sup_get0d.o sup_get0i.o sup_get0l.o sup_get0r.o sup_get1c.o sup_get1d.o sup_get1i.o sup_get1r.o sup_get1l.o sup_getfloc.o sup_gethds.o sup_getkey.o sup_getloc.o sup_getnc.o sup_getnd.o sup_getni.o sup_getnr.o sup_getnl.o sup_getname.o sup_getvc.o sup_getvd.o sup_getvi.o sup_getvr.o sup_getvl.o sup_gref.o sup_hdsarr.o sup_hdsass.o sup_hdsdef.o sup_hdsdyn.o sup_hdsin.o sup_hdslocs.o sup_hdsopen.o sup_hlpex.o sup_index.o sup_init.o sup_input.o sup_intloc.o sup_iput.o sup_keyreq.o sup_ldifc0.o sup_ldifc1.o sup_limitc.o sup_limitd.o sup_limiti.o sup_limitr.o sup_loadifc.o sup_maxc.o sup_maxd.o sup_maxi.o sup_maxr.o sup_minc.o sup_mind.o sup_mini.o sup_minr.o sup_mlith.o sup_mnmx.o sup_nameass.o sup_nametr.o sup_openifc.o sup_oput.o sup_pargp.o sup_parname.o sup_partype.o sup_promptcl.o sup_promt.o sup_put.o sup_put0c.o sup_put0d.o sup_put0i.o sup_put0l.o sup_put0r.o sup_put1c.o sup_put1d.o sup_put1i.o sup_put1r.o sup_put1l.o sup_putfloc.o sup_putloc.o sup_putnc.o sup_putnd.o sup_putni.o sup_putnr.o sup_putnl.o sup_putname.o sup_putpath.o sup_putvc.o sup_putvd.o sup_putvi.o sup_putvr.o sup_putvl.o sup_pwhlp.o sup_rangec.o sup_ranged.o sup_rangei.o sup_ranger.o sup_rdif.o sup_request.o sup_reset.o sup_scrnsz.o sup_selhelp.o sup_setcheck.o sup_split.o sup_splitval.o sup_state.o sup_store0.o sup_sync.o sup_termface.o sup_unset.o sup_updat.o sup_valass.o sup_vwhlp.o sup_wrerr.o sup_write.o sup_wrmsg.o sup_dexit.o sup_fname.o sup_gtcmd.o sup_pfer.o sup_prompt.o sup_tsknm.o sup_unquote.o sup_wrhelp.o  sup_admus.o sup_fifil.o sup_mkdir.o sup_trmsz.o' '-L/apps/cvsbuild/star/lib -lems'
 tar -xf subpar_source.tar subpar_dev
 tar -xf subpar_source.tar fac_170_err
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
 make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
 
 *** The SUBPAR package has been built
 
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
 cd parsecon; ./mk build
 mk: Environment variables defined for ix86_Linux system
@@ -947,11 +960,13 @@ tar -xf dtask_source.tar dtask_dev
 tar -xf dtask_source.tar fac_120_err
 tar -xf dtask_source.tar fac_320_err
 tar -xf dtask_source.tar dtask_main.f
+make[2]: *** Warning: File `/apps/cvsbuild/star/include/psx_err' has modification time in the future (2003-04-14 16:42:06 > 2002-10-10 04:01:54.201603)
 ln -fs /apps/cvsbuild/star/include/psx_err PSX_ERR
 g77 -fno-second-underscore -O -fPIC -c -g dtask_main.f
 tar -xf dtask_source.tar dtask_main.txt
 tar -xf dtask_source.tar alink
 tar -xf dtask_source.tar ilink
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
 make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/dtask'
 
 *** The DTASK package has been built
@@ -1185,6 +1200,9 @@ make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/task'
 
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/task'
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-07-17 10:08:28 > 2002-10-10 04:01:57.216035)
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs'
 
 *** The PCS package has been built
+make: warning:  Clock skew detected.  Your build may be incomplete.

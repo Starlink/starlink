@@ -1,10 +1,13 @@
 mk: Environment variables defined for ix86_Linux system
 make -e install
+make: *** Warning: File `makefile' has modification time in the future (2003-07-17 10:08:28 > 2002-10-10 04:01:57.306382)
 cd lex; ./mk install
 mk: Environment variables defined for ix86_Linux system
 make -e install
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-04-17 10:54:06 > 2002-10-10 04:01:57.318297)
 make[2]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
+make[2]: *** Warning: File `makefile' has modification time in the future (2003-04-17 10:54:06 > 2002-10-10 04:01:57.326543)
 for f in lex_link_adam ""; do \
            if test -n "$f"; then \
               cp -p $f /apps/cvsbuild/star/bin;\
@@ -74,10 +77,12 @@ chmod 444 /apps/cvsbuild/star/dates/lex_datestamp
 chmod 644 lex_datestamp
 rm lex_datestamp
 ln -fs /apps/cvsbuild/star/dates/lex_datestamp lex_datestamp
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
 make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
 
 *** The LEX package has been installed in directory /apps/cvsbuild/star
 
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/lex'
 cd string; ./mk install
 mk: Environment variables defined for ix86_Linux system
@@ -636,7 +641,9 @@ cd subpar; ./mk install
 mk: Environment variables defined for ix86_Linux system
 make -e install
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-01-06 10:16:33 > 2002-10-10 04:01:57.908651)
 make[2]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
+make[2]: *** Warning: File `makefile' has modification time in the future (2003-01-06 10:16:33 > 2002-10-10 04:01:57.930155)
 for f in subpar_link_adam ""; do \
            if test -n "$f"; then \
               cp -p $f /apps/cvsbuild/star/bin;\
@@ -706,10 +713,12 @@ chmod 444 /apps/cvsbuild/star/dates/subpar_datestamp
 chmod 644 subpar_datestamp
 rm subpar_datestamp
 ln -fs /apps/cvsbuild/star/dates/subpar_datestamp subpar_datestamp
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
 make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
 
 *** The SUBPAR package has been installed in directory /apps/cvsbuild/star
 
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/subpar'
 cd parsecon; ./mk install
 mk: Environment variables defined for ix86_Linux system
@@ -1145,8 +1154,10 @@ make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/task'
 
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs/task'
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-07-17 10:08:28 > 2002-10-10 04:01:58.433487)
 make install_pcs
 make[2]: Entering directory `/apps/cvsbuild/BUILDTEST/pcs'
+make[2]: *** Warning: File `makefile' has modification time in the future (2003-07-17 10:08:28 > 2002-10-10 04:01:58.440153)
 for f in ssn29.tex ssn77.tex sun115.tex sun134.tex sun144.tex sun224.tex sun241.tex ""; do \
            if test -n "$f"; then \
               cp -p $f /apps/cvsbuild/star/docs;\
@@ -1209,8 +1220,11 @@ chmod 444 /apps/cvsbuild/star/dates/pcs_datestamp
 chmod 644 pcs_datestamp
 rm pcs_datestamp
 ln -s /apps/cvsbuild/star/dates/pcs_datestamp pcs_datestamp
+make[2]: warning:  Clock skew detected.  Your build may be incomplete.
 make[2]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs'
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/pcs'
 
 *** The PCS package has been installed in directory /apps/cvsbuild/star
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

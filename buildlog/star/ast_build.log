@@ -1,58 +1,101 @@
 mk: Environment variables defined for ix86_Linux system
 make -e build
+make: *** Warning: File `makefile' has modification time in the future (2003-05-08 16:19:01 > 2002-10-10 04:03:02.931048)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/ast'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-05-08 16:19:01 > 2002-10-10 04:03:02.942084)
 tar -xf ast_source.tar ast_dev
+tar: ast_dev: time stamp 2003-05-08 16:18:43 is 18188141 s in the future
 tar -xf ast_source.tar ast_link
+tar: ast_link: time stamp 2003-05-08 16:18:43 is 18188141 s in the future
 tar -xf ast_source.tar ast_link_adam
+tar: ast_link_adam: time stamp 2003-05-08 16:18:43 is 18188141 s in the future
 tar -xf ast_source.tar ast.h
+tar: ast.h: time stamp 2003-05-08 16:18:43 is 18188140 s in the future
 tar -xf ast_source.tar ast_err
+tar: ast_err: time stamp 2003-05-08 16:18:43 is 18188140 s in the future
 tar -xf ast_source.tar grf_par
+tar: grf_par: time stamp 2003-05-08 16:18:49 is 18188146 s in the future
 tar -xf ast_source.tar ast_par.source
+tar: ast_par.source: time stamp 2003-05-08 16:18:43 is 18188140 s in the future
 tar -xf ast_source.tar astbad.c
+tar: astbad.c: time stamp 2003-05-08 16:18:43 is 18188140 s in the future
 gcc -ansi -O2 -fPIC astbad.c -I. -o astbad
 sed -e 's/<AST__BAD>/'`./astbad | tr 'E' 'D'`'/' \
             ast_par.source >ast_par
 rm -f astbad
 tar -xf ast_source.tar axis.c
+tar: axis.c: time stamp 2003-05-08 16:18:43 is 18188140 s in the future
 tar -xf ast_source.tar ast_err.h
+tar: ast_err.h: time stamp 2003-05-08 16:18:43 is 18188140 s in the future
 tar -xf ast_source.tar error.h
+tar: error.h: time stamp 2003-05-08 16:18:45 is 18188142 s in the future
 tar -xf ast_source.tar memory.h
+tar: memory.h: time stamp 2003-05-08 16:18:51 is 18188148 s in the future
 tar -xf ast_source.tar object.h
+tar: object.h: time stamp 2003-05-08 16:18:52 is 18188149 s in the future
 tar -xf ast_source.tar channel.h
+tar: channel.h: time stamp 2003-05-08 16:18:44 is 18188141 s in the future
 tar -xf ast_source.tar pointset.h
+tar: pointset.h: time stamp 2003-05-08 16:18:53 is 18188150 s in the future
 tar -xf ast_source.tar axis.h
+tar: axis.h: time stamp 2003-05-08 16:18:44 is 18188141 s in the future
 tar -xf ast_source.tar mapping.h
+tar: mapping.h: time stamp 2003-05-08 16:18:50 is 18188147 s in the future
 tar -xf ast_source.tar unit.h
+tar: unit.h: time stamp 2003-05-08 16:18:55 is 18188152 s in the future
 gcc -ansi -O2 -fPIC -I. -c axis.c
 tar -xf ast_source.tar c2f77.c
+tar: c2f77.c: time stamp 2003-05-08 16:18:44 is 18188140 s in the future
 tar -xf ast_source.tar c2f77.h
+tar: c2f77.h: time stamp 2003-05-08 16:18:44 is 18188140 s in the future
 gcc -ansi -O2 -fPIC -I. -c c2f77.c
 tar -xf ast_source.tar channel.c
+tar: channel.c: time stamp 2003-05-08 16:18:44 is 18188140 s in the future
 tar -xf ast_source.tar loader.h
+tar: loader.h: time stamp 2003-05-08 16:18:50 is 18188146 s in the future
 gcc -ansi -O2 -fPIC -I. -c channel.c
 tar -xf ast_source.tar cmpframe.c
+tar: cmpframe.c: time stamp 2003-05-08 16:18:44 is 18188139 s in the future
 tar -xf ast_source.tar unitmap.h
+tar: unitmap.h: time stamp 2003-05-08 16:18:56 is 18188151 s in the future
 tar -xf ast_source.tar permmap.h
+tar: permmap.h: time stamp 2003-05-08 16:18:52 is 18188147 s in the future
 tar -xf ast_source.tar cmpmap.h
+tar: cmpmap.h: time stamp 2003-05-08 16:18:45 is 18188140 s in the future
 tar -xf ast_source.tar frame.h
+tar: frame.h: time stamp 2003-05-08 16:18:48 is 18188143 s in the future
 tar -xf ast_source.tar frameset.h
+tar: frameset.h: time stamp 2003-05-08 16:18:49 is 18188144 s in the future
 tar -xf ast_source.tar cmpframe.h
+tar: cmpframe.h: time stamp 2003-05-08 16:18:44 is 18188139 s in the future
 gcc -ansi -O2 -fPIC -I. -c cmpframe.c
 tar -xf ast_source.tar cmpmap.c
+tar: cmpmap.c: time stamp 2003-05-08 16:18:44 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c cmpmap.c
 tar -xf ast_source.tar dssmap.c
+tar: dssmap.c: time stamp 2003-05-08 16:18:45 is 18188138 s in the future
 tar -xf ast_source.tar fitschan.h
+tar: fitschan.h: time stamp 2003-05-08 16:18:47 is 18188140 s in the future
 tar -xf ast_source.tar wcsmap.h
+tar: wcsmap.h: time stamp 2003-05-08 16:18:56 is 18188149 s in the future
 tar -xf wcslib.tar proj.h
+tar: proj.h: time stamp 2003-05-08 16:18:53 is 18188146 s in the future
 tar -xf wcslib.tar wcstrig.h
+tar: wcstrig.h: time stamp 2003-05-08 16:18:56 is 18188149 s in the future
 tar -xf wcslib.tar wcsmath.h
+tar: wcsmath.h: time stamp 2003-05-08 16:18:56 is 18188149 s in the future
 tar -xf ast_source.tar winmap.h
+tar: winmap.h: time stamp 2003-05-08 16:18:56 is 18188149 s in the future
 tar -xf ast_source.tar dssmap.h
+tar: dssmap.h: time stamp 2003-05-08 16:18:45 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c dssmap.c
 tar -xf ast_source.tar error.c
+tar: error.c: time stamp 2003-05-08 16:18:45 is 18188138 s in the future
 tar -xf ast_source.tar err.h
+tar: err.h: time stamp 2003-05-08 16:18:45 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c error.c
 tar -xf ast_source.tar fchannel.c
+tar: fchannel.c: time stamp 2003-05-08 16:18:45 is 18188138 s in the future
 if test -r /apps/cvsbuild/star/include/f77.h; then \
            ln -s /apps/cvsbuild/star/include/f77.h f77.h;\
         else \
@@ -60,129 +103,196 @@ if test -r /apps/cvsbuild/star/include/f77.h; then \
         fi
 gcc -ansi -O2 -fPIC -I. -c fchannel.c
 tar -xf ast_source.tar fcmpframe.c
+tar: fcmpframe.c: time stamp 2003-05-08 16:18:45 is 18188137 s in the future
 gcc -ansi -O2 -fPIC -I. -c fcmpframe.c
 tar -xf ast_source.tar fcmpmap.c
+tar: fcmpmap.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c fcmpmap.c
 tar -xf ast_source.tar fdssmap.c
+tar: fdssmap.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c fdssmap.c
 tar -xf ast_source.tar ferror.c
+tar: ferror.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c ferror.c
 tar -xf ast_source.tar ffitschan.c
+tar: ffitschan.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c ffitschan.c
 tar -xf ast_source.tar fframe.c
+tar: fframe.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c fframe.c
 tar -xf ast_source.tar fframeset.c
+tar: fframeset.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 gcc -ansi -O2 -fPIC -I. -c fframeset.c
 tar -xf ast_source.tar fintramap.c
+tar: fintramap.c: time stamp 2003-05-08 16:18:46 is 18188138 s in the future
 tar -xf ast_source.tar intramap.h
+tar: intramap.h: time stamp 2003-05-08 16:18:50 is 18188142 s in the future
 gcc -ansi -O2 -fPIC -I. -c fintramap.c
 tar -xf ast_source.tar fitschan.c
+tar: fitschan.c: time stamp 2003-05-08 16:18:47 is 18188139 s in the future
 tar -xf ast_source.tar skyframe.h
+tar: skyframe.h: time stamp 2003-05-08 16:18:54 is 18188146 s in the future
 tar -xf ast_source.tar matrixmap.h
+tar: matrixmap.h: time stamp 2003-05-08 16:18:51 is 18188143 s in the future
 tar -xf ast_source.tar sphmap.h
+tar: sphmap.h: time stamp 2003-05-08 16:18:55 is 18188147 s in the future
 if test -r /apps/cvsbuild/star/include/slalib.h; then \
            ln -s /apps/cvsbuild/star/include/slalib.h slalib.h;\
         else \
            tar -xf ast_source.tar slalib.h;\
         fi
+tar: slalib.h: time stamp 2003-05-08 16:18:54 is 18188145 s in the future
 tar -xf ast_source.tar specframe.h
+tar: specframe.h: time stamp 2003-05-08 16:18:55 is 18188146 s in the future
 tar -xf ast_source.tar specmap.h
+tar: specmap.h: time stamp 2003-05-08 16:18:55 is 18188146 s in the future
 gcc -ansi -O2 -fPIC -I. -c fitschan.c
 tar -xf ast_source.tar flutmap.c
+tar: flutmap.c: time stamp 2003-05-08 16:18:47 is 18188131 s in the future
 tar -xf ast_source.tar lutmap.h
+tar: lutmap.h: time stamp 2003-05-08 16:18:50 is 18188134 s in the future
 gcc -ansi -O2 -fPIC -I. -c flutmap.c
 tar -xf ast_source.tar fmapping.c
+tar: fmapping.c: time stamp 2003-05-08 16:18:47 is 18188131 s in the future
 gcc -ansi -O2 -fPIC -I. -c fmapping.c
 tar -xf ast_source.tar fmathmap.c
+tar: fmathmap.c: time stamp 2003-05-08 16:18:47 is 18188131 s in the future
 tar -xf ast_source.tar mathmap.h
+tar: mathmap.h: time stamp 2003-05-08 16:18:51 is 18188135 s in the future
 gcc -ansi -O2 -fPIC -I. -c fmathmap.c
 tar -xf ast_source.tar fmatrixmap.c
+tar: fmatrixmap.c: time stamp 2003-05-08 16:18:47 is 18188131 s in the future
 gcc -ansi -O2 -fPIC -I. -c fmatrixmap.c
 tar -xf ast_source.tar fobject.c
+tar: fobject.c: time stamp 2003-05-08 16:18:47 is 18188131 s in the future
 gcc -ansi -O2 -fPIC -I. -c fobject.c
 tar -xf ast_source.tar fpcdmap.c
+tar: fpcdmap.c: time stamp 2003-05-08 16:18:47 is 18188130 s in the future
 tar -xf ast_source.tar pcdmap.h
+tar: pcdmap.h: time stamp 2003-05-08 16:18:52 is 18188135 s in the future
 gcc -ansi -O2 -fPIC -I. -c fpcdmap.c
 tar -xf ast_source.tar fpermmap.c
+tar: fpermmap.c: time stamp 2003-05-08 16:18:47 is 18188130 s in the future
 gcc -ansi -O2 -fPIC -I. -c fpermmap.c
 tar -xf ast_source.tar fplot.c
+tar: fplot.c: time stamp 2003-05-08 16:18:47 is 18188130 s in the future
 tar -xf ast_source.tar plot.h
+tar: plot.h: time stamp 2003-05-08 16:18:53 is 18188136 s in the future
 tar -xf ast_source.tar grf.h
+tar: grf.h: time stamp 2003-05-08 16:18:49 is 18188132 s in the future
 gcc -ansi -O2 -fPIC -I. -c fplot.c
 tar -xf ast_source.tar frame.c
+tar: frame.c: time stamp 2003-05-08 16:18:48 is 18188131 s in the future
 gcc -ansi -O2 -fPIC -I. -c frame.c
 tar -xf ast_source.tar frameset.c
+tar: frameset.c: time stamp 2003-05-08 16:18:48 is 18188128 s in the future
 gcc -ansi -O2 -fPIC -I. -c frameset.c
 tar -xf ast_source.tar fskyframe.c
+tar: fskyframe.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c fskyframe.c
 tar -xf ast_source.tar fspecframe.c
+tar: fspecframe.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c fspecframe.c
 tar -xf ast_source.tar fslamap.c
+tar: fslamap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 tar -xf ast_source.tar slamap.h
+tar: slamap.h: time stamp 2003-05-08 16:18:54 is 18188132 s in the future
 gcc -ansi -O2 -fPIC -I. -c fslamap.c
 tar -xf ast_source.tar fspecmap.c
+tar: fspecmap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c fspecmap.c
 tar -xf ast_source.tar fsphmap.c
+tar: fsphmap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c fsphmap.c
 tar -xf ast_source.tar funitmap.c
+tar: funitmap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c funitmap.c
 tar -xf ast_source.tar fwcsmap.c
+tar: fwcsmap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c fwcsmap.c
 tar -xf ast_source.tar fwinmap.c
+tar: fwinmap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c fwinmap.c
 tar -xf ast_source.tar fzoommap.c
+tar: fzoommap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 tar -xf ast_source.tar zoommap.h
+tar: zoommap.h: time stamp 2003-05-08 16:18:57 is 18188135 s in the future
 gcc -ansi -O2 -fPIC -I. -c fzoommap.c
 tar -xf ast_source.tar intramap.c
+tar: intramap.c: time stamp 2003-05-08 16:18:49 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c intramap.c
 tar -xf ast_source.tar loader.c
+tar: loader.c: time stamp 2003-05-08 16:18:50 is 18188127 s in the future
 tar -xf ast_source.tar skyaxis.h
+tar: skyaxis.h: time stamp 2003-05-08 16:18:54 is 18188131 s in the future
 gcc -ansi -O2 -fPIC -I. -c loader.c
 tar -xf ast_source.tar lutmap.c
+tar: lutmap.c: time stamp 2003-05-08 16:18:50 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c lutmap.c
 tar -xf ast_source.tar mapping.c
+tar: mapping.c: time stamp 2003-05-08 16:18:50 is 18188127 s in the future
 gcc -ansi -O2 -fPIC -I. -c mapping.c
 tar -xf ast_source.tar mathmap.c
+tar: mathmap.c: time stamp 2003-05-08 16:18:51 is 18188102 s in the future
 gcc -ansi -O2 -fPIC -I. -c mathmap.c
 tar -xf ast_source.tar matrixmap.c
+tar: matrixmap.c: time stamp 2003-05-08 16:18:51 is 18188099 s in the future
 gcc -ansi -O2 -fPIC -I. -c matrixmap.c
 tar -xf ast_source.tar memory.c
+tar: memory.c: time stamp 2003-05-08 16:18:51 is 18188098 s in the future
 gcc -ansi -O2 -fPIC -I. -c memory.c
 tar -xf ast_source.tar object.c
+tar: object.c: time stamp 2003-05-08 16:18:51 is 18188098 s in the future
 gcc -ansi -O2 -fPIC -I. -c object.c
 tar -xf ast_source.tar pcdmap.c
+tar: pcdmap.c: time stamp 2003-05-08 16:18:52 is 18188098 s in the future
 gcc -ansi -O2 -fPIC -I. -c pcdmap.c
 tar -xf ast_source.tar permmap.c
+tar: permmap.c: time stamp 2003-05-08 16:18:52 is 18188098 s in the future
 gcc -ansi -O2 -fPIC -I. -c permmap.c
 tar -xf ast_source.tar plot.c
+tar: plot.c: time stamp 2003-05-08 16:18:53 is 18188098 s in the future
 gcc -ansi -O2 -fPIC -I. -c plot.c
 tar -xf ast_source.tar pointset.c
+tar: pointset.c: time stamp 2003-05-08 16:18:53 is 18188091 s in the future
 gcc -ansi -O2 -fPIC -I. -c pointset.c
 tar -xf ast_source.tar skyaxis.c
+tar: skyaxis.c: time stamp 2003-05-08 16:18:54 is 18188092 s in the future
 gcc -ansi -O2 -fPIC -I. -c skyaxis.c
 tar -xf ast_source.tar skyframe.c
+tar: skyframe.c: time stamp 2003-05-08 16:18:54 is 18188091 s in the future
 gcc -ansi -O2 -fPIC -I. -c skyframe.c
 tar -xf ast_source.tar specframe.c
+tar: specframe.c: time stamp 2003-05-08 16:18:55 is 18188091 s in the future
 gcc -ansi -O2 -fPIC -I. -c specframe.c
 tar -xf ast_source.tar specmap.c
+tar: specmap.c: time stamp 2003-05-08 16:18:55 is 18188089 s in the future
 gcc -ansi -O2 -fPIC -I. -c specmap.c
 tar -xf ast_source.tar slamap.c
+tar: slamap.c: time stamp 2003-05-08 16:18:54 is 18188087 s in the future
 gcc -ansi -O2 -fPIC -I. -c slamap.c
 tar -xf ast_source.tar sphmap.c
+tar: sphmap.c: time stamp 2003-05-08 16:18:55 is 18188086 s in the future
 gcc -ansi -O2 -fPIC -I. -c sphmap.c
 tar -xf ast_source.tar unit.c
+tar: unit.c: time stamp 2003-05-08 16:18:55 is 18188086 s in the future
 gcc -ansi -O2 -fPIC -I. -c unit.c
 tar -xf ast_source.tar unitmap.c
+tar: unitmap.c: time stamp 2003-05-08 16:18:56 is 18188085 s in the future
 gcc -ansi -O2 -fPIC -I. -c unitmap.c
 tar -xf ast_source.tar wcsmap.c
+tar: wcsmap.c: time stamp 2003-05-08 16:18:56 is 18188085 s in the future
 gcc -ansi -O2 -fPIC -I. -c wcsmap.c
 tar -xf ast_source.tar winmap.c
+tar: winmap.c: time stamp 2003-05-08 16:18:56 is 18188084 s in the future
 gcc -ansi -O2 -fPIC -I. -c winmap.c
 tar -xf ast_source.tar zoommap.c
+tar: zoommap.c: time stamp 2003-05-08 16:18:56 is 18188084 s in the future
 gcc -ansi -O2 -fPIC -I. -c zoommap.c
 ar r libast.a axis.o c2f77.o channel.o cmpframe.o cmpmap.o dssmap.o error.o fchannel.o fcmpframe.o fcmpmap.o fdssmap.o ferror.o ffitschan.o fframe.o fframeset.o fintramap.o fitschan.o flutmap.o fmapping.o fmathmap.o fmatrixmap.o fobject.o fpcdmap.o fpermmap.o fplot.o frame.o frameset.o fskyframe.o fspecframe.o fslamap.o fspecmap.o fsphmap.o funitmap.o fwcsmap.o fwinmap.o fzoommap.o intramap.o loader.o lutmap.o mapping.o mathmap.o matrixmap.o memory.o object.o pcdmap.o permmap.o plot.o pointset.o skyaxis.o skyframe.o specframe.o specmap.o slamap.o sphmap.o unit.o unitmap.o wcsmap.o winmap.o zoommap.o
 ranlib libast.a
 tar -xf ast_source.tar err_ems.c
+tar: err_ems.c: time stamp 2003-05-08 16:18:45 is 18188072 s in the future
 if test -r /apps/cvsbuild/star/include/ems.h; then \
            ln -s /apps/cvsbuild/star/include/ems.h ems.h;\
         else \
@@ -192,31 +302,41 @@ gcc -ansi -O2 -fPIC -I. -c err_ems.c
 ar r libast_ems.a err_ems.o
 ranlib libast_ems.a
 tar -xf ast_source.tar err_null.c
+tar: err_null.c: time stamp 2003-05-08 16:18:45 is 18188072 s in the future
 gcc -ansi -O2 -fPIC -I. -c err_null.c
 ar r libast_err.a err_null.o
 ranlib libast_err.a
 tar -xf ast_source.tar grf_null.c
+tar: grf_null.c: time stamp 2003-05-08 16:18:49 is 18188076 s in the future
 gcc -ansi -O2 -fPIC -I. -c grf_null.c
 ar r libast_grf.a grf_null.o
 ranlib libast_grf.a
 tar -xf ast_source.tar grf_pgplot.c
+tar: grf_pgplot.c: time stamp 2003-05-08 16:18:49 is 18188076 s in the future
 gcc -ansi -O2 -fPIC -I. -c grf_pgplot.c
 ar r libast_pgplot.a grf_pgplot.o
 ranlib libast_pgplot.a
 tar -xf ast_source.tar sla.c
+tar: sla.c: time stamp 2003-05-08 16:18:54 is 18188081 s in the future
 gcc -ansi -O2 -fPIC -I. -c sla.c
 ar r libast_slalib.a sla.o
 ranlib libast_slalib.a
 tar -xf wcslib.tar proj.c
+tar: proj.c: time stamp 2003-05-08 16:18:53 is 18188079 s in the future
 gcc -ansi -O2 -fPIC -I. -c proj.c
 tar -xf wcslib.tar wcstrig.c
+tar: wcstrig.c: time stamp 2003-05-08 16:18:56 is 18188081 s in the future
 gcc -ansi -O2 -fPIC -I. -c wcstrig.c
 tar -xf wcslib.tar tpn.c
+tar: tpn.c: time stamp 2003-05-08 16:18:55 is 18188080 s in the future
 gcc -ansi -O2 -fPIC -I. -c tpn.c
 ar r libast_wcslib.a proj.o wcstrig.o tpn.o
 ranlib libast_wcslib.a
 tar -xf ast_source.tar fac_1521_err
+tar: fac_1521_err: time stamp 2003-05-08 16:18:45 is 18188069 s in the future
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/ast'
 
 *** The AST package has been built
 
+make: warning:  Clock skew detected.  Your build may be incomplete.

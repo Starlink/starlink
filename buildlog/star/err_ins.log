@@ -1,6 +1,8 @@
 mk: Environment variables defined for ix86_Linux system
 make -e install
+make: *** Warning: File `makefile' has modification time in the future (2003-01-06 17:41:36 > 2002-10-10 04:02:13.545153)
 make[1]: Entering directory `/apps/cvsbuild/BUILDTEST/err'
+make[1]: *** Warning: File `makefile' has modification time in the future (2003-01-06 17:41:36 > 2002-10-10 04:02:13.560553)
 for f in err_link err_link_adam ""; do \
            if test -n "$f"; then \
               cp -p $f /apps/cvsbuild/star/bin;\
@@ -101,7 +103,9 @@ chmod 444 /apps/cvsbuild/star/dates/err_datestamp
 chmod 644 err_datestamp
 rm err_datestamp
 ln -s /apps/cvsbuild/star/dates/err_datestamp err_datestamp
+make[1]: warning:  Clock skew detected.  Your build may be incomplete.
 make[1]: Leaving directory `/apps/cvsbuild/BUILDTEST/err'
 
 *** The MERS package has been installed in directory /apps/cvsbuild/star
 
+make: warning:  Clock skew detected.  Your build may be incomplete.
