@@ -61,7 +61,7 @@
 *     {routine_machine_specifics}...
 
 *  References:
-*     bit Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/bit.html
+*     bit Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bit.html
 
 *  Keywords:
 *     package:bit, usage:public

@@ -58,7 +58,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     BIT Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/bit.html
+*     BIT Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bit.html
 
 *  Keywords:
 *     package:bit, usage:public
