@@ -1,0 +1,97 @@
+.help polysky Starlink figaro
+.nf
+ POLYSKY - Fits and subtracts sky from a long-slit spectrum
+
+
+Description
+
+ Subtract sky from a long slit spectrum by fitting a polynomial
+ in the spatial direction.
+
+Parameters
+
+
+IMAGE
+
+ The name of a 2-D file containing a long-slit
+ spectrum with the spectra being along the rows
+ (i.e. the X axis).
+
+YS1
+
+ The first Y value to be used for the first sky region.
+
+YE1
+
+ The last Y value to be used for the first sky region.
+
+YS2
+
+ The first Y value to be used for the second sky region.
+
+YE2
+
+ The last Y value to be used for the second sky region.
+
+DEGREE
+
+ Degree of polynomial to be fitted.
+
+NREJECT
+
+ Number of points to reject from each column. The NREJECT
+ points which deviate most from the mean will not be
+ included in the polynomial fit.
+
+OUTPUT
+
+ The name of the resulting sky subtracted data.
+
+WEIGHT
+
+ If set, the error or variance information associated
+ with the data is used to weight the fit.  Each point
+ is weighted as 1/variance. If not set, or if no
+ error information is available all points are given
+ equal weight.
+
+Source_comments
+
+ P O L Y S K Y
+
+ POLYSKY is used to subtract sky from a long slit spectrum by
+ polynomial fitting in the spatial direction to two regions of
+ sky on either side of an object of interest.
+
+ Only the region of the image between the outer edges of the two sky
+ fields is sky subtracted. Data outside this region is unchanged.
+ This enables POLYSKY to be used repeatedly to remove sky from more
+ than one object spectrum on an image.
+
+ The input image may optionally have associated error and quality
+ information. If quality is present points with bad quality will
+ be omitted from the fit. If error or variance is present the values
+ may be used to weight the fit.
+
+ If a non zero value for NREJECT is specified this number of points
+ will be omitted from the fit to each column. The points chosen for
+ omission will be those which deviate most from the mean for the column.
+
+ Command parameters -
+
+ 'IMAGE'    The name of the input file.
+ 'YS1'      Starting Y value to use for first sky field
+ 'YE1'      Ending Y value to use for first sky field
+ 'YS2'      Starting Y value to use for first sky field
+ 'YE2'      Ending Y value to use for first sky field
+ 'DEGREE'   Degree of the polynomial fit
+ 'NREJECT'  Number of points to reject in each fit
+ 'OUTPUT'   The name of the output subtracted file.
+
+ Command keywords -
+
+ 'WEIGHT'   Use the error or variance array to weight the
+            polynomial fit.
+
+                                 JAB / JAC 7th Feb 1991
+.endhelp

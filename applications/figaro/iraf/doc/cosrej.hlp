@@ -1,0 +1,142 @@
+.help cosrej Starlink figaro
+.nf
+ COSREJ - Reject cosmic rays from a set of supposedly identical spectra
+
+
+Description
+
+ Given an image whose cross-sections are a set of spectra of the
+ same object all with exactly the same wavelength to pixel mapping
+ (in other words a set of spectra that should be identical, other
+ than for signal to noise effects and possible differences in
+ their total counts due to differing exposure times etc), COSREJ
+ attempts to remove any cosmic rays or other obvious features that
+ might be contaminating some (but not the majority) of the spectra.
+
+Parameters
+
+
+IMAGE
+
+ A 2-D image in which all the cross sections are a
+ set of similar spectra.  Note that each pixel of
+ each spectrum is compared with the corresponding
+ pixels in the other spectra, so they should be
+ properly aligned - probably already scrunched.
+
+XSTART
+
+ COSREJ scales up each spectrum to the same mean value.
+ To do this it calculates the mean for each spectrum
+ between the limits sepcified for XSTART and XEND (which
+ are given in terms of the X-axis values, not necessarily
+ in pixels).  Normally, you would use the whole spectrum,
+ but there may be end effects you'd prefer to avoid.
+
+XEND
+
+ COSREJ scales up each spectrum to the same mean value.
+ To do this it calculates the mean for each spectrum
+ between the limits sepcified for XSTART and XEND (which
+ are given in terms of the X-axis values, not necessarily
+ in pixels).  Normally, you would use the whole spectrum,
+ but there may be end effects you'd prefer to avoid.
+
+CRSIG
+
+ Each pixel in each spectrum is compared with the equivalent
+ pixels in the other spectra, and any that differ from the
+ mean of the other pixels by more than a given factor (CRSIG)
+ times the standard deviation of the other pixels are
+ rejected.  This is repeated until either only two pixels
+ are left, or until no pixels are rejected in a pass through
+ the remaining pixels.  The rejected pixels are set to the
+ mean value of the remaining unrejected pixels.  If you're
+ only trying to get rid of gross effects like cosmic rays,
+ CRSIG values around 10 should be satisfactory.  The value
+ is unlikely to be critical.
+
+WMEAN
+
+ COSREJ can create a `spectrum' with one element for each
+ spectrum in the original image, where each element is
+ the mean value used for that spectrum.  This might possibly
+ be used to scale the resulting image using, for example,
+ ISYDIV.  Such a spectrum is produced only if WMEAN is
+ set.
+
+MSPECT
+
+ If WMEAN is set, MSPECT is the name of the `mean spectrum'
+ generated.  This is a file containing nothing but a data
+ array containing the mean values for the spectra in the image.
+
+OUTPUT
+
+ The name of the resulting image. The data produced in
+ OUTPUT is the same as that for IMAGE, except that the
+ cosmic rays have been processed out.  If OUTPUT and
+ IMAGE are the same, the operation is performed in situ.
+
+See_also
+
+ FIGARO: BCLEAN, CLEAN, MEDFILT, MEDSKY, TIPPEX.
+ KAPPA: FFCLEAN, CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN.
+
+Source_comments
+
+ C O S R E J
+
+ Name:
+    COSREJ
+
+ Function:
+    Remove cosmic rays from a set of similar spectra.
+
+ Description:
+    Given an image whose cross-sections are a set of spectra of the
+    same object all with exactly the same wavelength to pixel mapping
+    (in other words a set of spectra that should be identical, other
+    than for signal to noise effects and possible differences in
+    their total counts due to differing exposure times etc), this
+    routine attempts to remove any cosmic rays or other obvious
+    features that might be contaminating some (but not the majority)
+    of the spectra.  First, the mean value for each spectrum over a
+    specified range is calculated and this is used to reduce each
+    spectrum to the same mean value.  Each pixel in each spectrum is
+    compared with the equivalent pixels in the other spectra, and any
+    that differ from the mean of the other pixels by more than a
+    given factor (the CRSIG parameter) times the standard deviation
+    of the other pixels are rejected.  This is repeated until either
+    only two pixels are left, or until no pixels are rejected in a
+    pass through the remaining pixels.  The rejected pixels are set
+    to the mean value of the remaining unrejected pixels.  Finally,
+    the spectra are rescaled to their original mean values.  If
+    requested, the program can create a `spectrum' with one element
+    for each spectrum in the original image, where each element is
+    the mean value used for that spectrum.  This might possibly be
+    used to scale the resulting image using, for example, ISYDIV.
+
+ Command parameters:
+    IMAGE    The name of the image in which the spectra are held.
+    XSTART   The first x-value of the range to be used to calculate
+             the mean value for each spectrum.
+    XEND     The last x-value of the range to be used to calculate
+             the mean value for each spectrum.
+    CRSIG    The cutoff sigma value to be used.
+    MSPECT   The name of the mean spectrum produced, if WMEAN is yes.
+    OUTPUT   The name of the resulting image with the cosmic rays removed.
+
+ Command keywords:
+    WMEAN    Yes if a spectrum of mean values is to be produced.
+
+ Error array handling: Ignored.
+
+ Data quality / flagged value handling:
+    Not explicitly performed.  Relies on standard DSA processing.
+
+ Files used:
+    BADPIX.DAT  Contains a list of the cosmic rays removed from the data.
+
+    8th  Sept  1987.   Original version DJA / AAO
+.endhelp

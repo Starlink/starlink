@@ -1,0 +1,60 @@
+.help news_5_6-0 Starlink figaro
+.nf
+ Version 5.6-0 of Figaro has recently been released.  Figaro is a
+ powerful and comprehensive general-purpose package for the reduction
+ of astronomical images and spectra.  It contains particularly extensive
+ facilities for spectroscopy.
+
+ Version 5.6-0 contains relatively few changes: the automatic propagation
+ of errors has been added to a few more applications, there have been a
+ number of bug fixes and minor enhancements and there is one new minor
+ application.  In addition the user manual has been slightly revised.
+ Brief details of the changes are given below.
+
+ Figaro is documented in SUN/86.  To view a hypertext version of this
+ document type:
+
+    showme sun86
+
+ or
+
+    findme figaro
+
+ Further information about Figaro is available via the World Wide Web
+ at the following URL:
+
+     http://www.starlink.rl.ac.uk/figaro/
+
+ Please report any problems with Figaro by sending an e-mail message to
+ address figaro@star.rl.ac.uk.
+
+
+ A C Davenhall and V G Graffagnino, 30 October 2001.
+
+
+
+Error Propagation
+
+
+ Error Propagation has been added to the following applications: BBODY,
+ FWCONV, IRFLAT, ISHIFT, IXSMOOTH and SFIT.
+
+
+Bug Fixes and Minor Enhancements
+
+
+ Either bugs have been fixed in, or minor enhancements have been made to,
+ the following applications: CSPIKE, ECHSELECT, EMLT, FITGAUSS, SCROSS
+ and SPFLUX.  In addition, corrections have been made to the documentation
+ for CENTERS and SPECCONT.
+
+
+New Application
+
+
+ The new application IMPOS has been added.  It simply reads a text file
+ containing a list of X,Y positions and writes them to the environment
+ variables which input values to application CENTERS.  Thus, it provides
+ a mechanism for using CENTERS from a script rather than interactively.
+
+.endhelp

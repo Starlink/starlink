@@ -1,0 +1,110 @@
+.help ffcross Starlink figaro
+.nf
+ FFCROSS - Cross-correlate an image and a flat field (mainly IPCS data)
+
+
+Description
+
+ This is for use with some flat fields (notably IPCS) where
+ there may be a bodily shift between the flat field and the data.
+ For each cross-section in a given range, this routine calculates
+ the cross-correlation between the flat field and the data. It then
+ calculates the average shift for each cross-section, as determined
+ from the individual cross-correlation.  It also sums the individual
+ cross-correlations, and calculates the shift given by that summed
+ cross-correlation.  The idea is that the shift determined in this
+ way can then be applied using ISHIFT.
+
+Parameters
+
+
+IMAGE
+
+ Name of image.
+
+FLAT
+
+ Name of flat field.
+
+YSTART
+
+ First Y value to be used.
+
+YEND
+
+ Last Y value to be used.
+
+XSTART
+
+ First X value to be used.
+
+XEND
+
+ Last X value to be used.
+
+RECORD
+
+ Create file to record cross-correlation?
+
+CROSS
+
+ Name of cross-correlation data?
+
+LOG
+
+ Log individual cross-section shifts?
+
+Source_comments
+
+ F F C R O S S
+
+ Main body of the Figaro FFCROSS function.  This is for use
+ with some flat fields (notably IPCS) where there may be a bodily
+ shift between the flat field and the data.  For each
+ cross-section in a given range, this routine calculates the
+ cross-correlation between the flat field and the data.  It then
+ calculates the average shift for each cross-section, as determined
+ from the individual cross-correlation.  It also sums the individual
+ cross-correlations, and calculates the shift given by that summed
+ cross-correlation.  The idea is that the shift determined in this
+ way can then be applied using ISHIFT.
+
+ Command parameters -
+
+ IMAGE       (Character) The IMAGE to be compared with
+             the flat field.
+ FLAT        (Character) The FLAT field to be used.
+             The FLAT and IMAGE data arrays should have the same
+             dimensions.
+ YSTART      (Numeric) The first cross-section to be used.
+ YEND        (Numeric) The last cross-section to be used.
+ XSTART      (Numeric) Data with an AXIS(1) value less than XSTART
+             will be ignored in the cross-correlation.
+ XEND        (Numeric) Data with an AXIS(1) value greater than XEND
+             will also be ignored.  Note that these values are
+             used to determine the channel numbers to be used
+             for IMAGE and the same ones will be used for
+             FLAT even if FLAT has a  different AXIS(1)
+             structure.
+ CROSS       (Character) the name of the data structure to hold
+             the cross-correlation, if it is to be saved.
+             The file created will be cross.dst, and will look
+             like an ordinary spectrum - i.e. can be plotted by
+             SPLOT, etc.  CROSS is ignored if RECORD is not set.
+
+ Command keywords -
+
+ RECORD      If set, the summed cross-correlation of the two
+             images will be recorded as a new data structure.
+ LOG         If set, the individual shifts for each cross-
+             section will be logged as they are calculated.
+
+ User variables used -
+
+ SHIFT       (Numeric) The relative shift of the two images as
+             determined from the summed cross-correlation.
+ AVSHIFT     (Numeric) The average shift of the individual
+             cross-sections.
+
+                                         KS / CIT 5th Oct 1983
+.endhelp

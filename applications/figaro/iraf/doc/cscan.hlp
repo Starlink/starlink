@@ -1,0 +1,49 @@
+.help cscan Starlink figaro
+.nf
+ CSCAN - Plot array of profiles from a 3D array
+
+
+Description
+
+   This displays line profiles
+   from a sorted data cube (i.e. the first dimension is that of
+   wavelength).
+
+Parameters
+
+
+CUBE
+
+    CUBE = FILE (Read)
+        Name of CUBE for input
+
+YSTART
+
+    YSTART = REAL (Read)
+        display lower limit
+
+YEND
+
+    YEND = REAL (Read)
+        display upper limit
+
+TSTART
+
+    TSTART = INTEGER (Read)
+        display lower limit
+
+TEND
+
+    TEND = INTEGER (Read)
+        display upper limit
+
+HARDCOPY
+
+    HARDCOPY = LOGICAL (Read)
+        use hard graphics device for display
+
+Source_comments
+
+  none available
+
+.endhelp

@@ -1,0 +1,59 @@
+.help mask Starlink figaro
+.nf
+ MASK - Generate a mask spectrum given a spectrum and a mask table
+
+
+Description
+
+ Given a spectrum and a table of masked regions, MASK creates a
+ mask spectrum which is the same as the original spectrum in the
+ masked regions, but zero everywhere else.   The mask will have
+ the same x-values as the original spectrum.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of the original spectrum.
+
+TABLE
+
+ The name of the file containing the regions
+ to be masked.  This is a text file.  If no extension is
+ specified, .MSK will be assumed.  The table can be one
+ supplied as part of Figaro, or can be one supplied by
+ the user, either in the current default directory or
+ in one with the logical name FIGARO_PROG_U.  (There is
+ usually no need to specify the directory, since the
+ program will search for it.)
+
+MASK
+
+ The name of the mask spectrum generated.
+
+Source_comments
+
+ M A S K
+
+ Generates a spectral mask given a spectrum and a mask
+ table file.  The mask table contains a set of central
+ wavelengths and number of anstroms covered, one for each
+ part of the spectrum to be masked.  The program generates
+ a spectrum covering the same wavelength range as the
+ original spectrum, with the masked areas set to the same
+ values as the original spectrum in those areas, and the
+ unmasked areas set to zero.
+
+ Command parameters -
+
+ SPECTRUM   (Character) The spectrum to be used
+ TABLE      (Character) The mask table file to be used - if
+            the file has no extension, .MSK will be assumed.
+            The program searches for the mask file in the
+            standard Figaro search path for such files.
+ MASK       (Character) The output mask name.
+
+ User variables used - None
+                                      KS / CIT 4th April 1984
+.endhelp

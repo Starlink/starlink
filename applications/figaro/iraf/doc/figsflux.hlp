@@ -1,0 +1,50 @@
+.help figsflux Starlink figaro
+.nf
+ FIGSFLUX - Flux calibrates a FIGS spectrum
+
+
+Description
+
+ Flux calibrates a FIGS spectrum using a standard spectrum.
+
+Parameters
+
+
+SPECTRUM
+
+ Name of Star spectrum.
+
+STANDARD
+
+ Name of Standard spectrum.
+
+KMAG
+
+ K magnitude of standard star.
+
+OUTPUT
+
+ Name of resulting spectrum.
+
+Source_comments
+
+ F I G S F L U X
+
+ Flux calibrates a FIGS spectrum using a standard spectrum
+
+ Command parameters -
+
+ SPECTRUM  The name of the structure containing the first image.
+
+ STANDARD  The name of the structure containing the second
+           image data.
+
+ KMAG      The K magnitude of the standard used
+
+ OUTPUT    The name of the result of the operation.  This can
+           be the same as for SPECTRUM.  If not, a new structure
+           is created, with everything but the data a direct
+           copy of the input.
+
+                                      JAB / AAO  14th June 1985
+.endhelp

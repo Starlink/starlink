@@ -1,0 +1,65 @@
+.help specdre Starlink figaro
+.nf
+ Specdre - Spectroscopy Data Reduction.
+
+ Specdre is a package for spectroscopy data reduction and analysis which 
+ has been almagamated with Figaro.  Some of the general features are:
+
+ Hyper-cubes: The Specdre data set is in general a hyper-cube where each row
+    or hyper-column is a spectrum. Even where  a single spectrum is required
+    as input, this can be  an appropriate section of  the hyper-cube cut out
+    "on the fly" as the application accesses the data.
+
+ Coherent storage of fit results: The results of  line or continuum fits are
+    stored along with the data. In the case where a hyper-cube is a coherent
+    set of spectra, fit results will also be stored coherently. For example,
+    in  a three-dimensional data  set the two-dimensional  map of line inte-
+    grals is immediately available to display routines.
+
+ Bad values and variance: Bad  values (or quality information are recognised
+    and ignored or propagated,  as appropriate. If present, variance inform-
+    ation is   propagated or used  in the  processing, e.g.  for statistical
+    weights.   It can optionally   be ignored.  Where  covariance is created
+    (namely re-sampling), an  approximate  measure of  this is stored  along
+    with the data.  Other applications  (namely  fit routines) will use  the
+    ordinary variance or the measure of covariance, as appropriate.
+
+
+ The topics addressed by the applications are mainly:
+
+ ASCII I/O: The data  and errors of hyper-cubes  can be  written to or  read
+    from printable/editable tables. Bad values are converted between the two
+    formats. Single spectra can be read even if the axis data are not linear
+    or monotonic.
+
+ Graphics:  Display applications allow  full control of  the plot, including
+    font, colour, line  styles, error bars,  etc.  Overlay on previous plots
+    according   to their  "world  coordinates" is  possible.   This includes
+    overlays on grey/colour/line plots made by KAPPA, Pongo, Figaro, etc.
+
+ Cube manipulation: You can  extract averaged hyper-planes from hyper-cubes,
+    assemble hyper-cubes from   hyper-planes, or fill  in  a hyper-cube from
+    several given hyper-cubes.
+
+ Arc line  axis (wavelength)  calibration: While  full  user interaction via
+    graphics is granted, automatic arc line identification is also possible.
+
+ Re-sampling:  The  application for  re-sampling   can either  res-ample all
+    spectra in a hyper-cube, or re-sample  and average into one spectrum any
+    number  of  input spectra. It   allows  information about the covariance
+    between pixels to be carried through to a line fit routine.
+
+ Spectral fits: You can fit polynomials, blended Gauss or triangle profiles.
+    Fit results are stored along  with the data and can  be turned into fake
+    data sets for later subtraction, division, etc.
+
+
+ Specdre uses the NDF data access library,  which allows to specify sections
+ rather than  the whole  data  set.  Also, for  the special  requirements of
+ spectroscopy data reduction and analysis, an extension to the NDF format is
+ used.  This stores additional information with  the  data and by this means
+ allows much enhanced communication between Specdre applications.
+
+ Specdre is available on all Starlink-supported platforms.
+
+.endhelp

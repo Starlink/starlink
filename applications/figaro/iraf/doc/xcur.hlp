@@ -1,0 +1,35 @@
+.help xcur Starlink figaro
+.nf
+ XCUR - Uses cursor to delimit part of a spectrum
+
+
+Description
+
+ If a spectrum has been displayed on the current soft display
+ device, XCUR allows the user to delimit a range of it in X using
+ the cursor.  The sequence 'SPLOT parms', 'XCUR', 'SPLOT \' will
+ result in the display of the delimited part of the spectrum.
+
+Source_comments
+
+ X C U R
+
+ Uses the graphics cursor to delimit a range in X,
+ setting the user variables XSTART and XEND accordingly.
+
+ Command variables / keywords - None.
+
+ User variables -     (">" input, "<" output)
+
+ (>) SOFT     (Character) Device / type for soft plots.
+              See documentation on 'SOFT' command for
+              details.
+ (>) TVXST    (Numeric) X-start value for current plot.
+ (>) TVXEN    (Numeric) X-end value for current plot.
+ (>) TVLOW    (Numeric) Lowest value of current plot.
+ (>) TVHIGH   (Numeric) Highest value of current plot.
+ (<) XSTART   (Numeric) X-start for next plot.
+ (<) XEND     (Numeric) X-end for next plot.
+
+                              KS / CIT 26th July 1982
+.endhelp

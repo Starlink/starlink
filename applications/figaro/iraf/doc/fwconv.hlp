@@ -1,0 +1,56 @@
+.help fwconv Starlink figaro
+.nf
+ FWCONV - General unit conversion for spectra
+
+
+Description
+
+ FWCONV converts the flux units of a spectrum from AB magnitudes,
+ Janskys, milli-Janskys, micro-Janskys or erg/s/cm**2/A to any of
+ these.
+
+Parameters
+
+
+SPECTRUM
+
+ A spectrum whose units are either Janskys,
+ milli-Janskys, micro-Janskys, erg/s/cm**2/A
+ or AB magnitudes.
+
+FLUX_UNIT
+
+ Units of either Janskys, milli-Janskys,
+ micro-Janskys, erg/s/cm**2/A or AB magnitudes.
+
+OUTPUT
+
+ The resulting spectrum, whose units will be either
+ Janskys, milli-Janskys, micro-Janskys, erg/s/cm**2/A or
+ AB magnitudes.  OUTPUT can be the same as SPECTRUM, in which
+ case the conversion will be performed in situ.
+
+Source_comments
+
+ F W C O N V
+
+ Converts flux units of a spectrum from/to either
+ F_lambda (ergs/sec/cm**2/A), AB magnitudes or F_nu (Janskys).
+
+ Command parameters -
+
+ SPECTRUM The name of the structure containing the spectrum.
+          An x-axis data structure giving the wavelengths of the
+          data elements is also required.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for SPECTRUM. If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+
+ 4th  Feb 1991.  SMH/ AAO.  Original version, based on ABCONV code,
+.endhelp

@@ -1,0 +1,114 @@
+.help arcsdi Starlink figaro
+.nf
+  ARCSDI - Corrects for arc line curvature
+
+
+Description
+
+   Program to allow correction of 2-d spectra for S-distortion using
+   an arc - as a preliminary stage prior to wavelength calibration
+   and scrunching.
+     The lines are located by fitting gaussians to them.
+     These positions are then used to fit a chebyshev polynomial
+   to - one for each line. The intermediate positions are interpolated
+   from these.
+   Once this is done the data are shifted and interpolated in the
+   x-section direction to align them all.
+
+
+Parameters
+
+
+IMAGE
+
+    IMAGE = FILE (Read)
+        Name of image for input
+          This should be a file containing an arc spectrum.
+
+ARC_OPTS
+
+    ARC_OPTS = CHARACTER (Read)
+        Enter arc fit option
+          NEW    : set up a new wavelength calibration
+          REPEAT : Itterate on previous calibration.
+          CLONE  : CLone a previous calibration.
+          OLD    : Correct using previous results
+
+OUTPUT
+
+    OUTPUT = FILE (Write)
+        Name of output file
+           File to contain corrected data.
+
+YSTART
+
+    YSTART = INTEGER (Read)
+        analysis lower limit
+            The data between the limits ystart and yend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+YEND
+
+    YEND = INTEGER (Read)
+        analysis upper limit
+            The data between the limits ystart and yend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+YBLOCK
+
+    YBLOCK = INTEGER (Read)
+        Enter analysis x-sect width
+            Each window is of this width (except perhaphs the final one).
+
+ITERATION
+
+    ITERATION = INTEGER*2 (Read)
+        New value of iteration
+
+ORDER
+
+    ORDER = INTEGER (Read)
+        order for polynomial fitting
+          This is for the continuity correction of the data. Idealy the
+          arc should have been pre-processed with ARCSDI, so a low
+          order e.g. 2 should be used.
+
+MAXLINES
+
+    MAXLINES = INTEGER (Read)
+        Maximum number of lines to allow room for
+          This must be greater than or equal to the number of lines
+          fitted, so room should be allowed in case any more are
+          to be added later.
+
+CLFILE
+
+    CLFILE = FILE (Read)
+        Name of image for cloning from
+          This should be a file containing an arc spectrum.
+
+TOLS
+
+    TOLS = CHARACTER (Read)
+        For use in batch only
+
+KEEP_ITT
+
+    KEEP_ITT = LOGICAL (Read)
+        keep itteration files'
+
+PRFITS
+
+    PRFITS = LOGICAL (Read)
+        Print out details of fitting
+
+PLOTCORR
+
+    PLOTCORR = LOGICAL (Read)
+        Plot correction?
+
+Source_comments
+
+  none available
+
+.endhelp

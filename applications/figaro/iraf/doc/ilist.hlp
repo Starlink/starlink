@@ -1,0 +1,56 @@
+.help ilist Starlink figaro
+.nf
+ ILIST - List the data in an image (or spectrum)
+
+
+Description
+
+ Displays the values of pixels in a dataset.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be listed.
+
+YSTART
+
+ First Y value for list.
+
+YEND
+
+ Last Y value for list.
+
+XSTART
+
+ First X value for list.
+
+XEND
+
+ Last X value for list.
+
+HARDCOPY
+
+ Produce a file containing list?
+
+Source_comments
+
+ I L I S T
+
+ Lists the data in a subset of an image.
+
+ Command parameters -
+
+ IMAGE  (Char)    The name of the structure containing the image.
+ YSTART (Numeric) The Y value for the start of the subset.
+ YEND   (Numeric) The Y value for the end of the subset.
+ XSTART (Numeric) The X value for the start of the subset.
+ XEND   (Numeric) The X value for the end of the subset.
+
+ Command keywords -
+
+ HARDCOPY   List data in a file ready for printing.
+
+                                  KS / CIT 16th July 1983
+.endhelp

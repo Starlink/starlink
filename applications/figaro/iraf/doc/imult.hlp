@@ -1,0 +1,54 @@
+.help imult Starlink figaro
+.nf
+ IMULT - Multiplies two images (or two spectra)
+
+
+Description
+
+ Each pixel in IMAGE is multiplied by the corrsponding
+ pixel of IMAGE1.  The result is troed in OUTPUT.
+
+Parameters
+
+
+IMAGE
+
+ Name of first image.
+
+IMAGE1
+
+ Name of second image.
+
+OUTPUT
+
+ Name of resulting image.
+
+See_also
+
+ FIGARO: IADD, ISUB, IDIV, ICADD, ICSUB, ICMULT, ICDIV.
+ KAPPA: CADD, CDIV, CMULT, CSUB, MATHS, ADD, SUB, MULT, DIV.
+
+Source_comments
+
+ I A D S U B
+
+ Adds, multiplies, divides or subtracts two images.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the first image.
+
+ IMAGE1 The name of the structure containing the second
+        image data.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data (and any error
+        or data quality information) a direct copy of the first
+        image.
+
+ The command itself (IADD,IMULT,IDIV or ISUB) is used to
+ differentiate between the two operations.
+
+                                  KS / CIT 26th Sept 1983
+.endhelp

@@ -1,0 +1,320 @@
+.help gauss Starlink figaro
+.nf
+ GAUSS - Interactive fit of Gaussians to emission or absorption lines
+
+
+Description
+
+ The GAUSS command will plot a spectrum on the current
+ soft graphics device and allow interactive Gaussian
+ fitting of upto ten Gaussians on a polynomial continuum.
+
+Parameters
+
+
+TOL
+
+ The tolerance on the value of the optimised function
+ required by the NAG routine E04JBF.
+
+SPECTRUM
+
+ The name of the spectrum to be plotted and analysed.
+ It should be a 1-dimensional array
+
+FILE
+
+ Yes if results of the continuum and Gaussian fitting
+ are to be written to a data file
+
+FILNAM
+
+ The name for the data file to which results of the
+ continuum and Gaussian fit are written
+
+WHOLE
+
+ If set, the whole of the spectrum is plotted.
+ Otherwise, the limits plotted are determined by the
+ values of XSTART and XEND, which you will be prompted
+ for if they were not specified in the command string.
+
+AUTOSCALE
+
+ If set, the plot is scaled so that all of the data
+ to be plotted just fits on the display.  Otherwise, the
+ scale of the plot is determined by the values of HIGH and
+ LOW, which you will be prompted for if they were not
+ specified in the command string.
+
+XSTART
+
+ Specifies the first X value to be plotted, in the
+ units used by the data - angstroms, for example, if the
+ data is wavelength calibrated.  XSTART can be set before
+ the start of the data, if necessary.  RESET will set
+ XSTART to the first X value in the data.
+
+XEND
+
+ Specifies the last X value to be plotted, in the units
+ used by the data - angstroms, for example, if the data
+ is wavelength calibrated.  XEND can be set after the end
+ of the data, if necessary. RESET will set XEND to the last
+ X value in the data.
+
+HIGH
+
+ The maximum data value to be plotted - i.e. the top Y axis
+ value for the plot.
+
+LOW
+
+ The minimum data value to be plotted - i.e. the bottom Y axis
+ value for the plot.
+
+BIAS
+
+ A bias value applied to the data, usually to bias up a plot
+ which is to be superimposed upon a previous plot of almost
+ identical data values.  This makes the comparison easier.
+ BIAS N is essentially equivalent to setting HIGH and LOW
+ down by an amount N, so can result in unexpected axis
+ values if it is not accompanied by AXES=NO.
+
+LABEL
+
+ The label that will appear at the top of the plot and the
+ results data file.
+
+ORD
+
+ The order of the least squares polynomial fit to the
+ continuum (maximum = 7).
+
+SIG
+
+ The factor * the sigma on the last polynomial continuum fit
+ such that a point with a deviation greater than SIG * sigma
+ from the last fitted continuum will not be included in the
+ next fit.
+
+ERR
+
+ The factor * the error on a point such that a point with
+ a deviation greater than ERR * error from the fitted
+ continuum will not be included in the next fit.
+
+ITN
+
+ The number of iterations for performing the polynomial fit
+ to the continuum with rejection of points with large deviations
+ from the fit (maximum = 10).
+
+INDEX
+
+ The index number ( as listed ) of the Gaussian whose
+ parameters are to be altered.
+
+DELE
+
+ The index number ( as listed ) of the Gaussian which is to be
+ deleted.
+
+Pn_Hn_Wn_S
+
+
+ P followed by number -100 to 100 to alter position.
+    ( 1 unit = line extent/100 )
+ H followed by number -100 to 100 to alter height.
+    ( 1 unit = line height/100 )
+ W followed by number -100 to 100 to increase width.
+    ( 1 unit = line extent/100 )
+ S to plot modified line and return to menu.
+
+
+CONSTR
+
+ The fitted Gaussian parameters (peak position, peak height or line
+ width) can be singly constrained or chained to vary together in
+ groups.
+
+SINCON
+
+ The fit parameters (peak position, peak height and width) of any of
+ the Gaussian components can be constrained so as not to vary in the
+ optimization process.
+
+NPCON
+
+ The Gaussian number n can be constrained to the manually fitted value
+ of peak position (P), height (H) or width (W).  A value of -1
+ indicates the end of the single constraints.
+
+MULTCON
+
+ Sets of Gaussians can have their fit parameters constrained so that
+ the values are "chained" to vary together. The line seperations of
+ Gaussians can be set; the ratio of their peak heights can be fixed
+ and the ratio of their line widths can be fixed.
+
+NCHAIN
+
+ NCHAIN is the number of Gaussians to chain together so that line
+ seperation, height or width varies together. Must be less than or
+ equal to the number of fitted Gaussians. A value of -1 indicates that
+ there are no more chains to input.
+
+CHAIN
+
+ Gaussian parameter to be chained: - P to keep Gaussian line
+ seperations fixed; H to keep peak heights in specific ratio; W to
+ keep Gaussian widths varying in ratio.
+
+ICHAIN
+
+ ICHAIN is the index number of the Gaussian which is to be chained.
+
+RCHAIN
+
+ RCHAIN is the value of the seperation between two chained Gaussians,
+ the ratio of the heights of two chained Gaussians or the ratio of
+ their line widths.
+
+WGHT
+
+ Weighting of the residuals to be used in the optimization.
+
+ Options are: N for no weighting
+              V for weighting by Y value
+              E for weighting by 1/error**2
+
+MAN
+
+ If set, the results of the manual fit will be written to the
+ terminal and the results file (if open).  If not set, then a
+ return to the menu is made so the fit can be altered.
+
+RECNAME
+
+ The name of the data file produced by GAUSS from which a
+ fit is to be recalled and plotted for subsequent manipulation.
+
+GAUFIT
+
+ The name of the continuum and Gaussian fit spectrum file to
+ be written. It has the same dimension as the input spectrum.
+
+CCMD
+
+ Continuum fitting menu entry. Alternatives are:
+
+    CUR - indicate continuum regions by cursor.
+    ORD - order of polynomial fit.
+    SIG - factor*sigma on fit for continuum point rejection.
+    ERR - factor*error on point for rejection from continuum fit.
+    ITN - number of iterations for continuum point rejection.
+    FIT - perform the polynomial fitting.
+    GAU - proceed to Gaussian fitting (continuum set).
+
+GCMD
+
+ Gaussian fitting menu entry. Alternatives are:
+
+    LIM   _ delimit edges of line (default is adjacent
+            continuum edges).
+    SIN   - fit a single Gaussian to an indicated line.
+    NEW   - introduce a Gaussian at the cursor defined
+            position.
+    NEX   - introduce a new Gaussian at the peak.
+    INCH  - interactively alter peak position, height or
+            width.
+    LIS   - list the Gaussians fitted.
+    SEL   - select a line to be modified.
+    DEL   - delete a selected Gaussian.
+    OPT   - optimize the fit.
+    RECAL - read a previous fit data file and plot this fit.
+    HARD  - plot results of fit for hardcopy device.
+    SAVE  - save the Gaussian fit spectrum as a file (name
+            prompted for on quitting).
+    CON   - move to another section of continuum for more
+            fitting.
+    QUIT  - quit from program (spectrum analysis complete).
+
+Source_comments
+
+ G A U S S
+
+ Interactively fits Gaussians to an emission or absorption
+ feature in a spectrum. A spectrum, whose length is prompted
+ for, is plotted on the selected 'SOFT' device together with a
+ residual plot above. Regions of continuum are demarcated with
+ the cursor. Continuum is fitted by a polynomial with rejection
+ of points a selected sigma from this continuum or a fraction
+ of the error bar ( if available ). Single or multiple Gaussian
+ fits are made to the emission/absorption feature. In the case
+ of multiple fits interactive fitting of the profile by Gaussians
+ whose parameters are altered from the terminal occurs. The
+ residuals on the fit ( observed - fitted ) are plotted in the
+ residuals box above the main plot. If error bars are available
+ for the spectrum they are plotted in the residuals box. The fit
+ may be optimized and any single Gaussian parameter can be
+ constrained or its value chained to another. The residuals on
+ the fit for the purposes of the optimization can be weighted either
+ by value or error. Data on the fit - central wavelength, height and
+ sigma - are reported for each Gaussian and r.m.s. and mean
+ fractional error ( if errors available ) on fit. The results may be
+ recorded on a data file. The final fit spectrum can be saved as a
+ file for subsequent analysis.
+
+ Command parameters -
+
+ SPECTRUM    The data to be fitted. This should be a
+             1-d .dst file with a .z.data component.  If there
+             is a .x.data component this will be used to
+             give the x-axis.  If not, the x-axis will just
+             have to be the numbers from 1 to n.
+ XSTART      The x-value at which plotting is to start.
+ XEND        The x-value at which plotting is to end.
+             (XSTART and XEND are not required if the
+             WHOLE keyword is set.)
+ HIGH        The maximum value to be used for the plot.
+ LOW         The minimum value to be used for the plot.
+ BIAS        Value to be added to zero for the plot.
+ LABEL       A label for the plot and the data file.
+
+ Command keywords -
+
+ AUTOSCALE   The program is to work out the values for HIGH
+             and LOW, using the maximum and minimum values
+             in the data over the specified range.
+ WHOLE       The program is to display all of the spectrum.
+
+ User variables -    (">" input, "<" output)
+
+ (>) SOFT    Specifies the device and type to be used for soft
+             plots.  See the SOFT command for more details.
+ (>) HARD    Specifies the device and type to be used for hard
+             plots.  See the HARD command for more details.
+ (<) TVXST   is set to the starting x-value for the plot.
+ (<) TVXEN   Is set to the final x-value for the plot.
+ (<) TVHIGH  Is set to the same value as HIGH.
+ (<) TVLOW   Is set to the same value as LOW.
+ (<) TVFILE  Is set to the value of SPECTRUM.
+
+ Subroutines called:
+   MAPSPEC  -  unmaps the X and Z from virtual memory into arrays
+               in the program
+   MAPSPECE  -  unmaps the X, Z and error data from virtual memory
+                into arrays in the program
+   MAPSPECG  - maps the output fitting spectrum Z component into
+               virtual memory
+   GAUS_XZPLOT  -  handles all the PGPLOT plotting of spectrum,
+                   continuum fit, Gaussian fit, residuals and
+                   error bars
+   CONMENU  -  the continuum fitting menu for polynomial continuum
+               fitting
+   GAUMENU  -  the Gaussian fitting menu for all Gaussian fitting
+
+                                      JRW / AAO March 1987
+.endhelp

@@ -1,0 +1,17 @@
+.help figaro Starlink figaro
+.nf
+ Figaro is a set of general astronomical data reduction programs with
+ a certain inclination towards spectrocopy. The package was developed
+ by Keith Shortridge, originally at Caltech and later at AAO. The
+ present version - Portable Figaro 5.6-0 - is released and supported by
+ Starlink. It has evolved from Figaro 3.0 as distributed for VAXes by
+ Starlink. Figaro 3.0 was a release from AAO, but it had been adapted
+ somewhat by Starlink (Figaro 3.0-3 and 3.0-5). Also some modific-
+ ations had been made under the term "National Figaro" (3.0-1 through
+ 3.0-6).
+
+ The current version is Portable Figaro 5.6-0.
+
+ Try a question mark (?) for a list of topics.
+
+.endhelp

@@ -1,0 +1,89 @@
+.help lxset Starlink figaro
+.nf
+ LXSET - Set X array of spectrum/image to specified range
+
+
+Description
+
+ LXSET is a fudging routine used to set the X values for an image
+ or spectrum, given a start and end value.  The values can be set
+ to vary linearly or logarithmically.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image (or spectrum) whose
+ X values are to be set.  If IMAGE already has an X
+ array, this will be modified.  If it does not, a new
+ one will be created.
+
+WSTART
+
+ Specifies the value (usually a wavelength)
+ to be used for the first element of the X array.
+ Note that the value refers to the CENTER of the
+ bin - it's easy to find yourself one bin out.
+
+WEND
+
+ Specifies the value (usually a wavelength)
+ to be used for the last element of the X array.
+ Note that the value refers to the CENTER of the
+ bin - it's easy to find yourself one bin out.
+
+OUTPUT
+
+ The name of the resulting image (or spectrum).
+ If this is the same as IMAGE, the original
+ file will be modified.  Otherwise, a new file
+ will be created.
+
+LOG
+
+ If set, the X values will vary in a logarithmic
+ manner between WSTART and WEND.  The default is
+ for them to vary linearly.
+
+See_also
+
+ FIGARO: LYSET.
+ KAPPA: SETAXIS, AXCONV, AXLABEL, AXUNITS.
+
+Source_comments
+
+ L S E T
+
+ This routine is the main body of LXSET,LYSET
+
+ LXSET is a fudging routine that sets the range of the first axis
+ associated with a spectrum or image, given a start and end wavelength and
+ whether or not the wavelengths are to be scaled logarithmically.
+
+ LYSET performs an analgous set for the second axis structure
+ (for images).
+
+ Command parameters -
+
+ IMAGE      (Character) The name of the structure containing the image.
+
+ WSTART or  (Numeric) The value of the CENTER of the first
+ VSTART      bin of the resulting data. WSTART and VSTART are used
+             by  LXSET and LYSET respectively)
+
+ WEND  or   (Numeric) The value of the CENTER of the final
+ VEND        bin of the resulting data. WEND and VEND are used
+             by  LXSET and LYSET respectively)
+
+ OUTPUT     (Character) The name of the result of the operation.
+            This can be the same as for IMAGE.  If not, a new structure
+            is created, with everything but the axis data a direct
+            copy of the input.
+
+ Command keywords -
+
+ LOG    Axis values are to increase logarithmically.
+
+                                  KS / AAO 28th MArch 1985
+.endhelp

@@ -1,0 +1,67 @@
+.help gspike Starlink figaro
+.nf
+ GSPIKE - Generates a 'spiketrum' from a table of values
+
+
+Description
+
+ Given a template spectrum - from which it gets the wavelength
+ range required - and a table file giving wavelength and data
+ values, GSPIKE generates a 'spiketrum'; a spectrum where all
+ the elements except for those at the tablulated values are
+ zero.
+
+Parameters
+
+
+SPECTRUM
+
+ A template spectrum to determine the wavelength
+ range over which to generate the 'spiketrum'
+ from tabulated values.  Must have a proper
+ array of X values.
+
+TABLE
+
+ The name of the table file holding the pairs of
+ values (wavelength and data) for the points to be
+ used to generate the 'spiketrum'.  If no extension
+ is specified, .TAB will be used.  The table may be
+ in any of the standard Figaro directories, or in the
+ current default directory.  Or it may be specified
+ in a form that includes the directory name.
+
+SPIKETRUM
+
+ The name of the resulting 'spiked spectrum'
+ (hence 'spiketrum') produced by GSPIKE.  It
+ will always be a new file.
+
+Source_comments
+
+ G S P I K E
+
+ Generates a 'spiketrum' from a table of X and Z values, given a
+ spectrum to use as a template for the X range to be used.  The
+ resulting spiketrum will be a spectrum with the same .X structure
+ as the template spectrum, and a .Z structure that has zeros
+ everywhere except at the points given in the table.  The table file
+ can include SET commands that set individual item values in the
+ resulting file, but the item names need to have been defined in the
+ file SPIKETRUM.DEF.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The name of the template spectrum.
+ TABLE       (Character) The name of the file containing the
+             table of X and Z values.  If TABLE contains no
+             extension then '.TAB' will be assumed.
+ SPIKETRUM   (Character) The name of the spiketrum to be creeated.
+             Note that this will always be a new file.
+
+ Command keywords -  None
+
+ User variables used - None
+
+                                       KS / CIT 7th May 1984
+.endhelp

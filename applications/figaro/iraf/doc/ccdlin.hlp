@@ -1,0 +1,72 @@
+.help ccdlin Starlink figaro
+.nf
+ CCDLIN - Applies a linearity correction to AAO CCD data
+
+
+Description
+
+ CCDLIN applies a linearity correction to AAO CCD data.  The
+ correction applied has the form determined by John Barton (RCA#5
+ Non-Linearity Correction - AAO internal document), and has two
+ parameters: a correction factor (alpha), and a bias whose value
+ is assumed when applying the correction.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image to be corrected for non-linearity.
+ It should be a raw image obtained with an AAO CCD.
+
+OUTPUT
+
+ Specifies the resulting corrected image.  If this is the
+ same as IMAGE, the image is corrected in situ.
+ Otherwise, a new image is created.
+
+ALPHA
+
+ The value of the correction factor used.  The correction
+ is given by
+
+    M=C*(1+alpha*C)
+
+ where M and C are the measured and corrected intensities
+ (after bias subtraction) respectively.  John Barton's memo
+ gives a value of alpha=3.16E-6, and this is the reset value.
+
+CBIAS
+
+ Since the linearity correction is expressed in terms of
+ intensities after bias subtraction, a bias must be
+ assumed during the calculation.  The value is not very
+ critical (any error in bias results in a much smaller
+ error in the corrected data), and can safely be assumed
+ to be constant over the image.  The reset value is 180.
+
+Source_comments
+
+ C C D L I N
+
+ Applies a linearity correction to data from the AAO RCA CCD.
+ The correction applied is that given by John Barton (RCA#5
+ Non-Linearity Correction, AAO Internal Document).
+
+ Command parameters -
+
+ IMAGE   (Character) The name of the structure containing the image.
+
+ ALPHA   (Numeric) The value of the constant alpha in the expression
+         giving the linearity correction.
+
+ CBIAS   (Numeric) The value of the bias level to be applied when
+         making the correction.  This is not a particularly critical
+         parameter.
+
+ OUTPUT  (Character) The name of the result of the operation.  This
+         can be the same as for IMAGE.  If not, a new structure
+         is created, with everything but the data a direct
+         copy of the input.
+                                  KS / AAO 10th Sept 1986
+.endhelp

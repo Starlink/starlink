@@ -1,0 +1,65 @@
+.help isydiv Starlink figaro
+.nf
+ ISYDIV - Divides a spectrum into each Y direction x-section of an image
+
+
+Description
+
+ Each pixel of each row in the image is divided by a value.
+ The divisor values come from the corresponding pixels in an
+ input spectrum.
+
+Parameters
+
+
+IMAGE
+
+ Name of image.
+
+SPECTRUM
+
+ Name of spectrum.
+
+OUTPUT
+
+ Name of resulting image.
+
+Source_comments
+
+ I S O P S
+
+ Performs a number of operations all of the general form
+
+ Image=function(image,spectrum)
+
+ Specifically, if an image is of format (IX,IY) then
+
+ ISXSUB is Result = IMAGE(I,N)-SPECTRUM(I) 1<=I<=IX 1<=N<=IY
+ ISXADD  "   "    = IMAGE(I,N)+SPECTRUM(I)    "        "
+ ISXDIV  "   "    = IMAGE(I,N)/SPECTRUM(I)    "        "
+ ISXMUL  "   "    = IMAGE(I,N)*SPECTRUM(I)    "        "
+ ISYSUB is Result = IMAGE(N,I)-SPECTRUM(I) 1<=N<=IX 1<=I<=IY
+ ISYADD  "   "    = IMAGE(N,I)+SPECTRUM(I)    "        "
+ ISYDIV  "   "    = IMAGE(N,I)/SPECTRUM(I)    "        "
+ ISYMUL  "   "    = IMAGE(N,I)*SPECTRUM(I)    "        "
+
+ So the ISX... operations require a spectrum IX elements long,
+ and the ISY... operations need one IY elements long.
+
+ Command parameters -
+
+ IMAGE    The name of the structure containing the first image.
+
+ SPECTRUM The name of the structure containing the second
+          image data.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+ The command itself (IXSADD,IXSMUL, etc.) is used to
+ differentiate between the possible operations.
+
+                                  KS / CIT 18th Feb 1983
+.endhelp

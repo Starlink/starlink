@@ -1,0 +1,171 @@
+.help echfind Starlink figaro
+.nf
+ ECHFIND - Locate spectra in echelle data
+
+
+Description
+
+ Find orders within an echelle image and optionally write a mask
+ image that can be used for quick-look extraction of orders from a
+ raw echelle image.
+
+Parameters
+
+
+IMAGE
+
+ Name of echelle image in which to search.
+
+PERISCOPE
+
+ Is the periscope fitted?
+
+YSTART
+
+ Y value to start search for orders.
+
+YEND
+
+ Y value to stop search for orders.
+
+MSTART
+
+ Number of the first order in range.
+
+MDELTA
+
+ Order number increment (-1 or +1).
+
+SDIST
+
+ Write output file SDIST.DAT in SDIST format?
+
+OUTFILE
+
+ Name of output report file.
+
+THRESH
+
+ Threshold above which orders are deemed to exist.
+
+MINHW
+
+ Minimum half-width of orders.
+
+DOMASK
+
+ Create an output mask image?
+
+OUTPUT
+
+ Name of mask image showing order positions.
+
+Source_comments
+
+ E C H F I N D
+
+ Program name:
+    ECHFIND
+
+ Function:
+    Find orders within an echelle image and optionally write a mask
+    image that can be used for quick-look extraction of orders from a
+    raw echelle image.
+
+ Description:
+    Note: This program is believed to work, but it has not been as
+    extensively used and tested as has the ICUR/SDIST method.
+    ICUR/SDIST is believed to be a superior if slightly less
+    convenient way of locating and tracking orders. Having said this,
+    you are welcome to try this program!
+
+    The program can be run in several different ways. The SDIST
+    keyword controls whether an SDIST.DAT file (which can later be
+    used by CDIST) is created and the DOMASK keyword controls whether
+    a mask image (that can later be applied by MASKEXT) is created.
+
+    The program locates the orders by taking a vertical cut (i.e. in the
+    cross-dispersion direction) through the data (averaging 7 columns)
+    and then searches for peaks occurring above a user-specified
+    threshhold.  Unfortunately this threshhold has to be a constant
+    and this, plus knowing a sensible value to give for it, is one of
+    the major limitations of the program.
+
+    Having located the orders, they are tracked using a method that is
+    a combination of edge detection and centroiding. Little of the
+    feedback and control that is available with SDIST is available and
+    this is another major problem.
+
+    Having tracked the orders, the SDIST.DAT file is written if
+    requested.  If an SDIST.DAT file is not required, a more
+    user-readable listing file is written. Finally, the mask image is
+    written if requested.  The values in the mask are set to be zero
+    if that pixel in the mask does not lie in an order and to a number
+    derived from the order number otherwise (see below). It is
+    guaranteed that every order is extracted using the same number of
+    rows, but of course the position of these rows may vary along an
+    order so one can expect visible jumps in the extracted data,
+    especially if too fews rows are extracted to take all the data
+    from the object.
+
+    The PERISCOPE keyword (see below) determines whether each order
+    has two separate parts (corresponding to object and sky and due to
+    the special periscope that samples object and sky at a wide
+    spacing and brings them together on the slit) or one part
+    (corresponding simply to the slit).  The data values in the mask
+    are 10 * (true order number) + (sub-order number) where the
+    sub-order number is 0 if there is no periscope fitted, 1 if this
+    is the first part of an order and 2 if this is the second part of
+    the order. The "first" and "second" parts of an order are defined
+    so that the actual data values in the mask are monotonic along a
+    vertical slice through it, i.e. they might go 412, 411, 402, 401 if
+    the periscope is fitted and they might go 410, 400 if it is not
+    fitted.
+
+    If PERISCOPE is NO, then unlike in ECHMASK, the user has no
+    option of splitting the data in an order into object and sky.
+    There is room for enhancement here.
+
+ Parameters:
+
+    (>) IMAGE         (File) The name of the raw echelle image.
+    (>) YSTART        (Integer) The starting and ending Y positions to
+    (>) YEND          (Integer) search for orders. Default entire image.
+    (>) PERISCOPE     (Keyword) Whether or not the periscope is fitted.
+                      Default YES.
+    (>) MSTART        (Integer) The order number of the first
+                      "spectrum" in the coefficient file. Default 1.
+    (>) MDELTA        (Integer) +1 if order numbers increase as
+                      "spectrum number" increased, -1 otherwise.
+                      Default -1.
+    (>) SDIST         (Keyword) Whether to write an SDIST.DAT file.
+                      Default NO.
+    (>) OUTFILE       (Character) If SDIST is NO, the name of the
+                      listing file.
+    (>) THRESH        (Real) The threshhold above which peaks in the
+                      profile across the orders must lie in order to
+                      be considered as order peaks. Default 1000.
+    (>) MINHW         (Integer) The half width that is used for the
+                      median filter that is passed through the
+                      profiles to remove rogue data before looking for
+                      orders. Default 5.
+    (>) DOMASK        (Keyword) Whether to write a mask image. Default
+                      NO.
+    (<) OUTPUT        (File) If DOMASK is YES, the name of the mask
+                      image. Default MASK.
+
+ Language:
+    FORTRAN
+
+ External variables used:
+
+    None
+
+ Prior requirements:
+    None
+
+
+Authors
+
+ William Lupton, AAO
+.endhelp

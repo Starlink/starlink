@@ -1,0 +1,54 @@
+.help cmplx2r Starlink figaro
+.nf
+ CMPLX2R - Extracts the real part of a complex data structure
+
+
+Description
+
+ CMPLX2R creates a data structure, in which the data is taken
+ from the real part of a complex data structure.  The resulting
+ structure is not complex (i.e. has only a single data array, with
+ no 'real' and 'imaginary' arrays).
+
+Parameters
+
+
+CDATA
+
+ The name of an existing complex data structure.
+ The real data array from this will become the data array
+ of the resulting structure.
+
+OUTPUT
+
+ The name of the data structure to be created.
+ Its data array will come from the structure specified as
+ CDATA, and it will not have any 'real' or 'imaginary'
+ arrays.  If OUTPUT is the same as CDATA, CDATA will be
+ transformed into a non-complex structure (which means
+ that its imaginary part will be lost); otherwise, a new
+ file is created.
+
+Source_comments
+
+ C M P L X 2 R    /     C M P L X 2 I   /   C M P L X 2 M
+
+ Creates a real data structure (i.e. one with just a real data array)
+ as opposed to a complex data structure, (in the Figaro sense of a
+ structure with both  real and imaginary data arrays)
+ from a complex data structure.
+ In the case of CMPLX2R it is the real part of the complex data
+ that forms the data array in the resulting structure.
+ For CMPLX2I, it is the imaginary part, and for CMPLX2M
+ it is the modulus of the complex data.
+
+ Command parameters -
+
+ CDATA    (Character) The name of the input complex structure.
+ OUTPUT   (Character) The name of the resulting structure.  This
+          may be the same as CDATA. In either case a new file
+          is created.
+
+ Command keywords - None
+                                     KS / AAO  24th Sept 1986.
+.endhelp

@@ -1,0 +1,45 @@
+.help rembad Starlink figaro
+.nf
+ REMBAD - Removes pixels that have been flagged as bad from data
+
+
+Description
+
+ Remove from a spectrum points which are flagged as bad or
+ shown as bad in the quality array. The main purpose of this
+ command is to allow such spectra to be correctly processed
+ by FIGARO commands which do not support data quality.
+
+Parameters
+
+
+SPECTRUM
+
+ Spectrum containing bad points.
+
+OUTPUT
+
+ Name of resulting spectrum.
+
+See_also
+
+ FIGARO: BCLEAN, CLEAN, COSREJ, MEDFILT, MEDSKY, TIPPEX.
+ KAPPA: CHPIX, FILLBAD, GLITCH, MEDIAN, ZAPLIN.
+
+Source_comments
+
+ R E M B A D
+
+ Remove from a spectrum points which are flagged as bad or
+ shown as bad in the quality array. The main purpose of this
+ command is to allow such spectra to be correctly processed by
+ FIGARO commands which do not support data quality.
+
+ Command parameters -
+
+ SPECTRUM    The spectrum from which bad points will be removed.
+ OUTPUT      The resulting spectrum.
+
+ Command keywords -
+                                     JAB/ JAC  16th Dec 1990
+.endhelp

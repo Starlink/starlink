@@ -1,0 +1,87 @@
+.help table Starlink figaro
+.nf
+ TABLE - List contents of a SPICA memory file
+
+
+Description
+
+ This function produces a list of a SPICA memory file contents
+ on the screen, and in a file. If required, the file may then
+ be printed.
+
+Parameters
+
+
+FILE
+
+ The name of the SPICA Memory file from which the
+ records are to be listed.  The name of the file should be
+ given in full - e.g. 'ABCD1D.DAT'.  The Memory file can be
+ 1-D or 2-D.
+
+PRINT
+
+ If set, the table will be printed on the default printer
+ queue.  Default is PRINT=NO.
+
+DELETE
+
+ If set, the table will be deleted at the end or after
+ printing.  If DELETE is not set, the table will be
+ saved in the file TABLE.LIS in the default directory.
+ Default is DELETE=YES.
+
+Source_comments
+
+ T A B L E
+
+  This function produces a list of a SPICA memory file contents
+  on the screen, and in a file. If required, the file may then
+  be printed. The command is TABLE
+
+  With parameter
+
+  FILE     name of SPICA memory file
+
+  With keywords
+
+  PRINT=NO   specifies that the list is not to be printed (D)
+  PRINT=YES  that the list is to be printed
+
+  DELETE=NO  that the listing file is to be kept
+  DELETE=YES that the listing file is to be deleted (D)
+
+
+  SUBROUTINES AND FUNCTIONS CALLED :
+
+  ICH_LEN - (F) Looks for position of last non space in a string
+  INDSORT - Sorts index records                     (from SPSUBS)
+  PAR_WRUSER  - Writes a string to the terminal
+  PAR_RDCHAR  -
+  PAR_RDKEY   -
+  GEN_FORTERR -
+  FIG_SETERR  -
+
+
+  VARIABLES AND PARAMETERS :
+
+  DESREC : Desired record
+  HEADER : Array holding entry header
+  I, J   : Loop counters
+  LABEL  : Label of memory file entry
+  LISLU  : (P) LU on which listing file is opened
+  MEMLU  : (P) LU on which the memory file is opened
+  MEMORY : Memory file name
+  NI     : Number of channels in the data
+  NL     : Number of X sections in the data
+  NUMBER : Index entry number
+  RLVAL  : General REAL variable
+  STATUS : Status return
+  STRING : Output string
+  WSTAT  : Dummy status for PAR_WRUSER
+
+
+  Programmer :  S. A. Morris            Date :  21-APR-1983
+  Modified to sort the records    Alan Bridger  21-SEP-1983
+  Modified for FIGARO environment     P.W.Hill  16-MAR-1986
+.endhelp

@@ -1,0 +1,58 @@
+.help sfit Starlink figaro
+.nf
+ SFIT - Fit a polynomial to a spectrum
+
+
+Description
+
+ Task to generate a spectrum by fitting a polynomial to
+ an input spectrum.  An orthogonal polynomial of specified
+ order is fitted either to the spectrum or to its logarithm,
+ and the result is used to generate a new spectrum.
+
+Parameters
+
+
+SPECTRUM
+
+ Name of spectrum to be fitted.
+
+ORDER
+
+ Order of fitted polynomial.
+
+LOGS
+
+ Fit to logarithms of data.
+
+OUTPUT
+
+ Name of resulting spectrum.
+
+Source_comments
+
+ S F I T
+
+ Figaro function to generate a spectrum by fitting a polynomial
+ to an input spectrum.  An orthogonal polynomial of specified
+ order is fitted either to the spectrum or to its logarithm, and
+ the result is used to generate a new spectrum.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The name of the spectrum to be fitted.
+
+ ORDER       (Numeric) The order to be used for the fit.
+
+ OUTPUT      (Character) The name of the output file to
+             be created.  If this is the same as the input
+             spectrum, the data in the input spectrum will
+             be modified.
+
+ Command keywords -
+
+ LOGS        Indicates that the logs of the pixel values
+             of the input spectrum are to be fitted.
+
+                                          KS / CIT 5th June 1983
+.endhelp

@@ -1,0 +1,64 @@
+.help ipower Starlink figaro
+.nf
+ IPOWER - Raises an image to a specified power
+
+
+Description
+
+ IPOWER raises each pixel in an image to a specified power.  This
+ can be used, for example, to take the square root of an image (by
+ using a power of 0.5).  Any pixel for which the operation is not
+ legal - e.g. -ve pixels being raised to a non-integer power - are
+ set to zero in the output image.
+
+Parameters
+
+
+IMAGE
+
+ Name of the datafile to be processed.
+
+POWER
+
+ The power to which the input image is to be
+ raised.  So setting POWER=0.5 will take the square root
+ of the image, POWER=2.0 will square the image, POWER=-1
+ will give the inverse of the image, etc.
+
+OUTPUT
+
+ The name of the resulting image.  If this is the
+ same as IMAGE (the default) the operation will be
+ performed in situ.  Otherwise a new image will be
+ created.
+
+See_also
+
+ KAPPA: POW.
+
+Source_comments
+
+ I P O W E R
+
+ Raises the data in an image to a power of itself.  This can be used
+ to multiply an image by itself (POWER=2.0) or to take the square
+ root of an image (POWER=0.5), or may be used with an arbitrary power.
+ Pixels whose value is such that the operation is illegal will give
+ a zero result.
+
+ Command parameters -
+
+ IMAGE  (File) The name of the structure containing the image.
+
+ POWER  (Numeric) The power to which the image is to be raised.
+
+ OUTPUT (File) The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+                                  KS / AAO 28th May 1987
+.endhelp

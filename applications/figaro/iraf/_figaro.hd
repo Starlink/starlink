@@ -1,0 +1,6 @@
+# Help definitions for the figaro package
+figaro men = figaro.men,
+         hlp = ..,
+         sys = figaro.hlp,
+         pkg = figaro.hd,
+         src = figaro.cl

@@ -1,0 +1,46 @@
+.help igcur Starlink figaro
+.nf
+ IGCUR - Use cursor to show X, Y and data values
+
+
+Description
+
+ Interative task to determine pixel values in a dataset.
+ This task can be used to mark points to be used by other
+ tasks.
+
+Parameters
+
+ No user parameters.
+
+See_also
+
+ FIGARO: ICUR.
+ KAPPA: CURSOR, INSPECT, PICCUR.
+
+Source_comments
+
+ I G C U R
+
+ Services an 'IGCUR' command.   Displays position and
+ data value on the image display, depending on cursor position.
+
+ Command parameters, keywords - None
+
+ User variables used -   (">" input, "<" output)
+
+ (>) IMFILE    (Character) The name of the data currently
+               displayed.  Set by IGREY or similar.
+ (>) PGENVARG  (Numeric array) The argument list for PGENV that was
+               used in displaying the image.
+ (<) XPIXELS   (Numeric) The pixel numbers in X for the
+               points indicated by the cursor.
+ (<) YPIXELS   (Numeric) The pixel numbers in Y for the
+               points indicated by the cursor.
+ (<) NPIXELS   (Numeric) The number of points selected by
+               the cursor.  Note: if no points are selected,
+               the values of NPIXELS, XPIXELS and YPIXELS
+               are left unchanged.
+
+                                      KS / CIT 20th March 1984
+.endhelp

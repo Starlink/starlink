@@ -1,0 +1,92 @@
+.help figs322 Starlink figaro
+.nf
+ FIGS322 - Processes a FIGS data cube down to an image
+
+
+Description
+
+ FIGS321 takes a FIGS data cube, as produced by the FIGS data
+ acquisition system, and reduces it to a single image, subtracting
+ off the various beamswitch and chopping backgrounds.
+
+Parameters
+
+
+CUBE
+
+ The name of a data cube produced by the FIGS data
+ acquisition system.  That is is should have the
+ dimensions (wavelength steps,8,beamswitch cycles).
+
+IMAGE
+
+ The name of the resulting single image produced
+ by collapsing down the FIGS data cube.
+
+ADD
+
+ Disables the subtraction of the background beamswitch
+ and chopping data.  This is unusual (ADD=NO is the
+ default) and is generally only required for test data.
+
+BACK
+
+ Returns the background spectrum only, rather than the
+ background subtracted source data.
+
+Source_comments
+
+ F I G S 3 2 2 ,   F I G S 3 2 1
+
+ Given a FIGS data cube as produced by the FIGS data acquisition
+ system, processes it to produce either an image of wavelength
+ against cycle number (FIGS322) or a single spectrum (FIGS321).
+
+ Command parameters -
+
+ 'CUBE'     The name of the cube from which the planes
+            are to be taken.  This should be a raw FIGS data
+            cube.
+ 'IMAGE'    The name of the resulting image (FIGS322)
+ 'SPECTRUM' The name of the resulting spectrum (FIGS321)
+ 'CUTOFF'   The level (in sigma) at which a point will
+            be ignored (FIGS321 only)
+
+ Command keywords -
+
+ 'ADD'      Add the data together rather than subtracting the
+            beamswitch and chop backgrounds
+
+ 'BACK'     Return the background spectrum only
+
+ 'NORM'     Normalize data to mean level of each cycle.
+            (FIGS321 only.)
+
+ Input data -
+
+ This routine assumes that the first axis of the cube data
+ represents wavelength, that the second represents spectral
+ scans in the order A1a,A1b,B1a,B1b,B2a,B2b,A2a,A2b, where
+ A1,A2,B1,B2 represent the parts of the beamswitch ABBA cycle
+ and a and b represent the signal and background chop positions
+ respectively.  In grating mode 2, there are no chop positions,
+ and the second axis is just A1,B1,A2,B2. Grating mode 3 data
+ is modified by the on-line acquisition software so that it
+ has the same format as grating mode 1 data.  This means that the
+ second dimension of the cube has to be either 4 or 8.  The
+ cube third axis represents beamswitch cycle number.
+ The data is sorted into wavelength order using the various
+ grating parameters read from the .FITS sub-structure of CUBE.
+ The data is normalized to give a figure in detected photons
+ per second.
+
+ Output data -
+
+ IMAGE is created with the same structure as CUBE
+ except that main data array will only have 1 or 2 dimensions, and any
+ AXIS sub-structures that CUBE has will be deleted/renamed
+ as appropriate. If a spectrum is produced the errors (derived from
+ the cycle to cycle statistics) are generated.
+
+                                 KS / AAO 8th June 1985
+.endhelp

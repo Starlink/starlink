@@ -1,0 +1,75 @@
+.help hopt Starlink figaro
+.nf
+ HOPT - Histogram optimization of an image
+
+
+Description
+
+ Performs a histogram equalisation on an image in an attempt
+ to enhance the contrast.  See, for example, Gonzalez and
+ Wintz, 'Digital Image Processing', Addison-Wesley).
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be equalised.
+
+MINVAL
+
+ Minimum data value to be used.
+
+MAXVAL
+
+ Maximum data value to be used.
+
+EQUALISE
+
+ Generate equalised output data?
+
+OUTPUT
+
+ Name of resulting image.
+
+See_also
+
+ KAPPA: LAPLACE, LUTABLE, SHADOW, THRESH.
+
+Source_comments
+
+ H O P T
+
+ Performs a histogram equalisation on an image in an attempt
+ to enhance the contrast.  See, for example, Gonzalez and
+ Wintz, 'Digital Image Processing', Addison-Wesley).
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ MINVAL The minimum value to be used in generating the
+        histogram.
+
+ MAXVAL The maximum value to be used in generating the
+        histogram.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords -
+
+ EQUALISE  Actually perform an equalisation.  If this is
+           no (most likely if EQUALISE is not set) then
+           all that happens is that the distribution
+           histogram is generated and displayed.
+
+ User variables -
+
+ SOFT    (Character) The device/type to be used for terminal
+         graphics.
+
+                                  KS / CIT 27th Jan 1983
+.endhelp

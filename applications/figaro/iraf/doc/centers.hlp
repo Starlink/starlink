@@ -1,0 +1,138 @@
+.help centers Starlink figaro
+.nf
+ CENTERS - Generate file of object centroids from ICUR, IGCUR or IMPOS output
+
+
+Description
+
+ Figaro function that takes a list of approximate X,Y positions
+ of objects in a two-dimensional direct image and calculates
+ centroids (that is, accurate positions) for these objects.
+
+ The approximate positions input are obtained from environment
+ variables.  These variables should be set up prior to running
+ CENTERS, usually by using Figaro functions IGCUR or ICUR.
+ Alternatively, you may enter the positions into a text file and use
+ IMPOS to read this file and copy the values into the environment
+ variables required by CENTERS.
+
+ The computed centroids are output to a new file called center.dat.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image containing the objects.  This need not be the
+ image used to generate the original list of points - it may be a
+ similar image in a different waveband, with offsets in X and Y with
+ respect to the original image.
+
+APERTURE
+
+ The aperture used for the centroiding.  The aperture actually used is
+ a box APERTURE*2+1 pixels square, which is a rough approximation to a
+ circle of radius APERTURE.
+
+XOFF
+
+ The offset in X, in pixels.
+
+YOFF
+
+ The offset in Y, in pixels.
+
+PROFBOX
+
+ Size of profile box.
+
+PROFMIN
+
+ Minimum displayed value.
+
+PROFMAX
+
+ Maximum displayed value.
+
+PFILE
+
+ If set, a formatted file giving the summed radial profiles will
+ be produced.
+
+DISPROF
+
+ If set, the profile is displayed.
+
+CHGPROF
+
+ If set, the profile display can be changed.
+
+Source_comments
+
+ C E N T E R S
+
+ Figaro function that takes a list of approximate X,Y positions
+ of objects in a two-dimensional direct image and calculates
+ centroids (that is, accurate positions) for these objects.
+
+ The approximate positions input are obtained from environment
+ variables.  These variables should be set up prior to running
+ CENTERS, usually by using Figaro functions IGCUR or ICUR.
+ Alternatively, you may enter the positions into a text file and use
+ IMPOS to read this file and copy the values into the environment
+ variables required by CENTERS.
+
+ The computed centroids are output to a new file called center.dat.
+
+ Command parameters -
+
+ IMAGE    (Character) The name of the image containing the
+          objects.  This need not be the image used to
+          generate the original list of points - it may be
+          a similar image in a different waveband, with 
+          offsets in X and Y with respect to the original image.
+ APERTURE (Integer) The aperture used for the centroiding.
+          The aperture actually used is a box APERTURE*2+1
+          pixels square, which is a rough approximation to a
+          circle of radius APERTURE.
+ XOFF     (Real) The offset in X, in pixels.
+ YOFF     (Real) The offset in Y, in pixels.
+ PROFBOX  (Real) Size of profile box.
+ PROFMIN  (Real) Minimum displayed value.
+ PROFMAX  (Real) Maximum displayed value.
+
+ Command keywords -
+
+ PFILE    If specified, a formatted file giving the summed
+          radial profiles will be produced.
+ DISPROF  If specified, the profile is displayed.
+ CHGPROF  If specified, the profile display can be changed.
+
+ User variables - (">" input
+
+ (>) SOFT    (Character) The current device/type for soft plots.
+ (>) NPIXELS (Real) Number of objects for which positions are
+              specified.
+ (>) XPIXELS (Real array) List of approximate X positions of the
+             objects for which the centroids are to be computed
+             (pixels).
+ (>) YPIXELS (Real array) List of approximate Y positions of the
+             objects for which the centroids are to be computed
+             (pixels).
+
+ Output -
+
+ center.dat contains one record for each point, giving
+            XCENT,YCENT,IX,IY,DX,DY,AP 
+            in the format 2F8.2,2I5,2F8.2,I4 where
+            XCENT,YCENT give the position of the centroid
+            IX,IY are the original pixel position of the point.
+            DX,DY are the offsets in X and Y, and
+            AP is the value used for APERTURE.
+            If the centroid for a point cannot be determined, a
+            record is written giving 
+            '*** No centroid ',IX,IY,DX,DY,AP
+            in the format A,2I5,2F8.2,I4.
+                
+                                     KS / CIT 29th Sept 1983
+.endhelp

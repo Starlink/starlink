@@ -1,0 +1,82 @@
+.help xtplane Starlink figaro
+.nf
+ XTPLANE - Adds XT planes of a data cube to form an image
+
+
+Description
+
+ Given a data cube (strictly a cuboid) XTPLANE extracts a 2-D image
+ from it by adding together a number of planes of constant Y.
+
+Parameters
+
+
+CUBE
+
+ The name of a 3-dimensional data cuboid,
+ from which XTPLANE is to extract a 2-D image by adding
+ together contiguous planes of constant Y value, the
+ Y dimension being the second dimension of the data.
+
+YSTART
+
+ The Y value of the first of the planes to
+ be added together to form the extracted image.  If
+ the Y axis of the cube is calibrated, YSTART must be
+ specified in the units in which it is calibrated.
+ Otherwise, the element number (1..N) should be used.
+
+YEND
+
+ The Y value of the last of the planes to
+ be added together to form the extracted image.
+
+IMAGE
+
+ The name of the 2-D image to be created by XTPLANE.
+
+Source_comments
+
+ Y T P L A N E ,   X T P L A N E,    X Y P L A N E
+
+ Adds a number of consecutive planes from a cube to
+ produce a 2-D data object.  YTPLANE, XTPLANE and XYPLANE
+ take planes whose X,Y or T values respectively are
+ constant over the extracted plane.  (Pedantic note:
+ strictly, a cuboid is meant, rather than a cube.)
+ (Further pedantic note: the X, Y and T axes
+ mentioned in this routine should really be referred to
+ as AXIS(1), AXIS(2) and AXIS(3) respectively. However,
+ explanations become confusing if this is done, so the references to
+ X, Y and T remain. This does not mean that the data is stored in
+ .X .Y and .T structures - JM.)
+
+ Command parameters -
+
+ 'CUBE'     The name of the cube from which the planes
+            are to be taken.
+
+ 'XSTART'   The X,Y, or T-value of the first plane to be used.
+ 'YSTART'   If CUBE has a X, Y or T  structure, the data
+ 'TSTART'   from this is used.  If not, the plane numbers
+            are used, starting from 1.
+
+ 'XEND'     The X, Y, or T-value of the last plane to be used.
+ 'YEND'
+ 'TEND'
+
+ 'IMAGE'    The name of the resulting data structure.
+
+ Input data -
+
+ CUBE - 3-D data-array
+
+ Output data -
+
+ IMAGE is created with the same structure as CUBE
+ except that the data array will only have 2 dimensions, and if
+ CUBE has a X,Y or T structure, this will be omitted -
+ that is, XPLANE will omit any X structure, YPLANE any
+ Y structure and  etc.
+                                 KS / AAO 8th Jan 1985
+.endhelp

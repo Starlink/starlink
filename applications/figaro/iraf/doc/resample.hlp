@@ -1,0 +1,136 @@
+.help resample Starlink figaro
+.nf
+ RESAMPLE - Rebin an image to different dimensions and/or orientation
+
+
+Description
+
+ Given an input image, RESAMPLE creates an output image which
+ is the result of rotating/shifting/shearing/scaling the input
+ image. The transformation between the input and output pixel
+ coordinates can be specified by giving a rotation ANGLE and
+ scale factors to be applied to the X and Y axes (XMAG, YMAG),
+ or by explicitly specifying the transformation matrix (using
+ TRANSFORM). The later option allows shears to be specified.
+ The first option automatically selects the output image
+ shift and size so that the entire input image is present.
+ The interpolation used in setting the values of the output
+ pixels can be either 'nearest pixel', 'linear', or 'constant
+ noise'.
+
+Parameters
+
+
+IMAGE
+
+ The name of the input image.
+
+TRANSFORM
+
+ Allows you to specify the transformation between the input
+ and output pixel coordinates.  You can enter a 6-element
+ array, where the elements have the following meanings:
+
+    XIN = C(1)+C(2)*XOUT+C(3)*YOUT
+    YIN = C(4)+C(5)*XOUT+C(6)*YOUT
+
+ You can invert the transformation by using the INVERT
+ keyword. If you don't wish to enter TRANSFORM, respond
+ with a <CR> and you will be prompted for XMAG, YMAG,
+ and ROTATE instead.
+
+XMAG
+
+ The scale factor to be applied to the X
+ coordinate. For example, if you want the input image
+ blown up by a factor of two in the X direction, specify
+ XMAG=2. The scaling is done before any rotation.
+
+YMAG
+
+ The scale factor to be applied to the Y
+ coordinate. For example, if you want the input image
+ blown up by a factor of two in the Y direction, specify
+ YMAG=2. The scaling is done before any rotation.
+
+ANGLE
+
+ The number of degrees you wish to rotate the
+ input image. The angle is measured counterclockwise.
+ Rotation is performed after any scaling you have
+ requested.
+
+INVERT
+
+ Allows you to invert the transformation that you
+ have specified.
+
+METHOD
+
+ Allows you to chose the interpolation method
+ used when selecting the output pixel values. The three
+ choices are:
+
+    1 - Nearest pixel. No interpolation is performed, the
+        value of the nearest pixel is used. This is fast.
+    2 - Linear. A linear interpolation is performed using
+        the values of the 4 nearest pixels.
+    3 - Constant noise. Uses the 9 nearest pixels in some
+        mysterious way.
+
+XSIZE
+
+ Gives the number of pixels in the X-direction
+ for the output image. The default value is that
+ required to fit the input image after transformation.
+
+YSIZE
+
+ Gives the number of pixels in the Y-direction
+ for the output image. The default value is that
+ required to fit the input image after transformation.
+
+INVALID
+
+ The value for a pixel which is assumed to mean that
+ the pixel is invalid (which usually means that it
+ falls off the edge of the image). Such pixels are
+ not used for interpolations purposes.
+
+OUTPUT
+
+ The name of the resulting resampled image.
+
+Source_comments
+
+ R E S A M P L E
+
+ Given an input image, RESAMPLE creates an output image which
+ is the result of rotating/shifting/shearing/scaling the input
+ image. The transformation between the input and output pixel
+ coordinates can be specified by giving a rotation ANGLE and
+ scale factors to be applied to the X and Y axes (XMAG, YMAG),
+ or by explicitly specifying the transformation matrix (using
+ TRANSFORM). The later option allows shears to be specified.
+ The first option automatically selects the output image
+ shift and size so that the entire input image is present.
+ The interpolation used in setting the values of the output
+ pixels can be either 'nearest pixel', 'linear', or 'constant
+ noise'.
+
+ IMAGE      (Character) The name of the input image.
+ TRANSFORM  (6 element array) The transformation coefficients.
+ XMAG       (Numeric) The X magnification factor.
+ YMAG       (Numeric) The Y magnification factor.
+ ANGLE      (Numeric) The rotation angle (degrees).
+ INVERT     (Keyword) Whether to invert the transformation.
+ METHOD     (Numeric) The interpolation method (1, 2, or 3).
+ XSIZE      (Numeric) The X-dimension of the output image.
+ YSIZE      (Numeric) The Y-dimension of the output image.
+ INVALID    (Numeric) The value of an invalid pixel.
+ OUTPUT     (Character) The name of the output image.
+
+ User variables used -  None
+
+                              Michael Ashley / MSSSO 12th Dec 1986
+.endhelp

@@ -1,0 +1,77 @@
+.help ixsmooth Starlink figaro
+.nf
+ IXSMOOTH - Smooth in X-direction by gaussian convolution
+
+
+Description
+
+ IXSMOOTH smooths cross-sections of an array in the X-direction
+ by convolving them with a gaussian of specified sigma and a
+ specified cutoff width.  Note that this is not a 2-D smooth,
+ but a series of 1-D smooths; hence the name.
+
+ The VARIANCE array, if present, is propagated in exactly the same
+ way as the DATA array.  This procedure it not formally correct and
+ the computed variance will probably under-estimate the true error.
+
+Parameters
+
+
+IMAGE
+
+ Name of data to be smoothed.
+
+SIGMA
+
+ Gaussian half width in pixels.
+
+WIDTH
+
+ Pixels over which gaussian is calculated.
+
+OUTPUT
+
+ Name of resulting data.
+
+See_also
+
+ FIGARO: ICONV3, ISMOOTH, MEDFILT.
+ KAPPA: CONVOLVE, FFCLEAN, GAUSMOOTH, MEDIAN.
+
+Source_comments
+
+ I X S M O O T H
+
+ This routine is the main body of IXSMOOTH, which smooths
+ cross-sections of an array in the X-direction by convolving
+ them with a gaussian of specified sigma and a specified
+ cutoff width.  Note that this is not a 2-D smooth, but a series
+ of 1-D smooths; hence the name.
+
+ The VARIANCE array, if present, is propagated in exactly the same
+ way as the DATA array.  This procedure it not formally correct and
+ the computed variance will probably under-estimate the true error.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ SIGMA  (Numeric) The sigma of the gaussian, expressed in array
+        elements.  (This is approximately the half width at
+        half maximum, to within a factor of ~1.17).
+
+ WIDTH  (Numeric) The number of array elements over which the
+        gaussian is calcualted - i.e. outside this range the
+        gaussian is assumed to be zero.  This simplifies the
+        computation and also allows the use of strangely shaped
+        functions such as gaussians with very large sigmas but
+        small widths - which are almost the same as rectangular
+        filters.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+                                  KS / CIT 23rd March 1983
+.endhelp

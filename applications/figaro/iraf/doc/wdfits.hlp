@@ -1,0 +1,98 @@
+.help wdfits Starlink figaro
+.nf
+ WDFITS - Writes an image out in the AAO de facto 'Disk FITS' format
+
+
+Description
+
+ WDFITS writes a Figaro image out in the AAO de facto standard
+ 'Disk FITS' format.  This is used at the AAO for archiving of
+ data, and is a byte-swapped, 2880 byte record, format.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image to be written out to
+ a disk file in the 'Disk FITS' format.  The data
+ written out will be the main image in the file, and
+ any subsidiary information held in a .FITS structure
+ that is not an array.  Not all the information held in
+ a general Figaro file can be written out, since the
+ Figaro format is a superset of that used by FITS.
+
+FILE
+
+ The name of the 'Disk FITS' format file that
+ will be created by WDFITS.
+
+BIT16
+
+ Normally, WDFITS writes real data (FLOAT or DOUBLE arrays)
+ as 32 bit integers in order to preserve the maximum
+ amount of precision.  However, to conserve space, it is
+ possible to specify BIT16, in which case the data will
+ be written as 16 bit integers.  In both cases, a BSCALE
+ a BZERO value will be used to scale the real data to make
+ maximum use of all the 32 or 16 bits.
+
+See_also
+
+ FIGARO: RDFITS, FITSKEYS.
+ KAPPA: FITSDIN, FITSIN, FITSHEAD, FITSIMP, FITSLIST.
+ CONVERT: NDF2FITS.
+
+Source_comments
+
+ W D F I T S
+
+ Name:
+    WDFITS
+
+ Function:
+    Writes a Figaro image out to disk in FITS format.
+
+ Description:
+    Writes a Figaro image out to disk in FITS format.  Since the
+    Figaro format is a superset of FITS, not all the information
+    held in the Figaro file can be written to tape, so this
+    routine concentrates on the main data array.  This means that
+    it is really only suitable for images with no associated
+    calibration data.  If the file has axis structures that
+    contain linear data arrays, these will be converted into the
+    appropriate CDELTn, CRPIXn and CRVALn keywords.  Non-linear axis
+    data will be ignored. The only other information written into
+    the FITS header will be taken from the FITS-specific data
+    structure, should the structure contain one.  Any entries in this
+    structure that can reasonably be output as header quantities (arrays
+    of data cannot) will be.
+
+    If the end of the tape is reached while the data is being written,
+    the tape is backspaced to the start of the image data and an
+    end of tape mark is written.  The user is then given the option
+    of mounting a new tape and repeating the output.  Note that the
+    'standard' FITS recipie for handling end of tape - which allows
+    images to span tapes - is not followed.  In batch mode the user
+    is not given this option.
+
+    This program serves for the command WDFITS, which writes
+    an image out in the AAO de facto 'Disk Fits' format - i.e. to a
+    disk file whose 2880 byte records are exactly the same as the
+    records on a FITS tape would be, except that the data is not
+    byte-swapped.
+
+ Parameters:
+    IMAGE     (Character) The file containing the Figaro data
+              structure to be written to disk.
+    FILE      (Character) The name of the
+              disk file to which the data is to be written.
+
+ Keywords:
+    BIT16     Forces real data to be written out as 16 bit rather
+              than as 32 bit data.
+
+ User variables used:    (">" input, "<" output)
+
+ Keith Shortridge, AAO.
+.endhelp

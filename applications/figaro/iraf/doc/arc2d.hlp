@@ -1,0 +1,106 @@
+.help arc2d Starlink figaro
+.nf
+ ARC2D - Calibrates distortions in 2D arc line data.
+
+
+Description
+
+   This program controls both 1D and 2D wavlength calibration and
+   can operate either in BATCH or INTERACTIVE modes.
+   The philosophy behind it is somewhat different to those presented
+   in the existing SPICA/SDRSYS and FIGARO software in many respects.
+   In particular its exclusive use of gausian fitting of arclines, its
+   demand for "intellegent" users, who can decide which lines they want
+   to use initially and then allow them to make objective assesments of
+   which,if any are erroneous. Typical diagnostic information given are
+   plots of residuals from the fit versus line width,flux and position.
+   This is all made possible by the use of the Gaussian fitting.
+     The least squares polynomial fitting allows weights to be included
+   for each line(again derived from the formal Gaussian fits).Thus it
+   is possible to constrain the polynomial in difficult regions
+   eg "the 5100 gap" without distorting the global fit.
+
+Parameters
+
+
+IMAGE
+
+IMAGE = FILE (Read)
+        Name of image for input
+          This should be a file containing an arc spectrum.
+
+ARC_OPTS
+
+ARC_OPTS = CHARACTER (Read)
+        Enter arc fit option
+          NEW    : set up a new wavelength calibration
+          REPEAT : Itterate on previous calibration
+          CLONE  : CLone a previous calibration
+
+YSTART
+
+YSTART = INTEGER (Read)
+        analysis lower limit
+            The data between the limits ystart and yend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+YEND
+
+YEND = INTEGER (Read)
+        analysis upper limit
+            The data between the limits ystart and yend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+YBLOCK
+
+    YBLOCK = INTEGER (Read)
+        Enter analysis x-sect width
+            Each window is of this width (except perhaphs the final one).
+
+ITERATION
+
+    ITERATION = INTEGER*2 (Read)
+        New value of iteration
+
+ORDER
+
+    ORDER = INTEGER (Read)
+        order for polynomial fitting
+          This is for the continuity correction of the data. Idealy the
+          arc should have been pre-processed with ARCSDI, so a low
+          order e.g. 2 should be used.
+
+MAXLINES
+
+    MAXLINES = INTEGER (Read)
+        Maximum number of lines to allow room for
+          This must be greater than or equal to the number of lines
+          fitted, so room should be allowed in case any more are
+          to be added later.
+
+CLFILE
+
+    CLFILE = FILE (Read)
+        Name of image for cloning from
+          This should be a file containing an arc spectrum.
+
+TOLS
+
+    TOLS = CHARACTER (Read)
+        For use in batch only
+
+KEEP_ITT
+
+    KEEP_ITT = LOGICAL (Read)
+        keep itteration files'
+
+PRFITS
+
+    PRFITS = LOGICAL (Read)
+        Print out details of fitting
+
+Source_comments
+
+  none available
+
+.endhelp

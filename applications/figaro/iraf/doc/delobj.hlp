@@ -1,0 +1,51 @@
+.help delobj Starlink figaro
+.nf
+ DELOBJ - Delete a data object or a file
+
+
+Usage
+
+ delobj object
+
+Description
+
+ This routine deletes an HDS object (structure or primitive, scalar
+ or array) in an HDS file.
+
+Parameters
+
+
+OBJECT
+
+ The object to be deleted. Specify beginning with directory and
+ file name in the syntax of the operating system, followed by
+ the dot-separated structure hierarchy. Elements of structure
+ arrays are specified in ordinary brackets (). An array element
+ cannot be deleted.
+
+Examples
+
+ 1.  delobj file.axis(2).units
+    The file in question is in the current working directory and
+    has the standard extension ".sdf". The deleted structure is the
+    UNITS string in the 2nd element of the structure array AXIS.
+    Note that it would be impossible to delete AXIS(2), but one
+    could delete AXIS as a whole.
+
+ 2.  delobj @"/home/resun02/myname/data/file.dst".z.label
+    Here the file is specified with its complete Unix directory and
+    with its non-standard extension ".dst". The deleted structure
+    is the LABEL within the Z structure.
+
+
+See_also
+
+ FIGARO: CREOBJ, COPOBJ, RENOBJ, SETOBJ.
+ KAPPA: ERASE.
+
+Authors
+
+ KS: Keith Shortridge (AAO)
+
+ HME: Horst Meyerdierks (UoE, Starlink)
+.endhelp

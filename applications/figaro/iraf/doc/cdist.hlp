@@ -1,0 +1,118 @@
+.help cdist Starlink figaro
+.nf
+ CDIST - S-distortion correction using SDIST results
+
+
+Description
+
+ Applies the distortion correction determined by SDIST to an image.
+
+Parameters
+
+
+IMAGE
+
+ The name of the S-distorted image that is to be corrected.
+
+YSTART
+
+ If the image contains, for example, a single spectrum
+ in the center and a lot of unused background at the
+ edges, it can save processing time if only a part of
+ the Y-range of the data is corrected.  YSTART is the
+ first Y value in the range corrected by CDIST.
+
+YEND
+
+ Specifies the last Y value in the range corrected by CDIST.
+
+OUTPUT
+
+ Specifies the name of the resulting, corrected, image.
+ If OUTPUT is different to IMAGE, a new image will be created.
+ If it is the same, the correction will be performed in situ.
+
+MAXDEGY
+
+ If a number of spectra have been used to determine the
+ image distortion, CDIST interpolates between their
+ fitted positions by fitting a low order polynomial to
+ them.  MAXDEGY specifies the order of this polynomial.
+
+ROTATE
+
+ The processing performed by CDIST normally involves
+ accessing the image in a way that causes excessive
+ paging on the VAX.  This paging may be considerably
+ reduced by rotating the image (in a relatively efficient
+ way) before and after the correction.  Of course, this
+ introduces the overhead of the two rotations.  Generally,
+ large images should be rotated, small images should not.
+ The results should be identical in both cases.
+
+Source_comments
+
+ C D I S T
+
+ Performs an S-distortion correction for an image, using the
+ distortion analysis provided by SDIST.  If the SDIST analysis
+ was for a single spectrum, the the correction is '1-dimensional'
+ in that it consists simply of applying a shift in Y to the
+ data for each column of the image.  The shift is determined
+ separately for each column from the polynomial fitted by SDIST.
+ If the SDIST analysis was for more than one spectrum, the
+ correction is what might be termed '1.5-dimensional' - the
+ data is only redistributed within columns, but the amount of
+ shift varies along each column in a manner determined by fitting
+ a low order polynomial to the results of evaluating the polynomials
+ that SDIST fitted to each spectrum.  The 1.5D algorithm actually
+ reduces to the 1-D case when there is only one spectrum, but it
+ simplifies things to think of them as distinct cases.
+
+ Command parameters -
+
+ IMAGE    (Character) The name of the image to be corrected.
+
+ YSTART   (Numeric) The first Y value to be used.
+
+ YEND     (Numeric) The last Y value to be used.  Using YSTART
+          and YEND to limit the range of data corrected will
+          speed up the operation.
+
+ OUTPUT   (Character) The name of the resulting image.  This
+          can be the same as IMAGE, in which case the correction
+          will be performed in situ.
+
+ MAXDEGY  (Numeric) The maximum degree polynomial to fit to the
+          spectral positions in the case where there is more
+          than one spectrum covered by the SDIST analysis.
+
+ Command keywords -
+
+ ROTATE   If set, the image to be corrected will be rotated
+          prior to the application of the correction.  This
+          minimises the number of page faults during the correction,
+          but at the expense of the overheads of the rotation itself.
+
+ User variables - None
+
+ Input files -
+
+ SDIST.DAT contains the results of the fit(s), as written by
+           SDIST, in a format treated as follows -
+
+           3 header lines, all beginning with '*'
+           One line giving the number of spectra traced, in the
+           format 20X,I5.
+           Then, for each spectrum traced, one record giving
+           the spectrum number, and the leftmost and rightmost
+           pixels covered by the trace, in format
+           11X,I5,17X,I5,4X,I5, then 1 record giving the average
+           Y value in the spectrum, in format 16X,F13.7,
+           which is followed by 3 records giving the 11
+           polynomial coefficients for the fit, in 3D23.16.
+           Coefficients are given constant first, with any unused
+           coefficients set to zero.
+
+                                          KS / CIT 6th Feb 1984
+.endhelp

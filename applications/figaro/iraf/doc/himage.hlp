@@ -1,0 +1,78 @@
+.help himage Starlink figaro
+.nf
+ HIMAGE - Creates greyscale plot of image
+
+
+Description
+
+     Handles an 'HIMAGE' command, producing an image on any suitable
+     device. Originally based on the routine IMAGE.
+
+Parameters
+
+
+IMAGE
+
+     IMAGE = FILE (Read)
+        The name of the first image to be displayed.
+
+YSTART
+
+     YSTART = REAL (Read)
+        The first Y value to be displayed.
+
+YEND
+
+     YEND = REAL (Read)
+        The last Y value to be displayed.
+
+XSTART
+
+     XSTART = REAL (Read)
+        The first X value to be displayed.
+
+XEND
+
+     XEND = REAL (Read)
+        The last X value to be displayed.
+             X and Y are the horizontal and vertical directions
+             - as displayed on the Grinnell - respectively.  The
+             first value for each is 1.
+
+LOW
+
+     LOW = REAL (Read)
+        The minimum count level for the display, for
+             the first image.
+
+HIGH
+
+     HIGH = REAL (Read)
+        The maximum count level for the display, for
+             the first image.
+
+PLOTDEV
+
+     PLOTDEV = CHARACTER (Read)
+        The name of the plotting device
+
+ASPECT
+
+     ASPECT = REAL (Read)
+        The apect ratio of the plot
+
+SHRINK
+
+     SHRINK = LOGICAL (Read)
+        If to shrink image to leave margin all round
+
+LOG
+
+     LOG = LOGICAL (Read)
+        To take logarithms of the image to display it
+
+Source_comments
+
+  none available
+
+.endhelp

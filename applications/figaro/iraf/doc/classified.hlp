@@ -1,0 +1,393 @@
+.help classified Starlink figaro
+.nf
+ Classified list of commands.
+
+Input
+
+  ALASIN     Read a spectrum in ALAS (Abs. Line Analysis System) format
+  FITSET     Set the value of a FITS keyword
+  FITSKEYS   List the FITS keywords in a data file
+  ICOR16     Corrects 16 bit data from signed to unsigned range
+  RCGS2      Reads UKIRT CGS2 spectrum (also UKT9 and UKT6 CVF)
+  RDFITS     Read file in AAO de facto 'Disk FITS' format
+  RDIPSO     Read file in DIPSO/IUEDR/SPECTRUM format
+  TABLE      List contents of a SPICA memory file
+
+Output
+
+  ALASOUT    Output a spectrum in ALAS (Abs. Line Analysis System) format
+  WDFITS     Writes an image out in the AAO de facto 'Disk FITS' format
+  WDIPSO     Writes a file in DIPSO/IUEDR/SPECTRUM format
+
+Display
+
+  CCUR       After SPLOT, uses graphics cursor to indicate data values
+  COLOUR     Set colour table for image display
+  DVDPLOT    Plot the data in one file against the data in another
+  ELSPLOT    Produces a long (<3m) error bar plot of a spectrum
+  ESPLOT     Produces an error bar plot of a spectrum
+  HARD       Sets the file name for hard copy output
+  HOPT       Histogram optimization of an image
+  ICONT      Produces a contour map of an image
+  ICUR       Inspect an image with cursor
+  IDEV       Set the device for image display
+  IGCUR      Use cursor to show x, y and data values
+  IGREY      Produces a grey-scale plot of an image
+  IMAGE      Display an image
+  IPLOTS     Plots successive cross-sections of an image, several per page
+  ISPLOT     Plots successive cross-sections through an image
+  LSPLOT     Hardcopy spectrum plot of specified size (up to 3 metres)
+  MSPLOT     Plots a long spectrum as a series of separate plots
+  SOFT       Sets the device/type for terminal graphics
+  SPLOT      Plots a spectrum
+  XCUR       Uses cursor to delimit part of a spectrum
+
+Wavelengths
+
+  ARC        Interactive manual arc line identification
+  ECHARC     Wavelength calibrate an echelle arc
+  EMLT       Fits gaussians to the strongest lines in a spectrum
+  FSCRUNCH   Rebin data with a disjoint wavelength coverage to a linear one
+  IARC       Given fit to single spectrum, fit spectra in a 2-D arc
+  ISCRUNCH   Rebin an image to linear wavelength scale given IARC results
+  ISCRUNI    Like ISCRUNCH, but interpolates between two IARC result sets
+  LXSET      Set X array of spectrum/image to specified range
+  SCRUNCH    Rebin a spectrum to a linear wavelength range
+  VACHEL     Air to vacuum, and/or recession velocity wavelength conversion
+  XCOPI      Like XCOPY but interpolates X-data from 2 files
+  XCOPY      Copy X-info (e.g. wavelengths) into a spectrum
+
+  See also "Specdre" commands: ARCDISP, ARCGENDB, ARCIDENT, ARCLOCAT.
+
+B-stars
+
+  BSMULT     Atmospheric band removal using a B star calibration spectrum
+  CFIT       Generate a spectrum using the cursor
+  CSET       Interactively set regions of a spectrum to a constant value
+  MASK       Generate a mask spectrum given a spectrum and a mask table
+  MCFIT      Fit a continuum to a spectrum, given a mask spectrum
+  NCSET      Set a region of a spectrum to a constant
+
+Arithmetic
+
+  CLIP       Clip data above and below a pair of threshold values
+  IADD       Adds two images (or two spectra)
+  IALOG      Takes the antilog of an image
+  ICADD      Adds a constant to an image
+  ICDIV      Divides an image by a constant
+  ICMULT     Multiplies an image by a constant
+  ICONV3     Convolve an image with a 3x3 convolution kernel
+  ICSUB      Subtracts a constant from an image
+  IDIFF      Takes the 'differential' of an image
+  IDIV       Divides two images (or two spectra)
+  IGCONV     Convolve an image with a specified filter
+  ILOG       Takes the logarithm of an image
+  IMULT      Multiplies two images (or two spectra)
+  IPOWER     Raises an image to a specified power
+  IREVX      Reverse an image (or spectrum) in the X-direction
+  IREVY      Reverse an image in the Y-direction
+  ISHIFT     Applies a linear x and a linear y shift to an image
+  ISMOOTH    2-D smooth of image using 9-point smoothing algorithm
+  ISTRETCH   Stretches and shifts an image in X and Y.
+  ISUB       Subtracts two images (or two spectra)
+  ISUBSET    Produces a subset of an image
+  ISUPER     Produces a superset of an image
+  ISXADD     Adds a spectrum to each X direction x-section of an image
+  ISXDIV     Divides spectrum into each X direction x-section of an image
+  ISXMUL     Multiplies each X direction image x-sect by a spectrum
+  ISXSUB     Subtracts a spectrum from each Y direction x-section of an
+             image
+  ISYADD     Adds a spectrum to each Y direction x-section of an image
+  ISYDIV     Divides spectrum into each Y direction x-section of an image
+  ISYMUL     Multiplies each Y direction image x-sect by a spectrum
+  ISYSUB     Subtracts a spectrum from each Y direction x-section of an
+             image
+  IXSMOOTH   Smooth in x-direction by gaussian convolution
+  RESAMPLE   Rebin an image to different dimensions and/or orientation
+  RESCALE    Rescale using user-defined upper and lower limits
+  ROTX       Rotate data along the X-axis
+
+Flats
+
+  CFIT       Generate a spectrum using the cursor
+  FF         Flat field an image
+  FFCROSS    Cross-correlate an image and a flat field (mainly IPCS data)
+  MASK       Generate a mask spectrum given a spectrum and a mask table
+  MCFIT      Fit a continuum to a spectrum, given a mask spectrum
+  ISXDIV     Divides a spectrum into each X direction x-section of an image
+
+Manipulations
+
+  ADJOIN     Append two spectra (strictly a merge by wavelength value)
+  BCLEAN     Automatic removal of bad lines & cosmic rays from CCD data
+  CFIT       Generate a spectrum using the cursor
+  CLEAN      Interactive patching of bad lines, bad pixels in an image
+  COADD      Form the spectrum which is the mean of the rows in an image
+  COMBINE    Combine two spectra, adding with weights according to errors
+  COSREJ     Reject cosmic rays from a set of supposedly identical spectra
+  CREOBJ     Create a data object or file
+  FSCRUNCH   Rebin data with a disjoint wavelength coverage to a linear one
+  HCROSS     Cross-correlate two spectra & get redshift and error
+  HIST       Produce histogram of data value distribution in an image
+  HOPT       Histogram optimization of an image
+  ICONV3     Convolve an image with a 3x3 convolution kernel
+  ICOR16     Corrects 16 bit data from signed to unsigned range
+  IDIFF      Takes the 'differential' of an image
+  IGCONV     Convolve an image with a specified filter
+  IREVX      Reverse an image (or spectrum) in the X-direction
+  IREVY      Reverse an image in the Y-direction
+  IROT90     Rotates an image through 90 degrees
+  MEDFILT    Applies a median filter to an image
+  MEDFILTR   Applies a rectangular median filter to an image
+  MEDSKY     Take the median of a number of images
+  POLYSKY    Fits and subtracts sky from a long-slit spectrum
+  SCLEAN     Interactive patching of images, especially SCUBA data
+  SCNSKY     Calculates a sky spectrum for a scanned CCD image
+  SCROSS     Cross-correlate two spectra & get relative shift
+  SCRUNCH    Rebin a spectrum to a linear wavelength range
+  SFIT       Fit a polynomial to a spectrum
+
+Photometry
+
+  APERTURE   Do simple minded aperture photometry on a series of frames
+  CENTERS    Generate file of object centroids from ICUR/IGCUR output
+  FOTO       Perform aperture photometry given CENTERS output
+  ICUR       Inspect an image with cursor
+  IGCUR      Use cursor to show x, y and data values
+
+Line_fits
+
+  ABLINE     Interactive absorption line analysis
+  EMLT       Fits gaussians to the strongest lines in a spectrum
+  GAUSS      Interactive fit of Gaussians to emission or absorption lines
+
+Distortion
+
+  CDIST      S-distortion correction using SDIST results
+  FINDSP     Locate fibre spectra in an image
+  ICUR       Inspect an image with cursor
+  IGCUR      Use cursor to show x, y and data values
+  OFFDIST    Applies an offset to an SDIST fit
+  OVERPF     Overlays a FINDSP fit on another image
+  POLEXT     Extract fibre spectra from an image after a FINDSP analysis
+  SDIST      Analyse an image containing spectra for S-distortion
+
+Fudging
+
+  COPOBJ     Copy an HDS object
+  CREOBJ     Create a data object or file
+  CSET       Interactively set regions of a spectrum to a constant value
+  DELOBJ     Delete a data object or a file
+  FLAG2QUAL  Converts `flagged' values to produce a quality array
+  GOODVAR    Replace negative, zero and bad variance values
+  ICSET      Set a selected region of an image to a constant value
+  ISEDIT     Allows interactive editing of a 1-D or 2-D spectrum
+  LXSET      Set X array of spectrum/image to specified range
+  LYSET      Set Y array of spectrum/image to specified range
+  NCSET      Set a region of a spectrum to a constant
+  Q2BAD      Converts a datafile's quality into bad values
+  QUAL2FLAG  Converts a quality array into `flagged' values
+  REMBAD     Removes pixels that have been flagged as bad from data
+  RENOBJ     Change the name or location of an object within an HDS file
+  SETOBJ     Assign value to an HDS primitive
+  SPIED      Interactive spiketrum editor
+  TIPPEX     Modify individual pixel values with cursor
+  XCADD      Adds a constant to the X data in a file
+  XCDIV      Divides the X data in a file by a constant
+  XCMULT     Multiplies the X data in a file by a constant
+  XCSUB      Subtracts a constant from the X data in a file
+  YCADD      Adds a constant to the Y data in a file
+  YCDIV      Divides the Y data in a file by a constant
+  YCMULT     Multiplies the Y data in a file by a constant
+  YCSUB      Subtracts a constant from the Y data in a file
+
+Examination
+
+  HIST       Produce histogram of data value distribution in an image
+  FIGINFO    Describes the contents of a Figaro data file
+  FITSKEYS   List the FITS keywords in a data file
+  ICUR       Inspect an image with cursor
+  IGCUR      Use cursor to show x, y and data values
+  ILIST      List the data in an image (or spectrum)
+  ISTAT      Provides some statistics about an image (max, min etc.)
+
+Slices
+
+  EXTLIST    Adds non-contiguous lines of an image to form a spectrum
+  EXTRACT    Adds contiguous lines of an image to form a spectrum
+  GROWX      Performs reverse function to that of EXTRACT
+  GROWXT     Copies an image into contiguous XT planes of a cube
+  GROWXY     Copies an image into contiguous XY planes of a cube
+  GROWY      Performs reverse function to that of YSTRACT
+  GROWYT     Copies an image into contiguous YT planes of a cube
+  OPTEXTRACT Extracts a long-slit spectrum using Horne's algorithm
+  PROFILE    Profiles a long-slit spectrum for use by OPTEXTRACT
+  SLICE      Takes a slice with arbitrary end points through an image
+  XTPLANE    Adds XT planes of a data cube to form an image
+  XYPLANE    Adds XY planes of a data cube to form an image
+  YSTRACT    Adds columns of an image to form a spectrum
+  YTPLANE    Adds YT planes of a data cube to form an image
+
+Fibres
+
+  FINDSP     Locate fibre spectra in an image
+  OVERPF     Overlays a FINDSP fit on another image
+  POLEXT     Extract fibre spectra from an image after a FINDSP analysis
+
+Fluxing
+
+  ABCONV     Convert spectrum from Janskys into AB magnitudes
+  CALDIV     Generate calibration spectrum from continuum standard spectra
+  CFIT       Generate a spectrum using the cursor
+  CSET       Interactively set regions of a spectrum to a constant value
+  CSPIKE     Create calibration spiketrum given spiketrum & standard
+             spectrum
+  FIGSFLUX   Flux calibrates a FIGS spectrum
+  FLCONV     Convert a spectrum in Janskys into one in Ergs/cm**2/s/A
+  FWCONV     General unit conversion for spectra
+  GSPIKE     Generates a 'spiketrum' from a table of values
+  INTERP     Interpolates points of a 'spiketrum' to form a spectrum
+  IRFLUX     Flux calibrates an IR spectrum using a black-body model
+  LINTERP    Interpolates between spiketrum points to form a spectrum
+  NCSET      Set a region of a spectrum to a constant
+  SFIT       Fit a polynomial to a spectrum
+  SPFLUX     Applies a flux calibration spectrum to an observed spectrum
+  SPIED      Interactive spiketrum editor
+  SPIFIT     Fits a global polynomial to a spiketrum to form a spectrum
+
+Extinction
+
+  EXTIN      Correct spectrum for atmospheric extinction
+  GSPIKE     Generates a 'spiketrum' from a table of values
+  LINTERP    Interpolate between spiketrum points to form a spectrum
+
+Complex_and_FFT
+
+  BFFT       Takes the reverse FFT of a complex data structure
+  CMPLX2I    Extracts the imaginary part of a complex data structure
+  CMPLX2M    Extracts the modulus of a complex data structure
+  CMPLX2R    Extracts the real part of a complex data structure
+  CMPLXADD   Add two complex structures
+  CMPLXCONJ  Produce the complex conjugate of a complex structure
+  CMPLXDIV   Divide two complex structures
+  CMPLXFILT  Create a mid-pass filter for complex data
+  CMPLXMULT  Multiply two complex structures
+  CMPLXSUB   Subtract two complex structures
+  COSBELL    Create data that goes to zero at the edges in a cosine bell
+  FFT        Takes the forward FFT of a complex data structure
+  I2CMPLX    Copies an array into the imaginary part of a complex structure
+  PEAK       Determines position of highest peak in a spectrum
+  R2CMPLX    Creates a complex data structure from a real data array
+  ROTX       Rotate data along the X-axis
+
+Infra-red
+
+  FET321     Extracts a spectrum from 1 detector from etalon mode FIGS data
+  FIGS321    Processes a FIGS data cube down to a single spectrum
+  FIGS322    Processes a FIGS data cube down to an image
+  FIGS422    Process a FIGS image-mode hypercube down to an image
+  FIGS423    Process a FIGS image-mode hypercube down to a cube
+  FIGS424    Sort a FIGS image-mode hypercube into wavelength order
+  FIGSEE     Generate a seeing ripple spectrum from a FIGS spectrum
+  FIGSFLUX   Flux calibrates a FIGS spectrum
+  IRCONV     Converts data in Janskys to W/m**2/um
+  IRFLAT     Generates a ripple spectrum from an IR spectrum
+  IRFLUX     Flux calibrates an IR spectrum using a black-body model
+  REMBAD     Removes pixels that have been flagged as bad from data
+
+Echelle
+
+  CDIST      S-distortion correction using SDIST results
+  ECHARC     Fit an echelle arc
+  ECHFIND    Locate spectra in echelle data
+  ECHMASK    Produce an extraction mask from an SDIST analysis
+  ECHMERGE   Merge echelle spectra into a single long spectrum
+  ECHSELECT  Interactive selection of sky and object spectra for an echelle
+  ICUR       Inspect an image with cursor
+  IGCUR      Use cursor to show x, y and data values
+  IMAGE      Display an image on the selected image display
+  MASKEXT    Extracts echelle orders using a mask created by ECHMASK
+  OFFDIST    Applies an offset to an SDIST fit
+  SDIST      Analyse an image containing spectra for S-distortion
+
+Miscellany
+
+  CCDLIN     Applies a linearity correction to AAO CCD data
+  ERRCON     Converts percentage error values to absolute values
+  FIGHELP    Provide Figaro on-line help
+  RETYPE     Changes the type of the main data array in a file
+  SQRTERR    Generates an error array as Error = Square Root of
+             (Data/Const)
+  TRIMFILE   Creates a copy of an HDS file without unused space
+
+Specdre
+
+  Input/output
+    ASCIN      Read a 1-D or N-D data set from an ASCII table
+    ASCOUT     Write an NDF to an ASCII table
+
+  Display
+    MOVIE      Browse through slices of a cube
+    SPECCONT   Contour a two-dimensional cut
+    SPECGRID   Plot spectra on position grid
+    SPECPLOT   Plot a spectrum
+
+  Statistics, fitting
+    CORREL     Correlate two or three data sets
+    EVALFIT    Evaluate fit results
+    FITBB      Fit diluted Planck curves to a spectrum
+    FITGAUSS   Fit Gauss profiles to a spectrum
+    FITPOLY    Fit a polynomial to a spectrum
+    FITTRI     Fit triangular profiles to a spectrum
+    MOMENTS    Calculate moments of spectra in a cube
+
+  Axis calibration
+    ARCDISP    Fit polynomial dispersion curve
+    ARCGENDB   Convert list of laboratory values to feature data base
+    ARCIDENT   Auto-identify located features
+    ARCLOCAT   Locate line features in a set of spectra
+
+  Data calibration
+    BBODY      Calculate a black body spectrum
+
+  Convolution, re-sampling, merging
+    FILLCUBE   Copy one NDF into part of another
+    RESAMP     Re-sample and average several spectra
+
+  Reshaping
+    GROW       Copy an N-dimensional cube into part of an (N+M)-dimensional one
+    SUBSET     Take a subset of a data set
+    XTRACT     Average an N-dimensional cube into an (N-M)-dimensional one
+
+  Miscellaneous
+    EDITEXT    Edit the Specdre Extension
+
+
+Twodspec
+
+  Display
+  ISCAN     Plots cut through a 2D longslit array
+  HIMAGE    Plots a greyscale image of a 2D array
+  CSCAN     Plot array of profiles from a 3d array
+
+  Axis Calibration
+  ARC2D     Calibrates distortions in 2D arc line data
+  COMB      Corrects for S-distortion using continua
+  ARCSDI    Corrects for arc line curvature
+
+  Line Profile Analysis
+  LONGSLIT  Fits 2D longslit arrays and plots results
+  FIBDISP   Fits 3D cubes and plots results
+
+  Data Manipulation
+  FITCONT   Fit continuum for subtraction
+  CSUB      Subtract fitted continuum
+  CADD      Add back fitted continuum
+
+  Miscellaneous
+  FIBSEP    Seperate spectra in 2D array
+  FIB2CUBE  Stack LONGSLIT results into a data cube
+  CUBE2LONG Extract fits from a cube in LONGSLIT format
+  VIG       Corrects a 2D array for vignetting
+
+.endhelp

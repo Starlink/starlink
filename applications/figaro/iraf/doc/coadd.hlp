@@ -1,0 +1,101 @@
+.help coadd Starlink figaro
+.nf
+ COADD - Form the spectrum which is the mean of the rows in an image
+
+
+Description
+
+ COADD takes a 2-D file as produced by FIGS322 or RCGS2 and combines
+ scans to generate a spectrum with error bars
+
+Parameters
+
+
+IMAGE
+
+ The name of a 2-D file (wavelength by scan number) as
+ produced, for example, by FIGS322 or RCGS2.
+
+TSTART
+
+ The first t-value to be used.
+
+TEND
+
+ The last t-value to be used.
+
+YSTART
+
+ The first y-value to be used.
+
+YEND
+
+ The last y-value to be used.
+
+CUTOFF
+
+ Values more than CUTOFF times sigma away from the mean
+ value for the spectral point will not be included in
+ the final spectrum.
+
+SPECTRUM
+
+ The name of the resulting single spectrum produced
+ by collapsing down the image.
+
+NORM
+
+ NORM=YES causes the data for each cycle to be
+ normalized so that the mean value for each cycle
+ is the same. This gives more reasonable errors when
+ data are taken in the presence of cloud. It should
+ not be used on very faint sources, as the mean level
+ may go negative under these circumstances.
+
+Source_comments
+
+ C O A D D
+
+ Form a spectrum which is the mean of all the rows in an image
+ or form an image which is the mean of all the planes in a cube.
+ The errors on the result are the standard errors of the mean
+ (i.e. SIGMA/SQRT(N) when N rows or planes are combined). Any error
+ information in the original image or cube is ignored.
+
+ An XY image is collapsed along the Y direction to give a spectrum,
+ and an XYT cube is collapsed along the T direction to give an XY image.
+
+ Typical uses include the combination of the various cycles of a
+ CGS2 or FIGS observation as output by the FIGS322 or RCGS2 programs,
+ or coadding of CGS4 observations (for this purpose the individual images
+ must be first grown into a cube using GROWXY).
+
+ If the NORM keyword is set the errors are calculated after
+ normalizing each row or plane so that the mean value is the same
+ for all rows (planes). This does not effect the output data but
+ generates errors which are determined only by the noise level in the
+ data and are not influenced by any general trend in the data.
+
+ If the CUTOFF parameter is specified, points which deviate from the
+ mean by more than CUTOFF times the standard error for the mean are
+ excluded from the calculation. The mean is recalculated until no
+ points exceed the CUTOFF limit. This procedure allows spikes in the
+ data to be removed.
+
+ Command parameters -
+
+ 'IMAGE'    The name of the input 2-D or 3-D file.
+ 'YSTART'   (or TSTART) The first Y or T value to use.
+ 'YEND'     (or TEND) The last Y or T value to use.
+ 'SPECTRUM' The name of the resulting spectrum or image.
+ 'CUTOFF'   The level (in sigma) at which a point will
+            be ignored.
+
+ Command keywords -
+
+ 'NORM'     Normalize data to mean level.
+
+ Input data -
+
+                                 JAB / JAC 7th Dec 1990
+.endhelp

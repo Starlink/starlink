@@ -1,0 +1,52 @@
+.help combine Starlink figaro
+.nf
+ COMBINE - Combine two spectra, adding with weights according to errors
+
+
+Description
+
+ Combines two spectra, adding them with weights that depend
+ on their errors.  Elements with equal errors, for example,
+ will be averaged.  COMBINE is intended for use with
+ spectra, but will work on any data that has error values for
+ each data point.
+
+Parameters
+
+
+SPECTRUM
+
+ The first of the two spectra to be combined.
+
+SPECTRUM1
+
+ The second of the two spectra to be combined.
+
+OUTPUT
+
+ The name of the resulting spectrum.  This can be the
+ same as SPECTRUM, in which case no new spectrum will
+ be created.
+
+Source_comments
+
+ C O M B I N E
+
+ Combine two spectra or images. If error or variance information
+ is available on the two images a weighted mean of the two
+ is formed. If error information is missing for one or both
+ images a simple average is formed.
+
+ Command parameters -
+
+ SPECTRUM  The name of the structure containing the first spectrum
+
+ SPECTRUM1 The name of the structure containing the second spectrum
+
+ OUTPUT    The name of the result of the operation.  This can
+           be the same as for SPECTRUM.  If not, a new structure
+           is created, with everything but the data a direct
+           copy of the input.
+
+                                      JAB / AAO  14th July 1986
+.endhelp

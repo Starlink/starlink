@@ -1,0 +1,46 @@
+.help peak Starlink figaro
+.nf
+ PEAK - Determines position of highest peak in a spectrum
+
+
+Description
+
+ Returns the position and width of the highest peak in a data
+ array.  This is intended for the analysis of cross-correlation
+ results.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of a file containing a 1-D data array, in
+ which PEAK will determine the shift relative to the
+ first element, and the width, of the highest peak.
+
+Source_comments
+
+ P E A K
+
+ Determines the position and width of the largest peak in a data
+ array.  The data is treated as circular - i.e. the first element is
+ regarded as adjacent to the last element.  This routine is
+ intended for use analysing the results of cross-correlations,
+ and returns the position in terms of a shift relative to the
+ first element.  The algorithm used is a two step one: first a
+ parabolic fit to the five points closest to the peak gives a
+ value for the shift and width; the shift is then refined by
+ convolution with the derivative of a gaussian.
+
+ Command parameters -
+
+ SPECTRUM (Character) The name of the data to to be analysed.
+
+ User variables -
+
+ (<) SHIFT   (Numeric) The shift of the peak relative to the
+             center of the first element, in pixels.
+ (<) WIDTH   (Numeric) The width of the peak, again in pixels.
+
+                                             KS / AAO 29th Sept 1986
+.endhelp

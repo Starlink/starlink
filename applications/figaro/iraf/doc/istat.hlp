@@ -1,0 +1,106 @@
+.help istat Starlink figaro
+.nf
+ ISTAT - Provides some statistics about an image (max, min etc.)
+
+
+Description
+
+ ISTAT examines an image, or a rectangular subset of an image or
+ spectrum, and outputs a number of statistics about it, such as
+ maximum and minimum value, mean and sigma, etc.  The results
+ are used to set Figaro user variables, so can be used by Figaro
+ procedures.  There are a number of examples in the documentation
+
+Parameters
+
+
+IMAGE
+
+ The name of the image (or spectrum) for
+ which statistics are to be determined.
+
+YSTART
+
+ First Y value to be used.
+
+YEND
+
+ Last Y value to be used.
+
+XSTART
+
+ First X value to be used.
+
+XEND
+
+ Last X value to be used.
+
+PASS2
+
+ setting PASS2 makes ISTAT take two passes through the
+ data in order to calculate Sigma more accurately.  This
+ accuracy is, of course, gained at the expense of time
+ taken.  For cases where fewer than 10,000 pixels are
+ involved, ISTAT always uses two passes, since the other
+ overheads dominate the time taken.  If in doubt, try
+ both, and see if the slower algorithm gives significantly
+ different answers to the faster one.  If so, use PASS2.
+
+MEDIAN
+
+ Setting MEDIAN makes ISTAT calculate the median value
+ in the specified range.  This can be a time-consuming
+ operation, so is not performed by default.
+
+See_also
+
+ KAPPA: HISTAT, HISTOGRAM, INSPECT, MSTATS, NUMB, STATS.
+
+Source_comments
+
+ I S T A T
+
+ Examines an image (or a subset of an image) an determines
+ a number of useful statistics about the data in it, such as
+ the mean, max and minimum values.  For a full list, see below
+ under 'user variables'.
+
+ Command parameters -
+
+ IMAGE  (Char) The name of the structure containing the image.
+ YSTART (Numeric) The Y value for the start of the subset.
+ YEND   (Numeric) The Y value for the end of the subset.
+ XSTART (Numeric) The X value for the start of the subset.
+ XEND   (Numeric) The X value for the end of the subset.
+
+ Command keywords
+
+ PASS2   If set, the sigma value is calculated using two
+         passes throught the data.  The one-pass algorithm normally
+         used is prone to rounding error when large numbers of
+         pixels are involved, but is rather faster.  If fewer than
+         10,000 pixels are involved, ISTAT always uses two passes,
+         since the other overheads dominate the time taken.
+ MEDIAN  If set, the median value of the image data is
+         calculated (a possibly time-consuming business).
+
+ User variables -   ("<" output)
+
+ (<) STAT_TOTAL   The sum of the data.
+ (<) STAT_MIN     The minimum data value.
+ (<) STAT_MAX     The maximum data value.
+ (<) STAT_MEAN    The mean data value.
+ (<) STAT_MEDIAN  The median data value (only set if MEDIAN set)
+ (<) STAT_XMAX    The x-value of the pixel where the max was found.
+ (<) STAT_YMAX    The y-  "   "   "    "     "     "   "   "    "
+ (<) STAT_XMIN    The x-  "   "   "    "     "     " min   "    "
+ (<) STAT_YMIN    The y-  "   "   "    "     "     "   "   "    "
+ (<) STAT_SIGMA   The standard distribution of the data
+ (<) STAT_SIZE    The number of pixels examined
+ (<) STAT_XSTART  The first pixel number examined in X
+ (<) STAT_XEND    The last    "     "        "     " X
+ (<) STAT_YSTART  The first pixel number examined in Y
+ (<) STAT_YEND    The last    "     "        "     " Y
+
+                                  KS / CIT 7th June 1984
+.endhelp

@@ -1,0 +1,154 @@
+.help lsplot Starlink figaro
+.nf
+ LSPLOT - Hardcopy spectrum plot of specified size (up to 3 metres)
+
+
+Description
+
+ LSPLOT produces a splot of a spectrum, usually on a hard copy
+ device, with a physical size that can be specified (in metres) by
+ the user. The device used is that specified by the HARD command.
+ It will allow plots up to the maximum size allowed by the GKS
+ driver being used - in some cases this means that a non-standard
+ device  name must be specified in order to allow a larger maximum
+ size than usual.  LSPLOT is very similar to SPLOT, except that it
+ has plot dimension parameters and does not support build plots.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of the spectrum to be plotted by LSPLOT.
+ It should be a 1-dimensional array.
+
+XSIZE
+
+ The length of the plot in metres.  LSPLOT
+ can produce plots up to 10 metres in length.
+
+YSIZE
+
+ The height of the plot in metres.  The reset
+ value is the full page height for the device.
+
+WHOLE
+
+ If set, the whole of the spectrum is plotted.
+ Otherwise, the limits plotted are determined by the values of
+ XSTART and XEND, which you will be prompted for if they were
+ not specified in the command string.
+
+AUTOSCALE
+
+ If set, the plot is scaled so that all of the data to be
+ plotted just fits on the display.  Otherwise, the scale
+ of the plot is determined by the values of HIGH and LOW,
+ which you will be prompted for if they were not specified
+ in the command string.
+
+XSTART
+
+ Specifies the first X value to be plotted, in the
+ units used by the data - angstroms, for example, if the data
+ is wavelength calibrated.  XSTART can be set before the start
+ of the data, if necessary.  RESET will set XSTART to the first
+ X value in the data.
+
+XEND
+
+ Specifies the last X value to be plotted, in the units
+ used by the data - angstroms, for example, if the data
+ is wavelength calibrated.  XEND can be set after the end
+ of the data, if necessary.  RESET will set XEND to the last
+ X value in the data.
+
+HIGH
+
+ The maximum data value to be plotted - i.e. the top
+ Y axis value for the plot.
+
+LOW
+
+ The minimum data value to be plotted - i.e. the bottom
+ Y axis value for the plot.
+
+BIAS
+
+ A bias value applied to the data, usually to bias
+ up a plot which is to be superimposed upon a previous plot
+ of almost identical data values.  This makes the comparison
+ easier.  BIAS N  is essentially equivalent to setting HIGH
+ and LOW down by an amount N, so can result in unexpected
+ axis values.
+
+LABEL
+
+ The label that will appear at the top of the plot.
+
+LINES
+
+ Specifies that the plot is to made as a 'point-plot',
+ in a 'join the dots' fashion.  The alternative is a histogram
+ plot.  LINES will usually be a little faster, but messier,
+ because the resolution of the plotting device may result in
+ stepped lines.
+
+Source_comments
+
+ L S P L O T    /    E L S P L O T
+
+ These are versions of SPLOT and ESPLOT that allow the size of
+ the plot to be specified.  LSPLOT produces a plot of a single
+ spectrum, while ESPLOT produces an error bar plot of a spectrum
+ which has error information.
+
+ Command parameters -
+
+ XSIZE       The size of the plot in X, in metres.
+ YSIZE       The size of the plot in Y, in metres.
+ SPECTRUM    The data to be plotted.  If there
+             is an x-axis data component this will be used to
+             give the x-axis.  If not, the x-axis will just
+             have to be the numbers from 1 to n.
+ XSTART      The x-value at which plotting is to start.
+ XEND        The x-value at which plotting is to end.
+             (XSTART and XEND are not required if the
+             WHOLE keyword is set.)
+ HIGH        The maximum value to be used for the plot.
+ LOW         The minimum value to be used for the plot.
+ BIAS        A value used to displace the plot - BIAS is
+             effectively a value added to the data before
+             it is plotted. (It is implemented as a value
+             subtracted from both HIGH and LOW.)
+             (HIGH,LOW and BIAS are not required if the
+             AUTOSCALE keyword is set.)
+ LABEL       A label for the plot.
+
+ Command keywords -
+
+ AUTOSCALE   The program is to work out the values for HIGH
+             and LOW, using the maximum and minimum values
+             in the data over the specified range.
+ WHOLE       The program is to display all of the spectrum.
+ LINES       The plot is not done as a histogram, but as
+             a 'join the dots' line plot.  (LSPLOT only)
+
+ User variables used:
+
+ HARD        (Character) The device used for HARD plots.
+
+ Note:
+
+ The original version of LSPLOT used GKS 6.2 and the DIAGRAM
+ package.  This has now been discontinued, and some of the
+ functionality of DIAGRAM (the ability to specify the size of
+ the plot in physical units) has appeared in PGPLOT.  This new
+ version uses PGPLOT.  It can produce a plot of the specified
+ size, BUT only if that size is SMALLER than the default size
+ for the device.  In practice, this means that it can only work
+ in the way it was intended with `unusual' devices that have
+ particularly large default plot sizes (which often need to be set
+ up specially for the purpose).
+                                     KS / AAO 30th Jan 1984
+.endhelp

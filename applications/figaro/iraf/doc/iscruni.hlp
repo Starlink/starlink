@@ -1,0 +1,200 @@
+.help iscruni Starlink figaro
+.nf
+ ISCRUNI - Like ISCRUNCH, but interpolates between two IARC result sets
+
+
+Description
+
+ ISCRUNI rebins an image that contains a set of spectra, so that
+ the resulting data have either a linear wavelength scale or a
+ wavelength scale that is logarithmic (i.e. has a constant velocity
+ step).  ISCRUNI differs from SCRUNCH in that it uses  files that
+ contains a set of polynomial fits to a 2-D arc in order to get the
+ wavelength-channel relationship for each cross-section in the
+ image, while SCRUNCH uses the values in the image's X-axis array.
+ It differs from ISCRUNCH in using 2 such files, and taking values
+ intermediate between the two when calculating its wavelengths.
+ Note that ISCRUNI is not suitable for data in which the bins
+ contain data that covers discontinuous or overlapping wavelength
+ ranges (FIGS data, for example).
+
+Parameters
+
+
+IMAGE
+
+ The name of the image to be scrunched.  Each
+ cross-section of the image is handled separately, and
+ the channel-wavelength relationship for each cross-
+ section is assumed to be given by a set of polynomial
+ coefficients held in a file.  These coefficients will
+ have been determined by an analysis of a 2-D arc, and
+ IMAGE must specify data of the same dimensions as the
+ 2-D arc used.
+
+FILE
+
+ ISCRUNI is driven from the results of a 2-D arc fit -
+ usually performed by IARC - and needs to know where to
+ find the file that contains the polynomial coefficients
+ determined by this fit.  Usually, the default value will
+ be the file generated the last time IARC was run.  If no
+ extension is specified, .IAR is assumed.
+
+FILE2
+
+ The name of the second of the sets of IARC
+ results used by ISCRUNI in calculating the wavelength to
+ channel relation for its input data.
+
+FRACTION
+
+ When ISCRUNI calculates an input wavelength for a pixel,
+ it calculates it first using the data from FILE, then
+ repeats the calculation using the data from FILE2, and
+ combines them to get an intermediate result using the
+ supplied value of FRACTION.  FRACTION=0.5 will give
+ an average of the two, FRACTION=0.0 will effectively just
+ use the values from FILE and FRACTION=1.0 will just use
+ the values from FILE2.
+
+WSTART
+
+ The wavelength of the center of the first bin
+ of the resulting output data.
+
+WEND
+
+ Normally, represents the wavelength of the center of
+ the last bin of the resulting output data.  Because this
+ is not always the most convenient value to supply, ISCRUNI
+ will allow WEND to be used to specify the wavelength
+ increment value (for linear data, this is the constant
+ wavelength difference between bins; for logarithmic data
+ it is the constant velocity step in Km/sec).  The way
+ WEND is interpreted may be controlled explicitly by the
+ FINAL and INCREMENT hidden keywords, but by default ISCRUNI
+ will assume WEND is an incremental value if it is less than
+ WSTART, and a final value if it is greater than WSTART.
+
+BINS
+
+ The number of elements to be used for the
+ wavelength dimension of the resulting image.
+
+OUTPUT
+
+ The name of the resulting data file containing
+ the scrunched image. The structure of OUTPUT will be the
+ same as that of the input file, except that the data array
+ will generally be a different size, and any error array
+ will have been deleted.  (Eventually ISCRUNI may be able
+ to calculate the errors in the new image..)
+
+INCREMENT
+
+ If set, ISCRUNI will assume WEND is an incremental value
+ (a velocity or wavelength step), even if it is greater
+ than WSTART.
+
+FINAL
+
+ If set, ISCRUNI will assume that WEND is the wavelength
+ of the final element of the resulting data, even if it
+ is less than WSTART.
+
+LOG
+
+ Controls whether or not the data is binned to a linear
+ or a logarithmic wavelength scale.
+
+LINEAR
+
+ Specifies that linear rather than quadratic
+ interpolation is to be used during the scrunching.  Usually,
+ better results are obtained with quadratic interpolation.
+ Note that LINEAR is the opposite of QUAD, and NOT of LOG.
+
+QUAD
+
+ Specifies that quadratic rather than linear interpolation
+ is to be used during the scrunching.  Usually, better
+ results are obtained with quadratic interpolation.
+
+DENSITY
+
+ If the input data represents data whose units are flux per
+ unit wavelength (AB magnitudes,Janskys, etc) rather than
+ total flux over a wavelength range (photons, for example)
+ then it should be scrunched so as to conserve the mean
+ value of the data, and DENSITY should be set.  See HELP
+ FIGARO TECHNIQUES WAVELENGTH for more details on this point.
+
+Source_comments
+
+ I S C R U N C H      /      I S C R U N I
+
+ Applies the set of polynomial fits determind by IARC to
+ an image, re-binning each cross-section of the image to
+ either a linear or logarithmic wavelength scale.  ISCRUNCH
+ uses the results from a single 2-D arc fit as performed by
+ IARC to get the channel/wavelength relation.  ISCRUNI uses
+ two such fits, and performs a linear interpolation between
+ the two.
+
+ The routine can either conserve flux or the mean value
+ of the data.  Conserving flux is appropriate where the data is
+ actually in flux units (photons/sec, for example), but not when
+ the data is in units of flux per unit wavelength (AB magnitudes,
+ Janskys, etc). Consider the case where each input bin maps to two
+ output bins; if the data is in flux units - photon counts, for
+ example - then flux should be conserved and the mean data level
+ should drop by a factor 2; if the data is in magnitudes, then
+ the rebinning should not change the mean level.  The program
+ tries to determine for itself whether the data is in flux
+ or in flux per unit wavelength by looking at the units, but
+ uses a command keyword (DENSITY) to confirm its guess.
+
+ Command parameters -
+
+ IMAGE      (Character) Image to be scrunched.
+ FILE       (Character) File containing results of 2-D arc fit
+            as produced by IARC.  If no extension supplied,
+            .IAR is assumed.
+ FILE2      (Character) ISCRUNI only. Second file containing
+            IARC results.
+ FRACTION   (Numeric) ISCRUNI only.  Controls the interpolation
+            between the two sets of wavelength information.
+            Value used=
+                (File value)+(File2 value - File value)*FRACTION
+ WSTART     (Numeric) The wavelength of the CENTER of the first
+            bin of the resulting scrunched spectrum.
+ WEND       (Numeric) The wavelength of the CENTER of the final
+            bin of the resulting scrunched spectrum.  If WEND is
+            less than WSTART, then SCRUNCH assumes that it is the
+            increment rather than the final value that is being
+            specified.  If the scrunch is logarithmic and WSTART
+            is greater than WEND, SCRUNCH assumes that the WEND
+            value represents a velocity in km/sec.  These
+            assumptions can be controlled directly by the keywords
+            INCREMENT and FINAL, if they will not give the desired
+            effect.
+ BINS       (Numeric) The number of bins for the resulting spectrum.
+ OUTPUT     (Character) Name of resulting image.  Note that an image
+            cannot be scrunched into itself, so a new output file
+            will always be created.
+
+ Command keywords -
+
+ LOG        Bin into logarithmic wavelength bins.
+ DENSITY    Treat input data as being in units of flux per unit
+            wavelength.
+ LINEAR     Use linear interpolation when rebinning.
+ QUAD       Use quadratic interpolation when rebinning.
+ INCREMENT  WEND is an increment value, even though it is > WSTART.
+ FINAL      WEND is a final value, even though it is < WSTART.
+
+ User variables - None
+
+                                     KS / CIT 22nd June 1984
+.endhelp

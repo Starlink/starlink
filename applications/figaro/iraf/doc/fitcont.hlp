@@ -1,0 +1,30 @@
+.help fitcont Starlink figaro
+.nf
+ FITCONT - Fits a Chebyshev polynomial to the continuum for 2D data
+
+
+Description
+
+   As with VIG, lines can be excluded from the polynomial
+   fitting. FITCONT stores the polynomial fitting coefficients in
+   the actual data file, for use by LONGSLIT (the program is specfically
+   for use with LONGSLIT, and of no use otherwise).
+
+Parameters
+
+
+IMAGE
+
+   IMAGE = FILE (Read)
+        Input file
+
+XSECT
+
+   XSECT = INTEGER (Read)
+        Cross-section to take first cut from
+
+Source_comments
+
+  none available
+
+.endhelp

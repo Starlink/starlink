@@ -1,0 +1,67 @@
+.help mcfit Starlink figaro
+.nf
+ MCFIT - Fit a continuum to a spectrum, given a mask spectrum
+
+
+Description
+
+ Performs a masked fit to a spectrum.  At a given number of
+ equally separated points in the spectrum, the average of the
+ surrounding points is taken and a new spectrum is formed by
+ interpolating between the resulting values.  Any points in
+ spectrum for which the corresponding element of the mask
+ spectrum is non-zero will be ignored.
+
+Parameters
+
+
+SPECTRUM
+
+ The spectrum to which the masked fit is
+ to be applied.  At a given number of equally separated
+ points in SPECTRUM, the average of the surrounding
+ data is taken and a new spectrum formed by interpolating
+ between the resulting values.
+
+MASK
+
+ The name of the spectrum to be used as a mask.  Any
+ points in SPECTRUM for which the corresponding element in
+ MASK is non-zero will be ignored in the fit.
+
+POINTS
+
+ The number of spline points to be used in the fit.
+ The actual number used may be less, since the points are
+ equispaced and some may be masked out.)
+
+OUTPUT
+
+ The name of the resulting fitted spectrum.  Note
+ that the default is the same as SPECTRUM - i.e. the fitting
+ will be performed in situ, which is faster but destroys the
+ original data.
+
+Source_comments
+
+ M C F I T
+
+ Performs a masked fit to a spectrum.  At a given number of
+ equally separated points in the spectrum, the average of the
+ surrounding points is taken and a new spectrum is formed by
+ interpolating between the resulting values.  Any points in the
+ spectrum for which the corresponding element of the mask spectrum
+ is non-zero will be ignored.
+
+ Command parameters -
+
+ SPECTRUM     (Character) The spectrum to be fitted
+ MASK         (Character) The mask spectrum to be used
+ POINTS       (Numeric) The number of points to be used
+ OUTPUT       (Character) The name of the resulting spectrum
+
+ Command keywords - None
+
+ User variables used - None
+                                KS / CIT 8th April 1984
+.endhelp

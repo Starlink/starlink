@@ -1,0 +1,104 @@
+.help istretch Starlink figaro
+.nf
+ ISTRETCH - Stretches and shifts an image in X and Y.
+
+
+Description
+
+ Shifts an image in both X and Y, by, in each direction,
+ a constant amount expressed in pixels and stretches it
+ by a given factor - this is a linear stretch, combined
+ with a shift.  Note that this is functionally a superset
+ of ISHIFT, but ISHIFT should be used for cases where the
+ stretch is 1.0 in both X and Y, since it uses a simpler
+ algorithm for very simple cases.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be stretched.
+
+XSTRETCH
+
+ Stretch factor in X.
+
+YSTRETCH
+
+ Stretch factor in Y.
+
+XSHIFT
+
+ Shift in X.
+
+YSHIFT
+
+ Shift in Y.
+
+XSPLIT
+
+ Subdivision of X pixels.
+
+YSPLIT
+
+ Subdivision of Y pixels.
+
+OUTPUT
+
+ Name of resulting image.
+
+See_also
+
+ KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, TRANSFORMER.
+
+Source_comments
+
+ I S T R E T C H
+
+ Shifts an image in both X and Y, by, in each direction,
+ a constant amount expressed in pixels and stretches it
+ by a given factor - this is a linear stretch, combined
+ with a shift.  Note that this is functionally a superset
+ of ISHIFT, but ISHIFT should be used for cases where the
+ stretch is 1.0 in both X and Y, since it uses a simpler
+ algorithm for very simple cases.
+
+ Command parameters -
+
+ IMAGE    The name of the structure containing the image.
+
+ XSTRETCH (Numeric) The stretch factor to be applied in X.
+
+ YSTRECTH (Numeric) The stretch factor to be applied in Y.
+
+ XSHIFT   (Numeric) The number of pixels the image is to be
+          shifted in X.  A -ve number shifts towards lower
+          numbered pixels.
+
+ YSHIFT   (Numeric) The number of pixels the image is to be
+          shifted in Y.  Sense is as for XSHIFT.
+
+ XSPLIT   (Numeric) The number of sub-divisions to be made in
+          each of the original pixels in X.
+
+ YSPLIT   (Numeric) The number of sub-divisions to be made in
+          each of the original pixels in Y.
+
+          Note that if XSPLIT or YSPLIT are greater than 1,
+          the data will be interpolated using a fit to a 2-D
+          parabola.  This increases the accuracy (sometimes)
+          of the rebinning, but results in increased CPU usage.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.  Note that the size of the image
+          is the same as before - so either some pixels will
+          be stretched out of the image, or some pixels will
+          just be zero.
+
+ Command keywords -  None
+
+                                  KS / CIT 5th Dec 1983
+.endhelp

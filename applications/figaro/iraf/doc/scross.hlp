@@ -1,0 +1,121 @@
+.help scross Starlink figaro
+.nf
+ SCROSS - Cross-correlate two spectra & get relative shift
+
+
+Description
+
+ SCROSS cross-correlates two spectra and reports a relative shift
+ in pixels between the two.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of the spectrum whose shift relative
+ to a template spectrum is to be determined.
+
+TEMPLATE
+
+ The name of the spectrum to be used as a
+ template - the spectrum relative to which the shift of
+ SPECTRUM is to be determined.
+
+XSTART
+
+ The shift determination can be carried out over a restricted
+ number of pixels.  XSTART is the X-value of the first pixel
+ to be used.  If SPECTRUM and TEMPLATE have different X arrays
+ then that of SPECTRUM is used.  Ie, XSTART is converted into
+ a pixel number using the calibration for SPECTRUM, ditto
+ XEND, and this then gives the pixel range used from both
+ SPECTRUM and TEMPLATE.
+
+XEND
+
+ The end of the range used.  Note
+ that XSTART and XEND effectively specify a spectrum which
+ is a subset of the original spectrum, and it is these
+ subset spectra that are used - i.e. the cosine bell is
+ applied to these subsets, not the whole spectrum, and
+ similarly for the other operations performed.
+
+FITCONT
+
+ SCROSS - unlike some other cross-correlators - attempts a
+ continuum fit to the spectra prior to applying a cosine
+ bell and taking the fourier transform.  This replaces the
+ reduction to zero mean sometime applied.  For some data,
+ this may not be a suitable thing to do, and it can be
+ inhibited by setting FITCONT=NO.  However, if you do
+ so, you should have applied your own reduction to zero
+ mean to the data prior to using SCROSS.  FITCONT is the
+ recommended option.
+
+CBPC
+
+ By default, a cosine bell covering 10% of the specturm is
+ applied.  This is normally OK, but it can be changed by
+ specifying a different value for CBPC.
+
+RECORD
+
+ As an option, SCROSS will create a file containing the
+ cross-correlation function.  This can be used to see how
+ good the cross-correlation was, or can be used to re-
+ calculate the shift, by applying a different centering
+ algorithm to the central spike.  (You can use it as
+ input to ARC, for example.)
+
+CROSS
+
+ If RECORD has been set, CROSS gives the name of the
+ cross-correlation spectrum to be created.
+
+Source_comments
+
+ S C R O S S
+
+ Main body of the Figaro SCROSS function.  This computes
+ the cross-correlation of two spectra and the location of the
+ central peak of the cross-correlation.  It can be used to
+ determine a relative shift between two spectra.  The cross
+ correlation function can also be saved in a disk structure.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The spectrum to be compared with
+             a template spectrum.
+ TEMPLATE    (Character) The template spectrum to be used.
+             The two spectra should be the same length.
+ XSTART      (Numeric) Data with an axis data value less than XSTART
+             will be ignored in the cross-correlation.
+ XEND        (Numeric) Data with an axis data value greater than XEND
+             will also be ignored.  Note that these values are
+             used to determine the channel numbers to be used
+             for SPECTRUM, and the same ones will be used for
+             TEMPLATE, even if TEMPLATE has a  different axis
+             structure.
+ CBPC        (Numeric) Percentage of spectrum covered by a cosine
+             bell prior to application of the FFT.
+ CROSS       (Character) the name of the data structure to hold
+             the cross-correlation, if it is to be saved.
+             The file created will be cross.dst, and will look
+             like an ordinary spectrum - i.e. can be plotted by
+             SPLOT, etc.  CROSS is ignored if RECORD is not
+             set.
+
+ Command keywords -
+
+ FITCONT     If set, a continuum fit is performed on the two
+             spectra prior to application of the cosine bell.
+ RECORD      If set, the cross-correlation of the two spectra
+             will be recorded as a new data structure.
+
+ User variables used -
+
+ SHIFT       (Numeric) The relative shift of the two spectra.
+
+                                         KS / CIT 3rd Oct 1983
+.endhelp

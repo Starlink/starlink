@@ -1,0 +1,101 @@
+.help optextract Starlink figaro
+.nf
+ OPTEXTRACT - Extracts a long-slit spectrum using Horne's algorithm
+
+
+Description
+
+ OPTEXTRACT performs optimal extraction of a star spectrum from a
+ 2-D long slit spectrum using the algorithm of Horne 1986 (PASP
+ 98,609).  A spatial profile image should have previously been
+ determined using the PROFILE command, and the 2-D spectrum to be
+ extracted must be sky subtracted (e.g. using the POLYSKY command).
+
+ The input IMAGE array may have error and quality information.
+ An error or variance array is required to perform true optimal
+ extraction as the points should be weighted using the errors on
+ each point as well as the spatial profile information. If an error
+ array is not present (or not all the errors in a column are known)
+ the extraction is performed assuming equal errors on every point
+ in the column. The output spectrum has an error array only if the
+ input image has an error array. The WEIGHT keyword may be set to NO
+ to suppress error weighting even when errors are available.
+
+Parameters
+
+
+IMAGE
+
+ The name of a 2-D long slit spectrum.
+
+PROFILE
+
+ The name of the normalized spatial profile image for
+ the object to be extracted. This can be obtained
+ using the PROFILE command.
+
+SPECTRUM
+
+ The name of the resulting single spectrum.
+
+WEIGHT
+
+ If WEIGHT is set, the error or variance information
+ associated with the data is used to weight the data.
+ Each point is weighted as 1/variance. If not set, or
+ if no error information is available all points are
+ given equal weight.
+
+Source_comments
+
+ O P T E X T R A C T
+
+ OPTEXTRACT performs optimal extraction of a star spectrum from a
+ 2-D long slit spectrum using the algorithm of Horne 1986 (PASP 98,609).
+ A spatial profile image should have previously been determined using
+ the PROFILE command, and the 2-D spectrum to be extracted must be
+ sky subtracted (e.g. using the POLYSKY command).
+
+ The input IMAGE array may have error and quality information. An error
+ or variance array is required to perform true optimal extraction as
+ the points should be weighted using the errors on each point as well
+ as the spatial profile information. If an error array is not present (or
+ not all the errors in a column are known) the extraction is performed
+ assuming equal errors on every point in the column. The output spectrum
+ has an error array only if the input image has an error array. The
+ WEIGHT keyword may be set to NO to suppress error weighting even
+ when errors are available.
+
+ The spatial profile array used by OPTEXTRACT must satisfy the following
+ requirements.
+  (i)  Its quality array must specify a window (of arbitrary shape)
+       in which the extraction will be performed. Points inside the window
+       must have zero quality values, other points must have non zero
+       quality values
+  (ii) The data must be normalized. i.e. The sum along each column
+       must be one.
+  (iii) The data values may not be negative.
+
+ Command parameters -
+
+ 'IMAGE'    The name of the input 2-D file. This should be a
+            sky subtracted 2-D spectrum from which the spectrum
+            of an object is to be extracted. It may have error and
+            quality arrays
+ 'PROFILE'  The normalized spatial profile image used to perform the
+            extraction. The quality array should specify a window
+            in which the profile is determined. The data within
+            this window is the spatial profile to be used.
+ 'SPECTRUM' The name of the resulting 1-D spectrum. If the input image
+            has errors, so will the output spectrum. The quality
+            will be set to bad only if there is no data in the
+            relevant column.
+
+ Command keywords -
+
+ 'WEIGHT'    Use the error or variance array to weight the
+             pixels during extraction.
+
+
+                                 JAB / JAC 8th Feb 1991
+.endhelp

@@ -1,0 +1,58 @@
+.help rescale Starlink figaro
+.nf
+ RESCALE - Rescale using user-defined upper and lower limits
+
+
+Description
+
+ This task rescales spectra/images using user-defined upper
+ and lower limits.  The scaling is such that the interval
+ [LOWFACT,HIGHFACT] becomes the interval [0,1]. The "limits"
+ are not thresholds, i.e. data values beyond the limits are
+ also scaled.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be rescaled.
+
+LOWFACT
+
+ lower limit of rescaling.
+
+HIGHFACT
+
+ upper limit of rescaling.
+
+OUTPUT
+
+ Name of resulting image.
+
+Source_comments
+
+ R E S C A L E
+
+ This routine rescales spectra/images using user-defined upper and
+ lower limits. The scaling is such that the interval
+ [LOWFACT,HIGHFACT] becomes the interval [0,1]. The "limits" are
+ not thresholds, i.e. data values beyond the limits are also
+ scaled.
+
+ Command parameters -
+
+ IMAGE  (Character) The name of the structure containing the image.
+        Uses main data array, or the x-axis data for the XCxxx routines.
+
+ LOWFAC (Numeric) The lower limit of the rescaling.
+
+ HIGHFAC (Numeric) The upper limit of the rescaling.
+
+ OUTPUT (Character) The name of the result of the operation.  This
+        can be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ 02-MAY-1992  MAS (UoM): Original version.
+.endhelp

@@ -1,0 +1,70 @@
+.help figs424 Starlink figaro
+.nf
+ FIGS424 - Sort a FIGS image-mode hypercube into wavelength order
+
+
+Description
+
+ Re-orders a raw FIGS image-mode data hypercube so that the
+ spectral dimension is in ascending order of wavelength,
+ instead of in the order as read by the data acquisition system.
+
+Parameters
+
+
+HCUBE
+
+ The name of an image mode FIGS raw data hypercube,
+ as produced by the FIGS data acquisition system.
+
+OUTPUT
+
+ The name of the resulting FIGS image mode hypercube
+ sorted into proper wavelength order, and with a .X
+ structure that contains an appropriate wavelength
+ array.  If OUTPUT is the same as HCUBE, the data
+ will be processed in situ; otherwise a new data file
+ will be created.
+
+Source_comments
+
+ F I G S 4 2 4
+
+ Given a FIGS image-mode data hypercubecube as produced by the FIGS
+ data acquisition system, processes it to produce a hypercube in
+ which the data have been sorted into wavelength order in accordance
+ with the wavelength parameters included in the hypercube.
+
+ Command parameters -
+
+ 'HCUBE'    The name of the hypercube to be processed.
+            This should be a raw FIGS data hypercube.
+ 'OUTPUT'   The name of the resulting hypercube.  If this is the
+            same as HCUBE the data is processed in situ, if not
+            a new output file is produced.
+
+ Command keywords - None
+
+ Input data -
+
+ HCUBE is assumed to have a structure with the actual
+ cube data in HCUBE.Z.DATA
+
+ This routine assumes that the first axis of the cube data
+ represents wavelength, that the second and third represent the
+ X and Y dimensions of the image (this is an unfortunate,
+ since it means that the .X axis of the hypercube represents
+ wavelength, the .Y represents the image X axis and so forth)
+ and the fourth axis represents scan cycle number.
+ The data is sorted into wavelength order using the various
+ grating parameters read from the .FITS sub-structure of HCUBE.
+ The data is only re-ordered in the first dimension of the
+ hypercube.
+
+ Output data -
+
+ OUTPUT is created with the same structure as HCUBE, but with
+ a .X structure added to contain the wavelength information.
+
+                                 KS / AAO 25th Nov 1985
+.endhelp

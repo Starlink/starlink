@@ -1,0 +1,81 @@
+.help fighelp Starlink figaro
+.nf
+ FIGHELP - Provide Figaro on-line help
+
+
+Usage
+
+ fighelp [topic]
+
+Description
+
+ This routine interfaces the portable help library for the Figaro
+ package with a terminal. The ADAM parameter TOPIC is used only for
+ the initial entry into the help library. The user can then
+ navigate through the library with the following responses to the
+ prompt:
+
+   -  A blank response gets you one level up in the topic hierarchy.
+
+   -  A question mark (?) re-displays the current topic.
+
+   -  An end-of-file character exits fighelp. Note that this is
+      Ctrl-z under VMS but usually Ctrl-d under Unix.
+
+   -  Any normal text specifies (sub-) topics to look for.
+
+   -  Each blank-separated word stands for one topic in the
+      hierarchy. E.g. three blank-separated words go down three
+      levels in the hierarchy.
+
+   -  Each underscore-separated word stands for an
+      underscore-separated word in a single topic
+
+   -  Words (whether separated by blanks or underscores) that are not
+      unique topics or include wild card characters are expanded and
+      help is given on all matching topics. Wild card characters are
+      % for a single character and * for any number of characters
+      including none. In the word expansion A_G_N would match
+      active_galactic_nuclei, which is one topic. The same is true
+      for A*_G*_N* or active or active*.
+
+ When the help text to be printed is longer than the terminal page,
+ then the user is asked to press the Return key before proceeding
+ with output. At this point, too, can an end-of-file character be
+ given to exit fighelp immediately.
+
+Parameters
+
+
+PAGE
+
+ The number of lines that are a screen-full of information on
+ the terminal. This is used so that FIGHELP knows when to wait
+ for the reader to hit the return key. To turn paging off set
+ this parameter zero. If this is not given, then the routine will
+ try to find out about the terminal on its own.
+
+WIDTH
+
+ The number of columns on the screen. If this is not given, then
+ the routine will try to find out about the terminal on its own.
+
+LIBRARY
+
+ The full file name of the library to be enquired. If this is
+ not given, then the translation of the environment variable
+ FIG_HELP will be used.
+
+TOPIC
+
+ A initial topic to be looked for in the library. If this is not
+ given, the top level of the library will be presented.
+
+Notes
+
+ This routine is available only under Unix from a Unix shell.
+
+Authors
+
+ hme: Horst Meyerdierks (UoE, Starlink)
+.endhelp

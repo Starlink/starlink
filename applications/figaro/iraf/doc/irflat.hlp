@@ -1,0 +1,91 @@
+.help irflat Starlink figaro
+.nf
+ IRFLAT - Generates a ripple spectrum from an IR spectrum
+
+
+Description
+
+ IRFLAT generates a ripple spectrum from  an IR spectrum.
+ In principle, the (raw or ratioed) data can then be divided
+ by this ripple spectrum to take out the effects of different
+ detector responses, which produces a periodic pattern on the
+ continuum of the data (with period equal to the number of
+ detectors).
+
+Parameters
+
+
+SPECTRUM
+
+ Spectrum containing data.
+
+CGS2
+
+ Flag indicating whether to operate in 'CGS 2' mode.
+
+PERIOD
+
+ Period of the ripple (pixels).
+
+OUTPUT
+
+ The name of resulting ripple spectrum.
+
+XSTART
+
+ First X value for region to be used.
+
+XEND
+
+ Second X value for region to be used.
+
+MORE
+
+ Include additional ranges?  (If TRUE the prompts for XSTART and XEND
+ are repeated for another region.)
+
+Source_comments
+
+ I R F L A T
+
+ Figaro function that produces a "flatfield" ripple
+ spectrum from a infrared  spectrum, by averaging the data from
+ regions of the spectrum uncontaminated with spectral features
+ (i.e. assumed flat) to determine the relative response of each
+ detector or scan. The output spectrum can be divided into the original
+ spectrum using IDIV to flat field the data.
+
+ The program is used to remove two kinds of ripple from spectra.
+ In instruments which interleave a number of scan positions to give
+ a fully sampled spectrum (such as CGS3 and CGS4), the program removes
+ ripple which results from seeing or transparency fluctuations between
+ scan positions. In an instrument such as CGS2 it can remove the ripple
+ which results from the fact that the flatfield (i.e. relative detector
+ responses) is different for extended and point sources. In the case of
+ CGS2 data it makes use of a .MORE.PIXELS extension in the data which
+ specifies the detector and scan position corresponding to each pixel.
+ If this structure is not present it prompts for a period and assumes
+ a periodic ripple. The period will normally be the oversampling factor,
+ typically 2 or 3 for CGS4 or CGS3 data.
+
+ If the program is run in batch only one region can be specified.
+ Multiple regions can only be specified in interactive mode.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The name of the file containing the
+             spectrum to be used.
+ CGS2        (Logical) Flag indicating whether to operate in 'CGS 2'
+             mode.
+ PERIOD      (Real) The period of the ripple (in pixels).
+ OUTPUT      (Character) The name of the resulting ripple spectrum.
+ XSTART      (Real) First X value for region to be used.
+ XEND        (Real) Second X value for region to be used.
+
+ Command keywords -
+
+ MORE        If YES, the prompts for XSTART and XEND are repeated for
+             another region.
+
+ 10th Dec 1990 - JAB / JAC
+.endhelp

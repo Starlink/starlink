@@ -1,0 +1,63 @@
+.help rcgs2 Starlink figaro
+.nf
+ RCGS2 - Reads UKIRT CGS2 spectrum (also UKT9 and UKT6 CVF)
+
+
+Description
+
+ Reads a UKIRT CGS2 spectrum out of its original container
+ file and create a Figaro spectrum from it. (Also works for
+ UKT9 and UKT6 CVF spectra).
+
+Parameters
+
+
+FILE
+
+ The name of the container file to read in.
+
+OBS
+
+ The observation number in the container file.
+
+TWOD
+
+ If set, a 2-dimensional file is created giving all scans.
+ Otherwise a indivdual scan can be specified or the coadded
+ data used in a 1-D file.
+
+SCAN
+
+ The scan number in the observation.
+
+OUTPUT
+
+ The name of the Figaro file to be created from the
+ CGS2 Data.
+
+Source_comments
+
+ R C G S 2
+
+ Reads a UKIRT CGS2 spectrum out of its original container file
+ and create a Figaro spectrum from it. (Also works for UKT9
+ and UKT6 CVF spectra).
+
+ Command parameters -
+
+ FILE    (Character) The name of the container file
+ OBS     (Numeric) The observation number to be read from
+         the container file.
+ SCAN    (Numeric) The scan number to be read from the observation
+         (Only used if TWOD is not set) use zero to read the coadded data.
+ OUTPUT  (Character) The name of the Figaro file to be created.
+
+ Command keywords -
+
+ TWOD    If set create a 2-D array of wavelength by scan
+         number.
+
+ User variables used - None
+
+                                  JAB / JAC  25th Feb 1990
+.endhelp

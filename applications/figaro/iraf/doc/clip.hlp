@@ -1,0 +1,57 @@
+.help clip Starlink figaro
+.nf
+ CLIP - Clip data above and below a pair of threshold values
+
+
+Description
+
+ Clips an image, replacing any elements above a high threshold or
+ below a low threshold with that threshold value.
+
+Parameters
+
+
+IMAGE
+
+ The datafile to be threshold clipped.
+
+LOWCLIP
+
+ Any elements in the image that are less than LOWCLIP are
+ set to LOWCLIP.
+
+HIGHCLIP
+
+ Any elements in the image that are greater than HIGHCLIP
+ are set to HIGHCLIP.
+
+OUTPUT
+
+ The name of the resulting image.  If OUTPUT is the
+ same as IMAGE the operation will be performed in situ.
+ Otherwise a new file will be created.
+
+See_also
+
+ FIGARO: IDIFF, RESCALE.
+ KAPPA: THRESH.
+
+Source_comments
+
+ C L I P
+
+ Clips an image (or spectrum, cube or whatever..).  Given a low
+ and a high threshold value, CLIP sets any elements above the
+ high value or below the low value to the appropriate value.
+
+ Command parameters -
+
+ IMAGE    (Character) The name of the structure containing the image.
+ LOWCLIP  (Numeric) The low threshold value
+ HIGHCLIP (Numeric) The high threshold value
+ OUTPUT   (Character) The name of the result of the operation.  This
+          can be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+                                  KS / AAO 22nd July 1985
+.endhelp

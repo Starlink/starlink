@@ -1,0 +1,85 @@
+.help xcopi Starlink figaro
+.nf
+ XCOPI - Like XCOPY but interpolates X-data from 2 files
+
+
+Description
+
+ The main use of this task is to set the axis data in
+ a data file to values intermediate between those of
+ two other files.  Typically, the first file will be a
+ spectrum, the others will be arcs taken either side
+ of the spectrum.  The whole axis structure from the first
+ 'arc' file replaces that from the original file, and then
+ the axis data array is modified to give the required
+ intermediate result.
+
+Parameters
+
+
+SPECTRUM
+
+ File requiring X data.
+
+ARC
+
+ File containing X data.
+
+ARC2
+
+ Second file containing X data.
+
+FRACTION
+
+ Fraction in the relationship:
+
+    X data OUTPUT=ARC+(ARC2-ARC1)*FRACTION.
+
+
+OUTPUT
+
+ Name of resulting file.
+
+Source_comments
+
+ X C O P I
+
+ The main use of this routine is to set the axis data in
+ a data file to values intermediate between those of
+ two other files.  Typically, the first file will be a
+ spectrum, the others will be arcs taken either side
+ of the spectrum.  The whole axis structure from the first
+ 'arc' file replaces that from the original file, and then
+ the axis data array is modified to give the required
+ intermediate result.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The file name of the spectrum whose
+             data is to be combined with the axis data from the
+             arcs.
+
+ ARC         (Character) The file name of the arc spectrum - i.e.
+             the spectrum whose axis information is to be used.
+
+ ARC2        (Character) The file name of the second arc
+             spectrum whose axis array is to be used.
+
+ FRACTION    (Numeric) The fractional value controlling the
+             weight given to the different arc data arrays.
+             If 0., the output data is the same as for ARC,
+             and the simpler XCOPY routine should be used.
+             If 1., the output data is the same as for ARC2.
+             If .5, the output is the average of the two arcs.
+             Etc.
+
+ OUTPUT      (Character) The file name for the resulting data
+             structure.  If this is the same as SPECTRUM, the
+             axis data in SPECTRUM will be changed in situ.
+
+ Command keywords - None
+
+ User variables used - None
+
+                                         KS / CIT 1st July 1983
+.endhelp

@@ -1,0 +1,86 @@
+.help cmplxfilt Starlink figaro
+.nf
+ CMPLXFILT - Create a mid-pass filter for complex data
+
+
+Description
+
+ CMPLXFILT generates a complex data structure whose data have the
+ form of a mid-pass filter that can be applied to other complex
+ data of the same size using CMPLXMULT.  The filter is specified
+ by a low and high cutoff.  If the low cutoff is specified as 0,
+ a low-pass filter is constructed.
+
+Parameters
+
+
+CDATA
+
+ CMPLXFILT uses an input complex data structure, specified
+ as CDATA, as a template for the filter it generates.  The
+ resulting filter has the same structure (and data dimem-
+ sions) as the template, only the data arrays differing.
+ If the template data is n-dimensional, an n-dimensional
+ filter will be generated, the cutoff frequencies being the
+ same in each dimension.
+
+LOWCUT
+
+ The mid-pass filter rises from zero, LOWCUT being the
+ frequency (specified in terms of the Nyquist frequency)
+ at which it reaches a height of exp(-1/2) = ~0.6  If
+ LOWCUT is specified as zero, a low-pass filter results.
+ The filter is in fact a falling gaussian with a width
+ specified by HICUT which has subtracted from it a rising
+ gaussian with a width specified by LOWCUT.
+
+HICUT
+
+ HICUT is the element at which the filter drops to a
+ height of exp(-1/2) = ~0.6   It is specified in terms
+ of the Nyquist frequency.
+
+OUTPUT
+
+ The name of the resulting filter.  If OUTPUT is the
+ same as CDATA, the filter replaces the data originally
+ in CDATA.  Otherwise, a new structure is created.
+
+Source_comments
+
+ C M P L X F I L T
+
+ This routine produces a mid-pass complex filter, given a complex
+ structure as a template and low and high cutoff values.  The
+ filter is produced by the subtraction of two gaussians.  If no
+ low value is specified, the result is a single gaussian low-pass
+ filter.
+
+ Command parameters -
+
+ CDATA    (Character) The name of the template complex structure.
+ LOWCUT   (Numeric) The low cutoff value for the filter.  This is
+          specified in terms of the Nyquist frequency.  It is the
+          sigma of the low cut gaussian, i.e. the point at which the
+          rising edge of the filter reaches exp(-1/2) =~.6
+ HICUT    (Numeric) The high cutoff value for the filter.  This is
+          specified in terms of the Nyquist frequency.  It is the
+          sigma of the high cut gaussian, i.e. the point at which the
+          falling edge of the filter reaches exp(-1/2) =~.6
+ OUTPUT   (Character) The name of the resulting structure.  This
+          may be the same as CDATA, in which case the operation
+          is performed in situ.  Otherwise, a new file is created.
+
+ Command keywords - None
+
+ Output data -
+
+ The resulting complex data have a zero imaginary part, and a real
+ part given by F(X)=exp(-X**2/(2*V**2))-exp(-X**2/(2*U**2))
+ where U and V are the low and high frequency cutoffs respectively.
+ (Note that the actual data generated is symmetrical about the
+ mid point of the data, which is assumed to be the zero frequency
+ - the Figaro function FFT produces data in this form).
+
+                                     KS / AAO  9th Oct 1986.
+.endhelp

@@ -1,0 +1,64 @@
+.help alasout Starlink figaro
+.nf
+ ALASOUT - Output a spectrum in ALAS (Abs. Line Analysis System) format
+
+
+Description
+
+ ALASOUT  writes a section of a spectrum to an output file suitable for
+ use as an 'Observed Profile' by ALAS (Absorption Line Analysis Software).
+
+Parameters
+
+
+SPECTRUM
+
+ The input spectrum.  A section of this spectrum, as specified by XSTART
+ and XEND, will be written to the output file (ALASFILE).  Note that ALAS
+ expects the spectrum to have been normalised by the continuum.
+
+XSTART
+
+ The X value of the first channel which will be written to the output
+ (ALASFILE).
+
+XEND
+
+ The X value of the last channel which will be written to the output
+ (ALASFILE).  The total number of channels converted (XEND - XSTART + 1)
+ may not exceed 1500; ALAS (version as per Starlink LUN/41.1) accepts a
+ maximum of 300 channels in one file.
+
+ALASFILE
+
+ The name of the output ALAS format file.  The file type should not be
+ given: the file type is set internally and is always .ALS.  If the type
+ is given it will be ignored.
+
+Source_comments
+
+ A L A S O U T
+
+ ALASOUT takes data from a FIGARO spectrum and writes it to a file
+ in ACSII format, suitable for input to ALAS (Absorption Line
+ Analysis Software) as an 'Observed Profile File'.
+ The user can select the X range to be transferred, i.e. to cover
+ the desired line without too much extra spectrum.  This is
+ important since ALAS has a limit of 300 channels for these input
+ files (at least in version as per Starlink LUN/41.1).
+ For each selected channel an output line is written to the
+ file, giving the X value (F9.3) and the data value (F9.5).
+ Note that ALAS expects these data values to have been
+ normalised by the continuum.
+ The file created will have file type .ALS.
+
+ Command parameters
+
+ SPECTRUM    The input FIGARO spectrum
+ XSTART      First X value to transfer
+ XEND        Last X value to transfer
+ ALASFILE    File name of ALAS format output file (no file type
+             or version should be appended).
+
+                            J.G. Robertson   September 1985
+.endhelp

@@ -1,0 +1,62 @@
+.help ystract Starlink figaro
+.nf
+ YSTRACT - Adds contiguous columns of an image to form a spectrum
+
+
+Description
+
+ Adds a number of consecutive columns from an image to produce a 1-D
+ data object.  (A 'column' is all the pixels with a given X-value.)
+
+Parameters
+
+
+IMAGE
+
+ Name of image to extract data from.
+
+XSTART
+
+ First x-value to be used.
+
+XEND
+
+ Last x-value to be used.
+
+SPECTRUM
+
+ Name of spectrum to be generated.
+
+Source_comments
+
+ Y S T R A C T
+
+ Adds a number of consecutive columns from an image to
+ produce a 1-D data object.  (A 'column' is all the
+ pixels with a given AXIS(1) value.)
+
+ Command parameters -
+
+ 'IMAGE'    The name of the image from which the rows
+            are to be taken.
+
+ 'XSTART'   The AXIS(1)-value of the first row to be used.
+            If IMAGE has an AXIS(1) structure, the data from this
+            is used.  If not, the column numbers are used,
+            starting from 1.
+
+ 'XEND'     The AXIS(1)-value of the last column to be used.
+
+ 'SPECTRUM' The name of the resulting data.
+
+ Input data - an IMAGE
+
+ Output data -
+
+ SPECTRUM is created with the same structure as IMAGE,
+ except that the data-array will only have one dimension, and if
+ IMAGE has an AXIS(1) structure, this will be omitted.  Any AXIS(2)
+ structure will be copied unchanged.
+
+                                 KS / CIT 22nd March 1984
+.endhelp

@@ -1,0 +1,67 @@
+.help sqrterr Starlink figaro
+.nf
+ SQRTERR - Generates an error array as Error = Square Root of (Data/Const)
+
+
+Description
+
+ SQRTERR produces an error array, given a data array and a
+ constant.  Each element of the data array is calculated as
+ the square root of the equivalent element of the data array,
+ after division by a specified constant factor.
+
+Parameters
+
+
+IMAGE
+
+ The name of the file containing the data
+ for which an error array is to be caluclated.  The
+ data can have any dimensions.  If there is already
+ an error array, its contents are replaced.
+
+FACTOR
+
+ Calculating the errors as just the square root of
+ the data is OK only for certain types of data, such
+ as raw data from photon counting detectors.  For this
+ type of data, FACTOR should be set to 1.0.  Some other
+ types of data, such as raw data from CCD detectors,
+ can be handled if the data value is first divided by
+ a constant factor - the data number per photon value (or
+ ADU/photon value).  Other types of data should not be
+ treated using this routine, in general.
+
+OUTPUT
+
+ The name of the resulting image.  This
+ can be the same as the input image, in which case the
+ error array is added to the original image, or different,
+ in which case a new file containing an error array is
+ created.
+
+Source_comments
+
+ S Q R T E R R
+
+ Sets an error array for which the value of each element is
+ given by the square root of the corresponding data array
+ element.  Optionally, the data array element value may be divided
+ by a specified constant before the square root is taken.  The
+ case where the constant is 1 is suitable for data such as
+ photon-counting data is being used.  For CCDs and similar devices,
+ the constant should be equal to the ADU/photon value.
+
+ Command parameters -
+
+ IMAGE  (Character) The name of the structure containing the image.
+
+ FACTOR (Numeric) The value of the constant by which the data
+        values are divided before the square root is taken.
+
+ OUTPUT (Character) The name of the result of the operation.  This
+        can be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the error array a direct
+        copy of the input.
+                                  KS / AAO 8th Jan 1987
+.endhelp

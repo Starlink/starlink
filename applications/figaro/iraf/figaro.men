@@ -1,0 +1,244 @@
+      overview - Overview of the Figaro package
+    news_5_6_0 - Release notes for this version of Figaro
+       specdre - Specdre - Spectroscopy Data Reduction.
+    classified - Classified list of commands.
+        abconv - Convert spectrum from Janskys into AB magnitudes
+        abline - Interactive absorption line analysis
+        adjoin - Append two spectra (strictly a merge by wavelength value)
+        alasin - Read a spectrum in ALAS (Abs. Line Analysis System) format
+       alasout - Output a spectrum in ALAS (Abs. Line Analysis System) format
+      aperture - Do simple minded aperture photometry on a series of frames
+           arc - Interactive manual arc line identification
+       arcdisp - Fit polynomial dispersion curve.
+      arcgendb - Convert list of laboratory values to feature data base.
+      arcident - Auto-identify located features.
+      arclocat - Locate line features in a set of spectra.
+         ascin - Read a 1-D or N-D data set from an ASCII table.
+        ascout - Write an NDF to an ASCII table.
+         bbody - Calculate a black body spectrum.
+        bclean - Automatic removal of bad lines & cosmic rays from CCD data
+          bfft - Takes the reverse FFT of a complex data structure
+        bsmult - Atmospheric band removal using a B star calibration spectrum
+        caldiv - Generate calibration spectrum from continuum standard spectra
+        ccdlin - Applies a linearity correction to AAO CCD data
+          ccur - After SPLOT, uses graphics cursor to indicate data values
+         cdist - S-distortion correction using SDIST results
+       centers - Generate file of object centroids from ICUR/IGCUR output
+          cfit - Generate a spectrum using the cursor
+         clean - Interactive patching of bad lines, bad pixels in an image
+          clip - Clip data above and below a pair of threshold values
+       cmplx2i - Extracts the imaginary part of a complex data structure
+       cmplx2m - Extracts the modulus of a complex data structure
+       cmplx2r - Extracts the real part of a complex data structure
+      cmplxadd - Add two complex structures
+     cmplxconj - Produce the complex conjugate of a complex structure
+      cmplxdiv - Divide two complex structures
+     cmplxfilt - Create a mid-pass filter for complex data
+     cmplxmult - Multiply two complex structures
+      cmplxsub - Subtract two complex structures
+         coadd - Form the spectrum which is the mean of the rows in an image
+        colour - Set colour table for image display
+       combine - Combine two spectra, adding with weights according to errors
+        copobj - Copy an HDS object
+        correl - Correlate two or three data sets.
+       cosbell - Create data that goes to zero at the edges in a cosine bell
+        cosrej - Reject cosmic rays from a set of supposedly identical spectra
+        creobj - Create a data object or file
+          cset - Interactively set regions of a spectrum to a constant value
+        cspike - Create calibration spiketrum given spiketrum & standard spectrum
+        delobj - Delete a data object or a file
+       dvdplot - Plot the data in one file against the data in another
+        echarc - Wavelength calibrate an echelle arc
+       echfind - Locate spectra in echelle data
+       echmask - Produce an extraction mask from an SDIST analysis
+      echmerge - Merge echelle spectra into a single long spectrum
+     echselect - Interactive selection of sky and object spectra for an echelle
+       editext - Edit the Specdre Extension.
+       elsplot - Produces a long (<3m) error bar plot of a spectrum
+          emlt - Fits gaussians to the strongest lines in a spectrum
+        errcon - Converts percentage error values to absolute values
+        esplot - Produces an error bar plot of a spectrum
+       evalfit - Evaluate fit results.
+          exam - Display the contents/structure of data file
+         extin - Correct spectrum for atmospheric extinction
+       extlist - Adds non-contiguous lines of an image to form a spectrum
+       extract - Adds contiguous lines of an image to form a spectrum
+        fet321 - Extracts a spectrum from 1 detector from etalon mode FIGS data
+            ff - Flat field an image (uses Jon Tonry's algorithm)
+       ffcross - Cross-correlate an image and a flat field (mainly IPCS data)
+           fft - Takes the forward FFT of a complex data structure
+       fighelp - Provide Figaro on-line help
+       figinfo - Describes the contents of a Figaro data file
+       figs321 - Processes a FIGS data cube down to a single spectrum
+       figs322 - Processes a FIGS data cube down to an image
+       figs422 - Process a FIGS image-mode hypercube down to an image
+       figs423 - Process a FIGS image-mode hypercube down to a cube
+       figs424 - Sort a FIGS image-mode hypercube into wavelength order
+        figsee - Generate a seeing ripple spectrum from a FIGS spectrum
+      figsflux - Flux calibrates a FIGS spectrum
+      fillcube - Copy one NDF into part of another.
+        findsp - Locate fibre spectra in an image
+         fitbb - Fit diluted Planck curves to a spectrum.
+      fitgauss - Fit Gauss profiles to a spectrum.
+       fitpoly - Fit a polynomial to a spectrum.
+        fitset - Set the value of a FITS keyword
+      fitskeys - List the FITS keywords in a data file
+        fittri - Fit triangular profiles to a spectrum.
+     flag2qual - Converts `flagged' values to produce a quality array
+     flaircomp - Compresses a FLAIR frame to give a weight vector.
+      flairext - Optimally extracts spectra from a FLAIR NDF to form a new NDF.
+        flconv - Convert a spectrum in Janskys into one in Ergs/cm**2/s/A
+          foto - Perform aperture photometry given CENTERS output
+      fscrunch - Rebin data with a disjoint wavelength coverage to a linear one
+        fwconv - General unit conversion for spectra
+         gauss - Interactive fit of Gaussians to emission or absorption lines
+       goodvar - Replace negative, zero and bad variance values
+          grow - Copy an N-dimensional cube into part of an (N+M)-dimensional one.
+         growx - Performs reverse function to that of EXTRACT
+        growxt - Copies an image into contiguous XT planes of a cube
+        growxy - Copies an image into contiguous XY planes of a cube
+         growy - Performs reverse function to that of YSTRACT
+        growyt - Copies an image into contiguous YT planes of a cube
+        gspike - Generates a 'spiketrum' from a table of values
+          hard - Sets the file name for hard copy output
+        hcross - Cross-correlate two spectra & get redshift and error
+          hist - Produce histogram of data value distribution in an image
+          hopt - Histogram optimization of an image
+       i2cmplx - Copies an array into the imaginary part of a complex structure
+          iadd - Adds two images (or two spectra)
+         ialog - Takes the antilog of an image
+          iarc - Given fit to single spectrum, fit all spectra in a 2-D arc
+         icadd - Adds a constant to an image
+         icdiv - Divides an image by a constant
+        icmult - Multiplies an image by a constant
+         icont - Produces a contour map of an image
+        iconv3 - Convolve an image with a 3x3 convolution kernel
+        icor16 - Corrects 16 bit data from signed to unsigned range
+         icset - Set a selected region of an image to a constant value
+         icsub - Subtracts a constant from an image
+          icur - Inspect an image with cursor
+          idev - Set the device for image display
+         idiff - Takes the 'differential' of an image
+          idiv - Divides two images (or two spectra)
+        igconv - Convolve an image with a specified filter
+         igcur - Use cursor to show X, Y and data values
+         igrey - Produces a grey-scale plot of an image
+         ilist - List the data in an image (or spectrum)
+          ilog - Takes the logarithm of an image
+         image - Display an image
+         imult - Multiplies two images (or two spectra)
+        interp - Interpolates points of a 'spiketrum' to form a spectrum
+        iplots - Plots successive cross-sections of an image, several to a page
+        ipower - Raises an image to a specified power
+        irconv - Converts data in Janskys to W/m**2/um
+         irevx - Reverse an image (or spectrum) in the X-direction
+         irevy - Reverse an image in the Y-direction
+        irflat - Generates a ripple spectrum from an IR spectrum
+        irflux - Flux calibrates an IR spectrum using a black-body model
+        irot90 - Rotates an image through 90 degrees
+      iscrunch - Rebin an image to linear wavelength scale given IARC results
+       iscruni - Like ISCRUNCH, but interpolates between two IARC result sets
+        isedit - Allows interactive editing of a 1-D or 2-D spectrum
+        ishift - Applies a linear x and a linear y shift to an image
+       ismooth - 2-D smooth of image using 9-point smoothing algorithm
+        isplot - Plots successive cross-sections through an image
+         istat - Provides some statistics about an image (max, min etc.)
+      istretch - Stretches and shifts an image in X and Y.
+          isub - Subtracts two images (or two spectra)
+       isubset - Produces a subset of an image
+        isuper - Produces a superset of an image
+        isxadd - Adds a spectrum to each X direction X-section of an image
+        isxdiv - Divides a spectrum into each X direction x-section of an image
+        isxmul - Multiplies each X direction image x-sect by a spectrum
+        isxsub - Subtracts each X direction image x-sect from a spectrum
+        isyadd - Adds a spectrum to each Y direction x-section of an image
+        isydiv - Divides a spectrum into each Y direction x-section of an image
+        isymul - Multiplies each Y direction image x-sect by a spectrum
+        isysub - Subtracts each Y direction image x-sect from a spectrum
+      ixsmooth - Smooth in x-direction by gaussian convolution
+       linterp - Interpolates between spiketrum points to form a spectrum
+        lsplot - Hardcopy spectrum plot of specified size (up to 3 metres)
+         lxset - Set X array of spectrum/image to specified range
+         lyset - Set Y array of spectrum/image to specified range
+          mask - Generate a mask spectrum given a spectrum and a mask table
+       maskext - Extracts echelle orders using a mask created by ECHMASK
+         mcfit - Fit a continuum to a spectrum, given a mask spectrum
+       medfilt - Applies a median filter to an image
+      medfiltr - Applies a rectangular median filter to an image
+        medsky - Take the median of a number of images
+       moments - Calculate moments of spectra in a cube.
+         movie - Browse through slices of a cube.
+        msplot - Plots a long spectrum as a series of separate plots
+         ncset - Set a region of a spectrum to a constant
+       offdist - Applies an offset to an SDIST fit
+    optextract - Extracts a long-slit spectrum using Horne's algorithm
+        overpf - Overlays a FINDSP fit on another image
+          peak - Determines position of highest peak in a spectrum
+        polext - Extract fibre spectra from an image after a FINDSP analysis
+       polysky - Fits and subtracts sky from a long-slit spectrum
+       profile - Profiles a long-slit spectrum for use by OPTEXTRACT
+         q2bad - Converts a datafile's quality into bad values
+     qual2flag - Converts a quality array into `flagged' values
+       r2cmplx - Creates a complex data structure from a real data array
+         rcgs2 - Reads UKIRT CGS2 spectrum (also UKT9 and UKT6 CVF)
+        rdfits - Read file in AAO de facto 'Disk FITS' format
+        rdipso - Read file in DIPSO/IUEDR/SPECTRUM format
+        rembad - Removes pixels that have been flagged as bad from data
+        renobj - Change the name or location of an object within an HDS file
+        resamp - Re-sample and average several spectra (was Specdre RESAMPLE).
+      resample - Rebin an image to different dimensions and/or orientation
+       rescale - Rescale using user-defined upper and lower limits
+        retype - Changes the type of the main data array in a file
+          rotx - Rotate data along the X-axis
+        sclean - Interactive patching of images, especially SCUBA data.
+        scnsky - Calculates a sky spectrum for a scanned CCD image
+        scross - Cross-correlate two spectra & get relative shift
+       scrunch - Rebin a spectrum to a linear wavelength range
+         sdist - Analyse an image containing spectra for S-distortion
+        setobj - Assign value to an HDS primitive
+          sfit - Fit a polynomial to a spectrum
+      skyliner - Removes a sky spectrum normalised the 5577 [OI] line.
+         slice - Takes a slice with arbitrary end points through an image
+          soft - Sets the device/type for terminal graphics
+      speccont - Contour a two-dimensional cut.
+      specgrid - Plot spectra on position grid.
+      specplot - Plot a spectrum.
+        spflux - Applies a flux calibration spectrum to an observed spectrum
+         spied - Interactive spiketrum editor
+        spifit - Fits a global polynomial to a spiketrum to form a spectrum
+         splot - Plots a spectrum
+       sqrterr - Generates an error array as Error = Square Root of (Data/Const)
+        subset - Take a subset of a data set.
+         table - List contents of a SPICA memory file
+        tippex - Modify individual pixel values with cursor
+      trimfile - Creates a copy of an HDS file without unused space
+        vachel - Air to vacuum, and/or recession velocity wavelength conversion
+        wdfits - Writes an image out in the AAO de facto 'Disk FITS' format
+        wdipso - Writes a file in DIPSO/IUEDR/SPECTRUM format
+         xcadd - Adds a constant to the X data in a file
+         xcdiv - Divides the X data in a file by a constant
+        xcmult - Multiplies the X data in a file by a constant
+         xcopi - Like XCOPY but interpolates X-data from 2 files
+         xcopy - Copy X-info (e.g. wavelengths) into a spectrum
+         xcsub - Subtracts a constant from the X data in a file
+          xcur - Uses cursor to delimit part of a spectrum
+       xtplane - Adds XT planes of a data cube to form an image
+        xtract - Average an N-dimensional cube into an (N-M)-dimensional one.
+       xyplane - Adds XY planes of a data cube to form an image
+         ycadd - Adds a constant to the Y data in a file
+         ycdiv - Divides the Y data in a file by a constant
+        ycmult - Multiplies the Y data in a file by a constant
+         ycsub - Subtracts a constant from the Y data in a file
+       ystract - Adds contiguous columns of an image to form a spectrum
+       ytplane - Adds contiguous YT planes of a data cube to form an image
+
+
+
+
+
+
+
+
+
+
+

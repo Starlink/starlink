@@ -1,0 +1,91 @@
+.help ishift Starlink figaro
+.nf
+ ISHIFT - Applies a linear X and a linear Y shift to an image
+
+
+Description
+
+ Applies a linear X and Y shift to an image.
+
+ The VARIANCE array, if present, is propagated in exactly the same
+ way as the DATA array.  This procedure it not formally correct if
+ re-sampling occurs (that is, if either of the shifts is non-integer)
+ and in this case the resulting variance will probably under-estimate
+ the true error.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be shifted.
+
+XSHIFT
+
+ Shift in X.
+
+YSHIFT
+
+ Shift in Y.
+
+XSPLIT
+
+ Subdivision of X pixels.
+
+YSPLIT
+
+ Subdivision of Y pixels.
+
+OUTPUT
+
+ Name of resulting image.
+
+Source_comments
+
+ I S H I F T
+
+ Shifts an image in both X and Y, by, in each direction,
+ a constant amount expressed in pixels.
+
+ The VARIANCE array, if present, is propagated in exactly the same
+ way as the DATA array.  This procedure it not formally correct if
+ re-sampling occurs (that is, if either of the shifts is non-integer)
+ and in this case the resulting variance will probably under-estimate
+ the true error.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ XSHIFT (Numeric) The number of pixels the image is to be
+        shifted in X.  A -ve number shifts towards lower
+        numbered pixels.
+
+ YSHIFT (Numeric) The number of pixels the image is to be
+        shifted in Y.  Sense is as for XSHIFT.
+
+ XSPLIT (Numeric) The number of sub-divisions to be made in
+        each of the original pixels in X.
+
+        Note that if both YSHIFT and XSHIFT are integers, the
+        routine will just perform a fast data move, rather
+        than hit the problem with the big hammer of a general
+        rebinning.  YSPLIT and XSPLIT will be ignored.
+
+ YSPLIT (Numeric) The number of sub-divisions to be made in
+        each of the original pixels in Y.
+
+        Note that if XSPLIT or YSPLIT are greater than 1,
+        the data will be interpolated using a fit to a 2-D
+        parabola.  This increases the accuracy (sometimes)
+        of the rebinning, but results in increased CPU usage.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords -  None
+
+                                  KS / CIT 11th Sept 1983
+.endhelp

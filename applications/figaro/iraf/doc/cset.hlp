@@ -1,0 +1,74 @@
+.help cset Starlink figaro
+.nf
+ CSET - Interactively set regions of a spectrum to a constant value
+
+
+Description
+
+ CSET is an interactive program that takes a displayed spectrum
+ and allows the user to select regions that are to be set to
+ constant values.  This can be used, for example, to set regions
+ in a B star calibration spectrum to 1., so that they will have
+ no effect when used with BSMULT.
+
+Parameters
+
+
+VALUE
+
+ CSET lets you select regions of an already displayed spectrum, which
+ are then set to a constant value.  This value can be changed if
+ required, but this is the initial setting for it.
+
+OUTPUT
+
+ CSET generates an output file that is essentially the data from the
+ displayed spectrum, with certain regions set to constant values.
+ OUTPUT is the name of the resulting spectrum.
+
+QUIT
+
+ Used to confirm quitting area selection.
+
+See_also
+
+ FIGARO: ICSET, NCSET, TIPPEX.
+ KAPPA: CHPIX, FILLBAD, SEGMENT, NOMAGIC, RIFT, SETMAGIC, ZAPLIN.
+
+Source_comments
+
+ C S E T
+
+ Figaro function to set large interactively selected regions
+ of a spectrum to a constant value.  This is intended mainly
+ for use in generating mask spectra, or modifying calibration
+ spectra such as those used by BSMULT.  CSET assumes that a
+ spectrum has already been displayed by SPLOT, and will generate
+ a new data structure based on the spectrum displayed, with
+ only the data changed.
+
+ Command parameters -
+
+ VALUE       (Numeric) The value to use for the selected regions
+
+ OUTPUT      (Character) The name of the output file to
+             be created.  If this is the same as the displayed
+             spectrum, the data in the displayed spectrum will
+             be modified.
+
+ Command keywords -
+
+ QUIT        Used to confirm quitting area selection.
+
+ User variables used -  (">" input, "<" output)
+
+ (>) TVFILE  The name of the displayed spectrum
+ (>) TVXST   The first displayed x-value
+ (>) TVXEN   The last displayed x-value
+ (>) TVHIGH  The maximum displayed y-value
+ (>) TVLOW   The minimum displayed y-value
+ (>) TVCOLOR The GRPLOT code for the plot colour
+ (>) SOFT    The device/type string defining the display device
+
+                                          KS / CIT 11th April 1984
+.endhelp

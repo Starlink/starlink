@@ -1,0 +1,124 @@
+.help figinfo Starlink figaro
+.nf
+ FIGINFO - Describes the contents of a Figaro data file
+
+
+Description
+
+ FIGINFO provides a way of looking at the contents of a Figaro data
+ file through Figaro's eyes. You can do an hdstrace of file, but this
+ doesn't necessarily tell you how Figaro will interpret what you
+ find there, particularly in the case of awkward things like the
+ flag that indicates whether or not the file's main data array may
+ contain flagged data values (which doesn't necessarily mean that it
+ does, just that it might). This particular flag can be a problem for
+ Figaro files, partly because the default rules - how you interpret
+ it's absence - is different in the two data formats, .SDF and .DST.
+ If it is set when the file does not in fact contain flagged values then
+ processing the file can be inefficient, particularly for large files. If
+ the file does contain flagged data values but the flag is not set, then
+ very odd results can be obtained when the file is processed. FIGINFO
+ uses the same file access routines as a normal Figaro program to
+ interpret the file contents. It also provides a couple of options for
+ manipulating the 'may contain flagged data values' flag, should it
+ be mis-set.
+
+Parameters
+
+
+INPUT
+
+ The name of a datafile.
+ FIGINFO will list its contents - whether it has error or
+ quality information, whether it has a set of FITS keywords,
+ etc. Most of this can be gleaned from doing an hdstrace on
+ the file, but hdstrace just shows the file contents -
+ FIGINFO explains how they are interpreted by FIGARO.
+
+CHECK_FLAGS
+
+ If CHECK_FLAGS is set, and the file has the flag set to
+ indicate that it MAY have flagged data values in the main
+ data array, then FIGINFO will read the array and see if
+ there are in fact any flagged data values there. If there
+ are not, it clears the 'may have flagged values' flag.
+ This will speed up the processing of the file by Figaro
+ programs that do not handle flagged values themselves. There
+ is the overhead of the check, of course, which can be large
+ for very large data arrays, but FIGINFO does this as
+ efficiently as possible. (The same effect can be obtained by
+ doing an ISTAT on the data, but this is much less efficient)
+
+CLEAR_FLAG
+
+ If the file has the flag set to indicate that it MAY have
+ flagged data values in the main data array, but the option
+ to check the data array values is not taken - presumably on
+ the grounds that the overhead is not warranted - then the
+ CLEAR_FLAG option may be set to indicate that there
+ are definitely no flagged data values in the array and the
+ file should be modified to show this. This is a DANGEROUS
+ option to use. It should only be taken if the overhead of
+ checking the data array is too large - and that implies a
+ huge data file! - and if the user is CERTAIN that there
+ really are no flagged data values in the data. Use of this
+ option is not recommended.
+
+SET_FLAG
+
+ If the file does not have the flag set to indicate that it
+ MAY have flagged data values in the main data array, but
+ nevertheless does have such values, then a number of programs
+ will have problems handling the file. The SET_FLAG option
+ allows this flag to be set. This is a safe option - setting
+ it unnecessarily does no harm, but it does make for rather
+ inefficient processing of the file. However, this really
+ shouldn't be necessary - except, perhaps to correct for a
+ mistaken use of the CLEAR_FLAG option!
+
+Source_comments
+
+ F I G I N F O
+
+ Description:
+
+    FIGINFO provides a way of looking at the contents of a Figaro data
+    file through Figaro's eyes. You can do an hdstrace of file, but this
+    doesn't necessarily tell you how Figaro will interpret what you
+    find there, particularly in the case of awkward things like the
+    flag that indicates whether or not the file's main data array may
+    contain flagged data values (which doesn't necessarily mean that it
+    does, just that it might). This particular flag can be a problem for
+    Figaro files, partly because the default rules - how you interpret
+    it's absence - is different in the two data formats, .SDF and .DST.
+    If it is set when the file does not in fact contain flagged values then
+    processing the file can be inefficient, particularly for large files. If
+    the file does contain flagged data values but the flag is not set, then
+    very odd results can be obtained when the file is processed. FIGINFO
+    uses the same file access routines as a normal Figaro program to
+    interpret the file contents. It also provides a couple of options for
+    manipulating the 'may contain flagged data values' flag, should it
+    be mis-set.
+
+ Parameters:
+
+    INPUT     (Character) Is the name of the file to be checked.
+
+ Keywords:
+
+    CHECK_FLAGS   If set, FIGINFO reads the data in the main data array
+                  to see if it does in fact contain flagged data values.
+                  If it does not, the 'may contain flagged data values'
+                  flag is cleared. (This option is only offered if the
+                  flag was initially set.)
+    CLEAR_FLAG    A DANGEROUS option that clears the 'may contain flagged
+                  data values' flag without testing the actual data. (This
+                  option is only offered if the flag was initially set and
+                  CHECK_FLAGS was not set.)
+    SET_FLAG      A relatively safe option that sets the 'may contain
+                  flagged data values' flag. The actual data is not tested.
+                  (This option is only offered if the flag was not initially
+                  set.)
+
+    31st Jan 1995.  Original version. KS/AAO.
+.endhelp

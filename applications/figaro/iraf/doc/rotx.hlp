@@ -1,0 +1,59 @@
+.help rotx Starlink figaro
+.nf
+ ROTX - Rotate data along the X-axis
+
+
+Description
+
+ ROTX rotates the data in a file in the X-direction.  Data that
+ is shifted out of one end is shifted in at the other end.  The
+ data have to be rotated by an integer number of pixels.
+
+Parameters
+
+
+IMAGE
+
+ The name of the data to be rotated in
+ the X-direction.  The data may have any number of
+ dimensions.  Data with more than one dimension is treated
+ as a set of one dimensional arrays, and each is rotated
+ independently.
+
+PIXELS
+
+ The number of pixels that the data is to
+ be rotated.  This must be an integer, and will be truncated
+ if a non-integer value is specified.  A positive value
+ indicates a rotation towards higher pixel numbers in X.
+
+OUTPUT
+
+ The name of the resulting rotated data.
+ If this is the same as IMAGE, (the default), the rotation
+ takes place in situ.  Otherwise, a new file is created.
+ Note that the X data structure (if any) is unchanged by
+ ROTX.
+
+Source_comments
+
+ R O T X
+
+ Rotates a data array by an integer number of pixels in the
+ X direction.  The X data is not changed.
+
+ Command parameters -
+
+ IMAGE  (Character) The name of the structure containing the data to
+        be rotated.
+
+ PIXELS (Numeric) The number of pixels by which the data is to be
+        rotated.  A positive number indicates a shift towards higher
+        pixel numbers.
+
+ OUTPUT (Character) The name of the result of the operation.  This
+        can be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+                                        KS / AAO 23rd Sept 1986
+.endhelp

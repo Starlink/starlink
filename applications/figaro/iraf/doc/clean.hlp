@@ -1,0 +1,93 @@
+.help clean Starlink figaro
+.nf
+ CLEAN - Interactive patching of bad lines, bad pixels in an image
+
+
+Description
+
+ CLEAN is an interactive routine for fixing bad pixels and
+ rows in CCD data.  CLEAN can be used either as a prelude
+ to BCLEAN, in order to see what parameters may be suitable
+ or else it may be used after BCLEAN, to patch up any rows
+ or pixels that BCLEAN missed.
+
+Parameters
+
+
+IMAGE
+
+ IMAGE is the image - usually a CCD image - that is to be
+ interactively cleaned of bad rows and bad pixels.  Note that the
+ orientation of the image data should be such that bad rows are
+ horizontal (as seen on the Grinnell).
+
+OUTPUT
+
+ OUTPUT is the name of the image that results from the cleaning
+ process.  If OUTPUT is the same as IMAGE (the default value) the
+ correction will be performed in situ.
+
+QUIT
+
+ Used to confirm quitting the application.
+
+DEG
+
+ Degree of fit to use for interpolation.
+
+XSIZE
+
+ Size of deletion box in X.
+
+YSIZE
+
+ Size of deletion box in Y.
+
+HIGH
+
+ Highest displayed data value.
+
+LOW
+
+ Lowest displayed data value.
+
+See_also
+
+ FIGARO: BCLEAN, COSREJ, MEDFILT, MEDSKY, SCLEAN, TIPPEX.
+ KAPPA: FFCLEAN, CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN.
+
+Source_comments
+
+ C L E A N
+
+ Main routine for the Figaro 'CLEAN' command.  Displays
+ a CCD image and then allows the user to move around it with
+ the cursor, selecting rows and columns to be corrected and
+ cosmic rays to be zapped.  The idea is that this routine can
+ be used to fix up any areas in an image that were not fixed
+ automatically by the non-interactive version ('BCLEAN').  It
+ may also give a better idea of the best settings for the
+ BCLEAN parameters.
+
+ Command parameters -
+
+ IMAGE      (Character) The name of the image to be displayed.
+ OUTPUT     (Character) The name of the resulting cleaned image.
+            If the same as IMAGE, the image is cleaned in situ.
+ QUIT       (Logical) Used to confirm quitting the application.
+ DEG        (Integer) Degree of fit to use for interpolation.
+ XSIZE      (Integer) Size of deletion box in X.
+ YSIZE      (Integer) Size of deletion box in Y.
+ HIGH       (Real) Highest displayed data value.
+ LOW        (Real) Lowest displayed data value.
+
+ User variables -  ("<" output, "!" modified)
+
+ (!) IMARRAY (Numeric array) Contains current image display
+             parameters.
+ (<) IMFILE  (Character) Contains name of currently displayed
+             image file.
+ (>) IDEV    (Character) Contains name of display device.
+
+                                    KS / CIT 2nd July 1984
+.endhelp

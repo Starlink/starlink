@@ -1,0 +1,51 @@
+.help cmplxsub Starlink figaro
+.nf
+ CMPLXSUB - Subtract two complex structures
+
+
+Description
+
+ CMPLXSUB  subtracts two complex data  structures.  These  may
+ have any shape and size, so long as they are both the same.  A
+ 'complex data structure' here means a structure containing a
+ .Z.REAL, a .Z.IMAGINARY and a .Z.DATA array, all with dimensions
+ that factorise easily so that FFTs can be applied to them.
+
+Parameters
+
+
+CDATA
+
+ The complex data to be subtracted from.
+
+CDATA1
+
+ The complex data to subtract from CDATA.
+
+OUTPUT
+
+ The name of the resulting structure. This can be the same as
+ CDATA, in which case no new structure is created.  Otherwise,
+ OUTPUT will be a new file, with the same structure as CDATA.
+
+Source_comments
+
+ C M P L X A D D   /   C M P L X S U B
+
+ C M P L X D I V   /   C M P L X M U L T
+
+ This routine services the Figaro complex structure arithmetic
+ routines CMPLXADD, CMPLXSUB, CMPLXDIV, and CMPLXMULT.  These
+ commands operate on two complex structures, performing element
+ by element arithmetic to produce a new structure.  The complex
+ structures may be of any dimensions, so long as they match.
+
+ Command parameters -
+
+ CDATA    (Character) The name of the first complex structure.
+ CDATA1   (Character) The name of the second complex structure.
+ OUTPUT   (Character) The name of the resulting structure.
+
+ Command keywords - None
+                                     KS / AAO  10th Sept 1986.
+.endhelp

@@ -1,0 +1,100 @@
+.help aperture Starlink figaro
+.nf
+ APERTURE - Do simple minded aperture photometry on a series of frames
+
+
+Description
+
+ The image name is read and that image is plotted on the current
+ plot device.  The user is presented with a menu which allows
+ him/her/it to specify object and sky regions, change the colour
+ levels, change the radius of the aperture, show cuts or quit.
+ Integrations are a simple sum of the values of the pixels within
+ the aperture radius.
+
+Parameters
+
+
+OUTPUT
+
+ The name of the file where the answers will be written.
+
+IMAGE
+
+ The name of the file with the frame to be analysed.
+
+OPT
+
+ The option parameter.  Type H for help.
+
+LOW
+
+ The low data value for 2-D plots.
+
+HIGH
+
+ The high data value for 2-D plots.
+
+RADIUS
+
+ The radius of the circle to be used for the integration.
+
+OK
+
+ Say "yes" when you are happy with the apearture.
+
+Source_comments
+
+ A P E R T U R E
+
+ Description
+ -----------
+ Do simple minded aperture photometry on a series of frames
+
+ Scope of program
+ ----------------
+ - Handles 2-D images only.
+ - Data array converted to FLOAT.
+ - Magic values supported.
+ - Error arrays not supported
+ - Quality arrays not supported.
+ - Batch execution not supported.
+
+ Parameters
+ ----------
+ OUTPUT    Name of output ASCII file for results. The output info goes in
+           the following order: (1) Either 'O' or 'S' for "object" or
+           "sky"; (2) a sequence number; (3) the x,y coords of the
+           cursor, (4) the radius of the aperture; (5) the total
+           flux in pixels which are with a radial distance less than
+           or equal to the aperture radius.  No correction is made for
+           partial pixels; (6) the total number of pixels included.
+           (character)(prompted for)
+
+ IMAGE     Name of individual images in case you're not using a
+           list file. (character)(prompted for)
+
+ RADIUS    Radius for integration. (real)(prompted for)
+
+ LOW       Data value for lowest level in 2-d plot (real)(prompted for)
+
+ HIGH      Data value for highest level in 2-d plot (real)(prompted for)
+
+ Keywords
+ --------
+ OK
+
+ Method
+ ------
+ - The image name is read and that image is plotted on the current
+   plot device.
+ - The user is presented with a menu which allows him/her/it to specify
+   object and sky regions, change the colour levels, change the radius
+   of the aperture, show cuts or quit.
+ - Integrations are a simple sum of the values of the pixels within the
+   aperture radius.
+
+ Author/s
+ --------
+ Jim Lewis RGO (jrl@ast.cam.ac.uk)
+.endhelp

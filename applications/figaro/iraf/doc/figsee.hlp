@@ -1,0 +1,52 @@
+.help figsee Starlink figaro
+.nf
+ FIGSEE - Generate a seeing ripple spectrum from a FIGS spectrum
+
+
+Description
+
+ FIGSEE generates a seeing ripple spectrum from a FIGS spectrum.
+ In principle, the FIGS data can then be divided by this ripple
+ spectrum to take out the effects of variable seeing during the
+ observation.
+
+Parameters
+
+
+SPECTRUM
+
+ Spectrum to use for seeing data.
+
+NDET
+
+ Number of detectors to use.
+
+DETECTORS
+
+ Detectors to use.
+
+OUTPUT
+
+ Name of resulting seeing ripple data.
+
+Source_comments
+
+ F I G S E E
+
+ Figaro function that attempts to produce a seeing ripple spectrum
+ from a Figs spectrum, averaging the data from one or more detectors,
+ normalising the result to unity, and generating a spectrum in
+ which the normalised data from these detectors (ideally ones not
+ contaminated by spectral features) are repeated for each detector.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The name of the file containing the
+             spectrum to be used.
+ NDET        (Integer) The number of detectros to be used.
+ DETECTORS   (Numeric array) The detectors to be used.
+ OUTPUT      (Character) The name of the resulting ripple spectrum.
+
+ Command keywords -  None
+                                              KS / AAO 11th Feb 1987
+.endhelp

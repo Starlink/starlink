@@ -1,0 +1,79 @@
+.help bsmult Starlink figaro
+.nf
+ BSMULT - Atmospheric band removal using a B star calibration spectrum
+
+
+Description
+
+ BSMULT applies the calibration spectrum derived from a B-star
+ (for atmospheric bands) to the spectrum of an object.
+
+Parameters
+
+
+SPECTRUM
+
+ The spectrum specified by SPECTRUM will be multiplied
+ by the B star calibration spectrum (specified by BSTAR).
+ BSMULT differs from a simple multiplication (e.g. IMULT) in
+ taking account of the differences in air mass of the calib-
+ ration object and the object being calibrated.  So both
+ should  have valid values for .OBS.SECZ (the program will
+ complain if they don't).  Note that the calibration is by
+ multiplication, and so is not suitable for data in
+ logarithmic flux units such as magnitudes.
+
+BSTAR
+
+ BSTAR specifies the B-star calibration spectrum, obtained
+ by dividing a B star (or other suitable calibration spetrum)
+ by its continuum.  Any regions where no correction is
+ desired should be set to 1.0.
+
+OUTPUT
+
+ OUTPUT specifies the name of the calibrated spectrum to be
+ produced by BSMULT.  Note that this can be the same as for
+ SPECTRUM, in which case the operation will be performed in
+ situ.
+
+BETA
+
+ The algorithm used by BSMULT is:
+
+    OUTPUT=SPECTRUM*(BSTAR**(SSECZ/BSECZ)**BETA))
+
+ where SSECZ and BSECZ are the air masses for the
+ spectrum and the B star respectively.  BETA should
+ be 0.5 for saturated lines, 1.0 for unsaturated lines,
+ and the generally accepted best compromise value for
+ all lines (determined by P.J. Young) is 0.55.
+
+Source_comments
+
+ B S M U L T
+
+ Multiplies a spectrum by a B star calibration spectrum - which
+ should be 1.0 except in regions where there are atmospheric
+ bands.  This routine differs from an ordinary multiplication (e.g.
+ as in IMULT) since it includes a term for the correction due
+ to the different air masses of the two objects.  This means
+ that both the original spectrum and the B star spectrum must
+ have valid .OBS.SECZ values.  If the spectrum to be multiplied
+ is 2 dimensional, the same operation is repeated for each of
+ the spectra it contains.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The spectrum to be corrected.
+ BSTAR       (Character) The B star calibration spectrum.
+ BETA        (Numeric) Power to which relative air mass is
+             to be raised - see FIG_BSMULT.
+ OUTPUT      (Character) The resulting spectrum.
+
+ Command keywords - None
+
+ User variables used - None
+
+                                     KS / CIT 3rd July 1984
+.endhelp

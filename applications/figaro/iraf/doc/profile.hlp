@@ -1,0 +1,97 @@
+.help profile Starlink figaro
+.nf
+ PROFILE - Profiles a long-slit spectrum for use by OPTEXTRACT
+
+
+Description
+
+ Determine spatial profile image from a 2-D spectrum using the
+ algorithm of Horne, 1986 (PASP 98, 609).
+
+Parameters
+
+
+IMAGE
+
+ The name of a 2-D file.
+
+YSTART
+
+ Specifies the first Y value to be used.
+
+YEND
+
+ Specifies the last Y value to be used.
+
+DEGREE
+
+ Degree of polynomial to be fitted.
+
+NREJECT
+
+ Number of points to reject in each fit.
+
+PROFILE
+
+ The name of the resulting profile data.
+
+RESIDUAL
+
+ The name of an image containing the residuals of the fit.
+
+WEIGHT
+
+ If set, the error or variance information associated with
+ the data is used to weight the fit.  Each point is weighted
+ as 1/variance.  If not set, or if no error information is
+ available all points are given equal weight.
+
+Source_comments
+
+ P R O F I L E
+
+ PROFILE determines a spatial profile image for subsequent use
+ by the optimum extraction program OPTEXTRACT. PROFILE uses the
+ technique described by Horne, 1986 (PASP 98, 609). An initial
+ (noisy) estimate of the spatial profile is made by dividing the
+ values along each column by the sum over that column. A smoothed
+ version of this profile is then constructed by fitting polynomials
+ along each row to account for smooth variations of the spatial profile
+ with wavelength. The technique ensures that the profile is normalized
+ (sums to one along each column) and is everywhere positive. Rejection
+ of the NREJECT worst points in each fit allows the method to be
+ insensitive to cosmic ray hits or other bad data points.
+
+ Error and quality information may be present on the input image. Points
+ with bad quality will be ignored in the fit, and the errors may
+ be used to weight the fit.
+
+ An image containing the residuals of the fit to the profile is
+ generated and may be used to judge the quality of the fit.
+
+ The Horne algorithm is appropriate for the case where there is only
+ a slight tilt or distortion on the spectrum. Where the tilt or
+ distortion is more extreme, such as in a cross-dispersed echelle
+ spectrum, an algorithm such as that of Marsh, 1989 (PASP 101, 1032)
+ should be used to generate the spatial profile.
+
+ Command parameters -
+
+ 'IMAGE'     The name of the input file.
+ 'YSTART'    Starting Y value to use.
+ 'YEND'      Ending Y value to use.
+ 'DEGREE'    Degree of polynomial to use in fit.
+ 'NREJECT'   Number of points to reject in each fit.
+ 'PROFILE'   The name of the output file containing the normalized
+                spatial profile.
+ 'RESIDUAL'  The name of the data file containing the residuals of
+                the fit.
+
+ Command keywords -
+
+ 'WEIGHT'    Use the error or variance array to weight the
+             polynomial fit.
+
+
+                                 JAB / JAC 8th Feb 1991
+.endhelp

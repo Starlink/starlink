@@ -1,0 +1,97 @@
+.help flag2qual Starlink figaro
+.nf
+ FLAG2QUAL - Converts `flagged' values to produce a quality array
+
+
+Description
+
+ FLAG2QUAL removes 'flagged' (or 'magic') data values from the main
+ array of a Figaro file. Any such values are replaced either with a
+ single specified data value, or else FLAG2QUAL replaces them with
+ data values obtained by interpolation between the good pixels on
+ each side. (This is not a particularly sophisticated interpolation,
+ but then, these are data values that shouldn't ever actually be
+ used, since they are still flagged as bad in the quality array.)
+ When FLAG2QUAL replaces a flagged data value it sets the
+ corresponding element of the associated quality array to indicate
+ that the pixel is not to be trusted. If there was already a quality
+ array associated with the data it is used when deciding which pixels
+ to use for interpolation and is updated to reflect those flagged
+ pixels that have been replaced.  If the file did not already have a
+ quality array then one is created. Many Figaro routines prefer to
+ use quality arrays when dealing with data, and operate more
+ efficiently if the data is not flagged. Also, there may be some
+ programs that are confused by the presence in the file of flagged
+ data values. Finally, having both forms of data quality information
+ in a file can be confusing and FLAG2QUAL can tidy things up.
+
+Parameters
+
+
+INPUT
+
+ The name of a Figaro format file that might contain
+ flagged (or 'magic') data values.  It may also
+ contain an associated quality array. Whatever it
+ contains, FLAG2QUAL will process it so that the resulting
+ file has an array that does not contain any flagged data
+ values. Any information that was held in the form of
+ such flagged data values will be held in a quality array
+ in the resulting file.
+
+OUTPUT
+
+ The name of the resulting file. This can
+ be the same as the input file, in which case all changes are
+ made in situ. The resulting file will have all its data
+ quality information held in a quality array and will have no
+ flagged data values in its main array.
+
+FIXED
+
+ The flagged data values in the input array have to be replaced.
+ If FIXED is set, they are replaced by a single data value
+ specified in the VALUE parameter. If FIXED is not set, then
+ FLAG2QUAL replaces them using values calculated by
+ interpolation between the previous and next good pixels.
+
+VALUE
+
+ If FIXED is set, then VALUE is used to specify the single data
+ value to be used to replace the flagged values in the main data
+ array. This can be any value - although it would be perverse to
+ use the actual flag value!
+
+Source_comments
+
+ F L A G 2 Q U A L
+
+ Description:
+    This is a Figaro program that removes any 'flagged' values from
+    the main data array in a Figaro data file. If there are in fact
+    such values in the main data array (many arrays are flagged as
+    'may contain flagged values', but in fact do not) then this
+    routine sets the equivalent elements of an associated quality
+    array (which it may have to create).
+
+ Command parameters:
+
+    INPUT  (Character) The name of the structure containing the data.
+
+    OUTPUT (Character) The name of the result of the operation.  This
+           can be the same as for INPUT.  If not, a new structure
+           is created, with everything but the data a direct
+           copy of the input.
+
+    VALUE  (Numeric) If a fixed value is to be used to replace flagged
+           data values, this supplies that value.
+
+ Command keywords:
+
+    FIXED  If set, a fixed value (supplied in VALUE) is used
+           to replace the flagged data values. If not, the program
+           interpolates over them.
+
+    11th Feb 1995  KS / AAO.  Original version.
+
+.endhelp

@@ -1,0 +1,145 @@
+.help dvdplot Starlink figaro
+.nf
+ DVDPLOT - Plot the data in one file against the data in another
+
+
+Usage
+
+ dvdplot image image2 xlow xhigh low high autoscale
+
+Description
+
+ DVDPLOT (Data Versus Data PLOT) plots the data from the main
+ array in one structure against the data in the corresponding
+ elements of the main array in another structure.  It was first
+ written to help with linearity tests (plotting data from an
+ image with high count rates against a similar image with lower
+ count rates).
+
+ The Y value for each point is the pixel value from IMAGE and
+ the X value is the value of the corresponding value from
+ IMAGE2.
+
+ The images must have identical dimensions.
+
+Parameters
+
+
+IMAGE
+
+ Y-value image.
+
+IMAGE2
+
+ X-value image.
+
+XLOW
+
+ XLOW and XHIGH specify the limits in X of the plot.
+ They are values in the same range as the data range
+ as the main array in IMAGE2.  If WHOLE is set, XLOW
+ is set to the lowest data value in IMAGE2.
+
+XHIGH
+
+ XLOW and XHIGH specify the limits in X of the plot.
+ They are values in the same range as the data range
+ as the main array in IMAGE2.  If WHOLE is set, XHIGH
+ is set to the highest data value in IMAGE2.
+
+LOW
+
+ LOW and HIGH specify the limits in Y of the plot.
+ They are values in the same range as the data range
+ as the main array in IMAGE.  If AUTOSCALE is set, LOW
+ is set to the lowest data value in IMAGE for which
+ the corresponding IMAGE2 pixel is in the range XLOW..XHIGH.
+
+HIGH
+
+ LOW and HIGH specify the limits in Y of the plot.
+ They are values in the same range as the data range
+ as the main array in IMAGE.  If AUTOSCALE is set, HIGH
+ is set to the highest data value in IMAGE for which
+ the corresponding IMAGE2 pixel is in the range XLOW..XHIGH.
+
+WHOLE
+
+ WHOLE has the effect of setting XLOW and XHIGH (the x-limits
+ of the plot) to the extreme data values in IMAGE2.  The
+ result is that the plot range in X is such as to cover all
+ the pixels in the image.
+
+AUTOSCALE
+
+ The XLOW and XHIGH parameters (or, alternatively, the WHOLE
+ keyword) select the X-range of the plot and hence the pixels
+ that may be plotted.  The LOW and HIGH parameters then limit
+ the Y-range of the plot.  The AUTOSCALE keyword has the effect
+ of setting LOW and HIGH to the extreme values of the pixels
+ delimited by XLOW and XHIGH.  Which is a complicated way of
+ saying it scales the plot so all the points fit in it.
+
+HARDCOPY
+
+ Normally, DVDPLOT produces a plot on the current soft plot
+ device - selected using the SOFT command.  If the HARDCOPY
+ keyword is set, the plot is made on the current hard
+ copy plot device - selected using the HARD command.
+ Normally, only a plot file is produced and this must be
+ explicitly sent to the hardcopy device once DVIPLOT has
+ finished.
+
+Source_comments
+
+ D V D P L O T
+
+ Routine name:
+    DVDPLOT
+
+ Function:
+    Plots the data in one data array against the data in another.
+
+ Description:
+    DVDPLOT (Data Versus Data PLOT) plots the data in the main data
+    array in one Figaro structure against the corresponding data elements
+    of the main data array in another structure.  This was originally
+    written to help with linearity tests (where data in an image taken
+    at a low data rate could be plotted against one taken at a higher
+    data rate), but may have other applications.
+
+ Usage:
+    DVDPLOT IMage IMAGE2 XLow XHigh LOw HIgh AUtoscale
+
+ Parameters:
+    IMAGE     (Character) The name of the first structure.  It is this
+              structure whose data is plotted against the data in IMAGE2,
+              so its data values form the Y values of the plotted points.
+    IMAGE2    (Character) The name of the second structure.  Its data
+              values form the X values of the plotted points.
+    XLOW      (Numeric) The low end of the data range plotted in X (i.e.
+              the lower limit for the data in IMAGE2).
+    XHIGH     (Numeric) The high end of the data range plotted in X (i.e.
+              the upper limit for the data in IMAGE2).
+    LOW       (Numeric) The low end of the data range plotted in Y (i.e.
+              the lower limit for the data in IMAGE).
+    HIGH      (Numeric) The high end of the data range plotted in Y (i.e.
+              the upper limit for the data in IMAGE).
+
+ Keywords:
+    WHOLE     If set, XLOW and XHIGH will be set to the limits
+              of the data in IMAGE2.
+    AUTOSCALE If set, LOW and HIGH will be set to the limits
+              of the data in IMAGE.
+    HARDCOPY  If set, a hard copy plot will be produced.
+
+ User variables used:
+    HARD      (Character) PGPLOT specification for hardcopy plot device
+    SOFT      (Character) PGPLOT specification for softcopy plot device
+
+ Error information:  Ignored.
+
+ Quality information:  Handled using flagged values.
+
+ Keith Shortridge, AAO
+.endhelp

@@ -1,0 +1,33 @@
+.help fib2cube Starlink figaro
+.nf
+ FIB2CUBE - Arranges fibre output into 3-d data file
+
+
+Description
+
+  To convert a longslit spectrum of fibre spectra to a cube in an
+ arbitrary manner. The output cube is "SORTED" in the TAURUS sense.
+
+Parameters
+
+
+IMAGE1
+
+   IMAGE1,IMAGE2 etc. = FILE (Read)
+        Input images
+
+CUBE
+
+   CUBE = FILE (Write)
+        Output cube
+
+FILE
+
+   FILE = CHARACTER (Read)
+        File with relationships defined
+
+Source_comments
+
+  none available
+
+.endhelp

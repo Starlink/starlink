@@ -1,0 +1,91 @@
+.help spied Starlink figaro
+.nf
+ SPIED - Interactive spiketrum editor
+
+
+Description
+
+ SPIED allows the user to edit a spiketrum - deleting points and
+ adding new points - in order to control the spectrum obtained
+ by interpolating between the points (e.g. by INTERP or SPIFIT).
+
+Parameters
+
+
+SPIKETRUM
+
+ The spiketrum to be edited (probably generated either by
+ CSPIKE or by GSPIKE).  For more details see HELP FIGARO TECHNIQUES
+ SPIKETRA.
+
+OUTPUT
+
+ The name of the resulting edited spiketrum.  It may be the
+ same as SPIKETRUM, in which case the result will replace the input in
+ the same file.
+
+COLOUR
+
+ The colour for the data to be plotted in.
+ The axes are always plotted in white.  The colours allowed are Blue,
+ White, Red, Green, Black, Cyan, Magenta, Yellow.  This only works on
+ a colour display, of course.  Fitted data will be plotted in the
+ complementary colour
+
+HIGH
+
+ The maximum Y value for the plot.
+
+LOW
+
+ The minimum Y value for the plot.
+
+XSTART
+
+ The maximum X value for the plot.
+
+XEND
+
+ The minimum X value for the plot.
+
+ORDER
+
+ The order for the polynomial fit.
+
+QUIT
+
+ Used to confirm quitting from application.
+
+Source_comments
+
+ S P I E D
+
+ SPIketrum EDitor.  Allows the values of a spiketrum to be
+ edited interactively, until the user is satisfied with the
+ data that results from interpolating between them.
+
+ Command Parameters -
+
+ SPIKETRUM    (Character) The name of the spiketrum to be
+              edited.
+ OUTPUT       (Character) The name of the resulting edited
+              spiketrum.
+ COLOUR       (Character) The colour to be used for the data
+              when it is ploted.
+ HIGH         (Real) The maximum Y value for the plot.
+ LOW          (Real) The minimum Y value for the plot.
+ XSTART       (Real) The maximum X value for the plot.
+ XEND         (Real) The minimum X value for the plot.
+ ORDER        (Integer) The order for the polynomial fit.
+
+ Command keywords -
+
+ QUIT         Used to confirm quitting from application.
+
+ User variables used -    (">" input)
+
+ (>) SOFT     (Character) The device/type of the current soft
+              graphics device.
+
+                                    KS / CIT 23rd May 1984
+.endhelp

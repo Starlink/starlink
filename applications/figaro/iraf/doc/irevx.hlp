@@ -1,0 +1,53 @@
+.help irevx Starlink figaro
+.nf
+ IREVX - Reverse an image (or spectrum) in the X-direction
+
+
+Description
+
+ The data are reversed in X.  The result is an image where
+ the left and right have changed places.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be reversed.
+
+OUTPUT
+
+ Name of resulting image.
+
+See_also
+
+ FIGARO: IREVY, IROT90.
+ KAPPA: FLIP, ROTATE, TRANSFORMER.
+
+Source_comments
+
+ I R E V
+
+ Figaro routine to reverse an image (or a spectrum, which
+ is treated as an image with one dimension 1).  The reversal
+ is in the X-direction or the Y-direction.
+
+ Command parameters -
+
+ IMAGE    (Character) The name of the file containing the image.
+          The data and error components are reversed; the quality
+          component is reversed implicitly by internally using
+          flagged values; the x-axis or y-axis data
+          component is reversed if it contains anything other than
+          just the bin numbers.
+
+ OUTPUT   (Character) The name of the result of the operation.
+          This can be the same as IMAGE, in which case the
+          operation is performed in situ.
+
+ Command keywords - None
+
+ User variables - None
+
+                                     KS / CIT 20th July 1983
+.endhelp

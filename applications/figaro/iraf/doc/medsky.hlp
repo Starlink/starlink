@@ -1,0 +1,133 @@
+.help medsky Starlink figaro
+.nf
+ MEDSKY - Take the median of a number of images
+
+
+Description
+
+ MEDSKY takes a series of images and produces a single image in
+ which each pixel is the median of the corresponding pixels in the
+ series of images.   Note that this is a time-consuming operation.
+ The algorithm used attempts to optimise itself for the amount of
+ memory available and will run much faster if the user has a large
+ working set.
+
+Parameters
+
+
+FILES
+
+ The name of a text file, each line of which
+ should give the name of an input image.  These are the
+ images that will be used to form the output median image.
+
+OUTPUT
+
+ The name of the file to be created, in
+ which the value of each pixel is the median value of the
+ corresponding pixels in the input images.  Note that
+ OUTPUT must not have the same name as any of the input
+ images - the results will be incorrect if this is the
+ case.
+
+IMGLOG
+
+ If LOG is set, IMGLOG supplies the name of the 'log'
+ file produced.  This has nothing but a data array
+ containing the numbers from 1 to N of the images that
+ supplied the corresponding median values in the output
+ median image.  (Note that if more than one image contained
+ a given median value, the number chosen will be the lowest
+ of the possible values - i.e. the first image has precedence)
+
+SCALED
+
+ If set, then MEDSKY calculates the overall median value
+ for each image in turn, and before using the data from
+ an image, multiplies it by a scaling factor given by the
+ median value of the first image divided by the median value
+ of the image being used.  This means that all images are
+ conceptually scaled to the median level of the first image
+ before being used.  If SCALED is set a file - MEDSKY.LOG -
+ is written giving the file name, median value, and scaling
+ factor used for each image.
+
+LOG
+
+ LOG can be set to produce a diagnostic image called
+ a 'log' image as well as the normal output median image.
+ A 'log' image is an integer array of the same size as the
+ output image, in which each pixel contains the image number
+ in the order given in the file giving the list of images)
+ of the image that supplied the median value used. If LOG
+ is set, the name of the 'log' image is supplied by the
+ IMGLOG parameter.
+
+See_also
+
+ FIGARO: BCLEAN, CLEAN, COSREJ, MEDFILT.
+ KAPPA: MEDIAN, MSTATS.
+
+Source_comments
+
+ M E D S K Y
+
+ MEDSKY is a program for constructing sky flats for direct imaging,
+ using an algorithm due to Schneider, Schmidt and Gunn.
+
+ A list of images is read in from file,and the medians of
+ equivalent pixels in all the images are found, eg. for N images
+ (of any size), the first pixel ( the top-left one) in each image
+ is fetched : the median of these N pixels is then found, the
+ result becoming the first pixel in the output image. This process
+ is repeated for all the pixels in the input images to construct a
+ complete output image. In practice, more than one pixel is
+ analysed per pass through the image file list, the number being
+ determined by the memory available to the program. MEDSKY attempts
+ to minimise the page faulting which would occur by accessing too
+ much virtual memory at once by processing fewer pixels per pass,
+ on the assumption that the extra overheads in doing more passes
+ will be more than offset by fewer page faults. This approach seems
+ to have been justified, but performance is very sensitive to
+ changes in the proportions of memory allocated, and it is possible
+ that improvements could be made.
+
+ Command parameters -
+
+ FILES  The name of a .DAT file containing a list of names
+        of images. All these images must have dimensions
+        equal to those of the first image in the list, FIRST.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for FIRST.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ IMGLOG Only used if the LOG keyword is set.  This supplies
+        the name of the 'log' image created.  This will contain
+        a single integer data array.
+
+ Important
+ ~~~~~~~~~
+ MEDSKY does not check that the output image name is not a member
+ of the image file list.
+
+ Command keywords  -
+
+ SCALED If set, MEDSKY attempts to compensate for differences
+        in data scale between the different images.  It does this
+        by conceptually scaling all images so that they have the
+        same median value as the first image.
+
+ LOG    If set, MEDSKY creates a 'log' image.  This is an
+        image with the same dimensions as the output image, with
+        each pixel a number from 1 to N (the number of files)
+        showing the image number which for each output pixel had
+        the data value closest to the median value calculated.
+        This can be used to see if any image dominates the others,
+        or if there is any trend across the image. This is a rather
+        specialised option, and is not expected to be used much.
+
+ User variables used - None
+                                  DJA / AAO. 16th Aug 1987
+.endhelp

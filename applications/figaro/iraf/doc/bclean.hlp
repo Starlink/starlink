@@ -1,0 +1,237 @@
+.help bclean Starlink figaro
+.nf
+ BCLEAN - Automatic removal of bad lines & cosmic rays from CCD data
+
+
+Description
+
+ BCLEAN runs non-interactive cleaning algorithms on a CCD image
+ to detect and remove bad lines and cosmic rays.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image to be cleaned of bad rows and cosmic rays.
+ Generally, this will be a CCD image.  Note the program assumes
+ the image is oriented so that bad lines are horizontal (i.e.,
+ occupy contiguous regions in memory).
+
+CRSIG
+
+ The cosmic ray search algorithm looks at every pixel in the image
+ and compares its value with the average value of its four nearest
+ neighbours.  To be regarded as a cosmic ray, the pixel must exceed
+ that average value by an amount greater than CRSIG times the square
+ root of the average value.  Sensible numbers are probably in the
+ range 2.0 to 10.0, but the best way to tune the operation is to try
+ with a few different values, looking at the unfixed results to see
+ which pixels were considered cosmic rays.  This constraint is in
+ addition to those enforced by CRFACT and CRMINV.  If you set the
+ SHARPNESS keyword, a test of the sharpness of the cosmic ray is
+ also performed.
+
+CRFACT
+
+ To be regarded as a cosmic ray, a pixel value must exceed
+ the average of its neighbours by an amount that exceeds
+ CRFACT times that average value.  This constraint is in
+ addition to those enforced by CRSIG and CRMINV.
+
+CRMINV
+
+ To be regarded as a cosmic ray, a pixel value must exceed
+ the average of its neighbours by at least CRMINV.  This
+ constraint is in addition to those enforced by CRSIG and
+ CRFACT.
+
+CRSHARPNESS
+
+ If you set the SHARPNESS keyword, then a sharpness
+ test is performed on each pixel that passes the constraints
+ of CRSIG, CRMINV, and CRFACT. The sharpness test measures
+ the ratio of the height of the "core" of the cosmic ray
+ to the height of the "wings". Stars, even under conditions
+ of excellent seeing, tend to have wings that are a
+ significant fraction of the peak height, whereas cosmic
+ rays tend to have much sharper edges.
+
+BRFACT
+
+ The bad row search algorithm looks through an array formed
+ by collapsing the image along the rows, searching for rows
+ that are lower than their neighbours by a value that is
+ greater than BRFACT times the median difference between
+ adjacent elements of the array in the local neighbourhood.
+ Sensible values of BRFACT are quite low, especially if
+ combined with a larg-ish value for BRPASS.  BRFACT=1.5,
+ BRPASS=4 are reasonable values, and BRFACT can be taken
+ lower if necessary.
+
+BRPASS
+
+ The bad row searcher makes BRPASS passes through the data,
+ each time taking a different set of columns evenly distr-
+ ibuted through the image.  A row has to show up as bad in
+ every pass in order to be considered bad.
+
+DEGFIX
+
+ Bad data areas are interpolated by fitting local polynomials
+ to the data.  DEGFIX is the degree of polynomial to be used.
+ Three seems a reasonable value for most data.  DEGFIX is only
+ prompted for if FIX is set.
+
+OUTPUT
+
+ The name of the output image to be generated.
+ If OUTPUT is the same IMAGE, the data is modified in situ.
+
+NBROWS
+
+ The number of bad rows to be cleaned in the image.
+ Note that a 'row' is a horizontal (as seen on the Grinnell)
+ line in the image.  Note that NBROWS and BROWS are not
+ prompted for unless AUTOROW is not set.
+
+BROWS
+
+ An array giving the numbers of the bad rows to be
+ cleaned in the array.  Note that NBROWS and BROWS are not
+ prompted for unless AUTOROW is not set.
+
+AUTOROW
+
+ If AUTOROW is set, the program will perform a search
+ for bad rows, using the BRFACT and BRPASS parameters.  If it
+ is not set, the rows will be prompted for as NBROWS and
+ BROWS.  AUTOROW is set by default.
+
+FIX
+
+ If FIX is set, the output file has the detected cosmic
+ rays and bad rows corrected by interpolation.  If FIX is not
+ set, the data is not corrected, but is written out with
+ the bad areas flagged by being set to a value 1000 less than
+ the previous minimum value in the image.  FIX=NO can be used
+ to highlight the areas that will be fixed with the current
+ parameter values.  FIX is the default.  Note that an image
+ that has been run through BCLEAN with FIX=NO will
+ not subsequently BCLEAN properly, so should usually be output
+ to a scratch file.
+
+ WARNING - you should examine the output from BCLEAN carefully
+           to ensure that the parameters that you have chosen
+           are appropriate. FIX=NO and TEXTFILE are useful here.
+
+SHARPNESS
+
+ If SHARPNESS is set, the program will perform a test on
+ the sharpness of possible cosmic rays events. This test is in
+ addition to those specified by CRSIG, CRFACT, and CRMINV.
+
+TEXTFILE
+
+ If TEXTFILE is set, the program will produce a text file
+ containing the results of the cosmic ray search.  This file
+ is very useful when trying to choose appropriate values for
+ CRSIG, CRFACT, CRMINV, and CRSHARPNESS. The file is called
+ BCLEAN.LIS.
+
+DIRECTION
+
+ In the zapping of cosmic rays, the pixels are replaced with
+ a value interpolated from the neighboring pixels. This can
+ be done along rows or columns, or one can let the computer
+ decide which one gives smaller residuals (i.e., the best).
+
+See_also
+
+ FIGARO: CLEAN, COSREJ, MEDFILT, MEDSKY, TIPPEX.
+ KAPPA: FFCLEAN, CHPIX, FILLBAD, GLITCH, MEDIAN, MSTATS, ZAPLIN.
+
+Source_comments
+
+ B C L E A N
+
+ This is the non-interactive CCD image cleaning program,
+ which removes bad rows and cosmic rays from images.  Note
+ that it expects the data to be orientated so that bad
+ transfer lines in the chip are horizontal - i.e. are rows,
+ rather than columns.  The program will detect and blank out
+ the bad data, and optionally fix it up.  Running without the
+ fixup allows the user to see what parts of the image will be
+ affected and provides a chance to modify the cleaning parameters
+ accordingly.  For details of the cleaning algorithms used, see
+ the comments in the listings of FIG_ABROWS, FIG_ZAPRAYS,
+ FIG_VERTICAL, FIG_FIXAREA.  There are four parameters connected
+ with cosmic ray detection, two which affect bad line detection,
+ and one that controls the interpolation used to fix the data.
+
+ WARNING: you are strongly advised to examine the effects of this
+          program on your images.
+
+ Command line parameters -
+
+ IMAGE     (Character) The name of the image to be cleaned.
+ CRSIG     (Numeric) Cosmic Ray SIGma value.  The cosmic ray
+           searcher tests the value of each pixel against the
+           average value of the surrounding pixels.  It must
+           exceed the average value by more than CRSIG*(square
+           root of average value).
+ CRFACT    (Numeric) Cosmic Ray FACTor.  A cosmic ray must also
+           exceed the average value by CRFCT*(the average value).
+ CRMINV    (Numeric) Cosmic Ray MINimum Value.  A cosmic ray
+           must also exceed the average value by CRMINV.
+ CRSHARPNESS (Numeric) Cosmic Ray SHARPNESS. If the SHARPNESS
+           keyword has been set, then a cosmic ray must also
+           satisfy the sharpness criterion: the height of the cosmic
+           ray above the immediately surrounding sky must exceed the
+           difference between the immediately surrounding sky and the
+           sky a bit further away, by more than a ratio of CRSHARPNESS.
+           Stars tend to have lower values of this ratio than cosmic
+           rays. The default value is 10.
+ BRFACT    (Numeric) The bad row searcher looks through an array
+           formed by collapsing the image along the rows, looking
+           for rows that are lower than their neighbours by a
+           value that is greater than BRFACT*(median difference
+           between neighbours in the neighbourhood).
+ BRPASS    (Numeric) Bad Row PASS value.  The bad row searcher
+           makes BRPASS passes through the data, each time taking
+           a different set of columns evenly distributed through
+           the image.  A bad row must show up in all passes.
+ DEGFIX    (Numeric) The degree of polynomials to be used in
+           interpolating over bad data.
+ OUTPUT    (Character) The name of the output image to be
+           generated.  If this is the same as IMAGE, the
+           correction will be performed in situ.
+ NBROWS    (Numeric) The number of bad rows to be fixed.
+ BROWS     (Numeric vector) The numbers of the bad rows to
+           be fixed.  If NBROWS and BROWS are specified
+           explicitly, then they will be used.  Otherwise
+           an automatic bad line search will be preformed,
+           unless overidden by the setting of the AUTOROW
+           keyword.
+ DIRECTION (Numeric) Indicates along which direction on the CCD
+           the cosmic rays will be interpolated across. 1 means
+           columns, -1 means rows, and 0 means let the computer
+           decide which gives smaller residuals.
+
+ Command keywords -
+
+ AUTOROW   If set, an automatic bad row search will be performed.
+           If NBROWS or BROWS are specified explicitly,
+           AUTOROW=NO will be assumed.
+ FIX       If set, the bad data found will be fixed.
+           Otherwise, the output image will simply have the bad
+           pixels flagged by a specific flag value.
+ SHARPNESS If set, the "sharpness" test for cosmic rays will
+           be performed in addition to the other tests.
+ TEXTFILE  If set, a text file (BCLEAN.LIS) will be
+           produced giving a summary of the cosmic ray test
+           results. This file is useful when deciding on the
+           cosmic ray selection parameters.
+
+                                     KS / CIT 29th June 1984
+.endhelp

@@ -1,0 +1,50 @@
+.help ialog Starlink figaro
+.nf
+ IALOG - Takes the antilog of an image
+
+
+Description
+
+ IALOG takes the base 10 antilog of each pixel in an image.
+ Each pixel in the output image takes the value 10 to the power
+ of the corresponding pixel in the input image.
+
+Parameters
+
+
+IMAGE
+
+ The datafile to be processed.
+
+OUTPUT
+
+ The name of the resulting image.  If this is the
+ same as IMAGE (the default) the operation will be
+ performed in situ.  Otherwise a new image will be
+ created.
+
+See_also
+
+ FIGARO: ILOG.
+ KAPPA: LOG10, LOGAR, LOGE.
+
+Source_comments
+
+ I A L O G
+
+ Takes the base 10 antilog of an image.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+                                  KS / CIT 22nd April 1984
+.endhelp

@@ -1,0 +1,161 @@
+.help echmerge Starlink figaro
+.nf
+ ECHMERGE - Merge echelle spectra into a single long spectrum
+
+
+Description
+
+ The program expects two input files, each of which may be 1-D or
+ 2-D, but both of which must have the same number of pixels in X,
+ must have a recognised wavelength unit as the units of X and must
+ have (near enough) identical .X.DATA arrays. In practice this
+ means that both must have been scrunched on to the same wavelength
+ scale. (The details of this may change when SCRUNCH has been
+ upgraded to write an output file with a 2-D .X.DATA array
+ describing the discontinuous scrunched orders.)
+
+ It creates a 1-D output file which consists of all the orders from
+ the input files. Where orders overlap a weighted sum of the
+ overlapping orders is used. The formula used is:
+
+    in1weight(i) * in1(i) + in2weight(i) * in2(i)
+             in1weight(i) + in2weight(i)
+
+ and the weights are simply the result of median smoothing the data
+ that they weight. This means that more weight is given to stronger
+ signal data, that data where one of the inputs is zero is set to
+ the other of the inputs and that data where both of the inputs are
+ equal is left unaltered. All of these are desirable qualities.
+ There may be less desirable statistical consequences and it is not
+ obvious that signal to noise ratio cannot be degraded although
+ intuitively it will not be since on the assumption of Poisson
+ statistics the weights are essentially just the inverse variances.
+ At low signal, a cutoff applies since the major noise contribution
+ will no longer be Poisson.
+
+ The output file can be the same as either of the two input files
+ and the second input file can be given a blank name, in which case
+ it is not required. Often the first run will use a single input
+ file to create the output file and subsequent runs will add in
+ more input files to the existing output file.
+
+
+Parameters
+
+
+IMAGE
+
+ ECHMERGE merges one or two images that contain scrunched
+ echelle orders. The images must have the same size in the
+ X direction but each may be 1-D or 2-D.
+
+IMAGE1
+
+ The name of the image that is to be merged with IMAGE.
+ A blank name can be given.
+
+BOX
+
+ The input and output data is smoothed (in workspace) in
+ order to provide slowly varying data from which to derive
+ weights. This is the total width of the median filter used.
+ An even value is rounded down to the next odd number.
+
+CUTOFF
+
+ If the ration (stronger signal)/(weaker signal) exceeds
+ CUTOFF, only the stronger signal will be used. This is
+ an attempt to prevent signal to noise degradation due to
+ adding in of weak signal.
+
+OUTPUT
+
+ The name of the resulting image. The output image is a
+ single long spectrum containing the merged orders from
+ IMAGE and IMAGE1.
+
+Source_comments
+
+ E C H M E R G E
+
+ Program name:
+    ECHMERGE
+
+ Function:
+    Merge scrunched echelle orders into a single long spectrum.
+
+ Description:
+    The program expects two input files, each of which may be 1-D or
+    2-D, but both of which must have the same number of pixels in X,
+    must have a recognised wavelength unit as the units of X and must
+    have (near enough) identical .X.DATA arrays. In practice this
+    means that both must have been scrunched on to the same wavelength
+    scale. (The details of this may change when SCRUNCH has been
+    upgraded to write an output file with a 2-D .X.DATA array
+    describing the discontinuous scrunched orders.)
+
+    It creates a 1-D output file which consists of all the orders from
+    the input files. Where orders overlap a weighted sum of the
+    overlapping orders is used. The formula used is:
+
+                   in1weight(i) * in1(i) + in2weight(i) * in2(i)
+                            in1weight(i) + in2weight(i)
+
+    and the weights are simply the result of median smoothing the data
+    that they weight. This means that more weight is given to stronger
+    signal data, that data where one of the inputs is zero is set to
+    the other of the inputs and that data where both of the inputs are
+    equal is left unaltered. All of these are desirable qualities.
+    There may be less desirable statistical consequences and it is not
+    obvious that signal to noise ratio cannot be degraded although
+    intuitively it will not be since on the assumption of Poisson
+    statistics the weights are essentially just the inverse variances.
+    At low signal, a cutoff applies since the major noise contribution
+    will no longer be Poisson.
+
+    The output file can be the same as either of the two input files
+    and the second input file can be given a blank name, in which case
+    it is not required. Often the first run will use a single input
+    file to create the output file and subsequent runs will add in
+    more input files to the existing output file.
+
+ Parameters:
+
+    (>) IMAGE    (File) The name of the first input image. This can be
+                 1-D or 2-D and will normally be the output from
+                 SCRUNCH.  However it can also be the results of a
+                 previous run of this program.
+    (>) IMAGE1   (File) The name of the second input image. This can
+                 be 1-D or 2-D and will normally be the output from
+                 SCRUNCH. However it can also be the results of a
+                 previous run of this program. It must have the same X
+                 size as IMAGE, must agree in X units (which must be
+                 a recognised wavelength unit) and must more or less
+                 agree in the contents of .X.DATA. If no second
+                 input image is required, its name can be specified
+                 as blank.
+    (>) BOX      (Integer) The size of the box (in pixels) to be used
+                 in calculating the medians.  Should be odd; if even,
+                 BOX-1 will be used.
+    (>) CUTOFF   (Real) The ratio of higher signal to lower signal at
+                 which no contribution from the lower signal will be
+                 taken.
+    (<) OUTPUT   (File) The name of the output image. This will be
+                 a 1-D image with the same size and X information as a
+                 row of either of the input images.
+
+ Language:
+    FORTRAN
+
+ External variables used:
+
+    None
+
+ Prior requirements:
+    None
+
+
+Authors
+
+ William Lupton, AAO
+.endhelp

@@ -1,0 +1,95 @@
+.help isuper Starlink figaro
+.nf
+ ISUPER - Produces a superset of an image
+
+
+Description
+
+ Given an input image, ISUPER creates a similar image whose
+ dimensions are (possibly) different and where there is an
+ overlap between the pixels of the two images.  The overlap
+ pixels are copied directly into the output image from the
+ input, and all other pixels of the output image are zeroed.
+ The overlap is specified in terms of the position of the left
+ bottom (1,1) pixel of the input image on the output image.
+ X and Y data arrays will also be supersetted if they contain
+ linear data - otherwise no X and Y sub-structures will be
+ created in the output structure.
+
+Parameters
+
+
+IMAGE
+
+ The name of the input image.
+
+XSIZE
+
+ The number of pixels in the X-direction for the
+ output image.  This can be more than, less than,
+ or the same as, the number of X-pixels in the
+ input image.
+
+YSIZE
+
+ The number of pixels in the Y-direction for the
+ output image.  This can be more than, less than,
+ or the same as, the number of Y-pixels in the
+ input image.
+
+XPIXEL
+
+ The overlap between the input and output images is specified
+ in terms of the position of the bottom left (1,1) pixel
+ of the input image in the output image.  If this pixel does
+ not map onto a pixel of the output image, the position
+ should be given as a negative number, or as 0.  (0 is the
+ position of an imaginary pixel just outside the image.)
+
+YPIXEL
+
+ The overlap between the input and output images is specified
+ in terms of the position of the bottom left (1,1) pixel
+ of the input image in the output image.  If this pixel does
+ not map onto a pixel of the output image, the position
+ should be given as a negative number, or as 0.  (0 is the
+ position of an imaginary pixel just outside the image.)
+
+OUTPUT
+
+ The name of the resulting superset image.
+
+Source_comments
+
+ I S U P E R
+
+ Supersets an image or a spectrum, creating a new image
+ with larger dimensions than the input, and with the input
+ data just a part of the output image.  If the AXIS(1) or
+ AXIS(2) arrays contain linear data, then output AXIS(1) and
+ AXIS(2) sub-structures will be created reflecting this data.
+ If they contain non-linear data, ISUPER will not attempt to
+ extrapolate the data values and will omit the AXIS(1) or AXIS(2)
+ sub-structure in question from the output structure.
+ Note: It is also capable of subsetting.
+
+ Command Parameters -
+
+ IMAGE    (Character) The name of the input image.
+ XSIZE    (Numeric) The AXIS(1)-dimension of the output image.
+ YSIZE    (Numeric) The AXIS(2)-dimension of the output image.
+ XPIXEL   (Numeric) The pixel number in AXIS(1) at which the input
+          image is to start.
+ YPIXEL   (Numeric) The pixel number in AXIS(2) at which the input
+          image is to start.  That is, pixel (1,1) of the input
+          image maps onto pixel (XPIXEL,YPIXEL) of the output.
+          These values may be such that not all the input image
+          appears in the output - they may even be negative.
+ OUTPUT   (Character) The name of the output image.
+
+ Command keywords -  None
+
+ User variables used -  None
+
+                                        KS / CIT 9th Aug 1984
+.endhelp

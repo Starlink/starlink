@@ -1,0 +1,118 @@
+.help fet321 Starlink figaro
+.nf
+ FET321 - Extracts a spectrum from 1 detector from etalon mode FIGS data
+
+
+Description
+
+ FET321 takes a FIGS data cube, as produced by the FIGS data
+ acquisition system running in etalon mode, and reduces it to a
+ single spectrum, summing up the various cycles and performing the
+ beamswitch and chopping subtractions.  Data from only one detector
+ is extracted.
+
+Parameters
+
+
+CUBE
+
+ The name of a data cube produced by the FIGS data
+ acquisition system.  That is is should have the
+ dimensions (wavelength steps,8,beamswitch cycles)
+ The cube should have been taken in Etalon mode.
+
+DETECTOR
+
+ In etalon mode, each of the FIGS detectors produces
+ data over a different wavelength range.  Rather than
+ produce a single spectrum covering disjoint wavelength
+ ranges, FET321 uses DETECTOR to specify a single detector
+ to be used to produce the spectrum.
+
+SPECTRUM
+
+ The name of the resulting single spectrum
+ produced by collapsing down the FIGS data cube.
+
+CUTOFF
+
+ Values more than CUTOFF times sigma away from the mean
+ value for the spectral point will not be included in
+ the final spectrum.
+
+ADD
+
+ Disables the subtraction of the background beamswitch
+ and chopping data.  This is unusual (ADD=NO is the
+ default) and is generally only required for test data.
+
+BACK
+
+ Returns the background spectrum only, rather than the
+ background subtracted source data.
+
+NORM
+
+ Causes the data for each cycle to be normalized so that
+ the mean value for each cycle is the same. This gives more
+ reasonable errors when data are taken in the presence of
+ cloud. It should not be used on very faint sources, as the
+ mean level may go negative under these circumstances
+
+Source_comments
+
+ F E T 3 2 1
+
+ Given a FIGS data cube as produced by the FIGS data acquisition
+ system running in one of the etalon modes, processes it to produce
+ a single spectrum, for one of the detectors only.
+
+ Command parameters -
+
+ 'CUBE'     The name of the cube from which the planes
+            are to be taken.  This should be a raw FIGS data
+            cube.
+ 'DETECTOR' The number of the detector to be used.
+ 'SPECTRUM' The name of the resulting spectrum.
+ 'CUTOFF'   The level (in sigma) at which a point will
+            be ignored (FIGS321 only)
+
+ Command keywords -
+
+ 'ADD'      Add the data together rather than subtracting the
+            beamswitch and chop backgrounds
+
+ 'BACK'     Return the background spectrum only
+
+ 'NORM'     Normalize data to mean level of each cycle.
+
+ Input data -
+
+ CUBE is assumed to have a structure with the actual
+ cube data in CUBE.Z.DATA
+
+ This routine assumes that the first axis of the cube data
+ represents wavelength, that the second represents spectral
+ scans in the order A1a,A1b,B1a,B1b,B2a,B2b,A2a,A2b, where
+ A1,A2,B1,B2 represent the parts of the beamswitch ABBA cycle
+ and a and b represent the signal and background chop positions
+ respectively.  In etalon mode 2, there are no chop positions,
+ and the second axis is just A1,B1,A2,B2. This means that the
+ second dimension of the cube has to be either 4 or 8.  The
+ cube third axis represents beamswitch cycle number.
+ The data is normalized to give a figure in detected photons
+ per second.  Along the wavelength axis, the data is assumed
+ to be in order of etalon position, each etalon position having
+ n values where n is the number of detectors used.
+
+ Output data -
+
+ IMAGE is created with the same structure as CUBE
+ except that .Z.DATA will only have 1 dimension, and any
+ .Y or .T sub-structures that CUBE has will be deleted.
+ If a spectrum is produced the errors (derived from
+ the cycle to cycle statistics) are placed in the .Z.ERRORS
+ component
+
+  5th May 1988  KS / AAO.   Original version, based on FIGS321.
+.endhelp

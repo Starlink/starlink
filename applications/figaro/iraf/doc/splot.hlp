@@ -1,0 +1,198 @@
+.help splot Starlink figaro
+.nf
+ SPLOT - Plots a spectrum
+
+
+Description
+
+ The SPLOT command will plot a spectrum on the current
+ hard or soft graphics device.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of the spectrum to be plotted by SPLOT.
+ It should be a 1-dimensional array.
+
+HARDCOPY
+
+ If set, the plot is written to the device defined
+ as the current hardcopy device.  Generally, this
+ is a disk file which will then have to printed.  If
+ HARDCOPY is not set, the plot will go to the current
+ softcopy device.  The hard and soft copy devices are
+ specifed using the HARD and SOFT commands respectively.
+
+WHOLE
+
+ If set, the whole of the spectrum is plotted.
+ Otherwise, the limits plotted are determined by the values of
+ XSTART and XEND, which you will be prompted for if they were
+ not specified in the command string.
+
+AUTOSCALE
+
+ If set, the plot is scaled so that all of the data to be
+ plotted just fits on the display.  Otherwise, the scale of
+ the plot is determined by the values of HIGH and LOW, which
+ you will be prompted for if they were not specified in the
+ command string.
+
+XSTART
+
+ The first X value to be plotted, in the
+ units used by the data - angstroms, for example, if the data
+ is wavelength calibrated.  XSTART can be set before the start
+ of the data, if necessary.  RESET will set XSTART to the first
+ X value in the data.
+
+XEND
+
+ The last X value to be plotted, in the units
+ used by the data - angstroms, for example, if the data
+ is wavelength calibrated.  XEND can be set after the end
+ of the data, if necessary.  RESET will set XEND to the last
+ X value in the data.
+
+HIGH
+
+ The maximum data value to be plotted - i.e. the top
+ Y axis value for the plot.
+
+LOW
+
+ The minimum data value to be plotted - i.e. the bottom
+ Y axis value for the plot.
+
+BIAS
+
+ A bias value applied to the data, usually to bias
+ up a plot which is to be superimposed upon a previous plot
+ of almost identical data values.  This makes the comparison
+ easier.  BIAS N  is essentially equivalent to setting HIGH
+ and LOW down by an amount N, so can result in unexpected
+ axis values if it is not accompanied by AXES=NO.
+
+LABEL
+
+ The label that will appear at the top of the plot.
+
+ERASE
+
+ Specifies that the screen is to be erased before the plot
+ is made.  Usually ERASE and AXES will not be set when a
+ plot is superimposed on a previous one.
+
+AXES
+
+ Specifies that the axes for the plot are to be drawn.
+ These should be omitted if the plot is being superimposed on
+ a previous one, or sometimes just to save plotting time.
+
+LINES
+
+ Specifies that the plot is to made as a 'point-plot',
+ in a 'join the dots' fashion.  The alternative is a histogram
+ plot.  LINES will usually be a little faster, but messier,
+ because the resolution of the plotting device will result in
+ stepped lines.
+
+COLOUR
+
+ The colour the data are to be plotted in.
+ The axes are always plotted in white.  The
+ colours allowed are Blue, White, Red, Green, Black, Cyan,
+ Magenta, Yellow.  Using Black will have the effect of
+ erasing anything where the data is plotted.  This only
+ works on the Grinnell.
+
+THICKNESS
+
+ Only used for 'build' or 'hard' plots.  It is
+ used to increase the thickness of the lines plotted in
+ order to increase legibility, particularly on the Versatec.
+ Generally 1 or 3 is reasonable for the Versatec - depending
+ on how well set up it is at the present, and 1 should be
+ used for other devices.
+
+See_also
+
+ FIGARO: ESPLOT, IPLOTS, MSPLOT.
+ KAPPA: LINPLOT, MLINPLOT.
+
+Source_comments
+
+ S P L O T    /    E S P L O T
+
+ Produces a plot of a spectrum.  The plot is directed
+ to the device defined by the user variables 'SOFT' and
+ 'HARD', and by the value of the command keyword 'HARDCOPY',
+ so will appear immediately if these specify a video
+ device (VT125, Args, etc.).  If a hardcopy device
+ is specified, the file for that device will be produced,
+ but SPLOT does not attempt to spool it off for printing.
+
+ ESPLOT is similar to SPLOT, but plots error bars based on the
+ errors in the data.
+
+ Command parameters -
+
+ SPECTRUM    The data to be plotted.  If this contains X-axis
+             information, this will be used.  If not, the X-axis
+             will just have to be the numbers from 1 to n.
+ XSTART      The x-value at which plotting is to start.
+ XEND        The x-value at which plotting is to end.
+             (XSTART and XEND are not required if the
+             WHOLE keyword is set.)
+ HIGH        The maximum value to be used for the plot.
+ LOW         The minimum value to be used for the plot.
+ BIAS        A value used to displace the plot - BIAS is
+             effectively a value added to the data before
+             it is plotted. (It is implemented as a value
+             subtracted from both HIGH and LOW.)
+             (HIGH,LOW and BIAS are not required if the
+             AUTOSCALE keyword is set.)
+ LABEL       A label for the plot.
+ COLOUR      The colour for the plot, assuming the display device
+             supports it.  The axes are always white.
+ THICKNESS   The width of the lines used for the plot.  This is
+             only used for 'hard' & 'build' plots, and should
+             really be 1 for anything other than a high-resolution
+             device like a Versatec or a laser printer.
+
+ Command keywords -
+
+ AUTOSCALE   The program is to work out the values for HIGH
+             and LOW, using the maximum and minimum values
+             in the data over the specified range.
+ WHOLE       The program is to display all of the spectrum.
+ HARDCOPY    The plot is to produce a hard copy.
+ AXES        Axes will be plotted.
+ ERASE       The screen will be erased before the plot.
+ LINES       The plot is not done as a histogram, but as
+             a 'join the dots' line plot.  (Only applies
+             to SPLOT.)
+
+ User variables -    (">" input, "<" output)
+
+ (>) SOFT    Specifies the device and type to be used for soft
+             plots.  See the SOFT command for more details.
+ (>) HARD    Specifies the device and type to be used for hard
+             plots.  See the HARD command for more details.
+ (<) TVXST   is set to the starting x-value for the plot.
+ (<) TVXEN   Is set to the final x-value for the plot.
+ (<) TVHIGH  Is set to the same value as HIGH.
+ (<) TVLOW   Is set to the same value as LOW.
+ (<) TVFILE  Is set to the value of SPECTRUM.
+ (<) TVCOLOR Is set to the GRPCKG code for the plot colour.
+             (The TV.. variables are intended for use by
+             cursor routines, and reflect the settings for the
+             last plot made, even if XSTART etc are changed.)
+
+ (Other user variables may be set by the command processor, in
+ connection with the parameter values.)
+
+                                     KS / CIT  30th April 1984
+.endhelp

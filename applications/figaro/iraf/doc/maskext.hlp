@@ -1,0 +1,94 @@
+.help maskext Starlink figaro
+.nf
+ MASKEXT - Extracts echelle orders using a mask created by ECHMASK
+
+
+Description
+
+ Extracts spectra from an image using a mask image.  The mask
+ pixel values should be the numbers of the spectra that fall
+ in that pixel of the image.  This routine is intended for use
+ with echelle data, and the numbers in the image are expected
+ to be based on echelle order numbers.  The spectra are extracted
+ into an image whose Y-axis is the order number of the spectra,
+ and whose X-axis is that of the original data.  The actual
+ numbers in the image are expected to have the form
+ (echelle order number)*10 + (sub order number), sub orders
+ referring to separate spectra from the same order, as
+ produced, for example, by the UCL echelle at AAO.
+ MASKEXT will extract one specified sub-order from each
+ order, or will add all the sub-orders together for each order.
+
+Parameters
+
+
+IMAGE
+
+ Name of image containing spectra.
+
+MASK
+
+ Name of mask image.
+
+MLOW
+
+ Lowest order number to extract.
+
+MHIGH
+
+ Highest order number to extract.
+
+SUBORD
+
+ Sub-order to extract (0 => all).
+
+REVERSE
+
+ Create output with order numbers reversed?
+
+OUTPUT
+
+ Name of resulting set of spectra
+
+Source_comments
+
+ M A S K E X T
+
+ Extracts spectra from an image using a mask image.  The mask
+ pixel values should be the numbers of the spectra that fall
+ in that pixel of the image.  This routine is intended for use
+ with echelle data, and the numbers in the image are expected
+ to be based on echelle order numbers.  The spectra are extracted
+ into an image whose Y-axis is the order number of the spectra,
+ and whose X-axis is that of the original data.  The actual
+ numbers in the image are expected to have the form
+ (echelle order number)*10 + (sub order number), sub orders
+ referring to separate spectra from the same order, as
+ produced, for example, by the UCL echelle at AAO.
+ MASKEXT will extract one specified sub-order from each
+ order, or will add all the sub-orders together for each order.
+
+ Command parameters -
+
+ IMAGE      (Character) The name of the image containing the
+            spectra to be extracted
+ MASK       (Character) The name of the mask image.
+ MLOW       (Integer) The lowest order number to be extracted.
+ MHIGH      (Integer) The higest order number to be extracted.
+ SUBORD     (Integer) The sub-order number to be extracted.
+            If zero, all sub-orders are added for each order.
+ OUTPUT     (Character) The name of the resulting image.
+
+ Command keywords -
+
+ REVERSE    If set, the image created will have the
+            spectral orders in reverse order - higher order
+            numbers being at the start of the image.
+
+ 29th May 1988  KS/AAO.  Original version.
+
+ Note -
+
+ This version is an interim one - it really needs re-writing
+ using DSA_RESHAPE_DATA and DSA_RESHAPE_AXIS.
+.endhelp

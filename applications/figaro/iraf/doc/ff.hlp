@@ -1,0 +1,51 @@
+.help ff Starlink figaro
+.nf
+ FF - Flat field an image (uses Jon Tonry's algorithm)
+
+
+Description
+
+ Flat fields an image using Jon Tonry's algorithm.
+
+Parameters
+
+
+IMAGE
+
+ Name of data to be flat fielded.
+
+FLAT
+
+ Name of flat field to be used.
+
+ORDER
+
+ Order for flat field profile fit.
+
+OUTPUT
+
+ Name of result of operation.
+
+Source_comments
+
+ F F
+
+ Applies a flat field correction to an image.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ FLAT   The name of the structure containing the flat
+        field data.
+
+ ORDER  The order of the fit to be applied to the flat
+        field data profile.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+                                  KS / CIT 31st MAy 1983
+.endhelp

@@ -1,0 +1,37 @@
+.help skyliner Starlink figaro
+.nf
+ SKYLINER - Removes a sky spectrum normalised the 5577 [OI] line.
+
+
+Description
+
+ Removes a sky spectrum normalised by the height of the 5577 [OI]
+ emission line.
+
+Usage
+
+ skyliner in sky out
+
+Parameters
+
+
+IN = NDF (Read)
+
+ The one- or two-dimensional spectrum to be sky-subtracted.
+
+SKY = NDF (Read)
+
+ The one-dimensional sky spectrum.  It must not contain bad
+ pixels as they could affect the estimation of the [OI] line
+ strength.
+
+OUT = NDF (Write)
+
+ The sky-subtracted one- or two-dimensional spectrum.
+
+
+Source_comments
+
+ None available.
+
+.endhelp

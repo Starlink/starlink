@@ -1,0 +1,52 @@
+.help abconv Starlink figaro
+.nf
+ ABCONV - Convert spectrum from Janskys into AB magnitudes
+
+
+Description
+
+ ABCONV generates a spectrum in AB magnitudes, given a spectrum in
+ some other units.  At present, only Janskys, milli-Janskys and
+ micro-Janskys can be handled.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of a spectrum whose units are (currently)
+ either Janskys, milli-Janskys, or micro-Janskys.
+
+OUTPUT
+
+ The resulting spectrum, whose units will be AB magnitudes.
+ OUTPUT can be the same as SPECTRUM, in which case the
+ conversion will be performed in situ.
+
+Source_comments
+
+ A B C O N V  /  F L C O N V  /  I R C O N V
+
+ Converts a spectrum into AB magnitudes (ABCONV) or f-lambda
+ units (ergs/sec/cm**2/A) (FLCONV), or W/m**2/um (IRCONV).
+ The original units of the
+ data may be Janskys, milli-Janskys, or micro-Janskys.  Other
+ possibilities may be added later.
+
+ Command parameters -
+
+ SPECTRUM The name of the structure containing the spectrum.
+          currently used for the spectrum.  For FLCONV
+          an x-axis data structure giving the wavelengths of the
+          data elements is also required.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for SPECTRUM. If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+                                  KS / CIT 18th May 1984
+.endhelp

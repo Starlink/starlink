@@ -1,0 +1,73 @@
+.help igconv Starlink figaro
+.nf
+ IGCONV - Convolve an image with a specified filter
+
+
+Description
+
+ This Figaro function convolves an image with a box array that
+ is defined in a text file as a set of numbers.  This is more
+ flexible - though less efficient - than the simple convolution
+ performed by ICONV3.
+
+Parameters
+
+
+IMAGE
+
+ The name of a 1- or 2-dimensional data file that
+ is to be convoled with the data array defined
+ in the file specified by the CONVOL parameter.
+
+CONVOL
+
+ A text file (default extension .cvf)
+ which contains the definition of the data array that the
+ IMAGE data is to be convolved with. The convolution data
+ often referred to as a filter, since one of the main uses
+ of this routine is to apply sharpening or smoothing filters
+ to images) is specified as a series of numbers in free
+ format (blank lines and lines starting with '*' being
+ ignored). Normally one line of the filter is specified by
+ one line of the file, but a line can be continued by
+ ending it with a '\' character.
+
+OUTPUT
+
+ The name of the resulting data file.  This will be
+ a copy of the input file, except that the main data
+ array will have been convolved with the specified array.
+
+Source_comments
+
+ I G C O N V
+
+ This is a general-purpose convolution program, able to convolve the
+ main data array in a Figaro file with a rectangular array of any
+ dimensions. This is a more flexible routine than ICONV3, where the
+ convolution is with a 3x3 array specified only by a center and an
+ edge value, but the additional flexibility probably makes it
+ noticeably slower, particularly for very large convolution arrays.
+
+ Command parameters -
+
+ IMAGE    The name of the structure containing the image.
+
+ CONVOL   This is the name of a text file that contains the
+          definition of the convolution array. See below for the
+          format.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+ File format:
+    The text file defining the convolution array should simply contain
+    the values for the array in a free format, one line at a time. Lines
+    beginning with a '*' are ignored, as are blank lines. If the data for
+    a line of the array has to be continued onto another line, a '\'
+    should appear at the end of the line to be continued.
+
+ 11th Mar 1994.  Original version.  KS / AAO
+.endhelp

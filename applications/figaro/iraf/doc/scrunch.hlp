@@ -1,0 +1,177 @@
+.help scrunch Starlink figaro
+.nf
+ SCRUNCH - Rebin a spectrum to a linear wavelength range
+
+
+Description
+
+ SCRUNCH rebins a spectrum or a set of spectra so that the resulting
+ data have either a linear wavelength scale or a wavelength scale
+ that is logarithmic (i.e. has a constant velocity step).  Note that
+ SCRUNCH is not suitable for data in which the bins contain data that
+ covers discontinuous or overlapping wavelength ranges (FIGS data,
+ for example).
+
+Parameters
+
+
+SPECTRUM
+
+ The spectrum (or spectra) to be scrunched.
+ If SPECTRUM is an image (i.e. 2-D data) it will be treated
+ as a set of spectra all of which will be scrunched
+ individually.  In this case, if the wavelength data is
+ a 2-D array each of the data spectra will be scrunched
+ according to the corresponding cross-section of the
+ wavelength array.  If the wavelength array is 1-D, this
+ single array will be used for all the spectra.
+
+WSTART
+
+ The wavelength of the center of the first bin
+ of the resulting output data.
+
+WEND
+
+ Normally, represents the wavelength of the center of
+ the last bin of the resulting output data.  Because this
+ is not always the most convenient value to supply, SCRUNCH
+ will allow WEND to be used to specify the wavelength
+ increment value (for linear data, this is the constant
+ wavelength difference between bins; for logarithmic data
+ it is the constant velocity step in Km/sec).  The way
+ WEND is interpreted may be controlled explicitly by the
+ FINAL and INCREMENT hidden keywords, but by default SCRUNCH
+ will assume WEND is an incremental value if it is less than
+ WSTART, and a final value if it is greater than WSTART.
+
+BINS
+
+ The number of elements to be used for the resulting spectrum.
+
+OUTPUT
+
+ The name of the resulting data file containing
+ the scrunched spectrum or set of spectra.  The structure
+ of OUTPUT will be the same as that of the input file,
+ except that the data array will generally be a different
+ size, and any error array will have been deleted.
+ Eventually SCRUNCH will be able to calculate the errors
+ in the new spectrum..)
+
+INCREMENT
+
+ If set, SCRUNCH will assume WEND is an incremental value
+ (a velocity or wavelength step), even if it is greater
+ than WSTART.
+
+FINAL
+
+ If set, SCRUNCH will assume that WEND is the wavelength
+ of the final element of the resulting spectrum, even if
+ it is less than WSTART.
+
+LOG
+
+ Controls whether or not the data is binned to a linear
+ or a logarithmic wavelength scale.
+
+LINEAR
+
+ Specifies that linear rather than quadratic
+ interpolation is to be used during the scrunching.  Usually,
+ better results are obtained with quadratic interpolation.
+ Note that LINEAR is the opposite of QUAD, and NOT of LOG.
+
+QUAD
+
+ Specifies that quadratic rather than linear
+ interpolation is to be used during the scrunching.  Usually,
+ better results are obtained with quadratic interpolation.
+
+FLUX
+
+ If the input data represents flux (photons, for example)
+ rather than flux density (AB magnitudes, Janskys, etc)
+ then it should be scrunched so as to conserve flux, and
+ FLUX should be set.  See HELP FIGARO TECHNIQUES
+ WAVELENGTH fo more details on this point.
+
+MEAN
+
+ If the input data represents flux density (AB magnitudes,
+ Janskys, etc) rather than flux (photons, for example)
+ then it should be scrunched so as to conserve the mean
+ value of the data, and MEAN should be set.  See HELP
+ FIGARO TECHNIQUES WAVELENGTH fo more details on this point.
+
+Source_comments
+
+ S C R U N C H
+
+ Figaro routine to scrunch a spectrum or set of spectra.  Can scrunch
+ either into a linear wavelength scale, where the wavelength
+ increment from bin to bin is constant across the spectrum, or
+ into a logarithmic scale, where the increment of the log of
+ the wavelength from bin to bin is constant.  The operation
+ is performed by the routine FIG_REBIN.
+
+ If the input file is 2-D data, then it is treated as a set of
+ 1-D spectra and each is scrunched individually.   If the wavelength
+ array is 1-D, then this single array will be used for all
+ the spectra.  If it is 2-D, then each spectrum will be scrunched
+ according to the corresponding cross-section of the wavelength
+ array.
+
+ The routine can either conserve flux or the mean value
+ of the data.  Conserving flux is appropriate where the data is
+ actually in flux units, but not when the data is in magnitude
+ units.  (Consider the case where each input bin maps to two
+ output bins; if the data is in flux units - photon counts, for
+ example - then flux should be conserved and the mean data level
+ should drop by a factor 2; if the data is in magnitudes, then
+ the rebinning should not change the mean level.)  The program
+ does not try to determine for itself whether the data is in flux
+ or in magnitudes - it uses a command keyword.
+
+ Command parameters -
+
+ SPECTRUM     (Character) The name of the spectrum to be scrunched.
+ WSTART       (Numeric) The wavelength of the CENTER of the first
+              bin of the resulting scrunched spectrum.
+ WEND         (Numeric) The wavelength of the CENTER of the final
+              bin of the resulting scrunched spectrum.  If WEND is
+              less than WSTART, then SCRUNCH assumes that it is the
+              increment rather than the final value that is being
+              specified.  If the scrunch is logarithmic and WSTART
+              is greater than WEND, SCRUNCH assumes that the WEND
+              value represents a velocity in km/sec.  These
+              assumptions can be controlled directly by the keywords
+              INCREMENT and FINAL, if they will not give the desired
+              effect.
+ BINS         (Numeric) The number of bins for the resulting spectrum.
+ OUTPUT       (Character) The name of the resulting spectrum.
+              Note that SCRUNCH cannot rebin a spectrum into itself
+              and so will always create a new output file.
+
+ Command keywords -
+
+ LOG          Bin into logarithmic wavelength bins.
+ MEAN         Conserve mean data level rather than flux.
+ FLUX         Conserve flux rather than mean data level.
+ LINEAR       Use linear interpolation when rebinning.
+ QUAD         Use quadratic interpolation when rebinning.
+ INCREMENT    WEND is an increment value, even though it is > WSTART.
+ FINAL        WEND is a final value, even though it is < WSTART.
+
+ User variables -
+
+ SCRUNCH_INC  Is set to the wavelength increment if linear
+              rebinning is used, and to the velocity increment if
+              log rebinning is used.
+ SCRUNCH_END  Is set to the final wavelength value.  (This is for
+              those cases where the WEND value represents an
+              increment.)
+
+                                          KS / CIT 7th Feb 1984
+.endhelp

@@ -1,0 +1,33 @@
+.help q2bad Starlink figaro
+.nf
+ Q2BAD - Converts a datafile's quality into bad values
+
+
+Description
+
+ The routine converts an datafiles quality information into bad values.
+ There is no QUALITY structure in the output.
+ This is a temporary measure required whilst Figaro cannot handle
+ datafiles with both a QUALITY structure and flagged values.
+
+Parameters
+
+
+IN
+
+ The input datafile.
+
+OUT
+
+ The output datafile.
+
+See_also
+
+ KAPPA: SETBB.
+
+Authors
+
+ JM: Jo Murray (STARLINK)
+
+ HME: Horst Meyerdierks (UoE, Starlink)
+.endhelp

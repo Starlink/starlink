@@ -1,0 +1,94 @@
+.help growyt Starlink figaro
+.nf
+ GROWYT - Copies an image into contiguous YT planes of a cube
+
+
+Description
+
+ GROWYT copies an image into successive planes of a cube (strictly
+ a cuboid) for which the X value is constant.  This is the reverse
+ of the YTPLANE fnction, except that all the planes grown into the
+ cube are the same.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image to be used.
+
+CUBE
+
+ The name of the data cube into which the image
+ is to be grown.  Successive 'X' planes (planes for which
+ the first array index is constant) will be set the same
+ as IMAGE.  If CUBE does not exist, one will be created.
+ If it does exist, its second and third dimensions must
+ match the dimensions of IMAGE.
+
+XSTART
+
+ The number of the first plane in the cube
+ involved in this operation.
+
+XEND
+
+ The number of the last plane in the cube
+ involved in this operation.
+
+NEW
+
+ If not set, and a cube of the specified name exists,
+ then IMAGE will be grown into that existing cube.
+ If NEW is set, a new cube will always be created.
+
+XSIZE
+
+ If a new cube has to be created, its first dimension
+ is unknown and has to specified as XSIZE.  The other
+ two dimensions will be those of the image.
+
+Source_comments
+
+ G R O W 3
+
+ This is the main routine for the Figaro commands GROWXY, GROWXT
+ and GROWYT.  These both copy an cube into one or more
+ planes of a cuboid, GROWXY copying into planes of constant T,
+ GROWYT into planes of constant X, and GROWXT into planes of
+ constant Y.  The operations performed by GROWXY, GROWXT and
+ GROWYT are the inverses of XYPLANE, XTPLANE and YTPLANE
+ respectively.
+
+ Command parameters -
+
+ IMAGE       (Character) The name of the input image file.
+             This will actually be image.dst.
+
+ CUBE        (Character) The name of the cube into which the
+             image is to be copied.  If the cube file does
+             not exist, or if NEW is set, a new file is created
+             with all other data elements set to zero.
+
+ XSTART,     (Numeric) The number of the first plane
+ YSTART or   into which the image is to be copied.  XSTART
+ TSTART      is used by GROWYT, YSTART by GROWXT, TSTART by GROWXY.
+
+ XEND,       (Numeric) The number of the last plane
+ YEND, or    into which the image is to be copied.  XEND is
+ TEND        used by GROWYT, YEND by GROWXT, TEND by GROWXY.
+
+ XSIZE,      (Numeric) If a new cube has to be created, two
+ YSIZE, or   of its dimensions will be those of the image, but
+ TSIZE       the other is unknown.  This has to be specified as
+             XSIZE, YSIZE or TSIZE for GROWYT, GROWXT, GROWXY
+             respectively.
+
+ Command Keywords
+
+ NEW         Used to force the creation of a new cube, even if
+             such an cube exists already.
+
+ User variables used -  None
+                                         KS / AAO 15th April 1985
+.endhelp

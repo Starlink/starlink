@@ -1,0 +1,53 @@
+.help icor16 Starlink figaro
+.nf
+ ICOR16 - Corrects 16 bit data from signed to unsigned range
+
+
+Description
+
+ ICOR16 takes an image that was written as 16 bit unsigned data, but
+ has been read as 16 bit signed data (a particular problem with FITS
+ data) and corrects it.
+
+Parameters
+
+
+IMAGE
+
+ The name of an image (or possibly a spectrum) that
+ has been read as signed 16 bit integers, but actually
+ contained unsigned 16 bit integers.  The data range
+ in the image will be modified from -32767..32768 to
+ 0..65535 (only the negative values will be changed.)
+
+OUTPUT
+
+ The name of the resulting image.  If this is
+ the same as IMAGE (the default) the operation
+ will be performed in situ.  Otherwise a new
+ image will be created.
+
+Source_comments
+
+ I C O R 1 6
+
+ It is possible to have an image written on tape in what looks
+ like unsigned 16 bit data, when what is intended is actually
+ signed 16 bit data.  This is often true of FITS tapes, where
+ 16 bit data is always assumed to be unsigned.  ICOR16 corrects
+ such an image.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+                                  KS / AAO 6th Dec 1984
+.endhelp

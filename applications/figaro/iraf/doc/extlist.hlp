@@ -1,0 +1,67 @@
+.help extlist Starlink figaro
+.nf
+ EXTLIST - Adds non-contiguous lines of an image to form a spectrum
+
+
+Description
+
+ The EXTLIST command extracts specific cross-sections of an image,
+ adding them together to give one spectrum.  The cross-section
+ numbers are specified by an array of section numbers - this allows
+ up to 40 non-contiguous cross-sections to be specified, rather
+ than the single range allowed by EXTRACT.
+
+Parameters
+
+
+IMAGE
+
+ The name of a 2-dimensional image.  A number of rows
+ (cross-sections) will be extracted from this image and
+ added to form a single spectrum.
+
+NROWS
+
+ Used to specify the number of cross-sections (rows) to
+ be added together to form the single spectrum.
+ It has to be specified here because the defaulting of
+ values for the list makes it impossible to know otherwise
+ how many of the values you actually intend to be used.
+
+SECTIONS
+
+ The cross-sections of IMAGE specified by the array of
+ row numbers given in SECtions will be added together.
+
+SPECTRUM
+
+ Used to specify the name of the resulting 1-dimensional
+ array.  A new file will be created.
+
+Source_comments
+
+ E X T L I S T
+
+ Adds the rows from IMAGE specified by the array of row numbers
+ in SECTIONS and produces a 1-D data object called SPECTRUM.
+
+ Command parameters -
+
+ 'IMAGE'    The name of the image from which the rows
+             are to be taken.
+
+ 'NROWS'    The number of rows to be added.
+
+ 'SECTIONS' The array of row numbers.
+
+ 'SPECTRUM' The name of the resulting data.
+
+ Output data -
+
+ SPECTRUM is created with the same structure as IMAGE,
+ except that data array will only have one dimension, and if
+ IMAGE has Y-axis information, this will be omitted.  Any X-axis
+ information will be copied unchanged.
+
+                               DJA / AAO 10th July 1987
+.endhelp

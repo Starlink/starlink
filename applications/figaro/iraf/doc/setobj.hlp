@@ -1,0 +1,49 @@
+.help setobj Starlink figaro
+.nf
+ SETOBJ - Assign value to an HDS primitive
+
+
+Usage
+
+ setobj value object
+
+Description
+
+ This routine assigns a specified (numeric or string) value to an
+ existing HDS primitive. The destination object must exist. It can
+ be a primitive scalar or a cell in a primitive array.
+
+Parameters
+
+
+VALUE
+
+ The value the scalar primitive HDS object is to assume.
+
+OBJECT
+
+ The HDS object to be modified. Specify beginning with directory
+ and file name in the syntax of the operating system, followed by
+ the dot-separated structure hierarchy. Elements of structure
+ arrays are specified in ordinary brackets ().
+
+Examples
+
+ 1.  setobj value=90. object=file.MORE.FIGARO.TIME
+   Store the number or string 90 in the existing scalar HDS
+   object MORE.FIGARO.TIME in the file "file".
+
+
+See_also
+
+ FIGARO: CREOBJ, COPOBJ, DELOBJ, RENOBJ.
+ KAPPA: ERASE.
+
+Authors
+
+ KS: Keith Shortridge (AAO)
+
+ HME: Horst Meyerdierks (UoE, Starlink)
+
+ JFL: John Lightfoot (ROE)
+.endhelp

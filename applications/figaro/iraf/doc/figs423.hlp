@@ -1,0 +1,72 @@
+.help figs423 Starlink figaro
+.nf
+ FIGS423 - Process a FIGS image-mode hypercube down to a cube
+
+
+Description
+
+ Given an image mode FIGS data hypercube, produces a cube,
+ in which all the data from a selected range of cycles has
+ been summed.  The data hypercube may have been sorted into
+ wavelength order (by the program FIGS424) or it may be raw
+ data as produced by the acquisition system.  In general, it
+ will be better to sort the data before applying FIGS423.
+
+Parameters
+
+
+HCUBE
+
+ The name of an image mode FIGS data hypercube,
+ as produced by the FIGS data acquisition system
+ or as sorted by FIGS424.
+
+CYSTART
+
+ The first cycle number to be included in the
+ output data cube.
+
+CYEND
+
+ The last cycle number to be included in the
+ output data cube.
+
+CUBE
+
+ The name of the resulting cube.
+ FIGS423 always generates a new image file.
+
+Source_comments
+
+ F I G S 4 2 3
+
+ Given a FIGS image mode data hypercube, either sorted into
+ wavelength order (e.g. by FIGS424) or not, sums all the cycles
+ and wavelength planes within a specified wavelength range
+ to produce an image.  Note that it is probably best to have
+ performed the wavelength sort first.
+
+ Command parameters -
+
+ 'HCUBE'    (Character) The name of the hypercube to be processed.
+ 'CYSTART'  (Integer) The first cycle to be included.
+ 'CYEND'    (Integer) The last cycle to be included.
+ 'CUBE'     (Character) The name of the resulting cube..
+
+ Input data -
+
+ This routine assumes that the first axis of the hcube data
+ represents wavelength, that the second and third represent the
+ X and Y dimensions of the image (this is an unfortunate,
+ since it means that the .X axis of the hypercube represents
+ wavelength, the .Y represents the image X axis and so forth)
+ and the fourth axis represents scan cycle number.
+
+ Output data -
+
+ CUBE is created with the same structure as HCUBE
+ except that the dta array will only have 3 dimensions, and any
+ AXIS(4) sub-structures that HCUBE has will be deleted.
+
+                                 KS / AAO 19th May 1986
+.endhelp

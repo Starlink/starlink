@@ -1,0 +1,129 @@
+.help comb Starlink figaro
+.nf
+  COMB - Corrects for S-distortion using continua
+
+
+Description
+
+   This is a program to correct data for s-distortion by moving data in
+  the cross-section direction to line it up for a comb of continua
+  spectra.This correction is then applied to the data itself. A comb
+  dekker is used to produce about ten continuum spectra across an image
+  (this is done at the telescope). This image is then used by the
+  program:- The program requests two adjacent "teeth" to be marked, it
+  locates the remaining teeth and follows them along the image (in the
+  channel direction), finding the line centres by fitting gaussians. The
+  points so obtained are fitted with Chebyshev polynomials (for each
+  tooth), The intermediate positions are interpolated from these, which
+  are then used to evaluate the required movement for each data point.
+  The coefficients are written to a file which may then be read by the
+  program to apply correction to the actual data.
+  Alternatively if QUICK is specified centriods are used rather than
+  Gaussians.
+
+Parameters
+
+
+IMAGE
+
+    IMAGE = FILE (Read)
+        Name of image for input
+          This should be a file containing continua spectra.
+
+ARC_OPTS
+
+    ARC_OPTS = CHARACTER (Read)
+        Enter arc fit option
+          NEW    : set up a new wavelength calibration
+          REPEAT : Itterate on previous calibration.
+          CLONE  : CLone a previous calibration.
+          OLD    : Correct using previous results
+
+OUTPUT
+
+    OUTPUT = FILE (Write)
+        Name of output file
+           File to contain corrected data.
+
+XSTART
+
+    XSTART = INTEGER (Read)
+        analysis lower limit
+            The data between the limits xstart and xend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+XEND
+
+    XEND = INTEGER (Read)
+        analysis upper limit
+            The data between the limits xstart and xend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+XBLOCK
+
+    XBLOCK = INTEGER (Read)
+        Enter averaging width in channels
+            Each window is of this width (except perhaphs the final one).
+
+ITERATION
+
+    ITERATION = INTEGER*2 (Read)
+        New value of iteration
+
+LEVEL
+
+    LEVEL = REAL (Read)
+        Level of edge of tooth
+
+ORDER
+
+    ORDER = INTEGER (Read)
+        order for polynomial fitting
+          This is for the continuity correction of the data. Idealy the
+          arc should have been pre-processed with ARCSDI, so a low
+          order e.g. 2 should be used.
+
+MAXLINES
+
+    MAXLINES = INTEGER (Read)
+        Maximum number of lines to allow room for
+          This must be greater than or equal to the number of lines
+          fitted, so room should be allowed in case any more are
+          to be added later.
+
+CLFILE
+
+    CLFILE = FILE (Read)
+        Name of image for cloning from
+          This should be a file containing an arc spectrum.
+
+TOLS
+
+    TOLS = CHARACTER (Read)
+        For use in batch only
+
+KEEP_ITT
+
+    KEEP_ITT = LOGICAL (Read)
+        keep itteration files?
+
+QUICK
+
+    QUICK = LOGICAL (Read)
+        Centriod rather than fit gaussians?
+
+PRFITS
+
+    PRFITS = LOGICAL (Read)
+        Print out details of fitting
+
+PLOTCORR
+
+    PLOTCORR = LOGICAL (Read)
+        Plot correction?
+
+Source_comments
+
+  none available
+
+.endhelp

@@ -1,0 +1,71 @@
+.help iconv3 Starlink figaro
+.nf
+ ICONV3 - Convolve an image with a 3x3 convolution kernel
+
+
+Description
+
+ ICONV3 convolves an image with a 3x3 symmetric convolution
+ kernel, defined by its central value and its edge value.  So
+ the image is convolved with a 9 element array that has the 8
+ edge elements all set to one value and the central element to
+ another.  For example, CENTER=-9, EDGE=-1 is a highpass filter,
+ CENTER=0.1, EDGE=0.1 would be a lowpass filter, while CENTER=8,
+ EDGE=-1 would be a Laplacian edge enhancement filter.
+
+Parameters
+
+
+IMAGE
+
+ The image to be filtered.
+
+CENTER
+
+ Central value of 3x3 convolution array.
+
+EDGE
+
+ Edge value of 3x3 convolution array.
+
+OUTPUT
+
+ The name of the resulting filtered image.  This may
+ be the same as IMAGE, in which case the filtering
+ will be performed in situ, or different, in which
+ case a new file will be created.
+
+See_also
+
+ FIGARO: ISMOOTH, IXSMOOTH, MEDFILT.
+ KAPPA: CONVOLVE, FFCLEAN, GAUSMOOTH, MEDIAN.
+
+Source_comments
+
+ I C O N V 3
+
+ Convolves an image with a 3x3 symmetric convolution kernel.
+ This allows a variety of spatial filters to be applied to
+ an image.  The 3 by 3 array convolved with the image is defined
+ by two values, the central value and the single value used
+ for the eight edge elements.  That is, if C is the central and
+ E the edge value, the kernel array looks like
+
+                   E  E  E
+                   E  C  E
+                   E  E  E
+
+ Command parameters -
+
+ IMAGE    The name of the structure containing the image.
+
+ CENTER   The value for the kernel central element.
+
+ EDGE     The value for the kernel edge element.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+                                  KS / AAO 30th Oct 1987
+.endhelp

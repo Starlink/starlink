@@ -1,0 +1,47 @@
+.help fitskeys Starlink figaro
+.nf
+ FITSKEYS - List the FITS keywords in a data file
+
+
+Description
+
+ FITSKEYS lists all the items in the FITS-specific sub-structure
+ associated with a specified data structure.
+
+Parameters
+
+
+INPUT
+
+ INPUT can be any Figaro structure.  If it has any
+ items in a FITS substructure, these are listed.
+
+See_also
+
+ FIGARO: RDFITS, WDFITS.
+ KAPPA: FITSDIN, FITSIN, FITSHEAD, FITSIMP, FITSLIST.
+
+Source_comments
+
+ F I T S K E Y S
+
+ Name: FITSKEYS
+
+ Function:
+    List the contents of a FITS-specific structure.
+
+ Description:
+    This Figaro program lists all the items in the FITS-specific
+    substructure associated with a data structure.  It doesn't
+    give any information that can't be obtained using hdstrace, but
+    it presents it in a more convenient form, especially when the
+    structure contains multiple comment keywords.
+
+ Command Parameters:
+    INPUT     (Character) Name of structure whose FITS substructure
+              is to be listed.
+
+ Command keywords: None.
+
+ K. Shortridge, AAO
+.endhelp

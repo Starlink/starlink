@@ -1,0 +1,203 @@
+.help iarc Starlink figaro
+.nf
+ IARC - Given fit to single spectrum, fit all spectra in a 2-D arc
+
+
+Description
+
+ The manual arc line fitter, ARC, can be used to fit a single
+ spectrum obtained by summing successive cross-sections taken
+ from the center of a 2-D arc.  IARC will then apply that fit
+ to all the rows in the 2-D arc, starting from the center and
+ working out in both directions.
+
+Parameters
+
+
+IMAGE
+
+ EXTRACT can be used to sum cross-sections from the
+ center of a 2-D arc - an image containing a set of arc
+ spectra (a long-slit arc).  ARC can then be used to fit
+ them, producing a list of identified arc lines, channel
+ number & wavelengths.  IARC can then use this fit - in
+ the file ARLINES.LIS - as a starting point for a fit to
+ each of the cross-sections in the 2-D arc in the file
+ whose name is given by IMAGE.
+
+RSTART
+
+ Normally, IARC starts in the center - where the initial
+ fit should be best - and works its way out.  RSTART is
+ the cross-section (or row) at which it starts, and should
+ normally be the central cross-section of those summed to
+ produce the arc spectrum used in the initial ARC fit.
+
+RWIDTH
+
+ IARC can sum consecutive rows of a 2-D arc, instead of
+ fitting each row individually.  Increasing RWIDTH will
+ speed up the fitting, since it reduced the number of
+ spectra fitted, and may reduce the number of lines that
+ get rejected, since the signal to noise ratio in the
+ summed rows will be improved.  However, it will degrade
+ the smooth progression from one row to the next, and may
+ make the lines broader.
+
+FILE
+
+ The results of the 2-D fit are written to a file in a
+ form suitable for use by the image scrunchers, ISCRUNCH
+ and ISCRUNI.  For ISCRUNCH the default name is usually
+ satisfactory.  For ISCRUNI you may want to exercise more
+ control over the process and the files used.
+
+RSIGMA
+
+ Normally, you should use the same sigma (the line width
+ parameter) for IARC as was used for the original ARC fit,
+ and this is always the default.  However, IARC is a
+ little more tolerant in searching for lines than is ARC,
+ and there may sometimes be a case for using a slightly
+ lower value of sigma, especially if the arc lines are
+ very close together.
+
+SPREAD
+
+ IARC normally searches for lines in a new cross-section
+ in two steps, once with a larger sigma than that specified
+ in order to make it less likely to loose lines that may
+ be a little further away than expected, and then with
+ the specified sigma in order to tighten up the centering.
+ Setting SPREAD=NO will disable this feature and the search
+ will be performed once, with the specified sigma.
+
+GAP
+
+ If IARC fails to find a line, it will use the position
+ it had previously for the line.  If the line is missing
+ a specified number of times, however, it is deleted from
+ the line list.  This maximum number of times is specified
+ by GAP.  The correct setting for GAP depends on the nature
+ of the arc - an arc with high distortion should have a low
+ GAP value to avoid lines becomming confused.  If distortion
+ is low but several cross-sections are missing or have poor
+ data, GAP should be higher to let IARC 'jump' over them.
+
+SIGMIN
+
+ SIGMIN is a measure of the strength of an arc line.  When
+ the program searches for lines to use as 'lock' lines, it
+ evaluates their sigma - here the line height as a multiple
+ of the square of the local continuum.  Any line for which
+ this value is less than SIGMIN will not be used.
+
+XCORR
+
+ If XCORR is set, IARC will attempt to determine a linear
+ shift between successive spectra using cross-correlation
+ and will apply this to the arc lines found in the previous
+ spectrum before looking for them in the new spectrum. This
+ is particularly applicable to fibre data, where such linear
+ shifts often occur.  It is probably not useful for cases
+ such as image tube distortion, where the spectra should
+ change in a constant manner.
+
+DETAIL
+
+ If DETAIL is set, IARC will list the details line position,
+ wavelength, fitted wavelength, error) for each line fitted.
+ This is a lot of information, and is not normally useful.
+
+LOCK
+
+ If the original fit has regions where there are strongish
+ lines that have not been identified, it may help to use
+ their positions to lock down the fit in those regions.  This
+ does not improve the fit, since the wavelengths are simply
+ assumed to be those given by the original fit, but the
+ automatic fits will not be so free to wiggle in these regions.
+ However, you have to be careful not to get a large number of
+ weak lines that dominate the fit at the expense of stronger
+ lines that were positively identified.
+
+Source_comments
+
+ I A R C
+
+ Performs a 2-D fit to an arc spectrum, given an initial fit
+ to a single arc spectrum as a starting point.  Generally, the
+ starting spectrum will have been extracted from the center of the
+ 2-D arc.  IARC then starts at a suitable cross-section in the
+ 2-D arc - usually the central one - and works out from there,
+ fitting each cross-section individually, looking for the lines in
+ the starting spectrum.  For each line, the program looks for a
+ peak close to where it was found in the previous fit.  If a line
+ does not show up in one cross-section, the previous position will
+ be used, but if it fails to show up in the next cross-section, it
+ will be dropped from the search list.  In many cases, there may be
+ strong lines which were not indentified; these cannot be used to
+ improve the fit, but they can be used to 'lock' it down in the
+ regions where there are few or no identified lines.
+
+ Command parameters -
+
+ IMAGE     (Character) The name of the image containing the 2-D arc.
+ RSTART    (Numeric) The starting cross-section to be used.
+ RWIDTH    (Numeric) The number of cross-sections to be added
+           together for each fit - if the arc is weak, this will
+           need to be increased.
+ RSIGMA    (Numeric) Normally, the sigma value from the arc line
+           file is used, but this can be overidden by RSIGMA.
+ GAP       (Numeric) Number of cross sections over which IARC can
+           fail to find a line before deleting it from the lists.
+ FILE      (Character) The name of the file to which the results
+           are to be written.  If an extension is not given, .IAR
+           will be used.
+ SIGMIN    (Numeric) The minimum acceptable value for the sigma of
+           an arc line found in the locking process.  Sigma here is
+           the height of the line relative to the square root of the
+           continuum.  Only used if LOCK set.
+
+ Command keywords -
+
+ LOCK      Indicates that a search is to be made for lines to
+           'lock' the fit.
+ SPREAD    Indicates that IARC looks for lines first with an
+           increased sigma, then with the specified sigma in order
+           to refine the fit.  If SPREAD is not set, the search
+           is just with the specified sigma value.
+ DETAIL    Indicates that full details of the fits are to be output
+           (This is mainly a diagnostic tool.)
+ XCORR     If set, IARC will attempt to determine a linear shift
+           between successive spectra using cross-correlation. This
+           is particularly applicable to fibre data, where such linear
+           shifts may occur. It is probably not useful for cases such
+           as image tube distortion, where the spectra should change
+           in a constant manner.
+
+ User variables used -
+
+ (<) IARC_WMAX   (Numeric) Maximum wavelength for any of the spectra.
+ (<) IARC_WMIN   (Numeric) Minimum     "       "   "  "   "    "
+
+ Input files -
+
+ ARLINES.LIS   Contains the details of the starting fit.  For format
+               details see comments for subroutine ARGETL, or the
+               ARC command.
+
+ Output files -
+
+ As named by   Contains the details of the 2-D fit.  Format :
+ the FILE      Name of image, (24X,A).
+ parameter.    Dimensions, NX, NY (17X,I5,4X,I5).
+               # rows not fitted properly, (42X,I5).
+               Maximum RMS error, (20X,F10.2).
+               Maximum order used, - ORDER - (33X,I3).
+               Then, for each row, row number and ORDER+1 polynomial
+               coefficients, the constant term being the last
+               non-zero term.  (I14,10X,2D24.16,3(/3D24.16)).
+
+                                KS / CIT  15th June 1984
+.endhelp

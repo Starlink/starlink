@@ -1,0 +1,108 @@
+.help icset Starlink figaro
+.nf
+ ICSET - Set a selected region of an image to a constant value
+
+
+Description
+
+ ICSET sets a specified region in an image to a constant value.
+ This is a modification of NCSET to operate on a 2-D image, and is
+ a non-interactive version of CSET, which allows the region
+ to be specified precisely in terms of the X-values of the data.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image to be modified by NCSET.
+ It should be a 2-dimensional array.
+
+YSTART
+
+ The first Y value to be set to the constant,
+ in units used by the data - angstroms, for example, if the
+ data is wavelength calibrated.  RESET will set YSTART to the
+ first Y value in the data.
+
+YEND
+
+ The last Y value to be set to the constant,
+ in units used by the data - angstroms, for example, if the
+ data is wavelength calibrated.  RESET will set YEND to the
+ last Y value in the data.
+
+XSTART
+
+ The first X value to be set to the constant,
+ in units used by the data - angstroms, for example, if the
+ data is wavelength calibrated.  RESET will set XSTART to the
+ first X value in the data.
+
+XEND
+
+ The last X value to be set to the constant,
+ in units used by the data - angstroms, for example, if the
+ data is wavelength calibrated.  RESET will set XEND to the
+ last X value in the data.
+
+CONSTANT
+
+ The selected region of the image (from XSTART to
+ XEND) will be set to CONSTANT. No noise added on this
+ level.
+
+OUTPUT
+
+ NCSET generates an output file that is essentially the
+ data from the input image, with one region set to the
+ constant (user-specified) value.  OUTPUT is the name of
+ the resulting spectrum.
+
+See_also
+
+ FIGARO: CSET, NCSET, TIPPEX.
+ KAPPA: CHPIX, FILLBAD, SEGMENT, NOMAGIC, RIFT, SETMAGIC, ZAPLIN.
+
+Source_comments
+
+ I C S E T
+
+ Figaro function to set a selected region of an image to a constant
+ value.  This is a modification of the standard FIGARO program
+ NCSET to handle 2-D data arrays (which in turn is a non-interactive
+ version of CSET, but has the possible advantage of allowing the
+ region to be specified precisely in terms of the X values of the
+ data).
+
+ This program overcomes the limitations of CLEAN or BCLEAN (qv)
+ which inherently assume the data to be modified is in the rows
+ of the input array. This may not be the case for CCD images, and
+ certainly not for 2-D spectra where modification of data over a
+ specified wavelength region is most often required.
+
+ USES:
+
+ Anticipated uses are patching out of dud columns in a CCD image,
+ or removal of data over a specified wavelength range (whose X
+ limits are supplied by the user). The latter may be used to remove
+ residuals after less-than-perfect sky subtraction.
+
+ Command parameters -
+
+ IMAGE       (Character) The image to be modified.
+ YSTART      (Numeric) The Y-value of the start of the region.
+ YEND        (Numeric) The Y-value of the end of the region.
+ XSTART      (Numeric) The X-value of the start of the region.
+ XEND        (Numeric) The X-value of the end of the region.
+ VALUE       (Numeric) The value to use for the selected region.
+ OUTPUT      (Character) The name of the output file to
+             be created.  If this is the same as the input
+             image, the data will be modified in situ.
+
+ Command keywords - None
+
+ User variables used -  None
+
+                                          KS / CIT 27th March 1985
+.endhelp

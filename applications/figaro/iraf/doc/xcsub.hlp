@@ -1,0 +1,54 @@
+.help xcsub Starlink figaro
+.nf
+ XCSUB - Subtracts a constant from the X data in a file
+
+
+Description
+
+ Subtracts a constant value from each X-axis value in a datafile.
+
+Parameters
+
+
+IMAGE
+
+ Image with X data to be subtracted from.
+
+FACTOR
+
+ Constant to be subtracted from data.
+
+OUTPUT
+
+ Name of resulting image.
+
+Source_comments
+
+ I C O N S T
+
+ This routine is the main body of ICMULT,ICDIV,ICADD and ICSUB,
+ and of XCMULT, XCDIV, XCADD and XCSUB.  The Ixxxx routines
+ operate on the data in an image, the Xxxx routines operate on
+ the data in the X array of the input file.
+ ICMULT multiplies an image by a constant.  Since the constant
+ can be less than 1., this function will also divide an
+ image by a constant, but ICDIV saves the caller from having
+ to calculate a reciprocal. ICADD adds a constant to an image and
+ ICSUB subtracts a constant from an image.
+
+ Command parameters -
+
+ IMAGE  (Character) The name of the structure containing the image.
+        Uses main data array, or the x-axis data for the XCxxx routines.
+
+ FACTOR (Numeric) The value of the constant factor.
+
+ OUTPUT (Character) The name of the result of the operation.  This
+        can be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ The command name is used to distinguish between the
+ possible operations.
+                                  KS / CIT 12th June 1984
+.endhelp

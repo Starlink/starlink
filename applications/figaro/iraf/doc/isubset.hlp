@@ -1,0 +1,83 @@
+.help isubset Starlink figaro
+.nf
+ ISUBSET - Produces a subset of an image
+
+
+Description
+
+ ISUBSET takes a subset of an image.  The result is a new image
+ which is a rectangular subset of the original data.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image from which a subset
+ is to be taken.  IMAGE may be 1 or 2 dimensional.
+
+YSTART
+
+ The value of the Y-coordinate for the first
+ pixel in the input image to be included in the subset.
+ Note that the subsetting is done on a whole pixel basis,
+ so the resulting subset may not begin exactly on YSTART,
+ but will start with the first pixel that covers that
+ Y value.
+
+YEND
+
+ The value of the Y-coordinate for the last
+ pixel in the input image to be included in the subset.
+ Note that the subsetting is done on a whole pixel basis,
+ so the resulting subset may not end exactly on YEND,
+ but will end with the first pixel that covers that
+ Y value.
+
+XSTART
+
+ The value of the X-coordinate for the first
+ pixel in the input image to be included in the subset.
+ Note that the subsetting is done on a whole pixel basis,
+ so the resulting subset may not begin exactly on XSTART,
+ but will start with the first pixel that covers that
+ X value.
+
+XEND
+
+ The value of the X-coordinate for the last
+ pixel in the input image to be included in the subset.
+ Note that the subsetting is done on a whole pixel basis,
+ so the resulting subset may not end exactly on XEND,
+ but will end with the first pixel that covers that
+ X value.
+
+OUTPUT
+
+ The name of the resulting subset image.  If
+ this is different to IMAGE, then a new file will be
+ created, with everything bar the data a copy of the
+ original image.  If OUTPUT is the same as IMAGE, then
+ the input file will be modified to contain just a subset
+ of its original data.
+
+Source_comments
+
+ I S U B S E T
+
+ Creates a subset of an image.
+
+ Command parameters -
+
+ IMAGE  (Char) The name of the structure containing the image.
+ YSTART (Numeric) The AXIS(2) value for the start of the subset.
+ YEND   (Numeric) The AXIS(2) value for the end of the subset.
+ XSTART (Numeric) The AXIS(1) value for the start of the subset.
+ XEND   (Numeric) The AXIS(1) value for the end of the subset.
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+                                  KS / CIT 19th June 1984
+.endhelp

@@ -1,0 +1,55 @@
+.help xcopy Starlink figaro
+.nf
+ XCOPY - Copy X-info (e.g. wavelengths) into a spectrum
+
+
+Description
+
+ Copies the axis information from one datafile (typically an
+ arc) into another (typically some other spectrum).  The
+ result is either a modified version of the second datafile,
+ or a new datafile.
+
+Parameters
+
+
+SPECTRUM
+
+ File requiring X data.
+
+ARC
+
+ File containing X data.
+
+OUTPUT
+
+ Name of resulting file.
+
+Source_comments
+
+ X C O P Y
+
+ Copies the axis information from one Figaro data structure
+ (typically an arc) into another data structure (typically
+ some other spectrum).  The result is either a modified version
+ of the other data structure, or a new structure.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The file name of the spectrum whose
+             data is to be combined with the axis data from the
+             arc.
+
+ ARC         (Character) The file name of the arc spectrum - i.e.
+             the spectrum whose axis information is to be used.
+
+ OUTPUT      (Character) The file name for the resulting data
+             structure.  If this is the same as SPECTRUM, the
+             axis data in SPECTRUM will be changed in situ.
+
+ Command keywords - None
+
+ User variables used - None
+
+                                         KS / CIT 7th June 1983
+.endhelp

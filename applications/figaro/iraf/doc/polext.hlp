@@ -1,0 +1,77 @@
+.help polext Starlink figaro
+.nf
+ POLEXT - Extract fibre spectra from an image after a FINDSP analysis
+
+
+Description
+
+ POLEXT extracts a set of fibre spectra from a fibre image, given
+ a file (usually produced by FINDSP) that gives the positions and
+ shapes of the fibre spectra in terms of a set of fitted polynomials
+
+Parameters
+
+
+IMAGE
+
+ The name of the image that contains the fibre
+ spectra to be extracted.
+
+PFILE
+
+ The name of a file (usually produced by
+ FINDSP) that contains the polynomials fitted to the
+ spectra to be extracted.  If no extension is specified,
+ .POL is assumed.
+
+DFILE
+
+ The name of a file that lists any dud fibres - fibres to
+ be ignored in the extraction process.  If no extension is
+ specified, .DUD is assumed.  If there are no dud fibres,
+ DFILE can be specified as blank - which may mean specifying
+ it as " " (a blank within quotes).
+
+EXTWIDTH
+
+ The polynomial file is used to determine the positions of
+ the centres of all the fibre spectra.  EXTWIDTH is used to
+ specify the width of the spectra, and is specified in
+ pixels.  Note that this does not have to be an integer.
+
+OUTPUT
+
+ The name of the resulting fibre image.  Each
+ cross-section of OUTPUT is a single exctracted fibre
+ spectrum.
+
+Source_comments
+
+ P O L E X T
+
+ Given an image containing Fibre data, and a polynomial file
+ (produced, probably, by FINDSP) that gives the positions of the
+ centres of the spectra, POLEXT extracts the spectra to produce
+ a new image in which each cross-section is one of the fibre
+ spectra.
+
+ Command parameters -
+
+ IMAGE     (Character) The name of the image containing the
+           distorted fibre spectra.
+ PFILE     (Character) The name of the polynomial file that
+           describes the fibre positions.  Default extension
+           is .POL
+ DFILE     (Character) The name of an optional dud fibre file
+           that lists the numbers of any dud fibres.  If blank,
+           no file is used.  Default extension is .DUD.  If the
+           file cannot be opened, this is not regarded as a
+           fatal error, so it is possible to specify a
+           non-existent file, such as 'NONE'
+ EXTWIDTH  (Real) The width of the spectra in pixels.
+ OUTPUT    (Character) The name of the resulting image.
+
+ Command keywords - None
+
+ Original version by John Lucey (JRL), AAO
+.endhelp

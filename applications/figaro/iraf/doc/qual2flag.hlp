@@ -1,0 +1,65 @@
+.help qual2flag Starlink figaro
+.nf
+ QUAL2FLAG - Converts a quality array into `flagged' values
+
+
+Description
+
+ QUAL2FLAG turns a Figaro file that holds data quality information in
+ a quality array (or as combination of a quality array with flagged
+ data values) into one that holds the data quality information solely
+ in the form of flagged data values. Generally, Figaro programs
+ prefer to work with quality arrays - which allow the original data
+ values to be kept available even though the data element is
+ indicated as being bad through the quality array - but there are
+ some programs that may prefer to work with flagged data values and
+ these will run more efficiently on data that is actually held in
+ that form on disk. Having both forms of data quality information
+ in a file can be confusing and QUAL2FLAG can tidy things up.
+
+Parameters
+
+
+INPUT
+
+ The name of a Figaro format file that
+ contains an associated quality array. It may also have
+ some data elements flagged using 'flagged' (or 'magic')
+ data values. Whatever it contains, QUAL2FLAG will process it
+ so that the resulting file does not have a quality array,
+ and all quality information will be held in the form of
+ flagged data values in the main data array.
+
+OUTPUT
+
+ The name of the resulting file. This can
+ be the same as the input file, in which case all changes are
+ made in situ. The resulting file will have all its data
+ quality information held as flagged data values in its
+ main array, and will not have a quality array.
+
+Source_comments
+
+ Q U A L 2 F L A G
+
+ Description:
+    This is a Figaro program that removes the quality array from a
+    Figaro data file. If the quality array indicated that any of
+    the data array elements were bad, then those elements of the
+    main data array are set to the 'flagged' or 'magic' value. Note
+    that this replaces the previous value in the data array, which is
+    therefore left - so this process can remove information from the
+    file, which is why Figaro tends to prefer the use of quality
+    arrays rather than flagged data arrays.
+
+ Command parameters:
+
+    INPUT  (Character) The name of the structure containing the data.
+
+    OUTPUT (Character) The name of the result of the operation.  This
+           can be the same as for INPUT.  If not, a new structure
+           is created, with everything but the data a direct
+           copy of the input.
+
+    12th Feb 1995  KS / AAO.  Original version.
+.endhelp

@@ -1,0 +1,31 @@
+.help cadd Starlink figaro
+.nf
+ CADD - Add back fitted continuum
+
+
+Description
+
+  A polynomial previously fitted to the continuum is evaluated and
+  this is added.
+
+Parameters
+
+
+IMAGE
+
+    IMAGE = FILE (Read)
+        Name of image for input
+
+OUTPUT
+
+    OUTPUT = FILE (Write)
+        OUTput Name of output file
+        OUTPUT is the name of the resulting spectrum. If OUTPUT is the
+        same as INPUT the data in the input file will be modified in
+        situ.Otherwise a new file will be created.
+
+Source_comments
+
+  none available
+
+.endhelp

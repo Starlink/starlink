@@ -1,0 +1,249 @@
+.help echmask Starlink figaro
+.nf
+ ECHMASK - Produce an extraction mask from an SDIST analysis
+
+
+Description
+
+ The program reads a file that identifies where the orders are in
+ the image and sets the values in the mask to be zero if that pixel
+ in the mask does not lie in an order and to a number derived from
+ the order number otherwise (see below). It is guaranteed that
+ every order is extracted using the same number of rows, but of
+ course the position of these rows may vary along an order so one
+ can expect visible jumps in the extracted data, especially if too
+ fews rows are extracted to take all the data from the object.
+
+ The coefficient file will normally have been written by SDIST and
+ if so must have been written by the version of SDIST that was
+ modified to support ECHMASK.
+
+ The PERISCOPE keyword (see below) determines whether each order
+ has two separate parts (corresponding to object and sky and due to
+ the special periscope that samples object and sky at a wide
+ spacing and brings them together on the slit) or one part
+ corresponding simply to the slit).  The data values in the mask
+ are 10 * (true order number) + (sub-order number) where the
+ sub-order number is 0 if there is no periscope fitted, 1 if this
+ is the first part of an order and 2 if this is the second part of
+ the order. The "first" and "second" parts of an order are defined
+ so that the actual data values in the mask are monotonic along a
+ vertical slice through it, i.e. they might go 412, 411, 402, 401 if
+ the periscope is fitted and they might go 410, 400 if it is not
+ fitted.
+
+ If PERISCOPE is NO then the user has the option of splitting
+ the data in an order into object and up to two separate regions of
+ sky. The object is assigned sub-order 1 and the sky is assigned
+ sub-order 2. Note that this assignment may differ from when
+ PERISCOPE is yes, since in that case there is no guarantee that
+ sub-order 1 is object - it may be sky!  There may be room for
+ enhancement here.
+
+
+Parameters
+
+
+COFILE
+
+ The name of the file that contains details of where the orders
+ lie within the raw input image.  It will normally have been
+ created by SDIST.  Note that it is necessary to use a version
+ of SDIST that has been specially modified to write details of
+ the dimensions of the input image and of the widths of the orders.
+
+PERISCOPE
+
+ It is possible to fit a periscope to the spectrograph that
+ collects object and sky light from widely separated areas of
+ the sky and brings them together in a single order separated
+ by at least one blank row. If the periscope is fitted the
+ program must be told so that it knows that each order actually
+ looks like two orders in the raw data. When the periscope is
+ fitted it is the user's responsibility to ensure that the
+ first two "orders" listed in the coefficient file are indeed
+ an object / sky pair. If this is not obvious, look at an arc
+ image.
+
+OBJWIDTH
+
+ The same number of rows will be extracted from each order.
+ This is necessary to preserve counts in the extracted echell-
+ ograms. You can either specify the number explicitly or else
+ specify zero, in which case a sensible number will be derived
+ from the information in the coefficient file - assuming that
+ there are enough orders, the width of the third widest will be
+ used. In this casem if a non-zero value for OBJOFFSET is spec-
+ ified, twice this value will be extracted from OBJWIDTH so
+ as to ensure that the extracted rows lie within the order.
+
+OBJOFFSET
+
+ The centre of the order corresponds to the centre of the slit.
+ If the object is not centred on the slit, you can specify an
+ offset (which is a floating point number) from the centre. A
+ positive offset corresponds to a higher Y value (i.e. a position
+ further up the image when displayed in conventional orientation).
+
+S1WIDTH
+
+ Up to two regions of sky can be defined. Each is defined in a
+ similar manner to the object except that the offset is an off-
+ set from the centre of the object and not from the centre of
+ the order.
+
+S1OFFSET
+
+ Up to two regions of sky can be defined. Each is defined in a
+ similar manner to the object except that the offset is an off-
+ set from the centre of the object and not from the centre of
+ the order.
+
+S2WIDTH
+
+ Up to two regions of sky can be defined. Each is defined in a
+ similar manner to the object except that the offset is an off-
+ set from the centre of the object and not from the centre of
+ the order.
+
+S2OFFSET
+
+ Up to two regions of sky can be defined. Each is defined in a
+ similar manner to the object except that the offset is an off-
+ set from the centre of the object and not from the centre of
+ the order.
+
+MSTART
+
+ This is the order number of the first order whose fit is
+ listed in the coefficient file. Conventionally this should
+ be the order with the smallest Y value and is the order with
+ the highest order number.
+
+MDELTA
+
+ This is the increment to the order number as the orders listed
+ in the coefficient file are processed. Conventionally, if the
+ first order is that with the lowest Y value, the increment
+ will be -1.
+
+MASK
+
+ This file will be created and will have the same dimensions
+ as the raw input image. Areas where there are no orders will
+ have zero data values and areas that are deemed to lie within
+ an order will have a data value of 10 * (order number) +
+ sub-order number) where "sub-order number" is 1 or 2. When
+ the periscope is fitted the sub-order number is 2 for the
+ first "order" of each pair and 1 for the second one. Otherwise
+ it is always 1 for object and 2 for sky. The MASKEXT program
+ can be used to generate an exhellogram from this mask and the
+ raw input image and it permits selection of which sub-orders
+ to extract (one, the other or both).
+
+Source_comments
+
+ E C H M A S K
+
+ Program name:
+    ECHMASK
+
+ Function:
+    Write a mask image that can be used for quick-look extraction of
+    orders from a raw echelle image.
+
+ Description:
+    The program reads a file that identifies where the orders are in
+    the image and sets the values in the mask to be zero if that pixel
+    in the mask does not lie in an order and to a number derived from
+    the order number otherwise (see below). It is guaranteed that
+    every order is extracted using the same number of rows, but of
+    course the position of these rows may vary along an order so one
+    can expect visible jumps in the extracted data, especially if too
+    fews rows are extracted to take all the data from the object.
+
+    The coefficient file will normally have been written by SDIST and
+    if so must have been written by the version of SDIST that was
+    modified to support ECHMASK.
+
+    The PERISCOPE keyword (see below) determines whether each order
+    has two separate parts (corresponding to object and sky and due to
+    the special periscope that samples object and sky at a wide
+    spacing and brings them together on the slit) or one part
+    (corresponding simply to the slit).  The data values in the mask
+    are 10 * (true order number) + (sub-order number) where the
+    sub-order number is 0 if there is no periscope fitted, 1 if this
+    is the first part of an order and 2 if this is the second part of
+    the order. The "first" and "second" parts of an order are defined
+    so that the actual data values in the mask are monotonic along a
+    vertical slice through it, i.e. they might go 412, 411, 402, 401 if
+    the periscope is fitted and they might go 410, 400 if it is not
+    fitted.
+
+    If PERISCOPE is NO then the user has the option of splitting
+    the data in an order into object and up to two separate regions of
+    sky. The object is assigned sub-order 1 and the sky is assigned
+    sub-order 2. Note that this assignment may differ from when
+    PERISCOPE is yes, since in that case there is no guarantee that
+    sub-order 1 is object - it may be sky!  There may be room for
+    enhancement here.
+
+ Parameters:
+
+    (>) COFILE        (Character) The name of the coefficient file.
+                      Default SDIST.
+    (>) PERISCOPE     (Keyword) Whether or not the periscope is fitted.
+                      Default YES.
+    (>) OBJWIDTH      (Integer) The number of rows to be extracted on
+                      behalf of the object per order.  If PERISCOPE is
+                      YES then object and sky are not distinguished
+                      between and this width also applies to the sky.
+                      If PERISCOPE is NO then this width applies
+                      only to the object and the position of the sky
+                      is specified using the S1* and S2* parameters.
+                      If OBJWIDTH is specified as zero then the width
+                      information from the coefficient file is used to
+                      derive a sensible value. Default 0.
+    (>) OBJOFFSET     (Float) The offset of the centre of the object
+                      data from the centre of each order. If specified
+                      as being non-zero and if OBJWIDTH is zero, the
+                      derived width is adjusted to take account of the
+                      offset. Default 0.
+    (>) S1WIDTH       (Integer) The number of rows to be extracted on
+                      behalf of the first region of sky per order.
+                      This and the other S* parameters are prompted
+                      for only if PERISCOPE is NO. If specified as
+                      zero, it is assumed that no sky is to be
+                      extracted and the remaining S* parameters are
+                      not prompted for. Default 0.
+    (>) S1OFFSET      (Float) The offset of the centre of the first
+                      region of sky from the centre of the object data
+                      (not necessarily from the centre of the order).
+                      Default 0.
+    (>) S2WIDTH       (Integer) These parameters are the same as
+    (>) S2OFFSET      (Float)   S1WIDTH and S2OFFSET but they refer to
+                                the second region of sky if any.
+                                Defaults 0.
+    (>) MSTART        (Integer) The order number of the first
+                      "spectrum" in the coefficient file. Default 1.
+    (>) MDELTA        (Integer) +1 if order numbers increase as
+                      "spectrum number" increased, -1 otherwise.
+                      Default -1.
+    (<) MASK          (File) The name of the output mask image. This
+                      is created with only a .Z.DATA structure.
+                      Default MASK.
+
+ Language:
+    FORTRAN
+
+ External variables used:
+    None
+
+ Prior requirements:
+    None
+
+
+Authors
+
+ William Lupton, AAO
+.endhelp

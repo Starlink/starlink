@@ -1,0 +1,84 @@
+.help growx Starlink figaro
+.nf
+ GROWX - Performs reverse function to that of EXTRACT
+
+
+Description
+
+ Replicates a spectrum to form an image.  The source spectrum
+ runs along the X-axis.
+
+Parameters
+
+
+SPECTRUM
+
+ Spectrum to be 'grown' into image.
+
+IMAGE
+
+ Image to grow spectrum into.
+
+YSTART
+
+ First cross-section to copy spectrum into.
+
+YEND
+
+ Last cross-section to copy spectrum into.
+
+NEW
+
+ Force creation of a new image?
+
+YSIZE
+
+ Y-dimension of new image.
+
+Source_comments
+
+ G R O W
+
+ This is the main routine for the Figaro commands GROWX
+ and GROWY.  These both copy a spectrum into one or more
+ cross-sections of an image, GROWX copying into cross-
+ sections of constant AXIS(2), and GROWY copying into cross-
+ sections of constant AXIS(1).  The operation performed by GROWX
+ is the inverse of that performed by EXTRACT, and similarly
+ for GROWY and YSTRACT.
+
+ Command parameters:
+
+ SPECTRUM    (Character) The name of the input spectrum file.
+
+ IMAGE       (Character) The name of the image into which the
+             spectrum is to be copied.  If the image file does
+             not exist, or if NEW is set a new file is created
+             with all other data elements set to zero.
+
+ XSTART      (Numeric) The number of the first cross-section
+   or        into which the spectrum is to be copied.  XSTART
+ YSTART      is used by GROWY, YSTART by GROWX.
+
+ XEND        (Numeric) The number of the last cross-section
+   or        into which the sepctrum is to be copied.  XEND
+ YEND        is used by GROWY, YEND by GROWX.
+
+ XSIZE       (Numeric) If a new image has to be created, one
+   or        of its dimensions will be that of the spectrum, but
+ YSIZE       the other is unknown.  This has to be specified as
+             XSIZE (for GROWY) or YSIZE for GROWX.
+
+ Command Keywords:
+
+ NEW         Used to force the creation of a new image, even if
+             such an image exists already.
+
+ User variables used:  None
+
+ Error information:  Ignored.
+
+ Data quality information: Handled using flagged data values.
+
+                                         KS / CIT 19th Sept 1983
+.endhelp

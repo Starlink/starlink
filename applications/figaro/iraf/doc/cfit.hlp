@@ -1,0 +1,66 @@
+.help cfit Starlink figaro
+.nf
+ CFIT - Generate a spectrum using the cursor
+
+
+Description
+
+ Figaro function to generate a spectrum by interpolation
+ between points selected interactively using a display
+ device cursor.  CFIT assumes that a spectrum has already
+ been displayed by SPLOT, and will generate a new data
+ structure based on the spectrum displayed, with only the
+ data changed.
+
+Parameters
+
+
+OUTPUT
+
+ The name of the output file to be created.  If this is the same as
+ the displayed spectrum, the data in the displayed spectrum will be
+ modified.
+
+CHANGE
+
+ Set to mofify points.
+
+REDRAW
+
+ Set to redraw the original spectrum.
+
+Source_comments
+
+ C F I T
+
+ Figaro function to generate a spectrum by interpolation
+ between points selected interactively using a display
+ device cursor.  CFIT assumes that a spectrum has already
+ been displayed by SPLOT, and will generate a new data
+ structure based on the spectrum displayed, with only the
+ data changed.
+
+ Command parameters -
+
+ OUTPUT      (Character) The name of the output file to
+             be created.  If this is the same as the displayed
+             spectrum, the data in the displayed spectrum will
+             be modified.
+
+ Command keywords -
+
+ CHANGE      Set to mofify points.
+ REDRAW      Set to redraw the original spectrum.
+
+ User variables used -  (">" input, "<" output)
+
+ (>) TVFILE  The name of the displayed spectrum
+ (>) TVXST   The first displayed x-value
+ (>) TVXEN   The last displayed x-value
+ (>) TVHIGH  The maximum displayed y-value
+ (>) TVLOW   The minimum displayed y-value
+ (>) TVCOLOR The GRPLOT code for the plot colour
+ (>) SOFT    The device/type string defining the display device
+
+                                          KS / CIT 17th May 1983
+.endhelp

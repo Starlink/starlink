@@ -1,0 +1,211 @@
+.help abline Starlink figaro
+.nf
+ ABLINE - Interactive absorption line analysis
+
+
+Description
+
+ ABLINE is an interactive Figaro program whose main purpose is to
+ find wavelengths and equivalent widths of absorption lines.  It
+ includes the ability to fit a polynomial to selected regions of
+ the continuum.  As well as wavelengths and equivalent widths, the
+ program also estimates width and asymmetry parameters for each
+ line analysed.  For a full description, see the TECHNIQUES ABLINE
+ section of the Figaro documentation.
+
+Parameters
+
+
+SPECTRUM
+
+ SPECTRUM is the name of the Figaro file containing the spectrum to be
+ analysed.  It should have a linear X array, since this is assumed in
+ the calculations, and it is intended that the units be Angstroms,
+ although other units will work (with some interpretation of the
+ results being needed).
+
+OLDCONT
+
+ ABLINE allows you to fit local polynomials to parts of the spectrum
+ which, together with its discrepant point rejection algorithm,
+ usually allows a satisfactory continuum to be determined.  Such a
+ continuum may be written out by ABLINE and then re-read subsequently.
+ Alternatively, the ability to read a pre-computed continuum may be
+ used to read a continuum fitted in some different way, using other
+ more appropriate techniques.  If such a continuum is to be read,
+ OLDCONT should be set.
+
+CONTIN
+
+ If OLDCONT was set, ABLINE will read in a continuum from the
+ file specified by CONTIN.  This should be a normal Figaro
+ one-dimensional spectrum, with the same number of channels as the
+ spectrum to be analysed.  ABLINE assumes that the continuum channels
+ map directly onto those of the spectrum.
+
+SIG
+
+ The continuum fitting in the specified regions is an iterative
+ process.  A curve is fitted and points that are more than SIG times
+ the standard deviation will be rejected and ignored in the next
+ iteration.  2.25 seems to work quite well.
+
+ITN
+
+ ITN is the number of iterations used in determining the continuum.
+ Usually, 4 seems to be adequate.
+
+DEG
+
+ DEG is the degree of polynomial to be used when the continuum is
+ fitted.  It should be as low as possible while still able to follow
+ the believable trend of the continuum in the area in question.
+ Normal values would be in the range 1 to 3.
+
+LIMIT
+
+ It is usual to operate with LIMIT set.  In this case, when you
+ delimit a line using the cursor, ABLINE will cutoff its integrations
+ for the equivalent width and wavelength calculation at the channels
+ indicated.  If LIMIT is not set, ABLINE will calculate its own
+ limits, taking the channels at which the spectrum first exceeds the
+ continuum (having started from the middle of the indicated range).
+ At present, the algorithm used only works for absorption lines, so
+ LIMIT must be set if emission lines are being analysed.
+
+WIDTH
+
+ WIDTH is used to control how much of the spectrum is displayed at one
+ time by ABLINE.  Sometimes it helps to use a large width to get a
+ continuum fit and then a small width to home in on a line with the
+ cursor.  ABLINE has inbuilt limits to to number of channels it can
+ display at once, and you may find that you exceed these if you make
+ WIDTH too high (in which case you have to select a smaller WIDTH).
+
+NEWCONT
+
+ If NEWCONT is set, the continuum produced by ABLINE will be
+ written out as a spectrum.  This spectrum can then be used for
+ subsequent ABLINE runs, or for some other purpose altogether.
+
+CONTOUT
+
+ If NEWCONT is set, ABLINE writes the continuum out to the file
+ specified by CONTOUT.  If this is the same as the input continuum
+ file, the input continuum is over-written.  If it is different, a new
+ spectrum is generated with the same structure as the input spectrum
+ and data from the fitted continuum.
+
+CMD
+
+ If you enter a number, it will be taken as the central wavelength for
+ a new region to be displayed.  The other commands that are accepted
+ are:
+
+   SIG x     Set 'multiple of sigma' continuum rejection parameter
+             to x.
+   DEG n     Set polynomial degree for continuum fit to n (1..7).
+   ITN n     Set 'number of iterations' continuum rejection parameter
+             to n.
+   LIMIT     Line will be delimited by the cursor positions indicated.
+   NOLIM     Line delimited by points where data becomes < continuum.
+   WIDTH x   Set wavelength range displayed to x.
+   CONT      Determine continuum, starting with subsegment selection
+             by cursor.
+   RECONT    Repeat continuum fit, using same segments as last time.
+   FIT       Analyse a line, delimiting it using the cursor.
+   HELP      (or ?) Output this information.
+   QUIT      Exit ABLINE.
+
+ Commands may be abbreviated.  Omitted numeric parameters are
+ prompted for.
+
+ Generally, the sequence is: 1) Select center wavelength,
+ 2) CONTinuum, 3) FIT one or more lines.  To change degree of
+ continuum fit, use DEG followed by RECONT.  Similarly for other
+ continuum parameters.
+
+ More details should be available from the printed documentation.
+
+LINENAME
+
+ The name of a line to be fitted.
+
+HARDCOPY
+
+ Yes if hardcopy of soft plot to be made.
+
+COMMENT
+
+ A comment for a hardcopy
+
+Source_Comments
+
+ A B L I N E
+
+ This routine does interactive analysis of absorption lines in spectra.
+
+ The user designates a segment of the input spectrum to
+ be analysed in each pass.  First a continuum is fitted to this
+ region, using only wavelength subsegments selected graphically
+ by the user (i.e. ignoring the absorption line in question and any
+ other nearby lines or spikes).  In addition to this selection,
+ iterative rejection of discrepant points is performed.  The functional
+ form of the continuum is a polynomial of degree specified by the
+ user (0 - 7).  Alternatively, if a precomputed continuum spectrum
+ is available, it can be used instead.
+
+ The user specifies the wavelength limits of the interval containing
+ the line itself: the median wavelength and equivalent width of the
+ absorption line are calculated.
+
+ The routine finishes up each segment with a hard copy plot showing
+ the data, continuum and wavelength limits of the line, with a
+ printout of results.
+
+ Command line parameters -
+
+ SPECTRUM    Name of the file containing the spectrum with
+             lines to be fitted
+ CONTIN      File containing precomputed continuum, if one is
+             to be used.
+ SIG         Multiple of sigma for continuum point rejection
+ ITN         Number of iterations for continuum point rejection
+ DEG         Degree of polynomial for continuum fit
+ WIDTH       Wavelength range to display at one time
+ CONTOUT     Output continuum file name, if one is written.  If
+             CONTOUT is the same as CONTIN, the new continuum
+             overwrites the old.  Otherwise, a new file, the same
+             as SPECTRUM except for the data, is created.
+ CMD         The command in the main menu.
+ LINENAME    The name of a line to be fitted.
+ COMMENT     A comment for a hardcopy
+
+ Command keywords -
+
+ OLDCONT     Set if a precomputed continuum is to be used.
+ LIMIT       LIMIT is set if the limits of a line are to be
+             taken as the limits indicated with the cursor.
+             Otherwise, the program will look for the points
+             within the indicated limits where the data drops
+             below the continuum.
+ NEWCONT     Set if the continuum constructed during the run
+             is to be written to a file.
+ HARDCOPY    Yes if hardcopy of soft plot to be made.
+
+ User variables -  (">" input, "<" output)
+
+ (>) SOFT    (Character) Device/type for soft plots
+ (>) HARD    (Character)   "     "    "  hard  "
+ (<) TVXST   (Numeric)  )
+ (<) TVXEN   (Numeric)  ) Used to set the soft plot
+ (<) TVHIGH  (Numeric)  ) parameters so that
+ (<) TVLOW   (Numeric)  ) routines such as CCUR
+ (<) XSTART  (Numeric)  ) know what the display
+ (<) XEND    (Numeric)  ) limits for the currently
+ (<) HIGH    (Numeric)  ) displayed plot have
+ (<) LOW     (Numeric)  ) been set to.
+ (<) TVFILE  (Character))
+ (<) TVCOLOR (Numeric)  )
+                                                JGR   Jan 1985
+.endhelp

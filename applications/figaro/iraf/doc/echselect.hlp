@@ -1,0 +1,194 @@
+.help echselect Starlink figaro
+.nf
+ ECHSELECT - Interactive selection of sky and object spectra for an echelle
+
+
+Description
+
+ ECHSELECT allows the user to indicate interactively the cross-sections
+ of a corrected echellogram (one straightened by CDIST for example) to
+ be used as object and sky for the various orders.  It then creates a
+ collapsed echellogram for the object orders, and (optionally) one for
+ the sky orders.
+
+Parameters
+
+
+IMAGE
+
+ IMAGE is used to specify the corrected echellogram to be processed by
+ ECHSELECT.  It should have its orders straight and parallel to the
+ x-axis (i.e. as processed by CDIST).
+
+PREVIOUS
+
+ If PREVIOUS is selected, the results of a previous selection are read
+ from a file called ECHSELECT.LIS in the default directory and may be
+ modified.  Otherwise, you start from a clean slate.  Note that this
+ allows you to apply a selection based on one image to data in another
+ - for example you can process an arc according to the selection made
+ using an associated object exposure.
+
+WHOLE
+
+ ECHSELECT gets you to select cross-sections by indicating them on a
+ plot of a 1-D cut through the original image.  This cut is orthogonal
+ to the wavelength direction, so the various orders should show up as
+ peaks in the plot.  Often, the ends of the image have odd effects and
+ should not be included in this cut.  If you want to specify the
+ limits of the plot explicitly, set WHOLE to NO. Otherwise the whole
+ image will be summed to produce the cut.
+
+XSTART
+
+ If WHOLE is not selected, XSTART gives the x-axis value for the first
+ of the cross-sections to be summed to give the cut through the image
+
+XEND
+
+ If WHOLE is not selected, XEND gives the x-axis value for the last of
+ the cross-sections to be summed to give the cut through the image
+
+MSTART
+
+ This is the order number of the first order in IMAGE. Getting this
+ right is unimportant, since you have to option of setting the order
+ numbers explicitly during ECHSELECT.
+
+MDELTA
+
+ This is the increment to the order number as the orders listed in the
+ coefficient file are processed. Conventionally, if the first order is
+ that with the lowest Y value, the increment will be -1.  Note that
+ the order in which the orders appear in the collapsed echellogram
+ depends on the sign of MDELTA.
+
+OBJOUT
+
+ Once the cross-sections for each order are selected, ECHSELECT sums
+ those for each order to produce the collapsed echellograms.  Those
+ selected for the object go into one, whose name is given by OBJOUT,
+ and those for the sky into another.  The object cross-sections for
+ each order are simply summed into one cross-section of OBJOUT.  The
+ order in which the orders appear in the collapsed echellograms
+ depends on MDELTA - if MDELTA is -1, higher orders are at lower
+ cross-section numbers.
+
+SKYOUT
+
+ Once the cross-sections for each order are selected, ECHSELECT sums
+ those for each order to produce the collapsed echellograms.  Those
+ selected for the object go into one, those for the sky into another
+ whose name is given by SKYOUT.  The sky cross-sections for each order
+ are summed into one cross-section of SKYOUT, but are scaled to match
+ the number of object cross-sections for the same order.  This should
+ allow the two collapsed echellograms to be directly subtracted.
+
+DISNCHAN
+
+ Length of displayed section.
+
+MOVETOX
+
+ New plot centre x value.
+
+ORDER
+
+ Next echelle order to work on.
+
+LOW
+
+ Minimum value to display.
+
+HIGH
+
+ Maximum value to display.
+
+ADD
+
+ Used to confirm that more than one cross section are to be used for
+ an order's object.
+
+CLEAR
+
+ Used to confirm that all settings for an order to be cleared.
+
+QUITSEL
+
+ Used to confirm quitting work on an echelle order.
+
+Source_comments
+
+ E C H S E L E C T
+
+ Routine name:
+    ECHSELECT
+
+ Function:
+    Interactive object and sky selection from echellogram.
+
+ Description:
+    This application takes a corrected echellogram (one that has had
+    the orders straightened, probably by CDIST), and generates a
+    number of collapsed echellograms (images where each cross-section
+    is a separate echelle spectrum).  To determine which cross-sections
+    should be added to produce the sky and object spectra it gets the
+    user to indicate the relevant limits on a plot of the corrected
+    echelogram collapsed in the spectra direction.  For each order
+    the user can select a range of cross-sections to be used for the
+    object, and a number of ranges of cross-sections to be used for
+    the sky.  For each order, the object cross-sections are added
+    and the sky cross-sections are added and then scaled by the
+    factor (number of object cross-sections / number of sky cross
+    sections).  The object cross-sections are formed into one collapsed
+    echellogram and the sky cross-sections are formed into another
+    collapsed echellogram.  Optionally, a straightened arc can also
+    be processed using the same object and sky cross-section information,
+    in this case producing two collapsed arc echellograms, one for the
+    cross-sections designated as object, one for those designated as
+    sky, but in this case without any scaling being applied.
+
+ Command parameters:
+    IMAGE       (File) The name of the corrected echellogram.
+    XSTART      (Numeric) The first x-value to be used when collapsing
+                the image along the wavelength direction.
+    XEND        (Numeric) The last x-value to be used when collapsing
+                the image along the wavelength direction.
+    MSTART      (Integer) The order number for the first order.
+    MDELTA      (Integer) 1 if order numbers increase with cross-
+                section, -1 if they decrease.
+    OBJOUT      (File) The name of the object collapsed echellogram.
+    SKYOUT      (File) The name of the sky collapsed echellogram.
+    DISNCHAN    (Integer) Length of displayed section.
+    MOVETOX     (Numeric) New plot centre x value.
+    ORDER       (Integer) Next echelle order to work on.
+    LOW         (Numeric) Minimum value to display.
+    HIGH        (Numeric) Maximum value to display.
+
+ Command keywords:
+    WHOLE       Yes if all of spectral range is to be used
+    PREVIOUS    Yes if previous selection is to be used as a starting
+                point for the interactive selection.
+    ADD         Used to confirm that more than one cross section are
+                to be used for an order's object.
+    CLEAR       Used to confirm that all settings for an order to be
+                cleared.
+    QUITSEL     Used to confirm quitting work on an echelle order.
+
+ Data quality information:  Ignored.
+
+ Error data: Ignored.
+
+ Authors: Keith Shortridge, AAO
+
+ Files:
+    Selections made by ECHSELECT are written to ECHSELECT.LIS in the
+    default directory.  This begins with a number of comment lines -
+    all of which have an '*' in the first column, and is then followed
+    by a single line for each cross-section which has been selected,
+    giving cross-section number and order number, in format 2I10.
+    If the cross-section is part of the sky selected for that order,
+    the order number given is the negative of the actual order number.
+    (Note that this program cannot cope with zeroth order!).  This
+    file is also that read if PREVIOUS is set.
+.endhelp

@@ -1,0 +1,128 @@
+.help crigauss Starlink figaro
+.nf
+  CRIGAUSS - Creates a file with a profile of 1 to 5 gaussians
+
+
+Description
+
+   The profiles are evaluated and copied to each cross-section.
+   This is really intended for testing software.
+
+Parameters
+
+
+IMAGE
+
+    IMAGE = FILE (Read)
+        Name of image to be created
+
+YDIM
+
+    YDIM = INTEGER (Read)
+        Y dimension of data
+
+XDIM
+
+    XDIM = INTEGER (Read)
+        X dimension of data"
+
+XSTART
+
+    XSTART = REAL (Read)
+        First X value
+
+XEND
+
+    XEND = REAL (Read)
+        Last X value
+
+WIDTH1
+
+    WIDTH1 = REAL (Read)
+        WIDTH1 of gaussian (fwhm)
+
+CENTRE1
+
+    CENTRE1 = REAL (Read)
+        CENTRE1 of gaussian
+
+HEIGHT1
+
+    HEIGHT1 = REAL (Read)
+        HEIGHT1 of gaussian
+
+WIDTH2
+
+    WIDTH2 = REAL (Read)
+        WIDTH2 of gaussian (fwhm)
+
+CENTRE2
+
+    CENTRE2 = REAL (Read)
+        CENTRE2 of gaussian
+
+HEIGHT2
+
+    HEIGHT2 = REAL (Read)
+        HEIGHT2 of gaussian
+
+WIDTH3
+
+    WIDTH3 = REAL (Read)
+        WIDTH3 of gaussian (fwhm)
+
+CENTRE3
+
+    CENTRE3 = REAL (Read)
+        CENTRE3 of gaussian
+
+HEIGHT3
+
+    HEIGHT3 = REAL (Read)
+        HEIGHT3 of gaussian
+
+WIDTH3
+
+    WIDTH4 = REAL (Read)
+        WIDTH4 of gaussian (fwhm)
+
+CENTRE4
+
+    CENTRE4 = REAL (Read)
+        CENTRE4 of gaussian
+
+HEIGHT4
+
+    HEIGHT4 = REAL (Read)
+        HEIGHT4 of gaussian
+
+WIDTH5
+
+    WIDTH5 = REAL (Read)
+        WIDTH5 of gaussian (fwhm)
+
+CENTRE5
+
+    CENTRE5 = REAL (Read)
+        CENTRE5 of gaussian
+
+HEIGHT5
+
+    HEIGHT5 = REAL (Read)
+        HEIGHT5 of gaussian
+
+BASE
+
+    BASE = REAL (Read)
+        BASE for gaussian
+
+NCOMP
+
+    NCOMP = INTEGER (Read)
+        NCOMP Number of componants
+
+Source_comments
+
+  none available
+
+.endhelp

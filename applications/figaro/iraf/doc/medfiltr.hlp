@@ -1,0 +1,79 @@
+.help medfiltr Starlink figaro
+.nf
+ MEDFILTR - Applies a rectangular median filter to an image
+
+
+Description
+
+ MEDFILTR passes a rectangular median filter through the main data
+ array of an image. The result is an image where each pixel is set
+ to the median value found in the image within a box of the given
+ size centered on that pixel. MEDFILT is a similar program, but it
+ uses a square shaped filter box whereas MEDFILTR allows the box to
+ have different dimensions in X and Y.
+
+Parameters
+
+
+IMAGE
+
+ The name of a Figaro format data file.
+ A rectangular median filter of size XBOX by YBOX will
+ be passed through the main data array of the file. The
+ file should normally contain two-dimensional data, but
+ other data can be accomodated - this will require
+ YBOX to be set to 1.
+
+XBOX
+
+ The X-dimension of the box to be used
+ for the median filter. It is specified in pixels, and
+ ought to be an odd number. If an even number is used,
+ XBOX-1 will be used instead.
+
+YBOX
+
+ The Y-dimension of the box to be used
+ for the median filter. It is specified in pixels, and
+ ought to be an odd number. If an even number is used,
+ YBOX-1 will be used instead. If the data is not a 2-D
+ image, YBOX will be forced to 1.
+
+OUTPUT
+
+ The name of the resulting new image file. If it
+ differs from that specified for IMAGE then a new
+ file is created, otherwise the filter is applied in situ.
+
+Source_comments
+
+ M E D F I L T   /    M E D F I L T R
+
+ Figaro routines to median filter an image.  The result of
+ this operation is an image in which the value of each pixel
+ is the median value of a rectangular box of pixels centered on the
+ corresponding pixel in the original array. MEDFILTR allows the
+ box to be specified with different X and Y dimensions, while the
+ original MEDFILT only supported a square box. MEDFILTR is therefore
+ a full superset of MEDFILT, but the older application has to be
+ retained for compatability reasons.
+
+ Command parameters for MEDFILTR -
+
+ IMAGE    The name of the structure containing the image.
+
+ XBOX     (Numeric) The X-dimension of the box (in pixels) to be
+          used in calculating the medians.  Should be odd;
+          if even, XBOX-1 will be used.
+
+ YBOX     (Numeric) The Y-dimension of the box (in pixels) to be
+          used in calculating the medians.  Should be odd;
+          if even, YBOX-1 will be used.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+                                  KS / CIT 28th Jan 1984
+.endhelp

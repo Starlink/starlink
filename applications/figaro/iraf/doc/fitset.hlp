@@ -1,0 +1,113 @@
+.help fitset Starlink figaro
+.nf
+ FITSET - Set the value of a FITS keyword
+
+
+Description
+
+ FIGARO program to set (or modify) a FITS keyword in a Figaro file.
+ This program accepts the name of a single FITS keyword and a new
+ value for it. If the keyword already exists it will be changed,
+ unless it is one of the special keywords ("HISTORY", "COMMENT",
+ or 'blank') that can have multiple values, in which case the new
+ value will be added to those already in the file.
+
+Parameters
+
+
+FILE
+
+ The name of the Figaro file one of whose keywords
+ is to be changed.
+
+KEYWORD
+
+ The name of the FITS keyword to be set or modified.
+ If the keyword already exists it will be listed by
+ the program.  Note that FITS keyword names should
+ be limited to 8 characters in length, but this is not
+ enforced by this program. Note: if you set the value
+ of one of the standard keywords that can be deduced
+ from the rest of the data in the file, such as 'NAXIS'
+ or 'CRDELTn' or 'BITPIX' you may get confusing results.
+ This is not recommended.
+
+VALUE
+
+ The new value for the FITS keyword specified.  This is
+ specified as a character string, so may need to be given
+ enclosed by quotes. Note that the FITS standard limits
+ character values to upper case, so any lower case characters
+ will be folded to upper case. If the value is to be treated
+ as a logical value, it should be either 'T' or 'F'. Numeric
+ and logical values are treated slightly differently to the
+ way string values are treated. By default, if the value given
+ can be interpreted as a number by FITSET then it will be;
+ otherwise it will be treated as a literal string. This can
+ be overriden by the STRING and LOGICAL keywords.
+
+COMMENT
+
+ Each FITS keyword has a comment string associated with it.
+ COMMENT supplies the comment string to be associated with
+ the KEYWORD being set. If a keyword already exists, then
+ the exisitng comment (if any) is used as the default comment.
+
+LOGICAL
+
+ If LOGICAL is set, then FITSET will treat the supplied
+ value as a logical one. In this case the string supplied for
+ VALUE must have been either 'T' or 'F'. Logical values are
+ stored internally in FITS files slightly differently to the
+ way string values are treated. In most cases, this doesn't
+ matter much, but systems other than Figaro may be fussy about
+ the types of specific keywords.
+
+STRING
+
+ If STRING is set, then FITSET will treat the supplied
+ value as a literal character string, even if it can be
+ interpreted as a number. Numeric values are stored internally
+ in FITS files slightly differently to the way string values
+ are treated. In most cases, this doesn't matter much, but
+ systems other than Figaro may be fussy about the types of
+ specific keywords.
+
+Source_comments
+
+ F I T S E T
+
+ Function:
+    Figaro routine to set (or modify) a FITS keyword in a file.
+
+ Description:
+    This routine allows a FITS keyword in a file to be set or, if it
+    already exists, to be modified. This routine is needed mainly because
+    of the difficulty of changing items in a FITS header when the file
+    in question is in NDF format. (A .DST file has the FITS information
+    in separate structure items which can easily be modified using LET,
+    but an NDF format file has all the FITS keywords in a single
+    character array which is not amenable to such changes.)
+
+ Invocation:
+    FITSET file keyword value comment [logical] [string]
+
+ Parameters:
+    file     (Filename) The name of the Figaro format file in which the
+             keyword is to be set.
+    keyword  (Character string) The name of the FITS keyword that is to be
+             set.
+    value    (Character string) The new value of the FITS keyword. If
+             this can be interpreted as a numeric value it will be set as
+             such. Otherwise it will be kept as a character string.
+    comment  (Character string) The comment to be associated with the
+             keyword.
+    logical  (Keyword) If set, forces the value to be treated as a logical
+             value, in which case it must be one of 'T' or 'F' and will
+             be set as such in the output file.
+    string   (Keyword) If set, forces the value to be treated as a literal
+             string; in this case it will not be treated as a number even if
+             it can be.
+
+    Keith Shortridge, AAO.
+.endhelp

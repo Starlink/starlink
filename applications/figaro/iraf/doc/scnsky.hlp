@@ -1,0 +1,86 @@
+.help scnsky Starlink figaro
+.nf
+ SCNSKY - Calculates a sky spectrum for a scanned CCD image
+
+
+Description
+
+ Uses the 'minimum median' algorithm to create a sky spectrum
+ from an image without any lines clear of stars.  Each column
+ of the image is split into sections of a specified length and
+ the median of each section is calculated.  The sky element
+ corresponding to the column is set to the value of the minimum
+ median for that column (on the assumption that this is an
+ uncontaminated value).  This algorithm is suitable for exposures
+ taken using a CCD in scanned mode, hence the name of the routine.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to obtain sky from.
+
+SECTION
+
+ Length of each Y-section.
+
+SPECTRUM
+
+ Name of spectrum to be generated.
+
+LIMIT
+
+ Ignore pixels below a minimum value?
+
+MINIMUM
+
+ Minimum valid pixel value"
+
+Source_comments
+
+ S C N S K Y
+
+ Uses the 'minimum median' algorithm to create a sky spectrum
+ from an image without any lines clear of stars.  Each column
+ of the image is split into sections of a specified length and
+ the median of each section is calculated.  The sky element
+ corresponding to the column is set to the value of the minimum
+ median for that column (on the assumption that this is an
+ uncontaminated value).  This algorithm is suitable for exposures
+ taken using a CCD in scanned mode, hence the name of the routine.
+
+ Command parameters -
+
+ 'IMAGE'    The name of the image
+
+ 'SECTION'  The number of pixels in each section.
+
+ 'MINIMUM'  A minimum 'valid' pixel value.  A median value
+            will be ignored if the range of pixels over which it
+            was calculated contained pixels below this value.
+
+ 'SPECTRUM' The name of the resulting sky spectrum.
+
+ Command keywords -
+
+ 'LIMIT'    Use the minimum pixel value to limit the median
+            calculations - this is needed because there is no
+            obviously illegal value for 'MINIMUM' which the
+            program can take as an indication that it is to be
+            ignored.  (If 'MINIMUM' is given in the command
+            string explicitly, 'LIMIT' need not be set.)
+
+ Input data -
+
+ IMAGE is assumed to have a 2-D data structure.
+
+ Output data -
+
+ SPECTRUM is created with the same structure as IMAGE,
+ except that the data will only have one dimension, and if
+ IMAGE has an AXIS(2) structure, this will be omitted.  Any
+ AXIS(1) structure will be copied unchanged.
+
+                                 KS / CIT 25th May 1983
+.endhelp

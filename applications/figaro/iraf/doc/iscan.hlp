@@ -1,0 +1,59 @@
+.help iscan Starlink figaro
+.nf
+ ISCAN - Displays cuts through an IMAGE 
+
+
+Description
+
+   Either the user can go into a loop in which (s)he is prompted for
+   the start and end x-sects to extract, or the program will go through
+   the data, displaying successive cuts.
+
+Parameters
+
+
+IMAGE
+
+    IMAGE = FILE (Read)
+        Image to take cuts from
+
+XSTART
+
+    XSTART = REAL (Read)
+        Starting wavelength (or pixel number if not calibrated)
+
+XEND
+
+    XEND = REAL (Read)
+        End wavelength etc.
+
+YSTART
+
+    YSTART = INTEGER (Read)
+        Starting cross-section
+
+YEND
+
+    YEND = INTEGER (Read)
+        End cross-section
+
+YBLOCK
+
+    YBLOCK = INTEGER (Read)
+        Width to extract from data in cross-sections (if scanning)
+
+SCAN
+
+    SCAN = LOGICAL (Read)
+        If to scan through data
+
+HARDCOPY
+
+    HARDCOPY = LOGICAL (Read)
+        If to plot in hard-copy
+
+Source_comments
+
+  none available
+
+.endhelp

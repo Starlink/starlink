@@ -1,0 +1,209 @@
+.help isplot Starlink figaro
+.nf
+ ISPLOT - Plots successive cross-sections through an image
+
+
+Description
+
+ The ISPLOT command will plot a series of cross-sections
+ through an image as hidden line histograms on the current
+ hard or soft graphics device.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image whose data is to be plotted by ISPLOT.
+ Successive cross-sections (cuts of constant Y) are plotted as hidden
+ line histograms.  ISPLOT is probably most appropriate when IMAGE
+ contains a set of long-slit spectra.  If IMAGE is a 1-D array, SPLOT
+ should be used.
+
+HARDCOPY
+
+ If set, the plot is written to the device defined as the
+ current hardcopy device.  Generally, this is a disk file
+ which will then have to printed.  If HARDCOPY is not set,
+ the plot will go to the current softcopy device.  The hard
+ and soft copy devices are specifed using the HARD and SOFT
+ commands respectively.
+
+YSTART
+
+ ISPLOT plots a series of cross-sections (cuts of constant Y value).
+ YSTART and YEND are used to delimit these.  YSTART should be the Y
+ value of the lowest numbered cross-section to be plotted.  Note that
+ REVERSE should be used to cause cross-sections to be plotted in
+ reverse order.  Attempting to obtain the same effect by specifying
+ YSTART < YEND will not work.
+
+YEND
+
+ The Y value of the highest numbered cross-section plotted.
+ See the help text for YSTART for more details.
+
+WHOLE
+
+ If set, the whole of each cross-section is plotted.
+ Otherwise, the limits plotted are determined by the values of XSTART
+ and XEND, which you will be prompted for if they were not specified
+ in the command string.  Note that WHOLE does not imply the plotting
+ of EVERY cross-section.
+
+AUTOSCALE
+
+ If set, the plot is scaled so that all of the data to be plotted
+ just fits on the display.  Otherwise,the scale of the plot is
+ determined by the values of HIGH, LOW, and OFFSET, which you
+ will be prompted for if they were not specified in the command
+ string.
+
+XSTART
+
+ The first X value to be plotted, in the units used
+ by the data - angstroms, for example, if the data is wavelength
+ calibrated.  XSTART can be set before the start of the data, if
+ necessary.  RESET will set XSTART to the first X value in the data.
+
+XEND
+
+ The last X value to be plotted, in the units used by
+ the data - angstroms, for example, if the data is wavelength
+ calibrated.  XEND can be set after the end of the data, if necessary.
+ RESET will set XEND to the last X value in the data.
+
+REVERSE
+
+ If set, the cross-sections will be plotted in the reverse of
+ the order implied by the values of YSTART and YEND. Sometimes
+ two plots, one reversed, the other not, are needed to give a
+ proper picture of the data in IMAGE.
+
+HIGH
+
+ The maximum data value to be plotted - i.e. the top Y axis
+ value for the plot.
+
+LOW
+
+ The minimum data value to be plotted - i.e. the bottom Y axis
+ value for the plot.
+
+OFFSET
+
+ A value added to each cross-section in order to bias it up
+ above the previous cross-section.  Offset is normally calculated by
+ the program, but can be over-ridden - there may be some reason to set
+ it to zero, for example.
+
+SLANT
+
+ A number of elements of the data array by which successive
+ cross-sections are to be offset in order to obtain a '3-D' effect for
+ the plot.  A positive value causes a slant to the right, a negative
+ value a slant to the left.
+
+LABEL
+
+ The label that will appear at the top of the plot.
+
+ERASE
+
+ Specifies that the screen is to be erased before the plot is
+ made.  Usually ERASE and AXES will not be set when a plot is
+ superimposed on a previous one.
+
+AXES
+
+ Specifies that the axes for the plot are to be drawn.  These
+ should be omitted if the plot is being superimposed on a previous
+ one, or sometimes just to save plotting time.
+
+COLOUR
+
+ The colour for the data to be plotted in.
+ The axes are always plotted in white.  The colours allowed are Blue,
+ White, Red, Green, Black, Cyan, Magenta, Yellow.  Using Black will
+ have the effect of erasing anything where the data is plotted.  This
+ only works on the Grinnell.
+
+Source_comments
+
+ I S P L O T
+
+ Produces a hidden line histogram plot of an image.  This routine
+ is really intended for the case where the image is a 2-D set of
+ spectra.  The plot may be slanted to give a '3-D' effect if
+ required, and may be in reverse order.  The plot is directed
+ to the device defined by the user variables 'SOFT' and
+ 'HARD', and by the value of the command keyword 'HARDCOPY',
+ so will appear immediately if these specify a video
+ device (VT125, Grinnell, etc.).  If a hardcopy device is
+ specified, the file for that device will be produced,
+ but SPLOT does not attempt to spool it off for printing.
+
+ Command parameters -
+
+ IMAGE       The data to be plotted.  This should have a
+           two dimensional data structure. If there
+             is an x-axis component this will be used to
+             give the x-axis.  If not, the x-axis will just
+             have to be the numbers from 1 to n.
+ YSTART      The y-value at which plotting is to start.
+ YEND        The y-value at which plotting is to end.
+ XSTART      The x-value at which plotting is to start.
+ XEND        The x-value at which plotting is to end.
+             (XSTART and XEND are not required if the
+             WHOLE keyword is set.)
+ HIGH        The maximum value to be used for the plot.
+ LOW         The minimum value to be used for the plot.
+             (HIGH and LOW are not required if the
+             AUTOSCALE keyword is set.)
+ OFFSET      A bias to be added to each successive cross-section
+             to offset it from the previous one.  Normally, this
+             will be allowed to default, unless it is explicitly
+             specified in the command line.
+ LABEL       A label for the plot.
+ COLOUR      The colour for the plot (only meaningful for the
+             Grinnell - later may be extended to map onto
+             different line types).  The axes are always white.
+
+ Command keywords -
+
+ AUTOSCALE   The program is to work out the values for HIGH
+             and LOW, using the maximum and minimum values
+             in the data over the specified range.
+ WHOLE       The program is to plot the whole of each cross-section
+             of the image - note, not all the image, i.e. not every
+             cross-section.
+ HARDCOPY    The plot is to produce a hard copy.
+ AXES        Axes will be plotted.
+ ERASE       The screen will be erased before the plot.
+ REVERSE     The cross-sections will be plotted in reverse order.
+
+ User variables -    (">" input, "<" output)
+
+ (>) SOFT    Specifies the device and type to be used for soft
+             plots.  See the SOFT command for more details.
+ (>) HARD    Specifies the device and type to be used for hard
+             plots.  See the HARD command for more details.
+ (<) TVDIM   is set to 1 if a single spectrum is plotted, to
+             2 otherwise.
+ (<) TVYST   is set to the starting y-value for the plot.
+ (<) TVYEN   is set to the final y-value for the plot.
+ (<) TVXST   is set to the starting x-value for the plot.
+ (<) TVXEN   Is set to the final x-value for the plot.
+ (<) TVHIGH  Is set to the same value as HIGH.
+ (<) TVLOW   Is set to the same value as LOW.
+ (<) TVFILE  Is set to the value of IMAGE.
+ (<) TVCOLOR Is set to the GRPCKG code for the plot colour.
+             (The TV.. variables are intended for use by
+             cursor routines, and reflect the settings for the
+             last plot made, even if XSTART etc are changed.)
+
+ (Other user variables may be set by the command processor, in
+ connection with the parameter values.)
+
+                                     KS / CIT  5th March 1984
+.endhelp

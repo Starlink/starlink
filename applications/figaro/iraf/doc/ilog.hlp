@@ -1,0 +1,50 @@
+.help ilog Starlink figaro
+.nf
+ ILOG - Takes the logarithm of an image
+
+
+Description
+
+ ILOG takes the base 10 log of each pixel in an image.
+ Negative pixels are set to zero in the output image.
+
+Parameters
+
+
+IMAGE
+
+ The datafile to be processed.
+
+OUTPUT
+
+ The name of the resulting image.  If this is the
+ same as IMAGE (the default) the operation will be
+ performed in situ.  Otherwise a new image will be
+ created.
+
+See_also
+
+ FIGARO: IALOG.
+ KAPPA: LOG10, LOGAR, LOGE.
+
+Source_comments
+
+ I L O G
+
+ Takes the base 10 log of an image.  Any pixels that are
+ negative will give a zero pixel in the resulting image.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+                                  KS / CIT 22nd April 1984
+.endhelp

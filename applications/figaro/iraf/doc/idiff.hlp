@@ -1,0 +1,53 @@
+.help idiff Starlink figaro
+.nf
+ IDIFF - Takes the 'differential' of an image
+
+
+Description
+
+ IDIFF takes an input image and creates a new image where each pixel
+ is the average absolute difference between the corresponding pixel
+ in the original image and its nearest neighbours.  This emphasises
+ those regions in the image where the data is changing rapidly.
+
+Parameters
+
+
+IMAGE
+
+ IMAGE must contain two-dimensional data.  IDIFF creates
+ a resulting image where each pixel is the average absol-
+ ute difference between the corresponding pixel in IMAGE
+ and its nearest neighbours.
+
+OUTPUT
+
+ The name of the resulting image.  If this is the
+ same as IMAGE (the default) the operation will be
+ performed in situ.  Otherwise a new image will be
+ created.
+
+Source_comments
+
+ I D I F F
+
+ Given an image, creates a new image in which each pixel
+ is the average absolute difference between the corresponding
+ pixel in the input image and its immediate neighbours.  This
+ highlights regions in the image where the data is changing
+ rapidly.
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords  - None
+
+ User variables used - None
+                                  KS / CIT 22nd April 1984
+.endhelp

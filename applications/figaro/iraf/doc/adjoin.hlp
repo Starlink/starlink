@@ -1,0 +1,77 @@
+.help adjoin Starlink figaro
+.nf
+ ADJOIN - Append two spectra (strictly a merge by wavelength value)
+
+
+Description
+
+ ADJOIN is a Figaro routine whose primary function is to append one
+ spectrum to another.  That is, given two spectra, it produces one
+ output spectrum where the X-axis and data arrays are formed by
+ appending the second spectrum data onto the end of the data from the
+ first.
+
+ In detail, ADJOIN is a little more complex, since it produces a
+ spectrum in which the X data increase.  This may involve the sorting
+ of the various arrays, so ADJOIN can be regarded as a program that
+ merges two spectra into increasing X order.
+
+ If neither spectrum has any X information (i.e. no wavelength array),
+ the sort order will be first and then second.  If one or both have
+ X data, the resulting spectrum will be in order of X value.
+
+Parameters
+
+
+SPECTRUM
+
+ SPECTRUM to be appended to.
+
+SPECTRUM1
+
+ SPECTRUM1 specifies the second of the two spectra.
+ Note that it is the structure of the first spectrum
+ that is copied to the output spectrum.  Only data
+ arrays will be copied from the second.
+
+OUTPUT
+
+ OUTPUT is the name of the resulting spectrum.  Note
+ that ADJOIN always produces a new file, even if OUTPUT
+ has the same name as one of the input spectra.  OUTPUT
+ will have essentially the same structure as the first
+ spectrum, but any array found in the X-axis or data
+ structure of both input spectra, with the same length
+ as the main data array in both spectra, will appear in
+ OUTPUT as an array whose length is the sum of the two
+ arrays.
+
+Source_comments
+
+ A D J O I N
+
+ ADJOIN is a Figaro routine whose primary function is to
+ append one spectrum to another.  That is, given two spectra,
+ it produces one output spectrum where the .X and .Z arrays
+ are formed by appending the second spectrum data onto the end
+ of the data from the first.  In detail, ADJOIN is a little
+ more complex, since it produces a spectrum in which the
+ X data (the contents of the data object .X.DATA) increase.
+ This may involve the sorting of the various arrays, so ADJOIN
+ can be regarded as a program that merges two spectra into
+ increasing X order. The resulting spectrum makes perfect
+ sense if the data represent flux density measurements, but
+ may be misleading if the data represent total flux measured
+ within wavelength bins.  The X array may well not represent
+ even a smooth wavelength vs channel relationship, let alone
+ scrunched data.  Care should be taken in the use of this routine.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The first of the two spectra.
+ SPECTRUM1   (Character) The second of the two spectra.
+ OUTPUT      (Character) The resulting output spectrum.
+
+ Command keywords - None
+                                            KS  / AAO 18th June 1985
+.endhelp

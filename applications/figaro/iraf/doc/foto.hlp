@@ -1,0 +1,131 @@
+.help foto Starlink figaro
+.nf
+ FOTO - Perform aperture photometry given CENTERS output
+
+
+Description
+
+ The FOTO command performs aperture photometry on objects
+ in an image.
+
+Parameters
+
+
+IMAGE
+
+ The name of the image on which the photometry is to be
+ performed.  A file giving the centers of the objects in
+ IMAGE to be measured should already have been created,
+ probably by the sequence CPOS, CENTERS.
+
+RA1
+
+ The inner radius of the circular aperture to be used to
+ calculate the sky values.  It should be large enough to
+ clear the objects being measured.
+
+RA2
+
+ The outer radius of the circular aperture to be used to
+ calculate the sky values.
+
+NRADII
+
+ The number of circular apertures around the objects being
+ measured for which magnitudes will be calculated.
+
+RADII
+
+ The values of the radii of the circular apertures, in
+ pixels, around the objects being measured.
+
+BAD
+
+ The value below which pixels will be ignored.
+
+PHOTONS
+
+ The number of photons per output unit - i.e. the number of
+ photons actually represented by each count in the data array.
+
+READNS
+
+ The expected error in the readout when the data was taken.
+ It is only used in the calculation of the error values.
+
+MZERO
+
+ The offset that has to be applied to the calculated
+ magnitudes in order to get the actual magnitude values.
+ If you don't care about absolute values, you can leave
+ this as zero.
+
+SKYVAL
+
+ User-specified sky value.
+
+SIGMA
+
+ User-specified sigma.
+
+DISHIST
+
+ Used to ask whether sky histogram to be displayed.
+
+CONFIRM
+
+ Used to confirm acceptability of sky value and sigma.
+
+Source_comments
+
+ F O T O
+
+ Main routine for the Figaro aperture photometry function, FOTO.
+ This gets the required parameter values and then leaves the real
+ work to PHOTSUB, which is a modification for Figaro of a routine
+ originally written at KPNO by Don Wells.
+
+ Command parameters -
+
+ IMAGE   (Character) The name of the image being analysed.
+ RA1     (Numeric) The inner radius in pixels of the sky aperture.
+ RA2     (Numeric) The outer   "     "   "    "    "   "    "
+ NRADII  (Numeric) The number of apertures to use.
+ RADII   (Numeric array) The values of the radii, in pixels.
+ BAD     (Numeric) Bad pixel rejection threshold.
+ PHOTONS (Numeric) Number of photons per ADU.
+ READNS  (Numeric) Readout noise.
+ MZERO   (Numeric) Magnitude offset.
+ SKYVAL  (Numeric) User-specified sky value.
+ SIGMA   (Numeric) User-specified sigma.
+
+ Command keywords -
+
+ DISHIST  Used to ask whether sky histogram to be displayed.
+ CONFIRM  Used to confirm acceptability of sky value and sigma.
+
+ User variables used -  (">" input, "<" output)
+
+ (>) SOFT  (Character) The soft plot device/type, as required by
+           PGPLOT.
+
+ Input -
+
+ CENTER.DAT contains one record for each point, giving
+            XCENT,YCENT,IX,IY,DX,DY,AP
+            in the format 2F8.2,2I5,2F8.2,I4 where
+            XCENT,YCENT give the position of the centroid
+            IX,IY are the original pixel position of the point.
+            DX,DY are the offsets in X and Y, and
+            AP is the value used for APERTURE.
+            If the centroid for a point cannot be determined, a
+            record is written giving
+            '*** No centroid ',IX,IY,DX,DY,AP
+            in the format A,2I5,2F8.2,I4.
+
+ Output -
+
+ MAGS.DAT   lists the magnitudes as determined by the program.
+
+                                       KS / CIT 1st June 1983
+.endhelp

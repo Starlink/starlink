@@ -1,0 +1,80 @@
+.help offdist Starlink figaro
+.nf
+ OFFDIST - Applies an offset to an SDIST fit
+
+
+Description
+
+ OFFDIST reads the s-distortion fit file produced by SDIST and
+ writes a modified version in which a specified offset in Y has
+ been added to all the fits.  This allows the same distortion
+ analysis to be applied to data which has the same shape but is
+ physically displaced from the data originally analysed.
+
+Parameters
+
+
+INFILE
+
+ The name of the distortion file to
+ which an offset is to be added.  This will have been
+ produced by SDIST, and so will normally be called
+ SDIST.DAT.
+
+OFFSET
+
+ The offset in Y to be applied to the data is specified
+ by OFFSET.  A positive value moves the fits up (in the
+ sense that it will move the lines displayed by ODIST
+ up the screen of an image display).  OFFSET is a value
+ in pixels.
+
+OUTFILE
+
+ The name of the distortion file to be created with
+ the offset value applied.  A new file is always
+ created, even if the names supplied for OUTFILE and
+ INFILE are the same (a new version is created).  Most
+ applications that use these files expect them to be
+ called SDIST.DAT, so if you use anything else some
+ creative RENAMEing may be needed.
+
+Source_comments
+
+ O F F D I S T
+
+ Modifies the output s-distortion file produced by SDIST
+ to add an offset in Y to the fitted positions.
+
+ Command parameters -
+
+ INFILE    (Character) The name of the distortion file to
+           be modified.
+ OFFSET    (Numeric) The offset in Y to be added to the fits.
+ OUTFILE   (Character) The name of the resulting modified file.
+           Note that many of the applications that use these
+           files assume explicitly that they are called SDIST.DAT.
+           If OUTFILE is the same as INFILE, a new version of the
+           file is produced.
+
+ Command keywords - None
+
+ Input and output files -
+
+ SDIST.DAT contains the results of the fit(s), as written by
+           SDIST, in a format treated as follows -
+
+           3 header lines, all beginning with '*'
+           One line giving the number of spectra traced, in the
+           format 20X,I5.
+           Then, for each spectrum traced, one record giving
+           the spectrum number, and the leftmost and rightmost
+           pixels covered by the trace, then 1 record including
+           the average Y value in the spectrum, in format 16X,F13.7,
+           which is followed by 4 records giving the 11
+           polynomial coefficients for the fit.  Note that this
+           program only assumes the number of records for each
+           spectrum, and the position of the average Y value.  It
+           carefully only modifies the Y value fields, leaving all
+           the rest unchanged.
+.endhelp

@@ -1,0 +1,181 @@
+.help fibsep Starlink figaro
+.nf
+ FIBSEP - Separate spectra in 2D array
+
+
+Description
+
+    This cube should have been created using FIB2CUBE. Options available
+    include displaying planes of the cube and profiles and fitting
+    Gaussians etc. to these profiles.
+
+Parameters
+
+
+CUBE
+
+    CUBE = FILE (Read)
+        Cube for display
+          This should be a file produced by FIB2CUBE, containing
+          a .FIBRE structure.
+
+YSTART
+
+    YSTART = REAL (Read)
+        analysis lower limit
+            The data between the limits ystart and yend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+YEND
+
+    YEND = REAL (Read)
+        analysis upper limit
+            The data between the limits ystart and yend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+YBLOCK
+
+    YBLOCK = REAL (Read)
+        Enter analysis x-sect width
+            Each window is of this width (except perhaps the final one).
+
+TSTART
+
+    TSTART = REAL (Read)
+        analysis lower limit
+            The data between the limits tstart and tend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+TEND
+
+    TEND = REAL (Read)
+        analysis upper limit
+            The data between the limits tstart and tend is extracted
+            and the resultant spectrum is used to locate the lines.
+
+TBLOCK
+
+    TBLOCK = REAL (Read)
+        Enter analysis blocking width in 3rd dimension
+            Each window is of this width (except perhaps the final one).
+
+DEVICE
+
+    DEVICE = CHARACTER (Read)
+        Device for display
+
+ITERATION
+
+    ITERATION = INTEGER*2 (Read)
+        New value of itteration
+
+OUTABLE
+
+    OUTABLE = FILE (Write)
+        Name for EXTATIC file
+
+VCORR
+
+    VCORR = REAL (Read)
+        correction to apply to radial velocities
+
+TOLS
+
+    TOLS = CHARACTER (Read)
+        For use in batch only
+
+FITRAT
+
+    FITRAT = REAL (Read)
+        Ratio of widths, heights, or separation, for double fits
+
+CALRAT
+
+    CALRAT = INTEGER (Read)
+        Ratio of number of iteration to default
+
+OUTPUT
+
+    OUTPUT = FILE (Write)
+        Name for output file
+
+FIT_MODEL
+
+    FIT_MODEL = CHARACTER (Read)
+        Model of fit to perform
+
+LOW
+
+    LOW = REAL (Read)
+        Minimum value for display
+
+HIGH
+
+    HIGH = REAL (Read)
+        Maximum value for display
+
+ABSORPTION
+
+    ABSORPTION = LOGICAL (Read)
+        Allow fitting of absorption lines
+
+BOUNDS
+
+    BOUNDS = LOGICAL (Read)
+        Perform bounded fits to lines (in batch)
+
+HARDCOPY
+
+    HARDCOPY = LOGICAL (Read)
+        produce hardcopy plots of fits from cube
+
+TABLE
+
+    TABLE = LOGICAL (Read)
+        produce table of fits from cube
+
+PRINT
+
+    PRINT = LOGICAL (Read)
+        Produce print out of rotation curves
+
+SHAPE
+
+    SHAPE = LOGICAL (Read)
+        Carry out shape analysis
+
+KEEP_ITT
+
+    KEEP_ITT = LOGICAL (Read)
+        Keep itteration files'
+
+FIT
+
+    FIT = LOGICAL (Read)
+        perform fitting
+
+AIC
+
+    AIC = LOGICAL (Read)
+        Use Akiakes information criterion for fitting
+
+WEIGHTS
+
+    WEIGHTS = LOGICAL (Read)
+        Use weights for fitting
+
+PRFITS
+
+    PRFITS = LOGICAL (Read)
+        Print out details of fitting
+
+FULL
+
+    FULL = LOGICAL (Read)
+        Print out full details of fits in table
+
+Source_comments
+
+  none_available
+
+.endhelp

@@ -1,0 +1,78 @@
+.help irflux Starlink figaro
+.nf
+ IRFLUX - Flux calibrates an IR spectrum using a black-body model
+
+
+Description
+
+ Flux calibrates an IR spectrum using a black body model for a
+ standard star.
+
+Parameters
+
+
+SPECTRUM
+
+ Name of Star spectrum.
+
+STANDARD
+
+ Name of Standard spectrum.
+
+TEMP
+
+ Temperature of standard.
+
+CALTYPE
+
+ Type of calibration data.
+
+MAG
+
+ Magnitude of standard star.
+
+FLUX
+
+ Flux of standard star at calib wavelength (mJy).
+
+WAVE
+
+ Calibration wavelength (microns).
+
+OUTPUT
+
+ Name of resulting spectrum.
+
+Source_comments
+
+ I R F L U X
+
+ Flux calibrates an IR spectrum using a black body model for a
+ standard star
+
+ Command parameters -
+
+ SPECTRUM  The name of the structure containing the first image.
+
+ STANDARD  The name of the structure containing the second
+           image data.
+
+ TEMP      The temperature of the black body to be used.
+
+ CALTYPE   The type of calibration data. A single character as follows:
+              'J','H','K','L','M' - magnitude in a standard band
+              'F' - Flux at specified wavelength
+
+ MAG       The magnitude of the standard used.
+
+ FLUX      The flux in mJy of the standard.
+
+ WAVE      The wavelength at which the flux is specified.
+
+ OUTPUT    The name of the result of the operation.  This can
+           be the same as for SPECTRUM.  If not, a new structure
+           is created, with everything but the data a direct
+           copy of the input.
+
+                                      JAB / JAC  19th Sep 1990
+.endhelp

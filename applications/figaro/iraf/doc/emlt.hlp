@@ -1,0 +1,106 @@
+.help emlt Starlink figaro
+.nf
+ EMLT - Fits gaussians to the strongest lines in a spectrum
+
+
+Description
+
+ Analyses an emission line spectrum (typically an arc), and
+ produces a list of the strongest lines, giving their widths
+ and strengths.  Can also produce a synthetic spectrum from
+ the positions, widths and strengths of the fitted lines.
+
+Parameters
+
+
+SPECTRUM
+
+ Specifies the spectrum whose strongest emission
+ lines are to be fitted.  If the data is more than one-
+ dimensional, the analysis is repeated for each cross-
+ section (i.e. spectrum) in the data.
+
+XSTART
+
+ Specifies the X-value (wavelength for calibrated
+ data, or pixel number for uncalibrated data) at which
+ the analysis is to start.
+
+XEND
+
+ Specifies the X-value (wavelength for calibrated
+ data, or pixel number for uncalibrated data) at which
+ the analysis is to end.
+
+LINES
+
+ If LINES is non-zero, it specifies that only the
+ indicated number of strongest lines are to be included
+ in the analysis.  If zero, all lines for which a
+ reasonable fit can be obtained are included.
+
+FWHM
+
+ If FWHM is zero, the fits performed are unconstrained;
+ that is, the fit determines full width at half maximum
+ for each line independently.  If FWHM is non-zero, it
+ specifies a fullwidth at half maximum (in pixels) for
+ each line in the spectrum, and the fit is constrained
+ accordingly.
+
+MOMENTS
+
+ If MOMENTS is set, a center of moment analysis is
+ performed (in addition to the gaussian fit) for
+ each line and the results included in the output.
+ This analysis is performed for each line found, not
+ just the LINES strongest lines.
+
+SYNTH
+
+ If SYNTH is set, a synthetic spectrum based on the
+ fitted positions, strengths and widths of the lines
+ is generated.
+
+OUTPUT
+
+ The name of the resulting synthetic spectrum, if one
+ is to be created.
+
+Source_comments
+
+ E M L T
+
+ Figaro version of the original SDRSYS routine EMLT, which analyses
+ emission lines in a spectrum, fitting gaussians to the strongest
+ lines and logging their positions, widths and centers.  Optionally,
+ it will also give line centers using a centre of moment analysis,
+ and can also produce a synthetic spectrum generated from the
+ positions and widths of the located lines.  Note: Figaro and SDRSYS
+ differ in their pixel numbering, Figaro counting from 1 and SDRSYS
+ counting from 0, so there will be a discrepancy of 1 between the
+ output from the two versions for any pixel number values; wavelength
+ values produced by the two should be the same.
+
+ Parameters -
+
+ SPECTRUM    (Character) The name of the spectrum to be analysed.
+ XSTART      (Numeric) The first X-value to be used for the analysis.
+ XEND        (Numeric) The last X-value to be used for the analysis.
+ LINES       (Numeric) If LINES is zero, all lines that can be
+             fitted are listed.  Otherwise, it gives the number of
+             lines to be included in the analysis, starting with the
+             strongest and cutting off the weaker lines.
+ FWHM        (Numeric) If non-zero, all lines fitted are constrained
+             to a full width at half maximum of this value - in pixels.
+ OUTPUT      (Character) The name of any synthetic spectrum to be
+             generated.
+
+ Keywords -
+
+ MOMENTS     If set, a center of moment analysis is also performed
+             on all lines found.
+ SYNTH       If set, a synthetic spectrum is generated.
+
+                                              KS / AAO  4th March 1988
+.endhelp

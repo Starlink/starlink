@@ -1,0 +1,59 @@
+.help extin Starlink figaro
+.nf
+ EXTIN - Correct spectrum for atmospheric extinction
+
+
+Description
+
+ Given a spectrum and a calibration spectrum whose elements give
+ the extinction coefficients at the wavelengths of the spectrum,
+ corrects that spectrum for atmospheric extinction.
+
+Parameters
+
+
+SPECTRUM
+
+ The spectrum specified by SPECTRUM will be corrected
+ for extinction, given the extinction coefficients in
+ the coefficient spectrum, and taking account of the air
+ mass of the observation.  So SPECTRUM should have a
+ valid value for .OBS.SECZ (the program will complain
+ if it doesn't).  The correction algorithm used allows
+ for the data being calibrated in magnitudes.
+
+COEFF
+
+ A spectrum whose elements give the extinction
+ coefficients applicable for the observation.  COEFF will
+ normally have been prepared by first generating a spiketrum
+ from a table of coefficients using GSPIKE and then using
+ LINTERP to linearly interpolate between them.
+
+OUTPUT
+
+ Specifies the name of the calibrated spectrum to be produced
+ by EXTIN.  Note that this can be the same as for SPECTRUM,
+ in which case the operation will be performed in situ.
+
+Source_comments
+
+ E X T I N
+
+ Corrects a spectrum for extinction, given a coefficient spectrum
+ which gives the interpolated extinction coefficients over the
+ wavelength range of the spectrum.  The spectrum must have
+ a valid .OBS.SECZ value.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The spectrum to be corrected.
+ COEFF       (Character) The coefficient spectrum.
+ OUTPUT      (Character) The resulting spectrum.
+
+ Command keywords - None
+
+ User variables used - None
+
+                                     KS / CIT 24th July 1984
+.endhelp

@@ -1,0 +1,13 @@
+.help exam Starlink figaro
+.nf
+ EXAM - Display the contents/structure of data file
+
+
+Notes
+
+ The EXAM application has been removed. Please use the Starlink utility
+ HDSTRACE (cf. SUN/102).  For example, if you want a listing of the
+ contents of a data file use:
+
+    % hdstrace datafile full
+.endhelp

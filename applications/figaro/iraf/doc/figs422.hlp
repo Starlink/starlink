@@ -1,0 +1,109 @@
+.help figs422 Starlink figaro
+.nf
+ FIGS422 - Process a FIGS image-mode hypercube down to an image
+
+
+Description
+
+ Given an image mode FIGS data hypercube, produces an image.
+ It included all the scan cycles in the hypercube, but only
+ those wavelength planes within a specified range.  The data
+ hypercube may have been sorted into wavelength order (by the
+ program FIGS424) or it may be raw data as produced by the
+ acquisition system.
+
+Parameters
+
+
+HCUBE
+
+ The name of an image mode FIGS data hypercube,
+ as produced by the FIGS data acquisition system
+ or as sorted by FIGS424.
+
+XSTART
+
+ FIGS422 only includes wavelength planes that fall
+ within the wavelength range specified by XSTART..XEND.
+ The program allows some slop in the specification of
+ the wavelength values, so a single plane can be picked
+ out without having to worry about giving its wavelength
+ exactly as it appears in the cube.
+
+XEND
+
+ Specifies the end of the wavelength range to be
+ included in the resulting image.
+
+CYSTART
+
+ The first cycle number to be included in the
+ output data file(s).
+
+CYEND
+
+ The last cycle number to be included in the
+ output data file(s).
+
+IMAGE
+
+ The name of the resulting image.
+ FIGS422 always generates a new image file.
+
+SPLIT
+
+ If SPLIT is set, then FIGS422 will generate a separate
+ file for each of the cycles in the range CYSTART through
+ CYEND.  The files will be given the name specified by
+ IMAGE, but with the cycle number appended.  If SPLIT is
+ not set, FIGS422 adds all the cycles in the range to
+ produce a single image whose name is that specified by
+ IMAGE.
+
+Source_comments
+
+ F I G S 4 2 2
+
+ Given a FIGS image mode data hypercube, either sorted into
+ wavelength order (e.g. by FIGS424) or not, sums all the cycles
+ and wavelength planes within a specified wavelength range
+ to produce an image.
+
+ Command parameters -
+
+ 'HCUBE'    (Character) The name of the hypercube to be processed.
+ 'XSTART'   (Real) The start of the wavelength range to be included.
+ 'XEND'     (Real) The end of the wavelength range to be included.
+ 'CYSTART'  (Integer) The first cycle to be included.
+ 'CYEND'    (Integer) The last cycle to be included.
+ 'IMAGE'    (Character) The name of the resulting image.
+
+ Command keywords -
+
+ 'SPLIT'    If set, FIGS422 will create a number of output
+            files, one for each cycle in the specified range,
+            rather than just one with all the cycles in the range
+            summed.  In this case, the output files will be named
+            using the name specified using 'IMAGE', but with the
+            cycle number appended.
+
+ Input data -
+
+ HCUBE is assumed is the actual hypercube data.
+
+ This routine assumes that the first axis of the cube data
+ represents wavelength, that the second and third represent the
+ X and Y dimensions of the image (this is an unfortunate,
+ since it means that the AXIS(1) structure of the hypercube represents
+ wavelength, the AXIS(2) represents the image X axis and so forth)
+ and the fourth axis represents scan cycle number.
+
+ Output data -
+
+ IMAGE is created with the same structure as HCUBE
+ except that the main data array will only have 2 dimensions, and any
+ AXIS sub-structures that HCUBE has will be
+ deleted/renamed as appropriate.
+
+                                 KS / AAO 6th Jan 1985
+.endhelp

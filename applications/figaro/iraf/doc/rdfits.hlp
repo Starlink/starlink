@@ -1,0 +1,118 @@
+.help rdfits Starlink figaro
+.nf
+ RDFITS - Read file in AAO de facto 'Disk FITS' format
+
+
+Description
+
+ RDFITS reads a disk file containing data in a 'Disk FITS' format
+ and creates a Figaro data file from it.  RDFITS was originally
+ intended to handle the AAO 'de facto disk FITS' format, but the
+ addition of the SWAP keyword and code to determine the disk
+ format in use has made it rather more general.  Note that RDFITS
+ with SWAP set to NO can read files written in the 'JT disk FITS'
+ format handled by RJT.
+
+Parameters
+
+
+FILE
+
+ The name of a disk file containing an image
+ in 'Disk FITS' format - i.e. 2880 byte records looking
+ exactly the same as the records in a FITS tape.
+
+IMAGE
+
+ The name of the resulting Figaro image.  Note that
+ this will contain the image data itself and the 'FITS'
+ header information in a .FITS structure.  The conventions
+ used by the header information - e.g. is RA in hours, minutes
+ and seconds or in fractional minutes? - may not be those
+ used by normal Figaro routines, so be wary of just copying
+ them into any standard observation structure.
+
+SWAP
+
+ FITS data is by definition stored on tape in IBM byte order
+ which is the reverse of internal storage on a VAX.  SWAP =
+ YES for de facto 'disk FITS' files such as that from AAO
+ and written by the Figaro function WDFITS.  Some other 'disk
+ FITS' formats such as JT's may require SWAP=NO.
+
+FLOAT
+
+ The default setting for FLOAT is YES, and this causes
+ FITS to generate an output data structure with a main
+ data array whose type will be FLOAT.  This is the
+ recommended way to create the file.  If the data was
+ originally written with BITPIX=16, then disk space can
+ be saved by setting FLOAT=NO.  FLOAT=NO will be overidden
+ if the FITS header specifies BSCALE and BZERO values other
+ than 1.0 and 0.0 respectively, although the special case
+ of FLOAT=NO combined with BSCALE=1.0 BZERO=32768.0,
+ BITPIX=16 is trapped and produces a main data array of
+ unsigned 16bit integers (some FITS writers, notably WDFITS,
+ use this as an efficient way of writing 16bit unsigned
+ integer data).
+
+See_also
+
+ FIGARO: WDFITS, FITSKEYS.
+ KAPPA: FITSDIN, FITSIN, FITSHEAD, FITSIMP, FITSLIST.
+
+Source_comments
+
+ R D F I T S
+
+ Figaro routine to read file in a 'Disk FITS' format,
+ creating a Figaro data structure file that contains all
+ the information from the disk file (although not necessarily in
+ an ideal form, since the program cannot guess at the meaning
+ of all the various FITS keywords).  For more details, see the
+ listing for FIG_FITIN.
+
+ Command parameters -
+
+ FILE       (Character) The name of the 'Disk Fits' file.
+
+ IMAGE      (Character) The name of the Figaro output file.
+
+ Command keywords -
+
+ SWAP       Swap bytes.  This should be set to YES if the data
+            have been stored in the proper FITS format (IBM-style)
+            and the program is running on a non-IBM byte order
+            machine such as a VAX.  On a VAX, you should use:
+            SWAP=YES for AAO de facto 'disk FITS'.
+            SWAP=NO for WJT 'disk FITS'.
+
+ FLOAT      Convert the data to floating point numbers. This is
+            normally what will be required, although note that only
+            single precision is supported.  If FLOAT=NO is specified,
+            FITS will still convert to floating point if the data have
+            scaling and offset factors that are not 1.0 and 0.0
+            respectively.  The case where FLOAT=NO, BITPIX=16,
+            BSCALE=1.0, BZERO=32768 is treated as a special case and
+            will generate an array of unsigned 16 bit integers.
+            FLOAT=NO is usually only useful in this special case and
+            in the case where BSCALE=1.0, BZERO=0.0, BITPIX=16, where
+            it will create a smaller data file with no loss of precision.
+
+ User Variables used -   None
+
+ Note:  Most of the various 'disk FITS' formats differ only in
+        whether or not they swap bytes, and in the details of the
+        way the disk data is organised in records.  For example,
+        a VAX VMS file may have a 'FIXED', 'VARIABLE', or 'SEGMENTED'
+        format, whereas UNIX files are generally simpler.  Also on
+        a machine that has a record-based file structure (like a VAX)
+        the record lengths may or may not be the 2880 bytes that would
+        match a FITS tape. This program determines the disk format
+        (fixed, variable,segmented) and record length for itself, and
+        uses the SWAP keyword to indicate whether the data bytes are to
+        be treated as swapped or not.  It should therefore be able to
+        handle most of the available 'disk FITS' formats.
+
+                                         KS / AAO 17th June 1986
+.endhelp

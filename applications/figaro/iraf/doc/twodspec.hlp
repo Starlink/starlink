@@ -1,0 +1,11 @@
+.help twodspec Starlink figaro
+.nf
+ Twodspec - Longslit spectroscopy Data Reduction and Analysis
+
+ Twodspec is used for longslit spectroscopy data reduction and analysis.
+ It provides tools for calibration/correction of data and fitting of 2D
+ longslit arrays, either automatically or as an interactive process. These
+ tools also offer a number of options for generating hard copy output of
+ the resulting fits.
+
+.endhelp

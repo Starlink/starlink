@@ -1,0 +1,63 @@
+.help linterp Starlink figaro
+.nf
+ LINTERP - Interpolates between spiketrum points to form a spectrum
+
+
+Description
+
+ LINTERP interpolates between the points of a 'spiketrum' - an
+ array where most of the data is zero except for a few elements
+ whose values are set - to produce a spectrum.  Interpolation is
+ linear between the points of the spiketrum.
+
+Parameters
+
+
+SPIKETRUM
+
+ The name of the spiketrum - an array where only a
+ few elements are set to the correct values, the other
+ elements all being zero - which is to be used to produce
+ a spectrum by interpolation between those specified
+ elements.  SPIKETRUM has probably been produced by
+ GSPIKE from a table of values.
+
+SPECTRUM
+
+ The name of the spectrum to be produced by
+ interpolation between the points of the spiketrum.
+
+Source_comments
+
+ I N T E R P    /     S P I F I T    /   L I N T E R P
+
+ Interpolates between the points of a 'spiketrum' to
+ generate a spectrum.   The INTERP command does this by
+ spline interpolation, the SPIFIT command uses global polynomial
+ fitting, and the LINTERP command uses linear interpolation.
+
+ Command parameters -
+
+ SPIKETRUM  The name of the structure containing the spiketrum
+
+ ORDER      The order for the global polynomial to be fitted
+            (SPIFIT only).
+
+ SPECTRUM   The name of the result of the operation.  This can
+            be the same as for SPIKE.  If not, a new structure
+            is created, with everything but the data a direct
+            copy of the input.
+
+ Command keywords  -
+
+ LOG        (INTERP & SPIFIT only) Perform the interpolation on
+            the log of the data
+
+ LINEND     (INTERP only) Use a linear interpolation for the
+            ends of the data - spline fits can go wild outside the
+            range of the defined points.
+
+ User variables used - None
+                                  KS / CIT 6th July 1984
+
+.endhelp

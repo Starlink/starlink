@@ -1,0 +1,66 @@
+.help isedit Starlink figaro
+.nf
+ ISEDIT - Allows interactive editing of a 1-D or 2-D spectrum
+
+
+Description
+
+ Interactively edit a 1-D or 2-D spectrum allowing points or
+ complete spectra to be removed.
+
+Parameters
+
+
+IMAGE
+
+ IMAGE should be the name of a 1-D or 2-D file.
+
+WHOLE
+
+ If set, the whole of the spectrum is plotted.
+ Otherwise, the limits plotted are determined by the
+ values of XSTART and XEND, which you will be prompted
+ for if they were not specified in the command string.
+
+XSTART
+
+ Specifies the first X value to be plotted, in the units used
+ by the data - angstroms, for example, if the data is wavelength
+ calibrated.  RESET will set XSTART to the first X value in the data.
+
+XEND
+
+ Specifies the last X value to be plotted, in the units used by
+ the data - angstroms, for example, if the data is wavelength
+ calibrated.  RESET will set XEND to the last X value in the data.
+
+YVALUE
+
+ The number of the row to be worked on next.
+
+OUTPUT
+
+ The name of the resulting edited data.
+
+Source_comments
+
+ I S E D I T
+
+ Interactively edit a 1-D or 2-D spectrum allowing points or
+ complete spectra to be removed
+
+ Command parameters -
+
+ 'IMAGE'    The name of the input file.
+ 'XSTART'   Starting X value to plot
+ 'XEND'     Ending X value to plot
+ 'YVALUE'   Number of the row to be plotted.
+ 'OUTPUT'   The name of the output file.
+
+ Command keywords -
+
+ 'WHOLE'    Plot all of spectrum
+
+
+                                 JAB / JAC 11th Dec 1990
+.endhelp

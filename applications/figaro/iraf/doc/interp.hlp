@@ -1,0 +1,80 @@
+.help interp Starlink figaro
+.nf
+ INTERP - Interpolates points of a 'spiketrum' to form a spectrum
+
+
+Description
+
+ INTERP interpolates between the points of a 'spiketrum' - an
+ array where most of the data is zero except for a few elements
+ whose values are set - to produce a spectrum.  Interpolation is
+ by spline fitting, except for those cases where there are not
+ enough points available; in these cases a global polynomial will
+ be used.
+
+Parameters
+
+
+SPIKETRUM
+
+ The name of the spiketrum - an array where
+ only a few elements are set to the correct values, the
+ other elements all being zero - which is to be used to
+ produce a spectrum by interpolation between those specified
+ elements.  SPIKETRUM has probably been produced by GSPIKE
+ from a table of values.
+
+SPECTRUM
+
+ The name of the spectrum to be produced by
+ interpolation between the points of the spiketrum.
+
+LOG
+
+ It doesn't usually make much difference whether you fit
+ to the log of the data or to the data itself, but if the
+ data is changing very rapidly, particularly at the ends,
+ the fit may be better constrained if the log is used.
+
+LINEND
+
+ A spline fit tends to go a little wild at the ends of the
+ fitted spectrum - before the first and after the last point
+ defined by the spiketrum.  Using linear interpolation in
+ these extreme ranges prevents this, at the expense of the
+ smoothness of the resulting curve.  Usually, it doesn't
+ make much difference.
+
+Source_comments
+
+ I N T E R P    /     S P I F I T    /   L I N T E R P
+
+ Interpolates between the points of a 'spiketrum' to
+ generate a spectrum.   The INTERP command does this by
+ spline interpolation, the SPIFIT command uses global polynomial
+ fitting, and the LINTERP command uses linear interpolation.
+
+ Command parameters -
+
+ SPIKETRUM  The name of the structure containing the spiketrum
+
+ ORDER      The order for the global polynomial to be fitted
+            (SPIFIT only).
+
+ SPECTRUM   The name of the result of the operation.  This can
+            be the same as for SPIKE.  If not, a new structure
+            is created, with everything but the data a direct
+            copy of the input.
+
+ Command keywords  -
+
+ LOG        (INTERP & SPIFIT only) Perform the interpolation on
+            the log of the data
+
+ LINEND     (INTERP only) Use a linear interpolation for the
+            ends of the data - spline fits can go wild outside the
+            range of the defined points.
+
+ User variables used - None
+                                  KS / CIT 6th July 1984
+.endhelp

@@ -1,0 +1,92 @@
+.help vachel Starlink figaro
+.nf
+ VACHEL - Air to vacuum, and/or recession velocity wavelength conversion
+
+
+Description
+
+ VACHEL provides facilities for conversion of the X-array (wave-
+ length) from air to vacuum values, and/or correction of the
+ wavelengths for the effects of a Doppler shift (e.g. to correct
+ from observed to heliocentric velocity frame).
+
+Parameters
+
+
+IMAGE
+
+ The name of the image (or spectrum) whose
+ X values are to be converted. IMAGE must already
+ have a valid X-array.
+
+OUTPUT
+
+ The name of the resulting image (or
+ spectrum).  If this is the same as IMAGE, the
+ original file will be modified.  Otherwise, a
+ new file will be created.
+
+VEL
+
+ The recession velocity in Km/s
+ whose effects will be removed by this routine.
+ Use a negative VELOCITY to correct for a
+ velocity of approach.
+
+VAC
+
+ If VAC is set, the input wavelengths will be assumed
+ to be in air, and will be converted to vacuum values.
+ The input wavelengths must be in Angstroms for this to
+ give the correct result.  The resulting wavelength scale
+ will be (slightly) non-linear due to the wavelength
+ dependence of the refractive index of air.  Therefore it
+ is generally advisable to rescrunch after use of this
+ correction.
+
+DPLR
+
+ If DPLR is set, the input wavelengths will be corrected
+ for the effects of a recession velocity of VEL Km/S.
+
+Source_comments
+
+ V A C H E L
+
+ VACHEL alters the wavelength (X) structure, to convert it from
+ air to vacuum wavelengths, and to correct for a recession velocity
+ (user supplied value).  Usually (but not necessarily) the velocity
+ will be the recession velocity required to correct from observed
+ wavelengths to heliocentric. The velocity correction uses the
+ relativistic formula.
+     Either or both of the vacuum and recession corrections may be
+ applied in the one run.
+     The resulting X structure will be (slightly) non-linear, due
+ to the wavelength dependence of the refractive index of air. It
+ will therefore generally be advisable to rescrunch after use of
+ this routine.  An exception is if only a recession correction is
+ made: this leaves a linear scale (if the input is linear).
+     The input wavelength (X) data must be in Angstroms for the
+ air to vacuum conversion to work correctly.
+
+
+ Command parameters -
+
+ IMAGE  (Character) The name of the structure containing the image.
+ VEL    (Float) Recession velocity for which wavelength is to be
+        corrected
+ OUTPUT (Character) The name of the result of the operation.  This
+        can be the same as for IMAGE.  If not, a new structure
+        is created, with everything but the x-data a direct
+        copy of the input.
+
+ Command keywords -
+
+ VAC=YES  Correction from air to vacuum is to be made
+ VAC=NO   No correction from air to vacuum is to be made
+ DPLR=YES Correction for (+ or -) recession velocity is to
+          be made
+ DPLR=NO  No velocity correction
+
+                                  JGR  July 1985
+.endhelp

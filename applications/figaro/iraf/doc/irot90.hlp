@@ -1,0 +1,54 @@
+.help irot90 Starlink figaro
+.nf
+ IROT90 - Rotates an image through 90 degrees
+
+
+Description
+
+ The datafile is rotated throught 90 degrees in a clockwise
+ direction, unless ANTI is specifified, in which case the
+ rotatation is anti-clockwise.
+
+Parameters
+
+
+IMAGE
+
+ The name of the structure containing the image.
+
+OUTPUT
+
+ The name of the result of the operation.  This can be the same
+ as  for IMAGE.  In any case, a new structure is created, with
+ everything but the data a direct copy of the input.
+
+ANTI
+
+ If set, the rotation is anti-clockwise.
+
+See_also
+
+ FIGARO: IREVX, IREVY.
+ KAPPA: FLIP, ROTATE, TRANSFORMER.
+
+Source_comments
+
+ I R O T 9 0
+
+ Rotates an image through 90 degrees
+
+ Command parameters -
+
+ IMAGE  The name of the structure containing the image.
+
+ OUTPUT The name of the result of the operation.  This can
+        be the same as for IMAGE.  In any case, a new structure
+        is created, with everything but the data a direct
+        copy of the input.
+
+ Command keywords -
+
+ ANTI   If set, the rotation is anti-clockwise.
+
+                                  KS / CIT 7th March 1983
+.endhelp

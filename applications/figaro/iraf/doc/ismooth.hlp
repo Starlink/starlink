@@ -1,0 +1,77 @@
+.help ismooth Starlink figaro
+.nf
+ ISMOOTH - 2-D smooth of image using 9-point smoothing algorithm
+
+
+Description
+
+ ISMOOTH, which smooths a 2-D image using a nine-point 2-D
+ smoothing algorithm.  This is a 2-D extension of the 3-point
+ spectrum smoothing algorithm which replaces each pixel with
+ 1/2 its own value plus 1/4 of the value of each of its two
+ neighbours.  The routine used here replaces each pixel with
+ a fraction of its own value plus a fraction of the value of
+ its eight nearest neighbours.  The fraction from a 'corner'
+ neighbour is 1.414 times less than from a 'side' neighbour.
+ Repeating the process increases the amount of smothing applied,
+ and the operation is close in effect to a gaussian convolution.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be smoothed.
+
+FRACTION
+
+ Fraction of pixel data for redistribution.
+
+REPEAT
+
+ Number of times to repeat basic smoothing.
+
+OUTPUT
+
+ Name of resulting image.
+
+See_also
+
+ FIGARO: ICONV3, IXSMOOTH, MEDFILT.
+ KAPPA: CONVOLVE, FFCLEAN, GAUSMOOTH, MEDIAN.
+
+Source_comments
+
+ I S M O O T H
+
+ This routine is the main body of ISMOOTH, which smooths
+ a 2-D image using a nine-point 2-D smoothing algorithm.  This
+ is a 2-D extension of the 3-point spectrum smoothing algorithm
+ which replaces each pixel with 1/2 its own value plus 1/4 of
+ the value of each of its two neighbours.  The routine used here
+ (see GEN_ASMOTH for details) replaces each pixel with a fraction
+ of its own value plus a fraction of the value of its eight nearest
+ neighbours.  The fraction from a 'corner' neighbour is 1.414 times
+ less than from a 'side' neighbour.  Repeating the process increases
+ the amount of smothing applied, and the operation is close in
+ effect to a gaussian convolution.
+
+ Command parameters -
+
+ IMAGE    The name of the structure containing the image.
+
+ FRACTION (Numeric) The fraction of each pixel's value to be
+          distributed to its neighbours.  The higher this
+          value the greater the smoothing effect.
+
+ REPEAT   (Numeric) The number of times the operation is to
+          be repeated.  The higher this value, the greater
+          the smoothing effect.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+                                  KS / CIT 21st June 1983
+.endhelp

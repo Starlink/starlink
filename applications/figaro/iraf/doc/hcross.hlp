@@ -1,0 +1,145 @@
+.help hcross Starlink figaro
+.nf
+ HCROSS - Cross-correlate two spectra & get redshift and error
+
+
+Description
+
+ This computes the cross-correlation of two spectra and
+ the location of the central peak of the cross-correlation.
+ It can be used to determine a relative shift between two
+ spectra. Routines added to calculate the confidence levels
+ and improved error estimates (CCFPAR) according to analysis
+ in Heavens A.F.,1993, MNRAS, 263, 735.  The cross correlation
+ function can also be saved in a disk structure.
+
+
+Parameters
+
+
+SPECTRUM
+
+ Name of spectrum.
+
+TEMPLATE
+
+ Name of template spectrum.
+
+VELOCITIES
+
+ If yes, redshift is in km/S rather than Z.
+
+BASERED
+
+ Redshift of template spectrum.
+
+BASERR
+
+ Redshift error of template spectrum.
+
+BASEVEL
+
+ Velocity (km/s) of template spectrum.
+
+BASEVERR
+
+ Velocity error (km/s) of template spectrum.
+
+XSTART
+
+ First X value to be used.
+
+XEND
+
+ Last X value to be used.
+
+FITCONT
+
+ Fit continuum?
+
+CBPC
+
+ Percentage of spectrum covered by cosine bell.
+
+RECORD
+
+ Create file to record cross-correlation?
+
+CROSS
+
+ Name of cross-correlation data?
+
+Source_comments
+
+ H C R O S S
+
+ Main body of the Figaro HCROSS function.  This computes
+ the cross-correlation of two spectra and the location of the
+ central peak of the cross-correlation.  It can be used to
+ determine a relative shift between two spectra. Routines added to
+ calculate the confidence levels and improved error estimates (CCFPAR)
+ according to analysis in Heavens A.F.,1993, MNRAS, 263, 735.
+ Routine added to calculate the redshift and error in redshift
+ directly (GET_LOGSTEP and CALCRS).  The cross correlation
+ function can also be saved in a disk structure.
+
+ Command parameters -
+
+ SPECTRUM    (Character) The spectrum to be compared with
+             a template spectrum.
+ TEMPLATE    (Character) The template spectrum to be used.
+             The two spectra should be the same length.
+ BASERED     (Numeric) Redshift of template spectrum.
+             Negative=blueshift.  Required if VELOCITIES=NO
+ BASERR      (Numeric) Redshift error of template.
+             Required if VELOCITIES=NO
+ BASEVEL     (Numeric) Recession velocity in km/s
+             (see keyword VELOCITIES below) of template spectrum.
+             Negative=blueshift. Required if VELOCITIES=YES
+ BASEVERR    (Numeric) Velocity error of template (km/s).
+             Required if VELOCITIES=YES
+ XSTART      (Numeric) Data with an axis data value less than XSTART
+             will be ignored in the cross-correlation.
+ XEND        (Numeric) Data with an axis data value greater than XEND
+             will also be ignored.  Note that these values are
+             used to determine the channel numbers to be used
+             for SPECTRUM, and the same ones will be used for
+             TEMPLATE, even if TEMPLATE has a  different axis
+             structure.
+ CBPC        (Numeric) Percentage of spectrum covered by a cosine
+             bell prior to application of the FFT.
+ CROSS       (Character) the name of the data structure to hold
+             the cross-correlation, if it is to be saved.
+             The file created will be cross.dst, and will look
+             like an ordinary spectrum - i.e. can be plotted by
+             SPLOT, etc.  CROSS is ignored if RECORD is not
+             set.
+
+ Command keywords -
+
+ FITCONT     If set, a continuum fit is performed on the two
+             spectra prior to application of the cosine bell.
+ RECORD      If set, the cross-correlation of the two spectra
+             will be recorded as a new data structure.
+ VELOCITIES  If yes, template redshift and error are entered in
+             km/s (Negative=blueshift), and results are printed in km/s.
+             Recommended option, and default, is NO
+             i.e. a redshift z is expected and returned.
+             Velocity option only makes sense if v<<c.
+             v=cz and is accurate to O(z)
+
+ User variables used -
+
+ SHIFT       (Numeric) The relative shift of the two spectra.
+ REDSHIFT    (Numeric) The redshift of the spectrum.
+ REDERR      (Numeric) Redshift error of spectrum.
+ VELOCITY    (Numeric) Recession velocity of spectrum (km/s):
+                       Only meaningful if <<c.
+ VELERR      (Numeric) Recession velocity error of spectrum (km/s)
+ CONF        (Numeric) The confidence in the redshift of the spectrum
+ WARN        (Numeric) =1 if routine detects badly-matched spectra.
+                       =0 otherwise (not a guarantee of good spectra)
+
+ 5th  Oct. 1993. AFH, NEJ / UoE.
+
+.endhelp

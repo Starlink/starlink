@@ -1,0 +1,48 @@
+.help ccur Starlink figaro
+.nf
+ CCUR - After SPLOT, uses graphics cursor to indicate data values
+
+
+Description
+
+ If a spectrum has been displayed on the current soft plotting
+ device, CCUR allows the user to move the cursor around the
+ display, indicating the current cursor position and data value
+ each time a terminal key is pressed.
+
+Parameters
+
+
+SCREEN
+
+ The screen management routines used by CCUR do not know
+ how to handle all the various types of VDU.  If you
+ find that you are having problems getting output from
+ CCUR, try setting SCREEN=NO - this bypasses the fancy
+ screen formatting and puts out the data crudely but
+ directly to the terminal as though it were not a VDU.
+
+Source_comments
+
+ C C U R
+
+ Uses the cursor to get information about data as displayed on
+ the soft graphics device.
+
+ Command variables - None.
+
+ Command keywords - None.
+
+ User variables -     (">" input, "<" output)
+
+ (>) SOFT     (Character) Device / type for soft plots.
+              See documentation on 'SOFT' command for
+              details.
+ (>) TVXST    (Numeric) X-start value for current plot.
+ (>) TVXEN    (Numeric) X-end value for current plot.
+ (>) TVLOW    (Numeric) Lowest value of current plot.
+ (>) TVHIGH   (Numeric) Highest value of current plot.
+ (>) TVFILE   (Character) Name of currently displayed data.
+
+                              KS / CIT 23rd July 1984
+.endhelp

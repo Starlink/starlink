@@ -1,0 +1,238 @@
+.help arc Starlink figaro
+.nf
+ ARC - Interactive manual arc line identification
+
+
+Description
+
+ ARC is a Figaro program that can be used for interactive identif-
+ ication of arc lines.
+
+ Each invocation of ARC produces a file arlines.lis in the working
+ directory.  This file must be renamed or deleted before re-invoking
+ ARC.
+
+Parameters
+
+
+SPECTRUM
+
+ The arc data. If there is an X-axis data component the information it
+ contains will be used during the program.  At the end of the program
+ the X-axis data component can be set to contain the wavelengths
+ determined by the fit.
+
+ARCTYPE
+
+ The type of arc that was used - e.g. HELIUM, NEON, etc.  ARC will look
+ for a file called ARCTYPE.ARC which should hold the line list for the
+ arc.  Can be up to three types, separated by commas.
+
+SIGMA
+
+ Arc line half width in pixels.
+
+ORDER
+
+ Polynomial order for 1st fit.
+
+PREVIOUS
+
+ If set, ARC will read in the line list from the previous fit as
+ a starting point.
+
+ARFILE
+
+ The name of the list file from which the previous fit is to be read.
+ Only used if PREVIOUS is set.  Note that the output is always
+ written to ARLINES.LIS.  Default extension is .LIS
+
+XCORR
+
+ If the previous arc fit was to a different arc, then there is the
+ possibility that the current arc is similar to the previous one but
+ has been shifted. If this is the case, ARC can attempt to determine
+ the shift by cross-correlation of the current arc and the previous
+ one, and can then redetermine the arc line centers by looking for the
+ listed lines at their shifted positions.
+
+OUTPUT
+
+ If the final fit obtained is to be used, it is used to reset the
+ x-axis structure in the arc spectrum, giving a new output file.
+ OUTPUT is the name of output file, which can be the same as SPECTRUM,
+ in which case the x-axis structure of SPECTRUM is replaced.
+
+DISNCHAN
+
+ Length of displayed sections.
+
+MOVETOX
+
+ New plot centre x value.
+
+CMD
+
+ At this stage in ARC you have the following options available -
+
+   Fit      - Repeat the fit.
+   Disp     - Display the deviation of the fit from a linear fit.
+              This shows the trend of the fit, and the errors in
+              each line.
+   Order    - Change the order of the fit.
+   Edit     - Delete or change the wavelength of one or more of
+              the selected lines, without returning to the cursor
+              selection.
+   Reselect - Return to selection using the cursor.
+   Print    - Prints a copy of the fit (what ARLINES.LIS would look
+              like if you were to exit now).
+   Auto     - Starting from your current fit and arc line list, ARC
+              looks for additional line in the arc at wavelengths
+              given in the line list and adds any it finds to the
+              identified line tables.
+   Xauto    - Deletes all the lines found by 'Auto'.
+   Modify   - Allows you some control over the Autofit parameters.
+   Quit     - Start to exit ARC.
+   Help     - (or ?) Display this information.
+
+ The first letter of each command is sufficient.
+
+LINENO
+
+ Number of line to be edited.
+
+WAVELEN
+
+ Wavelength specification.
+
+CHFACT
+
+ The autofit algorithm is parameterised as follows.
+
+ It takes each pixel in turn.  If that pixel is more than CHFACT
+ times the current sigma value from any line already found, it uses
+ that pixel as the starting point for a line search.  If anything
+ resembling a line can be found, it calculates its wavelength and
+ looks in the line tables for a line close to that wavelength.
+
+ A line is accepted if the discrepancy between calculated and
+ tabulated wavelength is less than SIGFACT times the current RMS
+ value.  This means that the criterion for accepting new lines
+ is based on how their wavelength discrepancies compare with those for
+ the lines that have already been accepted.
+
+ SIGFACT is the more important parameter.
+
+SIGFACT
+
+ The autofit algorithm is parameterised as follows.
+
+ It takes each pixel in turn.  If that pixel is more than CHFACT
+ times the current sigma value from any line already found, it uses
+ that pixel as the starting point for a line search.  If anything
+ resembling a line can be found, it calculates its wavelength and
+ looks in the line tables for a line close to that wavelength.
+
+ A line is accepted if the discrepancy between calculated and
+ tabulated wavelength is less than SIGFACT times the current RMS
+ value.  This means that the criterion for accepting new lines
+ is based on how their wavelength discrepancies compare with those for
+ the lines that have already been accepted.
+
+ SIGFACT is the more important parameter.
+
+WRITEARC
+
+ If set, an output spectrum using the arc fit is written.
+
+HARDARC
+
+ If set, the output spectrum is plotted in a hard copy.
+
+HARDISP
+
+ If set, the dispersion curve is plotted in a hard copy.
+
+QUITSEL
+
+ Used to confirm quitting line selection.
+
+LINEOK
+
+ Used to confirm a choice of line for deletion, editing etc.
+
+RESOLVE
+
+ Used to decide what to do if a line is used twice.
+
+Source_comments
+
+ A R C
+
+ Interactively associates lines in an arc spectrum with
+ their wavelengths and performs a fit to these values.
+
+ Command parameters -
+
+ SPECTRUM   The arc data. If there is an x-axis data
+            component the information it contains will be
+            used during the program.  At the end of the
+            program the x-axis data component can be set to
+            contain the wavelengths determined by the fit.
+ ARCTYPE    The type of arc that was used - e.g. HELIUM,
+            NEON, etc.  ARC will look for a file called
+            ARCTYPE.ARC which should hold the line list for
+            the arc.  Can be up to three types, separated by
+            commas.
+ ORDER      The initial order for the polynomial fit.
+ SIGMA      The initial value for the line width.
+ ARFILE     The name of the list file from which the previous
+            fit is to be read.  Only used if PREVIOUS is
+            set.  Note that the output is always written
+            to ARLINES.LIS.  Default extension is .LIS
+ OUTPUT     If the final fit obtained is to be used, it is
+            used to reset the x-axis structure in the arc spectrum,
+            giving a new output file.  OUTPUT is the name of
+            output file, which can be the same as SPECTRUM, in
+            which case the x-axis structure of SPECTRUM is replaced.
+
+ Command keywords -
+
+ PREVIOUS   If set, ARC will read in the line list from
+            the previous fit as a starting point.
+ XCORR      If set, and arc is not the same as the arc used
+            to generate the previous line list, a shift between the
+            two will be determined and the line centers reanalyysed.
+
+ User variables -
+
+ (>) SOFT   (Char) The device/type to be used for graphics
+            soft plots.  See the SOFT command for details.
+            The device must support a cursor.
+ (>) HARD   (Char) The device/type for graphics hard plots.
+
+ Input -
+
+ As named    May use the lines from a previous run.  If so
+ by ARFILE   these are read from the previous run's output
+             file.  See below.
+
+ Output -
+
+ ARLINES.LIS File containing the lines used in the final fit.
+             Format is as follows -
+             Number of lines used in fit and file name (I5,23X,A)
+             1 blank record, then one header record.
+             Then one record for each line, giving channel number,
+             wavelength, calculated wavelength and wavelength
+             discrepancy line number and auto flag (4F13.4,I7,A4)
+             The auto flag is either " (A)" or is a blank string.
+             Then one blank record, then a record giving the RMS
+             error and the value of SIGMA used (12X,F10.2,19X,F5.2)
+             Then one blank record, then one record giving the
+             order of fit (i.e. 1 less than number of coefficients)
+             (15X,I3), then one blank record, then one or more
+             records giving the coefficients (3D23.16)
+
+                                       KS / CIT  13th June 1984
+.endhelp

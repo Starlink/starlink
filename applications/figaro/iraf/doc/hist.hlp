@@ -1,0 +1,66 @@
+.help hist Starlink figaro
+.nf
+ HIST - Produce histogram of data value distribution in an image
+
+
+Description
+
+ HIST produces a histogram showing the distribution of data values
+ in a Figaro data file.  The histrogram is produced in the form of
+ a one dimensional data structure, which can be plotted using SPLOT
+
+Parameters
+
+
+IMAGE
+
+ The name of the file containing the data to be
+ histogrammed.  The data may have any dimensions.
+
+MINVAL
+
+ The value of the center of the first bin of the
+ histogram.  Data less than MINVAL is not included
+ in the histogram, so if delta is the bin width
+ (Delta=(Maxval-Minval)/(Bins-1)), the first bin
+ of the result gives the number of pixels between
+ Minval and (Minval+delta/2), while the bin centered
+ on value will give the number of pixels between
+ value-delta/2 and value+delta/2.
+
+MAXVAL
+
+ The value of the center of the last bin of the
+ histogram.  Data greater than MAXVAL is not
+ included in the histogram.
+
+BINS
+
+ The number of bins to be used in the histogram.
+
+SPECTRUM
+
+ The histogram produced by HIST is in the form of a
+ one dimensional data array, i.e. a sort of spectrum
+ which may, for example, be plotted by SPLOT.
+
+Source_comments
+
+ H I S T
+
+ Creates a one dimensional data structure containing a histogram
+ of the data distribution in another structure.
+
+ Command parameters -
+
+ IMAGE    (Character) The name of the data structure (not necessarily
+          two dimensional) to be histogrammed.
+ MINVAL   (Numeric) The minimum value for the histogram.
+ MAXVAL   (Numeric) The maximum value for the histogram.
+ BINS     (Numeric) The number of bins to be used for the histogram.
+ SPECTRUM (Character) The histogram produced from the input data.
+
+ Command keywords -  None
+
+                                 KS / CIT 29th June 1984
+.endhelp

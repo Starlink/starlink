@@ -1,0 +1,126 @@
+.help icont Starlink figaro
+.nf
+ ICONT - Produces a contour map of an image
+
+
+Description
+
+ Produces a contour map of an image.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be contoured.
+
+YSTART
+
+ First Y value to be displayed.
+
+YEND
+
+ Last Y value to be displayed.
+
+XSTART
+
+ First X value to be displayed.
+
+XEND
+
+ Last X value to be displayed.
+
+LOW
+
+ Lowest contour level.
+
+HIGH
+
+ Highest contour level.
+
+CONTOURS
+
+ Number of contour levels.
+
+LABEL
+
+ Label for plot.
+
+THICKNESS
+
+ Width of plotted lines.
+
+LEVELS
+
+ Explicit contour levels to use.
+
+ADJUST
+
+ Adjust scales so as to fill display?
+
+BYVALUE
+
+ Specify contour level array explicitly?
+
+HARDCOPY
+
+ Generate a hardcopy plot?
+
+See_also
+
+ KAPPA: CONTOVER, TURBOCONT.
+
+Source_comments
+
+ I C O N T    /    I G R E Y
+
+ Handles an 'ICONT' command, producing a contour plot of an
+ image on either the current hard or soft graphics device,
+ or an 'IGREY' command, which produces a grey-scale plot.
+
+ Command parameters -
+
+ IMAGE    (Character) The name of the image to be contoured.
+ YSTART   (Numeric) The first Y value to be displayed.
+ YEND     (Numeric) The last Y value to be displayed.
+ XSTART   (Numeric) The first X value to be displayed.
+ XEND     (Numeric) The last X value to be displayed.
+          Note that this initial version only accepts these
+          values as pixel numbers.
+ LOW      (Numeric) The minimum contour level (ICONT) or
+          the black level (IGREY).
+ HIGH     (Numeric) The maximum contour level (ICONT) or
+          the white level (IGREY).
+ CONTOURS (Numeric) The number of contours displayed - these
+          will be divided evenly between HIGH and LOW, unless
+          explicitly specified as BYVALUE. (ICONT only).
+ LABEL    (Character) A label for the plot.
+ THICKNESS(Numeric) Thickness to use for lines (only used if
+          the HARDCOPY parameter is specified, and ICONT only)
+ LEVELS   (Numeric array) The contour levels to use (ICONT only,
+          and only if the BYVALUE keyword is specified).
+
+ Command keywords -
+
+ HARDCOPY Output the plot to the current hard graphics device.
+ ADJUST   Adjust scales so as to fill screen.
+ BYVALUE  For ICONT, indicates that explicit contour values are
+          specified in the LEVELS parameter.
+
+ User variables used -   (">" input, "<" output)
+
+ (>) SOFT     Current device/type (PGPLOT convention) for soft
+              graphics output.
+ (>) HARD     Current device/type (PGPLOT convention) for hardcopy
+              graphics output.
+ (<) TVXST    is set to the starting x-value for the plot.
+ (<) TVXEN    Is set to the final x-value for the plot.
+ (<) TVYST    is set to the starting y-value for the plot
+ (<) TVYEN    is set to the final y-value for the plot.
+ (<) TVHIGH   Is set to the same value as HIGH.
+ (<) TVLOW    Is set to the same value as LOW.
+ (<) PGENVARG Arguments used for PGENV.
+ (<) IMFILE   File containing the displayed image.
+
+                                           KS / CIT 21st March 1984.
+.endhelp

@@ -1,0 +1,59 @@
+.help impos Starlink figaro
+.nf
+ IMPOS - read positions from a file into the environment variables
+
+
+Description
+
+ Input a list of positions from a file to the environment variables
+ from which CENTERS obtains its input.
+
+ CENTERS requires a list of approximate X,Y input positions which
+ it reads from environment variables.  Usually this list is created
+ interactively with ICUR or IGCUR.  IMPOS creates the list by
+ reading it from a text file, thus allowing CENTERS to be used
+ non-interactively.
+
+ The input file is free-format, with one X,Y position per line.
+ The X and Y values should be separated by one or more spaces and
+ be expressed in pixels.  Up to a hundred positions may be included.
+
+Usage
+
+ impos file-name
+
+Parameters
+
+
+INPFLE
+
+INPFLE  =  _CHAR (Read)
+   Name of the input file containing the list of positions.
+
+XPIXELS
+
+XPIXELS  = _REAL (Write)
+   List of X coordinates (pixels).
+
+YPIXELS
+
+YPIXELS  = _REAL (Write)
+  List of Y coordinates (pixels).
+
+NPIXELS
+
+NPIXELS  =  _REAL (Write)
+  Number of points in the list.
+
+Source_comments
+
+ Input a list of positions from a file to the environment variables
+ from which CENTERS obtains its input.
+
+ The contents of an example input file containing positions for
+ three objects might be:
+
+      103.4   67.8
+      231.6  134.5
+      246.7   89.2
+.endhelp

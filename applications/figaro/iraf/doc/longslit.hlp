@@ -1,0 +1,296 @@
+.help longslit Starlink figaro
+.nf
+ LONGSLIT - Fits 2D longslit arrays and plots results
+
+
+Description
+
+   LONGSLIT can fit Gaussians, skew Gaussians, Lorentzians and Cauchy
+   functions to line profiles, and can carry out line profile analysis to
+   produce the Whittle and Heckman asymmetry parameters. Much of this
+   can be carried out in batch mode.
+     This program generates rotation curves from 2D data, for a number
+   of emission/absorption lines.
+     Options are available to automatically fit each line in the
+   spectrum or to do it in an interactive manner allowing unsatisfactory
+   fits to be rejected. Unsatisfactory fits may then be refitted on a
+   second pass.
+     For each line a table is created containing all the fit parameters
+   as a function of crossection.If the data has been block averaged in
+   an range of XSECTS the average XSECT value and the XSECT range are
+   computed and stored.
+     In manual mode the user can sweep through the XSECTS choosing
+   different BLOCKINGS and line types repeatedly until he either
+   accepts the fit or issues an instruction not to fit a given range of
+   XSECTS.
+     Continuum Fitting is provided in two ways. Firstly a GLOBAL
+   continuum may be defined for each block of data. This is a continuum
+   which is fitted to all regions of the spectrum which do NOT contain
+   lines. A variety of models are available.
+   Chebyshev Polynomials, Splines, (Power Law, Black Body, Black Body
+   with optical depth cuttoff, Empirical, and Balmer Continuum).
+   Secondly, A local continuum may be applied to each INDIVIDUAL
+   line. This continuum is applied in addition to that created
+   by GLOBAL but is confined to the regions of the spectra
+   containing a particular line. Because most of the allowed
+   line options also fit a FLAT base the combination of these
+   fits can be made to match even the most complex continua
+   The types of allowed continuum models for INDIVIDUAL is
+   restricted to Spline, Flat or Chebyshev.
+     It is possible to Edit the results cube created by LONGSLIT
+   and to create new Synthetic spectra by doing model -data
+   manipulations or from the models themselves. During this
+   process several usefull things can be done to the output
+   spectra, notably changing their Redshift, applying or
+   removing Reddening.
+     A similar approach creating Sky subracted data and using sky
+   lines for correcting for instrumental vignetting is also possible.
+     Rotation curves in individual lines are produced as requested in
+   the PLOT mode. In addition it is possible to calculate a mean
+   rotation curve. In the current release the user now has complete
+   control over the plotting parameters and the lines being
+   plotted.
+
+Parameters
+
+
+IMAGE
+
+   IMAGE = FILE (Read)
+        Name of image for input
+                This is the data. This should be a .dst file with
+                a .Z.DATA component. This should also have a .X.DATA
+                array which contains the wavelengths of the lines.
+                For the identification files supplied with the program
+                the units should be Angstroms, but if the user supplies
+                his/her own files, this need not apply, although some
+                plots may have the wrong labels.
+
+ARC_OPTS
+
+   ARC_OPTS = CHARACTER (Read)
+        Enter fit option
+                 NEW    : set up a new analysis
+                 REPEAT : iterate on previous analysis
+                 CLONE  : Clone an analysis from another file
+                          (line locations etc.)
+
+YSTART
+
+   YSTART = INTEGER (Read)
+        analysis lower limit
+
+YEND
+
+   YEND = INTEGER (Read)
+        analysis upper limit
+
+YBLOCK
+
+   YBLOCK = INTEGER (Read)
+        Enter analysis x-sect width
+
+ITERATION
+
+   ITERATION = INTEGER*2 (Read)
+        New value of iteration
+
+MAXLINES
+
+   MAXLINES = INTEGER (Read)
+        Maximum number of lines to allow room for
+
+CLFILE
+
+   CLFILE = FILE (Read)
+        Name of image for cloning from
+
+OUTABLE
+
+   OUTABLE = FILE (Write)
+        Name for extactic file
+
+VCORR
+
+   VCORR = REAL (Read)
+        correction to apply to radial velocities
+
+TOLS
+
+   TOLS = CHARACTER (Read)
+        For use in batch only
+
+INHERIT
+
+   INHERIT = INTEGER (Read)
+        Number to control inheritance of  previous fits
+                 If zero no inheritance of fits
+                 If one then inherited from next block
+                 If minus one then inherited from previous block
+
+DEVICE
+
+   DEVICE = CHARACTER (Read)
+        Device to use for greyscale plots
+
+FITRAT
+
+   FITRAT = REAL (Read)
+        Ratio for double fitting (of widths/heights or separation)
+
+CALRAT
+
+   CALRAT = INTEGER (Read)
+        Ratio to multiply default number of iterations in Nag
+                 optimisation
+
+WHITE
+
+   WHITE = REAL (Read)
+        White level for greyscale plots
+
+BLACK
+
+   BLACK = REAL (Read)
+        Black level for greyscale plots
+
+MAXGAUSS
+
+   MAXGAUSS = INTEGER (Read)
+        Maximum number of Gaussians to allow room for
+                 LONGSLIT can fit up to 9 component fits, but the results
+                 array for such is quite large. This allows the user to set
+                 the maximum number of components he/she is likely to fit,
+                since very little data requires 9 components!
+
+TSTART
+
+   TSTART = REAL (Read)
+        analysis lower limit
+
+TEND
+
+   TEND = REAL (Read)
+        analysis upper limit
+
+TBLOCK
+
+   TBLOCK = REAL (Read)
+        Analysis blocking width in T direction
+
+FIT_MODEL
+
+   FIT_MODEL = CHARACTER (Read)
+        Model of fit to perform
+
+PLOTLIM
+
+   PLOTLIM(4) = REAL ARRAY (Read)
+        Limits for velocity plots
+
+OUTPUT
+
+   OUTPUT = FILE (Write)
+        Name of output file
+
+HARDCOPY
+
+   HARDCOPY = LOGICAL (Read)
+        produce hardcopy plots of fits from cube
+
+TABLE
+
+   TABLE = LOGICAL (Read)
+        produce table of fits from cube
+
+PLOT
+
+   PLOT = LOGICAL (Read)
+        produce plots of rotation curves
+
+PRINT
+
+   PRINT = LOGICAL (Read)
+        produce print out of rotation curves
+
+SHAPE
+
+   SHAPE = LOGICAL (Read)
+        carry out shape analysis
+
+KEEP_ITT
+
+   KEEP_ITT = LOGICAL (Read)
+        keep iteration files
+
+FIT
+
+   FIT = LOGICAL (Read)
+        perform fitting
+
+COPY
+
+   COPY = LOGICAL (Read)
+        copy previous fits
+        This will repeat all the fits previously made, which
+        is likely to be of use if data is co-added after one
+        file has been analysed. Also, when used with CLONE
+        the entire .RES structure is copied without any change.
+        For the new fits the previous fits (suitably scaled)
+        are used as first guesses.
+
+ABSORPTION
+
+   ABSORPTION = LOGICAL (Read)
+        Allow fitting of absorption lines
+
+BOUNDS
+
+   BOUNDS = LOGICAL (Read)
+        Perform bounded fits to lines (in batch)
+
+LABEL
+
+   LABEL = LOGICAL (Read)
+        Put labels on plots
+
+CONTOUR
+
+   CONTOUR = LOGICAL (Read)
+        Create contour plots
+
+GREY
+
+   GREY = LOGICAL (Read)
+        Create greyscale plots
+
+LOG
+
+   LOG = LOGICAL (Read)
+        Use logarithmic scale for CONTOUR and GREY
+
+WEIGHTS
+
+   WEIGHTS = LOGICAL (Read)
+        Use weights for fitting
+
+PRFITS
+
+   PRFITS = LOGICAL (Read)
+        Print out details of fitting
+
+FULL
+
+   FULL = LOGICAL (Read)
+        Print out full details of fits in table
+
+CHECK
+
+   CHECK = LOGICAL (Read)
+        Plot array of line profiles
+
+Source_comments
+
+  none available
+
+.endhelp

@@ -1,0 +1,325 @@
+.help echarc Starlink figaro
+.nf
+ ECHARC - Wavelength calibrate an echelle arc
+
+
+Description
+
+ Each invocation of ECHARC produces a file arlines.ech in the working
+ directory.  This file must be renamed or deleted before re-invoking
+ ECHARC.
+
+Parameters
+
+
+IMAGE
+
+ The arc data.  This should be a .dst file with a two dimensional
+ .z.data component (pixels,orders). ECHARC assumes there is a
+ .y.data component giving order numbers "m"   (such as produced as
+ output from the command ECHTRACT).  If there is a .x.data component
+ the information it contains will be used during the program,
+ although usually the .x.data will simply be pixel number.
+
+ARCTYPE
+
+ The type of arc that was used - e.g. HELIUM, NEON, etc.  ARC will look
+ for a file called ARCTYPE.ARC which should hold the line list for the
+ arc.
+
+INTERACTIVE
+
+ Number of orders to fit interactively.
+
+ORDERS
+
+ The array of INTERACTIVE order numbers to be fit.
+
+SIGMA
+
+ Arc line half width in pixels.
+
+ORDERFIT
+
+ Polynomial order for 1st fit
+
+PREVIOUS
+
+ If set, ARC will read in the line list from the previous
+ session as a starting point.
+
+MONITOR
+
+ Monitor ECHARC autofitting on plot device?
+
+ARFILE
+
+ The name of the list file from which the previous fit is to be read.
+ Only used if PREVIOUS is set, Note that the output is always
+ written to ARLINES.ECH.  Default extension is .ECH
+
+DOWAVES
+
+ Write wavelength information to separate file?
+
+WAVES
+
+ An output image containing the fitted wavelengths from this ECHARC
+ solution as image data (not as axis data).  This is created only if
+ DOWAVES is set.
+
+OUTPUT
+
+ The name of the output file that combines the input image data
+ with the fitted wavelengths as axis data. This is created only
+ if DOWAVES is NO.
+
+CONTINUE
+
+ At this stage in ECHARC you can:
+
+   Continue - go to the next order to be fitted interactively.
+   Repeat   - return to working on the order just completed.
+   Start    - back to square one.
+   Quit     - quit prematurely.
+
+ORDPPAG
+
+ The number of sub-orders to be plotted per page in the hard copy
+ line atlas.
+
+DISNCHAN
+
+ Length of displayed sections.
+
+MOVETOX
+
+ New plot centre x value.
+
+CMD
+
+ At this stage in ECHARC you have the following options available:
+
+   Fit      - Repeat the fit.
+   O_fit    - Change the order of the fit.
+   Disp     - Display the deviation of the fit from a linear fit.
+              This shows the trend of the fit, and the errors in
+              each line.
+   Edit     - Delete or change the wavelength of one or more of
+              the selected lines, without returning to the cursor
+              selection.
+   Reselect - Return to selection using the cursor.
+   Continue - Start to quit this order.
+   Print    - Prints a copy of the fit (what ARLINES.LIS would
+              look like if you were to exit now).
+   Auto     - Starting from your current fit and arc line list,
+              ECHARC looks for additional line in the arc at
+              wavelengths given in the line list and adds any it
+              finds to the identified line tables.
+   Xauto    - Deletes all the lines found by 'Auto'.
+   Modify   - Allows you some control over the Autofit parameters.
+   Help     - (or ?) Display this information.
+
+ The first letter of each command is sufficient.
+
+LINENO
+
+ Number of line to be edited.
+
+WAVELEN
+
+ Wavelength specification.
+
+CHFACT
+
+ The autofit algorithm is parameterised as follows-
+
+   It takes each pixel in turn.  If that pixel is more than CHFACT
+   times the current sigma value from any line already found, it uses
+   that pixel as the starting point for a line search.  If anything
+   resembling a line can be found, it calculates its wavelength and
+   looks in the line tables for a line close to that wavelength.
+
+   A line is accepted if the discrepancy between calculated and
+   tabulated wavelength is less than SIGFACT times the current RMS
+   value.  This means that the criterion for accepting new lines
+   is based on how their wavelength discrepancies compare with those for
+   the lines that have already been accepted.
+
+ SIGFACT is the more important parameter.
+
+SIGFACT
+
+ The autofit algorithm is parameterised as follows-
+
+   It takes each pixel in turn.  If that pixel is more than CHFACT
+   times the current sigma value from any line already found, it uses
+   that pixel as the starting point for a line search.  If anything
+   resembling a line can be found, it calculates its wavelength and
+   looks in the line tables for a line close to that wavelength.
+
+   A line is accepted if the discrepancy between calculated and
+   tabulated wavelength is less than SIGFACT times the current RMS
+   value.  This means that the criterion for accepting new lines
+   is based on how their wavelength discrepancies compare with those for
+   the lines that have already been accepted.
+
+ SIGFACT is the more important parameter.
+
+HLINEMAP
+
+ If set, a map of line locations is plotted as a hard copy.
+
+HATLAS
+
+ If set, an atlas of lines is plotted as a hard copy.
+
+ANALYSIS
+
+ If set, a detailed line-by-line analysis of the arc fit is
+ written to the file "echarc.lis".
+
+HARDARC
+
+ If set, the output spectrum is plotted in a hard copy.
+
+HARDISP
+
+ If set, the dispersion curve is plotted in a hard copy.
+
+QUITSEL
+
+ Used to confirm quitting line selection.
+
+LINEOK
+
+ Used to confirm a choice of line for deletion, editing etc.
+
+RESOLVE
+
+ Used to decide what to do if a line is used twice.
+
+Source_comments
+
+ E C H A R C                    (Version 1.0, 18-NOV-1987 ff.)
+                                (Version 1.5, 08-DEC-1987 ff.)
+
+ This substantially revised version of ECHARC0 performs the 1-D
+ ARC process on 3-30 orders of a collapsed echelle image, and
+ then automatically detects lines and performs fits to all the
+ remaining orders.  The output from the program is a complete
+ listing of all lines found (ARLINES.ECH) and an output image
+ with WAVES.Z.DATA containing the fitted wavelengths.  One can
+ then use ICMULT and IADD to compute a weighted average of two
+ or more such output fits, and then ECHXREBIN to rebin the data
+ onto a constant "Meff * Lambda" .X.DATA scale.
+
+ Command parameters -
+
+ IMAGE        The arc data.  This should be a two-dimensional
+              image. ECHARC assumes there is a y axis giving
+              order numbers "m". If there is an x axis
+              component the information it contains will be
+              used during the program, although usually the
+              x data will simply be pixel number.
+ ARCTYPE      The type of arc that was used - e.g. HELIUM,
+              NEON, etc.  ARC will look for a file called
+              ARCTYPE.ARC which should hold the line list for
+              the arc.
+ INTERACTIVE  The number of orders to be fit interactively.
+ ORDERS       The array of INTERACTIVE order numbers to be fit.
+ ORDERFIT     The initial order of the polynomial fit.
+ SIGMA        The initial value for the line width.
+ ARFILE       The name of the list file from which the previous
+              fit is to be read.  Only used if PREVIOUS is
+              set.  Note that the output is always written
+              to ARLINES.ECH.  Default extension is .ECH
+ WAVES        An output image containing the fitted wavelengths
+              from this ECHARC solution as image data (not as axis
+              data). This is created only if DOWAVES is set.
+ OUTPUT       The name of the output file that combines the input
+              image data with the fitted wavelengths as axis
+              data. This is created only if DOWAVES is no.
+ CONTINUE     Command after an order is done with.
+ ORDPPAG      The number of sub-orders to be plotted per page in
+              the hard copy line atlas.
+ DISNCHAN     Length of displayed sections.
+ MOVETOX      New plot centre x value.
+ CMD          Command in main menu.
+ LINENO       Number of line to be edited.
+ WAVELEN      Wavelength specification.
+ CHFACT
+ SIGFACT
+
+ Command keywords -
+
+ PREVIOUS     If set, ARC will read in the line list from
+              the previous session as a starting point.
+ DOWAVES      If set, the fitted wavelengths will be stored
+              as image data in a separate file. Otherwise the
+              fitted wavelengths will be stored as axis data along
+              with the input image.
+ HLINEMAP     If set, a map of line locations is plotted as
+              a hard copy.
+ HATLAS       If set, an atlas of lines is plotted as a
+              hard copy.
+ ANALYSIS     If set, a detailed line-by-line analysis of the
+              arc fit is written to the file "echarc.lis".
+ HARDARC      If set, the output spectrum is plotted in a
+              hard copy.
+ HARDISP      If set, the dispersion curve is plotted in a
+              hard copy.
+ QUITSEL      Used to confirm quitting line selection.
+ LINEOK       Used to confirm a choice of line for deletion,
+              editing etc.
+ RESOLVE      Used to decide what to do if a line is used twice.
+
+ User variables -
+
+ (>) SOFT     (Char) The device/type to be used for graphics
+              soft plots.  See the SOFT command for details.
+              The device must support a cursor.
+ (>) HARD     (Char) The device/type for graphics hard plots.
+
+ Input -
+
+ As named     May use the lines from a previous run.  If so
+ by ARFILE    these are read from the previous run's output
+              file.  See below.
+
+ Output -
+
+ ARLINES.ECH  File containing the lines used in the final fit.
+              Format is as follows -
+              Number of lines used in fit (I5)
+              1 blank record, then one header record.
+              Then one record for each line, giving order, channel
+              number, wavelength, calculated wavelength, wavelength
+              discrepancy, line number and auto flag (I3,4F13.4,I7,A4)
+              The auto flag is either " (A)" for a single order Auto
+              fit, " (E)" for complete echelle order auto fit, or is
+              a blank string for lines explicitly identified by user.
+              Then one blank record, then a record giving the RMS
+              error and the value of SIGMA used (12X,F10.2,19X,F5.2)
+              Then one blank record, then one record giving the
+              number of coefficients of the fit (15X,I3).
+
+ Functions / subroutines used -
+
+ ECH_ARINTR  (FIGARO)  Plots an order section by section and
+                       allows user to identify lines, fit a
+                       polynomial to those lines, and repeat.
+                       When an order is finished, the lines
+                       identified within it are written to
+                       the file ARLINES.ECH in case of problems
+                       during the fit to the next order.
+ ECH_ARGETL  (FIGARO)  Reads order, channel, wavelength, etc.,
+                       information from an existing ARLINES.ECH
+                       -format file to use as a starting point
+                       for fits to the current order.
+
+ Originally  ARC :                             KS / CIT 13 Jun 1984
+ Stolen & Modified --> ECHARC0:               JKM / CIT  9 Dec 1986
+ Modified:         --> ECHARC:  v. 1.0        JKM / ESO 18 Nov 1987
+ Modified:         --> ECHARC:  v. 1.5        JKM / ESO  8 Dec 1987
+.endhelp

@@ -1,0 +1,61 @@
+.help medfilt Starlink figaro
+.nf
+ MEDFILT - Applies a median filter to an image
+
+
+Description
+
+ The result of this operation is an image in which the value of
+ each pixel is the median value of a rectangular box of pixels
+ centered on the corresponding pixel in the original array.
+ MEDFILT only supports a square box.  MEDFILTR allows rectangular
+ boxes to be used.
+
+Parameters
+
+
+IMAGE
+
+ Name of image to be smoothed.
+
+BOX
+
+ Size of box for median calculations.
+
+OUTPUT
+
+ Name of resulting image.
+
+See_also
+
+ FIGARO: MEDFILTR, BCLEAN, CLEAN, COSREJ, ISMOOTH, IXSMOOTH.
+ KAPPA: FFCLEAN, GAUSMOOTH, MEDIAN.
+
+Source_comments
+
+ M E D F I L T   /    M E D F I L T R
+
+ Figaro routines to median filter an image.  The result of
+ this operation is an image in which the value of each pixel
+ is the median value of a rectangular box of pixels centered on the
+ corresponding pixel in the original array. MEDFILTR allows the
+ box to be specified with different X and Y dimensions, while the
+ original MEDFILT only supported a square box. MEDFILTR is therefore
+ a full superset of MEDFILT, but the older application has to be
+ retained for compatability reasons.
+
+ Command parameters for MEDFILT -
+
+ IMAGE    The name of the structure containing the image.
+
+ BOX      (Numeric) The size of the box (in pixels) to be
+          used in calculating the medians.  Should be odd;
+          if even, BOX-1 will be used.
+
+ OUTPUT   The name of the result of the operation.  This can
+          be the same as for IMAGE.  If not, a new structure
+          is created, with everything but the data a direct
+          copy of the input.
+
+                                  KS / CIT 28th Jan 1984
+.endhelp

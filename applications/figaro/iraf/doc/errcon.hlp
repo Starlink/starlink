@@ -1,0 +1,51 @@
+.help errcon Starlink figaro
+.nf
+ ERRCON - Converts percentage error values to absolute values
+
+
+Description
+
+ At one stage in their development, Figaro routines held error data
+ as percentage values.  This was a bad idea, and all the routines
+ were converted to use absolute error values.  ERRCON converts a
+ file with percentage errors into one with absolute errors.  It
+ should only be needed for old data files written by the old (%)
+ versions of the various Figaro routines.
+
+Parameters
+
+
+SPECTRUM
+
+ The name of a file that contains an error array whose
+ values are expressed as a percentage of the data values.
+
+OUTPUT
+
+ The name of the resulting file, with the error array
+ containing absolute error values.  If OUTPUT is the
+ same as SPECTRUM (the default) the operation will be
+ performed in situ.  Otherwise a new file will be created.
+
+Source_comments
+
+ E R R C O N
+
+ Converts a Figaro file that has an error array containing
+ percentage errors into one that has absolute values in the
+ error array.  This is needed because of the ill-thought-out
+ use of percentage errors at one stage in Figaro.
+
+ Command parameters -
+
+ SPECTRUM  (Character) The name of the file to be converted.
+           This will usually be a spectrum, but data of any
+           dimension will be accepted.
+
+ OUTPUT    (Character) The name of the resulting file. This
+           can be the same as for SPECTRUM. If not, a new
+           structure is created, with everything but the error
+           array a direct copy of the input.
+
+                                  KS / AAO. 21st July 1986
+.endhelp

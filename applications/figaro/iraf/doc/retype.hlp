@@ -1,0 +1,68 @@
+.help retype Starlink figaro
+.nf
+ RETYPE - Changes the type of the main data array in a file
+
+
+Description
+
+ RETYPE changes the type of the main data array in a Figaro data
+ structure.  It converts the data into the new type (warning of
+ any conversion errors that this might generate).  Depending on
+ the structure of the file, RETYPE might leave some deadwood in
+ the output file (i.e. it may be larger than it need be).  If so,
+ this may be removed using TRIMFILE.
+
+Parameters
+
+
+INPUT
+
+ The name of the input data structure in which the
+ type of the main data array is to be changed.
+
+TYPE
+
+ The new type for the data array in the data structure.
+ It should be any type recognised by FIGARO (i.e., one
+ of 'FLOAT', 'INT', 'DOUBLE', 'SHORT', 'BYTE', and
+ 'USHORT').
+
+OUTPUT
+
+ The name of the resulting data file which will
+ be the same as the original data except for the
+ type of the main data array.
+
+Source_comments
+
+ R E T Y P E
+
+ Name:
+    RETYPE
+
+ Function:
+    Change the type of the main data array in a Figaro structure.
+
+ Description:
+    RETYPE converts the data in the main array of a Figaro structure
+    from its current type to a specified type.  For example, it could
+    convert a USHORT data array created by a data acquisition system
+    into a FLOAT array (which is easier to work with, especially if
+    you contemplate dividing your data by things such as flat fields).
+
+ Parameters:
+    INPUT     (Character) The name of the input data structure.
+    TYPE      (Character) The type to which the data array is to be
+              converted.  This can be any of the types recognised
+              by Figaro.
+    OUTPUT    (Character) The name of the output data structure.
+
+ Keywords: None
+
+ Note:
+    Depending on the structure of the file, RETYPE may end up creating
+    files that are larger than they need to be.  In this case,
+    TRIMFILE can be used to cut out the deadwood.
+
+ K.Shortridge, AAO.
+.endhelp

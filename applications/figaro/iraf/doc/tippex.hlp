@@ -1,0 +1,62 @@
+.help tippex Starlink figaro
+.nf
+ TIPPEX - Modify individual pixel values with cursor
+
+
+Description
+
+ Modifies individual pixel values with cursor.
+
+Parameters
+
+
+OUTPUT
+
+ The name of the output file to be created.  If this is the same as
+ the displayed spectrum, the data in the displayed spectrum will be
+ modified.
+
+CONFIRM
+
+ Used to confirm change to data.
+
+QUIT
+
+ Used to confirm quitting application.
+
+See_also
+
+ FIGARO: CSET, ICSET, NCSET.
+ KAPPA: CHPIX, FILLBAD, SEGMENT, NOMAGIC, SETMAGIC, ZAPLIN.
+
+Source_comments
+
+ T I P P E X
+
+ Figaro function to modify a displayed spectrum using the
+ cursor.
+
+ Command parameters -
+
+ OUTPUT      (Character) The name of the output file to
+             be created.  If this is the same as the displayed
+             spectrum, the data in the displayed spectrum will
+             be modified.
+
+ Command keywords -
+
+ CONFIRM     Used to confirm change to data.
+ QUIT        Used to confirm quitting application.
+
+ User variables used -  (">" input, "<" output)
+
+ (>) TVFILE  The name of the displayed spectrum
+ (>) TVXST   The first displayed x-value
+ (>) TVXEN   The last displayed x-value
+ (>) TVHIGH  The maximum displayed y-value
+ (>) TVLOW   The minimum displayed y-value
+ (>) TVCOLOR The GRPLOT code for the plot colour
+ (>) SOFT    The device/type string defining the display device
+
+                                          KS / CIT 25th May 1983
+.endhelp

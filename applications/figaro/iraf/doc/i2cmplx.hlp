@@ -1,0 +1,52 @@
+.help i2cmplx Starlink figaro
+.nf
+ I2CMPLX - Copies an array into the imaginary part of a complex structure
+
+
+Description
+
+ I2CMPLX copies the data from a specified file (usually not a
+ complex one) into the imaginary part of an existing complex data
+ file, usually one created by R2CMPLX.
+
+Parameters
+
+
+IDATA
+
+ The name of an existing file that contains a data
+ array that is to become the imaginary part of an
+ existing complex data structure.
+
+CDATA
+
+ The name of the existing complex data structure
+ whose imaginary part is to be set. CDATA may be the same
+ as IDATA (which will have to be a complex structure), in
+ which case one gets the odd effect of setting the imaginary
+ part equal to the previous value of the modulus.  Normally,
+ CDATA is a separate file recently created by R2CMPLX.
+
+Source_comments
+
+ I 2 C M P L X
+
+ Sets the imaginary part of an existing complex data structure.
+ The complex data structure will probably have been created in the
+ first instance by R2CMPLX, which leaves the imaginary part zero.
+ I2CMPLX takes the data array from a specified file (usually not a
+ complex one - note that if it is complex, it is the modulus that
+ is used) and uses it to form the imaginary part of the complex
+ data.
+
+ Command parameters -
+
+ IDATA       (Character) The data structure containing the array
+             that is to form the imaginary part of the complex data.
+             That is, the data array of IDATA becomes the
+             imaginary data array of the output complex structure.
+ CDATA       (Character) The resulting complex data structure.  Note
+             that this is an already existing structure.
+
+                                         KS / AAO 8th Sept 1986
+.endhelp

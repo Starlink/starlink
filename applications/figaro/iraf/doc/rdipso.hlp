@@ -1,0 +1,49 @@
+.help rdipso Starlink figaro
+.nf
+ RDIPSO - Read file in DIPSO/IUEDR/SPECTRUM format
+
+
+Description
+
+ Reads a file in DIPSO/IUEDR format and creates a Figaro file
+ from the data in it.  The file can have been written in any
+ of what IUEDR calls SPECTRUM type 0, type 1 or type 2 format.
+
+Parameters
+
+
+FILE
+
+ The name of the DIPSO file to be read in.
+ If no extension is specified, .DAT will be used.
+
+CODE
+
+ There are three SPECTRUM formats used by DIPSO, and
+ RDIPSO can handle any of them.  Type 0 is unformatted,
+ and is the most compact and fastest to use, but cannot
+ be read as a text file.  Type 1 is a fixed format text
+ file, and type 2 is a free-format text file.
+
+SPECTRUM
+
+ The name of the Figaro file to be created from
+ the data in the DIPSO format file.
+
+Source_comments
+
+ R D I P S O
+
+ Reads a file in DIPSO/IUEDR format and creates a Figaro file from
+ the data in it.  The file can have been written in any of what IUEDR
+ calls SPECTRUM type 0, type 1 or type 2 format.
+
+ Command parameters -
+
+ FILE      (Character) The name of the DIPSO format file to be read.
+ CODE      (Numeric) The SPECTRUM type code for the format (0,1 or 2).
+ SPECTRUM  (Character) The name of the Figaro file to be created.
+
+ Command keywords -  None
+                                           KS / AAO 13th Oct 1986
+.endhelp

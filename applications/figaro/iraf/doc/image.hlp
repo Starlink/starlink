@@ -1,0 +1,150 @@
+.help image Starlink figaro
+.nf
+ IMAGE - Display an image
+
+
+Usage
+
+ image image ystart yend xstart xend low high xplaces yplaces
+       atx aty xorigin yorigin xpixels ypixels optimize=?
+       [autoscale=? negative=? aspect=? log=? erase=? hardcopy=?]
+
+Description
+
+ This routine displays an image on the image display. Note that the
+ colour tables are not changed by this command, nor is the device
+ reset. The data can be logarithmised and/or histogram-optimised
+ prior to display.
+
+Parameters
+
+
+IMAGE
+
+ The image to be displayed.
+
+YSTART
+
+ The first Y value to be displayed.
+
+YEND
+
+ The last Y value to be displayed.
+
+XSTART
+
+ The first X value to be displayed.
+
+XEND
+
+ The last X value to be displayed.
+
+LOW
+
+ The lowest data value to be displayed. [0.]
+
+HIGH
+
+ The highest data value to be displayed. [1000.]
+
+XPLACES
+
+ If not 0, the number of sub-displays in X. Enter 0 to specify
+ a display region explicitly through X/YORIGIN and X/YPIXELS. [1]
+
+YPLACES
+
+ If not 0, the number of sub-displays in Y. [1]
+
+ATX
+
+ Which sub-display in X to use, counting from 1. [1]
+
+ATY
+
+ Which sub-display in Y to use, counting from 1. [1]
+
+XORIGIN
+
+ The first pixel in X to be used for display, counting from 0. [0]
+
+YORIGIN
+
+ The first pixel in Y to be used for display, counting from 0. [0]
+
+XPIXELS
+
+ How many pixels to use in X.
+
+YPIXELS
+
+ How many pixels to use in Y.
+
+OPTIMIZE
+
+ The degree of histogram optimisation to be applied. 0 for no
+ optimsation, 1 for full optimisation. Optimisation is applied
+ after taking common logarithms if LOG is YES. [0.5]
+
+AUTOSCALE
+
+ Yes if the display thresholds are to be the minimum and
+ maximum data values in the subset to be displayed. [T]
+
+NEGATIVE
+
+ Yes if the auto-scaling should be reversed. [F]
+
+ASPECT
+
+ Yes if data pixels are to be displayed as square pixels. [T]
+
+LOG
+
+ Yes if the common logarithm of data is to be displayed rather
+ than the data themselves. [F]
+
+ERASE
+
+ Yes if the display is to be erased before display. [F]
+
+HARDCOPY
+
+ Yes if the display is to be on the device set by the HARD
+ command. The "idev" device is commonly a screen display, while
+ the "hard" device is commonly a printer.   Be wary of the
+ NEGATIVE keyword in conjunction with HARDCOPY:  A "positive"
+ display will display the minimum as white and the maximum as
+ black, and it in that sense negative. If you set the NEGATIVE
+ keyword to YES, your hard copy will be "positive".
+
+IDEV
+
+ The name of the imaging device, normally got from a global
+ parameter which was set with the IDEV command.
+
+HARD
+
+ The name of the "hard" device, normally got from a global
+ parameter which was set with the HARD command.
+
+IMARRAY
+
+ Information about the displayed part of the image and the part
+ of the display used.
+
+IMFILE
+
+ File name of the image displayed.
+
+See_also
+
+ FIGARO: IGREY.
+ KAPPA: DISPLAY, GREYPLOT.
+
+Authors
+
+ KS: Keith Shortridge (AAO)
+
+ HME: Horst Meyerdierks (UoE, Starlink)
+.endhelp

@@ -1,0 +1,73 @@
+.help idev Starlink figaro
+.nf
+ IDEV - Set the device for image display
+
+
+Description
+
+ The IDEV command is used to set the current device
+ and type for all imaging output.
+
+Parameters
+
+
+IMAGDEV
+
+ The device to which all imaging output is to be
+ sent. Normally, a device name as recognised by
+ SGS  should be used - that is, the device specified
+ should be one of those listed in response to the
+ OPTIONS keyword - i.e. by the command SOFT OPTIONS.
+ If necessary, a device type and connection id can
+ be used, by specifying e.g. IMAGDEV="827,1" and by
+ setting FORCE=YES.
+
+OPTIONS
+
+ If set, a list of all the device names recognised
+ by the SGS system is output.
+
+FORCE
+
+ Normally, SOFT will reject a device specification
+ that is not known to SGS.  However, if FORCE is
+ set, it will use whatever is specified for SOFTDEV
+ unquestioningly.  If it fails, that's your problem.
+
+DRAW
+
+ If set, SOFT will output a test plot to the
+ specified device.  This acts as a test that
+ the specification was correct.
+
+Source_comments
+
+ S O F T  /  H A R D  /  I D E V
+
+ SOFT is used to set the user variable (SOFT) that controls
+ the soft copy graphics output of Figaro programs.  HARD is
+ used to set the user variable (HARD) that controls the
+ hardcopy graphics output. IDEV is used to set the user variable
+ (IDEV) that controls the image display.
+
+ Command parameters -
+
+ HARDDEV  (Character string) A device name recognised by
+   or     the GKS version of PGPLOT.  Normally, what should
+ SOFTDEV  be used is one of the device names recognised by
+   or     GNS.  HARDDEV and SOFTDEV are used by HARD and SOFT
+ IMAGDEV  respectively.
+
+ Command keywords -
+
+ OPTIONS  Causes a list of the various acceptable SGS device
+          names to be output.
+
+ FORCE    Forces the device specification to be accepted even
+          if it does not match one of the acceptable SGS names.
+
+ DRAW     Draws a test diagram on the screen.  (DRAW is the
+          default for SOFT and IDEV, NODRAW is the default for HARD)
+
+                                 KS / AAO 16th March 1988
+.endhelp

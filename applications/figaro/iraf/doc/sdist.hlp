@@ -1,0 +1,166 @@
+.help sdist Starlink figaro
+.nf
+ SDIST - Analyse an image containing spectra for S-distortion
+
+
+Description
+
+ SDIST traces curved continuous spectra in an image.  These can be
+ due to image tube S-distortion (the original use of the program),
+ or may perhaps be curved echelle orders.  SDIST fits polynomials
+ to the spectra and writes the fits to a file that may be used by
+ other programs such as CDIST.  Before using SDIST, starting points
+ for all the spectra to be traced must be indicated, usually by
+ displaying the image using IMAGE and selecting points in the
+ centers of the various spectra using ICUR.
+
+Parameters
+
+
+IMAGE
+
+ The image that contains the spectra to be traced.
+ Normally, this will be already displayed on the image display, and
+ the centers of the spectra (the places SDIST is to start tracing from
+ - it goes to the edge in both directions out from the selected
+ points) should have been selected using ICUR.
+
+COLUMNS
+
+ SDIST adds the data in several columns at a time to get a
+ cross-section through the spectrum it is tracing.  The more columns
+ it averages, the better the signal to noise it obtains, the faster
+ the processing, but the jumpier the fit may become.  A few columns is
+ normally enough.  It should be increased for noisier data.
+
+TRACE
+
+ SDIST applies one of a selection of algorithms to trace
+ the spectra. Four are available at present:
+
+    G (the original option) fits a guassian to the profile of the data.
+      This is suitable for stellar spectra taken with a wide slit, or
+      any data that genuinely is gaussian.
+    E (Edge) uses an algorithm that looks for the edges in data and
+      takes the average edge position. It is suitable for data that is
+      roughly `top-hat' in shape but tends to give rather quantised
+      results when the edges are very sharp (such edges cannot be
+      determined to better than a pixel). This shows up clearly if the
+      SOFTD option is used.
+    C (COG) is a compromise option for non-gaussian data that determines
+      the edges, then used the center of gravity of the data between
+      them.
+    B (Balance) is an extremely crude algorithm that determines the
+      centre of gravity over the width specified. It is very robust, but
+      very crude - use only in desperation.
+
+
+WIDTH
+
+ SDIST needs an indication of the width of the spectra it is to trace.
+ If the trace mode is G, this is the half width of the gaussians it
+ fits to the data, so can be quite critical.  Do not make this too
+ large.  In particular, the greater SDIST is, the further from the
+ center it looks, and can go off the edge of the image for extreme
+ spectra.  For the edge tracing options, the width must not be so
+ great that it encompases the falling edges of the next spectrum out.
+ Try to give an accurate value for WIDTH.
+
+MAXDEG
+
+ SDIST fits polynomials of degree MAXDEG to the spectra it traces.  In
+ general, MAXDEG should be as no higher than is needed to get a
+ satisfactory fit, since this minimises any effects at the edges if
+ the spectra could not be traced all the way to the edges of the
+ image.
+
+SOFTD
+
+ If set, SDIST plots for each spectrum the points traced and
+ the  curve fitted to them.  This can be particularly useful
+ when trying to decide on the trace mode to use - the quantised
+ effects sometimes found with the E(dge) trace show up very
+ well here.
+
+DIAGNOSE
+
+ If set, the detailed reasons for any failures to trace the
+ various spectra are logged.  This is too detailed to be of
+ general interest, being most useful when new trace algorithms
+ are being debugged.
+
+NEXT
+
+ Used to pause between plot pages.
+
+Source_comments
+
+ S D I S T
+
+ Determines the s-distortion parameters for a star spectrum.
+ This program requires as input an image containing at least one
+ stellar spectrum.  For each spectrum it is to examine, it
+ assumes that a point has been indicated somewhere in the center
+ of the spectrum.  Starting at that point, it attempts to follow
+ the spectrum and so map out the distortion.
+
+ Command parameters -
+
+ IMAGE      (Character) the image containing the spectra.
+ COLUMNS    (Numeric) The number of columns to be added
+            together when tracing the spectra.
+ TRACE      (Character) Controls the algorithm used to follow
+            the spectra.  Only the first character is significant.
+            'E' (Edges) Indicates that the data profile is a 'top-hat'
+            shape - as you might get from a continuum source
+            through a dekker.  If EDGES is set, an edge
+            locating algorithm is used, and the width of the
+            top hat is assumed to be approximately WIDTH*2.
+            'C' is the same as 'E', except that the center is
+            taken as the center of gravity of the data within the
+            edges, while 'E' takes it as the average of the edges.
+            'G' (Gaussian) Indicates that the profile is roughly
+            gaussian, of half width WIDTH.
+ WIDTH      (Numeric) The expected half-width of the spectra in
+            pixels.
+ MAXDEG     (Numeric) The maximum degree polynomial to be
+            fitted.
+
+ Command keywords -
+
+ SOFTD      Indicates that the fit results are to be plotted on
+            the current soft graphics device.
+ DIAGNOSE   Requests more detailed diagnostics on the tracing
+ NEXT       Used to pause between plot pages.
+
+ User variables -  (">" input, "<" output)
+
+ (>) IMARRAY  (Numeric array) Contains the parameters that
+              specify the current image display.  See IMAGE
+              for full details.
+ (>) NPIXELS  (Numeric) Number of points selected using ICUR
+ (>) XPIXELS  (Numeric array) X positions of points selected
+ (>) YPIXELS  (Numeric array) Y      "    "     "      "
+
+ Output files -
+
+ SDIST.DAT contains the results of the fit(s), in a format that
+           can be treated as follows -
+
+           3 header lines, all beginning with '*'
+           One line giving the number of spectra traced, and the
+           dimensions of the image used, in the format
+           20X,I5,15X,I8,4X,I8.
+           Then, for each spectrum traced, one record giving
+           the spectrum number, and the leftmost and rightmost
+           pixels covered by the trace, in format
+           11X,I5,17X,I5,4X,I5, then 1 record giving the average
+           Y value in the spectrum, and the width of the
+           spectrum, in format 16X,F13.7,10X,F9.2,
+           which is followed by 3 records giving the 11
+           polynomial coefficients for the fit, in 3D23.16.
+           Coefficients are given constant first, with any unused
+           coefficients set to zero.
+
+                                         KS / CIT 5th Feb 1984
+.endhelp
