@@ -68,7 +68,7 @@
       LOGICAL			OK			! Axis data ok?
 
 *  Version
-      CHARACTER*20 VERSION
+      CHARACTER*30 VERSION
           PARAMETER (VERSION='AXCONV Version 2.1-0b')
 *.
 

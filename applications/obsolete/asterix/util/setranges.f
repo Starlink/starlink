@@ -128,7 +128,7 @@
 *
 *    Version id :
 *
-      CHARACTER*23	      VERSION    ! Version id
+      CHARACTER*30	      VERSION    ! Version id
 	 PARAMETER            ( VERSION = 'SETRANGES Version 2.1-0b')
 *-
 
