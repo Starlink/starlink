@@ -38,6 +38,17 @@
 #
 #        Aligns the two input images "a" and "b", and stores them in 
 #        images "a_R" and "b_R" (single-beam mode). Calculate 
+#
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#
+#  History: 
+#     4-JUN-1998 (DSB):
+#        Original version.
+#     22-JUN-1998 (DSB):
+#        Disable OE Mapping types which include rotation or shear in the
+#        Options/Mapping Types/OE Mapping menu when dealing with
+#        polarimetric data.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -762,7 +773,8 @@
    set oemapmenu [menu $mapmenu.oe]
    for {set type 1} {$type < 6} {incr type} {
       $oemapmenu add radiobutton -label $MAPTYPE($type) -variable OEFITTYPE \
-                                 -selectcolor $RB_COL -value $MAPTYPE($type)
+                                 -selectcolor $RB_COL -value $MAPTYPE($type) \
+                                 -state $MAPSTATE($type,$POL)
    }
 
    SetHelp $oemapmenu ".  The type of mapping to use when aligning the O and E rays. "
