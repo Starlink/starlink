@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_REWRITE_FITS_R (MAX_FITS, N_FITS, FITS, NAME,
+*     CALL SCULIB_REWRITE_FITS_I (MAX_FITS, N_FITS, FITS, NAME,
 *    :  VALUE, STATUS)
 
 
@@ -50,6 +50,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.3  1997/11/19 02:31:54  timj
+*     Make sure there is a space between the number and the equals.
+*
 *     Revision 1.2  1997/11/19 02:30:11  timj
 *     Modernise header
 *
@@ -143,7 +146,7 @@
 
                         CALL CHR_ITOC (VALUE, STEMP, ITEMP)
                         CALL CHR_TERM (JPOS-IPOS-1, STEMP)
-                        FITS (I)(IPOS+1:JPOS-1) = STEMP (:JPOS-IPOS-1)
+                        FITS (I)(IPOS+2:JPOS-1) = STEMP (:JPOS-IPOS-2)
                      END IF
                   END IF
                END IF
