@@ -389,7 +389,7 @@ ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
 ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
 ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
-ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f
+ndg_ptsup.f ndg_setsz.f ndg1_sort.f ndg1_crpth.f ndg1_open.f ndg1_forxt.f
 
 #  Additional Fortran routines required for the standalone library.
 
@@ -1196,6 +1196,7 @@ ndg1_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
 ndg1_crpth.o:    SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDG_CONST
 ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
 ndg1_fpars.o:	 SAE_PAR
+ndg1_forxt.o:	 SAE_PAR
 ndg1_gtyps.o:	 SAE_PAR
 ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
