@@ -136,9 +136,12 @@ itcl::class gaia::GaiaAstTable {
        add_short_help $itk_component(table) \
           {Reference positions and their ideal/current X,Y places}
 
-       #  Add frame for holding table action buttons.
+       #  Add frames for holding table action buttons.
        itk_component add frame1 {
           frame $w_.frame1
+       }
+       itk_component add frame2 {
+          frame $w_.frame2
        }
 
        #  Miscellaneous operations.
@@ -192,13 +195,6 @@ itcl::class gaia::GaiaAstTable {
        add_short_help $itk_component(centroid) \
           {Centroid the X and Y positions}
 
-       #  Add a button to clear the table of its contents.
-       itk_component add clear {
-          button $itk_component(frame1).clear -text Clear \
-             -command [code $this clear_table]
-       }
-       add_short_help $itk_component(clear) {Clear the table}
-
        #  Add a button to clip any positions off image.
        itk_component add clip {
           button $itk_component(frame1).clip -text Clip \
@@ -207,62 +203,78 @@ itcl::class gaia::GaiaAstTable {
        add_short_help $itk_component(clip) \
           {Remove any positions lying off image}
 
-       itk_component add redraw {
-          button $itk_component(frame1).redraw -text Redraw \
-             -command [code $this redraw]
-       }
-       add_short_help $itk_component(redraw) \
-          {Redraw position markers}
-
        #  Buttons for reorienting the X,Y positions.
        itk_component add flipxy {
-          button $itk_component(frame1).flipxy  \
+          button $itk_component(frame2).flipxy  \
              -bitmap rotate -command [code $this flip xy]
        }
        add_short_help $itk_component(flipxy) \
           {Exchange X and Y positions, without changing image}
        itk_component add flipx {
-          button $itk_component(frame1).flipx \
+          button $itk_component(frame2).flipx \
              -bitmap flipx -command [code $this flip x]
        }
        add_short_help $itk_component(flipx) \
           {Flip X positions about centre, without changing image}
        itk_component add flipy {
-          button $itk_component(frame1).flipy \
+          button $itk_component(frame2).flipy \
              -bitmap flipy -command [code $this flip y]
        }
        add_short_help $itk_component(flipy) \
           {Flip Y positions about centre, without changing image}
 
-       #  Reset markers to their current projected positions.
+       #  Reset markers to their current sky positions.
        itk_component add reset {
-          button $itk_component(frame1).reset \
+          button $itk_component(frame2).reset \
              -text Reset -command [code $this update_x_and_y]
        }
        add_short_help $itk_component(reset) \
           {Reset X and Y to WCS projected positions}
 
+       #  Set RA and Dec to current X and Y positions.
+       itk_component add set {
+          button $itk_component(frame2).set \
+             -text Set -command [code $this update_ra_and_dec]
+       }
+       add_short_help $itk_component(set) \
+          {Set RA and Dec to same positions as X and Y}
+
+       #  Add a button to clear the table of its contents.
+       itk_component add clear {
+          button $itk_component(frame2).clear -text Clear \
+             -command [code $this clear_table]
+       }
+       add_short_help $itk_component(clear) {Clear the table}
+
+       #  Redraw markers (after clear).
+       itk_component add redraw {
+          button $itk_component(frame2).redraw -text Redraw \
+             -command [code $this redraw]
+       }
+       add_short_help $itk_component(redraw) \
+          {Redraw position markers}
+
+
        #  Pack all widgets into place.
        pack $itk_component(table) -side top -fill both -expand 1
-       pack $itk_component(frame1) -side top -fill x -expand 1 -pady 3 -padx 3
-       grid $itk_component(new) \
+       pack $itk_component(frame1) -side top -fill x -pady 3 -padx 3
+       pack $itk_component(frame2) -side top -fill x -pady 3 -padx 3
+
+       pack $itk_component(new) \
           $itk_component(modify) \
           $itk_component(delete) \
           $itk_component(grab) \
           $itk_component(centroid) \
-          $itk_component(clip) -pady 2 -padx 2 -sticky nsew
-       grid $itk_component(flipxy) \
+          $itk_component(clip) -pady 2 -padx 2 -side left -fill both -expand 1
+
+       pack $itk_component(flipxy) \
           $itk_component(flipx) \
           $itk_component(flipy) \
           $itk_component(reset) \
+          $itk_component(set) \
           $itk_component(clear) \
-          $itk_component(redraw) -pady 2 -padx 2 -sticky nsew
-       grid columnconfigure $itk_component(frame1) 0 -weight 1
-       grid columnconfigure $itk_component(frame1) 1 -weight 1
-       grid columnconfigure $itk_component(frame1) 2 -weight 1
-       grid columnconfigure $itk_component(frame1) 3 -weight 1
-       grid columnconfigure $itk_component(frame1) 4 -weight 1
-       grid columnconfigure $itk_component(frame1) 5 -weight 1
+          $itk_component(redraw) \
+             -pady 2 -padx 2 -side left -fill both -expand 1
 
        #  Strings to convert screen coordinates to canvas coordinates.
        set canvasX_ "\[$itk_option(-canvas) canvasx %x\]"
@@ -836,14 +848,14 @@ itcl::class gaia::GaiaAstTable {
    }
 
    #  Update the ra and dec positions using the current x and y
-   #  positions.
+   #  positions. Positions are formatted.
    public method update_ra_and_dec {} {
       set nrows [$itk_component(table) total_rows]
       set oldcon [$itk_component(table) get_contents]
       $itk_component(table) clear
       for { set i 0 } { $i < $nrows } { incr i } {
          lassign [lindex $oldcon $i] id ra dec x y
-         if { [ catch { $itk_option(-rtdimage) astpix2wcs $x $y } msg ] == 0 } {
+         if { [ catch { $itk_option(-rtdimage) astpix2wcs $x $y 0 1} msg ] == 0 } {
             lassign $msg newra newdec
             $itk_component(table) append_row [list $id $newra $newdec $x $y]
          }

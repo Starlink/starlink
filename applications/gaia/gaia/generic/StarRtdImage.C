@@ -245,7 +245,7 @@ public:
     { "astget",        &StarRtdImage::astgetCmd,        1, 1 },
     { "astmilli",      &StarRtdImage::astmilliCmd,      1, 1 },
     { "astpix2cur",    &StarRtdImage::astpix2curCmd,    2, 2 },
-    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,    2, 3 },
+    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,    2, 4 },
     { "astread",       &StarRtdImage::astreadCmd,       1, 1 },
     { "astrefine",     &StarRtdImage::astrefineCmd,     4, 4 },
     { "astreplace",    &StarRtdImage::astreplaceCmd,    0, 0 },
@@ -2548,11 +2548,15 @@ int StarRtdImage::astwcs2pixCmd( int argc, char *argv[] )
 //     the image WCS system.
 //
 //  Input:
-//     X and Y position, optional third parameter indicating if the
-//     result should be reported even if outside the image bounds.
+//     X and Y position followed by an optional third parameter indicating if
+//     the result should be reported even if outside the image bounds and a
+//     fourth optional parameter indicating if the result should be formatted
+//     (otherwise decimal degrees are returned). If the fourth parameter is
+//     needed then the third is not optional.
 //
 //  Result:
-//     RA and Dec in degrees (plus trailing equinox).
+//     RA and Dec either in degrees or formatted as the the related axes 
+//     (plus a trailing equinox). 
 //
 //  Notes:
 //     This provides some of the functionality of the convert command,
@@ -2574,9 +2578,16 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
     }
 
     int notbound = 0;
-    if ( argc == 3 ) {
+    if ( argc >= 3 ) {
         if ( *argv[2] != '0' ) {
             notbound = 1;
+        }
+    }
+
+    int formatted = 0;
+    if ( argc == 4 ) {
+        if ( *argv[3] != '0' ) {
+            formatted = 1;
         }
     }
 
@@ -2584,7 +2595,7 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
     //  is left in place for convenience).
     char buffer[80];
     StarWCS* wcsp = getStarWCSPtr();
-    wcsp->pix2wcs( x, y, notbound, buffer, 80, 0 );
+    wcsp->pix2wcs( x, y, notbound, buffer, 80, formatted );
 
     //  Set the result and return.
     set_result( buffer );

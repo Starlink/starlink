@@ -234,7 +234,7 @@ itcl::class gaia::GaiaTextImport {
    #  Set defaults for widget states.
    protected method set_defaults_ {} {
       set values_($this,separated) 1
-      set values_($this,delimiter) ","
+      set values_($this,delimiter) " "
       set values_($this,comment) "\#"
       set values_($this,fixwidths) {10 20}
       set values_($this,skip) 0
