@@ -60,7 +60,7 @@ More substantial release, CD candidate.
 Assorted tweaks, introduced since the release.
 </change>
 
-<distribution string="DR-0.4" date="10-SEP-1999" author="ng" versionid=v04>
+<distribution string="DR-0.4" date="10-SEP-1999" author="ng" versionid=v0-4>
 Smallish DTD and DC changes, arising from the programmers' meeting and
 discussion with Mark Taylor.
 </distribution>
@@ -1393,7 +1393,7 @@ paper version of the document.  I don't imagine that the docxref
 element would often be useful here, but url and webref might be.
 
 <subsect id=str.figures export>Figures
-<update versionid=v04>Rewrote section to match new figures structure</update>
+<update versionid=v0-4>Rewrote section to match new figures structure</update>
 
 <p>Includes
 <ref id='el.sun.figure' text='figure'>,
@@ -1418,7 +1418,7 @@ id=el.sun.verbatim text='verbatim'> element) as figure content.
 <p>For details, and an example, see <ref id=el.sun.figurecontent>.
 
 <subsect id=str.tables export>Tables
-<update versionid="v04">Include description of new tabular element</update>
+<update versionid="v0-4">Include description of new tabular element</update>
 
 <p>Includes
 <ref id='el.sun.caption' text='caption'>,
@@ -1546,7 +1546,7 @@ description lists familiar from HTML.  Unlike HTML, however, the dt
 and dd elements within the description list must be paired.
 
 <subsect id=str.maths export>Maths
-<update versionid="v04">Slight edit to discuss new mline and mlabel
+<update versionid="v0-4">Slight edit to discuss new mline and mlabel
 elements</update>
 
 <p>Includes
@@ -2218,15 +2218,18 @@ or
 depending on whether you are using a Bourne-like shell (<code/sh/,
 <code/bash/ or <code/ksh/) or a C-shell (<code/csh/, <code/tcsh/ or
 other variants).  This will set up a couple of environment variables,
-and modify your path.
+and define simple <code/sgml2html/ and <code/sgml2latex/ commands.
 
 <p>To use the SGML set, you need to have the program
 <code/dvi2bitmap/ installed.  This is a separate Starlink application,
 which converts &tex; DVI files to GIFs, and is used when you have
-maths in your document.  You also need to have a suitably patched copy
+maths in your document.
+
+<!--
+You also need to have a suitably patched copy
 of Jade installed, as this is not currently packaged with the rest of
 the SGML set.
-
+-->
 <!--
 <p>Note for developers: there will be a setup script, once I've sorted
 out where the various bits of the set will be placed, and whether
@@ -2246,21 +2249,6 @@ version of the documentation.  If you type <kbd/make
 ssn70.latex.stamp/ you should get the &latex version.
 -->
 
-<subsect id=editors export>Editors
-
-<p>SGML is a text format, so you can write SGML documents using
-whichever editor you prefer.
-
-<p>If you use emacs, you can benefit from an emacs SGML mode called
-<webref url='http://www.lysator.liu.se/projects/about_psgml.html'
-/psgml/.  This can help with simple things such as automatically
-inserting appropriate closing tags, all the way up to validating your
-document.
-
-<p>There are no free SGML editors that I'm aware of, but there will
-soon be free XML editors.  These aren't useful quite yet, as there is
-not yet an XML version of the Starlink DTD, but their time will come.
-
 <subsect id=proc.makefile export>Processing documents -- using the Makefile
 
 <p>Processing documents is potentially a bit of a headache.
@@ -2271,26 +2259,61 @@ documents -- those including maths or bibliographies, for example --
 require more or less elaborate preprocessing for some formats.  In
 some circumstances the names of output files are significant to the
 system.  It is for all these reasons that the system is designed to be
-used primarily <em/via/ Makefiles.
+used primarily <em/via/ makefiles.  See however, the description of
+the <code/sgml2html/ and <code/sgml2latex/ commands in <ref
+id=proc.sgml2stuff>.
 
 <p>The distribution contains a Makefile,
 <code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, which contains
 reasonably modular rules for the various stages of the formatting
 process.  The aim is that you can process your documents by including
-this common Makefile in a per-directory Makefile, and then simply
+this common makefile in a per-directory makefile, and then simply
 expressing the dependencies between your source documents and the
-Makefile's template targets.
+makefile's template targets.
 
-<p>For example, a Makefile to generate HTML documentation could be as
-simple as:
+<p>If your document is relatively simply, you may not actually need to
+have a makefile in the documentation 
+directory in order to use the setup.  Imagine that you want to process
+file <code/mydoc.sgml/.  If it has no backmatter or maths, then you
+can process this with the command
+<kbd>make -f $(STARLINK_SGML_DIR)/lib/Makefile.common
+mydoc.html.stamp</kbd>, which will read the set of rules from the
+common makefile and apply the one necessary to build the HTML target.
+If, in this 
+simple case, you wished to have a makefile in the current directory for
+the sake of clarity, it need contain nothing more than the line
 <verbatim>
 include $(STARLINK_SGML_DIR)/lib/Makefile.common
-ssn70.html.stamp: ssn70.sgml ssn70.htmlback.stamp
 </verbatim>
-Given this, the command <code>make ssn70.html.stamp</code> would
-generate an HTML version of the document's backmatter (bibliography
-and notes), generate the HTML version of the document, then create the
-stamp file <code/ssn70.html.stamp/.
+(assuming that your version of <code/make/ supports the `include'
+command), and you could build the documentation using the command
+<kbd/make mydoc.html.stamp/.  If your document is simple enough to
+need no more than this, then you will be able to use the
+<code/sgml2html/ command described in <ref id=proc.sgml2stuff>.
+
+<p>If your document includes backmatter (bibliography or notes) or
+maths, then they will need 
+to be preprocessed.  This is done by specifying extra dependencies in
+the makefile.  A document with backmatter would need a three-line
+makefile like:
+<verbatim>
+include $(STARLINK_SGML_DIR)/lib/Makefile.common
+mydoc.html.stamp:   mydoc.sgml   mydoc.htmlback.stamp
+mydoc.latex.stamp:  mydoc.sgml   mydoc.latexback.stamp
+</verbatim>
+Then the command <kbd/make mydoc.html.stamp/ would first process the
+backmatter, then generate the main HTML document.  The command
+<kbd/make mydoc.latex.stamp/ is broadly the same.
+
+<p>If your document contains some maths, then the generation of HTML
+requires another preprocessing step, and you declare the need for this
+with another target, so that our makefile would become:
+<verbatim>
+include $(STARLINK_SGML_DIR)/lib/Makefile.common
+mydoc.html.stamp:   mydoc.sgml   mydoc.htmlback.stamp   mydoc.imgeq.list.stamp
+mydoc.latex.stamp:  mydoc.sgml   mydoc.latexback.stamp
+</verbatim>
+(there is no need for a &latex; preprocessing stage for maths).
 
 <p>The root of the generated files is itself generated based on data
 within the file, and is not configurable.  Do not change filenames yourself,
@@ -2310,13 +2333,19 @@ of the stylesheet).  This file contains the filename root, a colon,
 the list of file extensions it has included links to, and another colon.
 The root may therefore be extracted with a command like:
 <verbatim>
-awk -F: '{print $1}' ssn70.html.stamp
+awk -F: '{print $1}' mydoc.html.stamp
+</verbatim>
+You might, for example, wish to finish off your processing of a
+document by giving a command like <kbd/ln -s SUN-123.html index.html/,
+which could be automated as
+<verbatim>
+ln -s `awk -F: '{print $1}' mydoc.html.stamp` index.html
 </verbatim>
 
-<p>The Makefile targets are as follows.  With Makefiles, the code is
+<p>The makefile targets are as follows.  With makefiles, the code is
 the documentation to a greater extent than with other languages, so
-the Makefile itself should be consulted if in doubt.  Note, however,
-that targets in the Makefile that are not mentioned here should not be
+the makefile itself should be consulted if in doubt.  Note, however,
+that targets in the makefile that are not mentioned here should not be
 used, since they are internal (ie, could disappear without warning),
 unstable, or otherwise deprecated.
 <dl>
@@ -2375,6 +2404,36 @@ convenience.
 a manifest of the files which make a complete set.  The names of the
 manifest files can be configured as parameters (see <ref
 id=appx.system.paramdsssl>).
+
+<subsect id=proc.sgml2stuff export>sgml2html and sgml2latex
+<update versionid="v0-4" >Added section on sgml2stuff commands, and
+discussion of very simple processing.</update>
+
+<p>The setup scripts described in <ref id=proc.setup> define two
+commands, <code/sgml2html/ and <code/sgml2latex/.  These are designed
+to do simple processing of documents, in the absence of a makefile, as
+described in <ref id=proc.makefile>.
+If you have a simple document called <code/mydoc.sgml/, then the
+command <kbd/sgml2html mydoc/ will transparently make the
+<code/mydoc.html.stamp/ target, and then create a symbolic link called
+<code/mydoc.html/ to the root HTML file.  The command
+<code/sgml2latex/ works in a similar way.  These commands assume that
+there is no need to do preprocessing of backmatter or maths.
+
+<subsect id=editors export>Editors
+
+<p>SGML is a text format, so you can write SGML documents using
+whichever editor you prefer.
+
+<p>If you use emacs, you can benefit from an emacs SGML mode called
+<webref url='http://www.lysator.liu.se/projects/about_psgml.html'
+/psgml/.  This can help with simple things such as automatically
+inserting appropriate closing tags, all the way up to validating your
+document.
+
+<p>There are no free SGML editors that I'm aware of, but there will
+soon be free XML editors.  These aren't useful quite yet, as there is
+not yet an XML version of the Starlink DTD, but their time will come.
 
 <sect id=final export>Finally
 
