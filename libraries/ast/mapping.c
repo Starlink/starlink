@@ -44,6 +44,7 @@ f     following routines may also be applied to all Mappings:
 c     - astDecompose: Decompose a Mapping into two component Mappings
 c     - astInvert: Invert a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
+c     - astRate: Calculate the rate of change of a Mapping output
 c     - astResample<X>: Resample a region of a data grid
 c     - astSimplify: Simplify a Mapping
 c     - astTran1: Transform 1-dimensional coordinates
@@ -53,6 +54,7 @@ c     - astTranP: Transform N-dimensional coordinates held in separate arrays
 f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
 f     - AST_INVERT: Invert a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
+f     - AST_RATE: Calculate the rate of change of a Mapping output
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
 f     - AST_SIMPLIFY: Simplify a Mapping
 f     - AST_TRAN1: Transform 1-dimensional coordinates
@@ -103,6 +105,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitMappingVtab
 *        method.
+*     10-JUL-2003 (DSB):
+*        Added method astRate.
 *class--
 */
 
@@ -136,6 +140,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Seems that math.h does not include a prototype for isnan */
+int isnan( double );
 
 /* Module type definitions. */
 /* ======================== */
@@ -173,6 +180,17 @@ typedef struct MapData {
    int nout;                     /* Number of output coordinates per point */
 } MapData;
 
+/* Data structure describing a polynomial function */
+#define RATE_ORDER 4             /* The order of polynial used to evalue function derivatives */
+typedef struct PN {
+   int order;                    /* The order; zero=constant, 1=linear, 2=quadratic */
+   double coeff[ RATE_ORDER + 1 ]; /* The coefficients of the polynomail */
+   double xlo;                   /* The lower x limit covered by the polynomial */
+   double xhi;                   /* The upper x limit covered by the polynomial */
+   double y0;                    /* The y offset to be added to the polynomial value */
+} PN;
+
+
 /* Module Variables. */
 /* ================= */
 /* Define the class virtual function table and its initialisation flag as
@@ -200,7 +218,6 @@ static int InterpolateNearestLD( int, const int *, const int *, const long doubl
 static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 #endif
 
-static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
@@ -210,6 +227,7 @@ static double MapFunction( const MapData *, const double [], int * );
 static double MaxD( double, double );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
 static double Random( long int * );
+static double Rate( AstMapping *, double *, int, int, double * );
 static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int * );
 static int GetInvert( AstMapping * );
 static int GetNin( AstMapping * );
@@ -217,16 +235,6 @@ static int GetNout( AstMapping * );
 static int GetReport( AstMapping * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
-static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * ); 
-static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * ); 
-static void InterpolateBlockAverageF( int, const int[], const int[], const float [], const float [], int, const int[], const double *const[], const double[], int, float, float *, float *, int * ); 
-static void InterpolateBlockAverageI( int, const int[], const int[], const int [], const int [], int, const int[], const double *const[], const double[], int, int, int *, int *, int * ); 
-static void InterpolateBlockAverageL( int, const int[], const int[], const long int [], const long int [], int, const int[], const double *const[], const double[], int, long int, long int *, long int *, int * ); 
-static void InterpolateBlockAverageS( int, const int[], const int[], const short int [], const short int [], int, const int[], const double *const[], const double[], int, short int, short int *, short int *, int * ); 
-static void InterpolateBlockAverageUB( int, const int[], const int[], const unsigned char [], const unsigned char [], int, const int[], const double *const[], const double[], int, unsigned char, unsigned char *, unsigned char *, int * ); 
-static void InterpolateBlockAverageUI( int, const int[], const int[], const unsigned int [], const unsigned int [], int, const int[], const double *const[], const double[], int, unsigned int, unsigned int *, unsigned int *, int * ); 
-static void InterpolateBlockAverageUL( int, const int[], const int[], const unsigned long int [], const unsigned long int [], int, const int[], const double *const[], const double[], int, unsigned long int, unsigned long int *, unsigned long int *, int * ); 
-static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * ); 
 static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char * );
 static int InterpolateKernel1D( AstMapping *, int, const int *, const int *, const double *, const double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, double, double *, double * );
 static int InterpolateKernel1F( AstMapping *, int, const int *, const int *, const float *, const float *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, float, float *, float * );
@@ -280,9 +288,20 @@ static void ClearAttrib( AstObject *, const char * );
 static void ClearInvert( AstMapping * );
 static void ClearReport( AstMapping * );
 static void Copy( const AstObject *, AstObject * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void GlobalBounds( MapData *, double *, double *, double [], double [] );
+static void InterpolateBlockAverageB( int, const int[], const int[], const signed char [], const signed char [], int, const int[], const double *const[], const double[], int, signed char, signed char *, signed char *, int * ); 
+static void InterpolateBlockAverageD( int, const int[], const int[], const double [], const double [], int, const int[], const double *const[], const double[], int, double, double *, double *, int * ); 
+static void InterpolateBlockAverageF( int, const int[], const int[], const float [], const float [], int, const int[], const double *const[], const double[], int, float, float *, float *, int * ); 
+static void InterpolateBlockAverageI( int, const int[], const int[], const int [], const int [], int, const int[], const double *const[], const double[], int, int, int *, int *, int * ); 
+static void InterpolateBlockAverageL( int, const int[], const int[], const long int [], const long int [], int, const int[], const double *const[], const double[], int, long int, long int *, long int *, int * ); 
+static void InterpolateBlockAverageS( int, const int[], const int[], const short int [], const short int [], int, const int[], const double *const[], const double[], int, short int, short int *, short int *, int * ); 
+static void InterpolateBlockAverageUB( int, const int[], const int[], const unsigned char [], const unsigned char [], int, const int[], const double *const[], const double[], int, unsigned char, unsigned char *, unsigned char *, int * ); 
+static void InterpolateBlockAverageUI( int, const int[], const int[], const unsigned int [], const unsigned int [], int, const int[], const double *const[], const double[], int, unsigned int, unsigned int *, unsigned int *, int * ); 
+static void InterpolateBlockAverageUL( int, const int[], const int[], const unsigned long int [], const unsigned long int [], int, const int[], const double *const[], const double[], int, unsigned long int, unsigned long int *, unsigned long int *, int * ); 
+static void InterpolateBlockAverageUS( int, const int[], const int[], const unsigned short int [], const unsigned short int [], int, const int[], const double *const[], const double[], int, unsigned short int, unsigned short int *, unsigned short int *, int * ); 
 static void Invert( AstMapping * );
 static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 static void MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -300,6 +319,12 @@ static void Tran2( AstMapping *, int, const double [], const double [], int, dou
 static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double * );
 static void TranP( AstMapping *, int, int, const double *[], int, int, double *[] );
 static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
+static PN *FitPN( AstMapping *, double *, int, int, double, double, double * );
+static double EvaluatePN( PN *, double );
+static double EvaluateDPN( PN *, double );
+static PN *InterpPN( int, double *, double * );
+static void CombinePN( PN *, PN * );
+static void FunPN( AstMapping *, double *, int, int, int, double *, double * );
 
 /* Member functions. */
 /* ================= */
@@ -372,6 +397,70 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static void CombinePN( PN *lo, PN *hi ) {
+/*
+*  Name:
+*     CombinePN
+
+*  Purpose:
+*     Combine polynomials "lo" and "hi", both of order N, into a polynomial
+*     of order N+1.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void CombinePN( PN *lo, PN *hi )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function combines polynomials "lo" and "hi", both of order N, 
+*     into a polynomial of order N+1, and return the new polynomial in 
+*     "lo". It is used to implemtn Neville's algorithm for finding an
+*     interpolating polynomial. See:
+*
+*        http://mathworld.wolfram.com/NevillesAlgorithm.html
+
+*  Parameters:
+*     lo
+*        A polynomial covering the lower x interval. Returned holding the
+*        combined higher-order polynomial.
+*     hi
+*        A polynomial covering the higher x interval. Unchanged on exit.
+
+*/
+
+/* Local Variables: */
+   int n, k;
+   double f, xlo, xhi, cc[ RATE_ORDER + 1 ];
+
+/* Check the global error status */
+   if ( !astOK ) return;
+
+   n = lo->order;
+   xlo = lo->xlo;
+   xhi = hi->xhi;
+
+   f = 1.0/( xlo - xhi );
+
+   cc[ 0 ] = f*(- xhi*( lo->coeff[0]) + xlo*( hi->coeff[ 0 ] ) );
+   for( k = 1; k <= n; k++ ) {
+      cc[ k ] = f*( ( lo->coeff[ k - 1 ] ) - xhi*( lo->coeff[ k ] )
+                   -( hi->coeff[ k - 1 ] ) + xlo*( hi->coeff[ k ] ) );
+   }
+
+   cc[ n + 1 ] = f*( lo->coeff[ n ] - hi->coeff[ n ] );
+
+   lo->order = n + 1;
+   lo->xlo = xlo;
+   lo->xhi = xhi;
+   for( k = 0; k < n+2; k++ ) lo->coeff[ k ] = cc[ k ];
+
 }
 
 static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2, 
@@ -472,6 +561,420 @@ static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
    if( invert1 ) *invert1 = astGetInvert( this );
    if( invert2 ) *invert2 = 0;
 }
+
+static void FunPN( AstMapping *map, double *at, int ax1, int ax2,
+                   int n, double *x, double *y ) {
+/*
+*  Name:
+*     FunPN
+
+*  Purpose:
+*     Find the value of the function currently being differentiated by the 
+*     astRate method.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void FunPN( AstMapping *map, double *at, int ax1, int ax2,
+*                 int n, double *x, double *y )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This is a service function for the astRate method. It evaluates the
+*     function being differentiated at specified axis values.
+*
+*     This function uses static resources in order to avoid the overhead 
+*     of creating new PointSets each time this function is called. These
+*     static resources which must be initialised before the first invocation 
+*     with a given Mapping, and must be released after the final invocation. 
+*     See "ax1".
+
+*  Parameters:
+*     map
+*        Pointer to a Mapping which yields the value of the function at x.
+*        The Mapping may have any number of inputs and outputs; the specific 
+*        output representing the function value, f, is specified by ax1 and 
+*        the specific input representing the argument, x, is specified by ax2.
+*     at
+*        A pointer to an array holding axis values at the position at which 
+*        the function is to be evaluated. The number of values supplied
+*        must equal the number of inputs to the Mapping. The value supplied 
+*        for axis "ax2" is ignored (the value of "x" is used for axis "ax2").
+*     ax1 
+*        The zero-based index of the Mapping output which is to be
+*        differentiated. Set this to -1 to allocate, or -2 to release, 
+*        the static resources used by this function.
+*     ax2 
+*        The zero-based index of the Mapping input which is to be varied.
+*     n
+*        The number of elements in the "x" and "y" arrays. This should not
+*        be greater than 2*RATE_ORDER.
+*     x
+*        The value of the Mapping input specified by ax2 at which the
+*        function is to be evaluated. If "ax2" is set to -1, then the
+*        supplied value is used as flag indicating if the static resources 
+*        used by this function should be initialised (if x >= 0 ) or
+*        freed (if x < 0).
+*     y
+*        An array in which to return the function values at the positions
+*        given in "x".
+
+*/
+#define MAX_CACHE  5
+
+/* Local Variables: */
+   static AstPointSet *pset1_cache[ MAX_CACHE ];
+   static AstPointSet *pset2_cache[ MAX_CACHE ];
+   static int next_slot;
+   static int pset_size[ MAX_CACHE ];
+
+   AstPointSet *pset1;
+   AstPointSet *pset2;
+   double **ptr1;
+   double **ptr2;
+   double *oldx;
+   double *oldy;
+   double *p;
+   double xx;
+   int i;
+   int k;
+   int nin;
+   int nout;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If required, initialise things. */
+   if( ax1 == -1 ) {
+      for( i = 0; i < MAX_CACHE; i++ ) {
+         pset_size[ i ] = 0;
+         pset1_cache[ i ] = NULL;
+         pset2_cache[ i ] = NULL;
+      }
+      next_slot = 0;
+
+/* If required, clean up. */
+   } else if( ax1 == -2 ) {
+      for( i = 0; i < MAX_CACHE; i++ ) {
+         pset_size[ i ] = 0;
+         if( pset1_cache[ i ] ) pset1_cache[ i ] = astAnnul( pset1_cache[ i ] );
+         if( pset2_cache[ i ] ) pset2_cache[ i ] = astAnnul( pset2_cache[ i ] );
+      }
+      next_slot = 0;
+
+/* Otherwise do the transformations. */
+   } else {
+
+/* See if we have already created PointSets of the correct size. */
+      pset1 = NULL;
+      for( i = 0; i < MAX_CACHE; i++ ) {
+         if( pset_size[ i ] == n ) {
+            pset1 = pset1_cache[ i ];
+            pset2 = pset2_cache[ i ];
+            break;
+         }
+      }
+
+/* If we have not, create new PointSets now. */
+      if( pset1 == NULL ) {
+         nin = astGetNin( map );
+         pset1 = astPointSet( n, nin, "" );
+         ptr1 = astGetPoints( pset1 );
+
+         nout = astGetNout( map );
+         pset2 = astPointSet( n, nout, "" );
+         ptr2 = astGetPoints( pset2 );
+
+/* Store the input position in the input PointSet. */
+         for( i = 0; i < nin; i++ ) {
+            xx = at[ i ];
+            p = ptr1[ i ];
+            for( k = 0; k < n; k++, p++ ) *p = xx;
+         }
+
+/* Add these new PointSets to the cache, removing any existing 
+   PointSets. */
+         if( pset_size[ next_slot ] > 0 ) {
+            astAnnul( pset1_cache[ next_slot ] );
+            astAnnul( pset2_cache[ next_slot ] );
+         }
+         pset1_cache[ next_slot ] = pset1;
+         pset2_cache[ next_slot ] = pset2;
+         pset_size[ next_slot ] = n;
+         if( ++next_slot == MAX_CACHE ) next_slot = 0;
+
+/* If existing PointSets were found, get there data arrays. */
+      } else {
+         ptr1 = astGetPoints( pset1 );
+         ptr2 = astGetPoints( pset2 );
+      }         
+
+/* Store the input X values in the input PointSet data array. */
+      oldx = ptr1[ ax2 ];
+      ptr1[ ax2 ] = x;
+
+/* Store the output Y values in the output PointSet data array. */
+      oldy = ptr2[ ax1 ];
+      ptr2[ ax1 ] = y;
+
+/* Transform the positions. */
+      astTransform( map, pset1, 1, pset2 );
+
+/* Re-instate the original arrays in the PointSets. */
+      ptr1[ ax2 ] = oldx;
+      ptr2[ ax1 ] = oldy;
+ 
+   } 
+
+#undef MAX_CACHE 
+}
+
+static double EvaluateDPN( PN *pn, double x ) {
+/*
+*  Name:
+*     EvaluateDPN
+
+*  Purpose:
+*     Evaluate the gradient of a polynomial at a given x value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     static double EvaluateDPN( PN *pn, double x ) {
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function evaluates the gradient of the supplied polynomial 
+*     at the supplied x value.
+
+*  Parameters:
+*     pn
+*        Pointer to the structure describing the polynomial.
+*     x
+*        The x value at which to evaluate the polynomial gradient.
+
+*  Returns:
+*     The polynomial gradient value.
+*/
+
+/* Local Variables: */
+   int n, i;
+   double ret;
+
+/* Initialise */
+   ret = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK || !pn ) return ret;
+
+   n = pn->order;
+
+   ret = n*pn->coeff[ n ];
+   for( i = n - 1; i > 0; i-- ) {
+      ret = i*pn->coeff[ i ] + ret*x;
+   }
+
+   return ret;
+
+}
+
+static double EvaluatePN( PN *pn, double x ) {
+/*
+*  Name:
+*     EvaluatePN
+
+*  Purpose:
+*     Evaluate a polynomial at a given x value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     static double EvaluatePN( PN *pn, double x ) {
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function evaluates the supplied polynomial at the supplied x
+*     value.
+
+*  Parameters:
+*     pn
+*        Pointer to the structure descirbing the polynomial.
+*     x
+*        The x value at which to evaluate the polynomial.
+
+*  Returns:
+*     The polynomial value.
+*/
+
+/* Local Variables: */
+   int n, i;
+   double ret;
+
+/* Initialise */
+   ret = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK || !pn ) return ret;
+
+   n = pn->order;
+   ret = pn->coeff[ n ];
+   for( i = n - 1; i >= 0; i-- ) {
+      ret = pn->coeff[ i ] + ret*x;
+   }
+
+   return ret;
+
+}
+
+static PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0, 
+                  double h, double *rms ){
+/*
+*  Name:
+*     FitPN
+
+*  Purpose:
+*     Fit a polynomial to the function being differentiated and return
+*     the RMS residual.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     PN *FitPN( AstMapping *map, double *at, int ax1, int ax2, double x0, 
+*                double h, double *rms )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function finds a polynomial which interpolates a set of evenly
+*     spaced samples of the function being differentiated by the astRate
+*     method. The coefficients of this polynomial are returned, together
+*     with the RMS residual between the polynomial and the function at points
+*     mid way between the interpolating points.
+
+*  Parameters:
+*     map
+*        Pointer to a Mapping which yields the value of the function at x.
+*        The Mapping may have any number of inputs and outputs; the specific 
+*        output representing the function value, f, is specified by ax1 and 
+*        the specific input representing the argument, x, is specified by ax2.
+*     at
+*        A pointer to an array holding axis values at the position at which 
+*        the function is to be evaluated. The number of values supplied
+*        must equal the number of inputs to the Mapping. The value supplied 
+*        for axis "ax2" is ignored (the value of "x" is used for axis "ax2").
+*     ax1 
+*        The zero-based index of the Mapping output which is to be
+*        differentiated. Set this to -1 to allocate, or -2 to release, 
+*        the static resources used by this function.
+*     ax2 
+*        The zero-based index of the Mapping input which is to be varied.
+*     x0
+*        The central axis value at which the function is to be evaluated. 
+*     h
+*        The interval over which the fitting is to be performed.
+*     rms
+*        A pointer to a location at which to return the RMS residual
+*        between the returned polynomial and the function, estimated at
+*        points mid way between the interpolating points. May be NULL.
+
+*  Returns:
+*     The PN structure holding the polynomial coefficients, etc, or NULL
+*     if no polynomial can be fitted. The independant variable of the 
+*     polynomial is (x-x0) and the dependant variable is (y(x)-y(x0)).
+*     The value of y(x0) is stored in the returned PN structure. The 
+*     memory used to store the polynomial should be freed using astFree 
+*     when no longer needed.
+*/
+
+/* Local Variables: */
+   double x[ RATE_ORDER + 2 ], y[ RATE_ORDER + 2 ], dh, off, s2, e;   
+   PN *ret;
+   int i0, i;
+
+/* Initialise */
+   ret = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return ret;
+
+/* Store the x values at (RATE_ORDER+1) evenly spaced points over the interval 
+   "h" centred on "x0". */
+   i0 = RATE_ORDER/2;
+   dh = h/RATE_ORDER;
+
+   for( i = 0; i <= RATE_ORDER; i++ ) {
+      x[ i ] = x0 + ( i - i0 )*dh;
+   }
+
+/* Get the function values at these positions. */
+   FunPN( map, at, ax1, ax2, RATE_ORDER + 1, x, y );
+
+/* Convert the x values into x offsets from "x0", and convert the y
+   values into y offsets from the central y value. */
+   off = y[ i0 ];
+   if( off == AST__BAD ) return NULL;
+   for( i = 0; i <= RATE_ORDER; i++ ) {
+      if( y[ i ] == AST__BAD ) {
+         return NULL;
+      } else {
+         y[ i ] -= off;
+         x[ i ] -= x0;
+      }
+   }
+
+/* Find the polynomial which interpolates these points. */
+   ret = InterpPN( RATE_ORDER + 1, x, y );
+
+/* If required, find the rms error between the polynomial and the 
+   function at points mid-way between the interpolating points. */
+   if( ret ) {
+      ret->y0 = off;
+      if( rms ) {
+
+/* Store the x values at which to evaluate the function. These are the
+   points mid way between the interpolating points (plus one beyond each
+   end). */
+         dh *= 0.5;
+         for( i = 0; i <= RATE_ORDER; i++ ) {
+            x[ i ] += x0 - dh;
+         }
+         x[ RATE_ORDER + 1 ] = x[ RATE_ORDER ] + 2*dh;
+
+/* Evaluate the function at these positions. */
+         FunPN( map, at, ax1, ax2, RATE_ORDER + 2, x, y );
+
+/* Loop round evaluating the polynomial fit and incrementing the sum of
+   the squared residuals. */
+         s2 = 0.0;
+         for( i = 0; i <= RATE_ORDER + 1; i++ ) {
+            e = EvaluatePN( ret, x[ i ] - x0 ) + off - y[ i ];
+            s2 += e*e;
+         }
+   
+/* Evaluate the rms residual. */
+         *rms = sqrt( s2/( RATE_ORDER + 2 ) );
+      }
+   }
+
+   return ret;
+
+}
+
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
@@ -1514,6 +2017,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->MapBox = MapBox;
    vtab->MapList = MapList;
    vtab->MapMerge = MapMerge;
+   vtab->Rate = Rate;
    vtab->ReportPoints = ReportPoints;
    vtab->ResampleB = ResampleB;
    vtab->ResampleD = ResampleD;
@@ -4732,6 +5236,102 @@ MAKE_INTERPOLATE_BLOCKAVE(UB,unsigned char,0,float,0)
 #undef ASSEMBLE_INPUT_1D
 #undef MAKE_INTERPOLATE_BLOCKAVE
 
+
+static PN *InterpPN( int np, double *x, double *y ) {
+/*
+*  Name:
+*     InterpPN
+
+*  Purpose:
+*     Find a polynomial which interpolates the given points. 
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     static PN *InterpPN( int np, double *x, double *y )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function finds the coefficients of a polynomial which
+*     interpolates the supplied positions. The order of the returned
+*     polynomial is one less than the the number of supplied points 
+*     (thus if 2 points are supplied, the polynomial will be of order 
+*     1 - a straight line).
+
+*  Parameters:
+*     np
+*        The number of points supplied in arrays x and y. This must be no
+*        more than (RATE_ORDER+1).
+*     x
+*        Pointer to a an array of "np" x values. Note the values in this
+*        array must increase monotonically.
+*     y
+*        Pointer to a an array of "np" y values.
+
+*  Returned:
+*     Pointer to a structure describing the polynomial, or NULL if no
+*     polynomial could be found. The memory used to store the polynomial
+*     should be freed using astFree when no longer needed.
+
+*/
+
+/* Local Variables: */
+    int i, k;
+    PN *pn[ RATE_ORDER + 1 ], *ret;
+
+/* Initialise. */
+    ret = NULL;
+
+/* Check the global error status */
+   if ( !astOK ) return ret;
+
+/* Check supplied points are good. */
+    if( np > RATE_ORDER + 1 ) return NULL;
+    for( i = 0; i < np; i++ ) {
+       if( x[ i ] == AST__BAD || y[ i ] == AST__BAD ) return NULL;
+    }
+
+/* Produce polynomials of order zero. */
+    for( i = 0; i < np; i++ ) {
+       pn[ i ] = astMalloc( sizeof( PN ) );
+       if( !astOK ) return NULL;
+       pn[ i ]->order = 0;
+       pn[ i ]->coeff[ 0 ] = y[ i ];
+       pn[ i ]->xlo = x[ i ];
+       pn[ i ]->xhi = x[ i ];
+    }
+
+/* Produce polynomials of order "k", from the polynomials of order "k-1".
+   This uses Neville's method (see:
+
+      http://mathworld.wolfram.com/NevillesAlgorithm.html
+
+*/
+    for( k = 1; k < np; k++ ) {
+       for( i = 0; i < np - k; i++ ) {
+          CombinePN( pn[i], pn[i+1] );
+       }
+    }
+
+    for( i = 1; i < np; i++ ) pn[ i ] = astFree( pn[ i ] );
+
+/* If any of the coefficients could not be found return NULL. */
+    ret = pn[ 0 ];
+    for( i = 0; i < np; i++ ) {
+       if( isnan( ret->coeff[ i ] ) ) {
+          ret = astFree( ret );
+          break;
+       }
+    }
+
+    return ret;
+}
+
+
 static void Invert( AstMapping *this ) {
 /*
 *++
@@ -6287,6 +6887,310 @@ static double Random( long int *seed ) {
 
 /* Return the result as a double value in the range 0 to 1. */
    return ( (double) ( *seed - 1 ) ) / (double) 2147483646;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 ){
+/*
+*+
+*  Name:
+*     astRate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     result = astRate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function evaluates the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. Also evaluates the second derivative.
+*
+*     The result is estimated by interpolating the function using a
+*     fourth order polynomial in the neighbourhood of the specified
+*     position. The size of the neighbourhood used is chosen to minimise
+*     the RMS residual per unit length between the interpolating
+*     polynomial and the supplied Mapping function.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+*     d2
+*        Address of a location at which to return an estimate of the
+*        second derivative of the Mapping function at the specified point.
+*        May be NULL.
+
+*  Returned Value:
+*     astRate()
+*        The rate of change of Mapping output "ax1" with respect to input 
+*        "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*        calculated.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+
+*  Implementation Notes:
+*     - This function implements the basic astRate method available
+*     via the protected interface to the Mapping class. The public
+*     interface to this method is provided by the astRateId_
+*     function.
+*/
+
+/* Local Variables: */
+#define MXY 100
+   double x0, h, s1, s2, sp, r, dh, ed2, ret, rms, h0, x[MXY], y[MXY];
+   int nin, nout, i, ixy;
+   PN *fit;
+
+/* Initialise */
+   ret = AST__BAD;
+   if( d2 ) *d2 = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return ret;
+
+/* Obtain the numbers of input and output coordinates for the Mapping. */
+   nin = astGetNin( this );
+   nout = astGetNout( this );
+
+/* Validate the output index. */
+   if ( astOK && ( ax1 < 0 || ax1 >= nout ) ) {
+      astError( AST__AXIIN, "astRate(%s): The supplied Mapping output "
+                "index (%d) is invalid; it should be in the range 1 to %d.", 
+                astGetClass( this ), ax1 + 1, nout );
+   }
+
+/* Validate the input index. */
+   if ( astOK && ( ax2 < 0 || ax2 >= nin ) ) {
+      astError( AST__AXIIN, "astRate(%s): The supplied Mapping input "
+                "index (%d) is invalid; it should be in the range 1 to %d.", 
+                astGetClass( this ), ax2 + 1, nin );
+   }
+
+/* Check the Mapping has a forward transformation. */
+   if ( astOK && !astGetTranForward( this ) ) {
+      astError( AST__NODEF, "astRate(%s): The supplied Mapping does not "
+                "have a defined forward transformation.", 
+                astGetClass( this ) );
+   }
+
+/* Save the central value on the Mapping input which is to be varied. */
+   x0 = at[ ax2 ];
+
+/* If it is bad, return bad values. */
+   if( astOK && x0 != AST__BAD ) {
+
+/* The required derivative is estimated by fitting a polynomial to the
+  function over a small range of length "h" centred on the supplied value
+  "x0", and then finding the derivative of this fitting polynomial at "x0".
+  The bulk of the problem lies in choosing a suitable value for the
+  length "h". If "h" is too large, the function is not well fitted by a
+  polynomial and so the returned value is inaccurate. If "h" is too small,
+  then the returned value is dominated by rounding errors and so is again
+  inaccurate. The process tries a series of different values for "h". The
+  initial estimate is formed as a fixed small fraction of the supplied 
+  "x0", or 1.0 if "x0" is zero. */
+      h = ( x0 != 0.0 ) ? DBL_EPSILON*1.0E10*x0 : 1.0;
+
+/* We next find a more reliable estimate based on the probable accuracy
+   of the calculated function values and the rate of change of the
+   derivative of the function in the region of "x0". Find a polynomial fit 
+   to the function over this initial interval. The independant variable 
+   of this fit is (x-x0) and the dependant variable is (y(x)-y(x0). */
+      fit = FitPN( this, at, ax1, ax2, x0, h, NULL );
+      if( !fit ) return AST__BAD;
+
+/* We need an estimate of how much the derivative may typically change
+   over this interval. The more the derivative changes, the smaller we
+   should make "h" in order to produce a good fit to the polynomial.
+   Calculate the rate of change of the polynomial (i.e the derivative
+   estimate) at a set of 5 evenly spaced points over the interval "h"
+   and then find the standard deviation of the derivative estimates
+   divided by the interval size. At the same time form an estimate of 
+   the RMS polynomial value over the step ("sp"). */  
+      s1 = 0.0;
+      s2 = 0.0;
+      sp = 0.0;
+      dh = h/4.0;
+      for( i = -(RATE_ORDER/2); i < (RATE_ORDER+1)/2; i++ ) {
+         r = EvaluateDPN( fit, i*dh );
+         s1 += r;
+         s2 += r*r;
+         r = EvaluatePN( fit, i*dh ) + fit->y0;
+         sp += r*r;
+      }
+      s2 /= RATE_ORDER;
+      s1 /= RATE_ORDER;
+      ed2 = s2 - s1*s1;
+      if( ed2 > 0 ) {
+         ed2 = sqrt( ed2 )/h;
+      } else {
+         ed2 = 0.0;
+      }
+      sp = sqrt( sp/RATE_ORDER );
+   
+      fit = astFree( fit );
+
+/* If the derivative estimate does not change over the interval, return
+   it. */
+      if( ed2 == 0.0 ) {
+         ret = s1;
+         if( d2 ) *d2 = ed2;
+ 
+      } else {
+
+/* Otherwise, we find a better estimate for the step size by assuming a
+   fixed relative error in the function value, and a second derivative 
+   based on the "ed2" value found above. The total error in the
+   derivative estimate is assumed to be of the form:
+
+     (a/h)**2 + (d2*h)**2
+
+   where "a" is the accuracy with which the function can be evaluated 
+   (assumed to be 1.0E5*DBL_EPSILON*sp) and f2 is the second derivative. 
+   The value of "h" below is the value which minimises the above
+   total error expression. */
+
+         h = sqrt( fabs( 1.0E5*DBL_EPSILON*sp/ed2 ) );
+
+/* It turns out that the error in the derivative (i.e. the residual
+   between the true derivative value and the derivative of the fitting
+   polynomial at the "x0" value), is generally equal to the RMS error
+   between the fitting polynomial and the function value, divided by the
+   step size. This error is high for very small step sizes because of
+   rounding error and is also high for large step sizes becase the function
+   is not well fitted by a polynomial. In between there is a minimum
+   which corresponds to the optimal step size. It also turns out that the
+   error in the derivative is a monotonic increasing function for step
+   sizes above the optimal step size. We find the optimal step size by
+   working our way down this monotonic function, in powers of ten, until 
+   the first increase in error is encountered. 
+
+   Starting at the step size found above, note log10( normalised rms error of
+   fit ) at increasing step sizes until the rms error exceeds the 0.2 of
+   the rms function value. Each new step size is a factor 10 times the previous 
+   step size. */
+         h0 = h;
+         ixy = 0;
+         rms = 0.1*sp - 1;
+         while( rms < 0.2*sp && ixy < MXY ) {
+            fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+            if( fit ) {
+               if( fit->coeff[ 1 ] != 0.0 ) {
+                  y[ ixy ] = log10( rms/( h0*fabs( fit->coeff[ 1 ] ) ) );
+               } else {
+                  y[ ixy ] = AST__BAD;
+               }
+               fit = astFree( fit );
+            } else {
+               y[ ixy ] = AST__BAD;
+            }
+            x[ ixy ] = ixy;
+            ixy++;
+            h0 *= 10.0;
+         }
+
+/* Now run down from the largest step size to the smallest looking for
+   the first step size at which the error increases rather than decreasing. */
+         h0 = AST__BAD;
+         while( ixy-- > 0 ){
+            if( y[ ixy - 1 ] != AST__BAD && y[ ixy ] != AST__BAD ) {         
+               if( y[ ixy - 1 ] > y[ ixy ] ) {         
+                  h0 = x[ ixy ];
+      
+                  x[ 0 ] = x[ ixy - 1 ];
+                  x[ 1 ] = x[ ixy ];
+                  x[ 2 ] = x[ ixy + 1 ];
+      
+                  y[ 0 ] = y[ ixy - 1 ];
+                  y[ 1 ] = y[ ixy ];
+                  y[ 2 ] = y[ ixy + 1 ];
+      
+                  break;
+               }
+            }
+         }
+
+/* If no minimum could be found in the above loop, continue decreasing
+   the step size below the value set above until a minimum is found. */
+         if( h0 == AST__BAD ) {
+            h0 = h;
+            ixy = 0;
+            while( y[ 0 ] < y[ 1 ] ) {
+   
+               h0 *= 0.1;
+               ixy--;
+               fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+               if( fit ) {
+                  x[ 2 ] = x[ 1 ];
+                  x[ 1 ] = x[ 0 ];
+                  y[ 2 ] = y[ 1 ];
+                  y[ 1 ] = y[ 0 ];
+                  if( fit->coeff[ 1 ] != 0.0 ) {
+                     x[ 0 ] = ixy;
+                     y[ 0 ] = log10( rms/( h0*fabs( fit->coeff[ 1 ] ) ) );
+                  } else {
+                     h0 *= 10.0;
+                     x[ 0 ] = AST__BAD;
+                     break;
+                  }
+                  fit = astFree( fit );
+               } else {
+                  h0 *= 10.0;
+                  x[ 0 ] = AST__BAD;
+                  break;
+               }
+            }
+         }
+
+/* If we have found a error which is lower than either of its
+   neighbouring errors, fit a quadratic through the three points and find
+   the power of ten which correspnds to the minimum of the function. */
+         if( x[ 0 ] != AST__BAD ) {
+            fit = InterpPN( 3, x, y );
+            if( fit ){
+               if( fit->coeff[ 2 ] > 0.0 ) {
+                  h0 = h*pow( 10.0, -0.5*fit->coeff[ 1 ]/fit->coeff[ 2 ] );
+               }
+               fit = astFree( fit );
+            }
+         }
+
+/* Use the best estimate of h to calculate the returned derivatives. */
+         fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
+         if( fit ) {         
+            ret = fit->coeff[ 1 ];
+            if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
+            fit = astFree( fit );
+         }
+      }
+   }
+
+/* Return the result. */
+   return ret;
+#undef MXY
 }
 
 static void ReportPoints( AstMapping *this, int forward,
@@ -12363,6 +13267,10 @@ MAKE_RESAMPLE_(US,unsigned short int)
 MAKE_RESAMPLE_(B,signed char)
 MAKE_RESAMPLE_(UB,unsigned char)
 #undef MAKE_RESAMPLE_
+double astRate_( AstMapping *this, double *at, int ax1, int ax2, double *d2 ){
+   if ( !astOK ) return AST__BAD;
+   return (**astMEMBER(this,Mapping,Rate))( this, at, ax1, ax2, d2 );
+}
 AstMapping *astSimplify_( AstMapping *this ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Mapping,Simplify))( this );
@@ -12408,6 +13316,7 @@ void astTranP_( AstMapping *this, int npoint,
    within this module. */
 void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
+double astRateId_( AstMapping *, double *, int, int, double * );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
@@ -12759,4 +13668,104 @@ f     routine is invoked with STATUS set to an error value.
    value decremented. */
    astMapBox_( this, lbnd_in, ubnd_in, forward, coord_out - 1,
                lbnd_out, ubnd_out, xl, xu );
+}
+
+double astRateId_( AstMapping *this, double *at, int ax1, int ax2, double *d2 ){
+/*
+*++
+*  Name:
+c     astRate
+f     AST_RATE
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     result = astRate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
+f     RESULT = AST_RATE( THIS, AT, AX1, AX2, D2 )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+c     This function 
+f     This routine 
+*     evaluates the rate of change of a specified output of the supplied
+*     Mapping with respect to a specified input, at a specified input
+*     position. 
+*
+*     The result is estimated by interpolating the function using a
+*     fourth order polynomial in the neighbourhood of the specified
+*     position. The size of the neighbourhood used is chosen to minimise
+*     the RMS residual per unit length between the interpolating
+*     polynomial and the supplied Mapping function. This method produces
+*     good accuracy but can involve evaluating the Mapping 100 or more
+*     times.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping to be applied.
+c     at
+f     AT( * ) = DOUBLE PRECISION (Given)
+c        The address of an 
+f        An
+*        array holding the axis values at the position at which the rate
+*        of change is to be evaluated. The number of elements in this
+*        array should equal the number of inputs to the Mapping.
+c     ax1
+f     AX1 = INTEGER (Given)
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 1 for the first output).
+c     ax2
+f     AX2 = INTEGER (Given)
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 1 for the first 
+*        input).
+c     d2
+f     D2 = DOUBLE PRECISION (Returned)
+c        Address of a location at which to return an estimate of the
+c        second derivative of the Mapping function at the specified point.
+c        May be NULL.
+f        An estimate of the second derivative of the Mapping function at the 
+f        specified point.
+
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astRate()
+f     AST_RATE = DOUBLE PRECISION
+c        The rate of change of Mapping output "ax1" with respect to input 
+c        "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+c        calculated.
+f        The rate of change of Mapping output AX1 with respect to input 
+f        AX2, evaluated at AT, or AST__BAD if the value cannot be 
+f        calculated.
+
+*  Notes:
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*--
+
+*  Implementation Notes:
+*     This function implements the public interface for the astRate
+*     method. It is identical to astRate_ except that the nominated
+*     coordinates given in "ax1" and "ax2" are decremented by one
+*     before use.  This is to allow the public interface to use
+*     one-based coordinate numbering (internally, zero-based
+*     coordinate numbering is used).
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Invoke the protected version of this function with the axis indices
+   decremented. */
+   return astRate_( this, at, ax1 - 1, ax2 - 1, d2 );
 }

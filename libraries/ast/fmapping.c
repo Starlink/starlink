@@ -22,6 +22,7 @@
 *     AST_TRAN1
 *     AST_TRAN2
 *     AST_TRANN
+*     AST_RATE
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -47,6 +48,8 @@
 *        to "double *".
 *     26-SEP-2001 (DSB):
 *        Added AST_DECOMPOSE.
+*     16-JUL-2003 (DSB):
+*        Added AST_RATE.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -423,3 +426,23 @@ F77_SUBROUTINE(ast_trann)( INTEGER(THIS),
                 *NCOORD_OUT, *OUTDIM, OUT );
    )
 }
+F77_DOUBLE_FUNCTION(ast_rate)( INTEGER(THIS),
+                               DOUBLE_ARRAY(AT),
+                               INTEGER(AX1),
+                               INTEGER(AX2),
+                               DOUBLE(D2),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(AX1)
+   GENPTR_INTEGER(AX2)
+   GENPTR_DOUBLE_ARRAY(AT)
+   GENPTR_DOUBLE(D2)
+   F77_DOUBLE_TYPE(RESULT);
+
+   astAt( "AST_RATE", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astRate( astI2P( *THIS ), AT, *AX1, *AX2, D2 );
+   )
+   return RESULT;
+}
+
