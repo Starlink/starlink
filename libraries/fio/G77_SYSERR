@@ -1,0 +1,30 @@
+*+
+*  Name:
+*     G77_SYSERR
+
+*  Type of Module:
+*     Fortran include file.
+
+*  Purpose:
+*     Define private private G77 File I/O error constants
+
+*  Description:
+*     This file defines private G77 File I/O error  constants for the
+*     FIO system. Required by fio1_serr.f in some cases (eg linux
+*     using g77 compiler).
+
+*  Authors:
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     22-JUL-2004 (TIMJ):
+*        Original version
+
+*-
+
+      INTEGER G77__ERFMT        ! Error in format
+      PARAMETER ( G77__ERFMT = 100 )
+
+      INTEGER G77__ILLUN        ! Illegal unit number
+      PARAMETER( G77__ILLUN = 101 )
+
