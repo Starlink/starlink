@@ -96,6 +96,7 @@ sub header;
 sub footer;
 sub hprint;
 sub quasialph;
+sub demeta;
 
 #  Determine whether we are being run as a CGI script, and take appropriate
 #  action if so.
@@ -184,6 +185,7 @@ elsif ($name && $type eq 'regex') {
 #  Name has been supplied as a search term.
 
    if ($html) {
+      header "$self: search for '" . demeta ($name) . "'";
       query_form $package;
       search_keys $name, $package;
       footer;
@@ -199,6 +201,7 @@ elsif (!$name) {
 #  or exit with a usage message (command-line mode).
 
    if ($html) {
+      header $self;
       query_form $package;
       package_list $package;
       footer;
@@ -274,7 +277,6 @@ sub query_form {
 
 #  Print form header.
 
-   header $self;
    hprint "
       <h1>$self: Starlink Source Code Browser</h1>
       <form method=GET action='$self'>
@@ -297,7 +299,7 @@ sub query_form {
    $radio{'regex'} = "<input type=radio name=type value='regex'>";
    $radio{$type} =~ s/>/ checked>/;
    hprint "
-      Type of item (optional):
+      Type of item:
          $radio{'func'}&nbsp;Routine
          $radio{'file'}&nbsp;File
          $radio{''}&nbsp;Either
@@ -433,7 +435,8 @@ sub package_list {
                print "<dt> $key <br>\n<dd>\n";
                foreach $file (sort @{$files{$key}}) {
                   print 
-                     "$sep<a href='$scb?file=$file&amp;$package'>$file</a>\n";
+                     "$sep<a href='$scb?$file&amp;$package&type=file'>",
+                     "$file</a>\n";
                }
             }
             print "\n</dl>\n<hr>\n";
@@ -466,7 +469,7 @@ sub search_keys {
    my ($regex, $package) = @_;
 
    my (%match);
-   my ($name, $loc, $pack, $index);
+   my ($name, $loc, $pack, $index, $indtext);
 
    foreach $index (qw/file func/) {
       while (($name, $loc) = ${$index . '_index'}->each($package)) {
@@ -477,7 +480,8 @@ sub search_keys {
       }
    }
 
-   print "\n<h2>Search results: $regex</h2>\n";
+   my $htregex = demeta $regex;
+   print "\n<h2>Search results: $htregex</h2>\n";
 
    if (%match) {
       foreach $index (sort keys %match) {
@@ -514,7 +518,7 @@ sub search_keys {
       }
    }
    else {
-      print "No matches were found for the regular expression '$regex'";
+      print "No matches were found for the regular expression '$htregex'";
       print " in package <b>$package</b>" if $package;
       print ".<p>\n";
    }
@@ -752,7 +756,7 @@ sub output {
 
 #     Add SGML-like tags to source code.
 
-      if ($ftype eq 'f' || $ftype eq 'gen' || $ftype eq '') {
+      if ($ftype eq 'f' || $ftype eq 'gen') {
          $tagged = FortranTag::tag (join '', <FILE>);
       }
       elsif ($ftype eq 'c' || $ftype eq 'h') {
@@ -762,62 +766,77 @@ sub output {
 
 #     Check tags, and remove those which fail to refer.
 
-      my $inhref = 0;
-      $tagged =~ s{(<[^>]+>)}{
-         &{
-            sub {
-               %tag = parsetag $1;
-               if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
-                  my $href;
-                  if ($name =~ /^INCLUDE-(.*)/) {
-                     my $file = $1;
-                     if ($file =~ /^[A-Z0-9_]*$/ && !$file_index->get($file)) {
-                        $file =~ tr/A-Z/a-z/;
-                     }
-                     if ($file_index->get($file)) {
-                        $href = "$scb?file=$file&amp;$package";
-                     }
-                  }
-                  else {
-                     $loc = $func_index->get($name);
-                     if ($loc) {
-                        if (index ($loc, $locname) >= 0) {
-                           $href = "#$name";
+      if ($tagged) {
+         my $inhref = 0;
+         $tagged =~ s{(<[^>]+>)}{
+            &{
+               sub {
+                  %tag = parsetag $1;
+                  if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
+                     my $href;
+                     if ($name =~ /^INCLUDE-(.*)/) {
+                        my $file = $1;
+                        if ($file =~ /^[A-Z0-9_]*$/ && 
+                           !$file_index->get($file)) {
+                           $file =~ tr/A-Z/a-z/;
                         }
-                        else {
-                           $href = "$scb?$name&amp;$package#$name";
+                        if ($file_index->get($file)) {
+                           $href = "$scb?file=$file&amp;$package";
                         }
                      }
+                     else {
+                        $loc = $func_index->get($name);
+                        if ($loc) {
+                           if (index ($loc, $locname) >= 0) {
+                              $href = "#$name";
+                           }
+                           else {
+                              $href = "$scb?$name&amp;$package#$name";
+                           }
+                        }
+                     }
+                     if ($href) {
+                        $inhref = 1;
+                        return "<a href='$href'>";
+                     }
+                     else {
+                        $inhref = 0;
+                        return "<b>";
+                     }
                   }
-                  if ($href) {
-                     $inhref = 1;
-                     return "<a href='$href'>";
-                  }
-                  else {
+                  elsif ($tag{'End'} eq 'a') {
+                     my $retval = $inhref ? '</a>' : '</b>';
                      $inhref = 0;
-                     return "<b>";
+                     return $retval;
                   }
+                  elsif (($tag{'Start'} eq 'a') && ($ftype eq 'gen') &&
+                         ($tag{'name'} =~ /(.*)(&lt;t&gt;)(.*)/i)) {
+                     my ($pre, $gen, $post) = ($1, $2, $3);
+                     return join ('', map ("<a name='$pre$_$post'>",
+                        ($gen, qw/i r d l c b ub w uw/)));
+                  }
+                  return $1;
                }
-               elsif ($tag{'End'} eq 'a') {
-                  my $retval = $inhref ? '</a>' : '</b>';
-                  $inhref = 0;
-                  return $retval;
-               }
-               elsif (($tag{'Start'} eq 'a') && ($ftype eq 'gen') &&
-                      ($tag{'name'} =~ /(.*)(&lt;t&gt;)(.*)/i)) {
-                  my ($pre, $gen, $post) = ($1, $2, $3);
-                  return join ('', map ("<a name='$pre$_$post'>",
-                     ($gen, qw/i r d l c b ub w uw/)));
-               }
-               return $1;
             }
-         }
-      }ges;
+         }ges;
 
-      print $tagged;
+         print $tagged;
+      }
+      else {
+
+#        No tagging routine available; output raw text.
+
+         while (<FILE>) {
+            print;
+         }
+
+      }
    }
 
    else {
+
+#     Output raw text to standard output.
+
       while (<FILE>) {
          print;
       }
@@ -882,12 +901,8 @@ sub header {
    my $title = shift;
 
    if ($html) {
-      $title =~ s/&/&amp;/g;
-      $title =~ s/>/&gt;/g;
-      $title =~ s/</&lt;/g;
-
       print "<html>\n";
-      print "<head><title>$title</title></head>\n";
+      print "<head><title>", demeta ($title), "</title></head>\n";
       print "<body>\n";
    }
 }
@@ -898,6 +913,17 @@ sub footer {
    print "</body>\n</html>\n" if $html;
 }
 
+
+sub demeta {
+
+   my $string = shift;
+
+   $string =~ s/&/&amp;/g;
+   $string =~ s/>/&gt;/g;
+   $string =~ s/</&lt;/g;
+
+   return $string;
+}
 
 ########################################################################
 sub hprint {
