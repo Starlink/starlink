@@ -25,7 +25,7 @@
 *     unless a command line value is given. In order to calculate the bolometer
 *     positions it is also necessary to read in the extinction corrected
 *     data file that was used to regrid the data (in fact any extinction
-*     corrected file can be used, possible with strange results).
+*     corrected file can be used, possibly with strange results).
 *     By default the position of the bolometers at the start of 
 *     the first integration and zero jiggle offset is plotted. Optionally,
 *     it is possible to plot the bolometer positions at any point during
@@ -59,29 +59,42 @@
 *        database).
 *     NAME = LOGICAL (Read)
 *        Label with bolometer name if true, else bolometer number. The default
-*        is true.
+*        is true. If a null response is given the bolometer label is not
+*        drawn.
 *     STYLE = LITERAL (Read)
 *        Plotting style to be used for the bolometers. The relevant key
 *        to use for adjusting the plotting style is 'bolometer'. This
 *        is a synonym for curve and can be abbreviated to 'bol'. The most
-*        useful attribute to change is the colour.
+*        useful attribute to change is the colour. Explicit control
+*        of the style of the text labels is provided using the 'text'
+*        attribute. If this attribute is not supplied all plotting
+*        styles are inherited from the 'bol' style.
 
 *  Examples:
 *     scuover
 *        The bolometer names will be overlaid using the default colour.
 *     scuover style='colour(bol)=red' noname
 *        This command will overlay bolometer numbers over the image in red.
-*     scuover integration=2
+*     scuover style='colour(bol)=yellow,font(text)=3,colour(text)=cyan'
+*        Draw yellow circles but draw the labels in cyan using font 3
+*        (italics).
+*     scuover integration=2 name=!
 *        Overlay the bolometer positions at the start of the second
-*        integration.
+*        integration but do not label them
 
 *  Notes: 
 *     - An image must have already been displayed before using SCUOVER.
+*     - The image must have been displayed using an AST aware application
+*     (such as KAPPA DISPLAY). Otherwise the alignment will not occur.
 *     - The array position is always shown with zero jiggle offset.
 *     - This routine does not take into account the use of SHIFT_DX or
 *     SHIFT_DY in REBIN. (the relevant information is not stored in the
 *     rebinned image).
 *     - Pointing shifts are taken into account.
+*     - It is assumed that the displayed image id regridded to the 
+*     default map centre. SCUOVER aligns the image using AXIS coordinates
+*     and not SKY coordinates therefore there will be an error if incorrect
+*     sky coordinates are assumed.
 
 *  Related Applications:
 *     SURF: REBIN, SCUPA
@@ -99,6 +112,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.16  2000/06/16 01:24:38  timj
+*     Plot text in different style to circles
+*
 *     Revision 1.15  2000/06/03 03:14:45  timj
 *     Replace SGS with AST/PGPLOT
 *
@@ -149,7 +165,8 @@
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
       LOGICAL          ALIGN           ! were the two frames aligned
-      DOUBLE PRECISION ATTRS( 20 )     ! PGPLOT graphics attributes on entry
+      DOUBLE PRECISION ATTRS1( 20 )    ! PGPLOT CURVES attributes on entry
+      DOUBLE PRECISION ATTRS2( 20 )    ! PGPLOT TEXT attributes on entry
       INTEGER          AX2GRMAP        ! Mapping between AXIS and GRAPHICS frm
       CHARACTER*(1)    B1              ! Name of bolometer (1 char)
       CHARACTER*(2)    B2              ! Name of bolometer (2 char)
@@ -230,8 +247,8 @@
                                        ! (radians)
       INTEGER          IN_LST_STRT_PTR ! pointer to .SCUBA.LST_STRT
       DOUBLE PRECISION IN_MJD1         ! modified Julian day at which object
-                                       ! was at IN_LAT,IN_LONG for PLANET centre
-                                       ! coordinate system
+                                       ! was at IN_LAT,IN_LONG for PLANET
+                                       ! centre coordinate system
       DOUBLE PRECISION IN_MJD2         ! modified Julian day at which object
                                        ! was at IN_LAT2,IN_LONG2 for PLANET
                                        ! centre coordinate system
@@ -344,6 +361,7 @@
       INTEGER          START_INT       ! First integration
       INTEGER          START_MEAS      ! First measurement
       CHARACTER*80     STEMP           ! scratch string
+      LOGICAL          PLOTNAME        ! Plot the name of the bolometer 
       DOUBLE PRECISION XTEMP(2)        ! X pos of first two bols
       DOUBLE PRECISION YTEMP(2)        ! Y pos of first two bols
 
@@ -357,6 +375,9 @@
       DEVCAN = .FALSE.
       GOTNAM = .FALSE.
       GOTLOC = .FALSE.
+
+*     Initialise PLOTNAME logical
+      PLOTNAME = .TRUE.
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
@@ -694,10 +715,6 @@
      :     'LAT-OBS', LAT_OBS, STATUS)
       LAT_OBS = LAT_OBS * PI / 180.0D0
 
-*     the UT of the observation expressed as modified Julian day
-
-      CALL SCULIB_GET_MJD(N_FITS, FITS, IN_UT1, RTEMP, STATUS)
-
 *     search for pointing correction structure in the REDS extension, if there
 *     is one read in the corrections
 
@@ -727,6 +744,11 @@
       CALL SCULIB_GET_LST_STRT(IN_SCUCDX_LOC, IN_LST_STRT_PTR,
      :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
      :     N_MEASUREMENTS, STATUS)
+
+*  UT at which observation was made expressed as modified Julian day
+
+      CALL SCULIB_GET_MJD(N_FITS, FITS, %VAL(IN_LST_STRT_PTR), IN_UT1, 
+     :     RTEMP, RTEMP, STATUS)
 
 *  see if the observation completed normally or was aborted
  
@@ -961,7 +983,7 @@
 
 *     Set the appearance of lines drawn using PGPLOT so that they mimic 
 *     curves produced using astCurves.
-         CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
+         CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS1, STATUS )
 
 *     Calculate the distance between bolometers. If we only have one
 *     bolometer just assume a distance of 24 arcsec (a random number)
@@ -1011,12 +1033,29 @@
          CALL KPG1_PGSHT( HGT, STATUS )
 
 *     Which type of label do we want
-         CALL PAR_GET0L('NAME', BOLNAME, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL PAR_GET0L('NAME', BOLNAME, STATUS)
+
+*     A null response indicates no name at all
+            IF (STATUS .EQ. PAR__NULL) THEN
+               PLOTNAME = .FALSE.
+               CALL ERR_ANNUL( STATUS )
+            END IF
+         END IF
          
 *     Set the Fill-Area mode to outline so we can see the text
 *     in the circles
          CALL PGSFS( 2 )
 
+*     We are going to do this loop twice. Once to draw the circles
+*     and again to write the labels. This is so that we can change
+*     style between plots and can therefore draw the labels in 
+*     a different colour to the circles
+*     Not very elegant since we end up calculating the positions
+*     twice. Do not want to store the positions since will need
+*     to MALLOC some memory for that.
+
+*     =============== CIRCLES ==================
 *     Loop through all bolometers
          DO I = 1, N_BOL
 
@@ -1036,38 +1075,72 @@
             RTEMP = SNGL( DXTEMP )
             RDTEMP = SNGL( DYTEMP )
 
-*     Convert to proper bol name if necessary
-            IF (BOLNAME) THEN
-               CALL SCULIB_BOLNAME(BOL_ADC(I), BOL_CHAN(I), BOL, STATUS)
-            ELSE 
-               CALL CHR_ITOC(I, BOL, ITEMP)
-            END IF
-
-*     Now plot on map (Need to call 3 times depending on length of string)
-*     Need to offset the Y value by half the character height so that it
-*     can be centred in Y as well as centre justified in X
-*     Divide by 2.5 since 2.0 seems to add too much of a correction
-            ITEMP = CHR_LEN(BOL)
-*            IF (ITEMP .EQ. 1) THEN
-*               B1 = BOL
-*               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, B1)
-*            ELSE IF (ITEMP .EQ. 2) THEN
-*               B2 = BOL
-*               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, B2)
-*            ELSE
-               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, BOL)
-*            END IF
-
 *     Plot the circle using PGPLOT directly
             CALL PGCIRC( RTEMP, RDTEMP, BOL_DIST_WORLD * 0.85 )
 
          END DO
 
+*     ========== CHANGE STYLE =============
+
+*     Clear previous synonyms
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*     Set up BOLometer as a synonym for textlab
+         CALL KPG1_ASPSY( '(BOL*OMETER)', '(TEXTLAB)', STATUS )
+
+*     Set the appearance of fonts drawn using PGPLOT so that they mimic 
+*     curves produced using astText.
+         CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .TRUE., ATTRS2, STATUS )
+
+
+*     ============= LABELS ==============
+*     Loop through all bolometers and plot labels
+         IF (PLOTNAME) THEN
+            DO I = 1, N_BOL
+
+               CALL VEC_DTOD(.TRUE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
+     :              DXTEMP, IERR, NERR, STATUS)
+               CALL VEC_DTOD(.TRUE., 1, 
+     :              %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
+     :              DYTEMP, IERR, NERR, STATUS)
+
+               DXTEMP = DXTEMP * R2AS
+               DYTEMP = DYTEMP * R2AS
+
+*     Transform to world coordinates
+*     It is probably better to do this outside the loop since
+*     AST_TRAN2 can convert many coordinates at once
+               CALL AST_TRAN2( AX2GRMAP, 1, DXTEMP, DYTEMP, 
+     :              .TRUE., DXTEMP, DYTEMP, STATUS)
+               RTEMP = SNGL( DXTEMP )
+               RDTEMP = SNGL( DYTEMP )
+
+*     Convert to proper bol name if necessary
+               IF (BOLNAME) THEN
+                  CALL SCULIB_BOLNAME(BOL_ADC(I), BOL_CHAN(I), BOL, 
+     :                 STATUS)
+               ELSE 
+                  CALL CHR_ITOC(I, BOL, ITEMP)
+               END IF
+
+*     Now plot on map (Need to call 3 times depending on length of string)
+*     Need to offset the Y value by half the character height so that it
+*     can be centred in Y as well as centre justified in X
+*     Divide by 2.5 since 2.0 seems to add too much of a correction
+               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, BOL)
+
+            END DO
+
+         END IF
 
       END IF
 
 *     Ensure that the previous synonyms are cleared
-         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+      CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*     Reset the plot attributes to their entry values
+      CALL KPG1_PGSTY( IPLOT, 'TEXTLAB', .FALSE., ATTRS2, STATUS )
+      CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS1, STATUS )
 
 *     Free memory
 
