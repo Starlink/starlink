@@ -213,7 +213,7 @@ void adic_seteti( char *tok, int val )
   adix_seteti( tok, val );
   }
 
-#ifndef EMSERR
+#ifdef NOEMS
 void adic_errctx( char *buf, int buflen )
   {
   adix_errctx( buf, buflen );

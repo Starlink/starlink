@@ -243,7 +243,7 @@ F77_SUBROUTINE(adifn(seteti))( CHARACTER(tok), INTEGER(val) TRAIL(tok) )
   adix_seteti( tstr, *val );
   }
 
-#ifndef EMSERR
+#ifdef NOEMS
 F77_SUBROUTINE(adifn(errctx))( CHARACTER(buf) TRAIL(buf) )
   {
   GENPTR_CHARACTER(buf)

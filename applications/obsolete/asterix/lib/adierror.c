@@ -5,7 +5,7 @@
 #include "adi_err.h"
 #include "adierror.h"
 
-#ifdef EMSERR
+#ifndef NOEMS
 #include "ems.h"
 #endif
 
@@ -18,8 +18,7 @@ char	*ADI_G_err_rtn = NULL;		/* Current error routine */
 
 /* Routines to support non-EMS error reporting
  */
-#ifndef EMSERR
-
+#ifdef  NOEMS
 #define	MAXTOK	10			/* Maximum number of tokens */
 #define TOKLEN  80
 
@@ -38,7 +37,7 @@ char	ADI_G_err_ctx[200];		/* Current contextual error */
 
 void adix_errcnl( ADIstatus status )
   {
-#ifdef EMSERR
+#ifndef NOEMS
   ems_annul_c( status );
 #else
   *status = SAI__OK;
@@ -50,7 +49,7 @@ void adix_setetc( char *tok, char *val, int vlen )
   if ( vlen < 1 )
     vlen = strlen(val);
 
-#ifdef EMSERR
+#ifndef NOEMS
   ems_setc_c( tok, val, vlen );
 #else
   if ( ADI_G_err_ntok < MAXTOK )
@@ -67,7 +66,7 @@ void adix_setetc( char *tok, char *val, int vlen )
 
 void adix_seteti( char *tok, int val )
   {
-#ifdef EMSERR
+#ifndef NOEMS
   ems_seti_c( tok, val );
 #else
   char	buf[20];
@@ -81,7 +80,7 @@ void adix_seteti( char *tok, int val )
 /*
  * Routine to expand message tokens for the error context string
  */
-#ifndef EMSERR
+#ifdef  NOEMS
 void adix_errexp( char *mes, char *obuf )
   {
   ADIboolean	found;
@@ -136,7 +135,7 @@ void adix_setec( ADIstatype code, ADIstatus status )
 
   *status = code;			/* Set the error code */
 
-#ifdef EMSERR
+#ifndef NOEMS
   emsg = adix_errmsg( code, NULL, 0 );	/* Get text message address */
 
   if ( emsg )                           /* Set the error */
@@ -169,7 +168,7 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
       cptr = ctx;
     }
 
-#ifdef EMSERR
+#ifndef NOEMS
   if ( cptr )				/* Any contextual error? */
     ems_rep_c( " ", cptr, status );
 
@@ -187,14 +186,14 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
 void adix_setecs( ADIstatype code, char *ctx, int clen, ADIstatus status )
   {
   adix_setec( code, status );           /* Set the error code */
-#ifdef EMSERR
+#ifndef NOEMS
   ems_renew_c();			/* Renew tokens for context error */
 #endif
   adix_setes( ctx, clen, status );	/* Set the context string */
   }
 
 
-#ifndef EMSERR
+#ifdef  NOEMS
 void adix_errctx( char *buf, int buflen )
   {
   strncpy( buf, ADI_G_err_ctx, buflen );
