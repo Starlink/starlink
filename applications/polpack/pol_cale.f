@@ -345,14 +345,19 @@
      :                       %VAL( IPWRK2 ), %VAL( IPWRK3 ),
      :                       %VAL( IPWRK4 ), STATUS )
 
-*  If the iteration limit was reached before convergence was achieved, an
 *  SAI__ERROR report will be made by CCD1_CMPRR. In this case, the
-*  resulting approximate solution will probably be OK, so just flush the
-*  error and carry on.
+*  resulting approximate solution will probably be OK, so just annul (or
+*  flush if ILEVEL is 2) the error and carry on.
             IF( STATUS .EQ. SAI__ERROR .AND. NITER .EQ. MAXIT ) THEN 
-               CALL ERR_REP( ' ', 'Continuing anyway... The E factors'//
-     :                       ' may only be approximate!', STATUS )
-               CALL ERR_FLUSH( STATUS )
+               IF( ILEVEL .GE. 2 ) THEN
+                  CALL ERR_REP( ' ', 'The above error probably '//
+     :                       'does not matter and so is being '//
+     :                       'ignored... The E factors may only '//
+     :                       'be approximate!', STATUS )
+                  CALL ERR_FLUSH( STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             END IF
 
 *  Store the values returned by CCD1_CMPRR.
