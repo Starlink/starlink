@@ -51,6 +51,7 @@
 
 #  Authors:
 #     MJC: Malcolm J. Currie (Starlink, RAL)
+#     DSB: David S. Berry (Starlink)
 #     {enter_new_authors_here}
 
 #  History:
@@ -59,6 +60,9 @@
 #     1996 March 15 (MJC):
 #        Allow for applications which produce multiple plot files
 #        (though this doesn't apply to DISPLAY).
+#     20-JAN-2000 (DSB):
+#        Use PICDEF MODE=GRID instead of PICGRID. Update DISPLAY
+#        parameters to V0.13. Ensure Starlink psmerge command is used.
 #     {enter_further_changes_here}
 
 #-
@@ -68,6 +72,9 @@
     alias echo "echo > /dev/null"
     source $KAPPA_DIR/kappa.csh
     unalias echo
+
+#  Ensure the starlink psmerge command is used.
+    alias psmerge STAR_BIN/psmerge
 
 #  Initialize some shell variables.
     set xpic = 4
@@ -157,7 +164,7 @@
            set pscount = 1000
 
 # Create the grid of frames.
-           picgrid $xpic $ypic device=$devname";plot"$pscount".ps"
+           picdef outline=no mode=array fraction=1.0 prefix=\"\" xpic=$xpic ypic=$ypic device=$devname";plot"$pscount".ps"
 
 # Increment the PostScript-file counter.  This will occur for each
 # output file.
@@ -174,7 +181,7 @@
         @ pscount = $pscount + 1
 
 # Display in the picture using the current settings.
-        display axes $file:r pltitl=$file:r device=$devname";plot"$pscount".ps" \\
+        display axes $file:r style="title=$file:r" device=$devname";plot"$pscount".ps" \\
         @ pscount = $pscount + 1
 
      end
