@@ -87,6 +87,23 @@ I can do in the autoconfigure script).
     alpha-dec-osf4.0f           Compaq C++ V6.2-024 for Digital UNIX V4.0F
 
 
+Font-string templates
+---------------------
+
+Several things which can be configured -- either at ./configure-time
+or in the config.h file, if you have to edit that explicitly -- are
+specified as being in the form of a `font string
+template'.  This is a printf-like string which has %? specifiers
+replaced by font parameters, according to the following scheme:
+  %M = mode (eg. ibmvga)
+  %f = font name (eg. cmr10)
+  %d = dpi (eg. 330)
+  %b = base dpi (eg. 110)
+  %m = magnification (eg. 3)
+  %% = %
+
+This applies to the font-generation script and font-search scripts.
+
 Documentation
 -------------
 
