@@ -44,4 +44,8 @@ proc cgs4drShowEnv {taskname} {
   cgs4drInform $taskname "RGDIR              = $env(RGDIR)"
   cgs4drInform $taskname "FIGARO_FORMATS     = $env(FIGARO_FORMATS)"
   cgs4drInform $taskname "Taskname           = $taskname"
+  if {$env(DOMAIN) == "ukirt.jach.hawaii.edu."} {
+    global ADAMnet
+    cgs4drInform $taskname "ADAMnet PID        = $ADAMnet"
+  }
 }
