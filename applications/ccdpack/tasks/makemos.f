@@ -94,6 +94,11 @@
 *        happen, for instance, if an input NDF is the result of a
 *        previous mosaic-ing process).
 *        [TRUE]
+*     CORRECT = LITERAL (Write)
+*        The name of the file used to output the scale and zero-point
+*        corrections (see SCALE, ZERO and WRITESZ parameters). This
+*        file can be read by the DRIZZLE A-task.
+*        [drizzle.dat]
 *     GENVAR = _LOGICAL (Read)
 *        If GENVAR is set to TRUE and all the input NDFs supplied
 *        contain statistical error (variance) information, then
@@ -451,6 +456,12 @@
 *        variance information. Otherwise, the input variance values are
 *        used to weight the input data when they are combined.
 *        [!]
+*     WRITESZ = _LOGICAL (Read)
+*        If set to TRUE then MAKEMOS will output a file containing the
+*        scale and zero-point corrections (see SCALE and ZERO parameters)
+*        which can be read into the DRIZZLE A-task. IF SCALE and ZERO are
+*        both set to FALSE, no file will be generated
+*        [FALSE]
 *     ZERO = _LOGICAL (Read)
 *        This parameter specifies whether MAKEMOS should attempt to
 *        adjust the input data values by applying zero-point (i.e.
@@ -648,6 +659,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     PDRAPER: Peter Draper (STARLINK)
+*     AALLAN: Alasdair Allan (Keele University, STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -683,6 +695,8 @@
 *     15-JAN-1999 (PDRAPER):
 *        Added changed to support estimation of output variances from 
 *        input data.
+*     13-SEP-1999 (AALLAN)
+*        Added WRITESZ and CORRECT parameters and associated chaanges
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -699,6 +713,8 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'CCD1_PAR'         ! General CCDPACK constants
       INCLUDE 'CCD1_MOSPR'       ! Constants specific to MAKEMOS
+      INCLUDE 'FIO_PAR'          ! FI/O constants
+      INCLUDE 'FIO_ERR'          ! FI/O error codes
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
 
 *  Global Variables:
@@ -739,6 +755,7 @@
       CHARACTER * ( 9 ) METH     ! Data combination method
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Storage type (output)
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type (output)
+      CHARACTER * ( FIO__SZFNM ) CORFIL ! corrections file
       DOUBLE PRECISION DSCALE( CCD1__MXNDF + 1 ) ! Scale factor error
       DOUBLE PRECISION DZERO( CCD1__MXNDF + 1 ) ! Zero point error
       DOUBLE PRECISION ORIGIN( CCD1__MXNDF + 1 ) ! False origin value
@@ -752,6 +769,7 @@
       INTEGER INGRP              ! ID for group of input NDFs
       INTEGER IREF               ! Loop counter for reference NDFs
       INTEGER IDUM               ! Dummy integer
+      INTEGER ISTAT              ! I/O Status
       INTEGER LBND( NDF__MXDIM , CCD1__MXNDF ) ! NDF lower bounds
       INTEGER LBNDX( NDF__MXDIM ) ! Minimum (overall) lower bound
       INTEGER LW                 ! Size of workspace
@@ -778,6 +796,7 @@
       INTEGER OPTOV              ! Optimum number of NDF overlaps
       INTEGER UBND( NDF__MXDIM, CCD1__MXNDF ) ! NDF upper bounds
       INTEGER UBNDX( NDF__MXDIM ) ! Maximum (overall) upper bound
+      INTEGER UNIT               ! free fortran I/O unit number
       INTEGER WRK1               ! Workspace pointer
       INTEGER WRK2               ! Workspace pointer
       INTEGER WRK3               ! Workspace pointer
@@ -800,6 +819,7 @@
       LOGICAL USEVAR             ! Use input variance information?
       LOGICAL USEWT              ! Use user-supplied weights?
       LOGICAL VAR                ! Variance array present?
+      LOGICAL WRSAZ              ! Write scale and zero-point info to file?
       REAL ALPHA                 ! Fraction of data to remove
       REAL NSIGMA                ! Clipping limit
       REAL RMAX                  ! Maximum data value
@@ -1463,7 +1483,51 @@
          END IF
          IF ( STATUS .NE. SAI__OK ) GO TO 99
       END IF
+      
+*  If we want the SCALE and ZERO point information to be written to a
+*  file then we do so here -- this file can be input into the DRIZZLE
+*  A-task via the CORRECT parameter.
+      CALL PAR_GET0L( 'writesz', WRSAZ, STATUS )
+      
+*  Should we output data?
+      IF ( WRSAZ .AND. ( GETS .OR. GETZ ) ) THEN
 
+*  If so, get the output filename from the CORRECT parameter
+         CALL PAR_GET0C( 'correct', CORFIL, STATUS )
+      
+*  Get a unit number
+         CALL FIO_GUNIT( UNIT, STATUS )
+
+*  Open a file
+         OPEN( UNIT=UNIT, FILE=CORFIL, STATUS='UNKNOWN', 
+     :         IOSTAT=ISTAT)
+     
+         IF ( ISTAT .EQ. 0 ) THEN
+
+*  Things are okay, write to file
+            WRITE(UNIT,'(A)') '#'
+            DO I = 1, NIN
+               IF ( GETS .AND. GETZ ) THEN
+                  WRITE(UNIT,*) I, SCALE(I), 
+     :                          ZERO( I ) - SCALE( I )*ORIGIN( I )
+               ELSE IF( .NOT. GETS ) THEN
+                  WRITE(UNIT,*) I, 1.0D0, 
+     :                          ZERO( I ) - SCALE( I )*ORIGIN( I ) 
+               ELSE IF( .NOT. GETZ ) THEN
+                  WRITE(UNIT,*) I, SCALE(I), 0.0D0
+               ENDIF                           
+            END DO
+            CLOSE( UNIT )
+         ELSE
+
+*  Panic, report the error
+            CALL FIO_REP( UNIT, CORFIL, ISTAT, ' ', STATUS )
+         ENDIF
+
+*  Return the unit number to the pool 
+         CALL FIO_PUNIT( UNIT, STATUS ) 
+      ENDIF
+     
 *  Display information about the output mosaic.
 *  ===========================================
 *  If an output mosaic is being generated, then display a heading.
