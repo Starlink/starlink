@@ -535,9 +535,6 @@
 	print *,'ncomp',ncomp
         call dat_size(loc,dummy,status)
 	print *,'size',dummy
-        call dat_paren(loc,ploc,status)
-        call dat_name(ploc,name,status)
-	print *,'parent',name
         call dat_clone(loc,cloc,status)
 	print *,'cloned'
         name=' '
