@@ -19,6 +19,7 @@ dnl    to try to reconfigure that directory, and automake to assume
 dnl    it's allowed to play there, too.
 (
     cd unix
+    echo ./configure --prefix=$prefix --cache-file=config.cache
     ./configure --prefix=$prefix --cache-file=config.cache
 )
 
