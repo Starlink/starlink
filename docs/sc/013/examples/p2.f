@@ -1,4 +1,5 @@
       subroutine mkidentity (matrix, dim)
+      implicit none
       real matrix (dim,dim)
       integer dim
       do m = 1, dim
