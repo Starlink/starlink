@@ -164,7 +164,7 @@
      :                    'FITS header cards could not be read and '//
      :                    'will be ignored:', STATUS )
             DO I = 1, NBAD
-               CALL MSG_SETI( 'CARD', HEADER( BADH( I ) ) )
+               CALL MSG_SETC( 'CARD', HEADER( BADH( I ) ) )
                CALL ERR_REP( 'FTS1_FTWCS_W4', '^CARD', STATUS )
             END DO
 
