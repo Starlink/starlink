@@ -109,7 +109,8 @@
         <verbatim>
 % cvs -d :ext:username@cvs.starlink.ac.uk:/cvs &lt;cvs-command&gt;
 </verbatim>
-        where <code>username</code> is your username on that system.
+        where <code>username</code> is your username on that
+        system<index>CVS!repository</index>.
         You will need to set the environment variable
         <code>CVS_RSH</code> to <code>ssh</code> to connect to the
         repository.  If you need an account on this machine, get in
@@ -165,7 +166,8 @@
         these sections before trying the commands above.</p>
 
       <p>Secondly, the build system handles the construction of
-        portable source-code sets -- distribution tarballs -- so that
+        portable source-code sets -- distribution
+        tarballs<index>distribution</index> -- so that
         individual components can be built by users,
         from source, as straightforwardly as possible.  Since we are
         using the GNU autotools, much of this functionality comes for
@@ -223,7 +225,7 @@
       <p>The build system as a whole consists of a number of components:
         <dl>
 
-          <dt>The Starlink autotools</dt>
+          <dt>The Starlink autotools<index>autotools!Starlink changes</index></dt>
           <dd>
             <p>These consist of versions of the GNU autotools, which
               are part of the Starlink CVS repository, and which are
@@ -246,7 +248,7 @@
 
           </dd>
 
-          <dt>The Starlink autoconf macros</dt>
+          <dt>The Starlink autoconf macros<index>autoconf</index></dt>
           <dd>
 
             <p>There is an extensive set of autoconf macros which
@@ -269,7 +271,7 @@
               starconf application.</p>
           </dd>
 
-          <dt>starconf</dt>
+          <dt>starconf<index>starconf</index></dt>
           <dd>
             <p>This is the program which handles installing required
               macros, and configuring your directory ready to use
@@ -286,7 +288,7 @@
         </dl>
       </p>
 
-      <subsect id="tooloverview" export="export">
+      <subsect id="tooloverview" export="export" indexkey="autotools">
         <subhead>
           <title>Overview of the Autotools</title>
         </subhead>
@@ -318,7 +320,8 @@
           subsections which follow.</p>
 
         <p>The two most obvious and important files are
-          <code>configure.ac</code> and <code>Makefile.am</code>.  The
+          <code>configure.ac</code><index>configure.ac</index> and
+          <code>Makefile.am</code><index>Makefile.am</index>.  The 
           first tells autoconf how to make the
           <code>./configure</code> script which does the actual
           configuration work, and which will be distributed with your
@@ -373,7 +376,8 @@
         </figure>
 
         <p>This diagram for <code>./configure</code> shows a file
-          <code>config.h.in</code> being edited.  This file -- which
+          <code>config.h.in</code><index>config.h.in</index> being
+          edited.  This file -- which 
           we will have more to say about in <ref
             id="autoconfoverview"/> -- is a template list of C
           preprocessor definitions, which can be
@@ -381,7 +385,8 @@
           configure the use of functions and definitions there.  Like
           any of the other <code>.in</code> files, it is possible to
           maintain this by hand, but it is more reliable to maintain
-          it using another application <em>autoheader</em>, which
+          it using another application
+          <em>autoheader</em><index>autoheader</index>, which 
           looks as follows.</p>
 
         <figure float="nofloat">
@@ -395,7 +400,8 @@
         </figure>
 
         <p>The other file we have not mentioned yet is
-          <code>starconf.m4</code>.  This file contains macros (in
+          <code>starconf.m4</code><index>starconf!location of
+          macros</index>.  This file contains macros (in 
           the implementation language of autoconf, m4) which are
           used to extend autoconf's functionality, supplying the
           Starlink-specific autoconf support.  You will
@@ -405,7 +411,8 @@
           working directory, but is installed in the place the
           autotools expect to find it, by the <em>starconf</em>
           application described in <ref id="starconf"/>.  You may also
-          notice a file <code>aclocal.m4</code> in your directory.
+          notice a file <code>aclocal.m4</code><index>aclocal</index>
+          in your directory. 
           This is a cache of autoconf macros, maintained by the
           autoreconf program; it should not be checked in.</p>
 
@@ -443,7 +450,8 @@
             >Appendix C of that book, `Generated file dependencies'</webref>.</p>
 
         <p>Comprehensive details of the autotools are to be found in their
-          respective manuals, which are available online at
+          respective manuals, which are available online
+          at<index>autotools!documentation</index>
           <ul>
             <li>
               <p><url>&autoconfman;/autoconf.html</url></p>
@@ -475,7 +483,7 @@
           packaging in the open-source world, and outlines the
           conventions which the autotools are designed to support.</p>
 
-        <subsubsect id="autoconfoverview">
+        <subsubsect id="autoconfoverview" indexkey="autoconf!overview">
           <subhead>
             <title>Autoconf</title>
           </subhead>
@@ -518,7 +526,8 @@ const char version[] = "@PACKAGE_VERSION@";
             The configure variable <code>PACKAGE_VERSION</code> is one of those
             substituted by default, and if this file were listed as
             one of those to be substituted (by mentioning it in the
-            autoconf macro <code>AC_CONFIG_FILES(version.h)</code>),
+            autoconf macro
+            <code>AC_CONFIG_FILES(version.h)</code><index>AC_CONFIG_FILES</index>), 
             then a file <code>version.h</code> would be created
             containing the contents of the <code>version.h.in</code>
             file with the <code>@PACKAGE_VERSION@</code> substituted by the
@@ -605,7 +614,8 @@ AC_CHECK_FUNCS([strchr])
             macros such as <code>AC_CHECK_HEADERS</code> above; if you
             wish to add further switches to the <code>config.h.in</code>
             file, you should do so by calling the autoconf macro
-            <code>AC_DEFINE</code>.  See the section <webref
+            <code>AC_DEFINE</code><index>AC_DEFINE</index>.  See the
+            section <webref 
               url="&autoconfhtml;/autoconf_82.html" >7.1 Defining C
               Preprocessor Symbols</webref> in the autoconf manual for
             further details.  Autoheader is one of those applications
@@ -619,8 +629,9 @@ AC_CHECK_FUNCS([strchr])
             advantage of this particular flexibility, but it is a good
             habit to get into.</p>
 
-          <p>An illustrative <code>configure.ac</code> might look like
-            this (with line numbers inserted):
+          <p>An illustrative
+            <code>configure.ac</code><index>configure.ac!example</index>
+            might look like this (with line numbers inserted):
             <verbatim>
 1   AC_INIT(mypack, 1.2, ussc@star.rl.ac.uk)
 2   AC_CONFIG_SRCDIR(src.c)
@@ -658,7 +669,7 @@ AC_CHECK_FUNCS([strchr])
               <webref url='&autoconfhtml;/autoconf_18.html' >4.3 Finding configure Input</webref></span></p>
 
           <p>Line 3: This macro is one of the Starlink extensions, and
-            the only required Starlink macro.  It
+            the only required Starlink macro<index>STAR_DEFAULTS</index>.  It
             sets up the defaults required for building Starlink
             applications, and assures the <code>starconf</code>
             program that it's being run in the correct directory.  See
@@ -768,7 +779,7 @@ AC_SUBST(wibble)
             <code>wibble</code> at the end of the
             <code>./configure</code> script.</p>
 
-          <subsubsubsect>
+          <subsubsubsect indexkey="m4">
             <subhead>
               <title>M4 syntax and traps</title>
             </subhead>
@@ -819,7 +830,7 @@ AC_INIT(...)
           </subsubsubsect>
         </subsubsect>
 
-        <subsubsect id='automakeoverview'>
+        <subsubsect id='automakeoverview' indexkey="automake!overview">
           <subhead>
             <title>Automake</title>
           </subhead>
@@ -836,8 +847,10 @@ AC_INIT(...)
               id="gnutools"/> for a summary of the differences.</p>
 
           <p>The file which controls automake is
-            <code>Makefile.am</code>.  Automake reads both this file and
-            <code>configure.ac</code>, and based on these emits a
+            <code>Makefile.am</code><index>Makefile.am</index>.
+            Automake reads both this file and 
+            <code>configure.ac</code><index>configure.ac!and
+            automake</index>, and based on these emits a 
             <code>Makefile.in</code>.  It is this latter file which
             you distribute, and which is substituted at build time by the 
             <code>./configure</code> script which autoconf generates
@@ -916,7 +929,8 @@ BUILT_SOURCES = PAR_ERR par_err.h
 
           <p>The variable <code>lib_LTLIBRARIES</code> consists of the
             `prefix' <code>lib</code> and the `primary'
-            <code>LTLIBRARIES</code>.  The primary tells automake that
+            <code>LTLIBRARIES</code><index>automake!prefixes and
+            primaries</index>.  The primary tells automake that 
             you wish to build the libtool library
             <code>libpar_adam.la</code>, and the prefix indicates that
             this is to be installed with the other libraries (the
@@ -987,13 +1001,14 @@ BUILT_SOURCES = PAR_ERR par_err.h
             files.</p>
 
           <p>The final line which is significant to automake is the
-            <code>BUILT_SOURCES</code> line.  This says that, even
+            <code>BUILT_SOURCES</code>
+            line<index>BUILT_SOURCES</index>.  This says that, even 
             though <code>PAR_ERR</code> and <code>par_err.h</code> are
             to be installed and distributed, they are not actually
             genuine source files, but must be built; adding the
             <code>BUILT_SOURCES</code> line forces automake to add a
             dependency for these files at an artificially early stage.
-            It is not always
+            It is only rather rarely
             necessary to include a line like this.  If one of the
             source files were in this category, then it would
             naturally be built when it was required, without any
@@ -1148,10 +1163,12 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             <code>sstsupport_DATA</code> illustrated above.  This is
             because the <code>configure.ac</code> in the
             <code>sst</code> component declares the option
-            <code>STAR_DEFAULTS(per-package-dirs)</code> (see <ref
+            <code>STAR_DEFAULTS(per-package-dirs)</code><index>per-package-dirs</index>
+            (see <ref
               id="macro-defaults"/>) which,
             amongst a couple of other magic features, causes the
-            variable <code>bin_DATA</code> to become legal.</p>
+            variable <code>bin_DATA</code><index>bin_DATA</index> to
+            become legal.</p>
 
           <p>This is a rather special case, and you should not have to
             do this sort of semi-licensed hacking very often.  In
@@ -1185,7 +1202,8 @@ hds_machine.txt: hds_machine
               id="macro-special-dirs"/> for details</p>
 
           <p>The remaining magic in this file is the
-            <code>EXTRA_DIST</code> variable.  For all its cleverness,
+            <code>EXTRA_DIST</code><index>distribution!EXTRA_DIST</index> variable.
+            For all its cleverness, 
             automake cannot work out that the <code>start.in</code>
             source, nor any of the <code>sstsupport_DATA</code> files
             are to be distributed, and you need to declare that
@@ -1199,7 +1217,7 @@ hds_machine.txt: hds_machine
           
         </subsubsect>
 
-        <subsubsect>
+        <subsubsect indexkey="libtool!overview">
           <subhead>
             <title>Libtool</title>
           </subhead>
@@ -1228,13 +1246,14 @@ hds_machine.txt: hds_machine
 
         </subsubsect>
 
-        <subsubsect id="autoreconf">
+        <subsubsect id="autoreconf" indexkey="autoconf">
           <subhead>
             <title>Autoreconf: why you don't need to know about aclocal</title>
           </subhead>
 
           <p>You don't have to know anything very much about
-            <code>autoreconf</code>, other than that, if you change one
+            <code>autoreconf</code><index>autoreconf</index>, other
+            than that, if you change one
             of the autotools files <code>Makefile.am</code> or
             <code>configure.ac.</code>, you should probably run
             <code>autoreconf</code> to bring everything up to date.  In
@@ -1243,8 +1262,10 @@ hds_machine.txt: hds_machine
             that <code>autoreconf</code> addresses is that when one of
             these files is updated, there are
             several commands which might need to be re-run, including
-            <code>aclocal</code>, <code>autoheader</code>,
-            <code>libtoolize</code> and others, and it's a headache
+            <code>aclocal</code><index>aclocal</index>,
+            <code>autoheader</code><index>autoheader</index>,
+            <code>libtoolize</code><index>libtoolize</index> and
+            others, and it's a headache 
             trying to remember which ones are which.</p>
 
         </subsubsect>
@@ -1271,7 +1292,7 @@ hds_machine.txt: hds_machine
 
           <p>The Starlink autoconf adds a couple of extra standard
             options.<dl>
-              <dt><code>--with-starlink[=location]</code></dt>
+              <dt><code>--with-starlink[=location]</code><index>--with-starlink</index></dt>
               <dd>
                 <p>If no <code>location</code> is provided, this does
                   nothing.  This is effectively the default.</p>
@@ -1283,7 +1304,7 @@ hds_machine.txt: hds_machine
                   Some packages might with to configure themselves
                   differently in this case.</p>
               </dd>
-              <dt><code>--without-stardocs</code></dt>
+              <dt><code>--without-stardocs</code><index>--without-stardocs</index></dt>
               <dd>
                 <p>Controls whether documentation is built and
                 installed.  You might want to turn this off, since it
@@ -1305,11 +1326,15 @@ hds_machine.txt: hds_machine
             a temporary feature of this component).</p>
 
           <p>All of the components have ``Some influential environment
-            variables'' listed in the help message.  This will include
-            at least <code>STARLINK</code>, and in the (very common!)
+            variables''<index>environment variables</index> listed in
+            the help message.  This will include
+            at least <code>environment variables!STARLINK</code><index>STARLINK</index>, and
+            in the (very common!) 
             case of components which include a compiler, an
-            environment variable such as <code>CC</code> or
-            <code>FC</code> which allows you to override the compiler
+            environment variable such as
+            <code>CC</code><index>environment variables!CC</index> or
+            <code>FC</code><index>environment variables!FC</index>
+            which allows you to override the compiler 
             which the configure script will find.  This is useful
             if you want to avoid a default compiler and use a specific
             one instead.  For example, if you wished to use
@@ -1362,7 +1387,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
           <p>You can pass options to the compiler using environment
             variables, but you will <em>not</em> need to do this in
-            general, other than perhaps to set <code>CFLAGS=-g</code>
+            general, other than perhaps to set
+            <code>CFLAGS=-g</code><index>environment
+            variables!CFLAGS</index>
             to turn on debugging in the code you are building.  The
             variables <code>CFLAGS</code> and <code>LDFLAGS</code> are
             variables you might potentially set and export in the
@@ -1380,7 +1407,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             generated compiler commands, you can end up picking up
             inconsistent versions of software.  That is, this is a mechanism
             for getting yourself out of a fix, not a recommended way
-            of building the software.</p>
+            of building the software.<index>environment
+            variables!warnings</index></p>
 
           <p>The important point of this is that these environment variables
             <em>do matter</em>, and implicitly <em>change the
@@ -1391,7 +1419,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
       </subsect>
 
-      <subsect id="starconf" export="export">
+      <subsect id="starconf" export="export" indexkey="starconf!overview">
         <subhead>
           <title>Starconf, and the Starlink autoconf macros</title>
         </subhead>
@@ -1405,7 +1433,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
                 script;</p>
             </li>
             <li>
-              <p>runs the <em>starconf-validate</em> application to
+              <p>runs the
+                <em>starconf-validate</em><index>starconf-validate</index>
+                application to
                 check that your <code>configure.ac</code> and 
                 <code>Makefile.am</code> files look at least
                 plausible by checking, amongst other things, for the
@@ -1414,7 +1444,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
                 been checked in to the repository;</p>
             </li>
             <li>
-              <p>creates the script <code>./starconf.status</code>,
+              <p>creates the script
+                <code>./starconf.status</code><index>starconf-status</index>,
                 which allows you to inspect some of the starconf
                 parameters.</p>
             </li>
@@ -1441,7 +1472,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
                 <code>configure.ac</code>;</p>
             </li>
             <li>
-              <p>runs <em>autoreconf</em> to regenerate configuration
+              <p>runs <em>autoreconf</em><index>autoreconf</index> to
+                regenerate configuration 
                 files if necessary.</p>
             </li>
           </ul>
@@ -1463,7 +1495,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           shouldn't be checked in.</p>
 
         <p>You might on other occasions run the
-          <code>./starconf.status</code> script.  You will do this
+          <code>./starconf.status</code>
+          script<index>starconf.status</index>.  You will do this 
           firstly to query important locations, such as the location
           of the starconf templates:
           <verbatim>
@@ -1482,8 +1515,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           but there is unlikely any need for that).</p>
 
         <p>Two important variables are
-          <code>STARCONF_DEFAULT_PREFIX</code> and
-          <code>STARCONF_DEFAULT_STARLINK</code>.  The first is the
+          <code>STARCONF_DEFAULT_PREFIX</code><index>STARCONF_DEFAULT_PREFIX</index> and
+          <code>STARCONF_DEFAULT_STARLINK</code><index>STARCONF_DEFAULT_STARLINK</index>.
+          The first is the
           default installation prefix of the software you are
           building; the second is the location of a currently built
           Starlink tree, which will be used for applications and
@@ -1505,7 +1539,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <code>STARLINK</code> variable unset.</p>
 
         <p>A companion to the starconf application is the
-          <em>starconf-validate</em> application.  When run, this
+          <em>starconf-validate</em><index>starconf-validate</index>
+          application.  When run, this
           examines the current directory, checking that all required
           files are present, and checking that you have the correct
           files checked in to the repository.  The command
@@ -1525,7 +1560,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           starconf files.  See <ref id="templates"/>.</p>
 
         <p>The final component of the starconf system is the file
-          <code>component.xml</code>.  This is an XML file
+          <code>component.xml</code><index>component.xml</index>.
+          This is an XML file
           containing information about the particular component in
           the directory.  The information in this file is redundant
           with some of the information you specify in
@@ -1550,7 +1586,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           </subhead>
 
           <p>There are three templates available as part of the
-            starconf system.  They are located in the starconf
+            starconf system<index>starconf!templates</index>.  They
+            are located in the starconf
             `buildsupportdir': given that the starconf application
             is in your path, you can find this location with
             <kbd>starconf --show buildsupportdata</kbd>, and if you
@@ -1571,7 +1608,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           </subhead>
 
           <p>The meaning of the elements in the component.xml DTD is
-            as follows.  The term `component' is used here rather
+            as follows<index>component.xml!format</index>.  The term
+            `component' is used here rather
             than `package': no great distinction is being drawn
             here, except that the components within the CVS tree
             might not be reflected in ultimately distributed packages.
@@ -1658,7 +1696,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
       </subsect>
 
-      <subsect id="tool-state" export="export">
+      <subsect id="tool-state" export="export" indexkey="state">
         <subhead>
           <title>A few remarks on state</title>
         </subhead>
@@ -1677,8 +1715,10 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             autoconf and automake.  Files <code>config.h.in</code> and
             <code>aclocal.m4</code>, are also part of this process,
             inasmuch as they are generated by autoreconf:
-            <code>config.h.in</code> is based on the declarations
-            within <code>configure.ac</code>; <code>aclocal.m4</code> is a
+            <code>config.h.in</code><index>config.h.in</index> is
+            based on the declarations
+            within <code>configure.ac</code>;
+            <code>aclocal.m4</code><index>aclocal</index> is a
             local cache of m4 macros, drawn from the starconf,
             autoconf, automake
             and libtool installations.  Other objects
@@ -1689,7 +1729,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             <code>ltmain.sh</code>, <code>missing</code> and
             <code>stamp-h1</code>.  All of this can be happily blown away
             by hand, and a lot of it is removed by <kbd>make
-              maintainer-clean</kbd>, though this doesn't remove things like
+              maintainer-clean</kbd><index>make
+            targets!maintainer-clean</index>, though this doesn't
+            remove things like
             <code>config.h.in</code> which are required for
             <code>./configure</code> to run.  Most of this state is
             maintained reliably by the dependencies within
@@ -1708,7 +1750,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             results.  However at the same time, it creates a log file in
             <code>config.log</code> (which can be handy to examine if a
             configure script fails or appears to give wrong answers), a
-            cache in <code>config.cache</code> if you ran
+            cache in
+            <code>config.cache</code><index>config.cache</index> if
+            you ran 
             <code>./configure</code> with the <code>-C</code> option, it
             creates the directory-specific <code>./libtool</code> script,
             and it creates a file <code>config.status</code>.  This last
@@ -1719,16 +1763,20 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             rerunning <code>./configure</code> with the same options such
             as <code>--prefix</code> which were given to the
             <code>./configure</code> script last time).  You won't often
-            have to run <code>./config.status</code> yourself, but it's
+            have to run
+            <code>./config.status</code><index>config.status</index>
+            yourself, but it's
             reassuring to know what it's doing when the makefile runs it
             for you.  It is always regenerated afresh by running
             <code>./configure</code>.</p>
 
           <p><em>Build state</em>: The compiled files are obviously part
             of the build state, and can be removed by <kbd>make
-              clean</kbd> and regenerated with plain <kbd>make</kbd>.  Less
+              clean</kbd><index>make targets!clean</index> and
+            regenerated with plain <kbd>make</kbd>.  Less
             obviously part of this state are the directory
-            <code>.libs</code>, which is libtool's' workspace and holds
+            <code>.libs</code><index>.libs</index>, which is
+            libtool's' workspace and holds
             different types of objects and libraries, and
             <code>.deps</code>, which holds dependency information gleaned
             as part of the last build.  Less obviously still are those
@@ -1739,7 +1787,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             hand-written makefile rule in
             <code>Makefile.am</code>.</p>
 
-        <p><em>Starconf state</em>: There is essentially no starconf
+        <p><em>Starconf state</em><index>starconf!state, lack of</index>: There
+          is essentially no starconf 
           state, since the starconf system's only role is to manage
           the <code>bootstrap</code> file and provide the extra
           autoconf macros (installed in the buildsupport part
@@ -1758,10 +1807,12 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             representing the build and link dependencies between
             components by makefile dependencies between the components'
             installed manifests, which are installed in the
-            <code>.../manifests</code> directory alongside, and at the
+            <code>.../manifests</code><index>manifests!state</index>
+            directory alongside, and at the 
             same time, as the component is installed by the
             <code>install</code> Makefile target.  Thus this is state held
-            <em>outside of the build tree</em>.  If the `make world' build
+            <em>outside of the build tree</em>.  If the `make
+            world'<index>make world</index> build 
             sees that a manifest file is up-to-date with respect to the
             dependencies expressed in <code>Makefile.dependencies</code>,
             it makes <em>no attempt to build it</em>, even if the
@@ -1791,7 +1842,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
       </subsect>
 
-      <subsect id="fortran" export="export">
+      <subsect id="fortran" export="export" indexkey="fortran!preprocessable">
         <subhead>
           <title>Preprocessable Fortran</title>
         </subhead>
@@ -1804,7 +1855,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           Fortran, by adding the two macros <code>AC_PROG_FC</code> and
           <code>AC_PROG_FPP</code>.</p>
 
-        <p>You should use <code>AC_PROG_FC</code> in preference to the
+        <p>You should use
+          <code>AC_PROG_FC</code><index>AC_PROG_FC</index> in
+          preference to the 
           macro <code>AC_PROG_F77</code> described in the autoconf
           manual, since the `FC' support in autoconf is more flexible
           and more developed than the `F77' support, and the
@@ -1837,7 +1890,8 @@ AC_PROG_FC([], 77)
         <p>Both the Sun and GNU Fortran compilers can handle cpp-style
           preprocessor constructs in a Fortran file, avoiding any
           separate preprocessing stage.  Sun have produced a Fortran
-          preprocessor, <em>fpp</em>, which is available at
+          preprocessor, <em>fpp</em><index>fpp (Sun Fortran
+          preprocessor)</index>, which is available at 
           <url>http://www.netlib.org/fortran/</url>: it's freely
           available, but not open-source.  And more often than not we
           can in fact fall back on simple <em>cpp</em>, as long as we have
@@ -1848,7 +1902,8 @@ AC_PROG_FC([], 77)
 
         <p>Starlink autoconf and automake between them add support for
           preprocessable Fortran.  Autoconf supplies the
-          <code>AC_PROG_FPP</code> macro described in <ref
+          <code>AC_PROG_FPP</code><index>AC_PROG_FPP</index> macro
+          described in <ref 
             id="macro-ac-prog-fpp"/>, to investigate what compiler and
           preprocessor are available, and automake works with the
           results of that test to add appropriate support to the
@@ -1894,7 +1949,7 @@ AC_FC_OPEN_SPECIFIERS(readonly)
 
       </subsect>
 
-      <subsect id="tool-cvs" export="export">
+      <subsect id="tool-cvs" export="export" indexkey="CVS">
         <subhead>
           <title>CVS</title>
         </subhead>
@@ -1943,7 +1998,7 @@ cvs tag &lt;tag-name&gt;
 
         </subsubsect>
 
-        <subsubsect id="tool-cvs-recursion">
+        <subsubsect id="tool-cvs-recursion" indexkey="CVS!and recursion">
           <subhead>
             <title>CVS and recursion -- checking out only a subtree</title>
           </subhead>
@@ -2046,7 +2101,7 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
 
         <p>The important targets in the top-level makefile are:
           <dl>
-            <dt><code>make world</code></dt>
+            <dt><code>make world</code><index>make world</index></dt>
             <dd>
               <p>This target builds the whole tree, in an order which
                 respects the dependencies between components.  It builds
@@ -2062,7 +2117,8 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
                   section</ref>.</p>
             </dd>
 
-            <dt><code>make &lt;manifest-file&gt;</code></dt>
+            <dt><code>make &lt;manifest-file&gt;</code>
+                <index>manifests</index></dt>
             <dd>
               <p>As an alternative to <kbd>make world</kbd>, you may
                 specify a single manifest file.  This builds and
@@ -2075,7 +2131,8 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
                 and remaking it.</p>
             </dd>
 
-            <dt><code>make</code> or <code>make all</code></dt>
+            <dt><code>make</code> or <code>make all</code> <index>make
+                  targets!top-level</index></dt>
             <dd>
               <p>This recurses into each of the directories listed in
                 <code>AC_CONFIG_SUBDIRS</code> within the top-level
@@ -2118,7 +2175,7 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
 
       </subsect>
 
-      <subsect id="bootstrapping" export="export">
+      <subsect id="bootstrapping" export="export" indexkey="bootstrapping">
         <subhead>
           <title>Bootstrapping and building the entire tree</title>
         </subhead>
@@ -2165,7 +2222,9 @@ autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
 
         <p>Lines 2-4: unset the <code>STARLINK</code> and
           <code>INSTALL</code> variables, and
-          set the two starconf variables as shown.  For a whole-tree
+          set the two starconf variables as
+          shown<index>STARCONF_DEFAULT_PREFIX</index>.  For a
+          whole-tree
           build, these two should have the same value, to ensure that
           the build uses only tools and libraries which have been
           built at an earlier point in the build.  For fuller details
@@ -2186,7 +2245,8 @@ autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
           for line 9.</p>
 
         <p>Line 6: put <code>/local/star/bin</code> and
-          <code>/local/star/buildsupport/bin</code> in the path, and
+          <code>/local/star/buildsupport/bin</code> in the
+          path<index>PATH</index>, and 
           make sure that there are <em>no</em> Starlink binary
           directories elsewhere in the path.</p>
 
@@ -2230,7 +2290,8 @@ autoconf (GNU Autoconf) 2.59
           components in an order which ensures that each component is
           build after the components it depends on, as declared in
           <code><ref id="macro-declare-dependencies"
-              >STAR_DECLARE_DEPENDENCIES</ref></code> invocations in
+              >STAR_DECLARE_DEPENDENCIES</ref></code>
+            <index>dependencies</index> invocations in 
           those components' <code>configure.ac</code> files.  The set
           of dependencies can be examined (if you're interested) in
           the file <code>componentset.xml</code>, which is built up
@@ -2293,7 +2354,9 @@ autoconf (GNU Autoconf) 2.59
           necessary, since it is not checked in to the repository.  This
           requires that the Starlink-specific autotools are in your
           path, and so you must first install these `buildsupport'
-          tools if they are not installed already.  Instructions for
+          tools if they are not installed
+          already<index>bootstrapping!buildsupport</index>.
+          Instructions for 
           that are in the <ref id="bootstrappingonly">next
             section</ref>.</p>
 
@@ -2314,8 +2377,8 @@ autoconf (GNU Autoconf) 2.59
         <p>You can control where the configuration process finds other
           Starlink applications in a broadly similar way.  The default
           location which is examined is specified by the
-          <code>STARCONF_DEFAULT_STARLINK</code> variable, which is
-          examined just as the
+          <code>STARCONF_DEFAULT_STARLINK</code><index>STARCONF_DEFAULT_STARLINK</index>
+          variable, which is examined just as the
           <code>STARCONF_DEFAULT_PREFIX</code> variable was above.
           That can be overridden by setting the environment variable
           <code>STARLINK</code>, and that can be overridden in turn by
@@ -2333,7 +2396,7 @@ autoconf (GNU Autoconf) 2.59
 
       </subsect>
 
-      <subsect id="monoliths" export="export">
+      <subsect id="monoliths" export="export" indexkey="monoliths">
         <subhead>
           <title>Building monoliths</title>
         </subhead>
@@ -2345,7 +2408,8 @@ autoconf (GNU Autoconf) 2.59
 
         <p>Along with the <code>bin_MONOLITHS</code> variable, a
           Makefile must also declare a set of tasks using the
-          <code>TASKS</code> primary, and this set will be empty if
+          <code>TASKS</code><index>tasks</index> primary, and this set
+          will be empty if
           the monolith is an ATASK.</p>
 
         <p>The <code>foo_TASKS</code> primary indicates to automake
@@ -2371,8 +2435,8 @@ autoconf (GNU Autoconf) 2.59
           generated <code>.ifl</code> file should not be included in
           the repository or the distribution.</p>
 
-        <p>If you are building an ATASK, then the task is the same
-          name as the program, so you should simply
+        <p>If you are building an ATASK<index>atasks</index>, then the
+          task is the same name as the program, so you should simply
           declare the <code>..._TASKS</code> variable to be empty:
 <verbatim>
 foo_TASKS =
@@ -2398,7 +2462,8 @@ foo_TASKS =
 
       </subsect>
 
-      <subsect id="bootstrappingonly" export="export">
+      <subsect id="bootstrappingonly" export="export"
+        indexkey="bootstrapping!buildsupport">
         <subhead>
           <title>Bootstrapping without building: configuring
           starconf and the autotools</title>
@@ -2571,7 +2636,8 @@ Directory /cvs/libraries/pcs/adam added to the repository
           (if that is not you).</p>
 
         <p>The ideal source for new code is a CVS or RCS repository.
-          A CVS repository is easy to import -- you just tar it up and
+          A CVS repository is easy to import<index>CVS</index> -- you
+          just tar it up and
           unpack it into the correct place within the Starlink
           repository.  An RCS repository is barely harder, with the
           only difference being that you have to create the Starlink
@@ -2673,7 +2739,8 @@ cvs server: use 'cvs commit' to add these files permanently
           </verbatim>
         </p>
 
-        <p>Note that CVS preserves access modes when it
+        <p>Note that CVS<index>CVS!and file modes</index> preserves
+          access modes when it
           stores files, so we should make sure that the script
           <code>adam_link_adam</code> is executable <em>before</em>
           checking it in, and we need not bother to make it executable
@@ -2751,6 +2818,7 @@ dnl    contains only a single definition, of the parameter ADAM__OK.
 AC_CONFIG_FILES(Makefile component.xml)
 AC_OUTPUT
 </verbatim>
+          <index>CNF</index><index>dependencies</index>
           The first five lines are straightforward boilerplate (see
           <ref id="autoconfoverview"/>).  The next three find a
           Fortran compiler, declare that we want to use libtool to
@@ -2761,7 +2829,8 @@ AC_OUTPUT
           by looking for a f95 compiler before looking for a f77
           compiler; if you know or discover this is inappropriate,
           then you can constrain the Fortran dialect that
-          <code>AC_PROG_FC</code> will look for by giving a value for
+          <code>AC_PROG_FC</code><index>AC_PROG_FC</index> will look
+          for by giving a value for 
           its optional dialect argument.  Macro
           <code>AC_PROG_FC</code> is not yet documented in the
           autoconf manual, but see <ref id="gnutools"/>.</p>
@@ -2846,7 +2915,8 @@ configure.ac: installing `./missing'
           </verbatim>
           The bootstrap script always re-runs starconf if it can, so
           this reminds you that you still haven't checked those files
-          in.  It also runs autoreconf (<ref id="autoreconf"/>) for
+          in<index>starconf-validate</index>.  It also runs autoreconf
+          (<ref id="autoreconf"/>) for 
           you, installing the helper files that requires, and
           constructing <code>configure</code> from
           <code>configure.ac</code> and <code>Makefile.in</code> from
@@ -2869,7 +2939,7 @@ configure.ac: installing `./missing'
 
       </subsect>
 
-      <subsect id="autodistrib" export="export">
+      <subsect id="autodistrib" export="export" indexkey="distribution">
         <subhead>
           <title>Distribution of components</title>
         </subhead>
@@ -2903,13 +2973,16 @@ AST_PAR: ast_par.source astbad
           only in a makefile dependency will not be automatically
           distributed by automake.  Files such as this should be
           included by the distribution by listing them in the value of
-          the <code>EXTRA_DIST</code> variable:
+          the
+          <code>EXTRA_DIST</code><index>distribution!EXTRA_DIST</index>
+          variable:
 <verbatim>
 EXTRA_DIST = ast_par.source
 </verbatim></p>
 
         <p>Automake also supports the <code>dist_</code> and
-          <code>nodist_</code> prefixes to automake variables.  These
+          <code>nodist_</code> prefixes to automake
+          variables<index>distribution!dist prefix</index>.  These
           can be used to adjust automake's defaults for certain
           primaries.  Automake does not distribute
           <code>_SCRIPTS</code> by default (this is since they are
@@ -2922,6 +2995,7 @@ dist_bin_SCRIPTS = ast_link_adam
 noinst_SCRIPTS = ast_cpp
 dist_noinst_SCRIPTS = makeh
 </verbatim>
+          <index>installation!noinst prefix</index>
           We see all four common possibilities here:
           <code>ast_link_adam</code> and <code>makeh</code> are needed
           in the distribution but need no configuration, and so should
@@ -2938,7 +3012,9 @@ dist_noinst_SCRIPTS = makeh
           in one place.</p>
 
         <p>Incidentally, the other occasionally important `prefix-prefix' like
-          <code>dist</code> is <code>nobase</code>.  A
+          <code>dist</code> is
+          <code>nobase</code><index>installation!nobase
+          prefix</index>.  A 
           <code>Makefile.am</code> line like
           <code>include_HEADERS = a.h subdir/b.h</code> will cause
           both <code>a.h</code> and <code>b.h</code> to be installed
@@ -2991,7 +3067,8 @@ nodist_libast_la_SOURCES = \
           but cause no problems.  Any files which should be present
           <em>only</em> prior to the distribution should be listed in
           <code>configure.ac</code> inside macro <ref
-            id="macro-predist-sources" >STAR_PREDIST_SOURCES</ref>.
+            id="macro-predist-sources"
+          >STAR_PREDIST_SOURCES</ref><index>STAR_PREDIST_SOURCES</index>.
           The <code>./configure</code> script expects to find either
           all of these files or none of them, and if it finds some
           other number, it will warn you.  If it finds these files, it
@@ -3017,6 +3094,7 @@ STAR_PREDIST_SOURCES(sun_master.tex)
 STAR_CHECK_PROGS(star2html)
 STAR_CHECK_PROGS(prolat, sst)   # prolat is part of SST
 </verbatim>
+          <index>documentation!complicated</index>
           The <code>sun_master.tex</code> file is used when the
           SUN/210 and SUN/211 files are being generated, and should
           not be distributed.  Since the process of generating the
@@ -3060,7 +3138,7 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
         <p>This is admittedly a rather crude technique, but it is a
           lot less fragile than the more elegant alternatives.</p>
 
-        <subsubsect id="rolldistribution">
+        <subsubsect id="rolldistribution" indexkey="distribution">
           <subhead>
             <title>Making a distribution</title>
           </subhead>
@@ -3095,7 +3173,7 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
 
       </subsect>
 
-      <subsect id="regressiontests" export="export">
+      <subsect id="regressiontests" export="export" indexkey="tests">
         <subhead>
           <title>Regression tests</title>
         </subhead>
@@ -3349,7 +3427,9 @@ AC_OUTPUT
             packages.</p>
 
           <p>As described in
-            <ref id="macro-special-install-command"/>, this adapts the 
+            <ref id="macro-special-install-command"/>
+            <index>STAR_SPECIAL_INSTALL_COMMAND</index>,
+            this adapts the  
             standard Makefile <code>install</code> target so that it
             uses the given command to make an installation.  Note that
             the version of autoconf which generated the Tcl
@@ -3428,7 +3508,8 @@ $(RECURSIVE_TARGETS):
 
         <p>In order for the new component to be a good citizen in the
           Starlink build tree, it needs to install a file manifest as
-          part of the <code>install</code> target.
+          part of the <code>install</code> target<index>manifests!and
+          third-party code</index>.
           Add to the <code>configure.in</code> file the lines
           <verbatim>
 : ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
@@ -3596,7 +3677,8 @@ M Makefile.dependencies
               <p>You can control the compiler at configure time by
               specifying the variable <code>F77</code>,
               <code>FC</code>, <code>CC</code> or <code>CXX</code>, as
-              appropriate; and you add compiler options with the
+              appropriate<index>environment variables</index>; and you
+              add compiler options with the 
               <code>FFLAGS</code>, <code>FCFLAGS</code> or
                 <code>CFLAGS</code> variables.  For details and
               warnings, see <ref id="configure-script"/>.</p>
@@ -3612,7 +3694,8 @@ M Makefile.dependencies
                 in a reasonably tidy way.</p>
             </dd>
 
-            <dt>I want to do odd things at install time.  How?</dt>
+            <dt>I want to do odd things at install time.
+              How?<index>installation</index></dt> 
             <dd>
               <p>Automake provides a couple of escape hatches for
                 installing extra material.  These are the
@@ -3645,7 +3728,8 @@ install-exec-local: dtask_main.o
                 This uses the <code>$(INSTALL_PROGRAM)</code> command to
                 install the object file in the library directory (you'd
                 use <code>$(INSTALL_DATA)</code> command for a data
-                target).  The installation location is
+                target)<index>installation!MANIFEST_FD</index><index>manifests!special
+                installation targets</index>.  The installation location is
                 <code>$(libdir)</code>, which is a location which
                 includes the <code>$(prefix)</code> variable, so that
                 this install rule behaves as other such rules do.
@@ -3664,7 +3748,8 @@ install-exec-local: dtask_main.o
                 hand-made install rule is to behave the same way as
                 the automatically-generated rules.</p>
 
-              <p>You often need to create links in this situation.  To
+              <p>You often need to create links in this
+                situation<index>symlinks</index>.  To 
                 do that portably (symbolic links are not required by
                 POSIX, and so the autoconf macros are able to emulate
                 them if necessary), put the <code>AC_PROG_LN_S</code> macro in
@@ -3683,7 +3768,8 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                 The option <code>rm -f</code> is portable.</p>
             </dd>
 
-            <dt>I want to do odd things at clean/distribution time.  How?</dt>
+            <dt>I want to do odd things at clean/distribution time.
+            How?<index>makefile targets!clean</index></dt>
             <dd>
               <p>Odder than what is described in <ref
                   id="autodistrib"/>?</p>
@@ -3697,7 +3783,8 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
             </dd>
 
             <dt>I want to make distribution tarballs install into
-              <code>/star</code>.  How?</dt>
+              <code>/star</code>.  How?<index>distribution!setting
+              prefix</index></dt>
             <dd>
               <p>See the description of <code>./bootstrap</code> in
                 <ref id="rolldistribution"/>.</p>
@@ -3749,7 +3836,7 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
         
       </subsect>
 
-      <subsect id="state-faqs" export="export">
+      <subsect id="state-faqs" export="export" indexkey="state">
         <subhead>
           <title>State FAQs</title>
         </subhead>
@@ -3902,7 +3989,8 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                   id="tool-state"/>.</p>
             </dd>
 
-            <dt>Why does <kbd>make world</kbd> not do anything?</dt>
+            <dt>Why does <kbd>make world</kbd> not do
+              anything?<index>make world</index></dt> 
             <dd>
               <p>The <kbd>make world</kbd> build works by comparing
                 timestamps of the <em>installed</em> files in the
@@ -3932,17 +4020,19 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
 
             <dt>I know the buildsupport tools have been updated in the
               repository.  What's the best way to install the new
-              versions locally?</dt>
+              versions locally?<index>buildsupport!updating</index></dt>
             <dd>
               <p>The most straightforward way is to update your
                 checkout of the component in question, then invoke
                 <kbd>./configure; make; make install</kbd>
                 within that checkout directory.</p>
-              <p>Alternatively, and much as described above, you could
+              <p>The best way, however is to
                 update your checkout of the component in question,
-                then delete its manifest file and run
-                <kbd>./bootstrap --buildsupport</kbd> in the
-                top level of the checkout.</p>
+                then run <kbd>./bootstrap --buildsupport</kbd> in the
+                top level of the checkout.  When the bootstrap script
+                is run in this mode, it always deletes any
+                buildsupport manifests, to ensure that the
+                buildsupport tools are <em>always</em> rebuilt if updated.</p>
             </dd>
 
             <dt>What does this mean?: <code>required file
@@ -3980,7 +4070,8 @@ configure: error: changes in the environment can compromise the build
 configure: error: run `make distclean' and/or `rm config.cache' and start over
 </verbatim>
               You have changed an `influential environment variable'.
-                See <ref id="configure-script"/>.</p>
+                See <ref id="configure-script"/><index>environment
+                variables</index>.</p> 
             </dd>
 
           </dl>
@@ -4029,7 +4120,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
         </subsect>
 
-        <subsect id="macro-ac-fc-check-intrinsics" export="export">
+        <subsect id="macro-ac-fc-check-intrinsics" export="export"
+        indexkey="AC_FC_CHECK_INTRINSICS"> 
           <subhead>
             <title>AC_FC_CHECK_INTRINSICS</title>
           </subhead>
@@ -4048,7 +4140,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           </p>
         </subsect>
 
-        <subsect id="macro-ac-fc-check-headers" export="export">
+        <subsect id="macro-ac-fc-check-headers" export="export"
+        indexkey="AC_FC_CHECK_HEADERS"> 
           <subhead>
             <title>AC_FC_CHECK_HEADERS</title>
           </subhead>
@@ -4063,7 +4156,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
         </subsect>
 
-        <subsect id="ac-fc-have-percentval" export="export">
+        <subsect id="ac-fc-have-percentval" export="export"
+        indexkey="AC_FC_HAVE_PERCENTVAL"> 
           <subhead>
             <title>AC_FC_HAVE_PERCENTVAL</title>
           </subhead>
@@ -4076,7 +4170,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             <code>%LOC</code> also.</p>
         </subsect>
 
-        <subsect id="macro-ac-fc-open-specifiers" export="export">
+        <subsect id="macro-ac-fc-open-specifiers" export="export"
+          indexkey="AC_FC_OPEN_SPECIFIERS">
           <subhead>
             <title>AC_FC_OPEN_SPECIFIERS</title>
           </subhead>
@@ -4106,7 +4201,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
         </subsect>
 
-        <subsect id="macro-ac-fc-recl-unit" export="export">
+        <subsect id="macro-ac-fc-recl-unit" export="export"
+          indexkey="AC_FC_RECL_UNIT">
           <subhead>
             <title>AC_FC_RECL_UNIT</title>
           </subhead>
@@ -4130,7 +4226,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             portable way.</p>
         </subsect>
 
-        <subsect id="macro-ac-prog-fc" export="export">
+        <subsect id="macro-ac-prog-fc" export="export"
+          indexkey="AC_PROG_FC">
           <subhead>
             <title>AC_PROG_FC</title>
           </subhead>
@@ -4152,12 +4249,13 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             fl32 af77] currently).</p>
         </subsect>
 
-        <subsect id="macro-ac-prog-fpp" export="export">
+        <subsect id="macro-ac-prog-fpp" export="export"
+          indexkey="AC_PROG_FPP">
           <subhead>
             <title>AC_PROG_FPP</title>
           </subhead>
 
-          <p><strong><code>AC_PROG_FPP(required-features, [FPP-SRC-EXT=fpp])</code></strong></p>
+          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=fpp])</code></strong><index>fortran!preprocessable</index></p> 
 
           <p><code>required-features</code> is a space-separated
             list of features that the Fortran preprocessor must
@@ -4174,7 +4272,8 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             X).</p>
 
           <p>The macro works out if the Fortran compiler discovered by
-            macro <code>AC_PROG_FC</code> has the requested set of
+            macro <code>AC_PROG_FC</code><index>AC_PROG_FC</index> has
+            the requested set of 
             features.  If so, it arranges for the compilation to be done
             `directly'; if not, it arranges for `indirect' compilation,
             where the preprocessable Fortran code is converted to pure
@@ -4309,7 +4408,8 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id='macro-check-progs' export='export'>
+        <subsect id='macro-check-progs' export='export'
+          indexkey="STAR_CHECK_PROGS">
           <subhead>
             <title>STAR_CHECK_PROGS</title>
           </subhead>
@@ -4326,7 +4426,8 @@ file.f: file.$(FPP_SRC_EXT)
             can be found.  Because of this default behaviour, this
             macro should _only_ be used for locating Starlink programs
             such as messgen or alink, and not as a general replacement
-            for <code>AC_CHECK_PROG</code>.  Any characters in the
+            for <code>AC_CHECK_PROG</code><index>AC_CHECK_PROG!and
+            STAR_CHECK_PROGS</index>.  Any characters in the 
             program outside of the set of alphanumerics and
             underscores are normalised to underscores.</p>
 
@@ -4357,12 +4458,13 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id='macro-cnf-compatible-symbols' export='export'>
+        <subsect id='macro-cnf-compatible-symbols' export='export'
+          indexkey="STAR_CNF_COMPATIBLE_SYMBOLS">
           <subhead>
             <title>STAR_CNF_COMPATIBLE_SYMBOLS</title>
           </subhead>
 
-          <p><strong><code>STAR_CNF_COMPATIBLE_SYMBOLS</code></strong></p>
+          <p><strong><code>STAR_CNF_COMPATIBLE_SYMBOLS</code></strong><index>CNF</index></p>
 
           <p>Work out what is required to have the Fortran compiler
             produce library symbols which are compatible with those
@@ -4396,14 +4498,16 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id='macro-declare-dependencies' export='export'>
+        <subsect id='macro-declare-dependencies' export='export'
+          indexkey="STAR_DECLARE_DEPENDENCIES">
           <subhead>
             <title>STAR_DECLARE_DEPENDENCIES</title>
           </subhead>
 
           <p><strong><code>STAR_DECLARE_DEPENDENCIES(type, deplist, [option=''])</code></strong></p>
 
-          <p>Declare dependencies of this component.  The
+          <p>Declare dependencies of this
+            component<index>dependencies</index>.  The
             <code>TYPE</code> is one of `sourceset', `build', `link',
             `use' or `test', and the <code>DEPLIST</code> is a space
             separated list of component names, which this component
@@ -4457,7 +4561,12 @@ file.f: file.$(FPP_SRC_EXT)
                   dependency on the component which contained that
                   application.  If no use dependencies are declared,
                   we take the use dependencies to be the same as the
-                  link dependencies.</p>
+                  link dependencies.  We expect that such use
+                  dependencies will become more important when we
+                  start using this dependency information to build
+                  distribution packages, and have to articular
+                  (minimal?) dependencies between them; until then,
+                  use dependencies will be rather rare.</p>
               </li>
 
              <li>
@@ -4484,6 +4593,12 @@ file.f: file.$(FPP_SRC_EXT)
             circularities (that is, A depending on B, which depends,
             possibly indirectly, on A).</p>
 
+          <p>It is because of this intricacy that the dependencies
+            scheme is so complicated.  <em>In general, you will declare
+            most things to have build dependencies</em>, and only
+            refine these into link or use dependencies when things
+            won't work otherwise.</p>
+
           <p>All these relationships are transitive: if A has a
             build dependency on B, and B has one on C, then A has a
             build dependency on C.  You can augment this by using the
@@ -4508,7 +4623,8 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
 
-        <subsect id='macro-defaults' export='export'>
+        <subsect id='macro-defaults' export='export'
+          indexkey="STAR_DEFAULTS">
           <subhead>
             <title>STAR_DEFAULTS</title>
           </subhead>
@@ -4521,8 +4637,9 @@ file.f: file.$(FPP_SRC_EXT)
             of option keywords, of which the only one defined at
             present is <code>per-package-dirs</code></p>
 
-          <p>The option <code>per-package-dirs</code>, has three
-            consequences:
+          <p>The option
+            <code>per-package-dirs</code><index>per-package-dirs</index>,
+            has three consequences:
             <ol>
               <li>
                 <p>applications, help and etc files are installed in a
@@ -4536,7 +4653,8 @@ file.f: file.$(FPP_SRC_EXT)
                 opposed to executables.</p>
               </li>
               <li>
-                <p>A file <code>version.dat</code> is created (at make
+                <p>A file <code>version.dat</code> is
+                created<index>version.dat</index> (at make 
                 rather than install time).  This holds the bare
                 <code>PACKAGE_VERSION</code> number, and is installed in the
                 binary directory.</p>
@@ -4552,7 +4670,7 @@ file.f: file.$(FPP_SRC_EXT)
                   is defined, so that you can use it elsewhere in your
                   <code>configure.ac</code> file.  The value of this
                   variable depends on the
-                  <code>STARCONF_DEFAULT_STARLINK</code> 
+                  <code>STARCONF_DEFAULT_STARLINK</code><index>STARCONF_DEFAULT_STARLINK</index>
                   variable which is defined by the
                   <code>./starconf.status</code> script (see <ref
                     id="starconf"/>), and can be
@@ -4573,7 +4691,12 @@ file.f: file.$(FPP_SRC_EXT)
                   the major, minor and release numbers extracted from
                   <code>PACKAGE_VERSION</code>, and an integer
                   representation of these consisting of <code>major *
-                  1000000 + minor * 1000 + release</code>.</p>
+                  1000000 + minor * 1000 + release</code>.
+                  <index>PACKAGE_VERSION_MAJOR</index>
+                  <index>PACKAGE_VERSION_MINOR</index>
+                  <index>PACKAGE_VERSION_RELEASE</index>
+                  <index>PACKAGE_VERSION_INTEGER</index>
+                </p>
               </li>
             </ul>
           </p>
@@ -4596,7 +4719,9 @@ file.f: file.$(FPP_SRC_EXT)
           </subhead>
 
           <p>There are several macros and makefile variables which
-            help you install files in special directories.  These are
+            help you install files in special
+            directories<index>documentation</index><index>directories!special</index>.
+            These are 
             the macros <code>STAR_</code><em>X</em><code>_FILES</code>
             for <em>X</em> in <code>DOCS</code>, <code>ETC</code>,
             <code>EXAMPLES</code>, and <code>HELP</code>, and the
@@ -4611,7 +4736,8 @@ file.f: file.$(FPP_SRC_EXT)
             place.</p>
         </subsect>
 
-        <subsect id="macro-fc-library-ldflags" export="export">
+        <subsect id="macro-fc-library-ldflags" export="export"
+          indexkey="STAR_FC_LIBRARY_LDFLAGS">
           <subhead>
             <title>STAR_FC_LIBRARY_LDFLAGS</title>
           </subhead>
@@ -4622,7 +4748,8 @@ file.f: file.$(FPP_SRC_EXT)
             any platform-specific magic required.</p>
 
           <p>The only place where this does anything different at
-            present is on OSX 10.3.  There's a library problem using
+            present is on OSX 10.3<index>OSX</index>.  There's a
+            library problem using 
             gcc under OSX 10.3 (10.3.4 Panther = Darwin 7.4.0), which
             results in the symbols restFP and saveFP being undefined
             at link time.  There's a shortage of authoritative
@@ -4648,7 +4775,8 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id='macro-latex-documentation' export='export'>
+        <subsect id='macro-latex-documentation' export='export'
+          indexkey="STAR_LATEX_DOCUMENTATION">
           <subhead>
             <title>STAR_LATEX_DOCUMENTATION</title>
           </subhead>
@@ -4656,7 +4784,8 @@ file.f: file.$(FPP_SRC_EXT)
           <p><strong><code>STAR_LATEX_DOCUMENTATION(documentcode, [targets=''])</code></strong></p>
 
           <p>Generate the standard makefile targets to handle
-            &latex; documentation source.  The parameter documentcode
+            &latex; documentation source<index>documentation</index>.
+            The parameter documentcode 
             should be something like `sun123' -- it should not include
             any .tex extension.</p>
 
@@ -4681,13 +4810,15 @@ file.f: file.$(FPP_SRC_EXT)
 
         </subsect>
 
-        <subsect id="variable-manifest-dir" export="export">
+        <subsect id="variable-manifest-dir" export="export"
+          indexkey="STAR_MANIFEST_DIR">
           <subhead>
             <title>Variable STAR_MANIFEST_DIR</title>
           </subhead>
 
           <p>The <code>STAR_MANIFEST_DIR</code> substitution variable
-            is slightly special.  If it is defined in your
+            is slightly special<index>manifests</index>.  If it is
+            defined in your
             <code>configure.ac</code> file, then Starlink automake
             will include in the generated <code>Makefile.in</code>
             code to create and install a manifest of all the files
@@ -4715,7 +4846,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
             value of the <code>$(prefix)</code> makefile variable.</p>
 
           <p>You do <em>not</em> have to set this in general, as this
-            is one of the things that the <code>STAR_DEFAULTS</code>
+            is one of the things that the
+            <code>STAR_DEFAULTS</code><index>STAR_DEFAULTS</index>
             macro (<ref id="macro-defaults"/>) takes care of.  The
             only time you need to use this feature is when you are
             importing a third-party code set into the tree (as
@@ -4730,13 +4862,15 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
 
         <subsect id="macro-special-install-command"
-            export="export">
+            export="export"
+          indexkey="STAR_SPECIAL_INSTALL_COMMAND">
           <subhead>
             <title>STAR_SPECIAL_INSTALL_COMMAND</title>
           </subhead>
 
           <p>Third-party sources will not come with a
-            <code>make install</code> target which installs a manifest.  It is
+            <code>make install</code> target which installs a
+            manifest<index>installation!special</index>.  It is 
             reasonably easy to add such support, however, as
             described in <ref id="config-tclsys"/>.  The crucial
             feature is the installation command declared in the macro
@@ -4777,17 +4911,20 @@ AC_SUBST(STAR_MANIFEST_DIR)
             <code>$(PACKAGE_VERSION)</code> be set.</p>
 
           <p>See <ref id="importing-thirdparty"/> for general
-            discussion of importing third-party sources.</p>
+            discussion of importing third-party
+            sources.<index>thirdparty code</index></p> 
         </subsect>
 
-        <subsect id='macro-messgen' export='export'>
+        <subsect id='macro-messgen' export='export'
+          indexkey="STAR_MESSGEN">
           <subhead>
             <title>STAR_MESSGEN</title>
           </subhead>
 
           <p><strong><code>STAR_MESSGEN(msgfile-list)</code></strong></p>
 
-          <p>Handle generating message, error, and facility files.</p>
+          <p>Handle generating message, error, and facility
+            files.<index>messgen</index></p>
 
           <p>The argument is a space-separated list of files, each
             of which has a set of message declarations in it, in the
@@ -4815,7 +4952,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
           <p>This macro also declares that the .msg files are
             pre-distribution files (it calls <ref
               id="macro-predist-sources"
-              ><code>STAR_PREDIST_SOURECS</code></ref>) on them, and so
+              ><code>STAR_PREDIST_SOURCES</code></ref><index>STAR_PREDIST_SOURCES</index>)
+            on them, and so 
             the resulting configure script should expect not to find
             them in an unpacked distribution.</p>
           
@@ -4830,13 +4968,15 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
         </subsect>
 
-        <subsect id='macro-monoliths' export='export'>
+        <subsect id='macro-monoliths' export='export'
+          indexkey="STAR_MONOLITHS">
           <subhead>
             <title>STAR_MONOLITHS</title>
           </subhead>
           <p><strong><code>STAR_MONOLITHS</code></strong></p>
 
-          <p>Declare that we will be creating monoliths.  This is
+          <p>Declare that we will be creating
+            monoliths<index>monoliths</index>.  This is 
             conceptually similar to the various
             <code>AC_PROG_FC</code> declarations, and does
             whatever configuration is necessary to handle these.</p>
@@ -4855,7 +4995,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
         </subsect>
 
-        <subsect id="path-tcltk" export="export">
+        <subsect id="path-tcltk" export="export"
+          indexkey="STAR_PATH_TCLTK">
           <subhead>
             <title>STAR_PATH_TCLTK</title>
           </subhead>
@@ -4889,7 +5030,9 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
           <p>The macro searches first in the path, and then in a
             selection of platform-specific standard locations.  The
-            configure option <code>--with-tcl</code> allows you to
+            configure option
+            <code>--with-tcl</code><index>--with-tcl</index> allows
+            you to 
             provide a path to a <code>tclsh</code> binary, which is
             put at the head of the list of locations to search.
             Option <code>--without-tcl</code> suppresses the search,
@@ -4900,7 +5043,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
         </subsect>
 
-        <subsect id='macro-platform-sources' export='export'>
+        <subsect id='macro-platform-sources' export='export'
+          indexkey="STAR_PLATFORM_SOURCES">
           <subhead>
             <title>STAR_PLATFORM_SOURCES</title>
           </subhead>
@@ -4953,7 +5097,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
             platform-specific files. </p>
         </subsect>
 
-        <subsect id="macro-predist-sources" export="export">
+        <subsect id="macro-predist-sources" export="export"
+          indexkey="STAR_PREDIST_SOURCES">
           <subhead>
             <title>STAR_PREDIST_SOURCES</title>
           </subhead>
@@ -4961,7 +5106,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
           <p>Give a (space-separated) list of files which should exist
             only in the pre-distribution (ie, repository checkout)
-            state.  If one of these is found, then the substitution
+            state<index>distribution</index>.  If one of these is
+            found, then the substitution 
             variable <code>PREDIST</code> is set to a blank rather
             than the comment character <code>#</code>.  This means
             that Makefile rules which are intended to work only in the
@@ -4991,7 +5137,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
       </sect>
 
-      <sect id="gnutools" export="export">
+      <sect id="gnutools" export="export"
+        indexkey="autotools!Starlink changes">
         <subhead>
           <title>The relationship with the GNU autotools</title>
         </subhead>
@@ -5002,11 +5149,10 @@ AC_SUBST(STAR_MANIFEST_DIR)
           repository, and built and installed during the top-level
           <code>./bootstrap</code> process.</p>
 
-        <p>The checked-in
-          libtool is an unmodified libtool 1.5
-          distribution.</p>
+        <p>The checked-in libtool is an unmodified libtool 1.5
+          distribution.<index>libtool</index></p>
 
-        <p>The Starlink autoconf is based on
+        <p>The Starlink autoconf<index>autoconf</index> is based on
           version 2.59, with additions to support preprocessable
           Fortran; these modifications have been submitted to the
           autoconf maintainers, so it is hoped that these
@@ -5018,7 +5164,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
           described in <ref id="starconfmacros"/>.</p>
 
         <p>The Starlink automake is a more heavily modified
-          version of automake version 1.8.2.  There are a few
+          version of automake version 1.8.2<index>automake!Starlink changes</index>.  There are a few
           generic changes to support the added Fortran
           autoconf macros, but the majority of the changes
           are in the service of Starlink's specific requirements.  They
@@ -5041,10 +5187,9 @@ AC_SUBST(STAR_MANIFEST_DIR)
             <li>
               <p>Addition of the
                 <code>stardocs</code>,
-                <code>staretc</code>
-                and
+                <code>staretc</code>,
                 <code>starhelp</code>
-                prefixes to
+                (and so on) prefixes to
                 the <code>DATA</code> primary.  Setting these variables has
                 the same effect as giving an argument to the
                 <code>STAR_DOCS_FILES</code> macro (and friends).  See
@@ -5052,7 +5197,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
             </li>
 
             <li>
-              <p>Extra <code>LDADD</code> options: In standard
+              <p>Extra <code>LDADD</code> options<index>link
+                scripts</index>: In standard 
                 <code>automake</code>, the content of the
                 <code>LDADD</code> variables must be a list of extra
                 objects to add to a program, or extra libraries,
