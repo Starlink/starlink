@@ -979,40 +979,47 @@ notably the interactive slice is now bound to \mytt{<control-a>}.
 \subsection{This release 2.3-3}
 This is a minor update to GAIA with the following fixes:
 \begin{itemize}
-  \item A percentiles option has been added to automatic contour
+\item A percentiles option has been added to automatic contour
       generation.
 
-  \item The \mytt{automatic} and \mytt{percent} generation options now
-        correctly use the image to be contoured not the displayed image.
+\item The ``automatic'' generation option now correctly uses the image
+      to be contoured not the displayed image. 
 
-  \item The measure band can now display pixels and non-celestial
-        coordinate system offsets.
+\item The measure band can now display pixels and non-celestial
+      coordinate system offsets.
 
-  \item The SExtractor toolbox increment and decrement arrows now work 
-        the obvious way around.
+\item The SExtractor toolbox increment and decrement arrows now work
+      the ``obvious'' way around.
 
-  \item Automatic NDF history recording should be working again.
+\item Automatic NDF history recording should be working again.
 
-  \item NDFs stored within container files are now supported.
+\item NDFs stored within container files are now supported.
 
-  \item Floating point images of size $35000*2048$ pixels are now 
-        known to display (if you have sufficient VM). Bigger images
-        may also now work.
+\item Floating point images of size $35,000*2,048$ pixels are now known to
+      display (if you have sufficient VM). Bigger images may also work.
 
-  \item Pixel coordinates (which include the NDF origin) can now be
-        selected as the \mytt{celestial} coordinate system (see the
-        \mytt{Celestial coordinates...} toolbox)
+\item Pixel coordinates (which include the NDF origin) can now be
+      selected as the ``celestial'' coordinate system (see the
+      ``Celestial coordinates...'' toolbox)
 
-  \item Blank pixels in unsigned word NDFs should be be handled 
-        correctly.
+\item Blank pixels in unsigned word NDFs should be be handled
+      correctly.
 
-  \item The on-line help for the photometry toolboxes should be
-        available again.  
+\item It should now be possible to plot POLPACK polarization data
+      again, although X and Y coordinates should still not include any 
+      NDF origin offsets.
 
-  \item A new configuration option \mytt{-focus\_follows\_mouse} has
-        been added to stop problems with \mytt{autoraise} and
-        \mytt{click-to-focus} when using the CDE window manager. Set
-        this option to $0$ (false). 
+\item The on-line help for the photometry toolbox is available
+      again.
+
+\item A new configuration option \mytt{-focus\_follows\_mouse} has been added
+      to stop problems with ``autoraise'' and ``click-to-focus'' when
+      using the CDE window manager. Set this option to 0 (false).
+
+\item The ability to zoom around an object in the main display has
+      been added (this is controlled using Shift-1 and Shift-2 mouse
+      buttons).
+
 \end{itemize}
 
 
