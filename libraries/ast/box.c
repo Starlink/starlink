@@ -56,6 +56,7 @@ f     The Box class does not define any new routines beyond those
 #include "region.h"              /* Coordinate regions (parent class) */
 #include "channel.h"             /* I/O channels */
 #include "box.h"                 /* Interface definition for this class */
+#include "polygon.h"             /* Interface definition for this class */
 #include "mapping.h"             /* Position mappings */
 #include "unitmap.h"             /* Unit Mappings */
 #include "permmap.h"             /* Axis permutation Mappings */
@@ -1492,12 +1493,18 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstMapping *map;              /* Base -> current Mapping */
    AstMapping *result;           /* Result pointer to return */
    AstPointSet *mesh;            /* Mesh of current Frame positions */
+   AstPointSet *ps1;             /* Box corners in base Frame */
+   AstPointSet *ps2;             /* Box corners in current Frame */
+   AstPolygon *newpoly;          /* New Polygon to replace Box */
    AstRegion *new;               /* Pointer to simplified Region */
    AstRegion *this;              /* Pointer to supplied Region structure */
    AstRegion *unc;               /* Pointer to uncertainty Region */
+   double **ptr1;                /* Pointers to axis values in ps1 */
+   double **ptr2;                /* Pointers to axis values in ps2 */
    double *constants;            /* Axis constants array */
    double *lbnd;                 /* Lower bounds for new Box */
    double *ubnd;                 /* Upper bounds for new Box */
+   double corners[8];            /* Box corners in current Frame */
    double k;                     /* Axis constant value */
    double lb;                    /* Lower axis bound */
    double ub;                    /* Upper axis bound */
@@ -1718,9 +1725,66 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          astAnnul( new );
          new = astClone( newbox );
          simpler = 1;
-      }
+
+/* If the transformed Box is not itself a Box, see if it can be
+   represented accuractely by a Polygon. This is only p[ossible for
+   2-dimensional Boxes. */
+      } else if( astGetNin( map ) == 2 && astGetNout( map ) == 2 ) {
+
+/* Get pointer to current Frame. */
+         frm = astGetFrame( new->frameset, AST__CURRENT );
+
+/* Create a PointSet holding the base Frame axis values at the four
+   corners of the Box. */
+         ps1 = astPointSet( 4, 2, "" );
+         ptr1 = astGetPoints( ps1 );
+         if( astOK ) {
+            newbox = (AstBox *) new;
+
+            ptr1[ 0 ][ 0 ] = newbox->centre[ 0 ] + newbox->extent[ 0 ];
+            ptr1[ 1 ][ 0 ] = newbox->centre[ 1 ] + newbox->extent[ 1 ];
+
+            ptr1[ 0 ][ 1 ] = newbox->centre[ 0 ] + newbox->extent[ 0 ];
+            ptr1[ 1 ][ 1 ] = newbox->centre[ 1 ] - newbox->extent[ 1 ];
+
+            ptr1[ 0 ][ 2 ] = newbox->centre[ 0 ] - newbox->extent[ 0 ];
+            ptr1[ 1 ][ 2 ] = newbox->centre[ 1 ] - newbox->extent[ 1 ];
+
+            ptr1[ 0 ][ 3 ] = newbox->centre[ 0 ] - newbox->extent[ 0 ];
+            ptr1[ 1 ][ 3 ] = newbox->centre[ 1 ] + newbox->extent[ 1 ];
+         }
+
+/* Transform the Box corners into the current Frame. */
+         ps2 = astTransform( map, ps1, 1, NULL );
+         ptr2 = astGetPoints( ps2 );
+         if( astOK ) {
+
+/* Create a Polygon from these points. */
+            for( ic = 0; ic < 4; ic++ ) {
+               corners[ ic ] = ptr2[ 0 ][ ic ];
+               corners[ 4 + ic ] = ptr2[ 1 ][ ic ];
+            }
+            newpoly = astPolygon( frm, 4, 2, corners, unc, "" );
+
+/* See if all points within the Box mesh fall on the boundary of this
+   Polygon, to within the uncertainty of the Region. */
+            if( astRegPins( newpoly, mesh, NULL, NULL ) ) {
+
+/* If so, use the new Polygon in place of the original Box. */
+               astAnnul( new );
+               new = astClone( newpoly );
+               simpler = 1;
+            }
 
 /* Free resources. */
+            newpoly = astAnnul( newpoly );
+         }
+
+         frm = astAnnul( frm );
+         ps1 = astAnnul( ps1 );
+         ps2 = astAnnul( ps2 );
+      }
+
       mesh = astAnnul( mesh );
       unc = astAnnul( unc );
       newbox = astAnnul( newbox );
