@@ -27,4 +27,4 @@ dist_pkgdata_DATA = figaro.news
 SUBDIRS = \
     appcb appsub dsa dta fda fig fibre fit fitres fla gen gkd graph ich jty \
     main opt par spext sploop tio twoutil unix work util \
-    figaro1 figaro2 figaro3 figaro4 figaro5 
+    figaro1 figaro2 figaro3 figaro4 figaro5 data
