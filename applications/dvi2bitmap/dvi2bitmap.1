@@ -218,12 +218,15 @@ be alternatively specified as
 .I "--process=nodvi"
 .TP
 .I "-o, --output=[filename-pattern]"
-Choose the output filename pattern.  The value is a 
-`printf' formatting string, with a single
+Choose the output filename pattern.  If there is a 
+.I "%d" string within the pattern, then this pattern will be used for
+each output file name, with the 
 .I "%d"
-formatting descriptor, which will be replaced in output filenames
-with the page number.  This can be overridden on a per-page basis by
-a TeX
+replaced by the page number.  If there is no such string, then this
+will be taken to be the name of the 
+.I first
+page output, after which the filename pattern will revert to the default.
+This can be overridden on a per-page basis by a TeX
 .I "\especial"
 embedded in the DVI file (see below).  If there is no 
 file extension, or if it does not match the output type, a suitable file
@@ -458,9 +461,10 @@ above, or, along with the
 .I "\-\-process=nocrop"
 option, to force the output bitmap to be a certain size.
 .TP
-.I "-v, --verbose=[quiet|silent]"
+.I "-v, --verbose=[normal|quiet|silent]"
 Quiet mode suppresses some chatter, and silent mode suppresses
-chatter, and does not display warnings or errors either.
+chatter, and does not display warnings or errors either.  Mode
+`normal' is the default.
 .TP
 .I "-V, --version"
 Display the version number and compilation options, and exit.

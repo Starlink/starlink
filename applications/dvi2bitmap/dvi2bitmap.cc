@@ -485,8 +485,14 @@ int main (int argc, char **argv)
 	    break;
 
 	  case 'o':		// --output
-	    bm.ofile_pattern = optarg;
-	    break;
+              {
+                  string a = optarg;
+                  if (a.find('%') == string::npos)
+                      bm.ofile_name = a;
+                  else
+                      bm.ofile_pattern = a;
+                  break;
+              }
 
 	    // case 'p', 'P': see 'l'
 
@@ -725,6 +731,8 @@ int main (int argc, char **argv)
 		verbosity = quiet;
 	    else if (strcmp(optarg, "silent") == 0)
 		verbosity = silent;
+            else if (strcmp(optarg, "normal") == 0)
+                verbosity = normal;
 	    else
 		Usage("bad verbosity keyword");
 	    
@@ -1524,7 +1532,7 @@ void show_help()
 "  --start-page=n, --end-page=n, --page-range=spec",
 "                                 Control which pages are processed",
 "  --scaledown=n                  Scale output bitmap down by n",
-"  --verbose=[quiet|silent]       Suppress chatter",
+"  --verbose=[normal|quiet|silent] Suppress chatter",
 "  -V, --version                  Show version and configuration info",
     };
     int nstrings = sizeof(helpstrings)/sizeof(helpstrings[0]);
