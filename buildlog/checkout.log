@@ -6649,6 +6649,15 @@ cvs checkout: Updating java/source/jnihds/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/jnihds/src/testcases/uk/ac/starlink/hds
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/HDSObjectTest.java
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/reduced_data1.sdf
+cvs checkout: Updating java/source/jnikappa
+cvs checkout: Updating java/source/jnikappa/src
+cvs checkout: Updating java/source/jnikappa/src/jni
+cvs checkout: Updating java/source/jnikappa/src/main
+cvs checkout: Updating java/source/jnikappa/src/main/uk
+cvs checkout: Updating java/source/jnikappa/src/main/uk/ac
+cvs checkout: Updating java/source/jnikappa/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/jnikappa/src/main/uk/ac/starlink/kappa
+cvs checkout: Updating java/source/jnikappa/src/main/uk/ac/starlink/kappa/support
 cvs checkout: Updating java/source/jpcs
 U java/source/jpcs/.properties
 U java/source/jpcs/build.xml
@@ -8313,6 +8322,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/CollapsedSpecDataImpl.jav
 U java/source/splat/src/main/uk/ac/starlink/splat/data/DataLimits.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/EditableSpecData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/EditableSpecDataImpl.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/ExtractedSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSHeaderSource.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/HdxInputNameParser.java
@@ -8657,6 +8667,18 @@ cvs checkout: Updating java/source/src/etc
 U java/source/src/etc/LICENCE.txt
 U java/source/src/etc/README
 U java/source/src/etc/tags
+cvs checkout: Updating java/source/startask
+cvs checkout: Updating java/source/startask/src
+cvs checkout: Updating java/source/startask/src/etc
+cvs checkout: Updating java/source/startask/src/lib
+cvs checkout: Updating java/source/startask/src/main
+cvs checkout: Updating java/source/startask/src/main/uk
+cvs checkout: Updating java/source/startask/src/main/uk/ac
+cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink/jiniutils
+cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink/startask
+cvs checkout: Updating java/source/startask/src/main/uk/ac/starlink/startask/support
+cvs checkout: Updating java/source/startask/src/script
 cvs checkout: Updating java/source/table
 U java/source/table/.properties
 U java/source/table/build.xml
@@ -9029,6 +9051,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ControlWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/Driver.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ImageWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/InverseRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELActivator.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
@@ -9073,14 +9096,17 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/MemberDoclet.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/XmlDoclet.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Arithmetic.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/CgiQuery.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Conversions.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Coords.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Image.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Maths.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Output.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sdss.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sog.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Splat.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Strings.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/SuperCosmos.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoQZ.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/package.html
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
