@@ -171,7 +171,7 @@
           CALL ADI_NAME( IIPID, IPNAME, STATUS )
 
 *      Copy data to HDS
-          CALL AID1_CCA2HT( IIPID, ' ', INLOC, IPNAME, STATUS )
+          CALL ADI1_CCA2HT( IIPID, ' ', INLOC, IPNAME, STATUS )
 
 *      Release the component
           CALL ADI_ERASE( IIPID, STATUS )
