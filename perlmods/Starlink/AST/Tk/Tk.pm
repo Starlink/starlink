@@ -101,7 +101,7 @@ my %GRF_PRIM = (
 
 # Similarly for style
 my %GRF_STYLE = (
-		 &Starlink::AST::Grf::GRF__STYLE() => 'LINE',
+		 &Starlink::AST::Grf::GRF__STYLE() => 'STYLE',
 		 &Starlink::AST::Grf::GRF__WIDTH() => 'WIDTH',
 		 &Starlink::AST::Grf::GRF__SIZE() => 'SIZE',
 		 &Starlink::AST::Grf::GRF__FONT() => 'FONT',
@@ -175,7 +175,23 @@ sub _GLine {
      my %opts;
 
      # Now add additional style information
+     # colour
      %opts = _attr_to_colour( $canvas, $external->[EXT_ATTR], 'LINE' );
+
+     # line style
+     my $lindex = $external->[EXT_ATTR]->{LINE}->{STYLE};
+     my $lstyle;
+     $lstyle = $LINE_STYLES[ $lindex ] if defined $lindex;
+     $opts{'-dash'} = $lstyle if defined $lstyle;
+
+     # a line width is in units of 1/200 in according to the PGPLOT
+     # standard
+     my $astwid = $external->[EXT_ATTR]->{LINE}->{WIDTH};
+     my $width;
+     $width = ( $astwid / 200 ) . 'i' if defined $astwid;
+     $opts{'-width'} = $width if defined $width;
+
+     # and draw the line
      my $t = $canvas->createLine( @points, %opts );
      $canvas->addtag( 'ASTGLine', 'withtag', $t);
 
@@ -783,6 +799,17 @@ sub _attr_to_colour {
     # background color
     if ($ci == 0) {
       $opts{'-fill'} = $canvas->cget('-background');
+    } elsif ($ci == 1) {
+      # foreground color
+      my $bg = $canvas->cget('-background');
+      my $fg = $COLOURS[$ci];
+
+      if ($bg eq $fg) {
+	# need to choose something else
+	$fg = $COLOURS[0];
+      };
+
+      $opts{'-fill'} = $fg;
     } else {
       $opts{'-fill'} = $COLOURS[$ci]
     }
