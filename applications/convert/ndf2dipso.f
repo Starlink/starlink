@@ -70,6 +70,7 @@
 *  Authors:
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *        reports.
 *     1992 September 22 (MJC):
 *        Added Notes and a section on how to create the input file.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,7 @@
       INCLUDE 'SAE_PAR'              ! Standard SAE constants
       INCLUDE 'DAT_PAR'              ! Data-system constants
       INCLUDE 'NDF_PAR'              ! NDF_ public constants
+      INCLUDE 'CNF_PAR'              ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS                 ! Global status
@@ -218,8 +222,10 @@
       CALL FIO_UNIT (FD, UNIT, STATUS)
 
 *   Call routine to write the data to a DIPSO file.
-      CALL CON_DIPWR( UNIT, TITLE, NPTS, %VAL(DATPTR), %VAL(AXPTR),
-     :                %VAL(FLXPTR), %VAL(WAVPTR), BAD, BREAK, MAXBRK,
+      CALL CON_DIPWR( UNIT, TITLE, NPTS, %VAL(CNF_PVAL(DATPTR)), 
+     :                %VAL(CNF_PVAL(AXPTR)),
+     :                %VAL(CNF_PVAL(FLXPTR)), %VAL(CNF_PVAL(WAVPTR)), 
+     :                BAD, BREAK, MAXBRK,
      :                STATUS )
 
 *   Cancel the ADAM parameter OUT and deactivate FIO.

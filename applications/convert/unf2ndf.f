@@ -172,6 +172,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -180,6 +181,8 @@
 *     1996 September 16 (MJC):
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -195,6 +198,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -362,7 +366,8 @@
 *   Check that the mandatory descriptors are present.  Want to start
 *   the searchs in the last (NHEADS) header.  When there are two
 *   headers, the first will be a dummy header.
-         CALL CON_MANDH( .TRUE., NCARD, %VAL( HPNTR ), HSTART( NHEADS ),
+         CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                   HSTART( NHEADS ),
      :                   BITPIX, NDIM, DIMS, DARRAY, NONSDA, EL,
      :                   STATUS, %VAL( 80 ) )
 
@@ -389,8 +394,10 @@
 
 *  Obtain the scale and zero, the blank value.
          CALL CON_FTYPE( BITPIX, HSTART( NHEADS ), NCARD,
-     :                   %VAL( HPNTR ), BSCALE, BZERO, BLANK,
-     :                   BADPIX, UNSIGN, STATUS, %VAL( 80 ) )
+     :                   %VAL( CNF_PVAL( HPNTR ) ), 
+     :                   BSCALE, BZERO, BLANK,
+     :                   BADPIX, UNSIGN, STATUS, 
+     :                   %VAL( 80 ) )
 
 *  Determine the HDS data type of the data array.  Note that the QUALITY
 *  component must be unsigned byte.
@@ -476,31 +483,38 @@
 *  Call a routine to read the data from the unformatted Fortran file.
 *  The selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_IFUFB( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFB( FD, EL, NUMPRE, SKIP, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IFUFD( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFD( FD, EL, NUMPRE, SKIP, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IFUFI( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFI( FD, EL, NUMPRE, SKIP, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_IFUFR( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFR( FD, EL, NUMPRE, SKIP, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_IFUFUB( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFUB( FD, EL, NUMPRE, SKIP, 
+     :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_IFUFUW( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFUW( FD, EL, NUMPRE, SKIP, 
+     :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_IFUFW( FD, EL, NUMPRE, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IFUFW( FD, EL, NUMPRE, SKIP, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       END IF
@@ -510,7 +524,8 @@
 *  The first argument is the number of header cards from the start of
 *  the headers up to the end of the current header.
       IF ( HEADER ) THEN
-         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, %VAL( HPNTR ),
+         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, 
+     :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS,
      :                   %VAL( 80 ) )
       END IF

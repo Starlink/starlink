@@ -161,11 +161,14 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1993 August 22 (MJC):
 *        Original version.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -181,6 +184,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! Primdat public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -599,12 +603,14 @@
 *  the input to the output NDF.  Call the appropriate routine for the
 *  array data type.
             IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL CON_CHVAI( EL, %VAL( IPNTR ), IBLANK, VAL__BADI, 
-     :                         %VAL( TPNTR ), NREP, STATUS )
+               CALL CON_CHVAI( EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         IBLANK, VAL__BADI,
+     :                         %VAL( CNF_PVAL( TPNTR ) ), NREP, STATUS )
 
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL CON_CHVAR( EL, %VAL( IPNTR ), BLANK, VAL__BADR, 
-     :                         %VAL( TPNTR ), NREP, STATUS )
+               CALL CON_CHVAR( EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         BLANK, VAL__BADR,
+     :                         %VAL( CNF_PVAL( TPNTR ) ), NREP, STATUS )
 
             END IF
 
@@ -616,8 +622,9 @@
 
 *  Apply the scale and zero to convert the temporary array into the
 *  output NDF's data array.
-               CALL CON_SCLOF( EL, %VAL( TPNTR ), SCALE, ZERO,
-     :                         %VAL( OPNTR( 1 ) ), STATUS )
+               CALL CON_SCLOF( EL, %VAL( CNF_PVAL( TPNTR ) ), 
+     :                         SCALE, ZERO,
+     :                         %VAL( CNF_PVAL( OPNTR( 1 ) ) ), STATUS )
 
 *  Release the workspace.
                CALL PSX_FREE( TPNTR, STATUS )
@@ -761,7 +768,7 @@
 *  such that the centre of the axis is 0.
                   CALL CON_SSAZR( EL, DBLE( PLTSCL ),
      :                            -DBLE( EL ) * 0.5D0 * DBLE( PLTSCL ),
-     :                            %VAL( AXPNTR ), STATUS )
+     :                            %VAL( CNF_PVAL( AXPNTR ) ), STATUS )
 
 *  Unmap the axis-centre array.
                   CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )

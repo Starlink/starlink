@@ -74,6 +74,7 @@
 *  Authors:
 *     Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -86,6 +87,8 @@
 *        error reports.
 *     1992 September 22 (MJC):
 *        Added Notes and a section on how to create the input file.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,6 +104,7 @@
       INCLUDE 'DAT_PAR'           ! Data-system constants
       INCLUDE 'NDF_PAR'           ! NDF_ public constants
       INCLUDE 'PRM_PAR'           ! PRIMDAT symbolic constants
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS              ! Global status
@@ -195,8 +199,10 @@
       END IF
 
 *   Call a subroutine to read the data into the mapped data arrays.
-      CALL CON_DIPRD (UNIT, NPTS, NBREAK, BREAK, NMAX, %VAL(WDIP), 
-     :                %VAL(FDIP), %VAL(WCOR), %VAL(FCOR), NCOR, STATUS)
+      CALL CON_DIPRD (UNIT, NPTS, NBREAK, BREAK, NMAX, 
+     :                %VAL(CNF_PVAL(WDIP)),
+     :                %VAL(CNF_PVAL(FDIP)), %VAL(CNF_PVAL(WCOR)), 
+     :                %VAL(CNF_PVAL(FCOR)), NCOR, STATUS)
 
 *  Check NCOR is greater than unity.
       IF (NCOR.LE.1) THEN
@@ -237,8 +243,10 @@
 *   Move corrected wavelength and flux arrays into the NDF. 
       NBYTES = VAL__NBR * NCOR
       IF ((NBYTES.GT.0) .AND. (STATUS.EQ.SAI__OK)) THEN
-         CALL CON_MOVE (NBYTES, %VAL(WCOR), %VAL(WAVPTR), STATUS)
-         CALL CON_MOVE (NBYTES, %VAL(FCOR), %VAL(DATPTR), STATUS)
+         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(WCOR)), 
+     :                  %VAL(CNF_PVAL(WAVPTR)), STATUS)
+         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(FCOR)), 
+     :                  %VAL(CNF_PVAL(DATPTR)), STATUS)
       END IF
 
 *   If there were no breaks in the data, set the NDF bad-pixel flag 

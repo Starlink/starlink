@@ -200,6 +200,7 @@
 *     ACD: A C Davenhall (Edinburgh)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     25/6/97 (ACD): 
@@ -213,7 +214,10 @@
 *     24-FEB-2004 (DSB):
 *        Modified NDF label to use AST escape sequences.
 *     11-AUG-2004 (TIMJ):
-*        Fix NDF lable for spectra as well as maps.
+*        Fix NDF label for spectra as well as maps.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 *-
 
 *  Type Definitions:
@@ -228,6 +232,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants 
       INCLUDE 'NDF_PAR'          ! NDF constants 
       INCLUDE 'PAR_ERR'          ! PAR_ error constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status.
@@ -413,7 +418,8 @@
 
 *  Add AXIS structures to the output NDF.
          CALL PSX_CALLOC( 6*MXDIM, '_DOUBLE', IPWORK, STATUS )
-         CALL CON_CAXES( INDF1, INDF2, %VAL( IPWORK ), STATUS )
+         CALL CON_CAXES( INDF1, INDF2, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                   STATUS )
          CALL PSX_FREE( IPWORK, STATUS )
 
 *  Copy any auxilliary information.
@@ -542,7 +548,8 @@
      :                       STATUS ) 
                CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPOUT, EL, 
      :                       STATUS ) 
-               CALL VEC_RTOR( .FALSE., EL, %VAL( IPIN ), %VAL( IPOUT ), 
+               CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                        %VAL( CNF_PVAL( IPOUT ) ),
      :                        IERR, NERR, STATUS )
 
 *  Unmap the array components.
@@ -555,7 +562,8 @@
 *  Add AXIS structures to the output NDF.
                CALL PSX_CALLOC( 6*( MUPBND(3) - MLWBND(3) + 1 ), 
      :                          '_DOUBLE', IPWORK, STATUS )
-               CALL CON_CAXES( INDF1, INDF2, %VAL( IPWORK ), STATUS )
+               CALL CON_CAXES( INDF1, INDF2, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                         STATUS )
                CALL PSX_FREE( IPWORK, STATUS )
 
 *  Set the output NDF label and unit.

@@ -143,6 +143,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -156,6 +157,8 @@
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.  Also writes CRPIXn FITS keyword when the NDF
 *        has linear axis centres.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -171,6 +174,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -586,25 +590,32 @@
 *  Call a routine to write the data to the unformatted Fortran file;
 *  the selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_OFUFB( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_OFUFD( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_OFUFI( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_OFUFR( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_OFUFUB( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFUB( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_OFUFUW( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFUW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    NUMPRE, STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_OFUFW( FD, EL, %VAL( PNTR( 1 ) ), NUMPRE, STATUS )
+         CALL CON_OFUFW( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   NUMPRE, STATUS )
 
       END IF
 

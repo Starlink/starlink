@@ -89,9 +89,11 @@
 *     End the NDF context.
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *  History:
 *     13/7/97 (ACD): Original version.
 *     8/1/98  (ACD): First stable version.
+*     9/9/04  (TIMJ): Use CNF_PVAL
 *-
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
@@ -100,6 +102,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants.
       INCLUDE 'DAT_ERR'          ! HDS error codes.
       INCLUDE 'MSG_PAR'          ! Message system constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *  Status:
       INTEGER STATUS             ! Global status.
 *  Local Variables:
@@ -248,9 +251,11 @@
                NY = DIM(1)
                NZ = DIM(2)
 
-               CALL CON_RCPY (NX, NY, NZ, %VAL(INPTR), %VAL(QLPTR),
-     :           BADBIT, VARFLG, %VAL(IVRPTR), %VAL(CUBPTR),
-     :           %VAL(OVRPTR), BADPIX, STATUS)
+               CALL CON_RCPY (NX, NY, NZ, %VAL(CNF_PVAL(INPTR)), 
+     :                        %VAL(CNF_PVAL(QLPTR)),
+     :           BADBIT, VARFLG, %VAL(CNF_PVAL(IVRPTR)), 
+     :           %VAL(CNF_PVAL(CUBPTR)),
+     :           %VAL(CNF_PVAL(OVRPTR)), BADPIX, STATUS)
 
 *
 *             Construct the axes of the cube.

@@ -152,6 +152,7 @@
 *  Authors:
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -183,6 +184,8 @@
 *     1993 January 27 (MJC):
 *        Corrected the description of the default value of parameter
 *        TYPE, and hence modified the examples.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +205,7 @@
       INCLUDE 'SAE_PAR'              ! Standard ADAM constants
       INCLUDE 'PAR_ERR'              ! Parameter-system errors
       INCLUDE 'FIO_PAR'              ! FIO_ constants
+      INCLUDE 'CNF_PAR'              ! For CNF_PVAL function
 
 *  Status:                  
       INTEGER STATUS                 ! Global status
@@ -403,7 +407,8 @@
 *         Copy the data array to the NDF.
             IF (STATUS .EQ. SAI__OK) THEN
                NBYTES = NELM * NBPI
-               CALL CON_MOVE (NBYTES, %VAL(DATBDF), %VAL(DATNDF), 
+               CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(DATBDF)), 
+     :                        %VAL(CNF_PVAL(DATNDF)),
      :                        STATUS)
             END IF
 
@@ -462,7 +467,7 @@
                   OFFSET = CRVAL( I ) - ( CRPIX( I ) - 1.0 ) *
      :                     CDELT( I )
                   CALL CON_FILL (NELM, OFFSET, CDELT( I ), 
-     :                           %VAL(WPTR), STATUS)
+     :                           %VAL(CNF_PVAL(WPTR)), STATUS)
                END DO
 
                DO I = 1, NDIM

@@ -120,6 +120,7 @@
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: A.J.Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -129,6 +130,8 @@
 *        Tidied to standard style.
 *     04-FEB-1999 (AJC):
 *        Revised version based on KAPPA DISPLAY.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -145,6 +148,7 @@
       INCLUDE 'PRM_PAR'        ! Magic-value definitions
       INCLUDE 'NDF_PAR'        ! NDF_ public constants
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -345,7 +349,7 @@
 *       =============================================================
 
          CALL CON_FAIND( BAD, DIMS( 1 ), DIMS( 2 ),
-     :                   %VAL( PNTRI( 1 ) ), SIGRNG, 
+     :                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ), SIGRNG,
      :                   DIMLO, DIMHI, STATUS )
 
 *    Do scaling with extreme values in the array as the limits.
@@ -362,7 +366,8 @@
 
 *       Obtain the maximum and minimum values.
 
-         CALL CON_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+         CALL CON_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                   NINVAL,
      :                       DIMHI, DIMLO, MAXPOS, MINPOS, STATUS )
 
 *       The number of bad pixels has been counted so it might be
@@ -398,7 +403,8 @@
 
 *          Obtain the maximum and minimum values to be used as
 *          dynamic defaults.
-            CALL CON_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL CON_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                      NINVAL,
      :                          DMAXV, DMINV, MAXPOS, MINPOS, STATUS )
 
 *          The number of bad pixels has been counted so it might be
@@ -450,7 +456,8 @@
 
 *          Obtain the maximum and minimum values to define the bounds
 *          of the histogram.
-            CALL CON_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
+            CALL CON_MXMND( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                      NINVAL,
      :                          DMAXV, DMINV, MAXPOS, MINPOS, STATUS )
 
 *          The number of bad pixels has been counted so it might be
@@ -458,7 +465,7 @@
             BAD = BAD .OR. ( NINVAL .EQ. 0 )
 
 *          Generate the histogram between those bounds.
-            CALL CON_GHSTD( BAD, EL, %VAL( PNTRI( 1 ) ),
+            CALL CON_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          NUMBIN, DMAXV, DMINV, HIST, STATUS )
 
 *          Estimate the values at the percentiles.
@@ -500,8 +507,8 @@
          CALL PSX_CALLOC( FLEN, '_CHAR', OPNTR, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-         CALL CON_WRTIF( EL, %VAL(PNTRI(1)), DIMS, FLEN, FIOD, 
-     :                    DIMLO, DIMHI, %VAL(OPNTR), STATUS )
+         CALL CON_WRTIF( EL, %VAL(CNF_PVAL(PNTRI(1))), DIMS, FLEN, FIOD,
+     :                    DIMLO, DIMHI, %VAL(CNF_PVAL(OPNTR)), STATUS )
 
 *       Finished with the input array so unmap it.
          CALL NDF_UNMAP( NDF, COMP, STATUS )

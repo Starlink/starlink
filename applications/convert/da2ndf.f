@@ -97,11 +97,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 October 19 (MJC):
 *        Original version.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -117,6 +120,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -275,31 +279,38 @@
 *  Call a routine to read the data from the direct-access unformatted
 *  file.  The selected routine depending on the data type of the array.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL CON_IUDAB( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAB( FD, EL, NUMPRE, 0, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IUDAD( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAD( FD, EL, NUMPRE, 0, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IUDAI( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAI( FD, EL, NUMPRE, 0, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL CON_IUDAR( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAR( FD, EL, NUMPRE, 0, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL CON_IUDAUB( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAUB( FD, EL, NUMPRE, 0, 
+     :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL CON_IUDAUW( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAUW( FD, EL, NUMPRE, 0, 
+     :                    %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                    STATUS )
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL CON_IUDAW( FD, EL, NUMPRE, 0, %VAL( PNTR( 1 ) ),
+         CALL CON_IUDAW( FD, EL, NUMPRE, 0, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       END IF

@@ -72,6 +72,7 @@
 *  Authors:
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,6 +84,8 @@
 *        Removed PSX calls and used RIO.  Used one shape parameter.
 *        Tidied the prologue and code.  Improved method for deciding
 *        whether to use the header file or not.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'PAR_PAR'          ! PAR constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -256,7 +260,8 @@
       CALL NDF_MAP( NDF, 'Data', '_WORD', 'WRITE', PNTRO, EL, STATUS )
 
 *  Pass mapped array to READGASP.
-      CALL CON_RGASP( GASPFI, DIMS( 1 ), DIMS( 2 ), %VAL( PNTRO( 1 ) ),
+      CALL CON_RGASP( GASPFI, DIMS( 1 ), DIMS( 2 ), 
+     :                %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                STATUS )
 
 *  Unmap the NDF's data array.

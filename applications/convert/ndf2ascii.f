@@ -168,6 +168,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -182,6 +183,8 @@
 *     1997 January 22 (MJC):
 *        Reduced the maximum record length to 512, and the default
 *        RECLEN to 132.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -197,6 +200,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -584,15 +588,18 @@
 *  integer array and it gets converted back to the actual type when the
 *  array is unmapped.
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_OAFFI( FD, EL, %VAL( PNTR( 1 ) ), FIXED, NCPVAL,
+         CALL CON_OAFFI( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   FIXED, NCPVAL,
      :                   NUMPRE, RECL, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_OAFFD( FD, EL, %VAL( PNTR( 1 ) ), FIXED, NCPVAL,
+         CALL CON_OAFFD( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   FIXED, NCPVAL,
      :                   NUMPRE, RECL, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_OAFFR( FD, EL, %VAL( PNTR( 1 ) ), FIXED, NCPVAL,
+         CALL CON_OAFFR( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   FIXED, NCPVAL,
      :                   NUMPRE, RECL, STATUS )
 
       END IF

@@ -163,6 +163,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -176,6 +177,8 @@
 *     1997 December 2 (MJC):
 *        Added MAXLEN parameter to permit long input records without
 *        impacting the efficiency of processing short records.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -191,6 +194,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -358,7 +362,8 @@
 *   Check that the mandatory descriptors are present.  Want to start
 *   the searchs in the last (NHEADS) header.  When there are two
 *   headers, the first will be a dummy header.
-         CALL CON_MANDH( .TRUE., NCARD, %VAL( HPNTR ), HSTART( NHEADS ),
+         CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                   HSTART( NHEADS ),
      :                   BITPIX, NDIM, DIMS, DARRAY, NONSDA, EL,
      :                   STATUS, %VAL( 80 ) )
 
@@ -385,8 +390,10 @@
 
 *  Obtain the scale and zero, the blank value.
          CALL CON_FTYPE( BITPIX, HSTART( NHEADS ), NCARD,
-     :                   %VAL( HPNTR ), BSCALE, BZERO, BLANK,
-     :                   BADPIX, UNSIGN, STATUS, %VAL( 80 ) )
+     :                   %VAL( CNF_PVAL( HPNTR ) ), 
+     :                   BSCALE, BZERO, BLANK,
+     :                   BADPIX, UNSIGN, STATUS, 
+     :                   %VAL( 80 ) )
 
 *  Determine the HDS data type of the data array.  Note that the QUALITY
 *  component must be unsigned byte.
@@ -464,16 +471,19 @@
 *  unmapped.  This should not generate conversion errors, unless the
 *  type specified by the user is incorrect.
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IAFFI( FD, EL, SKIP, MAXLEN, %VAL( PNTR( 1 ) ),
+         CALL CON_IAFFI( FD, EL, SKIP, MAXLEN, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IAFFD( FD, EL, SKIP, MAXLEN, %VAL( PNTR( 1 ) ),
+         CALL CON_IAFFD( FD, EL, SKIP, MAXLEN, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_IAFFR( FD, EL, SKIP, MAXLEN, %VAL( PNTR( 1 ) ),
+         CALL CON_IAFFR( FD, EL, SKIP, MAXLEN, 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   STATUS )
 
       END IF
@@ -483,7 +493,8 @@
 *  The first argument is the number of header cards from the start of
 *  the headers up to the end of the current header.
       IF ( HEADER ) THEN
-         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, %VAL( HPNTR ),
+         CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, 
+     :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS,
      :                   %VAL( 80 ) )
       END IF

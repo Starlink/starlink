@@ -85,6 +85,7 @@
 *  Authors:
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -96,6 +97,8 @@
 *        Largely rewritten.  Tidied to prologue to the standard style.
 *     11_JUN-1999 (AJC):
 *        Correct NDF to NDF in call to NDF_MSG
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +116,7 @@
       INCLUDE 'NDF_ERR'          ! NDF error constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -230,8 +234,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-         CALL CON_CHVAW( EL, %VAL( PNTR( 1 ) ), VAL__BADW, WFILBA,
-     :                   %VAL( PNTRT( 1 ) ), NREP, STATUS )
+         CALL CON_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   VAL__BADW, WFILBA,
+     :                   %VAL( CNF_PVAL( PNTRT( 1 ) ) ), NREP, STATUS )
 
 *  To save resources unmap the input NDF data array.
          CALL NDF_UNMAP( NDF, 'Data', STATUS )
@@ -255,7 +260,8 @@
 *  ======================
 
 *  Create the GASP pixel file.  Copy the data array to the GASP image.
-      CALL CON_WGASP( GASPFI, DIMS( 1 ), DIMS( 2 ), %VAL( PNTR( 1 ) ),
+      CALL CON_WGASP( GASPFI, DIMS( 1 ), DIMS( 2 ), 
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                STATUS )
 
 *  Report the number of replacements.

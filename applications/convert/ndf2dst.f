@@ -102,6 +102,7 @@
 *  Authors:
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +163,8 @@
 *        extension components SECZ or TIME (for OBS), and MAGFLAG or
 *        RANGE (for Z) are present and are physically stored following
 *        their respective structure.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -176,6 +179,7 @@
       INCLUDE  'DAT_PAR'            ! Data-system constants
       INCLUDE  'FIO_PAR'            ! FIO constants
       INCLUDE  'NDF_PAR'            ! NDF symbolic constants
+      INCLUDE  'CNF_PAR'            ! For CNF_PVAL function
 
 *  External References:
       INTEGER  CHR_LEN              ! Get effective length of string
@@ -532,7 +536,8 @@
 *   into the Figaro data array.
       CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
       IF ( (STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0) ) THEN
-         CALL CON_MOVE( NBYTES*NELM, %VAL(NDPTR), %VAL(FDPTR), STATUS )
+         CALL CON_MOVE( NBYTES*NELM, %VAL(CNF_PVAL(NDPTR)), 
+     :                  %VAL(CNF_PVAL(FDPTR)), STATUS )
       END IF
 
 *   Unmap .Z.DATA.
@@ -550,7 +555,8 @@
 
 *   Move imaginary data into the Figaro data array.
          IF ( (STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0) ) THEN
-            CALL CON_MOVE( NBYTES*NELM, %VAL(NIPTR), %VAL(FIPTR),
+            CALL CON_MOVE( NBYTES*NELM, %VAL(CNF_PVAL(NIPTR)), 
+     :                     %VAL(CNF_PVAL(FIPTR)),
      :                     STATUS )
          END IF
 
@@ -672,25 +678,32 @@
 *      Take the square root of the variance to make the error array.
 *      Call a routine appropriate to the variance type.
          IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL VEC_SQRTR( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTR( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_DOUBLE') THEN
-            CALL VEC_SQRTD( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTD( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_INTEGER') THEN
-            CALL VEC_SQRTI( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTI( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_BYTE') THEN
-            CALL VEC_SQRTB( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTB( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_WORD') THEN
-            CALL VEC_SQRTW( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTW( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                      %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_UBYTE') THEN
-            CALL VEC_SQRTUB( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTUB( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                       %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          ELSE IF ( TYPE .EQ. '_UWORD') THEN
-            CALL VEC_SQRTUW( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+            CALL VEC_SQRTUW( BAD, NELM, %VAL(CNF_PVAL(NVPTR)), 
+     :                       %VAL(CNF_PVAL(FEPTR)),
      :                      IERR, NERR, STATUS )
          END IF
          
@@ -817,8 +830,9 @@
                CALL CON_TYPSZ( TYPE, NBYTES, STATUS )         
                IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :              ( DIM( IAXIS ) .GT. 0 ) ) THEN
-                  CALL CON_MOVE( NBYTES * DIM( IAXIS ), %VAL(AXPTR), 
-     :                           %VAL(FAXPTR), STATUS )
+                  CALL CON_MOVE( NBYTES * DIM( IAXIS ), 
+     :                           %VAL(CNF_PVAL(AXPTR)),
+     :                           %VAL(CNF_PVAL(FAXPTR)), STATUS )
                END IF
 
 *            Unmap Figaro axis data.
@@ -856,8 +870,9 @@
                   CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
                   IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :                 ( DIM( IAXIS ) .GT. 0 ) ) THEN
-                     CALL CON_MOVE( NBYTES * DIM( IAXIS ), %VAL(AXPTR), 
-     :                              %VAL(FAXPTR), STATUS )
+                     CALL CON_MOVE( NBYTES * DIM( IAXIS ), 
+     :                              %VAL(CNF_PVAL(AXPTR)),
+     :                              %VAL(CNF_PVAL(FAXPTR)), STATUS )
                   END IF
 
 *                Unmap Figaro axis variances.
@@ -915,8 +930,9 @@
                   CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
                   IF ( ( STATUS .EQ. SAI__OK ) .AND.
      :                 ( DIM( IAXIS ) .GT. 0 ) ) THEN
-                     CALL CON_MOVE( NBYTES * DIM( IAXIS ), %VAL(AXPTR), 
-     :                              %VAL(FAXPTR), STATUS )
+                     CALL CON_MOVE( NBYTES * DIM( IAXIS ), 
+     :                              %VAL(CNF_PVAL(AXPTR)),
+     :                              %VAL(CNF_PVAL(FAXPTR)), STATUS )
                   END IF
 
 *                Unmap Figaro axis widths.

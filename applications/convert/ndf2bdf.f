@@ -158,6 +158,7 @@
 *  Authors:
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -186,6 +187,8 @@
 *     1993 January 4 (MJC):
 *        Fixed a bug that made it was possible not to write mandatory
 *        descriptors to the BDF.  Allowed lowercase Interim types.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +205,7 @@
       INCLUDE 'PRM_PAR'              ! PRIMDAT public constants
       INCLUDE 'NDF_PAR'              ! NDF_ public constants
       INCLUDE 'FIO_PAR'              ! FIO_ constants
+      INCLUDE 'CNF_PAR'              ! For CNF_PVAL function
 
 *  Status:                  
       INTEGER STATUS                 ! Global status
@@ -433,7 +437,8 @@
 *   Copy the data array to the BDF.
       IF (STATUS .EQ. SAI__OK) THEN
          NBYTES = NITEM * NBPI
-         CALL CON_MOVE (NBYTES, %VAL(POINTR), %VAL(IMAGEP), STATUS)
+         CALL CON_MOVE (NBYTES, %VAL(CNF_PVAL(POINTR)), 
+     :                  %VAL(CNF_PVAL(IMAGEP)), STATUS)
       END IF
 
       IF (STATUS.NE.SAI__OK) GO TO 995

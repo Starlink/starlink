@@ -51,6 +51,7 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,8 @@
 *        Original version.
 *     1996 February 12 (MJC):
 *        Tidied to standard style.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *-
@@ -69,6 +72,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constant
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
                
 *  Status:     
       INTEGER STATUS             ! Global status
@@ -157,7 +161,8 @@
       END IF
 
 *  Write the image.
-      CALL CON_WRPGM( ELEMS, %VAL( PD( 1 ) ), DIMS, %VAL( PDO( 1 ) ),
+      CALL CON_WRPGM( ELEMS, %VAL( CNF_PVAL( PD( 1 ) ) ), DIMS, 
+     :                %VAL( CNF_PVAL( PDO( 1 ) ) ),
      :                STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
  
