@@ -210,11 +210,11 @@
       CALL ADI_CMAPR( RMFID, 'Channels', 'READ', RCPTR, STATUS )
       CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', OAVPTR, STATUS )
       CALL BDI_AXMAPR( OFID, 1, 'Width', 'WRITE', OAWPTR, STATUS )
-      CALL FOLDGRID_B2VW( ODIMS(1), %VAL(RCPTR), %VAL(OAVPTR) %VAL(OAWPTR),
-     :                    STATUS )
+      CALL FOLDGRID_B2VW( ODIMS(1), %VAL(RCPTR), %VAL(OAVPTR),
+     :                    %VAL(OAWPTR), STATUS )
 
 *  Write channel bounds component too
-      CALL CMP_PUT1I( OLOC, 'CHANNEL_BOUNDS', NCHAN+1, %VAL(RCPTR),
+      CALL CMP_PUT1I( OLOC, 'CHANNEL_BOUNDS', ODIMS(1)+1, %VAL(RCPTR),
      :                STATUS )
 
 *  Release the pointers
