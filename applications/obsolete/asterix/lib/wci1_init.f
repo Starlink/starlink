@@ -117,9 +117,9 @@
 
 *    Define the methods
         CALL ADI_DEFMTH( 'ReadWCS(_HDSfile)', WCI1_READ, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteWCS(_HDSfile,_Pixellation,_Projection,'/
+        CALL ADI_DEFMTH( 'WriteWCS(_HDSfile,_,_Projection,'/
      :                   /'_CoordSystem)', WCI1_WRITE, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteWCS(_FITSfile,_Pixellation,_Projection,'/
+        CALL ADI_DEFMTH( 'WriteWCS(_FITSfile,_,_Projection,'/
      :                   /'_CoordSystem)', WCI2_WRITFIT, DID, STATUS )
 
 *    Now initialised
