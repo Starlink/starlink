@@ -22,7 +22,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -42,16 +42,16 @@
       CALL ERR_BEGIN( STATUS )
 
 *    Unmap everything
-      CALL BDA_UNMAPDATA_INT( IM_BDA, STATUS )
+      CALL BDI_UNMAPDATA( IM_ID, STATUS )
 
-*    Free BDA locators
-      CALL BDA_RELEASE_INT( IM_BDA, STATUS )
+*    Free BDI resources
+      CALL BDI_RELEASE( IM_ID, STATUS )
 
 *    Close the file
       IF ( CP_MULTI ) THEN
-        CALL HDS_CLOSE( IM_LOC, STATUS )
+        CALL ADI_FCLOSE( IM_ID, STATUS )
       ELSE
-        CALL USI_ANNUL( IM_LOC, STATUS )
+        CALL USI_TANNUL( IM_ID, STATUS )
       END IF
 
 *    Restore error context
@@ -84,7 +84,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Structure definitions :
@@ -106,11 +106,9 @@
 *
 *    Local variables :
 *
-      CHARACTER                ALOC*(DAT__SZLOC)       ! ASTERIX structure
-      CHARACTER                HLOC*(DAT__SZLOC)       ! HEADER structure
       CHARACTER                PATH*80                 ! Object path
 
-      INTEGER                  NDIM, DIMS(DAT__MXDIM)
+      INTEGER                  NDIM, DIMS(ADI__MXDIM)
       INTEGER                  NLEV                    ! Useless TRACE output
 
       LOGICAL                  OK                      ! Validity checks
@@ -121,16 +119,15 @@
 
 *    Associate psf
       IF ( IFILE .EQ. 1 ) THEN
-        CALL PSF_ASSOCI( IM_LOC, PSF_HAN, STATUS )
+        CALL PSF_TASSOCI( IM_ID, PSF_HAN, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get background subtracted flag if present
       IF ( .NOT. IM_PRIM ) THEN
-        CALL BDA_CHKAST_INT( IM_BDA, OK, STATUS )
+        CALL BDI_CHKAST( IM_ID, OK, STATUS )
         IF ( OK ) THEN
-          CALL BDA_LOCAST_INT( IM_BDA, ALOC, STATUS )
-          CALL PRO_GET( IM_LOC, 'BGND_SUBTRACTED',
+          CALL PRF_GET( IM_ID, 'BGND_SUBTRACTED',
      :                  IM_BGND_SUBTRACTED, STATUS )
           IF ( IM_BGND_SUBTRACTED ) THEN
             CALL MSG_PRNT( 'Image is background subtracted...' )
@@ -139,13 +136,13 @@
       END IF
 
 *    Check and map data
-      CALL BDA_CHKDATA_INT( IM_BDA, OK, BDS_NDIM, BDS_DIMS,STATUS )
+      CALL BDI_CHKDATA( IM_ID, OK, BDS_NDIM, BDS_DIMS,STATUS )
       CALL ARR_SUMDIM( BDS_NDIM, BDS_DIMS, BDS_NELM )
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', '! Invalid input data', STATUS )
+        CALL ERR_REP( ' ', 'Invalid input data', STATUS )
       ELSE
-        CALL BDA_MAPDATA_INT( IM_BDA, 'READ', IM_DATA_PTR, STATUS )
+        CALL BDI_MAPDATA( IM_ID, 'READ', IM_DATA_PTR, STATUS )
       END IF
 
 *    If not an image, check that the product of the higher dimensions
@@ -159,13 +156,13 @@
       END IF
 
 *    Get data units
-      CALL BDA_GETUNITS_INT( IM_BDA, IM_UNITS, STATUS )
+      CALL BDI_GETUNITS( IM_ID, IM_UNITS, STATUS )
       IF ( IM_UNITS .LE. ' ' ) IM_UNITS = 'count'
 
 *    Look for quality
-      CALL BDA_CHKQUAL_INT( IM_BDA, BDS_QUAL_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( IM_ID, BDS_QUAL_OK, NDIM, DIMS, STATUS )
       IF ( BDS_QUAL_OK ) THEN
-        CALL BDA_MAPMQUAL_INT( IM_BDA, 'READ', BDS_QUAL_PTR, STATUS )
+        CALL BDI_MAPMQUAL( IM_ID, 'READ', BDS_QUAL_PTR, STATUS )
 
 *      Which way to use quality if present?
         IF ( BDS_QUAL_OK ) THEN
@@ -176,9 +173,9 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    See if there's VARIANCE present
-      CALL BDA_CHKVAR_INT( IM_BDA, IM_VAR_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKVAR( IM_ID, IM_VAR_OK, NDIM, DIMS, STATUS )
       IF ( IM_VAR_OK ) THEN
-        CALL BDA_MAPVAR_INT( IM_BDA, 'READ', IM_VAR_PTR, STATUS )
+        CALL BDI_MAPVAR( IM_ID, 'READ', IM_VAR_PTR, STATUS )
         CALL PSS_CHK_VAR( BDS_NELM, BDS_QUAL_OK,
      :                    BDS_QUAL_PTR, %VAL(IM_VAR_PTR), STATUS )
       END IF
@@ -200,17 +197,17 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get pointing info from header.
-      CALL BDA_CHKHEAD_INT( IM_BDA, OK, STATUS )
+      CALL BDI_CHKHEAD( IM_ID, OK, STATUS )
       IF ( OK ) THEN
-        CALL BDA_LOCHEAD_INT( IM_BDA, HLOC, STATUS )
-        CALL POI_INIT( IM_LOC, GE_POINT, STATUS )
+        CALL WCI_GETIDS( IM_ID, GE_PIXID, GE_PRJID, GE_SYSID, STATUS )
+        GE_OK = (STATUS.EQ.SAI__OK)
       ELSE
         STATUS = SAI__OK
-        GE_POINT.OK =. FALSE.
+        GE_OK =. FALSE.
       END IF
 
 *    Get name etc
-      CALL HDS_TRACE( IM_LOC, NLEV, PATH, IM_FILE, STATUS )
+      CALL ADI_FTRACE( IM_ID, NLEV, PATH, IM_FILE, STATUS )
       IM_OK = ( STATUS .EQ. SAI__OK )
 
 *    Tidy up
@@ -246,7 +243,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -283,18 +280,18 @@
         CALL PSS_MUL_NEXT( IFILE, NFILE, IMAGE, STATUS )
 
 *      Open it
-        CALL HDS_OPEN( IMAGE, 'READ', IM_LOC, STATUS )
+        CALL ADI_FOPEN( IMAGE, '*', 'READ', IM_ID, STATUS )
         IM_PRIM = .FALSE.
 
       ELSE
 
 *      Get input object from user
-        CALL USI_ASSOCI( 'INP', 'READ', IM_LOC, IM_PRIM, STATUS )
+        CALL USI_TASSOCI( 'INP', '*', 'READ', IM_ID, STATUS )
+
+*      Primitive?
+        CALL BDI_PRIM( IM_ID, IM_PRIM, STATUS )
 
       END IF
-
-*    Get BDA identifier
-      CALL BDA_FIND( IM_LOC, IM_BDA, STATUS )
 
 *    Report errors
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -18,7 +18,7 @@
 *  Arguments:
 *     ID = INTEGER (given)
 *        ADI identifier of dataset
-*     NAME = CHARACTER*(*) (given)
+*     FLAG = CHARACTER*(*) (given)
 *        The name of the flag
 *     VALUE = LOGICAL (returned)
 *        The value of the flag
@@ -89,7 +89,7 @@
 
 *  Arguments Given:
       INTEGER			ID			! Dataset id
-      CHARACTER*(*)		NAME			! Flag name
+      CHARACTER*(*)		FLAG			! Flag name
 
 *  Arguments Returned:
       LOGICAL			VALUE			! Flag value
@@ -106,7 +106,7 @@
 
 *  Get locator and invoke HDS version
       CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL PRO_GET( LOC, NAME, VALUE, STATUS )
+      CALL PRO_GET( LOC, FLAG, VALUE, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF_GET', STATUS )
