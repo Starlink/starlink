@@ -199,6 +199,7 @@
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  History:
 *     25/6/97 (ACD): 
@@ -211,6 +212,8 @@
 *        a SpecFrame. Changed axis order to make spectral axis, axis 3.
 *     24-FEB-2004 (DSB):
 *        Modified NDF label to use AST escape sequences.
+*     11-AUG-2004 (TIMJ):
+*        Fix NDF lable for spectra as well as maps.
 *-
 
 *  Type Definitions:
@@ -556,10 +559,8 @@
                CALL PSX_FREE( IPWORK, STATUS )
 
 *  Set the output NDF label and unit.
-               CALL NDF_CPUT( 'T'//CHAR(92)//'dA'//CHAR(92)//'u'//
-     :                        CHAR(92)//'u*'//CHAR(92)//'d'//
-     :                        '   corrected antenna temperature', INDF2, 
-     :                        'LABEL', STATUS ) 
+               CALL NDF_CPUT( 'T%s60+%v30+A%^50+%<20+*%+   corrected '//
+     :              'antenna temperature', INDF2, 'LABEL', STATUS ) 
                CALL NDF_CPUT( 'K', INDF2, 'Unit', STATUS ) 
 
 *  Annul the current input and output NDF identifiers. 
