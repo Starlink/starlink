@@ -981,14 +981,14 @@ version.h:
 #  Can't include the dependence on doc/ReleaseNotes, since that isn't
 #  distributed.
 $(NEWS): #doc/ReleaseNotes
-	echo								> $@
-	echo "This is Starlink dvi2bitmap, release $(PKG_VERS)"		>>$@
-	echo "packaged `date`"						>>$@
-	echo								>>$@
-	echo								>>$@
-	echo "Release Notes, up to this version:"			>>$@
-	echo								>>$@
-	cat doc/ReleaseNotes						>>$@
+	@ echo								> $@
+	@ echo "This is Starlink dvi2bitmap, release $(PKG_VERS)"	>>$@
+	@ echo "packaged `date`"					>>$@
+	@ echo								>>$@
+	@ echo								>>$@
+	@ echo "Release Notes, up to this version:"			>>$@
+	@ echo								>>$@
+	@ cat doc/ReleaseNotes						>>$@
 
 #--------------------------------------------------------------------------
 
