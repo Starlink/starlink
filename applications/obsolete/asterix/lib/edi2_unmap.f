@@ -97,12 +97,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*6               ETABLE                  ! Name of events HDU
-      CHARACTER*20		LIST
+      CHARACTER*20		LIST			! List to unmap
 
-      INTEGER			BCOL			! Column number
-      INTEGER			EVHDU			! HDU containing events
-      INTEGER			LID			! List structure
       INTEGER			PSID			! Private list store
 *.
 
@@ -112,33 +108,17 @@
 *  Default return value
       OARG = ADI__NULLID
 
-*  Locate the EVENTS hdu
-      CALL ADI_CGET0C( ARGS(2), '.Etable', ETABLE, STATUS )
-      CALL ADI2_FNDHDU( ARGS(2), ETABLE, EVHDU, STATUS )
-
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), LIST, STATUS )
 
-*  Locate the list structure
-      CALL EDI_IDXNAM( ARGS(1), LIST, LID, STATUS )
-
-*  Locate the BINTABLE column
-      CALL ADI2_FNDBTC( EVHDU, LIST, BCOL, STATUS )
-
 *  Locate storage area for this column
-      CALL BDI0_LOCPST( EVHDU, LIST, .TRUE., PSID, STATUS )
+      CALL BDI0_LOCPST( ARGS(2), LIST, .FALSE., PSID, STATUS )
 
 *  Unmap the column
-      CALL ADI2_UNMAPCOL( EVHDU, PSID, BCOL, STATUS )
+      CALL ADI2_UNMAP( ARGS(2), PSID, 0, STATUS )
 
 *  Free storage
       CALL ADI_ERASE( PSID, STATUS )
-
-*  And the list structure
-      CALL ADI_ERASE( LID, STATUS )
-
-*  Release the HDU
-      CALL ADI_ERASE( EVHDU, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'EDI2_UNMAP', STATUS )
