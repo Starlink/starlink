@@ -45,7 +45,8 @@
 using std::cerr;
 #endif
 
-#include "kpathsea.h"
+#include <kpathsea.h>
+#include <PkFont.h>		// for PkFont::dpiBase
 
 // The Kpathsea library interface has to be isolated in this class because the
 // kpathsea headers typedef a `string' type, which conflicts with C++ string.
@@ -86,10 +87,24 @@ extern "C" {
 bool kpathsea::initialised_ = false;
 verbosities kpathsea::verbosity_ = normal;
 
+/**
+ * Initialises the <code>kpathsea</code> system.  If this is not done
+ * explicitly, then the system initialises itself with sensible
+ * defaults.  Thus the only reason for doing this is to register a
+ * different <code>program_name</code> for the kpathsea library to
+ * use when reporting errors or warnings.
+ *
+ * @param program_name the name to be used in kpathsea feedback
+ * @param basedpi the base resolution of the PK fonts; should
+ * generally be {@link PkFont.dpiBase}
+ */
 void kpathsea::init (const char *program_name, const int basedpi)
 {
-    if (initialised_ && verbosity_ > quiet)
-	cerr << "Warning: kpathsea doubly initialised.  Ignored\n";
+    if (initialised_ && verbosity_ > quiet) {
+	cerr << "Warning: kpathsea doubly initialised.  Duplicate init ignored\n";
+	return;
+    }
+    
 #ifdef DEFAULT_TEXMFCNF
     // if the TEXMFCNF variable isn't set in the environment, set it to this
     char *texmfcnf = getenv ("TEXMFCNF");
@@ -129,19 +144,27 @@ void kpathsea::init (const char *program_name, const int basedpi)
     kpse_init_prog ("TEX", basedpi, NULL, NULL);
     initialised_ = true;
 }
-
+/**
+ * Obtains the Kpathsea version
+ * @return the kpathsea version string
+ */
 const char *kpathsea::version_string (void)
 {
     extern char *kpathsea_version_string;
     return kpathsea_version_string;
 }
 
+/**
+ * Finds a font at a given resolution.
+ * @param fontname the name of the font to search for
+ * @param resolution the desired font resolution
+ * @return the full path to the PK file which defines the font, or
+ * zero if the font cannot be found
+ */
 const char *kpathsea::find (const char *fontname, int resolution)
 {
-    if (! initialised_ && verbosity_ > silent)
-    {
-	cerr << "Error: kpathsea not initialised\n";
-	return 0;
+    if (! initialised_ && verbosity_ > silent) {
+	init("tex", PkFont::dpiBase());
     }
 
     kpse_glyph_file_type glyph_info;
@@ -158,13 +181,24 @@ const char *kpathsea::find (const char *fontname, int resolution)
     return fname;
 }
 
-void kpathsea::verbosity (const verbosities level)
+/**
+ * Sets the verbosity level.  As well as setting the intrinsic level
+ * of chatter for this class, it controls the amount of chatter from
+ * the <code>libkpathsea</code> library itself: if the
+ * <code>level</code> is above <code>debug</code>, then <em>all</em>
+ * kpathsea debugging information is switched on.
+ * @param level the desired verbosity level
+ * @return the previous verbosity level
+ */
+verbosities kpathsea::verbosity (const verbosities level)
 {
+    verbosities oldv = verbosity_;
     verbosity_ = level;
     if (level > debug)
 	kpathsea_debug = ~0;	// all debugging
     else
 	kpathsea_debug = 0;	// none
+    return oldv;
 }
 
 

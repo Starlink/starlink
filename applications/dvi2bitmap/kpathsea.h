@@ -31,7 +31,7 @@
 class kpathsea {
  public:
     static void init (const char *name, const int basedpi);
-    static void verbosity (const verbosities level);
+    static verbosities verbosity (const verbosities level);
     static const char *version_string (void);
     static const char *find (const char *font, int resolution);
 
