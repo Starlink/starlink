@@ -5978,14 +5978,6 @@ calls @ovar{action-if-failure} (defaults to exiting with an error
 message).
 @end defmac
 
-@defmac AC_F77_HAVE_OPEN_READONLY
-@acindex AC_F77_HAVE_OPEN_READONLY
-
-If the Fortran compiler has the (common) extension which
-supports a @samp{READONLY} specifier with the @samp{OPEN} statement,
-then define @samp{F77_HAVE_OPEN_READONLY}.
-@end defmac
-
 @defmac AC_FC_CHECK_INTRINSICS (@var{intrinsic}@dots{})
 @acindex AC_FC_CHECK_INTRINSICS
 
@@ -5997,6 +5989,26 @@ to the Fortran compiler.  For each intrinsic in the
 @code{HAVE_INTRINSIC_SIN} if the @code{sin} intrinsic function were
 available (there are probably rather few Fortrans which don't have this
 function).
+
+@end defmac
+
+@defmac AC_FC_OPEN_SPECIFIERS (@var{specifier}@dots{})
+@acindex AC_FC_OPEN_SPECIFIERS
+
+The Fortran OPEN statement is a rich source of portability problems,
+since there are numerous common extensions which consist of extra
+specifiers, several of which are useful when they are available.
+
+For each of the specifiers in the (whitespace-separated) argument list,
+define @code{HAVE_FC_OPEN_@var{mungedspecifier}} if the specifier may be
+given as argument to the @code{OPEN} statement.  The
+@var{mungedspecifier} is the @var{specifier} argument converted to
+uppercase and with all characters outside @code{[a-zA-Z0-9_]} deleted.
+Note that this may include `specifiers' such as @code{access=append} and
+@code{[access=sequential,recl=1]} (note quoting of comma) to check
+combinations of specifiers.  You may not include a space in the
+`specifier', even quoted.  Each argument must be a maximum of 65
+characters in length (to abide by Fortran 77 line-length limits).
 
 @end defmac
 

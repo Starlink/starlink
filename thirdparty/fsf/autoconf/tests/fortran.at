@@ -75,14 +75,37 @@ if test "$ac_cv_fc_has_WIBBLE__OOPS_" != no; then
   AC_MSG_ERROR([CHECK_INTRINSICS has managed to find intrinsic WIBBLE__OOPS_!])
 fi
 
+AC_FC_OPEN_SPECIFIERS(form='formatted' [access='sequential',form='formatted'] status='scratch' thisstatus='wibble' readonly)
+
+echo "FORMFORMATTED -> $ac_cv_fc_spec_FORMFORMATTED"
+echo "ACCESSSEQUENTIALFORMFORMATTED -> $ac_cv_fc_spec_ACCESSSEQUENTIALFORMFORMATTED"
+echo "STATUSSCRATCH -> $ac_cv_fc_spec_STATUSSCRATCH"
+echo "THISSTATUSWIBBLE -> $ac_cv_fc_spec_THISSTATUSWIBBLE"
+if test -z "$ac_cv_fc_spec_FORMFORMATTED" \
+        -o "$ac_cv_fc_spec_FORMFORMATTED" != yes; then
+  AC_MSG_ERROR([AC_FC_OPEN_SPECIFIERS failed to verify form=formatted])
+fi
+if test -z "$ac_cv_fc_spec_ACCESSSEQUENTIALFORMFORMATTED" \
+        -o "$ac_cv_fc_spec_ACCESSSEQUENTIALFORMFORMATTED" != yes; then
+  AC_MSG_ERROR([AC_FC_OPEN_SPECIFIERS failed to verify access=sequential,form=formatted])
+fi
+if test -z "$ac_cv_fc_spec_STATUSSCRATCH" \
+        -o "$ac_cv_fc_spec_STATUSSCRATCH" != yes; then
+  AC_MSG_ERROR([AC_FC_OPEN_SPECIFIERS failed to verify status=scratch])
+fi
+if test -z "$ac_cv_fc_spec_THISSTATUSWIBBLE" \
+        -o "$ac_cv_fc_spec_THISSTATUSWIBBLE" != no; then
+  AC_MSG_ERROR([AC_FC_OPEN_SPECIFIERS did verify thisstatus=wibble])
+fi
+
 # Following tests can only be done because we know the behaviour of the
 # GNU Fortran compiler.
 if test "$ac_compiler_gnu" = yes; then
 
   # GNU Fortran does not have the OPEN READONLY keyword.
-  AC_F77_HAVE_OPEN_READONLY
-  if test "$ac_cv_f77_have_open_readonly" != no; then
-    AC_MSG_ERROR([OPEN_READONLY did not produce 'no'])
+  if test -z "$ac_cv_fc_spec_READONLY" \
+          -o "$ac_cv_fc_spec_READONLY" != no; then
+    AC_MSG_ERROR([AC_FC_OPEN_SPECIFIERS:readonly: g77 should produce result no])
   fi
 
   # GNU Fortran has an OPEN RECL of 1.

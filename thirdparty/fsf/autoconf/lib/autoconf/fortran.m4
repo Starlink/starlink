@@ -1314,13 +1314,15 @@ fi
 # -------------------------
 # Tests if the Fortran 77 compiler supports the READONLY specifier on the
 # OPEN statement, and define variable F77_HAVE_OPEN_READONLY if so.
+#
+# XXX Redundant with ac_fc_open_specifiers below.  Remove this.
 AC_DEFUN([AC_F77_HAVE_OPEN_READONLY],
          [AC_REQUIRE([AC_PROG_F77])dnl
           AC_CACHE_CHECK([whether OPEN has the READONLY specifier],
                          [ac_cv_f77_have_open_readonly],
                          [AC_LANG_PUSH([Fortran 77])dnl
                           AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
-                                              [      OPEN(UNIT=99,READONLY)]),
+                                              [      OPEN(UNIT=99,STATUS=SCRATCH,READONLY)]),
                                             [ac_cv_f77_have_open_readonly=yes],
                                             [ac_cv_f77_have_open_readonly=no])
                           AC_LANG_POP(Fortran 77)])
@@ -1329,6 +1331,49 @@ AC_DEFUN([AC_F77_HAVE_OPEN_READONLY],
                         [Define to 1 if F77 OPEN has the READONLY specifier])
           fi
 ])
+
+
+# AC_FC_OPEN_SPECIFIERS(specifier ...)
+# ------------------------------------
+#
+# The Fortran OPEN statement is a rich source of portability problems,
+# since there are numerous common extensions which consiste of extra
+# specifiers, several of which are useful when they are available.
+# For each of the specifiers in the (whitespace-separated) argument
+# list, define HAVE_FC_OPEN_mungedspecifier if the specifier may be
+# given as  argument to the OPEN statement.  The `mungedspecifier' is the
+# `specifier' converted to uppercase and with all characters outside
+# [a-zA-Z0-9_] deleted.  Note that this may include `specifiers' such
+# as `access=append' and `[access=sequential,recl=1]' (note quoting of
+# comma) to check combinations of specifiers.  You may not include a
+# space in the `specifier', even quoted.  Each argument must be a
+# maximum of 65 characters in length (to abide by Fortran 77
+# line-length limits). 
+#
+dnl Multiple m4_quote instances are necessary in case specifier includes comma.
+dnl In the Fortran OPEN line, include status='scratch' unless status=???
+dnl is in the specifier being tested.
+dnl Put specifier on continuation line, in case it's long.
+AC_DEFUN([AC_FC_OPEN_SPECIFIERS],
+         [AC_REQUIRE([AC_PROG_FC])dnl
+          AC_LANG_PUSH([Fortran])
+          AC_FOREACH([Specifier],
+                     m4_quote(m4_toupper([$1])),
+                     [m4_define([mungedspec],
+                                m4_bpatsubst(m4_quote(Specifier), [[^a-zA-Z0-9_]], []))
+                      AC_CACHE_CHECK([whether ${FC} supports OPEN specifier ]m4_quote(Specifier),
+                          [ac_cv_fc_spec_]mungedspec,
+                          [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
+                                                             [      OPEN(UNIT=99,]m4_if(m4_bregexp(m4_quote(Specifier), [\<STATUS *=]), -1, [STATUS='SCRATCH'[,]], [])
+     :m4_quote(Specifier)[)]),
+                                             [ac_cv_fc_spec_]mungedspec=yes,
+                                             [ac_cv_fc_spec_]mungedspec=no)])
+                      if test $ac_cv_fc_spec_[]mungedspec = yes; then
+                          AC_DEFINE([HAVE_FC_OPEN_]mungedspec, 1,
+                                    [Define to 1 if the Fortran compiler supports OPEN specifier ]m4_quote(Specifier))
+                      fi])
+           AC_LANG_POP([Fortran])
+])# AC_FC_OPEN_SPECIFIERS
 
 
 # AC_FC_CHECK_INTRINSICS(function ...)
