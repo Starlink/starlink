@@ -33,6 +33,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/dipso \
 	$(MANIFEST)/docfind \
 	$(MANIFEST)/echomop \
+	$(MANIFEST)/echwind \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/esp \
 	$(MANIFEST)/extractor \
