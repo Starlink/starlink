@@ -16,7 +16,7 @@ bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
 
 LOCAL_LINK = libcoi/libcoi.la libcof/libcof.la libcon/libcon.la \
              libaif/libaif.la \
-             iraf/libconspp.la $(FIGLIBS) $(IRAFLIBS) \
+             iraf/libconspp.la $(FIGLIBS) `$(srcdir)/iraf_link` \
              `$(srcdir)/convert_link_adam`
 
 bin_MONOLITHS = convert_mon
