@@ -182,9 +182,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! ADAM symbolic constants.
-      INCLUDE 'DTA_SOURCE:DTACODES.INC' ! Data structure error codes
-      INCLUDE 'DYN_SOURCE:DYNAMIC_MEMORY.INC' ! Dynamic memory support
-                                              ! ---defines %VAL.
+      INCLUDE 'DTACODES'         ! Data structure error codes
+      INCLUDE 'DYNAMIC_MEMORY'   ! Dynamic memory support (defines %VAL)
 
 *  Arguments Given:
       CHARACTER FIGFIL * ( * )   ! Name of input file
