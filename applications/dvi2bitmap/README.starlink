@@ -28,4 +28,4 @@ _source_ file, and will not automatically generate it.  You have to do
 that by hand, using
 
     make -f Makefile.in dvi2bitmap.tar
-    ./mk dvi2bitmap_source.tar
+    ./mk export_source
