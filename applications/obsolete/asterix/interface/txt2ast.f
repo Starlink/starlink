@@ -827,7 +827,9 @@
      :                                                DATAROW(I)
                 GOOD_LINE = ( STATUS .EQ. SAI__OK )
                 IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL IMPORT_ERROR( 'Real conversion error', CLINE )
+                  CALL MSG_SETC( 'DAT', DATAROW(I) )
+                  CALL IMPORT_ERROR( 'Read error, data = "^DAT"',
+     :                               CLINE )
                 END IF
 
               END IF
