@@ -308,17 +308,6 @@ astEnd()
     astEnd;
   )
 
-# No need to make this private but we need to make sure
-# this is called from within a mutex (so a callback is okay)
-# Call is as _OK. but without changing the current status integer
-
-bool
-ast_OK()
- CODE:
-  /* RETVAL = astOK; */
- OUTPUT:
-  RETVAL
-
 # Can be called as class method or function
 
 int
@@ -339,27 +328,51 @@ astIntraReg()
  CODE:
    Perl_croak(aTHX_ "astIntraReg Not yet implemented\n");
 
-void
-astClearStatus()
+# The following functions are associated with AST internal status
+# They can only be called from within an AST callback (eg the
+# graphics system since they do not MUTEX and they do not switch
+# the internal status variable.
+
+# Note the use of _ in name
+
+# No need to make this private but we need to make sure
+# this is called from within a mutex (so a callback is okay)
+# Call is as _OK. but without changing the current status integer
+
+bool
+ast_OK()
  CODE:
-  ASTCALL(
-   astClearStatus;
-  )
+  RETVAL = astOK;
+ OUTPUT:
+  RETVAL
+
+# Called only from within AST callbacks. No MUTEX locking.
 
 void
-astSetStatus( status )
+ast_Error( status, message)
+  StatusType status
+  char * message
+ CODE:
+  astError( status, message); 
+
+
+# Call only from within an AST callback
+
+void
+ast_ClearStatus()
+ CODE:
+   astClearStatus;
+
+void
+ast_SetStatus( status )
   StatusType status
  CODE:
-  ASTCALL(
    astSetStatus( status );
-  )
 
 StatusType
-astStatus()
+ast_Status()
  CODE:
-  ASTCALL(
    RETVAL = astStatus;
-  )
  OUTPUT:
   RETVAL
 
