@@ -52,11 +52,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-JUL-1992 (PDRAPER):
 *        Original version.
+*     12-JUL-2001 (MBT):
+*        Added check for no data lines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -162,6 +165,17 @@
 
 *  Trap any errors before proceeding.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Check that there were some data lines.
+      IF ( NLINES .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCD1_LMAPEMPTY', 'File contains no data',
+     :                 STATUS )
+         CALL MSG_SETC( 'FILENAME', FNAME )
+         CALL ERR_REP( 'FILEREADERR', 'Error reading file ^FILENAME',
+     :                 STATUS )
+         GO TO 99
+      END IF
 
 *  Set the output memory sizes.
       NVAL = NUMVAL

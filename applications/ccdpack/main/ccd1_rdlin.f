@@ -59,6 +59,10 @@
 *     13-SEP-1995 (PDRAPER):
 *        Removed fold to upper case. This is necessary when reading 
 *        file names on UNIX.
+*     12-JUL-2001 (MBT):
+*        Removed check for empty file.  This was questionable anyway,
+*        since it only regstered a completely empty file not one
+*        with only comments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,18 +134,6 @@
             IF ( STATUS .EQ. FIO__EOF ) THEN
                CALL ERR_ANNUL( STATUS )
                EOF = .TRUE.
-
-*  If the line number is still 0 then this file must be empty.
-               IF ( LINNUM .EQ. 0 ) THEN
-                  BUFFER = ' '
-                  CALL FIO_FNAME( FD, BUFFER, STATUS )
-                  STRLEN = MAX( 1, CHR_LEN( BUFFER ) )
-                  CALL MSG_SETC( 'FILNAM', BUFFER( : STRLEN ) )
-                  STATUS = SAI__ERROR
-                  CALL ERR_REP( 'RDLIN_ERROR',
-     :            '  ^FILNAM - contains no entries', STATUS ) 
-                  GO TO 99
-               END IF
             ELSE
 
 *  Not EOF, record this an increment line counter

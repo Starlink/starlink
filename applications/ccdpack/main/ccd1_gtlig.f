@@ -141,6 +141,7 @@
       CHARACTER * ( GRP__SZNAM ) NNAME ! NDF name
       INTEGER FD                 ! FIO file descriptor
       INTEGER I                  ! Loop variable
+      INTEGER IAT                ! Position in string
       INTEGER FIO1GR             ! GRP identifier for group fo all PARNAM FIOs
       INTEGER INGRP              ! Dummy GRP identifier
       INTEGER NC                 ! Number of characters in line (dummy)
@@ -325,16 +326,31 @@
 *  supplied but they did not all have associated lists.
       IF ( NOPEN .LT. MINOPN ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NOPEN', NOPEN )
-         CALL MSG_SETI( 'MINOPN', MINOPN )
-         CALL ERR_REP( 'CCD1_GTLIG_TOOFEW', 'Only ^NOPEN lists were'//
-     :' supplied - need at least ^MINOPN', STATUS )
+         IAT = 0
+         CALL CHR_PUTC( 'Only ', LINE, IAT )
+         CALL CHR_PUTI( NOPEN, LINE, IAT )
+         IF ( SKIPMT ) CALL CHR_PUTC( ' non-empty', LINE, IAT )
+         IF ( NOPEN .EQ. 1 ) THEN
+            CALL CHR_PUTC( ' file was', LINE, IAT )
+         ELSE
+            CALL CHR_PUTC( ' files were', LINE, IAT )
+         END IF
+         CALL CHR_PUTC( ' supplied - need at least ', LINE, IAT )
+         CALL CHR_PUTI( MINOPN, LINE, IAT )
+         CALL ERR_REP( 'CCD1_GTLIG_TOOFEW', LINE( 1:IAT ), STATUS )
       ELSE IF ( NOPEN .GT. MAXOPN ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NOPEN', NOPEN )
-         CALL MSG_SETI( 'MAXOPN', MAXOPN )
-         CALL ERR_REP( 'CCD1_GTLIG_TOOMANY', '^NOPEN lists were'//
-     :' supplied - no more than ^MAXOPN required', STATUS )
+         IAT = 0
+         CALL CHR_PUTI( NOPEN, LINE, IAT )
+         IF ( SKIPMT ) CALL CHR_PUTC( ' non-empty', LINE, IAT )
+         IF ( NOPEN .EQ. 1 ) THEN
+            CALL CHR_PUTC( ' file was', LINE, IAT )
+         ELSE
+            CALL CHR_PUTC( ' files were', LINE, IAT )
+         END IF
+         CALL CHR_PUTC( ' supplied - maximum is ', LINE, IAT )
+         CALL CHR_PUTI( MAXOPN, LINE, IAT )
+         CALL ERR_REP( 'CCD1_GTLIG_TOOMANY', LINE( 1:IAT ), STATUS )
       END IF
 
 *  Exit.
