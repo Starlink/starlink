@@ -1810,10 +1810,168 @@ astSpecAdd( this, cvt, args )
 MODULE = Starlink::AST   PACKAGE = AstPlotPtr  PREFIX = ast
 
 void
+astBorder( this )
+  AstPlot * this
+ CODE:
+  ASTCALL(
+   astBorder(this);
+  )
+
+void
+astBoundingBox( this, lbnd, ubnd )
+  AstPlot * this
+  AV* lbnd
+  AV* ubnd
+ PREINIT:
+  int len;
+  float * clbnd;
+  float * cubnd;
+ CODE:
+  len = av_len( lbnd ) + 1;
+  if ( len != 2 ) Perl_croak( aTHX_ "lbnd must contain 2 elements" );
+  len = av_len( ubnd ) + 1;
+  if ( len != 2 ) Perl_croak( aTHX_ "ubnd must contain 2 elements" );
+  clbnd = pack1D(newRV_noinc((SV*)lbnd), 'f');
+  cubnd = pack1D(newRV_noinc((SV*)ubnd), 'f');
+  ASTCALL (
+   astBoundingBox( this, clbnd, cubnd );
+  )
+
+void
+astClip( this, iframe, lbnd, ubnd )
+  AstPlot * this
+  int iframe
+  AV* lbnd
+  AV* ubnd
+ PREINIT:
+  int len;
+  double * clbnd;
+  double * cubnd;
+  int naxes;
+ CODE:
+  naxes = astGetI( this, "Naxes" );
+  len = av_len( lbnd ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "lbnd must contain %d elements", naxes );
+  len = av_len( ubnd ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "ubnd must contain %d elements", naxes );
+  clbnd = pack1D(newRV_noinc((SV*)lbnd), 'd');
+  cubnd = pack1D(newRV_noinc((SV*)ubnd), 'd');
+  ASTCALL (
+   astClip( this, iframe, clbnd, cubnd );
+  )
+
+void
+astCurve( this, start, finish )
+  AstPlot * this
+  AV* start
+  AV* finish
+ PREINIT:
+  int len;
+  double * cstart;
+  double * cfinish;
+  int naxes;
+ CODE:
+  naxes = astGetI(this, "Naxes" );
+  len = av_len( start ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "start must contain %d elements", naxes );
+  len = av_len( finish ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "finish must contain %d elements", naxes);
+  cstart = pack1D(newRV_noinc((SV*)start), 'd');
+  cfinish = pack1D(newRV_noinc((SV*)finish), 'd');
+  ASTCALL (
+   astCurve( this, cstart, cfinish );
+  )
+
+void
+astGenCurve( this, map )
+  AstPlot * this
+  AstMapping * map
+ CODE:
+  ASTCALL(
+   astGenCurve(this, map);
+  )
+
+void
+astGrfPop( this )
+  AstPlot * this
+ CODE:
+  ASTCALL(
+   astGrfPop(this);
+  )
+
+void
+astGrfPush( this )
+  AstPlot * this
+ CODE:
+  ASTCALL(
+   astGrfPush(this);
+  )
+
+void
 astGrid( this )
   AstPlot * this
  CODE:
-  astGrid( this );
+  ASTCALL(
+   astGrid(this);
+  )
+
+void
+astGridLine( this, axis, start, length )
+  AstPlot * this
+  int axis
+  AV* start
+  double length
+ PREINIT:
+  double * cstart;
+  int naxes;
+  int len;
+ CODE:
+  naxes = astGetI( this, "Naxes" );
+  len = av_len( start ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "start must contain %d elements", naxes );
+  cstart = pack1D(newRV_noinc((SV*)start), 'd');
+  ASTCALL(
+    astGridLine( this, axis, cstart, length );
+  )
+
+void
+astMark(this, in, type)
+  AstPlot * this
+  AV* in
+  int type
+ CODE:
+  Perl_croak(aTHX_ "Not Yet Implemented - talk to Tim\n");
+
+void
+astPolyLine(this, in)
+  AstPlot * this
+  AV* in
+ CODE:
+  Perl_croak(aTHX_ "Not Yet Implemented - talk to Tim\n");
+
+void
+astText( this, text, pos, up, just )
+  AstPlot * this
+  char * text
+  AV* pos
+  AV* up
+  char * just
+ PREINIT:
+  int len;
+  float * cup;
+  double * cpos;
+  int naxes;
+ CODE:
+  naxes = astGetI( this, "Naxes" );
+  len = av_len( pos ) + 1;
+  if ( len != naxes ) Perl_croak( aTHX_ "pos must contain %d elements", naxes);
+  len = av_len( up ) + 1;
+  if ( len != 1 ) Perl_croak( aTHX_ "up must contain 2 elements");
+  cpos = pack1D(newRV_noinc((SV*)pos), 'd');
+  cup = pack1D(newRV_noinc((SV*)up), 'f');
+  ASTCALL(
+    astText( this, text, cpos, cup, just );
+  )
 
 
 # Constants
