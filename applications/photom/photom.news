@@ -1,12 +1,18 @@
 1 Update_to_PHOTOM
 
-  PHOTOM is described in SUN/45, which you can view with the
-  command "showme sun45". The support programmer can be reached
-  my emailing photom@star.rl.ac.uk
+  PHOTOM is described in SUN/45, which you can view with the command 
+  "showme sun45". The support programmer can be reached my emailing
+  photom@star.rl.ac.uk
 
   Major Changes
   -------------
    
+    v 1.9
+    PSF algorithim changes, algorithim should be more robust.
+
+       Alasdair Allan  (STARLINK, Exeter University)
+       20th August 2002 
+            
     v 1.8
     The option to use the optimal extraction algorithim has been added
     to both PHOTOM and AUTOPHOTOM. The additional parameters OPTIMA,
@@ -25,6 +31,19 @@
   
   Bug Fixes 
   ---------
+  
+    Since v1.9
+    ----------
+
+    Problem with PSF star centroiding resolved.
+
+    Increased robustness of centroiding algorithim for extreme cases.
+
+    Bug in handling position files with PHOTOM under optimal extraction
+    resolved.
+
+    Fixed some GIRD/PIXEL co-ordianate inconsistences when reporting the
+    final fitted $X,Y$ co-ordinatles.
 
     Since v 1.8
     -----------
