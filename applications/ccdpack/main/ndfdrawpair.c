@@ -110,6 +110,29 @@
 #include "tclndf.h"
 
 
+/* Declare object function to be executed in the background. */
+
+   Tcl_ObjCmdProc do_ndfdrawpair;
+
+/* Structure for passing arguments from driver routine to background 
+   routine. */
+
+   struct ndfdrawpair_args_t {
+      int **pixbloc;
+      Ndf **ndf;
+      double *xoff;
+      double *yoff;
+      int *iframe;
+      char *device;
+      double shrink;
+      double xdev;
+      double xorigin;
+      double ydev;
+      double yorigin;
+      double zoom;
+   };
+
+
    int NdfDrawpair( ClientData clientData, Tcl_Interp *interp, int objc,
                     Tcl_Obj *CONST objv[] ) {
 /*
@@ -126,10 +149,6 @@
                   /*   7    8      9     10    11      12      */
                       "ndfB frameB xoffB yoffB lopercB hipercB ";
                   /*   13   14     15    16    17      18      */
-      int xpix[ 2 ];
-      int xpof[ 2 ];
-      int ypix[ 2 ];
-      int ypof[ 2 ];
       int xpdev;
       int ypdev;
       int xporig;
@@ -137,8 +156,6 @@
       int iframe[ 2 ];
       double xoff[ 2 ];
       double yoff[ 2 ];
-      double lbox[ 2 ][ 2 ];
-      double ubox[ 2 ][ 2 ];
       double xorigin;
       double yorigin;
       double xdev;
@@ -160,10 +177,12 @@
       int i;
       int locolour;
       int hicolour;
-      int ngood = 0;
       int const badcolour = 0;
       Tcl_Obj *result;
+      Tcl_Obj argob;
+      Tcl_Obj *ov[ 1 ];
       Ndf *ndf[ 2 ];
+      struct ndfdrawpair_args_t args;
 
 /* Check syntax. */
       if ( objc != 19 ) {
@@ -246,9 +265,11 @@
    PGPLOT to use the entire device surface for plotting. */
       cpgsvp( 0.0, 1.0, 0.0, 1.0 );
 
-/* Set the viewport. */
+/* Get the size of the viewport in pixels. */
       cpgqvsz( 3, &xplo, &xphi, &yplo, &yphi );
-      cpgswin( xorigin, xorigin + xdev, yorigin, yorigin + ydev );
+
+/* Close PGPLOT down for now. */
+      cpgclos();
 
 /* This prevents us from resampling into a frame which has many units for
    a single pixel, which would be a waste. */
@@ -257,16 +278,74 @@
       )
       shrink = ( psize * zoom < 1.1 ) ? 1.0 : 1.0 / ( psize * zoom );
 
-/* Now we need to generate a plottable array for each of the ndf objects. */
+/* Generate the scaled data array ready for plotting.
+   This wants to be done in the main process, since it may cache the 
+   calculated data block in the NDF structure. */
       for ( i = 0; i < 2; i++ ) {
          STARCALL( 
-
-/* Generate the scaled data array ready for plotting. */
             pixbloc[ i ] = getpixbloc( ndf[ i ], iframe[ i ], zoom * shrink,
                                        loval[ i ], hival[ i ], 
                                        locolour, hicolour, badcolour, status );
+         )
+      }
 
+/* The rest of the task can be performed as an independent background 
+   process, since it may take a significant amount of time and we want 
+   Tcl events to continue to be serviced. */
+
+/* Set up the arguments block for the rest of the processing. */
+      argob.internalRep.otherValuePtr = &args;
+      ov[ 0 ] = &argob;
+      args.pixbloc = pixbloc;
+      args.ndf = ndf;
+      args.xoff = xoff;
+      args.yoff = yoff;
+      args.iframe = iframe;
+      args.device = device;
+      args.shrink = shrink;
+      args.xdev = xdev;
+      args.xorigin = xorigin;
+      args.ydev = ydev;
+      args.yorigin = yorigin;
+      args.zoom = zoom;
+
+/* Call the routine which will do the rest of the processing in the 
+   background, and return its exit status. */
+      return tclbgcmd( (ClientData) do_ndfdrawpair, interp, 1, ov );
+   }
+
+
+   int do_ndfdrawpair( ClientData clientData, Tcl_Interp *interp, int objc,
+                       Tcl_Obj *CONST objv[] ) {
+      int const badcolour = 0;
+      int i;
+      int *status;
+      int ngood = 0;
+      int xpix[ 2 ];
+      int xpof[ 2 ];
+      int ypix[ 2 ];
+      int ypof[ 2 ];
+      double lbox[ 2 ][ 2 ];
+      double ubox[ 2 ][ 2 ];
+
+/* Set values from the structure passed in the argument list. */
+      struct ndfdrawpair_args_t *pargs = objv[ 0 ]->internalRep.otherValuePtr;
+      int **pixbloc = pargs->pixbloc;
+      Ndf **ndf = pargs->ndf;
+      double *xoff = pargs->xoff;
+      double *yoff = pargs->yoff;
+      int *iframe = pargs->iframe;
+      char *device = pargs->device;
+      double shrink = pargs->shrink;
+      double xdev = pargs->xdev;
+      double xorigin = pargs->xorigin;
+      double ydev = pargs->ydev;
+      double yorigin = pargs->yorigin;
+      double zoom = pargs->zoom;
+      
 /* Calculate the position and extent of the pixel array. */
+      for ( i = 0; i < 2; i++ ) {
+         STARCALL( 
             getbbox( ndf[ i ], iframe[ i ], lbox[ i ], ubox[ i ], status );
          )
          lbox[ i ][ 0 ] += xoff[ i ];
@@ -284,6 +363,17 @@
          xpof[ i ] = zoom * shrink * lbox[ i ][ 0 ];
          ypof[ i ] = zoom * shrink * lbox[ i ][ 1 ];
       }
+
+/* Start up PGPLOT.  We use the same invocations here as in the driver 
+   routine. */
+      if ( cpgopen( device ) < 0 ) {
+         Tcl_SetObjResult( interp,
+                           Tcl_NewStringObj( "Failed to open plotting device",
+                                             -1 ) );
+         return TCL_ERROR;
+      }
+      cpgsvp( 0.0, 1.0, 0.0, 1.0 );
+      cpgswin( xorigin, xorigin + xdev, yorigin, yorigin + ydev );
 
 /* Begin PGPLOT buffering. */
       cpgbbuf();

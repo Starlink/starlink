@@ -212,9 +212,23 @@
 
 
 /* General purpose static buffer.
-*/
+ */
    char buffer[ 4096 ];
 
+/* Machinery for calling ndfdisplay as a background process.
+ */
+   Tcl_ObjCmdProc ndfdisplay;
+   struct ndfdisplay_args {
+      char *device;
+      char *settings;
+      int *pixbloc;
+      float *gbox;
+      double *bbox;
+      AstFrameSet *wcs;
+      int ifrm;
+      int xpix;
+      int ypix;
+   };
 
 
 /**********************************************************************/
@@ -447,7 +461,9 @@
          double loval;
          double hival;
          double zoom;
-         AstPlot *plot;
+         struct ndfdisplay_args args;
+         Tcl_Obj argob;
+         Tcl_Obj *ov[ 1 ];
 
 /* Check syntax. */
          if ( objc != 7 ) {
@@ -497,6 +513,9 @@
 /* Get the viewport size in pixels. */
          cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
 
+/* Close PGPLOT down for now. */
+         cpgclos();
+
 /* Set the zoom factor so that PGPLOT can optimise the plotting.  Basically
    this entails making the pixel array the same shape as the plotting 
    surface.  However, making it a lot bigger than the plotting surface
@@ -516,31 +535,31 @@
          xpix = ndf->plotarray.xdim;
          ypix = ndf->plotarray.ydim;
 
-/* Begin PGPLOT buffering. */
-         cpgbbuf();
+/* The rest of the processing can be performed as an independetn background
+   process, since it may take a significant amount of time and we want 
+   Tcl events to continue to be serviced. */
 
-/* Plot the image. */
-         cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix, 
-                  gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+/* Set up the arguments block for the rest of the processing. */
+         argob.internalRep.otherValuePtr = &args;
+         ov[ 0 ] = &argob;
+         args.device = device;
+         args.settings = settings;
+         args.pixbloc = pixbloc;
+         args.gbox = gbox;
+         args.bbox = bbox;
+         args.wcs = ndf->wcs;
+         args.ifrm = ifrm;
+         args.xpix = xpix;
+         args.ypix = ypix;
 
-/* Get AST to plot the axes etc. */
-         ASTCALL(
-            ofrm = astGetI( ndf->wcs, "Current" );
-            astSetI( ndf->wcs, "Current", ifrm );
-            plot = astPlot( ndf->wcs, gbox, bbox, settings );
-            astSetI( ndf->wcs, "Current", ofrm );
-            astGrid( plot );
-            astAnnul( plot );
-         )
+/* Call the routine to do the plotting as a background task. */
+         if ( tclbgcmd( (ClientData) ndfdisplay, interp, 1, ov ) != TCL_OK ) {
+            printf( "It's an error" );
+            return TCL_ERROR;
+         }
 
-/* End PGPLOT buffering. */
-         cpgebuf();
-
-/* Close the plotting device. */
-         cpgclos();
-
-/* No result is returned. */
-         result = Tcl_NewStringObj( "", 0 );
+/* Get the result and return. */
+         result = Tcl_GetObjResult( interp );
       }
 
 
@@ -1386,6 +1405,67 @@
 
       return;
    }
+
+
+
+
+/**********************************************************************/
+   int ndfdisplay( ClientData clientData, Tcl_Interp *interp, int objc,
+                   Tcl_Obj *CONST objv[] ) {
+/**********************************************************************/
+      int ofrm;
+      Tcl_Obj *result;
+      AstPlot *plot;
+
+/* Set values from the structure passed in the arugment list. */
+      struct ndfdisplay_args *pargs = objv[ 0 ]->internalRep.otherValuePtr;
+      char *device = pargs->device;
+      char *settings = pargs->settings;
+      int *pixbloc = pargs->pixbloc;
+      float *gbox = pargs->gbox;
+      double *bbox = pargs->bbox;
+      AstFrameSet *wcs = pargs->wcs;
+      int ifrm = pargs->ifrm;
+      int xpix = pargs->xpix;
+      int ypix = pargs->ypix;
+
+/* Open PGPLOT.  Use the same invocations as in the driver routine. */
+      if ( cpgopen( device ) < 0 ) {
+         Tcl_SetObjResult( interp, 
+             Tcl_NewStringObj( "Failed to open plotting device", -1 ) );
+         return TCL_ERROR;
+      }
+      cpgsvp( 0.0, 1.0, 0.0, 1.0 );
+      cpgwnad( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+
+/* Begin PGPLOT buffering. */
+      cpgbbuf();
+
+/* Plot the image. */
+      cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix, 
+               gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+
+/* Get AST to plot the axes etc. */
+      ASTCALL(
+         ofrm = astGetI( wcs, "Current" );
+         astSetI( wcs, "Current", ifrm );
+         plot = astPlot( wcs, gbox, bbox, settings );
+         astSetI( wcs, "Current", ofrm );
+         astGrid( plot );
+         astAnnul( plot );
+      )
+
+/* End PGPLOT buffering. */
+      cpgebuf();
+
+/* Close the plotting device. */
+      cpgclos();
+
+/* No result is returned. */
+      result = Tcl_NewStringObj( "", 0 );
+      return TCL_OK;
+   }
+
 
 
 /**********************************************************************/
