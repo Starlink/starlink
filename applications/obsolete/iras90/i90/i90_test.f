@@ -38,7 +38,7 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          ! Standard SAE constants.
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants.
       INCLUDE 'I90_DAT'          ! I90_ constants.
 
 *  Global Status:
