@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE defectslist
+	PUBLIC "+//IDN astro.gla.ac.uk::norman//DTD Defects List//EN"
+	"defects.dtd">
+
+<defectslist>
+
+<title>ECHOMOP defects/issues list</title>
+
+<version>$Revision$</version>
+<date>$Date$</date>
+
+<p>This list contains the current list of defects and issues for
+ECHOMOP.  As well as specific deficiencies, these `defects' include
+items which are merely suggestions or TODOs.</p>
+
+<p>These are in no particular order, and some have a higher priority
+than others.</p>
+
+<!-- DO NOT CHANGE THE ORDER OF ELEMENTS IN THIS FILE.
+     They're numbered when they're formatted, and it'd be nice to keep
+     those numbers correct.
+     -->
+
+<defectgroup>
+<title>Functionality</title>
+
+<defect status="open"
+	originator="Michael Albrow"
+	originatoremail="phys170@cantua.canterbury.ac.nz"
+	date="1-Feb-1999">
+<title>ech_dekker and ech_object apparently yoked together</title>
+<p>Michael Albrow:
+<blockquote>
+<p>When using
+echmenu, options "4.1" and "4.2" (these are the tasks ech_dekker and
+ech_object)
+don't seem to be able to be invoked separately anymore. Instead, trying
+either option seems to do the same as option "4" (ech_spatial).</p>
+</blockquote>
+</p>
+</defect>
+
+<defect status="open" originator="Orlon Petterson"
+originatoremail="physokp@cantua.canterbury.ac.nz" date="4-Aug-2000">
+<title>Rounding of pixel numbers</title>
+
+<p>ECHOMOP 3.3-4: optimal extraction, as opposed to profile
+extraction, seems to round pixel numbers much more often than seems
+plausible.</p>
+</defect>
+
+<defect status="open" originator="James Bleach"
+originatoremail="jnb@astro.keele.ac.uk" date="9-Aug-2000">
+<title>`Hedgehog' problem</title>
+
+<p>Need to get more details.  See <figref id="bleach1"/> and <figref
+id="bleach2"/> for pictures.</p>
+
+<fig id="bleach1" src="bleach1.gif"/>
+<fig id="bleach2" src="bleach2.gif"/>
+</defect>
+
+<defect status="open" originator="Rachel North"
+originatoremail="rcn@astro.soton.ac.uk"
+date="12-May-2000">
+<title>AI option crashes!</title>
+<p>Rachel North managed to produce crashes using the AI toption of
+ech_idwave and saving scrunched object orders (option 14:
+RESULT_TYPE: SCROBJ).</p>
+</defect>
+
+</defectgroup>
+
+<defectgroup>
+
+<title>Interface problems</title>
+
+<defect status="open" originator="Rachel North"
+originatoremail="rcn@astro.soton.ac.uk" date="12-May-2000">
+<title>ech_idwave, XP and IM</title>
+<p>Basically, I can't seem to export(XP) or import(IM) the arc orders from 
+ech_idwave (option 10) so that the arc can be identified using the FIGARO 
+command ECHARC. This is the error message I'm getting:
+
+<verbatim>
+%echarc
+>echarc >IMAGE - (IMage) Collapsed echelle arc image to be fitted
+>/@ECH_ARC/ >ECH_ECHAR 
+>ARCTYPE - (ARctype) Type of arc /'thar'/ >
+>UNINITIALISED 
+>.Y.LABEL above not order number
+</verbatim>
+</p>
+
+<p>Also, the single order toggle (option 24) doesn't seem to have any effect.
+In addition, when I tried to use the AI option of ech_idwave, the program 
+crashed...</p>
+
+<p>Finally, when I try and save the scrunched object orders (option 14: 
+RESULT_TYPE: SCROBJ) the program crashes out with this message:
+<verbatim>
+>*** TERMINATING  /star/bin/echomop/echmenu
+>*** Received signal 11 SIGSEGV
+>Segmentation fault
+</verbatim></p>
+</defect>
+</defectgroup>
+
+</defectslist>
+
