@@ -68,6 +68,8 @@
 *        The dimensions of the output n-D arrays.
 *     OUTARR( * ) = ? (Returned)
 *        The transformed data array. 
+*     OUTVAR( * ) = ? (Returned)
+*        The variance array of the transformed data.
 *     COIN( OEL, NDIMI ) = REAL (Returned)
 *        Workspace used to store the co-ordinates of a row of points
 *        in the input arrays.
