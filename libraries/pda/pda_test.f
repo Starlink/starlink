@@ -13,6 +13,11 @@ C
       DOUBLE PRECISION DIGNOR
       DOUBLE PRECISION PDA_DBESJ1, PDA_DERF, PDA_PPND16, PDA_V11
 C
+
+      PRINT *,'If this message is printed the PDA library links ',
+     +     'correctly.'
+      GO TO 999
+
       CALL PDA_C2NAG()
       CALL PDA_CFFTB()
       CALL PDA_CFFTF()
@@ -133,5 +138,6 @@ C
       CALL PDA_CHE2R()
       CALL PDA_CHE2D()
 
+ 999  CONTINUE
 
       END
