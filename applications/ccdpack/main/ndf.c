@@ -10,52 +10,73 @@
 *     ANSI C.
 
 *  Purpose:
-*     Provides a new command "ndf" for use with Tcl.
+*     Provides new commands "ndf" and "ndfset" for use with Tcl.
 
 *  Description:
 *     This file provides an object to use within Tcl programs for
-*     manipulating NDFs.  When the object is created the NDF is 
-*     opened and when it is deleted the NDF is annulled.  To calling
-*     Tcl scripts it can provide the NDF dimensions, name and so on.
-*     It also provides some other services, such as mapping the NDF and
-*     generating an array suitable for feeding to PGPLOT for plotting
-*     on a display device, which cannot sensibly be used from within
-*     Tcl.  Such commands are designed to be used from other C 
-*     extensions to Tcl.
+*     manipulating NDFs.  There are two types of objects implemented
+*     here, an ndf and and ndfset.  Many of the same commands apply
+*     to both types of objects (e.g. you can execute "$ob name"
+*     to find the name of the ndf or ndfset object), but there is
+*     no straightforward inheritance relationship between the two.
+*     An ndfset object has-an array of ndf objects as well as some
+*     other characteristics.
+*
+*     Creating an ndf or ndfset object will open the named NDF(s); 
+*     deleting the object will annul them.
+*
+*     The commands can provide to calling Tcl scripts the NDF
+*     dimensions, name and so on.  Other services are also provided
+*     to calling C code (e.g. other extensions to Tcl), such as 
+*     mapping the NDF and generating an array suitable for feeding
+*     to PGPLOT for plotting on a display device.
+
+*  The following prologue items document the behaviour of both ndf and
+*  ndfset objects.
 
 *  Usage:
-*     set object [ndf name]
+*     set ndfob [ndf ndfname]
+*     set ndfsetob [ndfset setname ndfname ?ndfname ...?] 
 
-*  Constructor:
+*  Constructors:
 *     ndf name
 *        Creates an NDF object to manipulate the NDF which has the filename
 *        "name".  Returns the name of a new object command which can 
-*        be used to manipulate the NDF object.
+*        be used to manipulate the ndf object.
+*
+*     ndfset setname ndfname ?ndfname ...?
+*        Creates a new ndfset object with the given identifying setname
+*        (for presentation to the user) and containing the named NDFs.
+*        Returns the name of a new object command which can be used
+*        to manipulatte the ndfset object.
 
 *  Object commands:
 *
-*     object bbox frame
+*     ndfob-or-ndfsetob bbox frame
 *        Returns a list giving the extent of a bounding box large enough
-*        to hold the NDF when resampled from Base (Grid) coordinates into
+*        to hold the image when resampled from Base (Grid) coordinates into
 *        the indicated frame and plotted.  The returned value is a list 
 *        of the form {{lo hi} {lo hi} .. } with one pair for each of the
-*        NDF's dimensions.
+*        dimensions.
 *
 *        The frame may be specified either as a numerical frame index, 
 *        as a domain name, or as one of the special strings "BASE" or 
 *        "CURRENT".
 *
-*     object bounds
+*     ndfob bounds
 *        Returns a list giving the bounds of the NDF.  There are ndim
 *        elements in the list, where ndim is the number of dimensions 
 *        of the NDF.  Each element is a two element list giving the 
 *        lower and upper pixel index bound.
 *
-*     object destroy
-*        Releases all resources associated with the object.
+*     ndfob-or-ndfsetob destroy
+*        Releases resources associated with the object.  For an
+*        ndf object it will annul the associated NDF; for an
+*        ndfset object it will annul all the NDFs associated with
+*        the members of the ndfset.
 *
-*     object display ?options? device loval hival frame plotstyle
-*        Plots the NDF on the named PGPLOT device, with colour cutoffs
+*     ndfob-or-ndfsetob display ?-resamp? device loval hival frame plotstyle
+*        Plots the image on the named PGPLOT device, with colour cutoffs
 *        given by the loval and hival arguments, and axes drawn according
 *        to the frame argument.  The plotstyle string may contain any 
 *        plotting options desired, in astSet format.  If the '-resamp'
@@ -63,10 +84,11 @@
 *        indicated frame before plotting; otherwise the frame argument
 *        is just used for plotting axes.
 *
-*        The may be specified either as a numerical frame index, as a 
-*        domain name, or as one of the special strings "BASE" or "CURRENT".
+*        The frame may be specified either as a numerical frame index,
+*        as a domain name, or as one of the special strings "BASE"
+*        or "CURRENT".
 *
-*     object fitshead ?key? ...
+*     ndfob fitshead ?key? ...
 *        This method allows access to any FITS headers contained in the 
 *        .MORE.FITS extension of the NDF.  If any optional key arguments
 *        are supplied, then it will return an ordered list containing 
@@ -76,8 +98,8 @@
 *        element is the whole header card, except that trailing spaces
 *        and empty comments are stripped.
 *
-*     object frameatt attname ?frame?
-*        Returns frame attribute values from the WCS component of the NDF.
+*     ndfob-or-ndfsetob frameatt attname ?frame?
+*        Returns frame attribute values from the associated WCS frameset.
 *        If the optional frame argument is specified, then the value
 *        of the attribute is returned for the specified frame.  If not,
 *        then a list is returned containing one element with the value
@@ -94,22 +116,8 @@
 *        index, as a domain name, or as one of the special strings 
 *        "BASE" or "CURRENT".
 *
-*     object name
-*        Returns a string which is the name of the NDF.  This is the same
-*        string as was initially used to open the NDF.
-*
-*     object percentile perc ?perc? ...
-*        This calculates the value(s) of the data in the NDF which 
-*        correspond(s) to the given percentile value(s).  It returns a 
-*        list containing as many elements as the number of perc values 
-*        specified.  It is more efficient to calculate a multiple 
-*        percentile values using a single call to this method than 
-*        multiple calls.  It caches previously requested values, so 
-*        that requesting a percentile which has been requested at any
-*        previous time in the lifetime of this NDF object is fast.
-*
-*     object mapped ?setmap?
-*        This method controls mapping of the NDF's DATA component.
+*     ndfob-or-ndfsetob mapped ?setmap?
+*        This method controls mapping of the image's DATA component(s).
 *        With no optional setmap argument it returns a boolean value
 *        indicating whether the DATA array is currently mapped.
 *        If the setmap argument is supplied, it will force the DATA
@@ -121,7 +129,34 @@
 *        call this method; if it is unlikely that the DATA array will
 *        be needed again however, it may be called to force its unmapping.
 *
-*     object pixelsize frame
+*     ndfob-or-ndfsetob name
+*        Returns an identifying string.  For an ndf object this is the
+*        name initially used to open the NDF.  For an ndfset object 
+*        it is probably the Set Name attribute common to the NDFs.
+*
+*     ndfsetob ndfdo index|all cmd ?args? ...
+*        This executes a command on an ndf member of an ndfset object
+*        as if it were being addressed as an ndf object.  The index
+*        (starting at zero for the first one) indicates which ndf
+*        object the command is to be performed on, and the cmd and
+*        args argument give the command and its arguments.  If the
+*        literal 'all' is given for the index argument, the command
+*        will be performed on all of the member NDFs and the 
+*
+*     ndfsetob nndf
+*        Returns the number of member NDFs in the ndfset.
+*
+*     ndfob percentile perc ?perc? ...
+*        This calculates the value(s) of the data in the image which 
+*        correspond(s) to the given percentile value(s).  It returns a 
+*        list containing as many elements as the number of perc values 
+*        specified.  It is more efficient to calculate a multiple 
+*        percentile values using a single call to this method than 
+*        multiple calls.  It caches previously requested values, so 
+*        that requesting a percentile which has been requested at any
+*        previous time in the lifetime of this object is fast.
+*
+*     ndfob-or-ndfsetob pixelsize frame
 *        Returns the approximate linear size of an NDF (grid) pixel in
 *        units of the current frame.  This only properly makes
 *        sense if certain assumptions about the form of the transformation
@@ -133,7 +168,7 @@
 *        as a domain name, or as one of the special strings "BASE" or 
 *        "CURRENT".
 *
-*     object polygon frame
+*     ndfob polygon frame
 *        Returns a list of points ({x1 y1} {x2 y2} ...) which map out the
 *        outline in the given frame of the grid of the NDF.  Currently
 *        this method only returns a list of four points, one for the 
@@ -144,14 +179,19 @@
 *        This method only works on the first two dimensions of the NDF,
 *        regardless of the NDF's dimensionality.
 *
-*     object validndf
-*        Returns true if the NDF identifier is valid.  It should always 
-*        return true; this method can be used and caught to see whether
-*        a command represents an object belonging to this class.
+*     ndfob validndf
+*        Returns true if the NDF identifier is valid.  This method
+*        can be used and caught to see whether a command represents 
+*        an object belonging to the ndf class.
 *
-*     object wcstran ?options? from to pos ?pos ...?
+*     ndfsetob validndfset
+*        Returns true if the NDF identifiers of all the member NDFs
+*        are valid. This method can be used and caught to see whether
+*        a command represents an object belonging to the ndfset class.
+*
+*     ndfob-or-ndfsetob wcstran ?-format? from to pos ?pos ...?
 *        Transforms a set of points between coordinate frames in 
-*        the WCS component of the NDF.
+*        the WCS frameset.
 *           - options  -- If '-format' is given, the output will be a
 *                         text strings generated by AST_FORMAT, otherwise
 *                         it will be numeric values.
@@ -165,12 +205,19 @@
 *        each element of the list containing the coordinates in the 'to'
 *        frame of the corresponding pos argument.
 
+*  Bugs:
+*     In several cases, if a command exits with error status, it may
+*     have leaked some memory.  On the whole, such leaks should be
+*     pretty small.
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 
 *  History:
 *     16-AUG-2000 (MBT):
 *        Initial version.
+*     9-MAR-2001 (MBT):
+*        Upgraded for use with Sets.
 *-
 */
 
@@ -182,6 +229,7 @@
 #include <math.h>
 #include "sae_par.h"
 #include "dat_par.h"
+#include "img.h"
 #include "ndf.h"
 #include "tcl.h"
 #include "mers.h"
@@ -218,7 +266,7 @@
    } PercHashValue;
 
 
-/* General purpose static buffer.
+/* General purpose static buffers.
  */
    char buffer[ 4096 ];
 
@@ -234,8 +282,8 @@
       double psize;
       double zoom;
       AstFrameSet *wcs;
-      int ifrm;
-      int pfrm;
+      int *iframes;
+      int *pframes;
       int xpix;
       int ypix;
    };
@@ -247,8 +295,6 @@
 /**********************************************************************/
       Ndf *ndf;
       static int counter = 0;
-      char *ndfname;
-      int nleng;
       int i;
       Tcl_Obj *op;
 
@@ -259,50 +305,9 @@
          return TCL_ERROR;
       }
 
-/* Allocate the data structure to hold the client data. */
-      ndf = (Ndf *) malloc( sizeof( Ndf ) );
-      if ( tclmemok( interp, ndf ) != TCL_OK ) {
+/* Create the new NDF data structure. */
+      if ( newNdf( interp, objv[ 1 ], &ndf ) != TCL_OK ) { 
          return TCL_ERROR;
-      }
-      ndfname = Tcl_GetStringFromObj( objv[ 1 ], &nleng );
-      ndf->name = malloc( nleng + 1 );
-      if ( tclmemok( interp, ndf->name ) != TCL_OK ) {
-         return TCL_ERROR;
-      }
-      strcpy( ndf->name, ndfname );
-
-/* Initialise some elements of the data structure. */
-      ndf->mapped = 0;
-      ndf->bad = 1;
-      ndf->data = NULL;
-      *ndf->mtype = '\0';
-      ndf->plotarray.exists = 0;
-      ndf->plotarray.data = NULL;
-      ndf->fits.loaded = 0;
-      ndf->fits.ncard = 0;
-      ndf->fits.data = NULL;
-      Tcl_InitHashTable( &ndf->perchash, TCL_ONE_WORD_KEYS );
-
-      STARCALL( 
-
-/* Open the NDF. */
-         ndfFind( DAT__ROOT, ndf->name, &ndf->identifier, status );
-
-/* Get the bounds of the NDF. */
-         ndfBound( ndf->identifier, NDF__MXDIM, ndf->lbnd, ndf->ubnd, 
-                   &ndf->ndim, status );
-
-/* Get the HDS type of the DATA array. */
-         ndfType( ndf->identifier, "DATA", ndf->ntype, DAT__SZTYP, status );
-
-/* Get a pointer to the WCS component. */
-         ndfGtwcs( ndf->identifier, &ndf->wcs, status );
-      )
-
-/* Set the number of elements. */
-      ndf->nel = 1;
-      for ( i = 0; i < ndf->ndim; i++ ) {
-         ndf->nel *= ndf->ubnd[ i ] - ndf->lbnd[ i ] + 1;
       }
 
 /* Create a new Tcl command corresponding to the newly created object. */
@@ -323,96 +328,49 @@
 
 
 
-
-
 /**********************************************************************/
    void DeleteNdf( ClientData clientData ) {
 /**********************************************************************/
       Ndf *ndf = (Ndf *) clientData;
-      int status[ 1 ] = { SAI__OK };
-      int valid;
-
-/* Release the NDF resources associated with the object.  There is no
-   procedure for recovering from errors in a Tcl_CmdDeleteProc, so if
-   there is a problem we just have to annul the error status. */
-      errMark();
-      if ( ndf->fits.loaded && ndf->fits.ncard ) {
-         DECLARE_CHARACTER( locator, DAT__SZLOC );
-         cnfExprt( ndf->fits.loc, locator, DAT__SZLOC );
-         F77_CALL(dat_annul)( CHARACTER_ARG(locator), INTEGER_ARG(status)
-                              TRAIL_ARG(locator) );
-      }
-      astAnnul( ndf->wcs );
-      ndfValid( ndf->identifier, &valid, status );
-      if ( valid ) ndfAnnul( &ndf->identifier, status );
-      if ( *status != SAI__OK ) errAnnul( status );
-      errRlse();
-
-/* Release memory we (may) have allocated for the object.  Some or all of
-   these could be NULL, but if so, free() will not complain. */
-      Tcl_DeleteHashTable( &ndf->perchash );
-      free( ndf->name );
-      free( ndf->plotarray.data );
-      free( ndf );
+      forgetNdf( ndf );
    }
-
 
 
 /**********************************************************************/
    int ObjectNdfCmd( ClientData clientData, Tcl_Interp *interp, int objc, 
                      Tcl_Obj *CONST objv[] ) {
 /**********************************************************************/
-      Ndf *ndf = (Ndf *) clientData;
+      NdfOrNdfset *ndf = (NdfOrNdfset *) clientData;
+      Ndf1 *ndf1 = ndf->nmember ? NULL : ndf->content.ndf1;
+      AstFrameSet *wcs = ndf->wcs;
       Tcl_Obj *result;
       Tcl_Obj *op;
       char *command = Tcl_GetString( objv[ 1 ] );
       int i;
       int j;
 
+/* We deal with certain commands (those which work the same on ndf or
+   ndfset objects) by passing them straight to the ObjectNdfsetCmd() 
+   routine. */
+      if ( ! strcmp( command, "bbox" ) ||
+           ! strcmp( command, "destroy" ) ||
+           ! strcmp( command, "display" ) ||
+           ! strcmp( command, "frameatt" ) ||
+           ! strcmp( command, "mapped" ) ||
+           ! strcmp( command, "name" ) ||
+           ! strcmp( command, "pixelsize" ) ||
+           ! strcmp( command, "wcstran" ) ) {
+         return ObjectNdfsetCmd( clientData, interp, objc, objv );
+      }
+
 /* Take care of pending Tcl events now, in case what we are about to do
    is time-consuming. */
       tclupdate();
 
 /**********************************************************************/
-/* "bbox" command                                                     */
-/**********************************************************************/
-      if ( ! strcmp( command, "bbox" ) ) {
-         Tcl_Obj *ov[ 2 ];
-         double lbox[ NDF__MXDIM ];
-         double ubox[ NDF__MXDIM ];
-         int iframe;
-
-/* Check syntax. */
-         if ( objc != 3 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "frame" );
-            return TCL_ERROR;
-         }
-
-/* Get frame argument. */
-         if ( NdfGetIframeFromObj( interp, objv[ 2 ], ndf->wcs, &iframe ) 
-              != TCL_OK ) {
-            return TCL_ERROR;
-         }
-
-/* Get the bounding box. */
-         STARCALL(
-            getbbox( ndf, iframe, lbox, ubox, status );
-         )
-
-/* Set the result object. */
-         result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
-         for ( i = 0; i < ndf->ndim; i++ ) {
-            ov[ 0 ] = Tcl_NewDoubleObj( lbox[ i ] );
-            ov[ 1 ] = Tcl_NewDoubleObj( ubox[ i ] );
-            Tcl_ListObjAppendElement( interp, result, Tcl_NewListObj( 2, ov ) );
-         }
-      }
-
-
-/**********************************************************************/
 /* "bounds" command                                                   */
 /**********************************************************************/
-      else if ( ! strcmp( command, "bounds" ) ) {
+      if ( ! strcmp( command, "bounds" ) ) {
 
 /* Check syntax. */
          if ( objc != 2 ) {
@@ -422,190 +380,12 @@
 
 /* Set result. */
          result = Tcl_NewListObj( 0, NULL );
-         for ( i = 0; i < ndf->ndim; i++ ) {
-            sprintf( buffer, "%d %d", ndf->lbnd[ i ], ndf->ubnd[ i ] );
+         for ( i = 0; i < ndf1->ndim; i++ ) {
+            sprintf( buffer, "%d %d", ndf1->lbnd[ i ], ndf1->ubnd[ i ] );
             op = Tcl_NewStringObj( buffer, -1 );
             Tcl_ListObjAppendElement( interp, result, op );
          }
       }
-
-
-/**********************************************************************/
-/* "destroy" command                                                  */
-/**********************************************************************/
-      else if ( ! strcmp( command, "destroy" ) ) {
-
-/* Check syntax. */
-         if ( objc != 2 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "" );
-            return TCL_ERROR;
-         }
-
-/* Initiate destruction.  This call will delete the command from the 
-   interpreter and invoke our object deletion callback too.  */
-         Tcl_DeleteCommand( interp, Tcl_GetString( objv[ 0 ] ) );
-
-/* Set result. */
-         result = Tcl_NewStringObj( "", 0 );
-      }
-
-
-/**********************************************************************/
-/* "display" command                                                  */
-/**********************************************************************/
-      else if ( ! strcmp( command, "display" ) ) {
-         int const badcolour = 0;
-         int ifrm;
-         int locolour;
-         int hicolour;
-         int nflag;
-         int ofrm;
-         int pfrm;
-         int resamp;
-         int xpix;
-         int ypix;
-         int *pixbloc;
-         char *device;
-         char *settings;
-         float factor;
-         float gbox[ 4 ];
-         float xplo;
-         float xphi; 
-         float yplo;
-         float yphi;
-         double bbox[ 4 ];
-         double loval;
-         double hival;
-         double psize;
-         double zoom;
-         struct ndfdisplay_args args;
-         Tcl_Obj argob;
-         Tcl_Obj *ov[ 1 ];
-
-/* Process flags. */
-         resamp = 0;
-         nflag = 0;
-         if ( objc > 2 + nflag &&
-              ! strcmp( Tcl_GetString( objv[ 2 ] + nflag ), "-resamp" ) ) {
-            resamp = 1;
-            nflag++;
-         }
-
-/* Check syntax. */
-         if ( objc != 7 + nflag ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "?options? "
-                              "device loval hival frame plotstyle" );
-                            /* 2      3     4     5     6        */
-            return TCL_ERROR;
-         }
-
-/* Get string arguments. */
-         device = Tcl_GetString( objv[ 2 + nflag ] );
-         settings = Tcl_GetString( objv[ 6 + nflag ] );
-
-/* Get numeric arguments. */
-         if ( Tcl_GetDoubleFromObj( interp, objv[ 3 + nflag ], &loval ) != TCL_OK ||
-              Tcl_GetDoubleFromObj( interp, objv[ 4 + nflag ], &hival ) != TCL_OK ) {
-            return TCL_ERROR;
-         }
-           
-/* Get frame argument. */
-         if ( NdfGetIframeFromObj( interp, objv[ 5 + nflag ], ndf->wcs, &ifrm ) 
-              != TCL_OK ) {
-            return TCL_ERROR;
-         }
-
-/* Set the frame into which the image will be resampled for plotting to 
-   the GRID frame. */
-         pfrm = resamp ? ifrm : AST__BASE;
-
-/* Open the PGPLOT plotting device. */
-         if ( cpgopen( device ) <= 0 ) {
-            result = Tcl_NewStringObj( "Failed to open plotting device", -1 );
-            Tcl_SetObjResult( interp, result );
-            return TCL_ERROR;
-         }
-
-/* Query the plotting device for highest and lowest available colour indices. */
-         cpgqcir( &locolour, &hicolour );
-
-/* Set the plotting coordinate limits. */
-         STARCALL(
-            psize = getpixelsize( ndf, pfrm, status );
-            getbbox( ndf, pfrm, bbox, bbox + 2, status );
-         )
-         for ( i = 0; i < 4; i++ ) gbox[ i ] = (float) bbox[ i ];
-
-/* Set the viewport to use all of the available surface, within the 
-   constraint that the correct aspect ratio is retained. */
-         cpgsvp( 0.0, 1.0, 0.0, 1.0 );
-         cpgwnad( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
-
-/* Get the viewport size in pixels. */
-         cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
-
-/* Close PGPLOT down for now. */
-         cpgclos();
-
-/* Update pending Tcl events. */
-         tclupdate();
-
-/* Set the zoom factor so that PGPLOT can optimise the plotting.  Basically
-   this entails making the pixel array the same shape as the plotting 
-   surface.  However, making it a lot bigger than the plotting surface
-   would be a waste of memory. */
-         factor = 1.0;
-         zoom = 10.0 / psize;
-         while ( zoom > 2.1 / psize ) {
-            zoom = ( xphi - xplo ) / ( bbox[ 2 ] - bbox[ 0 ] ) / factor++;
-         }
-
-/* Prepare the image in a PGPLOT-friendly form. */
-         STARCALL(
-            pixbloc = getpixbloc( ndf, pfrm, zoom, loval, hival, 
-                                  locolour, hicolour, badcolour, status );
-         )
-         xpix = ndf->plotarray.xdim;
-         ypix = ndf->plotarray.ydim;
-
-/* The rest of the processing can be performed as an independent background
-   process, since it may take a significant amount of time and we want 
-   Tcl events to continue to be serviced. */
-
-/* Set up the arguments block for the rest of the processing. */
-         argob.internalRep.otherValuePtr = &args;
-         ov[ 0 ] = &argob;
-         args.device = device;
-         args.settings = settings;
-         args.pixbloc = pixbloc;
-         args.gbox = gbox;
-         args.bbox = bbox;
-         args.psize = psize;
-         args.zoom = ndf->plotarray.zoom;
-         args.wcs = ndf->wcs;
-         args.ifrm = ifrm;
-         args.pfrm = pfrm;
-         args.xpix = xpix;
-         args.ypix = ypix;
-
-/* Call the routine to do the plotting. */
-/* I was experimenting with doing this in a subprocess so that the Tcl
-   event loop was attended to during processing.  This is why ndfdisplay
-   is implemented as a separate routine here.  It can be invoked in 
-   this way using the call:
-      if ( tclbgcmd( (ClientData) ndfdisplay, interp, 1, ov ) != TCL_OK )
-   However, this doesn't seem to solve enough problems to be worthwhile,
-   so it is currently written to execute in the main process. */
-         if ( ((Tcl_ObjCmdProc *) ndfdisplay)( (ClientData) NULL, 
-                                               interp, 1, ov ) != TCL_OK ) {
-            printf( "It's an error" );
-            return TCL_ERROR;
-         }
-
-/* Get the result and return. */
-         result = Tcl_GetObjResult( interp );
-      }
-
 
 /**********************************************************************/
 /* "fitshead" command                                                 */
@@ -613,12 +393,12 @@
       else if ( ! strcmp( command, "fitshead" ) ) {
 
 /* If we have not attempted to load the FITS extension before, do so now. */
-         if ( ! ndf->fits.loaded ) {
+         if ( ! ndf1->fits.loaded ) {
             STARCALL( 
                int there;
 
 /* See if a FITS extension exists. */
-               ndfXstat( ndf->identifier, "FITS", &there, status );
+               ndfXstat( ndf1->identifier, "FITS", &there, status );
 
 /* If it does, then map it. */
                if ( F77_ISTRUE(there) ) {
@@ -628,7 +408,7 @@
                   DECLARE_CHARACTER( faccess, 6 );
 
 /* Get an HDS locator. */
-                  ndfXloc( ndf->identifier, "FITS", "READ", loc, status );
+                  ndfXloc( ndf1->identifier, "FITS", "READ", loc, status );
                   cnfExpch( loc, floc, floc_length );
                   cnfExprt( "READ", faccess, faccess_length );
                   cnfExprt( "_CHAR*80", ftype, ftype_length );
@@ -637,8 +417,8 @@
                   F77_CALL(dat_mapv)( CHARACTER_ARG(floc), 
                                       CHARACTER_ARG(ftype), 
                                       CHARACTER_ARG(faccess),
-                                      (F77_POINTER_TYPE *) &ndf->fits.data,
-                                      INTEGER_ARG(&ndf->fits.ncard),
+                                      (F77_POINTER_TYPE *) &ndf1->fits.data,
+                                      INTEGER_ARG(&ndf1->fits.ncard),
                                       INTEGER_ARG(status)
                                       TRAIL_ARG(floc) TRAIL_ARG(ftype) 
                                       TRAIL_ARG(faccess) );
@@ -647,11 +427,11 @@
 /* There was no FITS extension; record this as effectively a mapped FITS
    block of zero length. */
                else {
-                  ndf->fits.ncard = 0;
+                  ndf1->fits.ncard = 0;
                }
 
 /* Record that we have got any FITS headers there are to get. */
-               ndf->fits.loaded = 1;
+               ndf1->fits.loaded = 1;
             )
          }
 
@@ -663,8 +443,8 @@
             char *card;
             char *pc;
             Tcl_Obj *cardobj;
-            for ( j = 0; j < ndf->fits.ncard; j++ ) {
-               card = ndf->fits.data + j * 80;
+            for ( j = 0; j < ndf1->fits.ncard; j++ ) {
+               card = ndf1->fits.data + j * 80;
                pc = card + 79;
                while ( *pc == ' ' && pc >= card ) pc--;
                while ( *pc == '/' && pc >= card ) pc--;
@@ -695,8 +475,8 @@
                   DECLARE_CHARACTER( fkey, 80 );
                   DECLARE_CHARACTER( fvalue, 80 );
                   cnfExprt( key, fkey, 80 );
-                  ipfits = cnfFptr( ndf->fits.data );
-                  F77_CALL(ccd1_ftget)( INTEGER_ARG(&ndf->fits.ncard),
+                  ipfits = cnfFptr( ndf1->fits.data );
+                  F77_CALL(ccd1_ftget)( INTEGER_ARG(&ndf1->fits.ncard),
                                         (F77_POINTER_TYPE *) &ipfits,
                                         INTEGER_ARG(&one),
                                         CHARACTER_ARG(fkey),
@@ -718,144 +498,6 @@
                Tcl_ListObjAppendElement( interp, result, valobj );
             }
          }
-      }
-
-
-/**********************************************************************/
-/* "frameatt" command                                                 */
-/**********************************************************************/
-      else if ( ! strcmp( command, "frameatt" ) ) {
-         int getindex;
-         int ifrm;
-         char *attname;
-         const char (*aval);
-         AstFrame *frame;
-
-/* Check syntax. */
-         if ( objc < 3 || objc > 4 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "attname ?frame?" );
-            return TCL_ERROR;
-         }
-
-/* Get string argument. */
-         attname = Tcl_GetString( objv[ 2 ] );
-         getindex = strcasecmp( attname, "index" ) ? 0 : 1;
-
-/* Get frame argument. */
-         ifrm = AST__NOFRAME;
-         if ( objc == 4 ) {
-            if ( NdfGetIframeFromObj( interp, objv[ 3 ], ndf->wcs, &ifrm ) 
-                 != TCL_OK ) {
-               return TCL_ERROR;
-            }
-         }
-
-/* Begin AST context. */
-         astBegin;
-
-/* Get values and place them in the result object. */
-         if ( ifrm != AST__NOFRAME ) {
-            if ( getindex ) {
-               result = Tcl_NewIntObj( ifrm );
-            }
-            else {
-               ASTCALL( 
-                  frame = astGetFrame( ndf->wcs, ifrm );
-                  aval = astGetC( frame, attname );
-               )
-               result = Tcl_NewStringObj( aval, -1 );
-            }
-         }
-         else {
-            Tcl_Obj *ob;
-            result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
-            for ( ifrm = 1; ifrm <= astGetI( ndf->wcs, "Nframe" ); ifrm++ ) {
-               if ( getindex ) {
-                  ob = Tcl_NewIntObj( ifrm );
-               }
-               else {
-                  ASTCALL(
-                     frame = astGetFrame( ndf->wcs, ifrm );
-                  )
-                  ASTCALL(
-                     ob = Tcl_NewStringObj( astGetC( frame, attname ), -1 );
-                     if ( ! astOK ) {
-                        astClearStatus;
-                        ob = Tcl_NewDoubleObj( astGetD( frame, attname ) );
-                     }
-                  )
-               }
-               Tcl_ListObjAppendElement( interp, result, ob );
-            }
-         }
-
-/* End AST context. */
-         astEnd;
-      }
-
-
-/**********************************************************************/
-/* "mapped" command                                                   */
-/**********************************************************************/
-      else if ( ! strcmp( command, "mapped" ) ) {
-         int requested;
-
-/* More than three arguments - syntax error. */      
-         if ( objc > 3 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "?setmap?" );
-            return TCL_ERROR;
-         }
-
-/* Three arguments - get a Boolean value for the requested state. */
-         if ( objc == 3 ) {
-            if ( Tcl_GetBooleanFromObj( interp, objv[ 2 ], &requested ) 
-                 != TCL_OK ) { 
-               result = Tcl_NewStringObj( "ndf mapped: third argument \"", -1 );
-               Tcl_AppendObjToObj( result, objv[ 2 ] );
-               Tcl_AppendStringsToObj( result, "\" should be Boolean", 
-                                       (char *) NULL );
-               Tcl_SetObjResult( interp, result );
-               return TCL_ERROR;
-            }
-         }
-
-/* Set value of result to the current (intial) value of the attribute. */
-         result = Tcl_NewBooleanObj( ndf->mapped );
-         Tcl_SetObjResult( interp, result );
-
-/* Now we check whether a state different from the current state has been 
-   requested.  If not, the following code will just fall through to the
-   exit. */
-
-/* A mapped state has been requested, and we are not already mapped. */
-         if ( objc == 3 && requested && ! ndf->mapped ) {
-            STARCALL( 
-               domapdata( ndf, status );
-            )
-         }
-
-/* An unmapped state has been requested, and we are currently mapped. */
-         else if ( objc == 3 && ! requested && ndf->mapped ) {
-            STARCALL( 
-               dounmapdata( ndf, status );
-            )
-         }
-      }
-
-
-/**********************************************************************/
-/* "name" command                                                     */
-/**********************************************************************/
-      else if ( ! strcmp( command, "name" ) ) {
-
-/* Check syntax. */
-         if ( objc != 2 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "" );
-            return TCL_ERROR;
-         } 
-
-/* Set result and return successfully. */
-         result = Tcl_NewStringObj( ndf->name, -1 );
       }
 
 
@@ -896,7 +538,7 @@
    most of the ones which might be likely to be needed, we can probably
    save time on subsequent calls. */
          nextra = 0;
-         first = ( Tcl_FirstHashEntry( &ndf->perchash, &hsearch ) == NULL );
+         first = ( Tcl_FirstHashEntry( &ndf1->perchash, &hsearch ) == NULL );
          if ( first ) {
             nextra = sizeof( initset ) / sizeof( initset[ 0 ] );
          }
@@ -937,7 +579,7 @@
             PercHashKey hkey;
             hkey.hash = NULL;
             hkey.data = percs[ i ];
-            if ( Tcl_FindHashEntry( &ndf->perchash, hkey.hash ) == NULL ) {
+            if ( Tcl_FindHashEntry( &ndf1->perchash, hkey.hash ) == NULL ) {
                fracs[ nfrac++ ] = percs[ i ] * 0.01;
             }
          }
@@ -961,23 +603,23 @@
                F77_LOGICAL_TYPE bad;
 
 /* If the array is not currently mapped, we have to map it. */
-               if ( ! ndf->mapped ) domapdata( ndf, status );
+               if ( ! ndf1->mapped ) domapdata( ndf1, status );
 
 /* Massage some arguments for fortran. */
-               bad = F77_ISTRUE(ndf->bad);
-               cnfExprt( ndf->mtype, type, DAT__SZTYP );
+               bad = F77_ISTRUE(ndf1->bad);
+               cnfExprt( ndf1->mtype, type, DAT__SZTYP );
 
 /* Call the routine which does the calculations. */
                F77_CALL(ccd1_fra)( CHARACTER_ARG(type),
-                                   INTEGER_ARG(&ndf->nel),
-                                   (F77_POINTER_TYPE) &ndf->data,
+                                   INTEGER_ARG(&ndf1->nel),
+                                   (F77_POINTER_TYPE) &ndf1->data,
                                    INTEGER_ARG(&nfrac), DOUBLE_ARG(fracs),
                                    LOGICAL_ARG(&bad), DOUBLE_ARG(work),
                                    DOUBLE_ARG(vals), INTEGER_ARG(status)
                                    TRAIL_ARG(type) );
 
 /* We can update the bad flag as a bonus. */
-               ndf->bad = F77_ISTRUE(bad);
+               ndf1->bad = F77_ISTRUE(bad);
             )
             free( work );
 
@@ -989,7 +631,7 @@
                int new;
                hkey.hash = NULL;
                hkey.data = fracs[ i ] * 100.0;
-               entry = Tcl_CreateHashEntry( &ndf->perchash, hkey.hash, &new );
+               entry = Tcl_CreateHashEntry( &ndf1->perchash, hkey.hash, &new );
                hval.hash = (ClientData) NULL;
                hval.data = vals[ i ];
                Tcl_SetHashValue( entry, hval.hash );
@@ -1004,10 +646,10 @@
             Tcl_HashEntry *entry; 
             hkey.hash = NULL;
             hkey.data = percs[ i ];
-            entry = Tcl_FindHashEntry( &ndf->perchash, hkey.hash );
+            entry = Tcl_FindHashEntry( &ndf1->perchash, hkey.hash );
             if ( entry == NULL ) {    /* kludge - sorry */
                hkey.data = ( percs[ i ] * 0.01 ) * 100.0;
-               entry = Tcl_FindHashEntry( &ndf->perchash, hkey.hash );
+               entry = Tcl_FindHashEntry( &ndf1->perchash, hkey.hash );
             }
             hval.hash = Tcl_GetHashValue( entry );
             vals[ i ] = hval.data;
@@ -1024,35 +666,6 @@
          free( fracs );
          free( percs );
          free( vals );
-      }
-
-
-/**********************************************************************/
-/* "pixelsize" command                                                */
-/**********************************************************************/
-      else if ( ! strcmp( command, "pixelsize" ) ) {
-         double size;
-         int iframe;
-
-/* Check syntax. */
-         if ( objc != 3 ) {
-            Tcl_WrongNumArgs( interp, 2, objv, "frame" );
-            return TCL_ERROR;
-         }
-
-/* Get frame argument. */
-         if ( NdfGetIframeFromObj( interp, objv[ 2 ], ndf->wcs, &iframe )
-              != TCL_OK ) {
-            return TCL_ERROR;
-         }
-
-/* Get the pixel unit size. */
-         STARCALL(
-            size = getpixelsize( ndf, iframe, status );
-         )
-
-/* Set the result object. */
-         result = Tcl_NewDoubleObj( size );
       }
 
 
@@ -1074,21 +687,21 @@
          }
 
 /* Get frame argument. */
-         if ( NdfGetIframeFromObj( interp, objv[ 2 ], ndf->wcs, &iframe ) 
+         if ( NdfGetIframeFromObj( interp, objv[ 2 ], wcs, &iframe ) 
               != TCL_OK ) {
             return TCL_ERROR;
          }
 
 /* Set positions of the corners in the base frame. */
          xb[ 0 ] = xb[ 3 ] = 0.5;
-         xb[ 1 ] = xb[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1.5;
+         xb[ 1 ] = xb[ 2 ] = ndf1->ubnd[ 0 ] - ndf1->lbnd[ 0 ] + 1.5;
          yb[ 0 ] = yb[ 1 ] = 0.5;
-         yb[ 2 ] = yb[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1.5;
+         yb[ 2 ] = yb[ 3 ] = ndf1->ubnd[ 1 ] - ndf1->lbnd[ 1 ] + 1.5;
 
 /* Get the positions of the corners in the requested frame. */
          ASTCALL(
             astBegin;
-            map = astGetMapping( ndf->wcs, AST__BASE, iframe );
+            map = astGetMapping( wcs, AST__BASE, iframe );
             astTran2( map, 4, xb, yb, 1, xf, yf );
             astEnd;
          )
@@ -1118,11 +731,701 @@
 
 /* Check validity of the NDF identifier.  It should always be valid though. */
          STARCALL(
-            ndfValid( ndf->identifier, &valid, status );
+            ndfValid( ndf1->identifier, &valid, status );
          )
 
 /* Set result value. */
          result = Tcl_NewBooleanObj( F77_ISTRUE(valid) );
+      }
+
+
+/**********************************************************************/
+/* No known command.                                                  */
+/**********************************************************************/
+      else {
+
+/* Exit with a helpful message and error status. */
+         result = Tcl_NewStringObj( "", 0 );
+         Tcl_AppendObjToObj( result, objv[ 0 ] );
+         Tcl_AppendStringsToObj( result, " ", (char *) NULL );
+         Tcl_AppendObjToObj( result, objv[ 1 ] );
+         Tcl_AppendStringsToObj( result, ": ndf object command not known.  ",
+                               "Should be one of -",
+                               "\n    bbox frame",
+                               "\n    bounds", 
+                               "\n    destroy",
+                               "\n    display ?-resamp? device loval hival "
+                                             "frame plotstyle",
+                               "\n    fitshead ?key? ...",
+                               "\n    frameatt attname ?frame?",
+                               "\n    mapped ?setmap?",
+                               "\n    name",
+                               "\n    percentile perc ?perc? ...",
+                               "\n    pixelsize frame",
+                               "\n    polygon frame",
+                               "\n    validndf",
+                               "\n    wcstran ?-format? from to pos ?pos ...?",
+                               (char *) NULL );
+         Tcl_SetObjResult( interp, result );
+         return TCL_ERROR;
+      }
+
+/* If we've got here, we want to exit with the result in result, and 
+   success status. */
+      Tcl_SetObjResult( interp, result );
+      return TCL_OK;
+   }
+
+
+
+/**********************************************************************/
+   int NdfsetCmd( ClientData clientData, Tcl_Interp *interp, int objc,
+                  Tcl_Obj *CONST objv[] ) {
+/**********************************************************************/
+      Ndfset *ndfset;
+      AstFrameSet *wcs;
+      static int counter = 0;
+      int i;
+      int nleng;
+      int nndf;
+      Tcl_Obj *op;
+      char *ndfsetname;
+
+/* Check command arguments.  There should be one or more extra arguments
+   for the constructor, each the name of an NDF. */
+      if ( objc < 3 ) { 
+         Tcl_WrongNumArgs( interp, 1, objv, "setName ndfName ?ndfName ...?" );
+         return TCL_ERROR;
+      }
+
+/* Get the number of NDFs in the Set. */
+      nndf = objc - 2;
+
+/* Get the name of the ndfset. */
+      ndfsetname = Tcl_GetStringFromObj( objv[ 1 ], &nleng );
+
+/* Allocate the data structure to hold the client data. */
+      ndfset = (Ndfset *) malloc( sizeof( Ndfset ) );
+      ndfset->name = malloc( nleng );
+      ndfset->plotarray = malloc( sizeof( Plotarray ) );
+      ndfset->content.ndfs = malloc( nndf * sizeof( Ndf * ) );
+      if ( tclmemok( interp, ndfset ) != TCL_OK ||
+           tclmemok( interp, ndfset->name ) != TCL_OK ||
+           tclmemok( interp, ndfset->content.ndfs ) != TCL_OK ||
+           tclmemok( interp, ndfset->plotarray ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
+
+/* Open each named NDF and store a pointer to the resulting data structure. */
+      for ( i = 0; i < nndf; i++ ) {
+         if ( newNdf( interp, objv[ i + 2 ], 
+                      &ndfset->content.ndfs[ i ] ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+      }
+
+/* Set the ndfset's WCS frameset, arbitrarily, to that of the first of
+   of the NDFs. */
+      ndfset->wcs = ndfset->content.ndfs[ 0 ]->wcs;
+
+/* Do some other initialisation. */
+      ndfset->nmember = nndf;
+      strcpy( ndfset->name, ndfsetname );
+      ndfset->plotarray->exists = 0;
+      ndfset->plotarray->data = NULL;
+
+/* Create a new Tcl command corresponding to the newly created object. */
+      sprintf( buffer, "ndfset%d", counter );
+      Tcl_CreateObjCommand( interp, buffer, ObjectNdfsetCmd, 
+                            (ClientData) ndfset, DeleteNdfset );
+
+/* Bump the object count. */
+      counter++;
+
+/* Return the name of the new command as the result of this command. */
+      op = Tcl_NewStringObj( buffer, -1 );
+      Tcl_SetObjResult( interp, op );
+
+/* Return successful operation code. */
+      return TCL_OK;
+   }
+
+
+/**********************************************************************/
+   void DeleteNdfset( ClientData clientData ) {
+/**********************************************************************/
+      Ndfset *ndfset = (Ndfset *) clientData;
+      int i;
+
+      free( ndfset->name );
+      free( ndfset->plotarray->data );
+      free( ndfset->plotarray );
+      for ( i = 0; i < ndfset->nmember; i++ ) {
+         forgetNdf( ndfset->content.ndfs[ i ] );
+      }
+      free( ndfset->content.ndfs );
+      free( ndfset );
+   }
+
+
+/**********************************************************************/
+   int ObjectNdfsetCmd( ClientData clientData, Tcl_Interp *interp, int objc,
+                        Tcl_Obj *CONST objv[] ) {
+/**********************************************************************/
+      NdfOrNdfset *ndfset = (NdfOrNdfset *) clientData;
+      Ndf **ndfs;
+      AstFrameSet *wcs = ndfset->wcs;
+      Tcl_Obj *result = NULL;
+      char *command = Tcl_GetString( objv[ 1 ] );
+      int nndf;
+
+/* Take care of pending Tcl events now, in case what we are about to do
+   is time-consuming. */
+      tclupdate();
+
+/* Get a list of ndf objects we can work with. */
+      if ( ndfset->nmember ) {
+         nndf = ndfset->nmember;
+         ndfs = ndfset->content.ndfs;
+      }
+      else {
+         nndf = 1;
+         ndfs = &ndfset;
+      }
+
+
+/**********************************************************************/
+/* "bbox" command                                                     */
+/**********************************************************************/
+      if ( ! strcmp( command, "bbox" ) ) {
+         Tcl_Obj *ov[ 2 ];
+         double lbox[ NDF__MXDIM ];
+         double ubox[ NDF__MXDIM ];
+         int i;
+         int *iframes;
+         int ndim;
+
+/* Check syntax. */
+         if ( objc != 3 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "frame" );
+            return TCL_ERROR;
+         }
+
+/* Allocate some memory. */
+         iframes = malloc( nndf * sizeof( int ) );
+         if ( tclmemok( interp, iframes ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Interpret the frame argument. */
+         if ( NdfGetIframesFromObj( interp, objv[ 2 ], ndfset, iframes )
+              != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Get the bounding box. */
+         STARCALL(
+            getbbox( ndfset, iframes, lbox, ubox, status );
+         )
+
+/* Release memory. */
+         free( iframes );
+
+/* Get the number of dimensions. */
+         ndim = 0;
+         for ( i = 0; i < nndf; i++ ) {
+            ndim = max( ndim, ndfs[ i ]->content.ndf1->ndim );
+         }
+
+/* Set the result object. */
+         result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
+         for ( i = 0; i < ndim; i++ ) {
+            ov[ 0 ] = Tcl_NewDoubleObj( lbox[ i ] );
+            ov[ 1 ] = Tcl_NewDoubleObj( ubox[ i ] );
+            Tcl_ListObjAppendElement( interp, result, Tcl_NewListObj( 2, ov ) );
+         }
+      }
+
+
+/**********************************************************************/
+/* "destroy" command                                                  */
+/**********************************************************************/
+      else if ( ! strcmp( command, "destroy" ) ) {
+
+/* Check syntax. */
+         if ( objc != 2 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "" );
+            return TCL_ERROR;
+         }
+
+/* Initiate destruction.  This call will delete the command from the 
+   interpreter and invoke our object deletion callback too.  */
+         Tcl_DeleteCommand( interp, Tcl_GetString( objv[ 0 ] ) );
+
+/* Set result. */
+         result = Tcl_NewStringObj( "", 0 );
+      }
+
+
+/**********************************************************************/
+/* "display" command                                                  */
+/**********************************************************************/
+      else if ( ! strcmp( command, "display" ) ) {
+         int const badcolour = 0;
+         int i;
+         int locolour;
+         int hicolour;
+         int nflag;
+         int resamp;
+         int xpix;
+         int ypix;
+         int *iframes;
+         int *pframes;
+         int *pixbloc;
+         char *device;
+         char *settings;
+         float factor;
+         float gbox[ 4 ];
+         float xplo;
+         float xphi; 
+         float yplo;
+         float yphi;
+         double bbox[ 4 ];
+         double loval;
+         double hival;
+         double psize;
+         double zoom;
+         struct ndfdisplay_args args;
+         Tcl_Obj argob;
+         Tcl_Obj *ov[ 1 ];
+
+/* Process flags. */
+         resamp = 0;
+         nflag = 0;
+         if ( objc > 2 + nflag &&
+              ! strcmp( Tcl_GetString( objv[ 2 ] + nflag ), "-resamp" ) ) {
+            resamp = 1;
+            nflag++;
+         }
+
+/* Check syntax. */
+         if ( objc != 7 + nflag ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "?-resamp? "
+                              "device loval hival frame plotstyle" );
+                            /* 2      3     4     5     6        */
+            return TCL_ERROR;
+         }
+
+/* Get string arguments. */
+         device = Tcl_GetString( objv[ 2 + nflag ] );
+         settings = Tcl_GetString( objv[ 6 + nflag ] );
+
+/* Get numeric arguments. */
+         if ( Tcl_GetDoubleFromObj( interp, 
+                                    objv[ 3 + nflag ], &loval ) != TCL_OK ||
+              Tcl_GetDoubleFromObj( interp, 
+                                    objv[ 4 + nflag ], &hival ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+           
+/* Allocate some space. */
+         iframes = malloc( nndf * sizeof( int ) );
+         pframes = malloc( nndf * sizeof( int ) );
+         if ( tclmemok( interp, iframes ) != TCL_OK ||
+              tclmemok( interp, pframes ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Get frame argument. */
+         if ( NdfGetIframesFromObj( interp, objv[ 5 + nflag ], 
+                                    ndfset, iframes ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Set the frame into which the image will be resampled for plotting to 
+   the GRID frame. */
+         for ( i = 0; i < nndf; i++ ) {
+            pframes[ i ] = resamp ? iframes[ i ] : AST__BASE;
+         }
+
+/* Open the PGPLOT plotting device. */
+         if ( cpgopen( device ) <= 0 ) {
+            result = Tcl_NewStringObj( "Failed to open plotting device", -1 );
+            Tcl_SetObjResult( interp, result );
+            return TCL_ERROR;
+         }
+
+/* Query the plotting device for highest and lowest available colour indices. */
+         cpgqcir( &locolour, &hicolour );
+
+/* Set the plotting coordinate limits. */
+         STARCALL(
+            psize = getpixelsize( ndfset, pframes[ 0 ], status );
+            getbbox( ndfset, pframes, bbox, bbox + 2, status );
+         )
+         for ( i = 0; i < 4; i++ ) gbox[ i ] = (float) bbox[ i ];
+
+/* Set the viewport to use all of the available surface, within the 
+   constraint that the correct aspect ratio is retained. */
+         cpgsvp( 0.0, 1.0, 0.0, 1.0 );
+         cpgwnad( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+
+/* Get the viewport size in pixels. */
+         cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
+
+/* Close PGPLOT down for now. */
+         cpgclos();
+
+/* Update pending Tcl events. */
+         tclupdate();
+
+/* Set the zoom factor so that PGPLOT can optimise the plotting.  Basically
+   this entails making the pixel array the same shape as the plotting 
+   surface.  However, making it a lot bigger than the plotting surface
+   would be a waste of memory. */
+         factor = 1.0;
+         zoom = 10.0 / psize;
+         while ( zoom > 2.1 / psize ) {
+            zoom = ( xphi - xplo ) / ( bbox[ 2 ] - bbox[ 0 ] ) / factor++;
+         }
+
+/* Prepare the image in a PGPLOT-friendly form. */
+         STARCALL(
+            pixbloc = getpixbloc( ndfset, pframes, zoom, loval, hival, 
+                                  locolour, hicolour, badcolour, status );
+         )
+         xpix = ndfset->plotarray->xdim;
+         ypix = ndfset->plotarray->ydim;
+
+/* The rest of the processing can be performed as an independent background
+   process, since it may take a significant amount of time and we want 
+   Tcl events to continue to be serviced. */
+
+/* Set up the arguments block for the rest of the processing. */
+         argob.internalRep.otherValuePtr = &args;
+         ov[ 0 ] = &argob;
+         args.device = device;
+         args.settings = settings;
+         args.pixbloc = pixbloc;
+         args.gbox = gbox;
+         args.bbox = bbox;
+         args.psize = psize;
+         args.zoom = ndfset->plotarray->zoom;
+         args.wcs = wcs;
+         args.iframes = iframes;
+         args.pframes = pframes;
+         args.xpix = xpix;
+         args.ypix = ypix;
+
+/* Call the routine to do the plotting. */
+/* I was experimenting with doing this in a subprocess so that the Tcl
+   event loop was attended to during processing.  This is why ndfdisplay
+   is implemented as a separate routine here.  It can be invoked in 
+   this way using the call:
+      if ( tclbgcmd( (ClientData) ndfdisplay, interp, 1, ov ) != TCL_OK )
+   However, this doesn't seem to solve enough problems to be worthwhile,
+   so it is currently written to execute in the main process. */
+         if ( ((Tcl_ObjCmdProc *) ndfdisplay)( (ClientData) NULL, 
+                                               interp, 1, ov ) != TCL_OK ) {
+            printf( "It's an error" );
+            return TCL_ERROR;
+         }
+
+/* Free some resources. */
+         free( iframes );
+         free( pframes );
+
+/* Get the result and return. */
+         result = Tcl_GetObjResult( interp );
+      }
+
+
+/**********************************************************************/
+/* "frameatt" command                                                 */
+/**********************************************************************/
+      else if ( ! strcmp( command, "frameatt" ) ) {
+         int getindex;
+         int ifrm;
+         char *attname;
+         const char (*aval);
+         AstFrame *frame;
+
+/* Check syntax. */
+         if ( objc < 3 || objc > 4 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "attname ?frame?" );
+            return TCL_ERROR;
+         }
+
+/* Get string argument. */
+         attname = Tcl_GetString( objv[ 2 ] );
+         getindex = strcasecmp( attname, "index" ) ? 0 : 1;
+
+/* Get frame argument. */
+         ifrm = AST__NOFRAME;
+         if ( objc == 4 ) {
+            if ( NdfGetIframeFromObj( interp, objv[ 3 ], wcs, &ifrm ) 
+                 != TCL_OK ) {
+               return TCL_ERROR;
+            }
+         }
+
+/* Begin AST context. */
+         ASTCALL(
+            astBegin;
+
+/* Either get the value for a single frame and place it in the result 
+   object. */
+            if ( ifrm != AST__NOFRAME ) {
+               if ( getindex ) {
+                  result = Tcl_NewIntObj( ifrm );
+               }
+               else {
+                  frame = astGetFrame( wcs, ifrm );
+                  aval = astGetC( frame, attname );
+                  result = Tcl_NewStringObj( aval, -1 );
+               }
+            }
+
+/* Or loop over all the frames and append the value for each one to
+   the result object. */
+            else {
+               Tcl_Obj *ob;
+               result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
+               for ( ifrm = 1; ifrm <= astGetI( wcs, "Nframe" ); ifrm++ ) {
+                  if ( getindex ) {
+                     ob = Tcl_NewIntObj( ifrm );
+                  }
+                  else {
+                     frame = astGetFrame( wcs, ifrm );
+                     ob = Tcl_NewStringObj( astGetC( frame, attname ), -1 );
+                     if ( ! astOK ) {
+                        astClearStatus;
+                        ob = Tcl_NewDoubleObj( astGetD( frame, attname ) );
+                     }
+                  }
+                  Tcl_ListObjAppendElement( interp, result, ob );
+               }
+            }
+
+/* End AST context. */
+            astEnd;
+         )
+      }
+
+
+/**********************************************************************/
+/* "mapped" command                                                   */
+/**********************************************************************/
+      else if ( ! strcmp( command, "mapped" ) ) {
+         Ndf1 *ndf1;
+         int i;
+         int requested;
+
+/* More than three arguments - syntax error. */      
+         if ( objc > 3 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "?setmap?" );
+            return TCL_ERROR;
+         }
+
+/* Three arguments - get a Boolean value for the requested state. */
+         if ( objc == 3 ) {
+            if ( Tcl_GetBooleanFromObj( interp, objv[ 2 ], &requested ) 
+                 != TCL_OK ) { 
+               result = Tcl_NewStringObj( "ndf mapped: third argument \"", -1 );
+               Tcl_AppendObjToObj( result, objv[ 2 ] );
+               Tcl_AppendStringsToObj( result, "\" should be Boolean", 
+                                       (char *) NULL );
+               Tcl_SetObjResult( interp, result );
+               return TCL_ERROR;
+            }
+         }
+
+/* Set value of result to the current (intial) value of the attribute. */
+         result = Tcl_NewBooleanObj( ndfs[ 0 ]->content.ndf1->mapped );
+         Tcl_SetObjResult( interp, result );
+
+/* Now we check for each NDF whether a state different from the current 
+   state has been requested.  If not, the following code will just fall
+   through to the exit. */
+         STARCALL(
+            for ( i = 0; i < nndf; i++ ) {
+               ndf1 = ndfs[ i ]->content.ndf1;
+
+/* A mapped state has been requested, and we are not already mapped. */
+               if ( objc == 3 && requested && ! ndf1->mapped ) {
+                  domapdata( ndf1, status );
+               }
+
+/* An unmapped state has been requested, and we are currently mapped. */
+               else if ( objc == 3 && ! requested && ndf1->mapped ) {
+                  dounmapdata( ndf1, status );
+               }
+            }
+         )
+      }
+
+
+/**********************************************************************/
+/* "name" command                                                     */
+/**********************************************************************/
+      else if ( ! strcmp( command, "name" ) ) {
+
+/* Check syntax. */
+         if ( objc != 2 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "" );
+            return TCL_ERROR;
+         } 
+
+/* Set result and return successfully. */
+         result = Tcl_NewStringObj( ndfset->name, -1 );
+      }
+
+
+/**********************************************************************/
+/* "ndfdo" command                                                    */
+/**********************************************************************/
+      else if ( ! strcmp( command, "ndfdo" ) ) {
+         int doall;
+         int ndfobjc;
+         int imember;
+         Tcl_Obj **ndfobjv;
+
+/* Check syntax. */
+         ndfobjc = objc - 2;
+         if ( ndfobjc < 1 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "index|all command ?args...?" );
+            return TCL_ERROR;
+         }
+         ndfobjv = (Tcl_Obj **CONST) objv + ( objc - ndfobjc );
+
+/* Obtain the member index or the value "all" indicating which member(s)
+   the command should be performed on. */
+         doall = 0;
+         if ( Tcl_GetIntFromObj( interp, objv[ 2 ], &imember ) != TCL_OK ) {
+            if ( ! strcmp( Tcl_GetString( objv[ 2 ] ), "all" ) ) {
+               doall = 1;
+            }
+            else {
+               return TCL_ERROR;
+            }
+         }
+
+/* Either loop over all member ndfs, handing off each request to
+   ObjectNdfCmd and appending to a list object. */
+         if ( doall ) {
+            result = Tcl_NewListObj( 0, NULL );
+            for ( imember = 0; imember < nndf; imember++ ) {
+               if ( ObjectNdfCmd( (ClientData) ndfset->content.ndfs[ imember ],
+                                  interp, ndfobjc, ndfobjv ) != TCL_OK ||
+                    Tcl_ListObjAppendElement( interp, result, 
+                                              Tcl_GetObjResult( interp ) ) 
+                                                             != TCL_OK ) {
+                       return TCL_ERROR;
+               }
+            }
+         }
+
+/* Or check that we have been asked about an extant member and hand a 
+   single request to ObjectNdfCmd. */
+         else {
+            if ( ( imember >= ndfset->nmember || imember < 0 ) ) {
+               sprintf( buffer, "ndfset ndfob: index %d out of range 0..%d",
+                        imember, ndfset->nmember - 1 );
+               result = Tcl_NewStringObj( buffer, -1 );
+               Tcl_SetObjResult( interp, result );
+               return TCL_ERROR;
+            }
+            else {
+               if ( ObjectNdfCmd( (ClientData) ndfset->content.ndfs[ imember ], 
+                                  interp, ndfobjc, ndfobjv ) != TCL_OK ) {
+                  return TCL_ERROR;
+               }
+               result = Tcl_GetObjResult( interp );
+            }
+         }
+      }
+
+
+/**********************************************************************/
+/* "nndf" command                                                     */
+/**********************************************************************/
+      else if ( ! strcmp( command, "nndf" ) ) {
+
+/* Check syntax. */
+         if ( objc != 2 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "" );
+            return TCL_ERROR;
+         }
+
+/* Return the number of members. */
+         result = Tcl_NewIntObj( nndf );
+      }
+
+
+/**********************************************************************/
+/* "pixelsize" command                                                */
+/**********************************************************************/
+      else if ( ! strcmp( command, "pixelsize" ) ) {
+         double size;
+         int iframe;
+
+/* Check syntax. */
+         if ( objc != 3 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "frame" );
+            return TCL_ERROR;
+         }
+
+/* Get frame argument. */
+         if ( NdfGetIframeFromObj( interp,
+                                   objv[ 2 ], wcs, &iframe ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Get the pixel unit size. */
+         STARCALL(
+            size = getpixelsize( ndfset, iframe, status );
+         )
+
+/* Set the result object. */
+         result = Tcl_NewDoubleObj( size );
+      }
+
+
+/**********************************************************************/
+/* "validndfset" command                                              */
+/**********************************************************************/
+      else if ( ! strcmp( command, "validndfset" ) ) {
+         int i;
+         int ok;
+         int valid;
+         Ndf1 *ndf1;
+
+/* Check syntax. */
+         if ( objc != 2 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "" );
+            return TCL_ERROR;
+         }
+
+/* Check that it is an ndfset not an ndf. */
+         if ( ndfset->nmember <= 0 ) {
+            valid = 0;
+         }
+         else {
+
+/* Check that each of the member NDFs has a valid identifier.  They should
+   do. */
+            valid = 1;
+            STARCALL(
+               for ( i = 0; i < ndfset->nmember; i++ ) {
+                  ndf1 = ndfset->content.ndfs[ i ]->content.ndf1;
+                  ndfValid( ndf1->identifier, &ok, status );
+                  valid = valid && F77_ISTRUE(ok);
+               }
+            )
+         }
+
+/* Set the result value. */
+         result = Tcl_NewBooleanObj( valid );
       }
 
 
@@ -1132,6 +1435,8 @@
       else if ( ! strcmp( command, "wcstran" ) ) {
          int form;
          int iframe[ 2 ];
+         int i;
+         int j;
          int nflag;
          int nin;
          int nout;
@@ -1154,13 +1459,13 @@
 /* Check syntax. */
          if ( objc + nflag < 4 ) {
             Tcl_WrongNumArgs( interp, 2, objv, 
-                              "?options? from to pos ?pos ...?" );
+                              "?-format? from to pos ?pos ...?" );
             return TCL_ERROR;
          }
 
 /* Get frame arguments. */
          for ( i = 0; i < 2; i++ ) {
-            if ( NdfGetIframeFromObj( interp, objv[ nflag + 2 + i ], ndf->wcs,
+            if ( NdfGetIframeFromObj( interp, objv[ nflag + 2 + i ], wcs,
                                       &iframe[ i ] ) != TCL_OK ) {
                return TCL_ERROR;
             }
@@ -1170,12 +1475,12 @@
          npos = objc - nflag - 4;
 
 /* Begin AST context. */
-         astBegin;
+         ASTCALL(
+            astBegin;
 
 /* Get the mapping between the two frames. */
-         ASTCALL(
-            imap = astGetMapping( ndf->wcs, iframe[ 0 ], iframe[ 1 ] );
-            outframe = astGetFrame( ndf->wcs, iframe[ 1 ] );
+            imap = astGetMapping( wcs, iframe[ 0 ], iframe[ 1 ] );
+            outframe = astGetFrame( wcs, iframe[ 1 ] );
             nin = astGetI( imap, "Nin" );
             nout = astGetI( imap, "Nout" );
          )
@@ -1249,9 +1554,10 @@
 /* Tidy up. */
          free( inpos );
          free( outpos );
-         astEnd;
+         ASTCALL(
+            astEnd;
+         )
       }
-
 
 /**********************************************************************/
 /* No known command.                                                  */
@@ -1263,22 +1569,20 @@
          Tcl_AppendObjToObj( result, objv[ 0 ] );
          Tcl_AppendStringsToObj( result, " ", (char *) NULL );
          Tcl_AppendObjToObj( result, objv[ 1 ] );
-         Tcl_AppendStringsToObj( result, ": ndf object command not known.  ",
+         Tcl_AppendStringsToObj( result, ": ndfset object command not known.  ",
                                "Should be one of -",
                                "\n    bbox frame",
-                               "\n    bounds", 
                                "\n    destroy",
-                               "\n    display ?options? device loval hival "
+                               "\n    display ?-resamp? device loval hival "
                                              "frame plotstyle",
-                               "\n    fitshead ?key? ...",
                                "\n    frameatt attname ?frame?",
                                "\n    mapped ?setmap?",
                                "\n    name",
-                               "\n    percentile perc ?perc? ...",
+                               "\n    ndfdo index|all command ?args ...?",
+                               "\n    nndf",
                                "\n    pixelsize frame",
-                               "\n    polygon frame",
-                               "\n    validndf",
-                               "\n    wcstran ?options? from to pos ?pos ...?",
+                               "\n    validndfset",
+                               "\n    wcstran ?-format? from to pos ?pos ...?",
                                (char *) NULL );
          Tcl_SetObjResult( interp, result );
          return TCL_ERROR;
@@ -1289,7 +1593,6 @@
       Tcl_SetObjResult( interp, result );
       return TCL_OK;
    }
-
 
 
 /**********************************************************************/
@@ -1315,6 +1618,10 @@
       Tcl_CreateObjCommand( interp, "ndf", NdfCmd,
                             (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
+/* Create the "ndfset" object creation command. */
+      Tcl_CreateObjCommand( interp, "ndfset", NdfsetCmd,
+                            (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
 /* The module has initialised successfully. */
       return TCL_OK;
    }
@@ -1324,6 +1631,108 @@
 /**********************************************************************/
 /* Auxiliary functions.                                               */
 /**********************************************************************/
+
+/**********************************************************************/
+   int newNdf( Tcl_Interp *interp, Tcl_Obj *ndfnameobj, Ndf **pndf ) {
+/**********************************************************************/
+      char *ndfname;
+      int i;
+      int nleng;
+      Ndf *ndf;
+      Ndf1 *ndf1;
+
+/* Get the name of the NDF. */
+      ndfname = Tcl_GetStringFromObj( ndfnameobj, &nleng );
+
+/* Allocate the data structure to hold the client data. */
+      ndf = (Ndf *) malloc( sizeof( Ndf ) );
+      ndf->name = (char *) malloc( nleng + 1 );
+      ndf->plotarray = (Plotarray *) malloc( sizeof( Plotarray ) );
+      ndf->content.ndf1 = (Ndf1 *) malloc( sizeof( Ndf1 ) );
+      if ( tclmemok( interp, ndf ) != TCL_OK ||
+           tclmemok( interp, ndf->name ) != TCL_OK ||
+           tclmemok( interp, ndf->plotarray ) != TCL_OK ||
+           tclmemok( interp, ndf->content.ndf1 ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
+
+/* Initialise some elements of the data structure. */
+      strcpy( ndf->name, ndfname );
+      ndf->nmember = 0;
+      ndf1 = ndf->content.ndf1;
+      ndf1->mapped = 0;
+      ndf1->bad = 1;
+      ndf1->data = NULL;
+      *ndf1->mtype = '\0';
+      ndf->plotarray->exists = 0;
+      ndf->plotarray->data = NULL;
+      ndf1->fits.loaded = 0;
+      ndf1->fits.ncard = 0;
+      ndf1->fits.data = NULL;
+      Tcl_InitHashTable( &ndf1->perchash, TCL_ONE_WORD_KEYS );
+
+      STARCALL( 
+
+/* Open the NDF. */
+         ndfFind( DAT__ROOT, ndfname, &ndf1->identifier, status );
+
+/* Get the bounds of the NDF. */
+         ndfBound( ndf1->identifier, NDF__MXDIM, ndf1->lbnd, ndf1->ubnd, 
+                   &ndf1->ndim, status );
+
+/* Get the HDS type of the DATA array. */
+         ndfType( ndf1->identifier, "DATA", ndf1->ntype, DAT__SZTYP, status );
+
+/* Get a pointer to the WCS component. */
+         ndfGtwcs( ndf1->identifier, &ndf->wcs, status );
+      )
+
+/* Set the number of elements. */
+      ndf1->nel = 1;
+      for ( i = 0; i < ndf1->ndim; i++ ) {
+         ndf1->nel *= ndf1->ubnd[ i ] - ndf1->lbnd[ i ] + 1;
+      }
+
+/* Successful return. */
+      *pndf = ndf;
+      return TCL_OK;
+   }
+
+
+/**********************************************************************/
+   void forgetNdf( Ndf *ndf ) {
+/**********************************************************************/
+      Ndf1 *ndf1 = ndf->content.ndf1;
+      int status[] = { SAI__OK };
+      int valid;
+
+/* Release the NDF resources associated with the object.  There is no
+   procedure for recovering from errors in a Tcl_CmdDeleteProc (which
+   is who is likely to be calling this routine), so if there is a 
+   problem we just have to annul the error status. */
+      errMark();
+      if ( ndf1->fits.loaded && ndf1->fits.ncard ) {
+         DECLARE_CHARACTER( locator, DAT__SZLOC );
+         cnfExprt( ndf1->fits.loc, locator, DAT__SZLOC );
+         F77_CALL(dat_annul)( CHARACTER_ARG(locator), INTEGER_ARG(status)
+                              TRAIL_ARG(locator) );
+      }
+      astAnnul( ndf->wcs );
+      ndfValid( ndf1->identifier, &valid, status );
+      if ( valid ) ndfAnnul( &ndf1->identifier, status );
+      if ( *status != SAI__OK ) errAnnul( status );
+      errRlse();
+
+/* Release memory we (may) have allocated for the object.  Some or all of
+   these could be NULL, but if so, free() will not complain. */
+      Tcl_DeleteHashTable( &ndf1->perchash );
+      free( ndf->name );
+      free( ndf->plotarray->data );
+      free( ndf->plotarray );
+      free( ndf->content.ndf1 );
+      free( ndf );
+   }
+
 
 /**********************************************************************/
    int tclmemok( Tcl_Interp *interp, void *ptr ) {
@@ -1353,69 +1762,80 @@
 
 
 /**********************************************************************/
-   void domapdata( Ndf *ndf, int *status ) {
+   void domapdata( Ndf1 *ndf1, int *status ) {
 /**********************************************************************/
 /* Perform mapping of the DATA component of an ndf.  Use the data's native
    type for efficiency (another possiblity would be to use a smaller type,
    say _REAL if native type were _DOUBLE, for reduced memory consumption). */
       int nel;
       if ( *status != SAI__OK ) return;
-      ndfMap( ndf->identifier, "DATA", ndf->ntype, "READ", &ndf->data, &nel,
+      ndfMap( ndf1->identifier, "DATA", ndf1->ntype, "READ", &ndf1->data, &nel,
               status );
       if ( *status == SAI__OK ) {
-         strncpy( ndf->mtype, ndf->ntype, DAT__SZTYP );
-         ndf->mapped = 1;
+         strncpy( ndf1->mtype, ndf1->ntype, DAT__SZTYP );
+         ndf1->mapped = 1;
       }
    }
 
 
 /**********************************************************************/
-   void dounmapdata( Ndf *ndf, int *status ) {
+   void dounmapdata( Ndf1 *ndf1, int *status ) {
 /**********************************************************************/
 /* Perform unmapping of the DATA component of an NDF. */
       if ( *status != SAI__OK ) return;
-      ndfUnmap( ndf->identifier, "DATA", status );
+      ndfUnmap( ndf1->identifier, "DATA", status );
       if ( *status == SAI__OK ) {
-         ndf->data = NULL;
-         *ndf->mtype = '\0';
-         ndf->mapped = 0;
+         ndf1->data = NULL;
+         *ndf1->mtype = '\0';
+         ndf1->mapped = 0;
       }
    }
 
 
 /**********************************************************************/
-   double getpixelsize( Ndf *ndf, int iframe, int *status ) {
+   double getpixelsize( NdfOrNdfset *ndf, int iframe, int *status ) {
 /**********************************************************************/
 /* Return the approximate linear size of a unit pixel in the given frame,
    in terms of Base frame (GRID) pixels.  This only properly makes sense 
    if the mapping between the two frames contains just zooms, rotations 
    and translations, but for most non-drastic mappings it is a definite 
    enough result to be useful for certain purposes.  It only looks at 
-   the first dimension.
+   the first dimension, and calculates the size of a pixel in the middle
+   of the first member NDF (for an ndfset object) or of the only NDF 
+   (for an ndf object).
 */
       AstMapping *map;
       AstFrame *bfrm;
       AstFrame *ffrm;
+      AstFrameSet *wcs;
+      Ndf1 *ndf1;
       int i;
       int *old_status;
       double bpoint[ NDF__MXDIM ][ 2 ];
       double fpoint[ NDF__MXDIM ][ 2 ];
       double ratio = 1.0;
 
+/* Get a pointer to an Ndf1 data structure; either the one associated
+   with this ndf object, or the first one associated with an ndfset
+   object. */
+      ndf1 = ndf->nmember ? ndf->content.ndfs[ 0 ]->content.ndf1 
+                          : ndf->content.ndf1;
+      wcs = ndf->wcs;
+
 /* Arrange for AST to use the inherited status variable for status checking. */
       old_status = astWatch( status );
       astBegin;
 
 /* Construct a point at opposite corners of the Base frame. */
-      for ( i = 0; i < ndf->ndim; i++ ) {
+      for ( i = 0; i < ndf1->ndim; i++ ) {
          bpoint[ i ][ 0 ] = 0.5;
-         bpoint[ i ][ 1 ] = ndf->ubnd[ i ] - ndf->lbnd[ i ] + 1.5;
+         bpoint[ i ][ 1 ] = ndf1->ubnd[ i ] - ndf1->lbnd[ i ] + 1.5;
       }
 
 /* Construct a point at opposite corners of the selected frame. */
-      bfrm = astGetFrame( ndf->wcs, AST__BASE );
-      ffrm = astGetFrame( ndf->wcs, iframe );
-      map = astGetMapping( ndf->wcs, AST__BASE, iframe );
+      bfrm = astGetFrame( wcs, AST__BASE );
+      ffrm = astGetFrame( wcs, iframe );
+      map = astGetMapping( wcs, AST__BASE, iframe );
       astTranN( map, 2, astGetI( map, "Nin" ), 2, (const double (*)[]) bpoint, 
                 1, astGetI( map, "Nout" ), 2, fpoint );
 
@@ -1447,34 +1867,59 @@
 
 
 /**********************************************************************/
-   void getbbox( Ndf *ndf, int iframe, double *lbox, double *ubox, 
-                 int *status ) {
+   void getbbox( NdfOrNdfset *ndfset, int iframes[], double *lbox, 
+                 double *ubox, int *status ) {
 /**********************************************************************/
 /* Get the bounding box for an NDF resampled from the Base (GRID) frame
    into another, given, frame. 
 */
       int i;
+      int j;
       double lbnd[ NDF__MXDIM ];
+      double lower;
       double ubnd[ NDF__MXDIM ];
+      double upper;
       AstMapping *map;
       int *old_status;
-
-/* Get the bounding values in the GRID (Base) frame. */
-      for ( i = 0; i < ndf->ndim; i++ ) {
-         lbnd[ i ] = 0.5;
-         ubnd[ i ] = ndf->ubnd[ i ] - ndf->lbnd[ i ] + 1.5;
-      }
+      int nndf;
+      Ndf **ndfs;
+      Ndf1 *ndf1;
 
 /* Arrange for AST to use the inherited status variable for status checking. */
       astBegin;
       old_status = astWatch( status );
 
+/* Get a list of ndf objects to work with. */
+      if ( ndfset->nmember ) {
+         nndf = ndfset->nmember;
+         ndfs = ndfset->content.ndfs;
+      }
+      else {
+         nndf = 1;
+         ndfs = &ndfset;
+      }
+
+/* Loop over the ndf objects. */
+      for ( j = 0; j < nndf; j++ ) {
+         ndf1 = ndfs[ j ]->content.ndf1;
+
+/* Get the bounding values in the GRID (Base) frame. */
+         for ( i = 0; i < ndf1->ndim; i++ ) {
+            lbnd[ i ] = 0.5;
+            ubnd[ i ] = ndf1->ubnd[ i ] - ndf1->lbnd[ i ] + 1.5;
+         }
+
 /* Convert the GRID bounding values to the selected frame. */
-      map = astGetMapping( ndf->wcs, AST__BASE, iframe );
-      for ( i = 1; i <= ndf->ndim; i++ ) {
-         astMapBox( map, (const double *) lbnd, (const double *) ubnd,
-                    1, i, lbox + i - 1, ubox + i - 1, 
-                    (double *) NULL, (double *) NULL );
+         map = astGetMapping( ndfs[ j ]->wcs, AST__BASE, iframes[ j ] );
+         for ( i = 1; i <= ndf1->ndim; i++ ) {
+            astMapBox( map, (const double *) lbnd, (const double *) ubnd,
+                       1, i, &lower, &upper, 
+                       (double *) NULL, (double *) NULL );
+
+/* Update the current upper and lower bounds. */
+            if ( j == 0 || lower < lbox[ i - 1 ] ) lbox[ i - 1 ] = lower;
+            if ( j == 0 || upper > ubox[ i - 1 ] ) ubox[ i - 1 ] = upper;
+         }
       }
 
 /* End AST context. */
@@ -1506,8 +1951,8 @@
       double psize = pargs->psize;
       double zoom = pargs->zoom;
       AstFrameSet *wcs = pargs->wcs;
-      int ifrm = pargs->ifrm;
-      int pfrm = pargs->pfrm;
+      int *iframes = pargs->iframes;
+      int *pframes = pargs->pframes;
       int xpix = pargs->xpix;
       int ypix = pargs->ypix;
 
@@ -1539,8 +1984,8 @@
       ASTCALL(
          bfrm = astGetI( wcs, "Base" );
          cfrm = astGetI( wcs, "Current" );
-         astSetI( wcs, "Base", pfrm );
-         astSetI( wcs, "Current", ifrm );
+         astSetI( wcs, "Base", pframes[ 0 ] );
+         astSetI( wcs, "Current", iframes[ 0 ] );
          plot = astPlot( wcs, gbox, bbox, settings );
          astGrid( plot );
          astSetI( wcs, "Base", bfrm );
@@ -1562,9 +2007,9 @@
 
 
 /**********************************************************************/
-   int *getpixbloc( Ndf *ndf, int iframe, double zoom, double loval, 
-                    double hival, int locolour, int hicolour, int badcolour,
-                    int *status ) {
+   int *getpixbloc( NdfOrNdfset *ndfset, int iframes[], double zoom, 
+                    double loval, double hival, int locolour, int hicolour,
+                    int badcolour, int *status ) {
 /**********************************************************************/
 /* Return the address of a PGPLOT-friendly array of integers representing
    the DATA array of an NDF.  This routine will cause a new such array
@@ -1576,6 +2021,7 @@
    given by the frame index iframe, and following that, if zoom is 
    not (very nearly) unity, it adds a magnification on afterwards.
 */
+      int iframe = iframes[ 0 ];
 
 /* Check the inherited status. */
       if ( *status != SAI__OK ) return NULL;
@@ -1584,31 +2030,51 @@
    exists, or if the scale values are different from the ones 
    we've been asked for, then we'll have to construct it.  Otherwise
    we can just use the one we've already got. */
-      if ( ! ndf->plotarray.exists || ndf->plotarray.loval != loval
-                                   || ndf->plotarray.hival != hival 
-                                   || ndf->plotarray.iframe != iframe
-                                   || ndf->plotarray.zoom != zoom ) {
+      if ( ! ndfset->plotarray->exists || ndfset->plotarray->loval != loval
+                                       || ndfset->plotarray->hival != hival 
+                                       || ndfset->plotarray->iframe != iframe
+                                       || ndfset->plotarray->zoom != zoom ) {
          int i;
+         int ilbnd[ 2 ];
+         int iubnd[ 2 ];
          int ischeme;
-         int xdim;
+         int ival;
+         int ix;
+         int iy;
+         int maxpix;
+         int nndf;
+         int olbnd[ 2 ];
+         int oubnd[ 2 ];
+         int xb;
          int xbase;
+         int xd;
+         int xdim;
          int xndf;
+         int yb;
          int ybase;
+         int yd;
          int ydim;
          int yndf;
+         int *data;
          int *old_status;
+         double dval;
          double factor;
          double iparams[ 10 ];
          double lbox[ NDF__MXDIM ];
          double psize;
+         double scale;
+         double tol;
          double ubox[ NDF__MXDIM ];
+         void *work;
          AstMapping *map;
+         Ndf **ndfs;
+         Ndf *ndf;
+         Ndf1 *ndf1;
          DECLARE_CHARACTER( ftype, DAT__SZTYP );
 
-         psize = getpixelsize( ndf, iframe, status );
-         xndf = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ] + 1;
-         yndf = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ] + 1;
-         getbbox( ndf, iframe, lbox, ubox, status );
+/* Get the size of the output array. */
+         psize = getpixelsize( ndfset, iframes[ 0 ], status );
+         getbbox( ndfset, iframes, lbox, ubox, status );
          xbase = zoom * lbox[ 0 ];
          ybase = zoom * lbox[ 1 ];
          xdim = zoom * ( ubox[ 0 ] - lbox[ 0 ] );
@@ -1628,80 +2094,193 @@
             iparams[ 0 ] = floor( ( ( 1.0 / factor ) - 0.5 ) / 2.0 );
          }
 
+/* Get the rescaling factor. */
+         if ( loval >= hival ) {
+            *status = SAI__ERROR;
+            errRep( "NDF_BADLIM", "Maximum must be greater than minimum",
+                    status );
+            return NULL;
+         }
+         scale = ( hicolour - locolour ) / ( hival - loval );
+
 /* If a previous plotarray exists but is the wrong size, we will need to
    deallocate that memory prior to allocating more. */
-         if ( ndf->plotarray.exists && ( ndf->plotarray.xdim != xdim ||
-                                         ndf->plotarray.ydim != ydim ) ) {
-            free( ndf->plotarray.data );
-            ndf->plotarray.exists = 0;
+         if ( ndfset->plotarray->exists && 
+              ( ndfset->plotarray->xdim != xdim ||
+                ndfset->plotarray->ydim != ydim ) ) {
+            free( ndfset->plotarray->data );
+            ndfset->plotarray->exists = 0;
          }
 
 /* If we don't now have memory to put the pixel array in, allocate some. */
-         if ( ! ndf->plotarray.exists ) {
-            ndf->plotarray.data = malloc( sizeof( int ) * xdim * ydim );
-            if ( ndf->plotarray.data == NULL ) {
+         if ( ! ndfset->plotarray->exists ) {
+            ndfset->plotarray->data = malloc( sizeof( int ) * xdim * ydim );
+            if ( ndfset->plotarray->data == NULL ) {
                *status = SAI__ERROR;
                errRep( " ", "Memory allocation failed", status );
                return NULL;
             }
-            ndf->plotarray.exists = 1;
+            ndfset->plotarray->exists = 1;
+         }
+         data = ndfset->plotarray->data;
+
+/* Initialise the pixel array with bad values. */
+         for ( i = 0; i < xdim * ydim; i++ ) {
+            data[ i ] = badcolour;
          }
 
-/* If the array is not currently mapped, we have to map it. */
-         if ( ! ndf->mapped ) domapdata( ndf, status );
-
-/* Massage some arguments for fortran. */
-         cnfExprt( ndf->mtype, ftype, DAT__SZTYP );
+/* Get a list of ndf objects to work with. */
+         if ( ndfset->nmember ) {
+            nndf = ndfset->nmember;
+            ndfs = ndfset->content.ndfs;
+         }
+         else {
+            nndf = 1;
+            ndfs = &ndfset;
+         }
 
 /* Begin an AST context. */
          astBegin;
          old_status = astWatch( status );
 
-/* Get the mapping for the resample operation. */
-         map = astGetMapping( ndf->wcs, AST__BASE, iframe );
-         if ( fabs( zoom - 1.0 ) > 1. / (double) ( xndf + yndf ) ) {
-            map = (AstMapping *) 
+/* Now loop over each of the ndf objects, resampling it onto the output 
+   grid. */
+         for ( i = 0; i < nndf; i++ ) {
+            ndf = ndfs[ i ];
+            ndf1 = ndf->content.ndf1;
+            xndf = ndf1->ubnd[ 0 ] - ndf1->lbnd[ 0 ] + 1;
+            yndf = ndf1->ubnd[ 1 ] - ndf1->lbnd[ 1 ] + 1;
+
+/* Get the dimensions of the output array for this ndf only. */
+            getbbox( ndf, &iframes[ i ], lbox, ubox, status );
+            xb = zoom * lbox[ 0 ];
+            yb = zoom * lbox[ 1 ];
+            xd = zoom * ( ubox[ 0 ] - lbox[ 0 ] );
+            yd = zoom * ( ubox[ 1 ] - lbox[ 1 ] );
+            ilbnd[ 0 ] = 1;
+            ilbnd[ 1 ] = 1;
+            iubnd[ 0 ] = xndf;
+            iubnd[ 1 ] = yndf;
+            olbnd[ 0 ] = xb;
+            olbnd[ 1 ] = yb;
+            oubnd[ 0 ] = xb + xd - 1;
+            oubnd[ 1 ] = yb + yd - 1;
+            maxpix = xndf + yndf;
+            tol = 0.5 * min( ( (float) xd / (float) xndf ), 
+                             ( (float) yd / (float) yndf ) );
+
+/* Get the transformation mapping for the resample operation. */
+            map = astGetMapping( ndf->wcs, AST__BASE, iframes[ i ] );
+            if ( fabs( zoom - 1.0 ) > 1. / (double) ( xndf + yndf ) ) {
+               map = (AstMapping *) 
                      astCmpMap( map, (AstMapping *) astZoomMap( 2, zoom, "" ),
                                 1, "" );
-         }
-         map = astSimplify( map );
+            }
+            map = astSimplify( map );
 
-/* Call the routine which does the data scaling. */
-         F77_CALL(ccd1_mkimg)( (F77_POINTER_TYPE) &ndf->data,
-                               CHARACTER_ARG(ftype), INTEGER_ARG(&xndf),
-                               INTEGER_ARG(&yndf), INTEGER_ARG(&map),
-                               INTEGER_ARG(&xbase), INTEGER_ARG(&ybase),
-                               INTEGER_ARG(&xdim), INTEGER_ARG(&ydim),
-                               DOUBLE_ARG(&loval), DOUBLE_ARG(&hival),
-                               INTEGER_ARG(&locolour), INTEGER_ARG(&hicolour),
-                               INTEGER_ARG(&badcolour), INTEGER_ARG(&ischeme),
-                               DOUBLE_ARG(iparams),
-                               INTEGER_ARG(ndf->plotarray.data),
-                               INTEGER_ARG(status)
-                               TRAIL_ARG(ftype) );
+/* If the array is not currently mapped, we have to map it. */
+            if ( ! ndf1->mapped ) domapdata( ndf1, status );
+
+/* Define a macro to resample the ndf's data array into the output array
+   according to data type. */
+#define CASE_RESAMP(Xccdtype,Xctype,Xasttype,Xbadval) \
+               case Xccdtype: \
+\
+/* Allocate space for the intermediate resampled data. */ \
+                  work = malloc( xd * yd * sizeof( Xctype ) ); \
+                  if ( work == NULL ) { \
+                     *status = SAI__ERROR; \
+                     errRep( "NDF_NOMEM", "Memory allocation failed", \
+                             status ); \
+                     return NULL; \
+                  } \
+\
+/* Resample this NDF onto its new grid, using the same type. */ \
+                  astResample##Xasttype( map, 2, ilbnd, iubnd, \
+                                         (Xctype *) ndf1->data, NULL, \
+                                         ischeme, NULL, iparams, AST__USEBAD, \
+                                         tol, maxpix, Xbadval, 2, \
+                                         olbnd, oubnd, olbnd, oubnd, \
+                                         (Xctype *) work, NULL ); \
+\
+/* Copy the resampled image to its proper place on the output array, \
+   converting it to integer, rescaling it between the selected lower \
+   and upper limiting values, and combining it with whatever is there. */ \
+                  { \
+                     Xctype xval; \
+                     for ( iy = 0; iy < yd; iy++ ) { \
+                        for ( ix = 0; ix < xd; ix++ ) { \
+                           xval = ( (Xctype *) work )[ ix + iy * xd ]; \
+                           if ( xval != Xbadval ) { \
+                              dval = (double) xval; \
+                              if ( dval <= loval ) { \
+                                 ival = locolour; \
+                              } \
+                              else if ( dval >= hival ) { \
+                                 ival = hicolour; \
+                              } \
+                              else { \
+                                 ival = locolour + \
+                                    (int) ( 0.5 + ( dval - loval ) * scale ); \
+                              } \
+                              data[ ( ix + xb - xbase ) + \
+                                    ( iy + yb - ybase ) * xdim ] = ival; \
+                           } \
+                        } \
+                     } \
+                  } \
+\
+/* Free the workspace array. */ \
+                  free( work ); \
+                  break;
+
+/* Use the above macro to do the calculations using the correct type. */
+            switch ( CCD_TYPE( ndf1->mtype ) ) {
+               CASE_RESAMP(CCD_TYPE_B,F77_BYTE_TYPE,B,VAL__BADB)
+               CASE_RESAMP(CCD_TYPE_UB,F77_UBYTE_TYPE,UB,VAL__BADUB)
+               CASE_RESAMP(CCD_TYPE_W,F77_WORD_TYPE,S,VAL__BADS)
+               CASE_RESAMP(CCD_TYPE_UW,F77_UWORD_TYPE,US,VAL__BADUS)
+               CASE_RESAMP(CCD_TYPE_I,F77_INTEGER_TYPE,I,VAL__BADI)
+               CASE_RESAMP(CCD_TYPE_R,F77_REAL_TYPE,F,VAL__BADF)
+               CASE_RESAMP(CCD_TYPE_D,F77_DOUBLE_TYPE,D,VAL__BADD)
+               default:
+                  *status = SAI__ERROR;
+                  errRep( "NDF_BADTYPE", "Bad type value for mapped data",
+                          status );
+            }
+
+/* Undefine the macro. */
+#undef CASE_RESAMP
+         }
 
 /* End the AST context. */
          astWatch( old_status );
          astEnd;
 
 /* Store characteristics of the generated array. */
-         ndf->plotarray.xdim = xdim;
-         ndf->plotarray.ydim = ydim;
-         ndf->plotarray.iframe = iframe;
-         ndf->plotarray.zoom = zoom;
-         ndf->plotarray.loval = loval;
-         ndf->plotarray.hival = hival;
+         ndfset->plotarray->xdim = xdim;
+         ndfset->plotarray->ydim = ydim;
+         ndfset->plotarray->iframe = iframe;
+         ndfset->plotarray->zoom = zoom;
+         ndfset->plotarray->loval = loval;
+         ndfset->plotarray->hival = hival;
       }
 
 /* Return the address of the prepared array. */
-      return ndf->plotarray.data;
+      return ndfset->plotarray->data;
    }
 
 
+
+
+
+
+
 /**********************************************************************/
-   int NdfGetNdfFromObj( Tcl_Interp *interp, Tcl_Obj *obj, Ndf **ndf ) {
+   int NdfGetNdfFromObj( Tcl_Interp *interp, Tcl_Obj *obj, 
+                         NdfOrNdfset **ndf ) {
 /**********************************************************************/
-/* Converts an object into a pointer to an NDF.
+/* Converts an object into a pointer to an NdfOrNdfset structure.
    Returns TCL_OK for success or TCL_ERROR for failure.
    On failure the value at ndf is set to NULL and a suitable error message
    is left in the interpreter's result object.
@@ -1709,22 +2288,46 @@
       Tcl_CmdInfo cmdinfo;
       Tcl_Obj *result;
       Tcl_Obj *ov[ 2 ];
+      int valid;
 
-      *ndf = (Ndf *) NULL;
+      *ndf = (NdfOrNdfset *) NULL;
       if ( Tcl_GetCommandInfo( interp, Tcl_GetString( obj ), &cmdinfo ) == 1 ) {
+
+/* See if it is a valid ndf object. */
          ov[ 0 ] = obj;
          ov[ 1 ] = Tcl_NewStringObj( "validndf", -1 );
-         if ( Tcl_EvalObjv( interp, 2, ov, 0 ) == TCL_OK ) {
-            *ndf = (Ndf *) cmdinfo.objClientData;
+         if ( Tcl_EvalObjv( interp, 2, ov, 0 ) == TCL_OK &&
+              Tcl_GetBooleanFromObj( interp, Tcl_GetObjResult( interp ), 
+                                     &valid ) == TCL_OK &&
+              valid ) {
+            *ndf = (NdfOrNdfset *) cmdinfo.objClientData;
+         }
+
+/* See if it is a valid ndfset object. */
+         else {
+            ov[ 0 ] = obj;
+            ov[ 1 ] = Tcl_NewStringObj( "validndfset", -1 );
+            if ( Tcl_EvalObjv( interp, 2, ov, 0 ) == TCL_OK &&
+                 Tcl_GetBooleanFromObj( interp, Tcl_GetObjResult( interp ),
+                                        &valid ) == TCL_OK &&
+                 valid ) {
+               *ndf = (NdfOrNdfset *) cmdinfo.objClientData;
+            }
          }
       }
+
+/* Set an error result if it's not valid. */
       if ( *ndf == NULL ) {
          char rbuf[ 200 ];
          *rbuf = '\0';
-         sprintf( rbuf, "\"%s\" is not an ndf object", Tcl_GetString( obj ) );
+         sprintf( rbuf, "\"%s\" is not an ndf or ndfset object", 
+                  Tcl_GetString( obj ) );
          result = Tcl_NewStringObj( rbuf, -1 );
+         Tcl_SetObjResult( interp, result );
          return TCL_ERROR;
       }
+
+/* Return successfully. */
       return TCL_OK;
    }
    
@@ -1735,10 +2338,10 @@
                             AstFrameSet *fset, int *iframe ) {
 /**********************************************************************/
 /* Converts an object into a frame index which references a frame in the
-   given frameset.  
+   given frameset.  For an ndf object, a single value is stored.
    Returns TCL_OK for success or TCL_ERROR for failure.
-   On failure, the value at iframe is set to AST__NOFRAME, and a suitable
-   error message is left in the interpreter's result object.
+   On failure, at least the value at iframe is set to AST__NOFRAME, 
+   and a suitable error message is left in the interpreter's result object.
 */
       int leng;
       char *text;
@@ -1750,10 +2353,8 @@
       text = Tcl_GetStringFromObj( obj, &leng );
       *rbuf = '\0';
 
-/* Check that AST is not in an error state. */
-      if ( astOK ) {
-
 /* Begin an AST context. */
+      ASTCALL(
          astBegin;
 
 /* See if it is a special string. */
@@ -1801,20 +2402,50 @@
 
 /* End AST context. */
          astEnd;
-      }
-
-/* If there's an AST error, clear it but consider we have failed. */
-      if ( ! astOK ) {
-         astClearStatus;
-         *iframe = AST__NOFRAME;
-         sprintf( rbuf, "AST in error state - no frame found for \"%s\"",
-                  text );
-      }
+      )
 
 /* Return value. */
       result = Tcl_NewStringObj( rbuf, -1 );
       Tcl_SetObjResult( interp, result );
       return *iframe == AST__NOFRAME ? TCL_ERROR : TCL_OK;
+   }
+
+
+
+/**********************************************************************/
+   int NdfGetIframesFromObj( Tcl_Interp *interp, Tcl_Obj *obj,
+                             NdfOrNdfset *ndfset, int *ifrms ) {
+/**********************************************************************/
+/* Does the same as NdfGetIframeFromObj, but writes an array of iframe
+   values, one for each member ndf object of the passed ndfset object.
+   It is the caller's responsibility to ensure that the iframe array
+   is large enough to hold the output - it must have at least 
+   ndfset->nmember elements.
+*/
+      int i;
+      int nndf;
+      Ndf **ndfs;
+
+/* Get a list of ndf objects to work with. */
+      if ( ndfset->nmember ) {
+         nndf = ndfset->nmember;
+         ndfs = ndfset->content.ndfs;
+      }
+      else {
+         nndf = 1;
+         ndfs = &ndfset;
+      }
+
+/* Get the frame index for each NDF. */
+      for ( i = 0; i < nndf; i++ ) {
+         if ( NdfGetIframeFromObj( interp, obj, ndfs[ i ]->wcs,
+                                   &ifrms[ i ] ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+      }
+
+/* Return success. */
+      return TCL_OK;
    }
 
 
