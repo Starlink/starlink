@@ -150,6 +150,18 @@ to need explanation or elaboration.
   (make command name: "Strong"
     (process-children)))
 
+;; Examine the span element's `media' attribute.  If there is no such
+;; attribute, or if there is and its value is either
+;; %passthrough-mediatype% or `all', then process the children,
+;; otherwise do nothing.
+(element span
+  (let ((mediatypes (get-mediatypes (current-node))))
+    (if (or (not mediatypes)
+	    (assoc %passthrough-mediatype% mediatypes)
+	    (assoc "all" mediatypes))
+	(process-children)
+	(empty-sosofo))))
+
 ;;; Lists
 
 (element dl

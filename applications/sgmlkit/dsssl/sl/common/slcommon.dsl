@@ -20,9 +20,8 @@ and
 <url>http://www.jclark.com/jade/#limitations</url> for further details.
 
 <authorlist>
-<author id=ng affiliation='Glasgow'>Norman Gray
+<author id=ng affiliation='Starlink, Glasgow'>Norman Gray</author>
 
-;; Include common parameterisations
 &params.dsl;
 
 <routine>
@@ -583,9 +582,16 @@ brute-force version:
 ;; leading whitespace, then reversing it and doing it again, then
 ;; reversing it.
 (define (trim-string s)
-  (let* ((cl (string->list s))
-	 (rl (reverse (trim-leading-whitespace cl))))
-    (list->string (reverse (trim-leading-whitespace rl)))))
+  (list->string
+   (reverse
+    (trim-leading-whitespace
+     (reverse
+      (trim-leading-whitespace
+       (string->list s)))))))
+;(define (trim-string s)
+;  (let* ((cl (string->list s))
+;	 (rl (reverse (trim-leading-whitespace cl))))
+;    (list->string (reverse (trim-leading-whitespace rl)))))
 
 ;; Shorthand: return trimmed data, or false if argument is false
 ;; (ie, don't just fail in this second case)
@@ -607,10 +613,18 @@ brute-force version:
 	   (loop (cdr l) (append result (list replacement)))))))
 
 (define (normalise-string s)
-  (let* ((cl (string->list s))
-	 (rl (reverse (trim-leading-whitespace cl)))
-	 (rrl (reverse (trim-leading-whitespace rl))))
-    (list->string (normalise-character-list rrl))))
+  (list->string
+   (normalise-character-list
+    (reverse
+     (trim-leading-whitespace
+      (reverse
+       (trim-leading-whitespace
+	(string->list s))))))))
+;(define (normalise-string s)
+;  (let* ((cl (string->list s))
+;	 (rl (reverse (trim-leading-whitespace cl)))
+;	 (rrl (reverse (trim-leading-whitespace rl))))
+;    (list->string (normalise-character-list rrl))))
 
 <routine>
 <routinename>index-file-name
@@ -1133,7 +1147,8 @@ dd-MMM-yyyy.
   <description>Character-class function, which takes a single
   character as argument, and returns true if it should be categorised
   as whitespace, and false otherwise.  If this is insufficiently
-  flexible, then the <funcname>isbdy?</> function can be used.
+  flexible, then the <funcname>isbdy?</> function can be used.  The
+  default is the function <funcname>isspace?</>
 <parameter keyword default='break at spaces'>isbdy?
   <type>function
   <description>General character-class function, which takes as
@@ -1584,6 +1599,37 @@ or a non-empty sequence of nodes whose GIs are not members of
 	      (loop nllist
 		    (node-list tnl (node-list-first nl))
 		    (node-list-rest nl)))))))
+
+<routine>
+<routinename>get-mediatypes
+<purpose>Get any media attribute, and parse it.
+<description>If the specified node has a `media' attribute, then this
+routine extracts and parses it, according to the scheme described in
+the HTML4 spec at
+<url>http://www.w3.org/TR/REC-html40/types.html#h-6.13</url>. That is,
+media types are separated by commas plus whitespace, and each media
+type may have an arbitrary parameter string separated from it by
+whitespace.
+<returnvalue type='list of pairs'>A list of pairs, with the car of
+each one the media type, and the cdr any parameterstring present.  If
+there is no `media' attribute, return <code>#f</>.
+<argumentlist>
+<parameter default='(current-node)'>nd
+  <type>singleton-node-list
+  <description>The node to be examined for a media attribute.
+<codebody>
+(define (get-mediatypes #!optional (nd (current-node)))
+  (let ((medstr (attribute-string (normalize "media") nd)))
+    (if medstr
+	(map (lambda (s)
+	       (let ((l (tokenise-string (trim-string s) max: 1)))
+		 (cons (car l) (if (> (length l) 1)
+				   (cadr l)
+				   #f))))
+	     (tokenise-string (normalise-string medstr)
+			      boundary-char?: (lambda (c) (char=? c #\,))))
+	#f)))
+
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <routine>

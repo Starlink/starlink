@@ -92,6 +92,7 @@ types.
     "returnvalue"
     "examplelist"
     "implementationstatus"
+    "authorlist"
     "diytopic")
   ;; Alternative is
   ;;'("routinename" "purpose" "description" "returnvalue"

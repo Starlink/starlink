@@ -121,31 +121,29 @@ $Id$
 		  (literal (or (car autprops)
 			       "Mystery programmer"))))
       (make element gi: "dd"
-	    (make element gi: "dl"	;Assume we have at least one of these
+	    (make element gi: "ul"	;Assume we have at least one of these
 		  (if (cadr autprops)
-		      (make sequence
-			(make element gi: "dt"
-			      (literal "Affiliation"))
-			(make element gi: "dd"
-			      (literal (cadr autprops) ")")))
+		      (make element gi: "li"
+			    (literal "Affiliation: " (cadr autprops)))
 		      (empty-sosofo))
 		  (if (caddr autprops)
-		      (make sequence
-			(make element gi: "dt"
-			      (literal "Email"))
-			(make element gi: "dd"
+		      (make element gi: "li"
+			    (make sequence
+			      (literal "Email: ")
 			      (make element gi: "code"
 				    (literal (caddr autprops)))))
 		      (empty-sosofo))
 		  (if (cadddr autprops)
-		      (make sequence
-			(make element gi: "dt"
-			      (literal "URL"))
-			(make element gi: "dl"
+		      (make element gi: "li"
+			    (make sequence
+			      (literal "URL: ")
 			      (make element gi: "code"
-				    (make element gi: "a"
-					  attributes: `(("href" ,(cadddr autprops)))
-					  (literal (string-append "<" (cadddr autprops) ">"))))))
+				    (make sequence
+				      (literal "<")
+				      (make element gi: "a"
+					    attributes: `(("href" ,(cadddr autprops)))
+					    (literal (cadddr autprops)))
+				      (literal ">")))))
 		      (empty-sosofo)))))))
 
 (mode routine-ref
@@ -175,7 +173,8 @@ $Id$
 			    (empty-sosofo)
 			    (make sequence
 			      (make element gi: "dt"
-				    (literal "Authors"))
+				    (make element gi: "strong"
+					  (literal "Authors")))
 			      (make element gi: "dd"
 				    (make element gi: "dl"
 					  (process-authorlist allauthors)))))))
@@ -213,10 +212,12 @@ $Id$
     (empty-sosofo))			; (see mode routine-ref-get-reference)
   (element authorlist
     (make sequence
-      (make element gi: "h4"
-	    (literal "Authors"))
-      (make element gi: "ul"
-	    (process-children))))
+      (make element gi: "dt"
+	    (make element gi: "strong"
+		  (literal "Authors")))
+      (make element gi: "dd"
+	    (make element gi: "ul"
+		  (process-children)))))
   (element author
     (let ((id (attribute-string (normalize "id"))))
       (make element gi: "li"
@@ -613,6 +614,11 @@ $Id$
       (make element gi: "dd"
 	    (process-children))))
   (element history
+    (empty-sosofo))
+  (element authorlist			; authorlist in docblock is
+					; assembled from author
+					; elements in content.  Don't
+					; produce separate set of links.
     (empty-sosofo))
   ;; Following works, it's just that I don't want to produce this output.
 ;   (element history

@@ -227,6 +227,21 @@ for them.
 (define suppress-printable #f)
 
 <routine>
+<routinename>%passthrough-mediatype%
+<description>Specifies the media type, chosen from the list specified
+in the HTML4 spec at
+<url>http://www.w3.org/TR/REC-html40/types.html#h-6.13</url>.  At
+present, only `screen', `print', `tty' and `all' are documented as being
+recognised, but there's no reason why further ones couldn't be added
+ad lib., or fancy games played here.  For consistency, however, one
+should probably stick to the list in the HTML 4 spec.
+<returnvalue type=string>Media type string, chosen from the HTML4 list
+of media types.
+<codebody>
+(define %passthrough-mediatype%
+  "screen")
+
+<routine>
 <routinename>file-href
 <description>Gives an href to a file keyed by a name; the keys are 
 documented by the source of this function.
