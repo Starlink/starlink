@@ -198,6 +198,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.56  1998/06/09 20:29:45  timj
+*     Add configurable weight function rebin
+*
 *     Revision 1.55  1998/06/03 23:39:04  timj
 *     DESPIKE can now be told to use default output filenames automatically.
 *     (Note that MEDIAN rebinning was added in the previous version but
@@ -393,8 +396,8 @@ c
       PARAMETER (DIAMETER = 15.0)
       INTEGER WTFNRES                  ! number of values per scale length
       PARAMETER (WTFNRES = 64)
-      INTEGER WTFNRAD                  ! radius of Bessel reconstruction
-      PARAMETER (WTFNRAD = 10)         ! filter in scale-lengths
+      INTEGER WTFN_MAXRAD              ! Max radius of weighting function
+      PARAMETER (WTFN_MAXRAD = 10)     ! in scale-lengths
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       INTEGER     MAX_FILE             ! max number of input files
@@ -456,6 +459,7 @@ c
       LOGICAL          DEFOUT          ! Take default output files for DESPIKE
       LOGICAL          DESPIKE         ! Is this the despike task
       LOGICAL          DOLOOP          ! Loop for input data
+      DOUBLE PRECISION DTEMP           ! Scratch double
       INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          FD              ! File descriptor
       INTEGER          FILE            ! number of input files read
@@ -581,6 +585,7 @@ c
       INTEGER          RLEV     ! Recursion depth for reading
       REAL             RTEMP           ! Scratch real
       CHARACTER*10     SAMPLE_MODE     ! Sample mode for maps
+      REAL             SCALE           ! Size of 1 scale length for WT rebin
       REAL             SFACTOR         ! Smoothing factor for spline PDA_SURFIT
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
@@ -608,6 +613,7 @@ c
       INTEGER          TOTAL_BOLS      ! Number of bolometers
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
                                        ! of output image
+      LOGICAL          USEGRD          ! Use guard ring in wt regrid?
       CHARACTER*15     UTDATE(MAX_FILE)! date of first observation
       CHARACTER*15     UTSTART(MAX_FILE)! UT of start of first observation
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
@@ -615,7 +621,8 @@ c
                                        ! weights assigned to each input file
       LOGICAL          WEIGHTS         ! Store the weights array
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
-      REAL             WTFN (WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
+      REAL             WTFN (WTFN_MAXRAD * WTFN_MAXRAD * 
+     :     WTFNRES * WTFNRES + 1)
                                        ! Weighting function
 
 * Local data:
@@ -674,57 +681,12 @@ c
 
       ELSE
 
+*     Regridding
          CALL PAR_CHOIC('REBIN_METHOD', 'Linear', 
      :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3,Median', 
      :        .TRUE.,METHOD, STATUS)
 
-         IF (METHOD.EQ.'BESSEL') THEN
-*     Bessel
-            CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :           '^PKG: Initialising BESSEL weighting functions',
-     :           STATUS)
-            WEIGHTSIZE = WTFNRAD
-            CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
-         ELSE IF (METHOD.EQ.'LINEAR') THEN
-*     Linear
-            CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :           '^PKG: Initialising LINEAR weighting functions',
-     :           STATUS)
-            WEIGHTSIZE = 1
-            CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
 
-         ELSE IF (METHOD.EQ.'GAUSSIAN') THEN
-*     Gaussian
-            CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :           '^PKG: Initialising GAUSSIAN weighting functions',
-     :           STATUS)
-            WEIGHTSIZE = 1
-            CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
-
-         ELSE IF (METHOD.EQ.'MEDIAN') THEN
-*     Median
-            CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :           '^PKG: Median regridding selected',
-     :           STATUS)
-            
-         ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
-*     Do nothing
-            CALL MSG_SETC('PKG',PACKAGE)
-            CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :           '^PKG: Spline interpolation selected',
-     :           STATUS)
-
-         ELSE
-            STATUS = SAI__ERROR
-            CALL MSG_SETC('METHOD', METHOD)
-            CALL MSG_SETC('PKG', PACKAGE)
-            CALL ERR_REP(' ','^PKG: Rebin type ^METHOD unavailable',
-     :           STATUS)
-         END IF
       END IF
 
 *  get the output coordinate system and set the default centre of the
@@ -1521,6 +1483,96 @@ c
       CALL PAR_GET0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
 
+
+*     Now that we have the pixel spacing we can ask the user
+*     the size of the weighting function that they have requested
+*     (If they are using a weighting function)
+
+      IF (METHOD .EQ. 'BESSEL' .OR. METHOD.EQ.'LINEAR' .OR.
+     :     METHOD .EQ. 'GAUSSIAN') THEN
+
+*     Calculate my default scale length - Lambda/4D
+*     Also maybe should include factor for the width of the filter
+*     Need to convert to arcsec before changing back again
+         DTEMP = R2AS * DBLE(WAVELENGTH) * 1.0E-6 / 
+     :        (2.0 * DBLE(DIAMETER))
+
+*     Make it a bit smaller if we have a Gaussian regrid
+*     Claire Chandler tells me that she had best results
+*     with HWHM = 2.5 (850), 1.3 (450)
+*     This is almost approximated by LAMBDA/(4D)
+         IF (METHOD .EQ. 'GAUSSIAN') DTEMP = DTEMP / 2.5
+
+         CALL PAR_DEF0R('SCALE', REAL(DTEMP), STATUS)
+
+*     Change the prompt depending on the relationship
+         STEMP = ' '
+         IF (METHOD .EQ. 'BESSEL') THEN
+            STEMP = 'Position of first null (arcsec)'
+         ELSE IF (METHOD .EQ. 'LINEAR') THEN
+            STEMP = 'Radius of cone (arcsec)'
+         ELSE IF (METHOD .EQ. 'GAUSSIAN') THEN
+            STEMP = 'Half width half maximum of Gaussian (arcsec)'
+         END IF
+
+         CALL PAR_PROMT('SCALE',STEMP, STATUS)
+
+*     Read the parameter
+         CALL PAR_GET0R('SCALE', SCALE, STATUS)
+
+*     Convert back to radians
+         SCALE = SCALE / REAL(R2AS)
+
+*     Now need to ask for the number of scale lengths
+         WEIGHTSIZE = 1
+
+*     Linear should always have weightsize of 1
+         IF (METHOD.NE.'LINEAR') THEN
+            IF (METHOD .EQ.'BESSEL') THEN
+               ITEMP = 10
+            ELSE IF (METHOD .EQ. 'GAUSSIAN') THEN
+               ITEMP = 3
+            END IF
+            
+            CALL PAR_GDR0I('WTFNRAD',ITEMP, 1, WTFN_MAXRAD, .TRUE.,
+     :           WEIGHTSIZE, STATUS)
+
+         ENDIF
+
+*     Now initialise the weight functions
+
+         IF (METHOD.EQ.'BESSEL') THEN
+*     Bessel
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Initialising BESSEL weighting functions',
+     :           STATUS)
+            CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
+            USEGRD = .TRUE.
+
+         ELSE IF (METHOD.EQ.'LINEAR') THEN
+*     Linear
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Initialising LINEAR weighting functions',
+     :           STATUS)
+            CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
+            USEGRD = .FALSE.
+
+         ELSE IF (METHOD.EQ.'GAUSSIAN') THEN
+*     Gaussian
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Initialising GAUSSIAN weighting functions',
+     :           STATUS)
+            CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
+            USEGRD = .FALSE.
+         ENDIF
+
+      END IF
+
+
+
 *     Now I can set a default output filename for parameter 'OUT'
 *     For now the default is just the first word of the object
 *     name if there is more than 1 file. Else, derive from input
@@ -1836,10 +1888,10 @@ c
      :                 (METHOD .EQ. 'GAUSSIAN')) THEN
 
 *     Rebin the data using weighting function
-                     CALL SCULIB_WTFN_REGRID( NFILES, N_PTS, WTFNRAD, 
-     :                    WTFNRES, WEIGHTSIZE, DIAMETER, WAVELENGTH, 
-     :                    OUT_PIXEL, MAP_SIZE(1), MAP_SIZE(2), 
-     :                    I_CENTRE, J_CENTRE, WTFN, WEIGHT,
+                     CALL SCULIB_WTFN_REGRID( USEGRD, NFILES, N_PTS,
+     :                    WTFN_MAXRAD, WTFNRES, WEIGHTSIZE, SCALE, 
+     :                    DIAMETER, WAVELENGTH,  OUT_PIXEL, MAP_SIZE(1), 
+     :                    MAP_SIZE(2), I_CENTRE, J_CENTRE, WTFN, WEIGHT,
      :                    BOLWT, N_BOL, SCUBA__NUM_ADC*SCUBA__NUM_CHAN,
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, 
      :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
