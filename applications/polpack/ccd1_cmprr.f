@@ -781,7 +781,7 @@
                CALL MSG_SETR( 'DS', SS )
                CALL ERR_REP( 'CCD1_CMPRR_DS',
      :                       'Estimation of relative scale factor ' //
-     :                       'failed to conversge to required ' //
+     :                       'failed to converge to required ' //
      :                       'accuracy (^TOLS) after ^MAXIT ' //
      :                       'iteration(s) - change during final ' //
      :                       'iteration was ^DS', STATUS )
