@@ -100,8 +100,6 @@ typedef	int		LONG;			/* for DEC-Alpha... */
 		{if ((pos=FTELLO(file))==-1) \
 		   error(EXIT_FAILURE,"*Error*: File position unknown in ", \
 			fname);;}
-
-
 #define	QFREE(x)	{free(x); x = NULL;}
 
 #define	QCALLOC(ptr, typ, nel) \
@@ -128,10 +126,17 @@ typedef	int		LONG;			/* for DEC-Alpha... */
 #define	RINT(x)	(int)(floor(x+0.5))
 
 
-#define	QPRINTF		if (qflag) fprintf
+/*#define	QPRINTF		if (qflag) fprintf*/
+
+#define        AFPRINTF        adamprint
+
+#define	QPRINTF		if (qflag) adamprint
 
 #define	QFPRINTF(w,x)	{if (qflag) \
-				fprintf(w, "\33[1M> %s\n\33[1A",x);;}
+                adamprint(w, "\33[1M> %s\n\33[1A",x);;}
+
+/*#define	QFPRINTF(w,x)	{if (qflag) \
+  fprintf(w, "\33[1M> %s\n\33[1A",x);;}*/
 
 
 #define	QGETKEY(tab, key, keyname, dest) \
