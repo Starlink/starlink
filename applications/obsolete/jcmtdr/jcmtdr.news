@@ -1,0 +1,31 @@
+1 JCMTDR - Reduction of JCMT On-the-fly raster map data
+
+                                                      Expires: ????.??.??
+
+ JCMTDR is a collection of applications for use in reducing JCMT 
+ mapping data taken using the IFD in conjunction with UKT14 or the
+ single-pixel heterodyne frontends. It is intended as a replacement
+ for NOD2. This programme is intended for reduction of archive data
+ and of heterodyne beam maps.
+
+ For processing of SCUBA data use SURF (see SUN/216).
+
+2 News_1.2-2
+
+  Version 1.2-2 of JCMTDR is the port to Linux.
+
+  o  This involved the replacement of all NAG routines with
+     routines from the PDA library (see SUN/194). AE2RD2 has been removed
+     as no replacement PDA routine is available.
+
+  o  Include SC/1 and SUN/132 in the distribution. Update SUN/132 to current
+     standard although references to VMS and old Figaro support are still 
+     present and should be removed.
+
+  o  GSD inspection routines have been removed. They are now distributed as
+     part of the separate GSD package (see SUN/229).
+
+  o  The jcmt_xhelp command has been replaced with the standard Starlink
+     HTML access system ('findme sun132').
+
+
