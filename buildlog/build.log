@@ -287,12 +287,12 @@ execute_mk_script:
      [echo] java.home=/apps/j2sdk1.4.1_06/jre
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e shared
-     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c jsubpar.c
+     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/star/include -O -c jsubpar.c
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/jpcs/lib/i386/libsubpar_adam.so \
-     [exec]  " -L/apps/cvsbuild/star/share -L/apps/cvsbuild/star/lib \
+     [exec]  " -L/star/share -L/star/lib \
      [exec]        jsubpar.o   \
-     [exec]        /apps/cvsbuild/star/lib/libsubpar_adam.a \
-     [exec]        /apps/cvsbuild/star/lib/libparsecon_adam.a \
+     [exec]        /star/lib/libsubpar_adam.a \
+     [exec]        /star/lib/libparsecon_adam.a \
      [exec]        -lcnf"
 
 build:
@@ -358,7 +358,7 @@ execute_mk_script:
      [exec] Processing /apps/cvsbuild/star/lib/libems.a
      [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/star/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
      [exec] rm -r -f temp
      [echo] Executing Mirage target: build
 
@@ -462,9 +462,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/star/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 5 seconds
+Total time: 1 minute 18 seconds

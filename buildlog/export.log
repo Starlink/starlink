@@ -23,10 +23,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/junit-3.7.zip
+      [zip] Building zip: /star/sources/starjavaexport/junit-3.7.zip
       [tar] Building tar: /apps/cvsbuild/java/source/junit/junit-3.7.tar
-     [gzip] Building: /apps/cvsbuild/export/junit-3.7.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/junit-3.7.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/junit-3.7.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/junit-3.7.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/junit/junit-3.7.tar
      [echo] Executing tamfits target: export
 
@@ -51,10 +51,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/tamfits-0.96a.zip
+      [zip] Building zip: /star/sources/starjavaexport/tamfits-0.96a.zip
       [tar] Building tar: /apps/cvsbuild/java/source/tamfits/tamfits-0.96a.tar
-     [gzip] Building: /apps/cvsbuild/export/tamfits-0.96a.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/tamfits-0.96a.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/tamfits-0.96a.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/tamfits-0.96a.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/tamfits/tamfits-0.96a.tar
      [echo] Executing axis target: export
 
@@ -81,10 +81,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/axis-1.0b2.zip
+      [zip] Building zip: /star/sources/starjavaexport/axis-1.0b2.zip
       [tar] Building tar: /apps/cvsbuild/java/source/axis/axis-1.0b2.tar
-     [gzip] Building: /apps/cvsbuild/export/axis-1.0b2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/axis-1.0b2.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/axis-1.0b2.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/axis-1.0b2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/axis/axis-1.0b2.tar
      [echo] Executing Jetty target: export
 
@@ -106,10 +106,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jetty-4.0.4.zip
+      [zip] Building zip: /star/sources/starjavaexport/jetty-4.0.4.zip
       [tar] Building tar: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
-     [gzip] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jetty-4.0.4.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/jetty-4.0.4.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/jetty-4.0.4.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jetty/jetty-4.0.4.tar
      [echo] Executing UTIL target: export
 
@@ -134,10 +134,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/util-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/util-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/util/util-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/util-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/util-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/util-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/util-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/util/util-1.0.tar
      [echo] Executing Task target: export
 
@@ -162,10 +162,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/task-0.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/task-0.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/task/task-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/task-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/task-0.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/task-0.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/task-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/task/task-0.1.tar
      [echo] Executing JNIAST target: export
 
@@ -210,10 +210,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jniast-3.2-8-Linux.zip
+      [zip] Building zip: /star/sources/starjavaexport/jniast-3.2-8-Linux.zip
       [tar] Building tar: /apps/cvsbuild/java/source/jniast/jniast-3.2-8-Linux.tar
-     [gzip] Building: /apps/cvsbuild/export/jniast-3.2-8-Linux.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jniast-3.2-8-Linux.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/jniast-3.2-8-Linux.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/jniast-3.2-8-Linux.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jniast/jniast-3.2-8-Linux.tar
      [echo] Executing DIVA target: export
 
@@ -240,10 +240,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/diva-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/diva-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/diva/diva-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/diva-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/diva-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/diva-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/diva-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/diva/diva-1.0.tar
      [echo] Executing HELP target: export
 
@@ -268,10 +268,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/help-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/help-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/help/help-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/help-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/help-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/help-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/help-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/help/help-1.0.tar
      [echo] Executing ASTGUI target: export
 
@@ -296,10 +296,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/astgui-1.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/astgui-1.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/astgui/astgui-1.1.tar
-     [gzip] Building: /apps/cvsbuild/export/astgui-1.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/astgui-1.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/astgui-1.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/astgui-1.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/astgui/astgui-1.1.tar
      [echo] Executing JNIHDS target: export
 
@@ -344,10 +344,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jnihds-0.3-Linux.zip
+      [zip] Building zip: /star/sources/starjavaexport/jnihds-0.3-Linux.zip
       [tar] Building tar: /apps/cvsbuild/java/source/jnihds/jnihds-0.3-Linux.tar
-     [gzip] Building: /apps/cvsbuild/export/jnihds-0.3-Linux.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jnihds-0.3-Linux.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/jnihds-0.3-Linux.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/jnihds-0.3-Linux.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jnihds/jnihds-0.3-Linux.tar
      [echo] Executing HDX target: export
 
@@ -372,10 +372,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/hdx-0.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/hdx-0.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/hdx/hdx-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/hdx-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/hdx-0.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/hdx-0.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/hdx-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/hdx/hdx-0.1.tar
      [echo] Executing NDArray target: export
 
@@ -406,10 +406,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/array-0.2.zip
+      [zip] Building zip: /star/sources/starjavaexport/array-0.2.zip
       [tar] Building tar: /apps/cvsbuild/java/source/array/array-0.2.tar
-     [gzip] Building: /apps/cvsbuild/export/array-0.2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/array-0.2.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/array-0.2.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/array-0.2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/array/array-0.2.tar
      [echo] Executing NDX target: export
 
@@ -434,10 +434,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/ndx-0.2.zip
+      [zip] Building zip: /star/sources/starjavaexport/ndx-0.2.zip
       [tar] Building tar: /apps/cvsbuild/java/source/ndx/ndx-0.2.tar
-     [gzip] Building: /apps/cvsbuild/export/ndx-0.2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/ndx-0.2.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/ndx-0.2.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/ndx-0.2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/ndx/ndx-0.2.tar
      [echo] Executing Table target: export
 
@@ -462,10 +462,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/table-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/table-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/table/table-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/table-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/table-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/table-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/table-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/table/table-1.0.tar
      [echo] Executing NDTools target: export
 
@@ -490,10 +490,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/ndtools-0.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/ndtools-0.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/ndtools/ndtools-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/ndtools-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/ndtools-0.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/ndtools-0.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/ndtools-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/ndtools/ndtools-0.1.tar
      [echo] Executing HDS target: export
 
@@ -518,10 +518,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/hds-0.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/hds-0.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/hds/hds-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/hds-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/hds-0.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/hds-0.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/hds-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/hds/hds-0.1.tar
      [echo] Executing FITS target: export
 
@@ -546,10 +546,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/fits-0.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/fits-0.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/fits/fits-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/fits-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/fits-0.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/fits-0.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/fits-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/fits/fits-0.1.tar
      [echo] Executing JSky target: export
 
@@ -580,10 +580,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/jsky-2.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/jsky/jsky-2.0.tar
-     [gzip] Building: /apps/cvsbuild/export/jsky-2.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jsky-2.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/jsky-2.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/jsky-2.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jsky/jsky-2.0.tar
      [echo] Executing Pal target: export
 
@@ -608,10 +608,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/pal-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/pal-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/pal/pal-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/pal-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/pal-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/pal-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/pal-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/pal/pal-1.0.tar
      [echo] Executing VOTable target: export
 
@@ -636,10 +636,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/votable-2.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/votable-2.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/votable/votable-2.0.tar
-     [gzip] Building: /apps/cvsbuild/export/votable-2.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/votable-2.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/votable-2.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/votable-2.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/votable/votable-2.0.tar
      [echo] Executing JAIUtil target: export
 
@@ -664,10 +664,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jaiutil-1.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/jaiutil-1.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.1.tar
-     [gzip] Building: /apps/cvsbuild/export/jaiutil-1.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jaiutil-1.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/jaiutil-1.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/jaiutil-1.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.1.tar
      [echo] Executing SOAPSERVER target: export
 
@@ -692,10 +692,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.2.zip
+      [zip] Building zip: /star/sources/starjavaexport/soapserver-0.2.zip
       [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.2.tar
-     [gzip] Building: /apps/cvsbuild/export/soapserver-0.2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.2.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/soapserver-0.2.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/soapserver-0.2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.2.tar
      [echo] Executing JPCS target: export
 
@@ -728,10 +728,10 @@ javadocs:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jpcs-0.1-Linux.zip
+      [zip] Building zip: /star/sources/starjavaexport/jpcs-0.1-Linux.zip
       [tar] Building tar: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
-     [gzip] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/jpcs-0.1-Linux.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/jpcs-0.1-Linux.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
      [echo] Executing SOG target: export
 
@@ -756,10 +756,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/sog-0.2.zip
+      [zip] Building zip: /star/sources/starjavaexport/sog-0.2.zip
       [tar] Building tar: /apps/cvsbuild/java/source/sog/sog-0.2.tar
-     [gzip] Building: /apps/cvsbuild/export/sog-0.2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/sog-0.2.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/sog-0.2.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/sog-0.2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/sog/sog-0.2.tar
      [echo] Executing SPLAT target: export
 
@@ -799,10 +799,10 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/splat-2.2.zip
+      [zip] Building zip: /star/sources/starjavaexport/splat-2.2.zip
       [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.2.tar
-     [gzip] Building: /apps/cvsbuild/export/splat-2.2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/splat-2.2.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/splat-2.2.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/splat-2.2.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.2.tar
      [echo] Executing Mirage target: export
 
@@ -827,10 +827,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/mirage-0.1.zip
+      [zip] Building zip: /star/sources/starjavaexport/mirage-0.1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/mirage-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/mirage-0.1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/mirage-0.1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/mirage-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
      [echo] Executing TOPCAT target: export
 
@@ -867,10 +867,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/topcat-1.1-3.zip
+      [zip] Building zip: /star/sources/starjavaexport/topcat-1.1-3.zip
       [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.1-3.tar
-     [gzip] Building: /apps/cvsbuild/export/topcat-1.1-3.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/topcat-1.1-3.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/topcat-1.1-3.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/topcat-1.1-3.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.1-3.tar
      [echo] Executing Treeview target: export
 
@@ -902,10 +902,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/treeview-2.2-1.zip
+      [zip] Building zip: /star/sources/starjavaexport/treeview-2.2-1.zip
       [tar] Building tar: /apps/cvsbuild/java/source/treeview/treeview-2.2-1.tar
-     [gzip] Building: /apps/cvsbuild/export/treeview-2.2-1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/treeview-2.2-1.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/treeview-2.2-1.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/treeview-2.2-1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/treeview/treeview-2.2-1.tar
      [echo] Executing Coco target: export
 
@@ -930,10 +930,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/coco-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/coco-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/coco/coco-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/coco-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/coco-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/coco-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/coco-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/coco/coco-1.0.tar
      [echo] Executing RV target: export
 
@@ -958,10 +958,10 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/rv-1.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/rv-1.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/rv/rv-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/rv-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/rv-1.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/rv-1.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/rv-1.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/rv/rv-1.0.tar
      [echo] Executing FROG target: export
 
@@ -987,7 +987,7 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/star/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
      [exec] g77: temp/*.o: No such file or directory
 
@@ -1008,11 +1008,11 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/frog-0.6.0.zip
+      [zip] Building zip: /star/sources/starjavaexport/frog-0.6.0.zip
       [tar] Building tar: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
-     [gzip] Building: /apps/cvsbuild/export/frog-0.6.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/frog-0.6.0.tar.bz2
+     [gzip] Building: /star/sources/starjavaexport/frog-0.6.0.tar.gz
+    [bzip2] Building: /star/sources/starjavaexport/frog-0.6.0.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 22 minutes 35 seconds
+Total time: 23 minutes 2 seconds

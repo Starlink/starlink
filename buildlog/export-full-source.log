@@ -268,7 +268,7 @@ clean:
 clean:
 
 export-full-source:
-      [zip] Building zip: /apps/cvsbuild/export/starjava-sources.zip
+      [zip] Building zip: /star/sources/starjavaexport/starjava-sources.zip
 
 call_package_ant:
      [echo] Executing JUnit target: javadoc-sources
@@ -440,8 +440,8 @@ javadoc-sources:
      [copy] Copying 1960 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
-      [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
+      [zip] Building zip: /star/sources/starjavaexport/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 25 seconds
+Total time: 26 seconds

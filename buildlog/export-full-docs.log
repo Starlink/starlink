@@ -1489,8 +1489,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 55 files to /star/starjava/docs
      [echo] Executing tamfits target: install
 
 prepare:
@@ -1512,8 +1512,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 77 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 77 files to /star/starjava/docs
      [echo] Executing axis target: install
 
 prepare:
@@ -1537,8 +1537,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1551 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 17 files to /star/starjava/lib
+[loggedcopy] Copying 1551 files to /star/starjava/docs
      [echo] Executing Jetty target: install
 
 prepare:
@@ -1557,8 +1557,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 6 files to /star/starjava/lib
+[loggedcopy] Copying 397 files to /star/starjava/docs
      [echo] Executing UTIL target: install
 
 prepare:
@@ -1580,10 +1580,10 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 78 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/bin
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 1 file to /star/starjava/etc
+[loggedcopy] Copying 78 files to /star/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -1605,8 +1605,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 27 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 27 files to /star/starjava/docs
      [echo] Executing JNIAST target: install
 
 prepare:
@@ -1648,8 +1648,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 73 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 10 files to /star/starjava/lib
+[loggedcopy] Copying 73 files to /star/starjava/docs
      [echo] Executing DIVA target: install
 
 prepare:
@@ -1673,9 +1673,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1109 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 108 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 4 files to /star/starjava/lib
+[loggedcopy] Copying 1109 files to /star/starjava/docs
+[loggedcopy] Copying 108 files to /star/starjava/docs
      [echo] Executing HELP target: install
 
 prepare:
@@ -1697,8 +1697,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 29 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 4 files to /star/starjava/lib
+[loggedcopy] Copying 29 files to /star/starjava/docs
      [echo] Executing ASTGUI target: install
 
 prepare:
@@ -1720,8 +1720,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 62 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 62 files to /star/starjava/docs
      [echo] Executing JNIHDS target: install
 
 prepare:
@@ -1763,8 +1763,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 10 files to /star/starjava/lib
+[loggedcopy] Copying 18 files to /star/starjava/docs
      [echo] Executing HDX target: install
 
 prepare:
@@ -1786,8 +1786,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 29 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 29 files to /star/starjava/docs
      [echo] Executing NDArray target: install
 
 prepare:
@@ -1815,8 +1815,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 58 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 58 files to /star/starjava/docs
      [echo] Executing NDX target: install
 
 prepare:
@@ -1838,8 +1838,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 27 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 27 files to /star/starjava/docs
      [echo] Executing Table target: install
 
 prepare:
@@ -1861,9 +1861,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 118 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 4 files to /star/starjava/lib
+[loggedcopy] Copying 1 file to /star/starjava/bin
+[loggedcopy] Copying 118 files to /star/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -1885,9 +1885,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 15 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 1 file to /star/starjava/bin
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 15 files to /star/starjava/docs
      [echo] Executing HDS target: install
 
 prepare:
@@ -1909,8 +1909,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 20 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 20 files to /star/starjava/docs
      [echo] Executing FITS target: install
 
 prepare:
@@ -1932,8 +1932,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 23 files to /star/starjava/docs
      [echo] Executing JSky target: install
 
 prepare:
@@ -1961,9 +1961,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 9 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 434 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/bin
+[loggedcopy] Copying 9 files to /star/starjava/lib
+[loggedcopy] Copying 434 files to /star/starjava/docs
      [echo] Executing Pal target: install
 
 prepare:
@@ -1985,8 +1985,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 30 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 30 files to /star/starjava/docs
      [echo] Executing VOTable target: install
 
 prepare:
@@ -2008,8 +2008,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 29 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 29 files to /star/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -2031,8 +2031,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 31 files to /star/starjava/docs
      [echo] Executing SOAPSERVER target: install
 
 prepare:
@@ -2054,9 +2054,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 19 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/bin
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 19 files to /star/starjava/docs
      [echo] Executing JPCS target: install
 
 prepare:
@@ -2086,8 +2086,8 @@ javadocs:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 37 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 37 files to /star/starjava/docs
      [echo] Executing SOG target: install
 
 prepare:
@@ -2109,9 +2109,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 48 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/bin
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 48 files to /star/starjava/docs
      [echo] Executing SPLAT target: install
 
 prepare:
@@ -2148,11 +2148,11 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
-[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 251 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
+[loggedcopy] Copying 26 files to /star/starjava/bin
+[loggedcopy] Copying 10 files to /star/starjava/lib
+[loggedcopy] Copying 251 files to /star/starjava/docs
+[loggedcopy] Copying 262 files to /star/starjava/docs
+[loggedcopy] Copying 55 files to /star/starjava/etc
      [echo] Executing Mirage target: install
 
 prepare:
@@ -2174,9 +2174,9 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 1 file to /star/starjava/bin
+[loggedcopy] Copying 2 files to /star/starjava/lib
+[loggedcopy] Copying 17 files to /star/starjava/docs
      [echo] Executing TOPCAT target: install
 
 prepare:
@@ -2210,10 +2210,10 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 171 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 75 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 1 file to /star/starjava/bin
+[loggedcopy] Copying 5 files to /star/starjava/lib
+[loggedcopy] Copying 171 files to /star/starjava/docs
+[loggedcopy] Copying 75 files to /star/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -2242,10 +2242,10 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
+[loggedcopy] Copying 2 files to /star/starjava/bin
+[loggedcopy] Copying 5 files to /star/starjava/lib
+[loggedcopy] Copying 131 files to /star/starjava/docs
+[loggedcopy] Copying 14 files to /star/starjava/etc
      [echo] Executing Coco target: install
 
 prepare:
@@ -2267,8 +2267,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 18 files to /star/starjava/docs
      [echo] Executing RV target: install
 
 prepare:
@@ -2290,8 +2290,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /star/starjava/lib
+[loggedcopy] Copying 18 files to /star/starjava/docs
      [echo] Executing FROG target: install
 
 prepare:
@@ -2314,7 +2314,7 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/star/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
      [exec] g77: temp/*.o: No such file or directory
 
@@ -2335,12 +2335,12 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
 
 install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /star/starjava/bin
+[loggedcopy] Copying 6 files to /star/starjava/lib
+[loggedcopy] Copying 152 files to /star/starjava/docs
 
 export-full-docs:
-      [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
+      [zip] Building zip: /star/sources/starjavaexport/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 12 seconds
+Total time: 5 minutes 22 seconds
