@@ -506,11 +506,14 @@
 	<!-- Notes during drafting -->
 
 <!ELEMENT index %MXX; (#PCDATA)>
+	<!-- Index entry.  Index key (not output) is the element content.
+             Any sublevels are separated by !, as in
+             topic!subtopic!detail. -->
 <!ATTLIST index
-	key	CDATA	#IMPLIED
+	range	(open|close) #IMPLIED
 	>
 	<!-- attributes:
-		key	key, if not element contents 
+		range   open and close delimit range for entry
 	-->
 
 <!-- coderef element is for linking to code elements via a

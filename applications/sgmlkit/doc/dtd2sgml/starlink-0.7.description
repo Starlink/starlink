@@ -808,15 +808,17 @@ argument&lt;/update&gt;In this section...
 </element>
 
 
-<element gi="index" status="experimental">
-<p>The contents of the element are to be indexed.</p>
-<attribute name="key">
-<p>If this attribute is present, then the attribute value is used as
-the index key, rather than the element contents.
-
-</p>
-</attribute>
-</element>
+  <element gi="index" status="experimental">
+    <p>Specifies that the element content, should be indexed (and not
+      displayed).  The key may have sublevels separated by
+      <code>!</code> characters, as in
+      <code>topic!subtopic!detail</code>.</p>
+    <attribute name="range">
+      <p>One of the strings "open" or "close", indicating the
+      beginning or ending of a range of pages associated with a
+      particular keyword</p>
+    </attribute>
+  </element>
 
 
 <element gi="kbd" status="stable">
