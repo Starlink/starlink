@@ -134,9 +134,11 @@
          if { $state == "normal" } {
             $itk_component(zoomin) configure -state "normal"
             $itk_component(zoomout) configure -state "normal"
+            $itk_component(zoom) configure -state "normal"
          } elseif { $state == "disabled" } {
             $itk_component(zoomin) configure -state "disabled"
             $itk_component(zoomout) configure -state "disabled"
+            $itk_component(zoom) configure -state "disabled"
          }
       }
 
