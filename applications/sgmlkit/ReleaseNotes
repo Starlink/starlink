@@ -3,45 +3,19 @@
   $Id$
 -->
 
-<subsect id=release-0.3 export>Release Notes, version 0.3
+<subsect id=release-0.3 export>Release Notes, version DR-0.3
 
 <p>This is developers' release 0.3.
 
+<p>The system relies on the DSSSL engine Jade, but
+it does <em/not/ contain a pre-built version of Jade.  See <ref
+id=install> for further details of obtaining and building Jade.
+
 <subsubsect>New in this release
 
-<p>The only additional features are some hooks for customising the
-output, described in <ref id=appx.system.paramdsssl>.
-
-<p>The system relies on the DSSSL engine Jade, but
-it does <em/not/ contain a pre-built version of Jade.  Jade turns out
-to be a real hassle to build with a compiler other than gcc.  The
-author, James Clark, is a fine programmer, but apparently a bit of a
-standards purist (he was involved with writing the DSSSL standard, and
-with the development of XML/XSL): he seems to take the position that a
-standards document is an adequate C++ user manual, and doesn't appear
-to believe that porting software to non-conforming compilers should be
-high on his priority list.  Jade builds
-perfectly happily on gcc, but I've been struggling away for ages
-trying to get it to build using Sun's and Digital's C++ compilers.  I
-will distribute a runnable version of Jade eventually, but for the
-moment, you'll have to build Jade yourself.  If <em/you/ manage to
-build it using one of those, could you tell me what you had to do&ellip;.
-
-<p>Get Jade from Clark's <webref
-url='http://www.jclark.com/jade/' >Jade pages</webref>.  Before you
-build it, you need to patch it to a Starlink-specific version, using
-the patch at
-<url>http://www.astro.gla.ac.uk/users/norman/distrib/jade.html</url>.
-The configuration you'll need is:
-<verbatim>
-% mkdir -p /my/star/bin/sgml/bin /my/star/bin/sgml/lib
-% ./configure --enable-latex --prefix=/my/star/bin/sgml
-% make
-% make install
-</verbatim>
-The stylesheets need Jade patched to version
-<code/1.2.1-starlink-1.0b2/ (you can check Jade's version with
-<kbd>jade -v &lt;/dev/null</kbd>).
+<p>Additional features include some hooks for customising the
+output, described in <ref id=appx.system.paramdsssl>.  The generation
+of the backmatter was rewritten.  Numerous other fixes and tweaks.
 
 <subsubsect>Changes
 
@@ -96,7 +70,7 @@ ROUTINECODE elements come out with the wrong numbers.
 
 <dt>Updated Jade patches
 <dd>I've fixed a couple of buglets in the Jade back-end I produced.
-The stylesheets now need <code/1.2.1-starlink-1.0b2/.
+The stylesheets now need version <code/1.2.1-starlink-1.0b2/.
 
 </dl>
 
@@ -105,7 +79,7 @@ The stylesheets now need <code/1.2.1-starlink-1.0b2/.
 <p>This is the to-do list.  These are the issues which should either
 be addressed before the next full release, or postponed as being
 unresolvable just now.  For more wishful thinking, see <ref
-id=further.development>.
+id=final.development>.
 
 <dl>
 <dt>Bundle Jade with the system
@@ -160,7 +134,7 @@ Jade.  There's some weakness in the way that
 characters are output, which results in SDATA entities not being
 processed properly, when
 the character data is obtained via (data) rather than
-(process-children).  Unfortunately, I think that fixing this second
+(process-children).  Unfortunately, I think that fixing this
 one is going to need more knowledge of Jade internals than I have to
 hand right now.  The only available workaround is to avoid using any
 of the entities in <ref id=table.entities> within `DT' elements (which
