@@ -1,0 +1,206 @@
+.help astimp Starlink ccdpack
+.nf
+Imports AST FrameSet information into NDFs.
+
+Usage:
+
+   ASTIMP in astfile indomain
+
+Description:
+
+   This task reads AST FrameSet information from a suitable file
+   and uses it to modify the WCS components of the given NDFs.
+   A frame in a new domain is added (the same for each NDF) within
+   which a set of NDFs can be aligned.  This alignment may be used to
+   assist FINDOFF in registering the images, or as a substititute
+   for performing registration by matching objects.  The newly
+   added domain is made the Current domain of the WCS components.
+
+   AST files for use by this application are intended to be those
+   written by the ASTEXP application, but with care frameset files
+   written from other applications or doctored by hand could be used.
+
+   If the WCS component of the NDF has a frame whose Domain has
+   the same value as that of the Current frame of the frameset
+   being imported, it will be overwritten, and a warning message
+   issued.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ASTFILE
+
+ASTFILE = LITERAL (Read)
+   A file containing a sequence of framesets describing the
+   relative coordinate systems of NDFs from different sources.
+
+   It is intended that this file should be one written by the
+   ASTEXP application when a successful registration is made,
+   and the user need not be aware of its internal structure.
+   The files are readable text however, and can in principle be
+   written by other applications or doctored by hand, if this
+   is done with care, and with knowledge of AST objects (SUN/210).
+   The format of the file is explained in the Notes section.
+
+IN
+
+IN = LITERAL (Read)
+   A list of NDF names whose WCS components are to be modified
+   according to ASTFILE.  The NDF names may be specified using
+   wildcards, or may be specified using an indirection file
+   (the indirection character is "^").
+
+INDICES
+
+INDICES( * ) = _INTEGER (Read)
+   This parameter is a list of integers with as many elements as
+   there are NDFs accessed by the IN parameter.  If the frameset
+   identifiers are of the type 'INDEX' then it indicates, for
+   each NDF, what its index number is.  Thus if only one NDF is
+   given in the IN list, and the value of INDICES is [3], then
+   the frameset with the identifier 'INDEX 3' will be chosen.
+   Its default value is a list with the appropriate number of
+   elements starting 1,2,3,...  This default will normally be
+   appropriate unless the NDFs are being presented in an unusual
+   order, i.e. different from that in which they were presented
+   to ASTEXP when generating the AST file.
+   [Dynamic: 1,2,3,...]
+
+INDOMAIN
+
+INDOMAIN = LITERAL (Read)
+   The Domain name to be used for the Current frames of the
+   framesets which are imported.  If a null (!) value is given,
+   the frames will assume the same name as in the AST file.
+   [!]
+
+LOGFILE
+
+LOGFILE = FILENAME (Read)
+   Name of the CCDPACK logfile.  If a null (!) value is given for
+   this parameter then no logfile will be written, regardless of
+   the value of the LOGTO parameter.
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "CCDPACK.LOG".
+   [CCDPACK.LOG]
+
+LOGTO
+
+LOGTO = LITERAL (Read)
+   Every CCDPACK application has the ability to log its output
+   for future reference as well as for display on the terminal.
+   This parameter controls this process, and may be set to any
+   unique abbreviation of the following:
+
+      -  TERMINAL  -- Send output to the terminal only
+
+      -  LOGFILE   -- Send output to the logfile only (see the
+                      LOGFILE parameter)
+
+      -  BOTH      -- Send output to both the terminal and the
+                      logfile
+
+      -  NEITHER   -- Produce no output at all
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "BOTH".
+   [BOTH]
+
+Examples
+
+astimp data* camera.ast obs1
+   This will apply the AST file "camera.ast" to all the NDFs in
+   the current directory with names beginning "data".  The file
+   "camera.ast" has previously been written using ASTEXP with
+   the parameter ASTFILE=camera.ast.  A new frame with a Domain
+   called "OBS1" is added to the WCS component of each NDF.
+
+astimp "data3,data4" instrum.ast obs1 indices=[3,4]
+   This imports frameset information from the AST file instrum.ast
+   which was written by ASTEXP with the IDTYPE parameter set to
+   INDEX.  In this case NDFs of only the third and fourth types
+   described in that file are being modified.
+
+astimp astfile=instrum.ast in=! logto=terminal accept
+   This will simply report on the framesets contained within
+   the AST file "instrum.ast", writing the ID of each to the
+   terminal only.
+
+Notes
+
+AST file format:
+   The AST file is designed to be written by ASTEXP and read by
+   ASTIMP, and the user does not need to understand its format.
+   It is however a text file, and if care is taken it may be
+   edited by hand.  Removing entire framesets and modifying ID
+   values or domain names may be done fairly easily, but care
+   should be taken (see SUN/210) if any more involved changes
+   are to be undertaken.  The format of the file is explained
+   here.
+
+   The AST file consists of a sequence of framesets.  Each
+   frameset has an ID, and contains two frames (a Base frame and
+   a Current frame) and a mapping between them.  The domains of
+   all the Base frames should normally be the same, and likewise
+   for all the Current frames.  For the NDFs to which the file
+   will be applied by ASTIMP, their WCS components should contain
+   frames in the same domain as the AST file's Base frame.
+
+   The ID of each frameset is used to determine, for each NDF,
+   which of the framesets in the file should be applied to it.
+   This ID is a string which can assume one of the followin forms:
+
+   -  "FITSID KEY VALUE"
+         This will match an NDF if the first FITS header card
+         with the keyword KEY has the value VALUE.  If the value
+         is of type CHARACTER it must be in single quotes. KEY
+         may be compound (of the form keyword1.keyword2 etc) to
+         permit reading of hierarchical keywords.
+
+   -  "INDEX N"
+         This associates a frameset with an integer N.  Usually
+         N will take the values 1,2,3,... for the framesets
+         in the file.  Typically the N'th NDF in a list will
+         match the one with an ID of "INDEX N".
+
+   Rigorous error checking of the AST file is not performed, so
+   that unhelpful modifications to the WCS components of the
+   target NDFs may occur if it is not in accordance with these
+   requirements.
+
+Behaviour_of_parameters
+
+   Most parameters retain their current value as default. The
+   "current" value is the value assigned on the last run of the
+   application. If the application has not been run then the
+   "intrinsic" defaults, as shown in the parameter help, apply.
+
+   Retaining parameter values has the advantage of allowing you to
+   define the default behaviour of the application but does mean
+   that additional care needs to be taken when using the application
+   on new datasets or after a break of sometime.  The intrinsic
+   default behaviour of the application may be restored by using the
+   RESET keyword on the command line.
+
+   Certain parameters (LOGTO and LOGFILE) have global values.
+   These global values will always take precedence, except when an
+   assignment is made on the command line.  Global values may be set
+   and reset using the CCDSETUP and CCDCLEAR commands.
+
+Copyright
+
+   Copyright (C) 1999 Central Laboratory of the Research Councils
+
+Authors
+
+MBT: Mark Taylor (STARLINK)
+
+History
+
+ 05-MAR-1999 (MBT):
+    Original version.
+.endhelp
