@@ -18,6 +18,7 @@
      :    INPVAL( 3, 256, 10)  ! colour values
 
 *      check status on entry - return if not o.k.
+	STATUS = SAI__OK
 
 	IF ( STATUS .NE. SAI__OK ) THEN
 
