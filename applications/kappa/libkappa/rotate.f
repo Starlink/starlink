@@ -1004,17 +1004,17 @@
       SINANG = DBLE( SIN( ANGLE * DTOR ) )
 
       MATRIX( 1 ) = COSANG
-      MATRIX( 2 ) = -SINANG
-      MATRIX( 3 ) = SINANG
+      MATRIX( 2 ) = SINANG
+      MATRIX( 3 ) = -SINANG
       MATRIX( 4 ) = COSANG
 
       OXC = 0.5D0*DBLE( UBNDO( 1 ) + LBNDO( 1 ) - 1 )
       OYC = 0.5D0*DBLE( UBNDO( 2 ) + LBNDO( 2 ) - 1 )
-      IXC = 0.5D0*DBLE( UBND( 1 ) + LBND( 1 ) - 1 )
-      IYC = 0.5D0*DBLE( UBND( 2 ) + LBND( 2 ) - 1 )
+      IXC = 0.5D0*DBLE( SUBNDI( 1 ) + SLBNDI( 1 ) - 1 )
+      IYC = 0.5D0*DBLE( SUBNDI( 2 ) + SLBNDI( 2 ) - 1 )
 
-      OFFSET( 1 ) = OXC - IXC*COSANG + IYC*SINANG
-      OFFSET( 2 ) = OYC - IXC*SINANG - IYC*COSANG
+      OFFSET( 1 ) = OXC - IXC*COSANG - IYC*SINANG
+      OFFSET( 2 ) = OYC + IXC*SINANG - IYC*COSANG
 
 *  Propagate the WCS component.
       CALL KPG1_ASPRP( 2, NDFI, NDFO, MATRIX, OFFSET, STATUS )
