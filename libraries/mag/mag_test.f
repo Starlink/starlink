@@ -1,4 +1,6 @@
-      SUBROUTINE MAG_TEST( STATUS )
+      PROGRAM MAG_TEST
+      INTEGER STATUS
+      STATUS = 0
 
 *  Simple test to see that the MAG routine are available to be linked against.
 
