@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_PRMIN( XIN, YIN, NIN, DIFF, XOUT, YOUT, INDEXS,
-     :                       NOUT, STATUS )
+      SUBROUTINE CCD1_PRMIN( XIN, YIN, INDIN, NIN, DIFF, XOUT, YOUT,
+     :                       INDOUT, NOUT, STATUS )
 *+
 *  Name:
 *     CCD1_PRMIN
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_PRMIN( XIN, YIN, NIN, DIFF, XOUT, YOUT, NOUT, INDEXS,
-*                      STATUS )
+*     CALL CCD1_PRMIN( XIN, YIN, NIN, INDIN, DIFF, XOUT, YOUT, NOUT,
+*                      INDOUT, STATUS )
 
 *  Description:
 *     This routines determines the euclidian distance between the all
@@ -24,6 +24,8 @@
 *        Input X positions.
 *     YIN( NIN ) = DOUBLE PRECISION (Given)
 *        Input Y positions.
+*     INDIN( NIN ) = INTEGER (Given)
+*        Identificiation numbers for the input points.
 *     NIN = INTEGER (Given)
 *        Number of positions to be checked for proximity.
 *     DIFF = DOUBLE PRECISION (Given)
@@ -33,20 +35,22 @@
 *        Output X positions.
 *     YOUT( NIN ) = DOUBLE PRECISION (Returned)
 *        Output Y positions.
-*     INDEXS( NIN ) = INTEGER (Returned)
-*        Array of indices which record the original positions of the
-*        output data within the input data array.
+*     INDOUT( NIN ) = INTEGER (Returned)
+*        Identification numbers for the output points (by comparison
+*        with the INDIN array you can tell where an input point has
+*        ended up in the outputt list).
 *     NOUT = INTEGER (Returned)
 *        The number of positions output.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     -  The indexs array is supplied for use in re-ordering any
-*     associated data.
+*     -  The INDIN/INDOUT arrays are supplied for use in re-ordering 
+*     any associated data.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +60,8 @@
 *        Added indices option.
 *     4-JUN-1997 (PDRAPER):
 *        Added ability to deal with one input position.
+*     19-FEB-2001 (MBT):
+*        Added INDIN as well as INDOUT array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,12 +80,13 @@
       INTEGER NIN
       DOUBLE PRECISION XIN( NIN )
       DOUBLE PRECISION YIN( NIN )
+      INTEGER INDIN( NIN )
       DOUBLE PRECISION DIFF
 
 *  Arguments Returned:
       DOUBLE PRECISION XOUT( NIN )
       DOUBLE PRECISION YOUT( NIN )
-      INTEGER INDEXS( NIN )
+      INTEGER INDOUT( NIN )
       INTEGER NOUT
 
 *  Status:
@@ -132,7 +139,7 @@
                YOUT( NOUT ) = YIN( I )
                
 *  Record its original position.
-               INDEXS( NOUT ) = I
+               INDOUT( NOUT ) = INDIN( I )
             END IF
  1       CONTINUE
       END IF
@@ -155,7 +162,7 @@
          YOUT( NOUT ) = YIN( NIN )
 
 *  Record its original position.
-         INDEXS( NOUT ) = I
+         INDOUT( NOUT ) = INDIN( I )
       END IF
       END
 * $Id$
