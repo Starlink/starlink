@@ -517,7 +517,7 @@
 *  Initalise Pointers
             IF (STATUS .EQ. SAI__OK) THEN
                BOL_PTR = 0
-               BOL_END = 0
+               BOL_PTR_END = 0
                BOL_QPTR = 0
                BOL_QPTR_END = 0
             END IF
