@@ -72,6 +72,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.5  2005/03/23 08:00:04  timj
+*     Fix CNF_PVAL error
+*
 *     Revision 1.4  2004/09/01 01:02:03  timj
 *     use CNF_PVAL
 *
@@ -140,9 +143,10 @@
       INTEGER NN              ! Loop variable
       INTEGER NERR            ! For VEC_
       INTEGER NPS             ! Y position in input file
+      INTEGER OFFSET          ! OFFSET into array from pointer
       INTEGER REAL_FILE       ! File number associated with point
       INTEGER REAL_POS        ! Position in file of point
-      INTEGER QPTR            ! Pointer to quality byte
+      INTEGER QPTR            ! Temporary pointer
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -212,12 +216,14 @@
                   IF (REAL_FILE .LE. N_FILES .AND. 
      :                 REAL_POS .LE. N_PTS(REAL_FILE)) THEN
 
-                     QPTR = QUALITY_PTR(REAL_FILE) + 
-     :                    (REAL_POS - 1)*VAL__NBUB
-                     BTEMP = SCULIB_BITON(%VAL(CNF_PVAL(QPTR)), BITNUM)
+                     OFFSET = (REAL_POS - 1) * VAL__NBUB
+                     QPTR = QUALITY_PTR(REAL_FILE)
+
+                     BTEMP = SCULIB_BITON(%VAL(CNF_PVAL(QPTR)+OFFSET),
+     :                    BITNUM)
                   
                      CALL VEC_UBTOUB(.FALSE., 1, BTEMP, 
-     :                               %VAL(CNF_PVAL(QPTR)),
+     :                    %VAL(CNF_PVAL(QPTR)+OFFSET),
      :                    IERR, NERR, STATUS)
 
 *     It is conceivable that people will want to replace the spike with
@@ -230,11 +236,11 @@
 *     SURFLIB_FILL_GRID routine only use the requested section.
 *     Let's assume the data does not suffer from this problem.
 
-                     QPTR = DATA_PTR(REAL_FILE) + 
-     :                    (REAL_POS - 1) * VAL__NBR
+                     OFFSET = (REAL_POS - 1) * VAL__NBR
+                     QPTR = DATA_PTR(REAL_FILE)
 
                      CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
-     :                             %VAL(CNF_PVAL(QPTR)),
+     :                    %VAL(CNF_PVAL(QPTR)+OFFSET),
      :                    IERR, NERR, STATUS)
 
 
