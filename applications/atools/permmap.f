@@ -46,7 +46,7 @@
 *        Care should be taken to ensure that locations lying outside the
 *        extent of this array are not accidentally addressed. The array is
 *        not used if the INPERM and OUTPERM arrays do not contain negative 
-*        values. 
+*        values. Supply a null value (!) if no constants are needed.
 *     INPERM() = _INTEGER (Read) 
 *        An array of integers which, for each input coordinate, should 
 *        contain the number of the output coordinate whose value is to be
@@ -93,6 +93,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
@@ -101,6 +102,7 @@
 
 *  Local Variables:
       DOUBLE PRECISION CONST( NDF__MXDIM )
+      INTEGER I
       INTEGER INPRM( NDF__MXDIM )
       INTEGER NCON
       INTEGER NIN
@@ -121,8 +123,19 @@
 *  Get the output permutation array.
       CALL PAR_GET1I( 'OUTPERM', NDF__MXDIM, OUTPRM, NOUT, STATUS ) 
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999      
+
 *  Get the constants array.
       CALL PAR_GET1D( 'CONSTANTS', NDF__MXDIM, CONST, NCON, STATUS )
+
+*  If a null value was supplied, use an array filled with zeros.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         DO I = 1, NDF__MXDIM
+            CONST( I ) = 0.0
+         END DO
+      END IF
 
 *  Create the required PermMap.
       RESULT = AST_PERMMAP( NIN, INPRM, NOUT, OUTPRM, CONST, ' ',

@@ -1367,7 +1367,7 @@ skyframe.o  : SAE_PAR AST_PAR
 getframe.o  : SAE_PAR AST_PAR       
 getmapping.o: SAE_PAR AST_PAR     
 unitmap.o   : SAE_PAR NDF_PAR AST_PAR
-permmap.o   : SAE_PAR NDF_PAR AST_PAR
+permmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
 
 #-------------------------------------------------------------------------------
 #
