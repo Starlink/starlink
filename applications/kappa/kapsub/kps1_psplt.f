@@ -133,8 +133,10 @@
 
 *  Local Variables:
       CHARACTER DEFLBX*72        ! Default X axis label
+      CHARACTER DEFLBY*72        ! Default Y axis label
       INTEGER BIN                ! Bin counter for a star
-      INTEGER IATX                ! Length of X axis label
+      INTEGER IATX               ! Length of X axis label
+      INTEGER IATY               ! Length of Y axis label
       INTEGER IPLOT              ! AST Plot for plotting
       INTEGER NDATA              ! Number points to plot in the mean profile
       LOGICAL MINOR              ! Plot profile along the minor axis?
@@ -175,7 +177,7 @@
 
 *  Get the plot Y axis label.
       DEFLBY = 'Intensity'
-      IATX = 9
+      IATY = 9
 
       IF( YUNITS .NE. ' ' ) THEN
          CALL CHR_APPND( ' (', DEFLBY, IATY )
