@@ -22,7 +22,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -50,10 +49,10 @@
       ELSE
 
 *      Unmap everything
-        CALL BDA_UNMAP_INT( BG_BDA, STATUS )
+        CALL BDI_UNMAP( BG_ID, STATUS )
 
-*      Free BDA locators
-        CALL BDA_RELEASE_INT( BG_BDA, STATUS )
+*      Free BDI resources
+        CALL BDI_RELEASE( BG_ID, STATUS )
 
       END IF
 
@@ -65,13 +64,13 @@
 *    Close the file
       IF ( BG_DYNAMIC ) THEN
         IF ( .NOT. CP_MULTI ) THEN
-          CALL USI_ANNUL( BG_LOC, STATUS )
+          CALL USI_TANNUL( BG_ID, STATUS )
         END IF
       ELSE
         IF ( CP_MULTI ) THEN
-          CALL HDS_CLOSE( BG_LOC, STATUS )
+          CALL ADI_FCLOSE( BG_ID, STATUS )
         ELSE
-          CALL USI_ANNUL( BG_LOC, STATUS )
+          CALL USI_TANNUL( BG_ID, STATUS )
         END IF
       END IF
 
@@ -100,7 +99,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -114,21 +113,18 @@
 *    Local variables :
 *
       INTEGER                  I                       ! Loop over dimensions
-      INTEGER                  DIMS(DAT__MXDIM)        ! Image dimensions
+      INTEGER                  DIMS(ADI__MXDIM)        ! Image dimensions
       INTEGER                  NDIM
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get BDA identifier
-      CALL BDA_FIND( BG_LOC, BG_BDA, STATUS )
-
 *    First the data array
-      CALL BDA_CHKDATA_INT( BG_BDA, BG_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( BG_ID, BG_OK, NDIM, DIMS, STATUS )
       IF ( .NOT. BG_OK ) THEN
-        CALL MSG_PRNT( '! Invalid background data' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Invalid background data', STATUS )
 
       ELSE
 
@@ -143,7 +139,7 @@
         END DO
 
 *      Map the data
-        CALL BDA_MAPDATA_INT( BG_BDA, 'READ', BG_DATA_PTR, STATUS )
+        CALL BDI_MAPDATA( BG_ID, 'READ', BG_DATA_PTR, STATUS )
 
 *      Map array for background variance & divide by data variance squared
         IF ( .NOT. CP_CASH ) THEN
@@ -190,7 +186,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -249,7 +244,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -314,7 +308,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :

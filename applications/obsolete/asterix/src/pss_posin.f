@@ -369,7 +369,7 @@
         END DO
 
 *      Output message
-        IF ( SSSDS_THERE ) THEN
+        IF ( SSDS_THERE ) THEN
           CALL MSG_SETC( 'SRC', 'SSDS' )
         ELSE IF ( TXT_THERE ) THEN
           CALL MSG_SETC( 'SRC', 'text file' )

@@ -22,7 +22,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
 *
@@ -57,9 +57,9 @@
 
 *    Get output dataset
       IF ( MP_MODE .EQ. 'R' ) THEN
-        CALL USI_ASSOCI( EPAR, 'READ', MP_LOC, PRIM, STATUS )
+        CALL USI_TASSOCI( EPAR, '*', 'READ', MP_ID, STATUS )
       ELSE
-        CALL USI_ASSOCO( EPAR, 'IMAGE', MP_LOC, STATUS )
+        CALL USI_TASSOCO( EPAR, 'Image', MP_ID, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) THEN
         IF ( (STATUS.EQ.PAR__NULL) .AND. NOK ) THEN
@@ -69,8 +69,6 @@
         END IF
         GOTO 99
       END IF
-      CALL BDA_FIND( MP_LOC, MP_BDA, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Generate map axes
       CALL PSS_MAP_SETUP( STATUS )
@@ -107,7 +105,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -125,14 +123,14 @@
 *    Valid map?
       IF ( MP_OK ) THEN
 
-*      Free from BDA system
-        CALL BDA_RELEASE_INT( MP_BDA, STATUS )
+*      Free from BDI system
+        CALL BDI_RELEASE( MP_ID, STATUS )
 
 *      Environment map?
         IF ( MP_ENVIR ) THEN
           CALL USI_CANCL( MP_PAR, STATUS )
         ELSE
-          CALL HDS_CLOSE( MP_LOC, STATUS )
+          CALL ADI_FCLOSE( MP_ID, STATUS )
         END IF
 
 *      And reset
@@ -170,7 +168,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -194,8 +192,7 @@
       MP_MODE = 'W'
 
 *    Get output dataset
-      CALL HDS_NEW( FILE, 'DATASET', 'IMAGE', 0, 0, STATUS )
-      CALL BDA_FIND( MP_LOC, MP_BDA, STATUS )
+      CALL ADI_FCREAT( FILE, MP_ID, STATUS )
 
 *    Generate map axes
       CALL PSS_MAP_SETUP( STATUS )
@@ -234,7 +231,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -320,7 +317,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -346,7 +343,7 @@
       IF ( (STATUS.NE.SAI__OK) .OR. .NOT. MP_OK ) GOTO 99
 
 *    Write a title and units
-      CALL BDA_PUTUNITS_INT( MP_BDA, 'sigma', STATUS )
+      CALL BDI_PUTUNITS( MP_ID, 'sigma', STATUS )
       IF ( CP_CASH ) THEN
         CALL PSS_MAP_TITLE( 'Cash significance map', STATUS )
       ELSE
@@ -357,7 +354,7 @@
       CALL ARR_COP1R( GR_NELM, SMAP, %VAL(MP_DPTR), STATUS )
 
 *    Copy MORE box
-      CALL BDA_COPMORE_INT( IM_BDA, MP_BDA, STATUS )
+      CALL BDI_COPMORE( IM_ID, MP_ID, STATUS )
 
 *    Pixel plot with colour bar
       CALL GCB_LCONNECT( STATUS )
@@ -365,7 +362,7 @@
       CALL GCB_SETL( 'PIX_FLAG', .TRUE., STATUS )
       CALL GCB_SETL( 'KEY_FLAG', .TRUE., STATUS )
       CALL GCB_SETC( 'KEY_OPT', 'P', STATUS )
-      CALL GCB_SAVE( MP_LOC, STATUS )
+      CALL GCB_FSAVE( MP_ID, STATUS )
       CALL GCB_DETACH( STATUS )
 
 *    Release the dataset
@@ -405,7 +402,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -478,7 +475,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -589,7 +586,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -626,35 +623,35 @@
       IF ( MP_MODE .EQ. 'W' ) THEN
 
 *      Create dataset mapping the current grid
-        CALL BDA_CREBDS_INT( MP_BDA, 2, GR_DIMS, .TRUE., .FALSE.,
+        CALL BDI_CREBDS( MP_ID, 2, GR_DIMS, .TRUE., .FALSE.,
      :                                          .FALSE., STATUS )
 
 *      Set up axes to describe current grid
         DO IAX = 1, 2
-          CALL BDA_PUTAXVAL_INT( MP_BDA, IAX, AXV(IAX,GR_A0(IAX)),
+          CALL BDI_PUTAXVAL( MP_ID, IAX, AXV(IAX,GR_A0(IAX)),
      :              GR_DA(IAX)/AX_TOR(IAX), GR_DIMS(IAX), STATUS )
-          CALL BDA_PUTAXWID_INT( MP_BDA, IAX, ABS(GR_DA(IAX)/
+          CALL BDI_PUTAXWID( MP_ID, IAX, ABS(GR_DA(IAX)/
      :                              AX_TOR(IAX)), STATUS )
-          CALL BDA_COPAXTEXT_INT( IM_BDA, MP_BDA, IAX, IAX, STATUS )
+          CALL BDI_COPAXTEXT( IM_ID, MP_ID, IAX, IAX, STATUS )
         END DO
 
 *      Create some HISTORY
-        CALL HIST_COPY( IM_LOC, MP_LOC, STATUS )
-        CALL HIST_ADD( MP_LOC, PSS__VERSION, STATUS )
+        CALL HSI_COPY( IM_ID, MP_ID, STATUS )
+        CALL HSI_ADD( MP_ID, PSS__VERSION, STATUS )
 
 *      Bit more information
         HTEXT(1) = 'Input dataset {INP}'
         HLINES = 5
         CALL USI_TEXT( 1, HTEXT, HLINES, STATUS )
-        CALL HIST_PTXT( MP_LOC, HLINES, HTEXT, STATUS )
+        CALL HSI_PTXT( MP_ID, HLINES, HTEXT, STATUS )
 
 *      Copy MORE box
-        CALL BDA_COPMORE_INT( IM_BDA, MP_BDA, STATUS )
+        CALL BDI_COPMORE( IM_ID, MP_ID, STATUS )
 
       ELSE
 
 *      Check dataset
-        CALL BDA_CHKDATA_INT( MP_BDA, OK, NDIM, GR_DIMS, STATUS )
+        CALL BDI_CHKDATA( MP_ID, OK, NDIM, GR_DIMS, STATUS )
         GR_NELM = GR_DIMS(1)*GR_DIMS(2)
         IF ( .NOT. OK ) THEN
           CALL MSG_PRNT( '! Invalid significance map' )
@@ -666,11 +663,11 @@
         DO IAX = 1, 2
 
 *        Get axis scales
-          CALL BDA_GETAXVAL_INT( MP_BDA, IAX, GR_A0(IAX),
+          CALL BDI_GETAXVAL( MP_ID, IAX, GR_A0(IAX),
      :                          GR_DA(IAX), DIM, STATUS )
 
 *        Get units and conversion factor
-          CALL BDA_GETAXUNITS_INT( MP_BDA, IAX, UNITS, STATUS )
+          CALL BDI_GETAXUNITS( MP_ID, IAX, UNITS, STATUS )
           CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
 *        Set grid data
@@ -682,7 +679,7 @@
       END IF
 
 *    Map the map data
-      CALL BDA_MAPDATA_INT( MP_BDA, MP_MODE, MP_DPTR, STATUS )
+      CALL BDI_MAPDATA( MP_ID, MP_MODE, MP_DPTR, STATUS )
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
@@ -710,7 +707,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -741,7 +738,7 @@
         CALL MSG_MAKE( UTITLE, TEXT, TLEN )
 
 *      Write titl;e
-        CALL BDA_PUTTITLE_INT( MP_BDA, TEXT(:TLEN), STATUS )
+        CALL BDI_PUTTITLE( MP_ID, TEXT(:TLEN), STATUS )
 
       END IF
 
