@@ -40,6 +40,8 @@
 #        raising causes problems with some WMs).
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Extracted window centring to external routine CCDCentreWindow.
 #     {enter_further_changes_here}
 
 #-
@@ -72,22 +74,8 @@
 #  Make sure this window is on top and reasonable prominent
 #  (centre of screen of parent top-level).
       wm withdraw $topwin
-      update idletasks
-      set wtop [winfo toplevel $topwin]
-      if { $wtop != $topwin } {
-         set x [expr [winfo rootx $wtop] + [winfo reqwidth $wtop]/2 \
-                   -[winfo reqwidth $topwin]/2]
-         set y [expr [winfo rooty $wtop] + [winfo reqheight $wtop]/2 \
-                   -[winfo reqheight $topwin]/2]
-      } else {
-         set x [expr [winfo screenwidth $topwin]/2 - [winfo reqwidth $topwin]/2]
-         set y [expr [winfo screenheight $topwin]/2 - [winfo reqheight $topwin]/2]
-      }
-      wm geometry $topwin +$x+$y
+      CCDCentreWindow $Topwin [winfo parent $topwin]
       wm deiconify $topwin
-
-#  Try to make sure this window stays on Top.
-      wm transient $topwin [winfo parent $topwin]
 
 #  Make OK the focus
       $Button focus OK

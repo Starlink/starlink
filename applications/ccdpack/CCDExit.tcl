@@ -32,6 +32,8 @@ proc CCDExit {} {
 #        raising causes problems with some WMs).
 #     11-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Extracted window centring to external routine CCDCentreWindow.
 #     {enter_changes_here}
 
 #-
@@ -69,10 +71,7 @@ proc CCDExit {} {
 #  Make sure this window is on top and reasonable prominent 
 #  (centre of screen of parent top-level).
       wm withdraw $top
-      update idletasks
-      set x [expr [winfo screenwidth $top]/2 - [winfo reqwidth $top]/2]
-      set y [expr [winfo screenheight $top]/2 - [winfo reqheight $top]/2]
-      wm geometry $top +$x+$y
+      CCDCentreWindow $Top
       wm deiconify $top
 
 #  Try to make sure this window stays on Top.
