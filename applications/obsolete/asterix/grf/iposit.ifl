@@ -1,26 +1,11 @@
 interface IPOSIT
-  parameter ENTER
-    type '_LOGICAL'
-    default N
+  parameter MODE
+    type '_CHAR'
+    position 1
     vpath 'DEFAULT'
-    prompt 'Entry mode'
-    help 'Enter list of positions, individually or from a text or source file'
-  endparameter
-  parameter APPEND
-    type '_LOGICAL'
-    prompt 'Append to existing positions'
-  endparameter
-  parameter SEL
-    type '_LOGICAL'
-    default N
-    vpath 'DEFAULT'
-    prompt 'Select position from list'
-  endparameter
-  parameter SHOW
-    type '_LOGICAL'
-    default N
-    vpath 'DEFAULT'
-    prompt 'Show list of positions'
+    default 'POINT'
+    prompt 'Mode'
+    help 'POInt, ENTer, APPend, SELect, SHOw, SAVe'
   endparameter
   parameter LIST
     type '_CHAR'
