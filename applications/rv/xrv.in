@@ -1,4 +1,5 @@
-#!STAR_BIN/expectk 
+#!@starbindir@/expectk 
+#  @edited_input@
 #+
 #  Name:
 #     xrv
@@ -38,7 +39,7 @@
 #   
 # define absolute path to the RV startup script
 
-  set rv INSTALL_BIN/rv
+  set rv @bindir@/rv
 
 #
 # Nothing below this line should need to be changed on your system
