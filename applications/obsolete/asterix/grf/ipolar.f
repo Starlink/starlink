@@ -173,7 +173,6 @@
 
 *  Local Variables:
       CHARACTER*40 		AUNITS(2)            	! Units of axes
-      CHARACTER*1		AXC			! Axis number string
       CHARACTER*60 		DUNITS               	! Units of the data
       CHARACTER*80		PATH(8) 		! History input axis2-units
       CHARACTER*80 		TITLE 			! Title of files
@@ -542,8 +541,7 @@
 
 *  Copy third input axis if a cube
       IF ( CUBE ) THEN
-        CALL CHR_ITOC( ONDIM, AXC, TLEN )
-        CALL BDI_COPY( IFID, 'Axis_3', OFID, 'Axis_'//AXC, STATUS )
+        CALL BDI_AXCOPY( IFID, 3, ' ', OFID, ONDIM, STATUS )
       END IF
 
 *  Write data units to output file
