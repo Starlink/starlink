@@ -176,11 +176,8 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	INTEGER STATUS
 *    Local variables :
 	INTEGER AXPTR			! Pointer to axis data
-	INTEGER AXWPTR			! Pointer to axis width
 	INTEGER AXNO			! Axis number
 	INTEGER N			! Current bound number
-
-	LOGICAL WID			! Axis width available?
 *-
 
 *  Check inherited global status.
