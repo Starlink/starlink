@@ -153,6 +153,9 @@ to need explanation or elaboration.
 
 (element dl
   (make element
+    attributes: (if (attribute-string (normalize "compact") (current-node))
+		    '(("compact" "compact"))
+		    '())
     (process-children-trim)))
 
 (element dt
@@ -165,10 +168,16 @@ to need explanation or elaboration.
 
 (element ol
   (make element
+    attributes: (if (attribute-string (normalize "compact") (current-node))
+		    '(("compact" "compact"))
+		    '())
     (process-children-trim)))
 
 (element ul
   (make element
+    attributes: (if (attribute-string (normalize "compact") (current-node))
+		    '(("compact" "compact"))
+		    '())
     (process-children-trim)))
 
 (element li
