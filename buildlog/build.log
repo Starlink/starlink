@@ -506,4 +506,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 31 seconds
+Total time: 1 minute 28 seconds
