@@ -271,7 +271,7 @@
 *
 *    Inline function :
 *
-      REAL                     DEL,SIG,PIX
+      REAL                     DEL,PIX
       INTEGER                  SPIX
        SPIX(DEL,PIX) = MAX(1,NINT(abs(10.0*PIX)/RC/MAX(1.0,
      :                                SQRT(ABS(DEL/RC)))))

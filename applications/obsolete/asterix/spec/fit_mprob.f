@@ -555,7 +555,6 @@
 *
 *    Local variables :
 *
-      DOUBLE PRECISION		DI
       DOUBLE PRECISION		LFAC,FAC		! Cumulative factorial
       DOUBLE PRECISION		LDF(0:MAXFAC)		! Store log(d!) values
         SAVE			LDF
