@@ -90,7 +90,6 @@
       INTEGER IWK_END                            ! Pointer to end of IWK
       INTEGER IWK_PTR                            ! Integer scratch array
       INTEGER MODE                               ! Mode of fit
-      INTEGER NOP                                ! Number of output points
       REAL    RTEMP                              ! Dummy real
       INTEGER WK_END                             ! Pointer to End of WK
       INTEGER WK_PTR                             ! Pointer to REAL scratch array
