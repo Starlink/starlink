@@ -324,7 +324,7 @@ export:
 prepare:
 
 check_packages:
-[available] Dec 27, 2003 5:20:03 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 28, 2003 5:20:04 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -838,6 +838,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 create_archives:
@@ -1052,4 +1053,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 12 minutes 36 seconds
+Total time: 12 minutes 47 seconds
