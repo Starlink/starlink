@@ -50,23 +50,11 @@
 #include <setjmp.h>
 #include "f77.h"
 
-#if defined( sun4_Solaris )
+#include <config.h>
 
-#include <floatingpoint.h>
-
-
-#elif defined( alpha_OSF1 ) || defined( mips ) || defined( linux )
-
-#define main MAIN__   
-void for_rtl_init_( int*, char **);
-int for_rtl_finish_( void );
-
-
-#elif defined( sun4 )
-
-#include <floatingpoint.h>
-#define main MAIN_
-
+#if defined( sun4_solaris ) || defined( sun4 )
+/* Suns have special floating point support which we can take advantage of */
+#  include <floatingpoint.h>
 #endif
 
 void hand( int );
@@ -77,28 +65,18 @@ extern F77_SUBROUTINE(dipso)( INTEGER(n) );
 jmp_buf here;      
 
 /*  Entry Point: */
-main( int argc, char *argv[]){
+/*  FC_MAIN is a macro expanding to the entry point used by the Fortran RTL */
+int FC_MAIN() {
 
 /*  Local Variables: */
       DECLARE_INTEGER(n);
 
-/*  Initialise the fortran run-time-library data structures (OSF + mips). */
-
-#if defined( alpha_OSF1 ) || defined( mips )
-      for_rtl_init_( &argc, argv );
-
-
-/*  Initialise the fortran run-time-library data structures (sun). */
-
-#elif defined( sun4 ) || defined ( sun4_Solaris )
-      f_init();
-
+#if defined( sun4 ) || defined ( sun4_Solaris )
 /*  Switch off ieee floating point exception handling, so that it doesn't
  *  interfere with the handling set up by the following calls to "signal".
  */
       ieee_handler( "set", "common", SIGFPE_ABORT );
       nonstandard_arithmetic();
- 
 #endif
 
 /*  Use the setjmp function to define here to be the place to which the
@@ -119,19 +97,7 @@ main( int argc, char *argv[]){
  *  result of a trapped signal. */
       F77_CALL(dipso)( INTEGER_ARG( &n ) );
 
-/*  Free the data structures used by the fortran run-time-library */
-
-#if defined( alpha_OSF1 ) || defined( mips )
-
-      for_rtl_finish_();
-
-#elif defined( sun4 ) || defined ( sun4_Solaris )
-
-      f_exit();
-
-#endif
-
-
+      return 0;
 }
 
 
