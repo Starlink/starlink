@@ -412,9 +412,11 @@
 *    Use a spatial file (ARD file) to select pixels wanted?
       IF ( FSEL ) THEN
 
-*      Read some axis values
-        CALL QUALITY_DISPAX( ILOC, NDIM, DIMS, AXLABEL, AXLO, AXHI,
-     :                                                DIR, STATUS )
+*      Read some axis values if not read already
+        IF ( .NOT. AXSEL ) THEN
+          CALL QUALITY_DISPAX( ILOC, NDIM, DIMS, AXLABEL, AXLO, AXHI,
+     :                                                  DIR, STATUS )
+        END IF
 
 *      Read ARD file and set pixel values wanted
         CALL QUALITY_SETFSEL( ILOC, NDIM, DIMS, AXLO, AXHI,
@@ -540,6 +542,8 @@
       NFROM = NMOD
       IF ( AXSEL .AND. DATSEL ) THEN
         CALL MSG_SETC( 'FROM', 'axis/data range' )
+      ELSE IF ( AXSEL .AND. FSEL ) THEN
+        CALL MSG_SETC( 'FROM', 'axis/ARD file range' )
       ELSE IF ( AXSEL ) THEN
         CALL MSG_SETC( 'FROM', 'axis range' )
       ELSE IF ( FSEL ) THEN
