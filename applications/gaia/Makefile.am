@@ -33,7 +33,7 @@ TCL_TEST_FILES = built/lib/itclConfig.sh \
  built/lib/libtkhtml.a
 
 ## Binaries used for real time display.
-SKYCAT_FILES = rtdServer rtdClient rtdCubeDisplay
+SKYCAT_FILES = rtdServer$(EXEEXT) rtdClient$(EXEEXT) rtdCubeDisplay$(EXEEXT)
 
 SKYCAT_TEST_FILES = built/lib/skycatConfig.sh
 
@@ -45,7 +45,7 @@ GAIA_LIB_FILES =  \
 
 ## Files needed from gaia/bin.
 GAIA_BIN_FILES = \
- gaia_swish gaia_stcl gaiaMon
+ gaia_swish$(EXEEXT) gaia_stcl$(EXEEXT) gaiaMon$(EXEEXT)
 
 GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc \
  tab2cat.ifc asc2tab.ifc tab2asc.ifc
@@ -97,9 +97,9 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
 	SKYCAT_WRAPPER_DIR=et; export SKYCAT_WRAPPER_DIR; \
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
-	cp -p ./built/bin/rtdClient .
-	cp -p ./built/bin/rtdServer .
-	cp -p ./built/bin/rtdCubeDisplay .
+	cp -p ./built/bin/rtdClient$(EXEEXT) .
+	cp -p ./built/bin/rtdServer$(EXEEXT) .
+	cp -p ./built/bin/rtdCubeDisplay$(EXEEXT) .
 	cp -p ./built/include/rtd/config.h rtdConfig.h
 	cp -p ./built/include/rtd/rtdImageEvent.h .
 	cp -p ./built/lib/librtdImgEvt.a .
