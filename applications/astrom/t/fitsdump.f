@@ -49,10 +49,12 @@
          endif
          if (printline) write (*, '(a)'), s
          i = i+1
-         if (s(1:3).eq.'END') keepreading = .false.
-
-*      Next card
-         call ftgrec (ftunit, i, s, ftstat)
+         if (s(1:3).eq.'END') then
+            keepreading = .false.
+         else
+*         Next card
+            call ftgrec (ftunit, i, s, ftstat)
+         endif
       enddo
 
  998  continue
