@@ -254,7 +254,6 @@ itcl::class gaia::StarAstSystem {
       }
       set testing_ 0
       if { $itk_option(-really_die) } {
-         puts "really doe..."
          delete object $this
       } else {
          wm withdraw $w_
@@ -270,7 +269,6 @@ itcl::class gaia::StarAstSystem {
       $itk_option(-rtdimage) astfix
       set_system_defaults_
       if { $itk_option(-really_die) } {
-         puts "really doe..."
          delete object $this
       } else {
          wm withdraw $w_
