@@ -7887,6 +7887,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableRowHeader.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/UCDSelector.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ValueInfoCellEditor.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ValueInfoCellRenderer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/WriterFileFilter.java
@@ -8099,6 +8100,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/TOC.xml
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/Topcat.hs
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/browser.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/colinfo.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/direct.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/help.html
@@ -8113,6 +8115,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/mirage.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/param.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/plot.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/release.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/script.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/stats.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets-win.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets.html
