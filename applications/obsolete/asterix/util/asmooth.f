@@ -122,7 +122,7 @@
       REAL                   	LEVEL(ASM__MXLEV+2)   	! Data levels for smooth
       REAL                   	SNR                   	! Requested signal to noise
 
-      INTEGER                	A_X, A_Y, A_T         	! Axis numbers
+      INTEGER                	A_X, A_Y         	! Axis numbers
       INTEGER                	DIMS(ADI__MXDIM)      	! Input dimensions
       INTEGER                	FILTER                	! Filter choice
       INTEGER                	I                     	! General loop variable
