@@ -1,3 +1,10 @@
+version.dat
+*.htx_tar
+*.htx
+fort.1
+fort.2
+core.*
+chart_mon
 *.aux
 *.dvi
 *.log
