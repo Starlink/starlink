@@ -31,11 +31,13 @@ presentation which has no links (the motivation for this was the fact that
 command stands out somewhat).
 <codebody>
 (element ref
-  (let ((target (element-with-id (attribute-string (normalize "id")
-						   (current-node))))
+  (let ((target-id (attribute-string (normalize "id")
+				     (current-node)))
+	(target (node-list-or-false (element-with-id target-id)))
 	(linktext (attribute-string (normalize "text")
 				    (current-node))))
-    (if (member (gi target) (ref-target-element-list))
+    (if (and target
+	     (member (gi target) (ref-target-element-list)))
 	(if linktext
 	    (literal linktext)	;override generation of link text
 	    (if (member (gi target) (section-element-list))
@@ -45,9 +47,12 @@ command stands out somewhat).
 					      short-ref: %short-crossrefs%))
 		(with-mode section-reference
 			(process-node-list target))))
-	(error (string-append
-	     "The stylesheet is presently unable to link to elements of type "
-	          (gi target))))))
+	(if target
+	    (error (string-append
+		    "The stylesheet is presently unable to link to elements of type "
+		    (gi target)))
+	    (error (string-append
+		    "Can't find element with ID " target-id))))))
 
 <misccode>
 <description>The <code/docxref/ element has a required attribute
@@ -71,22 +76,30 @@ it produces an <funcname/error/.
 <codebody>
 (element docxref
   (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
+	 (xrefent-pubid (and xrefent
+			     (entity-public-id xrefent)))
 	 (xrefent-sysid (and xrefent
-			     (entity-generated-system-id xrefent)))
-	 (docelem (and xrefent-sysid
-		       (document-element (sgml-parse xrefent-sysid))))
+			     (entity-system-id xrefent)))
+	 (xrefent-gen-sysid (and xrefent
+				 (entity-generated-system-id xrefent)))
+	 (docelem (and xrefent-gen-sysid
+		       (document-element (sgml-parse xrefent-gen-sysid))))
 	 (xrefid (attribute-string (normalize "loc") (current-node)))
 	 ;; xreftarget is the element the docxref refers to, or #f if
 	 ;; attribute LOC is implied or the document doesn't have such
 	 ;; an ID
 	 (xreftarget (and xrefid
+			  docelem
 			  (node-list-or-false (element-with-id xrefid
 							       docelem))))
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget no-urls: #t)))
 	 (linktext (attribute-string (normalize "text")
 				     (current-node))))
-    (if (and docelem
+    (if (and xrefent-pubid
+	     (not xrefent-sysid)
+	     xrefent-gen-sysid
+	     docelem
 	     (string=? (gi docelem)
 		       (normalize "documentsummary"))) ; sanity check...
 	(if linktext
@@ -104,16 +117,28 @@ it produces an <funcname/error/.
 		(make command name: "textit" ; link to whole document
 		      (with-mode mk-docxref
 			(process-node-list docelem)))))
-	(error (cond
-		(docelem (string-append "DOCXREF: target " xrefent
+	(cond
+	 (docelem (error (string-append "DOCXREF: target " xrefent
 					" has document type " (gi docelem)
-					": expected DOCUMENTSUMMARY"))
-		(xrefent-sysid (string-append
-				"DOCXREF: Couldn't parse " xrefent-sysid))
-		(xrefent (string-append
-			  "DOCXREF: Couldn't generate sysid for entity "
-			  xrefent))
-		(else "DOCXREF: missing DOC attribute"))))))
+					": expected DOCUMENTSUMMARY")))
+	 (xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
+					      " has a SYSTEM id")))
+	 (xrefent-gen-sysid (error (string-append
+				    "DOCXREF: Couldn't parse " xrefent-sysid)))
+	 (xrefent-pubid (if linktext
+			    (literal linktext)
+			    (let* ((pfpi (parse-fpi xrefent-pubid))
+				   (td (query-parse-fpi 'text-description
+							pfpi)))
+			      (if td
+				  (literal td)
+				  (error (string-append
+				       "DOCXREF: couldn't make sense of FPI '"
+					  xrefent-pubid "'"))))))
+	 (xrefent (error (string-append
+			  "DOCXREF: entity " xrefent
+			  " has no PUBLIC identifier")))
+	 (else (error "DOCXREF: missing DOC attribute"))))))
 
 ;; possibly due to a bug in Jade, we need to provide dummy definitions
 ;; of %starlink-document-server% and the function href-to
