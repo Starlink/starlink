@@ -92,7 +92,6 @@
 void strx_exit( ADIstatus status );
 
 #define CHAR_BIT 8
-#define MEMORY_TRACING  1
 
 #ifdef MEMORY_TRACING
 #include "f77.h"
@@ -745,7 +744,7 @@ void ADImemFreeBlock( int iblk, ADIstatus status )
     while ( nslave-- ) {
       ADIblock	*sbptr = ADI_G_blks[next];
 #ifdef MEMORY_TRACING
-      printf( "Deleting slave block %d\n",next);fflush(stdout);
+    if (dmp_on) printf( "Deleting slave block %d\n",next);fflush(stdout);
 #endif
 
 /* Reset block store */
