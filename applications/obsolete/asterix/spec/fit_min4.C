@@ -211,11 +211,12 @@ float cred[100], oldcred[10000];
 int nold, parents[100][2], oldparents[10000][2], creator[100], oldcreator[10000];
 
 /* Declaration of external FORTRAN subroutine FIT_STAT */
-extern "C" void fit_stat_(int *nds, int *model, float *newpar, int *fstat, int *predictor,
-    double *newstat, double *lndfac, int *status);
+extern "C" void fit_stat_(int *nds, struct dataset *obdat, struct instr_resp *instr, struct model_spec *model,
+    float *newpar, int *fstat, int *predictor, struct prediction *preddat, double *newstat, double *lndfac,
+    int *status);
 
 /* Declaration of external FORTRAN subroutine FIT_PRGRS */
-extern "C" void fit_prgrs_(int* nit, float* param, int* frozen, int *pegged, int *model,
+extern "C" void fit_prgrs_(int* nit, float* param, int* frozen, int*pegged,struct model_spec* model,
      int* finished, int* status);
 
 /* Declaration of external FORTRAN subroutine ADI_CGET0I */
@@ -243,9 +244,9 @@ void binaryinsert(int n, int *list, int *place);
 int selectparent(float *array, float dec);
 void uniform(float *parent1, float *parent2, FloatArray* child1, FloatArray* child2, int npar);
 int inpop(FloatArray* child, FloatArray* popl, int npar);
-void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list, int * num,
-    int npar, int *nds, int *model, int *fstat, int *predictor, int *status, int parent1,
-    int parent2, int method, FloatArray* oldpopl, double *lndfac);
+void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list, int * num, int npar, int *nds, struct dataset *obdat,
+    struct instr_resp *instr, struct model_spec *model, int *fstat, int *predictor, struct prediction *preddat, int *status,
+    int parent1, int parent2, int method, FloatArray* oldpopl, double *lndfac);
 void reunite(int n);
 void calcfit(int *list, float *fit, float dec);
 void average(float *parent1, float *parent2, FloatArray* child, int npar);
@@ -257,9 +258,10 @@ void opfitness(float* opfit, int* nopc);
 
 /* Genetic algorithm function fit_min4 - called from FORTRAN */
 extern "C" {
-void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *ub, int *frozen,
-   int *sscale, double *lndfac, int *fstat, int *predictor, float *param, int *pegged,
-   double *stat, int *finished, int *fiterr, int *mctrl, int *status)
+void fit_min4_(int *nds, struct dataset *obdat, struct instr_resp *instr, struct model_spec *model,
+   int *prgres, int *npar,  float *lb, float *ub, int *frozen, int *sscale, double *lndfac, int *fstat,
+   int *predictor, struct prediction *preddat, float *param, int *pegged, double *stat, int *finished,
+   int *fiterr, int *mctrl, int *status)
  {
   /* Declare local variables */
   float rval, count, fit[100];
@@ -350,7 +352,7 @@ void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *
   /* Evaluate solutions */
   for(i = 0; i <= 99; i++)
    {
-    fit_stat_(nds, model, &popl(0, i), fstat, predictor, &eval[i], lndfac, status);
+    fit_stat_(nds, obdat, instr, model, &popl(0, i), fstat, predictor, preddat, &eval[i], lndfac, status);
    }
 
   /* Initialize list array */
@@ -428,8 +430,8 @@ void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *
           parent1 = selectparent(fit, dec);
           parent2 = selectparent(fit, dec);
           uniform(&popl(0, parent1), &popl(0, parent2), &child1, &child2, *npar);
-          insert(&child1, &child2, &popl, list, &nc,*npar, nds,
-            model, fstat, predictor, status, parent1, parent2, 0, &oldpopl, lndfac);
+          insert(&child1, &child2, &popl, list, &nc,*npar, nds, obdat,
+            instr, model, fstat, predictor, preddat, status, parent1, parent2, 0, &oldpopl, lndfac);
           if(nc > 0)
            {
             calcfit(list, fit, dec);
@@ -442,8 +444,8 @@ void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *
           parent1 = selectparent(fit, dec);
           parent2 = selectparent(fit, dec);
           average(&popl(0, parent1), &popl(0, parent2), &child1, *npar);
-          insert(&child1, &child2, &popl, list, &nc,*npar, nds,
-            model, fstat, predictor, status, parent1, parent2, 1, &oldpopl, lndfac);
+          insert(&child1, &child2, &popl, list, &nc,*npar, nds, obdat,
+            instr, model, fstat, predictor, preddat, status, parent1, parent2, 1, &oldpopl, lndfac);
           if(nc > 0)
            {
             calcfit(list, fit, dec);
@@ -455,8 +457,8 @@ void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *
           nc = 1;
           parent1 = selectparent(fit, dec);
           mutate(&popl(0, parent1), &child1, *npar, frozen, lb, ub);
-          insert(&child1, &child2, &popl, list, &nc,*npar, nds,
-            model, fstat, predictor, status, parent1, 100, 2, &oldpopl, lndfac);
+          insert(&child1, &child2, &popl, list, &nc,*npar, nds, obdat,
+            instr, model, fstat, predictor, preddat, status, parent1, 100, 2, &oldpopl, lndfac);
           if(nc > 0)
            {
             calcfit(list, fit, dec);
@@ -468,8 +470,8 @@ void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *
           nc = 1;
           parent1 = selectparent(fit, dec);
           creep(&popl(0, parent1), &child1, *npar, frozen, lb, ub, 0.02);
-          insert(&child1, &child2, &popl, list, &nc,*npar, nds,
-            model, fstat, predictor, status, parent1, 100, 3, &oldpopl, lndfac);
+          insert(&child1, &child2, &popl, list, &nc,*npar, nds, obdat,
+            instr, model, fstat, predictor, preddat, status, parent1, 100, 3, &oldpopl, lndfac);
           if(nc > 0)
            {
             calcfit(list, fit, dec);
@@ -481,8 +483,8 @@ void fit_min4_(int *nds, int *model, int *prgres, int *npar,  float *lb, float *
           nc = 1;
           parent1 = selectparent(fit, dec);
           creep(&popl(0, parent1), &child1, *npar, frozen, lb, ub, 0.0005);
-          insert(&child1, &child2, &popl, list, &nc,*npar, nds,
-            model, fstat, predictor, status, parent1, 100, 4, &oldpopl, lndfac);
+          insert(&child1, &child2, &popl, list, &nc,*npar, nds, obdat,
+            instr, model, fstat, predictor, preddat, status, parent1, 100, 4, &oldpopl, lndfac);
           if(nc > 0)
            {
             calcfit(list, fit, dec);
@@ -721,7 +723,11 @@ void sow( int *seed1, int *seed2 )
 {
         struct tm *tm_now;
         float s_sig, s_insig, maxs_sig, maxs_insig;
+#ifdef OSF
+        int secs_now;
+#else
         long secs_now;
+#endif
         int s, m, h, d, s1, s2;
 
         time(&secs_now);
@@ -896,8 +902,8 @@ int inpop(FloatArray* child, FloatArray* popl, int npar)
  }
 
 /* Insert children into population if not already in it */
-void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list, int * num,
-    int npar, int *nds, int *model, int *fstat, int *predictor, int *status,
+void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list, int * num, int npar, int *nds, struct dataset *obdat,
+    struct instr_resp *instr, struct model_spec *model, int *fstat, int *predictor, struct prediction *preddat, int *status,
     int parent1, int parent2, int method, FloatArray* oldpopl, double *lndfac)
  {
   int j, place;
@@ -922,7 +928,7 @@ void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list,
       reunite(99);
      }
     nold++;
-    fit_stat_(nds, model, &(*popl)(0, list[99]), fstat, predictor, &eval[list[99]], lndfac, status);
+    fit_stat_(nds, obdat, instr, model, &(*popl)(0, list[99]), fstat, predictor, preddat, &eval[list[99]], lndfac, status);
     if(*num == 2)
      {
       if(inpop(child2, popl, npar) == FALSE)
@@ -944,7 +950,7 @@ void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list,
           reunite(98);
          }
         nold++;
-        fit_stat_(nds, model, &(*popl)(0, list[98]), fstat, predictor, &eval[list[98]], lndfac, status);
+        fit_stat_(nds, obdat, instr, model, &(*popl)(0, list[98]), fstat, predictor, preddat, &eval[list[98]], lndfac, status);
        }
      }
    }
@@ -969,7 +975,7 @@ void insert(FloatArray* child1, FloatArray* child2, FloatArray* popl, int *list,
         reunite(99);
        }
       nold++;
-      fit_stat_(nds, model, &(*popl)(0, list[99]), fstat, predictor, &eval[list[99]], lndfac, status);
+      fit_stat_(nds, obdat, instr, model, &(*popl)(0, list[99]), fstat, predictor, preddat, &eval[list[99]], lndfac, status);
      }
    }
 
