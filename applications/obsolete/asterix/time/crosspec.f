@@ -58,6 +58,7 @@
 *    External references :
 *
       INTEGER CHR_LEN
+       LOGICAL		CHR_SIMLR
 *
 *    Local variables :
 *
@@ -69,7 +70,7 @@
       REAL                      BASE           ! Base value of output axis
       REAL                      FRAC           ! Fraction of array to taper
                                               ! at each end
-      REAL                      SCALE          		! Scale of output axis
+      REAL                      OSCALE          	! Scale of output axis
       REAL                      SCALE(2)         	! Scale of input axes
       REAL			SPARR(2)		! Spaced array data
 
@@ -96,7 +97,7 @@
       INTEGER                   QPTR           		! Pointer to quality array
       INTEGER                   SIGMA          ! Sigma width of Gaussian window
       INTEGER                   TPTR           		! Temporary pointer
-      INTEGERF			ULEN(2)			! Length of UNITS()
+      INTEGER 			ULEN(2)			! Length of UNITS()
       INTEGER                   WRK1PTR        		! Pointer to work array
       INTEGER                   WRK2PTR        		! Pointer to work array
 
@@ -246,7 +247,7 @@
       NV = (NTOT / 2) + 1
 
 *  Get output scale
-      SCALE = 1.0 / (REAL(NTOT) * SCALE(1))
+      OSCALE = 1.0 / (REAL(NTOT) * SCALE(1))
 
 *  Extend the data?
       IF ( NTOT .GT. NPTS ) THEN
@@ -294,15 +295,13 @@
 
       CALL BDI_MAPR( COFID, 'Data', 'WRITE', CODAT, STATUS )
       SPARR(1) = 0.0
-      SPARR(2) = SCALE
+      SPARR(2) = OSCALE
       CALL BDI_AXPUT1R( COFID, 1, 'SpacedData', 2, SPARR, STATUS )
 
       CALL BDI_PUT0C( PHFID, 'Title', 'Cross Spectrum', STATUS )
       CALL BDI_PUT0C( PHFID, 'Label', 'Phase', STATUS )
 
       CALL BDI_MAPR( PHFID, 'Data', 'WRITE', PHDAT, STATUS )
-      SPARR(1) = 0.0
-      SPARR(2) = SCALE
       CALL BDI_AXPUT1R( PHFID, 1, 'SpacedData', 2, SPARR, STATUS )
       CALL BDI_AXPUT0C( PHFID, 1, 'Label', 'Frequency', STATUS )
 
