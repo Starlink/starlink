@@ -1,6 +1,5 @@
       astexp - Exports AST FrameSet information from images to AST file.
       astimp - Imports AST FrameSet information into images from AST file.
-      bounds - Draws aligned boundaries of images on a graphics display.
       calcor - Subtracts a scaled dark or flash calibration image from a list.
     ccdalign - Aligns images graphically by interactive object selection
     ccdclear - Clears CCDPACK global parameters.
@@ -10,6 +9,7 @@
     ccdsetup - Sets the CCDPACK global parameters.
      ccdshow - Displays the value of the CCDPACK global parameters.
       debias - Performs the debiassing and initial preparation of CCD data.
+     drawndf - Draws aligned images or outlines on a graphics device.
      drizzle - Mosaics images using the drizzling algorithm.
     findcent - Centroids image features.
      findobj - Locates and centroids image features.
@@ -20,13 +20,15 @@
     makebias - Produces a master from a set of bias frames.
      makecal - Produces a dark or pre-flash calibration image.
     makeflat - Produces a flatfield calibration image.
-     makemos - Make a mosaic by combining and (optionally) normalising images.
+     makemos - Makes a mosaic by combining and (optionally) normalising images.
+     makeset - Writes Set header information to images.
      pairndf - Aligns images graphically by drag and drop.
     plotlist - Draws position markers on a graphics display.
      present - Presents a list of images to CCDPACK.
       reduce - Automatic CCD data reduction facility (command-line version).
     register - Determines transformations between lists of positions.
     schedule - Schedules an automated CCDPACK reduction.
+     showset - Outputs image Set header information.
  use_globals - Controls the use of global parameters in IRAF CCDPACK.
     tranlist - Transform lists of positions.
      tranndf - Transforms a list of images by resampling.

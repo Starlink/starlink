@@ -6,7 +6,6 @@ ccdpack        hlp = doc$ccdpack.hlp, src = ccdpack.f
 command_descriptions        hlp = doc$command_descriptions.hlp, src = command_descriptions.f
 astexp        hlp = doc$astexp.hlp, src = astexp.f
 astimp        hlp = doc$astimp.hlp, src = astimp.f
-bounds        hlp = doc$bounds.hlp, src = bounds.f
 calcor        hlp = doc$calcor.hlp, src = calcor.f
 ccdalign        hlp = doc$ccdalign.hlp, src = ccdalign.f
 ccdclear        hlp = doc$ccdclear.hlp, src = ccdclear.f
@@ -17,6 +16,7 @@ ccdnote        hlp = doc$ccdnote.hlp, src = ccdnote.f
 ccdsetup        hlp = doc$ccdsetup.hlp, src = ccdsetup.f
 ccdshow        hlp = doc$ccdshow.hlp, src = ccdshow.f
 debias        hlp = doc$debias.hlp, src = debias.f
+drawndf       hlp = doc$drawndf.hlp, src = drawndf.f
 drizzle       hlp = doc$drizzle.hlp, src = drizzle.f
 findcent        hlp = doc$findcent.hlp, src = findcent.f
 findobj        hlp = doc$findobj.hlp, src = findobj.f
@@ -28,12 +28,14 @@ makebias        hlp = doc$makebias.hlp, src = makebias.f
 makecal        hlp = doc$makecal.hlp, src = makecal.f
 makeflat        hlp = doc$makeflat.hlp, src = makeflat.f
 makemos        hlp = doc$makemos.hlp, src = makemos.f
+makeset        hlp = doc$makeset.hlp, src = makeset.f
 pairndf        hlp = doc$pairndf.hlp, src = pairndf.f
 plotlist        hlp = doc$plotlist.hlp, src = plotlist.f
 present        hlp = doc$present.hlp, src = present.f
 reduce        hlp = doc$reduce.hlp, src = reduce.f
 register        hlp = doc$register.hlp, src = register.f
 schedule        hlp = doc$schedule.hlp, src = schedule.f
+showset         hlp = doc$showset.hlp, src = showset.f
 use_globals     hlp = doc$use_globals.hlp, src = use_globals.f
 tranlist        hlp = doc$tranlist.hlp, src = tranlist.f
 tranndf        hlp = doc$tranndf.hlp, src = tranndf.f
