@@ -6,8 +6,9 @@
 #           Thu Nov 27 14:08:35 GMT 1997
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub kapgen_sub \
-kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub
+#TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub kapgen_sub \
+#kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub
+TAR_FILES_A = aif_sub irm_sub 
 
 # The names of all the tar files containing system-specific files:
 TAR_FILES_B = kappa_data_alpha_OSF1 kappa_data_ix86_Linux \

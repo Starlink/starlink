@@ -49,8 +49,14 @@
       chmod 777 *
 
 #  Create each of the tar files.
-      foreach file (`grp text_tars`)
-         grp ${file}_contents > ${TEMPDIR}/blt1
+      foreach file (`grp tar_files_a`)
+         tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
+         rm -f `grp ${file}`
+         mv ${TEMPDIR}/${file}.tar ${REL_DIR}
+      end
+
+      foreach file (`grp tar_files_b`)
+         grp ${file} > ${TEMPDIR}/blt1
          awk -F. '{print $1"."$2}' ${TEMPDIR}/blt1 > ${TEMPDIR}/blt2
          awk -F. '{print "mv "$0" "$1"."$2}' ${TEMPDIR}/blt1 > ${TEMPDIR}/blt3
          chmod u+x ${TEMPDIR}/blt3
