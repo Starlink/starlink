@@ -291,11 +291,11 @@ SOURCE_VARIANT = $(SYSTEM)
 #  Pathname of the root directory beneath which other Starlink software
 #  is currently installed.
 
-STARLINK = /star
+STARLINK = /tmp/norman/star
 
 #  Path of the Perl binary we will use
 
-STARPERL = /star/Perl/bin/perl
+STARPERL = /stardev/Perl/bin/perl
 
 #  Pathnames of Starlink sub-directories that may be referenced when
 #  building this package.
@@ -355,7 +355,7 @@ TAR_OUT=tar -xf
 RMF = rm -f
 
 #  Environment settings for calls to ./configure
-CONFENVS = unset INSTALL;
+CONFENVS = unset INSTALL &&
 
 #------------------------------------------------------------------------------
 ###############################################################################
@@ -388,7 +388,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-11
+PKG_VERS = 0.5-12
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1133,7 +1133,7 @@ $(PKG_NAME)_source.tar:
 		{ echo "Need newer version of autoconf!"; false; }
 	cd moggy && AUTOMAKE='automake --foreign' autoreconf || \
 		{ echo "Need newer version of autoconf!"; false; }
-	cd catlib && if test -f Makefile; then make distclean; fi
+	cd catlib && if test -f Makefile; then make distclean; else :; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
 # Do not include the t/images directory -- large files!
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib plugin-*.pl `find t -maxdepth 1 -type f`
@@ -1168,11 +1168,12 @@ clean:
 #  unconfigured Makefile will fail to clean out the SkyCat directories.
 #  Within catlib, Makefile.in doesn't handle distclean well. ]
 unbuild: clean
-	cd astrom && if test -f makefile; then ./mk unbuild; fi
-	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
-	cd catlib && if test -f Makefile; then make distclean; fi
+	cd astrom && if test -f makefile; then ./mk unbuild; else :; fi
+	cd moggy && if test -f Makefile; then make distclean; else :; fi
+#	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
+	cd catlib && if test -f Makefile; then make distclean; else :; fi
 	test ! -d $(CATLIBINSTALLDIR) || rm -Rf $(CATLIBINSTALLDIR)
-	cd doc && make unbuild
+	if test -d doc; then cd doc; make unbuild; else :; fi
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
@@ -1318,12 +1319,8 @@ moggy/Makefile.in astrom/makefile.in:
 	fi
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
 
-VERSION:
+VERSION: makefile
 	echo $(PKG_VERS) >VERSION
-
-##  Propagate the version number
-#autoastrom autoastrom.news makefile moggy/Moggy.pm: VERSION
-#	support/propagate-version autoastrom autoastrom.news makefile moggy/Moggy.pm
 
 
 #------------------------------------------------------------------------------
