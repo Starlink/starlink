@@ -15,7 +15,7 @@
 *  Description:
 *     This file contains the lex source code to build a lexical analyser
 *     for tokenising Fortran 77 source code well enough to feed it to a 
-*     corresponding grammar parser (written as yacc).
+*     corresponding grammar parser.
 *
 *     The type of yylval returned value is in all cases pointer to char.
 *     The text thus pointed to contains all the text of the original fortran
@@ -29,6 +29,10 @@
 *     The space pointed to by yylvals has been malloc'd.  It should be
 *     freed by the parser or memory will leak.
 *
+*     The tokeniser built by this file is insufficiently precise to 
+*     parse all the fortran source.  It is also more complex than it
+*     needs to be for the purposes of inscnf.
+*
 *  Bugs:
 *     Blanks within, for instance, reserved words are not ignored as
 *     they really should be within Fortran 77 (except in cases where 
@@ -40,6 +44,8 @@
 *  History:
 *     26-NOV-1999 (MBT):
 *        Initial version.
+*     24-JAN-2000 (MBT):
+*        Adapted for use with inscnf.
 *-
 */
 

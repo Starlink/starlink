@@ -68,11 +68,8 @@
 
 
 /* Local function prototypes. */
-   void addcpv( char *buffer, char *interp[], int leng );
    void inscnf();
-   void writeout();
-   void outchar( char c );
-   void interpnow();
+   int tokmatch( int *toks, ... );
 
 /* Global variables. */
    char *name;                          /* Name of the program               */
@@ -135,6 +132,34 @@
 
 
    int tokmatch( int *toks, ... ) {   /* Last arg should be zero. */
+/*
+*+
+*  Name:
+*     tokmatch
+*
+*  Purpose:
+*     Match lists of integers.
+*
+*  Description:
+*     This matches a list of integers given as arguments against ones
+*     in an array.  The given arguments are of variable number; the
+*     last one should be a zero (this causes matching to stop).
+*     If by the time the final (zero) argument is encountered no 
+*     mismatches have occurred, a true result is returned, but if
+*     any mismatches occur matching attempts stop and a false (zero)
+*     result is returned.
+*
+*  Arguments:
+*     toks = int *
+*        Start of an array of integers.
+*     ... = int
+*        A variable number of int arguments which are to be matched
+*        against the list starting at toks.
+*
+*  Return value:
+*     Unity if the lists match, zero if they don't.
+*-
+*/
        va_list ap;
        int mtok;
 
@@ -154,25 +179,44 @@
 #include "ygen.h"
 
 
+/* Structure to hold the input text with associated information. */
    struct outchr {
-      char *interp;
-      short flag;
-      unsigned char indent;
-      char chr;
+      char *interp;                     /* Text to interpolate before chr    */
+      short flag;                       /* Special information               */
+      unsigned char indent;             /* Indent column if line broken      */
+      char chr;                         /* Input character                   */
    };
 
 
    void outbuf( struct outchr *buf, int leng ) {
+/*
+*+
+*  Name:
+*     outbuf
+*
+*  Purpose:
+*     Output prepared text.
+*
+*  Description:
+*     Takes the array of outchr structs and prints them to standard output.
+*
+*  Arguments:
+*     buf = struct outchr *
+*        Array of things to output.
+*     leng = int
+*        Number of elements in buf.
+*-
+*/
       char c;
       char chr;
       char ebuf[ LBUFSIZ ];
-      int eindent[ LBUFSIZ ];
       char *interp;
       int col;
       int done;
-      int epos;
+      int eindent[ LBUFSIZ ];
+      int epos = -1;
       int flag;
-      int hadint;
+      int hadint = 0;
       int i;
       int ind;
       int indent;
@@ -185,15 +229,16 @@
       int started;
       int we;
 
-      epos = -1;
-      hadint = 0;
+/* Loop through buffer. */
       for ( oc = 0; oc < leng; oc++ ) {
 
+/* Get info for this buffer element. */
          chr = buf[ oc ].chr;
          interp = buf[ oc ].interp;
          flag = buf[ oc ].flag;
          indent = buf[ oc ].indent;
 
+/* Initialise some counters if it is the start of a line. */
          if ( flag == LINE_START ) {
             epos = 0;
             level = 0;
@@ -211,9 +256,14 @@
          }
 
 /* Within a line it is ensured that interpolations do not cause characters
-   to overflow beyond column 72. */
+   to overflow beyond column 72.  Firstly, characters in each line are
+   copied into an intermediate buffer, which includes the interpolations
+   as well as the original characters.  When a newline character is 
+   encountered, the intermeidate buffer is output, with new line breaks
+   if they are required. */
          else {
 
+/* If there are interpolations, copy them into the intermediate buffer. */
             if ( interp != NULL ) {
                while ( c = *( interp++ ) ) {
                   ebuf[ epos ] = c;
@@ -223,14 +273,15 @@
                hadint = 1;
             }
 
-/* It's not a line end; just add it to the buffer. */
+/* As long as the character is not a line end, just copy it to the 
+   intermediate buffer. */
             if ( chr != '\n' ) {
                ebuf[ epos ] = chr;
                eindent[ epos ] = indent;
                epos++;
             }
 
-/* It's a line end.  Process the line now. */
+/* It's a line end.  Process the whole line now. */
             else {
 
 /* Strip trailing whitespace if there have been interpolations, as it
@@ -252,7 +303,9 @@
    next boundary can be output on the current line do so, otherwise
    introduce a line break and continue with the rest of the input.
    A word starts at a '%' and ends at the first character at the same
-   level of bracketing which is none of ')', ',' or ' '.  */
+   level of bracketing which is none of ')', ',' or ' '.  These are
+   sensible choices based on our knowledge of what interpolations we
+   are expecting. */
                   i = 0;
                   col = 1;
                   while ( i < epos ) {
@@ -286,6 +339,9 @@
                         }
                      }
                      j--;
+
+/* Backtrack through whitespace to find the last non-blank character before
+   the potential line break. */
                      for ( we = j; isspace( ebuf[ we ] ) && we > i; we-- );
       
 /* If this word won't fit on the current line, output a line break now. */
@@ -323,12 +379,14 @@
 
                }
 
+/* Output the newline and reset counters. */
                putchar( '\n' );
                epos = 0;
                hadint = 0;
             }
          }
 
+/* If we have reached a line end, output the intermediate buffer. */
          if ( flag == LINE_END ) {
                for ( i = 0; i < epos; i++ ) putchar( ebuf[ i ] );
                epos = -1;
@@ -355,15 +413,14 @@
 *     to standard output.  The output is substantially similar to the
 *     input except that arguments of %VAL are wrapped in the CNF_PVAL
 *     function.
+*
+*     Tokenising the input stream is done using code generated by lex.
 *-
 */
 #define MAXTOK 1000                          /* Maximum tokens in a line     */
-#define LINELENG 160
+#define LINELENG 160                         /* Maximum characters in a line */
 
-      int tokid[ MAXTOK ];
-      int tokpos[ MAXTOK ];
-      char c;
-      char *tokstr[ MAXTOK ];
+      int bufsiz = 0;
       int calltok[ MAXNEST ];
       int col;
       int incpos = 0;
@@ -371,22 +428,25 @@
       int ilev;
       int j;
       int k;
-      int leng;
+      int leng = 0;
       int level;
-      int ntok;
+      int ntok = 0;
       int nval = 0;
       int stcol[ MAXNEST ];
       int tok;
+      int tokid[ MAXTOK ];
+      int tokpos[ MAXTOK ];
       int yleng;
-      int bufsiz = 0;
+      int scase;
+      int sspace;
       struct outchr *buf;
+      char c;
+      char *tokstr[ MAXTOK ];
       char *cpo[ 4 ];
       char *cpc[ 4 ];
       char *pc;
       char callname[ LINELENG ];
       char *namestart;
-      int scase;
-      int sspace;
 
 /* Set up strings for output. */
 #define CASE_UPPER 0
@@ -404,10 +464,9 @@
       scase = CASE_UPPER;
       sspace = SPACE_YES;
 
-/* Initialise. */
-      ntok = 0;
-      leng = 0;
-
+/* Get characters from the lex tokeniser.  As well as the token id which
+   is the returm value of yylex, the global yylval points to the 
+   characters which constituted this token. */
       while ( tok = yylex() ) {
 
 /* Assemble a line in terms of tokens. */
@@ -455,6 +514,10 @@
                                   LINE_END, 0 ) ) { 
                if ( incpos ) buf[ incpos ].interp = NULL;
                incpos = tokpos[ 3 ] + yleng;
+
+/* Allocate and generate text for the INCLUDE line.  We go to some trouble
+   to match the style (spacing, case, and comment positioning) of existing
+   INCLUDE lines. */
                buf[ incpos ].interp = pc = memok( calloc( LINELENG, 1 ) );
                strcpy( pc, "      " );
                pc += 6;
@@ -468,7 +531,9 @@
                strcat( pc, "\n" );
             }
 
-/* END line - reset some counters. */
+/* END line.  If there have been no interpolations, then forget about 
+   inserting the INCLUDE line.  If there have been interpolations but
+   we couldn't find any INCLUDE lines, warn the user. */
             else if ( tokmatch( tokid, LINE_START, END, LINE_END, 0 ) ) {
                buf[ tokpos[ 1 ] ].flag = END;
                if ( nval == 0 ) {

@@ -15,7 +15,8 @@
 *  History:
 *     25-NOV-1999 (MBT):
 *        Intial version.
-*
+*     24-JAN-2000 (MBT):
+*        Adapted for use by inscnf.
 *-
 */
 

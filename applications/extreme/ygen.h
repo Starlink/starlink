@@ -4,7 +4,7 @@
 *     tag.h
 *
 *  Purpose:
-*     Include file for tagging routines.
+*     Include file for parsing routines.
 *
 *  Description:
 *     This include file contains the shared declarations for the C code
@@ -16,6 +16,8 @@
 *  History:
 *     10-DEC-1999 (MBT):
 *        Initial revision.
+*     24-JAN-2000 (MBT):
+*        Adapted to use for inscnf.
 *-
 */
 
@@ -58,15 +60,18 @@
 
 /* Amount by which to increase the preval buffer each time it needs
    increasing.  Its value affects only time/memory efficiency. */
-
 #define BUFINC 4096
 
+/* Define type of yylval lex global. */
 typedef char * STRING;
 #define YYSTYPE STRING
-            
    YYSTYPE yylval;
 
 
+/* Define token numbers for yylex return values.  Since we don't have yacc,
+   we have to do this by hand.  The values of these are not significant,
+   but they must be ints out of the range of ASCII characters, and all
+   different. */
 #define LINE_START 257
 #define LINE_END 258
 #define BLANK_LINE 259
