@@ -510,6 +510,9 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        Added method astPolyCurve. 
 *     12-OCT-1999 (DSB):
 *        Allow tick marks to be specified separately for both axes.
+*     9-JAN-2001 (DSB):
+*        Change argument "in" for astMark and astPolyCurve from type
+*        "const double (*)[]" to "const double *".
 *-
 */
 
@@ -616,9 +619,9 @@ typedef struct AstPlotVtab {
    int (* CvBrk)( AstPlot *, int, double *, double *, double * );
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
-   void (* PolyCurve)( AstPlot *, int, int, int, const double (*)[] );
+   void (* PolyCurve)( AstPlot *, int, int, int, const double * );
    void (* Grid)( AstPlot * ); 
-   void (* Mark)( AstPlot *, int, int, int, const double (*)[], int  ); 
+   void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
    void (* Text)( AstPlot *, const char *, const double [], const float [2], const char * );
    double (* GetTol)( AstPlot * );
    int (* TestTol)( AstPlot * );
@@ -771,8 +774,8 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astGridLine_( AstPlot *, int, const double [], double );
    void astCurve_( AstPlot *, const double [], const double [] );
    void astGrid_( AstPlot * );
-   void astMark_( AstPlot *, int, int, int, const double (*)[], int  ); 
-   void astPolyCurve_( AstPlot *, int, int, int, const double (*)[] );
+   void astMark_( AstPlot *, int, int, int, const double *, int  ); 
+   void astPolyCurve_( AstPlot *, int, int, int, const double * );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
 
 #if defined(astCLASS)            /* Protected */

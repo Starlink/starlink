@@ -257,6 +257,9 @@ f     using AST_GRID
 *     13-OCT-2000 (DSB):
 *        o Purge zero length sections from CurveData structures.
 *        o Increase tolerance for edge labels from 0.0005 to 0.005.
+*     9-JAN-2001 (DSB):
+*        Change argument "in" for astMark and astPolyCurve from type
+*        "const double (*)[]" to "const double *".
 *class--
 */
 
@@ -1363,10 +1366,10 @@ static void LinePlot( AstPlot *, double, double, double, double, int, CurveData 
 static void Map1( int, double *, double *, double *, const char *, const char * );
 static void Map2( int, double *, double *, double *, const char *, const char * );
 static void Map3( int, double *, double *, double *, const char *, const char * );
-static void Mark( AstPlot *, int, int, int, const double (*)[], int );
+static void Mark( AstPlot *, int, int, int, const double *, int );
 static void Opoly( const char *, const char * );
 static void PlotLabels( AstPlot *, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
-static void PolyCurve( AstPlot *, int, int, int, const double (*)[] );
+static void PolyCurve( AstPlot *, int, int, int, const double * );
 static void PurgeCdata( CurveData * );
 static void RemoveFrame( AstFrameSet *, int );
 static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
@@ -14140,7 +14143,7 @@ static void Map3( int n, double *dist, double *x, double *y,
 }
 
 static void Mark( AstPlot *this, int nmark, int ncoord, int indim, 
-                  const double (*in)[], int type ){
+                  const double *in, int type ){
 /*
 *++
 *  Name:
@@ -14156,7 +14159,7 @@ f     AST_MARK
 *  Synopsis:
 c     #include "plot.h"
 c     void astMark( AstPlot *this, int nmark, int ncoord, int indim,
-c                   const double (*in)[], int type )
+c                   const double *in, int type )
 f     CALL AST_MARK( THIS, NMARK, NCOORD, INDIM, IN, TYPE, STATUS )
 
 *  Class Membership:
@@ -14194,7 +14197,8 @@ c        given should not be less than "nmark".
 f        given should not be less than NMARK.
 c     in
 f     IN( INDIM, NCOORD ) = DOUBLE PRECISION (Given)
-c        A 2-dimensional array of shape "[ncoord][indim]" giving the
+c        The address of the first element of a 2-dimensional array of 
+c        shape "[ncoord][indim]" giving the
 c        physical coordinates of the points where markers are to be
 c        drawn. These should be stored such that the value of
 c        coordinate number "coord" for input mark number "mark" is
@@ -14285,7 +14289,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    on each axis. */
    if( astOK ){
       for( axis = 0; axis < ncoord; axis++ ){
-         ptr1[ axis ] = *in + axis*indim;
+         ptr1[ axis ] = in + axis*indim;
       }
    }
 
@@ -14860,7 +14864,7 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 }
 
 static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
-                       const double (*in)[] ){
+                       const double *in ){
 /*
 *++
 *  Name:
@@ -14876,7 +14880,7 @@ f     AST_POLYCURVE
 *  Synopsis:
 c     #include "plot.h"
 c     void astPolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
-c                        const double (*in)[] )
+c                        const double *in )
 f     CALL AST_POLYCURVE( THIS, NPOINT, NCOORD, INDIM, IN, STATUS )
 
 *  Class Membership:
@@ -14927,7 +14931,8 @@ c        given should not be less than "npoint".
 f        given should not be less than NPOINT.
 c     in
 f     IN( INDIM, NCOORD ) = DOUBLE PRECISION (Given)
-c        A 2-dimensional array, of shape "[ncoord][indim]" giving the
+c        The address of the first element in a 2-dimensional array of shape 
+c        "[ncoord][indim]" giving the
 c        physical coordinates of the points which are to be joined in
 c        sequence by geodesic curves. These should be stored such that
 c        the value of coordinate number "coord" for point number
@@ -15039,7 +15044,7 @@ f        The global status.
    the "in" array. */
       if ( astOK ) {
          for ( coord = 0; coord < ncoord; coord++ ) {
-            in_ptr[ coord ] = *in + coord * indim;
+            in_ptr[ coord ] = in + coord * indim;
          }
 
 /* Establish the correct graphical attributes as defined by attributes
@@ -19558,7 +19563,7 @@ int astCvBrk_( AstPlot *this, int ibrk, double *brk, double *vbrk,
 }
 
 void astMark_( AstPlot *this, int nmark, int ncoord, int indim,
-               const double (*in)[], int type ) {
+               const double *in, int type ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Plot,Mark))( this, nmark, ncoord, indim, in, type );
 }
@@ -19580,7 +19585,7 @@ void astCurve_( AstPlot *this, const double start[], const double finish[] ){
 }
 
 void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim, 
-                    const double (*in)[] ){
+                    const double *in ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in);
 }

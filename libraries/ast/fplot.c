@@ -43,6 +43,9 @@
 *        in AST_TEXT.
 *     11-AUG-1998 (DSB):
 *        Added AST_POLYCURVE.
+*     9-JAN-2001 (DSB):
+*        Change argument "in" for astMark and astPolyCurve from type
+*        "const double (*)[]" to "const double *".
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -187,7 +190,7 @@ F77_SUBROUTINE(ast_mark)( INTEGER(THIS),
    astAt( "AST_MARK", NULL, 0 );
    astWatchSTATUS(
       astMark( astI2P( *THIS ), *NMARK, *NCOORD, *INDIM,
-               (const double (*)[])IN, *TYPE );
+               (const double *)IN, *TYPE );
    )
 }
 
@@ -231,6 +234,6 @@ F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
    astAt( "AST_POLYCURVE", NULL, 0 );
    astWatchSTATUS(
       astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *INDIM,
-                (const double (*)[])IN );
+                (const double *)IN );
    )
 }
