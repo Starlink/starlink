@@ -1,3 +1,10 @@
+2002-09-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* starlink/surf.news: Add release notes for 1.6-9
+
+	* surflib/surflib_remove_dc_from_exp.f
+	(SURFLIB_REMOVE_DC_FROM_EXP): Correctly initialise NSIGMA to 5.0
+
 2002-09-10  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* surflib/surflib_median_regrid.f (SURFLIB_MEDIAN_REGRID):
