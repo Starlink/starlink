@@ -321,6 +321,28 @@
 
 <!-- none? -->
 
+<!--========== Element classes ==========-->
+<!--
+  %phrase: different types of phrase display within text.
+  distinction between %simplephrase and %otherphrase is that
+  %otherphrase couldn't sensibly be included within %phrase elements.
+
+  %structuring: larger things, which can appear within a paragraph, but which
+  contain more text, or more complication, than the phrase markup.
+  Includes the three different types of lists.
+
+  %special: miscellanea.  The main distinction is that %special aren't
+  allowed in PX
+-->
+<!entity % simplephrase	"em | strong | quote | code | kbd | cite">
+<!entity % references	"ref | docxref | webref | url | citation">
+<!entity % special	"index | note | draftnote">
+<!entity % structuring	
+	"blockquote | dl | ul | ol | verbatim | linespecific | tabular">
+<!entity % maths	"m | mequation | meqnarray">
+<!entity % simpletext	"#pcdata | %simplephrase | %maths">
+<!entity % phrase	"%simpletext | %references">
+
 
 <!--========== Overall document structure ==========-->
 
@@ -379,14 +401,37 @@
 	coverimage?, copyright?'>
 <!element DOCINFO o o (%docinfo.model)>
 
-<!element TITLE		o o (#pcdata)
-			-- contains document title.  This is marked as
-			   omissable: it typically won't be, in the
+<!--
+  The TITLE element contains the document title, or the section title
+  if it's used within a subhead element.  In that latter context, it
+  can be followed by a displaytitle element.
+
+  The title element deliberately has a rather simple content model
+  because it's this element which is most likely to appear
+  in contexts remote from the General DTD (such as the DocumentSummary,
+  or HTML TITLE elements, or some cavern in this search engine we keep
+  talking about), so any markup in there would have to be reprocessed
+  (which would typically mean stripped) every time it's transformed.
+  This element is therefore defined with a model which is such that
+  simply stripping the markup from the TITLE content would be a
+  reasonable `transformation': this is a restriction the document
+  author might need to be aware of, so this should be documented.
+
+  As a companion to this, the DISPLAYTITLE element has a full content
+  model, and is intended to be used as a presentation title.
+-->
+<!element TITLE		o o (%simpletext)+
+			-- contains document title.  The opening and
+			   closing tags are marked as omissable: they
+			   typically won't be omitted, in the
 			   document head, but the same element is used
 			   as the first subelement of SUBHEAD, and
 			   both have to be omissable if we're to be
 			   able to write section headings as
 			   `<sect>title...' -->
+<!element DISPLAYTITLE	- o (%simpletext | %references | %special)+
+					-- displayable alternative title -->
+
 <!element AUTHORLIST	o o (author+, otherauthors?, editors?)
 					-- contains author names -->
 <!element (OTHERAUTHORS | EDITORS)
@@ -647,7 +692,7 @@
 	>
 
 <!-- Subhead and title are the header and title for (sub*)sections -->
-<!entity % subhead.model 'title %update.pc'>
+<!entity % subhead.model 'title, displaytitle? %update.pc'>
 <!element SUBHEAD o o (%subhead.model;)>
 
 <!--
@@ -684,29 +729,6 @@
 
 <!--========== Paragraphs, and the flow of text ==========-->
 
-<!-- see %body.content above -->
-<!entity % simplephrase	"em | strong | quote | code | kbd | cite">
-<!entity % references	"ref | docxref | webref | url | citation">
-<!entity % special	"index | note | draftnote">
-<!entity % structuring	
-	"blockquote | dl | ul | ol | verbatim | linespecific | tabular">
-<!entity % maths	"m | mequation | meqnarray">
-<!entity % simpletext	"(#pcdata | %simplephrase | %maths )*">
-<!entity % phrase	"%simpletext | %references">
-
-<!--
-  %phrase: different types of phrase display within text.
-  distinction between %simplephrase and %otherphrase is that
-  %otherphrase couldn't sensibly be included within %phrase elements.
-
-  %structuring: larger things, which can appear within a paragraph, but which
-  contain more text, or more complication, than the phrase markup.
-  Includes the three different types of lists.
-
-  %special: miscellanea.  The main distinction is that %special aren't
-  allowed in PX
--->
-
 <!--
   Make the paragraph start tag omissable.  It won't often be possible
   to omit it, but if we make it omissable, then we can have (p+)
@@ -732,7 +754,7 @@
 <!entity % px.model '%update (%phrase | %structuring)*'>
 <!element PX o o (%px.model)>
 
-<!element (EM | STRONG | CITE) - - (#pcdata|%simplephrase)*>
+<!element (EM | STRONG | CITE) - - (%phrase)*>
 
 <!--
   CODE is part of %phrase markup, and is for inline text such as
@@ -746,7 +768,7 @@
 <!attlist CODE
 	type			-- what type of thing is it?  Used for
 				   formatting hints. --
-		(fspath)
+		(fspath)	-- fspath: filesystem path --
 		#implied
 	>
 
@@ -758,7 +780,7 @@
 
   Allow %references within verbatim text, allowing us to include
   <webref> and <ref id=... text=...> within verbatim examples, making
-  the corresponding text `live' in online versions of documents.
+  the corresponding text `live' in electronic versions of documents.
 
   Also allow %simplephrase: the intention is to allow KBD in there,
   to display examples, but there might be legitimate applications of
@@ -1075,7 +1097,7 @@
 	-- see also RFC1808, Relative URLs --
 	>
 
-<!element WEBREF - - (%simpletext)*>
+<!element WEBREF - - (%simpletext)+>
 <!attlist WEBREF
 	url		-- URL --
 		cdata	#required
