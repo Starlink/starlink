@@ -89,6 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER			FID, IDX, MXSEL
@@ -114,12 +115,19 @@
 *  Invoke method
       CALL ADI_EXEC( 'ReadSel', 2, ARGS, OARG, STATUS )
 
-*  Extract selections
-      CALL ADI_GET1I( OARG, MXSEL, SEL, NSEL, STATUS )
-
-*  Destroy ADI data
+*  Destroy argument
       CALL ADI_ERASE( ARGS(2), STATUS )
-      CALL ADI_ERASE( OARG, STATUS )
+
+*  Extract selections
+      IF ( OARG .NE. ADI__NULLID ) THEN
+        CALL ADI_GET1I( OARG, MXSEL, SEL, NSEL, STATUS )
+        CALL ADI_ERASE( OARG, STATUS )
+      ELSE
+        NSEL = 0
+        STATUS = SAI__ERROR
+        CALL MSG_SETI( 'N', IDX )
+        CALL ERR_REP( ' ', 'No selections for reference ^N', STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FSI_GETSEL', STATUS )
