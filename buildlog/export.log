@@ -576,7 +576,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/jsky-2.0.zip
@@ -1013,4 +1012,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 24 minutes 31 seconds
+Total time: 25 minutes 21 seconds

@@ -1503,6 +1503,11 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:93: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:29: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:43: warning - Tag @link: reference not found: interpolate
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/geom/InterpolatedCurve2D.html...
+  [javadoc] "Return if the Interpolator is full, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
+  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:25: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:39: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:31: warning - Tag @link: reference not found: setCoords
@@ -1512,11 +1517,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/PolynomialInterp.java:24: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/PolynomialInterp.java:38: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/geom/InterpolatedCurve2D.html...
-  [javadoc] "Return if the Interpolator is full, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
-  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:492: warning - Tag @link: reference not found: orderVertices
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:492: warning - Tag @link: reference not found: setInterpolator
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:565: warning - Tag @link: reference not found: applySortIndex
@@ -1529,4 +1529,4 @@ javadoc-sources:
   [javadoc] 575 warnings
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 11 seconds
+Total time: 1 minute 27 seconds
