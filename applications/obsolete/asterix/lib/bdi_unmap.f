@@ -136,7 +136,7 @@
         CALL BDI0_CHKITM( ID, ITEMS(C1:C2), LITEM, LITL, STATUS )
 
 *    Locate private item store
-        CALL BDI0_LOCPST( ID, LITEM(:LITL), .FALSE., PSID, STATUS )
+        CALL ADI0_LOCPST( ID, LITEM(:LITL), .FALSE., PSID, STATUS )
 
 *    If null then the item is not mapped
         IF ( PSID .EQ. ADI__NULLID ) THEN

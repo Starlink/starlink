@@ -185,7 +185,7 @@
         CALL BDI0_CHKOP( LITEM(:LITL), 'Map', STATUS )
 
 *    Locate private storage for this item
-        CALL BDI0_LOCPST( ID, LITEM(:LITL), .TRUE., PSID, STATUS )
+        CALL ADI0_LOCPST( ID, LITEM(:LITL), .TRUE., PSID, STATUS )
 
 *    Get map count
         CALL ADI_CGET0I( PSID, 'MapCount', MCOUNT, STATUS )
