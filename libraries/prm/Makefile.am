@@ -4,6 +4,8 @@ bin_SCRIPTS = prm_link prm_link_adam
 lib_LTLIBRARIES = libprm.la libprm_a.la
 noinst_PROGRAMS = make-prm-par
 
+
+
 libprm_la_SOURCES = \
 	$(F_ROUTINES)
 	$(PUBLIC_INCLUDES) \
@@ -19,6 +21,7 @@ make_prm_par_LDADD = -lm
 include_HEADERS = \
 	$(NORMAL_INCLUDES) \
 	$(PLATFORM_INCLUDES)
+
 
 
 F_ROUTINES = val_absb.f val_absd.f val_absi.f \
@@ -105,6 +108,8 @@ vec_wtouw.f vec_wtow.f
 # we can compile it unconditionally.
 PLATFORM_C = num_han.c num1_cvt.c
 
+
+
 #  List of non platform-specific include files.
 NORMAL_INCLUDES = \
 	PRM_ERR prm_err.h \
@@ -116,21 +121,33 @@ NORMAL_INCLUDES = \
 	NUM_DEF NUM_DEC \
 	PRM_PAR prm_par.h
 
-#  List of configured include files.  Each of these has a
-#  corresponding .in file, which is configured by the ./configure script.
+
+
+# List of configured include files.  Each of these has a
+# corresponding .fpp file, which is configured by being run through the
+# Fortran preprocessor
 #
-#  NUM_CMN         uses the non-standard VOLATILE keyword
-#  NUM_DEF_{R,D}   uses non-standard SIND (etc) intrinsics
+# NUM_CMN         uses the non-standard VOLATILE keyword.
+# NUM_DEF_{R,D}   uses non-standard SIND (etc) intrinsics.
+# NUM_DEF_CVT     uses non-standard intrinsics when available,
+#                 and functions from num1_cvt.c otherwise.
 PLATFORM_INCLUDES = NUM_DEF_D NUM_DEF_R NUM_DEF_CVT NUM_CMN
 
-PRIVATE_INCLUDES = PRM_CONST prm_err.h
+# Here are the dependencies for these files
+NUM_CMN: NUM_CMN.fpp
+NUM_DEF_D: NUM_DEF_D.fpp
+NUM_DEF_R: NUM_DEF_R.fpp
+NUM_DEF_CVT: NUM_DEF_CVT.fpp
 
+# These files are created by being run through the Fortran preprocessor.
+# Define the rule to do this.
+#
 # Need to add the .fpp suffix explicitly, since there are no .fpp sources
 # in this component currently.
 SUFFIXES = .fpp
-# Run a .fpp file through the fpp preprocessor, to produce a .fppout file.
-# Strip fpp comment lines (beginning #) and leading blank lines, since these
-# are generated in abundance by this process.
+# Run a .fpp file through the fpp preprocessor, to produce a file with no
+# extension.  Strip fpp comment lines (beginning #) and leading blank lines,
+# since these are generated in abundance by this process.
 .fpp:
 	rm -f $@
 	$(FPP) $(FPPFLAGS) $(DEFAULT_INCLUDES) $(CPPFLAGS) $< $(FPP_OUTPUT)
@@ -139,11 +156,14 @@ SUFFIXES = .fpp
 	sed '/^#/d' $@ | sed -n '1{:a;s/[^ ]/&/;tz;n;ba;:z};p' >>$(@:=.tmp)
 	rm -f $@
 	mv $(@:=.tmp) $@
-NUM_CMN: NUM_CMN.fpp
-NUM_DEF_D: NUM_DEF_D.fpp
-NUM_DEF_R: NUM_DEF_R.fpp
-NUM_DEF_CVT: NUM_DEF_CVT.fpp
 
+
+
+PRIVATE_INCLUDES = PRM_CONST prm_err.h
+
+
+
+# PRM_PAR and prm_par.h are generated from information in float.h and limits.h
 PRM_PAR prm_par.h: make-prm-par
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
