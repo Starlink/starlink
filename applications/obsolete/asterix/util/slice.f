@@ -64,12 +64,12 @@
       REAL 		      DQMIN,DQMAX	! Data min & max with quality
       REAL 		      DMIN,DMAX		! Data min & max without quality
 
-      INTEGER		      DIMSD(DAT__MXDIM) ! Sizes of data dimensions
-      INTEGER		      DIMSQ(DAT__MXDIM) ! Sizes of quality dimensions
+      INTEGER		      DIMSD(ADI__MXDIM) ! Sizes of data dimensions
+      INTEGER		      DIMSQ(ADI__MXDIM) ! Sizes of quality dimensions
       INTEGER			DPTR		! Pointer to input data array
       INTEGER			I, K			! Loop counters
       INTEGER			IFID			! Input dataset id
-      INTEGER		      	INDICES(DAT__MXDIM) 	! Array indices of point
+      INTEGER		      	INDICES(ADI__MXDIM) 	! Array indices of point
       INTEGER			OCI			! AIO channel id
       INTEGER			NELM			! # data points
       INTEGER			NDIMD		! Dimensionality of data
