@@ -69,6 +69,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
       INTEGER INDF
