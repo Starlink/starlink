@@ -248,7 +248,7 @@ install:
 prepare:
 
 check_packages:
-[available] 09-Sep-2003 13:46:25 uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 10, 2003 4:19:29 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -493,28 +493,400 @@ prepare:
 check_packages:
 
 build:
-    [javac] Compiling 612 source files to /apps/cvsbuild/java/source/diva/build/classes
-    [javac] javac: invalid source release: 1.2
-    [javac] Usage: javac <options> <source files>
-    [javac] where possible options include:
-    [javac]   -g                        Generate all debugging info
-    [javac]   -g:none                   Generate no debugging info
-    [javac]   -g:{lines,vars,source}    Generate only some debugging info
-    [javac]   -nowarn                   Generate no warnings
-    [javac]   -verbose                  Output messages about what the compiler is doing
-    [javac]   -deprecation              Output source locations where deprecated APIs are used
-    [javac]   -classpath <path>         Specify where to find user class files
-    [javac]   -sourcepath <path>        Specify where to find input source files
-    [javac]   -bootclasspath <path>     Override location of bootstrap class files
-    [javac]   -extdirs <dirs>           Override location of installed extensions
-    [javac]   -d <directory>            Specify where to place generated class files
-    [javac]   -encoding <encoding>      Specify character encoding used by source files
-    [javac]   -source <release>         Provide source compatibility with specified release
-    [javac]   -target <release>         Generate class files for specific VM version
-    [javac]   -help                     Print a synopsis of standard options
 
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
 
-BUILD FAILED
-file:/apps/cvsbuild/java/source/diva/build.xml:334: Compile failed; see the compiler error output for details.
+javadoc_check:
 
-Total time: 32 seconds
+javadocs:
+
+dist:
+     [copy] Copying 283 files to /apps/cvsbuild/java/source/diva/docs/diva
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/diva
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/diva
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 1048 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 108 files to /apps/cvsbuild/star/docs
+     [echo] Executing JSky target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
+     [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/jsky
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/jsky
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 7 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 434 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copied 17 empty directories to /apps/cvsbuild/star/docs
+     [echo] Executing Pal target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/pal
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/pal
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 30 files to /apps/cvsbuild/star/docs
+     [echo] Executing VOTable target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/votable/lib/votable
+      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/votable
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/votable
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 29 files to /apps/cvsbuild/star/docs
+     [echo] Executing JAIUtil target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil
+      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/jaiutil
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/jaiutil
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 31 files to /apps/cvsbuild/star/docs
+     [echo] Executing SOAPSERVER target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/bin/soapserver
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/soapserver/bin/soapserver
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/soapserver
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/soapserver
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/soapserver
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 19 files to /apps/cvsbuild/star/docs
+     [echo] Executing SOG target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/lib/sog
+      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/bin/sog
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/sog/bin/sog
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/sog
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/sog
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/sog
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 48 files to /apps/cvsbuild/star/docs
+     [echo] Executing SPLAT target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+execute_mk_script:
+     [echo] java.home=/apps/jdk-1.4.1_02/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] make: Nothing to be done for `build'.
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/bin/splat
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/etc/splat
+     [copy] Copying 24 files to /apps/cvsbuild/java/source/splat/bin/splat
+     [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
+     [copy] Copying 435 files to /apps/cvsbuild/java/source/splat/docs/splat
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/splat
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/splat
+    [mkdir] Created dir: /apps/cvsbuild/star/etc/splat
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
+[loggedcopy] Copying 24 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 9 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 488 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copied 1 empty directory to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 224 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 55 files to /apps/cvsbuild/star/etc
+[loggedcopy] Copied 1 empty directory to /apps/cvsbuild/star/etc
+     [echo] Executing Mirage target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/lib/mirage
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/bin
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/mirage
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/mirage
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 17 files to /apps/cvsbuild/star/docs
+     [echo] Executing TOPCAT target: install
+
+prepare:
+
+check_packages:
+
+build_demo:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/topcat
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 51 files to /apps/cvsbuild/star/docs
+     [echo] Executing Treeview target: install
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/treeview/lib/treeview/showndx.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/showndx.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/etc/treeview
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/treeview/bin
+     [copy] Copying 14 files to /apps/cvsbuild/java/source/treeview/etc/treeview
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/treeview
+    [mkdir] Created dir: /apps/cvsbuild/star/etc/treeview
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/treeview
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 121 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 14 files to /apps/cvsbuild/star/etc
+     [echo] Executing Coco target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/coco
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/coco
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 18 files to /apps/cvsbuild/star/docs
+     [echo] Executing RV target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/rv
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/rv
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 18 files to /apps/cvsbuild/star/docs
+     [echo] Executing FROG target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+execute_mk_script:
+     [echo] java.home=/apps/jdk-1.4.1_02/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../frog_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+
+javadoc_check:
+
+javadocs:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/bin/frog
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/etc/frog
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/bin/frog
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/bin/frog
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/frog
+    [mkdir] Created dir: /apps/cvsbuild/star/etc/frog
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/frog
+[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
+
+BUILD SUCCESSFUL
+Total time: 4 minutes 2 seconds

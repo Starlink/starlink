@@ -215,7 +215,7 @@ build:
 prepare:
 
 check_packages:
-[available] 09-Sep-2003 13:41:38 uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 10, 2003 4:07:17 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -357,27 +357,228 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/classes
     [javac] Compiling 612 source files to /apps/cvsbuild/java/source/diva/build/classes
-    [javac] javac: invalid source release: 1.2
-    [javac] Usage: javac <options> <source files>
-    [javac] where possible options include:
-    [javac]   -g                        Generate all debugging info
-    [javac]   -g:none                   Generate no debugging info
-    [javac]   -g:{lines,vars,source}    Generate only some debugging info
-    [javac]   -nowarn                   Generate no warnings
-    [javac]   -verbose                  Output messages about what the compiler is doing
-    [javac]   -deprecation              Output source locations where deprecated APIs are used
-    [javac]   -classpath <path>         Specify where to find user class files
-    [javac]   -sourcepath <path>        Specify where to find input source files
-    [javac]   -bootclasspath <path>     Override location of bootstrap class files
-    [javac]   -extdirs <dirs>           Override location of installed extensions
-    [javac]   -d <directory>            Specify where to place generated class files
-    [javac]   -encoding <encoding>      Specify character encoding used by source files
-    [javac]   -source <release>         Provide source compatibility with specified release
-    [javac]   -target <release>         Generate class files for specific VM version
-    [javac]   -help                     Print a synopsis of standard options
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+    [mkdir] Created dir: /apps/cvsbuild/java/source/diva/lib/diva
+     [copy] Copying 4 files to /apps/cvsbuild/java/source/diva/lib/diva
+     [echo] Executing JSky target: build
 
+prepare:
 
-BUILD FAILED
-file:/apps/cvsbuild/java/source/diva/build.xml:334: Compile failed; see the compiler error output for details.
+check_packages:
 
-Total time: 33 seconds
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/classes
+    [javac] Compiling 332 source files to /apps/cvsbuild/java/source/jsky/build/classes
+     [copy] Copying 185 files to /apps/cvsbuild/java/source/jsky/build/classes
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/jsky/lib/jsky
+     [echo] Executing Pal target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/classes
+    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/pal/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/lib/pal
+     [echo] Executing VOTable target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/classes
+    [javac] Compiling 24 source files to /apps/cvsbuild/java/source/votable/build/classes
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/votable/build/classes
+     [echo] Executing JAIUtil target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jaiutil/build/classes
+    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/jaiutil/build/classes
+     [echo] Executing SOAPSERVER target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/classes
+    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/soapserver/build/classes
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/soapserver/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/lib/soapserver
+     [echo] Executing SOG target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/build/classes
+    [javac] Compiling 28 source files to /apps/cvsbuild/java/source/sog/build/classes
+    [javac] Note: /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotometryWorker.java uses or overrides a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/sog/build/classes
+     [echo] Executing SPLAT target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 159 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 63 files to /apps/cvsbuild/java/source/splat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
+     [copy] Copying 11 files to /apps/cvsbuild/java/source/splat/lib/splat
+
+execute_mk_script:
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/i386
+     [echo] java.home=/apps/jdk-1.4.1_02/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] gcc -I.  -I/apps/jdk-1.4.1_02/jre/../include -I/apps/jdk-1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
+     [exec] In file included from NDFJImpl.c:1425:
+     [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet2DInt':
+     [exec] NDFJImplGet.h:147: warning: passing arg 5 of pointer to function from incompatible pointer type
+     [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet1DInt':
+     [exec] NDFJImplGet.h:244: warning: passing arg 5 of pointer to function from incompatible pointer type
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../splat_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing /apps/cvsbuild/star/lib/libndf.a
+     [exec] Processing /apps/cvsbuild/star/lib/libary.a
+     [exec] Processing /apps/cvsbuild/star/lib/libhds.a
+     [exec] Processing /apps/cvsbuild/star/lib/liberr.a
+     [exec] Processing /apps/cvsbuild/star/lib/liberr_standalone.a
+     [exec] Processing /apps/cvsbuild/star/lib/libpsx.a
+     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
+     [exec] Processing /apps/cvsbuild/star/lib/libprm.a
+     [exec] Processing /apps/cvsbuild/star/lib/libprm_a.a
+     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
+     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
+     [exec] Processing /apps/cvsbuild/star/lib/libems.a
+     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/java/source/..//lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
+     [exec] rm -r -f temp
+     [echo] Executing Mirage target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
+     [echo] Executing TOPCAT target: build
+
+prepare:
+
+check_packages:
+
+build_demo:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
+     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
+
+build:
+    [javac] Compiling 37 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 85 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+     [echo] Executing Treeview target: build
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/etc/demo
+     [gzip] Building: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar
+      [tar] Building tar: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 108 source files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 66 files to /apps/cvsbuild/java/source/treeview/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/lib/treeview
+     [echo] Executing Coco target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/coco/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/coco/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/coco/lib/coco
+     [echo] Executing RV target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/rv/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/rv/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/rv/lib/rv
+     [echo] Executing FROG target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/build/classes
+    [javac] Compiling 89 source files to /apps/cvsbuild/java/source/frog/build/classes
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/frog/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/lib/frog
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/lib/frog
+
+execute_mk_script:
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/frog/build/jni
+     [echo] java.home=/apps/jdk-1.4.1_02/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] gcc -I.  -I/apps/jdk-1.4.1_02/jre/../include -I/apps/jdk-1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Dummy.c
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../frog_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
+
+BUILD SUCCESSFUL
+Total time: 1 minute 25 seconds

@@ -107,71 +107,85 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/diva/.diva.install
      [echo] Executing JSky target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jsky/.jsky.install
      [echo] Executing Pal target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing VOTable target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/votable/.votable.install
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/.jaiutil.install
      [echo] Executing SOAPSERVER target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/.soapserver.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/sog/.sog.install
      [echo] Executing SPLAT target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
      [echo] Executing TOPCAT target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
      [echo] Executing Treeview target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Coco target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/coco/.coco.install
      [echo] Executing RV target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/rv/.rv.install
      [echo] Executing FROG target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 clean:
 
@@ -271,56 +285,98 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/diva/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/diva/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/diva/docs
      [echo] Executing JSky target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/jsky/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/jsky/docs
      [echo] Executing Pal target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/docs
      [echo] Executing VOTable target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/votable/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/votable/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/votable/docs
      [echo] Executing JAIUtil target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/jaiutil/docs
      [echo] Executing SOAPSERVER target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/docs
      [echo] Executing SOG target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/sog/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/sog/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/sog/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/sog/docs
      [echo] Executing SPLAT target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/splat/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/splat/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/splat/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/splat/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/splat/etc
      [echo] Executing Mirage target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/mirage/docs
      [echo] Executing TOPCAT target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/topcat/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/etc
      [echo] Executing Treeview target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
      [echo] Executing Coco target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/coco/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/coco/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/coco/docs
      [echo] Executing RV target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/rv/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/rv/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/rv/docs
      [echo] Executing FROG target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/frog/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/frog/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/frog/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/frog/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 export-full-source:
       [zip] Building zip: /apps/cvsbuild/export/starjava-sources.zip
@@ -491,4 +547,4 @@ javadoc-sources:
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 43 seconds
+Total time: 1 minute 57 seconds
