@@ -1,33 +1,6 @@
-1 KAPPA_Version_0.10
-                                            Expires: 1997 October 31
+1 KAPPA_Version_0.12
 
- A new version of KAPPA is now available.  It is free of NAG-library
- calls, and thus offers the same facilities on all supported
- operating systems.  The main changes are:
-
-  o  4 new applications: DRAWSIG, KSTEST, FITSMOD, and SUBSTITUTE;
-
-  o  3 new synonyms for reading and writing ancillary data;
-
-  o  improved and updated documentation; and
-
-  o  many enhanced commands.  These include an NDF version of SURFIT;
-     more control of the charateristics of contours; and a revamped
-     and easy-to-use LINPLOT with new features such as error-bars, a
-     selection of line styles and symbols, and colour control.
-     FITSURFACE and MAKESURFACE now support variance.
-
-  o  COLUMNAR and HIDE have been temporarily withdrawn until suitable
-     public-domain graphics routines are available to replace the NAG
-     graphics these tasks call.
-
- A revised SUN/95 has been issued, and it is available in hypertext
- form (enter "showme sun95" or "findme KAPPA").  There is also an
- updated quick-reference card.
-
- You can find further details of the changes made at this release by
- looking at the KAPPA help "kaphelp Changes V0.10", or the release
- notes in the hypertext version of SUN/95 ("findme Release sun95").
-
- Malcolm Currie
- mjc@star.rl.ac.uk
+ A new version of KAPPA (V0.12) is now available, containing fixes 
+ for several bugs reported in the previous version. No new features or
+ applications have been introduced. The revised version of SUN/95
+ contains details of the changes made.
