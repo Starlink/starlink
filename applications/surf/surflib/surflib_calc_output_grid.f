@@ -56,6 +56,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20 - taken from SURF_REBIN.F
 *     $Log$
+*     Revision 1.6  2004/09/01 01:02:02  timj
+*     use CNF_PVAL
+*
 *     Revision 1.5  1999/08/06 02:29:05  timj
 *     Tweak headers for use with PROLAT.
 *
@@ -85,6 +88,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER N_FILES
@@ -126,18 +130,18 @@
 
 *     Find range of data
       
-      CALL SCULIB_RANGED (%val(X_PTR(1)), 1,
+      CALL SCULIB_RANGED (%val(cnf_pval(X_PTR(1))), 1,
      :     N_PTS(1), XMAX, XMIN, STATUS)
-      CALL SCULIB_RANGED (%val(Y_PTR(1)), 1,
+      CALL SCULIB_RANGED (%val(cnf_pval(Y_PTR(1))), 1,
      :     N_PTS(1), YMAX, YMIN, STATUS)
          
       IF (N_FILES .GT. 1) THEN
          DO I = 1, N_FILES
-            CALL SCULIB_RANGED (%val(X_PTR(I)), 1,
+            CALL SCULIB_RANGED (%val(cnf_pval(X_PTR(I))), 1,
      :           N_PTS(I), DTEMP, DTEMP1, STATUS)
             XMAX = MAX (XMAX,DTEMP)
             XMIN = MIN (XMIN,DTEMP1)
-            CALL SCULIB_RANGED (%val(Y_PTR(I)), 1,
+            CALL SCULIB_RANGED (%val(cnf_pval(Y_PTR(I))), 1,
      :           N_PTS(I), DTEMP, DTEMP1, STATUS)
             YMAX = MAX (YMAX,DTEMP)
             YMIN = MIN (YMIN,DTEMP1)

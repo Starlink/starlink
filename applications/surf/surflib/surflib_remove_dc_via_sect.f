@@ -78,6 +78,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.4  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.3  1999/08/03 19:32:53  timj
 *     Add copyright message to header.
 *
@@ -107,6 +110,7 @@
       INCLUDE 'SAE_PAR'               ! SSE global definitions
       INCLUDE 'PRM_PAR'               ! VAL__ constants
       INCLUDE 'MSG_PAR'               ! MSG__ constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
 
 *  Arguments Given:
       BYTE    BADBIT
@@ -238,7 +242,7 @@
          BTEMP = 0
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SCULIB_CFILLB(N_POS * N_BOL, BTEMP, 
-     :           %VAL(MASK_PTR))
+     :           %VAL(CNF_PVAL(MASK_PTR)))
          END IF
 
 *     Set BITNUM to 0 and badbit to 1
@@ -250,7 +254,7 @@
 *     Copy the QUALITY array to the mask prior to merging with the section
 *     Do not need to change bitnum or badbit.
          CALL VEC_UBTOUB(.FALSE., N_POS * N_BOL, OUT_QUALITY,
-     :        %VAL(MASK_PTR), IERR, NERR, STATUS)
+     :        %VAL(CNF_PVAL(MASK_PTR)), IERR, NERR, STATUS)
 
       END IF
 
@@ -326,12 +330,12 @@
 
                         CALL VEC_RTOR(.FALSE., 1, 
      :                       IN_DATA(BOL,POS), 
-     :                       %VAL(D_PTR + COUNT * VAL__NBR), 
+     :                       %VAL(CNF_PVAL(D_PTR) + COUNT * VAL__NBR),
      :                       IERR, NERR, STATUS)
                         CALL VEC_UBTOUB(.FALSE., 1, 
-     :                       %VAL(MASK_PTR + ( N_BOL * (POS-1)
+     :                       %VAL(CNF_PVAL(MASK_PTR) + ( N_BOL * (POS-1)
      :                       + BOL - 1) * VAL__NBUB),
-     :                       %VAL(Q_PTR + COUNT * VAL__NBUB), 
+     :                       %VAL(CNF_PVAL(Q_PTR) + COUNT * VAL__NBUB),
      :                       IERR, NERR, STATUS)
                         
                         COUNT = COUNT + 1
@@ -343,9 +347,10 @@
 
 
                      CALL SCULIB_STATR(N_SCAN, NSIGMA, 
-     :                    %VAL(D_PTR), %VAL(Q_PTR), BADBIT,
+     :                    %VAL(CNF_PVAL(D_PTR)), %VAL(CNF_PVAL(Q_PTR)), 
+     :                    BADBIT,
      :                    NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
-     :                    %VAL(QSORT_PTR), STATUS)
+     :                    %VAL(CNF_PVAL(QSORT_PTR)), STATUS)
 
 
 *     Now remove the dc level if DORLB else store the DC level

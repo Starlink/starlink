@@ -72,6 +72,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.8  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.7  2004/07/14 21:52:29  timj
 *     Remove reference to MAX_BOLS
 *
@@ -107,6 +110,7 @@
       INCLUDE 'SAE_PAR'               ! SSE global definitions
       INCLUDE 'PRM_PAR'               ! VAL__ constants
       INCLUDE 'MSG_PAR'               ! MSG__ constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
 
 *  Arguments Given:
       BYTE    BADBIT
@@ -251,11 +255,11 @@
 
                            CALL VEC_RTOR(.FALSE., 1, 
      :                          IN_DATA(BOL,POS), 
-     :                          %VAL(D_PTR + COUNT * VAL__NBR), 
+     :   %VAL(CNF_PVAL(D_PTR) + COUNT * VAL__NBR),
      :                          IERR, NERR, STATUS)
                            CALL VEC_UBTOUB(.FALSE., 1, 
      :                          IN_QUALITY(BOL,POS), 
-     :                          %VAL(Q_PTR + COUNT * VAL__NBUB), 
+     :   %VAL(CNF_PVAL(Q_PTR) + COUNT * VAL__NBUB),
      :                          IERR, NERR, STATUS)
 
                            COUNT = COUNT + 1
@@ -267,9 +271,10 @@
 
                         NSIGMA = 5.0
                         CALL SCULIB_STATR(N_SCAN, NSIGMA, 
-     :                       %VAL(D_PTR), %VAL(Q_PTR), BADBIT,
+     :                       %VAL(CNF_PVAL(D_PTR)), 
+     :                       %VAL(CNF_PVAL(Q_PTR)), BADBIT,
      :                       NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
-     :                       %VAL(QSORT_PTR), STATUS)
+     :                       %VAL(CNF_PVAL(QSORT_PTR)), STATUS)
 
 
 *     Now remove the dc level if DORLB else store the DC level

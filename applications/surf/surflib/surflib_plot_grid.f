@@ -63,6 +63,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.6  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.5  1999/08/03 19:32:51  timj
 *     Add copyright message to header.
 *
@@ -92,6 +95,7 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
       INCLUDE 'PAR_ERR'                          ! For PAR_NULL
       INCLUDE 'MSG_PAR'                          ! For MSG
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER UNIT
@@ -301,11 +305,11 @@
 *     D**M pointers!
                   
                      CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
-     :                    %VAL(MED_PTR + (N_MEDIANS * VAL__NBR)),
+     :   %VAL(CNF_PVAL(MED_PTR) + (N_MEDIANS * VAL__NBR)),
      :                    IERR, NERR, STATUS)
                   
                      CALL VEC_RTOR(.FALSE., 1, XPOS, 
-     :                    %VAL(MED_X_PTR + (N_MEDIANS * VAL__NBR)),
+     :   %VAL(CNF_PVAL(MED_X_PTR) + (N_MEDIANS * VAL__NBR)),
      :                    IERR, NERR, STATUS)
                   
                   
@@ -314,15 +318,15 @@
                      IF (STATS(I,J,2) .NE. VAL__BADR) THEN
 
                         CALL VEC_RTOR(.FALSE., 1, STATS(I,J,2), 
-     :                       %VAL(STDEVP_PTR + (N_SIGS * VAL__NBR)),
+     :   %VAL(CNF_PVAL(STDEVP_PTR) + (N_SIGS * VAL__NBR)),
      :                       IERR, NERR, STATUS)
                      
                         CALL VEC_RTOR(.FALSE., 1, STATS(I,J,3), 
-     :                       %VAL(STDEVM_PTR + (N_SIGS * VAL__NBR)),
+     :   %VAL(CNF_PVAL(STDEVM_PTR) + (N_SIGS * VAL__NBR)),
      :                       IERR, NERR, STATUS)
                      
                         CALL VEC_RTOR(.FALSE., 1, XPOS, 
-     :                       %VAL(SIG_X_PTR + (N_SIGS * VAL__NBR)),
+     :   %VAL(CNF_PVAL(SIG_X_PTR) + (N_SIGS * VAL__NBR)),
      :                       IERR, NERR, STATUS)
                      
                         N_SIGS = N_SIGS + 1
@@ -340,14 +344,15 @@
                   CALL PGSCI(1)
                   CALL PGSLS(1)
                
-                  CALL PGLINE(N_MEDIANS, %VAL(MED_X_PTR), %VAL(MED_PTR))
+                  CALL PGLINE(N_MEDIANS, %VAL(CNF_PVAL(MED_X_PTR)), 
+     :                        %VAL(CNF_PVAL(MED_PTR)))
                
                   IF (NSIGMA .GT. 0.0) THEN
                      CALL PGSCI(2)
-                     CALL PGLINE(N_SIGS, %VAL(SIG_X_PTR), 
-     :                    %VAL(STDEVP_PTR))
-                     CALL PGLINE(N_SIGS, %VAL(SIG_X_PTR), 
-     :                    %VAL(STDEVM_PTR))
+                     CALL PGLINE(N_SIGS, %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVP_PTR)))
+                     CALL PGLINE(N_SIGS, %VAL(CNF_PVAL(SIG_X_PTR)),
+     :                    %VAL(CNF_PVAL(STDEVM_PTR)))
                   END IF
                END IF
             

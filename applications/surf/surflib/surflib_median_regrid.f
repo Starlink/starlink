@@ -114,6 +114,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.7  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.6  2002/09/14 03:58:13  timj
 *     Update copyright
 *
@@ -150,6 +153,7 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
       INCLUDE 'PAR_ERR'                          ! PAR__NULL
       INCLUDE 'MSG_PAR'                          ! MSG__NORM
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
  
 *  Arguments Given:
@@ -264,17 +268,19 @@
 
 *     Fill with zeroes
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(TOTAL_WEIGHT_PTR))
+         CALL SCULIB_CFILLI(NX * NY, 0, 
+     :                      %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)))
       END IF
 
 
       DO I = 1, N_FILES
 
          CALL SCULIB_WTFN_REGRID_1 ( DIAMETER, WAVELENGTH, 1.0,
-     :        %VAL(DATA_PTR(I)), %VAL(BOL_RA_PTR(I)), 
-     :        %VAL(BOL_DEC_PTR(I)), N_PTS(I), DBLE(OUT_PIXEL),
-     :        NX, NY, ICEN, JCEN, %VAL(TOTAL_WEIGHT_PTR),
-     :        %VAL(REGRID1_PTR), STATUS)
+     :        %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))),
+     :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))), N_PTS(I), DBLE(OUT_PIXEL),
+     :        NX, NY, ICEN, JCEN, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
+     :        %VAL(CNF_PVAL(REGRID1_PTR)), STATUS)
 
       END DO
 
@@ -289,7 +295,7 @@
 
 *     Retrieve current value in histogram
             CALL VEC_ITOI(.FALSE., 1, 
-     :           %VAL(TOTAL_WEIGHT_PTR+(OFFSET*VAL__NBI)),
+     :           %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)+(OFFSET*VAL__NBI)),
      :           ITEMP, IERR, NERR, STATUS)
 
 *     If there is a point there set quality to 0 else set to 1
@@ -336,7 +342,7 @@
 *     Fill with zeroes
       IF (STATUS .EQ. SAI__OK) THEN
          BTEMP = 0
-         CALL SCULIB_CFILLB(ITEMP, BTEMP, %VAL(QUALITY_PTR))
+         CALL SCULIB_CFILLB(ITEMP, BTEMP, %VAL(CNF_PVAL(QUALITY_PTR)))
       END IF
 
 *     The first run through simply stores an I,J for each of the TOT_PTS
@@ -353,7 +359,7 @@
 
 *     Fill with zeroes
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(GRID_PTR))
+         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
       END IF
 
 *     Now loop through each map in turn and fill this array
@@ -373,8 +379,9 @@
 *     Fill the array with data. (1 file at a time)
 
          CALL SURFLIB_CALC_IJPOS(N_PTS(I), DBLE(OUT_PIXEL), ICEN, JCEN,
-     :        %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)), 
-     :        %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBR)),
+     :        %VAL(CNF_PVAL(BOL_RA_PTR(I))), 
+     :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))),
+     :        %VAL(CNF_PVAL(IJPOS_PTR)+ (2 * OFFSET * VAL__NBR)),
      :        STATUS)
 
 *     At the same time we can be adding the returned data into
@@ -389,9 +396,10 @@
 
          IF (STATUS .EQ. SAI__OK) THEN
             CALL SURFLIB_HISTOGRAM_GRID( N_PTS(I), NX, NY, .TRUE.,
-     :           %VAL(DATA_PTR(I)), %VAL(QUALITY_PTR), BADBIT,
-     :           %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)),
-     :           %VAL(GRID_PTR), IMAX, JMAX, NMAX, STATUS)
+     :           %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(QUALITY_PTR)), BADBIT,
+     :           %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :           %VAL(CNF_PVAL(GRID_PTR)), IMAX, JMAX, NMAX, STATUS)
 
 *     Dont worry if index values were out of range since we can rebin
 *     a subset
@@ -431,10 +439,11 @@
 *     Initialise the work arrays
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(GRID_PTR))
-         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, %VAL(BIN_PTR))
+         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(CNF_PVAL(GRID_PTR)))
+         CALL SCULIB_CFILLR(NX * NY * NMAX, VAL__BADR, 
+     :                      %VAL(CNF_PVAL(BIN_PTR)))
          CALL SCULIB_CFILLI(NX * NY * NMAX, VAL__BADI, 
-     :        %VAL(BIN_POS_PTR))
+     :        %VAL(CNF_PVAL(BIN_POS_PTR)))
       END IF
 
 *     Now we need to copy the data into BIN_PTR and the positions
@@ -446,9 +455,11 @@
          DO I = 1, N_FILES
 
             CALL SURFLIB_FILL_GRID(N_PTS(I), NX, NY, NMAX, OFFSET,
-     :           %VAL(DATA_PTR(I)), %VAL(QUALITY_PTR), BADBIT,
-     :           %VAL(IJPOS_PTR + (2 * OFFSET * VAL__NBI)),
-     :           %VAL(GRID_PTR), %VAL(BIN_PTR), %VAL(BIN_POS_PTR),
+     :           %VAL(CNF_PVAL(DATA_PTR(I))), 
+     :           %VAL(CNF_PVAL(QUALITY_PTR)), BADBIT,
+     :           %VAL(CNF_PVAL(IJPOS_PTR) + (2 * OFFSET * VAL__NBI)),
+     :           %VAL(CNF_PVAL(GRID_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :           %VAL(CNF_PVAL(BIN_POS_PTR)),
      :           STATUS)
 
 *     If a warning was raised simply ignore it since that means we
@@ -500,7 +511,7 @@
 
       UMODE = 'XLINEAR'
       CALL SURFLIB_CALC_GRIDIJ(UMODE, NX, NY, ICEN, JCEN,
-     :     %VAL(IPOS_PTR), %VAL(JPOS_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IPOS_PTR)), %VAL(CNF_PVAL(JPOS_PTR)), STATUS)
 
 
 *     Calculate the statistics of each bin and store in an array.
@@ -525,9 +536,10 @@
       SMODE = 'NONE'
       NSIGMA = 3.0  ! Cant use less than this because of iterative clipping
       CALL SURFLIB_STATS_GRID(SMODE, NX, NY, NMAX, NSIGMA, 
-     :     %VAL(IPOS_PTR),
-     :     %VAL(JPOS_PTR), %VAL(BIN_PTR), %VAL(PNT_PTR),
-     :     %VAL(STATS_PTR), STATUS)
+     :     %VAL(CNF_PVAL(IPOS_PTR)),
+     :     %VAL(CNF_PVAL(JPOS_PTR)), %VAL(CNF_PVAL(BIN_PTR)), 
+     :     %VAL(CNF_PVAL(PNT_PTR)),
+     :     %VAL(CNF_PVAL(STATS_PTR)), STATUS)
       
 *     Free memory
       CALL SCULIB_FREE('PNT_PTR', PNT_PTR, PNT_END, STATUS)
@@ -544,7 +556,7 @@
 
 
 *     Copy these stats to the output image
-      CALL VEC_RTOR(.FALSE., NX*NY, %VAL(STATS_PTR), 
+      CALL VEC_RTOR(.FALSE., NX*NY, %VAL(CNF_PVAL(STATS_PTR)),
      :     OUT_DATA, IERR, NERR, STATUS)
 
 *     Variaance
@@ -556,8 +568,9 @@
 *     Take difference and then square to get variance
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_SUBARE(NX*NY, %VAL(STATS_PTR+(NX*NY*VAL__NBR)),
-     :        %VAL(STATS_PTR+(2*NX*NY*VAL__NBR)), OUT_VAR,
+         CALL SCULIB_SUBARE(NX*NY, 
+     :                      %VAL(CNF_PVAL(STATS_PTR)+(NX*NY*VAL__NBR)),
+     :        %VAL(CNF_PVAL(STATS_PTR)+(2*NX*NY*VAL__NBR)), OUT_VAR,
      :        ITEMP, ITEMP, ITEMP, ITEMP, ITEMP, ITEMP,
      :        .FALSE., .TRUE., .FALSE.)
       END IF

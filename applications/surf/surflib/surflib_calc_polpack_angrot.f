@@ -59,6 +59,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.3  2000/07/06 00:00:30  timj
 *     Check that the return from SCULIB_FIND_INT is valid.
 *
@@ -77,6 +80,7 @@
 *  Global constants:
       INCLUDE 'SAE_PAR'         ! Status
       INCLUDE 'PRM_PAR'         ! For VAL__BAD and VAL__NB
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER N_POS
@@ -167,7 +171,8 @@
 
 *     Fill the byte array with 0
                IF (STATUS .EQ. SAI__OK) THEN
-                  CALL SCULIB_CFILLB(N_PTS, 0, %VAL(SCRATCHQ_PTR))
+                  CALL SCULIB_CFILLB(N_PTS, 0, 
+     :                               %VAL(CNF_PVAL(SCRATCHQ_PTR)))
                END IF
 
 *     Find the mean of the input angles
@@ -175,8 +180,10 @@
                STDEV = VAL__BADD
 
                CALL SCULIB_STATR(N_PTS, -1.0, ANGROT_IN(ISTART), 
-     :              %VAL(SCRATCHQ_PTR), BADBIT, ITEMP, MEAN, MEDIAN, 
-     :              SUM, SUMSQ, STDEV, %VAL(QSORT_PTR) ,STATUS)
+     :              %VAL(CNF_PVAL(SCRATCHQ_PTR)), 
+     :              BADBIT, ITEMP, MEAN, MEDIAN,
+     :              SUM, SUMSQ, STDEV, %VAL(CNF_PVAL(QSORT_PTR)) ,
+     :              STATUS)
 
 
 *     Fill the output array

@@ -62,6 +62,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.2  1999/08/03 19:32:54  timj
 *     Add copyright message to header.
 *
@@ -77,6 +80,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NX
@@ -150,7 +154,7 @@
 *     Fill this dummy quality array with 0
       BTEMP = 0
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLB(NMAX, BTEMP, %VAL(QUAL_PTR))
+         CALL SCULIB_CFILLB(NMAX, BTEMP, %VAL(CNF_PVAL(QUAL_PTR)))
       END IF
 
 
@@ -173,9 +177,9 @@
 
 *     Calculate the statistics of this data
 
-         CALL SCULIB_STATR(NMAX, NSIGMA, PNTS, %VAL(QUAL_PTR),
+         CALL SCULIB_STATR(NMAX, NSIGMA, PNTS, %VAL(CNF_PVAL(QUAL_PTR)),
      :        BTEMP, ITEMP, MEAN, MEDIAN, SUM, SUMSQ, STDEV,
-     :        %VAL(QSORT_PTR), STATUS)
+     :        %VAL(CNF_PVAL(QSORT_PTR)), STATUS)
 
 *     Store the required values taking care of bad values
 *     This does not check for overflow conditions.
@@ -275,7 +279,7 @@
 
 *       Copy the value in
                CALL VEC_RTOR(.FALSE., 1, RUNN,
-     :              %VAL(SCRATCH_PTR + ((COUNT-1) * VAL__NBR)),
+     :   %VAL(CNF_PVAL(SCRATCH_PTR) + ((COUNT-1) * VAL__NBR)),
      :              IERR, NERR, STATUS)
 
             END DO
@@ -288,7 +292,7 @@
                J = JPOS(COUNT)
 
                CALL VEC_RTOR(.FALSE., 1,
-     :              %VAL(SCRATCH_PTR + ((COUNT-1)*VAL__NBR)),
+     :              %VAL(CNF_PVAL(SCRATCH_PTR) + ((COUNT-1)*VAL__NBR)),
      :              STATS(I,J,P), IERR, NERR, STATUS)
 
             END DO

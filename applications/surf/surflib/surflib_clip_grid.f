@@ -72,6 +72,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.4  2004/09/01 01:02:03  timj
+*     use CNF_PVAL
+*
 *     Revision 1.3  1999/08/03 19:32:48  timj
 *     Add copyright message to header.
 *
@@ -95,6 +98,7 @@
       INCLUDE 'PRM_PAR'                          ! Bad values
       INCLUDE 'PAR_ERR'                          ! For PAR_NULL
       INCLUDE 'MSG_PAR'                          ! For MSG__VERB
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NX
@@ -210,9 +214,10 @@
 
                      QPTR = QUALITY_PTR(REAL_FILE) + 
      :                    (REAL_POS - 1)*VAL__NBUB
-                     BTEMP = SCULIB_BITON(%VAL(QPTR), BITNUM)
+                     BTEMP = SCULIB_BITON(%VAL(CNF_PVAL(QPTR)), BITNUM)
                   
-                     CALL VEC_UBTOUB(.FALSE., 1, BTEMP, %VAL(QPTR),
+                     CALL VEC_UBTOUB(.FALSE., 1, BTEMP, 
+     :                               %VAL(CNF_PVAL(QPTR)),
      :                    IERR, NERR, STATUS)
 
 *     It is conceivable that people will want to replace the spike with
@@ -228,7 +233,8 @@
                      QPTR = DATA_PTR(REAL_FILE) + 
      :                    (REAL_POS - 1) * VAL__NBR
 
-                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), %VAL(QPTR),
+                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), 
+     :                             %VAL(CNF_PVAL(QPTR)),
      :                    IERR, NERR, STATUS)
 
 
