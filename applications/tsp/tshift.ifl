@@ -1,0 +1,28 @@
+INTERFACE TSHIFT
+
+   PARAMETER INPUT
+     TYPE 'NDF'
+     PROMPT 'Dataset to Correct'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT'
+     POSITION 1
+   ENDPARAMETER
+
+   PARAMETER SHIFT
+     TYPE '_DOUBLE'
+     PROMPT 'Time Shift to Apply'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT'
+     POSITION 2
+   ENDPARAMETER
+
+   PARAMETER OUTPUT
+     TYPE 'NDF'
+     PROMPT 'Corrected Datatset'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT'
+     POSITION 3
+   ENDPARAMETER
+
+
+ENDINTERFACE      

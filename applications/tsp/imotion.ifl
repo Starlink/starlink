@@ -1,0 +1,60 @@
+INTERFACE IMOTION
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1
+    PROMPT 'Input Time series image'
+  ENDPARAMETER
+
+  PARAMETER TEMPLATE
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 2
+    PROMPT 'Template image'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 3
+    PROMPT 'Output Image Motion Time Series'
+  ENDPARAMETER
+
+  PARAMETER X
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 4
+    PROMPT 'X position of centre of star'
+  ENDPARAMETER
+
+  PARAMETER Y
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 5
+    PROMPT 'Y position of centre of star'
+  ENDPARAMETER
+
+  PARAMETER RADIUS
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 6
+    PROMPT 'Radius of aperture (pixels)'
+  ENDPARAMETER
+
+  PARAMETER BPIXEL
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    DEFAULT FALSE
+    POSITION 7
+    PROMPT 'Use brightest pixel (rather than centroid)'
+  ENDPARAMETER
+
+ENDINTERFACE

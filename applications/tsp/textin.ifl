@@ -1,0 +1,65 @@
+INTERFACE TEXTIN
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    POSITION 1
+    PPATH 'CURRENT'
+    VPATH 'PROMPT'
+    PROMPT 'Dataset to be extinction corrected'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'   
+    POSITION 2
+    PPATH 'CURRENT'
+    VPATH 'PROMPT'
+    PROMPT 'Output Dataset'
+  ENDPARAMETER
+
+   PARAMETER RA
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PROMPT '1950 RA of Object'
+     PPATH 'CURRENT'
+     POSITION 3
+   ENDPARAMETER
+
+   PARAMETER DEC
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PROMPT '1950 DEC of Object'
+     PPATH 'CURRENT'
+     POSITION 4
+   ENDPARAMETER
+
+   PARAMETER OBS
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PROMPT 'Observing site (HELP for list, NO to enter lat,long)'
+     DEFAULT 'AAT'
+     PPATH 'CURRENT,DEFAULT'
+     POSITION 5
+   ENDPARAMETER
+
+   PARAMETER LONG
+     TYPE '_DOUBLE'
+     VPATH 'PROMPT'
+     PROMPT 'Longitude of site (degrees, W +ve)'
+     PPATH 'CURRENT'
+   ENDPARAMETER
+
+   PARAMETER LAT
+     TYPE '_DOUBLE'
+     VPATH 'PROMPT'
+     PROMPT 'Geodetic latitude of site (degrees, N +ve)'
+     PPATH 'CURRENT'
+   ENDPARAMETER
+
+   PARAMETER EXTCOEF
+     TYPE '_REAL'
+     VPATH 'PROMPT'
+     PROMPT 'Extinction coefficent (mag/airmass)'
+     PPATH 'CURRENT'
+   ENDPARAMETER
+
+ENDINTERFACE

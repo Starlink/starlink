@@ -1,0 +1,67 @@
+INTERFACE SCRUNCH
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1           
+    PROMPT 'Dataset to scrunch'
+  ENDPARAMETER
+
+  PARAMETER WSTART
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    POSITION 2
+    PROMPT 'Starting Wavelength'
+  ENDPARAMETER
+
+  PARAMETER WEND
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    POSITION 3
+    PROMPT 'End Wavelength (or increment)'
+  ENDPARAMETER
+
+  PARAMETER BINS
+    TYPE '_INTEGER'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    POSITION 4
+    PROMPT 'Number of bins for scrunched spectrum'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 5       
+    PROMPT 'Output Scrunched Spectrum'
+  ENDPARAMETER               
+
+  PARAMETER LOG
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    PROMPT 'Scrunch to logarithmic bins'         
+    DEFAULT FALSE
+  ENDPARAMETER
+
+  PARAMETER MEAN
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    PROMPT 'Conserve mean data value (rather than flux)'
+    DEFAULT TRUE
+  ENDPARAMETER
+
+  PARAMETER QUAD
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    PROMPT 'Use quadratic (rather than linear) interpolation'
+    DEFAULT TRUE
+  ENDPARAMETER
+
+ENDINTERFACE

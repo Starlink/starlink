@@ -1,0 +1,95 @@
+INTERFACE CCDPOL
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1
+    PROMPT 'Input Time series image'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 2
+    PROMPT 'Output Photometry Dataset'
+  ENDPARAMETER
+
+  PARAMETER XE
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 3
+    PROMPT 'X position of centre of E image'
+  ENDPARAMETER
+
+  PARAMETER YE
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 4
+    PROMPT 'Y position of centre of E image'
+  ENDPARAMETER
+
+  PARAMETER RADIUS
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 5
+    PROMPT 'Radius of aperture (pixels)'
+  ENDPARAMETER
+
+  PARAMETER XO
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 6
+    PROMPT 'X position of centre of O image'
+  ENDPARAMETER
+
+  PARAMETER YO
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 7
+    PROMPT 'Y position of centre of O image'
+  ENDPARAMETER
+
+  PARAMETER LAMBDA
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT 5500
+    POSITION 8
+    PROMPT 'Wavelength of observation (Angstroms)'
+  ENDPARAMETER
+
+  PARAMETER STOKESPAR
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT 'V'
+    POSITION 9
+    PROMPT 'Stokes Parameter (Q,U or V)'
+  ENDPARAMETER
+
+  PARAMETER OFFSET
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT 0.0
+    POSITION 10
+    PROMPT 'Offset to polarization level (%)'
+  ENDPARAMETER
+
+  PARAMETER FLUXCAL
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT 1.0
+    POSITION 11
+    PROMPT 'Counts per Jansky'
+  ENDPARAMETER
+
+ENDINTERFACE

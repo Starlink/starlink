@@ -1,0 +1,27 @@
+INTERFACE DSTOKES
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1           
+    PROMPT 'Dataset to delete from'
+  ENDPARAMETER
+
+  PARAMETER STOKESPAR
+    TYPE '_CHAR'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 2
+    PROMPT 'Stokes parameter to delete (Q,U or V)'
+  ENDPARAMETER 
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 3
+    PROMPT 'Output Dataset'
+  ENDPARAMETER
+
+ENDINTERFACE

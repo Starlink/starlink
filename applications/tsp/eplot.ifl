@@ -1,0 +1,75 @@
+INTERFACE EPLOT
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1           
+    PROMPT 'Polarization Spectrum to Plot '
+    HELP 'The name of the file containing the Stokes data to be plotted - This must contain both Q and U stokes parameters'
+  ENDPARAMETER
+
+  PARAMETER DEVICE
+    TYPE 'DEVICE'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,GLOBAL'
+    POSITION 2
+    ASSOCIATION '<-GLOBAL.DEVICE'
+    PROMPT 'Plot Device'
+  ENDPARAMETER
+
+  PARAMETER LABEL
+    TYPE 'LITERAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    POSITION 3
+    PROMPT 'Label for plot '
+    DEFAULT ' '
+  ENDPARAMETER
+
+  PARAMETER AUTO
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT TRUE
+    PROMPT 'Autoscale Plot'
+  ENDPARAMETER
+
+  PARAMETER IMIN
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    PROMPT 'Minimum Intensity Level to Plot'
+  ENDPARAMETER
+
+  PARAMETER IMAX
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    PROMPT 'Maximum Intensity Level to Plot'
+  ENDPARAMETER
+
+  PARAMETER PMIN
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    PROMPT 'Minimum Polarization Level to Plot'
+  ENDPARAMETER
+
+  PARAMETER PMAX
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    PROMPT 'Maximum Polarization Level to Plot'
+  ENDPARAMETER
+
+           
+  PARAMETER THETA
+    TYPE '_REAL'
+    VPATH 'DEFAULT'
+    PPATH 'CURRENT,DEFAULT'   
+    PROMPT 'Angle Shift for Theta plot
+    DEFAULT 0.0
+  ENDPARAMETER
+
+ENDINTERFACE

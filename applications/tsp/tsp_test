@@ -1,0 +1,25 @@
+#!/bin/csh
+#+
+#   tsp_test
+#
+#  TSP test program
+#-
+
+echo "Running pplot..."
+tsp_pplot ${TSP_DIR}/sn1987a AUTO LABEL='"SN 1987A"' BINERR=0.1 DEVICE=xwindows
+
+echo "Running fplot..."
+tsp_fplot ${TSP_DIR}/sn1987a AUTO LABEL='"SN 1987A"' BINSIZE=4 DEVICE=xwindows
+
+echo "Running quplot..."
+tsp_quplot ${TSP_DIR}/sn1987a AUTO BINERR=0.1 LABEL='"SN 1987A"' DEVICE=xwindows
+
+echo "Running tsplot..."
+tsp_tsplot ${TSP_DIR}/exo DEVICE=xwindows WHOLE NPLOTS=2 NOERRORS CHAN1=3 ITEM1=Flux BIN1=-1 AUTO1 PLABEL1="Red" LABEL='"WW Hor"' CHAN2=6 ITEM2=Flux BIN2=-1 AUTO2 PLABEL2="Blue"
+
+echo "Running phaseplot..."
+tsp_phaseplot ${TSP_DIR}/exo DEVICE=xwindows WHOLE NPLOTS=2 NOERRORS CHAN1=3 ITEM1=Flux BIN1=-1 AUTO1 PLABEL1="Red" LABEL='"WW Hor"' CHAN2=6 ITEM2=Flux BIN2=-1 AUTO2 PLABEL2="Blue" EPOCH=0.0 PERIOD=0.080199 PHSTART=0.0 PHEND=2.0  
+
+echo "TSP test completed"
+
+#.

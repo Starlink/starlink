@@ -1,0 +1,21 @@
+INTERFACE SLIST
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1           
+    PROMPT 'Dataset to delete from'
+  ENDPARAMETER
+
+  PARAMETER FILE
+     TYPE 'FILE'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT,DEFAULT'
+     DEFAULT SLIST.DAT
+     POSITION 2
+     PROMPT 'Name of Text File'
+  ENDPARAMETER
+                
+ENDINTERFACE
+

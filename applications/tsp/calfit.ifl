@@ -1,0 +1,28 @@
+INTERFACE CALFIT
+
+   PARAMETER INPUT
+     TYPE 'NDF'
+     PROMPT 'Stokes data to fit'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT'
+     POSITION 1
+   ENDPARAMETER
+
+   PARAMETER DEGREE
+     TYPE '_INTEGER'
+     PROMPT 'Degree of Polynomial'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT'
+     POSITION 2
+   ENDPARAMETER
+
+   PARAMETER OUTPUT
+     TYPE 'NDF'
+     PROMPT 'Fitted dataset'
+     VPATH 'PROMPT'
+     PPATH 'CURRENT'
+     POSITION 3
+   ENDPARAMETER
+
+
+ENDINTERFACE      

@@ -1,0 +1,50 @@
+INTERFACE TBIN
+
+   PARAMETER INPUT
+      TYPE 'NDF'   
+      POSITION 1
+      VPATH 'PROMPT'
+      PPATH 'CURRENT'
+      PROMPT 'Dataset to be binned'
+   ENDPARAMETER
+
+  PARAMETER BIN
+    TYPE '_DOUBLE'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT -1.0
+    PROMPT 'Bin size (negative for no binning)'
+  ENDPARAMETER
+
+              
+  PARAMETER WHOLE
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'DEFAULT'
+    DEFAULT TRUE
+    PROMPT 'Use whole of time series'
+  ENDPARAMETER
+
+
+  PARAMETER XSTART
+    TYPE '_DOUBLE'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    PROMPT 'First X value (JD) to Use'
+  ENDPARAMETER
+
+  PARAMETER XEND
+    TYPE '_DOUBLE'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DYNAMIC'
+    PROMPT 'Last X value (JD) to Use'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    PROMPT 'Output Dataset'
+  ENDPARAMETER
+                
+ENDINTERFACE

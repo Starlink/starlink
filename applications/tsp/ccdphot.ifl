@@ -1,0 +1,70 @@
+INTERFACE CCDPHOT
+
+  PARAMETER INPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 1
+    PROMPT 'Input Time series image'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE 'NDF'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 2
+    PROMPT 'Output Photometry Dataset'
+  ENDPARAMETER
+
+  PARAMETER X
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 3
+    PROMPT 'X position of centre of star'
+  ENDPARAMETER
+
+  PARAMETER Y
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 4
+    PROMPT 'Y position of centre of star'
+  ENDPARAMETER
+
+  PARAMETER RADIUS
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT'
+    POSITION 5
+    PROMPT 'Radius of aperture (pixels)'
+  ENDPARAMETER
+
+  PARAMETER WEIGHT
+    TYPE '_LOGICAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT FALSE
+    POSITION 6
+    PROMPT 'Use Weighted Pixel Sum (rather than aperture photometry)'
+  ENDPARAMETER
+
+  PARAMETER LAMBDA
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT 5500
+    POSITION 7
+    PROMPT 'Wavelength of observation (Angstroms)
+  ENDPARAMETER
+
+  PARAMETER FLUXCAL
+    TYPE '_REAL'
+    VPATH 'PROMPT'
+    PPATH 'CURRENT,DEFAULT'
+    DEFAULT 1.0
+    POSITION 8
+    PROMPT 'Counts per Jansky'
+  ENDPARAMETER
+
+ENDINTERFACE
