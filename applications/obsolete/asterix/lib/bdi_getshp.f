@@ -137,8 +137,8 @@
         IF ( NDIM .GT. MXNDIM ) THEN
           STATUS = SAI__ERROR
           CALL BDI0_DESCID( ID, 'ID', STATUS )
-          CALL MSG_SET( 'ND', NDIM )
-          CALL MSG_SET( 'NA', MXNDIM )
+          CALL MSG_SETI( 'ND', NDIM )
+          CALL MSG_SETI( 'NA', MXNDIM )
           CALL ERR_REP( 'BDI_GETSHP_0', 'Input object ^ID has '/
      :                  /'^ND dimensions, where as the calling '/
      :                  /'program can only cope with ^NA', STATUS )
