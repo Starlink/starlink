@@ -136,9 +136,9 @@
 	 (gi (and target
 		  (attribute-string (normalize "gi") target))))
     (if gi
-	(make empty-element gi: "ref"
-	      attributes: (list (list "id" (xref-id gi))
-				(list "text" gi)))
+	(make element gi: "ref"
+	      attributes: `(("id" ,(xref-id gi)))
+	      (literal gi))
 	(error
 	 (string-append "dtdelemref: "
 			(cond
@@ -156,9 +156,9 @@
 		    (attribute-string (normalize "gi") target))))
       (if gi
 	  (make sequence
-	    (make empty-element gi: "ref"
-		  attributes: (list (list "id" (xref-id gi))
-				    (list "text" gi)))
+	    (make element gi: "ref"
+		  attributes: `(("id" ,(xref-id gi)))
+		  (literal gi))
 	    (if (last-sibling? (current-node))
 		(empty-sosofo)
 		(literal ", ")))
@@ -185,9 +185,9 @@
     (if gi
 	(if self
 	    (literal gi)
-	    (make empty-element gi: "ref"
-		  attributes: `(("id" ,(xref-id gi))
-				("text" ,gi))))
+	    (make element gi: "ref"
+		  attributes: `(("id" ,(xref-id gi)))
+		  (literal gi)))
 	(error "elemref: required gi attribute missing"))))
 (element elemxref
   (let* ((gi (attribute-string (normalize "gi") (current-node)))
@@ -196,9 +196,9 @@
 	 (xrefdtd-de (and xrefdtd-ent
 			  (document-element-from-entity xrefdtd-ent))))
     (if gi
-	(make empty-element gi: "ref"
-	      attributes: `(("id" ,(xref-id gi xrefdtd-de))
-			    ("text" ,gi)))
+	(make element gi: "ref"
+	      attributes: `(("id" ,(xref-id gi xrefdtd-de)))
+	      (literal gi))
 	(error "elemref: required gi attribute missing"))))
 (element example
   (make sequence
