@@ -114,6 +114,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.4  2000/08/22 00:14:18  timj
+*     Some MALLOC variables were not being initialised
+*
 *     Revision 1.3  1999/08/06 02:29:06  timj
 *     Tweak headers for use with PROLAT.
 *
@@ -227,6 +230,10 @@
       SCRATCH_PTR = 0
       IJPOS_PTR = 0
       IJPOS_END = 0
+      TOTAL_WEIGHT_PTR = 0
+      TOTAL_WEIGHT_END = 0
+      REGRID1_PTR = 0
+      REGRID1_END = 0
 
 *     First need to find out how many data points we are dealing with
 
