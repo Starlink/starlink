@@ -1,0 +1,9 @@
+#! /bin/sh -
+
+if test -f install-sh; then
+    autoreconf
+else
+    autoreconf --install --symlink
+fi
+
+exit 0
