@@ -101,13 +101,11 @@ typedef struct Memory {
 /* ================= */
 #ifdef DEBUG
 static Memory **issued = NULL;
-static int nissued = 0;
 static int siz_issued = 0;
-static int next_id = 0;
-static int watch_id = 0;
+static int next_id = -1;
+static int watch_id = -1;
 static int perm_mem = 0;
 static int memcheckid = -1;
-static int domemcheck = 1;
 static void (*memcheckfun)( void * );
 #endif
 
@@ -404,9 +402,9 @@ void *astFree_( void *ptr ) {
       mem->size = (size_t) 0;
 
 #ifdef DEBUG
-      mem->id = 0;
-      mem->perm = perm_mem;
       DeIssue( mem );
+      mem->id = -99;
+      mem->perm = perm_mem;
 #endif
 
 /* Free the allocated memory. */
@@ -637,16 +635,6 @@ static unsigned long Magic( void *ptr, size_t size ) {
 *     This function does not perform error checking.
 */
 
-#ifdef DEBUG
-   if( domemcheck && memcheckfun && memcheckid != -1 ) {
-      void *memcheckptr;
-      domemcheck = 0;
-      memcheckptr = astFindIdPtr( memcheckid );
-      if( memcheckptr ) (*memcheckfun)( memcheckptr );
-      domemcheck = 1;
-   }
-#endif
-
 /* Form the bit-wise exclusive OR between the memory address and the
    object size, then add 1 and invert the bits. Return the result as
    an unsigned long integer. */
@@ -863,8 +851,8 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 #ifdef DEBUG
                if( oldmem != mem ) {
-                  mem->id = ++next_id;
                   DeIssue( oldmem );
+                  mem->id = ++next_id;
                   Issue( mem );
                }
 #endif
@@ -1566,7 +1554,6 @@ static void Issue( Memory *new ) {
 */
 
 /* Local Variables: */
-   int i;
    size_t old_size;
    size_t new_size;
    Memory **new_issued;
@@ -1574,32 +1561,17 @@ static void Issue( Memory *new ) {
 /* Check inherited status */
    if( !astOK ) return;
 
-/* Report an error if this is the memory chunk which is being watched
-   for. By setting a debugger breakpoint on astError_, you can identify
+/* Invoke astIdHandler if this is the memory chunk which is being watched
+   for. By setting a debugger breakpoint on astIdHandler_, you can identify
    the moment when a chunk known to be part of a leak is first issued. */
-   if( new->id == watch_id ) {
-      astError( AST__INTER, "Issue(memory): The id %d has been issued to "
-                "memory address %p (internal AST programming error).", 
-                watch_id, new );
-      return;
-   }       
-
-/* Check the supplied object is not already on the list of issued
-   addresses. */
-   for( i = 0; i < nissued; i++ ) {
-      if( new == issued[ i ] ){
-         astError( AST__INTER, "Issue(memory): The memory address %p "
-                   "has already been issued (internal AST programming "
-                   "error).", new );
-         break;
-      }
-   }
+   if( new->id == watch_id ) astIdHandler( new+1 );
 
 /* If OK, extend the list and add in the new address. */
    if( astOK ) {
-      if( siz_issued - nissued < 5 ) {
+      if( siz_issued - new->id < 5 ) {
          old_size = siz_issued * sizeof( Memory * );
-         siz_issued += 100;
+         siz_issued *= 2;
+         if( siz_issued < 100 ) siz_issued = 100;
          new_size = siz_issued * sizeof( Memory * );
          new_issued = malloc( new_size );
          if( new_issued ) {
@@ -1613,7 +1585,7 @@ static void Issue( Memory *new ) {
                       "bytes of memory.", new_size );
          }
       }
-      if( astOK ) issued[ nissued++ ] = new;
+      if( astOK ) issued[ new->id ] = new;
    }
 }
 
@@ -1647,29 +1619,25 @@ static void DeIssue( Memory *old ) {
 */
 
 /* Local Variables: */
-   int i;
    int ok;
 
 /* Check a pointer was supplied. */
    if( !old ) return;
 
-/* Search for the supplied pointer in the list of issued addresses. */
-   ok = 0;
-   for( i = 0; i < nissued; i++ ) {
-      if( old == issued[ i ] ){
+/* The id stored in the supplied Memory structure is the index into the
+   "issued" array at which the pointer is stored. Check that this is the
+   case. */
+   ok = ( issued[ old->id ] == old );
 
-/* When found, set it NULL. */
-         issued[ i ] = NULL;
-         ok =1;
-         break;
-      }
-   }
+/* If Ok, set the entry NULL. */
+   if( ok ) {
+      issued[ old->id ] = NULL;
 
 /* If not found, report an error. */
-   if( !ok && astOK ) {
+   } else if( astOK ) {
       astError( AST__INTER, "DeIssue(memory): The memory address %p "
-                "was not issued by AST (internal AST programming "
-                "error).", old );
+                "(id %d) was not issued by AST or has already been "
+                "deissued (internal AST programming error).", old, old->id );
    }
 }
 
@@ -1713,8 +1681,8 @@ void astListIssued_( const char *label ) {
    if( label ) printf("%s: ", label );
    first = 1;
 
-   for( i = 0; i < nissued; i++ ) {
-      if( issued[ i ] && !issued[ i ]->perm ) {
+   for( i = 0; i <= next_id; i++ ) {
+      if( issued[ i ] && !issued[ i ]->perm && issued[ i ]->id == i ) {
          if( first ) {
             printf("Currently issued AST memory chunks:\n");
             first = 0;
@@ -1737,7 +1705,7 @@ void astSetWatchId_( int id ) {
 *     astSetWatchId
 
 *  Purpose:
-*     Indicate an error is to be reported when a specified chunk is issued.
+*     Indicate astIdHandler is to be invoked when a specified chunk is issued.
 
 *  Type:
 *     Protected function.
@@ -1747,9 +1715,9 @@ void astSetWatchId_( int id ) {
 *     astSetWatchId( int id )
 
 *  Description:
-*     This function forces an error to be reported (via astError) when a
+*     This function forces astIdHandler to be invoked when a
 *     specified memory chunk is issued. By setting a debugger breakpoint 
-*     on astError, the moment at which the specified memory chunk is
+*     on astIdHandler_ the moment at which the specified memory chunk is
 *     issued can be trapped, and the cause of the memory allocation 
 *     determined by examining the call stack.
 
@@ -1933,32 +1901,37 @@ void *astFindIdPtr_( int id ){
 
 *-
 */
-/* Local Variables: */
-   Memory *list;
-   int i;
-   void *result;                 
-
-/* Initialise */
-   result = NULL;
-
-/* Loop round all Memory structures which are on the list of issued
-   blocks. */
-   list = ( (Memory *) issued ) - 1;
-   for( i = 0; i < nissued; i++ ) {
-
-/* Set the returned pointer and leave the loop when one is found with the 
-   supplied identifier. */
-      if( issued[ i ] && issued[ i ]->id == id ) {
-         result = issued[ i ] + 1;
-         break;
-      } 
-   }
-
-/* Return the result. */
-   return result;
+   return ( issued[ id ] + 1 );
 }
 
+void astIdHandler_( void *new ){
+/*
+*+
+*  Name:
+*     astIdHandler
 
+*  Purpose:
+*     Called when a watched memory ID is issued.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astIdHandler()
+
+*  Description:
+*     This function is called when a watched memory ID is issued. See
+*     astSetWatchId.
+
+*  Parameters:
+*     new
+*        The memory pointer being issued.
+*-
+*/
+   printf( "astIdHandler(memory): The id %d has been issued to memory address %p.\n", 
+           watch_id, new );
+}
 
 #endif
 

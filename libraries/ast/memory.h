@@ -107,6 +107,7 @@ char *astAppendString_( char *, int *, const char * );
 
 #ifdef DEBUG
 void astListIssued_( const char *label );
+void astIdHandler_( void * );
 void astSetWatchId_( int id );
 int astSetPermMem_( int perm );
 int astGetMemId_( void * );
@@ -141,6 +142,7 @@ void *astFindIdPtr_( int );
 #ifdef DEBUG
 #define astListIssued(label) astListIssued_(label)
 #define astSetWatchId(id) astSetWatchId_(id)
+#define astIdHandler(mem) astIdHandler_(mem)
 #define astSetPermMem(perm) astSetPermMem_(perm)
 #define astGetMemId(ptr) astGetMemId_(ptr)
 #define astFindIdPtr(id) astFindIdPtr_(id)
