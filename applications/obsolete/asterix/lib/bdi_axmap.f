@@ -115,9 +115,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Construct axis number string
-      CALL CHR_ITOC( IAX, ASTR, NDIG )
-
 *  Loop over items while more of them and status is ok
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )

@@ -133,8 +133,14 @@
 
 *  Simple axis copy
       ELSE
-        CALL BDI_COPY( ID, 'Axis_'//ASTR(:NDIG1),
-     :                 OID, 'Axis_'//BSTR(:NDIG2), STATUS )
+
+*    Construct the item names
+ 20     FORMAT( 'Axis_', I1 )
+        WRITE( LITEM1, 20 ) IAX
+        WRITE( LITEM2, 20 ) OAX
+
+*    Copy axes
+        CALL BDI_COPY( ID, LITEM1, OID, LITEM2, STATUS )
 
       END IF
 
