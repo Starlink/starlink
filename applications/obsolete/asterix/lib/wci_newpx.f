@@ -21,7 +21,8 @@
 
 *  Arguments:
 *     DIMS[2] = INTEGER (given)
-*        Number of pixels in each axis
+*        Number of pixels in each axis. If first element is zero then no
+*        pixels are defined and the arguments BASES and SCALES are not accessed
 *     BASES[2] = REAL (given)
 *        Local coordinate value in axis units at centre of first pixel
 *     SCALES[2] = REAL (given)
@@ -75,8 +76,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     4 Jan 1995 (DJA):
+*      4 Jan 1995 (DJA):
 *        Original version.
+*     12 Dec 1995 (DJA):
+*        Allow DIMS(1) to be zero to signify event datasets
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,9 +133,11 @@
       CALL ADI_NEW0( 'Pixellation', ID, STATUS )
 
 *  Write attributes
-      CALL ADI_CPUT1I( ID, 'DIMS', 2, DIMS, STATUS )
-      CALL ADI_CPUT1R( ID, 'BASE', 2, BASES, STATUS )
-      CALL ADI_CPUT1R( ID, 'SCALE', 2, SCALES, STATUS )
+      IF ( DIMS(1) .GT. 0 ) THEN
+        CALL ADI_CPUT1I( ID, 'DIMS', 2, DIMS, STATUS )
+        CALL ADI_CPUT1R( ID, 'BASE', 2, BASES, STATUS )
+        CALL ADI_CPUT1R( ID, 'SCALE', 2, SCALES, STATUS )
+      END IF
       CALL ADI_CPUT1D( ID, 'UCONV', 2, UCONV, STATUS )
       CALL ADI_CPUT0D( ID, 'ROTATION', ROTA, STATUS )
 

@@ -124,6 +124,8 @@
      :                   STATUS )
         CALL ADI_DEFMTH( 'WriteWCS(_BinDS,_HDSfile,_,_Projection,'/
      :                   /'_CoordSystem)', WCI1_WRITE, DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteWCS(_EventDS,_HDSfile,_,_Projection,'/
+     :                   /'_CoordSystem)', WCI1_WRITE, DID, STATUS )
         CALL ADI_DEFMTH( 'WriteWCS(_BinDS,_FITSfile,_,_Projection,'/
      :                   /'_CoordSystem)', WCI2_WRITFIT, DID, STATUS )
 
