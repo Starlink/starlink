@@ -1,0 +1,78 @@
+\newpage
+\sstroutine{
+   GASP2NDF
+}{
+   Converts an image in GASP format to an NDF
+}{
+   \sstdescription{
+      This application converts a GAlaxy Surface Photometry (GASP)
+      format file into an NDF.
+   }
+   \sstusage{
+      gasp2ndf in out shape=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         A character string containing the name of GASP file to convert.
+         The extension should not be given, since {\tt "}.dat{\tt "} is assumed.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The name of the output NDF.
+      }
+      \sstsubsection{
+         SHAPE( 2 ) = \_INTEGER (Read)
+      }{
+         The dimensions of the GASP image (the number of columns
+         followed by the number of rows).  Each dimension must be in the
+         range 1 to 1024.  This parameter is only used if supplied on
+         the command line, or if the header file corresponding to the
+         GASP image does not exist or cannot be opened.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         gasp2ndf m31\_gasp m31
+      }{
+         Convert a GASP file called m31\_gasp.dat into an NDF called m31.
+         The dimensions of the image are taken from the header file
+         m31\_gasp.hdr.
+      }
+      \sstexamplesubsection{
+         gasp2ndf n1068 ngc1068 shape=[256,512]
+      }{
+         Take the pixel values in the GASP file n1068.dat and create
+         the NDF ngc1068 with dimensions 256 columns by 512 rows.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A GASP image is limited to a maximum of 1024 by 1024 elements.
+         It must be two dimensional.
+
+         \sstitem
+         The GASP image is written to the NDF's data array.  The data
+         array has type \_WORD. No other NDF components are created.
+
+         \sstitem
+         If the header file is corrupted, the user must remove the
+         offending {\tt "}.hdr{\tt "} file or specify the shape of the GASP image on the
+         command line, otherwise the application will continually abort.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      NDF2GASP
+   }
+   \sstdiytopic{
+      References
+   }{
+      GASP documentation (MUD/66).
+   }
+}
