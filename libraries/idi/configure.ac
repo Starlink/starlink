@@ -34,7 +34,8 @@ STAR_CNF_COMPATIBLE_SYMBOLS
  
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae cnf ems])
-STAR_DECLARE_DEPENDENCIES([link],  [starx ems cnf gwm gns])
+STAR_DECLARE_DEPENDENCIES(build, gwm, link)
+STAR_DECLARE_DEPENDENCIES([link],  [cnf ems gwm gns starx])
  
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
