@@ -1,6 +1,6 @@
 Interface ACF
   Parameter INP
-    Type        'UNIV'
+    Type        'LITERAL'
     Position    1
     Ppath       'Global'
     Association '<- GLOBAL.ANAL'
@@ -9,7 +9,7 @@ Interface ACF
   EndParameter
 
   Parameter OUT
-    Type        'UNIV'
+    Type        'LITERAL'
     Position    2
     Prompt      'Enter the name of the output dataset'
     Help        'This will contain the autocorrelation function(s).'
