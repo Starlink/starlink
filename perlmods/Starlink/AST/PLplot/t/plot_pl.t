@@ -77,10 +77,15 @@ my $ytop    = 0.5 * ( $y1 + $y2 + $ny * $scale );
 
 # Read data 
 # ---------
-#my $array = read_file( $file );
-#         
-#pggray( $array, $nx, $ny, 1, $nx, 1, $ny, 10000, 0, 
-#  [ $xleft-0.5*$scale, $scale, 0.0, $ybottom-0.5*$scale, 0.0, $scale ] );
+my $array = read_file( $file );
+
+Graphics::PLplot::plimage($array, $nx, $ny,
+			  $xleft, $xright, 
+			  $ybottom, $ytop,
+			  0,10000,
+			  $xleft, $xright,
+			  $ybottom, $ytop
+			 );
 
 # Change FrameSet
 # ---------------
@@ -119,20 +124,20 @@ sleep(2);
 plend();
 exit;
 
-#sub read_file {
-#   my $file = shift;
-#
-#   my $status = 0;
-#   my $fptr = Astro::FITS::CFITSIO::open_file(
-#             $file, Astro::FITS::CFITSIO::READONLY(), $status);
-#
-#   my ($array, $nullarray, $anynull);
-#   $fptr->read_pixnull( 
-#     Astro::FITS::CFITSIO::TLONG(), [1,1], $nx*$ny, $array, $nullarray, 
-#     $anynull ,$status);
-#   $fptr->close_file($status);
-#
-#   return $array;
-#}
+sub read_file {
+   my $file = shift;
+
+   my $status = 0;
+   my $fptr = Astro::FITS::CFITSIO::open_file(
+             $file, Astro::FITS::CFITSIO::READONLY(), $status);
+
+   my ($array, $nullarray, $anynull);
+   $fptr->read_pixnull( 
+     Astro::FITS::CFITSIO::TLONG(), [1,1], $nx*$ny, $array, $nullarray, 
+     $anynull ,$status);
+   $fptr->close_file($status);
+
+   return $array;
+}
 
 1;  
