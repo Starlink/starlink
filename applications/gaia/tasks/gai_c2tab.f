@@ -307,6 +307,12 @@
          ELSE IF ( NAME .EQ. 'Y_IMAGE' ) THEN
             IF ( YCOL .EQ. -1 ) YCOL = I - 1
 
+*  POLPACK names for X and Y.
+         ELSE IF ( NAME .EQ. 'X' ) THEN
+            IF ( XCOL .EQ. -1 ) XCOL = I - 1
+         ELSE IF ( NAME .EQ. 'Y' ) THEN
+            IF ( YCOL .EQ. -1 ) YCOL = I - 1
+
 *  Look for incoming IDCOL.
          ELSE IF ( NAME .EQ. 'ID_COL' ) THEN 
             IF ( IDCOL .EQ. -1 ) IDCOL = I - 1
