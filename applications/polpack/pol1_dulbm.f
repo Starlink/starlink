@@ -123,6 +123,8 @@
 *        cube.
 *     24-OCT-2001 (DSB):
 *        Map the output data array prior to calling POL1_FBBOX.
+*     3-JUL-2002 (DSB):
+*        Always map the NDF arrays as _REAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -233,8 +235,6 @@
                                  ! Image ID descriptor
       CHARACTER * ( 1 ) RAY( MAXIN )
                                  ! Image ray identifer.
-      CHARACTER * ( NDF__SZTYP ) TYPE
-                                 ! NDF data type
       CHARACTER * ( IDLEN ) ID( 4, MAXSET )
                                  ! Image ID string
       CHARACTER * ( 40 ) TITLE   ! Title for output NDF
@@ -303,11 +303,10 @@
       CALL NDF_MBNDN( 'PAD', NIM, NDFIN, STATUS )      
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       
-*  Get the image dimensions and data type by looking at the first mapped
+*  Get the image dimensions by looking at the first mapped
 *  NDF. Note, accept 3 dimensions since each input image may be a slice
 *  out of a 3D X/Y/frequency cube.
       CALL NDF_BOUND( NDFIN( 1 ), 3, LBND, UBND, NDIM, STATUS )
-      CALL NDF_TYPE( NDFIN( 1 ), 'DATA', TYPE, STATUS )
 
 *  Store the bounds of the Z planes.
       IF( NDIM .EQ. 2 ) THEN
@@ -772,16 +771,17 @@
                IF ( NSTATE( IPOS ) .GE. ISET ) THEN
                   IVAL_L = PSET( 2 * IPOS -1, ISET )
                   IVAL_R = PSET( 2 * IPOS, ISET )
-                  CALL NDF_MAP( SECVAL( IVAL_L ), 'DATA', TYPE, 'READ',
-     :                 IPDIN( 2 * IPOS - 1, ISET ), NEL, STATUS )
-                  CALL NDF_MAP( SECVAL( IVAL_R ), 'DATA', TYPE, 'READ',
-     :                 IPDIN( 2 * IPOS, ISET ), NEL, STATUS )
+                  CALL NDF_MAP( SECVAL( IVAL_L ), 'DATA', '_REAL', 
+     :                'READ', IPDIN( 2 * IPOS - 1, ISET ), NEL, STATUS )
+                  CALL NDF_MAP( SECVAL( IVAL_R ), 'DATA', '_REAL', 
+     :                'READ',IPDIN( 2 * IPOS, ISET ), NEL, STATUS )
                   IF( VAR ) THEN
-                     CALL NDF_MAP( SECVAL( IVAL_L ), 'VARIANCE', TYPE,
-     :                    'READ', IPVIN( 2 * IPOS - 1, ISET ), NEL,
+                     CALL NDF_MAP( SECVAL( IVAL_L ), 'VARIANCE',
+     :                    '_REAL', 'READ', IPVIN( 2 * IPOS - 1, ISET ), 
+     :                    NEL, STATUS )
+                     CALL NDF_MAP( SECVAL( IVAL_R ), 'VARIANCE', 
+     :                    '_REAL', 'READ', IPVIN( 2 * IPOS, ISET ), NEL, 
      :                    STATUS )
-                     CALL NDF_MAP( SECVAL( IVAL_R ), 'VARIANCE', TYPE,
-     :                    'READ', IPVIN( 2 * IPOS, ISET ), NEL, STATUS )
                   ELSE
                      IPVIN( 2 * IPOS - 1, ISET ) = IPDIN( 2 * IPOS - 1,
      :                      ISET )
