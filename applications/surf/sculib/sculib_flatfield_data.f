@@ -1,7 +1,7 @@
 *+  SCULIB_FLATFIELD_DATA - flatfield the data in an array
       SUBROUTINE SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
      :  DATA, VARIANCE, QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, 
-     :  NUM_ADC, BOL_FLAT, BOL_QUALITY, STATUS)
+     :  NUM_ADC, BOL_FLAT, BOL_QUALITY, BADBIT, STATUS)
 *    Description :
 *     This routine multiplies the data in the input array by the flatfield
 *     values of the bolometers that took it. Output quality will be set
@@ -10,7 +10,7 @@
 *    Invocation :
 *     CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM, DATA, VARIANCE,
 *    :  QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, NUM_ADC, BOL_FLAT,
-*    :  BOL_QUALITY, STATUS)
+*    :  BOL_QUALITY, BADBIT, STATUS)
 *    Parameters :
 *     N_BOL                  = INTEGER (Given)
 *           number of bolometers measured
@@ -25,7 +25,7 @@
 *                            = REAL (Given and returned)
 *           variance on DATA
 *     QUALITY (N_BOL, N_POS, N_BEAM)
-*                            = INTEGER (Given and returned)
+*                            = BYTE (Given and returned)
 *           quality on DATA
 *     BOL_CHAN (N_BOL)       = INTEGER (Given)
 *           the channel numbers of the measured bolometers
@@ -41,6 +41,8 @@
 *     BOL_QUALITY (NUM_CHAN, NUM_ADC)
 *                            = INTEGER (Given)
 *           quality on BOL_FLAT
+*     BADBIT                 = BYTE (Given)
+*         Bad bit mask
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -57,6 +59,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
+      BYTE    BADBIT
       INTEGER N_BOL
       INTEGER N_POS
       INTEGER N_BEAM
@@ -69,7 +72,7 @@
 *    Import-Export :
       REAL    DATA (N_BOL,N_POS,N_BEAM)
       REAL    VARIANCE (N_BOL,N_POS,N_BEAM)
-      INTEGER QUALITY (N_BOL,N_POS,N_BEAM)
+      BYTE QUALITY (N_BOL,N_POS,N_BEAM)
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -84,6 +87,8 @@
       INTEGER POS                          ! measurement index in DO loop
 *    Internal References :
 *    Local data :
+*    Functions:
+      INCLUDE 'NDF_FUNC'
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -95,7 +100,7 @@
 *  multiply by the flatfield if the quality of the datum and flatfield are
 *  good, otherwise set output datum quality bad
 
-               IF (QUALITY(BOL,POS,BEAM) .EQ. 0) THEN
+               IF (NDF_QMASK(QUALITY(BOL,POS,BEAM), BADBIT)) THEN
                   CHAN = BOL_CHAN (BOL)
                   ADC = BOL_ADC (BOL)
 
