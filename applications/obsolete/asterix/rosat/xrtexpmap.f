@@ -45,6 +45,7 @@
 *      9 Jun 94 : V1.7-1  Handles RDF data (DJA)
 *      5 Sep 95 : V1.8-0  Bug calculating exposure time when first attitude
 *                         record was ok (DJA)
+*     11 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -53,6 +54,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *
@@ -109,7 +111,6 @@
       INTEGER			ATT_Y_PTR		! Attitude YOFFSET
       INTEGER			BLK			! FITS block size
       INTEGER			DIMS(DAT__MXDIM)	! O/p dimensions
-      INTEGER			DPTR			! Output exposure map
       INTEGER			EVR_A1LL_PTR		! Event rate A1LL
       INTEGER			EVR_AXE_PTR		! Event rate AXE
       INTEGER			EVR_AEXE_PTR		! Event rate AEXE
@@ -122,7 +123,6 @@
       INTEGER			ITIME			! Loop over time slots
       INTEGER			LUN			! Logical unit number
       INTEGER			MFID			! O/p check map
-      INTEGER			MPTR			! Output detector map
       INTEGER			NACTGTIME		! Num good time slots
       INTEGER			NATTREC			! No. attitude records
       INTEGER			NEVRREC			! No. ev rate records
@@ -817,10 +817,13 @@ C
       SUBROUTINE XRTEXPMAP_PUTIM( DIMS, PIXSIZ, DATA, TITLE, LABEL,
      :                            UNITS, OFID, STATUS )
       IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+
       CHARACTER*(*) TITLE,LABEL,UNITS
       INTEGER       DIMS(2), OFID
       REAL          PIXSIZ, DATA(*)
       INTEGER       STATUS
+      REAL SPARR(2)
 
 *  Create interface object
       CALL BDI_LINK( 'Image', 2, DIMS, 'REAL', OFID, STATUS )
@@ -844,7 +847,7 @@ C
       CALL BDI_AXPUT0L( OFID, 2, 'Normalised', .TRUE., STATUS )
 
 *  Write data
-      CALL BDI_PUT( OFID, 'Data', 'REAL', NDIM, DIMS, DATA, STATUS )
+      CALL BDI_PUT( OFID, 'Data', 'REAL', 2, DIMS, DATA, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'XRTEXPMAP_PUTIUM', STATUS )
