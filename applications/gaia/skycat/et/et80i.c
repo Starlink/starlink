@@ -219,8 +219,7 @@ static int Et_VaEval(
   if( spaceNeeded<=sizeof(bigSpace) ){
     buf = bigSpace;
   }else{
-    extern char *malloc();
-    buf = malloc( spaceNeeded );
+    buf = (char *)malloc( spaceNeeded );
     if( buf==0 ){
        sprintf(bigSpace,"File %s line %d: can't allocate %d bytes of memory",
           fileName,lineNumber,spaceNeeded);
