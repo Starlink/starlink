@@ -253,8 +253,8 @@
 # Save the path to the directory containing POLPACK hypertext documents.
    set POLPACK_HELP $POLPACK_DIR/../../help/polpack
 
-# Get the paths to the CCDPACK and KAPPA directories from the corresponding
-# environment variables.
+# Get the paths to the CCDPACK, KAPRH and KAPPA directories from the 
+# corresponding environment variables.
    if { [info exists env(KAPPA_DIR)] } {
       set KAPPA_DIR $env(KAPPA_DIR)
    } else {
@@ -265,6 +265,12 @@
       set CCDPACK_DIR $env(CCDPACK_DIR)
    } else {
       set CCDPACK_DIR /star/bin/ccdpack
+   }
+
+   if { [info exists env(KAPRH_DIR)] } {
+      set KAPRH_DIR $env(KAPRH_DIR)
+   } else {
+      set KAPRH_DIR /star/bin/kaprh
    }
 
 #  Name this application (for xresources etc.)
@@ -385,6 +391,7 @@
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa    $KAPPA_DIR/kappa_mon
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
+   LoadTask kaprh    $KAPRH_DIR/kaprh_mon
    LoadTask ccdpack  $CCDPACK_DIR/ccdpack_reg
    LoadTask polpack  $POLPACK_DIR/polpack_mon
 

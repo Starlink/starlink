@@ -2591,8 +2591,8 @@ proc DescMap {map} {
       set ok 1
 
 # Otherwise, analyse the TRANSFORM structure in the specified HDS
-# container file. Use KAPPA:TRANTRACE to obtain the textual representation
-# of the forard and inverse transformation functions, and then extract the
+# container file. Use KAPRH:TRANTRACE to obtain the textual representation
+# of the forward and inverse transformation functions, and then extract the
 # constants from these expresions using regular expressions. Verify that
 # the constants are usable numbers using "scan". Note, it appears that
 # trantrace fails sometimes on the first attempt, returning DAT__LOCIN.
@@ -2609,9 +2609,9 @@ proc DescMap {map} {
 
 # Only report ADAM errors on the last attempt.
          if { $ntry < 2 } {
-            set ok [Obey kappa trantrace "transform=$map logfile=$logfile" noreport]
+            set ok [Obey kaprh trantrace "transform=$map logfile=$logfile" noreport]
          } {
-            set ok [Obey kappa trantrace "transform=$map logfile=$logfile"]
+            set ok [Obey kaprh trantrace "transform=$map logfile=$logfile"]
          }
 
 # If trantrace failed, delete the log file.
@@ -2625,7 +2625,7 @@ proc DescMap {map} {
 
 # If trantrace would not run, report a contextual error.
       if { !$ok } {
-         Message "KAPPA:TRANTRACE failed - cannot display mapping."
+         Message "KAPRH:TRANTRACE failed - cannot display mapping."
 
 # Otherwise, read the logfile.
       } {
@@ -2677,7 +2677,7 @@ proc DescMap {map} {
 
          } {
             set ok 0
-            Message "Cannot find transformation functions in KAPPA:TRANTRACE logfile - cannot display mapping."
+            Message "Cannot find transformation functions in KAPRH:TRANTRACE logfile - cannot display mapping."
          }
       }
       catch "exec rm -f $logfile"
@@ -5286,7 +5286,7 @@ proc MakeTrn {map} {
       set trfile [UniqueFile]
 
 # Create the new Mapping. Return the name of the Mapping file if succesful.
-      if { [Obey kappa wcsadd "ndf=\! naxes=2 maptype=$maptype mapout=$trfile tr=$coeffs"] } {
+      if { [Obey ndfpack wcsadd "ndf=\! naxes=2 maptype=$maptype mapout=$trfile tr=$coeffs"] } {
          set ret ${trfile}
       }
    }
