@@ -127,6 +127,7 @@
 *  External References:
       EXTERNAL			BDI1_WBBND
       EXTERNAL			BDI1_WBERR
+      EXTERNAL			BDI1_WBGEN
       EXTERNAL			BDI1_WBLQ
       EXTERNAL			BDI1_WBWID
       EXTERNAL			UTIL_PLOC
@@ -138,6 +139,7 @@
       CHARACTER*(DAT__SZLOC)	MLOC			! Quality mask
       CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
 
+      INTEGER			IERR, NERR		! Error info from VEC_
       INTEGER			NELM			! # invented elements
       INTEGER			PSID, WPSID		! Private item storage
       INTEGER			PTR, PTR2		! Mapped data address
@@ -312,6 +314,51 @@
         IF ( MLOC .NE. DAT__NOLOC ) THEN
           CALL DAT_ANNUL( MLOC, STATUS )
         END IF
+
+*  Data variance?
+      ELSE IF ( ITEM .EQ. 'Variance' ) THEN
+
+*    Locate primary data
+        CALL BDI1_CFIND( BDID, HFID, 'Data', .FALSE., CLOC,
+     :                   NDIM, DIMS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 59
+
+*    Create invented object
+        CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
+
+*    Locate the BDI private storage for the data, creating if required
+        CALL BDI0_LOCPST( BDID, 'Data', .TRUE., PSID, STATUS )
+
+*    Map it
+        CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', NDIM, DIMS, PSID, PTR,
+     :                    NELM, STATUS )
+
+*    Map the invented object
+        CALL ADI_MAP( ITID, TYPE, 'WRITE', WPTR, STATUS )
+
+*    Convert to variance
+        IF ( TYPE .EQ. 'REAL' ) THEN
+          CALL VEC_ABSR( .FALSE., NELM, %VAL(PTR), %VAL(WPTR), IERR,
+     :                   NERR, STATUS )
+        ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+          CALL VEC_ABSD( .FALSE., NELM, %VAL(PTR), %VAL(WPTR), IERR,
+     :                   NERR, STATUS )
+        ELSE
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'T', TYPE )
+          CALL ERR_REP( ' ', 'Error converting data to variance '/
+     :                  /'for type ^T', STATUS )
+        END IF
+
+*    Unmap the invented object and the file data
+        CALL ADI_UNMAP( ITID, WPTR, STATUS )
+        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+
+*    Set the WriteBack function
+        WBPTR = UTIL_PLOC( BDI1_WBGEN )
+
+*    Release storage
+        CALL ADI_ERASE( PSID, STATUS )
 
 *  Data error?
       ELSE IF ( ITEM .EQ. 'Error' ) THEN
