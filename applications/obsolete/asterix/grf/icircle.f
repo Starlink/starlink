@@ -46,7 +46,7 @@
 
 *  set region mask
         CALL IMG_SETWHOLE(STATUS)
-        CALL IMG_SETCIRC(XC,YC,RAD,STATUS)
+        CALL IMG_SETCIRC(XC,YC,RAD,.FALSE.,STATUS)
 
 *  store values
         CALL IMG_STORECIRC(XC,YC,RAD,STATUS)

@@ -47,24 +47,16 @@
 *  get box position
         CALL IMG_GETBOX('XCENT','YCENT','XWID','YWID',XC,YC,DX,DY,
      :                                                      STATUS)
-	print *,xc,yc,dx,dy
-*  needs this to stop it hanging for some reason
-        CALL MSG_BLNK()
 
 *  set region mask
-	print *,'1'
         CALL IMG_SETWHOLE(STATUS)
-	print *,'2'
-        CALL IMG_SETBOX(XC,YC,DX,DY,STATUS)
-	print *,'3'
+        CALL IMG_SETBOX(XC,YC,DX,DY,.FALSE.,STATUS)
 
 *  store box parameters
         CALL IMG_STOREBOX(XC,YC,DX,DY,STATUS)
-	print *,'4'
 
 *  mark box
         CALL IMG_BOX(XC,YC,DX,DY,STATUS)
-	print *,'5'
 
       ENDIF
 

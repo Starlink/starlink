@@ -4021,6 +4021,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  Status :
         INTEGER STATUS
 *  Local constants :
+        BYTE ZERO
+        PARAMETER (ZERO='00'X)
 *  Local variables :
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -4034,7 +4036,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         I_IY1=1
         I_IY2=I_NY
 
-        CALL ARR_INIT1B('00'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
+        CALL ARR_INIT1B(ZERO,I_NX*I_NY,%val(I_REG_PTR),STATUS)
         I_REG_TYPE='NONE'
 
       ENDIF
