@@ -149,6 +149,8 @@
       PARAMETER (MAXDIM = 4)
 
 *    Local variables :
+      LOGICAL          ABORTED          ! .TRUE. if the observation was
+                                        ! aborted
       DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent declination of array centre
                                         ! (radians)
       DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (radians)
@@ -255,6 +257,14 @@
                                         ! x jiggle offsets (arcsec)
       REAL             JIGGLE_Y (SCUBA__MAX_JIGGLE)
                                         ! y jiggle offsets (arcsec)
+      INTEGER          LAST_EXP         ! the number of the exposure being
+                                        ! measured when the abort occurred
+      INTEGER          LAST_INT         ! the number of the integration
+                                        ! being measured when the abort 
+                                        ! occurred
+      INTEGER          LAST_MEAS        ! the number of the measurement
+                                        ! being measured when the abort 
+                                        ! occurred
       DOUBLE PRECISION LAT_OBS          ! latitude of observatory (radians)
       DOUBLE PRECISION LAT_RAD          ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD         ! latitude of telescope centre at MJD2
@@ -348,6 +358,8 @@
       DOUBLE PRECISION SECOND_LST_RAD   ! SECOND_LST in radians
       REAL             SECOND_TAU       ! zenith sky opacity at SECOND_LST
       INTEGER          SLA_STATUS       ! status return from SLA routine
+      CHARACTER*80     STATE            ! the state of SCUCD when the 
+                                        ! datafile was closed
       CHARACTER*80     STEMP            ! scratch string
       CHARACTER*40     SUBLIST          ! List of available sub instruments
       CHARACTER*15     SUB_FILTER (SCUBA__MAX_SUB)
@@ -671,6 +683,16 @@
       N_INTEGRATIONS = DIM (2)
       N_MEASUREMENTS = DIM (3)
 
+*  see if the observation completed normally or was aborted
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
+     :  STATE, STATUS)
+      CALL CHR_UCASE (STATE)
+      ABORTED = .FALSE.
+      IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
+         ABORTED = .TRUE.
+      END IF
+
 *  map the .SCUCD.LST_STRT array and check its dimensions
 
       CALL ARY_FIND (IN_SCUCDX_LOC, 'LST_STRT', IN_LST_STRT_ARY,
@@ -729,10 +751,32 @@
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
-      CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
-     :  'exposure(s) in ^N_I integration(s) in '//
-     :  '^N_M measurement(s)', STATUS)
+      IF (.NOT. ABORTED) THEN
+         CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
+     :     'exposure(s) in ^N_I integration(s) in '//
+     :     '^N_M measurement(s)', STATUS)
+      ELSE
 
+*  get the exposure, integration, measurement numbers at which the abort
+*  occurred
+
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'EXP_NO', LAST_EXP, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'INT_NO', LAST_INT, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MEAS_NO', LAST_MEAS, STATUS)
+
+         CALL MSG_OUT (' ', 'REDS: the observation should have '//
+     :     'had ^N_E exposure(s) in ^N_I integration(s) in ^N_M '//
+     :     'measurement(s)', STATUS)
+         CALL MSG_SETI ('N_E', LAST_EXP)
+         CALL MSG_SETI ('N_I', LAST_INT)
+         CALL MSG_SETI ('N_M', LAST_MEAS)
+         CALL MSG_OUT (' ', ' - However, the observation was '//
+     :     'ABORTED during exposure ^N_E of integration ^N_I '//
+     :     'of measurement ^N_M', STATUS)
+      END IF
 
 *  calculate the apparent RA and Dec of the object for the time of the
 *  observation
@@ -1369,44 +1413,6 @@
             DO INTEGRATION = 1, N_INTEGRATIONS
                DO EXPOSURE = 1, N_EXPOSURES
 
-*  calculate a mean LST for the switch sequence in the exposure
-
-                  EXP_LST = 0.0D0
-                  DO I = 1, N_SWITCHES
-                     DATA_OFFSET = (((MEASUREMENT-1) * N_INTEGRATIONS +
-     :                 INTEGRATION - 1) * N_EXPOSURES + 
-     :                 EXPOSURE - 1) * N_SWITCHES + I - 1
-                     CALL VEC_DTOD(.FALSE., 1,
-     :                    %val(IN_LST_STRT_PTR + DATA_OFFSET *VAL__NBD),
-     :                    DTEMP, IERR, NERR, STATUS)
-                     EXP_LST = EXP_LST + DTEMP
-                  END DO
-                  EXP_LST = EXP_LST / DBLE (N_SWITCHES)
-
-*  get the scan parameters for a raster map
-
-                  IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                     CALL VEC_RTOR (.FALSE., 1, %val(IN_RA1_PTR +
-     :                    DATA_OFFSET * VAL__NBR), RA_START,
-     :                    IERR, NERR, STATUS)
-                     CALL VEC_RTOR (.FALSE., 1, %val(IN_RA2_PTR +
-     :                    DATA_OFFSET * VAL__NBR), RA_END,
-     :                    IERR, NERR, STATUS)
-                     CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC1_PTR +
-     :                    DATA_OFFSET * VAL__NBR), DEC_START,
-     :                    IERR, NERR, STATUS)
-                     CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC2_PTR +
-     :                    DATA_OFFSET * VAL__NBR), DEC_END,
-     :                    IERR, NERR, STATUS)
-
-*  convert to radians
-
-                     RA_START = RA_START * REAL(PI) / 12.0
-                     RA_END = RA_END * REAL(PI) / 12.0
-                     DEC_START = DEC_START * REAL(PI) / 180.0
-                     DEC_END = DEC_END * REAL(PI) / 180.0
-                  END IF
-
 *  find where the exposure starts and finishes in the data array
 
                   CALL SCULIB_FIND_SWITCH (%val(IN_DEM_PNTR_PTR),
@@ -1414,97 +1420,151 @@
      :              N_POS, 1, EXPOSURE, INTEGRATION, MEASUREMENT,
      :              EXP_START, EXP_END, STATUS)
 
+                  IF ((EXP_START .EQ. VAL__BADI) .OR.
+     :                (EXP_START .EQ. 0))        THEN
+                     CALL MSG_SETI ('E', EXPOSURE)
+                     CALL MSG_SETI ('I', INTEGRATION)
+                     CALL MSG_SETI ('M', MEASUREMENT)
+                     CALL MSG_OUT (' ', 'REDS: no data for exp ^E '//
+     :                 'in int ^I, meas ^M', STATUS)
+                  ELSE
+
+*  OK, there is data for the exposure, first calculate a mean LST for the
+*  switch sequence in the exposure
+
+                     EXP_LST = 0.0D0
+                     DO I = 1, N_SWITCHES
+                        DATA_OFFSET = (((MEASUREMENT-1) * 
+     :                    N_INTEGRATIONS + INTEGRATION - 1) * 
+     :                    N_EXPOSURES + EXPOSURE - 1) * N_SWITCHES + 
+     :                    I - 1
+                        CALL VEC_DTOD(.FALSE., 1,
+     :                       %val(IN_LST_STRT_PTR + DATA_OFFSET *
+     :                       VAL__NBD), DTEMP, IERR, NERR, STATUS)
+                        EXP_LST = EXP_LST + DTEMP
+                     END DO
+                     EXP_LST = EXP_LST / DBLE (N_SWITCHES)
+
+*  get the scan parameters for a raster map
+
+                     IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+                        CALL VEC_RTOR (.FALSE., 1, %val(IN_RA1_PTR +
+     :                    DATA_OFFSET * VAL__NBR), RA_START,
+     :                    IERR, NERR, STATUS)
+                        CALL VEC_RTOR (.FALSE., 1, %val(IN_RA2_PTR +
+     :                    DATA_OFFSET * VAL__NBR), RA_END,
+     :                    IERR, NERR, STATUS)
+                        CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC1_PTR +
+     :                    DATA_OFFSET * VAL__NBR), DEC_START,
+     :                    IERR, NERR, STATUS)
+                        CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC2_PTR +
+     :                    DATA_OFFSET * VAL__NBR), DEC_END,
+     :                    IERR, NERR, STATUS)
+
+*  convert to radians
+
+                        RA_START = RA_START * REAL(PI) / 12.0
+                        RA_END = RA_END * REAL(PI) / 12.0
+                        DEC_START = DEC_START * REAL(PI) / 180.0
+                        DEC_END = DEC_END * REAL(PI) / 180.0
+                     END IF
+
 *  cycle through the measurements in the exposure
 
-                  DO I = EXP_START, EXP_END
+                     DO I = EXP_START, EXP_END
 
 *  calculate the LST at which the measurement was made (hardly worth
 *  the bother because it's only an average over the switches anyway)
 
-                     LST = EXP_LST + DBLE(I - EXP_START) * 
-     :                 DBLE(EXP_TIME) * 1.0027379D0 * 2.0D0 * 
-     :                 PI / (3600.0D0 * 24.0D0)
+                        LST = EXP_LST + DBLE(I - EXP_START) * 
+     :                    DBLE(EXP_TIME) * 1.0027379D0 * 2.0D0 * 
+     :                    PI / (3600.0D0 * 24.0D0)
 
 *  work out the zenith sky opacity at this LST
 
-                     IF (LST .LE. FIRST_LST_RAD) THEN
-                        TAUZ = FIRST_TAU
-                     ELSE IF (LST .GE. SECOND_LST_RAD) THEN
-                        TAUZ = SECOND_TAU
-                     ELSE
-                        TAUZ = FIRST_TAU + (SECOND_TAU - FIRST_TAU) *
-     :                    (LST - FIRST_LST_RAD) /
-     :                    (SECOND_LST_RAD - FIRST_LST_RAD)
-                     END IF
+                        IF (LST .LE. FIRST_LST_RAD) THEN
+                           TAUZ = FIRST_TAU
+                        ELSE IF (LST .GE. SECOND_LST_RAD) THEN
+                           TAUZ = SECOND_TAU
+                        ELSE
+                           TAUZ = FIRST_TAU + (SECOND_TAU-FIRST_TAU) *
+     :                       (LST - FIRST_LST_RAD) /
+     :                       (SECOND_LST_RAD - FIRST_LST_RAD)
+                        END IF
 
 *  work out the offset at which the measurement was made in arcsec
 
-                     IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
-                        ARRAY_RA_CENTRE = RA_CENTRE
-                        ARRAY_DEC_CENTRE = DEC_CENTRE
+                        IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+                           ARRAY_RA_CENTRE = RA_CENTRE
+                           ARRAY_DEC_CENTRE = DEC_CENTRE
 
-                        IF (JIGGLE_REPEAT .EQ. 1) THEN
-                           JIGGLE = (EXPOSURE - 1) *
-     :                       JIGGLE_P_SWITCH +
-     :                       I - EXP_START + 1
-                        ELSE
-                           JIGGLE = MOD (I - EXP_START, 
-     :                       JIGGLE_COUNT) + 1
-                        END IF
-                        OFFSET_X = JIGGLE_X (JIGGLE)
-                        OFFSET_Y = JIGGLE_Y (JIGGLE)
+                           IF (JIGGLE_REPEAT .EQ. 1) THEN
+                              JIGGLE = (EXPOSURE - 1) *
+     :                          JIGGLE_P_SWITCH +
+     :                          I - EXP_START + 1
+                           ELSE
+                              JIGGLE = MOD (I - EXP_START, 
+     :                          JIGGLE_COUNT) + 1
+                           END IF
+                           OFFSET_X = JIGGLE_X (JIGGLE)
+                           OFFSET_Y = JIGGLE_Y (JIGGLE)
 
-                        IF (SAMPLE_COORDS .EQ. 'NA') THEN
-                           OFFSET_COORDS = 'NA'
-                        ELSE IF (SAMPLE_COORDS .EQ. 'AZ') THEN
-                           OFFSET_COORDS = 'AZ'
-                        ELSE
+                           IF (SAMPLE_COORDS .EQ. 'NA') THEN
+                              OFFSET_COORDS = 'NA'
+                           ELSE IF (SAMPLE_COORDS .EQ. 'AZ') THEN
+                              OFFSET_COORDS = 'AZ'
+                           ELSE
+                              OFFSET_COORDS = 'RD'
+                           END IF
+
+                        ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+                           ARRAY_RA_CENTRE = DBLE (RA_START) + 
+     :                       DBLE (RA_END - RA_START) * 
+     :                       DBLE (I - EXP_START) /
+     :                       DBLE (EXP_END - EXP_START)
+                           ARRAY_DEC_CENTRE = DBLE (DEC_START) +
+     :                       DBLE (DEC_END - DEC_START) *
+     :                       DBLE (I - EXP_START) /
+     :                       DBLE (EXP_END - EXP_START)
+
                            OFFSET_COORDS = 'RD'
+                           OFFSET_X = 0.0
+                           OFFSET_Y = 0.0
                         END IF
-
-                     ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                        ARRAY_RA_CENTRE = DBLE (RA_START) + 
-     :                    DBLE (RA_END - RA_START) * 
-     :                    DBLE (I - EXP_START) /
-     :                    DBLE (EXP_END - EXP_START)
-                        ARRAY_DEC_CENTRE = DBLE (DEC_START) +
-     :                    DBLE (DEC_END - DEC_START) *
-     :                    DBLE (I - EXP_START) /
-     :                    DBLE (EXP_END - EXP_START)
-
-                        OFFSET_COORDS = 'RD'
-                        OFFSET_X = 0.0
-                        OFFSET_Y = 0.0
-                     END IF
 
 *  now call a routine to work out the apparent RA,Dec of the measured
 *  bolometers at this position (no pointing corrections applied)
 
-                     N_POINT = 0
-  
-                     CALL SCULIB_CALC_BOL_COORDS ('RA', 
-     :                 ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
-     :                 LST, LAT_OBS, OFFSET_COORDS,
-     :                 OFFSET_X, OFFSET_Y, ROTATION, N_POINT,
-     :                 SCUBA__MAX_POINT, POINT_LST, POINT_DAZ, 
-     :                 POINT_DEL, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
-     :                 N_BOL_OUT, OUT_BOL_CHAN, OUT_BOL_ADC,
-     :                 BOL_DU3, BOL_DU4, CENTRE_DU3, CENTRE_DU4,
-     :                 BOL_RA, BOL_DEC, STATUS)
+                        N_POINT = 0
+   
+                        CALL SCULIB_CALC_BOL_COORDS ('RA', 
+     :                    ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
+     :                    LST, LAT_OBS, OFFSET_COORDS,
+     :                    OFFSET_X, OFFSET_Y, ROTATION, N_POINT,
+     :                    SCUBA__MAX_POINT, POINT_LST, POINT_DAZ, 
+     :                    POINT_DEL, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
+     :                    N_BOL_OUT, OUT_BOL_CHAN, OUT_BOL_ADC,
+     :                    BOL_DU3, BOL_DU4, CENTRE_DU3, CENTRE_DU4,
+     :                    BOL_RA, BOL_DEC, STATUS)
 
 *  correct the bolometer data for the sky opacity
-
-		     DO BEAM = 1, N_BEAM
-                        DATA_OFFSET = (BEAM-1) * N_POS * N_BOL_OUT +
-     :                    (I-1) * N_BOL_OUT
-                        CALL SCULIB_CORRECT_EXTINCTION (
-     :                    SCUBA__NUM_ADC * SCUBA__NUM_CHAN, N_BOL_OUT,
-     :                    %val(OUT_DATA_PTR + DATA_OFFSET * VAL__NBR), 
-     :                    %val(OUT_VARIANCE_PTR+DATA_OFFSET*VAL__NBR),
-     :                    BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
-     :                    STATUS)
+  
+                        DO BEAM = 1, N_BEAM
+                           DATA_OFFSET = (BEAM-1) * N_POS * N_BOL_OUT +
+     :                       (I-1) * N_BOL_OUT
+                           CALL SCULIB_CORRECT_EXTINCTION (
+     :                       SCUBA__NUM_ADC * SCUBA__NUM_CHAN,
+     :                       N_BOL_OUT,
+     :                       %val(OUT_DATA_PTR + DATA_OFFSET*VAL__NBR), 
+     :                       %val(OUT_VARIANCE_PTR+DATA_OFFSET*
+     :                       VAL__NBR),
+     :                       BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ,
+     :                       STATUS)
+                        END DO
                      END DO
-                  END DO
+
+                  END IF
+
                END DO
             END DO
          END DO
