@@ -370,9 +370,7 @@
 
       IF (STATUS.NE.SAI__OK) RETURN
 
-	print *,'opening header file',rtname(1:chr_len(rtname))//'_hdr'
       CALL HDS_OPEN(RTNAME(1:CHR_LEN(RTNAME))//'_hdr','READ',LOC,STATUS)
-	print *,'getting header',status
       CALL RAT_GETHEAD(LOC, 'HEAD', HEAD, STATUS)
       CALL HDS_CLOSE(LOC, STATUS)
 
@@ -512,38 +510,14 @@
       INTEGER STATUS
 *    Local constants :
 *    Local variables :
-      character*(dat__szloc) dloc,cloc,hloc
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
       INTEGER DUMMY			! Value not used
-      character*(DAT__SZNAM) name
-      logical valid
-      integer dummy,i,ncomp
-      character*(DAT__SZLOC) ploc
 *
       IF (STATUS.NE.SAI__OK) RETURN
 
 
-        call dat_ncomp(loc,ncomp,status)
-	print *,'ncomp',ncomp
-        call dat_size(loc,dummy,status)
-	print *,'size',dummy
-        name=' '
-        i=1
-        do while (name.ne.'HEAD'.and.i.le.ncomp.and.status.eq.sai__ok)
-          call dat_index(loc,i,aloc,status)
-          call dat_name(aloc,name,status)
-          print *,i,name
-          if (name.ne.'HEAD') then
-            call dat_annul(aloc,status)
-          endif
-          i=i+1
-        enddo
-c        call dat_there(cloc,'head',valid,status)
-c        print *,valid
-c        call dat_find(cloc,'head',aloc,status)
-c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
+      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
-	print *,1
 
       CALL CMP_GET0D(ALOC,'AXIS_RA',HEAD.AXIS_RA,STATUS)
       CALL CMP_GET0D(ALOC,'AXIS_DEC',HEAD.AXIS_DEC,STATUS)
@@ -553,7 +527,6 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       CALL CMP_GET0D(ALOC,'BASE_SCTIME',HEAD.BASE_SCTIME,STATUS)
       CALL CMP_GET1R(ALOC,'TSTART',MAXRAN,HEAD.TSTART,DUMMY,STATUS)
       CALL CMP_GET1R(ALOC,'TEND',MAXRAN,HEAD.TEND,DUMMY,STATUS)
-	print *,2
       CALL CMP_GET0I(ALOC,'ASTART',HEAD.ASTART,STATUS)
       CALL CMP_GET0I(ALOC,'AEND',HEAD.AEND,STATUS)
       CALL CMP_GET0I(ALOC,'CSTART',HEAD.CSTART,STATUS)
@@ -568,7 +541,6 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       CALL CMP_GET0I(ALOC,'YDEND',HEAD.YDEND,STATUS)
       CALL CMP_GET1I(ALOC,'NEVENTS',MAXMAPS,HEAD.NEVENTS,DUMMY,STATUS)
       CALL CMP_GET1I(ALOC,'EVSTART',MAXMAPS,HEAD.EVSTART,DUMMY,STATUS)
-	print *,3
       CALL CMP_GET0I(ALOC,'IEVLEN',HEAD.IEVLEN,STATUS)
       CALL CMP_GET0I(ALOC,'IRECLN',HEAD.IRECLN,STATUS)
       CALL CMP_GET0I(ALOC,'IFDSZX',HEAD.IFDSZX,STATUS)
@@ -579,7 +551,6 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       CALL CMP_GET0I(ALOC,'ISMNUY',HEAD.ISMNUY,STATUS)
       CALL CMP_GET0I(ALOC,'ISMTNU',HEAD.ISMTNU,STATUS)
       CALL CMP_GET0I(ALOC,'IEVTNU',HEAD.IEVTNU,STATUS)
-	print *,4
       CALL CMP_GET0I(ALOC,'NHEAD',HEAD.NHEAD,STATUS)
       CALL CMP_GET0C(ALOC,'OBS_MODE',HEAD.OBS_MODE,STATUS)
       CALL CMP_GET0C(ALOC,'OBC_MODE',HEAD.OBC_MODE,STATUS)
@@ -592,7 +563,6 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       CALL CMP_GET0C(ALOC,'TITLE',HEAD.TITLE,STATUS)
       CALL CMP_GET0C(ALOC,'XPUNITS',HEAD.XPUNITS,STATUS)
       CALL CMP_GET0C(ALOC,'YPUNITS',HEAD.YPUNITS,STATUS)
-	print *,5
       CALL CMP_GET0D(ALOC,'BASE_MJD',HEAD.BASE_MJD,STATUS)
       CALL CMP_GET0D(ALOC,'END_MJD',HEAD.END_MJD,STATUS)
       CALL CMP_GET0D(ALOC,'SCCONV',HEAD.SCCONV,STATUS)
@@ -605,7 +575,6 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       CALL CMP_GET0C(ALOC,'SASS_DATE',HEAD.SASS_DATE,STATUS)
       CALL CMP_GET0C(ALOC,'ORIGIN',HEAD.ORIGIN,STATUS)
       CALL DAT_ANNUL(ALOC,STATUS)
-	print *,6
 
 ***** Test for any reading errors
       IF (STATUS.NE.SAI__OK) THEN
@@ -1184,21 +1153,16 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       IF (STATUS .NE. SAI__OK) RETURN
 *
 *     Get header information
-	print *,'getting RAT header'
       CALL RAT_GETXRTHEAD(RTNAME,HEAD,STATUS)
-	print *,'got header'
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Copy the times into the right output variables
       NSEL = HEAD.NTRANGE * 2
-	print *,'time ranges=',nsel
 *
-	print *,'writing times to array'
       DO LP=1,HEAD.NTRANGE
          RAWTIM(1+(LP-1)*2) = HEAD.TSTART(LP)
          RAWTIM(LP*2) = HEAD.TEND(LP)
       ENDDO
-	print *,'done that!'
 *
 999   CONTINUE
 *
