@@ -644,7 +644,7 @@ sensitive help system.
 It also aims to be complete by allowing you to define the necessary
 geometric characteristics of your data interactively (if they cannot
 be obtained elsewhere).
-For those who prefer an equivalent command-line interface is also
+For those who prefer it an equivalent command-line interface is also
 available.
 
 The core of CCDPACK is a suite of programs that have been designed to
@@ -687,8 +687,8 @@ These are stored inside your data, which removes the need to remember them.
 General transformations may also be applied to `rubber-sheet' the
 data into novel configurations.
 
-Normalisation and combination (often also called mosaicing) is
-provided in a single {\em comprehensive} application, which is
+Normalisation and combination (often also called mosaicing) 
+are done in a single step, which is
 designed to deal with very large datasets.
 This uses robust methods for determining scale and/or zero point
 corrections.
@@ -2886,7 +2886,7 @@ the following example:
 
 data1: Current frame set to domain CCD_GEN
 
-data2: Basis frame 'ccd_gen' not found
+data2: Target frame 'ccd_gen' not found
        NDF not modified
 
 data3: Current frame set to domain CCD_GEN
@@ -3113,7 +3113,6 @@ Change to an empty directory and issue the command ``\text{wcsexercise}''.
 You should delete any files produced by this script.
 
 
-
 \subsection{Data resampling}
 
 Data resampling is performed by the application:
@@ -3161,6 +3160,168 @@ the output image, interpolate using nearest neighbour and conserve flux.
 \xref{TRANSFORMER}{sun95}{TRANSFORMER}, look at
 TRANSFORMER if \routine{TRANNDF} does not supply the capabilities you require.
 
+
+\subsection{Mosaicing and normalisation}
+
+The tasks of mosaicing and normalisation are performed by either of the:
+\begin{itemize}
+\item \xroutine{MAKEMOS}
+\item \xroutine{DRIZZLE}
+\end{itemize}
+programs.  To use \routine{MAKEMOS} the NDFs must first have been
+resampled on to the same grid, using \routine{TRANNDF}; \routine{DRIZZLE}
+combines these two tasks in one.
+
+\routine{MAKEMOS} is a comprehensive program and has many
+capabilities. In its default mode \routine{MAKEMOS} just combines images using a
+selected data combination method (\routine{MAKEMOS} supports the
+methods -- mean, median, trimmed mean etc.\ \S\ref{combinations}).
+In this it is similar to the \xroutine{MAKECAL} routine, but,
+\routine{MAKEMOS} makes much more efficient use of
+memory (it is designed to deal with datasets which may not have much
+overlap and which might have a very large output extent, unlike with CCD
+calibration data where the overlap will usually be complete).
+
+The other capabilities of \routine{MAKEMOS} are concerned with data normalisation.
+Normalisation is determined as two components, a scaling factor and a
+zero point factor. These may be controlled independently by the
+parameters \text{scale} and \text{zero}. So:
+\begin{myquote}
+\begin{verbatim}
+% makemos in='*' out=mosaic scale
+% makemos in='*' out=mosaic zero
+% makemos in='*' out=mosaic scale zero
+\end{verbatim}
+\end{myquote}
+would determine just scale factors, just zero points or both scale
+factors and zero points respectively. The option also exists to modify
+the data values of the input datasets so that their values are
+normalised (this may be combined with producing a mosaic or not using
+the \text{out} parameter). A full description of \routine{MAKEMOS}
+is given in appendix \S\ref{MAKEMOS}, some of the philosophy of
+its algorithms are explained in R.F.~Warren-Smith, {\bf 1993},
+`The Calibration of Large-Field Mosaics', Proceedings of the 5th
+ESO/ST-ECF Data Analysis Workshop.
+
+\routine{DRIZZLE} is a program with many of the capabilities
+of \routine{MAKEMOS}. However, unlike \routine{MAKEMOS} it
+does not need to operate on NDFs which have already been resampled
+to the same grid, and it supports only drizzling
+(described \hyperref{later}{in section \S}{}{drizzling}),
+as a data combination method. 
+
+The \routine{DRIZZLE} program supports the full range of normalisation
+capabilities described above for \routine{MAKEMOS}, however
+it also allows the user to supply scaling and zero-point factors via a
+plain text input file.
+If you wish the \routine{DRIZZLE} program to carry out scaling and/or
+zero-point corrections this is controlled via the \text{scale} and
+\text{zero} parameters (as for \routine{MAKEMOS}) and, additionally,
+the \text{correct} parameter. So:
+\begin{myquote}
+\begin{verbatim}
+% drizzle in='*' out=mosaic scale zero correct='!'
+\end{verbatim}
+\end{myquote}
+would determine (and apply) both scale and zero-point corrections. However,
+\routine{DRIZZLE} also has the capability to read scale and zero-point
+corrections in from a (correctly) formatted file by setting the
+\text{correct} parameter to point to the file. So:
+\begin{myquote}
+\begin{verbatim}
+% drizzle in='*' out=mosaic scale zero correct='drizzle.dat'
+\end{verbatim}
+\end{myquote}
+would read the corrections in from the file {\tt drizzle.dat}. 
+\routine{MAKEMOS} has the ability to generate this file,
+although it should be noted that it does so in the same manner as
+\routine{DRIZZLE} finds the corrections, so there is no advantage in
+doing it in two steps like this; the facility is provided 
+for users who wish to normalise their frames very accurately. 
+
+Full descriptions of \routine{DRIZZLE}
+and \routine{MAKEMOS} are given in appendices \S\ref{DRIZZLE} and
+\S\ref{MAKEMOS} respectively.
+
+
+\subsection{\xlabel{drizzling}The drizzling algorithm\label{drizzling}}
+
+The data combination algorithm used by the \routine{DRIZZLE} program
+is intended for specialised tasks, and if you intend to make
+use of \routine{DRIZZLE} it is
+recommended that you read the paper 
+A.S.~Fruchter and R.N.~Hook, {\bf 1998},
+``A Method for the Linear Reconstruction of Undersampled Images''
+(\htmladdnormallink{PASP, in
+press}{http://xxx.soton.ac.uk/abs/astro-ph/9808087}) which discusses the
+algorithm in depth. Further information can also be found on the web at
+\htmladdnormallink{http://www.stsci.edu/~fruchter/dither/drizzle.html}{http://www.stsci.edu/~fruchter/dither/drizzle.html}
+where the authors of the algorithm discuss its use in reconstructing
+the Hubble Deep Field.
+The rest of this section however summarises the description given
+in these references.
+
+The algorithm, known as Variable-Pixel Linear Reconstruction (or
+informally as ``drizzling''), was originally developed for the Hubble Deep
+Field, a project whose purpose was to image an otherwise unexceptional
+region of the sky to depths beyond those of previous astronomical images.
+Its primary application is to provide a method for the linear
+reconstruction of an image from a set of undersampled dithered data;
+it preserves photometry and resolution, and can weight input images
+according to the statistical weight of each pixel.
+
+The algorithm is conceptually straightforward. The input pixels,
+which are shrunk by a user defined amount (see the \xroutine{DRIZZLE}
+description for details), are mapped onto a finer grid of output pixels,
+taking account of shifts and rotations. The input pixels, now referred
+to as ``drops'', rain down onto the subsampled output grid 
+\latex{(see figure \ref{drizzlepicture})}.
+
+\myfig{sun139driz.eps}{height=0.5\textheight}{driz.gif}{drizzlepicture}
+{A schematic representation of Drizzling. The input pixel grid
+(shown left) is mapped onto a finer output grid (shown right)
+as determined by the WCS component of the NDF.
+The user is additionally allowed to ``shrink''
+the input pixels to smaller pixels, refered to as drops (faint inner
+squares). Each input image only affects the output pixels under the drops,
+so that
+in the above example the central output pixel recieves no information
+from that image (Fruchter \& Hook, ADASS VI,
+ASP Conf.\ Series, Vol.\ 125, 1997, G.~Hunt and H.E.~Payne, eds., pp.\
+147--150).}
+
+The drop size is determined by the \text{pixfrac} parameter, which
+is the ratio of the linear size of the drop to the input pixel, while
+the subsampling of the ouptut grid is determined by the \text{multi}
+parameter. It is important to note that the default values for these
+parameters are 0.9 and 1.5 respectively.
+
+The algorithm has a number of advantages over the resampling and
+combination methods provided by \routine{TRANNDF} and \routine{MAKEMOS}.
+Since the area of the
+pixels scales with the Jacobian of the geometric transformation, the
+algorithm preserves surface and absolute photometry. Flux can therefore
+be measured using an aperture whose size is independent of position on
+the output frame. As the algorithm anticipates that output pixels may not
+receive data from a given input pixel, bad pixels do not cause significant
+problems, so long as the stack of input images is sufficient to fill
+in the gaps caused by these zero-weight input pixels. Shifts of a few
+pixels between input images therefore allow the user to remove small scale
+defects such as hot pixels, bad columns and cosmic ray hits. Additionally,
+non-integral drizzling allows the user to recover some information lost
+to undersampling of the point spread function by the CCD pixels.
+
+However due to the nature of the algorithm, it is computationally
+intensive, and it is important to consider whether any advantage will
+be gained from its use. It has been primarily designed to combined
+undersampled image data in an attempt to reconstruct dithered
+CCD images.  Unlike the resampling methods used by the \routine{TRANNDF}
+routine, drizzling requires the forward rather than the inverse
+mapping for the geometric transformation.
+
+
+
+
 \subsection{Controlling extension information}
 
 The contents of an NDF's CCDPACK extension may be examined at any time
@@ -3200,47 +3361,9 @@ using if this process is really necessary. Also if you want to examine
 the headers in the manner described above then you will need to
 convert your data file into an NDF first.
 
-\subsection{Mosaicing and normalisation}
-
-The tasks of mosaicing and normalisation are performed by the:
-\begin{itemize}
-\item \xroutine{MAKEMOS}
-\end{itemize}
-program. \routine{MAKEMOS} is a comprehensive program and has many
-capabilities. In its default mode \routine{MAKEMOS} just combines images using a
-selected data combination method (\routine{MAKEMOS} supports the
-methods -- mean, median, trimmed mean etc.\ \S\ref{combinations}).
-In this it is similar to the \xroutine{MAKECAL} routine, but,
-\routine{MAKEMOS} makes much more efficient use of
-memory (it is designed to deal with datasets which may not have much
-overlap and which might have a very large output extent, unlike with CCD
-calibration data where the overlap will usually be complete).
-
-The other capabilities of \routine{MAKEMOS} are concerned with data normalisation.
-Normalisation is determined as two components, a scaling factor and a
-zero point factor. These may be controlled independently by the
-parameters \text{scale} and \text{zero}. So:
-\begin{myquote}
-\begin{verbatim}
-% makemos in='*' out=mosaic scale
-% makemos in='*' out=mosaic zero
-% makemos in='*' out=mosaic scale zero
-\end{verbatim}
-\end{myquote}
-would determine just scale factors, just zero points or both scale
-factors and zero points respectively. The option also exists to modify
-the data values of the input datasets so that their values are
-normalised (this may be combined with producing a mosaic or not using
-the \text{out} parameter). A full description of \routine{MAKEMOS}
-is given in appendix \S\ref{MAKEMOS}, some of the philosophy of
-its algorithms are explained in R.F. Warren-Smith, {\bf 1993},
-`The Calibration of Large-Field Mosaics', Proceedings of the 5th
-ESO/ST-ECF Data Analysis Workshop.
-
-
 
 \subsection{Schematic registration sequences}
-The order in which the various application should be used are shown in
+The order in which the various applications should be used are shown in
 schematic form in \hyperref{the following figure}{Figure }{}{registration}.
 
 \myfig{sun139reg.eps}{}{reg.gif}{registration}
@@ -3883,6 +4006,7 @@ CCDPACK supports many different methods of data combination:
 \item BROADENED MEDIAN
 \item SIGMA CLIPPED MEDIAN
 \item UNWEIGHTED MEDIAN
+\item DRIZZLE
 \end{itemize}
 
 The aim is to provide you with a fairly exhaustive list of ways in which
@@ -3928,11 +4052,15 @@ variation of the data is used.
 data values. No weighting is taken into account. This is significantly 
 faster than the weighted median, but takes no account of the known
 errors in the measurements.
+\item[DRIZZLE]  or variable-pixel linear reconstruction, maps weighted
+input data into pixels in a subsmapled output image. In order to avoid
+convoluting the output image with the large input pixel size, the input
+pixels are shrunk before it is averaged into the output image.
 \end{description}
 \end{myquote}
 
-All of these methods support variance propagation, provided that the
-input data errors have an approximately normal distribution.
+All of these methods, except drizzling, support variance propagation, 
+provided that the input data errors have an approximately normal distribution.
 
 In general if the input data comprise less than 5 datasets and spurious
 values are expected to be present, it is very difficult to perform
@@ -3956,6 +4084,7 @@ better than the median, and this is the normal default.
 
 \quickdes{CCDCLEAR}{Clears global parameters.}
          {CCDCLEAR}
+
 
 \quickdes{CCDEDIT}{Edits the CCDPACK extensions of images.}
          {CCDEDIT}
@@ -3981,6 +4110,9 @@ better than the median, and this is the normal default.
                  applies saturation values.}
                  {DEBIAS}
 
+\quickdes{DRIZZLE}{Mosaics and (optionally) normalises NDFs using 
+                   the drizzling algorithm}{DRIZZLE}
+
 \quickdes{FINDCENT}{Centroids NDF image features.}
                    {FINDCENT}
 
@@ -3991,13 +4123,14 @@ better than the median, and this is the normal default.
                    related by simple offsets.}
                    {FINDOFF}
 
+\newpage
+
 \quickdes{FLATCOR}{Performs the flatfield correction on a list of NDFs.}
                   {FLATCOR}
 
+
 \quickdes{IDICURS}{Reads co-ordinates from an X display (allows
                    zooming and panning).}{IDICURS}
-
-\newpage
 
 \quickdes{IMPORT}{Imports FITS information into CCDPACK extensions.}{IMPORT}
 
@@ -4337,13 +4470,13 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          The AST file consists of the following, in order:
          \begin{quote}
-            <global modifiers> \\
+            $<$global modifiers$>$ \\
             (blank line) \\
-            <frameset 1> \\
-            <frameset 1 modifiers> \\
+            $<$frameset 1$>$ \\
+            $<$frameset 1 modifiers$>$ \\
             (blank line) \\
-            <frameset 2> \\
-            <frameset 2 modifiers> \\
+            $<$frameset 2$>$ \\
+            $<$frameset 2 modifiers$>$ \\
             (blank line) \\
               \ldots \\
             (end of file) \\
@@ -4607,13 +4740,13 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          The AST file consists of the following, in order:
          \begin{quote}
-            <global modifiers> \\
+            $<$global modifiers$>$ \\
             (blank line) \\
-            <frameset 1> \\
-            <frameset 1 modifiers> \\
+            $<$frameset 1$>$ \\
+            $<$frameset 1 modifiers$>$ \\
             (blank line) \\
-            <frameset 2> \\
-            <frameset 2 modifiers> \\
+            $<$frameset 2$>$ \\
+            $<$frameset 2 modifiers$>$ \\
             (blank line) \\
               \ldots \\
             (end of file) \\
@@ -6825,7 +6958,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          put tmp\_ in front of the names. Replacement of a specified
          string with another in the output file names can also be used:
          \begin{myquote}
-            OUT $>$ tmp\_$*$$|$debias$|$flattened$|$
+            OUT $>$ tmp\_$*|$debias$|$flattened$|$
          \end{myquote}
          this replaces the string debias with flattened in any of the
          output names tmp\_$*$.
@@ -7159,6 +7292,391 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            NDF are set to ADUs or electrons depending on whether data
            expansion has occurred or not. Processing is supported for all
            HDS (non-complex) numeric types.
+      }
+   }
+}
+\sstroutine{DRIZZLE}{
+   Mosaics and (optionally) normalises NDFs using the drizzling algorithm
+}{
+   \sstdescription{
+      This routine transforms a set of NDFs from their PIXEL-domain
+      frame coordinates to the coordinates of the Current frame in their
+      WCS component.  The resulting images are combined together onto
+      a single output grid, which can therefore form a mosaic of
+      the input images.  Normalisation of the images can optionally
+      be carried out so that in overlapping regions the scaling and
+      zero point values of the images are consistent with each other.
+
+      The algorithm used for combining the images on the output grid
+      is Variable-Pixel Linear Reconstruction, or so-called {\tt '}drizzling{\tt '}.
+      The user is allowed to shrink the input pixels to a smaller size
+      (drops) so that each pixel of the input image only affects pixels
+      in the output image under the corresponding drop.
+   }
+   \sstusage{
+      drizzle in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         CORRECT = LITERAL (Read)
+      }{
+         Name of the sequential file containing the SCALE and ZERO point
+         corrections for the list of input NDFs given by the IN parameter
+         [DRIZZLE.DAT]
+      }
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         A list of the names of the input NDFs which are to be combined
+         into a mosaic. The NDF names should be separated by commas
+         and may include wildcards. The input NDFs are accessed only
+         for reading.
+      }
+      \sstsubsection{
+         LISTIN = \_LOGICAL (Read)
+      }{
+         If a TRUE value is given for this parameter (the default),
+         then the names of all the NDFs supplied as input will be
+         listed (and will be recorded in the logfile if this is
+         enabled).  Otherwise, this listing will be omitted.
+         [TRUE]
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Read)
+      }{
+         Name of the CCDPACK logfile.  If a null (!) value is given for
+         this parameter, then no logfile will be written, regardless of
+         the value of the LOGTO parameter.
+
+         If the logging system has been initialised using CCDSETUP,
+         then the value specified there will be used. Otherwise, the
+         default is {\tt "}CCDPACK.LOG{\tt "}.
+         [CCDPACK.LOG]
+      }
+      \sstsubsection{
+         LOGTO = LITERAL (Read)
+      }{
+         Every CCDPACK application has the ability to log its output
+         for future reference as well as for display on the terminal.
+         This parameter controls this process, and may be set to any
+         unique abbreviation of the following:
+         \sstitemlist{
+
+            \sstitem
+               TERMINAL  -- Send output to the terminal only
+
+            \sstitem
+               LOGFILE   -- Send output to the logfile only (see the
+                               LOGFILE parameter)
+
+            \sstitem
+               BOTH      -- Send output to both the terminal and the
+                               logfile
+
+            \sstitem
+               NEITHER   -- Produce no output at all
+
+         }
+         If the logging system has been initialised using CCDSETUP,
+         then the value specified there will be used. Otherwise, the
+         default is {\tt "}BOTH{\tt "}.
+         [BOTH]
+      }
+      \sstsubsection{
+         MAPVAR = \_LOGICAL (Read)
+      }{
+         The value of this parameter specifies whether statistical
+         error (variance) information contained in the input NDFs
+         should be used to weight the input image pixels as they
+         are drizzled on to the output NDF (see the discussion of the
+         drizzling algorithm). If MAPVAR is set to .TRUE. then the
+         ratio of the inverse variance of the input pixel and the
+         the mean inverse variance of the reference frame (or first
+         input NDF if no reference frame is provided) will be used to
+         weight each pixel as it drizzled onto the output image.
+
+         If weighting of the input pixels by the mean inverse variance
+         of the entire input image (rather than the pixels own variance)
+         is required MAPVAR should be set to .FALSE. and USEVAR should
+         be set to .TRUE. (this is the default condition).
+
+         It should be noted that due to the nature of the algorithm
+         variances are not propagated to the final output image.
+         [FALSE]
+      }
+      \sstsubsection{
+         MULTI = \_DOUBLE (Read)
+      }{
+         The linear scaling between the size of the input and output
+         pixels, i.e. for a MULTI of 2.0 then each side of the input
+         pixel is twice that of the sub-sampling output pixel. For large
+         values of MULTI, PIXFRAC must also be larger (e.g. for a MULTI
+         of 4.0 a PIXFRAC of 0.7 is unacceptably small for simgle image
+         drizzling, however for a MULTI of 3.0 a PIXFRAC of 0.7 produces
+         acceptable ouput images).
+         [1.5]
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Name of the NDF to contain the output mosaic.
+      }
+      \sstsubsection{
+         PIXFRAC = \_DOUBLE (Read)
+      }{
+         The linear {\tt "}drop{\tt "} size, this being the ratio of the linear
+         size of the drizzled drop to that of the input pixel. Interlacing
+         is equivalent to setting PIXFRAC=0.0, while shift-and-add is
+         equivalent to setting PIXFRAC=1.0. For low values of PIXFRAC the
+         MULTI parameter must also be set correspondingly low.
+         [0.9]
+      }
+      \sstsubsection{
+         REF = NDF (Read)
+      }{
+         If the input NDFs being drizzled onto the output NDF are being
+         weighted by the inverse of their mean variance (see the USEVAR
+         parameter) then by default the first NDF frame in the input
+         list (IN) will be used as a reference frame. However, if an NDF
+         is given via the REF parameter (so as to over-ride its default
+         null value), then the weighting will instead be relative to
+         the {\tt "}reference NDF{\tt "} supplied via this parameter.
+
+         If scale-factor, zero-point corrections (see the SCALE and ZERO
+         parameters respectively) have not been specified via a sequential
+         file listing (see the CORRECT parameter) then if an NDF is given
+         via the REF parameter the program will attempt to normalise the
+         input NDFs to the {\tt "}reference NDF{\tt "} supplied.
+
+         This provides a means of retaining the calibration of a set of
+         data, even when corrections are being applied, by nominating a
+         reference NDF which is to remain unchanged. It also allows the
+         output mosaic to be normalised to any externally-calibrated
+         NDF with which it overlaps, and hence allows a calibration to
+         be transferred from one set of data to another.
+
+         If the NDF supplied via the REF parameter is one of those
+         supplied as input via the IN parameter, then this serves to
+         identify which of the input NDFs should be used as a
+         reference, to which the others will be adjusted. In this case,
+         the scale-factor, zero-point corrections and/or weightings
+         applied to the nominated input NDF will be set to one, zero and
+         one respectively, and the corrections for the others will be adjusted
+         accordingly.
+
+         Alternatively, if the reference NDF does not appear as one of
+         the input NDFs, then it will be included as an additional set
+         of data in the inter-comparisons made between overlapping NDFs
+         and will be used to normalise the corrections obtained (so
+         that the output mosaic is normalised to it). However, it will
+         not itself contribute to the output mosaic in this case.
+         [!]
+      }
+      \sstsubsection{
+         SCALE = \_LOGICAL (Read)
+      }{
+         This parameter specifies whether DRIZZLE should attempt to
+         adjust the input data values by applying scale-factor (i.e.
+         multiplicative) corrections before combining them into a
+         mosaic. This would be appropriate, for instance, if a series
+         of images had been obtained with differing exposure times; to
+         combine them without correction would yield a mosaic with
+         discontinuities at the image edges where the data values
+         differ.
+
+         If SCALE is set to TRUE, then DRIZZLE will ask the user for a
+         sequential file containing the corrections for each image (see
+         the CORRECT parameter). If none is supplied the program will
+         attempt to find its own corrections.
+
+         DRIZZLE will inter-compare the NDFs supplied as input and will
+         estimate the relative scale-factor between selected pairs of
+         input data arrays where they overlap.  From this information,
+         a global set of multiplicative corrections will be derived which
+         make the input data as mutually consistent as possible. These
+         corrections will be applied to the input data before drizzling
+         them onto the output frame.
+
+         Calculation of scale-factor corrections may also be combined
+         with the use of zero-point corrections (see the ZERO
+         parameter). By default, no scale-factor corrections are
+         applied.
+         [FALSE]
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output mosaic NDF.
+         [Output from DRIZZLE]
+      }
+      \sstsubsection{
+         USEVAR = \_LOGICAL (Read)
+      }{
+         The value of this parameter specifies whether statistical
+         error (variance) information contained in the input NDFs
+         should be used to weight the input image pixels as they
+         are drizzled on to the output NDF (see the discussion of the
+         drizzling algorithm). If USEVAR is set to .TRUE. then the
+         ratio of the mean inverse variance of the input image and
+         the mean inverse variance of the reference frame (or first
+         input NDF if no reference frame is provided) will be used as
+         a weighting for the image.
+
+         If weighting of the input image by the inverse variance map
+         (rather than the mean) then the MAPVAR parameter whould be used.
+
+         It should be noted that due to the nature of the algorithm
+         variances are not propagated to the final output image.
+         [TRUE]
+      }
+      \sstsubsection{
+         ZERO = \_LOGICAL (Read)
+      }{
+         This parameter specifies whether DRIZZLE should attempt to
+         adjust the input data values by applying zero-point (i.e.
+         additive) corrections before combining them into a mosaic.
+         This would be appropriate, for instance, if a series of images
+         had been obtained with differing background (sky) values; to
+         combine them without correction would yield a mosaic with
+         discontinuities at the image edges where the data values
+         differ.
+
+         If ZERO is set to TRUE, then DRIZZLE will ask the user for a
+         sequential file containing the corrections for each image (see
+         the CORRECT parameter). If none is supplied the program will
+         attempt to calculate its own corrections.
+
+         DRIZZLE will inter-compare the NDFs supplied as input and will
+         estimate the relative zero-point difference between selected
+         pairs of input data arrays where they overlap.  From this
+         information, a global set of additive corrections will be
+         derived which make the input data as mutually consistent as
+         possible. These corrections will be applied to the input data
+         before drizzling them onto the output frame.
+
+         Calculation of zero-point corrections may also be combined
+         with the use of scale-factor corrections (see the SCALE
+         parameter). By default, no zero-point corrections are applied.
+         [FALSE]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         drizzle $*$ out pixfrac=0.7
+      }{
+         Drizzles a set of NDFs matching the wild-card {\tt "}$*${\tt "} into a mosaic
+         called {\tt "}out{\tt "}. The drop size of the input pixel is set to 0.7, i.e.
+         it is scaled to 70\% of its orginal size before being drizzled onto
+         the output grid.
+      }
+      \sstexamplesubsection{
+         drizzle in=img$*$ out=combined scale=true zero=true ref=! multi=4.0
+      }{
+         Drizzles a set of NDFs matching the wild-card {\tt "}img$*${\tt "} into a
+         mosaic called {\tt "}combined{\tt "}. Both scaling and zero-point corrections
+         are enabled (the program will request a correction file), however
+         no reference image has been supplied (the program will use the
+         first NDF supplied in the input list). The multiplicative scaling
+         factor between input and output images is set to 4, i.e. the
+         input pixel is 4 times larger than the output pixel and contains
+         16 output pixels.
+      }
+   }
+   \sstnotes{
+      The file containing scale and zero-point corrections (see the
+      CORRECT parameter) must contain one line per frame having the
+      following information
+      \begin{myquote}
+               INDEX SCALE ZERO
+      \end{myquote}
+      Where the fields have the following meaning:
+      \sstitemlist{
+      \sstitem
+            INDEX  = the index number of the frame, this must be the
+                     same as its order number in the input list (see
+                     the IN parameter)
+      \sstitem
+            SCALE  = the multiplicative scaling factor for the NDF
+      \sstitem
+            ZERO   = the zero-point correction for the NDF
+      }
+      Comment lines may be added, by must be prefixed with a {\tt "}\#{\tt "}
+      character.
+   }
+   \sstdiytopic{
+      Pitfalls
+   }{
+      The format of the file containing scale and zero-point corrections
+      must be correct or the A-task will abort operations.
+   }
+   \sstdiytopic{
+      Algorithms Used
+   }{
+      Taken from Fruchter et al., {\tt "}A package for the reduction of dithered
+      undersampled images{\tt "}, in Casertano et al. (eds), HST Calibration
+      Workshop, STSCI, 1997, pp. 518--528:
+      \begin{quotation}
+       The drizzle algorithm is conceptually straightforward. Pixels in
+       the original input images are mapped into pixels in the subsampled
+       output image, taking into account shifts and rotations between the
+       images and the optical distortion of the camera. However, in order
+       to avoid convolving the image with the larger pixel `footprint{\tt '} of
+       the camera, we allow the user to shrink the pixel before it is
+       averaged into the output image.
+
+       The new shrunken pixels, or `drops{\tt '}, rain down upon the subsampled
+       output. In the case of the Hubble Deep Field (HDF), the drops used
+       had linear dimensions one-half that of the input pixel -- slightly
+       larger than the dimensions of the output subsampled pixels. The value
+       of an input pixel is averaged into the output pixel with a weight
+       proportional to the area of overlap between the `drop{\tt '} and the output
+       pixel. Note that, if the drop size if sufficently small, not all
+       output pixels have data added to them from each input image. One
+       must therefore choose a drop size that is small enough to avoid
+       degrading the image, but large enough so that after all images
+       are `dripped{\tt '} the coverage is fairly uniform.
+
+       The drop pize if controlled by a user-adjustable parameter called
+       PIXFRAC, which is simply the ratio of the linear size of the drop to
+       the input pixel (before any adjustment due to geometric distortion
+       of the camera). Thus interlacing is equivalent to setting PIXFRAC=0.0,
+       while shift-and-add is equivalent to PIXFRAC=1.0.
+
+       When a drop with value $i_{xy}$ and a user-defined weight $w_{xy}$
+       is added to an image with pixel value $I_{xy}$, weight $W_{xy}$, and
+       fractional pixel overlap $0 < a_{xy} < 1$, the resulting value
+       the image $I^{\prime}_{xy}$ and weight $W^{\prime}_{xy}$ is
+       \begin{eqnarray*}
+              W^{\prime}_{xy} & = & a_{xy}w_{xy} + W_{xy}  \\
+              I^{\prime}_{xy} & = & \frac{a_{xy}i_{xy}w_{xy} + I_{xy}W_{xy}}{
+                                    W^{\prime}_{xy} }
+       \end{eqnarray*}
+       This algorithm has a number of advantages over standard linear
+       reconstruction methods presently used. Since the area of the pixels
+       scales with the Jacobian of the geometric distortion, drizzle
+       preserves both surface and absolute photometry. Therefore flux can
+       be measured using an aperture whose size is independent of position
+       on the chip. As the method anticipates that a given output pixel may
+       receive no information from a given input pixel, missing data (due
+       for instance to cosmic rays or detector defects) do not cause a
+       substantial problem, so long as there are enough dithered images to
+       fill in the gaps caused by these zero-weight input pixels. Finally
+       the linear weighting scheme is statistically optimum when inverse
+       variance maps are used as weights.
+      \end{quotation}
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         All non-complex numeric data types are supported, however the
+            output mosaic will be of data type \_REAL
+
+         \sstitem
+         Bad pixels are supported.
+
+         \sstitem
+         The algorithm is restricted to handling 2D NDFs only
       }
    }
 }
@@ -10235,6 +10753,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [TRUE]
       }
       \sstsubsection{
+         CORRECT = LITERAL (Write)
+      } {
+         The name of the file used to output the scale and zero-point
+         corrections (see SCALE, ZERO and WRITESZ parameters). This
+         file can be read by the DRIZZLE A-task.
+         [drizzle.dat]
+      }
+      \sstsubsection{
          GENVAR = \_LOGICAL (Read)
       } {
          If GENVAR is set to TRUE and all the input NDFs supplied
@@ -10689,6 +11215,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          variance information. Otherwise, the input variance values are
          used to weight the input data when they are combined.
          [!]
+      }
+      \sstsubsection{
+         WRITESZ = \_LOGICAL (Read)
+      } {
+         If set to TRUE then MAKEMOS will output a file containing the
+         scale and zero-point corrections (see SCALE and ZERO parameters)
+         which can be read into the DRIZZLE A-task. IF SCALE and ZERO are
+         both set to FALSE, no file will be generated
+         [FALSE]
       }
       \sstsubsection{
          ZERO = \_LOGICAL (Read)
@@ -13723,8 +14258,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }{
          If CONSERVE is TRUE, the output values are normalised by the
          ratio of the output-to-input pixel areas.  In other words this
-         conserves flux.  If CONSERVE is FALSE, there is no
-         normalisation.  [TRUE]
+         conserves flux. If CONSERVE is FALSE, there is no normalisation.
+         If the NDFs WCS component (see USEWCS parameter) is used to define the
+         transformation then the program will be unable to determine whether 
+         the transformation is of a linear nature. If CONSERVE is set to TRUE,
+         the program will warn the user that although it is atempting to
+         conserve flux it may do so corretly if the transform is non-linear.
+         [TRUE]
       }
       \sstsubsection{
          IN = image (Read)
@@ -13892,13 +14432,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    }
    \sstexamples{
       \sstexamplesubsection{
-         tranndf \qs{$*$} \qs{$*$-trn} reset
+         tranndf \qs{$*$} \qs{$*$-resamp} reset
       }{
-         This transforms all the images in the current directory if
-         they contain suitable transformation structures in their
-         extensions. It uses nearest-neighbour resampling and conserves
-         the flux levels. The output images are of a size such that all
-         the input pixels have contributed.
+         This transforms all the NDFs in the current directory from
+         the coordinates represented by the PIXEL-domain frame 
+         to the coordinates represented by the Current frame in their 
+         WCS components.  It uses nearest-neighbour resampling and 
+         conserves the flux levels. The output NDFs are of a size such  
+         that all the input pixels have contributed.
       }
       \sstexamplesubsection{
          tranndf curved straight linint shape=same
@@ -13911,18 +14452,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             shape=bounds lbound=\qs{[1,-20]} ubound=\qs{[256,172]}
       }{
          This transforms the images called a119$*$, using the transformation
-         merc in the HDS file called proj, into images called a119$*$s.
-         It uses nearest-neighbour resampling.  All the output images
-         have size 256 x 192 pixels and origin (1,-20).
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         This application is a restricted form of the KAPPA routine
-           \xref{TRANSFORMER}{sun95}{TRANSFORMER}. If additional
-           functionality is required then look at TRANSFORMER.
+         structure merc in the HDS file called proj, into images called 
+         a119$*$s.  It uses nearest-neighbour resampling.  All the output 
+         images have size 256 x 192 pixels and origin (1,-20).
       }
    }
    \sstdiytopic{
@@ -13964,7 +14496,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
          \sstitem
          Flux conservation can only be applied to constant-determinant
-           or linear transformations.
+           or linear transformations.  Since we currently can't tell 
+           whether AST Mappings are linear, flux conservation should be
+           turned off when using the NDFs WCS component to perform the
+           mapping. If left on the program will warn the user that it
+           may not be performing flux conservation correctly (N.B. if
+           the WCS transform is linear however, flux conservation will
+           be calculated correctly).
+
 
          \sstitem
          The NDF components are processed by this application as
@@ -13978,6 +14517,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             QUALITY is not derived from the input NDF for a linearly
                interpolated NDF. The DATA and VARIANCE arrays are
                resampled.
+
+         \sstitem
+            If USEWCS is TRUE, then the NDF WCS component is updated
+               and propagated.
 
          \sstitem
          Bad pixels, including automatic quality masking, are supported.
@@ -14019,7 +14562,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          COEFFS( $*$ ) = \_DOUBLE
       } {
          If MODE is ADD, this parameter is a list of the coefficients
-         used for the mapping from the basis frame to the new frame.
+         used for the mapping from the target frame to the new frame.
          Its meaning and the number of values required depend on the
          value of MAPTYPE:
          \sstitemlist{
@@ -14068,7 +14611,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \sstsubsection{
          FRAME = LITERAL (Read)
       } {
-         This parameter specifies the \qt{basis frame}, which has the
+         This parameter specifies the \qt{target frame}, which has the
          following meaning according to the value of the MODE parameter:
          \sstitemlist{
             \sstitem
@@ -14079,7 +14622,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                                  that domain will be removed.
             \sstitem
                 MODE = ADD    -- The new frame will be a copy of the
-                                 basis frame (though Domain and Title
+                                 target frame (though Domain and Title
                                  will be changed), and will be mapped 
                                  from it using the mapping given.
             \sstitem
@@ -14163,7 +14706,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          MAPTYPE = LITERAL (Read)
       } {
          This parameter is required when MODE is ADD, and specifies the
-         type of mapping which connects the basis frame to the new frame.
+         type of mapping which connects the target frame to the new frame.
          It may take one of the following values:
          \sstitemlist{
             \sstitem
@@ -14320,9 +14863,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
           (the indirection character is \qt{$^\wedge$}).
 
           If the application is successful, a new frame with a domain
-          determined by the OUTDOMAIN parameter will be added containing
-          the alignment information.  This frame will be made the new
-          Current domain.
+          determined by the OUTDOMAIN parameter will be added to each of
+          the IN files containing the alignment information.  This frame 
+          will be made the new Current frame.
        }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -14911,7 +15454,7 @@ A minor update to CCDPACK.
       application not accepting a saturation value. This is now fixed.
 \end{itemize}
 
-\subsection{This release 2.3-1}
+\subsection{Release 2.3-1}
 A minor update to CCDPACK.
 \begin{itemize}
 \item The applications \xroutine{MAKEMOS} and \xroutine{MAKEFLAT} have
@@ -14922,12 +15465,138 @@ A minor update to CCDPACK.
   found.
 \end{itemize}
 
+\subsection{Release 2.4-0}
+This is a minor update to CCDPACK. It corrects several bugs and
+introduces a small amount of new functionality.
+\begin{itemize}
+\item The applications \xroutine{MAKEMOS} and \xroutine{MAKEFLAT} have
+  been modified to generate output variances based on the scatter of
+  the input images.
+\item A parameter OVERRIDE has been added to \xroutine{FINDOFF}. This
+  now stops the program if a partial solution to the registration is
+  found.
+\item The applications \xroutine{FINDCENT}, \xroutine{CCDALIGN}
+      and \xroutine{PAIRNDF} have been improved to work more
+      effectively with large images. Previously the centroiding
+      technique they used failed because typical X window displays
+      are not capable of showing images at sufficient
+      resolution to obtain a good starting position.
+\item A bug in the image display part of \xroutine{XREDUCE} has been
+        fixed. This was caused by an incompatibility introduced in a
+        release of KAPPA.
+\item The parameter files for the IRAF version of CCDPACK should now
+      be synchronised (several where missing some new parameters). The
+      \qt{use\_globals} command now works as described.
+\end{itemize}
+
+
+\subsection{This release 3.0}
+
+This is a major update to CCDPACK.
+
+\begin{itemize}
+\item
+    CCDPACK has been revised to be aware of, and use, the World Coordinate
+    System (WCS) components of NDFs - see 
+    \xref{SUN/95}{sun95}{se_wcsuse} and \xref{SUN/210}{sun210}{}.
+    This has had the following effects on  the package:
+    \begin{itemize}
+    \item 
+    Some new applications have been introduced:
+       \begin{itemize}
+       \item \xroutine{ASTEXP} --
+             Exports AST frameset information from NDFs to file
+       \item \xroutine{ASTIMP} --
+             Imports AST frameset information from file to NDFs
+       \item \xroutine{WCSEDIT} --
+             Adds, removes, makes current frames in WCS component
+       \item \xroutine{WCSREG} --
+             Aligns NDFs using multiple WCS component frames
+       \end{itemize}
+    \item
+    A new test script is available:
+       \begin{itemize}
+       \item WCSEXERCISE --
+             test WCS-related functionality (not IRAF)
+       \end{itemize}
+
+    \item
+    The default way of handling coordinate mappings is now using 
+    frames in the WCS components of NDFs, rather than using 
+    TRANSFORM structures stored in the .MORE.CCDPACK extension.
+    All applications retain the option of using the previous
+    functionality for backwards compatibility however.
+    The following tasks are affected:
+       \begin{itemize}
+       \item \xroutine{FINDOFF} --   new parameters 
+          \text{maxdisp}, \text{restrict}, \text{usewcs}
+       \item \xroutine{REGISTER} --  new parameters 
+          \text{outdomain}, \text{outformat}
+       \item \xroutine{TRANLIST} --  new parameters 
+          \text{framein}, \text{epochin}, \text{frameout}, 
+          \text{epochout}, \text{wcsfile}
+       \item \xroutine{TRANNDF} --   new parameter  
+          \text{usewcs}
+       \item \xroutine{MAKEMOS} --   new parameters 
+          \text{correct}, \text{writesz}
+       \end{itemize}
+    \item
+    All applications now propagate WCS components where appropriate.
+    This affects, in addition to those mentioned above, 
+    the following applications:
+       \begin{itemize}
+       \item \xroutine{CALCOR}
+       \item \xroutine{DEBIAS}
+       \item \xroutine{FLATCOR}
+       \item \xroutine{MAKEBIAS}
+       \item \xroutine{MAKECAL}
+       \item \xroutine{MAKEFLAT}
+       \end{itemize}
+    \item
+    The package now requires AST 1.3 to build.
+    \end{itemize}
+\item
+    A new application, \xroutine{DRIZZLE}, has been introduced.  
+    This resamples and
+    combines images in one step, optionally normalising them at the same
+    time.  It uses the variable-pixel linear reconstruction, or 
+    ``drizzling'' algorithm, which is well suited for combination of
+    multiple dithered undersampled images.
+\item
+    \xroutine{FINDOFF} 
+    will now deal with position lists having as few as one object
+    in common.  This capability will principally be of use in conjunction
+    with the new WCS awareness of the package.
+\item
+    The package will no longer attempt to make use of NAG routines where
+    present.  The following routine is withdrawn:
+    \begin{itemize}
+    \item \routine{NAGMAKEMOS} -- \xroutine{MAKEMOS} should be used instead.
+    \end{itemize}
+\item  
+    There are other some minor changes in behaviour:
+    \begin{itemize}
+    \item
+       Some routines fail differently when objects cannot be matched:
+       \begin{itemize}
+       \item
+          FINDOFF erases the associated position list of NDFs which
+             cannot be matched instead of leaving the previously 
+             associated list.
+       \item
+          REGISTER ignores NDFs without associated position lists 
+             instead of exiting.
+       \end{itemize}
+    \item
+    REGISTER: output to screen has changed slightly for readability.
+    \end{itemize}
+\end{itemize}
+
+
+
 \begin{latexonly}
 
-\newpage
-This page left blank deliberately.
-\newpage
-
+\cleardoublepage
 
 \latexonlysection{Backpage alphabetic listing}
 
@@ -15020,6 +15689,9 @@ This page left blank deliberately.
                  produces variances --
                  applies saturation values.}
                  {DEBIAS}
+
+\quickdes{DRIZZLE}{Mosaics and (optionally) normalises NDFs using 
+                   the drizzling algorithm}{DRIZZLE}
 
 \quickdes{FINDCENT}{Centroids image features.}
                    {FINDCENT}
