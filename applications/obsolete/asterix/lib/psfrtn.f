@@ -3085,7 +3085,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *  Load the response into memory
       CALL CMP_SIZE( SLOC, 'DATA_ARRAY', NELM, STATUS )
       CALL DYN_MAPR( 1, NELM, RF_DPTR(SLOT), STATUS )
-      CALL CMP_GETVI( SLOC, 'DATA_ARRAY', NELM, %VAL(RF_DPTR(SLOT)),
+      CALL CMP_GETVR( SLOC, 'DATA_ARRAY', NELM, %VAL(RF_DPTR(SLOT)),
      :                NELM, STATUS )
 
 *  Is it compressed?
