@@ -93,6 +93,7 @@
 *      4 Dec 1995 (DJA):
 *        Compare each element with 1st element - less susceptible to
 *        rounding errors
+*      2 Jun 1999 Tolerance increased to 1.5 (rjv)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,7 +120,7 @@
 
 *  Local Constants:
       REAL			TOL
-        PARAMETER 		( TOL = 1.0 )
+        PARAMETER 		( TOL = 1.5 )
 
 *  Local Variables:
       REAL 			DX
