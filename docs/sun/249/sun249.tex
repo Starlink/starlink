@@ -1,6 +1,10 @@
 \documentclass[11pt]{article}
 
 \usepackage{graphicx}
+\usepackage{html}
+
+
+%  Set lengths for nicer output.
 
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
@@ -11,6 +15,11 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
+%  New private macros.
+
+\newenvironment{squote}{\begin{quote}\small}{\end{quote}}
+\newcommand{\xref}[3]{\htmladdnormallink{#1}{http://www.starlink.rl.ac.uk/cgi-bin/htxserver/#2.htx/?xref_#3}}
+
 
 \begin{document}
 
@@ -18,7 +27,7 @@
 \section{Registration of INT Wide Field Camera CCD images}
 
 The Wide Field Camera instrument on the Isaac Newton Telescope 
-contains four CCD chips, each 2048 x 4096 pixels, 
+contains four CCD chips, each 2048 $\times$ 4096 pixels, 
 in roughly the following orientation:
 \begin{quote}
 \begin{center}
@@ -34,24 +43,24 @@ the optics of the telescope.
 The nonlinear distortion is very well modelled by a radial ``pincushion''
 transformation, which has the form
 \begin{displaymath}
-  r^\prime = r ( 1 + D r^2 )
+  r' = r ( 1 + D r^2 )
 \end{displaymath}
 
 The following transformations take account of both these effects
 to map the pixel coordinates $(x_i, y_i)$
 of CCD\#$i$ into a new pixel-like coordinate system 
-$(x^\prime, y^\prime)$
+$(x', y')$
 of uniform scale, which is the same for all four CCDs.
 The origin of this coordinate system is at pixel coordinates
 $(1778, 3029)$ of CCD\#4, which is taken to be on the optical axis.
 At this point, one unit of the new coordinate system is equivalent
 to one pixel of the CCD\#4 system, so that the new coordinates 
-are almost equivalent to CCD\#4 coordinates (though they diverge
-away from the origin thanks to the nonlinear distortion).
+are almost equivalent to CCD\#4 coordinates, although they diverge
+away from the origin thanks to the nonlinear distortion.
 Each unit of the new coordinates has the same size, 
 which is approximately 0.3334 arcsec.
 
-The corrected coordinates $(x^\prime, y^\prime)$ are obtained from 
+The corrected coordinates $(x', y')$ are obtained from 
 each set of pixel coordinates $(x_i, y_i)$
 by first translating so that the origin is on the optical
 axis, then rotating to the correct angle, 
@@ -65,11 +74,11 @@ then correcting for the radial distortion effect:
   y_i^{\rm rot}   & = & x_i^{\rm shift} \sin \theta_i 
                       + y_i^{\rm shift} \cos \theta_i  \\[1ex]
 %
-  x^\prime        & = & x_i^{\rm rot} 
+  x'              & = & x_i^{\rm rot} 
                         \left( 1 + D \left[ \left. x_i^{\rm rot} \right.^2 
                                           + \left. y_i^{\rm rot} \right.^2
                                      \right] \right)  \\
-  y^\prime        & = & y_i^{\rm rot} 
+  y'              & = & y_i^{\rm rot} 
                         \left( 1 + D \left[ \left. x_i^{\rm rot} \right.^2
                                           + \left. y_i^{\rm rot} \right.^2
                                      \right] \right)
@@ -81,9 +90,11 @@ and $D$ is the pincushion distortion coefficient.
 
 Values for these coefficients have been obtained by registering
 two exposures of the same region of sky, in which the instrument
-had been rotated by $180^\circ$ between exposures.
+had been rotated by 180$^\circ$ between exposures.
 The value of $(X_4, Y_4)$ was taken from the value used 
-for the Wide Field Survey data, and $\theta_4$ was chosen to be zero.
+for the 
+\htmladdnormallink{Wide Field Survey}{http://www.ast.cam.ac.uk/~wfcsur/astrometry.html} 
+data, and $\theta_4$ was chosen to be zero.
 The values of the coefficients in these equations are approximately:
 \begin{displaymath}
   \begin{array}{c@{\ =\ }r@{\hspace{3em}}c@{\ =\ }r@{\hspace{3em}}c@{\ =\ }r}
@@ -97,8 +108,10 @@ and
 \begin{displaymath}
      D = -5.30 \times 10^{-10} {\rm pixel}^{-2}
 \end{displaymath}
-This value of $D$ corresponds in units of radians to $-20\,3{\rm rad}^{-2}$, 
-compared to the value $-259.8\,{\rm rad}^{-2}$
+This value of $D$ corresponds in units of radians to 
+\latexhtml{$-203\,{\rm rad}^{-2}$}{-203 rad$^{-2}$}, 
+compared to the value 
+\latexhtml{$-259.8\,{\rm rad}^{-2}$}{-259.8 rad$^{-2}$}
 quoted in the ING observer handbook.
 
 These values of the coefficients are thought to be correct to an
@@ -114,14 +127,162 @@ and the ``$\times$'' marks the origin of the unified coordinate system.
 \end{center}
 \end{quote}
 
+
+\latexhtml{\newpage}{\htmlrule}
+\section{Attaching modified coordinates using CCDPACK}
+
+% \htmladdnormallink{CCDPACK}{http://www.starlink.rl.ac.uk/ccdpack/} package, 
+
+For users of Starlink software,
+this coordinate information can be attached automatically
+to image files using the 
+\htmladdnormallink{ASTIMP}{http://capc23.ast.cam.ac.uk/star/local/docs/sun139.htx/node70.html#xref_ASTIMP} 
+command, and the file 
+\htmladdnormallinkfoot{{\tt WFC-b.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/WFC-b.ast}
+
+There are a couple of provisos for using this facility:
+first, it is best if the files are converted to Starlink NDF format
+using the \xref{CONVERT}{sun55}{}
+package as follows:
+\begin{squote}
+\begin{verbatim}
+% convert
+
+   CONVERT commands are now available -- (Version 1.2-4, 2000 January)
+ 
+   Defaults for automatic NDF conversion are set.
+ 
+   Type conhelp for help on CONVERT commands.
+   Type "showme sun55" to browse the hypertext documentation.
+ 
+% fits2ndf in='r10628?.fits' out='*'
+\end{verbatim}
+\end{squote}
+which will convert file {\tt r106280.fits} into {\tt r106280.sdf} and so on.
+The Starlink software will in fact work with FITS files,
+but because it converts them on the fly between FITS and NDF formats 
+before and after each command,
+this can be rather slow with files the size of WFC frames.
+
+Secondly, you must have CCDPACK version 3.
+This will be in the Starlink Spring 2000 release, which at the time
+of writing this document has not been distributed.
+However, copies can be obtained on request from Mark Taylor 
+at {\tt mbt@ast.cam.ac.uk}.
+
+
+
+Once the file is in Starlink NDF format, then obtain the file 
+\htmladdnormallink{{\tt WFC-b.ast}}{ftp://capc23.ast.cam.ac.uk/pub/star/register/WFC-b.ast}
+and from the Unix C shell do the following:
+\begin{squote}
+\begin{verbatim}
+% ccdpack 
+
+   CCDPACK commands are now available -- (Version 3.0-1)
+   
+  For help use the commands ccdhelp or ccdwww
+
+% astimp in='r10628?' astfile=WFC-b.ast reset accept
+
+    ASTIMP
+    ======
+  Framesets read from file WFC-b.ast:
+    FITS header "ROTSKYPA" used for rotation
+
+     N    Base domain         Current domain      Frameset ID
+     --   -----------         --------------      -----------
+     1    PIXEL               WFC-B               FITSID CHIPNAME 'A5506-4'
+     2    PIXEL               WFC-B               FITSID CHIPNAME 'A5383-17-7'
+     3    PIXEL               WFC-B               FITSID CHIPNAME 'A5530-3'
+     4    PIXEL               WFC-B               FITSID CHIPNAME 'A5382-1-7'
+  4 NDFs accessed using parameter IN
+
+  Processing NDF /data/cass58a/mbt/data/int4/r106280
+    Matched with frameset ID "FITSID CHIPNAME 'A5506-4'"
+    Rotating additional 180 degrees
+    New frame in domain "WFC-B" added
+
+  Processing NDF /data/cass58a/mbt/data/int4/r106281
+    Matched with frameset ID "FITSID CHIPNAME 'A5383-17-7'"
+    Rotating additional 180 degrees
+    New frame in domain "WFC-B" added
+
+  Processing NDF /data/cass58a/mbt/data/int4/r106282
+    Matched with frameset ID "FITSID CHIPNAME 'A5530-3'"
+    Rotating additional 180 degrees
+    New frame in domain "WFC-B" added
+
+  Processing NDF /data/cass58a/mbt/data/int4/r106283
+    Matched with frameset ID "FITSID CHIPNAME 'A5382-1-7'"
+    Rotating additional 180 degrees
+    New frame in domain "WFC-B" added
+\end{verbatim}
+\end{squote}
+This command sets the Current coordinate frame of the specified 
+NDF files to the new coordinate system $(x',y')$ described above.
+As well as applying the linear and nonlinear geometry terms whose
+coefficients were given,
+it also rotates the coordinates according to the value of the
+ROTSKYPA FITS header card, which records the orientation of the
+turntable when the observation was made;
+in this case it was oriented at 180$^\circ$.
+In this way, applying the {\tt WFC-b.ast} file to any set of 
+image NDF files will result in them sharing coordinates which 
+are related by a simple shift in X and Y coordinates, 
+since the nonlinear optical distortions, 
+the exact positioning of the CCDs on the turntable,
+and the orientation of the turntable itself will have been
+accounted for. 
+
+Once the new coordinate system has been attached to the images,
+then most Starlink applications will make use of this as appropriate.
+If you display any of the images using 
+\xref{KAPPA}{sun95}{}'s
+\xref{DISPLAY}{sun95}{DISPLAY}
+application, the axes will show the coordinates in the new frame:
+\begin{squote}
+\begin{verbatim}
+% kappa
+ 
+   KAPPA commands are now available -- (Version 0.13-7)
+ 
+   Type kaphelp for help on KAPPA commands
+   Type "showme sun95" to browse the hypertext documentation
+
+% display r106282 style='"grid=1,gap=500"'
+\end{verbatim}
+\end{squote}
+will give the following display:
+\begin{quote}
+\begin{center}
+\latexhtml{\includegraphics[scale=0.4]{r106282-s8-display.ps}}{\htmladdimg{r106282-display.gif}}
+\end{center}
+\end{quote}
+Close inspection will show that the grid is not parallel to the 
+sides of the image, because of the slight rotation from the vertical
+and nonlinear distortion.
+
+If some of the frames overlap, the corresponding X and Y 
+offsets can then easily be determined 
+using CCDPACK's object matching registration facilities.
+
+
+\section*{Acknowledgements}
+
+This calibration was done with assistance from 
+Peter Draper and David Gilbank in Durham.
+
 \vspace{\fill}
 
 
-\begin{flushright}
-\it
-Mark Taylor \\
-24 March 2000
-\end{flushright}
+\begin{latexonly}
+  \begin{flushright}
+  \it
+  Mark Taylor \\
+  24 March 2000
+  \end{flushright}
+\end{latexonly}
 
 
 \end{document}
