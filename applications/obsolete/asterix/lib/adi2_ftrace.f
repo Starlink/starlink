@@ -74,8 +74,10 @@
 *  History:
 *     20 Mar 1995 (DJA):
 *        Original version.
-*     3 Mar 1997 (RB):
+*      3 Mar 1997 (RB):
 *        Get the full path name properly.
+*      8 May 1997 (RB):
+*        Put in a proper PATH value.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,17 +105,13 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*200		FILE			! HDS trace info
-      CHARACTER*200		PWD
+      CHARACTER*200		FILE			! File name
+      CHARACTER*200		PWD			! Current directory
+      CHARACTER*200		PATH			! Object name
 
       INTEGER			FSTAT			! I/o status code
-      INTEGER			FPID			! Fpath value id
       INTEGER			LUN			! Logical unit number
-      INTEGER			NLEV			! # levels
-      INTEGER			PID			! Copy of Fpath
       INTEGER			I
-
-      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -126,13 +124,13 @@
       INQUIRE( UNIT=LUN, NAME=FILE, IOSTAT=FSTAT )
 
 *  Now do it properly
-      CALL PSX_GETENV('PWD', PWD, STATUS)
+      CALL PSX_GETENV( 'PWD', PWD, STATUS )
 
 *  Do we need to trim the strings for relative paths?
-      DO WHILE (FILE(1:3) .EQ. '../')
+      DO WHILE ( FILE(1:3) .EQ. '../' )
         FILE = FILE(4:)
-        I = CHR_LEN(PWD)
-        DO WHILE (PWD(I:I) .NE. '/')
+        I = CHR_LEN( PWD )
+        DO WHILE ( PWD(I:I) .NE. '/' )
           PWD(I:I) = ' '
           I = I - 1
         END DO
@@ -143,6 +141,19 @@
       IF ( FILE(1:1) .NE. '/') THEN
         FILE = PWD(:CHR_LEN(PWD)) // '/' // FILE(:CHR_LEN(FILE))
       END IF
+
+*  Extract PATH from the end of FILE
+      PATH = FILE
+      I = INDEX( PATH, '/' )
+      DO WHILE ( I .GT. 0 )
+        PATH = PATH(I+1:)
+        I = INDEX( PATH, '/' )
+      END DO
+      I = INDEX( PATH, '.' )
+      IF ( I .GT. 0 ) THEN
+        PATH = PATH(:I-1)
+      END IF
+      CALL CHR_UCASE( PATH )
 
 *  Report error if that failed
       IF ( FSTAT .NE. 0 ) THEN
@@ -155,24 +166,11 @@
      :                /' object', STATUS )
       ELSE
 
-*    Create structure and store filename
+*    Create structure and store filenames
         CALL ADI_NEW0( 'STRUC', OARG, STATUS )
         CALL ADI_CPUT0C( OARG, 'File', FILE(:CHR_LEN(FILE)), STATUS )
-
-*    The path stored in the Fpath member
-        CALL ADI_THERE( ARGS(1), 'Fpath', THERE, STATUS )
-        IF ( THERE ) THEN
-          CALL ADI_FIND( ARGS(1), 'Fpath', FPID, STATUS )
-          CALL ADI_COPY( FPID, PID, STATUS )
-          CALL ADI_CPUTID( OARG, 'Path', PID, STATUS )
-          CALL ADI_ERASE( FPID, STATUS )
-          NLEV = 1
-        ELSE
-          CALL ADI_CPUT0C( OARG, 'Path', ' ', STATUS )
-          NLEV = 1
-        END IF
-        CALL ADI_CPUT0I( OARG, 'Nlev', NLEV, STATUS )
-
+        CALL ADI_CPUT0C( OARG, 'Path', PATH(:CHR_LEN(PATH)), STATUS )
+        CALL ADI_CPUT0I( OARG, 'Nlev', 1, STATUS )
       END IF
 
 *  Report any errors
