@@ -48,6 +48,8 @@
 {        Add ADD_DBM
 {     08-Mar-1999 (TIMJ):
 {        Add REMIP
+{     14-Jun-2000 (TIMJ):
+{        Add SCUCLKERR
 {
 {  Bugs:
 {     {note_any_bugs_here}
@@ -79,6 +81,7 @@ define scan_rlb        $SURF_DIR/surf_mon
 define scuba2mem       $SURF_DIR/surf_mon
 define scucat          $SURF_DIR/surf_mon
 define scuclip         $SURF_DIR/surf_mon
+define scuclkerr       $SURF_DIR/surf_mon
 define scuover         $SURF_DIR/surf_mon
 define scuphot         $SURF_DIR/surf_mon
 define scumakewt       $SURF_DIR/surf_mon
@@ -108,6 +111,7 @@ defhelp scan_rlb        $SURF_HELP
 defhelp scuba2mem       $SURF_HELP
 defhelp scucat          $SURF_HELP
 defhelp scuclip         $SURF_HELP
+defhelp scuclkerr       $SURF_HELP
 defhelp scuhelp         $SURF_HELP
 defhelp scumakewt       $SURF_HELP
 defhelp scuover         $SURF_HELP
@@ -139,6 +143,7 @@ define surf_scan_rlb        $SURF_DIR/surf_mon scan_rlb
 define surf_scuba2mem       $SURF_DIR/surf_mon scuba2mem
 define surf_scucat          $SURF_DIR/surf_mon scucat
 define surf_scuclip         $SURF_DIR/surf_mon scuclip
+define surf_scuclkerr       $SURF_DIR/surf_mon scuclkerr
 define surf_scumakewt       $SURF_DIR/surf_mon scumakewt
 define surf_scuover         $SURF_DIR/surf_mon scuover
 define surf_scuphot         $SURF_DIR/surf_mon scuphot

@@ -60,6 +60,8 @@
 #        Add ADD_DBM and SCUSETENV
 #     08-Mar-1999 (TIMJ)
 #        Add REMIP. Use the STAR_PERL symbol for perl location
+#     14-JUN-2000 (TIMJ)
+#        Add SCUCLKERR
 #     {enter_changes_here}
 #
 #-
@@ -92,6 +94,7 @@ alias scan_rlb        ${SURF_DIR}/scan_rlb
 alias scuba2mem       ${SURF_DIR}/scuba2mem
 alias scucat          ${SURF_DIR}/scucat
 alias scuclip         ${SURF_DIR}/scuclip
+alias scuclkerr       ${SURF_DIR}/scuclkerr
 alias scuhelp         ${SURF_DIR}/scuhelp
 alias scuphot         ${SURF_DIR}/scuphot
 alias scuover         ${SURF_DIR}/scuover
@@ -121,6 +124,7 @@ alias surf_scan_rlb        ${SURF_DIR}/scan_rlb
 alias surf_scuba2mem       ${SURF_DIR}/scuba2mem
 alias surf_scucat          ${SURF_DIR}/scucat
 alias surf_scuclip         ${SURF_DIR}/scuclip
+alias surf_scuclkerr       ${SURF_DIR}/scuclkerr
 alias surf_scuhelp         ${SURF_DIR}/scuhelp
 alias surf_scuphot         ${SURF_DIR}/scuphot
 alias surf_scuover         ${SURF_DIR}/scuover
