@@ -6,17 +6,14 @@ D2BHEADERS = \
 	BitmapImage.h \
 	DviError.h \
 	DviFile.h \
-	GIFBitmap.h \
 	InputByteStream.h \
 	FileByteStream.h \
 	PipeStream.h \
 	PageRange.h \
-	PNGBitmap.h \
 	PkFont.h \
 	Util.h \
 	XBMBitmap.h \
 	XPMBitmap.h \
-	kpathsea.h \
 	Byte.h \
 	getopt_long.h \
 	stringstream.h \
@@ -37,8 +34,11 @@ libdvi2bitmap_la_SOURCES = \
 	$(D2BHEADERS)
 EXTRA_libdvi2bitmap_la_SOURCES = \
 	GIFBitmap.cc \
+	GIFBitmap.h \
 	PNGBitmap.cc \
-	KarlPathSearcher.cc
+	PNGBitmap.h \
+	KarlPathSearcher.cc \
+	KarlPathSearcher.h
 EXTRALO=@EXTRALO@
 libdvi2bitmap_la_LIBADD = $(EXTRALO) $(LTLIBOBJS)
 libdvi2bitmap_la_DEPENDENCIES = $(EXTRALO) $(LTLIBOBJS)
