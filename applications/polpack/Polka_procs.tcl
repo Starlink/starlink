@@ -34,6 +34,10 @@
 #        now stored in global DEF_OEMAP.
 #     29-APR-1999 (DSB):
 #        Added proc SendBack and modified proc exit to call SendBack.
+#     15-SEP-1999 (DSB):
+#        Modified CreateMask to look for the same mask in other images,
+#        before looking for the other mask in the specified image. See
+#        TMG mail 2/9/99, 3/99/99 (saved in PINE on 15/9/99).
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -1778,12 +1782,13 @@ proc CreateMask {image object} {
 #
 #  Purpose:
 #    This procedure creates a default mask for the supplied image and
-#    ray if it does not already have a mask. A search is made for an image
-#    for which the other mask is defined AND which has an OE mapping,
-#    checking the currently displayed image first. If found, the mapping 
-#    is used to transform the mask, and the mapped mask is returned. If 
-#    not found, a search is made for an image for which the required mask 
-#    is defined. If found, the first such mask is returned. 
+#    ray if it does not already have a mask. A search is made for an 
+#    image for which the required mask is defined. If found, the first 
+#    such mask is returned. If no such mask is found, all images are
+#    checked (starting with the specified image) to see if any has both 
+#    an OE mapping and a defined "other" mask. The first such image 
+#    found is used to create the required mask by mapping its "other" 
+#    mask using its OE mapping. 
 #
 #  Arguments:
 #    image
@@ -1807,7 +1812,6 @@ proc CreateMask {image object} {
 #        is a list of pixel X coordinates. 
 #-
    global E_RAY_MASK
-   global IMAGE_DISP
    global IMAGES
    global O_RAY_MASK
    global OBJTYPE
@@ -1836,18 +1840,36 @@ proc CreateMask {image object} {
          set inv 1
       }
 
+# Search for an image with a mask of the same type. Copy the first
+# one found.
+      foreach im $IMAGES {
+         if { [llength $PNTPX($im,$object)] > 0 } {
+            TranPXY "ref" 0 $im $object $image $object
+            set ok 1
+            break
+         } 
+      }
+
+# If no usable mask was found...
+      if { !$ok } {
+
+#  If the specified image has the "other" mask, use it, together with the
+#  image's OE mapping to define the required mask.
+         set map [OEMapping $image]
+         if { $map != "" && [llength $PNTPX($image,$other)] > 0 } {
+            TranPXY $map $inv $image $other $image $object
+            set ok 1
+         } 
+      }
+
+# If no usable mask was found...
+      if { !$ok } {
+
 # Search for an image with a mask of the other type AND an OE mapping. Map 
-# the first such mask found. Check the current image first, and then do all
-# the other images.
-      set map [OEMapping $IMAGE_DISP]
-      if { $map != "" && [llength $PNTPX($IMAGE_DISP,$other)] > 0 } {
-         TranPXY $map $inv $IMAGE_DISP $other $image $object
-         set ok 1
-
-      } {
-
+# the first such mask found. Do not include the specified image first since
+# this was checked earlier.
          foreach im $IMAGES {
-            if { $im != $IMAGE_DISP } { 
+            if { $im != $image } { 
                set map [OEMapping $im]
                if { $map != "" && [llength $PNTPX($im,$other)] > 0 } {
                   TranPXY $map $inv $im $other $image $object
@@ -1855,21 +1877,6 @@ proc CreateMask {image object} {
                   break
                }
             }
-         }
-
-      }
-
-# If no usable mask was found...
-      if { !$ok } {
-
-# Search for an image with a mask of the same type. Copy the first
-# one found.
-         foreach im $IMAGES {
-            if { [llength $PNTPX($im,$object)] > 0 } {
-                TranPXY "ref" 0 $im $object $image $object
-               set ok 1
-               break
-            } 
          }
       }
 
