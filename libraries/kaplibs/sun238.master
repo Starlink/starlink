@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.2}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {19th August 2002}
+\newcommand{\stardocdate}      {18th February 2003}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within\\
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.1}
+\newcommand{\stardocversion}   {Version 2.2}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
@@ -524,6 +524,16 @@ GKS version of the PGPLOT graphics library. If you wish to link with the
 
 This will include native PGPLOT in the link list, and cause all GKS and IDI 
 related items to be removed.
+
+\section{Changes in Version 2.2}
+\begin{itemize}
+\item Script \verb+kaplibs_link+ has been added to enable linking of standalone 
+applications.
+\item The routine KPG1_DSFRM has been modified to include details of AST 
+SpecFrames.
+\item The routine KPG1_ASMRG has been modified to attempt alignment in 
+Domain SPECTRAL.
+\end{itemize}
 
 \section{Changes in Version 2.0}
 \begin{itemize}

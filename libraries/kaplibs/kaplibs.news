@@ -6,18 +6,11 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like 
 applications (see SUN/238).
 
-Version 2.0. includes the following changes:
+Version 2.2. includes the following changes:
 
-   - The kaplibs_link_adam script now has an optional switch, "-nogks",
-   which allows applications to be linked with the native version of
-   PGPLOT instead of the Starlink GKS-based version.
+   - Script kaplibs_link added for linking standalone applications.
 
-   - The routine KPG1_PGOPN now initializes the colour table of the
-   opened device by reading a colour table from the file
-   ~/adam/kappa_lut.sdf. If this file does not exist, a monochrome colour
-   table is used. Applications which change the current colour table
-   should update this file by calling new routine KPG1_LTSAV to save
-   the current colour table in the file.
+   - kpg1_dsfrm modified to includ edetails of AST SpecFrames
 
-   - The IRAS90 IRQ library has been included. IRQ is used to manage
-   textual representations of NDF Quality bits.
+   - kpg1_asmrg modified to attempt alignment in Domain SPECTRAL
+
