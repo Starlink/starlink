@@ -1134,9 +1134,6 @@
 
 *  Local Variables:
       CHARACTER*20		LDESCRIP
-
-      LOGICAL			OK			! Data is ok?
-      LOGICAL			THERE			! Member exists?
 *.
 
 *  Check inherited global status.
