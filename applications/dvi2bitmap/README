@@ -2,14 +2,17 @@
 dvi2bitmap
 ==========
 
-dvi2bitmap is a utility to convert TeX DVI files to bitmaps.  The
-original motivation for this is to prepare mathematical equations for
-inclusion in HTML files, but I expect there are plenty of uses beyond
-that.  It can generate XBM and GIF bitmaps, plus PNG, if you have the
-libpng library installed.  It uses the same kpathsea font-searching
-library as other TeX programs, again as long as you have the
-appropriate library installed.
+dvi2bitmap is a utility to convert TeX DVI files directly to bitmaps,
+without going through the complicated (and slow!) route of conversion
+via PostScript and PNM.  The prime motivation for this is to
+prepare mathematical equations for inclusion in HTML files, but I
+expect there are plenty of uses beyond that.  It can generate XBM and
+GIF bitmaps, plus PNG, if you have the libpng library installed.  It
+uses the same kpathsea font-searching library as other TeX programs,
+again as long as you have the appropriate library installed.
 
+The program is written in C++, and incidentally provides a reasonably
+good (I think) object interface for DVI and PK files.
 
 Configuring and building
 ------------------------
