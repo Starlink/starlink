@@ -257,6 +257,9 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     27-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
+*     21-NOV-2001 (MBT):
+*        Fixed array overrun bug - now check for a maximum number of 
+*        input NDFs.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -273,6 +276,7 @@
       INCLUDE 'PAR_ERR'          ! PAR system error codes
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP system constants
+      INCLUDE 'CCD1_PAR'         ! CCDPACK local constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -284,6 +288,8 @@
 *  Local Constants:
       INTEGER MXFSET             ! Maximum framesets in one file
       PARAMETER( MXFSET = 100 )
+      INTEGER MXNDFS             ! Maximum NDFs per run
+      PARAMETER( MXNDFS = 500 )
 
 *  Local Variables:
       CHARACTER * ( AST__SZCHR ) DMCUR ! Domain of Current frame
@@ -300,7 +306,7 @@
       INTEGER FSMAT              ! AST pointer to matched frameset
       INTEGER I                  ! Loop variable
       INTEGER INDF               ! NDF identifier
-      INTEGER INDXS( MXFSET )    ! Index values for ID type of INDEX
+      INTEGER INDXS( MXNDFS )    ! Index values for ID type of INDEX
       INTEGER INGRP              ! Group identifier for NDF group
       INTEGER IPFITS             ! Pointer to FITS card array
       INTEGER IWCS               ! AST pointer to WCS component of NDF
@@ -340,6 +346,17 @@
       CALL CCD1_NDFGR( 'IN', INGRP, NNDF, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
+         GO TO 99
+      END IF
+
+*  Check that there are not too many NDFs to deal with.
+      IF ( NNDF .GT. MXNDFS ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NUM', NNDF )
+         CALL MSG_SETI( 'MAX', MXNDFS )
+         CALL ERR_REP( 'ASTIMP_TOOMANY',
+     :                 'ASTIMP: Too many NDFs (^NUM) supplied ' //
+     :                 '- maximum is ^MAX.', STATUS )
          GO TO 99
       END IF
 
