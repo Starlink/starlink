@@ -30,6 +30,8 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +61,10 @@
 *        Increased value of NDF__MXDCB and NDF__MXACB.
 *     17-JUL-2000 (RFWS):
 *        Added NDF__SZFXS.
+*     11-MAR-2004 (PWD):
+*        Increased NDF__SZCVT to 512 (from 200).
+*     31-AUG-2004 (MBT):
+*        Increased control block size limits by a factor of 4.
 *     {enter_further_changes_here}
 
 *-
@@ -70,11 +76,11 @@
 
 *  Maximum number of entries in the Access Control Block.
       INTEGER NDF__MXACB
-      PARAMETER ( NDF__MXACB = 2048 )
+      PARAMETER ( NDF__MXACB = 8192 )
 
 *  Maximum number of entries in the Data Control Block.
       INTEGER NDF__MXDCB
-      PARAMETER ( NDF__MXDCB = 1024 )
+      PARAMETER ( NDF__MXDCB = 4096 )
 
 *  Maximum number of foreign data formats which can be recognised.
       INTEGER NDF__MXFMT
@@ -82,7 +88,7 @@
 
 *  Maximum number of entries in the Placeholder Control Block.
       INTEGER NDF__MXPCB
-      PARAMETER ( NDF__MXPCB = 20 )
+      PARAMETER ( NDF__MXPCB = 80 )
 
 *  Common block identifiers.
 *  ========================
@@ -105,7 +111,7 @@
 *  Maximum length of a command to be used during foreign data format
 *  conversion operations.
       INTEGER NDF__SZCVT
-      PARAMETER ( NDF__SZCVT = 200 )
+      PARAMETER ( NDF__SZCVT = 512 )
 
 *  Maximum length of a string describing a data object disposal mode,
 *  entry in the DCB, e.g. 'DELETE'.
