@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE dtddescription SYSTEM 'dtddescription.dtd' [
   <!ENTITY dtdsummary SYSTEM 'programcode-0.7.dtdsummary'>
-  <!ENTITY sundtd 'sun'>
+  <!NOTATION XML SYSTEM ''>
+  <!ENTITY sundtd SYSTEM 'starlink-0.7.description' NDATA XML>
 ]>
 <!-- $Id$ -->
 
@@ -297,6 +298,12 @@ element.
 <p>A list of examples.
 </p>
 <!--splice:examplelist-->
+</element>
+
+<element gi="foreign" status="beta">
+<p>See <elemref gi="foreign" dtd="sundtd"/>
+</p>
+<!--splice:blockquote-->
 </element>
 
 <element gi="funcname" status="beta">

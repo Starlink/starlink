@@ -271,12 +271,31 @@ source code file.
 <p>A document which is marked up in a DTD which is a client of the
 Starlink programcode architecture.</p>
 </attribute>
-<attribute name="ids">
+<attribute name="includeonly">
 <p>If present, this lists the elements within the target document
 which should be processed (not currently implemented).
 </p>
 </attribute>
+<attribute name="id">
+<p>Allows you to assign an ID to this element.  You will have to use
+this ID to refer to elements within this codecollection, when you use
+a <elemref gi="coderef"/> element.</p>
+</attribute>
 <!--splice:codecollection-->
+</element>
+
+<element gi="coderef" status="alpha">
+<p>This element makes a link to a routine referred to within a
+<elemref gi="codecollection"/> element.  That element makes a
+reference to a document which is marked up using the programcode DTD.</p>
+<attribute name="collection">
+<p>The ID which you have assigned to a <elemref
+gi="codecollection"/>.</p>
+</attribute>
+<attribute name="id">
+<p>The ID within the programcode document.</p>
+</attribute>
+<!--splice:coderef-->
 </element>
 
 
@@ -415,7 +434,6 @@ those DTDs which do not have a <elemref gi="history"/> element.
 <p>The document metadata.
 </p>
 <!--splice:docinfo-->
-<!--
 </element>
 
 
@@ -429,7 +447,6 @@ those DTDs which do not have a <elemref gi="history"/> element.
 number has not (yet?) been assigned by the Starlink librarian.
 </p>
 </attribute>
--->
 <!--splice:docnumber-->
 </element>
 

@@ -3,3 +3,11 @@
 
 PUBLIC "-//Starlink//DTD Starlink General//EN"		../../dtd/starlink-0.7.dtd
 PUBLIC "-//W3C//DTD XSLT 1.0//EN" "/home/norman/s/src/sgml/w/sgml/dtd/xslt.dtd"
+	-- In order that the entity xml.decl, declared in
+	   dtddescription.dtd, complete with its bloody sysid, be
+	   resolved properly, we need to specify OVERRIDE YES here.
+	   That only lasts to the end of the catalogue file, so we
+	   need to repeat the declaration of the pubid here.
+	   --
+OVERRIDE YES
+PUBLIC "-//Starlink//TEXT XML Declaration//EN" "../../dtd/xml.decl"

@@ -15,8 +15,8 @@
   "UNREGISTERED::James Clark//Flow Object Class::empty-element")
 (declare-flow-object-class formatting-instruction
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
-;(define debug
-;  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
+(define debug
+  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
 
 (define %sect-gi% "subsubsect")
 (define %subsect-gi% "subsubsubsect")
@@ -183,14 +183,18 @@
   (let* ((gi (attribute-string (normalize "gi") (current-node)))
 	 (self (attribute-string (normalize "self") (current-node)))
 	 (xrefdtd-ent (attribute-string (normalize "dtd") (current-node)))
-	 (xrefdtd-gi (and xrefdtd-ent	; false if not present
-			  (entity-text xrefdtd-ent))))
+	 ;; Get document-element of the target document, if it exists
+	 (xrefdtd-de (and xrefdtd-ent
+			  (document-element-from-entity xrefdtd-ent)))
+	 ;(xrefdtd-gi (and xrefdtd-ent	; false if not present
+		;	  (entity-text xrefdtd-ent)))
+	 )
     (if gi
 	(if self
 	    (literal gi)
 	    (make empty-element gi: "ref"
-		  attributes: (list (list "id" (xref-id gi xrefdtd-gi))
-				    (list "text" gi))))
+		  attributes: `(("id" ,(xref-id gi xrefdtd-de))
+				("text" ,gi))))
 	(error "elemref: required gi attribute missing"))))
 (element example
   (make sequence
@@ -229,6 +233,15 @@
 		 (node-property 'grove-root node)
 		 default: #f ;(empty-node-list)
 		 ))
+(define %xml-decl-entity% "xml.decl")
+(define (document-element-from-entity str #!key (prepend-decl #t))
+  (let ((fsi (if prepend-decl
+		 (string-append (entity-generated-system-id %xml-decl-entity%)
+				(entity-generated-system-id str))
+		 (entity-generated-system-id str))))
+    (if fsi
+        (document-element (sgml-parse fsi))
+        (error (string-append "Can't generate file from entity " str)))))
 
 ;; (normalize) string function from DocBook library.  See there for docs.
 (define (normalize str)
@@ -239,9 +252,8 @@
 
 ;; Generate an id for an element with a given GI
 (define (xref-id giname #!optional (use-docelem #f))
-  (let ((docelem (or use-docelem
-		     (attribute-string (normalize "docelem")
-				       (document-element)))))
+  (let ((docelem (attribute-string (normalize "docelem")
+				   (or use-docelem (document-element)))))
     (if docelem
 	(string-append "el." docelem "." giname)
 	(error "Can't find DOCELEM"))))

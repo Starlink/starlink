@@ -108,10 +108,10 @@ CLASSPATH=/data/goedel/norman/s/src/sgml/java/classes/xp.jar:/data/goedel/norman
 # Default target must fail with an informative error message
 
 all:
-	echo "Error: this directory is included in the distribution for"
-	echo "reference only.  It uses a package (perlSGML) which is not"
-	echo "used in the built package, and so it is NOT BUILDABLE"
-	echo "after distribution.  See notes within Makefile."
+	@ echo "Error: this directory is included in the distribution for"
+	@ echo "reference only.  It uses a package (perlSGML) which is not"
+	@ echo "used in the built package, and so it is NOT BUILDABLE"
+	@ echo "after distribution.  See notes within Makefile."
 
 # This is the main target of this makefile
 #

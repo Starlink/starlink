@@ -71,6 +71,8 @@ foreach $e (@elements) {
 	if (SGML::DTD->is_occur_indicator($ce)
 	    || SGML::DTD->is_group_connector($ce)) {
 	    $op .= " $ce\n";
+	} elsif (SGML::DTD->is_elem_keyword($ce)) {
+	    $op .= " $ce\n";
 	} elsif (SGML::DTD->is_tag_name($ce)) {
 	    $ce = lc($ce);
 	    $op .= "<dtdelemref id='e.$ce'/>";

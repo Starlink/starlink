@@ -1,12 +1,18 @@
 <!-- DTD for documenting DTDs
 
-     This provides descriptive text for the elements
-     See dtd2sgml.dsl.
+     This is an XML DTD (ie, no tag-omission).
+
+     This DTD allows one to encapsulate much (most?) of the
+     user-visible structure of the DTD, in a form which makes it easy
+     to generate user documentation.  It also allows one to associate
+     documentation text with the various elements.
+
+     See also script dtd2sgml.dsl.
 
      $Id$
      -->
 
-<!ELEMENT dtddescription	(dtdsummary, (element+), commentary*)>
+<!ELEMENT dtddescription	(dtdsummary, element+, commentary*)>
 <!ELEMENT element		(p+, attribute*, commentary*)>
 <!ELEMENT attribute		(p+)>
 <!ELEMENT p			(#PCDATA | elemref | example | code 
@@ -43,7 +49,6 @@
 <!ELEMENT subject		(#PCDATA)>
 <!ELEMENT otherheader		(#PCDATA)>
 <!ELEMENT body			(#PCDATA | url)*>
-<!ELEMENT url			(#PCDATA)>
 
 <!ATTLIST dtddescription
 	docelem
@@ -172,6 +177,11 @@
 	<!-- attributes:
 		name		name of the header
 	-->
+
+<!-- Declare an entity referencing the XML declaration -->
+<!ENTITY xml.decl PUBLIC "-//Starlink//TEXT XML Declaration//EN"
+			"somewhere/over/the/rainbow">
+			<!-- Bloody XML and its system identifiers... -->
 
 <![ IGNORE [
 <!ENTITY amp CDATA '&'>
