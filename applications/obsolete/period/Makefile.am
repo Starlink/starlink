@@ -2,10 +2,15 @@
 
 bin_PROGRAMS = period
 noinst_LTLIBRARIES = libperiod.la
-noinst_INCLUDES = PIVARS
+dist_noinst_INCLUDES = PIVARS
 
 period_SOURCES = period_main.f
 period_LDADD = libperiod.la `$(srcdir)/period_link`
+
+starnewsdir = $(datadir)/doc/@PACKAGE_NAME@-@PACKAGE_VERSION@
+dist_starnews_DATA = period.news
+
+dist_pkgdata_DATA = period_test.dat
 
 libperiod_la_SOURCES = period_add.f period_alloc.f period_alpha.f      \
 period_autolim.f period_case.f period_clean.f period_convolv.f	       \
