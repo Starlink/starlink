@@ -1,6 +1,7 @@
-      SUBROUTINE CCD1_SWLIS( NDFGRP, FIOGRP, NLIST, NDFS, USEWCS,
-     :                       USESET, FRMS, MAPPIX, MAPSET, ISUP, NSUP,
-     :                       ILIS, ILISOF, STATUS )
+      SUBROUTINE CCD1_SWLIS( NDFGRP, FIOGRP, NLIST, NLGRP, NNOLIS, 
+     :                       NDFS, USEWCS, USESET, FRMS, MAPPIX,
+     :                       MAPSET, ISUP, NSUP, ILIS, ILISOF,
+     :                       INLSUP, STATUS )
 *+
 *  Name:
 *     CCD1_SWLIS
@@ -12,9 +13,9 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_SWLIS( NDFGRP, FIOGRP, NLIST, NDFS, USEWCS, USESET,
-*                      FRMS, MAPPIX, MAPSET, ISUP, NSUP, ILIS, ILISOF,
-*                      STATUS )
+*     CALL CCD1_SWLIS( NDFGRP, FIOGRP, NLIST, NLGRP, NNOLIS, NDFS,
+*                      USEWCS, USESET, FRMS, MAPPIX, MAPSET, ISUP,
+*                      NSUP, ILIS, ILISOF, INLSUP, STATUS )
 
 *  Description:
 *     This routine interrogates a group of files containing position
@@ -51,6 +52,12 @@
 *        The GRP identifier giving the names of the lists themselves.
 *     NLIST = INTEGER (Given)
 *        The number of elements in the NDFGRP group.
+*     NLGRP = INTEGER (Given)
+*        A GRP identifier for a list of NDFs with no associated lists.
+*        If NNOLIS is positive, the Set information of the NDFs in 
+*        this group is read to fill the INLSUP array.
+*     NNOLIS = INTEGER (Given)
+*        If positive, the number of members of NLGRP.
 *     NDFS = LOGICAL (Given)
 *        Indicates whether the NDFGRP group contains the names of NDFs
 *        which reference position lists in their 
@@ -72,12 +79,13 @@
 *        domain frame to the Current frame of the WCS component.
 *        Only returned if USEWCS is true.
 *     MAPSET( NLIST ) = INTEGER (Returned)
-*        For each of the NDFs in NDFGRP, an AST mapping from the CCD_SET-
-*        domain frame to the working frame of the WCS component.
-*        The working frame is in the PIXEL domain if USEWCS is false
-*        and the Current frame if USEWCS is true.
-*        For any NDF which is not a member of a Set, the value 
-*        AST__NULL will be stored.
+*        If USESET is true, the first NSUP elements returned are
+*        AST pointers to mappings from the CCD_SET-domain frame to the
+*        working frame of the WCS component of NDFs in the corresponding
+*        superlist.  The working frame is in the PIXEL domain if USEWCS
+*        is false and the Current frame if USEWCS is true.
+*        If there is no consistent mapping for the Set, AST__NULL is 
+*        returned.  This array is required as workspace.
 *        Only returned if USESET is true.
 *     ISUP( NLIST ) = INTEGER (Returned)
 *        For each of the NDFs in NDFGRP, the number of the superlist into
@@ -102,6 +110,11 @@
 *        Taken together, ILISOF and ILIS are a sort of inversion of ISUP.
 *        Note this array should be declared with at least NLIST + 1
 *        elements; the final element is a sentry value.
+*     INLSUP( NNOLIS ) = INTEGER (Returned)
+*        For each member of the NLGRP group, a value is returned which
+*        gives the number of the superlist to which it corresponds
+*        (i.e. is a member of the same Set as).  If USESET is false,
+*        this will be filled with zeros.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -135,9 +148,11 @@
       INTEGER NDFGRP
       INTEGER FIOGRP
       INTEGER NLIST
+      INTEGER NLGRP
+      INTEGER NNOLIS
       LOGICAL NDFS
       LOGICAL USEWCS
-
+      
 *  Arugments Given and Returned:
       LOGICAL USESET
       
@@ -149,6 +164,7 @@
       INTEGER NSUP
       INTEGER ILIS( NLIST )
       INTEGER ILISOF( NLIST + 1 )
+      INTEGER INLSUP( NNOLIS )
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -177,10 +193,16 @@
       INTEGER K                 ! Counter
       INTEGER MAP1              ! AST pointer to mapping
       INTEGER MAP2              ! AST pointer to mapping
+      INTEGER MAPS              ! AST pointer to set mapping for this list
       INTEGER NAMGRP            ! GRP identifier for group of Set names
       INTEGER SINDEX            ! Set Index attribute
+      DOUBLE PRECISION DIFF     ! Difference bewtween points
+      DOUBLE PRECISION PSIZE    ! Size of a pixel in CCD_SET coords
+      DOUBLE PRECISION XP( 2 )  ! Input transform X coordinates
+      DOUBLE PRECISION XQ( 2 )  ! Output transform X coordinates
+      DOUBLE PRECISION YP( 2 )  ! Input transform Y coordinates
+      DOUBLE PRECISION YQ( 2 )  ! Output transform Y coordinates
       LOGICAL DIFDMN            ! True if different domains have been used
-      LOGICAL OK                ! CCD_SET and Current frames consistent?
 
 *.
 
@@ -264,7 +286,7 @@
 *  If this is a Set member, store a mapping from CCD_SET frame to
 *  the working (PIXEL or Current) frame.  Otherwise store a null value.
             IF ( SNAME .EQ. ' ' ) THEN
-               MAPSET( I ) = AST__NULL
+               MAPS = AST__NULL
             ELSE
                IF ( USEWCS ) THEN
                   JWORK = AST__CURRENT
@@ -272,7 +294,7 @@
                   JWORK = JPIX
                END IF
                MAP1 = AST_GETMAPPING( IWCS, JSET, JWORK, STATUS )
-               MAPSET( I ) = AST_SIMPLIFY( MAP1, STATUS )
+               MAPS = AST_SIMPLIFY( MAP1, STATUS )
                CALL AST_ANNUL( MAP1, STATUS )
             END IF
 
@@ -283,33 +305,58 @@
 *  current -> CCD_SET mapping of the other, and seeing if they
 *  cancel out to form a UnitMap.
             IF ( SNAME .NE. ' ' .AND. IGOT .GT. 0 ) THEN
+               IF ( MAPSET( IGOT ) .NE. AST__NULL ) THEN
 
 *  Combine the two mappings back to back.
-               CALL AST_INVERT( MAPSET( I ), STATUS )
-               MAP1 = AST_CMPMAP( MAPSET( I ), MAPSET( IGOT ), .TRUE.,
-     :                            ' ', STATUS )
-               MAP2 = AST_SIMPLIFY( MAP1, STATUS )
+                  CALL AST_INVERT( MAPS, STATUS )
+                  MAP1 = AST_CMPMAP( MAPS, MAPSET( IGOT ), .TRUE., ' ',
+     :                            STATUS )
+                  MAP2 = AST_SIMPLIFY( MAP1, STATUS )
 
-*  Check for UnitMap status.
-               OK = AST_ISAUNITMAP( MAP2, STATUS )
+*  Check to see whether this is a UnitMap.
+                  IF ( .NOT. AST_ISAUNITMAP( MAP2, STATUS ) ) THEN
+
+*  It's not actually a UnitMap; is it very nearly a unit mapping?
+*  First find the size of an NDF pixel in the CCD_SET frame.
+                     CALL CCD1_PSIZE( IWCS, JWORK, PSIZE, STATUS )
+
+*  Now transform two points near the origin using the maybe-unit mapping.
+*  It's just possible that this region of the coordinate space is 
+*  illegal, in which case we'll get a spurious pass, but this seems
+*  very unlikely.
+                     XP( 1 ) = 0D0
+                     XP( 2 ) = PSIZE
+                     YP( 1 ) = 0D0
+                     YP( 2 ) = PSIZE
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        CALL ERR_MARK()
+                        CALL AST_TRAN2( MAP2, 2, XP, YP, .TRUE., XQ, YQ,
+     :                                  STATUS )
+
+*  See how far it falls from its original position.
+                        IF ( STATUS .EQ. SAI__OK ) THEN
+                           DIFF = SQRT( ( XQ( 1 ) - XP( 1 ) ) ** 2 +
+     :                                  ( YQ( 1 ) - YP( 1 ) ) ** 2 +
+     :                                  ( XQ( 2 ) - XP( 2 ) ) ** 2 +
+     :                                  ( YQ( 2 ) - YP( 2 ) ) ** 2 )
+                        ELSE
+                           DIFF = 0D0
+                           CALL ERR_ANNUL( STATUS )
+                        END IF
+                        CALL ERR_RLSE()
+                     END IF
+
+*  If it's further away than very close, log this as an inconsistent
+*  superlist.
+                     IF ( DIFF .GT. PSIZE * 1D-6 ) THEN
+                        MAPSET( IGOT ) = AST__NULL
+                     END IF
+                  END IF
 
 *  Tidy up.
-               CALL AST_INVERT( MAPSET( I ), STATUS )
-               CALL AST_ANNUL( MAP1, STATUS )
-               CALL AST_ANNUL( MAP2, STATUS )
-
-*  Warn the user if there is a problem.
-               IF ( .NOT. OK ) THEN
-                  IF ( USEWCS ) THEN
-                     CALL MSG_SETC( 'WORK', 'Current' )
-                  ELSE
-                     CALL MSG_SETC( 'WORK', 'PIXEL' )
-                  END IF
-                  CALL CCD1_MSG( ' ', '  ** Warning: ^WORK'//
-     :' coordinates are not consistent with Set alignment.', STATUS )
-                  CALL CCD1_MSG( ' ', '              This will'//
-     :            ' almost certainly result in errors.', STATUS )
-                  CALL CCD1_MSG( ' ', ' ', STATUS )
+                  CALL AST_INVERT( MAPS, STATUS )
+                  CALL AST_ANNUL( MAP1, STATUS )
+                  CALL AST_ANNUL( MAP2, STATUS )
                END IF
             END IF
 
@@ -323,6 +370,7 @@
             ELSE
                NSUP = NSUP + 1
                CALL GRP_PUT( NAMGRP, 1, SNAME, NSUP, STATUS )
+               MAPSET( NSUP ) = MAPS
                ISUP( I ) = NSUP
             END IF
 
@@ -392,6 +440,22 @@
             CALL CCD1_MSG( ' ', LINE, STATUS )
             LINE = ' '
          END DO
+
+*  If the CCD_SET->work mappings have been inconsistent, warn the user
+*  of this fact.
+         IF ( ILISOF( I + 1 ) - ILISOF( I ) .GT. 1 .AND. 
+     :        MAPSET( I ) .EQ. AST__NULL ) THEN
+            IF ( USEWCS ) THEN
+               CALL MSG_SETC( 'WORK', 'Current' )
+            ELSE
+               CALL MSG_SETC( 'WORK', 'PIXEL' )
+            END IF
+            CALL MSG_SETI( 'I', I )
+            CALL CCD1_MSG( ' ', '  ** Warning: No consistent'//
+     :' CCD_SET -> ^WORK coordinate mapping in superlist ^I', STATUS )
+            CALL CCD1_MSG( ' ', '              This will'//
+     :' almost certainly result in errors.', STATUS )
+         END IF
       END DO
 
 *  Indicate where the position lists originated.
@@ -405,6 +469,30 @@
             CALL CCD1_MSG( ' ',
      :'  Position list names extracted from NDF extensions.', STATUS )
          END IF
+      END IF
+
+*  Finally, go through the NLGRP group and assign list membership values
+*  to the NDFs in that if applicable.
+      IF ( NDFS .AND. USESET .AND. NNOLIS .GT. 0 ) THEN
+         DO I = 1, NNOLIS
+
+*  Get the Set information.
+            CALL NDG_NDFAS( NLGRP, I, 'READ', INDF, STATUS )
+            CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+            CALL CCD1_SETRD( INDF, IWCS, SNAME, SINDEX, JSET, STATUS )
+
+*  See if it corresponds to a Set of which we have made a superlist.
+*  If so, store the index of that list, otherwise store a value of zero.
+            IF ( JSET .NE. AST__NOFRAME .AND. SNAME .NE. ' ' ) THEN
+               CALL GRP_INDEX( SNAME, NAMGRP, 1, INLSUP( I ), STATUS )
+            ELSE
+               INLSUP( I ) = 0
+            END IF
+
+*  Release resources.
+            CALL NDF_ANNUL( INDF, STATUS )
+            CALL AST_ANNUL( IWCS, STATUS )
+         END DO
       END IF
 
 *  Release group resources.
