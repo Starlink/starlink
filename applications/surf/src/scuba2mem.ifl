@@ -64,7 +64,7 @@ INTERFACE SCUBA2MEM
       PARAMETER OUT
          POSITION 2
          TYPE     'FILENAME'
-         PROMPT   'Name of file to contain DBMEM information'
+         PROMPT   'Name of file to contain bolometer positions'
          VPATH    'PROMPT'
          PPATH    'GLOBAL'
          ASSOCIATION '->GLOBAL.DATA_ARRAY'
