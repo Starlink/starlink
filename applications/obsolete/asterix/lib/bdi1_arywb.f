@@ -110,12 +110,15 @@
       CHARACTER*(DAT__SZTYP)	TYPE			! BASE type
       CHARACTER*6		VARNT			! Array variant
 
+      INTEGER			ANDIM, ADIMS(DAT__MXDIM)! Existing object dimensions
       INTEGER			FPTR			! Mapped file data
+      INTEGER			I			! Loop over dimensions
       INTEGER			NDIM, DIMS(DAT__MXDIM)	! Object dimensions
       INTEGER			PTR			! Item data address
 
       LOGICAL			OK			! Locator is valid?
       LOGICAL			PRIM			! Object is primitive?
+      LOGICAL			SAME			! Objects same shape?
       LOGICAL			THERE			! Object exists?
 *.
 
@@ -157,14 +160,28 @@
 *      Get type used to map
           CALL ADI_CGET0C( PSID, 'Type', MTYPE, STATUS )
 
-*      Get parent
-          CALL DAT_PAREN( LOC, PLOC, STATUS )
-          CALL DAT_NAME( LOC, NAME, STATUS )
-          CALL DAT_ANNUL( LOC, STATUS )
-          CALL DAT_ERASE( PLOC, NAME, STATUS )
-          CALL DAT_NEW( PLOC, NAME, '_'//MTYPE, NDIM, DIMS, STATUS )
-          CALL DAT_FIND( PLOC, NAME, LOC, STATUS )
-          CALL DAT_ANNUL( PLOC, STATUS )
+*      Get actual dimensions and compare with those of the dat we want to write
+          CALL DAT_SHAPE( LOC, DAT__MXDIM, ADIMS, ANDIM, STATUS )
+          SAME = (ANDIM.EQ.NDIM)
+          I = 1
+          DO WHILE ( (I.LE.NDIM) .AND. SAME )
+            IF ( DIMS(I) .EQ. ADIMS(I) ) THEN
+              I = I + 1
+            ELSE
+              SAME = .FALSE.
+            END IF
+          END DO
+
+*      Recreate data if wrong shape
+          IF ( .NOT. SAME ) THEN
+            CALL DAT_PAREN( LOC, PLOC, STATUS )
+            CALL DAT_NAME( LOC, NAME, STATUS )
+            CALL DAT_ANNUL( LOC, STATUS )
+            CALL DAT_ERASE( PLOC, NAME, STATUS )
+            CALL DAT_NEW( PLOC, NAME, '_'//MTYPE, NDIM, DIMS, STATUS )
+            CALL DAT_FIND( PLOC, NAME, LOC, STATUS )
+            CALL DAT_ANNUL( PLOC, STATUS )
+          END IF
 
 *      Write the data
           CALL DAT_PUT( LOC, '_'//MTYPE, NDIM, DIMS, %VAL(PTR), STATUS )
