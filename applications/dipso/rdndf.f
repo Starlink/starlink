@@ -165,6 +165,7 @@
       INTEGER IPDATA             ! Pointer to mapped DATA array
       INTEGER IPW1               ! Pointer to work space
       INTEGER IWCS               ! Pointer to WCS FrameSet
+      INTEGER JUNK               ! Pointer to an unused FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Pixel index at lower bound of NDF
       INTEGER MAP                ! Pointer to replacement Mapping
       INTEGER NAX                ! No. of current Frame axes
@@ -434,6 +435,7 @@
 *  First try wavelength.
                   CALL AST_SETC( SFRM, 'SYSTEM', 'WAVE', STATUS )
                   CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
+                  JUNK = AST_FINDFRAME( SFRM, TEMPLT, ' ', STATUS )
 
 *  If an error occurred setting the unit, annul it and try frequency.
                   IF( STATUS .NE. SAI__OK ) THEN
@@ -447,6 +449,8 @@
                         CALL ERR_ANNUL( STATUS )
                         CALL AST_SETC( SFRM, 'SYSTEM', 'VOPT', STATUS )
                         CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
+                        JUNK = AST_FINDFRAME( SFRM, TEMPLT, ' ', 
+     :                                        STATUS )
 
 *  If an error occurred setting the unit, annul it, indicate that we need
 *  to try the next axis in the current Frame.
@@ -601,8 +605,8 @@
 *  Extract the AXIS->GRID Mapping.    
          AGMAP = AST_GETMAPPING( FS, AST__CURRENT, AST__BASE, STATUS )
 
-*  Concatentate this with the GRID->SPECTRAL Mapping to get the
-*  AXIS->SPECTRAL Mapping.
+*  Concatentate this with the GRID->SPECTRUM Mapping to get the
+*  AXIS->SPECTRUM Mapping.
          ASMAP = AST_CMPMAP( AGMAP, GSMAP, .TRUE., ' ', STATUS )
 
 *  Unmap the NDF AXIS array (since we need double precision access to it
