@@ -121,13 +121,10 @@
 
 *  External References:
       EXTERNAL			BDI2_AXWB
-C      EXTERNAL			BDI2_WBBND
-C      EXTERNAL			BDI2_WBERR
-C      EXTERNAL			BDI2_WBGEN
-C      EXTERNAL			BDI2_WBLQ
-C      EXTERNAL			BDI2_WBWID
       EXTERNAL			UTIL_PLOC
-        INTEGER			UTIL_PLOC
+        INTEGER			  UTIL_PLOC
+      EXTERNAL			CHR_LEN
+        INTEGER			  CHR_LEN
 
 *  Local Variables:
       CHARACTER*8		AKEY			! Axis keyword
@@ -162,8 +159,7 @@ C      EXTERNAL			BDI2_WBWID
       WMODE = (MODE(1:1).EQ.'W')
 
 *  Axis data?
-      IF ( ITEM(1:5) .EQ. 'Axis_' .AND.
-     :     ( ITEM(8:) .EQ. 'Data' .OR. ITEM(8:) .EQ. 'Bounds' ) ) THEN
+      IF ( ITEM(1:5) .EQ. 'Axis_' ) THEN
 
 *    Get dimensions of BinDS
         CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
@@ -175,48 +171,44 @@ C      EXTERNAL			BDI2_WBWID
 *    Private storage for axis data
         CALL ADI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
-*    Create invented object and attempt to fill values unless write mode
+*    Create invented object and calculate the axis data array
         CALL ADI_NEW1R( DIMS(IAX), ITID, STATUS )
-        IF ( .NOT. WMODE ) THEN
-          CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
+        CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
-*      Locate primary HDU
-          CALL ADI2_FNDHDU( FITID, 'PRIMARY', .FALSE., PHDU, STATUS )
+*    Locate primary HDU
+        CALL ADI2_FNDHDU( FITID, 'PRIMARY', .FALSE., PHDU, STATUS )
 
-*      Enumerated axis values?
-          CALL ADI2_HGKYR( PHDU, 'AX'//CAX//'C0001', AXVAL, CMNT,
-     :                     STATUS )
+*    Enumerated axis values?
+        CALL ADI2_HGKYR( PHDU, 'AX'//CAX//'C0001', AXVAL, CMNT,
+     :                   STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*    Read them one by one
+          DO I = 1, DIMS(IAX)
+            WRITE( AKEY, '(A,I4.4)' ) 'AX'//CAX//'C', I
+            CALL ADI2_HGKYR( PHDU, AKEY, AXVAL, CMNT, STATUS )
+            CALL ARR_SELEM1R( WPTR, DIMS(IAX), I, AXVAL, STATUS )
+          END DO
+
+*    Test for standard keywords
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+          CALL ADI2_HGKYR( PHDU, 'CRPIX'//CAX, RPIX, CMNT, STATUS )
+          CALL ADI2_HGKYR( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
+
+*      Standard keywords there?
           IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL ARR_REG1R( PIXW*(1.0 - RPIX), PIXW, DIMS(IAX),
+     :                      %VAL(WPTR), STATUS )
 
-*      Read them one by one
-            DO I = 1, DIMS(IAX)
-              WRITE( AKEY, '(A,I4.4)' ) 'AX'//CAX//'C', I
-              CALL ADI2_HGKYR( PHDU, AKEY, AXVAL, CMNT, STATUS )
-              CALL ARR_SELEM1R( WPTR, DIMS(IAX), I, AXVAL, STATUS )
-            END DO
-
-*      Test for standard keywords
+*      Otherwise regular values
           ELSE
             CALL ERR_ANNUL( STATUS )
-            CALL ADI2_HGKYR( PHDU, 'CRPIX'//CAX, RPIX, CMNT, STATUS )
-c           CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
-            CALL ADI2_HGKYR( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
-
-*        Standard keywords there?
-            IF ( STATUS .EQ. SAI__OK ) THEN
-              CALL ARR_REG1R( PIXW*(1.0 - RPIX), PIXW, DIMS(IAX),
-     :                        %VAL(WPTR), STATUS )
-
-*        Otherwise regular values
-            ELSE
-              CALL ERR_ANNUL( STATUS )
-              CALL ARR_REG1R( 1.0, 1.0, DIMS(IAX), %VAL(WPTR), STATUS )
-
-            END IF
+            CALL ARR_REG1R( 1.0, 1.0, DIMS(IAX), %VAL(WPTR), STATUS )
 
           END IF
 
-*      Now check the item is catered for
+*      Now check the item is catered for and invent properly
           IF ( ITEM(8:) .EQ. 'Data' ) THEN
             CALL ADI_UNMAP( ITID, WPTR, STATUS )
 
@@ -228,12 +220,33 @@ c           CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
 
 *        Construct the bounds
             CALL BDI2_INVNT_VW2B( BDIMS(2), %VAL(WPTR), .FALSE., 0.0,
-     :                       %VAL(BPTR), STATUS )
+     :                            %VAL(BPTR), STATUS )
 
 *        Swap the item IDs over
             CALL ADI_UNMAP( ITID, WPTR, STATUS )
             ITID = BITID
             CALL ADI_UNMAP( ITID, BPTR, STATUS )
+
+          ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
+            BDIMS(1) = 1
+            BDIMS(2) = DIMS(IAX)
+            CALL ADI_NEW( TYPE, 2, BDIMS, BITID, STATUS )
+            CALL ADI_MAPR( BITID, 'WRITE', BPTR, STATUS )
+            CALL BDI2_INVNT_V2W( BDIMS(2), %VAL(WPTR),
+     :                           %VAL(BPTR), STATUS )
+            CALL ADI_UNMAP( ITID, WPTR, STATUS )
+            ITID = BITID
+            CALL ADI_UNMAP( ITID, BPTR, STATUS )
+
+          ELSE IF ( ITEM(8:) .EQ. 'Label' ) THEN
+            CALL ADI_NEWV0C( ' ', ITID, STATUS )
+
+          ELSE IF ( ITEM(8:) .EQ. 'Normalised' ) THEN
+            CALL ADI_NEWV0L( .FALSE., ITID, STATUS )
+
+          ELSE
+            STATUS = SAI__ERROR
+            GOTO 59
           END IF
 
 *      Release HDU
@@ -255,15 +268,21 @@ c           CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
           WBPTR = UTIL_PLOC( BDI2_AXWB )
         END IF
 
+*    Anything other than an 'Axis_' invention
       ELSE IF ( ITEM .EQ. 'Title' ) THEN
+        CALL ADI_NEWV0C( ' ', ITID, STATUS )
+
+      ELSE IF ( ITEM .EQ. 'Label' ) THEN
+        CALL ADI_NEWV0C( ' ', ITID, STATUS )
+
+      ELSE IF ( ITEM .EQ. 'Units' ) THEN
         CALL ADI_NEWV0C( ' ', ITID, STATUS )
 
       ELSE
 
-*    Invent quality array
-
 *    Report error
         STATUS = SAI__ERROR
+        GOTO 59
 
       END IF
 
@@ -278,6 +297,9 @@ c           CALL ADI2_HGKYR( PHDU, 'CRVAL'//CAX, RVAL, CMNT, STATUS )
 
       END IF
 
+c     print*, ' '
+c     print*, '*** ', item(:chr_len(item)), ' ***'
+c     call adi_print(itid, status)
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI2_INVNT', STATUS )
 
