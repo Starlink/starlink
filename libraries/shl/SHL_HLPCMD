@@ -33,7 +33,7 @@
       INTEGER LUTERM
 
 *    Use separate comon blocks for the character and other data types.
-      COMMON /KPE_HLPCMD/ CMD, IOKF
-      COMMON /KPE_HLPIO/ LREP, LHELP, HELPN, LTOP, LBOT, ANSI, LUCMD,
+      COMMON /SHL_HLPCMD/ CMD, IOKF
+      COMMON /SHL_HLPIO/ LREP, LHELP, HELPN, LTOP, LBOT, ANSI, LUCMD,
      :                   LUTERM
 *
