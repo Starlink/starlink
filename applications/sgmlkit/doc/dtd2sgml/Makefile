@@ -24,12 +24,19 @@ all:
 
 # This existence of this stamp file is tested by ../ssn70/Makefile -- 
 # do not rename!
-sgmltext.stamp: starlink-0.4.sgmltext programcode-0.2.sgmltext
+sgmltext.stamp: starlink-0.5.sgmltext programcode-0.2.sgmltext
 	touch sgmltext.stamp
 
 starlink-0.2.dtdsummary: $(DTDDIR)/starlink-everything.dtd $(DTDDIR)/starlink-0.2.dtd
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl --descrip starlink-0.2.description \
+		$< >$@ 2>/dev/null
+
+starlink-0.5.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
+			$(DTDDIR)/starlink-0.5.dtd
+	SGML_SEARCH_PATH=$(DTDDIR) \
+	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
+			--descrip starlink-0.5.description \
 		$< >$@ 2>/dev/null
 
 starlink-0.4.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
@@ -50,6 +57,8 @@ starlink-0.2.sgmltext: starlink-0.2.dtdsummary starlink-0.2.description
 starlink-0.3.sgmltext: starlink-0.3.dtdsummary starlink-0.3.description
 
 starlink-0.4.sgmltext: starlink-0.4.dtdsummary starlink-0.4.description
+
+starlink-0.5.sgmltext: starlink-0.5.dtdsummary starlink-0.5.description
 
 programcode-0.2.sgmltext: programcode-0.2.dtdsummary programcode-0.2.description
 
