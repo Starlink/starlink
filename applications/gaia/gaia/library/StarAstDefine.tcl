@@ -153,7 +153,7 @@ itcl::class gaia::StarAstDefine {
             -textvariable [scope values_($this,dateobs)]
       }
       add_short_help $itk_component(dateobs) \
-         {Format 'dd/mm/yy' or 'ccyy-mm-ddThh:mm:ss[.sss...]Z'}
+         {Format ccyy-mm-ddThh:mm:ss[.sss...]Z (post 2000 dd/mm/yy pre)}
 
       #  CTYPE, CDELT, CROTA and CRPIX for both axes,
       #  plus LONGPOLE and LATPOLE
