@@ -64,11 +64,10 @@ f     Mapping, a FrameSet may also be inverted (see AST_INVERT), which
 *
 *     Every FrameSet also inherits any further attributes that belong
 *     to its current Frame, regardless of that Frame's class. (For
-*     example, the Epoch and Equinox attributes, defined by the
-*     SkyFrame class, are inherited by any FrameSet which has a
-*     SkyFrame as its current Frame.) The set of attributes belonging
-*     to a FrameSet may therefore change when a new current Frame is
-*     selected.
+*     example, the Equinox attribute, defined by the SkyFrame class, is 
+*     inherited by any FrameSet which has a SkyFrame as its current 
+*     Frame.) The set of attributes belonging to a FrameSet may therefore 
+*     change when a new current Frame is selected.
 
 *  Functions:
 c     In addition to those functions applicable to all Frames, the
