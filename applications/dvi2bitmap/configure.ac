@@ -41,9 +41,11 @@ dnl  spurious linking errors on, for example, Solaris)
 AC_LANG([C])
 
 AC_PATH_PROG(PERL, perl)
-AC_PATH_PROG(TEX, tex, NOTEX)
-AC_PATH_PROG(DOXYGEN, doxygen, [])
-if test -z "$DOXYGEN"; then
+AC_PATH_PROG(TEX, tex, NO_TEX)
+dnl  Test for doxygen; code here and in Makefile.am tests for
+dnl  equality with 'NO_DOXYGEN'
+AC_PATH_PROG(DOXYGEN, doxygen, NO_DOXYGEN)
+if test "$DOXYGEN" = NO_DOXYGEN; then
     AC_MSG_NOTICE([Couldn't find Doxygen -- I'll just create a stub library document.  Doxygen's good though: you can get it from www.doxygen.org])
 fi
 

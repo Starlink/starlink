@@ -64,11 +64,14 @@ man1_MANS = dvi2bitmap.1 dvireport.1
 # Special handling for distribution
 EXTRA_DIST = $(libdocdir) $(man1_MANS) VERSION
 
-# Generate library documentation using Doxygen
+# Generate library documentation using Doxygen.
+# If it's not available, just touch a stamp file in the right directory.
+# The configure.ac sets DOXYGEN to NO_DOXYGEN if it's not found.
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
+DOXYGEN=@DOXYGEN@
 $(libdocdir): Doxyfile
-	if test -n "@DOXYGEN@"; then \
-	  X=@DOXYGEN@; ${X-:};\
+	if test "$(DOXYGEN)" != NO_DOXYGEN; then \
+	  $(DOXYGEN); \
 	else \
 	  mkdir $(libdocdir); \
 	  echo "No doxygen available -- library documentation not generated" >$(libdocdir)/stamp; \
