@@ -1,7 +1,8 @@
       SUBROUTINE SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, 
      :     J_MEASURED, J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, 
      :     SUB_FILTER, T_TEL, T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, 
-     :     B_FIT, TAUZ_FIT, REXISQ, STATUS)
+     :     B_FIT, TAUZ_FIT, REXISQ, TAU_ERROR, ETA_ERROR,
+     :     B_ERROR, SIGMA, STATUS)
 *+
 *  Name:
 *     SCULIB_FIT_SKYDIP
@@ -99,6 +100,15 @@
 *              the fitted result for tauz
 *     REXISQ                    = REAL (Returned)
 *              the reduced chi square of the fit
+*     TAU_ERROR                 = REAL (Returned)
+*              error in the tau
+*     ETA_ERROR                 = REAL (Returned)
+*              error in eta_tel
+*     B_ERROR                   = REAL (Returned)
+*              error in B
+*     SIGMA                     = DOUBLE (Returned)
+*              standard deviation of the difference between the
+*              model and the fit.
 *     STATUS                    = INTEGER (Given and returned)
 *              Global status
 
@@ -114,10 +124,20 @@
 *  Authors:
 *     T.Jenness (timj@jach.hawaii.edu)
 *     J.Lightfoot (REVAD::JFL)
+*     Nick Tothill (N.F.H.Tothill@qmw.ac.uk)
 
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.13  1998/06/06 03:24:02  timj
+*     Add errors (Thanks to Nick Tothill for adding them).
+*     Tidy up -- return errors to calling routine.
+*
+
+*     1998/05/18 Revised to give reasonably realistic errors on fitted
+*     quantities; degrees-of-freedom handling changed; reduced chi-sq
+*     quoted with respect to different variance - NFHT
+
 *     Revision 1.12  1998/01/15 19:36:41  timj
 *     Return immediately if N_MEASUREMENTS is 0
 *
@@ -151,6 +171,7 @@
 *  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'              ! for VAL__NBx
+      INCLUDE 'MSG_PAR'              ! For MSG__
 
 *  Global Constants (for COMMON):
       INTEGER MAX_FIT_DATA           ! max number of measurements
@@ -176,6 +197,10 @@
       REAL    TAUZ_FIT
       REAL    ETA_TEL_FIT
       REAL             REXISQ        ! Reduced chi square
+      DOUBLE PRECISION SIGMA
+      REAL    B_ERROR
+      REAL    ETA_ERROR
+      REAL    TAU_ERROR
 
 *  Status:
       INTEGER STATUS
@@ -217,7 +242,8 @@
 *  Local variables:
       DOUBLE PRECISION ALPHA (3,3)   ! scratch used by SCULIB_FIT_FUNCTION
       DOUBLE PRECISION BETA (3)
-      CHARACTER*80     BUFFER        ! buffer to hold results of fit
+      CHARACTER*100    BUFFER        ! buffer to hold results of fit
+      CHARACTER*80     SIGBUFFER     ! buffer to hold scatter about fit
       INTEGER          COUNT         ! Counter
       DOUBLE PRECISION DA (6)    
       DOUBLE PRECISION FIT (3)       ! the fitted parameters
@@ -241,6 +267,12 @@
       DOUBLE PRECISION XIOLD         ! chi-squared of fit
       DOUBLE PRECISION XISQ          ! chi-squared of fit
 
+      DOUBLE PRECISION CHISQ         ! chi-squared of fit (not reduced)
+      DOUBLE PRECISION REDCHISQ      ! chi-squared of fit (reduced)
+                                     ! both with respect to updated variance
+      DOUBLE PRECISION VAR           ! variance of data around fit
+      DOUBLE PRECISION OLDVAR (MAX_FIT_DATA) !storage array for original
+                                             !variance values
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -311,12 +343,15 @@
 
       END DO
 
-*     Work out the number of degrees of freedom
-*     This is number of observations plus number of free parameters - 1
-*     (yes I know that the observations are free parameters)
-*     + 1 since tau is always free
+*     In general, the number of d.f. is
+*     given by the number of observations _minus_ the number
+*     of free parameters (see Bevington) 
+*     The - 1 is only used when there is an implicit additive constant
+*     in the fitting function, eg in most polynomial fits. 
+*     d.f. = n_obs - 1 (since tau is always free - eta & b
+*     may or may not be free parameters) - NFHT
 
-      NDEG = N_MEASUREMENTS - 1 + 1
+      NDEG = N_MEASUREMENTS - 1
 
 * Now try to fit this
 
@@ -324,12 +359,14 @@
 
 * Set initial guess and limits
 
+* Again, change the calculation of degrees of freedom - NFHT
+
          IF (B_IN .LT. 0.0) THEN
             C_B_HI = 0.9999D0
             C_B_LO = 0.0001D0
             FIT (2) = 0.7D0
 
-            NDEG = NDEG + 1
+            NDEG = NDEG - 1
          ELSE
             C_B_HI = DBLE (B_IN)
             C_B_LO = DBLE (B_IN)
@@ -341,7 +378,7 @@
             C_ETA_TEL_LO = 0.0001D0
             FIT (1) = 0.7D0
 
-            NDEG = NDEG + 1
+            NDEG = NDEG - 1
          ELSE
             C_ETA_TEL_HI = DBLE (ETA_TEL_IN)
             C_ETA_TEL_LO = DBLE (ETA_TEL_IN)
@@ -398,9 +435,98 @@
          B_FIT = REAL (FIT(2))
          TAUZ_FIT = REAL (FIT(3))
 
-*  output results
 
-         REXISQ = REAL(XISQ) / REAL(NDEG) ! Reduce chi sq
+******************** - Nick Tothill - Adding error determination
+
+*     First make sure that we have a good fit before trying this
+
+         IF (QUALITY .NE. 0) THEN
+
+            B_ERROR = VAL__BADR
+            TAU_ERROR = VAL__BADR
+            ETA_ERROR = VAL__BADR
+            SIGMA = VAL__BADD
+
+         ELSE
+
+* Now we have a fit, we can calculate the error on the 
+* tau estimate -NFHT
+
+* First we need a more realistic estimate of the data variance
+
+            CALL SCULIB_SKYDIP_VAR(VAR, N_MEASUREMENTS, FIT,
+     :           NDEG, STATUS)
+
+*  Calculate the std deviation of the scatter about the fit
+
+            SIGMA = SQRT(VAR)
+
+*  Dump the original variance values from the common block data array
+*  into a storage array. Replace them with the newly calculated variance
+
+            DO I=1,N_MEASUREMENTS
+
+               OLDVAR(I) = C_J_VARIANCE(I)
+               C_J_VARIANCE(I) = VAR
+
+            END DO
+
+*  Call subroutine to produce error matrix, and to find chi-squared
+*  wrt new variance. Otherwise, error values are derived from last
+*  returned inverted-alpha matrix
+
+            LAMBDA = 0
+
+            CALL SCULIB_FIT_FUNCTION (SCULIB_SKYDIP_XISQ, XICUT,
+     :           3, FIT, LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
+
+            CALL SCULIB_SKYDIP_XISQ (CHISQ, 3, FIT, STATUS)
+
+            ETA_ERROR = SQRT(ABS(ALPHA(1,1)))
+            B_ERROR = SQRT(ABS(ALPHA(2,2)))
+            TAU_ERROR = SQRT(ABS(ALPHA(3,3)))
+
+            IF (ALPHA(1,1) .LT. 0) THEN
+               CALL MSG_OUTIF (MSG__QUIET,' ', 
+     :              'WARNING: The variance of eta_tel '//
+     :              'is negative. Caution is advised.', STATUS)
+            END IF
+
+            IF (ALPHA(2,2) .LT. 0) THEN
+               CALL MSG_OUTIF (MSG__QUIET,' ', 
+     :              'WARNING: The variance of b '//
+     :              'is negative. Caution is advised.', STATUS)
+            END IF
+
+            IF (ALPHA(3,3) .LT. 0) THEN
+               CALL MSG_OUTIF (MSG__QUIET, ' ', 
+     :              'WARNING: The variance of tau '//
+     :              'is negative. Caution is advised.', STATUS)
+            END IF
+
+            REDCHISQ = CHISQ / REAL(NDEG)
+
+*     Restore the common block data array to its original form - 
+*     replace the variances with the old variance values out of the 
+*     storage array
+
+            DO I=1,N_MEASUREMENTS
+
+               C_J_VARIANCE(I) = OLDVAR(I)
+
+            END DO
+
+         END IF
+
+*************** End error determination *******************
+
+*  output results
+*  include errors, and output reduced chi-sq with respect to
+*  updated variance - NFHT
+
+*         REXISQ = REAL(XISQ) / REAL(NDEG) ! Reduce chi sq
+
+         REXISQ = REDCHISQ
 
          IF (QUALITY .NE. 0) THEN
             CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
@@ -411,25 +537,37 @@
      :        'for filter = ^FILT and sub-instrument ^SUB', STATUS)
             CALL ERR_REP (' ', ' - last fit values were:-', STATUS)
 
-            WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
-     :           REXISQ, ITERATION
+            WRITE (BUFFER, 20) ETA_TEL_FIT, ETA_ERROR, B_FIT, 
+     :           B_ERROR, TAUZ_FIT, TAU_ERROR, REXISQ, ITERATION
 
             CALL MSG_SETC ('BUFFER', BUFFER)
             CALL ERR_REP (' ', ' ^BUFFER', STATUS)
          ELSE
+
             CALL MSG_SETC ('FILT', SUB_FILTER)
             CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
 
-            CALL MSG_OUT (' ', 'SCULIB: fit for filter '//
+            CALL MSG_OUTIF (MSG__NORM,' ', 'SCULIB: fit for filter '//
      :           '^FILT and sub-instrument ^SUB', STATUS)
 
-            WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
-     :           REXISQ, ITERATION
- 20         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
-     :           '  tau = ', F7.3, '  X= ', F7.1, '  N= ', I4)
+* modified to output errors, and 
+
+            WRITE (BUFFER, 20) ETA_TEL_FIT, ETA_ERROR, B_FIT,
+     :           B_ERROR, TAUZ_FIT, TAU_ERROR
+ 20         FORMAT ('eta = ', F5.2, ' +/- ', F5.2,
+     :           '  b = ', F5.2, ' +/- ', F5.2,
+     :           '  tau = ', F7.3, ' +/- ', F5.3)
+
+            WRITE (SIGBUFFER, 30) SIGMA, REDCHISQ, ITERATION
+ 30         FORMAT ('Standard Deviation of fit residual = ', 
+     :           F6.2, ' K (X= ',F7.1, ' N= ',I4,')')
 
             CALL MSG_SETC ('BUFFER', BUFFER)
-            CALL MSG_OUT (' ', ' ^BUFFER', STATUS)
+            CALL MSG_OUTIF (MSG__NORM,' ', ' ^BUFFER', STATUS)
+
+            CALL MSG_SETC ('SIGBUFFER', SIGBUFFER)
+            CALL MSG_OUTIF (MSG__NORM,' ', ' ^SIGBUFFER', STATUS)
+
          END IF
       END IF
 
