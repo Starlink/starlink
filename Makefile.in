@@ -82,13 +82,31 @@ all: $(ALL_TARGETS)
 # configured yet); we must not fail in this case, nor may we attempt
 # to make GenerateDependencies.class.  In this case simply do nothing,
 # because the Makefile.dependencies file can be assumed to be up-to-date.
+#
+# We must also test whether the java/Makefile exists.  If not, it's
+# because buildsupport/starconf hasn't been configured (yet), so there
+# isn't yet a Makefile which would make GenerateDependencies.class for
+# us.
+#
+# If we can't do the work in this target, then simply touch
+# Makefile.dependencies to make it newer than componentset.xml.  If
+# this is out-of-date, then it's very probably just because, being
+# alphabetically earlier than componentset.xml, Makefile.dependencies
+# was CVS-updated before componentset.xml, so the remaking is
+# spurious.  When adding a new component, the documented procedure is
+# to delete componentset.xml and then remake Makefile.dependencies, so
+# that this makefile rule is purely to sequence the two actions.  It
+# might make more sense, therefore, to amalgamate these two rules into
+# one
 Makefile.dependencies: componentset.xml
-	if test -n "$(JAVA)"; then \
+	if test -n "$(JAVA)" -a -f buildsupport/starconf/java/Makefile; then \
 	    (cd buildsupport/starconf/java \
 	        && $(MAKE) GenerateDependencies.class) \
 	    && $(JAVA) -classpath buildsupport/starconf/java \
 		GenerateDependencies componentset.xml >$@; \
-	else :; fi
+	else \
+	    touch Makefile.dependencies; \
+	fi
 
 # Make a componentset.xml by concatenating all the component.xml files
 # we can find.  Sort the list of files to make the order
@@ -98,7 +116,7 @@ Makefile.dependencies: componentset.xml
 # componentset.xml `really' depends on all the component.xml files
 # below it, but don't state this, for the reason explained above
 # Makefile.dependencies.  If you add a component, then delete
-# componentset.xml here and remake it.
+# componentset.xml here and remake Makefile.dependencies.
 componentset.xml: componentinfo.dtd
 	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
 	echo '<componentset>' >>$@
