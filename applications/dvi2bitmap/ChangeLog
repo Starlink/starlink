@@ -1,7 +1,21 @@
+2003-08-21  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* Bitmap.cc Corrected scaleDown method: was working only for
+	bpp=1.  That meant that the scaling stopped working, and you got
+	heavily pixellated characters for all bitmaps after the first.
+
+2003-08-12  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* DviFile.cc getEndOfPage corrected; would have failed
+	(never-ending loop, I think) if called after the last page.  eof()
+	also corrected, so that it now returns true if the scanning of the
+	DVI file has reached the postamble
+	
 2003-08-11  Norman Gray  <norman@astro.gla.ac.uk>
 
-	* PipeStream.cc Finally (?) debugged. Version 0.11b1 released
-	* all Substantial additions to documentation
+	* PipeStream.cc Finally (?) debugged.
+	* all Substantial additions to documentation.  Version 0.11b1
+	released
 
 2003-08-03  Norman Gray  <norman@astro.gla.ac.uk>
 
