@@ -33,18 +33,18 @@
 *     ETA_TEL = _REAL (Read)
 *        The telescope efficiency. Must be between 0 and 1.0. 
 *        A negative value allows this parameter to be free.
-*     MODEL_OUT = NDF (Write)
+*     MODEL_OUT = _CHAR (Write)
 *        The name of the output file that contains the fitted sky
 *        temperatures.
-*     OUT = NDF (Write)
+*     OUT = _CHAR (Write)
 *        The name of the output file that contains the measured 
 *        sky temperatures.
 *     SUB_INSTRUMENT = _CHAR (Read)
 *        The name of the sub-instrument whose data are to be
 *        selected from the input file and fitted. Permitted 
-*        values are SHORT, LONG, P1100, P1300 and P2000
+*        values are SHORT, LONG, P1100, P1350 and P2000
 *     T_COLD = _REAL (Read)
-*        Temperature of the cold load. The default value is the one
+*        Temperature of the cold load. The default value is
 *        taken from the input file.
 
 *  Algorithm:
@@ -61,7 +61,7 @@
 *     The AIRMASS steps are then calculated and fitting paramters requested.
 *     Now loop over each measurement, find the data (with SCULIB_FIND_SWITCH),
 *     Select a part of the input data (with SKYDIP_GET_SLICE) and then convert
-*     to a sky temperature with SCULIB_SKYDIP_TEMPERATURES.
+*     to a sky temperature with CULIB_SKYDIP_TEMPERATURES.
 *
 *     The data is then fitted with SCULIB_FIT_SKYDIP. Both the measured and 
 *     model data are then written to NDFs for plotting in KAPPA-LINPLOT. (The
@@ -73,6 +73,11 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.9  1997/04/03 20:13:31  timj
+*     Add SCULIB_GET_SUB_INST and SCULIB_GET_DEM_PNTR.
+*     Write both output files inside a loop to reduce amount of repeating code.
+*     Add PKG and TASK names for MSG_OUT.
+*
 *     Revision 1.8  1997/03/07 02:33:30  timj
 *     Add support for PAR__NULL.
 *     Add support for START_EL and END_EL.
@@ -141,6 +146,9 @@ c
       PARAMETER (N_MODEL = 100)
       INTEGER N_TEMP                    ! Number of temp measurements(SKY,COLD,AMB)
       PARAMETER (N_TEMP = 3)
+      CHARACTER * 8 TSKNAME             ! Name of task
+      PARAMETER (TSKNAME = 'SKYDIP')
+
 *    Local variables :
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
       REAL    AIRMASS(SCUBA__MAX_INT)   ! Array of AIRMASS data
@@ -148,28 +156,32 @@ c
       REAL    AIRMASS_END               ! End airmass
       REAL    AIRMASS_VAR(SCUBA__MAX_INT)! Array of AIRMASS variance
       REAL    AIRSTEP                   ! AIRMASS increment for DO loop
+      INTEGER AREF                      ! Pointer to axis data
       REAL    B                         ! requested B
+      LOGICAL BADPIX                    ! are there bad pixels
       REAL    B_FIT                     ! B parameter
       CHARACTER*20 BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! bolometer types
+      REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                        ! dU3 Nasmyth coord of bolometers
+      REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                        ! dU4 Nasmyth coord of bolometers
       INTEGER DIM (MAXDIM)              ! the dimensions of an array
-      INTEGER DIMX (MAXDIM)             ! expected dimensions of an array
+      INTEGER DREF                      ! Pointer to output data
       REAL    EL                        ! Elevation in radians used for loop
       REAL    END_EL                    ! End elevation of skydip
       REAL    ETA_TEL                   ! Telescope efficiency
       REAL    ETA_TEL_FIT               ! Fitted eta_tel
       INTEGER EXP_END                   ! end index of data for an exposure
       INTEGER EXP_START                 ! start index of data for an exposure
+      INTEGER FILE                      ! File counter in DO loop
       CHARACTER*15 FILT                 ! Selected filter
       LOGICAL FITFAIL                   ! Status of the Model fit
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
       INTEGER I                         ! DO loop index
-      INTEGER IARY1                     ! ARY array identifier
       INTEGER IERR                      ! For VEC_
-      CHARACTER*15 INST                 ! Selected instrument
-      INTEGER IPOSN                     ! posn in string
       INTEGER ITEMP                     ! scratch integer
       INTEGER IN_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
@@ -179,7 +191,6 @@ c
                                         ! measured in input file
       INTEGER IN_DEM_PNTR_PTR           ! pointer to input .SCUBA.DEM_PNTR array
       INTEGER IN_DATA_PTR               ! pointer to data array of input file
-      CHARACTER*(DAT__SZLOC) IN_LOC     ! locator to item in input file
       INTEGER IN_NDF                    ! NDF identifier of input file
       INTEGER IN_POINTER (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! array connecting output bolometer
@@ -200,12 +211,14 @@ c
       BYTE J_SKY_AV_QUALITY (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! quality of j_sky average
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
+      CHARACTER * 15 LABEL              ! File label
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
       INTEGER MEASUREMENT               ! measurement index in DO loop
-      INTEGER MOD_NDF                   ! NDF identifier of output file
       INTEGER NDIM                      ! the number of dimensions in an array
       INTEGER NERR                      ! For VEC_
+      INTEGER NFILES                    ! Number of output files
+      INTEGER NPTS                      ! Number of output data points
       INTEGER NREC                      ! number of history records in file
       INTEGER N_BOLS                    ! number of bolometers measured
       INTEGER N_BOL_OUT                 ! number of bolometers measured in
@@ -220,7 +233,6 @@ c
       INTEGER N_SWITCHES                ! number of switches per exposure
       CHARACTER*15 OBSERVING_MODE       ! type of observation
       INTEGER OUT_AXIS_PTR              ! pointer to axis of observed output file
-      INTEGER OUT_AXIS_PTR_M            ! pointer to axis of model output file
       INTEGER OUT_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers in output
                                         ! file
@@ -228,36 +240,35 @@ c
                                         ! channel numbers of bolometers in
                                         ! output file
       INTEGER OUT_DATA_PTR              ! pointer to data array of output file
-      INTEGER OUT_DATA_PTR_M            ! pointer to data array of output file(MODEL)
+      CHARACTER *80 OUT_NAME            ! Name of output NDF
       INTEGER OUT_NDF                   ! NDF identifier of output file
       INTEGER OUT_QUAL_PTR               ! pointer to quality array of output file
       INTEGER OUT_VAR_PTR               ! pointer to variance array of output file
+      CHARACTER * 15 PARAM              ! Name of output file parameter
+      INTEGER PLACE                     ! A placeholder
       INTEGER RUN_NUMBER                ! run number of observation
       LOGICAL SKYDIP                    ! .TRUE. if not RAW data
       INTEGER SLICE_PTR                 ! Pointer to start of slice
       INTEGER SLICE_PTR_END             ! Pointer to end of slice
       CHARACTER*80 STEMP                ! scratch string
       REAL    START_EL                  ! Start elevation of skydip
-      CHARACTER*40 SUBLIST              ! List of available sub instruments
-      CHARACTER*15 SUB_FILTER (SCUBA__MAX_SUB)
-                                        ! filters in front of sub-instruments
-      CHARACTER*15 SUB_INSTRUMENT (SCUBA__MAX_SUB)
-                                        ! sub-instruments used
+      CHARACTER * 15 SUB_INST           ! Name of selected SUB instrument
       INTEGER SUB_POINTER               ! index of SUB_REQUIRED in sub-
                                         ! instruments observed
-      CHARACTER*15 SUB_REQUIRED     ! sub-instrument required for reduction
-      REAL    SUB_WAVE (SCUBA__MAX_SUB) ! wavelengths of observation
+      REAL    SWAVE(SCUBA__MAX_SUB)     ! Dummy SUB_WAVE array
+      CHARACTER*15 SSUB(SCUBA__MAX_SUB) ! Dummy SUB_INST array
+      REAL    STCOLD(SCUBA__MAX_SUB)    ! Dummy T_COLD array
       INTEGER SWITCHES                  ! number of switches implied by SWITCH_MODE
       CHARACTER*15 SWITCH_MODE          ! switch mode used
       REAL    TAUZ_FIT                  ! Fitted TAU
       REAL    T_ASK                     ! Given T_COLD
       REAL    T_AMB                     ! Temperature of ambient load
-      REAL    T_COLD (SCUBA__MAX_SUB)   ! Temperature of cold load
+      REAL    T_COLD                    ! Temperature of cold load
       REAL    T_HOT                     ! Hot load
       REAL    T_TEL                     ! Temperature of telescope
       INTEGER UBND (MAXDIM)             ! upper bounds of array
       REAL    WAVE                      ! Selectred wavelength
-      CHARACTER*(DAT__SZLOC) XLOC       ! Locator to EXTENSIONS
+      CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to EXTENSIONS
 
 *.
 
@@ -276,7 +287,8 @@ c
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SKYDIP: input file '//
+            CALL MSG_SETC('TASK',TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
@@ -291,7 +303,8 @@ c
 
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE observation ',
+      CALL MSG_SETC ('PKG', PACKAGE)
+      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation ',
      :     STATUS)
 
 
@@ -319,7 +332,8 @@ c
          IF (SKYDIP) THEN
             IF (STATUS .EQ. SAI__OK) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_SKYDIP: SKYDIP '//
+               CALL MSG_SETC('TASK',TSKNAME)
+               CALL ERR_REP (' ', '^TASK: SKYDIP '//
      :           'has already been run on the input data', STATUS)
             END IF
          END IF
@@ -328,93 +342,13 @@ c
 
 *  find and report the sub instruments used and filters for this observation
  
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_SUBS',
-     :  N_SUB, STATUS)
- 
-      CALL MSG_OUT (' ', 'REDS: file contains data for the '//
-     :  'following sub-instrument(s)', STATUS)
- 
-      IF (N_SUB .GT. 0) THEN
-         STEMP = 'SUB_'
-         DO I = 1, N_SUB
-            ITEMP = 4
-            CALL CHR_PUTI (I, STEMP, ITEMP)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :        STEMP, SUB_INSTRUMENT(I), STATUS)
-            CALL CHR_UCASE (SUB_INSTRUMENT(I))
-         END DO
-         STEMP = 'FILT_'
-         DO I = 1, N_SUB
-            ITEMP = 5
-            CALL CHR_PUTI (I, STEMP, ITEMP)
-            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        STEMP, SUB_FILTER(I), STATUS)
-            CALL CHR_UCASE (SUB_FILTER(I))
-         END DO
-         STEMP = 'WAVE_'
-         DO I = 1, N_SUB
-            ITEMP = 5
-            CALL CHR_PUTI (I, STEMP, ITEMP)
-            CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        STEMP, SUB_WAVE(I), STATUS)
-         END DO
- 
-         DO I = 1, N_SUB
-            CALL MSG_SETC ('SUB', SUB_INSTRUMENT(I))
-            CALL MSG_SETC ('FILT', SUB_FILTER(I))
-            CALL MSG_OUT (' ', ' - ^SUB with filter ^FILT', STATUS)
-         END DO
-      END IF 
-
-*  get the sub-instrument of interest and check it's OK
- 
-      IF (N_SUB .EQ. 1) THEN
- 
-*  If we only have one wavelength we dont need to ask
- 
-         SUB_POINTER = 1
-         SUB_REQUIRED = SUB_INSTRUMENT(SUB_POINTER)
-      ELSE
-         SUB_POINTER = VAL__BADI
- 
-*  Put all possible answers in a string
- 
-         IF (N_SUB .GT. 0) THEN
-            SUBLIST = ''
-            IPOSN = 0
-            CALL CHR_APPND(SUB_INSTRUMENT(1), SUBLIST, IPOSN)
-            DO I = 2, N_SUB
-               CALL CHR_APPND(',',SUBLIST,IPOSN)
-               CALL CHR_APPND(SUB_INSTRUMENT(I), SUBLIST, IPOSN)
-            END DO
- 
-*  Ask for the sub array
- 
-            CALL PAR_CHOIC('SUB_INSTRUMENT', SUB_INSTRUMENT(1), SUBLIST,
-     :           .TRUE., SUB_REQUIRED, STATUS)
-            CALL CHR_UCASE (SUB_REQUIRED)
- 
-            DO I = 1, N_SUB
-               IF (SUB_REQUIRED .EQ. SUB_INSTRUMENT(I)) THEN
-                  SUB_POINTER =I 
-               END IF
-            END DO
-         END IF
-      END IF
-         
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (SUB_POINTER .EQ. VAL__BADI) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC ('SUB', SUB_REQUIRED)
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: the file does not '//
-     :        'contain data for sub-instrument ^SUB', STATUS)
-         END IF
-      END IF
+      CALL SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, 'SUB_INSTRUMENT',
+     :     N_SUB, SUB_POINTER, WAVE, SUB_INST, FILT, STATUS)
 
 * Add _DC suffix to data
 
-      ITEMP = CHR_LEN(SUB_REQUIRED)
-      CALL CHR_APPND('_DC',SUB_REQUIRED,ITEMP)
+      ITEMP = CHR_LEN(SUB_INST)
+      CALL CHR_APPND('_DC', SUB_INST, ITEMP)
 
 *  get the number of bolometers measured
 
@@ -424,79 +358,27 @@ c
 
 * Find the SCUBA extension
 
-      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', XLOC, STATUS)
+      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
 
-* Get the bolometer description arrays
+* Get the bolometer description arrays (NB BOL_DU3 and DU4 are not used)
 
-      CALL DAT_FIND (XLOC, 'BOL_TYPE', IN_LOC, STATUS)
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL DAT_GETNC (IN_LOC, NDIM, DIMX, BOL_TYPE, DIM, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
- 
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)                 .OR.
-     :       (DIM(1) .NE. SCUBA__NUM_CHAN) .OR.
-     :       (DIM(2) .NE. SCUBA__NUM_ADC)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_SKYDIP: .SCUBA.BOL_TYPE '//
-     :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
-         END IF
-      END IF
-
-
-
-* Find number of ADC
-
-      CALL DAT_FIND (XLOC, 'BOL_ADC', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  IN_BOL_ADC, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
- 
-      IF (ITEMP .NE. N_BOLS) THEN
-         IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SKYDIP: dimension of '//
-     :        '.SCUBA.BOL_ADC does not match main data array',
-     :        STATUS)
-         END IF
-      END IF
-
-
-
-* Get the bolometer channel numbers
-
-      CALL DAT_FIND (XLOC, 'BOL_CHAN', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  IN_BOL_CHAN, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
- 
-      IF (ITEMP .NE. N_BOLS) THEN
-         IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SKYDIP: dimension of '//
-     :        '.SCUBA.BOL_CHAN does not match main data array',
-     :        STATUS)
-         END IF
-      END IF
+      CALL SCULIB_GET_BOL_DESC(IN_SCUBAX_LOC, SCUBA__NUM_CHAN,
+     :     SCUBA__NUM_ADC, N_BOLS, BOL_TYPE, BOL_DU3,
+     :     BOL_DU4, IN_BOL_ADC, IN_BOL_CHAN, STATUS)
  
 *  find how many bolometers the input data has in the required sub-instrument
 *  and their ADC/channel numbers and positions in the array
  
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_CALC_SUB_BOLS (N_BOLS, IN_BOL_ADC, IN_BOL_CHAN,
-     :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_TYPE, SUB_REQUIRED,
+     :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_TYPE, SUB_INST,
      :     N_BOL_OUT, OUT_BOL_ADC, OUT_BOL_CHAN, IN_POINTER, STATUS)
       END IF
 
       IF (N_BOL_OUT .EQ. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SKYDIP: none of the '//
+            CALL ERR_REP (' ', '^TASK: none of the '//
      :        'measured bolometers belongs to the requested '//
      :        'sub-instrument', STATUS)
          END IF
@@ -521,7 +403,8 @@ c
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
             CALL MSG_SETI ('DIM3', DIM(3))
-            CALL ERR_REP (' ', 'REDS_SKYDIP: main data '//
+            CALL MSG_SETC ('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: main data '//
      :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2 ^DIM3',
      :        STATUS)
          END IF
@@ -529,81 +412,47 @@ c
 
       N_POS = DIM (3)
 
-
 *  map the DEM_PNTR array and check its dimensions
+ 
+      CALL SCULIB_GET_DEM_PNTR(4, IN_SCUBAX_LOC,
+     :     IN_DEM_PNTR_PTR, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_MEASUREMENTS, STATUS)
 
-      CALL ARY_FIND (XLOC, 'DEM_PNTR', IARY1, STATUS)
-      CALL ARY_DIM (IARY1, MAXDIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (IARY1, '_INTEGER', 'READ', IN_DEM_PNTR_PTR, ITEMP,
-     :  STATUS)
+      IF (N_MEASUREMENTS .LE. 1) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC('TASK', TSKNAME)
+         CALL ERR_REP (' ','^TASK: Not enough measurements for fit',
+     :        STATUS)
+      END IF
+
+
+*  check that the number of switches matches the SWITCH_MODE
 
       SWITCH_MODE = 'SKYDIP'  ! Skydip has no switch mode
       SWITCHES = 1            ! Skydip does not switch
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NDIM .NE. 4) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_SKYDIP: .SCUBA.DEM_PNTR '//
-     :        'array has bad number of dimensions', STATUS)
-         ELSE 
-            IF (DIM(1) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM1', DIM(1))
-               CALL ERR_REP (' ', 'REDS_SKYDIP: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'switches - ^DIM1', STATUS)
-            END IF
-            IF (DIM(2) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM2', DIM(2))
-               CALL ERR_REP (' ', 'REDS_SKYDIP: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'exposures - ^DIM2', STATUS) 
-            END IF
-            IF (DIM(3) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM3', DIM(3))
-               CALL ERR_REP (' ', 'REDS_SKYDIP: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'integrations - ^DIM3', STATUS)
-            END IF
-            IF (DIM(4) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM4', DIM(4))
-               CALL ERR_REP (' ', 'REDS_SKYDIP: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'measurements - ^DIM4', STATUS)
-            END IF
-         END IF
-      END IF
-
-*  check that the number of switches matches the SWITCH_MODE
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (DIM(1) .NE. SWITCHES) THEN
+         IF (N_SWITCHES .NE. SWITCHES) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC ('SWITCH_MODE', SWITCH_MODE)
-            CALL MSG_SETI ('N_S', DIM(1))
-            CALL ERR_REP (' ', 'SKYDIP: number '//
+            CALL MSG_SETI ('N_S', N_SWITCHES)
+            CALL MSG_SETC('TASK',TSKNAME)
+            CALL ERR_REP (' ', '^TASK: number '//
      :        'of switches in .SCUBA.DEM_PNTR (^N_S) does not '//
      :        'match SWITCH_MODE (^SWITCH_MODE)', STATUS)
          END IF
       END IF
 
-      N_SWITCHES = DIM (1)
-      N_EXPOSURES = DIM (2)
-      N_INTEGRATIONS = DIM (3)
-      N_MEASUREMENTS = DIM (4)
-
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
-
-      CALL MSG_OUT (' ', 'REDS: file contains data for '//
+      CALL MSG_SETC ('PKG', PACKAGE)
+      
+      CALL MSG_OUT (' ', '^PKG: file contains data for '//
      :  '^N_I integration(s) in ^N_M measurement(s)', STATUS)
 
 * Read in the elevation data from the FITS header
 * Read from START and END EL first
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'START_EL',START_EL, STATUS)
@@ -631,13 +480,17 @@ c
          EL = (REAL(PI)/2.0) - END_EL * DEG2RAD
          CALL SCULIB_AIRMASS (EL, AIRMASS_END, STATUS)
 
+         print *,'Start:End :: ',AIRMASS_START, AIRMASS_END
+
          AIRSTEP = (AIRMASS_END - AIRMASS_START) / 
      :        REAL(N_MEASUREMENTS - 1)
          DO I = 1, N_MEASUREMENTS
-            AIRMASS(I) = AIRMASS_START + AIRSTEP * REAL(I-1) 
+            AIRMASS(I) = AIRMASS_START + AIRSTEP * REAL(I-1)
+ 
 *  Calculate the variance Delta A = (TAN / SIN) Delta EL
-            EL = ASIN(1.0/AIRMASS(I))
-            AIRMASS_VAR(I) = ARCSEC * TAN(EL) / SIN(EL) ! 1 arcsec error in EL
+*     TAN = 1/SQRT((AIR-1)(AIR+1))
+            AIRMASS_VAR(I) = 2.0 * ARCSEC * AIRMASS(I) / ! 2 arcsec error
+     :           SQRT((AIRMASS(I)-1) * (AIRMASS(I)+1))
          END DO
       END IF
 
@@ -650,25 +503,24 @@ c
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'T_TEL',
      :  T_TEL, STATUS)
 
+      STEMP = 'T_COLD_'
+      ITEMP = 7
+      CALL CHR_PUTI(SUB_POINTER, STEMP, ITEMP)
 
-      DO I = 1, N_SUB         
-         STEMP = 'T_COLD_'
-         ITEMP = 7
-         CALL CHR_PUTI(I, STEMP, ITEMP)
-         CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        STEMP, T_COLD(I), STATUS)
-      END DO
+      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, STEMP,
+     :  T_COLD, STATUS)
 
 * Get all the fitting parameters
 
-
-      CALL PAR_DEF0R('T_COLD', T_COLD(SUB_POINTER), STATUS)
+      CALL PAR_DEF0R('T_COLD', T_COLD, STATUS)
       CALL PAR_GET0R ('T_COLD', T_ASK, STATUS )
 
-      IF (T_ASK.NE. T_COLD(SUB_POINTER)) THEN
+      IF (T_ASK.NE. T_COLD) THEN
          CALL MSG_SETR ('T_COLD', T_COLD)
-         CALL MSG_OUT(' ', 'Redefining T_COLD from ^T_COLD', STATUS)
-         T_COLD(SUB_POINTER) = T_ASK
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUT(' ', '^PKG: Redefining T_COLD from ^T_COLD', 
+     :        STATUS)
+         T_COLD = T_ASK
       ENDIF
 
       CALL PAR_GET0R ('ETA_TEL', ETA_TEL, STATUS )
@@ -678,6 +530,20 @@ c
 
       CALL SCULIB_MALLOC (N_TEMP * N_BOLS * N_INTEGRATIONS * VAL__NBR, 
      :     SLICE_PTR, SLICE_PTR_END)
+
+* This is a kludge for sculib_skydip_temperatures
+      DO I = 1, N_SUB
+         IF (I .EQ. SUB_POINTER) THEN
+            SWAVE(I) = WAVE
+            SSUB(I)  = SUB_INST
+            STCOLD(I) = T_COLD
+         ELSE
+            SWAVE(I) = 1.0
+            SSUB(I) = 'NONE'
+            STCOLD(I) = 1.0
+         END IF
+      END DO
+
 
 * Now we can read in the data and average it all together
 
@@ -699,251 +565,191 @@ c
      :        EXP_START, EXP_END, N_SAMP_IN, N_POS, %VAL(SLICE_PTR),
      :        STATUS)
 
-
-         CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT, 
-     :        N_SUB, SUB_INSTRUMENT, SUB_WAVE, SCUBA__NUM_CHAN,
-     :        SCUBA__NUM_ADC, BOL_TYPE, N_BOLS, IN_BOL_CHAN, IN_BOL_ADC,
-     :        N_SAMP_IN, %VAL(SLICE_PTR),
+         CALL SCULIB_SKYDIP_TEMPERATURES(STCOLD, T_HOT, 
+     :        N_SUB, SSUB, SWAVE, SCUBA__NUM_CHAN,
+     :        SCUBA__NUM_ADC, BOL_TYPE, N_BOLS, 
+     :        IN_BOL_CHAN, IN_BOL_ADC, N_SAMP_IN, %VAL(SLICE_PTR),
      :        N_INTEGRATIONS, J_SKY, J_SKY_VARIANCE, 
      :        J_SKY_QUALITY, J_SKY_AV,
      :        J_SKY_AV_VARIANCE, J_SKY_AV_QUALITY, STATUS)
 
 * Extract the info for the bolometer we want
 
-            JSKY(MEASUREMENT) = J_SKY_AV(IN_POINTER(1))
-            JSKY_VAR(MEASUREMENT) = J_SKY_AV_VARIANCE(IN_POINTER(1))
-            JSKY_QUAL(MEASUREMENT) = J_SKY_AV_QUALITY(IN_POINTER(1))
+         JSKY(MEASUREMENT) = J_SKY_AV(IN_POINTER(1))
+         JSKY_VAR(MEASUREMENT) = J_SKY_AV_VARIANCE(IN_POINTER(1))
+         JSKY_QUAL(MEASUREMENT) = J_SKY_AV_QUALITY(IN_POINTER(1))
 
 
       END DO
 
-*      PRINT *, '    N  AIRMASS  JSKY   VARIANCE'
-*      DO MEASUREMENT = 1, N_MEASUREMENTS
-* Print out input data
-*         PRINT *,MEASUREMENT,AIRMASS(MEASUREMENT),'+/-', 
-*     :        AIRMASS_VAR(MEASUREMENT),
-*     :        JSKY(MEASUREMENT), '+/-', JSKY_VAR(MEASUREMENT)
-*      END DO
+*     Have now finished with input data
+
+      CALL SCULIB_FREE ('SLICE' , SLICE_PTR, SLICE_PTR_END, STATUS)
+      CALL CMP_UNMAP(IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
+      CALL DAT_ANNUL(IN_SCUBAX_LOC, STATUS)
+      CALL NDF_ANNUL (IN_NDF, STATUS)
 
 * Send to fit skydip
 
-      WAVE = SUB_WAVE(SUB_POINTER)
-      INST = SUB_INSTRUMENT(SUB_POINTER)
-      FILT = SUB_FILTER(SUB_POINTER)
-
-      CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, JSKY, JSKY_VAR,
-     :     WAVE, INST, FILT, T_TEL, T_AMB, ETA_TEL, B, ETA_TEL_FIT,
-     :     B_FIT, TAUZ_FIT, STATUS)
-
       IF (STATUS .EQ. SAI__OK) THEN
-         FITFAIL = .FALSE.
-      ELSE
-         STATUS = SAI__OK
-         FITFAIL = .TRUE.
-      ENDIF
+         CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, JSKY,JSKY_VAR,
+     :        WAVE, SUB_INST, FILT, T_TEL, T_AMB, ETA_TEL,B,ETA_TEL_FIT,
+     :        B_FIT, TAUZ_FIT, STATUS)
 
-* DATA has now been fitted. Write DATA and MODEL
-
-*  now open the output NDF, propagating it from the input file
- 
-      CALL NDF_PROP (IN_NDF, 'NOEXTENSION(SCUCD,SCUBA) ', 'OUT',
-     :     OUT_NDF, STATUS)
-
-* dont bother if a NULL has been returned
-
-      IF (STATUS .EQ. PAR__NULL) THEN
-         CALL ERR_ANNUL(STATUS)   ! Reset NULL
-      ELSE
-* Create a REDS extension to store the FIT parameters
-         CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
-     :        LOC1, STATUS)
-         CALL DAT_ANNUL (LOC1, STATUS)
-
-* Store fit parameters
-
-         CALL NDF_XPT0C(INST, OUT_NDF, 'REDS', 'SUB_INSTRUMENT', STATUS)
-         CALL NDF_XPT0C(FILT, OUT_NDF, 'REDS', 'FILTER', STATUS)
-         CALL NDF_XPT0R(WAVE, OUT_NDF, 'REDS', 'WAVELENGTH', STATUS)
-         CALL NDF_XPT0R(T_COLD(SUB_POINTER), OUT_NDF, 'REDS', 'T_COLD', 
-     :        STATUS)
-
-*  create a history component in the output file
-
-         CALL NDF_HCRE (OUT_NDF, STATUS)
-
-* Title of DATASET
-         CALL NDF_CPUT ('Skydip',OUT_NDF,'TITLE',STATUS)
-
-* Data label
-         CALL NDF_CPUT ('Jsky (measured)', OUT_NDF, 'LABEL',STATUS)
-
-* Data unit
-         CALL NDF_CPUT ('K', OUT_NDF, 'UNITS', STATUS)
-
-* Set-up the DATA array
-
-         NDIM = 1
-         LBND (1) = 1
-         UBND (1) = N_MEASUREMENTS
-
-* Set new bounds of data array
-         CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
-
-* Turn off automatic quality masking (just to make sure)
-         CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
-
-*  Map the data
-         CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
-     :        OUT_DATA_PTR, ITEMP, STATUS)
-
-         CALL VEC_RTOR(.FALSE., UBND(1),JSKY, %VAL(OUT_DATA_PTR),
-     :        IERR, NERR, STATUS)
-
-* Write VARIANCE
-
-         CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
-     :        OUT_VAR_PTR, ITEMP, STATUS)
-         
-         CALL VEC_RTOR(.FALSE., UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR),
-     :        IERR, NERR, STATUS)
-
-* Write QUALITY
-
-         CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :        OUT_QUAL_PTR, ITEMP, STATUS)
-         CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
-         
-         CALL VEC_BTOB(.FALSE.,UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR),
-     :        IERR, NERR, STATUS)
-
-* Create the AXES
-
-         CALL NDF_ACRE(OUT_NDF, STATUS)
-
-* Label everything
-
-         CALL NDF_ACPUT('AIRMASS',OUT_NDF,'LABEL',1,STATUS)
-
-* Write AXES data points
-
-         CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
-     :        OUT_AXIS_PTR, UBND(1), STATUS)
-         
-         CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR),
-     :        IERR, NERR, STATUS)
-
-* Write the AXIS variance (probably pretty inaccurate)
-         CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
-     :        OUT_AXIS_PTR, UBND(1), STATUS)
-
-         CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR,%VAL(OUT_AXIS_PTR),
-     :        IERR, NERR, STATUS)
-
-         CALL NDF_ANNUL (OUT_NDF, STATUS)
-
-      ENDIF
-
-
-* If FIT worked...
-
-      IF (.NOT.FITFAIL) THEN
-
-**** Now calculate the model and write out to another NDF *****
-
-*  now open the output NDF, propagating it from the input file
- 
-         CALL NDF_PROP (IN_NDF, 'NOEXTENSION(SCUCD,SCUBA) ','MODEL_OUT',
-     :        MOD_NDF, STATUS)
-
-* Only write out if required
-         IF (STATUS .EQ. PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            FITFAIL = .FALSE.
+            NFILES = 2
          ELSE
+            STATUS = SAI__OK
+            FITFAIL = .TRUE.
+            NFILES =1
+         ENDIF
+      END IF
 
-* Calculate model values
+*     Now create output files
+*     Only create model if we fitted okay
+      DO FILE = 1, NFILES
+
+*     Setup bits that are DIFFERENT between model and data
+
+         IF (FILE .EQ. 1) THEN
+*     Data parameters
+            PARAM = 'OUT'
+            NPTS = N_MEASUREMENTS
+            LABEL = 'Jsky'
+            BADPIX = .TRUE.
+            DREF = LOC(JSKY)
+            AREF = LOC(AIRMASS)
+
+         ELSE
+*     Model parameters and create
+            PARAM = 'MODEL_OUT'
+            NPTS = N_MODEL
+            LABEL = 'Jsky (Model)'
+            BADPIX = .FALSE.
+            DREF = LOC(J_THEORETICAL)   ! Reference to data
+            AREF = LOC(AIR_MODEL)       ! Reference to axis
+
             AIRSTEP = (AIRMASS(N_MEASUREMENTS) - AIRMASS(1)) /
      :           (N_MODEL - 1)
-               print *,AIRSTEP, AIRMASS(1), AIRMASS(N_MEASUREMENTS),
-     :           STATUS
+
             DO I = 1, N_MODEL
                AIR_MODEL(I) = AIRMASS(1) + AIRSTEP * (I - 1)
                CALL SCULIB_J_THEORETICAL (TAUZ_FIT, AIR_MODEL(I), T_TEL,
      :              T_AMB, WAVE, ETA_TEL_FIT, B_FIT, J_THEORETICAL(I),
      :              STATUS)
-               print *,AIR_MODEL(I), J_THEORETICAL(I)
             END DO
 
+         END IF
+
+*     Find out the name of the output file
+         CALL PAR_GET0C(PARAM, OUT_NAME, STATUS)
+ 
+*     Only write out if required
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+         ELSE
+
+*  now open the output NDF
+            NDIM = 1
+            LBND (1) = 1
+            UBND (1) = NPTS
+         
+            CALL NDF_PLACE(DAT__ROOT, OUT_NAME, PLACE, STATUS)
+            CALL NDF_NEW('_REAL',NDIM, LBND, UBND, PLACE, OUT_NDF, 
+     :           STATUS)
+
+* probably should store the FITS header
+
+            CALL NDF_XNEW(OUT_NDF, 'FITS','_CHAR*80', 1, N_FITS, LOC1,
+     :           STATUS)
+            CALL DAT_PUT1C(LOC1, N_FITS, FITS, STATUS)
+            CALL DAT_ANNUL(LOC1, STATUS)
 
 * Create a REDS extension to store the FIT parameters
-            CALL NDF_XNEW (MOD_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
+            CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
      :           LOC1, STATUS)
             CALL DAT_ANNUL (LOC1, STATUS)
 
 * Store fit parameters
-            CALL NDF_XPT0C(INST, MOD_NDF, 'REDS', 'SUB_INSTRUMENT',
+
+            CALL NDF_XPT0C(SUB_INST, OUT_NDF, 'REDS', 'SUB_INSTRUMENT', 
      :           STATUS)
-            CALL NDF_XPT0C(FILT, MOD_NDF, 'REDS', 'FILTER', STATUS)
-            CALL NDF_XPT0R(WAVE, MOD_NDF, 'REDS', 'WAVELENGTH', STATUS)
-            CALL NDF_XPT0R(T_COLD(SUB_POINTER), MOD_NDF,'REDS','T_COLD',
+            CALL NDF_XPT0C(FILT, OUT_NDF, 'REDS', 'FILTER', STATUS)
+            CALL NDF_XPT0R(WAVE, OUT_NDF, 'REDS', 'WAVELENGTH', STATUS)
+            CALL NDF_XPT0R(T_COLD, OUT_NDF,'REDS','T_COLD', 
      :           STATUS)
-            CALL NDF_XPT0R(ETA_TEL_FIT, MOD_NDF, 'REDS', 'ETA_TEL',
-     :           STATUS)
-            CALL NDF_XPT0R(B_FIT, MOD_NDF, 'REDS', 'B_FIT', STATUS)
-            CALL NDF_XPT0R(TAUZ_FIT, MOD_NDF, 'REDS', 'TAU_Z', STATUS)
+
+            IF (FILE .EQ. 2) THEN
+               CALL NDF_XPT0R(ETA_TEL_FIT, OUT_NDF, 'REDS', 'ETA_TEL',
+     :              STATUS)
+               CALL NDF_XPT0R(B_FIT, OUT_NDF, 'REDS', 'B_FIT', STATUS)
+               CALL NDF_XPT0R(TAUZ_FIT, OUT_NDF, 'REDS', 'TAU_Z',STATUS)
+            END IF
 
 *  create a history component in the output file
+            CALL NDF_HCRE (OUT_NDF, STATUS)
 
-            CALL NDF_HCRE (MOD_NDF, STATUS)
+*     Title, label and units
+            CALL NDF_CPUT ('Skydip', OUT_NDF,'TITLE',STATUS)
+            CALL NDF_CPUT (LABEL, OUT_NDF,'LABEL',STATUS)
+            CALL NDF_CPUT ('K', OUT_NDF, 'UNITS', STATUS)
 
-* Title of DATASET
-            CALL NDF_CPUT ('Skydip',MOD_NDF,'TITLE',STATUS)
-*     Data label
-            CALL NDF_CPUT ('Jsky (Theoretical)', MOD_NDF,'LABEL',STATUS)
-* Data unit
-            CALL NDF_CPUT ('K', MOD_NDF, 'UNITS', STATUS)
+* Create and label the AXES
+            CALL NDF_ACRE(OUT_NDF, STATUS)
+            CALL NDF_ACPUT('AIRMASS',OUT_NDF,'LABEL',1,STATUS)
 
+*     Map the data
+            CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
+     :           OUT_DATA_PTR, ITEMP, STATUS)
 
-* Set-up the DATA array
+            CALL VEC_RTOR(.FALSE.,UBND(1), %VAL(DREF),
+     :           %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
 
-            NDIM = 1
-            LBND (1) = 1
-            UBND (1) = N_MODEL
+*     Only data has VARIANCE and QUALITY
+            IF (FILE .EQ. 1) THEN
+               CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
+     :              OUT_VAR_PTR, ITEMP, STATUS)
+         
+               CALL VEC_RTOR(.FALSE., UBND(1), JSKY_VAR, 
+     :              %VAL(OUT_VAR_PTR), IERR, NERR, STATUS)
 
-* Set new bounds of data array
-            CALL NDF_SBND (NDIM, LBND, UBND, MOD_NDF, STATUS)
+               CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :              OUT_QUAL_PTR, ITEMP, STATUS)
+               CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
+         
+               CALL VEC_UBTOUB(.FALSE., UBND(1), JSKY_QUAL,
+     :              %VAL(OUT_QUAL_PTR), IERR, NERR, STATUS)
+            END IF
 
-*  Map the data
-            CALL NDF_MAP (MOD_NDF, 'DATA', '_REAL', 'WRITE',
-     :           OUT_DATA_PTR_M, ITEMP, STATUS)
+*     Map the Axes
+            CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
+     :           OUT_AXIS_PTR, UBND(1), STATUS)
 
-            CALL VEC_RTOR(.FALSE.,UBND(1),J_THEORETICAL, 
-     :           %VAL(OUT_DATA_PTR_M), IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE., UBND(1), %VAL(AREF),
+     :           %VAL(OUT_AXIS_PTR), IERR, NERR, STATUS)
 
-* Set the BAD pixel flag
-            CALL NDF_SBAD(.FALSE., MOD_NDF, 'Data', STATUS)
+* if data then write the AXIS variance (probably pretty inaccurate)
+            IF (FILE .EQ. 1) THEN
+               
+               CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
+     :              OUT_AXIS_PTR, UBND(1), STATUS)
 
-* Create the AXES
-            CALL NDF_ACRE(MOD_NDF, STATUS)
-* Label everything
-            CALL NDF_ACPUT('AIRMASS',MOD_NDF,'LABEL',1,STATUS)
-* Write AXES data points
-            CALL NDF_AMAP (MOD_NDF, 'Centre', 1, '_REAL', 'WRITE',
-     :           OUT_AXIS_PTR_M, UBND(1), STATUS)
+               CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR,
+     :              %VAL(OUT_AXIS_PTR), IERR, NERR, STATUS)
+            END IF
+         
+*     Set the bad pixel flag
+            CALL NDF_SBAD(BADPIX, OUT_NDF, 'Data', STATUS)
 
-            CALL VEC_RTOR(.FALSE., UBND(1), AIR_MODEL, 
-     :           %VAL(OUT_AXIS_PTR_M), IERR, NERR, STATUS)
+*     Tidy up
+            CALL NDF_ANNUL(OUT_NDF, STATUS)
 
-*   Tidy up
-            CALL NDF_ANNUL (MOD_NDF, STATUS)
          ENDIF
 
-      ENDIF
+      END DO
 
-* Finish up
-
-      CALL SCULIB_FREE ('SLICE' , SLICE_PTR, SLICE_PTR_END, STATUS )
-
-      CALL NDF_ANNUL (IN_NDF, STATUS)
+* Shut down the NDF system
 
       CALL NDF_END (STATUS)
 
