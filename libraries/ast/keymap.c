@@ -70,6 +70,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        Original version.
 *     5-JAN-2005 (DSB):
 *        Added astMapLenC method.
+*     17-JAN-2005 (DSB):
+*        Remove "void *" arithmetic.
 *class--
 */
 
@@ -2458,7 +2460,7 @@ static int MapGet1##X( AstKeyMap *this, const char *key, int mxval, int *nval, X
          } \
 \
 /* Increment the pointers to the next raw value. */ \
-         raw += raw_size; \
+         raw = (char *) raw + raw_size; \
       } \
    } \
 \
@@ -2612,7 +2614,7 @@ static int MapGet1C( AstKeyMap *this, const char *key, int l, int mxval,
 
 /* Increment the pointers to the next raw value and the next buffer
    location. */
-         raw += raw_size;
+         raw = (char *) raw + raw_size;
          val += l;
       } 
    } 
@@ -2754,7 +2756,7 @@ int astMapGet1AId_( AstKeyMap *this, const char *key, int mxval, int *nval,
          }
 
 /* Increment the pointers to the next raw value. */
-         raw += raw_size;
+         raw = (char *) raw + raw_size;
       } 
    } 
 
@@ -3104,7 +3106,7 @@ c        This does not include the trailing null character.
          if( l > result ) result = l;
 
 /* Increment the pointer to the next raw value. */
-         raw += raw_size;
+         raw = (char *) raw + raw_size;
       } 
    }
 
