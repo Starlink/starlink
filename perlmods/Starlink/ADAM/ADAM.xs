@@ -66,57 +66,56 @@ char *s;
     return -1;
 }
 
-static double
-constant(name, arg)
+static int
+constant(name)
 char *name;
-int arg;
 {
     errno = 0;
     switch (*name) {
 
     case 'C':
-      if (strEQ(name, "CANCEL")) return ((double)CANCEL);
-      if (strEQ(name, "CONTROL")) return ((double)CONTROL);
+      if (strEQ(name, "CANCEL")) return ((int)CANCEL);
+      if (strEQ(name, "CONTROL")) return ((int)CONTROL);
 
       break;
 
     case 'D':
-      if (strEQ(name, "DTASK__ACTSTART"))  return ((double)DTASK__ACTSTART);
-      if (strEQ(name, "DTASK__ACTCOMPLETE"))  return ((double)DTASK__ACTCOMPLETE);
+      if (strEQ(name, "DTASK__ACTSTART"))  return ((int)DTASK__ACTSTART);
+      if (strEQ(name, "DTASK__ACTCOMPLETE"))  return ((int)DTASK__ACTCOMPLETE);
 
       break;
 
     case 'G':
-      if (strEQ(name, "GET")) return ((double)GET);
+      if (strEQ(name, "GET")) return ((int)GET);
 
       break;
 
     case 'M':
-      if (strEQ(name, "MESSYS__INFINITE")) return ((double)MESSYS__INFINITE);
-      if (strEQ(name, "MESSYS__PARAMREQ")) return ((double)MESSYS__PARAMREQ);
-      if (strEQ(name, "MESSYS__PARAMREP")) return ((double)MESSYS__PARAMREP);
-      if (strEQ(name, "MESSYS__INFORM"))   return ((double)MESSYS__INFORM);
-      if (strEQ(name, "MESSYS__SYNC"))     return ((double)MESSYS__SYNC);
-      if (strEQ(name, "MESSYS__SYNCREP"))  return ((double)MESSYS__SYNCREP);
-      if (strEQ(name, "MESSYS__TRIGGER"))  return ((double)MESSYS__TRIGGER);
-      if (strEQ(name, "MESSYS__MESSAGE"))  return ((double)MESSYS__MESSAGE);
+      if (strEQ(name, "MESSYS__INFINITE")) return ((int)MESSYS__INFINITE);
+      if (strEQ(name, "MESSYS__PARAMREQ")) return ((int)MESSYS__PARAMREQ);
+      if (strEQ(name, "MESSYS__PARAMREP")) return ((int)MESSYS__PARAMREP);
+      if (strEQ(name, "MESSYS__INFORM"))   return ((int)MESSYS__INFORM);
+      if (strEQ(name, "MESSYS__SYNC"))     return ((int)MESSYS__SYNC);
+      if (strEQ(name, "MESSYS__SYNCREP"))  return ((int)MESSYS__SYNCREP);
+      if (strEQ(name, "MESSYS__TRIGGER"))  return ((int)MESSYS__TRIGGER);
+      if (strEQ(name, "MESSYS__MESSAGE"))  return ((int)MESSYS__MESSAGE);
 
-      if (strEQ(name, "MSG_NAME_LEN"))     return ((double)MSG_NAME_LEN);
-      if (strEQ(name, "MSG_VAL_LEN"))      return ((double)MSG_VAL_LEN);
+      if (strEQ(name, "MSG_NAME_LEN"))     return ((int)MSG_NAME_LEN);
+      if (strEQ(name, "MSG_VAL_LEN"))      return ((int)MSG_VAL_LEN);
 
       break;
 
     case 'O':
-      if (strEQ(name, "OBEY"))  return ((double)OBEY);
+      if (strEQ(name, "OBEY"))  return ((int)OBEY);
       
       break;
 
     case 'S':
-      if (strEQ(name, "SAI__OK"))    return ((double)SAI__OK);
-      if (strEQ(name, "SAI__WARN"))  return ((double)SAI__WARN);
-      if (strEQ(name, "SAI__ERROR")) return ((double)SAI__ERROR);
+      if (strEQ(name, "SAI__OK"))    return ((int)SAI__OK);
+      if (strEQ(name, "SAI__WARN"))  return ((int)SAI__WARN);
+      if (strEQ(name, "SAI__ERROR")) return ((int)SAI__ERROR);
 
-      if (strEQ(name, "SET")) return ((double)SET);
+      if (strEQ(name, "SET")) return ((int)SET);
 
       break;
 
@@ -133,15 +132,30 @@ not_there:
 MODULE = Starlink::ADAM		PACKAGE = Starlink::ADAM		
 
 
-double
-constant(name,arg)
+# Supply a real function for SAI__OK since this is the routine
+# used most often. This is about 30% faster than an autoloaded
+# constant but 4 times slower than a perl constant (use constant)
+
+
+int
+pSAI__OK()
+ PROTOTYPE:
+ CODE:
+  RETVAL = SAI__OK;
+ OUTPUT:
+  RETVAL
+
+
+int
+constant(name)
 	char *		name
-	int		arg
+
 
 
 void
 ams_astint(status)
 	int status
+ PROTOTYPE: $
  CODE:
   ams_astint(&status);
  OUTPUT:
@@ -153,6 +167,7 @@ ams_astmsg(name, length, value, status)
 	int length	
 	char * value	
 	int  status	
+ PROTOTYPE: $$$$
  CODE:
   ams_astmsg(name, length, value, &status);
  OUTPUT:
@@ -164,6 +179,7 @@ ams_exit()
 void
 ams_extint(status)
 	int status
+ PROTOTYPE: $
  CODE:
   ams_extint(&status);
  OUTPUT:
@@ -183,6 +199,7 @@ ams_getreply(timeout, path, messid, message_name_s, message_value_s, message_sta
 	int message_length = NO_INIT
 	char * message_value = NO_INIT
 	int status
+ PROTOTYPE: $$$$$$$$$$$
  CODE:
   message_name = str1;
   message_value = str2;
@@ -203,6 +220,7 @@ void
 ams_init(own_name, status)
 	char * own_name	
 	int status	
+ PROTOTYPE: $$
  CODE:
   ams_init(own_name, &status);
  OUTPUT:
@@ -220,6 +238,7 @@ ams_path(other_task_name, path, status)
 	char * other_task_name
 	int path     = NO_INIT
 	int status	
+ PROTOTYPE: $$$
  CODE:
   ams_path(other_task_name, &path, &status);
  OUTPUT:
@@ -231,6 +250,7 @@ ams_plookup(path, name, status)
 	int path 
 	char * name = NO_INIT	
 	int status	
+ PROTOTYPE: $$$
  CODE:
   name = str1;
   ams_plookup(path, name, &status);
@@ -251,6 +271,7 @@ ams_receive(timeout, message_name_s, message_value_s, message_status, message_co
 	int path = NO_INIT
 	int messid = NO_INIT
 	int status
+ PROTOTYPE: $$$$$$$$$$$
  CODE:
   message_name = str1;
   message_value = str2;
@@ -280,6 +301,7 @@ ams_reply(path, messid, message_function, message_status, message_context, messa
 	int message_length
 	char * message_value
 	int status
+ PROTOTYPE: $$$$$$$$
  CODE:
   ams_reply(path, messid, message_function, message_status, message_context,
 	    message_name, message_length, message_value, &status);
@@ -303,6 +325,7 @@ ams_send(path, message_function, message_status, message_context, message_name, 
 	char * message_value
 	int messid	= NO_INIT
 	int status	
+ PROTOTYPE: $$$$$$$$$
  CODE:
   ams_send(path, message_function, message_status, message_context, message_name, message_length, message_value, &messid, &status);
  OUTPUT:
