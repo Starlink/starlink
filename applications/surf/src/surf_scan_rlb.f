@@ -254,14 +254,14 @@
      :           'on the input file', STATUS)
             END IF
 
-            IF (EXTINCTION) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETC('TASK', TSKNAME)
-               CALL ERR_REP (' ', '^TASK: the '//
-     :           'EXTINCTION application has already been run '//
-     :           'on the input file. RESTORE should be run before '//
-     :           'EXTINCTION', STATUS)
-            END IF
+*            IF (EXTINCTION) THEN
+*               STATUS = SAI__ERROR
+*               CALL MSG_SETC('TASK', TSKNAME)
+*               CALL ERR_REP (' ', '^TASK: the '//
+*     :           'EXTINCTION application has already been run '//
+*     :           'on the input file. RESTORE should be run before '//
+*     :           'EXTINCTION', STATUS)
+*            END IF
          END IF
       END IF
 
