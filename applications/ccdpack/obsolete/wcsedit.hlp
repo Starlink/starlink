@@ -32,7 +32,7 @@ COEFFS
 
 COEFFS( * ) = _DOUBLE (Read)
    If MODE is ADD, this parameter is a list of the coefficients
-   used for the mapping from the basis frame to the new frame.
+   used for the mapping from the target frame to the new frame.
    Its meaning and the number of values required depend on the
    value of MAPTYPE:
 
@@ -73,7 +73,7 @@ EPOCH = _DOUBLE (Read)
 FRAME
 
 FRAME = LITERAL (Read)
-   This parameter specifies the 'basis frame', which has the
+   This parameter specifies the 'target frame', which has the
    following meaning according to the value of the MODE parameter:
 
       -  MODE = CURRENT -- The frame to be made Current
@@ -83,7 +83,7 @@ FRAME = LITERAL (Read)
                            that domain will be removed.
 
       -  MODE = ADD     -- The new frame will be a copy of the
-                           basis frame (though Domain and Title
+                           target frame (though Domain and Title
                            will be changed), and will be mapped
                            from it using the mapping given.
 
@@ -156,7 +156,7 @@ MAPTYPE
 
 MAPTYPE = LITERAL (Read)
    This parameter is required when MODE is ADD, and specifies the
-   type of mapping which connects the basis frame to the new frame.
+   type of mapping which connects the target frame to the new frame.
    It may take one of the following values:
 
       -  UNIT

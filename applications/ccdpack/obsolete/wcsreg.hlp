@@ -70,9 +70,10 @@ IN = LITERAL (Read)
    (the indirection character is "^").
 
    If the application is successful, a new frame with a domain
-   determined by the OUTDOMAIN parameter will be added containing
-   the alignment information.  This frame will be made the new
-   Current domain.
+   determined by the OUTDOMAIN parameter will be added to each of
+   the IN files containing the alignment information.  This frame 
+   will be made the new Current frame.
+
 
 LOGFILE
 
@@ -136,10 +137,12 @@ REFPOS
 
 REFPOS = _INTEGER (Read)
    The position within the IN list which corresponds to the
-   reference NDF.  For each domain in DOMAINS, alignment will
-   be attempted with the reference NDF first, and the mapping
-   between the output frame and the first matching name in
-   DOMAINS is a unit mapping.
+   reference NDF.  The registration frame is a copy of (and 
+   unitmapped to) the Current frame of the reference NDF,
+   and for each other NDF the program tries to find a path from
+   it to the reference NDF going from one NDF to another only
+   when they both have frames in the same one of the entries in
+   the DOMAINS list. 
    [1]
 
 Examples
