@@ -45,6 +45,8 @@
 *
 	INTEGER STATUS
 *    Local variables :
+      CHARACTER*10		MTH			! Storage method
+
       INTEGER 			AXPTR			! Pointer to axis data
       INTEGER 			NCB			! # channel bounds
       INTEGER 			NAX			! # axis values
@@ -66,7 +68,7 @@
       CALL ERI_GETIDS( ID, INSTR.R_ID, INSTR.A_ID, STATUS )
 
 *  Fill in dummy field
-      INSTR.LOC = DAT__NOLOC
+      INSTR.ELOC = DAT__NOLOC
 
 *  Went ok?
       IF ( STATUS .EQ. SAI__OK ) THEN
