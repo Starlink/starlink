@@ -45,9 +45,17 @@ AC_CHECK_FUNCS(setenv)
 
 dnl   Take a `copy' of the means autoconf uses to echo a string
 dnl   without a newline.  This will be a Makefile variable, so double
-dnl   the dollar sign to escape it.
+dnl   the dollar sign to escape it (you'd think we could just
+dnl   escape this automagically, but that's unexpectedly hard).
 AC_SUBST(ECHONONL)
-ECHONONL="function echononl () { echo $ac_n \$\$* $ac_c; }"
+if test -n "$ac_n"; then
+    ECHONONL='echononl () { echo -n $$*; }'
+elif test -n "$ac_c"; then
+    ECHONONL='echononl () { echo "$$*\c"; }'
+else
+    # eh?
+    ECHONONL='echononl () { echo $$*; }'
+fi
 
 
 
