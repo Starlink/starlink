@@ -13,6 +13,9 @@
 
 *  Description:
 *     This file defines the size of any CCDPACK global constants.
+*
+*     The file is automatically edited at package build time to substitute
+*     in the package version number.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
@@ -90,6 +93,6 @@
 
 *  Package version.
       CHARACTER * ( 32 ) VERS
-      PARAMETER ( VERS = '(PKG_VERS)' )
+      PARAMETER ( VERS = '(CCDPACK version PKG_VERS)' )
 
 * $Id$
