@@ -2286,7 +2286,7 @@
       for ( i = 0; i < ( nperc + nextra ); i++ ) {
          PercHashKey hkey;
          hkey.hash = NULL;
-         hkey.data = percs[ i ];
+         hkey.data = apercs[ i ];
          if ( Tcl_FindHashEntry( &ndf1->perchash, hkey.hash ) == NULL ) {
             afracs[ nfrac++ ] = apercs[ i ] * 0.01;
          }
