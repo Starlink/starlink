@@ -1,9 +1,10 @@
-SGMLDIR=/home/norman/s/src/sgml
-LIBDIR=${SGMLDIR}/lib
-DECL=${SGMLDIR}/dtd/starlink.decl
-STYLESHEET=${SGMLDIR}/dsssl/sl
+#SGMLDIR=/home/norman/s/src/sgml
+LIBDIR=${STARLINK_SGML_DIR}/lib
+DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
+STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
 SGMLPARSE=nsgmls
 
+JADE=jade
 JADEFLAGS=
 
 # The HTML stylesheet does not output the generated HTML to standard
@@ -20,11 +21,12 @@ JADEFLAGS=
 # ext? are the extensions it has created links to in the page footer
 # (in fact, as of March 1999, the stylesheet _doesn't_ generate these links,
 # but it will as soon as I start generating something to link to!)
-%.stamp: %.sgml
-	jade -t sgml $(JADEFLAGS) -d $(STYLESHEET)/html/sl.dsl#html $< > $@
+%.html.stamp: %.sgml
+	$(JADE) -t sgml -iHTML.sdata $(JADEFLAGS) \
+		-d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.single.html: %.sgml
-	jade -t sgml -isingle.file -V stream-output $(JADEFLAGS) -d $(STYLESHEET)/html/sl.dsl#html $< > $@
+	$(JADE) -t sgml -isingle.file -V stream-output $(JADEFLAGS) -d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.parse: %.sgml
 	$(SGMLPARSE) -wall -ru $(DECL) $< >$@
@@ -33,7 +35,16 @@ JADEFLAGS=
 	 sgmlnorm -A documentsummary -d $< > $@
 
 %.fot: %.sgml
-	jade -t fot -d $(STYLESHEET)/html/sl.dsl $< >$@
+	$(JADE) -t fot -d $(STYLESHEET)/html/sl.dsl $< >$@
+
+%.maths.stamp: %.sgml
+	$(JADE) -t sgml $(JADEFLAGS) \
+		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< > $@
+	ROOT=`awk -F: '{print $$1}' $@`; \
+	$(MAKE) $$ROOT.tth-html
+
+%.tth-html: %.tth-eqlist
+	tth -r < $< > $@
 
 %.data: %.sgml
 	$(SGMLPARSE) $(DECL) $< | \
