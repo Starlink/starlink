@@ -1,12 +1,6 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-dnl    Configure file for the PCS system.  This is just a shell for
-dnl    the various subsystems, so this configure file is atypical.  It
-dnl    is not at present intended to be distributable by itself.  Its
-dnl    main function is to express the dependence of this package on
-dnl    its subpackages, and to manage the PCS docs.
-
 dnl    Initialisation: package name and version number
 AC_INIT(graphpar, 1.1-5, ussc@star.rl.ac.uk)
 
@@ -38,8 +32,6 @@ dnl    This must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
 AC_CONFIG_SUBDIRS(gkspar pgppar sgspar)
-dnl     Missing from above list:
-dnl         adamnet -- redundant, and may not work
 
 AC_CONFIG_FILES(Makefile component.xml)
 
