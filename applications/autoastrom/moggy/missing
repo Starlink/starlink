@@ -38,18 +38,21 @@ else
   configure_ac=configure.in
 fi
 
-# Allow MISSING_ALLOW_RUN to be defaulted from the environment.
-# If MISSING_ALLOW_RUN is false, then ignore any --run option.
-: ${MISSING_ALLOW_RUN:=true}
+# Allow RUN_LOCAL_AUTOTOOLS to be set in the environment, but default it to 
+# be true, giving original behaviour.
+# If RUN_LOCAL_AUTOTOOLS is false, then ignore any --run option.
+: ${RUN_LOCAL_AUTOTOOLS:=true}
 
 case "$1" in
 --run)
-  if $MISSING_ALLOW_RUN; then
+  if $RUN_LOCAL_AUTOTOOLS; then
     # Try to run requested program, and just exit if it succeeds.
     run=
     shift
     "$@" && exit 0
   else
+    # Merely shift the --run option off the list: do not run the command,
+    # and do not set $run to be null.
     shift
   fi
   ;;
@@ -82,7 +85,10 @@ Supported PROGRAM values:
   lex          create \`lex.yy.c', if possible, from existing .c
   makeinfo     touch the output file
   tar          try tar, gnutar, gtar, then tar without non-portable flags
-  yacc         create \`y.tab.[ch]', if possible, from existing .[ch]"
+  yacc         create \`y.tab.[ch]', if possible, from existing .[ch]
+  true         exit with success status
+
+Setting RUN_LOCAL_AUTOTOOLS=false in environment suppresses effect of --run"
     ;;
 
   -v|--v|--ve|--ver|--vers|--versi|--versio|--version)
@@ -327,6 +333,14 @@ WARNING: I can't seem to be able to run \`tar' with the given arguments.
          You may want to install GNU tar or Free paxutils, or check the
          command line arguments."
     exit 1
+    ;;
+
+  true)
+    # Very easy to emulate!  We are almost certainly here because
+    # (i) ./configure is testing us by running `.../missing --run true'
+    # _and_ (ii) RUN_LOCAL_AUTOTOOLS is false, so that we didn't run
+    # `true' at the top.
+    exit 0
     ;;
 
   *)
