@@ -81,6 +81,8 @@
 *        Use DAT_SHAPE to determine if the parameter is a scalar instead
 *        of DAT_SIZE. DAT_SIZE does not distinguish between a scalar and 
 *        an array with only one element.
+*     4-OCT-2004 (TIMJ):
+*        Use ONE_SCRSZ rather than KPG1_SCRSZ
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -240,7 +242,7 @@
 *  Use a default when there has been an error.  Hide the error in its
 *  own context.  Constrain the width to the size of the buffer.
             CALL ERR_MARK
-            CALL KPG1_SCRSZ( WIDTH, HEIGHT, STATUS )
+            CALL ONE_SCRSZ( WIDTH, HEIGHT, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                WIDTH = MXCHAR
