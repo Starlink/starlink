@@ -1,3 +1,7 @@
+1999-05-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Makefile.PL: Use Starlink::Config
+
 1999-04-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm (fits_extract_key_val): Return null rather than undef
