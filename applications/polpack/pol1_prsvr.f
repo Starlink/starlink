@@ -74,19 +74,22 @@
       INTEGER LM                 ! Length of major version field
       INTEGER LN                 ! Length of minor version field
       INTEGER LR                 ! Length of revision field
+      INTEGER LV                 ! Used length of whole string
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise
-      M = -999
+*  Find the used length of the version string.
+      LV = CHR_LEN( VERS ) 
 
-*  Find the first dot.
+*  Find the first dot. If no dot use the end of the string.
       DOT = INDEX( VERS, '.' )
+      IF( DOT .EQ. 0 ) DOT = LV + 1
 
-*  Find the first hyphen.
+*  Find the first hyphen. If no hyphen use the end of the string.
       HYP = INDEX( VERS, '-' )
+      IF( HYP .EQ. 0 ) HYP = LV + 1
 
 *  Find the length of each field.
       LM = DOT - 1 

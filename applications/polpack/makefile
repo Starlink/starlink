@@ -437,7 +437,7 @@ polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f pol1_dbeam.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f pol1_snghd.f \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f pol1_hist2.f \
 pol1_sngfl.f pol1_sngsi.f pol1_sngsm.f pol1_sngvr.f pol1_blkwr.f \
-polsim.f pol1_simcl.f pol1_ptvrs.f
+polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
