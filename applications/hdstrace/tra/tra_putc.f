@@ -249,7 +249,6 @@
      :  FVALUE,                ! Value index for the last elements
      :  I,                     ! Temporary length
      :  INDENT,                ! Level of indention
-     :  INDS( DAT__MXDIM ),    ! Array indices
      :  IVALUE,                ! Value index for the first elements
      :  J,                     ! Loop counter
      :  MXVAL,                 ! Maximum number of elements to be read
