@@ -3298,6 +3298,10 @@ int RtdImage::cmapCmd(int argc, char* argv[])
         }
     }
 
+    if (strcmp(argv[0], "file") == 0) {
+        return set_result(colors_->cmap()->name());
+    }
+
     if (strcmp(argv[0], "reset") == 0) {
 	ret = colors_->reset();
         if ( ret == TCL_OK ) {
