@@ -398,7 +398,7 @@ foreach $onesub (@subs) {
   # Note that if the -rebin flag is used then photometry data will be 
   # rebinned
 
-if ($mode eq 'PHOTOM') {
+if ($mode eq 'PHOTOM' || $mode eq 'POLPHOT') {
 
   @parlist = ('ANALYSIS','ALLBOLS','MSG_FILTER');
   undef $modpars;
