@@ -14,7 +14,6 @@
     set cgs4drHtml    STAR_DOCS/sun27.htx
 
 # Set up library search path
-    #lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
     lappend auto_path [exec /usr/bin/pwd] $cgs4drTclLib $tclAdamLib 
 
 # Create default directories
@@ -25,6 +24,9 @@
     } else {
       set env(DOMAIN) unknown
     }
+
+# If at ukirt, spawn the distributed adamnet process
+   if {$env(DOMAIN) == "ukirt.jach.hawaii.edu."} {cgs4drAdamnet start}
 
 # Determine command to execute (must contain cgs4dr, p4_tcl, q4_tcl, r4_tcl or c4_tcl)
     set cmd [string tolower [string trim $argv0]]
@@ -160,6 +162,8 @@
       .qman.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $QmanTask"
       .qman.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $QmanTask"
       .qman.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $QmanTask"
+      .qman.mb.options.menu add command -underline 3 -label "Start ADAMnet" -command "cgs4drAdamnet start"
+      .qman.mb.options.menu add command -underline 1 -label "Stop ADAMnet" -command "cgs4drAdamnet stop"
       .qman.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $QmanTask author"
       .qman.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $QmanTask tcl/tk"
       .qman.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $QmanTask cgs4dr"
@@ -228,6 +232,8 @@
       .p4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $P4Task"
       .p4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $P4Task"
       .p4.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $P4Task"
+      .p4.mb.options.menu add command -underline 3 -label "Start ADAMnet" -command "cgs4drAdamnet start"
+      .p4.mb.options.menu add command -underline 1 -label "Stop ADAMnet" -command "cgs4drAdamnet stop"
       .p4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $P4Task author"
       .p4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $P4Task tcl/tk"
       .p4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $P4Task cgs4dr"
@@ -289,6 +295,8 @@
       .red4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $Red4Task"
       .red4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $Red4Task"
       .red4.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $Red4Task"
+      .red4.mb.options.menu add command -underline 3 -label "Start ADAMnet" -command "cgs4drAdamnet start"
+      .red4.mb.options.menu add command -underline 1 -label "Stop ADAMnet" -command "cgs4drAdamnet stop"
       .red4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $Red4Task author"
       .red4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Red4Task tcl/tk"
       .red4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Red4Task cgs4dr"
@@ -353,6 +361,8 @@
       .cred4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $Cred4Task"
       .cred4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $Cred4Task"
       .cred4.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $Cred4Task"
+      .cred4.mb.options.menu add command -underline 3 -label "Start ADAMnet" -command "cgs4drAdamnet start"
+      .cred4.mb.options.menu add command -underline 1 -label "Stop ADAMnet" -command "cgs4drAdamnet stop"
       .cred4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $Cred4Task author"
       .cred4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Cred4Task tcl/tk"
       .cred4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Cred4Task cgs4dr"
