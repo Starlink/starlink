@@ -170,7 +170,7 @@
 	            YSTART = 1
 	            XFINISH = IDIMS( 1)
 	            YFINISH = IDIMS( 2)/4
-	type *, xstart, xFINISH, ystart, yFINISH
+	PRINT *, xstart, xFINISH, ystart, yFINISH
 
 *                   copy the requested subset of the input image into
 *                   the output image
@@ -184,7 +184,7 @@
 	            YSTART = IDIMS( 2)/4 + 1
 	            XFINISH = IDIMS( 1)
 	            YFINISH = IDIMS( 2)/2
-	type *, xstart, xFINISH, ystart, yFINISH
+	PRINT *, xstart, xFINISH, ystart, yFINISH
 
 *                   copy the requested subset of the input image into
 *                   the output image
@@ -198,7 +198,7 @@
 	            YSTART = IDIMS( 2)/2 + 1
 	            XFINISH = IDIMS( 1)
 	            YFINISH = 3*IDIMS( 2)/4
-	type *, xstart, xFINISH, ystart, yFINISH
+	PRINT *, xstart, xFINISH, ystart, yFINISH
 
 *                   copy the requested subset of the input image into
 *                   the output image
@@ -212,7 +212,7 @@
 	            YSTART = 3*IDIMS( 2)/4 + 1
 	            XFINISH = IDIMS( 1)
 	            YFINISH = IDIMS( 2)
-	type *, xstart, xFINISH, ystart, yFINISH
+	PRINT *, xstart, xFINISH, ystart, yFINISH
 
 *                   copy the requested subset of the input image into
 *                   the output image

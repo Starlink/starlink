@@ -31,24 +31,24 @@
 	  IF( INT_2 .GT. 0.0) THEN
 	    RAT1 = INT_1/INT_2
 	  ELSE
-	type *, 'int_2 <= 0.0'
+	PRINT *, 'int_2 <= 0.0'
 	    RAT1 = 1.0E20
 	  END IF
 	  IF( INT_4 .GT. 0.0) THEN
 	    RAT2 = INT_3/INT_4
 	  ELSE
-	type *, 'int_4 <= 0.0'
+	PRINT *, 'int_4 <= 0.0'
 	    RAT2 = 1.0E20
 	  END IF
 	  IF( RAT2 .GT. 0.0) THEN
 	    IF( RAT1/RAT2 .GT. 0.0) THEN
 	      RAT3 = SQRT( RAT1/RAT2)
 	    ELSE
-	type *, 'rat1/rat2 <= 0.0'
+	PRINT *, 'rat1/rat2 <= 0.0'
 	      RAT3 = 0.0
 	    END IF
 	  ELSE
-	type *, 'rat2 <= 0.0'
+	PRINT *, 'rat2 <= 0.0'
 	    RAT3 = 0.0
 	  END IF
 	  STOKES = ( ( RAT3 - 1)/( RAT3 + 1))*100

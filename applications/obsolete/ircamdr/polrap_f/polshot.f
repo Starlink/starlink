@@ -81,7 +81,7 @@
         CALL GETINP( 'INPICPE', LOCIPE, STATUS)
 
 	if ( status .ne. sai__ok ) then
-	  type *,'after getinp ...'
+	  PRINT *,'after getinp ...'
 	  CALL NDF_ANNUL( LOCIP, STATUS)
 	  CALL NDF_ANNUL( LOCIPE, STATUS)
 	  return
