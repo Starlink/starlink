@@ -1,10 +1,300 @@
-Testing t1.rep... 
-ok
-Testing t1.sum... 
-ok
-Testing t1-fits01.fits... 
-ok
-Testing t1-fits02.fits... 
-ok
-Testing t1.log... 
-ok
+!!!+ tmp1.astrom-in
+J2000
+ASTR
+17 27  9.120   74 20  8.160   J2000  1998.47
+17 26 32.640   74 16 42.240 0.0  0.0  1998.47
+ 1653.995000    2482.706000
+17 26 24.720   74 16 46.200 0.0  0.0  1998.47
+ 1644.335000    2581.196000
+17 26 53.520   74 17 11.040 0.0  0.0  1998.47
+ 1563.551000    2229.920000
+17 26 48.240   74 18  2.880 0.0  0.0  1998.47
+ 1406.641000    2295.989000
+17 28  4.800   74 18  3.240 0.0  0.0  1998.47
+ 1390.010000    1359.541000
+17 27 24.480   74 19 31.800 0.0  0.0  1998.47
+ 1131.300000    1859.745000
+17 27 51.360   74 20 31.560 0.0  0.0  1998.47
+  943.707000    1537.692000
+17 27 44.640   74 22  0.120 0.0  0.0  1998.47
+  681.152000    1624.824000
+END
+!!!-
+!!!+ tmp1.rep
+1* * * * * * * * * * * * *
+ *  A S T R O M E T R Y  *
+ * * * * * * * * * * * * *
+
+
+
+ Equinox for mean coordinates of results:  J2000.0
+
+ Projection geometry:  Astrograph                              
+
+ Plate centre:  17 27 09.1   +74 20 08     Equinox J2000.0     Epoch J1998.470
+
+
+ Reference stars:
+
+                n              RA            Dec         pmR    pmD   Equinox   Epoch      px         Xmeas        Ymeas
+
+                1         17 26 32.640  +74 16 42.24  +0.0000 +0.000  J1998.5  J1998.470  0.000    +1653.995    +2482.706
+                2         17 26 24.720  +74 16 46.20  +0.0000 +0.000  J1998.5  J1998.470  0.000    +1644.335    +2581.196
+                3         17 26 53.520  +74 17 11.04  +0.0000 +0.000  J1998.5  J1998.470  0.000    +1563.551    +2229.920
+                4         17 26 48.240  +74 18 02.88  +0.0000 +0.000  J1998.5  J1998.470  0.000    +1406.641    +2295.989
+                5         17 28 04.800  +74 18 03.24  +0.0000 +0.000  J1998.5  J1998.470  0.000    +1390.010    +1359.541
+                6         17 27 24.480  +74 19 31.80  +0.0000 +0.000  J1998.5  J1998.470  0.000    +1131.300    +1859.745
+                7         17 27 51.360  +74 20 31.56  +0.0000 +0.000  J1998.5  J1998.470  0.000     +943.707    +1537.692
+                8         17 27 44.640  +74 22 00.12  +0.0000 +0.000  J1998.5  J1998.470  0.000     +681.152    +1624.824
+1Plate solution: 4-coefficient
+ -----------------------------
+
+     X,Y = expected plate coordinates (radians)
+
+     X =  +0.3282594E-02                            Y =  +0.1565646E-02
+          -0.3190710E-07 * Xmeas                         -0.1609908E-05 * Xmeas
+          -0.1609908E-05 * Ymeas                         +0.3190710E-07 * Ymeas
+
+
+ Xmeas =   +1012.520                            Ymeas =   +2018.928    
+           -12305.94     * X                              -620909.7     * X
+           -620909.7     * Y                              +12305.94     * Y
+
+
+      Plate scale (in measuring units):            0.3321 arcsec
+                           Orientation:          +88.865  deg and laterally inverted
+
+
+ Reference stars:
+                             Mean RA,Dec         Equinox J2000.0      Epoch J1998.470           Residuals (arcsec)
+                n                    catalogue                     calculated                 dX        dY        dR
+
+                1            17 26 30.160  +74 16 37.78    17 26 30.221  +74 16 37.90      +0.252    +0.121     0.279
+                2            17 26 22.240  +74 16 41.72    17 26 22.187  +74 16 41.64      -0.213    -0.080     0.227
+                3            17 26 51.034  +74 17 06.62    17 26 51.006  +74 17 06.48      -0.113    -0.140     0.180
+                4            17 26 45.748  +74 17 58.45    17 26 45.832  +74 17 58.98      +0.345    +0.528     0.631
+                5            17 28 02.302  +74 17 58.98    17 28 02.468  +74 17 58.18      +0.678    -0.796     1.045
+                6            17 27 21.973  +74 19 27.45    17 27 21.975  +74 19 27.67      +0.008    +0.223     0.224
+                7            17 27 48.843  +74 20 27.27    17 27 48.700  +74 20 27.71      -0.581    +0.437     0.727
+                8            17 27 42.111  +74 21 55.82    17 27 42.018  +74 21 55.52      -0.377    -0.294     0.478
+
+                                                                                  RMS :     0.384     0.400     0.554
+
+1Plate solution: 6-coefficient
+ -----------------------------
+
+     X,Y = expected plate coordinates (radians)
+
+     X =  +0.3284061E-02                            Y =  +0.1568243E-02
+          -0.3769997E-07 * Xmeas                         -0.1605967E-05 * Xmeas
+          -0.1606865E-05 * Ymeas                         +0.2803642E-07 * Ymeas
+
+
+ Xmeas =   +1011.775                            Ymeas =   +2020.031    
+           -10859.97     * X                              -622074.9     * X
+           -622422.9     * Y                              +14603.17     * Y
+
+
+     Plate scales (in measuring units):      X     0.3313 arcsec
+                                             Y     0.3315 arcsec
+                                          mean     0.3314 arcsec
+                   Nonperpendicularity:           +0.345  deg
+                           Orientation:          +88.828  deg and laterally inverted
+
+
+ Reference stars:
+                             Mean RA,Dec         Equinox J2000.0      Epoch J1998.470           Residuals (arcsec)
+                n                    catalogue                     calculated                 dX        dY        dR
+
+                1            17 26 30.160  +74 16 37.78    17 26 30.193  +74 16 37.80      +0.136    +0.019     0.137
+                2            17 26 22.240  +74 16 41.72    17 26 22.177  +74 16 41.45      -0.255    -0.269     0.370
+                3            17 26 51.034  +74 17 06.62    17 26 50.965  +74 17 06.51      -0.279    -0.114     0.301
+                4            17 26 45.748  +74 17 58.45    17 26 45.848  +74 17 58.83      +0.408    +0.375     0.554
+                5            17 28 02.302  +74 17 58.98    17 28 02.344  +74 17 58.76      +0.173    -0.216     0.276
+                6            17 27 21.973  +74 19 27.45    17 27 22.004  +74 19 27.64      +0.126    +0.194     0.232
+                7            17 27 48.843  +74 20 27.27    17 27 48.734  +74 20 27.78      -0.441    +0.512     0.676
+                8            17 27 42.111  +74 21 55.82    17 27 42.144  +74 21 55.31      +0.132    -0.502     0.519
+
+                                                                                  RMS :     0.270     0.321     0.420
+
+!!!-
+!!!+ tmp1.sum
+
+
+ FITS-WCS header for  4-component solution in file tmp1-fits01.fits
+ Residuals, 4-coefficient fit:
+
+                n           dX        dY        dR
+
+                1        +0.252    +0.121     0.279
+                2        -0.213    -0.080     0.227
+                3        -0.113    -0.140     0.180
+                4        +0.345    +0.528     0.631
+                5        +0.678    -0.796     1.045
+                6        +0.008    +0.223     0.224
+                7        -0.581    +0.437     0.727
+                8        -0.377    -0.294     0.478
+
+                RMS :     0.384     0.400     0.554
+
+
+ FITS-WCS header for  6-component solution in file tmp1-fits02.fits
+ Residuals, 6-coefficient fit:
+
+                n           dX        dY        dR
+
+                1        +0.136    +0.019     0.137
+                2        -0.255    -0.269     0.370
+                3        -0.279    -0.114     0.301
+                4        +0.408    +0.375     0.554
+                5        +0.173    -0.216     0.276
+                6        +0.126    +0.194     0.232
+                7        -0.441    +0.512     0.676
+                8        +0.132    -0.502     0.519
+
+                RMS :     0.270     0.321     0.420
+!!!-
+!!!+ tmp1.log
+FIT   1
+INFO RESIDUAL      1         0.252         0.121         0.279
+INFO RESIDUAL      2        -0.213        -0.080         0.227
+INFO RESIDUAL      3        -0.113        -0.140         0.180
+INFO RESIDUAL      4         0.345         0.528         0.631
+INFO RESIDUAL      5         0.678        -0.796         1.045
+INFO RESIDUAL      6         0.008         0.223         0.224
+INFO RESIDUAL      7        -0.581         0.437         0.727
+INFO RESIDUAL      8        -0.377        -0.294         0.478
+RESULT     nstars                    8 # no. ref stars
+RESULT       xrms             0.383879 # arcsec
+RESULT       yrms             0.400109 # arcsec
+RESULT       rrms             0.554482 # arcsec
+RESULT      plate             0.332133 # (mean) plate scale, arcsec
+RESULT       prms             1.669460 # rrms in pixels
+RESULT     nterms                    4 # no. terms in fit
+RESULT      rarad          4.569062542 # projection pole RA, radians
+RESULT     decrad          1.297400971 # projection pole Dec, radians
+RESULT      rasex  17:27:09.1          # projection pole RA, sexagesimal
+RESULT     decsex +74:20:08            # projection pole Dec, sexagesimal
+RESULT        wcs tmp1-fits01.fits # FITS-WCS output file
+STATUS OK
+ENDFIT
+FIT   2
+INFO RESIDUAL      1         0.136         0.019         0.137
+INFO RESIDUAL      2        -0.255        -0.269         0.370
+INFO RESIDUAL      3        -0.279        -0.114         0.301
+INFO RESIDUAL      4         0.408         0.375         0.554
+INFO RESIDUAL      5         0.173        -0.216         0.276
+INFO RESIDUAL      6         0.126         0.194         0.232
+INFO RESIDUAL      7        -0.441         0.512         0.676
+INFO RESIDUAL      8         0.132        -0.502         0.519
+RESULT     nstars                    8 # no. ref stars
+RESULT       xrms             0.270439 # arcsec
+RESULT       yrms             0.320953 # arcsec
+RESULT       rrms             0.419700 # arcsec
+RESULT      plate             0.331418 # (mean) plate scale, arcsec
+RESULT       prms             1.266375 # rrms in pixels
+RESULT     nterms                    6 # no. terms in fit
+RESULT      rarad          4.569062542 # projection pole RA, radians
+RESULT     decrad          1.297400971 # projection pole Dec, radians
+RESULT      rasex  17:27:09.1          # projection pole RA, sexagesimal
+RESULT     decsex +74:20:08            # projection pole Dec, sexagesimal
+RESULT        wcs tmp1-fits02.fits # FITS-WCS output file
+STATUS OK
+ENDFIT
+!!!-
+!!!+ tmp1-fits01.fits
+SIMPLE  =                    T / file does conform to FITS standard             
+BITPIX  =                    8 / number of bits per data pixel                  
+NAXIS   =                    2 / number of data axes                            
+NAXIS1  =                    1 / length of data axis 1                          
+NAXIS2  =                    1 / length of data axis 2                          
+COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
+COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
+COMMENT   Contact the NASA Science Office of Standards and Technology for the   
+COMMENT   FITS Definition document #100 and other FITS information.             
+HISTORY   Written by ASTROM                                                     
+COMMENT   ASTROM astrometric solution:  4-component solution                    
+CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
+CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
+RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
+EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
+LONPOLE =                  180 / Native longitude of celestial pole             
+CRVAL1  =          261.7880000 / Projection pole -- RA                          
+CRVAL2  =           74.3356000 / Projection pole -- DEC                         
+CRPIX1  =         1012.5201473 / Projection pole -- x-pixels                    
+CRPIX2  =         2018.9278316 / Projection pole -- y-pixels                    
+CUNIT1  = 'deg     '           / RA always given in degrees                     
+CUNIT2  = 'deg     '           / Dec always given in degrees                    
+CD1_1   =       -1.8281422E-06 / Transformation to intermed. world coords       
+CD2_1   =       -9.2240926E-05                                                  
+CD1_2   =       -9.2240926E-05                                                  
+CD2_2   =        1.8281422E-06                                                  
+COMMENT   Projection geometry: Astrograph                                       
+COMMENT   ASTROM q=    0.0000rad**-2 =     0.0000deg**-2                        
+PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
+PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
+PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
+PV1_9   =       -0.0000000E+00 / a_9 xy^2  = -q                                 
+PV1_17  =        0.0000000E+00 / a_17 x^5  = 3q^2                               
+PV1_21  =        0.0000000E+00 / a_21 xy^4 = 3q^2                               
+PV1_31  =       -0.0000000E+00 / a_31 x^7  = -12q^3                             
+PV1_37  =       -0.0000000E+00 / a_37 xy^6 = -12q^3                             
+PV2_0   =        0.0000000E+00 / Distortion function for y: b_0=0               
+PV2_1   =        1.0000000E+00 / b_1 y     = 1                                  
+PV2_7   =       -0.0000000E+00 / b_7 y^3   = -q                                 
+PV2_9   =       -0.0000000E+00 / b_9 yx^2  = -q                                 
+PV2_17  =        0.0000000E+00 / b_17 y^5  = 3q^2                               
+PV2_21  =        0.0000000E+00 / b_21 yx^4 = 3q^2                               
+PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3                             
+PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
+MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01)        
+END                                                                             
+!!!-
+!!!+ tmp1-fits02.fits
+SIMPLE  =                    T / file does conform to FITS standard             
+BITPIX  =                    8 / number of bits per data pixel                  
+NAXIS   =                    2 / number of data axes                            
+NAXIS1  =                    1 / length of data axis 1                          
+NAXIS2  =                    1 / length of data axis 2                          
+COMMENT   FITS (Flexible Image Transport System) format defined in Astronomy and
+COMMENT   Astrophysics Supplement Series v44/p363, v44/p371, v73/p359, v73/p365.
+COMMENT   Contact the NASA Science Office of Standards and Technology for the   
+COMMENT   FITS Definition document #100 and other FITS information.             
+HISTORY   Written by ASTROM                                                     
+COMMENT   ASTROM astrometric solution:  6-component solution                    
+CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
+CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
+RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
+EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
+LONPOLE =                  180 / Native longitude of celestial pole             
+CRVAL1  =          261.7880000 / Projection pole -- RA                          
+CRVAL2  =           74.3356000 / Projection pole -- DEC                         
+CRPIX1  =         1011.7752847 / Projection pole -- x-pixels                    
+CRPIX2  =         2020.0308714 / Projection pole -- y-pixels                    
+CUNIT1  = 'deg     '           / RA always given in degrees                     
+CUNIT2  = 'deg     '           / Dec always given in degrees                    
+CD1_1   =       -2.1600490E-06 / Transformation to intermed. world coords       
+CD2_1   =       -9.2015132E-05                                                  
+CD1_2   =       -9.2066602E-05                                                  
+CD2_2   =        1.6063685E-06                                                  
+COMMENT   Projection geometry: Astrograph                                       
+COMMENT   ASTROM q=    0.0000rad**-2 =     0.0000deg**-2                        
+PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
+PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
+PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
+PV1_9   =       -0.0000000E+00 / a_9 xy^2  = -q                                 
+PV1_17  =        0.0000000E+00 / a_17 x^5  = 3q^2                               
+PV1_21  =        0.0000000E+00 / a_21 xy^4 = 3q^2                               
+PV1_31  =       -0.0000000E+00 / a_31 x^7  = -12q^3                             
+PV1_37  =       -0.0000000E+00 / a_37 xy^6 = -12q^3                             
+PV2_0   =        0.0000000E+00 / Distortion function for y: b_0=0               
+PV2_1   =        1.0000000E+00 / b_1 y     = 1                                  
+PV2_7   =       -0.0000000E+00 / b_7 y^3   = -q                                 
+PV2_9   =       -0.0000000E+00 / b_9 yx^2  = -q                                 
+PV2_17  =        0.0000000E+00 / b_17 y^5  = 3q^2                               
+PV2_21  =        0.0000000E+00 / b_21 yx^4 = 3q^2                               
+PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3                             
+PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
+MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01)        
+END                                                                             
+!!!-
