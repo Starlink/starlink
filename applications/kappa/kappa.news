@@ -184,6 +184,19 @@
        the third pixel axis was retain with bounds spanning a single
        pixel). 
 
+     - PSF: 
+        o The default normalization of the model PSF is now chosen to
+	  give a peak value of exactly 1.0. Previously, the peak value
+	  could be higher or lower than 1.0 depending on whether the PSF
+	  was narrower or wider than a Gaussian.
+
+        o New parameters NORM and AMP1 have been added. NORM allows the
+	  peak value of the model PSF to be set equal to the fitted peak
+	  value of the first usable star, instead of the default value of
+	  1.0. AMP1 is an output parameter which receives the fitted peak
+	  value of the first usable star, in the data units of the input
+	  NDF.
+
      - SURFIT: A new output parameter called RMS has been added. The 
        RMS deviation of the fit from the original data (per pixel) is 
        stored in this output parameter on exit.
@@ -196,5 +209,4 @@
      - GAUSMOOTH: bug fixed which could cause a segmentation violation.
 
      - NDFTRACE: corrected the value written to the WCS output parameter.
-
 
