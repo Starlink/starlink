@@ -1084,27 +1084,40 @@ itcl::class gaia::GaiaBlink {
       $rtdimage flip y 0
       $clones_($target).panel.info.trans update_trans
 
-      #  Twice to really reset.
+      #  Twice to really reset (seems to get lost).
       $rtdimage rotate 0
       $rtdimage flip x 0
       $rtdimage flip y 0
       $clones_($target).panel.info.trans update_trans
       
-      #  Apply the new orientation.
+      #  Apply the new orientation. Repeats undo the any previous 
+      #  switches in that state.
       if { $ops != {} } {
          foreach op $ops {
             switch $op {
                "x" {
-                  puts "$targetimage rotate 1"
-                  $rtdimage rotate 1
+                  set state [$rtdimage rotate]
+                  if { $state } {
+                     $rtdimage rotate 0
+                  } else {
+                     $rtdimage rotate 1
+                  }
                }
                "lrf" {
-                  puts "$targetimage flip x 1"
-                  $rtdimage flip x 1
+                  set state [$rtdimage flip x]
+                  if { $state } { 
+                     $rtdimage flip x 0
+                  } else {
+                     $rtdimage flip x 1
+                  }
                }
                "udf" {
-                  puts "$targetimage flip y 1"
-                  $rtdimage flip y 1
+                  set state [$rtdimage flip y]
+                  if { $state } {
+                     $rtdimage flip y 0
+                  } else {
+                     $rtdimage flip y 1
+                  }
                }
             }
          }

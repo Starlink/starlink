@@ -16,7 +16,7 @@
 
 #  Notes:
 #     This will only run with the gaia_wish installed as part
-#     of the GAIA package with a Starlink extended RTD.
+#     of the GAIA package with a Starlink extended Skycat.
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK)
@@ -1215,7 +1215,8 @@ itcl::class gaia::Gaia {
    #  determining when the clone has been created). It also provides
    #  the ability to specify the file name directly (thus replacing
    #  the command-line version) and to gain access to an existing
-   #  clone (by number). Used for demo/remote control.
+   #  clone (by number). Used for demo/remote control. Note that 
+   #  a clone number of -1 generates a clone number.
    public method noblock_clone {number {file ""} {block 0} args} {
       global ::argv ::argc ::gaia_usage
 
@@ -1231,6 +1232,9 @@ itcl::class gaia::Gaia {
 
       #  If a clone number was given construct the related name.
       if { $number != "" } {
+         if { $number == -1 } {
+            set number [expr $clone_cnt_ + 1]
+         }
 	 set name ".gaia$number"
       } else {
 	 set name ""
