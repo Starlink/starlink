@@ -45,6 +45,8 @@
 #        Add the SIZE parameter
 #     1998 January 22 (TIMJ)
 #        Add the WEIGHTS and TIMES parameters
+#     1998 Jun 9 (TIMJ)
+#        Add WTFNRAD, SCALE. Position 1 for REF
 #     {enter_further_changes_here}
 
 #-
@@ -54,6 +56,7 @@
       HELPLIB 'SURF_HELP:'
 
       PARAMETER REF        # First reference date file
+         POSITION 1
          TYPE '_CHAR'
          ACCESS 'READ'
          PPATH 'GLOBAL'
@@ -105,12 +108,27 @@
 	 HELPKEY  '*'
       ENDPARAMETER
  
+      PARAMETER SCALE
+         TYPE '_REAL'
+         VPATH 'DYNAMIC,PROMPT'
+         PPATH 'DYNAMIC'
+      ENDPARAMETER  
+
+
       PARAMETER WEIGHT
         TYPE     '_REAL'
         PROMPT   'Weight to be assigned to input dataset'
         DEFAULT  1.0
 	 HELPKEY  '*'
       ENDPARAMETER
+
+      PARAMETER WTFNRAD
+         TYPE '_INTEGER'
+         VPATH 'DYNAMIC,PROMPT'
+         PPATH 'DYNAMIC'
+         PROMPT 'Radius of weighting function in scale lengths'
+      ENDPARAMETER  
+
 
       PARAMETER SFACTOR
         TYPE     '_REAL'
