@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.10}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {11th September 2001}
+\newcommand{\stardocdate}      {1th September 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -4472,7 +4472,7 @@ operations without needing to know the nature of the coordinate system
 represented by the \htmlref{Frame}{Frame}.
 
 Functions 
-are avilable to find the distance between two points, and to offset a 
+can be used to find the distance between two points, and to offset a 
 specified distance along a line joining two points, {\em{etc.}} In essence, 
 these define the metric of the coordinate space which the Frame represents. In
 the case of a basic Frame, this is a Cartesian metric.
@@ -4538,16 +4538,21 @@ longitude and latitude axes.
 
 The \htmlref{astOffset2}{astOffset2} function is similar to astOffset, but instead of using the
 geodesic which passes through two positions, it uses the geodesic which
-passes at a given position angle through the starting position. For
-SkyFrames, the position angle is the angle from north to the required
-geodesic, with positive rotation in the same sense as rotation from north
-to east. Any permutation of the axes in a SkyFrame is taken into
-account when interpreting position angles. For simple Frames, axis
-permutations are ignored, and the position angle is always the angle 
-between the positive direction of the second Frame axis to the required
-line, with positive angles being in the same sense as rotation from the 
-positive direction of the second axis to the positive direction of the 
-first Frame axis. 
+passes at a given position angle through the starting position. 
+
+Position angles are always measured from the positive direction of the 
+second Frame axis to the required line, with positive angles being in the 
+same sense as rotation from the positive direction of the second axis to 
+the positive direction of the first Frame axis. This definition applies
+to all classes of Frame, including SkyFrame. The default ordering of axes
+in a SkyFrame makes the second axis equivalent to north, and so the
+definition of position angle given above corresponds to the normal 
+astronomical usage, ``from north, through east''. However, it should be
+remembered that it is posible to permute the axes of a SkyFrame (or
+indeed any Frame), so that north becomes axis 1. In this case, an AST
+``position angle'' would be the angle ``from east, through north''. 
+Always take the axis ordering into account when deriving an astronomical 
+position angle from an AST position angle.
 
 Within a Cartesian coordinate system, the position angle of a geodesic
 ({\em{i.e.}}\ a straight line) is constant along its entire length, but
@@ -4569,14 +4574,12 @@ calculates the angle subtended by two points, at a third point.
 If used with a 2-dimensional Frame the returned angle
 is signed to indicate the sense of rotation (clockwise or anticlockwise)
 in taking the ``shortest route'' from the first point to the second.
-If used with a 3-dimensional Frame the result is un-signed. Other
-dimensionalities cause a value of AST\_\_BAD to be returned.
+If the Frame has more than 2 axes, the result is un-signed and is always
+in the range zero to $\pi$. 
 
-The \htmlref{astBear}{astBear} function 
-calculates the position angle of one point as seen from a second point
-within a 2 dimensional Frame (an error is reported if the Frame is not
-2 dimensional). Again, the algorithm used is appropriate to the class of
-the Frame.
+The \htmlref{astAxAngle}{astAxAngle} function is similar to astAngle,
+but the ``reference direction'', from which angles are measured, is 
+a specified axis. 
 
 The \htmlref{astResolve}{astResolve} function
 resolves a given displacement within a Frame into two components, parallel and 
@@ -10643,11 +10646,10 @@ Object            - Base class for all AST Objects
 }{
    \sstdescription{
       This function
-      finds the angle at point B between the line
-      joining points A and B, and the line joining points C
-      and B. These lines will in fact be geodesic curves appropriate to
-      the \htmlref{Frame}{Frame} in use. For instance, in \htmlref{SkyFrame}{SkyFrame}, they will be great
-      circles.
+      finds the angle at point B between the line joining points A and B,
+      and the line joining points C and B. These lines will in fact be
+      geodesic curves appropriate to the \htmlref{Frame}{Frame} in use. For instance, in
+      \htmlref{SkyFrame}{SkyFrame}, they will be great circles.
    }
    \sstsynopsis{
       double astAngle( AstFrame $*$this, const double a[], const double b[],
@@ -10683,23 +10685,15 @@ Object            - Base class for all AST Objects
          astAngle
       }{
          The angle in radians, from the line AB to the line CB. If the
-         Frame is 2-dimensional, it will be in the range \$$\backslash$pm $\backslash$pi\$.
-         If the Frame has 3 axes, a positive value will
-         always be returned in the range zero to \$$\backslash$pi\$. A value of
-         AST\_BAD will be returned if the Frame is not 2 or 3 dimensional.
+         Frame is 2-dimensional, it will be in the range \$$\backslash$pm $\backslash$pi\$,
+         and positive rotation is in the same sense as rotation from
+         the positive direction of axis 2 to the positive direction of
+         axis 1. If the Frame has more than 2 axes, a positive value will
+         always be returned in the range zero to \$$\backslash$pi\$.
       }
    }
    \sstnotes{
       \sstitemlist{
-
-         \sstitem
-         For a simple Frame positive rotation is in the same sense as
-         rotation from the positive direction of axis 2 to the positive
-         direction of axis 1.
-
-         \sstitem
-         For a SkyFrame positive rotation is in the same sense as
-         rotation from the north to east.
 
          \sstitem
          A value of AST\_BAD will also be returned if points A and B are
@@ -10762,6 +10756,73 @@ Object            - Base class for all AST Objects
          particular, it will fail if the pointer suppled is not valid,
          but this will only be reported if the error status is clear on
          entry.
+      }
+   }
+}
+\sstroutine{
+   astAxAngle\sstlabel{astAxAngle}
+}{
+   Returns the angle from an axis, to a line through two points
+}{
+   \sstdescription{
+      This function
+      finds the angle, as seen from point A, between the positive
+      direction of a specified axis, and the geodesic curve joining point
+      A to point B.
+   }
+   \sstsynopsis{
+      double astAxAngle( AstFrame $*$this, const double a[], const double b[], int axis )
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the \htmlref{Frame}{Frame}.
+      }
+      \sstsubsection{
+         a
+      }{
+         An array of double, with one element for each Frame axis
+         (\htmlref{Naxes}{Naxes} attribute) containing the coordinates of the first point.
+      }
+      \sstsubsection{
+         b
+      }{
+         An array of double, with one element for each Frame axis
+         (Naxes attribute) containing the coordinates of the second point.
+      }
+      \sstsubsection{
+         axis
+      }{
+         The number of the Frame axis from which the angle is to be
+         measured (axis numbering starts at 1 for the first axis).
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         astAxAngle
+      }{
+         The angle in radians, from the positive direction of the
+         specified axis, to the line AB. If the Frame is 2-dimensional,
+         it will be in the range \$$\backslash$pm $\backslash$pi\$, and positive rotation is in
+         the same sense as rotation from the positive direction of axis 2
+         to the positive direction of axis 1. If the Frame has more than 2
+         axes, a positive value will always be returned in the range zero
+         to \$$\backslash$pi\$.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The geodesic curve used by this function is the path of
+         shortest distance between two points, as defined by the
+         \htmlref{astDistance}{astDistance} function.
+
+         \sstitem
+         This function will return {\tt{"}}bad{\tt{"}} coordinate values (AST\_\_BAD)
+         if any of the input coordinates has this value, or if the require
+         position angle is undefined.
       }
    }
 }
@@ -10870,71 +10931,6 @@ Object            - Base class for all AST Objects
          A {\tt{"}}bad{\tt{"}} value will also be returned if this function is
          invoked with the AST error status set, or if it should fail for
          any reason.
-      }
-   }
-}
-\sstroutine{
-   astBear\sstlabel{astBear}
-}{
-   Returns the bearing (position angle) of one point as seen from another
-}{
-   \sstdescription{
-      This function
-      finds the bearing (position angle) of point B as seen from point A.
-      It can only be used with 2-dimensional Frames.
-   }
-   \sstsynopsis{
-      double astBear( AstFrame $*$this, const double a[], const double b[] )
-   }
-   \sstparameters{
-      \sstsubsection{
-         this
-      }{
-         Pointer to the \htmlref{Frame}{Frame}.
-      }
-      \sstsubsection{
-         a
-      }{
-         An array of double, with one element for each Frame axis
-         (\htmlref{Naxes}{Naxes} attribute) containing the coordinates of the first point.
-      }
-      \sstsubsection{
-         b
-      }{
-         An array of double, with one element for each Frame axis
-         (Naxes attribute) containing the coordinates of the second point.
-      }
-   }
-   \sstreturnedvalue{
-      \sstsubsection{
-         astBear
-      }{
-         The position angle in radians, of the point B as seen from the
-         point A. The value will be in the range zero to 2.PI.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         For a simple Frame, the returned position angle is the angle from the
-         positive direction of the second axis, to the line joining the supplied
-         positions. Positive rotation is in the sense of rotation from the
-         positive direction of the second axis, to the positive direction of the
-         first axis.
-
-         \sstitem
-         For a \htmlref{SkyFrame}{SkyFrame}, the returned position angle is the angle from north
-         to the great circle joining the supplied positions. Positive rotation is
-         in the sense of rotation from north to east.
-
-         \sstitem
-         An error will be reported if the Frame is not 2-dimensional.
-
-         \sstitem
-         This function will return {\tt{"}}bad{\tt{"}} coordinate values (AST\_\_BAD)
-         if any of the input coordinates has this value, or if the require
-         position angle is undefined.
       }
    }
 }
@@ -15574,7 +15570,7 @@ Object            - Base class for all AST Objects
    \sstdescription{
       This function finds the \htmlref{Frame}{Frame} coordinate values of a point which
       is offset a specified distance along the geodesic curve at a
-      given bearing from a specified staring point. It can only be
+      given angle from a specified starting point. It can only be
       used with 2-dimensional Frames.
 
       For example, in a basic Frame, this offset will be along the
@@ -15600,7 +15596,9 @@ Object            - Base class for all AST Objects
       }{
          The angle (in radians) from the positive direction of the second
          axis, to the direction of the required position, as seen from
-         the starting position.
+         the starting position. Positive rotation is in the sense of
+         rotation from the positive direction of axis 2 to the positive
+         direction of axis 1.
       }
       \sstsubsection{
          offset
@@ -15621,23 +15619,16 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          astOffset2
       }{
-         The position angle which the geodesic curve has at the end point.
-         That is, the angle between the positive direction of the second
+         The direction of the geodesic curve at the end point. That is, the
+         angle (in radians) between the positive direction of the second
          axis and the continuation of the geodesic curve at the requested
-         end point.
+         end point. Positive rotation is in the sense of rotation from
+         the positive direction of axis 2 to the positive direction of axis
+         1.
       }
    }
    \sstnotes{
       \sstitemlist{
-
-         \sstitem
-         For a simple Frame, positive rotation is in the sense of
-         rotation from the positive direction of the second axis to the
-         positive direction of the first axis.
-
-         \sstitem
-         For a \htmlref{SkyFrame}{SkyFrame}, positive rotation is in the sense of
-         rotation from north to east.
 
          \sstitem
          The geodesic curve used by this function is the path of
@@ -24284,13 +24275,13 @@ Object            - Base class for all AST Objects
          \htmlref{astAngle}{astAngle}: Calculate the angle subtended by two points at a third point
 
          \sstitem
+         \htmlref{astAxAngle}{astAxAngle}: Find the angle from an axis, to a line through two points.
+
+         \sstitem
          \htmlref{astAxDistance}{astAxDistance}: Calculate the distance between two axis values
 
          \sstitem
          \htmlref{astAxOffset}{astAxOffset}: Calculate an offset along an axis
-
-         \sstitem
-         \htmlref{astBear}{astBear}: Calculate the bearing of one point seen from another point.
 
          \sstitem
          \htmlref{astConvert}{astConvert}: Determine how to convert between two coordinate systems
@@ -26292,10 +26283,10 @@ if the reference point is at either the north or the south pole.
 
 
 \subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8}
+Introduced in V1.8-2}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.7 and V1.8 (the
+occurred in the AST library between versions V1.7 and V1.8-2 (the
 current version):
 
 \begin{enumerate}
@@ -26303,6 +26294,20 @@ current version):
 \item The \htmlref{SkyFrame}{SkyFrame} class has a new attribute called \htmlref{NegLon}{NegLon} which allows
    longitude values to be displayed in the range $-\pi$ to $+\pi$, instead 
    of the usual range zero to $2.\pi$.
+
+\item Some new 
+functions (\htmlref{astAngle}{astAngle}, \htmlref{astAxAngle}{astAxAngle}, \htmlref{astResolve}{astResolve}, \htmlref{astOffset2}{astOffset2}, \htmlref{astAxOffset}{astAxOffset}, 
+\htmlref{astAxDistance}{astAxDistance}) 
+have been added to the \htmlref{Frame}{Frame} class to allow navigation of the coordinate space 
+to be performed without needing to know the underlying geometry
+of the co-ordinate system (for instance, whether it is Cartesian or
+spherical). 
+
+Note, version 1.8-1 contained many of these facilities, but 
+some have been changed in version 1.8-2. Particularly, positions angles
+are now referred to the second Frame axis for {\em all} classes of Frames
+(including SkyFrames), and the 
+astBear function has been replaced by astAxAngle.
 
 \end{enumerate}
 
