@@ -225,6 +225,8 @@
 *           Normalise a set of Frame coordinates.
 *        astOffset
 *           Calculate an offset along a geodesic curve.
+*        astOffset2
+*           Calculate an offset along a geodesic curve for a 2D Frame.
 *        astPermAxes
 *           Permute the order of a Frame's axes.
 *        astPickAxes
@@ -434,7 +436,7 @@
 *     15-FEB-1998 (RFWS):
 *        Added astUnformat.
 *     21-JUN-2001 (DSB):
-*        Added astAngle.
+*        Added astAngle and astOffset2.
 *-
 */
 
@@ -557,6 +559,7 @@ typedef struct AstFrameVtab {
    void (* ClearUnit)( AstFrame *, int );
    void (* Norm)( AstFrame *, double[] );
    void (* Offset)( AstFrame *, const double[], const double[], double, double[] );
+   double (* Offset2)( AstFrame *, const double[2], double, double, double[2] );
    void (* Overlay)( AstFrame *, const int *, AstFrame * );
    void (* PermAxes)( AstFrame *, const int[] );
    void (* PrimaryFrame)( AstFrame *, int, AstFrame **, int * );
@@ -623,6 +626,7 @@ AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char * );
 double astAngle_( AstFrame *, const double[], const double[], const double[] );
 double astDistance_( AstFrame *, const double[], const double[] );
 void astNorm_( AstFrame *, double[] );
+double astOffset2_( AstFrame *, const double[2], double, double, double[2] );
 void astOffset_( AstFrame *, const double[], const double[], double, double[] );
 
 #if defined(astCLASS)            /* Protected */
@@ -759,6 +763,8 @@ astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainli
 astINVOKE(V,astNorm_(astCheckFrame(this),value))
 #define astOffset(this,point1,point2,offset,point3) \
 astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3))
+#define astOffset2(this,point1,angle,offset,point2) \
+astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2))
 
 #if defined(astCLASS)            /* Protected */
 #define astFormat(this,axis,value) \

@@ -62,6 +62,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Modified Match so that all the frames have some axes in order to
 *        match. Otherwise, null pointers are created (for zero axes),
 *        resulting in a seg vio.
+*     21-JUN-2001 (DSB):
+*        Added astAngle, astOffset2.
 
 *class--
 */
@@ -479,8 +481,10 @@ static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const int *GetPerm( AstFrame * );
+static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
+static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static int GenAxisSelection( int, int, int [] );
 static int GetDirection( AstFrame *, int );
 static int GetMaxAxes( AstFrame * );
@@ -811,6 +815,62 @@ static void AddExtraAxes( int naxes, int axes[], int i1, int i2,
          extra = axes[ i ] + ( following ? 0 : 1 );
       }
    }
+}
+
+static double Angle( AstFrame *this_frame, const double a[], 
+                     const double b[], const double c[] ) {
+/*
+*  Name:
+*     Angle
+
+*  Purpose:
+*     Calculate the angle subtended by two points at a third point.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double Angle( AstFrame *this_frame, const double a[], 
+*                   const double b[], const double c[] )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astAngle method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function reports an error if called since it is not possible to 
+*     finds the angle at point B between the line joining points A and B, 
+*     and the line joining points C and B, in the context of a CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     a 
+*        An array of double, with one element for each CmpFrame axis,
+*        containing the coordinates of the first point.
+*     b 
+*        An array of double, with one element for each CmpFrame axis,
+*        containing the coordinates of the second point.
+*     c 
+*        An array of double, with one element for each CmpFrame axis,
+*        containing the coordinates of the third point.
+
+*  Returned Value:
+*     AST__BAD.
+
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Report an error. */
+   astError( AST__BDOBJ, "astAngle: Invalid attempt to use the astAngle "
+             "method with a %s (possible programming error).", 
+             astGetClass( this_frame ) );
+
+/* Return the result. */
+   return AST__BAD;
 }
 
 static void ClearMaxAxes( AstFrame *this_frame ) {
@@ -2377,6 +2437,70 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 /* Free the memory used for the permuted coordinates. */
    v = astFree( v );
+}
+
+static double Offset2( AstFrame *this_frame, const double point1[2],
+                       double angle, double offset, double point2[2] ) {
+/*
+*  Name:
+*     Offset2
+
+*  Purpose:
+*     Calculate an offset along a geodesic curve at a given bearing.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     double Offset2( AstFrame *this_frame, const double point1[2],
+*                     double angle, double offset, double point2[2] )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astOffset2 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function reports an error if called since it is not possible to
+*     find the coordinate values of a point which is offset a specified 
+*     distance along the geodesic curve within a CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     point1
+*        An array of double, with one element for each SkyFrame axis.
+*        This should contain the coordinates of the point marking the
+*        start of the geodesic curve.
+*     angle
+*        The angle (in radians) from north, to the direction of the required 
+*        position, as seen from the starting position. Positive rotation is 
+*        in the sense of rotation from north to east.
+*     offset
+*        The required offset from the first point along the geodesic
+*        curve, in radians. If this is positive, it will be towards
+*        the given bearing. If it is negative, it will be in the
+*        opposite direction. 
+*     point2
+*        An array of double, with one element for each SkyFrame axis
+*        in which the coordinates of the required point will be
+*        returned.
+
+*  Returned Value:
+*     AST__BAD
+
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Report an error. */
+   astError( AST__BDOBJ, "astOffset2: Invalid attempt to use the astOffset2 "
+             "method with a %s (possible programming error).", 
+             astGetClass( this_frame ) );
+
+/* Return the result. */
+   return AST__BAD;
 }
 
 static void Offset( AstFrame *this_frame, const double point1[],

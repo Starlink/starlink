@@ -83,7 +83,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added "Unknown" option for the System attribute. Added read-only
 *        attributes LatAxis and LonAxis.
 *     21-JUN-2001 (DSB):
-*        Added astAngle.
+*        Added astAngle and astOffset2.
 *class--
 */
 
@@ -192,6 +192,7 @@ static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetEpoch( AstSkyFrame * );
 static double GetEquinox( AstSkyFrame * );
+static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static double ReadDateTime( const char * );
 static int ChrMatch( const char *, const char * );
 static int GetAsTime( AstSkyFrame *, int );
@@ -230,6 +231,8 @@ static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
 static void SetProjection( AstSkyFrame *, const char * );
 static void SetSystem( AstSkyFrame *, AstSkySystemType );
+static void Shapp( double, double *, double *, double, double * );
+static void Shcal( double, double, double, double *, double * );
 
 /* Member functions. */
 /* ================= */
@@ -2232,6 +2235,7 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    frame->Distance = Distance;
    frame->Norm = Norm;
    frame->Offset = Offset;
+   frame->Offset2 = Offset2;
 
 /* Store pointers to inherited methods that will be invoked explicitly
    by this class. */
@@ -3113,6 +3117,173 @@ static void Offset( AstFrame *this_frame, const double point1[],
    }
 }
 
+static double Offset2( AstFrame *this_frame, const double point1[2],
+                       double angle, double offset, double point2[2] ) {
+/*
+*  Name:
+*     Offset2
+
+*  Purpose:
+*     Calculate an offset along a geodesic curve at a given bearing.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double Offset2( AstFrame *this_frame, const double point1[2],
+*                     double angle, double offset, double point2[2] )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astOffset2 method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function finds the SkyFrame coordinate values of a point
+*     which is offset a specified distance along the geodesic curve
+*     (i.e. great circle) at a given bearing from a given starting point.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     point1
+*        An array of double, with one element for each SkyFrame axis.
+*        This should contain the coordinates of the point marking the
+*        start of the geodesic curve.
+*     angle
+*        The angle (in radians) from north, to the direction of the required 
+*        position, as seen from the starting position. Positive rotation is 
+*        in the sense of rotation from north to east.
+*     offset
+*        The required offset from the first point along the geodesic
+*        curve, in radians. If this is positive, it will be towards
+*        the given bearing. If it is negative, it will be in the
+*        opposite direction. 
+*     point2
+*        An array of double, with one element for each SkyFrame axis
+*        in which the coordinates of the required point will be
+*        returned.
+
+*  Returned Value:
+*     The position angle which the geodesic curve has at the end point.
+*     That is, the angle between the positive direction of the second
+*     axis and the continuation of the geodesic curve at the requested
+*     end point. 
+
+*  Notes:
+*     - The geodesic curve used by this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;          /* Pointer to the SkyFrame structure */
+   const int *perm;            /* Pointer to axis permutation array */
+   double p1[ 2 ];             /* Permuted coordinates for point1 */
+   double p2[ 2 ];             /* Permuted coordinates for point2 */
+   double result;              /* The returned answer */
+   double cosoff;              /* Cosine of offset */
+   double cosa1;               /* Cosine of longitude at start */
+   double cosb1;               /* Cosine of latitude at start */
+   double q1[ 3 ];             /* Vector PI/2 away from R4 in meridian of R4 */
+   double q2[ 3 ];             /* Vector PI/2 away from R4 on equator */
+   double q3[ 3 ];             /* Vector PI/2 away from R4 on great circle */
+   double r0[ 3 ];             /* Reference position vector */
+   double r3[ 3 ];             /* Vector PI/2 away from R0 on great circle */
+   double sinoff;              /* Sine of offset */
+   double sina1;               /* Sine of longitude at start */
+   double sinb1;               /* Sine of latitude at start */
+
+/* Check the global error status. */
+   result = AST__BAD;
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+   perm = astGetPerm( this );
+   if ( astOK ) {
+
+/* Check that all supplied values are OK. If not, generate "bad"
+   output coordinates. */
+      if ( ( point1[ 0 ] == AST__BAD ) || ( point1[ 1 ] == AST__BAD ) ||
+           ( angle == AST__BAD ) || ( offset == AST__BAD ) ) {
+         point2[ 0 ] = AST__BAD;
+         point2[ 1 ] = AST__BAD;
+
+/* Otherwise, apply the axis permutation array to obtain the
+   coordinates of the starting point in the required (longitude,latitude) 
+   order. */
+      } else {
+         p1[ perm[ 0 ] ] = point1[ 0 ];
+         p1[ perm[ 1 ] ] = point1[ 1 ];
+
+/* Use Shcal to calculate the required vectors R0 (representing
+   the reference point) and R3 (representing the point which is 90
+   degrees away from the reference point, along the required great
+   circle). The XY plane defines zero latitude, Z is in the direction
+   of increasing latitude, X is towards zero longitude, and Y is
+   towards longitude 90 degrees. */
+         Shcal( p1[ 0 ], p1[ 1 ], angle, r0, r3 );
+
+/* Use Shapp to use R0 and R3 to calculate the new position. */
+         Shapp( offset, r0, r3,  p1[ 0 ], p2 );
+
+/* Normalize the result. */
+         astNorm( this, p2 );
+
+/* Create the vector Q1 representing the point in the meridian of the
+   required point which has latitude 90 degrees greater than the
+   required point. */
+         sina1 = sin( p2[ 0 ] );
+         cosa1 = cos( p2[ 0 ] );
+         sinb1 = sin( p2[ 1 ] );
+         cosb1 = cos( p2[ 1 ] );
+   
+         q1[ 0 ] = -sinb1*cosa1;
+         q1[ 1 ] = -sinb1*sina1;
+         q1[ 2 ] = cosb1;
+
+/* Create the vector Q2 representing the point on the equator (i.e. a
+   latitude of zero), which has a longitude 90 degrees to the west of
+   the required point. */
+         q2[ 0 ] = -sina1;
+         q2[ 1 ] =  cosa1;
+         q2[ 2 ] =  0.0;
+
+/* Create the vector Q3 representing the point which is 90 degrees away
+   from the required point, along the required great circle. */
+         cosoff = cos( offset );
+         sinoff = sin( offset );
+   
+         q3[ 0 ] = -sinoff*r0[ 0 ] + cosoff*r3[ 0 ];
+         q3[ 1 ] = -sinoff*r0[ 1 ] + cosoff*r3[ 1 ];
+         q3[ 2 ] = -sinoff*r0[ 2 ] + cosoff*r3[ 2 ];
+
+/* Calculate the position angle of the great circle at the required
+   point. */
+         result = atan2( slaDvdv( q3, q2 ), slaDvdv( q3, q1 ) );
+
+/* Ensure that the end position angle is in the range 0 to 2*pi. */
+         result = slaDranrm( result );
+
+/* Permute the result coordinates to undo the effect of the SkyFrame
+   axis permutation array. */
+         point2[ 0 ] = p2[ perm[ 0 ] ];
+         point2[ 1 ] = p2[ perm[ 1 ] ];
+      }
+   }
+
+printf( "Add astOffset2 and astAngle to cmpframe.c !!!!!!\n" );
+
+/* Return the result. */
+   return result;
+
+}
+
 static void Overlay( AstFrame *template, const int *template_axes,
                      AstFrame *result ) {
 /*
@@ -3969,6 +4140,186 @@ static void SetMinAxes( AstFrame *this_frame, int minaxes ) {
 
 /* Use the parent astSetMinAxes method to set a value of 2. */
    (*parent_setminaxes)( this_frame, 2 );
+}
+
+static void Shapp( double dist, double *r0, double *r3, double a0, 
+                   double *p4 ){
+/*
+*  Name:
+*     Shapp
+
+*  Purpose:
+*     Use the vectors calculated by Shcal to find a sky position
+*     which is offset along a given position angle.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void Shapp( double dist, double *r0, double *r3, double a0, 
+*                 double *p4 )
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function uses the vectors R0 and R3 calculated previously by
+*     Shcal to find the sky position which is offset away from the
+*     "reference" position (see function Offset2) by a given arc
+*     distance, along a given great circle.
+*
+*     No checks are made for AST__BAD values.
+
+*  Parameters:
+*     dist 
+*        The arc distance to move away from the reference position
+*        in the given direction, in radians.
+*     r0
+*        Pointer to an array holding the 3-vector representing the reference 
+*        position.
+*     r3
+*        Pointer to an array holding the 3-vector representing the 
+*        point which is 90 degrees away from the reference point, along 
+*        the required great circle.
+*     a0 
+*        The sky longitude of the reference position, in radians.
+*     p4 
+*        Pointer to an array of 2 doubles in which to put the sky longitude 
+*        and latitude of the required point, in radians.
+
+*/
+
+/* Local Variables: */
+   double cosdst;            /* Cosine of DIST */
+   double r4[ 3 ];           /* Required position vector */
+   double sindst;            /* Sine of DIST */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store commonly used values. */
+   sindst = sin( dist );
+   cosdst = cos( dist );
+
+/* The vector R4 representing the required point is produced as a
+   linear sum of R0 and R3. */
+   r4[ 0 ] = cosdst*r0[ 0 ] + sindst*r3[ 0 ];
+   r4[ 1 ] = cosdst*r0[ 1 ] + sindst*r3[ 1 ];
+   r4[ 2 ] = cosdst*r0[ 2 ] + sindst*r3[ 2 ];
+
+/* Create the longitude of the required point. If this point is at 
+   a pole it is assigned the same longitude as the reference point. */
+   if( r4[ 0 ] != 0.0 || r4[ 1 ] != 0.0 ) {
+      p4[ 0 ] = atan2( r4[ 1 ], r4[ 0 ] );
+   } else {
+      p4[ 0 ] = a0;
+   }
+
+/* Create the latitude of the required point. */
+   p4[ 1 ] = asin( max( -1.0, min( 1.0, r4[ 2 ] ) ) );
+
+}
+
+static void Shcal( double a0, double b0, double angle, double *r0, 
+                   double *r3 ) {
+/*
+*  Name:
+*     Shcal
+
+*  Purpose:
+*     Calculate vectors required by Offset2.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void Shcal( double a0, double b0, double angle, double *r0, 
+*                 double *r3 )
+
+*  Class Membership:
+*     SkyFrame member function.
+
+*  Description:
+*     This function calculates the 3-vector R0, representing the given
+*     sky position (A0,B0), and the 3-vector R3, representing the sky
+*     position which is 90 degrees away from R0, along a great circle
+*     passing through R0 at a position angle given by ANGLE. Each
+*     3-vector holds Cartesian (X,Y,Z) values with origin at the centre
+*     of the celestial sphere. The XY plane is the "equator", the Z
+*     axis is in the direction of the "north pole", X is towards zero
+*     longitude (A=0), and Y is towards longitude 90 degrees.
+*
+*     No checks are made for AST__BAD input values.
+
+*  Parameters:
+*     a0 
+*        The sky longitude of the given position, in radians.
+*     b0 
+*        The sky latitude of the given position, in radians.
+*     angle 
+*        The position angle of a great circle passing through the given
+*        position.  That is, the angle from north to the required
+*        direction, in radians. Positive angles are in the sense of
+*        rotation from north to east.
+*     r0
+*        A pointer to an array to receive 3-vector R0. See above.
+*     r3
+*        A pointer to an array to receive 3-vector R3. See above.
+
+*/
+
+/* Local Variables: */
+   double cosa0;         /* Cosine of A0 */
+   double cosb0;         /* Cosine of B0 */
+   double cospa;         /* Cosine of ANGLE */
+   double r1[ 3 ];       /* Vector PI/2 away from R0 in meridian of R0 */
+   double r2[ 3 ];       /* Vector PI/2 away from R0 on equator */
+   double sinpa;         /* Sine of ANGLE */
+   double sina0;         /* Sine of A0 */
+   double sinb0;         /* Sine of B0 */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store commonly used values. */
+   sina0 = sin( a0 );
+   cosa0 = cos( a0 );
+   sinb0 = sin( b0 );
+   cosb0 = cos( b0 );
+   sinpa = sin( angle );
+   cospa = cos( angle );
+
+/* Create the vector R0 representing the given point. The XY plane
+   defines zero latitude, Z is in the direction of increasing latitude,
+   X is towards zero longitude, and Y is towards longitude 90 degrees. */
+   r0[ 0 ] =  cosb0*cosa0;
+   r0[ 1 ] =  cosb0*sina0;
+   r0[ 2 ] =  sinb0;
+
+/* Create the vector R1 representing the point in the meridian of the
+   given point which has latitude 90 degrees greater than the
+   given point. */
+   r1[ 0 ] = -sinb0*cosa0;
+   r1[ 1 ] = -sinb0*sina0;
+   r1[ 2 ] =  cosb0;
+
+/* Create the vector R2 representing the point on the equator (i.e. a
+   latitude of zero), which has a longitude 90 degrees to the west of
+   the given point. */
+   r2[ 0 ] = -sina0;
+   r2[ 1 ] =  cosa0;
+   r2[ 2 ] =  0.0;
+
+/* Create the vector R3 representing the point which is 90 degrees away
+   from the given point, along the required great circle. */
+   r3[ 0 ] =  cospa*r1[ 0 ] + sinpa*r2[ 0 ];
+   r3[ 1 ] =  cospa*r1[ 1 ] + sinpa*r2[ 1 ];
+   r3[ 2 ] =  cospa*r1[ 2 ] + sinpa*r2[ 2 ];
+
+/* Return */
+   return;
 }
 
 static int SubFrame( AstFrame *target_frame, AstFrame *template,

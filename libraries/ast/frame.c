@@ -62,6 +62,7 @@ c     - astFindFrame: Find a coordinate system with specified characteristics
 c     - astFormat: Format a coordinate value for a Frame axis
 c     - astNorm: Normalise a set of Frame coordinates
 c     - astOffset: Calculate an offset along a geodesic curve
+c     - astOffset2: Calculate an offset along a geodesic curve in a 2D Frame
 c     - astPermAxes: Permute the order of a Frame's axes
 c     - astPickAxes: Create a new Frame by picking axes from an existing one
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
@@ -72,6 +73,7 @@ f     - AST_FINDFRAME: Find a coordinate system with specified characteristics
 f     - AST_FORMAT: Format a coordinate value for a Frame axis
 f     - AST_NORM: Normalise a set of Frame coordinates
 f     - AST_OFFSET: Calculate an offset along a geodesic curve
+c     - AST_OFFSET2: Calculate an offset along a geodesic curve in a 2D Frame
 f     - AST_PERMAXES: Permute the order of a Frame's axes
 f     - AST_PICKAXES: Create a new Frame by picking axes from an existing one
 f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
@@ -118,7 +120,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     18-JUL-1999 (RFWS):
 *        Fixed memory leak in ConvertX.
 *     21-JUN-2001 (DSB):
-*        Added astAngle.
+*        Added astAngle and astOffset2.
 *class--
 */
 
@@ -625,7 +627,8 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstFrameVtab * );
 static void Norm( AstFrame *, double[] );
-static void Offset( AstFrame *this, const double[], const double[], double, double[] );
+static void Offset( AstFrame *, const double[], const double[], double, double[] );
+static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void PermAxes( AstFrame *, const int[] );
 static void PrimaryFrame( AstFrame *, int, AstFrame **, int * );
@@ -3459,6 +3462,7 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->Match = Match;
    vtab->Norm = Norm;
    vtab->Offset = Offset;
+   vtab->Offset2 = Offset2;
    vtab->Overlay = Overlay;
    vtab->PermAxes = PermAxes;
    vtab->PickAxes = PickAxes;
@@ -3877,6 +3881,132 @@ f     (using AST_FORMAT).
 /* Quit looping if an error occurs. */
       if ( !astOK ) break;
    }
+}
+
+static double Offset2( AstFrame *this, const double point1[2], double angle, 
+                     double offset, double point2[2] ){
+/*
+*++
+*  Name:
+c     astOffset2
+f     AST_OFFSET2
+
+*  Purpose:
+*     Calculate an offset along a geodesic curve in a 2D Frame.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     double Offset2( AstFrame *this, const double point1[2], double angle, 
+c                   double offset, double point2[2] );
+f     RESULT = AST_OFFSET2( THIS, POINT1, ANGLE, OFFSET, POINT2, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function finds the Frame coordinate values of a point which
+f     This routine finds the Frame coordinate values of a point which
+*     is offset a specified distance along the geodesic curve at a
+*     given bearing from a specified staring point. It can only be
+*     used with 2-dimensional Frames.
+*
+*     For example, in a basic Frame, this offset will be along the
+*     straight line joining two points. For a more specialised Frame
+*     describing a sky coordinate system, however, it would be along
+*     the great circle passing through two sky positions.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+f     POINT1( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute). This should contain the coordinates of the
+*        point marking the start of the geodesic curve.
+c     angle
+f     ANGLE = DOUBLE PRECISION (Given)
+*        The angle (in radians) from the positive direction of the second
+*        axis, to the direction of the required position, as seen from
+*        the starting position. Positive rotation is in the sense of 
+*        rotation from the positive direction of the second axis to the 
+*        positive direction of the first axis.
+c     offset
+f     OFFSET = DOUBLE PRECISION
+*        The required offset from the first point along the geodesic
+*        curve. If this is positive, it will be in the direction of the
+*        given angle. If it is negative, it will be in the opposite
+*        direction. 
+c     point2
+f     POINT2( * ) = DOUBLE PRECISION (Returned)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        in which the coordinates of the required point will be returned.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astOffset2
+f     AST_OFFSET2 = DOUBLE PRECISION
+*        The position angle which the geodesic curve has at the end point.
+*        That is, the angle between the positive direction of the second
+*        axis and the continuation of the geodesic curve at the requested
+*        end point. 
+
+*  Notes:
+c     - The geodesic curve used by this function is the path of
+f     - The geodesic curve used by this routine is the path of
+*     shortest distance between two points, as defined by the
+c     astDistance function.
+f     AST_DISTANCE function.
+*     - An error will be reported if the Frame is not 2-dimensional.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value.
+*--
+*/
+
+/* Local Variables: */
+   int axis;                     /* Loop counter for axes */
+   int naxes;                    /* Number of Frame axes */
+   double result;                /* Returned value */
+
+/* Check the global error status. */
+   result = AST__BAD;
+   if ( !astOK ) return result;
+
+/* Initialize bad values. */
+   point2[ 0 ] = AST__BAD;
+   point2[ 1 ] = AST__BAD;
+
+/* Determine the number of Frame axes. */
+   naxes = astGetNaxes( this );
+
+/* Report an error if the Frame is not 2 dimensional. */
+   if( naxes != 2 && astOK ) {
+      astError( AST__NAXIN, "astOffset2(%s): Invalid number of Frame axes (%d)."
+                " astOffset2 can only be used with 2 dimensonal Frames.",
+                astGetClass( this ), naxes );
+   }
+
+/* Check the supplied values. */
+   if ( astOK && point1[ 0 ] != AST__BAD && point1[ 1 ] != AST__BAD && 
+        angle != AST__BAD && offset != AST__BAD ) {
+
+/* Store the results. */
+      point2[ 0 ] = point1[ 0 ] + sin( angle )*offset;      
+      point2[ 1 ] = point1[ 1 ] + cos( angle )*offset;      
+
+/* The position angle of the curve does not vary in cartesian coordinates */
+      result = angle;
+
+   }
+
+/* Return the result. */
+   return result;
+
 }
 
 static void Offset( AstFrame *this, const double point1[],
@@ -7571,6 +7701,11 @@ void astOffset_( AstFrame *this, const double point1[], const double point2[],
                  double offset, double point3[] ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,Offset))( this, point1, point2, offset, point3 );
+}
+double astOffset2_( AstFrame *this, const double point1[2], double angle,
+                 double offset, double point2[2] ) {
+   if ( !astOK ) return AST__BAD;
+   return (**astMEMBER(this,Frame,Offset2))( this, point1, angle, offset, point2 );
 }
 void astOverlay_( AstFrame *template, const int *template_axes,
                   AstFrame *result ) {

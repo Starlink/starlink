@@ -22,6 +22,7 @@
 *     AST_ISAFRAME
 *     AST_NORM
 *     AST_OFFSET
+*     AST_OFFSET2
 *     AST_PERMAXES
 *     AST_PICKAXES
 *     AST_UNFORMAT
@@ -41,7 +42,7 @@
 *     25-FEB-1998 (RFWS):
 *        Added AST_UNFORMAT.
 *     21-JUN-2001 (DSB):
-*        Added AST_ANGLE.
+*        Added AST_ANGLE and AST_OFFSET2.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -237,6 +238,26 @@ F77_SUBROUTINE(ast_offset)( INTEGER(THIS),
    astWatchSTATUS(
       astOffset( astI2P( *THIS ), POINT1, POINT2, *OFFSET, POINT3 );
    )
+}
+
+F77_DOUBLE_FUNCTION(ast_offset2)( INTEGER(THIS),
+                             DOUBLE_ARRAY(POINT1),
+                             DOUBLE(ANGLE),
+                             DOUBLE(OFFSET),
+                             DOUBLE_ARRAY(POINT2),
+                             INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(POINT1)
+   GENPTR_DOUBLE(ANGLE)
+   GENPTR_DOUBLE(OFFSET)
+   GENPTR_DOUBLE_ARRAY(POINT2)
+   F77_DOUBLE_TYPE(RESULT);
+
+   astAt( "AST_OFFSET2", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astOffset2( astI2P( *THIS ), POINT1, *ANGLE, *OFFSET, POINT2 );
+   )
+   return RESULT;
 }
 
 F77_SUBROUTINE(ast_permaxes)( INTEGER(THIS),
