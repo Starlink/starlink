@@ -88,12 +88,12 @@
 *
 *     In its most simple format a FITS control table is just a series of
 *     lines which contain the names of CCDPACK extension items and the
-*     names of the FITS keywords to which they map.
+*     names of the FITS keywords to which they map:
 *
 *        Extension-item     FITS-keyword
 *
 *     If the HDS type of the destination Extension-item is known this
-*     may be included.
+*     may be included:
 *
 *        Extension-item     _HDS-type     FITS-keyword
 *
@@ -104,13 +104,13 @@
 *     "NDF_NAME.MORE.CCDPACK." part of the extension path name.
 *
 *     To allow functions of FITS-keywords to be possible a second
-*     "declarative" form of statement is necessary.
+*     "declarative" form of statement is necessary:
 *
 *        _HDS-type          FITS-keyword
 *
 *     So for instance if you wanted to derive an exposure time for an
 *     observation which was given in milliseconds and which you wanted
-*     to convert into seconds you would use this sequence of commands
+*     to convert into seconds you would use this sequence of commands:
 *
 *        _INTEGER          EXPOSURE
 *        TIMES.DARK        _DOUBLE    1000.0D0*EXPOSURE
@@ -118,7 +118,7 @@
 *     The "_INTEGER EXPOSURE" tells this application to find a FITS
 *     keyword of EXPOSURE and extract its value as an integer.  If you
 *     wanted to estimate the dark time from a knowledge of the start
-*     and end times (TAI0 and TAI1).
+*     and end times (TAI0 and TAI1):
 *
 *        _DOUBLE        TAI0
 *        _DOUBLE        TAI1
@@ -130,7 +130,7 @@
 *
 *     Functions are allowed to not contain any FITS-keywords in which
 *     case the extension item will be assigned to the value, so for
-*     instance constants may be given.
+*     instance constants may be given:
 *
 *        EXTENT.MINX   _INTEGER       1
 *        EXTENT.MINY   _INTEGER       1
@@ -139,12 +139,26 @@
 *     In this way import tables could actually be used to set all the
 *     required values in the CCDPACK extension (but see PRESENT also).
 *
-*     Characters strings cannot be manipulated by functions so a single
-*     special format for translating their values is provided. The name
-*     of the destination extension item and (optionally) its type are
-*     given as usual followed by a FITS-keyword which contains the
-*     string to be translated. This is then followed by statements which
-*     translate an "input" string into an "output" string. I.e.
+*     Characters strings cannot be manipulated by functions so two 
+*     special formats for translating their values are provided. 
+*     The first form allows for the concatenation of keywords and
+*     the second the translation from a known word to another
+*     (which is usually one of the CCDPACK special names). The
+*     concatenation form looks like:
+*
+*        _CHAR         FILTER
+*        _CHAR         HWP
+*        FILTER        _CHAR          FILTER//HWP
+*
+*     Which results in the FILTER extension item being set to the 
+*     concatenation of the values of the FITS keywords FILTER and
+*     HWP (you can concatentate more than two values).
+*
+*     In the second special form the name of the destination extension 
+*     item and (optionally) its type are given as usual followed by a 
+*     FITS-keyword which contains the string to be translated. This is 
+*     then followed by statements which translate an "input" string 
+*     into an "output" string. I.e.
 *
 *        FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
 *
@@ -221,6 +235,8 @@
 *        Added more prologue.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator control (foreign data access upgrade).
+*     12-SEP-1997 (PDRAPER):
+*        Added the concatenate option for character import.
 *     {enter_changes_here}
 
 *  Bugs:

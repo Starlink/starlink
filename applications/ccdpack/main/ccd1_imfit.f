@@ -35,7 +35,10 @@
 *   can process and should only contain a single FITS-keyword. Finally
 *   if the destination item is of HDS type _CHAR then it is assumed to
 *   be an expression which maps the values of string extracted from the
-*   FITS block to strings which are valid in the CCDPACK extension.
+*   FITS block to strings which are valid in the CCDPACK extension,
+*   unless it is a single word in which case the value is used
+*   directly or unless it contains the string '//' in which case the
+*   values are concatenated together.
 *
 *   The FITS items types need not be the same as the extension types as
 *   translations between the various types are preformed. This may
@@ -99,7 +102,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -147,6 +150,7 @@
       INTEGER FIRST             ! Position of first character in word
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in string
+      INTEGER NOWAT             ! Position in string
       INTEGER IFIT              ! Integer value of FITS item
       INTEGER IZERO( 1 )        ! 0
       INTEGER J                 ! Loop variable
@@ -162,7 +166,7 @@
       LOGICAL NOTTRN            ! No translation possible
       REAL RFIT                 ! Real value of FITS item
       REAL RZERO( 1 )           ! 0.0
-      INTEGER LENNAM            ! Length of extension item name 
+      INTEGER LENNAM            ! Length of extension item name
       INTEGER LENFUN            ! Length of function
       LOGICAL NOFUN             ! Whether a function exists or not
       INTEGER LENFOR            ! Length of forward expression
@@ -172,9 +176,9 @@
                                 ! be known and exist
 
 *  Local Data:
-      DATA DZERO / 0.0D0 / 
-      DATA RZERO / 0.0 / 
-      DATA IZERO / 0 / 
+      DATA DZERO / 0.0D0 /
+      DATA RZERO / 0.0 /
+      DATA IZERO / 0 /
 
 *.
 
@@ -193,7 +197,7 @@
 *  First job is to get the values of all the FITS-items which are
 *  required. The names of the FITS-keywords are given in FITGRP( 1 ).
 *  Their types are stored in FITGRP( 2 ).
-      NCHAR = 0 
+      NCHAR = 0
       DO 1 I = 1, NFITS
          CALL GRP_GET( FITGRP( 1 ), I, 1, KEYWRD, STATUS )
          CALL GRP_GET( FITGRP( 2 ), I, 1, FITVAL, STATUS )
@@ -259,23 +263,24 @@
 
 *  Get the values for this extension item, the destination name, its
 *  type and the function of FITS-keywords that result in a value for it.
-         CALL GRP_GET( DESGRP( 1 ), I, 1, EXTNAM, STATUS )    
+         CALL GRP_GET( DESGRP( 1 ), I, 1, EXTNAM, STATUS )
          LENNAM = CHR_LEN( EXTNAM( :80 ) )
-         CALL GRP_GET( DESGRP( 2 ), I, 1, EXTTYP, STATUS )    
+         CALL GRP_GET( DESGRP( 2 ), I, 1, EXTTYP, STATUS )
          LENTYP = CHR_LEN( EXTTYP( :15 ) )
-         CALL GRP_GET( DESGRP( 3 ), I, 1, EXTFUN, STATUS )    
+         CALL GRP_GET( DESGRP( 3 ), I, 1, EXTFUN, STATUS )
          LENFUN = CHR_LEN( EXTFUN )
          NOFUN = .FALSE.
          IF ( LENFUN .EQ. 0 ) NOFUN = .TRUE.
-         IF ( EXTTYP( 1 : 5 ) .EQ. '_CHAR' ) THEN             
-                                                              
+         IF ( EXTTYP( 1 : 5 ) .EQ. '_CHAR' ) THEN
+
 *  Result is a character value. The Function for this should either be
-*  a single keyword or a keyword followed by string1=string2 ...
-*  statements. The values on the right-hand side of the equations are
-*  the allowed names of the CCDPACK extension items the values on the
-*  left should equate to those picked up from the FITS extensions.
+*  a single keyword, a concatenation expression or a keyword followed
+*  by string1=string2 ... statements. The values on the right-hand
+*  side of the equations are the allowed names of the CCDPACK
+*  extension items the values on the left should equate to those
+*  picked up from the FITS extensions.
 *  First get the name of the keyword.
-            IF ( NOFUN ) THEN                                
+            IF ( NOFUN ) THEN
 
 *  Must be an empty field. Cannot do anything with this.
                CALL MSG_SETC( 'ITEM', EXTNAM )
@@ -283,44 +288,93 @@
      :         'value for _CHAR extension item ^ITEM', STATUS )
             ELSE
 
-*  Look for word (must exist) .
-               CALL CCD1_NXWRD( EXTFUN( :LENFUN ), 1, FIRST, LAST,
-     :                          NOTFND, STATUS )
+*  Check if the "function" contains the concatenation operator, if so
+*  then remove all the // strings and do the work.
+               IF ( INDEX( EXTFUN( :LENFUN ), '//' ) .NE. 0 ) THEN
+                  CALL CCD1_REPC( EXTFUN( :LENFUN ), '/', ' ', STATUS )
 
-*  Is this the only word or do other exist? If this is the only word
-*  then the associated value is that of the FITS-keyword. Otherwise we
-*  need to decode the equations.
-               IF ( LAST .EQ. LENFUN ) THEN
-                  NOMORE = .TRUE.
-               ELSE
-                  NOMORE = .FALSE.
-               END IF
-
-*  Ok now look for the value associated with this keyword.
-               NCHAR = LAST - FIRST + 1
-               FOUND = .FALSE.
-               DO 3 J = 1, NFITS
-                  CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
-                  IF ( EXTFUN( 1: NCHAR ) .EQ. KEYWRD( 1: NCHAR ) )
-     :            THEN 
-                     FOUND = .TRUE.                           
+*  Loop over all keywords and look for their associated values.
+                  IAT = 1
+                  NOWAT = 0
+                  FITVAL = ' '
+ 9                CONTINUE
+                  CALL CCD1_NXWRD( EXTFUN( :LENFUN ), IAT, FIRST,
+     :                             LAST, NOTFND, STATUS )
+                  IAT = LAST + 1
+                  IF ( .NOT. NOTFND ) THEN
+                     DO 8 J = 1, NFITS
+                        CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS)
+                        IF ( EXTFUN( FIRST : LAST ) .EQ.
+     :                       KEYWRD( : LAST - FIRST + 1 ) ) THEN
+                           FOUND = .TRUE.
 
 *  Found keyword, now need its value. This could be store in any type so
 *  need to translate.
-                     CALL GRP_GET( FITGRP( 2 ), J, 1, FOR, STATUS )
-                     IF ( FOR( 1 : 8 ) .EQ. '_INTEGER' ) THEN
-                        CALL CHR_ITOC( IVALS( J ), FITVAL, NCHAR )
-                     ELSE IF ( FOR( 1 : 5 ) .EQ. '_REAL' ) THEN
-                        CALL CHR_RTOC( RVALS( J ), FITVAL, NCHAR )
-                     ELSE IF ( FOR( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
-                        CALL CHR_DTOC( DVALS( J ), FITVAL, NCHAR )
-                     ELSE IF ( FOR( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
-                        CALL CHR_LTOC( LVALS( J ), FITVAL, NCHAR )
-                     ELSE
-                        CALL GRP_GET( CHRGRP, CVALS( J ), 1, FITVAL,
-     :                                STATUS )
-                        NCHAR = CHR_LEN( FITVAL( :80 ) )
-                     END IF
+                           CALL GRP_GET( FITGRP( 2 ), J, 1, FOR, STATUS)
+                           IF ( FOR( 1 : 8 ) .EQ. '_INTEGER' ) THEN
+                              CALL CHR_ITOC( IVALS( J ), FOR, NCHAR )
+                           ELSE IF ( FOR( 1 : 5 ) .EQ. '_REAL' ) THEN
+                              CALL CHR_RTOC( RVALS( J ), FOR, NCHAR )
+                           ELSE IF ( FOR( 1 : 7 ) .EQ. '_DOUBLE' )
+     :                     THEN
+                              CALL CHR_DTOC( DVALS( J ), FOR, NCHAR )
+                           ELSE IF ( FOR( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
+                              CALL CHR_LTOC( LVALS( J ), FOR, NCHAR )
+                           ELSE
+                              CALL GRP_GET( CHRGRP, CVALS( J ), 1,
+     :                                      FOR, STATUS )
+                           END IF
+                           CALL CHR_APPND( FOR, FITVAL, NOWAT )
+
+*  Skip more loops and try for next word.
+                           GO TO 9
+                        END IF
+ 8                   CONTINUE
+
+*  Only arrive here if the FITS keyword wasn't matched. If this case
+*  we must flag an error and abort.
+                     FOUND = .FALSE.
+                  END IF
+                  FIRST = 1
+               ELSE
+
+*  Now look for the first word (must exist).
+                  CALL CCD1_NXWRD( EXTFUN( :LENFUN ), 1, FIRST, LAST,
+     :                             NOTFND, STATUS )
+
+*  If this is the only word and the string is not a concatenation
+*  function then the associated value is that of the FITS-keyword.
+                  IF ( LAST .EQ. LENFUN ) THEN
+                     NOMORE = .TRUE.
+                  ELSE
+                     NOMORE = .FALSE.
+                  END IF
+
+*  Ok now look for the value associated with this keyword.
+                  NCHAR = LAST - FIRST + 1
+                  FOUND = .FALSE.
+                  DO 3 J = 1, NFITS
+                     CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
+                     IF ( EXTFUN( 1: NCHAR ) .EQ. KEYWRD( 1: NCHAR ) )
+     :               THEN
+                        FOUND = .TRUE.
+
+*  Found keyword, now need its value. This could be store in any type so
+*  need to translate.
+                        CALL GRP_GET( FITGRP( 2 ), J, 1, FOR, STATUS )
+                        IF ( FOR( 1 : 8 ) .EQ. '_INTEGER' ) THEN
+                           CALL CHR_ITOC( IVALS( J ), FITVAL, NCHAR )
+                        ELSE IF ( FOR( 1 : 5 ) .EQ. '_REAL' ) THEN
+                           CALL CHR_RTOC( RVALS( J ), FITVAL, NCHAR )
+                        ELSE IF ( FOR( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
+                           CALL CHR_DTOC( DVALS( J ), FITVAL, NCHAR )
+                        ELSE IF ( FOR( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
+                           CALL CHR_LTOC( LVALS( J ), FITVAL, NCHAR )
+                        ELSE
+                           CALL GRP_GET( CHRGRP, CVALS( J ), 1, FITVAL,
+     :                                   STATUS )
+                           NCHAR = CHR_LEN( FITVAL( :80 ) )
+                        END IF
 
 *  If necessary test this against the trailing description. Have
 *  several possibilities for the form here;
@@ -328,84 +382,90 @@
 *     string1 =string2
 *     string1= string2
 *     string1 = string2
-*   This should cope with all these cases.
-                     IF ( .NOT. NOMORE ) THEN
-                        NOTTRN = .FALSE.
-                        IAT = INDEX( EXTFUN(LAST+1: ), FITVAL(:NCHAR ) )
-                        IF ( IAT .NE. 0 ) THEN            
-                                                          
+*   This should cope with all these cases
+                        IF ( .NOT. NOMORE ) THEN
+                           NOTTRN = .FALSE.
+                           IAT = INDEX( EXTFUN(LAST+1: ),
+     :                                  FITVAL(:NCHAR ) )
+                           IF ( IAT .NE. 0 ) THEN
+
 *  Have found a match for this string in the trailing description, look
-*  for '=', which should be next character or next word.  
-                           IAT = LAST + IAT + NCHAR       
-                           IF ( EXTFUN( IAT: IAT ) .NE. '=' ) THEN
-                              CALL CCD1_NXWRD( EXTFUN, IAT, FIRST,
-     :                                         LAST, NOTFND, STATUS )
-                              IF ( NOTFND ) THEN          
-                                                          
+*  for '=', which should be next character or next word.
+                              IAT = LAST + IAT + NCHAR
+                              IF ( EXTFUN( IAT: IAT ) .NE. '=' ) THEN
+                                 CALL CCD1_NXWRD( EXTFUN, IAT, FIRST,
+     :                                            LAST, NOTFND, STATUS )
+                                 IF ( NOTFND ) THEN
+
 *  Probably have a misleading syntax, just use the default value.
-                                 NOTTRN = .TRUE.          
-                              ELSE                        
-                                                          
-*  This should be an equals sign                          
-                                 IF ( EXTFUN( FIRST : FIRST ) .EQ. '=' )
-     :                           THEN                     
-                                                              
-*  Next word is the actual value.                             
-                                    CALL CCD1_NXWRD( EXTFUN, FIRST + 1,
-     :                                               FIRST, LAST,
-     :                                               NOTFND, STATUS )
-                                    IF ( NOTFND ) THEN        
-                                                              
+                                    NOTTRN = .TRUE.
+                                 ELSE
+
+*  This should be an equals sign
+                                    IF ( EXTFUN( FIRST : FIRST ) .EQ.
+     :                                   '=' ) THEN
+
+*  Next word is the actual value.
+                                       CALL CCD1_NXWRD( EXTFUN,
+     :                                                  FIRST + 1,FIRST,
+     :                                                  LAST, NOTFND,
+     :                                                  STATUS )
+                                       IF ( NOTFND ) THEN
+
 *  Probably have a misleading syntax, just use the default value.
-                                       NOTTRN = .TRUE.        
-                                    ELSE                      
-                                                              
-*  Got a value.                                               
-                                       FITVAL = EXTFUN( FIRST: LAST )
-                                    END IF                    
-                                 ELSE                         
-                                                              
+                                          NOTTRN = .TRUE.
+                                       ELSE
+
+*  Got a value.
+                                          FITVAL = EXTFUN( FIRST: LAST )
+                                       END IF
+                                    ELSE
+
 *  Probably have a misleading syntax, just use the default value.
-                                    NOTTRN = .TRUE.           
-                                 END IF                       
-                              END IF                          
-                           ELSE                               
-                                                              
-*  No space next word is translation.                         
-                              CALL CCD1_NXWRD( EXTFUN, IAT + 1, FIRST,
-     :                                         LAST, NOTFND, STATUS )
-                              IF ( .NOT. NOTFND ) THEN
-                                 FITVAL = EXTFUN( FIRST : LAST )
-                              ELSE  
-                                 NOTTRN = .TRUE.
+                                       NOTTRN = .TRUE.
+                                    END IF
+                                 END IF
+                              ELSE
+
+*  No space next word is translation.
+                                 CALL CCD1_NXWRD( EXTFUN, IAT + 1,
+     :                                            FIRST, LAST, NOTFND,
+     :                                            STATUS )
+                                 IF ( .NOT. NOTFND ) THEN
+                                    FITVAL = EXTFUN( FIRST : LAST )
+                                 ELSE
+                                    NOTTRN = .TRUE.
+                                 END IF
                               END IF
+                           ELSE
+                              NOTTRN = .TRUE.
                            END IF
-                        ELSE
-                           NOTTRN = .TRUE.
-                        END IF
-                        IF ( NOTTRN ) THEN 
+                           IF ( NOTTRN ) THEN
 
 *  Failed to find a match for this. Just use the FITS-keyword value
 *  directly.
-                           CALL MSG_SETC( 'KEYWORD', KEYWRD )
-                           CALL MSG_SETC( 'FITVAL', FITVAL )
-                           CALL CCD1_MSG( ' ', '  Warning - failed to'//
-     :' locate a translation for FITS-keyword ^KEYWORD, using raw'//
-     :' value (^FITVAL)',  STATUS )
+                              CALL MSG_SETC( 'KEYWORD', KEYWRD )
+                              CALL MSG_SETC( 'FITVAL', FITVAL )
+                              CALL CCD1_MSG( ' ',
+     :                        '  Warning - failed to locate a'//
+     :                        ' translation for FITS-keyword'//
+     :                        ' ^KEYWORD, using raw  value (^FITVAL)',
+     :                        STATUS)
+                           END IF
                         END IF
-                     END IF
 
 *  Skip any remaining loops.
-                     GO TO 4
-                  END IF
- 3             CONTINUE
- 4             CONTINUE
+                        GO TO 4
+                     END IF
+ 3                CONTINUE
+ 4                CONTINUE
+               END IF
                IF ( .NOT. FOUND ) THEN
 
 *  Failed to locate a value for this keyword. Issue warning.
                   CALL MSG_SETC( 'KEYWORD', EXTFUN )
                   CALL CCD1_MSG( ' ', '  Warning - failed to obtain'//
-     :            ' a value for keyword ^KEYWORD', STATUS )
+     :            ' a value for ^KEYWORD', STATUS )
                ELSE
 
 *  Put the value into the extension.
@@ -416,7 +476,7 @@
 *  Inform user of result.
                    MESS = ' '
                    MESS( 5 : )  = EXTNAM
-                   MESS( 28 : ) = FITVAL( :LENFIT ) 
+                   MESS( 28 : ) = FITVAL( :LENFIT )
                    CALL CCD1_MSG( ' ', MESS, STATUS )
                END IF
             END IF
@@ -425,7 +485,7 @@
 
 *  Logicals are special too. Single value allowed must be translatable
 *  by the CHR_CTOL routine. First get name of the keyword.
-            IF ( NOFUN ) THEN 
+            IF ( NOFUN ) THEN
 
 *  Must be an empty field. Cannot do anything with this.
                CALL MSG_SETC( 'ITEM', EXTNAM )
@@ -436,31 +496,31 @@
 *  Look for word in function.
             CALL CCD1_NXWRD( EXTFUN ( : LENFUN ), 1, FIRST, LAST,
      :                       NOTFND, STATUS )
-            
+
 *  Is this the only word or do other exist? This should be the only
-*  word.    
+*  word.
                IF ( LAST .EQ. LENFUN ) THEN
                   NOMORE = .TRUE.
                ELSE
                   NOMORE = .FALSE.
                END IF
-            
+
 *  If more exis, issue a warning at they will be ignored.
                IF ( .NOT. NOMORE ) THEN
                   CALL MSG_SETC( 'EXTRA', EXTFUN( :LENFUN ) )
                   CALL CCD1_MSG( ' ', '  Warning - extra information'//
      :' following _LOGICAL keyword will be ignored (^EXTRA)', STATUS )
                END IF
-            
+
 *  Ok now look for the value associated with this keyword.
                NCHAR = LAST - FIRST + 1
                FOUND = .FALSE.
                DO 5 J = 1, NFITS
                   CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
                   IF ( EXTFUN( 1: NCHAR ) .EQ. KEYWRD( 1: NCHAR ) )
-     :            THEN 
+     :            THEN
                      FOUND = .TRUE.
-            
+
 *  Found keyword, now need its value. This could be store in any type so
 *  need to translate.
                      IF ( EXTTYP( 1 : 8 ) .EQ. '_INTEGER' ) THEN
@@ -476,17 +536,17 @@
      :                                STATUS )
                         NCHAR = CHR_LEN( FITVAL )
                      END IF
-            
+
 *  Convert the character string to logical. Just to check.
                      CALL ERR_MARK
                      CALL CHR_CTOL( FITVAL, NOTFND, STATUS )
                      IF ( STATUS .NE. SAI__OK ) THEN
-            
+
 *  Mustn't be a recognisable logical value.
                         NOTTRN = .FALSE.
                      END IF
                      CALL ERR_RLSE
-            
+
 *  Enter value into extension if ok.
                      IF ( .NOT. NOTTRN ) THEN
                         CALL CCG1_STOCL( NDF, EXTNAM( :LENNAM ),
@@ -496,22 +556,22 @@
                         CALL CHR_LTOC( NOTFND, MESS( 28 : ), NCHAR )
                         CALL CCD1_MSG( ' ', MESS, STATUS )
                      ELSE
-            
+
 *  No value -- issue warning.
                         CALL MSG_SETC( 'FITVAL', FITVAL )
                         CALL MSG_SETC( 'KEYWRD', KEYWRD )
                         CALL CCD1_MSG( ' ', '  Unable to translate '//
      :' (^FITVAL) to a _LOGICAL value (FITS keyword - ^KEYWRD)', STATUS)
                      END IF
-            
+
 *  One value is enough. Skip any extra loops.
                      GO TO 6
-                  END IF 
+                  END IF
  5             CONTINUE
  6             CONTINUE
             END IF
          ELSE
-            
+
 *  Assume that this is a recognisable HDS numeric type. The HDS type of
 *  the extension item is the one we are aiming for, but the components
 *  may be of differing types to this. Use TRANSFORM to work out these
@@ -528,7 +588,7 @@
                ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_REAL' ) THEN
                   CALL TRN_STOKR( KEYWRD( 1: NCHAR ), RVALS( J ),
      :                            EXTFUN, NSUBS, STATUS )
-               ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN 
+               ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
                   CALL TRN_STOKD( KEYWRD( 1: NCHAR ), DVALS( J ),
      :                            EXTFUN, NSUBS, STATUS )
                ELSE IF ( FITVAL( 1: 5 ) .EQ. '_CHAR' ) THEN
@@ -571,7 +631,7 @@
 *  should be worried about. Inform the user of the value derived and
 *  entered into the extension.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL ERR_MARK 
+               CALL ERR_MARK
                TRNTYP = EXTTYP( :LENTYP  ) //':'
                CALL TRN_NEW( 1, 1, FOR( : LENFOR ), INV , TRNTYP,
      :                       ' ', ' ', ' ', LOCTR, STATUS )
@@ -615,5 +675,5 @@
 *  Exit in a hurry label.
  99   CONTINUE
       END
-      
+
 * $Id$

@@ -46,6 +46,9 @@
 *        Original version.
 *     5-FEB-1992 (PDRAPER):
 *        Changed to CCD1_ routine from ARD original.
+*     12-SEP-1997 (PDRAPER):
+*        Modified to return a word that extends to the end of 
+*        the string correctly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,20 +80,25 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Word is not found by default.
+      NOTFND = .TRUE.
+
 *  Look for the first character of the word - first non delimeter.
       FIRST = OFFSET 
       CALL CHR_FIWS( STRING, FIRST, STATUS )
-      LAST = FIRST 
-      CALL CHR_FIWE( STRING, LAST, STATUS )
 
-*  Check for error.
+*  Check for error and report is an error for this stage.
       IF ( STATUS .EQ. CHR__ENDOFSENT .OR. STATUS .EQ. CHR__WRDNOTFND )
      :   THEN
             CALL ERR_ANNUL( STATUS )
-            NOTFND = .TRUE.
       ELSE
-            NOTFND = .FALSE.
-      END IF
 
+*  Look for end of word. Note end of sentence isn't an error now (since
+*  we have found the start of the word).
+         LAST = FIRST 
+         CALL CHR_FIWE( STRING, LAST, STATUS )
+         IF ( STATUS .NE. CHR__WRDNOTFND ) NOTFND = .FALSE.
+         IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+      END IF
       END 
 * $Id$
