@@ -26,6 +26,7 @@
 *  Authors:
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     rpt: Remo Tilanus (JAC, Hilo)
+*     timj: Tim Jenness (JAC, Hilo)
 *     {enter_new_authors_here}
 
 *  History:
