@@ -1,7 +1,7 @@
-      SUBROUTINE CCD1_SOFF( ERROR, XIN1, YIN1, NREC1, XIN2, YIN2,
-     :                      NREC2, XDIST, YDIST, XRANK, CRANK,
-     :                      WORK1, XOUT1, YOUT1, XOUT2, YOUT2, NOUT,
-     :                      XOFF, YOFF, IND1, IND2, STATUS )
+      SUBROUTINE CCD1_SOFF( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2,
+     :                      YIN2, INDI2, NREC2, XDIST, YDIST, XRANK,
+     :                      CRANK, WORK1, XOUT1, YOUT1, XOUT2, YOUT2,
+     :                      NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
 *+
 *  Name:
 *     CCD1_SOFF
@@ -13,10 +13,10 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_SOFF( ERROR, XIN1, YIN1, NREC1, XIN2, YIN2, NREC2,
-*                     XDIST, YDIST, XRANK, CRANK, WORK1,
-*                     XOUT1, YOUT1, XOUT2, YOUT2, NOUT,
-*                     XOFF ,YOFF, IND1, IND2, STATUS )
+*     CALL CCD1_SOFF( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2,
+*                     YIN2, INDI2, NREC2, XDIST, YDIST, XRANK,
+*                     CRANK, WORK1, XOUT1, YOUT1, XOUT2, YOUT2,
+*                     NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
 
 *  Description:
 *     This routine performs the work for the CCDOFF application. It
@@ -51,12 +51,16 @@
 *        First set of X positions.
 *     YIN1( NREC1 ) = DOUBLE PRECISION (Given)
 *        First set of Y positions.
+*     INDI1( NREC1 ) = INTEGER (Given)
+*        Indices for each of the points in the first set.
 *     NREC1 = INTEGER (Given)
 *        The number of values given in the XIN1 and YIN1 arrays.
 *     XIN2( NREC2 ) = DOUBLE PRECISION (Given)
 *        Second set of X positions.
 *     YIN2( NREC2 ) = DOUBLE PRECISION (Given)
 *        Second set of Y positions.
+*     INDI2( NREC2 ) = INTEGER (Given)
+*        Indices for each of the points in the second set.
 *     NREC2 = INTEGER (Given)
 *        The number of values given in the XIN2 and YIN2 arrays.
 *     XDIST( NREC1, NREC2 + 2 ) = DOUBLE PRECISION (Given and Returned)
@@ -93,10 +97,10 @@
 *        The offset in X which was selected.
 *     YOFF = DOUBLE PRECISION (Returned)
 *        The offset in Y which was selected.
-*     IND1( * ) = INTEGER
+*     INDO1( * ) = INTEGER (Returned)
 *        The indices in the input X and Y arrays of the selected
 *        positions. Should be the same size as XOUT1.
-*     IND2( * ) = INTEGER                            
+*     INDO2( * ) = INTEGER (Returned)
 *        The indices in the input X and Y arrays of the selected
 *        positions. Should be the same size as XOUT2.
 *     STATUS = INTEGER (Given and Returned)
@@ -104,6 +108,7 @@
             
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -121,6 +126,8 @@
 *        rather than a mean derived from this. This caused the
 *        completeness calcs to fail as the same positions are not
 *        guaranteed. 
+*     8-FEB-1999 (MBT):
+*        Added input index lists.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,9 +147,11 @@
       INTEGER NREC1
       DOUBLE PRECISION XIN1( NREC1 )
       DOUBLE PRECISION YIN1( NREC1 )
+      INTEGER INDI1( NREC1 )
       INTEGER NREC2
       DOUBLE PRECISION XIN2( NREC2 )
       DOUBLE PRECISION YIN2( NREC2 )
+      INTEGER INDI2( NREC2 )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION XDIST( NREC1, NREC2 + 2 )
@@ -159,8 +168,8 @@
       DOUBLE PRECISION YOUT2( * )
       DOUBLE PRECISION XOFF
       DOUBLE PRECISION YOFF
-      INTEGER IND1( * )
-      INTEGER IND2( * )
+      INTEGER INDO1( * )
+      INTEGER INDO2( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -425,8 +434,8 @@
                      YOUT2( NOUT ) = YIN2( KK ) 
 
 *  Record the original positions.
-                     IND1( NOUT ) = L
-                     IND2( NOUT ) = KK
+                     INDO1( NOUT ) = INDI1( L )
+                     INDO2( NOUT ) = INDI2( KK )
 
 *  The first value which is located will do as before.
                      GO TO 8

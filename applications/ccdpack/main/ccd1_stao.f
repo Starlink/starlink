@@ -1,7 +1,7 @@
-      SUBROUTINE CCD1_STAO( ERROR, XIN1, YIN1, NREC1, XIN2, YIN2,
-     :                      NREC2, DIST, XOUT1, YOUT1, XOUT2,
-     :                      YOUT2, NOUT, XOFF, YOFF, IND1, IND2,
-     :                      STATUS )
+      SUBROUTINE CCD1_STAO( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2, 
+     :                      YIN2, INDI2, NREC2, DIST, XOUT1, YOUT1, 
+     :                      XOUT2, YOUT2, NOUT, XOFF, YOFF, INDO1,
+     :                      INDO2, STATUS )
 *+                          
 *  Name:                    
 *     CCD1_STAO             
@@ -13,9 +13,9 @@
 *     Starlink Fortran 77   
                             
 *  Invocation:              
-*     CALL CCD1_STAO( ERROR, XIN1, YIN1, NREC1, XIN2, YIN2, NREC2,
-*                     DIST, XOUT1, YOUT1, XOUT2, YOUT2, NOUT, XOFF ,
-*                     YOFF, IND1, IND2, STATUS )
+*      CALL CCD1_STAO( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2, YIN2,
+*                      INDI2, NREC2, DIST, XOUT1, YOUT1, XOUT2, YOUT2,
+*                      NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
 
 *  Description:
 *     This routine performs the work for the CCDOFF application. It
@@ -42,12 +42,16 @@
 *        First set of X positions.
 *     YIN1( NREC1 ) = DOUBLE PRECISION (Given)
 *        First set of Y positions.
+*     INDI1( NREC1 ) = INTEGER (Given)
+*        The index numbers for the first set of positions.
 *     NREC1 = INTEGER (Given)
 *        The number of values given in the XIN1 and YIN1 arrays.
 *     XIN2( NREC2 ) = DOUBLE PRECISION (Given)
 *        Second set of X positions.
 *     YIN2( NREC2 ) = DOUBLE PRECISION (Given)
 *        Second set of Y positions.
+*     INDI2( NREC2 ) = INTEGER (Given)
+*        The index numbers for the second set of positions.
 *     NREC2 = INTEGER (Given)
 *        The number of values given in the XIN2 and YIN2 arrays.
 *     DIST( NREC1 * NREC2 ) = DOUBLE PRECISION (Given and Returned)
@@ -67,15 +71,16 @@
 *        The offset in X which was selected.
 *     YOFF = DOUBLE PRECISION (Returned)
 *        The offset in Y which was selected.
-*     IND1( NREC1 ) = INTEGER (Returned)
-*        The index within the input arrays of the matched position.
-*     IND2( NREC2 ) = INTEGER (Returned)
-*        The index within the input arrays of the matched position.
+*     INDO1( NREC1 ) = INTEGER (Returned)
+*        The index numbers for the first set of matched positions.
+*     INDO2( NREC2 ) = INTEGER (Returned)
+*        The index numbers for the second set of matched positions.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK - IoA)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,6 +92,9 @@
 *        Stopped update of offsets on last iteration. This was causing
 *        problem when still converging (the output offsets were not the
 *        ones used to select the positions).
+*     8-FEB-1999 (MBT):
+*        Modified to accept input index arrays rather than assuming 
+*        input lists are stored in rank order.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,9 +113,11 @@
       INTEGER NREC1
       DOUBLE PRECISION XIN1( NREC1 )
       DOUBLE PRECISION YIN1( NREC1 )
+      INTEGER INDI1( NREC1 )
       INTEGER NREC2
       DOUBLE PRECISION XIN2( NREC2 )
       DOUBLE PRECISION YIN2( NREC2 )
+      INTEGER INDI2( NREC2 )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION DIST( * )
@@ -120,8 +130,8 @@
       DOUBLE PRECISION YOUT2( NREC2 )
       DOUBLE PRECISION XOFF
       DOUBLE PRECISION YOFF
-      INTEGER IND1( NREC1 )
-      INTEGER IND2( NREC2 )
+      INTEGER INDO1( NREC1 )
+      INTEGER INDO2( NREC2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -190,7 +200,6 @@
 
 *  Now iterate until the number of matched positions stabilises
 *  or more than 5 iterations have occurred.
-C      WID = WIDTH / 2.0D0
       OK = .TRUE.
       NITER = 0
       NLAST = 0
@@ -200,9 +209,9 @@ C      WID = WIDTH / 2.0D0
 
 *  Now generate the matched lists. Use the offsets from to see
 *  which position are the same (within the limits of the bin).
-         CALL CCD1_MXYO( XIN1, YIN1, NREC1, XIN2, YIN2, NREC2,
-     :                   XOFF, YOFF, ERROR, XOUT1, YOUT1, XOUT2, YOUT2,
-     :                   NOUT, IND1, IND2, STATUS )
+         CALL CCD1_MXYO( XIN1, YIN1, INDI1, NREC1, XIN2, YIN2, INDI2,
+     :                   NREC2, XOFF, YOFF, ERROR, XOUT1, YOUT1,
+     :                   XOUT2, YOUT2, NOUT, INDO1, INDO2, STATUS )
          IF ( NOUT .GT. 0 ) THEN 
 
 *  Check for convergence, or last iteration.
