@@ -99,7 +99,8 @@ histogram laplace kstest logar look lucy manic makesurface maths      \
 median mstats mult noglobals nomagic normalize numb outset parget     \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
-zaplin listmake listshow profile wcsalign wcstran kapversion
+zaplin listmake listshow profile wcsalign wcstran kapversion \
+kaphelp
 
 KAPVIEW_TASKS = ardplot colcomp contour cursor drawsig drawnorth       \
 display elprof gdclear gdnames gdset gdstate linplot lutable lutsave   \
