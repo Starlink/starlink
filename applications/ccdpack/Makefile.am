@@ -59,7 +59,7 @@ ccdpack_red_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam`
 ccdpack_reg_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/pgp_ccdpack_link_adam`
 ccdpack_res_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/pgp_ccdpack_link_adam`
 ccdpack_scr_LDADD = $(LDADD) $(CCDPACK_LIBS) `$(srcdir)/ccdpack_link_adam`
-ccdhelp_LDADD = $(LDADD) help/libccdpack_help.la
+ccdhelp_LDADD = $(LDADD) help/libccdpack_help.la `shl_link_adam`
 
 #  List of applications/tasks in monoliths.
 
