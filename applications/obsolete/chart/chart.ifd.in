@@ -1,0 +1,983 @@
+package chart {
+   version @PACKAGE_VERSION@
+   prefix cht
+
+   executable chart_mon {
+      action astro {
+
+         helplib {$CHART_HELP}
+
+         parameter eqres {
+                          # Equinox of results
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter teltype {
+                            # Telescope type
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Telescope type}
+            helpkey *
+          }
+
+         parameter racen {
+                          # RA of centre of plate
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {RA of plate centre}
+            helpkey *
+          }
+
+         parameter decen {
+                          # DEC of centre of plate
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {DEC of plate centre}
+            helpkey *
+          }
+
+         parameter eqcentre {
+                             # Equinox of (RACEN,DECEN)
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter epplate {
+                            # Epoch that plate was taken
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Date plate taken}
+            helpkey *
+          }
+
+         parameter number {
+                           # NUMBER
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Sequence number of star}
+            helpkey *
+          }
+
+         parameter x {
+                      # X coordinate
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {X position}
+            helpkey *
+          }
+
+         parameter y {
+                      # Y coordinate
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Y position}
+            helpkey *
+          }
+
+         parameter xorr {
+                         # X or R?
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Enter X or R}
+            helpkey *
+          }
+
+         parameter name {
+                         # Name
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Name}
+            helpkey *
+          }
+
+         parameter ra {
+                       # RA
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {RA}
+            helpkey *
+          }
+
+         parameter dec {
+                        # DEC
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {DEC}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+      }
+      action bsearch {
+
+         helplib {$CHART_HELP}
+
+         parameter ra {
+                       # Right Ascension
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Right Ascension}
+            helpkey *
+          }
+
+         parameter dec {
+                        # Declination
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Declination}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for plot
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Title}
+            helpkey *
+          }
+
+         parameter type {
+                         # Type of error box
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Type of error box}
+            helpkey *
+          }
+
+         parameter xdiam {
+                          # X diameter of error box
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {X diameter of error box}
+            helpkey *
+          }
+
+         parameter ydiam {
+                          # Y diameter of error box
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Y diameter of error box}
+            helpkey *
+          }
+
+         parameter orient {
+                           # Orientation
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Orientation}
+            helpkey *
+          }
+
+         parameter ok {
+                       # OK
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {OK?}
+            helpkey *
+          }
+
+      }
+      action cht_disp {
+
+      }
+      action display {
+
+         helplib {$CHART_HELP}
+
+         parameter pause {
+                          # Pause the output
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Press return to continue}
+            helpkey *
+          }
+
+      }
+      action ecreate {
+
+         helplib {$CHART_HELP}
+
+         parameter efile {
+                          # File name
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {File name}
+            helpkey *
+          }
+
+         parameter add {
+                        # Append new positions to the current file?
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Add to the current file?}
+            helpkey *
+          }
+
+         parameter ra {
+                       # Right Ascension
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Right Ascension}
+            helpkey *
+          }
+
+         parameter dec {
+                        # Declination
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Declination}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter ok {
+                       # General query
+            type _LOGICAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {OK?}
+            helpkey *
+          }
+
+      }
+      action fcreate {
+
+         helplib {$CHART_HELP}
+
+         parameter ffile {
+                          # File name
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {File name}
+            helpkey *
+          }
+
+         parameter add {
+                        # Append new positions to the current file?
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Add to the current file?}
+            helpkey *
+          }
+
+         parameter ra {
+                       # Right Ascension
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Right Ascension}
+            helpkey *
+          }
+
+         parameter dec {
+                        # Declination
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Declination}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Title}
+            helpkey *
+          }
+
+         parameter ok {
+                       # General query
+            type _LOGICAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {OK?}
+            helpkey *
+          }
+
+      }
+      action cht_listo {
+      }
+      action oset {
+
+         helplib {$CHART_HELP}
+
+         parameter device {
+                           # Graphics device
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Graphics device}
+            helpkey *
+          }
+
+         parameter ratio {
+                          # Aspect ratio of plot
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Aspect ratio}
+            helpkey *
+          }
+
+         parameter factor {
+                           # Scale factor of plot?
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Scale factor}
+            helpkey *
+          }
+
+         parameter parea {
+                          # Length of side of Plotting area
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Length (in degrees) of side of plotting area}
+            helpkey *
+          }
+
+         parameter scale {
+                          # Plot scale
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Plot scale in (arcsec/mm)}
+            helpkey *
+          }
+
+         parameter symbol {
+                           # Symbol to plot stars with
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Symbol for plotting stars}
+            helpkey *
+          }
+
+         parameter key {
+                        # Select the plotting of magnitude and scale keys?
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Plot magnitude and/or scale keys}
+            helpkey *
+          }
+
+         parameter grid {
+                         # Select the plotting of a grid
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Plot a grid? (Reply yes, no or mini)}
+            helpkey *
+          }
+
+         parameter errbox {
+                           # Select the plotting of an error box
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Select type of error box}
+            helpkey *
+          }
+
+         parameter radius {
+                           # Radius of a circular error box
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Radius of a circular error box}
+            helpkey *
+          }
+
+         parameter coords {
+                           # File containing coordinates of error
+				 # box
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {File containing coordinates of error box}
+            helpkey *
+          }
+
+         parameter extra {
+                          # File name containing extra objects
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {File name containing extra objects}
+            helpkey *
+          }
+
+         parameter direct {
+                           # Do the plot normally or reversed
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Make the plot normal or with RA reversed}
+            helpkey *
+          }
+
+         parameter cross {
+                          # Plot the central cross
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Plot the central cross?}
+            helpkey *
+          }
+
+      }
+      action ploto {
+
+         helplib {$CHART_HELP}
+
+         parameter colour {
+                           # Plot the chart in colour?
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default FALSE
+            prompt {Plot the chart in colour?}
+            helpkey *
+          }
+
+         parameter continue {
+                             # Plot the chart in colour?
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            default { }
+            prompt { }
+            helpkey *
+          }
+
+      }
+      action qcreate {
+
+         helplib {$CHART_HELP}
+
+         parameter qfile {
+                          # File name
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {File name}
+            helpkey *
+          }
+
+         parameter ra {
+                       # Right Ascension
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Right Ascension}
+            helpkey *
+          }
+
+         parameter dec {
+                        # Declination
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Declination}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter ok {
+                       # General query
+            type _LOGICAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {OK?}
+            helpkey *
+          }
+
+      }
+      action rgogs {
+      }
+      action search {
+
+         helplib {CHART_HELPDIR:chart}
+
+         parameter ra {
+                       # Right Ascension
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Right Ascension}
+            helpkey *
+          }
+
+         parameter dec {
+                        # Declination
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Declination}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for plot
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Title}
+            helpkey *
+          }
+
+         parameter type {
+                         # Type of error box
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Type of error box}
+            helpkey *
+          }
+
+         parameter xdiam {
+                          # Length of longer side/diameter in
+				# arcseconds
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {X diameter}
+            helpkey *
+          }
+
+         parameter ydiam {
+                          # Length of shorter side/diameter in
+				# arcseconds
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Y diameter}
+            helpkey *
+          }
+
+         parameter orient {
+                           # Orientation of longer diameter/side
+				# measured from the nort, through east,
+				# in degrees.
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Orientation of error box}
+            helpkey *
+          }
+
+         parameter ok {
+                       # General query
+            type _LOGICAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {OK?}
+            helpkey *
+          }
+
+      }
+      action setone {
+
+         helplib {$CHART_HELP}
+
+         parameter param {
+                          # Name of CHART parameter
+            position 1
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Parameter name}
+            helpkey *
+          }
+
+         parameter value {
+                          # Value of CHART parameter
+            position 2
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Parameter value}
+            helpkey *
+          }
+
+      }
+      action sset {
+
+         helplib {$CHART_HELP}
+
+         parameter label {
+                          # Label for set of parameters
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Label for this set of parameters}
+            helpkey *
+          }
+
+         parameter sarea {
+                          # Search area
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Length in degrees of side of search area}
+            helpkey *
+          }
+
+         parameter equinox {
+                            # Equinox of output positions
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Equinox of output positions}
+            helpkey *
+          }
+
+         parameter epoch {
+                          # Epoch of output positions
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Epoch of output positions}
+            helpkey *
+          }
+
+         parameter mode {
+                         # Select main catalogue
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Search mode (selects main catalogue)}
+            helpkey *
+          }
+
+         parameter input {
+                          # Name of private catalogue
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Name of private catalogue}
+            helpkey *
+          }
+
+         parameter select {
+                           # Further selection of objects
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Further selection of objects}
+            helpkey *
+          }
+
+         parameter number {
+                           # Set maximum number of stars
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Set maximum number of stars}
+            helpkey *
+          }
+
+         parameter magnitud {
+                             # Set a magnitude limit
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Set a magnitude limit}
+            helpkey *
+          }
+
+         parameter catalogu {
+                             # Select a subset of input catalogues
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {Select input catalogues}
+            helpkey *
+          }
+
+         parameter fields {
+                           # Location of input fields
+            type _CHAR
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default { }
+            prompt {File containing input fields (or terminal)}
+            helpkey *
+          }
+
+      }
+      action typeo {
+
+         helplib {$CHART_HELP}
+
+         parameter more {
+                         # Continue the operation?
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default TRUE
+            prompt {Continue?}
+            helpkey *
+          }
+
+      }
+   }
+
+  icl {defhelp chart $CHART_HELP 0}
+
+  display {
+
+   Chart commands are now available -- (Version @PACKAGE_VERSION@)
+   Type "showme sun32" to browse the hypertext documentation
+
+
+  }
+
+}

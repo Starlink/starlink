@@ -1,3 +1,6 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
       SUBROUTINE FILEOPEN( ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7,
      : ARG8, STATUS )
 *+
@@ -12,15 +15,16 @@
 *     DEC machines, and so rather than have two different versions of
 *     the many routines which use these in their OPEN statements, for
 *     the different machines, we can have those routines call this one
-*     to do OPENs and just have two versions of this. This is the Sun
+*     to do OPENs and just have two versions of this. This is the DEC
 *     machine version.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FILEOPEN( ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ARG8,
-*                   STATUS )
+*     CALL FILEOPEN( UNIT, FILE, STAT, ACCESS, FORM, CARIGE,
+*          : RECL, RDONLY, STATUS  )
+
 *  Description:
 *     Basically it just does an OPEN statement, with the parameters
 *     supplied for the specifiers. Not all OPENs need all the
@@ -42,42 +46,41 @@
 *     ARG5 = CHARACTER * ( * ) (Given)
 *        FORM specifier.
 *     ARG6 = LOGICAL (Given)
-*        Flag : .TRUE. if CARRIAGECONTROL = 'LIST' specifier required,
-*        except that CARRIAGECONTROL is not used in this version (which
-*        is why there are two versions), but it has to be left in the
-*        calling sequence.
+*        Flag : .TRUE. if CARRIAGECONTROL = 'LIST' specifier required.
 *     ARG7 = INTEGER (Given)
-*        RECL specifier. Given in longwords, this version converts to
-*        bytes, as required by Sun machines.
+*        RECL specifier - if set to zero, it's not included in the OPEN
+*        statement, otherwise it is present.
 *     ARG8 = LOGICAL (Given)
-*        .TRUE. if READONLY specifier required - not implemented on Sun
-*        machines, but this arg must still be in the calling sequence so
-*        that the calling routines can remain unchanged.
-*     STATUS = INTEGER (Given and returned)
+*        .TRUE. if READONLY specifier required.
+*     [argument_spec]...
+*     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  [optional_subroutine_items]...
 *  Authors:
 *     AJJB: Andrew J. J. Broderick (Starlink - RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     17-MAR-1993 (AJJB):
 *        Original version.
+*      3-AUG-2004 (TIMJ):
+*        Autoconf version
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
+*  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       INCLUDE 'CHT_ERR'          ! Chart error constants
-
+                                 
 *  Arguments Given:
       INTEGER ARG1
       CHARACTER * ( * ) ARG2
@@ -87,10 +90,10 @@
       LOGICAL ARG6
       INTEGER ARG7
       LOGICAL ARG8
-
+      
 *  Arguments Given and Returned:
-      INTEGER STATUS             ! The global status
-
+      INTEGER STATUS
+      
 *  Local Constants:
       CHARACTER * ( 7 ) STADEF   ! Default value for STATUS specifier
       PARAMETER ( STADEF = 'UNKNOWN' )
@@ -104,6 +107,17 @@
       PARAMETER ( DIRDEF = 'UNFORMATTED' )
       CHARACTER BLANK            ! A space character
       PARAMETER ( BLANK = ' ' )
+      INTEGER BYTEPRU            ! Number of bytes per record unit
+#if FC_RECL_UNIT == 1
+      PARAMETER ( BYTEPRU = 1 )
+#elif FC_RECL_UNIT == 2
+      PARAMETER ( BYTEPRU = 1 )
+#elif FC_RECL_UNIT == 4
+      PARAMETER ( BYTEPRU = 1 )
+#else
+#           error "Unrecognized FC_RECL_UNIT"
+#endif
+
 
 *  Local Variables:
       INTEGER UNIT               ! Fortran logical unit #
@@ -119,7 +133,7 @@
 
 *.
 
-* Status check:
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 * Assign args to local variables with slightly more meaningful names :
@@ -144,23 +158,83 @@
 
 * Convert RECL specifier from longwords (as required on DEC machines) to
 * bytes (as required on Sun machines) if need be.
+* Note that this assumes we are always being given longwords
 
-      IF (FORM(:11) .EQ. 'UNFORMATTED' ) RECL = RECL * 4
+      IF (FORM(:11) .EQ. 'UNFORMATTED' ) RECL = RECL * 4 / BYTEPRU
+
       
-* Pick OPEN statement with or without RECL specifier according to what
+* Pick OPEN statement with appropriate specifiers according to what
 * calling routine requires :
 
-      IF ( ACCESS(1:3) .EQ. 'SEQ' ) THEN
-      
-            OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
-     :      ACCESS = ACCESS, FORM = FORM, ERR = 500 )
- 
-        ELSE
+      IF ( .NOT. RDONLY .AND. .NOT. CARIGE ) THEN
 
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
      :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500 )
 
+      ELSE IF ( .NOT. RDONLY .AND. CARIGE ) THEN
+            
+        IF ( RECL .EQ. 0 ) THEN
+      
+            OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
+     :      ACCESS = ACCESS, FORM = FORM, ERR = 500,
+     :      CARRIAGECONTROL = 'LIST' )
+
+        ELSE
+
+            OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
+     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500,
+     :      CARRIAGECONTROL = 'LIST' )
+
         ENDIF
+      
+      ELSEIF ( RDONLY .AND. .NOT. CARIGE ) THEN
+
+        IF ( RECL .EQ. 0 ) THEN
+      
+            OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
+     :      ACCESS = ACCESS, FORM = FORM,
+#if HAVE_FC_OPEN_READONLY
+     :          READONLY,
+#endif
+     :          ERR = 500)
+
+        ELSE
+
+            OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
+     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500, 
+     :      READONLY )
+            
+        ENDIF
+
+      ELSEIF ( RDONLY .AND. CARIGE ) THEN
+
+        IF ( RECL .EQ. 0 ) THEN
+      
+            OPEN ( UNIT = UNIT, FILE = FILE, STATUS = STAT,
+     :      ACCESS = ACCESS, FORM = FORM,
+#if HAVE_FC_OPEN_READONLY
+     :          READONLY,
+#endif
+#if HAVE_FC_OPEN_CARRIAGECONTROLLIST
+     :      CARRIAGECONTROL = 'LIST',
+#endif
+     :          ERR = 500 )
+
+        ELSE
+
+            OPEN ( UNIT = UNIT, FILE = FILE, STATUS = STAT,
+     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500,
+#if HAVE_FC_OPEN_READONLY
+     :          READONLY,
+#endif
+#if HAVE_FC_OPEN_CARRIAGECONTROLLIST
+     :      CARRIAGECONTROL = 'LIST',
+#endif
+     :          ERR = 500 )
+
+        ENDIF     
+
+      ENDIF
 
       RETURN
 
@@ -170,5 +244,5 @@
 
       STATUS = CHT__NOFIL
       CALL ERR_REP( ' ', 'FILEOPEN: Can''t open ' // FILE, STATUS )
-                  
+      
       END
