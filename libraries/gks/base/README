@@ -1,0 +1,15 @@
+These are the standard RAL GKS files with three exceptions:
+
+gkcell.f has a bona fide bug fix
+
+gkesc.f returns an error code 180 for escapes other than -1 and -2
+
+gkvers.f disables printing on the GKS version to stdout on initialisation.
+         This is simply commented out. We could enable this via a preprocessor
+         directive if it needs to be resurrected.
+
+All files compile to libgks_base.la for later inclusion into the
+normal libgks library by the parent directory.
+
+Note that in the original RAL GKS distribution optimization for gkclip.f
+was disabled on sun3 and sun4 platforms.
