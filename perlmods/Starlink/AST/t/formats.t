@@ -31,14 +31,18 @@ $x[1] = 624;
 $y[1] = 625;
 
 my ( $xworld, $yworld) = $wcsinfo->Tran2( $xpixel, $ypixel, 1 );
-is( $$xworld[0], 1.51078089509593, 
-                 "Forward mapping of lower bound X co-ordinate" ); 
-is( $$yworld[0], -0.00192903580308342, 
-                 "Forward mapping of lower bound Y co-ordinate" );
-is( $$xworld[1], 1.51050210722199, 
-                 "Forward mapping of upper bound X co-ordinate" ); 
-is( $$yworld[1], -0.00165774812315521, 
-                 "Forward mapping of upper bound Y co-ordinate" );
+is( sprintf ( "%.9f", $$xworld[0] ), 
+    sprintf ( "%.9f", 1.51078089509593 ), 
+    "Forward mapping of lower bound X co-ordinate" ); 
+is( sprintf ( "%.9f", $$yworld[0] ), 
+    sprintf ( "%.9f", -0.00192903580308342 ),  
+    "Forward mapping of lower bound Y co-ordinate" );
+is( sprintf ( "%.9f", $$xworld[1] ), 
+    sprintf ( "%.9f", 1.51050210722199 ), 
+    "Forward mapping of upper bound X co-ordinate" ); 
+is( sprintf ( "%.9f", $$yworld[1] ), 
+    sprintf ( "%.9f", -0.00165774812315521 ), 
+    "Forward mapping of upper bound Y co-ordinate" );
 
 # FORMATTING
 # ----------
