@@ -1,0 +1,58 @@
+#!/bin/csh
+
+#  Name:
+#     kaplibs_dev
+
+#  Purpose:
+#     Create or delete soft links to KAPLIBS include files
+
+#  Language:
+#     Unix C shell
+
+#  Description:
+#     Create or delete soft links in the current working directory that point
+#     to include files needed when writing ADAM/Starlink programs. The names of
+#     the soft links are in upper case.
+
+#  Arguments:
+#     Argument 1
+#        This can be "remove" or can be omitted. If it is omitted, the soft
+#        links are created, if it is "remove" they are removed.
+
+#  Algorithm:
+#     -  For each name in the list of file names:
+#     -     If the first parameter to this script is null then
+#     -        create a soft link with the name in upper case
+#     -     Else if the first parameter is "remove" then
+#     -        remove the soft link, which is in upper case
+#     -     Else
+#     -        print an error message and break out of the loop
+
+#  Authors:
+#     PMA: Peter Allan (Starlink, RAL)
+#     BLY: Martin Bly (Starlink, RAL)
+
+#  History:
+#     28-SEP-1992 (PMA):
+#        Original version.
+#     18-NOV-1992 (PMA):
+#        Use the variable include to hold the location of the include
+#        files.
+#     11-JUL-1994 (BLY):
+#        Change tr a-z A-Z to tr '[a-z]' '[A-Z]' for Solaris
+
+set include = "INSTALL_INC"
+
+foreach name ( \
+   ira_err \
+   ira_par \
+   )
+   if ( $1 == "" ) then
+      ln -s $include/$name `echo $name | tr '[a-z]' '[A-Z]'`
+   else if ( $1 == "remove" ) then
+      rm `echo $name | tr '[a-z]' '[A-Z]'`
+   else
+      echo "${0}: Invalid argument"
+      break
+   endif
+end

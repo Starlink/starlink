@@ -1,0 +1,107 @@
+#!/bin/tcsh
+# Name:
+#    make_unix_release
+#
+# Purpose:
+#    Do unix specific bits required to make a release of kaplibs.
+#
+# Type of Module:
+#    Shell script
+#
+# Description:
+#    This command creates a compressed tar file containing a release of the 
+#    kaplibs package. It is called from within the make_release script. 
+#    
+# Invocation:
+#    make_unix_release
+#
+# Authors:
+#    DSB: David S. Berry (STARLINK)
+#    {enter_new_authors_here}
+#
+# History:
+#    26-APR-2001 (DSB):
+#       Original version, based on KAPPA equivalent.
+#    {enter_changes_here}
+#
+# Bugs:
+#    {note_any_bugs_here}
+#-
+
+#  Ensure the sdt grp command is available.
+      source $SDT_DIR/startup.csh
+
+#  Store the name of the release directory, and go there.
+      set REL_DIR = ${TEMPDIR}/kaplibs_${SYSTEM}
+      cd ${REL_DIR}
+      echo "Moved to $PWD"
+
+#  Expand any generic source files.
+      foreach file (`grp generic_sources`)
+         echo "Expanding generic source file $file"
+         generic -t n -s ${file}
+      end
+
+#  Rename unsigned data type files.
+      foreach n (*W.f)
+         echo "Renaming expanded file file $n"
+         mv $n `basename $n W.f`uw.f
+      end
+      foreach n (*B.f)
+         echo "Renaming expanded file file $n"
+         mv $n `basename $n B.f`ub.f
+      end
+
+#  Check for direct calls to NDF parameter routines. These should usually
+#  be replaced by equivalent LPG routines (to allow multiple invocations to 
+#  process groups of NDFs).
+      set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
+      if( "$n" != "" ) then
+         set ans = `confirm "The following files contain references to NDF\nparameter routines or to PAR_STATE. May be these should be\nreplaced by equivalent LPG routines... Continue?\n\n$n"`
+         if( "$ans" == "n" || "$ans" == "N" ) then
+            exit
+         endif
+      endif
+
+#  Copy the hypertext docs to the release directory.
+      echo "Copying the hypertext docs to the release directory."
+      cp ${KAPLIBS_DEV}/../sunxx.htx_tar ${REL_DIR}
+
+#  Ensure all files are accessable.
+      echo "Setting protection for all files"
+      chmod 777 *
+
+#  Create each of the tar files. First do the system-independant ones
+#  listed in group TAR_FILES_A...
+      foreach file (`grp tar_files_a`)
+         echo "Creating ${file}.tar"
+         chmod 644 `grp ${file}`
+         chmod 755 `find . -type d`
+         tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
+         rm -f `grp ${file}`
+         mv ${TEMPDIR}/${file}.tar ${REL_DIR}
+      end
+
+#  Make the ctg and lpg source tar files.
+      ${CTG_SYS}/dev/bin/make_source.csh
+      ${LPG_SYS}/dev/bin/make_source.csh
+
+#  Tar up all the release files and then remove them.
+      echo "Creating kaplibs.tar"
+      chmod 644 `grp unix_total`
+      chmod 755 `find . -type d`
+      chmod 755 mk
+      tar -cvh -f ${TEMPDIR}/kaplibs.tar `grp unix_total` 
+      rm `grp unix_total` 
+      mv ${TEMPDIR}/kaplibs.tar ${REL_DIR}
+      rm -rf doc kaplibs.ifd
+
+#  Compress it.
+      echo "Compressing kaplibs.tar"
+      compress kaplibs.tar
+
+# Remove any spare .f files created by the expansion of generic source
+# files but not included in the release. Also remove grp.make.
+      rm -f *.f grp.make
+
+      exit
