@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.29  1998/11/24 21:57:06  timj
+*     Add REDUCE_NOISE
+*
 *     Revision 1.28  1998/05/13 21:49:00  timj
 *     Add CALCSKY
 *
@@ -222,6 +225,10 @@ c
       ELSE IF (NAME .EQ. 'REDUCE_SWITCH') THEN
 
          CALL SURF_REDUCE_SWITCH (STATUS)
+
+      ELSE IF (NAME .EQ. 'REDUCE_NOISE') THEN
+
+         CALL SURF_REDUCE_NOISE (STATUS)
 
       ELSE IF (NAME .EQ. 'REMSKY') THEN
 
