@@ -21,6 +21,10 @@
 # the description file follows the description file for perlSGML's
 # dtd2html program.  The one can easily be converted into the other.
 #    
+# A _much_ nicer way to do this whole thing would be to root around in a
+# document's property set.  Unfortunately, Jade doesn't support the
+# modules which are necessary (module "prolog sgml document string"
+# for class DocumentTypeDecl and friends).  Pity....
 
 $#ARGV == 1 || die "Usage: $0 dtd-file descriptions-file\n";
 
