@@ -13,12 +13,16 @@
 *     CALL ADI2_FCREAT( FILE, ID, FID, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Create a new FITS file.
 
 *  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
+*     FILE = INTEGER (given)
+*        ADI identifier of string holding name of file to create
+*     ID = INTEGER (given)
+*        ADI identifier of object to link to the new file
+*     FID = INTEGER (returned)
+*        The identifier of the FITSfile object created
+*     STATUS = INTEGER (given and returned)
 *        The global status.
 
 *  Examples:
@@ -63,7 +67,7 @@
 *     {routine_references}...
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:adi, usage:private, FITS
 
 *  Copyright:
 *     {routine_copyright}
@@ -98,14 +102,6 @@
 *  Status:
       INTEGER 			STATUS                  ! Global status
 
-*  External References:
-C      [external_declaration]
-C      {data_type} {external_name} ! [external_description]
-
-*  Local Constants:
-c      {data_type} {constant_name} ! [constant_description]
-C      PARAMETER ( {constant_name} = {cons} )
-
 *  Local Variables:
       CHARACTER*132		FNAME			! File name
       CHARACTER*8 		KEYWRD			! Keyword name
@@ -129,6 +125,9 @@ C      PARAMETER ( {constant_name} = {cons} )
 
 *  Grab logical unit from system
       CALL FIO_GUNIT( LUN, STATUS )
+
+*  Rename any old file if necessary
+      CALL ADI2_EXIREN( FNAME(:LFILEC), STATUS )
 
 *  Try to create file
       BSIZE = 1
