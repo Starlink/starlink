@@ -23,11 +23,14 @@ string CatalogueHandler::CatalogueRow::sep_ = " ";
 
 
 CatalogueHandler::CatalogueHandler ()
-    : searchType_(UNSPECIFIED), nrows_(0), equinox_(2000.0),
+        : searchType_(UNSPECIFIED), nrows_(0), equinox_(2000.0),
       valid_(fieldflags(0))
 {
     // Set the skycat error handler
     set_error_handler (&skycatErrorHandler_);
+
+    nrows_ = 50;		// Guess at a suitable default
+    setValid_(NROWS);
 }
 
 CatalogueHandler::~CatalogueHandler ()
