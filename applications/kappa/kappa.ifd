@@ -2164,6 +2164,17 @@ package kappa {
 
          helplib {$KAPPA_HELP}
    
+         parameter modify {
+            position 3
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Modify the pixel values?}
+            default FALSE
+            helpkey '*'
+         }
+
          parameter ndf {
             position 1
             type NDF
