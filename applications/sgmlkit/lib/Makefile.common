@@ -36,11 +36,13 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 # (in fact, as of March 1999, the stylesheet _doesn't_ generate these links,
 # but it will as soon as I start generating something to link to!)
 %.html.stamp: %.sgml
-	$(JADE) -t sgml -iHTML.entities $(JADEFLAGS) \
+	$(JADE) -t sgml -iHTML.entities -iOnly.web $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.single.html: %.sgml
-	$(JADE) -t sgml -isingle.file -iHTML.entities -V stream-output $(JADEFLAGS) -d $(STYLESHEET)/html/sl.dsl#html $< > $@
+	$(JADE) -t sgml -isingle.file -iHTML.entities -iOnly.web \
+		-V stream-output $(JADEFLAGS) \
+		-d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.parse: %.sgml
 	$(SGMLPARSE) -wall -ru $(DECL) $< >$@
@@ -60,7 +62,7 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 # this is that, in the typical case, this system won't be used for
 # drafting, but for generating a final document in one run.
 %.tth-maths.stamp: %.sgml
-	$(JADE) -t sgml $(JADEFLAGS) \
+	$(JADE) -t sgml -iOnly.web $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< > $@
 	ROOT=`awk -F: '{print $$1}' $@`; \
 	$(MAKE) $$ROOT.tth-html
@@ -70,7 +72,7 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 
 %.imgeq.list.stamp: %.sgml
 	# generate $$ROOT.imgeq.list
-	$(JADE) -t sgml $(JADEFLAGS) \
+	$(JADE) -t sgml -iOnly.web $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< \
 		> tmp-make.stamp
 	ROOT=`awk -F: '{print $$1}' tmp-make.stamp`	; \
@@ -105,7 +107,7 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 
 # The LaTeX stylesheet, like the HTML stylesheet, outputs a stamp.
 %.latex.stamp: %.sgml
-	$(JADE) -t latex -iLaTeX.entities $(JADEFLAGS) \
+	$(JADE) -t latex -iLaTeX.entities -iOnly.paper $(JADEFLAGS) \
 		-d $(STYLESHEET)/latex/sl.dsl#latex $< > $@
 
 # The back-matter stamp
