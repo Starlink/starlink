@@ -213,6 +213,7 @@
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU object
       INTEGER			IKEY			! Loop over keys
+      INTEGER			IVALUE			! Keyword value
       INTEGER			KID			! Keyword object
       INTEGER			LUN			! Logical unit number
       INTEGER			NKEY			! # of keywords
@@ -244,6 +245,9 @@
           IF ( CLASS(1:1) .EQ. 'D' ) THEN
             CALL ADI_GET0D( KID, DVALUE, STATUS )
             CALL FTPKYG( LUN, KEY, DVALUE, 8, CMT, FSTAT )
+          ELSE IF ( CLASS(1:1) .EQ. 'I' ) THEN
+            CALL ADI_GET0I( KID, IVALUE, STATUS )
+            CALL FTPKYJ( LUN, KEY, IVALUE, CMT, FSTAT )
           ELSE
             CALL ADI_GET0C( KID, CVALUE, STATUS )
             CALL FTPKYS( LUN, KEY, CVALUE, CMT, FSTAT )
