@@ -218,6 +218,11 @@
       CALL SCULIB_MALLOC(VAL__NBI * NX_OUT * NY_OUT, NCOADD_PTR, 
      :     NCOADD_END, STATUS) 
 
+*     Fill NCOADD with 0
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_CFILLI(NX_OUT*NY_OUT, 0, %VAL(NCOADD_PTR))
+      END IF
+
 *     The output grid is fixed for each integration (the extent of the entire
 *     data is already known) and so can be done outside the loop
 
@@ -412,6 +417,9 @@
 
          END DO
       END DO
+
+*     Should divide by the weight here
+*     (The equivalent of SCULIB_WTFN_REGRID_3)
 
 *     Finish
 
