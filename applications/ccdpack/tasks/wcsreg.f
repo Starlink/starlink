@@ -341,8 +341,8 @@
             IF ( I .EQ. REFPOS ) THEN
                CALL CCD1_MSG( ' ', '        (reference NDF)', STATUS )
             ELSE
-               DO 5 J = NSTEP, 1, -1
-                  CALL NDF_MSG( 'NDF', INDF( PATH( 1, J ) ) )
+               DO 5 J = 1, NSTEP
+                  CALL NDF_MSG( 'NDF', INDF( PATH( 2, J ) ) )
                   BUFFER = '        ' // DMNS( PATH( 3, J ) )
                   CALL CCD1_MSG( ' ', BUFFER( 1:30 ) // '   ^NDF', 
      :                           STATUS )
