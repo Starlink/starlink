@@ -5,14 +5,18 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions to refine extraction of objects.
 *
-*	Last modify:	11/05/99
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdlib.h>
@@ -20,6 +24,7 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"plist.h"
 #include	"extract.h"
 #include        "clean.h"       /* PWD: change here */
@@ -30,8 +35,8 @@
 #define	NSONMAX			1024	/* max. number per level */
 #define	NBRANCH			16	/* starting number per branch */
 
-static objliststruct	*objlist = NULL;
-static short		*son = NULL, *ok = NULL;
+static objliststruct	*objlist;
+static short		*son, *ok;
 
 /******************************** parcelout **********************************
 PROTO   parcelout(objliststruct *objlistin, objliststruct *objlistout)
@@ -59,20 +64,6 @@ int	parcelout(objliststruct *objlistin, objliststruct *objlistout)
   out = RETURN_OK;
 
   xn = prefs.deblend_nthresh;
-
-/*----- allocate some memory */
-
-  if (!son)
-    if (!(son = (short *)malloc(xn*NSONMAX*nbm*sizeof(short))))
-      error(EXIT_FAILURE, "Not enough memory in ", "parcelout()");
-  if (!ok)
-    if (!(ok = (short *)malloc(xn*NSONMAX*sizeof(short))))
-      error(EXIT_FAILURE, "Not enough memory in ", "parcelout()");
-
-  if (!objlist)
-    if (!(objlist = (objliststruct *)malloc(xn*sizeof(objliststruct))))
-      error(EXIT_FAILURE, "Not enough memory in ", "parcelout()");
-
 
 /* ---- initialize lists of objects */
 
@@ -199,15 +190,28 @@ exit_parcelout:
   return out;
   }
 
+/******************************* allocparcelout ******************************/
+/*
+Allocate the memory allocated by global pointers in refine.c
+*/
+void	allocparcelout(void)
+  {
+  QMALLOC(son, short,  prefs.deblend_nthresh*NSONMAX*NBRANCH);
+  QMALLOC(ok, short,  prefs.deblend_nthresh*NSONMAX);
+  QMALLOC(objlist, objliststruct,  prefs.deblend_nthresh);
+
+  return;
+  }
+
 /******************************* freeparcelout *******************************/
 /*
-free the memory allocated by global pointers in refine.c
+Free the memory allocated by global pointers in refine.c
 */
 void	freeparcelout(void)
   {
-  free(son);
-  free(ok);
-  free(objlist);
+  QFREE(son);
+  QFREE(ok);
+  QFREE(objlist);
   return;
   }
 
