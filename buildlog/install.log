@@ -561,6 +561,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -1031,4 +1032,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 26 seconds
+Total time: 7 minutes 33 seconds
