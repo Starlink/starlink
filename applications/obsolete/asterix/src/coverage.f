@@ -1,7 +1,25 @@
-*+  COVERAGE - Produce percentage coverage as function of data value
       SUBROUTINE COVERAGE( STATUS )
-*
-*    Description :
+*+
+*  Name:
+*     COVERAGE
+
+*  Purpose:
+*     Produce percentage coverage as function of data value
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL COVERAGE( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *
 *     Constructs the coverage function for 2d images, or in the case where
 *     an input with dimensionality greater than 2 is supplied,the coverage
@@ -14,46 +32,95 @@
 *     The output dataset is then a 1D dataset, with x-axis in units of the
 *     input dataset's data, and y-axis in percentage. In the higher dimen-
 *     sional case a stack of such functions is returned.
-*
-*    Environment parameters :
-*     parameter(dimensions) =type(access,i.e. R,W or U)
-*           <description of parameter>
-*    Method :
-*     <description of how the application works - for programmer info>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     15 Jun 92 : V1.7-0 Original (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Usage:
+*     coverage {parameter_usage}
+
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     coverage, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     15 Jun 1992 V1.7-0 (DJA):
+*        Original
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      4 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      CHARACTER*40              LABEL, UNITS            ! Input data attributes
 
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'COVERAGE Version V2.0-0' )
+
+*  Local Variables:
       REAL                      DMAX, DMIN              ! Range in data
+      REAL			SPARR(2)		! Spaced array data
 
-      INTEGER                   DDIMS(ADI__MXDIM)       ! Dummy dimensions
-      INTEGER                   DNDIM                   ! Dummy dimensionality
+      INTEGER			BDID			! Interface object
       INTEGER                   I                       ! General loop variable
       INTEGER                   IDIMS(ADI__MXDIM)       ! Input dimensions
       INTEGER                   IDPTR                   ! Input data ptr
@@ -65,33 +132,28 @@
       INTEGER                   ODIMS(ADI__MXDIM-1)     ! Output dimensions
       INTEGER                   ODPTR                   ! Output data ptr
       INTEGER			OFID			! Output dataset id
-      INTEGER                   ONDIM                   ! Output dimensionality
 
-      LOGICAL                   ANYBAD                  ! Any bad quality points
       LOGICAL                   OK                      ! Validity test
       LOGICAL                   QOK                     ! Quality present?
-*
-*    Version :
-*
-      CHARACTER*30             VERSION
-        PARAMETER              (VERSION = 'COVERAGE Version 1.8-0')
-*-
+*.
 
-*    Check status
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Start ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Get files
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+*  Get files
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_CREAT( OUT', ADI__NULLID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check data
-      CALL BDI_CHKDATA( IFID, OK, INDIM, IDIMS, STATUS )
+*  Check data
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, IDIMS, INDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( INDIM .LT. 2 ) THEN
         STATUS = SAI__ERROR
@@ -99,25 +161,21 @@
      :                                                       STATUS )
       END IF
 
-*    Map data
-      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
+*  Map data
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Quality present?
-      CALL BDI_CHKQUAL( IFID, QOK, DNDIM, DDIMS, STATUS )
+*  Quality present?
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
-        IF ( .NOT. ANYBAD ) THEN
-          CALL BDI_UNMAPLQUAL( IFID, STATUS )
-          QOK = .FALSE.
-        END IF
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Number of data points
+*  Number of data points
       CALL ARR_SUMDIM( INDIM, IDIMS, INELM )
 
-*    Get range in data
+*  Get range in data
       IF ( QOK ) THEN
         CALL ARR_RANG1RLQ( INELM, %VAL(IDPTR), %VAL(IQPTR), DMIN, DMAX,
      :                                                         STATUS )
@@ -125,78 +183,69 @@
         CALL ARR_RANG1R( INELM, %VAL(IDPTR), DMIN, DMAX, STATUS )
       END IF
 
-*    Set defaults for coverage graph
+*  Set defaults for coverage graph
       CALL USI_DEF0R( 'MIN', DMIN, STATUS )
       CALL USI_DEF0R( 'MAX', DMAX, STATUS )
 
-*    Get range for coverage
+*  Get range for coverage
       CALL USI_GET0R( 'MIN', DMIN, STATUS )
       CALL USI_GET0R( 'MAX', DMAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get number of bins for coverage array
+*  Get number of bins for coverage array
       CALL USI_GET0I( 'NBIN', NCBIN, STATUS )
 
-*    Create output dimensions
+*  Create output dimensions
       ODIMS(1) = NCBIN
       IF ( INDIM .GT. 2 ) THEN
         DO I = 3, INDIM
           ODIMS(I-1) = IDIMS(I)
         END DO
       END IF
-      ONDIM = INDIM - 1
 
-*    Create output axes. First axis comes from input data, second and
-*    subsequent axes are copied from 3rd onwards from input, if present.
-      CALL BDI_CREAXES( OFID, ONDIM, STATUS )
-      CALL BDI_CREAXVAL( OFID, 1, .TRUE., NCBIN, STATUS )
-      CALL BDI_PUTAXVAL( OFID, 1, DMIN + (DMAX-DMIN)/REAL(NCBIN)/2.0,
-     :                (DMAX-DMIN)/REAL(NCBIN), NCBIN, STATUS )
-      CALL BDI_GETUNITS( IFID, UNITS, STATUS )
-      CALL BDI_GETLABEL( IFID, LABEL, STATUS )
-      IF ( UNITS .GT. ' ' ) THEN
-        CALL BDI_PUTAXUNITS( OFID, 1, UNITS, STATUS )
-      END IF
-      IF ( LABEL .GT. ' ' ) THEN
-        CALL BDI_PUTAXLABEL( OFID, 1, LABEL, STATUS )
-      END IF
+*  Create interface object
+      CALL BDI_NEW( 'BinDS', INDIM-1, ODIMS, 'REAL', BDID, STATUS )
+      CALL BDI_SETLNK( BDID, OFID, STATUS )
+      OFID = BDID
+
+*  Create output axes. First axis comes from input data, second and
+*  subsequent axes are copied from 3rd onwards from input, if present.
+      SPARR(1) = DMIN + (DMAX-DMIN)/REAL(NCBIN)/2.0
+      SPARR(2) = (DMAX-DMIN)/REAL(NCBIN)
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_COPY( IFID, 'Label', OFID, 'Axis_1_Label', STATUS )
+      CALL BDI_COPY( IFID, 'Units', OFID, 'Axis_1_Units', STATUS )
       IF ( INDIM .GT. 2 ) THEN
         DO I = 3, INDIM
-          CALL BDI_COPAXIS( IFID, OFID, I, I-1, STATUS )
+          CALL BDI_AXCOPY( IFID, I, ' ', OFID, I-1, STATUS )
         END DO
       END IF
-      CALL BDI_PUTLABEL( OFID, 'Coverage', STATUS )
-      CALL BDI_PUTUNITS( OFID, 'percent', STATUS )
+      CALL BDI_PUT0C( OFID, 'Label', 'Coverage', STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', 'percent', STATUS )
 
-*    Create output data
-      CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+*  Create output data
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
 
-*    Perform coverage analysis
+*  Perform coverage analysis
       CALL COVERAGE_INT( IDIMS(1)*IDIMS(2), INELM/(IDIMS(1)*IDIMS(2)),
      :                   %VAL(IDPTR), QOK, %VAL(IQPTR), NCBIN,
      :                   DMIN, DMAX, %VAL(ODPTR), STATUS )
 
-*    Copy ancillary stuff
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
+*  Copy ancillary stuff
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
-*    History update
+*  History update
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Release datasets
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( OFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
 
 
-
-*+  COVERAGE_INT - Does work for COVERAGE
+*+  COVERAGE_INT - Do coverage analysis
       SUBROUTINE COVERAGE_INT( NIMAGE, NFRAME, IN, QOK, INQ,
      :                         NCOVER, LO, HI, OUT, STATUS )
 *    Description :
