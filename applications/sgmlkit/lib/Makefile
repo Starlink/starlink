@@ -6,6 +6,8 @@ SGMLPARSE=nsgmls
 
 JADE=jade
 JADEFLAGS=
+IMGEQ=$(LIBDIR)/img-eqlist.pl
+PSTOPNM=$(LIBDIR)/pstopnm-s
 
 # The HTML stylesheet does not output the generated HTML to standard
 # output, but instead generates a filename.  It needs to do this so
@@ -37,15 +39,15 @@ JADEFLAGS=
 %.fot: %.sgml
 	$(JADE) -t fot -d $(STYLESHEET)/html/sl.dsl $< >$@
 
-# The target %.maths.stamp is satisfied when the maths has been extracted from 
-# a document, and tth has been used to convert it to HTML.  Note that,
-# although it's feasible, maths is _not_ routinely re-extracted by each
-# run of the main stylesheet - the model is that the maths will be converted
-# to HTML once, and then reused on subsequent production of the main document.
-# The justification for this is that, in the typical case, this system
-# won't be used for drafting, but for generating a final document
-# in one run.
-%.maths.stamp: %.sgml
+# The target %.tth-maths.stamp is satisfied when the maths has been
+# extracted from a document, and tth has been used to convert it to
+# HTML.  Note that, although it's feasible, maths is _not_ routinely
+# re-extracted by each run of the main stylesheet - the model is that
+# the maths will be converted to HTML once, and then reused on
+# subsequent production of the main document.  The justification for
+# this is that, in the typical case, this system won't be used for
+# drafting, but for generating a final document in one run.
+%.tth-maths.stamp: %.sgml
 	$(JADE) -t sgml $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< > $@
 	ROOT=`awk -F: '{print $$1}' $@`; \
@@ -53,6 +55,39 @@ JADEFLAGS=
 
 %.tth-html: %.tth-eqlist
 	tth -r < $< > $@
+
+%.img-maths.stamp: %.sgml
+	$(JADE) -t sgml $(JADEFLAGS) \
+		-d $(STYLESHEET)/html/slmaths.dsl#maths.main $< > $@
+	ROOT=`awk -F: '{print $$1}' $@`; \
+	$(MAKE) $$ROOT.imgeq.stamp
+
+%.imgeq-sgml %.imgeq.tex: %.img-eqlist
+	$(IMGEQ) $<
+
+# processing chain is something like
+#   pnmcrop t001.ppm |pnmgamma 1.0|ppmdim 0.7| \
+#     ppmtogif -interlace -transparent rgb:b2/b2/b2 >t001.gif
+#
+# See notes in the script texttogif at
+# http://www.fourmilab.ch/webtools/textogif/textogif.html
+%.imgeq.stamp: %.imgeq.ps
+	$(PSTOPNM) -resolution 144 $<
+	for f in `ls $(<:.imgeq.ps=)*.ppm | sed 's/\.[^.]*$$//'`; do \
+		echo $$f; \
+		pnmcrop $$f.ppm |\
+		pnmgamma 1.0 |\
+		ppmdim 0.7 |\
+		ppmtogif -interlace -transparent rgb:b2/b2/b2 \
+		>$$f.gif ;\
+	done
+	touch $@
+
+%.ps: %.dvi
+	dvips $< -o
+
+%.dvi: %.tex
+	latex $<
 
 %.data: %.sgml
 	$(SGMLPARSE) $(DECL) $< | \
