@@ -466,18 +466,39 @@ AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
 ])# STAR_FC_LIBRARY_LDFLAGS
 
 
-# STAR_LIBRARY_TCLTK([minversion=0])
-# ----------------------------------
-# Finds a tclsh and wish, and adjusts the CFLAGS and LIBS variables to match.
-# If argument minversion is present, it specifies the minimum Tcl/Tk version
-# number required.  The macro searches first in the path, and then in a
-# selection of standard locations.
-AC_DEFUN([STAR_LIBRARY_TCLTK],
-    [AC_CACHE_CHECK([where to find Tcl/Tk[]m4_ifval([$1], [ $1+])],
-                    [star_cv_settcldir],
-                    [star_cv_settcldir=
-                     reqversint=`echo m4_ifval([$1], [$1], 0.0)-0-0 | [sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/']|dc`
-                     tclsources=`echo $PATH | sed "s/$PATH_SEPARATOR/ /g"`'
+# STAR_PATH_TCLTK([minversion=0])
+# -------------------------------
+# Finds a tclsh and wish, and the associated libraries.  Sets output
+# variable TCL_CFLAGS to the C compiler flags necessary to compile
+# with Tcl, and TCL_LIBS to the required library flags.  Define
+# the cpp variable TCL_MISSING to 1 if Tcl is not available.  Similar
+# to macro AC_PATH_XTRA.
+#
+# If argument minversion is present, it specifies the minimum Tcl/Tk
+# version number required.  The macro searches first in the path, and
+# then in a selection of platform-specific standard locations.  The
+# configure option --with-tcl allows you to provide a path to a tclsh
+# binary, which is put at the head of the list of locations to search.
+AC_DEFUN([STAR_PATH_TCLTK],
+    [AC_ARG_WITH([tcl],
+                 AS_HELP_STRING([--with-tcl],
+                                [give path to tclsh (dir which contains binary)]),
+                 [if test "X$withval" = Xno; then
+                      _star_use_tcl=false
+                  elif test "X$withval" = Xyes; then
+                      _star_use_tcl=true
+                  else
+                      _star_use_tcl=true
+                      _star_try_tcldir=$withval
+                  fi])
+     if $_star_use_tcl; then
+         AC_CACHE_CHECK(
+             [where to find Tcl/Tk[]m4_ifval([$1], [ $1+])],
+             [star_cv_settcldir],
+             [star_cv_settcldir=unknown
+              reqversint=`echo m4_ifval([$1], [$1], 0.0)-0-0 | [sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/']|dc`
+              tclsources=`echo $PATH | sed "s/$PATH_SEPARATOR/ /g"`
+              stdsources='
 dnl  Search in /usr and /usr/local at least
 /usr/bin
 /usr/local/bin
@@ -485,25 +506,25 @@ dnl  /opt/local and /sw are the default installation locations for OpenDarwin
 dnl  and Fink on OSX
 /opt/local/bin
 /sw/bin'
-                     for d in $tclsources
-                     do
-                         if test -x $d/tclsh \
-                                 -a -x $d/wish \
-                                 -a -r $d/../include/tcl.h \
-                                 -a -r $d/../include/tk.h; then
-                              if test ! -r $d/../lib/tclConfig.sh; then
-                                  echo "$d/../lib/tclConfig.sh not found"
-                                  break
-                              fi
-                              if test ! -r $d/../lib/tkConfig.sh; then
-                                  echo "$d/../lib/tkConfig.sh not found"
-                                  break
-                              fi
-                              rm -f conftest.sh
-                              exec 8>conftest.sh
-                              echo tcldir=`cd $d/..; pwd` >&8
-                              echo reqversint=$reqversint >&8
-                              cat <<\_STAREOF >&8
+              for d in $_star_try_tcldir $tclsources $stdsources
+              do
+                  if test -x $d/tclsh \
+                          -a -x $d/wish \
+                          -a -r $d/../include/tcl.h \
+                          -a -r $d/../include/tk.h; then
+                       if test ! -r $d/../lib/tclConfig.sh; then
+                           echo "$d/../lib/tclConfig.sh not found"
+                           break
+                       fi
+                       if test ! -r $d/../lib/tkConfig.sh; then
+                           echo "$d/../lib/tkConfig.sh not found"
+                           break
+                       fi
+                       rm -f conftest.sh
+                       exec 8>conftest.sh
+                       echo tcldir=`cd $d/..; pwd` >&8
+                       echo reqversint=$reqversint >&8
+                       cat <<\_STAREOF >&8
 . $tcldir/lib/tclConfig.sh
 . $tcldir/lib/tkConfig.sh
 tclversint=`[echo $TCL_VERSION$TCL_PATCH_LEVEL-0-0 | sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/'|dc]`
@@ -511,7 +532,7 @@ if test $tclversint -gt $reqversint; then
     # New enough version.
     # These envs include $TCL_DBGX -- expand this out.
     eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
-    echo "CFLAGS=\"\$CFLAGS $I\"; LIBS=\"\$LIBS $L\""
+    echo "TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\""
     status=0
 else
     echo "Tcl/Tk versions $TCL_VERSION$TCL_PATCH_LEVEL/$TK_VERSION$TK_PATCH_LEVEL too old"
@@ -519,23 +540,25 @@ else
 fi
 exit $status
 _STAREOF
-                              exec 8<&-
-                              if /bin/sh conftest.sh >conftest.results; then
-                                  star_cv_settcldir=`cat conftest.results`
-                              else
-                                  star_cv_settcldir=unknown
-                              fi
-                              cp conftest.sh saved-conftest.sh
-                              cp conftest.results saved-conftest.results
-                              if test "$star_cv_settcldir" != unknown; then
-                                  break
-                              fi
-                          fi
-                      done])
-     if test "$star_cv_settcldir" != unknown; then
-         eval $star_cv_settcldir
-     fi
-])# STAR_PROG_TCLTK
+                       exec 8<&-
+                       if /bin/sh conftest.sh >conftest.results; then
+                           star_cv_settcldir=`cat conftest.results`
+                       fi
+                       if test "$star_cv_settcldir" != unknown; then
+                           break
+                       fi
+                  fi
+              done])
+    fi # $_star_use_tcl
+    if test "$star_cv_settcldir" = unknown; then
+        AC_DEFINE(TCL_MISSING, 1,
+                  [Define to 1 if no Tcl/Tk libraries can be found])
+    else
+        eval $star_cv_settcldir
+    fi
+    AC_SUBST(TCL_CFLAGS)
+    AC_SUBST(TCL_LIBS)
+])# STAR_PATH_TCLTK
 
 
 # STAR_LATEX_DOCUMENTATION(documentcode, [targets])
