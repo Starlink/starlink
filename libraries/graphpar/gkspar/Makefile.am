@@ -1,0 +1,20 @@
+## Process this file with automake to produce Makefile.in
+
+bin_SCRIPTS = gks_link_adam gks1_link_adam
+
+lib_LTLIBRARIES = libgkspar_adam.la
+
+libgkspar_adam_la_SOURCES = $(F_ROUTINES) $(BLOCKDATA_ROUTINES) \
+        $(PRIVATE_INCLUDES)
+
+F_ROUTINES = gks1_activ.f gks1_chkid.f gks1_getgd.f gks_assoc.f	       \
+gks_gstat.f gks1_ass.f gks1_deas.f gks1_stop.f gks_cancl.f gks_reset.f \
+gks1_fndgd.f gks_annul.f gks_deact.f
+
+PRIVATE_INCLUDES = gksenv_par gksgo_cmn gkspa_cmn
+
+BLOCKDATA_ROUTINES = gks1_blk.f
+
+
+# Testing
+# Need to know how to build adam applications
