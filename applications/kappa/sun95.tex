@@ -8815,7 +8815,7 @@ value lies within a background area, and so on.
 The user is free to use the flags in whatever way seems most
 suited to the particular process being performed. The user can
 set (or reset) any of the flags within any sub-region of the {\small NDF}
-using application {\small SETQUAL}.
+using application \htmlref{SETQUAL}{SETQUAL}.
 Each of the flags is referred to by a ``Quality Name''
 specified by the user. Names which reflect the nature of the
 quality should be used, e.g. the quality name ``SATURATED'' could
@@ -8830,15 +8830,15 @@ element within the {\small QUALITY} array.
 The number of quality names which can be stored within an {\small NDF} is
 limited and therefore it may become necessary to remove quality names
 which are no longer needed to make room for new ones. The applications
-{\small SHOWQUAL} and {\small REMQUAL} allow the user to do this. {\small
+\htmlref{SHOWQUAL}{SHOWQUAL} and \htmlref{REMQUAL}{REMQUAL} allow the user to do this. {\small
 SHOWQUAL} displays a list of the quality names currently defined within
 an {\small NDF}, and {\small REMQUAL} removes specified quality names
 from an {\small NDF}.
 
 Some applications have a parameter {\small QEXP} which may be used to
 specify that the application is only to use data values which hold a
-specified selection of qualities.  As an example, when running {\small
-QUALTOBAD} the user could (for instance) specify a value of
+specified selection of qualities.  As an example, when running 
+\htmlref{QUALTOBAD}{QUALTOBAD} the user could (for instance) specify a value of
 ``BACKGROUND'' for the {\small QEXP} parameter. This means that only
 those data values for which the flag associated with the quality name
 ``BACKGROUND'' is set, are to be set bad. The quality name ``BACKGROUND''
