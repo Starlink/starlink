@@ -108,9 +108,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the file locator
-      CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
-
 *  Get flag name and value
       CALL ADI_GET0C( ARGS(3), NAME, STATUS )
       CALL ADI_GET0L( ARGS(4), VALUE, STATUS )
