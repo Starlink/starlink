@@ -61,10 +61,6 @@
 *     IN = NDF (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied.
-*     INTEGRATIONS = _INTEGER (Read)
-*        The inegrations that should be selected from the input data. Pass
-*        zero to select all integrations (ie if you have gone into this mode
-*        by mistake). This question is only asked if SELECT_INTS is true.
 *     LAT_OUT = _CHAR (Read)
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
@@ -84,19 +80,16 @@
 *        Size of pixels in the output map
 *     REBIN_METHOD = _CHAR (Read)
 *        The rebin method to be used. This can be either LINEAR or BESSEL.
-*     SELECT_INTS = _LOGICAL (Read)
-*        This parameter governs whether the user wishes to select any
-*        integrations for special treatment.
 *     SHIFT_DX = _REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line.
 *     SHIFT_DY = _REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
 *        maps in line.
-*     USE_INTS = _LOGICAL (Read)
-*        If you wish to discard the integrations specified by the INTEGRATIONS
-*        parameter then select 'no'. If you wish to rebin a map using only
-*        the specified integrations select 'yes'.
+*     USE_SECTION = _LOGICAL (Read)
+*        If you wish to discard the data specified by the SCUBA Section
+*        then select 'no'. If you wish to rebin a map using only
+*        the specified section select 'yes'.
 *     WEIGHT = _REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 
@@ -126,6 +119,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.29  1997/04/08 22:06:13  timj
+*     Use SCUBA sections instead of specifying INTS with parameters.
+*     Remove printing of integration count.
+*
 *     Revision 1.28  1997/04/07 22:59:55  timj
 *     Use SCULIB_WTFN_REGRID
 *     Start experimenting with SCULIB_SPLINE_REGRID
@@ -217,10 +214,14 @@ c
       INTEGER CHR_LEN                  ! CHR used-string-length function
 
 * Local Constants:
-      INTEGER          MAX__INT        ! max number of integrations 
-      PARAMETER (MAX__INT = 20)        ! that can be specified
-      INTEGER          MAX__INTS       ! max number of integrations 
-      PARAMETER (MAX__INTS = 200)      ! in an input file
+      INTEGER          MAX__EXP           ! max number of exposures
+      PARAMETER (MAX__EXP = 128)          ! in a file
+      INTEGER          MAX__INT           ! max number of integrations 
+      PARAMETER (MAX__INT = 200)          ! in a file
+      INTEGER          MAX__MEAS          ! max number of measurements
+      PARAMETER (MAX__MEAS = 20)          ! that can be specified
+      INTEGER          MAX__SWITCH        ! max number of switches
+      PARAMETER (MAX__SWITCH = 3)         ! in a file
       REAL DIAMETER                    ! diameter of JCMT mirror
       PARAMETER (DIAMETER = 15.0)
       INTEGER WTFNRES                  ! number of values per scale length
@@ -280,14 +281,20 @@ c
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
+
+      INTEGER          BOL_S (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                          ! array containing 1 for bolometers
+                                          ! selected in data-spec, 0 otherwise
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! bolometer types
       CHARACTER*10     CTYPE1          ! Coordinate type of output FITS
       CHARACTER*10     CTYPE2          ! Coordinate type of output FITS
+      INTEGER          CURLY           ! index of { in IN
       INTEGER          DATA_OFFSET     ! Offset for pointer arrays
+      CHARACTER*80     DATA_SPEC          ! data-spec part of IN
       CHARACTER*12     DATEOBS         ! Date of map obs
       INTEGER          DIM (MAX_DIM)   ! array dimensions
-      INTEGER          DUMMY_QUALITY (MAX__INTS)
+      INTEGER          DUMMY_QUALITY (MAX__INT)
                                        ! Dummy quality array
       DOUBLE PRECISION DTEMP           ! scratch double
       DOUBLE PRECISION DTEMP1          ! scratch double
@@ -297,6 +304,9 @@ c
                                        ! Pointer to dummy variance
       INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          EXP_END         ! end index of data for an exposure
+      INTEGER          EXP_S (MAX__EXP)   ! array containing 1 for
+                                          ! exposures selected in
+                                          ! data-spec, 0 otherwise
       INTEGER          EXP_START       ! start index of data for an exposure
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
@@ -322,6 +332,7 @@ c
       INTEGER          ID              ! day of an input observation
       INTEGER          IERR            ! Position of error from VEC_
       INTEGER          IM              ! month in which observation started
+      CHARACTER*80     IN                 ! input filename and data-spec
       CHARACTER*40     INSTRUMENT      ! FITS instrument entry
       INTEGER          INTEGRATION     ! integration index in DO loop
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
@@ -331,8 +342,11 @@ c
       INTEGER          INT_PTR(MAX_FILE)! Pointer to array of integration posns
       INTEGER          INT_PTR_END(MAX_FILE)! Pointer to end of INT_PTR
       INTEGER          INT_QUAL        ! Scratch quality
-      INTEGER          INT_QUALITY(MAX__INTS)
+      INTEGER          INT_QUALITY(MAX__INT)
                                        ! Integration quality (modify)
+      INTEGER          INT_S (MAX__INT)   ! array containing 1 for
+                                          ! integration selected by
+                                          ! data-spec, 0 otherwise
       INTEGER          INT_TIME        ! Number of good jiggles
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
@@ -405,6 +419,7 @@ c
                                        ! y jiggle offsets (arcsec)
       INTEGER          J_CENTRE        ! J index of central pixel in output
                                        ! map
+      INTEGER          KEEP            ! Quality flag for DUMMY_QUALITY
       LOGICAL          KEEP_INT        ! Keep the specified ints
       INTEGER          LAST_EXP        ! exposure during which abort
                                        ! occurred
@@ -419,6 +434,9 @@ c
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
       INTEGER          MEASUREMENT     ! Counter in do loop
+      INTEGER          MEAS_S (MAX__MEAS) ! array containing 1 for
+                                          ! measurement selected by
+                                          ! data-spec, 0 otherwise
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
                                        ! measured positions are calculated
@@ -486,6 +504,10 @@ c
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                        ! LST of pointing corrections (radians)
+      LOGICAL          POS_SELECTED       ! .TRUE. if selected data were
+                                          ! specified by P=....
+      INTEGER          POS_S_END          ! end of VM holding POS_S
+      INTEGER          POS_S_PTR          ! start of VM holding POS_S
       CHARACTER*5      RADECSYS        ! Type of coordinate system
       LOGICAL          READING         ! .TRUE. while reading input files
       LOGICAL          REBIN           ! .TRUE. if REBIN application has 
@@ -503,6 +525,7 @@ c
       CHARACTER*30     SCS             ! name of sky coordinate system
       CHARACTER*80     SCUCD_STATE     ! 'state' of SCUCD at the end of
                                        ! the observation
+      LOGICAL          SECTION         ! Am I processing a SCUBA section?
       LOGICAL          SELECT_INTS     ! Choose some integrations
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
@@ -519,6 +542,11 @@ c
       INTEGER          SUM_GOOD_INTS   ! Running total of good ints
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
+      LOGICAL          SWITCH_EXPECTED ! Should the section include SWITCH(NO)
+      INTEGER          SWITCH_S (MAX__SWITCH)
+                                          ! array that has 1 for
+                                          ! switches selected by
+                                          ! data-spec, 0 otherwise
       CHARACTER*10     TELESCOPE       ! FITS telescope entry
       CHARACTER*10     TSKNAME         ! Name of task
       INTEGER          TOTAL_BOLS      ! Number of bolometers
@@ -665,8 +693,38 @@ c
 *            IF (FILE.GT.2) CALL PAR_CANCL(PARAM, STATUS)
          END IF
 
-         CALL NDF_ASSOC(PARAM, 'READ', IN_NDF, STATUS)
-
+*       Read in the file and, if required, a section
+ 
+         CALL PAR_GET0C (PARAM, IN, STATUS)
+ 
+         IF (STATUS .NE. PAR__NULL) THEN
+         
+            CURLY = INDEX (IN,'{')
+            IF (STATUS .EQ. SAI__OK) THEN
+               IF (CURLY .EQ. 0) THEN
+*     No section so select all data
+                  FILENAME(FILE) = IN
+                  SECTION = .FALSE.
+                  CURLY = '{}'  ! select all data
+               ELSE IF (CURLY .EQ. 1) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC ('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: no filename specified',
+     :                 STATUS)
+               ELSE
+                  FILENAME(FILE) = IN (:CURLY-1)
+                  DATA_SPEC = IN (CURLY:)
+                  SECTION = .TRUE.
+               END IF
+            END IF
+  
+*     open the data NDF
+ 
+            CALL NDF_OPEN (DAT__ROOT, FILENAME(FILE), 'READ', 'OLD', 
+     :           IN_NDF, ITEMP, STATUS)
+ 
+         END IF
+ 
          IF (IN_NDF .EQ. NDF__NOID .OR. STATUS .EQ. PAR__NULL) THEN
             FILE = FILE - 1
             READING = .FALSE.
@@ -679,12 +737,9 @@ c
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: number of '//
      :           'files read exceeds maximum allowed - ^MAX', STATUS)
-         ELSE
-*     Store name of file
-            CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS)
-            CALL SUBPAR_GETNAME(IPAR, FILENAME(FILE), STATUS)
          END IF
 
+*       Everything is okay so read in this dataset
          IF (READING) THEN
 
 
@@ -1020,35 +1075,6 @@ c
                ABORTED = .TRUE.
             END IF
 
-*       Calculate the number of GOOD integrations so that I can report
-*       time contribution from each map
-               
-            TOTAL_INTS = N_MEASUREMENTS * N_INTEGRATIONS
-            DO I = 1, TOTAL_INTS
-               INT_QUALITY (I) = 0
-            END DO
-
-*     Find INT_QUALITY extension
-            IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
-               CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :              'JIGL_CNT', JIGGLE_COUNT, STATUS)
-               
-               IF (IN_REDSX_LOC .NE. DAT__NOLOC .AND. 
-     :              STATUS.EQ.SAI__OK) THEN
-                  CALL CMP_GET1I(IN_REDSX_LOC, 'INT_QUALITY',TOTAL_INTS,
-     :                 INT_QUALITY, ITEMP, STATUS)
-                  IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
-               END IF
-            END IF
-
-*     Find number of bad integrations
-            BAD_INTS = 0
-            DO I = 1, TOTAL_INTS
-               BAD_INTS = BAD_INTS + INT_QUALITY(I)
-            END DO
-
-*     Find number of good ints and add to running total
-            GOOD_INTS = TOTAL_INTS - BAD_INTS
 
 *  Print out information on observation
 
@@ -1087,14 +1113,6 @@ c
      :              'ABORTED during exposure ^N_E of integration '//
      :              '^N_I of measurement ^N_M', STATUS)
             END IF
-
-            CALL MSG_SETI('TOT', GOOD_INTS)
-            CALL MSG_SETI('TIME', GOOD_INTS * JIGGLE_COUNT)
-            CALL MSG_SETC('PKG', PACKAGE)
-               
-            CALL MSG_OUTIF(MSG__NORM, ' ',
-     :           '^PKG: file contains ^TOT complete good '//
-     :           'integrations (^TIME jiggles)', STATUS)
 
 *  calculate the apparent RA and Dec of the map centre at IN_UT1
 
@@ -1154,93 +1172,40 @@ c
 
             END IF
 
+*     SCUBA SECTION
+*     If there a SCUBA section has been specified then we need to apply it
+            IF (SECTION) THEN
 
-*  Maybe we only want to rebin some of the integrations
+*       Get some memory
 
-            IF (N_INTEGRATIONS .GT. 1) THEN
+               POS_S_PTR = 0
+               CALL SCULIB_MALLOC (N_POS(FILE) * VAL__NBI, POS_S_PTR, 
+     :              POS_S_END, STATUS)
 
-               CALL PAR_GET0L ('SELECT_INTS', SELECT_INTS, STATUS)
-
-               IF (SELECT_INTS) THEN
-                  CALL PAR_DEF1I ('INTEGRATIONS', 1, 0, STATUS)
-                  CALL PAR_GET1I ('INTEGRATIONS', MAX__INT, INT_BAD,
-     :                 N_INT_BAD, STATUS)
-                  CALL PAR_CANCL ('INTEGRATIONS', STATUS)
-
-                  IF (INT_BAD(1) .GT. 0) THEN
-
-*  do we want to keep or discard
+*     decode the data specification
  
-                     CALL PAR_GET0L ('USE_INTS', USE_INTS, STATUS)
-                     CALL PAR_CANCL ('USE_INTS', STATUS)
-                     IF (USE_INTS) THEN
-                        KEEP_INT = .TRUE.
-                        INT_QUAL = 0
-                        DO I = 1,TOTAL_INTS
-                           DUMMY_QUALITY(I) = 1
-                        END DO
-                     ELSE
-                        KEEP_INT = .FALSE.
-                        INT_QUAL = 1
-                        DO I = 1,TOTAL_INTS
-                           DUMMY_QUALITY(I) = 0
-                        END DO
-                     END IF
+               SWITCH_EXPECTED = .FALSE.
+            
+               CALL SCULIB_DECODE_SPEC (DATA_SPEC,%val(IN_DEM_PNTR_PTR),
+     :              1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
+     :              N_POS(FILE), N_BOL(FILE), SWITCH_EXPECTED,
+     :              POS_SELECTED, %val(POS_S_PTR), SWITCH_S, EXP_S, 
+     :              INT_S, MEAS_S, BOL_S, STATUS)
 
-*  Initialise the usage array
+*     Is section good or bad
+               CALL PAR_GET0L ('USE_SECTION', USE_INTS, STATUS)
+               CALL PAR_CANCL ('USE_SECTION', STATUS)
 
-                     DO I = 1, N_INTEGRATIONS
-                        USE_INT(I) = .NOT.KEEP_INT
-                     END DO
+*     and set quality for the selected bolometers and positions
 
-*  Now set the ones we want to keep
+               CALL SCULIB_SET_DATA (USE_INTS, %val(IN_DATA_PTR(FILE)), 
+     :              N_BOL(FILE), N_POS(FILE), 1, BOL_S, %val(POS_S_PTR), 
+     :              VAL__BADR, STATUS)
+               
+               CALL SCULIB_FREE ('POS_S', POS_S_PTR, POS_S_END, STATUS)
 
-                     DO I = 1, N_INT_BAD
-                        IF (INT_BAD(I) .GT. 0) THEN
-                           USE_INT(INT_BAD(I)) = KEEP_INT
-                           DUMMY_QUALITY(INT_BAD(I)) = INT_QUAL ! keep track
-                        END IF
-                     END DO
-
-
-                     DO INTEGRATION = 1, N_INTEGRATIONS
-                        IF (.NOT.USE_INT(INTEGRATION)) THEN
-*     Find start and end of integration
-                          CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
-     :                          1, N_EXPOSURES, N_INTEGRATIONS, 1,
-     :                          N_POS(FILE), 1, 1, INTEGRATION,1,
-     :                          EXP_START, ITEMP, STATUS)
-                          CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
-     :                          1, N_EXPOSURES, N_INTEGRATIONS, 1,
-     :                          N_POS(FILE), 1,N_EXPOSURES, INTEGRATION,
-     :                          1, ITEMP, EXP_END, STATUS)
-*     Set these data to bad values
-                          CALL SCULIB_CFILLR((1+EXP_END-EXP_START)*
-     :                         N_BOL(FILE), VAL__BADR,
-     :                         %VAL(IN_DATA_PTR(FILE) + VAL__NBR *
-     :                         (N_BOL(FILE)*(EXP_START-1))))
-                           
-                        END IF
-                     END DO
-                  END IF
-               END IF
             END IF
 
-*     Now find running total of good and bad integrations
-*     Find number of bad integrations
-            BAD_INTS = 0
-            DO I = 1, TOTAL_INTS
-               IF (DUMMY_QUALITY(I).EQ.1.OR.INT_QUALITY(I).EQ.1) THEN
-                  BAD_INTS = BAD_INTS + 1
-               END IF
-            END DO
-
-*     Find number of good ints and add to running total
-            GOOD_INTS = TOTAL_INTS - BAD_INTS
-
-            INT_TIME = INT_TIME + 
-     :           (GOOD_INTS * JIGGLE_COUNT)
-            SUM_GOOD_INTS = SUM_GOOD_INTS + GOOD_INTS
 
 *     Get some memory for the bolometer positions
 
@@ -1310,7 +1275,6 @@ c
             CALL PAR_CANCL ('WEIGHT', STATUS)
             CALL PAR_CANCL ('SHIFT_DX', STATUS)
             CALL PAR_CANCL ('SHIFT_DY', STATUS)
-            CALL PAR_CANCL ('SELECT_INTS', STATUS)
 
 *  annul locators and array identifiers and close the file
 
@@ -1356,16 +1320,6 @@ c
      :           'input data', STATUS)
          END IF
       END IF
-
-*  Report total number of good integrations
-
-      CALL MSG_SETI('TIME', INT_TIME)
-      CALL MSG_SETI('INTS', SUM_GOOD_INTS)
-      CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUTIF(MSG__NORM, ' ',
-     :     '^PKG: Total number of integrations in output'//
-     :     ' map is ^INTS (^TIME jiggles)', STATUS)
-
 
 *  get a title for the output map
 
