@@ -108,8 +108,8 @@
 
 *  Otherwise, create the column.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         CALL CAT_CNEWS( CI, ENAME, REPORT, DTYPE, CSIZE, UNITS, 
-     :                   EXTFMT, COMM, FI, STATUS)
+         CALL CAT_CNEWS( CI, ENAME, DTYPE, CSIZE, UNITS, EXTFMT, COMM, 
+     :                   FI, STATUS)
       END IF
 
       END

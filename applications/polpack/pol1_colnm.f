@@ -145,7 +145,7 @@
 *  file.
          CALL PSX_GETENV( 'HOME', RCFILE, STATUS )
          NC = CHR_LEN( RCFILE )         
-         CALL CHR_APPND( '.polpackrc', RCFILE, NC )
+         CALL CHR_APPND( '/.polpackrc', RCFILE, NC )
 
 *  Attempt to open this file.
          CALL FIO_OPEN( RCFILE( : NC ), 'READ', 'NONE', 0, FD, STATUS ) 
