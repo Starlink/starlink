@@ -148,6 +148,7 @@ C      {data_type} {external_name} ! [external_description]
         PARAMETER		( VERSION = 'EVSUBSET Version V2.0-0' )
 
 *  Local Variables:
+      CHARACTER*20  		LNAME    		! Current list name
       CHARACTER*20  		NAME(MXSEL)    		! Names of selected lists
       CHARACTER*7  		MTYPE                	! Mapping type
       CHARACTER*12            	PAR                  	! Parameter name
@@ -172,6 +173,7 @@ C      {data_type} {external_name} ! [external_description]
       INTEGER                 	COPY                 	! Pointer to copy array
       INTEGER                 	DIMS                 	! Number of dimensions
       INTEGER                 	EVENTS               	! Number of events in EVDS
+      INTEGER			EVID			! New event object
       INTEGER                 	I, J, K              	! Loop counters
       INTEGER                 	IBLOCK               	! Loop over blocks
       INTEGER                 	ICOPY                	! Pointer to copy array
@@ -182,6 +184,7 @@ C      {data_type} {external_name} ! [external_description]
       INTEGER                 	IQPTR(MXSEL)    	! Pointer to input quantum
       INTEGER                 	LDIMS(ADI__MXDIM)    	! Length of each dimension
       INTEGER                 	LEN                  	! Length of various things
+      INTEGER			LID			! List identifier
       INTEGER			NBLK			! # blocks to copy
       INTEGER                 	NCOMP                	! Number of components
       INTEGER                 	NLISTS               	! Number of LISTs
@@ -310,29 +313,29 @@ C      {data_type} {external_name} ! [external_description]
           END IF
 
 *      Alter bounds according to QUANTUM
-          CALL HDX_OK( ILLOC(J), 'QUANTUM', QOK(J), STATUS )
-
-          IF ( QOK(J) ) THEN
-            CALL CMP_SHAPE( ILLOC(J), 'QUANTUM', DAT__MXDIM, LDIMS,
-     :                                             DIMS, STATUS )
-
-            IF (DIMS .EQ. 0) THEN
-              CALL CMP_GET0R( ILLOC(J), 'QUANTUM', QUANTUM, STATUS )
-              CALL EVSUBSET_ALTER_RNG_S( QUANTUM, NRANGES(J), RANGES(1,J),
-     :                               FMIN(J), FMAX(J), KEEP(J), STATUS )
-
-            ELSE
-
-*            Map input vector QUANTUM component
-              QVEC(I) = .TRUE.
-              CALL CMP_MAPV( ILLOC(I), 'QUANTUM', '_REAL', 'READ',
-     :                                 IQPTR(J), LDIMS, STATUS )
-              CALL EVSUBSET_ALTER_RNG_V( EVENTS, %VAL(IQPTR(J)),
-     :                         NRANGES(J), RANGES(1,J), FMIN(J),
-     :                         FMAX(J), STATUS )
-
-            END IF
-          END IF
+c          CALL HDX_OK( ILLOC(J), 'QUANTUM', QOK(J), STATUS )
+c
+c          IF ( QOK(J) ) THEN
+c            CALL CMP_SHAPE( ILLOC(J), 'QUANTUM', DAT__MXDIM, LDIMS,
+c     :                                             DIMS, STATUS )
+c
+c            IF (DIMS .EQ. 0) THEN
+c              CALL CMP_GET0R( ILLOC(J), 'QUANTUM', QUANTUM, STATUS )
+c              CALL EVSUBSET_ALTER_RNG_S( QUANTUM, NRANGES(J), RANGES(1,J),
+c     :                               FMIN(J), FMAX(J), KEEP(J), STATUS )
+c
+c            ELSE
+c
+c*            Map input vector QUANTUM component
+c              QVEC(I) = .TRUE.
+c              CALL CMP_MAPV( ILLOC(I), 'QUANTUM', '_REAL', 'READ',
+c     :                                 IQPTR(J), LDIMS, STATUS )
+c              CALL EVSUBSET_ALTER_RNG_V( EVENTS, %VAL(IQPTR(J)),
+c     :                         NRANGES(J), RANGES(1,J), FMIN(J),
+c     :                         FMAX(J), STATUS )
+c
+c            END IF
+c          END IF
         END DO
 
 *    Check each event to see if it should be copied
@@ -425,8 +428,8 @@ C      {data_type} {external_name} ! [external_description]
 
 *    Is this one of the selected lists
         SELECT = .FALSE.
-        DO I = 1, NSEL
-          IF ( I .EQ. INDEX(I) ) SELECT = .TRUE.
+        DO J = 1, NSEL
+          IF ( J .EQ. INDEX(J) ) SELECT = .TRUE.
         END DO
 
 *    Make copy for output
