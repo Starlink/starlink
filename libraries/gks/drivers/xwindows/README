@@ -1,0 +1,15 @@
+Need to sort out how to look for Starlink include files.
+
+checking gwm.h usability... yes
+checking gwm.h presence... no
+configure: WARNING: gwm.h: accepted by the compiler, rejected by the 
+preprocessor!
+configure: WARNING: gwm.h: proceeding with the compiler's result
+checking for gwm.h... yes
+checking gwm_err.h usability... yes
+checking gwm_err.h presence... no
+configure: WARNING: gwm_err.h: accepted by the compiler, rejected by the 
+preprocessor!
+configure: WARNING: gwm_err.h: proceeding with the compiler's result
+checking for gwm_err.h... yes
+
