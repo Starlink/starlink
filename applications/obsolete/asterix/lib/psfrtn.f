@@ -998,13 +998,16 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Find energy in keV, and then energy bin number 1->2, 2->3 etc, and
 *    coerce into the range 0 to 10
       IF ( AS_PHA_DEF(SLOT) ) THEN
+
+*      Convert users PHA to raw PHA
         IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
           ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
-     :              SIS_GAIN/2.0
+     :              SIS_GAIN*AS_CHAN_SCALE(SLOT)/2.0
         ELSE
           ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
-     :              GIS_GAIN/2.0
+     :              GIS_GAIN*AS_CHAN_SCALE(SLOT)/2.0
         END IF
+
       ELSE
         ENERGY = AS_ENERGY(SLOT)
       END IF
@@ -1417,6 +1420,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ASCA_CMN'
 *
@@ -1437,7 +1441,11 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Local variables :
 *
+      CHARACTER*(DAT__SZLOC)	ILOC
       CHARACTER*20            MASK              ! Mask name
+
+      REAL			RCLO,RCHI,CLO,CHI
+      INTEGER			X_AX,Y_AX,E_AX,T_AX
 *-
 
 *    Check status
@@ -1477,10 +1485,42 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
+*  User is supplying PHA bounds
+      IF ( AS_PHA_DEF(SLOT) ) THEN
+
+*    Locate INSTRUMENT box
+        CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
+        CALL CMP_GET0R( ILOC, 'RCHANLO', RCLO, STATUS )
+        CALL CMP_GET0R( ILOC, 'RCHANHI', RCHI, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+
+          CALL ERR_ANNUL( STATUS )
+          RCLO = 0
+          IF ( AS_INSTR(SLOT) = 'SIS' ) THEN
+            RCHI = 4095
+          ELSE
+            RCHI(SLOT) = 1023
+          END IF
+          CALL MSG_SETI( 'TOP', RCHI(SLOT) )
+          CALL MSG_PRNT( 'Error reading raw channel bounds, '/
+     :                 /'assuming 0..^TOP' )
+        END IF
+
+*      Get channel axis range
+        CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
+        IF ( E_AX .GT. 0 ) THEN
+          CALL PSF_QAXEXT( SLOT, E_AX, CLO, CHI, STATUS )
+          AS_CHAN_SCALE(SLOT) = REAL(RCHI-RCLO)/REAL(CHI-CLO)
+	PRINT *,'User to RAW channel scaling = ',as_chan_scale(slot)
+        ELSE
+          AS_CHAN_SCALE(SLOT) = 1.0
+        END IF
+
 *    Get a mean photon energy
-      IF ( .NOT. AS_PHA_DEF(SLOT) ) THEN
+      ELSE
         CALL USI_PROMT( 'AUX', 'Mean photon energy in keV', STATUS )
         CALL USI_GET0R( 'AUX', AS_ENERGY(SLOT), STATUS )
+
       END IF
 
 *    Tidy up
