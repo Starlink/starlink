@@ -25,6 +25,7 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
+      CHARACTER*1 LMODE
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
