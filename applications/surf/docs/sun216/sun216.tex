@@ -65,8 +65,9 @@ descriptions of each task.
 \newcommand{\agi}{\xref{AGI}{sun48}{}}
 \newcommand{\ESP}{\xref{ESP}{sun180}{}}
 \newcommand{\specx}{\xref{{\sc{Specx}}}{sc8}{}}
-\newcommand{\polpack}{\xref{Polpack}{sun223}{}}
+\newcommand{\polpack}{\xref{{\sc{Polpack}}}{sun223}{}}
 \newcommand{\ccdpack}{\xref{CCDPACK}{sun139}{}}
+\newcommand{\cursa}{\xref{{\sc{Cursa}}}{sun190}{}}
 
 
 % Application tasks
@@ -153,6 +154,7 @@ descriptions of each task.
 \newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
 \newcommand{\sclean}{\xref{\task{sclean}}{sun86}{SCLEAN}}
 \newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
+\newcommand{\wcsalign}{\xref{\task{wcsalign}}{sun95}{WCSALIGN}}
 \newcommand{\ndfcopy}{\xref{\task{ndfcopy}}{sun95}{NDFCOPY}}
 \newcommand{\manic}{\xref{\task{manic}}{sun95}{MANIC}}
 \newcommand{\cdiv}{\xref{\task{cdiv}}{sun95}{CDIV}}
@@ -162,6 +164,14 @@ descriptions of each task.
 \newcommand{\image}{\xref{\task{image}}{sun86}{IMAGE}}
 \newcommand{\gaufit}{\xref{\task{gaufit}}{sun180}{GAUFIT}}
 \newcommand{\makemos}{\xref{\task{makemos}}{sun139}{MAKEMOS}}
+
+\newcommand{\polimp}{\xref{\task{polimp}}{sun223}{POLIMP}}
+\newcommand{\polcal}{\xref{\task{polcal}}{sun223}{POLCAL}}
+\newcommand{\polbin}{\xref{\task{polbin}}{sun223}{POLBIN}}
+\newcommand{\polvec}{\xref{\task{polvec}}{sun223}{POLVEC}}
+\newcommand{\polplot}{\xref{\task{polplot}}{sun223}{POLPLOT}}
+
+\newcommand{\catselect}{\xref{\task{catselect}}{sun190}{}}
 
 
 %%% Some macros
@@ -2647,8 +2657,14 @@ are long enough to be off-source LINEAR baseline removal can be used.
 For more complicated source structure MEDIAN is worth a try although
 extremely complicated regions (e.g. OMC-1) may cause problems. 
 
-Improvements to the baseline removal system are being considered but
-currently this is probably the weakest link in SCAN/MAP data reduction.
+In order to overcome this problem it is also possible to specify specific
+scans that can be used for calculating the offset level since the DC level
+appears to be fairly constant during an integration.  When the SECTION
+baseline removal method is selected a SCUBA section (\S\ref{sections}) can be
+used to specify exposure (scan) numbers or actual positions in the data
+stream. Usually the first and last exposures are used since these are most
+likely to be `off-source'. The appendix on \scanrlb\ contains some examples on
+the use of SCUBA sections to select baseline regions.
 
 \subsubsection{Sky removal\label{scan:sky}}
 
@@ -2815,7 +2831,121 @@ Fig.\ \ref{m82:final}.
 \end{figure}
 
 
+\subsection{\xlabel{scupol}Polarimetry data reduction\label{scupol}}
 
+Polarimetry observations are similar to map and photometry observations except
+that they are broken into measurements of a number of integrations (usually 1)
+for different positions of a half-wave plate. The wave plate normally steps in
+22.5 degree increments. The initial data reduction scheme is identical to
+standard reduction except that the \remip\ task must be run after \ext\ to
+remove the instrumental polarisation.  For map observations, the \intrebin\
+task must then be used to generate an image for each integration (in practice
+this means an image per wave-plate position). \intrebin\ ensures that the sky
+rotation angle and the waveplate angle are stored in the FITS headers (using
+the ANGROT and WPLATE keywords respectively). At this point the images can
+either be processed by scripts to calculate the Q and U
+images\footnote{Available from your support scientist if required} or use the
+\polpack\ data reduction system (version 2 or higher) which fits a sine wave
+to each pixel in the input images. The following example uses \polpack.
+
+Assuming the output of \intrebin\ is stored in file \texttt{omc1\_reb.sdf}
+(remembering that this file will contain an image per waveplate position named
+\texttt{.i1}, \texttt{.i2} etc. There are 16 images in this example),
+\polpack\ must first be told where to find the rotation angle and waveplate
+position:
+
+\begin{myquote}
+\begin{verbatim}
+% polimp table=$SURF_DIR/polimp.scuba omc1_reb
+  16 input images to process...
+
+  Processing 'omc1_reb.I1'
+     Setting WPLATE to -2.5
+     Setting ANGROT to 70.27795
+     Setting IMGID to 'omc1_reb.I1'
+     Setting FILTER to '850_-2.5'
+
+<cut intervening information>
+
+  Processing 'omc1_reb.I16'
+     Setting WPLATE to 335
+     Setting ANGROT to 75.46666
+     Setting IMGID to 'omc1_reb.I16'
+     Setting FILTER to '850_335'
+\end{verbatim}
+\end{myquote}
+
+\scusoft\ provides a suitable import table.
+
+The next stage is to generate the I, Q and U images from these individual
+waveplate images. This can be done by the \polcal\ task:
+
+\begin{myquote}
+\begin{verbatim}
+% polcal weights=3 ilevel=2 omc1_reb
+   Processing 16 images in single-beam mode...
+
+OUT - Output Stokes cube > omc1_cube
+
+ Iteration: 1...
+   Total number of aberrant input pixels rejected: 199
+
+ Iteration: 2...
+   Total number of aberrant input pixels rejected: 219
+
+ Iteration: 3...
+   Total number of aberrant input pixels rejected: 219
+
+ Iteration: 4...
+   Total number of aberrant input pixels rejected: 219
+
+ None of the output pixels failed the test specified by parameter MINFRAC.
+\end{verbatim}
+\end{myquote}
+
+
+In this case, we use WEIGHTS=3 to generate the variance information
+from the fit since the SCUBA variances are unreliable.
+\polcal\ can combine images from separate overlapping fields all in one go
+if desired. If the intention is to mosaic separate fields within \polcal\
+\intrebin\ should be run with the TRIM parameter set to some non-zero
+value to prevent problems with edge effects during the mosaicing. Also,
+\polcal\ expects all the images to be referenced to the same pixel origin.
+This can be achieved using the \Kappa\ \wcsalign\ command but it is easier
+to do this in \intrebin\ by making sure that all images are regridded
+relative to the same RA/Dec centre -- the resulting images will all
+be aligned to the same pixel grid.
+
+Once the IQU cube is made \polvec\ can be used to generate the vectors:
+
+\begin{myquote}
+\begin{verbatim}
+% polvec omc1_cube
+CAT - Output catalogue > omc1_cat
+
+   2530 vectors written to the output catalogue.
+\end{verbatim}
+\end{myquote}
+
+
+This catalogue can then be binned using \polbin, sections selected using
+\catselect (part of \cursa) and plotted using \polplot. An example
+image of OMC-1 can be seen in Fig.\ \ref{omc1_vectors}.
+
+For more information on \polpack\ see \xref{{SUN/223}}{sun223}{} \cite{polpack}.
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=4in]{sun216_omc1vec.eps}
+\caption{Polarisation E vectors around OMC-1 at 850 microns.}
+\label{omc1_vectors}
+\end{center}
+\end{figure}
+
+For photometry observations the output from \scuphot\ can be
+exported to a single-pixel data reduction system, or alternatively,
+processed as under-sampled images and reduced through \polpack\ as
+described above.
 
 \section{\xlabel{future}Future Work\label{future}}
 
@@ -2830,14 +2960,10 @@ Upgrades currently on the work list are:
 
 \item Support for heterodyne receiver beam maps.
 
-\item Enhancements to the reduction pipeline software (\scuquick), possibly
-      including an X-windows interface. This is currently underway and is
-      based on the ORAC data reduction pipeline \cite{oracdr}. Contact the
+\item Enhancements to the reduction pipeline software (\scuquick):
+      The ORAC data reduction \cite{oracdr} system is now in use at 
+      the telescope. Contact the
       author if you are interested in testing the SCUBA pipeline.
-
-\item A task to fit Gaussians to dual-beam images. [This task is almost
-complete in version 0.9-5 of \ESP\ \cite{esp} in the 
-\gaufit\ task]
 
 \end{itemize}
 
@@ -2871,7 +2997,7 @@ SURF.
 
 \item \scusoft\ version number is now written to history information
 
-\item \scanrlb : The -filter option will filter out how frequencies
+\item \scanrlb : The \texttt{-filter} option will filter out high frequencies
            before inverting the Fourier transform.
 
 \item \rebin :
@@ -3230,7 +3356,7 @@ Technology MMW, Radio and Terahertz Telescopes}, Philips~T.~G. (ed),
 Proc. SPIE \textbf{3357}, in press
 
 \bibitem{mnscu}
-Robson~E.I., Holland~W.~S., Gear~W.K., Lightfoot~J.~F., Jenness~T.,
+Holland~W.~S., Robson~E.I., Gear~W.K., Lightfoot~J.~F., Jenness~T.,
 Ivison~R.~J., Stevens~J.~A., Cunningham~C.~R., Ade~P.~A.~R.,
 Griffin~M.~J., Duncan~W.~D., Murphy~J.~A., Naylor~D.~A., 1999,
 \textit{MNRAS}, \textbf{303}, 659
@@ -3332,10 +3458,11 @@ Economou~F., Bridger~A., Wright~G.~S., Rees~N.~P., Jenness~T., 1998,
 \emph{Astronomical Data Analysis Software and Systems VII}, Albrecht~R.,
 Hook~R.~N., Bushouse~H.~A. (eds), ASP Conference Series, \textbf{145}, 195
 
-\bibitem{esp}
-Gray~N., Privett,~G., 1998, {\it ESP -- Extended Surface Photometry},
-\xref{Starlink User Note 180}{sun180}{}
 
+\bibitem{polpack}
+Berry~D.~S., Gledhill~T.~M., 1999, 
+\textit{Polpack -- An imaging polarimetry reduction package}
+\xref{Starlink User Note 223}{sun223}{}
 
 \bibitem{SR94}
 Stevens~J.~A.,  Robson~E.~I.,  1994, {\it  MNRAS}, {\bf 270}, L75

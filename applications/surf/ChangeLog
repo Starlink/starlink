@@ -1,3 +1,7 @@
+1999-06-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Release v1.4-0 to Starlink for Beta testing 
+
 1999-06-16  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_add_dbm.f (SURF_ADD_DBM): Rewrite fits keywords if they 
