@@ -16,12 +16,24 @@ ADDLIBS=
 all: test
 
 # Tests t7 and t9 require autoastrom to have been test-installed.  The
-# first line below ensures that; if AUTOASTROM_DIR isn't defined, this 
-# will fail.
-test: fitsdump
-	cd ..; ./mk test-install
+# target perlok ensures that.
+test: fitsdump perlok
 	./runtests
-#	AUTOASTROM_DIR=`cd ..;pwd` ./runtests
+
+# Check that the Perl binary on the first line of
+# $AUTOASTROM_DIR/autoastrom is new enough to compile the script (perl -c).
+#  The target perlok must not exist.
+#
+# These require autoastrom to have been (test-) installed.  If we
+# can't find $AUTOASTROM_DIR/autoastrom, we test-install it.
+perlok:
+	test -n "$$AUTOASTROM_DIR" || \
+		(echo "AUTOASTROM_DIR undefined"; exit 1)
+	test -x "$$AUTOASTROM_DIR/autoastrom" || (cd ..; ./mk test-install)
+	@ SPERL=`sed '1{s+^[^/]*\(/[^ ]*\).*$$+\1+;q;}' $$AUTOASTROM_DIR/autoastrom`; \
+		echo "Checking your Perl ($$SPERL) can run $$AUTOASTROM_DIR/autoastrom..."; \
+		$$SPERL -c $$AUTOASTROM_DIR/autoastrom || \
+			(echo "You need a newer version of Perl"; exit 1)
 
 # Utility to dump fits files, for diffing
 fitsdump: fitsdump.f
