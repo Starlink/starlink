@@ -113,7 +113,9 @@
       CALL ADI_EXEC( 'CopyAncillary', 5, ARGS, OARG, STATUS )
 
 *  Trap errors
-      IF ( STATUS .NE. SAI__OK ) THEN
+      IF ( STATUS .EQ. ADI__NOMTH ) THEN
+        CALL ERR_ANNUL( STATUS )
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_FLUSH( STATUS )
       END IF
 
