@@ -362,10 +362,14 @@ c     LOGICAL			ISBIND			! Binned dataset
                 CALL ADI_CGET0C( CACHEID, 'Comment', UNITS, STATUS )
                 IF ( INDEX( UNITS, 'deg' ) .GT. 0 ) THEN
                   UNITS = 'degrees'
+                ELSE IF ( INDEX( UNITS, 'arcm' ) .GT. 0 ) THEN
+                  UNITS = 'arcminutes'
+                ELSE IF ( INDEX( UNITS, 'arcs' ) .GT. 0 ) THEN
+                  UNITS = 'arcseconds'
                 ELSE IF ( INDEX( UNITS, 'pix' ) .GT. 0 ) THEN
                   UNITS = 'pixels'
                 ELSE
-                  UNITS = 'pixels'
+                  UNITS = 'degrees'
                 END IF
               ELSE
                 UNITS = 'pixels'
