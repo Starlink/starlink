@@ -9102,6 +9102,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/MemberDoclet.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/doc/XmlDoclet.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Arithmetic.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/BasicImageDisplay.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/CgiQuery.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Conversions.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Coords.java
@@ -9110,6 +9111,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Maths.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Output.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sdss.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sog.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Spectrum.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Splat.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Strings.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/SuperCosmos.java
