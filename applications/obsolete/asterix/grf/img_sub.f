@@ -2788,6 +2788,9 @@ c      LOGICAL VOK,QOK
 	REAL PI, DTOR
 	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *  Local variables :
+      REAL XP,YP,XPC,YPC
+      REAL AP,BP
+      REAL X,Y
       REAL ANG
       REAL SA,CA
       REAL SANG,CANG
@@ -2799,16 +2802,28 @@ c      LOGICAL VOK,QOK
 
         SANG=SIN(ANGLE)
         CANG=COS(ANGLE)
-        CALL PGMOVE(A*CANG,A*SANG)
+
+        CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
+        AP=A/ABS(I_XSCALE)
+        BP=B/ABS(I_XSCALE)
+
+        XP=XPC + AP*CANG
+        YP=YPC + AP*SANG
+        CALL IMG_PIXTOWORLD(XP,YP,X,Y,STATUS)
+        CALL PGMOVE(X,Y)
+
 
         DO IA=1,360
 
 
-          ANG=REAL(IA)*DTOR
-          CA=COS(ANG)
-          SA=SIN(ANG)
+          ANG=REAL(IA)
+          CA=COSD(ANG)
+          SA=SIND(ANG)
 
-          CALL PGMOVE(XC+A*CA*CANG-B*SA*SANG,YC+A*CA*SANG+B*SA*CANG)
+          XP=XPC + AP*CA*CANG - BP*SA*SANG
+          YP=YPC + AP*CA*SANG + BP*SA*CANG
+          CALL IMG_PIXTOWORLD(XP,YP,X,Y,STATUS)
+          CALL PGDRAW(X,Y)
 
         ENDDO
 
@@ -4703,31 +4718,43 @@ c      REAL HWID
       REAL XWID,YWID
       REAL A,ASQ,B,BSQ,CSQ
       REAL ALPHA
+      INTEGER FLAG
       LOGICAL LEFT,RIGHT
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  get centre of cut
+*  get centre of ellipse
         IF (I_MODE.EQ.1) THEN
           CALL MSG_PRNT(' ')
           XCENT=I_X
           YCENT=I_Y
-          CALL MSG_SETR('X',XCENT)
-          CALL MSG_SETR('Y',YCENT)
-          CALL MSG_PRNT('Select centre/^X,^Y/...')
-          CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
-          IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
-            XCENT=I_X
-            YCENT=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
+          ELSE
+            CALL MSG_SETR('X',XCENT)
+            CALL MSG_SETR('Y',YCENT)
+            CALL MSG_PRNT('Select centre/^X,^Y/...')
+            CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
+            IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
+              XCENT=I_X
+              YCENT=I_Y
+            ENDIF
           ENDIF
+
           CALL PGPOINT(1,XCENT,YCENT,2)
 
-*  get mid-point of end
+*  get one radius
           CALL MSG_PRNT('Select major radius...')
           XEND=XCENT
           YEND=YCENT
-          CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
+          ELSE
+            CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
+          ENDIF
+
           CALL PGPOINT(1,XEND,YEND,2)
 
 *  calculate other end and draw centre line
@@ -4743,24 +4770,21 @@ c      REAL HWID
           CALL MSG_PRNT('Select minor radius...')
           XWID=XCENT
           YWID=YCENT
-          CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
+          ELSE
+            CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
+          ENDIF
 
-*  calc major radius
+*  calc radii
           MAJOR=SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+          MINOR=SQRT((XWID-XCENT)**2 + (YWID-YCENT)**2)
 
 *  calc angle
           CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
           CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
           ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
 
-*  calc width (world coords)
-          ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
-          A=SQRT(ASQ)
-          BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
-          B=SQRT(BSQ)
-          CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
-          ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
-          MINOR=A*SIN(ALPHA)
 
 *  keyboard mode
         ELSE
