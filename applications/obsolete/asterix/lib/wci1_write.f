@@ -93,11 +93,10 @@
       INCLUDE 'WCI_PAR'					! WCI constants
 
 *  Arguments Given:
-      INTEGER			NARG			! # arguments
-      INTEGER			ARGS(*)			! Method arguments
+      INTEGER			NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER			OARG			! Returned data
+      INTEGER			OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -109,7 +108,6 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! Object header
       CHARACTER*80		LABEL			! X,Y axis labels
-      CHARACTER*(DAT__SZLOC)	LOC			! Object locator
       CHARACTER*3		PRJ			! Projection name
       CHARACTER*3		SYS			! Coord system name
       CHARACTER*40		UNITS(2)		! X,Y axis units
@@ -143,16 +141,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract the locator
-      CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
-
 *  Get 3 structures from argument array
-      PIXID = ARGS(2)
-      PRJID = ARGS(3)
-      SYSID = ARGS(4)
+      PIXID = ARGS(3)
+      PRJID = ARGS(4)
+      SYSID = ARGS(5)
 
 *  Look for ASTERIX header data
-      CALL ADI1_LOCHEAD( ARGS(1), .TRUE., HLOC, STATUS )
+      CALL ADI1_LOCHEAD( ARGS(2), .TRUE., HLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Write data to header

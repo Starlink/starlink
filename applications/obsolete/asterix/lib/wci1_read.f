@@ -93,8 +93,7 @@
       INCLUDE 'WCI_PAR'					! WCI constants
 
 *  Arguments Given:
-      INTEGER			NARG			! # arguments
-      INTEGER			ARGS(*)			! Method arguments
+      INTEGER			NARG, ARGS(*)
 
 *  Arguments Returned:
       INTEGER			OARG			! Returned data
@@ -181,7 +180,7 @@
       END IF
 
 *  Look for ASTERIX header data
-      CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
+      CALL ADI1_LOCHEAD( ARGS(2), .FALSE., HLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Extract data from header if present

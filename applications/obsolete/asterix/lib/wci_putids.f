@@ -107,7 +107,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			IARG(4)			! Method input data
+      INTEGER			IARG(5)			! Method input data
       INTEGER			RESID			! Method output data
 *.
 
@@ -118,13 +118,14 @@
       IF ( .NOT. WCI_INIT ) CALL WCI1_INIT( STATUS )
 
 *  Construct input arguments
-      CALL ADI_GETFILE( ID, IARG(1), STATUS )
-      IARG(2) = PIXID
-      IARG(3) = PRJID
-      IARG(4) = SYSID
+      IARG(1) = ID
+      CALL ADI_GETFILE( ID, IARG(2), STATUS )
+      IARG(3) = PIXID
+      IARG(4) = PRJID
+      IARG(5) = SYSID
 
 *  Simply invoke the WriteWCS method
-      CALL ADI_EXEC( 'WriteWCS', 4, IARG, RESID, STATUS )
+      CALL ADI_EXEC( 'WriteWCS', 5, IARG, RESID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'WCI_PUTIDS', STATUS )
