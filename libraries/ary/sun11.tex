@@ -1,0 +1,3012 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {11.3}
+\newcommand{\stardocauthors}   {R.F. Warren-Smith}
+\newcommand{\stardocdate}      {28th April 1998}
+\newcommand{\stardoctitle}     {ARY\\[2.5ex]
+                                A Subroutine Library for Accessing\\
+                                ARRAY Data Structures}
+\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocmanual}    {Reference Manual}
+\newcommand{\stardocabstract}  {%
+The ARY library is a set of routines for accessing Starlink ARRAY data 
+structures built using the Hierarchical Data System (HDS).
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+\newcommand{\noteroutine}[2]{\textbf{#1}\hspace*{\fill}\nopagebreak \\
+                             \hspace*{3em}\emph{#2}\hspace*{\fill}\par}
+
+% +
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2HTML. The contents of this file should be included in the
+%     source prior to any statements that make use of the SST commands.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+% -
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\newfont{\ssttt}{cmtt10 scaled 1095}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
+%  \sstroutine.
+   \renewcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  \sstdescription
+   \renewcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstusage
+   \renewcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  \sstinvocation
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  \sstarguments
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstreturnedvalue
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstparameters
+   \renewcommand{\sstparameters}[1]{
+      \item[Parameters:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstexamples
+   \renewcommand{\sstexamples}[1]{
+      \item[Examples:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstsubsection
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  \sstexamplesubsection
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+
+%  \sstnotes
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstdiytopic
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
+
+%  \sstimplementationstatus
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  \sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+   }
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+% .
+% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \null\vspace {5mm}
+    \begin {center}
+    \rule{80mm}{0.5mm} \\ [1ex]
+    {\Large\bf \stardoctitle \\ [2.5ex]
+               \stardocversion} \\ [2ex]
+    \rule{80mm}{0.5mm}
+    \end{center}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\begin{latexonly}
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\end{latexonly}
+
+% ? Main text
+
+\section{\xlabel{introduction}Introduction}
+\label{introduction}
+
+This is a preliminary document describing a set of routines for accessing
+Starlink ARRAY data structures built using the Hierarchical Data System HDS
+(\xref{SUN/92}{sun92}{}).  Details of these structures and the design
+philosophy behind them can be found in \xref{SGP/38}{sgp38}{}, although
+familiarity with that document is not necessarily required in order to
+use the routines described here.
+
+This document currently lacks a descriptive section outlining the
+philosophy behind the use of the ARY\_ routines.  It is nevertheless
+being made available in this form because the ARY\_ system constitutes
+an essential sub-component of the NDF\_ system, which contains routines
+for accessing Starlink NDF (N-Dimensional Data Format) structures.
+These NDF\_ routines are described in \xref{SUN/33}{sun33}{}.
+
+The most likely reason for needing to use the ARY\_ routines directly at
+present is for accessing ARRAY structures stored in NDF extensions.
+Since most ARY\_ routines closely resemble the equivalent NDF\_ routine,
+\xref{SUN/33}{sun33}{} should initially form an adequate introduction to 
+their use, in conjunction with the detailed routine descriptions contained in 
+Appendix~\ref{ss:routinedescriptions} of this document. 
+
+Note that at present, the ARY\_ system only supports the ``primitive'' and
+``simple'' forms of the ARRAY data structure. 
+
+\section{\xlabel{compiling_and_linking}Compiling and Linking}
+\label{compiling_and_linking}
+
+Before compiling or linking applications which call ARY\_ routines, you
+should first ``log in'' for software development using these routines. 
+This is done using the \texttt{ary\_dev} command.
+
+\begin{quote}\begin{verbatim}
+% ary_dev
+\end{verbatim}\end{quote}
+
+This will generate links to the ARY include files required for 
+programming (note that this is only necessary if you reference ARY\_
+system include files, or call ARY\_ routines explicitly in your
+application).
+
+ADAM applications which call ARY\_ routines may be linked with the link
+script \mbox{ary\_link\_adam}, which should be specified on the linker
+command line.  For example, to compile and link an application called
+\texttt{adamprog} using the \texttt{alink} command, the following might be
+used:
+
+\begin{quote}\begin{verbatim}
+% alink adamprog.f -o adamprog `ary_link_adam`
+\end{verbatim}\end{quote}
+
+A ``stand-alone'' (\emph{i.e.} non-ADAM) version of the ARY\_ system is
+also available and should be used by those applications which do not
+use ADAM facilities.  This version may be obtained by specifying the
+options file \mbox{ary\_link} on the linker command line.  For example,
+to compile and link a stand-alone application called \texttt{prog}, the
+following might be used:
+
+\begin{quote}\begin{verbatim}
+% f77 -O prog.f -o prog `ary_link`
+\end{verbatim}\end{quote}
+
+Both versions of the ARY\_ system contain the same set of user-callable
+routines.  
+
+\newpage
+\appendix
+
+\section{\xlabel{alphabetical_list_of_routines}Alphabetical list of Routines}
+\label{alphabetical_list_of_routines}
+
+\noteroutine{ARY\_ANNUL( IARY, STATUS )}
+            {Annul an array identifier}
+\noteroutine{ARY\_BAD( IARY, CHECK, BAD, STATUS )}
+            {Determine if an array may contain bad pixels}
+\noteroutine{ARY\_BASE( IARY1, IARY2, STATUS )}
+            {Obtain an identifier for a base array}
+\noteroutine{ARY\_BOUND( IARY, NDIMX, LBND, UBND, NDIM, STATUS )}
+            {Enquire the pixel-index bounds of an array}
+\noteroutine{ARY\_CLONE( IARY1, IARY2, STATUS )}
+            {Clone an array identifier}
+\noteroutine{ARY\_CMPLX( IARY, CMPLX, STATUS )}
+            {Determine whether an array holds complex values}
+\noteroutine{ARY\_COPY( IARY1, PLACE, IARY2, STATUS )}
+            {Copy an array to a new location}
+\noteroutine{ARY\_DELET( IARY, STATUS )}
+            {Delete an array}
+\noteroutine{ARY\_DIM( IARY, NDIMX, DIM, NDIM, STATUS )}
+            {Enquire the dimension sizes of an array}
+\noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
+            {Duplicate an array}
+\noteroutine{ARY\_FIND( LOC, NAME, IARY, STATUS )}
+            {Find an array in an HDS structure and import it into the ARY\_ system}
+\noteroutine{ARY\_FORM( IARY, FORM, STATUS )}
+            {Obtain the storage form of an array}
+\noteroutine{ARY\_FTYPE( IARY, FTYPE, STATUS )}
+            {Obtain the full data type of an array}
+\noteroutine{ARY\_IMPRT( LOC, IARY, STATUS )}
+            {Import an array into the ARY\_ system from HDS}
+\noteroutine{ARY\_ISACC( IARY, ACCESS, ISACC, STATUS )}
+            {Determine whether a specified type of array access is available}
+\noteroutine{ARY\_ISBAS( IARY, BASE, STATUS )}
+            {Enquire if an array is a base array}
+\noteroutine{ARY\_ISMAP( IARY, MAPPED, STATUS )}
+            {Determine if an array is currently mapped}
+\noteroutine{ARY\_ISTMP( IARY, TEMP, STATUS )}
+            {Determine if an array is temporary}
+\noteroutine{ARY\_MAP( IARY, TYPE, MMOD, PNTR, EL, STATUS )}
+            {Obtain mapped access to an array}
+\noteroutine{ARY\_MAPZ( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )}
+            {Obtain complex mapped access to an array}
+\noteroutine{ARY\_MSG( TOKEN, IARY )}
+            {Assign the name of an array to a message token}
+\noteroutine{ARY\_NDIM( IARY, NDIM, STATUS )}
+            {Enquire the dimensionality of an array}
+\noteroutine{ARY\_NEW( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )}
+            {Create a new simple array}
+\noteroutine{ARY\_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )}
+            {Create a new primitive array}
+\noteroutine{ARY\_NOACC( ACCESS, IARY, STATUS )}
+            {Disable a specified type of access to an array}
+\noteroutine{ARY\_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
+            {Obtain the pixel offset between two arrays}
+\noteroutine{ARY\_PLACE( LOC, NAME, PLACE, STATUS )}
+            {Obtain an array placeholder}
+\noteroutine{ARY\_RESET( IARY, STATUS )}
+            {Reset an array to an undefined state}
+\noteroutine{ARY\_SAME( IARY1, IARY2, SAME, ISECT, STATUS )}
+            {Enquire if two arrays are part of the same base array}
+\noteroutine{ARY\_SBAD( BAD, IARY, STATUS )}
+            {Set the bad-pixel flag for an array}
+\noteroutine{ARY\_SBND( NDIM, LBND, UBND, IARY, STATUS )}
+            {Set new pixel-index bounds for an array}
+\noteroutine{ARY\_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
+            {Create an array section}
+\noteroutine{ARY\_SHIFT( NSHIFT, SHIFT, IARY, STATUS )}
+            {Apply pixel-index shifts to an array}
+\noteroutine{ARY\_SIZE( IARY, NPIX, STATUS )}
+            {Determine the size of an array}
+\noteroutine{ARY\_SSECT( IARY1, IARY2, IARY3, STATUS )}
+            {Produce a similar array section to an existing one}
+\noteroutine{ARY\_STATE( IARY, STATE, STATUS )}
+            {Determine the state of an array (defined or undefined)}
+\noteroutine{ARY\_STYPE( FTYPE, IARY, STATUS )}
+            {Set a new type for an array}
+\noteroutine{ARY\_TEMP( PLACE, STATUS )}
+            {Obtain a placeholder for a temporary array}
+\noteroutine{ARY\_TRACE( NEWFLG, OLDFLG )}
+            {Set the internal ARY\_ system error-tracing flag}
+\noteroutine{ARY\_TYPE( IARY, TYPE, STATUS )}
+            {Obtain the numeric type of an array}
+\noteroutine{ARY\_UNMAP( IARY, STATUS )}
+            {Unmap an array}
+\noteroutine{ARY\_VALID( IARY, VALID, STATUS )}
+            {Determine whether an array identifier is valid}
+\noteroutine{ARY\_VERFY( IARY, STATUS )}
+            {Verify that an array's data structure is correctly constructed}
+
+
+\newpage
+\section{\xlabel{classified_list_of_routines}Classified list of Routines}
+\label{classified_list_of_routines}
+
+
+\subsection{\xlabel{access_to_existing_arrays}Access to Existing Arrays}
+\label{access_to_existing_arrays}
+
+\noteroutine{ARY\_FIND( LOC, NAME, IARY, STATUS )}
+            {Find an array in an HDS structure and import it into the ARY\_ system}
+\noteroutine{ARY\_IMPRT( LOC, IARY, STATUS )}
+            {Import an array into the ARY\_ system from HDS}
+
+
+\subsection{\xlabel{enquiring_array_attributes}Enquiring Array Attributes}
+\label{enquiring_array_attributes}
+
+\noteroutine{ARY\_BAD( IARY, CHECK, BAD, STATUS )}
+            {Determine if an array may contain bad pixels}
+\noteroutine{ARY\_BOUND( IARY, NDIMX, LBND, UBND, NDIM, STATUS )}
+            {Enquire the pixel-index bounds of an array}
+\noteroutine{ARY\_CMPLX( IARY, CMPLX, STATUS )}
+            {Determine whether an array holds complex values}
+\noteroutine{ARY\_DIM( IARY, NDIMX, DIM, NDIM, STATUS )}
+            {Enquire the dimension sizes of an array}
+\noteroutine{ARY\_FORM( IARY, FORM, STATUS )}
+            {Obtain the storage form of an array}
+\noteroutine{ARY\_FTYPE( IARY, FTYPE, STATUS )}
+            {Obtain the full data type of an array}
+\noteroutine{ARY\_ISACC( IARY, ACCESS, ISACC, STATUS )}
+            {Determine whether a specified type of array access is available}
+\noteroutine{ARY\_ISMAP( IARY, MAPPED, STATUS )}
+            {Determine if an array is currently mapped}
+\noteroutine{ARY\_ISBAS( IARY, BASE, STATUS )}
+            {Enquire if an array is a base array}
+\noteroutine{ARY\_ISTMP( IARY, TEMP, STATUS )}
+            {Determine if an array is temporary}
+\noteroutine{ARY\_NDIM( IARY, NDIM, STATUS )}
+            {Enquire the dimensionality of an array}
+\noteroutine{ARY\_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
+            {Obtain the pixel offset between two arrays}
+\noteroutine{ARY\_SAME( IARY1, IARY2, SAME, ISECT, STATUS )}
+            {Enquire if two arrays are part of the same base array}
+\noteroutine{ARY\_SIZE( IARY, NPIX, STATUS )}
+            {Determine the size of an array}
+\noteroutine{ARY\_STATE( IARY, STATE, STATUS )}
+            {Determine the state of an array (defined or undefined)}
+\noteroutine{ARY\_TYPE( IARY, TYPE, STATUS )}
+            {Obtain the numeric type of an array}
+\noteroutine{ARY\_VALID( IARY, VALID, STATUS )}
+            {Determine whether an array identifier is valid}
+\noteroutine{ARY\_VERFY( IARY, STATUS )}
+            {Verify that an array's data structure is correctly constructed}
+
+\subsection{\xlabel{creating_and_deleting_arrays}Creating and Deleting Arrays}
+\label{creating_and_deleting_arrays}
+
+\noteroutine{ARY\_DELET( IARY, STATUS )}
+            {Delete an array}
+\noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
+            {Duplicate an array}
+\noteroutine{ARY\_NEW( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )}
+            {Create a new simple array}
+\noteroutine{ARY\_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )}
+            {Create a new primitive array}
+
+
+\subsection{\xlabel{setting_array_attributes}Setting Array Attributes}
+\label{setting_array_attributes}
+
+\noteroutine{ARY\_NOACC( ACCESS, IARY, STATUS )}
+            {Disable a specified type of access to an array}
+\noteroutine{ARY\_RESET( IARY, STATUS )}
+            {Reset an array to an undefined state}
+\noteroutine{ARY\_SBAD( BAD, IARY, STATUS )}
+            {Set the bad-pixel flag for an array}
+\noteroutine{ARY\_SHIFT( NSHIFT, SHIFT, IARY, STATUS )}
+            {Apply pixel-index shifts to an array}
+\noteroutine{ARY\_STYPE( FTYPE, IARY, STATUS )}
+            {Set a new type for an array}
+
+
+\subsection{\xlabel{access_to_array_values}Access to Array Values}
+\label{access_to_array_values}
+
+\noteroutine{ARY\_MAP( IARY, TYPE, MMOD, PNTR, EL, STATUS )}
+            {Obtain mapped access to an array}
+\noteroutine{ARY\_MAPZ( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )}
+            {Obtain complex mapped access to an array}
+\noteroutine{ARY\_UNMAP( IARY, STATUS )}
+            {Unmap an array}
+
+
+\subsection{\xlabel{creation_and_control_of_identifiers}%
+Creation and Control of Identifiers}
+\label{creation_and_control_of_identifiers}
+
+\noteroutine{ARY\_ANNUL( IARY, STATUS )}
+            {Annul an array identifier}
+\noteroutine{ARY\_BASE( IARY1, IARY2, STATUS )}
+            {Obtain an identifier for a base array}
+\noteroutine{ARY\_CLONE( IARY1, IARY2, STATUS )}
+            {Clone an array identifier}
+\noteroutine{ARY\_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )}
+            {Create an array section}
+\noteroutine{ARY\_SSECT( IARY1, IARY2, IARY3, STATUS )}
+            {Produce a similar array section to an existing one}
+\noteroutine{ARY\_VALID( IARY, VALID, STATUS )}
+            {Determine whether an array identifier is valid}
+
+
+\subsection{\xlabel{message_system_routines}Message System Routines}
+\label{message_system_routines}
+
+\noteroutine{ARY\_MSG( TOKEN, IARY )}
+            {Assign the name of an array to a message token}
+
+
+\subsection{\xlabel{creating_placeholders}Creating Placeholders}
+\label{creating_placeholders}
+
+\noteroutine{ARY\_PLACE( LOC, NAME, PLACE, STATUS )}
+            {Obtain an array placeholder}
+\noteroutine{ARY\_TEMP( PLACE, STATUS )}
+            {Obtain a placeholder for a temporary array}
+
+
+\subsection{\xlabel{copying_arrays}Copying Arrays}
+\label{copying_arrays}
+
+\noteroutine{ARY\_COPY( IARY1, PLACE, IARY2, STATUS )}
+            {Copy an array to a new location}
+\noteroutine{ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )}
+            {Duplicate an array}
+
+
+\subsection{\xlabel{miscellaneous}Miscellaneous}
+\label{miscellaneous}
+
+\noteroutine{ARY\_TRACE( NEWFLG, OLDFLG )}
+            {Set the internal ARY\_ system error-tracing flag}
+
+\newpage
+\section{\xlabel{routine_descriptions}Routine Descriptions}
+\label{routine_descriptions}
+\label{ss:routinedescriptions}
+
+\sstroutine{
+   ARY\_ANNUL
+}{
+   Annul an array identifier
+}{
+   \sstdescription{
+      The routine annuls the array identifier supplied so that it is no
+      longer recognised as a valid identifier by the ARY\_ routines.
+      Any resources associated with it are released and made available
+      for re-use. If the array is mapped for access, then it is
+      automatically unmapped by this routine.
+   }
+   \sstinvocation{
+      CALL ARY\_ANNUL( IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given and Returned)
+      }{
+         The array identifier to be annulled. A value of ARY\_\_NOID is
+         returned (as defined in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to execute even if STATUS is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances. In particular, it
+         will fail if the identifier supplied is not initially valid, but
+         this will only be reported if STATUS is set to SAI\_\_OK on entry.
+
+         \sstitem
+         An error will result if an attempt is made to annul the last
+         remaining identifier associated with an array which is in an
+         undefined state (unless it is a temporary array, in which case it
+         will be deleted at this point).
+      }
+   }
+}
+\sstroutine{
+   ARY\_BAD
+}{
+   Determine if an array may contain bad pixels
+}{
+   \sstdescription{
+      The routine returns a logical value indicating whether an array
+      may contain bad pixels for which checks must be made when its
+      values are processed. Only if the returned value is .FALSE. can
+      such checks be omitted.  If the CHECK argument to this routine is
+      set .TRUE., then it will perform an explicit check (if necessary)
+      to see whether bad pixels are actually present.
+   }
+   \sstinvocation{
+      CALL ARY\_BAD( IARY, CHECK, BAD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         CHECK = LOGICAL (Given)
+      }{
+         Whether to perform an explicit check to see if bad pixels are
+         actually present.
+      }
+      \sstsubsection{
+         BAD = LOGICAL (Returned)
+      }{
+         Whether it is necessary to check for bad pixels when processing
+         the array{\tt '}s values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+%   \newpage
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If CHECK is set .FALSE., then the returned value of BAD will
+         indicate whether bad pixels might be present and should therefore
+         be checked for during subsequent processing. However, even if BAD
+         is returned .TRUE. in such circumstances, it is still possible
+         that there may not actually be any bad pixels present (for
+         instance, in an array section, the region of the base array
+         accessed might happen to avoid all the bad pixels).
+
+         \sstitem
+         If CHECK is set .TRUE., then an explicit check will be made,
+         if necessary, to ensure that BAD is only returned .TRUE. if bad
+         pixels are actually present.
+
+         \sstitem
+         If the array is mapped for access through the identifier
+         supplied, then the value of BAD will refer to the actual mapped
+         values. It may differ from its original (unmapped) value if
+         conversion errors occurred during the mapping process, or if an
+         initialisation option of {\tt '}/ZERO{\tt '} was specified for an array which
+         was initially undefined, or if the mapped values have subsequently
+         been modified.
+
+         \sstitem
+         The BAD argument will always return a value of .TRUE. if the
+         array is in an undefined state.
+      }
+   }
+}
+\sstroutine{
+   ARY\_BASE
+}{
+   Obtain an identifier for a base array
+}{
+   \sstdescription{
+      The routine returns an identifier for the base array with which
+      an array section is associated.
+   }
+   \sstinvocation{
+      CALL ARY\_BASE( IARY1, IARY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         Identifier for an existing array section (the routine will also
+         work if this is already a base array).
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the base array with which the section is
+         associated.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_BOUND
+}{
+   Enquire the pixel-index bounds of an array
+}{
+   \sstdescription{
+      The routine returns the lower and upper pixel-index bounds of
+      each dimension of an array, together with the total number of
+      dimensions.
+   }
+   \sstinvocation{
+      CALL ARY\_BOUND( IARY, NDIMX, LBND, UBND, NDIM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NDIMX = INTEGER (Given)
+      }{
+         Maximum number of pixel-index bounds to return (i.e. the
+         declared size of the LBND and UBND arguments).
+      }
+      \sstsubsection{
+         LBND( NDIMX ) = INTEGER (Returned)
+      }{
+         Lower pixel-index bounds for each dimension.
+      }
+      \sstsubsection{
+         UBND( NDIMX ) = INTEGER (Returned)
+      }{
+         Upper pixel-index bounds for each dimension.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Returned)
+      }{
+         Total number of array dimensions.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array has fewer than NDIMX dimensions, then any
+         remaining elements of the LBND and UBND arguments will be filled
+         with 1{\tt '}s.
+
+         \sstitem
+         If the array has more than NDIMX dimensions, then the NDIM
+         argument will return the actual number of dimensions. In this
+         case only the first NDIMX sets of bounds will be returned, and an
+         error will result if the size of any of the remaining dimensions
+         exceeds 1.
+
+         \sstitem
+         The symbolic constant ARY\_\_MXDIM may be used to declare the
+         size of the LBND and UBND arguments so that they will be able to
+         hold the maximum number of array bounds that this routine can
+         return. This constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_CLONE
+}{
+   Clone an array identifier
+}{
+   \sstdescription{
+      The routine produces a {\tt "}cloned{\tt "} copy of an array identifier (i.e.
+      it produces a new identifier describing an array with identical
+      attributes to the original).
+   }
+   \sstinvocation{
+      CALL ARY\_CLONE( IARY1, IARY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         Array identifier to be cloned.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Cloned identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_CMPLX
+}{
+   Determine whether an array holds complex values
+}{
+   \sstdescription{
+      The routine returns a logical value indicating whether an array
+      holds complex values.
+   }
+   \sstinvocation{
+      CALL ARY\_CMPLX( IARY, CMPLX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         CMPLX = LOGICAL (Returned)
+      }{
+         Whether the array holds complex values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_COPY
+}{
+   Copy an array to a new location
+}{
+   \sstdescription{
+      The routine copies an array to a new location and returns an
+      identifier for the resulting new base array.
+   }
+   \sstinvocation{
+      CALL ARY\_COPY( IARY1, PLACE, IARY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         Identifier for the array (or array section) to be copied.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the new array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_DELET
+}{
+   Delete an array
+}{
+   \sstdescription{
+      The routine deletes the specified array. If this is a base array,
+      then the associated data object is erased and all array
+      identifiers which refer to it (or to sections derived from it)
+      become invalid. If the array is mapped for access, then it is
+      first unmapped.  If an array section is specified, then this
+      routine is equivalent to calling ARY\_ANNUL.
+   }
+   \sstinvocation{
+      CALL ARY\_DELET( IARY, STATUS )
+   }
+%   \newpage
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given and Returned)
+      }{
+         Identifier for the array to be deleted. A value of ARY\_\_NOID
+         is returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to execute even if STATUS is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+
+         \sstitem
+         A value of ARY\_\_NOID is always returned for the IARY argument,
+         even if the routine should fail. This constant is defined in the
+         include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_DIM
+}{
+   Enquire the dimension sizes of an array
+}{
+   \sstdescription{
+      The routine returns the size in pixels of each dimension of an
+      array, together with the total number of dimensions (the size of
+      a dimension is the difference between that dimension{\tt '}s upper and
+      lower pixel-index bounds $+$ 1).
+   }
+   \sstinvocation{
+      CALL ARY\_DIM( IARY, NDIMX, DIM, NDIM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NDIMX = INTEGER (Given)
+      }{
+         Maximum number of dimension sizes to return (i.e. the declared
+         size of the DIM argument).
+      }
+      \sstsubsection{
+         DIM( NDIMX ) = INTEGER (Returned)
+      }{
+         Size of each dimension in pixels.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Returned)
+      }{
+         Total number of array dimensions.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array has fewer than NDIMX dimensions, then any
+         remaining elements of the DIM argument will be filled with 1{\tt '}s.
+
+         \sstitem
+         If the array has more than NDIMX dimensions, then the NDIM
+         argument will return the actual number of dimensions. In this
+         case only the first NDIMX dimension sizes will be returned, and
+         an error will result if the size of any of the excluded
+         dimensions exceeds 1.
+
+         \sstitem
+         The symbolic constant ARY\_\_MXDIM may be used to declare the
+         size of the DIM argument so that it will be able to hold the
+         maximum number of array dimension sizes that this routine can
+         return. This constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_DUPE
+}{
+   Duplicate an array
+}{
+   \sstdescription{
+      The routine duplicates an array, creating a new base array with
+      the same attributes as an existing array (or array section). The
+      new array is left in an undefined state.
+   }
+   \sstinvocation{
+      CALL ARY\_DUPE( IARY1, PLACE, IARY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         Identifier for the array to be duplicated.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the new duplicate array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason.  In either
+         event, the placeholder will still be annulled. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_FIND
+}{
+   Find an array in an HDS structure and import it into the ARY\_
+   system
+}{
+   \sstdescription{
+      The routine finds a named array within an HDS structure, imports
+      it into the ARY\_ system and issues an identifier for it. The
+      imported array may then be manipulated by the ARY\_ routines.
+   }
+   \sstinvocation{
+      CALL ARY\_FIND( LOC, NAME, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Locator to the enclosing HDS structure.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the HDS structure component to be imported.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Returned)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_FORM
+}{
+   Obtain the storage form of an array
+}{
+   \sstdescription{
+      The routine returns the storage form of an array as an upper-case
+      character string (e.g. {\tt '}SIMPLE{\tt '}).
+   }
+   \sstinvocation{
+      CALL ARY\_FORM( IARY, FORM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         FORM = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Storage form of the array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The symbolic constant ARY\_\_SZFRM may be used for declaring the
+         length of a character variable to hold the storage form of an
+         array. This constant is defined in the include file ARY\_PAR.
+
+         \sstitem
+         At present, the ARY\_ routines only support {\tt "}primitive{\tt "} and
+         {\tt "}simple{\tt "} arrays, so only the values {\tt '}PRIMITIVE{\tt '} and {\tt '}SIMPLE{\tt '} can
+         be returned.
+      }
+   }
+}
+\sstroutine{
+   ARY\_FTYPE
+}{
+   Obtain the full data type of an array
+}{
+   \sstdescription{
+      The routine returns the full data type of an array as an
+      upper-case character string (e.g. {\tt '}\_REAL{\tt '} or {\tt '}COMPLEX\_BYTE{\tt '}).
+   }
+   \sstinvocation{
+      CALL ARY\_FTYPE( IARY, FTYPE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Full data type of the array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The symbolic constant ARY\_\_SZFTP may be used for declaring the
+         length of a character variable to hold the full data type of an
+         array. This constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_IMPRT
+}{
+   Import an array into the ARY\_ system from HDS
+}{
+   \sstdescription{
+      The routine imports an array into the ARY\_ system from HDS and
+      issues an identifier for it. The array may then be manipulated by
+      the ARY\_ routines.
+   }
+   \sstinvocation{
+      CALL ARY\_IMPRT( LOC, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         HDS locator to an array structure.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Returned)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The locator supplied as input to this routine may later be
+         annulled without affecting the subsequent behaviour of the ARY\_
+         system.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_ISACC
+}{
+   Determine whether a specified type of array access is available
+}{
+   \sstdescription{
+      The routine determines whether a specified type of access to an
+      array is available, or whether it has been disabled. If access is
+      not available, then any attempt to access the array in this way
+      will fail.
+   }
+   \sstinvocation{
+      CALL ARY\_ISACC( IARY, ACCESS, ISACC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         ACCESS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The type of array access required: {\tt '}BOUNDS{\tt '}, {\tt '}DELETE{\tt '},
+         {\tt '}SHIFT{\tt '}, {\tt '}TYPE{\tt '} or {\tt '}WRITE{\tt '} (see the Notes section for
+         details).
+      }
+      \sstsubsection{
+         ISACC = LOGICAL (Returned)
+      }{
+         Whether the specified type of access is available.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The valid access types control the following operations on the
+      array:
+      \sstitemlist{
+
+         \sstitem
+         {\tt '}BOUNDS{\tt '} permits the pixel-index bounds of a base array to be
+         altered.
+
+         \sstitem
+         {\tt '}DELETE{\tt '} permits deletion of the array.
+
+         \sstitem
+         {\tt '}SHIFT{\tt '} permits pixel-index shifts to be applied to a base
+         array.
+
+         \sstitem
+         {\tt '}TYPE{\tt '} permits the data type of the array to be altered.
+
+         \sstitem
+         {\tt '}WRITE{\tt '} permits new values to be written to the array, or the
+         array{\tt '}s state to be reset.
+      }
+   }
+}
+\sstroutine{
+   ARY\_ISBAS
+}{
+   Enquire if an array is a base array
+}{
+   \sstdescription{
+      The routine returns a logical value indicating whether the array
+      whose identifier is supplied is a base array (as opposed to an
+      array section).
+   }
+   \sstinvocation{
+      CALL ARY\_ISBAS( IARY, BASE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         BASE = LOGICAL (Returned)
+      }{
+         Whether the array is a base array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_ISMAP
+}{
+   Determine if an array is currently mapped
+}{
+   \sstdescription{
+      The routine returns a logical value indicating whether an array is
+      currently mapped for access through the identifier supplied.
+   }
+   \sstinvocation{
+      CALL ARY\_ISMAP( IARY, MAPPED, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         MAPPED = LOGICAL (Returned)
+      }{
+         Whether the array is mapped for access through the IARY
+         identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_ISTMP
+}{
+   Determine if an array is temporary
+}{
+   \sstdescription{
+      The routine returns a logical value indicating whether the
+      specified array is temporary. Temporary arrays are deleted once
+      the last identifier which refers to them is annulled.
+   }
+   \sstinvocation{
+      CALL ARY\_ISTMP( IARY, TEMP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TEMP = LOGICAL (Returned)
+      }{
+         Whether the array is temporary.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_MAP
+}{
+   Obtain mapped access to an array
+}{
+   \sstdescription{
+      The routine obtains mapped access an array, returning a pointer
+      to the mapped values and a count of the number of elements
+      mapped.
+   }
+   \sstinvocation{
+      CALL ARY\_MAP( IARY, TYPE, MMOD, PNTR, EL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The numerical data type required for access (e.g. {\tt '}\_REAL{\tt '}).
+      }
+      \sstsubsection{
+         MMOD = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The mapping mode for access to the array: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or
+         {\tt '}WRITE{\tt '}, with an optional initialisation mode {\tt '}/BAD{\tt '} or
+         {\tt '}/ZERO{\tt '} appended.
+      }
+      \sstsubsection{
+         PNTR = INTEGER (Returned)
+      }{
+         Pointer to the mapped values.
+      }
+      \sstsubsection{
+         EL = INTEGER (Returned)
+      }{
+         Number of elements mapped.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_MAPZ
+}{
+   Obtain complex mapped access to an array
+}{
+   \sstdescription{
+      The routine obtains complex mapped access to an array, returning
+      pointers to the real and imaginary values and a count of the
+      number of elements mapped.
+   }
+   \sstinvocation{
+      CALL ARY\_MAPZ( IARY, TYPE, MMOD, RPNTR, IPNTR, EL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The numerical data type required for accessing the array (e.g.
+         {\tt '}\_REAL{\tt '}).
+      }
+      \sstsubsection{
+         MMOD = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The mapping mode for access to the array: {\tt '}READ{\tt '}, {\tt '}UPDATE{\tt '} or
+         {\tt '}WRITE{\tt '}, with an optional initialisation mode {\tt '}/BAD{\tt '} or
+         {\tt '}/ZERO{\tt '} appended.
+      }
+      \sstsubsection{
+         RPNTR = INTEGER (Returned)
+      }{
+         Pointer to the mapped real (i.e. non-imaginary) values.
+      }
+      \sstsubsection{
+         IPNTR = INTEGER (Returned)
+      }{
+         Pointer to the mapped imaginary values.
+      }
+      \sstsubsection{
+         EL = INTEGER (Returned)
+      }{
+         Number of elements mapped.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_MSG
+}{
+   Assign the name of an array to a message token
+}{
+   \sstdescription{
+      The routine assigns the name of an array to a message token (in a
+      form which a user will understand) for use in constructing
+      messages with the MSG\_ and ERR\_ routines (see SUN/104).
+   }
+   \sstinvocation{
+      CALL ARY\_MSG( TOKEN, IARY )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the message token.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine has no STATUS argument and performs no error
+         checking. If it should fail, then no assignment to the message
+         token will be made and this will be apparent in the final
+         message.
+      }
+   }
+}
+\sstroutine{
+   ARY\_NDIM
+}{
+   Enquire the dimensionality of an array
+}{
+   \sstdescription{
+      The routine determines the number of dimensions which an array
+      has.
+   }
+   \sstinvocation{
+      CALL ARY\_NDIM( IARY, NDIM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Returned)
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_NEW
+}{
+   Create a new simple array
+}{
+   \sstdescription{
+      The routine creates a new simple array and returns an identifier
+      for it. The array may subsequently be manipulated with the ARY\_
+      routines.
+   }
+   \sstinvocation{
+      CALL ARY\_NEW( FTYPE, NDIM, LBND, UBND, PLACE, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Full data type of the array.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         Lower pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         IARY = INTEGER (Returned)
+      }{
+         Identifier for the new array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_NEWP
+}{
+   Create a new primitive array
+}{
+   \sstdescription{
+      The routine creates a new primitive array and returns an
+      identifier for it. The array may subsequently be manipulated with
+      the ARY\_ routines.
+   }
+   \sstinvocation{
+      CALL ARY\_NEWP( FTYPE, NDIM, UBND, PLACE, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Data type of the array (e.g. {\tt '}\_REAL{\tt '}). Note that complex types
+         are not allowed for primitive arrays.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of array dimensions.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds of the array (the lower bound of each
+         dimension is taken to be 1).
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Given and Returned)
+      }{
+         An array placeholder (e.g. generated by the ARY\_PLACE routine)
+         which indicates the position in the data system where the new
+         array will reside. The placeholder is annulled by this
+         routine, and a value of ARY\_\_NOPL will be returned (as defined
+         in the include file ARY\_PAR).
+      }
+      \sstsubsection{
+         IARY = INTEGER (Returned)
+      }{
+         Identifier for the new array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. In either
+         event, the placeholder will still be annulled. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_NOACC
+}{
+   Disable a specified type of access to an array
+}{
+   \sstdescription{
+      The routine disables the specified type of access to an array, so
+      that any subsequent attempt to access it in that way will fail.
+      Access restrictions imposed on an array identifier by this
+      routine will be propagated to any new identifiers derived from
+      it, and cannot be revoked.
+   }
+   \sstinvocation{
+      CALL ARY\_NOACC( ACCESS, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ACCESS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The type of access to be disabled: {\tt '}BOUNDS{\tt '}, {\tt '}DELETE{\tt '},
+         {\tt '}MODIFY{\tt '}, {\tt '}SHIFT{\tt '}, {\tt '}TYPE{\tt '} or {\tt '}WRITE{\tt '}.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      Disabling each type of access imposes the following restrictions
+      on an array:
+      \sstitemlist{
+
+         \sstitem
+         {\tt '}BOUNDS{\tt '} prevents the pixel-index bounds of a base array from
+         being altered.
+
+         \sstitem
+         {\tt '}DELETE{\tt '} prevents the array being deleted.
+
+         \sstitem
+         {\tt '}MODIFY{\tt '} prevents any form of modification to the array (i.e.
+         it disables all the other access types).
+
+         \sstitem
+         {\tt '}SHIFT{\tt '} prevents pixel-index shifts from being applied to a
+         base array.
+
+         \sstitem
+         {\tt '}TYPE{\tt '} prevents the data type of the array from being altered.
+
+         \sstitem
+         {\tt '}WRITE{\tt '} prevents new values from being written to the array,
+         or the array{\tt '}s state from being reset.
+      }
+   }
+}
+\sstroutine{
+   ARY\_OFFS
+}{
+   Obtain the pixel offset between two arrays
+}{
+   \sstdescription{
+      The routine returns the pixel offset for each requested dimension
+      between two arrays. These values are the offsets which should be
+      added to the pixel indices of the first array to obtain the
+      indices of the corresponding pixel in the second array.
+   }
+   \sstinvocation{
+      CALL ARY\_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         First array identifier.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Given)
+      }{
+         Second array identifier.
+      }
+      \sstsubsection{
+         MXOFFS = INTEGER (Given)
+      }{
+         Maximum number of pixel offsets to return (i.e. the declared
+         size of the OFFS argument).
+      }
+      \sstsubsection{
+         OFFS( MXOFFS ) = INTEGER (Returned)
+      }{
+         Array of pixel offsets for each dimension.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The two array identifiers supplied need not refer to the same
+         base array (although they may often do so). If they do not, then
+         the offset between the pixels in each array is determined by
+         matching the pixel indices of their respective base arrays.
+
+         \sstitem
+         Note that non-zero pixel offsets may exist even for dimensions
+         which exceed the dimensionality of either of the two arrays
+         supplied. The symbolic constant ARY\_\_MXDIM may be used to declare
+         the size of the OFFS argument so that it will be able to hold the
+         maximum number of non-zero offsets that this routine can return.
+      }
+   }
+}
+\sstroutine{
+   ARY\_PLACE
+}{
+   Obtain an array placeholder
+}{
+   \sstdescription{
+      The routine returns an array placeholder. A placeholder is used
+      to identify a position in the underlying data system (HDS) and
+      may be passed to other routines (e.g. ARY\_NEW) to indicate where
+      a newly created array should be positioned.
+   }
+   \sstinvocation{
+      CALL ARY\_PLACE( LOC, NAME, PLACE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         HDS locator to the structure to contain the new array.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the new structure component (i.e. the array).
+      }
+      \sstsubsection{
+         PLACE = INTEGER (Returned)
+      }{
+         Array placeholder identifying the nominated position in the
+         data system.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Placeholders are intended only for local use within an
+         application and only a limited number of them are available
+         simultaneously. They are always annulled as soon as they are
+         passed to another routine to create a new array, where they are
+         effectively exchanged for an array identifier.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOPL will be returned for the PLACE argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOPL
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_RESET
+}{
+   Reset an array to an undefined state
+}{
+   \sstdescription{
+      The routine resets an array so that its values become undefined.
+      Its use is advisable before making format changes to an array if
+      retention of the existing values is not required (e.g. before
+      changing its data type with the ARY\_STYPE routine); this will
+      avoid the cost of converting the existing values.
+   }
+   \sstinvocation{
+      CALL ARY\_RESET( IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine may only be used to reset the state of a base
+         array. If an array section is supplied, then it will return
+         without action. No error will result.
+
+         \sstitem
+         An array cannot be reset while it is mapped for access. This
+         routine will fail if this is the case.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SAME
+}{
+   Enquire if two arrays are part of the same base array
+}{
+   \sstdescription{
+      The routine determines whether two array identifiers refer to
+      parts of the same base array.  If so, it also determines whether
+      they intersect.
+   }
+   \sstinvocation{
+      CALL ARY\_SAME( IARY1, IARY2, SAME, ISECT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         Identifier for the first array (or array section).
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Given)
+      }{
+         Identifier for the second array (or array section).
+      }
+      \sstsubsection{
+         SAME = LOGICAL (Returned)
+      }{
+         Whether the identifiers refer to parts of the same base array.
+      }
+      \sstsubsection{
+         ISECT = LOGICAL (Returned)
+      }{
+         Whether the arrays intersect.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Two arrays (or array sections) are counted as intersecting if
+         (i) they both refer to the same base array and (ii) altering
+         values in one of the arrays can result in the values in the other
+         array changing in consequence.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SBAD
+}{
+   Set the bad-pixel flag for an array
+}{
+   \sstdescription{
+      The routine sets the value of the bad-pixel flag for an array. A
+      call to this routine with BAD set to .TRUE. declares that the
+      specified array may contain bad pixel values for which checks
+      must be made by algorithms which subsequently processes its
+      values.  A call with BAD set to .FALSE. declares that there are
+      definitely no bad values present and that subsequent checks for
+      such values may be omitted.
+   }
+   \sstinvocation{
+      CALL ARY\_SBAD( BAD, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         Bad-pixel flag value to be set.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the array is mapped for access when this routine is called,
+         then the bad-pixel flag will be associated with the mapped
+         values. This information will only be transferred to the actual
+         data object when the array is unmapped (but only if it was mapped
+         for UPDATE or WRITE access). The value transferred may be
+         modified if conversion errors occur during the unmapping process.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SBND
+}{
+   Set new pixel-index bounds for an array
+}{
+   \sstdescription{
+      The routine sets new pixel-index bounds for an array (or array
+      section). The number of array dimensions may also be changed.  If
+      a base array is specified, then a permanent change is made to the
+      actual data object and this will be apparent through any other
+      array identifiers which refer to it.  However, if an identifier
+      for an array section is specified, then its bounds are altered
+      without affecting other arrays.
+   }
+   \sstinvocation{
+      CALL ARY\_SBND( NDIM, LBND, UBND, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         New number of array dimensions.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         New lower pixel-index bounds of the array.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         New upper pixel-index bounds of the array,
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The bounds of an array section cannot be altered while it is
+         mapped for access through the identifier supplied to this
+         routine.
+
+         \sstitem
+         The bounds of a base array cannot be altered while any part of
+         it is mapped for access (i.e. even through another identifier).
+
+         \sstitem
+         The array{\tt '}s pixel values (if defined) will be retained for
+         those pixels which lie within both the old and new bounds. Any
+         pixels lying outside the new bounds will be lost (and cannot
+         later be recovered by further changes to the array{\tt '}s bounds).
+         Any new pixels introduced where the new bounds extend beyond the
+         old ones will be assigned the {\tt "}bad{\tt "} value, and the subsequent
+         value of the bad-pixel flag will reflect this.
+
+         \sstitem
+         If the bounds of a base array are to be altered and retention
+         of the existing pixel values is not required, then a call to
+         ARY\_RESET should be made before calling this routine. This will
+         eliminate any processing which might otherwise be needed to
+         retain the existing values. This step is not necessary with an
+         array section, where no processing of pixel values takes place.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SECT
+}{
+   Create an array section
+}{
+   \sstdescription{
+      The routine creates a new array section which refers to a
+      selected region of an existing array (or array section). The
+      section may be larger or smaller in extent than the original
+      array.
+   }
+   \sstinvocation{
+      CALL ARY\_SECT( IARY1, NDIM, LBND, UBND, IARY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Identifier for the initial array.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         Number of dimensions for new section.
+      }
+      \sstsubsection{
+         LBND( NDIM ) = INTEGER (Given)
+      }{
+         Lower pixel-index bounds for the new section.
+      }
+      \sstsubsection{
+         UBND( NDIM ) = INTEGER (Given)
+      }{
+         Upper pixel-index bounds for the new section.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Returned)
+      }{
+         Identifier for the new section.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The number of section dimensions need not match the number of
+         dimensions in the initial array. Pixel-index bounds will be
+         padded with 1{\tt '}s as necessary to identify the pixels to which the
+         new section should refer.
+
+         \sstitem
+         Note that sections which extend beyond the pixel-index bounds
+         of the initial array will be padded with bad pixels.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY2 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SHIFT
+}{
+   Apply pixel-index shifts to an array
+}{
+   \sstdescription{
+      The routine applies pixel-index shifts to an array. An integer
+      shift is applied to each dimension so that its pixel-index
+      bounds, and the indices of each pixel, change by the amount of
+      shift applied to the corresponding dimension. The array{\tt '}s pixels
+      retain their values and none are lost.
+   }
+   \sstinvocation{
+      CALL ARY\_SHIFT( NSHIFT, SHIFT, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NSHIFT = INTEGER (Given)
+      }{
+         Number of dimensions to which shifts are to be applied. This
+         must not exceed the number of array dimensions. If fewer
+         shifts are supplied than there are dimensions in the array,
+         then the extra dimensions will not be shifted.
+      }
+      \sstsubsection{
+         SHIFT( NSHIFT ) = INTEGER (Given)
+      }{
+         The pixel-index shifts to be applied to each dimension.
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Pixel-index shifts applied to a base array will affect the
+         appearance of that array as seen by all base-array identifiers
+         associated with it. However, array sections derived from that
+         base array will remain unchanged (as regards both pixel-indices
+         and data content).
+
+         \sstitem
+         Pixel-index shifts cannot be applied to a base array while any
+         part of it is mapped for access (i.e. even through another
+         identifier).
+
+         \sstitem
+         Pixel-index shifts applied to an array section only affect
+         that section itself, and have no effect on other array
+         identifiers.
+
+         \sstitem
+         Pixel-index shifts cannot be applied to an array section while
+         it is mapped for access through the identifier supplied to this
+         routine.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SIZE
+}{
+   Determine the size of an array
+}{
+   \sstdescription{
+      The routine returns the number of pixels in the array whose
+      identifier is supplied (i.e. the product of its dimensions).
+   }
+   \sstinvocation{
+      CALL ARY\_SIZE( IARY, NPIX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         NPIX = INTEGER (Returned)
+      }{
+         Number of pixels in the array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_SSECT
+}{
+   Create a similar array section to an existing one
+}{
+   \sstdescription{
+      The routine creates a new array section, using an existing
+      section as a template. The new section bears the same
+      relationship to its base array as the template section does to
+      its own base array. Allowance is made for pixel-index shifts
+      which may have been applied so that the pixel-indices of the new
+      section match those of the template.  The number of dimensions of
+      the input and template arrays may differ.
+   }
+   \sstinvocation{
+      CALL ARY\_SSECT( IARY1, IARY2, IARY3, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY1 = INTEGER (Given)
+      }{
+         Identifier for the input array from which the section is to be
+         derived. This may be a base array or an array section.
+      }
+      \sstsubsection{
+         IARY2 = INTEGER (Given)
+      }{
+         Identifier for the template section (this may also be a base
+         array or an array section).
+      }
+      \sstsubsection{
+         IARY3 = INTEGER (Returned)
+      }{
+         Identifier for the new array section.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine normally generates an array section.  However, if
+         both input arrays are base arrays with identical pixel-index
+         bounds, then there is no need to create a section in order to
+         access the required part of the first array. In this case a base
+         array identifier will be returned instead.
+
+         \sstitem
+         The new section created by this routine will have the same
+         number of dimensions as the array (or array section) from which
+         it is derived. If the template (IARY2) array has fewer dimensions
+         than this, then the bounds of any additional input dimensions are
+         preserved unchanged in the new array. If the template (IARY2)
+         array has more dimensions, then the excess ones are ignored.
+
+         \sstitem
+         This routine takes account of the regions of each base array
+         to which the input array sections have access. It may therefore
+         restrict the region accessible to the new section (and pad with
+         {\tt "}bad{\tt "} pixels) so as not to grant access to regions of the base
+         array which were not previously accessible through the input
+         arrays.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOID will be returned for the IARY3 argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOID
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_STATE
+}{
+   Determine the state of an array (defined or undefined)
+}{
+   \sstdescription{
+      The routine returns a logical value indicating whether an array{\tt '}s
+      pixel values are currently defined.
+   }
+   \sstinvocation{
+      CALL ARY\_STATE( IARY, STATE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATE = LOGICAL (Returned)
+      }{
+         Whether the array{\tt '}s pixel values are defined.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_STYPE
+}{
+   Set a new type for an array
+}{
+   \sstdescription{
+      The routine sets a new full type for an array, causing its data
+      storage type to be changed. If the array{\tt '}s pixel values are
+      defined, then they will be converted from the old type to the new
+      one.  If they are undefined, then no conversion will be
+      necessary.  Subsequent enquiries will reflect the new type.
+      Conversion may be performed between any types supported by the
+      ARY\_ routines, including from a non-complex type to a complex
+      type (and vice versa).
+   }
+   \sstinvocation{
+      CALL ARY\_STYPE( FTYPE, IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FTYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The new full type specification for the array (e.g.  {\tt '}\_REAL{\tt '}
+         or {\tt '}COMPLEX\_INTEGER{\tt '}).
+      }
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine may only be used to change the type of a base
+         array. If it is called with an array which is not a base array,
+         then it will return without action. No error will result.
+
+         \sstitem
+         An error will result if the array, or any part of it, is
+         currently mapped for access (e.g. through another identifier).
+
+         \sstitem
+         If the type of an array is to be changed without its pixel
+         values being retained, then a call to ARY\_RESET should be made
+         beforehand. This will avoid the cost of converting all the
+         values.
+      }
+   }
+}
+\sstroutine{
+   ARY\_TEMP
+}{
+   Obtain a placeholder for a temporary array
+}{
+   \sstdescription{
+      The routine returns an array placeholder which may be used to
+      create a temporary array (i.e. one which will be deleted
+      automatically once the last identifier associated with it is
+      annulled). The placeholder returned by this routine may be passed
+      to other routines (e.g. ARY\_NEW or ARY\_COPY) to produce a
+      temporary array in the same way as a new permanent array would be
+      created.
+   }
+   \sstinvocation{
+      CALL ARY\_TEMP( PLACE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PLACE = INTEGER (Returned)
+      }{
+         Placeholder for a temporary array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Placeholders are intended only for local use within an
+         application and only a limited number of them are available
+         simultaneously. They are always annulled as soon as they are
+         passed to another routine to create a new array, where they are
+         effectively exchanged for an array identifier.
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         ARY\_\_NOPL will be returned for the PLACE argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The ARY\_\_NOPL
+         constant is defined in the include file ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_TRACE
+}{
+   Set the internal ARY\_ system error-tracing flag
+}{
+   \sstdescription{
+      The routine sets an internal flag in the ARY\_ system which
+      enables or disables error-tracing messages. If this flag is set
+      to .TRUE., then any error occurring within the ARY\_ system will
+      be accompanied by error messages indicating which internal
+      routines have exited prematurely as a result. If the flag is set
+      to .FALSE., this internal diagnostic information will not appear
+      and only standard error messages will be produced.
+   }
+   \sstinvocation{
+      CALL ARY\_TRACE( NEWFLG, OLDFLG )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEWFLG = LOGICAL (Given)
+      }{
+         The new value to be set for the error-tracing flag.
+      }
+      \sstsubsection{
+         OLDFLG = LOGICAL (Returned)
+      }{
+         The previous value of the flag.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         By default, the error tracing flag is set to .FALSE., so
+         no internal diagnostic information will be produced.
+      }
+   }
+}
+\sstroutine{
+   ARY\_TYPE
+}{
+   Obtain the numeric type of an array
+}{
+   \sstdescription{
+      The routine returns the numeric type of an array as an upper-case
+      character string (e.g. {\tt '}\_REAL{\tt '}).
+   }
+   \sstinvocation{
+      CALL ARY\_TYPE( IARY, TYPE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Numeric type of the array.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The symbolic constant ARY\_\_SZTYP may be used for declaring the
+         length of a character variable which is to hold the numeric type
+         of an array. This constant is defined in the include file
+         ARY\_PAR.
+      }
+   }
+}
+\sstroutine{
+   ARY\_UNMAP
+}{
+   Unmap an array
+}{
+   \sstdescription{
+      The routine unmaps an array which has previously been mapped for
+      READ, UPDATE or WRITE access.
+   }
+   \sstinvocation{
+      CALL ARY\_UNMAP( IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to execute even if STATUS is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances.
+
+         \sstitem
+         An error will result if the array has not previously been
+         mapped for access.
+      }
+   }
+}
+\sstroutine{
+   ARY\_VALID
+}{
+   Determine whether an array identifier is valid
+}{
+   \sstdescription{
+      Determine whether an array identifier is valid (i.e. associated
+      with an array).
+   }
+   \sstinvocation{
+      CALL ARY\_VALID( IARY, VALID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Identifier to be tested.
+      }
+      \sstsubsection{
+         VALID = LOGICAL (Returned)
+      }{
+         Whether the identifier is valid.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ARY\_VERFY
+}{
+   Verify that an array{\tt '}s data structure is correctly constructed
+}{
+   \sstdescription{
+      The routine checks that the data structure containing an array is
+      correctly constructed and that the array{\tt '}s pixel values are
+      defined. It also checks for the presence of any {\tt "}rogue{\tt "}
+      components in the data structure. If an anomaly is found, then an
+      error results. Otherwise, the routine returns without further
+      action.
+   }
+   \sstinvocation{
+      CALL ARY\_VERFY( IARY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IARY = INTEGER (Given)
+      }{
+         Array identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+
+\newpage
+\section{\xlabel{changes_and_new_features_in_v11}%
+Changes and new features in V1.1}
+\label{changes_and_new_features_in_v11}
+
+Only relatively minor changes have taken place since the previous
+version (V1.0) of the ARY\_ system.  The most significant of these are
+as follows:
+
+\begin{enumerate}
+
+\item An obscure bug resulting from an un-annulled HDS locator has been
+fixed.  This could occasionally result in corrupted files if the
+ARY\_STYPE routine was called repeatedly from successive invocations of
+an application in an ADAM monolith.
+
+\item Two new routines have been introduced, primarily to provide facilities 
+required by the NDF\_ system:
+
+\begin{itemize}
+
+\item \noteroutine{ARY\_NDIM( IARY, NDIM, STATUS )}
+                  {Enquire the dimensionality of an array}
+
+\item \noteroutine{ARY\_OFFS( IARY1, IARY2, MXOFFS, OFFS, STATUS )}
+                  {Obtain the pixel offset between two arrays}
+
+\end{itemize}
+
+\item A stand-alone (non-ADAM) version of the ARY\_ library has been
+added and new linker options files have been provided to allow linking
+with either version.
+
+\item The encoding of ARY\_ system identifiers has been changed to
+improve the chance of detecting erroneous identifier values.
+
+\item Messages about array data structures now contain the full HDS object 
+name, including the full container file name.
+
+\item A few minor documentation errors have been corrected.
+
+\end{enumerate}
+
+No changes to existing applications should be required, neither should any 
+re-compilation or re-linking be necessary.
+
+% ? End of main text
+\end{document}
+

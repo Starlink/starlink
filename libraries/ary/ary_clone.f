@@ -1,0 +1,105 @@
+      SUBROUTINE ARY_CLONE( IARY1, IARY2, STATUS )
+*+
+*  Name:
+*     ARY_CLONE
+
+*  Purpose:
+*     Clone an array identifier.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL ARY_CLONE( IARY1, IARY2, STATUS )
+
+*  Description:
+*     The routine produces a "cloned" copy of an array identifier (i.e.
+*     it produces a new identifier describing an array with identical
+*     attributes to the original).
+
+*  Arguments:
+*     IARY1 = INTEGER (Given)
+*        Array identifier to be cloned.
+*     IARY2 = INTEGER (Returned)
+*        Cloned identifier.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  If this routine is called with STATUS set, then a value of
+*     ARY__NOID will be returned for the IARY2 argument, although no
+*     further processing will occur. The same value will also be
+*     returned if the routine should fail for any reason. The ARY__NOID
+*     constant is defined in the include file ARY_PAR.
+
+*  Algorithm:
+*     -  Set an initial value of ARY__NOID for the IARY2 argument
+*     before checking the inherited status.
+*     -  Import the original array identifier.
+*     -  Produce a cloned copy of its ACB entry.
+*     -  Export an identifier for the new array.
+*     -  If an error occurred, then reset the IARY2 argument to
+*     ARY__NOID and report context information.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2-AUG-1989 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT_ public constants
+      INCLUDE 'ARY_PAR'          ! ARY_ public constants
+
+*  Arguments Given:
+      INTEGER IARY1
+
+*  Arguments Returned:
+      INTEGER IARY2
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER IACB1              ! Original array index in the ACB
+      INTEGER IACB2              ! Cloned array index in the ACB
+
+*.
+
+*  Set an initial value of zero for the IARY2 argument.
+      IARY2 = ARY__NOID
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Import the original array identifier.
+      CALL ARY1_IMPID( IARY1, IACB1, STATUS )
+
+*  Produce a cloned copy of its ACB entry.
+      CALL ARY1_CLN( IACB1, IACB2, STATUS )
+
+*  Export an identifier for the new array.
+      CALL ARY1_EXPID( IACB2, IARY2, STATUS )
+       
+*  If an error occurred, then reset the IARY2 argument to ARY__NOID,
+*  report context information and call the error tracing routine.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         IARY2 = ARY__NOID
+         CALL ERR_REP( 'ARY_CLONE_ERR',
+     :   'ARY_CLONE: Error cloning array identifier.', STATUS )
+         CALL ARY1_TRACE( 'ARY_CLONE', STATUS )
+      END IF
+
+      END

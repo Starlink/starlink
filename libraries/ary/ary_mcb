@@ -1,0 +1,164 @@
+*+
+*  Name:
+*     ARY_MCB
+
+*  Purpose:
+*     Define ARY_ system Mapping Control Block (MCB).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which hold information about
+*     mapped access to array data, so that appropriate "cleaning up"
+*     action can be taken (e.g. writing back of modified values) when
+*     the data are unmapped. A new slot in the MCB is acquired whenever
+*     a mapping operation takes place and its MCB index is stored in
+*     the ACB_IMCB entry in the MCB for the virtual data being mapped.
+*     MCB slots are released (and the ACB_IMCB value which points to
+*     them reset to zero) when the data are subsequently unmapped.
+
+*  Prior Requirements:
+*     The SAE_PAR, ARY_PAR and ARY_CONST include files should be
+*     included prior to this file, in order to define constants used
+*     here.
+
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-SEP-1989 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+
+*  Which slots have been used.
+*  ==========================
+*  This array is initialised to .FALSE. by the ARY1_INIT block data
+*  routine. Its entries are then selectively set to .TRUE. to indicate
+*  which slots in the MCB are in use (i.e. have ACB_IMCB entries which
+*  point to them).
+      LOGICAL MCB_USED( ARY__MXMCB )
+      
+*  Active mapping mode.
+*  ===================
+*  If a slot is in use, then the MCB_AMM entry holds the active mapping
+*  mode ('READ', 'WRITE' or 'UPDATE') associated with the MCB slot.
+      CHARACTER * ( ARY__SZAMM ) MCB_AMM( ARY__MXMCB )
+
+*  Mapping region bounds.
+*  =====================
+*  If a slot is in use, then the MCB_LMRB and MCB_UMRB entries hold the
+*  lower and upper bounds of the mapping region. This is the region of
+*  data which the user perceives as currently being mapped, but is
+*  expressed in the pixel index system of the actual data object. These
+*  entries are padded with 1's to give ARY__MXDIM bounds, regardless of
+*  the actual data object dimensionality.
+      INTEGER MCB_LMRB( ARY__MXDIM, ARY__MXMCB )
+      INTEGER MCB_UMRB( ARY__MXDIM, ARY__MXMCB )
+
+*  Mapping transfer region.
+*  =======================
+*  If a slot is in use, then the MCB_MTREX entry holds a logical value
+*  indicating whether a "mapping transfer region" exists for the
+*  current mapping. The mapping transfer region represents that region
+*  of the data object to which the mapping actually has access, and
+*  through which transfer of data values occurs during mapping and
+*  unmapping operations. It is formed from the intersection of the data
+*  object's bounds, the virtual (ACB) object's data transfer window and
+*  the virtual object's bounds as known to the user (having first
+*  converted them all into the same pixel index system).  If the
+*  MCB_MTREX value is .TRUE., then the MCB_LMTR and MCB_UMTR entries
+*  hold the lower and upper bounds of the mapping transfer region,
+*  expressed in the pixel index system of the actual data object. These
+*  entries are padded with 1's to give ARY__MXDIM bounds, regardless of
+*  the data object's actual dimensionality.
+      LOGICAL MCB_MTREX( ARY__MXMCB )
+      INTEGER MCB_LMTR( ARY__MXDIM, ARY__MXMCB )
+      INTEGER MCB_UMTR( ARY__MXDIM, ARY__MXMCB )
+
+*  Mapping transfer region properties.
+*  ==================================
+*  If a slot is in use and the MCB_MTREX entry is .TRUE., then the
+*  MCB_MRFUL entry holds a logical value indicating whether the mapping
+*  transfer region completely fills the mapping region. If this value
+*  is .TRUE., then the mapped data have not been "padded" to make them
+*  up to the size which the user requires. The MCB_WHOLE entry holds a
+*  logical value indicating whether the mapping and mapping transfer
+*  regions both match the actual data object extent. If this is so,
+*  then the whole data object will have been mapped directly (without
+*  any slicing or padding).
+      LOGICAL MCB_MRFUL( ARY__MXMCB )
+      LOGICAL MCB_WHOLE( ARY__MXMCB )
+
+*  Data copy flags.
+*  ===============
+*  If a slot is in use, then the MCB_DCOPY entry holds a logical value
+*  indicating if the mapped non-imaginary data component is held in a
+*  temporary object representing a memory "copy" of the actual data. If
+*  mapped access to complex data is in effect, then MCB_ICOPY holds a
+*  similar flag for the imaginary component.
+      LOGICAL MCB_DCOPY( ARY__MXMCB )
+      LOGICAL MCB_ICOPY( ARY__MXMCB )
+
+*  Mapped object locators.
+*  ======================
+*  If a slot is in use, then the MCB_DLOC entry contains a locator to
+*  the data object which is mapped to contain the non-imaginary data
+*  component passed to the user. This may be a cloned locator to the
+*  actual data object, or may be a locator to a temporary object
+*  holding a data "copy".  If mapped access to complex data is in
+*  effect, then the MCB_ILOC entry holds a similar locator for the
+*  imaginary component.
+      CHARACTER * ( DAT__SZLOC ) MCB_DLOC( ARY__MXMCB )
+      CHARACTER * ( DAT__SZLOC ) MCB_ILOC( ARY__MXMCB )
+
+*  Pointers to mapped data.
+*  =======================
+*  If a slot is in use, then the MCB_DPNTR entry contains a pointer to
+*  the mapped non-imaginary component of the data. If mapped access to
+*  complex data is in effect, then the MCB_IPNTR entry contains a
+*  similar pointer to the imaginary component.
+      INTEGER MCB_DPNTR( ARY__MXMCB )
+      INTEGER MCB_IPNTR( ARY__MXMCB )
+      
+*  Bad pixel flags.
+*  ===============
+*  If a slot is in use, then the MCB_BAD entry contains a logical value
+*  indicating whether "bad" values may be present in the mapping
+*  transfer region associated with the current mapping. This value is
+*  not used if no mapping transfer region exists. The MCB_PBAD entry
+*  similarly indicates if "bad" values are present in the "padding"
+*  region which exists around the mapping transfer region if the latter
+*  does not completely fill the mapping region.
+      LOGICAL MCB_BAD( ARY__MXMCB )
+      LOGICAL MCB_PBAD( ARY__MXMCB )
+
+*  Data type for access.
+*  ====================
+*  If a slot is in use, then the MCB_TYP entry contains the numeric
+*  data type used to access the data and the MCB_CPX entry indicates if
+*  access to complex data was requested.
+      CHARACTER * ( ARY__SZTYP ) MCB_TYP( ARY__MXMCB )
+      LOGICAL MCB_CPX( ARY__MXMCB )
+
+*  Common Blocks:    
+
+*  Non-character data.
+      COMMON /ARY1_MCB1/ MCB_BAD, MCB_CPX, MCB_DCOPY, MCB_DPNTR,
+     :                   MCB_ICOPY, MCB_IPNTR, MCB_LMRB, MCB_LMTR,
+     :                   MCB_MRFUL, MCB_MTREX, MCB_PBAD, MCB_UMRB,
+     :                   MCB_UMTR, MCB_USED, MCB_WHOLE
+
+*  Character data.
+      COMMON /ARY1_MCB2/ MCB_DLOC, MCB_ILOC, MCB_AMM, MCB_TYP
+
+*.
