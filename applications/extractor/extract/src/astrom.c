@@ -16,6 +16,8 @@
 *                       (including precession).  Model of local affine
 *                       transform is retained for to modifying
 *                       measurements based on area and angle etc.
+*                       25/09/99 (PWD): Added astNorm calls after all
+*                       astTran2s.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 #include	<math.h>
@@ -173,6 +175,20 @@ void computeastrom(picstruct *field, objstruct *obj) {
   return;
 }
 
+/***************************************************************************/
+/*
+  Normalise position into correct RA/Dec range
+*/
+static void norm_wcs( AstFrameSet *fset, double *x, double *y )
+{
+  double point[2];
+  point[0] = *x;
+  point[1] = *y;
+  astNorm( fset, point );
+  *x = point[0];
+  *y = point[1];
+}
+
 
 /****************************** compute_wcs *********************************/
 /*
@@ -186,6 +202,7 @@ double  *compute_wcs(picstruct *field, double mx, double my)
   double        xin[1], yin[1], xout[1], yout[1];
   double	*lm, al, da, de, cde;
   int		rcode;
+  double point[2];
 
   as = field->astrom;
   lm = as->linmat;
@@ -194,6 +211,7 @@ double  *compute_wcs(picstruct *field, double mx, double my)
   xin[0] = mx;
   yin[0] = my;
   astTran2( field->astwcs, 1, xin, yin, 1, xout, yout );
+  norm_wcs( field->astwcs, xout, yout );
   if ( ! astOK ) {
     error(EXIT_FAILURE, "*Error*"," transforming to world coordinates: " );
   }
@@ -205,6 +223,7 @@ double  *compute_wcs(picstruct *field, double mx, double my)
   xin[0] = mx + 1;
   yin[0] = my;
   astTran2( field->astwcs, 1, xin, yin, 1, xout, yout );
+  norm_wcs( field->astwcs, xout, yout );
   if ( ! astOK ) {
     error(EXIT_FAILURE, "*Error*"," transforming to world coordinates: " );
   }
@@ -225,6 +244,7 @@ double  *compute_wcs(picstruct *field, double mx, double my)
   xin[0] = mx;
   yin[0] = my + 1;
   astTran2( field->astwcs, 1, xin, yin, 1, xout, yout );
+  norm_wcs( field->astwcs, xout, yout );
   if ( ! astOK ) {
     error(EXIT_FAILURE, "*Error*"," transforming to world coordinates: " );
   }
@@ -471,6 +491,7 @@ void fk5( picstruct *field, double inalp, double indec,
   double equinox;      /*  Equinox of field celestial coordinates */
   AstFrameSet *cvt;    /*  FrameSet for converting coordinates */
   double a[1], b[1], x[1], y[1];   /*  Input/output coordinates in radians */
+  double point[2];     /*  Coordinates of a position */
 
   as = field->astrom;
 
@@ -485,8 +506,11 @@ void fk5( picstruct *field, double inalp, double indec,
     a[0] = inalp * D2R;
     b[0] = indec * D2R;
     astTran2( cvt, 1, a, b, 1, x, y );
-    *outalp = x[0] * R2D;
-    *outdec = y[0] * R2D;
+    point[0] = x[0];
+    point[1] = y[0];
+    astNorm( cvt, point );
+    *outalp = point[0] * R2D;
+    *outdec = point[1] * R2D;
   } else {
     /*  Input coordinates are already correct */
     *outalp = inalp;
@@ -507,6 +531,7 @@ void fk4( picstruct *field, double inalp, double indec,
   double epoch;        /*  Epoch of field celestial coordinates */
   AstFrameSet *cvt;    /*  FrameSet for converting coordinates */
   double a[1], b[1], x[1], y[1];   /*  Input/output coordinates in radians */
+  double point[2];     /*  Coordinates of a position */
 
   as = field->astrom;
 
@@ -522,8 +547,11 @@ void fk4( picstruct *field, double inalp, double indec,
     a[0] = inalp * D2R;
     b[0] = indec * D2R;
     astTran2( cvt, 1, a, b, 1, x, y );
-    *outalp = x[0] * R2D;
-    *outdec = y[0] * R2D;
+    point[0] = x[0];
+    point[1] = y[0];
+    astNorm( cvt, point );
+    *outalp = point[0] * R2D;
+    *outdec = point[1] * R2D;
   } else {
     /*  Input coordinates are already correct */
     *outalp = inalp;
