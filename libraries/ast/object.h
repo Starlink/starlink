@@ -89,6 +89,9 @@
 *           Test if an attribute value is set for an Object.
 *
 *     Protected:
+*        astAnnulId
+*           Annul an external ID for an Object (for use from protected code
+*           which must handle external IDs).
 *        astClearAttrib
 *           Clear the value of a specified attribute for an Object.
 *        astClearID
@@ -223,6 +226,8 @@
 *        Add astExempt function.
 *     20-JAN-1998 (RFWS):
 *        Make the astClear and astVSet methods virtual.
+*     15-SEP-1999 (RFWS):
+*        Made the astAnnulId function accessible to protected code.
 *--
 */
 
@@ -1132,13 +1137,13 @@ AstObject *astDelete_( AstObject * );
 void astSet_( void *, const char *, ... );
 
 #else                            /* Public */
-AstObject *astAnnulId_( AstObject * );
 AstObject *astDeleteId_( AstObject * );
 void astExemptId_( AstObject * );
 void astExportId_( AstObject * );
 void astSetId_( void *, const char *, ... );
 #endif
 
+AstObject *astAnnulId_( AstObject * );
 AstObject *astClone_( AstObject * );
 AstObject *astCopy_( const AstObject * );
 const char *astGetC_( AstObject *, const char * );
@@ -1227,6 +1232,7 @@ astINVOKE(O,astLoadObject_(mem,size,init,vtab,name,astCheckChannel(channel)))
    pointers. */
 #if defined(astCLASS)            /* Protected */
 #define astAnnul(this) astINVOKE(O,astAnnul_(astCheckObject(this)))
+#define astAnnulId(this) astINVOKE(O,astAnnulId_((AstObject *)(this)))
 #define astDelete(this) astINVOKE(O,astDelete_(astCheckObject(this)))
 #define astSet astINVOKE(F,astSet_)
 

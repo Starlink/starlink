@@ -92,6 +92,8 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 *        Make the astClear and astVSet methods virtual.
 *     29-APR-1998 (RFWS):
 *        Fixed bug in algorithm for encoding Object IDs.
+*     15-SEP-1999 (RFWS)
+*        Made astAnnulId accessible from protected code.
 *class--
 */
 
@@ -3130,7 +3132,6 @@ static void RemoveHandle( int, int * );
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
-AstObject *astAnnulId_( AstObject * );
 AstObject *astDeleteId_( AstObject * );
 void astBegin_( void );
 void astEnd_( void );
@@ -3225,18 +3226,19 @@ static void AnnulHandle( int ihandle ) {
 
 AstObject *astAnnulId_( AstObject *this_id ) {
 /*
+*+
 *  Name:
-*     AnnulId_
+*     AnnulId
 
 *  Purpose:
-*     Annul an Object identifier.
+*     Annul an external Object identifier.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "object.h"
-*     AstObject *astAnnulId_( AstObject *this )
+*     AstObject *astAnnulId( AstObject *this )
 
 *  Class Membership:
 *     Object member function.
@@ -3263,11 +3265,11 @@ AstObject *astAnnulId_( AstObject *this_id ) {
 *     - The identifier supplied should be associated with an active
 *     Object, otherwise an error will result (but no error report will
 *     be made if the global error status has already been set).
-*     - Although this function is documented as "private" and should
-*     not be invoked directly from outside this class, it is not a
-*     static function and has a public prototype. This is because it
-*     must be invoked via the astAnnul macro (defined in the
-*     "object.h" include file) as part of the public interface.
+*     - This function is invoked via the astAnnul macro for external use.
+*     For internal use (from protected code which needs to handle external
+*     IDs) it should be invoked via the astAnnulId macro (since astAnnul
+*     expects a true C pointer as its argument when used internally).
+*-
 */
 
 /* Obtain the Object pointer from the ID supplied and validate the
