@@ -176,16 +176,6 @@
      :          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
 
 *    Release workspace
-        CALL DYN_UNMAP(SMPTR,STATUS)
-        IF (SRT_IMAGE(1)) THEN
-          CALL DYN_UNMAP(S2MPTR,STATUS)
-        ENDIF
-        IF (SRT_BCKGND) THEN
-          CALL DYN_UNMAP(BMPTR,STATUS)
-          IF (SRT_IMAGE(2)) THEN
-            CALL DYN_UNMAP(B2MPTR,STATUS)
-          ENDIF
-        ENDIF
         CALL DYN_UNMAP(WPNTR1,STATUS)
         CALL DYN_UNMAP(WPNTR2,STATUS)
         IF (STATUS .NE. SAI__OK) GOTO 999
