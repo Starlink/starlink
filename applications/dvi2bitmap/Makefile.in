@@ -1,0 +1,62 @@
+# part of dvi2bitmap
+# $Id$
+
+CXX=@CXX@
+CXXFLAGS=@CXXFLAGS@
+DEFS=@DEFS@
+GIFOBJ=@GIFOBJ@
+
+
+EXEC=dvi2bitmap
+OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
+	BitmapImage.o XBMBitmap.o $(GIFOBJ)
+
+# Add a suffix rule for stupid makes (hello, Tru64...)
+.SUFFIXES: .o .cc
+.cc.o:
+	$(CXX) $(CXXFLAGS) $(DEFS) -c $<
+
+$(EXEC): $(OBJS)
+	$(CXX) $(OBJS) -o $@
+
+DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h
+
+InputByteStream.o: InputByteStream.cc InputByteStream.h dvi2bitmap.h
+
+dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h DviFile.h PkFont.h Bitmap.h version.h
+
+PkFont.o: PkFont.cc PkFont.h InputByteStream.h dvi2bitmap.h
+
+BitmapImage.o: BitmapImage.cc BitmapImage.h GIFBitmap.h XBMBitmap.h
+
+Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h BitmapImage.h
+
+GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h
+
+XBMBitmap.o: XBMBitmap.cc XBMBitmap.h Bitmap.h
+
+
+# Distribution
+configure: config/configure.in
+	autoconf config/configure.in >configure
+
+dvi2bitmap.mantext: dvi2bitmap.1
+	nroff -man dvi2bitmap.1 >dvi2bitmap.mantext
+
+dvi2bitmap.tar: configure dvi2bitmap.mantext
+	rm -f Manifest
+	for i in *.cc *.h Makefile.in \
+			configure config/config* config/install-sh \
+			dvi2bitmap.1 dvi2bitmap.mantext README; do \
+		echo dvi2bitmap/$$i >>Manifest; \
+	done
+	echo dvi2bitmap/Manifest >>Manifest
+	cd ..; tar cf dvi2bitmap.tar `cat dvi2bitmap/Manifest`
+	mv ../dvi2bitmap.tar .
+
+# Housekeeping targets
+tidy:
+	rm -f *~ config/*~
+
+clean: tidy
+	rm -f *.o $(EXEC)

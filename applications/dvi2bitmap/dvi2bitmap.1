@@ -82,8 +82,10 @@ Reduces the linear size of the output bitmap by a factor
 .B scalefactor
 (default 1).
 .TP
-.I "\-t gif|xbm"
-Choose the output format.
+.I "\-t xbm|gif"
+Choose the output format.  The program generates XBM bitmaps by
+default.  The GIF option may not be available if it wasn't selected
+when the program was configured.
 .TP
 .I "\-V"
 Display the version number, and exit.
@@ -117,11 +119,46 @@ This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
 produces a list of parameters which could be used to generate the
 font files.
+.PP
+How you generate fonts depends on your TeX distribution.  As explained
+above, you can determine which fonts you need using the 
+.I "\-l"
+option.  The teTeX and TeXLive TeX distributions include scripts to
+generate fonts for you; if you have a different distribution, there
+might be a similar script for you to use, or you might have to do it
+by hand.  In the case of teTeX, the command you'd use in the above
+example would be:
+.PP
+% MakeTeXPK cmr10 165 110 1.5 ibmvga
+.PP
+assuming you want to use the 
+.I ibmvga
+metafont mode.  If you want to use the same mode as you use for other
+documents, then the mode
+.I localfont
+should do the right thing.  Otherwise, and probably better if these
+images are intended for the screen rather than paper, you could use a
+more specialised mode such as 
+.I ibmvga,
+which has been tweaked to be readable at small resolutions.  See the file
+.I "modes.mf"
+somewhere in your metafont distribution for the list of possibilities.
+.PP
+If you're using the TeXLive distribution, the command would be:
+.PP
+% mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10
+.PP
+Then try giving the command
+.PP
+% kpsewhich pk cmr10.165pk
+.PP
+to confirm that TeX and friends can find the new fonts, and that your 
+dvi2bitmap environment variable is set correctly.
 .SH ENVIRONMENT
 The 
 .B DVI2BITMAP_PK_PATH
 environment variable gives the directory which is to be searched for
-PK files.  Note that, although the environment variable refers to a
+PK files.  Note that, although the variable name refers to a
 `path', you may specify only one directory.  I may make this
 marginally more sophisticated in future versions, but probably not:
 the correct thing to do here is to use the same Kpathsearch library
@@ -134,7 +171,7 @@ distribution, but are also available on CTAN, in
 .I /tex-archive/systems/knuth/texware/dvitype.web
 and 
 .I /tex-archive/systems/knuth/pxl/pktopx.web.
-.br
+.PP
 .IR "The DVI Driver Standard, Level 0" ,
 Available on CTAN, in directory 
 .I /tex-archive/dviware/driv-standard.

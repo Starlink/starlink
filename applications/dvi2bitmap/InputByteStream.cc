@@ -27,13 +27,13 @@ InputByteStream::InputByteStream (string s, bool preload)
 
     eof_ = false;
 
-    struct stat S;
-    if (fstat (fd_, &S))
-	throw InputByteStreamError ("Can't stat open file");
-    filesize_ = S.st_size;
-
     if (preload)
     {
+	struct stat S;
+	if (fstat (fd_, &S))
+	    throw InputByteStreamError ("Can't stat open file");
+	filesize_ = S.st_size;
+
 	buflen_ = filesize_;
 	buf_ = new Byte[buflen_];
 	int bufcontents = read (fd_, buf_, buflen_);

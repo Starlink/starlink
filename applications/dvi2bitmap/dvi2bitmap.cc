@@ -6,22 +6,16 @@
 #include <vector>
 
 #if NO_CSTD_INCLUDE
+#include <stdio.h>		// for vsprintf
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
 #else
+#include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
 #include <cctype>
 using std::exit;
-#endif
-
-#if VSPRINTF_IN_STDIO
-#if NO_CSTD_INCLUDE
-#include <stdio.h>
-#else
-#include <cstdio>
-#endif
 #endif
 
 #include "DviFile.h"
@@ -198,6 +192,7 @@ main (int argc, char **argv)
 	     f != 0;
 	     f = dvif->nextFont())
 	{
+	    string unk = "unknown";
 	    if (!f->loaded())	// flag at least one missing
 		all_fonts_present = false;
 	    if (show_font_list > 0)
@@ -211,7 +206,7 @@ main (int argc, char **argv)
 			 << f->dpi()*magmag << ' '
 			 << f->dpi() << ' '
 			 << magmag << ' '
-			 << (fn.length() == 0 ? "unknown" : fn)
+			 << (fn.length() == 0 ? unk : fn)
 			 << '\n';
 		}
 	}

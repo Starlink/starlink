@@ -37,11 +37,6 @@ class DviBug : public DviError {
 // I think this must just be a small GCC STL buglet.
 // Define DEFINE_NULL 1 if this needs to be done
 #define DEFINE_NULL 0
-
-// vsprintf is supposed to be defined in cstdarg, but Linux at least has it
-// in stdio instead
-#define VSPRINTF_IN_STDIO 1
-
 #if DEFINE_NULL
 #define NULL 0
 #endif

@@ -1,16 +1,45 @@
 
-Generate fonts using something like:
+dvi2bitmap
+==========
 
-For TeXLive:
+Configuring and building
+------------------------
 
-  mktexpk --mfmode ibmvga --mag 1 --bdpi 110 --dpi 110 cmr10
-  --> /var/tmp/fonts/pk/ibmvga/public/cm/cmr10.110pk
+To configure and build:
 
-for teTeX:
+    ./configure
+    make
 
-  MakeTeXPK cmr10 110 110 1 ibmvga
-  --> /var/lib/texmf/fonts/pk/ibmvga/public/cm/cmr10.110pk
-  MakeTeXPK cmr10 220 110 2 ibmvga
-  --> /var/lib/texmf/fonts/pk/ibmvga/public/cm/cmr10.220pk
+You can override the C++ compiler the configure script will choose by
+setting the environment variable CXX, either via `CXX=cxx ./configure'
+or `env CXX=cxx ./configure', depending on your shell.
 
-use `kpsewhich pk cmr10.110pk' to find the file.
+To install, just copy the executable dvi2bitmap wherever you want it
+to live.  The program generates XBM bitmaps by default.  
+
+If you want it to be able to generate GIFs, then give the configure
+option `--enable-gif'.  The GIF format is the copyright of CompuServe.
+As far as I understand it, one does not need a licence from CompuServe
+if one is distributing non-commercial, not-for-profit software, such
+as this.  You probably shouldn't enable GIF support when you build
+this program unless you're in that category as well.  But don't listen
+to me: there's a much fuller account of the whole sorry business in
+the comp.graphics.misc FAQ at, for example,
+<http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html>
+
+The program builds successfully on (at least) egcs-2.90, Sun Workshop
+C++ 5.0, and Alpha Digital C++ 6.0.  It should be written in
+standards-conforming C++, so if it doesn't build then (1) it's not as
+conformant as I think it is (in which case please tell me), (2) your
+compiler is not as conformant as you think it is (in which case please
+don't tell me), or (3) you need to invoke some magic to get the
+compiler to be conformant (in which case tell me, if there's something
+I can do in the autoconfigure script).
+
+
+Documentation
+-------------
+
+...is in dvi2bitmap.1  Not much at present, I'm afraid.
+
+

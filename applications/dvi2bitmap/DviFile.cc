@@ -4,11 +4,11 @@
 #define NULL 0
 #include <iostream>
 
-#if NO_CSTD_INCLUDE
-#include <math.h>
-#else
-#include <cmath>
-#endif
+//#if NO_CSTD_INCLUDE
+//#include <math.h>
+//#else
+//#include <cmath>
+//#endif
 
 #include "DviFile.h"
 #include "PkFont.h"
@@ -554,16 +554,26 @@ bool DviFile::eof()
 int DviFile::pixel_round(int dp)
 {
     if (dp>0)
+	return  static_cast<int>(px_per_dviu_ *   dp  + 0.5);
+    else
+	return -static_cast<int>(px_per_dviu_ * (-dp) + 0.5);
+#if 0
+    if (dp>0)
 	return  static_cast<int>(floor(px_per_dviu_ *   dp  + 0.5));
     else
 	return -static_cast<int>(floor(px_per_dviu_ * (-dp) + 0.5));
+#endif
 }
 
 // Return width of character in DVIUnits
 int DviFile::charwidth_ (int charno)
 {
+    return static_cast<int>(current_font_->glyph(charno)->tfmWidth()
+			    * dviu_per_pt_);
+#if 0
     return static_cast<int>(floor(current_font_->glyph(charno)->tfmWidth()
 				  * dviu_per_pt_));
+#endif
 }
 
 
