@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 
 <component id="ast">
-  <version>3.5-4</version>
+  <version>3.5-5</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
