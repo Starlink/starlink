@@ -2,6 +2,178 @@
 <componentset>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="atools">
+  <version>1.6-3</version>
+  <path>applications/atools</path>
+  <description>ATOOLS - AST applications</description>
+  <abstract><p>
+ATOOLS is a package of applications which manipulate descriptions
+of coordinate frames, mappings, etc, in the form of AST Objects (see
+SUN/210). Each application within the ATOOLS package corresponds closely
+to one of the functions within the AST library. ATOOLS thus provides a
+high-level interface to the AST library. 
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>grp</build><build>ndf</build><build>par</build><build>fio</build><build>kaplibs</build><build>sae</build><sourceset>sst</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <uname>dsb</uname>
+      <name>David S. Berry</name>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ccdpack">
+  <version>4.0-16</version>
+  <path>applications/ccdpack</path>
+  <description>CCD data reduction package</description>
+  <abstract>
+    <p>CCDPACK is a package of programs for reducing CCD-like data. They
+    allow you to debias, remove dark current, flatfield, register,
+    resample and normalize data from single- or multiple-CCD instruments.
+    </p>
+
+    <p>CCDPACK is designed to help you to reduce your data easily.
+    The basic reduction stages can be set up using an X based GUI that
+    controls an automated reduction system.
+    The GUI is designed to allow you to start working without any
+    detailed knowledge of the package (or indeed of CCD reduction).
+    Registration is performed using graphical, script based or automated
+    techniques that help reduce the amount of work to a minimum.
+    </p>
+
+    <p>This document is intended for all users of CCDPACK.
+    It provides instruction in how to use CCDPACK, describes CCD reduction
+    in general and contains complete descriptions of the individual
+    programs.
+    </p>
+  </abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+  </developers>
+  <!-- <documentation> sun139</documentation> -->
+  <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ccdgen">
+  <version>4.0-16</version>
+  <path>applications/ccdpack/gen</path>
+  <description>Generic library subsystem for CCDPACK</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ccdhelp">
+  <version>4.0-16</version>
+  <path>applications/ccdpack/help</path>
+  <description>Help library subsystem for CCDPACK</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ccdmain">
+  <version>4.0-16</version>
+  <path>applications/ccdpack/main</path>
+  <description>Main subroutine library for CCDPACK</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ccdtasks">
+  <version>4.0-16</version>
+  <path>applications/ccdpack/tasks</path>
+  <description>Tasks library subsystem for CCDPACK</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="daophot">
   <version>1.3-2</version>
   <path>applications/daophot</path>
@@ -15,7 +187,7 @@
     which improves the accuracy of the photometry.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person><name>Peter Stetson</name><role>Original author</role></person>
@@ -24,6 +196,29 @@
     <person><name>Mark Taylor</name></person>
   </developers>
   <!-- <documentation> sun42</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="dipso">
+  <version>3.6-4</version>
+  <path>applications/pisa</path>
+  <description>DIPSO -- A friendly spectrum analysis program</description>
+  <abstract><p>
+      
+  </p></abstract>
+  <dependencies >
+    <build>ast</build><build>cat</build><build>kaplibs</build><build>snx</build><build>pda</build><build>ndf</build><build>sae</build>
+  </dependencies>
+  <developers>
+    <person>
+      <uname>pwd</uname>
+      <name>David S. Berry</name>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun50</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -173,6 +368,32 @@ Traces an HDS file
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="icl">
+  <version>3.1-9</version>
+  <path>applications/icl</path>
+  <description>Interactive Command Language</description>
+  <abstract><p>ICL shell.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>S K Robinson</name>
+    </person>
+    <person>
+      <name>I R Jenkins</name>
+    </person>
+    <person>
+      <name>B K McIlwrath</name>
+    </person>
+  </developers>
+  <documentation> sg5</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="ifd">
   <version>1.2-8</version>
   <path>applications/ifd</path>
@@ -194,6 +415,36 @@ Traces an HDS file
   </developers>
   <!-- <documentation> ssn68</documentation> -->
   <bugreports>ussc@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="kappa">
+  <version>1.3-2</version>
+  <path>applications/kappa</path>
+  <description>KAPPA - Kernel Application Package</description>
+  <abstract><p>
+KAPPA is an applications package comprising about 180
+general-purpose commands for image processing, data visualisation, and
+manipulation of the standard Starlink data format---the NDF.  It is
+intended to work in conjunction with Starlink's various specialised
+packages.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><build>kaplibs</build><build>ard</build><build>pgplot</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>dsb</uname>
+    </person>
+  </developers>
+  <documentation> sun95 sun221</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
 
@@ -250,6 +501,35 @@ Traces an HDS file
     </person>
   </developers>
   <documentation> sun109</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="polpack">
+  <version>3.1-3</version>
+  <path>applications/polpack</path>
+  <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
+  <abstract><p>
+POLPACK is a package of applications for
+reducing imaging polarimetry or spectropolarimetry data. They cover
+registration, sky subtraction, calculation of Stokes parameters, and
+display of vector maps.  
+</p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><build>kaplibs</build><build>ard</build><build>pgplot</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Tim Gledhill</name>
+      <uname>tmg</uname>
+    </person>
+  </developers>
+  <documentation> sun223</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -331,7 +611,7 @@ Traces an HDS file
       commercial products being freely available on all Starlink
       machines. </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>par</build><build>psx</build><build>sae</build><build>task</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>par</build><build>psx</build><build>sae</build><build>hds</build><build>hlp</build><build option='use'>dtask</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -345,7 +625,7 @@ Traces an HDS file
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="star2html">
-  <version>1.4-6</version>
+  <version>1.4-7</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
@@ -745,7 +1025,7 @@ No longer under active control.
   <description>The tarlink RAL/ICL GKS graphics package.</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build>cnf</build><link>gwm</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>gwm</build><link>gwm</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -977,7 +1257,7 @@ No longer under active control.
       file. It also allows the creation of groups in which each element
       is a modified version of an element in another group.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>sae</build><build>subpar</build><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>sae</build><build>subpar</build><build>prm</build><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1180,7 +1460,7 @@ understand.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="par">
+<component id="kaplibs">
   <version>2.7-3</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
@@ -1191,7 +1471,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract> -->
   <dependencies >
-    <build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><link>cat</link><link>mers</link><link>pcs</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><link>cat</link><link>mers</link><link>pcs</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><sourceset>star2html</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -1202,7 +1482,7 @@ independently of KAPPA.</p></abstract> -->
     </person>
   </developers>
   -->
-  <!-- <documentation></documentation> -->
+  <!-- <documentation> sun238</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -1581,7 +1861,7 @@ Ultrix and for SunOS and may still work for them.
   <description>DTASK linking library</description>
   <abstract><p>ADD DETAILS!</p></abstract>
   <dependencies >
-    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset>
+    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><use>hdspar</use><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2079,6 +2359,39 @@ Ultrix and for SunOS and may still work for them.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="snx">
+  <version>1.1-1</version>
+  <path>libraries/snx</path>
+  <description>Starlink extensions to the NCAR Graphics Utilities</description>
+  <abstract><p> The NCAR graphics suite (SUN/88) consists of a set of
+  subprograms which can be used to produce complete graphs in a
+  variety of formats.  The package has been in wide use for some
+  years; the latest version employs the ISO standard GKS interfaces
+  for its low-level plotting, giving it access to all Starlink
+  graphics devices, present and future.</p></abstract>
+  <dependencies >
+    <build>sae</build><build>ncar</build><build>gks</build><build>sgs</build><link>ncar</link><link>gks</link><link>sgs</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+      <uname>pctr</uname>
+    </person>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>mjb</uname>
+    </person>
+    <person>
+      <name>Pat Wallace</name>
+      <uname>ptw</uname>
+    </person>
+  </developers>
+  <documentation> sun90</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="trn">
   <version>0.9-5</version>
   <path>libraries/trn</path>
@@ -2103,6 +2416,29 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> sun61</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pgplot">
+  <version>5.2.2-1</version>
+  <path>thirdparty/caltech/pgplot</path>
+  <description>Native PGPLOT</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -2203,13 +2539,93 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="tclsys">
+<component id="ncar">
+  <version>1.3-1</version>
+  <path>thirdparty/knoxville/ncar</path>
+  <description>NCAR - Graphics Utilities</description>
+  <abstract><p>The National Center for Atmospheric Research in Boulder,
+Colorado has, for many years, distributed a extensive suite of high level
+graphics utilities.  When NCAR converted these utilities to run over the ISO
+standard GKS, Starlink was used as a test site.  Starlink was subsequently
+given permission to release the NCAR utilities as part of the Starlink Software
+Collection.  The NCAR utilities offer an alternative high level graphics
+package to PGPLOT (SUN/15) for use within Starlink applications.  The NCAR
+package is arguably more powerful than PGPLOT in functionality and flexibility,
+but it does require a little more time to master.  Starlink provides a set of
+extensions to the NCAR graphics utilities, SNX (SUN/90), to make the use of
+NCAR more accessible to the beginner.  For lower level work, SGS (SUN/85) or
+GKS (SUN/83) should be used.</p></abstract>
+  <dependencies >
+    <build>gks</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun88</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="itcl">
+  <version>3.1.0</version>
+  <path>thirdparty/tclsys/itcl</path>
+  <description>[incr Tcl]</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="tcl">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
     
+  </dependencies>
+  <developers>
+    <!-- Tcl is maintained by Scriptics, but this part of the tree
+         is maintained by... -->
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="tk">
+  <version>8.2.3</version>
+  <path>thirdparty/tclsys/tk</path>
+  <description>The Tk system</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <build>tcl</build>
   </dependencies>
   <developers>
     <!-- Tcl is maintained by Scriptics, but this part of the tree
