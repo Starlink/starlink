@@ -20,9 +20,6 @@
 #     The installation target INSTALL_BIN is set outside of this script,
 #     and edited at install time to reflect the installation location.
 #
-#     The target PKG_VERS is set outside of this script, and edited at
-#     install time to indicate the version number.
-#
 #  Authors:
 #     BLY: M.J.Bly (Starlink, RAL)
 #     {enter_new_authors_here}
@@ -38,21 +35,21 @@
 #
 #  Define aliases for the applications.
 
-alias daophot INSTALL_BIN/daophot
+alias daophot $DAOPHOT_DIR/daophot
 
-alias allstar INSTALL_BIN/allstar
+alias allstar $DAOPHOT_DIR/allstar
 
-alias daogrey INSTALL_BIN/daogrey
+alias daogrey $DAOPHOT_DIR/daogrey
 
-alias daoplot INSTALL_BIN/daoplot
+alias daoplot $DAOPHOT_DIR/daoplot
 
-alias daocurs INSTALL_BIN/daocurs
+alias daocurs $DAOPHOT_DIR/daocurs
 
 #
 #  Announce the availability of the DAOPHOT commands.
 #
       echo " "
-      echo "   DAOPHOT applications are now available -- (Version PKG_VERS)"
+      echo "   DAOPHOT applications are now available -- (Version @PACKAGE_VERSION@)"
       echo " "
 #
 # end

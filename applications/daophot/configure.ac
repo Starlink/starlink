@@ -24,6 +24,6 @@ AC_PROG_LIBTOOL
 STAR_DECLARE_DEPENDENCIES(build, [sae mers subpar ndf psx chr agi])
 STAR_LATEX_DOCUMENTATION(sun42)
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml daophot.csh])
 
 AC_OUTPUT
