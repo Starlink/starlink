@@ -28,9 +28,9 @@
 *     NDF = INTEGER (Given)
 *        The NDF identifier
 *     COMP = CHARACTER * ( * ) (Given)
-*        The NDF component: 'DATA', 'VARIANCE' or 'ERROR'.  Any other
-*        component will result in a SAI__ERROR status being returned
-*        immediately.
+*        The NDF component: 'DATA', 'VARIANCE', 'QUALITY' or 'ERROR'.  
+*        Any other component will result in a SAI__ERROR status being 
+*        returned immediately.
 *     UNITS = CHARACTER * ( * ) (Returned)
 *        The string containing the units for the component, possibly
 *        truncated.  It is recommended that string should be at least
@@ -41,7 +41,7 @@
 *        status.
 *     NCU = INTEGER (Returned)
 *        The length of the units string in characters ignoring trailing
-*        blanks.
+*        blanks. Always returned equal to zero if COMP = 'QUALITY'.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -59,6 +59,9 @@
 *        Bug fixed which caused UNITS to be addressed out of bounds if
 *        the the UNITS NDF component is longer than the declared length of 
 *        the UNITS argument.
+*     4-11-1999 (DSB)
+*        Remove non-printable characters from the units string. Return
+*        NCU = 0 without error if COMP = 'QUALITY'.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -116,8 +119,14 @@
       CALL CHR_UCASE( CMPNAM )
       CALL CHR_LDBLK( CMPNAM )
 
-      IF ( CMPNAM( 1:2 ) .NE. 'DA' .AND. CMPNAM( 1:2 ) .NE. 'VA' .AND.
-     :     CMPNAM( 1:2 ) .NE. 'ER' ) THEN
+      IF( CMPNAM( 1:2 ) .EQ. 'QU' ) THEN
+         NCU = 0
+         UNITS = ' '
+
+         GO TO 999
+
+      ELSE IF ( CMPNAM( 1:2 ) .NE. 'DA' .AND. CMPNAM( 1:2 ) .NE. 'VA' 
+     :          .AND. CMPNAM( 1:2 ) .NE. 'ER' ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_DAUNI_COMP',
      :     'The component must be DATA or VARIANCE or ERROR to be '/
@@ -144,6 +153,9 @@
          CALL NDF_STATE( NDF, 'UNITS', UNITSP, STATUS )
          IF ( UNITSP ) THEN
             CALL NDF_CGET( NDF, 'UNITS', BUFFER, STATUS )
+
+*  Clean it.
+            CALL CHR_CLEAN( BUFFER )
 
 *  Get the number of characters in the units.
             CALL NDF_CLEN( NDF, 'UNITS', NCU, STATUS )
@@ -188,5 +200,7 @@
             END IF
          END IF
       END IF
+
+ 999  CONTINUE
 
       END
