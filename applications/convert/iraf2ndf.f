@@ -139,6 +139,7 @@
       INCLUDE 'PSX_ERR'          ! PSX error constants
       INCLUDE 'CMP_ERR'          ! CMP error constants
       INCLUDE 'MSG_PAR'          ! MSG constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -303,7 +304,14 @@
       CALL NDF_MAP( NDF, 'Data', ITYPE, 'WRITE', PNTR, EL, STATUS )
 
 *  Use PSX_CALLOC() to obtain dynamic storage for each line.
-      CALL PSX_CALLOC( NCOLS, ITYPE, LIPNTR, STATUS )
+*  As a temporary measure until PSX_CALLOC supports _WORD type we have
+*  to call PSX_MALLOC instead.
+      IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL PSX_MALLOC( NCOLS * VAL__NBW, LIPNTR, STATUS )
+      ELSE
+         CALL PSX_CALLOC( NCOLS, ITYPE, LIPNTR, STATUS )
+      END IF
+
       IF ( STATUS .NE. SAI__OK ) GOTO 980
       
 *  Pass the Image descriptor, image dimensions, line buffer,
