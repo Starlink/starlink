@@ -59,13 +59,26 @@ done
 # tools in one component before that component has been build and
 # installed. 
 
-test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
 AC_PREFIX_DEFAULT(!!STARCONF_DEFAULT_PREFIX!!)dnl
 
-if $_star_per_package_dirs; then
-    bindir="$bindir/$PACKAGE_NAME"
-    AC_MSG_NOTICE([[STAR_DEFAULTS] has per-package-dirs option: bindir=$bindir])
-fi
+test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
+
+# Handle the --with-starlink option.  Do nothing in the option-not-present
+# case, except continue to use the STARLINK value defaulted above.
+AC_ARG_WITH(starlink,
+            AS_HELP_STRING([--with-starlink],
+                           [Starlink tree to use (default ${STARLINK:=!!STARCONF_DEFAULT_STARLINK!!})]),
+            [if test -z "$withval"; then
+                 AC_MSG_WARN([no argument to --with-starlink; using default $STARLINK])
+             elif test "X$withval" = Xno; then
+                 AC_MSG_WARN([--without-starlink makes no sense; using default $STARLINK instead])
+             elif test -d "$withval"; then
+                 STARLINK="$withval"
+                 AC_MSG_NOTICE([STARLINK set to $STARLINK])
+             else
+                 AC_MSG_WARN([--with-starlink given nonexistent directory; ignored: using default $STARLINK instead])
+             fi])
+             
 
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
@@ -95,6 +108,24 @@ FFLAGS="$FFLAGS -I$STARLINK/include"
 CFLAGS="$CFLAGS -I$STARLINK/include"
 LDFLAGS="$LDFLAGS -L$STARLINK/lib"
 
+
+# Installation directory options.  This must match the variables handled
+# by _STAR_EXTRADIR_COMMON
+AC_SUBST([stardocsdir], ['${prefix}/docs'])dnl
+AC_SUBST([starhelpdir], ['${prefix}/help'])dnl
+AC_SUBST([staretcdir],  ['${prefix}/etc'])dnl
+
+# Certain directories are affected by the $_star_per_package_dir variable;
+# if it's true, then add the $PACKAGE_NAME to the directory.
+# The directories currently adjusted by this are bin and help;
+# there are others: see PWD's message of 2004-02-16
+# <http://www.jiscmail.ac.uk/cgi-bin/wa.exe?A2=ind0402&L=stardev&T=0&F=&S=&P=5153>
+if $_star_per_package_dirs; then
+    bindir="$bindir/$PACKAGE_NAME"
+    starhelpdir="$starhelpdir/$PACKAGE_NAME"
+    AC_MSG_NOTICE([[STAR_DEFAULTS] has option per-package-dirs:])
+    AC_MSG_NOTICE([    bindir=$bindir starhelpdir=$starhelpdir])
+fi
 
 # Dependency declarations and checks.
 # Everything is dependent on starconf, so we don't have to declare that 
@@ -673,31 +704,21 @@ AC_DEFUN([_STAR_UPCASE],
 # Common handler for STAR_HELP_FILES, etc.  DIR-TYPE is one of `help',
 # `etc', `docs', and `FILE-LIST' is a list of files to be installed in
 # the directory STAR_[DIR-TYPE]_DIR.  This works by defining and
-# AC_SUBSTing the variables `starX_STARDATA and
-# starXdir for X=dir-type (eg, `stardocs_STARDATA' and `stardocsdir').
-# The form of these variables is governed by the data.am template in automake.
-# Starlink-automake recognises the `primary' STARDATA and handles it
-# appropriately.
+# AC_SUBSTing the variables `starX_DATA for X=dir-type (eg, `stardocs_DATA').
 #
-# Specialcase 'help': help is one of the directories (the other is bin)
-# which is affected by the $_star_per_package_dir variable; if it's
-# true, then add the $PACKAGE_NAME to the starhelpdir.  There are
-# others: see PWD's message of 2004-02-16:
-# <http://www.jiscmail.ac.uk/cgi-bin/wa.exe?A2=ind0402&L=stardev&T=0&F=&S=&P=5153>
+# The variables starXdir (for X in {help, etc, docs}) are defined in
+# STAR_DEFAULTS, and the prefixes starX are added to the legal 'DATA'
+# prefixes in automake:handle_data.
 AC_DEFUN([_STAR_EXTRADIR_COMMON],
-         [m4_ifval([$1], [], [AC_FATAL([$0: called with zero args])])dnl
-          m4_ifval([$2], [], [AC_FATAL([$0: called with only one arg])])dnl
-          if test "X[$]star$1_STARDATA" = X; then
-              # First time
-              AC_SUBST(star$1_STARDATA)dnl
-              star$1[]dir='$(prefix)/$1'
-              m4_if([$1], [help],
-                    [if $_star_per_package_dirs; then
-                         star$1[]dir=star$1[]dir/$PACKAGE_NAME
-                     fi])
-              AC_SUBST(star$1[]dir)
-          fi
-          star$1_STARDATA="[$]star$1_STARDATA $2"
+         [m4_ifval([$1], [], [AC_FATAL([$0: must have two args])])dnl
+          m4_ifval([$2], [], [AC_FATAL([$0: must have two args])])dnl
+          m4_if(m4_bregexp([$1],
+                           [^\(docs\|etc\|help\)$]),
+                [0],
+                [],
+                [AC_FATAL([$0: unrecognised type $1])])dnl
+          AC_SUBST(star$1_DATA)dnl
+          star$1_DATA="[$]star$1_DATA $2"
 ])# _STAR_EXTRADIR_COMMON
 
 
