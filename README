@@ -60,7 +60,7 @@ following steps are required:
    Makefile ensure that everthing in built in the correct order.
 
       % ./configure -C   # -C means caching results
-      % make
+      % make world
 
  - If you wish to build only as far as a given component, then specify
    it by giving the name of the associated `manifest' file.
