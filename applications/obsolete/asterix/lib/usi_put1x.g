@@ -61,7 +61,7 @@
       CALL USI0_LOCRTN( USI__F_PUT1<T>, RPTR, STATUS )
 
 *    Invoke it
-      CALL USI_PUT1<T>_E( %VAL(RPTR), PAR, VALUE, STATUS )
+      CALL USI_PUT1<T>_E( %VAL(RPTR), PAR, NVALUE, VALUE, STATUS )
 
 *    Restore error context
       CALL ERR_RLSE
@@ -71,7 +71,7 @@
 
 
 *+  USI_PUT1<T>_E - Invoke parameter put routine
-      SUBROUTINE USI_PUT1<T>_E( PUT_RTN, PAR, VALUE, STATUS )
+      SUBROUTINE USI_PUT1<T>_E( PUT_RTN, PAR, NVALUE, VALUE, STATUS )
 *    Description :
 *     <description of what the subroutine does - for user info>
 *    Method :
