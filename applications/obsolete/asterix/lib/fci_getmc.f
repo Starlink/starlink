@@ -84,6 +84,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PKG'
       INCLUDE 'PAR_ERR'
+      INCLUDE 'SUBPAR_ERR'
 
 *  Arguments Returned:
       INTEGER			CTRLID
@@ -121,7 +122,15 @@
 *    Get parameters describing CURFIT control algorithm
         CALL USI_GET0I( 'MAX', NITMAX, STATUS )
         CALL USI_GET0R( 'MINS', MINSLO, STATUS )
-        CALL USI_GET0I( 'NUP', NUP, STATUS )
+
+*    Update control is optional - not needed by error and gridding software
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          CALL USI_GET0I( 'NUP', NUP, STATUS )
+          IF ( STATUS .EQ. SUBPAR__NOPAR ) THEN
+            CALL ERR_ANNUL( STATUS )
+            NUP = 1
+          END IF
+        END IF
 
 *    Good data from user?
         IF ( STATUS .EQ. SAI__OK ) THEN
