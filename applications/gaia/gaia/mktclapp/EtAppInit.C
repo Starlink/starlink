@@ -29,7 +29,7 @@
 /* declare command procedures here */
 extern "C" {
 #include "tk.h"
-#include "appinit.h"
+#include "gaiainit.h"
 extern int Blt_Init(Tcl_Interp *interp);
 extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);

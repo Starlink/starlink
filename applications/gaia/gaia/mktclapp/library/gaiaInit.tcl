@@ -1,67 +1,86 @@
-# E.S.O. - VLT project 
-# "@(#) $Id$"
+# $Id$
 #
-# skyCatInit.tcl - This script generates a scriptics prowrap config 
-#                file on the stdout.
+# gaiaInit.tcl - This script generates a mktclapp config file on stdout.
 #
 # who             when       what
 # --------------  ---------  ----------------------------------------
-# Allan Brighton  14 Nov 97  Created
-
-set tclutil_library $env(TCLUTIL_LIBRARY)
-set astrotcl_library $env(ASTROTCL_LIBRARY)
-set cat_library $env(CAT_LIBRARY)
-set rtd_library $env(RTD_LIBRARY)
-set skycat_library $env(SKYCAT_LIBRARY)
-set blt_library $env(BLT_LIBRARY)
-
-set srcdirs [list \
-		 $tclutil_library \
-		 $astrotcl_library \
-		 $rtd_library \
-		 $cat_library \
-		 $skycat_library]
-
+# Peter W. Draper 12 May 99  Created, based on skyCatInit.tcl
 proc main {} {
-    global argv0 argv argc srcdirs depend_list outfile tclx_library blt_library
-
-    if {$argc != 1} {
-	puts "usage: skycatInit.tcl output_file_name"
-	exit 1
-    }
-    set outfile [lindex $argv 0]
-    set fd [open $outfile w]
-
-    # use relative pathnames to access wrapped files...
-    foreach dir $srcdirs {
-	if {[file exists $dir/tclIndex]} {
-	    puts $fd "-relativeto [file dirname [file dirname $dir]]"
-	    puts $fd $dir/tclIndex
-	    puts $fd $dir/*.tcl
-	}
-    }
-
-    # tclX doesn't use tclIndex files
-    if {[info exists tclx_library] && [file exists $tclx_library/tcl.tlib]} {
-	puts $fd "-relativeto [file dirname $tclx_library]"
-	puts $fd $tclx_library/*.tcl
-	puts $fd $tclx_library/tcl.tlib
-	puts $fd $tclx_library/tcl.tndx
-    } else {
-	puts "$argv0: can't find TclX library files"
-	exit 1
-    }
-
-    # BLT has some special files
-    if {[info exists blt_library] && [file exists $blt_library/bltGraph.pro]} {
-	puts $fd "-relativeto [file dirname $blt_library]"
-	puts $fd $blt_library/tclIndex
-	puts $fd $blt_library/*.tcl
-	puts $fd $blt_library/*.pro
-    } else {
-	puts "$argv0: can't find BLT library files"
-	exit 1
-    }
+   global argv argc env argv0
+   
+   if {$argc != 1} {
+      puts "usage: gaiaInit.tcl output_file_name"
+      exit 1
+   }
+   set outfile [lindex $argv 0]
+   set fd [open $outfile w]
+   
+   #  Set names of source directories.
+   set tcl_library      $env(TCL_LIBRARY)
+   set tk_library       $env(TK_LIBRARY)
+   set itcl_library     $env(ITCL_LIBRARY)
+   set itk_library      $env(ITK_LIBRARY)
+   set tclutil_library  $env(TCLUTIL_LIBRARY)
+   set astrotcl_library $env(ASTROTCL_LIBRARY)
+   set cat_library      $env(CAT_LIBRARY)
+   set rtd_library      $env(RTD_LIBRARY)
+   set skycat_library   $env(SKYCAT_LIBRARY)
+   set gaia_library     $env(GAIA_LIBRARY)
+   set blt_library      $env(BLT_LIBRARY)
+   set iwidgets_library $env(IWIDGETS_LIBRARY)
+   set iscripts_library $env(IWIDGETS_LIBRARY)/scripts
+   set tclx_library     $env(TCLX_LIBRARY)
+   
+   set srcdirs [list \
+                   $tcl_library \
+                   $tk_library \
+                   $itcl_library \
+                   $itk_library \
+                   $iwidgets_library \
+                   $iscripts_library \
+                   $tclutil_library \
+                   $astrotcl_library \
+                   $rtd_library \
+                   $cat_library \
+                   $skycat_library \
+                   $gaia_library]
+   
+   #  Set location of startup script.
+   puts $fd "-main-script \"${gaia_library}/gaiaMain.tcl\""
+   
+   #  Set location of Tcl and Tk.
+   puts $fd "-tcl-library \"$tcl_library\""
+   puts $fd "-tk-library \"$tk_library\""
+   
+   #  Now add all the Tcl file from everywhere.
+   foreach dir $srcdirs {
+      if {[file exists $dir/tclIndex]} {
+         puts $fd "-strip-tcl \"$dir/tclIndex\""
+      }
+      set tclfiles [glob -nocomplain $dir/*.tcl $dir/*.itk]
+      foreach file "$tclfiles" {
+         puts $fd "-strip-tcl \"$file\""
+      }
+   }
+   
+   #  Add special TclX file.
+#   if {[info exists tclx_library] && [file exists $tclx_library/tcl.tlib]} {
+#      puts $fd "-strip-tcl \"$tclx_library/tcl.tlib\""
+#   } else {
+#      puts "$argv0: can't find TclX library files"
+#      exit 1
+#   }
+   
+   #  BLT has some special files.
+#   if {[info exists blt_library] && [file exists $blt_library/bltGraph.pro]} {
+#      set profiles [glob -nocomplain $blt_library/*.pro]
+#      foreach file "$profiles" {
+#         puts $fd "-dont-strip-tcl \"$file\""
+#      }
+#   } else {
+#      puts "$argv0: can't find BLT library files"
+#      exit 1
+#   }
 }
 
 main

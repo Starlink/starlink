@@ -96,6 +96,9 @@ ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` 
 #  Name of single binary
 PROG = bin/gaia_$(SYSTEM)
 
+#  Name of mktclapp converter.
+MKTCLAPP = bin/mktclapp
+
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
@@ -111,11 +114,13 @@ RM 	     = rm -f
 LN 	     = ln -s
 
 # ------------------------------------------------------------------------
-all: $(PROG) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
-	$(asc2tab) $(tab2asc)
+all: $(mktclapp) $(PROG)
 
-$(demo_wish): normallib tkAppInit.o FORCE
-	@echo "linking \"$(demo_wish)\"..."
+$(MKTCLAPP): mktclapp.o
+	$(CC) -o $(MKTCLAPP) mktclapp.o
+
+$(PROG): EtAppInit.o FORCE
+	@echo "linking \"$(PROG)\"..."
 	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(PROG)  \
 	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
 	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
@@ -133,7 +138,7 @@ install-bin:
 	$(INSTALL) $(PROG) $(BINDIR)
 
 clean:
-	$(RM) $(OBJECTS) $(PROG) 
+	$(RM) $(OBJECTS) $(PROG) $(MKTCLAPP)
 
 distclean: clean
 	$(RM) Makefile
