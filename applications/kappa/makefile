@@ -1238,9 +1238,9 @@ $(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o grf_kappa.o 
 
 #  Give dependencies and rule for building the pseudo-monoliths.
 
-$(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
+$(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPPA_MONO_SOURCE:.f=.o) -o $(KAPPA_MON) $(OBJECT_LIBRARIES) \
-	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
+	         gropen.o $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
 $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o $(LINK_SCRIPT)
@@ -1248,9 +1248,9 @@ $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_k
 	         gropen.o $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
-$(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o lsfun1.o $(LINK_SCRIPT)
+$(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
-	         lsfun1.o $(OBJECT_LIBRARIES) \
+	         lsfun1.o gropen.o $(OBJECT_LIBRARIES) \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 #  List of the interface files to be built and rules for compiling them.
