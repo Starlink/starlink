@@ -52,9 +52,28 @@ procedure use_globals( action )
 #-
 
 #  Parameters:
-bool action {"yes",prompt="Use CCDPACK global variables"}
+bool action {yes,prompt="Use CCDPACK global variables"}
 
 #.
 begin
-   set CCDPACK_GLOBALS=action
+   bool laction
+   laction = action
+   set CCDPACK_GLOBALS=lact
+   print (" ")
+   if ( lact ) {
+      print ("Global variables will now be used. Use the commands:")
+      print (" ")
+      print ("   CCDSETUP, CCDSHOW and CCDCLEAR.")
+      print (" ")
+      print ("to set, examine and clear them.")
+   } else {
+      print ("Global variables will now be ignored. The commands:")
+      print (" ")
+      print ("   CCDSETUP, CCDSHOW and CCDCLEAR")
+      print (" ")
+      print ("are now invalid.")
+   }
+   print (" ")
+   print ("Remember to restart any CCDPACK tasks already running.")
+   print (" ")
 end
