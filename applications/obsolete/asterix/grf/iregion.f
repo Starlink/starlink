@@ -1175,7 +1175,7 @@ c        ENDIF
         ELSEIF (INDEX(CMD,'SLI').NE.0) THEN	! rectangular slice
           MODE='SLI'
           MERGE=.TRUE.
-        ELSEIF (INDEX(CMD,'CON'.NE.0) THEN	! inside contour
+        ELSEIF (INDEX(CMD,'CON').NE.0) THEN	! inside contour
           MODE='CON'
           MERGE=.TRUE.
         ELSEIF (INDEX(CMD,'WHO').NE.0) THEN
@@ -1192,7 +1192,7 @@ c        ENDIF
           MERGE=.FALSE.
         ELSEIF (INDEX(CMD,'INV').NE.0) THEN
           MODE='INV'
-          MERGE=.FALSE
+          MERGE=.FALSE.
         ELSEIF (INDEX(CMD,'LIS').NE.0) THEN
           MODE='LIS'
           MERGE=.FALSE.
