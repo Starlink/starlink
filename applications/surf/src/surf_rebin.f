@@ -186,6 +186,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.43  1997/11/19 18:53:15  timj
+*     Fix some logic problems with errors being annulled by CHR_STATUS
+*
 *     Revision 1.42  1997/11/06 23:27:22  timj
 *     Add the verbose suffix option.
 *
@@ -532,9 +535,6 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-* Start up the error system
-      CALL ERR_BEGIN(STATUS)
-
 *     Initialize
       INTREBIN = .FALSE.
       BOLREBIN = .FALSE.
@@ -769,7 +769,7 @@ c
          IF (FILE .LE. 0) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: there is no '//
+            CALL ERR_REP (' ', '^TASK: there are no '//
      :           'input data', STATUS)
 
          ELSE
@@ -873,7 +873,7 @@ c
             IF (STATUS .EQ. SAI__OK) THEN
                ITEMP = 1
                CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
-               IF (STATUS .NE. 0) THEN
+               IF (STATUS .NE. SAI__OK) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETC('TASK', TSKNAME)
                   CALL ERR_REP (' ', '^TASK: error reading '//
@@ -905,7 +905,7 @@ c
             IF (STATUS .EQ. SAI__OK) THEN
                ITEMP = 1
                CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
-               IF (STATUS .NE. 0) THEN
+               IF (STATUS .NE. SAI__OK) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETC('TASK', TSKNAME)
                   CALL ERR_REP (' ', '^TASK: error reading '//
@@ -1146,37 +1146,39 @@ c
 *     For now the default is just the first word of the object
 *     name
 
-      IPOSN = 1
-      CHR_STATUS = SAI__OK
-      CALL CHR_FIWE(SOBJECT, IPOSN, CHR_STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         IPOSN = 1
+         CHR_STATUS = SAI__OK
+         CALL CHR_FIWE(SOBJECT, IPOSN, CHR_STATUS)
 
 *     Good status means two words were found (at least)
 *     Bad status means that the end of string was hit before finding
 *     the second word
 
-      IF (CHR_STATUS .EQ. SAI__OK) THEN
-         STEMP = SOBJECT(1:IPOSN)
-      ELSE
-         STEMP = SOBJECT
-         CALL ERR_ANNUL(CHR_STATUS)
-      END IF
+         IF (CHR_STATUS .EQ. SAI__OK) THEN
+            STEMP = SOBJECT(1:IPOSN)
+         ELSE
+            STEMP = SOBJECT
+            CALL ERR_ANNUL(CHR_STATUS)
+         END IF
 
 *     Need to make sure that this default is not just a number
 *     since HDS doesnt create a file in that case
 
-      CALL CHR_CTOR(STEMP, RTEMP, CHR_STATUS)
+         CALL CHR_CTOR(STEMP, RTEMP, CHR_STATUS)
 
 *     Good status implies the wrong answer :-)
 
-      IF (CHR_STATUS .EQ. SAI__OK) THEN
+         IF (CHR_STATUS .EQ. SAI__OK) THEN
 
 *     Prepend a character if the object name is a number
-         CALL CHR_PREFX('i', STEMP, ITEMP)
+            CALL CHR_PREFX('i', STEMP, ITEMP)
 
-      ELSE
-         CALL ERR_ANNUL(CHR_STATUS)
+         ELSE
+            CALL ERR_ANNUL(CHR_STATUS)
+         END IF
+
       END IF
-      
 
 *     Set the default
 
@@ -1518,6 +1520,5 @@ c
 
 
       CALL NDF_END (STATUS)
-      CALL ERR_END(STATUS)
- 
+
       END
