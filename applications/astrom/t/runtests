@@ -60,17 +60,29 @@ fi
 
 # Check filelist is non-null, and make it t* if it is.
 if [ -z "$filelist" ]; then
-    filelist=`$LS | grep '^t[0-9]*$'`
+    filelist=`$LS | grep '^t[0-9]*\.\(sh\|run\)$'`
 fi
 
 
 
 nfailures=0
 
-for name in $filelist
+for testprog in $filelist
 do
+        name=`expr $testprog : '\(t[0-9]*\)'`
+        ext=`expr $testprog : '.*\(\.[a-z]*\)$'`
 	echononl "$name... "
-	sh $name >$name.stdout 2>$name.stderr
+        if test -z "$ext"; then
+            echo "No extension!"
+            false
+        elif test $ext = .sh; then
+	    sh $testprog >$name.stdout 2>$name.stderr
+        elif test $ext = .run; then
+            ./$testprog >$name.stdout 2>$name.stderr
+        else
+            echo "Unrecognised extension $ext"
+            false
+        fi
 	testval=$?
 
 	if [ $testval != 0 ]; then
