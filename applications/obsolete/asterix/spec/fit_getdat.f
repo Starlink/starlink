@@ -422,7 +422,6 @@
 	        GOTO 99
 	      END IF
 	    END IF
-            CALL ADI_ERASE( TIMID, STATUS )
 
 *        Have data been b/g subtracted?
             CALL PRF_GET( DCFID(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
