@@ -17,7 +17,11 @@ package Scb;
 
 #  Description:
 #     Utility routines and global variables for source code browser
-#     and indexer programs.
+#     and indexer programs.  Via their definitions in this module
+#     the locations of various files and directories are determined.
+#     Both build-time (via the mk script) and run-time values of 
+#     some environment variables affect these locations, as documented
+#     in the "Global variables" section.
 
 #  Notes:
 #     This module reports errors using the routine &main::error 
@@ -71,14 +75,19 @@ use Cwd;
 #  The capitalised variable names in this section may be replaced by
 #  environment variables or mk script variables by the makefile at 
 #  build time.  The sequences "$VARIABLE_NAME" are substituted for 
-#  by sed(1), so it is important that the quoting syntax is not modified
-#  in these assignments.
+#  by sed(1), so it is important that the quoting syntax (in the pre-
+#  built files) is not modified in these assignments.  Since the mk 
+#  script/makefile modify these files at build time, if you are looking
+#  at the built version of this script it may look confusing.  The
+#  pre-built version can be seen by extracting the script directly
+#  from the scb_source.tar tar file.
 #
-#  Note that the script is written in such a way as to work even before 
-#  such replacements have taken place.
+#  The script is written so that it works in its pre-built form also, 
+#  using default values.
 #
-#  Some of the variables take the values of corresponding environment
-#  variable, if they exist.
+#  Some of the values determined by build-time environment variables
+#  (or pre-build defaults) can be overridden at run-time by environment 
+#  variables of the same name, if they exist.
 
 #  Starlink source tree directory locations.
 
