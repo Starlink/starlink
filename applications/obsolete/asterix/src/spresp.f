@@ -79,12 +79,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     {routine_references}...
 
@@ -111,6 +105,8 @@
 *        V1.7-4  Reduces expanded dimensions to minimum required
 *     25-Nov-94 (DJA):
 *        V1.8-0  User interface now uses only USI.
+*     25-Apr-95 (DJA):
+*        V1.8-1  New data interfaces.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +121,7 @@
       INCLUDE 'SAE_PAR'          		! Standard SAE constants
       INCLUDE 'DAT_PAR'          		! Standard HDS constants
       INCLUDE 'PRM_PAR'				! Standard PRM constants
+      INCLUDE 'ADI_PAR'          		! Asterix ADI constants
       INCLUDE 'PSF_PAR'				! Asterix PSF constants
       INCLUDE 'MATH_PAR'			! Asterix MATH constants
 
@@ -140,7 +137,6 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) ALOC           	! Input ASTERIX structure
-      CHARACTER*(DAT__SZLOC) ILOC           	! Input dataset
       CHARACTER*(DAT__SZLOC) SLOC           	! SPATIAL_RESP object
       CHARACTER*40           UNITS              ! Axis units
 
@@ -164,7 +160,8 @@
       INTEGER 		     EBIN      		! Loop over energy axis
       INTEGER 		     EPTR      		! Ptr to energy bin centres
       INTEGER                I               	! Loop variable
-      INTEGER                IDIMS(DAT__MXDIM)  ! Dimensions of input file
+      INTEGER                IDIMS(ADI__MXDIM)  ! Dimensions of input file
+      INTEGER			IFID			! Input dataset id
       INTEGER                INDIM           	! Dimensionality of input file
       INTEGER                IPSF           	! PSF handle
       INTEGER                NDIM           	! Dimensionality of response
@@ -173,6 +170,7 @@
       INTEGER                PSFSIZ		! Psf size in bytes
       INTEGER 		     RBIN      		! Loop over off-axis angle
       INTEGER                RLIMIT		! Limiting psf radius
+      INTEGER			SID			! Response identifier
       INTEGER		     SI_PTR		! Spatial reponse index
       INTEGER                SNELM           	! Total no. elements in response
       INTEGER		     SP_PTR		! Full spatial reponse
@@ -189,7 +187,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 1.8-0' )
+        PARAMETER        ( VERSION = 'SPRESP Version 1.8-1' )
 *.
 
 *    Check inherited global status.
@@ -202,16 +200,10 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get dataset
-      CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, IPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
 
 *    Does ASTERIX structure exist? If not, create it
-      CALL BDA_CHKAST( ILOC, OK, STATUS )
-      IF ( .NOT. OK ) THEN
-        CALL BDA_CREAST( ILOC, STATUS )
-      END IF
-
-*    Locate ASTERIX structure
-      CALL BDA_LOCAST( ILOC, ALOC, STATUS )
+      CALL ADI1_LOCAST( IFID, .TRUE., ALOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Remove existing SPATIAL_RESP object
@@ -222,13 +214,14 @@
       END IF
 
 *    Introduce dataset to psf system
-      CALL PSF_ASSOCI( ILOC, IPSF, STATUS )
+      CALL PSF_TASSOCI( IFID, IPSF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Create spatial response structure
       CALL DAT_NEW( ALOC, SRESP, 'EXTENSION', 0, 0, STATUS )
       CALL DAT_FIND( ALOC, SRESP, SLOC, STATUS )
       CALL DAT_NEW( SLOC, 'MORE', 'EXTENSION', 0, 0, STATUS )
+      CALL ADI1_PUTLOC( SLOC, SID, STATUS )
 
 *    Write SPRESP version id
       CALL HDX_PUTC( SLOC, 'VERSION', 1, VERSION, STATUS )
@@ -257,7 +250,7 @@
 *    for the binned dataset, or an energy list for the event dataset?
 
 *    Spatial resolution required
-      CALL BDA_GETAXUNITS( ILOC, X_AX, UNITS, STATUS )
+      CALL BDI_GETAXUNITS( IFID, X_AX, UNITS, STATUS )
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
       IF ( RADIAL ) THEN
         CALL USI_PROMT( 'SRES', 'Radial sampling of psf in '/
@@ -277,17 +270,17 @@
       ELSE
 
 *      Get data dimensions
-        CALL BDA_CHKDATA( ILOC, OK, INDIM, IDIMS, STATUS )
+        CALL BDI_CHKDATA( IFID, OK, INDIM, IDIMS, STATUS )
 
 *      Map energy if defined
         IF ( E_AX .GT. 0 ) THEN
-          CALL BDA_MAPAXVAL( ILOC, 'READ', E_AX, EPTR, STATUS )
+          CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EPTR, STATUS )
         END IF
 
 *      Extract X,Y pixel sizes
-        CALL BDA_GETAXVAL( ILOC, X_AX, XBASE, XSCALE, IDIMS(X_AX),
+        CALL BDI_GETAXVAL( IFID, X_AX, XBASE, XSCALE, IDIMS(X_AX),
      :                     STATUS )
-        CALL BDA_GETAXVAL( ILOC, Y_AX, YBASE, YSCALE, IDIMS(Y_AX),
+        CALL BDI_GETAXVAL( IFID, Y_AX, YBASE, YSCALE, IDIMS(Y_AX),
      :                     STATUS )
 
 *      Psf bin widths in radians
@@ -353,29 +346,28 @@
       END IF
 
 *    Write some axes
-      CALL BDA_PUTLABEL( SLOC, 'Psf amplitude', STATUS )
-      CALL BDA_PUTUNITS( SLOC, 'Integrated probability per pixel',
+      CALL BDI_PUTLABEL( SID, 'Psf amplitude', STATUS )
+      CALL BDI_PUTUNITS( SID, 'Integrated probability per pixel',
      :                                                    STATUS )
-      CALL BDA_CREAXES( SLOC, NDIM, STATUS )
-      CALL BDA_PUTAXLABEL( SLOC, 1, 'X offset from source', STATUS )
-      CALL BDA_PUTAXUNITS( SLOC, 1, UNITS, STATUS )
-      CALL BDA_PUTAXVAL( SLOC, 1, (0.0-DX*DIMS(1))/TOR, DX/TOR,
+      CALL BDI_CREAXES( SID, NDIM, STATUS )
+      CALL BDI_PUTAXLABEL( SID, 1, 'X offset from source', STATUS )
+      CALL BDI_PUTAXUNITS( SID, 1, UNITS, STATUS )
+      CALL BDI_PUTAXVAL( SID, 1, (0.0-DX*DIMS(1))/TOR, DX/TOR,
      :                   DIMS(1), STATUS )
-      CALL BDA_PUTAXLABEL( SLOC, 2, 'Y offset from source', STATUS )
-      CALL BDA_PUTAXUNITS( SLOC, 2, UNITS, STATUS )
-      CALL BDA_PUTAXVAL( SLOC, 2, (0.0-DY*DIMS(2))/TOR, DY/TOR,
+      CALL BDI_PUTAXLABEL( SID, 2, 'Y offset from source', STATUS )
+      CALL BDI_PUTAXUNITS( SID, 2, UNITS, STATUS )
+      CALL BDI_PUTAXVAL( SID, 2, (0.0-DY*DIMS(2))/TOR, DY/TOR,
      :                   DIMS(2), STATUS )
       IF ( RADIAL ) THEN
-        CALL BDA_PUTAXLABEL( SLOC, 3, 'Off-axis angle', STATUS )
-        CALL BDA_PUTAXUNITS( SLOC, 3, 'radian', STATUS )
-        CALL BDA_PUTAXVAL( SLOC, 3, SRES*TOR/2.0, SRES*TOR,
+        CALL BDI_PUTAXTEXT( SID, 3, 'Off-axis angle', 'radian', STATUS )
+        CALL BDI_PUTAXVAL( SID, 3, SRES*TOR/2.0, SRES*TOR,
      :                     DIMS(3), STATUS )
       ELSE
-        CALL BDA_COPAXIS( ILOC, SLOC, X_AX, 3, STATUS )
-        CALL BDA_COPAXIS( ILOC, SLOC, Y_AX, 4, STATUS )
+        CALL BDI_COPAXIS( IFID, SID, X_AX, 3, STATUS )
+        CALL BDI_COPAXIS( IFID, SID, Y_AX, 4, STATUS )
       END IF
       IF ( E_AX .GT. 0 ) THEN
-        CALL BDA_COPAXIS( ILOC, SLOC, E_AX, NDIM, STATUS )
+        CALL BDI_COPAXIS( IFID, SID, E_AX, NDIM, STATUS )
       END IF
 
 *    Map space for expanded spatial response structure
@@ -493,12 +485,12 @@
       CALL HDX_PUTR( SLOC, 'DATA_ARRAY', NUSED, %VAL(SP_PTR), STATUS )
 
 *    Add a bit of history
-      CALL HIST_ADD( ILOC, VERSION, STATUS )
+      CALL HIST_ADD( IFID, VERSION, STATUS )
 
 *    Release response
-      CALL BDA_RELEASE( SLOC, STATUS )
+      CALL BDI_RELEASE( SID, STATUS )
       CALL DAT_ANNUL( SLOC, STATUS )
-      CALL BDA_RELEASE( ILOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
