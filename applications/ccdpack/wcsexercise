@@ -37,6 +37,8 @@
 #     26-APR-1999 (MBT):
 #        Changed name CCDEXERCISE -> WCSEXERCISE and removed
 #        pre-registration steps.
+#     9-JAN-2001 (MBT):
+#        Added demo of OUTLINE task.
 #     {enter_further_changes_here}
 #-
 #
@@ -404,6 +406,27 @@
             percentiles='[2,98]' \
             reset accept
 #        end display
+      endif
+
+#  Draw outlines of the data frames.
+      if ( "$device" != "NONE" ) then
+         echo " "
+         echo "  Drawing outlines of the images over the displayed mosaic."
+         echo " "
+         outline \
+            in='data-1?' \
+            noclear \
+            nopenrot \
+            style='"colour=2"' \
+            reset accept
+#        end outline
+         outline \
+            in='data-2?' \
+            noclear \
+            nopenrot \
+            style='"colour=3"' \
+            reset accept
+#        end outline
       endif
 
 #  Exercise is completed.
