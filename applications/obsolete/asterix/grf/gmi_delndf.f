@@ -101,9 +101,6 @@
       CALL ADI1_GETLOC( ID, LOC, STATUS )
       CALL GMD_DELNDF( LOC, NUM, STATUS )
 
-*  Check initialised
-      IF ( .NOT. GMI_INIT ) CALL GMI0_INIT( STATUS )
-
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_DELNDF', STATUS )
 
