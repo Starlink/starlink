@@ -1030,6 +1030,46 @@ iraf! {
 
       }
 
+      action astshiftmap {
+         helplib {$ATOOLS_HELP}
+
+          parameter shift {
+            position 2
+            type _DOUBLE
+            prompt {Values to add onto each coordinate axis}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter ncoord {
+            position 1
+            type     _INTEGER 
+            prompt   {The number of coordinates for the ShiftMap}
+            ppath    CURRENT DEFAULT
+            default  2
+            helpkey  *
+          }
+
+         parameter options {
+            position 6
+            type LITERAL
+            prompt {Options for the ShiftMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 7
+            type LITERAL
+            prompt {Name of file in which to store the ShiftMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
       action astpermaxes {
 
          helplib {$ATOOLS_HELP}

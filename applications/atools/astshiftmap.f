@@ -81,7 +81,7 @@
 
 *  Get the required parameter values.
       CALL PAR_GET0I( 'NCOORD', NCOORD, STATUS )
-      CALL PAR_EXACD( 'SHIFT', NCOORD, INA, STATUS ) 
+      CALL PAR_EXACD( 'SHIFT', NCOORD, SHIFT, STATUS ) 
 
 *  Create the required ShiftMap.
       RESULT = AST_SHIFTMAP( NCOORD, SHIFT, ' ', STATUS )
