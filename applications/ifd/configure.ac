@@ -11,7 +11,7 @@ STAR_LATEX_DOCUMENTATION(ssn68)
 
 dnl    Locate the tclsh binary.
 dnl    Do not care which version of tclsh
-AC_CHECK_PROG(TCLSH, tclsh)
+STAR_CHECK_PROGS(tclsh)
 
 AC_CONFIG_FILES([Makefile component.xml])
 
