@@ -102,9 +102,13 @@
 *        the screen and written to the output parameter POSOUT.
 *     wcstran m51 "1:00:00 -12:30" equ(B1950) pixel quiet
 *        This transforms the RA/DEC position "1:00:00 -12:30" (referred
-*        (to the J2000 equinox) into pixel co-ordinates within the NDF m51. 
+*        to the J2000 equinox) into pixel co-ordinates within the NDF m51. 
 *        The results are written to the output parameter POSOUT, but are
 *        not displayed on the screen.
+*     wcstran m51 "1:00:00 -12:30" equ(B1950) equ(j2000) quiet
+*        This is like the previous example except that the position is
+*        transformed into RA/DEC referred to the B1950 equinox, instead of
+*        pixel co-ordinates.
 
 *  Related Applications:
 *     KAPPA: LISTMAKE, LISTSHOW, WCSFRAME, NDFTRACE, WCSATTRIB
@@ -135,17 +139,16 @@
 
 *  Local Variables:
       CHARACTER TEXT*128         ! Formatted text
+      DOUBLE PRECISION GRID( NDF__MXDIM )  ! GRID Frame position
       DOUBLE PRECISION POSIN( NDF__MXDIM ) ! Input position
       DOUBLE PRECISION POSOUT( NDF__MXDIM )! Output position
       INTEGER FRMIN              ! Pointer to requested input Frame
       INTEGER FRMOUT             ! Pointer to requested output Frame
       INTEGER IAT                ! No. of characters in the TEXT variable
       INTEGER ICURR              ! Index of original NDF current Frame
-      INTEGER IIN                ! Index of requested input Frame
       INTEGER INDF               ! NDF identifier
-      INTEGER IOUT               ! Index of requested output Frame
       INTEGER IWCS               ! AST pointer for WCS FrameSet
-      INTEGER MAP                ! Pointer to simplified Mapping
+      INTEGER NGRID              ! No. of GRID axes
       INTEGER NIN                ! No. of input axes
       INTEGER NOUT               ! No. of output axes
       LOGICAL QUIET              ! Suppress screen output?
@@ -163,6 +166,9 @@
 *  Create an AST FrameSet from the WCS component of the NDF.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
+*  Get the number of Base Frame (GRID) axes.
+      NGRID = AST_GETI( IWCS, 'NIN', STATUS )
+
 *  Save the index of the current Frame.
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
@@ -172,9 +178,21 @@
       CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, 'PIXEL', 'AXIS',
      :                 .TRUE., STATUS )
 
-*  Save the index of the specified input Frame, and re-instate the
-*  original current Frame.
-      IIN = AST_GETI( IWCS, 'CURRENT', STATUS )
+*  Get a pointer to the input Frame.
+      FRMIN = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+
+*  Get the number of input axes.
+      NIN = AST_GETI( FRMIN, 'NAXES', STATUS )
+
+*  Get the input position. Do not supply a dynamic default.
+      POSIN( 1 ) = AST__BAD
+      CALL KPG1_GTPOS( 'POSIN', FRMIN, POSIN, 0.0D0, STATUS )
+
+*  Transform the position into GRID co-ordinates.
+      CALL AST_TRANN( IWCS, 1, NIN, 1, POSIN, .FALSE., NGRID, 1, GRID, 
+     :                STATUS )
+
+*  Re-instate the original current Frame.
       CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
 *  Set the current Frame to be the required output Frame specified by 
@@ -183,28 +201,14 @@
       CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, 'PIXEL', 'AXIS',
      :                 .TRUE., STATUS )
 
-*  Get the simplified Mapping from input to output Frame. The primary
-*  reason for simplifying the Mapping is because the simplification may
-*  remove intermediate co-ordinate systems in which the position is not
-*  defined on all axes, thus allowing a wider range of positions to be
-*  mapped.
-      MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IIN, AST__CURRENT, 
-     :                                    STATUS ), STATUS )
-
-*  Get the number of input and output axes.
-      NIN = AST_GETI( MAP, 'NIN', STATUS )
-      NOUT = AST_GETI( MAP, 'NOUT', STATUS )
-
-*  Get pointers to the input and output Frames.
-      FRMIN = AST_GETFRAME( IWCS, IIN, STATUS )
+*  Get a pointer to the output Frame.
       FRMOUT = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  Get the input position. Do not supply a dynamic default.
-      POSIN( 1 ) = AST__BAD
-      CALL KPG1_GTPOS( 'POSIN', FRMIN, POSIN, 0.0D0, STATUS )
+*  Get the number of output axes.
+      NOUT = AST_GETI( FRMOUT, 'NAXES', STATUS )
 
-*  Transform the position.
-      CALL AST_TRANN( MAP, 1, NIN, 1, POSIN, .TRUE., NOUT, 1, POSOUT, 
+*  Transform the GRID position into the output Frame.
+      CALL AST_TRANN( IWCS, 1, NGRID, 1, GRID, .TRUE., NOUT, 1, POSOUT, 
      :                STATUS )
 
 *  See if the results are to be displayed on the screen.

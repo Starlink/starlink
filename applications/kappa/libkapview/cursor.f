@@ -857,27 +857,6 @@
                IF( IPIX .NE. AST__NOFRAME ) THEN
                   FRM2 = AST_GETFRAME( IPLOT, IPIX, STATUS )
 
-*  If no format has already been set for the pixel axes, set them so that
-*  the displayed pixel co-ords have 1 decimal place. Loop round each
-*  pixel axis.
-                  DO I = 1, AST_GETI( FRM2, 'NAXES', STATUS )
-
-*  Form the name of the Format attribute for this axis.
-                     ATTRIB = 'FORMAT('
-                     IAT = 7
-                     CALL CHR_PUTI( I, ATTRIB, IAT )
-                     CALL CHR_APPND( ')', ATTRIB, IAT )
-
-*  If is not already set, set the Format to %8.1f (i.e. minimum field of
-*  10 characters including 1 decimal place).
-                     IF( .NOT. AST_TEST( FRM2, ATTRIB( : IAT ), 
-     :                                   STATUS ) ) THEN
-                        CALL AST_SETC( FRM2, ATTRIB( : IAT ), '%8.1f', 
-     :                                 STATUS )
-                     END IF
-
-                  END DO
-
 *  If PIXEL co-ordinates are to be displayed as well as the required
 *  co-ordinate Frame get the simplified Mapping from Base (GRAPHICS) Frame 
 *  to the PIXEL Frame.
