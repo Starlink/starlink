@@ -1,0 +1,20 @@
+
+AutoAstrometry of Mosaics
+-------------------------
+
+%%VERSION%%    0.1
+
+
+This is a quick initial release of the autoastrometry package.
+
+It does nothing much yet, except contain the moggy package (an
+interface to the SkyCat libraries).
+
+To build, give the sequence of commands
+
+    ./configure --with-cat=....
+    make
+    make test
+
+You need to have a copy of the SkyCat libraries installed, and use
+--with-cat to point to its location.

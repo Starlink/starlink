@@ -1,0 +1,36 @@
+#
+# Scrappy stub Makefile at present -- only moggy exists.
+#
+
+# %%VERSION%%
+PKG_VERS=0.1
+PKG_NAME=autoastrom
+PKG_DIR=$(PKG_NAME)-$(PKG_VERS)
+
+SOURCE_FILES=README Makefile.in
+SOURCE_DIRS=config moggy
+
+all:
+	cd moggy; $(MAKE)
+
+test:
+	cd moggy; $(MAKE) test
+
+
+# Distribution and maintenance targets
+
+astrom.tar: README
+	mkdir $(PKG_DIR)
+	for f in $(SOURCE_FILES) $(SOURCE_DIRS); do \
+		find $$f \( -type d -exec mkdir $(PKG_DIR)/{} \; \) -o -exec ln {} $(PKG_DIR)/{} \; ; \
+	done
+	tar cf $(PKG_DIR).tar $(PKG_DIR)
+	rm -Rf $(PKG_DIR)
+	ln -s $(PKG_DIR).tar $@
+
+README Makefile.in: VERSION
+	misc/propagate-version README Makefile.in
+
+configure: config/configure.in
+	autoconf config/configure.in > configure
+	chmod 755 configure
