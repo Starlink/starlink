@@ -70,8 +70,9 @@
             menu $menubutton.menu
          }
          lappend atts { grid "Draw grid" "grid=0" "grid=1" }
-         lappend atts { numlab "Label axes" "numlab=0" \
-                        "numlab=1,labelling=interior" }
+         lappend atts \
+            { numlab "Label axes" "numlab=0,majticklen=0,minticklen=0" \
+              "numlab=1,labelling=interior,majticklen=0.015,minticklen=0.007" }
          set i 0
          foreach att $atts {
             set name [ lindex $att 0 ]
