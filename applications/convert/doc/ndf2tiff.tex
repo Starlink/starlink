@@ -1,0 +1,65 @@
+\newpage
+\sstroutine{
+   NDF2TIFF
+}{
+   Converts an NDF to an 8-bit TIFF-6.0-format file.
+}{
+   \sstdescription{
+      This application converts an NDF to a Tag Image File Format (TIFF).
+      One- or two-dimensional arrays can be handled.
+
+      The routine first finds the brightest and darkest pixel values in the 
+      image.  It then uses these to determine suitable scaling factors to
+      convert the image into an 8-bit representation.  These are then output 
+      to a simple greyscale TIFF-6.0 file.
+   }
+   \sstusage{
+      ndf2tiff in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The name of the input NDF data structure (without the {\tt .sdf} 
+         extension).  The suggested default is the current NDF if one exists,
+         otherwise it is the current value.
+      }
+      \sstsubsection{
+         OUT = \_CHAR (Read)
+      }{
+         The name of the TIFF file to be generated.
+         The {\tt .tif} name extension is added to any output filename that
+         does not contain it.     
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2tiff old new
+      }{
+         This converts the NDF called old (in file {\tt old.sdf}) to the
+         TIFF file called {\tt new.tif}.
+      }
+      \sstexamplesubsection{
+         ndf2tiff in=spectre out=spectre.tif
+      }{
+         This converts the NDF called spectre (in file {\tt spectre.sdf}) 
+         to the TIFF file called {\tt spectre.tif}.
+      }
+   }
+   \sstnotes{
+      This application generates only 256 grey levels and does not use 
+      any image colour lookup table so absolute data values may be lost.
+
+      No compression is applied.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      \CONVERT: TIFF2NDF.
+   }
+   \sstimplementationstatus{
+      Bad values in the data array are replaced with zero in the output
+      TIFF file.
+   }
+}
+
