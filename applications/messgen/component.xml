@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE component SYSTEM "componentlist.dtd">
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
 
 <component id="messgen">
 <description>Starlink Facility Error Message Generation</description>
