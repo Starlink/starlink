@@ -1,8 +1,8 @@
 /apps/jdk
 Buildfile: build.xml
-
-clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/ant/build
-
-BUILD SUCCESSFUL
-Total time: 1 second
+java.lang.NoClassDefFoundError: org/apache/tools/ant/types/FilterSet
+	at org.apache.tools.ant.Project.<init>(Project.java:188)
+	at org.apache.tools.ant.Main.runBuild(Main.java:551)
+	at org.apache.tools.ant.Main.start(Main.java:196)
+	at org.apache.tools.ant.Main.main(Main.java:235)
+org/apache/tools/ant/types/FilterSet
