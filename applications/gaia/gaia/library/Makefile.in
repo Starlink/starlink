@@ -30,7 +30,7 @@ FILES        = \
  StarAstTable.tcl StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
  StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
  GaiaApPhotom.tcl GaiaOptPhotom.tcl GaiaPhotomDetails.tcl \
- GaiaPhotomExtras.tclGaiaPhotomList.tcl GaiaPhotomObject.tcl \
+ GaiaPhotomExtras.tcl GaiaPhotomList.tcl GaiaPhotomObject.tcl \
  gaia2astrom.tcl gaiaMain.tcl \
  gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
