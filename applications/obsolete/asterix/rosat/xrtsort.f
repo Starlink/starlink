@@ -2721,9 +2721,6 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
-*    Global parameters
-*     ROOTNAME  - hds events filename
-*     DIFFILE   - hds diff events filename
 *    Status :
       INTEGER STATUS
 *    Structures :
@@ -2778,7 +2775,10 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       CHARACTER*(DAT__SZLOC) LOCA(7),SLOCA(7)   ! Locators to data arrays
       INTEGER PTRA(7),NELEMS     ! Pointer to mapped arrays and item count
       INTEGER IX,UPPER,LOWER     ! number of indexes and ranges
-*
+*-
+
+      IF (STATUS.NE.SAI__OK) RETURN
+
 * Set events in hotspots counter to zero
       BADEV = 0
 *
@@ -2860,6 +2860,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      NELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
+	print *,2
 ***      Check them against the sort parameters
          CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),
      &      %val(PTRA(2)),%val(PTRA(3)), %val(PTRA(4)),
@@ -2871,6 +2872,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      SRT.QUAL_MORE, MAXBAD, NBAD, STBAD, ENBAD, XWIDTH, YWIDTH,
      &      XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
      &      BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
+	print *,22
+
 
 ***      unmap the arrays & memory
          CALL RAT_UNMAPEVE(SLOCA, STATUS)
@@ -3154,6 +3157,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
         BCPHI = BSRT.COSPHI
         BSPHI = BSRT.SINPHI
       ENDIF
+	print *,3
 
 ***   Loop over each element in arrays
       DO IX = 1,NELEMS
@@ -3207,6 +3211,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
             ENDIF
           ENDIF
+	print *,4
 
 *  Check if each event is within the selected time range
           OK = .FALSE.
@@ -3216,6 +3221,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &                                                .GE. TEV)
             TLP=TLP+1
           ENDDO
+	print *,5
 
 *  If quality limits have been made more strict then check quality
           IF (QCHECK) THEN
@@ -3229,6 +3235,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             ENDDO
 
           ENDIF
+	print *,6
 
 *  if timing Ok then check event falls within various other limits
           IF (OK) THEN
@@ -3239,6 +3246,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      :           (SRT.MIN_YD .LE.YDEV .AND.SRT.MAX_YD .GE.YDEV)
 *
           ENDIF
+	print *,7
 
 *  if event has survived this far check spatial selection
           IF (OK) THEN
@@ -3293,6 +3301,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             ENDIF
 
           ENDIF
+	print *,8
 
           IF (SOK) THEN
 
@@ -3350,6 +3359,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 *
+	print *,9
 
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
@@ -3392,6 +3402,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
       ENDDO
 *
+	print *,10
 999   CONTINUE
 *
       SRT.MIN_Y = SAVE_YMIN
