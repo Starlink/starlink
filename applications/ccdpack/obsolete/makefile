@@ -1089,6 +1089,7 @@ $(HELPTASK).tar:
 
 $(DOCUMENTATION):
 	co $(LATEX_DOCS) $(PKG_NAME).news
+	chmod 644 $(LATEX_DOCS) $(PKG_NAME).news
 	cp $(CCDPACK_HOME)/documents/$(HYPERTEXT_DOCS:.htx=.htx_tar.gz) ./
 	cp $(CCDPACK_HOME)/documents/$(HYPERTEXT_HELP:.htx=.htx_tar.gz) ./
 	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar.gz)
