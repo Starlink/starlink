@@ -59,6 +59,8 @@
           CALL IPOSIT_SHOW(STATUS)
         ELSEIF (MODE.EQ.'SAV') THEN
           CALL IPOSIT_SAVE(STATUS)
+        ELSEIF (MODE.EQ.'CLE') THEN
+          CALL IPOSIT_CLE(STATUS)
         ENDIF
 
 
@@ -642,6 +644,40 @@
         ENDDO
 
         CALL FIO_CLOSE(FID,STATUS)
+
+      ENDIF
+
+      END
+
+
+
+*+  IPOSIT_CLEAR
+      SUBROUTINE IPOSIT_CLEAR(STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local Constants :
+*    Local variables :
+*    Global Variables :
+      INCLUDE 'IMG_CMN'
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (I_NPOS.GT.0) THEN
+          CALL GRP_SETSZ(I_POS_ID,0,STATUS)
+          I_NPOS=0
+        ENDIF
 
       ENDIF
 
