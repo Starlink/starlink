@@ -100,6 +100,7 @@
       EXTERNAL			HSI1_NEW
       EXTERNAL			HSI1_OK
       EXTERNAL			HSI1_PTXT
+      EXTERNAL			HSI1_PUTCTR
 
       EXTERNAL			ADI_DEFMTH
       EXTERNAL			ADI_REQPKG
@@ -121,11 +122,13 @@
         CALL ADI_DEFMTH( 'CopyHistory(HDSfile,HDSfile)', HSI1_COPY,
      :                   DID, STATUS )
 
-*    Data extractors
+*    Data extractors & modifiers
         CALL ADI_DEFMTH( 'GetHistoryCtrl(HDSfile)', HSI1_GETCTR,
      :                   DID, STATUS )
         CALL ADI_DEFMTH( 'GetHistoryRec(HDSfile,INTEGER)', HSI1_GETREC,
      :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'PutHistoryCtrl(HDSfile,HistoryControl)',
+     :                   HSI1_PUTCTR, DID, STATUS )
 
 *    Checkers
         CALL ADI_DEFMTH( 'ChkHistory(HDSfile)', HSI1_OK,
