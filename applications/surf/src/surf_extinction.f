@@ -337,13 +337,14 @@
       CHARACTER*15     SUB_REQUIRED     ! sub-instrument required for reduction
                                         ! wavelengths of observation
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
+      REAL             TAUZ             ! Tau read from FITS header
       INTEGER          UBND (MAXDIM)    ! upper bounds of array
       DOUBLE PRECISION UT1              ! UT1 of start of observation expressed
                                         ! as modified Julian day
       REAL             WAVE             ! Wavelength of sub inst
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_ext_','x'/
+      DATA SUFFIX_STRINGS /'!ext','x','ext'/
 
 *.
 
@@ -739,13 +740,34 @@
          END IF
       END IF
 
-*  get the sky opacities at times bracketing the observation
-*  Use a default of 0 for FIRST_TAU and FIRST_LST but use
-*  a dynamic default of FIRST_* for SECOND_*
+*     Read the tau value from the FITS header
+      STEMP = 'TAUZ_'
+      ITEMP = 5
+      CALL CHR_PUTI(SUB_POINTER ,STEMP, ITEMP)
 
+*     Make sure the entry is present in the FITS
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_R(SCUBA__MAX_FITS, N_FITS, FITS,
+     :        STEMP, TAUZ, STATUS)
+
+         IF (STATUS .NE. SAI__OK) THEN
+            TAUZ = 0.0
+            CALL ERR_ANNUL(STATUS)
+         END IF
+      END IF
+
+*     get the sky opacities at times bracketing the observation
+
+*     Use a default of 0 for FIRST_LST but use
+*     the tau as stored in the FITS header as the default FIRST_TAU
+
+      CALL PAR_DEF0R('FIRST_TAU', TAUZ, STATUS)
+
+*     Get the values
       CALL PAR_GET0R ('FIRST_TAU', FIRST_TAU, STATUS)
       CALL PAR_GET0C ('FIRST_LST', FIRST_LST, STATUS)
 
+*     Use a dynamic default of FIRST_* for SECOND_*
 *     Set up defaults
       CALL PAR_DEF0R('SECOND_TAU', FIRST_TAU, STATUS)
       CALL PAR_DEF0C('SECOND_LST', FIRST_LST, STATUS)
@@ -801,17 +823,56 @@
 
       CALL NDF_SECT(INDF, NDIM, LBND, UBND, SECNDF, STATUS)
 
+*     For extinction we have the special case that we would like
+*     to include a reference to the sub-instrument in the output
+*     name. In order to prevent the sub-instrument from being chopped
+*     if we are using the 'LONG' scuba_suffix option, the sub-inst
+*     code has to be prepended before the suffix.
+*     This means that we have to prepend to all suffices since we can't
+*     know which one the user has chosen (without reading the environment
+*     variable value in two places which is a pain).
+
+*     Loop through all suffices
+
+      DO I = 1, SCUBA__N_SUFFIX
+
+*     For convenience I shall add the first 3 letters of the sub_instrument
+*     This is the smallest unique name. Other options are wavelength (since
+*     this is really unique) or just a single number to id the sub.
+*     The 3 character option is probably okay since it is only possible 
+*     to use one wavelength for each sub-instrument so this format will
+*     be unique for any given observation.
+*     Only problem is that the SHORT form of the default name probably 
+*     should not include a long description of the sub-instrument.
+*     Probably should use a single id for this case. Need to think
+*     about this.
+
+         STEMP = '_' // SUB_REQUIRED(1:3) // '_'
+
+*     Lower case it (since this is a unix filename)
+         CALL CHR_LCASE(STEMP)
+
+*     Check for the special character of a '!' since this will indicate
+*     a chop
+*     If we have one then we have to keep it at the start of the string
+
+         IF (SUFFIX_STRINGS(I)(1:1) .EQ. '!') THEN
+            CALL CHR_PREFX(STEMP(1:CHR_LEN(STEMP)), 
+     :           SUFFIX_STRINGS(I)(2:), ITEMP)
+         ELSE
+            CALL CHR_PREFX(STEMP(1:CHR_LEN(STEMP)), 
+     :           SUFFIX_STRINGS(I), ITEMP)
+         END IF
+
+
+
+
+      END DO
+
+
 *     Generate a default name for the output file
       CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
      :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
-
-*     For extinction we need to append something to identify
-*     the sub-instrument. For now I will just append the wavelength
-
-      CALL CHR_RTOC(WAVE, STEMP, ITEMP)
-
-      ITEMP = CHR_LEN(OUTFILE)
-      CALL CHR_APPND(STEMP, OUTFILE, ITEMP)
 
 *     set the default
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
