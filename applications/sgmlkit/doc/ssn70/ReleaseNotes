@@ -24,6 +24,7 @@ is in the correct format.  Jade still gives a warning in this case
 (which it's not easy to turn off), but it doesn't invalidate the
 document.
 
+<!--
 <li>There was a minor conflict in the list of hyperlinking
 requirements.  I implemented the requirements that the `top' file in
 the <code/.htx/ directory be <code/index.html/ and that the filenames
@@ -34,6 +35,7 @@ to be called <code/sunxxx.html/.  So now the top file is still called
 <code/hlink/, <code/showme/ and <code/findme/ work fine, now that the
 <code/sgml2docs/ script normalises the Jade output in a
 post-processing step.
+-->
 
 <li>The SGML declaration was changed in such a way that IDs within the
 document are now case-sensitive.  This could not be done without
@@ -42,6 +44,9 @@ This required substantial reorganisation.  As well as forcing the
 whole system to be a little tighter (no bad thing), this helps pave
 the way for an eventual XML version of the DTD (XML has a fixed
 declaration which makes documents case-sensitive).
+
+<li>The &latex; down-converter now supports the most important of the
+Oasis Table attributes.  The HTML down-converter should follow soon.
 
 </ul>
 
@@ -59,7 +64,7 @@ declaration which makes documents case-sensitive).
 <dd><code/dvi2bitmap/ incorporated into package.
 
 <dt>Makefile to support all standard targets.
-<dd>??
+<dd>Done
 
 <dt>Do not produce document summaries when sgmlstar is installed.
 <dd>Done.
@@ -90,7 +95,7 @@ The document name should not be included in the HTML file names;
 The top level HTML file should be <code/index.html/;
 Need shorter names for html files;
 There should be no links within the <code/.htx/ directory.
-<dd>All done.  See notes above.
+<dd>All done.
 
 <dt>Need a fix for line breaks within tags in <code/htx/ index file;
 Findme, showme and hlink should all work.
@@ -129,32 +134,34 @@ added a note that the public identifier can be unresolved without error.
 <dd>Done at meeting.
 
 <dt>Table of contents: move it to the front.
-<dd>??
+<dd>Done.  Settable through <code/--options/ flag to <code/sgml2docs/.
 
 <dt>Look-and-feel: reproduce original &latex; appearance.
-<dd>??
+<dd>Page size fixed.
 
 <dt>Down-converter should have two flags (defaulting to yes) to indicate
      if each appendix or section should start on a new page.
-<dd>??
+<dd>Done.  Settable through <code/--options/ flag to <code/sgml2docs/.
 
 <dt>Tables: implement alignment, rules, colspan.
-<dd>??
+<dd>Done.  Implementation is not complete, but has most of &latex;
+functionality.
 
 <dt>Authors should manually replace tabbing environments within &latex;
 documents before running the up-converter. The up-converter should 
 issue a warning if it finds a tabbing environment.
-<dd>??
+<dd>No action needed.
 
 <dt>Optional inclusion of section headings in table of contents will not
 be supported.
 <dd>No action needed.
 
 <dt>Need increased sloppiness in line wrapping.
-<dd>??
+<dd>I haven't addressed this here, since it's only RH 6.0 which is
+affected by a distribution bug, and RH 6.1 is already available.
 
 <dt>Verbatim text (displayed only) needs to be a bit smaller.
-<dd>??
+<dd>Done.
 
 </dl>
 
