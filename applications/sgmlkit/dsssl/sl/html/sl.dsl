@@ -109,6 +109,8 @@ transformation extensions of Jade.</description>
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
 (define debug
   (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
+(define all-element-number
+  (external-procedure "UNREGISTERED::James Clark//Procedure::all-element-number"))
 
 (define %stylesheet-version%
   "Starlink HTML Stylesheet version 0.1")
