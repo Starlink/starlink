@@ -21,6 +21,8 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+AC_C_BIGENDIAN
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
