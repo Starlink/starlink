@@ -32,6 +32,8 @@
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     25/6/97( ACD ): 
@@ -41,6 +43,9 @@
 *     17-FEB-2003 (DSB):
 *        Re-written to derived the AXIS values from the WCS component of
 *        the NDF cube.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 
 *-
 
@@ -50,6 +55,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants
       INCLUDE 'AST_PAR'           ! AST constants and functions
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IMAP
@@ -185,7 +191,8 @@
             DO J = L, L + DIM( 3 ) - 1
                WORK( J ) = WORK( J ) - CPOS( 3 )
             END DO
-            CALL VEC_DTOD( .FALSE., NEL, WORK( L ), %VAL( IPAXIS ), 
+            CALL VEC_DTOD( .FALSE., NEL, WORK( L ), 
+     :                     %VAL( CNF_PVAL( IPAXIS ) ),
      :                     IERR, NERR, STATUS )
 
 *  For RA and DEC axes, find the arc-distance from the source position at
@@ -210,7 +217,8 @@
             END DO
 
 *  Copy these to the AXIS centre array.
-            CALL VEC_DTOD( .FALSE., NEL, WORK, %VAL( IPAXIS ), IERR, 
+            CALL VEC_DTOD( .FALSE., NEL, WORK, 
+     :                     %VAL( CNF_PVAL( IPAXIS ) ), IERR,
      :                     NERR, STATUS )
          END IF
 

@@ -69,6 +69,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +78,8 @@
 *     1996 September 16 (MJC):
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -90,6 +93,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'             ! Standard SAE constants
       INCLUDE 'NDF_PAR'             ! NDF_ public constants
+      INCLUDE 'CNF_PAR'             ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER   NDF                 ! NDF identifier
@@ -288,7 +292,8 @@
                CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL CON_AXLID( NELM, %VAL( APNTR( I ) ), DSTART,
+               CALL CON_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                         DSTART,
      :                         DEND, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
@@ -300,7 +305,8 @@
                CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL CON_AXLIR( NELM, %VAL( APNTR( I ) ), START,
+               CALL CON_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                         START,
      :                         END, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN

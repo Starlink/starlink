@@ -62,9 +62,18 @@
 *     Unmap the input map grid.
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+*
 *  History:
-*     25/6/97 (ACD): Original version.
-*     28/8/97 (ACD): First stable version.
+*     25/6/97 (ACD):
+*        Original version.
+*     28/8/97 (ACD):
+*        First stable version.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
+*
 *  Bugs:
 *     None known
 *-
@@ -73,6 +82,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'
 *  Arguments Given:
       LOGICAL
      :  GRIDFG
@@ -127,8 +137,10 @@
          IF (STATUS .EQ. SAI__OK  .AND.  GRIDFG) THEN
             CALL NDF_XGT0C (MAPID, 'SPECX_MAP', 'ID', TITLE, STATUS)
 
-            CALL CON_WGRID ( %VAL(IPBUF), GRIDFL, TITLE, MAPX, MAPY, 
-     :                       %VAL(MAPPTR), STATUS, %VAL( BUFLEN ) )
+            CALL CON_WGRID ( %VAL(CNF_PVAL(IPBUF)), 
+     :                       GRIDFL, TITLE, MAPX, MAPY,
+     :                       %VAL(CNF_PVAL(MAPPTR)), STATUS, 
+     :                       %VAL( BUFLEN ) )
 
             IF (STATUS .NE. SAI__OK) THEN
                CALL ERR_FLUSH (STATUS)
@@ -163,8 +175,9 @@
 *
 *             Attempt to copy the cube.
 
-               CALL CON_SPCPY (MAPX, MAPY, %VAL(MAPPTR), NSPEC, SPTS,
-     :           %VAL(SPPTR), %VAL(CUBPTR), STATUS)
+               CALL CON_SPCPY (MAPX, MAPY, %VAL(CNF_PVAL(MAPPTR)), 
+     :                         NSPEC, SPTS,
+     :           %VAL(CNF_PVAL(SPPTR)), %VAL(CNF_PVAL(CUBPTR)), STATUS)
 
 *
 *             Unmap the cube.

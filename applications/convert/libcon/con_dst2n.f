@@ -120,6 +120,7 @@
 *  Authors: 
 *     JM: Jo Murray (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
      
 *  History:
@@ -206,6 +207,8 @@
 *        that ING hierarchical keywords may be written when the DST's
 *        FITS structure contains non-standard structures.  Modified the
 *        count of the FITS extension's size accordingly.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -220,6 +223,7 @@
       INCLUDE 'SAE_PAR'          ! ADAM symbolic constants.
       INCLUDE 'DTACODES'         ! Data structure error codes
       INCLUDE 'DYNAMIC_MEMORY'   ! Dynamic memory support (defines %VAL)
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       character FIGFIL * ( * )   ! Name of input file
@@ -830,8 +834,10 @@
                      
 *                  The errors in INPUT.Z.ERRORS are standard deviations.
 *                  Therefore square the values within OUTPUT.VARIANCE.
-                     CALL VEC_MULR( .TRUE., NDATA, %VAL( IPTR ), 
-     :                              %VAL( IPTR ), %VAL( IPTR ), IERR, 
+                     CALL VEC_MULR( .TRUE., NDATA, 
+     :                              %VAL( CNF_PVAL( IPTR ) ),
+     :                              %VAL( CNF_PVAL( IPTR ) ), 
+     :                              %VAL( CNF_PVAL( IPTR ) ), IERR,
      :                              NERR, STATUS )
 
 *                  Unmap the variance array.
@@ -930,8 +936,10 @@
 
 *                     Copy the quality.
                         NBYTES = NDATA
-                        CALL CON_MOVE( NBYTES, %VAL( INQPTR ), 
-     :                                 %VAL( OTQPTR ), STATUS )
+                        CALL CON_MOVE( NBYTES, 
+     :                                 %VAL( CNF_PVAL( INQPTR ) ),
+     :                                 %VAL( CNF_PVAL( OTQPTR ) ), 
+     :                                 STATUS )
 
 *                     Unmap the quality arrays.
                         CALL DTA_FRVAR( LEVEL2, DSTAT )
@@ -1237,8 +1245,10 @@
 
 *                        Axis error arrays are converted from standard
 *                        deviations to variance in situ.
-                           CALL VEC_MULR( .TRUE., NDATA, %VAL( IPTR ), 
-     :                                    %VAL( IPTR ), %VAL( IPTR ),
+                           CALL VEC_MULR( .TRUE., NDATA, 
+     :                                    %VAL( CNF_PVAL( IPTR ) ),
+     :                                    %VAL( CNF_PVAL( IPTR ) ), 
+     :                                    %VAL( CNF_PVAL( IPTR ) ),
      :                                    IERR, NERR, STATUS)
 
 *                        Unmap the axis variance.
@@ -1344,10 +1354,12 @@
 *                       Fill array with the constant.
                            IF ( TYPE .EQ. 'FLOAT' ) THEN
                               CALL CON_FILL( DIMS( IAXIS ), WIDTH, 0.0,
-     :                                       %VAL( IPTR ), STATUS )
+     :                                       %VAL( CNF_PVAL( IPTR ) ), 
+     :                                       STATUS )
                            ELSE
                               CALL CON_FILLD( DIMS( IAXIS ), DWIDTH,
-     :                                        0.0D0, %VAL( IPTR ),
+     :                                        0.0D0, 
+     :                                        %VAL( CNF_PVAL( IPTR ) ),
      :                                        STATUS )
                            END IF
 
@@ -1698,7 +1710,7 @@
                START = 0.5
                INCREM = 1.0
                CALL CON_FILL( DIMS( IAXIS ), START, INCREM,
-     :                        %VAL( IPTR ), STATUS )
+     :                        %VAL( CNF_PVAL( IPTR ) ), STATUS )
 
 *            Unmap the data array.
                CALL DTA_FRVAR( AXOUTD, DSTAT )

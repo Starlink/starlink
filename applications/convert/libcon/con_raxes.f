@@ -21,9 +21,17 @@
 *     Generate each of the three axis components in turn.
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+*
 *  History:
-*     14/7/97 (ACD): Original version.
-*     3/9/97  (ACD): First stable version.
+*     14/7/97 (ACD):
+*       Original version.
+*     3/9/97  (ACD):
+*       First stable version.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 *  Bugs:
 *     None known
 *-
@@ -32,6 +40,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard Starlink constants.
       INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'
 *  Arguments Given:
       CHARACTER
      :  RLOC*(*)
@@ -78,7 +87,8 @@
          CALL DAT_FIND (ARLOC, 'BASE', EZPLOC, STATUS)
          CALL DAT_GET0R (EZPLOC, EZEROP, STATUS)
 
-         CALL CON_LAXIS (EZEROP, ESCALE, NAXIS(1), %VAL(AXPTR(1)),
+         CALL CON_LAXIS (EZEROP, ESCALE, NAXIS(1), 
+     :                   %VAL(CNF_PVAL(AXPTR(1))),
      :     STATUS)
          CALL NDF_AUNMP (CUBID, 'CENTRE', 1, STATUS)
 
@@ -108,7 +118,8 @@
 
          SCALE = SCALE * 6.0E1
 
-         CALL CON_SAXIS (SCALE, NAXIS(2), %VAL(AXPTR(2)), STATUS)
+         CALL CON_SAXIS (SCALE, NAXIS(2), %VAL(CNF_PVAL(AXPTR(2))), 
+     :                   STATUS)
 
          CALL NDF_AUNMP (CUBID, 'CENTRE', 2, STATUS)
          CALL NDF_ACPUT ('X offset', CUBID, 'LABEL', 2,
@@ -133,7 +144,8 @@
 
          SCALE = SCALE * 6.0E1
 
-         CALL CON_SAXIS (SCALE, NAXIS(3), %VAL(AXPTR(3)), STATUS)
+         CALL CON_SAXIS (SCALE, NAXIS(3), %VAL(CNF_PVAL(AXPTR(3))), 
+     :                   STATUS)
 
          CALL NDF_AUNMP (CUBID, 'CENTRE', 3, STATUS)
          CALL NDF_ACPUT ('Y offset', CUBID, 'LABEL', 3,

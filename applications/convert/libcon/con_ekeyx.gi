@@ -67,11 +67,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 March 16 (MJC):
 *        Original version.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,6 +88,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'DAT_PAR'          ! DAT__ global definitions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -130,7 +134,8 @@
 
 *  Obtain the value and comment.
          SCARD = 1
-         CALL CON_GKEY<T>( EL, %VAL( PNTR( 1 ) ), SCARD, NAME, NOCCUR,
+         CALL CON_GKEY<T>( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                     SCARD, NAME, NOCCUR,
      :                     THERE, VALUE, COMENT, CARD, STATUS,
      :                     %VAL( LENGTH ) )
 

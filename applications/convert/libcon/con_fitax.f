@@ -48,6 +48,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,6 +67,8 @@
 *        CUNITn and axis units.
 *     2001 August 30 (AJC):
 *        Correct CON_GKEYD arguments
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,6 +83,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NCARD
@@ -216,7 +220,8 @@
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL CON_SSAZR( EL, DELT, OFFSET,
-     :                            %VAL( PNTR( 1 ) ), STATUS )
+     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            STATUS )
                
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
@@ -235,7 +240,8 @@
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL CON_SSAZD( EL, DELT, OFFSET,
-     :                            %VAL( PNTR( 1 ) ), STATUS )
+     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                            STATUS )
 
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
