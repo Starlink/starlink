@@ -324,9 +324,6 @@ class Ccdtop {
 #-----------------------------------------------------------------------
          if { [ incr waitlevel ] == 1 } {
             set waitwin [ waiter $itk_interior.waiter -text $msg ]
-            set normalcursor [ $itk_interior cget -cursor ]
-            $itk_interior configure -cursor watch
-            $waitwin configure -cursor $normalcursor
          }
       }
 
@@ -336,7 +333,6 @@ class Ccdtop {
 #-----------------------------------------------------------------------
          if { [ incr waitlevel -1 ] == 0 } {
             destroy $waitwin
-            $itk_interior configure -cursor $normalcursor
          }
       }
 
@@ -453,7 +449,6 @@ class Ccdtop {
       private variable controls        ;# List of control widgets in panel
       private variable groups          ;# List of control groups in panel
       private variable ngroup 0        ;# Number of control groups in panel
-      private variable normalcursor    ;# Non-waiting cursor of window
       private variable waitlevel 0     ;# Number of active waitpush calls
       private variable waitwin         ;# Name of the waiter window
       private variable watchlevel 0    ;# Call stack level of calling code
