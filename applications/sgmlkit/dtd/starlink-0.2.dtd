@@ -653,11 +653,7 @@
 <!entity % simplephrase	"em | strong | quote | code | kbd | cite">
 <!entity % references	"ref | docxref | webref | url">
 <!entity % special	"index | note | draftnote | citation">
-<!--
 <!entity % structuring	"blockquote | table | figure | dl | ul | ol">
--->
-<!entity % structuring	"blockquote | figure | dl | ul | ol">
-
 <!entity % phrase	"%simplephrase | %references">
 <!--
   I think this is too general a definition for simpletext:
@@ -1065,102 +1061,22 @@
 <!element (OL|UL) - - (%oul.model)>
 <!element LI - o (p)+>
 
-
-<![ ignore [
-<!-- Ignore the TABLE and FIGURE stuff for the moment -->
-<!--========== Tables ==========-->
 <!-- 
-  This is basically the Wilbur tables DTD, with some extensions
-  from the HTML 3 DTD <http://www.w3.org/pub/WWW/TR/WD-tables.html>
-  and some deletions.  It adds the COL element
-  and removes ROWSPAN (because it's murder to implement!).
+  Use the OASIS Exchange Table Model subset of the CALS table model.
+  See http://www.oasis-open.org/html/a503.htm for discussion, and
+  http://www.oasis-open.org/html/publtext.htm for public texts.
 
-  Not all the attributes in here are interpreted by the down-converters.
+  The Exchange Table Model can be customised.  Replace the optional
+  TITLE element with a required CAPTION, and add an ID attribute to
+  the TABLE.
 -->
+<!entity % titles 'caption'>
+<!entity % tbl.table.att 
+	'pgwide number	#implied
+	 id	id	#implied'>
+<!entity % calstbls public "-//OASIS//DTD Exchange Table Model 19960430//EN">
+%calstbls;
 
-<!entity % cell.halign
-        "halign  (left|center|right) #IMPLIED"
-	-- horizontal alignment attributes for cell contents --
-        >
-
-<!entity % cell.valign
-        "valign  (top|middle|bottom|baseline)  #IMPLIED"
-	-- vertical alignment attributes for cell contents --
-        >
-
-<!entity % table.model 
-	'%update caption?, (colgroup*,col*), thead?, tfoot?, tbody+'>
-<!element TABLE - - (%table.model)>
-
-<!element CAPTION - - %simpletext	-- table or figure caption -->
-
-<!element COLGROUP - O (col*)>
-<!element COL - o empty>
-
-<!element (THEAD|TFOOT) - O (tr+)	-- table header and footer -->
-<!element TBODY O O (tr+)		-- repeatable table body -->
-
-<!element TR - O (th | td)+>
-<!element (TH|TD) - O %simpletext>
-
-<!attlist table				-- table element --
-	id	id	#implied
-	wide	(wide | narrow) narrow	-- formatting hint --
-        frame   (void | border) #implied
-					-- what edges to draw --
-        rules   (none | groups | rows | cols | all) #implied
-					-- rules between entries --
-        float	(float | nofloat) nofloat -- should it be allowed to float? --
-        >
-
-<!attlist tr 				-- table row --
-        %cell.halign;			-- horizontal alignment in cells --
-        %cell.valign;			-- vertical alignment in cells --
-        >
-
-<!attlist (th|td)			-- header or data cell --
-        nowrap	(nowrap)  #IMPLIED	-- suppress word wrap --
-        colspan	NUMBER   1		-- number of cols spanned by cell --
-        %cell.halign;			-- horizontal alignment in cells --
-        %cell.valign;			-- vertical alignment in cells --
-        width	cdata	#implied	-- width specification --
-        >
-
-<!attlist col
-        width	cdata	#implied	-- width specification --
-        %cell.halign;			-- horizontal alignment in cells --
-        %cell.valign;			-- vertical alignment in cells --
-        >
-
-
-<!--========== Figures ==========-->
-<!entity % figure.model '%update caption?, (figuresrc+ | figurecontent)'>
-<!element FIGURE - - (%figure.model)>
-<!element FIGURESRC - o empty>
-<!element FIGURECONTENT - - (px)+>
-
-<!--
-  The figure element has one or more figuresrc elements within it,
-  each of which has a URL and a MIME type associated with it.  The
-  down-converter should pick a source based on the MIME types it
-  can deal with, or else use the alt attribute for the figure. 
-
-  Alternatively, figurecontent is arbitrary text which is to be taken
-  as the figure's content.
--->
-<!attlist figure
-	id	id		#implied
-        alt     cdata    	#required   
-		-- for (HTML) display in place of image --
-	wide	(wide|narrow)	narrow	-- formatting hint --
-        float    (float|nofloat) nofloat -- should it be allowed to float? --
-        >
-
-<!attlist figuresrc
-	src	cdata		#required
-	mime	cdata		#required
-	>
-]]>
 
 <!--
   The FIGURECONTENT element will either contain text of some sort (perhaps
@@ -1169,11 +1085,10 @@
   The down-converter should scan this list, and incorporate that image format
   which is most suitable.
 -->
-<!entity % figure.model '%update caption?, figurecontent'>
+<!entity % figure.model '%update caption, figurecontent'>
 <!entity % figurecontent.model 'px+'>
 <!element FIGURE - - (%figure.model)>
 <!element FIGURECONTENT - o (%figurecontent.model)>
-<!element CAPTION - o (px+)>
 <!attlist FIGURE
 	float		-- may it be unanchored from its position? --
 		(float|nofloat)
@@ -1190,3 +1105,6 @@
 		cdata
 		#required
 	>
+
+<!-- CAPTION element is common to table and figure -->
+<!element CAPTION - o (px+)>
