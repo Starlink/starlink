@@ -69,6 +69,17 @@ These are the document element types.
 					     (literal "; "))))
 			  (literal "With: ")))))
 
+(element manualtype
+   (case (normalize (attribute-string (normalize "type")))
+      (("users") (literal "User's Guide"))
+      (("programmers") (literal "Programmer's Guide"))
+      (("programmers.c") (literal "Programmer's Guide (C version)"))
+      (("programmers.fortran") (literal "Programmer's Guide (Fortran version)"))
+      (else (process-children))))
+
+(element softwareversion
+   (process-children))
+
 (mode make-html-author-links
   (element author
     (let ((email (attribute-string "email")))
@@ -107,118 +118,80 @@ Flow-object constructors for the document body
 information from the docinfo element, then doing <funcname/process-children/
 to format the document content.
 
-<p>Need to have a think about exactly what dates and release information
-are shown at the top of the document.
+<p>The title page is currently configured (pending a re-design) to look
+more-or-less as much like the existing star2html output as possible.
 
 <codebody>
 (element docbody
-  (let* ((tsosofo (process-node-list (getdocinfo 'title)))
-	 (authors (children (getdocinfo 'authorlist)))
-	 (rel (document-release-info))
-	 (vers (car (cdr (cdr (cdr rel)))))
-	 (reldate (if (car (cdr rel))
-		      (format-date (car (cdr rel)))
-		      "not released"))
-	 (docref (getdocnumber))
-	 (copyright (getdocinfo 'copyright))
-	 (coverimage (getdocinfo 'coverimage))
-	 )
-    (make sequence
-      ;; need something to hook the xref label on,
-      ;; and it can't be the table, since that contains A elements
-      ;; Improve this sometime!
-      (make element gi: "a" attributes: '(("name" "xref_"))
-	    (literal "."))
-      (make element gi: "table"
-	    attributes: '(("width" "100%"))
-	    (make sequence
-	      (make element gi: "tr"
-		    (make element gi: "td"
-			  attributes: (list (list "colspan" "2")
-					    (list "align" "center"))
-			  (make element gi: "h1"
-				tsosofo)))
-	      (if docref
-		  (make element gi: "tr"
-			(make sequence
-			  (make element gi: "td"
-				attributes: (list (list "align"	"right")
-						  (list "width" "50%"))
-				(make element gi: "em"
-				      (literal "Document")))
-			  ;; (make element gi: "td"
-			  ;; (literal docref))
-			  (make element gi: "td"
-				(make sequence
-				  (literal docref)
-				  (literal (if vers
-				      (string-append "." vers)
-				      ""))))
-			  ))
-		  (empty-sosofo))
-	      (make element gi: "tr"
-		    (make sequence
-		      (make element gi: "td"
-			    attributes: '(("align" "right"))
-			    (make element gi: "em"
-				      (literal "Author")))
-		      (make element gi: "td"
-			    (node-list-reduce
-			     authors
-			     (lambda (result a)
-			       (sosofo-append
-				result
-				(make sequence
-				  (process-node-list a)
-				  (make empty-element gi: "br"))))
-			     (empty-sosofo)))))
-	      (make element gi: "tr"
-		    (make sequence
-		      (make element gi: "td"
-			    attributes: '(("align" "right"))
-			    (make element gi: "em"
-				      (literal "Release date")))
-		      (make element gi: "td"
-			      (literal reldate))))
-	      (if (and %starlink-banner% (not suppress-banner))
-		  (make element gi: "tr"
-			(make element gi: "td"
-			      attributes: (list (list "align" "center")
-						(list "colspan" "2"))
-			      (make element gi: "small"
-				    %starlink-banner%)))
-		  (empty-sosofo))))
-      (if coverimage
-	  (make element gi: "table"
-		attributes: '(("width" "100%")
-			      ("border" "1"))
-		(make element gi: "tr"
-		      (make element gi: "td"
-			    attributes: '(("align" "center"))
-			    (process-node-list coverimage))))
-	  (empty-sosofo))
-      (process-children)
-      (if copyright
-	  (process-node-list copyright)
-	  (make element gi: "p"
-		(literal %copyright-string%)))
-      (if (and %link-extension-list% (not suppress-printable))
-	  (make element gi: "p"
-		(literal "Printable version")
-		(apply sosofo-append
-		       (map (lambda (l)
-			      (make sequence
-				(literal " : ")
-				(make element gi: "a"
-				      attributes: (list (list "href"
-							      (string-append
-							       (root-file-name)
-							       "." (car l)))
-							(list "title"
-							      (cdr l)))
-				      (literal (cdr l)))))
-			    %link-extension-list%)))
-	  (empty-sosofo))
-      (process-backmatter))))
+   (let* ((title (getdocinfo 'title))
+          (authors (children (getdocinfo 'authorlist)))
+          (rel (document-release-info))
+          (vers (caddr rel))
+          (reldate (if (car rel)
+                       (format-date (car rel))
+                       "not released"))
+          (dotvers (if vers (string-append "." vers) ""))
+          (docwordref 
+             (string-append (getdocnumber (current-node) 'asString) dotvers))
+          (docref (string-append (index-file-name) dotvers))
+          (manualtype (getdocinfo 'manualtype))
+          (softwareversion (getdocinfo 'softwareversion))
+          (copyright (getdocinfo 'copyright))
+          (coverimage (getdocinfo 'coverimage))
+         )
+      (make sequence
+         (make element gi: "h1"  attributes: '(("align" "center"))
+            (make element gi: "a" attributes: '(("name" "xref_"))
+               (process-node-list title)))
+         (if softwareversion
+             (make element gi: "h2" attributes: '(("align" "center"))
+                (process-node-list softwareversion))
+             (empty-sosofo))
+         (if manualtype
+             (make element gi: "h2" attributes: '(("align" "center"))
+                (process-node-list manualtype))
+             (empty-sosofo))
+         (if coverimage
+             (make element gi: "p" attributes: '(("align" "center"))
+                (process-node-list coverimage)) 
+             (empty-sosofo))
+         (make empty-element gi: "hr")
+         (make element gi: "p"
+             (make element gi: "i"
+                (if docwordref 
+                    (make sequence 
+                       (literal docwordref) 
+                       (make empty-element gi: "br")) 
+                    (empty-sosofo))
+                (let loop ((to (empty-sosofo))
+                           (from authors))
+                   (if (node-list-empty? from)
+                       to
+                       (loop 
+                          (sosofo-append 
+                             to 
+                             (process-node-list (node-list-first from))
+                             (if (node-list-empty? (node-list-rest from))
+                                 (empty-sosofo)
+                                 (literal ", ")))
+                          (node-list-rest from))))
+                (make empty-element gi: "br")
+                (literal reldate)))
+         (if (and %starlink-banner% (not suppress-banner))
+             (make element gi: "p" %starlink-banner%)
+             (empty-sosofo))
+         (if (not suppress-printable)
+             (make element gi: "p"
+                (make element gi: "a"
+                      attributes: (list (list "href" (starlink-hardcopy-server 
+                                                      docref)))
+                   (make empty-element gi: "img"
+                               attributes: '(("border" "0") 
+                                             ("src" "source.gif")))
+                   (literal "Retrieve hardcopy")))
+             (empty-sosofo))
+         (make empty-element gi: "hr")
+         (process-backmatter))))
+        
 
 
