@@ -119,12 +119,17 @@
         DO IL=1,NL
           CALL ARX_GET(ARDID,IL,TEXT,STATUS)
           CALL CHR_UCASE(TEXT)
+	print *,text
+        call flush(6)
           NCIRC=NCIRC+STR_OCCUR('CIRCLE',TEXT)
           NELL=NELL+STR_OCCUR('ELLIPSE',TEXT)
           NBOX=NBOX+STR_OCCUR('BOX',TEXT)
           NAND=NAND+STR_OCCUR('AND',TEXT)
           NNOT=NNOT+STR_OCCUR('NOT',TEXT)
         ENDDO
+
+	print *,ncirc
+        call flush(6)
 
 *  simple circle
         IF (NCIRC.EQ.1) THEN
@@ -133,6 +138,8 @@
           C2=INDEX(TEXT(C1:),')')
           READ(TEXT(C1+1:C2-1),*) PAR(1),PAR(2),PAR(3)
 
+	print *,par(1),par(2),par(3)
+        call flush(6)
 *  simple ellipse
         ELSEIF (NELL.EQ.1) THEN
           SHAPE='ELLIPSE'
