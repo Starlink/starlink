@@ -219,10 +219,14 @@
 
 *  Generate a format statement which will format the fourth field with
 *  the correct number of leading zeros.
-         WRITE( TDP, '(I3)' ) DP
-         CALL CHR_RMBLK( TDP )
-         LTDP = CHR_LEN( TDP )
-         FMT = '(I'//TDP( :LTDP )//'.'//TDP( :LTDP )//')'
+         IF (DP .NE. 0) THEN
+            WRITE( TDP, '(I3)' ) DP
+            CALL CHR_RMBLK( TDP )
+            LTDP = CHR_LEN( TDP )
+            FMT = '(I'//TDP( :LTDP )//'.'//TDP( :LTDP )//')'
+         ELSE
+            FMT = '(I1)'
+         END IF
 
 *  Produce a string holding the fourth field value.
          WRITE( FTEXT( 4 ), FMT ) FIELDS( 4 )
