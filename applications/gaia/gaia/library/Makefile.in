@@ -8,16 +8,13 @@ GAIA_LIB      = @RTD_DIR@/../gaia
 RM           = rm -f
 SHELL        = /bin/sh
 FILES        = \
- Batch.tcl CanvasPrint.tcl ETable.tcl FileSelect.tcl FrameWidget.tcl \
- GaiaConvertTable.tcl GaiaForeignExec.tcl GaiaImage.tcl \
+ Batch.tcl ETable.tcl GaiaConvertTable.tcl GaiaForeignExec.tcl \
  GaiaImageCtrl.tcl GaiaImageCut.tcl GaiaImagePanel.tcl \
- GaiaImageSpectrum.tcl GaiaQuery.tcl GaiaQueryResult.tcl GaiaSearch.tcl \
- GaiaSextractor.tcl GraphPrint.tcl LabelEntry.tcl LabelEntryMenu.tcl \
+ GaiaImageSpectrum.tcl GaiaQuery.tcl GaiaQueryResult.tcl \
+ GaiaSearch.tcl GaiaSextractor.tcl LabelEntry.tcl LabelEntryMenu.tcl \
  LabelEntryScale.tcl LabelFileChooser.tcl LabelRule.tcl \
- ManyLabelEntry.tcl NameChooser.tcl \
- Queue.tcl RtdImage.tcl RtdImageCtrl.tcl RtdImagePick.tcl \
- RtdImagePixTable.tcl RtdImageTrans.tcl RtdImageZoomView.tcl \
- ScrollText.tcl Scrollbox.tcl StarApp.tcl StarAppFilter.tcl StarArd.tcl \
+ ManyLabelEntry.tcl NameChooser.tcl Queue.tcl ScrollText.tcl \
+ Scrollbox.tcl StarApp.tcl StarAppFilter.tcl StarArd.tcl \
  StarArdAnnBox.tcl StarArdAnnCircle.tcl StarArdAnnColumn.tcl \
  StarArdAnnEllipse.tcl StarArdAnnList.tcl StarArdAnnPixel.tcl \
  StarArdAnnPoly.tcl StarArdAnnRect.tcl StarArdAnnRotBox.tcl \
@@ -28,14 +25,13 @@ FILES        = \
  StarAstDefine.tcl StarAstGrid.tcl StarAstReference.tcl \
  StarAstRefine.tcl StarAstSystem.tcl StarAstTable.tcl StarBlink.tcl \
  StarCanvasDraw.tcl StarCanvasObject.tcl StarDemo.tcl \
- StarEnterObject.tcl StarHelp.tcl StarLabelCheck.tcl StarPatch.tcl \
- StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
- StarPhotomList.tcl StarPhotomObject.tcl \
- defaults.tcl gaiaMain.tcl graphics_features.tcl udialog.tcl \
- Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp StarArd.hlp \
- StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp StarAstGrid.hlp \
- StarAstReference.hlp StarAstRefine.hlp StarAstSystem.hlp \
- StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
+ StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl StarPhotom.tcl \
+ StarPhotomDetails.tcl StarPhotomExtras.tcl StarPhotomList.tcl \
+ StarPhotomObject.tcl defaults.tcl gaiaMain.tcl graphics_features.tcl \
+ udialog.tcl Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
+ StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
+ StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
+ StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
  skycat.cfg gaiawcs2tab tclIndex Gaia.tcl ScrollArrows.tcl
 
 PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh

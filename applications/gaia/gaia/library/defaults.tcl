@@ -175,17 +175,16 @@ proc gaia::setXdefaults {} {
     option add *RtdImageColorRamp.cursor exchange
 
     #  GAIA defaults:
-    option add *GaiaImage.canvasBackground     black
+    option add *StarLabelCheck.anchor          w
     option add *GaiaImageCtrl.canvasBackground black
     option add *GaiaImageCtrl.canvasWidth      512
     option add *GaiaImageCtrl.canvasHeight     512
-    option add *StarLabelCheck.anchor          w
 
     #  Stop ugly tearoff menus.
     option add *TearOff  0 userDefault
 
     #  Fonts for canvas draw (used here as work around to modifying
-    #  code, these are the Solaris XSun optimised names).
+    #  code, these are the Solaris Xsun optimised names).
     option add *Fonts {
        -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
        -adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*

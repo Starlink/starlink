@@ -69,7 +69,7 @@ class gaia::GaiaImageCut {
       set to [$image_ max]
       if {$to <= $from} {
          # no image is loaded ?
-         if {[$image_ isclear] || ! $initialised_ } {
+         if {[$image_ isclear] || ! $initialized_ } {
             quit
             return
          }

@@ -95,6 +95,7 @@ class gaia::Gaia {
       #  Remove any options we're overriding and evaluate all
       #  options.
       itk_option remove rtd::Rtd::scrollbars
+      itk_option remove rtd::Rtd::panel_layout
       eval itk_initialize $args
 
       #  Override about_skycat message.
@@ -145,12 +146,13 @@ class gaia::Gaia {
       }
 
       #  Get the clone number for this window.
-      regsub {\.rtd} $w_ {} clone_
+      set clone_ $itk_option(-number)
+      #regsub {\.rtd} $w_ {} clone_
 
       #  Set/get X defaults - can be overridden in subclass and/or
       #  in user's .Xdefaults file.
       tk appname GAIA
-      setXdefaults
+      gaia::setXdefaults
 
       #  Start the introduction window going.
       set Init_ [TopLevelWidget $w_.init -center 1 \
@@ -334,8 +336,15 @@ class gaia::Gaia {
             -newimagecmd [code $this cleared] \
             -temporary $itk_option(-temporary) \
             -grid_command [code $this maybe_draw_grid_] \
-            -component $itk_option(-component)
+            -with_warp 1 \
+            -panel_layout $itk_option(-panel_layout) \
+            -regioncommand [code $this select_region] \
+            -component $itk_option(-component) \
+            -min_scale $itk_option(-min_scale) \
+            -max_scale $itk_option(-max_scale) \
+            -pickobjectorient $itk_option(-pickobjectorient)
       }
+      puts stdout "$itk_option(-panel_layout)"; flush stdout
 
       #  Keep a list of SkyCat/GAIA instances.
       global ::skycat_images
@@ -1050,6 +1059,9 @@ class gaia::Gaia {
    #  Name of ESO catalogue config file.
    itk_option define -eso_config_file eso_config_file Eso_config_file \
       {http://archive.eso.org/skycat/skycat2.0.cfg}
+
+   #  Redefine panel_layout to GAIA default
+   itk_option define -panel_layout panel_layout Panel_layout reverse
 
    # -- Protected variables --
 

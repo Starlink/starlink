@@ -46,7 +46,8 @@
 #        problematic).
 #     26-FEB-1999 (PDRAPER):
 #        Merged GaiaImage into this class. This removes the need to
-#        modify RtdImageCtrl.
+#        modify RtdImageCtrl. All code relating to float_panel is
+#        removed as are changes for with_warp.
 #     {enter_changes_here}
 
 #-
@@ -69,10 +70,8 @@ class gaia::GaiaImageCtrl {
       bindtags $canvas_ $tags
 
       #  Remove options we're overriding from base classes.
-      itk_option remove RtdImage::scrollbars
       itk_option remove RtdImage::show_object_menu
       itk_option remove RtdImage::drag_scroll
-      itk_option remove RtdImage::with_warp
       itk_option remove RtdImage::file
 
       #  Initialise all options.
@@ -105,7 +104,6 @@ class gaia::GaiaImageCtrl {
             -transient 1 \
             -center 0 \
             -withdraw 1 \
-            -show_object_menu 1 \
             -clipping 0 \
             -shorthelpwin $itk_option(-shorthelpwin) \
             -withtoolbox $itk_option(-withtoolbox) \
@@ -247,120 +245,45 @@ class gaia::GaiaImageCtrl {
       set after_id_ {}
    }
 
-   #  Make the control panel for operating on the image (adds the
-   #  ability to make the panel float).
-   method make_control_panel {} {
-      if { $itk_option(-float_panel) } {
-         itk_component add panel {
-            toplevel $w_.panel
-         }
-         wm withdraw $itk_component(panel)
-
-         #  Stop this window from being destroyed.
-         wm protocol $itk_component(panel) \
-            WM_DELETE_WINDOW [code $this do_nothing_]
-         regsub {\.rtd} $top_ {} clone
-         wm title $itk_component(panel) "Control Panel ($clone)"
-
-      } else {
-         itk_component add panel {
-            frame $w_.panel
-         }
-         pack $itk_component(panel) -side top -fill x -before $w_.imagef
-      }
-
-      #  Zoom window.
-      feedback "zoom window..."
-      if {$itk_option(-with_zoom_window)} {
-         # set on/off by default
-         global ::$itk_component(panel).zoom.dozoom
-         set $itk_component(panel).zoom.dozoom $itk_option(-dozoom)
-
-         if {$itk_option(-use_zoom_view)} {
-            itk_component add zoom {
-               rtd::RtdImageZoomView $itk_component(panel).zoom \
-                  -target_image $this \
-                  -width $itk_option(-zoom_width) \
-                  -height $itk_option(-zoom_height) \
-                  -factor $itk_option(-zoom_factor) \
-                  -propagate $itk_option(-zoom_view_propagate) \
-                  -usexshm $itk_option(-usexshm) \
-                  -borderwidth 3 \
-                  -relief groove
-            }
-         } else {
-            itk_component add zoom {
-               rtd::RtdImageZoom $itk_component(panel).zoom \
-                  -target_image $this \
-                  -width $itk_option(-zoom_width) \
-                  -height $itk_option(-zoom_height) \
-                  -factor $itk_option(-zoom_factor) \
-                  -usexshm $itk_option(-usexshm) \
-                  -borderwidth 3 \
-                  -relief groove
-            }
-         }
-
-         #  Tell the base class to use this zoom window when entered.
-         configure -zoomwin $itk_component(zoom)
-      }
-
-      #  Add info panel.
+   #  Make the panel info subwindow. Override to use GaiaImagePanel,
+   #  rather than RtdImagePanel. Also remove the make_grid_item capability.
+   protected method make_panel_info {panel} {
+      #  Add info panel
       feedback "info panel..."
+        
+      # Info panel, GaiaImagePanel object used to display image controls
       itk_component add info {
-         gaia::GaiaImagePanel $itk_component(panel).info \
+         gaia::GaiaImagePanel $panel.info \
             -image $this \
-            -shorthelpwin $itk_option(-shorthelpwin) \
             -state disabled \
+            -min_scale $itk_option(-min_scale) \
+            -max_scale $itk_option(-max_scale) \
+            -shorthelpwin $itk_option(-shorthelpwin) \
             -borderwidth 3 -relief groove
       }
-
-      #  Panning window.
-      feedback "pan window..."
-      if {$itk_option(-with_pan_window)} {
-         itk_component add pan {
-            rtd::RtdImagePan $itk_component(panel).pan \
-               -target_image $this \
-               -zoomwin $itk_option(-zoomwin) \
-               -width $itk_option(-pan_width) \
-               -height $itk_option(-pan_height) \
-               -usexshm $itk_option(-usexshm) \
-               -verbose $itk_option(-verbose) \
-               -borderwidth 3 \
-               -relief groove
-         }
-      }
       if { $itk_option(-float_panel) } {
-         pack $itk_component(info) -side bottom -fill both
-         if {$itk_option(-with_pan_window)} {
-            pack $itk_component(pan) -side left -fill y
-         }
-         if {$itk_option(-with_zoom_window)} {
-            pack $itk_component(zoom) -side left -fill both -expand 1
-         }
-         after 0 [code wm deiconify $itk_component(panel)]
+         set side bottom
       } else {
-         if {$itk_option(-with_pan_window)} {
-            pack $itk_component(pan) -side left -fill y
-         }
-         pack $itk_component(info) -side left -fill both -expand 1
-         if {$itk_option(-with_zoom_window)} {
-            pack $itk_component(zoom) -side left -fill y
-         }
+         set side left
+      }
+      pack $itk_component(info)  \
+         -side $side -fill both -expand 1
+
+      #  Take opportunity to stop floating panel from being destroyed.
+      #  Using {} as command isn't enough.
+      if { $itk_option(-float_panel) } {
+         wm protocol $panel WM_DELETE_WINDOW [code $this do_nothing_]
       }
    }
+   private method do_nothing_ {} {
+   }
 
-   #  Null method.
-   private method do_nothing_ {} {}
-
-   # update the toplevel window header and icon name to include the name
-   # of the file being displayed
-
-   method update_title {} {
+   #  Update the toplevel window header and icon name to include the name
+   #  of the file being displayed.
+   protected method update_title {} {
       set file "[file tail $itk_option(-file)]"
       set w [winfo toplevel $w_]
-      regsub {\.rtd} $w {} clone
-      wm title $w "Gaia/SkyCat ($clone): $file"
+      wm title $w "Gaia/Skycat: $file ([$w cget -number])"
       wm iconname $w $file
    }
 
@@ -550,24 +473,17 @@ class gaia::GaiaImageCtrl {
    }
 
    #  Clear the current image display and remove an windows that
-   #  access it (extend parent class version to also configure
-   #  temporary variable and deal with float_panel changes).
+   #  access it (extend parent class version to also deal with 
+   #  temporary images).
    method clear {} {
+
       #  If this window this previously displayed a temporary image
       #  then delete it.
       maybe_delete_
       delete_temporary_
 
-      rtd::RtdImage::clear
-      $itk_component(info) config -state disabled
-      if {[winfo exists $w_.cut]} {
-         destroy $w_.cut
-      }
-      if {[winfo exists $w_.draw]} {
-         $w_.draw set_menu_state disabled
-         wm withdraw $w_.draw
-      }
-
+      #  Really clear.
+      rtd::RtdImageCtrl::clear
    }
 
    #  Load a FITS file (internal version: use -file option/public
@@ -707,12 +623,6 @@ class gaia::GaiaImageCtrl {
    }
    itk_option define -file_change_cmd file_change_cmd File_Change_Cmd {}
 
-   #  Debugging flag.
-   itk_option define -debug debug Debug 0
-
-   #  Floating panel option (for small displays).
-   itk_option define -float_panel float_panel Float_Panel 0
-
    #  Is image temporary. If set after image is displayed/configured
    #  then the associated file will be deleted when replaced or when this
    #  object is deleted.
@@ -721,43 +631,6 @@ class gaia::GaiaImageCtrl {
    #  Names and extensions of known data types.
    itk_option define -file_types file_types File_Types \
       {{any *} {ndf *.sdf} {fits *.fit*}}
-
-   #  Whether up, down, left and right arrows warp the cursor.
-   itk_option define -with_warp with_warp With_warp 1
-
-   #  Flag: if true, display horizontal and vertical scrollbars,
-   #  changed to default to 1.
-   itk_option define -scrollbars scrollbars Scrollbars 1 {
-      if {$itk_option(-scrollbars)} {
-         if {![info exists itk_component(vscroll)]} {
-            itk_component add vscroll {
-               scrollbar $itk_component(vscrollf).vscroll \
-                  -relief sunken \
-                  -command [code $canvas_ yview]
-            }
-            pack $itk_component(vscroll) -side right -fill y
-            $canvas_ config -yscrollcommand "$itk_component(vscroll) set"
-         }
-         if {![info exists itk_component(hscroll)]} {
-            itk_component add hscroll {
-               scrollbar $itk_component(hscrollf).hscroll \
-                  -relief sunken \
-                  -orient horiz \
-                  -command [code $canvas_ xview]
-            }
-            pack $itk_component(hscroll) -side bottom -fill x
-            $canvas_ config -xscrollcommand "$itk_component(hscroll) set"
-         }
-      } else {
-         $canvas_ config -xscrollcommand "" -yscrollcommand ""
-         if {[info exists itk_component(vscroll)]} {
-            destroy $itk_component(vscroll)
-            destroy $itk_component(hscroll)
-            unset itk_component(vscroll)
-            unset itk_component(hscroll)
-         }
-      }
-   }
 
    #  Flag: if true, set bindings to scroll with the middle mouse
    #  button and make a depressed mouse button drag scroll the image.
