@@ -27,6 +27,8 @@
 *        DefaultURI and astXmlAddURI modified to allow a blank URI to be
 *        used to ignore a default namespace URI provided by an enclosing
 *        element.
+*     29-NOV-2004 (DSB):
+*        Added astXmlGetType method.
 */
 
 
@@ -2049,6 +2051,94 @@ const char *astXmlGetTag_( AstXmlObject *this, int opening ){
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
+}
+
+const char *astXmlGetType_( AstXmlObject *this ){
+/*
+*+
+*  Name:
+*     astXmlGetType
+
+*  Purpose:
+*     Returns a string holding the type of the given XmlObject.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "xml.h"
+*     const char *astXmlGetType( AstXmlObject *this )
+
+*  Description:
+*     This function returns a pointer to a static string containing the
+*     type of the given XmlObject.
+
+*  Parameters:
+*     this
+*        Pointer to the XmlObject.
+
+*  Returned Value:
+*     Pointer to a null terminated string holding the type string.
+
+*  Notes:
+*     - NULL is returned if an error has already occurred, or if this
+*     function should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   const char *result;             /* The returned pointer */
+   int type;                       /* Element type */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if( !astOK ) return result;
+
+   type = this->type;
+   if( type == AST__XMLELEM ) {
+      result = "element";
+
+   } else if( type == AST__XMLATTR ) {
+      result = "attribute";
+
+   } else if( type == AST__XMLCDATA ) {
+      result = "CDATA section";
+
+   } else if( type == AST__XMLCOM ) {
+      result = "comment";
+
+   } else if( type == AST__XMLPI ) {
+      result = "processing instruction";
+
+   } else if( type == AST__XMLNAME ) {
+      result = "namespace";
+
+   } else if( type == AST__XMLDOC ) {
+      result = "document";
+
+   } else if( type == AST__XMLPRO ) {
+      result = "prologue";
+
+   } else if( type == AST__XMLDEC ) {
+      result = "XML delaration PI";
+
+   } else if( type == AST__XMLDTD ) {
+      result = "DTD";
+
+   } else if( type == AST__XMLWHITE ) {
+      result = "white-space character data ";
+
+   } else if( type == AST__XMLBLACK ) {
+      result = "non-blank character data";
+
+   } else {
+      result = "unknown XML object";
+   }
+
+/* Return the result. */
+   return result;
 }
 
 const char *astXmlGetURI_( AstXmlObject *this ){
