@@ -96,6 +96,12 @@ f     The MatrixMap class does not define any new routines beyond those
 *     10-NOV-2003 (DSB):
 *        Modified functions which swap a MatrixMap with another Mapping
 *        (e.g. MatSwapPerm, etc), to simplify the returned Mappings.
+*     13-JAN-2003 (DSB):
+*        Modified the tolerance used by CompressMatrix when checking for 
+*        zero matrix elements. Old system compared each element to thre
+*        size of the diagonal, but different scalings on different axes could 
+*        cause this to trat as zero values which should nto be treated as
+*        zero.
 *class--
 */
 
@@ -456,13 +462,19 @@ static void CompressMatrix( AstMatrixMap *this ){
 */
 
 /* Local Variables: */
+   double *a;                     /* Pointer to next element */
+   double *colmax;                /* Pointer to array holding column max values */
    double *fmat;                  /* Pointer to compressed forward matrix */
+   double *rowmax;                /* Pointer to array holding row max values */
    double minv;                   /* The smallest effective non-zero value */
    double mval;                   /* Matrix element value */
    int i;                         /* Loop count */
+   int j;                         /* Loop count */
+   int k;                         /* Loop count */
    int ncol;                      /* No. of columns in forward matrix */
    int ndiag;                     /* No. of diagonal elements in matrix */
    int new_form;                  /* Compressed storage form */
+   int new_inv;                   /* New inverse requied? */
    int next_diag;                 /* Index of next diagonal element */
    int nrow;                      /* No. of rows in forward matrix */
 
@@ -514,46 +526,106 @@ static void CompressMatrix( AstMatrixMap *this ){
 /* Otherwise, a full MatrixMap has been supplied, but this could be stored 
    in a unit or diagonal MatrixMap if the element values are appropriate. */
    } else {
+      new_form = FULL;
+
+/* Find the maximum absolute value in each column. Scale by
+   sqrt(DBL_EPSILON) to be come a lower limit for non-zero values. */
+      colmax = astMalloc( ncol*sizeof( double ) );
+      if( colmax ) {
+         for( j = 0; j < ncol; j++ ) {
+            colmax[ j ] = 0.0;      
+            i = j;
+            for( k = 0; k < nrow; k++ ) {
+               mval = (this->f_matrix)[ i ];
+               if( mval != AST__BAD ) {
+                  mval = fabs( mval );
+                  if( mval > colmax[ j ] ) colmax[ j ] = mval;
+               }
+               i += ncol;
+            }
+            colmax[ j ] *= sqrt( DBL_EPSILON );
+         }
+      }
+
+/* Find the maximum absolute value in each row. Scale by
+   sqrt(DBL_EPSILON) to be come a lower limit for non-zero values. */
+      rowmax = astMalloc( nrow*sizeof( double ) );
+      if( rowmax ) {
+         for( k = 0; k < nrow; k++ ) {
+            rowmax[ k ] = 0.0;      
+            i = k*ncol;
+            for( j = 0; j < ncol; j++ ) {
+               mval = (this->f_matrix)[ i ];
+               if( mval != AST__BAD ) {
+                  mval = fabs( mval );
+                  if( mval > rowmax[ k ] ) rowmax[ k ] = mval;
+               }
+               i++;
+            }
+            rowmax[ k ] *= sqrt( DBL_EPSILON );
+         }
+      }
+
+/* Check memory can be used */
+      if( astOK ) {
+
+/* Initialise a flag indicating that the inverse matrix does not need to
+   be re-calculated. */
+         new_inv = 0;
 
 /* Initially assume that the forward matrix is a unit matrix. */
-      new_form = UNIT;
+         new_form = UNIT;
 
-/* Get the length of the diagonal vector. Off-diagonal elements are
-   considered to be equivalent to zero if they are less than
-   SQRT(DBL_EPSILON) times the length of the diagonal vector. */
-      minv = 0.0;
-      for( i = 0; i < ncol*nrow; i += ncol + 1 ){
-         mval = (this->f_matrix)[ i ];
-         if( mval != AST__BAD ) minv += mval*mval;
-      }
-      minv = sqrt( ( minv > 0.0 ) ? minv*DBL_EPSILON: 0.0 );
+/* Store a pointer to the next matrix element. */
+         a = this->f_matrix;
+  
+/* Loop through all the columns in the forward matrix array. */
+         for( j = 0; j < ncol; j++ ) {
 
-/* Store the index of the next diagonal term within the forward matrix 
-   array. */
-      next_diag = 0;
+/* Loop through all the elements in this column. */
+            for( k = 0; k < nrow; k++, a++ ) {
 
-/* Loop through all the elements in the forward matrix array. */
-      for( i = 0; i < ncol*nrow; i++ ){
-         mval = (this->f_matrix)[ i ];
+/* If this element is bad, use full form. */
+               if( *a == AST__BAD ) {
+                  new_form = FULL;
 
-/* If this is the next diagonal term, check its value. If it is not
-   one, then the matrix cannot be a unit matrix, but it could still
-   be a diagonal matrix. Update the index of the next diagonal term. */
-         if( i == next_diag ) {
-            if( mval != 1.0 ) new_form = DIAGONAL;
-            next_diag += ncol + 1;
+/* Otherwise, if this is a diagonal term, check its value. If it is not one, 
+   then the matrix cannot be a unit matrix, but it could still be a diagonal 
+   matrix. */
+               } else {
+                  if( j == k ) {
+                     if( *a != 1.0 && new_form == UNIT ) new_form = DIAGONAL;
 
 /* If this is not a diagonal element, and the element value is not zero, 
-   then the matrix is not a diagonal matrix. We can stop checking element
-   values as soon as this has been discovered. Allow a tolerance of
-   DBL_EPSILON times the length of the diagonal vector. */
-         } else {
-            if( fabs( mval ) > minv ) {
-               new_form = FULL;
-               break;
+   then the matrix is not a diagonal matrix. Allow a tolerance of
+   SQRT(DBL_EPSILON) times the largest value in the same row or column as
+   the current matrix element. That is, an element must be insignificant
+   to both its row and its column to be considered as effectively zero. 
+   Replace values less than this limit with zero. */
+                  } else {
+                     mval = fabs( *a );
+                     if( mval <= rowmax[ k ] &&
+                         mval <= colmax[ j ] ) {
+
+/* If the element will change value, set a flag indicating that the inverse 
+   matrix needs to be re-calculated. */
+                        if( *a != 0.0 ) new_inv = 1;
+
+/* Ensure this element value is zero. */
+                        *a = 0.0;
+
+                     } else {
+                        new_form = FULL;
+                     }             
+                  }
+               }
             }
          }
       }
+
+/* Free memory. */
+      colmax = astFree( colmax );
+      rowmax = astFree( rowmax );
 
 /* If it can be compressed into a UNIT MatrixMap, change the storage form and 
    free the arrays holding the element values. */
@@ -584,6 +656,11 @@ static void CompressMatrix( AstMatrixMap *this ){
             this->form = DIAGONAL;
 
          }
+
+/* Calculate a new inverse matrix if necessary. */
+      } else if( new_inv ) {
+         (void) astFree( (void *) this->i_matrix );
+         this->i_matrix = InvertMatrix( FULL, nrow, ncol, this->f_matrix );
       }
    }
 
