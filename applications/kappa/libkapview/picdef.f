@@ -841,7 +841,7 @@
 
          CALL SGS_ZONE( X1, X2, Y1, Y2, ZONEN, STATUS )
          CALL SGS_SW( X1, X2, Y1, Y2, STATUS )
-         IF ( BOX ) CALL SGS_BOX( X1, X2, Y1, Y2, STATUS )
+         IF ( BOX ) CALL SGS_BOX( X1, X2, Y1, Y2 )
 
 *       Store the new zone as a database picture.
 

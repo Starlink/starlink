@@ -534,7 +534,7 @@
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
                         CALL KPG1_CHVAB( EL, %VAL( PNTRI( 1 ) ), 
-     :                                   VAL__BADB, BSDVAL**2, 
+     :                                   VAL__BADB, BSDVAL*BSDVAL, 
      :                                   %VAL( PNTRO( 1 ) ),
      :                                   NREP, STATUS )
  
@@ -610,7 +610,7 @@
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
                         CALL KPG1_CHVAD( EL, %VAL( PNTRI( 1 ) ), 
-     :                                   VAL__BADD, SIGMA**2, 
+     :                                   VAL__BADD, SIGMA*SIGMA, 
      :                                   %VAL( PNTRO( 1 ) ),
      :                                   NREP, STATUS )
  
@@ -692,7 +692,7 @@
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
                         CALL KPG1_CHVAI( EL, %VAL( PNTRI( 1 ) ), 
-     :                                   VAL__BADI, ISDVAL**2, 
+     :                                   VAL__BADI, ISDVAL*ISDVAL, 
      :                                   %VAL( PNTRO( 1 ) ),
      :                                   NREP, STATUS )
  
@@ -774,7 +774,7 @@
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
                         CALL KPG1_CHVAUB( EL, %VAL( PNTRI( 1 ) ), 
-     :                                   VAL__BADUB, BSDVAL**2, 
+     :                                   VAL__BADUB, BSDVAL*BSDVAL, 
      :                                   %VAL( PNTRO( 1 ) ),
      :                                   NREP, STATUS )
  
@@ -858,7 +858,7 @@
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
                         CALL KPG1_CHVAUW( EL, %VAL( PNTRI( 1 ) ), 
-     :                                   VAL__BADUW, WSDVAL**2, 
+     :                                   VAL__BADUW, WSDVAL*WSDVAL, 
      :                                   %VAL( PNTRO( 1 ) ),
      :                                   NREP, STATUS )
  
@@ -942,7 +942,7 @@
 
                      IF ( COMP( I ) .EQ. 'Variance' ) THEN
                         CALL KPG1_CHVAW( EL, %VAL( PNTRI( 1 ) ), 
-     :                                   VAL__BADW, WSDVAL**2, 
+     :                                   VAL__BADW, WSDVAL*WSDVAL, 
      :                                   %VAL( PNTRO( 1 ) ),
      :                                   NREP, STATUS )
  

@@ -627,8 +627,9 @@
 
             IF ( STATUS .NE. SAI__OK ) GOTO 999
        
-            CALL KPG1_SCLOF( %VAL( PNT1BV( 1 ) ), NEL1B, 1.0 / SLOPE**2,
-     :                       0.0, %VAL( PNTOV( 1 ) ), BAD, STATUS )
+            CALL KPG1_SCLOF( %VAL( PNT1BV( 1 ) ), NEL1B, 
+     :                       DBLE( 1.0 / SLOPE**2 ), 0.0D0, 
+     :                       %VAL( PNTOV( 1 ) ), BAD, STATUS )
 
 *  Set the bad pixel flag for the output variance array.
             CALL NDF_SBAD( BAD, NDFOUT, 'Variance', STATUS )
