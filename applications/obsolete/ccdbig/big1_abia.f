@@ -1,7 +1,7 @@
-      SUBROUTINE CCD1_ABIA( IMAGE, NPIX, SEED, STATUS )
+      SUBROUTINE CCDB1_ABIA( IMAGE, NPIX, SEED, STATUS )
 *+
 *  Name:
-*     CCD1_ABIA
+*     CCDB1_ABIA
 
 *  Purpose:
 *     To add a reproducible pseudo-random bias frame to data.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ABIA( IMAGE, NPIX, SEED, STATUS )
+*     CALL CCDB1_ABIA( IMAGE, NPIX, SEED, STATUS )
 
 *  Arguments:
 *     IMAGE( NPIX ) = REAL (Given and Returned)
@@ -87,4 +87,4 @@
       END DO
 
       END
-* $Id: ccdb1_abia.f,v 1.1 1998/06/16 09:40:54 mbt Exp $
+* $Id: ccdb1_abia.f,v 1.2 1998/06/16 17:37:19 mbt Exp mbt $
