@@ -149,6 +149,93 @@ proc red4Update {item value} {
       $Red4Widgets(FI_ENT02) insert end OBJECT
     }
 
+  } elseif {[string trim ${item}] == "red4Polysky"} {
+    if {[string trim ${value}] == "ALL"} {
+      selection clear $Red4Widgets(PF_INPUT) 
+      $Red4Widgets(PF_INPUT) delete 0 end
+      $Red4Widgets(PF_INPUT) insert end $Red4Widgets(DRG)
+      set Red4Widgets(PF_POLYFIT) NONE
+      selection clear $Red4Widgets(PF_DEGREE) 
+      $Red4Widgets(PF_DEGREE) delete 0 end
+      $Red4Widgets(PF_DEGREE) insert end 1.0
+      selection clear $Red4Widgets(PF_NREJECT) 
+      $Red4Widgets(PF_NREJECT) delete 0 end
+      $Red4Widgets(PF_NREJECT) insert end 0
+      set Red4Widgets(PF_WEIGHT) 1
+      selection clear $Red4Widgets(PF_SAYS1) 
+      $Red4Widgets(PF_SAYS1) delete 0 end
+      $Red4Widgets(PF_SAYS1) insert end 20
+      selection clear $Red4Widgets(PF_SAYE1) 
+      $Red4Widgets(PF_SAYE1) delete 0 end
+      $Red4Widgets(PF_SAYE1) insert end 25
+      selection clear $Red4Widgets(PF_SAYS2) 
+      $Red4Widgets(PF_SAYS2) delete 0 end
+      $Red4Widgets(PF_SAYS2) insert end 35
+      selection clear $Red4Widgets(PF_SAYE2) 
+      $Red4Widgets(PF_SAYE2) delete 0 end
+      $Red4Widgets(PF_SAYE2) insert end 40
+      selection clear $Red4Widgets(PF_SAYS3) 
+      $Red4Widgets(PF_SAYS3) delete 0 end
+      $Red4Widgets(PF_SAYS3) insert end -1
+      selection clear $Red4Widgets(PF_SAYE3) 
+      $Red4Widgets(PF_SAYE3) delete 0 end
+      $Red4Widgets(PF_SAYE3) insert end -1
+      selection clear $Red4Widgets(PF_SAYS4) 
+      $Red4Widgets(PF_SAYS4) delete 0 end
+      $Red4Widgets(PF_SAYS4) insert end -1
+      selection clear $Red4Widgets(PF_SAYE4) 
+      $Red4Widgets(PF_SAYE4) delete 0 end
+      $Red4Widgets(PF_SAYE4) insert end -1
+    } elseif {[string trim ${value}] == "PF_INPUT"} {
+      selection clear $Red4Widgets(PF_INPUT) 
+      $Red4Widgets(PF_INPUT) delete 0 end
+      $Red4Widgets(PF_INPUT) insert end $Red4Widgets(DRG)
+    } elseif {[string trim ${value}] == "PF_POLYFIT"} {
+      set Red4widgets(PF_POLYFIT) NONE
+    } elseif {[string trim ${value}] == "PF_DEGREE"} {
+      selection clear $Red4Widgets(PF_DEGREE) 
+      $Red4Widgets(PF_DEGREE) delete 0 end
+      $Red4Widgets(PF_DEGREE) insert end 1.0
+    } elseif {[string trim ${value}] == "PF_NREJECT"} {
+      selection clear $Red4Widgets(PF_NREJECT) 
+      $Red4Widgets(PF_NREJECT) delete 0 end
+      $Red4Widgets(PF_NREJECT) insert end 0
+    } elseif {[string trim ${value}] == "PF_WEIGHT"} {
+      set Red4widgets(PF_WEIGHT) 1
+    } elseif {[string trim ${value}] == "PF_SAYS1"} {
+      selection clear $Red4Widgets(PF_SAYS1) 
+      $Red4Widgets(PF_SAYS1) delete 0 end
+      $Red4Widgets(PF_SAYS1) insert end 20
+    } elseif {[string trim ${value}] == "PF_SAYE1"} {
+      selection clear $Red4Widgets(PF_SAYE1) 
+      $Red4Widgets(PF_SAYE1) delete 0 end
+      $Red4Widgets(PF_SAYE1) insert end 25
+    } elseif {[string trim ${value}] == "PF_SAYS2"} {
+      selection clear $Red4Widgets(PF_SAYS2) 
+      $Red4Widgets(PF_SAYS2) delete 0 end
+      $Red4Widgets(PF_SAYS2) insert end 35
+    } elseif {[string trim ${value}] == "PF_SAYE2"} {
+      selection clear $Red4Widgets(PF_SAYE2) 
+      $Red4Widgets(PF_SAYE2) delete 0 end
+      $Red4Widgets(PF_SAYE2) insert end 40
+    } elseif {[string trim ${value}] == "PF_SAYS3"} {
+      selection clear $Red4Widgets(PF_SAYS3) 
+      $Red4Widgets(PF_SAYS3) delete 0 end
+      $Red4Widgets(PF_SAYS3) insert end -1
+    } elseif {[string trim ${value}] == "PF_SAYE3"} {
+      selection clear $Red4Widgets(PF_SAYE3) 
+      $Red4Widgets(PF_SAYE3) delete 0 end
+      $Red4Widgets(PF_SAYE3) insert end -1
+    } elseif {[string trim ${value}] == "PF_SAYS4"} {
+      selection clear $Red4Widgets(PF_SAYS4) 
+      $Red4Widgets(PF_SAYS4) delete 0 end
+      $Red4Widgets(PF_SAYS4) insert end -1
+    } elseif {[string trim ${value}] == "PF_SAYE4"} {
+      selection clear $Red4Widgets(PF_SAYE4) 
+      $Red4Widgets(PF_SAYE4) delete 0 end
+      $Red4Widgets(PF_SAYE4) insert end -1
+    }
+
   } elseif {[string trim ${item}] == "red4Flux"} {
     if {[string trim ${value}] == "ALL"} {
       selection clear $Red4Widgets(FC_ENT01) 
