@@ -488,7 +488,7 @@
        IF (COLNO .NE. 0) THEN
          FBEG = 1
             CALL DYN_MAPI(1,NROWS,ATT_X_PTR,STATUS)
-            CALL DYN_MAPR(1,NROWS,TEMP_PTR)
+            CALL DYN_MAPR(1,NROWS,TEMP_PTR,STATUS)
             CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
      :      %VAL(TEMP_PTR),ANYF,STATUS)
             ENTIM = NROWS
