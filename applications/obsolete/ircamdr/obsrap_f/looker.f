@@ -22,6 +22,7 @@
 * History :
 *   24.02.1986:  Original (REVAD::BDK)
 *   03.03.1986:  Modified READER to get all since time T (REVA::CAA)
+*   11.08.2004:  Use CHR_APPND (TIMJ@JACH)
 * endhistory
 
 * Type Definitions :
@@ -48,6 +49,9 @@
 	LOGICAL WANT_NAME    	   ! option to miss out name
 	LOGICAL WANT_STRING    	   ! option to miss out string
 	LOGICAL WANT_TIME    	   ! option to miss out time
+
+	INTEGER CHR_LEN
+	EXTERNAL CHR_LEN
 *-
 *
 * Check status on entry
@@ -86,7 +90,7 @@
 *
 * initialize position variable
 *
-	    POS = 1
+	    POS = 0
 *
 * test if want time in output string
 *
@@ -94,12 +98,11 @@
 *
 * if read Ok then trim string TIME and put into output buffer
 *
-	      CALL STR$TRIM ( OUTPUT( POS:), TIME, LENGTH )
+	       CALL CHR_APPND( TIME, OUTPUT, POS)
 *
 * add space after time
 *
-	      OUTPUT( POS+LENGTH:POS+LENGTH) = ' '
-	      POS = POS + LENGTH + 1
+	       CALL CHR_APPND(' ',OUTPUT, POS)
 	    END IF
 *
 * test if user wants name in output string
@@ -108,12 +111,11 @@
 *
 * trim string NAME and put into output buffer
 *
-	      CALL STR$TRIM ( OUTPUT(POS:), NAME, LENGTH )
+	       CALL CHR_APPND(NAME, OUTPUT, POS)
 *
-* add space after time
+* add space after name
 *
-	      OUTPUT( POS+LENGTH:POS+LENGTH) = ' '
-	      POS = POS + LENGTH + 1
+	       CALL CHR_APPND(' ',OUTPUT, POS)
 	    END IF
 *
 * test if user wants string in output string
@@ -122,7 +124,8 @@
 *
 * trim string STRING and put into output buffer
 *
-	      CALL STR$TRIM ( OUTPUT( POS:), STRING, LENGTH )
+	       CALL CHR_APPND(STRING, OUTPUT, POS)
+
 	    END IF
 *
 * write the output buffer to the users terminal
