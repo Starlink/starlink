@@ -44,11 +44,13 @@ configure: config/configure.in
 dvi2bitmap.mantext: dvi2bitmap.1
 	nroff -man dvi2bitmap.1 >dvi2bitmap.mantext
 
-dvi2bitmap.tar: configure dvi2bitmap.mantext
+dvi2bitmap.tar: configure dvi2bitmap.mantext 
 	rm -f Manifest
-	for i in *.cc *.h Makefile.in \
+	cd doc; $(MAKE) doc.tar
+	mv doc/doc.tar .
+	for i in *.cc *.h Makefile.in README \
 			configure config/config* config/install-sh \
-			dvi2bitmap.1 dvi2bitmap.mantext README; do \
+			dvi2bitmap.1 dvi2bitmap.mantext LICENCE doc.tar; do \
 		echo dvi2bitmap/$$i >>Manifest; \
 	done
 	echo dvi2bitmap/Manifest >>Manifest
@@ -61,3 +63,4 @@ tidy:
 
 clean: tidy
 	rm -f *.o $(EXEC)
+	cd doc; $(MAKE) clean
