@@ -1429,8 +1429,8 @@ sun180.htx_tar: sun180.tex sun180.aux
 	tar cf sun180.htx_tar sun180.htx
 
 #  Propagate version number from file VERSION
-makefile sun180.tex: VERSION
-	./propagate-version makefile sun180.tex
+makefile sun180.tex esp.news: VERSION
+	./propagate-version makefile sun180.tex esp.news
 
 #  Generate the file esp1_vers.f from the VERSION file.  Matches
 #  major.minor and major.minor-release; tolerant of text after the
