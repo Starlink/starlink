@@ -62,11 +62,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     21-MAY-1992 (PDRAPER):
 *        Original version.
+*     11-OCT-2004 (BRADC):
+*        No longer use NUM_CMN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,9 +107,11 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
+
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
 
@@ -137,7 +142,7 @@
 *  Initial good pixel count and weights sum.
          NGOOD = 0
          SUM = 0.0D0
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
@@ -157,11 +162,11 @@
                SUM = SUM + 1.0D0 / NUM_RTOD( VARS( I, J ) )
 
 *  Trap conversion failures.
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
 
 *  Decrement NGOOD, do not let it go below zero.
                   NGOOD = MAX( 0, NGOOD - 1 )
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
             END IF
  2       CONTINUE
@@ -208,7 +213,7 @@
             RESVAR( I ) = REAL( VAR )
 
 *  Trap numeric errors.
-            IF ( NUM_ERROR .NE. SAI__OK ) THEN
+            IF ( .NOT. NUM_WASOK() ) THEN
                RESULT( I ) = VAL__BADR
                RESVAR( I ) = VAL__BADR
             END IF

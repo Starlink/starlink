@@ -64,6 +64,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,8 @@
 *        Modified to derive a standard deviation estimate from the
 *        data values rather than assuming that the input "variances"
 *        are typical for each line. This was never the case.
+*     11-OCT-2004 (BRADC):
+*        No longer use NUM_CMN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,9 +112,11 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
+
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
 
@@ -142,7 +147,7 @@
 *  Loop over for all possible output pixels.
       DO 1 I = 1, NPIX
          NGOOD = 0
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          SUM1 = 0.0D0
          SUM2 = 0.0D0
 
@@ -174,11 +179,11 @@
                USED( NGOOD ) = .TRUE.
 
 *  Finally trap numeric errors by rejecting all values.
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
 
 *  Decrement NGOOD, do not let it go below zero.
                   NGOOD = MAX( 0, NGOOD - 1 )
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
             END IF
  2       CONTINUE
@@ -248,7 +253,7 @@
             RESULT( I ) = REAL( VAL )
 
 *  Trap numeric errors.
-            IF ( NUM_ERROR .NE. SAI__OK ) THEN
+            IF ( .NOT. NUM_WASOK() ) THEN
                RESULT( I ) = VAL__BADR
             END IF
          ELSE

@@ -54,11 +54,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     BRADC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     21-MAY-1992 (PDRAPER):
 *        Original version.
+*     11-OCT-2004 (BRADC):
+*        No longer use NUM_CMN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,9 +94,11 @@
       INTEGER STATUS             ! Global status
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
+
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
 
@@ -124,7 +129,7 @@
 *  Loop over for all possible output pixels.
          SUM1 = 0.0D0
          SUM2 = 0.0D0
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NGOOD = 0
 
 *  Loop over all possible contributing pixels forming weighted mean
@@ -159,7 +164,7 @@
             RESVAR( I ) = 1.0D0 /SUM1
 
 *  Trap numeric errors.
-            IF ( NUM_ERROR .NE. SAI__OK ) THEN
+            IF ( .NOT. NUM_WASOK() ) THEN
                RESULT( I ) = VAL__BADD
                RESVAR( I ) = VAL__BADD
             END IF
