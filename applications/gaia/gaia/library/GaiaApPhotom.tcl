@@ -493,7 +493,7 @@ itcl::class gaia::GaiaApPhotom {
          set autophotom_ {}
       }
       if { $namer_ != {} } { 
-	 catch {object delete $namer_}
+	 catch {delete object $namer_}
       }
    }
 
