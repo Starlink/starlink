@@ -5,8 +5,8 @@ SUBDIRS = @subdirs@
 bin_SCRIPTS = $(DYNSCRIPTS)
 
 bin_PROGRAMS = jcmt_help
-jcmt_help_SOURCES = helpc.c helpm.c
-jcmt_help_LDADD = `hlp_link` `fio_link` `cnf_link` @FCLIBS@
+jcmt_help_SOURCES = helpm.c
+jcmt_help_LDADD = `shl_link` @FCLIBS@
 
 bin_MONOLITHS = jcmtdr
 
@@ -15,13 +15,22 @@ jcmtdr_SOURCES = jcmtdr.f
 # libira comes from kaplibs but we do not want all of kaplibs
 # Figaro libraries are required: -lfig -ldsa -ldta -lgen -lpar -lich
 
-jcmtdr_LDADD = subs/libjcmtsubs.la applic/libjcmtapplic.la -lira \
+FIG_LIBS = \
+/home/timj/data/tmp/star/cvs/applications/figaro/dsa/libdsa.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/dta/libdta.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/par/libfigpar.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/ich/libich.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/gen/libgen.la \
+/home/timj/data/tmp/star/cvs/applications/figaro/fig/libfig.la 
+
+jcmtdr_LDADD = applic/libjcmtapplic.la subs/libjcmtsubs.la -lira \
+$(FIG_LIBS) \
 `sla_link_adam` `hlp_link_adam` `ndf_link_adam` `prm_link_adam`	 \
 `fio_link_adam` `gsd_link` `pda_link_adam`
 
 jcmtdr_TASKS = $(TASKS)
 
-BUILT_SOURCES = jcmtdr.csh jcmtdr.ifc jcmtdr.icl $(IFL_FILES)
+BUILT_SOURCES = jcmtdr.csh jcmtdr.icl $(IFL_FILES)
 
 TASKS = ae2rd1 ae2rd2 fake iras_tag jcmtextc makemap map2mem map2ts \
 	restore ts2map
