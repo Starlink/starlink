@@ -67,6 +67,8 @@
 #     30-MAY-2000 (PWD):
 #        Added -textvaribles to all entry related fields, this
 #        ends need to press <return>.
+#     20-FEB-2002 (PWD):
+#        Added X_PIXEL and Y_PIXEL parameters.
 #     {enter_further_changes_here}
 
 #-
@@ -2664,8 +2666,10 @@ itcl::class gaia::GaiaSextractor {
       {NUMBER} {Running object number}
       {X_WORLD} {Barycenter position along world x axis}
       {Y_WORLD} {Barycenter position along world y axis}
-      {X_IMAGE} {Object position along x}
-      {Y_IMAGE} {Object position along y}
+      {X_IMAGE} {Object position along x (FITS coords)}
+      {Y_IMAGE} {Object position along y (FITS coords)}
+      {X_PIXEL} {Object position along x (NDF pixel coordinates)}
+      {Y_PIXEL} {Object position along y (NDF pixel coordinates)}
       {FLUX_ISO} {Isophotal flux}
       {FLUXERR_ISO} {RMS error for isophotal flux}
       {MAG_ISO} {Isophotal magnitude}
