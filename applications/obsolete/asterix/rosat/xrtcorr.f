@@ -149,7 +149,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTCORR Version rb test')
+      PARAMETER (VERSION = 'XRTCORR Version 2.2-0')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 *
