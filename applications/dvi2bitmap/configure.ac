@@ -6,7 +6,7 @@ dnl       of the Research Councils
 dnl   See file LICENCE for conditions.
 
 
-AC_INIT(dvi2bitmap, 0.12, norman@astro.gla.ac.uk)
+AC_INIT(dvi2bitmap, 0.13b1, norman@astro.gla.ac.uk)
 AM_INIT_AUTOMAKE
 AC_REVISION($Revision$)
 
@@ -117,11 +117,16 @@ dnl   Are the standard functions in the std namespace?
 dnl   We only need to check <ostream> here, but <iostream> is on more
 dnl   machines (specifically, and irritatingly, <ostream> appears to
 dnl   be missing from egcs-2.91.66)
-AC_MSG_CHECKING(whether standard functions are in namespace std)
-stdprefix=
-AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
-  AC_MSG_RESULT(no),
-  AC_TRY_COMPILE([#include <iostream>], [std::cout<<"Hello\n";],
+AC_CACHE_CHECK([whether standard functions are in namespace std],
+  [my_cv_stdprefix],
+  [my_cv_stdprefix=
+   AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
+     AC_MSG_RESULT(no),
+     AC_TRY_COMPILE([#include <iostream>], [std::cout<<"Hello\n";],
+       my_cv_stdprefix=std
+       AC_MSG_RESULT(yes),
+       AC_MSG_RESULT(ARGHH -- error compiling)))])
+if test -n "$my_cv_stdprefix"; then
     AC_DEFINE(HAVE_STD_NAMESPACE,
 	      1,
 	      [Related to HAVE_CSTD_INCLUDE: define as 1 if you have
@@ -130,13 +135,11 @@ AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
 	      At present, we use this flag to decide if we need to
 	      dump everything into the global namespace; this is not
 	      as elegant as I'd like, but it'll do for now.])
-    stdprefix=std
-    AC_MSG_RESULT(yes),
-    AC_MSG_RESULT(ARGHH -- error compiling)))
+fi
 AC_DEFINE_UNQUOTED(STD,
-	 	   $stdprefix,
-		  [Define as `std' (no quotes) if standard functions are in 
-		   the std namespace; define as empty otherwise])
+	 	   $my_cv_stdprefix,
+                   [Define as `std' (no quotes) if standard functions are in 
+                    the std namespace; define as empty otherwise])
 
 
 dnl   Extra .lo objects, to be conditionally compiled
