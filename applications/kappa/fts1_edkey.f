@@ -168,7 +168,7 @@
 *     keyword or from column 10 whichever is greater.
 *     -  At present the following reserved keywords are neither
 *     modifiable nor movable: SIMPLE, BITPIX, NAXIS, NAXISn, EXTEND,
-*     PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.   This is because
+*     PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.  This is because
 *     order in the extension should be fixed and should not be
 *     changed by any routine.
 
@@ -179,6 +179,10 @@
 *  History:
 *     1996 November 1 (MJC):
 *        Original version based upon FTS1_INKEY.
+*     2000 July 26 (MJC):
+*        Do not adjust linked lists for 'Move' and 'Update' when the
+*        card is already at the correct position.  Remove unused
+*        variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -247,17 +251,13 @@
       INTEGER CLPPOS             ! Column of comment reference keyword
                                  ! left parenthesis
       LOGICAL CMPKEY             ! Compound keyword?
-      LOGICAL CMPPST             ! Compound position keyword flag
       LOGICAL COMCRD             ! Comment keyword?
       CHARACTER * ( 70 ) COMENT  ! FITS comment to write
-      INTEGER CPOS               ! Column position for appending text
       CHARACTER * ( VALLN ) CVALUE ! Value (as string)
       INTEGER DCARD              ! Dummy card number
-      LOGICAL DELETE             ! Delete the card
       DOUBLE PRECISION DVALUE    ! FITS value
       CHARACTER * ( 1 ) EDIT     ! Edit command abbreviation
       INTEGER ENDCAR             ! Card number of END card 
-      INTEGER EQLPSN             ! Position of the equal sign
       LOGICAL THERE              ! Is it there?
       INTEGER I                  ! Do-loop index
       LOGICAL INTTYP             ! One of the integer data types?
@@ -274,7 +274,6 @@
       INTEGER LREFVK             ! Length of the value reference keyword
       INTEGER LSTCAR             ! Last card number of FITS array
       LOGICAL LVALUE             ! FITS value
-      INTEGER NAMELN             ! Length of a keyword on a card 
       CHARACTER * ( HKEYLN ) NEWKEY ! Replacement keyword
       INTEGER OLDLST             ! Last card number of old FITS array
       INTEGER PCARD              ! Number of positional card
@@ -289,7 +288,6 @@
                                  ! keyword?
       LOGICAL REFVAL             ! Value contains value reference
                                  ! keyword?
-      LOGICAL RELOC              ! Shows a card has been relocated
       LOGICAL RESVED             ! Shows a keyword is reserved
       INTEGER REVOC              ! Reference-value-keyword occurrence
                                  ! number
@@ -641,48 +639,54 @@
 *  =========================
          ELSE IF ( EDIT .EQ. 'M' ) THEN
 
+*  No need to move if the card is already in the correct location.
+*  Indeed it can duplicate links and isolate elements like an ox-bow
+*  lake.
+            IF ( PCARD .NE. IARY1( CARD ) ) THEN
+
 *  Move just requires different linkages in the linked lists.  If the
 *  card is to be moved from the middle of the old FITS card array,
 *  change the chains at the position.  Use temporary values to prevent
 *  the original values being lost until the relinkage is complete.
-            IF ( CARD .NE. CHAIN1 .AND. CARD .NE. CHAIN2 ) THEN
-               TMP = IARY1( CARD )
-               TMP2 = IARY2( CARD )
+               IF ( CARD .NE. CHAIN1 .AND. CARD .NE. CHAIN2 ) THEN
+                  TMP = IARY1( CARD )
+                  TMP2 = IARY2( CARD )
 
-               IARY1( IARY2( PCARD ) ) = CARD
-               IARY1( TMP2 ) = TMP
-               IARY1( CARD ) = PCARD
+                  IARY1( IARY2( PCARD ) ) = CARD
+                  IARY1( TMP2 ) = TMP
+                  IARY1( CARD ) = PCARD
 
-               IARY2( CARD ) = IARY2( PCARD )
-               IARY2( PCARD ) = CARD
-               IARY2( TMP ) = TMP2
+                  IARY2( CARD ) = IARY2( PCARD )
+                  IARY2( PCARD ) = CARD
+                  IARY2( TMP ) = TMP2
 
 *  If the old card is at the beginning of chain 1 (end of chain 2),
 *  take the next one in the chain as the new start card for chain 1 and
 *  as the end card for chain 2.
-            ELSE IF ( CARD .EQ. CHAIN1 ) THEN
-               CHAIN1 = IARY1( CARD )
-               IARY2( CHAIN1 ) = 0
+               ELSE IF ( CARD .EQ. CHAIN1 ) THEN
+                  CHAIN1 = IARY1( CARD )
+                  IARY2( CHAIN1 ) = 0
 
-               IARY1( IARY2( PCARD ) ) = CARD
-               IARY1( CARD ) = PCARD
+                  IARY1( IARY2( PCARD ) ) = CARD
+                  IARY1( CARD ) = PCARD
 
-               IARY2( CARD ) = IARY2( PCARD )
-               IARY2( PCARD ) = CARD
+                  IARY2( CARD ) = IARY2( PCARD )
+                  IARY2( PCARD ) = CARD
 
 *  If the old card is at the end of chain 1 (beginning of chain 2),
 *  take the card before as the end card for chain 1 and as the start
 *  card for chain 2.
-            ELSE IF ( CARD .EQ. CHAIN2 ) THEN
-               CHAIN2 = IARY2( CARD )
-               IARY1( CHAIN2 ) = 0
+               ELSE IF ( CARD .EQ. CHAIN2 ) THEN
+                  CHAIN2 = IARY2( CARD )
+                  IARY1( CHAIN2 ) = 0
 
-               IARY1( IARY2( PCARD ) ) = CARD
-               IARY1( CARD ) = PCARD
+                  IARY1( IARY2( PCARD ) ) = CARD
+                  IARY1( CARD ) = PCARD
 
-               IARY2( CARD ) = IARY2( PCARD )
-               IARY2( PCARD ) = CARD
+                  IARY2( CARD ) = IARY2( PCARD )
+                  IARY2( PCARD ) = CARD
 
+               END IF
             END IF
 
 *  Perform the Rename, Update, or Write command.
@@ -1126,48 +1130,54 @@
 *  being edited.  If so we have to move the card to its new location.
             ELSE IF ( EDIT .EQ. 'U' .AND. PCARD .NE. CARD ) THEN
 
+*  No need to move if the card is already in the correct location.
+*  Indeed it can duplicate links and isolate elements like an ox-bow
+*  lake.
+               IF ( PCARD .NE. IARY1( CARD ) ) THEN
+
 *  Move just requires different linkages in the linked lists.  If the
 *  card is to be moved from the middle of the old FITS card array,
 *  change the chains at the position.  Use temporary values to prevent
 *  the original values being lost until the relinkage is complete.
-               IF ( CARD .NE. CHAIN1 .AND. CARD .NE. CHAIN2 ) THEN
-                  TMP = IARY1( CARD )
-                  TMP2 = IARY2( CARD )
+                  IF ( CARD .NE. CHAIN1 .AND. CARD .NE. CHAIN2 ) THEN
+                     TMP = IARY1( CARD )
+                     TMP2 = IARY2( CARD )
 
-                  IARY1( IARY2( PCARD ) ) = CARD
-                  IARY1( TMP2 ) = TMP
-                  IARY1( CARD ) = PCARD
+                     IARY1( IARY2( PCARD ) ) = CARD
+                     IARY1( TMP2 ) = TMP
+                     IARY1( CARD ) = PCARD
 
-                  IARY2( CARD ) = IARY2( PCARD )
-                  IARY2( PCARD ) = CARD
-                  IARY2( TMP ) = TMP2
+                     IARY2( CARD ) = IARY2( PCARD )
+                     IARY2( PCARD ) = CARD
+                     IARY2( TMP ) = TMP2
 
 *  If the old card is at the beginning of chain 1 (end of chain 2),
 *  take the next one in the chain as the new start card for chain 1 and
 *  as the end card for chain 2.
-               ELSE IF ( CARD .EQ. CHAIN1 ) THEN
-                  CHAIN1 = IARY1( CARD )
-                  IARY2( CHAIN1 ) = 0
+                  ELSE IF ( CARD .EQ. CHAIN1 ) THEN
+                     CHAIN1 = IARY1( CARD )
+                     IARY2( CHAIN1 ) = 0
 
-                  IARY1( IARY2( PCARD ) ) = CARD
-                  IARY1( CARD ) = PCARD
+                     IARY1( IARY2( PCARD ) ) = CARD
+                     IARY1( CARD ) = PCARD
 
-                  IARY2( CARD ) = IARY2( PCARD )
-                  IARY2( PCARD ) = CARD
+                     IARY2( CARD ) = IARY2( PCARD )
+                     IARY2( PCARD ) = CARD
 
 *  If the old card is at the end of chain 1 (beginning of chain 2),
 *  take the card before as the end card for chain 1 and as the start
 *  card for chain 2.
-               ELSE
-                  CHAIN2 = IARY2( CARD )
-                  IARY1( CHAIN2 ) = 0
+                  ELSE
+                     CHAIN2 = IARY2( CARD )
+                     IARY1( CHAIN2 ) = 0
 
-                  IARY1( IARY2( PCARD ) ) = CARD
-                  IARY1( CARD ) = PCARD
+                     IARY1( IARY2( PCARD ) ) = CARD
+                     IARY1( CARD ) = PCARD
 
-                  IARY2( CARD ) = IARY2( PCARD )
-                  IARY2( PCARD ) = CARD
+                     IARY2( CARD ) = IARY2( PCARD )
+                     IARY2( PCARD ) = CARD
 
+                  END IF
                END IF
 
             END IF

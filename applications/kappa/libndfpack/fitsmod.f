@@ -441,8 +441,9 @@
 *        Original version.
 *     22-SEP-1999 (DSB):
 *        Added EXISTS parameter.
-*     17-MAY-2000 (DSB):
-*        Increased COMLN parameter from 47 to 70.
+*     2000 May 8 (MJC):
+*        Increased comment length to 70, allowing for comment or blank
+*        lines.  Removed unused variables.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -468,7 +469,7 @@
       INTEGER CHR_LEN            ! Significant length of a string
 
 *  Local Constants:
-      INTEGER COMLN              ! Maximum number of characters in a
+      INTEGER COMLN              ! Maximum number of characters in an
                                  ! comment in a FITS header card
       PARAMETER ( COMLN = 70 )
 
@@ -491,18 +492,15 @@
 *  Local Variables:
       INTEGER ATEMPT             ! Number of attempts to obtain a
                                  ! valid keyword
-      INTEGER CARD               ! Fits header element (card) found
       CHARACTER * ( DAT__SZLOC ) CELLOC ! Locator to first element of
                                  ! FITS extension locator
-      CHARACTER * ( COMLN ) COMENT ! Comments 
-      CHARACTER * ( DAT__SZNAM ) COMP ! Component name in NDF extension 
+      CHARACTER * ( COMLN ) COMENT ! Comments
       INTEGER COPNTR             ! Pointer to mapped values
       INTEGER CSTAT              ! Local status variable
       DOUBLE PRECISION DVAL      ! Double precision FITS value
       CHARACTER * ( 6 ) EDIT     ! Edit command
       INTEGER EDPNTR             ! Pointer to mapped edit commands
       INTEGER EKPNTR             ! Pointer to mapped edit keywords
-      INTEGER EL                 ! Number of FITS header records mapped
       INTEGER FD                 ! Descriptor of the text file
       INTEGER FDIM( 1 )          ! Initial length of the FITS extension
       INTEGER INDF               ! NDF identifier
@@ -527,8 +525,6 @@
       INTEGER POCCUR             ! Occurrence of positional keyword
       INTEGER POPNTR             ! Pointer to mapped poistional-keyword
                                  ! occurrences
-      REAL RVAL                  ! Real FITS value
-      INTEGER SIZE               ! Number of values in the NDF component
       LOGICAL STRING             ! Is value a string?
       LOGICAL EXISTS             ! Result of final "Exist" operation
       LOGICAL THERE              ! FITS extension already exists?
