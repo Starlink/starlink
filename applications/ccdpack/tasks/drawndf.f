@@ -32,7 +32,7 @@
 *     between pixel and Current coordinates is nonlinear.
 *     The origin (minimum X,Y pixel value) of each outline is marked
 *     by a dot, and by a label giving the NDF's name and/or index number
-*     (as determined by the LABMODE parameter).  This label is written
+*     (as determined by the LABEL parameter).  This label is written
 *     parallel to the X direction, or anti-parallel if the mapping
 *     between pixel and Current coordinates includes a reflection.
 *
@@ -78,16 +78,15 @@
 *        [Current display device]
 *     IN = LITERAL (Read)
 *        A list of the NDFs whose outlines are to be drawn.
-*     LABMODE = LITERAL (Read)
-*        This determines what text label is written on the outlines.
-*        The text label is written near the origin of each outline;
-*        its content is determined by the LABMODE variable as follows:
-*           - NAME   -- The name of the NDF
-*           - INDEX  -- The index number of the NDF
-*           - BOTH   -- The index and name separated by a colon
-*           - NONE   -- No label will be plotted
+*     LABEL = LITERAL (Read)
+*        This is a comma-separated list of keywords indicating what 
+*        sort of label should be written at the origin of the outlines.
+*        Any combination of the following keywords may be used:
+*           - NAME   -- The name of the NDF is written
+*           - INDEX  -- The index number of the NDF is written
+*           - DOT    -- The origin of the NDF is marked by a dot
 *
-*        [NAME]
+*        [NAME,DOT]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -178,6 +177,10 @@
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
 
+*  Local Constants:
+      INTEGER MAXLAB             ! Maximum number of labelling options
+      PARAMETER ( MAXLAB = 8 )
+
 *  External references:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN           ! Used length of string
@@ -191,7 +194,6 @@
       INTEGER FRM                ! AST identifier for a frame
       INTEGER FSET               ! AST identifier for global frameset
       INTEGER GID                ! NDG group identifier for input NDFs
-      INTEGER GIDSTY             ! GRP group for style elements
       INTEGER HICOL              ! Highest colour index available
       INTEGER I                  ! Loop variable
       INTEGER INDF               ! NDF identifier
@@ -205,6 +207,7 @@
       INTEGER MLW                ! Line width for drawing origin dot
       INTEGER NAXES              ! Number of axes (dimensions) in a frame
       INTEGER NDIM               ! Number of returned dimensions
+      INTEGER NLAB               ! Number of labelling options
       INTEGER NNDF               ! Number of input NDFs in group
       INTEGER NPEN               ! Number of distinct pens for rotation
       INTEGER NSTY               ! Number of style elements in group
@@ -216,6 +219,9 @@
       LOGICAL AXES               ! Draw axes?
       LOGICAL CLEAR              ! Clear the graphics device before plotting?
       LOGICAL DIFERS             ! Not all the same domain?
+      LOGICAL LABNAM             ! Use labelling NAME option?
+      LOGICAL LABIND             ! Use labelling INDEX option?
+      LOGICAL LABDOT             ! Use labelling DOT option?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
       REAL GBOX( 4 )             ! Graph box for AST_PLOT definition
       REAL XCH                   ! Vertical baseline text character height
@@ -248,7 +254,7 @@
       DOUBLE PRECISION YMAX      ! Upper Y coordinate of bounding box
       DOUBLE PRECISION YMIN      ! Lower Y coordinate of bounding box
       CHARACTER * ( 2 ) JUST     ! Justification for text placement
-      CHARACTER * ( 16 ) LMODE   ! Labelling mode
+      CHARACTER * ( 16 ) LABOPT( MAXLAB ) ! Labelling mode strings
       CHARACTER * ( 16 ) LFMT    ! Format string for text labels
       CHARACTER * ( 80 ) BUFFER  ! Line buffer for output
       CHARACTER * ( AST__SZCHR ) DMN ! Current domain for this NDF
@@ -276,16 +282,30 @@
 *  Get the list of NDFs for display.
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, GID, NNDF, STATUS )
 
-*  Determine what the text labels will look like.
-      CALL PAR_CHOIC( 'LABMODE', 'NAME', 'NAME,INDEX,BOTH,NONE',
-     :                .FALSE., LMODE, STATUS )
-      IF ( LMODE .EQ. 'NAME' ) THEN
-         LFMT = '^NDF'
-      ELSE IF ( LMODE .EQ. 'INDEX' ) THEN
-         LFMT = '^INDEX'
-      ELSE IF ( LMODE .EQ. 'BOTH' ) THEN
+*  Determine what the labelling options are required.
+      CALL PAR_CHOIV( 'LABEL', MAXLAB, 'NAME,INDEX,DOT', LABOPT, NLAB,
+     :                STATUS )
+      LABNAM = .FALSE.
+      LABIND = .FALSE.
+      LABDOT = .FALSE.
+      DO I = 1, NLAB
+         IF ( LABOPT( I ) .EQ. 'NAME' ) THEN
+            LABNAM = .TRUE.
+         ELSE IF ( LABOPT( I ) .EQ. 'INDEX' ) THEN
+            LABIND = .TRUE.
+         ELSE IF ( LABOPT( I ) .EQ. 'DOT' ) THEN
+            LABDOT = .TRUE.
+         END IF
+      END DO
+
+*  Construct a labelling format string accordingly.
+      IF ( LABNAM .AND. LABIND ) THEN
          LFMT = '^INDEX: ^NDF'
-      ELSE IF ( LMODE .EQ. 'NONE' ) THEN
+      ELSE IF ( LABNAM ) THEN
+         LFMT = '^NDF'
+      ELSE IF ( LABIND ) THEN
+         LFMT = '^INDEX'
+      ELSE
          LFMT = ' '
       END IF
 
@@ -505,8 +525,7 @@ c        CALL PGSCLP( 0 )
      :                REAL( YMAX ) )
 
 *  Create a new AGI picture with the name 'DATA'.
-         CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE frame outlines',
-     :                    PICID, STATUS )
+         CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE', PICID, STATUS )
 
 *  Turn the global frameset into an AST Plot.
          CALL CCD1_APLOT( FSET, PICID, .FALSE., PLOT, STATUS )
@@ -558,7 +577,7 @@ c        CALL PGSCLP( 0 )
       END IF
 
 *  Initialise pen number.
-      IPEN = 1
+      IPEN = AST_GETI( PLOT, 'Colour(curves)', STATUS )
 
 *  Initialise constant vertex positions.
       XLO = 0.5D0
@@ -614,10 +633,12 @@ c        CALL PGSCLP( 0 )
          CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
 
 *  Plot a marker at the origin of each outline.
-         CALL PGQLW( LW )
-         CALL PGSLW( MLW )
-         CALL AST_MARK( PLOT, 1, 2, 5, VERTEX, -1, STATUS )
-         CALL PGSLW( LW )
+         IF ( LABDOT ) THEN
+            CALL PGQLW( LW )
+            CALL PGSLW( MLW )
+            CALL AST_MARK( PLOT, 1, 2, 5, VERTEX, -1, STATUS )
+            CALL PGSLW( LW )
+         END IF
 
 *  We now want to plot the name of the NDF near the origin of its outline.
 *  Calculate the origin position and 'up' direction in plot base 
