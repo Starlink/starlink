@@ -2066,6 +2066,7 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "h", "hour", "3600 s" );
       MakeKnownUnit( "d", "day", "86400 s" );
       MakeKnownUnit( "yr", "year", "31557600 s" );
+      MakeKnownUnit( "a", "year", "31557600 s" );
       MakeKnownUnit( "eV", "electron-Volt", "1.60217733E-19 J" );
       MakeKnownUnit( "erg", "erg", "1.0E-7 J" );
       MakeKnownUnit( "Ry", "Rydberg", "13.605692 eV" );
@@ -5154,6 +5155,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "h":  hour  (3600 s).
 *     - "d":  day  (86400 s).
 *     - "yr":  year  (31557600 s).
+*     - "a":  year  (31557600 s).
 *     - "eV":  electron-Volt  (1.60217733E-19 J).
 *     - "erg":  erg  (1.0E-7 J).
 *     - "Ry":  Rydberg  (13.605692 eV).
@@ -5182,8 +5184,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "D":  Debye  (1.0E-29/3 C.m).
 *
 *     Note, AST follows the widespread practice within astronomy of using 
-*     "A" and/or "a" as an alias for "Angstrom". This replaces the association 
-*     of "A" with Ampere and "a" with year included in the FITS-WCS standard.
+*     "A" as an alias for "Angstrom". This replaces the association of "A" 
+*     with Ampere included in the FITS-WCS standard.
 *
 *     In addition, any other unknown unit symbol may be used (but of course 
 *     no mapping will be possible between unknown units).
