@@ -95,85 +95,71 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/table/.table.install
      [echo] Executing NDTools target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/ndtools/.ndtools.install
      [echo] Executing HDS target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/hds/.hds.install
      [echo] Executing FITS target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/fits/.fits.install
      [echo] Executing JSky target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/jsky/.jsky.install
      [echo] Executing Pal target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing VOTable target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/votable/.votable.install
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/.jaiutil.install
      [echo] Executing SOAPSERVER target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/.soapserver.install
      [echo] Executing JPCS target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/jpcs/.jpcs.install
      [echo] Executing StarTask target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/startask/.startask.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/sog/.sog.install
      [echo] Executing SPLAT target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
      [echo] Executing TOPCAT target: deinstall
 
 deinstall:
@@ -201,4 +187,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 11 seconds
+Total time: 10 seconds

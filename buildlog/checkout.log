@@ -8305,6 +8305,8 @@ U java/source/splat/src/jni/splat_libraries
 U java/source/splat/src/jni/uk_ac_starlink_splat_imagedata_NDFJ.h
 cvs checkout: Updating java/source/splat/src/lib
 U java/source/splat/src/lib/bsh-1.2b7.jar
+U java/source/splat/src/lib/jargs.LICENCE
+U java/source/splat/src/lib/jargs.jar
 U java/source/splat/src/lib/jdom.jar
 U java/source/splat/src/lib/jdom_license.txt
 U java/source/splat/src/lib/jsci_core.jar
@@ -8747,6 +8749,7 @@ cvs checkout: Updating java/source/table/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table
 U java/source/table/src/main/uk/ac/starlink/table/AbstractStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ArrayColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/BlankColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnData.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnPermutedStarTable.java
@@ -8756,6 +8759,7 @@ U java/source/table/src/main/uk/ac/starlink/table/ConcatStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
 U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/EmptyRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/EmptyStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/JoinStarTable.java
@@ -9176,6 +9180,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Spectrum.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Splat.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Strings.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/SuperCosmos.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoMass.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoQZ.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/package.html
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
