@@ -514,7 +514,7 @@ F_ROUTINES = $(CCDPACK_F_ROUTINES) $(ATOOLS_F_ROUTINES) \
 
 KAPVIEW_F_ROUTINES = \
 ardplot.f colcomp.f contour.f \
-cursor.f drawsig.f display.f elprof.f \
+cursor.f drawsig.f drawnorth.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
 linplot.f lutable.f \
 lutsave.f lutview.f lutedit.f \
@@ -661,7 +661,7 @@ kps1_wiecs.f kps1_wiefl.f kps1_wiefp.f kps1_wieou.f kps1_wiepw.f \
 kps1_zpdec.f kps1_zprep.f kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f \
 kps1_zprgr.f kps1_zprgub.f kps1_zprguw.f kps1_zprgw.f linplt.f \
 listsb.f med3d.f medwts.f medwv.f opus.f shifts.f shiftx.f shifty.f \
-statv.f thrsr.f tropus.f uget.f uput.f
+statv.f thrsr.f tropus.f uget.f uput.f kps1_dnrth.f
 
 
 MEM_F_ROUTINES = mem2d.f
@@ -2331,6 +2331,7 @@ curre.o:	SAE_PAR PAR_ERR
 cursor.o:	SAE_PAR DAT_PAR GRP_PAR NDF_PAR AST_PAR PRM_PAR PAR_ERR AGI_ERR
 display.o:	SAE_PAR NDF_PAR PRM_PAR AST_PAR PAR_ERR PAR_PAR CTM_PAR
 drawsig.o:	SAE_PAR DAT_PAR NDF_PAR PAR_ERR PRM_PAR AST_PAR
+drawnorth.o:    SAE_PAR PRM_PAR PAR_ERR NDF_PAR CTM_PAR AST_PAR
 elprof.o:	SAE_PAR PRM_PAR PAR_ERR
 erase.o:	SAE_PAR DAT_PAR FIO_PAR PAR_ERR
 errclip.o:	SAE_PAR PRM_PAR MSG_PAR
@@ -2378,6 +2379,7 @@ kaphelp.o:	SAE_PAR PAR_ERR
 kappa_mon.o:	SAE_PAR
 kapversion.o:	SAE_PAR PAR_ERR
 kapview_mon.o:	SAE_PAR
+kps1_dnrth.o:   SAE_PAR MSG_PAR PRM_PAR AST_PAR
 kps1_agnch.o:	SAE_PAR GRP_PAR
 kps1_agncm.o:	SAE_PAR GRP_PAR
 kps1_agncp.o:	SAE_PAR

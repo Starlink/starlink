@@ -54,7 +54,7 @@ lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
 picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
 ardmask.par axconv.par axlabel.par axunits.par block.par collapse.par cadd.par \
 calc.par calpol.par cdiv.par centroid.par chpix.par cmult.par compadd.par \
-compave.par compick.par contour.par convolve.par colcomp.par \
+compave.par compick.par contour.par convolve.par colcomp.par drawnorth.par \
 creframe.par csub.par cursor.par lutedit.par display.par drawsig.par \
 elprof.par erase.par errclip.par exp10.par expe.par expon.par ffclean.par \
 fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
@@ -92,7 +92,7 @@ IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
 axlabel.hlp axunits.hlp block.hlp collapse.hlp cadd.hlp calc.hlp calpol.hlp cdiv.hlp \
 centroid.hlp changes_to_kappa.hlp chpix.hlp classified_commands.hlp \
 cmult.hlp co_ordinate_systems.hlp colour_set.hlp compadd.hlp compave.hlp \
-compick.hlp contour.hlp convolve.hlp creframe.hlp \
+compick.hlp contour.hlp convolve.hlp creframe.hlp drawnorth.hlp \
 csub.hlp cursor.hlp custom_kappa.hlp data_structures.hlp lutedit.hlp display.hlp \
 div.hlp drawsig.hlp elprof.hlp erase.hlp errclip.hlp exp10.hlp expe.hlp \
 expon.hlp feedback.hlp ffclean.hlp fillbad.hlp fitsdin.hlp fitsedit.hlp \
@@ -152,7 +152,7 @@ segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
 drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
-gdstate.ifl \
+gdstate.ifl drawnorth.ifl \
 ardplot.ifl linplot.ifl lutable.ifl \
 lutsave.ifl lutview.ifl mlinplot.ifl \
 paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
@@ -267,10 +267,11 @@ kps1_wieou.f kps1_wiefp.f kps1_wiefl.f kps1_wiecs.f kps1_wiecp.f \
 kps1_wieap.f kps1_wala0.f kps1_zprgw.f kps1_zprguw.f kps1_zprgub.f \
 kps1_zprgr.f kps1_zprgi.f kps1_zprgd.f kps1_zprgb.f kps1_zprep.f \
 kps1_zpdec.f linplt.f listsb.f lsfun1.f med3d.f medwts.f medwv.f opus.f \
-shifts.f shiftx.f shifty.f statv.f thrsr.f tropus.f uget.f uput.f 
+shifts.f shiftx.f shifty.f statv.f thrsr.f tropus.f uget.f uput.f \
+kps1_dnrth.f
 
 # The contents of the kapview_sub.tar file:
-KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
+KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f drawnorth.f display.f \
 elprof.f gdclear.f gdnames.f gdset.f gdstate.f \
 linplot.f lutable.f lutedit.f \
 lutsave.f lutview.f mlinplot.f \
