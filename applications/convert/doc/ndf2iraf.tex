@@ -2,39 +2,55 @@
 \sstroutine{
    NDF2IRAF
 }{
-   Converts an NDF to an IRAF (OIF) image
+   Converts an NDF to an IRAF image
 }{
    \sstdescription{
-      This application converts an NDF to an IRAF image in the old
-      format (OIF).  See the Notes for details of the conversion.
+      This application converts an NDF to an IRAF image. 
+      See the Notes for details of the conversion.
    }
    \sstusage{
-      NDF2IRAF IN OUT
+      ndf2iraf in out [fillbad]
    }
    \sstparameters{
       \sstsubsection{
          IN = NDF (Read)
       }{
-         Input NDF data structure. The suggested default is the current
-         NDF if one exists, otherwise it is the current value.
+         The input NDF data structure.  The suggested default is the
+         current NDF if one exists, otherwise it is the current value.
       }
       \sstsubsection{
-         OUT = \_CHAR (Write)
+         FILLBAD = \_REAL (Read)
+      }{
+         The value used to replace bad pixels in the NDF's data array
+         before it is copied to the IRAF file.  A null value ({\tt !}) means
+         no replacements are to be made.  This parameter is ignored if
+         there are no bad values.  {\tt [!]}
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
       }{
          The name of the output IRAF image.  Two files are produced
-         with the same name but different extensions. The {\tt ".PIX"} file
-         contains the data array, and {\tt ".IMH"} is the associated header
+         with the same name but different extensions. The {\tt "}.pix{\tt "} file
+         contains the data array, and {\tt "}.imh{\tt "} is the associated header
          file that may contain a copy of the NDF's FITS extension.
          The suggested default is the current value.
-       }
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
-         NDF2IRAF ABELL119 A119
+         ndf2iraf abell119 a119
       }{
-         Converts an NDF called ABELL119.SDF into the IRAF image
-         comprising the pixel file A119.PIX and the header file
-         A119.IMH.
+         Converts an NDF called abell119 into the IRAF image comprising
+         the pixel file a119.pix and the header file a119.imh.  If there
+         are any bad values present they are copied verbatim to the IRAF
+         image.
+      }
+      \sstexamplesubsection{
+         ndf2iraf qsospe qsospe fillbad=0
+      }{
+         Converts the NDF called QSOSPE to an IRAF image comprising the
+         pixel file qsospe.imh and the header file qsospe.pix.  Any bad
+         values in the data array are replaced by zero.
       }
    }
    \sstnotes{
@@ -42,16 +58,17 @@
       \sstitemlist{
 
          \sstitem
-         The NDF data array is copied to the {\tt ".PIX"} file.
+         The NDF data array is copied to the {\tt "}.pix{\tt "} file.
 
          \sstitem
-         The NDF title is written to the header object {\tt i\_title} in
-         the {\tt ".IMH"} header file.  There is a limit of twenty
+         The NDF title is written to the header object i\_title in
+         the {\tt "}.imh{\tt "} header file. There is a limit of twenty
          characters.
 
          \sstitem
-         If there is a FITS extension in the NDF, then this is added to
-         the `user area' of the IRAF header file.
+         If there is a FITS extension in the NDF, then the elements up
+         to the first END keyword of this are added to the `user area' of
+         the IRAF header file.
 
          \sstitem
          A HISTORY record is added to the IRAF header file indicating
@@ -63,33 +80,33 @@
       }
    }
    \sstdiytopic{
-      Pitfalls
+      Related Applications
    }{
-      The IMFORT routines refuse to overwrite an IRAF image if an image
-      with the same name exists.  The application then aborts.
-   }
-   \sstdiytopic{
-      References
-   }{
-      IRAF IMFORT subroutine library manual.
+      IRAF2NDF
    }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         Only handles two-dimensional NDFs, though a one-dimensional NDF
-         is treated as an image with a second dimension equal to one.
+         Only handles one-, two-, and three-dimensional NDFs.
 
          \sstitem
          Of the NDF's array components only the data array may be
          copied.
 
          \sstitem
-         The IRAF image produced has type REAL independent of the
-         type of the NDF's data array.  The pixel type of the image can be
+         The IRAF image produced has type SIGNED WORD or REAL dependent
+         of the type of the NDF's data array.  (The IRAF imfort FORTRAN
+         subroutine library only supports these data types.)  For \_BYTE,
+         \_UBYTE, and \_WORD data arrays the IRAF image will have type
+         SIGNED WORD; for all other data types of the NDF data array a
+         REAL IRAF image is made.  The pixel type of the image can be
          changed from within IRAF using the {\bf chpixtype} task in the
          {\bf images} package.
+
+         \sstitem
+         Bad values may arise due to type conversion.  These too are
+         substituted by the (non-null) value of FILLBAD.
       }
    }
 }
-
