@@ -1,16 +1,16 @@
-      SUBROUTINE ADI2_FNDHDU( ID, HDU, HDUID, STATUS )
+      SUBROUTINE ADI2_FNDHDU( ID, HDU, CREATE, HDUID, STATUS )
 *+
 *  Name:
 *     ADI2_FNDHDU
 
 *  Purpose:
-*     Locate an HDU in a FITSfile
+*     Locate an HDU in a FITSfile, creating if required
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_FNDHDU( ID, HDU, HDUID, STATUS )
+*     CALL ADI2_FNDHDU( ID, HDU, CREATE, HDUID, STATUS )
 
 *  Description:
 *     Locate an HDU in a FITSfile. It is an error if the HDU does not
@@ -21,8 +21,10 @@
 *        ADI identifier of FITSfile object
 *     HDU = CHARACTER*(*) (given)
 *        Name of the HDU we're loooking for
+*     CREATE = LOGICAL (given)
+*        Create if not present?
 *     HDUID = INTEGER (returned)
-*        ADI identifier of FITShdu object
+*        ADI identifier of HDU cache object
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -91,6 +93,7 @@
 *  Arguments Given:
       INTEGER			ID
       CHARACTER*(*)		HDU
+      LOGICAL			CREATE
 
 *  Arguments Returned:
       INTEGER			HDUID
@@ -99,118 +102,30 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*50		CMNT			! Keyword comment
-      CHARACTER*20		EXTNAM			! Extension name
-      CHARACTER*15		LHDU			! HDU name
-
-      INTEGER			FSTAT			! FITSIO status code
-      INTEGER			HCID			! HDU container
-      INTEGER			HDUTYP			! HDU type
-      INTEGER			IHDU			! HDU number
-      INTEGER			LUN			! Logical unit number
-      INTEGER			UIHDU			! User HDU number
-
-      LOGICAL			FOUND			! Found HDU
-      LOGICAL			THERE			! HDU exists?
+      LOGICAL			DIDCRE			! Did we create HDU?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the HDU container in the file
-      CALL ADI_FIND( ID, 'Hdus', HCID, STATUS )
+*  Locate the named HDU
+      CALL ADI2_CFIND( ID, HDU, ' ', ' ', CREATE, .FALSE.,
+     :                 ' ', 0, 0, DIDCRE, HDUID, STATUS )
 
-*  Get user HDU specification
-      CALL ADI_CGET0I( ID, 'UserHDU', UIHDU, STATUS )
+*  Issue error if not there
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Make local copy of HDU name. Convert if user HDU number supplied
-      LHDU = HDU
-      IF ( HDU .EQ. ' ' ) LHDU = 'PRIMARY'
-      IF ( (UIHDU .GT. 0) .AND. (HDU.GT.' ') .AND.
-     :     (HDU.NE.'PRIMARY') ) THEN
-c        STATUS = SAI__ERROR
-c        CALL ERR_REP( ' ', 'Attempted illegal index to named HDU '/
-c     :              /'when file opened with specific HDU', STATUS )
-c        GOTO 99
-      END IF
+*    If there, check not marked for delete
+        IF ( HDUID .NE. ADI__NULLID ) THEN
+          CALL ADI2_CHKDEL( HDUID, STATUS )
 
-*  HDU already found?
-      CALL ADI_THERE( HCID, LHDU, THERE, STATUS )
-      IF ( THERE ) THEN
-        CALL ADI_FIND( HCID, LHDU, HDUID, STATUS )
-        GOTO 99
-      END IF
-
-*  Extract logical unit
-      CALL ADI_CGET0I( ID, 'Lun', LUN, STATUS )
-
-*  Move to start of file?
-      IF ( (UIHDU.EQ.1) .OR.
-     :     ((UIHDU.EQ.0).AND.(LHDU .EQ. 'PRIMARY')) ) THEN
-
-*    Move to first HDU
-        CALL ADI2_MVAHDU( ID, LUN, 1, HDUTYP, STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-          CALL ADI2_ADDHDU( ID, LHDU, 1, HDUTYP, HDUID, STATUS )
+*    otherwise error
         ELSE
-          GOTO 99
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'H', HDU )
+          CALL ERR_REP( ' ', 'Unable to locate HDU ^H in file',
+     :                  STATUS )
         END IF
-
-      ELSE
-
-*    Scan HDU for HDU matching requested name
-        FOUND = .FALSE.
-        IHDU = 2
-        DO WHILE ( (STATUS.EQ.SAI__OK) .AND. .NOT. FOUND )
-
-*      Move to next HDU
-          CALL ADI2_MVAHDU( ID, LUN, IHDU, HDUTYP, STATUS )
-          IF ( STATUS .EQ. SAI__OK ) THEN
-
-*        Construct name for HDU
-            FSTAT = 0
-            CALL FTGKYS( LUN, 'EXTNAME', EXTNAM, CMNT, FSTAT )
-            IF ( FSTAT .NE. 0 ) THEN
-              FSTAT = 0
-              WRITE( EXTNAM, '(A,I2.2)' ) 'HDU_', IHDU
-            END IF
-
-*        Add its description to our list
-            CALL ADI2_ADDHDU( ID, EXTNAM, IHDU, HDUTYP, HDUID, STATUS )
-
-*        If not found release this HDU
-            IF ( (UIHDU.GT.0) .AND. (IHDU.EQ.UIHDU) ) THEN
-              FOUND = .TRUE.
-            ELSE IF ( EXTNAM .EQ. LHDU ) THEN
-              FOUND = .TRUE.
-            ELSE
-              CALL ADI_ERASE( HDUID, STATUS )
-              IHDU = IHDU + 1
-            END IF
-
-          END IF
-
-        END DO
-
-*    If we didn't find the HDU, write the number of HDU's in the file
-        IF ( .NOT. FOUND ) THEN
-          CALL ERR_BEGIN( STATUS )
-          CALL ADI_CPUT0I( ID, 'Nhdu', IHDU-1, STATUS )
-          CALL ERR_END( STATUS )
-        END IF
-
-      END IF
-
-*  Release the HDU container
- 99   CALL ERR_BEGIN( STATUS )
-      CALL ADI_ERASE( HCID, STATUS )
-      CALL ERR_END( STATUS )
-
-*  Report if not found
-      IF ( HDUID .EQ. ADI__NULLID ) THEN
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'HDU', LHDU )
-        CALL ERR_REP( ' ', 'HDU /^HDU/ not found in file', STATUS )
       END IF
 
 *  Report any errors

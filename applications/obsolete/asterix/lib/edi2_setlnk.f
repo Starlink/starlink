@@ -66,8 +66,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     18 Jun 1996 (DJA):
+*        Updated for new ADI routines
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,6 +98,7 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
+      CHARACTER*72		CMNT			! Keyword comment
       CHARACTER*6		ETABLE			! Extension for events
       CHARACTER*40		NAME			! Column name
       CHARACTER*20		TYPE			! Column type
@@ -129,13 +132,13 @@
 *  supplied search for EVENTS or STDEVT, otherwise use main HDU
       CALL ADI_CGET0I( ARGS(2), 'UserHDU', UIHDU, STATUS )
       IF ( UIHDU .GT. 0 ) THEN
-        CALL ADI2_FNDHDU( ARGS(2), ' ', EVHDU, STATUS )
+        CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE., EVHDU, STATUS )
         ETABLE = '      '
       ELSE
-        CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', EVHDU, STATUS )
+        CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', .FALSE., EVHDU, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          CALL ADI2_FNDHDU( ARGS(2), 'STDEVT', EVHDU, STATUS )
+          CALL ADI2_FNDHDU( ARGS(2), 'STDEVT', .FALSE., EVHDU, STATUS )
           ETABLE = 'STDEVT'
         ELSE
           ETABLE = 'EVENTS'
@@ -147,8 +150,8 @@
       CALL ADI_CPUT0C( ARGS(2), '.Etable', ETABLE, STATUS )
 
 *  Read the keywords defining the number of events and columns
-      CALL ADI2_HGKYI( EVHDU, 'TFIELDS', NLIST, STATUS )
-      CALL ADI2_HGKYI( EVHDU, 'NAXIS2', NEVENT, STATUS )
+      CALL ADI2_HGKYI( EVHDU, 'TFIELDS', NLIST, CMNT, STATUS )
+      CALL ADI2_HGKYI( EVHDU, 'NAXIS2', NEVENT, CMNT, STATUS )
 
 *  Get number of top level components
       DO ILIST = 1, NLIST
