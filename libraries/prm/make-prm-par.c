@@ -713,16 +713,6 @@ const char* tohex(int size, Number* p)
     for (i=2*size-1; i>=0; i--, pi>>=4) {
         c[i] = hexdigits[pi & 0xf];
     }
-    /*
-    for (i=2*size-1; i>=0; i--, pi>>=4) {
-        int64_t t = pi & 0xf;
-        if (t < 10)
-            c[i] = '0' + t;
-        else
-            c[i] = 'A' - 10 + t;
-        printf("pi=%llx  t=%llx  c[%d]='%c'\n", pi, t, i, c[i]);
-    }
-    */
 #endif /* WORDS_BIGENDIAN */
 
     assert (c[16] == '\0');
