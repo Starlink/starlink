@@ -49,7 +49,7 @@
         STATUS=SAI__ERROR
       ELSEIF (STATUS.EQ.SAI__OK) THEN
 *  get new dimensions
-        CALL PAR_GET1I('DIMS',DAT__MXDIM,DIMSN,NVAL,STATUS)
+        CALL USI_GET1I('DIMS',DAT__MXDIM,DIMSN,NVAL,STATUS)
 *  check for correct number of values
         IF (NVAL.NE.NDIM) THEN
           CALL MSG_PRNT('! number of dimensions cannot be changed')

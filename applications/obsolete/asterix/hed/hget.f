@@ -199,10 +199,10 @@ c     CALL MSG_PRNT( VERSION )
 *
             IF ( ITEM(1:3) .EQ. 'MIN' ) THEN
               RVALUE = MINVAL
-              CALL PAR_PUT0I( 'INDEX', INDMIN, TSTAT )
+              CALL USI_PUT0I( 'INDEX', INDMIN, TSTAT )
             ELSE
               RVALUE = MAXVAL
-              CALL PAR_PUT0I( 'INDEX', INDMAX, TSTAT )
+              CALL USI_PUT0I( 'INDEX', INDMAX, TSTAT )
             END IF
           END IF
           CALL DAT_UNMAP( LOC, STATUS )
