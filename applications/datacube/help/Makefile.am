@@ -6,12 +6,8 @@ datacube_help_SOURCES = $(F_ROUTINES)
 datacube_help_TASKS =
 datacube_help_LDADD = `shl_link_adam`
 
-F_ROUTINES = \
-  datacube_help.f gthlpi.f gethlp.f pthlpo.f kpg1_scrsz.f sread.f
+F_ROUTINES = datacube_help.f
 
-PRIVATE_INCLUDES = \
-  helpcmd.inc
-   
 ##  The on-line help.
 HELP_SOURCES = datacube.hlp
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
