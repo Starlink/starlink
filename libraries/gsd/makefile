@@ -1301,6 +1301,7 @@ clean:
 
 unbuild: clean
 	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	@- rm -f gsdprint 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
 
