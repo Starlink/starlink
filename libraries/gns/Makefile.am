@@ -40,21 +40,15 @@ intin.f iong.f itwcg.f iwcg.f iwsg.f logtr.f msg.f rdwsi.f rdwst.f \
 spech.f start.f stop.f termg.f termi.f tndg.f tng.f tni.f trim.f   \
 fndf.f
 
-FPP_ROUTINES = initg.fpp initi.fpp
-
-initg.f: initg.fpp
-initi.f: initi.fpp
+FPP_ROUTINES = initg.F initi.F
 
 BUILT_SOURCES = GNS_ERR
 
 # Need to specify how to create the binary database files
 
 noinst_PROGRAMS = gksbuild idibuild
-gksbuild_SOURCES = gksbuild.fpp
-idibuild_SOURCES = idibuild.fpp
-
-gksbuild.f: gksbuild.fpp
-idibuild.f: idibuild.fpp
+gksbuild_SOURCES = gksbuild.F
+idibuild_SOURCES = idibuild.F
 
 gns_gksdevices : gksbuild$(EXEEXT) gksdevices.txt
 	-rm -f gns_gksdevices
