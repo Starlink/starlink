@@ -94,13 +94,25 @@ elements on the way to the current chunk
 <argumentlist>
 <parameter>nd<type>node-list<description>Node we want the path to
 <codebody>
+(define ($chunk-path-abbrev$ nd)
+  (let* ((gi-map (list (cons (normalize "sect") "a")
+		       (cons (normalize "subsect") "b")
+		       (cons (normalize "subsubsect") "c")
+		       (cons (normalize "subsubsubsect") "d")
+		       (cons (normalize "appendices") "x")
+		       (cons (normalize "routinelist") "r")
+		       (cons (normalize "codecollection") "f")))
+	 (nd-gi-map (assoc (gi nd) gi-map)))
+    (if nd-gi-map
+	(cdr nd-gi-map)
+	(gi nd))))
 (define (chunk-path nd)
   (let loop ((this-node (chunk-level-parent nd))
 	     (path-string ""))
     (if (node-list-empty? this-node)
 	path-string
 	(loop (chunk-level-parent (parent this-node))
-	      (string-append (gi this-node)
+	      (string-append ($chunk-path-abbrev$ this-node) ;(gi this-node)
 			     (number->string (child-number this-node))
 			     path-string)))))
 
@@ -157,7 +169,9 @@ Returns the filename of the html file that contains the given node.
 				; means either that we're not
 				; chunking, or else that this is the
 				; root chunk.
-		      (root-file-name target_nd)
+		      (if %override-root-file-name%
+			  %override-root-file-name%
+			  (root-file-name target_nd))
 				; give target_nd as argument - this is
 				; a singleton-node-list (required
 				; argument for document-element), but
