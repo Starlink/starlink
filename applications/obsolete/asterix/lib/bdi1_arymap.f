@@ -158,9 +158,8 @@
 *  Is object primitive?
       CALL DAT_PRIM( LOC, PRIM, STATUS )
 
-*  If number of elements doesn't match and the actual object is a scalar
-*  then we have to map dynamically
-      IF ( (NELM .NE. ENELM) .AND. (NDIM.EQ.0) ) THEN
+*  Object is scalar?
+      IF ( NDIM .EQ. 0 ) THEN
 
 *    Map workspace of required type
         CALL DYN_MAPT( 1, ENELM, HTYPE, PTR, STATUS )
@@ -175,7 +174,9 @@
         CALL DAT_PREC( LOC, SSIZE, STATUS )
 
 *    Fill mapped array with copies of scalar data
-        CALL BDI1_ARYMAP_REP( SSIZE, DBUF, ENELM, %VAL(PTR), STATUS )
+        IF ( ENELM .GT. NELM ) THEN
+          CALL BDI1_ARYMAP_REP( SSIZE, DBUF, ENELM, %VAL(PTR), STATUS )
+        END IF
 
 *    Clone a copy of the locator for mapping
         CALL DAT_CLONE( LOC, SLOC, STATUS )
