@@ -83,7 +83,7 @@ dvi2bitmap.mantext: dvi2bitmap.1
 
 dvi2bitmap_source.tar: configure dvi2bitmap.mantext
 	echo "Packaging up dvi2bitmap version" `cat VERSION`
-	tar cf $@ *.cc *.h Makefile.in config.h.in README VERSION \
+	tar cf $@ *.cc *.c *.h Makefile.in config.h.in README VERSION \
 			configure config/config* config/install-sh \
 			extras test \
 			dvi2bitmap.1 dvi2bitmap.mantext LICENCE
@@ -119,6 +119,8 @@ dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 		$(MAKE) -f Makefile.in $$FN; \
 		rm -f $@; \
 		ln -s $$FN $@
+
+distrib: dvi2bitmap.tar
 
 version.h README dvi2bitmap.1 Makefile.starlink: VERSION
 	./propagate-version version.h README dvi2bitmap.1 Makefile.starlink
