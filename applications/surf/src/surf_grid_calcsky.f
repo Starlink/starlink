@@ -187,6 +187,10 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.9  1999/08/19 21:18:13  timj
+*     Remove debug print statements.
+*     Fix memory leak when using a MODEL.
+*
 *     Revision 1.8  1999/08/19 03:37:42  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -428,7 +432,7 @@
 
       END IF
 
-      PRINT *, 'grid ', nx, ny, icen, jcen
+*      PRINT *, 'grid ', nx, ny, icen, jcen
 
 
 *     The first run through simply stores an I,J for each of the TOT_PTS
@@ -507,6 +511,10 @@
          END IF
 
       END DO
+
+*     Free the histogram memory. Do it here since we will not need
+*     it any more if a model is supplied.
+      CALL SCULIB_FREE('GRID_PTR', GRID_PTR, GRID_END, STATUS)
 
 *     If we have an input image then the STATS for the image
 *     are simply the mapped input data (dont care about variance)
@@ -592,12 +600,21 @@
          CALL SCULIB_MALLOC(NX * NY * NMAX * VAL__NBI, BIN_POS_PTR,
      :        BIN_POS_END, STATUS)
 
+
 *     We are going to use the histogram scratch space to keep track
 *     of the current highest member used in BIN_PTR (etc).
 *     Two options for doing this:
 *       1. Reset to zero and increment each time a data point is entered.
 *       2. Leave as is and decrement each time a data point is entered.
 *     Not much difference so I will go for the increment option.
+*     In fact, since the histogram scratch space may not be required
+*     if we are using a MODEL then we have already freed the memory associated
+*     with the histogram. Allocate some more now and then free it immediately
+*     afterwards. This will have to be changed if we dont want to free it
+*     before the IF (USEMODEL) section.
+
+      CALL SCULIB_MALLOC(NX * NY * VAL__NBI, GRID_PTR, GRID_END,
+     :     STATUS)
 
 
 *     Initialise the work arrays
@@ -640,7 +657,7 @@
 *     Free the scratch memory used for the histogram and counting the
 *     current position in the array.
 
-         CALL SCULIB_FREE ('GRID_PTR', GRID_PTR, GRID_END, STATUS)
+         CALL SCULIB_FREE ('GRID_PTR2', GRID_PTR, GRID_END, STATUS)
 
 *     Some scratch space for storing the numbers (size nmax)
 *     in each bin
@@ -745,6 +762,7 @@
          CALL SCULIB_FREE('STATS_PTR', STATS_PTR, STATS_END, STATUS)
       END IF
 
+*     Free the IJ lookup table
       CALL SCULIB_FREE ('IJPOS_PTR', IJPOS_PTR, IJPOS_END, STATUS)
 
 *     Write data to file
