@@ -24,9 +24,7 @@ libhlp_la_SOURCES = \
 	$(PRIVATE_INCLUDES)
 
 FPP_ROUTINES = \
-	fopr.fpp
-
-fopr.f: fopr.fpp
+	fopr.F
 
 F_ROUTINES = \
 	comstr.f \
