@@ -69,7 +69,7 @@ sub extract_objects ($$$$) {
 #      ("extractor_mon_$$", "$ENV{EXTRACTOR_DIR}/extractor");
 #    $extractor->contactw  || die "Error launching extractor -- timeout";
 
-    my $parlist = "image=$ndfname config=$ENV{AUTOASTROM_DIR}/misc/extractor.config keywords=false";
+    my $parlist = "image=$ndfname config=$ENV{AUTOASTROM_DIR}/extractor.config keywords=false";
     print STDERR "parlist=$parlist\n";
     my $status = $extractor->obeyw ("extractor", $parlist);
 
