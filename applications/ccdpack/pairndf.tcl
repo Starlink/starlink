@@ -81,15 +81,62 @@
 #  Initialise screen.
       wm withdraw .
 
-#  Generate ndf objects for all of the NDFs in the input list.
+#  Generate ndf objects for all of the NDFs in the input list.  At the 
+#  same time, check whether they all share the same Current WCS frame.
       set nndf 0
       set ndflist {}
+      set diffcurrent 0
+      set maxleng 0
       foreach n $NDFNAMES {
          incr nndf
          set ndf [ ndf $n ]
          set ndfs($nndf) $ndf
          lappend ndflist $ndf
+         set current [ $ndf frameatt domain CURRENT ]
+         set nameleng [ string length [ $ndf name ] ]
+         if {  $nameleng > $maxleng } {
+            set maxleng $nameleng
+         }
+         if { $nndf > 1 && $current != $lastcurrent } {
+            set diffcurrent 1
+         }
+         set lastcurrent [ $ndf frameatt domain CURRENT ]
       }
+
+#  If not all the NDFs have the same Current frame, check that the user
+#  is aware of the fact.
+     if { $diffcurrent } {
+        catch { unset warnlines }
+        lappend warnlines \
+           "The input images do not all have Current coordinate systems" \
+           "with the same name; they are:" \
+           ""
+        foreach ndf $ndflist {
+           lappend warnlines [ format "    %-${maxleng}s:  %s" \
+                                      [ $ndf name ] \
+                                      [ $ndf frameatt domain CURRENT ] ]
+        }
+        lappend warnlines \
+           "" \
+           "PAIRNDF will only work if the Current coordinate systems of all" \
+           "images are related by a simple offset (translation) in X and Y." \
+           "" \
+           "Do you wish to continue?"
+        set warnbox [ iwidgets::messagedialog .warn \
+                         -modality application \
+                         -bitmap questhead \
+                         -title "PAIRNDF: Different WCS frames" \
+                         -text [ join $warnlines "\n" ] \
+                    ]
+        $warnbox buttonconfigure Cancel -text "Abort PAIRNDF"
+        $warnbox buttonconfigure OK -text "Continue"
+        [ $warnbox component message ] configure -justify left
+        $warnbox hide Help
+        $warnbox center
+        if { ! [ $warnbox activate ] } {
+           error "User abort."
+        }
+     }
 
 #  Create an NDF pair alignment widget.
       set aligner [ ndfalign .a ]
