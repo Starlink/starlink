@@ -3725,9 +3725,9 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         Y=Y-YC
 
 *  rotate to frame parallel with slice axes
-        THETA=ATAN2(ABS(Y),ABS(X))
+        THETA=ATAN2(Y,X)
         DISP=SQRT(X**2 + Y**2)
-        X=DISP*COS(ANGLE-THETA)
+        X=DISP*COS(3.142/2.0-ANGLE-THETA)
         Y=DISP*SIN(ANGLE-THETA)
 
 *  check transformed coord falls within slice
