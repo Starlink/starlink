@@ -302,6 +302,10 @@ SOURCE_VARIANT = $(SYSTEM)
 
 STARLINK = /star
 
+#  Path of the Perl binary we will use
+
+STARPERL = $(STARLINK)/Perl/bin/perl
+
 #  Pathnames of Starlink sub-directories that may be referenced when
 #  building this package.
 
@@ -710,7 +714,14 @@ install:
 #  Install the executables, giving them world-execute permission.
 #  Install the library material into the same directory.
 	test -d $(INSTALL_BIN) || mkdir $(INSTALL_BIN)
-	for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES) ""; do \
+	for f in $(PUBLIC_SCRIPTS) ""; do \
+		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
+		if test -n "$$f"; then \
+			sed '1s+/[^ ]*+$(STARPERL)+' $$f >$$DEST; \
+			chmod 755 $$DEST; \
+		fi; \
+	done
+	for f in $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
 		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
 			cp -p $$f $$DEST; \
@@ -773,7 +784,15 @@ test-install:
 	@ test -n "$$AUTOASTROM_DIR" || (echo "Define AUTOASTROM_DIR" && false)
 	@ echo "TEST-INSTALL in $$AUTOASTROM_DIR..."
 	test -n "$$AUTOASTROM_DIR" && test -d "$$AUTOASTROM_DIR"
-	@ for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES); do \
+	@ for f in $(PUBLIC_SCRIPTS); do \
+		DEST=$$AUTOASTROM_DIR/`echo $$f|sed s+.*/++`; \
+		if test -n "$$f"; then \
+			sed '1s+/[^ ]*+$(STARPERL)+' $$f >$$DEST; \
+			echo $$DEST; \
+			chmod 755 $$DEST; \
+		else :; fi; \
+	done
+	@ for f in $(BUILT_FILES) $(LIBRARY_FILES); do \
 		DEST=$$AUTOASTROM_DIR/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
 			cp -p $$f $$DEST; \
@@ -833,7 +852,10 @@ do_deinstall:
 #  Note the package will need to be tested again.
 	@- if test -f .TESTED_$(SYSTEM); then $(RMF) .TESTED_$(SYSTEM); else :; fi
 #  Deinstall the executables and library files.
-	for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES) ""; do \
+	for f in $(PUBLIC_SCRIPTS) ""; do \
+		if test -n "$$f"; then $(RMF) $$f; fi; \
+	done
+	for f in $(BUILT_FILES) $(LIBRARY_FILES) ""; do \
 		DEST=$(INSTALL_BIN)/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
 			$(RMF) $$f; \
