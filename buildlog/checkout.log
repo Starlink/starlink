@@ -9053,9 +9053,11 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnSelectorModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ConcatWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ControlWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/CutoutSelector.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/Driver.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ImageWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/IntSelector.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/InverseRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELActivator.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
