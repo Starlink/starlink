@@ -631,108 +631,115 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int result;
    const double *zero;
    const double *grad;
-   int a1;
-   int a2;
-   int g1;
-   int g2;
+   int i1;
+   int i2;
+   double *accum;
+   int coord_in;
+   int coord_out;
+   int ix, iy, off1;
+   double x1, y1;
 
    result = 0;
    if ( !astOK ) return result;
 
-   npoint = 1;
-   for ( idim = 0; idim < ndim_out; idim++ ) {
-      npoint *= ubnd[ idim ] - lbnd[ idim ] + 1;
+   for ( npoint = 1, coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+      npoint *= ubnd[ coord_out ] - lbnd[ coord_out ] + 1;
    }
    offset = astMalloc( sizeof( int ) * (size_t) npoint );
    dim = astMalloc( sizeof( int ) * (size_t) ndim_out );
    stride = astMalloc( sizeof( int ) * (size_t) ndim_out );
-
-   off = 0;
-   s = 1;
-   for ( idim = 0; idim < ndim_out; idim++ ) {
-      stride[ idim ] = s;
-      s *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1;
-      dim[ idim ] = lbnd[ idim ];
-      off += ( dim[ idim ] - lbnd_out[ idim ] ) * stride[ idim ];
-   }
-
-   if ( linear_fit ) {
-      double *accum;
-      int coord_in;
-      int coord_out;
-      int ndim_in = astGetNin( this );
-      int nd1;
-      zero = linear_fit;
-      grad = linear_fit + ndim_out;
-      pset_in = astPointSet( npoint, ndim_in, "" );
-      ptr_in = astGetPoints( pset_in );
-      accum = astMalloc( sizeof( double ) *
-                         (size_t) ( ndim_in * ( ndim_out + 1 ) ) );
-      nd1 = ndim_out + 1;
-      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-         a1 = coord_in * nd1;
-         g1 = coord_in * ndim_out;
-         accum[ a1 + ndim_out ] = zero[ coord_in ];
-         for ( coord_out = ndim_out - 1; coord_out >= 0; coord_out-- ) {
-            a2 = a1 + coord_out;
-            g2 = g1 + coord_out;
-            accum[ a2 ] = accum[ a2 + 1 ] + grad[ g2 ] *
-                                        (double) lbnd[ coord_out ];
-         }
+   if ( astOK ) {
+      off = 0;
+      s = 1;
+      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+         stride[ coord_out ] = s;
+         s *= ubnd_out[ coord_out ] - lbnd_out[ coord_out ] + 1;
+         dim[ coord_out ] = lbnd[ coord_out ];
+         off += ( dim[ coord_out ] - lbnd_out[ coord_out ] ) * stride[ coord_out ];
       }
-
-      for ( done = 0, point = 0; !done; point++ ) {
-         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-            ptr_in[ coord_in ][ point ] = accum[ coord_in * nd1 ];
-         }
-         offset[ point ] = off;
-         coord_out = 0;
-         do {
-            if ( dim[ coord_out ] < ubnd[ coord_out ] ) {
-               dim[ coord_out ]++;
-               off += stride[ coord_out ];
-               break;
-            } else {
-               dim[ coord_out ] = lbnd[ coord_out ];
-               off -= ( ubnd[ coord_out ] - lbnd[ coord_out ] ) * stride[ coord_out ];
-               done = ( ++coord_out == ndim_out );
+      if ( linear_fit ) {
+         zero = linear_fit;
+         grad = linear_fit + ndim_out;
+         pset_in = astPointSet( npoint, ndim_in, "" );
+         ptr_in = astGetPoints( pset_in );
+         point = 0;
+         if ( ( ndim_in == 1 ) && ( ndim_out == 1 ) ) {
+            for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+               ptr_in[ 0 ][ point ] = zero[ 0 ] + grad[ 0 ] * (double) ix;
+               offset[ point ] = ix - lbnd_out[ 0 ];
+               point++;
             }
-         } while ( !done );
-         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-            a1 = coord_in * nd1;
-            g1 = coord_in * ndim_out;
-            for ( idim = coord_out; idim >= 0; idim-- ) {
-               a2 = a1 + idim;
-               g2 = g1 + idim;
-               accum[ a2 ] = accum[ a2 + 1 ] + dim[ idim ] * grad[ g2 ];
+         } else if ( ( ndim_in == 2 ) && ( ndim_out == 2 ) ) {
+            for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+               x1 = zero[ 0 ] + grad[ 1 ] * (double) iy;
+               y1 = zero[ 1 ] + grad[ 3 ] * (double) iy;
+               off1 = ( iy - lbnd_out[ 1 ] ) * stride[ 1 ] - lbnd_out[ 0 ];
+               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                  ptr_in[ 0 ][ point ] = x1 + grad[ 0 ] * (double) ix;
+                  ptr_in[ 1 ][ point ] = y1 + grad[ 2 ] * (double) ix;
+                  offset[ point ] = off1 + ix;
+                  point++;
+               }
+            }
+         } else {
+            accum = astMalloc( sizeof( double ) *
+                              (size_t) ( ndim_in * ndim_out ) );
+            if ( astOK ) {
+               for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                  accum[ ( coord_in + 1 ) * ndim_out - 1 ] = zero[ coord_in ];
+               }
+               coord_out = ndim_out - 1;
+               for ( done = 0; !done; point++ ) {
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     i1 = coord_in * ndim_out;
+                     for ( idim = coord_out; idim >= 1; idim-- ) {
+                        i2 = i1 + idim;
+                        accum[ i2 - 1 ] = accum[ i2 ] + dim[ idim ] * grad[ i2 ];
+                     }
+                     ptr_in[ coord_in ][ point ] = accum[ i1 ] + dim[ 0 ] * grad[ i1 ];
+                  }
+                  offset[ point ] = off;
+                  coord_out = 0;
+                  do {
+                     if ( dim[ coord_out ] < ubnd[ coord_out ] ) {
+                        dim[ coord_out ]++;
+                        off += stride[ coord_out ];
+                        break;
+                     } else {
+                        dim[ coord_out ] = lbnd[ coord_out ];
+                        off -= ( ubnd[ coord_out ] - lbnd[ coord_out ] ) * stride[ coord_out ];
+                        done = ( ++coord_out == ndim_out );
+                     }
+                  } while ( !done );
+               }
+            }
+            accum = astFree( accum );
+         }
+      } else {
+         pset_out = astPointSet( npoint, ndim_out, "" );
+         ptr_out = astGetPoints( pset_out );
+         for ( done = 0, point = 0; !done; point++ ) {
+            for ( idim = 0; idim < ndim_out; idim++ ) {
+               ptr_out[ idim ][ point ] = (double) dim[ idim ];
+            }
+            offset[ point ] = off;
+            idim = 0;
+            while ( !done ) {
+               if ( dim[ idim ] < ubnd[ idim ] ) {
+                  dim[ idim ]++;
+                  off += stride[ idim ];
+                  break;
+               } else {
+                  dim[ idim ] = lbnd[ idim ];
+                  off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
+                  done = ( ++idim == ndim_out );
+               }
             }
          }
+         pset_in = astTransform( this, pset_out, 0, NULL );
+         ptr_in = astGetPoints( pset_in );
+         pset_out = astAnnul( pset_out );
       }
-      accum = astFree( accum );
-   } else {
-      pset_out = astPointSet( npoint, ndim_out, "" );
-      ptr_out = astGetPoints( pset_out );
-      for ( done = 0, point = 0; !done; point++ ) {
-         for ( idim = 0; idim < ndim_out; idim++ ) {
-            ptr_out[ idim ][ point ] = (double) dim[ idim ];
-         }
-         offset[ point ] = off;
-         idim = 0;
-         while ( !done ) {
-            if ( dim[ idim ] < ubnd[ idim ] ) {
-               dim[ idim ]++;
-               off += stride[ idim ];
-               break;
-            } else {
-               dim[ idim ] = lbnd[ idim ];
-               off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
-               done = ( ++idim == ndim_out );
-            }
-         }
-      }
-      pset_in = astTransform( this, pset_out, 0, NULL );
-      ptr_in = astGetPoints( pset_in );
-      pset_out = astAnnul( pset_out );
    }
    if ( astOK ) {
       if ( method == AST__NEAREST ) {
