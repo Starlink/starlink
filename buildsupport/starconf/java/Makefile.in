@@ -1,10 +1,18 @@
 JAVAC=@JAVAC@
+JAVA=@JAVA@
 
 .SUFFIXES: .java .class
 .java.class:
 	$(JAVAC) -source 1.4 $<
 
 GenerateDependencies.class: GenerateDependencies.java
+
+check: GenerateDependencies.class testdeps.xml testdeps.correct
+	rm -f testdeps.stdout testdeps.stderr
+	$(JAVA) GenerateDependencies --test testdeps.xml \
+	    >testdeps.stdout 2>testdeps.stderr
+	diff testdeps.correct testdeps.stdout
+	rm -f testdeps.stdout testdeps.stderr
 
 clean:
 	rm -f *.class

@@ -1,0 +1,54 @@
+a:
+  b
+  c
+  path=a \
+  --
+
+b:
+  c
+  path=b \
+  --
+
+c:
+  path=c \
+  --
+
+d:
+  a
+  c
+  e
+  path=d \
+  --
+
+e:
+  path=e \
+  --
+
+f:
+  g
+  path=f \
+  --
+
+g:
+  path=g \
+  --
+
+Component t: circular build dependencies
+Component u: circular build dependencies
+Component v: circular build dependencies
+Component w: circular build dependencies
+Component x: circular build dependencies
+Component y: circular build dependencies
+Component z: circular build dependencies
+za:
+  zb
+  path=za \
+  (buildsupport)
+  --
+
+zb:
+  path=zb \
+  --
+
+buildsupport:
+  za

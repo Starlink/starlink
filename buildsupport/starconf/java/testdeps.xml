@@ -1,0 +1,166 @@
+<?xml version="1.0"?>
+<!DOCTYPE componentset SYSTEM "../componentinfo.dtd">
+
+<componentset>
+  <component id="a">
+    <version>1</version>
+    <path>a</path>
+    <description>x</description>
+    <dependencies>
+      <build>b</build>
+      <link>c</link>
+    </dependencies>
+  </component>
+
+  <component id="b">
+    <version>1</version>
+    <path>b</path>
+    <description>x</description>
+    <dependencies>
+      <build>c</build>
+      <!-- <build option="link">c</build> -->
+    </dependencies>
+  </component>
+
+  <component id="c">
+    <version>1</version>
+    <path>c</path>
+    <description>x</description>
+    <dependencies>
+    </dependencies>
+  </component>
+
+  <component id="d">
+    <version>1</version>
+    <path>d</path>
+    <description>x</description>
+    <dependencies>
+      <!-- <build>a</build> -->
+      <build option="link">e</build>
+    </dependencies>
+  </component>
+
+  <component id="e">
+    <version>1</version>
+    <path>e</path>
+    <description>x</description>
+    <dependencies>
+      <link>a</link>
+    </dependencies>
+  </component>
+
+  <component id="f">
+    <!-- circular link dependency on g: OK -->
+    <version>1</version>
+    <path>f</path>
+    <description>x</description>
+    <dependencies>
+      <build>g</build>
+    </dependencies>
+  </component>
+
+  <component id="g">
+    <version>1</version>
+    <path>g</path>
+    <description>x</description>
+    <dependencies>
+      <link>f</link>
+    </dependencies>
+  </component>
+
+
+  <!-- Following should fail -->
+
+  <component id="t">
+    <!-- depends on the three-way dependency -->
+    <version>1</version>
+    <path>t</path>
+    <description>x</description>
+    <dependencies>
+      <build>u</build>
+    </dependencies>
+  </component>
+
+  <component id="u">
+    <!-- three-way circular dependency on v and w -->
+    <version>1</version>
+    <path>u</path>
+    <description>x</description>
+    <dependencies>
+      <build>v</build>
+    </dependencies>
+  </component>
+
+  <component id="v">
+    <version>1</version>
+    <path>v</path>
+    <description>x</description>
+    <dependencies>
+      <build>w</build>
+    </dependencies>
+  </component>
+
+  <component id="w">
+    <version>1</version>
+    <path>w</path>
+    <description>x</description>
+    <dependencies>
+      <build>u</build>
+    </dependencies>
+  </component>
+
+  <component id="x">
+    <!-- Depends on a thing with a circular dependency, but doesn't
+         have a circular dependency on itself. -->
+    <version>1</version>
+    <path>x</path>
+    <description>x</description>
+    <dependencies>
+      <build>y</build>
+    </dependencies>
+  </component>
+
+  <component id="y">
+    <!-- circular dependency via z -->
+    <version>1</version>
+    <path>y</path>
+    <description>x</description>
+    <dependencies>
+      <build>z</build>
+      <build>a</build>
+    </dependencies>
+  </component>
+
+  <component id="z">
+    <version>1</version>
+    <path>z</path>
+    <description>x</description>
+    <dependencies>
+      <build>y</build>
+      <build>za</build>
+    </dependencies>
+  </component>
+
+  <!-- following should succeed, but put them alphabetically after the
+       above so that they'll be tested after z (and co) have failed -->
+
+  <component id="za" buildsupport="yes">
+    <!-- za is a dependency of a circular dependency, z, but has a
+         perfectly OK dependency on zb -->
+    <version>1</version>
+    <path>za</path>
+    <description>x</description>
+    <dependencies>
+      <build>zb</build>
+    </dependencies>
+  </component>
+
+  <component id="zb">
+    <version>1</version>
+    <path>zb</path>
+    <description>x</description>
+    <dependencies>
+    </dependencies>
+  </component>
+
+</componentset>
