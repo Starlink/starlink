@@ -8642,6 +8642,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/direct.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/help.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/html-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/index.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/intro.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/invoke.html
@@ -8944,6 +8945,7 @@ U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/multidisplay
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/multiply3.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/open3.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/plaindat.gif
+U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/redoy2.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/row.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/smallbox1.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/sogimage.gif

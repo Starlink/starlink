@@ -162,387 +162,35 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
   [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectTextField.java:17: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:30: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfigurator.java:40: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/StoreConfigurator.java:33: package uk.ac.starlink.ast.gui.images does not exist
-  [javadoc] import uk.ac.starlink.ast.gui.images.ImageHolder;
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppLogSink.java:5: package org.mortbay.util does not exist
-  [javadoc] import org.mortbay.util.LogSink;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppLogSink.java:6: package org.mortbay.util does not exist
-  [javadoc] import org.mortbay.util.Frame;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppLogSink.java:16: cannot resolve symbol
-  [javadoc] symbol  : class LogSink 
-  [javadoc] location: class uk.ac.starlink.soap.AppLogSink
-  [javadoc]     implements LogSink
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppLogSink.java:35: cannot resolve symbol
-  [javadoc] symbol  : class Frame 
-  [javadoc] location: class uk.ac.starlink.soap.AppLogSink
-  [javadoc]     public void log(String tag, Object msg, Frame frame, long time )
-  [javadoc]                                             ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:13: package javax.servlet does not exist
-  [javadoc] import javax.servlet.Servlet;
-  [javadoc]                      ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:22: package org.mortbay.http does not exist
-  [javadoc] import org.mortbay.http.HttpContext;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:23: package org.mortbay.http does not exist
-  [javadoc] import org.mortbay.http.HttpServer;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:24: package org.mortbay.jetty.servlet does not exist
-  [javadoc] import org.mortbay.jetty.servlet.ServletHandler;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:25: package org.mortbay.jetty.servlet does not exist
-  [javadoc] import org.mortbay.jetty.servlet.ServletHolder;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:26: package org.mortbay.jetty.servlet does not exist
-  [javadoc] import org.mortbay.jetty.servlet.ServletHttpContext;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:27: package org.mortbay.jetty.servlet does not exist
-  [javadoc] import org.mortbay.jetty.servlet.WebApplicationContext;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:28: package org.mortbay.util does not exist
-  [javadoc] import org.mortbay.util.Code;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:29: package org.mortbay.util does not exist
-  [javadoc] import org.mortbay.util.Log;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:30: package org.mortbay.xml does not exist
-  [javadoc] import org.mortbay.xml.XmlConfiguration;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:61: cannot resolve symbol
-  [javadoc] symbol  : class HttpServer 
-  [javadoc] location: class uk.ac.starlink.soap.AppHttpSOAPServer
-  [javadoc] public class AppHttpSOAPServer extends HttpServer
-  [javadoc]                                        ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:119: cannot resolve symbol
-  [javadoc] symbol  : class HttpContext 
-  [javadoc] location: class uk.ac.starlink.soap.AppHttpSOAPServer
-  [javadoc]     protected HttpContext newHttpContext( String contextPathSpec )
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppHttpSOAPServer.java:133: cannot resolve symbol
-  [javadoc] symbol  : class WebApplicationContext 
-  [javadoc] location: class uk.ac.starlink.soap.AppHttpSOAPServer
-  [javadoc]     public WebApplicationContext addAxisSOAPServices( String direct )
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:87: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GraphicsPane;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:56: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GraphicsPane;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:57: package diva.canvas does not exist
-  [javadoc] import diva.canvas.JCanvas;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:76: cannot resolve symbol
-  [javadoc] symbol  : class JCanvas 
-  [javadoc] location: class jsky.image.gui.DivaGraphicsImageDisplay
-  [javadoc] public class DivaGraphicsImageDisplay extends JCanvas implements GraphicsImageDisplay {
-  [javadoc]                                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorPane.java:10: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GraphicsPane;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorPane.java:11: package diva.canvas does not exist
-  [javadoc] import diva.canvas.CanvasLayer;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorPane.java:21: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.navigator.NavigatorPane
-  [javadoc] public class NavigatorPane extends GraphicsPane {
-  [javadoc]                                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:38: package diva.canvas does not exist
-  [javadoc] import diva.canvas.AbstractFigure;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:39: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionInteractor;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:40: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionModel;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:41: package diva.canvas.toolbox does not exist
-  [javadoc] import diva.canvas.toolbox.BasicFigure;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:42: package diva.canvas.toolbox does not exist
-  [javadoc] import diva.canvas.toolbox.LabelFigure;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:43: package diva.util.java2d does not exist
-  [javadoc] import diva.util.java2d.Polygon2D;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:44: package diva.util.java2d does not exist
-  [javadoc] import diva.util.java2d.Polyline2D;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:42: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionInteractor;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:43: package diva.util.java2d does not exist
-  [javadoc] import diva.util.java2d.Polygon2D;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:44: package diva.util.java2d does not exist
-  [javadoc] import diva.util.java2d.Polyline2D;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:318: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
-  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane) {
-  [javadoc]                                 ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:330: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
-  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane, ImageProcessor processor) {
-  [javadoc]                                 ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:375: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
-  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane, Component parent,
-  [javadoc]                                 ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:388: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
-  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane, Component parent) {
-  [javadoc]                                 ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSImage.java:46: package ca.nrc.cadc.arch.io does not exist
-  [javadoc] import ca.nrc.cadc.arch.io.FitsFilterInputStream;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:19: package diva.canvas does not exist
-  [javadoc] import diva.canvas.CanvasLayer;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:20: package diva.canvas does not exist
-  [javadoc] import diva.canvas.VisibleComponent;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:29: cannot resolve symbol
-  [javadoc] symbol  : class CanvasLayer 
-  [javadoc] location: class jsky.image.graphics.ImageLayer
-  [javadoc] public class ImageLayer extends CanvasLayer implements VisibleComponent {
-  [javadoc]                                 ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:29: cannot resolve symbol
-  [javadoc] symbol  : class VisibleComponent 
-  [javadoc] location: class jsky.image.graphics.ImageLayer
-  [javadoc] public class ImageLayer extends CanvasLayer implements VisibleComponent {
-  [javadoc]                                                        ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:187: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.image.gui.DivaGraphicsImageDisplay
-  [javadoc]     public DivaGraphicsImageDisplay(GraphicsPane pane, ImageProcessor imageProcessor, String name) {
-  [javadoc]                                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:19: package gnu.jel does not exist
-  [javadoc] import gnu.jel.DVResolver;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:33: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.catalog.TablePlotSymbol
-  [javadoc] public class TablePlotSymbol implements DVResolver {
-  [javadoc]                                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:10: package diva.canvas does not exist
-  [javadoc] import diva.canvas.CanvasLayer;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:11: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GraphicsPane;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:12: package diva.canvas does not exist
-  [javadoc] import diva.canvas.VisibleComponent;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:20: cannot resolve symbol
-  [javadoc] symbol  : class CanvasLayer 
-  [javadoc] location: class jsky.navigator.SymbolLayer
-  [javadoc] public class SymbolLayer extends CanvasLayer implements VisibleComponent {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:20: cannot resolve symbol
-  [javadoc] symbol  : class VisibleComponent 
-  [javadoc] location: class jsky.navigator.SymbolLayer
-  [javadoc] public class SymbolLayer extends CanvasLayer implements VisibleComponent {
-  [javadoc]                                                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:30: package diva.canvas does not exist
-  [javadoc] import diva.canvas.AbstractFigure;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:31: package diva.canvas does not exist
-  [javadoc] import diva.canvas.Figure;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:32: package diva.canvas does not exist
-  [javadoc] import diva.canvas.FigureLayer;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:33: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GraphicsPane;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:34: package diva.canvas.event does not exist
-  [javadoc] import diva.canvas.event.LayerAdapter;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:35: package diva.canvas.event does not exist
-  [javadoc] import diva.canvas.event.LayerEvent;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:36: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.BoundsManipulator;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:37: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.DragInteractor;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:38: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.Interactor;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:39: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.PathManipulator;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:40: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionEvent;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:41: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionInteractor;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:42: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionListener;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:43: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.SelectionModel;
-  [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:44: package diva.canvas.toolbox does not exist
-  [javadoc] import diva.canvas.toolbox.BasicHighlighter;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:81: package Polyline2D does not exist
-  [javadoc]     protected Polyline2D.Double polyline;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:84: package Polygon2D does not exist
-  [javadoc]     protected Polygon2D.Double polygon;
-  [javadoc]                        ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:87: package Polyline2D does not exist
-  [javadoc]     protected Polyline2D.Double freehand;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:90: cannot resolve symbol
-  [javadoc] symbol  : class AbstractFigure 
-  [javadoc] location: class jsky.image.graphics.gui.CanvasDraw
-  [javadoc]     protected AbstractFigure figure;
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:66: cannot resolve symbol
-  [javadoc] symbol  : class SelectionInteractor 
-  [javadoc] location: class jsky.image.graphics.gui.FITSGraphics
-  [javadoc]     protected SelectionInteractor interactor;
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:10: package gnu.jel does not exist
-  [javadoc] import gnu.jel.CompilationException;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:11: package gnu.jel does not exist
-  [javadoc] import gnu.jel.CompiledExpression;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:12: package gnu.jel does not exist
-  [javadoc] import gnu.jel.DVResolver;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:13: package gnu.jel does not exist
-  [javadoc] import gnu.jel.Evaluator;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:14: package gnu.jel does not exist
-  [javadoc] import gnu.jel.Library;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:27: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc] public class JavaExpr implements DVResolver {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:69: cannot resolve symbol
-  [javadoc] symbol  : class GraphicsPane 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private GraphicsPane _graphicsPane;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:72: cannot resolve symbol
-  [javadoc] symbol  : class FigureLayer 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private FigureLayer _figureLayer;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:78: cannot resolve symbol
-  [javadoc] symbol  : class SelectionInteractor 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private SelectionInteractor _selectionInteractor;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:81: cannot resolve symbol
-  [javadoc] symbol  : class SelectionInteractor 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private SelectionInteractor _lineInteractor;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:84: cannot resolve symbol
-  [javadoc] symbol  : class DragInteractor 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private DragInteractor _dragInteractor;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:87: cannot resolve symbol
-  [javadoc] symbol  : class SelectionInteractor 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private SelectionInteractor _fixedSelectionInteractor;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:90: cannot resolve symbol
-  [javadoc] symbol  : class SelectionListener 
-  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
-  [javadoc]     private SelectionListener _selectionListener;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:20: package diva.canvas does not exist
-  [javadoc] import diva.canvas.Figure;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:21: package diva.canvas does not exist
-  [javadoc] import diva.canvas.FigureDecorator;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:22: package diva.canvas does not exist
-  [javadoc] import diva.canvas.FigureLayer;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:23: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GeometricSet;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:24: package diva.canvas does not exist
-  [javadoc] import diva.canvas.GraphicsPane;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:25: package diva.canvas does not exist
-  [javadoc] import diva.canvas.OverlayLayer;
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:26: package diva.canvas.event does not exist
-  [javadoc] import diva.canvas.event.EventLayer;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:27: package diva.canvas.event does not exist
-  [javadoc] import diva.canvas.event.LayerEvent;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:28: package diva.canvas.event does not exist
-  [javadoc] import diva.canvas.event.LayerListener;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:29: package diva.canvas.event does not exist
-  [javadoc] import diva.canvas.event.MouseFilter;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:30: package diva.canvas.interactor does not exist
-  [javadoc] import diva.canvas.interactor.DragInteractor;
-  [javadoc]                               ^
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
   [javadoc] symbol: class CBZip2InputStream 
   [javadoc]             return new CBZip2InputStream( raw );
   [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
+  [javadoc] "AstStrings is a model for all the general text elements shown in
+  [javadoc]  an AST Plot (i.e."
+  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
+  [javadoc] next major release (when that interpretation will be internationalized), which is:
+  [javadoc] "AstStrings is a model for all the general text elements shown in
+  [javadoc]  an AST Plot (i.e. those with element name "strings"). "
+  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
+  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - Tag @see: malformed: "AstAxisLabels,"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: malformed: "Plot, PlotConfig."
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
-  [javadoc] "AstStrings is a model for all the general text elements shown in
-  [javadoc]  an AST Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "AstStrings is a model for all the general text elements shown in
-  [javadoc]  an AST Plot (i.e. those with element name "strings"). "
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
@@ -563,15 +211,11 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested fraction resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
@@ -579,6 +223,10 @@ javadoc-sources:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested fraction resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -664,9 +312,32 @@ javadoc-sources:
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:99: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/DataSource.java:64: warning - @param argument "introSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/DataSource.java:195: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/DataSource.java:217: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/DataSource.java:398: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Loader.java:99: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/SourceReader.java:121: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:49: warning - @param argument "test" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:72: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:203: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:279: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:406: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:474: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:497: warning - @param argument "messsage" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/Task.java:41: warning - @param argument "args" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/Parameter.java:120: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/Parameter.java:142: warning - @param argument "parameter" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/Parameter.java:189: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/TerminalInvoker.java:33: warning - @param argument "toolclass" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/TerminalInvoker.java:52: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/UsageException.java:26: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jniast/build/java/uk/ac/starlink/ast/FitsChan.java:257: warning - @param argument "obj" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jniast/build/java/uk/ac/starlink/ast/Mapping.java:1392: warning - @param argument "a" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotController.java:36: warning - Tag @link: reference not found: PlotConfiguration.getAst
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotControls.java:27: warning - Tag @link: reference not found: Plot
@@ -686,11 +357,19 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e. the X axis intersection with the Y axis). "
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:292: warning - @param argument "colour" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:317: warning - @param argument "colour" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:343: warning - @param argument "width" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:369: warning - @param argument "width" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstAxisLabels.html...
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:160: warning - @param argument "s" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:160: warning - @param argument "frame" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:160: warning - @param argument "axis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:179: warning - @param argument "s" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
@@ -711,6 +390,8 @@ javadoc-sources:
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:49: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:46: warning - Tag @see: reference not found: AstNumerLabels
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ColourIcon.java:69: warning - @param argument "mainColour" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ComponentColourControls.java:101: warning - @param argument "description" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:68: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:280: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/ConfigurationStore.html...
@@ -720,6 +401,7 @@ javadoc-sources:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e. get this Element then write the configuration data
   [javadoc]  attached to it). "
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:122: warning - @param argument "stream" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontControls.java:30: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
@@ -728,12 +410,11 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: reference not found: Plot, PlotConfig.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: Tag @see: Malformed: AstAxisLabels,
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - Tag @see: reference not found: AstAxisLabels,
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -747,33 +428,183 @@ javadoc-sources:
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/SelectCharacters.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: Tag @see: Malformed: InsertCharacters, SelectCharactersModel
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - Tag @see: reference not found: InsertCharacters, SelectCharactersModel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectTextField.java:31: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/Utilities.java:66: warning - Tag @link: reference not found: getConfigDirectory
+  [javadoc] /apps/cvsbuild/java/source/hds/build/java/uk/ac/starlink/hds/HDSType.java:103: warning - @param argument "Type" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/BadHandler.java:54: warning - @param argument "length" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/BufferIterator.java:70: warning - @param argument "type" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/DeterministicArrayImpl.java:44: warning - @param argument "offset" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/NDShape.java:246: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/Requirements.java:123: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:40: warning - @param argument "badHandler1" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:40: warning - @param argument "badHandler2" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:82: warning - @param argument "badHandler1" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:82: warning - @param argument "badHandler2" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/ndx/build/java/uk/ac/starlink/ndx/DefaultMutableNdx.java:75: warning - @param argument "NullPointerException" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/ndx/build/java/uk/ac/starlink/ndx/XMLNdxHandler.java:528: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableWriter.java:46: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/AbstractStarTable.java:134: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/DefaultValueInfo.java:489: warning - @param argument "info" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/RandomWrapperStarTable.java:152: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:32: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:89: warning - @param argument "an" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/Tables.java:25: warning - @param argument "stab" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/WrapperStarTable.java:107: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:106: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableColumn.java:54: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/fits/build/java/uk/ac/starlink/fits/FitsConstants.java:227: warning - @param argument "dis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/Param.java:24: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "el" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "systemId" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOElement.java:95: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTable.java:142: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTable.java:157: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:183: warning - @param argument "name" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/soap/AppAxisServerFactory.html...
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: Tag @see: Malformed: Plot, PlotConfigurator
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImage.java:195: warning - @param argument "fileOrURL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImage.java:223: warning - @param argument "Document" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImage.java:237: warning - @param argument "Document" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/NDArrayData.java:54: warning - @param argument "tiler" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/NDArrayData.java:83: warning - @param argument "tiler" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: reference not found: Plot, PlotConfigurator
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/AMParams.java:95: warning - @param argument "b[3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/AMParams.java:100: warning - @param argument "h[3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/AMParams.java:110: warning - @param argument "bev[3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/AMParams.java:122: warning - @param argument "p[3][3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:389: warning - @param argument "ra" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:3164: warning - @param argument "J2000.0" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:3435: warning - @param argument "isec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:3498: warning - @param argument "isec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:3537: warning - @param argument "z" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:3735: warning - @param argument "TDB" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Pal.java:5793: warning - @param argument "utl" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/build/java/uk/ac/starlink/pal/Stardata.java:21: warning - Parameter "pm" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/coco/build/java/uk/ac/starlink/coco/CoordinateConversion.java:190: warning - @param argument "ep" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/coco/build/java/uk/ac/starlink/coco/CoordinateConversion.java:251: warning - @param argument "ep" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/rv/build/java/uk/ac/starlink/rv/RadialVelocity.java:108: warning - @param argument "date" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedFile.java:91: warning - @param argument "buffer" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/BufferedFile.java:121: warning - @param argument "length" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/ColumnTable.java:237: warning - @param argument "The" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/ColumnTable.java:254: warning - Tag @see: reference not found: ColumnTable.getColumn.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/ColumnTable.java:354: warning - @param argument "rowSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/util/ColumnTable.java:354: warning - @param argument "nrows" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/AsciiTableHDU.java:33: warning - @param argument "header" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/BasicHDU.java:58: warning - @param argument "Header" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/BasicHDU.java:218: warning - @param argument "hdr" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/BinaryTable.java:109: warning - @param argument "header" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/BinaryTable.java:317: warning - @param argument "arraySize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/BinaryTable.java:929: warning - @param argument "dimens" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/BinaryTableHDU.java:53: warning - @param argument "table" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/Fits.java:518: warning - @param argument "dos" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/FitsDate.java:39: warning - Tag @return cannot be used in constructor documentation.  It can only be used in the following types of documentation: method.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/Header.java:58: warning - @param argument "cards" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/Header.java:320: warning - @param argument "The" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/Header.java:675: warning - @param argument "val" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/Header.java:675: warning - @param argument "comment" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/Header.java:816: warning - @param argument "val." is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/ImageHDU.java:24: warning - @param argument "obj" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/ImageHDU.java:119: warning - @param argument "o" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/RandomGroupsHDU.java:78: warning - @param argument "myHeader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/UndefinedHDU.java:22: warning - @param argument "obj" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/fits/UndefinedHDU.java:79: warning - @param argument "o" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/image/ImageTiler.java:53: warning - @param argument "The" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/build/java/nom/tam/image/ImageTiler.java:53: warning - @param argument "The" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorCatalogMenu.java:77: warning - @param argument "navigator" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/Format.java:387: warning - @param argument "x" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/Format.java:401: warning - @param argument "x" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/FormatUtilities.java:69: warning - @param argument "inLeftOfDec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/Preferences.java:359: warning - @param argument "preferredSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/Preferences.java:374: warning - @param argument "preferredSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/ReplacementEvent.java:69: warning - @param argument "oldObject," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/ReplacementEvent.java:69: warning - @param argument "newObject," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/BusyWin.java:113: warning - @param argument "busy" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/GenericToolBar.java:211: warning - @param argument "isMenuButton" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/JTextFieldDouble.java:167: warning - @param argument "Double" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/JTextFieldDouble.java:175: warning - @param argument "double" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/ProgressPanel.java:80: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/ProgressPanel.java:333: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/QuantitySlider.java:130: warning - @param argument "borderOn" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/QuantitySlider.java:161: warning - Parameter "scaleMin" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/QuantitySlider.java:177: warning - @param argument "minQ" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/QuantitySlider.java:177: warning - @param argument "maxQ" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/QuantitySlider.java:177: warning - Parameter "scaleMin" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/ToggleButtonPanel.java:52: warning - Parameter "nrows" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/ToggleButtonPanel.java:102: warning - Parameter "nrows" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/gui/XYDisplay.java:40: warning - Parameter "xLabelStr" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/MemoryCatalog.java:122: warning - @param argument "more" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/MemoryCatalog.java:208: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/MemoryCatalog.java:692: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:268: warning - @param argument "table" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/gui/TablePlotter.java:115: warning - @param argument "g2D" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/gui/BasicTablePlotter.java:757: warning - @param argument "isSelected" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/gui/BasicTablePlotter.java:801: warning - @param argument "g2D" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/gui/CatalogQueryPanel.java:438: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/gui/HyperlinkTableCellRenderer.java:48: warning - @param argument "sp" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/irsa/IRSATable.java:238: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatTable.java:143: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/skycat/SkycatTable.java:137: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/skycat/SkycatTable.java:156: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/skycat/SkycatTable.java:288: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/coords/WorldCoordinates.java:92: warning - Parameter "pos1" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/coords/ImageCoords.java:154: warning - Parameter "pos1" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/coords/WCSTransform.java:862: warning - @param argument "dec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/coords/WorldCoords.java:522: warning - Parameter "pos1" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/ImageProcessor.java:580: warning - Parameter "lowCut" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/ImageProcessor.java:593: warning - Parameter "lowCut" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:401: warning - @param argument "pane" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageSaveDialog.java:450: warning - @param argument "acceptableExtensions" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageSaveDialog.java:450: warning - @param argument "newExtension" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSData.java:47: warning - @param argument "tiler" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSData.java:47: warning - @param argument "axes" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSImage.java:157: warning - @param argument "fileOrURL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:491: warning - @param argument "fill" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:349: warning - @param argument "mode" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "xOffSet" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "yOffSet" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "width" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "height" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/graphics/CanvasGraphics.java:85: warning - @param argument "anchor" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/AbstractWavelength1D.java:76: warning - @param argument "interpolate," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/AbstractWavelength1D.java:111: warning - @param argument "wl" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/AbstractWavelength1D.java:173: warning - @param argument "targetWL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/AbstractWavelength1D.java:173: warning - @param argument "exactOnly" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/AbstractWavelength1D.java:198: warning - @param argument "targetWL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/AbstractWavelength1D.java:212: warning - @param argument "targetWL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Coordinates.java:452: warning - @param argument "ra" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/CoordinatesOffset.java:112: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/CoordinatesOffset.java:204: warning - @param argument "ra" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/CoordinatesOffset.java:204: warning - @param argument "dec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:162: warning - @param argument "inName," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:178: warning - @param argument "inName," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:178: warning - @param argument "inMin" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:178: warning - @param argument "inMax" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:239: warning - @param argument "value" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:251: warning - @param argument "value" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:581: warning - @param argument "dataOnly," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:792: warning - @param argument "newP," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:836: warning - @param argument "reader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DArray.java:858: warning - @param argument "reader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/Wavelength1DFormula.java:125: warning - @param argument "inName" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/WavelengthArrayParserAsciiPairs.java:123: warning - @param argument "reader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/science/WavelengthArrayParserAsciiPairs.java:123: warning - @param argument "wlUnits" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 190 warnings
+  [javadoc] 281 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 1 minute 4 seconds
+Total time: 48 seconds

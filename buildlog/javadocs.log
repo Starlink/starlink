@@ -23,16 +23,40 @@ javadocs:
   [javadoc] Loading source files for package nom.tam.image...
   [javadoc] Loading source files for package nom.tam.util...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/AsciiTableHDU.java:33: warning - @param argument "header" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BasicHDU.java:58: warning - @param argument "Header" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BasicHDU.java:218: warning - @param argument "hdr" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BinaryTable.java:109: warning - @param argument "header" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BinaryTable.java:317: warning - @param argument "arraySize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BinaryTable.java:929: warning - @param argument "dimens" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BinaryTableHDU.java:53: warning - @param argument "table" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/Fits.java:518: warning - @param argument "dos" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/FitsDate.java:39: warning - Tag @return cannot be used in constructor documentation.  It can only be used in the following types of documentation: method.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/Header.java:58: warning - @param argument "cards" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/Header.java:320: warning - @param argument "The" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/Header.java:675: warning - @param argument "val" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/Header.java:675: warning - @param argument "comment" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/Header.java:816: warning - @param argument "val." is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/ImageHDU.java:24: warning - @param argument "obj" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/ImageHDU.java:119: warning - @param argument "o" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/RandomGroupsHDU.java:78: warning - @param argument "myHeader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/UndefinedHDU.java:22: warning - @param argument "obj" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/UndefinedHDU.java:79: warning - @param argument "o" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/image/ImageTiler.java:53: warning - @param argument "The" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/image/ImageTiler.java:53: warning - @param argument "The" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/BufferedDataInputStream.java:349: warning - @returns is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/BufferedFile.java:91: warning - @param argument "buffer" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/BufferedFile.java:121: warning - @param argument "length" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/ColumnTable.java:237: warning - @param argument "The" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/ColumnTable.java:254: warning - Tag @see: reference not found: ColumnTable.getColumn.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/ColumnTable.java:354: warning - @param argument "rowSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/util/ColumnTable.java:354: warning - @param argument "nrows" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/tamfits/docs/tamfits/javadocs/stylesheet.css...
-  [javadoc] 3 warnings
+  [javadoc] 28 warnings
      [echo] Executing axis target: javadocs
 
 javadocs:
@@ -56,8 +80,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
   [javadoc]                               ^
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
   [javadoc] symbol: class CBZip2InputStream 
   [javadoc]             return new CBZip2InputStream( raw );
@@ -69,12 +92,26 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java:25: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:99: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/DataSource.java:64: warning - @param argument "introSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/DataSource.java:195: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/DataSource.java:217: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/DataSource.java:398: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Loader.java:99: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/SourceReader.java:121: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:49: warning - @param argument "test" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:72: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:203: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:279: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:406: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:474: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:497: warning - @param argument "messsage" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 8 warnings
+  [javadoc] 22 warnings
      [echo] Executing Task target: javadocs
 
 prepare:
@@ -87,11 +124,19 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.task...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/Task.java:41: warning - @param argument "args" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/Parameter.java:120: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/Parameter.java:142: warning - @param argument "parameter" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/Parameter.java:189: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/TerminalInvoker.java:33: warning - @param argument "toolclass" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/TerminalInvoker.java:52: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/task/src/main/uk/ac/starlink/task/UsageException.java:26: warning - @param argument "the" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/task/docs/task/javadocs/stylesheet.css...
+  [javadoc] 7 warnings
      [echo] Executing JNIAST target: javadocs
 
 prepare:
@@ -111,11 +156,14 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.ast.grf...
   [javadoc] Loading source files for package uk.ac.starlink.ast.xml...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/jniast/build/java/uk/ac/starlink/ast/FitsChan.java:257: warning - @param argument "obj" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jniast/build/java/uk/ac/starlink/ast/Mapping.java:1392: warning - @param argument "a" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/jniast/docs/jniast/javadocs/stylesheet.css...
+  [javadoc] 2 warnings
      [echo] Executing ASTGUI target: javadocs
 
 prepare:
@@ -128,31 +176,30 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.ast.gui...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/index-all.html...
+  [javadoc] "AstStrings is a model for all the general text elements shown in
+  [javadoc]  an AST Plot (i.e."
+  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
+  [javadoc] next major release (when that interpretation will be internationalized), which is:
+  [javadoc] "AstStrings is a model for all the general text elements shown in
+  [javadoc]  an AST Plot (i.e. those with element name "strings"). "
+  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
+  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - Tag @see: malformed: "AstAxisLabels,"
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: malformed: "Plot, PlotConfig."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/index-all.html...
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
-  [javadoc] "AstStrings is a model for all the general text elements shown in
-  [javadoc]  an AST Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "AstStrings is a model for all the general text elements shown in
-  [javadoc]  an AST Plot (i.e. those with element name "strings"). "
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
@@ -172,11 +219,7 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested fraction resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
@@ -184,10 +227,14 @@ javadocs:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested fraction resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/ConfigurationStore.java:280: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e."
@@ -277,11 +324,19 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e. the X axis intersection with the Y axis). "
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:292: warning - @param argument "colour" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:317: warning - @param argument "colour" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:343: warning - @param argument "width" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:369: warning - @param argument "width" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/uk/ac/starlink/ast/gui/AstAxisLabels.html...
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:160: warning - @param argument "s" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:160: warning - @param argument "frame" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:160: warning - @param argument "axis" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:179: warning - @param argument "s" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
@@ -302,6 +357,8 @@ javadocs:
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxisLabelControls.java:49: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxisNumLabControls.java:46: warning - Tag @see: reference not found: AstNumerLabels
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourIcon.java:69: warning - @param argument "mainColour" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/ComponentColourControls.java:101: warning - @param argument "description" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/ConfigurationStore.java:68: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/ConfigurationStore.java:280: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/uk/ac/starlink/ast/gui/ConfigurationStore.html...
@@ -311,6 +368,7 @@ javadocs:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e. get this Element then write the configuration data
   [javadoc]  attached to it). "
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/ConfigurationStore.java:122: warning - @param argument "stream" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/FontControls.java:30: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
@@ -319,12 +377,11 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: reference not found: Plot, PlotConfig.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: Tag @see: Malformed: AstAxisLabels,
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - Tag @see: reference not found: AstAxisLabels,
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -338,8 +395,7 @@ javadocs:
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/uk/ac/starlink/ast/gui/SelectCharacters.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharacters.java:45: Tag @see: Malformed: InsertCharacters, SelectCharactersModel
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - Tag @see: reference not found: InsertCharacters, SelectCharactersModel
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectTextField.java:31: warning - @copyright is an unknown tag.
@@ -347,7 +403,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/astgui/docs/astgui/javadocs/stylesheet.css...
-  [javadoc] 74 warnings
+  [javadoc] 88 warnings
      [echo] Executing JNIHDS target: javadocs
 
 prepare:
@@ -360,8 +416,7 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.hds...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
@@ -398,8 +453,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFactory.java:4: package uk.ac.starlink.util does not exist
   [javadoc] import uk.ac.starlink.util.URLUtils;
   [javadoc]                            ^
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
@@ -427,15 +481,23 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.array...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/BadHandler.java:54: warning - @param argument "length" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/BufferIterator.java:70: warning - @param argument "type" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/DeterministicArrayImpl.java:44: warning - @param argument "offset" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/NDArrayFactory.java:37: warning - Tag @link: reference not found: uk.ac.starlink.hds.HDSArrayBuilder
   [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/NDArrayFactory.java:37: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsArrayBuilder
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/NDShape.java:246: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/Requirements.java:123: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:40: warning - @param argument "badHandler1" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:40: warning - @param argument "badHandler2" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:82: warning - @param argument "badHandler1" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/array/build/java/uk/ac/starlink/array/TypeConverter.java:82: warning - @param argument "badHandler2" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/array/docs/array/javadocs/stylesheet.css...
-  [javadoc] 2 warnings
+  [javadoc] 11 warnings
      [echo] Executing NDX target: javadocs
 
 prepare:
@@ -448,15 +510,16 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.ndx...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/DefaultMutableNdx.java:75: warning - @param argument "NullPointerException" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java:44: warning - Tag @link: reference not found: uk.ac.starlink.hds.NDFNdxHandler
   [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/NdxIO.java:44: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsNdxHandler
+  [javadoc] /apps/cvsbuild/java/source/ndx/src/main/uk/ac/starlink/ndx/XMLNdxHandler.java:528: warning - @param argument "a" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/ndx/docs/ndx/javadocs/stylesheet.css...
-  [javadoc] 2 warnings
+  [javadoc] 4 warnings
      [echo] Executing Table target: javadocs
 
 prepare:
@@ -472,21 +535,29 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableWriter.java:46: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/AbstractStarTable.java:134: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java:489: warning - @param argument "info" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/RandomWrapperStarTable.java:152: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:47: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:47: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:32: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:32: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:32: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:89: warning - @param argument "an" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/Tables.java:25: warning - @param argument "stab" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java:107: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:106: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java:54: warning - @param argument "the" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 17 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:
@@ -499,8 +570,7 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.ndtools...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
@@ -516,11 +586,13 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.hds...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/hds/src/main/uk/ac/starlink/hds/HDSType.java:103: warning - @param argument "Type" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/hds/docs/hds/javadocs/stylesheet.css...
+  [javadoc] 1 warning
      [echo] Executing FITS target: javadocs
 
 prepare:
@@ -533,11 +605,13 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/fits/src/main/uk/ac/starlink/fits/FitsConstants.java:227: warning - @param argument "dis" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/fits/docs/fits/javadocs/stylesheet.css...
+  [javadoc] 1 warning
      [echo] Executing DIVA target: javadocs
 
 prepare:
@@ -600,8 +674,7 @@ javadocs:
   [javadoc] Loading source files for package diva.util.xml...
   [javadoc] Loading source files for package diva.whiteboard...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
@@ -614,12 +687,6 @@ javadocs:
   [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
-  [javadoc] "Add an array of objects to the selection."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Add an array of objects to the selection. the model should
-  [javadoc]  highlight the selected objects."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AppContextDelegate.java:28: warning - The first sentence is interpreted to be:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
@@ -630,6 +697,12 @@ javadocs:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
   [javadoc]  AppContext or an ApplicationContext.)  "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
+  [javadoc] "Add an array of objects to the selection."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Add an array of objects to the selection. the model should
+  [javadoc]  highlight the selected objects."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
@@ -666,17 +739,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/package.html: Close body tag missing from HTML file
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/demo/package.html: Close body tag missing from HTML file
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/event/package.html: Close body tag missing from HTML file
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/canvas/interactor/package.html: Close body tag missing from HTML file
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/graph/package.html: Close body tag missing from HTML file
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/graph/layout/package.html: Close body tag missing from HTML file
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/gui/package.html: Close body tag missing from HTML file
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  This is
   [javadoc] our term for complex data structures that evolve with time."
@@ -696,14 +765,17 @@ javadocs:
   [javadoc] <li>stroke filtering utilities</li>
   [javadoc] <li>out-of-the-box recognizers</li>
   [javadoc] <li>etc</li> </ol> </P>"
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
-  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar: Body tag missing from HTML
+  [javadoc] /apps/cvsbuild/java/source/frog/lib/frog/diva.jar/diva/util/xml/package.html: Close body tag missing from HTML file
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:239: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Scene.java:83: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
+  [javadoc] "A set of utilities for traversing/manipulating/etc."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
+  [javadoc] "A set of utilities for traversing/manipulating/etc."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:184: warning - The first sentence is interpreted to be:
   [javadoc] "Get the point at which this figure is "anchored." This
   [javadoc]  will be one of the positioning constants defined in 
@@ -714,14 +786,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JShadePane.java:175: warning - Tag @see: can't find setComponentAt in diva.gui.toolbox.JShadePane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/toolbox/JTreePane.java:229: warning - Tag @see: can't find setComponentAt in diva.gui.toolbox.JTreePane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: warning - Tag @see: malformed: "GraphModel, GraphPane"
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
-  [javadoc] "A set of utilities for traversing/manipulating/etc."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
-  [javadoc] "A set of utilities for traversing/manipulating/etc."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/layout/LevelLayout.java:79: warning - Tag @see: missing #: "setOrientation(int)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
   [javadoc] "Get the index of the given page."
@@ -801,6 +865,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:78: warning - Tag @see: can't find addDropKey(String,Figure) in diva.graph.schematic.GraphDropTarget
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:306: warning - Tag @see: can't find addHoldListener(ActionListener) in diva.sketch.MultiStateInterpreter
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:316: warning - Tag @see: can't find addStrokeListener(MouseInputListener) in diva.sketch.MultiStateInterpreter
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SimpleData.java:50: warning - Tag @see: missing #: "Type.isStaticType(String)"
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SimpleData.java:50: warning - Tag @see: can't find Type.isStaticType(String) in diva.sketch.recognition.SimpleData
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -831,8 +897,6 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SimpleData.java:50: warning - Tag @see: missing #: "Type.isStaticType(String)"
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SimpleData.java:50: warning - Tag @see: can't find Type.isStaticType(String) in diva.sketch.recognition.SimpleData
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." A snap means that the output value of the point
@@ -840,14 +904,6 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] "Compute mu's and sigma's for each class, also computes the
-  [javadoc]  coefficients (one per class) that are used in the joint
-  [javadoc]  p.d.f."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Compute mu's and sigma's for each class, also computes the
-  [javadoc]  coefficients (one per class) that are used in the joint
-  [javadoc]  p.d.f. calculation."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
@@ -865,6 +921,14 @@ javadocs:
   [javadoc] "A typed node renderer with the given node renderer
   [javadoc]  as its default (i.e. how to render a node if it
   [javadoc]  has a type that is not understood by this renderer)."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
+  [javadoc] "Compute mu's and sigma's for each class, also computes the
+  [javadoc]  coefficients (one per class) that are used in the joint
+  [javadoc]  p.d.f."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Compute mu's and sigma's for each class, also computes the
+  [javadoc]  coefficients (one per class) that are used in the joint
+  [javadoc]  p.d.f. calculation."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeController.java:268: warning - Tag @see:illegal character: ";" in "GraphController#rerenderSubgraph(Iterator);"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/layout/LevelLayout.java:72: warning - Tag @see: missing #: "setOrientation(int)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/WeightSet.java:26: warning - The first sentence is interpreted to be:
@@ -1092,6 +1156,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/XmlBuilder.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/AbstractXmlBuilder.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/CompositeBuilder.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/XmlElement.java:63: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/XmlElement.java:83: warning - @param argument "name" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/XmlReader.java:346: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#ignorableWhitespace
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/xml/XmlReader.java:357: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#processingInstruction
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/EdgeController.java:58: warning - @rating is an unknown tag.
@@ -1120,8 +1186,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphPane.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphViewEvent.java:25: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/JGraph.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: Tag @see: Malformed: GraphModel, GraphPane
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: warning - Tag @see: reference not found: GraphModel, GraphPane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeDragInteractor.java:32: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeInteractor.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/SimpleGraphController.java:52: warning - @rating is an unknown tag.
@@ -1216,8 +1281,7 @@ javadocs:
   [javadoc]  node in this model, i.e. it contains children."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeController.java:90: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/NodeController.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeController.java:268: Tag @see: Malformed: GraphController#rerenderSubgraph(Iterator);
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeController.java:268: warning - Tag @see: reference not found: GraphController#rerenderSubgraph(Iterator);
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphException.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/event/GraphListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/event/GraphViewListener.java:21: warning - @rating is an unknown tag.
@@ -1268,6 +1332,8 @@ javadocs:
   [javadoc] "Get the index of the given page. -1 if it is not known."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:186: warning - @param argument "publicId" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageParser.java:186: warning - @param argument "systemId" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
@@ -1405,9 +1471,9 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/CompositeElement.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MultiStrokeRecognizer.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Scene.java:28: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Scene.java:83: warning - @param argument "element" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneElement.java:28: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/sketch/recognition/SceneElement.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneElement.java:28: Tag @see: Malformed: Scene, StrokeElement, CompositeElement, ChoiceElement
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneElement.java:28: warning - Tag @see: reference not found: Scene, StrokeElement, CompositeElement, ChoiceElement
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SceneRecognizer.java:16: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeElement.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeRecognizer.java:19: warning - @rating is an unknown tag.
@@ -1427,6 +1493,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:120: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:137: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#endElement
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:188: warning - @param argument "publicId" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MSTrainingParser.java:188: warning - @param argument "systemId" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/MultiStrokeSceneRecognizer.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Recognition.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/RecognitionSet.java:23: warning - @rating is an unknown tag.
@@ -1439,6 +1507,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SSTrainingParser.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SSTrainingParser.java:99: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SSTrainingParser.java:107: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#endElement
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SSTrainingParser.java:227: warning - @param argument "publicId" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/SSTrainingParser.java:227: warning - @param argument "systemId" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/StrokeSceneRecognizer.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/Type.java:38: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/VotingSceneRecognizer.java:23: warning - @rating is an unknown tag.
@@ -1506,12 +1576,11 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/TextLine.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/TrainingToMatlab.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/ZoomRecognizer.java:35: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlHandler.java:27: warning - Tag @see: reference not found: org.xml.sax.EntityHandler
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlHandler.java:27: warning - Tag @see: reference not found: org.xml.sax.DocumentHandler
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlHandler.java:27: warning - Tag @see: reference not found: org.xml.sax.ErrorHandler
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/HandlerBase.java:42: warning - Tag @see: reference not found: org.xml.sax.HandlerBase
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlHandler.java:140: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlHandler.java:140: warning - @param argument "type" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlParser.java:47: warning - Tag @see: reference not found: SAXDriver
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlParser.java:2806: warning - @returns is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/aelfred/XmlParser.java:2882: warning - @param argument "ename" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/util/java2d/Polygon2D.Double.html...
   [javadoc] "Create a new polygon with the
@@ -1528,6 +1597,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/XmlBuilder.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/AbstractXmlBuilder.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/CompositeBuilder.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/XmlElement.java:63: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/XmlElement.java:83: warning - @param argument "name" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/XmlReader.java:346: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#ignorableWhitespace
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/xml/XmlReader.java:357: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#processingInstruction
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/whiteboard/CommandInterpreter.java:49: warning - @rating is an unknown tag.
@@ -1538,8 +1609,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/whiteboard/WhiteboardView.java:73: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/whiteboard/WhiteboardView.java:235: warning - @returns is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/stylesheet.css...
-  [javadoc] 17 errors
-  [javadoc] 456 warnings
+  [javadoc] 8 errors
+  [javadoc] 469 warnings
      [echo] Executing JSky target: javadocs
 
 prepare:
@@ -1574,11 +1645,90 @@ javadocs:
   [javadoc] Loading source files for package jsky.util.gui...
   [javadoc] Loading source files for package jsky.util.java2d...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/MemoryCatalog.java:122: warning - @param argument "more" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/MemoryCatalog.java:208: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/MemoryCatalog.java:692: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/TablePlotSymbol.java:268: warning - @param argument "table" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/astrocat/AstroCatTable.java:143: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/gui/TablePlotter.java:115: warning - @param argument "g2D" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/gui/BasicTablePlotter.java:757: warning - @param argument "isSelected" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/gui/BasicTablePlotter.java:801: warning - @param argument "g2D" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/gui/CatalogQueryPanel.java:438: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/gui/HyperlinkTableCellRenderer.java:48: warning - @param argument "sp" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/irsa/IRSATable.java:238: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/skycat/SkycatTable.java:137: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/skycat/SkycatTable.java:156: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/catalog/skycat/SkycatTable.java:288: warning - @param argument "dataVector" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/coords/WorldCoordinates.java:92: warning - Parameter "pos1" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/coords/ImageCoords.java:154: warning - Parameter "pos1" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/coords/WCSTransform.java:862: warning - @param argument "dec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/coords/WorldCoords.java:522: warning - Parameter "pos1" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/graphics/CanvasGraphics.java:85: warning - @param argument "anchor" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/ImageProcessor.java:580: warning - Parameter "lowCut" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/ImageProcessor.java:593: warning - Parameter "lowCut" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/fits/codec/FITSData.java:47: warning - @param argument "tiler" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/fits/codec/FITSData.java:47: warning - @param argument "axes" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/fits/codec/FITSImage.java:157: warning - @param argument "fileOrURL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/graphics/DivaImageGraphics.java:491: warning - @param argument "fill" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/graphics/gui/CanvasDraw.java:349: warning - @param argument "mode" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/gui/DivaMainImageDisplay.java:401: warning - @param argument "pane" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/gui/ImageSaveDialog.java:450: warning - @param argument "acceptableExtensions" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/image/gui/ImageSaveDialog.java:450: warning - @param argument "newExtension" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/navigator/NavigatorCatalogMenu.java:77: warning - @param argument "navigator" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/AbstractWavelength1D.java:76: warning - @param argument "interpolate," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/AbstractWavelength1D.java:111: warning - @param argument "wl" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/AbstractWavelength1D.java:173: warning - @param argument "targetWL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/AbstractWavelength1D.java:173: warning - @param argument "exactOnly" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/AbstractWavelength1D.java:198: warning - @param argument "targetWL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/AbstractWavelength1D.java:212: warning - @param argument "targetWL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Coordinates.java:452: warning - @param argument "ra" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/CoordinatesOffset.java:112: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/CoordinatesOffset.java:204: warning - @param argument "ra" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/CoordinatesOffset.java:204: warning - @param argument "dec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:162: warning - @param argument "inName," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:178: warning - @param argument "inName," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:178: warning - @param argument "inMin" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:178: warning - @param argument "inMax" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:239: warning - @param argument "value" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:251: warning - @param argument "value" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:581: warning - @param argument "dataOnly," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:792: warning - @param argument "newP," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:836: warning - @param argument "reader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DArray.java:858: warning - @param argument "reader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/Wavelength1DFormula.java:125: warning - @param argument "inName" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/WavelengthArrayParserAsciiPairs.java:123: warning - @param argument "reader" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/science/WavelengthArrayParserAsciiPairs.java:123: warning - @param argument "wlUnits" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "xOffSet" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "yOffSet" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "width" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/timeline/DefaultTimeLineNode.java:432: warning - @param argument "height" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/Format.java:387: warning - @param argument "x" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/Format.java:401: warning - @param argument "x" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/FormatUtilities.java:69: warning - @param argument "inLeftOfDec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/Preferences.java:359: warning - @param argument "preferredSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/Preferences.java:374: warning - @param argument "preferredSize" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/ReplacementEvent.java:69: warning - @param argument "oldObject," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/ReplacementEvent.java:69: warning - @param argument "newObject," is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/BusyWin.java:113: warning - @param argument "busy" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/GenericToolBar.java:211: warning - @param argument "isMenuButton" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/JTextFieldDouble.java:167: warning - @param argument "Double" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/JTextFieldDouble.java:175: warning - @param argument "double" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/ProgressPanel.java:80: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/ProgressPanel.java:333: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/QuantitySlider.java:130: warning - @param argument "borderOn" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/QuantitySlider.java:161: warning - Parameter "scaleMin" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/QuantitySlider.java:177: warning - @param argument "minQ" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/QuantitySlider.java:177: warning - @param argument "maxQ" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/QuantitySlider.java:177: warning - Parameter "scaleMin" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/ToggleButtonPanel.java:52: warning - Parameter "nrows" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/ToggleButtonPanel.java:102: warning - Parameter "nrows" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/jsky/src/main/jsky/util/gui/XYDisplay.java:40: warning - Parameter "xLabelStr" is documented more than once.
+  [javadoc] Generating /apps/cvsbuild/java/source/jsky/docs/jsky/javadocs/stylesheet.css...
+  [javadoc] 78 warnings
      [echo] Executing Pal target: javadocs
 
 prepare:
@@ -1591,11 +1741,24 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.pal...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/AMParams.java:95: warning - @param argument "b[3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/AMParams.java:100: warning - @param argument "h[3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/AMParams.java:110: warning - @param argument "bev[3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/AMParams.java:122: warning - @param argument "p[3][3]" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:389: warning - @param argument "ra" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:3164: warning - @param argument "J2000.0" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:3435: warning - @param argument "isec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:3498: warning - @param argument "isec" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:3537: warning - @param argument "z" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:3735: warning - @param argument "TDB" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Pal.java:5793: warning - @param argument "utl" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/pal/src/main/uk/ac/starlink/pal/Stardata.java:21: warning - Parameter "pm" is documented more than once.
+  [javadoc] Generating /apps/cvsbuild/java/source/pal/docs/pal/javadocs/stylesheet.css...
+  [javadoc] 12 warnings
      [echo] Executing VOTable target: javadocs
 
 prepare:
@@ -1608,11 +1771,19 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.votable...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/Param.java:24: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "el" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "systemId" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java:95: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java:142: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java:157: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:183: warning - @param argument "name" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/votable/docs/votable/javadocs/stylesheet.css...
+  [javadoc] 7 warnings
      [echo] Executing JAIUtil target: javadocs
 
 prepare:
@@ -1625,8 +1796,7 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.jaiutil...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
@@ -1651,10 +1821,16 @@ javadocs:
   [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImage.java:195: warning - @param argument "fileOrURL" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImage.java:223: warning - @param argument "Document" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImage.java:237: warning - @param argument "Document" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - Tag @link: reference not found: jsky.image.gui.DivaGraphicsImageDisplay
   [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - Tag @link: reference not found: jsky.image.gui.ImageDisplay
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/ImageDisplay.java:172: warning - @param argument "source" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/NDArrayData.java:54: warning - @param argument "tiler" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/NDArrayData.java:83: warning - @param argument "tiler" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/jaiutil/docs/jaiutil/javadocs/stylesheet.css...
-  [javadoc] 4 warnings
+  [javadoc] 10 warnings
      [echo] Executing SOAPSERVER target: javadocs
 
 prepare:
@@ -1667,16 +1843,14 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.soap...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
   [javadoc] Building index for all classes...
-  [javadoc] Generating /apps/cvsbuild/java/source/soapserver/docs/soapserver/javadocs/uk/ac/starlink/soap/AppAxisServerFactory.html...
-  [javadoc] /apps/cvsbuild/java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java:28: Tag @see: Malformed: Plot, PlotConfigurator
+  [javadoc] /apps/cvsbuild/java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: reference not found: Plot, PlotConfigurator
   [javadoc] Generating /apps/cvsbuild/java/source/soapserver/docs/soapserver/javadocs/stylesheet.css...
-  [javadoc] 1 warning
+  [javadoc] 2 warnings
      [echo] Executing SOG target: javadocs
 
 prepare:
@@ -1690,8 +1864,7 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.sog...
   [javadoc] Loading source files for package uk.ac.starlink.sog.photom...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
@@ -1723,6 +1896,7 @@ javadocs:
   [javadoc] "Update the shape to match a new radius etc. in the various
   [javadoc]  components."
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/ExceptionDialog.java:50: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:63: warning - @created is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/uk/ac/starlink/sog/SOG.html...
@@ -1763,7 +1937,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getDescription
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getSpecificDescription
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/stylesheet.css...
-  [javadoc] 19 warnings
+  [javadoc] 20 warnings
      [echo] Executing SPLAT target: javadocs
 
 prepare:
@@ -1783,11 +1957,14 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.mirage...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/mirage/src/main/uk/ac/starlink/mirage/MirageDriver.java:191: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/mirage/src/main/uk/ac/starlink/mirage/MirageFormatter.java:26: warning - @param argument "pstrm" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs/stylesheet.css...
+  [javadoc] 2 warnings
      [echo] Executing TOPCAT target: javadocs
 
 prepare:
@@ -1800,11 +1977,17 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/AuxWindow.java:338: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java:44: warning - Parameter "value" is documented more than once.
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/PlotWindow.java:572: warning - @param argument "combo" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticSubsetQueryWindow.java:28: warning - @param argument "tableviewer" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewer.java:986: warning - @param argument "icol" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
+  [javadoc] 5 warnings
      [echo] Executing Treeview target: javadocs
 
 prepare:
@@ -1851,13 +2034,37 @@ javadocs:
   [javadoc] location: class uk.ac.starlink.treeview.TarBranchDataNode
   [javadoc]     public TarBranchDataNode( TarStreamDataNode tarnode, TarEntry entry ) {
   [javadoc]                                                          ^
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/BasicTransferable.java:91: warning - @param argument "src" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeFactory.java:407: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeFactory.java:407: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeFactory.java:492: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTreeModel.java:73: warning - @param argument "root" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/DefaultDataNode.java:146: warning - @param argument "code" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/FtpLocation.java:135: warning - @param argument "pathname" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/FtpLocation.java:154: warning - @param argument "directory" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/HexDumper.java:54: warning - @param argument "leng" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/MetamapGroup.java:97: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDisplayer.java:47: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NodeAncestorComboBox.java:32: warning - @param argument "node" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NodeAncestorComboBox.java:45: warning - @param argument "bottom" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NodeAncestorComboBox.java:75: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ScalingPlot.java:48: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ScalingPlot.java:48: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ScalingPlot.java:80: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TableHDUDataNode.java:42: warning - @param argument "istrm" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java:20: warning - @param argument "tarstreamnode" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TreeModelNode.java:67: warning - @param argument "datanode" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java:243: warning - @param argument "object" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java:295: warning - @param argument "a" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java:329: warning - @param argument "the" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java:530: warning - @param argument "topNode" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ZipArchiveDataNode.java:36: warning - @param argument "name" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 33 warnings
      [echo] Executing Coco target: javadocs
 
 prepare:
@@ -1870,11 +2077,14 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.coco...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/coco/src/main/uk/ac/starlink/coco/CoordinateConversion.java:190: warning - @param argument "ep" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/coco/src/main/uk/ac/starlink/coco/CoordinateConversion.java:251: warning - @param argument "ep" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/coco/docs/coco/javadocs/stylesheet.css...
+  [javadoc] 2 warnings
      [echo] Executing RV target: javadocs
 
 prepare:
@@ -1887,11 +2097,13 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.rv...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/rv/src/main/uk/ac/starlink/rv/RadialVelocity.java:108: warning - @param argument "date" is not a parameter name.
+  [javadoc] Generating /apps/cvsbuild/java/source/rv/docs/rv/javadocs/stylesheet.css...
+  [javadoc] 1 warning
      [echo] Executing FROG target: javadocs
 
 prepare:
@@ -1913,36 +2125,35 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.frog.plot...
   [javadoc] Loading source files for package uk.ac.starlink.frog.util...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
+  [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: warning - Tag @see: malformed: "TimeSeries, FoldSeriesDialog"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/InputNameParser.java:233: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/themes/AquaTheme.java:45: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/index-all.html...
-  [javadoc] "Make name absolute (i.e."
+  [javadoc] "This class describes a theme using "blue-green" colors."
   [javadoc] This sentence is different from what will be interpreted as the first sentence in the
   [javadoc] next major release (when that interpretation will be internationalized), which is:
-  [javadoc] "Make name absolute (i.e. start with leading "/")."
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:119: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:119: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: warning - Tag @see: malformed: "Plot, PlotConfigurator"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:58: warning - Tag @see: malformed: "#Diva,#AstUtilities"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:58: warning - Tag @see: malformed: "#Diva,#AstUtilities"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:30: warning - Tag @see: malformed: "Figure, AbstractFigure"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotCompositeFigure.java:29: warning - Tag @see: malformed: "Plot, BackgroundedCompositeFigure, Figure"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: warning - Tag @see: malformed: "Plot, Figure"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: warning - Tag @see: malformed: "Plot, Figure"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - Tag @see: malformed: "SelectionDragger, Plot"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: warning - Tag @see: malformed: "Gram, TimeSeries"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/themes/AquaTheme.java:45: warning - The first sentence is interpreted to be:
-  [javadoc] "This class describes a theme using "blue-green" colors."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "This class describes a theme using "blue-green" colors.
 
   [javadoc]  1.3 07/22/99"
+  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
+  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: warning - Tag @see: malformed: "TimeSeries, FoldSeriesDialog"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/InputNameParser.java:233: warning - The first sentence is interpreted to be:
+  [javadoc] "Make name absolute (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Make name absolute (i.e. start with leading "/")."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:119: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:119: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: warning - Tag @see: malformed: "Plot, PlotConfigurator"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:58: warning - Tag @see: malformed: "#Diva,#AstUtilities"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:58: warning - Tag @see: malformed: "#Diva,#AstUtilities"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: warning - Tag @see: malformed: "Plot, Figure"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - Tag @see: malformed: "SelectionDragger, Plot"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotCompositeFigure.java:29: warning - Tag @see: malformed: "Plot, BackgroundedCompositeFigure, Figure"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: warning - Tag @see: malformed: "Plot, Figure"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:30: warning - Tag @see: malformed: "Figure, AbstractFigure"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: warning - Tag @see: malformed: "Gram, TimeSeries"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: warning - The first sentence is interpreted to be:
   [javadoc] "PlotFigure extends the diva BasicFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
@@ -1963,28 +2174,29 @@ javadocs:
   [javadoc] "This class describes a theme using gray colors.
 
   [javadoc]  1.3 07/22/99"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:152: warning - The first sentence is interpreted to be:
-  [javadoc] "Object that contains a description of the non-series AST properties
-  [javadoc]  of the plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Object that contains a description of the non-series AST properties
-  [javadoc]  of the plot (i.e. labels etc.)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:150: warning - The first sentence is interpreted to be:
   [javadoc] "Object that contains a description of the non-gram AST properties
   [javadoc]  of the plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Object that contains a description of the non-gram AST properties
   [javadoc]  of the plot (i.e. labels etc.)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:152: warning - The first sentence is interpreted to be:
+  [javadoc] "Object that contains a description of the non-series AST properties
+  [javadoc]  of the plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Object that contains a description of the non-series AST properties
+  [javadoc]  of the plot (i.e. labels etc.)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/XRangeFigure.java:27: warning - Tag @see: malformed: "BasicPlotFigure, BasicFigure"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:26: warning - Tag @see: malformed: "#DataLimits, #PlotConfigFrame."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PolylineFigure.java:18: warning - Tag @see: malformed: "BasicPlotFigure, BasicFigure"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: warning - Tag @see: malformed: "BasicComboBoxEditor, DecimalField"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java:14: warning - Tag @see: malformed: "TimeSeries, FoldSeriesDialog"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: warning - Tag @see: malformed: "TimeSeriesImpl, FITSTimeSeriesImpl"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: warning - Tag @see: malformed: "Frog, FrogMain"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureListener.java:30: warning - The first sentence is interpreted to be:
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e. moved or transformed)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: warning - Tag @see: malformed: "TimeSeriesImpl, FITSTimeSeriesImpl"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1461: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2033,7 +2245,6 @@ javadocs:
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: warning - Tag @see: malformed: "Frog, FrogMain"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:221: warning - The first sentence is interpreted to be:
   [javadoc] "The full range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2044,12 +2255,12 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
   [javadoc]  yPos, plus the standard deviations in yPos)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:624: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:624: warning - The first sentence is interpreted to be:
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
   [javadoc]  plot, including zoomed regions that you cannot see)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:624: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:624: warning - The first sentence is interpreted to be:
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
@@ -2064,8 +2275,8 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the full range (i.e. data limits plus standard deviations)
   [javadoc]   of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:1129: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2074,13 +2285,13 @@ javadocs:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the range (i.e. data limits) of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:598: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:598: warning - The first sentence is interpreted to be:
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e. what you can see)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:598: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:598: warning - The first sentence is interpreted to be:
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2203,18 +2414,18 @@ javadocs:
   [javadoc] "Data model and data handling classes
   [javadoc] <P>
   [javadoc] The classes in this package are used handle the data model and underlying raw data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:608: warning - The first sentence is interpreted to be:
-  [javadoc] "Update the plot to reflect any changes in the series being plotted
-  [javadoc]  (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Update the plot to reflect any changes in the series being plotted
-  [javadoc]  (i.e. when a new series is added)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:606: warning - The first sentence is interpreted to be:
   [javadoc] "Update the plot to reflect any changes in the gram being plotted
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Update the plot to reflect any changes in the gram being plotted
   [javadoc]  (i.e. when a new gram is added)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:608: warning - The first sentence is interpreted to be:
+  [javadoc] "Update the plot to reflect any changes in the series being plotted
+  [javadoc]  (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Update the plot to reflect any changes in the series being plotted
+  [javadoc]  (i.e. when a new series is added)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:231: warning - The first sentence is interpreted to be:
   [javadoc] "Cause the plot to redraw itself, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2233,11 +2444,11 @@ javadocs:
   [javadoc] "Whether this series should be used when auto-ranging (certain classes
   [javadoc]  of series, i.e. generated ones, could be expected to have artificial
   [javadoc]  ranges)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:75: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:73: warning - The first sentence is interpreted to be:
   [javadoc] "Have either scales changed? If so need complete redraw."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Have either scales changed? "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:73: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:75: warning - The first sentence is interpreted to be:
   [javadoc] "Have either scales changed? If so need complete redraw."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Have either scales changed? "
@@ -2310,15 +2521,20 @@ javadocs:
   [javadoc]  creation, removal and transformations.
 
   [javadoc]  "
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/FrogSplash.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: Tag @see: Malformed: Frog, FrogMain
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/Frog.java:591: warning - @param argument "menu" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/Frog.java:678: warning - @param argument "menu" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: warning - Tag @see: reference not found: Frog, FrogMain
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:133: warning - @param argument "astref" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:394: warning - @notes is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:414: warning - @notes is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:561: warning - @param argument "astref" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:577: warning - @param argument "astref" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:606: warning - @notes is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:627: warning - @notes is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:694: warning - @param argument "mapping" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/ast/AstUtilities.java:721: warning - @param argument "mapping" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/FITSHeaderSource.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: Tag @see: Malformed: TimeSeriesImpl, FITSTimeSeriesImpl
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: warning - Tag @see: reference not found: TimeSeriesImpl, FITSTimeSeriesImpl
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/GramAccess.html...
   [javadoc] "Get the full range (i.e."
@@ -2360,8 +2576,7 @@ javadocs:
   [javadoc] "Get the dimension of the time series (i.e. the number of values
   [javadoc]   it contains)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/DataLimits.java:15: warning - Tag @see: reference not found: SpecDataComp
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/Ephemeris.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java:14: Tag @see: Malformed: TimeSeries, FoldSeriesDialog
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java:14: warning - Tag @see: reference not found: TimeSeries, FoldSeriesDialog
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:29: warning - @created is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:221: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/Gram.html...
@@ -2413,6 +2628,8 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time stamp and data value) that
   [javadoc]  correspond to a graphics X coordinate."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:410: warning - @param argument "series" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:722: warning - @param argument "i" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:22: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:423: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/GramComp.html...
@@ -2435,13 +2652,20 @@ javadocs:
   [javadoc] "Lookup the physical values (i.e. timestamp and data value)
   [javadoc]   that correspond to a graphics X coordinate.
   [javadoc]   "
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:156: warning - @param argument "index" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:201: warning - @param argument "marker" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:223: warning - @param argument "state" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramFactory.java:154: warning - @param argument "min" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramFactory.java:154: warning - @param argument "max" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramFactory.java:154: warning - @param argument "interval" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramManager.java:191: warning - @param argument "f" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramManager.java:202: warning - @param argument "key" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/InputNameParser.java:233: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/InputNameParser.html...
   [javadoc] "Make name absolute (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Make name absolute (i.e. start with leading "/")."
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/SinFit.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: Tag @see: Malformed: TimeSeries, FoldSeriesDialog
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: warning - Tag @see: reference not found: TimeSeries, FoldSeriesDialog
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:56: warning - @created is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:295: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/TimeSeries.html...
@@ -2488,6 +2712,8 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time stamp and data value) that
   [javadoc]  correspond to a graphics X coordinate."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:500: warning - @param argument "ephem" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:823: warning - @param argument "i" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:34: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:434: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/TimeSeriesComp.html...
@@ -2510,12 +2736,24 @@ javadocs:
   [javadoc] "Lookup the physical values (i.e. timestamp and data value)
   [javadoc]   that correspond to a graphics X coordinate.
   [javadoc]   "
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:167: warning - @param argument "index" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:212: warning - @param argument "marker" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:234: warning - @param argument "state" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesManager.java:221: warning - @param argument "f" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesManager.java:233: warning - @param argument "fram" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/fit/LeastSquaresFitPoly.java:125: warning - @param argument "x" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/fit/LeastSquaresFitSin.java:199: warning - @param argument "x" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/gram/ChisqPeriodogram.java:146: warning - @param argument "error" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/ArithmeticDialog.java:91: warning - @param argument "f" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/CombineSeriesDialog.java:81: warning - @param argument "f" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/CombineSeriesDialog.java:207: warning - @param argument "frame" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: Tag @see: Malformed: BasicComboBoxEditor, DecimalField
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: warning - Tag @see: reference not found: BasicComboBoxEditor, DecimalField
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/FakeDataCreationDialog.java:190: warning - @param argument "f" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:45: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/GramCreationDialog.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: Tag @see: Malformed: Gram, TimeSeries
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:292: warning - @param argument "index" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:332: warning - @param argument "index" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: warning - Tag @see: reference not found: Gram, TimeSeries
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:182: warning - Tag @see: reference not found: setDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:182: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramFileFilter.java:182: warning - Tag @see: reference not found: isExtensionListInDescription
@@ -2531,7 +2769,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java:24: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LineRenderer.java:24: warning - Tag @see: reference not found: PlotControl.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LookAndFeelManager.java:47: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/LookAndFeelManager.java:101: warning - @param argument "debugManager" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:51: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:314: warning - @param argument "index" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:354: warning - @param argument "index" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:573: warning - @param argument "value" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:763: warning - @param argument "bin" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:763: warning - @param argument "fit" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: setDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: setExtensionListInDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:182: warning - Tag @see: reference not found: isExtensionListInDescription
@@ -2544,12 +2788,14 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:245: warning - Tag @see: reference not found: getDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:245: warning - Tag @see: reference not found: setDescription
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SeriesFileFilter.java:245: warning - Tag @see: reference not found: setExtensionListInDescription
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:26: Tag @see: Malformed: #DataLimits, #PlotConfigFrame.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:26: warning - Tag @see: reference not found: #DataLimits, #PlotConfigFrame.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:231: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.html...
   [javadoc] "Cause the plot to redraw itself, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Cause the plot to redraw itself, i.e. apply our changes. "
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:81: warning - @param argument "dataLimits" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/TrigArithmeticDialog.java:140: warning - @param argument "f" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureListener.java:30: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/FigureListener.html...
@@ -2557,16 +2803,14 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e. moved or transformed)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/PlotFigure.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: Tag @see: Malformed: Plot, Figure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: warning - Tag @see: reference not found: Plot, Figure
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotScaledListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/BasicPlotFigure.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: Tag @see: Malformed: Plot, Figure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: warning - Tag @see: reference not found: Plot, Figure
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaController.java:35: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaGram.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:58: Tag @see: Malformed: #Diva,#AstUtilities
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:58: warning - Tag @see: reference not found: #Diva,#AstUtilities
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:150: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaGram.html...
   [javadoc] "Object that contains a description of the non-gram AST properties
   [javadoc]  of the plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2583,10 +2827,10 @@ javadocs:
   [javadoc] "Update the plot to reflect any changes in the gram being plotted
   [javadoc]  (i.e. when a new gram is added)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:937: warning - Tag @see: reference not found: trackMouseMotion
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:1129: Tag @see: Malformed: DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaPlot.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:58: Tag @see: Malformed: #Diva,#AstUtilities
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:1129: warning - Tag @see: reference not found: DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:58: warning - Tag @see: reference not found: #Diva,#AstUtilities
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:152: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaPlot.html...
   [javadoc] "Object that contains a description of the non-series AST properties
   [javadoc]  of the plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2603,13 +2847,11 @@ javadocs:
   [javadoc] "Update the plot to reflect any changes in the series being plotted
   [javadoc]  (i.e. when a new series is added)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:939: warning - Tag @see: reference not found: trackMouseMotion
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: Tag @see: Malformed: DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: warning - Tag @see: reference not found: DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: Tag @see: Malformed: Plot, PlotConfigurator
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: warning - Tag @see: reference not found: Plot, PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DragRegion.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: Tag @see: Malformed: SelectionDragger, Plot
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - Tag @see: reference not found: SelectionDragger, Plot
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:16: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:31: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/FigureChangedEvent.html...
@@ -2632,11 +2874,13 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e. what you can see)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:322: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:332: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:508: warning - @param argument "series" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PathPlotFigure.java:32: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PathPlotFigure.java:32: warning - Tag @see: reference not found: BasicPlotFigure.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotCompositeFigure.java:29: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/PlotCompositeFigure.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotCompositeFigure.java:29: Tag @see: Malformed: Plot, BackgroundedCompositeFigure, Figure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotCompositeFigure.java:29: warning - Tag @see: reference not found: Plot, BackgroundedCompositeFigure, Figure
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:63: warning - Tag @see: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:624: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/PlotControl.html...
@@ -2650,26 +2894,31 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e. what you can see)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:322: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:332: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:508: warning - @param argument "series" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotRectangle.java:29: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/PlotRectangle.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotRectangle.java:29: Tag @see: Malformed: Plot, PlotConfigurator
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotRectangle.java:29: warning - Tag @see: reference not found: Plot, PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotScaleChangedEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:30: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/Pointer.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:30: Tag @see: Malformed: Figure, AbstractFigure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:30: warning - Tag @see: reference not found: Figure, AbstractFigure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:99: warning - @param argument "size" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:115: warning - @param argument "size" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PolylineFigure.java:18: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/PolylineFigure.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PolylineFigure.java:18: Tag @see: Malformed: BasicPlotFigure, BasicFigure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PolylineFigure.java:18: warning - Tag @see: reference not found: BasicPlotFigure, BasicFigure
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/RangeManipulator.java:28: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/XRangeFigure.java:27: warning - @copyright is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/XRangeFigure.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/XRangeFigure.java:27: Tag @see: Malformed: BasicPlotFigure, BasicFigure
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/XRangeFigure.java:27: warning - Tag @see: reference not found: BasicPlotFigure, BasicFigure
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/XRangeWithFeatureFigure.java:21: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:15: warning - Tag @see: reference not found: Frog
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:41: warning - @param argument "debug" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:71: warning - @param argument "string" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:83: warning - @param argument "flag" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:94: warning - @param argument "flag" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:94: warning - Tag @see: reference not found: RunTime
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java:17: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/stylesheet.css...
-  [javadoc] 199 warnings
+  [javadoc] 272 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 18 seconds
+Total time: 2 minutes 37 seconds
