@@ -93,11 +93,11 @@ itcl::class gaia::GaiaTextImport {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this cancel]
 
-      #  Add the close menu item.
-      $File add command -label Close \
-         -command [code $this close] \
+      #  Add the accept menu item.
+      $File add command -label Accept \
+         -command [code $this accept] \
          -accelerator {Control-x}
-      bind $w_ <Control-x> [code $this close]
+      bind $w_ <Control-x> [code $this accept]
 
       #  Name of input file.
       if { $itk_option(-show_infile) } {
@@ -183,13 +183,13 @@ itcl::class gaia::GaiaTextImport {
       pack $itk_component(cancel) -side left -expand 1 -pady 3 -padx 3
 
       #  Close window accepting import.
-      itk_component add close {
-         button $itk_component(actions).close -text Close \
-            -command [code $this close]
+      itk_component add accept {
+         button $itk_component(actions).accept -text Accept \
+            -command [code $this accept]
       }
-      add_short_help $itk_component(close) \
+      add_short_help $itk_component(accept) \
          {Close window accepting import}
-      pack $itk_component(close) -side left -expand 1 -pady 3 -padx 3
+      pack $itk_component(accept) -side left -expand 1 -pady 3 -padx 3
 
       #  View the first page.
       $itk_component(notebook) view 0
@@ -216,12 +216,12 @@ itcl::class gaia::GaiaTextImport {
       set values_($this,separated) 1
       set values_($this,delimeter) ","
       set values_($this,comment) "\#"
-      set values_($this,fixwidths) {10 20 30 40 50}
+      set values_($this,fixwidths) {10 20}
       set values_($this,skip) 0
    }
 
    #  Close window writing output file.
-   public method close {} {
+   public method accept {} {
       if { [save_file_] } {
          wm withdraw $w_
          configure -outfile $itk_option(-outfile)
@@ -319,7 +319,7 @@ itcl::class gaia::GaiaTextImport {
       }
       pack $itk_component(fixwidths) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(fixwidths) \
-         {Widths of fields: position1 position2 ... }
+         {Postions of field separation: position1 position2 ... }
 
       #  Interactive tab positioning widget.
       itk_component add tabstop {
@@ -327,9 +327,10 @@ itcl::class gaia::GaiaTextImport {
             -change_cmd [code $this update_fixed_ from] \
             -text "No information, press update"
       }
+      $itk_component(tabstop) setindices $values_($this,fixwidths)
       pack $itk_component(tabstop) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(tabstop) \
-         {Fixed width positions (interactive adjustment)}
+         {Fixed width positions (can interactively adjust/create/delete)}
    }
 
 

@@ -14,6 +14,10 @@
 #     it. The number of tab stops is initially controlled by a
 #     configuration option, however, new stops may be added
 #     interactively.
+#
+#     New stops are added by pressing the blue tab-stop, this creates
+#     a new stop that can then be positioned. Configuration options
+#     allow for callbacks whenever a tab-stop is repositioned.
 
 #  Invocations:
 #
@@ -69,13 +73,14 @@ itcl::class gaia::GaiaTabStops {
       eval itk_initialize $args
 
       #  Create the display elements. These are a scrolled canvas
-      #  region with a label and a series of triangles pointing
-      #  to the tab positions.
+      #  region with a label, a creator blue triangle and a series of
+      #  red triangles pointing to the tab positions.
       itk_component add canvas {
          scrolledcanvas $w_.canvas \
             -autoresize 1 \
             -vscrollmode none \
-            -hscrollmode dynamic
+            -hscrollmode dynamic \
+            -xscrollincrement 5m
       }
       pack $itk_component(canvas) -side top -fill both -expand 1
       set canvas_ $itk_component(canvas)
@@ -87,15 +92,16 @@ itcl::class gaia::GaiaTabStops {
       set label_ $itk_component(label)
       update_label_size_
 
-      #  Work out the geometry of the triangles.
+      #  Work out a geometry for all triangles.
       set trioffset_ [expr int($entheight_)+1]
       set triheight_ [expr $trioffset_+$triheight_]
 
       #  Set height of canvas to include label and triangles.
       $canvas_ configure -height [expr $triheight_+30]
 
-      #  Add the "source" tab marker. Pressing <1> generates a new
-      #  marker.
+      #  Add the "source" tabstop triangle. Pressing <1> on this
+      #  generates a new marker, moving the cursor also moves the new
+      #  marker. 
       set xo 5
       set id [$canvas_ create polygon \
                  $xo $trioffset_ \
@@ -105,14 +111,20 @@ itcl::class gaia::GaiaTabStops {
       $canvas_ bind $id <ButtonPress-1> [code $this add_stop_]
       $canvas_ bind $id <B1-Motion> [code $this move_last_stop_ %x]
       $canvas_ bind $id <ButtonRelease-1> [code $this update_stops_]
+      $canvas_ bind $id <Enter> \
+         [code $this short_help {Press <1> to create new marker}]
+      $canvas_ bind $id <Leave> [code $this short_help {}]
 
       #  Add text label to the canvas.
       set labelid_ [$canvas_ create window [expr int($step_*1.5)] 0 \
                        -anchor nw -width $entwidth_ \
                        -height $entheight_ -window $label_]
 
-      #  Dragging tab-stop off visible canvas region autoscrolls.
-      #bind $canvas_ <B1-Leave> [code $this view_region_ %x]
+      #  Dragging <1> off visible canvas region autoscrolls.
+      set ic [$canvas_ component canvas]
+      bind $ic <B1-Leave> [code $this autoscan_ start $ic %x]
+      bind $ic <B1-Enter> [code $this autoscan_ stop $ic 0]
+      bind $ic <ButtonRelease-1> [code $this autoscan_ stop $ic 0]
    }
 
    #  Destructor:
@@ -132,9 +144,10 @@ itcl::class gaia::GaiaTabStops {
             [expr $cx-$triwidth_] $triheight_ \
             [expr $cx+$triwidth_] $triheight_
       }
+      set last_id_ $id
    }
    
-   #  Move the tab-stop that has just been created.
+   #  Move the tab-stop that has just been created or moved.
    protected method move_last_stop_ {x} {
       move_stop_ $last_id_ $x
    }
@@ -157,6 +170,32 @@ itcl::class gaia::GaiaTabStops {
       $canvas_ bind $id <ButtonRelease-1> [code $this update_stops_]
       set last_id_ $id
       return $id
+   }
+   
+   #  Control the autoscan function when dragged off canvas.
+   protected method autoscan_ {do w x} {
+      if { $do == "start" } {
+         #  Start autoscan, cancel existing ones.
+         if { $afterid_ != {} } {
+            after cancel $afterid_
+            set afterid_ {}
+         }
+         set width [winfo width $w]
+         if {$x >= $width } {
+            $canvas_ xview scroll 1 units
+            move_last_stop_ $width
+         } elseif {$x < 0} {
+            $canvas_ xview scroll -1 units
+            move_last_stop_ 0
+         }
+         eval set afterid_ [after 50 [code $this autoscan_ $do $w $x]]
+      } else {
+         #  Stop autoscan.
+         if { $afterid_ != {} } {
+            after cancel $afterid_
+            set afterid_ {}
+         }
+      }
    }
 
    #  Set the position of a tab-stop by character index.
@@ -285,9 +324,11 @@ itcl::class gaia::GaiaTabStops {
    #  Canvas id of last tab-stop.
    protected variable last_id_ {}
 
+   #  Identifier of after command.
+   protected variable afterid_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
-
 
 #  End of class definition.
 }
