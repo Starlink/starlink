@@ -24,7 +24,7 @@ Interface FOLDBIN
       help        'This should be in the same units as the axis 1 data'
    EndParameter
 
-   Parameter    PEPOCH
+   Parameter    EPOCH
       POSITION    4
       TYPE        '_DOUBLE'
       PROMPT      'Enter epoch of phase zero (days)'
@@ -38,11 +38,12 @@ Interface FOLDBIN
       help        'This is the number of elements in the output DATA_ARRAY.'
    EndParameter
 
-   Parameter    WEIGHTED
+   Parameter    WEIGHT
       TYPE        '_LOGICAL'
       prompt      'Are weighted means required?'
       default     N
       ppath       'DEFAULT'
       vpath       'PROMPT'
    EndParameter
+
 EndInterface
