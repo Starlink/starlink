@@ -23,6 +23,10 @@
   <!ENTITY fig-configure-gif  SYSTEM "ssn78-4.gif" NDATA gif89a>
   <!ENTITY fig-configure-eps  SYSTEM "ssn78-4.eps" NDATA eps>
   <!ENTITY fig-configure-pdf  SYSTEM "ssn78-4.pdf" NDATA pdf>
+  <!ENTITY fig-versinfo-png   SYSTEM "ssn78-5.png" NDATA png>
+  <!ENTITY fig-versinfo-gif   SYSTEM "ssn78-5.gif" NDATA gif89a>
+  <!ENTITY fig-versinfo-eps   SYSTEM "ssn78-5.eps" NDATA eps>
+  <!ENTITY fig-versinfo-pdf   SYSTEM "ssn78-5.pdf" NDATA pdf>
 ]>
 <!-- $Revision$ -->
 
@@ -559,7 +563,8 @@
             configure script by editing the values of certain
             `substitution variables' into a list of template files.</p>
 
-          <p>For example, you might have a version header file
+          <p>For example, you might have a version header
+            file<index>version numbers</index>
             <code>version.h.in</code>, containing the line
             <verbatim>
 const char version[] = "@PACKAGE_VERSION@";
@@ -568,7 +573,7 @@ const char version[] = "@PACKAGE_VERSION@";
             substituted by default, and if this file were listed as
             one of those to be substituted (by mentioning it in the
             autoconf macro
-            <code>AC_CONFIG_FILES(version.h)</code><index>autoconf macros!AC_CONFIG_FILES</index>), 
+            <code>AC_CONFIG_FILES(version.h)</code><index>autoconf!macros!AC_CONFIG_FILES</index>), 
             then a file <code>version.h</code> would be created
             containing the contents of the <code>version.h.in</code>
             file with the <code>@PACKAGE_VERSION@</code> substituted by the
@@ -655,7 +660,7 @@ AC_CHECK_FUNCS([strchr])
             macros such as <code>AC_CHECK_HEADERS</code> above; if you
             wish to add further switches to the <code>config.h.in</code>
             file, you should do so by calling the autoconf macro
-            <code>AC_DEFINE</code><index>autoconf macros!AC_DEFINE</index>.  See the
+            <code>AC_DEFINE</code><index>autoconf!macros!AC_DEFINE</index>.  See the
             section <webref 
               url="&autoconfhtml;/autoconf_82.html" >7.1 Defining C
               Preprocessor Symbols</webref> in the autoconf manual for
@@ -760,7 +765,8 @@ AC_CHECK_FUNCS([strchr])
               <webref url="&autoconfhtml;/autoconf_27.html">4.8
                 Configuration Header Files</webref>.</span>  If you
             want to put extra information into this file, use the
-            <code>AC_DEFINE</code> macro: a declaration like
+            <code>AC_DEFINE</code><index>autoconf!macros!AC_DEFINE</index>
+            macro: a declaration like 
             <code>AC_DEFINE(SPECIALCASE,1)</code> would insert
             <code>#define SPECIALCASE 1</code> into the
             <code>config.h</code>; autoheader also spots this and puts
@@ -847,9 +853,9 @@ AC_SUBST(wibble)
               file, you should prefix them with the m4 <em>macro</em>
               <code>dnl</code>, as in
               <verbatim>
-dnl   This is a comment
-AC_INIT(...)
-</verbatim>
+                dnl   This is a comment
+                AC_INIT(...)
+              </verbatim>
               There's no harm in including <code>#</code>-style
               comments in your <code>configure.ac</code> file and
               allowing these to be passed through to the output file,
@@ -869,6 +875,7 @@ AC_INIT(...)
               some advice.</p>
 
           </subsubsubsect>
+
         </subsubsect>
 
         <subsubsect id='automakeoverview' indexkey="automake!overview">
@@ -923,17 +930,17 @@ libpar_adam_la_SOURCES = $(F_ROUTINES)
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 F_ROUTINES = \
-         par1_menu.f \
-         par_cancl.f \
-         [blah...]
+     par1_menu.f \
+     par_cancl.f \
+     [blah...]
 
 PUBLIC_INCLUDES = \
-	PAR_ERR \
-	PAR_PAR \
-	par.h \
-	parwrap.h \
-	par_err.h \
-	par_par.h
+    PAR_ERR \
+    PAR_PAR \
+    par.h \
+    parwrap.h \
+    par_err.h \
+    par_par.h
 
 BUILT_SOURCES = PAR_ERR par_err.h
 </verbatim></p>
@@ -1371,9 +1378,9 @@ hds_machine.txt: hds_machine
           <p>All of the components have ``Some influential environment
             variables''<index>environment variables</index> listed in
             the help message.  This will include
-            at least <code>environment variables!STARLINK</code><index>STARLINK</index>, and
-            in the (very common!) 
-            case of components which include a compiler, an
+            at least <code>STARLINK</code><index>environment
+            variables!STARLINK</index>, and in the (very common!) case
+            of components which include a compiler, an 
             environment variable such as
             <code>CC</code><index>environment variables!CC</index> or
             <code>FC</code><index>environment variables!FC</index>
@@ -1612,12 +1619,15 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           the two are consistent is to configure
           <code>component.xml</code> from
           <code>configure.ac</code>.  To this end, there is a
-          template <code>component.xml.in</code> file in the starconf
+          template
+          <code>component.xml.in</code><index>component.xml!template</index>
+          file in the starconf
           `buildsupportdata' directory.  When you are preparing a
           directory to be build with the Starlink tools, copy this
           <code>template-component.xml.in</code> into the current
           directory under the name <code>component.xml.in</code>,
-          and fill in those field which are not configured.  See
+          and fill in those field which are not configured.  Remember
+          to uncomment the elements you fill in!  See
           <ref id="componentxml"/> for details.  The files
           <code>component.xml</code> and
           <code>component.xml.in</code> should both be
@@ -1716,9 +1726,9 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             <kbd>./starconf.status --show buildsupportdata</kbd>.</p>
 
           <p>The three templates present are
-            <code>template-Makefile.am</code>,
-            <code>template-configure.ac</code> and
-            <code>template-configure.xml.in</code>.</p>
+            <code>template-Makefile.am</code><index>Makefile.am!template</index>,
+            <code>template-configure.ac</code><index>configure.ac!template</index> and
+            <code>template-component.xml.in</code><index>component.xml!template</index>.</p>
 
         </subsubsect>
 
@@ -1730,13 +1740,24 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <p>The meaning of the elements in the component.xml DTD is
             as follows<index>component.xml!format</index>.  
             <dl>
-              <dt>component/id</dt>
+              <dt>component: attribute `id'</dt>
               <dd>
                 <p>The ID for this component.  This must match the
                   package name in <code>configure.ac</code>, and is
                   the name under which the manifest file is
                   installed.  Let this remain under the control
                   of <code>configure.ac</code></p>
+              </dd>
+
+              <dt>component: attribute `status'</dt>
+              <dd>
+                <p>The status of this component, which can be
+                  <code>current</code> (the default, and assumed if no
+                  such attribute is present), or
+                  <code>obsolete</code>.  When the
+                  <code>Makefile.dependencies</code> file is
+                  regenerated, the program doing that will warn if any
+                  component depends on a component marked obsolete.</p>
               </dd>
 
               <dt>version</dt>
@@ -1809,6 +1830,145 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             </dl></p>
 
         </subsubsect>
+
+      </subsect>
+
+      <subsect id="versioninfo" export="export" indexkey="version numbers">
+        <subhead>
+          <title>Version numbers</title>
+        </subhead>
+
+        <p>The only place where you should specify a version
+          number is as the second argument to the
+          <code>AC_INIT</code> macro; if you need the version
+          number anywhere else, such as a bit of code which
+          reports the package version number, you should put it
+          there with the <code>@PACKAGE_VERSION@</code>
+          substitution variable<index>autoconf!substitution
+            variables!PACKAGE_VERSION</index>, or one of the
+          variants of this defined by <code>STAR_DEFAULTS</code>
+          (see <ref id="macro-defaults"/>).</p>
+
+        <p>Starlink follows the usual practice of indicating
+          release versions with a three-part version number,
+          major.minor-release.  We have no particularly precise
+          rules controlling these, but the major version number is
+          typically incremented for a release which contains a
+          major change in functionality or implementation, the
+          minor is incremented for changes of functionality less
+          significant than this, and the release number is
+          incremented for bugfix releases, involving no
+          functionality changes at all.</p>
+
+        <p>If a component contains a shared library, then the
+          maintainer may elect to maintain shared library
+          versioning information [XXX: should we make this a
+          requirement for libraries?].  Since we use libtool, we
+          can use its <code>-version-info</code> interface to
+          maintain library versions.  This is documented in
+          <webref
+            url="http://www.gnu.org/software/libtool/manual.html#SEC35">section
+            `Updating library version information'</webref> of the
+          libtool manual, but the explanation is repeated and
+          elaborated below.</p>
+
+        <p>The crucial thing to remember is that the versioning
+          information encoded in this <code>-version-info</code>
+          option is <em>not</em> the component version number, but
+          instead an encoding of which <em>interface</em> versions
+          a given shared library implements, in the form
+          of a triple <code>current:revision:age</code>.
+          'Current' is the interface version, as a monotonically
+          increasing integer, and 'age' is a statement of how many
+          interfaces are compatible with it: if a library has a
+          triple <code>c:r:a</code>, then it implements all the
+          interfaces between versions <em>c-a</em> and <em>c</em>,
+          inclusive.  When you're making a new release of a
+          library which had the <code>-version-info c:r:a</code>,
+          <ol>
+            <li>
+              <p>If the interface is unchanged, but the
+                implementation has changed or been fixed, then
+                increment <code>r</code>.</p>
+            </li>
+            <li>
+              <p>Otherwise, increment <code>c</code> and zero
+                <code>r</code>.
+                <ol>
+                  <li><p>If the interface has grown (that is, the
+                      new library is compatible with old code),
+                      increment <code>a</code>.</p>
+                  </li>
+                  <li>
+                    <p>If the interface has changed in an
+                      incompatible way (that is, functions have
+                      changed or been removed), then zero
+                      <code>a</code>.</p>
+                  </li>
+                </ol>
+              </p>
+            </li>
+          </ol>
+          This is illustrated in <ref id="versinfo"/>.
+        </p>
+        <figure float="nofloat" id="versinfo">
+          <caption>
+            <px>Updating <code>-version-info</code> specifications</px>
+          </caption>
+          <figurecontent image="fig-versinfo-png"/>
+          <figurecontent image="fig-versinfo-gif"/>
+          <figurecontent image="fig-versinfo-eps"/>
+          <figurecontent image="fig-versinfo-pdf"/>
+        </figure>
+
+        <p>The libtool documentation suggests starting the
+          version-info specifications at 0:0:0, and this is the
+          default if no <code>-version-info</code> option is
+          present.  Since only some Starlink libraries have this
+          versioning maintained, it is best if you start the
+          specification at 1:0:0, to distinguish this from those
+          libraries which have no version-info defined.</p>
+
+        <p>You add the <code>-version-info</code> specification to
+          the libtool command using the library's
+          <code>LDFLAGS</code> variable, as follows.  First the
+          <code>Makefile.am</code> (from the <code>prm</code> component):
+<verbatim>
+libprm_la_SOURCES = \
+    $(F_ROUTINES)
+    $(PUBLIC_INCLUDES) \
+    $(PRIVATE_INCLUDES) \
+    PRM_PAR
+libprm_la_LDFLAGS = -version-info $(libprm_la_version_info)
+
+libprm_a_la_SOURCES = \
+    $(PLATFORM_C)
+libprm_a_la_LDFLAGS = -version-info $(libprm_a_la_version_info)
+[...]
+</verbatim>
+          and then the corresponding section from
+          <code>configure.ac</code>:
+          <verbatim>
+AC_INIT(prm, 1.3-1, ussc@star.rl.ac.uk)
+# Version-info specifications.  See SSN/78 for guidelines, and update the table
+# below for ANY change of version number.
+#
+# Release    libprm.la      libprm_a.la
+#  1.3-1       1:0:0          1:0:0
+AC_SUBST(libprm_la_version_info,   1:0:0)
+AC_SUBST(libprm_a_la_version_info, 1:0:0)
+
+[...]
+</verbatim>
+          There is no automake magic to the
+          <code>libprm_la_version_info</code> variable name -- it
+          is just mnemonic, and you are free to change it if you
+          have a good reason to do so.  Since there is no fixed
+          relationship between the component version number and
+          the <code>-version-info</code> specification, it is
+          important to maintain a simple table of associations
+          between the two, and the <code>configure.ac</code> file
+          is a sensible place to do that.</p>
 
       </subsect>
 
@@ -1972,7 +2132,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <code>AC_PROG_FPP</code>.</p>
 
         <p>You should use
-          <code>AC_PROG_FC</code><index>autoconf macros!AC_PROG_FC</index> in
+          <code>AC_PROG_FC</code><index>autoconf!macros!AC_PROG_FC</index> in
           preference to the 
           macro <code>AC_PROG_F77</code> described in the autoconf
           manual, since the `FC' support in autoconf is more flexible
@@ -2018,7 +2178,7 @@ AC_PROG_FC([], 77)
 
         <p>Starlink autoconf and automake between them add support for
           preprocessable Fortran.  Autoconf supplies the
-          <code>AC_PROG_FPP</code><index>autoconf macros!AC_PROG_FPP</index> macro
+          <code>AC_PROG_FPP</code><index>autoconf!macros!AC_PROG_FPP</index> macro
           described in <ref 
             id="macro-ac-prog-fpp"/>, to investigate what compiler and
           preprocessor are available, and automake works with the
@@ -2026,7 +2186,8 @@ AC_PROG_FC([], 77)
           generated <code>Makefile.in</code>.</p>
 
         <p>For example, you might have in your
-          <code>configure.ac</code> file the lines
+          <code>configure.ac</code> file the
+          lines<index>autoconf!macros!AC_FC_OPEN_SPECIFIERS</index>
           <verbatim>
 AC_PROG_FC
 AC_PROG_FPP
@@ -3006,7 +3167,7 @@ AC_OUTPUT
           by looking for a f95 compiler before looking for a f77
           compiler; if you know or discover this is inappropriate,
           then you can constrain the Fortran dialect that
-          <code>AC_PROG_FC</code><index>autoconf macros!AC_PROG_FC</index> will look
+          <code>AC_PROG_FC</code><index>autoconf!macros!AC_PROG_FC</index> will look
           for by giving a value for 
           its optional dialect argument.  Macro
           <code>AC_PROG_FC</code> is not yet documented in the
@@ -3042,6 +3203,15 @@ sed -n \
           download one package more than they have to, or might create
           a circular dependency and break the nightly build, in which
           case you'll find out soon enough.</p>
+
+        <p>See <ref id="macro-declare-dependencies"/> for the
+          description of the various types of dependencies you can
+          specify here.</p> 
+
+        <p>By the way, remember (because everyone forgets) that there
+          are no components <code>err</code> and <code>msg</code>:
+          all of the <code>err_</code> and <code>msg_</code> functions
+          are in the <code>mers</code> component.</p>
 
         <p>The next couple of lines tells you that we lied
           outrageously, above, when we were talking about
@@ -4521,7 +4691,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-check-intrinsics" export="export"
-        indexkey="autoconf macros!AC_FC_CHECK_INTRINSICS"> 
+        indexkey="autoconf!macros!AC_FC_CHECK_INTRINSICS"> 
           <subhead>
             <title>AC_FC_CHECK_INTRINSICS</title>
           </subhead>
@@ -4541,7 +4711,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-check-headers" export="export"
-        indexkey="autoconf macros!AC_FC_CHECK_HEADERS"> 
+        indexkey="autoconf!macros!AC_FC_CHECK_HEADERS"> 
           <subhead>
             <title>AC_FC_CHECK_HEADERS</title>
           </subhead>
@@ -4557,7 +4727,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="ac-fc-have-percentval" export="export"
-        indexkey="autoconf macros!AC_FC_HAVE_PERCENTVAL"> 
+        indexkey="autoconf!macros!AC_FC_HAVE_PERCENTVAL"> 
           <subhead>
             <title>AC_FC_HAVE_PERCENTVAL</title>
           </subhead>
@@ -4571,7 +4741,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-open-specifiers" export="export"
-          indexkey="autoconf macros!AC_FC_OPEN_SPECIFIERS">
+          indexkey="autoconf!macros!AC_FC_OPEN_SPECIFIERS">
           <subhead>
             <title>AC_FC_OPEN_SPECIFIERS</title>
           </subhead>
@@ -4602,7 +4772,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-recl-unit" export="export"
-          indexkey="autoconf macros!AC_FC_RECL_UNIT">
+          indexkey="autoconf!macros!AC_FC_RECL_UNIT">
           <subhead>
             <title>AC_FC_RECL_UNIT</title>
           </subhead>
@@ -4627,7 +4797,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-prog-fc" export="export"
-          indexkey="autoconf macros!AC_PROG_FC">
+          indexkey="autoconf!macros!AC_PROG_FC">
           <subhead>
             <title>AC_PROG_FC</title>
           </subhead>
@@ -4650,7 +4820,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-prog-fpp" export="export"
-          indexkey="autoconf macros!AC_PROG_FPP">
+          indexkey="autoconf!macros!AC_PROG_FPP">
           <subhead>
             <title>AC_PROG_FPP</title>
           </subhead>
@@ -4672,7 +4842,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             X).</p>
 
           <p>The macro works out if the Fortran compiler discovered by
-            macro <code>AC_PROG_FC</code><index>autoconf macros!AC_PROG_FC</index> has
+            macro <code>AC_PROG_FC</code><index>autoconf!macros!AC_PROG_FC</index> has
             the requested set of 
             features.  If so, it arranges for the compilation to be done
             `directly'; if not, it arranges for `indirect' compilation,
@@ -4826,9 +4996,10 @@ file.f: file.$(FPP_SRC_EXT)
             can be found.  Because of this default behaviour, this
             macro should _only_ be used for locating Starlink programs
             such as messgen or alink, and not as a general replacement
-            for <code>AC_CHECK_PROG</code><index>autoconf
-            macros!AC_CHECK_PROG and STAR_CHECK_PROGS</index>.  Any
-            characters in the 
+            for
+            <code>AC_CHECK_PROG</code><index>autoconf!macros!AC_CHECK_PROG
+            and STAR_CHECK_PROGS</index>.
+            Any characters in the 
             program outside of the set of alphanumerics and
             underscores are normalised to underscores.</p>
 
@@ -4912,17 +5083,56 @@ file.f: file.$(FPP_SRC_EXT)
             <code>TYPE</code> is one of `sourceset', `build', `link',
             `use' or `test', and the <code>DEPLIST</code> is a space
             separated list of component names, which this component
-            depends on in the given way.
+            depends on in the specified way.</p>
+
+          <p>This is less complicated than it seems.  The only types
+            you're likely to have to specify are `build' and `link'
+            dependencies.
             <ul>
-              <li><p>Sourceset dependencies are those components
+              <li>
+                <p>If a particular component <em>D</em> needs to be
+                  installed in order for a given component <em>C</em>
+                  to be built (perhaps because it uses include files
+                  installed by the component <em>D</em>), then that
+                  second component has a <em>build</em> dependency on
+                  <em>D</em>:
+                  <code>STAR_DECLARE_DEPENDENCIES(build,D)</code>.</p>
+              </li>
+              <li>
+                <p>If <em>D</em> is a library which we need to link
+                  against in order to build our component <em>C</em>, then
+                  this is still a build dependency on <em>D</em>, but
+                  we must indicate that we depend on all of
+                  <em>D</em>'s link dependencies also:
+                  <code>STAR_DECLARE_DEPENDENCIES(build,D,link)</code>.
+                </p>
+              </li>
+              <li>
+                <p>Where do these link dependencies come from?  If
+                  <em>C</em> is a library which depends on functions
+                  from another library <em>D</em>, then <em>D</em>
+                  does not have to be present in order to build
+                  <em>C</em>, but it does have to be present, at some
+                  later stage, in order to link against it.</p>
+              </li>
+            </ul>
+          </p>
+
+          <p>In full, the types of dependencies are as follows:
+            <dl>
+              <dt>Sourceset dependencies</dt>
+              <dd>
+                <p>These are the components
                   which must be installed in order to build the complete
                   set of sources, either for building or for
                   distribution.  This includes documentation, so it
-                  would include star2html as well as messgen.</p>
-              </li>
+                  would include <code>star2html</code> as well as
+                  <code>messgen</code>.</p>
+              </dd>
 
-              <li>
-                <p>Build dependencies are those which are required
+              <dt>Build dependencies</dt>
+              <dd>
+                <p>These are the dependencies which are required
                   in order to build this component.  This typically
                   means include files, but if part of the component is
                   an executable file (such as <code>compifl</code>
@@ -4932,10 +5142,11 @@ file.f: file.$(FPP_SRC_EXT)
                   two components which have a build dependency on each
                   other, since that would mean that each would have to
                   be built before the other, which is impossible.</p>
-              </li>
+              </dd>
 
-              <li>
-                <p>Link dependencies are those required to link
+              <dt>Link dependencies</dt>
+              <dd>
+                <p>These are the dependencies required to link
                   against the libraries in a component.  That means
                   all the libraries that this component's libraries
                   use.  These are not necessarily build dependencies,
@@ -4951,10 +5162,11 @@ file.f: file.$(FPP_SRC_EXT)
                   declared as such.  In other words, the distinction
                   between build and link dependencies is important
                   only for library components.</p>
-              </li>
+              </dd>
 
-              <li>
-                <p>Use dependencies are those which are required in
+              <dt>Use dependencies</dt>
+              <dd>
+                <p>These are the dependencies required in
                   order for the component to be used by something
                   else, after it has been built and installed.  For
                   example a library which called another application
@@ -4968,10 +5180,11 @@ file.f: file.$(FPP_SRC_EXT)
                   distribution packages, and have to articular
                   (minimal?) dependencies between them; until then,
                   use dependencies will be rather rare.</p>
-              </li>
+              </dd>
 
-             <li>
-                <p>Test dependencies are those which are required in
+              <dt>Test dependencies</dt>
+              <dd>
+                <p>These are required in
                   order to run any regression tests which come with
                   the component.  It's generally a good idea to avoid
                   making this a larger set than the use dependencies,
@@ -4980,11 +5193,11 @@ file.f: file.$(FPP_SRC_EXT)
                   dependencies to be the same as the use
                   dependencies.  Note that the system does not
                   currently make any use of this information.</p>
-              </li>
-            </ul>
+              </dd>
+            </dl>
           </p>
 
-          <p>The point of this is that different dependencies are
+          <p>The point of all this is that different dependencies are
             required at different times.  The set of dependencies in
             the master makefile is composed of all the `sourceset' and
             `build' dependencies, but not `link' or `use'
@@ -4995,7 +5208,7 @@ file.f: file.$(FPP_SRC_EXT)
             possibly indirectly, on A).</p>
 
           <p>It is because of this intricacy that the dependencies
-            scheme is so complicated.  <em>In general, you will declare
+            scheme is so complicated.  <em>In general, it is safe to declare
             most things to have build dependencies</em>, and only
             refine these into link or use dependencies when things
             won't work otherwise.</p>
@@ -5101,10 +5314,11 @@ file.f: file.$(FPP_SRC_EXT)
                   <code>PACKAGE_VERSION</code>, and an integer
                   representation of these consisting of <code>major *
                   1000000 + minor * 1000 + release</code>.
-                  <index>PACKAGE_VERSION_MAJOR</index>
-                  <index>PACKAGE_VERSION_MINOR</index>
-                  <index>PACKAGE_VERSION_RELEASE</index>
-                  <index>PACKAGE_VERSION_INTEGER</index>
+                  <index>version numbers</index>
+                  <index>autoconf!substitution variables!PACKAGE_VERSION_MAJOR</index>
+                  <index>autoconf!substitution variables!PACKAGE_VERSION_MINOR</index>
+                  <index>autoconf!substitution variables!PACKAGE_VERSION_RELEASE</index>
+                  <index>autoconf!substitution variables!PACKAGE_VERSION_INTEGER</index>
                 </p>
               </li>
             </ul>
