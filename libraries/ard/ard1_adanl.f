@@ -87,6 +87,8 @@
 *  History:
 *     27-APR-1994 (DSB):
 *        Original version.
+*     25-OCT-2000 (DSB):
+*        Report an error if a blank ARD expression is supplied.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -168,8 +170,13 @@
 *  Get the size of the group containing the supplied ARD description.
       CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
 
-*  Exit if the group is empty.
-      IF( SIZE .EQ. 0 ) GO TO 999
+*  Report an error if the group is empty.
+      IF( SIZE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = ARD__BLANK
+         CALL ERR_REP( 'ARD1_ADANL_ERR0', 'Blank ARD expression '//
+     :                 'supplied.', STATUS )
+         GO TO 999
+      END IF
 
 *  Initialise the index of the next element to be obtained from the
 *  group.

@@ -13,5 +13,6 @@ MISOP	<Missing operand >
 MSPAR	<Missing parenthesis>
 NOT2D	<ARD description is not 2-D>
 SCALE	<Current mapping is not isotropic>
+BLANK   <Blank ARD expression supplied>
 
 .END
