@@ -4,7 +4,7 @@ SUBDIRS = @subdirs@
 
 bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
 
-LOCAL_LINK = polsub/libpolsub.la ccdpack/libccdpack.la `$(srcdir)/polpack_nogks_link_adam`
+LOCAL_LINK = polsub/libpolsub.la ccdpack/libccdpack.la `$(srcdir)/polpack_link_adam`
 
 bin_MONOLITHS = polpack_mon 
 polpack_mon_SOURCES = $(POLPACK_MONO_SOURCE) $(POLPACK_F_ROUTINES)
@@ -18,6 +18,18 @@ polpack_mon_TASKS = $(POLPACK_TASKS)
 version.dat:
 	-rm -f version.dat
 	echo $(PACKAGE_VERSION) > version.dat
+
+# Help source file
+starhelp_DATA = polpack.shl
+
+.hlp.shl:
+        @HLIB@ $<
+
+polpack.hlp: $(POLPACK_F1_ROUTINES) polpack_master.hlp
+	cat $(POLPACK_F1_ROUTINES) > all.f
+	prohlp in=all.f out=all.hlp single=no
+	cat polpack_master.hlp all.hlp > polpack.hlp
+	-rm -f all.hlp
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -76,7 +88,6 @@ DYNSCRIPTS = polpack.csh polpack.icl
 
 $(IFL_FILES) $(DYNSCRIPTS): polpack.ifd
 	$(IFD2STAR) polpack
-
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
