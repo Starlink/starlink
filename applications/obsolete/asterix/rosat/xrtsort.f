@@ -1363,6 +1363,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       UNITS(2)='degrees'
 *
 	print *,mdim(1),mdim(2)
+	print *,base(1),scale(1)
+	print *,base(2),scale(2)
       CALL DYN_MAPI(2,MDIM,SMPTR,STATUS)
 	print *,'masking'
       CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(SMPTR),STATUS)

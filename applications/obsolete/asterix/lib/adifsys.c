@@ -424,6 +424,10 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
 /* Link user object to file object if required */
     adix_newlnk( id, *fileid, status );
+
+/* If ok return the top object rather than the file object */
+    if ( _ok(status) )
+      *fileid = id;
     }
 
   }
