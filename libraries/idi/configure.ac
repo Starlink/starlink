@@ -53,7 +53,7 @@ STAR_MESSGEN(idi_err.msg)
 dnl    These files are installed into the etc directory. They
 dnl    are binary files so should not go into share
 
-STAR_ETC_FILES(xworks.dat)
+STAR_ETC_FILES(xworks.dat xworks.dct)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

@@ -1,7 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_SCRIPTS = idi_link idi_link_adam
-staretc_DATA = xworks.dct xworks.dat
 
 lib_LTLIBRARIES = libidi.la libidi_adam.la
 
