@@ -1,5 +1,5 @@
       SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
-     :     DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, USE_SECTION,
+     :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :     N_BOL, N_POS, N_INTS,
      :     MJD_STANDARD, OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
      :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
@@ -17,7 +17,7 @@
  
 *  Invocation:
 *      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
-*     :     DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, USE_SECTION,
+*     :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
 *     :     N_BOL, N_POS, N_INTS,
 *     :     MJD_STANDARD, OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
@@ -45,10 +45,8 @@
 *        Output coordinates system. (Passed into SURF_READ_REBIN_NDFS)
 *     N_FILE = INTEGER (Given & Returned)
 *        Current file number (less than MAX_FILE and greater than 0).
-*     SECPAR = LOGICAL (Given)
-*        Has the USE_SECTION parameter  been set outside this routine
 *     USE_SECTION = LOGICAL (Given)
-*        Value of USE_SECTION parameter if SECPAR
+*        Determines whether we are using the section or the invers
 *     N_BOL = INTEGER (Returned)
 *        Number of bolometers associated with this observation
 *     N_POS = INTEGER (Returned)
@@ -131,7 +129,6 @@
       INTEGER          MAX_FILE
       INTEGER          NSPEC
       CHARACTER*(*)    OUT_COORDS
-      LOGICAL          SECPAR
       LOGICAL          USE_SECTION
 
 *  Arguments Given & Returned:
@@ -823,21 +820,12 @@
       CALL NDF_ANNUL(SECNDF, STATUS)
 
 *     SCUBA SECTION
-*     If there a SCUBA section has been specified then we need to apply it
+*     If a SCUBA section has been specified then we need to apply it
       IF (NSPEC .GT. 0) THEN
-
-*     Is section good or bad
-
-         IF (SECPAR) THEN
-            USE_INTS = USE_SECTION
-         ELSE
-            CALL PAR_GET0L ('USE_SECTION', USE_INTS, STATUS)
-            CALL PAR_CANCL ('USE_SECTION', STATUS)
-         END IF
 
 *     If we are using the section we actually want the inverse
 *     section to be set bad and not the section itself.
-         USE_INTS = .NOT.USE_INTS
+         USE_INTS = .NOT.USE_SECTION
 
 *     decode the data specifications
          
