@@ -9032,6 +9032,7 @@ U java/source/topcat/src/docs/changes
 U java/source/topcat/src/docs/docs.dtd
 U java/source/topcat/src/docs/epsgraphics.jar
 U java/source/topcat/src/docs/fop.jar
+U java/source/topcat/src/docs/multishot.gif
 U java/source/topcat/src/docs/sun253.xml
 U java/source/topcat/src/docs/toFo.xslt
 U java/source/topcat/src/docs/toHTML.xslt
@@ -9066,6 +9067,7 @@ U java/source/topcat/src/docs/figures/SubsetWindow.gif
 U java/source/topcat/src/docs/figures/SyntheticColumnQueryWindow.gif
 U java/source/topcat/src/docs/figures/SyntheticSubsetQueryWindow.gif
 U java/source/topcat/src/docs/figures/TableViewerWindow.gif
+U java/source/topcat/src/docs/figures/multishot-mini.gif
 cvs checkout: Updating java/source/topcat/src/etc
 cvs checkout: Updating java/source/topcat/src/etc/demo
 cvs checkout: Updating java/source/topcat/src/etc/demo/fits
