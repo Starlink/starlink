@@ -1314,8 +1314,11 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  ------------------------------------
 #
 #  Remove all intermediate files.  Do not remove built files.
+#  Note need DUMMY to give rule a dependency, otherwise Solaris
+#  make extracts clean.c from the source file.
+DUMMY:
 
-clean:
+clean: DUMMY
 	@- rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
               $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
