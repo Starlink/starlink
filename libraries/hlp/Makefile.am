@@ -3,12 +3,16 @@
 bin_SCRIPTS = hlib hlp_link hlp_link_adam
 
 bin_PROGRAMS = lsthlp crehlp
+
+TESTS = tsthlp
 check_PROGRAMS = tsthlp
 
 lsthlp_SOURCES = lsthlp.f
 tsthlp_SOURCES = tsthlp.f
 crehlp_SOURCES = crehlp.f
-LDADD = -lhlp
+
+# All programs we build will link against the HLP library
+LDADD = libhlp.la
 
 lib_LTLIBRARIES = libhlp.la
 
@@ -57,3 +61,4 @@ demo.shl: demo.hlp crehlp
 	rm fort.1
 	mv fort.2 demo.shl
 
+tsthlp_DEPENDENCIES = demo.shl
