@@ -97,17 +97,17 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL				BR_DEXP
-        DOUBLE PRECISION 		BR_DEXP
-      EXTERNAL				BR_K0
-        DOUBLE PRECISION 		BR_K0
-      EXTERNAL				BR_K1
-        DOUBLE PRECISION 		BR_K1
-      EXTERNAL				PDA_DERFC
-        DOUBLE PRECISION 		PDA_DERFC
+      EXTERNAL		     	BR_DEXP
+        DOUBLE PRECISION 	BR_DEXP
+      EXTERNAL			BR_K0
+        DOUBLE PRECISION 	BR_K0
+      EXTERNAL			BR_K1
+        DOUBLE PRECISION 	BR_K1
+      EXTERNAL			PDA_DERFC
+        DOUBLE PRECISION 	PDA_DERFC
 
 *  Local Variables:
-      DOUBLE PRECISION 		EMA,ERFC       		!
+      DOUBLE PRECISION 		EMA,ERFC,RVAL           !
       INTEGER			PFAIL               	! PDA failure code
 *.
 
