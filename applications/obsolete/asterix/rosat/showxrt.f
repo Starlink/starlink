@@ -168,7 +168,7 @@
           CALL AIO_WRITE( AID, SBUF, STATUS )
           EXPOS = EXPOS + HEAD_TEND(LP) - HEAD_TSTART(LP)
         END DO
- 1020   FORMAT(2X, F10.1, X, F10.1, X, F10.1)
+ 1020   FORMAT(2X, F10.1, 1X, F10.1, 1X, F10.1)
         CALL AIO_BLNK( AID, STATUS )
 
 *      Write exposure time
@@ -224,7 +224,7 @@
      &                              CSTRING2(IND2A:IND2B)
          ENDDO
 *
-1000     FORMAT(X,'M',A,4X,'M',A)
+1000     FORMAT(1X,'M',A,4X,'M',A)
 *
          CALL FIO_PUNIT(MUNIT, STATUS)
 

@@ -8,6 +8,7 @@
 *   the version number
 * Authors : Jeremy Ashley
 * History : 15-Jun-1994 Original
+*            6 Apr 98 linux port (rjv)
 * Type Definitions :
       IMPLICIT NONE
 * Global constants :
@@ -368,15 +369,17 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
+      CHARACTER*132 FILE
 
       IF (STATUS.NE.SAI__OK) RETURN
 
-      CALL HDS_OPEN(RTNAME(1:CHR_LEN(RTNAME))//'_hdr','READ',LOC,STATUS)
+      FILE=RTNAME(1:CHR_LEN(RTNAME))//'_hdr'
+      CALL HDS_OPEN(FILE,'READ',LOC,STATUS)
       CALL RAT_GETHEAD(LOC, 'HEAD',STATUS)
       CALL HDS_CLOSE(LOC, STATUS)
 
       IF (STATUS.NE.SAI__OK) THEN
-         CALL MSG_SETC('INAME',RTNAME(1:CHR_LEN(RTNAME))//'_hdr')
+         CALL MSG_SETC('INAME',FILE)
          CALL MSG_PRNT('** Error reading header info from ^INAME **')
       ENDIF
 
