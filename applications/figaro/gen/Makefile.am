@@ -1,5 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+# Use common set of include files.
+AM_FCFLAGS = -I../include
+
 lib_LTLIBRARIES = libgen.la
 
 libgen_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) 
