@@ -25,10 +25,10 @@
 as an hour angle.  All the attributes are (syntactically) individually
 omissable: the system does not perform any check that the
 supplied value is reasonable.
-<example>&lt;angle angle=45 minutes=30 seconds=10 fraction=0&gt; is an angle in
-degrees (the default), and &lt;angle unit=hours angle=6 minutes=45&gt; is
+<example>&lt;angle angle=45 minutes=30 seconds=10 fraction=0/&gt; is an angle in
+degrees (the default), and &lt;angle unit=hours angle=6 minutes=45/&gt; is
 an angle in hours, with the number of seconds and fractions of seconds
-omitted.  An angle like &lt;angle angle=1000 fraction=10&gt; is
+omitted.  An angle like &lt;angle angle=1000 fraction=10/&gt; is
 syntactically acceptable, but astronomical nonsense.</example>
 </p>
 <attribute name="unit">
@@ -237,7 +237,9 @@ reference to a document which is marked up using the programcode DTD.
 ]>
 ...
 <p>Here is some text.  It refers to 
-<coderef collection=cc1 id=tryxxx>the tryxxx function</coderef>
+<coderef collection=cc1 id=tryxxx>the tryxxx function</coderef>.
+We could also refer to this, in this case, as the function
+<coderef id=tryxxx/>.
 
 <sect id=two export>Routines
 <routinelist>
@@ -249,12 +251,15 @@ routine or a routinename element).</p>
 
 <p>Like the <elemref gi="ref"/> element, if you do not supply any content for
 this element -- that is, you give the element as <code>&lt;coderef
-collection="cc1" id="tryxxx"/></code> -- then suitable content will be
-generated for the output.</p>
+collection="cc1" id="tryxxx"/></code> -- then the target function's
+name will be used as the text.</p>
 
 <attribute name="collection">
 <p>The ID which you have assigned to a <elemref
-gi="codecollection"/>.</p>
+gi="codecollection"/>.  If omitted, the <elemref gi="coderef"
+self="self"/> element is taken to refer to the first <elemref
+gi='codecollection'/> element in the document, which is useful if there
+is only one such element in a simple document.</p>
 </attribute>
 <attribute name="id">
 <p>The ID within the programcode document.</p>
@@ -411,6 +416,35 @@ number has not (yet?) been assigned by the Starlink librarian.
 ...
 &lt;p&gt;See also &lt;docxref doc=otherdoc&gt;</example>
 </p>
+
+<p>Exactly as with the <elemref gi='ref'/> element, you can give the
+element no content, in which case the generated text will be of
+the form `SUN/XXX', or `SUN/XXX: section nnn'.  That is, the generated
+texts should be grammatically consistent with each other.  Note,
+however, that this mechanism for generating text is intended to be a
+shorthand, with pretensions to no more than being correct <em>most</em> of
+the time; sometimes you will need to help it out.</p>
+
+<p>This element is <em>designed</em> to work with summary documents,
+which express the structure of the target document, and list the valid
+potential targets; this design means that you can't accidentally refer
+to a document, or a section, which doesn't exist, only to have your
+links break later.  There is a maintenance problem, however, in
+distributing accurate document summaries, which has been deemed
+awkward enough that no such summaries are being distributed in the
+initial version of the Starlink SGML kit.</p>
+
+<p>Instead, you can simply rely on the kit's fallback method of
+determining links for <elemref self='self' gi='docxref'/> elements.
+If the public identifier supplied to the element is of the form of the
+example above, so that the last word in the `description' part of the
+public identifier is of the form <code>XXX/NNN</code> (for example,
+<code>SUN/123</code>), then the document will make a link to the
+corresponding document at the central <webref
+url="http://www.starlink.rl.ac.uk/docscode.html" >Starlink document
+server</webref>.  If you also supply a `loc' attribute, the system
+will add that to the end of the generated URL.</p>
+
 <attribute name="doc">
 <p>Indicates the document we wish to link to.  The value of this
 attribute is an entity (declared in the document declaration subset),
@@ -421,9 +455,10 @@ which references another document.</p>
 attribute is an ID reference within the target document.</p>
 </attribute>
 <attribute name="text">
-<p>If present, the attribute's data is used to form the link text,
-rather than generating it based on the target.
-</p>
+<p>At one time, the link text could be specified via the `text'
+attribute.  This is now strongly deprecated in favour of specifying it
+via docxref element content, and this attribute is likely to disappear
+without further warning.</p>
 </attribute>
 </element>
 
