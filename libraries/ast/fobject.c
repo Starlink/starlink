@@ -112,12 +112,8 @@ F77_INTEGER_FUNCTION(ast_clone)( INTEGER(THIS),
 
 F77_INTEGER_FUNCTION(ast_version)( ) {
    F77_INTEGER_TYPE(RESULT);
-
    astAt( "AST_VERSION", NULL, 0 );
-   astWatchSTATUS(
-      RESULT = astVersion;
-   )
-   return RESULT;
+   return astVersion;
 }
 
 F77_INTEGER_FUNCTION(ast_copy)( INTEGER(THIS),
