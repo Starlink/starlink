@@ -1190,8 +1190,7 @@
             IF (LUX.GT.0) WRITE (LUX, 1008)
  1007       FORMAT (/
      :       1X,'Observation data were incomplete and will be ignored'/)
- 1008       FORMAT ('ERROR 014 Observation data were incomplete ',
-     :           '//and will be ignored')
+ 1008       FORMAT ('ERROR 014 Observation data were incomplete')
          END IF
       ELSE
 
@@ -1945,6 +1944,9 @@
                VARX=CVM(7,7)/W
                VARY=CVM(8,8)/W
                SIGR=SQRT(VARX+VARY)
+*NORMAN
+               write (*,'("varx,y=(",2d12.5,"), sigr=",f10.3)')
+     :              varx,vary,sigr
             END IF
          END IF
 
@@ -1973,14 +1975,17 @@
 *              Report distortion coefficient and update if OK
                   IF (FITDI) THEN
                      DDI=DISTE-DISTOR
+*NORMAN
+                     write (*,'("diste=",f10.3," distor=",f10.3,
+     :                    " ddi=",f10.3," sigdi=",f10.3)') 
+     :                    diste,distor,ddi,sigdi
                      IF (ABS(DDI).LT.1000D0.AND.SIGDI.LT.100D0) THEN
                         WRITE (LUR,1060) DDI,DISTE,SIGDI
                         WRITE (LUS,1060) DDI,DISTE,SIGDI
                         IF (LUX.GT.0) WRITE (LUX, 1061) DDI,DISTE,SIGDI
  1060                   FORMAT (1X,'Radial distortion has changed by',
      :                     SP,F8.2,' to',F8.2,'  (std dev',SS,F6.2,')'/)
- 1061                   FORMAT ('WARNING 005 Radial distortion '//
-     :                       'changed by ',
+ 1061               FORMAT ('WARNING 005 Radial distortion changed by ',
      :                       F8.2,' to',F8.2,'  (std dev',SS,F6.2,')')
                         DISTOR=DISTE
                      ELSE
@@ -1989,9 +1994,8 @@
                         IF (LUX.GT.0) WRITE (LUX, 1063)
  1062                   FORMAT (1X,'Radial distortion coefficient ',
      :                                'cannot reliably be determined!'/)
- 1063                   FORMAT ('WARNING 006 '//
-     :                       'Radial distortion coefficient ',
-     :                       'cannot reliably be determined!'/)
+ 1063                   FORMAT ('WARNING 006 Radial distortion ',
+     :                       'cannot be reliably determined!')
                         FITOK=.FALSE.
                      END IF
                   END IF
@@ -2042,8 +2046,8 @@
                         IF (LUX.GT.0) WRITE (LUX,1069)
  1068                   FORMAT (1X,
      :                   'Plate centre cannot reliably be determined!'/)
- 1069                   FORMAT ('WARNING 009 ',
-     :                   'Plate centre cannot reliably be determined!'/)
+ 1069                   FORMAT ('WARNING 007 Plate centre cannot ',
+     :                       'reliably be determined!')
                         FITOK=.FALSE.
                      END IF
                   END IF
@@ -2081,7 +2085,9 @@
 
 *NORMAN
                IF (FITSOP) THEN
-*               Write a fits file
+*               Write a FITS-WCS file.  See Calabretta and Greisen (C&G),
+*               `Representations of Celestial Coordinates in FITS'
+*               (still draft).
                   FTSTAT = 0
 
 *               First, generate a filename from FTPREF and solution number NSOL
@@ -2092,8 +2098,8 @@
 *                  We're in trouble
                      WRITE (LUS, '(" FITS Filename <",a,
      :                  "> too long.  FITS writing abandoned")') FTPREF
-                     IF (LUX.GT.0) WRITE (LUX, '("ERROR 010",
-     :                    " FITS Filename <",a,
+                     IF (LUX.GT.0)
+     :                    WRITE (LUX, '("ERROR 010 FITS filename <",a,
      :                    "> too long.  FITS writing abandoned")') 
      :                    FTPREF
 *                  Set FITSOP false to avoid coming this way again
@@ -2138,37 +2144,36 @@
                   CALL FTPKYS (FTUNIT, 'DATE', FTWS,
      :                 'Date file was written', FTSTAT)
 
-                  WRITE (FTWS, '("Astrometric solution: ",i2,
+                  WRITE (FTWS, '("ASTROM astrometric solution: ",i2,
      :                 "-component solution")'), NTERMS
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
                   
-                  WRITE (FTWS, '("Projection geometry: ",A)') KPROJ
-                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
-                  IF (KTEL.EQ.'ASTR') THEN
-                     CALL FTPKYS (FTUNIT, 'RADESYS', 'FK5', 
-     :                    'Celestial coordinates in FK5 system', FTSTAT)
-                     CALL FTPKYS (FTUNIT, 'CTYPE1', 'RA---TAN',
-     :                    'RA -- tangent-plane projection', FTSTAT)
-                     CALL FTPKYS (FTUNIT, 'CTYPE2', 'DEC--TAN',
-     :                    'DEC -- tangent-plane projection', FTSTAT)
+                  CALL FTPKYS (FTUNIT, 'CTYPE1', 'RA---TAN',
+     :                 'RA -- tangent-plane projection', FTSTAT)
+                  CALL FTPKYS (FTUNIT, 'CTYPE2', 'DEC--TAN',
+     :                 'DEC -- tangent-plane projection', FTSTAT)
+                  CALL FTPKYS (FTUNIT, 'RADESYS', 'FK5', 
+     :                 'Celestial coordinates in FK5 system', FTSTAT)
+*               Default equinox J2000
+                  CALL FTPKYG (FTUNIT, 'EQUINOX', 2000.0D0, 1,
+     :                 'Equator and equinox of J2000.0', FTSTAT)
+*               Native longitude of celestial pole.  This is the
+*               default, as specified in C&G
+                  IF (DCPCG/D2R.LT.90D0) THEN
+                     CALL FTPKYG (FTUNIT, 'LONPOLE', 180D0, 0,
+     :                    'Native longitude of celestial pole',
+     :                    FTSTAT)
                   ELSE
-                     WRITE (LUS, 
-     :                    '(" FITS error: unknown astrometric system")')
-                     IF (LUX.GT.0) WRITE (LUX, '("ERROR 012 ",
-     :                    "unknown astrometric system")')
-                     CALL FTPCOM (FTUNIT, "Don''t know system!!!", 
+                     CALL FTPKYG (FTUNIT, 'LONPOLE', 0D0, 0,
+     :                    'Native longitude of celestial pole',
      :                    FTSTAT)
                   ENDIF
 
-*               Coordinates of reference point, and the transformation
-*               matrix.  Note that the coordinates, and the
-*               transformation matrix, are in degrees not radians.
-*               Calabretta and Greisen paper II recommends that FITS
-*               writers check check the consistency of these figures
-*               with their eqns (8), (9) and (10) -- I don't do this at
-*               present.  The estimated and predicted coordinates here
-*               in ASTROM are in the projected plane, and are the
-*               `intermediate world coordinates' of the FITS-WCS proposals.
+*               Coordinates of reference point.
+*               We have to deal only with zenithal coordinates.
+*               The estimated and predicted coordinates here in ASTROM
+*               are in the projected plane, and are the `intermediate
+*               world coordinates' of the FITS-WCS proposals.
                   CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCG/D2R, 7,
      :                 'Projection pole -- RA', FTSTAT)
                   CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCG/D2R, 7,
@@ -2179,6 +2184,14 @@
                   CALL FTPKYG (FTUNIT, 'CRPIX2', 
      :                 fnorm*pltcon(4,nsol+maxsol), 7,
      :                 'Projection pole -- y-pixels', FTSTAT)
+*               Note that the coordinates, and the
+*               transformation matrix, are required to be in degrees
+*               rather than radians.
+                  CALL FTPKYS (FTUNIT, 'CUNIT1', 'deg', 
+     :                 'RA always given in degrees', FTSTAT)
+                  CALL FTPKYS (FTUNIT, 'CUNIT2', 'deg', 
+     :                 'Dec always given in degrees', FTSTAT)
+*               Transformation matrix, again in units of degrees, not radians
                   CALL FTPKYD (FTUNIT, 'CD1_1',
      :                 PLTCON(2,NSOL)/FNORM/D2R, 7,
      :                 'Transformation to intermed. world coords',
@@ -2189,6 +2202,56 @@
      :                 PLTCON(3,NSOL)/FNORM/D2R, 7, '', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_2',
      :                 PLTCON(3+MAXSOL,NSOL)/FNORM/D2R, 7, '', FTSTAT)
+*               Include the relevant coefficients of the TAN distortion.
+*               If we write the undistorted gnomonic projection
+*               coordinates as (\xi, \eta), following C&G, and the distorted 
+*               coordinates (ie, the plate coordinates) as (x,y), then
+*               ASTROM handles the relationship between these as
+*               x=\xi(1+q\rho^2) and y=\eta(1+q\rho^2), where
+*               \rho^2=\xi^2+\eta^2.  We need to invert this, to give
+*               (\xi,\eta) as a function of (x,y).  Write r^2=x^2+y^2
+*               and Q=1/(1+q\rho^2), so that \rho^2=Qr^2.  Substitute
+*               \rho^2 into Q, then Q into itself, and expand, keeping
+*               terms to O(r^6), to obtain Q=1 - qr^2 + 3q^2r^4 -
+*               12q^3r^6 + O(r^8), and the distortion functions become
+*               \xi=Q(r)x, \eta=Q(r)y
+                  WRITE (FTWS,'("Projection geometry: ",A)') KPROJ
+                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
+                  WRITE (FTWS, '("ASTROM q=",F10.4)') DISTOR
+                  CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
+
+                  CALL FTPKYD (FTUNIT, 'PV1_0', 0D0, 7,
+     :                 'Distortion function for x: a_0=0', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_1', 1D0, 7,
+     :                 'a_1 x', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_7', -DISTOR, 7,
+     :                 'a_7 x^3', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_9', -DISTOR, 7,
+     :                 'a_9 xy^2', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_17', 3*DISTOR**2, 7,
+     :                 'a_17 x^5', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_21', 3*DISTOR**2, 7,
+     :                 'a_21 xy^4', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_31', -12*DISTOR**3, 7,
+     :                 'a_31 x^7', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV1_37', -12*DISTOR**3, 7,
+     :                 'a_37 xy^6', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_0', 0D0, 7,
+     :                 'Distortion function for y: b_0=0', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_1', 1D0, 7,
+     :                 'b_1 y', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_7', -DISTOR, 7,
+     :                 'b_7 y^3', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_9', -DISTOR, 7,
+     :                 'b_9 yx^2', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_17', 3*DISTOR**2, 7,
+     :                 'b_17 y^5', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_21', 3*DISTOR**2, 7,
+     :                 'b_21 yx^4', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_31', -12*DISTOR**3, 7,
+     :                 'b_31 y^7', FTSTAT)
+                  CALL FTPKYD (FTUNIT, 'PV2_37', -12*DISTOR**3, 7,
+     :                 'b_37 yx^6', FTSTAT)
 
 *               Write date of observation
                   IF (GOTPEP) THEN
@@ -2227,8 +2290,9 @@
                      ENDDO
                      WRITE (LUS, '(" FITS error detected: ",a)')
      :                    FTWS(:FTI)
-                     IF (LUX.GT.0) WRITE (LUX, '("ERROR 013 ",
-     :                    "FITS error: ",A)') FTWS(:FTI)
+                     IF (LUX.GT.0) 
+     :                    WRITE (LUX, '("ERROR 013 FITS error: ",A)')
+     :                    FTWS(:FTI)
                      CALL FTGMSG (FTWS)
                      DO WHILE (FTWS.NE.'')
                         FTI=LEN(FTWS)
