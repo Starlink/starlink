@@ -83,6 +83,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PSF_PAR'
 
 *  Global Variables:
       INCLUDE 'PSF_CMN'

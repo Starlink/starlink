@@ -42,6 +42,7 @@
       INTEGER                  	ICMP			! Loop over list
       INTEGER                  	IPSF               	! Psf column
       INTEGER                  	NPSF               	! # psfs
+      INTEGER			PID			! A particular psf
 *-
 
 *  Check status
