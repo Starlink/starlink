@@ -174,7 +174,7 @@
             IF ( I_BGM_ON ) THEN
 
 *          Redefine samples
-              CALL IBGND_SETSAMP( I_BGM_AREA, I_BGM_MEAN, STATUS )
+              CALL IBGND_SETQ( STATUS )
 
 *          Recompute the samples and surface
               CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
@@ -940,10 +940,8 @@
 
 *  Update noticeboard
       IF ( I_GUI ) THEN
-
         CALL NBS_FIND_ITEM( I_NBID, 'BG_NSRC', ITEMID, STATUS )
         CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBI, I_BGM_NSRC, STATUS )
-
       END IF
 
 *  Initialise the the background model quality array. This is ok for points
@@ -2148,10 +2146,10 @@
         I_BGM_NSAMP =  INT(MAXR / I_BGM_RBIN) + 1
 
       ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
-      END IF
 
-*  Compute indices
-      CALL IBGND_SETQ( STATUS )
+        I_BGM_NSAMP = 1
+
+      END IF
 
 *  Allocate space for information needed per sample
       DO I = 1, I__NSAMATT
@@ -2160,6 +2158,9 @@
       CALL ARR_INIT1R( 0.0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(1)), STATUS )
       CALL ARR_INIT1R( 0.0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(2)), STATUS )
       CALL ARR_INIT1I( 0, I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(3)), STATUS )
+
+*  Compute indices
+      CALL IBGND_SETQ( STATUS )
 
       END
 
@@ -2845,10 +2846,25 @@
       INTEGER			F__NONE
         PARAMETER		( F__NONE = 2 )
 
+      INTEGER			F__SPLINE
+        PARAMETER		( F__SPLINE = 3 )
+
+      INTEGER			F__POLY
+        PARAMETER		( F__POLY = 4 )
+
+      INTEGER			MAXPT
+        PARAMETER		( MAXPT = 512 )
+
 *  Local Variables:
+      DOUBLE PRECISION		PFX(MAXPT)
+      DOUBLE PRECISION	       	PFY(MAXPT)
+      DOUBLE PRECISION		YP, YFIT
+
       REAL			MEAN			! Mean sample value
       REAL			MINFR, MAXFR		! Extreme residuals
       REAL			FR, RMSFR		! RMS frac residual
+      REAL			WRKC(MAXPT*2+1)	! Poly workspace
+
       REAL			XW1, XW2, YW1, YW2	! Worst positions
       REAL			XW, YW, R, Y2		! Pixel radius bits
 
@@ -2859,11 +2875,21 @@
       INTEGER			MINFR_X, MINFR_Y	! Min position
       INTEGER			NFR			! # residuals
       INTEGER			NGS			! # good samples
+      INTEGER			PFAIL			! PDA status code
       INTEGER			S			! Loop over samples
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert character fit to code
+      IF ( I_BGM_FIT .EQ. 'NONE' ) THEN
+        FMODE = F__NONE
+      ELSE IF ( I_BGM_FIT .EQ. 'CONS' ) THEN
+        FMODE = F__CONS
+      ELSE IF ( I_BGM_FIT .EQ. 'SPLINE' ) THEN
+        FMODE = F__SPLINE
+      END IF
 
 *  Switch on sample mode
       IF ( I_BGM_AREA(1:3) .EQ. 'WHO' ) THEN
@@ -2875,6 +2901,12 @@
 *      Outside area?
             IF ( IDX(I,J) .LT. 0 ) THEN
               BGMOD(I,J) = 0.0
+            ELSE IF ( IDX(I,J) .EQ. 0 ) THEN
+              IF ( FMODE .EQ. F__NONE ) THEN
+                BGMOD(I,J) = 0.0
+              ELSE
+                BGMOD(I,J) = SAMM(1)
+              END IF
             ELSE
               BGMOD(I,J) = SAMM(1)
             END IF
@@ -2891,8 +2923,8 @@
 *  Annular sampling?
       ELSE IF ( I_BGM_AREA(1:3) .EQ. 'ANN' ) THEN
 
-*    Fit a function to the radial profile
-        IF ( I_BGM_FIT .EQ. 'CONS' ) THEN
+*    Simple mean?
+        IF ( FMODE .EQ. F__CONS ) THEN
 
           MEAN = 0.0
           NGS = 0
@@ -2907,11 +2939,36 @@
           ELSE
             MEAN = 0.0
           END IF
-          FMODE = F__CONS
 
-*    Simple mode lets the user see the raw model
-        ELSE IF ( I_BGM_FIT .EQ. 'NONE' ) THEN
-          FMODE = F__NONE
+*    Polynomial fit
+        ELSE IF ( FMODE .EQ. F__POLY ) THEN
+
+*      Fit coefficients
+          NGS = 0
+          DO I = 1, NS
+            IF ( SAMNP(I) .GT. 1 ) THEN
+              NGS = NGS + 1
+              PFX(NGS) = (REAL(I)-0.5) * I_BGM_RBIN
+              PFY(NGS) = SAMM(I)
+            END IF
+          END DO
+
+*      Trap single good sample case
+          IF ( NGS .LT. 2 ) THEN
+            FMODE = F__CONS
+            MEAN = PFY(1)
+
+*      Otherwise compute coefficients
+          ELSE
+
+*        Compute coefficients
+            PFAIL = 0
+            CALL PDA_DPLINT( NGS, PFX, PFY, WRKC, PFAIL )
+
+          END IF
+
+*    Spline fit
+        ELSE IF ( FMODE .EQ. F__SPLINE ) THEN
 
         END IF
 
@@ -2938,13 +2995,29 @@
                   BGMOD(I,J) = 0.0
                 END IF
 
-*          Evaluate fitted function at R
-              ELSE
+*          Evaluate polynomial at R
+              ELSE IF ( FMODE .EQ. F__POLY ) THEN
 
 *            Find exact distance to this pixel
                 XW = I_XBASE + (I-1)*I_XSCALE
                 XW = XW - I_BGM_X0
                 R = SQRT( XW*XW + Y2 ) / I_BGM_RBIN
+
+*            Evaluate polynomial
+                CALL PDA_DPOLVL( 0, DBLE(R), YFIT, YP, NGS, PFX,
+     :                           WRKC, PFAIL )
+
+*            Store value
+                BGMOD(I,J) = YFIT
+
+*          Evaluate spline at R
+              ELSE IF ( FMODE .EQ. F__SPLINE ) THEN
+
+*            Find exact distance to this pixel
+                XW = I_XBASE + (I-1)*I_XSCALE
+                XW = XW - I_BGM_X0
+                R = SQRT( XW*XW + Y2 ) / I_BGM_RBIN
+                IR = INT(R) + 1
 
               END IF
 
@@ -3176,7 +3249,7 @@
       END IF
 
 *  Fitting
-      I_BGM_FIT = 'NONE'
+      I_BGM_FIT = 'CONS'
 
       END
 
