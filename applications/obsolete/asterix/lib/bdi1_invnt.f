@@ -1131,10 +1131,9 @@
       IF ( NVAL .EQ. 1 ) THEN
         LWIDTH(NVAL)=0.0
       ELSE
-        LWIDTH(1)=ABS
         DO I = 2, NVAL
           LWIDTH(I) = ABS(VALUE(I)-VALUE(I-1))/2.0
-        END DO
+        ENDDO
         LWIDTH(1) = LWIDTH(2)
       ENDIF
 
