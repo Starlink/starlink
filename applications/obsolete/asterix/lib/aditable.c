@@ -10,7 +10,7 @@
 #include "adistrng.h"                   /* String manipulations */
 #include "adiparse.h"
 #include "adicface.h"                   /* C interface */
-
+#include "adisyms.h"
 #include "adierror.h"                   /* ADI error handling */
 
 
@@ -130,8 +130,6 @@ ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
   ADIobj	*car,*cdr;		/* Sides of list cell */
   ADIobj        cstr;                   /* Current dataobj name */
   ADIlogical	found = ADI__false;	/* Return value */
-  ADIstring	*sdat = _str_data(str);	/* String data block */
-  int           test = 1;               /* String comparison */
 
 /* Check inherited status */
   _chk_stat_ret(ADI__false);
@@ -141,7 +139,8 @@ ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
 
 /* Loop while end of list not reached and name not found */
 /* and not past name in alphabet */
-  while ( _valid_q(**sptr) && ! found && (test>=0) ) {
+/*  while ( _valid_q(**sptr) && ! found && (test>=0) ) { */
+  while ( _valid_q(**sptr) && ! found ) {
 
 /* Extract links from this list cell */
     _GET_CARCDR_A(car,cdr,**sptr);
@@ -152,19 +151,26 @@ ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
 /* Compare the two names - fast check for equality */
     if ( cstr == str )
       found = ADI__true;
+    else
+      *sptr = cdr;
 
-/* Otherwise brute force comparison */
+/* Compare the two names - fast check for equality
+    if ( cstr == str )
+      found = ADI__true;
+
+ Otherwise brute force comparison
     else {
       test = strx_cmpc( sdat->data, sdat->len, cstr );
 
-/* Terminate if match found */
+ Terminate if match found
       if ( test == 0 )
 	found = ADI__true;
 
-/* Next list element if query name precedes current one alphabetically */
+ Next list element if query name precedes current one alphabetically
       else if ( test > 0 )
 	*sptr = cdr;
-      }
+      }*/
+
     }
 
   return found;
@@ -175,17 +181,13 @@ ADIobj *tblx_lochead( ADIobj *table, char *str, int slen, ADIstatus status )
   {
   int           hcode;                  /* Table hashing code */
   ADIobj	*head = table;
-  int           hval;                   /* String hash value */
   ADIinteger    lhcode = 0;
 
   if ( _tbl_q(*table) )	{		/* Table or a-list? */
     adic_get0i( _tbl_htsize(*table), &lhcode, status );
     hcode = (int) lhcode;
 
-/* Find string's hash value */
-    strx_hash( str, slen, hcode, &hval, status );
-
-    head = _tbl_hash(*table) + hval;
+    head = _tbl_hash(*table) + strx_hash( str, slen, hcode );
     }
 
   return head;
@@ -365,3 +367,43 @@ ADIobj tblx_findi( ADIobj *table, ADIobj str, ADIstatus status )
     return ADI__nullid;
   }
 
+
+void tblx_hstats( ADIobj table, ADIstatus status )
+  {
+  ADIobj	*baddr;
+  ADIinteger	bcount[11] = {0,0,0,0,0,0,0,0,0,0,0};
+  ADIinteger	big = 0;
+  ADIinteger	hsize,i;
+  ADIinteger	llen;
+  ADIinteger	total = 0;
+
+  _chk_init_err; _chk_stat;
+
+  adic_get0i( _tbl_htsize(table), &hsize, status );
+
+/* Loop over buckets, accumulating counts */
+  for( baddr = _tbl_hash(table), i = hsize; i; i--, baddr++ ) {
+
+/* Find length of chain */
+    if ( _valid_q(*baddr) )
+      llen = lstx_len( *baddr, status );
+    else
+      llen = 0;
+
+/* Add this count */
+    total += llen;
+    if ( llen > 10 )
+      big++;
+    else
+      bcount[llen]++;
+    }
+
+/* Print results */
+  for( i=0; i<11; i++ )
+    if ( bcount[i] )
+      ADIstrmPrintf( ADIcvStdOut, "Buckets with %I entries (%I)\n", status, i, bcount[i] );
+  ADIstrmPrintf( ADIcvStdOut, "Buckets with > 10 entries (%I)\n\n", status, big );
+  ADIstrmPrintf( ADIcvStdOut, "Average search depth %f\n", status,
+	((float) total)/((float) (hsize-bcount[0])) );
+  ADIstrmFlush( ADIcvStdOut, status );
+  }

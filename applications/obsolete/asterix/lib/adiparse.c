@@ -47,6 +47,7 @@ ADIobj  K_Apply = ADI__nullid;
 ADIobj  K_Array = ADI__nullid;
 ADIobj  K_ArrayRef = ADI__nullid;
 
+ADIobj  K_Binding = ADI__nullid;
 ADIobj  K_Blank = ADI__nullid;
 ADIobj  K_BlankSeq = ADI__nullid;
 ADIobj  K_BlankNullSeq = ADI__nullid;
@@ -2044,7 +2045,7 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
   do {
     if ( _strm_data(pstream)->ctok.t == endtok ) {
       if ( _null_q(robj) )
-	robj = lstx_cell( ADI__nullid, ADI__nullid, status );
+	robj = adix_clone( ADIcvNulCons, status );
       more = ADI__false;
       }
     else {
@@ -2441,6 +2442,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Array,"Array"),
     CSTR_TENTRY(K_ArrayRef,"ArrayRef"),
 
+    CSTR_TENTRY(K_Binding,"Binding"),
     CSTR_TENTRY(K_Blank,"Blank"),
     CSTR_TENTRY(K_BlankSeq,"BlankSeq"),
     CSTR_TENTRY(K_BlankNullSeq,"BlankNullSeq"),

@@ -188,7 +188,7 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
   {
   ADIobj      	*lid;
 
-  _chk_init_err; _chk_init;
+  _chk_init_err; _chk_stat;
 
 /* Find data address */
   adix_locdat( &id, name, nlen, DA__ARRAY, &lid, NULL, NULL, status );
@@ -215,8 +215,8 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
 	newid = adix_cls_nalloc( atdef,	/* Allocate new data object */
 	      ndim, dims, status );
 
-	memcpy( (char *) _DTDAT(newid),	/* Simple block memory copy */
-		(char *) _DTDAT(ary->data),
+/* Simple block memory copy */
+	_CH_MOVE( _DTDAT(newid), _DTDAT(ary->data),
 		_MAX(onelm,nnelm)*atdef->alloc.size );
 
 	if ( onelm > nnelm ) {		/* Old objects being lost? */
@@ -241,6 +241,54 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
     else
       adic_setecs( ADI__INVARG, "Object is not an array", status );
     }
+  }
+
+
+void ADIaryPrint( ADIobj stream, ADIarray *ary, ADIstatus status )
+  {
+  ADIinteger		pdims[ADI__MXDIM];
+  ADIinteger		i,j,k,l,m,n,o;
+  ADIobj		idata;
+  int			ndim = ary->ndim;
+
+  _chk_stat;
+
+  for( i=0; i<ndim; i++ )
+    pdims[i] = ary->dims[i];
+  for( i=ndim; i<ADI__MXDIM; i++ )
+    pdims[i] = 1;
+
+  idata = ary->data;
+
+  if ( ndim > 6 ) ADIstrmPrintf( stream, "[", status );
+  for( o = pdims[6]; o; o-- ) {
+    if ( ndim > 5 ) ADIstrmPrintf( stream, "[", status );
+    for( n = pdims[5]; n; n-- ) {
+      if ( ndim > 4 ) ADIstrmPrintf( stream, "[", status );
+      for( m = pdims[4]; m; m-- ) {
+	if ( ndim > 3 ) ADIstrmPrintf( stream, "[", status );
+	for( l = pdims[3]; l; l-- ) {
+	  if ( ndim > 2 ) ADIstrmPrintf( stream, "[", status );
+	  for( k = pdims[2]; k; k-- ) {
+	    if ( ndim > 1 ) ADIstrmPrintf( stream, "[", status );
+	    for( j = pdims[1]; j; j-- ) {
+	      ADIstrmPrintf( stream, "[", status );
+	      for( i = pdims[0]; i; i-- ) {
+		ADIstrmPrintf( stream, "%O%s", status, idata, i>1 ? ", " : "]" );
+		idata = ADImemIdAddOff( idata, 1, status );
+		}
+	      }
+	    if ( ndim > 1 ) ADIstrmPrintf( stream, "]", status );
+	    }
+	  if ( ndim > 2 ) ADIstrmPrintf( stream, "]", status );
+	  }
+	if ( ndim > 3 ) ADIstrmPrintf( stream, "]", status );
+	}
+      if ( ndim > 4 ) ADIstrmPrintf( stream, "]", status );
+      }
+    if ( ndim > 5 ) ADIstrmPrintf( stream, "]", status );
+    }
+  if ( ndim > 6 ) ADIstrmPrintf( stream, "]", status );
   }
 
 

@@ -4,23 +4,17 @@
  *
  *    Test:
  *
- *      GetPid()	- especially as regards use of ()
- *
  *    New functions:
  *
- *	AtomQ		- raw data object?
- *	NullQ		- object == ADI__nullid
  *	CardinalQ	- is object B|UB|W|UW|I
  *	NumberQ		- CardinalQ | R|D
  *	Shape/Size	-
  *	mk...		- series generators
- *	GetEnv		- value of environment variable
- *	Nint		- nearest integer
- *	Power(x,y)	- exponentiation (special case for 2?)
  *	Round(x,np)	- round to specified number of places
  *	B|UB|W|UW 	- constructors
  *	Strip		- strip spaces from string
  *	Substr(s,b,n)	- sub-string op
+ *	Time(cmd,nrep)	- time execution
  *	HMS2RAD		-
  *	RAD2HMS		- format radian angle to H,M,S
  *	Time,Date,TimeZone etc
@@ -30,7 +24,6 @@
  *    Other issues:
  *
  *    o And/Or shortcut evaluation
- *    o Function specialisation to actual value (needs adix_equal)
  *    o	Ensure handling of zero length strings/lists is consistent
  *    o Printing of non-prnt able types, eg. streams
  *    o precision of D.P. printing
@@ -39,7 +32,6 @@
  *    o Casteing to support mixed mode maths
  *    o Coercion of bool values to T|F on input
  *    o Creation and printing of arrays
- *    o Object accounting!
  *    o local and global statements
  */
 
@@ -47,10 +39,14 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <math.h>
+#include <time.h>
+#include <sys/time.h>
 #include <string.h>
+
 #ifdef __MSDOS__
 #include <process.h>
 #else
+#include <sys/timeb.h>
 #include <sys/types.h>
 #include <unistd.h>
 #endif
@@ -68,6 +64,10 @@
 #include "adisyms.h"
 #include "adistrng.h"
 #include "adiexpr.h"
+#include "adiarray.h"
+#include "aditable.h"
+
+extern ADIstackFrame	ADI_G_fs[];
 
 /*
  * Macro to define a logical operation on an arbitrary data type
@@ -84,6 +84,31 @@ ADIobj ADI##_tcode##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
 /*
  *  System interface functions
  */
+ADIobj ADIsysGetEnv_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+  char		*estr;
+  ADIstring	*sdat;
+  ADIobj	tstr;
+
+/* Ensure null terminated string */
+  tstr = ADIstrngEnsureNterm( args[0], status );
+  sdat = _str_data(tstr);
+
+  if ( sdat->data )
+    estr = getenv( sdat->data );
+  else
+    estr = NULL;
+
+/* Delete temporary string */
+  adix_erase( &tstr, 1, status );
+
+  if ( estr )
+    adic_newv0c( estr, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIsysGetPid_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIinteger	pid;
@@ -99,6 +124,50 @@ ADIobj ADIsysGetPid_i( int narg, ADIobj args[], ADIstatus status )
 /*
  *  General purpose functions
  */
+ADIobj ADIgenAtomQ_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIlogical	res = ADI__false;
+  ADIobj	rval = ADI__nullid;
+
+  if ( _valid_q(args[0]) )
+    res = _DTDEF(args[0])->prim;
+
+  adic_newv0l( res, &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIgenGet_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	tstr;
+  FILE	*fp;
+
+/* Ensure null terminated string */
+  tstr = ADIstrngEnsureNterm( args[0], status );
+
+  fp = fopen( _str_dat(tstr), "r" );
+
+/* Delete temporary string */
+  adix_erase( &tstr, 1, status );
+
+  if ( fp )
+    ADIstrmExtendFile( ADIcvStdIn, fp, status );
+  else
+    adic_setecs( ADI__INVARG, "No such file %O\n", status, args[0] );
+
+  return ADI__nullid;
+  }
+
+ADIobj ADIgenHst_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIstrmPrintf( ADIcvStdOut, "Common string table: \n\n", status );
+  tblx_hstats( ADI_G_commonstrings, status );
+  ADIstrmPrintf( ADIcvStdOut, "\nMaster symbol table: \n\n", status );
+  tblx_hstats( ADI_G_fs[0].syms, status );
+
+  return ADI__nullid;
+  }
+
 ADIobj ADIgenName_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	nid;
@@ -114,17 +183,101 @@ ADIobj ADIgenName_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIgenNullQ_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0l( _null_q(args[0]), &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIgenProbe_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  adic_probe( status );
+
+  return ADI__nullid;
+  }
+
 ADIobj ADIgenSet_i( int narg, ADIobj args[], ADIstatus status )
   {
+  ADIobj	dbind;
+  ADIobj	name;
   ADIobj	rval = ADI__nullid;
 
   rval = ADIexprOwnArg( args+1, status );
 
-  ADIsymAddBind( _etn_head(args[0]), ADI__true,
-		 ADIsbindNew( ADI__defn_sb, rval, status ),
-		 status );
+/* Extract symbol name */
+  name = _etn_head(args[0]);
+
+/* Look for definition binding */
+  dbind = ADIsymFind( name, ADI__true, ADI__defn_sb, status );
+
+/* If it exists, delete definition object from existing binding */
+  if ( _valid_q(dbind) ) {
+    adix_erase( &_sbind_defn(dbind), 1, status );
+    _sbind_defn(dbind) = rval;
+    }
+
+/* Otherwise create a new one */
+  else
+    ADIsymAddBind( name, ADI__true,
+		   ADIsbindNew( ADI__defn_sb, rval, status ),
+		   status );
 
   return adix_clone( rval, status );
+  }
+
+ADIobj ADIgenTimeIt_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIlogical	changed;
+  double	diff;
+  ADIinteger	nit = _IVAL(args[1]);
+  ADIinteger	ic = nit;
+  ADIobj	res;
+#ifdef __MSDOS__
+  struct timeb	start,stop;
+#elif NO_GETTOD
+  struct tms dummy2;
+  long start, stop;
+#else
+  struct timeval start, stop;
+  struct timezone tz;
+  int micros;
+#endif
+
+#ifdef __MSDOS__
+  ftime( &start );
+#elif NO_GETTOD
+  start = times(&dummy2);
+#else
+  gettimeofday(&start, &tz);
+#endif
+
+  while ( ic-- ) {
+    res = ADIexprEval( args[0], ADI__false, status );
+    adix_erase( &res, 1, status );
+    }
+
+#ifdef __MSDOS__
+  ftime( &stop );
+  diff = ((double) (stop.time - start.time))*1000000.0 +
+          ((double) (stop.millitm-start.millitm))*1000.0;
+#elif NO_GETTOD
+  stop = times(&dummy2);
+  diff = (((double) (stop - start))*1000000.0)/CLK_TCK;
+#else
+  gettimeofday(&stop, &tz);
+  micros = (stop.tv_sec - start.tv_sec)*1000000
+	    + (stop.tv_usec - start.tv_usec);
+  diff = micros;
+#endif
+
+  ADIstrmPrintf( ADIcvStdOut, "Time is %I microseconds per iteration\n", status,
+		 (ADIinteger) (diff / ((double) nit)) );
+  ADIstrmFlush( ADIcvStdOut, status );
+
+  return ADI__nullid;
   }
 
 ADIobj ADIgenType_i( int narg, ADIobj args[], ADIstatus status )
@@ -372,6 +525,27 @@ ADIobj ADIintPlus_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIintPow2_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIinteger	res = _IVAL(args[0]);
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0i( res*res, &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIintPower_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIinteger	a1 = _IVAL(args[0]);
+  ADIinteger	a2 = _IVAL(args[1]);
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0d( pow((ADIdouble) a1,(ADIdouble) a2), &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIintQ_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	rval = ADI__nullid;
@@ -591,6 +765,28 @@ ADIobj ADIrealNeg_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIrealNint_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+  ADIreal	value = _RVAL(args[0]);
+  ADIreal	fvalue;
+
+  fvalue = floor( value );
+
+  if ( value > 0.0 ) {
+    if ( (value-fvalue) >= 0.5 )
+      fvalue += 1.0;
+    }
+  else {
+    if ( (value-fvalue) > 0.5 )
+      fvalue += 1.0;
+    }
+
+  adic_newv0r( fvalue, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIrealPlus_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	*carg;
@@ -601,6 +797,28 @@ ADIobj ADIrealPlus_i( int narg, ADIobj args[], ADIstatus status )
     result += _RVAL(*carg);
 
   adic_newv0r( result, &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIrealPower_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIreal	a1 = _RVAL(args[0]);
+  ADIreal	a2 = _RVAL(args[1]);
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0r( (ADIreal) pow((ADIdouble) a1,(ADIdouble) a2), &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIrealPowerI_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIreal	a1 = _RVAL(args[0]);
+  ADIinteger	a2 = _IVAL(args[1]);
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0r( (ADIreal) pow((ADIdouble) a1,(ADIdouble) a2), &rval, status );
 
   return rval;
   }
@@ -795,6 +1013,28 @@ ADIobj ADIdbleNeg_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIdbleNint_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+  ADIdouble	value = _DVAL(args[0]);
+  ADIdouble	fvalue;
+
+  fvalue = floor( value );
+
+  if ( value > 0.0 ) {
+    if ( (value-fvalue) >= 0.5 )
+      fvalue += 1.0;
+    }
+  else {
+    if ( (value-fvalue) > 0.5 )
+      fvalue += 1.0;
+    }
+
+  adic_newv0d( fvalue, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIdblePlus_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	*carg;
@@ -805,6 +1045,28 @@ ADIobj ADIdblePlus_i( int narg, ADIobj args[], ADIstatus status )
     result += _DVAL(*carg);
 
   adic_newv0d( result, &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIdblePower_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIdouble	a1 = _DVAL(args[0]);
+  ADIdouble	a2 = _DVAL(args[1]);
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0d( pow(a1,a2), &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIdblePowerI_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIdouble	a1 = _DVAL(args[0]);
+  ADIinteger	a2 = _IVAL(args[1]);
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0d( pow(a1,(ADIdouble) a2), &rval, status );
 
   return rval;
   }
@@ -1045,7 +1307,7 @@ ADIobj ADIstrConcat_i( int narg, ADIobj args[], ADIstatus status )
       if ( sdat->len ) {
 
 /* Copy to output */
-	memcpy( sptr, sdat->data, sdat->len );
+	_CH_MOVE( sptr, sdat->data, sdat->len );
 
 /* Advance data pointer */
 	sptr += sdat->len;
@@ -1227,8 +1489,7 @@ ADIobj ADIlstMk_i( int narg, ADIobj args[], ADIstatus status )
     oarg = ADIexprOwnArg( carg, status );
 
 /* Insert into the list we're making */
-    *ipoint = lstx_cell( oarg, ADI__nullid, status );
-    ipoint = &_CDR(*ipoint);
+    lstx_inscel( oarg, &ipoint, status );
     }
 
   return rval;
@@ -1243,17 +1504,145 @@ ADIobj ADIlstQ_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+/*
+ *  Functions on Stream's
+ */
 
+ADIobj ADIstrmQ_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0l( _strm_q(args[0]), &rval, status );
+
+  return rval;
+  }
+
+/*
+ *  Functions on Array's
+ */
+ADIobj ADIaryMk1_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	car,curp;
+  ADIinteger	nelm = 0;
+  ADIclassDef	*ot = NULL;
+  ADIobj	rval = ADI__nullid;
+  ADIlogical	same = ADI__true;
+
+/* Find length of list and determine whether types of objects in list are identical */
+/* If the list contains null items the output array is always generic */
+  curp = args[0];
+  while ( _valid_q(curp) ) {
+    _GET_CARCDR(car,curp,curp);
+    if ( _valid_q(car) ) {
+      if ( nelm++ )
+	same &= (_DTDEF(car) == ot);
+      else
+	ot = _DTDEF(car);
+      }
+    else
+      same = ADI__false;
+    }
+
+/* Create the output array */
+  if ( nelm ) {
+    adic_new1( same ? ot->name : "*", nelm, &rval, status );
+    if ( _ok(status) ) {
+      ADIarray	*ary = _ary_data(_han_id(rval));
+      ADIobj	idata = ary->data;
+      if ( same ) {
+	curp = args[0];
+	while ( _valid_q(curp) ) {
+	  _GET_CARCDR(car,curp,curp);
+	  adix_putid( idata, NULL, 0, car, status );
+	  idata = ADImemIdAddOff( idata, 1, status );
+	  }
+	}
+      else {
+	curp = args[0];
+	while ( _valid_q(curp) ) {
+	  _GET_CARCDR(car,curp,curp);
+	  *_obj_data(idata) = adix_copy( car, status );
+	  idata = ADImemIdAddOff( idata, 1, status );
+	  }
+	}
+      }
+    }
+
+  return rval;
+  }
+
+ADIobj ADIaryQ_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIlogical	res = ADI__false;
+  ADIobj	rval = ADI__nullid;
+
+  if ( _han_q(args[0]) )
+    res = _ary_q(_han_id(args[0]));
+
+  adic_newv0l( res, &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIaryRank_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIarray	*ary = _ary_data(_han_id(args[0]));
+  ADIobj	rval = ADI__nullid;
+
+  adic_newv0i( ary->ndim, &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIaryRef_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIarray	*ary = _ary_data(_han_id(args[0]));
+  int		inds[ADI__MXDIM];
+  ADIobj	idata;
+  int		idim;
+  ADIobj	rval = ADI__nullid;
+
+  if ( (narg-1) != ary->ndim )
+    adic_setecs( ADI__INVARG, "Number of indices does not match array dimensionality", status );
+  else {
+    for( idim=0; idim<(narg-1) && _ok(status); idim++ ) {
+      inds[idim] = _IVAL(args[idim+1]);
+      if ( (inds[idim] < 1) || (inds[idim]>ary->dims[idim]) )
+	adic_setecs( ADI__INVARG,
+"Array bound violation in dimension %d, index value %d vs. dimension %d",
+status, idim+1, inds[idim], ary->dims[idim] );
+      }
+
+    if ( _ok(status) ) {
+      idata = ADImemIdAddOff( ary->data,
+			    ADIaryOffset( ary->ndim, ary->dims, inds ), status );
+
+      if ( _obj_q(idata) )
+	rval = adix_clone( *_obj_data(idata), status );
+      else
+	rval = adix_copy( idata, status );
+      }
+    }
+
+  return rval;
+  }
 
 void ADIfuncInit( ADIstatus status )
   {
   DEFINE_FUNC_TABLE(sys_funcs)
+    FUNC_TENTRY( "GetEnv(_CHAR)",			ADIsysGetEnv_i,	FA_L ),
     FUNC_TENTRY( "GetPid()",				ADIsysGetPid_i,	0 ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(gen_funcs)
+    FUNC_TENTRY( "AtomQ(_)",				ADIgenAtomQ_i,	FA_L ),
+    FUNC_TENTRY( "Get(_CHAR)",				ADIgenGet_i,	FA_L ),
     FUNC_TENTRY( "Name(_)",				ADIgenName_i,	FA_L ),
+    FUNC_TENTRY( "HashStats()",				ADIgenHst_i,	0 ),
+    FUNC_TENTRY( "NullQ(_)",				ADIgenNullQ_i,	FA_L ),
+    FUNC_TENTRY( "Probe()",				ADIgenProbe_i,	FA_L ),
     FUNC_TENTRY( "Set(_Symbol,_)",			ADIgenSet_i,	FA_L1 ),
+    FUNC_TENTRY( "TimeIt(_,_INTEGER)",			ADIgenTimeIt_i,	FA_1 ),
     FUNC_TENTRY( "Type(_)",				ADIgenType_i,	FA_L ),
   END_FUNC_TABLE;
 
@@ -1282,6 +1671,8 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "OddQ(_INTEGER)",			ADIintOddQ_i,	FA_L ),
     FUNC_TENTRY( "Or(__INTEGER)",			ADIintOr_i,	FA_L ),
     FUNC_TENTRY( "Plus(__INTEGER)",			ADIintPlus_i,	FA_L ),
+    FUNC_TENTRY( "Power(_INTEGER,_INTEGER)", 		ADIintPower_i,	FA_L ),
+    FUNC_TENTRY( "Power(_INTEGER,2)", 			ADIintPow2_i,	FA_L ),
     FUNC_TENTRY( "Shift(_INTEGER,_INTEGER)",		ADIintShift_i,	FA_L ),
     FUNC_TENTRY( "Sign(_INTEGER,_INTEGER)",		ADIintSign_i,	FA_L ),
     FUNC_TENTRY( "Subtract(_INTEGER,_INTEGER)", 	ADIintSub_i,	FA_L ),
@@ -1292,6 +1683,13 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Length(_List)",			ADIlstLen_i,	0 ),
     FUNC_TENTRY( "List(__)",				ADIlstMk_i,	0 ),
     FUNC_TENTRY( "ListQ(_)",				ADIlstQ_i,	FA_L ),
+  END_FUNC_TABLE;
+
+  DEFINE_FUNC_TABLE(array_funcs)
+    FUNC_TENTRY( "Array(_List)",			ADIaryMk1_i,	0 ),
+    FUNC_TENTRY( "ArrayQ(_)",				ADIaryQ_i,	FA_L ),
+    FUNC_TENTRY( "ArrayRef(_Array,__INTEGER)",		ADIaryRef_i,	0 ),
+    FUNC_TENTRY( "Rank(_Array)",			ADIaryRank_i,	0 ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(real_funcs)
@@ -1318,8 +1716,11 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Mod(_REAL,_REAL)",  			ADIrealMod_i,	FA_L ),
     FUNC_TENTRY( "Multiply(__REAL)",			ADIrealMult_i,	FA_L ),
     FUNC_TENTRY( "Negate(_REAL)",			ADIrealNeg_i,	FA_L ),
+    FUNC_TENTRY( "Nint(_REAL)",				ADIrealNint_i,	FA_L ),
     FUNC_TENTRY( "NotEqual(_REAL,_REAL)",  		ADIrealNE_i,	FA_L ),
     FUNC_TENTRY( "Plus(__REAL)",			ADIrealPlus_i,	FA_L ),
+    FUNC_TENTRY( "Power(_REAL,_REAL)",  		ADIrealPower_i,	FA_L ),
+    FUNC_TENTRY( "Power(_REAL,_INTEGER)",  		ADIrealPowerI_i,FA_L ),
     FUNC_TENTRY( "Real(_DOUBLE)",			ADIrealCaste_i,	FA_L ),
     FUNC_TENTRY( "Real(_INTEGER)",			ADIrealCaste_i,	FA_L ),
     FUNC_TENTRY( "RealQ(_)",				ADIrealQ_i,	FA_L ),
@@ -1403,8 +1804,11 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Mod(_DOUBLE,_DOUBLE)",  		ADIdbleMod_i,	FA_L ),
     FUNC_TENTRY( "Multiply(__DOUBLE)",			ADIdbleMult_i,	FA_L ),
     FUNC_TENTRY( "Negate(_DOUBLE)",			ADIdbleNeg_i,	FA_L ),
+    FUNC_TENTRY( "Nint(_DOUBLE)",			ADIdbleNint_i,	FA_L ),
     FUNC_TENTRY( "NotEqual(_DOUBLE,_DOUBLE)",  		ADIdbleNE_i,	FA_L ),
     FUNC_TENTRY( "Plus(__DOUBLE)",		    	ADIdblePlus_i,	FA_L ),
+    FUNC_TENTRY( "Power(_DOUBLE,_DOUBLE)",  		ADIdblePower_i,	FA_L ),
+    FUNC_TENTRY( "Power(_DOUBLE,_INTEGER)",  		ADIdblePowerI_i,FA_L ),
     FUNC_TENTRY( "Sign(_DOUBLE,_DOUBLE)",  		ADIdbleSign_i,	FA_L ),
     FUNC_TENTRY( "Sin(_DOUBLE)",			ADIdbleSin_i,	FA_L ),
     FUNC_TENTRY( "Sinh(_DOUBLE)",			ADIdbleSinh_i,	FA_L ),
@@ -1414,6 +1818,10 @@ void ADIfuncInit( ADIstatus status )
     FUNC_TENTRY( "Tanh(_DOUBLE)",			ADIdbleTanh_i,	FA_L ),
   END_FUNC_TABLE;
 
+  DEFINE_FUNC_TABLE(strm_funcs)
+    FUNC_TENTRY( "StreamQ(_)",				ADIstrmQ_i,	FA_L ),
+  END_FUNC_TABLE;
+
   _chk_stat;
 
 /* Install functions */
@@ -1421,8 +1829,11 @@ void ADIfuncInit( ADIstatus status )
   ADIkrnlAddFuncs( gen_funcs, status );
   ADIkrnlAddFuncs( int_funcs, status );
   ADIkrnlAddFuncs( list_funcs, status );
+  ADIkrnlAddFuncs( array_funcs, status );
   ADIkrnlAddFuncs( real_funcs, status );
   ADIkrnlAddFuncs( dble_funcs, status );
   ADIkrnlAddFuncs( log_funcs, status );
   ADIkrnlAddFuncs( string_funcs, status );
+  ADIkrnlAddFuncs( strm_funcs, status );
   }
+

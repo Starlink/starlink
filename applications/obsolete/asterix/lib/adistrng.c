@@ -94,11 +94,12 @@ char *strx_alloc( int len, ADIstatus status )
   }
 
 
-void strx_free( char *ptr, ADIstatus status )
+void strx_free( char *ptr, int len, ADIstatus status )
   {
   StrStorePtr   curp = ss_first;
   ADIlogical    found = ADI__false;
   StrStorePtr   lcurp = NULL;
+  int		llen = len;
   long          pdif;
 
   _chk_stat;
@@ -115,13 +116,11 @@ void strx_free( char *ptr, ADIstatus status )
       }
     }
 
-  if ( found )                          /* Found the pointer? */
-    {
+/* Found the pointer? */
+  if ( found ) {
     char *cptr = ptr;
-    while ( *cptr )
-      {
+    while ( llen-- )
       *cptr++ = 0;
-      }
 
     curp->nhit--;                       /* Decrease reference count on block */
 
@@ -158,7 +157,8 @@ ADIobj strx_dstrc( int narg, ADIobj args[], ADIstatus status )
   {
   ADIstring         *sptr = _str_data(args[0]);
 
-  strx_free( sptr->data, status );
+  if ( sptr->data )
+    strx_free( sptr->data, sptr->len, status );
 
   return ADI__nullid;
   }
@@ -291,22 +291,18 @@ int strx_cmpic( char *str1, int len1, ADIobj str2 )
 /* adix_str_hash - case sensitive string hash
  *
  */
-void strx_hash( char       *str,
-                int        slen,
-                int        tsize,        /* Hash list length */
-                int        *hash,        /* Hash value */
-                ADIstatus  status )
+int strx_hash( char *str, int slen, int tsize )
   {
   register int     cp;			/* Loop over string */
   register char    *sptr;
+  register unsigned int	   lhash = 0;
 
-  _chk_stat;                            /* Check status */
-
-  *hash = 0;                            /* Calculate the hash value */
+/* Calculate the hash value */
   for ( cp = slen, sptr = str;
 	cp; cp-- )
-    *hash = *hash + *sptr++;
-  *hash = *hash % tsize;
+    lhash += (lhash<<3) + *sptr++;
+
+  return lhash % tsize;
   }
 
 void strx_exit( ADIstatus status )
@@ -346,4 +342,30 @@ void ADIstrngExport( ADIobj id, int clang, char *buf, int blen,
 	memset( buf + nstr->len, ' ', blen - nstr->len );
       }
     }
+  }
+
+ADIobj ADIstrngEnsureNterm( ADIobj id, ADIstatus status )
+  {
+  ADIlogical	clone = ADI__true;
+  ADIstring	*ndat;
+  ADIobj	rval;
+  ADIstring	*sdat = _str_data(id);
+
+  if ( sdat->data )
+    if ( sdat->data[sdat->len-1] )
+      clone = ADI__false;
+
+  if ( clone )
+    rval = adix_clone( id, status );
+  else {
+    adic_new0c( &rval, status );
+    ndat = _str_data(rval);
+
+    ndat->data = strx_alloc( sdat->len+1, status );
+    ndat->len = sdat->len + 1;
+    memcpy(ndat->data,sdat->data,sdat->len);
+    ndat->data[sdat->len] = 0;
+    }
+
+  return rval;
   }

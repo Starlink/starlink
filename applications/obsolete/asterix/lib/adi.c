@@ -64,6 +64,7 @@
  *
  *    To be done :
  *
+ *     _DTDAT must only work 1 level deep for arrays
  *     does adix_name work on slices/cells?
  *     merge cerase and delcmp,delprp?
  *     encapsulate global variables in a ADIinterpreter object
@@ -100,7 +101,6 @@
  *     Data packing and stream representation of ADI data
  *     Iterators and locking
  *     Special non-recursive list destructor
- *     Remove malloc/free from adix_mark/rlse
  *     Lock access when object is mapped
  */
 
@@ -186,13 +186,6 @@ static ADIclassDef    *ADI_G_firstcdef = NULL;
 static ADIclassDef    **ADI_G_cdeflink = &ADI_G_firstcdef;
 
 
-/* Add a cell to an object list such as the above. Macro works on the list
- * insertion point and the new object.
- */
-#define _LST_APPEND(_list,_id) \
-     {ADIobj ncell = lstx_cell( _id,ADI__nullid, status );\
-      *_list = ncell; _list = &_CDR(ncell); }
-
 
 /*
  * Standard frequently used names
@@ -213,6 +206,41 @@ ADIobj ADIcvStdIn       = ADI__nullid;
 ADIobj ADIcvStdOut      = ADI__nullid;
 
 static ADIobj   ADI_G_stdmcf = ADI__nullid;
+
+static ADIblock *last_bt=NULL;
+static ADIidIndex last_ibt = 9;
+static ADIobj	lastid = ADI__nullid;
+static char *last_ad;
+
+char *adix_idd( ADIobj id )
+  {
+  ADIblock	*b;
+  if ( id == lastid)
+    return last_ad;
+  else {
+    lastid=id;
+    b = ADI_G_blks[_ID_IBLK(id)];
+
+    return last_ad = b->data + _ID_SLOT(id)*b->size;
+    }
+  }
+
+char *adix_iddt( ADIobj id, ADIclassDef **cdef )
+  {
+  ADIblock	*b;
+  ADIidIndex	ib = _ID_IBLK(id);
+
+  if ( ib == last_ibt )
+    b = last_bt;
+  else {
+    last_ibt = ib;
+    b = last_bt = ADI_G_blks[ib];
+    }
+
+  *cdef = b->cdef;
+
+  return b->data + _ID_SLOT(id)*b->size;
+  }
 
 
 /*
@@ -363,10 +391,10 @@ void adix_erase( ADIobj *id, int nval, ADIstatus status )
     if ( _valid_q(tdef->destruc) ) {
       int	ival;
       ADIobj	oid = *id;
-      for( ival=nval; ival; ival-- ) {
+      for( ival=nval; ival; ) {
 
 	adix_exemth( ADI__nullid, tdef->destruc, 1, &oid, status );
-	if ( ival )
+	if ( --ival )
 	  oid = ADImemIdAddOff( oid, 1, status );
 	}
       }
@@ -464,6 +492,7 @@ ADIobj ADIkrnlNewHan( ADIobj id, ADIlogical slice, ADIstatus status )
     hdata->name = ADI__nullid;          /* No name defined */
     hdata->lock = ADI__nullid;          /* No object locks */
     hdata->ref = 1;                     /* Initialise the reference count */
+    hdata->data = NULL;
 
     hdata->markdel = ADI__false;        /* Not marked for delete */
     hdata->readonly = ADI__false;       /* Dynamic object by default */
@@ -476,19 +505,28 @@ ADIobj ADIkrnlNewHan( ADIobj id, ADIlogical slice, ADIstatus status )
   }
 
 
-
 char *adix_dtdat( ADIobj id )
   {
-  if ( _han_q(id) ) {
-    return _DTDAT(_han_id(id));
+  ADIclassDef	*cdef;
+  char		*data;
+
+  data = adix_iddt( id, &cdef );
+
+  if ( cdef == &KT_DEFN_han ) {
+    ADIobjHan	*hptr = (ADIobjHan *) data;
+
+    if ( ! hptr->data )
+      hptr->data = _DTDAT(hptr->id);
+
+    return hptr->data;
     }
-  else if ( _ary_q(id) ) {
-    ADIarray      *aptr = _ary_data(id);
+  else if ( cdef == &KT_DEFN_ary ) {
+    ADIarray      *aptr = (ADIarray *) data;
 
     return _ID_DATA(aptr->data);
     }
   else
-    return _ID_DATA(id);
+    return data;
   }
 
 
@@ -497,18 +535,25 @@ ADIclassDef *adix_dtdef( ADIobj id )
   ADIarray           	*ad;
   ADIobjHan             *hd;
   ADIclassDef        	*allc;
-  ADIclassDef           *bcls = _ID_BLOCK(id)->cdef;
+  ADIclassDef		*cdef;
+  char			*data;
 
-  if ( bcls == &KT_DEFN_han ) {
-    hd = _han_data(id);
-    allc = _DTDEF(hd->id);
+  data = adix_iddt( id, &cdef );
+
+  if ( cdef == &KT_DEFN_han ) {
+    hd = (ADIobjHan *) data;
+    cdef = allc = _ID_TYPE(hd->id);
+    if ( cdef == &KT_DEFN_ary )
+      data = adix_idd( hd->id );
     }
-  else if ( bcls == &KT_DEFN_ary ) {
-    ad = _ary_data(id);
-    allc = _DTDEF(ad->data);
+
+  if ( cdef == &KT_DEFN_ary ) {
+    ad = (ADIarray *) data;
+/*    allc = _DTDEF(ad->data); */
+    allc = _ID_TYPE(ad->data);
     }
   else
-    allc = _ID_TYPE(id);
+    allc = cdef;
 
   return allc;
   }
@@ -630,15 +675,12 @@ void ADIdefClassMakeDlist( ADIclassDef *tdef, ADIstatus status )
   if ( _valid_q(tdef->superclasses) ) {
 
 /* Put class name at head of list */
-    *ipoint = lstx_cell( tdef->aname, ADI__nullid, status );
-    ipoint = & _CDR(*ipoint);
+    lstx_inscel( tdef->aname, &ipoint, status );
 
 /* Each each direct superclass name in turn */
     curp = tdef->superclasses;
     while ( _valid_q(curp) ) {
-      *ipoint = lstx_cell( _pdef_name(curp), ADI__nullid, status );
-      ipoint = & _CDR(*ipoint);
-
+      lstx_inscel( _pdef_name(curp), &ipoint, status );
       curp = _pdef_next(curp);
       }
     }
@@ -810,8 +852,13 @@ ADIobj adix_estab_ord( ADIobj classes, ADIobj dsupers, ADIstatus status )
     ADIobj      cands;
     ADIobj      winner;
 
+ADIstrmPrintf( ADIcvStdOut, "ppairs = %O\n", status, ppairs );
+ADIstrmFlush( ADIcvStdOut, status );
+
 /* Next lot of candidates */
     cands = adix_filt_classes( curcls, ppairs, status );
+ADIstrmPrintf( ADIcvStdOut, "cls = %O, cands = %O\n", status, curcls, cands );
+ADIstrmFlush( ADIcvStdOut, status );
     winner = adix_filt_cands( cands, preclst, dsupers, status );
 
     ppairs = adix_filt_pairs( ppairs, winner, status );
@@ -921,7 +968,7 @@ void adix_defgen( char *spec, int slen, char *options, int olen,
 	narg++;
 
 /* Insert into argument list */
-	_LST_APPEND(ainsert,aname);
+        lstx_inscel( aname, &ainsert, status );
 
 	ctok = ADInextToken( pstream, status );
 
@@ -1085,7 +1132,8 @@ void adix_defmth( char *spec, int slen,
 	 status );
 	  }
 
-	_LST_APPEND(ainsert,aname);     /* Insert into argument list */
+/* Insert into argument list */
+        lstx_inscel( aname, &ainsert, status );
 	narg++;
 
 /*     Comma delimits argument names */
@@ -1612,7 +1660,7 @@ void adix_delcls( ADIclassDef **cvar, ADIstatus status )
 		  1, status );
     }
 
-  strx_free( tdef->name, status );      /* The class name */
+/*  strx_free( tdef->name, status );      The class name */
 
   *cvar = NULL;
   }
@@ -1702,6 +1750,11 @@ void adix_prnt_struc( int narg, ADIobj args[], ADIstatus status )
     }
 
   ADIstrmPrintf( args[0], "}", status );
+  }
+
+void adix_prnt_ref( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIstrmPrintf( args[0], "%O", status, *_obj_data(args[1]) );
   }
 
 
@@ -1843,7 +1896,7 @@ void adi_init( ADIstatus status )
     PTYPE_TENTRY("CHAR",   ADIstring,  &UT_ALLOC_c ,adix_prnt_c),
     PTYPE_TENTRY("POINTER",ADIpointer, &UT_ALLOC_p ,adix_prnt_p),
     PTYPE_TENTRY("STRUC",  ADIobj,     &UT_ALLOC_struc, adix_prnt_struc),
-    PTYPE_TENTRY("OBJREF", ADIobj,     &UT_ALLOC_ref, NULL),
+    PTYPE_TENTRY("OBJREF", ADIobj,     &UT_ALLOC_ref, adix_prnt_ref),
     PTYPE_TENTRY("Stream", ADIstream,  &UT_ALLOC_strm, NULL),
   END_PTYPE_TABLE;
 
@@ -1957,6 +2010,9 @@ void adi_init( ADIstatus status )
 
 /* Initialise sub-systems depending on common string table */
     prsx_init( status );
+
+/* Set the array kernel object ADI name - makes argument testing easier */
+    KT_DEFN_ary.aname = K_Array;
 
 /* Create the constant stream object pointing to standard output & error */
     ADIcvStdIn = ADIstrmExtendFile( ADIstrmNew( "r", status ), stdin, status );
@@ -2466,10 +2522,12 @@ void adix_refadj( ADIobj id, int offset, ADIstatus status )
   {
   _chk_init_err;
 
-  if ( _han_q(id) )
-    _han_ref(id) += offset;
-  else
-    adic_setecs( ADI__ILLKOP, NULL, status );
+  if ( _valid_q(id) ) {
+    if ( _han_q(id) )
+      _han_ref(id) += offset;
+    else
+      adic_setecs( ADI__ILLKOP, NULL, status );
+    }
   }
 
 
@@ -2636,7 +2694,8 @@ void adix_mtacop( ADImta *ind, ADImta *outd, ADIstatus status )
     }
 
   if ( _ok(status) && _valid_q(outd->id) )
-    _han_set(outd->id) = ADI__true;
+    if ( _han_q(outd->id) )
+      _han_set(outd->id) = ADI__true;
 
   if ( nerr )
     adic_setecs( ADI__CONER, "%d data conversion error(s) occurred",
@@ -2650,12 +2709,19 @@ void adix_mtaid( ADIobj id, ADImta *mta, ADIstatus status )
 
   _chk_stat;
 
-  if ( ! _han_q(id) ) {
+  if ( _krnl_q(id) && ! _han_q(id) ) {
     adic_setecs( ADI__ILLKOP, "Cannot construct MTA for kernel object", status );
     }
   else
     {
-    ADIobj      hid = _han_id(id);
+    ADIobj      hid = ADI__nullid;
+    ADIlogical	isary = ADI__false;
+
+    if ( _han_q(id) ) {
+      hid = _han_id(id);
+      isary = _ary_q(hid);
+      }
+
     tdef = _DTDEF(id);                  /* Locate class definition block */
 
 /* Set the transfer type */
@@ -2666,7 +2732,8 @@ void adix_mtaid( ADIobj id, ADImta *mta, ADIstatus status )
 
     mta->id = id;                       /* Store object being transferred */
 
-    if ( _ary_q(hid) ) {                /* Array object? */
+/* Array object? */
+    if ( isary ) {
       ADIarray       	*adata = _ary_data(hid);
       int               i;
       int               *bdims;
@@ -2785,9 +2852,8 @@ void adix_chkput( ADIobj *id, ADIobj **lid, ADIstatus status )
 /* Check PUT operation ok on this object. Allow PUTs on primitive data
  * defined by ADI, and on class data where a default member is defined
  */
-  if ( ! _valid_q(*id) )                /* Valid ADI identifier? */
-    {
-    }
+  if ( _null_q(*id) )                	/* Valid ADI identifier? */
+    *lid = id;
   else if ( _han_q(*id) ) {             /* Only scalar object allowed */
     ADIclassDef      *tdef = _DTDEF(*id);
 
@@ -2801,6 +2867,8 @@ void adix_chkput( ADIobj *id, ADIobj **lid, ADIstatus status )
     else                                /* User supplied a class object */
       *lid = adix_defmem( id, status );
     }
+  else if ( _prim_q(*id) )                	/* Valid ADI identifier? */
+    *lid = id;
   else
     adic_setecs( ADI__ILLKOP, "Cannot PUT data from kernel objects", status );
   }
@@ -3490,7 +3558,8 @@ void adix_wdata( ADIobj parid, ADIobj namid, ADIobj *id, ADImta *mta, ADIstatus 
 
     adix_mtacop( mta, &omta, status );  /* Perform transfer */
 
-    if ( _ok(status) ) {                /* Everything ok? */
+    if ( _ok(status) && _han_q(*id) ) {                /* Everything ok? */
+
       _han_set(*id) = ADI__true;
       if ( _valid_q(parid) )
 	_han_set(parid) = ADI__true;
@@ -3599,29 +3668,51 @@ void adix_set_n( int clang, ADIobj id, char *name, int nlen, int ndim,
 ADIobj adix_copy( ADIobj id, ADIstatus status )
   {
   ADIarray   	*adata;
+  char		*data;
+  ADIobj	hid;
+  ADIlogical	ishan = ADI__false;
   ADIobj        rval = id;
+  ADIlogical	rdonly = ADI__false;
+  ADIclassDef	*tdef;
   ADIobj        temp;
 
   _chk_init_err; _chk_stat_ret(ADI__nullid);
 
-  if ( _valid_q(id) )                   /* Trap null objects */
-   if ( _han_q(id) ) {                  /* Don't copy kernel objects */
-    if ( _han_readonly(id) )            /* Object is readonly? */
-      rval = adix_clone(id,status);
+/* Trap null objects */
+  if ( _valid_q(id) ) {
+
+/* Get base data and type */
+    data = adix_iddt( id, &tdef );
+
+/* If it's a handle, locate the handled object */
+    if ( tdef == &KT_DEFN_han ) {
+      hid = ((ADIobjHan *) data)->id;
+      ishan = ADI__true;
+      rdonly = _han_readonly(id);
+      }
     else
-      {
-      ADIobj    hid = _han_id(id);      /* Object pointed to by handle */
-      ADIclassDef    *tdef;
+      hid = id;
 
-      tdef = _DTDEF(hid);               /* Locate object class definition */
+/* Object is a handled readonly object? If so, just clone it */
+    if ( rdonly )
+      rval = adix_clone( id, status );
 
-      if ( _ary_q(hid) ) {              /* Array kernel object */
-	adata = _ary_data(hid);
+    else {
 
-	temp = adix_cls_nalloc( tdef,         /* Create new object */
-	  adata->ndim, adata->dims, status );
+/* Locate next level data for handled objects */
+      if ( ishan )
+	data = adix_iddt( hid, &tdef );
+
+/* Object is an array */
+      if ( tdef == &KT_DEFN_ary ) {
+	adata = (ADIarray *) data;
+
+/* Create new object */
+	temp = adix_cls_nalloc( tdef, adata->ndim, adata->dims, status );
 	}
-      else if ( tdef->prim ) {          /* Primitive (ie. non-class) data? */
+
+/* Primitive (ie. non-class) data? */
+      else if ( tdef->prim ) {
 	ADImta	imta,omta;
 
 /* Create new object */
@@ -3636,7 +3727,9 @@ ADIobj adix_copy( ADIobj id, ADIstatus status )
 	  rval = temp;
 	  }
 	}
-      else {                            /* Class instance */
+
+/* Class instance */
+      else {
 	int     i;
 	ADIobj  *iobj,*oobj;
 
@@ -3656,6 +3749,56 @@ ADIobj adix_copy( ADIobj id, ADIstatus status )
     }
 
   return rval;
+  }
+
+
+/*
+ *  Compare objects - doesn't handle arrays
+ */
+ADIlogical adix_equal( ADIobj id1, ADIobj id2, ADIstatus status )
+  {
+  ADIlogical	same = ADI__false;
+  ADIclassDef	*t1,*t2;
+  char		*d1,*d2;
+  ADIobj	*cd1,*cd2;
+  size_t	ic;
+
+  _chk_init_err; _chk_stat_ret(ADI__false);
+
+/* Objects are identical? */
+  if ( id1 == id2 )
+    same = ADI__true;
+
+/* Neither is null */
+  else if ( _valid_q(id1) && _valid_q(id2) ) {
+
+/* Types must be the same */
+    t1 = _DTDEF(id1);
+    t2 = _DTDEF(id2);
+    if ( t1 == t2 ) {
+
+/* Locate base data */
+      d1 = _DTDAT(id1);
+      d2 = _DTDAT(id2);
+
+/* Kernel or simple data */
+      same = ADI__true;
+      if ( t1->prim || t1->kernel ) {
+	ic = t1->alloc.size;
+	while ( ic-- && same)
+	  same = (*d1++ == *d2++);
+	}
+      else {
+	cd1 = (ADIobj *) d1;
+	cd2 = (ADIobj *) d2;
+	ic = t1->nslot;
+	while ( ic-- && same )
+	  same = adix_equal( *cd1++, *cd2++, status );
+	}
+      }
+    }
+
+  return same;
   }
 
 /*
@@ -3724,7 +3867,9 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
 /* Mark object to prevent recursive printing */
     _han_recur(id) = 1;
 
-    if ( _krnl_q(hid) )
+    if ( _ary_q(hid) )
+      adix_print( stream, hid, level+1, value_only, status );
+    else if ( _krnl_q(hid) )
       adix_print( stream, hid, level+1, ADI__false, status );
     else {
       tdef = _DTDEF(hid);               /* Locate class definition block */
@@ -3817,13 +3962,19 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
     ADIarray	*ary = _ary_data(id);
     int         i;
 
-    if ( _krnl_q(ary->data) )
-      ADIstrmPrintf( stream, "generic array [", status );
-    else
-      ADIstrmPrintf( stream, "%s[", status, _DTDEF(ary->data)->name );
-    for( i=0; i<ary->ndim; i++ )
-      ADIstrmPrintf( stream, "%d%c", status,
-		ary->dims[i], ((i+1)==ary->ndim) ? ']' : ',' );
+    if ( ! value_only ) {
+      if ( _krnl_q(ary->data) )
+	ADIstrmPrintf( stream, "generic array [", status );
+      else
+	ADIstrmPrintf( stream, "%s[", status, _DTDEF(ary->data)->name );
+
+      for( i=0; i<ary->ndim; i++ )
+	ADIstrmPrintf( stream, "%d%s", status,
+		ary->dims[i], ((i+1)==ary->ndim) ? "] = " : "," );
+      }
+
+    ADIaryPrint( stream, ary, status );
+
     value_only = ADI__true;
     }
   else {
@@ -4244,6 +4395,8 @@ void adix_primth( int narg, int farg, int nmth,
 
 /* Order the list of classes appearing in mclist into ascending priority. */
 /* If there are no direct superclasses, then the ordering is moot */
+	ADIstrmPrintf( ADIcvStdOut, "Ordering %O and %O\n", status, mclist, dslist );
+	ADIstrmFlush( ADIcvStdOut, status );
       if ( _valid_q(dslist) ) {
 	rlist = adix_estab_ord( mclist, dslist, status );
 
@@ -4255,6 +4408,8 @@ void adix_primth( int narg, int farg, int nmth,
 	}
       else
 	rlist = mclist;
+	ADIstrmPrintf( ADIcvStdOut, "Gives %O\n", status, rlist );
+	ADIstrmFlush( ADIcvStdOut, status );
 
 /* Now process the list of methods. Start at the beginning of the ranked
  * list and shuffle the remaining methods with this class to the head of the
@@ -4274,7 +4429,7 @@ void adix_primth( int narg, int farg, int nmth,
 
 	while ( imth < nleft ) {
 
-	  int     jarg = iarg + 1;
+	  int     jarg = iarg;
 	  ADIobj	*mthdadr;
 	  ADIobj  mthd;
 	  ADIobj  *anext;
@@ -4313,7 +4468,7 @@ void adix_primth( int narg, int farg, int nmth,
 /* All the high priority methods have been transferred to the head of the
  * the list. If more than one method, invoke this routine recursively to
  * order them. */
-	if ( nmoved > 1 )
+	if ( (nmoved > 1) && ((farg+1) < narg) )
 	  adix_primth( narg, farg+1, nmoved, &lmlist, status );
 
 /* Move all these methods to our output list. They go on the end! Advance
@@ -4687,8 +4842,7 @@ ADIobj adix_exemth( ADIobj generic, ADIobj eproc,
   }
 
 
-ADIobj adix_execi( ADIobj func, int narg,
-		   ADIobj args[], ADIstatus status )
+ADIobj adix_execi( ADIobj func, int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj        gen;                    /* Generic function id */
   ADIobj        rval = ADI__nullid;     /* The returned value */

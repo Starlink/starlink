@@ -155,6 +155,7 @@ ADIobj lstx_rest( ADIobj list, ADIstatus status )
 
 ADIobj lstx_cell( ADIobj aid, ADIobj bid, ADIstatus status )
   {
+  ADIobj	*car,*cdr;
   ADIobj    lid;
 
   if ( !_ok(status) )                   /* Check status on entry */
@@ -163,7 +164,10 @@ ADIobj lstx_cell( ADIobj aid, ADIobj bid, ADIstatus status )
   lid = adix_cls_alloc( _cdef_data(UT_ALLOC_list), status );
 
   if ( _ok(status) ) {
-    _CAR(lid) = aid; _CDR(lid) = bid;
+    _GET_CARCDR_A(car,cdr,lid);
+
+    *car = aid;
+    *cdr = bid;
     }
 
   return lid;
@@ -222,6 +226,29 @@ ADIobj lstx_append( ADIobj lst1, ADIobj lst2, ADIstatus status )
   return lst1;                          /* Simply return first argument */
   }
 
+
+/*
+ * Create a list cell updating an object point to point to the address of
+ * _CDR cell.
+ */
+void lstx_inscel( ADIobj id, ADIobj **ipoint, ADIstatus status )
+  {
+  ADIobj	*car,*cdr;
+  ADIobj	lid;
+
+  lid = adix_cls_alloc( _cdef_data(UT_ALLOC_list), status );
+
+  if ( _ok(status) ) {
+    _GET_CARCDR_A(car,cdr,lid);
+
+    *car = id;
+    *cdr = ADI__nullid;
+    **ipoint = lid;
+    *ipoint = cdr;
+    }
+  }
+
+
 /*
  * Special list erase where only list cells are deleted
  */
@@ -229,15 +256,19 @@ void lstx_sperase( ADIobj *list, ADIstatus status )
   {
   ADIobj curp = *list;
   ADIobj	*car,*cdr;
+  ADIobj	last;
 
   while ( _valid_q(curp) ) {
     _GET_CARCDR_A(car,cdr,curp);
 
+    last = curp;
     *car = ADI__nullid;
     curp = *cdr;
+    *cdr = ADI__nullid;
+    adix_erase( &last, 1, status );
     }
 
-  adic_erase( list, status );
+  *list = ADI__nullid;
   }
 
 void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
@@ -370,12 +401,8 @@ ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj),
   while ( _valid_q(curp) && _ok(status) ) {
     _GET_CARCDR(car,curp,curp);
 
-    if ( ! (*ltest)(car,args) ) {
-      *ipoint = lstx_cell( adix_copy(car,status),
-			   ADI__nullid, status );
-
-      ipoint = &_CDR(*ipoint);
-      }
+    if ( ! (*ltest)(car,args) )
+      lstx_inscel( adix_copy(car,status), &ipoint, status );
     }
 
   return newlist;
