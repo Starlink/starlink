@@ -1,7 +1,7 @@
 <!DOCTYPE componentset SYSTEM "componentinfo.dtd">
 <componentset>
 
-<component id="astrom">
+<component id="astrom" support="S">
   <version>3.8</version>
   <path>applications/astrom</path>
   <description>Basic astrometry package</description>
@@ -28,9 +28,13 @@
   </developers>
   <documentation> sun5</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="atools">
+<component id="atools" support="S">
   <version>1.8-1</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
@@ -54,9 +58,13 @@ high-level interface to the AST library.
   </developers>
   <documentation></documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="ccdpack">
+<component id="ccdpack" support="S">
   <version>4.0-18</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
@@ -97,9 +105,16 @@ high-level interface to the AST library.
     </person>
   </developers>
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+    <notes>
+      <p>Except for contents of obsolete dir</p>
+    </notes>
+  </copyright>
 </component>
 
-<component id="coco">
+<component id="coco" support="S">
   <version>2.2-8</version>
   <path>applications/coco</path>
   <description>Conversion of Celestial Coordinates</description>
@@ -121,7 +136,7 @@ system are supported.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="convert">
+<component id="convert" support="S">
   <version>1.5-5</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
@@ -159,7 +174,7 @@ Starlink applications, and a number of other common data formats.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="cursa">
+<component id="cursa" support="S">
   <version>6.4-1</version>
   <path>applications/cursa</path>
   <description>CURSA - Catalogue and Table Manipulation Applications</description>
@@ -194,9 +209,13 @@ on-line catalogues via the Internet.
   </developers>
   <documentation> sun190 ssn76</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="daophot">
+<component id="daophot" support="U">
   <version>1.3-3</version>
   <path>applications/daophot</path>
   <description>Stellar Photometry Package</description>
@@ -224,9 +243,13 @@ on-line catalogues via the Internet.
   </developers>
   <documentation> sun42</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Peter Stetson/DAO</name>
+  </copyright>
 </component>
 
-<component id="datacube">
+<component id="datacube" support="S">
   <version>1.0-4</version>
   <path>applications/datacube</path>
   <description>DATACUBE - An IFS datacube manipulation package</description>
@@ -249,7 +272,7 @@ cube manipulation. </p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="dipso">
+<component id="dipso" support="S">
   <version>3.6-4</version>
   <path>applications/dipso</path>
   <description>DIPSO -- A friendly spectrum analysis program</description>
@@ -271,7 +294,7 @@ cube manipulation. </p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="docfind">
+<component id="docfind" support="S">
   <version>1.3-1</version>
   <path>applications/docfind</path>
   <description>Starlink document index searching</description>
@@ -293,7 +316,7 @@ cube manipulation. </p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="dvi2bitmap">
+<component id="dvi2bitmap" support="S">
   <version>0.13b2</version>
   <path>applications/dvi2bitmap</path>
   <description>Converts TeX DVI files to bitmaps</description>
@@ -314,10 +337,15 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   <documentation></documentation>
+  <tests status="yes"/>
   <bugreports>norman@astro.gla.ac.uk</bugreports>
+  <copyright>
+    <year>1992-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="echomop">
+<component id="echomop" support="S">
   <version>3.3-7</version>
   <path>applications/echomop</path>
   <description>Echelle Data Reduction Package</description>
@@ -354,9 +382,20 @@ cube manipulation. </p></abstract>
   </developers>
   <documentation> sun152</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <copyright>
+    <year></year>
+    <name>Others...</name>
+    <notes>
+      <p>Various small contributions, mostly from UCL</p>
+    </notes>
+  </copyright>
 </component>
 
-<component id="echwind">
+<component id="echwind" support="S">
   <version>3.1-4</version>
   <path>applications/echwind</path>
   <description>UCL Echelle Spectrograph Observation Planning</description>
@@ -384,7 +423,7 @@ proposal, or before or during an observing run.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="esp">
+<component id="esp" support="S">
   <version>0.11</version>
   <path>applications/esp</path>
   <description>Extended Surface Photometry</description>
@@ -417,9 +456,16 @@ proposal, or before or during an observing run.
   </developers>
   <documentation> sun180</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996-1999, 2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+    <notes>
+      <p>Includes some public domain code</p>
+    </notes>
+  </copyright>
 </component>
 
-<component id="extractor">
+<component id="extractor" support="S">
   <version>2.3-1</version>
   <path>applications/extractor</path>
   <description>EXTRACTOR - An Astronomical Source Detection Program</description>
@@ -442,9 +488,13 @@ variety of formats.
   </developers>
   <documentation> sun226</documentation>
   <bugreports>extractor@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="extreme">
+<component id="extreme" support="U">
   <version>0.1-1</version>
   <path>applications/extreme</path>
   <description>Handling Extreme Data Sets</description>
@@ -477,9 +527,13 @@ variety of formats.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="figaro">
+<component id="figaro" support="S">
   <version>5.6-2</version>
   <path>applications/figaro</path>
   <description>FIGARO general data-reduction system</description>
@@ -542,7 +596,7 @@ wide range of images and spectra.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="findcoords">
+<component id="findcoords" support="U">
   <version>1.0-1</version>
   <path>applications/findcoords</path>
   <description>Find the coordinates of a named object</description>
@@ -564,7 +618,7 @@ and its coordinates are displayed.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="gaia">
+<component id="gaia" support="S">
   <version>2.8-2</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
@@ -589,9 +643,13 @@ and the ability to query on-line (WWW) catalogues.
   </developers>
   <documentation> sun214</documentation>
   <bugreports>gaia@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="generic">
+<component id="generic" support="S">
   <version>1.1-2</version>
   <path>applications/generic</path>
   <description>A Utility for Compiling Generic Fortran Subroutines</description>
@@ -614,7 +672,7 @@ and the ability to query on-line (WWW) catalogues.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="hdstools">
+<component id="hdstools" support="S">
   <version>1.0</version>
   <path>applications/hdstools</path>
   <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
@@ -640,9 +698,17 @@ package but have now been modified to run as normal Starlink tasks.
     </person>  </developers>
   <documentation> sun245</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
+  <copyright>
+    <year></year>
+    <name>University of Birmingham</name>
+  </copyright>
 </component>
 
-<component id="hdstrace">
+<component id="hdstrace" support="S">
   <version>1.2-2</version>
   <path>applications/hdstrace</path>
   <description>HDSTRACE - Trace an HDS file</description>
@@ -664,7 +730,7 @@ Traces an HDS file
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="htx">
+<component id="htx" support="S">
   <version>1.2-10</version>
   <path>applications/htx</path>
   <description>Hypertext Cross-reference Utilities</description>
@@ -702,9 +768,13 @@ Traces an HDS file
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="icl">
+<component id="icl" support="S">
   <version>3.1-10</version>
   <path>applications/icl</path>
   <description>Interactive Command Language</description>
@@ -728,7 +798,7 @@ Traces an HDS file
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="ifd">
+<component id="ifd" support="S">
   <version>1.2-8</version>
   <path>applications/ifd</path>
   <description>Interface Definition Files</description>
@@ -756,7 +826,7 @@ Traces an HDS file
   <bugreports>ussc@starlink.ac.uk</bugreports>
 </component>
 
-<component id="kappa">
+<component id="kappa" support="S">
   <version>1.4-1</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
@@ -786,7 +856,7 @@ packages.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="kaprh">
+<component id="kaprh" support="U">
   <version>2.0</version>
   <path>applications/kaprh</path>
   <description>KAPRH - A home for retired KAPPA applications</description>
@@ -815,7 +885,7 @@ them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="messgen">
+<component id="messgen" support="S">
   <version>1.2</version>
   <path>applications/messgen</path>
   <description>Starlink Facility Error Message Generation</description>
@@ -850,7 +920,7 @@ them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="news">
+<component id="news" support="S">
   <version>2.1-2</version>
   <path>applications/news</path>
   <description>Starlink online information system</description>
@@ -1033,7 +1103,7 @@ A software package designed to search for periodicities in data.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="photom">
+<component id="photom" support="S">
   <version>1.9-0</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
@@ -1056,7 +1126,7 @@ A software package designed to search for periodicities in data.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="pisa">
+<component id="pisa" support="U">
   <version>2.4-7</version>
   <path>applications/pisa</path>
   <description>PISA - Position Intensity and Shape Analysis</description>
@@ -1078,7 +1148,7 @@ A software package designed to search for periodicities in data.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="polpack">
+<component id="polpack" support="S">
   <version>3.1-3</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
@@ -1105,6 +1175,10 @@ display of vector maps.
   </developers>
   <documentation> sun223</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
 <component id="pongo">
@@ -1142,7 +1216,7 @@ package.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="psmerge">
+<component id="psmerge" support="U">
   <version>1.0-6</version>
   <path>applications/psmerge</path>
   <description>Merge EPS files</description>
@@ -1170,7 +1244,7 @@ package.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="rv">
+<component id="rv" support="S">
   <version>2.4-5</version>
   <path>applications/rv</path>
   <description>Radial Components of Observer's Velocity</description>
@@ -1199,7 +1273,7 @@ package.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="scb">
+<component id="scb" support="U">
   <version>1.1-3</version>
   <path>applications/scb</path>
   <description>Source Code Browser</description>
@@ -1226,9 +1300,13 @@ package.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="sgmlkit">
+<component id="sgmlkit" support="S">
   <version>0.7-13</version>
   <path>applications/sgmlkit</path>
   <description>Starlink documentation SGML kit</description>
@@ -1256,9 +1334,13 @@ package.
   </developers>
   <documentation> ssn70</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1999-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="spt">
+<component id="spt" support="U">
   <version>1.3-1</version>
   <path>applications/spt</path>
   <description>Software Porting Tools</description>
@@ -1283,7 +1365,7 @@ UNIX).
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="sst">
+<component id="sst" support="S">
   <version>1.1</version>
   <path>applications/sst</path>
   <description>SST - A Simple Software Tools Package</description>
@@ -1320,9 +1402,13 @@ UNIX).
   </developers>
   <documentation> sun110</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="star2html">
+<component id="star2html" support="S">
   <version>1.4-7</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
@@ -1350,10 +1436,14 @@ UNIX).
   </developers>
   <documentation> sun199</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
 
-<component id="startcl">
+<component id="startcl" support="S">
   <version>1.5-5</version>
   <path>applications/startcl</path>
   <description>Starlink extensions to Tcl &amp; Tk</description>
@@ -1385,7 +1475,7 @@ UNIX).
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="starx">
+<component id="starx" support="U">
   <version>1.2-1</version>
   <path>applications/starx</path>
   <description>X library linker helper</description>
@@ -1428,7 +1518,7 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="xdisplay">
+<component id="xdisplay" support="S">
   <version>2.2</version>
   <path>applications/xdisplay</path>
   <description>Automatically determine how to set the DISPLAY variable</description>
@@ -1456,7 +1546,7 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="starconf" buildsupport="yes">
+<component id="starconf" buildsupport="yes" support="U">
   <version>1.2</version>
   <path>buildsupport/starconf</path>
   <description>Starlink autoconf support</description>
@@ -1474,7 +1564,7 @@ to handle data from a variety of different instruments.
 </component>
 
 
-<component id="ssn78">
+<component id="ssn78" support="U">
   <version>0.1</version>
   <path>docs/ssn/078</path>
   <description>Description of the build system</description>
@@ -1492,7 +1582,7 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="info">
+<component id="info" support="S">
   <version>2004.1-1</version>
   <path>etc/info</path>
   <description>General admin files and doc index</description>
@@ -1513,7 +1603,7 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@starlink.ac.uk</bugreports>
 </component>
 
-<component id="init">
+<component id="init" support="S">
   <version>1.1-26</version>
   <path>etc/init</path>
   <description>Starlink initialisation files</description>
@@ -1534,7 +1624,7 @@ to handle data from a variety of different instruments.
   <bugreports>ussc@starlink.ac.uk</bugreports>
 </component>
 
-<component id="agi">
+<component id="agi" support="S">
   <version>2.1-1</version>
   <path>libraries/agi</path>
   <description>Applications Graphics Interface Library</description>
@@ -1560,9 +1650,13 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> sun48</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="ard">
+<component id="ard" support="S">
   <version>2.0-5</version>
   <path>libraries/ard</path>
   <description>ASCII Region Definition</description>
@@ -1588,9 +1682,13 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> sun183</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="ary">
+<component id="ary" support="S">
   <version>1.1-9</version>
   <path>libraries/ary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
@@ -1615,9 +1713,13 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> sun11</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="ast">
+<component id="ast" support="S">
   <version>3.5-6</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
@@ -1653,9 +1755,13 @@ to handle data from a variety of different instruments.
   </developers>
   <documentation> sun210 sun211</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="cat">
+<component id="cat" support="S">
   <version>8.1</version>
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
@@ -1676,12 +1782,16 @@ astronomical catalogues and similar tabular datasets.
   </developers>
   <documentation> sun181</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <notes><p>
 No longer under active control.
 </p></notes>
 </component>
 
-<component id="chr">
+<component id="chr" support="S">
   <version>2.2-5</version>
   <path>libraries/chr</path>
   <description>Character Handling Routines</description>
@@ -1719,9 +1829,13 @@ No longer under active control.
     </person>  </developers>
   <documentation> sun40</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="cnf">
+<component id="cnf" support="S">
   <version>4.1-1</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
@@ -1757,9 +1871,13 @@ No longer under active control.
     </person>  </developers>
   <documentation> sun209</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="ems">
+<component id="ems" support="S">
   <version>2.0-7</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
@@ -1790,9 +1908,13 @@ No longer under active control.
     </person>  </developers>
   <documentation> ssn4</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="fio">
+<component id="fio" support="S">
   <version>1.5-3</version>
   <path>libraries/fio</path>
   <description>FORTRAN file I/O routines</description>
@@ -1826,7 +1948,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="gks">
+<component id="gks" support="U">
   <version>1.37-1</version>
   <path>libraries/gks</path>
   <description>The tarlink RAL/ICL GKS graphics package.</description>
@@ -1843,7 +1965,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="gns">
+<component id="gns" support="U">
   <version>1.1-4</version>
   <path>libraries/gns</path>
   <description>Graphics Workstation Name Service</description>
@@ -1877,7 +1999,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="graphpar">
+<component id="graphpar" support="S">
   <version>1.1-5</version>
   <path>libraries/graphpar</path>
   <description>ADAM Graphics Programming</description>
@@ -1913,7 +2035,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="grp">
+<component id="grp" support="S">
   <version>3.3</version>
   <path>libraries/grp</path>
   <description>GRP - Routines for Managing Groups of Objects</description>
@@ -1937,9 +2059,13 @@ No longer under active control.
   </developers>
   <documentation> sun150</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="gsd">
+<component id="gsd" support="U">
   <version>1.0-1</version>
   <path>libraries/gsd</path>
   <description>Global Section Datafile (GSD) access library</description>
@@ -1975,7 +2101,7 @@ No longer under active control.
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
 </component>
 
-<component id="gwm">
+<component id="gwm" support="U">
   <version>1.5-1</version>
   <path>libraries/gwm</path>
   <description>GWM - X Graphics Window Manager</description>
@@ -2000,7 +2126,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="hds">
+<component id="hds" support="S">
   <version>4.3-4</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
@@ -2046,7 +2172,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="hlp">
+<component id="hlp" support="S">
   <version>3.3-2</version>
   <path>libraries/hlp</path>
   <description>HLP -- interactive help system</description>
@@ -2070,7 +2196,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="idi">
+<component id="idi" support="U">
   <version>1.4-5</version>
   <path>libraries/idi</path>
   <description>IDI -- Image Display Interface</description>
@@ -2100,7 +2226,7 @@ No longer under active control.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="img">
+<component id="img" support="S">
   <version>1.3-1</version>
   <path>libraries/img</path>
   <description>IMG - Simple Image Data Access</description>
@@ -2122,9 +2248,13 @@ understand.
   </developers>
   <documentation> sun160</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="jpl">
+<component id="jpl" support="S">
   <version>2.0-2</version>
   <path>libraries/jpl</path>
   <description>JPL Ephemeris access routines</description>
@@ -2150,7 +2280,7 @@ understand.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="kaplibs">
+<component id="kaplibs" support="S">
   <version>2.8-2</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
@@ -2175,7 +2305,7 @@ independently of KAPPA.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="mag">
+<component id="mag" support="U">
   <version>1.1-4</version>
   <path>libraries/mag</path>
   <description>Fortran access to magentic tape devices</description>
@@ -2217,7 +2347,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="mers">
+<component id="mers" support="U">
   <version>1.8</version>
   <path>libraries/mers</path>
   <description>Message and Error Reporting Systems</description>
@@ -2247,7 +2377,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="nbs">
+<component id="nbs" support="S">
   <version>2.5-9</version>
   <path>libraries/nbs</path>
   <description>NBS Noticeboard System</description>
@@ -2276,7 +2406,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="ndf">
+<component id="ndf" support="S">
   <version>1.5-10</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
@@ -2306,9 +2436,13 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> ssn20 sun33</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="ndg">
+<component id="ndg" support="S">
   <version>5.2-2</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
@@ -2331,9 +2465,13 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun2</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="one">
+<component id="one" support="U">
   <version>1.1-5</version>
   <path>libraries/one</path>
   <description>General purpose Starlink odds and ends functions</description>
@@ -2370,7 +2508,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="par">
+<component id="par" support="S">
   <version>2.3</version>
   <path>libraries/par</path>
   <description>Interface to the ADAM Parameter System</description>
@@ -2408,7 +2546,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="pcs">
+<component id="pcs" support="S">
   <version>4.1-1</version>
   <path>libraries/pcs</path>
   <description>PCS -- Parameter and Communication Subsystems</description>
@@ -2571,10 +2709,14 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1999-2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
   <notes><p>Documentation is in the pcs-docs subdirectory.</p></notes>
 </component>
 
-<component id="pda">
+<component id="pda" support="S">
   <version>0.5-1</version>
   <path>libraries/pda</path>
   <description>Public Domain Algorithms</description>
@@ -2609,9 +2751,16 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun194</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+    <notes>
+      <p>Most of the code is public domain (that's the point)</p>
+    </notes>
+  </copyright>
 </component>
 
-<component id="pgp">
+<component id="pgp" support="S">
   <version>5.1.1-9</version>
   <path>libraries/pgp</path>
   <description>PGPLOT Graphics Subroutine Library (GKS version)q</description>
@@ -2641,7 +2790,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="prm">
+<component id="prm" support="S">
   <version>1.4-1</version>
   <path>libraries/prm</path>
   <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
@@ -2672,9 +2821,13 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun39</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987, 1988, 1991, 1992, 1995, 2004</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="psx">
+<component id="psx" support="U">
   <version>0.5</version>
   <path>libraries/psx</path>
   <description>POSIX interface routines</description>
@@ -2700,7 +2853,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="ref">
+<component id="ref" support="U">
   <version>1.1-4</version>
   <path>libraries/ref</path>
   <description>Routines for Handling References to HDS Objects</description>
@@ -2729,7 +2882,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="sae">
+<component id="sae" support="U">
   <version>1.0</version>
   <path>libraries/sae</path>
   <description>Starlink Applications Environment special files</description>
@@ -2752,7 +2905,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="sgs">
+<component id="sgs" support="S">
   <version>1.1-2</version>
   <path>libraries/sgs</path>
   <description>SGS -- Simple Graphics System</description>
@@ -2791,7 +2944,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="shl">
+<component id="shl" support="S">
   <version>1.0-1</version>
   <path>libraries/shl</path>
   <description>SHL -- Support for HLP Library access</description>
@@ -2826,7 +2979,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="sla">
+<component id="sla" support="S">
   <version>2.4-12</version>
   <path>libraries/sla</path>
   <description>SLALIB --- Positional Astronomy Library</description>
@@ -2848,9 +3001,13 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun67</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1989-2003</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="snx">
+<component id="snx" support="U">
   <version>1.1-1</version>
   <path>libraries/snx</path>
   <description>Starlink extensions to the NCAR Graphics Utilities</description>
@@ -2881,7 +3038,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="trn">
+<component id="trn" support="S">
   <version>0.9-5</version>
   <path>libraries/trn</path>
   <description>TRANSFORM - Coordinate Transformation Facility</description>
@@ -2912,9 +3069,13 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun61</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year></year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
-<component id="pgplot">
+<component id="pgplot" support="S">
   <version>5.2.2-2</version>
   <path>thirdparty/caltech/pgplot</path>
   <description>Native PGPLOT</description>
@@ -2933,7 +3094,7 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="autoconf" buildsupport="yes">
+<component id="autoconf" buildsupport="yes" support="U">
   <version>2.59</version>
   <path>thirdparty/fsf/autoconf</path>
   <description>Starlink autoconf</description>
@@ -2947,13 +3108,25 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>@PACKAGE_BUGREPORT</bugreports>
+  <copyright>
+    <year>1994-2004</year>
+    <name>Free Software Foundation</name>
+  </copyright>
+  <copyright>
+    <year>2004-5</year>
+    <name>Council for the Central Laboratory of the Research
+    Councils</name>
+    <notes>
+      <p>Modifications</p>
+    </notes>
+  </copyright>
   <notes><p>This version of autoconf has been patched to include
       Fortran preprocessor support.  Those patches were submitted
       to autoconf-patches@gnu.org in January 2004, and were being
       examined after that.</p></notes>
 </component>
 
-<component id="automake" buildsupport="yes">
+<component id="automake" buildsupport="yes" support="U">
   <version>1.8.2-starlink</version>
   <path>thirdparty/fsf/automake</path>
   <description>GNU automake, patched</description>
@@ -2972,6 +3145,17 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1994-2004</year>
+    <name>Free Software Foundation</name>
+  </copyright>
+  <copyright>
+    <year>2004-5</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+    <notes>
+      <p>Modifications</p>
+    </notes>
+  </copyright>
   <notes><p>This version of automake has been patched to include
       Fortran preprocessor support, and a variety of Starlink-specific
       targets.  The Fortran patches were submitted
@@ -2979,7 +3163,7 @@ Ultrix and for SunOS and may still work for them.
       examined after that.</p></notes>
 </component>
 
-<component id="libtool" buildsupport="yes">
+<component id="libtool" buildsupport="yes" support="U">
   <version>1.5</version>
   <path>thirdparty/fsf/libtool</path>
   <description>GNU libtool</description>
@@ -2993,11 +3177,15 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1996-2004</year>
+    <name>Free Software Foundation</name>
+  </copyright>
   <notes><p>This version of libtool is unpatched -- just the standard
       version.</p></notes>
 </component>
 
-<component id="m4" buildsupport="noauto">
+<component id="m4" buildsupport="noauto" support="U">
   <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
        add the buildsupport="yes" attribute.  If we did, then this would
        ALWAYS be built at the beginning of the bootstrap process.
@@ -3019,11 +3207,15 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990-1994, 2000-2004</year>
+    <name>Free Software Foundation</name>
+  </copyright>
   <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
     on 2004-03-07</p></notes>
 </component>
 
-<component id="cfitsio">
+<component id="cfitsio" support="U">
   <version>2.4-90</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
@@ -3047,7 +3239,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="jpeg">
+<component id="jpeg" support="U">
   <version>6b</version>
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>
@@ -3061,7 +3253,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="ncar">
+<component id="ncar" support="U">
   <version>1.3-1</version>
   <path>thirdparty/knoxville/ncar</path>
   <description>NCAR - Graphics Utilities</description>
@@ -3093,7 +3285,7 @@ GKS (SUN/83) should be used.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="itcl">
+<component id="itcl" support="U">
   <version>3.1.0</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>
@@ -3113,7 +3305,7 @@ GKS (SUN/83) should be used.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="tcl">
+<component id="tcl" support="U">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
@@ -3133,7 +3325,7 @@ GKS (SUN/83) should be used.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="tk">
+<component id="tk" support="U">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
