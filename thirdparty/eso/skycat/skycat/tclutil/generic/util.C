@@ -1,15 +1,19 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: util.C,v 1.2 1998/04/02 21:18:30 abrighto Exp $" 
+ * "@(#) $Id: util.C,v 1.1 1997/11/28 01:39:05 abrighto Exp $" 
  *
  * util.C - utility routines
  * 
  * who             when       what
  * --------------  ---------  ----------------------------------------
  * Allan Brighton  06.Jul.96  Created
+ * Peter W. Draper 24.Nov.97  Fixed up suffix to return characters
+ *                            after first '.' after last '/' or from
+ *                            the beginning of string if no '/'
+ *                            available, rather than just last '.'. 
  */
-static const char* const rcsId="@(#) $Id: util.C,v 1.2 1998/04/02 21:18:30 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: util.C,v 1.1 1997/11/28 01:39:05 abrighto Exp $";
 
 
 #include <string.h>
@@ -18,6 +22,7 @@ static const char* const rcsId="@(#) $Id: util.C,v 1.2 1998/04/02 21:18:30 abrig
 #include <ctype.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
 #include <iostream.h>
@@ -70,16 +75,23 @@ char* stripWhiteSpace(char* p)
 
 
 /* 
- * return the suffix of the filename (part following ".", if any)
+ * return the suffix of the filename, /xx/xx/xx.xxx or xx.xxx.
  */
 const char* fileSuffix(const char* name) 
 {
-    const char* p = strrchr(name, '.');
-    if (p)
-	return p+1;
+  char *c = (char *) name;
+  c = strrchr( c, '/' );
+  if ( !c ) {
+    c = (char *) name;
+    c--;
+  }
+  c = strchr( ++c, '.' );
+  if ( c ) {
+    return c + 1;
+  } else {
     return "";
+  }
 }
-
 
 /* 
  * return the basename of the file (part following last "/", if any)

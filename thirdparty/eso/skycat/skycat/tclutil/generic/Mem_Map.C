@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: Mem_Map.C,v 1.3 1998/08/21 10:46:56 abrighto Exp $
+ * $Id: Mem_Map.C,v 1.2 1998/02/09 08:03:12 abrighto Exp $
  *
  * Mem_Map.C - method definitions for class Mem_Map
  * Author:     Doug Schmidt - ripped from ACE_wrappers by K. Gillies.
@@ -8,8 +8,11 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  3 Aug 96  Created, added call to "sys_error()", set status_
+ * Peter W. Draper 23 Jan 97 Added cast to MAP_FAILED comparison (OSF/1).
+ *                 21 Nov 97 Added fix for OSF/1 problems with statvfs
+ *                           include.
  */
-static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.3 1998/08/21 10:46:56 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.2 1998/02/09 08:03:12 abrighto Exp $";
 
 
 #include <unistd.h>
@@ -21,9 +24,15 @@ static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.3 1998/08/21 10:46:56 ab
 #include "Mem_Map.h"
 #include <stdio.h>
 #ifdef HAVE_SYS_STATVFS_H
-extern "C" {  // needed on some systems (DEC alpha)
+#ifdef __alpha   // Extern "C" & prototypes missing on OSF/1
+extern "C" {
+#endif
 #include <sys/statvfs.h>
+int statvfs(const char *, struct statvfs *);
+int fstatvfs(int, struct statvfs *);
+#ifdef __alpha
 }
+#endif
 #endif
 
 //----------------------------------------------------------------------------
