@@ -14,8 +14,11 @@ require AutoLoader;
  
 @ISA = qw(Exporter DynaLoader); 
 
-# Version 1.3
-'$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
+# Version derived from CVS repository
+# This means I have to check it in before making a release
+# '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
+
+$VERSION = '1.40';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -290,7 +293,9 @@ sub par_get ($$$) {
 
   croak 'Usage: par_get(param, application, status)' if (scalar(@_)!=3);
   my  ($parname, $pkg, $status, $path, $filename, $tempstat, $prim,
-	 $loc, $there, $loco, $type, $locs, @cvalues, $el, $size);
+       $ploc, $loc, $there, $loco, $type, $locs, @cvalues, $el, $size);
+
+  my $SAI__OK = &NDF::SAI__OK;
 
   ($parname, $pkg, $status) = @_;
 
@@ -305,38 +310,74 @@ sub par_get ($$$) {
     return;
   }
 
-  return if $$status != &NDF::SAI__OK;
+  return if $$status != $SAI__OK;
 
   # Find the location of the SDF files
+  # Should be in $ADAM_USER or $HOME/adam
 
-  $path = $ENV{'ADAM_USER'};
-
-  if ($path !~ /./) {
-    $path = $ENV{'HOME'};
-    if ($path !~ /./) {
-      $$status = &NDF::SAI__ERROR;
-      err_rep('PARGET_NOPARS','Could not find the location of the ADAM parameter files. Neither ADAM_USER nor HOME were set.',$$status);
-      return;
-    }
-    # The HOME directory does not include adam explicitly
-    $path .= '/adam';
+  if (exists $ENV{'ADAM_USER'}) {
+    $path = $ENV{'ADAM_USER'};
+  } elsif (exists $ENV{'HOME'}) {
+    $path = $ENV{'HOME'} . '/adam';
+  } else {
+    $$status = &NDF::SAI__ERROR;
+    err_rep('PARGET_NOPARS','Could not find the location of the ADAM parameter files. Neither ADAM_USER nor HOME were set.',$$status);
+    return;
   }
 
-  $filename = "$path/$pkg";
+  # Now we need to go through and check that the package name does
+  # not include dots (since HDS_OPEN can not handle that)
+  # .sdf should not be here either
 
-  # Open the file
-  hds_open($filename, 'READ', $loc, $$status);
-  return if $$status != &NDF::SAI__OK;
+  $pkg =~ s/\.sdf//;
+
+  # Extract root
+  my ($root, @path) = split(/\./,$pkg);
+
+  $filename = "$path/$root";
+
+  # Open the file - $loc is the parent locator
+  hds_open($filename, 'READ', $ploc, $$status);
+  return if $$status != $SAI__OK;
+
+  # Allow one extra level of nesting (rather than abritrary
+  # recursion). Monolith parameter files store parameters for 
+  # all actions/tasks in a single file. This means that the 
+  # stats parameters are in kappa_mon.stats rather than simply
+  # kappa_mon.sdf
+
+  if ($#path > -1) {
+    # Look for the task name
+    dat_there($ploc, $path[0], $there, $$status);
+
+    if (! $there && $$status == $SAI__OK) {
+      $$status = &NDF::SAI__ERROR;
+      msg_setc('PAR', $path[0]);
+      msg_setc('PATH', $filename);
+      err_rep("PARGET_NOTASK", "There is no task \"^PAR\" in monolith file ^PATH", $$status);
+    }
+
+    dat_find($ploc, $path[0], $loc, $$status);
+
+    if ($#path > 0 && $$status == $SAI__OK) {
+      carp 'Only one level of HDS nesting is supported'
+	if $^W;
+    }
+
+  } else {
+    # Okay this is assumed to be a standard file
+    # so just clone the parent locator
+    dat_clone($ploc, $loc, $$status);
+  }
 
   # Find the object
   dat_there($loc, $parname, $there, $$status);
 
-  if (! $there) {
+  if (! $there && $$status == $SAI__OK) {
     $$status = &NDF::SAI__ERROR;
     msg_setc('PAR', $parname);
     msg_setc('PATH', $filename);
     err_rep("PARGET_NOOBJ", "There is no parameter \"^PAR\" in file ^PATH", $$status);
-    return;
   }
 
   # Obtain a locator to the desired value from the primitive object
@@ -351,15 +392,15 @@ sub par_get ($$$) {
     dat_find($loc, $parname, $locs, $$status);
     dat_type($locs, $type, $$status);
 
-    if ($type ne "ADAM_PARNAME") {
+    if ($type ne "ADAM_PARNAME" && $$status == $SAI__OK) {
       $$status = &NDF::SAI__ERROR;
       msg_setc('PAR', $parname);
       msg_setc('PATH', $filename);
       err_rep('PARGET_NOOBJ', 'Object ^PAR in file ^PATH is an arbitrary structure.', $$status);
       dat_annul($locs, $$status);
       dat_annul($loc, $$status);
+      dat_annul($ploc, $$status);
       return;
-
     } else {
 
       dat_find($locs, 'NAMEPTR', $loco, $$status);
@@ -369,18 +410,19 @@ sub par_get ($$$) {
   }
 
   # Find the number of elements associated with the object
-
   dat_size($loco, $size, $$status);
 
   # Get the values as a character array
   dat_getvc($loco, $size, \@cvalues, $el, $$status); # Need to pass reference
                                                      # when in module
   # Finish off
-  dat_annul($loco, $$status);
-  dat_annul($loc, $$status);
 
-  return (@cvalues);
+  dat_annul($loco, $$status) if defined $loco;
+  dat_annul($loc, $$status) if defined $loc;
+  dat_annul($ploc, $$status) if defined $ploc;
 
+  return (@cvalues) if $$status == $SAI__OK;
+  return undef;
 }
 
 #-----------------------------------------------------------------------
