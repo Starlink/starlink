@@ -77,7 +77,7 @@
 *        null value (!) is supplied no plot will be made. [Current graphics 
 *        device]
 *     IN1 = NDF (Read)
-*        The NDF to be displayed on the horizonmtal axis.
+*        The NDF to be displayed on the horizontal axis.
 *     IN2 = NDF (Read)
 *        The NDF to be displayed on the vertical axis.
 *     MARGIN( 4 ) = _REAL (Read)
