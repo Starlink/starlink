@@ -69,6 +69,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1997/06/09 21:43:06  timj
+*     Initialise BYTE_PTR and check status before running SCULIB_CFILLB
+*
 *     Revision 1.1  1997/05/30 02:49:31  timj
 *     Initial revision
 *
@@ -157,7 +160,8 @@
       MEAS_S_PTR= 0
       BOL_S_PTR = 0
       BOL_S_END = 0
-
+      BYTE_PTR  = 0
+      BYTE_END  = 0
 
       CALL SCULIB_MALLOC (N_POS * VAL__NBI, POS_S_PTR, POS_S_END,
      :     STATUS)
@@ -182,7 +186,9 @@
 *     (ie set to one) before masking the QUALITY array itself.
 
       BTEMP = 0
-      CALL SCULIB_CFILLB(N_POS * N_BOLS, BTEMP, %VAL(BYTE_PTR))
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_CFILLB(N_POS * N_BOLS, BTEMP, %VAL(BYTE_PTR))
+      END IF
 
 *     I am setting bit 1 in the mask array
 
