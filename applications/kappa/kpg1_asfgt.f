@@ -77,6 +77,7 @@
 
 *  External References:
       LOGICAL KPG1_ASSIR         ! Is string an IRAS90 SCS?
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
       CHARACTER DOM*30           ! Co-ordinate Frame specification
@@ -124,7 +125,7 @@
          FRM = AST_FRAME( NAX, ' ', STATUS )
 
 *  Give it the supplied Domain.
-         CALL AST_SETC( FRM, 'DOMAIN', DOM, STATUS )         
+         CALL AST_SETC( FRM, 'DOMAIN', DOM( : CHR_LEN( DOM ) ), STATUS )
 
 *  If the DOMAIN was one of the standard Domains, set up Title, Symbols,
 *  units, labels, etc.
