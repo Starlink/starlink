@@ -924,8 +924,7 @@ itcl::class gaia::GaiaDemo {
       refresh_
       wait_ $readtime_
       short_display {Detecting images...}
-      $toolbox run [code $this set_continue_]
-      vwait [scope continue_($this)]
+      $toolbox run
       wait_ $readtime_
       $toolbox close
       set catname [$toolbox get_catname]
@@ -1496,10 +1495,10 @@ $catlist
    protected variable running_ 0
 
    #  List of all known demos.
-   protected variable demolist_ \
-       "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-        contour_ detection_ blink_ grid_ astdefine_ astreference_ \
-        astrefine_ astcopy_ skycat_ archives_"
+    protected variable demolist_ \
+        "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+         contour_ detection_ blink_ grid_ astdefine_ astreference_ \
+         astrefine_ astcopy_ skycat_ archives_"
    
    #  Interval to wait while reading text
    protected variable readtime_ 15000

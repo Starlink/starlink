@@ -1956,7 +1956,7 @@ itcl::class gaia::GaiaSextractor {
 
 	    #  Set the command to run when measurements are available.
 	    if { $args != "" } { 
-	       set completed_cmd_ $args
+	       set complete_cmd_ $args
 	    }
 
             #  And run the application as required. Note "sdf" files
