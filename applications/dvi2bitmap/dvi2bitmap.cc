@@ -20,11 +20,13 @@ char *progname;
 main (int argc, char **argv)
 {
     string dviname;
+    int resolution = 72;	// in pixels-per-inch
 
     bool debug_ = false;
-    //DviFile::debug(true);
-    //PkFont::debug(true);
-    //PkRasterdata::debug(false);
+    DviFile::debug(1);
+    //DviFile::debug(2);
+    //PkFont::debug(2);
+    //PkRasterdata::debug(2);
     Bitmap::debug(true);
     if (char *pkpath = getenv("DVI2BITMAP_PK_PATH"))
 	PkFont::setFontPath(pkpath);
@@ -41,6 +43,12 @@ main (int argc, char **argv)
 		    Usage();
 		PkFont::setFontPath(*argv);
 		break;
+	      case 'r':
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		resolution = atoi (*argv);
+		break;
 	      default:
 		Usage();
 	    }
@@ -56,7 +64,7 @@ main (int argc, char **argv)
 
     try
     {
-	DviFile *dvif = new DviFile(dviname);
+	DviFile *dvif = new DviFile(dviname, resolution);
 	if (dvif->eof())
 	{
 	    cout << "Can't open file " << dviname << " to read\n";
@@ -98,9 +106,9 @@ main (int argc, char **argv)
 			 << ")\n";
 		// calculate glyph positions, taking into account the
 		// offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
-		// = (72px,72px) offset of the TeX origin.
-		int x = dvif->currH() + glyph->hoff() + 72;
-		int y = dvif->currV() + glyph->voff() + 72;
+		// = (resolution px,resolution px) offset of the TeX origin.
+		int x = dvif->currH() + glyph->hoff() + resolution;
+		int y = dvif->currV() + glyph->voff() + resolution;
 		bitmap->paint (x, y,
 			       glyph->w(), glyph->h(),
 			       glyph->bitmap());
@@ -166,6 +174,6 @@ DviError::DviError(char *fmt,...)
 
 void Usage (void)
 {
-    cout << "Usage: " << progname << " [-f PKpath ] dvifile" << '\n';
+    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] dvifile" << '\n';
     exit (1);
 }

@@ -19,9 +19,9 @@ class DviFile {
 public:
     bool eof();
     DviFileEvent *getEvent();
-    DviFile (string s);
+    DviFile (string s, int resolution);
     ~DviFile();
-    static debug (bool sw) { debug_ = sw; }
+    static debug (int level) { debug_ = level; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
     int currH() const { return hh_; }	// device units
@@ -49,7 +49,7 @@ private:
     double dviu_per_pt_;	// ...including magnification
     double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
     // resolution is in pixels-per-inch
-    const double resolution_ = 72;
+    int resolution_;
 
     // DVI units must be multiplied by
     // this factor to convert them to device (ie, pixel) units.
@@ -108,7 +108,7 @@ private:
     };
     PosStateStack *posStack_;
     map<int,PkFont*> fontMap_;
-    static bool debug_;
+    static int debug_;
 };
 
 

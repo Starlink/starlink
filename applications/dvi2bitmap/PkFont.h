@@ -22,7 +22,7 @@ class PkRasterdata {
 		 unsigned int w, unsigned int h);
     const Byte *bitmap()
 	{ if (bitmap_ == 0) construct_bitmap(); return bitmap_; }
-    static debug (bool sw) { debug_ = sw; }
+    static debug (int level) { debug_ = level; }
  private:
     Byte *rasterdata_, *eob_;
     const unsigned int len_, w_, h_;
@@ -34,7 +34,7 @@ class PkRasterdata {
     unsigned int unpackpk();
     Byte nybble();
     void construct_bitmap ();
-    static bool debug_;
+    static int debug_;
 };
 
 class PkGlyph {
@@ -66,12 +66,12 @@ class PkGlyph {
     double tfmWidth() const { return tfmwidth_; }
     // h/vEscapement() are the character's horizontal and vertical
     // escapements in pixels
-    int hEscapement();
-    int vEscapement();
-    static debug (bool sw) { debug_ = sw; }
+    int hEscapement() const { return dx_; }
+    int vEscapement() const { return dy_; }
+    static debug (int level) { debug_ = level; }
 
  private:
-    unsigned int cc_, dm_, dx_, dy_, w_, h_;
+    unsigned int cc_, dx_, dy_, w_, h_;
     double tfmwidth_;
     int hoff_, voff_;
     unsigned int hoffu_, voffu_;
@@ -79,7 +79,7 @@ class PkGlyph {
     PkRasterdata *rasterdata_;
     bool longform_;
     const Byte *bitmap_;
-    static bool debug_;
+    static int debug_;
     const double two20_ = 1048576;	// 2^20
     const double two16_ = 65536; // 2^16
     //int unpackTfmWidth (unsigned int tfmwidth);
@@ -94,13 +94,19 @@ class PkFont {
 	    string name);
     ~PkFont();
     PkGlyph *glyph (unsigned int i) const {
-	if (i > nglyphs_)
-	    throw DviBug ("requested out-of-range glyph");
-	return glyphs_[i];
+	if (font_loaded_)
+	{
+	    if (i > nglyphs_)
+		throw DviBug ("requested out-of-range glyph");
+	    return glyphs_[i];
+	}
+	else
+	    return glyphs_[0];	// dummy glyph
     }
-    static debug (bool sw) { debug_ = sw; }
+    static debug (int level) { debug_ = level; }
     static void setFontPath(string fp) { fontpath_ = fp; }
     static void setFontPath(char  *fp) { fontpath_ = fp; }
+    static void setResolution(int res) { resolution_ = res; }
     string name() const { return name_; }
     bool seenInDoc(void) const { return seen_in_doc_; }
     void setSeenInDoc(void) { seen_in_doc_ = true; }
@@ -109,15 +115,22 @@ class PkFont {
     double backSpace() const { return back_space_; }
     double quad() const { return quad_; }
     // design size, and horiz/vert pixels-per-point, in points
-    double designSize() const { return preamble_.designSize; }
+    double designSize() const {
+	if (font_loaded_)
+	    return preamble_.designSize;
+	else
+	    return font_header_.d;
+    }
     double hppp() const { return preamble_.hppp; }
     double vppp() const { return preamble_.vppp; }
     // return checksum obtained from PK file
     unsigned int checksum() const { return preamble_.cs; }
+    bool loaded() const { return font_loaded_; }
 
  private:
     string name_;
     InputByteStream *pkf_;
+    bool font_loaded_;		// font loaded successfully
     struct {
 	unsigned int c, s, d;
     } font_header_;		// this is the information retrieved
@@ -139,8 +152,9 @@ class PkFont {
     bool seen_in_doc_;		// true once the font_def command has been
     				// seen in the document, as well as the
     				// postamble
-    static bool debug_;
+    static int debug_;
     static string fontpath_;	// single string with %F in it
+    static int resolution_;
 };
 
 #endif // #ifndef PK_FONT_HEADER_READ

@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <cstring>
 
-bool Bitmap::debug_ = false;
+int Bitmap::debug_ = 0;
 
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
@@ -26,7 +26,7 @@ Bitmap::Bitmap (int w, int h)
     cropB = H;
     cropped_ = false;
 
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "new Bitmap(" << w << ',' << h << ")\n";
 }
 
@@ -67,7 +67,7 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     if (y+row1 < bbT) bbT = y+row1;
     if (y+row2 > bbB) bbB = y+row2;
 
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "Bitmap @ (" << x << ',' << y << "): (0:"
 	     << w << ",0:" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
@@ -98,7 +98,7 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
     if (row1 < bbT) bbT = row1;
     if (row2 > bbB) bbB = row2;
 
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "Rule @ (" << x << ',' << y << "): ("
 	     << w << "x" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2

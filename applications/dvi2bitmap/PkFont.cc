@@ -3,28 +3,40 @@
 
 #include <cstring>
 #include <cmath>
+#include <cstdio>		// for sprintf
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
 
 // define class static variables
-bool PkRasterdata::debug_;
-bool PkFont::debug_;
-bool PkGlyph::debug_;
+int PkRasterdata::debug_;
+int PkFont::debug_;
+int PkGlyph::debug_;
 string PkFont::fontpath_;
+int PkFont::resolution_ = 72;
 
 PkFont::PkFont(unsigned int dvimag,
 	       unsigned int c,
 	       unsigned int s,
 	       unsigned int d,
 	       string name)
+    : font_loaded_(false)
 {
+    font_header_.c = c;
+    font_header_.s = s;
+    font_header_.d = d;
+
     //name_ = "/var/lib/texmf/pk/ljfour/public/cm/cmr6.600pk"; // temp
     //name_ = "/var/lib/texmf/fonts/pk/ljfour/public/cm/cmr10.600pk";
-    name_ = fontpath_;
-    int strpos = name_.find("%F");
-    name_.replace(strpos, 2, name);
-    if (debug_)
+    //name_ = fontpath_;
+    //int strpos = name_.find("%F");
+    //name_.replace(strpos, 2, name);
+    // Fontpath stuff rudimentary -- eventually replace with KPSE
+    char fnbuf[200];
+    sprintf (fnbuf, "%s/%s.%dpk",
+	     fontpath_.c_str(), name.c_str(), resolution_);
+    name_ = fnbuf;
+    if (debug_ > 1)
 	cerr << "Font file: " << name_ << '\n';
     try
     {
@@ -34,25 +46,27 @@ PkFont::PkFont(unsigned int dvimag,
 	read_font (*pkf_);
 	delete pkf_;		// don't need the file any more
 
-	font_header_.c = c;
-	font_header_.s = s;
-	font_header_.d = d;
-	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
 	if (debug_)
+	    cerr << "Opened font " << name_ << " successfully\n";
+
+	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
+	if (debug_ > 1)
 	    cout << "PkFont: font scaling: "
 		 << dvimag << "/1000 * (" << s << '/' << d
 		 << ")=" << fontscale_ << '\n'
 		 << "DVI's font checksum=" << c << '\n';
 
-	quad_ = ((double)dvimag/1000.0) * d;
-	word_space_ = 0.2*quad_;
-	back_space_ = 0.9*quad_;
+	font_loaded_ = true;
     }
     catch (InputByteStreamError& e)
     {
-	string prob = e.problem();
-	throw PkError (prob);
+	cerr << "Font " << name << " at "
+	     << resolution_ << "dpi not found\n";
+	glyphs_[0] = new PkGlyph(resolution, this); // dummy glyph
     }
+    quad_ = ((double)dvimag/1000.0) * d;
+    word_space_ = 0.2*quad_;
+    back_space_ = 0.9*quad_;
 };
 
 PkFont::~PkFont()
@@ -81,7 +95,7 @@ void PkFont::read_font (InputByteStream& pkf)
     preamble_.vppp = (double)i/two16_;
 
 
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "PK file " << name_ << " '" << preamble_.comment << "\'\n"
 	     << "designSize="  << preamble_.designSize
 	     << " cs=" << preamble_.cs
@@ -188,7 +202,7 @@ void PkFont::read_font (InputByteStream& pkf)
 					     rd, this);
 		pkf.skip(packet_length);
 	    }
-	    if (debug_)
+	    if (debug_ > 1)
 		cerr << "Char " << g_cc
 		     << " tfm=" << g_tfmwidth
 		     << " w="   << g_w
@@ -216,7 +230,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			 special_len > 0;
 			 special_len--)
 			special += static_cast<char>(pkf.getByte());
-		    if (debug_)
+		    if (debug_ > 1)
 			cerr << "Special \'" << special << "\'\n";
 		}
 		break;
@@ -248,11 +262,13 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 int voff,
 		 PkRasterdata *rasterdata,
 		 PkFont *f) 
-    : cc_(cc), dm_(dm), w_(w), h_(h),
+    : cc_(cc), w_(w), h_(h),
       hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
       longform_(false), bitmap_(0) 
 {
     tfmwidth_ = tfmwidth/two20_ * f->designSize();
+    dx_ = dm;
+    dy_ = 0;
 };
 
 PkGlyph::PkGlyph(unsigned int cc,
@@ -265,34 +281,27 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int voff,
 		 PkRasterdata *rasterdata,
 		 PkFont *f)
-    : cc_(cc), dx_(dx), dy_(dy), w_(w), h_(h),
+    : cc_(cc), w_(w), h_(h),
       hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata), font_(f),
       longform_(true), bitmap_(0)
 {
     tfmwidth_ = tfmwidth/two20_ * f->designSize();
+    dx_ = static_cast<int>(floor(dx / two16_ + 0.5));
+    dy_ = static_cast<int>(floor(dy / two16_ + 0.5));
 };
+
+PkGlyph::PkGlyph(int resolution, PkFont *f)
+    : font_(f)
+{
+    tfmwidth_ = f->designSize();
+    throw DviBug ("Whoops haven't supported dummy glyph yet!");
+}
 
 const Byte *PkGlyph::bitmap()
 {
     if (bitmap_ == 0)
 	bitmap_ = rasterdata_->bitmap();
     return bitmap_;
-}
-
-int PkGlyph::hEscapement()
-{
-    if (longform_)
-	return static_cast<int>(floor(dx_ / two16_ + 0.5));
-    else
-	return dm_;
-}
-
-int PkGlyph::vEscapement()
-{
-    if (longform_)
-	return (int)floor(dy_ / two16_ + 0.5);
-    else
-	return 0;
 }
 
 PkRasterdata::PkRasterdata(Byte opcode,
@@ -339,7 +348,7 @@ unsigned int PkRasterdata::unpackpk ()
 	    repeatcount_ = unpackpk ();
 	res = unpackpk();	// get the following runcount
     }
-    if (debug_)
+    if (debug_ > 1)
 	cerr << '=' << res
 	     << ' ' << static_cast<int>(repeatcount_) << '\n';
     return res;
@@ -356,7 +365,7 @@ Byte PkRasterdata::nybble() {
     }
     else
 	res = (*rasterdata_++)&0xf;
-    if (debug_)
+    if (debug_ > 1)
 	cerr << '<' << static_cast<int>(res) << '\n';
     return res;
 }
@@ -402,7 +411,7 @@ void PkRasterdata::construct_bitmap()
 	Byte pixelcolour = start_black_;
 
 	repeatcount_ = 0;
-	if (debug_)
+	if (debug_ > 1)
 	{
 	    cerr << "dyn_f=" << static_cast<int>(dyn_f_)
 		 << " h=" << h_
@@ -424,7 +433,7 @@ void PkRasterdata::construct_bitmap()
 		{
 		    ncol = 0;
 		    nrow++;
-		    if (debug_)
+		    if (debug_ > 1)
 		    {
 			cerr << nrow << ':';
 			for (const Byte *p=rowstart; p<rowp; p++)

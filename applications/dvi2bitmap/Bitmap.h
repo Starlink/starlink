@@ -12,7 +12,7 @@ class Bitmap {
     enum imageFormats { gif, debugbitmap };
     void write (string filename, imageFormats format=gif);
     void crop ();
-    static debug (bool sw) { debug_ = sw; }
+    static debug (int level) { debug_ = level; }
 
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
@@ -26,7 +26,7 @@ class Bitmap {
     // cropX is the value of bbX when the crop() method was called
     int cropL, cropR, cropT, cropB;
     bool cropped_;
-    static bool debug_;
+    static int debug_;
 
     void write_debugbitmap (string filename);
     void write_gif (string filename);

@@ -9,11 +9,13 @@
 #include "InputByteStream.h"
 
 // Static debug switch
-bool DviFile::debug_;
+int DviFile::debug_;
 
-DviFile::DviFile (string s)
-    : fileName_(s)
+DviFile::DviFile (string s, int res)
+    : fileName_(s), resolution_(res)
 {
+    PkFont::setResolution(res);
+
     try
     {
 	dvif_ = new InputByteStream (s);
@@ -63,7 +65,7 @@ DviFileEvent *DviFile::getEvent()
     {
 	opcode = getByte();
 	int charno;
-	if (debug_)
+	if (debug_ > 1)
 	    cerr << 'O' << static_cast<int>(opcode) << '\n';
 	if (opcode <= 127)	// set character
 	{
@@ -167,8 +169,8 @@ DviFileEvent *DviFile::getEvent()
 		    posStack_->push(ps);
 		    //PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
 		    //posStack_.push(ps);
-		    if (debug_)
-			cerr << ">>ps=" << ps << '\n';
+		    //if (debug_ > 1)
+		    //cerr << ">>ps=" << ps << '\n';
 		}
 		break;
 	      case 142:		// pop
@@ -192,8 +194,8 @@ DviFileEvent *DviFile::getEvent()
 		    y_ = ps->y;
 		    z_ = ps->z;
 		    delete ps;
-		    if (debug_)
-			cerr << "<<ps=" << ps << '\n';
+		    //if (debug_ > 1)
+		    //	cerr << "<<ps=" << ps << '\n';
 		}
 		break;
 	      case 143:		// right1
@@ -582,7 +584,7 @@ void DviFile::updateH_ (int hup, int hhup)
     if (dist > max_drift_)
 	hh_ = Kh + sdist*max_drift_;
 
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "updateH_ ("
 	     << hup << ',' << hhup << ") -> ("
 	     << h_ << ',' << hh_ << ")\n";
@@ -634,7 +636,7 @@ void DviFile::read_postamble()
 	    ("DviFile::read_postamble: post_post not in correct place");
     p++;
     unsigned int q = InputByteStream::getUIU(4, p);
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "Postamble address=" << q << '\n';
 
     dvif_->seek(q);
@@ -649,7 +651,7 @@ void DviFile::read_postamble()
     postamble_.u = dvif_->getUIU(4);    
     postamble_.s = dvif_->getUIU(2);    
     postamble_.t = dvif_->getUIU(2);
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "Postamble: l=" << postamble_.l
 	     << " u=" << postamble_.u
 	     << " s=" << postamble_.s
@@ -775,7 +777,7 @@ void DviFile::process_preamble(DviFilePreamble* p)
     true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
     dviu_per_pt_ = true_dviu_per_pt_ * (double)p->mag/1000.0;
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
-    if (debug_)
+    if (debug_ > 1)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
 	     << ", px_per_dviu_ = " << px_per_dviu_
 	     << ", mag=" << p->mag << '\n';
