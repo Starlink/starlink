@@ -1,0 +1,47 @@
+1 CURSA
+
+  Version 6.4 of the CURSA package for manipulating astronomical
+  catalogues and tables has recently been released.  This version
+  contains no major changes, but rather a number of enhancements and
+  bug fixes.  The enhancements include the following.
+
+  * catchart, the application for plotting finding charts, has been
+    extended to plot objects as ellipses and also made more robust.
+
+  * The facilities to access remote catalogues via the Internet have
+    been completely re-worked and extended.
+
+  * catcopy, the application for copying catalogues, has an additional
+    facility to both omit selected catalogue parameters from, and to add
+    new parameters to, the output catalogue.
+
+  * catheader, the application for displaying catalogue header
+    information, has been re-worked and now offers various options and
+    more convenient output.
+
+  * A `quiet mode', in which fewer informational and warning messages
+    are issued, has been added to most of the applications.
+
+  * Support for the CHI/HDS catalogue format, which was little-used, has
+    been removed.  CURSA continues to be able to access catalogues in the
+    FITS tables format and simple text files in the Small Text List
+    (STL) and Tab-Separated Table (TST) formats.
+
+  * Most of the applications have been compiled into a single monolith,
+    rather than being released as individual A-tasks, in order to save
+    disk space.  This change should not usually affect the user.
+
+  In addition there are a few other minor enhancements and bug fixes.
+
+  The CURSA package is documented in SUN/190.  To view an on-line
+  version type:
+
+     showme sun190
+
+  Further information about CURSA is available via the World Wide
+  Web at the following URL:
+
+     http://www.starlink.rl.ac.uk/cursa/
+
+
+  A C Davenhall (acd@roe.ac.uk), 5 November 2001.
