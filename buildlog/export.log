@@ -8,19 +8,7 @@ export:
 call_package_ant:
      [echo] Executing JUnit target: export
 
-export:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/junit-3.7.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/junit/junit-3.7.tar
-     [gzip] Building: /apps/cvsbuild/export/junit-3.7.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/junit-3.7.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/junit/junit-3.7.tar
-     [echo] Executing tamfits target: export
-
 BUILD FAILED
-file:/apps/cvsbuild/java/source/build.xml:112: Basedir /apps/cvsbuild/java/source/tamfits does not exist
+file:/apps/cvsbuild/java/source/build.xml:109: Basedir /apps/cvsbuild/java/source/junit does not exist
 
-Total time: 6 seconds
+Total time: 1 second

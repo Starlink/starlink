@@ -8,12 +8,7 @@ install:
 call_package_ant:
      [echo] Executing JUnit target: install
 
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 55 files to /apps/cvsbuild/star/docs
-     [echo] Executing tamfits target: install
-
 BUILD FAILED
-file:/apps/cvsbuild/java/source/build.xml:112: Basedir /apps/cvsbuild/java/source/tamfits does not exist
+file:/apps/cvsbuild/java/source/build.xml:109: Basedir /apps/cvsbuild/java/source/junit does not exist
 
-Total time: 2 seconds
+Total time: 1 second

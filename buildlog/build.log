@@ -8,12 +8,7 @@ build:
 call_package_ant:
      [echo] Executing JUnit target: build
 
-prepare:
-
-build:
-     [echo] Executing tamfits target: build
-
 BUILD FAILED
-file:/apps/cvsbuild/java/source/build.xml:112: Basedir /apps/cvsbuild/java/source/tamfits does not exist
+file:/apps/cvsbuild/java/source/build.xml:109: Basedir /apps/cvsbuild/java/source/junit does not exist
 
 Total time: 1 second
