@@ -11,7 +11,7 @@
 #     Perl 5
 
 #  Invocation:
-#     scbindex.pl [package-location [package-location ...]]
+#     scbindex [-update] [package-location [package-location ...]]
 
 #  Description:
 #     This program attempts to find all the source code files which form
@@ -66,12 +66,15 @@
 #
 #     Each line in the task file is of the format:
 #
-#           package: task1 task2 task3 ...
+#           package:time: task1 task2 task3 ...
 #
 #     with each indexed package for which any entries appear in a 
 #     StarIndex object appearing exactly once.  Thus the tasks file
 #     is the record of all the packages which have been indexed as
-#     well as the record of all the task names.
+#     well as the record of all the task names.  The time field
+#     indicates the time associated with the index for this package
+#     (in seconds since the epoch); this is currently the time at 
+#     which the index for that package was built.
 #     Although the task file is plain text, some of the lines may be 
 #     quite long.
 
@@ -90,10 +93,34 @@
 #     (typically /star/sources).  Additionally all the files in the 
 #     include directory $incdir (typically /star/include) are indexed.
 
+#  Flags:
+#     -update
+#        If this flag is present then only packages which have been
+#        modified since they were last indexed are indexed.
+#        Time of last modification is determined from the mtime of 
+#        the files; of the tar file only if the indexed package is a 
+#        tar file, or of the directory and all the files in the top
+#        level only of the directory if it is a directory.
+
 #  Notes:
 #     Operation of this script will be affected by the build-time and 
 #     run-time values of certain environment variables, as documented
 #     in the module Scb.pm.
+
+#  Examples:
+#     scbindex
+#        Build an index, in directory $SCB_INDEX, of all the packages 
+#        in the default sources directory ($SCB_SOURCES).
+#     scbindex ccdpack
+#        Overwrite the index for the ccdpack package which is stored in
+#        the default sources directory.
+#     scbindex ~/star/ccdpack
+#        Overwrite the index in $SCB_INDEX with the copy of the ccdpack
+#        package which is in ~/star.
+#     scbindex -update
+#        Rewrite index entries for all the packages in the default 
+#        sources directory which have been updated since the last time
+#        scbindex was run.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -104,7 +131,9 @@
 
 #  History:
 #     24-AUG-1998 (MBT):
-#       Initial revision.
+#        Initial revision.
+#     13-DEC-1999 (MBT):
+#        Added -update flags and some other modifications.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -150,9 +179,17 @@ mkdirp $tmpdir, 0755;
 
 $SIG{'INT'} = sub {tidyup; exit;};
 
+#  Check command line flags to see if we are running in update-only mode.
+
+$update_only = 0;
+if ($ARGV[0] =~ /^-update/) {
+   shift @ARGV;
+   $update_only = 1;
+}
+
 #  Initialise index objects.
 
-my $fmode = @ARGV ? 'update' : 'new';
+my $fmode = (@ARGV || $update_only) ? 'update' : 'new';
 
 foreach $iname (@indexes) {
    $index{$iname} = StarIndex->new("$indexdir/$iname", $fmode);
@@ -163,10 +200,11 @@ foreach $iname (@indexes) {
 $taskfile = "$indexdir/tasks";
 
 if (@ARGV && open TASKS, $taskfile) {
-   my ($pack, $tasks);
+   my ($pack, $itime, $tasks);
    while (<TASKS>) {
-      ($pack, $tasks) = /^ *(\S+) *: *(.*)$/;
+      ($pack, $itime, $tasks) = split ":", $_;
       ${tasks{$pack}} = [ split ' ', $tasks ];
+      ${itime{$pack}} = $itime;
    }
    close TASKS;
 }
@@ -198,7 +236,7 @@ else {
 my ($line, $module);
 open TASKS, ">$taskfile" or error "Couldn't open $taskfile\n";
 foreach $pack (sort keys %tasks) {
-   $line = "$pack:";
+   $line = "$pack:" . $itime{$pack} . ":";
    foreach $task (uniq sort @{$tasks{$pack}}) {
 
 #     Look for an indexed module called "$task_", then "$task".  Add to
@@ -312,6 +350,30 @@ sub index_pack {
       return;
    }
 
+#  Check that we want to index this file (either $update_only is unset,
+#  or there are files more recent than the last index).
+
+   if ($update_only) {
+      my $uptodate = 1;
+      if ((stat $pack_file)[9] > $itime{$package}) {
+         $uptodate = 0;
+      }
+      if (-d $pack_file ) {
+         my $f;
+         foreach $f (<$pack_file/*>) {
+            if ((stat $f)[9] > $itime{$package}) {
+               $uptodate = 0;
+               last;
+            }
+         }
+      }
+      if ($uptodate) {
+         print "*** Skipping '$fqpack_file' (indexed since last change)"
+             . " ***\n"; 
+         return;
+      }
+   }
+
 #  If any records for this package already exist in any of the indexes,
 #  delete them.
 
@@ -372,6 +434,11 @@ sub index_pack {
       }
       popd;
    }
+
+#  If we have got this far then indexing has been successful; record last 
+#  indexed time.
+
+   $itime{$package} = time;
    
 }
  
@@ -456,7 +523,7 @@ sub index_list {
 #     and in any case we probably don't want to index it if it's not 
 #     really in the source tree.
 
-      if (-d $file && -r _ && -x _ && !-l _) {
+      if (-d $file && -r _ && -x _ && !-l $file) {
          index_dir "$path$file/", $file; 
       }
 

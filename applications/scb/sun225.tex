@@ -614,7 +614,19 @@ e.g.
 The packages so named will be taken from the SCB\_SOURCES directory in
 the same way as if the whole source tree is being indexed.
 
-Since the indexing can take a long time, it will probably be preferable to 
+Alternatively the {\tt -update} flag can be used:
+\begin{quote}
+\begin{verbatim}
+% scbindex -update
+\end{verbatim}
+\end{quote}
+This will look through the packages in SCB\_SOURCES and update the index
+for only those packages which appear (on the basis of the modification
+times of the files in the top level of the directory) to have been 
+changed since the last time an was built for them.
+
+Since indexing the whole Starlink source collection can take a long time, i
+t will probably be preferable to 
 run it in the background, possibly {\tt renice}d, with the output
 redirected elsewhere, e.g.:
 \begin{quote}
@@ -626,7 +638,7 @@ If the machine will be used by other people while the indexing
 is running, then you should seek advice from your system manager 
 about the nice level that ought to be used.
 
-While the indexing is taking place, the index files {\it may} 
+While the indexing is taking place, the index files {\it may\/} 
 (depending on the implementation of the database libraries on
 your system)
 be unreadable, so that the browser program ceases to work.

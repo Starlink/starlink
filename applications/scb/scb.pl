@@ -235,12 +235,12 @@ foreach $iname (@indexes) {
 #  Read list of packages and tasks if it will be required.
 
 if (!$name || $type eq 'regex') {
-   my $pack;
+   my ($pack, $time);
    my $taskfile = "$indexdir/tasks";
    open TASKS, $taskfile or error "Failed to open $taskfile\n";
    while (<TASKS>) {
-      ($pack, @tasks) = split;
-      $pack =~ s/:?$//;
+      my($pre, @tasks) = split;
+      ($pack, $time) = split ':', $pre;
       @{$tasks{$pack}} = @tasks;
    }
    close TASKS;
@@ -578,7 +578,7 @@ sub query_form {
       <br>
       <input type=submit value='Retrieve'>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <a href='$htxserver/sun225.htx/node16.html#xref_BROWSER-HELP'>Help</a>
+      <a href='$htxserver/sun225.htx/node17.html#xref_BROWSER-HELP'>Help</a>
       </form>
       <hr>
    ";
