@@ -2,13 +2,14 @@
 *                              arrays holding the switch chop data, chop 
 *                              variance, calibrator, cal variance and quality
 *                              separately
-      SUBROUTINE SCULIB_COPY_DEMOD_SWITCH (NBOLS, NJIG,
+      SUBROUTINE SCULIB_COPY_DEMOD_SWITCH (NBOLS, NJIG, LEVEL,
      :  SWITCH, SWITCH_DATA, SWITCH_VARIANCE, SWITCH_CALIBRATOR,
      :  SWITCH_CAL_VARIANCE, SWITCH_QUALITY, STATUS)
 *    Description :
 *     This routine copies the demodulated data for the jiggle positions
 *     measured in the last switch into separate arrays for the switch
 *     chop data, chop variance, calibrator, cal variance and quality.
+*     Quality is marked bad if BIT 1 is set and LEVEL is greater than requested
 *    Invocation :
 *     CALL SCULIB_COPY_DEMOD_SWITCH (NBOLS, NJIG,
 *    :  SWITCH, SWITCH_DATA, SWITCH_VARIANCE, SWITCH_CALIBRATOR,
@@ -18,6 +19,8 @@
 *           number of bolometers being measured
 *     NJIG                            = INTEGER (Given)
 *           number of jiggle positions measured
+*     LEVEL                           = INTEGER (Given)
+*           level at which spikes are marked as bad quality
 *     SWITCH (5, NBOLS, NJIG)         = REAL (Given)
 *           switch datablock
 *     SWITCH_DATA (NBOLS, NJIG)       = REAL (Returned)
@@ -28,7 +31,7 @@
 *           calibrator for this switch of the exposure
 *     SWITCH_CAL_VARIANCE (NBOLS, NJIG)= REAL (Returned)
 *           variance on the calibrator signal
-*     SWITCH_QUALITY (NBOLS, NJIG)    = INTEGER (Returned)
+*     SWITCH_QUALITY (NBOLS, NJIG)    = BYTE (Returned)
 *           quality for this switch of the exposure
 *     STATUS                          = INTEGER (Given and returned)
 *           global status
@@ -48,7 +51,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
-      INTEGER NBOLS, NJIG
+      INTEGER NBOLS, NJIG, LEVEL
       REAL SWITCH (5, NBOLS, NJIG)
 *    Inport-Export :
 *    Export :
@@ -56,15 +59,17 @@
       REAL SWITCH_VARIANCE (NBOLS, NJIG)
       REAL SWITCH_CALIBRATOR (NBOLS, NJIG)
       REAL SWITCH_CAL_VARIANCE (NBOLS, NJIG)
-      INTEGER SWITCH_QUALITY (NBOLS, NJIG)
+      BYTE SWITCH_QUALITY (NBOLS, NJIG)
 *    Status :
       INTEGER STATUS
 *    External references :
+      BYTE SCULIB_BITON
 *    Global variables :
 *    Local Constants :
 *    Local variables :
       INTEGER J 
       INTEGER BOL
+      INTEGER NQUAL      ! Integer quality
 *    Internal References :
 *    Local data :
 *-
@@ -83,7 +88,22 @@
             SWITCH_VARIANCE (BOL, J) = SWITCH (2, BOL, J)
             SWITCH_CALIBRATOR (BOL, J) = SWITCH (3, BOL, J)
             SWITCH_CAL_VARIANCE (BOL, J) = SWITCH (4, BOL, J)
-            SWITCH_QUALITY (BOL, J) = NINT (SWITCH (5, BOL, J))
+
+*           Check the quality
+            NQUAL = NINT(SWITCH (5, BOL, J))
+            SWITCH_QUALITY(BOL,J) = 0
+
+            IF (NQUAL .GT. 0) THEN
+               IF (MOD(NQUAL, 2) .EQ. 1)  THEN   ! ODD
+                  SWITCH_QUALITY(BOL,J) = 
+     :                 SCULIB_BITON(SWITCH_QUALITY(BOL,J), 1)
+                  NQUAL = NQUAL - 1
+               ENDIF
+               IF (NQUAL .GT. LEVEL) THEN
+                  SWITCH_QUALITY(BOL,J) = 
+     :                 SCULIB_BITON(SWITCH_QUALITY(BOL,J), 2)
+               ENDIF
+            ENDIF
 
          END DO
       END DO
