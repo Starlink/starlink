@@ -51,6 +51,8 @@
 #include "sae_par.h"
 #include "ccdtcl.h"
 #include "mers.h"
+#include "msg_par.h"
+#include "cnf.h"
 
 #define BUFLENG 4096
 
@@ -199,6 +201,8 @@
 *     It does it by writing the text of the command down the pipe to 
 *     the child process set up by a previous ccdTclStart call, and then
 *     reading the response sent back up the pipe from that process.
+*     It also watches for, and outputs appropriately, messages for 
+*     output via the CCDPACK logging system which may come up the pipe.
 *
 *  Arguments:
 *     cinterp = ccdTcl_Interp *
@@ -232,30 +236,59 @@
    the child process can execute it. */
       write( ofd, cmd, strlen( cmd ) + 1 );
 
+
+/* Loop until we get a return status which indicates the command has 
+   completed (i.e. not one which just requires output through the CCDPACK
+   logging system). */
+      do {
+
 /* Read the Tcl return status from the upward pipe. */
-      tclrtn = -1;
-      bytes = read( ifd, &tclrtn, sizeof( int ) );
+         tclrtn = -1;
+         bytes = read( ifd, &tclrtn, sizeof( int ) );
 
 /* Read the result of the evaluation from the upward pipe. */
-      c = retbuf - 1;
-      do {
-         if ( ++c >= retbuf + BUFLENG ) {
-            *status = SAI__ERROR;
-            errRep( "CCD_TCL_BUF", "Buffer overflow", status );
-            return NULL;
-         }
-         bytes = read( ifd, c, 1 );
+         c = retbuf - 1;
+         do {
+            if ( ++c >= retbuf + BUFLENG ) {
+               *status = SAI__ERROR;
+               errRep( "CCD_TCL_BUF", "Buffer overflow", status );
+               return NULL;
+            }
+            bytes = read( ifd, c, 1 );
 
 /* If the read failed then we probably caught a signal or the child
    process stopped writing in the middle of a command.  Neither of these
    should happen, so signal an error.  It might be desirable to do 
    something smarter than this on receipt of a signal (like try the
    read again) but I don't think that it is a very likely eventuality. */
-         if ( bytes != 1 ) {
-            strcpy( c, "\n   Tcl communications error\n" );
-            tclrtn = -1;
+            if ( bytes != 1 ) {
+               strcpy( c, "\n   Tcl communications error\n" );
+               tclrtn = -1;
+            }
+         } while ( *c != '\0' );
+
+/* If the Tcl return status was CCD_CCDMSG or CCD_CCDERR then what follows
+   are two strings, separated by a carriage return, to output via the 
+   CCDPACK logging system. */
+         if ( tclrtn == CCD_CCDMSG || tclrtn == CCD_CCDERR ) {
+            DECLARE_CHARACTER( fmsg, MSG__SZMSG );
+            DECLARE_CHARACTER( fname, MSG__SZMSG );
+            c = index( retbuf, '\n' );
+            *(c++) = '\0';
+            cnfExprt( retbuf, fname, MSG__SZMSG );
+            cnfExprt( c, fmsg, MSG__SZMSG );
+            if ( tclrtn == CCD_CCDMSG ) {
+               F77_CALL(ccd1_msg)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
+                                   INTEGER_ARG(status)
+                                   TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
+            }
+            else {
+               F77_CALL(ccd1_errep)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
+                                     INTEGER_ARG(status)
+                                     TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
+            }
          }
-      } while ( *c != '\0' );
+      } while ( tclrtn == CCD_CCDMSG || tclrtn == CCD_CCDERR );
 
 /* If the Tcl return status was not TCL_OK, then flag an error and write
    an error report. */
@@ -264,7 +297,7 @@
          char *estart;
          char *fmt = ( tclrtn == TCL_ERROR ) ? "Tcl error:\n%s" 
                                              : "Unexpected Tcl return:\n%s";
-         sprintf( buffer, fmt, retbuf );
+         snprintf( buffer, BUFLENG - strlen( fmt ), fmt, retbuf );
          *status = SAI__ERROR;
          for ( estart = buffer; ! done; estart = c + 1 ) {
             for ( c = estart; *c != '\n' && *c != '\0'; c++ );

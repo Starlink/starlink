@@ -22,6 +22,12 @@
 *     CCD1_ERREP routines, according to whether the '-error' flag is
 *     submitted.
 
+*  Notes:
+*     This command works by writing commands up the pipe to the parent
+*     process, if ccdwish is runningin pipes mode.  Therefore its
+*     implementation is closely tied to the interprocess communication
+*     code in the ccdwish binary.
+
 *  Arguments:
 *     options
 *        If present, the '-error' option will cause the output to get
@@ -50,6 +56,10 @@
 #include "cnf.h"
 #include "mers.h"
 #include "msg_par.h"
+#include "ccdtcl.h"
+
+   extern int ccdifd;
+   extern int ccdofd;
 
 /**********************************************************************/
    int CcdlogCmd( ClientData clientData, Tcl_Interp *interp, int objc,
@@ -62,8 +72,6 @@
       int status[ 1 ];
       char *msg;
       char *name;
-      DECLARE_CHARACTER( fmsg, MSG__SZMSG );
-      DECLARE_CHARACTER( fname, MSG__SZMSG );
 
 /* Process flags. */
       errmsg = 0;
@@ -90,38 +98,25 @@
          nleng = 1;
       }
 
-/* Turn string arguments into fortran-friendly strings. */
-      cnfExprt( msg, fmsg, mleng );
-      cnfExprt( name, fname, nleng );
+/* There are two possibilities: either we are running as a subprocess,
+   or we are running free standing.  Find out which. */
+      if ( ccdofd >= 0 ) {
 
-/* Begin an error context in a clean state. */
-      errMark();
-      *status = SAI__OK;
-
-/* Call the appropriate routine. */
-      if ( errmsg ) {
-         F77_CALL(ccd1_errep)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
-                               INTEGER_ARG(status)
-                               TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
+/* We are running as a subprocess.  Write the message in an appropriate
+   format back up the pipe to the parent. */
+         int log_flag;
+         log_flag = errmsg ? CCD_CCDERR : CCD_CCDMSG;
+         write( ccdofd, &log_flag, sizeof( int ) );
+         write( ccdofd, name, nleng );
+         write( ccdofd, "\n", 1 );
+         write( ccdofd, msg, mleng + 1 );
       }
       else {
-         F77_CALL(ccd1_msg)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
-                             INTEGER_ARG(status)
-                             TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
-      }
 
-/* The call failed - this is probably because the CCDPACK messaging system
-   was not enabled (ccdwish was freestanding rather than this being called
-   somewhere within a CCDPACK Atask).  In any case, we arrange to output
-   the error to the screen and assume that this will be enough.  This 
-   strategy could result in a duplicated error message.  So kill me. */
-      if ( *status != SAI__OK ) {
-         errAnnul( status );
+/* We are running freestanding.  Simply output the message to standard 
+   output. */
          printf( "%s\n", msg );
       }
-
-/* Release the error context. */
-      errRlse();
 
 /* Set result and exit successfully. */
       Tcl_SetObjResult( interp, Tcl_NewStringObj( "", 0 ) );

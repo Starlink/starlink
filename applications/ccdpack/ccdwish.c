@@ -72,6 +72,9 @@
       SIGHUP, SIGINT, SIGQUIT, SIGTERM,  /* Likely signals */
       0                                  /* List terminator */
    };
+   int ccdifd = -1;                 /* Downward pipe file descriptor */
+   int ccdofd = -1;                 /* Upward pipe file descriptor */
+
 
 /* Prototypes for local functions. */
 
@@ -117,6 +120,11 @@
             fprintf( stderr, "Usage: %s [-pipes ifd ofd]\n", argv[ 0 ] );
             exit( 1 );
          }
+
+/* Store the values of the pipes; other routines (currently, ccdlog) may
+   need to know these for direct communication with the parent. */
+         ccdifd = ifd;
+         ccdofd = ofd;
 
 /* We have values for both file descriptors.  Start up a Tcl interpreter
    and loop indefinitely. */

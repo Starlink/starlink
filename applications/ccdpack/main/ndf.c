@@ -480,13 +480,12 @@
    the list, but calls to this routine are unlikely ever to be very
    time-critical. */
          else {
-            int keyleng;
             char *key;
             char *pc;
             Tcl_Obj *valobj;
             result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
             for ( i = 2; i < objc; i++ ) {
-               key = Tcl_GetStringFromObj( objv[ i ], &keyleng );
+               key = Tcl_GetString( objv[ i ] );
                errMark();
                {
                   int status[] = { SAI__OK };
@@ -495,7 +494,7 @@
                   F77_POINTER_TYPE ipfits;
                   DECLARE_CHARACTER( fkey, 80 );
                   DECLARE_CHARACTER( fvalue, 80 );
-                  cnfExprt( key, fkey, keyleng );
+                  cnfExprt( key, fkey, 80 );
                   ipfits = cnfFptr( ndf->fits.data );
                   F77_CALL(ccd1_ftget)( INTEGER_ARG(&ndf->fits.ncard),
                                         (F77_POINTER_TYPE *) &ipfits,
