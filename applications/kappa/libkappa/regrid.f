@@ -412,6 +412,9 @@
 *        Modified propagation of WCS to use KPG1_ASFIX. Re-named
 *        from RESAMPLE to REGRID. Propagate QUALITY if Nearest Neighbour
 *        interpolation is being used.
+*     6-MAR-2003 (DSB):
+*        Changed the AST_RESAMPLE MAXPIX parameter from a fixed value of
+*        50 to 1 larger than the largest output dimension (for extra speed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -652,10 +655,6 @@
       CALL PAR_GET0D( 'TOL', TOL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Set the initial scale size for the Mapping linear approximation
-*  algorithm (see AST_RESAMPLE<X> documentation).
-      MAXPIX = 50
-
 *  Add an additional scaling factor to the Mapping.
 *  ================================================
 
@@ -807,8 +806,12 @@
      :                UBNDO, STATUS )
 
 *  Do a check that there is some overlap between the requested range
-*  and the resampled image of the NDF.
+*  and the resampled image of the NDF. Also, set the initial scale size 
+*  for the Mapping linear approximation algorithm to be equal to the 
+*  largest dimension (see AST_RESAMPLE<X> documentation).
+      MAXPIX = 50
       DO I = 1, NDIMO
+         MAXPIX = MAX( MAXPIX, UBNDO( I ) - LBNDO( I ) + 1 )
          IF ( UBNDO( I ) .LT. LBDEF( I ) .OR. 
      :        LBNDO( I ) .GT. UBDEF( I ) ) THEN
             STATUS = SAI__ERROR
@@ -818,6 +821,9 @@
             GO TO 999
          END IF
       END DO
+
+*  Ensure that MAXPIX is larger than the largest dimension.
+      MAXPIX = MAXPIX + 1
 
 *  Create and configure the output NDF.
 *  ====================================
