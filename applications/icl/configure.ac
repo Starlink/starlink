@@ -39,6 +39,12 @@ AC_CHECK_FUNCS([strsignal psignal sys_siglist])
 # General checks
 AC_CHECK_HEADERS([sys/time.h sys/utsname.h sys/wait.h signal.h])
 
+# icl.h
+AC_CHECK_FUNCS([isexception finite sys_nerr])
+
+# We expect finite to be defined in math.h
+AC_CHECK_DECLS([finite],,,[#include <math.h>])
+
 STAR_CNF_COMPATIBLE_SYMBOLS
  
 dnl    Documentation is in the parent directory

@@ -1,3 +1,7 @@
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 typedef void *PORTPTR;   /* should be void  */
 #define ICL_BUFSIZE 1024
 #include <stdlib.h>
@@ -60,11 +64,10 @@ extern node *NODENIL;
 
 extern int iocommand_q;
 
+/* Needed for sys_nerr. We use strerror now so this is not 
+   a worry. If strerror is not found we may need to worry. */
 #ifdef vaxc
 #include <perror.h>
-#elif !defined(linux)
-extern int sys_nerr;
-extern char *sys_errlist[];
 #endif
 
 #ifndef M_PI
@@ -72,16 +75,15 @@ extern char *sys_errlist[];
 #define M_PI	3.14159265358979323846
 #endif
 
-#if defined (mips) || defined (vaxc)
+#if HAVE_ISEXCEPTION
 #define isexc(val) (isexception (val))
-/* the Ultrix compiler will not cope with below */
 #else
 #define isexc(val) ((val).type == TYPE_EXCEPTION)
 #define cntlcexp(val) ((val).type == TYPE_EXCEPTION && \
 		     !strncmp((val).u.string, "CNTLC", 5) )
 #endif
 
-#ifdef mips
+#if HAVE_FINITE && !HAVE_DECL_FINITE
 long finite ();
 #endif
 
