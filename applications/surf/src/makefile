@@ -2,6 +2,9 @@
 
 .SUFFIXES : .ifl .ifc
 
+# Version string
+PKG_VERS = "'1.4-0JAC'"
+
 # Location of libsculib.a
 SCULIB   = ../sculib
 SURFLIB  = ../surflib
@@ -27,7 +30,7 @@ LDFLAGS =  -C -g
 # Compiler flags
 
 FFLAGS = -C -g
-FCPPFLAGS = -DHAS_IRAS90
+FCPPFLAGS = -DPKG_VERS=$(PKG_VERS)
 FC    = f77
 COMPIFL = compifl
 LINK   = ln -s
@@ -56,7 +59,7 @@ FSOURCES= surf_extinction.f surf_flatfield.f \
 	surf_grid_calcsky.f surf_reduce_noise.f surf_add_dbm.f \
 	surf_remip.f
 
-FCPPSOURCES=	surf_write_map_info.F
+FCPPSOURCES=	surf_write_map_info.F surf_set_app_name.F
 
 PKG_IFL = surf_mon.ifl
 

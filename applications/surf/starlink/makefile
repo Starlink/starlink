@@ -295,6 +295,8 @@
 #        Add REDUCE_NOISE
 #      30-Apr-1999 (TIMJ)
 #        Include PERL symbol. - no longer uses NDFPERL
+#        Add -DPKG_VERS to automatically write version number to
+#        monolith application name for history writing
 #        Version 1.4
 #     {enter_further_changes_here}
 #
@@ -472,7 +474,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.4alpha
+PKG_VERS = 1.4-0
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -572,7 +574,7 @@ surf_write_photom.f surf_write_photom_header.f surf_scuba2mem.f \
 surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f \
 surf_add_dbm.f surf_remip.f
 
-SURF_FCPP_ROUTINES = surf_write_map_info.F
+SURF_FCPP_ROUTINES = surf_write_map_info.F surf_set_app_name.F
 
 KAP_F_ROUTINES = \
 gethlp.f kpg1_agref.f kpg1_macol.f kpg1_qidat.f gthlpi.f kpg1_asref.f \
@@ -714,7 +716,7 @@ HELP_SOURCES = $(PKG_NAME).hlp
 
 DATA_FILES = calsig_450_850_photom.sdf calsig_450_850_bp2.sdf \
 	calsig_450_map.sdf calsig_450_850_map.sdf calsig_850_map.sdf \
-	ipfile.dat
+	ipfile.dat polimp.scuba
 
 
 #  Lists of Latex and hypertext documents.
@@ -881,7 +883,7 @@ MONO_OBJECT = $(MONO_SOURCE:.f=.o)
 .f.o:
 	$(FC) $(FFLAGS) -c $<
 .F.o:
-	$(FC) $(FFLAGS) $(FCPPFLAGS) -c $<
+	$(FC) $(FFLAGS) $(FCPPFLAGS) -DPKG_VERS="'$(PKG_VERS)'" -c $<
 
 
 #  List of object library files to be built and rules for building
@@ -1696,6 +1698,7 @@ surf_scuclip.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_scuhelp.o: PAR_ERR SAE_PAR
 surf_scuover.o: DAT_PAR GKS_PAR MSG_PAR NDF_PAR PAR_ERR PAR_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_scuphot.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_set_app_name.o: SAE_PAR PAR_PAR SURF_PAR
 surf_skydip.o: DAT_PAR MSG_PAR NDF_FUNC PAR_ERR PRM_PAR SAE_PAR SURF_PAR
 surf_write_data.o: PRM_PAR SAE_PAR
 surf_write_photom.o: PRM_PAR SAE_PAR
