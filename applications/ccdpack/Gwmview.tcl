@@ -841,9 +841,8 @@ class Gwmview {
          }
          set device [ devname ]
          if { $state == "active" } {
-            iCCDRunTask lutable \
-               "coltab=$table mapping=$maptype device=$device reset" \
-               3 itk_component(viewarea)
+            taskrun lutable \
+               "coltab=$table mapping=$maptype device=$device reset"
          }
       }
 

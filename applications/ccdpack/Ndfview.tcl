@@ -256,8 +256,7 @@
                                          [ lindex $percentiles 1 ] ]
 
 #  Display the NDF into the GWM item.
-         iCCDRunTask \
-            display " \
+         taskrun display " \
                in=$ndfname \
                device=[ devname ] \
                scale=true \
@@ -267,8 +266,7 @@
                margin=0 \
                style=\"tickall=1,drawtitle=0,$displaystyle\" \
                reset \
-            " \
-            3 $itk_component(viewarea)
+            " "Displaying NDF $ndfname"
 
 #  Ugly bug workaround.
          $canvas move gwmitem [ lindex $shift 0 ] [ lindex $shift 1 ]

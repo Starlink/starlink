@@ -418,8 +418,9 @@
                set scalevals [ $ndf percentile [ lindex $percs 0 ] \
                                                [ lindex $percs 1 ] ]
                set devname "xw;$gwmname"
-               iCCDRunTask \
-                  display " \
+               taskrun lutable \
+                  "coltab=grey mapping=linear device=$devname reset"
+               taskrun display " \
                      in=[ $ndf name ] \
                      device=$devname \
                      scale=true \
@@ -428,12 +429,7 @@
                      high=[ lindex $scalevals 1 ] \
                      margin=0 \
                      style=\"drawtitle=0,tickall=1,$displaystyle\" \
-                  " \
-                  3 $itk_component(choosearea)
-
-               iCCDRunTask \
-                  lutable "coltab=grey mapping=linear device=$devname reset" \
-                  3 $itk_component(choosearea)
+                  " "Displaying ndf [ $ndf name ]"
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                $ndf mapped 0
