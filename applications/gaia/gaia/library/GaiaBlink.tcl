@@ -282,6 +282,9 @@ itcl::class gaia::GaiaBlink {
             -command [code $this hscroll]
       }
 
+      #  Add all the images to the canvas.
+      add_views_ $Images
+
       #  Pack all widgets into place.
       pack $itk_component(Bframe) -side bottom -fill x  -ipadx 5 -ipady 5
       pack $itk_component(Close) -side right -expand 1 -ipadx 3 -ipady 3
@@ -302,8 +305,6 @@ itcl::class gaia::GaiaBlink {
       pack $itk_component(Vscroll) -side right -fill y
       pack $itk_component(Frame) -side left -expand 1 -fill both
 
-      #  And add all the views.
-      add_views_ $Images
    }
 
    #  Destructor:
@@ -344,20 +345,67 @@ itcl::class gaia::GaiaBlink {
    #  Images menu with checkbuttons to control which images are
    #  displayed.
    private method add_views_ {menu} {
+
+      set cmd \
+         [list canvas $itk_component(Frame).canvas \
+             -xscrollincr 1 \
+             -yscrollincr 1 \
+             -background black \
+             -insertofftime 0]
+
+      itk_component add canvas {
+         set canvas_ [uplevel "#0" $cmd]
+      } {
+         rename -relief -canvasrelief canvasRelief CanvasRelief
+         rename -borderwidth -canvasborderwidth canvasBorderwidth CanvasBorderwidth
+         rename -background -canvasbackground canvasBackground CanvasBackground
+         rename -width -canvaswidth canvasWidth CanvasWidth
+         rename -height -canvasheight canvasHeight CanvasHeight
+      }
+      #place $canvas_  -x 0 -y 0 -anchor nw -relwidth 1.0 -relheight 1.0
+      pack $canvas_ -fill both -expand 1
+
+      #  Stop the cursor from warping in canvas and add bindings
+      #  to move the mobile image.
+      bind $canvas_ <Left>  [code $this move_mobile_ -1 0]
+      bind $canvas_ <Right> [code $this move_mobile_ 1 0]
+      bind $canvas_ <Up>    [code $this move_mobile_ 0 -1]
+      bind $canvas_ <Down>  [code $this move_mobile_ 0 1]
+      bind $canvas_ <Control-Left>  [code $this move_mobile_ -5 0]
+      bind $canvas_ <Control-Right> [code $this move_mobile_ 5 0]
+      bind $canvas_ <Control-Up>    [code $this move_mobile_ 0 -5]
+      bind $canvas_ <Control-Down>  [code $this move_mobile_ 0 5]
+      bind $canvas_ <Shift-Left>  [code $this move_mobile_ -25 0]
+      bind $canvas_ <Shift-Right> [code $this move_mobile_ 25 0]
+      bind $canvas_ <Shift-Up>    [code $this move_mobile_ 0 -25]
+      bind $canvas_ <Shift-Down>  [code $this move_mobile_ 0 25]
+      
+      #  Make <Return> cycle through the images.
+      bind $canvas_ <Return>  [code $this view_next]
+      
+      #  <1> in canvas area gives it focus.
+      bind $canvas_ <1> [code focus $canvas_]
+      
+      #  Set canvas movements to change scrollbars.
+      $canvas_ configure -xscrollcommand "$itk_component(Hscroll) set"
+      $canvas_ configure -yscrollcommand "$itk_component(Vscroll) set"
+
       set n_ 0
       foreach w [skycat::SkyCat::get_skycat_images] {
-         itk_component add image$n_ {
-            RtdImage $itk_component(Frame).image$n_ -graphics 0 \
-               -scrollbars 0
-         }
-         set canvas_($n_) [$itk_component(image$n_) get_canvas]
-         set image_($n_) [$itk_component(image$n_) get_image]
+         set cmd [list image create rtdimage]
+         set image_($n_) [uplevel "#0" $cmd]
          set target_($n_) [$w get_image]
 	 set names_($n_) [$w cget -file]
 
+         #  Set the image to view the parent image.
+         $target_($n_) view add $image_($n_)
+
+         #  Put the image in the canvas. Position??
+         set imageId_ [$canvas_ create image 0 0  -image $image_($n_) \
+                          -anchor nw -tags $image_($n_)]
+
          set clone_num_($n_) [[winfo toplevel $w] cget -number]
          set clones_($n_) $w
-         set canvas $canvas_($n_)
 
 	 $menu add checkbutton \
             -label "$names_($n_)($clone_num_($n_))" \
@@ -367,36 +415,6 @@ itcl::class gaia::GaiaBlink {
             -command [code $this toggle_view_ $n_]
 	 set view_($this,$n_) 1
 
-         #  Stop the cursor from warping in canvas and add bindings
-         #  to move the mobile image.
-         bind $canvas <Left>  [code $this move_mobile_ -1 0]
-         bind $canvas <Right> [code $this move_mobile_ 1 0]
-         bind $canvas <Up>    [code $this move_mobile_ 0 -1]
-         bind $canvas <Down>  [code $this move_mobile_ 0 1]
-         bind $canvas <Control-Left>  [code $this move_mobile_ -5 0]
-         bind $canvas <Control-Right> [code $this move_mobile_ 5 0]
-         bind $canvas <Control-Up>    [code $this move_mobile_ 0 -5]
-         bind $canvas <Control-Down>  [code $this move_mobile_ 0 5]
-         bind $canvas <Shift-Left>  [code $this move_mobile_ -25 0]
-         bind $canvas <Shift-Right> [code $this move_mobile_ 25 0]
-         bind $canvas <Shift-Up>    [code $this move_mobile_ 0 -25]
-         bind $canvas <Shift-Down>  [code $this move_mobile_ 0 25]
-	 
-	 #  Make <Return> cycle through the images.
-         bind $canvas <Return>  [code $this view_next]
-
-         #  <1> in canvas area gives it focus.
-         bind $canvas <1> [code focus $canvas]
-
-         #  Set canvas movements to change scrollbars.
-         $canvas configure -xscrollcommand "$itk_component(Hscroll) set"
-         $canvas configure -yscrollcommand "$itk_component(Vscroll) set"
-
-         #  Set the view and place the image (use place to overlay).
-         $target_($n_) view add $image_($n_)
-         place $itk_component(image$n_)  -x 0 -y 0 -anchor nw \
-            -relwidth 1.0 -relheight 1.0
-         $itk_component(image$n_) center
          incr n_
       }
       set top_ [expr $n_ -1]
@@ -425,7 +443,7 @@ itcl::class gaia::GaiaBlink {
       incr top_
       if { $top_ >= $n_ } { set top_ 0 }
       if { $view_($this,$top_) } {
-         raise $itk_component(image$top_)
+         $canvas_ raise $image_($top_)
          update
          eval set id_ \
             [after $itk_option(-time) [code catch "$this raise_next" dummy]]
@@ -452,7 +470,7 @@ itcl::class gaia::GaiaBlink {
             }
          }
       }
-      raise $itk_component(image$top_)
+      $canvas_ raise $image_($top_)
       top_clone_
    }
 
@@ -478,36 +496,12 @@ itcl::class gaia::GaiaBlink {
 
    #  Scroll images vertically.
    method vscroll {args} {
-      if { $n_ > 0 } {
-
-         # All images has same scrollregion to keep aligned.
-         set w [$image_($mobile_) dispwidth]
-         set h [$image_($mobile_) dispheight]
-
-         for { set i 0 } { $i < $n_ } { incr i } {
-            eval $canvas_($i) yview $args
-
-            #  Make sure image scale changes are seen now.
-            $canvas_($i) configure -scrollregion "0 0 $w $h"
-         }
-      }
+      eval $canvas_ yview $args
    }
 
    #  Scroll images horizontally.
    method hscroll {args} {
-      if { $n_ > 0 } {
-
-         # All images has same scrollregion to keep aligned.
-         set w [$image_($mobile_) dispwidth]
-         set h [$image_($mobile_) dispheight]
-
-         for { set i 0 } { $i < $n_ } { incr i } {
-            eval $canvas_($i) xview $args
-
-            #  Make sure image scale changes are seen now.
-            $canvas_($i) configure -scrollregion "0 0 $w $h"
-         }
-      }
+      eval $canvas_ xview $args
    }
 
    #  Set the top clone information.
@@ -517,8 +511,7 @@ itcl::class gaia::GaiaBlink {
       $itk_component(Name) configure -value "$names_($top_) ($clone_num_($top_))"
 
       #  Image offset.
-      set imageId [$itk_component(image$top_) get_imageId]
-      lassign [$canvas_($top_) bbox $imageId] x0 y0 x1 y1
+      lassign [$canvas_ bbox $image_($top_)] x0 y0 x1 y1
       $image_($top_) convert coords $x0 $y1 canvas x0 y1 image
       $itk_component(Xlow) configure -value $x0
       $itk_component(Ylow) configure -value $y1
@@ -531,47 +524,38 @@ itcl::class gaia::GaiaBlink {
 
    #  Shift an image to a new position.
    private method place_animage_ {index dir new} {
-      set tag [$itk_component(image$index) get_imageId]
-      lassign [$canvas_($index) bbox $tag] x0 y0 x1 y1
+      lassign [$canvas_ bbox $image_($index)] x0 y0 x1 y1
       $image_($index) convert coords $x0 $y1 canvas x0 y1 image
       if { $dir == "x" } {
          set dx [expr $new-$x0]
          $image_($index) convert dist $dx 0 image dx dummy canvas
-         $canvas_($index) move $tag $dx 0
+         $canvas_ move $image_($index) $dx 0
       } else {
          set dy [expr $y1-$new]
          $image_($index) convert dist 0 $dy image dummy dy canvas
-         $canvas_($index) move $tag 0 $dy
+         $canvas_ move $image_($index) 0 $dy
       }
       update_view_ $index
    }
 
    #  Move the mobile image to a new position.
    private method move_mobile_ {dx dy} {
-      raise $itk_component(image$mobile_)
+      $canvas_ raise $image_($mobile_)
       set top_ $mobile_
       top_clone_
-      set tag [$itk_component(image$mobile_) get_imageId]
-      $canvas_($mobile_) move $tag $dx $dy
+      $canvas_ move $image_($mobile_) $dx $dy
    }
-   #  Experimental Move image using placer code. Replaces move command above.
-   #       set x [expr [winfo x $itk_component(image$mobile_)] + ($dx)]
-   #       set y [expr [winfo y $itk_component(image$mobile_)] + ($dy)]
-   #       place $itk_component(image$mobile_) -x $x -y $y \
-   #          -bordermode outside -relwidth 1.0 -relheight 1.0
 
    #  Move an image to a new position.
    private method move_image_ {index dx dy} {
-      raise $itk_component(image$index)
-      set tag [$itk_component(image$index) get_imageId]
-      $canvas_($index) move $tag $dx $dy
+      $canvas_ raise $image_($index)
+      $canvas_ move $image_($index) $dx $dy
    }
 
    #  Update the offsets of the view when activity drops (do not do this all
    #  the time as this is very slow).
    private method update_view_ { n } {
-      set tag [$itk_component(image$n) get_imageId]
-      lassign [$canvas_($n) bbox $tag] x0 y0 x1 y1
+      lassign [$canvas_ bbox $image_($n)] x0 y0 x1 y1
       set w [expr $x1-$x0+1]
       set h [expr $y1-$y0+1]
       $target_($n) view update $image_($n) 0 0 $w $h $x0 $y0 0 0 canvas
@@ -592,43 +576,45 @@ itcl::class gaia::GaiaBlink {
    #  image then we need to switch it to a visible image, plus if this
    #  is the last visible image then we deny the service.
    protected method toggle_view_ {n} {
-      if { $view_($this,$n) } {
-         place $itk_component(image$n) -x 0 -y 0 -anchor nw \
-            -relwidth 1.0 -relheight 1.0
-         $itk_component(image$n) center
-      } else {
-         set nok 0 
-         for { set i 0 } { $i < $n_ } { incr i } {
-            if { $view_($this,$i) } {
-               incr nok
-            }
-         }
-         if { $nok > 0 } {
-            place forget $itk_component(image$n)
-            if { $n == $mobile_ } {
-               view_next
-               set mobile_ $top_
-            }
-         } else {
-            set view_($this,$n) 1
-         }
-      }
+#       if { $view_($this,$n) } {
+#          place $itk_component(image$n) -x 0 -y 0 -anchor nw \
+#             -relwidth 1.0 -relheight 1.0
+#          $itk_component(image$n) center
+#       } else {
+#          set nok 0 
+#          for { set i 0 } { $i < $n_ } { incr i } {
+#             if { $view_($this,$i) } {
+#                incr nok
+#             }
+#          }
+#          if { $nok > 0 } {
+#             place forget $itk_component(image$n)
+#             if { $n == $mobile_ } {
+#                view_next
+#                set mobile_ $top_
+#             }
+#          } else {
+#             set view_($this,$n) 1
+#          }
+#       }
    }
 
    #  Modify the first image scroll to reflect the relative positioning 
    #  of the first clone.
    protected method init_scroll_ {} {
-       if { [info exists clones_(1)] } { 
-	   set canvas [$clones_(1) get_canvas]
-	   lassign [$canvas xview] xleft xright
-	   lassign [$canvas yview] yleft yright
-           if { $xleft != 0.0 } {
-	       hscroll moveto $xleft; #$canvas_(1) xview moveto $xleft
-	   }
-	   if { $yleft != 0.0 } {
-	       vscroll moveto $yleft; #$canvas_(1) yview moveto $yleft
-	   }
-       } 
+      set w [$image_(0) dispwidth]
+      set h [$image_(0) dispheight]
+      $canvas_ configure -scrollregion "0 0 $w $h"
+      if { [info exists clones_(1)] } { 
+         lassign [$canvas_ xview] xleft xright
+         lassign [$canvas_ yview] yleft yright
+         if { $xleft != 0.0 } {
+            hscroll moveto $xleft
+         }
+         if { $yleft != 0.0 } {
+            vscroll moveto $yleft
+         }
+      } 
    }
 
    #  Set the origins of the images to reflect any origins. Doesn't work!
@@ -639,12 +625,12 @@ itcl::class gaia::GaiaBlink {
          # All images has same scrollregion to keep aligned.
          set w [$image_(0) dispwidth]
          set h [$image_(0) dispheight]
+         $canvas_ configure -scrollregion "0 0 $w $h"
          for { set i 0 } { $i < $n_ } { incr i } {
             $image_($i) origin xo yo
             set dx [expr ( $xo - $bxo ) / 2]
             set dy [expr ( $byo - $yo ) / 2]
             puts "dx = $dx, dy = $dy ($xo $yo),($bxo,$byo),($w,$h)"
-            $canvas_($i) configure -scrollregion "0 0 $w $h"
             move_image_ $i $dx $dy
             #place_animage_ $i x $dx
             #place_animage_ $i y $dy
