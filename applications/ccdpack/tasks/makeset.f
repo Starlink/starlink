@@ -29,10 +29,13 @@
 *     other CCDPACK routines will know about the relationship between
 *     them.
 *
-*     MAKESET writes three items of data to each NDF:
+*     MAKESET writes the following items of data to the .MORE.CCDPACK.SET
+*     extension of each NDF:
 *        1. The Set NAME (a string identifying all NDFs in the same Set)
 *        2. The Set INDEX (an integer identifying the NDF's position 
 *           within the Set)
+*
+*     and it will also optionally (if ADDWCS is set true) write:
 *        3. The Set coordinate system (a coordinate frame in the NDF's 
 *           WCS component with the Domain 'CCD_SET').
 *
@@ -47,6 +50,18 @@
 *     makeset in
 
 *  ADAM Parameters:
+*     ADDWCS = _LOGICAL (Read)
+*        If ADDWCS is true, then MAKESET will attach a new coordinate
+*        system to the WCS component of the image.  The new coordinate
+*        frame will be a copy of the Current coordinate frame of
+*        the image, and will have the Domain name of 'CCD_SET';
+*        CCDPACK tasks concerned with registration know about this
+*        name and will use such a frame on the assumption that it
+*        constitutes a correct registration of images if it exists.
+*        Therefore this should be set true if the images which will
+*        form a Set are known to be aligned in their common Current
+*        coordinate system.
+*        [TRUE]
 *     IN = LITERAL (Read)
 *        A list of NDFs to group.  Normally, this should be a list of
 *        the NDFs which will be grouped into a single Set.  The order
@@ -121,7 +136,7 @@
 *        invocation of MAKESET has to be the same size.
 
 *  Examples:
-*     makeset "data1,data2,data3,data4"
+*     makeset "data1,data2,data3,data4" addwcs
 *        This will write Set information into the named NDFs; they will
 *        all be given the same Set Name attribute ("data1") and will
 *        be given the Set Index attributes 1, 2, 3 and 4 respectively.
@@ -151,13 +166,13 @@
 *        MAKESET to check that the order is correct.  It is safest
 *        to list Set members explicitly as in the previous example.
 *
-*     makeset "d1,d2,d3,e1,e2,e3" name=night1-* setsize=3
+*     makeset "d1,d2,d3,e1,e2,e3" name=night1-* setsize=3 addwcs=no
 *        This will construct two Sets, which will be given Set Name
 *        attributes of "night1-d1" and "night1-e1" respectively.
 *        You might want to do this if you are going to use these
 *        files along with other Sets generated from files with the
-*        names the same as these.
-*        Set Name attribute
+*        names the same as these.  No additions are made to the
+*        WCS componnent of the images.
 *
 *     makeset "d1,d3" indices=[1,3]
 *        This will construct a Set of the two named NDFs, giving them
@@ -230,6 +245,7 @@
       INTEGER INGRP              ! GRP identifier for input NDFs
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
+      INTEGER JSET               ! Symbolic frame index for new WCS frame
       INTEGER K                  ! Offset into input NDF list
       INTEGER LDRGRP             ! GRP identifier for NDF Set leader names
       INTEGER NAMGRP             ! GRP identifier for Set NAME attributes
@@ -239,6 +255,7 @@
       INTEGER NSET               ! Number of Sets to generate
       INTEGER NTRY               ! Number of tries for parameter entry
       INTEGER SETSIZ             ! Number of NDFs in each Set
+      LOGICAL ADDWCS             ! Add a CCD_SET frame?
       LOGICAL DIFER              ! Do some NDFs have different Current domain?
       LOGICAL ERASE              ! Are we erasing Set information?
       CHARACTER * ( AST__SZCHR ) DMN1 ! Domain of Set leader Current frame
@@ -319,7 +336,6 @@
 *  Get a list of integers to use for the Set INDEX attributes.  If null,
 *  use an array 1,2,3..SETSIZ.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      CALL PAR_EXACI( 'INDICES', SETSIZ, INDXS, STATUS )
       CALL CCD1_GISEQ( 1, 1, SETSIZ, INDDFL, STATUS )
       CALL PAR_GDR1I( 'INDICES', SETSIZ, INDDFL, 1, VAL__MAXI, .TRUE.,
      :                INDXS, STATUS )
@@ -337,18 +353,30 @@
       CALL CCD1_STRGR( 'NAME', LDRGRP, NSET, NSET, NAMGRP, NRET,
      :                 STATUS )
 
+*  Determine whether we are to add a CCD_SET frame.
+      CALL PAR_GET0L( 'ADDWCS', ADDWCS, STATUS )
+      IF ( ADDWCS ) THEN
+         JSET = AST__CURRENT
+      ELSE
+         JSET = AST__NOFRAME
+      END IF
+
 *  Write output message header to user.
       CALL CCD1_MSG( ' ', ' ', STATUS )
       LINE = ' '
       LINE( 2: ) = 'Set name'
       LINE( 12: ) = 'Set index'
       LINE( 24: ) = 'NDF name'
-      LINE( 60: ) = 'CCD_SET domain'
+      IF ( ADDWCS ) THEN
+         LINE( 60: ) = 'CCD_SET domain'
+      END IF
       CALL CCD1_MSG( ' ', LINE, STATUS )
       LINE( 2: ) = '--------'
       LINE( 12: ) = '---------'
       LINE( 24: ) = '--------'
-      LINE( 60: ) = '--------------'
+      IF ( ADDWCS ) THEN
+         LINE( 60: ) = '--------------'
+      END IF
       CALL CCD1_MSG( ' ', LINE, STATUS )
 
 *  Loop over Sets to be generated.
@@ -374,24 +402,28 @@
             CALL GRP_GET( INGRP, K, 1, NDFNAM, STATUS )
 
 *  Get the name of the Current domain.
-            CALL CCD1_GTWCS( INDF, IWCS, STATUS )
-            DMN = AST_GETC( IWCS, 'Domain', STATUS )
-            IF ( J .EQ. 1 ) THEN
-               DMN1 = DMN
-            ELSE
-               IF ( DMN .NE. DMN1 ) DIFER = .TRUE.
-            END IF 
-            CALL AST_ANNUL( IWCS, STATUS )
+            IF ( ADDWCS ) THEN
+               CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+               DMN = AST_GETC( IWCS, 'Domain', STATUS )
+               IF ( J .EQ. 1 ) THEN
+                  DMN1 = DMN
+               ELSE
+                  IF ( DMN .NE. DMN1 ) DIFER = .TRUE.
+               END IF 
+               CALL AST_ANNUL( IWCS, STATUS )
+            END IF
 
 *  Output a message to the user.
             LINE = ' '
             CALL CHR_ITOC( INDEX, LINE( 16: ), NCHAR )
             LINE( 24:58 ) = NDFNAM
-            LINE( 60: ) = DMN
+            IF ( ADDWCS ) THEN
+               LINE( 60: ) = DMN
+            END IF
             CALL CCD1_MSG( ' ', LINE, STATUS )
 
 *  Write the Set information.
-            CALL CCD1_SETWR( INDF, NAME, INDEX, AST__CURRENT, STATUS )
+            CALL CCD1_SETWR( INDF, NAME, INDEX, JSET, STATUS )
 
 *  Annul the NDF.
             CALL NDF_ANNUL( INDF, STATUS )
