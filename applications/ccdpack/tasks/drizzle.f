@@ -1133,7 +1133,7 @@
                  
 *  Create a Count array and map it, we'll use this to count the
 *  number of input pixels we've drizzled onto the output image
-      CALL CCD1_MKTMP( EL, OTYPE, CNREF, STATUS )
+      CALL CCD1_MKTMP( EL, '_INTEGER', CNREF, STATUS )
       CALL CCD1_MPTMP( CNREF, 'WRITE', OCNT, STATUS )  
              
       IF ( STATUS .NE. SAI__OK ) GOTO 940

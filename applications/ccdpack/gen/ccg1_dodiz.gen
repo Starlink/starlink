@@ -40,11 +40,11 @@
 *        Data type of the input NDF's
 *     ODAT( OX, OY ) = REAL (Given)
 *        Data component of the output NDF
-*     OWHT( OX, OY ) = DOUBLE PRECISION (Given)
+*     OWHT( OX, OY ) = <TYPE> (Given)
 *        Weight component of the output NDF
 *     OCNT( OX, OY ) = INTEGER (Given)
 *        Count component of the output NDF
-*     OVAR( OX, OY ) = REAL (Given)
+*     OVAR( OX, OY ) = <TYPE> (Given)
 *        Variance component of the output NDF
 *     FRCUR = INTEGER (Given)
 *        Pointer to the Current AST Frame
@@ -84,7 +84,7 @@
 *        Variance scaling factor (used when GETM is TRUE)
 *     VAR = LOGICAL (Given)
 *        Do we need to propogate the variances for this input image?
-*     VWHT( OX, OY ) = DOUBLE PRECISION (Given)
+*     VWHT( OX, OY ) = <TYPE> (Given)
 *        Weight component of the output NDF variance component
 *     STATUS = INTEGER (Given and Returned)
 *        Global status value
