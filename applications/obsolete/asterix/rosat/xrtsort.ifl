@@ -66,6 +66,11 @@
                PROMPT 'ARD file'
      ENDPARAMETER
 
+     PARAMETER BARD
+               TYPE '_CHAR'
+               PROMPT 'ARD file'
+     ENDPARAMETER
+
      PARAMETER CENTRE
                TYPE '_CHAR'
                PROMPT 'Nominal source centre'
