@@ -121,14 +121,13 @@ class PkFont {
     string name() const { return name_; }
     string fontFilename() const { return path_; }
     string fontgenCommand();
-    int magnification() const { return dvimag_; }
+    double magnification() const;
     int dpi() const { return static_cast<int>(resolution_
 					      * (double)dvimag_ / 1000.0); }
     static int dpiBase() { return resolution_; }
     int dpiScaled() const {
 	return static_cast<int>(resolution_
-				* ((double)font_header_.s * (double)dvimag_)
-				/ ((double)font_header_.d * 1000.0)
+				* magnification()
 				+ 0.5);
     }
     double scale() const {
