@@ -6,9 +6,7 @@
 ##
 ## This `template' is based on the Makefile.am for the CNF package, used
 ## because it contains most of the interesting features of Makefile.am files.
-
-## Always include Makefile.starconf -- provides necessary boilerplate
-include $(srcdir)/Makefile.starconf
+## Most Makefile.am files will be rather simpler than this.
 
 ## List the scripts which are to be installed in the `bin' directory,
 ## wherever it ends up.  bin_PROGRAMS is similar, but the variable
@@ -62,9 +60,6 @@ f77.h: cnf.h
 ## Declaring the file as a `built source' simply ensures that the file
 ## is generated at the very beginning of the build.  However the
 ## targets listed here _won't_ be built unless they are listed in some
-## other dependency above.
-##
-## As an extension to the automake conventions, we require that one of
-## the values in this line is `@BUILT_SOURCES@', which allows the
-## configuration macros to insert other values in this line when necessary.
-BUILT_SOURCES = f77.h @BUILT_SOURCES@
+## other dependency above (we've done it in PUBLIC_INCLUDES,
+## which is a dependency of libcnf_la_SOURCES).
+BUILT_SOURCES = f77.h
