@@ -81,7 +81,6 @@
       INTEGER                   I              ! loop counter
       INTEGER			IFID(2)			! Input dataset ids
       INTEGER                   LEN            ! Length of an axis
-      INTEGER                   LEN1, LEN2     ! length of input 1 & 2 units
       INTEGER                   LSHIFT         ! Alignment shift
       INTEGER			MOBJ			! MultiGraph object
       INTEGER			NBAD			! # bad quality points
@@ -97,6 +96,7 @@
       INTEGER                   QPTR           		! Pointer to quality array
       INTEGER                   SIGMA          ! Sigma width of Gaussian window
       INTEGER                   TPTR           		! Temporary pointer
+      INTEGERF			ULEN(2)			! Length of UNITS()
       INTEGER                   WRK1PTR        		! Pointer to work array
       INTEGER                   WRK2PTR        		! Pointer to work array
 
@@ -306,7 +306,7 @@
       CALL BDI_AXPUT1R( PHFID, 1, 'SpacedData', 2, SPARR, STATUS )
       CALL BDI_AXPUT0C( PHFID, 1, 'Label', 'Frequency', STATUS )
 
-      IF ( LEN1 .GT. 0 ) THEN
+      IF ( ULEN(1) .GT. 0 ) THEN
         CALL BDI_AXPUT0C( COFID, 1, 'Units', OUNITS, STATUS )
         CALL BDI_AXPUT0C( PHFID, 1, 'Units', OUNITS, STATUS )
       END IF
@@ -317,7 +317,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Compute cross-spectrum
-      CALL CROSSPEC_XS (NV, NTOT, LSHIFT, %VAL(DPTR1), %VAL(DPTR2),
+      CALL CROSSPEC_XS (NV, NTOT, LSHIFT, %VAL(DPTR(1)), %VAL(DPTR(2)),
      :            SIGMA, %VAL(WRK1PTR), %VAL(WRK2PTR), %VAL(CODAT),
      :                             %VAL(PHDAT), BANDWIDTH, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
