@@ -128,7 +128,8 @@ AC_ARG_WITH([motif],
   fi])
 
 AC_CHECK_HEADER([Xm/XmP.h], set have_xmheader = "yes" ) 
-AC_CHECK_LIB(Xm, xmp_PrependWidget, set have_xmlib = "yes" )
+AC_CHECK_LIB(Xm, XmScrolledWindowSetAreas, set have_xmlib = "yes" )
+
 AM_CONDITIONAL( HAVE_XMOTIF, \
    [test "$have_xmheader" = "yes" && test "$have_xmlib" = "yes"] )
 
