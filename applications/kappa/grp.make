@@ -307,10 +307,10 @@ wcsattrib.hlp wcscopy.hlp wcsframe.hlp wcsremove.hlp wcsshow.hlp \
 chain.hlp reshape.hlp copybad.hlp wcstran.hlp scatter.hlp kapversion.hlp
 
 # The contents of the kappa_data.tar file:
-KAPPA_DATA = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \ 
-ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf ccdframec.sdf comwest.sdf \ 
-spectrum.sdf m31.sdf iras.sdf grey_lut.sdf m31_issa_100.sdf \ 
-m31_issa_12.sdf m31_issa_25.sdf m31_issa_60.sdf m57.sdf logo.sdf \ 
+KAPPA_DATA = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf \
+ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf ccdframec.sdf comwest.sdf \
+spectrum.sdf m31.sdf iras.sdf grey_lut.sdf m31_issa_100.sdf \
+m31_issa_12.sdf m31_issa_25.sdf m31_issa_60.sdf m57.sdf logo.sdf \
 logo_lut.sdf
 
 # The contents of the kappa_ifls.tar file:
