@@ -1,31 +1,40 @@
 1 CONVERT_new_release
-                                             Expires 1992 November 30
+                                             Expires 1994 February 28
 
-A new version of CONVERT (V0.4) is now available.  There are five new 
-applications for converting to an IRAF image, between text files
-and NDFs, and between sequential unformatted files and NDFs.  All of
-these will handle FITS headers, if present.  Numerous bugs have been
-fixed, and DST2NDF has been relinked with the new DTA library. 
-Online help is provided.
+A new version of CONVERT (V0.5) is now available.  This is the first
+release for UNIX, and is available for Alpha/OSF1, Sun/Solaris,
+DEC/Ultrix, and Sun/SunOS with the following exceptions:
 
-To use the package from DCL, you must now enter
+  - BDF2NDF and NDF2BDF are not available because the Interim
+    library is not being ported.
 
-    $ CONVERTSTART
+  - DIPSO2NDF and NDF2DIPSO are not required because UNIX DIPSO
+    processes NDFs.
 
-since the commands are not defined in the SSC login.  From ICL, enter
+  - IRAF2NDF and NDF2IRAF are currently not available under OSF/1
+    and Solaris, because at the time of development there were no
+    IRAF IMFORT libraries released for these platforms.
 
-    ICL> CONVERT
 
-There is a new document (SUN/55.4) that accompanies this release.
-Details of the changes to CONVERT can be found in its Appendix B, or
-in the "Changes_to_CONVERT" help topic by entering
+To use the package from the UNIX shell, just enter
 
-    ICL> HELP CONVERT CHANGES
+    % convert
 
-once the package is initialised.
+and the CONVERT commands are then available.  Note that from
+CONVERT commands must be in lowercase and cannot be abbreviated
+from the UNIX shell.
 
-1 STARCON_withdrawn
-                                             Expires 1992 November 30
+The release also includes four new applications for converting from
+an IRAF image to an NDF, from an IRCAM-format file to a series of
+NDFs, and between GASP-format files and NDFs.  There are various
+improvements to existing applications, and bug fixes.  For details
+see the "Changes_to_CONVERT V0.5" topic in the CONVERT online help,
+for example on UNIX systems you enter
 
-The STARCON package has been withdrawn.  CONVERT (SUN/55) provides
-improved functionality in applications called BDF2NDF and NDF2BDF.
+    % conhelp changes V0.5
+
+or consult the new SUN/55.5 (Appendix B), which accompanies this
+release. 
+
+Malcolm Currie         Internet: CUR@STAR.RL.AC.UK 
+                       SPAN    : RLVAD::CUR
