@@ -13,23 +13,31 @@
 # current directory doesn't have to be called acinclude.m4, which
 # would confuse things.
 #
-# The <option> characters are `?' and `!'.  If the files start with a
-# `?' then they are optionally unpacked, depending on logic contained
-# within this script, which is kept consistent with the requirements
-# of macros in starconf.m4.in.  That is, files which do not have a `?' 
-# <option> are always unpacked.  If the <option> includes `!' then the
-# file is will overwrite any file of the same name in the directory in
-# which the `starconf' script is run; if the <option> `!' is not
-# present, then the script will not overwrite a file named <file> if
-# one exists in the directory.  Thus files which the starconf package
-# `owns' (such as the `acinclude.m4' file) should be given with a `!' 
-# option, and ones which it merely provides if they are not present
-# (such as the `component.xml.in' file) should not have a `!' option.
+# The <option> characters are `?', `!' and `*'.
+#
+#     If the files start with a `?' then they are optionally unpacked,
+#     depending on logic contained within this script, which is kept
+#     consistent with the requirements of macros in starconf.m4.in.
+#     That is, files which do not have a `?' <option> are always
+#     unpacked. 
+#
+#     If the <option> includes `!' then the file is will overwrite any
+#     file of the same name in the directory in which the `starconf'
+#     script is run; if the <option> `!' is not present, then the
+#     script will not overwrite a file named <file> if one exists in
+#     the directory.  Thus files which the starconf package `owns'
+#     (such as the `acinclude.m4' file) should be given with a `!'
+#     option, and ones which it merely provides if they are not
+#     present (such as the `component.xml.in' file) should not have a
+#     `!' option. 
+#
+#     If the <option> includes `*', then the corresponding file is
+#     made executable after it is extracted.
 #
 # This script generates a starconf script which has the specified
 # files contained within it.  When the (generated) starconf script is
-# run in a development directory, it scans configure.ac (objecting
-# if it isn't there), and builds a list of files to extract.  It
+# run in a development directory, it runs starconf-validate to check
+# that the configuration is OK, and builds a list of files to extract.  It
 # extracts these into a script, `starconf.status', which does nothing
 # other than unpack the files, and then execs the script; the user may
 # also run the `starconf.status' script to regenerate them, and it is
@@ -52,7 +60,7 @@ fi
 allconfchunks="$@"
 
 # The list of option characters
-optchars="?!"
+optchars="?!\*"
 
 # Find all the files which are always extracted -- that is, all the
 # files which do not have a `?' <option>
@@ -89,18 +97,22 @@ cat >&3 <<\_STARCONF_EOD
 extrachunks=""
 
 # Make sure we have a configure.ac in the current directory
-if test -r configure.ac; then
+if test -r configure.ac -a Makefile.am; then
     : OK
 else
-    echo "$0: can't find readable configure.ac"
+    echo "$0: can't find readable configure.ac and Makefile.am"
+    echo "    ...see $datadir for templates"
     exit 1
 fi
 
 # If we can find a starconf-validate script (that is, if we're on a build
-# system (which has starconf installed) rather than a distribution system)
-# then run starconf-validate to make sure everything's OK
+# system, which has starconf installed, rather than a distribution system)
+# then run starconf-validate to make sure everything's OK.  Call it
+# with the --force option, so that this will succeed, albeit with
+# warnings, the very first time that starconf is run in a directory,
+# before the user has had the chance to check in Makefile.in and friends.
 if test -x $bindir/starconf-validate; then
-    if $bindir/starconf-validate .; then
+    if $bindir/starconf-validate --force .; then
         : OK
     else
         echo "$0: Configuration not valid -- fix above errors first"
@@ -108,7 +120,20 @@ if test -x $bindir/starconf-validate; then
     fi
 fi
 
-# Scan configure.ac, getting all the used macros into a string
+if test -e bootstrap; then
+    # Check the `bootstrap' file, to see if the first word on the second line
+    # is `original'.  If it is, then unpack the bootstrap file, overwriting
+    # any bootstrap file that's already there.
+    original=`sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*/\1/;q;}' bootstrap`
+    if test "X$original" = Xoriginal; then
+        extrachunks=!bootstrap
+    fi
+else
+    # No `bootstrap' file, so unpack one
+    extrachunks=bootstrap
+fi
+
+# Scan configure.ac, getting all the used STAR_* macros into a string
 starmacros=`sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | sed '{:a;N;s/\n/ /;t a;}'`
 
 # Certain macros depend on certain additional files.  Scan the list of
@@ -147,6 +172,7 @@ fi
 # We now know what files we're going to include in the generated
 # starconf.status
 filelist=" $defaultchunks $extrachunks "
+# echo "XXX filelist=$filelist"
 
 # Make sure there's a link to the installed componentinfo.dtd
 test -e componentinfo.dtd || $ln_s $datadir/componentinfo.dtd componentinfo.dtd
@@ -165,8 +191,8 @@ for f in $filelist
 do
 _STARCONF_EOD
 echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
-echo 'done'                                            	                >&3
-echo 'echo "" >&4'                                                      >&3
+echo 'done'                                                              >&3
+echo 'echo "" >&4'                                                       >&3
 
 for ch in $allconfchunks
 do
@@ -178,18 +204,23 @@ do
     # Don't just cat to &3 here -- we need to be careful about quoting
     echo ""                                                              >&3
     echo "# -------------------- $filename --------------------"         >&3
-    echo "if test \`expr \"\$filelist\" : '.* [$optchars]*$filename'\` -gt 0; then" >&3
     echo "echo '# ---------- $filename ----------'       >&4"            >&3
 
-    # if the `!' <option> is present, ...
-    if expr "$opts" : '.*!' >/dev/null; then
-        # ...then just unpack the file (stomp away!)
-        echo "echo 'unpack_this=true'                    >&4"            >&3
-    else
-        # ...but if not, then only unpack the file if there's no such 
-        # file in the current directory (ie, don't stomp on modified files)
-        echo "echo 'if test -e $filename; then unpack_this=false; else unpack_this=true;fi' >&4" >&3
-    fi
+    # Handle the ! option
+    echo 't=`expr "x $filelist" : "x .* \(['$optchars']*\)'$filename'"`' >&3
+    echo 'echo filename='$filename'  t=$t'                               >&3
+    echo '# If the ! option is present, ...'                             >&3
+    echo 'if expr "x$t" : "x.*\(!\)" >/dev/null; then'                   >&3
+    echo '    # ...then just unpack the file (stomp stomp stomp)'        >&3
+    echo '    echo unpack_this=true                      >&4'            >&3
+    echo 'else'                                                          >&3
+    echo '    # ...but if not, then only unpack the file if'             >&3
+    echo '    # there is no such file in the current directory'          >&3
+    echo '    # (ie, avoid stomping on modified files)'                  >&3
+    echo "    echo 'if test -e $filename; then unpack_this=false; else unpack_this=true;fi' >&4" >&3
+    echo 'fi'                                                            >&3
+
+    # do the unpacking
     echo "echo 'if \$unpack_this; then'                  >&4"            >&3
     echo "echo '    echo \"Creating $filename\"'         >&4"            >&3
     echo "echo '    cat >$filename <<\_STARCONF_EOD'     >&4"            >&3
@@ -197,10 +228,14 @@ do
     cat $filesource                                                      >&3
     echo '_STARCONF_EOD'                                                 >&3
     echo 'echo _STARCONF_EOD                             >&4'            >&3
+    # Is this file to be made executable (* option present)?
+    if expr "$opts" : '.*\*' >/dev/null; then
+        echo "echo '    chmod +x $filename'              >&4"            >&3
+    fi
     echo "echo 'else'                                    >&4"            >&3
     echo "echo '    echo \"File $filename already exists, not overwriting\"'>&4 ">&3
     echo "echo 'fi'                                      >&4"            >&3
-    echo 'fi'                                                            >&3
+#    echo 'fi'                                                            >&3
 done
 
 cat >&3 <<\_STARCONF_EOD
