@@ -25,4 +25,5 @@ testphotom: testphotom.in
 	-rm -f testphotom.tmp testphotom
 	$(edit) \
 	$(srcdir)/testphotom.in >testphotom.tmp
-	mv testphotom.tmp testphotom	
+	mv testphotom.tmp testphotom
+	chmod 0755 testphotom	

@@ -36,6 +36,7 @@ echo "                            ******************"
 echo "                            * Test of PHOTOM *"
 echo "                            ******************"
 
+setenv PHOTOM_DIR @bindir@
 source @bindir@/photom_init
 
 echo "                *****************************************"
