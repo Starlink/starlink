@@ -2409,6 +2409,8 @@ C
 *    Import-Export :
 *    Export :
       BYTE OQUAL(NT)                ! Quality of each time bin
+*    Functions :
+      BYTE BIT_ANDUB
 *    Local constants :
 *    Local variables :
       INTEGER TLP,XLP,YLP,PLP,RLP
@@ -2424,7 +2426,8 @@ C
              DO RLP=1,NR
 *
 *     If this bin is good - set output quality good
-               IF ( (IQUAL(XLP,YLP,TLP,PLP,RLP) .AND. MASK) .EQ. 0) THEN
+               IF ( BIT_ANDUB(IQUAL(XLP,YLP,TLP,PLP,RLP),MASK).EQ.0)
+     :                                                          THEN
                   OQUAL(TLP) = QUAL__GOOD
                ENDIF
 *

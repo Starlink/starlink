@@ -400,7 +400,7 @@
      &                              CSTRING2(IND2A:IND2B)
       ENDDO
 *
-1000  FORMAT(X,'M',A,4X,'M',A)
+1000  FORMAT(1X,'M',A,4X,'M',A)
 *
       CALL FIO_PUNIT(MUNIT, STATUS)
 *

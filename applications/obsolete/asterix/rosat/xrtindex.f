@@ -30,6 +30,7 @@
 *     18 Dec 1995 V2.0-0 (DJA):
 *        ADI port. Split in two for cleaner XRTCONV interface
 *      7 Apr 98 V2.2-1 Removed Structures (rjv)
+*      7 Apr 98 v2.2-2 linux port (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -90,6 +91,7 @@
         EXTERNAL CHR_LEN
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC                  ! Locator to HDS file
+      CHARACTER*132 IFILE
       INTEGER IUNIT,OFID,IFID
       INTEGER ISTAT
       INTEGER INDEX  ! structure to hold index
@@ -118,8 +120,8 @@
       END IF
 
 *  Create the index file
-      CALL ADI_FCREAT( HNAME(:CHR_LEN(HNAME))//'_hdr%hds',
-     :                                  ADI__NULLID, OFID, STATUS )
+      IFILE=HNAME(1:CHR_LEN(HNAME))//'_hdr%hds'
+      CALL ADI_FCREAT( IFILE,  ADI__NULLID, OFID, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Write Rationalised fits version
