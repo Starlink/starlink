@@ -92,15 +92,16 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER			ID			! See above
-      CHARACTER*(*)		MEMBER
+      INTEGER			ID
+      CHARACTER*(*)		MEMBER,CMP
       CHARACTER*(DAT__SZLOC)	LOC
-      CHARACTER*(*)		CMP
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*(DAT__SZLOC)	CLOC			! HDS object to write
+
       <TYPE>			VALUE			! Intermediate value
 
       INTEGER			DIMS(ADI__MXDIM)	! Data dimensions
@@ -128,17 +129,24 @@
 *  Try to copy if it exists
       IF ( THERE ) THEN
 
-*    HDS value already exists? If so, delete it
-        CALL DAT_THERE( LOC, CMP, THERE, STATUS )
-        IF ( THERE ) THEN
-          CALL DAT_ERASE( LOC, CMP, STATUS )
-        END IF
-
 *    Get dimensions
         CALL ADI_SHAPE( MID, ADI__MXDIM, DIMS, NDIM, STATUS )
 
-*    Create the HDS value
-        CALL DAT_NEW( LOC, CMP, '<HTYPE>', NDIM, DIMS, STATUS )
+*    HDS value already exists? If so, delete it
+        IF ( CMP .GT. ' ' ) THEN
+          CALL DAT_THERE( LOC, CMP, THERE, STATUS )
+          IF ( THERE ) THEN
+            CALL DAT_ERASE( LOC, CMP, STATUS )
+          END IF
+
+*      Create the HDS value
+          CALL DAT_NEW( LOC, CMP, '<HTYPE>', NDIM, DIMS, STATUS )
+          CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
+
+        ELSE
+          CALL DAT_CLONE( LOC, CLOC, STATUS )
+
+        END IF
 
 *    Scalar?
         IF ( NDIM .EQ. 0 ) THEN
@@ -147,7 +155,7 @@
           CALL ADI_GET0<T>( MID, VALUE, STATUS )
 
 *      Write to HDS
-          CALL CMP_PUT0<T>( LOC, CMP, VALUE, STATUS )
+          CALL DAT_PUT0<T>( CLOC, VALUE, STATUS )
 
         ELSE
 
@@ -155,13 +163,15 @@
           CALL ADI_MAP<T>( MID, 'READ', VPTR, STATUS )
 
 *      Write to HDS
-          CALL CMP_PUTN<T>( LOC, CMP, NDIM, DIMS, %VAL(VPTR), DIMS,
-     :                      STATUS )
+          CALL DAT_PUTN<T>( CLOC, NDIM, DIMS, %VAL(VPTR), DIMS, STATUS )
 
 *      Unmap the ADI data
           CALL ADI_UNMAP( MID, VPTR, STATUS )
 
         END IF
+
+*    Release the HDS object
+        CALL DAT_ANNUL( CLOC, STATUS )
 
       END IF
 
