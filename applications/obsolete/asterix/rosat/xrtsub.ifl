@@ -1,5 +1,14 @@
 INTERFACE XRTSUB
 
+     PARAMETER ROOTNAME
+               POSITION 1
+               TYPE    '_CHAR'
+               PROMPT  'Rootname of files to sort'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter name of files without the extension'
+               VPATH   'PROMPT'
+     ENDPARAMETER
+
      PARAMETER SOURCE
                POSITION 1
                TYPE    'LITERAL'
