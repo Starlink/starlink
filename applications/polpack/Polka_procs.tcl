@@ -10300,7 +10300,7 @@ proc Save {} {
 
          set pfrm [frame $fr0.pfrm]
          SetHelp $pfrm ".  A list of the processing stages involved in creating the output images. Tick marks are displayed next to the stages which have been completed, and the current stage is highlighted in red. "
-         pack $imlist $pfrm -side left -fill both -padx 4m -pady 4m
+         pack $imlist $pfrm -side left -fill x -padx 4m -pady 4m
 
          if { $STOKES } {
             set stok [frame $topf.stok -background $back]
@@ -10329,13 +10329,13 @@ proc Save {} {
 
          set image ""
          set fr1 [frame $pfrm.fr1]
-         pack $fr1 -side top -anchor w -fill both -expand 1
+         pack $fr1 -side top -anchor nw -fill x 
          set l1 [label $fr1.l1 -text "Doing image: " -font $S_FONT]
          set l2 [label $fr1.l2 -textvariable SIMAGE]
          pack $l1 $l2 -side left -padx 6m 
 
          set fr234 [frame $pfrm.fr234 -background $back -bd 2 -relief raised]
-         pack $fr234 -side left -padx 5m -pady 3m -fill both -expand 1
+         pack $fr234 -side left -padx 5m -pady 3m -fill x -expand 1
          pack [label $fr234.lb -text "Processing stages" -font $S_FONT -background $back] -side top 
 
          set fr2 [frame $fr234.fr2 -background $back]
