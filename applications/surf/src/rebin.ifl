@@ -206,6 +206,7 @@
          DEFAULT 'FALSE'
          PROMPT 'Store the weights array'
          VPATH 'DEFAULT'
+         HELPKEY '*'
       ENDPARAMETER
          
       PARAMETER TIMES
@@ -213,6 +214,7 @@
          DEFAULT 'FALSE'
          PROMPT 'Store the times array'
          VPATH 'DEFAULT'
+         HELPKEY '*'
       ENDPARAMETER
 
 
