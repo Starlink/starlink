@@ -1,8 +1,29 @@
-// Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
-// See file LICENCE for conditions.
+//    This file is part of dvi2bitmap.
+//    Copyright 1999--2002, Council for the Central Laboratory of the Research Councils
+//    
+//    This program is part of the Starlink Software Distribution: see
+//    http://www.starlink.ac.uk 
 //
-// $Id$
+//    dvi2bitmap is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    dvi2bitmap is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with dvi2bitmap; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    The General Public License is distributed along with this
+//    program in the file LICENCE.
+//
+//    Author: Norman Gray <norman@astro.gla.ac.uk>
+//    $Id$
+
 
 #ifndef PK_FONT_HEADER_READ
 #define PK_FONT_HEADER_READ 1
@@ -120,8 +141,18 @@ class PkFont {
 	    return glyphs_[0];	// dummy glyph
     }
     static void verbosity (const verbosities level);
-    static void setFontPath(string fp) { fontpath_ = fp; }
-    static void setFontPath(char  *fp) { fontpath_ = fp; }
+    // setFontPath: specify path to search for fonts.  If argument is
+    // null or zero length, simple enable this.
+    static void setFontSearchPath(string fp);
+    static void setFontSearchPath(char  *fp);
+    static void setFontSearchPath(bool yesno);
+    // setFontSearchCommand: set the command to use to search for
+    // fonts.  If argument is null or zero length, simply enable this,
+    // using the compiled-in default.
+    static void setFontSearchCommand(string cmd);
+    static void setFontSearchCommand(char* cmd);
+    static void setFontSearchCommand(bool yesno);
+    static void setFontSearchKpse(bool yesno);
     static void setResolution(int res) { resolution_ = res; }
     static void setMissingFontMode(string mode) { missingFontMode_ = mode; }
     static void setMakeFonts(bool doit) { makeMissingFonts_ = doit; }
@@ -204,7 +235,14 @@ class PkFont {
     				// seen in the document, as well as the
     				// postamble
     static verbosities verbosity_;
-    static string fontpath_;	// colon-separated list of directories
+    static string fontSearchPath_;	// colon-separated list of directories
+    static string fontSearchCommand_; // command to find fonts
+    static void setFontSearchStrategy_(unsigned int, bool);
+    static unsigned int fontSearchStrategies_; // ways to find fonts: flags:
+    static const unsigned int fontSearchStrategyPath_ = 1;
+    static const unsigned int fontSearchStrategyKpse_ = 2;
+    static const unsigned int fontSearchStrategyCommand_ = 4;
+
     static int resolution_;
     static bool makeMissingFonts_;	// automatically make fonts
     static string missingFontMode_;

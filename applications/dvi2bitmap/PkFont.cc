@@ -1,14 +1,36 @@
-// Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
-// See file LICENCE for conditions.
+//    This file is part of dvi2bitmap.
+//    Copyright 1999--2002, Council for the Central Laboratory of the Research Councils
+//    
+//    This program is part of the Starlink Software Distribution: see
+//    http://www.starlink.ac.uk 
 //
-// $Id$
+//    dvi2bitmap is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    dvi2bitmap is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with dvi2bitmap; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    The General Public License is distributed along with this
+//    program in the file LICENCE.
+//
+//    Author: Norman Gray <norman@astro.gla.ac.uk>
+//    $Id$
+
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <iostream>		// for debugging code, written to cerr
+#include <fstream>
 #include <sys/stat.h>
 //#include <unistd.h>
 #include <vector>
@@ -25,7 +47,8 @@
 using std::cerr;
 using std::endl;
 using std::ends;
-//using std::vector;
+using std::ofstream;
+using std::ios;
 #define STD std
 #else
 #define STD 
@@ -48,7 +71,7 @@ string_list break_path (string);
 verbosities PkRasterdata::verbosity_ = normal;
 verbosities PkFont::verbosity_ = normal;
 verbosities PkGlyph::verbosity_ = normal;
-string PkFont::fontpath_ = "";
+
 
 #ifndef DEFAULT_MFMODE
 #define DEFAULT_MFMODE "ibmvga"
@@ -59,6 +82,32 @@ string PkFont::fontpath_ = "";
 
 string PkFont::missingFontMode_ = DEFAULT_MFMODE;
 int PkFont::resolution_ = DEFAULT_RESOLUTION;
+
+// Font-search strategies: manipulated by setFontSearchPath() and
+// setFontSearchCommand().  This could be made a lot more
+// sophisticated, but I can't yet decide in precisely which way.  The
+// initialisation would probably be better done using
+// setFontSearchStrategy_() in a class initialiser (but I've forgotten
+// how to do that in C++!)
+//unsigned int PkFont::fontSearchStrategies_ = ~0;
+unsigned int PkFont::fontSearchStrategies_ =
+	fontSearchStrategyPath_
+#ifdef FONT_SEARCH_SCRIPT
+	| fontSearchStrategyCommand_
+#endif
+#if ENABLE_KPATHSEA
+	| fontSearchStrategyKpse_
+#endif
+	;
+
+string PkFont::fontSearchPath_ = "";
+#ifdef FONT_SEARCH_SCRIPT
+string PkFont::fontSearchCommand_ = FONT_SEARCH_SCRIPT;
+#else
+string PkFont::fontSearchCommand_ = "";
+#endif /* defined FONT_SEARCH_SCRIPT */
+
+
 
 #if defined(FONT_GEN_TEMPLATE)
 bool PkFont::makeMissingFonts_ = true;
@@ -188,11 +237,9 @@ void PkFont::verbosity (const verbosities level)
 #endif
 }
 
-// Find a font.  Basic method uses the environment variable and is somewhat
-// cruddy.  If ENABLE_KPATHSEA is true and the first method doesn't 
-// produce anything (which will be true if the environment variable wasn't
-// set and the -f option wasn't given) then fall through to a call to
-// the kpathsea library.
+// Find a font.  Uses the flags in fontSearchStrategies_ to decide
+// which methods to try.  The result of the first one which succeeds
+// is the one returned.
 //
 // Return true if we found a file to open, and return the path in the
 // argument, which is unchanged otherwise.  Return false on error.
@@ -200,15 +247,10 @@ void PkFont::verbosity (const verbosities level)
 // constructed without problems (in fact, in both cases, success
 // _does_ mean that the file was found, but this is not guaranteed by
 // this routine).
-//
-// XXX honour an option -M (like dvips and xdvi) to suppress
-// generating a font file and sticking to missfont.log instead.
 bool PkFont::find_font (string& path)
 {
     bool got_it = false;
     double scaled_res = resolution_ * magnification();
-    //	* ((double)font_header_.s * (double)dvimag_)
-    /// ((double)font_header_.d * 1000.0);
 
     if (verbosity_ > normal)
 	cerr << "PkFont::find_font: " << name_
@@ -216,44 +258,49 @@ bool PkFont::find_font (string& path)
 	     << ", res " << resolution_
 	     << '*' << magnification()
 	     << " = " << scaled_res
+	     << " (fontSearchStrategies_=" << fontSearchStrategies_ << ')'
 	     << endl;
 
-    string pkpath = "";
-    if (fontpath_.length() > 0)
+    if (fontSearchStrategies_ & fontSearchStrategyPath_) 
     {
-	pkpath = fontpath_;
-	if (verbosity_ > normal)
-	    cerr << "find_font: using fontpath=" << fontpath_ << endl;
-    }
-    else
-    {
-	const char *pkpath_p = getenv ("DVI2BITMAP_PK_PATH");
-	if (pkpath_p != 0)
+	string pkpath = "";
+	if (fontSearchPath_.length() > 0)
 	{
-	    pkpath = pkpath_p;
+	    pkpath = fontSearchPath_;
 	    if (verbosity_ > normal)
-		cerr << "find_font: using DVI2BITMAP_PK_PATH="
-		     << pkpath << endl;
+		cerr << "find_font: using fontpath=" << fontSearchPath_ << endl;
 	}
-    }
-
-    if (pkpath.length() != 0)
-    {
-	string& found_file = search_pkpath (pkpath, name_, scaled_res);
-
-	if (found_file.length() > 0)
+	else
 	{
-	    path = found_file;
-	    got_it = true;
+	    const char *pkpath_p = getenv ("DVI2BITMAP_PK_PATH");
+	    if (pkpath_p != 0)
+	    {
+		pkpath = pkpath_p;
+		if (verbosity_ > normal)
+		    cerr << "find_font: using DVI2BITMAP_PK_PATH="
+			 << pkpath << endl;
+	    }
 	}
 
-        if (verbosity_ > normal)
-            cerr << "PkFont::find_font: search_pkpath produced "
-                 << (got_it ? path : "...nothing!") << endl;
-    }
+	if (pkpath.length() != 0)
+	{
+	    string& found_file = search_pkpath (pkpath, name_, scaled_res);
 
+	    if (found_file.length() > 0)
+	    {
+		path = found_file;
+		got_it = true;
+	    }
+
+	    if (verbosity_ > normal)
+		cerr << "PkFont::find_font: search_pkpath produced "
+		     << (got_it ? path : "...nothing!") << endl;
+	}
+    }
+    
 #if ENABLE_KPATHSEA
-    if (! got_it)
+    if (! got_it
+	&& (fontSearchStrategies_ & fontSearchStrategyKpse_))
     {
 	const char *kpse_file;
 
@@ -274,10 +321,11 @@ bool PkFont::find_font (string& path)
     }
 #endif
 
-#if defined(FONT_SEARCH_SCRIPT)
-    if (! got_it)
+    if (! got_it
+	&& (fontSearchStrategies_ & fontSearchStrategyCommand_)
+	&& (fontSearchCommand_.length() != 0))
     {
-	string& cmd = substitute_font_string (FONT_SEARCH_SCRIPT,
+	string& cmd = substitute_font_string (fontSearchCommand_,
 					      missingFontMode_,
 					      name_,
 					      dpiScaled(),
@@ -298,9 +346,24 @@ bool PkFont::find_font (string& path)
 	    got_it = true;
 	}
     }
-#endif /* defined(FONT_SEARCH_SCRIPT) */
 
-    // XXX write substitute_font_string to missfont.log
+    if (! got_it)
+    {
+	// write font-generation command string to missfont.log
+	string fontgenCmd = fontgenCommand();
+	if (fontgenCmd.length() != 0)
+	{
+	    ofstream missfont;
+	    missfont.open("./missfont.log", ios::app);
+	    if (!missfont)
+		cerr << "Can't open ./missfont.log to write" << endl;
+	    else
+	    {
+		missfont << fontgenCmd << endl;
+		missfont.close();
+	    }
+	}
+    }
 
     return got_it;
 }
@@ -725,6 +788,54 @@ double PkFont::magnification() const
 	     << " *" << dvimag_ << "/1000 = " << rval << endl;
     return rval;
 }
+
+void PkFont::setFontSearchPath(string fp) 
+{
+    if (fp.length() == 0)
+	// simply enable this
+	fontSearchPath_ = fp;
+    setFontSearchPath(true);
+}
+void PkFont::setFontSearchPath(char *fp) 
+{
+    string s = (fp == 0 ? "" : fp);
+    setFontSearchPath(s);
+}
+void PkFont::setFontSearchPath(bool usePath)
+{
+    setFontSearchStrategy_(fontSearchStrategyPath_, usePath);
+}
+
+void PkFont::setFontSearchCommand(string cmd)
+{
+    // if cmd is zero length, simply enable this
+    if (cmd.length() != 0)
+	fontSearchCommand_ = cmd;
+    setFontSearchCommand(true);
+}
+void PkFont::setFontSearchCommand(char* cmd)
+{
+    string s = (cmd == 0 ? "" : cmd);
+    setFontSearchCommand(s);
+}
+void PkFont::setFontSearchCommand(bool useCommand)
+{
+    setFontSearchStrategy_(fontSearchStrategyCommand_, useCommand);
+}
+ 
+void PkFont::setFontSearchKpse(bool useKpse)
+{
+    setFontSearchStrategy_(fontSearchStrategyKpse_, useKpse);
+}
+
+void PkFont::setFontSearchStrategy_(unsigned int strat, bool useit)
+{
+    if (useit)
+	fontSearchStrategies_ |= strat;
+    else
+	fontSearchStrategies_ &= ~strat;
+}
+
 
 PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int tfmwidth,
