@@ -96,7 +96,7 @@ void adix_getfile( ADIobj id, ADIobj *root, ADIstatus status )
 
   _chk_stat;
 
-  while ( (lid!=ADI__nullid) && _ok(status) )
+  while ( (lid!=ADI__nullid) && _ok(status) && ! found )
     {
     if ( adix_isfile(lid,status) )
       found = ADI__true;
