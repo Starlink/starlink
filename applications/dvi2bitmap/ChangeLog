@@ -4,6 +4,9 @@
 	bpp=1.  That meant that the scaling stopped working, and you got
 	heavily pixellated characters for all bitmaps after the first.
 
+	* configure.ac: reorder check for getopt and co. -- should be
+	after other library checks
+
 2003-08-12  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* DviFile.cc getEndOfPage corrected; would have failed
