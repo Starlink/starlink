@@ -1,0 +1,237 @@
+#!/star/bin/ndfperl -s
+
+# Script to shift ADC cards along by a specified amount. A big kludge.
+
+
+# NDF access
+use NDF;
+
+# Readline
+use Term::ReadLine;
+
+# Deal with the simple command line arguments:
+
+($h) && do {
+  print qq/
+  Usage: scushift [-h] ndf card shift
+  Arguments:
+    -h  \t Help
+    ndf \t The NDF to be modified
+    card\t The letter identifying the A to D card (A..I)
+    shift\t Size of shift
+
+  A positive shift moves d2->d1 and a negative shift moves d16->d1.
+
+/;
+  exit;
+};
+
+
+# Read the command line.
+# Arguments should be:    NDF  Card  Shift
+
+($ndf, $card, $shift) = @ARGV;
+
+# Setup a readline object thingy
+$term = new Term::ReadLine 'scushift';
+
+
+# Ask for missing parameters
+
+# Input NDF. Dont do any special checking for the NDF to see if it
+# is allowed. Will find that out soon enough
+# Simply make sure that a file exists
+until (-e "$ndf.sdf") {
+  $prompt = "Input NDF (no .sdf): ";
+
+  $ndf = $term->readline($prompt);
+
+};
+
+# Card - must be a single letter A to I
+until ($card =~ /^[A-Ia-i]$/) {
+
+   $prompt = "Which A to D card (a single letter): ";
+   
+   $card = $term->readline($prompt);
+}
+
+
+
+######## Now read in the NDF and find the SCUBA extension
+
+# Constants
+
+# Number of channels on an A-D
+$numchan = 16;
+
+
+# Set initial status
+$status = &NDF::SAI__OK;
+$good   = &NDF::SAI__OK;
+
+err_begin($status);
+ndf_begin();
+
+
+# Open the NDF for write access
+ndf_open(&NDF::DAT__ROOT, $ndf, 'UPDATE', 'OLD', $indf, $place, $status);
+
+if ($status == $good) {
+  print "Using the NDF $ndf...\n";
+} else {
+  err_flush($status);
+  die "Error reading $ndf\n";
+}
+
+# Now find the SCUBA extension
+
+$xloc = &NDF::DAT__NOLOC;
+ndf_xloc($indf, 'SCUBA', 'UPDATE', $xloc, $status);
+
+
+# We now have to read in the BOL_CHAN and BOL_TYPE arrays.
+# We shift BOL_CHAN at the location of the A to D card
+# and put the data at the end of the card
+
+# Read in BOL_CHAN
+
+cmp_getvi($xloc, 'BOL_CHAN', 150, @bolchan, $el, $status);
+
+# Read in BOL_ADC
+cmp_getvi($xloc, 'BOL_ADC', 150, @boladc, $el, $status);
+
+# To fix BOL_CHAN I simply have to splice in a new array at the
+# correct location
+# First find the position of the card in these arrays
+
+# No point if status is bad
+
+if ($status == $good) {
+
+  $adc = &atoi($card);
+
+  # Need to go through BOL_ADC until we find the area corresponding to this
+  # card
+
+  $startpos = -1;  # Protext against not finding card
+  $endpos   = -1;      
+  $notyet = 1;
+  for ($count=0; $count <= $#boladc; $count++) {
+    
+    if ($notyet & $boladc[$count] == $adc) {
+      $startpos = $count;
+      $notyet = 0;
+    } elsif ($boladc[$count+1] == $adc+1 | $count == $#boladc) {
+      $endpos = $count;
+      last;
+    }
+  }
+
+  die "The $card card is not available\n" if ($startpos == -1 | $endpos == -1);
+  
+  print "Card $adc starts and ends at positions $startpos and $endpos\n";
+  
+  # It is only at this point that we know the maximum allowed shift
+  # How big a shift is required != 0 and size < end - start
+  
+  $maxshift = $endpos - $startpos - 1;
+  
+  until (abs($shift) < $maxshift & $shift != 0) {
+    
+    $prompt = "Enter required shift (<$maxshift): ";
+    
+    $shift = $term->readline($prompt);
+  }
+
+  
+  # Now we need to implement the fix
+  
+  # Firstly I need to remove the requisite number of points from the array
+  # Then I need to add in those numbers at the end of the card
+  
+  print "Before: @bolchan\n";
+  
+  # If the shift is negative we start at the end
+  
+  # Only changing bol_chan for now
+  
+  $start = ($shift > 0 ? $startpos : $endpos - abs($shift) + 1);
+  $end   = ($shift > 0 ? $endpos - $shift + 1 : $startpos);
+  
+  # Simply have to add the shift to each bolometer between 
+  # startpos and endpos making sure that they do not go negative 
+  # or greater than 16
+  
+  @bolchan[$startpos..$endpos] = map {&roll($_,$shift)} @bolchan[$startpos..$endpos];
+
+
+  #@removed = splice(@bolchan, $start, abs($shift));
+  
+  #print "Removed: @removed\n";
+  # Now insert these bolometers at the end of the card
+  #splice(@bolchan, $end, 0, @removed);
+  
+  print "Bolchan: @bolchan\n";
+
+}
+
+die "Finish early\n";
+
+
+# Now we have to write the data out again
+
+cmp_putvi($xloc, 'BOL_CHAN', $#bolchan+1, @bolchan, $status);
+
+
+
+# Annul everything
+dat_annul($xloc, $status) if $xloc ne &NDF::DAT__NOLOC;
+ndf_annul($indf, $status);
+
+ndf_end($status);
+
+err_flush($status) if $status != $good;
+err_end($status);
+
+exit;
+
+
+# This routine converts the A-to-D number to a letter
+
+sub atoi {
+  my ($card, $adc);
+  $card = shift;
+
+  ($card =~ /^[aA]$/) && ($adc = 1);
+  ($card =~ /^[bB]$/) && ($adc = 2);
+  ($card =~ /^[cC]$/) && ($adc = 3);
+  ($card =~ /^[dD]$/) && ($adc = 4);
+  ($card =~ /^[eE]$/) && ($adc = 5);
+  ($card =~ /^[fF]$/) && ($adc = 6);
+  ($card =~ /^[gG]$/) && ($adc = 7);
+  ($card =~ /^[hH]$/) && ($adc = 8);
+  ($card =~ /^[iI]$/) && ($adc = 9);
+
+  return $adc;
+}
+
+# This routine adds one to a number
+# If result is greater than $numchan we return modulo chan
+# If result is less than 0 we add $numchan
+
+sub roll {
+  my ($number, $shift) = @_;
+
+  # Work out modulo numchan
+  my $dummy = $number + $shift;
+  my $mod   = $dummy - $numchan * int($dummy/$numchan);  
+
+  # Check for special cases
+  $mod += $numchan if $mod  < 0;
+  $mod  = $numchan if $mod == 0;
+  
+  # Return the result
+  return $mod;
+
+}
