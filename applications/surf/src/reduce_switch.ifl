@@ -31,8 +31,10 @@
 #        Add ability to select a switch
 #     1997 June 20 (TIMJ)
 #        Use default value as VPATH in USE_CALIBRATOR and SPIKE_LEVEL
-#     1998 Januart 15 (TIMJ)
+#     1998 January 15 (TIMJ)
 #        Add T_HOT for skydips
+#     2000 Apr 24 (TIMJ)
+#        Add TARRAY parameter for skydips
 #     {enter_further_changes_here}
 
 #-
@@ -78,6 +80,14 @@
  	 PROMPT   'Which switch (0=reduce;1,2,3=switch number)'
          vpath       'DEFAULT'
          ppath       'DEFAULT'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER TARRAY
+         TYPE     '_LOGICAL'
+	 DEFAULT 'NO'
+         VPATH    'DEFAULT'
+         PROMPT   'Read the cold load temperatures as an array'
 	 HELPKEY  '*'
       ENDPARAMETER
 
