@@ -19,6 +19,9 @@
 #     	 Original version.
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     29-AUG-2000 (MBT):
+#        Removed CCDNDFAC parameters since CCDALIGN no longer calls this
+#        Atask routine.
 #     {enter_changes_here}
 
 #-
@@ -134,41 +137,6 @@
             prompt "Logfile name[ccd_global]"
             default CCDPACK.LOG
             helpkey *
-          }
-
-
-#  CCDNDFAC parameters
-         parameter namelist {
-            type LITERAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default CCDNDFAC.LIS
-            prompt {Name of output file for NDF namelist}
-            helpkey CCDNDFAC PARAMETERS NAMELIST
-          }
-
-         parameter echo {
-                         # Echo NDF names
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default TRUE
-            prompt {Echo NDF names to user}
-            helpkey CCDNDFAC PARAMETERS ECHO
-          }
-
-         parameter maxndf {
-                           # Maximum number of NDFs that may be
-				 # accessed.
-            type _INTEGER
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default !
-            prompt {Maximum number of NDFs to access}
-            helpkey CCDNDFAC PARAMETERS MAXNDF
           }
 
       }
