@@ -892,7 +892,9 @@ used as arguments I<unless> the routine is called with a &.
 For example, both
 
    $value = fits_get_item(@fits, $keyword);
+
 and
+
    $value = &fits_get_item(\@fits, $keyword);
 
 are correct but 
