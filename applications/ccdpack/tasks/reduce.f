@@ -142,6 +142,7 @@
 *  External References:
 C      EXTERNAL SLV_LOADW        ! Load an ADAM task
 C      INTEGER SLV_LOADW
+      EXTERNAL PRESENT          ! Avoid confusion with PRESENT intrinsic
 
 *  Local Constants:
       INTEGER TIMOUT
