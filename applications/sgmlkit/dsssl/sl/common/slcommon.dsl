@@ -1552,10 +1552,12 @@ MLABEL child in the document instance.
   to be referred to.
 <codebody>
 (define (img-eqnref #!optional (nd (current-node)))
-  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY")))
-	(docprefix (if (have-ancestor? (normalize "programcode") nd)
-		       (hash-of-tree (document-element nd))
-		       "X")))
+  (let* ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY")))
+	 (de (document-element nd))
+	 (docprefix (debug (if ;;(string=? (gi de) (normalize "programcode"))
+			 (have-ancestor? (normalize "programcode") nd)
+		       (hash-of-tree de)
+		       "X"))))
     (if (node-list-empty? refable-ancestor)
 	(string-append docprefix "DEQ" (gi nd)
 		       (number->string (element-number nd)))
@@ -1645,10 +1647,25 @@ there is no `media' attribute, return <code>#f</>.
 <routine>
 <routinename>hash-of-tree
 <purpose>Return some hash of a tree
-<description>Return some hash of a tree.  Returns a string which
+<description>Return some hash of a tree.  This is used, for example,
+when we are generating filenames or equation labels within 
+programcode documents: we can't look `up' into the parent document, so
+we have to use this function to generate something unique to the
+document. Returns a string which
 should be reasonably unique to a node sub-tree.  Works by going down a
 number of levels in the node tree, counting the number of children at
-each level, and munging them with a pseudorandomly picked RNG.
+each level, and munging them with an RNG.
+<p>Note that the (select-by-class) of the children of the node is
+***extremely*** important: missing this out results in a substantial
+slowdown in this function, resulting in a massive (factor of 10?!)
+slowdown of the down-converter as a whole.  The (select-by-class)
+disables a Jade optimisation which treats the characters in a string
+as just that, rather than the formally correct node-list.  I can't
+really detect this slowdown in the conversion of a trial document, but
+perhaps it disables the optimisation on a wider scale, or frustrates
+caching, or something similar.  The depth of the hash
+doesn't *seem* to make much difference, but I've kept it smallish
+just in case.
 <argumentlist>
 <parameter>nd<type>singleton-node-list<description>The node to be
 hashed
@@ -1660,7 +1677,7 @@ the node subtree.  Starts with a letter.
 (define (hash-of-tree nd #!optional (depth #f))
   (if depth
       ;; this is an `internal' call
-      (let ((kids (children nd)))
+      (let ((kids (select-by-class (children nd) 'element)))
 	(if (node-list-empty? kids)
 	    1
 	    (if (<= depth 0)
@@ -1672,24 +1689,30 @@ the node subtree.  Starts with a letter.
 		 1))))
       ;; This is an `external' call -- call myself, and return number
       ;; as hex string.
-      (string-append "X" (number->string (hash-of-tree nd 5) 16))))
+      (string-append "X" (number->string (hash-of-tree nd 4) 16))))
 
-;; Get the term in a pseudo-RNG next after the number n.  Use the
-;; selector (an integer) to select which RNG to choose from.  The
-;; numbers here are the first few constants for the Quick and Dirty
-;; RNGs in Numerical Recipes, section 7.1
-(define (hash-mult n selector)
-  (let* ((qdrng '(( 6075  106 1283)
-		  ( 7875  211 1663)
-		  ( 7875  421 1663)
-		  ( 6075 1366 1283)
-		  ( 6655  936 1399)
-		  (11979  430 2531)))
-	 (consts (list-ref qdrng (modulo selector (length qdrng)))))
-    (modulo (+ (* n (cadr consts))
-	       (caddr consts))
-	    (car consts))))
-
+;; Combine two numbers using a pseudo RNG.  This is a simple
+;; linear-congruence generator, which finds the term in the sequence
+;; next after the sum of the two arguments.
+;; The numbers here are from the table of constants for the Quick and Dirty
+;; RNGs in Numerical Recipes, section 7.1.
+;; Other possibilities:
+;;     ((   m    a    c )
+;;      ( 6075  106 1283)
+;;      ( 7875  211 1663)
+;;      ( 7875  421 1663)
+;;      ( 6075 1366 1283)
+;;      ( 6655  936 1399)
+;;      (11979  430 2531))
+;;
+(define (hash-mult x1 x2)
+  (let ((m 11979)
+	(a 430)
+	(c 2531))
+    (modulo (+ (* (+ x1 x2)
+		  a)
+	       c)
+	    m)))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <routine>
