@@ -1,0 +1,32 @@
+#+
+#  Name:
+#     kappa_keystyle.def
+
+#  Purpose:
+#     Defines the default style for keys produced by KAPPA applications.
+
+#  Description:
+#     This file contains default settings for plotting style attributes
+#     which are used when drawing a key. These defaults can be over-ridden 
+#     by the user by supplying a value for the KEYSTYLE parameter when 
+#     running the applications. Individual applications may have
+#     alternative defaults files (eg see kappa_linplot_keystyle.def).
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explicitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-OCT-1999 (DSB):
+#        Original version.
+#-
+
+#  Set the size of the text so that is rather bigger than the default of
+#  1.0.
+      size=1.4
+
