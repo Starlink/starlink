@@ -1,6 +1,12 @@
 *     31 July 2000 (ajc):
 *        Re-write illegal concatenation
 *        Unused GEN_IENDCH
+*     10 August 2004 (timj):
+*        Fix error where the default string SDEF was being copied
+*        into the prompt despite the fact that the string had been
+*        copied into the output STRING and then cleaned up (to fix
+*        initialisation errors). Also stop running off the end of the
+*        buffer if the output string is smaller than the input default.
 *-----------------------------------------------------------------------
 
       LOGICAL FUNCTION GEN_GETSTR2 (LV, PROMPT, SDEF,
@@ -54,7 +60,7 @@ C   As for GEN_GETSTR but has extra option of LEVEL in call
 *     than blanks --- correct this at this stage.
 
       STRING = SDEF(:LCOPY)//' '
-      DO I = 1, ILDEF
+      DO I = 1, LCOPY
         IF (STRING(I:I) .EQ. CHAR(0)) STRING(I:I) = ' '
       END DO
 
@@ -62,7 +68,7 @@ C   As for GEN_GETSTR but has extra option of LEVEL in call
         CALL GEN_INPUT  (LV, PROMPT, STR, ILS, JDEF)
       ELSE
         STR = '('//FDEF(:GEN_ILEN(FDEF))//')'
-        WRITE (DEFSTR, STR) SDEF(:GEN_ILEN(SDEF))
+        WRITE (DEFSTR, STR) STRING(:GEN_ILEN(STRING))
         IDS = GEN_ILEN (DEFSTR)
         ILP = GEN_ILEN (PROMPT)
         PSTRING = PROMPT(:ILP)
