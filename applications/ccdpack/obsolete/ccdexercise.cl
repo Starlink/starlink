@@ -127,16 +127,18 @@ begin
      print " "
      print "  Displaying raw target frames."
      print " "
-     picdef ( mode="array", xpic=2, ypic=2, prefix="a" )
+     picdef ( mode_="array", xpic=2, ypic=2, prefix="a" )
      lutheat
      picsel ( label="a1" )
-     display ( in=data1.imh, mode=percentiles, percentiles="2,98" )
+     display.xmagn=INDEF
+     display.ymagn=INDEF
+     display ( in="data1.imh", mode_="percentiles", percentiles="2,98" )
      picsel ( label="a2" )
-     display ( in=data2.imh, mode=percentiles, percentiles="2,98" )
+     display ( in="data2.imh", mode_="percentiles", percentiles="2,98" )
      picsel ( label="a3" )
-     display ( in=data3.imh, mode=percentiles , percentiles="2,98" )
+     display ( in="data3.imh", mode_="percentiles" , percentiles="2,98" )
      picsel ( label="a4" )
-     display ( in=data4.imh, mode=percentiles, percentiles="2,98" )
+     display ( in="data4.imh", mode_="percentiles", percentiles="2,98" )
    }
 
    #  Add note to logfile.
@@ -165,15 +167,15 @@ begin
      print "  but are not displayed."
      print " "
      gdclear
-     picdef ( mode=array, xpic=2, ypic=2, prefix="a" )
-     picsel ( label=a1 )
-     display ( in=debias_data1.imh, mode=percentiles, percentiles= "2,98" )
-     picsel ( label=a2 )
-     display ( in=debias_data2.imh, mode=percentiles, percentiles="2,98" )
-     picsel ( label=a3 )
-     display ( in=debias_data3.imh, mode=percentiles, percentiles="2,98" )
-     picsel ( label=a4 )
-     display ( in=debias_data4.imh, mode=percentiles, percentiles="2,98" )
+     picdef ( mode_="array", xpic=2, ypic=2, prefix="a" )
+     picsel ( label="a1" )
+     display ( in="debias_data1.imh", mode_="percentiles", percentiles= "2,98" )
+     picsel ( label="a2" )
+     display ( in="debias_data2.imh", mode_="percentiles", percentiles="2,98" )
+     picsel ( label="a3" )
+     display ( in="debias_data3.imh", mode_="percentiles", percentiles="2,98" )
+     picsel ( label="a4" )
+     display ( in="debias_data4.imh", mode_="percentiles", percentiles="2,98" )
    }
 
    #  Create a flat field master
@@ -193,7 +195,7 @@ begin
      print "  is a ramp, normal flatfields are not like this). "
      print " "
      gdclear
-     display ( in=master_flat, mode=percentiles, percentiles="2,98" )
+     display ( in="master_flat.imh", mode_="percentiles", percentiles="2,98" )
    }
 
    #  Flatfield all the DATA frames
@@ -207,16 +209,16 @@ begin
      print "  Displaying flatfielded target frames."
      print " "
      gdclear
-     picdef ( mode=array, xpic=2, ypic=2, prefix="a" )
+     picdef ( mode_="array", xpic=2, ypic=2, prefix="a" )
      lutheat
-     picsel ( label=a1 )
-     display ( in=reduced_data1.imh, mode=percentiles, percentiles="2,98" )
-     picsel ( label=a2 )
-     display ( in=reduced_data2.imh, mode=percentiles, percentiles="2,98" )
-     picsel ( label=a3 )
-     display ( in=reduced_data3.imh, mode=percentiles, percentiles="2,98" )
-     picsel ( label=a4 )
-     display ( in=reduced_data4.imh, mode=percentiles, percentiles="2,98" )
+     picsel ( label="a1" )
+     display ( in="reduced_data1.imh", mode_="percentiles", percentiles="2,98" )
+     picsel ( label="a2" )
+     display ( in="reduced_data2.imh", mode_="percentiles", percentiles="2,98" )
+     picsel ( label="a3" )
+     display ( in="reduced_data3.imh", mode_="percentiles", percentiles="2,98" )
+     picsel ( label="a4" )
+     display ( in="reduced_data4.imh", mode_="percentiles", percentiles="2,98" )
    }
 
    #  Now proceed to test out some alignment functionality.
@@ -238,14 +240,18 @@ begin
      print "  Displaying the positions of the object which have been"
      print "  detected."
      print " "
-     picsel ( label=a1 )
-     plotlist ( inlist="reduced_data1.imh", palnum=4, mtype=23 )
-     picsel ( label=a2 )
-     plotlist ( inlist="reduced_data2.imh" )
-     picsel ( label=a3 )
-     plotlist ( inlist="reduced_data3.imh" )
-     picsel ( label=a4 )
-     plotlist ( inlist="reduced_data4.imh" )
+     picsel ( label="a1" )
+     plotlist ( device=local_dev, inlist="reduced_data1.imh", 
+	        palnum=4, mtype=23 )
+     picsel ( label="a2" )
+     plotlist ( device=local_dev, inlist="reduced_data2.imh",
+                palnum=4, mtype=23 )
+     picsel ( label="a3" )
+     plotlist ( device=local_dev, inlist="reduced_data3.imh",
+                palnum=4, mtype=23 )
+     picsel ( label="a4" )
+     plotlist ( device=local_dev, inlist="reduced_data4.imh",
+                palnum=4, mtype=23 )
    }
 
    #  Determine matches between the positions.
@@ -260,15 +266,18 @@ begin
      print " "
      print "  Displaying the labels of objects which have been matched."
      print " "
-     picsel ( label=a1 )
-     plotlist ( inlist="reduced_data1.imh", palnum=3, mtype=-1,
-                thick=2, msize=1.5 )
-     picsel ( label=a2 )
-     plotlist ( inlist="reduced_data2.imh" )
-     picsel ( label=a3 )
-     plotlist ( inlist="reduced_data3.imh" )
-     picsel ( label=a4 )
-     plotlist ( inlist="reduced_data4.imh" )
+     picsel ( label="a1" )
+     plotlist ( device=local_dev, inlist="reduced_data1.imh", 
+                palnum=3, mtype=-1, thick=2, msize=1.5 )
+     picsel ( label="a2" )
+     plotlist ( device=local_dev, inlist="reduced_data2.imh", 
+                palnum=3, mtype=-1, thick=2, msize=1.5 )
+     picsel ( label="a3" )
+     plotlist ( device=local_dev, inlist="reduced_data3.imh", 
+                palnum=3, mtype=-1, thick=2, msize=1.5 )
+     picsel ( label="a4" )
+     plotlist ( device=local_dev, inlist="reduced_data4.imh", 
+                palnum=3, mtype=-1, thick=2, msize=1.5 )
    }
 
    #  Set the registration structures.
@@ -304,7 +313,7 @@ begin
      print "  Displaying the final mosaic."
      print " "
      gdclear
-     display ( in=mosaic.imh, mode=percentiles, percentiles="2,98" )
+     display ( in="mosaic.imh", mode_="percentiles", percentiles="2,98" )
    }
 
    #  Exercise is completed.
