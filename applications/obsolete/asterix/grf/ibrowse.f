@@ -592,8 +592,8 @@
           ENDIF
 
 *  get current cursor position in device coords
-          CALL IMG_GET0I('XP',IXP,STATUS)
-          CALL IMG_GET0I('YP',IYP,STATUS)
+          CALL IMG_NBGET0I('XP',IXP,STATUS)
+          CALL IMG_NBGET0I('YP',IYP,STATUS)
           IYP=IYPMAX-IYP
 
 *  convert to world coords
