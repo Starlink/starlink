@@ -130,6 +130,10 @@
    "   objects will be centroided to provide an accurate alignment during the" \
    "   next stage." \
    "" \
+   "   If you are not sure the positioning is correct, a good tip is to move" \
+   "   one image a few pixels away; if all the features look smeared out then" \
+   "   you are close to a correctly aligned position." \
+   "" \
    "   When you are happy with the alignment, click with the (left) mouse" \
    "   button on the overlapping region to mark centroidable features." \
    "   If you mark any in error, they can be removed by clicking on them" \
@@ -331,7 +335,12 @@
 #  Add this datum to the results list.  By storing these in a hash at
 #  this stage, we ensure we don't pass back duplicate pairings to the
 #  calling routine.
-                  set pairs($iA,$iB) [ list $nmatch $xoff $yoff $matchpts ]
+                  if { $iA < $iB } {
+                     set key "$iA,$iB"
+                  } else {
+                     set key "$iB,$iA"
+                  }
+                  set pairs($key) [ list $nmatch $xoff $yoff $matchpts ]
 
 #  Record the fact that these images have been connected.
                   set Done($iA) 1
