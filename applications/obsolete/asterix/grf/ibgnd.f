@@ -126,6 +126,7 @@
       CHARACTER*16		CMD			! Major mode
       CHARACTER*7		MODE			! Sampling mode
       CHARACTER*80		OFILE			! Output file name
+      CHARACTER*7		SUBMODE			! Sampling mode
 
       REAL			XPOS, YPOS, R		! Source position
 
@@ -1423,6 +1424,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MATH_PAR'
 
 *  Global Variables:
       INCLUDE 'IMG_CMN'
