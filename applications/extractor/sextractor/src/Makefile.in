@@ -124,7 +124,8 @@ sex_SOURCES = analyse.c assoc.c astrom.c back.c bpro.c catout.c \
 			  globals.h growth.h image.h interpolate.h key.h \
 			  neurro.h param.h photom.h plist.h poly.h prefs.h \
 			  preflist.h psf.h retina.h sexhead1.h sexhead.h \
-			  sexheadsc.h som.h types.h weight.h
+			  sexheadsc.h som.h types.h weight.h userradii.c \
+                          userradii.h
 
 sex_LDADD = $(top_builddir)/src/fits/libfits.a $(top_builddir)/src/wcs/libwcs_c.a
 DATE = `date +"%Y-%m-%d"`
@@ -145,7 +146,7 @@ am_sex_OBJECTS = analyse.$(OBJEXT) assoc.$(OBJEXT) astrom.$(OBJEXT) \
 	misc.$(OBJEXT) neurro.$(OBJEXT) pc.$(OBJEXT) photom.$(OBJEXT) \
 	plist.$(OBJEXT) poly.$(OBJEXT) prefs.$(OBJEXT) psf.$(OBJEXT) \
 	readimage.$(OBJEXT) refine.$(OBJEXT) retina.$(OBJEXT) \
-	scan.$(OBJEXT) som.$(OBJEXT) weight.$(OBJEXT)
+	scan.$(OBJEXT) som.$(OBJEXT) weight.$(OBJEXT) userradii.$(OBJECT)
 sex_OBJECTS = $(am_sex_OBJECTS)
 sex_DEPENDENCIES = $(top_builddir)/src/fits/libfits.a \
 	$(top_builddir)/src/wcs/libwcs_c.a
@@ -170,7 +171,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/psf.Po ./$(DEPDIR)/readimage.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/refine.Po ./$(DEPDIR)/retina.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/scan.Po ./$(DEPDIR)/som.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/weight.Po
+@AMDEP_TRUE@	./$(DEPDIR)/weight.Po ./$(DEPDIR)/userradii.Po 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
@@ -262,6 +263,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/som.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/weight.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/userradii.Po@am__quote@
 
 distclean-depend:
 	-rm -rf ./$(DEPDIR)
