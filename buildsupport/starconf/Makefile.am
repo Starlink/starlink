@@ -50,6 +50,7 @@ starconf: make-starconf \
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
+	-e 's,@prefix\@,$(prefix),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
 	-e 's,@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g' \
 	-e 's,@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g' \
