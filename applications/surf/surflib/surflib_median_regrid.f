@@ -1,5 +1,5 @@
-      SUBROUTINE SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS, DIAMETER,
-     :     WAVELENGTH, OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
+      SUBROUTINE SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS,
+     :     OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
      :     BOL_DEC_PTR, DATA_PTR,  OUT_DATA, OUT_VAR, OUT_QUAL, 
      :     STATUS )
 *+
@@ -13,8 +13,8 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS, DIAMETER,
-*    :     WAVELENGTH, OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
+*     CALL SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS,
+*    :     OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
 *    :     BOL_DEC_PTR, DATA_PTR,  OUT_DATA, OUT_VAR, OUT_QUAL,
 *    :     STATUS )
 
@@ -114,6 +114,10 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.8  2005/03/23 03:48:48  timj
+*     No longer use wavelength + diameter for determining resolution element. Use
+*     the pixel size.
+*
 *     Revision 1.7  2004/09/01 01:02:03  timj
 *     use CNF_PVAL
 *
@@ -167,8 +171,6 @@
       INTEGER NY
       INTEGER ICEN
       INTEGER JCEN
-      REAL    WAVELENGTH
-      REAL    DIAMETER
       
 *  Arguments Returned:
       REAL    OUT_DATA ( NX, NY )
@@ -212,6 +214,7 @@
       INTEGER QUALITY_PTR                   ! Scratch quality
       INTEGER REGRID1_END                   ! End of REGRID1 Scratch array
       INTEGER REGRID1_PTR                   ! Scratc space for regrid1
+      REAL    SCALE                         ! Scale size for bad pixel finding
       INTEGER SCRATCH_END                   ! Scratch space
       INTEGER SCRATCH_PTR                   ! Scratch space
       CHARACTER * (10) SMODE                ! Smoothing mode
@@ -272,14 +275,18 @@
      :                      %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)))
       END IF
 
-
+*     Generate a mask for all the pixels that do not have valid
+*     data points. We choose a scalesize that will cover an entire
+*     pixel -- the distance from the centre of the pixel to the corner
+      SCALE = OUT_PIXEL / SQRT( 2.0 )
       DO I = 1, N_FILES
 
-         CALL SCULIB_WTFN_REGRID_1 ( DIAMETER, WAVELENGTH, 1.0,
+         CALL SCULIB_WTFN_REGRID_1 ( 1.0,
      :        %VAL(CNF_PVAL(DATA_PTR(I))), 
      :        %VAL(CNF_PVAL(BOL_RA_PTR(I))),
      :        %VAL(CNF_PVAL(BOL_DEC_PTR(I))), N_PTS(I), DBLE(OUT_PIXEL),
-     :        NX, NY, ICEN, JCEN, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
+     :        NX, NY, ICEN, JCEN, 1, SCALE,
+     :        %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
      :        %VAL(CNF_PVAL(REGRID1_PTR)), STATUS)
 
       END DO
