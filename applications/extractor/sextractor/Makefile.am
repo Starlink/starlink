@@ -5,7 +5,7 @@ SUBDIRS			= man src
 EXTRA_DIST		= config doc AUTHORS BUGS ChangeLog COPYING HISTORY \
 			  INSTALL README THANKS \
 			  $(PACKAGE).spec.in $(PACKAGE)-tpx.spec.in \
-			  man/sex.1.in
+			  man/sex.1.in \
 			  acx_pthread.m4 acx_prog_cc_optim.m4
 RPM_ROOTDIR		= /usr/src/RPM
 RPM_SRCDIR		= $(RPM_ROOTDIR)/SOURCES
