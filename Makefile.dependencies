@@ -1438,19 +1438,25 @@ $(MANIFEST)/pongo: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
-		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
+		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd applications/pongo \
 	  && $(MAKE_CPT)
 
