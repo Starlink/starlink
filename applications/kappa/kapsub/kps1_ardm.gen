@@ -1,0 +1,120 @@
+      SUBROUTINE KPS1_ARDM<T>( BAD, CONST, INSIDE, EL, MASK, ARRAY, 
+     :                         STATUS )
+ 
+*+
+*  Name:
+*     KPS1_ARDM<T>
+ 
+*  Purpose:
+*     Sets to bad all elements of an array that have a positive mask
+*     value.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPS1_ARDM<T>( BAD, CONST, INSIDE, EL, MASK, ARRAY, STATUS )
+ 
+*  Description:
+*     This routine uses an integer mask (probably from ARD) to flag
+*     elements of an array.  Whenever a positive mask value is found
+*     the associated pixel in the output image is set to VAL__BADR.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If .TRUE. assign bad values to the output pixels. Otherwise
+*        assign the CONST value.
+*     CONST = DOUBLE PRECISION (Given)
+*        The constant value to assign to the output pixels. Only used if
+*        BAD is .FALSE.
+*     INSIDE = LOGICAL (Given)
+*        If .TRUE. assign the values to the inside of the region (i.e.
+*        the positive mask values). Otheriwse, assign thr value to the
+*        outside of the region (zero mask values).
+*     EL = INTEGER (Given)
+*        The dimension of the input and output arrays.
+*     MASK( EL ) = INTEGER (Given)
+*        The mask array.  Positive values willgenerate bad values in the
+*        array.
+*     ARRAY( EL ) = <TYPE> (Given & Returned)
+*        The array to be masked.
+*     STATUS  =  INTEGER (Given and Returned)
+*        Global status value.
+ 
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     1995 June 30 (MJC):
+*        Original version.
+*     30-NOV-2001 (DSB):
+*        Reconstructed the generic source and added arguments BAD, CONST
+*        and INSIDE.
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE parameters
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
+ 
+*  Status:
+      INTEGER STATUS             ! Global status value
+ 
+*  Arguments Given:
+      LOGICAL BAD
+      DOUBLE PRECISION CONST
+      LOGICAL INSIDE
+      INTEGER EL
+      INTEGER MASK( EL )
+ 
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+ 
+*  Local Variables:
+       <TYPE> C                  ! Constant value
+       INTEGER I                 ! Loop counter
+ 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+*.
+ 
+*  Check the global inhertied status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Store the constant to use.
+      IF( BAD ) THEN
+         C = VAL__BAD<T>
+      ELSE
+         C = NUM_DTO<T>( CONST )
+      END IF 
+
+*  Deal with cases where the inside of the region is to be replaced.
+      IF( INSIDE ) THEN 
+
+*  Loop for each array element.  Replace the element with the bad value
+*  whenever the corresponding mask value is positive.
+         DO I = 1, EL
+            IF ( MASK( I ) .GT. 0 ) ARRAY( I ) = C
+         END DO
+
+*  Now deal with cases where the outside of the region is to be replaced.
+      ELSE
+
+*  Loop for each array element.  Replace the element with the bad value
+*  whenever the corresponding mask value is zero.
+         DO I = 1, EL
+            IF ( MASK( I ) .EQ. 0 ) ARRAY( I ) = C
+         END DO
+
+      END IF
+
+      END
