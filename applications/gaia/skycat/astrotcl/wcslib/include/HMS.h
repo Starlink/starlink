@@ -20,7 +20,6 @@
 
 const double HMS_NULL = HUGE_VAL;	// null value for a double
 
-
 /*
  * Class HMS
  */
@@ -89,6 +88,15 @@ public:
     friend double operator-(const HMS& a, const HMS& b) {
 	return (a.val_ - b.val_);
     }
+
+    // set how many decimal places to show for arc seconds, this is 2
+    // by default, setting this to 1 shows 3 (milli arcsec).
+    static int extra_precision;
+
+    protected:
+    void print_normal_precise_( char *buf ) const;
+    void print_extra_precise_( char *buf ) const;
+
 };
 
 
