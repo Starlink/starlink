@@ -1,10 +1,10 @@
-*+  SPEC_MK - Fast computation of flux from Raymond & Smith hot plasma model
+*+  SPEC_MK - Fast computation of flux from MEKAL hot plasma model
       SUBROUTINE SPEC_MK(GENUS,NDS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,
      :                   STATUS)
 *
 *    Summary:
 *
-*     Fast Raymond-Smith plasma model calculation, uses RS grid binned up to
+*     Fast MEKAL plasma model calculation, uses MKL grid binned up to
 *     match the instrument response and the object redshift (if such a grid
 *     exists). New grids for a particular instrument and or redshift can be
 *     created with RS_REBIN (in OBELIX)
@@ -12,7 +12,7 @@
 *    Description :
 *
 *     Returns flux in each energy channel delimited by bounds from the hot,
-*     optically thin plasma models of Raymond & Smith. Returned flux has
+*     optically thin plasma models of MEKAL. Returned flux has
 *     units of photons/(cm**2*s*keV).
 *     Model parameters are:
 *	A      = PARAM(1)	Emission measure/distance**2 (units
@@ -41,12 +41,8 @@
 *     into `metals' for the MK model.
 *     Emissivity grid has to be multiplied by Ne*NH*Volume to get radiated
 *     power.
-*     NOTE: Contiguous energy bins are assumed (for efficiency savings).
-*     For description of R & S models see Ap.J.Supp.35, 419 (1977).
-*     The version used here is the VMS version sent to John Pye by Raymond
-*     in April 1987.
 *
-*     The code will automatically search the default RS grid directory and
+*     The code will automatically search the default MKL grid directory and
 *      check every grid found against the energy bounds of the
 *      dataset to be fitted. The first matching grid will be used.
 *      This has the disadvantage that two grids identical apart
@@ -345,7 +341,7 @@ D	        type*,'  energy bounds values dont agree'
             IF ( GENUS .NE. 'SPEC' ) THEN
               STATUS = SAI__ERROR
               CALL MSG_SETC( 'GENUS', GENUS )
-              CALL ERR_REP( ' ', 'Full Raymond & Smith grid not '/
+              CALL ERR_REP( ' ', 'Full MEKAL grid not '/
      :                  /'available for ^GENUS fitting', STATUS )
               GOTO 9000
             END IF
@@ -372,7 +368,7 @@ D	        type*,'  energy bounds values dont agree'
 *        check full grid has just 2 elements and inform user of grid
 	  IF(.NOT.SMALLGRID(NDS) .AND. DIMS(2).EQ.2) THEN
 	    CALL MSG_SETI('NDS',NDS)
-	    CALL MSG_PRNT('Dataset ^NDS : Full Raymond+Smith grid used')
+	    CALL MSG_PRNT('Dataset ^NDS : Full MEKAL grid used')
 	  ELSEIF(.NOT.SMALLGRID(NDS) .AND. DIMS(2).NE.2) THEN
 	    CALL MSG_SETI('NDS',NDS)
 	    CALL MSG_SETI('NEL',DIMS(2))
@@ -573,8 +569,7 @@ D	        type*,'  energy bounds values dont agree'
 
 *     Description:
 *      The Gould bremsstrahlung spectrum normalisation is modified
-*      to units of 1E-23 erg*cm**3/s, to match the Raymond and Smith
-*      spectrum.
+*      to units of 1E-23 erg*cm**3/s, to match the MEKAL spectrum.
 *      A further adjustment is made to allow for the fact that non-cosmic
 *      abundances will change the Sum{ N(Z)*Z**2} value assumed by SPEC_BR,
 *      and to allow for the NH/Ne scaling in SPEC_MK (this should not be
