@@ -106,6 +106,8 @@
       CHARACTER*(DAT__SZLOC)	LOC			! Dataset locator
 
       INTEGER			NREC			! Number of records
+
+      LOGICAL			THERE			! Component exists?
 *.
 
 *  Check inherited global status.
