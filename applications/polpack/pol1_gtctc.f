@@ -205,7 +205,7 @@
 
 *  If a parameter abort or null value was supplied, re-report the error with
 *  a more appropriate message.
-      IF( STATUS .EQ. PAR__ABORT .OR. STATUS .EQ. PAR__NULL ) THEN
+      IF( STATUS .EQ. PAR__ABORT ) THEN
          CALL ERR_ANNUL( STATUS )
          STATUS = PAR__ABORT
          CALL MSG_SETC( 'PARAM', PARAM )
@@ -214,11 +214,20 @@
      :                 'the name of a catalogue ^DESC using parameter'//
      :                 ' %^PARAM.', STATUS )
 
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         STATUS = PAR__NULL 
+         CALL MSG_SETC( 'PARAM', PARAM )
+         CALL MSG_SETC( 'DESC', DESC )
+         CALL ERR_REP( 'POL1_GTCTC_4', 'Null value obtained for  '//
+     :                 'the name of a catalogue ^DESC using parameter'//
+     :                 ' %^PARAM.', STATUS )
+
 *  Add a context message to any other error.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL MSG_SETC( 'DESC', DESC )
-         CALL ERR_REP( 'POL1_GTCTC_4', 'Failed to obtain the name of '//
+         CALL ERR_REP( 'POL1_GTCTC_5', 'Failed to obtain the name of '//
      :                 'a catalogue ^DESC using parameter %^PARAM.', 
      :                 STATUS )
       END IF
