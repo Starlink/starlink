@@ -31,6 +31,15 @@ INTERFACE BINGRP
     PROMPT 'Perform spatial groouping using an ARD file'
   ENDPARAMETER
 
+  Parameter ARDFILE
+    Type      '_char'
+    Vpath     'prompt'
+    Ppath     'global,current'
+    Prompt    'spatial filename'
+    Association '<->GLOBAL.ARDFILE'
+    Help      'Name of the ARD, spatial description file'
+  EndParameter
+
   PARAMETER UPDATE
     TYPE '_LOGICAL'
     DEFAULT N
