@@ -83,7 +83,7 @@
 *     26-OCT-1998 (DSB):
 *        Original version.
 *     10-DEC-2001 (DSB):
-*        Modified to use a default FrameSet if the catalogue does not
+*        Modified to use a default FrameSet if he catalogue does not
 *        contain a FrameSet.
 *     {enter_further_changes_here}
 

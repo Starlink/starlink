@@ -524,6 +524,15 @@ related items to be removed.
 \item The ``-nogks'' switch has been added to the
 \verb#kaplibs_link_adam# command, allowing applications to be linked with
 native PGPLOT instead of the Starlink GKS-based PGPLOT.
+\item The routine KPG1_WRLST now allows the user to choose the
+co-ordinate system in which the positions are stored in the catalogue
+columns. This is done using two ADAM parameters called COLFRAME and
+COLEPOCH (these names are hard-wired into the routine to encourage
+conformity). Consequently, applications which use this routine should add
+definitions for these two parameters to their IFL files.
+\item The routine KPG1_RDLST can now read positions from catalogues which
+do not contain a WCS FrameSet, in certain special cases. That is, if the
+catalogue contains columsn called RA and DEC, or X and Y. 
 \end{itemize}
 
 

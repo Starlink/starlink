@@ -21,10 +21,12 @@
 *     subsequent applications to interpret the positions. Files written with 
 *     this routine can be read using KPG1_RDLST (and also XCATVIEW etc).
 *
-*     The positions are stored in the file as Base Frame positions within
-*     the supplied FrameSet, although they can be supplied within any of
-*     the Frames in the FrameSet (they will be Mapped into the Base Frame if 
-*     necessary).
+*     The positions are stored in the file in a Frame selected by the 
+*     user using hardwired parameters CATFRAME and CATEPOCH. This Frame
+*     defaults to a SKY Frame if present, otherwise a PIXEL Frame if present,
+*     otherwise the original Base Frame within the supplied FrameSet. The
+*     positions can be supplied within any of the Frames in the FrameSet
+*     and will be Mapped into the required Frame if necessary.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -68,6 +70,9 @@
 *  History:
 *     15-SEP-1998 (DSB):
 *        Original version.
+*     13-DEC-2001 (DSB):
+*        Added facility to specify the Frame in which to store positions
+*        in the catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,6 +107,9 @@
 *  Local Variables:
       CHARACTER CVAL*80          ! Character value obtained for the parameter
       INTEGER CI                 ! CAT identifier
+      INTEGER IBASE              ! Index of base Frame 
+      INTEGER ICURR              ! Index of current Frame 
+      INTEGER IDEF               ! Index of default catalogue Frame 
       INTEGER IPW                ! Pointer to work space
       INTEGER MAP                ! AST Pointer to Mapping
       INTEGER NBAX               ! No. of axes in BASE FRAME
@@ -109,6 +117,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Indicate we have not yet changed the Base Frame.
+      IBASE = AST__NOFRAME
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
@@ -122,6 +133,32 @@
          CALL ERR_END( STATUS )
          GO TO 999
       END IF
+
+*  Allow the user to select an alternative base Frame. First note the
+*  original base and current Frames.
+      IBASE = AST_GETI( IWCS, 'BASE', STATUS )
+      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  Make the default Frame the current Frame. If a SKY Frame is available,
+*  use it, otherwise if a PIXEL Frame is available, use it, otherwise use
+*  the current Base Frame.
+      CALL KPG1_ASFFR( IWCS, 'SKY', IDEF,STATUS )
+      IF( IDEF .EQ. AST__NOFRAME ) THEN
+         CALL KPG1_ASFFR( IWCS, 'PIXEL', IDEF,STATUS )
+         IF( IDEF .EQ. AST__NOFRAME ) IDEF = IBASE
+      END IF         
+      CALL AST_SETI( IWCS, 'CURRENT', IDEF, STATUS )
+
+*  Allow the user to change the current FRAME.
+      CALL MSG_SETC( 'A', 'catalogue' )
+      CALL KPG1_ASFRM( 'CATFRAME', 'CATEPOCH', IWCS, 'PIXEL', 'AXIS', 
+     :                 .TRUE., '^A', STATUS )
+
+*  Set the base Frame equal to the new current Frame, and then re-instate 
+*  the original current Frame.
+      CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', STATUS ),
+     :               STATUS )
+      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
 *  Get the simplified Mapping from the supplied Frame to the Base Frame.
       MAP = AST_SIMPLIFY( AST_GETMAPPING( IWCS, IFRM, AST__BASE, 
@@ -175,6 +212,10 @@
 *  If a null parameter value was supplied, annul the error if a null
 *  value is OK. 
       IF( STATUS .EQ. PAR__NULL .AND. NULL ) CALL ERR_ANNUL( STATUS )
+
+*  Re-instate the original base Frame in the FrameSet.
+      IF( IBASE .NE. AST__NOFRAME ) CALL AST_SETI( IWCS, 'BASE', IBASE, 
+     :                                             STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )

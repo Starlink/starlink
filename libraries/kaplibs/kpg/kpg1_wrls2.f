@@ -108,7 +108,9 @@
       INTEGER J                  ! Axis index
       INTEGER LWCS               ! Pointer to the FrameSet to be stored
       INTEGER TI                 ! CAT identifier for TITLE parameter
+      INTEGER QI                 ! CAT identifier for another parameter
       LOGICAL COPIED             ! Has a copy of the Frameet been taken?
+      LOGICAL ISSKY              ! Is the Base Frame a SkyFrame?
 *.
 
 *  Check the inherited global status.
@@ -122,8 +124,9 @@
       LWCS = AST_CLONE( IWCS, STATUS )
       COPIED = .FALSE.
 
-*  Get a pointer to the Base Frame.
+*  Get a pointer to the Base Frame, and note if it is a SkyFrame.
       FRM = AST_GETFRAME( LWCS, AST__BASE, STATUS )
+      ISSKY = AST_ISASKYFRAME( FRM, STATUS )
 
 *  Create the output catalogue.
       CALL LPG_CATCREAT( PARAM, CI, STATUS )
@@ -172,11 +175,36 @@
 
          END IF
 
+*  If the Base Frame is a SkyFrame, use special Units strings which
+*  indicate to the CAT_ library that the column represents a angle.
+         IF( ISSKY ) THEN
+            ATTR = 'FORMAT('
+            IAT = 7
+            CALL CHR_PUTI( I, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            UNT = 'RADIANS{'
+            IAT = 8
+            CALL CHR_APPND( AST_GETC( FRM, ATTR, STATUS ), UNT, IAT )
+            CALL CHR_APPND( '}', UNT, IAT )
+         END IF
+
 *  Create the column.
          CALL CAT_CNEWS( CI, SYM, CAT__TYPED, 0, UNT, ' ', LAB, 
      :                   COLID( I ), STATUS )
 
       END DO
+
+*  If the Frame is a SkyFrame store the epoch and equinox as catalogue
+*  parameters.
+      IF( ISSKY ) THEN
+         CALL CAT_PPTSC( CI, 'EPOCH', AST_GETC( FRM, 'EPOCH', STATUS ),
+     :                   ' ', QI, STATUS ) 
+         CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS ) 
+         CALL CAT_PPTSC( CI, 'EQUINOX', AST_GETC( FRM, 'EQUINOX', 
+     :                                            STATUS ),
+     :                   ' ', QI, STATUS ) 
+         CALL CAT_TATTI( QI, 'CSIZE', 12, STATUS ) 
+      END IF
 
 *  Loop round each supplied position.
       DO I = 1, NPOS
