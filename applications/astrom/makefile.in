@@ -256,6 +256,7 @@ CC = @CC@
 CFLAGS = @CFLAGS@
 FC = @F77@
 FFLAGS = @FFLAGS@
+FLIBS = @FLIBS@
 
 #  Command for forming a link to a file.
 
@@ -278,7 +279,7 @@ TAR_OUT = @TAR_OUT@
 #  Link fiags.
 
 LDFLAG1 =
-LDFLAG2 =
+LDFLAG2 = @LDFLAGS@
 
 #-------------------------------------------------------------------------------
 ################################################################################
@@ -349,9 +350,11 @@ PUBLIC_INCLUDES = params.inc
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
-#  it, but which are not required by users of it.
+#  it, but which are not required by users of it.  (we can't include
+#  configure in this list, since that's generated in a separate
+#  target, from configure.ac
 
-PRIVATE_INCLUDES = params.f.in makefile.in configure
+PRIVATE_INCLUDES = params.f.in makefile.in
 
 PLATFORM_PRIVATE_INCLUDES =
 
@@ -446,6 +449,12 @@ $(DEMO_SOURCE) $(DEMO_BUILT)
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 
+##########
+#
+# Default target
+# =============
+all: build
+
 #  Rules to set up links to locate each of the above include files.
 
 #  Rules for extracting source files from the source archive.
@@ -463,13 +472,14 @@ $(F_ROUTINES_EXE) $(DEMO_SOURCE): # $(PKG_NAME)_source.tar
 $(PKG_NAME)_source.tar: \
 		$(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
 		$(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
-		$(STARTUP_SCRIPT) $(F_ROUTINES_EXE) $(DEMO_SOURCE)
-	if test ! -f configure; then autoconf; fi
+		$(STARTUP_SCRIPT) $(F_ROUTINES_EXE) $(DEMO_SOURCE) \
+		configure
 #	# ensure we include the configure-generated files
 	./configure
 	$(TAR_IN) $@ $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
 		$(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
-		$(STARTUP_SCRIPT) $(F_ROUTINES_EXE) $(DEMO_SOURCE)
+		$(STARTUP_SCRIPT) $(F_ROUTINES_EXE) $(DEMO_SOURCE) \
+		configure
 
 
 #  Rules for extracting platform specific source files from the source
@@ -1137,9 +1147,9 @@ strip:
 #  Miscellaneous
 #  =============
 #
-#configure: configure.ac
-#	autoconf
-#
+configure: config/configure.ac
+	autoconf --output=configure config/configure.ac
+
 #params.f: params.f.in configure
 #	./configure
 #makefile: makefile.in configure
