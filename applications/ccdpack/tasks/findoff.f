@@ -425,6 +425,9 @@
 *        (IPBEEN and IPQUE increased to NOPEN from NMATCH).
 *     30-MAR-1999 (MBT):
 *        Changed to deal with WCS components of NDFs.
+*     26-APR-1999 (MBT):
+*        Now erases .MORE.CCPACK.CURRENT_LIST component for unmatched
+*        NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -451,6 +454,7 @@
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for reading in data
       CHARACTER * ( CCD1__BLEN ) LINE1 ! Line buffer for writing out text
       CHARACTER * ( CCD1__BLEN ) LINE2 ! Line buffer for writing out text
+      CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for CCDPACK extension
       CHARACTER * ( 4 ) METHOD  ! Last method attempted for object matching
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
       DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
@@ -1324,6 +1328,27 @@
             END IF
          END IF   
       END IF      
+
+*  If not all the position lists have been matched but we are going to 
+*  continue, we should remove the associated position lists from any
+*  NDFs which have not been matched, otherwise casual use of them by 
+*  later applications may give the impression that the original position
+*  lists are matched ones.
+      IF ( .NOT. OK .AND. NDFS ) THEN
+         DO 13 I = 1, NOPEN
+            IF ( .NOT. PAIRED( I ) ) THEN
+               CALL IRG_NDFEX( NDFGR, I, IDIN, STATUS )
+               CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT, STATUS )
+               CALL DAT_ERASE( LOCEXT, 'CURRENT_LIST', STATUS )
+               CALL CCD1_MSG( ' ', 
+     :'  Removing associated position list from CCDPACK extension of',
+     :                        STATUS )
+               CALL NDF_MSG( 'NDF', IDIN )
+               CALL CCD1_MSG( ' ', '      unmatched NDF ^NDF.', STATUS )
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+            END IF
+ 13      CONTINUE
+      END IF
                   
 *=======================================================================
 *  End of data intercomparison and offset estimation
