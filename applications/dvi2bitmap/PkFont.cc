@@ -1,18 +1,18 @@
 // part of dvi2bitmap
 // $Id$
 
+#include "dvi2bitmap.h"
 #include <iostream>		// for debugging code, written to cerr
 #include <cstring>
 #include <cmath>
 #include <cstdio>		// for sprintf
-#include "dvi2bitmap.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
 
 // define class static variables
-int PkRasterdata::debug_;
-int PkFont::debug_;
-int PkGlyph::debug_;
+int PkRasterdata::verbosity_ = 1;
+int PkFont::verbosity_ = 1;
+int PkGlyph::verbosity_ = 1;
 string PkFont::fontpath_;
 int PkFont::resolution_ = 72;
 
@@ -42,7 +42,7 @@ PkFont::PkFont(unsigned int dvimag,
     std::sprintf (fnbuf, "%s/%s.%dpk",
 	     fontpath_.c_str(), name.c_str(), scaled_res);
     path_ = fnbuf;
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << "Font file: " << path_
 	     << ", checksum=" << c
 	     << ", scaled " << s << '/' << d 
@@ -56,36 +56,38 @@ PkFont::PkFont(unsigned int dvimag,
 	read_font (*pkf_);
 	delete pkf_;		// don't need the file any more
 
-	if (debug_ > 1)
+	if (verbosity_ > 1)
 	    cerr << "Opened font " << path_ << " successfully\n";
 
 	//fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
-	//if (debug_ > 1)
+	//if (verbosity_ > 1)
 	//    cerr << "PkFont: font scaling: "
 	//	 << dvimag << "/1000 * (" << s << '/' << d
 	//	 << ")=" << fontscale_
 	//	 << ": DVI font checksum=" << c << '\n';
 
 	if (preamble_.cs != c)
-	    cerr << "Font " << name_
-		 << "found : expected checksum " << c
-		 << ", got checksum " << preamble_.cs
-		 << '\n';
+	    if (verbosity_ > 0)
+		cerr << "Font " << name_
+		     << "found : expected checksum " << c
+		     << ", got checksum " << preamble_.cs
+		     << '\n';
 
 	font_loaded_ = true;
     }
     catch (InputByteStreamError& e)
     {
-	cerr << "Font " << name << " at "
-	     << dpiScaled() << "dpi ("
-	     << path_ << ") not found\n";
+	if (verbosity_ > 0)
+	    cerr << "Font " << name << " at "
+		 << dpiScaled() << "dpi ("
+		 << path_ << ") not found\n";
 	preamble_.cs = 0;
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
     quad_ = ((double)dvimag/1000.0) * d;
     word_space_ = 0.2*quad_;
     back_space_ = 0.9*quad_;
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << "Quad="<<quad_<<" dvi units\n";
 };
 
@@ -115,7 +117,7 @@ void PkFont::read_font (InputByteStream& pkf)
     preamble_.vppp = (double)i/(double)two16_;
 
 
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << "PK file " << name_ << " '" << preamble_.comment << "\'\n"
 	     << "designSize="  << preamble_.designSize
 	     << " cs=" << preamble_.cs
@@ -157,7 +159,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		    pos = pkf.pos();
 		    packet_length -= 7*4;
 
-		    if (debug_ > 1)
+		    if (verbosity_ > 1)
 			cerr << "char " << static_cast<int>(g_cc)
 			     << hex
 			     << ": opcode=" << static_cast<int>(opcode)
@@ -202,7 +204,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		    pos = pkf.pos();
 		    packet_length -= 3 + 5*2;
 
-		    if (debug_ > 1)
+		    if (verbosity_ > 1)
 			cerr << "char " << static_cast<int>(g_cc)
 			     << hex
 			     << ": opcode=" << static_cast<int>(opcode)
@@ -246,7 +248,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		pos = pkf.pos();
 		packet_length -= 8;
 
-		if (debug_ > 1)
+		if (verbosity_ > 1)
 		    cerr << "char " << static_cast<int>(g_cc)
 			 << hex
 			 << ": opcode=" << static_cast<int>(opcode)
@@ -270,7 +272,7 @@ void PkFont::read_font (InputByteStream& pkf)
 					     rd, this);
 		pkf.skip(packet_length);
 	    }
-	    if (debug_ > 1)
+	    if (verbosity_ > 1)
 		cerr << "Char " << g_cc
 		     << " tfm=" << g_tfmwidth
 		     << " w="   << g_w
@@ -298,7 +300,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			 special_len > 0;
 			 special_len--)
 			special += static_cast<char>(pkf.getByte());
-		    if (debug_ > 1)
+		    if (verbosity_ > 1)
 			cerr << "Special \'" << special << "\'\n";
 		}
 		break;
@@ -421,7 +423,7 @@ unsigned int PkRasterdata::unpackpk ()
 	    repeatcount_ = unpackpk ();
 	res = unpackpk();	// get the following runcount
     }
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << '=' << res
 	     << ' ' << static_cast<int>(repeatcount_) << '\n';
     return res;
@@ -438,7 +440,7 @@ Byte PkRasterdata::nybble() {
     }
     else
 	res = (*rasterdata_++)&0xf;
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << '<' << static_cast<int>(res) << '\n';
     return res;
 }
@@ -484,7 +486,7 @@ void PkRasterdata::construct_bitmap()
 	Byte pixelcolour = start_black_;
 
 	repeatcount_ = 0;
-	if (debug_ > 1)
+	if (verbosity_ > 1)
 	{
 	    cerr << "dyn_f=" << static_cast<int>(dyn_f_)
 		 << " h=" << h_
@@ -506,7 +508,7 @@ void PkRasterdata::construct_bitmap()
 		{
 		    ncol = 0;
 		    nrow++;
-		    if (debug_ > 1)
+		    if (verbosity_ > 1)
 		    {
 			cerr << nrow << ':';
 			for (const Byte *p=rowstart; p<rowp; p++)

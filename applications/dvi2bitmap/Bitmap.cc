@@ -1,15 +1,16 @@
 // $Id$
 
+#include "dvi2bitmap.h"
+
 #include <iostream>		// debug code writes to cerr
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 
-#include "dvi2bitmap.h"
 #include "Bitmap.h"
 #include "BitmapImage.h"
 
-int Bitmap::debug_ = 0;
+int Bitmap::verbosity_ = 1;
 
 
 // Indecision: Within scaleDown, it seems sensible to average the
@@ -37,7 +38,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropped_ = false;
     max_colour_ = (1<<bpp_) - 1;
 
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << "new Bitmap(" << W << ',' << H << ',' << bpp_ << ")\n";
 }
 
@@ -80,7 +81,7 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     if (y+row1 < bbT) bbT = y+row1;
     if (y+row2 > bbB) bbB = y+row2;
 
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << "Bitmap @ (" << x << ',' << y << "): (0:"
 	     << w << ",0:" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
@@ -111,7 +112,7 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
     if (row1 < bbT) bbT = row1;
     if (row2 > bbB) bbB = row2;
 
-    if (debug_ > 1)
+    if (verbosity_ > 1)
 	cerr << "Rule @ (" << x << ',' << y << "): ("
 	     << w << "x" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
