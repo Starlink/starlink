@@ -98,6 +98,10 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  Local Constants:
+      INTEGER			TLEN			! History text length
+        PARAMETER		( TLEN = 80 )
+
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CRLOC			! Current record
       CHARACTER*(DAT__SZLOC)	HLOC			! Input HISTORY object
@@ -146,7 +150,7 @@
       IF ( IVERB .GE. HSI__NORMAL ) THEN
 
 *    Get number of lines
-        CALL ADI_CELL( ARGS(2), NLINE, STATUS )
+        CALL ADI_SIZE( ARGS(2), NLINE, STATUS )
 
 *    Locate RECORDS structure, and find its size
         CALL DAT_FIND( HLOC, 'RECORDS', RLOC, STATUS )
@@ -162,7 +166,7 @@
 
 *    If TEXT doesn't exist, create it big enough to hold our text
         IF ( .NOT. THERE ) THEN
-          CALL DAT_NEWC( CRLOC, 'TEXT', 80, 1, NLINE, STATUS )
+          CALL DAT_NEWC( CRLOC, 'TEXT', TLEN, 1, NLINE, STATUS )
           NL = 0
           CALL DAT_FIND( CRLOC, 'TEXT', TXLOC, STATUS )
 
@@ -185,7 +189,7 @@
 
 *      Extract the string and write it
           CALL ADI_GET0C( CID, LINE, STATUS )
-          CALL DAT_PUT0C( TXCLOC, LINE, STATUS )
+          CALL DAT_PUT0C( TXCLOC, LINE(:TLEN), STATUS )
 
 *      Release the sliced objects
           CALL ADI_ERASE( CID, STATUS )
