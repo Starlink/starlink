@@ -792,7 +792,8 @@
 *     calculate position of each bolometer at first measurement
 
       CALL SCULIB_PROCESS_BOLS(.FALSE., .TRUE., 0, N_BOL,
-     :     N_POS,N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,N_MEASUREMENTS,
+     :     N_POS, 1, N_SWITCHES, N_EXPOSURES, 
+     :     N_INTEGRATIONS,N_MEASUREMENTS,
      :     START_EXP, END_EXP, START_INT, END_INT, START_MEAS, END_MEAS,
      :     0, N_FITS, FITS,
      :     %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
@@ -807,9 +808,9 @@
      :     LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
-     :     BOL_DU3, BOL_DU4, .FALSE., 0.0, 0.0, 0.0, 0.0,
+     :     BOL_DU3, BOL_DU4, .FALSE., 0.0D0, 0.0D0, 0.0, 0.0,
      :     %VAL(BOL_DEC_PTR), %VAL(BOL_RA_PTR),
-     :     0.0, 0.0, STATUS)
+     :     0.0, 0.0, .FALSE., 0, STATUS)
 
 *     annul locators and array identifiers and close the file
 
