@@ -14,7 +14,6 @@ if ($@) {
   %StarConfig = (
 		 Star_Inc => '/star/include',
 		 Star_Lib => '/star/lib',
-		 Star_Share => '/star/share'
 		);
 }
 
@@ -25,9 +24,9 @@ die "No EMS libraries were found.\n This may imply that the
 ems_link command is not in your path." if $emslibs !~ /./;
  
 # Libs requires the location of the Starlink libraries 
-$libs = "-L$StarConfig{Star_Share} -L$StarConfig{Star_Lib} $emslibs ";
+$libs = "-L$StarConfig{Star_Lib} $emslibs ";
 
-# Fortran libs - required if we are using /star/share
+# Fortran libs - required for some of the routines
 $libs .= ExtUtils::F77->runtime;
 
 # Write the makefile....
@@ -37,6 +36,9 @@ WriteMakefile(
     'LIBS'      => [ $libs ],   # e.g., '-lm' 
     'INC'       => "-I$StarConfig{Star_Inc}", # e.g., '-I/usr/include/other' 
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
-                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}
+                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
+  ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+     (ABSTRACT_FROM => 'TextANSIColor.pm',
+      AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>') : ()),
 );
 
