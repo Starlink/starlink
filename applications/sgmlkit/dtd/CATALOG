@@ -54,6 +54,7 @@ PUBLIC "-//Starlink//DTD Starlink MUD 0.3//EN"		mud-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.2//EN"		mud-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.1//EN"		mud-0.1.dtd
 
+PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"	summary-0.2.dtd
 PUBLIC "-//Starlink//DTD Document Summary 0.1//EN"	summary-0.1.dtd
 
 --PUBLIC "-//Starlink//DTD Program Source Code 0.3//EN"	programcode-0.3.dtd--
