@@ -53,10 +53,12 @@ LOGFILE = FILENAME (Write)
 
 NDF
 
-NDF = NDF (Update)
+NDF = NDF (Read or Update)
    If an NDF is supplied, then its WCS FrameSet is displayed. If a
    null (!) value is supplied, then the parameter OBJECT is used to
-   specify the AST Object to display.
+   specify the AST Object to display. Update access is required to
+   the NDF if a value is given for parameter NEWWCS. Otherwise, only
+   read access is required.
 
 NEWWCS
 
@@ -64,11 +66,11 @@ NEWWCS = GROUP (Read)
    A group expression giving a dump of an AST FrameSet which
    is to be stored as the WCS component in the NDF given by parameter
    NDF. The existing WCS component is unchanged if a null value is
-   supplied. This parameter is only accessed if a non-null value is
-   supplied for parameter NDF. The Base Frame in the FrameSet is
-   assumed to be the GRID Frame. If a value is given for this
-   parameter, then the log file or Tk browser will display the new
-   FrameSet (after being stored in the NDF and retrieved). [!]
+   supplied. The value supplied for this parameter is ignored if a
+   null value is supplied for parameter NDF. The Base Frame in the
+   FrameSet is assumed to be the GRID Frame. If a value is given for
+   this parameter, then the log file or Tk browser will display the
+   new FrameSet (after being stored in the NDF and retrieved). [!]
 
 OBJECT
 

@@ -333,4 +333,5 @@ Implementation_Status
    -  This application will handle data in all numeric types, though
    type conversion to integer will occur for unsigned byte and word
    images.
+
 .endhelp

@@ -16,7 +16,9 @@ Description:
    of the displayed positions may be controlled using parameter STYLE.
 
    Positions may be reported in several different co-ordinate Frames
-   (see parameter FRAME).
+   (see parameter FRAME). Optionally, the corresponding pixel
+   co-ordinates at each position may also be reported (see parameter
+   SHOWPIXEL).
 
    The picture or pictures within which positions are required can be
    selected in several ways (see parameters MODE and NAME).
@@ -234,6 +236,15 @@ QUIET = _LOGICAL (Read)
    messages describing the use of the cursor is controlled by the
    parameter INFO. [FALSE]
 
+SHOWPIXEL
+
+SHOWPIXEL = _LOGICAL (Read)
+   If TRUE, the pixel co-ordinates of each selected position are
+   shown on a separate line, following the co-ordinates requested
+   using parameter FRAME. If pixel co-ordinates are being displayed
+   anyway (see parameter FRAME) then a value of FALSE is used for.
+   SHOWPIXEL. [current value]
+
 STYLE
 
 STYLE = LITERAL (Read)
@@ -315,6 +326,11 @@ celestial co-ordinate values are stored in radians.
 -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
+
+-  Pixel co-ordinates are formatted with 1 decimal place unless a
+format has already been specified by setting the Format attributes
+for the axes of the PIXEL co-ordinate Frame (eg using application
+WCSATTRIB).
 
 -  Positions can be removed (the instructions state how), starting
 from the most-recent one.  Such positions are excluded from the

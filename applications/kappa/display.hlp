@@ -124,7 +124,7 @@ CLEAR
 
 CLEAR = _LOGICAL (Read)
    TRUE if the current picture is to be cleared before the image is
-   displayed. [FALSE]
+   displayed. [current value]
 
 COMP
 
