@@ -131,10 +131,12 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'Y','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'RA','_CHAR',0,12,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'DEC','_CHAR',0,12,SID,STATUS)
+*  data min/max
         CALL NBS_DEFINE_PRIMITIVE(ID,'MIN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'MAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+*  axes min/max
         CALL NBS_DEFINE_PRIMITIVE(ID,'XMIN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'XMAX','_REAL',0,VAL__NBR,SID,
@@ -151,6 +153,18 @@
      :                                                         STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YPMAX','_INTEGER',0,VAL__NBI,SID,
      :                                                         STATUS)
+
+*  limits of current region
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGXMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGXMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+
+*  colour table
         CNAME='DATA'
         DO I=1,9
           DO J=1,9
