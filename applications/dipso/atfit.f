@@ -31,7 +31,7 @@
      : (WAVE, FLUX, MAXBRK, BREAK, NBREAK,
      : NOBS, WORV, OK, VARS)
 !   declarations
-       INCLUDE 'declare_stks.f'
+       INCLUDE 'DECLARE_STKS'
 !
        INTEGER  MAXBRK
        REAL WAVE(ASIZE1), FLUX(ASIZE1)

@@ -35,7 +35,7 @@
 *
        IMPLICIT NONE
 *
-       INCLUDE 'declare_stks.f'
+       INCLUDE 'DECLARE_STKS'
 *
        INTEGER ISV1, ISV2
        COMMON /MINISV/ ISV1, ISV2

@@ -44,7 +44,7 @@
 *
 *   Common area
 *
-       INCLUDE 'declare_stks.f'
+       INCLUDE 'DECLARE_STKS'
  
        LOGICAL PUSHW
        COMMON /PUSHW / PUSHW

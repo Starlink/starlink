@@ -37,7 +37,7 @@
       LOGICAL CHR_SIMLR
 
 *  Declare stacks
-       INCLUDE 'declare_stks.f'
+       INCLUDE 'DECLARE_STKS'
        INTEGER JJ
        LOGICAL PROCEED,USENDF,CLR,EXISTS,OVERWR
        INTEGER STATUS
@@ -93,7 +93,7 @@ D       INCLUDE '($IODEF)'
        EQUIVALENCE (WORK(1),IWORK(1),DPWORK(1))
 *
 *   Declare data areas
-       INCLUDE 'declare_data.f'
+       INCLUDE 'DECLARE_DATA'
 
        REAL XRKEEP(2), YRKEEP(2)
 *
@@ -109,7 +109,7 @@ D       INCLUDE '($IODEF)'
 *
 *   Declarations and common blocks for use in PLTARR
 *
-       INCLUDE 'declare_plts.f'
+       INCLUDE 'DECLARE_PLTS'
 
 *
        LOGICAL FIRSTDEVICE
@@ -233,7 +233,7 @@ D       INCLUDE '($IODEF)'
 
 *   Include LABELS for axes
 
-       INCLUDE 'declare_lbls.f'
+       INCLUDE 'DECLARE_LBLS'
 *
        COMMON /MINISV/ ISV1, ISV2
 

@@ -3,7 +3,7 @@
      : ISIZE, XHIST, YHIST)
 
 *   Include graphics stuff
-       INCLUDE 'declare_plts.f'
+       INCLUDE 'DECLARE_PLTS'
 *
  
        INTEGER SLEN
@@ -36,7 +36,7 @@
        PARAMETER (PI=3.14159265,TWOPI=2.*PI)
 
 *   Include LABELS for axes
-       INCLUDE 'declare_lbls.f'
+       INCLUDE 'DECLARE_LBLS'
 
 *
        REAL MAJTICKSD(2)

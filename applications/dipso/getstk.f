@@ -9,7 +9,7 @@
        CHARACTER*(*) TITLE
        LOGICAL OK
 *
-       INCLUDE 'declare_stks.f'
+       INCLUDE 'DECLARE_STKS'
 *
 *
        OK = .TRUE.
