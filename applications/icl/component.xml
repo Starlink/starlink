@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="icl">
+  <version>3.1-9</version>
+  <path>applications/icl</path>
+  <description>Interactive Command Language</description>
+  <abstract><p>ICL shell.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>S K Robinson</name>
+    </person>
+    <person>
+      <name>I R Jenkins</name>
+    </person>
+    <person>
+      <name>B K McIlwrath</name>
+    </person>
+  </developers>
+  <documentation> sg5</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
