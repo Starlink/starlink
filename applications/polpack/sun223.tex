@@ -2737,7 +2737,8 @@ for NDF applications.
          value used for each input array is chosen so that the residuals
          between the input array and the corresponding intensity values
          implied by the Stokes vectors produced on the previous iteration, 
-         have a mean value of zero. Selecting the DEZERO option can
+         have a mean value of zero. Set ILEVEL to 3 or more to see the
+         values used. Selecting the DEZERO option can
          reduce the variances in the output cube, but usually slows down 
          convergence of the iterative procedure. Thus you may have to give 
          a larger value for parameter MAXIT, resulting in significantly 
