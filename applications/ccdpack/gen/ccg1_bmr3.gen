@@ -54,6 +54,8 @@
 *  History:
 *     19-MAY-1992 (PDRAPER):
 *        Original version.
+*     17-NOV-1998 (PDRAPER):
+*        Modified to use quicksort/insertion sort hybrid.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -146,7 +148,7 @@
          IF ( NGOOD .GT. 1 ) THEN
 
 *  Sort these values into increasing order.
-            CALL CCG1_IS2R( WRK1, POINT, NGOOD, STATUS )
+            CALL CCG1_SRT2R( WRK1, POINT, NGOOD, STATUS )
 
 *  Determine the trimming fraction.
             IF ( NGOOD .GT. 12 ) THEN

@@ -110,13 +110,15 @@
 *        An integer representing the required method for combining the
 *        input data into a mosaic:
 *           2 = MEAN
-*           3 = MEDIAN
+*           3 = WEIGHTED MEDIAN
 *           4 = TRIMMED MEAN
 *           5 = MODE
 *           6 = SIGMA CLIPPED MEAN
 *           7 = THRESHOLD EXCLUSION MEAN
 *           8 = MINMAX MEAN
 *           9 = BROADENED MEDIAN
+*           10 = SIGMA CLIPPED MEDIAN
+*           11 = UNWEIGHTED MEDIAN
 *        This, and the following associated arguments, are only used if
 *        DOOUT is .TRUE..
 *     ALPHA = REAL (Given)

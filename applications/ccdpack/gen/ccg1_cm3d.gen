@@ -98,6 +98,8 @@
 *        routine structure to increase efficiency.
 *     30-JAN-1998 (PDRAPER):
 *        Added sigma clipped median.
+*     16-NOV-1998 (PDRAPER):
+*        Added fast median.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -201,6 +203,12 @@
          CALL CCG1_SMD3<T>( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
      :                      RESULT, WRK1, WRK2, NCON, POINT, USED,
      :                      STATUS )
+
+      ELSE IF ( IMETH .EQ. 11 ) THEN
+
+*  Forming fast median (no weights).
+         CALL CCG1_FMD3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, 
+     :                      WRK1, NCON, POINT, USED, STATUS )
 
       ELSE
 

@@ -74,6 +74,8 @@
 *        Original version.
 *     28-MAY-1992 (PDRAPER):
 *        Now performs weighted covariance summation.
+*     17-NOV-1998 (PDRAPER):
+*        Modified to use quicksort/insertion sort hybrid.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -206,7 +208,7 @@
 *  non-central for (noisy) skew distributions, so the order statitics
 *  summation will be incorrect if we procede assuming that the mean is
 *  central also for the covariances.
-            CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
+            CALL CCG1_SRT3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Set the clipping range.
             RVAL1 = REAL( VAL - DBLE( NSIGMA ) * SQRT( VAR ) )

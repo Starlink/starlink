@@ -121,6 +121,8 @@
 *        efficiency and keep in line with new routines.
 *     30-JAN-1998 (PDRAPER):
 *        Added sigma clipped median.
+*     16-NOV-1998 (PDRAPER):
+*        Added fast median.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -239,6 +241,13 @@
          CALL CCG1_SMD2<T>( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
      :                      COVEC, NMAT, RESULT, RESVAR, WRK1, WRK2,
      :                      NCON, POINT, USED, STATUS )
+
+      ELSE IF ( IMETH .EQ. 11 ) THEN
+
+*  Forming the fast median.
+         CALL CCG1_FMD2<T>( STACK, NPIX, NLINES, VARS, MINPIX, COVEC,
+     :                      NMAT, RESULT, RESVAR, WRK1, WRK2, NCON,
+     :                      POINT, USED, STATUS )
 
       ELSE
 

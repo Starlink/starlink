@@ -55,6 +55,8 @@
 *        7 = THRESHOLD EXCLUSION MEAN
 *        8 = MINMAX MEAN
 *        9 = BROADENED MEDIAN
+*        10 = CLIPPED MEDIAN
+*        11 = FAST MEDIAN
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.

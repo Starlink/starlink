@@ -1,6 +1,6 @@
       SUBROUTINE CCG1_FMR1<T>( STACK, NPIX, NLINES, VARS, MINPIX, 
-     :                         RESULT, RESVAR, WRK1, WRK2, NCON, POINT, 
-     :                         USED, STATUS )
+     :                         COVEC, NMAT, RESULT, RESVAR, WRK1, WRK2, 
+     :                         NCON, POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_FMR1
@@ -12,19 +12,20 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_FMR1( STACK, NPIX, NLINES, VARS, MINPIX, RESULT, RESVAR, 
-*                     WRK1, WRK2, NCON, POINT, USED, STATUS )
+*     CALL CCG1_FMR1<T>( STACK, NPIX, NLINES, VARS, MINPIX, COVEC, NMAT, 
+*                        RESULT, RESVAR, WRK1, WRK2, NCON, POINT, USED, 
+*                        STATUS )
 
 *  Description:
-
 *     This routine accepts an array consisting a series of (vectorised)
 *     lines of data. The data values in the lines are then combined to
 *     form a (fast) median line. This method uses no weights and returns
-*     the estimated variance as pi/2 of variance that a mean would have.
+*     the estimated variances based on order stats for the population
+*     sizes used at each output pixel.
 *
-*     The method used in based on Wirth's algorithm for selecting the
+*     The method used is based on Wirth's algorithm for selecting the
 *     Kth value, which is very fast compared to a full sort.
-* 
+*
 *     The output medians are returned in the array RESULT.
 
 *  Arguments:
@@ -39,6 +40,13 @@
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
+*     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given)
+*        The packed variance-covariance matrix of the order statistics
+*        from a normal distribution of sizes up to NLINES, produced by
+*        CCD1_ORVAR. This is only used when median is derived from
+*        the central-2 values.
+*     NMAT = INTEGER (Given)
+*        Size of the first dimension of COVEC.
 *     RESULT( NPIX ) = REAL (Returned)
 *        The output line of data.
 *     RESVAR( NPIX ) = REAL (Returned)
@@ -83,8 +91,10 @@
       INTEGER NPIX
       INTEGER NLINES
       INTEGER MINPIX
+      INTEGER NMAT
       <TYPE> STACK( NPIX, NLINES )
       <TYPE> VARS( NPIX, NLINES )
+      DOUBLE PRECISION COVEC( NMAT, NLINES )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION NCON( NLINES )
@@ -113,13 +123,16 @@
       PARAMETER ( PIBY2 = 1.57079632679  ) ! PI/2.0
 
 *  Local Variables:
-      INTEGER I                 ! Loop variable
-      INTEGER J                 ! Loop variable
+      DOUBLE PRECISION SUM      ! Variance sum
       DOUBLE PRECISION VAL      ! Weighted median
       DOUBLE PRECISION VAR      ! Final variance
-      DOUBLE PRECISION DUM      ! Temporary variable
-      DOUBLE PRECISION SUM      ! Variance sum
+      DOUBLE PRECISION VSUM     ! Variance/covariance sum
+      INTEGER I                 ! Loop variable
+      INTEGER K                 ! Loop variable
+      INTEGER IMED              ! Position of median value
+      INTEGER J                 ! Loop variable
       INTEGER NGOOD             ! Number of good pixels
+      REAL  RVAL                ! Real variable
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -172,10 +185,10 @@
          IF ( NGOOD .GT. 0 ) THEN
 
 *  If only one value is available then this is the median.
-            IF ( NGOOD .EQ. 1 ) THEN 
+            IF ( NGOOD .EQ. 1 ) THEN
                VAL = WRK1( 1 )
                VAR = WRK2( 1 )
-            ELSE 
+            ELSE
 
 *  Get position at median, or one above (for even)
                IMED = NGOOD / 2 + 1
@@ -183,29 +196,49 @@
 *  If number is even we need the central two values.
                IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
 
-*  Select the two values needed for median.
-                  CALL CCG1_KTHR( NGOOD, IMED, WRK1, VAL, STATUS )
-                  CALL CCG1_KTHR( NGOOD, IMED - 1, WRK1, DUM, STATUS )
-                  VAL = ( VAL + DUM ) * 0.5D0
+*  Select the two values needed for median, update the used counters.
+                  CALL CCG1_KTHR( NGOOD, IMED, WRK1, POINT, RVAL,
+     :                            STATUS )
+                  VAL = DBLE( RVAL )
+                  NCON( POINT( IMED ) ) = NCON( POINT( IMED ) ) + 1.0D0
 
-*  Variance is PI/2 of population value (approx... avoids serious calcs).
-                  VAR = ( 1.0D0 / SUM ) * PIBY2 * 2.0D0
+                  IMED = IMED - 1
+                  CALL CCG1_KTHR( NGOOD, IMED, WRK1, POINT, RVAL,
+     :                            STATUS )
+                  NCON( POINT( IMED ) ) = NCON( POINT( IMED ) ) + 1.0D0
 
-*  Update the used line counters.
-                  NCON( POINT( IMED - 1 ) ) = NCON( POINT( IMED - 1) ) + 
-     :                                        1.0D0
+*  Median is mean of these two values.
+                  VAL = ( VAL + DBLE( RVAL ) ) * 0.5D0
+
+*  Use order statistics to derive the correct modification of the
+*  population variances.
+                  VSUM = 0.0D0
+                  DO 3 K = IMED, IMED + 1
+                     DO 4 J = K, IMED + 1
+                        
+*  Sum variances and twice covariances ( off diagonal elements ).
+                        IF( K .EQ. J ) THEN
+                           VSUM = VSUM + 
+     :                     COVEC( K + J * ( J - 1 ) / 2, NGOOD )
+                        ELSE
+                           VSUM = VSUM +
+     :                     2.0D0 * COVEC( K + J * ( J - 1 )/ 2, NGOOD )
+                        END IF
+ 4                   CONTINUE
+ 3                CONTINUE
+                  VAR = ( 1.0D0 / SUM ) * VSUM * DBLE( NGOOD ) * 0.25
                ELSE
 
 *  Straight-forward case.
-                  CALL CCG1_KTHR( NGOOD, IMED, WRK1, VAL, STATUS )
+                  CALL CCG1_KTHR( NGOOD, IMED, WRK1, POINT, RVAL,
+     :                            STATUS )
+                  NCON( POINT( IMED ) ) = NCON( POINT( IMED ) ) + 1.0D0
+                  VAL = DBLE( RVAL )
 
 *  Variance is PI/2 of population value.
-                  VAR = ( 1.0D0 / SUM ) * PIBY2
+                  VAR = ( 1.0D0 / SUM ) * DBLE( NGOOD ) * 
+     :                  COVEC( IMED + IMED * ( IMED - 1 ) / 2, NGOOD ) 
                END IF
-
-*  Update the used line counters.
-               NCON( POINT( IMED ) ) = NCON( POINT( IMED ) ) + 1.0D0
-
             END IF
          END IF
 

@@ -41,7 +41,7 @@
 *     IMETH = INTEGER (Returned)
 *        An integer representing the required combination method:
 *           2  = MEAN
-*           3  = MEDIAN
+*           3  = WEIGHTED MEDIAN
 *           4  = TRIMMED MEAN
 *           5  = MODE
 *           6  = SIGMA CLIPPED MEAN
@@ -49,6 +49,7 @@
 *           8  = MINMAX MEAN
 *           9  = BROADENED MEDIAN
 *           10 = SIGMA CLIPPED MEDIAN
+*           11 = UNWEIGHTED MEDIAN
 *     USEWT = LOGICAL (Returned)
 *        Set to .TRUE. if user-supplied weights were obtained. If set
 *        to .FALSE, then no weighting is to be used. This value is only
@@ -97,6 +98,8 @@
 *        Removed AIF_ routines and replaced with PAR_
 *     30-JAN-1998 (PDRAPER):
 *        Added sigma clipped median.
+*     18-NOV-1998 (PDRAPER):
+*        Added unweighted median (fastmed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -141,7 +144,8 @@
 *  Obtain the data combination method to be used, using MEDIAN as the
 *  default.
       CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN,MEAN,TRIMMED,MODE,'//
-     :                'SIGMA,THRESHOLD,MINMAX,BROADENED,CLIPMED', 
+     :                'SIGMA,THRESHOLD,MINMAX,BROADENED,CLIPMED,'//
+     :                'FASTMED', 
      :                .FALSE., METH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -164,6 +168,8 @@
          IMETH = 9
       ELSE IF ( METH .EQ. 'CLIPMED' ) THEN
          IMETH = 10
+      ELSE IF ( METH .EQ. 'FASTMED' ) THEN
+         IMETH = 11
       END IF
 
 *  If variance values are not being used and the data combination

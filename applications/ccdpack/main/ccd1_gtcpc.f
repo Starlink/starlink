@@ -38,7 +38,7 @@
 *     IMETH = INTEGER (Returned)
 *        An integer representing the method chosen.
 *        2  = MEAN
-*        3  = MEDIAN
+*        3  = WEIGHTED MEDIAN
 *        4  = TRIMMED MEAN
 *        5  = MODE
 *        6  = SIGMA CLIPPED MEAN ! allowed if genvar true (has noise
@@ -47,6 +47,7 @@
 *        8  = MINMAX MEAN
 *        9  = BROADENED MEDIAN
 *        10 = SIGMA CLIPPED MEDIAN
+*        11 = UNWEIGHTED MEDIAN
 *     CMODE = CHARACTER * ( * ) (Returned)
 *        The method chosen represented as a string.
 *     NITER = INTEGER (Returned)
@@ -79,6 +80,8 @@
 *        Removed AIF_ calls.
 *     30-JAN-1998 (PDRAPER):
 *        Added sigma clipped mean.
+*     18-NOV-1998 (PDRAPER):
+*        Added fast median option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,14 +117,14 @@
 
 *  Find out the combination mode. Use median as the default
       IF ( GENVAR ) THEN
-         CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,MODE '//
-     :               ',SIGMA ,THRESHOLD ,MINMAX ,BROADENED, CLIPMED', 
-     :               .FALSE., CMODE, STATUS )
+         CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN,MEAN,TRIMMED,MODE,'//
+     :                   'SIGMA,THRESHOLD,MINMAX,BROADENED,CLIPMED,'//
+     :                   'FASTMED', .FALSE., CMODE, STATUS )
       ELSE
 
 *  Disallow the SIGMA clipping options.
-         CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,'//
-     :                   'MODE, THRESHOLD ,MINMAX ,BROADENED', 
+         CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN,MEAN,TRIMMED ,'//
+     :                   'MODE,THRESHOLD,MINMAX,BROADENED,FASTMED', 
      :                   .FALSE., CMODE, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -145,6 +148,8 @@
          IMETH = 9
       ELSE IF ( CMODE .EQ. 'CLIPMED' ) THEN
          IMETH = 10
+      ELSE IF ( CMODE .EQ. 'FASTMED' ) THEN
+         IMETH = 11
       ELSE
 
 *  Bad return set status and exit.

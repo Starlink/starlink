@@ -170,7 +170,7 @@
 *        to form the output mosaic. This may be set to any unique
 *        abbreviation of the following:
 *           -  MEAN      -- Mean of the input data values
-*           -  MEDIAN    -- Median of the input data values
+*           -  MEDIAN    -- Weighted median of the input data values
 *           -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
 *                           alpha of the values are removed from
 *                           each extreme
@@ -185,6 +185,7 @@
 *                           number of central values)
 *           -  CLIPMED   -- A sigma clipped median (like SIGMA except
 *                           that the median of the clipped values is used)
+*           -  FASTMED   -- Unweighted median of input data values
 *        [MEDIAN]
 *     MIN = _REAL (Read)
 *        Lower limit for input data values which may contribute to the
@@ -658,6 +659,8 @@
 *        Stopped the propagation of quality from the first NDF to the
 *        output. This was not the right thing to do when the NDFs are
 *        padded to match bounds (regions of BAD quality are introduced).
+*     18-NOV-1998 (PDRAPER):
+*        Added fastmed combination method.
 *     {enter_further_changes_here}
 
 *  Bugs:

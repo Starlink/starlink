@@ -69,6 +69,8 @@
 *        Removed AIF_ calls
 *     30-JAN-1998 (PDRAPER):
 *        Added sigma clipped median.
+*     18-NOV-1998 (PDRAPER):
+*        Added fastmed option.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,9 +102,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find out the combination mode. Use median as the default
-      CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,MODE ,'//
-     :                ' SIGMA ,THRESHOLD ,MINMAX ,BROADENED ,'//
-     :                'CLIPMED ,FASTMED', .FALSE., CMODE, STATUS )
+      CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN,MEAN,TRIMMED,MODE,'//
+     :                'SIGMA,THRESHOLD,MINMAX,BROADENED,'//
+     :                'CLIPMED,FASTMED', .FALSE., CMODE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Act on the return, set the IMETH value

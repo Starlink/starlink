@@ -73,6 +73,8 @@
 *        Modified to derive a standard deviation estimate from the
 *        data values rather than assuming that the input "variances"
 *        are typical for each line. This was never the case.
+*     17-NOV-1998 (PDRAPER):
+*        Modified to use quicksort/insertion sort hybrid.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,7 +205,7 @@
 *  non-central for (noisy) skew distributions, so the order statitics
 *  summation will be incorrect if we procede assuming that the mean is
 *  central and so are the covariances.
-               CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
+               CALL CCG1_SRT3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Set the clipping range.
                RVAL1 = REAL( VAL - DBLE( NSIGMA ) * SQRT( SVAR ) )

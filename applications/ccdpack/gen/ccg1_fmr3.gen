@@ -1,5 +1,5 @@
       SUBROUTINE CCG1_FMR3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, 
-     :                         WRK1, WRK2, NCON, POINT, USED, STATUS )
+     :                         WRK1, NCON, POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_FMR3
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCG1_FMR3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, 
-*                        WRK1, WRK2, NCON, POINT, USED, STATUS )
+*                        WRK1, NCON, POINT, USED, STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)
@@ -38,8 +38,6 @@
 *     RESULT( NPIX ) = REAL (Returned)
 *        The output line of data.
 *     WRK1( NLINES ) = REAL (Given and Returned)
-*        Workspace for calculations.
-*     WRK2( NLINES ) = REAL (Given and Returned)
 *        Workspace for calculations.
 *     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        The actual number of contributing pixels.
@@ -82,7 +80,6 @@
 *  Arguments Given and Returned:
       DOUBLE PRECISION NCON( NLINES )
       REAL WRK1( NLINES )
-      REAL WRK2( NLINES )
 
 *  Arguments Returned:
       REAL RESULT( NPIX )
@@ -108,7 +105,6 @@
       DOUBLE PRECISION SUM      ! Variance sum
       DOUBLE PRECISION VAL      ! Weighted median
       INTEGER I                 ! Loop variable
-      INTEGER K                 ! Loop variable
       INTEGER IMED              ! Position of median value
       INTEGER J                 ! Loop variable
       INTEGER NGOOD             ! Number of good pixels

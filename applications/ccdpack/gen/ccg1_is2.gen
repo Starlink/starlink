@@ -1,7 +1,7 @@
       SUBROUTINE CCG1_IS2<T>( ORDDAT, ANCDAT, NENT, STATUS )
 *+
 *  Name:
-*     CCG1_IS2T
+*     CCG1_IS2<T>
 
 *  Purpose:
 *     To sort the list of data orddat into increasing order, also sorts

@@ -88,7 +88,7 @@
 
 *  Use quicksort, need an array of pointers to permute.
          CALL CCD1_MALL( NENT, '_INTEGER', IPTMP, STATUS )
-         CALL CCG1_QSRT<T>( NENT, ORDDAT, %VAL( IPTMP ), STATUS )
+         CALL PDA_QSIA<T>( NENT, ORDDAT, %VAL( IPTMP ) )
 
 *  Now permute data.
          IFAIL = 0

@@ -170,7 +170,7 @@
 *        to form the output mosaic. This may be set to any unique
 *        abbreviation of the following:
 *           -  MEAN      -- Mean of the input data values
-*           -  MEDIAN    -- Median of the input data values
+*           -  MEDIAN    -- Weighted median of the input data values
 *           -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
 *                           alpha of the values are removed from
 *                           each extreme
@@ -183,6 +183,9 @@
 *                           removed
 *           -  BROADENED -- A broadened median (the mean of a small
 *                           number of central values)
+*           -  CLIPMED   -- A sigma clipped median (like SIGMA except
+*                           that the median of the clipped values is used)
+*           -  FASTMED   -- Unweighted median of input data values
 *        [MEDIAN]
 *     MIN = _REAL (Read)
 *        Lower limit for input data values which may contribute to the

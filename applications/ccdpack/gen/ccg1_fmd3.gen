@@ -1,5 +1,5 @@
       SUBROUTINE CCG1_FMD3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, 
-     :                         WRK1, WRK2, NCON, POINT, USED, STATUS )
+     :                         WRK1, NCON, POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_FMD3
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCG1_FMD3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, 
-*                        WRK1, WRK2, NCON, POINT, USED, STATUS )
+*                        WRK1, NCON, POINT, USED, STATUS )
 
 *  Description:
 *     This routine accepts an array consisting a series of (vectorised)
@@ -38,8 +38,6 @@
 *     RESULT( NPIX ) = DOUBLE PRECISION (Returned)
 *        The output line of data.
 *     WRK1( NLINES ) = DOUBLE PRECISION (Given and Returned)
-*        Workspace for calculations.
-*     WRK2( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        Workspace for calculations.
 *     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        The actual number of contributing pixels.
@@ -82,7 +80,6 @@
 *  Arguments Given and Returned:
       DOUBLE PRECISION NCON( NLINES )
       DOUBLE PRECISION WRK1( NLINES )
-      DOUBLE PRECISION WRK2( NLINES )
 
 *  Arguments Returned:
       DOUBLE PRECISION RESULT( NPIX )
@@ -111,7 +108,6 @@
       INTEGER I                 ! Loop variable
       INTEGER IMED              ! Position of median value
       INTEGER J                 ! Loop variable
-      INTEGER K                 ! Loop variable
       INTEGER NGOOD             ! Number of good pixels
 
 *  Internal References:
