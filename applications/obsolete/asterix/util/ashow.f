@@ -967,6 +967,9 @@
       CHARACTER*20		SNAME			! Selection name
       CHARACTER*20		VARIANT			! Selector variant
 
+      REAL			START, STOP		! Range pair
+
+      INTEGER			BPTR, EPTR		! Mapped range pairs
       INTEGER			GRPID			! ARD identifier
       INTEGER			I			! Loop over selections
       INTEGER			ICMP			! Loop over selectors
@@ -978,8 +981,6 @@
       INTEGER			SIID			! Selector identifier
       INTEGER			SID			! Selectors structure
       INTEGER			SIZE			! Amount of sel data
-
-      LOGICAL			OK			! Link is present
 *.
 
 *  Check inherited global status.
@@ -1033,7 +1034,8 @@
             CALL ADI_CGET0C( SIID, 'Variant', VARIANT, STATUS )
 
 *        Switch on variant
-            CALL ASHOW_VAL( VARIANT, 'Variant', ' ', OCH, STATUS )
+            CALL ASHOW_VAL( 'Variant = '//VARIANT, 'Name', ' ',
+     :                      OCH, STATUS )
             IF ( VARIANT .EQ. 'AREA_DESCRIPTION' ) THEN
               CALL ADI_CGET0I( SIID, 'GRPID', GRPID, STATUS )
 
@@ -1046,11 +1048,43 @@
                   CALL ASHOW_VAL( ARDIN(:L), 'Description', ' ',
      :                            OCH, STATUS )
                 ELSE
-                  CALL AIO_IWRITE( OCH, 20, ': '//ARDIN(:L), STATUS )
+                  CALL AIO_IWRITE( OCH, 29, ARDIN(:L), STATUS )
                 END IF
               END DO
 
             ELSE IF ( VARIANT .EQ. 'RANGE_PAIRS' ) THEN
+
+*          How many pairs?
+              CALL ADI_CSIZE( SIID, 'START', SIZE, STATUS )
+
+*          Map the data
+              CALL ADI_CMAPR( SIID, 'START', 'READ', BPTR, STATUS )
+              CALL ADI_CMAPR( SIID, 'STOP', 'READ', EPTR, STATUS )
+
+*          Loop over pairs
+              DO ITXT = 1, SIZE
+
+*            Get these values
+                CALL ARR_ELEM1R( BPTR, SIZE, ITXT, START, STATUS )
+                CALL ARR_ELEM1R( EPTR, SIZE, ITXT, STOP, STATUS )
+
+*            Print 'em out
+                CALL MSG_SETR( 'START', START )
+                CALL MSG_SETR( 'STOP', STOP )
+                CALL MSG_MAKE( '^START -> ^STOP', ARDIN, L )
+                IF ( ITXT .EQ. 1 ) THEN
+                  CALL ASHOW_VAL( ARDIN(:L), 'Description', ' ',
+     :                            OCH, STATUS )
+                ELSE
+                  CALL AIO_IWRITE( OCH, 29, ARDIN(:L), STATUS )
+                END IF
+
+              END DO
+
+*          Release range pairs data
+              CALL ADI_CUNMAP( SIID, 'START', BPTR, STATUS )
+              CALL ADI_CUNMAP( SIID, 'STOP', EPTR, STATUS )
+
             END IF
 
 *        Release selector
