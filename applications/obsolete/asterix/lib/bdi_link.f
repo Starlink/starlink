@@ -104,8 +104,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*15		PAR			! USI parameter
-
       INTEGER			TID			! Temporary identifier
 *.
 
@@ -115,25 +113,11 @@
 *  Create new object
       CALL BDI_NEW( CLASS, NDIM, DIMS, TYPE, TID, STATUS )
 
-*  Link it if creation went ok
-      IF ( STATUS .EQ. SAI__OK ) THEN
-        CALL ADI_SETLNK( TID, FID, STATUS )
+*  Link the objects
+      CALL UDI_LINK( TID, FID, STATUS )
 
-*    Was the input object obtained from USI?
-        CALL USI0_IDPAR( FID, PAR, STATUS )
-        IF ( PAR .GT. ' ' ) THEN
-
-*      If so, update USI storage
-          CALL USI0_UPDID( PAR, TID, STATUS )
-
-        END IF
-
-*    Update file object if successful
-        IF ( STATUS .EQ. SAI__OK ) THEN
-          FID = TID
-        END IF
-
-      END IF
+*  Update file object if successful
+      IF ( STATUS .EQ. SAI__OK ) FID = TID
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_LINK', STATUS )
