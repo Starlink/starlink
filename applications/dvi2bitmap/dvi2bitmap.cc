@@ -55,9 +55,11 @@ typedef vector<string> string_list;
 // bitmap to be written.
 struct bitmap_info {
     bitmap_info()
-	: blur_bitmap(false), make_transparent(true), bitmap_scale_factor(1),
+	: blur_bitmap(false), crop_bitmap(true),
+	  make_transparent(true), bitmap_scale_factor(1),
 	  ofile_pattern(""), ofile_name(""), ofile_type("") { }
     bool blur_bitmap;
+    bool crop_bitmap;
     bool make_transparent;
     int bitmap_scale_factor;
     string ofile_pattern;
@@ -152,12 +154,19 @@ int main (int argc, char **argv)
 		    break;
 		  case 'p':
 		    argc--, argv++; if (argc <= 0) Usage();
+		    // Note that the functionality here will vary
+		    // depending on whether the magmag is set before
+		    // or after this option, and it'll take no
+		    // account of variations of the magnification
+		    // within the DVI file.
 		    int i;
 		    for (i = 0; i<npapersizes; i++)
 			if (strcmp (*argv, papersizes[i].name) == 0)
 			{
-			    bitmapH = static_cast<int>(papersizes[i].h+0.5);
-			    bitmapW = static_cast<int>(papersizes[i].w+0.5);
+			    bitmapH
+				= static_cast<int>(magmag*papersizes[i].h+0.5);
+			    bitmapW
+				= static_cast<int>(magmag*papersizes[i].w+0.5);
 			    break;
 			}
 		    if (i == npapersizes)
@@ -182,52 +191,39 @@ int main (int argc, char **argv)
 	      case 'c':		// crop
 	      {
 		  char c = *++*argv;
-		  if (c == 'x')
+		  argc--, argv++; if (argc <= 0) Usage();
+		  // get dimension, and convert points to pixels.
+		  // Note that the functionality here will vary
+		  // depending on whether the magmag is set before
+		  // or after this option, and it'll take no
+		  // account of variations of the magnification
+		  // within the DVI file.
+		  int cropmargin = static_cast<int>(magmag*atof(*argv)/72.0*resolution);
+		  switch (c)
 		  {
-		      // turn off cropping
-		      Bitmap::cropDefault(Bitmap::None, 0, false);
-		  }
-		  else
-		  {
-		      argc--, argv++; if (argc <= 0) Usage();
-		      // get dimension, and convert points to pixels.
-		      // Note that the functionality here will vary
-		      // depending on whether the magmag is set before
-		      // or after this option, and it'll take no
-		      // account of variations of the magnification
-		      // within the DVI file.
-		      int cropmargin = static_cast<int>(magmag*atof(*argv)/72.0*resolution);
-		      switch (c)
-		      {
-			case 'l':
-			  Bitmap::cropDefault(Bitmap::Left,
-					      cropmargin, absCrop);
-			  break;
-			case 'r':
-			  Bitmap::cropDefault(Bitmap::Right,
-					      cropmargin, absCrop);
-			  break;
-			case 't':
-			  Bitmap::cropDefault(Bitmap::Top,
-					      cropmargin, absCrop);
-			  break;
-			case 'b':
-			  Bitmap::cropDefault(Bitmap::Bottom,
-					      cropmargin, absCrop);
-			  break;
-			case '\0':
-			  if (absCrop) // don't want this!
-			      Usage();
-			  Bitmap::cropDefault(Bitmap::All,
-					      cropmargin, false);
-			  //Bitmap::cropDefault(Bitmap::Left,   cropmargin, false);
-			  //Bitmap::cropDefault(Bitmap::Right,  cropmargin, false);
-			  //Bitmap::cropDefault(Bitmap::Top,    cropmargin, false);
-			  //Bitmap::cropDefault(Bitmap::Bottom, cropmargin, false);
-			  break;
-			default:
+		    case 'l':
+		      Bitmap::cropDefault(Bitmap::Left,	  cropmargin, absCrop);
+		      break;
+		    case 'r':
+		      Bitmap::cropDefault(Bitmap::Right,  cropmargin, absCrop);
+		      break;
+		    case 't':
+		      Bitmap::cropDefault(Bitmap::Top,	  cropmargin, absCrop);
+		      break;
+		    case 'b':
+		      Bitmap::cropDefault(Bitmap::Bottom, cropmargin, absCrop);
+		      break;
+		    case '\0':
+		      if (absCrop) // don't want this!
 			  Usage();
-		      }
+		      Bitmap::cropDefault(Bitmap::All,	  cropmargin, false);
+		      //Bitmap::cropDefault(Bitmap::Left,   cropmargin, false);
+		      //Bitmap::cropDefault(Bitmap::Right,  cropmargin, false);
+		      //Bitmap::cropDefault(Bitmap::Top,    cropmargin, false);
+		      //Bitmap::cropDefault(Bitmap::Bottom, cropmargin, false);
+		      break;
+		    default:
+		      Usage();
 		  }
 		  break;
 	      }
@@ -335,6 +331,12 @@ int main (int argc, char **argv)
 			break;
 		      case 'T':	// don't
 			bm.make_transparent = false;
+			break;
+		      case 'c':	// crop bitmap
+			bm.crop_bitmap = true;
+			break;
+		      case 'C':	// don't
+			bm.crop_bitmap = false;
 			break;
 		      default:
 			Usage();
@@ -769,7 +771,8 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			     << (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch)
 			     << '\n';
 			}
-			bitmap->crop();
+			if (b.crop_bitmap)
+			    bitmap->crop();
 			if (b.blur_bitmap)
 			    bitmap->blur();
 			if (b.make_transparent)
@@ -1201,8 +1204,8 @@ void Usage (void)
     cerr << "Usage: " << progname << " [-qV] [-Q[FfGgtbp]] \n\
         [-b(h|w) size] [-bp a4|a4l|usletter...]\n\
 	[-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
-	[-r resolution] [-P[bBtT]] [-s scale-factor] [-o outfile-pattern]\n\
-	[-m magmag ] [-[Cc][lrtb] size] [-cx] [-n]\n\
+	[-r resolution] [-P[bBtTcC]] [-s scale-factor] [-o outfile-pattern]\n\
+	[-m magmag ] [-[Cc][lrtb] size] [-n]\n\
 	[-R[fb] int,int,int]\n\
 	[-p num] [-l num] [-pp ranges] [-t xbm"
 #if ENABLE_GIF
