@@ -19,17 +19,17 @@
 *    Authors :
 *     Trevor Ponman (BHVAD::TJP)
 *    History :
-*      3 Mar 88: Original (code stripped from FIT_DATGET)
-*     20 Oct 88: Response locator included in INSTR structure (TJP)
-*     15 Feb 89: ASTERIX88 version - SPECTRAL_SET handling (TJP)
-*     20 Mar 91: Fix for case where no axis data are present (TJP)
-*      2 Aug 95: Specify energy axis by argument (DJA)
+*      3 Mar 1988 : Original (code stripped from FIT_DATGET)
+*     20 Oct 1988 : Response locator included in INSTR structure (TJP)
+*     15 Feb 1989 : ASTERIX88 version - SPECTRAL_SET handling (TJP)
+*     20 Mar 1991 : Fix for case where no axis data are present (TJP)
+*      2 Aug 1995 : Specify energy axis by argument (DJA)
+*     30 Nov 1995 : New data interface routines (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
 *    Structure definitions :
@@ -72,7 +72,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Axis values exist?
-	CALL BDI_CHKAXVAL( ID, E_AX, OK, REG, NAX, STATUS )
+        CALL BDI_AXCHK( ID, E_AX, 'Data', OK, STATUS )
 	IF ( OK ) THEN
 
 *    Response dimensions must
@@ -92,7 +92,7 @@
      :                        RCPTR, STATUS )
 
 *      Map in axis values
-              CALL BDI_MAPAXVAL( ID, 'READ', E_AX, AXPTR, STATUS )
+              CALL BDI_AXMAPR( ID, E_AX, 'Data', 'READ', AXPTR, STATUS )
 
 *      And check against dataset channels...
 	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCC,
@@ -101,7 +101,7 @@
 *      Release the axis and spec array
               CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelSpec',
      :                          RCPTR, STATUS )
-	      CALL BDI_UNMAPAXVAL( ID, E_AX, STATUS )
+              CALL BDI_AXUNMAP( ID, E_AX, 'Data', AXPTR, STATUS )
 
             END IF
 
@@ -113,7 +113,7 @@
 
       END IF
 
-* Exit
+*  Exit
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_GETINS', STATUS )
       END IF
