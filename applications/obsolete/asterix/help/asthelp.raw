@@ -25,7 +25,7 @@
  <dl>
  <dt> SHOWXRT           
  <dd> Show observation information stored in header file
- <dt> XRTCONV           
+ <Dt> XRTCONV
  <dd> Since ASTERIX 2.3-0 works directly on FITS RDF files
  <dd> this command has become obselete.
  <dt> XRTINDEX          
@@ -1872,7 +1872,7 @@
  default but larger than <math>|dmin|</math>) a larger dynamic range will be
  retained.<p>
 
-3 Data level options
+3 Data_level_options
  The user can choose between linearly (1) or logarithmically (2) spaced data
  levels or, alternatively, can specify the level boundaries explicitly (3).
  In the case of user-defined levels it is only necessary to specify the
@@ -5200,7 +5200,7 @@
  The first TXT2AST demo file,<p>
 
  <exam>
- ICL> TXT2AST AST_DEMO:IMPORT_1D OUTPUT         ;
+ ICL> TXT2AST AST_DEMO:TXT2AST_1D OUTPUT         ;
 
   ;--------------------------------------------------
   ;|       TXT2AST demo file - 1 dimensional         |
@@ -5305,7 +5305,7 @@
 
  <exam>
   ;--------------------------------------------------
-  ;         IMPORT demo file - 1 dimensional  
+  ;         TXT2AST demo file - 1 dimensional
   ;        with x and y-axis asymmetric errors
   ;   but using data error limits rather than errors
   ;--------------------------------------------------
@@ -7842,7 +7842,7 @@
  setting command. It sets the quality of a complicated area on an image
  to BAD.<p>
 
-2 WELLARD (now XRTARD)*
+2 WELLARD_(XRTARD)*
 
  Note - The program WELLARD has been renamed and is now called XRTARD
 
