@@ -2,7 +2,7 @@
 TAR_FILES_A = kaplibs_source ira_source
 
 # The contents of the ira_source.tar file:
-KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_xxxx_err
+KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err
 
 # The contents of the ira_source.tar file:
 IRA_SOURCE = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
@@ -20,14 +20,14 @@ GENERIC_SOURCES =
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kaplibs.tar.
-UNIX_OTHERS = makefile mk sunxx.tex kaplibs.news KAPLIBS_CONDITIONS
+UNIX_OTHERS = makefile mk sun238.tex kaplibs.news KAPLIBS_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) 
 
 #  The contents of kaplibs.tar.
-UNIX_TOTAL = kaplibs_source.tar makefile mk sunxx.tex sunxx.htx_tar \
+UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
 kaplibs.news ira_source.tar KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.

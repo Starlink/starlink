@@ -389,7 +389,7 @@ PKG_NAME = kaplibs
 #  This is the number allocated to each package to enable unique
 #  status values to be defined for the package.
 
-PKG_NUM = xxxx
+PKG_NUM = 1522
 
 #  Version number (as in the documentation - i.e. not the same thing
 #  as the shared library version number).
@@ -506,8 +506,8 @@ FAC_ERRS = fac_$(PKG_NUM)_err
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = sunxx.tex
-HYPERTEXT_DOCS = sunxx.htx
+LATEX_DOCS = sun238.tex
+HYPERTEXT_DOCS = sun238.htx
 
 #  List of documentation files.
 
