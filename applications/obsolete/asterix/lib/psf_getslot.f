@@ -69,6 +69,7 @@
         P_MODID(SLOT) = 0
         P_MODEL(SLOT) = .FALSE.
         P_INST(SLOT) = 0
+        P_GOTAX(SLOT) = .FALSE.
 
 *      Mark slot in use
         P_USED(SLOT) = .TRUE.
