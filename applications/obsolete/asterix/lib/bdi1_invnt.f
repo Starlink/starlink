@@ -437,7 +437,7 @@
      :                      NELM, STATUS )
 
 *      Create dynamic array
-          CALL ADI_NEW1( TYPE, 1, NELM, ITID, STATUS )
+          CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
           CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
 *      Convert to widths to half-widths
@@ -465,7 +465,7 @@
      :                        PTR, NELM, STATUS )
 
 *        Create dynamic array
-            CALL ADI_NEW1( TYPE, 1, NELM, ITID, STATUS )
+            CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
             CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
 *        Convert to values to half-widths

@@ -2129,6 +2129,117 @@ c        ENDIF
 
 
 
+*+ IMG_CHECK1D - check image
+	SUBROUTINE IMG_CHECK1D(IFID, STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
+        INCLUDE 'MATH_PAR'
+        INCLUDE 'PRM_PAR'
+*  Import :
+      INTEGER			IFID
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+      INTEGER NDIM,DIMS(ADI__MXDIM)
+      LOGICAL DOK
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  check validity of data array
+        CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL BDI_CHK( IFID, 'Data', DOK, STATUS )
+        IF (STATUS.EQ.SAI__OK) THEN
+          IF (.NOT.DOK) THEN
+            CALL MSG_PRNT('AST_ERR: invalid data array')
+            STATUS=SAI__ERROR
+          ELSEIF (NDIM.NE.1) THEN
+            CALL MSG_PRNT(
+     :            'AST_ERR: this is not a one dimensional dataset')
+            STATUS=SAI__ERROR
+          ELSEIF (NDIM.EQ.1) THEN
+            I_N_1D=DIMS(1)
+          ENDIF
+        ENDIF
+
+
+      ENDIF
+
+      END
+
+
+
+*+ IMG_LOAD1D - load image into system
+	SUBROUTINE IMG_LOAD1D(IFID,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
+*  Import :
+        INTEGER			IFID
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+      INTEGER NVAL
+      INTEGER DPTR,XPTR,VPTR,QPTR
+      LOGICAL VOK,QOK
+*-
+
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        NVAL=I_N_1D
+
+*  map data and  axis values
+        CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
+        CALL DYN_MAPR(1,NVAL,I_DPTR_1D,STATUS)
+        CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR_1D),STATUS)
+        CALL BDI_UNMAP(IFID,'Data',DPTR,STATUS)
+
+        CALL BDI_AXMAPR(IFID,1,'READ',XPTR,STATUS)
+        CALL DYN_MAPR(1,NVAL,I_XPTR_1D,STATUS)
+        CALL ARR_COP1R(NVAL,%VAL(XPTR),%VAL(I_XPTR_1D),STATUS)
+        CALL BDI_AXUNMAP(IFID,1,XPTR,STATUS)
+
+*  get variance and quality
+        CALL BDI_MAPR(IFID,'Variance','READ',VPTR,STATUS)
+        CALL DYN_MAPR(1,NVAL,I_VPTR_1D,STATUS)
+        CALL ARR_COP1R(NVAL,%VAL(VPTR),%VAL(I_VPTR_1D),STATUS)
+        CALL BDI_UNMAP(IFID,'Variance',VPTR,STATUS)
+
+        CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
+        CALL DYN_MAPB(1,NVAL,I_QPTR_1D,STATUS)
+        CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR_1D),STATUS)
+
+*  get top level text
+        CALL BDI_GET0C( IFID, 'Title', I_TITLE_1D, STATUS )
+        CALL BDI_GET0C( IFID, 'Label', I_LABEL_1D, STATUS )
+        CALL BDI_GET0C( IFID, 'Units', I_UNITS_1D, STATUS )
+
+        CALL BDI_AXGET0C( IFID, 1, 'Units', I_XUNITS_1D, STATUS )
+        CALL BDI_AXGET0C( IFID, 1, 'Units', I_YUNITS_1D, STATUS )
+        CALL BDI_AXGET0C( IFID, 1, 'Label', I_XLABEL_1D, STATUS )
+        CALL BDI_AXGET0C( IFID, 1, 'Label', I_YLABEL_1D, STATUS )
+
+
+      ENDIF
+
+      END
+
+
 *+ IMG_MATCH - match image to one loaded
 	SUBROUTINE IMG_MATCH(IFID,MATCH,STATUS)
 
