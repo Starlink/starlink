@@ -30,6 +30,7 @@
       CHARACTER STR*15
       CHARACTER*8 OPT
       REAL X1,X2,Y1,Y2
+      REAL XW1,XW2,YW1,YW2
       REAL XB1,XB2,YB1,YB2
       REAL XWID,YWID
       REAL SIZE
@@ -48,10 +49,11 @@
       INTEGER I,ICOL
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL OK
-      LOGICAL PIX,CONT
+      LOGICAL PIX,CONT,ANG
       LOGICAL PFLAG,CFLAG
       LOGICAL COLOURDEV
       LOGICAL NUM
+      LOGICAL A,S
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -60,10 +62,12 @@
         IF (.NOT.OK) THEN
           PIX=.FALSE.
           CONT=.FALSE.
+          ANG=.FALSE.
         ELSE
           CALL CHR_UCASE(OPT)
           PIX=(INDEX(OPT,'P').NE.0)
           CONT=(INDEX(OPT,'C').NE.0)
+          ANG=(INDEX(OPT,'A').NE.0)
         ENDIF
         CALL GCB_GETL('CONT_FLAG',OK,CFLAG,STATUS)
         CONT=(CONT.AND.OK.AND.CFLAG)
@@ -264,6 +268,14 @@
 
 *  restore transformation for plot
         CALL GTR_RESTORE(STATUS)
+
+        IF (ANG) THEN
+
+          CALL GTR_CURR(X1,X2,Y1,Y2,A,XW1,XW2,YW1,YW2,S,STATUS)
+          CALL GFX_KEY_SCALE(XW1,XW2,YW1,YW2,STATUS)
+
+        ENDIF
+
 
 *  restore default attributes
         CALL GCB_SETDEF(STATUS)
@@ -482,6 +494,108 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
         WRITE(STR,'(G10.3)') X
         CALL CHR_FANDL(STR,NN,PP)
         STR=STR(NN:PP)
+      ENDIF
+
+      END
+
+
+*+  GFX_KEY_SCALE
+      SUBROUTINE GFX_KEY_SCALE(X1,X2,Y1,Y2,STATUS)
+
+*    Description :
+*    Parameters :
+*    Method :
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Import :
+      REAL X1,X2,Y1,Y2
+*    Import-export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Local Constants :
+*    Global variables :
+*    Functions :
+*    Local variables :
+      CHARACTER*12 LBL
+      REAL ASTEP(10)/1.0,2.0,5.0,10.0,20.0,30.0,60.0,120.0,300.0,600.0/
+      REAL RANGE
+      REAL XSCALE,YSCALE
+      REAL X,Y
+      REAL FACT
+      REAL SIZE
+      INTEGER FONT,BOLD
+      INTEGER L
+      LOGICAL OK
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+          CALL GCB_SETDEF(STATUS)
+          CALL GCB_GETR('KEY_SIZE',OK,SIZE,STATUS)
+          IF (OK) THEN
+            CALL PGSCH(SIZE)
+          ENDIF
+          CALL GCB_GETI('KEY_FONT',OK,FONT,STATUS)
+          IF (OK) THEN
+            CALL PGSCF(FONT)
+          ENDIF
+          CALL GCB_GETI('KEY_BOLD',OK,BOLD,STATUS)
+          IF (OK) THEN
+            CALL PGSLW(BOLD)
+          ENDIF
+
+
+*  get angular range in arcmin
+        RANGE=ABS(X2-X1)
+        XSCALE=(X2-X1)/RANGE
+        YSCALE=(Y2-Y1)/ABS(Y2-Y1)
+
+*  less than 10 assume degrees - otherwise arcmin
+        IF (RANGE.LT.10.0) THEN
+          FACT=60.0
+        ELSE
+          FACT=1.0
+        ENDIF
+        RANGE=RANGE*FACT
+
+*  find an appropriate unit size
+        AUNIT=RANGE/10.0
+        IF (AUNIT.GE.ASTEP(10)) THEN
+          AUNIT=ASTEP(10)
+        ELSE
+          I=1
+          DO WHILE (AUNIT.GT.ASTEP(I))
+            I=I+1
+          ENDDO
+          AUNIT=ASTEP(I)
+        ENDIF
+
+        X=X1+AUNIT/FACT/2.0*XSCALE
+        Y=Y1+AUNIT/FACT/2.0*YSCALE
+        CALL PGMOVE(X,Y)
+        CALL PGDRAW(X+AUNIT/FACT*XSCALE,Y)
+        X=X+AUNIT/FACT/2.0*XSCALE
+        IF (AUNIT.LT.60.0) THEN
+          CALL CHR_ITOC(INT(AUNIT),LBL,L)
+          LBL=LBL(:L)//'\(0716)'
+        ELSE
+          AUNIT=AUNIT/60.0
+          CALL CHR_ITOC(INT(AUNIT),LBL,L)
+          LBL=LBL(:L)//'\(0718)'
+        ENDIF
+
+        CALL PGPTEXT(X,Y,0.0,0.5,LBL)
+
       ENDIF
 
       END
