@@ -168,7 +168,7 @@ sub new {
 
    %fmode = ( 'read'   => O_RDONLY,
               'update' => O_RDWR | O_CREAT,
-              'new'    => O_TRUNC | O_CREAT,
+              'new'    => O_RDWR | O_CREAT | O_TRUNC,
             );
 
 #  Tie the StarIndex object, which is a hash, to the DBM file.
@@ -427,7 +427,6 @@ sub put {
 
    my ($rlocate, $name, $location) = @_;
 
-
    if ($rlocate->{$name}) {
 
 #     Value for given name already exists: create hash %loc containing
@@ -437,8 +436,8 @@ sub put {
       foreach $loc (split ' ', $rlocate->{$name}) {
          $loc{starpack $loc} = $loc;
       }
-      $oldloc = $loc{$package};
       my $package = starpack $location;
+      $oldloc = $loc{$package};
 
 #     If no location for this package exists, or if the new one is better
 #     than the old one, replace it in the index.  Otherwise leave the
