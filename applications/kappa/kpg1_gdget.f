@@ -44,6 +44,13 @@
 *     TRANSFORM structure stored with the picture in the database. If
 *     present, it will be the Current Frame in the Plot on exit. See
 *     "Usage" below for warnings about using this option.
+*
+*     Finally, another Frame is added to the Plot representing normalised
+*     co-ordinates in the BASE picture. The axis scales are equal in this 
+*     Frame, and the co-ordinates of the bottom left corner are (0,0). The
+*     shorter axis has length 1.0, and the other axis has a length greater
+*     than 1.0. If the Plot read from the database already contains a
+*     BASEPIC Frame then it is retained and no new BASEPIC Frame is added.
 
 *  Usage:
 *     -  To create a new AGI picture, an AST-based application should 
@@ -134,6 +141,8 @@
 *  History:
 *     2-SEP-1998 (DSB):
 *        Original version.
+*     15-DEC-1998 (DSB):
+*        Modified to include the BASEPIC Frame in the returned Plot.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -168,6 +177,13 @@
       CHARACTER MORLOC*(DAT__SZLOC)! HDS locator for picture's MORE structure
       CHARACTER NAME*(AGI__SZNAM)  ! Name stored with required picture
       DOUBLE PRECISION DBX( 4 )    ! D.P. version of BX
+      DOUBLE PRECISION INA( 2 )    ! Corner A in GRAPHICS co-ords
+      DOUBLE PRECISION INB( 2 )    ! Corner B in GRAPHICS co-ords
+      DOUBLE PRECISION OUTA( 2 )   ! Corner A in BASEPIC co-ords
+      DOUBLE PRECISION OUTB( 2 )   ! Corner B in BASEPIC co-ords
+      INTEGER WMAP                 ! GRAPHICS->BASEPIC WinMap
+      INTEGER BPIC                 ! BASEPIC Frame
+      INTEGER IBPIC                ! Index of BASEPIC Frame
       INTEGER IPICL                ! AGI identifier for picture to use
       INTEGER IWOCO                ! Index of AGI world co-ordinates Frame
       INTEGER MAP                  ! Pointer to WORLD -> DATA Mapping
@@ -263,7 +279,8 @@
          DBX( 3 ) = DBLE( BX( 3 ) )
          DBX( 4 ) = DBLE( BX( 4 ) )
 
-*  Create the Plot.
+*  Create the Plot. This sets the PGPLOT world co-ordinate system in the
+*  current viewport to millimetres from the bottom left corner.
          CALL KPG1_ASPLT( WCFRM, DBX, ' ', IPLOT, STATUS )
 
 *  If no Frame was supplied, a default 2D Frame will have been used. Set
@@ -297,6 +314,55 @@
      :                    'symbol(1)=X,symbol(2)=Y', STATUS )
 
          END IF
+
+      END IF
+
+*  Add a Frame representing AGI world co-ordinates in the BASE picture.
+*  This picture has equals scales on both axes, and the shorter axis
+*  has a length of 1.0. This Frame is given the Domain BASEPIC.
+*  ====================================================================
+
+*  See if the Plot already contains a BASEPIC Frame.
+      CALL KPG1_ASFFR( IPLOT, 'BASEPIC', IBFRM, STATUS )
+
+*  If not, add one into the Plot now.
+      IF( IBFRM .EQ. AST__NOFRAME ) THEN
+
+*  Get the bounds of the entire view surface in millimetres.
+         CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+
+*  Store these as the GRAPHICS co-ordinates.
+         INA( 1 ) = DBLE( BX( 1 ) )
+         INA( 2 ) = DBLE( BX( 2 ) )
+         INB( 1 ) = DBLE( BX( 3 ) )
+         INB( 2 ) = DBLE( BX( 4 ) )
+
+*  We now find the bounds of the view surface in BASEPIC co-ordinates (i.e.
+*  co-ordinates normalised so that the shorter axis has length 1.0).
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+     :                        ABS( BX( 4 ) - BX( 2 ) ) )
+            OUTB( 2 ) = 1.0D0
+         ELSE
+            OUTA( 1 ) = 0.0D0
+            OUTA( 2 ) = 0.0D0
+            OUTB( 1 ) = 1.0D0
+            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+     :                        ABS( BX( 3 ) - BX( 1 ) ) )
+         END IF
+
+*  Create a WinMap which scales millimetres into BASE_WORLD co-ordinates.
+         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+
+*  Create the BASEPIC Frame.
+         BPIC = AST_FRAME( 2, 'DOMAIN=BASEPIC,TITLE=Normalised world '//
+     :                     'co-ordinates in the AGI BASE picture.',
+     :                     STATUS )
+
+*  Add the BASEPIC Frame into the Plot.      
+         CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, BPIC, STATUS )
 
       END IF
 
