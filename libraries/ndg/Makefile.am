@@ -22,7 +22,7 @@ PRIVATE_INCLUDES = NDG_CONST
 
 PUBLIC_INCLUDES = NDG_ERR
 
-BASIC_C_ROUTINES = ndg1_wild.c ndg1_regsb.c ndg1_match.c
+BASIC_C_ROUTINES = ndg1_regsb.c ndg1_match.c
 
 BASIC_F_ROUTINES = ndg1_appen.f ndg_asexp.f ndg1_chscn.f ndg1_crexp.f \
 ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \

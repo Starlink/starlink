@@ -33,6 +33,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,6 +42,8 @@
 *     26-AUG-1999 (DSB):
 *        Changed to use new NDG1_WILD which returns all matching files,
 *        not just ones which are known data files.
+*     2-SEP-2004 (TIMJ):
+*        Switch to using ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -54,8 +57,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
-      INCLUDE 'NDG_CONST'        ! NDG private constants.
-      INCLUDE 'NDG_ERR'          ! NDG error constants.
+      INCLUDE 'ONE_ERR'          ! ONE_ constants
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -67,13 +69,13 @@
       INTEGER STATUS             ! Global status
 
 *  External references:
-      INTEGER NDG1_WILD
-      INTEGER NDG1_EWILD
+      LOGICAL ONE_FIND_FILE
+      EXTERNAL ONE_FIND_FILE
 
 *  Local Variables:
       CHARACTER FILE*(GRP__SZFNM) ! The file spec of the matching file
       INTEGER ICONTX             ! Context for ndg1_wild
-      INTEGER ISTAT              ! Local status value
+      LOGICAL FOUND              ! Matched a filename
 *.
 
 *  Check inherited global status.
@@ -82,20 +84,21 @@
 *  Ignore blank templates.
       IF( TEMPLT .NE. ' ' ) THEN
 
-*  Initialise the context value used by NDG1_WILD so that a new file
+*  Initialise the context value used by ONE_FIND_FILE so that a new file
 *  searching context will be started.
          ICONTX = 0
 
-*  Loop round looking for matching files.
-         ISTAT = NDG__OK
-         DO WHILE( ISTAT .EQ. NDG__OK .AND. STATUS .EQ. SAI__OK ) 
+*  Loop round looking for matching files until we get bad status
+*  (which may include ONE__NOFILES)
+         DO WHILE( STATUS .EQ. SAI__OK ) 
 
 *  Attempt to find the next matching file.
             FILE = ' '
-            ISTAT = NDG1_WILD( TEMPLT, FILE, ICONTX )
+            FOUND = ONE_FIND_FILE( TEMPLT, .TRUE., FILE, ICONTX, 
+     :           STATUS )
 
 *  If another file was found which matches the name...
-            IF( ISTAT .EQ. NDG__OK ) THEN
+            IF( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Append it to the group.
                CALL GRP_PUT( IGRP1, 1, FILE, 0, STATUS )
@@ -103,24 +106,15 @@
 *  Append a copy of REST to the second group.
                CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
            
-*  If a system error was detected by NDG1_WILD, report it.
-            ELSE IF ( ISTAT .EQ. NDG__WPER ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'NDG1_APPEN_ERR1', 'NDG1_APPEN: Error'//
-     :                       ' getting pipe from forked process', 
-     :                       STATUS )
-      
-            ELSE IF ( ISTAT .EQ. NDG__WMER ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'NDG1_APPEN_ERR2', 'NDG1_APPEN: '//
-     :                       'Cannot allocate memory', STATUS )
-      
             END IF
 
          END DO
 
+*  Clear status if no more files
+         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+
 *  End the search context.
-         ISTAT = NDG1_EWILD( ICONTX )
+         CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
       END IF
 

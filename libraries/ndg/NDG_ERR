@@ -19,6 +19,7 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -26,17 +27,14 @@
 *        Original version.
 *     15-DEC-1997 (DSB):
 *        Added private status values returned by NDG1_WILD
+*     2-SEP-2004 (TIMJ):
+*        Remove NDG1_WILD constants
 *     {enter_further_changes_here}
 
 *-
 
       INTEGER NDG__NOFIL        ! Some specified files were not found.
       INTEGER NDG__SYSER        ! A Operating System error has occured.
-      INTEGER NDG__OK           ! NDG1_WILD success
-      INTEGER NDG__WNMF         ! NDG1_WILD no more files
-      INTEGER NDG__WPER         ! NDG1_WILD pipe error
-      INTEGER NDG__WLER         ! NDG1_WILD length error
-      INTEGER NDG__WMER         ! NDG1_WILD malloc error
 
 *  NDG_ facility number:
       INTEGER NDG__FAC         ! NDG facility number (=IRAS90)
@@ -47,11 +45,3 @@
      :           NDG__NOFIL  = 134250498 + 65536*NDG__FAC + 8*1,
      :           NDG__SYSER  = 134250498 + 65536*NDG__FAC + 8*2)
 
-*  Private status values returned by NDG1_WILD.
-      PARAMETER (
-     :           NDG__OK     =   0,
-     :           NDG__WNMF   = 101,
-     :           NDG__WPER   = 102,
-     :           NDG__WLER   = 103,
-     :           NDG__WMER   = 104 )
-*.
