@@ -11,13 +11,14 @@
 *
 *	Contents:	functions for input of image data.
 *
-*	Last modify:	06/05/99 (EB):
+*	Last modify:	06/05/99
 *	Last modify:	28/10/98 (AJC)
 *                          In line with V2.0.15
 *                       14/12/98 (PWD):
 *                          Added USHORT and UBYTE support.
 *                       17/12/98 (PWD):
 *                          Changed to use NDF WCS component for astrometry.
+*	Last modify:	27/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -63,6 +64,7 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
   w = field->width;
   flags = field->flags;
   interpflag = (wfield && wfield->interp_flag);
+  wdata = NULL;			/* To avoid gcc -Wall warnings */
 
   if (!field->y)
     {
@@ -110,15 +112,15 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
           {
           if (flags & MEASURE_FIELD)
             {
-            if (check = prefs.check[CHECK_BACKGROUND])
+            if ((check = prefs.check[CHECK_BACKGROUND]))
               writecheck(check, field->backline, w);
-            if (check = prefs.check[CHECK_SUBTRACTED])
+            if ((check = prefs.check[CHECK_SUBTRACTED]))
               writecheck(check, data, w);
-            if (check = prefs.check[CHECK_APERTURES])
+            if ((check = prefs.check[CHECK_APERTURES]))
               writecheck(check, data, w);
-            if (check = prefs.check[CHECK_SUBPSFPROTOS])
+            if ((check = prefs.check[CHECK_SUBPSFPROTOS]))
               writecheck(check, data, w);
-            if (check = prefs.check[CHECK_SUBPCPROTOS])
+            if ((check = prefs.check[CHECK_SUBPCPROTOS]))
               writecheck(check, data, w);
             }
           if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
@@ -178,15 +180,15 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
         {
         if (flags & MEASURE_FIELD)
           {
-          if (check = prefs.check[CHECK_BACKGROUND])
+          if ((check = prefs.check[CHECK_BACKGROUND]))
             writecheck(check, field->backline, w);
-          if (check = prefs.check[CHECK_SUBTRACTED])
+          if ((check = prefs.check[CHECK_SUBTRACTED]))
             writecheck(check, data, w);
-          if (check = prefs.check[CHECK_APERTURES])
+          if ((check = prefs.check[CHECK_APERTURES]))
             writecheck(check, data, w);
-          if (check = prefs.check[CHECK_SUBPSFPROTOS])
+          if ((check = prefs.check[CHECK_SUBPSFPROTOS]))
             writecheck(check, data, w);
-          if (check = prefs.check[CHECK_SUBPCPROTOS])
+          if ((check = prefs.check[CHECK_SUBPCPROTOS]))
             writecheck(check, data, w);
           }
         if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))

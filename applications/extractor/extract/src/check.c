@@ -18,6 +18,7 @@
 *                          a problem with aperture display.
 *	Last modify:	15/12/2002
 *                          (EB): 2.3
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -363,6 +364,7 @@ void	reendcheck(picstruct *field, checkstruct *check)
   {
   size_t	padsize;
 
+  padsize = 0;				/* To avoid gcc -Wall warnings */
   switch(check->type)
     {
     case CHECK_MINIBACKGROUND:

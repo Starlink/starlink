@@ -11,6 +11,7 @@
 *
 *	Last modify:	13/06/2002
 *                       15/03/2004 (PWD): Adam versions of error and warning.
+*	Last modify:	14/05/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -24,6 +25,10 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include        <setjmp.h>
+
+#ifdef HAVE_MPI
+#include	<mpi.h>
+#endif
 
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
@@ -48,9 +53,13 @@ void    error(int num, char *msg1, char *msg2)
   msgSetc( "TOK1", msg1 );
   msgSetc( "TOK2", msg2 );
   errRep( " ", "^TOK1 ^TOK2", &status );
+
+#ifdef HAVE_MPI
+  MPI_Finalize();
+#endif
+
   longjmp( env, num );
   }
-
 
 /********************************* warning **********************************/
 /*

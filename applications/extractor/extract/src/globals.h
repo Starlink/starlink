@@ -9,11 +9,11 @@
 *
 *	Contents:	global declarations.
 *
-*	Last modify:   25/05/99 (EB):
+*	Last modify:   25/05/99
 *                      02/11/98 (AJC)
 *                        Add initialise flag
 *	Last modify:   02/04/2003
-*                        (EB): 2.3
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -35,7 +35,6 @@ picstruct		thefield1,thefield2, thewfield1,thewfield2;
 objstruct		flagobj;
 obj2struct		flagobj2;
 extern obj2struct	outobj2;
-static obj2struct	*obj2 = &outobj2;
 float			ctg[37], stg[37];
 char			gstr[MAXCHAR];
 

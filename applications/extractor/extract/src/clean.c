@@ -10,7 +10,7 @@
 *	Contents:	functions that remove spurious detections from the
 *			catalog
 *
-*	Last modify:	13/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -21,12 +21,15 @@
 
 #include	<math.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
 #include	"prefs.h"
 #include	"check.h"
 #include	"clean.h"
+#include	"flag.h"
+#include	"image.h"
 
 /*------------------------------- variables ---------------------------------*/
 
@@ -231,7 +234,7 @@ void	mergeobject(objstruct *objslave,objstruct *objmaster)
   {
    checkstruct	*check;
 
-  if (check = prefs.check[CHECK_SEGMENTATION])
+  if ((check = prefs.check[CHECK_SEGMENTATION]))
     {
      USHORT	*pix;
      USHORT	colorslave = (USHORT)objslave->number,

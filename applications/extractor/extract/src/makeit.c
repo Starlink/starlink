@@ -9,12 +9,12 @@
 *
 *	Contents:	main program.
 *
-*	Last modify:	10/09/99 (EB):
-*	Last modify:	13/07/98 (EB):
+*	Last modify:	10/09/99
+*	Last modify:	13/07/98
 *                       28/10/98 (AJC)
 *                          Use AFPRINTF not fprintf
 *	Last modify:	16/12/2002
-*                          (EB): 2.3
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -26,12 +26,15 @@
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
+#include	<string.h>
 #include	<time.h>
 
 #include	"define.h"
 #include	"globals.h"
 #include        "prefs.h"
 #include	"fits/fitscat.h"
+#include	"assoc.h"
+#include	"back.h"
 #include	"check.h"
 #include	"field.h"
 #include	"filter.h"
@@ -267,8 +270,8 @@ void	makeit()
 /*-- Update the CHECK-images */
   if (prefs.check_flag)
       for (i=0; i<MAXCHECK; i++)
-          if (check=prefs.check[i])
-              reinitcheck(field, check);
+        if ((check=prefs.check[i]))
+          reinitcheck(field, check);
 
 /*-- Initialize PSF contexts and workspace */
   if (prefs.psf_flag)
@@ -305,14 +308,14 @@ void	makeit()
 /*-- Finish the current CHECK-image processing */
   if (prefs.check_flag)
       for (i=0; i<MAXCHECK; i++)
-          if (check=prefs.check[i])
-              reendcheck(field, check);
+        if ((check=prefs.check[i]))
+          reendcheck(field, check);
 
 /*-- Final time measurements*/
-  if (time(&thetime2)!=-1)
-  {
-      if (!strftime(thecat.ext_date, 10, "%d/%m/%y", localtime(&thetime2)))
-          error(EXIT_FAILURE, "*Internal Error*: Date string too long ","");
+    if (time(&thetime2)!=-1)
+      {
+      if (!strftime(thecat.ext_date, 12, "%d/%m/%Y", localtime(&thetime2)))
+        error(EXIT_FAILURE, "*Internal Error*: Date string too long ","");
       if (!strftime(thecat.ext_time, 10, "%H:%M:%S", localtime(&thetime2)))
           error(EXIT_FAILURE, "*Internal Error*: Time/date string too long ","");
       thecat.ext_elapsed = difftime(thetime2, thetime1);
@@ -350,7 +353,7 @@ void	makeit()
   if (prefs.check_flag)
     for (i=0; i<MAXCHECK; i++)
       {
-      if (check=prefs.check[i])
+      if ((check=prefs.check[i]))
         endcheck(check);
       prefs.check[i] = NULL;
       }

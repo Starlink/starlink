@@ -10,7 +10,7 @@
 *	Contents:	functions for extraction of connected pixels from
 *			a bitmap.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -21,6 +21,7 @@
 
 #include	<math.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
@@ -107,7 +108,7 @@ int	lutz(objliststruct *objlistroot, int nroot, objstruct *objparent,
   out = RETURN_OK;
 
   minarea = prefs.deb_maxarea;
-  plistin = objlistroot->plist;
+  plistint = plistin = objlistroot->plist;
   objroot = &objlistroot->obj[nroot];
   stx = objparent->xmin;
   sty = objparent->ymin;
@@ -130,6 +131,7 @@ int	lutz(objliststruct *objlistroot, int nroot, objstruct *objparent,
   if (!(obj=objlist->obj=(objstruct *)malloc(nobjm*sizeof(objstruct))))
     {
     out = RETURN_FATAL_ERROR;
+    plist = NULL;			/* To avoid gcc -Wall warnings */
     goto exit_lutz;
     }
 
@@ -140,6 +142,7 @@ int	lutz(objliststruct *objlistroot, int nroot, objstruct *objparent,
 	= (pliststruct *)malloc((eny-sty)*(enx-stx)*plistsize)))
     {
     out = RETURN_FATAL_ERROR;
+    plist = NULL;			/* To avoid gcc -Wall warnings */
     goto exit_lutz;
     }
 

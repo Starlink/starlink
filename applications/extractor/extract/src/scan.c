@@ -10,7 +10,7 @@
 *	Contents:	functions for extraction of connected pixels from
 *			a pixmap.
 *
-*	Last modify:	02/04/2003
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -22,6 +22,7 @@
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
@@ -72,6 +73,9 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
    status		cs, ps, *psstack;
    int			*start, *end, ymax;
 
+  scan = dscan = cdscan = cdwscan = wscan = NULL;/* Avoid gcc -Wall warnings */
+  victim = NULL;				/* Avoid gcc -Wall warnings */
+  blankh = 0;				/* Avoid gcc -Wall warnings */
 /*----- Beginning of the main loop: Initialisations  */
   thecat.ntotal = thecat.ndetect = 0;
 
@@ -83,10 +87,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 
 /* If WEIGHTing and no absolute thresholding, activate threshold scaling */
   varthreshflag = (cdwfield && prefs.thresh_type[0]!=THRESH_ABSOLUTE);
-
-  if (varthreshflag)
-    relthresh = prefs.dthresh[0];
-
+  relthresh = varthreshflag ? prefs.dthresh[0] : 0.0;/* To avoid gcc warnings*/
   w = cfield->width;
   h = cfield->height;
   objlist.dthresh = cfield->dthresh;
@@ -131,6 +132,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
   QMALLOC(psstack, status, stacksize);
   QMALLOC(start, int, stacksize);
   QMALLOC(end, int, stacksize);
+  blankpad = bpt = NULL;
   lutzalloc(w,h);
   allocparcelout();
   if (prefs.filter_flag)
@@ -246,7 +248,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
         cdwscan = dwscan;
         }
 
-      if (check=prefs.check[CHECK_FILTERED])
+      if ((check=prefs.check[CHECK_FILTERED]))
         writecheck(check, cdscan, w);
       }
 
@@ -681,7 +683,7 @@ void  sortit(picstruct *field, picstruct *dfield, picstruct *wfield,
     if ((n=cleanobjlist->nobj) >= prefs.clean_stacksize)
       {
        objstruct	*cleanobj;
-       int		ymin, ymax, victim;
+       int		ymin, ymax, victim=0;
 
       ymin = 2000000000;	/* No image is expected to be that tall ! */
       cleanobj = cleanobjlist->obj;
@@ -737,7 +739,7 @@ INPUT   objlist number,
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 28/11/98
+VERSION 28/11/2003
  ***/
 void  preanalyse(int no, objliststruct *objlist, int analyse_type)
 
@@ -756,6 +758,8 @@ void  preanalyse(int no, objliststruct *objlist, int analyse_type)
   thresh = obj->dthresh;
   if (PLISTEXIST(dthresh))
     minthresh = BIG;
+  else
+    minthresh = 0.0;
   fdnpix = dnpix = 0;
   rv = 0.0;
   peak = cpeak = -BIG;

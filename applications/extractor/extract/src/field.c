@@ -11,9 +11,9 @@
 *
 *	Contents:	Handling of field structures.
 *
-*	Last modify:	14/10/2000 (EB):
-*	Last modify:	12/08/99 (EB):
-*	Last modify:	02/02/98 (EB):
+*	Last modify:	14/10/2000
+*	Last modify:	12/08/99
+*	Last modify:	02/02/98
 *                       27/10/98 (AJC)
 *                          Use AFPRINTF not fprintf
 *                       06/01/99 (PWD)
@@ -21,7 +21,7 @@
 *                          used differently in NDF interface (was
 *                          being closed!). 
 *	Last modify:	14/12/2002
-                           (EB): 2.3
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */

@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for writing LDAC FITS catalogs.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	03/12/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -26,18 +26,18 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-char	*lineout_buf, padbuf[FBSIZE];
+char	*lineout_buf;
 int	lineout_size, nlineout;
 
-/****** save_cat ***************************************************************
+/****** save_cat **************************************************************
 PROTO	void save_cat(catstruct *cat, char *filename)
 PURPOSE	Save a FITS catalog with name filename.
 INPUT	catalog structure,
 	filename.
 OUTPUT	-.
 NOTES	Any preexisting file with name filename is overwritten.
-AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	08/05/2002
+AUTHOR	E. Bertin (IAP)
+VERSION	09/09/2003
  ***/
 void	save_cat(catstruct *cat, char *filename)
 
@@ -71,13 +71,13 @@ void	save_cat(catstruct *cat, char *filename)
 
 /****** save_tab **************************************************************
 PROTO	void save_tab(catstruct *cat, tabstruct *tab)
-PURPOSE	Save a FITS catalog with name filename.
-INPUT	catalog structure,
-	filename.
+PURPOSE	Save a FITS table.
+INPUT	pointer to the catalog structure,
+	pointer to the table structure.
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/12/2002
+VERSION	09/09/2003
  ***/
 void	save_tab(catstruct *cat, tabstruct *tab)
 
@@ -95,17 +95,17 @@ void	save_tab(catstruct *cat, tabstruct *tab)
 /*  Make the table parameters reflect its content*/
   update_tab(tab);
 /*  The header itself*/
-  tabflag = update_head(tab)==RETURN_OK?1:0;
-  QFTELL(cat->file, tab->headpos, cat->filename);
-  QFWRITE(tab->headbuf, tab->headnblock*FBSIZE, cat->file, cat->filename);
+  tabflag = save_head(cat, tab)==RETURN_OK?1:0;
 /*  Allocate memory for the output buffer */
   tabsize = 0;
+  tabcat = NULL;	/* to satisfy gcc -Wall */
+  inbuf = NULL;		/* to satisfy gcc -Wall */
   if (tabflag)
     {
 /*-- If segment is a binary table, save it row by row */
     QMALLOC(outbuf, char, (larrayout = tab->naxisn[0]));
     nkey = tab->nkey;
-    tabsize = 0;
+    tabsize = larrayin = 0;
     for (j=tab->nseg; j--;)
       {
       update_tab(tab);
@@ -200,11 +200,61 @@ void	save_tab(catstruct *cat, tabstruct *tab)
     }
 
 /* FITS padding*/
-  size = PADEXTRA(tabsize);
-  if (size)
-    QFWRITE(padbuf, (size_t)size, cat->file, cat->filename);
+  pad_tab(cat, tabsize);
 
   return;
+  }
+
+
+/****** save_head *************************************************************
+PROTO	int save_head(catstruct *cat, tabstruct *tab)
+PURPOSE	Save a FITS table header.
+INPUT	catalog structure,
+	table structure.
+OUTPUT	RETURN_OK if tab is a binary table, or RETURN_ERROR otherwise.
+NOTES	-.
+AUTHOR	E. Bertin (IAP)
+VERSION	03/12/2003
+ ***/
+int	save_head(catstruct *cat, tabstruct *tab)
+
+  {
+   int		tabflag;
+
+/*  Make the table parameters reflect its content*/
+  update_tab(tab);
+/*  The header itself*/
+  tabflag = update_head(tab);
+  QFTELL(cat->file, tab->headpos, cat->filename);
+  QFWRITE(tab->headbuf, tab->headnblock*FBSIZE, cat->file, cat->filename);
+
+  return tabflag;
+  }
+
+
+/******* pad_tab *************************************************************
+PROTO	int pad_tab(catstruct *cat, KINGSIZE_T size)
+PURPOSE	Pad the FITS body of a tab with 0's to FBSIZE.
+INPUT	A pointer to the cat structure,
+	the number of elements that have been written.
+OUTPUT	RETURN_OK if padding necessary, RETURN_ERROR otherwise.
+NOTES	.
+AUTHOR	E. Bertin (IAP)
+VERSION	03/12/2003
+ ***/
+int pad_tab(catstruct *cat, KINGSIZE_T size)
+  {
+   static char  padbuf[FBSIZE];
+   int		padsize;
+
+  padsize = PADEXTRA(size);
+  if (padsize)
+    {
+    QFWRITE(padbuf, padsize, cat->file, cat->filename);
+    return RETURN_OK;
+    }
+  else
+    return RETURN_ERROR;
   }
 
 
@@ -216,7 +266,7 @@ INPUT	catalog structure,
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/12/2002
+VERSION	09/09/2003
  ***/
 void	init_writeobj(catstruct *cat, tabstruct *tab)
 
@@ -227,11 +277,9 @@ void	init_writeobj(catstruct *cat, tabstruct *tab)
 /* Make the table parameters reflect its content*/
   update_tab(tab);
 /* The header itself */
-  if (update_head(tab) != RETURN_OK)
+  if (save_head(cat, tab) != RETURN_OK)
     error(EXIT_FAILURE, "*Error*: Not a binary table: ", tab->extname);
 
-  QFTELL(cat->file, tab->headpos, cat->filename);
-  QFWRITE(tab->headbuf, tab->headnblock*FBSIZE, cat->file, cat->filename);
 /* Store the current position */
   QFTELL(cat->file, tab->bodypos, cat->filename);
 
@@ -311,14 +359,14 @@ INPUT	catalog structure,
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/12/2002
+VERSION	09/09/2003
  ***/
 void	end_writeobj(catstruct *cat, tabstruct *tab)
 
   {
    keystruct	*key;
    OFF_T	pos;
-   int		k, size;
+   int		k;
 
 /* Make the table parameters reflect its content*/
   key = tab->key;
@@ -330,9 +378,8 @@ void	end_writeobj(catstruct *cat, tabstruct *tab)
     error(EXIT_FAILURE, "*Error*: Not a binary table: ", tab->extname);
 
 /*--FITS padding*/
-  size = PADEXTRA(tab->tabsize);
-  if (size)
-    QFWRITE(padbuf, size, cat->file, cat->filename);
+  pad_tab(cat, tab->tabsize);
+  pos = ftell(cat->file);
   QFTELL(cat->file, pos, cat->filename);
   QFSEEK(cat->file, tab->headpos, SEEK_SET, cat->filename);
   QFWRITE(tab->headbuf, FBSIZE*tab->headnblock, cat->file, cat->filename);

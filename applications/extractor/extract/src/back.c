@@ -13,6 +13,7 @@
 *                       16/03/2004
 *                          (PWD): QFTELL and QFSEEK become NDFQFTELL 
 *                                 and NDFQFSEEK.
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -71,7 +72,7 @@ void	makeback(picstruct *field, picstruct *wfield)
   lflag = (field->width*field->backh >= (size_t)65536);
 
 /* Save current positions in files */
-
+  wfcurpos = wfcurpos2 = 0;		/* to avoid gcc -Wall warnings */
   NDFQFTELL(field->file, fcurpos, field->filename);
   if (wfield)
     NDFQFTELL(wfield->file, wfcurpos, wfield->filename);
@@ -89,6 +90,8 @@ void	makeback(picstruct *field, picstruct *wfield)
     bufshift = (step/2)*(OFF_T)w;
     jumpsize = (step-1)*(OFF_T)w;
     }
+  else
+    bufshift = jumpsize = 0;		/* to avoid gcc -Wall warnings */
 
 /* Allocate some memory */
   QMALLOC(backmesh, backstruct, nx);		/* background information */
@@ -386,6 +389,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
    wbm = wbackmesh;
    offset = w - bw;
    step = sqrt(2/PI)*QUANTIF_NSIGMA/QUANTIF_AMIN;
+   wmean = wsigma = wlcut = whcut = 0.0;	/* to avoid gcc -Wall warnings */
    for (m = n; m--; bm++,buf+=bw)
    {
       if (!m && (lastbite=w%bw))
@@ -396,10 +400,10 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
       mean = sigma = 0.0;
       buft=buf;
 /*-- We separate the weighted case at this level to avoid penalty in CPU */
+      ngood = 0;
       if (wbackmesh)
       {
          wmean = wsigma = 0.0;
-         ngood = 0;
          wbuft = wbuf;
          for (y=h; y--; buft+=offset,wbuft+=offset)
          {
@@ -474,10 +478,10 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
       mean = sigma = 0.0;
       npix = 0;
       buft = buf;
+      npix = wnpix = 0;
       if (wbackmesh)
       {
          wmean = wsigma = 0.0;
-         wnpix = 0;
          wbuft=wbuf;
          for (y=h; y--; buft+=offset, wbuft+=offset)
             for (x=bw; x--;)
@@ -659,7 +663,7 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
 
   sig = 10.0*nlevelsm1;
   sig1 = 1.0;
-  mea = 0.0;
+  mea = med = bkg->mean;
   for (n=100; n-- && (sig>=0.1) && (fabs(sig/sig1-1.0)>EPS);)
     {
     sig1 = sig;
@@ -735,6 +739,7 @@ void	filterback(picstruct *field)
 
   back = field->back;
   sigma = field->sigma;
+  val = sval = 0.0;
 
 /* Look for `bad' meshes and interpolate them if necessary */
   for (i=0,py=0; py<ny; py++)

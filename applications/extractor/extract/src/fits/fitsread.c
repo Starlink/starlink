@@ -9,10 +9,11 @@
 *
 *	Contents:	low-level functions for reading LDAC FITS catalogs.
 *
-*	Last modify:	28/11/98 (EB):
+*	Last modify:	28/11/98
 *                       26/11/98 (PWD): Added global initialisations
 *	Last modify:	29/06/2002
 *                                (EB): 2.3
+*	Last modify:	15/08/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -105,7 +106,7 @@ INPUT	Table structure.
 OUTPUT	Pointer to the table structure from which the data will be read.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	07/04/97
+VERSION	15/08/2003
  ***/
 tabstruct	*init_readobj(tabstruct *tab)
 
@@ -117,6 +118,7 @@ tabstruct	*init_readobj(tabstruct *tab)
 
 /* Scan keys to find the reference tab and other things*/
   keytab = NULL;
+  tabcat = NULL;
   key = tab->key;
   for (k=tab->nkey; k--; key = key->nextkey)
     if (!key->ptr)
