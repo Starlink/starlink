@@ -327,17 +327,6 @@ c	From INTEGER to improve exposure time evaluation
 *    Center the instrument map, invert the Y-axis, and turn it real.
 *    Also, exclude the "bright line" regions of enhanced particle
 *    background as suggested by Plucinsky et al. (1993)
-C      DO I = 25, 488
-C        DO II = 35, 456
-C          IF ( II .EQ. 35 ) THEN
-C            RMAP(I,514-II-12) = 0.25*SCAL*MAP(I,II)
-C          ELSEIF(II .EQ. 456) THEN
-C            RMAP(I,514-II-12) = 0.44*SCAL*MAP(I,II)
-C          ELSE
-C            RMAP(I,514-II-12) = SCAL*MAP(I,II)
-C          END IF
-C        END DO
-C      END DO
       CALL ARR_COP1R( 512*512, RMAP, TEMPAR, STATUS )
       DO I = 25, 488
         DO II = 35, 456
