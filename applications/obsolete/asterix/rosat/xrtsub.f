@@ -182,8 +182,8 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Read source data from copied input file
-      CALL XRTSUB_GETDATA(LOCOUT, 'UPDATE', SHEAD, SDIM, SORD, SDPNTR,
-     &                  TSDPNTR, SLVAR, SVPNTR, TSVPNTR,
+      CALL XRTSUB_GETDATA(OID, LOCOUT, 'UPDATE', SHEAD, SDIM, SORD,
+     &                  SDPNTR, TSDPNTR, SLVAR, SVPNTR, TSVPNTR,
      &                  SLQUAL, SQPNTR, TSQPNTR, SMASK, SREORD, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -196,7 +196,7 @@
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-      CALL XRTSUB_GETDATA(LOCBCK, 'READ', BHEAD, BDIM, BORD, BDPNTR,
+      CALL XRTSUB_GETDATA(BID,LOCBCK, 'READ', BHEAD, BDIM, BORD, BDPNTR,
      &                TBDPNTR, BLVAR, BVPNTR, TBVPNTR,
      &                BLQUAL, BQPNTR, TBQPNTR, BMASK, BREORD, STATUS)
 *
@@ -485,7 +485,6 @@
 *    First map the PHA array
          IF (BDIM(4) .GT. 1) THEN
             CALL BDA_MAPAXVAL(LOCBCK, 'READ', BORD(4), AXPNTR, STATUS)
-*
 
 	    CALL DYN_MAPR(1,BDIM(4),EPHPTR,STATUS)
 *
@@ -544,7 +543,6 @@
 *      Map the data and variance from the extrapolated background file
          CALL BDA_MAPDATA(BSLOC, 'UPDATE', OSUBD, STATUS)
          CALL BDA_MAPVAR(BSLOC, 'UPDATE', OSUBV, STATUS)
-*
 *
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('** Error producing extrapolated backgnd'/
@@ -1492,8 +1490,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_GETDATA    Maps the data array and reorders if necessary
-      SUBROUTINE XRTSUB_GETDATA(LOCIN,MODE, HEAD, ODIMS, ORDER, DPNTR,
-     &                      TDPNTR, LVAR, VPNTR, TVPNTR, LQUAL,
+      SUBROUTINE XRTSUB_GETDATA(IFID,LOCIN,MODE, HEAD, ODIMS, ORDER,
+     &                      DPNTR,TDPNTR, LVAR, VPNTR, TVPNTR, LQUAL,
      &                         QPNTR, TQPNTR, MASK, LREORD, STATUS)
 *    Description :
 *      Maps the data_array and puts it in the axis order, X,Y,Time,Energy.
@@ -1533,6 +1531,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
+      INTEGER			IFID			! Input file id
       CHARACTER*(DAT__SZLOC) LOCIN       ! Locator to input fle
       CHARACTER*(*) MODE		 ! Access mode
 *    Import-Export :
@@ -1779,15 +1778,14 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ENDIF
 *
 * Access header info from the datafile
-      CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
-*
+      CALL ADI1_LOCHEAD( IFID, .FALSE., HLOC, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('Error getting locator to header structure')
           GOTO 999
       ENDIF
 *
 * Get the sort ranges
-      CALL XRT_GETSORT(LOCIN, HEAD, STATUS)
+      CALL XRT_GETSORT( IFID, HEAD, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
