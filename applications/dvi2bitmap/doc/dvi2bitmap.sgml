@@ -1,5 +1,6 @@
 <!DOCTYPE ssn PUBLIC "-//Starlink//DTD Starlink SSN//EN" [
   <!ENTITY releasenotes SYSTEM "ReleaseNotes">
+  <!ENTITY version-number SYSTEM "../VERSION">
   <!ENTITY ddash CDATA "--">
 ]>
 <!-- $Id$ -->
@@ -12,7 +13,7 @@
 	>Norman Gray
 
 <manualtype users>
-<softwareversion>0.9-3-devel <!-- %%VERSION%% -->
+<softwareversion>&version-number;
 
 <docnumber>71
 
