@@ -100,6 +100,7 @@
 
 *  Implementation Status:
 *     The propagation rules depend on parameters ANGLE and NNMETH.
+*
 *     -  For rotations that are multiples of 90-degrees, VARIANCE,
 *     QUALITY, AXIS, HISTORY, LABEL WCS and UNITS components of the input
 *     NDF are propagated to the output NDF.  The axis and WCS components 
