@@ -1,4 +1,4 @@
-\documentstyle[11pt,epsfig]{article}
+\documentstyle[11pt,twoside,epsfig]{article}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 % -----------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -295,7 +295,7 @@ programs.
 %  ===========================================
  \begin{latexonly}
    \newpage
-   \markright{\stardocname}
+   \markboth{\stardocname}{\stardocname}
    \null\vspace{5mm}
    \begin {center}
    \rule{80mm}{0.5mm} \\ [1ex]
@@ -311,7 +311,7 @@ programs.
 % -----------------------------------------------------------------------------
 %  Introduction page.
 %  ==================
-\newpage
+\cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 \begin{latexonly}
