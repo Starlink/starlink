@@ -233,7 +233,7 @@
 *
 *   Do the sort
 	print *,3
-         CALL XRTSORT_SORT_EVE(SRT, BSRT, MAPLIM,
+         CALL XRTSORT_SORT_EVE(HEAD, SRT, BSRT, MAPLIM,
      &          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
      &          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
      &          %val(SEVPTR(7)), %val(BEVPTR(1)), %val(BEVPTR(2)),
