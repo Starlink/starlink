@@ -85,6 +85,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
 
 #include "ygen.h"
 #include "ftokens.h"
