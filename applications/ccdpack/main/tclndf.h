@@ -171,6 +171,11 @@
    int NdfGetNdfFromObj( Tcl_Interp *interp, Tcl_Obj *obj, Ndf **ndf );
 
 
+/* Declarations for commands coping with handling events in the background. */
+   Tcl_ObjCmdProc tclbgcmd;
+   void tclupdate( void );
+
+
 /* Utility macros. 
 */
 #define max(a,b) (((a) > (b)) ? (a) : (b))
