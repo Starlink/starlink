@@ -24,7 +24,7 @@ public class GenerateDependencies {
     
     public static void main (String[] args) {
         if (args.length != 1) {
-            System.err.println("Too few arguments");
+            System.err.println("GenerateDependencies: wrong number of arguments");
             System.exit(1);
         }
         String xmlinput = args[0];
