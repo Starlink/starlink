@@ -16,38 +16,21 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-  o The C interface to several methods have been changed to make them
-  easier to call from C++.
+  o It is now possible to specify the primitive graphics functions used
+  by the Plot class at run-time as well as at link-time. The Plot class
+  produces graphics by calling a set of wrapper functions which in turn
+  call functions of a graphics package such as PGPLOT. Previously, these
+  wrapper functions needed to be coded into a "grf" module (based on the
+  grf_pgplot.c template distribued with AST), which was then linked with
+  the application using the options of the ast_link command. Now, in
+  addition, graphics wrappers can be "registered" at run-time using a
+  new method of the Plot class. This allows applications to change from
+  one graphics system to another at any time. It also allows wrapper
+  functions to be written in Fortran as well as C.
 
-  o Several bugs has been fixed in the Plot class which could cause axes
-  and tick marks to be drawn incorrectly.
-
-  o The FITS-WCS encoding used by the FitsChan class now includes support
-  for the WCSNAME keyword, and retains the identification letter associated 
-  with multiple axis descriptions correctly. Improvements have been made
-  to way that unrecognized celestial coordinate systems and axis types 
-  are handled. Also improved is the way that Frame Title and axis Labels 
-  are selected when reading a FITS header.
-
-  o A new interpolation scheme has been added to the astResample(X) set
-  of functions. The new scheme calculates each output pixel value by
-  finding the mean of the input pixels in a box centred on the output
-  pixel.
-
-  o The SkyFrame class can now be used to represent an arbitrary spherical
-  coordinate system by setting its System attribute to "Unknown".
-
-  o The indices of the latitude and longitude axes of a SkyFrame can
-  now be found using new read-only attributes LatAxis and LonAxis. The
-  effects of any axis permutation is taken into account.
-
-  o A new attribute called Ident has been added to the Object class.
-  This serves the same purpose as the existing ID attribute, but (unlike ID)
-  its value is transferred to the new Object when a copy is made.
-
-  o A bug has been fixed which could prevent complex CmpFrames
-  behaving correctly (for instance, resulting in the failure of attempts 
-  to find a Mapping between a CmpFrame and itself).
+  o A bug has been fixed in the Plot class which could cause axis labels
+  to be drawn on inappropriate edges of the plotting box when using
+  interior labelling.
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
@@ -65,4 +48,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-4/4/2001
+14/6/2001
