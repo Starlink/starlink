@@ -211,7 +211,7 @@
 *  If the current Frame is a CmpFrame, we now display details of its
 *  component Frames.
       IF( FULL .AND. AST_ISACMPFRAME( CFRM, STATUS ) ) THEN
-         FRM( 1 ) = CFRM;
+         FRM( 1 ) = CFRM
          I = 1
          TOP = 1
          COUNT = 1
