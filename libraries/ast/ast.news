@@ -16,6 +16,14 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+ o A new method astPutCards (AST_PUTCARDS) has been added to the FitsChan 
+ class. This allows multiple concatenated header cards to be stored in a 
+ FitsChan in a single call, providing an alternative to the existing
+ astPutCards (AST_PUTCARDS) method.
+
+ o A bug has been fixed in the FitsChan class which could cause keywords 
+ associated with alternate axis descriptions to be mis-interpreted.
+
  o  The Plot class now provides facilities for modifying the appearance of
  sub-strings within text strings such as axis labels, titles, etc, by
  producing super-scripts, sub-scripts, changing the font colour, size,

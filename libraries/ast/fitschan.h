@@ -134,6 +134,8 @@
 *           Find the next FITS header card for a given keyword.
 *        astPutFits
 *           Store a FITS header card in a FitsChan.
+*        astPutCards
+*           Store a set of FITS header cards in a FitsChan.
 *
 *     Protected:
 *        Test, Clear, Get and Set functions for all the above attributes,
@@ -239,6 +241,8 @@
 *        Added protected astInitFitsChanVtab method.
 *     13-FEB-2003 (DSB):
 *        Added Clean attribute.
+*     19-MAR-2004 (DSB):
+*        Added astPutCards function.
 *-
 */
 
@@ -318,6 +322,7 @@ typedef struct AstFitsChanVtab {
    void (* DelFits)( AstFitsChan * );
    int (* FindFits)( AstFitsChan *, const char *, char [81], int );
    void (* PutFits)( AstFitsChan *, const char [81], int );
+   void (* PutCards)( AstFitsChan *, const char * );
    int (* KeyFields)( AstFitsChan *, const char *, int, int *, int *);
    int (* FitsEof)( AstFitsChan * );
    int (* FitsGetCF)( AstFitsChan *, const char *, double * );
@@ -419,6 +424,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
    void astPutFits_( AstFitsChan *, const char [81], int );
+   void astPutCards_( AstFitsChan *, const char * );
    int  astFindFits_( AstFitsChan *, const char *, char [81], int );
    void astDelFits_( AstFitsChan * );
 
@@ -539,6 +545,9 @@ astINVOKE(O,astLoadFitsChan_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #define astPutFits(this,card,overwrite) \
 astINVOKE(V,astPutFits_(astCheckFitsChan(this),card,overwrite))
+
+#define astPutCards(this,cards) \
+astINVOKE(V,astPutCards_(astCheckFitsChan(this),cards))
 
 #define astDelFits(this) \
 astINVOKE(V,astDelFits_(astCheckFitsChan(this)))

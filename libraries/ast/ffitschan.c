@@ -18,6 +18,7 @@
 *     AST_FINDFITS
 *     AST_FITSCHAN
 *     AST_ISAFITSCHAN
+*     AST_PUTCARDS
 *     AST_PUTFITS
 
 *  Copyright:
@@ -260,6 +261,23 @@ F77_LOGICAL_FUNCTION(ast_isafitschan)( INTEGER(THIS),
       RESULT = astIsAFitsChan( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
    )
    return RESULT;
+}
+
+F77_SUBROUTINE(ast_putcards)( INTEGER(THIS),
+                              CHARACTER(CARDS),
+                              INTEGER(STATUS)
+                              TRAIL(CARDS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(CARDS)
+   int overwrite;
+   char *cards;
+
+   astAt( "AST_PUTCARDS", NULL, 0 );
+   astWatchSTATUS(
+      cards = astString( CARDS, CARDS_length );
+      astPutCards( astI2P( *THIS ), cards );   
+      (void) astFree( (void *) cards );
+   )
 }
 
 F77_SUBROUTINE(ast_putfits)( INTEGER(THIS),

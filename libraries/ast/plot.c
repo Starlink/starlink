@@ -491,6 +491,16 @@ f     - Title: The Plot title drawn using AST_GRID
 *        create an edge label from 3 degs to 5 degs.
 *        - Modified PlotLabels to ignore duplicate adjacent labels which
 *        determining overlap of labels.
+*     17-MAR-2004 (DSB):
+*        - Modified Typical to give normal weight to edge bins in
+*        histogram if these bins contain all the counts.
+*        - Modified DrawTicks to add extra minor ticks below first major
+*        tick value and above last major tick value.
+*        - Norm1 can reject usable tick mark values because of an
+*        inappropriate value being used on the other axis (i.e. one for
+*        which the position is undefined in grapics coords). Therfoer
+*        Norm1 has been modified to use 3 different reference values
+*        in an attempt to find one which gives good axis values.
 *class--
 */
 
@@ -1621,7 +1631,7 @@ static double GetTicks( AstPlot *, int, double *, double **, int *, int *, int, 
 static double GetUseSize( AstPlot *, int );
 static double GetUseWidth( AstPlot *, int );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
-static double Typical( int, double *, double, double );
+static double Typical( int, double *, double, double, double * );
 static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
@@ -1643,7 +1653,7 @@ static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
-static int FindMajTicks( AstMapping *, AstFrame *, int, double, double , double *, int, double *, double ** );
+static int FindMajTicks( AstMapping *, AstFrame *, int, double, double, double , double *, int, double *, double ** );
 static int FindMajTicks2( int, double, double, int, double *, double ** );
 static int FindDPTZ( AstFrame *, int, const char *, const char *, int *, int * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
@@ -1708,7 +1718,7 @@ static void Map2( int, double *, double *, double *, const char *, const char * 
 static void Map3( int, double *, double *, double *, const char *, const char * );
 static void Map4( int, double *, double *, double *, const char *, const char * );
 static void Mark( AstPlot *, int, int, int, const double *, int );
-static void Norm1( AstMapping *, int, int, double *, double );
+static void Norm1( AstMapping *, int, int, double *, double, double );
 static void Opoly( AstPlot *, const char *, const char * );
 static void PlotLabels( AstPlot *, int, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
 static void PolyCurve( AstPlot *, int, int, int, const double * );
@@ -9200,6 +9210,17 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                      delta2 = delta1 / gap[ axis ];
                   } 
 
+/* Extra minor tick marks are drawn below the first major tick mark and
+   above the last major tick mark to fill in any gaps caused by axis
+   limits being exceeded. */
+                  if( tick == 0 ) {
+                     minlo = 1 - info->nminor;
+                  } if( tick == 1 ) {
+                     minlo = ( 1 - info->nminor )/2;
+                  } else if( tick == info->nmajor - 1 ) {
+                     minhi = info->nminor - 1;
+                  }
+
 /* Store the axis value at the first minor tick mark. */
                   minval = *value + minlo*delta2;
 
@@ -10971,7 +10992,7 @@ int astFindEscape_( const char *text, int *type, int *value, int *nc ){
 }
 
 static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis, 
-                         double refval, double gap, double *cen, int ngood, 
+                         double refval, double width, double gap, double *cen, int ngood, 
                          double *data, double **tick_data ){
 /*
 *  Name:
@@ -10986,7 +11007,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 *  Synopsis:
 *     #include "plot.h"
 *     int FindMajTicks( AstMapping *map, AstFrame *frame, int axis, 
-*                       double refval, double gap, double *cen, int ngood, 
+*                       double refval, double width, double gap, double *cen, int ngood, 
 *                       double *data, double **tick_data )
 
 *  Class Membership:
@@ -11035,6 +11056,8 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 *     refval
 *        Value to use for the other axis (index [1-axis]) when placing
 *        the tick mark values into their primary domain.
+*     width
+*        Range of used values on the other axis (index [1-axis]).
 *     gap
 *        The supplied value for the gaps between ticks on the axis.
 *     cen
@@ -11179,7 +11202,7 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 /* Use the Mapping to place each tick mark value in its primary domain.
    This is a sort of normalization, similar but different to that performed
    by the astNorm method. */
-   Norm1( map, axis, nticks, ticks, refval ); 
+   Norm1( map, axis, nticks, ticks, refval, width ); 
 
 /* Check for success. */
    if( astOK ){
@@ -13743,6 +13766,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
    static double **ptr;             /* Pointer to physical coordinate values */
    static double defgaps[ 2 ];      /* Initial test gaps for each axis */
    static double typval[ 2 ];       /* Typical value on each axis */
+   static double width[ 2 ];        /* Range of used axis values */
    static int maxticks;             /* Max. number of ticks on each axis */
    static int mintick;              /* Min. number of ticks on each axis */
    static int ngood[ 2 ];           /* No. of good physical values on each axis */
@@ -13793,7 +13817,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 /* Find a typical value on each axis. */
       for( i = 0; i < 2 && astOK; i++ ){
-         typval[ i ] = Typical( ngood[ i ], ptr[ i ], -DBL_MAX, DBL_MAX );
+         typval[ i ] = Typical( ngood[ i ], ptr[ i ], -DBL_MAX, DBL_MAX,
+                                width + i );
       }
    }
 
@@ -14032,8 +14057,9 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
                used_gap = new_used_gap;
                if( *ticks ) *ticks = astFree( *ticks );
                if( cen ) *cen = cen0;
-               *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
-                                       ngood[ axis ], ptr[ axis ], ticks );
+               *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ], 
+                                       used_gap, cen, ngood[ axis ], 
+                                       ptr[ axis ], ticks );
             }
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
@@ -14073,8 +14099,9 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double **ticks,
 
 /* Find where the major ticks should be put. */
          if( cen ) *cen = cen0;
-         *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
-                                 ngood[ axis ], ptr[ axis ], ticks );
+         *nmajor = FindMajTicks( map, frame, axis, *refval, width[ 1-axis ],
+                                 used_gap, cen, ngood[ axis ], ptr[ axis ], 
+                                 ticks );
       }
    }
 
@@ -18017,7 +18044,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
             GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-            gelid = NUMLABS_ID;
+            gelid = NUMLAB2_ID;
 
          }
       }
@@ -19263,7 +19290,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
 }
 
 static void Norm1( AstMapping *map, int axis, int nv, double *vals, 
-                   double refval ){
+                   double refval, double width ){
 /*
 *  Name:
 *     Norm1
@@ -19277,7 +19304,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 *  Synopsis:
 *     #include "plot.h"
 *     void Norm1( AstMapping *map, int axis, int nv, double *vals, 
-*                 double refval )
+*                 double refval, double width )
 
 *  Class Membership:
 *     Plot member function.
@@ -19290,13 +19317,28 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 *     Mapping, by transforming the physical position into Graphics position, 
 *     and then back into a physical position. For instance, if the Mapping 
 *     represents a mapping of Cartesian graphics axes onto a 2D polar 
-*     coordinate system, a physical theta value of 3.PI wil be normalized by 
+*     coordinate system, a physical theta value of 3.PI will be normalized by 
 *     the Mapping into a theta value of 1.PI (probably, but it depends on 
 *     the Mapping). In this case, the Mapping normalization may well be the 
 *     only normalization available, since the 2D polar coord. system will 
 *     probably use a simple Frame to represent the (radius,theta) system,
-*     and a simpel Frame defines no normalization (i.e. the astNorm method
+*     and a simple Frame defines no normalization (i.e. the astNorm method
 *     returns the supplied position unchanged).
+*
+*     Complications arise though because it is not possible to normalise
+*     a single axis value - you can only normalize a complete position.
+*     Therefore some value must be supplied for the other axis. We
+*     should use the LabelAt value, but we do not yet know what the LabelAt 
+*     value will be. Instead, we try first using the supplied "refval"
+*     which should be close to the mode of the other aixs values. Usually
+*     the value used is not very important. However, for some complex 
+*     projections (such as quad-cubes, TSC, etc) the choice can be more
+*     critical since some positions on the ksy correspond to undefined
+*     graphics positions (e.g the face edges in a TSC projection).
+*     Therefore, if the supplied refval results in any positions being
+*     undefined we refine the process by transforming the undefined
+*     positaons again using a different refval. We do this twice to bump
+*     up the likelihood of finding a suitable reference value.
 
 *  Parameters:
 *     mapping
@@ -19308,8 +19350,10 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 *     vals 
 *        Pointer to an array of axis values. On exit they are normalized.
 *     refval 
-*        The constant value to use for the other axis when normalizing the 
-*        values in "vals".
+*        The preffered constant value to use for the other axis when 
+*        normalizing the values in "vals".
+*     width
+*        The range of used values for the other axis.
 
 */
 
@@ -19320,6 +19364,8 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
    double *a;                 /* Pointer to next axis value */
    double *b;                 /* Pointer to next axis value */
    int i;                     /* Loop count */
+   int nbad;                  /* No. of bad values found after transformation */
+   int *flags;                /* Pointer to flags array */
 
 /* Check the inherited global status. */
    if( !astOK ) return;
@@ -19342,15 +19388,84 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 /* Transform the Base Frame positions back into the Current Frame. */
    (void) astTransform( map, pset2, 1, pset1 );
 
-/* If good, store these values back in the supplied array. */
+/* Allocate memory to hold a flag for each position which is non-zero if
+   we currently have a good axis value to return for the position. */
+   flags = (int *) astMalloc( sizeof(int)* (size_t) nv );
+
+/* If good, store these values back in the supplied array. If the
+   transformed values are bad, retain the original good values for the
+   moment in "vals", and also copy the good values back into pset1. So
+   at the end, pset1 will contain the original good values at any points
+   which produced bad values after the above transformation - the other
+   points in pset1 will be bad.  */
+   nbad = 0;
    if( astOK ) {
       a = ptr1[ axis ];
-      for( i = 0; i < nv; i++){
-         vals[ i ] = *(a++);
+      for( i = 0; i < nv; i++, a++ ){
+         if( *a != AST__BAD ) {
+            vals[ i ] = *a;
+            *a = AST__BAD;
+            flags[ i ] = 1;
+         } else if( vals[ i ] != AST__BAD ) {
+            nbad++;
+            *a = vals[ i ];
+            flags[ i ] = 0;
+         } else {
+            flags[ i ] = 1;
+         }
       }
    }
 
+/* If the above transformation produced any bad values, try again with a
+   different value on the other axis. */
+   if( astOK && nbad > 0 ) {
+      b = ptr1[ 1 - axis ];
+      for( i = 0; i < nv; i++){
+         *(b++) = refval + 0.1*width;
+      }
+
+/* Transform to graphics coords and back to world coords. */
+      (void) astTransform( map, pset1, 0, pset2 );
+      (void) astTransform( map, pset2, 1, pset1 );
+
+/* Copy any good positions back into the returned vals array. Count
+   remaining bad positions. */
+      a = ptr1[ axis ];
+      nbad = 0;
+      for( i = 0; i < nv; i++, a++ ){
+         if( *a != AST__BAD ) {
+            vals[ i ] = *a;
+            flags[ i ] = 1;
+            *a = AST__BAD;
+         } else if( !flags[ i ] ) {
+            nbad++;
+            *a = vals[ i ];
+         }
+      }
+   }
+
+/* If the above transformation produced any bad values, try one last time 
+   with yet another different value on the other axis. */
+   if( astOK && nbad > 0 ) {
+      b = ptr1[ 1 - axis ];
+      for( i = 0; i < nv; i++){
+         *(b++) = refval - 0.1*width;
+      }
+
+/* Transform to graphics coords and back to world coords. */
+      (void) astTransform( map, pset1, 0, pset2 );
+      (void) astTransform( map, pset2, 1, pset1 );
+
+/* Copy any good positions back into the returned vals array. */
+      a = ptr1[ axis ];
+      for( i = 0; i < nv; i++, a++ ) {
+         if( !flags[ i ] ) vals[ i ] = *a;
+      }
+
+   }
+
 /* Free resources. */
+   flags = (int *) astFree( flags );
    pset1 = astAnnul( pset1 );   
    pset2 = astAnnul( pset2 );   
 
@@ -24062,7 +24177,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 }
 
-static double Typical( int n, double *value, double lolim, double hilim ) {
+static double Typical( int n, double *value, double lolim, double hilim,
+                       double *width ) {
 /*
 *  Name:
 *     Typical
@@ -24075,7 +24191,8 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     double Typical( int n, double *value, double lolim, double hilim  )
+*     double Typical( int n, double *value, double lolim, double hilim,
+*                     double *width  )
 
 *  Class Membership:
 *     Plot member function.
@@ -24096,6 +24213,10 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
 *     hilim
 *        Values greater than hilim are ignored. Supply as DBL_MAX if there
 *        is no upper limit.
+*     width
+*        Pointer to a double in which to return the width (i,e, data range)
+*        of the non-empty histogram cells. This is an estimate of the
+*        range of used values in the supplied array. NULL may be supplied.
 
 *  Returned Value:
 *     A typical value from the supplied array. AST__BAD is returned only
@@ -24120,12 +24241,15 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
    int i;                 /* Loop count */
    int ibin;              /* Bin index */
    int maxcnt;            /* Maximum no. of values in any bin */
+   int modify;            /* Modify the effect of the edge bins? */
    int nbin;              /* No. of bins in histogram */
    int nc;                /* Total number of points in histogram */
    int ngood;             /* No. of good values supplied */
+   int nonemp;            /* No. of non-empty bins in hstogram */
 
 /* Initialise. */
    result = AST__BAD;
+   if( width ) *width = 0.0;
 
 /* Check the global error status. */
    if ( !astOK ) return result;
@@ -24147,6 +24271,9 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
          }
       }
    }
+
+/* Initialise the returned width to the total data range. */
+   if( width && maxval != -DBL_MAX ) *width = maxval - minval;
 
 /* If less than 3 points were found, we will return the first. Otherwise, if 
    3 or more good values were found, find a typical value. */
@@ -24191,16 +24318,23 @@ static double Typical( int n, double *value, double lolim, double hilim ) {
    the limits since they can give problems with regard to normalization
    (rounding errors can knock them over the edge), so we modify the counts 
    in each bin of the histogram to reduce the impact of bins near the edge.
+   However, we do not do this if the number of bins is very small or if
+   all the counts are in the edge bins. */
+            modify = ( nbin > 4 && 
+                      ( hist[ 0 ] + hist[ nbin - 1 ] < 0.98*ngood ) );
 
-Find the bin with the highest modified count. If there is more than one bin
+/* Find the bin with the highest modified count. If there is more than one bin
    with the highest modified count, choose the one which is closest to the
-   mean data value found above. */
+   mean data value found above. Also count the number of non-empty bins. */
+            nonemp = 0;
             maxcnt = 0;
             w0 = nbin/2;
             for( i = 0; i < nbin; i++ ) {
 
                cnt = hist[ i ];
-               if( nbin > 4 ) {
+               if( cnt ) nonemp++;
+
+               if( modify ) {
                   w1 = i*w0;
                   w2 = ( nbin - 1 - i )*w0;
                   w = ( w1 < w2 ) ? w1 :w2;               
@@ -24223,6 +24357,8 @@ Find the bin with the highest modified count. If there is more than one bin
 /* Free the histogram memory. */
             hist = astFree( hist );
 
+/* If required, return the width of the non-empty bins. */
+            if( width ) *width = nonemp*delta;
 
 /* Call this function recursively to refine the value, restricting
    attention to those data values which are within the range of the bin
@@ -24230,7 +24366,7 @@ Find the bin with the highest modified count. If there is more than one bin
             if( maxcnt < nc && ibin*delta > 1000.0*DBL_EPSILON*fabs(maxval) ) {
                minval += ibin*delta;
                maxval = minval + delta;
-               result = Typical( n, value, minval, maxval );
+               result = Typical( n, value, minval, maxval, NULL );
             }
          }
       }

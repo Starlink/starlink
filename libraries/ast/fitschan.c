@@ -28,10 +28,10 @@ f     AST_WRITE) will, if the Object is suitable, generate a
 *     the FitsChan's integer Card attribute, which identifies a "current"
 *     card, to which subsequent operations apply. Searches
 c     based on keyword may be performed (using astFindFits), new
-c     cards may be inserted (astPutFits) and existing ones may be
+c     cards may be inserted (astPutFits, astPutCards) and existing ones may be
 c     deleted (astDelFits).
 f     based on keyword may be performed (using AST_FINDFITS), new
-f     cards may be inserted (AST_PUTFITS) and existing ones may be
+f     cards may be inserted (AST_PUTFITS, AST_PUTCARDS) and existing ones may be
 f     deleted (AST_DELFITS).
 *
 *     When you create a FitsChan, you have the option of specifying
@@ -40,8 +40,8 @@ f     deleted (AST_DELFITS).
 *     a source function, it is used to fill the FitsChan with header
 *     cards when it is created. If you do not provide a source
 *     function, the FitsChan remains empty until you explicitly enter
-c     data into it (e.g. using astPutFits or astWrite). If you
-f     data into it (e.g. using AST_PUTFITS or AST_WRITE). If you
+c     data into it (e.g. using astPutFits, astPutCards or astWrite). If you
+f     data into it (e.g. using AST_PUTFITS, AST_PUTCARDS or AST_WRITE). If you
 *     provide a sink function, it is used to deliver any remaining
 *     contents of a FitsChan to an external data store when the
 *     FitsChan is deleted. If you do not provide a sink function, any
@@ -119,6 +119,8 @@ c     - astFindFits: Find a FITS card in a FitsChan by keyword
 f     - AST_FINDFITS: Find a FITS card in a FitsChan by keyword
 c     - astPutFits: Store a FITS header card in a FitsChan
 f     - AST_PUTFITS: Store a FITS header card in a FitsChan
+c     - astPutCards: Stores a set of FITS header card in a FitsChan
+f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -509,6 +511,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     11-MAR-2004 (DSB):
 *        - Modified SpecTrans to check all axis descriptions for keywords
 *        to be translated.
+*     19-MAR-2004 (DSB):
+*        - Added astPutCards to support new fits_hdr2str function in
+*        CFITSIO.
 
 *class--
 */
@@ -1018,6 +1023,7 @@ static void MakeIntoComment( AstFitsChan *, const char *, const char * );
 static void MarkCard( AstFitsChan * );
 static void NewCard( AstFitsChan *, const char *, int, const void *, const char *, int );
 static void PreQuote( const char *, char [ FITSCARDLEN - FITSNAMLEN - 3 ] );
+static void PutCards( AstFitsChan *, const char * );
 static void PutFits( AstFitsChan *, const char [ FITSCARDLEN + 1 ], int );
 static void ReadFromSource( AstFitsChan * );
 static void RoundFString( char *, int );
@@ -11950,6 +11956,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->PutCards = PutCards;   
    vtab->PutFits = PutFits;   
    vtab->DelFits = DelFits;   
    vtab->FindFits = FindFits;   
@@ -16444,6 +16451,96 @@ static void PreQuote( const char *value,
    string. */
    if ( dquotes ) string[ j++ ] = '"';
    string[ j ] = '\0';
+}
+
+static void PutCards( AstFitsChan *this, const char *cards ) {
+/*
+*++
+*  Name:
+c     astPutCards
+f     AST_PUTCARDS
+
+*  Purpose:
+*     Store a set of FITS header cards in a FitsChan.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astPutCards( AstFitsChan *this, const char *cards )
+f     CALL AST_PUTCARDS( THIS, CARDS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function 
+f     This routine 
+*     stores a set of FITS header cards in a FitsChan. The cards are
+*     supplied concatenated together into a single character string.
+*     Any existing cards in the FitsChan are removed before the new cards
+*     are added. The FitsChan is "re-wound" on exit by clearing its Card 
+*     attribute. This means that a subsequent invocation of 
+c     astRead
+f     AST_READ
+*     can be made immediately without the need to re-wind the FitsChan
+*     first.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+c     cards
+f     CARDS = CHARACTER * ( * ) (Given)
+c        Pointer to a null-terminated character string
+f        A character string
+*        containing the FITS cards to be stored. Each individual card
+*        should occupy 80 characters in this string, and there should be
+*        no delimiters, new lines, etc, between adjacent cards. The final
+*        card may be less than 80 characters long.
+c        This is the format produced by the fits_hdr2str function in the
+c        CFITSIO library.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - An error will result if the supplied string contains any cards
+*     which cannot be interpreted.
+*--
+*/
+/* Local Variables: */
+   const char *a;         /* Pointer to start of next card */
+   const char *class;     /* Object class */
+   const char *method;    /* Current method */
+   int clen;              /* Length of supplied string */
+   int i;                 /* Card index */
+   int ncard;             /* No. of cards supplied */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the current method, and the class of the supplied object for use 
+   in error messages.*/
+   method = "astPutCards";
+   class = astGetClass( this );
+
+/* Empty the FitsChan. */
+   astEmpty( this );
+
+/* Loop round the supplied string in 80 character segments, inserting
+   each segment into the FitsChan as a header card. Allow the last card
+   to be less than 80 characters long. */
+   clen = strlen( cards );
+   ncard = clen/80;
+   if( ncard*80 < clen ) ncard++;
+   
+   a = cards;
+   for( i = 0; i < ncard; i++, a += 80 ) astPutFits( this, a, 1 );
+
+/* Rewind the FitsChan. */
+   astClearCard( this );
+
 }
 
 static void PutFits( AstFitsChan *this, const char card[ FITSCARDLEN + 1 ], 
@@ -28805,10 +28902,10 @@ f     AST_WRITE) will, if the Object is suitable, generate a
 *     the FitsChan's integer Card attribute, which identifies a "current"
 *     card, to which subsequent operations apply. Searches
 c     based on keyword may be performed (using astFindFits), new
-c     cards may be inserted (astPutFits) and existing ones may be
+c     cards may be inserted (astPutCards, astPutFits) and existing ones may be
 c     deleted (astDelFits).
 f     based on keyword may be performed (using AST_FINDFITS), new
-f     cards may be inserted (AST_PUTFITS) and existing ones may be
+f     cards may be inserted (AST_PUTCARDS, AST_PUTFITS) and existing ones may be
 f     deleted (AST_DELFITS).
 *
 *     When you create a FitsChan, you have the option of specifying
@@ -28817,8 +28914,8 @@ f     deleted (AST_DELFITS).
 *     a source function, it is used to fill the FitsChan with header
 *     cards when it is created. If you do not provide a source
 *     function, the FitsChan remains empty until you explicitly enter
-c     data into it (e.g. using astPutFits or astWrite). If you
-f     data into it (e.g. using AST_PUTFITS or AST_WRITE). If you
+c     data into it (e.g. using astPutCards, astPutFits or astWrite). If you
+f     data into it (e.g. using AST_PUTCARDS, AST_PUTFITS or AST_WRITE). If you
 *     provide a sink function, it is used to deliver any remaining
 *     contents of a FitsChan to an external data store when the
 *     FitsChan is deleted. If you do not provide a sink function, any
@@ -28879,7 +28976,7 @@ c        should return a NULL pointer when there are no more cards to
 c        be read.
 c
 c        If "source" is NULL, the FitsChan will remain empty until
-c        cards are explicitly stored in it (e.g. using astPutFits).
+c        cards are explicitly stored in it (e.g. using astPutCards or astPutFits).
 f        A source routine, which is a function taking two arguments: a
 f        character argument of length 80 to contain a FITS card, and an
 f        integer error status argument. It should return an integer value.
@@ -28894,7 +28991,7 @@ f        status argument to an error value before returning.
 f
 f        If the null routine AST_NULL is supplied as the SOURCE value,
 f        the FitsChan will remain empty until cards are explicitly
-f        stored in it (e.g. using AST_PUTFITS).
+f        stored in it (e.g. using AST_PUTCARDS or AST_PUTFITS).
 c     sink
 f     SINK = SUBROUTINE (Given)
 c        Pointer to a sink function that takes a pointer to a
@@ -29132,7 +29229,7 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
 *        "source_wrap" function before the function is invoked.
 *
 *        If "source" is NULL, the FitsChan will remain empty until
-*        cards are added explicitly (e.g. using astPutFits).
+*        cards are added explicitly (e.g. using astPutCards or astPutFits).
 *     source_wrap
 *        Pointer to a function which can be used to invoke the
 *        "source" function supplied (above). This wrapper function is
@@ -29152,7 +29249,7 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
 *        should be returned if there is no more input to read.
 *
 *        If "source" is NULL, the FitsChan will remain empty until
-*        cards are added explicitly (e.g. using astPutFits).
+*        cards are added explicitly (e.g. using astPutCards or astPutFits).
 *     sink
 *        Pointer to a "sink" function which will be used to deliver
 *        FITS header cards. Generally, this will be obtained by
@@ -29325,7 +29422,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
 *        "source_wrap" function before the function is invoked.
 *
 *        If "source" is NULL, the FitsChan will remain empty until
-*        cards are added explicitly (e.g. using astPutFits).
+*        cards are added explicitly (e.g. using astPutCards or astPutFits).
 *     source_wrap
 *        Pointer to a function which can be used to invoke the
 *        "source" function supplied (above). This wrapper function is
@@ -29345,7 +29442,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
 *        should be returned if there is no more input to read.
 *
 *        If "source" is NULL, the FitsChan will remain empty until
-*        cards are added explicitly (e.g. using astPutFits).
+*        cards are added explicitly (e.g. using astPutCards or astPutFits).
 *     sink
 *        Pointer to a "sink" function which will be used to deliver
 *        FITS header cards. Generally, this will be obtained by
@@ -29751,6 +29848,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 void astEmpty_( AstFitsChan *this ){
    if( !this ) return;
    (**astMEMBER(this,FitsChan,Empty))(this);
+}
+
+void astPutCards_( AstFitsChan *this, const char *cards ){
+   if( !astOK ) return;
+   (**astMEMBER(this,FitsChan,PutCards))(this,cards);
 }
 
 void astPutFits_( AstFitsChan *this, const char *card, int overwrite ){

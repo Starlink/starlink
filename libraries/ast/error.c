@@ -38,6 +38,10 @@
 *        foreign language and graphics interfaces, etc.
 *     27-NOV-2002 (DSB):
 *        Added suppression of error reporting using astReporting.
+*     11-MAR-2004 (DSB):
+*        Add facility to astAt to allow astAt to be called from public
+*        interface without private interface settings over-riding the
+*        public interface settings.
 */
 
 /* Define the astCLASS macro (even although this is not a class
@@ -69,10 +73,11 @@ static int reporting = 1;
 static const char *current_file = NULL; /* Current file name pointer */
 static const char *current_routine = NULL; /* Current routine name pointer */
 static int current_line = 0;     /* Current line number */
+static int foreign_set = 0;      /* Have foreign values been set? */
 
 /* Function implementations. */
 /* ========================= */
-void astAt_( const char *routine, const char *file, int line ) {
+void astAt_( const char *routine, const char *file, int line, int forn) {
 /*
 *+
 *  Name:
@@ -86,7 +91,7 @@ void astAt_( const char *routine, const char *file, int line ) {
 
 *  Synopsis:
 *     #include "error.h"
-*     void astAt( const char *routine, const char *file, int line )
+*     void astAt( const char *routine, const char *file, int line, int forn)
 
 *  Description:
 *     This function stores a pointer to two strings containing the
@@ -103,6 +108,10 @@ void astAt_( const char *routine, const char *file, int line ) {
 *        (which should reside in static memory).
 *     line
 *        The line number in the file.
+*     for
+*        Is this call being made from a foreign language interface?
+*        If so any values supplied will take precedence of the values
+*        set by the C interface.
 
 *  Notes:
 *     - This function returns without action (i.e. without changing
@@ -121,10 +130,17 @@ void astAt_( const char *routine, const char *file, int line ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Store the values supplied. */
-   current_routine = routine;
-   current_file = file;
-   current_line = line;
+/* If the values refer to a foreign interface, or if no foreign values
+   have yet been set, store the supplied values. */
+   if( forn|| !foreign_set ) {   
+      current_routine = routine;
+      current_file = file;
+      current_line = line;
+   }
+
+/* If the values relate to a foreign interface, set a flag which prevents
+   local values set later replacing them. */
+   foreign_set = forn;
 }
 
 void astClearStatus_( void ) {

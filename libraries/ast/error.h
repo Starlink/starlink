@@ -89,7 +89,7 @@ void astSetStatus_( int );
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
-void astAt_( const char *, const char *, int );
+void astAt_( const char *, const char *, int, int );
 void astError_( int, const char *, ... );
 int astReporting_( int );
 #endif
@@ -104,10 +104,15 @@ int astReporting_( int );
 #define astStatus astStatus_()
 #define astWatch(status_address) astWatch_(status_address)
 
+#if defined(astCLASS) 
+#define astAt(routine,file,line) astAt_(routine,file,line,0)
+#else
+#define astAt(routine,file,line) astAt_(routine,file,line,1)
+#endif
+
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
-#define astAt(routine,file,line) astAt_(routine,file,line)
 #define astError astError_
 #define astReporting astReporting_
 #endif

@@ -75,7 +75,7 @@ f     The XmlChan class does not define any new routines beyond those
 #define INDENT_INC 3
 
 /* The XML element name used to store an AST attribute setting */
-#define _ATTRIBUTE "_attribute"
+#define ATTR "_attribute"
 
 /* The XML element name used for an AST "isa" element */
 #define ISA "_isa"
@@ -512,15 +512,15 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name ) {
 /* Ignore this item if it is not an element. */
          if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
-/* Ignore this element if its name is not _ATTRIBUTE. */
+/* Ignore this element if its name is not ATTR. */
             if( !astOK ) break;
-            if( !strcmp( astXmlGetName( item ), _ATTRIBUTE ) ){
+            if( !strcmp( astXmlGetName( item ), ATTR ) ){
 
 /* Ignore this element if it represents a default value. */
                def = astXmlGetAttributeValue( item, DEFAULT );
                if( !def || strcmp( def, TRUE ) ) {
 
-/* If this _ATTRIBUTE element has an XML attribute called NAME with
+/* If this ATTR element has an XML attribute called NAME with
    the required value (case-insensitive), we may have found a matching 
    element. */
                    xmlname = astXmlGetAttributeValue( item, NAME );
@@ -700,14 +700,14 @@ static AstXmlElement *FindObject( AstXmlChan *this, const char *name ) {
 /* Ignore this item if it is not an element. */
          if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
-/* Ignore this element if its name is _ATTRIBUTE. */
-            if( astOK && strcmp( astXmlGetName( item ), _ATTRIBUTE ) ){
+/* Ignore this element if its name is ATTR. */
+            if( astOK && strcmp( astXmlGetName( item ), ATTR ) ){
 
 /* Ignore this element if it represents a default value. */
                def = astXmlGetAttributeValue( item, DEFAULT );
                if( !def || strcmp( def, TRUE ) ) {
 
-/* If this non-_ATTRIBUTE element has an XML attribute called LABEL with
+/* If this non-ATTR element has an XML attribute called LABEL with
    the required value (case-insensitive), we may have found a matching element. */
                    xmlname = astXmlGetAttributeValue( item, LABEL );
                    if( xmlname && !Ustrcmp( xmlname, name ) ) {
@@ -1726,10 +1726,10 @@ static double ReadDouble( AstChannel *this_channel, const char *name, double def
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_channel;
 
-/* Search the current container element for an _ATTRIBUTE element
+/* Search the current container element for an ATTR element
    describing an AST attribute of the specified name. This call ignores
-   _ATTRIBUTE elements which represent default values. No error is
-   reported if an _ATTRIBUTE element with the given name cannot be 
+   ATTR elements which represent default values. No error is
+   reported if an ATTR element with the given name cannot be 
    found. */
    element = FindAttribute( this, name );
 
@@ -1747,7 +1747,7 @@ static double ReadDouble( AstChannel *this_channel, const char *name, double def
                       "cannot be read as a double precision floating point "
                       "number.", name, value );
 
-/* If the value was succesfully read, remove the _ATTRIBUTE element
+/* If the value was succesfully read, remove the ATTR element
    from the container. */
          } else {
             element = Remove( this, element );
@@ -1838,10 +1838,10 @@ static int ReadInt( AstChannel *this_channel, const char *name, int def ) {
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_channel;
 
-/* Search the current container element for an _ATTRIBUTE element
+/* Search the current container element for an ATTR element
    describing an AST attribute of the specified name. This call ignores
-   _ATTRIBUTE elements which represent default values. No error is
-   reported if an _ATTRIBUTE element with the given name cannot be 
+   ATTR elements which represent default values. No error is
+   reported if an ATTR element with the given name cannot be 
    found. */
    element = FindAttribute( this, name );
 
@@ -1859,7 +1859,7 @@ static int ReadInt( AstChannel *this_channel, const char *name, int def ) {
                       "astRead(XmlChan): The value \"%s = %s\" cannot "
                       "be read as an integer.", name, value );
 
-/* If the value was succesfully read, remove the _ATTRIBUTE element
+/* If the value was succesfully read, remove the ATTR element
    from the container. */
          } else {
             element = Remove( this, element );
@@ -1951,7 +1951,7 @@ static AstObject *ReadObject( AstChannel *this_channel, const char *name,
    this = (AstXmlChan *) this_channel;
 
 /* Search the current container element for an element with a name which
-   is not _ATTRIBUTE and with the specified LABEL. This call ignores
+   is not ATTR and with the specified LABEL. This call ignores
    elements which represent default values. No error is reported if an
    element with the given label cannot be found. */
    element = FindObject( this, name );
@@ -2049,10 +2049,10 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_channel;
 
-/* Search the current container element for an _ATTRIBUTE element
+/* Search the current container element for an ATTR element
    describing an AST attribute of the specified name. This call ignores
-   _ATTRIBUTE elements which represent default values. No error is
-   reported if an _ATTRIBUTE element with the given name cannot be 
+   ATTR elements which represent default values. No error is
+   reported if an ATTR element with the given name cannot be 
    found. */
    element = FindAttribute( this, name );
 
@@ -2070,7 +2070,7 @@ static char *ReadString( AstChannel *this_channel, const char *name, const char 
             }         
          }
 
-/* Remove the _ATTRIBUTE element from the container. */
+/* Remove the ATTR element from the container. */
          element = Remove( this, element );
 
 /* Report an error if the attribute does not have a value. */
@@ -3037,9 +3037,9 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
    written. */
       if( Use( this, set, helpful ) ) {
 
-/* Create a new XmlElement with a name of _ATTRIBUTE (and no namespace 
+/* Create a new XmlElement with a name of ATTR (and no namespace 
    prefix), and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, _ATTRIBUTE,
+         elem = astXmlAddElement( this->container, ATTR,
                                   astGetXmlPrefix( this ) );
 
 /* Add a NAME attribute to this element containing the item name. */
@@ -3317,9 +3317,9 @@ static void WriteInt( AstChannel *this_channel, const char *name, int set, int h
    written. */
       if( Use( this, set, helpful ) ) {
 
-/* Create a new XmlElement with a name of _ATTRIBUTE (and no namespace 
+/* Create a new XmlElement with a name of ATTR (and no namespace 
    prefix), and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, _ATTRIBUTE,
+         elem = astXmlAddElement( this->container, ATTR,
                                   astGetXmlPrefix( this ) );
 
 /* Add a NAME attribute to this element containing the item name. */
@@ -3687,9 +3687,9 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
    written. */
       if( Use( this, set, helpful ) ) {
 
-/* Create a new XmlElement with a name of _ATTRIBUTE (and no namespace 
+/* Create a new XmlElement with a name of ATTR (and no namespace 
    prefix), and add it into the current container (i.e. parent) element. */
-         elem = astXmlAddElement( this->container, _ATTRIBUTE,
+         elem = astXmlAddElement( this->container, ATTR,
                                   astGetXmlPrefix( this ) );
 
 /* Add a NAME attribute to this element containing the item name. */

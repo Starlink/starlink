@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {210.13}
+\newcommand{\stardocnumber}    {210.14}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {4th March 2004}
+\newcommand{\stardocdate}      {19th March 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1436,6 +1436,7 @@ description of the ``\htmlref{ast\_link}{ast_link}'' command in
 
 \subsection{\label{ss:howtoreadwcs}\ldots Read a WCS Calibration from a Dataset}
 
+
 Precisely how you extract world coordinate system (WCS) information
 from a dataset obviously depends on what type of dataset it
 is. Usually, however, you should be able to obtain a set of FITS
@@ -1918,7 +1919,9 @@ from your input dataset by modifying the example given in
 
       ...
 
-*  Create an input FitsChan and fill it with FITS header cards.
+*  Create an input FitsChan and fill it with FITS header cards. Note,
+*  if you have all the header cards in a single string, use AST_PUTCARDS in
+*  place of AST_PUTFITS.
       FITSCHAN1 = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
       DO 1 ICARD = 1, NCARD
          CALL AST_PUTFITS( FITSCHAN1, CARDS( ICARD ), .FALSE., STATUS )
@@ -1982,7 +1985,7 @@ dataset ({\em{e.g.}}\ \secref{ss:howtomodifywcs}), in the form of a
 
 For details of how to modify the contents of the output FitsChan in
 other ways, such as by adding, over-writing or deleting header cards,
-see \secref{ss:addressingfitscards}, \secref{ss:addingfitscards} and
+see \secref{ss:addressingfitscards}, \secref{ss:addingmulticards}, \secref{ss:addingfitscards} and
 \secref{ss:findingandchangingfits}.
 
 Once you have assembled the output FITS cards, you may retrieve them
@@ -8653,11 +8656,15 @@ forms a workspace in which you can assemble FITS cards and manipulate
 them before writing them out to a FITS file.
 
 By default, when a FitsChan is first created, it contains no cards and
-there are three ways of inserting cards into it:
+there are four ways of inserting cards into it:
 
 \begin{enumerate}
 \item You may add cards yourself, one at a time, using \htmlref{AST\_PUTFITS}{AST_PUTFITS}
 (\secref{ss:addingfitscards}).
+
+\item You may add cards yourself, supplying all cards concatenated into a
+single string, using \htmlref{AST\_PUTCARDS}{AST_PUTCARDS}.
+(\secref{ss:addingmulticards}).
 
 \item You may write an AST \htmlref{Object}{Object} to the FitsChan (using \htmlref{AST\_WRITE}{AST_WRITE}),
 which will have the effect of creating new cards within the FitsChan
@@ -8841,7 +8848,7 @@ continued on the next card.
 Note, this splitting of long strings over several cards only occurs when
 writing AST Objects to a FitsChan using the AST\_WRITE routine and the
 {\em native} encoding. If a long string is stored in a FitsChan using
-(for instance) the \htmlref{AST\_PUTFITS}{AST_PUTFITS} routine, it will simply be truncated.
+(for instance) the \htmlref{AST\_PUTFITS}{AST_PUTFITS} or \htmlref{AST\_PUTCARDS}{AST_PUTCARDS} routine, it will simply be truncated.
 
 \subsection{\label{ss:extractingfitscards}Extracting Individual Cards from a FitsChan}
 
@@ -8999,6 +9006,22 @@ will insert the cards in sequence into a FitsChan:
 Note that AST\_PUTFITS enforces the validity of a FitsChan by
 rejecting any cards which do not adhere to the FITS standard. If any
 such cards are detected, an error will result.
+
+\subsection{\label{ss:addingmulticards}Adding Concatenated Cards to a FitsChan}
+
+If you have all your cards concatenated together into a single long string, 
+each occupying 80 characters (with no delimiters), you can insert them
+into a \htmlref{FitsChan}{FitsChan} in a single call using
+\htmlref{AST\_PUTCARDS}{AST_PUTCARDS}.
+This call first empties the supplied FitsChan of any existing cards, then 
+inserts the new cards, and finally rewinds the FitsChan so that a
+subsequent call to 
+\htmlref{AST\_READ}{AST_READ}
+will start reading from the first supplied card. The
+AST\_PUTCARDS routine uses \htmlref{AST\_PUTFITS}{AST_PUTFITS}
+internally to interpret and store each individual card, and so the
+caveats in \secref{ss:addingfitscards} should be read.
+
 
 \subsection{\label{ss:readingnativefits}Reading Native Objects From a FitsChan}
 
@@ -9158,7 +9181,8 @@ AST\_FINDFITS in \appref{ss:functiondescriptions}.
 
 The use of source and sink routines with a \htmlref{FitsChan}{FitsChan} is optional. This
 is because you can always arrange to explicitly fill a FitsChan with
-FITS cards (\secref{ss:addingfitscards}) and you can also extract any
+FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards}) 
+and you can also extract any
 cards that remain and write them out yourself
 (\secref{ss:extractingfitscards}) before you delete the FitsChan.
 
@@ -13800,7 +13824,7 @@ Object             - Base class for all AST Objects
       the FitsChan's integer \htmlref{Card}{Card} attribute, which identifies a {\tt{"}}current{\tt{"}}
       card, to which subsequent operations apply. Searches
       based on keyword may be performed (using \htmlref{AST\_FINDFITS}{AST_FINDFITS}), new
-      cards may be inserted (\htmlref{AST\_PUTFITS}{AST_PUTFITS}) and existing ones may be
+      cards may be inserted (\htmlref{AST\_PUTCARDS}{AST_PUTCARDS}, \htmlref{AST\_PUTFITS}{AST_PUTFITS}) and existing ones may be
       deleted (\htmlref{AST\_DELFITS}{AST_DELFITS}).
 
       When you create a FitsChan, you have the option of specifying
@@ -13809,7 +13833,7 @@ Object             - Base class for all AST Objects
       a source function, it is used to fill the FitsChan with header
       cards when it is created. If you do not provide a source
       function, the FitsChan remains empty until you explicitly enter
-      data into it (e.g. using AST\_PUTFITS or AST\_WRITE). If you
+      data into it (e.g. using AST\_PUTCARDS, AST\_PUTFITS or AST\_WRITE). If you
       provide a sink function, it is used to deliver any remaining
       contents of a FitsChan to an external data store when the
       FitsChan is deleted. If you do not provide a sink function, any
@@ -13874,7 +13898,7 @@ Object             - Base class for all AST Objects
 
          If the null routine AST\_NULL is supplied as the SOURCE value,
          the FitsChan will remain empty until cards are explicitly
-         stored in it (e.g. using AST\_PUTFITS).
+         stored in it (e.g. using AST\_PUTCARDS or AST\_PUTFITS).
       }
       \sstsubsection{
          SINK = SUBROUTINE (Given)
@@ -17691,6 +17715,55 @@ Object             - Base class for all AST Objects
          A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
          function is invoked with STATUS set to an error value, or if it
          should fail for any reason.
+      }
+   }
+}
+\sstroutine{
+   AST\_PUTCARDS\sstlabel{AST_PUTCARDS}
+}{
+   Store a set of FITS header cards in a FitsChan
+}{
+   \sstdescription{
+      This routine
+      stores a set of FITS header cards in a \htmlref{FitsChan}{FitsChan}. The cards are
+      supplied concatenated together into a single character string.
+      Any existing cards in the FitsChan are removed before the new cards
+      are added. The FitsChan is {\tt{"}}re-wound{\tt{"}} on exit by clearing its \htmlref{Card}{Card}
+      attribute. This means that a subsequent invocation of
+      \htmlref{AST\_READ}{AST_READ}
+      can be made immediately without the need to re-wind the FitsChan
+      first.
+   }
+   \sstinvocation{
+      CALL AST\_PUTCARDS( THIS, CARDS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the FitsChan.
+      }
+      \sstsubsection{
+         CARDS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A character string
+         containing the FITS cards to be stored. Each individual card
+         should occupy 80 characters in this string, and there should be
+         no delimiters, new lines, etc, between adjacent cards. The final
+         card may be less than 80 characters long.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error will result if the supplied string contains any cards
+         which cannot be interpreted.
       }
    }
 }
@@ -28001,7 +28074,7 @@ Object             - Base class for all AST Objects
       the FitsChan's integer \htmlref{Card}{Card} attribute, which identifies a {\tt{"}}current{\tt{"}}
       card, to which subsequent operations apply. Searches
       based on keyword may be performed (using \htmlref{AST\_FINDFITS}{AST_FINDFITS}), new
-      cards may be inserted (\htmlref{AST\_PUTFITS}{AST_PUTFITS}) and existing ones may be
+      cards may be inserted (\htmlref{AST\_PUTFITS}{AST_PUTFITS}, \htmlref{AST\_PUTCARDS}{AST_PUTCARDS}) and existing ones may be
       deleted (\htmlref{AST\_DELFITS}{AST_DELFITS}).
 
       When you create a FitsChan, you have the option of specifying
@@ -28010,7 +28083,7 @@ Object             - Base class for all AST Objects
       a source function, it is used to fill the FitsChan with header
       cards when it is created. If you do not provide a source
       function, the FitsChan remains empty until you explicitly enter
-      data into it (e.g. using AST\_PUTFITS or AST\_WRITE). If you
+      data into it (e.g. using AST\_PUTFITS, AST\_PUTCARDS or AST\_WRITE). If you
       provide a sink function, it is used to deliver any remaining
       contents of a FitsChan to an external data store when the
       FitsChan is deleted. If you do not provide a sink function, any
@@ -28117,6 +28190,9 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{AST\_PUTFITS}{AST_PUTFITS}: Store a FITS header card in a FitsChan
+
+         \sstitem
+         \htmlref{AST\_PUTCARDS}{AST_PUTCARDS}: Stores a set of FITS header card in a FitsChan
       }
    }
 }
@@ -31801,6 +31877,16 @@ occurred in the AST library between versions V3.1 and V3.2 (the
 current version):
 
 \begin{enumerate}
+
+\item A new
+routine \htmlref{AST\_PUTCARDS}{AST_PUTCARDS}
+has been added to the \htmlref{FitsChan}{FitsChan} class. This allows multiple concatenated header 
+cards to be stored in a FitsChan in a single call, providing an alternative to 
+the existing
+AST\_PUTCARDS routine.
+
+\item A bug has been fixed in the FitsChan class which could cause 
+keywords associated with alternate axis descriptions to be mis-interpreted.
 
 \item The \htmlref{Plot}{Plot} class now provides facilities for modifying the appearance
 of sub-strings within text strings such as axis labels, titles, \emph{etc},

@@ -221,16 +221,13 @@
 *        class implementations) are defined. This macro also affects
 *        the reporting of error context information, which is only
 *        provided for external calls to the AST library.
-*     astNOERR
-*        If the astNOERR macro is defined, reporting of error
+*     astFORTRAN77
+*        If the astFORTRAN77 macro is defined, reporting of error
 *        context information is suppressed. This is necessary when
 *        implementing foreign language interfaces to the AST library, as
 *        otherwise the file names and line numbers given would refer
 *        to the interface implementation rather than the user's own
 *        code.
-*     astFORTRAN77
-*        Defining the astFORTRAN77 macro has the same effect as defining
-*        the astNOERR macro. 
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -265,8 +262,6 @@
 *        Added astVersion function.
 *     7-FEB-2004 (DSB):
 *        Added astEscapes function.
-*     27-FEB-2004 (DSB):
-*        Added the astNOERR macro.
 *--
 */
 
@@ -368,11 +363,11 @@
    Suppress reporting of the file and line number from internal code
    and from foreign language interfaces by not using astAt in these
    cases. */
-#if defined(astCLASS) || defined(astFORTRAN77) || defined(astNOERR)
+#if defined(astCLASS) || defined(astFORTRAN77)
 #define astINVOKE(rettype,function) astRet##rettype##_(function)
 #else
 #define astINVOKE(rettype,function) \
-(astAt(NULL,__FILE__,__LINE__),astRet##rettype##_(function))
+(astAt_(NULL,__FILE__,__LINE__,0),astRet##rettype##_(function))
 #endif
 
 /* astRetF_ and astRetV_ currently do nothing. */

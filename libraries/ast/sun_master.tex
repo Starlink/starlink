@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.13}
+\newcommand{\stardocnumber}    {211.14}
 c-
 f+
-\newcommand{\stardocnumber}    {210.13}
+\newcommand{\stardocnumber}    {210.14}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {4th March 2004}
+\newcommand{\stardocdate}      {19th March 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1671,10 +1671,49 @@ Precisely how you extract world coordinate system (WCS) information
 from a dataset obviously depends on what type of dataset it
 is. Usually, however, you should be able to obtain a set of FITS
 header cards which contain the WCS information (and probably much more
-besides). Suppose that ``cards'' is a pointer to an array of strings
-containing a complete set of FITS header cards and ``ncard'' is the
-number of cards. Then proceed as follows:
+besides). Suppose that ``cards'' is a pointer to a string 
+containing a complete set of concatenated FITS header cards (such as
+produced by the CFITSIO function fits\_hdr2str). Then proceed as follows:
+
+\begin{quote}
+\small
+\begin{verbatim}
+fitsfile *fptr;
+AstFitsChan *fitschan;
+AstFrameSet *wcsinfo;
+char *header;
+int nkeys, status;
+
+...
+
+/* Obtain all the cards in the header concatenated into a single dynamically 
+   allocated null-terminated character string. Note, we do not exclude
+   any cards since we may later modify the WCS information within the
+   header and consequently want to write the entire header out again. */
+   if( fits_hdr2str( fptr, 0, NULL, 0, &header, &nkeys, &status ) )
+          printf(" Error getting header\n");
+   ...
+
+/* Header obtained succesfully... */
+   } else {
+
+/* Create a FitsChan and fill it with FITS header cards. */
+      fitschan = astFitsChan( NULL, NULL, "" );
+      astPutCards( fitschan, header );
+
+/* Free the memory holding the concatenated header cards. */
+      header = free( header );
+
+/* Read WCS information from the FitsChan. */
+      wcsinfo = astRead( fitschan );
+
+      ...
+  
+\end{verbatim}
+\normalsize
+\end{quote}
 c-
+
 f+
 Precisely how you extract world coordinate system (WCS) information
 from a dataset obviously depends on what type of dataset it
@@ -1683,31 +1722,7 @@ header cards which contain the WCS information (and probably much more
 besides). Suppose that CARDS is an array of character strings
 containing a complete set of FITS header cards and NCARD is the number
 of cards. Then proceed as follows:
-f-
 
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-AstFitsChan *fitschan;
-AstFrameSet *wcsinfo;
-char *cards[ MAXCARD ];
-int icard, ncard;
-
-...
-
-/* Create a FitsChan and fill it with FITS header cards. */
-fitschan = astFitsChan( NULL, NULL, "" );
-for ( icard = 0; icard < ncard; icard++ ) astPutFits( fitschan, cards[ icard ], 0 );
-
-/* Rewind the FitsChan and read WCS information from it. */
-astClear( fitschan, "Card" );
-wcsinfo = astRead( fitschan );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
 \small
 \begin{verbatim}
       INTEGER FITSCHAN, ICARD, NCARD, WCSINFO
@@ -2577,7 +2592,9 @@ const char *encode;
 
 ...
 
-/* Create an input FitsChan and fill it with FITS header cards. */
+/* Create an input FitsChan and fill it with FITS header cards. Note,
+   if you have all the header cards in a single string, use astPutCards in
+   place of astPutFits. */
 fitschan1 = astFitsChan( NULL, NULL, "" );
 for ( icard = 0; icard < ncard; icard++ ) astPutFits( fitschan1, cards[ icard ], 0 );
 
@@ -2599,7 +2616,9 @@ f+
 
       ...
 
-*  Create an input FitsChan and fill it with FITS header cards.
+*  Create an input FitsChan and fill it with FITS header cards. Note,
+*  if you have all the header cards in a single string, use AST_PUTCARDS in
+*  place of AST_PUTFITS.
       FITSCHAN1 = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
       DO 1 ICARD = 1, NCARD
          CALL AST_PUTFITS( FITSCHAN1, CARDS( ICARD ), .FALSE., STATUS )
@@ -2730,7 +2749,7 @@ f-
 
 For details of how to modify the contents of the output FitsChan in
 other ways, such as by adding, over-writing or deleting header cards,
-see \secref{ss:addressingfitscards}, \secref{ss:addingfitscards} and
+see \secref{ss:addressingfitscards}, \secref{ss:addingmulticards}, \secref{ss:addingfitscards} and
 \secref{ss:findingandchangingfits}.
 
 Once you have assembled the output FITS cards, you may retrieve them
@@ -13750,7 +13769,7 @@ forms a workspace in which you can assemble FITS cards and manipulate
 them before writing them out to a FITS file.
 
 By default, when a FitsChan is first created, it contains no cards and
-there are three ways of inserting cards into it:
+there are four ways of inserting cards into it:
 
 \begin{enumerate}
 c+
@@ -13760,6 +13779,17 @@ c-
 f+
 \item You may add cards yourself, one at a time, using AST\_PUTFITS
 (\secref{ss:addingfitscards}).
+f-
+
+c+
+\item You may add cards yourself, supplying all cards concatenated into a
+single string, using astPutCards
+(\secref{ss:addingmulticards}).
+c-
+f+
+\item You may add cards yourself, supplying all cards concatenated into a
+single string, using AST\_PUTCARDS.
+(\secref{ss:addingmulticards}).
 f-
 
 c+
@@ -14119,14 +14149,14 @@ c+
 Note, this splitting of long strings over several cards only occurs when
 writing AST Objects to a FitsChan using the astWrite function and the
 {\em native} encoding. If a long string is stored in a FitsChan using
-(for instance) the astPutFits function, it will simply be truncated.
+(for instance) the astPutFits or astPutCards function, it will simply be truncated.
 c- 
 
 f+
 Note, this splitting of long strings over several cards only occurs when
 writing AST Objects to a FitsChan using the AST\_WRITE routine and the
 {\em native} encoding. If a long string is stored in a FitsChan using
-(for instance) the AST\_PUTFITS routine, it will simply be truncated.
+(for instance) the AST\_PUTFITS or AST\_PUTCARDS routine, it will simply be truncated.
 f- 
 
 \subsection{\label{ss:extractingfitscards}Extracting Individual Cards from a FitsChan}
@@ -14415,6 +14445,61 @@ Note that AST\_PUTFITS enforces the validity of a FitsChan by
 rejecting any cards which do not adhere to the FITS standard. If any
 such cards are detected, an error will result.
 f-
+
+\subsection{\label{ss:addingmulticards}Adding Concatenated Cards to a FitsChan}
+
+If you have all your cards concatenated together into a single long string, 
+each occupying 80 characters (with no delimiters), you can insert them
+into a FitsChan in a single call using
+c+
+astPutCards.
+c-
+f+
+AST\_PUTCARDS.
+f-
+This call first empties the supplied FitsChan of any existing cards, then 
+inserts the new cards, and finally rewinds the FitsChan so that a
+subsequent call to 
+c+
+astRead
+c-
+f+
+AST\_READ
+f-
+will start reading from the first supplied card. The
+c+
+astPutCards function uses astPutFits
+c-
+f+
+AST\_PUTCARDS routine uses AST\_PUTFITS
+f-
+internally to interpret and store each individual card, and so the
+caveats in \secref{ss:addingfitscards} should be read.
+
+c+
+For instance, if you are using the CFITSIO library for access to FITS
+files, you can use the CFITSIO fits\_hdr2str function to obtain a string suitable
+for passing to astPutCards:
+
+\begin{quote}
+\small
+\begin{verbatim}
+
+
+if( !fits_hdr2str( fptr, 0, NULL, 0, &header, &nkeys, &status ) )
+   fitschan = astFitsChan( NULL, NULL, "" );
+   astPutCards( fitschan, header );
+   header = free( header );
+   wcsinfo = astRead( fitschan );
+
+   ...
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+c-
 
 \subsection{\label{ss:readingnativefits}Reading Native Objects From a FitsChan}
 
@@ -14728,14 +14813,16 @@ f-
 c+
 The use of source and sink functions with a FitsChan is optional. This
 is because you can always arrange to explicitly fill a FitsChan with
-FITS cards (\secref{ss:addingfitscards}) and you can also extract any
+FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards}) 
+and you can also extract any
 cards that remain and write them out yourself
 (\secref{ss:extractingfitscards}) before you delete the FitsChan.
 c-
 f+
 The use of source and sink routines with a FitsChan is optional. This
 is because you can always arrange to explicitly fill a FitsChan with
-FITS cards (\secref{ss:addingfitscards}) and you can also extract any
+FITS cards (\secref{ss:addingfitscards} and \secref{ss:addingmulticards}) 
+and you can also extract any
 cards that remain and write them out yourself
 (\secref{ss:extractingfitscards}) before you delete the FitsChan.
 f-
@@ -20128,6 +20215,26 @@ occurred in the AST library between versions V3.1 and V3.2 (the
 current version):
 
 \begin{enumerate}
+
+\item A new
+c+
+function astPutCards
+c-
+f+
+routine AST\_PUTCARDS
+f-
+has been added to the FitsChan class. This allows multiple concatenated header 
+cards to be stored in a FitsChan in a single call, providing an alternative to 
+the existing
+c+
+astPutCards function.
+c-
+f+
+AST\_PUTCARDS routine.
+f-
+
+\item A bug has been fixed in the FitsChan class which could cause 
+keywords associated with alternate axis descriptions to be mis-interpreted.
 
 \item The Plot class now provides facilities for modifying the appearance
 of sub-strings within text strings such as axis labels, titles, \emph{etc},
