@@ -12,9 +12,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -32,6 +31,8 @@
         CALL MSG_PRNT('AST_ERR: time series system not active')
 
       ELSE
+
+        CALL USI_INIT()
 
         CALL GCB_ATTACH('TIME',STATUS)
 
@@ -58,6 +59,8 @@
 
         CALL BDA_RELEASE(OLOC,STATUS)
         CALL USI_ANNUL(OLOC,STATUS)
+
+        CALL USI_CLOSE()
 
       ENDIF
 

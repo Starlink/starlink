@@ -228,7 +228,7 @@
       CALL MSG_PRNT( 'TIME UNITS are ^UNITS' )
 
 *    Get period
-      CALL PAR_GET0R( 'PERIOD', PERIOD, STATUS )
+      CALL USI_GET0R( 'PERIOD', PERIOD, STATUS )
 
 *    Define base epoch
       CALL BDA_LOCHEAD( ILOC, HEADER, STATUS )
@@ -239,8 +239,8 @@
         CALL MSG_PRNT( 'No atomic time: set to zero' )
         BASE_TAI=0.0
       ENDIF
-      CALL PAR_DEF0D( 'PHASE_0_EPOCH', BASE_TAI, STATUS )
-      CALL PAR_GET0D( 'PHASE_0_EPOCH', ZeroEpoch, STATUS )
+      CALL USI_DEF0D( 'PHASE_0_EPOCH', BASE_TAI, STATUS )
+      CALL USI_GET0D( 'PHASE_0_EPOCH', ZeroEpoch, STATUS )
       ZEROOFFSET = (ZEROEPOCH - BASE_TAI) * 86400.D0
 
 *    Check axis and data match
@@ -258,7 +258,7 @@
             INBINS = INT( PERIOD / ABS(SCALE) )
             CALL MSG_SETI( 'INBINS', INBINS, STATUS )
 C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
-            CALL PAR_DEF0I( 'N_PHASE_BINS', INBINS, STATUS )
+            CALL USI_DEF0I( 'N_PHASE_BINS', INBINS, STATUS )
             CALL DYN_MAPR( 1, NDATA, XPTR, STATUS )
             CALL DYN_MAPR( 1, NDATA, XWPTR, STATUS )
             CALL ARR_REG1R( BASE, SCALE, NDATA, %VAL(XPTR), STATUS )
@@ -280,7 +280,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
 
       END IF
 
-      CALL PAR_GET0I( 'N_PHASE_BINS', NBINS, STATUS )
+      CALL USI_GET0I( 'N_PHASE_BINS', NBINS, STATUS )
 
       IF ( REGULAR .AND. (NBINS .GT. INBINS) ) THEN
          CALL MSG_PRNT('The data is being oversampled - this is'/
@@ -289,7 +289,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       END IF
 
 *    Ask if weighted mean required
-      CALL PAR_GET0L('WEIGHT',WEIGHT,STATUS)
+      CALL USI_GET0L('WEIGHT',WEIGHT,STATUS)
 
 *    Check status - drop out if bad.
       IF ( STATUS .NE. SAI__OK ) GOTO 999

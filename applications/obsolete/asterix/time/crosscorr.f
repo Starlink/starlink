@@ -251,8 +251,8 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
       ENDIF
 
 *    User input
-      CALL PAR_DEF0I('MAX_LAG',ND-1,STATUS)
-      CALL PAR_GET0I( 'MAX_LAG', LMAX, STATUS )
+      CALL USI_DEF0I('MAX_LAG',ND-1,STATUS)
+      CALL USI_GET0I( 'MAX_LAG', LMAX, STATUS )
       IF(STATUS.NE.SAI__OK) GO TO 9000
       IF(LMAX.GT.ND-1)THEN
         LMAX=ND-1
@@ -282,8 +282,8 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
 
 *      Weighting &/or noise correction required?
         IF(VARS)THEN
-          CALL PAR_GET0L( 'WEIGHTED', WEIGHT, STATUS )
-          CALL PAR_GET0L( 'NOISE_CORRECTED', DENOISE, STATUS )
+          CALL USI_GET0L( 'WEIGHTED', WEIGHT, STATUS )
+          CALL USI_GET0L( 'NOISE_CORRECTED', DENOISE, STATUS )
         ENDIF
         IF(STATUS.NE.SAI__OK) GO TO 9000
 
@@ -345,8 +345,8 @@ D     print *,'z;ok,ndim,idim,status:',ok,ndim,idim,status
       ENDIF
 
 *    Create a cross-correlation object
-      CALL DAT_CREAT( 'XCORR_OBJ', 'CROSS_CORR', 0, 0, STATUS )
-      CALL DAT_ASSOC( 'XCORR_OBJ', 'WRITE', XCLOC, STATUS )
+      CALL USI_DCREAT( 'XCORR_OBJ', 'CROSS_CORR', 0, 0, STATUS )
+      CALL USI_DASSOC( 'XCORR_OBJ', 'WRITE', XCLOC, STATUS )
       IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *    Create principal arrays

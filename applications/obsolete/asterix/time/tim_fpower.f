@@ -162,7 +162,6 @@ C      IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER                NPTS                          ! Number of datapoints
 *    Import-Export :

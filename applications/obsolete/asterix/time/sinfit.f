@@ -38,6 +38,7 @@
 *                rewritten version of TIM_PERIODS. (PLA)
 *
 *     13 Jun 90: V1.2-0  Several bug fixes done (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -45,7 +46,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -99,7 +99,7 @@
 *    Version id :
 *
       CHARACTER*21            VERSION
-         PARAMETER           (VERSION = 'SINFIT Version 1.2-0')
+         PARAMETER           (VERSION = 'SINFIT Version 1.8-0')
 *-
 
 *    Check status.
@@ -200,10 +200,10 @@
       END IF
 
 *    User input.
-      CALL PAR_GET0R ('BASE_FREQ',      BASEFREQ, STATUS)
-      CALL PAR_GET0R ('FREQ_INCREMENT', FREQSTEP, STATUS)
-      CALL PAR_GET0I ('NO_OF_FREQS',    NFREQ,    STATUS)
-      CALL PAR_GET0L ('PHASE',          PHASE,    STATUS)
+      CALL USI_GET0R ('BASE_FREQ',      BASEFREQ, STATUS)
+      CALL USI_GET0R ('FREQ_INCREMENT', FREQSTEP, STATUS)
+      CALL USI_GET0I ('NO_OF_FREQS',    NFREQ,    STATUS)
+      CALL USI_GET0L ('PHASE',          PHASE,    STATUS)
 
 *    Create dynamic arrays
       CALL DYN_MAPR (1, NFREQ, COSPTR,  STATUS)
@@ -425,7 +425,6 @@
 *    Include
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER                STATUS
 *    Import : (in same order as arguments)
@@ -518,7 +517,7 @@
 
       END DO
 
-      CALL PAR_GET0L ('DEMEAN', DEMEAN, STATUS)
+      CALL USI_GET0L ('DEMEAN', DEMEAN, STATUS)
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 999

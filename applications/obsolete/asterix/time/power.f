@@ -43,14 +43,15 @@
 *
 *    History :
 *
-*      8 Jan 86: Original  (TJP)
-*     22 Jan 86: Bug in TIM_FPOWER fixed  (TJP)
-*     20 Mar 86: Array truncation option, COMMENTS removed  (TJP)
-*      1 Sep 86: SGS workstation name updated (TJP)
-*     16 Mar 87: Rewritten to ROSAT specification. Previous name: POWER (PLA)
-*      9 Jun 88: Converted to new STARLINK HDS file standards.
-*                No longer uses a temporary array for the data. (PLA)
-*     14 Jun 90: V1.2-0  Checks for irregular axes and bad quality (DJA)
+*      8 Jan 86 : Original  (TJP)
+*     22 Jan 86 : Bug in TIM_FPOWER fixed  (TJP)
+*     20 Mar 86 : Array truncation option, COMMENTS removed  (TJP)
+*      1 Sep 86 : SGS workstation name updated (TJP)
+*     16 Mar 87 : Rewritten to ROSAT specification. Previous name: POWER (PLA)
+*      9 Jun 88 : Converted to new STARLINK HDS file standards.
+*                 No longer uses a temporary array for the data. (PLA)
+*     14 Jun 90 : V1.2-0  Checks for irregular axes and bad quality (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -60,7 +61,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -106,7 +106,7 @@
 *    Version id :
 *
       CHARACTER*21           VERSION
-         PARAMETER           ( VERSION = 'POWER Version 1.2-0' )
+         PARAMETER           ( VERSION = 'POWER Version 1.8-0' )
 *-
 
 *    Check status.
@@ -115,8 +115,8 @@
 *    Version.
       CALL MSG_PRNT (VERSION)
 
-*    Initialize BDA_ & DYN_ routines
-      CALL AST_INIT
+*    Initialize ASTERIX
+      CALL AST_INIT()
 
 *    Obtain data object, access and check it.
       CALL USI_ASSOCI ('INPUT', 'READ', ILOC, INPRIM, STATUS)
@@ -187,7 +187,7 @@
          CALL MSG_PRNT( '^NDAT data points entered' )
 
 *       User input
-         CALL PAR_GET0L('TRUNCATE', TRUNC, STATUS)
+         CALL USI_GET0L('TRUNCATE', TRUNC, STATUS)
 
 *       Check status
          IF (STATUS .NE. SAI__OK) GOTO 99
@@ -200,10 +200,10 @@
          END IF
 
 *       User input
-         CALL PAR_GET0L ('TAPER', TAPER, STATUS)
+         CALL USI_GET0L ('TAPER', TAPER, STATUS)
 
          IF ( .NOT. TAPER ) THEN
-            CALL PAR_GET0L ('REMOVE_MEAN', DEMEAN, STATUS)
+            CALL USI_GET0L ('REMOVE_MEAN', DEMEAN, STATUS)
          END IF
 
 *       Check status - drop out if bad.
@@ -282,7 +282,7 @@
       END IF
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END

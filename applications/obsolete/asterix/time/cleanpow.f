@@ -16,8 +16,8 @@
 *    Authors :
 *     Harry Lehto  (SOTON::HL)
 *    History :
-*     15-Aug-1990   original
-*     7-Jun-1991    Asterix version   (LTVAD::RDS)
+*     15 Aug 90 : Original
+*      7 Jun 91 : Asterix version   (LTVAD::RDS)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -115,7 +115,7 @@
 *
       CALL MSG_PRNT(VERSION)
 *
-      CALL AST_INIT(STATUS)
+      CALL AST_INIT()
 *
 * Get input data from file
       CALL TIM_GETDATA(LOC, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
@@ -131,7 +131,7 @@
 *   Ask for extra weighting factor. Weights are defined as
 *   W = 1.0 / (variance + var0)
 *
-         CALL PAR_GET0R('VAR0', VAR0, STATUS)
+         CALL USI_GET0R('VAR0', VAR0, STATUS)
 *
       ELSE
          FILFLG = 0
@@ -151,7 +151,7 @@ C        READ *, LGXFL,LGYFL
       LGYFL=0
 *
 * Ask if average should be subtracted first.
-      CALL PAR_GET0L('AVSUB', AVSUB, STATUS)
+      CALL USI_GET0L('AVSUB', AVSUB, STATUS)
 *
       IF (AVSUB) THEN
          AVERFL=1
@@ -245,30 +245,30 @@ C        READ *, LGXFL,LGYFL
       CALL MSG_PRNT(' ')
 *
 * Ask if any changes required
-      CALL PAR_GET0L('CHANGE', LCHANGE, STATUS)
+      CALL USI_GET0L('CHANGE', LCHANGE, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Set defaults and get new values if changes wanted
       IF (LCHANGE) THEN
 *
-         CALL PAR_DEF0D('GAIN', GAIN, STATUS)
-         CALL PAR_GET0D('GAIN', GAIN, STATUS)
+         CALL USI_DEF0D('GAIN', GAIN, STATUS)
+         CALL USI_GET0D('GAIN', GAIN, STATUS)
 *
-         CALL PAR_DEF0I('MAXITE', MAXITE, STATUS)
-         CALL PAR_GET0I('MAXITE', MAXITE, STATUS)
+         CALL USI_DEF0I('MAXITE', MAXITE, STATUS)
+         CALL USI_GET0I('MAXITE', MAXITE, STATUS)
 *
-         CALL PAR_DEF0R('MAXFR', AMAXFR, STATUS)
-         CALL PAR_GET0R('MAXFR', AMAXFR, STATUS)
+         CALL USI_DEF0R('MAXFR', AMAXFR, STATUS)
+         CALL USI_GET0R('MAXFR', AMAXFR, STATUS)
 *
-         CALL PAR_DEF0R('HPBW', HPBWR, STATUS)
-         CALL PAR_GET0R('HPBW', HPBWR, STATUS)
+         CALL USI_DEF0R('HPBW', HPBWR, STATUS)
+         CALL USI_GET0R('HPBW', HPBWR, STATUS)
 *
-         CALL PAR_DEF0R('NPHPBW', NPHPBW, STATUS)
-         CALL PAR_GET0R('NPHPBW', NPHPBW, STATUS)
+         CALL USI_DEF0R('NPHPBW', NPHPBW, STATUS)
+         CALL USI_GET0R('NPHPBW', NPHPBW, STATUS)
 *
-         CALL PAR_DEF0R('CLNLIM', CLNLIM, STATUS)
-         CALL PAR_GET0R('CLNLIM', CLNLIM, STATUS)
+         CALL USI_DEF0R('CLNLIM', CLNLIM, STATUS)
+         CALL USI_GET0R('CLNLIM', CLNLIM, STATUS)
 *
          CALL MSG_PRNT('GAIN, AMAXFR, NPHPBW will be fixed, very minor')
          CALL MSG_PRNT('adjustments will be made later by the program'/

@@ -12,9 +12,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -33,13 +32,14 @@
 
       IF (T_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: time-series system already active')
+
       ELSE
 
 *  general initialisation
         CALL AST_INIT()
 
 *  get input image
-        CALL PAR_GET0C('INP',TSD,STATUS)
+        CALL USI_GET0C('INP',TSD,STATUS)
         CALL HDS_OPEN(TSD,'UPDATE',ILOC,STATUS)
 
         CALL MSG_PRNT(' ')
@@ -64,13 +64,13 @@
         IF (ACTIVE) THEN
           CALL GDV_DEVICE(DEV,STATUS)
         ELSE
-          CALL PAR_GET0C('DEV',DEV,STATUS)
-          CALL PAR_GET0I('NX',NX,STATUS)
-          CALL PAR_GET0I('NY',NY,STATUS)
+          CALL USI_GET0C('DEV',DEV,STATUS)
+          CALL USI_GET0I('NX',NX,STATUS)
+          CALL USI_GET0I('NY',NY,STATUS)
           CALL GDV_OPEN(DEV,NX,NY,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('MODE',T_MODE,STATUS)
+        CALL USI_GET0I('MODE',T_MODE,STATUS)
 
         IF (STATUS.EQ.SAI__OK) THEN
           T_DEV=DEV
@@ -90,6 +90,8 @@
           ENDIF
           T_STEP=.FALSE.
           T_SYMBOL=0
+          CALL USI_CLOSE()
+
         ELSE
           CALL GDV_CLOSE(STATUS)
           CALL GCB_DETACH(STATUS)

@@ -100,7 +100,7 @@
       CALL BDA_MAPVAR( BLOC, 'READ', BVPTR, STATUS )
 
 *    Get relative area factor
-      CALL PAR_GET0R( 'AREA', AREA, STATUS )
+      CALL USI_GET0R( 'AREA', AREA, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map QUALITY as a logical.
@@ -136,7 +136,7 @@
 *    Write parameter to user and external
       CALL MSG_SETR( 'STAT', PFUNC )
       CALL MSG_PRNT( 'Variability statistic ^STAT' )
-      CALL PAR_PUT0R( 'PFUNC', PFUNC, STATUS )
+      CALL USI_PUT0R( 'PFUNC', PFUNC, STATUS )
 
 *    Free dynamic memory
       CALL DYN_UNMAP( IACT, STATUS )

@@ -38,9 +38,10 @@
 *     author (Doug Bertram,BHVAD::DB)
 *    History :
 *
-*     20-Jun-90  Original (DB)
-*     23-Nov-90  V1.5-0 : Upgrade (DB)
-*     28 Mar 94  V1.7-0 : Ditto (DB)
+*     20-Jun-90 : Original (DB)
+*     23-Nov-90 : V1.5-0 Upgrade (DB)
+*     28 Mar 94 : V1.7-0 Ditto (DB)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -50,7 +51,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Structure definitions :
 *
@@ -194,7 +194,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'BARYCORR Version 1.7-0')
+      PARAMETER (VERSION = 'BARYCORR Version 1.8-0')
 *-
 
 *    Version id
@@ -227,8 +227,8 @@
         CALL BDA_LOCINSTR(OUTLOC, INSTRLOC, STATUS)
 * does the user want simple mode?
 
-        CALL PAR_DEF0L('SIMPLE_MODE', .TRUE. , STATUS)
-        CALL PAR_GET0L('SIMPLE_MODE', SIMPLE_MODE, STATUS)
+        CALL USI_DEF0L('SIMPLE_MODE', .TRUE. , STATUS)
+        CALL USI_GET0L('SIMPLE_MODE', SIMPLE_MODE, STATUS)
         IF(SIMPLE_MODE)THEN
           SATCORR = .FALSE.
           POS_FILE_OK = .FALSE.
@@ -351,8 +351,8 @@
              CALL MSG_PRNT(' No RAW_TIMETAG OR DATA present!')
              CALL MSG_PRNT(' if you continue, barycentric correction')
              CALL MSG_PRNT(' will occur on basis of header data only')
-             CALL PAR_DEF0L('ABORT', .FALSE. , STATUS)
-             CALL PAR_GET0L('ABORT', ABORT, STATUS)
+             CALL USI_DEF0L('ABORT', .FALSE. , STATUS)
+             CALL USI_GET0L('ABORT', ABORT, STATUS)
              IF (ABORT)THEN
                CALL MSG_PRNT(' BARYCORR EXITING...')
                GOTO 999
@@ -374,8 +374,8 @@
              CALL MSG_PRNT(' no RAW_TIMETAG & no time axis present!')
              CALL MSG_PRNT(' if you continue, barycentric correction')
              CALL MSG_PRNT(' will occur on basis of header data only')
-             CALL PAR_DEF0L('ABORT', .TRUE. , STATUS)
-             CALL PAR_GET0L('ABORT', ABORT, STATUS)
+             CALL USI_DEF0L('ABORT', .TRUE. , STATUS)
+             CALL USI_GET0L('ABORT', ABORT, STATUS)
              IF (ABORT)THEN
                CALL MSG_PRNT(' BARYCORR EXITING...')
                GOTO 999
@@ -455,7 +455,7 @@
 *        IF(VALID_ROSAT .AND.( .NOT. SIMPLE_MODE) )THEN
 *
 * Ask if orbit correction is required
-*          CALL PAR_GET0L('SATCORR', SATCORR, STATUS)
+*          CALL USI_GET0L('SATCORR', SATCORR, STATUS)
 * The unix version of barycorr doesn't support the orbital file format
            SATCORR = .FALSE.
 *
@@ -465,7 +465,7 @@
 *          IF (SATCORR) THEN
 *
 *    Get the name of the orbit file
-*             CALL PAR_GET0C('POS_FILE', POS_FILE, STATUS)
+*             CALL USI_GET0C('POS_FILE', POS_FILE, STATUS)
 *
 *             IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -516,8 +516,8 @@
 *     :              (' POS file does not cover whole observation')
 *
 *       pos file doesn't cover period. So do Earth centred corrections or not ?
-*             CALL  PAR_DEF0L('GO_ON', .TRUE. ,STATUS)
-*             CALL  PAR_GET0L('GO_ON', IGNORE_POS, STATUS)
+*             CALL  USI_DEF0L('GO_ON', .TRUE. ,STATUS)
+*             CALL  USI_GET0L('GO_ON', IGNORE_POS, STATUS)
 *
 *             IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -541,8 +541,8 @@
 *             RECORD_SEP = (SECOND_KEY - FIRST_KEY)/2
 *
 * obtain Barycentric calculation frequency
-*             CALL PAR_DEF0R('UPDATE_PRD', REAL(RECORD_SEP), STATUS)
-*             CALL PAR_GET0R('UPDATE_PRD', UPDATE_PERIOD, STATUS)
+*             CALL USI_DEF0R('UPDATE_PRD', REAL(RECORD_SEP), STATUS)
+*             CALL USI_GET0R('UPDATE_PRD', UPDATE_PERIOD, STATUS)
 *
 * Eliminate Stupid ideas
 *             IF(UPDATE_PERIOD .LT. REAL(RECORD_SEP))THEN
@@ -573,8 +573,8 @@
 * update period not used in this mode
          ELSE
           DEF_UPD_PRD = (TIME_MAX - TIME_MIN)/100.0
-          CALL PAR_DEF0R('UPDATE_INT',DEF_UPD_PRD,STATUS)
-          CALL PAR_GET0R('UPDATE_INT', UPDATE_PERIOD, STATUS)
+          CALL USI_DEF0R('UPDATE_INT',DEF_UPD_PRD,STATUS)
+          CALL USI_GET0R('UPDATE_INT', UPDATE_PERIOD, STATUS)
          ENDIF
        ENDIF
 *
@@ -680,7 +680,9 @@
       CALL BDA_RELEASE(OUTLOC, STATUS)
 *      CALL USI_ANNUL(OUTLOC,STATUS)
       CALL DAT_ANNUL(OUTLOC, STATUS)
-      CALL AST_CLOSE(STATUS)
+      CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END
 
 
@@ -1135,10 +1137,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       STRUCTURE /POS_REC/
          INTEGER UT/0/				! hk clock (1/2s) time
@@ -1284,10 +1282,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       STRUCTURE /POS_REC/
          INTEGER UT/0/				! hk clock (1/2s) time
@@ -1416,12 +1410,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-*     <specification of FORTRAN structures>
 *    Import :
 *
       CHARACTER*(DAT__SZLOC)   LOC         ! locater to event dataset
@@ -1515,12 +1503,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
-
 
 *-
 * IMPORTS

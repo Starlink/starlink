@@ -12,9 +12,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -39,6 +38,8 @@
 
       ELSE
 
+        CALL USI_INIT()
+
         CALL GCB_ATTACH('TIME',STATUS)
 
         CALL MSG_PRNT('Select points to remove( press X to eXit)...')
@@ -54,6 +55,8 @@
           ENDIF
 
         ENDDO
+
+        CALL USI_CLOSE()
 
       ENDIF
 
@@ -77,7 +80,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Import :
       INTEGER ISECT
       REAL X

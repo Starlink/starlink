@@ -32,9 +32,10 @@
 *
 *    History :
 *
-*      7 Jun 91 : V1.5-0  Adapted from PHASE (DJA)
-*     24 Jul 91 : V1.5-1  Updated TAI definition (DJA)
-*      7 Oct 92 : V1.7-0  Minor changes for UNIX port (DJA)
+*      7 Jun 91 : V1.5-0 Adapted from PHASE (DJA)
+*     24 Jul 91 : V1.5-1 Updated TAI definition (DJA)
+*      7 Oct 92 : V1.7-0 Minor changes for UNIX port (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -44,7 +45,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -75,7 +75,7 @@
 *    Version :
 *
       CHARACTER*25           VERSION
-         PARAMETER         ( VERSION = 'EVPHASE Version 1.7-0' )
+         PARAMETER         ( VERSION = 'EVPHASE Version 1.8-0' )
 *-
 
 *    Version
@@ -129,14 +129,14 @@
 
 *    Get parameters of ephemeris (units JD)
       CALL MSG_PRNT('Enter Ephemeris Coeffs : a(1) + a(2)*N + a(3)*N*N')
-      CALL PAR_GET0D('COEFF1', COEFF(1), STATUS)
- 20   CALL PAR_GET0D('COEFF2', COEFF(2), STATUS)
+      CALL USI_GET0D('COEFF1', COEFF(1), STATUS)
+ 20   CALL USI_GET0D('COEFF2', COEFF(2), STATUS)
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( COEFF(2) .LT. 0.0 ) ) THEN
         CALL MSG_PRNT( 'Negative period supplied !' )
-        CALL PAR_CANCL( 'COEFF2', STATUS )
+        CALL USI_CANCL( 'COEFF2', STATUS )
         GOTO 20
       END IF
-      CALL PAR_GET0D( 'COEFF3', COEFF(3), STATUS )
+      CALL USI_GET0D( 'COEFF3', COEFF(3), STATUS )
 
 *    Write ephemeris values to EPHEMERIS
       DO C = 1, 3
@@ -196,7 +196,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *

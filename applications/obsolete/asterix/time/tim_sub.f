@@ -10,7 +10,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
 *    Import-Export :
@@ -48,7 +48,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       CHARACTER*(DAT__SZLOC) LOC
@@ -145,7 +145,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       CHARACTER*(DAT__SZLOC) LOC
@@ -238,7 +238,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       BYTE Q(*)
@@ -328,7 +328,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
 *    Import-Export :
@@ -380,7 +380,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       REAL A(T_NVAL)
@@ -465,7 +465,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
 *    Import-Export :
@@ -554,7 +554,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       INTEGER ISECT
@@ -617,7 +617,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       REAL D(T_NVAL)
@@ -679,7 +679,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       REAL XC
@@ -748,7 +748,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       REAL XC
@@ -792,7 +792,7 @@
 *  Status :
       INTEGER STATUS
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *  Local constants :
 *  Local variables :
       INTEGER ID
@@ -886,7 +886,7 @@
 *  Status :
       INTEGER STATUS
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *  Local constants :
 *  Local variables :
       REAL BASE
@@ -985,7 +985,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       INTEGER I,N
@@ -1037,7 +1037,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Structure definitions :
 *    Import :
       CHARACTER*(DAT__SZLOC) LOC

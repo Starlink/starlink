@@ -35,10 +35,11 @@
 *     11 Jun 87 : Redundancy in code removed. (pla)
 *     30 Aug 88 : Major rewrite for ASTERIX88 (pla)
 *     12 Jan 90 : Wasn't locating axes properly (BHVAD::DJA)
-*     13 Jun 90 : V1.2-0  Various bugs fixed. Now always maps axis data, as
-*                         algorithm did it anyway! Traps -ve periods. (DJA)
-*     24 Jul 91 : V1.5-0  Uses updated TAI definition (DJA)
-*     29 Jul 92 : V1.6-0  Explicitly create o/p axes structure (DJA)
+*     13 Jun 90 : V1.2-0 Various bugs fixed. Now always maps axis data, as
+*                        algorithm did it anyway! Traps -ve periods. (DJA)
+*     24 Jul 91 : V1.5-0 Uses updated TAI definition (DJA)
+*     29 Jul 92 : V1.6-0 Explicitly create o/p axes structure (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -48,7 +49,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -84,7 +84,7 @@
 *    Version :
 *
       CHARACTER*22           VERSION
-        PARAMETER         ( VERSION = 'PHASE Version 1.6-0' )
+        PARAMETER         ( VERSION = 'PHASE Version 1.8-0' )
 *-
 
 *    Version Announcement
@@ -147,14 +147,14 @@
 
 *    Get parameters of ephemeris (units JD)
       CALL MSG_PRNT('Enter Ephemeris Coeffs : a(1) + a(2)*N + a(3)*N*N')
-      CALL PAR_GET0D('COEFF1', COEFF(1), STATUS)
- 20   CALL PAR_GET0D('COEFF2', COEFF(2), STATUS)
+      CALL USI_GET0D('COEFF1', COEFF(1), STATUS)
+ 20   CALL USI_GET0D('COEFF2', COEFF(2), STATUS)
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( COEFF(2) .LT. 0.0 ) ) THEN
         CALL MSG_PRNT( 'Negative period supplied !' )
-        CALL PAR_CANCL( 'COEFF2', STATUS )
+        CALL USI_CANCL( 'COEFF2', STATUS )
         GOTO  20
       END IF
-      CALL PAR_GET0D('COEFF3', COEFF(3), STATUS)
+      CALL USI_GET0D('COEFF3', COEFF(3), STATUS)
 
 *    Write ephemeris values to EPHEMERIS
       WRITE (EPHEMERIS(1), '(15X,A,G15.5)') 'Coefficient 1 = ',COEFF(1)
@@ -240,7 +240,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *

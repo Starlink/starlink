@@ -26,10 +26,13 @@
 *
 *   Bugs :
 *   Authors :
+*
 *     Trevor Ponman   (BHVAD::TJP)
 *     Phillip Andrews (BHVAD::PLA)
 *     David Allan     (BHVAD::DJA)
+*
 *   History :
+*
 *     23 Jan 86 : Original
 *     11 Feb 86 : New ordering for 2D arrays  (TJP)
 *     20 Mar 86 : Zero frequency power excluded (TJP)
@@ -46,6 +49,7 @@
 *                 out, now writes to TITLE. (DJA)
 *      8 Dec 89 : V1.0-2 Bug fixed in HIST_PTXT (DJA)
 *      8 Oct 92 : V1.7-0 Use common copy of TIM_FPOWER with POWER (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -68,7 +72,7 @@
 *   Local Constants :
 *
       CHARACTER*24           VERSION
-        PARAMETER         ( VERSION=' DYNAMICAL Version 1.7-0' )
+        PARAMETER         ( VERSION=' DYNAMICAL Version 1.8-0' )
 
       INTEGER                MAXLINES
          PARAMETER           (MAXLINES = 9)
@@ -172,7 +176,7 @@
      :      ('enter number of points in each section (this will be '
      :                                //'rounded to nearest 2**N)' )
 
-         CALL PAR_GET0I( 'SECT_SIZE', LSECT, STATUS )
+         CALL USI_GET0I( 'SECT_SIZE', LSECT, STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
             LSECT = 2 ** NINT(ALOG10(REAL(LSECT))/ALOG10(2.0))

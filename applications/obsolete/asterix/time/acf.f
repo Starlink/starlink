@@ -42,8 +42,9 @@
 *
 *    History :
 *
-*     12 Jun 89 : V1.0-0  Original (PLA)
-*     14 Jun 90 : V1.2-0  Does check for irregular axes and bad quality (DJA)
+*     12 Jun 89 : V1.0-0 Original (PLA)
+*     14 Jun 90 : V1.2-0 Does check for irregular axes and bad quality (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -99,7 +100,7 @@
 *    Version id :
 *
       CHARACTER*80           VERSION
-        PARAMETER            (VERSION =' ACF Version 1.2-0')
+        PARAMETER            (VERSION =' ACF Version 1.8-0')
 *-
 
 *    Display version
@@ -132,10 +133,10 @@
         CALL MSG_PRNT (' ')
 
         IF (T_AXIS .GT. 0) THEN
-          CALL PAR_DEF0I ('AXIS', T_AXIS, STATUS)
+          CALL USI_DEF0I ('AXIS', T_AXIS, STATUS)
 
         END IF
-        CALL PAR_GET0I ('AXIS', T_AXIS, STATUS)
+        CALL USI_GET0I ('AXIS', T_AXIS, STATUS)
 
 *      Check status
         IF (STATUS .NE. SAI__OK) GOTO 99
@@ -158,8 +159,8 @@
       CALL ARR_SUMDIM( NDIM, LDIMS, NELM, STATUS )
 
 *    User input
-      CALL PAR_GET0L ('BIAS',  BIAS,  STATUS)
-      CALL PAR_GET0L ('WEIGHT', USEWT, STATUS)
+      CALL USI_GET0L ('BIAS',  BIAS,  STATUS)
+      CALL USI_GET0L ('WEIGHT', USEWT, STATUS)
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
@@ -227,8 +228,8 @@
       END IF
 
 *    Ask user for maximum lag to calculate
-      CALL PAR_DEF0I ('MXLAG', NPTS - 1, STATUS)
-      CALL PAR_GET0I ('MXLAG', MXLAG,    STATUS)
+      CALL USI_DEF0I ('MXLAG', NPTS - 1, STATUS)
+      CALL USI_GET0I ('MXLAG', MXLAG,    STATUS)
 
       IF (MXLAG .GT. (NPTS - 1)) THEN
         MXLAG = NPTS - 1
@@ -323,10 +324,7 @@
 
 *    Exit
   99  CALL AST_CLOSE
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( 'EXERR', '...from ACF', STATUS)
-      END IF
+      CALL AST_ERR( STATUS )
 
       END
 

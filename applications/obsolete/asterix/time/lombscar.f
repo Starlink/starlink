@@ -78,14 +78,14 @@
 *
 * Get input parameters
 *   Oversampling function
-      CALL PAR_GET0R('OFAC', OFAC, STATUS)
+      CALL USI_GET0R('OFAC', OFAC, STATUS)
 *
 *   Multiple of Nyquist frequency to extrapolate power spectrum to.
-      CALL PAR_GET0R('HIFAC', HIFAC, STATUS)
+      CALL USI_GET0R('HIFAC', HIFAC, STATUS)
 *
 *   Window function frequency. This should be set to zero if window
 *   function is not wanted
-      CALL PAR_GET0R('WFREQ', F1, STATUS)
+      CALL USI_GET0R('WFREQ', F1, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *

@@ -12,9 +12,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -39,10 +38,12 @@
 
       ELSE
 
+        CALL USI_INIT()
+
         CALL GCB_ATTACH('TIME',STATUS)
 
 *  see if all segments to be selected
-        CALL PAR_GET0L('ALL',ALL,STATUS)
+        CALL USI_GET0L('ALL',ALL,STATUS)
         IF (ALL.AND.STATUS.EQ.SAI__OK) THEN
           DO ISEL=1,T_NSECT
             SEL(ISEL)=ISEL
@@ -80,6 +81,8 @@
           T_DISP=.TRUE.
           T_CLEAR=.FALSE.
         ENDIF
+
+        CALL USI_CLOSE()
 
       ENDIF
 

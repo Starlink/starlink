@@ -12,9 +12,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'TIMLIB(TIM_CMN)'
+      INCLUDE 'TIM_CMN'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -34,10 +33,12 @@
 
       ELSE
 
+        CALL USI_INIT()
+
         SET=.FALSE.
 
 *  get style specification
-        CALL PAR_GET0L('POLY',POLY,STATUS)
+        CALL USI_GET0L('POLY',POLY,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           POLY=T_POLY
           STATUS=SAI__OK
@@ -45,7 +46,7 @@
           SET=.TRUE.
         ENDIF
 
-        CALL PAR_GET0L('STEP',STEP,STATUS)
+        CALL USI_GET0L('STEP',STEP,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           STEP=T_STEP
           STATUS=SAI__OK
@@ -53,7 +54,7 @@
           SET=.TRUE.
         ENDIF
 
-        CALL PAR_GET0L('ERR',ERR,STATUS)
+        CALL USI_GET0L('ERR',ERR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           ERR=T_ERR
           STATUS=SAI__OK
@@ -61,7 +62,7 @@
           SET=.TRUE.
         ENDIF
 
-        CALL PAR_GET0I('SYMBOL',SYMBOL,STATUS)
+        CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           SYMBOL=T_SYMBOL
           STATUS=SAI__OK
@@ -81,6 +82,8 @@
           T_ERR=ERR
           T_SYMBOL=SYMBOL
         ENDIF
+
+        CALL USI_CLOSE()
 
       ENDIF
 

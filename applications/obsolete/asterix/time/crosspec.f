@@ -269,11 +269,11 @@
 
 *    User input
       CALL USI_ASSOCO( 'OUT', 'GRAFIX', OUT, STATUS )
-      CALL PAR_GET0L( 'TAPER_DATA', TAPER, STATUS )
+      CALL USI_GET0L( 'TAPER_DATA', TAPER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( TAPER ) THEN
-        CALL PAR_GET0R ('TAPER_SIZE', FRAC, STATUS) ! Default to 0.2
+        CALL USI_GET0R ('TAPER_SIZE', FRAC, STATUS) ! Default to 0.2
       END IF
 
 *    Taper data with cosine bell if required
@@ -349,11 +349,11 @@
       CALL MSG_SETI( 'NV', NV )
       CALL MSG_PRNT( 'There are ^NV output frequency bins.' )
 
-      CALL PAR_GET0I( 'ALIGNMENT_SHIFT', LSHIFT, STATUS )
+      CALL USI_GET0I( 'ALIGNMENT_SHIFT', LSHIFT, STATUS )
 
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-      CALL PAR_GET0I ('WINDOW_SIGMA', SIGMA, STATUS)
+      CALL USI_GET0I ('WINDOW_SIGMA', SIGMA, STATUS)
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99

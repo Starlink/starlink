@@ -51,7 +51,8 @@
 *
 *    History :
 *
-*     12 Nov 93 : Original (DJA)
+*     12 Nov 93 : V1.7-0 Original (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -61,7 +62,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -122,7 +122,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER  ( VERSION = 'CORRECT Version 1.7-0' )
+        PARAMETER  ( VERSION = 'CORRECT Version 1.8-0' )
 *-
 
 *    Check status
@@ -135,7 +135,7 @@
       CALL MSG_PRNT( VERSION )
 
 *    Overwrite input?
-      CALL PAR_GET0L( 'OVER', OVER, STATUS )
+      CALL USI_GET0L( 'OVER', OVER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get either one or two dataset names
@@ -179,7 +179,7 @@
 
 *    Given user option of creating Poisson array
       ELSE
-        CALL PAR_GET0L( 'POISS', POISS, STATUS )
+        CALL USI_GET0L( 'POISS', POISS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Create variance array from data?
@@ -369,7 +369,7 @@
       ELSE
 
 *      Get it from the user
-        CALL PAR_GET0R( 'TEXP', TEXP, STATUS )
+        CALL USI_GET0R( 'TEXP', TEXP, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Write it into the EXPOSURE_TIME field in the header

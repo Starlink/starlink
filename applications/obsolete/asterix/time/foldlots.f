@@ -211,15 +211,15 @@
       IF (STATUS .NE. SAI__OK) STATUS = SAI__OK
 *
 *    Get start period
-      CALL PAR_GET0R( 'PERIOD', PERIOD, STATUS )
+      CALL USI_GET0R( 'PERIOD', PERIOD, STATUS )
 *
       PSTART=PERIOD
 
 *    Get period increment
-      CALL PAR_GET0R( 'PINC', PINC, STATUS )
+      CALL USI_GET0R( 'PINC', PINC, STATUS )
 
 *    Get number of periods to fold at
-      CALL PAR_GET0I( 'NPER', NPER, STATUS )
+      CALL USI_GET0I( 'NPER', NPER, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -235,8 +235,8 @@
         BASE_TAI=0.0
       ENDIF
 
-      CALL PAR_DEF0D( 'PHASE_0_EPOCH', BASE_TAI, STATUS )
-      CALL PAR_GET0D( 'PHASE_0_EPOCH', ZeroEpoch, STATUS )
+      CALL USI_DEF0D( 'PHASE_0_EPOCH', BASE_TAI, STATUS )
+      CALL USI_GET0D( 'PHASE_0_EPOCH', ZeroEpoch, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -255,8 +255,8 @@
 C      CALL MSG_SETI('NB', INBINS)
 C      CALL MSG_PRNT( 'Maximum No of phase bins : ^NB')
 *
-      CALL PAR_DEF0I( 'NPHASE', INBINS, STATUS )
-      CALL PAR_GET0I( 'NPHASE', NBINS, STATUS )
+      CALL USI_DEF0I( 'NPHASE', INBINS, STATUS )
+      CALL USI_GET0I( 'NPHASE', NBINS, STATUS )
 
       IF ( NBINS .GT. INBINS ) THEN
 C          CALL MSG_PRNT( 'Too many output bins: ' )
@@ -268,7 +268,7 @@ C          NBINS = INBINS
       END IF
 
 *    Ask if weighted mean required
-      CALL PAR_GET0L('WEIGHT',WEIGHT,STATUS)
+      CALL USI_GET0L('WEIGHT',WEIGHT,STATUS)
 *
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
