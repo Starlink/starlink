@@ -176,12 +176,10 @@
       NREC = MAXLINES
       CALL USI_TEXT( 1, TEXT, NREC, STATUS )
 
-*    Write this into history structure
-      CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
-
 *    Copy and update HISTORY
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
+      CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE
