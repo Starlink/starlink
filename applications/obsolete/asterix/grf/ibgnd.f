@@ -2874,6 +2874,11 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+	print *,'In samp comp'
+	print *,'mean = '//i_bgm_mean
+	print *,'nsamp = ',i_bgm_nsamp
+	print *,'nsrc = ',i_bgm_nsrc
+	call flush(6)
 
 *  Switch on mean method
       IF ( I_BGM_MEAN .EQ. 'MEAN' ) THEN
@@ -2939,6 +2944,8 @@
         END DO
 
       END IF
+	print *,'Done comps'
+	call flush(6)
 
 *  Export details of means to environment
       S = 1
