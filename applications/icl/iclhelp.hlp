@@ -1,0 +1,2044 @@
+0 ICL
+ICL is an interactive command language  used for running programs in the
+ADAM software environment. In the topics listed below, those marked with
+* have not yet been implemented in Unix ICL.
+
+1 Invocation
+ICL is started from a Unix shell by a command of the form:
+
+    % icl [ICL_options] [command_files...]
+
+Where:
+ICL_options (optional) have not yet been fully developed and should not be
+   used without advice.  ICL options start with  -  and must appear BEFORE
+   any command-file names.
+
+command_files... (optional) are the names of any files containing commands
+   to be obeyed by ICL before the ICL prompt appears.  They are read after 
+   any ICL login files (see Environment_variables). A default file extension
+   of .icl is assumed.    All filenames must appear AFTER any ICL options.
+2 Examples
+The usual invocation will be:
+
+    % icl
+
+Required environment variables will probably have been set in the user's
+.login file.
+
+For example:
+
+   setenv ICL_LOGIN ~/myicl_login
+   setenv EDITOR tpu
+
+will cause ICL to obey commands in the file ~/myicl_login.icl before
+prompting the user for more commands, and to use tpu as the editor for
+editing procedures.
+
+
+
+A more complex invocation would be:
+
+    % icl -io test_io comfile1 comfile2
+
+This would set the value of the ICL option -io to "test_io" and the ICL
+command files procfile1.icl and procfile2.icl would be automatically
+loaded into ICL before the ICL prompt was output.
+1 Language
+ICL  is  language designed to provide a programmable user interface to an
+astronomical data reduction or data aquisition system.  It can be used as
+a programming language but is  intended  for  writing  relatively  simple
+programs.  The main elements of the language are described below.
+2 Types
+The language manipulates entities which can  have  one  of  four  possible
+types:
+
+     1. Integer
+     2. Real
+     3. Logical
+     4. String
+
+The integer type represents integral numbers  and the real type represents 
+numbers in floating point from (double precision).  The  range  of numbers
+will  depend  on  the  underlying  system.   For Unix systems, ranges will 
+generally be found in /usr/include/limits.h
+
+2 Numbers
+
+ Numeric constants may be used to denote  real  and  integer  values.  A
+ constant is interpreted as a real if it contains a decimal point,  an E
+ (denoting an exponent) or if its magnitude is  too  large  for  integer
+ representation.  Otherwise,  the constant is interpreted as an integer.
+ Integer constants may also  be entered  in binary, octal or hexadecimal
+ form by preceding the number with %B, %O or %X.  In hexadecimal numbers
+ the letters A to F  (in either  upper or lower case) are used to denote
+ 10 to 15.
+
+    e.g.       %B100110       %O377        %Xffff
+
+2 Logicals
+
+The values of the logical type are true and false, and these may be
+represented by the constants TRUE and FALSE.
+
+2 Strings
+
+The string type represents strings of characters.   String values may be 
+denoted by string constants, which consist of a sequence  of  characters  
+enclosed in quotation marks (single or double quotes). If it is required
+to include a quote of the same type as the quoting mark in a string, two
+quotes  must  be inserted.  Normally the alternate type would be used as
+the quoting marks in this case.
+
+   E.g. "O'Leary's bar"   and  'O''Leary''s bar'  are equivalent
+
+An exception to this is when values are given in response  to  a  prompt
+from an ADAM task - then all quote marks are equivalent. Either type may
+be used to quote the string but internal quotes of either type  must  be 
+doubled up.
+
+   E.g. STRING/'fred''s bar'/ > "O''Leary''s bar'
+
+2 Constants
+
+   Real     e.g.  1.234E-5      3.14159
+
+   Integer  e.g.  123      %B100110    %O377      %Xffff
+
+   Logical        TRUE    FALSE
+
+   String         'This is a string'    "So is this"
+                  (For more information, see subtopic Strings)
+
+2 Operators
+
+  Priority
+     1             **
+     2             *  /
+     3             +  - 
+     4             =  >  <  >=  <=  <>  :
+     5             NOT  AND  OR  &
+
+
+     & performs string concatenation
+     : is formatting operator -  X:n:m  is X converted to an n
+                            character string with m decimal places.
+
+2 Variables
+
+Variables are represented by identifiers which are  composed  of  letters,
+digits,  and  the  underscore  character.   The  first character must be a
+letter.  The language is  case  insensitive  (i.e.   the  same  identifier
+written  in upper or lower case denotes the same variable).  Certain words
+are used for special purposes in the language and  are  not  available  as
+identifiers.  These are:
+
+   AND, OR, NOT, LOOP, WHILE, FOR, TO, STEP, BREAK, IF, ELSE, END, 
+   PROC, ENDIF, ENDLOOP, ENDPROC, TRUE, FALSE, EXCEPTION, ENDEXCEPTION
+
+The names of procedures and functions are not  reserved  words,  as  their
+required  use  can  always  be  distinguished  by  context.   Thus  it  is
+permissible (though somewhat confusing) to have variables called SIN, LOG,
+EDIT,  LIST  etc.   Variables  do  not  have  specific  types  permanently
+associated with them.  Rather a  variable  acquires  a  type  when  it  is
+assigned  a  value.   Thus  the type of a variable may change as different
+values are assigned to it, as in the following sequence:
+
+    X = 123        ; X is assigned the integer value 123 
+    X = 123.456    ; X is assigned the real value 123.456 
+    X = TRUE       ; X is assigned the logical value TRUE 
+    X = 'String'   ; X is assigned the string value 'String' 
+
+2 Expressions
+
+Expressions are built up from operands  which  may  be  either  variables,
+constants  or function calls using the following operators, which have the
+following order of precedence:
+
+  1 (highest)       **  (exponentiation)
+  2                 *  /
+  3                 +  -
+  4                 =  >  <  >=  <=  <>  : (formatting operator)
+  5 (lowest)        NOT  AND  OR  & (string concatenation)
+
+The order of evaluation of expressions  is  that  the  highest  precedence
+operators  are  applied  first.  Operators of equal precedence are applied
+from left to  right.   These  rules  may  be  overridden  by  the  use  of
+parentheses.
+
+When evaluating expressions type conversion is applied freely to  operands
+to attempt to make sense of them.
+
+Arithmetic operations will produce an integer result if both operands  are
+integers  (except  for  division which always produces a real result).  If
+one or both operands are real the result is always real.  Logical operands
+used in arithmetic operations are treated as integers with FALSE = 0, TRUE
+= 1.
+
+When a string is used as an operand to an arithmetic operator  an  attempt
+is  made to convert the string to a number, by evaluating the string as an
+expression.  Thus the string '1.234' has  a  numeric  value.   The  string
+'X+1' has a numeric value if X is currently a numeric variable, or if X is
+a string which can be converted to a numeric  value.   A  run  time  error
+occurs if the string cannot be converted to a number.
+
+The relational operators (=, >, <, >=, <=, <>) produce  a  logical  result
+from  a  comparison  of  two operands.  If both operands are numeric their
+numeric values are compared.  If both operands  are  strings  their  ASCII
+values  are compared ( after padding the shorter string with blanks to the
+length of the longer  string).   If  a  string  and  numeric  operand  are
+compared, an attempt is made to convert the string to a number.
+
+The formatting operator (:) is  used  to  format  numbers  into  character
+strings.   The  result of X:N1:N2 is a character string of length N1 which
+contains the number X expressed with N2 decimal  places.   If  the  number
+will  not  fit  into  the number of characters allowed, a longer string is
+produced.  The number of decimal places (N2)  is  optional,  and  will  be
+ignored if the first operand is an integer.
+
+The operator (&) produces a character string by concatenation of  its  two
+operands.  If one of the operands is numeric, the number will be converted
+to a string.
+
+The logical operators AND, OR, NOT produce logical results, and must  have
+logical operands.
+
+2 Immediate
+
+The immediate statement has the form:
+
+   = expression
+
+It causes the expression to be evaluated and its result to  be  output  on
+the terminal.
+
+
+2 Assignment 
+
+The Assignment statement has the form:
+
+    variable  =  expression
+
+It causes the expression to be evaluated, and  its  value  (and  type)  be
+assigned to the variable.
+
+2 Commands
+
+The procedure call is the most important statement in the language  as  it
+provides  the  command  facility  for the command language.  The procedure
+call is used for three types of procedures.
+
+    a. Built in commands which form part of the language system itself.
+       These are procedures such as PRINT, INPUT, EDIT, LIST etc.
+
+    b. External procedures which provide the commands for whatever system
+       the command language is being used to run. In the current system
+       this means the ADAM commands.
+
+    c. Procedures written in the command language by the user.
+
+The procedure call has the basic form:
+
+     identifier  parameters
+
+where the identifier is the name of the procedure,  and  parameters  is  a
+list of parameters to be passed to the procedure.
+
+In order that the  command  language  be  reasonably  user  friendly  some
+changes  in  syntax  are  needed for procedure parameters as compared with
+that used for the rest of the language.  The normal case is for parameters
+to  be  interpreted  as  strings  delimited  by  either  spaces or commas.
+Parameters may also be strings in quotation marks.  This form is necessary
+in order to pass strings which contain spaces or commas.
+
+To pass the value of an expression to a procedure the expression  must  be
+enclosed  in parentheses.  This form must also be used to pass the name of
+a variable into which a value is to be returned.
+
+As an example the PRINT procedure expects to receive character strings  as
+its parameters.  Suppose we use the statement:
+
+    PRINT X
+
+The result will be to print the character X.  If  we  want  to  print  the
+value of a variable X we must use the form:
+
+    PRINT (X)
+
+These two forms can be combined to give something like:
+
+    PRINT x squared = (X*X) square root of x = (SQRT(X))
+
+In this sort of case 'x', 'squared', and  '='  are  actually  received  as
+separate  parameters but PRINT concatenates them into a single string with
+a space between each one.  Thus  in  most  cases  we  don't  need  to  use
+quotation  marks to pass strings to PRINT.  We would need to use quotation
+marks if we wanted to insert more than one space between words, or print a
+string containing parentheses as in the following example:
+
+    PRINT 'x squared  =  ' (X*X)  '    sqrt(x)  =  ' (SQRT(X))
+
+However, the free conversion of strings into numbers, means that  in  many
+cases  the use of parentheses is not necessary.   If procedure P expects a
+numeric parameter (rather than a string as does PRINT), both the following
+forms will result in the same number being received:
+
+     P (X+Y*Z)
+
+     P  X+Y*Z
+
+In the first case the expression X+Y*Z will be evaluated and the resulting
+value  passed  to the procedure.  In the second case the string 'X+Y*Z' is
+passed to the procedure.   However  when  the  parameter  is  required  in
+numeric  form  the  expression  will  be evaluated giving the same numeric
+result as in the first case.
+
+The two cases are  not  equivalent,  however.   In  the  first  case,  the
+expression  is compiled when the procedure call statement is compiled.  In
+the second case the expression  gets  compiled  during  execution  of  the
+procedure (possibly more than once).  Used within a program the first form
+will be substantially faster.
+
+2 Procedures
+An ICL Procedure is essentially the equivalent of a Subroutine in FORTRAN.
+It  allows  us to write a sequence of ICL statements which can be run with
+a single command.  The procedure may have a number of parameters which are
+used to pass values to the procedure, and return values from it.
+
+3 Creating_procedures
+The  PROC  statement  is  used  to  begin  entry  of  a command language 
+procedure. It has the form:
+
+    PROC  procedure_name  normal_parameters [optional_parameters]
+
+where procedure_name is an identifier used as the name of the procedure,
+and normal_parameters  and optional_parameters are lists of identifiers,
+separated by commas or spaces,  which are used for the formal parameters
+of the procedure. 
+
+Parameters  have  identifiers  of the same form as ICL variables and are
+referred to in the same way within the procedure.
+
+Note that the "[" and "]" characters used to delimit optional parameters
+are part of the language syntax. See the example below.
+
+Following the entry of a PROC statement a new mode  is  entered in which
+statements  are  compiled  into the procedure rather than being executed
+immediately (but see 'Direct_commands').  An  END PROC statement returns 
+control to the normal command mode.  Once compiled,  a  procedure can be
+executed by using the procedure call statement.
+
+Example 1 - A procedure with one mandatory argument
+
+   ICL> PROC SQUARE_ROOT X
+   SQUARE_ROOT> { A procedure to print the square root of a number }
+   SQUARE_ROOT> PRINT The Square Root of (X) is (SQRT(X))
+   SQUARE_ROOT> END PROC
+   ICL>
+
+The line beginning with  {  is a comment  which will be ignored  by  ICL
+when  executing the procedure.   The closing  }  is  not  necessary  but
+looks neater.
+
+Example 2 - A procedure with one mandatory and two optional arguments
+
+   ICL> PROC PRINT_IT A, [B, C]
+   PRINT_IT> PRINT (A) (B) (C)
+   PRINT_IT> END PROC
+
+In this  example  the first parameter (A) is mandatory and the procedure
+will normally fail to run if it is omitted (See  Running_procedures  for
+more  details on this).  In contrast "B" and "C" may be omitted and then
+their values will be <UNDEFINED>.  The ICL function  UNDEFINED(X) may be 
+used to control procedure execution with omitted parameters.   Note that
+there is no way of omitting "B" while passing "C".
+
+3 Running_procedures
+To  run  a  procedure we use the command format described earlier, using 
+the procedure name as the command and adding any parameters required.
+
+    ICL> SQUARE_ROOT (2)
+    The Square Root of         2 is 1.414214
+
+But we can also specify the parameter without parentheses:
+
+    ICL> SQUARE_ROOT 2
+    The Square Root of 2 is  1.414214
+
+What has happened  here is that instead of the numeric value 2,  we have
+passed the string  '2'  as the  parameter.  However, the  SQRT  function
+requires a numeric  argument, so converts this string to a number. Thus, 
+the free approach to type conversion, means that in many cases the rules 
+for command parameters described in the previous chapter can be relaxed.
+
+    ICL> Y=3
+    ICL> SQUARE_ROOT Y
+    The Square Root of Y is  1.732051
+
+Here  the parameter passed was the string  'Y',  but once again this was
+converted to a numeric value for the SQRT function.
+
+By  default,  ICL  will check that the correct number of parameters have
+been supplied before it will obey a procedure.  However  this  behaviour
+may be overridden by the  SET NOCHECKPARS  command  or by declaring some
+of the parameters 'optional' (see Creating_procedures).  Note that  if a
+procedure  has parameters  A  and  B declared in that order, there is no
+way of omitting A and passing B.
+
+Omitted parameters will be <UNDEFINED>  and the function  UNDEFINED  may
+be used within the  procedure  to  check if values have been  given when
+the procedure is run.  
+
+3 Listing_procedures
+The LIST command may be used to list a procedure at the terminal. 
+
+      LIST procedure_name
+
+To find the names of all the current procedures, use the commad PROCS.
+
+3 Editing_procedures
+Entering procedures directly is fine for very simple procedures, but for
+anything more complex it is likely that some mistakes will  be  made  in
+entering the procedures.  When this happens it will be necessary to edit
+the procedure.  Editing is accomplished from  within ICL using  standard 
+editors.   For example the command:
+
+    ICL> EDIT SQUARE_ROOT
+
+would be used to edit the SQUARE_ROOT procedure.  By default the  editor
+vi  is  used  but it is  possible  to override this with the environment 
+variable EDITOR or the SET EDITOR command. 
+
+When editing a procedure there are two possible options.
+
+ 1. We can leave the name of the procedure unchanged, but edit the code. 
+    In  this  case  we  create  a  new  version of the procedure,  which
+    replaces the old one when we exit from the editing session.
+
+ 2. We can change the name of the procedure by editing the  PROC  state-
+    ment at the start of the procedure.  This  creates a  new  procedure
+    with the new name, and leaves the old procedure unchanged.
+
+It is possible to enter procedures completely using the editors. However
+it is  recommended  that  procedures  be entered originally using direct
+entry.  The advantage is that during direct entry,  any errors  will  be
+detected immediately.
+
+Following such an error, we can use the command line editing facility to
+correct the line and reenter it.  If  the  same  error  occurred  during
+procedure entry using an editor, the error would only be detected at the
+time of exit from the editing session, and it would be necessary to EDIT
+the procedure again to correct it.
+
+3 Saving_procedures
+Procedures created during an ICL session will only exist for the duration
+of that session.  If we need to keep them longer they need to be saved in
+a disk file.  This is achieved by means of the SAVE command.  To save the
+SQUARE_ROOT procedure on disk we would use:
+
+    ICL> SAVE SQUARE_ROOT
+
+The  SAVE  command  causes  the procedure to be saved in a file with name 
+square_root.icl (lower case regardless of the case typed) in the  current
+default directory. 
+
+If  you  have  many procedures you may not want to save and load them all
+individually. It is possible to save all the current procedures using the
+command:
+
+    ICL> SAVE ALL
+
+This  saves  all  the  current  procedures in a single file with the name
+save.icl.
+The  SAVE ALL  command is rarely used however,  because this  command  is
+executed automatically whenever you exit from ICL (unless  SET NOSAVE  is 
+in operation) -  this ensures that ICL procedures do not get accidentally 
+lost because you forget to save them.
+
+3 Loading_procedures
+Procedure  definitions  will  usually be saved in disk files to avoid 
+having  to type them in repeatedly.  This may be done using the  SAVE
+command or by creating the file directly, outside ICL.
+
+To load  procedure definition(s), or in fact to obey any ICL commands
+saved in a file, use the LOAD command.
+
+    ICL> LOAD file_name
+
+will read commands from the file  file_name.icl.  `file_name' may be a  
+relative  or  absolute pathname and may include environment variables. 
+Extension .icl is assumed.
+3 Exception_handlers
+
+An exception handler has the following form:
+
+    PROC
+    .
+    .
+    .
+      EXCEPTION name
+      .
+      .
+      END EXCEPTION
+    END PROC
+
+where  name  is the name of the exception to be handled.
+
+The exception handler consists of the statements between EXCEPTION and
+END EXCEPTION.  It  follows  the  main  code of the procedure,  and is 
+executed if the named exception occurs during the procedure.  No error
+message will be output if an exception occurs but is handled.  
+
+A procedure may have any number of exception handlers for different 
+exceptions.
+
+2 Control_Structures
+The ICL control structures provide a means of controlling the flow of
+execution within a procedure. They are only accepted within a procedure.
+
+3 IF
+
+ IF structures have the form:
+
+    IF expression
+    .
+    ELSE IF expression
+    .
+    .
+    ELSE
+    .
+    END IF
+
+ where there may be any number of ELSE IF clauses. The ELSE IF and ELSE
+ sections are optional. ELSEIF and ENDIF may be used in place of 
+ ELSE IF and END IF.
+
+3 LOOP
+
+    Loop structures have three possible forms:
+
+  LOOP            [LOOP] WHILE exp   [LOOP] FOR var = exp1 TO exp2 [STEP exp3]  
+  .               .                  . 
+  .               .                  .
+  END LOOP        END LOOP           END LOOP
+
+ An immediate exit form a loop may be forced by using a BREAK statement.
+
+3 WHILE
+
+    [LOOP] WHILE expression
+    .
+    .
+    .
+    END LOOP
+
+The statements between LOOP and END LOOP  are  executed  as  long  as  the
+expression  has  the  logical  value TRUE.  The expression is re-evaluated
+before every loop iteration, and if the value  FALSE  is  found  execution
+continues with the statement following END LOOP.
+
+3 FOR
+
+    [LOOP] FOR variable = expression1 TO expression2 STEP expression3
+    .
+    .
+    .
+    END LOOP
+
+The statements between LOOP and END LOOP are  executed  for  a  series  of
+sequential  values  of  the  control  variable.   STEP  may be omitted and
+defaults to one.  All three expressions are converted to  integers  before
+execution of the loop.
+
+2 Functions
+
+    The following are equivalent to the FORTRAN functions of the same name
+
+    SIN  COS  TAN  ASIN  ACOS  ATAN  ATAN2  LOG  LOG10  EXP  SQRT  ABS
+    SIND COSD TAND ASIND ACOSD ATAND ATAN2D SINH COSH   TANH MOD   DIM
+    INT  IFIX REAL FLOAT SIGN  CHAR  ICHAR  LEN  INDEX  IAND IOR   IEOR
+    
+    UNDEFINED(X) - TRUE if X is undefined.
+    TYPE(X)      - Return the type of X.
+    INTEGER(X)   - Convert X to Integer.
+    REAL(X)      - Convert X to Real.
+    STRING(X)    - Convert C to String.
+    LOGICAL(X)   - Convert X to logical.
+    BIN(X,n,m)   - integer X formatted in binary.
+    OCT(X,n,m)   - integer X formatted in octal.
+    HEX(X,n,m)   - integer X formatted in hexadecimal.
+    DEC(X,n,m)   - integer X formatted in decimal.
+    RANDOM(I)    - random number between 0 and 1 from seed I (I is changed).
+    SUBSTR(S,n,m) - Substring of S beginning at n of length m.
+    UPCASE(S)    - Convert a string to upper case.
+    SNAME(S,n[,m]) - Name derived by concatenating string S with integer n
+                   formatted into m characters including leading zeros. If
+                   m is omitted, use required number of characters.
+    VARIABLE(proc,X) - Returns value of variable X of procedure proc.
+    OK(stat)     - True if Status OK.
+    DATE()       - Return current date.
+    TIME()       - Return current time.
+    RA(S)        - String in HMS converted to radians.
+    DECL(S)      - String in DMS converted to radians.
+    RA2S(R,n,S)  - Radians to HMS, n dec places on secs, fields separated by S.
+    DEC2S(R,n,S) - Radians to DMS, n dec places on secs, fields separated by S.
+    INKEY()      - Value of last trapped key pressed.
+    KEYVAL(S)    - Value of key with name.
+    GETENV(S)    - Value of environment variable S
+                   (Null string if S is undefined).
+    FILE_EXISTS(S)- TRUE if file S exists.
+    ELEMENT(N,D,S)- Return Nth element of S (elements delimited by character D
+                   and numbered from 0).
+    SYSERR([S])  - Message or value associated with ICL status.
+                   S='default' (or omitted) returns string 'fac__ident'
+                   S='full' returns string 'fac-sev-ident, message'
+                   S='facility' returns string 'fac'
+                   S='ident' returns string 'ident'
+                   S='severity' returns string 'sev'
+                   S='value' returns status as an integer.
+2 Format
+
+ Statement format
+
+    Normally one statement per line. A ~ at the end of a line indicates
+    that the statement continues on the next line (up to 10 continuations
+    are allowed). The maximum statement length is 300 characters.
+  
+    A { or ; character indicates that the remainder of the line is a comment.
+
+2 Direct_Commands
+This is the term used to describe commands entered at the  ICL>  prompt.
+It is sometimes useful to have a command directly obeyed whilst entering
+a procedure.  This can be done by prefixing the command with a % character.
+
+For example:
+
+    ICL> PROC SQUARE_ROOT X
+    SQUARE_ROOT> %HELP
+
+would give on-line help information which might be needed to complete the 
+procedure. If the % was omitted, the HELP command would be included as part
+of the procedure.
+
+2 Example
+
+Example Program
+
+PROC STATS
+
+{ A program to calculate the mean and standard deviation of  }
+{ a set of values                                            }
+
+  SUM = 0.0
+  SUMSQ = 0.0
+  N = 0
+  PRINT Enter the values - type END when finished
+  LOOP
+    INPUTR 'Value: ' (X)
+    IF UNDEFINED(X)
+      BREAK
+    ELSE
+      N = N+1
+      SUM = SUM+X
+      SUMSQ = SUMSQ + X*X
+    END IF
+  END LOOP
+  MEAN = SUM/N
+  SIGMA = SQRT((SUMSQ - SUM*SUM/N)/(N*(N-1)))
+  PRINT Mean of (N:3) values = (MEAN) 
+  PRINT Sigma = (SIGMA)
+END PROC
+
+1 ICL_Commands
+
+    ( * indicates that the command is not yet implemented. )
+
+    APPEND name file  -  Open text file to append output           
+    CD [directory] - Change the working directory for the ICL process.
+    CLEAR n m    -   Clear line n to m (screen mode)
+    CLOSE name   -   Close text file                       
+    CREATE name file  -  Create text file and open it for output
+    !, SH [command]  -   Issue shell command
+    $, DCL  or SPAWN [command]  -  Obsolete (see Shell_commands).
+    DEFAULT [dir [taskname]] -   Set/Show current working directory.
+    DEFHELP name library [topic [subtopic ... ]] - Define source of help
+    DEFPROC command [file [procedure]] - Associate command with a procedure
+    DEFSTRING command [equivalence_string] - Associate command with string
+    DELETE proc  -   Delete procedure
+    EDIT name    -   Edit procedure or file
+    EXIT         -   Exit from ICL
+    GETNBS nbsname (variable)  -   Get value of NBS item.
+    HELP [topic [subtopic...]]  -   Provide on-line documentation
+    INPUT [prompt] S  -  Input a string into S
+    INPUTI prompt i j ...
+                 -   Input integers into variables i j etc
+    INPUTI prompt l m ...
+                 -   Input logical values into variables l m etc
+    INPUTR prompt x y ...
+                 -   Input real numbers into variables x y etc   
+    KEY key equiv -  Define equivalence string fro key  (screen mode)
+    KEYOFF key    -  Turn off key trapping   (screen mode)
+    KEYTRAP key   -  Trap key  (screen mode)
+    KEYUSER key image routine  -  Associate key with subroutine
+    LIST proc    -   List procedure proc
+    LOAD file    -   Accept commands from file.icl
+    LOCATE r c text  -  Write text at row r column c (screen mode)
+    *NOREP        -   Turn off reporting                         
+    OPEN name file  -  Open text file for input
+    PRINT p1 p2  -   PRINT concatenation of all parameters
+    PROCS [S]    -   List Procedure names [which start with string S]
+    PUTNBS nbsname value  -  Write value of an EXISTING NBS item.                                                          
+    QUIT         -   Exit from ICL (synonym for EXIT)
+    READ name (s) -  Read line from text file into variable s
+    READI name (i) (j) ..  Read integers from text file
+    READL name (l) (m) ..  Read logicals from text file
+    READR name (x) (y) ..  Read real numbers from text file              
+    REPFILE [logfile]  [DTNS]  -  Examine logfile
+    *REPORT [logfile]  -   Turn on reporting
+    SAVE proc    -   Save procedure proc in proc.icl        
+    *SAVEINPUT n file -  Save last n input lines in a file
+    SIGNAL name text -  Signal an ICL Exception                  
+    SETENV var [word] - Set a Unix environment variable in the ICL process
+    *SET (NO)ATTRIBUTES s -  Set attributes for text written with LOCATE
+    SET (NO)AUTOLOAD -  Switch automatic task loading on/off
+    SET (NO)CHECKPARS -  Switch procedure parameter checking on/off
+    *SET (NO)COMMENTS -  Switch on/off storing of comments in procedures
+    SET (NO)EDITOR name  -  Set editor to TPU, EDT or LSE
+    SET (NO)HELPFILE file -  Set required help file
+    SET (NO)PROMPT string -  Set a prompt string. 
+    SET (NO)SAVE -   Switch writing of save.icl on/off
+    SET (NO)SCREEN   -  Switch screen mode on/off
+    SET (NO)TRACE    -  Switch tracing of procedures on/off
+    SET (NO)PRECISION n  -  Specify precision for real to string conversions
+    STRINGS [S]   -  List DEFSTRING, DEFPROC and DEFHELP strings
+                     [which start with string 'S']
+    UNSETENV var  -  Unset a Unix environment variable in the ICL process
+    VARS proc     -  List variables of procedure proc
+    VERSION       -  Displays the ICL version number
+    WAIT x        -  Wait for x seconds        
+    WRITE name p1 p2 .. -  Write line to text file
+
+1 ADAM_Commands
+
+DEFINE  command taskname [action] 
+  - Define a command to obey a task.      
+DEFTASK  command [taskname] 
+  - Define a command to SEND to a task.
+ALOAD  exename [taskname] 
+  - Load an ADAM task.
+LOADD  exename [taskname] [priority] 
+  - Load an ADAM task into a detached process.
+LOADW  exename [taskname] 
+  - Load an ADAM task and wait for loading to complete.
+KILL  taskname 
+  - Kill an ADAM task.
+KILLW  taskname 
+  - Kill an ADAM task and wait for it to die.
+SEND  taskname context 
+  - Send a GET, SET, OBEY, CANCEL or CONTROL message to a task.
+OBEYW  taskname action [parameters] 
+  - Send an OBEY message to a task and await completion.
+STARTOBEY (path) (messid) task action [parameters] 
+  - Start an action and return associated path and message_id.
+ENDOBEY (path) (messid) 
+  - Await completion of action with given path and message_id.
+GET  taskname parameter (variable)
+  - Get the value of a task parameter into an ICL variable.
+SETPAR  command parameter value
+  - Set the value of a task parameter.
+GETPAR  command parameter (variable)
+  - Get the value of a task parameter into an ICL variable.
+CREATEGLOBAL parameter
+  - Create a global parameter.
+SETGLOBAL  parameter value
+  - Set the value of a global parameter.
+GETGLOBAL  parameter (variable)
+  - Get the value of a global parameter into an ICL variable.
+CHECKTASK  taskname (exists)
+  - Set ICL variable  exists TRUE if  taskname is loaded
+TASKS
+  - List all loaded tasks
+SET MESSAGES, SET NOMESSAGES
+  - Switch 'Loading' messages on/off.
+
+1 Shell_Commands
+In direct mode (i.e. at the ICL> prompt), commands which are not 
+recognised as ICL commands are assumed to be commands to be obeyed 
+in a shell subprocess. A subprocess is created and the command passed
+to it. The shell to be used in the subprocess can be defined by the 
+environment variable SHELL. If SHELL is undefined, csh is used.
+
+Note that the SETENV, UNSETENV and CD commands ARE recognised as ICL
+commands. They have the expected effect on the process in which ICL
+is running. Their effect will be inherited by any subprocesses created
+subsequently by ICL, but not on existing subprocesses (loaded tasks).
+The DEFAULT command may be used to change the default directory for
+existing task subprocesses.
+
+Commands may also be obeyed in a shell subprocess by using the ICL 
+commands SH or ! (or their obsolete equivalents DCL, SPAWN and $). 
+This method is required in procedures.
+
+E.g.
+
+  ICL> ! [shell_command]
+
+If no parameter is supplied with these commands, the subprocess
+is created and the user is prompted for commands to be obeyed in it.
+To return to ICL, type % exit in the shell subprocess.
+If parameters are defined, they are concatenated to form a command 
+which is executed within the shell subprocess which then disappears, 
+leaving the user again at the ICL prompt.
+
+Because the commands are executed in the shell subprocess rather than 
+in the process running ICL, some commands may not have the expected 
+effect. 
+
+E.g. ! cd will set the default directory for the subprocess but not
+for the process running ICL. 
+
+1 Exceptions
+
+2 ADAMERR
+
+  ADAMERR  -  An Error has occurred in an ADAM task.
+              An associated message will give further information.
+              
+2 ASSNOTVAR
+
+ASSNOTVAR  -  An Assignment has been made to a procedure formal parameter 
+              which does not correspond to a variable in the procedure call. 
+
+
+2 CLOSEERR                            
+
+CLOSEERR  -  Error closing text file. 
+
+2 CONVERR
+
+CONVERR  -  Error converting RA or Dec to string or vice versa 
+
+
+2 CTRLC
+
+CTRLC    -   A Control-C has been entered on the terminal.
+
+2 DEVERR
+
+DEVERR  -  Error allocating or mounting device.
+            
+2 EDITERR 
+
+EDITERR  -   Attempt to use the LSE editor on a system on which LSE is 
+             not available, or an attempt to use TPU when the TPU shareable 
+             image is not accessible. 
+                                               
+2 EOF
+
+EOF - End of file encountered on text file operation. 
+
+2 FLTDIV
+
+FLTDIV  -    Floating point division by zero. 
+            
+2 FLTOVF
+
+FLTOVF  -    Floating point overflow. 
+      
+2 IFERR
+
+IFERR   -    The expression in an IF or ELSE IF statement does not  
+             evaluate to a logical value.                                
+            
+2 INTOVF
+
+INTOVF  -    Integer Overflow. 
+            
+2 INVARGMAT
+
+INVARGMAT -  Invalid argument to a mathematical function.  
+
+2 INVSET
+
+INVSET    -  Invalid SET command.  
+            
+2 LOGZERNEG
+
+LOGZERNEG -  Logarithm of zero or negative number.    
+
+2 NBSERR
+
+NBSERR  -  Error in GETNBS or PUTNBS. 
+
+2 OPENERR
+
+OPENERR  -  Error opening text file. 
+                                      
+
+2 OPNOTLOG
+
+OPNOTLOG  -  Operands of a logical operator (AND, OR etc.) are 
+             not logical values.  
+           
+2 OPNOTNUM
+
+OPNOTNUM  -  Operands of a formatting operation (:) are not  
+             numeric.  
+           
+2 PROCERR
+
+PROCERR   -  Unrecognized procedure or command name.  
+                                     
+2 READERR
+
+READERR  -  Error reading from text file.
+
+2 RECCALL
+
+RECCALL   -  Attempt to make a recursive call of a procedure. 
+                                         
+2 SCREENERR
+
+SCREENERR  -  Error in screen mode I/O.
+
+2 SQUROONEG
+
+SQUROONEG -   Square root of negative number. 
+                        
+2 STKOVFLOW
+
+STKOVFLOW -  ICL's stack has overflowed. 
+           
+2 STKUNDFLOW
+
+STKUNDFLOW - ICL stack underflow - If this occurs it indicates 
+             an internal error in ICL  -  Please report the circumstances.  
+             
+2 TOOFEWPARS
+
+TOOFEWPARS -  Not enough parameters for a function or command. 
+            
+2 TOOMANYPARS
+
+TOOMANYPARS -  Too many parameters for a procedure or command. 
+             
+2 UNDEFVAR
+
+UNDEFVAR  -  Attempt to use an undefined variable - i.e. one 
+             that has not yet had a value assigned.  
+             
+2 UNDEXP
+
+UNDEXP   -  Undefined Exponentiation.  
+           
+2 WHILERR
+
+WHILEERR -  The expression in a WHILE statement does not 
+            evaluate to a logical value.                     
+
+2 WRITERR
+
+WRITERR  -  Error writing to text file.
+
+
+An alternative to cd is the ICL DEFAULT (DEF) command.
+
+1 Environment_variables
+ICL's operation can be controlled by several (optional) environment
+variables. The variables are:
+ICL_LOGIN_SYS, ICL_LOGIN_LOCAL and ICL_LOGIN - Define ICL login files.
+EDITOR       -  Defines which editor to use.
+ICL_HELPFILE -  Defines the default help file.
+SHELL        -  Defines which shell to use.
+
+2 ICL_Login_variables
+ICL_LOGIN_SYS, ICL_LOGIN_LOCAL and ICL_LOGIN
+
+If set, these environment variables specify ICL command files to be 
+obeyed, in the above order, by ICL before the ICL prompt appears.
+A default file extension of .icl is assumed. 
+For example:
+
+      % setenv ICL_LOGIN ~/myprocs
+
+will cause file myprocs.icl in the user's home directory to be loaded 
+as ICL starts up.
+
+ICL_LOGIN_SYS and ICL_LOGIN_LOCAL should be reserved for system use.
+SSN/64 describes how they are used at Starlink sites.
+
+2 EDITOR
+If set, this will override the ICL default editor (vi). 
+For example:
+
+      % setenv EDITOR tpu
+
+2 ICL_HELPFILE
+If set, this will override the default search path for the ICL helpfile. 
+The default search path is:
+
+      ../help/icl/iclhelp.shl
+
+relative to each directory in the user's PATH.
+
+This process for finding the helpfile only operates if a helpfile has not
+already  been  defined   -  i.e.  initially and after any  SET NOHELPFILE 
+command.
+
+2 SHELL 
+This defines the shell which ICL will use to run Unix commands.
+If SHELL is undefined, csh will be used.
+
+1 !_and_SH
+
+ See Shell_Commands
+
+1 CD
+   CD [directory]
+
+Change the working directory for the ICL process.
+If `directory' is omitted, the users home directory will be used.
+
+Note that this is an ICL command, not a shell command.  It will
+affect subprocesses subsequently created by ICL, but not those
+already created. The DEFAULT command may be used to change the
+working directory of existing subprocesses (tasks).
+ 
+1 DEFAULT
+
+   DEFAULT  [directory [taskname]]
+
+ Set the current working directory for the process running ICL and, if 
+ `taskname' is not specified, for all existing and future task 
+ subprocesses.
+
+ If `taskname' is specified it may be an explicit task name or an alias
+ name created by the ICL `DEFINE' command. In this case the working directory
+ for the specified task alone is changed. Also in this case if the new
+ directory is specified as a null string ('') the current default
+ directory of the specified task will be displayed.
+
+ DEFAULT with no parameter displays ICL's current working directory.
+
+ DEFAULT may be abbreviated to DEF.
+
+1 DELETE
+
+   DELETE  proc
+
+ Delete procedure proc from the procedure table.
+
+1 EDIT
+
+   EDIT  name
+
+ Edit a procedure using the selected editor.
+ The selected editor may be changed using the SET EDITOR command.
+ 
+ If the name of a procedure is unchanged during the editing session the new
+ version replaces the old one. If the name is changed a new procedure is 
+ created and the old  version of 'proc' remains unchanged. 
+
+ The editors may also be used in the host operating system using the SH
+ command or equivalent.
+
+1 EXIT
+
+   EXIT
+
+ Exit  from  ICL  and return control to the shell. On exiting from ICL a
+ copy of all the current procedures is saved in the file save.icl unless
+ the SET NOSAVE command has been obeyed.
+ QUIT is a synonym for EXIT.
+
+1 QUIT
+
+   QUIT
+
+ Exit  from  ICL  and return control to the shell. On exiting from ICL a
+ copy of all the current procedures is saved in the file save.icl unless
+ the SET NOSAVE command has been obeyed.
+ EXIT is a synonym for QUIT.
+
+1 INPUT
+
+   INPUT  [prompt]   (string)
+
+ Input a string from the terminal.
+
+   prompt  -  (optional) A prompt string to be output on the terminal
+
+   string  -  A variable into which the input string will be read.
+
+1 INPUTI
+
+    INPUTI  prompt  (i) (j)  ....
+
+ Input integers from the terminal
+
+    prompt  -  A prompt string to be output on the terminal.
+
+    i,j etc -  The variables into which integers will be read.
+
+1 INPUTR
+
+    INPUTR  prompt  (x) (y)  ....
+
+ Input real numbers from the terminal
+
+    prompt  -  A prompt string to be output on the terminal.
+
+    x,y etc -  The variables into which the numbers will be read.
+
+1 INPUTL
+
+    INPUTL  prompt  (l) (m)  ....
+
+ Input logical values from the terminal
+
+    prompt  -  A prompt string to be output on the terminal.
+
+    l,m etc -  The variables into which the logical values will be read.
+
+1 LIST
+
+    LIST  proc
+
+ List procedure 'proc' on the terminal
+
+1 LOAD  
+
+    LOAD  file
+
+ Accept commands from 'file.icl' rather than from the terminal.
+
+ 'file' may contain a procedure definition produced by a  SAVE  command.
+
+1 LOCATE
+
+    LOCATE row column text
+
+For use only in screen mode, LOCATE will display the specified text in
+the fixed part of the screen - row and column specify the position at
+which the text will start.
+
+1 PRINT
+
+    PRINT    p1  p2  ....
+
+ The parameters of PRINT are concatenated and printed on the terminal.
+
+1 PROCS
+
+    PROCS [string]
+
+ List the names of all current procedures in alphabetical order.
+ If `string' is specified, only procedures whose names start with the
+ given string are listed.
+
+1 SAVE
+
+   SAVE  proc
+
+ Save procedure  'proc'  in the file 'proc.icl' in the current default
+ directory.  The filename will be in lower case regardless of the case
+ typed.
+
+   SAVE  ALL
+
+ Save all defined procedures in file 'save.icl' in the current default
+ directory.
+
+ Procedures saved in this way may be reloaded using LOAD.
+
+1 STRINGS
+
+    STRINGS [string]
+
+ Lists, in alphabetical order, the strings defined by DEFSTRING, DEFHELP
+ or DEFPROC. If `string' is specified, only those strings whose names start 
+ with the specified string are listed.
+
+1 VARS
+
+   VARS [ proc ]
+
+ Lists the variables of procedure 'proc' with their current types and
+ values. VARS with no parameters lists the variables at direct mode.
+
+1 VERSION
+
+    VERSION
+
+ Displays the ICL version number.
+
+1 ALOAD
+
+    ALOAD  exename  [taskname]
+
+    Load an ADAM task:
+
+    exename - The name of the executable image file to
+              be used for the task.
+
+    taskname - (optional) The name of the task to be created.
+              If omitted it defaults to the file name part of
+              exename.
+
+1 CHECKTASK
+
+   CHECKTASK  taskname  (loaded)
+
+ Check whether an ADAM task is currently loaded. If ICL's internal tables
+ record that the task is loaded but it is not in fact loaded, the tables
+ will be corrected.
+
+    taskname  -  The name of the task.
+
+    loaded    -  An ICL variable which will be set to the logical value
+                 TRUE if the task is loaded, FALSE otherwise.
+
+
+1 DEFHELP
+
+   DEFHELP  name  help_library  [topic [subtopic ...]]
+
+ Allows the ICL HELP command to be able to access information in other 
+ help libraries.
+
+     name - The Help name to be defined.
+
+     help_library - The Help library to be used.
+
+     topic - The topic in the library or, as a special case, if set to 0 
+             (zero), HELP <name> will output the top level help of the 
+             specified library. If omitted topic defaults to name.
+
+     subtopic - The subtopic(s) of topic.
+
+After  name  has been defined in this way
+
+  ICL> HELP name
+
+will return the information on the topic/subtopic in  help_library.
+
+1 DEFINE
+
+   DEFINE  command  taskname  [action]
+
+ Define a command which issues an OBEYW to an ADAM task
+
+    command - The command to be defined. An abbreviation
+              may be specified in the form COM(MAND) where
+              COM is the minimum acceptable abbreviation.
+
+    taskname - The task which will execute the OBEYW.
+
+    action - (optional)  The action to be executed. If
+              omitted it defaults to command.
+
+Once a command has been defined then
+
+    ICL> command . . .
+
+is equivalent to typing 
+
+    ICL> OBEYW taskname action . . .
+
+with any parameters of command being appended to the OBEYW as the VALUE
+string sent to the task. The task will be loaded into a subprocess if
+necessary.
+
+1 DEFTASK
+
+   DEFTASK  command  [taskname]
+
+ Define a command which issues a SEND to an ADAM task
+
+    command - The command to be defined. An abbreviation
+              may be specified in the form COM(MAND) where
+              COM is the minimum acceptable abbreviation.
+
+    taskname - (optional) The task which will receive the SEND.
+              If omitted it defaults to command.
+
+Once a command has been defined using DEFTASK then
+
+    ICL> command . . .
+
+is equivalent to typing 
+
+    ICL> SEND action . . .
+
+the parameters of command must supply the CONTEXT (GET, SET, OBEY, CANCEL)
+and the parameter or action name to be sent to the task.
+
+
+1 DEFPROC
+
+   DEFPROC  command  [file  [procedure]]
+
+ Define a command which runs a procedure from a source file.
+
+    command - The command to be defined. An abbreviation
+              may be specified in the form COM(MAND) where
+              COM is the minimum acceptable abbreviation.
+
+    file    - The source file containing the procedure.
+
+    procedure - (optional)  The procedure to be executed. If
+              omitted it defaults to command.
+
+
+When  command  is issued file.icl is loaded and compiled (if it is not
+already loaded) and the procedure is called.  Any parameters specified
+with the original command are passed to the procedure.
+
+If only the `command' parameter is given,  the command is `un-defined'
+(currently not implemented).
+1 DEFSTRING
+
+   DEFSTRING  command  [equivalence_string]
+
+ Associate a command with an equivalence string.
+
+   command  - The command to be defined. An abbreviation
+              may be specified in the form COM(MAND) where
+              COM is the minimum acceptable abbreviation.
+
+   equivalence_string - The equivalence string for the command.
+
+Issuing the command is equivalent to typing the equivalence string. Any
+parameters of the command are appended to the equivalence string.
+
+If only the `command' parameter is given, the command is `un-defined'
+(currently not implemented).
+1 ENDOBEY
+
+   ENDOBEY (path) (messid)
+
+ Wait for completion of an ADAM D-task action initiated by STARTOBEY
+
+   path  -  The path associated with the action.
+
+   messid  -  The message identifier associated with the action.
+
+
+1 GET
+
+   GET  taskname  parameter  (variable)
+
+ Get a parameter of an ADAM I-task and put the value into an ICL variable.
+
+   taskname - The name of the I-task.
+
+   parameter - The name of the parameter to be got.
+
+   variable - The ICL variable into which the value will be put.
+
+
+1 GETGLOBAL
+
+   GETGLOBAL   parameter  (variable)
+
+Get the value of a ADAM global parameter
+
+    parameter - The name of the global parameter to be got.
+
+    variable - An ICL variable to receive the result.
+
+
+1 GETPAR
+
+   GETPAR  command  parameter  (variable)
+
+Get the value of a ADAM A-task parameter from the parameter file.
+
+    command - A command name associated with an ADAM A-task or
+              monolith program by means of a DEFINE command.
+
+    parameter - The name of the parameter to be got.
+
+    variable - An ICL variable to receive the result.
+
+
+1 HELP
+
+    HELP topic subtopic...
+
+  Display help on the specified topic/subtopic. The source of help on
+  topic may have been defined by a DEFHELP command. If not, it is
+  assumed to be in the current helpfile, which may have been set by a
+  SET HELPFILE command (usually for a specific applications package)
+  or may be the default, ICL,  helpfile.
+
+1 KILL
+
+    KILL  taskname
+
+ Kill an ADAM task
+
+    taskname -  The name of the task to be killed.
+
+
+1 KILLW
+
+    KILLW  taskname
+
+ Kill an ADAM task and wait for it to die.
+
+    taskname -  The name of the task to be killed.
+
+1 LOADD
+
+
+    LOADD  exename  [taskname]  [priority]
+
+    Load an ADAM task into a detached process and wait for
+    loading to complete.
+
+  exename - The name of the executable image file to
+            be used for the task.
+
+  taskname - (optional) The name of the task to be created.
+            If omitted it defaults to the file name part of
+            exename.
+
+  priority - (optional) The priority for the created task.
+
+1 LOADW
+
+
+    LOADW  exename  [taskname]
+
+    Load an ADAM task into a subprocess and wait for loading to complete:
+
+    exename - The name of the executable image file to
+            be used for the task.
+
+    taskname - (optional) The name of the task to be created.
+            If omitted it defaults to the file name part of
+            exename.
+
+1 OBEYW
+
+    OBEYW  taskname  action  . . . 
+
+ Send an OBEY message to an ADAM task and wait for it to complete. Load the
+ task into a subprocess if necessary.
+
+ taskname - The name of the task to which the obey message will be sent.
+
+ action - The action name to be obeyed.
+
+ . . . - Any parameters for the action.
+
+1 SEND
+
+    SEND  taskname  context . . . 
+
+ Send a GET, SET, OBEY, CANCEL or CONTROL message to a loaded ADAM task. 
+
+ taskname - The name of the task to which the message will be sent.
+            This may be an explicit task name or alternatively an
+            alias name created by the ICL DEFINE command.
+
+ context  - The context (GET, SET, OBEY, CANCEL or CONTROL).
+
+ . . .    - The remainder of the message - this will depend upon context.
+
+ The SEND command is intended for use with I-tasks.  It can be  used  with
+ A-tasks and A-task monoliths but often does not have the expected effect.
+ See the individual context descriptions below for details.
+ 
+2 GET
+
+     SEND taskname GET parameter
+
+        parameter - The name of a parameter of the task.
+                    If the task is an A-task monolith, parameter must be
+                    specified as  `atask:parameter',  where atask is the
+                    name of the individual A-task within the monolith.
+
+     The value of the parameter is displayed.
+
+     Note that in the case of A-tasks and A-task monoliths, all parameter
+     values are cancelled at the end of each invocation of the task. This
+     means that  SEND GET  will only produce a result after the parameter
+     value has been set, using SEND SET, and before an OBEY for the task.
+
+2 SET
+
+     SEND taskname SET parameter value
+
+        parameter - The name of a task parameter whose value is to be set.
+                    If the task is an A-task monolith,  parameter must be
+                    specified as  `atask:parameter',  where  atask is the
+                    name of the individual A-task within the monolith.
+
+        value - The value to be set.  Type conversion will be done if
+                necessary.
+         
+     The specified parameter is set to the specified value.
+
+2 OBEY
+
+     SEND taskname OBEY action [parameters]
+
+        action - The name of the action to be obeyed.  For A-tasks, any
+                 name will do. For A-task monoliths, action is the name
+                 of the individual A-task.
+
+        parameters - The parameter string for the action.
+
+     The specified action is obeyed using the given parameter values.
+
+2 CANCEL
+
+     SEND taskname CANCEL action [parameters]
+
+        action - The name of an I-task action to be cancelled.
+
+        parameters - The parameter string for the action.
+
+     The specified I-task action is cancelled using the given parameter
+     values.
+
+     Note that the CANCEL context is not relevant for A-tasks or A-task
+     monoliths.
+
+2 CONTROL
+
+     SEND taskname CONTROL action [value]
+
+        action - The control action to be performed. It may be:
+
+            DEFAULT - Set the current working directory of the task to
+                      `value'. If `value' is omitted or null, the current
+                      working directory will be displayed.
+
+            PAR_RESET - Deactivate the parameter system, resetting all
+                      parameter values to the GROUND state. `value' may
+                      specify a particular action; otherwise parameters
+                      for all actions in the task are reset.  This is 
+                      only required where the normal closedown has been
+                      prevented by environment variable ADAM_TASK_TYPE
+                      being set to `I'.
+
+            SETENV -  Set an environment variable for the task. `value'
+                      should have the form `varname=string'. If string
+                      is required to have leading blanks, `value' must
+                      be enclosed in quotes on the command line.
+2 Examples
+
+     Examples: SEND task OBEY action parameters...
+
+               SEND task GET parameter
+
+               SEND KAPPA_PM SET ADD:IN1 object-name
+                 (IN1 is a parameter of ADD which is an A-task linked into
+                 the KAPPA monolith.)
+
+               SEND KAPPA_MON CONTROL PAR_RESET ADD
+
+               SEND KAPPA_MON CONTROL DEFAULT /home/myhome/files
+
+               SEND KAPPA_MON CONTROL SETENV ADAM_ABBRV=
+1 SET
+
+The SET command is used to control various features of the state of ICL.
+
+2 ATTRIBUTES
+
+N.B. This command currently has no effect with Unix ICL.
+
+   SET ATTRIBUTES  attributes
+
+   SET NOATTRIBUTES
+
+Sets the attributes for text written with the LOCATE command. attributes is
+a string containing any combination of the letters D (double size), B
+(bold), R (Reverse video), U (underlined) and F (flashing).
+     
+2 AUTOLOAD
+
+   SET AUTOLOAD
+
+   SET NOAUTOLOAD
+
+Prevent (or allow) the automatic loading of tasks in response to an 
+invocation.
+
+The default state is AUTOLOAD.
+
+2 CHECKPARS
+
+   SET CHECKPARS
+
+   SET NOCHECKPARS
+
+Prevent (or allow) the check that all defined parameters are provided when
+a procedure is invoked. If NOCHECKPARS is set, the procedure will execute
+even if parameters are missing. The function UNDEFINED may be used to test 
+for the absence of required parameters.
+
+The default state is CHECKPARS.
+
+2 *COMMENTS
+
+   SET COMMENTS
+
+   SET NOCOMMENTS
+
+Prevent (or allow) the storing of comment lines when procedures are loaded.
+If NOCOMMENTS is set, comment lines will not be saved. For large systems, 
+this can save significant amounts of memory and page faults.
+
+The default is COMMENTS
+
+2 EDITOR
+
+   SET EDITOR  name
+
+   SET NOEDITOR
+
+Sets a user's choice of editor to be used for editing of ICL procedures.
+
+The default is to attempt to translate the environment variable EDITOR or,
+if that fails, to use vi.
+
+SET NOEDITOR will reset to the default.
+
+2 HELPFILE
+
+   SET HELPFILE file
+
+   SET NOHELPFILE
+
+Specifies  a  file to be used by the ICL HELP system. A directory
+specification may be included in the file specification, file.
+
+SET NOHELPFFILE  resets  to use the default icl helpfile which is
+obtained by translating the environment variable ICL_HELPFILE or,
+if that is not defined, the first  ../help/icl/iclhelp.shl  found
+relative to directories on the user's PATH.
+
+2 MESSAGES
+
+   SET MESSAGES
+
+   SET NOMESSAGES
+
+These commands control whether or not loading messages are output when
+ADAM tasks are loaded.
+
+By default loading messages are output.
+
+2 PRECISION
+
+   SET PRECISION n
+
+   SET NOPRECISION
+
+ This command sets the precision for unformatted real to string conversions.
+ n may be anything from 1 to 16.
+ SET NOPRECISION will reset the precision to the default (6 decimal digits).
+
+
+2 PROMPT
+
+   SET PROMPT  string
+
+   SET NOPROMPT
+
+This command can be used to specify a prompt string to replace the
+default ICL> prompt. 
+
+SET NOPROMPT will restore the default prompt.
+
+N.B.
+The special tokens $DATE and $TIME which may be used with VMS ICL have not
+yet been implemented in Unix ICL.
+
+2 SAVE
+
+   SET SAVE
+
+   SET NOSAVE
+
+These commands control whether procedures are saved in a `save.icl' file
+when ICL exits.
+               
+The default is SAVE
+
+2 SCREEN
+
+   SET SCREEN n
+
+   SET NOSCREEN
+
+These commands select screen I/O mode or normal I/O mode. On the 
+SET SCREEN mode, the parameter n specifies the number of lines in the 
+scrolling region. If n is omitted, eight lines of scrolling region are 
+allocated.
+
+2 TRACE
+
+   SET TRACE
+
+   SET NOTRACE
+
+These commands turn on and off the tracing of procedure and script 
+execution. When tracing is on, each line is output on the terminal 
+before execution.
+
+The default is NOTRACE.
+
+1 SETGLOBAL
+
+   SETGLOBAL  parameter  value
+
+Set the value of a ADAM global parameter
+
+    parameter - The name of the global parameter to be set.
+
+    value - The value for the parameter.
+
+If the parameter value is an HDS object name or device name it must be 
+prefixed by @.
+
+If the parameter component does not exist in the GLOBAL file,
+one is created with type _CHAR*132 (or ADAM_PARNAME for names).
+1 SETPAR
+
+   SETPAR  command  parameter  value
+
+Set the value of a ADAM A-task parameter
+
+   command   - A command name associated with an ADAM A-task or
+                 monolith program by means of a DEFINE command.
+
+   parameter - The name of the parameter to be set.
+
+   value     - The value for the parameter.
+
+If the parameter value is an HDS object name or device name it must be 
+prefixed by @. SETPAR sets the current value of the parameter. Thus the
+VPATH or PPATH must include CURRENT for SETPAR to have any effect on
+subsequent execution of the command.
+
+If the parameter component does not exist in the parameter file it will
+be created with type _CHAR*132 (or ADAM_PARNAME for names).
+1 SETENV
+
+    SETENV var [word]
+
+Sets environment variable `var' for the ICL process to the specified word.
+If `word' is omitted the environment variable will be set to a null string.
+
+Note that this is an ICL command, not a shell command, and environment 
+variables defined in this way will be inherited by processes subsequently
+created by ICL.
+
+1 SIGNAL
+
+   SIGNAL  name  [text]
+
+ Signal an ICL exception
+
+    name - The exception name --- any valid ICL identifier.
+
+    text - A message text associated with the exception.
+
+Following SIGNAL an exception handler will be executed if one exists
+for the exception. Otherwise a message will be output, and control will
+return to direct mode.
+
+1 STARTOBEY
+
+   STARTOBEY  (path)  (messid)  task  action  value
+
+ Send an OBEY message to an ADAM task and return the path and message-id.
+ Used in conjunction with ENDOBEY to set up multiple concurrent actions in
+ a D-task.
+
+   path - An ICL variable to receive the path associated with the action.
+
+   messid - An ICL variable to receive the message identifier associated 
+            with the action.
+
+   task - The task to which the OBEY message will be sent.
+
+   action - The action to be executed.
+
+   value - Any parameters associated with the action.
+
+1 TASKS
+
+   TASKS
+
+ List all loaded ADAM tasks.
+
+                                       
+1 WRITE
+
+    WRITE  intname  p2  p3  ....
+
+The parameters of WRITE are concatenated and written to the text file
+of name intname. This file must have been previously opened with an
+APPEND or CREATE command.
+
+1 WAIT
+
+    WAIT  interval
+
+Wait for a specified interval expressed in seconds.
+                             
+1 *REPFILE
+
+    REPFILE  [logfile]  [DTNS]
+
+ Examine a logfile
+
+ logfile -  Name of the logfile to be examined - defaults to
+            ADAM_LOGFILE
+
+ DTNS  -  String specifying which items in each log record are displayed.
+          D = Date, T = Time, N = Name, S = String.
+          replace letters of unwanted items - e.g. xTxS causes only the
+          time and string to be displayed.
+
+1 *REPORT
+
+    REPORT  [logfile]
+
+ Turn on reporting. After reporting has been turned on a log of input/output
+ and ADAM message system traffic is written to the file specified by logfile.
+ If the parameter is omitted the name ADAM_LOGFILE is used. In the standard
+ system, logical name ADAM_LOGFILE is defined as ADAM_USER:ADAM.LOG. The 
+ logfile may  be examined using the REPFILE command or the ADAM_EXE:LISTLOG
+ task which may be used to produce a printable file. 
+ 
+ The command NOREP turns off reporting.
+
+1 PUTNBS
+
+   PUTNBS  nbsname  value
+
+ Write the value of an NBS noticeboard item
+
+ nbsname - The name of the noticeboard item to be written.
+
+ value - The new value for the item.
+
+ The noticeboard name must correspond to an EXISTING primitive NBS item
+ with one of the standard HDS types (e.g. _INTEGER).   A dot notation is
+ used to specify structure components (e.g. NOTICEBOARD.ITEM1.ITEM2).
+ If the primitive item is an array, only the first component is accessed.
+
+ ICL will not create the noticeboard item and it is also the responsibility 
+ of the task performing NBS creation to ensure that the space allowed is 
+ suitable to hold the required ICL values.
+
+1 READ
+
+   READ  intname   (string)
+
+ Read a line from a text file.
+
+ intname  -  The internal name of the text file. The file must have
+             been opened with the OPEN command.
+
+ string   -  A variable into which the input string will be read.
+
+1 READI
+
+
+    READI  intname  (i)  (j)  ....
+
+ Read a line of integers from a text file.
+
+
+ intname  -  The internal name of the text file. The file must have
+             been opened with the OPEN command.
+
+ i,j etc  -  The variables into which integers will be read.
+
+
+1 READL
+
+
+    READL  prompt  (l)  (m)  ....
+
+ Read a line of logical values from a text file.
+
+ intname  -  The internal name of the text file. The file must have
+             been opened with the OPEN command.
+
+ l,m etc  -  The variables into which logical values will be read.
+
+ The logical values may be input as YES, NO, TRUE, FALSE or any
+ abbreviation of these, in either upper or lower case.
+
+
+1 READR
+
+    READR  intname  (x)  (y)  ....
+
+ Read a line of real numbers from a text file
+
+
+intname  -  The internal name of the text file. The file must have
+            been opened with the OPEN command.
+
+x,y etc  -  The variables into which the numbers will be read.
+
+1 OPEN
+                                       
+   OPEN  intname  [filename]
+
+ Open an existing text file for input. 
+
+ intname  -  The internal name by which the file will be known
+             within ICL.
+
+ filename  -  The VMS file name of the file. If omitted the
+              file name will be intname.DAT.
+
+1 *NOREP
+
+   NOREP
+
+ Turn off reporting. Reporting is turned on by the REPORT command.
+ 
+1 KEY
+
+    KEY  keyname  equivalence_string
+         
+ Define an equivalence string for a key
+
+ keyname  -  The name of the key 
+
+ equivalence_string  -  The equivalence string for the key. A #
+              character may be used to indicate a RETURN character
+              terminating the string.
+
+ The KEY command may be used at any time but the definition is only
+ effective when screen mode is in use.
+
+1 KEYTRAP
+
+    KEYTRAP   keyname 
+         
+ Specify trapping of a key
+
+ keyname  -  The name of the key 
+
+ The KEYTRAP command may be used at any time but the definition is only
+ effective when screen mode is in use. The INKEY function is used to test
+ for the pressing of a trapped key.
+
+1 KEYUSER
+
+    KEYUSER  keyname  image  routine
+         
+ Associate key with a user written subroutine in a shareable image
+
+ keyname  -  The name of the key
+
+ image    - logical name of the shareable image 
+                                     
+ routine  - name of the subroutine to be called. This must be a universal
+            symbol of the shareable image.
+
+ The KEYUSER command may be used at any time but the definition is only
+ effective when screen mode is in use. KEYUSER causes the specified routine
+ to be called at AST level immediately the key is pressed. If necessary the
+ shareable image is activated dynamically
+ 
+1 GETNBS
+
+   GETNBS   nbsname  (variable)
+
+Get the value of a noticeboard item
+
+ nbsname  - The name of the noticeboard item to be got.
+            A dot notation is used to specify structure components 
+            (e.g. NOTICEBOARD.ITEM1.ITEM2).
+            The item must be one of the standard HDS types (i.e. _CHAR,
+            _DOUBLE, _INTEGER, _REAL or _LOGICAL).
+
+ variable - An ICL variable to receive the result.
+
+1 CLEAR
+
+   CLEAR  first  last
+
+ In screen mode the range of lines on the screen between first and last
+ are cleared.
+
+1 CLOSE
+                                       
+   CLOSE  intname
+
+ Close a text file previously opened with CREATE, OPEN or APPEND.
+
+ intname  -  The internal name of the file.
+
+
+1 CREATE
+                                       
+   CREATE  intname  [filename]
+
+ Create a text file and open it for output.
+
+ intname  -  The internal name by which the file will be known
+             within ICL.
+
+ filename  -  The VMS file name of the file. If omitted the
+              file name will be intname.DAT.
+
+
+1 APPEND
+                                       
+   APPEND  intname  [filename]
+
+ Open an existing text file for output. Output will be appended to the
+ existing text.
+
+ intname  -  The internal name by which the file will be known
+             within ICL.
+
+ filename  -  The VMS file name of the file. If omitted the
+              file name will be intname.DAT.
+
+1 CREATEGLOBAL
+
+   CREATEGLOBAL parname type
+
+Create an ADAM global parameter.
+
+  parname - The name of the global parameter to be created. If a parameter
+            of this name already exists it will be deleted.
+
+  type    - The type of the parameter to be created. Must be one of
+            _REAL, _INTEGER, _DOUBLE, _LOGICAL, _CHAR*n (where n is
+            an integer) or ADAM_PARNAME.
+The GLOBAL file will be created if it does not exist.
+1 *SAVEINPUT
+
+   SAVEINPUT  lines  filename
+
+Save previous input lines in a text file. 'lines' specifies the number of 
+lines  to  be saved,  and 'filename' is the file in which they are saved. 
+If  'filename'  is omitted it defaults to  `saveinput.icl' in the default
+directory. If 'lines' is omitted the entire input buffer is saved.
+
+1 UNSETENV
+
+    UNSETENV var
+
+Unsets environment variable `var' for the ICL process.
+
+Note that this is an ICL command, not a shell command, and environment 
+variables un-defined in this way will be un-defined for processes 
+subsequently created by ICL.

@@ -1,0 +1,49 @@
+*+  UFACE_CMN - UFACE common block for terminal i/o.
+*   JAC::REVA 23May84
+*   02.04.1985:  UFACE version (REVAD::BDK)
+*   18.12.1985:  add LOGSTATE for controlling logging and SHTASK for 
+*                controlling display of taskname (REVAD::BDK)
+*   19.12.1985:  add LOGFILE, LOGON, EAVESON and EAVESFILE (REVAD::BDK)
+*   20.06.1986:  add VMS_BATCH (REVAD::BDK)
+*   01.06.1990:  add LCOUNT and PAGSIZ (RLVAD::AJC)
+*   19.05.1992:  rename LCOUNT and PAGSIZ (RLVAD::AJC)
+*    9.12.1993:  Mod for Unix - make TERMCHAN INTEGER not INTEGER*2
+*                               Remove IOSB (RLVAD::AJC)
+*-
+      INTEGER TERMCHAN         !  terminal input channel
+
+      LOGICAL LINE_INPUT       ! .false => single-character terminal 
+                               !           input
+
+      CHARACTER*1 INCHAR       !  input character
+
+      CHARACTER*80 INBUF       !  input line
+
+      INTEGER LOGSTATE         ! bit-pattern storing what categories of 
+                               ! output are copied to the logfile
+
+      INTEGER LOGFILE          ! FORTRAN unit for logfile
+
+      LOGICAL LOGON            ! .TRUE> => logging enabled
+
+      LOGICAL EAVESON          ! .TRUE. => enable writing log to file 
+                               ! for remote eavesdropping
+
+      INTEGER EAVESFILE        ! FORTRAN unit for eavesfile
+
+      LOGICAL SHTASK           ! .TRUE. => prompts and messages are 
+                               ! prefixed by the taskname
+
+      LOGICAL VMS_BATCH        ! .TRUE. => ADAMCL is being run as a VMS 
+                               ! batch job
+                               ! .FALSE. => run from terminal
+
+      INTEGER UFACEPGSZ        ! Page size of help screen
+
+      INTEGER UFACELCNT        ! Help line down counter
+
+      COMMON / UFACEG01 / TERMCHAN, LINE_INPUT
+      COMMON / UFACEG02 / INCHAR, INBUF
+      COMMON / UFACEG04 / LOGSTATE, LOGFILE, LOGON, EAVESON, EAVESFILE
+      COMMON / UFACEG05 / SHTASK, VMS_BATCH
+      COMMON / UFACEG06 / UFACEPGSZ, UFACELCNT
