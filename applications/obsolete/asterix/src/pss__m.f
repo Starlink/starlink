@@ -1432,7 +1432,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       CALL PSS_MAP_TITLE( '^STR confidence upper limit map ', STATUS )
 
 *    Write map units
-      CALL BDI_PUTUNITS( MP_ID, IM_UNITS, STATUS )
+      CALL BDI_PUT0C( MP_ID, 'Units', IM_UNITS, STATUS )
 
 *    Convert confidence to delta-chisquared for upper limits map
       CALL MATH_CHISQD( REAL(1.0D0-CONF/100.D0), 1, DELSTAT, STATUS )

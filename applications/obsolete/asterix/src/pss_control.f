@@ -128,7 +128,7 @@
         IF ( BPRIM ) THEN
 
 *        Check only one element
-          CALL BDI_SIZE( BG_ID, BNELM, STATUS )
+          CALL BDI_GETNEL( BG_ID, BNELM, STATUS )
           IF ( BNELM .NE. 1 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ','Background must be file or single '/
