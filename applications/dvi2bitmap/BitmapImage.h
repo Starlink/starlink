@@ -28,7 +28,11 @@ class BitmapImage {
     static BitmapImage *newBitmapImage
 	(const string format, const int w, const int h, const int bpp=1);
     static bool supportedBitmapImage (const string format);
-    static const string defaultBitmapImageFormat;
+    // Return default bitmap format
+    static const char* defaultBitmapImageFormat();
+    // After a call to defaultBitmapImageFormat, successive calls to
+    // otherBitmapImageFormat return further allowable formats.
+    static const char* otherBitmapImageFormat();
     static void verbosity (const verbosities level) { verbosity_ = level; }
 
  protected:
@@ -43,6 +47,9 @@ class BitmapImage {
     static const string *softwareversion;
     static const string *inputfilename;
     static const string *furtherinfo;
+    static const char* formats[];
+    static const int nformats;
+    static int iterator_index;
     static verbosities verbosity_;
 };
 #endif // #ifndef BITMAPIMAGE_HEADER_READ
