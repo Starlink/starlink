@@ -116,6 +116,7 @@
 
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU identifier
+      INTEGER			KCID			! Keyword container
       INTEGER			LUN			! Logical unit
       INTEGER			NKEY			! Number of keywords
 *.
@@ -133,10 +134,12 @@
       CALL ADI2_GETLUN( FID, LUN, STATUS )
 
 *  Reserve space for keywords
-      CALL ADI_NCMP( HID, NKEY, STATUS )
+      CALL ADI_FIND( HID, 'Keys', KCID, STATUS )
+      CALL ADI_NCMP( KCID, NKEY, STATUS )
       IF ( NKEY .GT. 0 ) THEN
         CALL FTHDEF( LUN, NKEY, FSTAT )
       END IF
+      CALL ADI_ERASE( KCID, STATUS )
 
 *  Define BINTABLE extension
       FSTAT = 0

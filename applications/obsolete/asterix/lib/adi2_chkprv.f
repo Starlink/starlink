@@ -101,12 +101,10 @@
 	INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*8		HDU			! HDU name
-      CHARACTER*20		HDUTYPE			! HDU type
-      CHARACTER*6		STR			!
-
       INTEGER			FSTAT			! FITSIO status
+      INTEGER			HDUTYPE			! Type of HDU
       INTEGER			IHDU			! Loop over HDUs
+      INTEGER			KCID			! Keyword container
       INTEGER			LUN			! Logical unit
       INTEGER			NKEY			! Keyword count
       INTEGER			OHID			! Old HDU object
@@ -132,15 +130,10 @@
 *    Initialise for this HDU
         FSTAT = 0
         MOVED = .FALSE.
+        NKEY = 0
 
 *    Locate an HDU by its consecutive number
-        IF ( IHDU .EQ. 1 ) THEN
-          HDU = ' '
-        ELSE
-          WRITE( STR, '(A,I1.1)' ) '.HDU_', IHDU
-          CALL ADI_CGET0C( FID, STR, HDU, STATUS )
-        END IF
-        CALL ADI2_LOCHDU( FID, HDU(:max(1,CHR_LEN(HDU))), OHID, STATUS )
+        CALL ADI2_LOCIHD( FID, IHDU, OHID, STATUS )
 
 *    Is the definition incomplete?
         CALL ADI_CGET0L( OHID, 'DefEnd', DEFEND, STATUS )
@@ -161,10 +154,15 @@
 
 *        Create it if it doesn't exist
             IF ( .NOT. CREATED ) THEN
+
+*          Move to the IHDU'th HDU
+              CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
+              MOVED = .TRUE.
+              IF ( FSTAT .EQ. 107 ) FSTAT = 0
               IF ( IHDU .GT. 1 ) THEN
                 CALL FTCRHD( LUN, FSTAT )
               END IF
-              CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
+
               IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN
                 CALL ADI2_FITERP( FSTAT, STATUS )
                 GOTO 99
@@ -172,30 +170,34 @@
                 FSTAT = 0
               END IF
 
-              MOVED = .TRUE.
               CALL ADI_CPUT0L( OHID, 'Created', .TRUE., STATUS )
 
-*          Reserve some keyword space too
-              CALL ADI_NCMP( OHID, NKEY, STATUS )
+*          Locate the keywords structure
+              CALL ADI_FIND( OHID, 'Keys', KCID, STATUS )
 
-            ELSE
-              NKEY = 0
+*          How many components?
+              CALL ADI_NCMP( KCID, NKEY, STATUS )
+
+*          Release keywords structure
+              CALL ADI_ERASE( KCID, STATUS )
 
             END IF
 
 *        There is no definition, however, so create a default one
+	    CALL FTPDEF( LUN, 8, 0, 0, 0, 1, FSTAT )
             CALL FTPHPR( LUN, .TRUE., 8, 0, 0, 0, 1, .TRUE., FSTAT )
 
 *        Reserve keyword space?
             IF ( NKEY .GT. 0 ) THEN
               CALL FTHDEF( LUN, NKEY, FSTAT )
             END IF
-	    CALL FTRDEF( LUN, FSTAT )
+c	    CALL FTRDEF( LUN, FSTAT )
             IF ( FSTAT .NE. 0 ) THEN
               CALL ADI2_FITERP( FSTAT, STATUS )
             END IF
 
 *        Mark as defined
+            CALL ADI_CPUT0L( OHID, 'DefStart', .TRUE., STATUS )
             CALL ADI_CPUT0L( OHID, 'DefEnd', .TRUE., STATUS )
 
           END IF
@@ -206,7 +208,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Write keywords?
-          IF ( WRKEYS ) THEN
+          IF ( (NKEY .GT. 0) .OR. WRKEYS ) THEN
 
 *        Move to HDU unless already there
             IF ( .NOT. MOVED ) THEN
