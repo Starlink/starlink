@@ -12,7 +12,7 @@
 	>Norman Gray
 
 <manualtype users>
-<softwareversion>0.9
+<softwareversion>0.9-2
 
 <docnumber>71
 
@@ -60,6 +60,10 @@ colours, and strut).
 <distribution string="0.9" date="11-Jun-2000" author=ng versionid="v0-9">
 Minor functionality changes, but significant interface changes, so new
 version.
+</distribution>
+
+<distribution string="0.9-2" date='12-Jun-2000' author=ng versionid="v0-9-2">
+Bugfix release.
 </distribution>
 
 </history>
@@ -144,7 +148,8 @@ and then this program can scoot through it turning each page into a
 bitmap.  I had thought about some complicated scheme to delimit areas
 on the page, but realised that since the file being processed would
 typically be generated on the fly specifically for processing by a
-tool like this, this wasn't really necessary.
+tool like this, this wasn't really necessary.  See <ref
+id=developments/> for a script which can help with this.
 
 <p>I hope that the program is (or can be made to be) flexible enough
 to support other modes of use.
@@ -900,8 +905,20 @@ equivalent to <code>./configure --enable-kpathsea --enable-png
 --enable-mktexpk</code> (meaning that kpathsea and PNG output will be
 enabled if library support for them is found).
 
-<p>The program builds successfully on (at least) egcs-2.90, Sun Workshop
-C++ 5.0, and Alpha Compaq C++ 6.2.  It should be written in
+<p>The program builds successfully on (at least):
+<tabular>
+<tgroup cols="2">
+<thead>
+<row><entry>Platform<entry>Compiler
+<tbody>
+<row><entry>i686-pc-linux-gnu (RedHat 6.0)<entry>egcs-2.91.66
+<row><entry>powerpc-mac-linux-gnu (mklinux DR-0.3?)<entry>gcc 2.8.1?
+<row><entry>sparc-sun-solaris2.7<entry>egcs-2.91.66
+<row><entry>sparc-sun-solaris2.7<entry>gcc 2.8.1
+<row><entry>sparc-sun-solaris2.7<entry>WorkShop Compilers 5.0 98/12/15 C++ 5.0
+<row><entry>alpha-dec-osf4.0f<entry>Compaq C++ V6.2-024 for Digital UNIX V4.0F
+</tabular>
+It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
 conformant as I think it is (in which case please tell me), (2) your
 compiler is not as conformant as you think it is (in which case please
@@ -939,7 +956,7 @@ web2c directory (which is the bulk of the distribution).  Configure
 and build it as usual, ignoring the warnings about the missing main
 <code/texmf> tree.
 
-<sect id=developments export>Bugs, and further developments
+<sect id=developments export>Bugs, extras, and further developments
 <update versionid=v0-7-1>Added bugreport address</update>
 
 <p>Bugs:
@@ -960,12 +977,17 @@ have enabled.
 <ul>
 <li>There are an <em/awful> lot of options, aren't there.
 <li>Support PBM graphics.
-<li>Support for different colours of output, controllable through specials.
 <li>Ermmm, any suggestions?
 
 </ul>
 
-<p>Bright ideas, fixes and (especially) implementations, cheerfully received.
+<p>Bright ideas, fixes and (especially) implementations, cheerfully
+received.
+
+<p>In the <code type=fspath>.../extras</code> directory of the
+distribution is a script <code>img-eqlist.pl</>, which transforms a
+file of LaTeX fragments into a LaTeX file, keeping track of
+filenames, and avoiding generating duplicate bitmaps for duplicated maths.
 
 <sect id=refs export>References and acknowledgements
 

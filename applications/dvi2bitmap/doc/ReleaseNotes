@@ -1,3 +1,14 @@
+<subsect id=rn-0.9-2 export>Release 0.9-2
+
+<p>Bugfix release.  The program was crashing on Suns, when built with
+gcc 2.8.1.  I'm not sure I found any underlying problem, but I fixed
+something, which stopped it crashing for me (Mmmm...).
+
+<p>This release adds a script <code>img-eqlist.pl</>, to transform
+a file of LaTeX maths fragments into a LaTeX file, keeping track of
+filenames, and avoiding generating duplicate bitmaps for duplicated
+maths.  See <ref id=developments/>.
+
 <subsect id=rn-0.9 export>Release 0.9
 
 <p>No big changes, but a sufficiently significant change in the
@@ -15,7 +26,8 @@ scripts parsing the previous version's output would break.
 <li>Options <code/-Rf> and <code/-Rb> added (see <ref
 id=usage.options.r/>), to set the foreground and 
 background colours on the command line, rather than just using the
-<ref id=usage.special.fg>foreground special</ref>
+<ref id=usage.special.fg>foreground special</ref>.  This is still a
+bit rudimentary, as it can be done only once, for the whole document.
 
 <li>Some improvements to the PNG output, so that when transparent PNGs
 are viewed against their `natural' background, they look the same as
