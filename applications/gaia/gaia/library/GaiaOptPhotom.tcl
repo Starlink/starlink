@@ -548,7 +548,7 @@ itcl::class gaia::GaiaOptPhotom {
    method define_psf_sky {} {
       $itk_component(DefinePSFSky) configure -state disabled
       $itk_component(DefinePSFSky) configure -relief sunken
-      $object_psf_ create_sky_region
+      $psf_list_ create_sky_region
    }
 
    #  Close window checking first if measurements have been
@@ -743,14 +743,18 @@ itcl::class gaia::GaiaOptPhotom {
          if { [lindex $args 0] == "annulus" } {
             set skymethod_($this) 1
             $itk_component(DefineSky) configure -state disabled
+            $itk_component(DefinePSFSky) configure -state disabled
          } else {
             set skymethod_($this) 0
             $itk_component(DefineSky) configure -state normal
             $itk_component(DefineSky) configure -relief raised
+            $itk_component(DefinePSFSky) configure -state normal
+            $itk_component(DefinePSFSky) configure -relief raised
          }
       } else {
          if { $skymethod_($this) } {
             $itk_component(DefineSky) configure -state disabled
+            $itk_component(DefineSPSFky) configure -state disabled
             configure -annulus 1
          } else {
             configure -annulus 0
@@ -837,6 +841,7 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -canvasdraw canvasdraw CanvasDraw {} {
       if { $object_list_ != {} } {
          $object_list_ configure -canvasdraw $itk_option(-canvasdraw)
+         $psf_list_ configure -canvasdraw $itk_option(-canvasdraw)
       }
    }
 
@@ -844,6 +849,7 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -canvas canvas Canvas {} {
       if { $object_list_ != {} } {
          $object_list_ configure -canvas $itk_option(-canvas)
+         $psf_list_ configure -canvas $itk_option(-canvas)
       }
    }
 
@@ -851,6 +857,7 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -rtdimage rtdimage RtdImage {} {
       if { $object_list_ != {} } {
          $object_list_ configure -rtdimage $itk_option(-rtdimage)
+         $psf_list_ configure -rtdimage $itk_option(-rtdimage)
       }
    }
 
@@ -858,6 +865,7 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -annulus annulus Annulus 1 {
       if { $object_list_ != {} } {
          $object_list_ configure -annulus $itk_option(-annulus)
+         $psf_list_ configure -annulus $itk_option(-annulus)
       }
    }
 
@@ -865,6 +873,7 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -shape shape Shape circle {
       if { $object_list_ != {} } {
          $object_list_ configure -shape $itk_option(-shape)
+         $psf_list_ configure -shape $itk_option(-shape)
       }
    }
 
@@ -872,6 +881,7 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -linewidth linewidth LineWidth 1 {
       if { $object_list_ != {} } {
          $object_list_ configure -linewidth $itk_option(-linewidth)
+         $psf_list_ configure -linewidth $itk_option(-linewidth)
       }
    }
 
@@ -903,17 +913,17 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
    itk_option define -psf_deselected_colour psf_deselected_colour Psf_deselected_colour {green} {
-      if { $object_list_ != {} } {
+      if { $psf_list_ != {} } {
          $psf_list_ configure -deselected_colour $itk_option(-psf_deselected_colour)
       }
    }
    itk_option define -psf_selected_sky_colour psf_selected_sky_colour Psf_selected_skycolour {red} {
-      if { $object_list_ != {} } {
+      if { $psf_list_ != {} } {
          $psf_list_ configure -selected_sky_colour $itk_option(-psf_selected_sky_colour)
       }
    }
    itk_option define -psf_deselected_sky_colour psf_deselected_sky_colour Psf_deselected_skycolour {red} {
-      if { $object_list_ != {} } {
+      if { $psf_list_ != {} } {
          $psf_list_ configure -deselected_sky_colour $itk_option(-psf_deselected_sky_colour)
       }
    }
