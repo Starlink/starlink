@@ -327,6 +327,9 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *       - Added axis-specific graphical elements "axis1", "axis2", etc.
 *       - FullForm returns a match without ambiguity if the test string
 *       matches an option exactly, including length.
+*     31-JAN-2002 (DSB):
+*       - Added RejectOOB to reject tick marks which are not in their primary 
+*       domain.
 *class--
 */
 
@@ -342,7 +345,7 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
 /* Macros to check for equality of floating point values. */
-#define EQUAL(aa,bb) (fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))
+#define EQUAL(aa,bb) (fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_EPSILON))
 
 /* Values for constants used in this class. */
 #define CRV_NSEG       14 /* No. of curve segments drawn by function Crv */
@@ -1438,7 +1441,7 @@ static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
-static int FindMajTicks( AstFrame *, int, double, double , double *, int, double *, double ** );
+static int FindMajTicks( AstMapping *, AstFrame *, int, double, double , double *, int, double *, double ** );
 static int FindMajTicks2( int, double, double, int, double *, double ** );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FullForm( const char *, const char *, const char *, const char *, const char * );
@@ -1446,6 +1449,7 @@ static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **,
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
 static int Overlap( AstPlot *, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
+static int RejectOOB( AstMapping *, double, AstFrame *, int, double *, int );
 static int UseColour( AstPlot *, int );
 static int UseFont( AstPlot *, int );
 static int UseStyle( AstPlot *, int );
@@ -9521,9 +9525,9 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 }
 
-static int FindMajTicks( AstFrame *frame, int axis, double refval, 
-                         double gap, double *cen, int ngood, double *data, 
-                         double **tick_data ){
+static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis, 
+                         double refval, double gap, double *cen, int ngood, 
+                         double *data, double **tick_data ){
 /*
 *  Name:
 *     FindMajTicks
@@ -9536,8 +9540,9 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
 
 *  Synopsis:
 *     #include "plot.h"
-*     int FindMajTicks( AstFrame *frame, int axis, double refval, double gap, 
-*                       double *cen, int ngood, double *data, double **tick_data )
+*     int FindMajTicks( AstMapping *map, AstFrame *frame, int axis, 
+*                       double refval, double gap, double *cen, int ngood, 
+*                       double *data, double **tick_data )
 
 *  Class Membership:
 *     Plot member function.
@@ -9569,9 +9574,14 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
 *     The returned tick mark values are normalised using the astNorm
 *     method for the supplied Frame. The other axis is assigned the value
 *     "refval" during the normalisation. Duplicate tick marks values are
-*     removed from the returned list.
+*     removed from the returned list, as are tick marks which are outside 
+*     their primary domain (as indicated by the fact that they change
+*     significantly when mapped into the GRAPHICS frame and then back into
+*     the current Frame).
 
 *  Parameters:
+*     map 
+*        Mapping from the Plot Base Frame to Plot Current Frame.
 *     frame
 *        Pointer to the Frame.
 *     axis 
@@ -9686,6 +9696,13 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
 
 /* Modify the number of ticks to exclude the duplicate ones. */
       nticks = (int) ( w - ticks ) + 1;
+
+/* We now get rid of any ticks which are out-of-bounds (i.e. not in their 
+   primary domain). All ticks are transformed into the Base Frame, and then 
+   back into the Current Frame and normalized. If this process changes any 
+   tick mark significantly, then the tick mark is removed from the array. */
+      nticks = RejectOOB( map, refval, frame, axis, ticks, nticks );
+
    }
 
 /* If an error has occurred, free the memory holding the major tick mark
@@ -9702,7 +9719,6 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
    return nticks;
 
 }
-
 static int FindMajTicks2( int nfill, double gap, double centre, int ngood, 
                           double *data, double **tick_data ){
 /*
@@ -11633,12 +11649,13 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
    double used_gap;          /* The used gap size */
 
    static AstFrame *frame;          /* Pointer to the current Frame */
+   static AstMapping *map;          /* Pointer to Base->Current Mapping */
    static AstPointSet *pset=NULL;   /* Pointer to a PointSet holding physical coords */
    static double **ptr;             /* Pointer to physical coordinate values */
    static double defgaps[ 2 ];      /* Initial test gaps for each axis */
    static double mean[ 2 ];         /* Mean value on each axis */
    static int maxticks;             /* Max. number of ticks on each axis */
-   static int mintick;             /* Min. number of ticks on each axis */
+   static int mintick;              /* Min. number of ticks on each axis */
    static int ngood[ 2 ];           /* No. of good physical values on each axis */
    static int bad;                  /* Were any bad pixels found? */
 
@@ -11650,6 +11667,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 /* If a NULL pointer has been supplied for "this", release the resources
    allocated on the first call to this function, and return. */
    if( !this ){
+      map = astAnnul( map );
       pset = astAnnul( pset );
       frame = astAnnul( frame );
       return 0.0;
@@ -11660,6 +11678,9 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 
 /* If this is the first call to this function, do some initialisation. */
    if( !pset ){
+
+/* Get the Mapping from Base to Current Frame in the Plot. */
+      map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* Get a pointer to the current Frame from the Plot. */
       frame = astGetFrame( this, AST__CURRENT );
@@ -11727,7 +11748,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
    data first. */
          if( *ticks ) *ticks = astFree( *ticks );
          if( cen ) *cen = cen0;
-         *nmajor = FindMajTicks( frame, axis, mean[ 1 - axis ], used_gap, cen, 
+         *nmajor = FindMajTicks( map, frame, axis, mean[ 1 - axis ], used_gap, cen, 
                                  ngood[ axis ], ptr[ axis ], ticks );
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
@@ -11767,7 +11788,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 
 /* Find where the major ticks should be put. */
       if( cen ) *cen = cen0;
-      *nmajor = FindMajTicks( frame, axis, mean[ 1 - axis ], used_gap, cen, 
+      *nmajor = FindMajTicks( map, frame, axis, mean[ 1 - axis ], used_gap, cen, 
                               ngood[ axis ], ptr[ axis ], ticks );
 
    }
@@ -17411,7 +17432,176 @@ f        The global status.
    return;
 
 }
+static int RejectOOB( AstMapping *map, double refval, AstFrame *frame, 
+                      int axis, double *ticks, int nticks ) {
+/*
+*  Name:
+*     RejectOOB
 
+*  Purpose:
+*     Reject out-of-bounds major tick values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int RejectOOB( AstMapping *map, double refval, AstFrame *frame, 
+*                    int axis, double *ticks, int nticks )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function searches the supplied array of candidate major tick
+*     values. It removes any ticks which are out-of-bounds (i.e. not in their 
+*     primary domain). The check is performed as follows: All ticks are 
+*     transformed into the Base Frame, and then back into the Current Frame 
+*     and normalized. If this process changes any tick mark significantly, 
+*     then the tick mark is removed from the array.
+
+*  Parameters:
+*     map 
+*        Mapping from the Plot Base Frame to Plot Current Frame.
+*     refval
+*        Value to use for the other axis (index [1-axis]) when normalising
+*        the tick mark values.
+*     frame
+*        Pointer to the Current Frame.
+*     axis 
+*        Zero-based index of the axis being used.
+*     ticks 
+*        A pointer to an array holding the candidate major tick values.
+*        These should have been normalized using the astNorm method of the 
+*        supplied Frame. On exit, any out-of-bounds values are replaced by
+*        AST__BAD and shuffled to the end of the array.
+*     nticks
+*        The number of values in the array pointed to by "ticks".
+
+*  Returned Value:
+*     The number of good values in the "ticks" array on exit. This will be 
+*     less than or equal to "nticks".
+
+*/
+
+/* Local Variables: */
+   AstPointSet *pset1;/* AstPointset holding current Frame positions */
+   AstPointSet *pset2;/* AstPointset holding base Frame positions */
+   double **ptr1;     /* Pointer to pset1 data */
+   double *a;         /* Pointer to next value */
+   double *b;         /* Pointer to next value */
+   double *c;         /* Pointer to next value */
+   double dst;        /* Distance between two points */
+   double lim;        /* Max. distance between 2 points for them to be 
+                         considered co-incident */
+   double val[ 2 ];   /* Axis values to be normalised */
+   double val2[ 2 ];  /* Original axis values */
+   int i;             /* Tick mark index */
+   int j;             /* Tick mark index */
+   int cha;           /* Has "the axis" changed? */
+   int chb;           /* Has "the other axis" changed? */
+   int reject;        /* Reject this tick? */
+
+/* Check the global error status. */
+   if ( !astOK ) return nticks;
+
+/* Create a pointset holding the supplied positions. */
+   pset1 = astPointSet( nticks, 2, "" );
+   ptr1 = astGetPoints( pset1 );
+   a = ptr1[ axis ];
+   b = ptr1[ 1 - axis ];
+   for( i = 0; i < nticks; i++){
+      *(a++) = ticks[ i ];
+      *(b++) = refval;
+   }
+
+/* Transform the supplied positions into the Base Frame. */
+   pset2 = astTransform( map, pset1, 0, NULL );
+
+/* Transform the Base Frame positions back into the Current Frame. */
+   astTransform( map, pset2, 1, pset1 );
+
+/* Check each position. */
+   a = ptr1[ axis ];
+   b = ptr1[ 1-axis ];
+   c = ticks;
+   i = 0;
+   while( i < nticks ){
+
+/* Normalize the transformed position. */
+      val[ axis ] = *a;
+      val[ 1-axis ] = *b;
+      astNorm( frame, val );
+
+/* See which axes have changed significantly. */
+      cha = !EQUAL( val[ axis ], *c );
+      chb = !EQUAL( val[ 1-axis ], refval );
+
+/* Reject the tick if *both* axes have changed. */
+      if( cha && chb ) {
+         reject = 1;
+
+/* Reject the tick if *either* axis is bad. */
+      } else if( val[ axis ] == AST__BAD || val[ 1-axis ] == AST__BAD ) {
+         reject = 1;
+
+/* Do not reject the tick if *neither* axis has changed. */
+      } else if( !cha && !chb ) {
+         reject = 0;
+
+/* If just one axis has changed, this may be because we are at a
+   singularity (like the poles in a celestial coord system) at which
+   an axis value is undefined (e.g. RA is undefined at the equatorial 
+   poles). */
+      } else {
+
+/* Modify the value on the axis which has changed. The size of the 
+   modification is unimportant. We choose to modify the axis to the
+   mean of the original and changed values. */
+         if( cha ) {
+            val[ axis ] = 0.5*( val[ axis ] + *c );
+         } else {
+            val[ 1-axis ] = 0.5*( val[ 1-axis ] + refval );
+         }
+
+/* Find the geodesic distance from the modified position to the original
+   position. */
+/* If this is not significantly different to zero, then the modification to
+   the axis value has not changed the position in physical space, and so
+   we are at a singularity. Do not reject the tick value in this case. As
+   our "significant distance" we take a small fraction of the larger of
+   the two axis values. */
+         val2[ axis ] = *c;
+         val2[ 1-axis ] = refval;
+         dst = astDistance( frame, val2, val );
+         lim = 1.0E5*DBL_EPSILON*MAX( fabs( *c ), fabs( refval ) );
+         reject = ( dst > lim );
+      }
+
+/* If the tick is to be rejected, decrement the number of ticks
+   remaining, shuffle the remaining unchecked positions down one place, 
+   and fill the last position with a bad value. */
+      if( reject ) {
+         nticks--;
+         for( j = i; j < nticks; j++ ) ticks[ j ] = ticks[ j + 1 ];
+         ticks[ nticks ] = AST__BAD;
+
+/* Otherwise move on to check the next value. */
+      } else {
+	i++;
+        c++;
+      }
+      a++;
+      b++;
+   }
+
+/* Annul the PointSets. */
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
+
+/* Return the number of remaining ticks. */
+   return nticks;
+}
 static void RemoveFrame( AstFrameSet *this_fset, int iframe ) {
 /*
 *  Name:
