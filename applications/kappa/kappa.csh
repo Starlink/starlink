@@ -518,6 +518,49 @@ alias kap_picgrid     'picdef array 1.0 prefix=\"\"'
 alias kap_piclast     'piclist picnum=last'
 alias kap_picxy       'picdef xy 1.0'
 
+#--------------------------------------------------------------
+#  This next block ensures that new features in V0.13 are visible 
+#  without the user needing to do anything. It should be removed when
+#  V0.14 is released.
+
+#  We erase some current parameter values from the users ADAM
+#  directory. This is done so that the user will automatically be presented
+#  with new features in the DISPLAY application (such as annoated axes 
+#  and the clearing of the screen). Previous current values in the adam
+#  directory could stop these new features being used otherwise (for
+#  instance the user may have NO as the current value for DISPLAY
+#  parameter AXES). These parameters are only erased the first time 
+#  KAPPA V0.13 is started.
+
+#  Get the path to the ADAM directory.
+      if( $?ADAM_USER ) then
+         setenv adam $ADAM_USER
+      else
+         setenv adam $HOME/adam
+      endif
+
+#  See if this is the first time KAPPA V0.13 has been started. this is 
+#  indicated by the absence of a file called ".kappa_v13" in the ADAM
+#  directory.
+      if( ! -e $adam/.kappa_v13 ) then 
+
+#  If there is a file containing defaults for the DISPLAY application,
+#  erase the current values for parameters AXES and CLEAR.
+         if( -e $adam/display.sdf ) then 
+            $KAPPA_DIR/erase $adam/display.axes OK
+            $KAPPA_DIR/erase $adam/display.clear OK
+         endif
+
+#  If the ADAM directory exists, create the file .kappa_v13 which will
+#  prevent the parameters being cleared the next time KAPPA is started.
+         if( -e $adam ) then 
+            touch $adam/.kappa_v13
+         endif
+
+      endif
+ 
+#--------------------------------------------------------------
+
 #
 #  Tell the user that KAPPA commands are now available.
 
