@@ -19,7 +19,7 @@ The AMS C library routines are accessible directly or they can be
 accessed via wrapper routines that handle the most commonly used
 combinations.
 
-  The Starlink::ADAMTASK module can be used to provide higher level
+  The Starlink::AMS::Task module can be used to provide higher level
 access to AMS.
 
 =head1 Exported functions
@@ -86,7 +86,7 @@ sub AUTOLOAD {
     # Note that the default autoloader expects integer argument
     # if @_ contains something (this can be @_ from the calling routine!)
     # Since these routines only expect a single argument just pass a 0.
-    my $val = constant($constname, 0);
+    my $val = constant($constname);
 
     if ($! != 0) {
 	if ($! =~ /Invalid/) {
@@ -94,7 +94,7 @@ sub AUTOLOAD {
 	    goto &AutoLoader::AUTOLOAD;
 	}
 	else {
-		croak "Your vendor has not defined Starlink::ADAM macro $constname";
+		croak "Your vendor has not defined Starlink::ADAM constant $constname";
 	}
     }
     eval "sub $AUTOLOAD { $val }";
@@ -102,6 +102,14 @@ sub AUTOLOAD {
 }
 
 bootstrap Starlink::ADAM $VERSION;
+
+# Install optimised access method for compiler constant
+# This is only slightly better than the AUTOLOAD since the
+# AUTOLOAD also sets up a new command for each AUTOLOAD via eval...
+{
+  my $SAI__OK = &pSAI__OK();
+  eval "sub SAI__OK { $SAI__OK }";
+}
 
 # Preloaded methods go here.
 # These are wrappers to the AMS routines
@@ -120,7 +128,7 @@ Exit the adam messaging system.
 sub adam_exit {
 
   croak "Wrong # args: should be adam_exit()\n"
-    if (scalar(@_) > 2);
+    if (@_);
 
   # Exit AMS
   ams_exit();
@@ -762,14 +770,15 @@ They can be accessed as subroutines eg
 
 =head1 Other requirements
 
-  The Starlink::EMS module is also required.
+The Starlink::EMS module is also required.
 
 =head1 AUTHOR
 
-Tim Jenness (timj@jach.hawaii.edu), Copyright (c)1997.
+Tim Jenness (timj@jach.hawaii.edu), 
+Copyright (c) PPARC and Tim Jenness 1997, 1998.
 
 =head1 SEE ALSO
 
-perl(1). Starlink::EMS, Starlink::ADAMTASK
+perl(1). Starlink::EMS, Starlink::AMS::Task
 
 =cut
