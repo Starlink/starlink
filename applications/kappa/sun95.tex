@@ -8812,38 +8812,37 @@ a palette.
 your data from data processing or analysis.  Suppose that you are
 doing surface photometry of a bright galaxy, part of the data reduction
 is to measure the background contribution around the galaxy and to
-subtract it.  What you want to avoid is to include light from the galaxy
+subtract it.  You usually want to avoid inclusion of light from the galaxy
 in your estimation of the background.  A convenient method for doing
 this is to mask the galaxy during the background fitting.
 
 There are two techniques used for masking.  One employs special {\em
-bad\/} values, which are synonymous with {\em magic\/} or {\em
-invalid\/} values.  These appear within the data or variance arrays
-instead of the actual values, and indicate that the value is to be
-ignored or is undefined.  They are destructive and so some people
-don't like them, but you can always mask your data into a new,
-temporary NDF.  If bad values weren't used what is a programme
-supposed to do if it cannot compute a value, say divide by zero?  With
-a little care, bad values are quite effective and they are used
-throughout {\footnotesize KAPPA}.  By its nature, a bad value can only
-indicate a logical condition about a data element---it is either good
-or bad---and so this technique is sometimes called {\em flagging}.
+bad\/} values (also known as {\em magic\/} or {\em invalid\/} values).
+These appear within the data or variance arrays in place of the actual
+values, and indicate that the pixel is to be ignored or is undefined.
+They are destructive\footnote{That is, the special bad value replaces the
+original data values, and so the original data values are lost.} and so
+some people don't like them, but you can always mask your data into a
+new, temporary NDF.  With a little care, bad values are quite effective
+and they are used throughout {\footnotesize KAPPA}.  By its nature, a bad
+value can only indicate a logical, two-state condition about a data
+element---it is either good or bad---and so this technique is sometimes
+called {\em flagging}.
 
 In contrast, the second technique, uses a quality array.  This permits
-many more attributes or qualities of the data to be associated with
-each pixel.  In the current implementation there may be up to 255
-integer values or 8 1-bit logical.  Thus quality can be regarded as
-offering 8 logical masks extending over the data or variance arrays,
-and can signify the presence or absence of a particular property if
-the bit has value 1 or 0 respectively.  An application of quality to
-satellite data might include the detector used to measure the value,
-some indicator of the time each pixel was observed, was the
-observation made within the Earth's radiation belts, and whether or
-not the pixel contains a reseau mark.  By selecting only those data
-with the appropriate quality values, you process only the data with
-the desired properties.  This can be very powerful.  However, it does
-have the drawback of having to store at least an extra byte per pixel
-in your NDF.
+many more attributes or qualities of the data to be associated with each
+pixel.  In the current implementation there may be up to 255 integer
+values, or 8 single-bit logical flags.  Thus quality can be regarded as
+offering 8 logical masks extending over the data or variance arrays, and
+can signify the presence or absence of a particular property if the bit
+has value 1 or 0 respectively.  An application of quality to satellite
+data might include the detector used to measure the value, some indicator
+of the time each pixel was observed, was the observation made within the
+Earth's radiation belts, and whether or not the pixel contains a reseau
+mark.  By selecting only those data with the appropriate quality values,
+you process only the data with the desired properties.  This can be very
+powerful.  However, it does have the drawback of having to store at least
+an extra byte per pixel in your NDF.
 
 The two methods are {\em not\/} mutually exclusive; the NDF permits
 their simultaneous use in a dataset.
@@ -8869,47 +8868,49 @@ create an \xref{ASCII Region Definition}{sun183}{} (ARD) file.
 \small
 \begin{verbatim}
      % cat myard.ard
+     COFRAME(PIXEL)
      PIXEL( 23.5, -17.2 )
-     CIRCLE( -14.5, 318.7, 44.3 )
-     ELLIPSE( 75.2, 296.6, 33, 16, 78 )
+     ELLIPSE( 75.2, 296.6, 33, 16, 78 ) 
      POLYGON( 110, 115, 123, 132, 130, 125 )
      CIRCLE( 10, 10, 40 ) .AND. .NOT. CIRCLE( 10, 10, 30 )
+     COFRAME(SKY,SYSTEM=FK5,EQUINOX=2000)
+     CIRCLE( 10:09:12.2, -45:12:13, ::40 ) 
      CTRL/D
 \end{verbatim}
 \normalsize
 
 In this example, the regions are: the pixel with index [24,~$-$17] (note
-the rounding of \emph{pixel co-ordinates} to \emph{pixel indices}), a
-circle of radius 44.3 pixels about pixel co-ordinates (-14.5,~318.7),
-an ellipse centred at (75.2,~296.6) with semi-major axis of 33 pixels
-and semi-minor axis of 16 pixels, at orientation 78\dgs\ clockwise
-from the $x$ axis, and an annulus centred on pixel (10,~10) between
-radius 30 and 40 pixels.  There are several other keywords besides
-those shown here.  ARD also has a powerful syntax for combining
-regions, and you can set it up to use linear data co-ordinates or
-your co-ordinate system.  These are described fully in 
-\xref{SUN/183}{sun183}{}, but you'll be relieved to learn that there
-is a shortcut.
+the rounding of \emph{pixel co-ordinates} to \emph{pixel indices}), an
+ellipse centred at (75.2,~296.6) with semi-major axis of 33 pixels and
+semi-minor axis of 16 pixels, at orientation 78\dgs\ clockwise from the
+$x$ axis, and an annulus centred on pixel co-ordinates (10.0,~10.0)
+between radius 30 and 40 pixels. a circle centred on RA 10:09:12.2, and
+DEC -45:12:13 of radius 40 arc-seconds. The COFRAME statements indicate
+the coordinate system in which subsequent positions are supplied. There
+are several other keywords besides those shown here.  ARD has powerful
+syntax for combining regions and supplying WCS information, described
+fully in \xref{SUN/183}{sun183}{}, But you'll be relieved to learn that
+there is a shortcut...
 
 If you are dealing with 2-dimensional data, {\footnotesize KAPPA} offers an
 interactive graphical tool for generating ARD files.  To use
 \htmlref{ARDGEN}{ARDGEN} you must first display your data on a device
 with a cursor, such as an X-terminal.  \htmlref{DISPLAY}{DISPLAY}
 with a greyscale lookup table is probably best for doing that.
-The grey lets you see the coloured overlays clearly.
+The grey lets you see the coloured overlays clearly. The following
+exampel assumes that the current co-ordinate Frame in the NDF is PIXEL 
+({\em i.e.} pixel co-ordinates). Consequently all positions are shown
+below in pixel co-ordinates. If the current co-ordinate Frame in the NDF 
+was not PIXEL but (say) SKY, then ARDGEN would produce positions in SKY
+co-ordinates. The ARD file generated by ARDGEN always contains a description 
+of the co-ordinate system in which positions are specified, allowing later
+applications to interpret them correctly, and convert them (if necessary)
+into other co-ordinate systems.
 
 \small
 \begin{verbatim}
      % ardgen demo.ard
-
      Current picture has name: DATA, comment: KAPPA_DISPLAY.
-     Using NDF '/star/bin/kappa/ccdframec'
-
-     Instructions for using the cursor...
-        Press left button on mouse/trackerball to select a point.
-        Press middle button on mouse/trackerball to see current cursor co-ordinates.
-        Press right button on mouse/trackerball to end input.
-
      SHAPE - Region shape /'CIRCLE'/ >
 \end{verbatim}
 \normalsize
@@ -8920,8 +8921,11 @@ list.  Once you've selected a shape you'll receive instructions.
 \begin{verbatim}
      SHAPE - Region shape /'COLUMN'/ > ellipse
 
-     Region type is "ELLIPSE". Identify the centre, then one end of the semi-major
-     axis, and finally one other point on the ellipse.
+ Region type is "ELLIPSE". Identify the centre, then one end of the semi-major
+ axis, and finally one other point on the ellipse.
+
+    To select a position press the space bar or left mouse button
+    To exit press "." or the right mouse button
 \end{verbatim}
 \normalsize
 Once you have defined one ellipse, you can define another or exit to
@@ -8932,7 +8936,9 @@ a rotated box.
 \small
 \begin{verbatim}
      Region completed. Identify another 'ELLIPSE' region...
-     OPTION - Next operation to perform /'SHAPE'/ > rotbox
+     OPTION - Next operation to perform /'SHAPE'/ > shape
+     SHAPE - Region shape /'ELLIPSE'/ > rotbox
+
 
      Region type is "ROTBOX". Identify the two end points of any edge and then give
      a point on the opposite edge.
@@ -9046,7 +9052,9 @@ ARD file is created.  {\tt "Quit"} also leaves the programme, but
 the ARD file is not made.
 
 Having created the ARD file it is straightforward to generate a
-masked image with \htmlref{ARDMASK}{ARDMASK}.
+masked image with \htmlref{ARDMASK}{ARDMASK}. You can also plot the
+outline of the selected regions on top of a display image using 
+\htmlref{ARDPLOT}{ARDPLOT}. 
 
 \small
 \begin{verbatim}

@@ -543,20 +543,15 @@ For information on individual parameters, select from the list below:
 3 ARDFILE
 ARDFILE = FILENAME (Read)
    The name of the ARD file containing a description of the parts
-   of the image to be masked out, i.e. set to bad.  The suggested
-   default is the current value or ardfile.dat if there is no
-   current value.
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system to be used.  This can be either "World"
-   or "Data".  If COSYS = "World" the co-ordinates used in the
-   ARD file are pixel co-ordinates or indices.  If COSYS = "Data"
-   the co-ordinates used in the ARD file are interpreted as data
-   co-ordinates, provided the NDF contains axes that map onto
-   pixel co-ordinates using linear transformations.  If there are
-   no axes, pixel co-ordinates are assumed; if axes are present
-   but non-linear, the task fails.  COSYS="World" is recommended.
-   [Current co-ordinate system]
+   of the image to be masked out, i.e. set to bad. The co-ordinate
+   system in which positions within this file are given should be
+   indicated by including suitable COFRAME or WCS statements within
+   the file (see SUN/183), but will default to pixel co-ordinates
+   in the absence of any such statements. For instance, starting the
+   file with a line containing the text "COFRAME(SKY,System=FK5)" would
+   indicate that positions are specified in RA/DEC (FK5,J2000). The
+   statement "COFRAME(PIXEL)" indicates explicitly that positions are
+   specified in pixel co-ordinates.
 3 IN
 IN = NDF (Read)
    The name of the source NDF.
@@ -580,19 +575,14 @@ ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a
    and sets the pixels specified by the ARD description contained
    in ardfile.txt to the bad value.  The resultant image is
    output to the NDF called ic3374a.  The title is unchanged.
-
-ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
-   As the previous example except that the ARD file is
-   written using data co-ordinates.
 2 ASCII-region-definition_Descriptors
    The ARD file may be created by ARDGEN or written manually.  In the
    latter case consult SUN/183 for full details of the ARD
    descriptors and syntax; however, much may be learnt from looking
    at the ARD files created by ARDGEN and the ARDGEN documentation.
-   There is also a summary with examples in the main body of SUN/95
-   and the online help.
+   There is also a summary with examples in the main body of SUN/95.
 2 Related_Applications
-   KAPPA: ARDGEN.
+   KAPPA: ARDGEN, ARDPLOT, LOOK.
 2 Authors
 GJP: Grant Privett (STARLINK)
 
@@ -617,8 +607,19 @@ DSB: David S. Berry (STARLINK)
  1996 July 31 (MJC):
     Made ARDFILE have type FILENAME for IRAF usage.
 
+ 1997 December 12 (MJC):
+    Sets the bad-pixel flag to indicate the possible presence of
+    bad pixels in the output dataset.
+
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
+
+ 20-AUG-2001 (DSB):
+    Converted to ARD V2 by removing COSYS parameter.
+
+ 25-OCT-2001 (DSB):
+    Modified to make pixel coords the default coord system for ard
+    files.
 2 Implementation_Status
    -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
    LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
@@ -640,24 +641,24 @@ Usage:
 Description:
 
    This application draws the outlines of regions described in
-   a supplied 2-dimensional ARD file. The outlines are drawn over
-   the top of a previously displayed picture, aligned (if possible)
-   in the current coordinate Frame of the previously drawn picture.
+   a supplied 2-dimensional ARD file (an `ARD Description' - see
+   SUN/183). The outlines are drawn over the top of a previously
+   displayed picture, aligned (if possible) in the current coordinate
+   Frame of the previously drawn picture.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 ARDFILE
 ARDFILE = FILENAME (Read)
-   The name of the ARD file containing a description of the regions
+   The name of a file containing an `ARD Description' of the regions
    to be outlined. The co-ordinate system in which positions within
    this file are given should be indicated by including suitable
-   COFRAME or WCS statements within the file (see SUN/183). For
-   instance, starting the file with a line containing the text
-   "COFRAME(PIXEL)" will indicate that positions are specified in
-   pixel coordinates. The statement "COFRAME(SKY,System=FK5)" would
-   indicate that positions are specified in RA/DEC (FK5,J2000). If
-   no such statements are included, then it is assumed that positions
-   are given within the current co-ordinate system of the existing
-   DATA picture.
+   COFRAME or WCS statements within the file (see SUN/183), but will
+   default to pixel co-ordinates in the absence of any such
+   statements. For instance, starting the file with a line containing
+   the text "COFRAME(SKY,System=FK5)" would indicate that positions
+   are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
+   indicates explicitly that positions are specified in pixel
+   co-ordinates.
 3 DEVICE
 DEVICE = DEVICE (Read)
    The plotting device. [Current graphics device]
@@ -714,12 +715,15 @@ DATA picture can be found.
 database. On exit the current database picture for the chosen
 device reverts to the input picture.
 2 Related_Applications
-   KAPPA: ARDGEN, ARDMASK.
+   KAPPA: ARDGEN, ARDMASK, LOOK.
 2 Authors
 DSB: David Berry (STARLINK)
 2 History
  13-SEP-2001 (DSB):
     Original version.
+
+ 25-OCT-2001 (DSB):
+    Make pixel coords the default coord system for the ard file.
 1 Automatic_Data_Conversion
 
 Although KAPPA tasks do not work directly with `foreign' formats,
@@ -15242,7 +15246,7 @@ Description:
    a 2D NDF. The listing may be displayed on the screen and logged in
    a text file (see parameters QUIET and LOGFILE). The region
    to be listed can be specified either by giving its centre and size or
-   its corners, or by giving an ARD description for the region (see
+   its corners, or by giving an `ARD Description' for the region (see
    parameter MODE). The top-right pixel value is also written to an output
    parameter (VALUE). The listing may be produced in several different
    formats (see parameter FORMAT), and the format of each individual
@@ -15255,17 +15259,22 @@ AGAIN = _LOGICAL (Read)
    a FALSE value is obtained. [FALSE]
 3 ARDDESC
 ARDDESC = LITERAL (Read)
-   An ARD description for the parts of the image to be listed.
+   An `ARD Description' for the parts of the image to be listed.
    Multiple lines can be supplied by ending each line with a minus
    sign, in which case further prompts for ARDDESC are made until
    a value is supplied which does not end with a minus sign. All
    the supplied values are then concatenated together (after removal
    of the trailing minus signs). Only acessed if MODE is "ARD".
+   Positions in the ARD description are assumed to be in the
+   current co-ordinate Frame of the NDF unless there are COFRAME or
+   WCS statements which indicate a different system. See "Notes" below.
 3 ARDFILE
 ARDFILE = FILENAME (Read)
-   The name of an existing text file containing an ARD description
+   The name of an existing text file containing an `ARD Description'
    for the parts of the image to be listed. Only acessed if MODE is
-   "ARDFile".
+   "ARDFile". Positions in the ARD description are assumed to be in
+   pixel co-ordinates unless there are COFRAME or WCS statements
+   which indicate a different system. See "Notes" below.
 3 CENTRE
 CENTRE = LITERAL (Read)
    The co-ordinates of the data pixel at the centre of the area to
@@ -15340,7 +15349,7 @@ MODE = LITERAL (Read)
    - "Bounds" -- The bounds of the region are specified using
    parameters LBOUND and UBOUND.
 
-   - "ARDFile" -- The region is given by an ARD description
+   - "ARDFile" -- The region is given by an `ARD Description'
    supplied within a text file specified using parameter ARDFILE.
    Pixels outside the ARD region are represented by the string "OUT".
 
@@ -15443,16 +15452,21 @@ look ngc6872 mode=ardfile ardfile=central.ard
    Lists the pixel values specified by the ARD description stored
    in the text file "central.dat".
 2 Notes
--  The co-ordinate system in which positions are given within ARD
+- ARD files may be created by ARDGEN or written manually.  In the
+latter case consult SUN/183 for full details of the ARD
+descriptors and syntax; however, much may be learnt from looking
+at the ARD files created by ARDGEN and the ARDGEN documentation.
+There is also a summary with examples in the main body of SUN/95.
+
+- The co-ordinate system in which positions are given within ARD
 descriptions can be indicated by including suitable
 COFRAME or WCS statements within the description (see SUN/183).
 For instance, starting the description with the text
 "COFRAME(PIXEL)" will indicate that positions are specified in
 pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
 indicate that positions are specified in RA/DEC (FK5,J2000). If
-no such statements are included, then it is assumed that
-positions are given within the current co-ordinate system of the
-input NDF.
+no such statements are included, then a default co-ordinate system
+is used as specified in the parameter description above.
 2 Related_Applications
    KAPPA: TRANDAT, ARDGEN, ARDMASK, ARDPLOT.
 2 Authors
@@ -15466,7 +15480,6 @@ DSB: David S. Berry (STARLINK)
 
    -  Processing of bad pixels and automatic quality masking are
    supported.
-
 1 LUCY
 Performs a Richardson-Lucy deconvolution of a 1- or 2-dimensional
 array.
