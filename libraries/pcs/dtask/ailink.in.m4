@@ -1,7 +1,9 @@
 changequote([[,]])dnl
 changecom[[]]dnl   no comments
-#!/bin/sh
+#! /bin/sh -
 # @edited_input@
+# alink.in and ilink.in: generated from ailink.in.m4
+# $Id$
 
 # Description:
 ifelse(SCRIPTNAME, alink,
@@ -12,15 +14,18 @@ ifelse(SCRIPTNAME, alink,
 #       % SCRIPTNAME [-xdbx] [SCRIPTNAME[[]]_opts] [linker_opts] prog_module [other_arguments]
 #
 # Arguments:
-#       [SCRIPTNAME[[]]_opts] are:
-#         -xdbx or --xdbx: Must be the first argument if it is used.
-#           Its effect is to add a -g option to the compile/link command,
-#           create a dummy source file for dtask_main, the top-level routine 
-#           of an ADAM task and to prevent the deletion of the otherwise 
-#           temporary dtask_applic files. This overcomes some problems using
-#           xdbx and ups on Suns and may be helpful in other cases where
-#           debuggers are used.
-#         --verbose: echos the generated compiler line at the end
+#       SCRIPTNAME[[]]_opts are:
+#          -xdbx or --xdbx: Must be the first argument if it is used.
+#            Its effect is to add a -g option to the compile/link command,
+#            create a dummy source file for dtask_main, the top-level routine 
+#            of an ADAM task and to prevent the deletion of the otherwise 
+#            temporary dtask_applic files. This overcomes some problems using
+#            xdbx and ups on Suns and may be helpful in other cases where
+#            debuggers are used.
+#
+#          --verbose: echoes the generated compiler line at the end
+#
+#          --static: link the monolith against static libraries only
 #
 #       linker_opts: option arguments preceding prog_module are 
 #         permitted, and interpreted as if they formed part of the
@@ -121,11 +126,10 @@ ifelse(SCRIPTNAME, alink,
 #          
 #-
 
-set -e
-
 # Strip off `our' options from the beginning of the list of arguments
 includedebug=false
 verbose=false
+staticlink=false
 while [ $# != 0 ]
 do 
         case $1 in
@@ -135,26 +139,35 @@ do
         --verbose)
             verbose=true
             ;;
+        --static)
+            staticlink=true
+            ;;
         -?|--help)
             cat >&2 <<FOO
-            usage: `basename $0` [SCRIPTNAME-opts] [linker-opts] <name of program> [ other files, libraries and options ]
-                   `basename $0` [--help | --version]
+usage: `basename $0` [SCRIPTNAME-opts] [linker-opts] <name of program> [ other files, libraries and options ]
+       `basename $0` [--help | --version]
 	
-            e.g.
-            \$ f77 -c fred-aux.o
-            \$ $0 fred.f fred-aux.o -lgks
+e.g.
+\$ f77 -c fred-aux.o
+\$ $0 fred.f fred-aux.o -lgks
 
-            [SCRIPTNAME-opts] are:
-                -xdbx or --xdbx: include debugging support
-                --verbose: be verbose
+[SCRIPTNAME-opts] are:
+    --xdbx:     include debugging support (or -xdbx)
+    --verbose:  be verbose
+    --static:   link statically
 
-            This script was configured with
-                CC         @CC@
-                CFLAGS     @CFLAGS@
-                FC         @FC@
-                FCFLAGS    @FCFLAGS@
-                libdir     @libdir@
-                staretcdir @staretcdir@
+This script was configured with
+    CC         @CC@
+    CFLAGS     @CFLAGS@
+    FC         @FC@
+    FCFLAGS    @FCFLAGS@
+    libdir     @libdir@
+    staretcdir @staretcdir@
+
+If you need to override the libtool which is used to do the link
+(@bindir@/dtask_libtool), do so by defining the environment
+variable DTASK_LIBTOOL to the full path of the configured libtool
+you wish to use.
 FOO
             exit 1
             ;;
@@ -379,34 +392,26 @@ ifelse(SCRIPTNAME, alink,
       END
 FOO
 
-# We need to link monoliths statically.  This is partly because if we
-# don't, we need to worry about setting LD_LIBRARY_PATH or similar,
-# but mostly because monoliths appear not to work if linked against
-# shared libraries.  This needs further investigation, but in the mean
-# time, force static linking.
-#
-# NOTE NOTE NOTE: This option is almost certainly specific to
-# gcc/gnuld, and so will surely need configuration in future.  Better
-# overall would be to use libtool to do this link.
-#
-if @FC@ --version | sed 1q | grep -i 'gnu fortran' >/dev/null; then
-    : OK
-else
-    echo "NOTE SCRIPTNAME is currently g77-specific: link may not work!"
-    echo "NOTE SCRIPTNAME is currently g77-specific: link may not work!" >&2
+LIBTOOL=${DTASK_LIBTOOL-@bindir@/dtask_libtool}
+echo LIBTOOL=$LIBTOOL
+
+extra_mode_args=
+if $staticlink
+then
+    extra_mode_args='-all-static'
 fi
 
-alinkextraflags='-static-libgcc -Wl,--static'
+linkextraflags=
 if $includedebug
 then
     $verbose && echo "Including debugging support in dtask_main.f"
-    alinkextraflags="$alinkextraflags -g"
+    linkextraflags="$linkextraflags -g"
     sed -e s#PROGNAME#$PROGNAME# @staretcdir@/dtask_main.txt \
            >dtask_main.f
 fi
 
-linkcmd="@FC@ @FCFLAGS@ -o $EXENAME \
-        $alinkextraflags \
+linkcmd="$LIBTOOL --mode=link @FC@ $extra_mode_args @FCFLAGS@ -o $EXENAME \
+        $linkextraflags \
         @libdir@/dtask_main.o \
         dtask_applic.f \
         $ARGS \
@@ -414,8 +419,23 @@ linkcmd="@FC@ @FCFLAGS@ -o $EXENAME \
         -lpar_adam \
         `dtask_link_adam`"
 
-$verbose && echo $linkcmd
-eval $linkcmd
+# Substitute any -lX options which refer to a libtool library
+# @libdir@/libX.la, with an explicit reference to that library.  We
+# could be more sophisticated and recognise them also in directories
+# indicated in -L options, but that's more than we need right now.
+xlinkcmd=
+for x in $linkcmd
+do
+    l=`expr x$x : 'x-l\(.*\)'`
+    if test -n "$l" -a -r @libdir@/lib$l.la; then
+        xlinkcmd="$xlinkcmd @libdir@/lib$l.la"
+    else
+        xlinkcmd="$xlinkcmd $x"
+    fi
+done
+
+$verbose && echo $xlinkcmd
+eval $xlinkcmd
 
 if $includedebug
 then
@@ -424,3 +444,5 @@ else
     $verbose && echo "rm -f dtask_applic.[fo] dtask_wrap.[co]"
     rm -f dtask_applic.[fo] dtask_wrap.[co]
 fi
+
+exit 0
