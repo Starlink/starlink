@@ -616,12 +616,9 @@
 *  get plot window parameters
         CALL PGQVP(3,XP1,XP2,YP1,YP2)
         CALL PGQWIN(XW1,XW2,YW1,YW2)
-	print *,ixpmax,iypmax
-	print *,xp1,xp2,yp1,yp2
-	print *,xw1,xw2,yw1,yw2
 
         XSCALE=(XW2-XW1)/(XP2-XP1)
-        YSCALE=-(YW2-YW1)/(YP2-YP1)
+        YSCALE=(YW2-YW1)/(YP2-YP1)
 
         FLAG=0
         DO WHILE (FLAG.EQ.0)
@@ -629,6 +626,7 @@
 *  get current cursor position in device coords
           CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
           CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
+          IYP=IYPMAX-IYP
 
 *  convert to world coords
           XW=XW1+(REAL(IXP)-XP1)*XSCALE
