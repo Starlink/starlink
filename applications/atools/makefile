@@ -447,7 +447,7 @@ I_SUB2 =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDF_PAR NDF_ERR \
+EXTERNAL_INCLUDES = HLPCMD SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDF_PAR NDF_ERR \
 PAR_ERR PAR_PAR FIO_ERR AST_PAR CNF_PAR
 
 #  List of Fortran routines required for building the package.  This is
@@ -462,7 +462,7 @@ atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astfindframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f astpermaxes.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
-astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f
+astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f gethlp.f
 
 F_SUB2 = 
 
@@ -586,6 +586,7 @@ SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 CNF_PAR:   $(STAR_INC)/cnf_par;   $(LINK) $? $@
+HLPCMD:    $(STAR_INC)/hlpcmd;     $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -1393,6 +1394,7 @@ astpcdmap.o    : SAE_PAR AST_PAR
 astwinmap.o    : SAE_PAR AST_PAR NDF_PAR
 astunitmap.o   : SAE_PAR NDF_PAR AST_PAR
 astpermmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
+gethlp.o       : SAE_PAR HLPCMD
 
 #-------------------------------------------------------------------------------
 #

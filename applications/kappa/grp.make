@@ -12,7 +12,7 @@ kappa_atools
 
 # The contents of the kappa_atools.tar file:
 KAPPA_ATOOLS = atl1_creat.f atl1_gtobj.f atl1_rdfch.f \
-atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f
+atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f atl1_rm.c
 
 # The contents of the kappa_ccdpack.tar file:
 KAPPA_CCDPACK = ccd1_orvar.f ccd1_par ccg1_bmd1d.f ccg1_bmd3d.f \

@@ -41,8 +41,7 @@
 
 #-
 
-      echo -lkapsub -lkapgen -lira -lfits -lcfitsio `agi_link_adam` \
-        `grp_link_adam` `fio_link_adam` `ndf_link_adam` \
+      echo `kaplibs_link_adam -nogks` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

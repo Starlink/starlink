@@ -693,7 +693,7 @@
       IF( SCALE .NE. 1.0 ) THEN     
          CALL MSG_SETR( 'S', REAL( SCALE ) )
          CALL MSG_OUT( ' ', '  The supplied Mapping is being modified'//
-      :                ' by a scale factor of ^S.', STATUS )      
+     :                 ' by a scale factor of ^S.', STATUS )      
 
 *  Generate the actual mapping from the input to output array, by
 *  combining the Mapping from base to current frames and a ZoomMap
