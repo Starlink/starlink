@@ -62,7 +62,6 @@
             IF (.NOT.ISAFILE) THEN
               CALL AST_PATH_TRY(BUFF(1:L)//'.sdf',ISAFILE,STATUS)
             ENDIF
-       print *,isafile
 *  could be case that default expects filename to be added
             IF (ISAFILE) THEN
 *  but alternate doesn't

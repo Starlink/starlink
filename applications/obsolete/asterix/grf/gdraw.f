@@ -48,7 +48,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Status :
       INTEGER STATUS
 *    Functions :
@@ -66,8 +66,8 @@
       LOGICAL ID
       LOGICAL ACTIVE
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GFX_CMN'
-      INCLUDE '../../kernel/grf/inc/GMD_CMN'
+      INCLUDE 'GFX_CMN'
+      INCLUDE 'GMD_CMN'
 *-
 
 *  Version id
@@ -174,7 +174,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER                   ID
 *    Import-export :
@@ -186,8 +186,8 @@
 *    Local variables :
       LOGICAL MULTI
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GFX_CMN'
-      INCLUDE '../../kernel/grf/inc/GMD_CMN'
+      INCLUDE 'GFX_CMN'
+      INCLUDE 'GMD_CMN'
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -238,7 +238,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -248,7 +248,7 @@
       LOGICAL OVLY
       PARAMETER (OVLY=.FALSE.)
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GFX_CMN'
+      INCLUDE 'GFX_CMN'
 *    Local variables :
       REAL X1,X2,Y1,Y2
 *    External References :
@@ -292,8 +292,8 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '../../kernel/lib/inc/ADI_PAR'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
 *    Import :
       INTEGER                           ID
       REAL X1,X2,Y1,Y2
@@ -304,7 +304,7 @@
       INTEGER STATUS
 *    Local Constants :
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GMD_CMN'
+      INCLUDE 'GMD_CMN'
 *    Local variables :
       CHARACTER*80 TITLE,LABEL,UNITS
       CHARACTER*80 XLABEL,YLABEL
@@ -556,9 +556,9 @@
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GFX_CMN'
+      INCLUDE 'GFX_CMN'
 *    Structure definitions :
 *    Import-Export :
 *    Export :
@@ -830,7 +830,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -840,7 +840,7 @@
       LOGICAL OVLY
       PARAMETER (OVLY=.FALSE.)
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GFX_CMN'
+      INCLUDE 'GFX_CMN'
 *    Local variables :
       REAL X1,X2,Y1,Y2
 *-
@@ -881,7 +881,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER                   ID
       REAL X1,X2,Y1,Y2
@@ -920,7 +920,7 @@
       LOGICAL RADEC
       LOGICAL ATTOK
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GMD_CMN'
+      INCLUDE 'GMD_CMN'
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1164,7 +1164,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER ID,DIMS(2)
       LOGICAL XREG,YREG
@@ -1233,7 +1233,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER			ID			! Top level object
       INTEGER DIMS(2)
@@ -1314,7 +1314,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER N                 ! number of values
       REAL X(*)                 ! axis values
@@ -1366,7 +1366,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER N                 ! number of values
       REAL X(*)                 ! axis values
@@ -1413,8 +1413,8 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/include/prm_par'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER NX,NY
       INTEGER IX1,IX2,IY1,IY2
@@ -1463,9 +1463,9 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '../../kernel/lib/inc/QUAL_PAR'
-      INCLUDE '/star/include/prm_par'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'QUAL_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER NX,NY
       INTEGER IX1,IX2,IY1,IY2
@@ -1518,7 +1518,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER			ID
 *    Import-export :
@@ -1561,7 +1561,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -1571,8 +1571,8 @@
       INTEGER MXOVLY
       PARAMETER (MXOVLY=100)
 *    Global variables :
-      INCLUDE '../../kernel/grf/inc/GFX_CMN'
-      INCLUDE '../../kernel/grf/inc/GMD_CMN'
+      INCLUDE 'GFX_CMN'
+      INCLUDE 'GMD_CMN'
 *    Local variables :
       INTEGER			GFID			! Individual graph
       CHARACTER*132 OVLY
@@ -1679,7 +1679,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER ID,NPLOT
 *    Import-export :
@@ -1767,7 +1767,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
+      INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER IPLOT
       INTEGER NX,NY
