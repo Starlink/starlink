@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.9}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {4th April 2001}
+\newcommand{\stardocdate}      {14th June 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -15960,6 +15960,61 @@ It will draw both linear and curvilinear axes and grids, as required
 by the particular Plot. The appearance of the output can be modified
 in a wide variety of ways by setting various Plot attributes.
 
+\subsection{\label{ss:choosingagraphicspackage}Choosing a Graphics Package}
+The Plot class itself does not include any code for actually drawing on a
+graphics device. Instead, it requires a set of functions to be provided
+which it uses to draw the required graphics. These include functions
+to draw a straight line, draw a text string, \emph{etc}. You may choose
+to provide functions from your favorite graphics package, or you can even
+write your own! To accomodate variations in the calling interfaces of
+different graphics packages, AST defines a standard interface for these
+routines. If this interface differs from the interface provided by your
+graphics package (which in general it will), then you must write a set of
+\emph{wrapper functions}, which provide the interface expected by AST but
+which then call functions from your graphics package to provide the
+required functionality. AST comes with wrapper functions suitable for
+the PGPLOT graphics package (see \xref{SUN/15}{sun15}{}).
+
+There are two ways of indicating which wrapper functions are to be used by 
+the Plot class:
+\begin{enumerate}
+
+\item A file containing C functions with pre-defined names can be written
+and linked with the application using options of the ast\_link command.
+(see \secref{ss:howtobuild} and \appref{ss:commanddescriptions}). AST is
+distributed with such a file (called {\tt grf\_pgplot.c}) which calls PGPLOT 
+functions to implement the required functionality. This file can be used
+as a template for writing your own.
+f+
+Currently, it is not possible to write such ``grf modules'' in Fortran.
+If you want to use wrapper functions written in Fortran, then you must 
+use the AST_GRFFUN method as described below.
+f-
+
+\item The 
+c+
+astGrfFun 
+c-
+f+
+AST_GRFFUN
+f-
+method of the Plot class can be used to ``register''
+wrapper functions at run-time. This allows an application to switch
+between graphics systems if required. Graphics functions registered in
+this way do not need to have the pre-defined names used in the link-time
+method described above.
+
+\end{enumerate}
+
+For details of the interfaces of the wrapper routines, see 
+c+
+either the {\tt grf\_pgplot.c} file included in the AST source
+distribution, or the reference documentation for the astGrfFun method.
+c-
+f+
+the reference documentation for the AST_GRFFUN method.
+f-
+
 \cleardoublepage
 \section{Compiling and Linking Software that Uses AST}
 
@@ -17138,12 +17193,10 @@ AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.6}
+\subsection{Changes Introduced in V1.6}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.5 and V1.6 (the
-current version):
+occurred in the AST library between versions V1.5 and V1.6:
 
 \begin{enumerate}
 
@@ -17226,6 +17279,35 @@ its value is transferred to the new Object when a copy is made.
 \item A bug has been fixed which could prevent complex CmpFrames
 behaving correctly (for instance, resulting in the failure of attempts 
 to find a Mapping between a CmpFrame and itself).
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.7}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.6 and V1.7 (the
+current version):
+
+\begin{enumerate}
+
+\item The Plot class has a new method called 
+f+
+AST_GRFFUN 
+f-
+c+
+astGrfFun 
+c-
+which allows the underlying primitive graphics functions to be selected
+at run-time. Previously, the functions used by the Plot class to produce
+graphics could only be selected at link-time, using the options of the
+ast\_link command. The new Plot method allows an application to over-ride
+the functions established at link-time, by specifying alternative
+primitive graphics routines.
+
+\item A bug has been fixed in the Plot class which could result in axis
+labels being drawn on inappropriate edges of the plotting box when using
+``interior'' labelling.
 
 \end{enumerate}
 
