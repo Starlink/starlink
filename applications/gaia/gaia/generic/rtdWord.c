@@ -17,7 +17,7 @@
  *
  *  Notes:
  *     This isn't a usual Tk text object as it doesn't use Tk's font
- *     caching, support selection or editting. It uses the xvertext
+ *     caching, support selection or editing. It uses the xvertext
  *     extensions by Alan Richardson (mppa3@uk.ac.sussex.syma) to
  *     scale and rotate the text. This should be replaced by the
  *     X11R6 scheme at some time.
