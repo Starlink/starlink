@@ -52,7 +52,33 @@ gkurei.f gkvers.f gkwcld.f gkwddl.f gkwkc4.f gkwspb.f gkxbcl.f gkxcge.f \
 gkxcpu.f gkxdcs.f gkxdwc.f gkxdwo.f gkxfd.f gkxlin.f gkxof.f gkxon.f \
 gkxpal.f gkxpat.f gkxpcc.f gkxpcx.f gkxpxc.f gkxpxo.f gkxqxc.f gkxqxo.f \
 gkxss.f gkxtfb.f gkxtfp.f gkxthw.f gkxxf.f gkan1.f gkaton.f gkfobo.f \
-gkfoco.f gkiocl.f gkiofi.f
+gkfoco.f gkiocl.f gkiofi.f \
+gactm.f gacwk.f gasgwk.f gca.f gclks.f gclrwk.f gclsg.f gclwk.f \
+gcrsg.f gcsgwk.f gdawk.f gdsg.f gdsgwk.f geclks.f gerhnd.f gerlog.f \
+gesc.f gevtm.f gfa.f ggdp.f ggtitm.f giitm.f ginch.f ginlc.f ginpk.f \
+ginsg.f ginsk.f ginst.f ginvl.f gmsg.f gmsgs.f gopks.f gopwk.f gpl.f \
+gpm.f gprec.f gqacwk.f gqasf.f gqaswk.f gqcf.f gqchb.f gqchh.f gqchs.f \
+gqchsp.f gqchup.f gqchw.f gqchxp.f gqclip.f gqcntn.f gqcr.f gqdch.f \
+gqdds.f gqdlc.f gqdpk.f gqdsga.f gqdsk.f gqdsp.f gqdst.f gqdvl.f \
+gqdwka.f gqeci.f gqefai.f gqegdp.f gqentn.f gqepai.f gqepli.f gqepmi.f \
+gqetxi.f gqewk.f gqfaci.f gqfaf.f gqfai.f gqfais.f gqfar.f gqfasi.f \
+gqgdp.f gqlcs.f gqli.f gqln.f gqlvks.f gqlwk.f gqlwsc.f gqmk.f \
+gqmksc.f gqmntn.f gqnt.f gqops.f gqopsg.f gqopwk.f gqpa.f gqpaf.f \
+gqpar.f gqparf.f gqpcr.f gqpfar.f gqpkid.f gqpks.f gqplci.f gqplf.f \
+gqpli.f gqplr.f gqpmci.f gqpmf.f gqpmi.f gqpmr.f gqppar.f gqpplr.f \
+gqppmr.f gqptxr.f gqpx.f gqpxa.f gqpxad.f gqsga.f gqsgp.f gqsgus.f \
+gqsgwk.f gqsks.f gqsts.f gqtxal.f gqtxci.f gqtxf.f gqtxfp.f gqtxi.f \
+gqtxp.f gqtxr.f gqtxx.f gqtxxs.f gqvls.f gqwkc.f gqwkca.f gqwkcl.f \
+gqwkdu.f gqwkm.f gqwks.f gqwkt.f grditm.f grensg.f grqch.f grqlc.f \
+grqpk.f grqsk.f grqst.f grqvl.f grsgwk.f gsasf.f gschh.f gschm.f \
+gschsp.f gschup.f gschxp.f gsclip.f gscr.f gsds.f gsdtec.f gselnt.f \
+gsfaci.f gsfai.f gsfais.f gsfar.f gsfasi.f gshlit.f gslcm.f gsln.f \
+gslwsc.f gsmk.f gsmksc.f gspa.f gspar.f gsparf.f gspkid.f gspkm.f \
+gsplci.f gspli.f gsplr.f gspmci.f gspmi.f gspmr.f gssgp.f gssgt.f \
+gsskm.f gsstm.f gstxal.f gstxci.f gstxfp.f gstxi.f gstxp.f gstxr.f \
+gsvis.f gsvlm.f gsvp.f gsvpip.f gswkvp.f gswkwn.f gswn.f gtx.f gtxs.f \
+gurec.f guwk.f gwitm.f
+
 
 
 # These are the routines that were in the machines directory but
