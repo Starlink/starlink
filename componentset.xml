@@ -1029,7 +1029,7 @@ A software package designed to search for periodicities in data.
       <uname>kpd</uname>
     </person>
   </developers>
-  <documentation> sun167 ssn25 period_history</documentation>
+  <documentation> sun167 ssn25</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
@@ -2713,7 +2713,7 @@ Ultrix and for SunOS and may still work for them.
   which have been referenced in this way.
     </p></abstract>
   <dependencies >
-    <build>sae</build><link>hds</link><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>hds</build><link>hds</link><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

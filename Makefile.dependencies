@@ -1527,6 +1527,10 @@ $(MANIFEST)/psx: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/ref: \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
