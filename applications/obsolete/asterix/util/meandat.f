@@ -173,7 +173,7 @@
 
 *  Open files
       DO LP = 1, NFILES
-        CALL USI_IASSOC( LP, 'INP', 'BinDS|Array', 'READ', IFID(LP),
+        CALL USI_IASSOC( 'INP', LP, 'BinDS|Array', 'READ', IFID(LP),
      :                   STATUS )
         IF (STATUS .NE. SAI__OK) GOTO 99
       END DO
