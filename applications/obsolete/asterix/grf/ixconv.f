@@ -68,7 +68,8 @@
 *
 *    Functions :
 *
-      INTEGER			CHR_LEN
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
 *
 *    Local variables :
 *
@@ -89,9 +90,9 @@
       INTEGER 				IDUM,M3,N3           ! Output dimensions
       INTEGER DIMS1(ADI__MXDIM)           ! dimensions found in input array
       INTEGER DIMS2(ADI__MXDIM)           ! dimensions found in input array
-      INTEGER ODIMS(ADI__MXDIM)           ! dimensions for output
-      INTEGER NDIMS1                  ! number found (should be 2)
-      INTEGER NDIMS2                  ! number found (should be 2)
+      INTEGER 			ODIMS(ADI__MXDIM)       ! O/p dimensions
+      INTEGER 			NDIMS1                  ! number found (should be 2)
+      INTEGER 			NDIMS2                  ! number found (should be 2)
 
       INTEGER WPTR_XR                  ! Pointer to work area XR
       INTEGER WPTR_XI                  ! Pointer to work area
@@ -103,7 +104,6 @@
 
       INTEGER 			DPTR_1			! First dataset's data
       INTEGER 			DPTR_2			! Second dataset's data
-      INTEGER 			IFAIL			! NAG status code
       INTEGER			IFID1			! Input dataset 1
       INTEGER			IFID2			! Input dataset 2
       INTEGER 			ODPTR			! Output data pointer
