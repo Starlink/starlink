@@ -982,8 +982,8 @@ evaluate more than one expression one after another!
   <name>d
   <type>string
   <description>
-  <p>The string should be in the form dd-MMM-yyyy (two-digit day,
-  3-uppercase-character month appreviation, four-digit year)
+  <p>The string should be in the form dd-MMM-yyyy (one- or two-digit day,
+  3-character month abbreviation, four-digit year), and may include whitespace.
 <history>
 <change author="ng" date="19-MAR-1999">
 <p>Altered from original yyyymmdd format.
@@ -991,25 +991,31 @@ evaluate more than one expression one after another!
 </history>
 <codebody>
 (define (format-date d)
-  (let* ((strok (and d
-		     (string? d)
-		     (equal? (string-length d) 11)))
-	 (year (and strok (substring d 7 11)))
-	 (month (and strok (case (substring d 3 6)
-			     (("JAN") (cons "January" 31))
-			     (("FEB") (cons "February" 29))
-			     (("MAR") (cons "March" 31))
-			     (("APR") (cons "April" 30))
-			     (("MAY") (cons "May" 31))
-			     (("JUN") (cons "June" 30))
-			     (("JUL") (cons "July" 31))
-			     (("AUG") (cons "August" 31))
-			     (("SEP") (cons "September" 30))
-			     (("OCT") (cons "October" 31))
-			     (("NOV") (cons "November" 31))
-			     (("DEC") (cons "December" 31))
-			     (else #f))))
-	 (day (and strok (string->number (substring d 0 2)))))
+  (let* ((parts (tokenise-string d boundary-char?: (lambda (c)
+						     (or (char=? c #\-)
+							 (char=? c #\space)))))
+	 (cpts (debug (if (string=? (car parts) "")
+		   (cdr parts)
+		   parts)))
+	 (strok (equal? (length cpts) 3))
+	 (day (and strok (string->number (car cpts))))
+	 (month-str (and strok (cadr cpts)))
+	 (year (and strok (caddr cpts)))
+ 	 (month (and strok (case (case-fold-up month-str)
+ 			     (("JAN") (cons "January" 31))
+ 			     (("FEB") (cons "February" 29))
+ 			     (("MAR") (cons "March" 31))
+ 			     (("APR") (cons "April" 30))
+ 			     (("MAY") (cons "May" 31))
+ 			     (("JUN") (cons "June" 30))
+ 			     (("JUL") (cons "July" 31))
+ 			     (("AUG") (cons "August" 31))
+ 			     (("SEP") (cons "September" 30))
+ 			     (("OCT") (cons "October" 31))
+ 			     (("NOV") (cons "November" 31))
+ 			     (("DEC") (cons "December" 31))
+ 			     (else #f))))
+	 )
     (if (and strok year month (and (<= day (cdr month)) (>= day 1)))
 	(string-append (number->string day) " "
 		       (car month) " "
