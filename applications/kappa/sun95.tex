@@ -26773,9 +26773,19 @@ plot (10k).
       GUI is available through the Help menu within the GUI.
    }
    \sstusage{
-      lutedit lut image
+      lutedit lut image device
    }
    \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of an image display device.  If a null (!) value is
+         supplied for parameter LUT, then the current LUT associated with
+         the specified device will be loaded into the editor initially.
+         On exit, the final contents of the editor (if saved) are 
+         established as the current LUT for the specified device. 
+         {\tt [Current image-display device]}
+      }
       \sstsubsection{
          LUT = NDF (Read)
       }{

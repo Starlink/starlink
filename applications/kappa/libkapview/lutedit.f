@@ -31,9 +31,16 @@
 *     GUI is available through the Help menu within the GUI.
 
 *  Usage:
-*     lutedit lut image
+*     lutedit lut image device
 
 *  ADAM Parameters:
+*     DEVICE = DEVICE (Read)
+*        The name of an image display device.  If a null value is
+*        supplied for parameter LUT, then the current LUT associated with
+*        the specified device will be loaded into the editor initially.
+*        On exit, the final contents of the editor (if saved) are 
+*        established as the current LUT for the specified device. 
+*        [Current image-display device]
 *     LUT = NDF (Read)
 *        Name of an exiting colour table to be edited. This should be an 
 *        NDF containing an array of red, green and blue intensities. The 
@@ -42,7 +49,7 @@
 *        colour table if the second dimension is different from the number 
 *        of unreserved colour indices is controlled by the "Interpolation" 
 *        option in the GUI. If LUT is null (!) the current KAPPA colour 
-*        table for the xwindows graphics display is used. [!]
+*        table for the device specified by parameter DEVICE is used. [!]
 *     IMAGE = NDF (Read)
 *        Input NDF data structure containing the image to be displayed
 *        to show the effect of the created colour table. If a null value
@@ -71,8 +78,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Standard SAE definitions
+      INCLUDE 'DAT_PAR'        ! HDS constants
       INCLUDE 'PSX_ERR'        ! PSX error constants
       INCLUDE 'PAR_ERR'        ! PAR error constants
+      INCLUDE 'CTM_PAR'        ! Colout Table Management constants
 
 *  Status:
       INTEGER STATUS
@@ -83,14 +92,22 @@
 *  Local Variables:
       CHARACTER CMD*512        ! Command to execute lutedit tcl script
       CHARACTER IMNAM*255      ! Full path for IMAGE NDF
+      CHARACTER LOC*(DAT__SZLOC)! HDS locator for new ndf
       CHARACTER LUTNAM*255     ! Full path for LUT NDF
-      INTEGER ILEN             ! Used length of IMNAM 
-      INTEGER LLEN             ! Used length of LUTNAM 
+      CHARACTER PLOC*(DAT__SZLOC)! HDS locator for original LUT
       INTEGER IAT              ! Length of CMD
-      INTEGER IPLUT            ! Pointer to mapped lut array
-      INTEGER NEL              ! No. of elements in IPLUT
+      INTEGER ILEN             ! Used length of IMNAM 
       INTEGER INDF1            ! LUT NDF identifier
       INTEGER INDF2            ! Image NDF identifier
+      INTEGER IPIC             ! AGI identifier for current picture
+      INTEGER IPLUT            ! Pointer to mapped lut array
+      INTEGER LLEN             ! Used length of LUTNAM 
+      INTEGER LP               ! Lowest usable pen index
+      INTEGER NEL              ! No. of elements in IPLUT
+      INTEGER PLACE            ! Unused NDF placeholder
+      INTEGER UP               ! Highest usable pen index
+      LOGICAL DEVOPN           ! Has a graphice device been opened
+      LOGICAL SAVLUT           ! Save the edited LUT?
 *.
 
 *  Check the inherited status.
@@ -99,8 +116,79 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN 
 
-*  Initialize a string to hold the command to execute the lutedit tcl
-*  script.
+*  Associate the parameter with a workstation and current picture.
+      CALL AGI_ASSOC( 'DEVICE', 'READ', IPIC, STATUS )
+
+*  If no device given, annull the error.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         DEVOPN = .FALSE.
+
+*  Otherwise, open it.
+      ELSE
+         CALL AGI_BEGIN
+         CALL AGP_ACTIV( STATUS )
+         CALL AGP_NVIEW( .FALSE., STATUS )
+         DEVOPN = .TRUE.
+      END IF
+
+*  Initialize the names of the LUT and image to use.
+      LUTNAM = '""'
+      IMNAM = '""'
+      SAVLUT = .FALSE.
+
+*  Obtain the NDF identifier and pointer of the input lookup table.
+*  Validate the LUT.
+      CALL KPG1_AVLUT( 'LUT', INDF1, IPLUT, NEL, STATUS )
+
+*  Null status means do not read a new lookup table. Instead, we will use
+*  the existing table for the specified device (if any).
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+*  Check a device was given.
+         IF( DEVOPN ) THEN
+            LUTNAM = './lutedit-temp'
+
+*  Locate the HDS array holding the LUT for the specified device.
+            CALL KPG1_LTGET( PLOC, STATUS )
+            IF( PLOC .NE. DAT__NOLOC ) THEN
+
+*  Create an NDF holding the devices colour table.
+               CALL HDS_NEW( LUTNAM, 'LUTEDIT', 'LUT', 0, 0, LOC, 
+     :                       STATUS ) 
+
+*  Copy the array into it, putting it in "data_array" so that it becomes
+*  a primitive NDF, and can be accessed by other KAPPA apps.
+               CALL DAT_COPY( PLOC, LOC, 'DATA_ARRAY', STATUS )
+
+*  Close both files.
+               CALL DAT_ANNUL( PLOC, STATUS )
+               CALL DAT_ANNUL( LOC, STATUS )
+
+            END IF
+
+*  Indicate that the edited LUT should be saved before exiting.
+            SAVLUT = .TRUE.
+
+         END IF
+
+*  If a specific LUT was given, get the full path to the NDF.
+      ELSE
+         CALL NDF_MSG( 'NDF', INDF1 )
+         CALL MSG_LOAD( ' ', '^NDF', LUTNAM, LLEN, STATUS )
+      END IF
+
+*  Get the image to display.
+      CALL LPG_ASSOC( 'IMAGE', 'READ', INDF2, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+      ELSE
+         CALL NDF_MSG( 'NDF', INDF2 )
+         CALL MSG_LOAD( ' ', '^NDF', IMNAM, ILEN, STATUS )
+      END IF
+
+*  Get a string holding the command to execute the lutedit tcl script.
       CMD = ' '
       CALL PSX_GETENV( 'KAPPA_DIR', CMD, STATUS )
       IF( STATUS .EQ. PSX__NOENV ) THEN
@@ -110,41 +198,58 @@
 
       IAT = CHR_LEN( CMD )
       CALL CHR_APPND( '/lutedit.tcl', CMD, IAT )
-
-*  Obtain the NDF identifier and pointer of the input lookup table.
-*  Validate the LUT.
-      CALL KPG1_AVLUT( 'LUT', INDF1, IPLUT, NEL, STATUS )
-
-*  Null status means do not read a new lookup table. Instead, we will use
-*  the existing table.
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL CHR_APPND( ' ""', CMD, IAT )
-
-*  Otherwise, get the full path to the NDF.
-      ELSE
-         CALL NDF_MSG( 'NDF', INDF1 )
-         CALL MSG_LOAD( ' ', '^NDF', LUTNAM, LLEN, STATUS )
-         IAT = IAT + 1
-         CALL CHR_APPND( LUTNAM, CMD, IAT )
-      END IF
-
-* Get the image to display.
-      CALL LPG_ASSOC( 'IMAGE', 'READ', INDF2, STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-      ELSE
-         CALL NDF_MSG( 'NDF', INDF2 )
-         CALL MSG_LOAD( ' ', '^NDF', IMNAM, ILEN, STATUS )
-         IAT = IAT + 1
-         CALL CHR_APPND( IMNAM, CMD, IAT )
-      END IF
-
-*  End the NDF context.
-      CALL NDF_END( STATUS )
+      IAT = IAT + 1
+      CALL CHR_APPND( LUTNAM, CMD, IAT )
+      IAT = IAT + 1
+      CALL CHR_APPND( IMNAM, CMD, IAT )
 
 *  Execute the script.
       CALL KPS1_LUTED( CMD( : IAT ), STATUS )
+
+*  If required, save the edited colour table as the current colour table
+*  for the specified device.
+      IF( SAVLUT .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Inquire the number of pens that are available on the specified device.
+         CALL PGQCOL( LP, UP )
+
+*  The lowest pen number available for used by the colour table is
+*  CTM__RSVPN.  0 is reserved for the background.  Others below CTM__RSVPN 
+*  are reserved for annotations.
+         LP = CTM__RSVPN
+
+*  Open the NDF holding the edited LUT.
+         CALL NDF_OPEN( DAT__ROOT, LUTNAM, 'UPDATE', 'OLD', INDF1, 
+     :                  PLACE, STATUS ) 
+
+*  Ignore any error while opening the NDF.
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+
+*  Map the DATA array.
+            CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPLUT, NEL, 
+     :                    STATUS ) 
+
+*  Load the LUT into the colour table.
+            CALL KPG1_PGLUT( NEL/3, %VAL( IPLUT ), LP, UP, .FALSE., 
+     :                       STATUS )
+
+*  Save the new colour table in $ADAM_USER/kappa_lut.sdf
+            CALL KPG1_LTSAV( STATUS )
+
+*  Remove the temporary NDF.
+            CALL NDF_DELET( INDF1, STATUS )
+
+         ENDIF
+
+      END IF
+
+*  Close down the graphics device, if open.
+      IF( DEVOPN ) CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )
 
 *  Add a context report if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN

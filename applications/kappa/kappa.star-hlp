@@ -15680,7 +15680,7 @@ Create or edit an image-display colour lookup table.
 
 Usage:
 
-   lutedit lut image
+   lutedit lut image device
 
 Description:
 
@@ -15695,6 +15695,13 @@ Description:
    GUI is available through the Help menu within the GUI.
 2 Parameters
 For information on individual parameters, select from the list below:
+3 DEVICE 
+DEVICE = DEVICE (Read)
+   The name of an image display device.  If a null value is supplied for
+   parameter LUT, then the current LUT associated with the specified
+   device will be loaded into the editor initially. On exit, the final
+   contents of the editor (if saved) are established as the current LUT
+   for the specified device. [Current image-display device]
 3 LUT
 LUT = NDF (Read)
    Name of an exiting colour table to be edited. This should be an

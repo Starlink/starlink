@@ -391,6 +391,60 @@ proc bridge {} {
    }
 }
 
+proc flip {all} {
+#
+#  Flip the selected pens horizontally. If there is currently no
+#  selection, use the whole table. If $all is zero, just flip the current
+#  curve. Otherwise flip all curves.
+#
+   global LENTRY
+   global HENTRY
+   global RGBNOW
+   global LUT
+   global NENTM1
+   global SHIFT
+   global PPENT
+
+   if { $HENTRY == "" } {
+      set hi $NENTM1
+   } else {
+      set hi $HENTRY
+   }
+
+   if { $LENTRY == "" } {
+      set lo 0
+   } else {
+      set lo $LENTRY
+   }
+
+   if { $all } {
+      set newr ""
+      set newg ""
+      set newb ""
+      for { set i $hi } { $i >= $lo } { incr i -1 } {
+         append newr "[lindex $LUT(red) $i] "
+         append newg "[lindex $LUT(green) $i] "
+         append newb "[lindex $LUT(blue) $i] "
+      }
+      set LUT(red) [eval lreplace {$LUT($RGBNOW)} $lo $hi  $newr]
+      set LUT(green) [eval lreplace {$LUT($RGBNOW)} $lo $hi  $newg]
+      set LUT(blue) [eval lreplace {$LUT($RGBNOW)} $lo $hi  $newb]
+      updateDisplay 0
+
+   } else {
+      set new ""
+      for { set i $hi } { $i >= $lo } { incr i -1 } {
+         append new "[lindex $LUT($RGBNOW) $i] "
+      }
+      set LUT($RGBNOW) [eval lreplace {$LUT($RGBNOW)} $lo $hi  $new]
+      updateCurrent
+
+   }
+
+   record
+}
+
+
 proc setCon {} {
 #
 #  Set the currently selected pens to a user-specified constant value.
@@ -861,16 +915,26 @@ proc cpoint {} {
    }
 }
 
-proc Read {save} {
+proc Read {conf} {
 #
 #  Read the current GWM colour table into the editor.
 #
-   if { !$save || [Saver] } { 
+   global LUTFILE
+   global KEEPFILE
+   global UWIN
+
+   if { !$conf || [Saver] } { 
       set tfile [UniqueFile]
       Obey kapview lutsave "lut=\! logfile=$tfile" 1
       textLut $tfile
       file delete -force $tfile   
-      set LUTFILE ""
+      if { !$KEEPFILE } { 
+         set LUTFILE ""
+         set KEEPFILE 0
+         wm  title $UWIN "LutEdit <untitled>"
+      } else {
+         wm  title $UWIN "LutEdit $LUTFILE"
+      }
       orig
       updateDisplay -1
    }
@@ -1718,8 +1782,11 @@ proc openNamed {file force} {
 
    set ret 1
 
-#  Check the NDF is suitable.
+#  Check it exists.
    set ndf [file rootname $file]
+   if { ![file exists "$ndf.sdf"] } { return 0 }
+
+#  Check the NDF is suitable.
    Obey ndfpack ndftrace "ndf=$ndf" 
    set dims [GetParamED ndfpack ndftrace:dims]
    regexp {\[([-+0-9]+),([-+0-9]+)\]} $dims a xd yd
@@ -4025,6 +4092,7 @@ proc doResize {} {
 #-
    global CAN
    global CAN2
+   global KEEPFILE
    global GWMNEW
    global CURY1
    global CURY2
@@ -4032,6 +4100,7 @@ proc doResize {} {
    global DEVICE
    global UWIN
    global INITLUT
+   global LUTFILE
    global TKT
 
 #  Cancel the binding for Configure so that the configuration changes 
@@ -4092,23 +4161,25 @@ proc doResize {} {
          if { $cy2 > $CURY2 } { set CURY2 $cy2 }
       }
 
-#  If no colour table has yet been loaded, save the current kappa colour 
-#  table into a text file, and initialize the editor to use it.
-      if { ![info exists LUT(red)] } { Read 0 }
-
 #  If this is the first time an image has been displayed, load the
 #  specified initial LUT if any.
       if { $INITLUT != "" } {
          set done [openNamed $INITLUT 1]
+         if { !$done } { 
+            set LUTFILE $INITLUT 
+            set KEEPFILE 1 
+         }
          set INITLUT ""
       } else {
          set done 0      
       }
 
-#  If we have not yet displayed anything succesfully, redraw the display with 
-#  the current LUT.
-      if { !$done } { updateDisplay 1 }
-
+#  If no colour table has yet been loaded, save the current kappa colour 
+#  table into a text file, and initialize the editor to use it.
+      if { !$done } { 
+         Read 0
+         updateDisplay 1
+      }
    }
 
 #  Re-instate the original binding for Configure.
@@ -4789,6 +4860,7 @@ proc WaitFor {name args} {
    set NENTM1 [expr $NENT-1]
    set NN "NO"
    set NOLD 0
+   set KEEPFILE 0
    set PPENT 1
    set PVAL ""
    set RGBNOW ""
@@ -5058,6 +5130,11 @@ proc WaitFor {name args} {
       $editmenu add command -label "Smooth      " -command {smooth}
       MenuHelp $editmenu "Smooth      " "Smooth the currently selected pens using a box filter of specified width."
 
+      $editmenu add command -label "Flip current" -command {flip 0}
+      MenuHelp $editmenu "Smooth      " "Flip the current curve horizontally."
+
+      $editmenu add command -label "Flip all" -command {flip 1}
+      MenuHelp $editmenu "Smooth      " "Flip all curves horizontally."
 
 # Add menu items to the Options menu.
       $optsmenu add checkbutton -label "Auto-update" -variable AUTOUP 
