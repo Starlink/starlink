@@ -104,6 +104,7 @@
 
 *  Local Variables:
       INTEGER			IID			! InstanceData struct
+      LOGICAL			THERE			! Variable exists?
 *.
 
 *  Check inherited global status.
@@ -112,8 +113,20 @@
 *  Locate the instance data structure
       CALL ADI_FIND( PSID, 'InstanceData', IID, STATUS )
 
-*  Write the data
-      CALL ADI_CGET1<T>( IID, NAME, MXVAL, VALUE, NVAL, STATUS )
+*  Component exists?
+      CALL ADI_THERE( IID, NAME, THERE, STATUS )
+      IF ( THERE ) THEN
+
+*    Write the data
+        CALL ADI_CGET1<T>( IID, NAME, MXVAL, VALUE, NVAL, STATUS )
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'NAME', NAME )
+        CALL ERR_REP( ' ', 'Cannot access psf instance variable ^NAME',
+     :                STATUS )
+
+      END IF
 
 *  Release the instance data
       CALL ADI_ERASE( IID, STATUS )
