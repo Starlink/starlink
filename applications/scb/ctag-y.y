@@ -115,12 +115,11 @@ unit
 	;
 
 external_definition
-	: f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' 
-	  function_body
-		{ $$ = scat( 8, $1, $2, canchor( "name", $3, 1 ), 
-		             $4, $5, $6, $7, $8 ); }
-	| f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' ';'
-		{ $$ = scat( 8, $1, $2, $3, $4, $5, $6, $7, $8 ); }
+	: f77_define_macro '(' identifier ')' bracket_item function_body
+		{ $$ = scat( 6, $1, $2, canchor( "name", $3, 1 ), 
+                             $4, $5, $6 ); }
+	| f77_define_macro '(' identifier ')' bracket_item ';'
+		{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
 	| FUNC_NAME bracket_sequence function_body
 		{ $$ = scat( 3, canchor( "name", $1, 0 ), $2, $3 ); }
 	| FUNC_NAME bracket_sequence ';'
@@ -208,8 +207,12 @@ executable_code
 	;
 
 executable_item
-	: F77_CALL '(' identifier ')' 
-		{ $$ = scat( 4, $1, $2, canchor( "href", $3, 1 ), $4 ); }
+	: F77_CALL '(' identifier ')' '(' executable_code ')'
+		{ $$ = scat( 7, $1, $2, canchor( "href", $3, 1 ), 
+                             $4, $5, $6, $7 ); }
+	| F77_CALL '(' identifier ')' '(' ')'
+		{ $$ = scat( 6, $1, $2, canchor( "href", $3, 1 ),
+                             $4, $5, $6 ); }
 	| FUNC_NAME '(' executable_code ')'
 		{ $$ = scat( 4, canchor( "href", $1, 0 ), $2, $3, $4 ); }
 	| FUNC_NAME '(' ')'
