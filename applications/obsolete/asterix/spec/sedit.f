@@ -3,8 +3,7 @@
 *
 *    Description :
 *
-*     Allows creation and editing of FIT_MODEL structures using both a
-*     command driven and screen oriented interface.
+*     Allows creation and editing of FIT_MODEL structures
 *
 *    Environment parameters :
 *
@@ -16,8 +15,6 @@
 *		String containing specification of composite model
 *     VALUES=LITERAL(R)
 *               String containing parameter value/limits
-*     SCREEN=LOGICAL(R)
-*               Run in screen mode?
 *
 *    Deficiencies :
 *    Bugs :
@@ -42,6 +39,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     14 Dec 94 : V1.8-1 Display ties (DJA)
 *     24 Apr 95 : V1.8-2 Use ADI to store locators (DJA)
+*     11 Jan 1996 : V1.8-3 TSM removed (DJA)
 *
 *    Type Definitions :
 *
@@ -51,7 +49,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'TSM_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *
@@ -92,7 +89,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION            	! Version id
-        PARAMETER               ( VERSION = 'SEDIT Version 1.8-2' )
+        PARAMETER               ( VERSION = 'SEDIT Version 1.8-3' )
 *-
 
 *    Check status
@@ -132,43 +129,8 @@
       END IF
       IF (STATUS.NE.SAI__OK) GOTO 99
 
-*    Screen mode?
-      CALL USI_GET0L( 'SCREEN', SCREEN, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    SEDIT needs a screen which is at least 132 columns
-      IF ( SCREEN ) THEN
-        CALL TSM_INIT( ' ', STATUS )
-        CALL TSM_GETDIMS( 0, SNX, SNY, STATUS )
-        IF ( SNX .LT. 132 ) THEN
-          CALL MSG_PRNT( '** SEDIT needs a screen at least 132 columns'/
-     :                   /' wide in screen mode **' )
-          SCREEN = .FALSE.
-        ELSE
-          CALL TSM_CREWINB( SNX-2, SNY-5, 2, 2, W_BIG, STATUS )
-          DNX = SNX-4
-          DNY = SNY-11
-          CALL TSM_CRESUB( W_BIG, DNX, DNY, 2, 2, W_DISP, STATUS )
-          CALL TSM_PUTLABEL( W_BIG, '< Model Selection >', TSM__TOP,
-     :                     TSM__CENTRE, STATUS )
-          CALL TSM_CREWINB( SNX-2, 1, 2, SNY-1, W_STATUS, STATUS )
-          CALL TSM_PUTSTRAT( W_STATUS, 'File : ', 2, 1, STATUS )
-          DSTART = 1
-          CLINE = 1
-          CCOL = 0
-          UPDATE=.TRUE.
-        END IF
-      END IF
-
 *    Declare file to user :
-      IF ( SCREEN ) THEN
-        CALL ADI_FTRACE( FID, NLEV, PATH, FILE, STATUS )
-        CALL TSM_PUTSSTRAT( W_STATUS, FILE(:CHR_LEN(FILE)), TSM__BOLD,
-     :                                                  9, 1, STATUS )
-        CALL TSM_REFRESH( W_STATUS, STATUS )
-      ELSE
-        CALL DISP_FILENAM( FID, 'Model', STATUS )
-      END IF
+      CALL DISP_FILENAM( FID, 'Model', STATUS )
 
 *    History file entry :
       CALL HSI_ADD( FID, VERSION, STATUS )
@@ -177,11 +139,7 @@
 *    No existing model, so ask the user to input one :
       IF ( SNEW ) THEN
         CALL SEDIT_NEWMOD( FLOC, STATUS )
-        IF ( SCREEN ) THEN
-          CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, 6, STATUS )
-        ELSE
-          CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, -1, STATUS )
-        END IF
+        CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, -1, STATUS )
       ELSE
 
 *      Display component parameters
@@ -202,20 +160,9 @@
       QUIT = .FALSE.
       DO WHILE ( (STATUS.EQ.SAI__OK) .AND. .NOT. QUIT )
 
-*       Screen mode
-         IF ( SCREEN ) THEN
-           IF ( UPDATE ) THEN
-             CALL SEDIT_UPDSCR( STATUS )
-             UPDATE =.FALSE.
-           END IF
-           CALL SEDIT_CURSOR( .TRUE., STATUS )
-           CALL TSM_RDCH( W_BIG, IOPT, STATUS )
-           IF ( IOPT .LT. 255 ) OPTION = CHAR(IOPT)
-         ELSE
-           CALL USI_GET0C('OPTION',OPTION,STATUS)
-           CALL USI_CANCL('OPTION',STATUS)
-           IOPT = ICHAR(OPTION(1:1))
-         END IF
+         CALL USI_GET0C('OPTION',OPTION,STATUS)
+         CALL USI_CANCL('OPTION',STATUS)
+         IOPT = ICHAR(OPTION(1:1))
 
 *       Bad response?
          IF ( STATUS .NE. SAI__OK ) THEN
@@ -225,32 +172,20 @@
          ELSE IF ( CHR_SIMLR(OPTION,'RE') ) THEN
            CALL SEDIT_ERESET(FLOC,PARTOT,COMP,PAR,STATUS)
 
-*       Refresh screen
-         ELSE IF ( (IOPT .EQ. TSM__K_CTRLL) .OR.
-     :             (IOPT .EQ. TSM__K_UPPERCASE_R) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_R) ) THEN
-           CALL TSM_REFRESH( W_BIG, STATUS )
-           CALL TSM_REFRESH( W_STATUS, STATUS )
-           UPDATE = .TRUE.
-
 *       Alter parameters
-         ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_A) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_A) ) THEN
+         ELSE IF ( CHR_SIMLR(OPTION,'A') ) THEN
            CALL SEDIT_ALTERPAR(FLOC,PARTOT,COMP,PAR,STATUS)
 
 *       Freeze parameters
-         ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_F) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_F) ) THEN
+         ELSE IF ( CHR_SIMLR(OPTION,'F') ) THEN
            CALL SEDIT_FR_OR_TH(FLOC,PARTOT,COMP,PAR,.TRUE.,STATUS)
 
 *       Thaw parameters
-         ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_T) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_T) ) THEN
+         ELSE IF ( CHR_SIMLR(OPTION,'T') ) THEN
            CALL SEDIT_FR_OR_TH(FLOC,PARTOT,COMP,PAR,.FALSE.,STATUS)
 
 *       Hardcopy of parameters
-         ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_P) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_P) ) THEN
+         ELSE IF ( CHR_SIMLR(OPTION,'P') ) THEN
 
 *         Open the file
            CALL AIO_OPEN( 'PRINTER', 'LIST', OCH, WIDTH, STATUS )
@@ -268,8 +203,7 @@
            IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *       List parameters to screen
-         ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_L) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_L) ) THEN
+         ELSE IF ( CHR_SIMLR(OPTION,'L') ) THEN
            CALL SEDIT_LISTPAR( FID, PARTOT, COMP, PAR, 6, STATUS )
 
 *       New parameters
@@ -280,38 +214,8 @@
          ELSE IF ( CHR_SIMLR(OPTION,'NM') ) THEN
            CALL SEDIT_NEWMOD( FLOC, STATUS )
 
-*       Move cursor left
-         ELSE IF ( SCREEN .AND. (IOPT.EQ.TSM__K_LEFT) ) THEN
-
-*       Move cursor right
-         ELSE IF ( SCREEN .AND. (IOPT.EQ.TSM__K_RIGHT) ) THEN
-
-*       Move cursor down
-         ELSE IF ( SCREEN .AND. (IOPT.EQ.TSM__K_DOWN) ) THEN
-
-           CALL SEDIT_CURSOR( .FALSE., STATUS )
-           IF ( CLINE .EQ. NLINE ) THEN
-             CALL TSM_BELL( 1, STATUS )
-           ELSE
-             CALL SEDIT_SCRDISP( CLINE+1, STATUS )
-             CLINE = CLINE + 1
-           END IF
-
-*       Move cursor up
-         ELSE IF ( SCREEN .AND. (IOPT.EQ.TSM__K_UP) ) THEN
-
-           CALL SEDIT_CURSOR( .FALSE., STATUS )
-           IF ( CLINE .EQ. 1 ) THEN
-             CALL TSM_BELL( 1, STATUS )
-           ELSE
-             CALL SEDIT_SCRDISP( CLINE-1, STATUS )
-             CLINE = CLINE - 1
-           END IF
-
 *       Quit program?
-         ELSE IF ( (IOPT .EQ. TSM__K_UPPERCASE_X) .OR.
-     :             (IOPT .EQ. TSM__K_LOWERCASE_X) ) THEN
-           IF ( SCREEN ) CALL SEDIT_CURSOR( .FALSE., STATUS )
+         ELSE IF ( CHR_SIMLR(OPTION,'X') ) THEN
            QUIT = .TRUE.
 
          END IF
@@ -396,18 +300,9 @@
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Display menu and enter new model
-      IF ( SCREEN ) THEN
-        CALL TSM_ERASE( W_BIG, STATUS )
-        CALL SEDIT_FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-        CALL TSM_PUTSTRAT( W_BIG, 'Model specification > ', 2,
-     :                                         SNY-6, STATUS )
-        CALL TSM_REFRESH( W_BIG, STATUS )
-        CALL TSM_RDSTR( W_BIG, MODSPEC, STATUS )
-      ELSE
-        CALL FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-        CALL USI_GET0C('MODEL_SPEC',MODSPEC,STATUS)
-        CALL USI_CANCL('MODEL_SPEC',STATUS)
-      END IF
+      CALL FIT_MENU( GENUS, NCIMP, MENU, STATUS )
+      CALL USI_GET0C('MODEL_SPEC',MODSPEC,STATUS)
+      CALL USI_CANCL('MODEL_SPEC',STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Extract model components and check them :
@@ -481,11 +376,9 @@
       CALL FIT_PARSET( GENUS, NMCOMP, MODL, FLOC, STATUS )
 
 *    Get parameters from user :
-      IF ( .NOT. SCREEN ) THEN
-        CALL MSG_PRNT ('Enter new model parameters:-')
-        CALL SEDIT_NEWPAR( FLOC, STATUS )
-        IF (STATUS.EQ.PAR__NULL) CALL ERR_ANNUL( STATUS )
-      END IF
+      CALL MSG_PRNT ('Enter new model parameters:-')
+      CALL SEDIT_NEWPAR( FLOC, STATUS )
+      IF (STATUS.EQ.PAR__NULL) CALL ERR_ANNUL( STATUS )
 
 *    Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
@@ -760,22 +653,7 @@
         GOTO 99
       END IF
 
-      IF ( SCREEN ) THEN
-        CALL TSM_ERASE( W_BIG, STATUS )
-        CALL MSG_SETC( 'MODEL', MODSPEC )
-        CALL TSM_PUTMSGAT( W_STATUS, 'Model is : ^MODEL',
-     :                                    85, 1, STATUS )
-        CALL TSM_PUTSSTRAT( W_BIG, 'Component/Parameter          '/
-     :                  /'   Units                          Value'/
-     :                  /'                    Range',
-     :                     TSM__BOLD, 2, 1, STATUS )
-        CALL TSM_DRAWLINE( W_BIG, 1, SNY-9, SNX-2, SNY-9, STATUS )
-        CALL TSM_PUTSTRAT( W_BIG, '[H]ELP              [R]efresh'/
-     :             /' screen           E[X]it', 1, SNY-8, STATUS )
-        CALL TSM_REFRESH( W_STATUS, STATUS )
-
-        IL = 0
-      ELSE IF ( OCH .GT. 0 ) THEN
+      IF ( OCH .GT. 0 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
         CALL MSG_SETC( 'MODEL', MODSPEC )
         CALL AIO_WRITE( OCH, 'Existing model is: ^MODEL', STATUS )
@@ -803,12 +681,7 @@
 *       Write component id
          CALL CMP_GET0C( MILOC, 'KEY', KEY, STATUS )
          WRITE( LINE, '(A,I1,2A)' ) 'Component ',I,' - ',KEY
-         IF ( SCREEN ) THEN
-           IL = IL + 1
-           DLINE(IL) = LINE
-           FLINE(I) = IL
-           NPAR(I) = MNPAR
-         ELSE IF ( OCH .GT. 0 ) THEN
+         IF ( OCH .GT. 0 ) THEN
            CALL AIO_WRITE( OCH, LINE, STATUS )
          END IF
 
@@ -859,10 +732,7 @@
 	      WRITE(LINE,300)J,PARNAME,FROZ,VSTR
  300	      FORMAT(I3,') ',A25,A3,A44 )
 	    END IF
-            IF ( SCREEN ) THEN
-              IL = IL + 1
-	      DLINE(IL) = LINE
-            ELSE IF ( OCH .GT. 0 ) THEN
+            IF ( OCH .GT. 0 ) THEN
               CALL AIO_IWRITE( OCH, 1, LINE, STATUS )
             END IF
          END DO
@@ -871,11 +741,6 @@
       END DO
       NLINE = IL
 
-*    Ensure screen is up to date
-      IF ( SCREEN ) THEN
-        CALL TSM_REFRESH( W_BIG, STATUS )
-      END IF
-
 *    Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'SEDIT_LISTPAR', STATUS )
@@ -883,185 +748,6 @@
 
       END
 
-
-*+  SEDIT_UPDSCR - Update display in screen mode
-      SUBROUTINE SEDIT_UPDSCR( STATUS )
-*
-*    Description :
-*
-*     Lists current parameter values and specifications.
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'FIT_PAR'
-      INCLUDE 'TSM_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'SEDIT_CMN'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local varaiables :
-*
-      INTEGER I
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Wipe the display surface
-      CALL TSM_ERASE( W_DISP, STATUS )
-
-*    Output lines of text
-      DO I = DSTART, MIN(DSTART+DNY-1,NLINE)
-        CALL TSM_PUTSTRAT( W_DISP, DLINE(I), 1, I-DSTART+2, STATUS )
-      END DO
-
-*    Ensure visible version is up to date
-      CALL TSM_REFRESH( W_DISP, STATUS )
-
-      END
-
-
-
-*+  SEDIT_CURSOR - Update display in screen mode
-      SUBROUTINE SEDIT_CURSOR( ON, STATUS )
-*
-*    Description :
-*
-*     Lists current parameter values and specifications.
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'FIT_PAR'
-      INCLUDE 'TSM_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'SEDIT_CMN'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Import :
-*
-      LOGICAL         ON
-*
-*    Local variables :
-*
-      INTEGER         CX, CY, I, IMOD,ASTYLE
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Cursor Y position
-      CY = CLINE - DSTART + 2
-
-*   Work out the cursor text and position
-*    Cursor in last column?
-      IF ( CCOL .EQ. 0 ) THEN
-
-*      Set arrow style
-        ASTYLE = TSM__BOLD + TSM__BLINK
-
-      ELSE
-
-*      Are we on a model component name line?
-        IMOD = 0
-        DO I = 1, NCOMP
-          IF ( CLINE .EQ. FLINE(I) ) IMOD = I
-        END DO
-
-*      Set arrow style
-        ASTYLE = TSM__BOLD
-
-      END IF
-
-*    Always display the arrow
-      CX = DNX - 2
-      IF ( ON ) THEN
-        CALL TSM_PUTSSTRAT( W_DISP, '<<', ASTYLE,
-     :                      CX, CY, STATUS )
-      ELSE
-        CALL TSM_PUTSTRAT( W_DISP, '  ', CX, CY, STATUS )
-      END IF
-
-*    Ensure visible version is up to date
-      CALL TSM_REFRESH( W_DISP, STATUS )
-
-      END
-
-
-
-*+  SEDIT_SCRDISP - Ensure screen would contain new cursor position
-      SUBROUTINE SEDIT_SCRDISP( NEWLINE, STATUS )
-*
-*    Description :
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'FIT_PAR'
-      INCLUDE 'TSM_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'SEDIT_CMN'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Import :
-*
-      INTEGER            NEWLINE
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Is the new position above the current top of display?
-      IF ( NEWLINE .LT. DSTART ) THEN
-
-*      Scroll window down
-        CALL TSM_SCROLL( W_DISP, -1, STATUS )
-        DSTART = DSTART - 1
-
-*    Is it off the bottom
-      ELSE IF ( NEWLINE .GT. (DSTART+DNY-1) ) THEN
-
-*      Scroll window up
-        CALL TSM_SCROLL( W_DISP, 1, STATUS )
-        DSTART = DSTART + 1
-
-      END IF
-
-*    Ensure visible version is up to date
-      CALL TSM_REFRESH( W_DISP, STATUS )
-
-      END
 
 
 *+  SEDIT_FR_OR_TH - Freeze or thaw selected parameters
@@ -1411,149 +1097,5 @@
  99   IF ( STATUS.NE.SAI__OK ) THEN
         CALL AST_REXIT( 'SEDIT_DECODE', STATUS )
       END IF
-
-      END
-
-
-
-*+  SEDIT_FIT_MENU - Displays menu of available primitive spectral models
-      SUBROUTINE SEDIT_FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-*    Description :
-*     Retrieves keywords and names of the supported primitive models from model
-*     menu file (e.g. SPEC_MENU) and displays these as a menu on the user's
-*     terminal.
-*     No.of models implemented and an array of the model keywords are returned
-*     to the calling routine.
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Trevor Ponman  (BHVAD::TJP)
-*    History :
-*
-*      4 Aug 93 : Taken from FIT_MENU (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
-      INCLUDE 'FIT_PAR'
-      INCLUDE 'TSM_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'SEDIT_CMN'
-*
-*    Import :
-*
-      CHARACTER*(*) GENUS			! Model genus
-*
-*    Export :
-*
-      INTEGER       NCIMP			! No of models supported
-      CHARACTER*(*) MENU(*)			! Menu of model keys
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-	CHARACTER*80 LINE			! Line from menu file
-	CHARACTER*80 STRING			! String from LINE
-	CHARACTER*(MAXKEYLEN) KEY		! Model keyword
-	CHARACTER*40 NAME			! Model name
-	CHARACTER*14 TYPE			! Model type
-
-      INTEGER         IL                        ! Line for printing
-      INTEGER         MFD                       ! Menu file descriptor
-      INTEGER         N
-*-
-
-*    Status check
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Access menu file
-      CALL FIT_MEN_OPEN( GENUS, MFD, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-      NCIMP = 0
-      IL = 3
-
-*    Write menu prologue
-      CALL TSM_PUTSTRAT( W_BIG, ' A composite model can be '/
-     :        /'synthesised using + - * ( ) and any of the '/
-     :         /'following primitive models:', 1, 1, STATUS )
-
-*    Read line from menu file, leave loop if end of menu
-      DO WHILE ( STATUS .EQ. SAI__OK )
- 10	CALL AIO_READF( MFD, LINE, STATUS )
-        IF((STATUS.EQ.SAI__OK).AND.(LINE(1:1).EQ.'#'))GOTO 10
-	IF(INDEX(LINE,'endmenu').GT.0) GO TO 99	! Jump to exit
-
-*      Look for 'model' header
-	IF(INDEX(LINE,'  model').EQ.0) GO TO 10		! Read next line
-
-*      Header found - read model key, name & type
-	CALL AIO_READF( MFD, LINE, STATUS )
-	N=INDEX(LINE,'key:')
-	IF(N.EQ.0)THEN
-	  STATUS=SAI__ERROR
-	  CALL ERR_REP('BADMNU','Error in menu file',STATUS)
-	  GO TO 99
-	ENDIF
-
-*      Strip out keyword
-	STRING=LINE(N+4:80)
-	CALL CHR_LDBLK(STRING)
-	IF(STATUS.NE.SAI__OK) GO TO 99
-	KEY=STRING(1:)
-
-	CALL AIO_READF( MFD, LINE, STATUS )
-	N=INDEX(LINE,'mname:')
-	IF(N.EQ.0)THEN
-	  STATUS=SAI__ERROR
-	  CALL ERR_REP('BADMNU','Error in SPECFIT.MNU',STATUS)
-	  GO TO 99
-	ENDIF
-
-*      Strip out model name
-	STRING=LINE(N+6:80)
-	CALL CHR_LDBLK(STRING)
-	IF(STATUS.NE.SAI__OK) GO TO 99
-	NAME=STRING(1:40)
-
-	CALL AIO_READF( MFD, LINE, STATUS )
-	N=INDEX(LINE,'type:')
-	IF(N.EQ.0)THEN
-	  STATUS=SAI__ERROR
-	  CALL ERR_REP('BADMNU','Error in menu file',STATUS)
-	  GO TO 99
-	ENDIF
-
-*      Strip out model type
-	STRING=LINE(N+5:80)
-	CALL CHR_LDBLK(STRING)
-	IF(STATUS.NE.SAI__OK) GO TO 99
-	TYPE=STRING(1:14)
-
-*      If model's type is properly defined then add it to menu
-	IF(TYPE.EQ.'additive'.OR.TYPE.EQ.'multiplicative')THEN
-	  NCIMP=NCIMP+1
-	  MENU(NCIMP)=KEY
-	  WRITE(LINE,50)KEY,NAME,TYPE
- 50	  FORMAT(4X,A4,3X,A40,5X,A14)
-          CALL TSM_PUTSTRAT( W_BIG, LINE, 2, IL, STATUS )
-          IL = IL + 1
-	ENDIF
-
-      END DO
-
-*    Close menu file
- 99   CALL FIT_MEN_CLOSE( MFD, STATUS )
 
       END
