@@ -49,32 +49,22 @@
 *
       INTEGER STATUS
 *
-*    Functions :
-*
-      LOGICAL                 CHR_INSET
-*
 *    Local variables :
 *
-      CHARACTER*5             	LSUF              	! List suffix for evds
-      CHARACTER*20  		TYPE              	! Dataset type
       CHARACTER*40            	LABEL, UNITS		! Axis attributes
 
-      REAL                    	AXV1, AXV2        ! Axis values
       REAL                    BASE, SCALE       ! Axis data attributes
       REAL                    	TOR               	! Radian conversion factor
 
       INTEGER			AXID(4)			! Axis numbers
-      INTEGER                 	DIM               	! Size of an axis
       INTEGER                 	DIMS(ADI__MXDIM)  	! Dataset dimensions
       INTEGER                 	IAX               	! Loop over axes
       INTEGER			LID			! List identifier
       INTEGER                 	NDIM              	! Dimensionality
       INTEGER                 	PTR               	! Pointer to axis data
-      INTEGER                 	WE                	! Word delimiter
 
       LOGICAL                 	OK                	! General validity check
       LOGICAL                 	REG               	! Axis is regular?
-      LOGICAL			XTHERE			! X_CORR present?
 *
 *  Local Data:
 *
