@@ -168,6 +168,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -179,6 +180,9 @@
 *        getting the range values.  Used PSX for workspace.  Fixed a
 *        bug in RANGE reporting.  Allowed for Error as a COMP option.
 *        Added PXSIZE and PYSIZE parameters.
+*     27-FEB-1998 (DSB):
+*        Corrected the reporting of the upper limit of _DOUBLE data by
+*        replacing call to CHR_PUTI by CHR_PUTD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -437,7 +441,7 @@
             CALL CHR_PUTC( 'Minimum value is ', BUFFER, NC )
             CALL CHR_PUTD( DMINV, BUFFER, NC )
             CALL CHR_PUTC( ' and the maximum is ', BUFFER, NC )
-            CALL CHR_PUTI( DMAXV, BUFFER, NC )
+            CALL CHR_PUTD( DMAXV, BUFFER, NC )
             CALL MSG_OUT( 'EXTREMES', BUFFER( :NC ), STATUS )
 
 *  Set the default values.
