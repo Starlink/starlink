@@ -13,6 +13,9 @@
  * Peter W. Draper 16 Jun 98  Added support for web proxy servers.
  *                 06 Aug 01  Added "Host:" header for interception
  *                            proxy support.
+ *                 21 Jan 03  Changed to work with UNIX permissions
+ *                            after gcc3 looses a non-standard
+ *                            ofstream constructor. 
  */
 static const char* const rcsId="@(#) $Id: HTTP.C,v 1.14 1998/07/20 13:29:44 abrighto Exp $";
 
@@ -520,10 +523,15 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
     os << newentry << endl << ends;
     
     // create the auth file with -rw------- perms
-    ofstream f(auth_file_, ios::out, 0600);
+    ofstream f(auth_file_, ios::out );// PWD: was ", 0600 );" but gcc3 looses
+                                      // permission argument.
     if (f) 
 	f << os.str();
     delete os.str();
+    f.close();
+    
+    //  Change permissions the UNIX way.
+    chmod( auth_file_, 0600 );
 
     return 0;
 }

@@ -11,6 +11,8 @@
  *                           linux. Something horrible happens here 
  *                           under RH5 and glibc.
  *                 08/12/98  Changed for egcs compiler 
+ *                 21/01/03  Changed for gcc3, errno and friends
+ *                           cannot be referenced twice.
  */
 static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
 
@@ -68,13 +70,10 @@ int error(const char* msg1, const char* msg2, int code)
  */
 int sys_error(const char* msg1, const char* msg2)
 {
-    extern int sys_nerr;
-#ifdef __alpha
-    extern char *sys_errlist[];
-#else
-    extern const char *const sys_errlist[];
-#endif
-    extern int errno;
+    // PWD: not needed, defined in include files.
+    //     extern int sys_nerr;
+    //     extern const char *const sys_errlist[];
+    //     extern int errno;
     char* s = strerror(errno);
 
     // XXX configure: sys_nerr may not be defined ?
