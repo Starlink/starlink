@@ -1,4 +1,4 @@
-      SUBROUTINE UDI0_ADVITI( ITEMS, START, STOP, STATUS )
+      SUBROUTINE UDI0_ADVITI( ITEMS, START, STOP, IITEM, STATUS )
 *+
 *  Name:
 *     UDI0_ADVITI
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL UDI0_ADVITI( ITEMS, START, STOP, STATUS )
+*     CALL UDI0_ADVITI( ITEMS, START, STOP, IITEM, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -22,6 +22,8 @@
 *        Character index of start of first item in list
 *     STOP = INTEGER (given and returned)
 *        Character index of end of first item in list
+*     IITEM = INTEGER (given and returned)
+*        Item counter
 *     STATUS = INTEGER (given)
 *        The global status.
 
@@ -90,8 +92,8 @@
 *  Arguments Given:
       CHARACTER*(*)		ITEMS
 
-*  Arguments Returned:
-      INTEGER			START, STOP
+*  Arguments Given and Returned:
+      INTEGER			START, STOP, IITEM
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -111,6 +113,9 @@
 *  Find end of this word
       STOP = START + 1
       CALL CHR_FIWE( ITEMS, STOP, STATUS )
+
+*  Increment counter
+      IITEM = IITEM + 1
 
 *  If bad status then end of list is met
       IF ( STATUS .EQ. CHR__EOSNT ) THEN

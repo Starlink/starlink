@@ -1,4 +1,4 @@
-      SUBROUTINE UDI0_CREITI( ITEMS, START, STOP, STATUS )
+      SUBROUTINE UDI0_CREITI( ITEMS, START, STOP, IITEM, STATUS )
 *+
 *  Name:
 *     UDI0_CREITI
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL UDI0_CREITI( ITEMS, START, STOP, STATUS )
+*     CALL UDI0_CREITI( ITEMS, START, STOP, IITEM, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -22,6 +22,8 @@
 *        Character index of start of first item in list
 *     STOP = INTEGER (returned)
 *        Character index of end of first item in list
+*     IITEM = INTEGER (returned)
+*        Item counter
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -91,7 +93,7 @@
       CHARACTER*(*)		ITEMS
 
 *  Arguments Returned:
-      INTEGER			START, STOP
+      INTEGER			START, STOP, IITEM
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -103,6 +105,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  First word
+      IITEM = 1
 
 *  First start of first word
       START = 1
