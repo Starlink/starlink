@@ -1,45 +1,60 @@
 #!perl -w
 
+# Test the pure library interface
+use strict;
+no strict 'refs';
+use Test;
+
+BEGIN { plan tests => 6 }
+
 use GSD;
 
-my ($filename, $status, $version, $label, $no_items, $fptr, $file_dsc);
-my ($item_dsc, $data_ptr, $nm, $item, $unit, $array, $call, $i);
-my ($newdata, $type);
+ok(1);
 
-print "1..3\n";   # 3 tests
+my ($version, $label, $no_items, $fptr, $file_dsc, $item_dsc, $data_ptr);
 
-$filename = "t/obs_das_0141";
+my $filename = "t/obs_das_0141";
 
-print "Trying gsdOpenRead...\n";
+print "# Trying gsdOpenRead...\n";
 
-$status = gsdOpenRead($filename,$version,$label,$no_items,$fptr,$file_dsc,
-	$item_dsc,$data_ptr);
+my $status = gsdOpenRead($filename,$version,$label,$no_items,$fptr,$file_dsc,
+			 $item_dsc,$data_ptr);
 
 $label =~ s/\s+$//g;
 
+if ($status != 0) {
+  ok(0);
+  exit;
+} else {
+  ok(1);
+}
 
-($status != 0) && do {print "not ok\n"; exit;};
+ok($label =~ /JCMT/);
 
-($label =~ /JCMT/) && (print "ok\n") || (print "not ok\n");
+#($label =~ /JCMT/) && (print "ok\n") || (print "not ok\n");
 
 
-$nm = "c1long";
+my $nm = "c1long";
+my ($unit, $type, $array, $item);
 $status = gsdFind($file_dsc,$item_dsc,$nm,$item,$unit,$type,$array);
 
-$call = "gsdGet$array\l$type";
+my $newdata;
+my $call = "gsdGet$array\l$type";
 $status = &{$call}($file_dsc,$item_dsc,$data_ptr,$item,$newdata);
 
-($newdata - 155.479721069336  < 1e-10) && (print "ok\n") 
-	|| (print "not ok\n");
+ok($newdata - 155.479721069336  < 1e-10);
 
-$i  = 10;
+my $i  = 10;
 $status = gsdItem($file_dsc,$item_dsc,$i,$nm,$unit,$type,$array);
 $call = "gsdGet$array\l$type";
 $status = &{$call}($file_dsc,$item_dsc,$data_ptr,$i,$newdata);
 
-($newdata =~ /BESSELIAN/) && (print "ok\n") || (print "not ok\n");
+
+ok($newdata =~ /BESSELIAN/);
 
 $status = gsdClose($fptr,$file_dsc,$item_dsc,$data_ptr);
+print "# Close status: $status\n";
+ok($status == 0);
 
 exit;
 
