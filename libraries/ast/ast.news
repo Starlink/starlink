@@ -21,7 +21,8 @@ o  The FITS-WCS encoding used by the FitsChan class now includes the
    values of the WCSNAME keywords are now used as the Domain names for
    the corresponding Frames in the returned FrameSet. When writing a
    FrameSet to a FITS header the Domain names of each Frame are stored in
-   WCSNAME keywords in the header.
+   WCSNAME keywords in the header. The Domain name is used to create a
+   default Title for the Frame.
 
 o  A new resampling scheme (identified by the symbolic constant
    AST__BLOCKAVE) has been added to AST_RESAMPLE. This scheme sets each 

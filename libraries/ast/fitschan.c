@@ -323,6 +323,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        account of the possiblity of lots of trailing spaces.
 *     5-DEC-2000 (DSB):
 *        Add support for the WCSNAME FITS keyword.
+*     12-DEC-2000 (DSB):
+*        Add a title to each physical, non-celestial coord Frame based on 
+*        its Domain name (if any).
 *class--
 */
 
@@ -16012,6 +16015,14 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
    ckeyval = GetItemC( &(store->wcsname), 0, s, NULL, method, class );
    if( ckeyval ){
       astSetDomain( ret, ckeyval );
+   }
+
+/* If the returned Frame is not a SkyFrame, and no Title value has been
+   set, create a Title using the Domain name (if any). */
+   if( !astIsASkyFrame( ret ) && !astTestTitle( ret ) && 
+        astTestDomain( ret ) ) {
+      sprintf( buf, "%s coordinates", astGetDomain( ret ) );
+      astSetTitle( ret, buf );
    }
 
 /* If an error has occurred, annul the Frame. */
