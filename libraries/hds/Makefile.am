@@ -113,13 +113,13 @@ C_ROUTINES = \
         \
         win_fixups.c
 
-dat_par.h: dat_par_h
+dat_par.h: dat_par_h$(EXEEXT)
 	./dat_par_h >dat_par.h
 
-DAT_PAR: dat_par_f
+DAT_PAR: dat_par_f$(EXEEXT)
 	./dat_par_f > DAT_PAR
 
-hds_machine.txt: hds_machine
+hds_machine.txt: hds_machine$(EXEEXT)
 	echo "Machine characteristics, as determined by HDS" >$@
 	echo "" >>$@
 	./hds_machine >>$@
