@@ -135,7 +135,7 @@
           CALL ADI_CGET0I( PSID, 'Column', BCOL, STATUS )
           CALL ADI_CGET0C( PSID, 'Type', TYPE, STATUS )
           CALL ADI_CGET0I( PSID, 'Frow', FROW, STATUS )
-          CALL ADI_CGET0I( PSID, 'Nelem', NELM, STATUS )
+          CALL ADI_CGET0I( PSID, 'Nelm', NELM, STATUS )
 
 *      Write back data
           FSTAT = 0

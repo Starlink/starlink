@@ -161,7 +161,7 @@
       CALL ADI2_STOMAP( PSID, HDUID, 'BC', PTR, TYPE, MODE, STATUS )
 
 *  Store additional stuff needed by column mapping
-      CALL ADI_CPUT0I( PSID, 'ColNum', BCOL, STATUS )
+      CALL ADI_CPUT0I( PSID, 'Column', BCOL, STATUS )
       CALL ADI_CPUT0I( PSID, 'Frow', FROW, STATUS )
       CALL ADI_CPUT0I( PSID, 'Nelm', NVAL, STATUS )
 
