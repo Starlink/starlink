@@ -3699,6 +3699,111 @@ package kappa {
 
       }
 
+      action drawnorth {
+         alias {drawn(orth)}
+
+         helplib {$KAPPA_HELP}
+         parameter arrow {
+            type _REAL
+            vpath CURRENT DEFAULT
+            prompt {Fractional size of arrow heads}
+            ppath CURRENT DEFAULT
+            default 0.02
+            helpkey *
+         }
+
+         parameter blank {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Blank area behind arrows?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+         }
+         
+	 parameter blanksize {
+            type _REAL
+            vpath DEFAULT
+            prompt {Fractional size of area to be blanked}
+            ppath CURRENT DEFAULT
+            default 1.05
+            helpkey *
+         }
+
+         parameter device {
+            position 1
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            prompt {Name of graphics device}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            helpkey *
+         }
+
+         parameter epoch {
+            type _DOUBLE
+            prompt {Epoch of observation}
+            ppath DYNAMIC CURRENT
+            helpkey *
+         }
+
+         parameter frame {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Coordinate Frame for arrows}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+         }
+
+         parameter length {
+            position 2
+            type _REAL
+            vpath CURRENT DEFAULT
+            prompt {Lengths of arrows}
+            ppath CURRENT DEFAULT
+            default 0.1
+            helpkey *
+         }
+
+         parameter oframe {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Coordinate Frame for origin}
+            ppath CURRENT DEFAULT
+            default CURNDC
+            helpkey *
+         }
+
+         parameter origin {
+            position 3
+            type LITERAL
+            prompt {Position of arrow origin}
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+         }
+
+         parameter style {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the arrows}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+         }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            prompt {The axes to be annotated}
+            ppath DYNAMIC DEFAULT
+            default !
+            helpkey *
+         }
+      }
+
       action drawsig {
          alias {draw(sig)}
 

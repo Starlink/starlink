@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.2}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {16th January 2002}
+\newcommand{\stardocdate}      {19th August 2002}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within\\
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocversion}   {Version 2.1}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
@@ -543,6 +543,11 @@ catalogue contains columsn called RA and DEC, or X and Y.
 textual representations of NDF Quality bits.
 \end{itemize}
 
+\section{Changes in Version 2.1}
+\begin{itemize}
+\item The KPG1_CPSTY routine has been added to copy AST Plotting styles
+from one graphical element to another.
+\end{itemize}
 
 \appendix
 

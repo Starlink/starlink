@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application draws a pair of arrows on top of a previously displayed 
-*     DATA picture which indicate the directions of the labeled axes in the
+*     DATA picture which indicate the directions of the labelled axes in the
 *     underlying picture, at the position specified by parameter ORIGIN. For 
 *     instance, if the underlying picture has axes labelled with celestial 
 *     co-ordinates, then the arrows will by default indicate the directions 
@@ -149,11 +149,11 @@
 *
 *        The text of the label to draw against each arrow is specified by 
 *        the Symbol(1) and Symbol(2) attributes. These default to the
-*        correspoding attributes of the underlying picture. The
+*        corresponding attributes of the underlying picture. The
 *        appearance of these labels can be controlled using the attributes
 *        Font(TextLab), Size(TextLab), etc. The gap between the end of the 
 *        arrow and the corresponding label can be controlled using attribute 
-*        TextLabGap. The drawing of labels can be supressed using
+*        TextLabGap. The drawing of labels can be suppressed using
 *        attribute TextLab. [current value]
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the co-ordinate Frame selected using

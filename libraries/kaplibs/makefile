@@ -402,7 +402,7 @@ PKG_NUM = 1522
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.1-1
+PKG_VERS = 1.1-2
 
 #  Library version number.
 #
@@ -675,7 +675,7 @@ kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f \
 ncraxs.f ncrbck.f ncropn.f normal.f nxtnam.f powarr.f pthlpo.f \
 sread.f zero1d.f zero2d.f \
 kpg1_manib.f kpg1_manid.f kpg1_manii.f kpg1_manir.f kpg1_maniub.f \
-kpg1_maniuw.f kpg1_maniw.f 
+kpg1_maniuw.f kpg1_maniw.f kpg1_cpsty.f
 
 CTG_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
@@ -1867,6 +1867,7 @@ ira_seteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira_trans.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
 ira_write.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
 kpg1_abset.o:	 SAE_PAR PAR_ERR
+kpg1_cpsty.o:	 SAE_PAR AST_PAR
 kpg1_agatc.o:	 SAE_PAR DAT_PAR
 kpg1_agfnd.o:	 SAE_PAR DAT_PAR
 kpg1_agref.o:	 SAE_PAR DAT_PAR DAT_ERR
