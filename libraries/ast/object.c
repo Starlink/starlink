@@ -121,6 +121,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added debug conditional code to keep track of memory leaks.
 *     22-AUG-2004 (DSB):
 *        Added astEqual
+*     27-JAN-2005 (DSB):
+*        Correct use of ->ident pointers, and added further DEBUG blocks.
 *class--
 */
 
@@ -133,10 +135,6 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 
 /* Include files. */
 /* ============== */
-/* Configuration information */
-/* ------------------------ */
-#include "version.h"             /* Version numbers */
-
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
@@ -145,6 +143,10 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include "object.h"              /* Interface definition for this class */
 #include "plot.h"                /* Plot class (for astStripEscapes) */
 
+/* Configuration information */
+/* ------------------------ */
+#include "version.h"             /* Version numbers */
+ 
 /* Error code definitions. */
 /* ----------------------- */
 #include "ast_err.h"             /* AST error codes */
@@ -261,6 +263,10 @@ f     error value
 /* Check the pointer to ensure it identifies a valid Object (this
    generates an error if it doesn't). */
    if ( !astIsAObject( this ) ) return NULL;
+
+#ifdef DEBUG
+   astIdHandler( this, "annulled" );   
+#endif
 
 /* Decrement the Object's reference count and delete the Object if
    necessary. */
@@ -509,6 +515,10 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
+#ifdef DEBUG
+   astIdHandler( this, "cloned" );   
+#endif
+
 /* Increment the Object's reference count. */
    this->ref_count++;
 
@@ -595,6 +605,11 @@ f     function is invoked with STATUS set to an error value, or if it
       new->dynamic = 1;
       new->ref_count = 1;
       new->id = NULL;   /* ID attribute is not copied (but Ident is copied) */
+
+/* Copy the persistent identifier string. */
+      if( this->ident ) {
+         new->ident = astStore( NULL, this->ident, strlen( this->ident ) + 1 );
+      }
 
 /* Loop to execute any copy constructors declared by derived classes. */
       for ( i = 0; i < this->vtab->ncopy; i++ ) {
@@ -713,8 +728,9 @@ f     value
       ( *this->vtab->delete[ i ] )( this );
    }
 
-/* Free the ID string. */
+/* Free the ID strings. */
    this->id = astFree( this->id );
+   this->ident = astFree( this->ident );
 
 /* Save the virtual function table address and note if the Object's
    memory was allocated dynamically. Also note its size. */
@@ -3159,8 +3175,9 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 /* Initialise the reference count (of Object pointers in use). */
          new->ref_count = 1;
 
-/* Initialise the ID string. */
+/* Initialise the ID strings. */
          new->id = NULL;
+         new->ident = NULL;
 
 /* Increment the count of active Objects in the virtual function table. */
          new->vtab->nobject++;

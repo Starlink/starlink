@@ -8759,6 +8759,7 @@ AstRegion *astInitRegion_( void *mem, size_t size, int init,
 /* Form a FrameSet consisting of two copies of the supplied Frame
    connected together by a UnitMap, and store in the Region structure. */
       astSetRegFS( new, f0 );
+      f0 = astAnnul( f0 );
 
 /* Store a clone of the supplied PointSet pointer. */
       new->points = pset ? astClone( pset ) : NULL;

@@ -126,7 +126,7 @@ f     The SkyFrame class does not define any new routines beyond those
 *     2-DEC-2004 (DSB):
 *        Added System "J2000"
 *     27-JAN-2005 (DSB):
-*        Fix memory leak in astLoadSkyFrame_
+*        Fix memory leaks in astLoadSkyFrame_ and Match.
 *class--
 */
 
@@ -4076,17 +4076,17 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    Frames which effects the required coordinate conversion. */
       match = astSubFrame( target, template, 2, *target_axes, *template_axes,
                            map, result );
+   }
 
 /* If an error occurred, or conversion to the result Frame's
    coordinate system was not possible, then free all memory, annul the
    returned objects, and reset the returned value. */
-      if ( !astOK || !match ) {
-         *template_axes = astFree( *template_axes );
-         *target_axes = astFree( *target_axes );
-         if( *map ) *map = astAnnul( *map );
-         if( *result ) *result = astAnnul( *result );
-         match = 0;
-      }
+   if ( !astOK || !match ) {
+      *template_axes = astFree( *template_axes );
+      *target_axes = astFree( *target_axes );
+      if( *map ) *map = astAnnul( *map );
+      if( *result ) *result = astAnnul( *result );
+      match = 0;
    }
 
 /* Return the result. */

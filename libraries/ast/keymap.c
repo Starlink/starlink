@@ -72,6 +72,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        Added astMapLenC method.
 *     17-JAN-2005 (DSB):
 *        Remove "void *" arithmetic.
+*     25-JAN-2005 (DSB):
+*        Added more DEBUG blocks
 *class--
 */
 
@@ -1456,6 +1458,10 @@ f     reason.
    static int init = 0;          /* "strings" array initialised? */
    static int istr = 0;          /* Offset of next string in "strings" */
 
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Initialise. */
    result = NULL;
 
@@ -1479,8 +1485,15 @@ f     reason.
    element, so the earlier string is effectively replaced by the new
    one.) */
    if ( astOK ) {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
       strings[ istr ] = astStore( strings[ istr ], value,
                                   strlen( value ) + (size_t) 1 );
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to

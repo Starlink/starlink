@@ -121,6 +121,7 @@ static unsigned long Magic( void *ptr, size_t size );
 #ifdef DEBUG
 static void Issue( Memory *new );
 static void DeIssue( Memory *old );
+void IdAlarm( const char * );
 #endif
 
 /* Function implementations. */
@@ -1560,10 +1561,11 @@ static void Issue( Memory *new ) {
 /* Check inherited status */
    if( !astOK ) return;
 
-/* Invoke astIdHandler if this is the memory chunk which is being watched
-   for. By setting a debugger breakpoint on astIdHandler_, you can identify
-   the moment when a chunk known to be part of a leak is first issued. */
-   if( new->id == watch_id ) astIdHandler( new+1 );
+/* Invoke astIdHandler which checks if this is the memory chunk which is 
+   being watched for. By setting a debugger breakpoint on IdAlarm, you can 
+   identify the moment when a chunk known to be part of a leak is first 
+   issued. */
+   astIdHandler( new+1, "issued" );
 
 /* If OK, extend the list and add in the new address. */
    if( astOK ) {
@@ -1622,6 +1624,8 @@ static void DeIssue( Memory *old ) {
 
 /* Check a pointer was supplied. */
    if( !old ) return;
+
+   astIdHandler( old + 1, "deissued" );
 
 /* The id stored in the supplied Memory structure is the index into the
    "issued" array at which the pointer is stored. Check that this is the
@@ -1704,7 +1708,7 @@ void astSetWatchId_( int id ) {
 *     astSetWatchId
 
 *  Purpose:
-*     Indicate astIdHandler is to be invoked when a specified chunk is issued.
+*     Indicate IdAlarm is to be invoked when a specified chunk is issued.
 
 *  Type:
 *     Protected function.
@@ -1714,9 +1718,9 @@ void astSetWatchId_( int id ) {
 *     astSetWatchId( int id )
 
 *  Description:
-*     This function forces astIdHandler to be invoked when a
+*     This function forces IdAlarm to be invoked when a
 *     specified memory chunk is issued. By setting a debugger breakpoint 
-*     on astIdHandler_ the moment at which the specified memory chunk is
+*     on IdAlarm the moment at which the specified memory chunk is
 *     issued can be trapped, and the cause of the memory allocation 
 *     determined by examining the call stack.
 
@@ -1903,33 +1907,61 @@ void *astFindIdPtr_( int id ){
    return ( issued[ id ] + 1 );
 }
 
-void astIdHandler_( void *new ){
+void astIdHandler_( void *new, const char *verb ){
 /*
 *+
 *  Name:
 *     astIdHandler
 
 *  Purpose:
-*     Called when a watched memory ID is issued.
+*     Called to check if a watched memory ID is issued.
 
 *  Type:
 *     Protected function.
 
 *  Synopsis:
 *     #include "memory.h"
-*     void astIdHandler()
+*     void astIdHandler( void *new, const char *verb )
+
+*  Description:
+*     This function checks if the supplied pointer is being watched, and
+*     calls IdAlarm if it is. See astSetWatchId.
+
+*  Parameters:
+*     new
+*        The memory pointer being issued.
+*     verb
+*        Text to include in message.
+*-
+*/
+   if( (((Memory *)new)-1)->id == watch_id ) IdAlarm( verb );
+}
+
+void IdAlarm( const char *verb ){
+/*
+*  Name:
+*     IdHandler
+
+*  Purpose:
+*     Called when a watched memory ID is issued.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void IdAlarm( const char *verb )
 
 *  Description:
 *     This function is called when a watched memory ID is issued. See
 *     astSetWatchId.
 
 *  Parameters:
-*     new
-*        The memory pointer being issued.
-*-
+*     verb
+*        Text to include in message.
 */
-   printf( "astIdHandler(memory): The id %d has been issued to memory address %p.\n", 
-           watch_id, new );
+
+   printf( "IdAlarm(memory): The id %d has been %s.\n", watch_id, verb );
 }
 
 #endif
