@@ -73,7 +73,7 @@
 
 #  Generate the final argument list and pass it through an awk script 
 #  which eliminates all except the last reference to each library.
-      echo "`fio_link` `trn_link` \
+      echo "`fio_link` `trn_link` `pda_link` \
             `chr_link` `prm_link` `psx_link` \
             `ard_link` `ndg_link` `grp_link` \
             `ams_link_adam` \
