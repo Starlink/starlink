@@ -15,6 +15,7 @@
 #include "grismmap.h"
 #include "interval.h"
 #include "intramap.h"
+#include "keymap.h"
 #include "loader.h"
 #include "lutmap.h"
 #include "mapping.h"
@@ -95,6 +96,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(GrismMap);
    LOAD(Interval);
    LOAD(IntraMap);
+   LOAD(KeyMap);
    LOAD(LutMap);
    LOAD(Mapping);
    LOAD(MathMap);

@@ -63,6 +63,7 @@ g77 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/inclu
 g77 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 g77 -fno-second-underscore -o testxmlchan testxmlchan.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 g77 -fno-second-underscore -o testregions testregions.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+g77 -fno-second-underscore -o testkeymap testkeymap.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the main regression tester
 regression >& regression.out
@@ -85,6 +86,10 @@ testxmlchan
 # Run the Region tester
 echo "\nTesting Region subclasses...\n"
 testregions
+
+# Run the KeyMap tester
+echo "\nTesting KeyMap classes...\n"
+testkeymap
 
 # Make new plots.
 echo "\nGenerating new plots...\n"

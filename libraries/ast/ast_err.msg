@@ -138,4 +138,8 @@ ZERAX           <Range of log axis scale includes zero>
 ! New codes introduced for V3.3
 BADOC           <Invalid parameters for offset sky coordinate system>
 
+! New codes introduced for V3.5-2
+MPGER           <error getting a named value from a KeyMap>
+MPIND           <invalid integer index supplied for a KeyMap entry>
+
 .END

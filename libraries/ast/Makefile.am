@@ -32,6 +32,7 @@ GRP_C_ROUTINES = \
     finterval.c \
     fintramap.c \
     fitschan.c \
+    fkeymap.c \
     flutmap.c \
     fmapping.c \
     fmathmap.c \
@@ -62,6 +63,7 @@ GRP_C_ROUTINES = \
     grismmap.c \
     interval.c \
     intramap.c \
+    keymap.c \
     loader.c \
     lutmap.c \
     mapping.c \
@@ -106,6 +108,7 @@ AST_H_FILES = \
     ast_err.h \
     version.h \
     object.h \
+       keymap.h \
        pointset.h \
        axis.h \
           skyaxis.h \
