@@ -32,7 +32,7 @@ UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE)
 
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
-kaplibs.news ira_source.tar KAPLIBS_CONDITIONS
+kaplibs.news ira_source.tar ctg_source.tar lpg_source.tar KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.
 $(action)

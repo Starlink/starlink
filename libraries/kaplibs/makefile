@@ -424,7 +424,7 @@ LIB_VERS = 1.1
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-ira_source.tar 
+ira_source.tar ctg_source.tar lpg_source.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -446,14 +446,18 @@ STARTUP_SCRIPT = $(PKG_NAME)_dev
 #  installed in the $(INSTALL_INC) directory.
 
 IRA_PUBLIC_INCLUDES = ira_err ira_par
-PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES)
+CTG_PUBLIC_INCLUDES = ctg_err 
+PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES) 
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
 IRA_PRIVATE_INCLUDES = ira_com
-PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES)
+CTG_PRIVATE_INCLUDES = ctg_const 
+LPG_PRIVATE_INCLUDES = lpg_com lpg_const
+PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
+                  $(LPG_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -461,7 +465,8 @@ PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES)
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR
+EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
+                    CAT_PAR PSX_ERR SUBPAR_PAR NDF_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -479,7 +484,16 @@ ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
 
-F_ROUTINES = $(IRA_F_ROUTINES)
+CTG_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
+ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
+ctg1_gtyps.f ctg1_crexp.f ctg1_lasto.f ctg_catas.f ctg_gtsup.f ctg1_subst.f \
+ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f ctg1_sort.f
+
+LPG_F_ROUTINES = lpg_again.f lpg_catcreat.f lpg_prop.f lpg_test.f lpg1_ptpar.f \
+lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
+lpg_state.f
+
+F_ROUTINES = $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) $(LPG_F_ROUTINES)
 
 #  List of Fortran BLOCK DATA routines.
 
@@ -497,8 +511,10 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-IRA_C_ROUTINES =
-C_ROUTINES = $(IRA_C_ROUTINES)
+IRA_C_ROUTINES = 
+CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
+LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
+C_ROUTINES = $(IRA_C_ROUTINES) $(LPG_C_ROUTINES) $(LPG_C_ROUTINES)
 
 #  The facility error file.
 
@@ -545,20 +561,32 @@ $(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS)
 #  files whose names do not exactly match the names used in the source
 #  code.
 
-IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM
-
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS)
+IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM 
+CTG_INCLUDE_LINKS CTG_ERR CTG_CONST
+LPG_INCLUDE_LINKS LPG_CONST LPG_COM
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
+                $(LPG_INCLUDE_LINKS)
 
 #  Rules to set up links to locate each of the above include files.
 
 IRA_ERR:   ira_err;               $(LINK) $? $@
 IRA_COM:   ira_com;               $(LINK) $? $@
 IRA_PAR:   ira_par;               $(LINK) $? $@
+CTG_CONST:   ctg_const;           $(LINK) $? $@
+CTG_ERR:     ctg_err;             $(LINK) $? $@
+LPG_CONST:   lpg_const;           $(LINK) $? $@
+LPG_COM:     lpg_com;             $(LINK) $? $@
 
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
+GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
+GRP_ERR:   $(STAR_INC)/err_err;   $(LINK) $? $@
+CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
+PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
+SUBPAR_PAR:  $(STAR_INC)/subpar_par;   $(LINK) $? $@
+NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -567,6 +595,17 @@ $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) $(IRA_C_ROUTINES):
 	$(TAR_OUT) ira_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in ira_source.tar; exit 1; fi
+
+$(CTG_PUBLIC_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
+$(CTG_F_ROUTINES) $(CTG_C_ROUTINES):
+	$(TAR_OUT) ctg_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in ctg_source.tar; exit 1; fi
+
+$(LPG_PRIVATE_INCLUDES) $(LPG_F_ROUTINES) $(LPG_C_ROUTINES):
+	$(TAR_OUT) lpg_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in lpg_source.tar; exit 1; fi
 
 $(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
@@ -592,7 +631,13 @@ $(PLATFORM_F) dummy_target1:
 IRA_OBJECT_FILES = $(IRA_BLOCK_DATA:.f=.o) $(IRA_F_ROUTINES:.f=.o) \
                   $(IRA_PLATFORM_F:.f=.o) $(IRA_C_ROUTINES:.c=.o)
 
-OBJECT_FILES = $(IRA_OBJECT_FILES)
+CTG_OBJECT_FILES = $(CTG_F_ROUTINES:.f=.o) \
+                  $(CTG_PLATFORM_F:.f=.o) $(CTG_C_ROUTINES:.c=.o)
+
+LPG_OBJECT_FILES = $(LPG_F_ROUTINES:.f=.o) \
+                  $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
+
+OBJECT_FILES = $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) $(LPG_OBJECT_FILES)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -602,9 +647,17 @@ OBJECT_FILES = $(IRA_OBJECT_FILES)
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libira.a
+OBJECT_LIBRARIES = libira.a libctg.a liblpg.a
 
 libira.a: $(IRA_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+libctg.a: $(CTG_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+liblpg.a: $(LPG_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
@@ -1269,6 +1322,25 @@ unbuild: clean
 #  files).  These are normally generated automatically from the source
 #  files.
 
+ctg1_appen.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
+ctg1_asexp.o:	 SAE_PAR CTG_CONST CTG_ERR GRP_PAR
+ctg1_catch.o:	 SAE_PAR GRP_PAR CTG_CONST CTG_ERR
+ctg1_crexp.o:	 SAE_PAR GRP_PAR CTG_CONST PSX_ERR
+ctg1_expan.o:	 SAE_PAR GRP_PAR CTG_CONST
+ctg1_fpars.o:	 SAE_PAR
+ctg1_gtyps.o:	 SAE_PAR
+ctg1_lasto.o:	 SAE_PAR
+ctg1_match.o:	 SAE_PAR GRP_PAR CTG_CONST
+ctg1_subst.o:	 SAE_PAR
+ctg_asso1.o:	 SAE_PAR GRP_PAR CAT_PAR
+ctg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR CTG_ERR
+ctg_catas.o:	 SAE_PAR CAT_PAR GRP_PAR CTG_CONST
+ctg_catcr.o:	 SAE_PAR CAT_PAR GRP_PAR CTG_CONST
+ctg_crea1.o:	 SAE_PAR GRP_PAR CAT_PAR
+ctg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
+ctg_gtsup.o:	 SAE_PAR GRP_PAR
+ctg_ptsup.o:	 SAE_PAR GRP_PAR
+ctg_setsz.o:	 SAE_PAR GRP_PAR
 ira1_aito.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira1_ascre.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
 ira1_asdef.o:	 SAE_PAR IRA_PAR
@@ -1320,6 +1392,18 @@ ira_read.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
 ira_seteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira_trans.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
 ira_write.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+lpg1_init.o:	 DAT_PAR LPG_CONST GRP_PAR LPG_COM
+lpg1_ptpar.o:	 SAE_PAR GRP_PAR DAT_PAR
+lpg1_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_again.o:	 SAE_PAR DAT_PAR PAR_ERR LPG_CONST LPG_COM
+lpg_assoc.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_catassoc.o:	 SAE_PAR DAT_PAR CAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_catcreat.o:	 SAE_PAR DAT_PAR GRP_PAR CAT_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_creat.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_crep.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_prop.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR LPG_CONST PAR_ERR LPG_COM
+lpg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM
+lpg_state.o:	 SAE_PAR DAT_PAR LPG_CONST LPG_COM
 
 #-------------------------------------------------------------------------------
 #
