@@ -16,6 +16,9 @@
 
 *     HISTORY
 *     14-JUL-1994  Changed STR$ to CHR_ (SKL@JACH)
+*      9-AUG-2004  Turn on IMPLICIT and fix TEXTD error (TIMJ@JACH)
+
+	IMPLICIT NONE
 
         INCLUDE 'CHR_ERR'
 
@@ -54,6 +57,7 @@
      :	  BZERO,              ! zero for conversion back to 32 bit data (DN)
      :	  COADDS,             ! number of coadds in data (ind)
      :	  DEC( 3),            ! declination of telescope (D,M,S)
+     :    RDEC,               ! dec in decimal
      :	  EQUINOX,            ! equinox of telescope coordinates (Y)
      :	  HEIGHT,             ! height above sea level of telescope (FT)
      :	  EVENMEAN,           ! stats mean in even pixels (DN)
@@ -68,6 +72,7 @@
      :	  HA( 3),             ! Hour Angle
      :	  JUNK,               ! junk variable
      :	  LAT( 3),            ! latitude of telescope (D,M,S)
+     :    RLAT, RLONG,        ! Long and lat in decimal
      :	  LONG( 3),           ! longitude of telescope (D,M,S)
      :	  MAX,                ! maximum value in data image (DN)
      :	  MIN,                ! minimum value in data image (DN)
@@ -118,6 +123,10 @@
      :	  DATE3*2,            ! date year
      :	  RDATE2*2,           ! real date month
      :	  TIME*8              ! time
+
+	INTEGER JCHAR, JTAPE, JCARD
+	INTEGER MTWR
+	EXTERNAL MTWR
 
 *      Start defining the cards : data format type
 	CARD( 1) = 'SIMPLE  ='
@@ -853,7 +862,7 @@
 	    CALL CHR_APPND( CARD( JCARD), CARD( JCARD), LEN)
             CALL CHR_CLEAN( TEXT( JCARD) )
             LEN = 0
-	    CALL CHR_APPND( TEXTD( JCARD), TEXT( JCARD), LEN2)
+	    CALL CHR_APPND( TEXT( JCARD), TEXT( JCARD), LEN2)
 
 *          Add the comment / character
 	    CARD( JCARD) = CARD( JCARD)( 1:LEN)//TEXT( JCARD)( 1:LEN2)
