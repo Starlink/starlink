@@ -64,6 +64,7 @@ skyframe.c \
 sla.c \
 slamap.c \
 sphmap.c \
+tpn.c \
 unitmap.c \
 wcsmap.c \
 wcstrig.c \
@@ -115,6 +116,7 @@ slamap.h \
 sphmap.h \
 unitmap.h \
 wcsmap.h \
+wcsmath.h \
 wcstrig.h \
 winmap.h \
 zoommap.h
@@ -155,8 +157,10 @@ simpexamp.eps
 WCSLIB_FILES = \
 COPYING.LIB \
 proj.c \
+tpn.c \
 proj.h \
 wcstrig.c \
+wcsmath.h \
 wcstrig.h
 
 UNIX_LINK_FILES = \

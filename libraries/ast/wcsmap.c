@@ -20,13 +20,14 @@ f     AST_WCSMAP
 *     coordinates (and vice versa).
 *
 *     A WcsMap is a specialised form of Mapping which implements these
-*     sky projections (all of those in the FITS-WCS paper are
-*     supported) and applies them to a specified pair of coordinates.
-*     Using the FITS-WCS terminology, this transformation is between
-*     "native spherical" and "relative physical" coordinates.  These
-*     coordinates may, optionally, be embedded in a space with more
-*     than two dimensions, the remaining coordinates being copied
-*     unchanged. Note, however, that for consistency with other AST
+*     sky projections and applies them to a specified pair of coordinates.
+*     All the projections in the FITS-WCS paper are supported, plus the now 
+*     deprecated "TAN with polynomial correction terms" projection which 
+*     is refered to here by the code "TPN". Using the FITS-WCS terminology, 
+*     the transformation is between "native spherical" and "projection
+*     plane" coordinates.  These coordinates may, optionally, be embedded in 
+*     a space with more than two dimensions, the remaining coordinates being 
+*     copied unchanged. Note, however, that for consistency with other AST
 *     facilities, a WcsMap handles coordinates that represent angles
 *     in radians (rather than the degrees used by FITS-WCS).
 *
@@ -36,7 +37,7 @@ f     AST_WCSMAP
 *     using the WcsType attribute and the coordinates on which it acts
 *     may be determined using the WcsAxis(lonlat) attribute.
 *
-*     Each WcsMap also allows up to 99 "projection parameters" to be
+*     Each WcsMap also allows up to 100 "projection parameters" to be
 *     associated with each axis. These specify the precise form of the 
 *     projection, and are accessed using PVj_m attribute, where "j" is 
 *     the integer axis index (starting at 1), and m is an integer
@@ -128,6 +129,12 @@ f     The WcsMap class does not define any new routines beyond those
 *        with wcslib.
 *     10-OCT-2002 (DSB):
 *        Added astIsZenithal.
+*     22-OCT-2002 (DSB):
+*        - GetPV now returns the FITS default value instead of AST__BAD
+*        if a defaultable latitude projection parameter has not been set.
+*        - A number of changes needed to support WcsLib v2.9.
+*        - Added AST__TPN projection.
+
 *class--
 */
 
@@ -525,7 +532,7 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
 #include "wcsmap.h"              /* Interface definition for this class */
 #include "slalib.h"              /* SLALIB function prototypes */
 #include "channel.h"             /* I/O channels */
-#include "proj.h"                /* WCSLIB projections */
+#include "proj.h"                /* WCSLIB projections and WCSLIB_MXPAR */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -547,9 +554,9 @@ typedef struct PrjData {
    int prj;                     /* WCSLIB projection identifier value */
    char desc[60];               /* Long projection description */
    char ctype[5];               /* FITS CTYPE identifying string */
-   int (* WcsFwd)(double, double, struct AstPrjPar *, double *, double *);
+   int (* WcsFwd)(double, double, struct AstPrjPrm *, double *, double *);
                                 /* Pointer to forward projection function */
-   int (* WcsRev)(double, double, struct AstPrjPar *, double *, double *);
+   int (* WcsRev)(double, double, struct AstPrjPrm *, double *, double *);
                                 /* Pointer to reverse projection function */
    double theta0;               /* Native latitude of reference point */
 } PrjData;
@@ -572,33 +579,35 @@ static void (* parent_setattrib)( AstObject *, const char * );
    projections. The last entry in the list should be for the AST__WCSBAD 
    projection. This marks the end of the list. */
 static PrjData PrjInfo[] = {
-   { AST__AZP,  "zenithal perspective", "-AZP", astAzpfwd, astAzprev, AST__DPIBY2 },
-   { AST__TAN,  "gnomonic", "-TAN",  astTanfwd, astTanrev, AST__DPIBY2 },
-   { AST__SIN,  "orthographic", "-SIN",  astSinfwd, astSinrev, AST__DPIBY2 },
-   { AST__STG,  "stereographic", "-STG",  astStgfwd, astStgrev, AST__DPIBY2 },
-   { AST__ARC,  "zenithal equidistant", "-ARC",  astArcfwd, astArcrev, AST__DPIBY2 },
-   { AST__ZPN,  "zenithal polynomial", "-ZPN",  astZpnfwd, astZpnrev, AST__DPIBY2 },
-   { AST__ZEA,  "zenithal equal area", "-ZEA",  astZeafwd, astZearev, AST__DPIBY2 },
-   { AST__AIR,  "Airy", "-AIR",  astAirfwd, astAirrev, AST__DPIBY2 },
-   { AST__CYP,  "cylindrical perspective", "-CYP",  astCypfwd, astCyprev, 0.0 },
-   { AST__CAR,  "Cartesian", "-CAR",  astCarfwd, astCarrev, 0.0 },
-   { AST__MER,  "Mercator", "-MER",  astMerfwd, astMerrev, 0.0 },
-   { AST__CEA,  "cylindrical equal area", "-CEA",  astCeafwd, astCearev, 0.0 },
-   { AST__COP,  "conical perspective", "-COP",  astCopfwd, astCoprev, AST__BAD },
-   { AST__COD,  "conical equidistant", "-COD",  astCodfwd, astCodrev, AST__BAD },
-   { AST__COE,  "conical equal area", "-COE",  astCoefwd, astCoerev, AST__BAD },
-   { AST__COO,  "conical orthomorphic", "-COO",  astCoofwd, astCoorev, AST__BAD },
-   { AST__BON,  "Bonne's equal area", "-BON",  astBonfwd, astBonrev, 0.0 },
-   { AST__PCO,  "polyconic", "-PCO",  astPcofwd, astPcorev, 0.0 },
-   { AST__GLS,  "sinusoidal", "-GLS",  astSflfwd, astSflrev, 0.0 },
-   { AST__SFL,  "sinusoidal", "-SFL",  astSflfwd, astSflrev, 0.0 },
-   { AST__PAR,  "parabolic", "-PAR",  astParfwd, astParrev, 0.0 },
-   { AST__AIT,  "Hammer-Aitoff", "-AIT",  astAitfwd, astAitrev, 0.0 },
-   { AST__MOL,  "Mollweide", "-MOL",  astMolfwd, astMolrev, 0.0 },
-   { AST__CSC,  "cobe quadrilateralized spherical cube", "-CSC",  astCscfwd, astCscrev, 0.0 },
-   { AST__QSC,  "quadrilateralized spherical cube", "-QSC",  astQscfwd, astQscrev, 0.0 },
-   { AST__TSC,  "tangential spherical cube", "-TSC",  astTscfwd, astTscrev, 0.0 },
+   { AST__AZP,  "zenithal perspective", "-AZP", astAZPfwd, astAZPrev, AST__DPIBY2 },
+   { AST__SZP,  "slant zenithal perspective", "-SZP", astSZPfwd, astSZPrev, AST__DPIBY2 },
+   { AST__TAN,  "gnomonic", "-TAN",  astTANfwd, astTANrev, AST__DPIBY2 },
+   { AST__STG,  "stereographic", "-STG",  astSTGfwd, astSTGrev, AST__DPIBY2 },
+   { AST__SIN,  "orthographic", "-SIN",  astSINfwd, astSINrev, AST__DPIBY2 },
+   { AST__ARC,  "zenithal equidistant", "-ARC",  astARCfwd, astARCrev, AST__DPIBY2 },
+   { AST__ZPN,  "zenithal polynomial", "-ZPN",  astZPNfwd, astZPNrev, AST__DPIBY2 },
+   { AST__ZEA,  "zenithal equal area", "-ZEA",  astZEAfwd, astZEArev, AST__DPIBY2 },
+   { AST__AIR,  "Airy", "-AIR",  astAIRfwd, astAIRrev, AST__DPIBY2 },
+   { AST__CYP,  "cylindrical perspective", "-CYP",  astCYPfwd, astCYPrev, 0.0 },
+   { AST__CEA,  "cylindrical equal area", "-CEA",  astCEAfwd, astCEArev, 0.0 },
+   { AST__CAR,  "Cartesian", "-CAR",  astCARfwd, astCARrev, 0.0 },
+   { AST__MER,  "Mercator", "-MER",  astMERfwd, astMERrev, 0.0 },
+   { AST__SFL,  "Sanson-Flamsteed", "-SFL",  astSFLfwd, astSFLrev, 0.0 },
+   { AST__PAR,  "parabolic", "-PAR",  astPARfwd, astPARrev, 0.0 },
+   { AST__MOL,  "Mollweide", "-MOL",  astMOLfwd, astMOLrev, 0.0 },
+   { AST__AIT,  "Hammer-Aitoff", "-AIT",  astAITfwd, astAITrev, 0.0 },
+   { AST__COP,  "conical perspective", "-COP",  astCOPfwd, astCOPrev, AST__BAD },
+   { AST__COE,  "conical equal area", "-COE",  astCOEfwd, astCOErev, AST__BAD },
+   { AST__COD,  "conical equidistant", "-COD",  astCODfwd, astCODrev, AST__BAD },
+   { AST__COO,  "conical orthomorphic", "-COO",  astCOOfwd, astCOOrev, AST__BAD },
+   { AST__BON,  "Bonne's equal area", "-BON",  astBONfwd, astBONrev, 0.0 },
+   { AST__PCO,  "polyconic", "-PCO",  astPCOfwd, astPCOrev, 0.0 },
+   { AST__TSC,  "tangential spherical cube", "-TSC",  astTSCfwd, astTSCrev, 0.0 },
+   { AST__CSC,  "cobe quadrilateralized spherical cube", "-CSC", astCSCfwd, astCSCrev, 0.0 },
+   { AST__QSC,  "quadrilateralized spherical cube", "-QSC",  astQSCfwd, astQSCrev, 0.0 },
    { AST__NCP,  "AIPS north celestial pole", "-NCP",  NULL,   NULL, 0.0 },
+   { AST__GLS,  "sinusoidal", "-GLS",  astSFLfwd, astSFLrev, 0.0 },
+   { AST__TPN,  "gnomonic polynomial", "-TPN",  astTPNfwd, astTPNrev, AST__DPIBY2 },
    { AST__WCSBAD, "<null>",   "    ",  NULL,   NULL, 0.0 } };
 
 /* External Interface Function Prototypes. */
@@ -635,8 +644,9 @@ static void CopyPV( AstWcsMap *, AstWcsMap * );
 static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
 static void FreePV( AstWcsMap * );
+static void InitPrjPrm( AstWcsMap * );
 static void InitVtab( AstWcsMapVtab * );
-static void LongRange( const PrjData *, struct AstPrjPar *, double *, double *);
+static void LongRange( const PrjData *, struct AstPrjPrm *, double *, double *);
 static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
 static void WcsPerm( AstMapping **, int *, int );
@@ -1049,10 +1059,10 @@ static void ClearPV( AstWcsMap *this, int j, int m ) {
                 astGetClass( this ), j + 1, j + 1, m, astGetNin( this ) ); 
 
 /* Validate the parameter index. */ 
-   } else if( m < 0 || m > 99 ){ 
+   } else if( m < 0 || m >= WCSLIB_MXPAR ){ 
       astError( AST__AXIIN, "astClearPV(%s): Parameter index (%d) is invalid "
-                "in attribute PV%d_%d - it should be in the range 0 to 99.", 
-                astGetClass( this ), m, j + 1, m ); 
+                "in attribute PV%d_%d - it should be in the range 0 to %d.", 
+                astGetClass( this ), m, j + 1, m, WCSLIB_MXPAR - 1 ); 
 
 /* See if the parameter is currently set. Is so, set its value to
    AST__BAD. */
@@ -1061,9 +1071,8 @@ static void ClearPV( AstWcsMap *this, int j, int m ) {
       if( m < npar && this->p[ j ] ) this->p[ j ][ m ] = AST__BAD;
    } 
 
-/* Indicate that the intermediary values stored in the "AstPrjPar" structure 
-   (which is used by the WCSLIB proj.c module) need to be re-calculated. */
-    this->params.flag = 0;   
+/* Re-initialize the values stored in the "AstPrjPrm" structure. */
+    InitPrjPrm( this );
 
 } 
 
@@ -1140,10 +1149,8 @@ static void CopyPV( AstWcsMap *in, AstWcsMap *out ) {
 
    }
 
-/* Set the AstPrjPar structure values. */
-   out->params.flag = 0;   
-   out->params.p = out->p;
-   out->params.np = out->np;  
+/* Re-initialize the values stored in the "AstPrjPrm" structure. */
+   InitPrjPrm( out );
 
 }
 
@@ -1235,9 +1242,9 @@ static void FreePV( AstWcsMap *this ) {
       this->p = (double **) astFree( (void *) this->p );
    }
 
-   this->params.flag = 0;   
-   this->params.p = NULL;
-   this->params.np = NULL;
+/* Re-initialize the values stored in the "AstPrjPrm" structure. */
+   InitPrjPrm( this );
+
 
 }   
 
@@ -1485,13 +1492,18 @@ static double GetPV( AstWcsMap *this, int j, int m ) {
                 astGetClass( this ), j + 1, j + 1, m, astGetNin( this ) ); 
 
 /* Validate the parameter index. */ 
-   } else if( m < 0 || m > 99 ){ 
+   } else if( m < 0 || m >= WCSLIB_MXPAR ){ 
       astError( AST__AXIIN, "astGetPV(%s): Parameter index (%d) is invalid "
-                "in attribute PV%d_%d - it should be in the range 0 to 99.", 
-                astGetClass( this ), m, j + 1, m ); 
+                "in attribute PV%d_%d - it should be in the range 0 to %d.", 
+                astGetClass( this ), m, j + 1, m, WCSLIB_MXPAR - 1 ); 
 
-/* See if the arrays stored in the WcsMap structure extend as far as the
-   requested parameter. If so, return the required attribute value.
+/* For latitude parameters use the values in the "params" structure which will
+   have been defaulted. */
+   } else if( j == astGetWcsAxis( this, 1 ) ) {
+      ret = (this->params).p[ m ];
+
+/* For other axes, see if the arrays stored in the WcsMap structure extend as 
+   far as the requested parameter. If so, return the required attribute value.
    Otherwise the AST__BAD value initialised above is retained. */
    } else if( this->np && this->p ){ 
       npar = this->np[ j ];
@@ -1501,6 +1513,127 @@ static double GetPV( AstWcsMap *this, int j, int m ) {
    return ret;
 
 } 
+
+static void InitPrjPrm( AstWcsMap *this ) {
+/*
+*  Name:
+*     InitPrjPrm
+
+*  Purpose:
+*     Initialise the WcsLib PrjPrm structure, assigning default values for 
+*     missing parameters.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void InitPrjPrm( AstWcsMap *this )
+
+*  Description:
+*     This function initializes the projection parameter information
+*     stored within the WcsLib AstPrjPrm structure associated with the 
+*     supplied WcsMap. Default values are assigned to any unspecified 
+*     parameter values. AST__BAD values are assigned if any parameters
+*     have not been supplied for which there is no default.
+
+*  Parameters:
+*     this 
+*        The WcsMap.
+
+*/
+
+
+/* Local Variables: */
+   struct AstPrjPrm *params;     /* The AstPrjPrm structure from the WcsMap */
+   int i;                        /* Loop index */
+   int latax;                    /* Index of latitude axis */
+   int lonax;                    /* Index of longitude axis */
+   int npar;                     /* No. of parameters supplied */
+   int type;                     /* Projection type */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the AstPrjPrm structure*/
+   params = &(this->params);
+
+/* Tell the routines within the WcsLib "proj.c" module  to re-calculate
+   intermediate values. */
+   params->flag = 0;
+   params->r0 = 0;
+
+/* Initially set all parameter to AST__BAD. */
+   for( i = 0; i < WCSLIB_MXPAR; i++ ) (params->p)[i] = AST__BAD;
+
+/* If the WcsMap contains any projection parameter values... */
+   if( this->np && this->p ){
+
+/* Get the index of the latitude axis. Currently, all projection
+   parameters are associated with the latitude axis (except for 
+   the TPN projection, which is a hang-over from a earlier draft of the
+   FITS-WCS paper). */
+      latax = astGetWcsAxis( this, 1 );
+
+/* Find the number of projection parameters in the WcsMap for the
+   latitude axis. */
+      npar = (this->np)[ latax ];
+
+/* Copy the parameters to the AstPrjPrm structure. Do not copy more than
+   can be stored in the AstPrjPrm structure. */
+      for( i = 0; i < npar && i < WCSLIB_MXPAR; i++ ) {
+         (params->p)[ i ] = (this->p)[ latax ][ i ];
+      }
+
+/* Do the same for the longitude axis (for the benefit of the TPN
+   projection). */
+      lonax = astGetWcsAxis( this, 0 );
+      npar = (this->np)[ lonax ];
+      for( i = 0; i < npar && i < WCSLIB_MXPAR; i++ ) {
+         (params->p2)[ i ] = (this->p)[ lonax ][ i ];
+      }
+
+   }
+
+/* Get the projection type. */
+   type = astGetWcsType( this );
+
+/* First supply default values for any missing projection parameters which 
+   do not default to zero. */
+   if( type == AST__SZP ){
+      if( (params->p)[ 3 ] == AST__BAD ) (params->p)[ 3 ] = 90.0;
+
+   } else if( type == AST__AIR ){
+      if( (params->p)[ 1 ] == AST__BAD ) (params->p)[ 1 ] = 90.0;
+
+   } else if( type == AST__CYP ){
+      if( (params->p)[ 1 ] == AST__BAD ) (params->p)[ 1 ] = 1.0;
+      if( (params->p)[ 2 ] == AST__BAD ) (params->p)[ 2 ] = 1.0;
+
+   } else if( type == AST__CEA ){
+      if( (params->p)[ 1 ] == AST__BAD ) (params->p)[ 1 ] = 1.0;
+
+   } else if( type == AST__TPN ){
+      if( (params->p)[ 1 ] == AST__BAD ) (params->p)[ 1 ] = 1.0;
+      if( (params->p2)[ 1 ] == AST__BAD ) (params->p2)[ 1 ] = 1.0;
+
+   } 
+
+/* Now use a default value of zero for any remaining unspecified values,
+   except for un-defaultable projection parameters. */
+   for( i = 0; i < WCSLIB_MXPAR; i++ ){
+
+/* Retain any AST__BAD value for these undefaultable parameters. */
+      if( i == 1 && ( type == AST__BON || 
+                     type == AST__COP || type == AST__COE || 
+                     type == AST__COD || type == AST__COO ) ){
+
+/* Use a default of zero for all other parameters. */
+      } else {
+         if( (params->p)[ i ] == AST__BAD ) (params->p)[ i ] = 0.0;
+         if( (params->p2)[ i ] == AST__BAD ) (params->p2)[ i ] = 0.0;
+      }
+   }
+}
 
 static void InitVtab( AstWcsMapVtab *vtab ) {
 /*
@@ -1644,7 +1777,8 @@ static int IsZenithal( AstWcsMap *this ){
 
 /* The following are always zenithal... */
    if( type == AST__TAN  || type == AST__STG  || type == AST__ARC  || 
-       type == AST__ZPN  || type == AST__ZEA  || type == AST__AIR ) {
+       type == AST__ZPN  || type == AST__ZEA  || type == AST__AIR ||
+       type == AST__TPN ) {
       ret = 1;
 
 /* The following are sometimes zenithal... */
@@ -1659,20 +1793,17 @@ static int IsZenithal( AstWcsMap *this ){
       if( p2 == AST__BAD ) p2 = 0.0;
       if( p1 == 0.0 && p2 == 0.0 ) ret = 1;
 
-/* >>>>>>>>>>>>>>>>  UNCOMMENT !!!!!!!  <<<<<<<<<<<<<
-   A new projection introduced by 23/4/2002 paper 
-
    } else if( type == AST__SZP ) {
       p3 = astGetPV( this, latax, 2 );
-      if( p3 == AST__BAD ) p3 == 90.0;
+      if( p3 == AST__BAD ) p3 = 90.0;
       if( p3 == 90.0 || p3 == -90.0 ) ret = 1; 
-*/
+
    }
 
    return ret;
 }
 
-static void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
+static void LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
                        double *high, double *low ){
 /*
 *
@@ -1688,7 +1819,7 @@ static void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
+*     void LongRange( const PrjData *prjdata, struct AstPrjPrm *params,
 *                     double *high, double *low )
 
 *  Class Membership:
@@ -1702,7 +1833,7 @@ static void LongRange( const PrjData *prjdata, struct AstPrjPar *params,
 *     prjdata
 *        A pointer to information about the mapping.
 *     params
-*        Pointer to a WCSLIB "AstPrjPar" structure containing the projection 
+*        Pointer to a WCSLIB "AstPrjPrm" structure containing the projection 
 *        parameters, etc.
 *     high
 *        A pointer to a location at which is returned the upper bound of
@@ -1816,7 +1947,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 */
 
 /* Local Variables: */
-   struct AstPrjPar *params;        /* Pointer to structure holding WCSLIB info */
+   struct AstPrjPrm *params;     /* Pointer to structure holding WCSLIB info */
    const PrjData *prjdata;       /* Information about the projection */
    double latitude;              /* Latitude value in degrees */
    double longitude;             /* Longitude value in degrees */
@@ -1824,8 +1955,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    double longlo;                /* Lower longitude limit in degrees */
    double x;                     /* X Cartesian coordinate in degrees */
    double y;                     /* Y Cartesian coordinate in degrees */
-   int i;                        /* Parameter index */
-   int latax;                    /* Index of latitude axis */
+   int i;                        /* Loop count */
    int point;                    /* Loop counter for points */
    int wcs_status;               /* Status from WCSLIB functions */
    int type;                     /* Projection type */
@@ -1844,9 +1974,15 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    if( ( !prjdata->WcsFwd && forward ) ||
        ( !prjdata->WcsRev && !forward ) ) return 1;
 
+/* Check that all necessary projection parameters have been supplied, or
+   can be defaulted. */
+   params = &(this->params);
+   for( i = 0; i < WCSLIB_MXPAR; i++ ) {
+      if( ( params->p)[ i ] == AST__BAD ) return 400+i;
+   }
+
 /* If we are doing a reverse mapping, get the acceptable range of longitude
    values. */
-   params = &(this->params);
    if( !forward ) LongRange( prjdata, params, &longhi, &longlo );
       
 /* Loop to apply the projection to each point in turn, checking for
@@ -1870,11 +2006,11 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
             latitude = AST__DR2D*slaDrange(  in1[ point ] );  
             if ( latitude > 90.0 ){
                latitude = 180.0 - latitude;
-               longitude = AST__DR2D*slaDrange( PI + in0[ point ] );
+               longitude = AST__DR2D*slaDrange( AST__DPI + in0[ point ] );
 
             } else if ( latitude < -90.0 ){
                latitude = -180.0 - latitude;
-               longitude = AST__DR2D*slaDrange( PI + in0[ point ] );
+               longitude = AST__DR2D*slaDrange( AST__DPI + in0[ point ] );
 
             } else {
                longitude = AST__DR2D*slaDrange( in0[ point ] );
@@ -2699,10 +2835,10 @@ static void SetPV( AstWcsMap *this, int j, int m, double val ) {
                 astGetClass( this ), j + 1, j + 1, m, naxis ); 
 
 /* Validate the parameter index. */ 
-   } else if( m < 0 || m > 99 ){ 
+   } else if( m < 0 || m >= WCSLIB_MXPAR ){ 
       astError( AST__AXIIN, "astSetPV(%s): Parameter index (%d) is invalid "
-                "in attribute PV%d_%d - it should be in the range 0 to 99.", 
-                astGetClass( this ), m, j + 1, m ); 
+                "in attribute PV%d_%d - it should be in the range 0 to %d.", 
+                astGetClass( this ), m, j + 1, m, WCSLIB_MXPAR - 1 ); 
 
 /* If the dynamic arrays used to hold the parameters have not yet been
    created, create them now, and store pointers to them in the WcsMap
@@ -2759,13 +2895,8 @@ static void SetPV( AstWcsMap *this, int j, int m, double val ) {
       }   
    }
 
-/* Indicate that the intermediary values stored in the "AstPrjPar" structure 
-   (which is used by the WCSLIB proj.c module) need to be re-calculated. 
-   Also, update the pointers to the parameter arrays. */
-    this->params.flag = 0;   
-    this->params.p = this->p;
-    this->params.np = this->np;  
-
+/* Re-initialize the values stored in the "AstPrjPrm" structure. */
+    InitPrjPrm( this );
 } 
 
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
@@ -2910,10 +3041,10 @@ static int TestPV( AstWcsMap *this, int j, int m ) {
                 astGetClass( this ), j + 1, j + 1, m, astGetNin( this ) ); 
 
 /* Validate the parameter index. */ 
-   } else if( m < 0 || m > 99 ){ 
+   } else if( m < 0 || m >= WCSLIB_MXPAR ){ 
       astError( AST__AXIIN, "astTestPV(%s): Parameter index (%d) is invalid "
-                "in attribute PV%d_%d - it should be in the range 0 to 99.", 
-                astGetClass( this ), m, j + 1, m ); 
+                "in attribute PV%d_%d - it should be in the range 0 to %d.", 
+                astGetClass( this ), m, j + 1, m, WCSLIB_MXPAR - 1 ); 
 
 /* See if the parameter is currently set. */
    } else if( this->np && this->p ){ 
@@ -3283,7 +3414,6 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
    double *consts;               /* Pointer to constants array */
    int *inperm;                  /* Pointer to input axis permutation array */
    int *outperm;                 /* Pointer to output axis permutation array */
-   int ip;                       /* Index of projection parameter */
    int latax;                    /* Index of latitude axis */
    int lonax;                    /* Index of longitude axis */
    int npin;                     /* No. of input axes in supplied PermMap */
@@ -3449,15 +3579,21 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
 *
 *     Some projection parameters have default values (as defined in
 *     the FITS-WCS paper) which apply if no explicit value is given.
-*     Currently, these defaults are all zero. You may omit setting a
-*     value for these "optional" parameters and the default will
-*     apply. Some projection parameters, however, have no default and
-*     a value must be explicitly supplied.  This is most conveniently
+*     You may omit setting a value for these "optional" parameters and the 
+*     default will apply. Some projection parameters, however, have no 
+*     default and a value must be explicitly supplied.  This is most 
+*     conveniently
 c     done using the "options" argument of astWcsMap (q.v.) when a WcsMap
 f     done using the OPTIONS argument of AST_WCSMAP (q.v.) when a WcsMap
 *     is first created. An error will result when a WcsMap is used to
 *     transform coordinates if any of its required projection
 *     parameters has not been set and lacks a default value.
+
+*     A "get" operation for a parameter which has not been assigned a value 
+*     will return the default value defined in the FITS-WCS paper, or 
+*     AST__BAD if the paper indicates that the parameter has no default.
+*     A default value of zero is returned for parameters which are not
+*     accessed by the projection.
 
 *  Applicability:
 *     WcsMap
@@ -3500,7 +3636,10 @@ f     The values used are represented by symbolic constants with names of
 *     code used by the FITS-WCS "CTYPEi" keyword to identify the
 *     projection. For example, possible values are AST__TAN (for the
 *     tangent plane or gnomonic projection) and AST__AIT (for the
-*     Hammer-Aitoff projection).
+*     Hammer-Aitoff projection). AST__TPN is an exception in that it 
+*     is not part of the FITS-WCS standard (it represents a TAN
+*     projection with polynomial correction terms as defined in an early
+*     draft of the FITS-WCS paper).
 
 *  Applicability:
 *     WcsMap
@@ -3839,13 +3978,14 @@ f     RESULT = AST_WCSMAP( NCOORD, TYPE, LONAX, LATAX, OPTIONS, STATUS )
 *     coordinates (and vice versa).
 *
 *     A WcsMap is a specialised form of Mapping which implements these
-*     sky projections (all of those in the FITS-WCS paper are
-*     supported) and applies them to a specified pair of coordinates.
-*     Using the FITS-WCS terminology, this transformation is between
-*     "native spherical" and "relative physical" coordinates.  These
-*     coordinates may, optionally, be embedded in a space with more
-*     than two dimensions, the remaining coordinates being copied
-*     unchanged. Note, however, that for consistency with other AST
+*     sky projections and applies them to a specified pair of coordinates.
+*     All the projections in the FITS-WCS paper are supported, plus the now 
+*     deprecated "TAN with polynomial correction terms" projection which 
+*     is refered to here by the code "TPN". Using the FITS-WCS terminology, 
+*     the transformation is between "native spherical" and "projection
+*     plane" coordinates.  These coordinates may, optionally, be embedded in 
+*     a space with more than two dimensions, the remaining coordinates being 
+*     copied unchanged. Note, however, that for consistency with other AST
 *     facilities, a WcsMap handles coordinates that represent angles
 *     in radians (rather than the degrees used by FITS-WCS).
 *
@@ -3855,7 +3995,7 @@ f     RESULT = AST_WCSMAP( NCOORD, TYPE, LONAX, LATAX, OPTIONS, STATUS )
 *     using the WcsType attribute and the coordinates on which it acts
 *     may be determined using the WcsAxis(lonlat) attribute.
 *
-*     Each WcsMap also allows up to 99 "projection parameters" to be
+*     Each WcsMap also allows up to 100 "projection parameters" to be
 *     associated with each axis. These specify the precise form of the 
 *     projection, and are accessed using PVj_m attribute, where "j" is 
 *     the integer axis index (starting at 1), and m is an integer
@@ -3884,7 +4024,10 @@ f        given as a symbolic value such as AST__TAN (for a tangent
 *        plane projection), where the characters following the double
 *        underscore give the projection type code (in upper case) as
 *        used in the FITS-WCS "CTYPEi" keyword. You should consult the
-*        FITS-WCS paper for a list of the available projections.
+*        FITS-WCS paper for a list of the available projections. The
+*        additional code of AST__TPN can be supplied which represents a 
+*        TAN projection with polynomial correction terms as defined in an 
+*        early draft of the FITS-WCS paper.
 c     lonax
 f     LONAX = INTEGER (Given)
 *        The index of the longitude axis. This should lie in the range
@@ -4157,7 +4300,6 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstWcsMap *new;              /* Pointer to new WcsMap */
-   int i;                       /* parameter index */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -4228,14 +4370,8 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
          new->p = NULL;
          new->np = NULL;
 
-/* Initialise the "AstPrjPar" structure (defined in proj.h). */
-         new->params.flag = 0;   /* Tells FITS-WCS to re-initialise the structure. */
-         new->params.unset = AST__BAD; /* Value for unset parameters */
-         new->params.r0 = 0;     /* Tells FITS-WCS to use a unit sphere. */
-         new->params.axlon = lonax; /* Index of latitude axis */
-         new->params.axlat = latax; /* Index of latitude axis */
-         new->params.p = NULL;   /* No projection parameters defined yet. */
-         new->params.np = NULL;  
+/* Initialise the "AstPrjPrm" structure (defined in proj.h). */
+         InitPrjPrm( new );
 
 /* Get the native latitude of the reference point for the specified
    projection stored in the projection database in wcsmap.h. This will be
@@ -4347,7 +4483,6 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
    AstWcsMap *new;              /* Pointer to the new WcsMap */
    const char *text;            /* Textual form of an integer value */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
-   double natlat;               /* New value for NatLat attribute */
    double pv;                   /* Projection parameter */
    int axis;                    /* Axis index */
    int j;                       /* Axis index */
@@ -4419,20 +4554,14 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
          new->wcsaxis[ axis ] = astReadInt( channel, buff, axis + 1 ) - 1;
       }
 
-/* Initialise the structure used by WCSLIB to hold intermediate values,
-   so that the values will be re-calculated on the first invocation of a
-   mapping function. */
-      new->params.flag = 0;   /* Tells FITS-WCS to re-initialise the structure. */
-      new->params.unset = AST__BAD; /* Value for unset parameters */
-      new->params.r0 = 0;     /* Tells FITS-WCS to use a unit sphere. */
-      new->params.axlon = new->wcsaxis[ 0 ]; /* Index of longitude axis */
-      new->params.axlat = new->wcsaxis[ 1 ]; /* Index of latitude axis */
-      new->params.p = NULL;   /* No projection parameters defined yet. */
-      new->params.np = NULL;  
-
 /* Initialise the pointers to the projection parameter information. */
       new->p = NULL;
       new->np = NULL;
+
+/* Initialise the structure used by WCSLIB to hold intermediate values,
+   so that the values will be re-calculated on the first invocation of a
+   mapping function. */
+      InitPrjPrm( new );
 
 /* Get the native latitude of the reference point for the specified
    projection stored in the projection database. This will be
@@ -4452,7 +4581,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
 /* PVj_m. */
 /* -------*/
       for( j = 0; j < astGetNin( new ); j++ ){
-         for( m = 0; m < 99; m++ ){
+         for( m = 0; m < WCSLIB_MXPAR; m++ ){
             (void) sprintf( buff, "pv%d_%d", j + 1, m );
             pv = astReadDouble( channel, buff, AST__BAD );
             if( pv != AST__BAD ) SetPV( new, j, m, pv );

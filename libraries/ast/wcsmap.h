@@ -188,6 +188,8 @@
 *           An integer identifier for the FITS QSC projection. 
 *        AST__TSC     
 *           An integer identifier for the FITS TSC projection
+*        AST__TPN
+*           An integer identifier for a "TAN with correction terms" projection. 
 *        AST__WCSBAD  
 *           An integer identifier for a "null" projection.
 *
@@ -270,34 +272,37 @@
 #define AST__DR2D 57.295779513082320876798154814105170332405472466564
 
 /* Projection Types: (note, WCSBAD must be the last in this list) */
-#define   AST__AZP    1          /* The FITS AZP projection */ 
-#define   AST__TAN    2          /* The FITS TAN projection */ 
-#define   AST__SIN    3          /* The FITS SIN projection */ 
-#define   AST__STG    4          /* The FITS STG projection */ 
-#define   AST__ARC    5          /* The FITS ARC projection */ 
-#define   AST__ZPN    6          /* The FITS ZPN projection */ 
-#define   AST__ZEA    7          /* The FITS ZEA projection */ 
-#define   AST__AIR    8          /* The FITS AIR projection */ 
-#define   AST__CYP    9          /* The FITS CYP projection */ 
-#define   AST__CAR    10         /* The FITS CAR projection */ 
-#define   AST__MER    11         /* The FITS MER projection */ 
-#define   AST__CEA    12         /* The FITS CEA projection */ 
-#define   AST__COP    13         /* The FITS COP projection */ 
-#define   AST__COD    14         /* The FITS COD projection */ 
-#define   AST__COE    15         /* The FITS COE projection */ 
-#define   AST__COO    16         /* The FITS COO projection */ 
-#define   AST__BON    17         /* The FITS BON projection */ 
-#define   AST__PCO    18         /* The FITS PCO projection */ 
-#define   AST__GLS    19         /* The FITS GLS projection */ 
-#define   AST__SFL    20         /* The FITS GLS projection */ 
-#define   AST__PAR    21         /* The FITS PAR projection */ 
-#define   AST__AIT    22         /* The FITS AIT projection */ 
-#define   AST__MOL    23         /* The FITS MOL projection */ 
-#define   AST__CSC    24         /* The FITS CSC projection */ 
-#define   AST__QSC    25         /* The FITS QSC projection */ 
-#define   AST__NCP    26         /* The AIPS NCP projection */
-#define   AST__TSC    27         /* The FITS TSC projection */
-#define   AST__WCSBAD 28         /* A bad projection type */
+
+#define AST__AZP 0
+#define AST__SZP 1
+#define AST__TAN 2
+#define AST__STG 3
+#define AST__SIN 4
+#define AST__ARC 5
+#define AST__ZPN 6
+#define AST__ZEA 7
+#define AST__AIR 8
+#define AST__CYP 9
+#define AST__CEA 10
+#define AST__CAR 11
+#define AST__MER 12
+#define AST__SFL 13
+#define AST__PAR 14
+#define AST__MOL 15
+#define AST__AIT 16
+#define AST__COP 17
+#define AST__COE 18
+#define AST__COD 19
+#define AST__COO 20
+#define AST__BON 21
+#define AST__PCO 22
+#define AST__TSC 23
+#define AST__CSC 24
+#define AST__QSC 25
+#define AST__NCP 26
+#define AST__GLS 27
+#define AST__TPN 28
+#define AST__WCSBAD 29   /* A bad projection type */
 
 /* Type Definitions. */
 /* ================= */
@@ -316,7 +321,7 @@ typedef struct AstWcsMap {
    int wcsaxis[2];               /* Indices of lon and lat. axes */
    double **p;                   /* Pointer to array of projection parameter arrays */
    int *np;                      /* Pointer to array of projection parameter counts */
-   struct AstPrjPar params;      /* WCS structure holding projection
+   struct AstPrjPrm params;      /* WCS structure holding projection
                                     parameters, etc. Defined in proj.h */
 
 } AstWcsMap;
