@@ -383,16 +383,19 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sla \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/star2html
 	cd applications/datacube \
 	  && $(MAKE_CPT)
