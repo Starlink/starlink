@@ -68,7 +68,7 @@
       CALL USI_TASSOCI( 'MODEL', '*', 'READ', FID, STATUS )
 
 *    Declare file to user :
-      CALL DISP_FILENAM( FLOC, 'Model', STATUS )
+      CALL DISP_FILENAM( FID, 'Model', STATUS )
 
 *    Set up output channel
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, WID, STATUS )
