@@ -117,6 +117,9 @@
 *        More fixes from MT related to typing of MINV and MAXV.
 *     18-JUL-2001 (DSB):
 *        Add a STATUS check after the call to KPG1_GHST<T>.
+*     4-SEP-2001 (DSB):
+*        More fixes from MT related to checking for large numbers of
+*        equal-valued pixels, and correcting generic arithmetic.
 *     {enter_further_changes_here}
 
 *-
@@ -447,8 +450,8 @@
                END IF
 
 *  Find the new limiting value for the finer-resolution histogram.
-               DATLIM( 1 ) = DATLIM( 1 ) + NUM_DTO<T>( 
-     :                       DBLE( J - 1 ) * BINSIZ )
+               DATLIM( 1 ) = NUM_ADD<T>( DATLIM( 1 ),
+     :                       NUM_DTO<T>( DBLE( J - 1 ) * BINSIZ ) )
                HISLIM( 1 ) = NUM_<T>TOD( DATLIM( 1 ) )
 
 *  Set new data limits.
@@ -480,8 +483,10 @@
                END IF
 
 *  Find the new limiting value for the finer-resolution histogram.
-               DATLIM( 2 ) = DATLIM( 2 ) - NUM_DTO<T>( 
-     :                       DBLE( CLNBIN - K ) * BINSIZ )
+               DATLIM( 2 ) = NUM_SUB<T>( DATLIM( 2 ),
+     :                       NUM_DTO<T>( DBLE( CLNBIN - K ) * BINSIZ ) )
+               IF ( NUM_LT<T>( DATLIM( 2 ), DATLIM( 1 ) ) )
+     :            DATLIM( 2 ) = DATLIM( 1 )
                HISLIM( 2 ) = NUM_<T>TOD( DATLIM( 2 ) )
 
 *  Set new data limits.
@@ -501,6 +506,12 @@
 *  possible.
             LOOP = TRIMED( 1 ) .OR. TRIMED( 2 )
 
+*  Under some circumstances (many elements have identical values),
+*  the binsize can decay to zero because the algorithm keeps thinking
+*  there are outliers, which leads to an infinite loop.  The following
+*  test breaks out in this case.
+            LOOP = LOOP .AND. NUM_GT<T>( DATLIM( 2 ), DATLIM( 1 ) )
++
 *  The histogram may still be sparse but no trimming is possible.
 *  This could happen with a fraction close to 0.0 or 1.0 which locates
 *  an extreme outlier, leaving the vast majority of values in one to a
