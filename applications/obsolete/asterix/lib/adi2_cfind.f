@@ -159,6 +159,7 @@
       INTEGER			I			! Loop over dimensions
       INTEGER			IASC			! Loop over ascendants
       INTEGER			IMID			! Image identifier
+      INTEGER			KEYID			! Keyword identifier
       INTEGER			NASC			! # ascendants
 
       LOGICAL			THERE			! Object exists?
@@ -169,6 +170,7 @@
 
 *  Initialise return value
       CACHEID = ADI__NULLID
+      DIDCRE = .FALSE.
 
 *  No ascendants initially
       NASC = 0
@@ -210,16 +212,53 @@
 
 *   What kind of sub-component?
 *    Keyword?
-        IF ( CNAME .EQ. '.' ) THEN
+        IF ( CNAME(1:1) .EQ. '.' ) THEN
+
+*      Reinitialise
+          DIDCRE = .FALSE.
+
+*      Look for keyword
+          CALL ADI2_CFIND_KEY( HDUID, CNAME(2:), CREATE, KEYID,
+     :                         DIDCRE, STATUS )
+
+*      Sub-component of keyword?
+          IF ( SNAME .GT. ' ' ) THEN
+
+*      Add key to ascendants list
+          NASC = NASC + 1
+          ASC(NASC) = KEYID
+
+*        Keyword value
+            IF ( SNAME .EQ. 'Value' ) THEN
+            ELSE IF ( SNAME .EQ. 'Comm' ) THEN
+            ELSE
+              STATUS = SAI__ERROR
+              CALL MSG_SETC( 'C', SNAME )
+              CALL MSG_SETC( 'K', CNAME(2:) )
+              CALL ERR_REP( ' ', 'Illegal keyword subcomponent '/
+     :                  /'specifier /^C/ to keyword ^K', STATUS )
+
+            END IF
+
+*      Delete of keyword wanted?
+          ELSE IF ( DELETE ) THEN
+            CALL ADI2_SETDEL( KEYID, STATUS )
+            CALL ADI_ERASE( KEYID, STATUS )
+
+*      Otherwise whole keyword wanted
+          ELSE
+            CACHEID = KEYID
+
+          END IF
 
 *    BINTABLE extension column?
-        ELSE IF ( CNAME .EQ. '|' ) THEN
+        ELSE IF ( CNAME(1:1) .EQ. '|' ) THEN
 
 *    Comment?
-        ELSE IF ( CNAME .EQ. ',' ) THEN
+        ELSE IF ( CNAME(1:1) .EQ. ',' ) THEN
 
 *    History?
-        ELSE IF ( CNAME .EQ. '#' ) THEN
+        ELSE IF ( CNAME(1:1) .EQ. '#' ) THEN
 
 *    Image extension data?
         ELSE IF ( CNAME .EQ. '@' ) THEN
@@ -455,7 +494,7 @@
 
 *  Initialise
       HDUID = ADI__NULLID
-      DIDCRE = .FALSE.
+      IF ( DIDCRE ) DIDCRE = .FALSE.
       FOUND = .FALSE.
 
 *  Locate the HDU container and the table
@@ -603,6 +642,158 @@
 *  Release the container
       CALL ADI_ERASE( HDUTAB, STATUS )
       CALL ADI_ERASE( HCID, STATUS )
+
+      END
+
+
+
+      SUBROUTINE ADI2_CFIND_KEY( HDUID, KEY, CREATE, KEYID, DIDCRE,
+     :                           STATUS )
+*+
+*  Name:
+*     ADI2_CFIND_KEY
+
+*  Purpose:
+*     Locate/create the named keyword in an HDU
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ADI2_CFIND_KEY( HDUID, KEY, CREATE, KEYID, DIDCRE, STATUS )
+
+*  Description:
+*     Locates, creating if required, the named keyword in the specified
+*     HDU.
+
+*  Arguments:
+*     HDUID = INTEGER (given)
+*        The HDU in which the keyword will be found/created
+*     KEY = CHARACTER*(*) (given)
+*        The name of the keyword
+*     CREATE = LOGICAL (given)
+*        Create component if it doesn't exist?
+*     HDUID = INTEGER (returned)
+*        Identifier of FITS keyword cache object. If we are locating and
+*        it doesn't exist, set to ADI__NULLID
+*     DIDCRE = LOGICAL (returned)
+*        If CREATE true on entry tells whether keyword was created
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1996
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     10 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			HDUID
+      CHARACTER*(*)		KEY
+      LOGICAL			CREATE
+
+*  Arguments Returned:
+      LOGICAL			DIDCRE
+      INTEGER                   KEYID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER		        CHR_LEN
+      EXTERNAL			CHR_SIMLR
+        LOGICAL			CHR_SIMLR
+      EXTERNAL			ADI2_MKIDX
+        CHARACTER*8		ADI2_MKIDX
+
+*  Local Variables:
+      INTEGER			TABID			! Card table object
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      KEYID = ADI__NULLID
+      IF ( CREATE ) DIDCRE = .FALSE.
+
+*  Locate the card table
+      CALL ADI_FIND( HDUID, 'CrdTable', TABID, STATUS )
+
+*  Keyword exists in card table?
+      CALL ADI2_CFIND_NAM( TABID, KEY, KEYID, STATUS )
+
+*  Doesn't exist, and we can create?
+      IF ( (KEYID .EQ. ADI__NULLID) .AND. CREATE ) THEN
+
+*    Create cache object
+        CALL ADI2_CFIND_CREC( HDUID, 'Crd', KEY, 'FITSkeyCache',
+     :                        KEYID, STATUS )
+
+*    We did create it
+        DIDCRE = .TRUE.
+
+      END IF
+
+*  Release card table
+      CALL ADI_ERASE( TABID, STATUS )
 
       END
 
