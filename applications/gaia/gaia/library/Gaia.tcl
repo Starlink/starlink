@@ -66,6 +66,8 @@
 #        all other configuration files when set (otherwise need
 #        to delete ~/.skycat/skycat.cfg before can use another 
 #        configuration file).
+#     12-MAY-2000 (PWD):
+#        Added positions toolbox.
 #     {enter_changes_here}
 
 #-
@@ -339,7 +341,7 @@ itcl::class gaia::Gaia {
             -float_panel $itk_option(-float_panel) \
             -newimagecmd [code $this cleared] \
             -temporary $itk_option(-temporary) \
-            -ast_tag "$this" \
+            -ast_tag $ast_tag_ \
             -grid_command [code $this redraw_specials_] \
             -with_warp 1 \
             -panel_layout $itk_option(-panel_layout) \
@@ -662,7 +664,7 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -ast_tag "$this" \
+            -ast_tag $ast_tag_ \
             -clone_cmd [code $this make_toolbox astgrid 1] \
             -really_die $cloned
       }
@@ -789,7 +791,7 @@ itcl::class gaia::Gaia {
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
-            -ast_tag "$this" \
+            -ast_tag ast_tag_ \
             -image $image_ \
             -filter_types $itk_option(-file_types) \
             -transient $itk_option(-transient_tools) \
@@ -863,6 +865,11 @@ itcl::class gaia::Gaia {
          if { [wm state $itk_component(contour)] != "withdrawn" } {
             $itk_component(contour) redraw 0
          }
+      }
+
+      if { [info exists itk_component(positions) ] &&
+           [winfo exists $itk_component(positions) ] } {
+         $itk_component(positions) redraw
       }
    }
 
@@ -1362,6 +1369,9 @@ itcl::class gaia::Gaia {
 
    #  Number for creating toolbox clones.
    protected variable tool_clones_ 0
+
+   #  Unique identifier for items to be ignored when drawn on canvas.
+   protected variable ast_tag_ ast_element
 
    # -- Common variables --
 

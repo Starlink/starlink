@@ -240,7 +240,7 @@ itcl::class gaia::GaiaContour {
    destructor  {
 
       #  Release the rtdimage used to access image files.
-      if { image_rtd_ != {} } {
+      if { $image_rtd_ != {} } {
 	 catch {image delete $image_rtd_}
       }
    }

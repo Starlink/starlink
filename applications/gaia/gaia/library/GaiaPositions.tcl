@@ -178,6 +178,11 @@ itcl::class gaia::GaiaPositions {
       }
    }
 
+   #  Redraw the table (external change, like image is flipped).
+   public method redraw {} {
+      $itk_component(table) redraw
+   }
+
    #  Add menus to menubar.
    protected method add_menus_ {} {
 
@@ -469,7 +474,7 @@ itcl::class gaia::GaiaPositions {
          #  table.
          if { $outfile != {} } {
             $itk_component(table) read_positions $outfile
-            
+
             #  If X and Y or RA/Dec where missing then project them
             #  from the given coordinates.
             if { $x == -1 && $y == -1 } {
@@ -485,7 +490,7 @@ itcl::class gaia::GaiaPositions {
    protected method precess_ {} {
       busy {
 
-         #  Start precession dialog. When started give it name of 
+         #  Start precession dialog. When started give it name of
          #  our existing table to copy. When finished we may need to
          #  update our table.
          set transform [gaia::GaiaAstTransform $w_.\#auto \

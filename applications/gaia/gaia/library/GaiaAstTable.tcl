@@ -100,20 +100,28 @@ itcl::class gaia::GaiaAstTable {
 
        # Add options to the edit menu if given.
        if { $itk_option(-editmenu) != {} } {
-	   set m $itk_option(-editmenu)
-	   add_short_help $m {Edit/create reference positions}
+          set m $itk_option(-editmenu)
+          add_short_help $m {Edit/create reference positions}
 
-	   $top_ add_menuitem $m command "Remove selected" \
-		   {Remove selected rows} \
-		   -command [code $this remove_selected]
+          $top_ add_menuitem $m command "Remove selected" \
+             {Remove selected rows} \
+             -command [code $this remove_selected]
 
-	   $top_ add_menuitem $m command "Enter new object..." \
-		   {Enter the data for a new object} \
-		   -command [code $this enter_new_object]
+          $top_ add_menuitem $m command "Enter new object..." \
+             {Enter the data for a new object} \
+             -command [code $this enter_new_object]
 
-	   $top_ add_menuitem $m command "Edit selected object..." \
-		   {Edit the data for the selected object} \
-		   -command [code $this edit_selected_object]
+          $top_ add_menuitem $m command "Edit selected object..." \
+             {Edit the data for the selected object} \
+             -command [code $this edit_selected_object]
+
+          $top_ add_menuitem $m command "Label selected object" \
+             {Set label for the selected object} \
+             -command [code $this label_selected_object_]
+
+          $top_ add_menuitem $m command "Label all objects" \
+             {Add labels to all objects} \
+             -command [code $this label_objects]
        }
 
        #  Add control for markers colours etc., if given.
@@ -624,6 +632,22 @@ itcl::class gaia::GaiaAstTable {
       redraw
    }
 
+   #  Delete a marker from the canvas. Also remove associated label.
+   protected method remove_mark_ {id} {
+      if { $id != {} } {
+         set tag $tags_($id)
+         unset tags_($id)
+         unset marks_($tag)
+         $itk_option(-canvas) delete $tag
+         
+         #  Also remove label.
+         if { [info exists ltags_($id)] } {
+            $itk_option(-canvas) delete $ltags_($id)
+            unset ltags_($id)
+         }
+      }
+   }
+
    #  Update the X and Y values for the centre.
    protected method update_centre_ {canx cany} {
        $itk_option(-rtdimage) convert coords $canx $cany canvas x y image
@@ -647,11 +671,8 @@ itcl::class gaia::GaiaAstTable {
        }
        $itk_component(table) remove_selected
        foreach line $selected {
-	   set id [lindex [lindex $line 0] 0]
-	   set tag $tags_($id)
-	   unset tags_($id)
-	   unset marks_($tag)
-	   $itk_option(-canvas) delete $tag
+          set id [lindex [lindex $line 0] 0]
+          remove_mark_ $id
        }
 
        #  Update the display.
@@ -693,10 +714,7 @@ itcl::class gaia::GaiaAstTable {
       }
       $itk_component(table) remove_selected
       set id [lindex [lindex $selected 0] 0]
-      set tag $tags_($id)
-      unset tags_($id)
-      unset marks_($tag)
-      $itk_option(-canvas) delete $tag
+      delete_mark_ $id
 
       # update the display
       redraw
@@ -713,10 +731,17 @@ itcl::class gaia::GaiaAstTable {
          return
       }
 
-      #  Replace the data.
+      #  Replace the data. Note if the identifier is changed then
+      #  (since these are used to reference the tags etc.) we need
+      #  to delete the marker.
       $itk_component(table) set_row $old_data $new_data
+      lassign $old_data oldid
+      lassign $new_data is
+      if { $id != $oldid } {
+         remove_mark_ $oldid
+      }
 
-      #  And redraw objects.
+      #  And redraw all objects.
       redraw
    }
 
@@ -928,9 +953,11 @@ itcl::class gaia::GaiaAstTable {
    #  Clear the graphics markers from canvas.
    public method clear_marks {} {
       $itk_option(-canvas) delete ${this}_mark
+      $itk_option(-canvas) delete ${this}_label
       catch {$itk_option(-canvas) delete ${this}_cross}
       catch {unset marks_}
       catch {unset tags_}
+      catch {unset ltags_}
    }
 
    #  Clear the table.
@@ -1109,7 +1136,7 @@ itcl::class gaia::GaiaAstTable {
       }
    }
 
-   #  Remove any values that lie off the image.
+   #  Remove any markers (and their entries) that lie off the image.
    public method clip_to_image {} {
       set nrows [$itk_component(table) total_rows]
       set oldcon [$itk_component(table) get_contents]
@@ -1121,12 +1148,7 @@ itcl::class gaia::GaiaAstTable {
          if { $x <= $width && $x > 0.0 && $y <= $height && $y > 0.0 } {
             $itk_component(table) append_row [list $id $ra $dec $x $y]
          } else {
-
-            #  Remove the related information.
-            set tag $tags_($id)
-            unset tags_($id)
-            unset marks_($tag)
-            $itk_option(-canvas) delete $tag
+            remove_mark_ $id
          }
       }
       $itk_component(table) new_info
@@ -1192,26 +1214,55 @@ itcl::class gaia::GaiaAstTable {
    #  strings that can be moved, but not editted.
    protected method label_selected_object_ {} {
       set line [lindex [$itk_component(table) get_selected] 0]
-      lassign $line id ra dec x y
-      set id [lindex $line 0]
+      lassign $line id
+      label_object_ $id
+   }
+
+   #  Label the given object. The arg is the label. The position is
+   #  determined from the bounding box of the marker.
+   protected method label_object_ {id} {
       set canvas $itk_option(-canvas)
       set image $itk_option(-rtdimage)
       if {"$id" == "" || $canvas == "" || $image == ""} {
          return
       }
-      $image convert coords $x $y image cx cy canvas
 
+      #  Get position of text, slightly offset from centre of bounding
+      #  box.
+      if { [llength [set box [$canvas bbox $tags_($id)]]] } {
+         lassign $box x0 y0 x1 y1
+         set x [expr ($x0+$x1)*0.5]
+         set y $y0
+      } else {
+         #  Marker not around.
+         return
+      }
+
+      #  Create tag for label, remove previous copy and create it.
+      set ltags_($id) label$id
       set tags [list objects ${this}_label label$id]
       $canvas delete label$id
-      set labelid [$canvas create text $cx $cy \
+      set labelid [$canvas create text $x $y \
                       -text "$id" \
-                      -anchor sw \
+                      -anchor c \
                       -fill white \
                       -font $itk_option(-canvasfont) \
                       -tags $tags]
 
+      #  Make sure user can adjust label position and properies using
+      #  the canvasdraw tools.
       [$itk_option(-image) component draw] add_object_bindings $labelid
       ct_add_bindings $canvas $labelid
+   }
+
+   #  Label all objects.
+   public method label_objects {} {
+      set nrows [$itk_component(table) total_rows]
+      set oldcon [$itk_component(table) get_contents]
+      for { set i 0 } { $i < $nrows } { incr i } {
+         lassign [lindex $oldcon $i] id
+         label_object_ $id
+      }
    }
 
    #  Configuration options
@@ -1374,6 +1425,9 @@ itcl::class gaia::GaiaAstTable {
    #  and the inverse (index by object id to return canvas tag).
    protected variable marks_
    protected variable tags_
+
+   #  Tags used for any labels.
+   protected variable ltags_
 
    #  Widths of various fields.
    protected variable vwidth_ 20
