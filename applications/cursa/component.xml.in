@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/kappa</path>
+  <description>CURSA - Catalogue and Table Manipulation Applications</description>
+  <abstract><p>
+CURSA is a package of Starlink applications for manipulating astronomical
+catalogues and similar tabular datasets. It provides facilities for:
+browsing or examining catalogues, selecting subsets from a catalogue,
+sorting catalogues, copying catalogues, pairing two catalogues, converting
+catalogue coordinates between some celestial coordinate systems, plotting
+finding charts and photometric calibration.  Also, subsets can be extracted
+from a catalogue in a format suitable for plotting using other Starlink
+packages, such as PONGO.  CURSA can access catalogues held in the popular
+FITS table format, the Tab-Separated Table (TST) format or the Small Text
+List (STL) format.  Catalogues in the STL and TST formats are simple ASCII
+text files.  CURSA also includes some facilities for accessing remote
+on-line catalogues via the Internet.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Clive Davenhall</name>
+      <uname>acd</uname>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

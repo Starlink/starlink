@@ -1,0 +1,91 @@
+## Process this file with automake to produce Makefile.in
+
+SUBDIRS = @subdirs@
+
+bin_SCRIPTS = xcatview cursa_test.csh cursa.csh xcatview catcdsin \
+ catremote UrlReader.class UrlReader.java
+
+LOCAL_LINK = libcap/libcap.la `$(srcdir)/cursa_link_adam`
+
+bin_MONOLITHS = catview cursa
+
+catview_SOURCES = catview.f
+catview_LDADD = $(LOCAL_LINK)
+catview_TASKS =
+
+cursa_SOURCES = cursa.f
+cursa_LDADD = $(LOCAL_LINK)
+cursa_TASKS = catchart catchartrn catcoord catcopy catgrid  \
+ catgscin catheader catpair catphotomfit catphotomlst catphotomtrn \
+ catselect catsort
+
+bin_PROGRAMS = geturl
+
+geturl_SOURCES = geturl.c
+
+##  Name things to be built that are not named elsewhere.
+BUILT_SOURCES = xcatviewLib/adamMessageRelay
+
+#  List of ancillary data files (all types). These need a home at some point.
+EXAMPLE_FILES = examples/*
+
+##  Extra files for CURSA bin directory.
+cursasupportdir = $(bindir)
+cursasupport_DATA = data/cursa_output.lis data/catselect.script \
+ data/catpair.script data/catview.script data/5828.gsc data/targets.TXT
+
+##  Scripts for xcatview
+
+xcatviewsupportdir = $(bindir)/xcatviewLib
+xcatviewsupport_DATA = \
+ xcatviewLib/Action.tcl xcatviewLib/GetFile.tcl \
+ xcatviewLib/GetScatterOver.tcl xcatviewLib/Error.tcl \
+ xcatviewLib/GetFormat.tcl xcatviewLib/GetSelection.tcl \
+ xcatviewLib/GetCat.tcl xcatviewLib/GetHist.tcl \
+ xcatviewLib/GetStatsCols.tcl xcatviewLib/GetCatalogue.tcl \
+ xcatviewLib/GetHistOver.tcl xcatviewLib/HelpText.tcl \
+ xcatviewLib/GetColumns.tcl xcatviewLib/GetParam.tcl \
+ xcatviewLib/OpenCat.tcl xcatviewLib/GetConfig.tcl \
+ xcatviewLib/GetRange.tcl xcatviewLib/OpenRemote.tcl \
+ xcatviewLib/GetDirCat.tcl xcatviewLib/GetRemoteQuery.tcl \
+ xcatviewLib/RemoteList.tcl xcatviewLib/GetDispConfig.tcl \
+ xcatviewLib/GetRow.tcl xcatviewLib/RemoteName.tcl \
+ xcatviewLib/GetExprn.tcl xcatviewLib/GetScatter.tcl \
+ xcatviewLib/RemoteQuery.tcl xcatviewLib/RemoteUrl.tcl \
+ xcatviewLib/adamtask.tcl xcatviewLib/adamMessageRelay
+
+##  Edit scripts during make to have the correct paths.
+edit = sed \
+        -e 's,@bindir\@,$(bindir),g' \
+        -e 's,@EXPECTK\@,$(EXPECTK),g' \
+        -e 's,@PERL\@,$(PERL),g' \
+        -e 's,@AWISH\@,$(AWISH),g'
+
+xcatview: xcatview.in
+	rm -f xcatview.tmp xcatview
+	$(edit) \
+	   -e 's,@edited_input\@,xcatview: produced from xcatview.in by Makefile.am,' \
+	   $(srcdir)/xcatview.in >xcatview.tmp
+	mv xcatview.tmp xcatview
+
+xcatviewLib/adamMessageRelay: xcatviewLib/adamMessageRelay.in
+	rm -f xcatviewLib/adamMessageRelay.tmp xcatviewLib/adamMessageRelay
+	$(edit) \
+	   -e 's,@edited_input\@,adamMessageRelay: produced from catviewLib/adamMessageRelay.in by Makefile.am,' \
+	   $(srcdir)/xcatviewLib/adamMessageRelay.in >xcatviewLib/adamMessageRelay.tmp
+	mv xcatviewLib/adamMessageRelay.tmp xcatviewLib/adamMessageRelay
+	chmod 755 xcatviewLib/adamMessageRelay
+
+catcdsin: catcdsin.in
+	rm -f catcdsin.tmp catcdsin
+	$(edit) \
+	   -e 's,@edited_input\@,catcdsin: produced from catcdsin.in by Makefile.am,' \
+	   $(srcdir)/catcdsin.in >catcdsin.tmp
+	mv catcdsin.tmp catcdsin
+
+catremote: catremote.in
+	rm -f catremote.tmp catremote
+	$(edit) \
+	   -e 's,@edited_input\@,catremote: produced from catremote.in by Makefile.am,' \
+	   $(srcdir)/catremote.in >catremote.tmp
+	mv catremote.tmp catremote
