@@ -1,0 +1,20 @@
+Demo programs for SC/13.%%VERSION%%
+
+To build all the example programs, give the commands
+
+    ./configure
+    make
+
+Some of the programs in here require specific compiler options.  
+
+The configure script should sort these out, but if it fails you might need to
+specify them by hand as arguments to the configure script.  For example:
+
+    ./configure --enable-profiling=-pg --enable-nounderscore=-ext_names=plain
+
+If you have to resort to this, please let norman@astro.gla.ac.uk know
+of the options you had to add, and the compiler type reported by the
+configure script.
+
+
+Norman Gray
