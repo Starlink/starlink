@@ -353,7 +353,7 @@
 
 *  now open the output NDF, propagating it from the input file
 
-      CALL NDF_PROP (INDF, ' ', 'OUT', OUTNDF, STATUS)
+      CALL NDF_PROP (INDF, 'Axis,Units', 'OUT', OUTNDF, STATUS)
 
 *  map the various components of the output data array
 
