@@ -93,8 +93,9 @@ COMPIFL  = @STARLINK@/bin/compifl
 AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf`
 ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` `subpar_link_adam` `ndf_link`  -lpda
 
-#  Name of single binary
-PROG = bin/gaia_$(SYSTEM)
+#  Name of single binaries
+TKPROG = bin/gaia_swish
+TCLPROG = bin/gaia_stcl
 
 #  Name of mktclapp converter.
 MKTCLAPP = bin/mktclapp
@@ -104,7 +105,7 @@ INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 
 # these objects are only needed to make the gaia_wish binary for the demos
-OBJECTS      = gaiainit.o EtAppInit.o 
+OBJECTS      = gaia_swish.o gaia_stcl.o tkAppInit.o 
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -114,24 +115,36 @@ RM 	     = rm -f
 LN 	     = ln -s
 
 # ------------------------------------------------------------------------
-all: $(PROG)
+all: $(TKPROG) $(TCLPROG)
 
 $(MKTCLAPP): mktclapp.o
 	$(CC) -o $(MKTCLAPP) mktclapp.o
 
-gaiainit.c: $(MKTCLAPP) library/gaiaInit.tcl
-	$(BINDIR)/skycat_tcl library/gaiaInit.tcl gaiainit.mta
-	$(MKTCLAPP) -header > gaiainit.h
-	$(MKTCLAPP) -f gaiainit.mta > gaiainit.c
+gaia_swish.c: $(MKTCLAPP) library/gaia_swish.tcl
+	$(BINDIR)/skycat_tcl library/gaia_swish.tcl gaia_swish.mta
+	$(MKTCLAPP) -header > gaia_swish.h
+	$(MKTCLAPP) -f gaia_swish.mta > gaia_swish.c
 
-$(PROG): $(MKTCLAPP) $(OBJECTS) FORCE
-	@echo "linking \"$(PROG)\"..."
-	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(PROG)  \
+gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
+	$(BINDIR)/skycat_tcl library/gaia_stcl.tcl gaia_stcl.mta
+	$(MKTCLAPP) -header > gaia_stcl.h
+	$(MKTCLAPP) -f gaia_stcl.mta > gaia_stcl.c
+
+$(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
+	@echo "linking \"$(TKPROG)\"..."
+	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
 	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
 	       $(TCLUTIL_LIB_STATIC) $(TCLADAM) $(LOCAL_LIBRARY) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
+
+$(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
+	@echo "linking \"$(TCLPROG)\"..."
+	$(CXX) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o -o $(TCLPROG)  \
+	       $(LD_SEARCH_FLAGS) $(TCLADAM) $(LOCAL_LIBRARY) \
+	       $(ADAM_LIBS) $(TCLTKLIBS) \
+	       $(EXTRA_LIBS)
 
 install: install-top install-bin
 

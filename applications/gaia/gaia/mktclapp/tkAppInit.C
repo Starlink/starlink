@@ -28,7 +28,7 @@
 /* declare command procedures here */
 extern "C" {
 #include "tk.h"
-#include "gaiainit.h"
+#include "gaia_swish.h"
 extern int Blt_Init(Tcl_Interp *interp);
 extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);

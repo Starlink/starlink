@@ -600,10 +600,10 @@ ${FC} -v -o /tmp/tmp$$ /tmp/tmp$$.f 2> /tmp/tmp$$.log 1>&2
 
 #  Now for the tricky bit.
 #  First we need to strip out the ld line. First form assumes /xxx/ld
-#  and second ' ld ' (g77).
+#  and second ' /xxx/ld ' (g77).
 ldline=`grep '^[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
 if test "$ldline" = "" ; then
-   ldline=`grep '^[[\ ]]ld[[\ ]]' /tmp/tmp$$.log`
+   ldline=`grep '[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
 fi
 
 #  Now we try to keep words that are -lxxx -Lxxx */lib*.a,
@@ -634,10 +634,9 @@ if test "$FC" = "g77"; then
    $FC -v -o $ffile ${ffile}.f 2> ${ffile}.log 1>&2
 
 #  Look for ld line.
-
-   ldline=`grep '^[[^\ ]]*ld[[\ ]]' ${ffile}.log`
+   ldline=`grep '^[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
    if test "$ldline" = "" ; then
-      ldline=`grep '^[\ ]ld[\ ]' ${ffile}.log`
+      ldline=`grep '[[^\ ]]*ld[[\ ]]' /tmp/tmp$$.log`
    fi
 
 #  Now we try each word of this line until we can concatenate it
@@ -699,6 +698,7 @@ AC_OUTPUT(Makefile \
         library/gaia_version.tcl \
         src/Makefile \
         mktclapp/Makefile \
-        mktclapp/library/gaiaInit.tcl \
+        mktclapp/library/gaia_swish.tcl \
+        mktclapp/library/gaia_stcl.tcl \
         colormaps/Makefile \
         bitmaps/Makefile, sh makelinks)

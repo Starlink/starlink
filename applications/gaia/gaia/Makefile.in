@@ -97,7 +97,7 @@ LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
 #       Libraries required to link against Fortran source code
 #       using a C++ compiler.
 # ------------------------------------------------------------------------
-F77_LIBS = @F77_LIBS@
+F77_LIBS = -L./ @F77_LIBS@
 TCLADAM  = @DESTDIR@/lib/tclAdam.o
 STAR_LIB = @STARLINK@/lib
 STAR_INC = @STARLINK@/include
@@ -110,6 +110,9 @@ ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` 
 
 #  Main wish interpreter for GAIA.
 demo_wish = bin/gaia_wish
+
+#  Command-line interpretor.
+demo_tcl = bin/gaia_tcl
 
 # ARDSTAT
 ardstat = bin/ardstat
@@ -129,13 +132,12 @@ asc2tab = bin/asc2tab
 # TAB2ASC
 tab2asc = bin/tab2asc
 
-
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 
 # these objects are only needed to make the gaia_wish binary for the demos
-OBJECTS      = tkAppInit.o
+OBJECTS      = tkAppInit.o tclAppInit.o
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -145,17 +147,23 @@ RM 	     = rm -f
 LN 	     = ln -s
 
 # ------------------------------------------------------------------------
-all: $(demo_wish) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
+all: $(demo_wish) $(demo_tcl) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
 	$(asc2tab) $(tab2asc)
 
 $(demo_wish): normallib tkAppInit.o FORCE
 	@echo "linking \"$(demo_wish)\"..."
-	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish)  \
+	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
 	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
 	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
 	       $(TCLUTIL_LIB_STATIC) $(TCLADAM) $(LOCAL_LIBRARY) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
+
+$(demo_tcl): normallib tclAppInit.o FORCE
+	@echo "linking \"$(demo_tcl)\"..."
+	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(demo_tcl) \
+	       $(LD_SEARCH_FLAGS) $(TCLADAM) $(LOCAL_LIBRARY) $(ADAM_LIBS) \
+	       $(TCLTKLIBS) $(EXTRA_LIBS)
 
 $(ardstat): normallib ardstat.o
 	echo "linking \"$(ardstat)\"..."
@@ -227,7 +235,6 @@ install-bin:
 	$(INSTALL_DATA) $(asc2tab).ifc $(BINDIR)
 	$(INSTALL) $(tab2asc) $(BINDIR)
 	$(INSTALL_DATA) $(tab2asc).ifc $(BINDIR)
-
 
 install-man:
 	@(cd man; $(MAKE) install)
