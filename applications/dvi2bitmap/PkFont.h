@@ -38,41 +38,41 @@ class PkRasterdata {
 class PkGlyph {
  public:
     PkGlyph(unsigned int cc,
-	    unsigned int tfmwidth,
-	    unsigned int dm,
-	    unsigned int w,
-	    unsigned int h,
-	    int hoff,
-	    int voff,
-	    PkRasterdata *rasterdata) 
-	: cc_(cc), tfmwidth_(tfmwidth), dm_(dm), w_(w), h_(h),
-	hoff_(hoff), voff_(voff), rasterdata_(rasterdata),
-	longform_(false), bitmap_(0) { };
+	    unsigned int tfmwidth,  unsigned int dm,
+	    unsigned int w, unsigned int h,
+	    int hoff, int voff, PkRasterdata *rasterdata);
     PkGlyph(unsigned int cc,
-	    unsigned int tfmwidth,
-	    unsigned int dx,
-	    unsigned int dy,
-	    unsigned int w,
-	    unsigned int h,
-	    unsigned int hoff,
-	    unsigned int voff,
-	    PkRasterdata *rasterdata)
-	: cc_(cc), tfmwidth_(tfmwidth), dx_(dx), dy_(dy), w_(w), h_(h),
-	hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata),
-	longform_(true), bitmap_(0) { };
+	    unsigned int tfmwidth, unsigned int dx, unsigned int dy,
+	    unsigned int w, unsigned int h,
+	    unsigned int hoff, unsigned int voff, PkRasterdata *rasterdata);
+    // bitmap() returns the character's bitmap.  This runs from the 
+    // top-left of the character.
     const Byte *bitmap();
+    // w() and h() are the width and height of this character in
+    // device units.  That is, they are the size of the character's bitmap.
     inline unsigned int w() const { return w_; }
     inline unsigned int h() const { return h_; }
+    // hoff() and voff() are the offset (in pixels, with right and down
+    // being positive) of the first
+    // pixel of the bitmap from the `current position' in the DVI file.
+    inline int hoff() const { return -hoff_; }
+    inline int voff() const { return -voff_; }
     static debug (bool sw) { debug_ = sw; }
+    // dviWidth() is the character's width, in DVI units, as obtained
+    // from the character's `tfm width'.
+    unsigned int dviWidth();
+
  private:
-    unsigned int cc_, tfmwidth_, dm_, dx_, dy_, w_, h_;
+    unsigned int cc_, dm_, dx_, dy_, w_, h_;
+    int tfmwidth_;
     int hoff_, voff_;
     unsigned int hoffu_, voffu_;
     PkRasterdata *rasterdata_;
     bool longform_;
     const Byte *bitmap_;
     static bool debug_;
- };
+    int unpackTfmWidth (unsigned int tfmwidth);
+};
 
 class PkFont {
  public:
@@ -92,6 +92,11 @@ class PkFont {
     static void setFontPath(char  *fp) { fontpath_ = fp; }
     bool seenInDoc(void) const { return seen_in_doc_; }
     void setSeenInDoc() { seen_in_doc_ = true; }
+    // wordSpace(), backSpace() and quad() return those values in DVI units
+    unsigned int wordSpace() const { return word_space_; }
+    unsigned int backSpace() const { return back_space_; }
+    unsigned int quad() const { return quad_; }
+
  private:
     string name_;
     InputByteStream *pkf_;

@@ -24,19 +24,30 @@ public:
     static debug (bool sw) { debug_ = sw; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
-    int currH() const { return hh_; }
+    int currH() const { return hh_; }	// device units
     int currV() const { return vv_; }
-    void updateH (PkGlyph *g);
 private:
     string fileName_;
+    // all dimensions within this class are in DVI units, except where stated.
     int h_, v_, w_, x_, y_, z_;
-    int hh_, vv_;
+    int pending_hupdate_;
+    int hh_, vv_;		// these are in device units
+    PkFont *current_font_;
     InputByteStream *dvif_;
-    double dvi_to_pix_;		// conversion factor
+    // DVI units are defined by the numerator and denominator 
+    // specified in the DVI preamble.  DVI units must be multiplied by
+    // this factor to convert them to device (ie, pixel) units.
+    // true_dvi_to_device_ is dvi_to_device_ without the magnification
+    double dvi_to_device_;
+    double true_dvi_to_device_;
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output
-    // change (for example if we produce oversize gifs, ready for shrinking.
+    // change (for example if we produce oversize gifs, ready for shrinking).
     const int max_drift_ = 0;
+    // tfm_conv_ is the multiplier to convert TFM widths, found in the
+    // PK files, to DVI units.  The only account of this I can find is
+    // somewhat implicitly within Knuth's DVIType program
+    double tfm_conv_;
     Byte getByte();
     signed int getSIU(int), getSIS(int);
     unsigned int getUIU(int);
@@ -51,6 +62,7 @@ private:
     void process_preamble(DviFilePreamble&);
     void check_duplicate_font(int);
     int pixel_round(int);
+    // updateH/V update the horizontal position	by an amount in DVI units
     void updateH (int x);
     void updateV (int y);
     struct PosState {
@@ -83,29 +95,35 @@ private:
 
 // DviFileEvent is what is returned to the client from the DVI reading class.
 // Declare one derived class for each type of event.
+//
+// This is rather bad design - these classes should be subclasses of DviFile
+// above.
 class DviFileEvent {
  public:
     enum eventTypes { setchar, setrule, fontchange, special,
 		      page, preamble, postamble };
-    DviFileEvent(eventTypes t) : type_(t) { }
+    DviFileEvent(eventTypes t, DviFile *dp=0)
+	: type_(t), dviFile_(dp) { }
     unsigned char opcode;
-    const eventTypes type_;
     virtual void debug() const;
     eventTypes type() const { return type_; }
+ private:
+    DviFile *dviFile_;
+    void *updater_;
+    const eventTypes type_;
 };
 class DviFileSetChar : public DviFileEvent {
  public:
-    int charno;
-    bool increaseH;		// true if we should increase h afterwards
-    DviFile *dviFile;
-    DviFileSetChar(DviFile *dptr) : DviFileEvent(setchar), dviFile(dptr) { }
+    DviFileSetChar(int charno, DviFile *dptr)
+	: DviFileEvent(setchar,dptr), charno(charno) { }
+    const int charno;
     void debug() const;
 };
 class DviFileSetRule: public DviFileEvent {
  public:
-    int a, b;
-    bool increaseH;		// as with DviFileSetChar
-    DviFileSetRule() : DviFileEvent(setrule) { }
+    const int h, w;
+    DviFileSetRule(DviFile *dptr, int h, int w)
+	: DviFileEvent(setrule,dptr), h(h), w(w) { }
     void debug() const;
 };
 /*
@@ -120,23 +138,23 @@ class DviFileFontDef : public DviFileEvent {
 */
 class DviFileFontChange : public DviFileEvent {
  public:
-    DviFileFontChange() : DviFileEvent(fontchange) { }
+    DviFileFontChange(PkFont *f) : DviFileEvent(fontchange), font(f) { }
+    const PkFont *font;
     void debug() const;
-    PkFont *font;
-    int number;
 };
 class DviFileSpecial : public DviFileEvent {
  public:
-    string specialString;
-    DviFileSpecial() : DviFileEvent(special) { }
+    const string specialString;
+    DviFileSpecial(string str)
+	: DviFileEvent(special), specialString(str) { }
     void debug() const;
 };
 class DviFilePage : public DviFileEvent {
  public:
-    bool isStart;		// true/false if this is a bop/eop
+    const bool isStart;		// true/false if this is a bop/eop
     signed int count[10];
     signed int previous;
-    DviFilePage() : DviFileEvent(page) { }
+    DviFilePage(bool isStart) : DviFileEvent(page), isStart(isStart) { }
     void debug() const;
 };
 class DviFilePreamble : public DviFileEvent {

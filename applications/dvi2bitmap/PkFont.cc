@@ -230,11 +230,48 @@ void PkFont::read_font (InputByteStream& pkf)
     }
 }
 
+PkGlyph::PkGlyph(unsigned int cc,
+		 unsigned int tfmwidth,
+		 unsigned int dm,
+		 unsigned int w,
+		 unsigned int h,
+		 int hoff,
+		 int voff,
+		 PkRasterdata *rasterdata) 
+    : cc_(cc), dm_(dm), w_(w), h_(h),
+      hoff_(hoff), voff_(voff), rasterdata_(rasterdata),
+      longform_(false), bitmap_(0) 
+{
+    tfmwidth_ = unpackTfmWidth (tfmwidth);
+};
+
+PkGlyph::PkGlyph(unsigned int cc,
+		 unsigned int tfmwidth,
+		 unsigned int dx,
+		 unsigned int dy,
+		 unsigned int w,
+		 unsigned int h,
+		 unsigned int hoff,
+		 unsigned int voff,
+		 PkRasterdata *rasterdata)
+    : cc_(cc), dx_(dx), dy_(dy), w_(w), h_(h),
+      hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata),
+      longform_(true), bitmap_(0)
+{
+    tfmwidth_ = unpackTfmWidth (tfmwidth);
+};
+
 const Byte *PkGlyph::bitmap()
 {
     if (bitmap_ == 0)
 	bitmap_ = rasterdata_->bitmap();
     return bitmap_;
+}
+
+// Convert a TFM width to DVI units
+int PkGlyph::unpackTfmWidth (unsigned int tfmwidth)
+{
+    return tfmwidth;		// this is WRONG!!!!
 }
 
 PkRasterdata::PkRasterdata(Byte opcode,

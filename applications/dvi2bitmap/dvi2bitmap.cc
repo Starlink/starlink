@@ -62,16 +62,19 @@ main (int argc, char **argv)
 
 	DviFilePostamble *post;
 	DviFileEvent *ev;
+	const PkFont *curr_font;
 	do
 	{
 	    PkGlyph *glyph;
-	    PkFont *curr_font;
 	    ev = dvif->getEvent();
 	    ev->debug();
 	    if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
 	    {
 		glyph = curr_font->glyph(sc->charno);
-		cout << "set glyph " << glyph->w() << 'x' << glyph->h() << '\n';
+		cout << "set glyph " << glyph->w() << 'x' << glyph->h()
+		     << " at position ("
+		     << dvif->currH() << ',' << dvif->currV()
+		     << ")\n";
 	    }
 	    else if (DviFileFontChange *fc =
 		     dynamic_cast<DviFileFontChange*>(ev))
@@ -105,6 +108,7 @@ main (int argc, char **argv)
 		}
 	    }
 		*/
+	    delete ev;
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }

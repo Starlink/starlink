@@ -17,6 +17,15 @@ dvi2bitmap.o: dvi2bitmap.cc dvi2bitmap.h DviFile.h PkFont.h
 
 PkFont.o: PkFont.cc PkFont.h InputByteStream.h dvi2bitmap.h
 
+Bitmap.o: Bitmap.cc Bitmap.h dvi2bitmap.h GIFBitmap.o
+
+GIFBitmap.o: GIFBitmap.cc GIFBitmap.h Bitmap.h
+
+btest: btest.o Bitmap.o GIFBitmap.o
+	g++ -o btest btest.o Bitmap.o GIFBitmap.o
+
+btest.o: btest.cc
+
 tidy:
 	rm -f *~
 
