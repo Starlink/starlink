@@ -422,22 +422,22 @@ void	astrom_errparam(picstruct *field, objstruct *obj)
 Copy astrometrical structures.
 */
 void	copyastrom(picstruct *infield, picstruct *outfield)
-
-  {
-   astromstruct	*inas, *outas;
-
-  if (infield->astrom)
-    {
+{
+  astromstruct	*inas, *outas;
+  
+  if (infield->astrom) {
     QMEMCPY(infield->astrom, outfield->astrom, astromstruct, 1);
     inas = infield->astrom;
     outas = outfield->astrom;
-
+    
     /*  Copy precession FrameSet */
-    outas->cvt = astCopy( inas->cvt );
+    if ( inas->cvt ) {
+      outas->cvt = astCopy( inas->cvt );
     }
-
-  return;
   }
+  
+  return;
+}
 
 
 /******************************* endastrom ***********************************/
@@ -450,7 +450,9 @@ void	endastrom(picstruct *field)
   as = field->astrom;
 
   /* Release precession FrameSet */
-  as->cvt = astAnnul( as->cvt );
+  if ( as->cvt ) {
+    as->cvt = astAnnul( as->cvt );
+  }
 
   free(as);
   return;

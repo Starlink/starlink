@@ -538,7 +538,7 @@ MUD_DOCS = mud165.ps sex1_doc.ps.gz sexpaper.ps.gz
 #  List of documentation files.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
-$(PKG_NAME).news $(LICENCE) $(MUD_DOCS)
+                $(PKG_NAME).news $(LICENCE) $(MUD_DOCS)
 
 #  Conditions of use file.
 
@@ -574,11 +574,6 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
-
-L_SUB1 =
-
-L_SUB2 =
-
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -638,13 +633,9 @@ MONO_OBJECT = $(MONO_SOURCE:.c=.o)
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libsub1.a libsub2.a
+OBJECT_LIBRARIES = libsub1.a
 
 libsub1.a: $(O_SUB1)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
-
-libsub2.a: $(O_SUB2)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
