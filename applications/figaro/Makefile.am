@@ -6,6 +6,9 @@ demo_specdre.icl demo_twodspec.icl twodspec.icl twodspec.csh
 ## Should really call this FIG_DYNAMIC_MEMORY
 include_HEADERS = include/DYNAMIC_MEMORY 
 
+dist_noinst_HEADERS = include/DSA_TYPES include/SPD_EPAR  include/arc_dims  include/bytesdef  include/fit_coding_inc  include/gr_inc  \
+	include/opt_cmn  include/status_inc
+
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
     sun86a.tex sun86_2df.eps sun86_ech1.eps sun86_ech2.eps sun86_ech3.eps \
     sun86_ech4.eps sun86_ech5.eps sun86_hard.eps sun86_icont.eps \
