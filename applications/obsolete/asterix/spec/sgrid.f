@@ -615,7 +615,7 @@
       IF ( UP ) THEN
         CALL MSG_PRNT( '** Updating model spec - do not exit'/
      :                                /' until completed **' )
-        CALL FIT_TMODUP( MFID, MODEL.NCOMP, NPAR, PARAM, LE, UE,
+        CALL FIT_MODUP( MFID, MODEL.NCOMP, NPAR, PARAM, LE, UE,
      :                                          -99.0, STATUS )
         CALL MSG_PRNT( '** Model dataset updated **' )
       END IF

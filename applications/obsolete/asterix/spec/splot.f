@@ -1323,13 +1323,12 @@
       REAL YDEC				! No of decades allowed in range of
       PARAMETER (YDEC=3.1)		! data
 *    Local variables :
-      INTEGER CBPTR,ESPTR,CIPTR,EIPTR,RPTR
+      INTEGER CBPTR,CIPTR,EIPTR,RPTR
       INTEGER NACT,NRESP
       LOGICAL CBOUNDS
 *-
 
       IF (STATUS.NE.SAI__OK) RETURN
-
 
 *  divide data and fit by bin width to normalise
       CALL SPLOT_DIVWID(NVAL,%val(DWPTR),%val(DDPTR),STATUS)
@@ -1338,12 +1337,11 @@
       CALL SPLOT_DIVWID(NVAL,%val(DWPTR),%val(DFDPTR),STATUS)
 
 *  get fit data
-      CALL ADI_CMAPR( INSTR.R_ID, 'Energy', 'READ', ESPTR, STATUS )
-      CALL ARR_COP1R( NFIT, %val(ESPTR), %val(PFXPTR), STATUS )
+      CALL ADI_CGET1R( INSTR.R_ID, 'Energy', NFIT, %val(PFXPTR),
+     :                 NACT, STATUS )
       CALL SPLOT_NORM( NFIT, %val(PREDDAT.MPTR),
      :      %val(PREDDAT.MLBNDPTR),%val(PREDDAT.MUBNDPTR),Z,
      :                                     %val(PFDPTR),STATUS)
-      CALL ADI_CUNMAP( INSTR.R_ID, 'Energy', ESPTR, STATUS )
 
 *     determine channel energies & widths
 
@@ -1365,6 +1363,7 @@
 *     derive centres and widths from bounds
         CALL SPLOT_CHEN(NVAL,%val(CBPTR),%val(PXPTR),
      :                                     %val(PWPTR),STATUS)
+        CALL ADI_CUNMAP( INSTR.R_ID, 'Channels', CBPTR, STATUS )
 
       ENDIF
 

@@ -379,7 +379,7 @@
 	CALL MSG_BLNK()
 	CALL MSG_PRNT( '** Updating model spec - do not exit '/
      :                                  /'until completed **' )
-	CALL FIT_TMODUP( MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,-99.0,STATUS)
+	CALL FIT_MODUP( MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,-99.0,STATUS)
 	IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL ERR_FLUSH(STATUS)
 	ELSE
@@ -427,7 +427,7 @@
 
 *    Update model_spec errors
       IF ( ER ) THEN
-	CALL FIT_TMODUP(MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,1.0,STATUS)
+	CALL FIT_MODUP(MFID,MODEL.NCOMP,NPAR,PARAM,LE,UE,1.0,STATUS)
 	CALL MSG_PRNT( '** Error estimates entered in model spec. **' )
 	CALL MSG_BLNK()
       END IF
