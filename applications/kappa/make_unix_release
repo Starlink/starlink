@@ -46,12 +46,12 @@
 #      endif
 
 #  Check for direct calls to NDF parameter routines. These should usually
-#  be replaced by equivalent NDG routines (to allow multiple invocations to 
+#  be replaced by equivalent LPG routines (to allow multiple invocations to 
 #  process groups of NDFs).
       set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
       if( "$a" != "" ) then
          echo "The following files contain references to NDF parameter routines or"
-         echo "to PAR_STATE. Shouldn't these be replaced by equivalent NDG routines??
+         echo "to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines??
          echo $n
          echo -n "Continue? (Y/N): "
          set ans = $<
@@ -114,8 +114,10 @@
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
-#  Make the ndg source tar file.
+#  Make the ndg, ctg and lpg source tar files.
       ${NDG_SYS}/dev/bin/make_source.csh
+      ${CTG_SYS}/dev/bin/make_source.csh
+      ${LPG_SYS}/dev/bin/make_source.csh
 
 #  Tar up all the release files and then remove them.
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 

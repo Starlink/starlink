@@ -177,7 +177,7 @@ kpg1_plotp.f kpg1_plots.f kpg1_pltln.f kpg1_pqvid.f kpg1_prnth.f \
 kpg1_rdast.f kpg1_rdlst.f kpg1_short.f kpg1_verb.f kpg1_fit1d.f \
 kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f \
 kpg1_tkast.c kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f \
-kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f \
+kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
 kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
 kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
@@ -449,7 +449,8 @@ sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps sun95_gd5.eps sun95_gd9.eps \
 sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps sun95_ardwork.eps sun95.htx_tar \
 sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps kappa.news \
 aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar kappa_sub.tar \
-ndg_source.tar kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
+ndg_source.tar lpg_source.tar ctg_source.tar kapsub_sub.tar
+kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
 kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
 
