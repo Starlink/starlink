@@ -41,7 +41,7 @@
 *        A null (!) or blank string means that pictures of all names may 
 *        be selected. [!]
 *     SINGLE = _LOGICAL (Read)
-*        If TRUE then the user cna supply only one position using the
+*        If TRUE then the user can supply only one position using the
 *        cursor, where-upon the application immediately exits, leaving
 *        the selected picture as the current picture. If FALSE is supplied, 
 *        then the user can supply multiple positions. Once all positions
