@@ -21,8 +21,8 @@
  
 *  Description:
 *     This application takes raw SKYDIP data and calculates tau, eta_tel
-*     and B by fitting. Sky temperatures are taken at different airmasses
-*     and then fitted with a model of the sky.
+*     and B by fitting. Sky brightness temperatures are calculated for 
+*     different airmasses and then fitted with a model of the sky.
 
 *  Usage:
 *     skydip in sub_instrument t_cold eta_tel b_fit out model_out
@@ -70,9 +70,7 @@
 *     
 
 *  Related Applications:
-*     SURF: EXTINCTION
-
-*  References:
+*     SURF: EXTINCTION, SDIP
 
 *  Algorithm:
 *     If status is good on entry, the routine reads in some general information
@@ -100,6 +98,10 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.17  1997/06/27 23:23:22  timj
+*     Slight changes to header.
+*     Make sure I am not setting status when status is already bad.
+*
 *     Revision 1.16  1997/06/20 21:46:10  timj
 *     Add printout of the LST of the observation since this is useful for
 *     EXTINCTION.
@@ -368,9 +370,12 @@ c
 
       IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
          CALL MSG_SETC('TASK', TSKNAME)
-         STATUS = SAI__ERROR
-         CALL ERR_REP(' ', '^TASK: This is not a SKYDIP observation',
-     :        STATUS)
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP(' ', '^TASK: This is not a SKYDIP observation',
+     :           STATUS)
+         END IF
       END IF
 
 
