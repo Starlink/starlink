@@ -108,6 +108,15 @@ HELP 'Name of effective area file, default is standard file for your obs.'
                HELP 'Enter NO to ignore the PSF correction'
             ENDPARAMETER
 
+     PARAMETER ECORR
+               TYPE    '_LOGICAL'
+               PROMPT  'Perform exposure correction'
+               PPATH   'DEFAULT'
+               VPATH   'DEFAULT'
+               DEFAULT  Y
+                HELP 'Enter NO if not converting to counts/s'
+            ENDPARAMETER
+
      PARAMETER OFFAX1
                TYPE    '_REAL'
                PROMPT  'The off-axis angle of the 1st radial bin (arcmins)'
