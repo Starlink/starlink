@@ -9,16 +9,14 @@ SGML2DOCS=$(STARLINK_SGML_DIR)/bin/sgml2docs
 
 ssn70.tar-htx: ssn70.sgml ReleaseNotes
 	cd ../dtd2sgml; $(MAKE) sgmltext.stamp
-	cd ../../bin; $(MAKE) bindocs.sgml
-	cd ../../lib; $(MAKE) libdocs.sgml
+	cd ../../misc; $(MAKE) docs
 	SGML_CATALOG_FILES=$$PWD/../documents/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --html --tarball $@ ssn70.sgml
 
 ssn70.tar-tex: ssn70.sgml ReleaseNotes
 	cd ../dtd2sgml; $(MAKE) sgmltext.stamp
-	cd ../../bin; $(MAKE) bindocs.sgml
-	cd ../../lib; $(MAKE) libdocs.sgml
+	cd ../../misc; $(MAKE) docs
 	SGML_CATALOG_FILES=$$PWD/../documents/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --latex --tarball $@ ssn70.sgml

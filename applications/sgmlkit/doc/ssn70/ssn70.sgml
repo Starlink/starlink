@@ -18,6 +18,7 @@
   <!ENTITY sgmlsystem.gif SYSTEM 'ssn70_SGMLsystem.gif' NDATA gif89a>
 
   <!-- Local text files included -->
+  <!ENTITY swversion	SYSTEM '../../VERSION'>
   <!ENTITY starlinkdtddoc	
 			SYSTEM '../dtd2sgml/starlink-0.7.sgmltext'>
   <!ENTITY programcodedtddoc
@@ -28,9 +29,9 @@
 			-- dsssl common code -->
   <!ENTITY dsssl.params	SYSTEM "../../dsssl/sl/common/slparams.sgml" SUBDOC
 			-- Parameterisation -->
-  <!ENTITY supportbinaries SYSTEM "../../bin/bindocs.sgml" SUBDOC
+  <!ENTITY supportbinaries SYSTEM "../../misc/bindocs.sgml" SUBDOC
 			-- Generated documentation for sgml2... -->
-  <!ENTITY supportlib SYSTEM "../../lib/libdocs.sgml" SUBDOC
+  <!ENTITY supportlib SYSTEM "../../misc/libdocs.sgml" SUBDOC
 			-- Generated documentation for library utils... -->
   <!ENTITY release.notes	
 			SYSTEM "ReleaseNotes">
@@ -59,6 +60,8 @@
 	affiliation='University of Cambridge'
 	id=mbt
 	>Mark Taylor
+
+<softwareversion>&swversion;
 
 <docnumber>70
 
@@ -126,7 +129,7 @@ There will be a proper distribution before 1 June.
 <px>Some restructuring.  Preparing for distribution
 
 <distribution string='DR-0.7' date='11-Jun-2000' author=ng versionid='v0-7'>
-<px>RCS $Id$
+<px>RCS Id: ssn70.sgml,v 1.53 2000/06/11 16:21:27 norman Exp 
 <px>First real release to programmers not directly concerned with the
 SGML project.
 
@@ -140,7 +143,7 @@ SGML project.
 </coverimage>
 
 <copyright>
-Copyright 1999, Particle Physics and Astronomy Research Council
+Copyright 1999, 2000, Particle Physics and Astronomy Research Council
 </copyright>
 
 <abstract>

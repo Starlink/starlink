@@ -374,6 +374,7 @@ PKG_NAME = sgmlkit
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
+# %%VERSION%%
 PKG_VERS = 0.7-5
 
 #  List of public script files.  These are scripts which form part of
@@ -393,7 +394,7 @@ DOCUMENTATION=$(PKG_NAME).NEWS doc/ssn70/ssn70.tar-htx doc/ssn70/ssn70.tar-tex
 #  defines the minimum set of files required to rebuild completely the
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION)
 
 ###########################################################################
 #--------------------------------------------------------------------------
@@ -891,7 +892,7 @@ CVS-CHECK:
 $(PKG_NAME)_source.tar:
 	cd doc/dtd2sgml; \
 		$(MAKE) sgmltext.stamp
-	$(TAR_IN) $@ bin doc dsssl dtd lib
+	$(TAR_IN) $@ bin doc dsssl dtd lib misc
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -944,8 +945,14 @@ doc/ssn70/ssn70.tar-htx: doc/ssn70/ssn70.sgml
 doc/ssn70/ssn70.tar-tex: doc/ssn70/ssn70.sgml
 	cd doc/ssn70; $(MAKE) ssn70.tar-tex
 
-$(PKG_NAME).NEWS:
-	$(LINK) doc/ssn70/ReleaseNotes $@
+$(PKG_NAME).NEWS: doc/ssn70/ReleaseNotes
+	echo								> $@
+	echo "This is the Starlink SGML kit, release $(PKG_VERS)"	>>$@
+	echo "packaged `date`"						>>$@
+	echo								>>$@
+	echo								>>$@
+	echo "Release Notes:"						>>$@
+	cat doc/ssn70/ReleaseNotes 					>>$@
 
 #  Unpacking.  Use the presence of the $(UNPACK_FILES) variable (=lib)
 #  to determine whether we need to unpack the source tarball.  Don't
