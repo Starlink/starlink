@@ -19,6 +19,8 @@
 #     	 Original version.
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     26-MAR-2001 (MBT):
+#        Added USESET.
 #     {enter_changes_here}
 
 #-
@@ -327,6 +329,17 @@
             association <->global.ccdpack_ndfnam
           }
 
+         parameter useset {
+                           # Whether to use Set header info
+            type _LOGICAL
+            access READ
+            vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
+            ppath DYNAMIC GLOBAL CURRENT DEFAULT
+            default TRUE
+            prompt {Use CCDPACK Set header information if available?}
+            association <->global.ccdpack_useset
+          }
+            
          parameter save {
                          # Whether to save CCD parameters or not
             type _LOGICAL
