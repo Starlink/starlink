@@ -131,12 +131,6 @@ DviFile::DviFile (string& fn,
 {
     if (res != 0)
 	PkFont::setResolution(res);
-//     if (resolution_ == 0)
-// 	// then default it from PkFont
-// 	resolution_ = PkFont::dpiBase();
-//     else
-// 	// set PkFont's resolution to match this
-// 	PkFont::setResolution(resolution_);
 
     try
     {
@@ -742,18 +736,6 @@ int DviFile::pixel_round(int dp)
 	return  static_cast<int>( dp/dviu_per_px_ + 0.5);
     else
 	return -static_cast<int>(-dp/dviu_per_px_ + 0.5);
-#if 0
-    if (dp>0)
-	return  static_cast<int>(px_per_dviu_ *   dp  + 0.5);
-    else
-	return -static_cast<int>(px_per_dviu_ * (-dp) + 0.5);
-#endif
-#if 0
-    if (dp>0)
-	return  static_cast<int>(floor(px_per_dviu_ *   dp  + 0.5));
-    else
-	return -static_cast<int>(floor(px_per_dviu_ * (-dp) + 0.5));
-#endif
 }
 
 /**
@@ -838,7 +820,6 @@ int DviFile::charEscapement_ (int charno)
     return static_cast<int>
 	    (current_font_->glyph(charno)->hEscapement() // unmagnified
 	     * current_font_->magnification());
-    //    return static_cast<int>(current_font_->glyph(charno)->hEscapement());
 }
 
 
@@ -989,9 +970,6 @@ void DviFile::read_postamble()
 // 	postamble_.u = static_cast<unsigned int>(postamble_.u
 // 						 * (double)dvimag / 1000.0);
     }
-    // px_per_dviu_ is set in preamble
-//     widest_page_ = static_cast<int>(postamble_.u * px_per_dviu_);
-//     deepest_page_ = static_cast<int>(postamble_.l * px_per_dviu_);
 
     // dvimag/1000 is the font magnification factor
     double fontmag = dvimag/1000.0;
@@ -1001,7 +979,6 @@ void DviFile::read_postamble()
 	     << " u=" << postamble_.u
 	     << " s=" << postamble_.s
 	     << " t=" << postamble_.t
-		//	     << "; (w)x(d)=" << widest_page_ << "x" << deepest_page_
 	     << "; fontmag=" << fontmag
 	     << endl;
 
@@ -1173,8 +1150,6 @@ void DviFile::process_preamble(DviFilePreamble* p)
     // 1px = dviu_per_px_ * 1dviu
     double resolution = PkFont::dpiBase();
     dviu_per_px_ = 2.54e5/(resolution*netmag_) / numden;
-//     dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
-//     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
 
     // pixel_size is the size of one pixel, in inches
     double pixel_size = dviu_per_px_ / dviu_per_pt_ / 72.27;
@@ -1186,7 +1161,6 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	max_drift_ = 2;
     if (verbosity_ > normal)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
-		//	     << ", px_per_dviu_ = " << px_per_dviu_
 	     << ", dviu_per_px_ = " << dviu_per_px_
 	     << ", mag=" << preamble_.mag
 	     << ", extmag=" << extmag_

@@ -232,8 +232,6 @@ public:
 	return static_cast<int>
 		(npt * dviu_per_pt_ / dviu_per_px_ + 0.5);
     }
-/*     int pt2px (double npt) const */
-/* 	    { return static_cast<int>(px_per_dviu_*dviu_per_pt_*netmag_*npt+0.5); }; */
     /**
      * Gets the name of this DVI file.
      * @return the open file name as a string
@@ -280,12 +278,8 @@ private:
      * <code>dviu_per_pt_</code> x d/pt</em>.  This does not include
      * any DVI-magnification.
      */
-    double dviu_per_pt_;	// 1dviu = 1/dviu_per_pt_ * 1pt
-    // <code>1dviu = 1/dviu_per_pt_ * 1pt</code>, and thus <code>d/dviu =
-    // dviu_per_pt * d/pt</code>.  Note that <code>dviu_per_pt_</code>
-    // does not include DVI-magnification 
+    double dviu_per_pt_;
 
-    //double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
     /**
      * Conversion between DVIunits and pixels.  This is 
      * <em>1/K</em>, where <em>K</em> is the constant referred to in
@@ -293,15 +287,14 @@ private:
      * lengths in pixels, or <code>1px = dviu_per_px_ *
      * 1dviu</code>.  It includes DVI-magnification.
      */
-    double dviu_per_px_;	// 1px = dviu_per_px_ * 1dviu (includes mag)
+    double dviu_per_px_;
     /**
      * Conversion between DVIunits and scaled points.  For DVI files
      * written by TeX82, this will have the value 1 (see [driv-std]).
      * Definition is <code>1sp = dviu_per_sp_ * 1dviu</code>.
      */
-    double dviu_per_sp_;	// 1sp = dviu_per_sp_ * 1dviu
-    // resolution is in pixels-per-inch
-    //int resolution_;
+    double dviu_per_sp_;
+
     /**
      * The factor by which the file's internal magnification
      * should be increased (1.0 = no magnification).  This is set
@@ -346,10 +339,6 @@ private:
 	unsigned int i, num, den, mag;
 	string comment;
     } preamble_;
-/*     inline int magnify_(int i) const */
-/* 	{ return (netmag_==1.0 */
-/* 		  ? i */
-/* 		  : static_cast<int>(netmag_*(double)i)); } */
     void read_postamble()
 	    throw (DviError);
     bool have_preread_postamble_; /* we sought to it at beginning */
@@ -581,16 +570,6 @@ class DviFileSetChar : public DviFileEvent {
      */
     DviFileSetChar(int charno, DviFile *dptr);
     DviFileSetChar(int opcode, int charno, DviFile *dptr);
-/*     DviFileSetChar(int charno, DviFile *dptr) */
-/* 	    : DviFileEvent(charno, setchar, dptr), charno_(charno) */
-/*     { */
-/* 	if (verbosity_ > normal) */
-/* 	    cerr << "Char " << charno << "=" */
-/* 		 << (isprint(charno) ? static_cast<char>(charno) : '?') */
-/* 		 << endl; */
-/*     } */
-/*     DviFileSetChar(unsigned char opcode, int charno, DviFile *dptr) */
-/* 	    : DviFileEvent(opcode, setchar, dptr), charno_(charno) { } */
     void debug() const;
     /**
      * Obtains the character which is to be set.
