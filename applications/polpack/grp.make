@@ -40,7 +40,7 @@ pol1_vecky.f pol1_vecpl.f pol1_vect.f pol_cale.f \
 pol_calf.f pol_calp.f pol_calti.f polbin.f polbin.ifl polcal.f \
 polcal.ifl polcent.f polcent.ifl polexp.csh polexp.f polexp.ifl \
 polext.f polext.ifl polhelp.f polhelp.ifl polimp.csh polimp.f \
-polimp.ifl polka.f polka.ifl polpack.c polpack.csh \
+polimp.ifl polka.f polka.ifl polpack.c polpack.csh polexpx.f polexpx.ifl \
 polpack.hlp polpack.icl polpack_link_adam polpack_mon.ifl \
 polpack_mon.f polpack_test polplot.f polplot.ifl polvec.f polvec.ifl \
 pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
