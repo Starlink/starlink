@@ -82,6 +82,7 @@ INTERFACE SFIT
 
    PARAMETER OP
       TYPE '_LOGICAL'
+      DEFAULT FALSE
       PROMPT 'Output results?'
       HELP 'If Y, then final fit results will be spooled or sent to a file'
    ENDPARAMETER
