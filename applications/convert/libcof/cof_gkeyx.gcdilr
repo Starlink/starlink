@@ -46,6 +46,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,6 +54,9 @@
 *        Original version.
 *     1997 January 17 (MJC):
 *        Added COMENT argument.
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning with uninitialised COMENT on entry
+*        to fitsio routine
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +98,7 @@
 
 *  Initialise the presence flag.
       THERE = .FALSE.
+      COMENT = ' '
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.

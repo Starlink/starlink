@@ -242,6 +242,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -306,6 +307,8 @@
 *        so the count must be adjusted.
 *     2003 May 3 (MJC):
 *        Added support for INES IUE spectra.
+*     2004 September 10 (TIMJ):
+*        Initialise some variables that were causing valgrind trouble
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -461,6 +464,11 @@
       
 *  Initialise the merged header flag.
       MERGED = .FALSE.
+
+*  Initialise variables that would otherwise not be initialised by
+*  some compilers
+      XTENS = ' '
+      MULTIP = .FALSE.
 
       IF ( EXTABL ) THEN
 *  Initialize the DONE flag array - we do it here afresh for each FITS file.

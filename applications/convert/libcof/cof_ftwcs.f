@@ -71,6 +71,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,6 +84,9 @@
 *        Clarified the errors reported if no WCS is created.
 *     20-FEB-2002 (DSB):
 *        Added argument WCSATT.
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning with uninitialised HEADER on entry
+*        to fitsio routine
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,6 +163,7 @@
 *  Obtain the header. If an error occurred getting the header, flush
 *  the FITSIO error stack, increment the number of bad headers, but 
 *  carry on to process any remaining headers.
+         HEADER = ' '
          CALL FTGREC( FUNIT, IHEAD, HEADER, FSTAT )
          IF( FSTAT .NE. FITSOK ) THEN
             FSTAT = FITSOK

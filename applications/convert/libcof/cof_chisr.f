@@ -41,6 +41,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,10 @@
 *        Allowed for the shift in alignment made by CFITSIO starting
 *        in column 11 from 9, but also still valid for old data written
 *        with the original alignment.
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning with uninitialised CARD on entry
+*        to fitsio routine
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -181,6 +186,7 @@
          IF ( HISPRE ) THEN
 
 *  Obtain the header card.
+            CARD = ' '
             CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
 
 *  Was the HISTORY card written by COF_WHISR?  Need to find the heading.

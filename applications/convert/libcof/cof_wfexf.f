@@ -55,6 +55,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     JAB: Jeremy Bailey (AAO)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +66,10 @@
 *        final record.
 *     2002 Dec 20 (AJC):
 *        Don't add END if last was END (A merged header)
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning with uninitialised HEADER on entry
+*        to fitsio routine.
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,7 +108,6 @@
       PARAMETER( HEDLEN = 80 )
 
 *  Local Variables:
-      CHARACTER * ( 256 ) BUFFER ! Used to form error messages
       INTEGER CARD               ! Count of airlock headers written
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
       INTEGER EL                 ! Number of FITS-extension elements
@@ -115,7 +119,6 @@
                                  ! extension
       INTEGER I                  ! Loop counter for group parameters
       INTEGER IHEAD              ! Loop counter for headers
-      INTEGER KEYADD             ! Number of headers that can be added
       CHARACTER * ( 8 ) KEYWRD   ! FITS keyword for PTYPEn
       INTEGER NCF                ! Number of characters in the FITS file
                                  ! name
@@ -166,6 +169,7 @@
          IF ( RETAIN( IHEAD ) ) THEN
 
 *  Obtain the header card.
+            HEADER = ' '
             CALL FTGREC( FUNIT, IHEAD, HEADER, FSTAT )
 
 *  Report if anything went wrong.  Go to the point before the end where

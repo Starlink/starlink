@@ -41,6 +41,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *        to avoid lots of spurious decimal places.
 *     20-MAY-2003 (DSB):
 *        Issue warning if WCS headers cannot be produced.
+*     10-SEP-2004 (TIMJ):
+*        Initialise HEADER to fix valgrind warning
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,6 +108,9 @@
 
 *  Check the inherited global status.
       IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialisation
+      HEADER = ' '
 
 *  Begin as AST context.
       CALL AST_BEGIN( STATUS )

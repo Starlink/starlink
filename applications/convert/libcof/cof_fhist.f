@@ -37,11 +37,15 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 March 6 (MJC):
 *        Original version.
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning with uninitialised CARD on entry
+*        to fitsio routine
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,6 +116,7 @@
       IF ( NOTHIS .AND. KEY .LE. MAXKEY ) THEN
 
 *  Obtain the current card.
+         CARD = ' '
          CALL FTGREC( FUNIT, KEY, CARD, FSTAT )
 
 *  Is this a HISTORY card.

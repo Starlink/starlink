@@ -44,6 +44,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +52,9 @@
 *        Original version.
 *     2000 April 5 (AJC):
 *        Added the check facility
+*     2004 September 10 (TIMJ):
+*        Fix valgrind warning with uninitialised KEYWRD on entry
+*        to fitsio routine
 *     {enter_changes_here}
 
 *  Bugs:
@@ -164,6 +168,7 @@
 
 *  See if there are lower-bounds keywords.  Use the default value if
 *  one is not present.
+            KEYWRD = ' '
             CALL FTKEYN( KEYROT, I, KEYWRD, FSTAT )
             IF ( FSTAT .NE. FITSOK ) THEN
                BUFFER = 'FITS keyword for lower bounds is invalid.  '/

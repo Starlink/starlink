@@ -32,6 +32,9 @@
 *  History:
 *     11-JAN-2000 (DSB):
 *        Original version.
+*     10-SEP-2004 (TIMJ):
+*        Remove unused variable NDFNAM
+*        Initialise HEADER variable
 *     {enter_changes_here}
 
 *  Bugs:
@@ -59,7 +62,6 @@
 *  Local Variables:
       CHARACTER HEADER*80        ! A FITS header
       CHARACTER MESS*1024        ! The warning message
-      CHARACTER NDFNAM*256       ! The NDF name
       CHARACTER VALUE*80         ! A FITS keyword value
       INTEGER HLEN               ! Used length of string
       INTEGER IAT                ! Used length of MESS
@@ -78,6 +80,9 @@
       REPORT = .FALSE. 
       MESS = ' '
       IAT = 0
+
+*  Initialise some variables
+      HEADER = ' '
 
 *  Rewind the FitsChan so that the following search starts with the first
 *  card.
