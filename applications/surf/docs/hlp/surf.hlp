@@ -219,6 +219,20 @@ using the following format:
 
 1 Release_notes
 
+2 New_in_version_1_6_8
+
+This is a bug fix release. Main changes are:
+
+  - Add support for Raster skydips
+
+  - New version of the mapping cookbook (SC/11) to include scan map
+
+  - Update of REMDBM to support KAPPA 0.18
+
+  - Minor fixes to SCUBA2MEM with EKH scanning
+
+  - Dont calculate clock correction when using AZ
+
 2 New_in_version_1_6
 
 Important changes to SKYDIP and a fix for the clock error problem.
