@@ -219,10 +219,10 @@
             set y2 [ lindex [ lindex $bounds 1 ] 1 ]
             set infodata(b) "\[$x1:$x2,$y1:$y2\]"
             set infodata(p) "[ expr $x2 - $x1 + 1 ] x [ expr $y2 - $y1 + 1 ]"
-            set xlo $x1
-            set xhi $x2
-            set ylo $y1
-            set yhi $y2
+            set xlo [ expr $x1 - 0.5 ]
+            set xhi [ expr $x2 + 0.5 ]
+            set ylo [ expr $y1 - 0.5 ]
+            set yhi [ expr $y2 + 0.5 ]
          } else {
             set viewframe CCD_SET
             set infodata(b) ""
