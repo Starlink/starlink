@@ -191,13 +191,13 @@
 
                   CALL SCULIB_CONVOLVE (SCRATCH1_DATA,
      :              SCRATCH1_VARIANCE, SCRATCH1_QUALITY, 
-     :              SY_CONV_FUNCTION, N_SCAN, N_CONV, NORM,
+     :              SY_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :              SCRATCH2_DATA, SCRATCH2_VARIANCE, 
      :              SCRATCH2_QUALITY, STATUS)
 
                   CALL SCULIB_CONVOLVE (SCRATCH2_DATA,
      :              SCRATCH2_VARIANCE, SCRATCH2_QUALITY, 
-     :              AS_CONV_FUNCTION, N_SCAN, N_CONV, NORM,
+     :              AS_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
      :              SCRATCH1_DATA, SCRATCH1_VARIANCE, 
      :              SCRATCH1_QUALITY, STATUS)
 
