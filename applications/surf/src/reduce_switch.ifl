@@ -40,6 +40,13 @@
 	 HELPKEY  '*'
       ENDPARAMETER
 
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
 
       PARAMETER USE_CALIBRATOR
          POSITION 2
