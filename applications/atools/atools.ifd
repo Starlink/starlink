@@ -381,7 +381,7 @@ iraf! {
       }
       action getframe {
          helplib {$ATOOLS_HELP}
-         parameter frame {
+         parameter iframe {
             position 2
             type LITERAL
             prompt {The index or Domain of the required Frame}
