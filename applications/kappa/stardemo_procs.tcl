@@ -3149,26 +3149,31 @@ proc TextTags {widget scope} {
       $widget tag delete $tag
    }
 
-# Get the pixels per inch on the screen.
-   set dpi [winfo fpixels . "1i"]
+# Find a factor to scale the screeen size by. A nominal screen size of
+# 1200x900 is assumed.
+   set fac [expr [winfo screenwidth .]/1200.0 ]
+   set fac2 [expr [winfo screenheight .]/900.0 ]
+   if { $fac2 < $fac } {
+      set fac $fac2
+   }
 
 # Find the font sizes in pixels.
-   set px180 [expr round( ( 18.0 * $dpi ) / 88.0 ) ]   
-   set px140 [expr round( ( 14.0 * $dpi ) / 88.0 ) ]   
-   set px120 [expr round( ( 12.0 * $dpi ) / 88.0 ) ]   
-   set px100 [expr round( ( 10.0 * $dpi ) / 88.0 ) ]   
+   set px180 [expr round( 18.0 * $fac ) ]
+   set px140 [expr round( 14.0 * $fac ) ]
+   set px120 [expr round( 12.0 * $fac ) ]
+   set px100 [expr round( 10.0 * $fac ) ]
 
 # Set the fonts corresponding to the fomatting tags which can be used
 # within demo scripts.
    $widget tag configure ATTR    -font [SelectFont "-*-helvetica-medium-r-*-*-$px140-*-*-*-*-*-*-*"]
    $widget tag configure BUTTON  -font [SelectFont "-*-*-medium-r-*-*-$px120-*-*-*-*-*-*-*"]
-   $widget tag configure COMMAND -font [SelectFont "-*-helvetica-medium-r-*-*-$px140-*-*-*-*-*-*-*"]
+   $widget tag configure COMMAND -font [SelectFont "-*-helvetica-medium-r-*-*-$px180-*-*-*-*-*-*-*"]
    $widget tag configure DOC     -font [SelectFont "-*-times-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
    $widget tag configure EMPH    -font [SelectFont "-*-times-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
    $widget tag configure FILE    -font [SelectFont "-*-helvetica-medium-r-*-*-$px140-*-*-*-*-*-*-*"]
    $widget tag configure FOR     -font [SelectFont "-*-times-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
    $widget tag configure PACK    -font [SelectFont "-*-*-bold-i-*-*-$px140-*-*-*-*-*-*-*"]
-   $widget tag configure PARAM   -font [SelectFont "-*-helvetica-bold-r-*-*-$px180-*-*-*-*-*-*-*"]
+   $widget tag configure PARAM   -font [SelectFont "-*-helvetica-bold-r-*-*-$px140-*-*-*-*-*-*-*"]
    $widget tag configure URL     -font [SelectFont "-*-helvetica-medium-r-*-*-$px140-*-*-*-*-*-*-*"]
 
 # Initialise a list of the available link tags
