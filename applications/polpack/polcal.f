@@ -86,14 +86,16 @@
 *     NITER = _INTEGER (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the maximum number of iterations to be used when 
-*        estimating input variances and rejecting aberrant input values. 
+*        estimating input variances or rejecting aberrant input values. 
 *        The default value depends on the value supplied for parameter
 *        WEIGHTS. If WEIGHTS indicates that estimates of the input
 *        variances are to be made (i.e. if WEIGHTS has the value 2 or 3), 
-*        then the default value is 6. Otherwise (i.e. if WEIGHTS has the
-*        value 1 or 4), the default is zero. This is because each iteration 
-*        is a computationally expensive process, and so iterations should
-*        only be performed if they are really necessary. []
+*        then the default value is 4. Otherwise, if variances in the input 
+*        NDFs are to be used (i.e. if WEIGHTS is 1), the default is zero. 
+*        This is because each iteration is a computationally expensive 
+*        process, and so iterations should only be performed if they are 
+*        really necessary. NITER is always fixed at zero if WEIGHTS is 4
+*        (i.e. if all input data are given constant weight). []
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the threshold at which to reject input data values. If
@@ -137,11 +139,11 @@
 *        slightly better results for star fields. [10]
 *     SMBOX = _INTEGER (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
-*        specifies the size (in pixels) of the smoothing box used to
-*        reduce the noise in the Stokes parameters prior to estimating the
-*        variance of the input data. It is only accessed if parameter 
-*        WEIGHTS is given the value 2 or 3 (i.e. if input variances are
-*        to be estimated from the spread of the input data values). 
+*        specifies the size (in pixels) of the smoothing box to use
+*        when estimating the variance of the input data. It is only 
+*        accessed if parameter WEIGHTS is given the value 2 or 3 (i.e. if 
+*        input variances are to be estimated from the spread of the input 
+*        data values). 
 *
 *        The error of a given input intensity value can be estimated 
 *        in two ways, by its deviation from the sine curve connecting 
@@ -161,7 +163,7 @@
 *        positions (the minimum possible number), then the sine curves
 *        would fit the supplied data exactly, no matter what the noise
 *        may be, and would consequently give no information about the input
-*        variances. In this case, a larger value of SMBOX (say 7) may be
+*        variances. In this case, a larger value of SMBOX (say 9) may be
 *        necessary. [3]
 *     TITLE = LITERAL (Read)
 *        A title for the output cube. [Output from POLCAL]
@@ -212,7 +214,9 @@
 *        zero, thus preventing the iterative estimation of input variances.
 *
 *        - 4 -- Use a constant weight of 1.0 for all input images. Any 
-*        variances supplied with the input images are ignored. 
+*        variances supplied with the input images are ignored. The
+*        iterative rejection of bad input values controlled by parameter
+*        NITER is not available in this mode.
 *
 *        The dual-beam algorithm always uses scheme 1. [1]
  
@@ -255,12 +259,16 @@
 *        data values. The I, Q and U images are then smoothed by fitting
 *        a quadratic surface to the data within a box centred on each
 *        pixel (the size of the box can be specified using parameter
-*        SMBOX). The squared residuals are then found between the
-*        supplied intensities and the intensities implied by these
-*        smoothed Stokes vectors. These squared residuals are then
-*        smoothed using a 7x7 pixel mean box and the mean squared
-*        residuals are used as the variance estimates for the input
-*        intensity values.
+*        SMBOX). For each input image, a similar image is then created
+*        holding the squared residual between the input intensity values, 
+*        and the intensity values implied by the smoothed Stokes vectors 
+*        (using the known analyser positions, etc, for the images). These
+*        images containing squared residuals are then stacked together
+*        to obtain a single image holding the mean squared residual at
+*        each pixel. This image is then smoothed using a mean box filter
+*        of size specified by parameter SMBOX. The values in the resulting 
+*        image are used as the variance estimates for the input data (note,
+*        the same variance estimates are used for all the input images).
 *        
 *        In order to provide some safe-guards against aberrant values in 
 *        the input images, input data values which are badly inconsistent 
