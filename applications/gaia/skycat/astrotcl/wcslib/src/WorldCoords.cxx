@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: WorldCoords.C,v 1.6 1998/07/30 22:20:11 abrighto Exp $
+ * $Id$
  *
  * WorldCoords.C - method definitions for class WorldCoords
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: WorldCoords.C,v 1.6 1998/07/30 22:20:11 abrighto Exp $";
+static const char* const rcsId="@(#) $Id$";
 
 
 #include <stdio.h>
