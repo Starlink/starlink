@@ -31,7 +31,7 @@ KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com grecom.inc grerr kappa_ardplot_style.def \
-sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f \
+sft_com kappa.hlp kappa_mon.f kapgks_mon.f kapview_mon.f ndfpack_mon.f \
 kappa_style.def tkast.tcl kappa_contour_keystyle.def \
 kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
@@ -71,7 +71,7 @@ settype.par setunits.par setvar.par shadow.par slide.par \
 sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
 trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
 trantrace.par trig.par vecplot.par wiener.par zaplin.par \
-kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
+kappa_mon.tcl kapview_mon.tcl kapgks_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
@@ -160,7 +160,7 @@ setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
 reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
-kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
+kapview_mon.ifl kapgks_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \

@@ -3154,175 +3154,6 @@ package kappa {
 
       }
 
-      action crelut {
-         alias {crel(ut)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter colour {
-            size *
-            type LITERAL
-            vpath PROMPT
-            prompt {New palette colour}
-            helpkey *
-          }
-
-         parameter colrange {
-            size *
-            type _INTEGER
-            vpath PROMPT
-            prompt {Select one or two colours from the palette}
-            helpkey *
-          }
-
-         parameter comp {
-            position 4
-            type LITERAL
-            vpath DEFAULT
-            ppath CURRENT DYNAMIC
-            prompt {Component to display}
-            helpkey *
-            default Data
-          }
-
-         parameter device {
-            ptype DEVICE
-            position 9
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Image-display device}
-            helpkey *
-          }
-
-         parameter high {
-            position 6
-            type _DOUBLE
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {High value for image scaling}
-            helpkey *
-          }
-
-         parameter inlut {
-            position 1
-            type NDF
-            access READ
-            vpath PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.LUT
-            prompt {NDF containing input lookup table}
-            helpkey *
-          }
-
-         parameter inpal {
-            position 7
-            type NDF
-            access READ
-            vpath DEFAULT
-            prompt {NDF containing input palette}
-            helpkey *
-            default !
-          }
-
-         parameter low {
-            position 5
-            type _DOUBLE
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Low value for image scaling}
-            helpkey *
-          }
-
-         parameter ndf {
-            position 3
-            type NDF
-            vpath PROMPT
-            ppath GLOBAL
-            association <->GLOBAL.DATA_ARRAY
-            prompt {Image to be displayed}
-            helpkey *
-          }
-
-         parameter nn {
-            type _LOGICAL
-            prompt {Nearest-neighbour mapping?}
-            vpath DEFAULT
-            default FALSE
-            helpkey *
-          }
-
-         parameter ok {
-            type _LOGICAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Accept this colour (Y/N)?}
-            helpkey *
-          }
-
-         parameter outlut {
-            position 2
-            type NDF
-            access WRITE
-            vpath PROMPT
-            ppath DEFAULT
-            prompt {NDF to save the lookup table}
-            association ->GLOBAL.LUT
-            helpkey *
-          }
-
-         parameter outpal {
-            position 8
-            type NDF
-            access WRITE
-            vpath PROMPT
-            ppath DEFAULT
-            prompt {NDF to save the palette}
-            helpkey *
-            default !
-          }
-
-         parameter palnum {
-            type _INTEGER
-            vpath PROMPT
-            prompt {Number of the palette entry to be modified}
-            helpkey *
-          }
-
-         parameter penrange {
-            size *
-            type _INTEGER
-            vpath PROMPT
-            prompt {First and last pen of the LUT to be modified}
-            helpkey *
-          }
-
-         parameter ptitle {
-            type LITERAL
-            vpath DEFAULT
-            prompt {Title for the palette}
-            helpkey *
-            default {Kappa - Crelut}
-          }
-
-         parameter title {
-            type LITERAL
-            vpath DEFAULT
-            prompt {Title for the lookup table}
-            helpkey *
-            default {Kappa - Crelut}
-          }
-
-         parameter valrange {
-            size *
-            type _DOUBLE
-            vpath PROMPT
-            prompt {Data-value range to be assigned colours}
-            helpkey *
-          }
-
-      }
-
       action cursor {
 
          helplib {$KAPPA_HELP}
@@ -4079,23 +3910,6 @@ package kappa {
 
       }
 
-      action gdnames {
-         alias {gdna(mes) sho(dev)}
-
-            message BLANK {
-              text " "
-	}
-
-            message HEADING {
-              text "Graphics devices available:"
-	}
-
-            message DEVICE {
-              text "^NAME - ^COMMENT"
-	}
-
-      }
-
       action gdset {
          alias {gdse(t)}
 
@@ -4278,51 +4092,6 @@ package kappa {
             ppath GLOBAL CURRENT
             association <-GLOBAL.IMAGE_DISPLAY
             prompt {Name of the image display}
-            helpkey *
-          }
-
-      }
-
-      action idinvisible {
-         alias {idin(visible)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter device {
-            ptype DEVICE
-            position 2
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
-            helpkey *
-          }
-
-         parameter planes {
-            size *
-            position 1
-            type _INTEGER
-            prompt {Memory plane number(s)?}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default 0
-          }
-
-      }
-
-      action idpazo {
-         alias {idpaz(o)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter device {
-            ptype DEVICE
-            position 1
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
             helpkey *
           }
 
@@ -4813,123 +4582,6 @@ package kappa {
 
       }
 
-      action lutflip {
-         alias {lutfl(ip)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter device {
-            ptype DEVICE
-            position 1
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
-            helpkey *
-          }
-
-         parameter plane {
-            position 2
-            type _INTEGER
-            prompt {Memory plane number?}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default 0
-          }
-
-      }
-
-      action luthilite {
-         alias {luthi(lite)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter colour {
-            size *
-            position 1
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT
-            prompt {Highlight colour}
-            helpkey *
-          }
-
-         parameter device {
-            ptype DEVICE
-            position 2
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
-            helpkey *
-          }
-
-         parameter full {
-            type _LOGICAL
-            prompt {Highlight the full colour table?}
-            vpath DEFAULT
-            default FALSE
-            helpkey *
-          }
-
-         parameter plane {
-            position 3
-            type _INTEGER
-            prompt {Memory plane number}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default 0
-          }
-
-         parameter view {
-            type _LOGICAL
-            position 4
-            prompt {Display the colour table?}
-            vpath DEFAULT
-            ppath CURRENT
-            default FALSE
-            helpkey *
-          }
-
-      }
-
-      action lutrot {
-         alias {lutro(t)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter device {
-            ptype DEVICE
-            position 1
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
-            helpkey *
-          }
-
-         parameter full {
-            type _LOGICAL
-            prompt {Rotate the full colour table?}
-            vpath DEFAULT
-            default FALSE
-            helpkey *
-          }
-
-         parameter plane {
-            position 2
-            type _INTEGER
-            prompt {Memory plane number}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default 0
-          }
-
-      }
-
       action lutsave {
          helplib {$KAPPA_HELP}
          parameter device {
@@ -4974,51 +4626,6 @@ package kappa {
             default {KAPPA - Lutsave}
             helpkey *
           }
-      }
-
-      action luttweak {
-         alias {lutt(weak)}
-
-         helplib {$KAPPA_HELP}
-
-         parameter device {
-            ptype DEVICE
-            position 1
-            vpath GLOBAL PROMPT
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
-            helpkey *
-          }
-
-         parameter full {
-            type _LOGICAL
-            prompt {Tweak the full colour table?}
-            vpath DEFAULT
-            default FALSE
-            helpkey *
-          }
-
-         parameter plane {
-            position 2
-            type _INTEGER
-            prompt {Memory plane number}
-            vpath DEFAULT
-            ppath DEFAULT
-            helpkey *
-            default 0
-          }
-
-         parameter view {
-            type _LOGICAL
-            position 3
-            prompt {Display the colour table?}
-            vpath DEFAULT
-            ppath CURRENT
-            default FALSE
-            helpkey *
-          }
-
       }
 
       action lutview {
@@ -5569,45 +5176,6 @@ package kappa {
             default {Kappa - Palsave}
           }
 
-      }
-
-      action permaxes {
-         helplib {$KAPPA_HELP}
-         parameter in {
-            position 1
-            type NDF
-            access READ
-            vpath {PROMPT }
-            prompt {Input NDF data structure}
-            ppath GLOBAL CURRENT
-            association <-GLOBAL.DATA_ARRAY
-            helpkey *
-          }
-         parameter out {
-            position 2
-            type NDF
-            access WRITE
-            vpath {PROMPT }
-            prompt {Output NDF data structure}
-            association ->GLOBAL.DATA_ARRAY
-            helpkey *
-          }
-         parameter perm {
-            position 3
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            prompt {Input axis for each output axis}
-            helpkey *
-          }
-         parameter title {
-            type LITERAL
-            vpath {DEFAULT }
-            prompt {Title for output NDF}
-            ppath CURRENT
-            default !
-            helpkey *
-          }
       }
 
       action piccur {
@@ -6531,6 +6099,390 @@ package kappa {
 
       }
 
+   }
+
+   executable kapgks_mon {
+
+      action crelut {
+         alias {crel(ut)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter colour {
+            size *
+            type LITERAL
+            vpath PROMPT
+            prompt {New palette colour}
+            helpkey *
+          }
+
+         parameter colrange {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            prompt {Select one or two colours from the palette}
+            helpkey *
+          }
+
+         parameter comp {
+            position 4
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            prompt {Component to display}
+            helpkey *
+            default Data
+          }
+
+         parameter device {
+            ptype DEVICE
+            position 9
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Image-display device}
+            helpkey *
+          }
+
+         parameter high {
+            position 6
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {High value for image scaling}
+            helpkey *
+          }
+
+         parameter inlut {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.LUT
+            prompt {NDF containing input lookup table}
+            helpkey *
+          }
+
+         parameter inpal {
+            position 7
+            type NDF
+            access READ
+            vpath DEFAULT
+            prompt {NDF containing input palette}
+            helpkey *
+            default !
+          }
+
+         parameter low {
+            position 5
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Low value for image scaling}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 3
+            type NDF
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Image to be displayed}
+            helpkey *
+          }
+
+         parameter nn {
+            type _LOGICAL
+            prompt {Nearest-neighbour mapping?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter ok {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Accept this colour (Y/N)?}
+            helpkey *
+          }
+
+         parameter outlut {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {NDF to save the lookup table}
+            association ->GLOBAL.LUT
+            helpkey *
+          }
+
+         parameter outpal {
+            position 8
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {NDF to save the palette}
+            helpkey *
+            default !
+          }
+
+         parameter palnum {
+            type _INTEGER
+            vpath PROMPT
+            prompt {Number of the palette entry to be modified}
+            helpkey *
+          }
+
+         parameter penrange {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            prompt {First and last pen of the LUT to be modified}
+            helpkey *
+          }
+
+         parameter ptitle {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for the palette}
+            helpkey *
+            default {Kappa - Crelut}
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for the lookup table}
+            helpkey *
+            default {Kappa - Crelut}
+          }
+
+         parameter valrange {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            prompt {Data-value range to be assigned colours}
+            helpkey *
+          }
+
+      }
+
+      action gdnames {
+         alias {gdna(mes) sho(dev)}
+      }
+
+      action idinvisible {
+         alias {idin(visible)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter device {
+            ptype DEVICE
+            position 2
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter planes {
+            size *
+            position 1
+            type _INTEGER
+            prompt {Memory plane number(s)?}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0
+          }
+
+      }
+
+      action idpazo {
+         alias {idpaz(o)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter device {
+            ptype DEVICE
+            position 1
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+      }
+
+      action lutflip {
+         alias {lutfl(ip)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter device {
+            ptype DEVICE
+            position 1
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter plane {
+            position 2
+            type _INTEGER
+            prompt {Memory plane number?}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0
+          }
+
+      }
+
+      action luthilite {
+         alias {luthi(lite)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter colour {
+            size *
+            position 1
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Highlight colour}
+            helpkey *
+          }
+
+         parameter device {
+            ptype DEVICE
+            position 2
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter full {
+            type _LOGICAL
+            prompt {Highlight the full colour table?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter plane {
+            position 3
+            type _INTEGER
+            prompt {Memory plane number}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0
+          }
+
+         parameter view {
+            type _LOGICAL
+            position 4
+            prompt {Display the colour table?}
+            vpath DEFAULT
+            ppath CURRENT
+            default FALSE
+            helpkey *
+          }
+
+      }
+
+      action lutrot {
+         alias {lutro(t)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter device {
+            ptype DEVICE
+            position 1
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter full {
+            type _LOGICAL
+            prompt {Rotate the full colour table?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter plane {
+            position 2
+            type _INTEGER
+            prompt {Memory plane number}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0
+          }
+
+      }
+
+      action luttweak {
+         alias {lutt(weak)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter device {
+            ptype DEVICE
+            position 1
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter full {
+            type _LOGICAL
+            prompt {Tweak the full colour table?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter plane {
+            position 2
+            type _INTEGER
+            prompt {Memory plane number}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0
+          }
+
+         parameter view {
+            type _LOGICAL
+            position 3
+            prompt {Display the colour table?}
+            vpath DEFAULT
+            ppath CURRENT
+            default FALSE
+            helpkey *
+          }
+
+      }
+      
    }
 
    executable kappa_mon {
@@ -12896,6 +12848,45 @@ iraf! {
             helpkey *
           }
 
+      }
+
+      action permaxes {
+         helplib {$KAPPA_HELP}
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {Input NDF data structure}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output NDF data structure}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter perm {
+            position 3
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            prompt {Input axis for each output axis}
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath {DEFAULT }
+            prompt {Title for output NDF}
+            ppath CURRENT
+            default !
+            helpkey *
+          }
       }
 
       action pixdupe {

@@ -131,10 +131,6 @@
          ELSE IF ( NAME .EQ. 'CONTOUR' ) THEN
             CALL CONTOUR ( STATUS )
 
-*  Creates or manipulates an image-display lookup table using a palette.
-         ELSE IF ( NAME .EQ. 'CRELUT' ) THEN
-            CALL CRELUT ( STATUS )
-
 *  Reports the co-ordinates of points selected using the
 *  cursor and selects the current picture.
          ELSE IF ( NAME .EQ. 'CURSOR' ) THEN
@@ -156,10 +152,6 @@
          ELSE IF ( NAME .EQ. 'GDCLEAR' ) THEN
             CALL GDCLEAR( STATUS )
 
-*  Shows which graphics devices are available.
-         ELSE IF ( NAME .EQ. 'GDNAMES' ) THEN
-            CALL GDNAMES ( STATUS )
-
 *  Selects a current graphics device.
          ELSE IF ( NAME .EQ. 'GDSET' ) THEN
             CALL GDSET ( STATUS )
@@ -168,21 +160,9 @@
          ELSE IF ( NAME .EQ. 'GDSTATE' ) THEN
             CALL GDSTATE( STATUS )
 
-*  Draws a perspective plot of a two-dimensional NDF.
-*         ELSE IF ( NAME .EQ. 'HIDE' ) THEN
-*            CALL HIDE ( STATUS )
-
 *  Clears an image display and purges its database entries.
          ELSE IF ( NAME .EQ. 'IDCLEAR' ) THEN
             CALL GDCLEAR( STATUS )
-
-*  Makes memory planes of an image-display device invisible.
-         ELSE IF ( NAME .EQ. 'IDINVISIBLE' ) THEN
-            CALL IDINVISIBLE ( STATUS )
-
-*  Pans and zooms an image-display device.
-         ELSE IF ( NAME .EQ. 'IDPAZO' ) THEN
-            CALL IDPAZO ( STATUS )
 
 *  Selects a current image-display device.
          ELSE IF ( NAME .EQ. 'IDSET' ) THEN
@@ -201,25 +181,9 @@
          ELSE IF ( NAME .EQ. 'LUTABLE' ) THEN
             CALL LUTABLE ( STATUS )
 
-*  Flips the colour table of an image-display device.
-         ELSE IF ( NAME .EQ. 'LUTFLIP' ) THEN
-            CALL LUTFLIP ( STATUS )
-
-*  Highlights a colour table of image-display device.
-         ELSE IF ( NAME .EQ. 'LUTHILITE' ) THEN
-            CALL LUTHILITE ( STATUS )
-
-*  Rotates a colour table of image-display device.
-         ELSE IF ( NAME .EQ. 'LUTROT' ) THEN
-            CALL LUTROT ( STATUS )
-
 *  Saves the current colour table of an image-display device in an NDF.
          ELSE IF ( NAME .EQ. 'LUTSAVE' ) THEN
             CALL LUTSAVE ( STATUS )
-
-*  Tweaks a colour table of an image display.
-         ELSE IF ( NAME .EQ. 'LUTTWEAK' ) THEN
-            CALL LUTTWEAK ( STATUS )
 
 *   Draws a colour-table key.
          ELSE IF ( NAME .EQ. 'LUTVIEW' ) THEN
