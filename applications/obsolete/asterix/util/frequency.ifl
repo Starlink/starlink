@@ -46,4 +46,12 @@
        HELP 'Answer Y if you want the "area" under the curve to be 1'
     ENDPARAMETER
 
+   PARAMETER USEGRP
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   YES
+      PROMPT    'Use grouping information'
+      HELP      'Responding N will ignore the grouping data in the file'
+   ENDPARAMETER
+
 ENDINTERFACE
