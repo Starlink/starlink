@@ -17,7 +17,8 @@ require Exporter;
 #  Names of routines and variables defined here to be exported.
 
 @EXPORT = qw/tarxf popd pushd starpack rmrf parsetag
-             $incdir $srcdir $bindir $indexfile $taskfile/;
+             $incdir $srcdir $bindir 
+             $func_indexfile $file_indexfile $taskfile/;
 
 #  Includes.
 
@@ -36,7 +37,8 @@ $incdir = "/star/include";              # Starlink include directory
 
 #  Index file locations.
 
-$indexfile = cwd . "/index";
+$func_indexfile = cwd . "/func";
+$file_indexfile = cwd . "/file";
 $taskfile  = cwd . "/tasks";
 
 
@@ -176,7 +178,7 @@ sub parsetag {
    my %tag = (Start => '', End => '');
   
    $tag =~ m%<(/?)\s*(\w+)\s*%g
-      or die "Internal: $tag doesn't look like a tag.\n";
+      or die "Internal: '$tag' doesn't look like a tag.\n";
    $tag{ $1 ? 'End' : 'Start' } = lc $2;
    while ($tag =~ m%(\w+)\s*(?:=\s*(?:(["'])(.*?)\2|()(\w*)))?%g) {
       $tag{lc $1} = $3;
