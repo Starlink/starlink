@@ -313,17 +313,22 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 
 PUBLIC_SCRIPTS = scb.pl scbindex.pl dbmcat dbmdo
 
+#  List of CGI scripts.  These are executables which will be installed
+#  in the $(INSTALL_CGI) directory with execute permission set and may
+#  be executed as CGI programs if an HTTP server is set up appropriately.
+
+CGI_SCRIPTS = scb.pl
+
+#  List of all scripts including $(CGI_SCRIPTS) and $(PUBLIC_SCRIPTS)
+#  (but without duplicated entries).
+
+ALL_SCRIPTS = scb.pl scbindex.pl dbmcat dbmdo
+
 #  List of Perl modules.  These are library modules required by the 
 #  public script files $(PUBLIC_SCRIPTS) and will be installed in the
 #  $(INSTALL_PERL_MOD) directory.
 
 PERL_MODULES = Tag.pm CTag.pm FortranTag.pm Scb.pm StarIndex.pm
-
-#  List of CGI scripts.  These are executables which will be installed
-#  in the $(INSTALL_CGI) directory with execute permission set and may
-#  be executed as CGI programs if an HTTP server is set up appropriately.
-
-CGI_SCRIPTS = scb.pl scbindex.pl
 
 #  Lists of Latex and hypertext documents.
 
@@ -347,16 +352,16 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(PUBLIC_SCRIPTS) $(CGI_SCRIPTS) $(PERL_MODULES)
+BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES)
 
 #  Rules for extracting source files from the source archive.
 
-$(PUBLIC_SCRIPTS) $(PERL_MODULES) $(CGI_SCRIPTS):
+$(ALL_SCRIPTS) $(PERL_MODULES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 	mv $@ $@.gen
-	$(SUBST_CP) $@.gen $@
+	$(SUBST_CP) $@.gen > $@
 	rm -f $@.gen
 
 #  The build is done by filtering through the following sed script, which
@@ -365,9 +370,9 @@ $(PUBLIC_SCRIPTS) $(PERL_MODULES) $(CGI_SCRIPTS):
 SUBST_CP = sed \
             -e'1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5)%' \
             -e's%"$$STARLINK"%"$(STARLINK)"%' \
-            -e's%"$$PERL_MOD_DIR"%$(PERL_MOD_DIR)"%' \
+            -e's%"$$PERL_MOD_DIR"%"$(PERL_MOD_DIR)"%' \
             -e's%"$$INDEX_DIR"%"$(INDEX_DIR)"%' \
-            -e's%"$$SOURCES_DIR"%$(SOURCES_DIR)"%' \
+            -e's%"$$SOURCES_DIR"%"$(SOURCES_DIR)"%' \
             -e's%"$$HTXSERVER_URL"%"$(HTXSERVER_URL)"%' \
             -e's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
 
