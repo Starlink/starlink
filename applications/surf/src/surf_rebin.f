@@ -241,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.67  1999/07/14 19:21:04  timj
+*     Pass TELESCOPE and INSTRUMENT down to WRITE_MAP_INFO
+*
 *     Revision 1.66  1999/07/14 04:50:18  timj
 *     Use surf_request_output_coords
 *
@@ -563,6 +566,7 @@ c
       INTEGER          IJ_PTR_END      ! End of scratch pointer
       INTEGER          IJ_PTR          ! Scratch pointer
       CHARACTER*256    IN              ! input filename and data-spec
+      CHARACTER*20     INSTRUMENT      ! Name of instrument that took the data
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
                                 ! Pointer to integration posns
@@ -698,6 +702,7 @@ c
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
+      CHARACTER*20     TELESCOPE       ! Name of telescope that took the data
       LOGICAL          THERE           ! Is a component there?
       LOGICAL          TIMES           ! Store the TIMES array
       INTEGER          TOT(MAX_FILE)   ! Number of integrations per input file
@@ -2170,6 +2175,14 @@ c
                   CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
      :                 FITS(1,1), 'NDFUNITS', OUT_UNITS, STATUS)
 
+*     Extract the instrument name from the first fits array
+                  CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
+     :                 FITS(1,1), 'INSTRUME', INSTRUMENT, STATUS)
+
+*     Extract the telescope name from the first fits array
+                  CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
+     :                 FITS(1,1), 'TELESCOP', TELESCOPE, STATUS)
+
 *     Retrieve the waveplate and rotation angles
 *     Can always do this since they will be bad if there was no
 *     polarimetry.
@@ -2183,7 +2196,7 @@ c
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
      :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
-     :                 WPLATE, ANGROT,
+     :                 WPLATE, ANGROT, TELESCOPE, INSTRUMENT,
      :                 STATUS )
                   
 
