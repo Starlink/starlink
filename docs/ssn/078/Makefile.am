@@ -42,10 +42,13 @@ ssn78.texml_tar: ssn78.xml $(EPSFILES) $(PDFFILES)
 		ssn78.xml
 
 ssn78.ps: ssn78.texml
-	cd ssn78.texml; latex ssn78; latex ssn78; dvips -o ssn78.ps ssn78
+	cd ssn78.texml; \
+	  latex ssn78; makeindex ssn78; latex ssn78; \
+	  dvips -o ssn78.ps ssn78
 	cp ssn78.texml/ssn78.ps .
 ssn78.pdf: ssn78.texml
-	cd ssn78.texml; pdflatex ssn78; pdflatex ssn78
+	cd ssn78.texml; \
+	  pdflatex ssn78; makeindex ssn78; pdflatex ssn78
 	cp ssn78.texml/ssn78.pdf .
 ssn78.texml: ssn78.texml_tar
 	tar xf ssn78.texml_tar
