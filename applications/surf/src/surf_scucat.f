@@ -60,9 +60,13 @@
 *  History:
 *     $Id$
 *     $Log$
-*     Revision 1.9  1996/11/02 01:42:34  timj
-*     Fix bug in Author/History header
+*     Revision 1.10  1996/12/06 18:31:59  timj
+*     Now recognises multiple bolometers in file and writes out all bolometer
+*     data to concatenated data.
 *
+c Revision 1.9  1996/11/02  01:42:34  timj
+c Fix bug in Author/History header
+c
 c Revision 1.8  1996/11/02  01:24:00  timj
 c Change Name to SCUCAT (from REDS_SCUCAT)
 c
@@ -112,26 +116,26 @@ c
       INTEGER STATUS
 
 *     External references:
-      INTEGER CHR_LEN            ! Length of string
-      LOGICAL CHR_SCOMP          ! Sort algorithm
+      INTEGER  CHR_LEN           ! Length of string
+      EXTERNAL CHR_LEN
+      BYTE     SCULIB_BITOR      ! Bitwise AND for Quality
+      EXTERNAL SCULIB_BITOR
 
 *     Local constants:
       INTEGER MAXCMP             ! Max number of bolometers in an HDS
       PARAMETER (MAXCMP = 20)
-      INTEGER MAX_FILE           ! Max number of files
-      PARAMETER (MAX_FILE = 20)
 
 *     Local variables:
       BYTE          BADBIT       ! Bad bit mask
       CHARACTER*15  BOL(MAXCMP)  ! Name of bolometers present in NDF
-      CHARACTER*15  BOLOMETER    ! Selected bolometer
       CHARACTER*(MAXCMP*15) BOL_LIST ! List of all bolometers in NDF
       INTEGER       EL           ! Number of input data points
       INTEGER       FILE         ! File count
       CHARACTER *132 FILENAME    ! Filename
+      LOGICAL       FILEMINONE   ! Have I decremented the file counter yet?
       INTEGER       I            ! Loop counter
       INTEGER       IERR         ! Location of error during VEC_ copy
-      INTEGER       IN_NDF       ! Input NDF identifier
+      INTEGER       IN_NDF(MAXCMP)! Input NDF identifiers
       INTEGER       IN_DATA_PTR  ! Pointer to D array
       INTEGER       IN_VAR_PTR   ! Pointer to V array
       INTEGER       IN_QUAL_PTR  ! Pointer to Q array
@@ -141,24 +145,37 @@ c
       INTEGER       LBND(1)      ! Lower bound of output array
       CHARACTER*(DAT__SZLOC) LOC ! Locator to root HDS file
       LOGICAL       LOOPING      ! Controls read loop
+      INTEGER       LOWER        ! Lower bound of section
       CHARACTER*10  MODE         ! Access mode for output
+      INTEGER       N            ! Bolometer counter
       CHARACTER*15  NAME(MAXCMP) ! Names of NDFs
       INTEGER       NCOMP        ! Number of components in HDS
       INTEGER       NDATA        ! Number of data points in input
       INTEGER       NERR         ! Number of errors during VEC_ copy
+      BYTE          NEWQUAL      ! Result of bitwise AND
       CHARACTER*(DAT__SZLOC) NLOC! Loc to  Bol NDF inside HDS file
-      INTEGER       N_PHOT       ! Number of bolometers in an HDS
+      INTEGER       NUM_NDF      ! Counter of each sub NDF
+      INTEGER       N_PHOT      ! Number of bolometers in an HDS
       INTEGER       OUT_NDF      ! Output NDF identifier
       INTEGER       OUT_APTR     ! Pointer to Axis array
       INTEGER       OUT_DATA_PTR ! Pointer to D array
       INTEGER       OUT_VAR_PTR  ! Pointer to V array
       INTEGER       OUT_QUAL_PTR ! Pointer to Q array
+      INTEGER       QP           ! Counter for quality
       CHARACTER*(DAT__SZLOC) PLOC(MAXCMP) ! Locs to PEAK NDFs
       LOGICAL       READING      ! Logical to control file reading
+      INTEGER       SEC_NDF      ! NDF identifier to NDF section
       CHARACTER*40  TITLE        ! Title of observation
       INTEGER       UBND(1)      ! Upper bound of output array
       LOGICAL       USE_OUT      ! Have I opened an output file
-      CHARACTER*(DAT__SZLOC) USE_LOC ! Locator to selected file
+      REAL          WT           ! Weight assigned to each bolometer
+      REAL          WTSUM        ! Weight assigned to each bolometer
+      INTEGER       WT_DATA_PTR(MAXCMP) ! Pointer to D array      
+      INTEGER       WT_DATA_END(MAXCMP) ! Pointer to D array
+      INTEGER       WT_VAR_PTR(MAXCMP)  ! Pointer to V array
+      INTEGER       WT_VAR_END(MAXCMP)  ! Pointer to end V array
+      INTEGER       WT_QUAL_PTR(MAXCMP) ! Pointer to Q array
+      INTEGER       WT_QUAL_END(MAXCMP) ! Pointer to end Q array
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -235,36 +252,20 @@ c
 *     Have I found a photometry observation
             IF (N_PHOT .GT. 1) THEN
                
-               CALL MSG_OUT(' ','Found data for the following '//
-     :              'bolometers:', STATUS)
-
 *     Sort the bolometer list
-               CALL CHR_SORT(CHR_SCOMP, N_PHOT, BOL, ITEMP)
 
                BOL_LIST = ''
                IPOSN = 0
                CALL CHR_APPND(BOL(1),BOL_LIST, IPOSN)
                DO I =  2, N_PHOT
-                  CALL CHR_APPND(',',BOL_LIST,IPOSN)
+                  CALL CHR_APPND(', ',BOL_LIST,IPOSN)
                   CALL CHR_APPND(BOL(I),BOL_LIST, IPOSN)
-
-                  CALL MSG_SETC('BOL',BOL(I))
-                  CALL MSG_OUT(' ','    ^BOL', STATUS)
                END DO
 
-               CALL PAR_CHOIC('BOLOMETER', BOL(1), BOL_LIST, .TRUE.,
-     :              BOLOMETER, STATUS)
+               CALL MSG_SETC('BOL',BOL_LIST)
+               CALL MSG_OUT(' ','Found data for the following '//
+     :              'bolometers: ^BOL', STATUS)
 
-*     Which one has been selected
-               DO I = 1, N_PHOT
-                  IF (BOLOMETER .EQ. BOL(I)) THEN
-                     ITEMP = I
-                     I = N_PHOT
-                  END IF
-               END DO
-
-               CALL DAT_CLONE(PLOC(ITEMP), USE_LOC, STATUS)
-               CALL DAT_PRMRY(.TRUE., USE_LOC, .TRUE., STATUS)
 
 *     Only one, so I know what to do
             ELSE IF (N_PHOT.EQ.1) THEN
@@ -272,36 +273,34 @@ c
                CALL MSG_OUT(' ','Contains data for bolometer ^BOL', 
      :              STATUS)
 
-               CALL DAT_CLONE(PLOC(1), USE_LOC, STATUS)
-               CALL DAT_PRMRY(.TRUE., USE_LOC, .TRUE., STATUS)
             ELSE
 
                READING = .FALSE.
-               USE_LOC = DAT__NOLOC
-            END IF
-
-
-*     Annul all the temporary locators
-            IF (N_PHOT .GT. 0) THEN
-               DO I = 1, N_PHOT
-                  CALL DAT_ANNUL(PLOC(I), STATUS)
-               END DO
             END IF
 
 *     Now open the file
 
-            IF (STATUS .EQ. SAI__OK) THEN 
-               IF (USE_LOC .NE. DAT__NOLOC) THEN
-                  CALL NDF_FIND(USE_LOC, ' ', IN_NDF, STATUS)
-                  CALL DAT_ANNUL(USE_LOC, STATUS)
-               ELSE
-                  IN_NDF = NDF__NOID
-               END IF
-
-               IF (IN_NDF .EQ. NDF__NOID) THEN
-                  FILE = FILE - 1
-                  READING = .FALSE.
-               END IF
+            FILEMINONE = .FALSE.
+            IF (N_PHOT .GT. 0) THEN
+               DO N = 1, N_PHOT
+                  IF (STATUS .EQ. SAI__OK) THEN 
+                     IF (PLOC(N) .NE. DAT__NOLOC) THEN
+                        CALL NDF_FIND(PLOC(N), ' ', IN_NDF(N), STATUS)
+                        CALL DAT_ANNUL(PLOC(N), STATUS)
+                     ELSE
+                        IN_NDF(N) = NDF__NOID
+                     END IF
+                  
+                     IF (IN_NDF(N) .EQ. NDF__NOID) THEN
+                        READING = .FALSE.
+*                       Need to make sure dont decrement file more than once
+                        IF (.NOT.FILEMINONE) THEN
+                           FILE = FILE - 1
+                           FILEMINONE = .TRUE.
+                        END IF
+                     END IF
+                  END IF
+               END DO
             END IF
 
 *     END of If (file = 'null')
@@ -309,80 +308,95 @@ c
          
          IF (READING.AND. STATUS .EQ. SAI__OK) THEN
 
-*     Map the input file
+*     Loop through all bolometers
+            DO NUM_NDF = 1, N_PHOT
 
-            CALL NDF_MAP(IN_NDF, 'QUALITY', '_UBYTE', 'READ',
-     :           IN_QUAL_PTR, EL, STATUS)
-            CALL NDF_MAP(IN_NDF, 'Data,','_REAL', 'READ',
-     :           IN_DATA_PTR, EL, STATUS)
-            CALL NDF_MAP(IN_NDF, 'Variance','_REAL', 'READ',
-     :           IN_VAR_PTR, EL, STATUS)
+*     Map the input file
+               CALL NDF_SQMF(.FALSE., IN_NDF(NUM_NDF), STATUS)
+               CALL NDF_MAP(IN_NDF(NUM_NDF), 'QUALITY', '_UBYTE',
+     :              'READ', IN_QUAL_PTR, EL, STATUS)
+               CALL NDF_MAP(IN_NDF(NUM_NDF), 'Data,','_REAL', 'READ',
+     :              IN_DATA_PTR, EL, STATUS)
+               CALL NDF_MAP(IN_NDF(NUM_NDF), 'Variance','_REAL', 'READ',
+     :              IN_VAR_PTR, EL, STATUS)
 
 *     Give some information about this data
 
+               IF (NUM_NDF .EQ. 1) THEN
+
 *     Name of source
-            CALL NDF_CGET(IN_NDF, 'Title', TITLE, STATUS)
-
+                  CALL NDF_CGET(IN_NDF(NUM_NDF), 'Title', TITLE, STATUS)
+                  
 *     Number of integrations
-            CALL MSG_SETI('NINT', EL)
-            CALL MSG_SETC('TITLE', TITLE)
-            
-            CALL MSG_OUT(' ','This is a PHOTOM observation of '//
-     :           '^TITLE. There are ^NINT integrations', STATUS)
+                  CALL MSG_SETI('NINT', EL)
+                  CALL MSG_SETC('TITLE', TITLE)
+                  
+                  CALL MSG_OUT(' ','This is a PHOTOM observation of '//
+     :                 '^TITLE. There are ^NINT integrations', STATUS)
 
+               END IF
+
+*     Find the weight of this bolometer
+
+               CALL NDF_XGT0R(IN_NDF(NUM_NDF), 'REDS', 'BEAM_WT', WT,
+     :              STATUS)
+
+               IF (STATUS .NE. SAI__OK) THEN ! CANT find WT
+                  WT = 1.0
+                  CALL ERR_ANNUL(STATUS)
+               END IF
 
 *     Open the output file
 
-            IF (FILE .EQ. 1) THEN
-               LBND(1) = 1
-               UBND(1) = 2
-               CALL NDF_CREAT('OUT', '_REAL', 1, LBND, UBND, OUT_NDF, 
-     :              STATUS)
-               IF (OUT_NDF .NE. NDF__NOID) USE_OUT = .TRUE.
-               UBND(1) = 0
-            END IF
+               IF (FILE .EQ. 1 .AND. NUM_NDF .EQ. 1) THEN
+                  LBND(1) = 1
+                  UBND(1) = 2
+                  CALL NDF_CREAT('OUT', '_REAL', 1, LBND, UBND, OUT_NDF, 
+     :                 STATUS)
+                  IF (OUT_NDF .NE. NDF__NOID) USE_OUT = .TRUE.
+                  UBND(1) = 0
+               END IF
+
 
 *     Change the bounds
+               NDATA = UBND(1) - LBND(1) + 1
+               UBND(1) = UBND(1) + EL
 
-            NDATA = UBND(1) - LBND(1) + 1
-            UBND(1) = UBND(1) + EL
+               CALL NDF_SBND(1, LBND, UBND, OUT_NDF, STATUS)
 
-            CALL NDF_SBND(1, LBND, UBND, OUT_NDF, STATUS)
+*     Get the new NDF section
+               LOWER = UBND(1) - EL + 1
 
+               CALL NDF_SECT(OUT_NDF, 1, LOWER, UBND, SEC_NDF, STATUS)
 
 *     Map the output data arrays
-
-            IF (FILE .EQ. 1) THEN
                MODE = 'WRITE'
-            ELSE
-               MODE = 'UPDATE'
-            END IF
+               CALL NDF_MAP(SEC_NDF, 'QUALITY', '_UBYTE', MODE,
+     :              OUT_QUAL_PTR, ITEMP, STATUS)
+               CALL NDF_MAP(SEC_NDF, 'Data', '_REAL', MODE,
+     :              OUT_DATA_PTR, ITEMP, STATUS)
+               CALL NDF_MAP(SEC_NDF, 'Variance', '_REAL', MODE,
+     :              OUT_VAR_PTR, ITEMP, STATUS)
 
-            CALL NDF_MAP(OUT_NDF, 'QUALITY', '_UBYTE', MODE,
-     :           OUT_QUAL_PTR, ITEMP, STATUS)
-            CALL NDF_MAP(OUT_NDF, 'Data', '_REAL', MODE,
-     :           OUT_DATA_PTR, ITEMP, STATUS)
-            CALL NDF_MAP(OUT_NDF, 'Variance', '_REAL', MODE,
-     :           OUT_VAR_PTR, ITEMP, STATUS)
+*     Copy the input data into the output data
 
-*     Copy all the data
-            CALL VEC_RTOR(.FALSE., EL, %VAL(IN_DATA_PTR),
-     :           %VAL(OUT_DATA_PTR + NDATA * VAL__NBR), IERR, NERR, 
-     :           STATUS)
-            CALL VEC_RTOR(.FALSE., EL, %VAL(IN_VAR_PTR),
-     :           %VAL(OUT_VAR_PTR + NDATA * VAL__NBR), IERR, NERR, 
-     :           STATUS)
-            CALL VEC_UBTOUB(.FALSE., EL, %VAL(IN_QUAL_PTR),
-     :           %VAL(OUT_QUAL_PTR + NDATA * VAL__NBUB), IERR, NERR, 
-     :           STATUS)
-
-*     Unmap the output array
-            CALL NDF_UNMAP(OUT_NDF, '*', STATUS)
+               CALL VEC_RTOR(.FALSE., EL, %VAL(IN_DATA_PTR),
+     :              %VAL(OUT_DATA_PTR), IERR, NERR, STATUS)
+               CALL VEC_RTOR(.FALSE., EL, %VAL(IN_VAR_PTR),
+     :              %VAL(OUT_VAR_PTR), IERR, NERR, STATUS)
+               CALL VEC_UBTOUB(.FALSE., EL, %VAL(IN_QUAL_PTR),
+     :              %VAL(OUT_QUAL_PTR), IERR, NERR, STATUS)
 
 *     Tidy up
 
-            CALL NDF_UNMAP(IN_NDF, '*', STATUS)
-            CALL NDF_ANNUL(IN_NDF, STATUS)
+               CALL NDF_UNMAP(IN_NDF(NUM_NDF), '*', STATUS)
+               CALL NDF_ANNUL(IN_NDF(NUM_NDF), STATUS)
+
+*     Unmap the output array
+               CALL NDF_UNMAP(SEC_NDF, '*', STATUS)
+               CALL NDF_ANNUL(SEC_NDF, STATUS)
+
+            END DO
 
          END IF
          CALL PAR_CANCL('IN', STATUS)
@@ -397,7 +411,6 @@ c
       END DO
 
 *     Setup the axis
-
       IF (USE_OUT) THEN
          CALL NDF_AMAP(OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE', OUT_APTR,
      :        ITEMP, STATUS)
@@ -410,6 +423,8 @@ c
          
          BADBIT = 1
          CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
+*     Just in case
+         CALL NDF_SBAD(.TRUE., OUT_NDF,'Data,Variance' ,STATUS)
       ELSE 
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
