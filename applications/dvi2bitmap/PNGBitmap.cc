@@ -28,6 +28,19 @@ using std::fclose;
 //using std::fflush;
 #endif
 
+// The PNG calls below have been written to be general, rather than
+// depending on a particular colour model.  That is, it should be
+// possible to define colour_type in write() to be PNG_COLOR_TYPE_GRAY
+// instead of the current PNG_COLOR_TYPE_PALETTE, and for the rest of
+// the routine to simply work.  This requires the function
+// png_set_write_user_transform_fn to be in libpng, which is true only
+// of versions of the library after 0.96.  Having said that, it hasn't
+// been tested recently.  The following define is really intended only to
+// document the points which would need attention if the colour model
+// were to be generalised in future: if you were to define it to be 1
+// the write() routine would probably work, but I'm not guaranteeing anything.
+#define GREYSCALE_BITMAP 0
+
 png_structp PNGBitmap::png_ptr_ = 0;
 png_infop PNGBitmap::info_ptr_ = 0;
 // Following two must have indexes 1..8 (for up to 8 bpp bit depth),
@@ -36,10 +49,11 @@ png_infop PNGBitmap::info_ptr_ = 0;
 png_color *PNGBitmap::palettes_[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 png_byte *PNGBitmap::trans_[]     = { 0, 0, 0, 0, 0, 0, 0, 0, 0  };
 
+#if GREYSCALE_BITMAP
 static void png_invert_greyscale (png_structp png_ptr,
 				  png_row_infop row_info,
 				  png_bytep data);
-
+#endif
 
 PNGBitmap::PNGBitmap (const int w, const int h, const int bpp)
     : BitmapImage (w, h, bpp)
@@ -80,9 +94,10 @@ void PNGBitmap::write (const string filename)
     // limited to 8 bits of colour table.
 
     // This routine can cope with only these two types
-    int colour_type = PNG_COLOR_TYPE_PALETTE;
-#if 0
+#if GREYSCALE_BITMAP
     int colour_type = PNG_COLOR_TYPE_GRAY;
+#else
+    int colour_type = PNG_COLOR_TYPE_PALETTE;
 #endif
 
     if (bitmapRows_ != h_)
@@ -121,12 +136,14 @@ void PNGBitmap::write (const string filename)
 	    throw BitmapError ("Can't create PNG info_ptr");
 	}
 
+#if GREYSCALE_BITMAP
 	// Call png_set_write_user_transform_fn to install a function
 	// to invert the greyscale on output.  This function is not
 	// present in libpng 0.96 -- should I work around this or just
 	// require newer versions?
 	if (colour_type == PNG_COLOR_TYPE_GRAY)
 	    png_set_write_user_transform_fn (png_ptr_, &png_invert_greyscale);
+#endif
 
 	/* not needed since I use custom error functions above
 	if (setjmp (png_ptr_->jmpbuf))
@@ -252,8 +269,12 @@ void PNGBitmap::write (const string filename)
 			  trans_[bpp_], (1<<bpp_),
 			  0);
 
-	// Fill in the bKGD chunk, just for completeness
+	// Fill in the bKGD chunk, just for completeness.
+	// This definition of the background colour is suitable for
+	// different colour models: colour index 0 is the background
+	// colour by construction, above.
 	png_color_16 bKGD_colour;
+	bKGD_colour.index = 0;
 	bKGD_colour.red   = bg_.red;
 	bKGD_colour.green = bg_.green;
 	bKGD_colour.blue  = bg_.blue;
@@ -401,12 +422,13 @@ void PNGBitmap::png_error_fn (png_structp png_ptr,
 }
 
 void PNGBitmap::png_warning_fn (png_structp png_ptr,
-				       png_const_charp warning_msg)
+				png_const_charp warning_msg)
 {
     if (verbosity_ > quiet)
 	cerr << "PNG warning: " << warning_msg;
 }
 
+#if GREYSCAPE_BITMAP
 // A row-transform function which inverts the greyscale.  Bitmaps are
 // sent to this class with zero being white and all-bits-on being
 // black, which is opposite to what PNG wants.  png_set_invert_mono
@@ -453,3 +475,4 @@ static void png_invert_greyscale (png_structp png_ptr,
     for (unsigned int n=0; n<row_info->width; n++, dp++)
 	*dp = maxval-*dp;
 }
+#endif
