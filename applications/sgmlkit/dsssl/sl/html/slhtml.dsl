@@ -1,11 +1,24 @@
-<!-- -*- mode: sgml; sgml-parent-document: ("sl\.dsl" "CODEGROUP" '("PROGRAMCODE" "CODEGROUP")); -*- -->
+<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
 
-<!--
-;;This section supports the generation of HTML.
-;;
-;; It heavily uses file dbhtml.dsl from Norm Walsh's 
-;; DocBook Stylesheet distribution.
--->
+<docblock>
+<title>HTML-specific support
+<description>
+This section supports the generation of HTML.
+
+<authorlist>
+<author id=ng affiliation='Glasgow'>Norman Gray
+<otherauthors>
+<author id=nw>Norman Walsh
+<authornote>
+The structure of the support in this file, and some of the code, draws
+on file <code/dbhtml.dsl/ from Norm Walsh's 
+DocBook Stylesheet distribution.
+
+<copyright>Copyright 1999, Particle Physics and Astronomy Research
+Council.
+
+<codegroup id=code.html>
+<title>HTML-specific support
 
 <func>
 <codeprologue>
@@ -13,7 +26,7 @@
 <name>html-document
 <description>
 <p>Every element which is potentially a chunk should be passed to
-<code/(html-document)/ as its body-sosofo argument.  If it is in fact to
+<funcname/html-document/ as its body-sosofo argument.  If it is in fact to
 be chunked, then this creates a new entity with that body as its
 contents, if not, it evaluates simply to body-sosofo.
 </description>

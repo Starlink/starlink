@@ -8,7 +8,7 @@
 <title>Common functions for the Starlink stylesheets
 <description>
 <p>These are functions and handlers common to both the HTML and print
-versions of the Starlink stylesheets.
+versions of the Starlink stylesheets.  Library functions are in another file.
 
 <p>Note that Jade only supports the DSSSL Online subset of DSSSL, so some
 more advanced features will be missing.
@@ -18,7 +18,7 @@ and
 <url>http://www.jclark.com/jade/#limitations</url> for further details.
 
 <authorlist>
-<author id=ng attribution='Glasgow'>Norman Gray
+<author id=ng affiliation='Glasgow'>Norman Gray
 
 <func>
 <codeprologue>
@@ -321,7 +321,7 @@ We don't check whether the dates are sensible (ie, whether the last
 element really does have the latest date).
 <returnvalue type=list>(version date version-number distribution-id)
 <argumentlist>
-<parameter>
+<parameter optional default="(current-node)">
 <name>nd
 <type>node-list
 <description>
@@ -330,34 +330,40 @@ element really does have the latest date).
 </argumentlist>
 </codeprologue>
 (define (document-release-info #!optional (nd (current-node)))
-  (let* ((histkids (node-list-reverse (children (getdocinfo 'history nd))))
-	 ; vers-and-change returns a list:
-	 ; (last-version last-distribution last-distribution-or-change)
-	 ; Either of the last two may be false
-	 (vers-and-change (let loop ((nl histkids)
-				     (distrib #f)
-				     (lastchange #f))
-			    (if (string=? (gi (node-list-first nl))
-					  (normalize "version")) ; VERSION
-				(list (node-list-first nl)
-				      distrib
-				      lastchange)
-				(if (string=? (gi (node-list-first nl))
-					      (normalize "distribution"))
-				    (loop (node-list-rest nl) ; DISTRIBUTION
-					  (or distrib
-					      (node-list-first nl))
-					  (or lastchange
-					      (node-list-first nl)))
-				    (loop (node-list-rest nl) ; CHANGE
-					  distrib
-					  (or lastchange
-					      (node-list-first nl)))))))
-	 (dist-or-change-date (and (caddr vers-and-change)
+  (let* ((hist (getdocinfo 'history nd))
+	 (histkids (and hist
+			(node-list-reverse (children hist))))
+	 ;; vers-and-change returns a list:
+	 ;; (last-version last-distribution last-distribution-or-change)
+	 ;; Either of the last two may be false
+	 (vers-and-change
+	  (and hist
+	       (let loop ((nl histkids)
+			  (distrib #f)
+			  (lastchange #f))
+		 (if (string=? (gi (node-list-first nl))
+			       (normalize "version")) ; VERSION
+		     (list (node-list-first nl)
+			   distrib
+			   lastchange)
+		     (if (string=? (gi (node-list-first nl))
+				   (normalize "distribution"))
+			 (loop (node-list-rest nl) ; DISTRIBUTION
+			       (or distrib
+				   (node-list-first nl))
+			       (or lastchange
+				   (node-list-first nl)))
+			 (loop (node-list-rest nl) ; CHANGE
+			       distrib
+			       (or lastchange
+				   (node-list-first nl))))))))
+	 (dist-or-change-date (and hist
+				   (caddr vers-and-change)
 				   (attribute-string (normalize "date")
 						     (caddr vers-and-change))))
 	 (docdate (getdocinfo 'docdate nd))) ;false if no docdate element
-    (list (or (and (car vers-and-change)
+    (list (or (and hist
+		   (car vers-and-change)
 		   (attribute-string (normalize "date")
 				     (car vers-and-change)))
 	      dist-or-change-date
@@ -366,10 +372,12 @@ element really does have the latest date).
 	  (or dist-or-change-date
 	      (and docdate
 		   (trim-data docdate)))
-	  (and (car vers-and-change)
+	  (and hist
+	       (car vers-and-change)
 	       (attribute-string (normalize "number")
 				 (car vers-and-change)))
-	  (and (cadr vers-and-change)
+	  (and hist
+	       (cadr vers-and-change)
 	       (attribute-string (normalize "string")
 				 (cadr vers-and-change))))))
 </func>

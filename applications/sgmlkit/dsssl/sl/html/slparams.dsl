@@ -32,7 +32,9 @@ stylesheet will be written to the file named by '%html-manifest%'.
 <returnvalue type=string>
 <argumentlist none>
 <codebody>
-(define %html-manifest% "HTML.manifest")
+(define %html-manifest%
+	#f; "HTML.manifest"
+	)
 </codebody>
 </func>
 

@@ -12,7 +12,7 @@ This file contains functions defined in 10179, but not in Jade, and not
 in <code>lib/dblib.dsl</code> in Norm Walsh's DocBook stylesheet.
 
 <authorlist>
-<author id=ng attribution='Glasgow'>Norman Gray
+<author id=ng affiliation='Glasgow'>Norman Gray
 <otherauthors>
 <author id=iso10179>Text of ISO 10179:1996
 <authornote>The DSSSL standard defines many functions without mandating
@@ -68,26 +68,31 @@ parent of the node.
 <name>document-element
 <description><p>
 Returns the document element of the document containing the given
-node (originally from James Clark).
+node.
 
-<p>The original definition of this was:
-<code>(define (document-element #!optional (node (current-node)))
-  (node-property 'document-element node))</code>
-which I found in Eliot Kimber's dovalueref package.  However, I
-think this may be wrong, as only the SgmlDocument node class
-exibits a DocumentElement property, so this would only work when
-the node given as argument is the SgmlDocument node (ie, the
-grove-root).
+<p>Only the <code/SgmlDocument/ node class
+exibits a <code/DocumentElement/ property, so to find the document element
+we first have to find the grove root, which we do by examining the 
+<code/grove-root/ property of the current node.  The only node which doesn't
+have a <code/grove-root/ property is the root node, but in that case,
+<funcname/current-node/ returns the grove root directly (this isn't clear
+from the standard -- see the discussion on `Finding the root element' in
+the dssslist archive at
+<url>http://www.mulberrytech.com/dsssl/dssslist/</url>).
 <returnvalue type="singleton-node-list">The document element, or
 <code/#f/ if not found
-<parameter optional>
+<parameter optional default='(current-node)'>
   <name>node
   <type>node-list
-  <description>node we want the document element of
+  <description>this node indicates the grove we want the document element
+  of.
 <codebody>
 (define (document-element #!optional (node (current-node)))
-  (node-property 'document-element
-		 (node-property 'grove-root node)))
+  (let ((gr (node-property 'grove-root node)))
+    (if gr				; gr is the grove root
+	(node-property 'document-element gr)
+	;; else we're in the root rule now
+	(node-property 'document-element node))))
 </codebody>
 </func>
 
@@ -98,7 +103,7 @@ grove-root).
 <description>
 <p>Return the document element of the document referred to by the
 entity string passed as argument.  
-Uses <code/(sgml-parse)/: see 10179, 10.1.7.
+Uses <funcname/sgml-parse/: see 10179, 10.1.7.
 <returnvalue type="node-list">Document element, or <code/#f/ on error.
 <argumentlist>
 <parameter>
