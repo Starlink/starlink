@@ -14,9 +14,7 @@ require AutoLoader;
  
 @ISA = qw(Exporter DynaLoader); 
 
-# Version derived from CVS repository
-# This means I have to check it in before making a release
-# '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
+# Version derived from CVS repository:  '$Revision$ '
 
 $VERSION = '1.40';
 
