@@ -1087,30 +1087,41 @@
 *    Local constants :
 *    Local variables :
       INTEGER I,J
+      INTEGER I1,I2,J1,J2
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
 
+        I1=I_NX
+        I2=1
+        J1=I_NY
+        J2=1
         DO J=1,I_NY
           DO I=1,I_NX
 
-            IF (INC(I,J).GT.1) THEN
+            IF (INC(I,J).GT.0) THEN
               Q(I,J)=BIT_ORUB(Q(I,J),QUAL__IGNORE)
               I_BAD_W=.TRUE.
               IF (DAT) THEN
                 D(I,J)=DVAL
               ENDIF
-*  redisplay pixel
-              I_PMIN=I_DMIN
-              I_PMAX=I_DMAX
-              CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,I,I,J,J,.TRUE.,
-     :                      %VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-     :                          D,I_PMIN,I_PMAX,Q,I_MASK_W,STATUS)
+              I1=MIN(I1,I)
+              I2=MAX(I2,I)
+              J1=MIN(J1,J)
+              J2=MAX(J2,J)
             ENDIF
 
           ENDDO
         ENDDO
 
+*  redisplay
+        IF (I1.LE.I2) THEN
+          I_PMIN=I_DMIN
+          I_PMAX=I_DMAX
+          CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,I1,I2,J1,J2,.TRUE.,
+     :                        %VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
+     :                          D,I_PMIN,I_PMAX,Q,I_MASK_W,STATUS)
+        ENDIF
 
       ENDIF
 
