@@ -22,7 +22,7 @@
 *  Description:
 *     This application plots vectors defined by the values contained
 *     within four columns in a catalogue. These columns give the magnitude
-*     and orientation of each vector, and the (X,Y) position of each vector.
+*     and orientation of each vector, and the position of each vector.
 *
 *     The plot is produced within the current graphics database picture. 
 *     If there is an existing DATA picture within the current picture, then
@@ -31,7 +31,7 @@
 *     then a new DATA picture is created.
 
 *  Usage:
-*     POLPLOT cat colx coly colmag colang [vscale] [arrow] [just] [device]
+*     polplot cat colx coly colmag colang [vscale] [arrow] [just] [device]
 
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
@@ -81,32 +81,25 @@
 *        vector. A list of available column names is displayed if a 
 *        non-existent column name is given. [P]
 *     COLX = LITERAL (Read)
-*        The name of the catalogue column holding the X coordinate at
-*        each vector. A list of available column names is displayed if 
-*        a non-existent column name is given. How the coordinates
-*        specified by COLX and COLY are used depends on whether or not
-*        the vector map is being drawn over a previously displayed 
-*        DATA picture (see parameter CLEAR). If not, then the coordinates 
-*        given by COLX and COLY will be mapped linearly onto a new DATA 
-*        picture.  If the vector map is being drawn over a previous DATA 
-*        picture, then an attempt will be made to map the coordinates given 
-*        by COLX and COLY so that the vectors are drawn aligned with the 
-*        existing picture (in the coordinate Frame given by parameter COSYS).
-*        This will only be possible if the catalogue contains information
-*        about coordinate Frames in the form of an AST FrameSet (see 
-*        SUN/210). [X]
+*        The name of the catalogue column which gives the position of each
+*        vector along the first axis. A list of available column names is 
+*        displayed if a non-existent column name is given. See the "Notes" 
+*        section below for further details of how these positions are 
+*        interpreted. [X]
 *     COLY = LITERAL (Read)
-*        The name of the catalogue column holding the Y coordinate at
-*        each vector (see COLX for additional information). [Y]
+*        The name of the catalogue column which gives the position of each
+*        vector along the second axis. A list of available column names is 
+*        displayed if a non-existent column name is given. See the "Notes" 
+*        section below for further details of how these positions are 
+*        interpreted. [Y]
 *     COSYS = GROUP (Read)
 *        This gives the co-ordinate Frame to be displayed along the annotated 
 *        axes (see parameter AXES). The supplied value will usually be a 
-*        Domain name such as
-*        SKY, AXIS, PIXEL, etc, but more specific Frame descriptions can
-*        also be given by supplying a group of "name=value" strings where 
-*        "name" is the name of an AST Frame attribute (see SUN/210), and 
-*        "value" is the value to assign to it. In addition, IRAS90 Sky 
-*        Coordinate System (SCS) values (such as "EQUATORIAL(J2000)", 
+*        Domain name such as SKY, AXIS, PIXEL, etc, but more specific Frame 
+*        descriptions can also be given by supplying a group of "name=value" 
+*        strings where "name" is the name of an AST Frame attribute (see 
+*        SUN/210), and "value" is the value to assign to it. In addition, 
+*        IRAS90 Sky Coordinate System (SCS) values (such as "EQUATORIAL(J2000)", 
 *        "GALACTIC", etc - see SUN/163) can be given. Domains "WORLD" and 
 *        "DATA" are taken as synonyms for "PIXEL" and "AXIS" (unless the 
 *        catalogue contains explicit definitions for the "WORLD" and "DATA" 
@@ -172,8 +165,8 @@
 *     LBND(2) = _REAL (Read)
 *        The coordinates to put at the lower left corner of the plotting 
 *        area, in the coordinates system specified by parameters COLX and
-*        COLY. The suggested value just encloses all the data in the supplied
-*        catalogue. []
+*        COLY. If a null value is supplied then an area is used which just 
+*        encloses all the data in the supplied catalogue. [!]
 *     PXSIZE = _REAL (Read)
 *        The length (x axis) of the plot in metres. [Maximum that can
 *        fit in the current picture while preserving square pixels]
@@ -199,8 +192,8 @@
 *     UBND(2) = _REAL (Read)
 *        The coordinates to put at the top right corner of the plotting 
 *        area, in the coordinates system specified by parameters COLX and
-*        COLY. The suggested value just encloses all the data in the supplied
-*        catalogue. []
+*        COLY. If a null value is supplied then an area is used which just 
+*        encloses all the data in the supplied catalogue. [!]
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
@@ -247,6 +240,32 @@
 *        Produces a vector map in which each vector is represented by an 
 *        arrow, starting at the position of the corresponding pixel.  No key
 *        to the vector scale and justification is produced.
+*     polplot ABEB.FIT clear=no colx=ra coly=dec colmag=l colang=b
+*        Reads the non-POLPACK FITS table in file ABEB.FIT, and displays a 
+*        vector for every row defined by the catalogue columns "l" and "b".
+*        The position of each vector is given by columns "ra" and "dec".
+*        If a previous DATA picture has been displayed, and has a calibration 
+*        in terms of any of the common sky coordinate systems, then the
+*        vectors are aligned with the existing DATA picture.
+
+*  Notes:
+*     -  The columns specified by parameters COLX and COLY should hold
+*     coordinates in the "Base Frame" of the WCS information stored as 
+*     an AST FrameSet (see SUN/210) in the supplied catalogue. If the 
+*     catalogue has been produced by one of the POLPACK application polvec 
+*     or polbin, then the Base Frame will be pixel co-ordinates within the 
+*     aligned intensity images, and these will be stored in columns with 
+*     names "X" and "Y". If the catalogue was not created by POLPACK, it
+*     may have no usable WCS information, in which case the supplied
+*     positions are mapped linearly onto the screen. There is one
+*     exception to this; if the columns have names RA and DEC then they
+*     are assumed to be equatorial sky coordinates with epoch and equinox
+*     specified by the optional catalogue parameters EPOCH and EQUINOX
+*     (defaults are used for these parameters if they are not present in the
+*     catalogue). If the vector map is displayed over an existing DATA
+*     picture (i.e. if CLEAR=NO) then these RA/DEC positions will be aligned
+*     with the existing DATA picture if possible (i.e. if the existing 
+*     picture has sky coordinate information stored with it).
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -260,7 +279,9 @@
 *        Original version, derived from kappa:vecplot.
 *     5-AUG-1998 (DSB):
 *        Correct the DOMAIN passed to KPG1_PLOT so that it refers to the 
-*        Base Frame of the WCS info, instead of the Current Frame.
+*        Base Frame of the WCS info, instead of the Current Frame. Changed 
+*        the interpretation of parameters COLX and COLY accordingly. Defaults 
+*        for LBND and UBND changed.
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -14,10 +14,10 @@
 \newcommand{\stardocsource}    {sun\stardocumber}
 \newcommand{\stardocnumber}    {223.1}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {8 July 1998}
+\newcommand{\stardocdate}      {7 August 1998}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {Users' Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1215,6 +1215,20 @@ monochrome colour table:
 \begin{verbatim}
    % display "cube(,,1)" mode=per percentiles="[5,95]"
    % lutgrey
+\end{verbatim}
+\end{myquote}
+
+\item \label{STEP:PICLIST} Re-select the ``base picture''. This is a
+picture which corresponds to the whole screen. We need to do this because
+output from graphics applications such as POLPLOT is usually restricted
+to the current picture. At the moment, the current picture is the one
+created by PICDEF above which contains the grey-scale image. We want the
+key produced by POLPLOT to appear outside this picture. We therefore need
+to select the base picture so that POLPLOT has room for the key within
+the current picture:
+\begin{myquote}
+\begin{verbatim}
+   % piclist picnum=1
 \end{verbatim}
 \end{myquote}
 
@@ -3381,7 +3395,7 @@ for NDF applications.
    \sstdescription{
       This application plots vectors defined by the values contained
       within four columns in a catalogue. These columns give the magnitude
-      and orientation of each vector, and the (X,Y) position of each vector.
+      and orientation of each vector, and the position of each vector.
 
       The plot is produced within the current graphics database picture.
       If there is an existing DATA picture within the current picture, then
@@ -3390,7 +3404,7 @@ for NDF applications.
       then a new DATA picture is created.
    }
    \sstusage{
-      POLPLOT cat colx coly colmag colang [vscale] [arrow] [just] [device]
+      polplot cat colx coly colmag colang [vscale] [arrow] [just] [device]
    }
    \sstparameters{
       \sstsubsection{
@@ -3420,8 +3434,8 @@ for NDF applications.
          CAT = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A 
-         file type of .FIT is assumed if no file type is supplied.
+         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A file type of .FIT
+         is assumed if no file type is supplied.
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -3447,7 +3461,7 @@ for NDF applications.
       }{
          The name of the catalogue column holding the orientation of each
          vector. The values are considered to be in units of degrees unless
-         the UNITS attribute of the column has the value \texttt{"}Radians\texttt{"} (case
+         the UNITS attribute of the column has the value {\tt "}Radians{\tt "} (case
          insensitive).  The positive X axis defines zero orientation, and
          rotation from the X axis to the Y axis is considered positive.
          A list of available column names is displayed if a non-existent
@@ -3463,44 +3477,36 @@ for NDF applications.
       \sstsubsection{
          COLX = LITERAL (Read)
       }{
-         The name of the catalogue column holding the X coordinate at
-         each vector. A list of available column names is displayed if
-         a non-existent column name is given. How the coordinates
-         specified by COLX and COLY are used depends on whether or not
-         the vector map is being drawn over a previously displayed
-         DATA picture (see parameter CLEAR). If not, then the coordinates
-         given by COLX and COLY will be mapped linearly onto a new DATA
-         picture.  If the vector map is being drawn over a previous DATA
-         picture, then an attempt will be made to map the coordinates given
-         by COLX and COLY so that the vectors are drawn aligned with the
-         existing picture (in the coordinate Frame given by parameter COSYS).
-         This will only be possible if the catalogue contains information
-         about coordinate Frames in the form of an AST FrameSet (see
-         \xref{SUN/210}{sun210}{}). [X]
+         The name of the catalogue column which gives the position of each
+         vector along the first axis. A list of available column names is
+         displayed if a non-existent column name is given. See the {\tt "}Notes{\tt "}
+         section below for further details of how these positions are
+         interpreted. [X]
       }
       \sstsubsection{
          COLY = LITERAL (Read)
       }{
-         The name of the catalogue column holding the Y coordinate at
-         each vector (see COLX for additional information). [Y]
+         The name of the catalogue column which gives the position of each
+         vector along the second axis. A list of available column names is
+         displayed if a non-existent column name is given. See the {\tt "}Notes{\tt "}
+         section below for further details of how these positions are
+         interpreted. [Y]
       }
       \sstsubsection{
          COSYS = GROUP (Read)
       }{
          This gives the co-ordinate Frame to be displayed along the annotated
          axes (see parameter AXES). The supplied value will usually be a
-         Domain name such as
-         SKY, AXIS, PIXEL, \emph{etc}, but more specific Frame descriptions can
-         also be given by supplying a group of \texttt{"}name=value\texttt{"} strings where
-         \texttt{"}name\texttt{"} is the name of an AST Frame attribute (see
-         \xref{SUN/210}{sun210}{}), and
-         \texttt{"}value\texttt{"} is the value to assign to it. In addition, IRAS90 Sky
-         Coordinate System (SCS) values (such as \texttt{"}EQUATORIAL(J2000)\texttt{"},
-         \texttt{"}GALACTIC\texttt{"}, \emph{etc} - see \xref{SUN/163}{sun163}{}) can be given. Domains \texttt{"}WORLD\texttt{"} and
-         \texttt{"}DATA\texttt{"} are taken as synonyms for \texttt{"}PIXEL\texttt{"} and \texttt{"}AXIS\texttt{"} (unless the
-         catalogue contains explicit definitions for the \texttt{"}WORLD\texttt{"} and \texttt{"}DATA\texttt{"}
+         Domain name such as SKY, AXIS, PIXEL, etc, but more specific Frame
+         descriptions can also be given by supplying a group of {\tt "}name=value{\tt "}
+         strings where {\tt "}name{\tt "} is the name of an AST Frame attribute (see
+         \xref{SUN/210}{sun210}{}), and {\tt "}value{\tt "} is the value to assign to it. In addition,
+         IRAS90 Sky Coordinate System (SCS) values (such as {\tt "}EQUATORIAL(J2000){\tt "},
+         {\tt "}GALACTIC{\tt "}, etc - see \xref{SUN/163}{sun163}{}) can be given. Domains {\tt "}WORLD{\tt "} and
+         {\tt "}DATA{\tt "} are taken as synonyms for {\tt "}PIXEL{\tt "} and {\tt "}AXIS{\tt "} (unless the
+         catalogue contains explicit definitions for the {\tt "}WORLD{\tt "} and {\tt "}DATA{\tt "}
          Domains). The available coordinate Frames are defined by an AST
-         FrameSet (see SUN/210) in the supplied catalogue. If the catalogue
+         FrameSet (see \xref{SUN/210}{sun210}{}) in the supplied catalogue. If the catalogue
          does not contain a FrameSet, then a default FrameSet is used
          containing a single 2-dimensional Frame spanned by the axes defined
          by parameters COLX and COLY. If a null (!) value is supplied for
@@ -3543,7 +3549,7 @@ for NDF applications.
             \sstitem
                END -- the vectors are drawn ending at the corresponding
                pixel coordinates.
-            [\texttt{"}Centre\texttt{"}]
+            [{\tt "}Centre{\tt "}]
          }
       }
       \sstsubsection{
@@ -3565,17 +3571,17 @@ for NDF applications.
          KEYSTYLE = GROUP (Read)
       }{
          The plotting style to use for the key (see parameter KEY). This
-         should be a group of comma-separated name=value strings where \texttt{"}name\texttt{"}
-         is the name of a Plot attribute and \texttt{"}value\texttt{"} is the value to assign
-         to the attribute. The text in the key is drawn as Plot \texttt{"}Strings\texttt{"}
-         (using attributes COLOUR(STRINGS), FONT(STRINGS), \emph{etc} - the synonym
+         should be a group of comma-separated name=value strings where {\tt "}name{\tt "}
+         is the name of a Plot attribute and {\tt "}value{\tt "} is the value to assign
+         to the attribute. The text in the key is drawn as Plot {\tt "}Strings{\tt "}
+         (using attributes COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
          TEXT can be used in place of STRINGS). The example vector is drawn
-         as a Plot \texttt{"}Curve\texttt{"} (using attributes COLOUR(CURVES), \emph{etc} - the
+         as a Plot {\tt "}Curve{\tt "} (using attributes COLOUR(CURVES), etc - the
          synonym VECTOR can be used in place of CURVES). The numerical
          scale value is formatted as an axis 1 value (using attributes
-         FORMAT(1), DIGITS(1), \emph{etc} - the synonym SCALE can be used in place
+         FORMAT(1), DIGITS(1), etc - the synonym SCALE can be used in place
          of the value 1). The length of the example vector is formatted as an
-         axis 2 value (using attribute FORMAT(2), \emph{etc} - the synonym VECTOR
+         axis 2 value (using attribute FORMAT(2), etc - the synonym VECTOR
          can be used in place of the value 2). A null (!) value causes the
          key style used on the previous invocation of POLPLOT to be
          re-used. If no previous key style is available, or if the keyword
@@ -3593,8 +3599,8 @@ for NDF applications.
       }{
          The coordinates to put at the lower left corner of the plotting
          area, in the coordinates system specified by parameters COLX and
-         COLY. The suggested value just encloses all the data in the supplied
-         catalogue. []
+         COLY. If a null value is supplied then an area is used which just
+         encloses all the data in the supplied catalogue. [!]
       }
       \sstsubsection{
          PXSIZE = \_REAL (Read)
@@ -3612,7 +3618,7 @@ for NDF applications.
          NEGATE = \_LOGICAL (Read)
       }{
          If a TRUE value is supplied, then the angles giving the
-         orientation of the polarization (\emph{i.e.} the values in the column
+         orientation of the polarization (i.e. the values in the column
          specified by parameter COLANG) are negated before adding on any
          value specified by parameter ANGROT. [FALSE]
       }
@@ -3620,10 +3626,10 @@ for NDF applications.
          STYLE = GROUP (Read)
       }{
          The plotting style to use for the annotated axes. This should be
-         a group of comma-separated name=value strings where \texttt{"}name\texttt{"} is the
-         name of a Plot attribute, and \texttt{"}value\texttt{"} is the value to assign to
-         the attribute. Vectors are drawn as \texttt{"}Curves\texttt{"} but may also be
-         referred to using the synonym \texttt{"}Vectors\texttt{"} when specifying Plot
+         a group of comma-separated name=value strings where {\tt "}name{\tt "} is the
+         name of a Plot attribute, and {\tt "}value{\tt "} is the value to assign to
+         the attribute. Vectors are drawn as {\tt "}Curves{\tt "} but may also be
+         referred to using the synonym {\tt "}Vectors{\tt "} when specifying Plot
          attributes. Default values are supplied for any attributes which
          are not specified. These are obtained from the WCS information
          in the supplied catalogue, or inherited from the previous
@@ -3635,8 +3641,8 @@ for NDF applications.
       }{
          The coordinates to put at the top right corner of the plotting
          area, in the coordinates system specified by parameters COLX and
-         COLY. The suggested value just encloses all the data in the supplied
-         catalogue. []
+         COLY. If a null value is supplied then an area is used which just
+         encloses all the data in the supplied catalogue. [!]
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
@@ -3651,26 +3657,26 @@ for NDF applications.
          polplot poltab
       }{
          Produces a vector map on the current graphics device with
-         vectors defined in the FITS binary table \texttt{"}poltab\texttt{"}. The magnitudes
+         vectors defined in the FITS binary table {\tt "}poltab{\tt "}. The magnitudes
          are taken from column P, the orientations from column ANG and
          the coordinates of each vector from columns X and Y.
       }
       \sstexamplesubsection{
-         polplot poltab style=$^\wedge$mystyle.dat
+         polplot poltab style=$\wedge$mystyle.dat
       }{
          As above, but the annotated axes and vectors are drawn according
-         to the description given in text file \texttt{mystyle.dat}. If this
+         to the description given in text file $\backslash$verb$+$mystyle.dat$+$. If this
          files contains the following lines:
 
-\hspace*{1in}\texttt{title=My favorite colours}\\
-\hspace*{1in}\texttt{grid=1}\\
-\hspace*{1in}\texttt{minticklen=0}\\
-\hspace*{1in}\texttt{colour(border)=green}\\
-\hspace*{1in}\texttt{colour(grid)=blue}\\
-\hspace*{1in}\texttt{colour(vec)=red}\\
-\hspace*{1in}\texttt{width(border)=0.05}\\
+            title=My favorite colours
+            grid=1
+            minticklen=0
+            colour(border)=green
+            colour(grid)=blue
+            colour(vec)=red
+            width(border)=0.05
 
-         then the title is set to \texttt{"}My favourite colours\texttt{"}; a grid is drawn
+         then the title is set to {\tt "}My favourite colours{\tt "}; a grid is drawn
          across the plot instead of tick marks around the edge; the border,
          grid and vectors are drawn in green, blue and red respectively,
          and slightly thicker lines are used to draw the border.
@@ -3682,11 +3688,11 @@ for NDF applications.
          (as defined by the value zero in the column ANG) is at the
          position angle 23.4 degrees (measured anti-clockwise from the
          positive y axis) in the displayed map. The position of each vector
-         is specified by columns \texttt{"}ra\texttt{"} and \texttt{"}dec\texttt{"}. The annotated axes give
+         is specified by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}. The annotated axes give
          equatorial (RA/DEC) coordinates referred to the equinox of B1950.
          If the vector map is displayed over an existing DATA picture, then
          the vector map will be aligned on the sky with the previously
-         displayed data if possible (\emph{i.e.} the FrameSet associated with the
+         displayed data if possible (i.e. the FrameSet associated with the
          existing picture in the AGI database contains a sky coordinate
          Frame). If this is not possible, then the vector map will be
          aligned in pixel or grid coordinates. A message is displayed
@@ -3699,6 +3705,44 @@ for NDF applications.
          arrow, starting at the position of the corresponding pixel.  No key
          to the vector scale and justification is produced.
       }
+      \sstexamplesubsection{
+         polplot ABEB.FIT clear=no colx=ra coly=dec colmag=l colang=b
+      }{
+         Reads the non-POLPACK FITS table in file ABEB.FIT, and displays a
+         vector for every row defined by the catalogue columns {\tt "}l{\tt "} and {\tt "}b{\tt "}.
+         The position of each vector is given by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}.
+         If a previous DATA picture has been displayed, and has a calibration
+         in terms of any of the common sky coordinate systems, then the
+         vectors are aligned with the existing DATA picture.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The columns specified by parameters COLX and COLY should hold
+         coordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
+         an AST FrameSet (see \xref{SUN/210}{sun210}{}) in the supplied catalogue. If the
+         catalogue has been produced by one of the POLPACK application polvec
+         or polbin, then the Base Frame will be pixel co-ordinates within the
+         aligned intensity images, and these will be stored in columns with
+         names {\tt "}X{\tt "} and {\tt "}Y{\tt "}. If the catalogue was not created by POLPACK, it
+         may have no usable WCS information, in which case the supplied
+         positions are mapped linearly onto the screen. There is one
+         exception to this; if the columns have names RA and DEC then they
+         are assumed to be equatorial sky coordinates with epoch and equinox
+         specified by the optional catalogue parameters EPOCH and EQUINOX
+         (defaults are used for these parameters if they are not present in the
+         catalogue). If the vector map is displayed over an existing DATA
+         picture (i.e. if CLEAR=NO) then these RA/DEC positions will be aligned
+         with the existing DATA picture if possible (i.e. if the existing
+         picture has sky coordinate information stored with it).
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1998 Central Laboratory of the Research Councils
    }
 }
 \newpage
@@ -3713,7 +3757,8 @@ for NDF applications.
       parameters in the supplied input cube (which will normally have been
       created by POLKA or POLCAL). These calculated values may be stored either in
       a series of 2D NDFs, or in a single catalogue which may be
-      examined and manipulated using the CURSA package (see SUN/190).
+      examined and manipulated using the CURSA package (see
+\xref{SUN/190}{sun190}{}).
    }
    \sstusage{
       polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
@@ -3797,13 +3842,13 @@ for NDF applications.
          binning the Stokes vectors in this application (see parameter BOX).
          Information describing the mappings between pixel coordinates and
          any other known coordinate Frames will be stored in the catalogue
-         in textual form, as an AST FrameSet (see SUN/210).
+         in textual form, as an AST FrameSet (see \xref{SUN/210}{sun210}{}).
 
          The storage format of the catalogue is determined by the {\tt "}file
          type{\tt "} specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
          with file extension {\tt "}.FIT{\tt "}. Other possibilities are described in
-         SUN/190.
+         \xref{SUN/190}{sun190}{}.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
@@ -4267,5 +4312,22 @@ examined using POLEXT or the \xref{\texttt{hdstrace}}{sun102}{} command.
    \end{figure}
    \end{quote}
 \end{htmlonly}
+
+\section{\label{APP:HISTORY}History}
+This section describes the major changes introduced at each release of
+POLPACK.
+\subsection{V1.1}
+\begin{enumerate}
+\item A bug has been fixed which caused POLPLOT to display vectors in 
+incorrect positions when annotating the axes with sky coordinates. This bug
+was not seen if the vectors were plotted over an existing picture.
+\item Catalogues created by POLVEC now inherit the Current coordinate Frame 
+from the supplied Stokes cube. Previously the Current Frame was always reset to
+pixel coordinates.
+\item Vectors produced by POLPLOT no longer intersect the border.
+\item The vectors positions in the catalogue supplied to POLPLOT must now
+be given in the Base Frame of the WCS information stored in the catalogue.
+
+\end{enumerate}
 
 \end{document}
