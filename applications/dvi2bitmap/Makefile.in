@@ -93,6 +93,9 @@ dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 defects.html: defects.xml
 	java com.jclark.xsl.sax.Driver defects.xml /home/norman/sgml/defect/defects.xslt defects.html
 
+test: 
+	cd test; ($MAKE) test
+
 # Housekeeping targets
 tidy:
 	rm -f *~ config/*~
