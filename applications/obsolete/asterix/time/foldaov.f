@@ -122,7 +122,7 @@
      :                                           OFID1, STATUS )
 
 *  Add axis label
-      CALL BDA_PUTAXTEXT( OFID1, 1, 'Fold frequency', 'Hz', STATUS )
+      CALL BDI_PUTAXTEXT( OFID1, 1, 'Fold frequency', 'Hz', STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error writing periodogram file')
       ENDIF
@@ -132,7 +132,7 @@
      :                                1.0/REAL(NPBIN), OFID2, STATUS)
 
 *  Add axis label
-      CALL BDA_PUTAXTEXT( OFID2, 1, 'Phase', ' ', STATUS )
+      CALL BDI_PUTAXTEXT( OFID2, 1, 'Phase', ' ', STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT('Error writing phase file')
       END IF
