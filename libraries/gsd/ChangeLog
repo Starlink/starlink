@@ -1,5 +1,10 @@
 1999-12-16  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* gsd_test.f (GSD_PRINT): Fix format statement errors for 'X' on linux
+
+	* gsd_print.f (GSD_PRINT): Fix format statement errors for 'X' on
+	linux.
+
 	* gsd_f77.c: Fix prototype warning in gsdGet1b
 
 	* makefile: Create MkV makefile for Starlink

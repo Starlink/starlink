@@ -252,37 +252,37 @@
                      CALL GSD_GET1B (GSDINDEX, 1, SIZE, START, END, 
      :                            BVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4001) (BVALUES(I), I = 1, ACTVALS)
-4001                 FORMAT (1X, 12(X,I4,X))
+4001                 FORMAT (1X, 12(1X,I4,1X))
                   ELSE IF ( TYPE .EQ. 'L' ) THEN
                      CALL GSD_GET1L (GSDINDEX, 1, SIZE, START, END, 
      :                            LVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4002) (LVALUES(I), I = 1, ACTVALS)
-4002                 FORMAT (1X, 12(X,L1,X))
+4002                 FORMAT (1X, 12(1X,L1,1X))
                   ELSE IF ( TYPE .EQ. 'W' ) THEN
                      CALL GSD_GET1W (GSDINDEX, 1, SIZE, START, END, 
      :                            WVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4003) (WVALUES(I), I = 1, ACTVALS)
-4003                 FORMAT (1X, 8(X,I6,X))
+4003                 FORMAT (1X, 8(1X,I6,1X))
                   ELSE IF ( TYPE .EQ. 'I' ) THEN
                      CALL GSD_GET1I (GSDINDEX, 1, SIZE, START, END, 
      :                            IVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4004) (IVALUES(I), I = 1, ACTVALS)
-4004                 FORMAT (1X, 6(X,I10,X))
+4004                 FORMAT (1X, 6(1X,I10,1X))
                   ELSE IF ( TYPE .EQ. 'R' ) THEN
                      CALL GSD_GET1R (GSDINDEX, 1, SIZE, START, END, 
      :                            RVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4005) (RVALUES(I), I = 1, ACTVALS)
-4005                 FORMAT (1X, 4(X,G14.8,X))
+4005                 FORMAT (1X, 4(1X,G14.8,1X))
                   ELSE IF ( TYPE .EQ. 'D' ) THEN
                      CALL GSD_GET1D (GSDINDEX, 1, SIZE, START, END, 
      :                            DVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4006) (DVALUES(I), I = 1, ACTVALS)
-4006                 FORMAT (1X, 3(X,G21.15,X))
+4006                 FORMAT (1X, 3(1X,G21.15,1X))
                   ELSE IF ( TYPE .EQ. 'C' ) THEN
                      CALL GSD_GET1C (GSDINDEX, 1, SIZE, START, END, 
      :                            CVALUES, ACTVALS, STATUS)
                      WRITE (LUN, 4007) (CVALUES(I), I = 1, ACTVALS)
-4007                 FORMAT (1X, 4(X,A16,X))
+4007                 FORMAT (1X, 4(1X,A16,1X))
                   END IF
                ENDDO
             ENDIF
