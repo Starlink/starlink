@@ -39,25 +39,23 @@
 # -------------------------------------------------------------------
 proc display {text llen ind} {
 
-   set pref [string repeat " " $ind]
+   for {set i 0} {$i < $ind} { incr i } { append pref " " }
    set buf $pref
    set lb $ind
 
    while { [regexp {^ *([^ ]+)(.*)$} $text match word text] } {
-         set lw [string length $word]
-         if { $lw + $lb >= $llen } {
-            puts $buf
-            set buf $pref
-            set lb $ind
-         }
-         append buf "$word "
-         incr lb $lw
-         incr lb
+      set lw [string length $word]
+      if { $lw + $lb >= $llen } {
+         puts $buf
+         set buf $pref
+         set lb $ind
       }
+      append buf "$word "
+      incr lb $lw
+      incr lb
    }
    if { $lb > $ind } { puts $buf }
 }
-
 
 #  Searchs for any sub-string of $words within $test, and returns a
 #  weight for all matches. Matches of longer sub-strings have more 
