@@ -1,7 +1,7 @@
-      SUBROUTINE IMPORT( STATUS )
+      SUBROUTINE TXT2AST( STATUS )
 *+
 *  Name:
-*     IMPORT
+*     TXT2AST
 
 *  Purpose:
 *     Reads in a formatted text file and constructs a binned dataset
@@ -13,14 +13,14 @@
 *     ASTERIX task
 
 *  Invocation:
-*     CALL IMPORT( STATUS )
+*     CALL TXT2AST( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
-*     IMPORT reads a plain ascii text file composed of record descriptors
+*     TXT2AST reads a plain ascii text file composed of record descriptors
 *     and data lines. The former describe the structure of the latter. This
 *     application is a means of getting numeric data into a form with which
 *     ASTERIX can work.
@@ -53,17 +53,17 @@
 *     {routine_side_effects}...
 
 *  Algorithm:
-*     IMPORT picks up the record descriptors and validates the data lines
+*     TXT2AST picks up the record descriptors and validates the data lines
 *     based on those descriptors. After being read in, the data is processed
 *     and put into standard HDS form.
 *
-*     IMPORT allocates space for its data in a very efficient manner.
+*     TXT2AST allocates space for its data in a very efficient manner.
 *     Initially only a table of pointers exist. When the need arises a new
 *     block of memory is fetched and its address assigned to a table entry.
 *     Once all the data has been read one new large table of pointers to
 *     the individual data table rows is constructed - this is then used to
 *     sort the data. With 40 table entries, and each block being 10000 rows
-*     deep, IMPORT therefore places a limit of 400,000 on the number of
+*     deep, TXT2AST therefore places a limit of 400,000 on the number of
 *     points being entered.
 
 *  Accuracy:
@@ -94,6 +94,7 @@
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
 *     ISH: Ian S. Hobbs (University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -161,6 +162,8 @@
 *        Full ADI port. No longer coerces regular axes.
 *      3 Apr 1996 V2.0-1 (DJA):
 *        Added ability import grouping
+*      2 Mar 1998 V2.2-1 (RB):
+*        Convert from IMPORT
 *     {enter_changes_here}
 
 *  Bugs:
@@ -177,7 +180,7 @@
       INCLUDE 'QUAL_PAR'
 
 *  Global Variables:
-      INCLUDE 'IMPORT_CMN'
+      INCLUDE 'TXT2AST_CMN'
 
 *  Status:
       INTEGER			STATUS             	! Global status
@@ -185,8 +188,8 @@
 *  External References:
       EXTERNAL			CHR_LEN
         INTEGER             	CHR_LEN
-      EXTERNAL			IMPORT_LOCSYM
-        INTEGER             	IMPORT_LOCSYM
+      EXTERNAL			TXT2AST_LOCSYM
+        INTEGER             	TXT2AST_LOCSYM
 
 *  Local Constants:
       INTEGER             DEFAULT           ! Tells FIO to use default
@@ -208,7 +211,7 @@
         PARAMETER        	( NMASKS = 6 )		! mask names
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'IMPORT Version 2.2-0' )
+        PARAMETER		( VERSION = 'TXT2AST Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*80		AX_LABEL(ADI__MXDIM) 	! Axis labels
@@ -344,20 +347,20 @@
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
 *  Get the first input line
-      CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
+      CALL TXT2AST_NEXTLINE( OFID, IFD, CLINE, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'TOPLEVEL or data descriptor expected.' )
         STATUS = SAI__ERROR
       END IF
 
 *  Does the input file have a TOPLEVEL record
-      IF ( IMPORT_LOCSYM( 'TOPLEVEL' ) .EQ. 1 ) THEN
+      IF ( TXT2AST_LOCSYM( 'TOPLEVEL' ) .EQ. 1 ) THEN
 
 *    It does so process the options
         IF ( WD_NUM .GT. 1 ) THEN
 
 *      See if the TOPLEVEL line contains a TYPE specifier
-          CALL IMPORT_EXTQSYM( 'TYPE', TYPE_DATA, TYPE_OK, STATUS )
+          CALL TXT2AST_EXTQSYM( 'TYPE', TYPE_DATA, TYPE_OK, STATUS )
 
           IF ( .NOT. TYPE_OK ) THEN
             TYPE_DATA = 'BinDS'
@@ -365,18 +368,18 @@
           END IF
 
 *      See if the TOPLEVEL line contains a TITLE specifier
-          CALL IMPORT_EXTQSYM( 'TITLE', TITLE_DATA, TITLE_OK, STATUS )
+          CALL TXT2AST_EXTQSYM( 'TITLE', TITLE_DATA, TITLE_OK, STATUS )
 
 *      Tell user if any garbage on command line
           EXTRA = .FALSE.
           DO I = 1, WD_NUM
             IF ( .NOT. WD_USED(I) ) EXTRA = .TRUE.
           END DO
-          IF ( EXTRA ) CALL IMPORT_ERROR( 'WARNING : Extra ignored',
+          IF ( EXTRA ) CALL TXT2AST_ERROR( 'WARNING : Extra ignored',
      :                                                     CLINE )
 
         ELSE
-          CALL IMPORT_ERROR( 'TITLE or TYPE expected after TOPLEVEL',
+          CALL TXT2AST_ERROR( 'TITLE or TYPE expected after TOPLEVEL',
      :                                                      CLINE )
         END IF
         TOP_LEVEL = .TRUE.
@@ -410,14 +413,14 @@
       DO WHILE ( MORE_DESCS .AND. (STATUS .EQ. SAI__OK) )
 
         IF ( TOP_LEVEL ) THEN
-          CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
+          CALL TXT2AST_NEXTLINE( OFID, IFD, CLINE, STATUS )
         END IF
         TOP_LEVEL= .TRUE.
 
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Check word against valid descriptors
-          IF ( IMPORT_LOCSYM( 'AXIS' ) .EQ. 1 ) THEN
+          IF ( TXT2AST_LOCSYM( 'AXIS' ) .EQ. 1 ) THEN
 
 *        Check that last axis, if any, did not leave any dangling asymmetric
 *        widths.
@@ -429,13 +432,13 @@
                 ELSE
                   CALL MSG_SETC( 'DESC', 'LOWIDTH' )
                 END IF
-                CALL IMPORT_ERROR( 'Missing ^DESC for previous axis',
+                CALL TXT2AST_ERROR( 'Missing ^DESC for previous axis',
      :                                                      CLINE )
               END IF
             END IF
 
             IF ( NAXES .EQ. ADI__MXDIM ) THEN
-              CALL IMPORT_ERROR( 'Maximum number of axes exceeded',
+              CALL TXT2AST_ERROR( 'Maximum number of axes exceeded',
      :                                                    CLINE )
             ELSE
               NAXES = NAXES + 1
@@ -450,21 +453,21 @@
             IF ( PRIM ) GOTO 17
 
 *        Test for keywords after AXIS. First LABEL
-            CALL IMPORT_EXTQSYM( 'LABEL', AX_LABEL(N),
+            CALL TXT2AST_EXTQSYM( 'LABEL', AX_LABEL(N),
      :                           AX_LABEL_OK(N), STATUS )
 
 *        ...then UNITS
-            CALL IMPORT_EXTQSYM( 'UNITS', AX_UNITS(N),
+            CALL TXT2AST_EXTQSYM( 'UNITS', AX_UNITS(N),
      :                           AX_UNITS_OK(N), STATUS )
 
 *        ... then NORM
-            AX_NORM(N) = IMPORT_LOCSYM('NORM') .NE. 0
+            AX_NORM(N) = TXT2AST_LOCSYM('NORM') .NE. 0
 
 *        ...then DECREASING
-            AX_DECR(N) = IMPORT_LOCSYM('DECREASING') .NE. 0
+            AX_DECR(N) = TXT2AST_LOCSYM('DECREASING') .NE. 0
 
 *        ...then SCALAR_WIDTH
-            CALL IMPORT_EXTQSYM( 'SCALAR_WIDTH', TSTR,
+            CALL TXT2AST_EXTQSYM( 'SCALAR_WIDTH', TSTR,
      :                           AX_SCALAR(N), STATUS )
             IF ( AX_SCALAR(N) ) THEN
               CALL CHR_CTOR( TSTR(:CHR_LEN(TSTR)),AX_SCADAT(N), STATUS )
@@ -476,12 +479,12 @@
  17         CONTINUE
 
 *      Axis width descriptor
-          ELSE IF ( IMPORT_LOCSYM( 'WIDTH' ) .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM( 'WIDTH' ) .EQ. 1 ) THEN
 
 *        Assume WIDTH descriptor corresponds to most recent
 *        AXIS specifier. If NAXES is zero, then error...
             IF ( NAXES .EQ. 0 ) THEN
-              CALL IMPORT_ERROR( 'No axis for this WIDTH '/
+              CALL TXT2AST_ERROR( 'No axis for this WIDTH '/
      :                           /'descriptor', CLINE )
             ELSE IF ( AX_WOK(NAXES) ) THEN
               IF ( AX_SYMWID(NAXES) ) THEN
@@ -489,10 +492,10 @@
               ELSE
                 CALL MSG_SETC( 'FORM', 'Asymmetric' )
               END IF
-              CALL IMPORT_ERROR( '^FORM axis widths already specified'/
+              CALL TXT2AST_ERROR( '^FORM axis widths already specified'/
      :                                     /' for this axis', CLINE )
             ELSE IF ( AX_SCALAR(NAXES) ) THEN
-              CALL IMPORT_ERROR( 'Scalar width already specified'/
+              CALL TXT2AST_ERROR( 'Scalar width already specified'/
      :                           /' for this axis', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
@@ -502,14 +505,14 @@
             END IF
 
 *      Lower or upper axis widths descriptors
-          ELSE IF ( ( IMPORT_LOCSYM('LOWIDTH') .EQ. 1 ) .OR.
-     :              ( IMPORT_LOCSYM('UPWIDTH') .EQ. 1 ) ) THEN
+          ELSE IF ( ( TXT2AST_LOCSYM('LOWIDTH') .EQ. 1 ) .OR.
+     :              ( TXT2AST_LOCSYM('UPWIDTH') .EQ. 1 ) ) THEN
 
 *        Assume LO/HI WIDTH descriptor corresponds to most recent
 *        AXIS specifier. If NAXES is zero, then error...
             IF ( NAXES .EQ. 0 ) THEN
               CALL MSG_SETC( 'DESC', WD_DATA(1) )
-              CALL IMPORT_ERROR( 'No axis for this ^DESC '/
+              CALL TXT2AST_ERROR( 'No axis for this ^DESC '/
      :                           /'descriptor', CLINE )
             ELSE IF ( AX_WOK(NAXES) ) THEN
               IF ( AX_SYMWID(NAXES) ) THEN
@@ -517,15 +520,15 @@
               ELSE
                 CALL MSG_SETC( 'FORM', 'Asymmetric' )
               END IF
-              CALL IMPORT_ERROR( '^FORM axis widths already specified'/
+              CALL TXT2AST_ERROR( '^FORM axis widths already specified'/
      :                                     /' for this axis', CLINE )
             ELSE
 
 *          Set flags for lower/upper axis widths
               NUM_DESCS = NUM_DESCS + 1
-              IF ( IMPORT_LOCSYM('LOWIDTH') .EQ. 1 ) THEN
+              IF ( TXT2AST_LOCSYM('LOWIDTH') .EQ. 1 ) THEN
                 IF ( USE_AX_AWIDLO(NAXES) ) THEN
-                  CALL IMPORT_ERROR( 'Lower axis widths already'/
+                  CALL TXT2AST_ERROR( 'Lower axis widths already'/
      :                     /' specified for this axis', CLINE )
                 ELSE
                   USE_AX_AWIDLO(NAXES) = .TRUE.
@@ -533,7 +536,7 @@
                 END IF
               ELSE
                 IF ( USE_AX_AWIDHI(NAXES) ) THEN
-                  CALL IMPORT_ERROR( 'Upper axis widths already'/
+                  CALL TXT2AST_ERROR( 'Upper axis widths already'/
      :                     /' specified for this axis', CLINE )
                 ELSE
                   USE_AX_AWIDHI(NAXES) = .TRUE.
@@ -551,10 +554,10 @@
             END IF
 
 *      Lower error descriptor
-          ELSE IF ( IMPORT_LOCSYM('LOERROR') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('LOERROR') .EQ. 1 ) THEN
 
             IF ( USE_LOERR ) THEN
-              CALL IMPORT_ERROR( 'Lower data widths already'/
+              CALL TXT2AST_ERROR( 'Lower data widths already'/
      :                               /' specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
@@ -563,10 +566,10 @@
             END IF
 
 *      Upper error descriptor
-          ELSE IF ( IMPORT_LOCSYM('UPERROR') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('UPERROR') .EQ. 1 ) THEN
 
             IF ( USE_UPERR ) THEN
-              CALL IMPORT_ERROR( 'Upper data widths already'/
+              CALL TXT2AST_ERROR( 'Upper data widths already'/
      :                               /' specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
@@ -575,10 +578,10 @@
             END IF
 
 *      Lower error descriptor, but with LOLIM
-          ELSE IF ( IMPORT_LOCSYM('LOLIM') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('LOLIM') .EQ. 1 ) THEN
 
             IF ( USE_LOERR ) THEN
-              CALL IMPORT_ERROR( 'Lower data widths already'/
+              CALL TXT2AST_ERROR( 'Lower data widths already'/
      :                               /' specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
@@ -588,10 +591,10 @@
             END IF
 
 *      Upper error descriptor, but with UPLIM
-          ELSE IF ( IMPORT_LOCSYM('UPLIM') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('UPLIM') .EQ. 1 ) THEN
 
             IF ( USE_UPERR ) THEN
-              CALL IMPORT_ERROR( 'Upper data widths already'/
+              CALL TXT2AST_ERROR( 'Upper data widths already'/
      :                               /' specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
@@ -601,55 +604,55 @@
             END IF
 
 *      Ignore descriptor
-          ELSE IF ( IMPORT_LOCSYM('IGNORE') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('IGNORE') .EQ. 1 ) THEN
 
 *        If IGNORE descriptor we're ignoring a column
             NUM_DESCS = NUM_DESCS + 1
             IGNORE(NUM_DESCS) = .TRUE.
 
 *      Data descriptor
-          ELSE IF ( IMPORT_LOCSYM('DATA') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('DATA') .EQ. 1 ) THEN
 
 *        Make sure DATA hasn't already been specified
             IF ( USE_DATA ) THEN
-              CALL IMPORT_ERROR( 'DATA multiply specified', CLINE )
+              CALL TXT2AST_ERROR( 'DATA multiply specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
               USE_DATA = .TRUE.
               POS_DATA = NUM_DESCS
 
 *          Data units present?
-              CALL IMPORT_EXTQSYM( 'UNITS', UNITS_DATA, UNITS_OK,
+              CALL TXT2AST_EXTQSYM( 'UNITS', UNITS_DATA, UNITS_OK,
      :                             STATUS )
 
 *          Data label present?
-              CALL IMPORT_EXTQSYM( 'LABEL', LABEL_DATA, LABEL_OK,
+              CALL TXT2AST_EXTQSYM( 'LABEL', LABEL_DATA, LABEL_OK,
      :                             STATUS )
 
             END IF
 
 *      Quality descriptor
-          ELSE IF ( IMPORT_LOCSYM('QUALITY') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('QUALITY') .EQ. 1 ) THEN
 
 *        Make sure QUALITY hasn't already been specified
             IF ( USE_QUAL ) THEN
-              CALL IMPORT_ERROR( 'QUALITY multiply specified', CLINE )
+              CALL TXT2AST_ERROR( 'QUALITY multiply specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
               USE_QUAL = .TRUE.
               POS_QUAL = NUM_DESCS
 
 *          QUALITY mask present?
-              CALL IMPORT_EXTQSYM( 'MASK', QMASK, QMASK_OK, STATUS )
+              CALL TXT2AST_EXTQSYM( 'MASK', QMASK, QMASK_OK, STATUS )
 
             END IF
 
 *      Variance descriptor
-          ELSE IF ( IMPORT_LOCSYM('VARIANCE') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('VARIANCE') .EQ. 1 ) THEN
 
 *        Make sure VARIANCE hasn't already been specified
             IF ( USE_VAR ) THEN
-              CALL IMPORT_ERROR( 'VARIANCE multiply specified', CLINE )
+              CALL TXT2AST_ERROR( 'VARIANCE multiply specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
               USE_VAR = .TRUE.
@@ -658,11 +661,11 @@
             END IF
 
 *      Grouping descriptor
-          ELSE IF ( IMPORT_LOCSYM('GROUP') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('GROUP') .EQ. 1 ) THEN
 
 *        Make sure GROUP hasn't already been specified
             IF ( USE_GRP ) THEN
-              CALL IMPORT_ERROR( 'GROUP multiply specified', CLINE )
+              CALL TXT2AST_ERROR( 'GROUP multiply specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
               USE_GRP = .TRUE.
@@ -670,11 +673,11 @@
             END IF
 
 *      Error descriptor
-          ELSE IF ( IMPORT_LOCSYM('ERROR') .EQ. 1 ) THEN
+          ELSE IF ( TXT2AST_LOCSYM('ERROR') .EQ. 1 ) THEN
 
 *        Make sure VARIANCE hasn't already been specified
             IF ( USE_VAR ) THEN
-              CALL IMPORT_ERROR( 'Data error/variance multiply'/
+              CALL TXT2AST_ERROR( 'Data error/variance multiply'/
      :                                  /' specified', CLINE )
             ELSE
               NUM_DESCS = NUM_DESCS + 1
@@ -696,9 +699,9 @@
 
         IF ( STATUS .NE. SAI__OK ) THEN
           IF ( NUM_DESCS .EQ. 0 ) THEN
-            CALL IMPORT_ERROR( 'Record descriptor expected', CLINE )
+            CALL TXT2AST_ERROR( 'Record descriptor expected', CLINE )
           ELSE
-            CALL IMPORT_ERROR( 'Record descriptor or numeric'/
+            CALL TXT2AST_ERROR( 'Record descriptor or numeric'/
      :                           /' data expected', CLINE )
           END IF
           GOTO 99
@@ -710,7 +713,7 @@
           DO I = 1, WD_NUM
             IF ( .NOT. WD_USED(I) ) EXTRA = .TRUE.
           END DO
-          IF ( EXTRA ) CALL IMPORT_ERROR( 'WARNING : Extra ignored',
+          IF ( EXTRA ) CALL TXT2AST_ERROR( 'WARNING : Extra ignored',
      :                                                      CLINE )
         END IF
 
@@ -725,7 +728,7 @@
           ELSE
             CALL MSG_SETC( 'DESC', 'LOWIDTH' )
           END IF
-          CALL IMPORT_ERROR( 'Missing ^DESC for previous axis',CLINE )
+          CALL TXT2AST_ERROR( 'Missing ^DESC for previous axis',CLINE )
           GOTO 99
         END IF
       END IF
@@ -738,7 +741,7 @@
         ELSE
           CALL MSG_SETC( 'DESC', 'LOERROR/LOLIM' )
         END IF
-        CALL IMPORT_ERROR( 'Missing ^DESC descriptor', CLINE )
+        CALL TXT2AST_ERROR( 'Missing ^DESC descriptor', CLINE )
         GOTO 99
       END IF
 
@@ -791,7 +794,7 @@
                 DATAROW(I) = LASTROW(I)
 
               ELSE
-                CALL IMPORT_ERROR( 'Cannot ditto on first data'/
+                CALL TXT2AST_ERROR( 'Cannot ditto on first data'/
      :                                       /' line', CLINE )
                 STATUS = SAI__ERROR
                 GOTO 99
@@ -802,7 +805,7 @@
 
 *          The item is a hyphen - try and use default
               IF ( DEF_VALS(I) .EQ. NODEFAULT ) THEN
-                CALL IMPORT_ERROR( 'No default for this field',CLINE )
+                CALL TXT2AST_ERROR( 'No default for this field',CLINE )
                 STATUS = SAI__ERROR
                 GOTO 99
 
@@ -829,7 +832,7 @@
      :                     QMASK_NAMES, QMASK_VALS, QVAL, STATUS )
                 IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETC( 'QSTR', WD_DATA(I)(:DATA_LEN) )
-                  CALL IMPORT_ERROR( 'Invalid quality byte '/
+                  CALL TXT2AST_ERROR( 'Invalid quality byte '/
      :                          /'specifier ^QSTR', CLINE )
                   STATUS = SAI__ERROR
                   GOTO 99
@@ -850,7 +853,7 @@
                     CALL MSG_SETC( 'TXT', 'data = ' )
                   END IF
                   CALL MSG_SETC( 'DAT', WD_DATA(I)(:DATA_LEN) )
-                  CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
+                  CALL TXT2AST_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
                   STATUS = SAI__ERROR
                   GOTO 99
                 END IF
@@ -880,7 +883,7 @@
                   CALL MSG_SETC( 'TXT', 'data =' )
                 END IF
                 CALL MSG_SETC( 'DAT', WD_DATA(I)(:DATA_LEN) )
-                CALL IMPORT_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
+                CALL TXT2AST_ERROR( 'Read error, ^TXT "^DAT"', CLINE )
                 STATUS = SAI__ERROR
                 GOTO 99
               END IF
@@ -891,7 +894,7 @@
           END DO
 
         ELSE
-          CALL IMPORT_ERROR( 'Data item(s) missing', CLINE )
+          CALL TXT2AST_ERROR( 'Data item(s) missing', CLINE )
           STATUS = SAI__ERROR
           GOTO 99
 
@@ -917,7 +920,7 @@
         END IF
 
 *    Get the next data row
-        CALL IMPORT_NEXTLINE( OFID, IFD, CLINE, STATUS )
+        CALL TXT2AST_NEXTLINE( OFID, IFD, CLINE, STATUS )
 
         IF ( STATUS .NE. SAI__OK ) THEN
           MORE_DATA = .FALSE.
@@ -941,7 +944,7 @@
 
             ELSE
               SPACE_LEFT = .FALSE.
-              CALL IMPORT_ERROR( 'IMPORT has run out of space', CLINE )
+              CALL TXT2AST_ERROR( 'TXT2AST has run out of space', CLINE )
             END IF
 
           END IF
@@ -957,7 +960,7 @@
 
 *    Fill the master data table with the address of all the data
 *    rows entered.
-        CALL IMPORT_FILLTAB( NELM, %VAL(MASTER_PTR), PTR_TABLES,
+        CALL TXT2AST_FILLTAB( NELM, %VAL(MASTER_PTR), PTR_TABLES,
      :                    BLOCK, PTR_TABLEN, NUM_DESCS, STATUS )
 
       END IF
@@ -1005,7 +1008,7 @@
       CALL MSG_PRNT( '^NREC data records read in from ^FILE' )
 
 *  Process the data
-      CALL IMPORT_CRUNCH( OFID, TYPE_DATA, PRIM, NAXES, NELM, NDIM,
+      CALL TXT2AST_CRUNCH( OFID, TYPE_DATA, PRIM, NAXES, NELM, NDIM,
      :                    DIMS, AX_WOK, AX_DECR, AX_SYMWID, AX_SCALAR,
      :                    QMASK_OK, QMASK, ERROR_TO_VAR,
      :                    %VAL(MASTER_PTR),
@@ -1067,8 +1070,8 @@
       END
 
 
-*+  IMPORT_NEXTLINE - Returns next useful line from input
-      SUBROUTINE IMPORT_NEXTLINE( OFID, INFILE, CURLINE, STATUS )
+*+  TXT2AST_NEXTLINE - Returns next useful line from input
+      SUBROUTINE TXT2AST_NEXTLINE( OFID, INFILE, CURLINE, STATUS )
 *
 *    Description :
 *
@@ -1102,7 +1105,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'IMPORT_CMN'
+      INCLUDE 'TXT2AST_CMN'
 *
 *    Import :
 *
@@ -1270,8 +1273,8 @@
 
 
 
-*+  IMPORT_ERROR - Signal an error in IMPORT
-      SUBROUTINE IMPORT_ERROR( MESSAGE, LINENUMBER )
+*+  TXT2AST_ERROR - Signal an error in TXT2AST
+      SUBROUTINE TXT2AST_ERROR( MESSAGE, LINENUMBER )
 *
 *    Description :
 *
@@ -1305,8 +1308,8 @@
 
 
 
-*+  IMPORT_EXTQSYM - Gets a keyword-data pair from a word list
-      SUBROUTINE IMPORT_EXTQSYM( KEYWORD, KDAT, KDAT_OK, STATUS )
+*+  TXT2AST_EXTQSYM - Gets a keyword-data pair from a word list
+      SUBROUTINE TXT2AST_EXTQSYM( KEYWORD, KDAT, KDAT_OK, STATUS )
 *
 *    Description :
 *
@@ -1336,7 +1339,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'IMPORT_CMN'
+      INCLUDE 'TXT2AST_CMN'
 *
 *    Import :
 *
@@ -1351,7 +1354,7 @@
 *    Function declarations :
 *
       INTEGER             CHR_LEN                ! Logical length of a string
-      INTEGER             IMPORT_LOCSYM          ! Find a word in list
+      INTEGER             TXT2AST_LOCSYM          ! Find a word in list
 *
 *    Local variables :
 *
@@ -1367,7 +1370,7 @@
       KDAT_OK = .FALSE.
       KDAT = ' '
 
-      I = IMPORT_LOCSYM(KEYWORD)
+      I = TXT2AST_LOCSYM(KEYWORD)
       KEY_OK = ( I .NE. 0 )
 
       IF ( KEY_OK ) THEN
@@ -1389,8 +1392,8 @@
 
 
 
-*+  IMPORT_LOCSYM - Locate a word in word table
-      INTEGER FUNCTION IMPORT_LOCSYM( KEYWORD )
+*+  TXT2AST_LOCSYM - Locate a word in word table
+      INTEGER FUNCTION TXT2AST_LOCSYM( KEYWORD )
 *
 *    Description :
 *
@@ -1417,7 +1420,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'IMPORT_CMN'
+      INCLUDE 'TXT2AST_CMN'
 *
 *    Import :
 *
@@ -1446,14 +1449,14 @@
         END IF
       END DO
 
-      IMPORT_LOCSYM = KEY_POS
+      TXT2AST_LOCSYM = KEY_POS
 
       END
 
 
 
-*+  IMPORT_FILLTAB - Creates master table of row addresses
-      SUBROUTINE IMPORT_FILLTAB( N, MASTER, NBLOCKS, BLOCK_STARTS,
+*+  TXT2AST_FILLTAB - Creates master table of row addresses
+      SUBROUTINE TXT2AST_FILLTAB( N, MASTER, NBLOCKS, BLOCK_STARTS,
      :                               BLOCK_LEN, ITEMSIZE, STATUS )
 *
 *    Description :
@@ -1512,8 +1515,8 @@
       END
 
 
-*+  IMPORT_CRUNCH - Do main data manipulation for IMPORT
-      SUBROUTINE IMPORT_CRUNCH( OFID, TYPE, PRIM, NAXES, N, NDIM, DIMS,
+*+  TXT2AST_CRUNCH - Do main data manipulation for TXT2AST
+      SUBROUTINE TXT2AST_CRUNCH( OFID, TYPE, PRIM, NAXES, N, NDIM, DIMS,
      :                AX_WOK, AX_DECR, AX_SYMWID, AX_SCALAR,
      :                QMASK_OK, CQMASK, ERROR_TO_VAR, MASTER, ORIG,
      :                NCOLS, WORK,
@@ -1521,7 +1524,7 @@
 *
 *    Description :
 *
-*     IMPORT_CRUNCH inserts data,variance and quality values into output
+*     TXT2AST_CRUNCH inserts data,variance and quality values into output
 *     arrays in positions dictated by the axis values.
 *
 *    Method :
@@ -1566,7 +1569,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'IMPORT_CMN'
+      INCLUDE 'TXT2AST_CMN'
 *
 *    Import :
 *
@@ -1645,7 +1648,7 @@
 *    Vector widths on this axis?
         VECTOR_WIDTHS = AX_WOK(I) .AND. .NOT. AX_SCALAR(I)
         IF ( SORT ) THEN
-          CALL IMPORT_SORT( N, MASTER, TABLE, AX_DECR(I),
+          CALL TXT2AST_SORT( N, MASTER, TABLE, AX_DECR(I),
      :                           POS_AX_DATA(I), STATUS )
         END IF
 
@@ -1922,14 +1925,14 @@
       END IF
 
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'IMPORT_CRUNCH', STATUS )
+        CALL AST_REXIT( 'TXT2AST_CRUNCH', STATUS )
       END IF
 
       END
 
 
-*+  IMPORT_SORT - Sort a 1D list of pointers to data rows by a given column
-      SUBROUTINE IMPORT_SORT( N, MASTER, AUXIL, DECREASING,
+*+  TXT2AST_SORT - Sort a 1D list of pointers to data rows by a given column
+      SUBROUTINE TXT2AST_SORT( N, MASTER, AUXIL, DECREASING,
      :                                     COLUMN, STATUS )
 *
 *    Description :
