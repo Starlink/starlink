@@ -102,20 +102,14 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*2               ASTR,BSTR               ! Axis number strings
       CHARACTER*20		LITEM1, LITEM2		! Local item names
 
       INTEGER                   C1, C2                  ! Character pointers
       INTEGER                   IITEM                   ! Item counter
-      INTEGER                   NDIG1,NDIG2             ! Digits used in strings
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Construct axis number strings
-      CALL CHR_ITOC( IAX, ASTR, NDIG1 )
-      CALL CHR_ITOC( OAX, BSTR, NDIG2 )
 
 *  Have items been specified?
       IF ( ITEMS .GT. ' ' ) THEN
@@ -125,9 +119,9 @@
         DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
 *    Construct the item names
- 10       FORMAT( 'Axis_', A, '_', A )
-          WRITE( LITEM1, 10 ) ASTR(:NDIG1), ITEMS(C1:C2)
-          WRITE( LITEM2, 10 ) BSTR(:NDIG2), ITEMS(C1:C2)
+ 10       FORMAT( 'Axis_', I1, '_', A )
+          WRITE( LITEM1, 10 ) IAX, ITEMS(C1:C2)
+          WRITE( LITEM2, 10 ) OAX, ITEMS(C1:C2)
 
 *      Copy the axis item
           CALL BDI_COPY( ID, LITEM1, OID, LITEM2, STATUS )

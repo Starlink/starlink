@@ -106,11 +106,10 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*2               ASTR                    ! Axis number string
+      CHARACTER*20		LITEM			! Local item name
 
       INTEGER                   C1, C2                  ! Character pointers
       INTEGER                   IITEM                   ! Item counter
-      INTEGER                   NDIG                    ! # digits used in ASTR
 *.
 
 *  Check inherited global status.
@@ -123,9 +122,12 @@
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
+*    Construct the item name
+ 10     FORMAT( 'Axis_', I1, '_', A )
+        WRITE( LITEM, 10 ) IAX, ITEMS(C1:C2)
+
 *    Map the axis item
-        CALL BDI_MAP( ID, 'Axis_'//ASTR(:NDIG)//'_'//ITEMS(C1:C2),
-     :                TYPE, MODE, PTRS(IITEM), STATUS )
+        CALL BDI_MAP( ID, LITEM, TYPE, MODE, PTRS(IITEM), STATUS )
 
 *    Advance iterator to next item
         CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )
