@@ -124,7 +124,6 @@
 *    Status :
       INTEGER STATUS
 *    External references :
-      INTEGER CHR_LEN                 ! CHR string-length function
 *    Global variables :
 *    Local Constants :
       INTEGER MAX_WRD                 ! number of words on a valid bolometer
