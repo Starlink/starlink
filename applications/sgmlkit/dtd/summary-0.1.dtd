@@ -68,6 +68,46 @@
 
 
 
+<!--
+  The only text which appears in the summary DTD, outside of section
+  titles, is in the abstract, so we need to define a minimal amount of
+  markup to cater for what might appear there.  Don't get ceried away,
+  however - anything more complicated than the following should
+  probably be removed when the summary is generated.
+-->
+<!entity % simplephrase	"em | strong | quote | code | kbd | cite">
+
+<!--
+  Include the same entities as are defined in the General DTD.  Note
+  that, since documents marked up using this DTD are (always?) read as
+  subdocuments, these other entities will probably never be defined
+  (could LPDs define them?).  It's important that they're defined,
+  less so that they're defined perfectly correctly.
+-->
+<!entity % LaTeX.entities 'IGNORE'>
+<!entity % HTML.entities 'IGNORE'>
+
+<![ %LaTeX.entities [
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//LATEX">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX">
+]]>
+<![ %HTML.entities [
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//HTML">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML">
+]]>
+<!entity % Additional.Char.Ents
+	public "-//Starlink//ENTITIES Additional entities//EN//PLAIN">
+<!entity % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN">
+
+%Additional.Char.Ents;
+%ISOents;
+
+
 <!element DocumentSummary o o (docinfo, docbody)>
 
 <!--
@@ -172,7 +212,7 @@
 <!element DOCBODY 	o o ((docxref | label)*,
 				abstract?, sect*, appendices?)>
 
-<!element ABSTRACT	- - (#pcdata)>
+<!element ABSTRACT	- - ((#pcdata | %simplephrase)*)>
 <!element SECT          - o (title, (docxref | label)*, subsect*)>
 <!element SUBSECT       - o (title, (docxref | label)*, subsubsect*)>
 <!element SUBSUBSECT    - o (title, (docxref | label)*, subsubsubsect*)>
@@ -274,3 +314,6 @@
 		cdata
 		#required
 	>
+
+<!-- Define all the simple markup elements -->
+<!element (%simplephrase) - - (#pcdata)>
