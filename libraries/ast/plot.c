@@ -140,8 +140,13 @@ f     - AST_TEXT: Draw a text string for a Plot
 *
 c     - Border: The Plot border drawn using astBorder or astGrid
 f     - Border: The Plot border drawn using AST_BORDER or AST_GRID
-c     - Grid: Grid lines drawn using astGridLine or astGrid
-f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID
+c     - Grid: Grid lines drawn using astGridLine or astGrid (provides
+f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID (provides
+      default values for Grid1 and Grid2)
+c     - Grid1: Grid lines which cross axis 1, drawn using astGridLine or astGrid 
+f     - Grid1: Grid lines which cross axis 1, drawn using AST_GRIDLINE or AST_GRID
+c     - Grid2: Grid lines which cross axis 2, drawn using astGridLine or astGrid 
+f     - Grid2: Grid lines which cross axis 2, drawn using AST_GRIDLINE or AST_GRID
 c     - Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
 f     - Curves: Geodesic curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
 c     - NumLab: Numerical axis labels drawn using astGrid (provides
@@ -365,6 +370,8 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 #define TEXTLAB2_ID    15 /* Id for textual axis labels */
 #define TICKS1_ID      16 /* Id for major and minor tick marks */
 #define TICKS2_ID      17 /* Id for major and minor tick marks */
+#define GRIDLINE1_ID   18 /* Id for axis 1 astGridLine curves */
+#define GRIDLINE2_ID   19 /* Id for axis 2 astGridLine curves */
 #define LEFT            0 /* Id for the left edge of the plotting area */
 #define TOP             1 /* Id for the top edge of the plotting area */
 #define RIGHT           2 /* Id for the right edge of the plotting area */
@@ -1219,7 +1226,9 @@ static CurveData Curve_data;
 /* Strings giving the label for the graphics items corresponding to
    BORDER_ID, GRIDLINE_ID, etc. */
 static char *GrfLabels = "Border Grid Curves NumLab TextLab Title "
-                         "Markers Strings Ticks Axes Axis1 Axis2";
+                         "Markers Strings Ticks Axes Axis1 Axis2 "
+                         "NumLab1 NumLab2 TextLab1 TextLab2 "
+                         "Ticks1 Ticks2 Grid1 Grid2";
 
 /* Text values used to represent edges externally. */
 static const char *xedge[4] = { "left", "top", "right", "bottom" };
@@ -3343,6 +3352,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
    int i;                  /* Loop count */
    int naxes;              /* No. of axes in the base Frame */
    int ok;                 /* Are all start coords good? */
+   int gridid;             /* Identifier value for element being drawn */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -3370,7 +3380,12 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, GRIDLINE_ID, 1, GRF__LINE, method, class );
+      if( axis == 0 ) {
+         gridid = GRIDLINE2_ID;
+      } else {
+         gridid = GRIDLINE1_ID;         
+      }
+      GrfAttrs( this, gridid, 1, GRF__LINE, method, class );
 
 /* Set up the externals used to communicate with the Map1 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -3467,7 +3482,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1_map = astAnnul( Map1_map );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, GRIDLINE_ID, 0, GRF__LINE, method, class );
+      GrfAttrs( this, gridid, 0, GRF__LINE, method, class );
 
    }
 
@@ -12614,6 +12629,12 @@ static char *GrfItem( int item, const char *text ){
    } else if ( item == GRIDLINE_ID ) {     
       desc = "Gridline";
 
+   } else if ( item == GRIDLINE1_ID ) {     
+      desc = "Axis 1 gridline";
+
+   } else if ( item == GRIDLINE2_ID ) {     
+      desc = "Axis 2 gridline";
+
    } else if ( item == CURVE_ID ) {        
       desc = "Curve";
 
@@ -20258,6 +20279,12 @@ static int UseColour( AstPlot *this, int id ) {
       if( !astTestColour( this, id ) ) {
          id = TICKS_ID;
       }
+
+/* Likewise for Grid1 and Grid2 */
+   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
+      if( !astTestColour( this, id ) ) {
+         id = GRIDLINE_ID;
+      }
    }
 
 /* If the requested value is set, get the value. Otherwise retain the
@@ -20338,6 +20365,12 @@ static int UseFont( AstPlot *this, int id ) {
    } else if( id == TICKS1_ID || id == TICKS2_ID ) {
       if( !astTestFont( this, id ) ) {
          id = TICKS_ID;
+      }
+
+/* Likewise for Grid1 and Grid2 */
+   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
+      if( !astTestFont( this, id ) ) {
+         id = GRIDLINE_ID;
       }
    }
 
@@ -20420,6 +20453,12 @@ static double UseSize( AstPlot *this, int id ) {
       if( !astTestSize( this, id ) ) {
          id = TICKS_ID;
       }
+
+/* Likewise for Grid1 and Grid2 */
+   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
+      if( !astTestSize( this, id ) ) {
+         id = GRIDLINE_ID;
+      }
    }
 
 /* If the requested value is set, get the value. Otherwise retain the
@@ -20501,6 +20540,12 @@ static int UseStyle( AstPlot *this, int id ) {
       if( !astTestStyle( this, id ) ) {
          id = TICKS_ID;
       }
+
+/* Likewise for Grid1 and Grid2 */
+   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
+      if( !astTestStyle( this, id ) ) {
+         id = GRIDLINE_ID;
+      }
    }
 
 /* If the requested value is set, get the value. Otherwise retain the
@@ -20581,6 +20626,12 @@ static double UseWidth( AstPlot *this, int id ) {
    } else if( id == TICKS1_ID || id == TICKS2_ID ) {
       if( !astTestWidth( this, id ) ) {
          id = TICKS_ID;
+      }
+
+/* Likewise for Grid1 and Grid2 */
+   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
+      if( !astTestWidth( this, id ) ) {
+         id = GRIDLINE_ID;
       }
    }
 

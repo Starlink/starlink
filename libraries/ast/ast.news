@@ -16,13 +16,12 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-   o The Plot class defines new graphical elements Axis1,
-   Axis2, NumLabs1, NumLabs2, TextLab1, TextLab2, Ticks1 and
-   Ticks2. These allow graphical attributes (colour, width,
-   etc) to be set for each axis individually. Previously,
-   graphical attributes could only be set for both axes
-   together, using graphical elements Axes, NumLabs, TextLabs
-   and Ticks.
+   o The Plot class defines new graphical elements Axis1, Axis2, Grid1,
+   Grid2, NumLabs1, NumLabs2, TextLab1, TextLab2, Ticks1 and Ticks2.
+   These allow graphical attributes (colour, width, etc) to be set for
+   each axis individually. Previously, graphical attributes could only be
+   set for both axes together, using graphical elements Axes, Grid,
+   NumLabs, TextLabs and Ticks.
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).

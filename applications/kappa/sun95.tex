@@ -3467,7 +3467,17 @@ non-zero value. Values specified using ``Axis2'' override any supplied
 using ``Axes''. \\
 {\tt Border}: The plot border, drawn if attribute {\tt Border} is given a non-zero value.\\
 {\tt Curves}: Curves drawn over the top of a plot ({\it e.g.} contours, data curves, {\it etc}).\\
-{\tt Grid}: The grid lines, drawn if attribute {\tt Grid} is given a non-zero value.\\
+{\tt Grid}: The grid lines, drawn if attribute {\tt Grid} is given a non-zero value.
+Values set using ``Grid'' are
+only only used if axis-specific values have not been set using ``Grid1''
+or ``Grid2''. Thus, ``Grid'' provides default values for ``Grid1'' and
+``Grid2''. \\
+{\tt Grid1}: Grid lines which cross axis 1, drawn if attribute {\tt Grid} 
+is given a non-zero value. Values specified using ``Grid1'' override any 
+supplied using ``Grid''. \\
+{\tt Grid2}: Grid lines which cross axis 2, drawn if attribute {\tt Grid} 
+is given a non-zero value. Values specified using ``Grid2'' override any 
+supplied using ``Grid''. \\
 {\tt Markers}: Graphical markers (symbols) drawn over a plot.\\
 {\tt NumLab}: Numerical axis labels drawn around annotated axes.
 Values set using ``NumLab'' are
