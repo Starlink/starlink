@@ -508,11 +508,10 @@ horizontally in world coordinates.
 
    my ( $status, $chv, $chh ) = _GQch( );
 
-Where $chv is a reference which is to receive the height of characters 
-drawn with a vertical baseline. This will be an increment in the X axis.
-
-Where $chh is a reference which is to receive the height of characters 
-drawn with a horizontal baseline. This will be an increment in the Y axis.
+Where $chv is the height of characters drawn with a vertical
+baseline. This will be an increment in the X axis.  Where $chh is the
+height of characters drawn with a horizontal baseline. This will be an
+increment in the Y axis.
 
 =cut
 
