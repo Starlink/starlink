@@ -1,4 +1,3 @@
-C# IL>=a, OL>=0
       SUBROUTINE GERHND (IER, KFUNC, IERFL )
 *
 * (C) COPYRIGHT ICL & SERC  1984
@@ -8,22 +7,28 @@ C# IL>=a, OL>=0
 *
 *  RUTHERFORD / ICL GKS SYSTEM
 *
-*  GKS Function name:  Error Handling
+*  GKS Function name:  Error Logging
 *  Author:             CJW
 *
-      INCLUDE '../include/check.inc'
+      INCLUDE 'source/include/check.inc'
 *
 *  PURPOSE OF THE ROUTINE
 *  ----------------------
-*  Default error handler. Its only action is to call the error logger
-*  (GERLOG). The routine may be replaced by the user.
+*  Error Handler. Prints an error message and GKS function
+*  Identification via the Starlink error reporting system
+
 *
 *  MAINTENANCE LOG
 *  ---------------
-*     22/10/82  CJW  Original version stabilized
-*     27/06/83  CJW  Implement revised error handling precedure
-*                    (No change required)
-*     26/07/83  CJW  Integer routine name
+*     22/10/82  CJW   Original version stabilized
+*     27/06/83  CJW   Implement revised error handling precedure
+*                     (No change required)
+*     21/07/83  CJW   Pass copy of IER to GKGEM incase its KERROR
+*     26/07/83  CJW   Integer routine name
+*     07/03/84  CJW   Check for invalid routine name
+*     xx/02/85  SHS   Added temp storage for shifting part of CEMESS.
+*     22/01/87  JCS   IS conversion. Error changes.
+*     07/02/91  DLT   Use Starlink error system
 *
 *  ARGUMENTS
 *  ---------
@@ -33,9 +38,74 @@ C# IL>=a, OL>=0
 *
       INTEGER IER, IERFL, KFUNC
 *
+*  COMMON BLOCK USAGE
+*  ------------------
+*     Read   /GKOPS/  KOPS
+*
+      INCLUDE 'source/include/gks.par'
+      INCLUDE 'source/include/gkops.cmn'
+*
+*  LOCALS
+*  ------
+*     IEMX    Maximum number of characters in an error message (P)
+*     CEMESS  Hold the error message
+*     ILCLER  Copy of IER
+*     BNAME   Copy of name of routine
+*     STATUS  EMS error status
+*
+      INTEGER IEMX, STATUS, ILCLER, INULL
+      PARAMETER (IEMX = 152)
+      CHARACTER * 7 AINVAL
+      PARAMETER (AINVAL = 'Invalid')
+      CHARACTER * (IEMX) CEMESS
+      CHARACTER * 9 BNAME
+      INCLUDE 'gks_err'
+      INCLUDE 'source/include/gksnam.par'
+*
+*
+*  ALGORITHM
+*  ---------
+*
+*  COMMENTS
+*  --------
+*                       SYSTEM DEPENDENT
+*
 *---------------------------------------------------------------------
 
+*     Get Message
+*     -----------
 
-      CALL GERLOG( IER, KFUNC, IERFL )
+*     Save IER incase IER is infact KERROR (prevents GKGEM having
+*     same variable as an argument and in common = side effects!)
+
+      ILCLER = IER
+      CALL GKGEM(ILCLER,CEMESS)
+      INULL = INDEX(CEMESS,CHAR(0)) - 1
+      IF (INULL.LT.0) THEN
+         INULL = LEN(CEMESS)
+      ELSE IF (INULL.EQ.0) THEN
+         INULL = 1
+      ENDIF
+
+*     Get Name
+*     --------
+
+      IF ((KFUNC.LT.0) .OR. (KFUNC.GT.108)) THEN
+         BNAME = AINVAL
+      ELSE
+         BNAME = 'G'//ANAMES(KFUNC)
+      ENDIF
+
+*     Set suitable status value
+
+      STATUS = GKS__ERROR
+
+*     Output Message
+*     --------------
+
+      CALL EMS_SETC( 'BNAME', BNAME//'[')
+      CALL EMS_SETI( 'IER', IER)
+
+      CALL EMS_REP( 'GKS_ERROR', '^BNAME^IER] '//CEMESS(:INULL), STATUS)
 
       END
