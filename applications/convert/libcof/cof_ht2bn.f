@@ -42,7 +42,10 @@
 *  History:
 *     1994 June 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1996 July 23 ({author_identifier}):
+*        Fixed bug arising out of HEASARC rAw extension, because r is
+*        not the repeat count but the total width.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -75,6 +78,7 @@
                                  ! bytes
       CHARACTER * ( 12 ) CSIZE   ! String form of the array size and
                                  ! work value
+      INTEGER WIDTH              ! Width of a character value
 *.
 
 *  Check the inherited global status.
@@ -100,7 +104,7 @@
          CALL CHR_APPND( 'D', CSIZE, NC )
 
       ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
-         CALL CHR_APPND( 'W', CSIZE, NC )
+         CALL CHR_APPND( 'L', CSIZE, NC )
 
       ELSE IF ( INDEX( TYPE, '_CHAR' ) .NE. 0 ) THEN
 
@@ -120,8 +124,12 @@
             CALL CHR_APPND( 'A', CLEN, NC )
             CSIZE = CLEN
 
-*  This is not.  It uses the HEASARC rAw form.
+*  This is not.  It uses the HEASARC rAw form.  Note that r is *not* the
+*  repeat count, but is the total width.  So have to redefine the start
+*  of the string.
          ELSE
+            CALL CHR_CTOI( CLEN, WIDTH, STATUS )
+            CALL CHR_ITOC( WIDTH * SIZE, CSIZE, NC )
             CALL CHR_APPND( 'A', CSIZE, NC )
             CALL CHR_APPND( CLEN, CSIZE, NC )
          END IF
