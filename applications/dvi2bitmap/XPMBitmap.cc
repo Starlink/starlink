@@ -40,7 +40,7 @@ void XPMBitmap::write (const string filename)
 	throw BitmapError ("can't open XPM file"+filename+" to write");
 
     size_t dotpos = filename.find_last_of('.');
-    size_t seppos = filename.find_last_of(path_separator);
+    size_t seppos = filename.find_last_of(FSPATH_SEP);
     if (seppos == string::npos) seppos = 0;
     if (dotpos == string::npos) dotpos = filename.length();
     string fnroot_str = "";

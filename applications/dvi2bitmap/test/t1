@@ -3,7 +3,8 @@ test $? = 0 || exit 1
 
 run=./t1.run
 
-echo "<"`uname -a`">" > t1.correct
+T=`uname -a`
+echo "<$T>" > t1.correct
 cat t1.master-correct >> t1.correct
 
 $run "uname -a"

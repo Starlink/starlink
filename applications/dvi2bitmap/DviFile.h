@@ -7,11 +7,12 @@
 #ifndef DVI_FILE_HEADER_READ
 #define DVI_FILE_HEADER_READ 1
 
-//#include <fstream>
 #include <string>
 #include <stack>
 #include <map>
-#include "dvi2bitmap.h"
+
+#include "Byte.h"
+#include "DviError.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
 #include "verbosity.h"

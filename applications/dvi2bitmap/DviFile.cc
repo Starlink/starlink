@@ -8,13 +8,6 @@
 #include <iostream>
 #include <assert.h>
 
-//#if HAVE_CSTD_INCLUDE
-//#include <cmath>
-//#else
-//#include <math.h>
-//#endif
-
-
 
 #include "DviFile.h"
 #include "PkFont.h"

@@ -18,17 +18,26 @@ AC_CONFIG_AUX_DIR(config)
 
 dnl   Checks for programs.
 AC_PROG_CXX
+AC_PROG_RANLIB
 
 dnl   use C++ to compile test programs
 AC_LANG_CPLUSPLUS
 
 dnl   Does -MM option work?
-AC_MSG_CHECKING(whether ${CXX} -MM works)
+AC_MSG_CHECKING(whether ${CXX} -MM does the Right Thing)
 AC_SUBST(CXXMM)
-echo "void f(){}" >conftest.cc
-if AC_TRY_COMMAND([${CXX} -MM conftest.cc >/dev/null 2>&1]); then
-  CXXMM=-MM
-  AC_MSG_RESULT(yes)
+cat <<EOD >conftest.cc
+#include <stdio.h>
+#include "DviError.h"
+void f(){}
+EOD
+if AC_TRY_COMMAND([${CXX} -MM conftest.cc >conftest.Mout 2>&1]); then
+  if grep 'stdio.h' conftest.Mout >/dev/null 2>&1; then
+    AC_MSG_RESULT([nearly, but not nearly enough])
+  else
+    CXXMM=-MM
+    AC_MSG_RESULT(yes)
+  fi
 else
   AC_MSG_RESULT(no)
 fi
@@ -306,5 +315,5 @@ dnl   but it seems that Compaq's cxx compiler accepts -MM as
 dnl   equivalent to -M, and generates the full set of dependencies,
 dnl   taking as long to do it as it does to compile the source set).
 AC_MSG_CHECKING(dependencies (might take a while))
-make simpledeps_
+make deps_
 AC_MSG_RESULT(done)

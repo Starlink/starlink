@@ -15,14 +15,14 @@ PERLBIN=@PERL@
 
 all: test
 
-test: dvi2bitmap.tested regression
+test: regression pathtest
 
 regression:
 	PERLBIN=$(PERLBIN) ./runtests
 
-dvi2bitmap.tested: ../dvi2bitmap hello.dvi
+pathtest: ../dvi2bitmap hello.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi
-	touch dvi2bitmap.tested
+	touch pathtest
 
 magtest: ../dvi2bitmap magtest.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap magtest.dvi magtest-output
@@ -39,11 +39,19 @@ magtest.dvi: magtest.tex
 modetest.dvi: modetest.tex
 	latex modetest
 
-t1.run: t1.cc ../Util.o ../DviError.o
-	$(CXX) $(CXXFLAGS) -o $@ t1.cc ../Util.o ../DviError.o
 
-t2.run: t2.cc ../PkFont.o ../DviError.o
-	$(CXX) $(CXXFLAGS) -o $@ t2.cc ../PkFont.o ../DviError.o
+# These regression tests depend on a libdvi2bitmap.a from the source
+# directory.  That directory doesn't use it, but we need it here,
+# otherwise linking all the tests is too complicated to deal with happily.
+t1.run: t1.cc libdvi2bitmap.a
+	$(CXX) $(CXXFLAGS) -o $@ t1.cc -L.. -ldvi2bitmap
+
+t2.run: t2.cc libdvi2bitmap.a
+	$(CXX) $(CXXFLAGS) -o $@ t2.cc -L.. -ldvi2bitmap
+
+libdvi2bitmap.a:
+	cd ..; $(MAKE) libdvi2bitmap.a
+	cp ../libdvi2bitmap.a .
 
 dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
 	../dvi2bitmap -X >dvi2bitmap.test

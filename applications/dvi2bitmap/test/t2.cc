@@ -22,7 +22,7 @@ int main (int argc, char **argv)
     if (argc != 7)
     {
 	cerr << "Usage: " << argv[0]
-	     << "fmt mode fontname dpi basedpi magnification" << endl;
+	     << " fmt mode fontname dpi basedpi magnification" << endl;
 	exit (1);
     }
 

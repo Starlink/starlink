@@ -4,7 +4,6 @@
 //
 // $Id$
 
-#include "dvi2bitmap.h"
 
 #include <iostream>		// debug code writes to cerr
 #include <string>

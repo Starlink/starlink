@@ -16,7 +16,6 @@ static const char RCSID[] =
 #include "config.h"
 #endif
 
-#include "dvi2bitmap.h"
 #include <vector>
 #include <iostream>
 #include <string>
@@ -512,17 +511,17 @@ int main (int argc, char **argv)
 		cout << "  libkpathsea: "
 		     << kpathsea::version_string() << endl;
 #endif
-#ifdef FONT_SEARCH_STRING
-		cout << "FONT_SEARCH_STRING   " << FONT_SEARCH_STRING << endl;
-#endif
 #ifdef DEFAULT_TEXMFCNF
 		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << endl;
 #endif
 #ifdef FAKE_PROGNAME
 		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << endl;
 #endif
+#ifdef FONT_SEARCH_SCRIPT
+		cout << "FONT_SEARCH_SCRIPT   " << FONT_SEARCH_SCRIPT << endl;
+#endif
 
-#if defined(FONT_GEN_TEMPLATE)
+#ifdef FONT_GEN_TEMPLATE
 		cout << "FONT_GEN_TEMPLATE    " << FONT_GEN_TEMPLATE << endl;
 #else
 		cout << "Font generation disabled" << endl;
@@ -1118,7 +1117,7 @@ bool process_special (DviFile *dvif, string specialString,
 string get_ofn_pattern (string dviname)
 {
     // strip path and extension from filename
-    size_t string_index = dviname.rfind(path_separator);
+    size_t string_index = dviname.rfind(FSPATH_SEP);
     string dvirootname;
     //if (string_index < 0)
     if (string_index == string::npos)

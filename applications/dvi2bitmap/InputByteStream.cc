@@ -8,7 +8,6 @@
 #include "config.h"
 #endif
 
-#include "dvi2bitmap.h"
 #include "InputByteStream.h"
 
 #include <iostream>

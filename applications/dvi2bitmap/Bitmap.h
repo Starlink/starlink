@@ -7,7 +7,8 @@
 #ifndef BITMAP_HEADER_READ
 #define BITMAP_HEADER_READ 1
 
-#include "dvi2bitmap.h"
+#include "Byte.h"
+#include "DviError.h"
 #include "verbosity.h"
 
 class BitmapError : public DviError {

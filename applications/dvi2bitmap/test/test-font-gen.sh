@@ -100,7 +100,7 @@ else
 	echo "I will now try to generate the fonts required for the test file."
 	echo "This might be redundant, but it won't be wrong."
 	echo $preline
-	echo "% $d2bpath -Qg -n $infile -q ..."
+	echo "% $d2bpath -Qg -n $infile -q | sed -n '/^Qg/s/^Qg *//p' | sh"
 	$d2bpath -Qg -n $infile -q | \
 	    sed -n '/^Qg/s/^Qg *//p' | \
 	    sh

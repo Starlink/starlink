@@ -7,7 +7,6 @@
 #ifndef PNGBITMAP_HEADER_READ
 #define PNGBITMAP_HEADER_READ 1
 
-#include "dvi2bitmap.h"
 #include "BitmapImage.h"
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>

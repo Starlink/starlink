@@ -9,7 +9,8 @@
 
 #include <string>
 #include "InputByteStream.h"
-#include "dvi2bitmap.h"
+#include "Byte.h"
+#include "DviError.h"
 #include "verbosity.h"
 
 class PkFont;

@@ -8,7 +8,8 @@
 #define INPUT_BYTE_STREAM_HEADER_READ 1
 
 #include <string>
-#include "dvi2bitmap.h"
+#include "Byte.h"
+#include "DviError.h"
 #include "verbosity.h"
 
 class InputByteStreamError : public DviError {

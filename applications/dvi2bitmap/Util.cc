@@ -39,7 +39,6 @@ string Util::runCommandPipe (string cmd)
     bool firstline = true;
     while ((ich = fgetc (PIN)) != EOF)
     {
-	cerr << "ich=" << ich << endl;
 	if (firstline)
 	{
 	    const char ch = static_cast<char>(ich);
@@ -53,7 +52,7 @@ string Util::runCommandPipe (string cmd)
     resp << ends;		// terminate the string
 
     int exitval = pclose(PIN);
-        if (exitval == -1)
+    if (exitval == -1)
     {
 	// Couldn't exit cleanly
 	if (verbosity_ >= normal)

@@ -28,7 +28,6 @@ using std::system;
 #include <stdlib.h>		// for system()
 #endif
 
-//#include "dvi2bitmap.h"
 #include "DviError.h"
 #include "InputByteStream.h"
 #include "PkFont.h"

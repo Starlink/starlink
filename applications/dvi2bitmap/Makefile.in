@@ -17,19 +17,31 @@ LIBS=-lm @LIBS@
 KPATHSEA_OBJ=@KPATHSEAOBJ@
 PNG_OBJ=@PNGOBJ@
 GIF_OBJ=@GIFOBJ@
+RANLIB=@RANLIB@
 
 EXEC=dvi2bitmap
-OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
+OBJS=DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o Util.o DviError.o \
 	$(KPATHSEA_OBJ) $(PNG_OBJ) $(GIF_OBJ)
+
+D2BLIB=libdvi2bitmap.a
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
 
-$(EXEC): $(OBJS)
-	$(CXX) $(OBJS) $(LIBS) -o $@
+$(EXEC): dvi2bitmap.o $(OBJS)
+	$(CXX) dvi2bitmap.o $(OBJS) $(LIBS) -o $@
+
+# Make a library of all the (OBJS) files.  We don't use this in this
+# makefile (partly because it's not necessary, but mostly because I
+# want this to have a fighting chance of being portable to non-unix
+# boxes and I'm scared of libtool).  It's mostly for the benefit of
+# the regression tests in test/.
+$(D2BLIB): $(OBJS)
+	ar -r $@ $(OBJS)
+	$(RANLIB) $@
 
 # Distribution
 configure: config/configure.in
@@ -115,7 +127,7 @@ simpledeps_:
 # doesn't distinguish -M from -MM, and so takes aaaaages to do this.
 # Can I avoid this?
 deps_:
-	if test -z "$(CXXMM)"; then \
+	@ if test -z "$(CXXMM)"; then \
 		$(MAKE) simpledeps_; \
 	else \
 		for c in `echo $(OBJS) | sed 's/\.o/\.cc/g'`; do \

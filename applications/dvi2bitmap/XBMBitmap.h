@@ -7,7 +7,6 @@
 #ifndef XBMBITMAP_HEADER_READ
 #define XBMBITMAP_HEADER_READ 1
 
-#include "dvi2bitmap.h"
 #include "BitmapImage.h"
 
 class XBMBitmap : public BitmapImage {
