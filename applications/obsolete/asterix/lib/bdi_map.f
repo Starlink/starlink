@@ -26,7 +26,9 @@
 *     TYPE = CHARACTER*(*) (given)
 *        The type with whichthe mapping will be performed
 *     MODE = CHARACTER*(*) (given)
-*        The access mode for the items
+*        The access mode for the items. May also have an initialiser
+*        appended such as /ZERO or /BAD (or /TRUE or /FALSE for logical
+*        arrays) if the mode is write.
 *     PTRS[] = INTEGER (returned)
 *        The pointers to the mapped items
 *     STATUS = INTEGER (given and returned)
@@ -78,8 +80,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     13 Mar 1996 (DJA):
+*        Added initialiser option
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,18 +114,24 @@
         EXTERNAL		AST_QPKGI
 
 *  Local Variables:
+      CHARACTER*4               INIT                    ! Initialiser
       CHARACTER*20		LITEM			! Local item name
       CHARACTER*6               LMODE			! Local copy of mode
       CHARACTER*7 		LTYPE			! Local copy of type
 
       INTEGER			ARGS(5)			! Function args
-      INTEGER			C1, C2			! Character pointers
+      INTEGER			C1, C2, CP		! Character pointers
+      INTEGER			IDUM			! Dummy return from ADI
       INTEGER			IITEM			! Item counter
       INTEGER			LITL			! Used length of LITEM
       INTEGER			LSTAT			! Local status
       INTEGER			PSID			! Private item storage
       INTEGER			MCOUNT			! Object map count
+      INTEGER			NELM			! # mapped values
       INTEGER			OARG			! Return value
+      INTEGER			RVALS(2)		! Method return data
+
+      LOGICAL			INITP			! Initialiser present?
 *.
 
 *  Check inherited global status.
@@ -143,6 +153,24 @@
 *  Fifth is the mapping mode
       LMODE = MODE
       CALL CHR_UCASE( LMODE )
+
+*  Look for the initialiser
+      CP = INDEX( LMODE, '/' )
+      IF ( CP .EQ. 0 ) THEN
+        INITP = .FALSE.
+      ELSE
+        INITP = .TRUE.
+        INIT = LMODE(CP+1:)
+        LMODE = LMODE(:CP-1)
+        IF ( LMODE(1:1) .NE. 'W' ) THEN
+          CALL MSG_SETC( 'I', INIT )
+          CALL MSG_SETC( 'M', LMODE )
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Illegal initialiser present; cannot be '/
+     :                  /'used in ^M mode', STATUS )
+        END IF
+
+      END IF
       CALL ADI_NEWV0C( LMODE, ARGS(5), STATUS )
 
 *  Loop over items while more of them and status is ok
@@ -176,10 +204,46 @@
 *      Invoke the function
           CALL ADI_FEXEC( 'FileItemMap', 5, ARGS, OARG, STATUS )
 
-*      Extract pointer from return value
+*      Success?
           IF ( (STATUS .EQ. SAI__OK) .AND. (OARG.NE.ADI__NULLID) ) THEN
-            CALL ADI_GET0I( OARG, PTRS(IITEM), STATUS )
+
+*        Extract pointer & number of elements from return value
+            CALL ADI_GET1I( OARG, 2, RVALS, IDUM, STATUS )
+            PTRS(IITEM) = RVALS(1)
+            NELM = RVALS(2)
             CALL ADI_ERASE( OARG, STATUS )
+
+*        Initialise?
+            IF ( INITP .AND. (LMODE(1:1) .EQ. 'W') ) THEN
+
+*          Switch on data type
+              IF ( LTYPE .EQ. 'REAL' ) THEN
+                CALL BDI0_INITR( INIT, NELM, %VAL(PTRS(IITEM)), STATUS )
+              ELSE IF ( LTYPE .EQ. 'DOUBLE' ) THEN
+                CALL BDI0_INITD( INIT, NELM, %VAL(PTRS(IITEM)), STATUS )
+              ELSE IF ( LTYPE .EQ. 'INTEGER' ) THEN
+                CALL BDI0_INITI( INIT, NELM, %VAL(PTRS(IITEM)), STATUS )
+              ELSE IF ( LTYPE .EQ. 'LOGICAL' ) THEN
+                CALL BDI0_INITL( INIT, NELM, %VAL(PTRS(IITEM)), STATUS )
+              ELSE IF ( LTYPE .EQ. 'BYTE' ) THEN
+                CALL BDI0_INITB( INIT, NELM, %VAL(PTRS(IITEM)), STATUS )
+              ELSE IF ( LTYPE .EQ. 'UBYTE' ) THEN
+                CALL BDI0_INITUB( INIT, NELM, %VAL(PTRS(IITEM)),
+     :                            STATUS )
+              ELSE IF ( LTYPE .EQ. 'WORD' ) THEN
+                CALL BDI0_INITW( INIT, NELM, %VAL(PTRS(IITEM)), STATUS )
+              ELSE IF ( LTYPE .EQ. 'UWORD' ) THEN
+                CALL BDI0_INITUW( INIT, NELM, %VAL(PTRS(IITEM)),
+     :                            STATUS )
+              ELSE
+                CALL MSG_SETC( 'T', TYPE )
+                STATUS = SAI__ERROR
+                CALL ERR_REP( ' ', 'WRITE mode initialisation is not'/
+     :                             /' supported for type ^T', STATUS )
+              END IF
+            END IF
+
+*      Mapping failed
           ELSE IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
             LSTAT = SAI__OK

@@ -82,8 +82,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     13 Mar 1996 (DJA):
+*        Added number of elements to return value
 *     {enter_changes_here}
 
 *  Bugs:
@@ -120,6 +122,7 @@
       INTEGER			NELM			! # mapped items
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address
+      INTEGER			RVAL(2)			! Returned data
       INTEGER			WBPTR			! WriteBack procedure
 *.
 
@@ -184,8 +187,11 @@
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )
 
-*    If mapping went ok, store the pointer in the return argument
-        CALL ADI_NEWV0I( PTR, OARG, STATUS )
+*    If mapping went ok, store the pointer & number of elements in
+*    the return argument
+        RVAL(1) = PTR
+        RVAL(2) = NELM
+        CALL ADI_NEWV1I( 2, RVAL, OARG, STATUS )
 
 *    Release the object if defined
         IF ( CLOC .NE. DAT__NOLOC ) THEN
