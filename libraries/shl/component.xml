@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="hlps">
+  <version>1.0-1</version>
+  <path>libraries/hlps</path>
+  <description>HLPS -- High level support library for HLP</description>
+  <abstract><p>The Starlink HLP system allows an application program
+      to retrieve named items from a hierarchically-arranged library
+      of text.  The facility resembles VAX/VMS HELP.  It consists of a
+      library plus utility programs for creating, listing and reading
+      help libraries.</p>
+     <p>Since each application needs its own help system, it made little
+     sense to rewrite a help browser for each application independently.
+     Over the years Starlink applications have switched to using the
+     standard KAPPA help application code. Implemented by copying
+     the kappa files to each application in turn. Now that all the
+     applications are in a single location, the kappa help infrastructure
+     has been factored out into the HLPS library.</p>
+     <p>In addition to the KAPPA fortran infrastructure, a C implementation
+     of a help browser has also been integrated (from figaro) into
+     HLPS.</p>
+  </abstract>
+  <dependencies >
+    <build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
