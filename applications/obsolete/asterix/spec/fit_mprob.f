@@ -196,7 +196,7 @@
 *-
 
 *    Check status
-      IF ( STATUS .NE. SAI__OK  )RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Initialise for case of no quality
       GOOD = .TRUE.
@@ -556,7 +556,7 @@
 *    Local variables :
 *
       DOUBLE PRECISION		DI
-      DOUBLE PRECISION		FAC			! Cumulative factorial
+      DOUBLE PRECISION		LFAC,FAC		! Cumulative factorial
       DOUBLE PRECISION		LDF(0:MAXFAC)		! Store log(d!) values
         SAVE			LDF
 
@@ -600,9 +600,12 @@
 *    Otherwise calculate it
       ELSE
 
-        DI = DBLE(I)
-        FIT_MPROB_LDF = DI * LOG(DI) - DI +
-     :                  0.5D0*LOG(2.0D0*MATH__DPI*DI)
+        LFAC = LDF(MAXFAC)
+        DO I = MAXFAC + 1, D
+          FAC = LFAC + LOG(DBLE(I))
+          LFAC = FAC
+        END DO
+        FIT_MPROB_LDF = FAC
 
       END IF
 

@@ -354,7 +354,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
-      INCLUDE 'AST_SYS_PAR'
 *    Include files
       INCLUDE 'XRTLIB(INC_XRTHEAD)'
 *    Parameters :
@@ -372,10 +371,8 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 	print *,'opening header file',rtname(1:chr_len(rtname))//'_hdr'
-	read(*,*) dummy
       CALL HDS_OPEN(RTNAME(1:CHR_LEN(RTNAME))//'_hdr','READ',LOC,STATUS)
 	print *,'getting header',status
-	read(*,*) dummy
       CALL RAT_GETHEAD(LOC, 'HEAD', HEAD, STATUS)
       CALL HDS_CLOSE(LOC, STATUS)
 
@@ -515,6 +512,7 @@
       INTEGER STATUS
 *    Local constants :
 *    Local variables :
+      character*(dat__szloc) dloc,cloc,hloc
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
       INTEGER DUMMY			! Value not used
       character*(DAT__SZNAM) name
@@ -525,19 +523,18 @@
 
         call dat_valid(loc,valid,status)
         print *,valid
-	read(*,*) dummy
 
 	print *,'finding ',object
-	read(*,*) dummy
         call dat_name(loc,name,status)
         print *,name
-	read(*,*) dummy
         call dat_struc(loc,valid,status)
         print *,valid
-	read(*,*) dummy
-        call dat_there(loc,'head',valid,status)
+        call dat_ncomp(loc,dummy,status)
+	print *,dummy
+        call dat_clone(loc,cloc,status)
+        call dat_there(cloc,'head',valid,status)
         print *,valid
-        call dat_find(loc,'head',aloc,status)
+        call dat_find(cloc,'head',aloc,status)
 c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
 	print *,1
