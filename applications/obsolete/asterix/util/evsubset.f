@@ -160,7 +160,7 @@
       END DO
 
 *    Associate input & output datasets
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', INPL, OUTL, STATUS )
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       CALL ADI1_GETLOC( IFID, INPL, STATUS )
       CALL ADI1_GETLOC( OFID, OUTL, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
