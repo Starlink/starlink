@@ -1032,7 +1032,7 @@ file extension stored in the standard Starlink NDF data format.
 
 <component id="period">
   <version>5.0-3</version>
-  <path>applications/obosolete/period</path>
+  <path>applications/oboslete/period</path>
   <description>PERIOD - A Time-series analysis package</description>
   <abstract><p>
 A software package designed to search for periodicities in data.
@@ -1432,7 +1432,7 @@ UNIX).
 
 <component id="tsp">
   <version>2.3-3</version>
-  <path>applications/kappa</path>
+  <path>applications/tsp</path>
   <description>TSP - Time Series/Polarimetry Package</description>
   <abstract><p>
 TSP is an astronomical data reduction package which handles time series

@@ -1280,7 +1280,7 @@ $(MANIFEST)/period: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
-	cd applications/obosolete/period \
+	cd applications/oboslete/period \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/pgp: \
@@ -1668,7 +1668,7 @@ $(MANIFEST)/tsp: \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
-	cd applications/kappa \
+	cd applications/tsp \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/xdisplay: \
