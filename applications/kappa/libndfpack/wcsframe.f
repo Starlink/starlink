@@ -40,8 +40,9 @@
 *        than 1984.0 and as a Julian epoch otherwise. 
 *     FRAME = LITERAL (Read)
 *        A string specifying the new co-ordinate Frame. If a null parameter 
-*        value is supplied, then the current Frame is left unchanged. The 
-*        string can be one of the following:
+*        value is supplied, then the current Frame is left unchanged. The
+*        suggested default is the Domain (or index if the Domain is not
+*        set) of the current Frame. The string can be one of the following:
 *
 *        - A domain name such as SKY, AXIS, PIXEL, etc. The two
 *        "pseudo-domains" WORLD and DATA may be supplied and will be
@@ -115,11 +116,16 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_PAR'          ! PAR constants 
+      INCLUDE 'AST_PAR'          ! AST constants 
 
 *  Status:
       INTEGER STATUS
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
+      CHARACTER DEF*50           ! Dynamic default value for FRAME
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST pointer for WCS FrameSet
       INTEGER STATE              ! Indicates state of FRAME parameter
@@ -149,6 +155,15 @@
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Choose the dynamic default for the FRAME parameter. This is the Domain of 
+*  the current Frame if not blank, and the current Frame index otherwise.
+      DEF = AST_GETC( IWCS, 'DOMAIN', STATUS )
+      IF( CHR_LEN( DEF ) .EQ. 0 ) DEF = AST_GETC( IWCS, 'CURRENT', 
+     :                                            STATUS )
+
+*  Set the dynamic default for the FRAME parameter.
+      CALL PAR_DEF0C( 'FRAME', DEF, STATUS )
 
 *  Set the new Current Frame using parameter FRAME. If "WORLD" co-ordinates
 *  are requested, use PIXEL. If "DATA" co-ordinates are requested, use
