@@ -1,4 +1,7 @@
+
 2004-12-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	---- RELEASE v0.03 to CPAN ----
 
 	* AST.xs: Add Region support (including Box, Circle and Ellipse)
 	
