@@ -28,6 +28,9 @@ aclocal_DATA = starconf.m4
 # could legitimately be done at configure time -- it does not have to
 # be done this late -- but that would require us to have more than one
 # substitution step, which would be too confusing and messy.
+#
+# (note, by the way, that we escape _both_ @-signs in these substitutions;
+# this is Perl, not the usual sed!)
 edit = @PERL@ -p \
 	-e 's,\@bindir\@,$(bindir),g;' \
 	-e 's,\@pkgdatadir\@,$(pkgdatadir),g;' \
@@ -38,6 +41,7 @@ edit = @PERL@ -p \
 	-e 's,\@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g;' \
 	-e 's,\@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g;'\
 	-e 's,\@aclocaldir\@,$(aclocaldir),g;' \
+	-e 's,\@JAVA\@,@JAVA@,g;' \
 	-e '/^XXXINCLUDE *(\S*)/ && do { open (F, "<$$1") || die "Unable to open $$1"; while(<F>) { print; } close (F); };'
 starconf: starconf.in bootstrap.installed config.status
 	rm -f starconf starconf.tmp
