@@ -243,6 +243,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -260,6 +261,10 @@
 *     18-SEP-1996 (PDRAPER):
 *        Changed error function call to use PDA_DERF instead
 *        of NAG routine S15AEF.
+*     12-JAN-1998 (DSB):
+*        Add checks that STATUS is SAI__OK before reporting new errors.
+*        Add cast to REAL when passing DOUBLE PRECISION variables to
+*        MSG_SETR.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -465,8 +470,9 @@
 
 *  If there are insufficient usable data values to obtain a fit, then
 *  report an error.
-         IF ( NPTS .LT. NPAR ) THEN
+         IF ( NPTS .LT. NPAR .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
+
             IF ( GETS .AND. GETZ ) THEN
                CALL MSG_SETC( 'PAR', 'scale factor and zero point' )
             ELSE IF ( GETS ) THEN
@@ -474,6 +480,7 @@
             ELSE IF ( GETZ ) THEN
                CALL MSG_SETC( 'PAR', 'zero point' )
             END IF
+
             IF ( NPTS .EQ. 0 ) THEN
                CALL ERR_REP( 'CCD1_CMPRR_0',
      :                       'No good data values available; cannot ' //
@@ -764,10 +771,10 @@
 
 *  If the scale factor estimate did not converge, then make an error
 *  report.
-            IF ( GETS .AND.
+            IF ( STATUS .EQ. SAI__OK .AND. GETS .AND.
      :           ( ABS( SS ) .GT. ABS( TOLS * SCALE ) ) ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETR( 'TOLS', ABS( TOLS * SCALE ) )
+               CALL MSG_SETR( 'TOLS', REAL( ABS( TOLS * SCALE ) ) )
                CALL MSG_SETI( 'MAXIT', MAX( MAXIT, 1 ) )
                CALL MSG_SETR( 'DS', SS )
                CALL ERR_REP( 'CCD1_CMPRR_DS',
@@ -779,10 +786,10 @@
             END IF
 
 *  If the zero point estimate did not converge, make a similar report.
-            IF ( GETZ .AND.
+            IF ( STATUS .EQ. SAI__OK .AND. GETZ .AND.
      :           ( ABS( ZZ ) .GT. ABS( TOLZ * SCALE ) ) ) THEN
                STATUS = SAI__ERROR
-               CALL MSG_SETR( 'TOLZ', ABS( TOLZ * SCALE ) )
+               CALL MSG_SETR( 'TOLZ', REAL( ABS( TOLZ * SCALE ) ) )
                CALL MSG_SETI( 'MAXIT', MAX( MAXIT, 1 ) )
                CALL MSG_SETR( 'DZ', ZZ )
                CALL ERR_REP( 'CCD1_CMPRR_DZ',

@@ -75,7 +75,7 @@ interface POLCAL
       access   READ
       vpath    'CURRENT, DEFAULT'
       ppath    'CURRENT, DEFAULT'
-      default  3
+      default  30
       prompt   'Maximum number of interations during image inter-comparisons'
       helpkey  '*'
    endparameter

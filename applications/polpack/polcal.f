@@ -90,7 +90,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
-c      INCLUDE 'DAT_PAR'          ! ONLY TEMPORARY FOR TSP
+      INCLUDE 'DAT_PAR'          ! HDS constants
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -166,6 +166,10 @@ c      INCLUDE 'DAT_PAR'          ! ONLY TEMPORARY FOR TSP
                                  ! NDF data type
       CHARACTER * ( 10 ) ID( 4, MAXSET )
                                  ! Image ID string
+      CHARACTER * ( 40 ) TITLE   ! Title for output NDF
+      CHARACTER * ( 40 ) LABEL   ! Label for output NDF
+      CHARACTER * ( 3 ) PLANES   ! Quantities stored in output planes
+      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator for output POLPACK extension
       
       LOGICAL DESCOK             ! Image descriptors OK?
       LOGICAL VAR                ! Variance information present and
@@ -262,14 +266,29 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  (corresponding to Ordinary and Extraordinary rays). The IMGID should
 *  simply be a non-null character identifier.
          IF ( STATUS .EQ. SAI__OK ) THEN
+
             DO IPOS = 1, NPOS
                IF ( WPLATE( IVAL ) .EQ. WPREF( IPOS ) ) THEN
                   DESCOK = .TRUE.
                ENDIF
             ENDDO
-            DESCOK = DESCOK .AND. ( RAY( IVAL ) .EQ. 'O' .OR.
-     :               RAY( IVAL ) .EQ. 'E' ) .AND. IMGID( IVAL )
-     :               .NE. ' '
+
+            IF( .NOT. DESCOK ) THEN
+               CALL MSG_SETC( 'I', 'WPLATE' )
+               CALL MSG_SETR( 'V', WPLATE( IVAL ) )
+
+            ELSE IF( RAY( IVAL ) .NE. 'O' .AND. 
+     :               RAY( IVAL ) .NE. 'E' ) THEN
+               DESCOK = .FALSE.
+               CALL MSG_SETC( 'I', 'RAY' )
+               CALL MSG_SETC( 'V', RAY( IVAL ) )
+
+            ELSE IF( IMGID( IVAL ) .EQ. ' ' ) THEN
+               DESCOK = .FALSE.
+               CALL MSG_SETC( 'I', 'IMGID' )
+               CALL MSG_SETC( 'V', ' ' )
+
+            END IF
 
 *  If this image has valid descriptors then add it to the list of
 *  validated images and increment the number of valid images.
@@ -281,9 +300,9 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  continue looking for other valid images.
             ELSE
                CALL NDF_MSG( 'NDF', NDFIN( I ) )
-               CALL MSG_OUT( ' ', 'POLCAL: The POLPACK extension in '//
-     :                       '''^NDF'' contains invalid values.', 
-     :                       STATUS )
+               CALL MSG_OUT( ' ', 'POLCAL: The POLPACK extension item'//
+     :                       ' ^I does not exist in ''^NDF''or has '//
+     :                       'the illegal value ''^V''.', STATUS )
             ENDIF
 
 *  If an error occured whilst obtaining the descriptors, then notify the
@@ -306,26 +325,45 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
          GO TO 99
       ENDIF
 
+*  Check the status value so that we can be sure that any error condition
+*  detected after the next subroutine call was generated within the
+*  called subroutine.
+      IF( STATUS .NE. SAI__OK ) GO TO 99
+
 *  See if the user wants variance information to be propagated through
 *  to the output data.
       CALL PAR_GET0L( 'VARIANCE', VAR, STATUS )
 
-*  If the user does want variance information to be propagated then
-*  check that variances are present in the input data. All input images
+*  Set a flag and annull the error if a null value was supplied for
+*  VARIANCE. In this case we assume .TRUE. for VAR if all the inputs
+*  have VARIANCE components, and .FALSE. otherwise.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         GOTVAR = .FALSE.
+      ELSE
+         GOTVAR = .TRUE.
+      END IF         
+
+*  If the user wants variance information to be propagated (if possible) then
+*  see if variances are present in the input data. All input images
 *  must have variance information for it to be propagated. If this is
-*  not the case then warn the user.
-      IF ( VAR ) THEN
+*  not the case then warn the user if an explicit requested to propagate
+*  variances was made.
+      IF ( VAR .AND. GOTVAR .OR. .NOT. GOTVAR ) THEN
+
          CALL NDF_STATE( NDFVAL( 1 ), 'VARIANCE', VAR, STATUS )
          DO IVAL = 2, NVAL
             IF ( VAR ) CALL NDF_STATE( NDFVAL( IVAL ), 'VARIANCE', VAR,
      :                                 STATUS )
          ENDDO
-         IF ( .NOT. VAR ) THEN
+
+         IF ( .NOT. VAR .AND. GOTVAR ) THEN
             CALL MSG_OUT( ' ', 'POLCAL: VARIANCE information was ' //
      :           'requested in the output. However, not all of the ' //
      :           'input images have VARIANCES so NO output VARIANCE ' //
      :           'can be calculated.', STATUS )
          ENDIF
+
       ENDIF
 
 *  Get the parmeter values for image intercomparisons.
@@ -650,14 +688,29 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       LBND( 3 ) = 1
       IF ( MODE .EQ. 'LINEAR' ) THEN
          UBND( 3 ) = 3
+         TITLE = 'Output from POLPACK: Linear polarimetry',
+         LABEL = 'Stokes parameters (I, Q, U)'
+         PLANES = 'IQU'
       ELSE
          UBND( 3 ) = 2
+         TITLE = 'Output from POLPACK: Circular polarimetry',
+         LABEL = 'Stokes parameters (I, V)'
+         PLANES = 'IV'
       ENDIF
       CALL NDF_CREAT( 'OUT', '_REAL', 3, LBND, UBND, NDFOUT, STATUS )
 
-* Set the TITLE component for the output.
-      CALL NDF_CPUT( 'Output from POLPACK: '//MODE//' Polarimetry',
-     :     NDFOUT, 'TITLE', STATUS )
+*  Set the TITLE component for the output.
+      CALL NDF_CPUT( TITLE, NDFOUT, 'TITLE', STATUS )
+
+*  Set the LABEL component for the output.
+      CALL NDF_CPUT( LABEL, NDFOUT, 'LABEL', STATUS )
+
+*  Create a POLPACK extension containing a character array identifying the
+*  quantities stored in each plane of the DATA array.
+      CALL NDF_XNEW( NDFOUT, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
+      CALL NDF_XPT0C( PLANES( : CHR_LEN( PLANES ) ), NDFOUT, 'POLPACK',
+     :                'STOKES', STATUS ) 
+      CALL DAT__ANNUL( XLOC, STATUS )         
 
 * Map the output DATA array and if necessary, the VARIANCE array.
       CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE/BAD', IPDOUT, NOUT,

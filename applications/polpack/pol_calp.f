@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     CALL POL_CALP(  NEL, NSET, NPOS, NPAIR, IPDCOR, IPVCOR,
-*     :                NSTATE, VAR, IEST, VIEST, QEST, VQEST, UEST,
-*     :                VUEST, WEIGHT, OUT, VOUT, STATUS )
+*    :                NSTATE, VAR, IEST, VIEST, QEST, VQEST, UEST,
+*    :                VUEST, WEIGHT, OUT, VOUT, STATUS )
 
 *  Description:
 *     This routine will calculate estimates of the I, Q, and U Stokes
