@@ -81,10 +81,12 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (RB)
 *
 *    History :
 *
 *     11 Mar 91 : Original (DJA)
+*     14 Mar 97 : Sort out duff NAG calls (RB)
 *
 *    Type definitions :
 *

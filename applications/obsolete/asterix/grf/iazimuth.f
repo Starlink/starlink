@@ -12,6 +12,7 @@
 *     25 Jan 93: V1.7-0 GCB,GFX etc used (RJV)
 *      1 Jul 93: V1.7-1 GTR used (RJV)
 *     16 Aug 93: V1.7-2 Check status after USI_GETs to stop crash (DJA)
+*     14 Mar 97: V2.1-0 GUI version (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -31,6 +32,7 @@
       PARAMETER (DTOR=TWOPI/360.0)
 *    Local variables :
       CHARACTER*1 CH
+      CHARACTER*12 OPT
       INTEGER WPNTR
       REAL XC,YC,PXC,PYC
       REAL XR,YR,PXR,PYR,RAD,PRAD
@@ -38,6 +40,7 @@
       INTEGER FLAG
       INTEGER NBIN
       INTEGER I
+      LOGICAL PLOT
       DOUBLE PRECISION UNITFACT          ! Conversion factor between
 *                                        ! pixel and square axis unit
 *    Version :
@@ -53,6 +56,21 @@
       ELSEIF (.NOT.I_DISP) THEN
         CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
+
+*  if run from GUI - is plot required
+        IF (I_GUI) THEN
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+*  GUI is plotting externally - so no plot here
+          IF (OPT(1:1).EQ.'E') THEN
+            PLOT=.FALSE.
+          ELSE
+            PLOT=.TRUE.
+          ENDIF
+
+        ELSE
+          PLOT=.TRUE.
+        ENDIF
+
 
 *  ensure transformations are correct
         CALL GTR_RESTORE(STATUS)
@@ -199,16 +217,21 @@
         CALL ARR_RANG1R(I_N_1D,%VAL(I_DPTR_1D),I_Y1_1D,I_Y2_1D,STATUS)
         I_Y2_1D=I_Y2_1D+0.1*(I_Y2_1D-I_Y1_1D)
 
-*  go to new zone and plot
-        CALL GDV_CLEAR(STATUS)
-        CALL IMG_PLOT(STATUS)
+        CALL GCB_CACHE(I_CACHE_1D,STATUS)
+
+        IF (PLOT) THEN
+          CALL GDV_CLEAR(STATUS)
+          CALL IMG_PLOT(STATUS)
 
 *  flag current plotting status
-        I_DISP=.FALSE.
-        I_DISP_1D=.TRUE.
-        I_CLEAR=.FALSE.
+          I_DISP_1D=.TRUE.
+          I_DISP=.FALSE.
+          I_CLEAR=.FALSE.
+        ELSE
+*  if not plotting then resynchronise GCBs
+          CALL IMG_2DGCB(STATUS)
+        ENDIF
 
-        CALL GCB_CACHE(I_CACHE_1D,STATUS)
 
  99     CONTINUE
 
