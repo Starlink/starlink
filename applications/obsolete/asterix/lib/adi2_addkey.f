@@ -71,11 +71,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
+*     30 Apr 1997 (RB):
+*        Make sure each card is marked as unwritten.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -138,9 +141,10 @@
 *  Release the card
       CALL ADI_ERASE( CID, STATUS )
 
-*  Mark HDU as modified
+*  Mark HDU as modified (and the card as unwritten - RB)
       IF ( FC .EQ. 1 ) THEN
         CALL ADI_CPUT0L( HDUID, 'Modified', .TRUE., STATUS )
+        CALL ADI_CPUT0L( CID, 'Written', .FALSE., STATUS )
       END IF
 
 *  Report any errors
