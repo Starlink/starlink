@@ -56,7 +56,7 @@ dvi2bitmap.mantext: dvi2bitmap.1
 dvi2bitmap_source.tar: configure dvi2bitmap.mantext
 	tar cf $@ *.cc *.h Makefile.in config.h.in README \
 			configure config/config* config/install-sh \
-			extras \
+			extras test \
 			dvi2bitmap.1 dvi2bitmap.mantext LICENCE
 
 #  In Makefile.starlink, dvi2bitmap_doc.tar is listed as a SOURCE file, so
