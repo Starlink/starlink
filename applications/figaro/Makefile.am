@@ -8,5 +8,11 @@ demo_specdre.icl demo_twodspec.icl twodspec.icl twodspec.csh
 ## Should really call this FIG_DYNAMIC_MEMORY
 include_HEADERS = include/DYNAMIC_MEMORY 
 
+# Define the help source file.
+starhelp_DATA = figaro.shl
+
+.hlp.shl:
+	@HLIB@ $<
+
 ## News files
 dist_pkgdata_DATA = figaro.news
