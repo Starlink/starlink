@@ -36,9 +36,13 @@
 *     in the first place).
 *
 *     Some attention is paid to the aesthetic qualities of the output:
-*     line breaks are done, where possible, following the usage in, e.g.,
-*     KAPPA.  An attempt is made copy the style of case usage from the 
+*     line breaks are made, where possible, following the usage in, e.g.,
+*     KAPPA.  An attempt is made to copy the style of case usage from the 
 *     input.
+*
+*     No changes are made to comment lines so that, for instance, the 
+*     Arguments stanza of subroutine prologues will not have argument
+*     types modified from 'INTEGER' to 'INTEGER * 8'.
 *
 *     The program will write a warning on standard error for certain 
 *     constructions in the code which are likely to cause trouble after
@@ -49,10 +53,8 @@
 *        - EQUIVALENCE statements
 *        - Use of INTEGER Specific names for standard intrinsic functions
 *          (IABS, ISIGN, IDIM, MAX0, AMAX0, MIN0, IMIN0)
-*        - Literal integer constants used as actual arguments in function
-*          or subroutine calls.  A function call is identified as such
-*          (rather than an array reference) if its name contains an 
-*          underscore - obviously, this might lead to mistakes.
+*        - Any module (SUBROUTINE, FUNCTION or BLOCK DATA) which does not
+*          include an IMPLICIT NONE statement.
 *
 *  Bugs:
 *     In some cases, the line breaks are not made in very beautiful places.
@@ -201,6 +203,8 @@
       int done;
       int fixedint = 0;
       int i;
+      int implicitnone = 0;
+      int itok;
       int j;
       int k;
       int leng;
@@ -215,6 +219,7 @@
       int tok;
       char c;
       char incbuf[ 160 ] = "";
+      char modname[ 160 ] = "";
       char *pc;
       char *qc;
       struct tokitem *pctok;
@@ -340,7 +345,7 @@
    the right type. */
          else if ( t1 == INTEGER_CONSTANT ) {
             int sign = 1;
-            int itok = i + 1;
+            itok = i + 1;
 
 /* Get the token preceding the constant, and any unary sign; and the token
    following it. */
@@ -396,14 +401,14 @@
                      for ( j = pctok - tbuf + 1;  
                            tbuf[ j ].tokval != LINE_START && j >= 0; j-- );
                      col1 = 1;
-                     for ( ; j <= pctok - tbuf; j++ ) {
+                     for ( ; j <= pctok - tbuf + 1; j++ ) {
                         for ( pc = tbuf[ j ].string; c = *pc; pc++ )
                            col1 = colchar( col1, c );
                      }
                      if ( col1 + strlen( fmt ) - 3 + lastcol - col2 > 72 )
                         indent = 9;
                      else
-                        indent = col1 + 1;
+                        indent = col1;
                   }
 
 /* Reconstruct the integer token with the new text. */
@@ -441,19 +446,34 @@
          }
 
 /* Integer specific intrinsic function call - generate a warning. */
-         else if ( ( t == IABS || t == ISIGN || t == IDIM || t == MAX0 ||
-                t == AMAX0 || t == MIN0 || t == AMIN0 ) && t1 == '(' ) {
+         else if ( t == IABS || t == ISIGN || t == IDIM || t == MAX0 ||
+                   t == AMAX0 || t == MIN0 || t == AMIN0 ) {
             fprintf( stderr, "%s: INTEGER-specific intrinsic name %s\n",
                             name, tbuf[ i ].strmat );
          }
 
-/* Include line - mark it for interpolating our own includes afterwards. */
-         else if ( i > 2 && tbuf[ i ].tokval == LINE_END
-                         && tbuf[ i - 1 ].tokval == STRING_CONSTANT
-                         && tbuf[ i - 2 ].tokval == INCLUDE
-                         && tbuf[ i - 3 ].tokval == LINE_START ) {
+/* Start of module - record the name. */
+         else if ( ( t == FUNCTION || t == SUBROUTINE || t == BLOCKDATA ) 
+                 && ( t1 == IDENTIFIER ) ) {
+            strcpy( modname, tbuf[ i + 1 ].strmat );
+         }
+
+/* IMPLICIT NONE statement - record that it has occurred. */
+         else if ( t == IMPLICITNONE ) {
+            implicitnone = 1;
+         }
+
+/* Include line - mark it for interpolating our own includes afterwards. 
+   If we've already done this for the current module, don't do it again -
+   this way the new include line is interpolated after the first existing
+   one, which is (slightly) more likely to be where it should be. */
+         else if ( ( itok = i - 2 ) > 0 
+                  && tbuf[ itok - 1 ].tokval == LINE_START
+                  && tbuf[ itok + 0 ].tokval == INCLUDE
+                  && tbuf[ itok + 1 ].tokval == STRING_CONSTANT
+                  && tbuf[ itok + 2 ].tokval == LINE_END 
+                  && ! *incbuf ) {
             int spc;
-            int itok = i - 2;
             qc = incbuf;
             for ( pc = tbuf[ itok - 1 ].string; *pc; pc++ ) *(qc++) = *pc;
             for ( pc = tbuf[ itok ].string; *pc; pc++ ) *(qc++) = *pc;
@@ -465,15 +485,19 @@
                    + strchr( tbuf[ itok + 2 ].string, '!' ) 
                    - tbuf[ itok + 2 ].string;
                while ( spc-- ) *(qc++) = ' ';
-               for ( pc = "! For large integer type constants\n"; *pc; pc++ )
+               for ( pc = "! For large integer type constants"; *pc; pc++ )
                    *(qc++) = *pc;
             }
-            *(qc) = '\0';
+            *(qc++) = '\n';
+            *(qc++) = '\0';
             outmark( incbuf );
          }
 
-/* End line - flush character buffer. */
+/* End of module - tidy up. */
          if ( ( t == END && t1 == LINE_END ) || i == leng - 1 ) {
+
+/* Try to make sure "INCLUDE 'EXT_PAR'" will be inserted, or not inserted,
+   as appropriate, and warn if this is not possible. */
             if ( fixedint ) {
                if ( ! *incbuf )
                   fprintf( stderr, "%s: Nowhere to INCLUDE 'EXT_PAR'\n", name );
@@ -481,6 +505,16 @@
             else {
                *incbuf = '\0';
             }
+            
+/* Warn if we have not encountered an "IMPLICIT NONE" but should have done. */
+            if ( ! implicitnone && *modname ) {
+               fprintf( stderr, "%s: No IMPLICIT NONE in module %s\n", 
+                                name, modname );
+            }
+            *modname = '\0';
+            implicitnone = 0;
+
+/* Flush output buffer. */
             outwrite();
             *incbuf = '\0';
             fixedint = 0;
