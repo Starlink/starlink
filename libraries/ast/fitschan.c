@@ -30921,11 +30921,12 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *
 *     When writing a FrameSet out using FITS-CLASS encoding, the current
 *     Frame may be temporarily modified if this will allow the header
-*     to be produced. If this is done, the associated pixel->WCS Mapping will 
-*     also be modified to take account of the changes to the Frame. The
-*     modifications performed include re-ordering axes, changing spectral
-*     coordinate system and standard of rest, changing the celestial
-*     coordinate system and reference equinox, and changing axis units.
+*     to be produced. If this is done, the associated pixel->WCS Mapping
+*     will also be modified to take account of the changes to the Frame. 
+*     The modifications performed include re-ordering axes (WCS axes, not
+*     pixel axes), changing spectral coordinate system and standard of
+*     rest, changing the celestial coordinate system and reference equinox, 
+*     and changing axis units.
 
 *  The NATIVE Encoding:
 *     The NATIVE encoding may be used to store a description of any
