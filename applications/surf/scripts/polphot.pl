@@ -12,9 +12,34 @@
 # Needs READLINE and NDF
 
 use NDF;
+use Getopt::Long;
 use Term::ReadLine;
 
+#
+# command line arguments
+#
 
+my $status = GetOptions("sub=s","h","out=s");
+
+($opt_h) && do {
+print qq{
+pol [-h] [-s sub] [-out outfile] (file|number) integrations/waveplate 
+
+extract polarimetry information from photometry file
+
+ Args: 
+   -h: help
+   -s: sub-instrument (default 'lon')
+       This is the string that goes between  oNN_ and _pht
+       in the standard SURF naming convention
+       This option is ignored if a full filename is provided
+   -out: output filename (default is obsNN.dat)
+   file|number: The filename to be processed or the observation number
+       If a number is provided the filename is assumed to be oNN_SUB_pht.sdf
+
+};
+exit;
+};
 
 # Get the location of KAPPA
  
@@ -46,15 +71,33 @@ unless (defined $file) {
 
 $file =~ s/\.sdf//;
 
+# If file matches a number then assume we really mean
+# oNN_lon_pht
+
+if ($file =~ /^\d+/) {
+
+  # Need to check $sub
+  unless (defined $sub) {
+    $sub = "lon";
+    print "using default sub-instrument: lon\n";
+  }
+
+  $run_no = $file; # This is the run number
+
+  $file = "o${file}_${sub}_pht";
+}
+
+print "Reading from file $file\n";
+
 # Read in the integrations per wave plate
 
 $int_per_wp = shift;
 
 unless (defined $int_per_wp) {
-  $prompt = "How many integrations per waveplate position: ";
-  $int_per_wp = $term->readline($prompt);
-}
+  $int_per_wp = 4;
 
+}
+print "Using $int_per_wp integrations per waveplate\n";
 
 # Find out all the _peak NDFs in the input file
 
@@ -87,11 +130,25 @@ die "This is not a photometry output file\n" if $#names == -1;
 # Start up NDF
 ndf_begin;
 
+
+
 # Loop over each name
 foreach $name (@names) {
 
    # Read the header info
    ($hashref,$status) = fits_read_header("$file.$name");
+
+   # If $run_no is undefined we need to read it from the fits header
+   $run_no = $hashref->{RUN} unless (defined $run_no);
+
+   # Construct output file name if necessary
+   # and open the file
+   unless (defined $output_file) {
+     $output_file = "obs${run_no}.dat";
+     print "Output filename is $output_file\n";
+     open(OUT, "> $output_file") || die "Error could not open output file: $!";
+     select OUT;
+   }
 
   $name =~ /(.*)_PEAK/ & ($bol = $1);
 
@@ -113,12 +170,13 @@ foreach $name (@names) {
 
     # Now that I know the size print the second header line
     $nposplate = int($npix/$int_per_wp + 0.99);
+    $ncycle = int($nposplate/16.0);
 
     # Convert the time to hours
     (@times) = split(/:/,$$hashref{STSTART});
     $lst = $times[0] + ($times[1] / 60) + ($times[2] / 3600); 
 
-    print "$nposplate $int_per_wp $$hashref{MEANRA} $$hashref{MEANDEC} $lst\n";
+    print "$nposplate $ncycle $$hashref{MEANRA} $$hashref{MEANDEC} $lst\n";
 
     # Number of time round the loop depends on $npix
 
@@ -141,6 +199,9 @@ foreach $name (@names) {
 
 
 }
+
+# Close output file
+close(OUT);
 
 # Shut down NDF
 
