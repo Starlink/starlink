@@ -114,7 +114,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 500
+            default 1280
             prompt {Maximum X or Y dimension of scrolled display region}
             helpkey *
          }
