@@ -132,16 +132,15 @@
         EP = EP - 1
       END DO
       IF ( EP .GT. 0 ) THEN
-        DP = INDEX( FSPEC(EP:), '.' )
-        IF ( DP .GT. 0 ) THEN
-          DP = DP + EP - 1
-          IF ( CHR_SIMLR( FSPEC(DP+1:FLEN), 'sdf' ) ) THEN
-            DP = 0
-            FLEN = FLEN - 4
-          END IF
-        END IF
+        DP = INDEX( FSPEC(EP:), '.' ) + EP - 1
       ELSE
         DP = INDEX( FSPEC, '.' )
+      END IF
+      IF ( DP .GT. EP ) THEN
+        IF ( CHR_SIMLR( FSPEC(DP+1:FLEN), 'sdf' ) ) THEN
+          DP = 0
+          FLEN = FLEN - 4
+        END IF
       END IF
 
 *    Simple HDS file name?
