@@ -1,7 +1,7 @@
       SUBROUTINE REDS_REDUCE_SWITCH (STATUS)
 *+  
 *  Name:
-*     REDS_REDUCE_SWITCH
+*     REDUCE_SWITCH
 
 *  Purpose:
 *     reduce the switch sequence for a SCUBA observation
@@ -68,7 +68,7 @@
 *        Finally, the IN and OUT files are closed and all virtual memory
 *     freed.
 
-*  Parameters:
+*  ADAM Parameters:
 *     IN = NDF (Read)
 *        The name of the demodulated data file.
 *     OUT = NDF (Read)
@@ -82,8 +82,8 @@
 *  Examples:
 *     reduce_switch IN=test USE_CALIBRATOR=no SPIKE_LEVEL=0 OUT=nosw
 *        This will reduce the switch from input file test.sdf without dividing
-*        by the calibrator signal and no toleration of any spikes detected by the
-*        transputers. The output data will be written to nosw.sdf.
+*        by the calibrator signal and no toleration of any spikes detected by
+*        the transputers. The output data will be written to nosw.sdf.
 
 *  Notes:
 
@@ -103,9 +103,12 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
-*     Revision 1.9  1996/10/31 18:07:24  timj
-*     Add support for SCUBAWAVE and RAMPWAVE chop functions.
+*     Revision 1.10  1996/11/02 01:21:45  timj
+*     Add ADAM to header
 *
+c Revision 1.9  1996/10/31  18:07:24  timj
+c Add support for SCUBAWAVE and RAMPWAVE chop functions.
+c
 c Revision 1.8  1996/10/30  03:01:39  timj
 c Use VEC_ITOI instead of SCULIB_COPYI.
 c Rewrite header to new Starlink standard.
