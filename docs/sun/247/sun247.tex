@@ -1,0 +1,526 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2004 Council for the Central Laboratory of the 
+Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {247.1}
+\newcommand{\stardocauthors}   {A.C.~Davenhall \& R.T.~Platon}
+\newcommand{\stardocdate}      {13 August 2004}
+\newcommand{\stardoctitle}     {XRT: % \\ [1ex]
+                                ROSAT XRT Data Reduction}
+\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocmanual}    {User's Manual}
+\newcommand{\stardocabstract}  {
+XRT is a package for reducing data acquired with the ROSAT XRT
+instruments.  The XRT (X-Ray Telescope) was the principal scientific
+payload of the ROSAT X-ray astronomy satellite.  The XRT had two
+instruments: the PSPC (Position Sensitive Proportional Counter) and the
+HRI (High Resolution Imager).  The XRT package operates on data produced
+by these instruments and can be used to transform them into calibrated
+images, spectra, time-series \emph{etc}.
+
+XRT was created by taking the ROSAT XRT-specific functions in the ASTERIX
+general X-ray astronomy data reduction system and re-packaging them as
+stand-alone applications.
+
+\begin{latexonly}
+\vspace{2mm}
+\end{latexonly}
+
+\begin{center}
+{\bf Who Should Read this Document?}
+\end{center}
+
+This document is aimed at people who plan to reduce data acquired with
+the ROSAT XRT instruments (the PSPC and the HRI).
+
+\begin{latexonly}
+\vspace{2mm}
+\end{latexonly}
+
+\begin{center}
+{\bf Disclaimer}
+\end{center}
+
+\begin{quote}
+{\bf We believe that the current version of XRT does not work.  It is
+made available purely on an `as is' basis and comes with no
+recommendation, guarantee or warranty whatsoever.  Further, one of us
+(ACD), though an author of this note, was not involved in developing the
+XRT source code.}
+\end{quote}}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+%  \newpage
+%  \begin{latexonly}
+%    \setlength{\parskip}{0mm}
+%    \tableofcontents
+%    \setlength{\parskip}{\medskipamount}
+%    \markboth{\stardocname}{\stardocname}
+%  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\xlabel{INTRO}\label{INTRO}Introduction}
+
+XRT is a package for reducing data acquired with the ROSAT XRT instruments.
+\htmladdnormallink{ROSAT}{http://ledas-www.star.le.ac.uk/rosat-goc/index.html}
+({\it R\"{O}entgen-SATellit}\/) was a highly successful German/US/UK
+X-ray astronomy satellite which was operational from 1990 to 1999.
+During this period it amassed a considerable archive of observations which
+are still regularly used.  ROSAT's principal scientific payload was the
+XRT (X-Ray Telescope).  The XRT had two instruments: the PSPC (Position
+Sensitive Proportional Counter) and the HRI (High Resolution Imager).
+
+During the late 1980s and early 1990s the 
+\htmladdnormallink{ASTERIX}{http://www.sr.bham.ac.uk/asterix/}
+software package was developed for the analysis of ROSAT (and other X-ray
+astronomy) data.  ASTERIX was mostly written by the 
+\htmladdnormallink{Astrophysics and Space Research Group}
+{http://www.sr.bham.ac.uk/}
+at the University of Birmingham, but with some involvement by Starlink.
+Starlink used to distribute ASTERIX but no longer does so, though it
+can still be obtained from the Birmingham group (see below).
+
+Much of the functionality of ASTERIX is included in other packages.
+However, some of the functions specific to ROSAT data are not available
+elsewhere.  These ROSAT-specific functions have been re-packaged as
+stand-alone applications and released as the XRT package, which is briefly
+documented here.
+
+
+\section{\xlabel{FORMATS}\label{FORMATS}Data Formats and Obtaining Data}
+
+Various archives of ROSAT data are maintained at astronomical data
+centres around the world, and the data are stored in several different
+formats.  XRT requires data in the so-called RDF (Rationalized Data 
+Format) format.  RDF files contain data in the FITS\footnote{FITS (Flexible
+Image Transport System) is a standard data format in astronomy.  The
+details are not germane here, though there is a
+\xref{brief introduction}{sc5}{FITS} in \xref{SC/5.3}{sc5}{}: {\it The
+2-D CCD Data Reduction Cookbook}, A.C.~Davenhall, G.J.~Privett and
+M.B.~Taylor, 16 August 2001, Starlink.  For a full description of the
+standard, and much other information, see URL
+\htmladdnormallink{{\tt http://fits.gsfc.nasa.gov/fits\_home.html}}
+{http://fits.gsfc.nasa.gov/fits_home.html}.} format.  Typically an RDF
+dataset comprises four FITS files each containing a separate table.  These
+files are:
+
+\begin{center}
+\begin{tabular}{ll}
+File                 & Contents \\ \hline
+{\tt events.tbl}     & Photon event table \\
+{\tt eventrates.tbl} & Instrument count rates for dead time corrections \\
+{\tt attitude.tbl}   & Satellite attitude information  \\
+{\tt orbit.tbl}      & Satellite orbital information   \\
+\end{tabular}
+\end{center}
+
+ROSAT data in the RDF format can be obtained from the 
+\htmladdnormallink{LEDAS}{http://ledas-www.star.le.ac.uk/}
+service provided by the
+\htmladdnormallink{X-ray and Observational Astronomy Group}
+{http://www.star.le.ac.uk/}
+in the Department of Physics and Astronomy at the University of Leicester.
+LEDAS includes an archive of ROSAT data which can be searched to locate
+observations of interest.  See URL:
+
+\begin{quote}
+\htmladdnormallink{{\tt http://ledas-www.star.le.ac.uk/rosat/}}
+{http://ledas-www.star.le.ac.uk/rosat/}
+\end{quote}
+
+Note that in addition to the basic RDF data the LEDAS ROSAT archive also
+includes reduced `data products' such as images.  These products have been
+constructed from the raw data in a standardised fashion as part of the
+LEDAS service.
+
+
+\section{\xlabel{START}\label{START}Starting XRT}
+
+XRT is run from the Unix shell.  To start it simply type:
+
+\begin{quote}
+{\tt xrt}
+\end{quote}
+
+A message similar to the following should appear:
+
+\begin{verbatim}
+
+                       XRT
+    (extracted from Asterix Rosat XRT Package)
+
+                   Version 1.1
+
+      Type "showme sun247" to see the manual
+\end{verbatim}
+
+and the XRT commands are now available.  If XRT does not start correctly
+then it is probably not installed at your site.  In the first instance
+see your site manager for assistance.
+
+
+\section{\xlabel{COMMANDS}\label{COMMANDS}Commands Available}
+
+The commands available in XRT are listed in Table~\ref{XRTCOMMANDS}.
+To run each command simply type its name, for example:
+
+\begin{quote}
+{\tt xrtsort}
+\end{quote}
+
+and answer the ensuing prompts.
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{ll}
+Command  & Description \\ \hline
+{\tt ast2qdp}  & Convert a one-dimensional dataset to QDP format. \\
+{\tt ast2txt}  & Convert a one-dimensional dataset to text format. \\
+{\tt ast2xsp}  & Convert spectrum from ASTERIX to XSPEC format. \\
+{\tt radopt}   & Finds optimum signal-to-noise ratio radius for a given 
+ source. \\
+{\tt showxrt}  & Show observation information stored in header file. \\
+{\tt xpsscorr} & Converts PSS XRT source counts into a flux. \\
+{\tt xrad}     & Calculates the PSF radius for a PSPC source. \\
+{\tt xrtcorr}  & Corrects XRT data files for vignetting effects \emph{etc}. \\
+{\tt xrthk}    & Produce list of times based on housekeeping parameters. \\
+{\tt xrtindex} & Extracts header information from ROSAT FITS files. \\
+{\tt xrtsort}  & Sorts ROSAT PSPC and HRI raw data into ASTERIX datasets. \\
+{\tt xrtsub}   & Subtracts an XRT background from an XRT source file. \\
+{\tt xspokes}  & Defines the ribs region on a PSPC image. \\
+\end{tabular}
+\end{center}
+
+\begin{quote}
+\caption{The XRT commands \label{XRTCOMMANDS} }
+\end{quote}
+
+\end{table}
+
+
+\section{\xlabel{INFO}\label{INFO}Further Information}
+
+The XRT commands are essentially identical to, and have the same names as,
+the corresponding ASTERIX functions.  These ASTERIX functions are
+described, in some detail, in SUN/98\footnote{SUN/98.6: {\it ASTERIX --
+X-ray Data Processing System},  D.J.~Allan and R.J.~Vallance, 3 May 1995,
+Birmingham.  Note that this document is not distributed by Starlink (see
+text).}, the ASTERIX manual, which should be consulted for further details.
+Note that though SUN/98 is numbered in Starlink's SUN series, like ASTERIX
+itself, it is no longer distributed by Starlink.  Rather, both hyper-text
+and printable versions are available from Birmingham's ASTERIX Web site
+at URL:
+
+\begin{quote}
+\htmladdnormallink{{\tt http://www.sr.bham.ac.uk/asterix/}}
+{http://www.sr.bham.ac.uk/asterix/}
+\end{quote}
+
+
+\section{\xlabel{PROBLEMS}\label{PROBLEMS}Reporting Problems}
+
+Problems with XRT can be reported by sending an e-mail message to {\tt
+ussc@star.rl.ac.uk}.  Alternatively, in the unlikely event that you do not
+have access to e-mail, you can write to: The Software Librarian, Starlink
+Project, Rutherford Appleton Laboratory, Chilton, DIDCOT, Oxfordshire,
+OX11 0QX, UK.
+
+
+\section{\xlabel{ACK}\label{ACK}Acknowledgements}
+
+XRT comprises the ROSAT-specific functions in ASTERIX converted to
+stand-alone applications.  Numerous people have contributed to ASTERIX,
+including {\it inter alia}, David~Allan, Bob~Vallance and Richard~Saxton.
+
+
+\section{\xlabel{REV}\label{REV}Revision History}
+
+\begin{enumerate}
+
+  \item 1 November 2002: Version 0.  Original draft (ACD).
+
+  \item 13 August 2004: Version 1.  First released version.  Tidied
+   previous draft for release (ACD).
+
+\end{enumerate}
+
+
+%------------------------------------------------------------------------------
+
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+\typeout{Reminder: run this document through Latex three times}
+\typeout{to resolve the references.}
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+
+\end{document}
