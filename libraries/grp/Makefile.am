@@ -5,8 +5,7 @@ bin_SCRIPTS = grp_link grp_link_adam
 
 libgrp_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
-        $(BASIC_F_ROUTINES) $(STANDALONE_F_ROUTINES) $(BLOCKDATA) \
-        $(C_ROUTINES)
+        $(BASIC_F_ROUTINES) $(STANDALONE_F_ROUTINES) $(BLOCKDATA)
 
 libgrp_adam_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
@@ -51,8 +50,5 @@ ADAM_F_ROUTINES = grp_group.f grp_list.f grp1_gtfil.f
 
 #  List of Fortran BLOCK DATA routines.
 BLOCKDATA = grp1_init.f
-
-#  List of C routines.
-C_ROUTINES = grp1_wild.c
 
 

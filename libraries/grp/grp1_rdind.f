@@ -61,6 +61,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,8 @@
 *        read even if it is terminated with an EOF rather than a newline.
 *     7-JAN-2003 (DSB):
 *        Expand shell meta-characters using GRP1_WILD.
+*     2-SEP-2004 (TIMJ):
+*        Switch from private GRP1_WILD to ONE_FIND_FILE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants.
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_ERR'          ! GRP error values.
+      INCLUDE 'ONE_ERR'          ! ONE error values
 
 *  Arguments Given:
       INTEGER UNIT
@@ -110,8 +114,8 @@
       INTEGER CHR_LEN            ! Used length of a string
       INTEGER GRP1_INDEX         ! Finds un-escaped control characters
       LOGICAL GRP1_CHKCC         ! See if a character is a control character
-      INTEGER GRP1_WILD          ! Start a wild card file search
-      INTEGER GRP1_EWILD         ! End a wild card file search
+      LOGICAL ONE_FIND_FILE      ! Start a wild card file search
+      EXTERNAL ONE_FIND_FILE
 
 *  Local Variables:
       CHARACTER COMC*1           ! Groups current omment character.
@@ -134,6 +138,7 @@
       LOGICAL EOF                ! Has end of file has been reached ?
       LOGICAL ESCOK              ! Is the escape character defined?
       LOGICAL FLAGOK             ! Is a flag character defined?
+      LOGICAL FOUND              ! Found a file
       LOGICAL KCLOK              ! Is closing kernel delimiter defined?
       LOGICAL KOPOK              ! Is opening kernel delimiter defined?
       LOGICAL VERB               ! Are we in a verbatim section?
@@ -146,15 +151,14 @@
 *  searching context will be started.
       ICONTX = 0
 
-*  Use GRP1_WILD to expand any shell meta-characters in the supplied file
+*  Use ONE_FIND_FILE to expand any shell meta-characters in the supplied file
 *  name. If the file name includes any wild-cards, the first matching file
 *  name is returned.
-      ISTAT = GRP__OK
       FILE = ' '
-      ISTAT = GRP1_WILD( INFILE, FILE, ICONTX )
+      FOUND = ONE_FIND_FILE( INFILE, .TRUE., FILE, ICONTX, STATUS )
 
 *  If a file was found which matches the name...
-      IF( ISTAT .EQ. GRP__OK ) THEN
+      IF( FOUND .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Open the text file specified after the first character.
          OPEN( UNIT = UNIT, FILE = FILE, STATUS = 'OLD', 
@@ -325,6 +329,11 @@
 
 *  End the search context.
  999  CONTINUE
-      ISTAT = GRP1_EWILD( ICONTX )
+
+*  Clear status if no more files
+      IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+
+*  End the search context.
+      CALL ONE_FIND_FILE_END( ICONTX, STATUS )
 
       END
