@@ -770,11 +770,14 @@
 
 *        Create description
             IF ( OUTSIDE ) THEN
-              TEXT = '  .NOT. POLYGON('
+              TEXT = ' .NOT.(POLYGON('
             ELSE
-              TEXT = 'POLYGON('
+              TEXT = ' POLYGON('
             ENDIF
             TLEN = CHR_LEN(TEXT)
+            CALL ARX_PUT(GRPID,0,TEXT(:TLEN),STATUS)
+            TEXT = ' '
+            TLEN = 1
 
 *        Write each vertex allowing for line continuation
             DO IV = 1, NVERTEX
@@ -789,7 +792,12 @@
             ENDDO
 
 *        Write remaining polygon descriptor line
-            TEXT(TLEN:TLEN)=')'
+            IF (OUTSIDE) THEN
+              TEXT(TLEN:)='))'
+              TLEN=TLEN+1
+            ELSE
+              TEXT(TLEN:TLEN)=')'
+            ENDIF
             CALL ARX_PUT(GRPID,0,TEXT(:TLEN),STATUS)
 
           ENDIF
@@ -1001,13 +1009,12 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*132 AFILE
       CHARACTER*80 UNITS(2)
       REAL BASE(2),SCALE(2)
       REAL DVAL
-      INTEGER AUNIT
+      INTEGER GRPID
       INTEGER DIMS(2)
-      INTEGER IPTR,EPTR,WPTR
+      INTEGER IPTR
       LOGICAL DAT
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1023,15 +1030,13 @@
 
 
 *  get spatial description (ARD) file
-        CALL USI_GET0C('FILE',AFILE,STATUS)
-        CALL FIO_OPEN(AFILE,'READ','LIST',0,AUNIT,STATUS)
+        CALL ARX_OPEN('READ',GRPID,STATUS)
+        CALL ARX_READ('FILE',GRPID,STATUS)
 
         DIMS(1)=I_NX
         DIMS(2)=I_NY
-        CALL DYN_MAPL(2,DIMS,IPTR,STATUS)
-        CALL DYN_MAPL(2,DIMS,EPTR,STATUS)
-        CALL DYN_MAPL(2,DIMS,WPTR,STATUS)
-        CALL ARR_INIT1L(.FALSE.,I_NX*I_NY,%val(WPTR),STATUS)
+        CALL DYN_MAPI(2,DIMS,IPTR,STATUS)
+        CALL ARR_INIT1I(0,I_NX*I_NY,%val(IPTR),STATUS)
 
         BASE(1)=I_XBASE_W
         BASE(2)=I_YBASE_W
@@ -1039,16 +1044,14 @@
         SCALE(2)=I_YSCALE_W
         UNITS(1)=I_XYUNITS
         UNITS(2)=I_XYUNITS
-        CALL IMG_ARDMASK(BASE,SCALE,UNITS,AUNIT,EPTR,IPTR,
-     :                                 I_NX,I_NY,WPTR,STATUS)
+        CALL ARX_MASK(GRPID,DIMS,BASE,SCALE,UNITS,%val(IPTR),
+     :                                                 STATUS)
         CALL IEXCLUDE_REGION_REM(%val(IPTR),DAT,DVAL,
      :                      %VAL(I_DPTR_W),%VAL(I_QPTR_W),STATUS)
 
         CALL DYN_UNMAP(IPTR,STATUS)
-        CALL DYN_UNMAP(EPTR,STATUS)
-        CALL DYN_UNMAP(WPTR,STATUS)
 
-        CALL FIO_CLOSE(AUNIT,STATUS)
+        CALL ARX_CLOSE(GRPID,STATUS)
 
       ENDIF
 
@@ -1070,7 +1073,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
-      LOGICAL INC(I_NX,I_NY)
+      INTEGER INC(I_NX,I_NY)
       LOGICAL DAT
       REAL DVAL
       REAL D(I_NX,I_NY)
@@ -1091,7 +1094,7 @@
         DO J=1,I_NY
           DO I=1,I_NX
 
-            IF (INC(I,J)) THEN
+            IF (INC(I,J).GT.1) THEN
               Q(I,J)=BIT_ORUB(Q(I,J),QUAL__IGNORE)
               I_BAD_W=.TRUE.
               IF (DAT) THEN
