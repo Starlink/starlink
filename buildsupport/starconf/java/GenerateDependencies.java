@@ -21,7 +21,6 @@ import java.util.Stack;
  */
 public class GenerateDependencies {
 
-    private static java.util.Map allComponents;
     private static boolean verbose = false;
 
     /**
@@ -52,8 +51,6 @@ public class GenerateDependencies {
         if (xmlinput == null)
             Usage();
 
-        allComponents = new java.util.TreeMap();
-        
         try {
 
             javax.xml.parsers.DocumentBuilder db 
@@ -65,9 +62,10 @@ public class GenerateDependencies {
                     = componentset.getElementsByTagName("component");
 
             for (int i=0; i<componentList.getLength(); i++) {
-                Element e = (Element)componentList.item(i);
-                Component c = new Component(e);
-                allComponents.put(c.getName(), c);
+                // Run through all of the <component> elements,
+                // creating a Component object for each.  Discard the
+                // return value below.
+                Component.newComponent((Element)componentList.item(i));
             }
             
         } catch (java.io.IOException e) {
@@ -89,6 +87,7 @@ public class GenerateDependencies {
         String manifestString = "$(MANIFEST)/";
         String newlineString = " \\\n\t\t";
         String makeBuildsupportString = "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $$t >configure-output.log; echo $$t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi \\";
+        String runConfigureString = "\t    && test -f config.status || ./configure >configure-output.log \\";
         String makeString = "\t    && make>make.log && make install>>make.log";
         String cdString = "\tcd ";
 
@@ -96,6 +95,7 @@ public class GenerateDependencies {
             manifestString = "";
             newlineString = "\n  ";
             makeBuildsupportString = "  (buildsupport)";
+            runConfigureString = "  (configdep)";
             makeString = "  --";
             cdString = "  path=";
         }
@@ -121,9 +121,8 @@ public class GenerateDependencies {
 
         java.util.List allbuildsupport = new java.util.LinkedList();
         
-        for (Iterator ci = allComponents.keySet().iterator(); ci.hasNext(); ) {
-            Component c = (Component)allComponents.get(ci.next());
-
+        for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
+            Component c = (Component) ci.next();
 
             Set alldeps = c.getCompleteDependencies(Dependency.SOURCESET);
             if (alldeps == null) {
@@ -152,8 +151,40 @@ public class GenerateDependencies {
             }
             alldeps.addAll(builddeps);
 
+            // What type of component is this?
+            String componentType = null;
+            if (Dependency.getConfigureDependencies().contains(c))
+                componentType = "confdep";
+            if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
+                if (componentType != null) {
+                    System.err.println("Warning: Component " + c 
+                                       + " is a buildsupport component, but is also marked as a configure dependency -- latter ignored");
+                }
+                componentType = "buildsupport";
+            }
+
+            // Comments before the target
+            if (componentType == "confdep")
+                System.out.println("# Component " + c
+                 + " is a configure dependency, so is configurable in place.");
+            if (componentType == "buildsupport")
+                System.out.println("# Component " + c 
+                                   + " is a buildsupport component");
+            Set confdeps = c.getCompleteDependencies(Dependency.CONFIGURE);
+            if (confdeps != null && confdeps.size() > 0) {
+                System.out.println("# Component " + c
+                                 + " has configure dependencies on "
+                                 + showSet(confdeps) + ",");
+                System.out.println("# which must be built before this component is configured.");
+            }
+            if (c.getStatus() == Component.STATUS_OBSOLETE) {
+                System.out.println("# Component " + c
+                                   + " is OBSOLETE -- do not build");
+            }
+
             // Emit the target
             System.out.print(manifestString + c.getName() + ':');
+
 
             // Emit the list of dependencies
             Component lastComponent = null;
@@ -177,9 +208,11 @@ public class GenerateDependencies {
 
             // Emit the rule
             System.out.println(cdString + c.componentPath() + " \\");
-            if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
+            if (componentType == "buildsupport") {
                 System.out.println(makeBuildsupportString);
                 allbuildsupport.add(c);
+            } else if (componentType == "confdep") {
+                System.out.println(runConfigureString);
             }
             System.out.println(makeString);
             System.out.println();
@@ -209,7 +242,25 @@ public class GenerateDependencies {
         System.out.println("buildsupport: $(BUILDSUPPORT_MANIFESTS)");
         System.out.println("clean-buildsupport:");
         System.out.println("\trm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)");
-        
+
+        // Emit the list of configure dependencies, if any
+        Set confdeps = Dependency.getConfigureDependencies();
+        System.out.println();
+        if (confdeps.isEmpty()) {
+            System.out.println("# No configure dependencies");
+            System.out.println("configure-deps:");
+            System.out.println
+                    ("\techo \"There are no configure dependencies\"");
+        } else {
+            System.out.println("# Configuration dependencies");
+            System.out.println("# Run 'make configure-deps' to make these components before ./configure");
+            System.out.print("configure-deps:");
+            for (Iterator cdi=confdeps.iterator(); cdi.hasNext(); ) {
+                Component c = (Component)cdi.next();
+                System.out.print(newlineString + manifestString + c);
+            }
+            System.out.println();
+        }
 
         System.exit(globalStatus);
     }
@@ -220,11 +271,26 @@ public class GenerateDependencies {
     }
 
     /**
+     * Display a set's contents.  Mostly, but not entirely, a debugging
+     * method.
+     */
+    private static String showSet(Set s) {
+        StringBuffer sb = new StringBuffer("{");
+        if (s == null)
+            sb.append(" <null>");
+        else
+            for (Iterator si=s.iterator(); si.hasNext(); )
+                sb.append(' ').append(si.next().toString());
+        sb.append(" }");
+        return sb.toString();
+    }
+
+    /**
      * Represents a single component.
      */
-    private static final class Component {
+    private static final class Component
+            implements Comparable {
 
-        private Element el;
         /**
          * A map of all the direct dependencies.  The keys are dependency
          * types (SOURCESET, and so on).  Each element of this map
@@ -234,7 +300,7 @@ public class GenerateDependencies {
         /**
          * A map of all the dependencies.  The keys are dependency
          * types (SOURCESET, and so on).  Each element of this map is a
-         * Set of Component objects.
+         * Set of Dependency objects.
          */
         private Map allComponentDependencies;
 
@@ -243,6 +309,13 @@ public class GenerateDependencies {
 
         /** The path to the component */
         private String path;
+
+        /** Contents of the dependencies element */
+        private NodeList depElements;
+        /** Indicates whether this is a buildsupport object */
+        private int buildsupportType;
+        /** Is this a current component or an obsolete one? */
+        private int statusType;
 
         private Set marks = new java.util.HashSet();
 
@@ -271,10 +344,29 @@ public class GenerateDependencies {
          */
         public static final int STATUS_OBSOLETE = 2;
 
+        /**
+         * If true, then the resolveComponents method has been
+         * called.  All component references are solved, and so
+         * it becomes an error to create any new components.
+         */
+        private static boolean componentsResolved = false;
 
-        public Component(Element el) {
-            this.el = el;
-            allDirectDependencies = new java.util.HashMap();
+        private static final Set emptySet = new java.util.HashSet();
+
+        /**
+         * Map of all the components created
+         */
+        private static final java.util.Map componentMap
+                = new java.util.TreeMap();
+
+
+        private Component(Element el) {
+            name = el.getAttribute("id").intern();
+            buildsupportType = extractBuildsupport(el);
+            path = extractComponentPath(el);
+            statusType = extractStatus(el);
+            depElements = el.getElementsByTagName("dependencies");
+
             allComponentDependencies = new java.util.HashMap();
             if (componentPath().indexOf("obsolete") >= 0
                 && getStatus() != STATUS_OBSOLETE) {
@@ -284,11 +376,48 @@ public class GenerateDependencies {
             }
         }
 
+        public static Component newComponent(Element el) {
+            Component rval;
+            if (componentsResolved) {
+                System.err.println("Error: component network locked: one of the query methods has been called");
+                rval = null;
+            } else {
+                Component c = new Component(el);
+                componentMap.put(c.getName(), c);
+                rval = c;
+            }
+            return rval;
+        }
+
         /** Name of the component */
         public String getName() {
-            if (name == null)
-                name = el.getAttribute("id").intern();
             return name;
+        }
+
+        /**
+         * Looks up a component by name.
+         * @param componentName the name of a component
+         * @return the Component which has this name, or null if no
+         * such component exists
+         */
+        public static Component lookupComponent(String componentName) {
+            return (Component) componentMap.get(componentName);
+        }
+
+        /**
+         * Retrieves all of the components which have been allocated
+         * @return an Iterator which produces each of the components
+         * in turn
+         */
+        public static Iterator allComponents() {
+            // Use a TreeSet so that the iterator produces the
+            // components in a known order
+            Set rset = new java.util.TreeSet();
+            for (Iterator ei=componentMap.entrySet().iterator();
+                 ei.hasNext(); ) {
+                rset.add(((Map.Entry)ei.next()).getValue());
+            }
+            return rset.iterator();
         }
 
         public String toString() {
@@ -300,9 +429,12 @@ public class GenerateDependencies {
          * <code>BUILDSUPPORT_NOAUTO</code> or <code>BUILDSUPPORT_NO</code>.
          */
         public int getBuildsupport() {
+            return buildsupportType;
+        }
+
+        private int extractBuildsupport(Element el) {
             String s = el.getAttribute("buildsupport");
             int ret;
-            
             if (s.equals("yes"))
                 ret = BUILDSUPPORT_AUTO;
             else if (s.equals("noauto"))
@@ -317,16 +449,17 @@ public class GenerateDependencies {
          * Retrieves the path to this component.
          */
         public String componentPath() {
-            if (path == null) {
-                NodeList nl = el.getElementsByTagName("path");
-                if (nl.getLength() != 1) {
-                    System.err.println("Component " + getName()
-                                       + " does not have precisely one <path> element");
-                    System.exit(1);
-                }
-                path = nl.item(0).getFirstChild().getNodeValue();
-            }
             return path;
+        }
+
+        private String extractComponentPath(Element el) {
+            NodeList nl = el.getElementsByTagName("path");
+            if (nl.getLength() != 1) {
+                System.err.println("Component " + getName()
+                                   + " does not have precisely one <path> element");
+                System.exit(1);
+            }
+            return nl.item(0).getFirstChild().getNodeValue();
         }
 
         /**
@@ -335,6 +468,10 @@ public class GenerateDependencies {
          * {@link #STATUS_OBSOLETE}
          */
         public int getStatus() {
+            return statusType;
+        }
+
+        private int extractStatus(Element el) {
             String s = el.getAttribute("status");
             int ret;
 
@@ -358,12 +495,13 @@ public class GenerateDependencies {
          * @return a Set of Dependency objects
          */
         public Set getDeps(String type) {
-            Set s = (Set)allDirectDependencies.get(type);
-            if (s == null) {
-                s = getElementDependenciesAsSet(type);
-                allDirectDependencies.put(type, s);
-            }
-            return s;
+            if (!componentsResolved)
+                resolveComponents();
+        
+            Set rval = (Set)allDirectDependencies.get(type);
+            if (rval == null)
+                rval = emptySet;
+            return rval;
         }
 
         /**
@@ -378,18 +516,40 @@ public class GenerateDependencies {
          *     {@link #globalStatus}.
          */
         public Set getCompleteDependencies(String type) {
-            if (allComponentDependencies.containsKey(type))
-                // our work is already done
-                return (Set)allComponentDependencies.get(type); // JUMP OUT
+            Set rval;
 
-             return getCompleteDependencies(type, true, 0);
+            if (type == null) {
+                System.err.println("getCompleteDependencies: null argument");
+                System.exit(1);
+            }
+
+            if (!componentsResolved)
+                resolveComponents();
+
+            if (allComponentDependencies.containsKey(type)) {
+                // our work is already done
+                rval = (Set)allComponentDependencies.get(type);
+                if (verbose) {
+                    System.err.println("Cached for " + this
+                                       + ", type " + type + ": "
+                                       + showSet(rval));
+                }
+            } else {
+                rval = getCompleteDependencies(type, true, 0);
+            }
+            return rval;
         }
 
         private Set getCompleteDependencies(String type,
                                             boolean errorCircular,
                                             int recurseLevel) {
+            assert type != null;
+            
             boolean foundCircular = false;
             
+            if (!componentsResolved)
+                resolveComponents();
+
             if (verbose) {
                 System.err.println("[" + recurseLevel + "] "
                                    + this.toString()
@@ -418,7 +578,7 @@ public class GenerateDependencies {
                 if (verbose)
                     System.err.println("[" + recurseLevel
                                        + "] ...depends on " + c);
-                //                if (c == checkComponent) {
+
                 collectedDeps.add(d);
 
                 Set cdeps;      // Set of Dependency objects
@@ -450,10 +610,9 @@ public class GenerateDependencies {
             }
             if (verbose) {
                 System.err.println("[" + recurseLevel
-                                   + "] ...collected for " + this + ":");
-                for (Iterator i=collectedDeps.iterator(); i.hasNext(); ) {
-                    System.err.println("  " + i.next());
-                }
+                                   + "] ...collected for " + this
+                                   + ", type " + type + ": "
+                                   + showSet(collectedDeps));
             }
 
             try {
@@ -470,66 +629,103 @@ public class GenerateDependencies {
             return (foundCircular ? null : collectedDeps);
         }
 
-        private static String showSet(Set s) {
-            StringBuffer sb = new StringBuffer("{");
-            for (Iterator si=s.iterator(); si.hasNext(); )
-                sb.append(' ').append(si.next().toString());
-            sb.append(" }");
-            return sb.toString();
-        }
+        private static void resolveComponents() {
+            componentsResolved = true;
 
-        /**
-         * Finds all the child elements with the given name, and returns a
-         * Set containing their contents.
-         * @param elname the element name to be examined
-         * @return a Set of Dependency objects
-         */
-        private Set getElementDependenciesAsSet(String elname) {
-            Set deps = new java.util.TreeSet();
-            NodeList nl = el.getElementsByTagName(elname);
+            for (Iterator ci=allComponents(); ci.hasNext(); ) {
+                Component c = (Component)ci.next();
+                c.extractElementDependencySets();
+            }
+        }
+            
+        private void extractElementDependencySets() {
+            // allDirectDependencies is a hash of (type, Set-of-Dependency)
+            // pairs.
+            // We should come this way only once.
+            assert allDirectDependencies == null;
+            allDirectDependencies = new java.util.HashMap();
+            if (depElements.getLength() != 1) {
+                System.err.println
+                  ("Element does not have exactly one <dependencies> element");
+                System.exit(1);
+            }
+            
+            NodeList nl = depElements.item(0).getChildNodes();
             for (int i=0; i<nl.getLength(); i++) {
-                try {
-                    assert nl.item(i).getNodeType() == Node.ELEMENT_NODE;
-                    deps.add(new Dependency((Element)nl.item(i)));
-                } catch (IllegalArgumentException e) {
-                    return null;
+                Node n = nl.item(i);
+                if (n.getNodeType() != Node.ELEMENT_NODE) {
+                    // What's this?  Never mind -- skip it.
+                    continue;
+                }
+                n.normalize();
+                Node text = n.getFirstChild();
+                if (text == null || text.getNodeType() != Node.TEXT_NODE)
+                    throw new IllegalArgumentException
+                            ("Element does not contain text");
+
+                Component c = Component.lookupComponent(text.getNodeValue());
+                if (c == null) {
+                    System.err.println("Dependency " + text.getNodeValue()
+                                       + " unknown");
+                    System.exit(1);
+                }
+                Dependency d = Dependency.newDependency
+                        (n.getNodeName(), c,
+                         ((Element)n).getAttribute("option"));
+                Set dep = (Set)allDirectDependencies.get(d.type());
+                if (dep == null) {
+                    dep = new java.util.HashSet();
+                    allDirectDependencies.put(d.type(), dep);
+                }
+                dep.add(d);
+            }
+            if (verbose) {
+                System.err.println("Component " + getName()
+                                   + ".extractElementDependencySets ->");
+                for (Iterator i=allDirectDependencies.keySet().iterator();
+                     i.hasNext();) {
+                    String s = (String)i.next();
+                    Set ss = (Set)allDirectDependencies.get(s);
+                    System.err.println("  " + s + "-->" + showSet(ss));
                 }
             }
-            return deps;
         }
 
-//         public boolean equals(Object o) {
-//             if (o == this)
-//                 return true;
-//             else if (o instanceof Component) {
-//                 Component c = (Component) o;
-//                 return c.name == name
-//                         && c.path == path
-//                         && c.getBuildsupport() == getBuildsupport();
-//             } else {
-//                 return false;
-//             }
-//         }
-//         public int compareTo(Object o) 
-//                 throws ClassCastException {
-//             if (equals(o))
-//                 return 0;
-//             else {
-//                 Component c = (Component)o;
-//                 int i = name.compareTo(c.name);
-//                 if (i != 0)
-//                     return i;
-//                 i = path.compareTo(c.path);
-//                 if (i != 0)
-//                     return i;
-//                 i = getBuildsupport() - c.getBuildsupport();
-//                 assert i != 0;  // or else equals() should have been true
-//                 return i;
-//             }
-//         }
-//         public int hashCode() {
-//             return (name.hashCode() ^ path.hashCode()) + getBuildsupport();
-//         }
+        // Implementation of the Comparable interface, plus the equals
+        // method that ought to be implemented when compareTo is.
+
+        public boolean equals(Object o) {
+            if (o == this)
+                return true;
+            else if (o instanceof Component) {
+                Component c = (Component) o;
+                return c.name == name
+                        && c.path == path
+                        && c.getBuildsupport() == getBuildsupport();
+            } else {
+                return false;
+            }
+        }
+        public int compareTo(Object o) 
+                throws ClassCastException {
+            if (equals(o))
+                return 0;
+            else {
+                Component c = (Component)o;
+                int i = name.compareTo(c.name);
+                if (i != 0)
+                    return i;
+                i = path.compareTo(c.path);
+                if (i != 0)
+                    return i;
+                i = getBuildsupport() - c.getBuildsupport();
+                assert i != 0;  // or else equals() should have been true
+                return i;
+            }
+        }
+        public int hashCode() {
+            return (name.hashCode() ^ path.hashCode()) + getBuildsupport();
+        }
     }
 
     /**
@@ -540,7 +736,6 @@ public class GenerateDependencies {
     private static final class Dependency
             implements Comparable {
         private String mytype;
-        private String dependsOnComponentName;
         private Component dependsOnComponent;
         private String option;
 
@@ -549,36 +744,63 @@ public class GenerateDependencies {
         public static final String LINK = "link";
         public static final String USE = "use";
         public static final String TEST = "test";
+        public static final String CONFIGURE = "configure";
         private static final String DUMMY = "dummy";
 
-        Dependency(Element el) {
+        /** Flag is true when we have expanded dependencies */
+        private static boolean dependenciesAreExpanded = false;
+        
+        /**
+         * Set of all the components which are a configure dependency
+         * of some component.  This starts off as a set of component
+         * names, then turns into a set of Component objects when
+         * getConfigureDependencies is called.
+         */
+        private static Set configureDependencyObjectSet
+                = new java.util.HashSet();
 
-            String type = el.getNodeName().intern();
-            if (typeOK(type))
-                mytype = type;
-            else
+
+        private Dependency(String type,
+                           Component component,
+                           String attoption) {
+
+            mytype = type.intern();
+            if (!typeOK(mytype))
                 throw new IllegalArgumentException
-                        ("Element contains unrecognised text " + type);
+                        ("Dependency element of unrecognised type: " + type);
 
-            el.normalize();
-            Node text = el.getFirstChild();
-            if (text == null || text.getNodeType() != Node.TEXT_NODE)
-                throw new IllegalArgumentException
-                        ("Element does not contain text");
-            dependsOnComponentName = text.getNodeValue().intern();
+            dependsOnComponent = component;
 
-            String attval = el.getAttribute("option");
-            if (attval.length() > 0) {
+            if (mytype == CONFIGURE)
+                configureDependencyObjectSet.add(dependsOnComponent);
+
+            if (attoption.length() > 0) {
                 if (verbose)
                     System.err.println("dependency on "
-                                       + dependsOnComponentName
-                                       + ", option <" + attval + ">");
-                option = attval.trim().intern();
+                                       + component.getName()
+                                       + ", option <" + attoption + ">");
+                option = attoption.trim().intern();
                 if (! typeOK(option)) {
                     System.err.println("Option " + option + " illegal");
                     option = null;
                 }
             }
+
+            assert dependsOnComponent != null
+                    && mytype != null;
+        }
+
+        public static Dependency newDependency(String type,
+                                               Component component,
+                                               String attoption) {
+            Dependency rval;
+            if (dependenciesAreExpanded) {
+                System.err.println("Error: creation of Dependency objects locked");
+                rval = null;
+            } else {
+                rval = new Dependency(type, component, attoption);
+            }
+            return rval;
         }
 
         public String type() {
@@ -586,16 +808,6 @@ public class GenerateDependencies {
         }
 
         public Component component() {
-            if (dependsOnComponent == null) {
-                dependsOnComponent =
-                        (Component)allComponents.get(dependsOnComponentName);
-                if (dependsOnComponent == null) {
-                    System.err.println("Dependency " + dependsOnComponentName
-                                       + " unknown");
-                    System.exit(1);
-                }
-                assert dependsOnComponentName == dependsOnComponent.getName();
-            }
             return dependsOnComponent;
         }
 
@@ -604,7 +816,7 @@ public class GenerateDependencies {
         }
 
         public String toString() {
-            return dependsOnComponentName;
+            return dependsOnComponent.getName();
         }            
 
         /** Returns true if the type is one of the legal ones */
@@ -613,7 +825,8 @@ public class GenerateDependencies {
                     || type == BUILD
                     || type == LINK
                     || type == USE
-                    || type == TEST);
+                    || type == TEST
+                    || type == CONFIGURE);
         }
 
         public boolean equals(Object o) {
@@ -621,7 +834,7 @@ public class GenerateDependencies {
                 return true;
             else if (o instanceof Dependency) {
                 Dependency d = (Dependency)o;
-                return d.dependsOnComponentName == dependsOnComponentName
+                return d.dependsOnComponent == dependsOnComponent
                         && d.mytype == mytype
                         && d.option == option;
             } else {
@@ -633,8 +846,8 @@ public class GenerateDependencies {
             if (equals(o))
                 return 0;
             Dependency od = (Dependency)o; // throws Exception if not possible
-            int i = dependsOnComponentName
-                    .compareTo(od.dependsOnComponentName);
+            int i = dependsOnComponent
+                    .compareTo(od.dependsOnComponent);
             if (i != 0)
                 return i;
             i = mytype.compareTo(od.mytype);
@@ -655,9 +868,45 @@ public class GenerateDependencies {
         }
 
         public int hashCode() {
-            return dependsOnComponentName.hashCode()
+            return dependsOnComponent.hashCode()
                     ^ mytype.hashCode()
-                    ^ option.hashCode();
+                    ^ (option == null ? "" : option).hashCode();
+        }
+
+        /**
+         * Returns a set containing all those components which are the
+         * target of a configure dependency, plus all those which are
+         * build dependencies of those.
+         * @return a Set of Component objects
+         */
+        public static Set getConfigureDependencies() {
+            if (!dependenciesAreExpanded)
+                resolveDependencies();
+
+            return configureDependencyObjectSet;
+        }
+
+        public static void resolveDependencies() {
+            // Replace configureDependencyObjectSet with a new set
+            // which is a copy, with all the dependencies followed.
+            // Be careful not to mutate the references we get below.
+            // Use a TreeSet to ensure a repeatable order.
+            Set newset = new java.util.TreeSet();
+            for (Iterator cdi=configureDependencyObjectSet.iterator();
+                 cdi.hasNext(); ) {
+                Component c = (Component)cdi.next();
+                newset.add(c);
+                Set deps = c.getCompleteDependencies(CONFIGURE);
+                    if (deps != null && deps.size() > 0)
+                        for (Iterator i=deps.iterator(); i.hasNext(); )
+                            newset.add(((Dependency)i.next()).component());
+                    deps = c.getCompleteDependencies(BUILD);
+                    if (deps != null && deps.size() > 0)
+                        for (Iterator i=deps.iterator(); i.hasNext(); )
+                            newset.add(((Dependency)i.next()).component());
+            }
+            configureDependencyObjectSet = newset;
+            dependenciesAreExpanded = true;
         }
     }
 }
