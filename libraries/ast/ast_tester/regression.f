@@ -119,8 +119,9 @@
 *  Display the AST version number.
       VERS = AST_VERSION()
       MAJ = VERS/1000000
-      MIN = ( VERS - 1000000*MAJ )/1000
-      REV = ( VERS - 1000*MIN )
+      VERS = VERS - 1000000*MAJ 
+      MIN = VERS/1000
+      REV = VERS - 1000*MIN
       WRITE(*,'(A,I2,A,I1,A,I2)') 'AST version ',MAJ,'.',MIN,'-',REV
 
 *  First do a test of the AST_PUTCARDS routine.
@@ -134,15 +135,20 @@
       CARDS( 5*80 + 1: ) = 'CUNIT1  = ''GHz'''
 
       CALL AST_PUTCARDS( FC, CARDS, STATUS )
-      WRITE(*,*) 'PutCards Ncards = ',AST_GETI( FC, 'NCARD', STATUS )
-      WRITE(*,*) 'PutCards Card = ',AST_GETI( FC, 'CARD', STATUS )
+      WRITE(*,'(A,I2)') 'PutCards Ncards = ',AST_GETI( FC, 'NCARD', 
+     :                                                 STATUS )
+      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD', 
+     :                                               STATUS )
 
       CALL AST_SETI( FC, 'CARD', 10, STATUS )
-      WRITE(*,*) 'PutCards Card = ',AST_GETI( FC, 'CARD', STATUS )
+      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD', 
+     :                                               STATUS )
       
       CALL AST_PUTCARDS( FC, CARDS, STATUS )
-      WRITE(*,*) 'PutCards Ncards = ',AST_GETI( FC, 'NCARD', STATUS )
-      WRITE(*,*) 'PutCards Card = ',AST_GETI( FC, 'CARD', STATUS )
+      WRITE(*,'(A,I2)') 'PutCards Ncards = ',AST_GETI( FC, 'NCARD', 
+     :                                                 STATUS )
+      WRITE(*,'(A,I2)') 'PutCards Card = ',AST_GETI( FC, 'CARD', 
+     :                                               STATUS )
       CALL AST_SHOW( FC, STATUS )
 
 *  We loop round testing several sorts of FITS Headers.
@@ -153,27 +159,27 @@
 	 CMN_FTEST = I
          CMN_LINE = 1
 
-         WRITE(*,*) ' '
-         WRITE(*,*) ' '
-         WRITE(*,*) ' '
-         WRITE(*,*) ' '
-         WRITE(*,*) ' FITS test number ',I
-         WRITE(*,*) ' ===================='
-         WRITE(*,*) ' '
-         WRITE(*,*) ' '
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A,I2)') ' FITS test number ',I
+         WRITE(*,'(A)') ' ===================='
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') ' '
 
 *  Create a FitsChan, read an Object from it, and dump the Object
 *  to standard output. The Object should be a FrameSet if all is OK.
          FC = AST_FITSCHAN( REG_SOURCE, REG_SINK, ' ', STATUS )
          FS = AST_READ( FC, STATUS )
-         WRITE(*,*) ' '
-         WRITE(*,*) 'AST_SHOW:'
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') 'AST_SHOW:'
          CALL AST_SHOW( FS, STATUS )
 
 *  Annul the FitsChan. This will cause the unused contents (if any) to
 *  be written out using REG_SINK.
-         WRITE(*,*) ' '
-         WRITE(*,*) 'REG_SINK:'
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') 'REG_SINK:'
          CALL AST_ANNUL( FC, STATUS )            
 
 * Create another FrameSet with Native encoding. Write the FrameSet to
@@ -181,10 +187,11 @@
 * written to stdout).
          FC = AST_FITSCHAN( AST_NULL, REG_SINK, 'Encoding=native', 
      :                      STATUS )
-         WRITE(*,*) ' '
-         WRITE(*,*) 'Objects written: ', AST_WRITE( FC, FS, STATUS )
-         WRITE(*,*) ' '
-         WRITE(*,*) 'Native Encoding:'
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A,I2)') 'Objects written: ', AST_WRITE( FC, FS, 
+     :                                                     STATUS )
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') 'Native Encoding:'
          CALL AST_ANNUL( FC, STATUS )
 
 *  Create a Plot which maps the area specified by BBOX the Base Frame 
@@ -213,38 +220,38 @@
 *  Get some attributes (separate the AST_GET calls and the WRITEs in order
 *  to avoid recursive I/O due to the REG_xxx routines trying to write to
 *  standard output).
-         WRITE(*,*) ' '
-         WRITE(*,*) 'ATTRIBUTES:'
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') 'ATTRIBUTES:'
 
          DO J = 1, NCAT
             CV = AST_GETC( PLOT, CAT(J), STATUS )
-   	    WRITE(*,*) ' '//CAT(J)//': ',CHR_LEN(CV)
+   	    WRITE(*,'(A,I10)') ' '//CAT(J)//': ',CHR_LEN(CV)
          END DO
 
          DO J = 1, NRAT
             RV = AST_GETR( PLOT, RAT(J), STATUS )
-   	    WRITE(*,*) ' '//RAT(J)//': ',RV
+   	    WRITE(*,'(A,G13.6)') ' '//RAT(J)//': ',RV
          END DO
 
          DO J = 1, NLAT
             LV = AST_GETL( PLOT, LAT(J), STATUS )
-   	    WRITE(*,*) ' '//LAT(J)//': ',LV
+   	    WRITE(*,'(A,I1)') ' '//LAT(J)//': ',LV
          END DO
 
          DO J = 1, NDAT
             DV = AST_GETD( PLOT, DAT(J), STATUS )
-   	    WRITE(*,*) ' '//DAT(J)//': ',DV
+   	    WRITE(*,'(A,G13.6)') ' '//DAT(J)//': ',DV
          END DO
 
          DO J = 1, NIAT
             IV = AST_GETI( PLOT, IAT(J), STATUS )
-   	    WRITE(*,*) ' '//IAT(J)//': ',IV
+   	    WRITE(*,'(A,I4)') ' '//IAT(J)//': ',IV
          END DO
 
 
 *  Draw a grid.
-         WRITE(*,*) ' '
-         WRITE(*,*) 'AST_GRID:'
+         WRITE(*,'(A)') ' '
+         WRITE(*,'(A)') 'AST_GRID:'
          CALL AST_GRID( PLOT, STATUS )
 
 *  Annul the Plot.
@@ -267,7 +274,7 @@
 *  Flush graphics.
 *  ---------------
       INTEGER FUNCTION REG_FLUSH()
-      WRITE(*,*) 'REG_FLUSH:'
+      WRITE(*,'(A)') 'REG_FLUSH:'
       REG_FLUSH = 1
       END
 
@@ -308,7 +315,7 @@
       ELSE IF( ATT .EQ. GRF__COLOUR ) THEN
          I = 5
       ELSE
-         WRITE(*,*) 'Bad ATT value: ', ATT
+         WRITE(*,'(A,I2)') 'Bad ATT value: ', ATT
       END IF
 
       IF( PRIM .EQ. GRF__LINE ) THEN
@@ -318,7 +325,7 @@
       ELSE IF( PRIM .EQ. GRF__TEXT ) THEN
          J = 3
       ELSE
-         WRITE(*,*) 'Bad PRIM value: ', PRIM
+         WRITE(*,'(A,I2)') 'Bad PRIM value: ', PRIM
       END IF
       
 *  Return the old value.
@@ -343,7 +350,7 @@
       REAL Y( N )
       INTEGER I
 
-      WRITE(*,*) 'REG_LINE: ',N
+      WRITE(*,'(A,I4)') 'REG_LINE: ',N
       DO I = 1, N
          WRITE(*,'(3X,G10.3,1X,G10.3)') X(I),Y(I)
       END DO
@@ -361,7 +368,7 @@
       REAL Y( N )
       INTEGER I
 
-      WRITE(*,*) 'REG_MARK: ', N, TYPE
+      WRITE(*,'(A,I4,I2)') 'REG_MARK: ', N, TYPE
       DO I = 1, N
          WRITE(*,'(3X,G10.3,1X,G10.3)') X(I),Y(I)
       END DO
@@ -377,7 +384,7 @@
       CHARACTER TEXT*(*), JUST*(*)
       REAL X, Y, UPX, UPY
 
-      WRITE(*,*) 'REG_TEXT: ''', TEXT,''''
+      WRITE(*,'(A,A,A)') 'REG_TEXT: ''', TEXT,''''
       WRITE(*,'(3X,G10.3,1X,G10.3,1X,A,1X,G10.3,1X,G10.3)')
      :      X, Y, JUST, UPX, UPY
 
@@ -423,7 +430,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
 
       INTEGER CAP, VALUE
 
-      WRITE(*,*) 'REG_CAP: ', CAP
+      WRITE(*,'(A,I2)') 'REG_CAP: ', CAP
 
       REG_CAP = 0
       IF( CAP .EQ. GRF__SCALES ) REG_CAP = 1
@@ -436,7 +443,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
       IMPLICIT NONE
       REAL ALPHA, BETA
 
-      WRITE(*,*) 'REG_SCALES: '
+      WRITE(*,'(A)') 'REG_SCALES: '
 
       ALPHA = 1.0
       BETA = 1.0
@@ -451,7 +458,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
       IMPLICIT NONE
       REAL CHV, CHH
 
-      WRITE(*,*) 'REG_QCH: '
+      WRITE(*,'(A)') 'REG_QCH: '
 
       CHV = 0.01
       CHH = 0.01
@@ -469,7 +476,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
       IMPLICIT NONE
       CHARACTER CARD*80
       INTEGER STATUS
-      WRITE(*,*) CARD
+      WRITE(*,'(A)') CARD
       END
 
 
@@ -1483,7 +1490,7 @@ c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
       ELSE
          REG_SOURCE = 0
          STATUS = SAI__ERROR
-         WRITE(*,*) 'REG_SOURCE: No such test: ',CMN_FTEST
+         WRITE(*,'(A,I2)') 'REG_SOURCE: No such test: ',CMN_FTEST
       END IF
 
       CMN_LINE = CMN_LINE + 1
