@@ -208,6 +208,7 @@ void vdm_cr_i ( char device[], int xoff, int yoff, int xdim, int ydim,
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History :
 *     26-OCT-1988 (SANTIN):
@@ -228,12 +229,14 @@ void vdm_cr_i ( char device[], int xoff, int yoff, int xdim, int ydim,
 *        Use long for pixels
 *     11-MAR-1994 (DLT):
 *        Free pixels array
+*     19-MAY-1992 (TIMJ):
+*        Decrement virgin counter if an unsupported visual error occurs
 */
 
 {
 
 /* Local Variables */
-Display            *display_id;
+Display            *display_id = NULL;
 Window             w_id;
 Pixmap             pix_id;
 XWindowAttributes  info;
@@ -337,6 +340,7 @@ if ( GWM_FindWindow( display_id, device, &w_id ) != VD_SUCCESS )
       if ( vinfo->class != PseudoColor && vinfo->class != GrayScale )
          {
          XFree( vinfo );
+         if ( virgin > 1 ) virgin--;
          *status = VD_UNSUPVT;
          return;
       }
@@ -370,6 +374,7 @@ else
    if ( vinfo->class != PseudoColor && vinfo->class != GrayScale )
       {
       XFree( vinfo );
+      if ( virgin > 1 ) virgin--;
       *status = VD_UNSUPVT;
       return;
       }
