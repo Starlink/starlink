@@ -31,6 +31,17 @@
 *    Status :
 *
       INTEGER 			STATUS
+*
+*  Local Variables:
+*
+      CHARACTER*1		IO			! Parameter mode
+
+      INTEGER			I			! Loop over parameters
+      INTEGER			ID			! File identifier
+      INTEGER			PSID			! Parameter store
+      INTEGER			NPAR			! # parameters
+
+      LOGICAL			TEMP			! Temp file?
 *-
 
 *  Check existing count
@@ -39,6 +50,24 @@
       CALL USI0_OUTLOG( STATUS )
 
 *  Export data to external environment
+      CALL ADI_NCMP( CTX_PST(USI_ICTX), NPAR, STATUS )
+      DO I = 1, NPAR
+
+*    Locate the parameter
+        CALL ADI_INDCMP( CTX_PST(USI_ICTX), I, PSID, STATUS )
+
+*    Get its 3 bits of info
+        CALL ADI_CGET0C( PSID, 'IO', IO, STATUS )
+        CALL ADI_CGET0I( PSID, 'ID', ID, STATUS )
+        CALL ADI_CGET0L( PSID, 'TEMP', TEMP, STATUS )
+
+*    Close the file
+        CALL ADI_FCLOSE( ID, STATUS )
+
+*    Release parameter
+        CALL ADI_ERASE( PSID, STATUS )
+
+      END DO
 
 *  Reset context data
       CTX_TYPE(USI_ICTX) = 0
