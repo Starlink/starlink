@@ -72,8 +72,15 @@ all: $(ALL_TARGETS)
 # inaccurate if we (rarely) add a new component, so they're good
 # enough for their purpose.  componentset.xml doesn't really depend on
 # configure.ac, but it's a useful and plausible dummy to end the list with.
+#
+# The test of whether $(JAVA) is zero-length is important.  An edited
+# version of this file is used by the ./bootstrap script, in which the
+# JAVA variable is empty (since the directory may not have been
+# configured yet); we must not fail in this case, nor may we attempt
+# to make GenerateDependencies.class.
 Makefile.dependencies: componentset.xml
-	if test -f buildsupport/starconf/java/GenerateDependencies.class;then \
+	if test -f buildsupport/starconf/java/GenerateDependencies.class \
+			-o -z "$(JAVA)";then \
 		:; \
 	    else \
 		cd buildsupport/starconf/java && \
@@ -85,9 +92,7 @@ Makefile.dependencies: componentset.xml
 	    && echo "componentset.xml: \\" >>$@ \
 	    && find . -name component.xml | sed 's/\(.*\)/		\1 \\/' >>$@ \
 	    && echo "		configure.ac" >>$@; \
-	else \
-	    :; \
-	fi
+	else :; fi
 
 # Make a componentset.xml by concatenating all the component.xml files
 # we can find.  Sort the list of files, not because this matters, but
