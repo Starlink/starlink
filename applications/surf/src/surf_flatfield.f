@@ -1,8 +1,48 @@
-*+  REDS_FLATFIELD - routine to flatfield demodulated SCUBA data 
+
+
       SUBROUTINE REDS_FLATFIELD (STATUS)
-*    Description :
+*+
+*  Name:
+*     REDS_FLATFIELD
+
+*  Purpose:
+*     Routine to flatfield demodulated SCUBA data 
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_FLATFIELD( STATUS )
+ 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+
+*  Description:
 *     This routine flatfields SCUBA demodulated data. 
 *
+
+*  Usage:
+*     flatfield in out
+
+*  ADAM parameters:
+*     IN = NDF (Read)
+*        The name of the NDF containing the demodulated data to be flatfielded.
+*        This should already have been run through the REDUCE_SWITCH application.
+*     OUT = NDF (Write)
+*        The name of the NDF the flatfielded data are to be written to.
+
+*  Examples:
+*     flatfield redsw flat
+*        This will flatfield the data from redsw.sdf and write it to flat.sdf
+
+*  Notes:
+*     The input data must have been REDUCE-SWITCHed.
+
+*  Algorithm:
 *        The data array of the IN file should have dimensions (N_BOLS,N_POS) 
 *     for most observing modes, where N_BOLS was the number of bolometers 
 *     measured and N_POS the number of times they were measured. In PHOTOM 
@@ -18,46 +58,45 @@
 *        The application will not run on input files that have not previously
 *     been processed by the REDUCE_SWITCH application or which have already
 *     had FLATFIELD run on them.
-*        The parameters used are:-
-*
-*      IN               - the name of the ndf containing the demodulated
-*                         data to be flatfielded. This should already have
-*                         been run through the REDUCE_SWITCH application.
-*
-*      OUT              - the name of the ndf the flatfielded data are to 
-*                         be written to.
-*    Invocation :
-*     CALL REDS_FLATFIELD (STATUS)
-*    Parameters :
-*     STATUS          = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
+
+*  Implementation Status:
+*     -Bad pixel handling is performed.
+
 *    Authors :
-*     J.Lightfoot (JFL/ROE)
+*     JFL: J.Lightfoot (ROE)
+*     TIMJ: T. Jenness (JACH)
+
 *    History :
 *     $Id$
 *     18-JUN-1996: Original version.
-*    endhistory
+*     $Log$
+*     Revision 1.5  1996/10/31 18:22:55  timj
+*     Added modern Starlink header.
+*
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+
 *    Type Definitions :
       IMPLICIT NONE
+
 *    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'SAE_PAR'                ! SSE global definitions
+      INCLUDE 'DAT_PAR'                ! Data-system constants
       INCLUDE 'REDS_SYS'               ! REDS constants
-*    Import :
-*    Import-Export :
-*    Export :
+
 *    Status :
       INTEGER STATUS
-*    External references :
-*    Global variables :
+
 *    Local Constants :
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
+
 *    Local variables :
-      BYTE             BADBIT
+      BYTE             BADBIT          ! Bad bit mask
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -107,9 +146,7 @@
                                        ! has been run on input file
       INTEGER          RUN_NUMBER      ! run number of input file
       CHARACTER*80     STEMP           ! scratch string
-*    Internal References :
-*    Local data :
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
