@@ -1,5 +1,6 @@
 FC    = f77
-FFLAGS = -O4 -C -ftrap=%all
+FFLAGS = -O4 -C
+CFLAGS = 
 
 # install
 
@@ -14,12 +15,12 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_2pos_confn.f sculib_3pos_confn.f sculib_statr.f \
 	sculib_add_demod_exposure.f sculib_addare.f \
 	sculib_extract_bol.f sculib_insert_bol.f \
-	sculib_addcai.f sculib_addcar.f sculib_airmass.f \
+	sculib_addcai.f sculib_addcad.f sculib_addcar.f sculib_airmass.f \
 	sculib_apparent_2_tp.f sculib_wtfn_regrid_1.f \
 	sculib_wtfn_regrid_2.f \
 	sculib_wtfn_regrid_3.f sculib_bessj1.f sculib_boldecode.f \
 	sculib_bolname.f sculib_bolselect.f sculib_calc_apparent.f \
-	sculib_calc_bol_coords.f \
+	sculib_calc_bol_coords.f sculib_remove_linear_baseline.f\
 	sculib_calc_flatfield.f sculib_calc_grid.f \
 	sculib_calc_output_coords.f sculib_calc_sub_bols.f sculib_cfilld.f \
 	sculib_cfilli.f sculib_cfillr.f sculib_coadd.f sculib_coadd_remove.f \
@@ -33,7 +34,7 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_fit_2d_parabola.f sculib_fit_d2xisq_daj2.f sculib_fit_skydip.f \
 	sculib_fit_d2xisq_dajk.f sculib_fit_dxisq_daj.f sculib_fit_function.f \
 	sculib_fit_makealpha.f sculib_fit_makebeta.f sculib_fit_mult.f \
-	sculib_fit_plane.f sculib_flatfield_data.f sculib_flatfield_sequence.f \
+	sculib_fit_plane.f sculib_flatfield_data.f sculib_flatfield_sequence.f\
 	sculib_free.f sculib_gensyconfn.f sculib_get_fits_c.f \
         sculib_get_fits_d.f sculib_get_fits_i.f sculib_get_fits_l.f \
 	sculib_get_fits_r.f sculib_decode_spec.f sculib_decode_component.f \
@@ -50,7 +51,7 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_remove_opacity.f sculib_rewrite_fits_c.f \
 	sculib_rewrite_fits_i.f \
 	sculib_rewrite_fits_r.f sculib_set_user.f sculib_sinc.f \
-	sculib_skycon_1.f \
+	sculib_skycon_1.f sculib_search_datadir.f\
 	sculib_skydip_allan_variance.f sculib_skydip_bols.f \
 	sculib_skydip_temperatures.f sculib_skyfunc_1.f sculib_skyfunc_2.f \
 	sculib_sqrootr.f sculib_standard_apparent.f sculib_sub_tauz.f \
@@ -63,14 +64,24 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_extract_2dim_d.f sculib_skyfunc.f sculib_skyfuncd.f \
 	sculib_get_dem_pntr.f sculib_get_lst_strt.f sculib_get_bol_desc.f \
 	sculib_get_jiggle.f sculib_get_raster.f sculib_get_mjd.f \
-	sculib_process_bols.f sculib_get_sub_inst.f sculib_wtfn_regrid.f
+	sculib_process_bols.f sculib_get_sub_inst.f sculib_wtfn_regrid.f \
+	sculib_spline_regrid.f sculib_copy_good.f sculib_set_data.f\
+	sculib_spline_regrid_1.f sculib_spline_pda_idbvip.f\
+	sculib_spline_pda_idsfft.f sculib_spline_pda_surfit.f\
+	sculib_coadd_maps.f sculib_set_data_ub.f\
+	sculib_scan_apparent_tp_2_azna.f \
+	sculib_skydip_xisq.f\
+	sculib_split_file_spec.f sculib_decode_rebin_line.f \
+	sculib_set_qual.f sculib_set_data_bit.f sculib_mask_data.f
+
+CSOURCES = sculib_linux.c
 
 OBJS = ${FSOURCES:.f=.o}
 
 .f.o:
 	${FC} ${FFLAGS} -c $<
 
-lib:	${OBJS}
+lib:	${OBJS} ${CSOURCES:.c=.o}
 	ar r libsculib.a $?
 
 clean:	
