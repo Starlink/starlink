@@ -96,6 +96,7 @@
       DOUBLE PRECISION 
      :     P2( ARD__MXDIM ),     ! User coordinates of target point
      :     PIXCO( ARD__MXDIM ),  ! Pixel coordinates for current corner
+     :     ROOT2,                ! Square root of 2
      :     USERCO( ARD__MXDIM )  ! User coordinates for current corner
 
 *.
@@ -110,6 +111,7 @@
       END DO
 
 *  Loop round each dimension.
+      ROOT2 = SQRT( 2.0D0 )
       DO I = 1, NDIM
 
 *  Store the user coords of a point displaced a little away from the centre 
@@ -125,8 +127,8 @@
          END IF            
 
 *  Offset away from the centre towards this second point, going a
-*  distance equal to the sphere radius.
-         CALL AST_OFFSET( FRM, PAR, P2, PAR( NDIM + 1), USERCO, 
+*  distance equal to the sphere radius*sqrt(2) to get the exterior box.
+         CALL AST_OFFSET( FRM, PAR, P2, ROOT2*PAR( NDIM + 1), USERCO, 
      :                    STATUS )
 
 *  Transform the resulting user position to pixel coordinates.
@@ -145,7 +147,7 @@
 
 *  Now offset in the opposite direction by the same amount (do this by
 *  negating the offset distance).
-         CALL AST_OFFSET( FRM, PAR, P2, -PAR( NDIM + 1), USERCO, 
+         CALL AST_OFFSET( FRM, PAR, P2, -ROOT2*PAR( NDIM + 1), USERCO, 
      :                    STATUS )
 
 *  Transform the resulting user position to pixel coordinates.
