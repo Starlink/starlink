@@ -26,7 +26,7 @@ c    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
       data  myeqnx /1950./, mycs   /'equd'/
       data  unlstd /'unlstd'/, ecs /'ecl'/
       data  epoch  /1950./                   
-      data  plares /'cmdd'/ 
+      data  plates /'cmdd'/ 
       data online / 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
      + 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
      + 30, 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 45, 46, 47, 48, 
@@ -41,6 +41,7 @@ c    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
      +417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429,
      +430/
 
+      len = 0
 c
 c---------------------------------------------
       print*,'-----------------------------------------------'
@@ -82,10 +83,10 @@ c---------------------------------------------
  816  continue
       if (isys .EQ. 2) then
 	 write(*,910)
-  910    format(' Enter RA as nnHnnMnn.nS====================>'$)
+  910    format(' Enter RA as nnHnnMnn.nS====================>',$)
 	 read(*,303) clon
 	 write(*,911)
-  911    format(' Enter DEC as +-nnDnnMnnS===================>'$)
+  911    format(' Enter DEC as +-nnDnnMnnS===================>',$)
 	 read(*,303) clat
       endif
       if (isys .NE. 2) then
@@ -172,7 +173,7 @@ c-----loop over all posible plates
 500   continue
 822   continue
       write(*,823)
-  823 format(' Enter another position? (y/n)==============>'$)
+  823 format(' Enter another position? (y/n)==============>',$)
       read(*,821) ans 
   821 format(a1)
       if (ans .EQ. 'y') go to 816
@@ -772,9 +773,9 @@ c
 c     RA ----------------------------------
 c
       ideg = FALSE
-      hr  = 0
-      min = 0
-      sec = 0
+      hr  = 0.0
+      min = 0.0
+      sec = 0.0
       tmph = '0'
       tmpm = '0'
       tmps = '0'
@@ -859,8 +860,8 @@ c
       xyz = tsec/1000.
 c
       if(tsec.GT.60.) then
-          hr = int(tsec/10000.)
-          min = jint((tsec - hr*10000.) / 100.)
+          hr = aint(tsec/10000.)
+          min = aint((tsec - hr*10000.) / 100.)
           sec = tsec - hr*10000. - min*100.
       else
 c-------
@@ -888,9 +889,9 @@ c
 c
 c     DEC -------------------------------------
 c
-      deg = 0
-      min = 0
-      sec = 0
+      deg = 0.0
+      min = 0.0
+      sec = 0.0
       tmpd = '0'
       tmpm = '0'
       tmps = '0'
@@ -978,8 +979,8 @@ c
       tsec = abs(sec)
 c
       if(tsec.GT.60.) then
-          deg = jint(tsec/10000.)
-          min = jint((tsec - deg*10000.) / 100.)
+          deg = aint(tsec/10000.)
+          min = aint((tsec - deg*10000.) / 100.)
           sec = tsec - deg*10000. - min*100.
       else
       ilen = INDEX(tmpd,' ') 
