@@ -15,8 +15,10 @@ ECHONONL=@ECHONONL@
 test: local.config ../moggy
 	PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests # && touch test
 
+# We get peculiar linking errors on Tru64/cxx if we attempt to build
+# t3.C in this directory.  So build it in the parent.
 t3.run: t3.C ../util.o
-	$(CXX) $(CXXFLAGS) -o $@ t3.C -I.. ../util.o
+	cd ..; $(CXX) $(CXXFLAGS) -o t/$@ t/t3.C -I. util.o
 
 clean:
 	rm -f *~ *.run *.stderr *.stdout *.tmp *.diff test
