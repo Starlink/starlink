@@ -453,6 +453,8 @@
      :                    Y, STATUS )
         CALL ARR_SELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I_BGM_NSRC,
      :                    R, STATUS )
+	print *,'Stored source ',x,y,r
+	call flush(6)
 
 *    Initialise the the background model quality array. This is ok for points
 *    inside the current region, and bad outside and for bad input pixels
@@ -775,12 +777,18 @@
       DO S = 1, I_BGM_NSRC
 
 *    Get position
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X, STATUS )
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I, Y, STATUS )
-        CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I_BGM_NSRC, S, X, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I_BGM_NSRC, S, Y, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I_BGM_NSRC, S, R, STATUS )
+
+	print *,'Getting source ',s,x,y,r
+	call flush(6)
 
 *    Convert position and radius to bounding rectangle
         CALL IMG_CIRCTOBOX( X, Y, R, I1, I2, J1, J2, STATUS )
+	print *,'Bounding box',i1,i2,j1,j2
+	call flush(6)
+
         DO J = J1, J2
           DO I = I1, I2
 
