@@ -2174,8 +2174,9 @@ dat_get1c(loc, elx, value, el, status)
   ndfint &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- CODE:
+ PREINIT:
   ndfint i;
+ CODE:
   value = malloc(elx * FCHAR);
   dat_get1c_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
 
@@ -2248,8 +2249,9 @@ dat_getvc(loc, elx, value, el, status)
   ndfint &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
- CODE:
+ PREINIT:
   ndfint i;
+ CODE:
   value = malloc(elx * FCHAR);
   dat_getvc_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
   /* Write to perl character array */
@@ -3208,8 +3210,9 @@ cmp_get1c(loc, name, elx, value, el, status)
   ndfint &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- CODE:
+ PREINIT:
   ndfint i;
+ CODE:
   value = malloc(elx * FCHAR);
   cmp_get1c_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
   /* Write to perl character array */
@@ -3287,8 +3290,9 @@ cmp_getvc(loc, name, elx, value, el, status)
   ndfint &el = NO_INIT
   ndfint &status
  PROTOTYPE: $$$\@$$
- CODE:
+ PREINIT:
   ndfint i;
+ CODE:
   value = malloc(elx * FCHAR);
   cmp_getvc_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
   /* Write to perl character array */
