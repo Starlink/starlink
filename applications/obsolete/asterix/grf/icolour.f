@@ -58,7 +58,7 @@
 
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
-
+	print *,mode,i_gui
         IF (MODE.EQ.'LOAD'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_LOAD(STATUS)
         ELSEIF (MODE.EQ.'UPDATE'.AND.I_GUI) THEN
@@ -1014,7 +1014,7 @@
       INTEGER ICOL
       INTEGER GCBID
 *-
-
+	print *,ncol,nshade,first,last
       IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
 
 *  locate noticeboard copy of GCB
