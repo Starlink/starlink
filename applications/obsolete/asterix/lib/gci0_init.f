@@ -96,9 +96,6 @@
 
 *  External References:
       EXTERNAL			ADI_REQPKG
-
-*  Local variables:
-      INTEGER			DID			! Ignored identifier
 *.
 
 *  Check inherited global status.

@@ -90,8 +90,8 @@
             IF ( MTH(1:7) .EQ. 'ASTERIX' ) THEN
 
 *      Map channel centres field and check against axis values
-              CALL ADI_CMAP( INSTR.R_ID, 'ChannelSpec', 'READ',
-     :                       RCPTR, STATUS )
+              CALL ADI_CMAPR( INSTR.R_ID, 'ChannelSpec', 'READ',
+     :                        RCPTR, STATUS )
 
 *      Map in axis values
               CALL BDI_MAPAXVAL( ID, 'READ', 1, AXPTR, STATUS )

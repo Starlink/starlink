@@ -131,7 +131,7 @@
 
 *  If instrument was specified, look for detector and filter names
       IF ( IOK ) THEN
-        CALL ADI1_LOCINSTR( ARGS(1), INLOC, STATUS )
+        CALL ADI1_LOCINSTR( ARGS(1), .FALSE., INLOC, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           CALL ADI1_CGET0C( INLOC, 'DETECTOR', DOK, DET, STATUS )
           CALL ADI1_CGET0C( INLOC, 'FILTER', FOK, FILT, STATUS )
