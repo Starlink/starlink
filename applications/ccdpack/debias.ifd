@@ -80,7 +80,7 @@
             ppath GLOBAL CURRENT
             size *
             association <-global.ccdpack_bounds
-            prompt {Pixel indices of bias strips (in pairs)}
+            prompt "Pixel indices of bias strips (in pairs)[ccd_global]"
             helpkey *
           }
 
@@ -94,7 +94,7 @@
             default 1.0
             dynamic yes
             association <-global.ccdpack_rnoise
-            prompt {Readout noise (ADUs)}
+            prompt "Readout noise (ADUs)[ccd_global]"
             helpkey *
           }
 
@@ -109,7 +109,7 @@
             default 1.0
             dynamic yes
             association <-global.ccdpack_adc
-            prompt {Number of electrons per ADU}
+            prompt "Number of electrons per ADU[ccd_global]"
             helpkey *
           }
 
@@ -122,7 +122,7 @@
             ppath GLOBAL CURRENT DEFAULT
             default !
             association <-global.ccdpack_mask
-            prompt {Mask data file}
+            prompt "Mask data file[ccd_global]"
             helpkey *
           }
 
@@ -183,7 +183,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_genvar
             default FALSE
-            prompt {Do you want to generate variance estimates}
+            prompt "Do you want to generate variance estimates[ccd_global]"
             helpkey *
           }
 
@@ -206,7 +206,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_direct
             default X
-            prompt {Readout direction ( X or Y )}
+            prompt "Readout direction ( X or Y )[ccd_global]"
             helpkey *
           }
 
@@ -285,7 +285,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_preser
             default TRUE
-            prompt {Do you want to preserve the input type}
+            prompt "Do you want to preserve the input type[ccd_global]"
             helpkey *
           }
 
@@ -330,7 +330,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
-            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
             default Both
             helpkey *
           }
@@ -342,7 +342,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logfile
-            prompt {Logfile name}
+            prompt "Logfile name[ccd_global]"
             default CCDPACK.LOG
             helpkey *
           }
@@ -402,7 +402,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             default FALSE
-            prompt {Set saturated pixels to the saturation value}
+            prompt "Set saturated pixels to the saturation value[ccd_global]"
             association <-global.ccdpack_setsat
             helpkey *
           }
@@ -414,7 +414,7 @@
             vpath GLOBAL CURRENT PROMPT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             default 1.0D6
-            prompt {Saturation value}
+            prompt "Saturation value[ccd_global]"
             association <-global.ccdpack_satval
             helpkey *
           }
@@ -427,7 +427,7 @@
             ppath GLOBAL CURRENT DEFAULT
             default 0.0
             association <-global.ccdpack_defer
-            prompt {Deferred charge (ADUs)}
+            prompt "Deferred charge (ADUs)[ccd_global]"
             helpkey *
           }
 
@@ -439,7 +439,7 @@
             ppath GLOBAL CURRENT DYNAMIC
             association <-global.ccdpack_extent
             size *
-            prompt {Useful CCD region (xmin,xmax,ymin,ymax)}
+            prompt "Useful CCD region (xmin,xmax,ymin,ymax)[ccd_global]"
             helpkey *
           }
 

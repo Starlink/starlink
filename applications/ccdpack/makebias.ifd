@@ -65,7 +65,7 @@
             ppath GLOBAL DYNAMIC CURRENT DEFAULT
             dynamic yes
             default 0.0
-            prompt {Readout noise (ADUs)}
+            prompt "Readout noise (ADUs)[ccd_global]"
             association <-global.ccdpack_rnoise
             helpkey *
           }
@@ -91,7 +91,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_genvar
             default FALSE
-            prompt {Do you want to generate a variance component}
+            prompt "Do you want to generate a variance component[ccd_global]"
             helpkey *
           }
 
@@ -205,7 +205,7 @@
             ppath GLOBAL CURRENT DEFAULT
             default TRUE
             association <-global.ccdpack_preser
-            prompt {Preserve input NDF data type}
+            prompt "Preserve input NDF data type[ccd_global]"
             helpkey *
           }
 
@@ -227,7 +227,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
-            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
             default Both
             helpkey *
           }
@@ -238,7 +238,7 @@
             access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
-            prompt {Logfile name}
+            prompt "Logfile name[ccd_global]"
             default CCDPACK.LOG
             association <-global.ccdpack_logfile
             helpkey *
