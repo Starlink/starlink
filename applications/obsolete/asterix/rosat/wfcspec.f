@@ -68,7 +68,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
 *
 *    Status :
 *
@@ -118,10 +118,9 @@
 
       LOGICAL			EXPCOR			! Exposure corrected?
       LOGICAL			GOTMJD			! Got MJD from input?
-      LOGICAL IS_SET                          ! Is SSDS compound?
+      LOGICAL 			IS_SET                  ! Is SSDS compound?
       LOGICAL LVAR,LQUAL                      ! Is variance/quality present ?
       LOGICAL OK                              ! Is object ok ?
-      LOGICAL ONED                            ! Input array 1-dimensional?
       LOGICAL OVERRIDE                        ! Override date in dataset?
       LOGICAL SSDS                            ! Input file is srce search d/set
 *
