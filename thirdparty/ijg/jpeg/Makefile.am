@@ -5,7 +5,7 @@ RECURSIVE_TARGETS = all clean distclean check
 
 
 $(RECURSIVE_TARGETS):
-	cd jpeg-6b; $(MAKE) $@
+	cd src; $(MAKE) $@
 
 install:
-	cd jpeg-6b; $(MAKE) install install-lib
+	cd src; $(MAKE) install install-lib

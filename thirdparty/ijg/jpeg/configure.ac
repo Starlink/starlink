@@ -16,13 +16,13 @@ AC_PROG_MAKE_SET
 dnl    To configure jpeg, run ./configure in the source directory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS.
 (
-    cd jpeg-6b
+    cd src
     echo ./configure --prefix=$prefix --cache-file=config.cache
     ./configure --prefix=$prefix --cache-file=config.cache
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([
-    cd jpeg-6b;
+    cd src;
     $(MAKE) INSTALL_ROOT=$$DESTDIR install])
 
 AC_CONFIG_FILES([Makefile component.xml])
