@@ -1,7 +1,7 @@
-      SUBROUTINE KAPHELP( STATUS )
+      SUBROUTINE CONHELP( STATUS )
 *+
 *  Name:
-*     KAPHELP
+*     CONHELP
 
 *  Purpose:
 *     Gives help about CONVERT.
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL KAPHELP( STATUS )
+*     CALL CONHELP( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
