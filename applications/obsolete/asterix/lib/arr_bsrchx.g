@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ARR_BSRCH<X>( N, ARRAY, VALUE, MID, STATUS )
+*     CALL ARR_BSRCH<T>( N, ARRAY, VALUE, MID, STATUS )
 
 *  Description:
 *     Binary search of sorted <COMM> array. The array is assumed to be
