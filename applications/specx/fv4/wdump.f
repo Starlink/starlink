@@ -61,6 +61,7 @@ C   Main stack space
       EQUIVALENCE (IHEAD(1),CDATIM)
 
       IERR = 0
+      ERRCODE = 0
 
       STATUS = 0
 

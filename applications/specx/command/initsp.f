@@ -253,6 +253,7 @@ C   using NAMELIST directed read
       CALL UTRNLOG ('SPECX_INIT', FILENAME, STATUS)
 
       STATUS = IGETLUN (LUN, 'Initsp', .TRUE.)
+      IERR = 0
       OPEN (LUN, FILE=FILENAME, STATUS='OLD', ACCESS='SEQUENTIAL',
      &      IOSTAT=IERR)
       IF (IERR.NE.0) THEN
