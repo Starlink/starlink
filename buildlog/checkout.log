@@ -9013,6 +9013,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotBox.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotState.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotSurface.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/Points.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PtPlotSurface.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/ScatterPlot.java
