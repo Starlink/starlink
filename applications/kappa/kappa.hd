@@ -73,7 +73,6 @@ getting_data_into_k        hlp = doc$getting_data_into_k.hlp
 getting_started        hlp = doc$getting_started.hlp
 glitch        hlp = doc$glitch.hlp
 globals        hlp = doc$globals.hlp
-graphics_database        hlp = doc$graphics_database.hlp
 greyplot        hlp = doc$greyplot.hlp
 hds_data_types        hlp = doc$hds_data_types.hlp
 hints        hlp = doc$hints.hlp

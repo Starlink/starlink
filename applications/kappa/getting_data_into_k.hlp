@@ -12,7 +12,7 @@ these work `directly' with KAPPA.
 You can run CONVERT (cf. SUN/55) directly to perform conversions.
 There is also TRANDAT, which will read a text file of data values,
 or co-ordinates and data values into an NDF, and ASCIN in the
-SPECDRE package (SUN/140).
+FIGARO package.
 
 
 FITS_Readers
@@ -29,7 +29,7 @@ Tape
 
 
 FITSIN reads FITS files stored on tape.  For efficiency, you should
-select the ``no-rewind'' device for the particular tape drive, for
+select the "no-rewind" device for the particular tape drive, for
 example /dev/nrmt0h on OSF and /dev/rmt/1n on Solaris.
 
 We ask for the second file on the tape, and the headers are
@@ -83,7 +83,7 @@ its purpose in sub-topic "FITS_Airlock".
                                        ... 216,218,218,204,221,218,219,222,221,218
         TITLE          <_CHAR*13>      'SYS:ARCCL.002'
         UNITS          <_CHAR*3>       'ADU'
-        MORE           <EXT>           {structure}
+        MORE           <EXT>           {structure
            FITS(84)       <_CHAR*80>      'SIMPLE  =                    T','BI...'
                                           ... '   ...','         ING PACKEND','END'
    

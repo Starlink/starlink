@@ -15,7 +15,7 @@ Description:
    reference picture.  On completion the new picture becomes the
    current picture.
 
-   This command is a synonym for {\tt picdef xy 1.0}.
+   This command is a synonym for picdef xy 1.0.
 
 
 Parameters

@@ -109,7 +109,7 @@ There is an easier method of tailoring KAPPA to your requirements.
 If you frequently use certain commands, especially those with a long
 list of keywords and fixed values, you can define some C-shell
 aliases or ICL symbols for the commands.  Like the shell's
-$HOME/.login, ICL has a login file. (See the ``ICL for Unix''
+$HOME/.login, ICL has a login file. (See the "ICL for Unix"
 Appendix in SUN/144, or SSN/64 for details.)  If you add symbols to
 this file, each time you activate ICL these abbreviations will be
 available to you without further typing.  What you should do is to
@@ -121,7 +121,7 @@ It is possible to have several ICL login files, each for different
 work in different directories.  Now to abbreviate a command you put
 a DEFSTRING entry into the ICL login file.  For example, 
 
-     DEFSTRING MYC{ON} TURBOCONT CLEAR=F PENROT MODE=AU NCONT=7
+     DEFSTRING MYC{ON TURBOCONT CLEAR=F PENROT MODE=AU NCONT=7
 
 defines MYC or MYCO or MYCON to run TURBOCONT without clearing the
 screen, with pen rotation and seven equally spaced contour heights. 

@@ -17,7 +17,7 @@ to hurdle them.  Please suggest additions to this compilation.
 Unable_to_Obtain_Work_Space
 
 One group of error messages which may puzzle you, mostly because
-they are incomplete reads like ``Unable to create work array''.
+they are incomplete reads like "Unable to create work array".
 Many applications require temporary or work space to perform their
 calculations.  This space is stored in an HDS file within directory
 $HDS_SCRATCH and most likely is charged to your disc quota.  (If you
@@ -82,7 +82,7 @@ Application_Automatically_pPcks_up_the_Wrong_NDF
 
 Some applications read the name of the NDF used to create a plot or
 image from the graphics database in order to save typing.  Rarely,
-you'll say ``that's not the one I wanted''.  This is because AGI
+you'll say "that's not the one I wanted".  This is because AGI
 finds the last DATA picture situated within the current picture.
 Abort the application via !!, then use PICCUR or PICLIST to select
 the required FRAME picture enclosing the DATA picture, or even
@@ -242,7 +242,7 @@ position of the tape between invocations of Starlink applications.
 
 When FITSIN is given a name, the magnetic-tape system validates the
 name to check that it is a known device.  There should be a
-{\tt devdataset.sdf} file (within {\tt /star/etc} at Starlink sites)
+devdataset.sdf file (within /star/etc at Starlink sites)
 containing a list of at least all the available drives at your site.
 What FITSIN is complaining about above, is that the device you have
 given is not included in the DEVDATASET file.  Now this might be
@@ -302,9 +302,9 @@ monolith interface files.
      % hdstrace $ADAM_USER/kappa_mon full
 
 
-If that doesn't cure the problem, send me mjc@star.rl.ac.uk or the
-Starlink Software Librarian ussc@star.rl.ac.uk a log of the session
-demonstrating the problem, and we shall endeavour to interpret it
-for you, and find out what's going wrong.
+If that doesn't cure the problem, send a log of the session
+demonstrating the problem to the Starlink Software Librarian
+ussc@star.rl.ac.uk, and we shall endeavour to interpret it for
+you and find out what's going wrong.
 
 .endhelp

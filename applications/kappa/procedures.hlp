@@ -266,7 +266,7 @@ space between the left bracket and parenthesis is essential.
            PRINT Unable to find or plot the star.
         END EXCEPTION
      END PROC
-\end{verbatim}
+\end{verbatim
 \normalsize
 
 Here is another that creates a fancy display of an image with axes and

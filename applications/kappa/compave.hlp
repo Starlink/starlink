@@ -176,7 +176,7 @@ History
     Changed the way in which the bounds of the output image are
     determined so that pixel origin information is retained.
 
- {enter_further_changes}
+ {enter_further_changes
 
 Implementation_Status
 

@@ -216,7 +216,7 @@ MAX
   ppath       'CURRENT,DYNAMIC'
   prompt      'Maximum peak intensity for Gaussians'
   help        'Give the value to be used as the upper limit to 
-              Gaussians'' peak values'
+              Gaussians" peak values'
 
 MIN
 
@@ -227,7 +227,7 @@ MIN
   ppath       'CURRENT,DYNAMIC'
   prompt      'Minimum peak intensity for Gaussians'
   help        'Give the value to be used as the lower limit to 
-              Gaussians'' peak values'
+              Gaussians" peak values'
 
 BACKGROUND
 

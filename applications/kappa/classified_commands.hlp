@@ -4,6 +4,7 @@ KAPPA applications may be classified in terms of their functions as
 follows:
 
 
+
 Data_import_&_export
 
 
@@ -129,13 +130,13 @@ CONTOUR     - Contours a 2-d NDF.
 CONTOVER    - Contours a 2-d data array overlaid on an image displayed
               previously.
 DISPLAY     - Displays a 1-d or 2-d NDF.
-DRAWSIG     - Draws +/- n standard-deviation lines on a line plot.
+DRAWSIG     - Draws n standard-deviation lines on a line plot.
 ELPROF      - Creates a radial or azimuthal profile of a 2-dimensional
               image.
 GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
-LINPLOT     - Draws a line plot of a 1-d NDF's data values against their
-              axis co-ordinates.
+LINPLOT     - Draws a line plot of the data values in a 1-d NDF.
+LISTSHOW    - Displays the positions stored in a positions list.
 LOOK        - Outputs the values of a sub-array of a 2-d data array to
               the screen or a text file.
 MLINPLOT    - Draws a multi-line plot of a 2-d NDF's data values against
@@ -168,8 +169,7 @@ CSUB        - Subtracts a scalar from an NDF data structure.
 DIV         - Divides one NDF data structure by another.
 EXP10       - Takes the base-10 exponential of each pixel of a data
               array.
-EXPE        - Takes the exponential of each pixel of a data array 
-              (base e).
+EXPE        - Takes the exponential of each pixel of a data array (base e).
 EXPON       - Takes the exponential of each pixel of a data array
               (specified base).
 LOG10       - Takes the base-10 logarithm of each pixel of a data array.
@@ -208,15 +208,19 @@ PIXDUPE     - Expands an NDF by pixel duplication.
 SQORST      - Squashes or stretches a 2-d data array in either or both
               axes.
 TRANSFORMER - Applies a transformation to an NDF.
+WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
 
 
 Configuration_change
 
+CHAIN       - Concatenates a series of vectorized NDFs.
 FLIP        - Reverses an NDF's pixels along a specified dimension.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
 MANIC       - Converts all or part of a data array from one
               dimensionality to another.
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
+PROFILE     - Creates a 1-d profile through an N-d NDF.
+RESHAPE     - Reshapes an NDF, treating its arrays as vectors.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through any
               angle.
 SETBOUND    - Sets new bounds for an NDF.
@@ -305,12 +309,29 @@ HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
 
 
+NDF_world_coordinate_systems
+
+WCSADD      - Adds a new co-ordinate Frame into the WCS component of an
+              NDF.
+WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
+WCSATTRIB   - Manages attribute values associated with the WCS component
+              of an NDF.
+WCSCOPY     - Copies WCS information from one NDF to another.
+WCSFRAME    - Changes the current co-ordinate Frame in the WCS component
+              of an NDF.
+WCSREMOVE   - Removes co-ordinate Frames from the WCS component of an
+              NDF.
+WCSTRAN     - Transforms a position from one NDF co-ordinate Frame to
+              another.
+
+
 Pixel_editing_and_masking
 
 ARDGEN      - Creates a text file describing selected regions of an
               image.
 ARDMASK     - Uses an ARD file to set some pixels of an NDF to be bad.
 CHPIX       - Replaces the values of selected pixels in an NDF.
+COPYBAD     - Copies the bad pixel mask from one NDF to another.
 ERRCLIP     - Removes pixels with large errors from an NDF.
 FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
@@ -346,6 +367,7 @@ TRANMAKE    - Makes a transformation structure given its co-ordinate
               mappings.
 TRANSFORMER - Applies a transformation to an NDF.
 TRANTRACE   - Lists the contents of a transformation structure.
+WCSALIGN    - Aligns a group of 2-d NDFs using WCS information.
 
 
 Surface_fitting
@@ -406,5 +428,6 @@ NOGLOBALS   - Resets the KAPPA global parameters.
 Miscellaneous
 
 KAPHELP     - Gives help about KAPPA.
+LISTMAKE    - Create a catalogue holding a positions list.
 
 .endhelp

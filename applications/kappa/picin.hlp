@@ -31,7 +31,7 @@ COMMENT = LITERAL (Write)
 CURRENT
 
 CURRENT = _LOGICAL (Read)
-   If this is {\tt TRUE}, the current picture is compared against the
+   If this is TRUE, the current picture is compared against the
    chosen name before searching from the most-recent picture
    within the current picture. [FALSE]
 

@@ -1708,7 +1708,7 @@ Modified_applications
 
   o CONTOVER, CONTOUR, and TURBOCONT have had several improvements.
     There are two new methods for selecting the contour heights
-    using percentiles (MODE="Equalised" and "Percentiles"}).  There
+    using percentiles (MODE="Equalised" and "Percentiles").  There
     is a CONCOL parameter for selecting the colour of the contours.
     Dashed contours may be plotted for those with heights below the
     value of a new DASHED parameter.  There is a new THICK parameter
@@ -1858,5 +1858,491 @@ structure:
    HISTEQ INSPECT LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY 
    NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB 
    SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
+
+
+V0.13
+
+
+Several applications have been changed to enable them to make use
+of the NDF WCS component, which stores descriptions of world
+co-ordinate systems within NDF data structures. In some cases,
+this has involved major changes, including the removal of existing
+parameters and the addition of new parameters.
+
+
+       Scripts which make use of any of the removed or
+       modified parameters will fail when run with KAPPA
+       V0.13. Such scripts will need to be changed to take
+       account of the new features introduced in this
+       release. Check the lists below for details.
+
+
+Several new applications have also been written to support the use
+of the WCS component. If no WCS component is present within an
+NDF, applications which read the WCS component will attempt to
+find suitable WCS information in one of two other sources.
+Firstly, any IRAS90 astrometry structure contained within an NDF
+extension will be used. If no such structure can be found, any
+FITS header cards in the FITS extension will be used. Applications
+which write WCS information to an NDF will always write it in the
+form of a WCS component.
+
+One of the major changes is that some graphics applications which
+previously had many parameters to control the appearance of the
+plot (ABSLAB, ORDLAB, FONT, PLTITL, etc), now use a single STYLE
+parameter instead. The value supplied for a STYLE parameter should
+be a group of plotting attributes. Defaults for unspecified
+plotting attributes are read from the text file $KAPPA_DIR/style.def. 
+A different defaults file may be specified by setting the
+environment variable KAPPA_STYLE to hold the name of the defaults
+file to use.
+
+Another major change is that the new and modified applications no
+longer use the global COSYS parameter to select data (i.e. axis)
+or world (i.e. pixel) co-ordinates. Instead, each NDF carries
+knowledge around with it of several co-ordinate "Frames", one of
+which is nominated as the current co-ordinate Frame. This
+information is stored in the WCS component of each NDF. All
+interaction with a given NDF uses the current co-ordinate Frame
+when referring to positions within the NDF. The new application
+WCSFRAME can be used to change the current co-ordinate Frame in an
+NDF.
+
+A more minor change is that the PXSIZE and PYSIZE parameters have
+been removed from the modified graphics applications. These
+parameters were previously used to specify the absolute size of
+the picture in metres. PICDEF can now be used to do this, using
+the new SIZE parameter. A picture of the required size should be
+created before running the appropriate plotting application.
+
+The section of SUN/95 entitled "Graphics Database" has been
+completely re-written to illustrate the new WCS facilities of the
+AGI graphics database. In addition, two new sections have been
+added, "Using World Co-ordinate Systems" describing the use of WCS
+information within NDFs, and section "Using Plotting Styles"
+describing the use of graphical style parameters.
+
+
+Modified applications
+
+The following applications have been modified:
+
+
+COMPADD
+
+
+- The way in which the pixel index bounds of the output NDF are
+chosen has been changed in order to retain the pixel origin. The
+compression is now centred on the origin of pixel co-ordinates
+(previously the lower left corner of the output NDF was assigned
+the arbitrary pixel indices [1,1,...] irrespective of the origin
+of the supplied NDF).
+
+- Bug fixed which caused errors to be reported if COMPADD was used
+to compress 1-dimensional data.
+
+
+COMPAVE
+
+ - The choice of origin for the output NDF has been changed. See
+COMPADD.
+
+- Bug fixed which caused errors to be reported if COMPAVE was used
+to compress 1-dimensional data.
+
+
+COMPICK
+
+- The choice of origin for the output NDF has been changed. See
+COMPADD.
+
+
+CONTOUR
+
+
+- Axes are now annotated with values in the current co-ordinate
+Frame of the supplied NDF.
+
+- Information describing the co-ordinate Frames available in the
+supplied NDF is stored with the DATA picture in the AGI graphics
+database.
+
+- If the screen is not cleared before plotting a contour map (i.e.
+if the parameter CLEAR is set to FALSE), then an attempt will be
+made to align the new contour map spatially with any existing DATA
+picture. This alignment occurs by preference in the current
+co-ordinate Frame of the supplied NDF, but may occur in another
+Frame if the existing DATA picture does not have suitable WCS
+information stored with it.
+
+- There is now much greater control over the appearance of the
+map. This is provided through the STYLE and KEYSTYLE parameters
+which allow plotting attributes to be set.
+
+- The position of the key can now be controlled both vertically
+and horizontally.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute {\tt Label(1).
+
+   o BORDER -- Set AXES=TRUE, and suppress everything but the
+   border by setting suitable plotting attributes (e.g.
+   MajTickLen=0, MinTickLen=0, TextLab=0, etc).
+
+   o CONCOL -- Use the Colour(Cont) plotting attribute (or
+   parameter PENS).
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+   o FONT -- Use the Font plotting attributes.
+
+   o MAJTIC -- Use the Gap plotting attributes.
+
+   o MINTIC -- Use the MinTick plotting attribute.
+
+   o ORDLAB -- Use Label(2) plotting attribute.
+
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+
+   o PLTITL -- Use the Title plotting attribute.
+
+   o PXSIZE -- Create the picture first using PICDEF, specifying
+   the required picture size using the new parameter SIZE.
+
+   o PYSIZE -- See PXSIZE.
+
+   o THICK -- Use the Width plotting attributes.
+
+
+- The following new parameters have been added: KEYPOS, KEYSTYLE,
+MARGIN, PENS, STYLE, USEAXIS.
+
+- The following parameters have been modified:
+
+   o AXES -- Axes are now annotated with the current co-ordinate
+   Frame of the NDF.
+
+   o CLEAR -- Setting CLEAR=FALSE cause the new contour map to be
+   aligned spatially with any existing DATA picture (if possible).
+
+   o KEY -- The appearance of the key can now be controlled using
+   parameter KEYSTYLE, and the position of the key can be
+   controlled using parameter KEYPOS.
+
+
+CURSOR 
+
+
+- The positions are now reported in the current co-ordinate Frame
+of the picture (by default). This can be changed using the new
+parameter FRAME.
+
+- The format of the reported positions has changed (axis symbols
+and units are now included, and the picture comment, name and
+label are displayed on a separate line).
+
+- There are now many more options for marking the positions on the
+screen. Detailed control over the appearance of these graphics is
+provided through the new STYLE parameter.
+
+- Control is now available over the minimum and maximum number of
+position which may be supplied.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o COLOUR -- Use the STYLE parameter to specify values for the
+   Colour plotting attributes.
+
+   o COSYS -- Use parameter FRAME.
+                  
+   o DOUBLE -- Double precision is now always used.
+                  
+   o XC -- Use parameters LASTPOS and LASTDIM.
+
+   o XP -- Specify an output catalogue using parameter OUTCAT, and
+   then read the required positions using application LISTSHOW.
+
+   o YC -- Use parameters LASTPOS and LASTDIM.
+                  
+   o YP -- See XP.
+
+- The following new parameters have been added: DESCRIBE, EPOCH,
+FRAME, GEODESIC, INFO, LASTDIM, LASTPOS, MARKER, MAXPOS, MINPOS,
+OUTLIST, QUIET, SHOWPIXEL, STRINGS, STYLE.
+
+- The following parameters have been modified:
+
+   o PLOT -- Option "Cross" has been changed (it now produces a
+   full-screen cross-hair), and the new options "Mark", "Chain",
+   "Box", "Vline", "Hline" and "Text" have been added.
+
+
+
+DISPLAY
+
+
+- Axes are now annotated with values in the current co-ordinate
+Frame of the supplied NDF.
+
+- Information describing the co-ordinate Frames available in the
+supplied NDF is stored with the DATA picture in the AGI graphics
+database.
+
+- There is now much greater control over the appearance of the
+axes or border. This is provided through the STYLE and BORSTYLE
+parameters which allow plotting attributes to be set.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute Label(1).
+
+   o BCOLOUR -- Use the Colour(Border) plotting attribute.
+
+   o BWIDTH -- Use the Width(Border) plotting attribute.
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+   o FONT -- Use the Font plotting attributes.
+                  
+   o MAJTIC -- Use the Gap plotting attributes.
+                  
+   o MINTIC -- Use the MinTick plotting attribute.
+                  
+   o ORDLAB -- Use Label(2) plotting attribute.
+
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+
+   o PLTITL -- Use the Title plotting attribute.
+
+   o SQUASH -- Specify the required scale factors explicitly using
+   parameters XMAGN and YMAGN.
+
+   o THICK -- Use the Width plotting attributes.
+
+- The following new parameters have been added: BORSTYLE, MARGIN,
+STYLE, USEAXIS.
+
+- The following parameters have been modified:
+
+   o AXES -- Axes are now annotated with the current co-ordinate
+   Frame of the NDF. The default value is now the current value
+   (initially TRUE) instead of FALSE.
+
+   o BORDER -- The default value is now the current value
+   (initially FALSE) instead of FALSE.
+
+   o CENTRE -- This is now a literal string value which should be
+   given the formatted co-ordinates of the position to put at the
+   centre of the picture. These co-ordinates should be expressed
+   within the current co-ordinate Frame of the NDF.
+
+   o CLEAR -- The default value is now the current value instead
+   of FALSE.
+
+   o FILL -- The default value is now TRUE if the input NDF is
+   1-dimensional, and FALSE otherwise.
+
+   o XMAGN -- This used to be the number of device pixels per NDF
+   pixel along the horizontal axis. It is now a scaling factor,
+   with a value of 1.0 producing an image which just fills the
+   available width on the screen.
+
+   o YMAGN -- This has been changed in the same way as XMAGN.
+
+
+LINPLOT
+
+
+- NDFs in which the current co-ordinate Frame has more than 1
+dimension can now be handled. For example, a 1-d trace through a
+2-d image will in general have a 2-d current co-ordinate Frame,
+even though the pixel array itself is only 1-d. In this case, the
+current co-ordinate Frame gives the position of each pixel within
+the original 2-d image.
+
+- The horizontal axis is now annotated using the current
+co-ordinate Frame of the supplied NDF. If this has more than one
+dimension, then the horizontal axis can be annotated using any
+specified axis in the current Frame. Alternatively, the distance
+from the starting point to each position on the horizontal axis
+may be used for the annotation.
+
+- There is now much greater control over the appearance of the
+plot. This is provided through the STYLE parameter.
+
+- A key can now be produced indicating the starting and ending
+points of the plot within the current co-ordinate Frame of the
+NDF. Its appearance can be controlled using the KEYSTYLE
+parameter.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute Label(1).
+
+   o ABSLIM -- Use parameters YBOT and YTOP.
+                  
+   o AXLIM -- Use parameter ALIGN.
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+   o ERRCOL -- Use the Colour(ErrBars) plotting attribute.
+                  
+   o FONT -- Use the Font plotting attributes.
+                  
+   o LINCOL -- Use the Colour(Lines) plotting attribute.
+                  
+   o MAJTIC -- Use the Gap plotting attributes.
+                  
+   o MINTIC -- Use the MinTick plotting attribute.
+                  
+   o ORDLAB -- Use Label(2) plotting attribute.
+                  
+   o ORDLIM -- Use parameters XLEFT and XRIGHT.
+                  
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+                  
+   o PLTITL -- Use the Title plotting attribute.
+
+   o PXSIZE -- Create the picture first using PICDEF, specifying
+   the required picture size using the new parameter SIZE.
+
+   o PYSIZE -- See PXSIZE.
+                  
+   o SYMCOL -- Use the Colour(Symbols) plotting attribute.
+                  
+   o THICK -- Use the Width plotting attributes.
+                  
+   o XLOG -- Logarithmic X axes are not currently supported.
+
+- The following new parameters have been added: ALIGN, AXES, KEY,
+KEYSTYLE, MARGIN, MARKER, STYLE, USEAXIS, XLEFT, XRIGHT, XSIGMA,
+YTOP, YBOT, YSIGMA.
+
+- The following parameters have been modified:
+
+   o MODE -- The option of supplying an integer marker type has
+   been removed (replaced by parameter MARKER). Options "Mark" and
+   "Chain" have been added.
+
+   o YLOG -- Logarithmic data values are now represented as
+   equally spaced values of log(data), instead of logarithmically
+   spaced values of data.
+
+
+NATIVE
+
+
+- Any floating point NaN or Inf values in the supplied HDS object
+are now converted to the appropriate Starlink bad value. This
+occurs even if the object already has the appropriate primitive
+data representation for the machine in use.
+
+
+NDFTRACE 
+
+
+- This now displays the available WCS information within an NDF.
+If a WCS component is not present within the NDF, then it will
+display WCS information derived from an IRAS90 astrometry
+structure or FITS extension (if possible) as described earlier.
+
+- The following new parameters have been added: CURRENT, FDIM,
+FDOMAIN, FTITLE, FULLFRAME, FULLWCS, WCS.
+
+
+PICDEF 
+
+
+- This now allows the picture size to be specified in absolute
+units (centimetres).
+
+- The following new parameter has been added: SIZE
+
+
+PSF
+
+
+- This now allows the gamma coefficient to be constrained to be
+two.  A failure to meet the tolerance test is no longer fatal.
+Warning messages showing the requested and used tolerances replace
+the error message.
+
+- The following new parameter has been added: GAUSS
+
+
+New applications
+
+
+- CHAIN -- Concatenates a series of NDFs, in the order supplied
+and treated as vectors, to form a 1-dimensional output NDF.  The
+dimensions of the NDFs may be different, and indeed so may their
+dimensionalities.
+
+- COPYBAD -- Copies the bad pixels from one NDF into another.
+
+- LISTMAKE -- Creates a catalogue holding a positions list. These
+are used to communicate positions between applications, together
+with associated WCS information. In addition to numerical axis
+values, they also contain an integer identifier for each position,
+and a description of the available co-ordinate Frames. The
+positions are supplied by the user in a file or in response to
+parameter prompts. Alternatively, the pixel centres in a specified
+NDF may be used.
+
+- LISTSHOW -- Shows a sub-set of the positions contained within a
+positions list catalogue, in any of the co-ordinate Frames
+described within the catalogue. It can also write the selected
+positions to a new positions list. The positions are displayed on
+the screen, and can also be marked on the current graphics device
+in a variety of ways.
+
+- PROFILE -- Produces a 1-dimensional NDF containing a profile
+through an N-dimensional NDF, retaining the current co-ordinate
+Frame of the n-dimensional NDF. The data values in the output NDF
+are samples taken along a specified 1-dimensional curve through
+the input NDF.
+
+- RESHAPE -- This application reshapes an NDF to create another
+NDF by copying array values.  The array components in the input
+NDF are treated as vectors.  Each output array is filled in order
+with values from the input vector, until it is full or the input
+vector is exhausted.
+
+- WCSADD -- Allows a new co-ordinate Frame to be added into the
+WCS component of an NDF. The new Frame must be linearly related to
+an existing Frame.
+
+- WCSALIGN -- Resamples a group of 2-dimensional NDFs in order to
+align them with a specified reference NDF. The WCS information
+within the NDFs is used to determine the transformations required
+to achieve alignment.
+
+- WCSATTRIB -- Allows attributes within the WCS component of an
+NDF to be examined or changed.
+
+- WCSCOPY -- Copies the WCS component from one NDF to another. One
+use of this is to allow WCS information to be re-instated in an
+NDF after being stripped out by an application which does not
+propagate WCS information.
+
+- WCSFRAME -- Allows the current co-ordinate Frame within an NDF
+to be examined and changed.
+
+- WCSREMOVE -- Removes one or more co-ordinate Frames from the WCS
+component of an NDF.
+
+- WCSTRAN -- Transforms a position from one NDF WCS co-ordinate
+Frame to another.
 
 .endhelp

@@ -78,7 +78,7 @@ Navigating_the_Help_Library
       o  a <CR> to see more text at a "Press RETURN to continue ..."
          request;
 
-      o  a <CR>} at topic and subtopic prompts to move up one level
+      o  a <CR> at topic and subtopic prompts to move up one level
          in the hierarchy, and if you are at the top level it will
          terminate the help session;
 

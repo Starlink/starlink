@@ -151,5 +151,5 @@ Implementation_Status
    FITS extension into the requested order, removing the relocated
    cards.  It then inserts the new values.  If there are multiple
    occurrences of a keyword, this process can leave behind cards
-   having the token value '{undefined}'.
+   having the token value '{undefined'.
 .endhelp

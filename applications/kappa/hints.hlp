@@ -91,12 +91,12 @@ Graphics
 See topic "Selecting_Graphics_Devices" for selecting an output
 device for your plots.  If you are using an image display topic
 "Colour_Table_and_Palette" gives details of how to control the
-appearance of colour tables and the annotation palette.  There are
-also examples of how to create lookup tables.  See topic
-"Graphics_Database" for an explanation of the graphics database, and
-Section 9 of SUN/95 has illustrated examples of how to use the
-database.  The topics on "Co-ordinate_Systems" and
-"Interaction_Mode" are partially related to the graphics database.
+appearance of colour tables and the annotation palette.  There
+are also examples of how to create lookup tables. SUN/95 has a
+section called "The Graphics Database" containing illustrated
+examples of how to use the AGI graphics database.  The topics on
+"Co-ordinate_Systems" and "Interaction_Mode" are partially
+related to the graphics database.
 
 
 Issuing_Commands

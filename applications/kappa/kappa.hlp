@@ -5,7 +5,7 @@ applications, particularly for image processing, data visualisation,
 and manipulating components in the Starlink standard data format:
 the NDF.  KAPPA provides facilities that integrate with specialised
 packages such as CCDPACK, ESP, Figaro, IRAS90, JCMTDR, PHOTOM, PISA,
-SPECDRE, and TSP.  Topic "Role of KAPPA" explains this more fully.
+and TSP.  Topic "Role of KAPPA" explains this more fully.
 
 KAPPA commands are available from both the UNIX C-shell (and
 variants) and from the ICL command language.  The "Functionality"

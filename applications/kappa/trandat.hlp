@@ -255,7 +255,7 @@ use all the data points in the file.
 
 Related_Applications
 
-   CONVERT: ASCII2NDF, NDF2ASCII; SPECDRE: ASCIN, ASCOUT.
+   CONVERT: ASCII2NDF, NDF2ASCII; FIGARO: ASCIN, ASCOUT.
 
 Authors
 

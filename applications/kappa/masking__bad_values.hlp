@@ -120,7 +120,7 @@ a rotated box.
      Region completed. Identify another 'ROTBOX' region...
 
 If you make a mistake, enter List at the OPTION prompt to see a list
-of the regions.  Note the ``Region Index'' of the region(s) you wish
+of the regions.  Note the "Region Index" of the region(s) you wish
 to remove, and select the Delete option.  At the REGION prompt,
 give a list of the regions you want to remove.  If you change your
 mind, enter ! at the prompt for parameter REGIONS, and no regions are

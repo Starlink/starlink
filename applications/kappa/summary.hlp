@@ -16,17 +16,14 @@ AXLABEL     - Sets a new label value for an axis within an NDF data
               structure.
 AXUNITS     - Sets a new units value for an axis within an NDF data
               structure.
-
-
 BLOCK       - Smooths a 1- or 2-dimensional image using a square or
               rectangular box filter.
-
-
 CADD        - Adds a scalar to an NDF data structure.
 CALC        - Evaluates a mathematical expression.
 CALPOL      - Calculates polarisation parameters.
 CDIV        - Divides an NDF by a scalar.
 CENTROID    - Finds the centroids of star-like features in an NDF.
+CHAIN	    -  Concatenates a series of vectorized NDFs.
 CHPIX       - Replaces the values of selected pixels in an NDF.
 CMULT       - Multiplies an NDF by a scalar.
 COMPADD     - Reduces the size of an NDF by adding values in
@@ -39,6 +36,7 @@ CONTOUR     - Contours a 2-d NDF.
 CONTOVER    - Contours a 2-d NDF overlaid on an image displayed
               previously.
 CONVOLVE    - Convolves a pair of 1- or 2-dimensional NDFs together.
+COPYBAD	    - Copies the bad pixel mask from one NDF to another.
 CREFRAME    - Generates a test 2-d data array from a selection of
               several types.
 CRELUT      - Creates or manipulates an image-display lookup table
@@ -46,12 +44,9 @@ CRELUT      - Creates or manipulates an image-display lookup table
 CSUB        - Subtracts a scalar from an NDF data structure.
 CURSOR      - Reports the co-ordinates of points selected using the
               cursor.
-
-
 DISPLAY     - Displays a 1-d or 2-d NDF.
 DIV         - Divides one NDF data structure by another.
 DRAWSIG     - Draws +/-n standard-deviation lines on a line plot.
-
 ELPROF      - Creates a radial or azimuthal profile of a
               2-dimensional image.
 ERASE       - Erases an HDS object.
@@ -61,8 +56,6 @@ EXP10       - Takes the base-10 exponential of each pixel of a data
 EXPE        - Takes the exponential of each pixel of a data array
               (base e).
 EXPON       - Takes the exponential of each pixel  of a data array.
-
-
 FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
 FILLBAD     - Removes regions of bad values from a 2-dimensional NDF.
@@ -87,8 +80,6 @@ FITSWRITE   - Writes a new keyword to the FITS extension.
 FLIP        - Reverses an NDF's pixels along a specified dimension.
 FOURIER     - Performs forward and inverse Fourier transforms of
               1- or 2-dimensional NDFs.
-
-
 GAUSMOOTH   - Smooths a 1- or 2-dimensional image using a Gaussian
               filter.
 GDCLEAR     - Clears a graphics device and purges its database
@@ -100,8 +91,6 @@ GLITCH      - Replaces bad pixels in a 2-d data array with the local
               median.
 GLOBALS     - Displays the values of the KAPPA global parameters.
 GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
-
-
 HISCOM      - Adds commentary to the history of an NDF.
 HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
@@ -109,8 +98,6 @@ HISTAT      - Computes ordered statistics for an NDF's pixels using
               an histogram.
 HISTEQ      - Performs an histogram equalisation on an NDF.
 HISTOGRAM   - Computes an histogram of an NDF's values.
-
-
 IDCLEAR     - Clears an image display and purges its database
               entries.
 IDINVISIBLE - Makes memory planes of an image-display device
@@ -119,15 +106,14 @@ IDPAZO      - Pans and zooms an image-display device.
 IDSET       - Selects a current image-display device.
 IDSTATE     - Shows the current status of an image display.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
-
-
 KAPHELP     - Gives help about KAPPA.
 KSTEST      - Compares data sets using the Kolmogorov-Smirnov test.
-
 LAPLACE     - Performs a Laplacian convolution as an edge detector
               in a 2-d data array.
 LINPLOT     - Draws a line plot of a 1-d NDF's data values against
               their axis co-ordinates.
+LISTMAKE    - Create a catalogue holding a positions list.
+LISTSHOW    - Reports the positions stored in a positions list.
 LOG10       - Takes the base-10 logarithm of each pixel of a data
               array.
 LOGAR       - Takes the logarithm of each pixel of a data array
@@ -159,8 +145,6 @@ LUTSPEC     - Loads a spectrum-like lookup table.
 LUTTWEAK    - Tweaks a colour table of an image-display device.
 LUTVIEW     - Draws a colour-table key.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
-
-
 MAKESURFACE - Creates a 2-dimensional NDF from the coefficients of
               a polynomial surface.
 MANIC       - Converts all or part of a data array from one
@@ -178,8 +162,6 @@ MOSAIC      - Merges several non-congruent 2-d data arrays into one
 MSTATS      - Does cumulative statistics on a 2-d sub-array over a
               sequence of data arrays.
 MULT        - Multiplies two NDF data structures.
-
-
 NATIVE      - Converts an HDS object to native machine data
               representation.
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
@@ -191,14 +173,10 @@ NORMALIZE   - Normalises one NDF to a similar NDF by calculating a
               scale factor and zero difference.
 NUMB        - Counts the number of elements of an NDF with values or
               absolute values above or below a threshold.
-
-
 OUTSET      - Sets pixels outside a specified circle in a 2-d data
               array to a specified value.
 OVCLEAR     - Clears an image-display overlay.
 OVSET       - Selects a current image-display overlay.
-
-
 PALDEF      - Loads the default palette to a colour table.
 PALENTRY    - Enters a colour into an image display's palette.
 PALREAD     - Fills the palette of a colour table from an NDF.
@@ -235,20 +213,16 @@ PICXY       - Creates a new picture defined by co-ordinate bounds.
 PIXDUPE     - Expands an NDF by pixel duplication.
 POW         - Takes the specified power of each pixel of a data
               array.
+PROFILE	    -  Creates a 1-d profile through an N-d NDF.
 PSF         - Determines the parameters of a model star profile by
               fitting star images in a two-dimensional NDF.
-
-
 QUILT       - Generates a mosaic from equally sized 2-d data arrays,
               optionally specified from an ASCII file.
-
-
+RESHAPE	    -  Reshapes an NDF, treating its arrays as vectors.
 RIFT        - Adds a scalar to a section of an NDF data structure
               to correct rift-valley defects.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through
               any angle.
-
-
 SEGMENT     - Copies polygonal segments from one NDF to another.
 SETAXIS     - Sets values for an axis array component within an NDF
               data structure.
@@ -282,8 +256,6 @@ SUBSTITUTE  - Replaces all occurrences of a given value in an NDF
               array with another value.
 SURFIT      - Fits a polynomial or spline surface to a 2-d data
               array using blocking.
-
-
 THRESH      - Edits an NDF such that array values below and above
               two thresholds take constant values.
 TRANDAT     - Converts free-format text data into an NDF.
@@ -296,9 +268,14 @@ TRANTRACE   - Lists the contents of a transformation structure.
 TRIG        - Performs a trigonometric transformation on a data
               array.
 TURBOCONT   - Contours a 2-d NDF quickly.
-
-
 VECPLOT     - Plots a 2-dimensional vector map.
+WCSADD	    -  Adds a new co-ordinate Frame into the WCS component of an NDF.
+WCSALIGN    -  Aligns a group of 2-d NDFs using WCS information.
+WCSATTRIB   -  Manages attribute values associated with the WCS component of an NDF.
+WCSCOPY	    -  Copies WCS information from one NDF to another.
+WCSFRAME    - Changes the current co-ordinate Frame in the WCS component of an NDF.
+WCSREMOVE   -  Removes co-ordinate Frames from the WCS component of an NDF.
+WCSTRAN	    -  Transforms a position from one NDF co-ordinate Frame to another.
 WIENER      - Applies a Wiener filter to a 1- or 2-dimensional
               array.
 ZAPLIN      - Replaces regions in a 2-d NDF by bad values or by

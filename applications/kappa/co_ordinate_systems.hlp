@@ -1,5 +1,45 @@
 .help co_ordinate_systems Starlink kappa
 .nf
+     KAPPA is currently undergoing major changes in the way
+     it handles co-ordinate information. The new system uses
+     the WCS (World Co-ordinate System) component of the NDF
+     structure to allow access to a much wider range of
+     co-ordinate systems than has previously been available.
+     For this reason, you will find some inconsistencies in
+     the way co-ordinate information is handled by different
+     applications. This situation will be rectified once all
+     applications have been modified to use the WCS
+     component. Until then, please pay particular attention
+     to the descriptions of the co-ordinate handling
+     facilities of each application you use.
+
+     The new (converted) applications are identified by the
+     fact that their descriptions in this help library and in
+     SUN/95 include references to the "WCS component" or to
+     "WCS information". In the new system, each NDF has a
+     "current co-ordinate Frame". The converted applications
+     use this co-ordinate Frame when referring to any
+     position within the NDF, for instance when producing
+     axis annotation, or requesting a position from the user.
+     Each NDF has its own current co-ordinate Frame, and the
+     global parameter GLOBAL.COORD_SYSTEM is ignored. These
+     application do not have a COSYS parameter which has
+     previously been used to specify a co-ordinate system.
+
+     In the previous system, there was a "global" co-ordinate
+     system which was used by all applications irrespective
+     of the contents of the NDF. This co-ordinate system was
+     either data or world and was obtained by each
+     application using a COSYS parameter. These parameters
+     were associated with the global parameter
+     GLOBAL.COORD_SYSTEM.
+
+     The rest of this section describes the old pre-WCS
+     system and will be removed when the conversion process
+     is complete. The new system is described in SUN/95
+     section "Using World Co-ordinate Systems"
+
+
 KAPPA uses a number of co-ordinate systems; this topic describes
 them, and how to select one.  NDFTRACE reports the bounds of an NDF
 in these various co-ordinate systems. 

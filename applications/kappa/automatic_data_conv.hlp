@@ -39,7 +39,7 @@ m51.sdf).  If it could not locate that NDF, STATS would then look
 for a file called m51.fit, and then m51.imh, and finally m51.dst,
 stopping once a file was found and associating the appropriate
 format with it.  If none of the files exist, you'll receive a
-``file not found'' error message.
+"file not found" error message.
 
 You can still define an NDF section (see topic "NDF_Sections") when
 you access an existing data file in a foreign format.  Thus

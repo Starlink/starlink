@@ -98,7 +98,7 @@ CONTOVER, INSPECT or SEGMENT.  A GWM overlay does have one drawback,
 however: it halves the number of available colour indices.  If you
 want to use an X-windows overlay, you must ensure that you have made
 the window with the -overlay qualifier to xmake, or change your
-X-defaults file, or use a {\tt +} suffix to the device name.
+X-defaults file, or use a + suffix to the device name.
 
 The following set up to place in your X-defaults file is a reasonable
 compromise, as it maximises the number of colour indices for the

@@ -140,14 +140,14 @@ the hierarchy is indented.
       TITLE          <_CHAR*30>      'HR6259 - AAT fibre data'
       LABEL          <_CHAR*20>      'Flux'
       UNITS          <_CHAR*20>      'Counts/s'
-      QUALITY        <QUALITY>       {structure}
+      QUALITY        <QUALITY>       {structure
          BADBITS        <_UBYTE>        1
          QUALITY(856)   <_UBYTE>        1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
                                      ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
 
       VARIANCE(856)  <_REAL>         2.1,0.1713413,1.5301,34.38378,42.35531,
                                      ... 615.6732,427.5547,353.9127,337.1805
-      AXIS(1)        <AXIS>          {structure}
+      AXIS(1)        <AXIS>          {structure
 
       Contents of AXIS(1)
          DATA_ARRAY(856)  <_REAL>       3847.142,3847.672,3848.201,3848.731,
@@ -155,10 +155,10 @@ the hierarchy is indented.
          LABEL          <_CHAR*20>      'Wavelength'
          UNITS          <_CHAR*20>      'Angstroms'
 
-      HISTORY        <HISTORY>       {structure}
+      HISTORY        <HISTORY>       {structure
          CREATED        <_CHAR*30>      '1990-DEC-12 08:21:02.324'
          CURRENT_RECORD  <_INTEGER>     3
-         RECORDS(10)    <HIST_REC>      {array of structures}
+         RECORDS(10)    <HIST_REC>      {array of structures
 
          Contents of RECORDS(1)
             TEXT           <_CHAR*40>      'Extracted spectrum from fibre data.'
@@ -166,8 +166,8 @@ the hierarchy is indented.
             COMMAND        <_CHAR*30>      'FIGARO V2.4 FINDSP command'
 
 
-      MORE           <EXT>           {structure}
-         FIGARO         <EXT>           {structure}
+      MORE           <EXT>           {structure
+         FIGARO         <EXT>           {structure
             TIME           <_REAL>         1275
             SECZ           <_REAL>         2.13
 
@@ -253,6 +253,33 @@ variance of the axis centres.  All axes or none must be present.
 Use SETAXIS to set the values of an AXIS array component; AXLABEL
 and AXUNITS to set an axis LABEL or UNITS component; and SETNORM
 to set an axis normalisation flag.
+
+
+WCS 
+
+This component provides an alternative, and superior, method for
+storing co-ordinate information. The AXIS structure described
+above has the severe limitation that it can only describe
+co-ordinate systems in which all axes are independant (i.e. the
+value on any axis can be changed without needing to change the
+values on any other axes). This means for instance that axes
+cannot be rotated (other than by multiples of 90 degrees), and
+cannot be used to describe celestial co-ordinates over a large
+field, or near a pole. The WCS component overcomes these
+restrictions. It contains descriptions of an arbitrary number of
+different co-ordinate Frames, together with the mappings required
+to convert positions between these Frames. All NDFs have three
+default Frames available; these are known as the GRID, PIXEL and
+AXIS Frames. The PIXEL Frame corresponds to pixel co-ordinates.
+The AXIS Frame corresponds to the co-ordinate Frame implied by
+the NDF AXIS structures. The GRID Frame is similar to the PIXEL
+Frame, the main difference being that it has a different origin;
+the centre of the first ("bottom left") pixel is always (1.0,1.0)
+in the GRID Frame regardless of the pixel origin of the NDF.
+Other Frames can be added to the WCS component in various ways,
+for instance, by importing them from appropriate FIST headers
+(FITSIN, FITSDIN), or using an appropriate application to create
+them from scratch (eg WCSADD, SETSKY or GAIA ).
 
 
 HISTORY

@@ -23,7 +23,7 @@ Description:
    the line.  This is repeated in each line until the top-right
    picture.
 
-   This command is a synonym for "picdef array 1.0 false prefix=''"}.
+   This command is a synonym for "picdef array 1.0 false prefix="".
 
 Parameters
 

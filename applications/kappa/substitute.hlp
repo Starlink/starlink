@@ -90,7 +90,7 @@ less than their mean times the precision of the data type.
 Related_Applications
 
    KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC, ZAPLIN;
-   SPECDRE: GOODVAR.
+   FIGARO: GOODVAR.
 
 Authors
 

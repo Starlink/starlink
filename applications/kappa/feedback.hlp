@@ -1,10 +1,7 @@
 .help feedback Starlink kappa
 .nf
 Bug reports should be mailed to ussc@star.rl.ac.uk in the normal
-way.  A copy to the author (mjc@star.rl.ac.uk) may accelerate a fix.
-Normally, fix will be made the same day, and often immediately; you
-will be told from where you can copy a revised application until
-KAPPA is re-released.
+way.  
 
 Constructive comments are always welcome.  If you wish to suggest
 new tasks or enhancements to existing ones please contact the

@@ -24,16 +24,16 @@ extensions, to store any ancillary data associated with the data
 array, even other NDFs. 
 
 The backbone of the applications packages is KAPPA (Kernel
-APplication PAckage).  It provides general-purpose applications that
-have wide applicability, concentrating on image processing, data
-visualisation, and manipulating NDF components.  KAPPA provides
-facilities that integrate with specialised Starlink packages such as
-those for CCD reduction (CCDPACK), stellar and galaxy photometry
-(PHOTOM, PISA, ESP), spectroscopy (ECHOMOP, Figaro, SPECDRE,
-TWODSPEC), X-ray (ASTERIX), graphics (PONGO), time-series
-polarimetry (TSP), instrument-specific (CGS4DR, IRAS90, IRCAMPACK,
-JCMTDR) etc.  Thus the functionality of KAPPA should not be regarded
-in isolation. 
+APplication PAckage).  It provides general-purpose applications
+that have wide applicability, concentrating on image processing,
+data visualisation, and manipulating NDF components.  KAPPA
+provides facilities that integrate with specialised Starlink
+packages such as those for CCD reduction (CCDPACK), stellar and
+galaxy photometry (PHOTOM, PISA, ESP), spectroscopy (ECHOMOP,
+Figaro, TWODSPEC), X-ray (ASTERIX), graphics (PONGO), time-series
+polarimetry (TSP), instrument-specific (CGS4DR, IRAS90,
+IRCAMPACK, JCMTDR) etc.  Thus the functionality of KAPPA should
+not be regarded in isolation.
 
 Nor KAPPA should not be perceived as a rival to Figaro.  As Figaro
 applications become more integrated with Starlink packages, for

@@ -61,7 +61,7 @@ pixdupe cube1 cube2 [3,1,2]  title="Reconfigured cube"
    This expands the NDF called cube1 by having three pixels for
    each pixel along the first axis and duplicating along the
    third axis, and stores the enlarged data in the NDF called
-   cube2.  The title of cube2 is {\tt "Reconfigured cube"}.
+   cube2.  The title of cube2 is "Reconfigured cube".
 
 Related_Applications
 
@@ -81,7 +81,7 @@ History
  11-JUN-1998 (DSB):
     Added propagation of the NDF WCS component.
 
- {enter_any_changes_here}
+ {enter_any_changes_here
 
 Implementation_Status
 

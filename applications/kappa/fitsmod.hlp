@@ -285,7 +285,7 @@ File_Format
 
    The format is summarised below:
 
-     command keyword{[occur]}{(keyword{[occur]})} {value {comment}}
+     command keyword{[occur]{(keyword{[occur]) {value {comment
 
    where braces indicate optional values, and occur is the
    occurrence of the keyword.  In effect there are four fields
@@ -336,7 +336,7 @@ File_Format
       COMMENT or HISTORY.  Any text between the brackets other than
       a positive integer is interpreted as the first occurrence.
 
-      Use a null value ('' or "") if you want the card to be a
+      Use a null value (" or "") if you want the card to be a
       comment with keyword other than COMMENT or HISTORY.  As blank
       keywords are used for hierarchical keywords, to write a
       comment in a blank keyword you must give a null edit keyword.
@@ -439,12 +439,12 @@ Examples_of_the_File_Format
    the comment being "Following values apply to mid-observation".
    Note the full stop.
 
-       W DROCOM(AIRMASS) '' Following values apply to mid-observation
+       W DROCOM(AIRMASS) " Following values apply to mid-observation
    As the preceding example but this writes to a non-standard
    comment keyword called DROCOM.  Note the need to supply a null
    value.
 
-       W (AIRMASS) '' Following values apply to mid-observation
+       W (AIRMASS) " Following values apply to mid-observation
    As the preceding example but this writes to a blank-keyword
    comment.
 
