@@ -61,6 +61,7 @@
 *    24-Feb-1994   Uses RDF convention filename (INC_RDF) V1.6-15 (LTVAD::JKA)
 *    24-Apr-1994   (v1.7-0) for new asterix release
 *    15-Aug-1994   V1.7-1 Fix when NOVR=0 in XRTSUB_PARTCNT (DJA)
+*    11 Jan 1996   V1.8-2 ADI port (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -83,14 +84,8 @@
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOCSRC               ! Locator to source file
-      CHARACTER*(DAT__SZLOC) LOCBCK               ! Locator to background file
-      CHARACTER*(DAT__SZLOC) LOCOUT               ! Locator to output file
-      CHARACTER*(DAT__SZLOC) ALOC                 ! Locator to ASTERIX box
       CHARACTER*(DAT__SZLOC) RLOC                 ! Locator to response file
       CHARACTER*(DAT__SZLOC) ELOC                 ! Locator to effective areas
-      CHARACTER*(DAT__SZLOC) PLOC                 ! Locator to Particle file
-      CHARACTER*(DAT__SZLOC) BSLOC                ! Loc. to extrapolated bckgnd
       CHARACTER*(DAT__SZTYP) TYPE                 ! Type of source file
       CHARACTER*80 PATH(10)                       ! History text
       CHARACTER*80 RFILE                          ! Name of response file
@@ -128,7 +123,7 @@
       INTEGER BDIM(DAT__MXDIM)                    ! Dimensions of bckgnd data
       INTEGER RDIM(DAT__MXDIM)                    ! Dimensions of reordered arr.
       INTEGER NSIZE                               ! Total no. of data elements
-      INTEGER SID,BID,OID,MID
+      INTEGER SID,BID,OID,MID,PFID
       LOGICAL SLVAR                               ! variances in source file?
       LOGICAL BLVAR                               ! variances in bckgnd file?
       LOGICAL INPRIM                              ! Is input data primitive
@@ -147,42 +142,31 @@
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTSUB  Version 1.8-1')
+      PARAMETER (VERSION = 'XRTSUB  Version 1.8-2')
 *-
       CALL AST_INIT
 *
       CALL MSG_PRNT(VERSION)
-*
+
 * Get source file
-      CALL USI_TASSOCI('SOURCE','*', 'READ', SID, STATUS)
-      CALL ADI1_GETLOC(SID,LOCSRC,STATUS)
-*
+      CALL USI_ASSOC( 'SOURCE', 'BinDS', 'READ', SID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*
+
 * Get name of background file
-      CALL USI_TASSOCI('BCKGND','*', 'READ', BID, STATUS)
-      CALL ADI1_GETLOC(BID,LOCBCK,STATUS)
-
+      CALL USI_ASSOC( 'BCKGND', 'BinDS', 'READ', BID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*
+
 * Get name of output file
-      CALL USI_TASSOCO('OUT', 'BinDS', OID, STATUS)
-      CALL ADI1_GETLOC(OID,LOCOUT,STATUS)
-
+      CALL USI_CLONE( 'SOURCE', 'OUT', 'BinDS', OID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*   Copy all components from source file into output file
-      CALL HDX_COPY(LOCSRC, LOCOUT, STATUS)
-*
+
 * Check source file is XRT and get pointing position
-      CALL XRTSUB_GETPOS(LOCOUT, SHEAD, STATUS)
+      CALL XRTSUB_GETPOS( OID, SHEAD, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Read source data from copied input file
-      CALL XRTSUB_GETDATA(OID, LOCOUT, 'UPDATE', SHEAD, SDIM, SORD,
+      CALL XRTSUB_GETDATA( OID, 'UPDATE', SHEAD, SDIM, SORD,
      &                  SDPNTR, TSDPNTR, SLVAR, SVPNTR, TSVPNTR,
      &                  SLQUAL, SQPNTR, TSQPNTR, SMASK, SREORD, STATUS)
 *
@@ -192,11 +176,11 @@
       NSIZE=SDIM(1)*SDIM(2)*SDIM(3)*SDIM(4)*SDIM(5)
 *
 * Get pointing position of background file
-      CALL XRTSUB_GETPOS(LOCBCK, BHEAD, STATUS)
+      CALL XRTSUB_GETPOS( BID, BHEAD, STATUS )
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-      CALL XRTSUB_GETDATA(BID,LOCBCK, 'READ', BHEAD, BDIM, BORD, BDPNTR,
+      CALL XRTSUB_GETDATA( BID, 'READ', BHEAD, BDIM, BORD, BDPNTR,
      &                TBDPNTR, BLVAR, BVPNTR, TBVPNTR,
      &                BLQUAL, BQPNTR, TBQPNTR, BMASK, BREORD, STATUS)
 *
@@ -281,8 +265,7 @@
 *
 * Give the option of producing an output background file, which is
 * the extrapolated background counts in the source box
-      CALL USI_TASSOCO('BGMODEL', 'BinDS', MID, STATUS)
-      CALL ADI1_GETLOC(MID,BSLOC,STATUS)
+      CALL USI_CLONE( 'SOURCE', 'BGMODEL', 'BinDS', MID, STATUS )
 
 *   "!" means dont produce a file
       IF (STATUS .EQ. PAR__NULL) THEN
@@ -347,7 +330,7 @@
 *
 
 *   Calculate the position correction array
-         CALL XRTSUB_POSCORR(LOCSRC, SHEAD, BHEAD, RLOC, ELOC, SORD(4),
+         CALL XRTSUB_POSCORR( SID, SHEAD, BHEAD, RLOC, ELOC, SORD(4),
      &                           BDIM(4), SDIM(5), %val(PCPNTR), STATUS)
 *
       ELSE
@@ -386,31 +369,26 @@
 
 * Get the particle counts at this position
       IF (LPART) THEN
-         CALL XRTSUB_PARTCNT(LOCBCK, BHEAD, BAREA, BDIM(3), BDIM(4),
+         CALL XRTSUB_PARTCNT( BID, BHEAD, BAREA, BDIM(3), BDIM(4),
      &           %val(PPAR1), %val(PPAR2), %val(PPAR3), STATUS)
 *
 
 * Allow the user to produce a particle spectrum if desired
-         CALL USI_GET0C('PART_FILE', PFILE, STATUS)
-*
+         CALL USI_CREAT( 'PART_FILE', ADI__NULLID, PFID, STATUS )
 
 *   "!" means dont produce a file
          IF (STATUS .EQ. PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
          ELSE
+
 *
-*      Produce a particle file
-            CALL HDS_NEW(PFILE, 'PARTICLES', 'PARTS', 0, 0,
-     &                   PLOC, STATUS)
-*
+           CALL BDI_LINK( 'Spectrum', 1, BDIM(4), 'REAL', PFID, STATUS )
+
 *      Create data array and axes
-            CALL BDA_CREBDS(PLOC, 1, BDIM(4), .TRUE., .FALSE.,
-     &                                            .FALSE., STATUS)
-            CALL BDA_MAPDATA(PLOC, 'WRITE', PDPNTR, STATUS)
-*
+            CALL BDI_MAPR( PFID, 'Data', 'WRITE', PDPNTR, STATUS )
+
 *      Copy spectral axis from background file
-            CALL BDA_COPAXIS(LOCBCK, PLOC, BORD(4), 1, STATUS)
-*
+            CALL BDI_AXCOPY( BID, BORD(4), ' ', PFID, 1, STATUS )
             IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_PRNT('** Error producing particle spectrum'/
      &                      /' file **')
@@ -484,8 +462,8 @@
 *   of the centre of each PH bin.
 *    First map the PHA array
          IF (BDIM(4) .GT. 1) THEN
-            CALL BDA_MAPAXVAL(LOCBCK, 'READ', BORD(4), AXPNTR, STATUS)
-
+            CALL BDI_AXMAPR( BID, BORD(4), 'Data', 'READ', AXPNTR,
+     :                       STATUS)
 	    CALL DYN_MAPR(1,BDIM(4),EPHPTR,STATUS)
 *
             IF (STATUS .NE. SAI__OK) THEN
@@ -536,13 +514,10 @@
 *
 *  Produce an extrapolated background file if requested
       IF (LBMOD) THEN
-*
-*      Copy all components from source file into the new background file
-         CALL HDX_COPY(LOCOUT, BSLOC, STATUS)
-*
+
 *      Map the data and variance from the extrapolated background file
-         CALL BDA_MAPDATA(BSLOC, 'UPDATE', OSUBD, STATUS)
-         CALL BDA_MAPVAR(BSLOC, 'UPDATE', OSUBV, STATUS)
+         CALL BDI_MAPR( MID, 'Data', 'UPDATE', OSUBD, STATUS )
+         CALL BDI_MAPR( MID, 'Variance', 'UPDATE', OSUBV, STATUS )
 *
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('** Error producing extrapolated backgnd'/
@@ -596,11 +571,7 @@
       CALL DYN_UNMAP(SUBV,STATUS)
 *
 * Set the background subtracted flag
-      CALL BDA_LOCAST(LOCOUT, ALOC, STATUS)
-*
-      CALL HDX_PUTL(ALOC, 'PROCESSING.BGND_SUBTRACTED', 1,
-     &                                           .TRUE., STATUS)
-*
+      CALL PRF_SET( OID, 'BGND_SUBTRACTED', .TRUE., STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error setting BGND_SUBTRACTED flag true')
          GOTO 999
@@ -608,22 +579,19 @@
 *
 * Set a reference to the background spectrum - if it has been created
       IF (LBMOD .AND. SDIM(4) .GT. 1) THEN
-         CALL REF_CRPUT(ALOC, 'BGREF', BSLOC, .FALSE., STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error writing reference to background '/
+        CALL FRI_PUT( OID, 'BGND', MID, STATUS )
+        IF (STATUS .NE. SAI__OK) THEN
+          CALL MSG_PRNT('Error writing reference to background '/
      &                   /'spectrum')
-         ENDIF
+        ENDIF
       ENDIF
 
 * Update the history structure
 *   Trace path of input data.
-      CALL USI_NAMEI(NLINES,PATH,STATUS)
-*
+      CALL USI_NAMES( 'I', IFILES, STATUS )
       CALL HSI_ADD(OID, VERSION, STATUS)
 *
-      CALL HSI_PTXT(OID, NLINES, PATH, STATUS)
-*
+      CALL HSI_PTXTI(OID, IFILES, .FALSE., STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error writing history record')
       ENDIF
@@ -634,10 +602,10 @@
 *      Add history structure to the extrapolated background file
          CALL HSI_ADD(MID, VERSION, STATUS)
 *
-         CALL HSI_PTXT(MID, NLINES, PATH, STATUS)
+         CALL HSI_PTXTI(MID, IFILES, .TRUE., STATUS)
 *
 *   Change title of the background image
-         CALL BDA_PUTTITLE(BSLOC, 'Extrapolated background file',
+         CALL BDI_PUT0C( MID, 'Title', 'Extrapolated background file',
      &                                            STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error adding HISTORY record to '/
@@ -647,15 +615,11 @@
       ENDIF
 *
 *   Release all the files
-      CALL BDA_RELEASE(LOCSRC, STATUS)
-      CALL BDA_RELEASE(LOCBCK, STATUS)
-      CALL BDA_RELEASE(LOCOUT, STATUS)
       CALL USI_ANNUL('SOURCE',STATUS)
       CALL USI_ANNUL('BGKGND',STATUS)
       CALL USI_ANNUL('OUT',STATUS)
 
       IF (LBMOD) THEN
-        CALL BDA_RELEASE(BSLOC, STATUS)
         CALL USI_ANNUL('BGMODEL',STATUS)
       ENDIF
 
@@ -673,13 +637,10 @@
 * Close the eff. area and response files
       IF (.NOT. LHRI) CALL DAT_ANNUL(ELOC, STATUS)
 *
-* Close the particle file
-C      CALL DAT_ANNUL(PLOC, STATUS)
-*
-*
 * Close down the Asterix common blocks
       CALL AST_CLOSE()
-*
+      CALL AST_ERR( STATUS )
+
       END
 
 
@@ -1586,8 +1547,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ENDDO
 *
 * Check data_array is present
-      CALL BDA_CHKDATA(LOCIN, OK, NDIM, DIMS, STATUS)
-*
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, DAT__MXDIM, DIMS, NDIM, STATUS )
       IF (STATUS .NE. SAI__OK .OR. .NOT. OK) THEN
           CALL MSG_PRNT('Error accessing data array')
           STATUS=SAI__ERROR
@@ -1595,15 +1556,13 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ENDIF
 *
 * Initialise dimension arrays
-      DO LP=NDIM+1,7
-         DIMS(LP)=1
-      ENDDO
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
 
 * Set the size value
-      NSIZE = DIMS(1)*DIMS(2)*DIMS(3)*DIMS(4)*DIMS(5)*DIMS(6)*DIMS(7)
-*
+      CALL ARR_SUMDIM( NDIM, DIMS, NSIZE )
+
 * Map the data array
-      CALL BDA_MAPDATA(LOCIN, MODE, TDPNTR, STATUS)
+      CALL BDI_MAPR( IFID, 'Data', MODE, TDPNTR, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('Error mapping data array')
@@ -1611,17 +1570,15 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       ENDIF
 *
 * Check variance array is present
-      CALL BDA_CHKVAR(LOCIN, LVAR, VNDIM, VDIMS, STATUS)
+      CALL BDI_CHK( IFID, 'Variance', LVAR, STATUS )
 
 * If output file then force creation of variance
       IF (.NOT.LVAR.AND.(MODE(1:1).EQ.'W'.OR.MODE(1:1).EQ.'U')) THEN
-        CALL BDA_CREVAR(LOCIN,NDIM,DIMS,STATUS)
-        CALL BDA_MAPVAR(LOCIN,'WRITE', TVPNTR, STATUS)
+        CALL BDI_MAPR( IFID, 'Variance', 'WRITE', TVPNTR, STATUS)
         CALL ARR_COP1R(NSIZE,%val(TDPNTR),%val(TVPNTR),STATUS)
       ELSE
-        CALL BDA_MAPVAR(LOCIN, MODE, TVPNTR, STATUS)
+        CALL BDI_MAPR( IFID, 'Variance', MODE, TVPNTR, STATUS)
       ENDIF
-*
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error mapping variance array')
         GOTO 999
@@ -1629,30 +1586,27 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *
 *
 * Check if QUALITY is present in file
-      CALL BDA_CHKQUAL(LOCIN, LQUAL, QNDIM, QDIMS, STATUS)
+      CALL BDI_CHK( IFID, 'Quality', LQUAL, STATUS )
 
 * If output file force creation of quality
       IF (.NOT.LQUAL.AND.(MODE(1:1).EQ.'W'.OR.MODE(1:1).EQ.'U')) THEN
-        CALL BDA_CREQUAL(LOCIN,NDIM,DIMS,STATUS)
-        CALL BDA_MAPQUAL(LOCIN,'WRITE', TQPNTR, STATUS)
+        CALL BDI_MAPUB( IFID, 'Quality', 'WRITE', TQPNTR, STATUS)
         CALL ARR_INIT1B(QUAL__GOOD,NSIZE,%val(TQPNTR),STATUS)
+        MASK = QUAL__MASK
+        CALL BDI_PUT0UB( IFID, 'QualityMask', MASK, STATUS )
       ELSE
-        CALL BDA_MAPQUAL(LOCIN, MODE, TQPNTR, STATUS)
+        CALL BDI_MAPUB( IFID, 'Quality', MODE, TQPNTR, STATUS)
+        CALL BDI_GET0UB( IFID, 'QualityMask', MASK, STATUS )
       ENDIF
-
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error mapping quality array')
         GOTO 999
       ENDIF
-*
-      CALL BDA_GETMASK(LOCIN, MASK, STATUS)
-*
-*
-* Find which axis is which
+
+*  Find which axis is which
       DO LP=1,NDIM
 *
-         CALL BDA_GETAXLABEL(LOCIN, LP, LABEL, STATUS)
-*
+         CALL BDI_AXGETOC( IFID, LP, 'Label', LABEL, STATUS )
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error reading axis label')
             GOTO 999
@@ -1852,7 +1806,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       END
 
 *+XRTSUB_GETPOS Gets position information from an XRT datafile
-      SUBROUTINE XRTSUB_GETPOS(LOCIN, HEAD, STATUS)
+      SUBROUTINE XRTSUB_GETPOS( IFID, HEAD, STATUS)
 *    Description :
 *     Finds the pointing position of the file and checks if its an LE file
 *    Deficiencies :
@@ -1872,7 +1826,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCIN                 ! Locator to input file
+      INTEGER			IFID			! Input file id
 *    Export :
       RECORD /CORR/ HEAD                           ! Header structure
 *    Status :
@@ -1886,8 +1840,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       IF (STATUS .NE. SAI__OK) RETURN
 *
 * Test if source file is telescope 1
-      CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
-*
+      CALL ADI1_LOCHEAD( IFID, .FALSE., HLOC, STATUS)
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error accessing the header box')
          GOTO 999
@@ -2228,7 +2181,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       END
 
 *+ XRTSUB_PARTCNT - Estimate the particle count in each time bin.
-      SUBROUTINE XRTSUB_PARTCNT(LOC, HEAD, AREA, NT, NE, PART1,
+      SUBROUTINE XRTSUB_PARTCNT( FID, HEAD, AREA, NT, NE, PART1,
      &                                        PART2, PART3, STATUS)
 *    Description :
 *     Estimates the number of particles likely to be found in the
@@ -2281,7 +2234,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       INCLUDE 'XRTLIB(INC_CORR)'
       INCLUDE 'INC_XRTHEAD'                ! Gives the MAXRAN constant
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC ! Locator to file
+      INTEGER			FID			! File identifier
       RECORD /CORR/ HEAD         ! Header stuff
       REAL AREA                  ! Area of the background box (ARCMIN**2)
       INTEGER NT,NE              ! Dimensions
@@ -2332,7 +2285,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *-
 *
 * Get a locator to instrument section
-      CALL BDA_LOCINSTR(LOC, ILOC, STATUS)
+      CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS)
 *
 * Get the file origin from the RAWDATA entry
       CALL DAT_THERE(ILOC,'rawdata',THERE,STATUS)
@@ -2373,9 +2326,9 @@ C      YSCALE = SHEAD.YSCALE*60.
       ENDIF
 *
 * Get base_mjd from file header
-      CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
+      CALL ADI1_LOCHEAD( FID, .FALSE., HLOC, STATUS )
       CALL CMP_GET0D(HLOC, 'BASE_MJD', BASE_MJD, STATUS)
-*
+
 * Decide which 'particle model time slot' this observation falls into.
       CALL CONV_YMDMJD(1991, 1, 25, MJD1)
       CALL CONV_YMDMJD(1991, 5, 31, MJD2)
@@ -2600,7 +2553,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *
       END
 
-*****************************************************
+
 *+XRTSUB_PARTCNT_MVR - Calculate Mean MVR in this time bin
       SUBROUTINE XRTSUB_PARTCNT_MVR(NMVTIM, MVTIM, SCBASE, MVR,
      &                   MAXJN, NOVR, TJOIN, AVMVR, MSAVE, MVMEAN)
@@ -2774,6 +2727,7 @@ C      YSCALE = SHEAD.YSCALE*60.
           EXTERNAL CHR_LEN
 *    Local constants :
 *    Local variables :
+      CHARACTER*(DAT__SZLOC)	DLOC			! Response data array
       INTEGER DDIM(2)                     ! Dimensions of detector resp. array
       INTEGER NPHA                        ! Number of PH chans in response arr.
       INTEGER NENERGY                     ! Number of energy bins in resp. arr.
@@ -2785,8 +2739,10 @@ C      YSCALE = SHEAD.YSCALE*60.
 *    Local data :
 *-
 * Find the size of the response array
-      CALL BDA_CHKDATA(RLOC, OK, NDIM, DDIM, STATUS)
-*
+      CALL DAT_FIND( RLOC, 'DATA_ARRAY', DLOC, STATUS )
+      CALL DAT_VALID( DLOC, OK, STATUS )
+      CALL DAT_SHAPE( DLOC, 2, DDIM, NDIM, STATUS )
+      CALL DAT_ANNUL( DLOC, STATUS )
       IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error accessing response array')
          GOTO 999
@@ -2828,7 +2784,7 @@ C      YSCALE = SHEAD.YSCALE*60.
       END
 
 *+XRTSUB_POSCORR   Calcs. corrections for different box positions
-      SUBROUTINE XRTSUB_POSCORR(LOCSRC, SHEAD, BHEAD, RLOC, ELOC,
+      SUBROUTINE XRTSUB_POSCORR( SFID, SHEAD, BHEAD, RLOC, ELOC,
      &                            EAX, EDIM, RDIM, PFACTOR, STATUS)
 *    Description :
 *       Calculates the ratio of the instrument response at the
@@ -2862,7 +2818,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCSRC       ! Locator to the source file
+      INTEGER			SFID			! Source file id
       RECORD /CORR/ SHEAD                 ! Header info for source file
       RECORD /CORR/ BHEAD                 ! Header info for bkgnd file
       CHARACTER*(DAT__SZLOC) RLOC         ! Locator to the response file
@@ -2884,6 +2840,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *                                         ! energy value (0.2 keV). This number
 *                                         ! has a very small effect.
 *    Local variables :
+      CHARACTER*(DAT__SZLOC)	DLOC			! Response data locator
       REAL MEAN_EN                        ! Mean photon energy
       INTEGER SPNTR,BPNTR                 ! Effective ares as a fn of energy
       INTEGER DDIM(2)                     ! Dimensions of detector resp. array
@@ -2899,9 +2856,12 @@ C      YSCALE = SHEAD.YSCALE*60.
       INTEGER LP,LP2,RLP,NDIM
 *    Local data :
 *-
+
 * Find the size of the response array
-      CALL BDA_CHKDATA(RLOC, OK, NDIM, DDIM, STATUS)
-*
+      CALL DAT_FIND( RLOC, 'DATA_ARRAY', DLOC, STATUS )
+      CALL DAT_VALID( DLOC, OK, STATUS )
+      CALL DAT_SHAPE( DLOC, 2, DDIM, NDIM, STATUS )
+      CALL DAT_ANNUL( DLOC, STATUS )
       IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error accessing response array')
          GOTO 999
@@ -2927,8 +2887,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 * Map the pulse height channel if available, otherwise use the
 * channel of the mean energy.
       IF (EDIM .GT. 1) THEN
-         CALL BDA_MAPAXVAL(LOCSRC, 'READ', EAX, PPNTR, STATUS)
-*
+         CALL BDI_AXMAPR( SFID, EAX, 'Data', 'READ', PPNTR, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error mapping corrected PH axis')
             GOTO 999
@@ -2947,8 +2906,7 @@ C      YSCALE = SHEAD.YSCALE*60.
 *
 * Unmap axis pointer
       IF (EDIM .GT. 1) THEN
-         CALL BDA_UNMAPAXVAL(LOCSRC, EAX, STATUS)
-*
+         CALL BDI_AXUNMAP( SFID, EAX, 'Data', PPNTR, STATUS )
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error unmapping corrected PH axis')
             GOTO 999
