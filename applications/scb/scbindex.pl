@@ -1112,3 +1112,4 @@ sub error {
 
    die @_;
 }
+# $Id$
