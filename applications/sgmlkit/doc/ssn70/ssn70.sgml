@@ -625,9 +625,11 @@ a punctuation dash (this is currently set to `<code/&amp;endash;>', but
 could conceivably change to `<code/&amp;emdash;>' if we make a
 typographic decision on that score), `<code/&quot>' instead of
 `<code/&amp;quot;>' and `<code/&tilde>' instead of
-`<code/&amp;nbsp;>'.  These short references work within paragraphs;
-inside maths elements, all these characters should function as normal,
-and you only need to escape the characters `&amp;', `&gt;' and `&lt;'.
+`<code/&amp;nbsp;>'.  These short-references work within paragraphs.
+
+<p><update versionid="v0-7-11">Noted that entity references should not
+be used inside maths elements.</update>See <ref id=str.maths/> for a
+brief discussion of using entities within maths elements.
 
 <p>For more details on entities, see <ref id=sgml.entities/>.
 
