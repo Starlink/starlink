@@ -17288,14 +17288,14 @@ STRINGS = LITERAL (Read)
    A group of text strings which are used to mark the supplied positions
    if parameter PLOT is set to "TEXT". The first string in the
    group is used to mark the first position, the second string is
-   used to mark the second position, etc (note, these integers may
-   be different to the position identifiers in the supplied positions
-   list - if you want to see the position identifiers, use parameter
-   LABEL). If more positions are given than there are strings in the
-   group, then the extra positions will be marked with an integer value
-   indicating the index within the list of supplied positions. If a
-   null value (!) is given for the parameter, then all positions will
-   be marked with integer indices, starting at 1.
+   used to mark the second position, etc. If more positions are given than 
+   there are strings in the group, then the extra positions will be marked 
+   with an integer value indicating the index within the list of supplied 
+   positions (note, these integers may be different to the position 
+   identifiers in the supplied positions list - if you want to see the 
+   position identifiers, use parameter LABEL). If a null value (!) is 
+   given for the parameter, then all positions will be marked with integer 
+   indices, starting at 1.
 
    A comma-separated list should be given in which each element is
    either a marker string, or the name of a text file preceded by an
