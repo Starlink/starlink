@@ -76,6 +76,8 @@ be declared <em>somewhere</>: the default is declared in the General DTD.
 (define %starlink-decl-entity% "starlink.decl")
 ;; defined in DTD to point to "-//Starlink//TEXT Starlink Declaration//EN"
 
+(define %xml-decl-entity% "xml.decl")
+
 <routine>
 <routinename>%copyright-string%
 <description>Standard copyright string, unless overridden.
