@@ -580,14 +580,12 @@ class DviFileSetRule: public DviFileEvent {
  public:
     /**
      * The height of the rule to be set at this position.  Given in
-     * scaled points -- that is, after any required magnification has
-     * been applied.
+     * pixels/device units.
      */
     const int h;
     /**
      * The width of the rule to be set at this position.  Given in
-     * scaled points -- that is, after any required magnification has
-     * been applied.
+     * pixels/device units.
      */
     const int w;
     DviFileSetRule(unsigned char opcode, DviFile *dptr, int h, int w)

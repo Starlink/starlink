@@ -148,7 +148,7 @@ int main (int argc, char **argv)
 
     DviFile* dvi;
     try {
-	dvi = new DviFile(dviname);
+	dvi = new DviFile(dviname, 72);
     } catch (DviError& e) {
 	cerr << "Can't open DVI file " << dviname
 	     << ": " << e.problem() << endl;
@@ -186,7 +186,7 @@ int main (int argc, char **argv)
 		    DviFileSetRule& sr = *test;
 		    cout << "r "
 			 << sr.h << "x" << sr.w
-			 << "sp @";
+			 << "px @";
 		    show_position(dvi, unitlist);
 		    cout << endl;
 		}
