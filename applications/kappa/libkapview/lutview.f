@@ -84,6 +84,10 @@
 *        shortest dimension of the current picture has length 1.0. The
 *        scales on the two axes are equal.
 *
+*        - NDC -- gives positions in a normalised system in which the 
+*        bottom left corner of the plotting surface is (0,0) and the 
+*        top right corner is (1,1).
+*
 *        There may be additional Frames available, describing previously 
 *        displayed data. If a null value is supplied, the current Frame
 *        associated with the displayed data (if any) is used. This parameter 

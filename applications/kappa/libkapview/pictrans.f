@@ -58,7 +58,7 @@
 *        position is supplied (see parameter POSIN). The string can be 
 *        one of the following:
 *
-*        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC, 
+*        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, NDC, CURPIC, 
 *        BASEPIC, etc. 
 *
 *        - An integer value giving the index of the required Frame within
@@ -75,7 +75,7 @@
 *        the current Frame in the picture is used. The string can be one of the 
 *        following:
 *
-*        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC, 
+*        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, NDC, CURPIC, 
 *        BASEPIC, etc. 
 *
 *        - An integer value giving the index of the required Frame within
@@ -122,6 +122,11 @@
 *     device. The bottom left corner of the device screen has BASEPIC 
 *     co-ordinates of (0,0). The shorter dimension of the screen has 
 *     length 1.0, and the other axis has a length greater than 1.0. 
+*
+*     -  NDC co-ordinates also locate a position within the entire graphics 
+*     device. The bottom left corner of the device screen has NDC 
+*     co-ordinates of (0,0), and the top right corner has NDC
+*     co-ordinates (1,1).
 *
 *     -  GRAPHICS co-ordinates also span the entire graphics device but
 *     are measured in millimetres from the bottom left corner.

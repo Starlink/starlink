@@ -63,8 +63,8 @@
 *        current picture. The string supplied for FRAME can be one of the 
 *        following:
 *
-*        - A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, etc. The 
-*        special domain AGI_WORLD is used to refer to the world co-ordinate 
+*        - A domain name such as SKY, AXIS, PIXEL, BASEPIC, NDC, CURPIC, etc. 
+*        The special domain AGI_WORLD is used to refer to the world co-ordinate 
 *        system stored in the AGI graphics database. This can be useful if 
 *        no WCS information was store with the picture when it was created.
 *

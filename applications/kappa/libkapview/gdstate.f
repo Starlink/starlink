@@ -59,10 +59,11 @@
 *        current picture. The string supplied for FRAME can be one of the 
 *        following:
 *
-*        - A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, etc. The 
-*        special domain AGI_WORLD is used to refer to the world co-ordinate 
-*        system stored in the AGI graphics database. This can be useful if 
-*        no WCS information was store with the picture when it was created.
+*        - A domain name such as SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC, etc. 
+*        The special domain AGI_WORLD is used to refer to the world 
+*        co-ordinate system stored in the AGI graphics database. This can 
+*        be useful if no WCS information was store with the picture when 
+*        it was created.
 *
 *        - An integer value giving the index of the required Frame.
 *
@@ -175,6 +176,9 @@
 *     that "Normalised Device Co-ordinates" were normalised so that the 
 *     longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
 *     are normalised so that the shorter of the two axes has length 1.0.
+*     - The Domain "NDC" now refers to a Frame in which the bottom left
+*     corner of the device has co-ordinates (0,0) and the top right
+*     corner has co-ordinates (1,1).
 
 *  Related Applications:
 *     KAPPA: GDSET, GDCLEAR.
