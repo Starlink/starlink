@@ -492,7 +492,6 @@
       REAL			W1, W2			! Widths
 
       INTEGER                 	BEG, IC           ! Character pointers
-      INTEGER			INST			! Instance data
       INTEGER                 	X_AX,Y_AX,E_AX,T_AX	! Axis numbers
 
       LOGICAL                 	X_OK, Y_OK        	! Axes ok?
@@ -525,17 +524,16 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Identify spatial axes
-      CALL ADI_CGET0I( PSID, 'Instance', INST, STATUS )
       CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Tell the user about the pixel size if we have a dataset.
-      X_OK = PSF1_GETAXOK( INST, X_AX, STATUS )
-      Y_OK = PSF1_GETAXOK( INST, Y_AX, STATUS )
-      X_DR = PSF1_GETAXDR( INST, X_AX, STATUS )
-      Y_DR = PSF1_GETAXDR( INST, Y_AX, STATUS )
-      X_TOR = PSF1_GETAXTOR( INST, X_AX, STATUS )
-      Y_TOR = PSF1_GETAXTOR( INST, Y_AX, STATUS )
-      CALL PSF1_GETAXTXT( INST, X_AX, LABEL, UNITS, STATUS )
+      X_OK = PSF1_GETAXOK( PSID, X_AX, STATUS )
+      Y_OK = PSF1_GETAXOK( PSID, Y_AX, STATUS )
+      X_DR = PSF1_GETAXDR( PSID, X_AX, STATUS )
+      Y_DR = PSF1_GETAXDR( PSID, Y_AX, STATUS )
+      X_TOR = PSF1_GETAXTOR( PSID, X_AX, STATUS )
+      Y_TOR = PSF1_GETAXTOR( PSID, Y_AX, STATUS )
+      CALL PSF1_GETAXTXT( PSID, X_AX, LABEL, UNITS, STATUS )
 
 *  Are dataset axes ok?
       IF ( X_OK .AND. Y_OK .AND. .NOT.
@@ -1931,7 +1929,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			FID			! Dataset handle
       INTEGER			FSTAT			! i/o status code
       INTEGER                 	IAX			! Loop over axes
-      INTEGER			INST			! More instance data
       INTEGER                 	NELM 			! Number of elements mapped
       INTEGER			REVISION		! Creator revision no.
       INTEGER			RLIM			! Radial limit
@@ -1949,7 +1946,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Extract locator
       CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
-      CALL ADI_CGET0I( PSID, 'Instance', INST, STATUS )
       CALL ADI1_GETLOC( FID, LOC, STATUS )
 
 *  Does the dataset have an attached spatial response?
@@ -2041,8 +2037,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           R_SCALE = SPARR(2)
 
 *      Get dataset axis attributes
-          D_SCALE = PSF1_GETAXDR( INST, X_AX, STATUS )
-          TOR = PSF1_GETAXTOR( INST, X_AX, STATUS )
+          D_SCALE = PSF1_GETAXDR( PSID, X_AX, STATUS )
+          TOR = PSF1_GETAXTOR( PSID, X_AX, STATUS )
 
 *        Compare bin sizes
           IF ( ABS((ABS(R_SCALE)-ABS(D_SCALE/TOR))/R_SCALE)
