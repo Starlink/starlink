@@ -474,9 +474,11 @@ SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
 #  Rules for extracting source files from the source archive.
 #
 $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
-$(SPP_F_ROUTINES) $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
-$(INTERFACE_FILES) $(HELP_SOURCE) $(DOCUMENTATION) $(TEST_FILES):
+$(MACHINE_SPECIFIC_F_ROUTINES) $(SPP_F_ROUTINES) $(ATASK_F_ROUTINES) \
+$(BLOCK_DATA) $(C_ROUTINES) $(INTERFACE_FILES) $(IRAF_LIBRARIES) \
+$(HELP_SOURCE) $(TEST_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+
 #
 #  Rules for extracting machine specific source files from the source
 #  archive.
@@ -1064,10 +1066,10 @@ unbuild: clean
 $(PKG_NAME)_source.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(F_ROUTINES) \
                 $(MACHINE_SPECIFIC_F_ROUTINES) $(SPP_F_ROUTINES) \
-                $(ATASK_F_ROUTINES) $(C_ROUTINES) \
-                $(PUBLIC_INCLUDES) $(BLOCK_DATA) $(PRIVATE_INCLUDES) \
+                $(ATASK_F_ROUTINES) $(C_ROUTINES) $(PUBLIC_INCLUDES) \
+                $(BLOCK_DATA) $(PRIVATE_INCLUDES) $(IRAF_LIBRARIES) \
                 $(PUBLIC_SCRIPTS) $(TEST_FILES) \
-                $(INTERFACE_FILES) $(HELP_SOURCE) $(DOCUMENTATION) \
+                $(INTERFACE_FILES) $(HELP_SOURCE)
 
 #----------------------------------------------------------------------------
 
