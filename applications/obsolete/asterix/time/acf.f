@@ -45,6 +45,7 @@
 *     12 Jun 89 : V1.0-0 Original (PLA)
 *     14 Jun 90 : V1.2-0 Does check for irregular axes and bad quality (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1  New data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -53,8 +54,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -62,27 +62,27 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC                  ! Locator to input file
-      CHARACTER*(DAT__SZLOC) OLOC                  ! Locator to output file
       CHARACTER*80           TEXT(2)
       CHARACTER*80           UNITS
 
       INTEGER                I                     ! Loop counter
       INTEGER                IDPTR                 ! Input data pointer
+      INTEGER			IFID			! Input dataset id
       INTEGER                IQPTR                 ! Input quality pointer
       INTEGER                IVPTR                 ! Input variance pointer
       INTEGER                ODPTR                 ! Output data pointer
-      INTEGER                OLDIMS(DAT__MXDIM)    ! Size of output dimensions
+      INTEGER			OFID			! Output dataset id
+      INTEGER                OLDIMS(ADI__MXDIM)    ! Size of output dimensions
       INTEGER                OQPTR                 ! Output quality pointer
       INTEGER                OVPTR                 ! Output variance pointer
-      INTEGER                LDIMS(DAT__MXDIM)     ! Length of each dimension
+      INTEGER                LDIMS(ADI__MXDIM)     ! Length of each dimension
       INTEGER                NELM                  ! total number of data values
       INTEGER                MXLAG                 ! Maximum lag required
       INTEGER                NBAD                  ! # of bad points
       INTEGER                NDIM                  ! Number of dimensions
       INTEGER                NPTS                  ! Number of T_AXIS values
       INTEGER                T_AXIS                ! Index of time axis
-      INTEGER                TLDIMS(DAT__MXDIM)    ! Length of each dimension
+      INTEGER                TLDIMS(ADI__MXDIM)    ! Length of each dimension
       INTEGER                TNDIM                 ! Number of dimensions
 
       REAL                   BASE                  ! } these define the
@@ -91,8 +91,6 @@
       LOGICAL                BAD                   ! Any bad quality?
       LOGICAL                BIAS                  ! Use biassed autocovariance?
       LOGICAL                OK                    ! Is data ok?
-      LOGICAL                INPRIM                ! Is the input a
-                                                   ! primative object?
       LOGICAL                QOK                   ! Is QUALITY ok?
       LOGICAL                REG                   ! Regularly spaced T_AXIS?
       LOGICAL                USEWT                 ! Use weighting algorithm?
@@ -100,36 +98,33 @@
 *    Version id :
 *
       CHARACTER*80           VERSION
-        PARAMETER            (VERSION =' ACF Version 1.8-0')
+        PARAMETER            (VERSION =' ACF Version 1.8-1')
 *-
 
-*    Display version
+*  Version
       CALL MSG_PRNT (VERSION)
 
-*    Initialise
-      CALL AST_INIT
+*  Initialise
+      CALL AST_INIT()
 
-*    Obtain input & output locators
-      CALL USI_ASSOC2 ('INP', 'OUT', 'R', ILOC, OLOC, INPRIM, STATUS)
-
-*    Check status
+*  Obtain input & output identifiers
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Check the dataset
-      CALL BDA_CHKDATA (ILOC, OK, NDIM, LDIMS, STATUS)
+*  Check the dataset
+      CALL BDI_CHKDATA (IFID, OK, NDIM, LDIMS, STATUS)
 
       IF (.NOT. OK) THEN
-        CALL MSG_PRNT ('FATAL ERROR: Invalid dataset')
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset', STATUS )
         GOTO 99
-
       END IF
 
       IF (NDIM .GT. 1) THEN
-        CALL AXIS_FIND (ILOC, 'TIMETAG', NDIM, T_AXIS, STATUS)
+        CALL AXIS_TFIND( IFID, 'TIMETAG', NDIM, T_AXIS, STATUS)
         CALL MSG_PRNT (' ')
         CALL MSG_PRNT (' The axes present are:-')
-        CALL AXIS_LIST (ILOC, NDIM, STATUS)
+        CALL AXIS_TLIST( IFID, NDIM, STATUS)
         CALL MSG_PRNT (' ')
 
         IF (T_AXIS .GT. 0) THEN
@@ -147,15 +142,14 @@
       END IF
 
 *    Set length of unused dimensions to 1
-      IF (NDIM .LT. 7) THEN
-        DO I = NDIM + 1, 7
+      IF (NDIM .LT. ADI__MXDIM) THEN
+        DO I = NDIM + 1, ADI__MXDIM
           LDIMS(I) = 1
-
         END DO
       END IF
 
 *    Map input data
-      CALL BDA_MAPDATA (ILOC, 'R', IDPTR, STATUS)
+      CALL BDI_MAPDATA (IFID, 'R', IDPTR, STATUS)
       CALL ARR_SUMDIM( NDIM, LDIMS, NELM, STATUS )
 
 *    User input
@@ -167,10 +161,10 @@
 
       IF (USEWT) THEN
 *      See if quality is present
-        CALL BDA_CHKQUAL (ILOC, QOK, TNDIM, TLDIMS, STATUS)
+        CALL BDI_CHKQUAL (IFID, QOK, TNDIM, TLDIMS, STATUS)
 
         IF ( QOK ) THEN
-          CALL BDA_MAPLQUAL (ILOC, 'R', BAD, IQPTR, STATUS)
+          CALL BDI_MAPLQUAL (IFID, 'R', BAD, IQPTR, STATUS)
 
 *        Check for no bad quality events
           IF ( BAD ) THEN
@@ -178,17 +172,17 @@
             CALL MSG_SETI( 'NBAD', NBAD )
             CALL MSG_PRNT( 'There are ^NBAD bad quality points' )
           ELSE
-            CALL BDA_UNMAPLQUAL (ILOC, STATUS)
+            CALL BDI_UNMAPLQUAL (IFID, STATUS)
             QOK = .FALSE.
 
           END IF
         END IF
 
 *      Check and map variance
-        CALL BDA_CHKVAR (ILOC, OK, TNDIM, TLDIMS, STATUS)
+        CALL BDI_CHKVAR (IFID, OK, TNDIM, TLDIMS, STATUS)
 
         IF ( OK ) THEN
-          CALL BDA_MAPVAR (ILOC, 'R', IVPTR, STATUS)
+          CALL BDI_MAPVAR (IFID, 'R', IVPTR, STATUS)
 
         ELSE IF ( QOK ) THEN
 
@@ -206,13 +200,13 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Check correlation axis is regularly spaced.
-      CALL BDA_CHKAXVAL (ILOC, T_AXIS, OK, REG, NPTS, STATUS)
+      CALL BDI_CHKAXVAL (IFID, T_AXIS, OK, REG, NPTS, STATUS)
       SCALE = 1.0E0
       UNITS = 'pixels'
 
       IF ( OK ) THEN
-        CALL BDA_GETAXVAL( ILOC, T_AXIS, BASE, SCALE, TNDIM, STATUS )
-        CALL BDA_GETAXUNITS( ILOC, T_AXIS, UNITS, STATUS )
+        CALL BDI_GETAXVAL( IFID, T_AXIS, BASE, SCALE, TNDIM, STATUS )
+        CALL BDI_GETAXUNITS( IFID, T_AXIS, UNITS, STATUS )
 
       ELSE IF (OK .AND. .NOT. REG) THEN
         CALL MSG_PRNT ('WARNING: Autocorrelation axis is not regularly '
@@ -239,47 +233,46 @@
       END IF
 
 *    Create output dataset
-      DO I = 1, 7
+      DO I = 1, ADI__MXDIM
         OLDIMS(I) = LDIMS(I)
       END DO
 
       OLDIMS(T_AXIS) = MXLAG + 1
 
-      CALL BDA_PUTLABEL (OLOC, 'Autocorrelation', STATUS)
-      CALL BDA_CREDATA  (OLOC, NDIM, OLDIMS,      STATUS)
-      CALL BDA_MAPDATA  (OLOC, 'W', ODPTR,        STATUS)
+      CALL BDI_PUTLABEL (OFID, 'Autocorrelation', STATUS)
+      CALL BDI_CREDATA  (OFID, NDIM, OLDIMS,      STATUS)
+      CALL BDI_MAPDATA  (OFID, 'W', ODPTR,        STATUS)
 
-      CALL BDA_CREAXES  (OLOC, NDIM,              STATUS)
+      CALL BDI_CREAXES  (OFID, NDIM,              STATUS)
 
       DO I = 1, NDIM
         IF (I .NE. T_AXIS) THEN
-          CALL BDA_CHKAXVAL (ILOC, I, OK, REG, TNDIM, STATUS)
+          CALL BDI_CHKAXVAL (IFID, I, OK, REG, TNDIM, STATUS)
 
           IF (OK) THEN
-            CALL BDA_COPAXIS (ILOC, OLOC, I, I, STATUS)
+            CALL BDI_COPAXIS (IFID, OFID, I, I, STATUS)
 
           END IF
         ELSE
-          CALL BDA_CREAXVAL (OLOC, I, .TRUE.,     OLDIMS(I), STATUS)
-          CALL BDA_PUTAXVAL (OLOC, I, 0.0, SCALE, OLDIMS(I), STATUS)
+          CALL BDI_CREAXVAL (OFID, I, .TRUE.,     OLDIMS(I), STATUS)
+          CALL BDI_PUTAXVAL (OFID, I, 0.0, SCALE, OLDIMS(I), STATUS)
 
-          CALL BDA_PUTAXLABEL (OLOC, I, 'Lag', STATUS)
-          CALL BDA_PUTAXUNITS (OLOC, I, UNITS, STATUS)
+          CALL BDI_PUTAXTEXT( OFID, I, 'Lag', UNITS, STATUS )
 
         END IF
       END DO
 
       IF (USEWT) THEN
-        CALL BDA_CREVAR (OLOC, NDIM, OLDIMS, STATUS)
-        CALL BDA_MAPVAR (OLOC, 'W', OVPTR,   STATUS)
+        CALL BDI_CREVAR (OFID, NDIM, OLDIMS, STATUS)
+        CALL BDI_MAPVAR (OFID, 'W', OVPTR,   STATUS)
 
-        CALL BDA_CREQUAL (OLOC, NDIM, OLDIMS, STATUS)
-        CALL BDA_MAPQUAL (OLOC, 'W', OQPTR,   STATUS)
+        CALL BDI_CREQUAL (OFID, NDIM, OLDIMS, STATUS)
+        CALL BDI_MAPQUAL (OFID, 'W', OQPTR,   STATUS)
 
       END IF
 
 *    Copy MORE box
-      CALL BDA_COPMORE (ILOC, OLOC, STATUS)
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
@@ -306,8 +299,8 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Write History
-      CALL HIST_COPY (ILOC, OLOC,    STATUS)
-      CALL HIST_ADD  (OLOC, VERSION, STATUS)
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
       IF (BIAS) THEN
         TEXT(1) = '           Biassed autocorrelation function'
@@ -320,10 +313,10 @@
       ELSE
         TEXT(2) = '           Input VARIANCE and QUALITY were NOT used.'
       END IF
-      CALL HIST_PTXT (OLOC, 2, TEXT, STATUS)
+      CALL HIST_PTXT (OFID, 2, TEXT, STATUS)
 
 *    Exit
-  99  CALL AST_CLOSE
+  99  CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -353,8 +346,6 @@
 
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 
 *    Import :
       INTEGER                NDIM                  ! Number of dimensions
@@ -768,8 +759,6 @@
 
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
