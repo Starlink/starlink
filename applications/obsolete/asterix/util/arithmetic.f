@@ -25,9 +25,9 @@
 *           Output data object
 *     OPER=CHAR(R)
 *           Type of operation (+,-,*,/)
-*     ERR1=UNIV(R)
+*     ERROR1=UNIV(R)
 *           error estimate for first primitive data object
-*     ERR2=UNIV(R)
+*     ERROR2=UNIV(R)
 *           error estimate for second primitive data object
 *
 *    Method :
@@ -67,6 +67,7 @@
 *      1 Mar 94 : V1.7-1 Updated handling of bit quality - now use BIT_
 *                        routines and QUAL__ constants (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     12 Jan 95 : V1.8-1 Use new data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -75,7 +76,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'        ! Asterix quality definitions
 *
@@ -87,65 +88,69 @@
 *
       BYTE			BIT_ANDUB
 *
+*    Local constants :
+*
+      INTEGER			MAXTXT			! Max amount of history
+        PARAMETER		( MAXTXT = 8 )
+*
 *    Local variables :
 *
-      CHARACTER              OPER             ! Operation
-      CHARACTER*(DAT__SZLOC) LOC	      ! Temp locator
-      CHARACTER*10           MODE             ! 'READ' or 'UPDATE'
-      CHARACTER*(DAT__SZLOC) IN1_LOC, IN2_LOC ! Input datasets
-C     CHARACTER*200          IN1_NAME, IN2_NAME
-      CHARACTER*(DAT__SZLOC) IN1_VLOC, IN2_VLOC !
-      CHARACTER*(DAT__SZLOC) OUT_LOC          ! Output dataset
-      CHARACTER*(DAT__SZTYP) OUT_TYPE         ! Output array type
+      CHARACTER              	OPER             	! Operation
+      CHARACTER*6           	MODE             	! 'READ' or 'UPDATE'
+      CHARACTER*(ADI__SZTYP)	OUT_TYPE         	! Output array type
 
-      CHARACTER*80 TEXTI(8)                   ! Input files
-      CHARACTER*80 TEXTO(8)                   ! Output file
-      CHARACTER*80 TEXT(7)                    ! History text
+      CHARACTER*80 		TEXT(MAXTXT)            ! History text
 
-      INTEGER I				      ! index
-      INTEGER LEVELS                          ! # lines in input name
-      INTEGER LEVELSO                         ! # lines in output
-      INTEGER NAX                             ! # axes present
-      INTEGER NBAD                            ! # new bad points
+      INTEGER			FID1, FID2		! Input file ids
+      INTEGER 			I			! index
+      INTEGER 			NAX                     ! # axes present
+      INTEGER 			NBAD                    ! # new bad points
+      INTEGER			NHIN			! # i/p history lines
+      INTEGER			NLINE			! # o/p history lines
+
       INTEGER NIG                             ! Number of ignored points
       INTEGER IN1_DPTR, IN2_DPTR, OUT_DPTR    ! Dataset data pointers
-      INTEGER IN1_DIMS(DAT__MXDIM)            ! 1st input dimensions
-      INTEGER IN2_DIMS(DAT__MXDIM)            ! 2nd input dimensions
-      INTEGER OUT_DIMS(DAT__MXDIM)            ! Output dimensions
+      INTEGER IN1_DIMS(ADI__MXDIM)            ! 1st input dimensions
+      INTEGER IN2_DIMS(ADI__MXDIM)            ! 2nd input dimensions
+      INTEGER OUT_DIMS(ADI__MXDIM)            ! Output dimensions
       INTEGER IN1_NELM, IN2_NELM, OUT_NELM    ! # elements in datasets
       INTEGER IN1_NDIM, IN2_NDIM, OUT_NDIM    ! Dimensionality of datasets
-      INTEGER IN1_VDIMS(DAT__MXDIM)           ! Dimensions of 1st input error
-      INTEGER IN2_VDIMS(DAT__MXDIM)           ! Dimensions of 2nd input error
+      INTEGER IN1_VDIMS(ADI__MXDIM)           ! Dimensions of 1st input error
+      INTEGER IN2_VDIMS(ADI__MXDIM)           ! Dimensions of 2nd input error
       INTEGER IN1_QPTR, IN2_QPTR, OUT_QPTR    ! Dataset quality pointers
       INTEGER IN1_VPTR, IN2_VPTR, OUT_VPTR    ! Dataset variance pointers
       INTEGER IN1_VNDIM, IN2_VNDIM            ! Dataset variance dimensionality
       INTEGER IN1_VNELM, IN2_VNELM, OUT_VNELM ! # elements in dataset variances
-      INTEGER                 TDIMS(DAT__MXDIM)
-      INTEGER                 TNDIM
+      INTEGER			OFID			! Output file id
+      INTEGER                 	TDIMS(ADI__MXDIM)
+      INTEGER			TID
+      INTEGER			TLEN			! Length of a string
+      INTEGER                 	TNDIM
+      INTEGER			VID1, VID2		! External variance ids
 
-      BYTE                    IN1_MASK        ! 1st input quality mask
-      BYTE                    IN2_MASK        ! 2nd input quality mask
-      BYTE                    OUT_MASK        ! Output quality mask
+      BYTE                    	IN1_MASK        	! 1st i/p quality mask
+      BYTE                    	IN2_MASK        	! 2nd i/p quality mask
+      BYTE                    	OUT_MASK        	! Output quality mask
 
-      LOGICAL                 DQD 	      ! Division operation
-      LOGICAL                 ERRORS          ! Prompt for input errors?
-      LOGICAL                 IN1_PRIM        ! 1st input primitive?
-      LOGICAL                 IN2_PRIM        ! 2nd input primitive?
-      LOGICAL                 IN1_QOK, IN2_QOK, OUT_QOK
-      LOGICAL                 IN1_SCALAR      ! 1st input scalar?
-      LOGICAL                 IN2_SCALAR      ! 2nd input scalar?
+      LOGICAL                 	DQD 	      		! Division operation
+      LOGICAL                 	ERRORS          	! Prompt for input errors?
+      LOGICAL                 	IN1_PRIM        	! 1st input primitive?
+      LOGICAL                 	IN2_PRIM        	! 2nd input primitive?
+      LOGICAL                 	IN1_QOK, IN2_QOK, OUT_QOK
+      LOGICAL                 	IN1_SCALAR      	! 1st input scalar?
+      LOGICAL                 	IN2_SCALAR      	! 2nd input scalar?
       LOGICAL                 IN1_UERR        ! Supplied error for input #1
       LOGICAL                 IN2_UERR        ! Supplied error for input #1
       LOGICAL                 IN1_VOK, IN2_VOK! Variance present in inputs?
-      LOGICAL                 OK              ! General validity test
-      LOGICAL                 OUT_PRIM        ! Output primitive?
-      LOGICAL                 OVER            ! Overwrite input file?
-      LOGICAL                 SAME12          ! Input 1 same as input 2
+      LOGICAL                 	OK              	! General validity test
+      LOGICAL                 	OUT_PRIM        	! Output primitive?
+      LOGICAL                 	OVER            	! Overwrite input file?
+      LOGICAL                 	SAME12          	! Input 1 same as 2?
 *
 *    Local data :
 *
       CHARACTER*30            VERSION
-         PARAMETER            (VERSION = 'ARITHMETIC Version 1.8-0')
+         PARAMETER            (VERSION = 'ARITHMETIC Version 1.8-1')
 *-
 
 *    Version id
@@ -164,17 +169,16 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 *    Associate data objects
       IF ( OVER ) THEN
         CALL MSG_PRNT( 'First input file will be overwritten' )
-        CALL USI_ASSOCI( 'INP1', 'UPDATE',IN1_LOC, IN1_PRIM, STATUS )
-        CALL USI_ASSOCI( 'INP2', 'READ',  IN2_LOC, IN2_PRIM, STATUS )
-        OUT_LOC = IN1_LOC
-        OUT_PRIM = IN1_PRIM
-        CALL USI_NAMEI( LEVELS, TEXTI, STATUS )
+        CALL USI_TASSOCI( 'INP1', '*', 'UPDATE', FID1, STATUS )
+        CALL USI_TASSOCI( 'INP2', '*', 'READ', FID2, STATUS )
+        OFID = FID1
       ELSE
-        CALL USI_ASSOC3('INP1','INP2','OUT','READ','READ', IN1_LOC,
-     :         IN2_LOC, OUT_LOC, SAME12, IN1_PRIM, IN2_PRIM,STATUS )
-        CALL USI_NAMEI(LEVELS,TEXTI,STATUS)
-        CALL USI_NAMEO(LEVELSO,TEXTO,STATUS)
+        CALL USI_TASSOC3('INP1','INP2','OUT','READ','READ', FID1,
+     :         FID2, OFID, SAME12, STATUS )
       END IF
+      CALL BDI_PRIM( FID1, IN1_PRIM, STATUS )
+      CALL BDI_PRIM( FID2, IN2_PRIM, STATUS )
+      OUT_PRIM = IN1_PRIM
 
 *    See if errors wanted for primitive input
       IF ( IN1_PRIM .OR. IN2_PRIM ) THEN
@@ -183,7 +187,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check size of input datasets
-      CALL BDA_CHKDATA( IN1_LOC, OK, IN1_NDIM, IN1_DIMS, STATUS )
+      CALL BDI_CHKDATA( FID1, OK, IN1_NDIM, IN1_DIMS, STATUS )
       IF ( OK ) THEN
         IN1_SCALAR = ( IN1_NDIM .EQ. 0 )
         IF ( IN1_SCALAR ) THEN
@@ -194,7 +198,7 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
       ELSE
         CALL ERR_REP( ' ', 'Bad input data - not numeric', STATUS )
       END IF
-      CALL BDA_CHKDATA( IN2_LOC, OK, IN2_NDIM, IN2_DIMS, STATUS )
+      CALL BDI_CHKDATA( FID2, OK, IN2_NDIM, IN2_DIMS, STATUS )
       IF ( OK ) THEN
         IN2_SCALAR = ( IN2_NDIM .EQ. 0 )
         IF ( IN2_SCALAR ) THEN
@@ -220,23 +224,23 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 *    Obtain errors and validate for first object
       IF ( IN1_PRIM ) THEN
         IF ( ERRORS ) THEN
-          CALL USI_DASSOC( 'ERR1', 'READ', IN1_VLOC, STATUS)
+          CALL USI_TASSOCI( 'ERROR1', '*', 'READ', VID1, STATUS)
           IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL DAT_VALID( IN1_VLOC, IN1_VOK, STATUS )
-            IN1_UERR = IN1_VOK
+            IN1_UERR = .TRUE.
+            IN1_VOK = .TRUE.
           ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             IN1_VOK = .FALSE.
           END IF
         END IF
       ELSE
-        CALL BDA_CHKVAR( IN1_LOC, IN1_VOK, IN1_VNDIM,
-     :                               IN1_VDIMS, STATUS )
+        CALL BDI_CHKVAR( FID1, IN1_VOK, IN1_VNDIM,
+     :                         IN1_VDIMS, STATUS )
       END IF
       IF ( ( STATUS .EQ. SAI__OK ) .AND. IN1_VOK ) THEN
         IF ( IN1_UERR ) THEN
-          CALL DAT_SHAPE( IN1_VLOC, DAT__MXDIM, IN1_VDIMS,
-     :                                    IN1_VNDIM, STATUS )
+          CALL BDI_CHKVAR( VID1, IN1_VOK, IN1_VNDIM,
+     :                               IN1_VDIMS, STATUS )
         END IF
         CALL ARR_SUMDIM( IN1_VNDIM, IN1_VDIMS, IN1_VNELM )
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -256,9 +260,9 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
 *    Obtain errors and validate for first second
       IF ( IN2_PRIM ) THEN
         IF ( ERRORS ) THEN
-          CALL USI_DASSOC( 'ERR2', 'READ', IN2_VLOC, STATUS)
+          CALL USI_TASSOCI( 'ERROR2', '*', 'READ', VID2, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL DAT_VALID( IN2_VLOC, IN2_VOK, STATUS )
+            IN2_VOK = .TRUE.
             IN2_UERR = IN2_VOK
           ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -266,13 +270,13 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
           END IF
         END IF
       ELSE
-        CALL BDA_CHKVAR( IN2_LOC, IN2_VOK, IN2_VNDIM,
+        CALL BDI_CHKVAR( FID2, IN2_VOK, IN2_VNDIM,
      :                               IN2_VDIMS, STATUS )
       END IF
       IF ( ( STATUS .EQ. SAI__OK ) .AND. IN2_VOK ) THEN
         IF ( IN2_UERR ) THEN
-          CALL DAT_SHAPE( IN2_VLOC, DAT__MXDIM, IN2_VDIMS,
-     :                                    IN2_VNDIM, STATUS )
+          CALL BDI_CHKVAR( VID2, IN2_VOK, IN2_VNDIM,
+     :                               IN2_VDIMS, STATUS )
         END IF
         CALL ARR_SUMDIM( IN2_VNDIM, IN2_VDIMS, IN2_VNELM )
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -300,62 +304,52 @@ C     CHARACTER*200          IN1_NAME, IN2_NAME
       END IF
 
 *    Map first object
-      CALL BDA_MAPDATA( IN1_LOC, MODE, IN1_DPTR, STATUS )
+      CALL BDI_MAPDATA( FID1, MODE, IN1_DPTR, STATUS )
       IF ( IN1_PRIM .AND. IN1_VOK ) THEN
-         CALL DAT_MAPV( IN1_VLOC, '_REAL', MODE, IN1_VPTR,
-     :                                    IN1_VNELM, STATUS )
-         IF ( IN1_UERR ) THEN
-            CALL ARR_SQR1R( %VAL(IN1_VPTR), IN1_VNELM, STATUS )
-         END IF
+        CALL BDI_MAPDATA( VID1, MODE, IN1_VPTR, STATUS )
+        IF ( IN1_UERR ) THEN
+          CALL ARR_SQR1R( %VAL(IN1_VPTR), IN1_VNELM, STATUS )
+        END IF
       ELSE IF ( IN1_VOK ) THEN
-         CALL BDA_MAPVAR( IN1_LOC, MODE, IN1_VPTR, STATUS )
+        CALL BDI_MAPVAR( FID1, MODE, IN1_VPTR, STATUS )
       END IF
 
 *    And second object - always map for read
-      CALL BDA_MAPDATA( IN2_LOC, 'READ', IN2_DPTR, STATUS )
+      CALL BDI_MAPDATA( FID2, 'READ', IN2_DPTR, STATUS )
       IF ( IN2_PRIM .AND. IN2_VOK ) THEN
-        CALL DAT_MAPV( IN2_VLOC, '_REAL', 'READ', IN2_VPTR,
-     :                                     IN2_VNELM, STATUS )
+        CALL BDI_MAPDATA( VID2, MODE, IN2_VPTR, STATUS )
         IF ( IN2_UERR ) THEN
           CALL ARR_SQR1R( %VAL(IN2_VPTR), IN2_VNELM, STATUS )
         END IF
       ELSE IF ( IN2_VOK ) THEN
-        CALL BDA_MAPVAR( IN2_LOC, 'READ', IN2_VPTR, STATUS )
+        CALL BDI_MAPVAR( FID2, 'READ', IN2_VPTR, STATUS )
       END IF
-
-*    Adjust names of inputs if scalar
-c      IF ( IN1_SCALAR ) THEN
-c        CALL CHR_RTOC( %VAL(IN1_DPTR), IN1_NAME, TLEN )
-c      END IF
-c      IF ( IN2_SCALAR ) THEN
-c        CALL CHR_RTOC( %VAL(IN2_DPTR), IN2.NAME, TLEN )
-c      END IF
 
 *    Create components in output dataset
       IF ( .NOT. IN1_PRIM ) THEN
-        CALL CMP_TYPE( IN1_LOC, 'DATA_ARRAY', OUT_TYPE, STATUS )
+        CALL BDI_TYPE( FID1, OUT_TYPE, STATUS )
       ELSE IF ( .NOT. IN2_PRIM ) THEN
-        CALL CMP_TYPE( IN2_LOC, 'DATA_ARRAY', OUT_TYPE, STATUS )
+        CALL BDI_TYPE( FID2, OUT_TYPE, STATUS )
       ELSE IF ( IN1_PRIM ) THEN
-        CALL DAT_TYPE( IN1_LOC, OUT_TYPE, STATUS )
+        CALL BDI_TYPE( FID1, OUT_TYPE, STATUS )
       ELSE IF ( IN2_PRIM ) THEN
-        CALL DAT_TYPE( IN2_LOC, OUT_TYPE, STATUS )
+        CALL BDI_TYPE( FID2, OUT_TYPE, STATUS )
       END IF
       IF ( .NOT. OVER ) THEN
         IF ( .NOT. IN1_SCALAR ) THEN
           OUT_NDIM = IN1_NDIM
-          DO I = 1, DAT__MXDIM
+          DO I = 1, ADI__MXDIM
             OUT_DIMS(I) = IN1_DIMS(I)
           END DO
         ELSE
           OUT_NDIM = IN2_NDIM
-          DO I = 1, DAT__MXDIM
+          DO I = 1, ADI__MXDIM
             OUT_DIMS(I) = IN2_DIMS(I)
           END DO
         END IF
-        CALL BDA_CREDATA( OUT_LOC, OUT_NDIM, OUT_DIMS, STATUS )
+        CALL BDI_CREDATA( OFID, OUT_NDIM, OUT_DIMS, STATUS )
         IF ( IN1_VOK .OR. IN2_VOK ) THEN
-          CALL BDA_CREVAR( OUT_LOC, OUT_NDIM, OUT_DIMS, STATUS )
+          CALL BDI_CREVAR( OFID, OUT_NDIM, OUT_DIMS, STATUS )
         END IF
       END IF
 
@@ -381,9 +375,9 @@ c      END IF
         OUT_DPTR = IN1_DPTR
         OUT_VPTR = IN1_VPTR
       ELSE
-        CALL BDA_MAPDATA( OUT_LOC, 'WRITE', OUT_DPTR, STATUS )
+        CALL BDI_MAPDATA( OFID, 'WRITE', OUT_DPTR, STATUS )
         IF ( IN1_VOK .OR. IN2_VOK  ) THEN
-          CALL BDA_MAPVAR( OUT_LOC, 'WRITE', OUT_VPTR, STATUS )
+          CALL BDI_MAPVAR( OFID, 'WRITE', OUT_VPTR, STATUS )
         ELSE
           OUT_VNELM = 0
         END IF
@@ -391,8 +385,8 @@ c      END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    See what input quality flags we have
-      CALL BDA_CHKQUAL( IN1_LOC, IN1_QOK, TNDIM, TDIMS, STATUS )
-      CALL BDA_CHKQUAL( IN2_LOC, IN2_QOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKQUAL( FID1, IN1_QOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKQUAL( FID2, IN2_QOK, TNDIM, TDIMS, STATUS )
 
 *    Decide whether to set up or modify QUALITY in output dataset
       DQD = (OPER.EQ.'/') .AND. (IN2_NELM.GT.1) .AND. .NOT. OUT_PRIM
@@ -403,15 +397,15 @@ c      END IF
          IF ( OVER .AND. .NOT. OUT_PRIM ) THEN
            IF ( .NOT. IN1_QOK ) THEN
 *   Create output QUALITY
-             CALL BDA_CREQUAL(IN1_LOC,IN1_NDIM,IN1_DIMS,STATUS)
-             CALL BDA_PUTMASK(IN1_LOC,QUAL__MASK,STATUS)
-             CALL BDA_MAPQUAL(IN1_LOC,'W',OUT_QPTR,STATUS)
+             CALL BDI_CREQUAL(FID1,IN1_NDIM,IN1_DIMS,STATUS)
+             CALL BDI_PUTMASK(FID1,QUAL__MASK,STATUS)
+             CALL BDI_MAPQUAL(FID1,'WRITE',OUT_QPTR,STATUS)
              OUT_QOK = .TRUE.
            ELSE
-             CALL BDA_MAPQUAL(IN1_LOC,'U',IN1_QPTR,STATUS)
+             CALL BDI_MAPQUAL(FID1,'U',IN1_QPTR,STATUS)
              OUT_QPTR = IN1_QPTR
              IF ( IN2_QOK ) THEN
-               CALL BDA_MAPQUAL(IN2_LOC,'R',IN2_QPTR,STATUS)
+               CALL BDI_MAPQUAL(FID2,'READ',IN2_QPTR,STATUS)
                OUT_QOK = .TRUE.
              END IF
            END IF
@@ -419,25 +413,25 @@ c      END IF
          ELSE
 
 *          Create output QUALITY
-            CALL BDA_CREQUAL(OUT_LOC,OUT_NDIM,OUT_DIMS,STATUS)
-            CALL BDA_MAPQUAL( OUT_LOC,'W',OUT_QPTR,STATUS )
+            CALL BDI_CREQUAL(OFID,OUT_NDIM,OUT_DIMS,STATUS)
+            CALL BDI_MAPQUAL( OFID,'WRITE',OUT_QPTR,STATUS )
 
             IF ( IN1_QOK ) THEN
-              CALL BDA_MAPQUAL(IN1_LOC,'R',IN1_QPTR,STATUS)
-              CALL BDA_GETMASK( IN1_LOC, IN1_MASK, STATUS )
+              CALL BDI_MAPQUAL(FID1,'READ',IN1_QPTR,STATUS)
+              CALL BDI_GETMASK( FID1, IN1_MASK, STATUS )
             ELSE
               IN1_MASK = QUAL__MASK
             END IF
 
             IF ( IN2_QOK ) THEN
-              CALL BDA_MAPQUAL(IN2_LOC,'R',IN2_QPTR,STATUS)
-              CALL BDA_GETMASK( IN2_LOC, IN2_MASK, STATUS )
+              CALL BDI_MAPQUAL(FID2,'READ',IN2_QPTR,STATUS)
+              CALL BDI_GETMASK( FID2, IN2_MASK, STATUS )
             ELSE
               IN2_MASK = QUAL__MASK
             END IF
 
             OUT_MASK = BIT_ANDUB(IN1_MASK,IN2_MASK)
-            CALL BDA_PUTMASK( OUT_LOC, OUT_MASK, STATUS )
+            CALL BDI_PUTMASK( OFID, OUT_MASK, STATUS )
 
          END IF
 
@@ -492,50 +486,66 @@ c      END IF
       IF ( .NOT. OVER ) THEN
         IF ( .NOT. ( IN1_PRIM .AND. IN2_PRIM ) ) THEN
           IF ( IN1_PRIM ) THEN
-            LOC = IN2_LOC
+            TID = FID2
           ELSE
-            LOC = IN1_LOC
+            TID = FID1
           END IF
 
 *        Copy top level text
-          CALL BDA_COPTEXT( LOC, OUT_LOC, STATUS )
+          CALL BDI_COPTEXT( TID, OFID, STATUS )
 
 *        Copy axis data
-          CALL BDA_CHKAXES( LOC, NAX, STATUS )
+          CALL BDI_CHKAXES( TID, NAX, STATUS )
           IF ( NAX .GT. 0 ) THEN
-            CALL BDA_COPAXES( LOC, OUT_LOC, STATUS )
+            CALL BDI_COPAXES( TID, OFID, STATUS )
           END IF
 
 *        Copy MORE box
-          CALL BDA_COPMORE( LOC, OUT_LOC, STATUS )
+          CALL BDI_COPMORE( TID, OFID, STATUS )
 
 *        Copy HISTORY
-          CALL HIST_COPY( LOC, OUT_LOC, STATUS )
+          CALL HSI_COPY( TID, OFID, STATUS )
 
         END IF
       END IF
 
 *    History update
       IF ( .NOT. OUT_PRIM ) THEN
-        CALL HIST_ADD( OUT_LOC, VERSION, STATUS )
-        TEXT(1)='Operation: '//OPER
-        CALL HIST_PTXT( OUT_LOC, 1, TEXT, STATUS )
-        IF ( .NOT. OVER ) THEN
-          CALL HIST_PTXT( OUT_LOC, LEVELSO, TEXTO, STATUS )
-        ELSE
-          TEXT(1) = 'Dataset was overwritten'
-          CALL HIST_PTXT( OUT_LOC, 1, TEXT, STATUS )
+        CALL HSI_ADD( OFID, VERSION, STATUS )
+        CALL HSI_PTXT( OFID, 1, 'Operation: '//OPER, STATUS )
+        IF ( OVER ) THEN
+          CALL HSI_PTXT( OFID, 1, 'Dataset was overwritten', STATUS )
         END IF
-        CALL HIST_PTXT( OUT_LOC, LEVELS, TEXTI, STATUS )
+        NHIN = 1
+        TEXT(1) = 'Input 1 : {INP1}'
+        TEXT(2) = '  value = '
+*    Display value if scalar
+        IF ( IN1_SCALAR ) THEN
+          NHIN = NHIN + 1
+          TEXT(NHIN) = '  value = '
+          CALL CHR_RTOC( %VAL(IN1_DPTR), TEXT(NHIN)(11:), TLEN )
+        END IF
+        NHIN = NHIN + 1
+        TEXT(NHIN) = 'Input 2 : {INP2}'
+*    Display value if scalar
+        IF ( IN2_SCALAR ) THEN
+          NHIN = NHIN + 1
+          TEXT(NHIN) = '  value = '
+          CALL CHR_RTOC( %VAL(IN2_DPTR), TEXT(NHIN)(11:), TLEN )
+        END IF
+
+*    Convert text
+        NLINE = MAXTXT
+        CALL USI_TEXT( NHIN, TEXT, NLINE, STATUS )
+        CALL HSI_PTXT( OFID, NLINE, TEXT, STATUS )
+
       END IF
 
 *    Tidy up
- 99   CONTINUE
-
-      CALL BDA_UNMAP( OUT_LOC,STATUS )
-      CALL BDA_RELEASE( IN2_LOC,STATUS )
+ 99   CALL BDI_UNMAP( OFID, STATUS )
+      CALL BDI_RELEASE( FID2, STATUS )
       IF ( .NOT. OVER ) THEN
-        CALL BDA_RELEASE( IN1_LOC, STATUS )
+        CALL BDI_RELEASE( FID1, STATUS )
       END IF
 
       CALL AST_CLOSE()
@@ -552,7 +562,6 @@ c      END IF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'        ! Asterix quality definitions
 *
 *    Status :
@@ -632,7 +641,6 @@ c      END IF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 	CHARACTER OPER		! required operation
 	INTEGER NA		! # of A elements
@@ -1078,7 +1086,6 @@ c      END IF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'        ! Asterix quality definitions
 *
 *    Import :

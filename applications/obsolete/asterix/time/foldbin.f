@@ -377,7 +377,7 @@ C            CALL MSG_PRNT( 'Maximum number of phase bins is ^INBINS' )
       IDIM(1)=NBINS
 *    Set output quality to GOOD (as all bad data has been excluded)
       CALL ARR_SUMDIM(NACTDIM,IDIM,NELM2)
-      CALL ARR_INIT1B(QUAL_GOOD,NELM2,%VAL(FQPTR),STATUS)
+      CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(FQPTR),STATUS)
 
       IDIM(1)=NDATA
 

@@ -294,7 +294,7 @@ C          NBINS = INBINS
      :                       'WRITE', 1, FNPTR,NBINS,STATUS)
 *    Set output quality to GOOD (as all bad data has been excluded)
       CALL ARR_SUMDIM(1,NBINS,NELM2)
-      CALL ARR_INIT1B(QUAL_GOOD,NELM2,%VAL(FQPTR),STATUS)
+      CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(FQPTR),STATUS)
 
 *    Set up and map components in output object - chi-sq vs. period  data
       CALL BDA_CREDATA(CLOC,1,NPER,STATUS)
@@ -310,7 +310,7 @@ C          NBINS = INBINS
       END IF
 *    Set output quality to GOOD (as all bad data has been excluded)
       CALL ARR_SUMDIM(1,NPER,NELM2)
-      CALL ARR_INIT1B(QUAL_GOOD,NELM2,%VAL(CQPTR),STATUS)
+      CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(CQPTR),STATUS)
 
 *  Fold the data
       IF (WEIGHT)THEN
