@@ -631,6 +631,10 @@
 *  specified in the X and Y catalogue columns.
       CALL AST_SETI( IPLOT, 'CURRENT', ICAT, STATUS )
 
+*  Set up clipping which results in vectors outside the supplied bounds
+*  being ignored.
+      CALL AST_CLIP( IPLOT, AST__CURRENT, BOX( 1 ), BOX( 3 ), STATUS ) 
+
 *  Use the inverse of the Plot as a Mapping to transform the (x,y) positions 
 *  in the catalogue into graphics world coordinates.
       CALL AST_TRAN2( IPLOT, NVEC, %VAL( IPX ), %VAL( IPY ), .FALSE.,
