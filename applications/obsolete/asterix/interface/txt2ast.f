@@ -1540,7 +1540,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
@@ -1584,11 +1583,13 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)	OLOC			!
-
       REAL                DVAL                   ! Two data values
       REAL                RQUAL                  ! Quality value
 
+      INTEGER			AX_DPTR(ADI__MXDIM)	! Axis data
+      INTEGER			AX_HIWPTR(ADI__MXDIM)	! Axis high widths
+      INTEGER			AX_LOWPTR(ADI__MXDIM)	! Axis low widths
+      INTEGER			AX_WPTR(ADI__MXDIM)	! Axis widths
       INTEGER             AX_SIZE(ADI__MXDIM)		! Values per axis
       INTEGER             I, J, K                ! Loop counter
       INTEGER             IQMASK                 ! Integer quality mask
@@ -1683,19 +1684,23 @@
 *    Is output structured?
         IF ( .NOT. PRIM ) THEN
 
-*      Create the axis array, map it and copy in the
-          CALL BDI_AXPUT1R( OFID, I, 'Data', AX_SIZE(I), WORK, STATUS )
+*      Copy axis data
+          CALL DYN_MAPR( 1, AX_SIZE(I), AX_DPTR(I), STATUS )
+          CALL ARR_COP1R(  AX_SIZE(I), WORK, %VAL(AX_DPTR(I)), STATUS )
 
 *      Are vector widths wanted
           IF ( VECTOR_WIDTHS ) THEN
             IF ( AX_SYMWID(I) ) THEN
-              CALL BDI_AXPUT1R( OFID, I, 'Width', AX_SIZE(I),
-     :                          WWORK(1,1), STATUS )
+              CALL DYN_MAPR( 1, AX_SIZE(I), AX_WPTR(I), STATUS )
+              CALL ARR_COP1R(  AX_SIZE(I), WWORK(1,1),
+     :                             %VAL(AX_WPTR(I)), STATUS )
             ELSE
-              CALL BDI_AXPUT1R( OFID, I, 'LoWidth', AX_SIZE(I),
-     :                          WWORK(1,1), STATUS )
-              CALL BDI_AXPUT1R( OFID, I, 'HiWidth', AX_SIZE(I),
-     :                          WWORK(1,1), STATUS )
+              CALL DYN_MAPR( 1, AX_SIZE(I), AX_LOWPTR(I), STATUS )
+              CALL ARR_COP1R(  AX_SIZE(I), WWORK(1,1),
+     :                             %VAL(AX_LOWPTR(I)), STATUS )
+              CALL DYN_MAPR( 1, AX_SIZE(I), AX_HIWPTR(I), STATUS )
+              CALL ARR_COP1R(  AX_SIZE(I), WWORK(1,2),
+     :                             %VAL(AX_HIWPTR(I)), STATUS )
             END IF
 
           END IF
@@ -1711,6 +1716,36 @@
         DIMS(I) = AX_SIZE(I)
       END DO
       CALL AR7_PAD( NAXES, DIMS, STATUS )
+
+*  Link to output object
+      CALL BDI_LINK( TYPE, NAXES, DIMS, 'REAL', OFID, STATUS )
+
+*  Create axis data
+      IF ( .NOT PRIM ) THEN
+
+        DO I = 1, NAXES
+
+*      Create the axis array, map it and copy in the
+          CALL BDI_AXPUT1R( OFID, I, 'Data', AX_SIZE(I),
+     :                        %VAL(AX_DPTR(I)), STATUS )
+
+*      Are vector widths wanted
+          IF ( VECTOR_WIDTHS ) THEN
+            IF ( AX_SYMWID(I) ) THEN
+              CALL BDI_AXPUT1R( OFID, I, 'Width', AX_SIZE(I),
+     :                          %VAL(AX_WPTR(I)), STATUS )
+            ELSE
+              CALL BDI_AXPUT1R( OFID, I, 'LoWidth', AX_SIZE(I),
+     :                          %VAL(AX_LOWPTR(I)), STATUS )
+              CALL BDI_AXPUT1R( OFID, I, 'HiWidth', AX_SIZE(I),
+     :                          %VAL(AX_HIWPTR(I)), STATUS )
+            END IF
+
+          END IF
+
+        END DO
+
+      END IF
 
 *  How many elements in output data array
       CALL ARR_SUMDIM( NAXES, DIMS, NELM )
@@ -1733,15 +1768,7 @@
 
 *  Create components with dimensions calculated
       IF ( USE_DATA ) THEN
-        IF ( PRIM ) THEN
-          CALL USI_DCREAT( 'OUT', TYPE, NDIM, DIMS, STATUS )
-          CALL USI_DASSOC( 'OUT', 'WRITE', OLOC, STATUS )
-          CALL DAT_MAPR( OLOC, 'WRITE', NDIM, DIMS, PTR_DATA, STATUS )
-          CALL USI0_STORE( 'OUT', OLOC, 'O', STATUS )
-          CALL ADI1_PUTLOC( OLOC, OFID, STATUS )
-        ELSE
-          CALL BDI_MAPR( OFID, 'Data', 'WRITE', PTR_DATA, STATUS )
-        END IF
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE', PTR_DATA, STATUS )
         CALL ARR_INIT1R( 0.0, NELM, %VAL(PTR_DATA), STATUS )
       END IF
       IF ( USE_VAR ) THEN
@@ -1763,12 +1790,10 @@
         ELSE
           QMASK = QUAL__MASK
         END IF
-        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, QMASK,
-     :                STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', QMASK, STATUS )
 
 *    Map it
-        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', PTR_QUAL,
-     :                STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', PTR_QUAL, STATUS )
 
 *    Initialise quality values to MISSING
         CALL ARR_INIT1B( QUAL__MISSING, NELM, %VAL(PTR_QUAL), STATUS )
