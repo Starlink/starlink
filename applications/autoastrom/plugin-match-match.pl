@@ -1,5 +1,5 @@
 # Plugin for autoastrom, which uses match
-# <http://acd188a-005.rit.edu/match/> to do the matching.
+# <http://spiff.rit.edu/match/> to do the matching.
 #
 # To work as an autoastrom plugin, we have to define a routine which
 # takes the correct arguments, and store a reference to it in

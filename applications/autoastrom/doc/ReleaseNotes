@@ -26,7 +26,7 @@
 <ul>
   <li><p>In 0.5-7: Fixed crashing error in 0.5-6; now works without `match'
     being installed; now distribute `match'
-    (<url>http://acd188a-005.rit.edu/match/</url>) with autoastrom.</p></li> 
+    (<url>http://spiff.rit.edu/match/</url>) with autoastrom.</p></li> 
   <li><p>Fixed typo in function name which made some informational
     messages fatal.</p></li>
   <li><p>Extractor sometimes claims to detect objects with a negative flux

@@ -52,12 +52,12 @@ There's a pre-installation regression test:
     ./mk pretest
 
 This version includes plugins, and specifically a plugin to support
-the `match' application to be found at <http://acd188a-005.rit.edu/match/>
-or <http://stupendous.rit.edu/richmond/>.  The distribution includes a
-copy of the match distribution, and has been tested against match 0.3,
-0.4 and 0.7; but if you wish to replace this version with any newer
-one, you can, if its output is compatible with earlier versions: build
-it yourself and install it in the directory $AUTOASTROM_DIR.
+the `match' application to be found at <http://spiff.rit.edu/match/>.
+The distribution includes a copy of the match distribution, and has
+been tested against match 0.3, 0.4 and 0.7; but if you wish to replace
+this version with any newer one, you can, if its output is compatible
+with earlier versions: build it yourself and install it in the
+directory $AUTOASTROM_DIR.
 
 Regression tests: A couple of the regression tests in directory t/
 (namely t/t7 and t/t9) are poor ones, since they depend far too much
