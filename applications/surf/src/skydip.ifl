@@ -1,0 +1,83 @@
+## SKYDIP - Process skydip data
+
+#+
+#  Name:
+#     SKYDIP.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+#     {enter_new_authors_here}
+ 
+#  History:
+#     1996 (TIMJ)
+#        Original version
+#     1997 March 26 (TIMJ)
+#	 OUT is now CHAR instead of NDF
+#        Add HELP
+
+   INTERFACE SKYDIP
+
+      HELPLIB 'SCUBA_HELP:'
+
+      PARAMETER   B_FIT 
+        POSITION 5
+        PROMPT   'B parameter'
+        TYPE     '_REAL'
+	DEFAULT  -1.0
+        RANGE    -1000000, 1.0
+	HELPKEY '*'
+      ENDPARAMETER
+ 
+      PARAMETER   ETA_TEL
+        POSITION 4
+        PROMPT   'Telescope efficiency'
+        TYPE     '_REAL'
+	DEFAULT  -1.0
+        RANGE    -1000000, 1.0
+	HELPKEY '*'
+      ENDPARAMETER 
+
+      PARAMETER IN
+        POSITION 1 
+        TYPE     NDF
+        PROMPT   'Name of input file containing demodulated data'
+	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER   MODEL_OUT
+         POSITION 7
+         PROMPT   'Name of output NDF for MODEL data'
+         TYPE     '_CHAR'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         DEFAULT  !
+  	 HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER   SUB_INSTRUMENT
+         POSITION 2
+         PROMPT   'Name of sub-instrument to be extinction corrected'
+         TYPE     '_CHAR'
+#         IN       'LONG', 'SHORT', 'P2000', 'P1300', 'P1100'
+  	 HELPKEY '*'
+      ENDPARAMETER
+        
+      PARAMETER   OUT
+         POSITION 6
+         PROMPT   'Name of output NDF for measured data'
+         TYPE     '_CHAR'
+	 DEFAULT  !
+	 HELPKEY '*'
+      ENDPARAMETER 
+         
+      PARAMETER   T_COLD
+        POSITION 3
+        PROMPT   'Temperature of cold load'
+        TYPE     '_REAL'
+        RANGE    1, 300
+	HELPKEY '*'
+      ENDPARAMETER
+
+    ENDINTERFACE   
