@@ -10,6 +10,8 @@
  EXTRACTOR and SExtractor have modified to offer the BKGSIG parameter
  (local background sigma) option used by GIM2D.
 
+ A bug causing the output from EXTRACTOR to be garbled has been fixed.
+
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
