@@ -13,3 +13,25 @@ directory, t.
 
 Norman Gray (norman@astro.gla.ac.uk)
 2001-06-11
+
+
+
+2003 May 2
+----------
+
+Assorted changes, ready for release.  See the news file.
+
+Significantly, ASTROM is now partly configured through autoconf.  If
+you check out a fresh copy from CVS, there is no longer a makefile.
+To build a distribution straight from CVS, you need to give the
+following commands (and you need a reasonably recent version of
+autoconf or else you get an error like `autoconf: configure.in: No
+such file or directory')
+
+    autoconf
+    ./configure
+    make export_source
+
+(in fact you need to `latex sun5;bibtex sun5;latex sun5;bibtex
+sun5;latex sun5') in order to include the bibliography correctly, but
+I haven't tried to automate that in the makefile)
