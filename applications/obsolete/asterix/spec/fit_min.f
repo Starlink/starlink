@@ -58,25 +58,41 @@
 *
 *    History :
 *
-*      7 Apr 87 : Original (BHVAD::TJP)
-*     29 Apr 87 : Calculate parameter increments, new FIT_DERIVS interface (TJP)
-*     15 May 87 : Return DPAR to calling program (TJP)
-*     11 Jun 87 : CHANGELIM termination criterion changed (TJP)
-*     24 Jul 87 : MINSLO entered as a program argument (TJP)
-*     29 Apr 88 : Use of globals eliminated by passing structures (TJP)
-*      1 Jul 88 : Amended to handle NDOF=0 case (TJP)
-*     24 May 89 : Amended to caculate chisq even if all params frozen (TJP)
-*     25 Mar 92 : Renamed, FIT_PREDDAT made external PREDICTOR (RJV)
-*     27 May 92 : Allow maximum likelihood fitting using Cash statistic.
-*                 Correct error handling and allow -ve statistics. Now
-*                 uses D.P. (DJA)
-*     15 Jun 92 : Added FSTAT argument, changed NDOF to SSCALE (DJA)
-*     18 Aug 92 : Statistic now double precision (DJA)
-*     27 Nov 92 : Allow termination if STAT and SLOPE unchanged by amount
-*                 TDELTA after 2nd or subsequent iterations (DJA)
-*     16 Feb 94 : Adjust termination condition to correctly handle TDELTA
-*                 option for -ve statistics (DJA)
-*     19 May 94 : Added parameter constraint handling (DJA)
+*      7 Apr 1987 (TJP):
+*        Original version
+*     29 Apr 1987 (TJP):
+*        Calculate parameter increments, new FIT_DERIVS interface
+*     15 May 1987 (TJP):
+*        Return DPAR to calling program
+*     11 Jun 1987 (TJP):
+*        CHANGELIM termination criterion changed
+*     24 Jul 1987 (TJP):
+*        MINSLO entered as a program argument
+*     29 Apr 1988 (TJP):
+*        Use of globals eliminated by passing structures
+*      1 Jul 1988 (TJP):
+*        Amended to handle NDOF=0 case
+*     24 May 1989 (TJP):
+*        Amended to calculate chisq even if all params frozen
+*     25 Mar 1992 (RJV):
+*        Renamed, FIT_PREDDAT made external PREDICTOR
+*     27 May 1992 (DJA):
+*        Allow maximum likelihood fitting using Cash statistic. Correct error
+*        handling and allow -ve statistics. Now uses D.P.
+*     15 Jun 1992 (DJA):
+*        Added FSTAT argument, changed NDOF to SSCALE
+*     18 Aug 1992 (DJA):
+*        Statistic now double precision
+*     27 Nov 1992 (DJA):
+*        Allow termination if STAT and SLOPE unchanged by amount
+*        TDELTA after 2nd or subsequent iterations
+*     16 Feb 1994 (DJA):
+*        Adjust termination condition to correctly handle TDELTA
+*        option for -ve statistics
+*     19 May 1994 (DJA):
+*        Added parameter constraint handling
+*     16 Apr 1996 (DJA):
+*        Changed from NAG to PDA routine
 *
 *    Type definitions :
 *
@@ -85,7 +101,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -182,11 +197,11 @@
         SAVE                    LFROZEN
       LOGICAL 		  	NEWPEG(NPAMAX)		! New parameters pegged
 *
-*    Nag related declarations :
+*    PDA related declarations :
 *
-      DOUBLE PRECISION	  	LU(NPAMAX,NPAMAX)	! Work space and LU decomp
-      DOUBLE PRECISION	  	WKS1(NPAMAX),WKS2(NPAMAX)  ! Work space
-      INTEGER 		  	FAIL			! NAG error code
+      INTEGER			ACC			! Accuracy code
+      DOUBLE PRECISION	  	WKS1(NPAMAX)		! Work space
+      INTEGER         		WKS2(NPAMAX)  		! Work space
 *-
 
 *    Status check
@@ -310,7 +325,7 @@ D	PRINT *,'fit_min;deriv2: ',((deriv2(j,k),k=1,npar),j=1,npar)
 
 *          Set up arrays of 1st and second derivs of REDUCED chi-squared w.r.t.
 *          the SCALED parameters, for free parameters only
-	    SCDERIV1(NPFREE) = -DERIV1(J)*PSCALE(J)/LSSCALE ! Minus for F04ATF
+	    SCDERIV1(NPFREE) = -DERIV1(J)*PSCALE(J)/LSSCALE
 	    DO K=1,NPFREE-1	! N.B. Diagonal element not evaluated here
 	      SCDERIV2(K,NPFREE)=DERIV2(IPFREE(K),J)*PSCALE(IPFREE(K))*
      :           PSCALE(J)/LSSCALE
@@ -346,22 +361,27 @@ C	PRINT *,'fit_min;scderiv2: ',((scderiv2(j,k),k=1,npfree),
 C    :    j=1,npfree)
 D	PRINT *,'fit_min;scderiv2(k,k): ',(scderiv2(k,k),k=1,npfree)
 
-*      Call NAG routine to solve for parameter offsets
-	FAIL=1
-	CALL F04ATF(SCDERIV2,NPAMAX,SCDERIV1,NPFREE,PARSTEP,LU,NPAMAX,
-     :                                                 WKS1,WKS2,FAIL)
-D	PRINT *,'fit_min;parstep: ',(parstep(k),k=1,npfree)
+*    Call PDA routine to solve for parameter offsets
+        DO K = 1, NPFREE
+          PARSTEP(K) = SCDERIV1(K)
+        END DO
+        CALL PDA_DGEFS( SCDERIV2, NPAMAX, NPFREE, PARSTEP, 1, ACC,
+     :                  WKS1, WKS2, STATUS )
+D        print *,'pda_vals; acc = ',acc
+D        PRINT *,'pda_vals;parstep: ',(parstep(k),k=1,npfree)
+        IF ( ACC .LT. 0 ) THEN
+          IF ( ACC .EQ. -3 ) THEN
+            FITERR = 4
+          ELSE IF ( ACC .EQ. -10 ) THEN
+            FITERR = 5
+          END IF
+          GOTO 99
+        END IF
+
+*    Increment iteration counter
         RITER = RITER + 1
 
-*      Check for error in NAG routine
-	IF ( FAIL .NE. 0 ) THEN
-	  FITERR = FAIL + 3
-*...........( FITERR=4 for singular DERIV2 matrix )
-*...........(       =5 for ill-conditioned matrix )
-	  GOTO 99
-	END IF
-
-*      Evaluate new (unscaled) parameter values and check against bounds
+*    Evaluate new (unscaled) parameter values and check against bounds
 	DO J = 1, NPAR
 	  NEWPAR(J) = PARAM(J)
 	  NEWPEG(J) = .FALSE.
@@ -404,7 +424,7 @@ D	PRINT *,'fit_min;parstep: ',(parstep(k),k=1,npfree)
 	  GOTO 1000
 	ELSE
 
-*        Successful iteration - update parameters
+*      Successful iteration - update parameters
 	  DO J = 1, NPAR
 	    PARAM(J) = NEWPAR(J)
 	    IF ( NEWPEG(J) ) THEN
@@ -415,7 +435,7 @@ D	PRINT *,'fit_min;parstep: ',(parstep(k),k=1,npfree)
 	    END IF
 	  END DO
 
-*        Output fitting information
+*      Output fitting information
 	  IF ( OPCHAN .GT. 0 ) THEN
             IF ( FSTAT .EQ. FIT__CHISQ ) THEN
 	      WRITE(OPCHAN,2000,IOSTAT=ISTAT) NIT,NEWSTAT/LSSCALE,
