@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE defectslist SYSTEM "defects.dtd">
+
+<defectslist>
+
+<title>ESP issues list</title>
+<version>$Revision$</version>
+<date>$Date$</date>
+
+<p>This list contains the current defects list for the ESP
+application.  As well as specific deficiencies, these `defects'
+include items which are merely suggestions or TODOs.</p>
+
+<p>Unfortunately, I have very little ESP time allocated this year.</p>
+
+<p>If it's not in here, I don't plan to do anything about it.  That
+probably means it's slipped through the (unfortunately rather ragged)
+net, and you should remind me about it.</p>
+
+<p>These are in chronological order, and some have a higher priority
+than others.</p>
+
+<!-- DO NOT CHANGE THE ORDER OF ELEMENTS IN THIS FILE.
+     They're numbered when they're formatted, and it'd be nice to keep
+     those numbers correct.
+     -->
+
+<defectgroup>
+<title>Functionality</title>
+
+<defect status="open"
+	originator="Jonathan Smoker"
+	originatoremail="J.Smoker@Queens-Belfast.AC.uk">
+<title>ARDFIL parameter does not behave properly</title>
+<p>Looking at ards.f it appears that
+ESP_ARD_DRIVER returns a warning whether you type !
+(=PAR__NULL, cf SUN/114) in response to the ARDFIL prompt, or
+!! (=PAR__ABORT).  The latter should cause the application to
+stop, and it doesn't.</p>
+
+<p>Also, ards.f calls par_cancl, which (I think) carefully discards any value
+of ardfil the user sets on the command line.  Is there some
+twisted reason why this is a Good Idea?  I don't think so -- Malcolm
+Currie also reported this as a problem.</p>
+
+<p>Quoth Malcolm:
+<blockquote><p>There are problems using ARD files.  First the reference documentation
+for the ARDFIL parameters oit to mention that you need the ^ prefix.
+The data type is _CHAR, when in fact it is GROUP.  In KAPPA/ARDMASK I only
+accept a filename hence the type is FILENAME.  I accept that it is
+mentioned once in the main text and in the odd example, but it wasn't
+in the specification for the task I was looking at.  Thus I saw errors
+like this.
+
+<verbatim>
+   ARDFIL - Masking ARD file /@gb160151_db_dk_fl.ard/ > 
+   !! SUBPAR: Error finding component 'ard' in gb160151_db_dk_fl.ard
+   !  SUBPAR: Failed to open HDS object associated with parameter ARDFIL
+   ARDFIL - Masking ARD file /@gb160151_db_dk_fl.ard/ > gb160151_db_dk_fl.ard
+   WARNING! - ARD file not used.
+</verbatim>
+Please could the final error message be expanded, perhaps suggesting that
+there should be a ^ before the filename. 
+</p></blockquote>
+</p>
+<p>Also, the types associated with the ARDFIL parameter seem confused.</p>
+</defect>
+
+<defect status="open"
+	originator="Malcolm Currie"
+	originatoremail="mjc@jach.hawaii.edu">
+<title>BACK parameter misbehaving?</title>
+<p>Malcolm:
+<blockquote>
+<p>ELLPRO generates different results depending on the BACK value. There
+was some light leak on the CCD, so I ran HISTPEAK excluding the lower
+left.  I ran ELLPRO with parameter BACK set to 1923.  Later I used
+KAPPA/SURFIT to remove the sky variation, flat to about 1 count.  I
+ran ELLPRO again but with BACK set to 0.  I saw different results,
+both the radii and ther limiting radius.  So I added a constant 1923
+to the sky-subtracted image and ran ELLPRO once again with BACK=1923.
+The results were different from the BACK=0 case.
+</p></blockquote></p>
+</defect>
+
+<defect status="open" originator="Emanuela Pompei"
+originatoremail="epompei@brera.mi.astro.it" date="28-Jun-2000">
+<title>GRAPHS: Mysterious end-of-file</title>
+<p>GRAPHS running on an ELLFOU output file claims to find a spurious
+end-of-file.</p>
+</defect>
+
+</defectgroup>
+
+
+<defectgroup>
+<title>Appearance and output</title>
+
+<defect status="open"
+	originator="Malcolm Currie"
+	originatoremail="mjc@jach.hawaii.edu">
+<title>Write computed values to parameters</title>
+<p>It would be convenient if ESP/GAUFIT wrote computed
+values to parameters, rather than just to a text file.</p>
+</defect>
+
+<defect status="open"
+	originator="Malcolm Currie"
+	originatoremail="mjc@jach.hawaii.edu">
+<title>ELLPRO output and its origin</title>
+<p>Malcolm:
+<blockquote>
+<p>The co-ordinate information output by ELLPRO ignores the origin.  The
+pixel co-ordinates are with respect to the grid.  Also the unfortunately
+named parameter ORIGIN (I'd prefer CENTRE) also fails to allow for
+the NDF origin.
+</p></blockquote></p>
+</defect>
+
+<defect status="open"
+	originator="Athanassios Katsiyannis"
+	originatoremail="Star@Queens-Belfast.AC.UK">
+<title>ELLPRO/FOU's SIGMA parameter</title>
+<p>Thanassis:
+<blockquote>
+<p>In ellpro and ellfou there is a parameter called SIGMA which is described
+as "Standard deviation of the background". But those are two different
+things (although their values are quite close so it doesn't really
+matters). Could you please clarify that?</p>
+</blockquote>
+</p>
+</defect>
+
+<defect status="open"
+	originator="Athanassios Katsiyannis"
+	originatoremail="Star@Queens-Belfast.AC.UK">
+<title>LOBACK: extra statistics output</title>
+<p>Thanassis:
+<blockquote>
+<p>The loback command gives useful statistics of certain image areas.
+Could you please put an extra output line at the end giving statistics
+from all the samples? (for example the standard deviation, sigma, average
+etc of all the individual samples).
+</p>
+</blockquote>
+</p>
+</defect>
+
+</defectgroup>
+
+</defectslist>
