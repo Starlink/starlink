@@ -31,9 +31,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.9  1996/11/18 02:25:49  timj
-*     Add REMSKY
+*     Revision 1.10  1996/12/17 20:30:31  timj
+*     Add final ELSE to see if task is not recognised
 *
+c Revision 1.9  1996/11/18  02:25:49  timj
+c Add REMSKY
+c
 c Revision 1.8  1996/11/01  22:15:46  timj
 c Change PHOTOM to SCUPHOT
 c
@@ -142,6 +145,11 @@ c
 
       ELSE IF (NAME .EQ. 'DRAWSIG') THEN
          CALL DRAWSIG (STATUS) 
+
+      ELSE
+         CALL MSG_SETC('TAS', NAME)
+         CALL MSG_OUT(' ','^TAS is not present in the monolith',
+     :        STATUS)
 
       END IF
 
