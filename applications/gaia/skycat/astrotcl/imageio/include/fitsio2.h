@@ -80,7 +80,9 @@
 /*  AMD64 */
 #define MACHINE IBMPC
 #define BYTESWAPPED TRUE
+#if defined(__LP64)
 #define LONGSIZE 64
+#endif
 
 #elif defined(_MSC_VER) || defined(__BORLANDC__) || defined(__TURBOC__)
 
