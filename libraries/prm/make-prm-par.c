@@ -1097,7 +1097,7 @@ int sigfpe_on_denormalized(void)
 {
     /* first, ensure that sigfpe_on_denormalized_test() has in fact
        been called */
-    assert(sigfpe_on_denormalized_result > 0);
+    assert(sigfpe_on_denormalized_result >= 0);
     return sigfpe_on_denormalized_result;
 }
 
