@@ -241,6 +241,8 @@
 
       SUBROUTINE ADI2_DMAP_AXINV( BASE, DELTA, NELM, AXDAT, STATUS )
 
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
       REAL			BASE
       REAL			DELTA
       INTEGER			NELM
@@ -259,6 +261,8 @@
 
 
       SUBROUTINE ADI2_DMAP_AXWID( DELTA, NELM, AXDAT, STATUS )
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
       REAL			DELTA
       INTEGER			NELM
