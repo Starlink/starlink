@@ -36,11 +36,11 @@
 *        Global status value.
 
 *  Notes:
-*     -  There is a routine for the real and signed word data types:
-*     replace "x" in the routine name by R or W as appropriate.  INARR,
-*     OUTARR, OLDVAL, and NEWVAL must have the data type specified.
-*     (Note that although all numeric data types are acceptable, in
-*     practice only these two types are required.)
+*     -  There is a routine for the integer, real, and signed word data
+*     types: replace "x" in the routine name by I, R, or W as
+*     appropriate.  INARR, OUTARR, OLDVAL, and NEWVAL must have the
+*     data type specified.  (Note that although all numeric data types
+*     are acceptable, in practice only these two types are required.)
 
 *  Algorithm:
 *     -  To avoid testing two floating-point values for equality, they
