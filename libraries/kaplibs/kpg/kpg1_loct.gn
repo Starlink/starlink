@@ -144,11 +144,15 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1991 March 25 (MJC):
 *        Original version based on LOCATE in earlier versions of KAPPA.
+*     5-JUL-1999 (DSB):
+*        Fill BUFFER with spaces before using it to avoid spurious
+*        trailing characters being displayed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -692,6 +696,7 @@
 *             commas.
 
                NC = 0
+               BUFFER = ' '
                CALL CHR_PUTC( '( ', BUFFER, NC )
                DO  I = 1, NDIM
                   CALL CHR_PUTR( FINAL( I ) - INIT( I ), BUFFER, NC )
