@@ -3,7 +3,7 @@
 .SUFFIXES : .ifl .ifc
 
 # Version string
-PKG_VERS = "'1.4-0JAC'"
+PKG_VERS = "'1.4-2JAC'"
 
 # Location of libsculib.a
 SCULIB   = ../sculib
