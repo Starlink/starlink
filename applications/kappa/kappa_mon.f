@@ -434,26 +434,6 @@
          ELSE IF ( NAME .EQ. 'TRANDAT' ) THEN
             CALL TRANDAT ( STATUS )
 
-*  Inverts a transformation.
-         ELSE IF ( NAME .EQ. 'TRANINVERT' ) THEN
-            CALL TRANINVERT ( STATUS )
-
-*  Joins two transformations.
-         ELSE IF ( NAME .EQ. 'TRANJOIN' ) THEN
-            CALL TRANJOIN ( STATUS )
-
-*  Makes a transformation structure given its co-ordinate mappings.
-         ELSE IF ( NAME .EQ. 'TRANMAKE' ) THEN
-            CALL TRANMAKE ( STATUS )
-
-*  Applies a transformation to an NDF.
-         ELSE IF ( NAME .EQ. 'TRANSFORMER' ) THEN
-            CALL TRANSFORMER ( STATUS )
-
-*  Lists the contents of a transformation structure.
-         ELSE IF ( NAME .EQ. 'TRANTRACE' ) THEN
-            CALL TRANTRACE ( STATUS )
-
 *  Performs a trigonometric transformation on a data array.
          ELSE IF ( NAME .EQ. 'TRIG' ) THEN
             CALL TRIG ( STATUS )

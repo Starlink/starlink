@@ -71,8 +71,7 @@ setaxis.par setbad.par setbb.par setbound.par setext.par setlabel.par \
 setmagic.par setnorm.par setorigin.par setsky.par settitle.par \
 settype.par setunits.par setvar.par shadow.par slide.par \
 sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
-trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
-trantrace.par trig.par vecplot.par wiener.par zaplin.par \
+trandat.par trig.par vecplot.par wiener.par zaplin.par \
 kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
@@ -115,8 +114,7 @@ role_of_kappa.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
 setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
 shadow.hlp slide.hlp sqorst.hlp stats.hlp substitute.hlp \
-summary.hlp surfit.hlp thresh.hlp trandat.hlp traninvert.hlp tranjoin.hlp \
-tranmake.hlp transformer.hlp trantrace.hlp trig.hlp \
+summary.hlp surfit.hlp thresh.hlp trandat.hlp trig.hlp \
 unix_usage.hlp using_help.hlp vecplot.hlp wiener.hlp zaplin.hlp \
 automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
@@ -144,8 +142,7 @@ makesurface.ifl maths.ifl median.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
 paste.ifl pixdupe.ifl pow.ifl psf.ifl rift.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
-sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
-tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
+sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
 drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl \
@@ -174,8 +171,7 @@ kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
 median.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
 numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
-substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
-tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
+substitute.f surfit.f thresh.f trandat.f trig.f wiener.f zaplin.f mem2d.f \
 listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f kapversion.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
@@ -252,11 +248,11 @@ kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_subid.f kps1_subir.f \
 kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f kps1_supev.f \
 kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f kps1_susf.f \
 kps1_suskd.f kps1_suskr.f kps1_trdrd.f kps1_cremg.f kps1_crets.f \
-kps1_trdri.f kps1_trdrr.f kps1_trncl.f kps1_trndd.f kps1_trndi.f \
+kps1_trdri.f kps1_trdrr.f kps1_trndd.f kps1_trndi.f \
 kps1_trndr.f kps1_trnvd.f kps1_trnvi.f kps1_trnvr.f kps1_trop1.f \
 kps1_trop2.f kps1_vecky.f kps1_vecpl.f kps1_wieap.f kps1_wiecp.f \
 kps1_wiecs.f kps1_wiefl.f kps1_wiefp.f kps1_wieou.f kps1_wiepw.f \
-kps1_wltrn.f kps1_wptrn.f kps1_zpabd.f kps1_zpabr.f kps1_zprep.f \
+kps1_zpabd.f kps1_zpabr.f kps1_zprep.f \
 kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f kps1_zprgub.f \
 kps1_zprguw.f kps1_zprgw.f laplsb.f lccell.f linplt.f linset.f listsb.f \
 lsfun1.f ma1to2.f ma1to3.f ma2to1.f ma2to3.f ma3to1.f ma3to2.f maless.f \

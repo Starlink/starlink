@@ -554,8 +554,7 @@ normalize.f numb.f outset.f parget.f paste.f \
 permaxes.f pixdupe.f psf.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
-trandat.f traninvert.f tranjoin.f tranmake.f \
-transformer.f trantrace.f trig.f wiener.f zaplin.f \
+trandat.f trig.f wiener.f zaplin.f \
 listmake.f listshow.f profile.f wcsalign.f wcstran.f kapversion.f
 
 #  kappa routines for which the atask action name can be derived from the 
@@ -634,12 +633,12 @@ kps1_stpaw.f kps1_skyfn.f kps1_skyf4.f kps1_skyf3.f kps1_suclr.f \
 kps1_skyf2.f kps1_suskr.f kps1_susf.f kps1_susev.f kps1_susei.f \
 kps1_suseb.f kps1_supf.f kps1_supev.f kps1_supei.f kps1_supeb.f \
 kps1_trop1.f kps1_trnvr.f kps1_trnvi.f kps1_trndr.f kps1_trndi.f \
-kps1_trndd.f kps1_trncl.f kps1_trdrr.f kps1_trdri.f kps1_trdrd.f \
+kps1_trndd.f kps1_trdrr.f kps1_trdri.f kps1_trdrd.f \
 kps1_thgtw.f kps1_thgtuw.f kps1_thgtub.f kps1_trnvd.f kps1_thgtr.f \
 kps1_thgti.f kps1_thgtd.f kps1_trop2.f kps1_thgtb.f kps1_vecpl.f \
-kps1_vecky.f kps1_wltrn.f kps1_wiepw.f kps1_wieou.f kps1_wiefp.f \
+kps1_vecky.f kps1_wiepw.f kps1_wieou.f kps1_wiefp.f \
 kps1_wiefl.f kps1_wiecs.f kps1_wiecp.f kps1_wieap.f kps1_wala6.f \
-kps1_wala5.f kps1_wala4.f kps1_wala3.f kps1_wptrn.f kps1_wala0.f \
+kps1_wala5.f kps1_wala4.f kps1_wala3.f kps1_wala0.f \
 kps1_zprgw.f kps1_zprguw.f kps1_zprgub.f kps1_zprgr.f kps1_zprgi.f \
 kps1_zprgd.f kps1_zprgb.f kps1_zprep.f kps1_zpabr.f kps1_zpabd.f laplsb.f \
 lccell.f linplt.f linset.f listsb.f lsfun1.f ma1to2.f ma1to3.f ma2to1.f \
@@ -2683,7 +2682,6 @@ kps1_thgtw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_trdrd.o:	 SAE_PAR DAT_PAR FIO_ERR CHR_ERR
 kps1_trdri.o:	 SAE_PAR DAT_PAR FIO_ERR CHR_ERR
 kps1_trdrr.o:	 SAE_PAR DAT_PAR FIO_ERR CHR_ERR
-kps1_trncl.o:	 SAE_PAR TRN_PAR
 kps1_trndd.o:	 SAE_PAR
 kps1_trndi.o:	 SAE_PAR
 kps1_trndr.o:	 SAE_PAR
@@ -2707,8 +2705,6 @@ kps1_wiefl.o:	 SAE_PAR
 kps1_wiefp.o:	 SAE_PAR
 kps1_wieou.o:	 SAE_PAR PRM_PAR
 kps1_wiepw.o:	 SAE_PAR PRM_PAR
-kps1_wltrn.o:	 SAE_PAR DAT_PAR TRN_PAR
-kps1_wptrn.o:	 SAE_PAR DAT_PAR TRN_PAR
 kps1_zpabd.o:	 SAE_PAR
 kps1_zpabr.o:	 SAE_PAR
 kps1_zpdec.o:	 SAE_PAR AST_PAR
@@ -2843,11 +2839,6 @@ surfit.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR MSG_PAR
 thresh.o:	 SAE_PAR NDF_PAR PAR_ERR PRM_PAR MSG_PAR
 thrsr.o:	 SAE_PAR PRM_PAR
 trandat.o:	 SAE_PAR DAT_PAR PRM_PAR PAR_ERR FIO_ERR
-traninvert.o:	 SAE_PAR DAT_PAR
-tranjoin.o:	 SAE_PAR DAT_PAR DAT_ERR PAR_ERR
-tranmake.o:	 SAE_PAR DAT_PAR DAT_ERR PAR_ERR TRN_PAR
-transformer.o:	 SAE_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR TRN_PAR
-trantrace.o:	 SAE_PAR TRN_PAR DAT_PAR PAR_ERR
 trgscl.o:	 SAE_PAR
 trig.o:	 SAE_PAR DAT_PAR PAR_ERR
 trigsb.o:	 SAE_PAR PRM_PAR
