@@ -12,7 +12,7 @@
 <!ENTITY slparams.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
 <!ENTITY slspecial.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Special Code//EN">
 
-<!ENTITY lib.dsl		SYSTEM "../lib/sllib-jade-1.2.1.dsl" SUBDOC>
+<!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
 <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
 <!ENTITY maths.dsl		SYSTEM "slmaths.dsl" SUBDOC>
 <!ENTITY slback.dsl		SYSTEM "slback.dsl" SUBDOC>

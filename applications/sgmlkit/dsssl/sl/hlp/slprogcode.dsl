@@ -1,7 +1,7 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
 
 <![ IGNORE [   -- These are not currently used --
-   <!ENTITY lib.dsl       SYSTEM "../lib/sllib-jade-1.2.1.dsl">
+   <!ENTITY lib.dsl       SYSTEM "../lib/sllib.dsl">
    <!ENTITY common.dsl    SYSTEM "../common/slcommon.dsl">
    <!ENTITY dblib.dsl     SYSTEM "../lib/dblib.dsl">
 ]]>
