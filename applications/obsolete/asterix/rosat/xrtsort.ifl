@@ -267,19 +267,19 @@
             ENDPARAMETER
 
      PARAMETER RA
-               TYPE    '_DOUBLE'
+               TYPE    '_CHAR'
                PROMPT  'RA of the centre of the source region'
                PPATH   'DYNAMIC'
                VPATH   'PROMPT'
-               HELP    'Enter in decimal degrees, default is centre of field'
+               HELP    'Enter in any format'
             ENDPARAMETER
 
      PARAMETER DEC
-               TYPE    '_DOUBLE'
+               TYPE    '_CHAR'
                PROMPT  'DEC of the centre of the source region'
                PPATH   'DYNAMIC'
                VPATH   'PROMPT'
-               HELP    'Enter in decimal degrees, default is centre of field'
+               HELP    'Enter in any format'
             ENDPARAMETER
 
      PARAMETER SWIDTH
@@ -436,19 +436,19 @@
             ENDPARAMETER
 
      PARAMETER RAB
-               TYPE    '_DOUBLE'
-               PROMPT  'RA of centre of bckgnd box (dec. degrees)'
+               TYPE    '_CHAR'
+               PROMPT  'RA of centre of bckgnd box'
                PPATH   'DYNAMIC'
                VPATH   'PROMPT'
                HELP    'Can be away from source box or an annulus around it.'
             ENDPARAMETER
 
      PARAMETER DECB
-               TYPE    '_DOUBLE'
+               TYPE    '_CHAR'
                PROMPT  'DEC of the centre of the bckgnd box'
                PPATH   'DYNAMIC'
                VPATH   'PROMPT'
-               HELP    ' Enter in decimal degrees'
+               HELP    ' Enter in any format'
             ENDPARAMETER
 
      PARAMETER BWIDTH
