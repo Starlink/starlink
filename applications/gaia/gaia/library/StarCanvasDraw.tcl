@@ -1,20 +1,20 @@
 #+
 #  Name:
 #     StarCanvasDraw
-
+#
 #  Type of Module:
 #     [incr Tk] class
-
+#
 #  Purpose:
 #     Adds the functionality required for applications to use the
 #     CanvasDraw class.
-
+#
 #  Description:
 #     See methods and configurations for additional functionality.
 #     Basically it adds the new canvas items, ellipses, circles,
 #     point editable polygon, rotating box, pixel and pixel wide
 #     row and columns.
-
+#
 #  Invocations:
 #
 #        StarCanvasDraw object_name [configuration options]
@@ -30,14 +30,14 @@
 #        object_name method arguments
 #
 #     Performs the given method on this object.
-
+#
 #  Inheritance:
 #     Inherits CanvasDraw.
-
+#
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
-#     {enter_new_authors_here}
-
+#     NG: Norman Gray (Starlink, Glasgow)
+#
 #  History:
 #     9-MAY-1996 (PDRAPER):
 #        Original version.
@@ -52,8 +52,9 @@
 #          Changed tag "selected" to "$w_.selected", and added new tag
 #          "$w_.objects" in addition to the more general tag "objects".
 #          Updated method create_object.
-#     {enter_further_changes_here}
-
+#     5-Dec-1999 (NG):
+#        Added `square' and `sector' drawing modes.
+#
 #-
 
 #.
@@ -179,6 +180,30 @@ itcl::class gaia::StarCanvasDraw {
             bind $canvas_ <Double-ButtonPress-1> \
                [code eval $this create_done $canvasX_ $canvasY_]
          }
+	 square {
+	     bind $canvas_ <1> \
+		     [code eval $this create_object $canvasX_ $canvasY_]
+	     bind $canvas_ <ButtonRelease-1> \
+		     [code eval $this check_done $canvasX_ $canvasY_ update_square]
+	     bind $canvas_ <B1-Motion> \
+		     [code eval $this update_square $canvasX_ $canvasY_]
+	     bind $canvas_ <Shift-B1-Motion> \
+		     [code eval $this update_square $canvasX_ $canvasY_]
+	     bind $canvas_ <Double-ButtonPress-1> \
+		     [code eval $this create_done $canvasX_ $canvasY_]
+	 }
+	 sector {
+	     bind $canvas_ <1> \
+		     [code eval $this create_object $canvasX_ $canvasY_]
+	     bind $canvas_ <ButtonRelease-1> \
+		     [code eval $this check_done $canvasX_ $canvasY_ update_sector]
+	     bind $canvas_ <B1-Motion> \
+		     [code eval $this update_sector $canvasX_ $canvasY_]
+	     bind $canvas_ <Shift-B1-Motion> \
+		     [code eval $this update_sector $canvasX_ $canvasY_]
+	     bind $canvas_ <Double-ButtonPress-1> \
+		     [code eval $this create_done $canvasX_ $canvasY_]
+	 }
          column {
             bind $canvas_ <1> \
                [code eval $this create_object $canvasX_ $canvasY_]
@@ -243,6 +268,14 @@ itcl::class gaia::StarCanvasDraw {
                if { $draw } { draw_ellipse_selection_grips $id }
                $canvas_ addtag $w_.selected withtag $id
             }
+	    square {
+		if {$draw} {draw_square_selection_grips $id}
+		$canvas_ addtag $w_.selected withtag $id
+	    }
+	    sector {
+		if {$draw} {draw_sector_selection_grips $id}
+		$canvas_ addtag $w_.selected withtag $id
+	    }
             column -
             row -
             pixel {
@@ -329,6 +362,66 @@ itcl::class gaia::StarCanvasDraw {
       adjust_circle_selection $id
    }
 
+   #  Draw the selection grip for a square. This is at the end of the X axis.
+
+   method draw_square_selection_grips {id} {
+      set sel_id [$canvas_ create rectangle 0 0 \
+                     $itk_option(-gripwidth)  $itk_option(-gripwidth) \
+                     -tags "grip grip.$id" \
+                     -fill $itk_option(-gripfill) \
+                     -outline $itk_option(-gripoutline)]
+
+      $canvas_ bind $sel_id <Any-Enter> \
+         [code $canvas_ configure -cursor $itk_option(-linecursor)]
+      $canvas_ bind $sel_id <Any-Leave> \
+         [code $this reset_cursor]
+      $canvas_ bind $sel_id <1> \
+         [code eval $this mark $canvasX_ $canvasY_]
+      $canvas_ bind $sel_id <Shift-1> \
+         [code eval $this mark $canvasX_ $canvasY_]
+      $canvas_ bind $sel_id <ButtonRelease-1> \
+         [code $this end_resize_square $id]
+      $canvas_ bind $sel_id <Shift-ButtonRelease-1> \
+         [code $this end_resize_square $id]
+      $canvas_ bind $sel_id <B1-Motion> \
+         [code eval $this resize_square $id $canvasX_ $canvasY_]
+      $canvas_ bind $sel_id <Shift-B1-Motion> \
+         [code eval $this resize_square $id $canvasX_ $canvasY_]
+      adjust_square_selection $id
+   }
+
+   #  Draw the selection grips for a sector.
+   #  These are in the middle of the arc, and the middle of one of the lines
+
+   method draw_sector_selection_grips {id} {
+      foreach side {arc line} {
+         set sel_id [$canvas_ create rectangle 0 0 \
+                     $itk_option(-gripwidth) \
+                     $itk_option(-gripwidth) \
+                        -tags "grip grip.$id grip.$id.$side" \
+                        -fill $itk_option(-gripfill) \
+                        -outline $itk_option(-gripoutline)]
+
+         $canvas_ bind $sel_id <Any-Enter> \
+            [code $canvas_ configure -cursor $itk_option(-linecursor)]
+         $canvas_ bind $sel_id <Any-Leave> \
+            [code $this reset_cursor]
+         $canvas_ bind $sel_id <1> \
+            [code eval $this mark $canvasX_ $canvasY_]
+         $canvas_ bind $sel_id <Shift-1> \
+            [code eval $this mark $canvasX_ $canvasY_]
+         $canvas_ bind $sel_id <ButtonRelease-1> \
+            [code $this end_resize_sector $id]
+         $canvas_ bind $sel_id <Shift-ButtonRelease-1> \
+            [code $this end_resize_sector $id]
+         $canvas_ bind $sel_id <B1-Motion> \
+            [code eval $this resize_sector $id $canvasX_ $canvasY_ $side]
+         $canvas_ bind $sel_id <Shift-B1-Motion> \
+            [code eval $this resize_sector $id $canvasX_ $canvasY_ $side]
+      }
+      adjust_sector_selection $id
+   }
+
    #  Draw selection grips for a point editable polygon.
    method draw_pointpoly_selection_grips {id} {
       for {set i 0} {$i < $obj_points_} {incr i} {
@@ -390,6 +483,8 @@ itcl::class gaia::StarCanvasDraw {
          } else {
             adjust_ellipse_selection $id
          }
+      } elseif {"[$canvas_ type $id]" == "sector" } {
+	 adjust_sector_selection $id
       } elseif {"[$canvas_ type $id]" == "rtd_rotbox" } {
          adjust_ellipse_selection $id
       } elseif { [info exists types_($id)] && $types_($id) == "pointpoly" } {
@@ -477,6 +572,123 @@ itcl::class gaia::StarCanvasDraw {
       reset_cursor
    }
 
+   #  Adjust the selection handles for the given square.
+
+   method adjust_square_selection {id} {
+      lassign [$canvas_ coords $id] x0 y0 x1 y1
+      set ymid [expr ($y0+$y1)/2]
+      set w [expr $itk_option(-gripwidth)/2]
+      $canvas_ coords grip.$id [expr $x1-$w] [expr $ymid-$w] \
+         [expr $x1+$w] [expr $ymid+$w]
+   }
+
+   #  Resize a square
+
+   method resize_square {id x y} {
+      set resizing_ 1
+      lassign [$canvas_ coords $id] x0 y0 x1 y1
+      set centx [expr ($x0+$x1)/2]
+      set centy [expr ($y0+$y1)/2]
+      set hwid [expr $x-$centx > $y-$centy ? $x-$centx : $y-$centy]
+      $canvas_ coords $obj_id_ [expr $centx-$hwid] [expr $centy-$hwid] \
+	       [expr $centx+$hwid] [expr $centy+$hwid]
+
+      if {[info exists notify_update_($id)]} {
+         eval "$notify_update_($id) resize"
+      }
+   }
+
+   #  Stop resizing the selected square
+
+   method end_resize_square {id} {
+      if {[info exists notify_($id)]} {
+         eval "$notify_($id) resize"
+      }
+      adjust_square_selection $id
+      set resizing_ 0
+      reset_cursor
+   }
+
+   #  Adjust the selection handles for the given sector
+
+   method adjust_sector_selection {id} {
+      # Place a grip in the middle of the arc and one near the end of
+      # the -start radius
+      lassign [$canvas_ coords $id] x0 y0 x1 y1
+      # pa and oa in radians
+      set pa [expr [$canvas_ itemcget $id -start]/$rad_to_deg_]
+      set oa [expr [$canvas_ itemcget $id -extent]/$rad_to_deg_]
+      set centx [expr ($x0+$x1)/2]
+      set centy [expr ($y0+$y1)/2]
+      set rad [expr ($x1-$x0)/2]
+      # remember y increases downwards
+      set arcx  [expr $centx+$rad*cos($pa+$oa/2)]
+      set arcy  [expr $centy-$rad*sin($pa+$oa/2)]
+      set linex [expr $centx+0.9*$rad*cos($pa)]
+      set liney [expr $centy-0.9*$rad*sin($pa)]
+
+      set w [expr $itk_option(-gripwidth)/2]
+      foreach i [list "arc $arcx $arcy" "line $linex $liney"] {
+         lassign $i side x y
+         $canvas_ coords grip.$id.$side \
+	       [expr $x-$w] [expr $y-$w] \
+	       [expr $x+$w] [expr $y+$w]
+      }
+   }
+
+   #  Resize a sector.
+
+   method resize_sector {id x y side} {
+      set resizing_ 1
+      
+      lassign [$canvas_ coords $id] x0 y0 x1 y1
+
+      set centx [expr ($x0+$x1)/2]
+      set centy [expr ($y0+$y1)/2]
+      set dx [expr $x-$centx]
+      set dy [expr $y-$centy]
+
+      # ang in degrees
+      # Remember y increases downwards,
+      # and that atan2(y,x) is arctan(y/x) in correct quadrant
+      # (the tcl book is wrong)
+      set ang [expr atan2(-$dy,$dx) * $rad_to_deg_]
+
+      set oa [$canvas_ itemcget $id -extent]
+      if {$side == "arc"} {
+	 # oa in degrees
+	 set rad [expr sqrt($dx*$dx+$dy*$dy)]
+	 $canvas_ coords $id \
+	       [expr $centx-$rad] [expr $centy-$rad] \
+	       [expr $centx+$rad] [expr $centy+$rad]
+	 $canvas_ itemconfigure $id -start [expr $ang-($oa/2)]
+      } else {
+	 # side=line
+	 set rad [expr sqrt($dx*$dx+$dy*$dy)/0.9]
+	 $canvas_ coords $id \
+	       [expr $centx-$rad] [expr $centy-$rad] \
+	       [expr $centx+$rad] [expr $centy+$rad]
+	 # pa in degrees
+	 set pa [$canvas_ itemcget $id -start]
+	 $canvas_ itemconfigure $id \
+	       -extent [expr abs($oa+2*($pa-$ang))] -start $ang
+      }
+      if {[info exists notify_update_($id)]} {
+	 eval "$notify_update_($id) resize"
+      }
+   }
+
+   #  Stop resizing the selected sector.
+
+   method end_resize_sector {id} {
+      if {[info exists notify_($id)]} {
+         eval "$notify_($id) resize"
+      }
+      adjust_sector_selection $id
+      set resizing_ 0
+      reset_cursor
+   }
+
    #  Adjust the selection handles for the given pointpoly. Note that
    #  update to canvas position needs to remove the extra point returned
    #  by the canvas command (this is the repeat of point 1).
@@ -529,9 +741,9 @@ itcl::class gaia::StarCanvasDraw {
    #  types_ array to access obj_id_).
 
    method create_object {x y} {
-       mark $x $y
-       set obj_coords_ "$x $y"
-       set obj_id_ [create_$drawing_mode_ $x $y]
+      mark $x $y
+      set obj_coords_ "$x $y"
+      set obj_id_ [create_$drawing_mode_ $x $y]
       if {"$drawing_mode_" != "region"} {
          $canvas_ addtag objects withtag $obj_id_
          $canvas_ addtag $w_.objects withtag $obj_id_
@@ -576,6 +788,63 @@ itcl::class gaia::StarCanvasDraw {
                  -fill $itk_option(-fillcolor) \
                  -outline $itk_option(-outlinecolor) \
                  -stipple $itk_option(-stipplepattern)]
+   }
+
+   #  Create and return a square object
+
+   method create_square {x y} {
+       return [$canvas_ create rectangle $x $y $x $y \
+                 -fill $itk_option(-fillcolor) \
+                 -outline $itk_option(-outlinecolor) \
+                 -width $itk_option(-linewidth) \
+                 -stipple $itk_option(-stipplepattern)]
+   }
+
+   #  Create and return a sector object
+
+   method create_sector {x y} {
+      return [$canvas_ create arc $x $y $x $y \
+	    -start 90 \
+	    -extent 20 \
+	    -style pieslice \
+	    -outline $itk_option(-outlinecolor)]
+   }
+   method update_sector {x y} {
+      lassign [$canvas_ coords $obj_id_] x0 y0 x1 y1
+      set oa [$canvas_ itemcget $obj_id_ -extent]
+      set centx [expr ($x0+$x1)/2]
+      set centy [expr ($y0+$y1)/2]
+      set dx [expr $x-$centx]
+      set dy [expr $y-$centy]
+      set rad [expr sqrt($dx*$dx+$dy*$dy)]
+
+      # remember y increases downwards
+      set newang [expr atan2(-$dy,$dx) * $rad_to_deg_]
+
+      $canvas_ coords $obj_id_ \
+	    [expr $centx-$rad] [expr $centy-$rad] \
+	    [expr $centx+$rad] [expr $centy+$rad]
+      $canvas_ itemconfigure $obj_id_ -start [expr $newang-($oa/2)]
+   }
+
+   # Return sector coordinates corresponding to id, as a list, or {} if 
+   # no such coordinates.
+   # Return value is a list, of [x y r pa oa].  (x,y,r) are the position of
+   # the centre of the circle of which this is a sector, and its
+   # radius.  (pa) is the position-angle of the centre-line of the
+   # sector, in degrees from the x-axis, measured anti-clockwise.
+   # (oa) is the opening-angle of the sector, in degrees, from radius
+   # to radius (ie, not from radius to centre-line)
+   public method sector_coords {id} {
+      lassign [$canvas_ coords $id] x0 y0 x1 y1
+      # pa and oa in degrees
+      set pa [$canvas_ itemcget $id -start]
+      set oa [$canvas_ itemcget $id -extent]
+
+      set centx [expr ($x0+$x1)/2]
+      set centy [expr ($y0+$y1)/2]
+
+      return [list $centx $centy [expr ($x1-$x0)/2] [expr $pa+$oa/2] $oa]
    }
 
    #  Create and return a pointpoly object
@@ -730,6 +999,16 @@ itcl::class gaia::StarCanvasDraw {
    method update_row {x y} {
       lassign [$canvas_ coords $obj_id_] x0 y0 x1 y1
       $canvas_ coords $obj_id_ $x0 $y $x1 $y
+   }
+
+   #  Update square.
+   method update_square {x y} {
+       lassign [$canvas_ coords $obj_id_] x0 y0 x1 y1
+       set centx [expr ($x0+$x1)/2]
+       set centy [expr ($y0+$y1)/2]
+       set hwid [expr $x-$centx > $y-$centy ? $x-$centx : $y-$centy]
+       $canvas_ coords $obj_id_ [expr $centx-$hwid] [expr $centy-$hwid] \
+	       [expr $centx+$hwid] [expr $centy+$hwid]
    }
 
    #  Update pixel to new position (obj_id_ not known when setting bindings
@@ -897,14 +1176,19 @@ itcl::class gaia::StarCanvasDraw {
    #  A canvas tag to ignore when flipping or rotating items.
    itk_option define -ignore_tag ignore_tag Ignore_Tag {} {}
 
+   #  A size for the button at the centre of a sector
+   itk_option define -sectorbutton sectorbutton Sectorbutton {} {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
    #  List of drawing types available.
    protected variable drawing_modes_ {
       anyselect objselect line rectangle oval circle polygon polyline
-      text ellipse column row pixel rotbox pointpoly
+      text ellipse column row pixel rotbox pointpoly square 
    }
+   # I tried adding `sector' to this, but Tcl complained that `bitmap
+   # "sector" not defined'...
 
    #  Width of an image pixel.
    protected variable pixel_width_ 1
@@ -919,9 +1203,15 @@ itcl::class gaia::StarCanvasDraw {
    #  Number of points in point adjustable object.
    protected variable obj_points_ 0
 
+   #  Private variables (available only to the instance)
+   #  -----------------
+
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
+   #common pi_ 3.141592657
+   common rad_to_deg_ 57.295779450887607
 
 #  End of class definition.
 }
