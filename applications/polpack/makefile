@@ -988,7 +988,7 @@ install:
 #
 #  Install the Latex documentation (and associated figures), giving it world 
 #  read permission, leaving the source copy in place.
-        for f in $(LATEX_DOCS:.tex=) ""; do \
+	for f in $(LATEX_DOCS:.tex=) ""; do \
            if test -n "$$f"; then \
               cp -p $${f}.tex $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$${f}.tex;\
@@ -1166,7 +1166,7 @@ do_deinstall:
          else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
-        - for f in $(LATEX_DOCS:.tex=) ""; do \
+	- for f in $(LATEX_DOCS:.tex=) ""; do \
            if test -n "$$f"; then \
               if test -f $(INSTALL_DOCS)/$${f}.tex; then \
                  rm -f $(INSTALL_DOCS)/$${f}.tex;\
