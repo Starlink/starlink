@@ -26,6 +26,8 @@
 #        Add MSG_FILTER
 #     1997 May 1 (TIMJ)
 #        CHANGE_QUALITY.IFL becomes CHANGE_DATA.IFL
+#     1997 May 29 (TIMJ)
+#        Add SECTION
 #     {enter_further_changes_here}
  
 #-
@@ -69,6 +71,14 @@
          ASSOCIATION '->GLOBAL.DATA_ARRAY'
          PROMPT   'Name of output file to contain modified data'
          HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER 'SECTION'
+         TYPE '_CHAR'
+         ACCESS 'READ'
+         VPATH 'PROMPT'
+         PROMPT 'Please enter a section (including {})'
+         HELPKEY '*'
       ENDPARAMETER
 
       PARAMETER USE_SECTION
