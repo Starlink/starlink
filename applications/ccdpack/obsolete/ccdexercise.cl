@@ -120,7 +120,8 @@ begin
 
    #  Make the output files of type ".imh"
    reset NDF_FORMATS_OUT="IRAF(.imh),.,*"
-   ccdgenerate ( nseq=4, file="ccdtest_obj.dat", reduced=no,
+   ccdgenerate ( nseq=4, file="ccdtest_obj.dat", reduced=no, container=no,
+                 dataname=data, biasname=bias, ffname=ff,
                  pixels="128,128", origins="-1,-1,-40,15,-10,-74,-35,-70",
                  angles="0,0,0,0" )
 
