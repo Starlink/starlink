@@ -153,7 +153,7 @@ nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
 kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f
 
 # The contents of the kappa_iraf.tar file:
-KAPPA_IRAF = fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
+KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
 lutcol.cl lutcont.cl lutfc.cl lutgrey.cl lutheat.cl lutikon.cl lutneg.cl \
 lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
 picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
