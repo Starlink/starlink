@@ -436,7 +436,7 @@ ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
 ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
 ndg_ptsup.f ndg_setsz.f ndg_asso1.f ndg_assoc.f ndg_crea1.f ndg_creat.f \
-ndg_crep1.f ndg_prop1.f ndg1_sort.f
+ndg_crep1.f ndg_prop1.f ndg1_sort.f ndg1_crpth.f ndg1_open.f
 
 F_CTG = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
