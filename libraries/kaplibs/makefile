@@ -424,7 +424,7 @@ LIB_VERS = 1.1
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-ira_source.tar aif_source.tar ctg_source.tar lpg_source.tar
+ira_source.tar aif_source.tar fts_source.tar ctg_source.tar lpg_source.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -456,8 +456,9 @@ PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES)
 IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
+FTS_PRIVATE_INCLUDES = fts_par
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
-                  $(LPG_PRIVATE_INCLUDES) 
+                   $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -466,11 +467,26 @@ PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
-                    CAT_PAR PSX_ERR SUBPAR_PAR NDF_PAR
+                    CAT_PAR PSX_ERR SUBPAR_PAR NDF_PAR NUM_DEF_CVT \
+                    NUM_DEC_CVT 
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines, which are treated separately).
+
+FTS_F_ROUTINES = \
+fts1_axis.f fts1_blcar.f fts1_comnt.f fts1_crndf.f fts1_dread.f \
+fts1_dtype.f fts1_edfex.f fts1_edkey.f fts1_evkey.f fts1_fndfs.f \
+fts1_frmt.f fts1_ftwcs.f fts1_gkeyc.f fts1_gkeyd.f fts1_gkeyi.f \
+fts1_gkeyl.f fts1_gkeyr.f fts1_gparm.f fts1_hdlog.f fts1_i2vxd.f \
+fts1_i2vxr.f fts1_inkey.f fts1_iskey.f fts1_lokey.f fts1_mandh.f \
+fts1_ndf.f fts1_ndfcm.f fts1_phead.f fts1_ptkey.f fts1_qtype.f \
+fts1_rdata.f fts1_rfmod.f fts1_rgrda.f fts1_rootn.f fts1_rstab.f \
+fts1_scofb.f fts1_sctab.f fts1_sdscf.f fts1_skip.f fts1_tread.f \
+fts1_ukeyc.f fts1_ukeyd.f fts1_ukeyi.f fts1_ukeyl.f fts1_ukeyr.f \
+fts1_vhead.f fts1_wcsax.f fts1_wcsdf.f fts1_wcsim.f fts1_wcsut.f \
+fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
+fts1_chvai.f fts1_chvaub.f fts1_chvaw.f fts1_astwn.f
 
 AIF_F_ROUTINES = \
 aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -498,7 +514,7 @@ lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
 lpg_state.f
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) \
-             $(LPG_F_ROUTINES)
+             $(LPG_F_ROUTINES) $(FTS_F_ROUTINES)
 
 #  List of Fortran BLOCK DATA routines.
 
@@ -519,7 +535,9 @@ PLATFORM_F =
 IRA_C_ROUTINES = 
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
-C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES)
+FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
+C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
+             $(FTS_C_ROUTINES) 
 
 #  The facility error file.
 
@@ -569,8 +587,9 @@ $(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS)
 IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM 
 CTG_INCLUDE_LINKS = CTG_ERR CTG_CONST
 LPG_INCLUDE_LINKS = LPG_CONST LPG_COM
+FTS_INCLUDE_LINKS = FTS_PAR
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
-                $(LPG_INCLUDE_LINKS)
+                $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) 
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -581,6 +600,7 @@ CTG_CONST:   ctg_const;           $(LINK) $? $@
 CTG_ERR:     ctg_err;             $(LINK) $? $@
 LPG_CONST:   lpg_const;           $(LINK) $? $@
 LPG_COM:     lpg_com;             $(LINK) $? $@
+FTS_PAR:     fts_par;             $(LINK) $? $@
 
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
@@ -592,6 +612,8 @@ CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
 SUBPAR_PAR:  $(STAR_INC)/subpar_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
+NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
+NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -606,6 +628,11 @@ $(CTG_F_ROUTINES) $(CTG_C_ROUTINES):
 	$(TAR_OUT) ctg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in ctg_source.tar; exit 1; fi
+
+$(FTS_PRIVATE_INCLUDES) $(FTS_F_ROUTINES) $(FTS_C_ROUTINES):
+	$(TAR_OUT) fts_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in fts_source.tar; exit 1; fi
 
 $(LPG_PRIVATE_INCLUDES) $(LPG_F_ROUTINES) $(LPG_C_ROUTINES):
 	$(TAR_OUT) lpg_source.tar $@
@@ -643,6 +670,9 @@ AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o)
 IRA_OBJECT_FILES = $(IRA_BLOCK_DATA:.f=.o) $(IRA_F_ROUTINES:.f=.o) \
                   $(IRA_PLATFORM_F:.f=.o) $(IRA_C_ROUTINES:.c=.o)
 
+FTS_OBJECT_FILES = $(FTS_F_ROUTINES:.f=.o) \
+                   $(FTS_PLATFORM_F:.f=.o) $(FTS_C_ROUTINES:.c=.o)
+
 CTG_OBJECT_FILES = $(CTG_F_ROUTINES:.f=.o) \
                   $(CTG_PLATFORM_F:.f=.o) $(CTG_C_ROUTINES:.c=.o)
 
@@ -650,7 +680,7 @@ LPG_OBJECT_FILES = $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
-               $(LPG_OBJECT_FILES)
+               $(LPG_OBJECT_FILES) $(FTS_OBJECT_FILES) 
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -660,7 +690,7 @@ OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a
+OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfts.a
 
 libaif.a: $(AIF_OBJECT_FILES)
 	$(AR_IN) $@ $?
@@ -671,6 +701,10 @@ libira.a: $(IRA_OBJECT_FILES)
 	$(RANLIB) $@
 
 libctg.a: $(CTG_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+libfts.a: $(FTS_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
@@ -1365,6 +1399,62 @@ ctg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
 ctg_gtsup.o:	 SAE_PAR GRP_PAR
 ctg_ptsup.o:	 SAE_PAR GRP_PAR
 ctg_setsz.o:	 SAE_PAR GRP_PAR
+fts1_astwn.o:	 SAE_PAR AST_PAR 
+fts1_axis.o:	 SAE_PAR DAT_PAR PRM_PAR
+fts1_chvai.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+fts1_chvaub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+fts1_chvaw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+fts1_comnt.o:	 SAE_PAR
+fts1_crndf.o:	 SAE_PAR
+fts1_dread.o:	 SAE_PAR
+fts1_dtype.o:	 SAE_PAR DAT_PAR PRM_PAR
+fts1_edfex.o:	 SAE_PAR DAT_PAR FTS_PAR
+fts1_edkey.o:	 SAE_PAR DAT_PAR MSG_PAR FTS_PAR
+fts1_evkey.o:	 SAE_PAR
+fts1_fndfs.o:	 SAE_PAR AST_PAR
+fts1_frmt.o:	 SAE_PAR
+fts1_ftwcs.o:	 SAE_PAR AST_PAR
+fts1_gkeyc.o:	 SAE_PAR
+fts1_gkeyd.o:	 SAE_PAR
+fts1_gkeyi.o:	 SAE_PAR
+fts1_gkeyl.o:	 SAE_PAR
+fts1_gkeyr.o:	 SAE_PAR
+fts1_gparm.o:	 SAE_PAR PAR_ERR PRM_PAR
+fts1_hdlog.o:	 SAE_PAR
+fts1_inkey.o:	 SAE_PAR FTS_PAR
+fts1_iskey.o:	 SAE_PAR
+fts1_lokey.o:	 SAE_PAR
+fts1_mandh.o:	 SAE_PAR DAT_PAR PRM_PAR
+fts1_ndf.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
+fts1_ndfcm.o:	 SAE_PAR DAT_PAR
+fts1_phead.o:	 SAE_PAR DAT_PAR
+fts1_ptkey.o:	 SAE_PAR DAT_PAR FTS_PAR
+fts1_qtype.o:	 SAE_PAR PRM_PAR
+fts1_rdata.o:	 SAE_PAR
+fts1_rfmod.o:	 SAE_PAR PRM_PAR FIO_ERR
+fts1_rgrda.o:	 SAE_PAR
+fts1_rootn.o:	 SAE_PAR
+fts1_rstab.o:	 SAE_PAR PAR_ERR
+fts1_scofb.o:	 SAE_PAR PRM_PAR
+fts1_sctab.o:	 SAE_PAR DAT_PAR PAR_ERR
+fts1_sdscf.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
+fts1_skip.o:	 SAE_PAR
+fts1_tread.o:	 SAE_PAR
+fts1_ukeyc.o:	 SAE_PAR
+fts1_ukeyd.o:	 SAE_PAR
+fts1_ukeyi.o:	 SAE_PAR
+fts1_ukeyl.o:	 SAE_PAR
+fts1_ukeyr.o:	 SAE_PAR
+fts1_vhead.o:	 SAE_PAR MSG_PAR
+fts1_wcsax.o:	 SAE_PAR NDF_PAR AST_PAR
+fts1_wcsdf.o:	 SAE_PAR AST_PAR PRM_PAR
+fts1_wcsim.o:	 SAE_PAR DAT_PAR NDF_PAR AST_PAR
+fts1_wcsut.o:	 SAE_PAR NDF_PAR AST_PAR
+fts1_wkeyc.o:	 SAE_PAR
+fts1_wkeyd.o:	 SAE_PAR
+fts1_wkeyi.o:	 SAE_PAR
+fts1_wkeyl.o:	 SAE_PAR
+fts1_wkeyr.o:	 SAE_PAR
 ira1_aito.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira1_ascre.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
 ira1_asdef.o:	 SAE_PAR IRA_PAR

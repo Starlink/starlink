@@ -3,10 +3,25 @@
 EXCLUDE = ctg_test.f lpg_test.f
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = kaplibs_source ira_source aif_source
+TAR_FILES_A = kaplibs_source ira_source aif_source fts_source
 
 # The contents of the ira_source.tar file:
 KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch
+
+# The contents of the fts_source.tar file:
+FTS_SOURCE = fts_par fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \
+fts1_astwn.f fts1_dread.f fts1_dtype.f fts1_edfex.f fts1_edkey.f fts1_evkey.f \
+fts1_frmt.f fts1_gkeyc.f fts1_gkeyd.f fts1_gkeyi.f fts1_gkeyl.f \
+fts1_gkeyr.f fts1_gparm.f fts1_hdlog.f fts1_i2vxd.f fts1_i2vxr.f \
+fts1_inkey.f fts1_iskey.f fts1_lokey.f fts1_mandh.f fts1_ndf.f \
+fts1_ndfcm.f fts1_phead.f fts1_ptkey.f fts1_qtype.f fts1_rdata.f \
+fts1_rfmod.f fts1_rgrda.f fts1_rootn.f fts1_rstab.f fts1_scofb.f \
+fts1_sctab.f fts1_sdscf.f fts1_skip.f fts1_tread.f fts1_ukeyc.f \
+fts1_ukeyd.f fts1_ukeyi.f fts1_ukeyl.f fts1_ukeyr.f fts1_vhead.f \
+fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
+fts1_findf.c fts1_rnand.c fts1_rnanr.c fts1_ftwcs.f fts1_wcsim.f \
+fts1_fndfs.f fts1_wcsax.f fts1_wcsut.f fts1_wcsdf.f \
+fts1_chvai.f fts1_chvaub.f fts1_chvaw.f 
 
 # The contents of the aif_source.tar file:
 AIF_SOURCE = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -33,12 +48,12 @@ UNIX_OTHERS = makefile mk sun238.tex kaplibs.news KAPLIBS_CONDITIONS
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) \
-$(AIF_SOURCE)
+$(AIF_SOURCE) $(FTS_SOURCE)
 
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
-kaplibs.news ira_source.tar aif_source.tar ctg_source.tar lpg_source.tar \
-KAPLIBS_CONDITIONS
+kaplibs.news ira_source.tar fts_source.tar aif_source.tar ctg_source.tar \
+lpg_source.tar KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.
 $(action)
