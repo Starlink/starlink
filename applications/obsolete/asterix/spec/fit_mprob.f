@@ -82,6 +82,7 @@ c     DOUBLE PRECISION 		G01EAF
         NAGSTAT = 0
         FPROB = 0.0D0
 c       FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01ECF' )
 
 *    Likelihood
       ELSE IF ( FSTAT .EQ. FIT__LOGL ) THEN
@@ -106,7 +107,8 @@ c       FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
         NAGSTAT = 0
         FPROB = 1.0D0
 c       FPROB = 1.0D0 - G01EAF( 'L', (LFPM-LFPD)/SQRT(LFPDV),
-     :                          NAGSTAT )
+c    :                          NAGSTAT )
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01EAF' )
 
 *    Programmer error
       ELSE

@@ -1822,7 +1822,7 @@
         IFAIL = 0
         PLEK = 0.0D0
 c       CALL G01BKF( DBLE(BSUM), NINT(DSUM), PLEK, PGTK, PEQK, IFAIL )
-        CALL MSG_PRINT( '*** WARNING: no PDA replacement for G01BKF' )
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01BKF' )
 
 *      We want upper tail AND the probability of observed counts
         PPROB = PGTK + PEQK

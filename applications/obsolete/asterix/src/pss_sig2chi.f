@@ -71,6 +71,7 @@ c     DOUBLE PRECISION             S15ABF
         ISTAT = 1
         PROB = 0.0D0
 c       PROB = 2.0D0 * S15ABF( DBLE(SIG), ISTAT) - 1.0D0
+        CALL MSG_PRNT( '*** WARNING: no PDA replacement for S15ABF' )
         CALL MATH_CHISQD( REAL(1.0D0-PROB), NDOF, DC, STATUS )
 
       ELSE

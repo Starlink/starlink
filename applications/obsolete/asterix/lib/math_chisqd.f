@@ -60,5 +60,6 @@ c     DOUBLE PRECISION             G01FCF
       IFAIL = 0
       DEVIATE = 0.0
 c     DEVIATE = G01FCF( PROB, DBLE(NDOF), IFAIL )
+      CALL MSG_PRNT( '*** WARNING: no PDA replacement for G01FCF' )
 
       END

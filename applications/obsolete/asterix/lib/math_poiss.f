@@ -43,6 +43,7 @@ c       CALL G05CCF(NINT(MATH_RND()))
       IFAIL = 0
       MATH_POISS = INT( LAMB )
 c     MATH_POISS = G05DRF( DBLE(LAMB), IFAIL )
+      CALL MSG_PRNT( '*** WARNING: no PDA replacement for G05DRF' )
 
       END
 
