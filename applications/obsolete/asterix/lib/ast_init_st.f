@@ -19,4 +19,7 @@ c      CALL USI_INIT()
 *    Initialize DYN_CMN
       CALL DYN_INIT()
 
+*    Start resources
+      CALL AST_RESBEG()
+
       END

@@ -62,8 +62,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Jun 1995 (DJA):
+*      9 Jun 1995 (DJA):
 *        Original version.
+*     24 May 1996 (DJA):
+*        Added resources closure
 *     {enter_changes_here}
 
 *  Bugs:
@@ -75,6 +77,9 @@
       IMPLICIT NONE              ! No implicit typing
 
 *.
+
+*  Shutdown resources system
+      CALL AST_RESEND()
 
 *  User interface
       CALL USI_CLOSE()
