@@ -23,7 +23,7 @@ DEPEND_TARGET	= @DEPEND_TARGET@
 
 # source files (Note: see ../README for information about the source of the C files)
 SRCS 		=  ImageIO.C FitsIO.C \
-	        buffers.c cfileio.c checksum.c compress.c drvrfile.c drvrmem.c \
+	        buffers.c cfileio.c checksum.c gzcomp.c drvrfile.c drvrmem.c \
 		drvrnet.c  editcol.c edithdu.c eval_l.c eval_y.c eval_f.c \
 		fitscore.c getcol.c getcolb.c getcold.c getcole.c \
 		getcoli.c getcolj.c getcolk.c getcoll.c getcols.c getcoluk.c \
@@ -35,7 +35,7 @@ SRCS 		=  ImageIO.C FitsIO.C \
 		wcsutil.c f77_wrap1.c f77_wrap2.c drvrsmem.c
 
 OBJS 		=  ImageIO.o FitsIO.o \
-		buffers.o cfileio.o checksum.o compress.o drvrfile.o drvrmem.o \
+		buffers.o cfileio.o checksum.o gzcomp.o drvrfile.o drvrmem.o \
 		drvrnet.o  editcol.o edithdu.o eval_l.o eval_y.o eval_f.o \
 		fitscore.o getcol.o getcolb.o getcold.o getcole.o \
 		getcoli.o getcolj.o getcolk.o getcoll.o getcols.o getcoluk.o \
