@@ -4482,6 +4482,13 @@ M Makefile.dependencies
                 <code>EXTRA_DIST</code> in the Automake manual.</p>
             </dd>
 
+            <dt>I want to incorporate an external package which
+              already has a configuration system.  How?</dt>
+            <dd>
+              <p>This is `thirdparty code': see <ref
+                  id="importing-thirdparty"/> for several examples.</p>
+            </dd>
+
             <dt>I want to make distribution tarballs install into
               <code>/star</code>.  How?<index>distribution!setting
               prefix</index></dt>
@@ -4917,6 +4924,61 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </p>
       </subsect>
 
+    </sect>
+
+    <sect id="tips" export="export">
+      <subhead>
+        <title>Miscellaneous hints and tips</title>
+      </subhead>
+
+      <p>This section contains assorted techniques and patterns which
+        don't fit neatly in anywhere else.  Please do add to this
+        section.</p>
+
+      <subsect id="tip-force-link-language" export="export">
+        <subhead>
+          <title>Forcing automake's choice of linking language</title>
+        </subhead>
+
+        <p>When building a library or application, automake needs to
+          make a decision about which language to use to do the final
+          link.  For example, it must use the Fortran linker to make a
+          library which consists of or includes Fortran modules, and
+          the C linker if it consists of pure C.  This matters more on
+          some platforms than others -- the OSX linker has some very
+          fixed ideas on this point (it heartily disapproves of common
+          blocks, and so needs special Fortran juju to make a library
+          from Fortran which uses them).</p>
+
+        <p>Automake makes this decision based on the source code which
+          is listed in the library's <code>_SOURCES</code> variable.
+          When you are assembling a library purely from convenience
+          libraries, however (see section `Linking static libraries'
+          in the <webref url="&libtoolman;" >Libtool manual</webref>),
+          the <code>_SOURCES</code> variable is empty, and automake
+          ends up using the C linker, for want of any other
+          information.</p>
+
+        <p>You can avoid this problem, and indicate to automake which
+          langauge it should use, by giving a dummy value for the
+          <code>_SOURCES</code> variable as follows:
+<verbatim>
+libsubpar_adam_la_SOURCES = dummy_routine.f
+libsubpar_adam_la_LIBADD = \
+        subpar/libsubpar_convenience.la \
+        parsecon/libparsecon_convenience.la
+</verbatim>
+          where the <code>dummy_fortran.f</code> module is a trivial
+          Fortran routine:
+<verbatim>
+C A dummy Fortran routine.  See comments in Makefile.am
+      SUBROUTINE DUMMY
+      END
+</verbatim>
+          As the comment indicates, it is wise to include an
+          explanation of this ... let's not call it a hack ... in the
+          <code>Makefile.am</code>.</p>
+      </subsect>
     </sect>
 
     <appendices>
@@ -5409,9 +5471,9 @@ target: dependency
           <p>Declare dependencies of this
             component<index>dependencies</index>.  The
             <code>TYPE</code> is one of `sourceset', `build', `link',
-            `use' or `test', and the <code>DEPLIST</code> is a space
-            separated list of component names, which this component
-            depends on in the specified way.</p>
+            `configure', `use' or `test', and the <code>DEPLIST</code>
+            is a space separated list of component names, which this
+            component depends on in the specified way.</p>
 
           <p>This is less complicated than it seems.  The only types
             you're likely to have to specify are `build' and `link'
@@ -5498,6 +5560,30 @@ target: dependency
                   declared as such.  In other words, the distinction
                   between build and link dependencies is important
                   only for library components.</p>
+              </dd>
+
+              <dt>Configure dependencies</dt>
+              <dd>
+                <p>There are some components which must be installed
+                  <em>before</em> the configure step, since they must
+                  be present in order for other packages to configure
+                  against them.  Components which are listed as a
+                  configure dependency of some other component are
+                  made during the <code>make configure-deps</code>
+                  stage of the bootstrapping build process.</p>
+
+                <p>You should try hard to avoid declaring dependencies
+                  of this type, since they necessarily subvert the
+                  normal build order.  Note that transitivity implies
+                  that any dependencies of a configure dependency are
+                  also configure dependencies, so that declaring a
+                  configure dependency on sst for example (an obvious
+                  but bad plan), results in half the software set
+                  being built before configuration.  Which is crazy.</p>
+
+                <p>You can see the set of configure dependencies by
+                  looking at the <code>configure-deps</code> target in
+                  <code>Makefile.dependencies</code>.</p>
               </dd>
 
               <dt>Use dependencies</dt>
