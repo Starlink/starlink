@@ -809,7 +809,7 @@ install:
 prepare:
 
 check_packages:
-[available] Oct 14, 2003 4:24:03 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Oct 15, 2003 4:25:08 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1969,13 +1969,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/interactor/SelectionDragger.java:54: warning - @history is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/BackgroundedCompositeFigure.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:184: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:299: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/canvas/toolbox/LabelFigure.html...
   [javadoc] "Get the point at which this figure is "anchored." This
   [javadoc]  will be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:299: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
@@ -4345,12 +4345,12 @@ javadoc-sources:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e. get this Element then write the configuration data
   [javadoc]  attached to it). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontControls.java:30: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsEdges.html...
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontControls.java:30: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
@@ -4405,4 +4405,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 14 minutes 36 seconds
+Total time: 16 minutes 44 seconds

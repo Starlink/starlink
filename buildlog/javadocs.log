@@ -779,29 +779,29 @@ javadocs:
   [javadoc]              +-s-> e --+
   [javadoc]  </pre>"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/Pod.java:29: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod is a "pile of data." This is any complex evolving data
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc]  structure."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:296: warning - Tag @see: can't find addClickListener(MouseListener) in diva.sketch.MultiStateInterpreter
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:78: warning - Tag @see: missing #: "addDropKey(String,Figure)"
   [javadoc] "A Pod is a "pile of data." "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:78: warning - Tag @see: can't find addDropKey(String,Figure) in diva.graph.schematic.GraphDropTarget
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new polygon with the
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:306: warning - Tag @see: can't find addHoldListener(ActionListener) in diva.sketch.MultiStateInterpreter
   [javadoc]  given vertices, in the format
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:316: warning - Tag @see: can't find addStrokeListener(MouseInputListener) in diva.sketch.MultiStateInterpreter
   [javadoc]  [x0, y0, x1, y1, ..."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create a new polygon with the
   [javadoc]  given vertices, in the format
   [javadoc]  [x0, y0, x1, y1, ... ]."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g. zooming).  "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:296: warning - Tag @see: can't find addClickListener(MouseListener) in diva.sketch.MultiStateInterpreter
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:78: warning - Tag @see: missing #: "addDropKey(String,Figure)"
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/schematic/GraphDropTarget.java:78: warning - Tag @see: can't find addDropKey(String,Figure) in diva.graph.schematic.GraphDropTarget
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:306: warning - Tag @see: can't find addHoldListener(ActionListener) in diva.sketch.MultiStateInterpreter
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/MultiStateInterpreter.java:316: warning - Tag @see: can't find addStrokeListener(MouseInputListener) in diva.sketch.MultiStateInterpreter
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 

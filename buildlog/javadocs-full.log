@@ -375,13 +375,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:45: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:45: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:235: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:266: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstAxes.html...
   [javadoc] "Set position along the X axis at which to start labelling
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the X axis at which to start labelling
   [javadoc]  (i.e. the Y axis intersection with the X axis). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:266: warning - The first sentence is interpreted to be:
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -475,4 +475,4 @@ javadoc-sources:
   [javadoc] 92 warnings
 
 BUILD SUCCESSFUL
-Total time: 6 minutes 4 seconds
+Total time: 6 minutes 9 seconds
