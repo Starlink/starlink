@@ -56,7 +56,7 @@
          parameter outdomain {
             type LITERAL
             access READ
-            vpath CURRENT DEFAULT
+            vpath PROMPT
             ppath CURRENT DEFAULT
             default CCD_REG
             prompt {Name of registration frame domain}
@@ -87,20 +87,10 @@
          parameter placein {
             type LITERAL
             access READ
-            vpath CURRENT DEFAULT
+            vpath PROMPT
             ppath CURRENT DEFAULT
-            default NDF
-            prompt {Store transformation structures in (NDF,FILE)}
-            helpkey *
-          }
-
-         parameter outformat {
-            type LITERAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default WCS
-            prompt {How transformation is written to NDF (WCS,TRANSFORM)}
+            default EACH
+            prompt {Put new frames in SINGLE NDF or one EACH per list?}
             helpkey *
           }
 
@@ -130,16 +120,16 @@
             access READ
             vpath PROMPT CURRENT
             ppath CURRENT
-            prompt {List of NDFs to contain transforms}
+            prompt {List of NDFs to contain new coordinate systems}
             helpkey *
           }
 
-         parameter trfile {
-            type TRFILE
+         parameter wcsfile {
+            type NDF
             access READ
             vpath PROMPT CURRENT
             ppath CURRENT
-            prompt {Name of container file to store transforms}
+            prompt {Name of NDF to contain all new coordinate systems}
             helpkey *
           }
 
@@ -213,26 +203,6 @@
             helpkey *
           }
 
-         parameter classify {
-                             # Add a classification structure
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Add classifications}
-            helpkey *
-          }
-
-         parameter class {
-                          # Classifications
-            type _CHAR
-            access READ
-            vpath PROMPT
-            ppath CURRENT
-            helpkey *
-          }
-
          parameter usewcs {
             type _LOGICAL
             access READ
@@ -242,6 +212,27 @@
             prompt {Offsets are in Current coordinate frame?}
             helpkey *
          }
+
+         parameter simpfi {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Can forward followed by inverse be simplified to unit?}
+            helpkey *
+         }
+
+         parameter simpif {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Can inverse followed by forward be simplified to unit?}
+            helpkey *
+         }
+
 
          parameter fa {
             type LITERAL
