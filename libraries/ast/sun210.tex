@@ -9775,7 +9775,7 @@ the ``ast\_link\_adam'' command description in
 %  sstdiytopic
    \renewcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
-         #2
+         #2:
       \end{description}
    }
 
@@ -12682,7 +12682,7 @@ Object            - Base class for all AST Objects
          OFFSET( NPOINT ) = INTEGER (Given)
       }{
          For each interpolation point, this array will contain the
-         offset from the start of the OUT (and OUT\_VAR) arrays at
+         offset from the start of the OUT (and OUT\_VAR) array(s) at
          which the interpolated value (and its variance, if required)
          should be stored. For example, the interpolated value for
          point number POINT should be stored in OUT(1$+$OFFSET(POINT)).
@@ -12715,7 +12715,7 @@ Object            - Base class for all AST Objects
          AST\_RESAMPLE$<$X$>$. You may test this value in order to provide
          detailed control over the operation of your resampling
          algorithm. Note that the special flag values AST\_\_UINTERP1,
-         2, 3 and 4 are reserved for you to use for your own purposes
+         2, 3 \& 4 are reserved for you to use for your own purposes
          (see AST\_RESAMPLE$<$X$>$).
       }
       \sstsubsection{
@@ -14982,7 +14982,7 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         AST\_\_UINTERP1, 2, 3 and 4: A set of four flags which are
+         AST\_\_UINTERP1, 2, 3 \& 4: A set of four flags which are
          reserved for your own use. They may be used to pass private
          information to any sub-pixel interpolation algorithm which you
          implement yourself. They are ignored by all the pre-defined

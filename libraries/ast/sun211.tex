@@ -10214,7 +10214,7 @@ the ``ast\_link\_adam'' command description in
 %  sstdiytopic
    \renewcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
-         #2
+         #2:
       \end{description}
    }
 
@@ -13001,7 +13001,7 @@ Object            - Base class for all AST Objects
          type as the {\tt{"}}in{\tt{"}} array. If given, this will contain the set
          of variance values associated with the input data and will be
          the same array as was passed to astResample$<$X$>$ via the
-         {\tt{"}}in\_var{\tt{"}} argument.
+         {\tt{"}}in\_var{\tt{"}} parameter.
 
          If no variance values are being processed, this will be a
          NULL pointer.
@@ -13017,7 +13017,7 @@ Object            - Base class for all AST Objects
       }{
          Pointer to an array of integers with {\tt{"}}npoint{\tt{"}} elements. For
          each interpolation point, this will contain the zero-based
-         index in the {\tt{"}}out{\tt{"}} (and {\tt{"}}out\_var{\tt{"}}) arrays at which the
+         index in the {\tt{"}}out{\tt{"}} (and {\tt{"}}out\_var{\tt{"}}) array(s) at which the
          interpolated value (and its variance, if required) should be
          stored. For example, the interpolated value for point number
          {\tt{"}}point{\tt{"}} should be stored in {\tt{"}}out[offset[point]]{\tt{"}} (assuming
@@ -13055,7 +13055,7 @@ Object            - Base class for all AST Objects
          astResample$<$X$>$. You may test this value in order to provide
          detailed control over the operation of your resampling
          algorithm. Note that the special flag values AST\_\_UINTERP1,
-         2, 3 and 4 are reserved for you to use for your own purposes
+         2, 3 \& 4 are reserved for you to use for your own purposes
          (see astResample$<$X$>$).
       }
       \sstsubsection{
@@ -15301,7 +15301,7 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         AST\_\_UINTERP1, 2, 3 and 4: A set of four flags which are
+         AST\_\_UINTERP1, 2, 3 \& 4: A set of four flags which are
          reserved for your own use. They may be used to pass private
          information to any sub-pixel interpolation algorithm which you
          implement yourself. They are ignored by all the pre-defined

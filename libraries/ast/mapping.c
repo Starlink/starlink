@@ -5901,6 +5901,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    int point;                    /* Counter for output points (pixels ) */
    int result;                   /* Result value to return */
    int s;                        /* Temporaty variable for strides */
+   int usevar;                   /* Process variance array? */
 
 /* Initialise. */
    result = 0;
@@ -6309,17 +6310,28 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* ------------------------------------- */
       } else {
 
+/* Determine if a variance array is to be processed. */
+         usevar = in_var && out_var;
+
 /* Define a macro to use a "case" statement to invoke the
    user-supplied interpolation function appropriate to a given data
-   type. */
+   type. Ensure that either both "in_var and "out_var" are passed, or
+   neither is. If an error occurs within the user-supplied function,
+   then report a contextual error message. */
 #define USER_CASE(X,Xtype) \
             case ( TYPE_##X ): \
                result = ( *( (AstInterpolate##X) interp ) ) \
-                           ( ndim_in, lbnd_in, ubnd_in, \
-                             (Xtype *) in, (Xtype *) in_var, npoint, \
-                             offset, (const double *const *) ptr_in, \
+                           ( ndim_in, lbnd_in, ubnd_in, (Xtype *) in, \
+                             (Xtype *) ( usevar ? in_var : NULL ), \
+                             npoint, offset, (const double *const *) ptr_in, \
                              params, flags, *( (Xtype *) badval_ptr ), \
-                             (Xtype *) out, (Xtype *) out_var ); \
+                             (Xtype *) out, \
+                             (Xtype *) ( usevar ? out_var : NULL )); \
+               if ( !astOK ) { \
+                  astError( astStatus, "astResample"#X"(%s): Error " \
+                            "signalled by user-supplied sub-pixel " \
+                            "interpolation function.", astGetClass( this ) ); \
+               } \
                break;
 
 /* Use the above macro to invoke the function. */
