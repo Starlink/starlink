@@ -194,6 +194,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.47  1998/03/04 03:14:27  timj
+*     Make sure that OUT_WEIGHT_PTR is initialised with zeroes
+*
 *     Revision 1.46  1998/02/03 01:14:24  timj
 *     Make upper limit to map size larger.
 *
@@ -1450,9 +1453,14 @@ c
                   END IF
 
 
-*     Get some memory for the weights array
+*     Get some memory for the weights array and fill with zeroes
                   CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
      :                 OUT_WEIGHT_PTR, OUT_WEIGHT_END, STATUS)
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_CFILLR (N_PIXELS, 0.0, 
+     :                    %val(OUT_WEIGHT_PTR))
+                  END IF
+
 
 *     Now time for regrid
                   IF ((METHOD .EQ. 'BESSEL') .OR. 
