@@ -1408,9 +1408,9 @@ to check you have the right fonts by comparing resolution, etc..
 only size that &tex; uses in its calculations, and which the DVI
 reader uses when working out how far to move the reference point when
 it sets a character.  This is defined in [P9] to be in units of
-<code/FIXes>, where one <code/FIX> is <m/2^{-20}> points.  [D37]
-describes how to multiply these widths by scaling factors without
-overflowing.
+<code/FIXes>, where one <code/FIX> is <m/2^{-20}> times the design
+size in points.  [D37] describes how to multiply these widths by
+scaling factors without overflowing.
 
 <li>The difference between the pixel escapements and <code/tfmwidth>
 is that the latter is a resolution-independent shift of the DVI
