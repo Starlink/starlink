@@ -1,7 +1,6 @@
-      SUBROUTINE KPS1_CNTDR( BAD, IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, 
-     :                       YLL, XSIZE, YSIZE, NCONT, CONT, STATS, 
-     :                       FAST, DONE, CNTUSD, CNTLEN, CNTCLS, 
-     :                       STATUS )
+      SUBROUTINE KPS1_CNTDR( IPLOT, IGRP, DIM1, DIM2, ARRAY, XLL, YLL, 
+     :                       XSIZE, YSIZE, NCONT, CONT, STATS, FAST, 
+     :                       DONE, CNTUSD, CNTLEN, CNTCLS, STATUS )
 *+
 *  Name:
 *     KPS1_CNTDR
@@ -168,9 +167,6 @@
 *        statistics via new arguments STATS, CNTLEN, and CNTCLS.
 *     17-MAR-1998 (DSB):
 *        Modified to use AST for drawing the contours.
-*     25-JAN-2001 (DSB):
-*        Added argument BAD to allow outling of good pixels. Also added
-*        code to draw a simple rectangle around the array bounds.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,7 +184,6 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
 
 *  Arguments Given:
-      LOGICAL BAD
       INTEGER IPLOT
       INTEGER IGRP
       INTEGER DIM1
@@ -288,11 +283,10 @@
                                  ! contour
 
 *   Internal References:
-      BADPIX( I, J ) = BAD .AND. (
-     :                 ( ARRAY( I, J )     .EQ. VAL__BADR ) .OR.
+      BADPIX( I, J ) = ( ARRAY( I, J )     .EQ. VAL__BADR ) .OR.
      :                 ( ARRAY( I+1, J )   .EQ. VAL__BADR ) .OR.
      :                 ( ARRAY( I+1, J+1 ) .EQ. VAL__BADR ) .OR.
-     :                 ( ARRAY( I, J+1 )   .EQ. VAL__BADR ) )
+     :                 ( ARRAY( I, J+1 )   .EQ. VAL__BADR )
 
       DIST( I, J ) = SQRT( ( X( I ) - X( J ) )**2 +
      :                     ( Y( I ) - Y( J ) )**2 )
@@ -362,23 +356,40 @@
 
 *  If different pens are being used, produce a modified Plot which draws 
 *  curves with the pen style supplied for this contour. 
-         IF( NPEN .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         IF( NPEN .GT. 0 ) THEN
 
 *  Take a deep copy of the supplied Plot. This Plot will be modify using the
 *  supplied attribute settings. A copy is used so that the original plotting
 *  attributes can be re-instated later.
             IPLOTT = AST_COPY( IPLOT, STATUS )
 
-*  Establish the attributes for this pen.
-            CALL KPS1_CNTST( IPLOTT, IGRP, IPEN, STATUS )
+*  Get the next list of AST Attribute settings from the group. 
+            CALL GRP_GET( IGRP, IPEN, 1, PENDEF, STATUS )
+
+*  Abort if an error has occurred.
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Loop round each comma-delimited attribute in the definitions, translating 
+*  colour names and any defined synonyms, and storing it in the Plot.
+            IF( PENDEF .NE. ' ' ) THEN
+               J1 = 1
+               DO WHILE( J1 .LE. GRP__SZNAM )
+                  J2 = J1
+                  CALL CHR_FIND( PENDEF, ',', .TRUE., J2 )
+                  CALL KPG1_ASSTS( PENDEF( J1 : J2 - 1 ), .TRUE., 
+     :                             .TRUE., IPLOTT, BADAT, STATUS )
+                  J1 = J2 + 1
+               END DO
 
 *  Issue a context message if anything went wrong setting the pen.
-            IF( STATUS .NE. SAI__OK ) THEN
-               CALL MSG_SETI( 'I', ICONT )
-               CALL MSG_SETC( 'I', CHR_NTH( ICONT ) )               
-               CALL ERR_REP( 'KPS1_CNTDR_1', 'Unable to set the '//
-     :                       'pen for the ^I contour level.', STATUS )
-               GO TO 999
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL MSG_SETI( 'I', ICONT )
+                  CALL MSG_SETC( 'I', CHR_NTH( ICONT ) )               
+                  CALL ERR_REP( 'KPS1_CNTDR_1', 'Unable to set the '//
+     :                         'pen for the ^I contour level.', STATUS )
+                  GO TO 999
+               END IF
+
             END IF
 
 *  Increment the index of the next pen to use, cycling back to the start
@@ -401,123 +412,106 @@
          IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .TRUE., ATTRS,
      :                               STATUS )
 
-*  If required, draw a curve outlinging the array.
-         IF( CVAL .EQ. VAL__BADR ) THEN
-            X( 1 ) = REAL( XLL ) - 0.5
-            Y( 1 ) = REAL( YLL ) - 0.5
-            X( 2 ) = REAL( XLL + XSIZE ) - 0.5 
-            Y( 2 ) = REAL( YLL ) - 0.5
-            X( 3 ) = REAL( XLL + XSIZE ) - 0.5 
-            Y( 3 ) = REAL( YLL + YSIZE ) - 0.5
-            X( 4 ) = REAL( XLL ) - 0.5 
-            Y( 4 ) = REAL( YLL + YSIZE ) - 0.5
-            X( 5 ) = REAL( XLL ) - 0.5
-            Y( 5 ) = REAL( YLL ) - 0.5
-            CALL KPG1_ASCRV( IPLOTT, FAST, 5, X, Y, STATUS )
-
-
-*  Otherwise we do the contouring...
-         ELSE
-
 *  Initialise record of contour levels actually used.
-            CNTUSD( ICONT ) = .FALSE.
-            IF ( STATS ) THEN
-               CNTLEN( ICONT ) = 0.0
-               CNTCLS( ICONT ) = 0
-            END IF
+         CNTUSD( ICONT ) = .FALSE.
+         IF ( STATS ) THEN
+            CNTLEN( ICONT ) = 0.0
+            CNTCLS( ICONT ) = 0
+         END IF
 
 *  Initialise the store of cells done.
-            DO J = 1, YSIZE - 1
-               DO I = 1, XSIZE - 1
-                  DONE( I, J ) = .FALSE.
-               END DO
+         DO J = 1, YSIZE - 1
+            DO I = 1, XSIZE - 1
+               DONE( I, J ) = .FALSE.
             END DO
+         END DO
 
 *  Initialise counter for number of x-y co-ordinates to plot.
-            NPTS = 0
+         NPTS = 0
 
 *  Scan the image, looking for a cell containing the current contour
 *  level.
-            DO J = 1, YSIZE - 1
-               DO I = 1, XSIZE - 1
+         DO J = 1, YSIZE - 1
+            DO I = 1, XSIZE - 1
 
 *  If he cell has already been contoured, omit it.
-                  IF ( .NOT. DONE( I, J ) ) THEN
+               IF ( .NOT. DONE( I, J ) ) THEN
 
 *  Note this cell has been looked at.
-                     DONE( I, J ) = .TRUE.
+                  DONE( I, J ) = .TRUE.
 
 *  Find the position of the current pixel in the full two-dimensional array.
-                     IX = I + XLL - 1
-                     IY = J + YLL - 1
+                  IX = I + XLL - 1
+                  IY = J + YLL - 1
 
 *  Don't use this cell if there is a bad pixel adjacent.
-                     IF ( .NOT. BADPIX( IX, IY ) ) THEN
+                  IF ( .NOT. BADPIX( IX, IY ) ) THEN
 
 *  Extract data values and test if they contain the contour.
-                        B( 1 ) = ARRAY( IX, IY )
-                        B( 2 ) = ARRAY( IX+1, IY )
-                        B( 3 ) = ARRAY( IX+1, IY+1 )
-                        B( 4 ) = ARRAY( IX, IY+1 )
-                        BMAX = MAX( B( 1 ), B( 2 ), B( 3 ), B( 4 ) )
-                        BMIN = MIN( B( 1 ), B( 2 ), B( 3 ), B( 4 ) )
-   
-                        IF ( CVAL .LT. BMAX .AND. CVAL .GT. BMIN ) THEN
-                           B( 5 ) = B( 1 )
+                     B( 1 ) = ARRAY( IX, IY )
+                     B( 2 ) = ARRAY( IX+1, IY )
+                     B( 3 ) = ARRAY( IX+1, IY+1 )
+                     B( 4 ) = ARRAY( IX, IY+1 )
+                     BMAX = MAX( B( 1 ), B( 2 ), B( 3 ), B( 4 ) )
+                     BMIN = MIN( B( 1 ), B( 2 ), B( 3 ), B( 4 ) )
+
+                     IF ( CVAL .LT. BMAX .AND. CVAL .GT. BMIN ) THEN
+                        B( 5 ) = B( 1 )
 
 *  Initialise the pointers to the cells on this contour.
-                           II = I
-                           JJ = J
+                        II = I
+                        JJ = J
 
 *  Initialise the cell side where the contour enters the cell.
-                           LIN = 0
-                           LINEND = .FALSE.
-                           DO WHILE ( .NOT. LINEND )
-                              NEXIT = 0
+                        LIN = 0
+                        LINEND = .FALSE.
+                        DO WHILE ( .NOT. LINEND )
+                           NEXIT = 0
 
 *  Scan the cell sides, searching for intersections with the contour.
-                              ANOTE = B( 1 ) .GE. CVAL
-   
-                              DO L = 1, 4
-                                 ABOVE = B( L+1 ) .GE. CVAL
+                           ANOTE = B( 1 ) .GE. CVAL
+
+                           DO L = 1, 4
+                              ABOVE = B( L+1 ) .GE. CVAL
 
 *  Don't count contour exits from the same side as it entered.
-                                  IF ( ( ABOVE .NEQV. ANOTE ) .AND.
-     :                                ( L .NE. LIN ) ) THEN
-                                    LSIDE = L
-                                    NEXIT = NEXIT+1
-                                    NPTS = NPTS+1
+                               IF ( ( ABOVE .NEQV. ANOTE ) .AND.
+     :                             ( L .NE. LIN ) ) THEN
+                                 LSIDE = L
+                                 NEXIT = NEXIT+1
+                                 NPTS = NPTS+1
 
 *  Calculate the co-ordinates of the contour exit point from the cell
 *  by linear interpolation, and store them in X and Y.
-                                    FRACT = ( CVAL - B( L ) ) / 
-     :                                      ( B( L+1 ) - B( L ) )
-                                    X( NPTS ) = IX + CX( L ) + DX( L ) *
+                                 FRACT = ( CVAL - B( L ) ) / ( B( L+1 )
+     :                                   -B( L ) )
+                                 X( NPTS ) = IX + CX( L ) + DX( L ) *
      :                                       FRACT
-                                    Y( NPTS ) = IY + CY( L ) + DY( L ) *
+                                 Y( NPTS ) = IY + CY( L ) + DY( L ) *
      :                                       FRACT
 
-                                 END IF
+                              END IF
 
-                                 ANOTE = ABOVE
-                              END DO
+                              ANOTE = ABOVE
+                           END DO
 
 *  The cell is confused if the number of contour exits does not match
 *  the number of entries.
-                              IF ( LIN .EQ. 0 ) THEN
-                                 CONFUS = NEXIT .NE. 2
-                              ELSE
-                                 CONFUS = NEXIT .NE. 1
-                              END IF
+                           IF ( LIN .EQ. 0 ) THEN
+                              CONFUS = NEXIT .NE. 2
+
+                           ELSE
+                              CONFUS = NEXIT .NE. 1
+                           END IF
 
 *  Find the co-ordinates of the next cell which the contour enters.
-                              II = II + IMOVE( LSIDE )
-                              JJ = JJ + JMOVE( LSIDE )
-                              IX = IX + IMOVE( LSIDE )
-                              IY = IY + JMOVE( LSIDE )
+                           II = II + IMOVE( LSIDE )
+                           JJ = JJ + JMOVE( LSIDE )
+                           IX = IX + IMOVE( LSIDE )
+                           IY = IY + JMOVE( LSIDE )
 
 *  Find the side of the new cell through which it enters.
-                              LIN = NEWSID( LSIDE )
+                           LIN = NEWSID( LSIDE )
 
 *  It is the end of current contour line if the:
 *     o  contour goes off edge of the image,
@@ -525,38 +519,38 @@
 *     o  enters a cell already contoured,
 *     o  leaves a confused cell, or
 *     o  exceeds the storage space for the X and Y arrays.
-                              IF ( OFFIMG( II, JJ ) ) THEN
-                                 LINEND = .TRUE.
-   
-                              ELSE
-                                 LINEND = BADPIX( IX, IY ) .OR. CONFUS
+                           IF ( OFFIMG( II, JJ ) ) THEN
+                              LINEND = .TRUE.
+
+                           ELSE
+                              LINEND = BADPIX( IX, IY ) .OR. CONFUS
      :                                 .OR. DONE( II, JJ ) .OR.
      :                                 ( NPTS .GE. MAXPTS )
-                              END IF
+                           END IF
 
 *  If we are continuing on this contour, extract the data for next cell
 *  and mark the cell done.
-                              IF ( .NOT. LINEND ) THEN
-                                 B( 1 ) = ARRAY( IX, IY )
-                                 B( 2 ) = ARRAY( IX+1, IY )
-                                 B( 3 ) = ARRAY( IX+1, IY+1 )
-                                 B( 4 ) = ARRAY( IX, IY+1 )
-                                 B( 5 ) = B( 1 )
-                                 DONE( II, JJ ) = .TRUE.
-                              END IF
+                           IF ( .NOT. LINEND ) THEN
+                              B( 1 ) = ARRAY( IX, IY )
+                              B( 2 ) = ARRAY( IX+1, IY )
+                              B( 3 ) = ARRAY( IX+1, IY+1 )
+                              B( 4 ) = ARRAY( IX, IY+1 )
+                              B( 5 ) = B( 1 )
+                              DONE( II, JJ ) = .TRUE.
+                           END IF
 
 *  Return to analyse the new cell.
-                           END DO
+                        END DO
 
 *  If the last cell on a contour was confused, all four cell sides will
 *  be crossed by a contour.  The crossing points must be correctly
 *  paired.  There are three possible pairing combinations which leave
 *  the first point in its original position.
-                           IF ( CONFUS ) THEN
+                        IF ( CONFUS ) THEN
 
 *  Check if the current pairing causes contour lines to cross.  If so,
 *  swap the appropriate pair of points so they no longer cross.
-                              IF ( ( MAX( X(NPTS), X(NPTS-1) ) .GT.
+                           IF ( ( MAX( X(NPTS), X(NPTS-1) ) .GT.
      :                            MAX( X(NPTS-2), X(NPTS-3) ) .AND.
      :                            MIN( X(NPTS), X(NPTS-1) ) .LT.
      :                            MIN( X(NPTS-2), X(NPTS-3) ) ) .OR.
@@ -565,88 +559,85 @@
      :                            MIN( X(NPTS), X(NPTS-1) ) .GT.
      :                            MIN( X(NPTS-2), X(NPTS-3) ) ) ) THEN
 
-                                 XTEMP = X( NPTS-1 )
-                                 YTEMP = Y( NPTS-1 )
-                                 X( NPTS-1 ) = X( NPTS-2 )
-                                 Y( NPTS-1 ) = Y( NPTS-2 )
-                                 X( NPTS-2 ) = XTEMP
-                                 Y( NPTS-2 ) = YTEMP
-                              END IF
+                              XTEMP = X( NPTS-1 )
+                              YTEMP = Y( NPTS-1 )
+                              X( NPTS-1 ) = X( NPTS-2 )
+                              Y( NPTS-1 ) = Y( NPTS-2 )
+                              X( NPTS-2 ) = XTEMP
+                              Y( NPTS-2 ) = YTEMP
+                           END IF
 
 *  Make a further swap if necessary, to find the pairing (out of the
 *  two which remain) which produces the shorter total length of contour
 *  line.
-                              IF ( DIST( NPTS, NPTS-1 ) +
-     :                             DIST( NPTS-2, NPTS-3 ) .GT.
-     :                             DIST( NPTS-1, NPTS-2 ) +
-     :                             DIST( NPTS-3, NPTS ) ) THEN
+                           IF ( DIST( NPTS, NPTS-1 ) +
+     :                          DIST( NPTS-2, NPTS-3 ) .GT.
+     :                          DIST( NPTS-1, NPTS-2 ) +
+     :                          DIST( NPTS-3, NPTS ) ) THEN
 
 *  Swap the pairing if necessary.
-                                 XTEMP = X( NPTS )
-                                 YTEMP = Y( NPTS )
-                                 X( NPTS ) = X( NPTS-2 )
-                                 Y( NPTS ) = Y( NPTS-2 )
-                                 X( NPTS-2 ) = XTEMP
-                                 Y( NPTS-2 ) = YTEMP
-                              END IF
-                              NPTS = NPTS - 2
+                              XTEMP = X( NPTS )
+                              YTEMP = Y( NPTS )
+                              X( NPTS ) = X( NPTS-2 )
+                              Y( NPTS ) = Y( NPTS-2 )
+                              X( NPTS-2 ) = XTEMP
+                              Y( NPTS-2 ) = YTEMP
+                           END IF
+                           NPTS = NPTS - 2
 
 *  End of confusion check.
-                           END IF
+                        END IF
 
 *  Indicate contour level has been used.
-                           CNTUSD( ICONT ) = .TRUE.
+                        CNTUSD( ICONT ) = .TRUE.
 
 *  Add the length of the new section of contour.  Allow for a spearate
 *  section arising from a confused contour.
-                           IF ( STATS .AND. NPTS .GT. 1 ) THEN
-                              DO L = 1, NPTS - 1
-                                 CNTLEN( ICONT ) = CNTLEN( ICONT ) +
-     :                                             RDIST( L, L + 1 )
-                              END DO
-                              IF ( CONFUS ) THEN
-                                 CNTLEN( ICONT ) = CNTLEN( ICONT ) +
+                        IF ( STATS .AND. NPTS .GT. 1 ) THEN
+                           DO L = 1, NPTS - 1
+                              CNTLEN( ICONT ) = CNTLEN( ICONT ) +
+     :                                          RDIST( L, L + 1 )
+                           END DO
+                           IF ( CONFUS ) THEN
+                              CNTLEN( ICONT ) = CNTLEN( ICONT ) +
      :                                          RDIST( NPTS, NPTS + 1 )
-                              END IF
+                           END IF
 
 *  Count the number of closed contours by seeing if the first and last
 *  points are the same.
-                              IF ( SAME( 1, NPTS ) ) THEN
-                                 CNTCLS( ICONT ) = CNTCLS( ICONT ) + 1
-                              END IF
+                           IF ( SAME( 1, NPTS ) ) THEN
+                              CNTCLS( ICONT ) = CNTCLS( ICONT ) + 1
                            END IF
-
-*  Plot the stored contour. 
-                           CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, 
-     :                                      STATUS )
-
-*  Plot the segment of the other contour found in the confused cell.
-                           IF ( CONFUS ) THEN
-                              CALL KPG1_ASCRV( IPLOTT, FAST, 2, 
-     :                                     X( NPTS + 1 ), Y( NPTS + 1 ),
-     :                                     STATUS )
-                           END IF
-
-*  Reset the number of points to plot.
-                           NPTS = 0
-
-*  End of contour-lies-between-pixels check.
                         END IF
 
-*  End of bad-pixel check.
+*  Plot the stored contour. 
+                        CALL KPG1_ASCRV( IPLOTT, FAST, NPTS, X, Y, 
+     :                                   STATUS )
+
+*  Plot the segment of the other contour found in the confused cell.
+                        IF ( CONFUS ) THEN
+                           CALL KPG1_ASCRV( IPLOTT, FAST, 2, 
+     :                                     X( NPTS + 1 ), Y( NPTS + 1 ),
+     :                                     STATUS )
+                        END IF
+
+*  Reset the number of points to plot.
+                        NPTS = 0
+
+*  End of contour-lies-between-pixels check.
                      END IF
 
-*  End of already contoured-pixel check.
+*  End of bad-pixel check.
                   END IF
 
-*  End of the loop through the columns.
-               END DO
+*  End of already contoured-pixel check.
+               END IF
 
-*  End of the loop through the lines.
+*  End of the loop through the columns.
             END DO
 
-*  End of contouring check.
-         END IF
+*  End of the loop through the lines.
+         END DO
 
 *  Flush the buffers used by KPG1_ASCRV.
          CALL KPG1_ASCRV( IPLOTT, FAST, 0, 0.0, 0.0, STATUS )

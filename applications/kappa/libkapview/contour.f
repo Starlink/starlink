@@ -493,7 +493,7 @@
 *     26-OCT-1999 (DSB):
 *        Margin changed to be a fraction of the current picture instead
 *        of the DATA picture.
-*     25-JAN-2001 (DSB):
+*     6-FEB-2001 (DSB):
 *        Added modes Good and Bounds, and parameter LABOUT.
 *     {enter_further_changes_here}
 
@@ -822,11 +822,20 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Draw the contour plot.
-      CALL KPS1_CNTDR( BAD, IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), 
-     :                 %VAL( PNTR ), 1, 1, DIMS( 1 ), DIMS( 2 ), NCONT, 
-     :                 CNTLEV, STATS, FAST, %VAL( WKPNTR ), CNTUSD, 
-     :                 CNTLEN, CNTCLS, STATUS )
+*  Draw a data outline if required.
+      IF( MODE .EQ. 'BOUNDS' .OR. MODE .EQ. 'GOOD' ) THEN
+         CALL KPS1_CNTGD( (MODE .EQ. 'BOUNDS'), IPLOT, IGRP, DIMS( 1 ), 
+     :                    DIMS( 2 ), %VAL( PNTR ), 1, 1, DIMS( 1 ), 
+     :                    DIMS( 2 ), FAST, CNTUSD, CNTLEN, CNTCLS, 
+     :                    STATUS )
+
+*  Otherwise, draw a contour plot.
+      ELSE
+         CALL KPS1_CNTDR( IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), 
+     :                    %VAL( PNTR ), 1, 1, DIMS( 1 ), DIMS( 2 ), 
+     :                    NCONT, CNTLEV, STATS, FAST, %VAL( WKPNTR ), 
+     :                    CNTUSD, CNTLEN, CNTCLS, STATUS )
+      END IF
 
 *  Add a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN

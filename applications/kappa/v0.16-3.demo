@@ -1,10 +1,10 @@
 ## Allow 3 seconds to read each line of text (assuming a maximum line length 
 # of 68 characters), or 3 words per second. 
 
-demo v0.16-2 {
+demo v0.16-3 {
 
    info "This demonstration highlights the main changes which have been
-   introduced into the <PACK KAPPA> package by version V0.16-2. See the
+   introduced into the <PACK KAPPA> package by version V0.16-3. See the
    '<htx:sun95|se_changes <emph Release Notes>>' section of <doc SUN/95>
    for a complete list."
 
@@ -20,7 +20,7 @@ demo v0.16-2 {
       command {exec echo "MajTickLen=0" >> stardemo.tmp}
       command {exec echo "MinTickLen=0" >> stardemo.tmp}
       command {exec echo "TextLab(2)=0" >> stardemo.tmp}
-      command {exec echo "Label(1)=Version 0.16-2   " >> stardemo.tmp}
+      command {exec echo "Label(1)=Version 0.16-3   " >> stardemo.tmp}
       command {exec echo "LabelUnits=0" >> stardemo.tmp}
       command {exec echo "TextLabGap(1)=0.25" >> stardemo.tmp}
       command {exec echo "Size(TextLab)=2" >> stardemo.tmp}
@@ -32,7 +32,7 @@ demo v0.16-2 {
       command {exec rm -f stardemo.tmp}
 
       text "This demonstration highlights the main changes which have
-      been introduced into the <PACK KAPPA> package by version V0.16-2. See
+      been introduced into the <PACK KAPPA> package by version V0.16-3. See
       the '<htx:sun95|se_changes <emph Release Notes>>' section of <doc
       SUN/95> for a complete list."
 
