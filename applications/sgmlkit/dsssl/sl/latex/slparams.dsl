@@ -115,6 +115,26 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 \\newcommand\\Quote[1]{`#1'}
 \\let\\Strong\\textbf
 \\let\\Cite\\textit
+<!-- Verbatimlines environment.  This is based fairly distantly on the
+     LaTeX raggedright environment, but somewhat simplified.  Note
+     that the LaTeX text _must_ be generated in such a way that
+     there's no newline between `\end' and `{Verbatimlines}'.  Also
+     note that putting this inside, for example, {quote} stuffs things
+     up, because {quote} is implemented as a trivlist, which plays
+     merry hell with any indents inside {Verbatimlines}. -->
+<!--
+\\def\\my@centrecr{\\ifhmode\\unskip\\else\\hbox{}\\fi \\vskip-\\parskip}
+-->
+\\def\\my@centrecr{\\ifhmode\\unskip \\vskip-\\parskip\\else\\relax\\fi}
+{\\catcode`\\^^M=\\active %
+\\gdef\\Verbatimlines{\\par%
+  \\catcode`\\^^M=\\active \\let^^M\\my@centrecr %
+  \\@rightskip\\@flushglue \\rightskip\\@rightskip %
+  \\leftskip 4em %
+  \\parindent\\z@ %
+  \\verbatim@font %
+  }}
+\\let\\endVerbatimlines=\\relax
 <!-- I may make \DTitem more sophisticated about linebreaking -->
 \\def\\DTitem#1{\\item[#1]}
 <!-- Title page. 
@@ -276,51 +296,52 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
   ;; most of the commands have become environments, which means that
   ;; it is now possible to have catcode-changing environments such as
   ;; {verbatim} in the arguments.
-  "%+
-%  Name:
-%     SST.TEX
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-%  Language:
-%     LaTeX
-%  Type of Module:
-%     LaTeX data file.
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
-%     documentstyle declaration).
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-%  Bugs:
-%     {note_any_bugs_here}
-%-
-%  Define length variables.
+
+;;  Name:
+;;     SST.TEX
+;;  Purpose:
+;;     Define LaTeX commands for laying out Starlink routine descriptions.
+;;  Language:
+;;     LaTeX
+;;  Type of Module:
+;;     LaTeX data file.
+;;  Description:
+;;     This file defines LaTeX commands which allow routine documentation
+;;     produced by the SST application PROLAT to be processed by LaTeX and
+;;     by LaTeX2html. The contents of this file should be included in the
+;;     source prior to any statements that make of the sst commnds.
+;;  Notes:
+;;     The commands defined in the style file html.sty provided with LaTeX2html 
+;;     are used. These should either be made available by using the appropriate
+;;     sun.tex (with hypertext extensions) or by putting the file html.sty 
+;;     on your TEXINPUTS path (and including the name as part of the  
+;;     documentstyle declaration).
+;;  Authors:
+;;     RFWS: R.F. Warren-Smith (STARLINK)
+;;     PDRAPER: P.W. Draper (Starlink - Durham University)
+;;  History:
+;;     10-SEP-1990 (RFWS):
+;;        Original version.
+;;     10-SEP-1990 (RFWS):
+;;        Added the implementation status section.
+;;     12-SEP-1990 (RFWS):
+;;        Added support for the usage section and adjusted various spacings.
+;;     8-DEC-1994 (PDRAPER):
+;;        Added support for simplified formatting using LaTeX2html.
+;;     {enter_further_changes_here}
+;;  Bugs:
+;;     {note_any_bugs_here}
+;;
+"<!-- Define length variables. -->
 \\newlength{\\sstbannerlength}
 \\newlength{\\sstcaptionlength}
 \\newlength{\\sstexampleslength}
 \\newlength{\\sstexampleswidth}
-%  Define a \\tt font of the required size.
+<!-- Define a \\tt font of the required size. -->
 \\newfont{\\ssttt}{cmtt10 scaled 1095}
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
+<!-- Define a command to produce a routine header, including its name,
+     a purpose description and the rest of the routine's documentation.
+     -->
 \\def\\routinesubsectlevel{section}  % to be overridden by generated text
 \\newenvironment{sstroutine}[2]{
    \\goodbreak
@@ -341,107 +362,52 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
    \\addcontentsline{toc}\\routinesubsectlevel{Routine #1}
    \\begin{description}}
   {\\end{description}}
-% \\newcommand{\\sstroutine}[3]{
-%    \\goodbreak
-%    \\rule{\\textwidth}{0.5mm}
-%    \\vspace{-7ex}
-%    \\newline
-%    \\settowidth{\\sstbannerlength}{{\\Large {\\bf #1}}}
-%    \\setlength{\\sstcaptionlength}{\\textwidth}
-%    \\setlength{\\sstexampleslength}{\\textwidth}
-%    \\addtolength{\\sstbannerlength}{0.5em}
-%    \\addtolength{\\sstcaptionlength}{-2.0\\sstbannerlength}
-%    \\addtolength{\\sstcaptionlength}{-5.0pt}
-%    \\settowidth{\\sstexampleswidth}{{\\bf Examples:}}
-%    \\addtolength{\\sstexampleslength}{-\\sstexampleswidth}
-%    \\parbox[t]{\\sstbannerlength}{\\flushleft{\\Large {\\bf #1}}}
-%    \\parbox[t]{\\sstcaptionlength}{\\center{\\Large #2}}
-%    \\parbox[t]{\\sstbannerlength}{\\flushright{\\Large {\\bf #1}}}
-%    \\begin{description}
-%       #3
-%    \\end{description}
-% }
-%  Format the description section.
+<!-- Format the description section. -->
 \\newenvironment{sstdescription}{\\item[Description:]}{}
-%\\newcommand{\\sstdescription}[1]{\\item[Description:] #1}
-%  Format the usage section.
+<!-- Format the usage section. -->
 \\newenvironment{sstusage}{\\item[Usage:] \\mbox{} \\\\[1.3ex] \\ssttt}{}
-%\\newcommand{\\sstusage}[1]{\\item[Usage:] \\mbox{} \\\\[1.3ex] {\\ssttt #1}}
-%  Format the invocation section.
+<!-- Format the invocation section. -->
 \\newenvironment{sstinvocation}{\\item[Invocation:]\\hspace{0.4em}\\tt}{}
-%\\newcommand{\\sstinvocation}[1]{\\item[Invocation:]\\hspace{0.4em}{\\tt #1}}
-%  Format the arguments section.
+<!-- Format the arguments section. -->
 \\newenvironment{sstarguments}{
    \\item[Arguments:] \\mbox{} \\\\
    \\vspace{-3.5ex}
    \\begin{description}}{\\end{description}}
-% \\newcommand{\\sstarguments}[1]{
-%    \\item[Arguments:] \\mbox{} \\\\
-%    \\vspace{-3.5ex}
-%    \\begin{description}
-%       #1
-%    \\end{description}
-% }
-%  Format the returned value section (for a function).
+<!-- Format the returned value section (for a function). -->
 \\newenvironment{sstreturnedvalue}{
    \\item[Returned Value:] \\mbox{} \\\\
    \\vspace{-3.5ex}
    \\begin{description}}{\\end{description}}
-% \\newcommand{\\sstreturnedvalue}[1]{
-%    \\item[Returned Value:] \\mbox{} \\\\
-%    \\vspace{-3.5ex}
-%    \\begin{description}
-%       #1
-%    \\end{description}
-% }
-%  Format the parameters section (for an application).
+<!-- Format the parameters section (for an application). -->
 \\newenvironment{sstparameters}{
    \\item[Parameters:] \\mbox{} \\\\
    \\vspace{-3.5ex}
    \\begin{description}}{\\end{description}}
-% \\newcommand{\\sstparameters}[1]{
-%    \\item[Parameters:] \\mbox{} \\\\
-%    \\vspace{-3.5ex}
-%    \\begin{description}
-%       #1
-%    \\end{description}
-% }
-%  Format the examples section.
+<!-- Format the examples section.  Modified SST examples container,
+     which does NOT put its contents into a list environment, because
+     that plays merry hell with the spacings in inner environments,
+     specifically Verbatimlines. -->
 \\newenvironment{sstexamples}{
-   \\item[Examples:] \\mbox{} \\\\
-   \\vspace{-3.5ex}
-   \\begin{description}}{\\end{description}}
-% \\newcommand{\\sstexamples}[1]{
-%    \\item[Examples:] \\mbox{} \\\\
-%    \\vspace{-3.5ex}
-%    \\begin{description}
-%       #1
-%    \\end{description}
-% }
-%  Define the format of a subsection in a normal section.
+    \\item[Examples:]\\mbox{}\\\\
+    \\vskip -3ex \\@tempcnta 1}{}
+<!-- Define the format of a subsection in a normal section. -->
 \\newcommand{\\sstsubsection}[1]{ \\item[{#1}] \\mbox{} \\\\}
-%  Define the format of a subsection in the examples section.
+<!-- Define the format of a subsection in the examples section.
+     The example numbering is rather redundant, but it looks better if
+     there's something on the line before the (indented, tt-font)
+     example. -->
 \\newenvironment{sstexamplesubsection}{
-  \\sloppy\\item[]}{}
-% \\newcommand{\\sstexamplesubsection}[2]{\\sloppy
-% \\item[\\parbox{\\sstexampleslength}{\\ssttt #1}] \\mbox{} \\\\ #2 }
-%  Format the notes section.
+    \\par Example \\the\\@tempcnta:\\par \\global\\advance\\@tempcnta 1}{}
+<!-- Format the notes section. -->
 \\newcommand{\\sstnotes}[1]{\\item[Notes:] \\mbox{} \\\\[1.3ex] #1}
-%  Provide a general-purpose format for additional (DIY) sections.
+<!-- Provide a general-purpose format for additional (DIY) sections. -->
 \\newenvironment{sstdiytopic}[1]{\\item[{#1:}]\\mbox{}\\\\}{}
-% The following is a faithful translation of the original
-% \\sstdiytopic, but I don't understand why these \\hspace commands are
-% in there, since they mess up the formatting
-%\\newenvironment{sstdiytopic}[1]{\\item[{\\hspace{-0.35em}#1\\hspace{-0.35em}:}] 
-%    \\mbox{} \\\\[1.3ex]}{}
-%\\newcommand{\\sstdiytopic}[2]{\\item[{\\hspace{-0.35em}#1\\hspace{-0.35em}:}] \\mbox{} \\\\[1.3ex] #2}
-%  Format the implementation status section.
+<!-- Format the implementation status section. -->
 \\newenvironment{sstimplementationstatus}{
    \\item[{Implementation Status:}] \\mbox{} \\\\[1.3ex]}{}
-%  Format the bugs section.
+<!-- Format the bugs section. -->
 \\newenvironment{sstbugs}{\\item[Bugs:]}{}
-%\\newcommand{\\sstbugs}[1]{\\item[Bugs:] #1}
-%  Format a list of items while in paragraph mode.
+<!-- Format a list of items while in paragraph mode. -->
 \\newcommand{\\sstitemlist}[1]{
   \\mbox{} \\\\
   \\vspace{-3.5ex}
@@ -449,151 +415,18 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
      #1
   \\end{itemize}
 }
-%  Define the format of an item.
+<!-- Define the format of an item. -->
 \\newcommand{\\sstitem}{\\item}
-%  End of sst.tex layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
 "
   )
 
-; (define %latex-sst-preamble%
-;   ;;Add the sst.tex file from the now-defunct SUN/110 distribution
-;   "%+
-; %  Name:
-; %     SST.TEX
-; %  Purpose:
-; %     Define LaTeX commands for laying out Starlink routine descriptions.
-; %  Language:
-; %     LaTeX
-; %  Type of Module:
-; %     LaTeX data file.
-; %  Description:
-; %     This file defines LaTeX commands which allow routine documentation
-; %     produced by the SST application PROLAT to be processed by LaTeX and
-; %     by LaTeX2html. The contents of this file should be included in the
-; %     source prior to any statements that make of the sst commnds.
-; %  Notes:
-; %     The commands defined in the style file html.sty provided with LaTeX2html 
-; %     are used. These should either be made available by using the appropriate
-; %     sun.tex (with hypertext extensions) or by putting the file html.sty 
-; %     on your TEXINPUTS path (and including the name as part of the  
-; %     documentstyle declaration).
-; %  Authors:
-; %     RFWS: R.F. Warren-Smith (STARLINK)
-; %     PDRAPER: P.W. Draper (Starlink - Durham University)
-; %  History:
-; %     10-SEP-1990 (RFWS):
-; %        Original version.
-; %     10-SEP-1990 (RFWS):
-; %        Added the implementation status section.
-; %     12-SEP-1990 (RFWS):
-; %        Added support for the usage section and adjusted various spacings.
-; %     8-DEC-1994 (PDRAPER):
-; %        Added support for simplified formatting using LaTeX2html.
-; %     {enter_further_changes_here}
-; %  Bugs:
-; %     {note_any_bugs_here}
-; %-
-; %  Define length variables.
-; \\newlength{\\sstbannerlength}
-; \\newlength{\\sstcaptionlength}
-; \\newlength{\\sstexampleslength}
-; \\newlength{\\sstexampleswidth}
-; %  Define a \\tt font of the required size.
-; \\newfont{\\ssttt}{cmtt10 scaled 1095}
-; %  Define a command to produce a routine header, including its name,
-; %  a purpose description and the rest of the routine's documentation.
-; \\newcommand{\\sstroutine}[3]{
-;    \\goodbreak
-;    \\rule{\\textwidth}{0.5mm}
-;    \\vspace{-7ex}
-;    \\newline
-;    \\settowidth{\\sstbannerlength}{{\\Large {\\bf #1}}}
-;    \\setlength{\\sstcaptionlength}{\\textwidth}
-;    \\setlength{\\sstexampleslength}{\\textwidth}
-;    \\addtolength{\\sstbannerlength}{0.5em}
-;    \\addtolength{\\sstcaptionlength}{-2.0\\sstbannerlength}
-;    \\addtolength{\\sstcaptionlength}{-5.0pt}
-;    \\settowidth{\\sstexampleswidth}{{\\bf Examples:}}
-;    \\addtolength{\\sstexampleslength}{-\\sstexampleswidth}
-;    \\parbox[t]{\\sstbannerlength}{\\flushleft{\\Large {\\bf #1}}}
-;    \\parbox[t]{\\sstcaptionlength}{\\center{\\Large #2}}
-;    \\parbox[t]{\\sstbannerlength}{\\flushright{\\Large {\\bf #1}}}
-;    \\begin{description}
-;       #3
-;    \\end{description}
-; }
-; %  Format the description section.
-; \\newcommand{\\sstdescription}[1]{\\item[Description:] #1}
-; %  Format the usage section.
-; \\newcommand{\\sstusage}[1]{\\item[Usage:] \\mbox{} \\\\[1.3ex] {\\ssttt #1}}
-; %  Format the invocation section.
-; \\newcommand{\\sstinvocation}[1]{\\item[Invocation:]\\hspace{0.4em}{\\tt #1}}
-; %  Format the arguments section.
-; \\newcommand{\\sstarguments}[1]{
-;    \\item[Arguments:] \\mbox{} \\\\
-;    \\vspace{-3.5ex}
-;    \\begin{description}
-;       #1
-;    \\end{description}
-; }
-; %  Format the returned value section (for a function).
-; \\newcommand{\\sstreturnedvalue}[1]{
-;    \\item[Returned Value:] \\mbox{} \\\\
-;    \\vspace{-3.5ex}
-;    \\begin{description}
-;       #1
-;    \\end{description}
-; }
-; %  Format the parameters section (for an application).
-; \\newcommand{\\sstparameters}[1]{
-;    \\item[Parameters:] \\mbox{} \\\\
-;    \\vspace{-3.5ex}
-;    \\begin{description}
-;       #1
-;    \\end{description}
-; }
-; %  Format the examples section.
-; \\newcommand{\\sstexamples}[1]{
-;    \\item[Examples:] \\mbox{} \\\\
-;    \\vspace{-3.5ex}
-;    \\begin{description}
-;       #1
-;    \\end{description}
-; }
-; %  Define the format of a subsection in a normal section.
-; \\newcommand{\\sstsubsection}[1]{ \\item[{#1}] \\mbox{} \\\\}
-; %  Define the format of a subsection in the examples section.
-; \\newcommand{\\sstexamplesubsection}[2]{\\sloppy
-; \\item[\\parbox{\\sstexampleslength}{\\ssttt #1}] \\mbox{} \\\\ #2 }
-; %  Format the notes section.
-; \\newcommand{\\sstnotes}[1]{\\item[Notes:] \\mbox{} \\\\[1.3ex] #1}
-; %  Provide a general-purpose format for additional (DIY) sections.
-; \\newcommand{\\sstdiytopic}[2]{\\item[{\\hspace{-0.35em}#1\\hspace{-0.35em}:}] \\mbox{} \\\\[1.3ex] #2}
-; %  Format the implementation status section.
-; \\newcommand{\\sstimplementationstatus}[1]{
-;    \\item[{Implementation Status:}] \\mbox{} \\\\[1.3ex] #1}
-; %  Format the bugs section.
-; \\newcommand{\\sstbugs}[1]{\\item[Bugs:] #1}
-; %  Format a list of items while in paragraph mode.
-; \\newcommand{\\sstitemlist}[1]{
-;   \\mbox{} \\\\
-;   \\vspace{-3.5ex}
-;   \\begin{itemize}
-;      #1
-;   \\end{itemize}
-; }
-; %  Define the format of an item.
-; \\newcommand{\\sstitem}{\\item}
-; %  End of sst.tex layout definitions.
-; % .
-; % @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
-; ")
 
+<!-- If there turn out to be nasty spacing problems to do with
+     paragraphs and blank lines, they might be solvable by removing
+     the TeX feature that interprets a blank line as a \par.  We can
+     do this with `\\catcode`\\^^M=10'. -->
 (define %latex-end-preamble%
-  "%\\catcode`\\^^M=10 % make end-of-line a space
-\\makeatother
+  "\\makeatother
 ")
 
 <routine>
