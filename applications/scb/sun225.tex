@@ -330,7 +330,8 @@ the Starlink tree in more or less the usual way.
 However, there are some environment variables which affect the
 installation, determining for instance the location of the 
 indices, the Perl binary and temporary directories.  
-All default to sensible values, but the comments in the
+All default to sensible values, and the most important ones
+are described below, but the comments in the
 {\tt mk} script should be read and modifications made,
 or environment variables set, accordingly.
 
@@ -341,7 +342,7 @@ If the environment variables are set when the programs are being
 run however, this value overrides the defaults set at build time.
 These variables are:
 \begin{description}
-\item[SCB_SOURCES]
+\item[SCB\_SOURCES]
 The directory containing the Starlink source code.  
 This directory must contain nothing but Starlink source packages,
 each of which must be {\em either\/} in a directory named after the package
@@ -350,20 +351,20 @@ using {\tt compress} or {\tt gzip} (and named with a suffix .Z or .gz
 respectively).
 The former of these is the usual format if the sources are in
 their usual location, {\tt /star/sources}.
-If undefined at build time and run time, SCB_SOURCES 
+If undefined at build time and run time, SCB\_SOURCES 
 defaults to {\tt /star/sources}.
-\item[SCB_INDEX]
+\item[SCB\_INDEX]
 The directory containing the index files (around 5\,Mbyte for the full
 Starlink source collection).
-If undefined at run time and build time, SCB_INDEX defaults to
+If undefined at run time and build time, SCB\_INDEX defaults to
 {\tt /star/etc/scb}.
-\item[SCB_BROWSER_TMP]
+\item[SCB\_BROWSER\_TMP]
 The directory used by the browser program to store temporary files. 
-If undefined at run time and build time, SCB_BROWSER_TMP defaults to
+If undefined at run time and build time, SCB\_BROWSER\_TMP defaults to
 {\tt /usr/tmp/scb}.
-\item[SCB_INDEXER_TMP]
+\item[SCB\_INDEXER\_TMP]
 The directory used by the indexer program to store temporary files. 
-If undefined at run time and build time, SCB_INDEXER_TMP defaults to
+If undefined at run time and build time, SCB\_INDEXER\_TMP defaults to
 {\tt /usr/tmp/scb}.
 \end{description}
 
@@ -386,35 +387,130 @@ An example site installation might go as follows:
 \end{quote}
 
 
-\subsection{Generating the index}
+\subsection{\label{sec:install-cgi}Installing the CGI script}
+
+The installation program, as well as installing some of the 
+binaries into \$INSTALL{\tt /bin}, also installs the browser
+program {\tt scb.pl} itself into \$INSTALL/{\tt bin/cgi}.
+
+In order to use this package to browse source code using a
+World Wide Web browser, the browser script itself {\tt scb.pl}
+must be installed as a CGI (Common Gateway Interface) program
+on a computer running an HTTP server.  
+For this purpose, the browser script is copied by the package
+installation process (the {\tt mk install} step) 
+into \$INSTALL{\tt /bin/cgi} as well as in \$INSTALL{\tt /bin}.
+
+A full discussion of the setup of CGI programs is
+beyond the scope of this document, but by way of example, 
+if the HTTP server being used is Apache, it will typically 
+be necessary to
+add a stanza like the following to Apache's {\tt conf/access.conf} file:
+\begin{quote}
+\begin{verbatim}
+<Directory /star/bin/cgi>
+Options ExecCGI
+</Directory>
+\end{verbatim}
+\end{quote}
+and a line like the following to the {\tt conf/srm.conf} file:
+\begin{quote}
+\begin{verbatim}
+ScriptAlias /star/cgi-bin/ /star/bin/cgi/
+\end{verbatim}
+\end{quote}
+Setting up the CGI program can usually only 
+be done by the system manager.
+
+Every attempt has been made to make the CGI script secure against
+abuse by users of the browsing facility, but anybody setting it 
+up on their machines should be aware
+that provision of any CGI program is risky for the server involved.
+It should also be noted that the browser 
+program can use significant system resources which might 
+make it possible for users of the service intentionally or 
+unintentionally to degrade performance of the server.
+In particular, heavy use may be made of the following resources:
+\begin{itemize}
+\item {\bf CPU time}: 
+Parsing source files to add the HTML tags is done on the fly by 
+the browser program, and while for most of the source files this 
+is quite fast, for some of the very large files it can 
+take a matter of seconds or even minutes.
+\item {\bf Memory}:
+Again the parsing can take a significant amount of memory when the
+file to be parsed is very large.
+\item {\bf Temporary disk space}:
+Temporary files will created in the SCB\_BROWSER\_TMP directory
+if it is necessary to unpack tar archives.  The problem is most acute
+when tar files are contained in other tar files (usually only the
+case if the source archives are stored as tar files themselves,
+rather than unpacked as is more usual).  
+If all the tar files within the source archive are unpacked in place,
+for instance using a sequence like 
+\begin{quote}
+\begin{verbatim}
+setenv SCB_SOURCES /star/sources
+foreach tarfile (`find $SCB_SOURCES -name \*.tar -print`)
+   cd $tarfile:h
+   tar xf $tarfile:t
+end
+\end{verbatim}
+\end{quote}
+then no temporary disk space will be used, and much reduced disk
+activity will be required by the browser program.
+The disadvantage of doing this is increased use of disk space
+in the SCB\_SOURCES directory 
+(by around 220MB for the full unbuilt USSC), 
+and also slower running of the
+indexer program (since it checks all files outside of the tar files
+as well as all files inside them).
+\end{itemize}
+
+
+
+
+
+\subsection{\label{sec:indexing} Generating the index}
 
 In order for the browser to work, indexes of the source files must be
 generated.  This is done by the script {\tt scbindex.pl}, installed
 by default in {\tt /star/bin}.
+The following subsections explain how to use this command to
+build an index.  In most cases, only an index of the whole Starlink
+collection will be required, but people modifying or developing
+their own copies of packages may wish to generate a personalised index.
+
+
+\subsubsection{Indexing the whole Starlink collection}
 
 To index the whole of the source collection, simply invoke the 
 indexer program as follows:
+\begin{quote}
 \begin{verbatim}
 % scbindex.pl
 \end{verbatim}
+\end{quote}
 This will 
-read the source files from the directory specified in SCB_SOURCES, 
-write the index files to the directory specified in SCB_INDEX,
+read the source files from the directory specified in SCB\_SOURCES, 
+write the index files to the directory specified in SCB\_INDEX,
 and print to the screen each index entry as it is encountered.
 If the entire Starlink source code collection is installed, 
 this will take a matter of hours.  Some indication of how far the indexing
 has progressed can be seen by looking at the package currently
-being indexed (the name is given before the `#' sign on the 
+being indexed (the name is given before the `\#' sign on the 
 printed lines, e.g. lines which look like
+\begin{quote}
 \begin{verbatim}
 cmp_activ.f          =>  hds#hds_source.tar>cmp_activ.f
 cmp_blk.f            =>  hds#hds_source.tar>cmp_blk.f
 cmp_cct              =>  hds#hds_source.tar>cmp_cct
 \end{verbatim}
+\end{quote}
 indicate that the HDS package is being indexed).
 The packages are dealt with in alphabetical order, so by seeing how 
 far the package currently being examined is through the list of files
-in the directory SCB_SOURCES you can get a rough idea of how much remains
+in the directory SCB\_SOURCES you can get a rough idea of how much remains
 to be done.
 
 If only one or a few packages have been changed
@@ -422,35 +518,291 @@ since the last indexing,
 then the index can be updated rather than being regenerated from scratch.
 In this case only the changed packages are named on the command line,
 e.g.
+\begin{quote}
 \begin{verbatim}
 % scbindex.pl ast polpack ndf
 \end{verbatim}
-The packages so named will be taken from the SCB_SOURCES directory in
+\end{quote}
+The packages so named will be taken from the SCB\_SOURCES directory in
 the same way as if the whole source tree is being indexed.
-However it is possible to index source code from elsewhere than the
-main Starlink source tree, by giving the full pathname of the directory
-or tarfile containing the source.
 
-don't forget:  oh, i forgot.
-
-
-Since the indexing can take a long time, it may be preferable to 
+Since the indexing can take a long time, it will probably be preferable to 
 run it in the background, possibly {\tt renice}d, with the output
 redirected elsewhere, e.g.:
+\begin{quote}
 \begin{verbatim}
 % nice +4 scbindex.pl >& scbindex.log &
 \end{verbatim}
+\end{quote}
+If the machine will be used by other people while the indexing 
+is running, then you should seek advice from your system manager 
+about the nice level that ought to be used.
 
 Occasionally some non-fatal error messages will be generated in the 
 course of the indexing, for instance:
+\begin{quote}
 \begin{verbatim}
 Use of uninitialized value at FortranTag.pm line 456, <SOURCE> chunk 42.
 \end{verbatim}
+\end{quote}
 These indicate that an error has occurred during the indexing process,
 but unless they appear very many times can be safely ignored.
 If the program stops with an error however, it should be investigated.
 The error message in this case should give an indication of what has
 gone wrong and how to fix it.
+
+
+\subsubsection{Creating a personalised index}
+
+As well as examining all the source files from their natural home
+in the main Starlink source tree (the SCB\_SOURCES directory),
+it is also possible to index source code from elsewhere, 
+by giving the pathname of the directory
+or tarfile containing the source.
+In this way a personalised index can be created: 
+suppose you have a personal source copy (under development say) of 
+Figaro, you can execute the following sequence:
+\begin{quote}
+\begin{verbatim}
+% setenv SCB_SOURCES /star/sources
+% setenv SCB_INDEX ~/star/etc/scb
+% scbindex.pl
+% scbindex.pl ~/star/sources/figaro
+\end{verbatim}
+\end{quote}
+--- the first invocation of {\tt scbindex.pl} 
+creates an index of the main body
+of Starlink source code, and the second one
+replaces the entries relating to the Figaro package 
+with those in your personal copy.
+If the modified sources are instead in a compressed tar file in the current
+directory, the last line above could be replaced by
+\begin{quote}
+\begin{verbatim}
+% scbindex.pl ./figaro.tar.Z
+\end{verbatim}
+\end{quote}
+Note that for this usage of {\tt scbindex.pl} at least one '/' character
+must appear in the package name, otherwise it will be interpreted
+as a reference to the copy of the package in the SCB\_SOURCES directory.
+The personalised index files will be written in the SCB\_INDEX directory.
+
+
+\section{Viewing the source code}
+
+This section explains how to use the extractor program, {\tt scb.pl},
+to view source code from the Starlink source tree,
+assuming that an index has been built as explained in 
+section \ref{sec:indexing}.
+The browser system tries to come up with the requested section of
+source code, but for one reason and another sometimes fails to 
+do so.  
+For more insight into why it behaves as it does, and 
+how it might be coaxed into behaving otherwise, 
+section \ref{sec:internals} gives some explanation of how the
+indexing and extraction is done.
+
+
+\subsection{Command line operation}
+
+However the package has been installed, it should be 
+possible to use the extractor program, {\tt scb.pl},
+to view the source code from the Unix shell.
+
+\subsubsection{Basic use}
+
+At its simplest, this is simply done by giving the 
+requested filename or routine as an argument to the extractor:
+\begin{quote}
+\begin{verbatim}
+% scb.pl dsa_data_size
+\end{verbatim}
+\end{quote}
+finds the file which contains the routine `{\tt dsa\_data\_size}'
+and prints it to standard output.  It also
+prints to standard error the location of this file.
+The file can therefore be viewed using {\tt more}, or printed,
+or saved to a local file, or searched with {\tt grep}, or
+generally used in the usual Unix ways.
+For instance to save it to a local file {\tt file.f}:
+\begin{quote}
+\begin{verbatim}
+% scb.pl dsa_data_size >file.f
+figaro#figaro_dsa.tar>dsa/dsa_dat_sz.f
+\end{verbatim}
+\end{quote}
+the second line here is the line printed to standard error 
+by the program indicating the file in which the routine was found;
+it means that the file is part of the package FIGARO,
+is contained in the tar archive {\tt figaro\_dsa.tar}, and
+within that archive is called {\tt dsa/dsa\_dat\_sz.f}.
+Files can be extracted by their filename instead,
+so that
+\begin{quote}
+\begin{verbatim}
+% scb.pl dsa_dat_sz.f >file.f
+figaro#figaro_dsa.tar>dsa/dsa_dat_sz.f
+\end{verbatim}
+\end{quote}
+has exactly the same effect as the former example.
+
+Routine names are indexed by the names the Unix linker gives them.
+For C functions, this means the name of the function as in the 
+source code should be used.
+For Fortran functions and subroutines however, the indexed name is 
+formed by appending an underscore to the lower case name of the 
+routine.  
+If the underscore is omitted however, and no routine by that name
+can be found the extractor program will look for a routine with
+the underscore appended.
+
+
+\subsubsection{{\tt package} argument}
+
+If the extractor can find a Fortran subroutine or function, 
+or a C function or macro definition with the name supplied on
+the command line, it will extract the relevant source file.
+However it is sometimes necessary to restrict the search
+further, since there may be more than one source file answering
+to that description.  So it is also possible to specify the
+package in which you expect to find the file or routine. 
+For instance, there is a routine called `{\tt help.f}' in
+package HLP and another in POLMAP.  
+To ensure that you get the one in HLP, specify it on the 
+command line using the `{\tt package=}' argument:
+\begin{quote}
+\begin{verbatim}
+% scb.pl help.f package=hlp
+\end{verbatim}
+\end{quote}
+Note that the package argument only serves as a hint to the
+extractor program: if the requested file/routine occurs in the
+specified package, then that one is retrieved.  If it does not,
+but it does exist in another package, then that one is retrieved.
+Thus
+\begin{quote}
+\begin{verbatim}
+% scb.pl help.f package=ccdpack
+\end{verbatim}
+\end{quote}
+and 
+\begin{quote}
+\begin{verbatim}
+% scb.pl help.f
+\end{verbatim}
+\end{quote}
+will give the same result, which is one or other of the {\tt help.f}
+files from either POLMAP or HLP (picked more or less at random).
+
+The `{\tt package=}' part may be omitted, so that 
+`{\tt scb.pl help.f hlp}'
+is equivalent to 
+`{\tt scb.pl help.f package=hlp}'.
+
+
+\subsubsection{{\tt type} argument, and pattern matching}
+
+Finally, it is possible to specify whether the requested search
+term is a routine/function or a file, by specifying `{\tt type=func}'
+or `{\tt type=file}' respectively on the command line.  This is not
+normally necessary, since the names of functions rarely clash with
+the names of routines.
+
+A third possibility is `{\tt type=regex}', in which case the 
+search term is interpreted as a case-insensitive 
+Perl regular expression, and
+all functions and all files are searched for matches.
+All the matching terms, along with file locations, are then printed out
+(first files, then routines).
+In this case no source file is extracted.
+The same format of regular expression as used by the Unix {\tt grep}
+utility can be used 
+(although the many additional pattern matching facilities
+offered by Perl are also allowed).
+Thus to find, for instance, the locations of 
+all the files and routines whose names contain `fit' followed
+by `gauss', the following command can be used:
+\begin{quote}
+\begin{verbatim}
+% scb.pl 'fit.*gauss' type=regex
+
+Files:
+ech_fit_gaussian.f       => echomop#echomop_source.tar>ech_fit_gaussian.f
+fitgauss.f               => figaro#figaro_appca.tar>appca/fitgauss.f
+fitgauss.ifl             => figaro#figaro_source.tar>fitgauss.ifl
+sculib_fit_2d_gaussian.f => surf#surf_sculib.tar>sculib_fit_2d_gaussian.f
+fit_mgauss.f             => twodspec#twodspec_opt.tar>opt/fit_mgauss.f
+
+Routines:
+ech_fit_gaussian_        => echomop#echomop_source.tar>ech_fit_gaussian.f
+fitgauss_                => figaro#figaro_appca.tar>appca/fitgauss.f
+sculib_fit_2d_gaussian_  => surf#surf_sculib.tar>sculib_fit_2d_gaussian.f
+fit_mgauss_              => twodspec#twodspec_opt.tar>opt/fit_mgauss.f
+\end{verbatim}
+\end{quote}
+
+
+\subsubsection{Producing HTML from the command line}
+
+If the `{\tt -html}' flag is included on the command line, 
+then HTML is written, in the same way as if the extractor were
+being invoked as a CGI script.  This is not particularly useful.
+
+
+\subsection{Browsing using HTML}
+
+If the extractor program {\tt scb.pl} has been installed
+as a CGI program as described in section \ref{sec:install-cgi}
+then the Starlink source code can be viewed as a set of 
+hypertext pages hyperlinked together 
+where there are function or subroutine calls or include files.
+It should be fairly intuitive how to use the pages generated,
+so the following discussion does not give exact instructions
+but clears up a few points.
+The best way to see how it works is to play around with it.
+
+The URL of the source code browser will depend on exactly how
+the installation has been performed, but it will look something
+like {\tt http://host.domain/cgi-bin/star/scb.pl}.
+By pointing your web browser to the right address, you should
+see a form with the following parts:
+\begin{itemize}
+\item {\bf Name of item}:
+The name of the file or function/subroutine to locate.
+\item {\bf Type of item}:
+How to interpret the ``Name of item'' box.  Select one of:
+\begin{itemize}
+   \item {\bf Routine}:
+   The item is a Fortran or C function or subroutine.
+   This is case sensitive.
+   For C use the name of the function exactly as it occurs in the source code.
+   For Fortran, use the routine's name in lower case with an 
+   underscore appended;
+   However, if the underscore is omitted the browser will still probably 
+   find the right routine.
+   \item {\bf File}:
+   The item is a filename.  This is case sensitive.
+   \item {\bf Either}:
+   The browser will look for either a routine or a file which matches
+   the item name given.
+   \item {\bf Search term}:
+   The item name is a Perl 5 regular expression, interpreted case-insensitively;
+   The browser will present a list of all the routines or filenames 
+   which match it.
+   For most practical purposes, Perl regular expressions are a superset
+   of ordinary regular expressions, so the can be treated like the 
+   argument of a `{\tt grep -i}' command.
+\end{itemize}
+\item {\bf Name of package (optional)}:
+If one of the listed packages is selected, it serves
+as a hint about where the file or routine being searched for might be.
+It is used as follows: if a file or routine of the given name is found
+in the package specified, then that one will be presented.
+If it is not in that package, or if no package is specified, 
+then any such item in the whole source tree will be presented.
+In particular, this means that even when one package is specified here,
+a routine from another package may be presented.
+\end{itemize}
 
 
 
