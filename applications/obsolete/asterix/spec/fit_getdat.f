@@ -52,7 +52,7 @@
 *     {routine_side_effects}...
 
 *  Algorithm:
-*     The locator ILOC may point to either a single dataset, or an object
+*     The identifier ID may refer to either a single dataset, or an object
 *     containing a collection of references, for input of multiple datasets.
 *     Data quality is taken into account if present, so that bad data are
 *     given zero weight. Good data take a weight equal to their inverse
@@ -251,8 +251,8 @@
       END IF
 
 * Find datasets - get locators
-	CALL DAT_TYPE(ILOC,TYPE,STATUS)
-	IF(TYPE.NE.'REF_FILE')THEN
+      CALL DAT_TYPE(ILOC,TYPE,STATUS)
+      IF ( TYPE .NE. 'REF_FILE' ) THEN
 
 *    Single input dataset container (directly referenced)
 	  REF=.FALSE.
@@ -729,7 +729,7 @@ D	    print *,'ldim,udim :',ldim,udim
  99   IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Input is not a set?
-        IF ( OBDAT(1).SETINDEX .EQ. 0 ) THEN
+        IF ( (OBDAT(1).SETINDEX .EQ. 0) .AND. .NOT. REF ) THEN
           CALL ADI_CLONE( ID, OBDAT(1).D_ID, STATUS )
         ELSE
           DO I = 1, NDS
