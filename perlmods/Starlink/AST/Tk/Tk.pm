@@ -359,7 +359,9 @@ use Starlink::AST::Tk;
 
 sub tk {
   my $self = shift;
+  my $canvas = shift;
   
+  $self->GExternal( $canvus );
   $self->GFlush(\&Starlink::AST::Tk::_GFlush);  
   $self->GLine(\&Starlink::AST::Tk::_GLine);
   $self->GMark(\&Starlink::AST::Tk::_GMark);
