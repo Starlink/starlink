@@ -730,7 +730,7 @@ check:
 	@ echo
 	@ nosource='';\
           for f in $(SOURCE_FILES); do \
-             if test ! -f $$f; then \
+             if test ! -r $$f; then \
                 nosource='1';\
                 break;\
              else :; fi;\
