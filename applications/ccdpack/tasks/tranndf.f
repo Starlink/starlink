@@ -284,6 +284,8 @@
 *        a user error or misconception.
 *     9-SEP-2002 (MBT):
 *        Now retains a copy of the old PIXEL frame as CCD_OLDPIXEL.
+*     11-FEB-2003 (MBT):
+*        Fixed a flux-conservation bug which occurred with flipped frames.
 *     {enter_further_changes_here}
 
 *  Bugs:
