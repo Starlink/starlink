@@ -23,9 +23,6 @@
  *    local machine, and to convert between different data types on the local
  *    machine.
  *
- *    The generic file gsd2_unknown.h is intended for editing the platform-
- *    dependent files. It is prepared for alpha_OSF1, sun4_Solaris, sun4, and
- *    VAX. Also, for ix86_Linux.
 
  * Implementation Status:
  *    The sun4 and vax cases are untested.
@@ -40,10 +37,12 @@
  *       Original version.
  *    15 Dec 1999 (timj):
  *       Add Linux
+ *    10 Mar 2004 (timj):
+ *       Switch to configure based checking
 
  * Copyright:
- *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
- *    All Rights Reserved.
+ *    Copyright (C) 1994-1999,2004 Particle Physics and Astronomy Research 
+ *    Council. All Rights Reserved.
 
  *-
  */
@@ -112,16 +111,6 @@
 static const int host_order[GSD_NTYPES] =
  { GSD_INTEND, GSD_INTEND, GSD_INTEND, GSD_INTEND, GSD_FLOAT, GSD_FLOAT, 0 };
 
-/* These are the old way of doing things */
-/* sun4_Solaris.
- * sun4.
- { BIGEND, BIGEND, BIGEND, BIGEND, IEEE, IEEE, 0 }; */
-/* alpha_OSF1.
-   ix86_Linux
-   { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, IEEEBS, IEEEBS, 0 }; */
-/* vax.
-   { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, VAXF, VAXF, 0 }; */
-
 
 /* Set the VAX/GSD bad value patterns. Note these are different from
  * VAX/PRIMDAT patterns and different from IEEE/PRIMDAT patterns. Since this
@@ -162,52 +151,20 @@ static const union { unsigned char c[2]; short w; }
    val1__badw = { 0x00, 0x80 };
 static const union { unsigned char c[4]; int i; }
    val1__badi = { 0x00, 0x00, 0x00, 0x80 };
-static const union { unsigned char c[4]; float r; }
-   val1__badr = { 0xFF, 0xFF, 0x7F, 0xFF };
-static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF };
-#endif
-
-
-/* sun4_Solaris.
- * sun4.
-static const union { unsigned char c[1]; char b; }
-   val1__badb = { 0x80 };
-static const union { unsigned char c[2]; short w; }
-   val1__badw = { 0x80, 0x00 };
-static const union { unsigned char c[4]; int i; }
-   val1__badi = { 0x80, 0x00, 0x00, 0x00 };
-static const union { unsigned char c[4]; float r; }
-   val1__badr = { 0xFF, 0x7F, 0xFF, 0xFF };
-static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; 
-*/
-
-/* alpha_OSF1.
- * ix86_Linux 
-static const union { unsigned char c[1]; char b; }
-   val1__badb = { 0x80 };
-static const union { unsigned char c[2]; short w; }
-   val1__badw = { 0x00, 0x80 };
-static const union { unsigned char c[4]; int i; }
-   val1__badi = { 0x00, 0x00, 0x00, 0x80 };
-static const union { unsigned char c[4]; float r; }
-   val1__badr = { 0xFF, 0xFF, 0x7F, 0xFF };
-static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF };
-*/
-
-/* vax.
-static const union { unsigned char c[1]; char b; }
-   val1__badb = { 0x80 };
-static const union { unsigned char c[2]; short w; }
-   val1__badw = { 0x00, 0x80 };
-static const union { unsigned char c[4]; int i; }
-   val1__badi = { 0x00, 0x00, 0x00, 0x80 };
+# if GSD_FLOAT == VAXF
 static const union { unsigned char c[4]; float r; }
    val1__badr = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const union { unsigned char c[8]; double d; }
-   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; */
+   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+# else
+static const union { unsigned char c[4]; float r; }
+   val1__badr = { 0xFF, 0xFF, 0x7F, 0xFF };
+static const union { unsigned char c[8]; double d; }
+   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF };
+# endif
+#endif
+
+/* Now actually set up the shorthand macros */
 
 #define val__badb val1__badb.c
 #define VAL__BADB val1__badb.b
