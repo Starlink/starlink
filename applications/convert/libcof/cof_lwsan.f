@@ -78,11 +78,16 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 April 30 (MJC):
 *        Original version.
+*     2000 Sept 12 (AJC):
+*        Make NAXES a genuine array (was 2) in call FTGSVJ
+*         prevents crash on Alphas with CFITSIO
+*        Use CNF_PVAL for safety
 *     {enter_changes_here}
 
 *  Bugs:
@@ -98,6 +103,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! CNF_PVAL
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -159,6 +165,7 @@
                                  ! column
       INTEGER MINPOS             ! Index of the minimum value of a
                                  ! column
+      INTEGER NAXES(1)           ! Size of each dimension
       INTEGER NCF                ! Number of characters in filename
       INTEGER NFIELD             ! Number of fields in table
       INTEGER NINVAL             ! Number of bad values in a column
@@ -187,7 +194,6 @@
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to the LWSAN extension
       INTEGER XPNTR              ! Pointer to column of x indices
       INTEGER YPNTR              ! Pointer to column of x indices
-
 *.
 
 *  Check the inherited global status.
@@ -253,9 +259,11 @@
 *  main header, so must be counted.
 *
 *  Obtain workspace for the three columns.
+
       CALL PSX_CALLOC( NOBS, '_INTEGER', XPNTR, STATUS )
       CALL PSX_CALLOC( NOBS, '_INTEGER', YPNTR, STATUS )
       CALL PSX_CALLOC( NOBS, '_INTEGER', SPNTR, STATUS )
+
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Find the column number of the raster-point identification.
@@ -273,8 +281,8 @@
 
       INCS( 1 ) = 1
       INCS( 2 ) = 1
-      CALL FTGSVJ( FUNIT, COLNUM, 1, 2, FPIXEL, LPIXEL, INCS,
-     :             VAL__BADI, %VAL( XPNTR ), BAD, FSTAT )
+      CALL FTGSVJ( FUNIT, COLNUM, 1, NAXES(1), FPIXEL, LPIXEL, INCS,
+     :             VAL__BADI, %VAL( CNF_PVAL(XPNTR) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
@@ -284,15 +292,16 @@
       END IF
 
 *  Find the range of the x indices.
-      CALL COF_MXMNI( BAD, NOBS, %VAL( XPNTR ), NINVAL, UBND( 1 ),
-     :                LBND( 1 ), MAXPOS, MINPOS, STATUS )
+      CALL COF_MXMNI( BAD, NOBS, %VAL( CNF_PVAL(XPNTR ) ), NINVAL,
+     :                UBND( 1 ), LBND( 1 ), MAXPOS, MINPOS, STATUS )
 
 *  Obtain the y indices from this column.  There are 2 elements in each
 *  vector.
+      NAXES(1) = 2
       FPIXEL( 1 ) = 2
       LPIXEL( 1 ) = FPIXEL( 1 )
-      CALL FTGSVJ( FUNIT, COLNUM, 1, 2, FPIXEL, LPIXEL, INCS,
-     :             VAL__BADI, %VAL( YPNTR ), BAD, FSTAT )
+      CALL FTGSVJ( FUNIT, COLNUM, 1, NAXES(1), FPIXEL, LPIXEL, INCS,
+     :             VAL__BADI, %VAL( CNF_PVAL(YPNTR) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
@@ -302,8 +311,8 @@
       END IF
 
 *  Find the range of the y indices.
-      CALL COF_MXMNI( BAD, NOBS, %VAL( YPNTR ), NINVAL, UBND( 2 ),
-     :                LBND( 2 ), MAXPOS, MINPOS, STATUS )
+      CALL COF_MXMNI( BAD, NOBS, %VAL( CNF_PVAL(YPNTR) ), NINVAL,
+     :                UBND( 2 ), LBND( 2 ), MAXPOS, MINPOS, STATUS )
 
 *  Find the column number of the scan counter.
       CALL FTGCNO( FUNIT, .FALSE., 'LSANSCNT', COLNUM, FSTAT )
@@ -312,8 +321,8 @@
       USED( COLNUM ) = .TRUE.
 
 *  Obtain the scan count indices from this column.
-      CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADI, %VAL( SPNTR ),
-     :             BAD, FSTAT )
+      CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADI, 
+     :             %VAL( CNF_PVAL(SPNTR) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
@@ -323,8 +332,8 @@
       END IF
 
 *  Find the range of the scan counts.
-      CALL COF_MXMNI( BAD, NOBS, %VAL( SPNTR ), NINVAL, UBND( 4 ),
-     :                LBND( 4 ), MAXPOS, MINPOS, STATUS )
+      CALL COF_MXMNI( BAD, NOBS, %VAL( CNF_PVAL(SPNTR) ), NINVAL,
+     :                UBND( 4 ), LBND( 4 ), MAXPOS, MINPOS, STATUS )
 
 *  Temporarily set the bounds of the NDF.  This is need to enable the
 *  axis type along the third dimension to be set in the COF_ATYPC call.
@@ -351,8 +360,8 @@
       USED( COLNUM ) = .TRUE.
 
 *  Obtain the wavelengths from this column.
-      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, %VAL( WAPNTR ),
-     :             BAD, FSTAT )
+      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, 
+     :             %VAL( CNF_PVAL(WAPNTR) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
@@ -368,8 +377,8 @@
       USED( COLNUM ) = .TRUE.
 
 *  Obtain the wavelength errors from this column.
-      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, %VAL( WEPNTR ),
-     :             BAD, FSTAT )
+      CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR, 
+     :             %VAL( CNF_PVAL(WEPNTR) ), BAD, FSTAT )
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
@@ -392,9 +401,10 @@
       CALL PSX_CALLOC( NOBS, '_INTEGER', IPNTR, STATUS )
 
 *  Call the routine to count and store the unique wavelengths.
-      CALL COF_LWS1( NOBS, VAL__EPSR, %VAL( WAPNTR ), %VAL( WEPNTR ),
-     :               NWAVEL, %VAL( RWPNTR ), %VAL( REPNTR ),
-     :               %VAL( IPNTR ), STATUS )
+      CALL COF_LWS1( NOBS, VAL__EPSR, %VAL( CNF_PVAL(WAPNTR) ),
+     :               %VAL( CNF_PVAL(WEPNTR) ), NWAVEL, 
+     :               %VAL( CNF_PVAL(RWPNTR) ), %VAL( CNF_PVAL(REPNTR) ),
+     :               %VAL( CNF_PVAL(IPNTR) ), STATUS )
 
 *  By definition the lower bound of the spectral axis is 1.
       LBND( 3 ) = 1
@@ -410,8 +420,9 @@
       CALL PSX_CALLOC( NOBS, '_REAL', WIPNTR, STATUS )
 
 *  Convert the wavelengths into floating-point indices.
-      CALL CON_AXCOR( 1, NWAVEL, %VAL( RWPNTR ), NOBS, %VAL( WAPNTR ),
-     :                %VAL( WIPNTR ), STATUS )
+      CALL CON_AXCOR( 1, NWAVEL, %VAL( CNF_PVAL(RWPNTR) ), NOBS,
+     :                %VAL( CNF_PVAL(WAPNTR) ),
+     :                %VAL( CNF_PVAL(WIPNTR) ), STATUS )
 
 *  Free the resources used for the columns of wavelengths and their
 *  associated errors.
@@ -434,12 +445,12 @@
 *  Copy the wavelength values into the axis centres.  Call the
 *  appropriate routine for the chosen type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_MOVE( VAL__NBR * NWAVEL, %VAL( RWPNTR ),
-     :                  %VAL( APNTR( 1 ) ), STATUS )
+         CALL CON_MOVE( VAL__NBR * NWAVEL, %VAL( CNF_PVAL(RWPNTR) ),
+     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
       
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_MOVE( VAL__NBD * NWAVEL, %VAL( RWPNTR ),
-     :                  %VAL( APNTR( 1 ) ), STATUS )
+         CALL CON_MOVE( VAL__NBD * NWAVEL, %VAL( CNF_PVAL(RWPNTR) ),
+     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
       
       ELSE
          STATUS = SAI__ERROR
@@ -466,12 +477,12 @@
 *  Copy the wavelength error values into the axis errors.  Call the
 *  appropriate routine for the chosen type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_MOVE( VAL__NBR * NWAVEL, %VAL( REPNTR ),
-     :                  %VAL( APNTR( 1 ) ), STATUS )
+         CALL CON_MOVE( VAL__NBR * NWAVEL, %VAL( CNF_PVAL(REPNTR) ),
+     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
       
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_MOVE( VAL__NBD * NWAVEL, %VAL( REPNTR ),
-     :                  %VAL( APNTR( 1 ) ), STATUS )
+         CALL CON_MOVE( VAL__NBD * NWAVEL, %VAL( CNF_PVAL(REPNTR) ),
+     :                  %VAL( CNF_PVAL( APNTR(1) ) ), STATUS )
       
       END IF
 
@@ -541,11 +552,14 @@
 *  Form the weighted mean flux and errors, and the quality.
       CALL COF_LWS2( FUNIT, NDF, LBND( 1 ), UBND( 1 ), LBND( 2 ),
      :               UBND( 2 ), NWAVEL, LBND( 4 ), UBND( 4 ),
-     :               NOBS, NFIELD, %VAL( XPNTR ), %VAL( YPNTR ),
-     :               %VAL( WIPNTR ), %VAL( SPNTR ),
-     :               %VAL( PNTR( 1 ) ), %VAL( PNTR( 2 ) ),
-     :               %VAL( QPNTR( 1 ) ), USED, %VAL( FPNTR ),
-     :               %VAL( FEPNTR ), %VAL( DPNTR ), %VAL( SDPNTR ),
+     :               NOBS, NFIELD, %VAL( CNF_PVAL(XPNTR) ),
+     :               %VAL( CNF_PVAL(YPNTR) ),
+     :               %VAL( CNF_PVAL(WIPNTR) ), %VAL( CNF_PVAL(SPNTR) ),
+     :               %VAL( CNF_PVAL( PNTR(1) ) ),
+     :               %VAL( CNF_PVAL( PNTR(2) ) ), 
+     :               %VAL( CNF_PVAL( QPNTR(1) ) ), USED,
+     :               %VAL( CNF_PVAL(FPNTR) ), %VAL( CNF_PVAL(FEPNTR) ),
+     :               %VAL( CNF_PVAL(DPNTR) ), %VAL( CNF_PVAL(SDPNTR) ),
      :               STATUS )
 
 *  Free the workspace.
@@ -618,23 +632,23 @@
 *  for the chosen type.
                IF ( CTYPE .EQ. '_UBYTE' ) THEN
                   CALL FTGCVB( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADUB,
-     :                         %VAL( EXPNTR ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL(EXPNTR) ), BAD, FSTAT )
 
                ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                   CALL FTGCVI( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADW,
-     :                         %VAL( EXPNTR ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL(EXPNTR) ), BAD, FSTAT )
       
                ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADI,
-     :                         %VAL( EXPNTR ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL(EXPNTR) ), BAD, FSTAT )
       
                ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                   CALL FTGCVE( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADR,
-     :                         %VAL( EXPNTR ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL(EXPNTR) ), BAD, FSTAT )
       
                ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGCVD( FUNIT, COLNUM, 1, 1, NOBS, VAL__BADD,
-     :                         %VAL( EXPNTR ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL(EXPNTR) ), BAD, FSTAT )
       
                END IF
 

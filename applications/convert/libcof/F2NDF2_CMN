@@ -1,0 +1,19 @@
+*+
+*  Name:
+*     F2NDF2_CMN
+
+*  Purpose:
+*     Hold the pointer to the FITS primary header records save in memory
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE file
+
+      INTEGER NPHEAD         ! Number of primary header records
+      INTEGER H0_PTR         ! Pointer to array of header records
+      
+      COMMON /F2NDF2_CMN/ NPHEAD, H0_PTR
+*.
+

@@ -38,6 +38,8 @@
 *  History:
 *     1997 November 16 (MJC):
 *        Original version.
+*     18-DEC-1997 (DSB):
+*        Added statement to initialise FSTAT to FITSOK.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +83,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find the number of FITS headers.
+      FSTAT = FITSOK
       CALL FTGHSP( FUNIT, NCARD, KEYADD, FSTAT )
 
       IF ( FSTAT .NE. FITSOK ) THEN

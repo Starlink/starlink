@@ -1,5 +1,5 @@
       SUBROUTINE COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
-     :                      STATUS )
+     :                      ENCOD, NATIVE, STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN, STATUS )
+*     CALL COF_WHEAD( NDF, COMP, FUNIT, BITPIX, PROPEX, ORIGIN,
+*                     ENCOD, NATIVE, STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -19,13 +20,14 @@
 *     an NDF.  The IMAGE extension is written when the current header
 *     and data unit (CHDU) is not the first.
 
-*     There are two stages:
+*     There are three stages:
 *     a) Inquire of the NDF its shape, type, character components,
 *     and axis components; and write these to the header.
 *     b) Look for a FITS extension if requested to do so.  If one is
 *     present append the headers contained therein to the FITS header
-*     section, but not replacing any of the headers created in stage
-*     a).
+*     section, but not replacing any of the headers created in stage a).
+*     c) Creates keywords describing the NDF's WCS component. These
+*     over-write any keywords created in stages a) and b).
 
 *  Arguments:
 *     NDF = INTEGER (Given)
@@ -42,6 +44,13 @@
 *        the FITS extension is ignored.
 *     ORIGIN = CHARACTER * ( * ) (Given)
 *        The value of the ORIGIN card.
+*     ENCOD = CHARACTER * ( * ) (Given)
+*        The encoding to use. If this is blank, then a default encoding 
+*        is chosen based on the contents of the FITS extension. The
+*        supplied string should be a recognised AST encoding such as 'DSS', 
+*        'FITS-WCS', 'NATIVE', etc (or a blank string).
+*     NATIVE = LOGICAL (Given)
+*        Include a NATIVE encoding of the WCS info in the header?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -92,6 +101,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -109,10 +119,29 @@
 *        for axis units.
 *     1997 November 14 (MJC):
 *        Filtered LBOUNDn keywords.
+*     18-DEC-1997 (DSB):
+*        Propagation of NDF's WCS component added. The old code which
+*        generated keywords CRVALn, CRPIXn etc, has been retained for
+*        compatibility with old NDFs. Values generated from the WCS
+*        component over-write any created by the old code.
 *     1998 January 5 (MJC):
 *        Added ORIGIN argument.  Inherits airlock ORIGIN card if
 *        present unless ORIGIN argument is neither the default nor
 *        blank.
+*     1998 February 4 (MJC):
+*        Now issues a warning meesage if an invalid header is located.
+*        Substitutes space for null in headers.
+*     9-NOV-1998 (DSB):
+*        Replaced arguments NENCOD and ENCODS by NATIVE.
+*     22-JUN-1999 (DSB):
+*        Added ENCOD argument.
+*     11-APR-2000 (DSB):
+*        Updated description of ENCOD argument. 
+*     23-OCT-2000 (AJC):
+*        Ignore all after END (could be garbage)
+*     30-NOV-2000 (AJC):
+*        Correctly omit airlock ORIGIN card from output if ORIGIN argument
+*         is not default or blank.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,6 +157,7 @@
       INCLUDE 'DAT_PAR'          ! Data system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'MSG_PAR'          ! MSG_ constants
 
 *  Arguments Given:
       INTEGER   NDF              ! NDF identifier
@@ -136,12 +166,14 @@
       INTEGER   BITPIX           ! Bits per pixel
       LOGICAL   PROPEX           ! Propagate FITS extension, when true
       CHARACTER * ( * ) ORIGIN   ! The ORIGIN card value
+      CHARACTER * ( * ) ENCOD    ! The AST encoding to use for WCS info
+      LOGICAL   NATIVE           ! Include a NATIVE encoding of WCS info?
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER   FITSOK           ! Good status for FITSIO library
+      INTEGER FITSOK             ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
 
       INTEGER   NFLAGS           ! Number of flags to indicate
@@ -176,7 +208,7 @@
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       LOGICAL   FITSPR           ! True if FITS extension is present
-      CHARACTER FITSTR * ( SZFITS ) ! FITS string
+      CHARACTER FITSTR * ( SZFITS ) ! FITS header
       INTEGER   FSTAT            ! FITSIO status
       CHARACTER FTLOC * ( DAT__SZLOC ) ! Locator to NDF FITS extension
       CHARACTER FTLOCI * ( DAT__SZLOC ) ! Locator to element of NDF
@@ -190,6 +222,7 @@
       INTEGER   NCHAR            ! Length of a character string
       INTEGER   NCOMP            ! No. of components
       INTEGER   NDIM             ! Number of dimensions
+      CHARACTER NULL * ( 1 )     ! ASCII null character
       LOGICAL   PRORIG           ! True if to use supplied ORIGIN
                                  ! argument
       LOGICAL   ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the
@@ -206,6 +239,9 @@
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
       FSTAT = FITSOK
+
+*  Define the null character.
+      NULL = CHAR( 0 )
 
 *  Prepare the ORIGIN.
 *  ===================
@@ -243,8 +279,8 @@
 *      string.
 *    BLANK --- is created for integer data types from the bad value.
 *
-      CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, LORIGN, CMPFND,
-     :                STATUS )
+      CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, LORIGN, 
+     :                PROPEX, CMPFND, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Write classification and naming headers.
@@ -265,9 +301,9 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR3', 'FTPKYS',
-     :                    'Error writing an EXTNAME or HDUCLASn '/
-     :                    /'header card.', STATUS )
+         CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR1', 'FTPKYS',
+     :     'Error writing an EXTNAME or HDUCLASn header card.',
+     :     STATUS )
          GOTO 999
       END IF
 
@@ -311,6 +347,7 @@
          CALL DAT_SIZE( FTLOC, NCOMP, STATUS )
 
 *  Loop for each header in the NDF FITS extension.
+*  -----------------------------------------------
          DO I = 1, NCOMP
 
 *  Get a locator to successive elements in the FITS extension.
@@ -324,6 +361,8 @@
             KEYWRD = FITSTR( 1:SZKEY )
             VALUE = FITSTR( 11:SZFITS )
 
+*  Filter the keywords.
+*  --------------------
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
 *  NAXISn, and possibly LBOUNDn, CDELTn, CRVALn, CRPIXn, CRTYPEn,
 *  CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and END
@@ -355,11 +394,13 @@
 
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This tests for the ORIGIN card.
-            IF ( KEYWRD .EQ. 'ORIGIN' .AND. PRORIG ) THEN
+            IF ( KEYWRD .EQ. 'ORIGIN' ) THEN
+               IF ( PRORIG ) THEN
 
 *  Overwrite the ORIGIN card written by COF_WNDFH rather than making a
 *  second card.
-               CALL FTMCRD( FUNIT, 'ORIGIN', FITSTR, FSTAT )
+                  CALL FTMCRD( FUNIT, 'ORIGIN', FITSTR, FSTAT )
+               END IF
 
 *  Do the test whether to copy the FITS extension header into the output
 *  FITS file's header.
@@ -401,13 +442,70 @@
                   CALL FTPREC( FUNIT, FITSTR, FSTAT )
                END IF
 
-*  Just skip over non-valid cards.  Thus defective cards are not
-*  propagated.  There is no warning, but users should check their
-*  headers anyway, and we should aim to have header-validation
-*  software.
-               IF ( FSTAT .GT. FITSOK ) FSTAT = FITSOK
+*  Deal with problem headers.
+*  --------------------------
+*  A common cause for problems here are invalid (i.e. not text)
+*  characters, by far the most frequent being null for space.  This is
+*  FITSIO error number 207.
+               IF ( FSTAT .EQ. 207 ) THEN
+
+*  Flush the FITSIO error stack and set the FITSIO status to be good.
+                  CALL FTCMSG
+                  FSTAT = FITSOK
+
+*  Replace the nulls with spaces.  One could substitute more at the
+*  cost of efficiency.  This seems a good compromise.
+                  CALL CHR_TRCHR( NULL, ' ', FITSTR, STATUS )
+
+*  Make a second attempt to write the header card.
+                  CALL FTPREC( FUNIT, FITSTR, FSTAT )
+
+*  If that's cured the problem, continue to inform the user of the
+*  errorneous header to encourage correction at the source, e.g. an
+*  observatory. 
+                  IF ( FSTAT .EQ. FITSOK ) THEN
+
+*  Issue a warning message.
+                     CALL MSG_OUTIF( MSG__NORM, 'COF_WHEAD_WAR1',
+     :                 'Warning: NDF''s FITS airlock header contained '/
+     :                 /'at least one invalid null character.  Each '/
+     :                 /'null was replaced with a space before '/
+     :                 /'propagation to the FITS file.  Header was:',
+     :                 STATUS )
+                     CALL MSG_OUTIF( MSG__NORM, 'COF_WHEAD_WAR2',
+     :                 FITSTR, STATUS )
+                     CALL MSG_OUTIF( MSG__NORM, 'COF_WHEAD_WAR3',
+     :                 ' ', STATUS )
+                  END IF
+
+*  If that didn't cure the problem, the FITSIO error stack will contain
+*  messages, and we can continue as if there was no attempt to
+*  substitute the null characters.
+               END IF
+
+*  Skip over non-valid cards.  Thus defective cards are not propagated.
+*  However, issue a warning message and flush the FITSIO error stack.
+*  We should aim to have header-validation software.
+               IF ( FSTAT .GT. FITSOK ) THEN
+                  CALL ERR_MARK
+                  CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR3', 'FTPREC',
+     :              'Warning: error unable to propagate a header from '/
+     :              /'NDF''s FITS airlock.', STATUS )
+
+*  The error is not fatal so reset the FIO status to OK.
+                  FSTAT = FITSOK
+                  CALL ERR_FLUSH( STATUS )
+                  CALL ERR_RLSE
+               END IF
+
+*  End loop if END header
+            ELSE IF ( KEYWRD .EQ. 'END' ) THEN
+               GO TO 100
+
             END IF
          END DO
+
+  100    CONTINUE
 
 *  Deal with rotated axes.
 *  =======================
@@ -455,6 +553,10 @@
             END IF
          END DO      
       END IF
+
+*  Write out the NDF WCS information.
+*  ==================================
+      CALL COF_FPWCS( FUNIT, NDF, ENCOD, NATIVE, STATUS )
 
   999 CONTINUE
 

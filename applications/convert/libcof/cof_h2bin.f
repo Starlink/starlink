@@ -53,6 +53,8 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,6 +65,12 @@
 *        keywords.
 *     1997 November 15 (MJC):
 *        Extended to convert primitive objects too.
+*     1-2-1999 (DSB):
+*        Corrected string length arguments used in calls which pass a
+*        character array using %VAL. 
+*     12-MAR-2002 (AJC):
+*        Correct CRDNM for TDIMn card error message.
+*        Add string length to dimensions in TDIMn cards for _CHAR arrays
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,7 +123,8 @@
       INTEGER CPOS               ! Character position
       CHARACTER * ( 8 ) CRDNAM   ! Header-card name to insert TNULLn
       CHARACTER * ( MXSLEN ) CVALUE ! Character component value
-      INTEGER DIMS( DAT__MXDIM ) ! Component and structure dimensions
+      INTEGER DIMS( DAT__MXDIM + 1) ! Component and structure dimensions
+                                    ! +1 allows for string length for_CHAR array
       DOUBLE PRECISION DVALUE    ! D.p. component value
       INTEGER EL                 ! Number of array elements
       CHARACTER * ( FITSCH ) EXTNAM  ! Name of the component
@@ -291,7 +300,7 @@
             END IF
 
 *  Insert the TNULL1 card.
-            CALL FTIKYJ( FUNIT, CRDNAM, INULL,
+            CALL FTIKYJ( FUNIT, 'TNULL1', INULL,
      :                   'Starlink bad value', FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
@@ -309,6 +318,17 @@
 
 *  This is only necessary when the object is multi-dimensional.  
          IF ( NDIM .GT. 1 ) THEN
+         
+*  If the type is _CHAR*n, we must adjust the dimensions to make the first 
+*  equal the number of characters per element - as required by the rAw
+*  convention for TFORM.
+            IF ( TYPE(1:6) .EQ. '_CHAR*' ) THEN
+               DO I = NDIM, 1, -1
+                  DIMS(I+1) = DIMS(I)
+               END DO
+               NDIM = NDIM + 1
+               CALL CHR_CTOI( TYPE(7:), DIMS(1), STATUS )
+            END IF
 
 *  FITSIO does not permit cards to be placed after a named card; 
 *  it requires that we read that named card first.
@@ -512,13 +532,13 @@
 *  a blank string.  Copy this blank string to the binary table.
                     CALL ERR_ANNUL( STATUS )
                     CVALUE = ' '
-                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE, STRLEN,
+                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, CVALUE, 
      :                           FSTAT )
                  ELSE
 
 *  Copy the mapped value to the binary table.
                     CALL FTPCLS( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
-     :                           STRLEN, FSTAT )
+     :                           FSTAT, %VAL( STRLEN ) )
                  END IF
 
 *  Release the new error context.
@@ -713,11 +733,11 @@
                   CVALUE = ' '
                   DO LEL = 1, EL
                      CALL FTPCLS( FUNIT, 1, 1, LEL, 1,
-     :                            CVALUE( :STRLEN ), STRLEN, FSTAT )
+     :                            CVALUE( :STRLEN ), FSTAT )
                   END DO
                ELSE
                   CALL FTPCLS( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
-     :                         STRLEN, FSTAT )
+     :                         FSTAT, %VAL( STRLEN ) )
                END IF
                ROUTIN = 'FTPCLS'
 
@@ -791,7 +811,6 @@
 *  Structure
 *  =========
       ELSE
-
 *  Determine how many components the structure has.
          CALL DAT_NCOMP( LOC, NCMP, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
@@ -886,11 +905,11 @@
 *  Obtain the data type.
                   CALL DAT_TYPE( LOC, EXTTYP, STATUS )
 
-*  Need to determine the shape of the full array.  Test whether or not
-*  the supplementary locator to a full array structure is valid.
+*  Need to determine the shape of the full array.
+*  Test whether or not the supplementary locator to a full array structure
+*  is valid.
                   CALL DAT_VALID( ALOC, VALID, STATUS )
                   IF ( VALID ) THEN
-
 *  Obtain the data shape of the full array of structures.
                      CALL DAT_SHAPE( ALOC, DAT__MXDIM, DIMS, NDIM,
      :                               STATUS )
@@ -1007,7 +1026,6 @@
 *  This is only necessary when the object is multi-dimensional.  
                   IF ( NMDCOL .GT. 0 ) THEN
                      DO ICMD = 1, NMDCOL
-
 *  Convert the column number into character form.
                         CALL CHR_ITOC( MDCOMP( ICMD ), CN, NC )
 
@@ -1020,16 +1038,27 @@
 *  FITSIO does not permit cards to be placed after a named card; 
 *  it requires that we read that named card first.
                         CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
-
-*  Get a locator to the object so that we can determine its shape.
+*  Get a locator to the object so that we can determine its shape and type.
 *  This information was obtained before, but inquiring again avoids
 *  having large dimension arrays.  Release the locator at the end.
                         CALL DAT_INDEX( LOC, MDCOMP( ICMD ), LCMP,
      :                                  STATUS )
-                        CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS, NDIM,
+                        CALL DAT_TYPE( LCMP, TYPE, STATUS )
+*  Get the dimensions
+*  If the type is _CHAR*n, we must adjust the dimensions to make the first 
+*  equal the number of characters per element - as required by the rAw
+*  convention for TFORM.
+                        IF( TYPE(1:6) .EQ. '_CHAR*' ) THEN
+                           CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS(2),
+     :                                   NDIM, STATUS )
+                           CALL CHR_CTOI( TYPE(7:), DIMS(1), STATUS )
+                           NDIM = NDIM + 1
+                        ELSE
+                           CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS, NDIM,
      :                                  STATUS )
-                        CALL DAT_ANNUL( LCMP, STATUS )
+                        END IF
 
+                        CALL DAT_ANNUL( LCMP, STATUS )
 *  Insert the TDIMn card.
                         CALL FTPTDM( FUNIT, MDCOMP( ICMD ), NDIM, DIMS,
      :                               FSTAT )
@@ -1038,8 +1067,8 @@
 *  warnings.  Specify from which routine the error arose.
 *  Form the name of the TDIMn keyword along the way.
                         IF ( FSTAT .GT. FITSOK ) THEN
-                           NC = 5
-                           CRDNAM = 'TNULL'
+                           NC = 4
+                           CRDNAM = 'TDIM'
                            CALL CHR_APPND( CN, CRDNAM, NC )
                            CALL COF_FIOER( FSTAT,
      :                       'COF_H2BIN_ERR7', 'FTIKYJ',
@@ -1290,13 +1319,13 @@
                                  CALL ERR_ANNUL( STATUS )
                                  CVALUE = ' '
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        CVALUE, STRLEN, FSTAT )
+     :                                        CVALUE, FSTAT )
                               ELSE
 
 *  Copy the mapped value to the binary table.
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), STRLEN,
-     :                                        FSTAT )
+     :                                        %VAL( OPNTR ), 
+     :                                        FSTAT, %VAL( STRLEN ) )
                               END IF
 
 *  Release the new error context.
@@ -1533,12 +1562,12 @@
                                  DO LEL = 1, EL
                                     CALL FTPCLS( FUNIT, NOPRIM, 1, LEL,
      :                                           1, CVALUE( :STRLEN ),
-     :                                           STRLEN, FSTAT )
+     :                                           FSTAT )
                                  END DO
                               ELSE
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), STRLEN,
-     :                                        FSTAT )
+     :                                        %VAL( OPNTR ), 
+     :                                        FSTAT, %VAL( STRLEN ) )
                               END IF
                               ROUTIN = 'FTPCLS'
 

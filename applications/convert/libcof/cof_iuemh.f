@@ -1,26 +1,26 @@
-      SUBROUTINE COF_IUEMX( FUNIT, FILE, NDF, PROFIT, LOGHDR, FDL,
+      SUBROUTINE COF_IUEMH( FUNIT, FILE, NDF, PROFIT, LOGHDR, FDL,
      :                      STATUS )
 *+
 *  Name:
-*     COF_IUEMX
+*     COF_IUEMH
 
 *  Purpose:
-*     Converts an IUE MXLO binary table into an NDF.
+*     Converts an IUE MXHI binary table into an NDF.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_IUEMX( FUNIT, FILE, NDF, PROFIT, LOGHDR, FDL, STATUS )
+*     CALL COF_IUEMH( FUNIT, FILE, NDF, PROFIT, LOGHDR, FDL, STATUS )
 
 *  Description:
-*     This routine converts an IUE MXLO product stored in a FITS binary
+*     This routine converts an IUE MXHI product stored in a FITS binary
 *     table into a series of 1-dimensional NDFs stored in a single
 *     container file corresponding to the supplied NDF identifier.
-*     Each NDF contains data, variance and quality arrays, and axes.
+*     Each NDF contains data and quality arrays, axes, label and units.
 *     Only the most-significant 8 bits of the quality flags are
 *     transferred to the NDF.  Additional columns in the binary table
-*     are written as components of an IUE_MX extension.  The primary
+*     are written as components of an IUE_MH extension.  The primary
 *     HDU headers may be written to the standard FITS airlock
 *     extension.  See the "Notes" for further details.
 
@@ -53,19 +53,34 @@
 
 *  Notes:
 *     -  The names of multiple NDFs within the HDS container file are
-*     LARGE or SMALL depending on the size of the aperture used for the
-*     observation.
+*     ORDER<order_number>, where <order_number> is the value of the
+*     first column in the binary table.
 *     -  The conversion from binary-table columns and headers to NDF
 *     objects is as follows:
 *
-*          NPOINTS                Number of elements
-*          WAVELENGTH             Start wavelength, label, and units
+*          NPOINTS                Number of non-zero elements
+*          WAVELENGTH             Start wavelength of the non-zero
+*                                 elements, label, and units
+*          STARTPIX               Lower bound of the non-zero elements
 *          DELTAW                 Incremental wavelength
-*          FLUX                   Data array, label, and units
-*          SIGMA                  Data-error array
+*          ABS_CAL                Data array, label, and units
 *          QUALITY                Quality array
-*          remaining columns      Component in IUE_MX extension (NET and
-*                                 BACKGROUND are NDFs)
+*          remaining columns      Component in IUE_MH extension (NOISE,
+*           (except 14-17)        NET, BACKGROUND, and RIPPLE are NDFs
+*                                 each comprising a data array, label,
+*                                 units and wavelength axis)
+*     -  It may be possible to evaluate an approximate error array for
+*     the absolutely calibrated data (ABS_CAL), by multiplying the
+*     NOISE by the ratio ABS_CAL / NET for each element.
+
+*  Implementation Deficiencies:
+*     Columns 14 to 17 are omitted to enable a Quick solution.  These
+*     columns contain the Chebyshev coefficients, limits, scale factor
+*     of the background fit.  It's not much of a loss since the
+*     background array is propagated.  The implementation of these
+*     columns in the IUEFA contain three errors: the coefficients are
+*     reversed in row number, the limits are 768 minus the number
+*     stored, and the resultant background array is flipped.
 
 *  [optional_subroutine_items]...
 *  Authors:
@@ -74,35 +89,12 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     1996 June 30 (MJC):
-*        Original version.
-*     22-JAN-1998 (DSB):
-*        - Changed the scheme for naming multiple NDFs within the
-*        container file; previously the row number was used, but NDF
-*        names cannot start with numeric characters and an error was
-*        reported by NDF_OPEN.  Therefore the word "ROW" has been
-*        prepended to the row number.
-*        - Changed the 4th argument of every call of FTGCVx from IOBS to
-*        1.
 *     1998 January 22 (MJC):
-*        Corrected an COF_FIOER error report to use a buffer and not an
-*        MSG token; this makes it consistent with the other error
-*        reports.  Created axis centres for extension NDFs.  Added some
-*        defensive programming in case the MXLO format changes.
-*     1998 January 26 (MJC):
-*        Name the multiple NDFs LARGE or SMALL (from the size of the
-*        aperture used) rather than ROW1 and ROW2.  Do not delete the
-*        data array in the container file; it is needed to make the
-*        file a valid NDF for the global FITS airlock.  Correct the
-*        zero null value to the appropriate type for the floating-point
-*        invocations of FTGCVx, while obtaining the wavelength axis
-*        information.
-*     10-AUG-1998 (DSB):
-*        Corrected interpretation of NPOINTS column value from "no. of
-*        spectra" to "no. of points in current spectrum".
-*     1998 August 11 (MJC):
-*        Make "no. of spectra" no more than two.
-*     {enter_further_changes_here}
+*        Original version.
+*     18-FEB-1998 (DSB):
+*        Corrected constant "0" used as nullval argument to FTGCVx so that
+*        it has the required type (eg "0", "0.0" or "0.0D0" ).
+*     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -138,11 +130,10 @@
       PARAMETER( FITSOK = 0 )
 
       INTEGER MXCOLS             ! Maximum number of columns
-      PARAMETER( MXCOLS = 9 )
+      PARAMETER( MXCOLS = 13 )
 
 *  Local Variables:
       LOGICAL ARREXT             ! Column in extension is an array?
-      CHARACTER * ( 5 ) APERT    ! Aperture size
       CHARACTER * ( NDF__SZTYP ) ATYPE ! Processing type for axis
       LOGICAL BAD                ! Column array contains bad values?
       CHARACTER * ( 10 ) BTYPE ! Column TFORM data type
@@ -152,34 +143,36 @@
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
       CHARACTER * ( 5 ) CVAL     ! Character value
       INTEGER COLNUM             ! Column number
-      CHARACTER * ( 9 ) CON      ! Observation number
+      CHARACTER * ( 3 ) COR      ! Order number
       CHARACTER * ( DAT__SZTYP ) CTYPE ! Column HDS data type
       INTEGER DATCOD             ! FITSIO data code
       DOUBLE PRECISION DSTARW    ! Start wavelength
       DOUBLE PRECISION DSTEPW    ! Wavelength step
       DOUBLE PRECISION DVAL      ! Scalar column value
-      INTEGER EL                 ! Number of pixels in the spectrum
+      INTEGER EL                 ! Number of non-zero spectral elements
       INTEGER FSTAT              ! FITSIO status
       INTEGER HDUTYP             ! HDU type (primary, IMAGE, ASCII or
                                  ! binary table)
       INTEGER I                  ! Loop counter
-      INTEGER IOBS               ! Observations loop counter
+      INTEGER IORDER               ! Order (row) loop counter
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing and actual type for
                                  ! a column array
       INTEGER IVAL               ! Scalar column value
       CHARACTER * ( 8 ) KEYWRD   ! FITS header keyword
-      INTEGER LBND               ! Lower bound of the array (=1)
-      LOGICAL MULTIP             ! Multiple observations?
-      INTEGER NC                 ! Number of characters in observation
-                                 ! number
+      INTEGER LBND               ! Lower bound of the array
+      LOGICAL MULTIP             ! Multiple orders?
+      INTEGER NC                 ! Number of characters in order number
+      INTEGER NCC                ! Number of characters in component
+                                 ! name
       INTEGER NCF                ! Number of characters in filename
       INTEGER NDFE               ! Identifier of effective NDF
       INTEGER NDFO               ! Identifier for output NDF
       INTEGER NFIELD             ! Number of fields in table
       CHARACTER * ( DAT__SZLOC ) NLOC ! Locator to the dummy NDF
-      INTEGER NOBS               ! Number of observations in table
+      INTEGER NORDER             ! Number of orders (rows) in table
       INTEGER NREP               ! Number of bad error values replaced
       INTEGER NREPHI             ! Dummy
+      INTEGER ORDER              ! Order number
       INTEGER PLACE              ! Placeholder for new NDF
       INTEGER PNTR( 1 )          ! Pointer to a mapped column array
       INTEGER REPEAT             ! Column repeat count
@@ -195,7 +188,7 @@
       INTEGER WPNTR              ! Pointer to work array (for quality)
       INTEGER * 2 WVAL           ! Scalar column value
       INTEGER * 2 WVALUE         ! A word value
-      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to the IUE_MX extension
+      CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to the IUE_MH extension
 
 *.
 
@@ -222,23 +215,21 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error skipping to the extension of the IUE MX FITS '/
      :            /'file '//FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_IUEMX_WREXT', 'FTMRHD', BUFFER,
+         CALL COF_FIOER( FSTAT, 'COF_IUEMH_WREXT', 'FTMRHD', BUFFER,
      :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'FILE', FILE )
-         CALL ERR_REP( 'COF_IUEMX_NOBINTAB',
+         CALL ERR_REP( 'COF_IUEMH_NOBINTAB',
      :     'The first extension of ^FILE is not a BINTABLE.', STATUS )
       END IF
 
 *  Find the shape of the binary table.
 *  ===================================
 
-*  Obtain the number of spectra.   There should be one or two spectra
-*  present.
-      CALL COF_GKEYI( FUNIT, 'NAXIS2', THERE, NOBS, COMENT, STATUS )
-      NOBS = MAX( MIN( 2, NOBS ), 1 )
+*  Obtain the number of elements.
+      CALL COF_GKEYI( FUNIT, 'NAXIS2', THERE, NORDER, COMENT, STATUS )
 
 *  Obtain the number of fields in the table.
       CALL COF_GKEYI( FUNIT, 'TFIELDS', THERE, NFIELD, COMENT, STATUS )
@@ -246,10 +237,10 @@
 *  Define the structure of the HDS container file.
 *  ===============================================
 
-*  In general the number of observations is not going to be one, so
-*  a series of NDFs has to be made in the container file.  When the
-*  number is one, then a normal NDF can be created.
-      MULTIP = NOBS .GT. 1
+*  In general the number of orders is not going to be one, so a series
+*  of NDFs has to be made in the container file.  When the number is
+*  one, then a normal NDF can be created.
+      MULTIP = NORDER .GT. 1
 
       IF ( MULTIP ) THEN
 
@@ -263,12 +254,9 @@
 *  changed.
       NFIELD = MIN( NFIELD, MXCOLS )
 
-*  By definition the lower bound is always 1.
-      LBND = 1
-
-*  Loop for each of the observations.
-*  ==================================
-      DO IOBS = 1, NOBS
+*  Loop for each of the orders.
+*  ============================
+      DO IORDER = 1, NORDER
 
 *  Initialise flags to indicate that none of the binary-table columns
 *  has been used.
@@ -276,42 +264,53 @@
             USED( I ) = .FALSE.
          END DO
 
-*  Convert the observation number to a string.  It is needed for error
-*  messages.
-         CALL CHR_ITOC( IOBS, CON, NC )
-
-*  Read the columns defining the array's shape.
-*  ============================================
+*  Read the column defining the spectral order number.
+*  ===================================================
 
 *  Find the column number of the number of points in the spectrum.
+         CALL FTGCNO( FUNIT, .FALSE., 'ORDER', COLNUM, FSTAT )
+
+*  Read the value for the current order.  Note that there
+*  are no bad values.  Record the column as being used.
+         CALL FTGCVJ( FUNIT, COLNUM, IORDER, 1, 1, 0, ORDER, BAD,
+     :                FSTAT )
+         USED( COLNUM ) = .TRUE.
+ 
+*  Convert the order number to a string.  It is needed for error
+*  messages.
+         CALL CHR_ITOC( ORDER, COR, NC )
+
+*  Read the columns defining the array's shape and lower bound.
+*  ============================================================
+
+*  Find the column number of the number of non-zero points in the
+*  spectrum.
          CALL FTGCNO( FUNIT, .FALSE., 'NPOINTS', COLNUM, FSTAT )
 
-*  Read the value for the current observation.  Note that there
-*  are no bad values.  Record the column as being used.  
-         CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, 1, 0, UBND, BAD,
+*  Read the value for the current order.  Note that there
+*  are no bad values.  Record the column as being used.
+         CALL FTGCVJ( FUNIT, COLNUM, IORDER, 1, 1, 0, EL, BAD, FSTAT )
+         USED( COLNUM ) = .TRUE.
+
+*  Find the column number of the start of the non-zero elements in the
+*  spectrum.
+         CALL FTGCNO( FUNIT, .FALSE., 'STARTPIX', COLNUM, FSTAT )
+
+*  Read the value for the current order.  Note that there
+*  are no bad values.  Record the column as being used.
+         CALL FTGCVJ( FUNIT, COLNUM, IORDER, 1, 1, 0, LBND, BAD,
      :                FSTAT )
          USED( COLNUM ) = .TRUE.
 
-*  Read the columns defining the array's shape.
-*  ============================================
-
-*  Find the column number of the aperture size.
-         IF ( MULTIP ) THEN
-            CALL FTGCNO( FUNIT, .FALSE., 'APERTURE', COLNUM, FSTAT )
-
-*  Read the value for the current observation.  Note that there
-*  are no bad values.  Do not record the column as being used.  This
-*  retains the aperture size in the extension even if the user renames
-*  or copies the NDF.
-            CALL FTGCVS( FUNIT, COLNUM, IOBS, 1, 1, ' ', APERT, BAD,
-     :                   FSTAT )
-         END IF
+*  Derive the upper bound of the spectrum.  These bounds are retained so
+*  you can match against the pixel indices of SIHI data.
+         UBND = LBND - 1 + EL
 
 *  Inquire where the data array is stored and its data type.
 *  =========================================================
 
 *  Find the column number of the calibrated flux values. 
-         CALL FTGCNO( FUNIT, .FALSE., 'FLUX', COLNUM, FSTAT )
+         CALL FTGCNO( FUNIT, .FALSE., 'ABS_CAL', COLNUM, FSTAT )
 
 *  Record that this column is used.
          USED( COLNUM ) = .TRUE.
@@ -325,9 +324,9 @@
 *  ==========================================
          IF ( MULTIP ) THEN
 
-*  Create new NDF placeholder.  Use the aperture size as the name of
-*  the NDF.
-            CALL NDF_PLACE( NLOC, APERT, PLACE, STATUS )
+*  Create new NDF placeholder.  Use the order number as the name
+*  of the NDF.
+            CALL NDF_PLACE( NLOC, 'ORDER'//COR, PLACE, STATUS )
 
 *  Create the new NDF using the placeholder.  It is one-dimensional by
 *  definition.
@@ -357,24 +356,24 @@
 *  Read the column into the data array.  Call the appropriate routine
 *  for the chosen type.  This should be _REAL.
          IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
+            CALL FTGCVJ( FUNIT, COLNUM, IORDER, LBND, EL, VAL__BADI,
      :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
+            CALL FTGCVE( FUNIT, COLNUM, IORDER, LBND, EL, VAL__BADR,
      :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
+            CALL FTGCVD( FUNIT, COLNUM, IORDER, LBND, EL, VAL__BADD,
      :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
       
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'IT', ITYPE )
-            CALL MSG_SETI( 'ON', IOBS )
-            CALL ERR_REP( 'COF_IUEMX_ITYPE',
-     :        'Invalid data type (^IT) selected for the IUE MXLO flux '/
-     :        /'array in observation ^ON.', STATUS )
+            CALL MSG_SETI( 'ON', ORDER )
+            CALL ERR_REP( 'COF_IUEMH_ITYPE',
+     :        'Invalid data type (^IT) selected for the IUE MXHI flux '/
+     :        /'array in order ^ON.', STATUS )
             GOTO 999
          END IF
 
@@ -386,9 +385,9 @@
 
 *  Check that the transfer was correct.
          IF ( FSTAT .NE. FITSOK ) THEN
-            BUFFER = 'Error copying the IUE MXLO flux to the NDF '/
-     :               /'data array in observation '//CON( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUEMX_CRDAT', 'FTGCVx',
+            BUFFER = 'Error copying the IUE MXHI flux to the NDF '/
+     :               /'data array in order '//COR( :NC )//'.'
+            CALL COF_FIOER( FSTAT, 'COF_IUEMH_CRDAT', 'FTGCVx',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -404,85 +403,6 @@
 
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Obtain the standard deviation and store as the error array.
-*  ===========================================================
-
-*  Find the column number of the errors.
-         CALL FTGCNO( FUNIT, .FALSE., 'SIGMA', COLNUM, FSTAT )
-
-*  Find the data code (effectively the data type) for the column.  Use
-*  it to define the implementation type.
-         CALL FTGTCL( FUNIT, COLNUM, DATCOD, REPEAT, WIDTH, FSTAT )
-         CALL COF_STYPC( NDFO, 'Variance', ' ', DATCOD, ITYPE, STATUS )
-
-*  Map some workspace.
-         CALL PSX_CALLOC( UBND, ITYPE, WPNTR, STATUS )
-
-*  Map the NDF component.
-         CALL NDF_MAP( NDFO, 'Error', ITYPE, 'WRITE', PNTR, EL, STATUS )
-
-*  Read the column into the work array, and then replace any negative
-*  values (the official -1s meaning undefined error and any other
-*  garbage) with the bad value.  Call the appropriate routine for the
-*  chosen type.
-         IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
-     :                   %VAL( WPNTR ), BAD, FSTAT )
-
-            CALL CON_THRSI( .TRUE., EL, %VAL( WPNTR ), 0, VAL__MAXI,
-     :                      VAL__BADI, VAL__MAXI, %VAL( PNTR( 1 ) ),
-     :                      NREP, NREPHI, STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
-     :                   %VAL( WPNTR ), BAD, FSTAT )
-
-            CALL CON_THRSR( .TRUE., EL, %VAL( WPNTR ), 0.0, VAL__MAXR,
-     :                      VAL__BADR, VAL__MAXR, %VAL( PNTR( 1 ) ),
-     :                      NREP, NREPHI, STATUS )
-      
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
-     :                   %VAL( WPNTR ), BAD, FSTAT )
-      
-            CALL CON_THRSD( .TRUE., EL, %VAL( WPNTR ), 0.0D0, VAL__MAXD,
-     :                      VAL__BADD, VAL__MAXD, %VAL( PNTR( 1 ) ),
-     :                      NREP, NREPHI, STATUS )
-
-         ELSE
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'IT', ITYPE )
-            CALL MSG_SETI( 'ON', IOBS )
-            CALL ERR_REP( 'COF_IUEMX_ITYPE',
-     :        'Invalid data type (^IT) selected for the IUE MXLO '/
-     :        /'error array in observation ^ON.', STATUS )
-            GOTO 999
-         END IF
-
-*  Set the bad-pixel flag.
-         BAD = BAD .OR. NREP .GT. 0
-         CALL NDF_SBAD( BAD, NDFO, 'Variance', STATUS )
-
-*  Unmap the error array.  Note this call is assymetric with NDF_MAP,
-*  in that the error array can be mapped, but not unmapped; we have
-*  to specify the variance instead.
-         CALL NDF_UNMAP( NDFO, 'Variance', STATUS )
-
-*  Free the workspace.
-         CALL PSX_FREE( WPNTR, STATUS )
-
-*  Check that the transfer was correct.
-         IF ( FSTAT .NE. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_IUEMX_CRVAR', 'FTGCVx',
-     :        'Error copying the IUE MXLO standard deviation to the '/
-     :        /'NDF error array.', STATUS )
-            GOTO 999
-         END IF
-
-*  Record that this column is used.
-         USED( COLNUM ) = .TRUE.
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
-
 *  Obtain the quality column store in the quality array.
 *  =====================================================
 
@@ -490,12 +410,12 @@
          CALL FTGCNO( FUNIT, .FALSE., 'QUALITY', COLNUM, FSTAT )
 
 *  Get some workspace for the 16-bit 2's complement quality data.
-         CALL PSX_MALLOC( UBND * VAL__NBW, WPNTR, STATUS )
+         CALL PSX_MALLOC( EL * VAL__NBW, WPNTR, STATUS )
 
 *  Read the column into the work array.  Note that there are no bad
 *  values.
          WVALUE = 0
-         CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, UBND, WVALUE,
+         CALL FTGCVI( FUNIT, COLNUM, IORDER, LBND, EL, WVALUE,
      :                %VAL( WPNTR ), BAD, FSTAT )
 
 *  Map the input array component with the desired data type.  Any type
@@ -513,9 +433,9 @@
 
 *  Check that the transfer was correct.
          IF ( FSTAT .NE. FITSOK ) THEN
-            BUFFER = 'Error copying the IUE MXLO quality to the NDF '/
-     :                /'quality array in observation '//CON( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUEMX_CRQUA', 'FTGCVB',
+            BUFFER = 'Error copying the IUE MXHI quality to the NDF '/
+     :                /'quality array in order '//COR( :NC )//'.'
+            CALL COF_FIOER( FSTAT, 'COF_IUEMH_CRQUA', 'FTGCVB',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -538,25 +458,25 @@
          CALL COF_ATYPC( NDFO, 'Centre', 1, ' ', DATCOD, ITYPE, STATUS )
 
 *  Obtain the start wavelength from the column.  Call the appropriate
-*  routine for the chosen type.  This should be _REAL.  Store d.p.
+*  routine for the chosen type.  This should be _DOUBLE.  Store d.p.
 *  values for real data too, so there is always a matching pair of
 *  start and increment.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, 1, 0.0, STARTW,
+            CALL FTGCVE( FUNIT, COLNUM, IORDER, 1, 1, 0.0, STARTW,
      :                   BAD, FSTAT )
             DSTARW = DBLE( STARTW )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, 1, 0.0D0, DSTARW,
+            CALL FTGCVD( FUNIT, COLNUM, IORDER, 1, 1, 0.0D0, DSTARW,
      :                   BAD, FSTAT )
 
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'IT', ITYPE )
-            CALL MSG_SETI( 'ON', IOBS )
-            CALL ERR_REP( 'COF_IUEMX_ITYPESW',
-     :        'Invalid data type (^IT) selected for the IUE MXLO '/
-     :        /'start wavelength in observation ^ON.', STATUS )
+            CALL MSG_SETI( 'ON', ORDER )
+            CALL ERR_REP( 'COF_IUEMH_ITYPESW',
+     :        'Invalid data type (^IT) selected for the IUE MXHI '/
+     :        /'start wavelength in order ^ON.', STATUS )
             GOTO 999
          END IF
 
@@ -582,24 +502,24 @@
 
 *  Obtain the wavelength step.  Read the column into the data array.
 *  Call the appropriate routine for the chosen type (assume the same
-*  data type as the start wavelength).  This should be _REAL.  Store
+*  data type as the start wavelength).  This should be _DOUBLE.  Store
 *  d.p. values for real data too, so there is always a matching pair.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, 1, 0.0, STEPW,
+            CALL FTGCVE( FUNIT, COLNUM, IORDER, 1, 1, 0.0, STEPW,
      :                   BAD, FSTAT )
             DSTEPW = DBLE( STEPW )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, 1, 0.0D0, DSTEPW,
+            CALL FTGCVD( FUNIT, COLNUM, IORDER, 1, 1, 0.0D0, DSTEPW,
      :                   BAD, FSTAT )
 
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'IT', ITYPE )
-            CALL MSG_SETI( 'ON', IOBS )
-            CALL ERR_REP( 'COF_IUEMX_ITYPEIW',
-     :        'Invalid data type (^IT) selected for the IUE MXLO '/
-     :        /'step wavelength in observation ^ON.', STATUS )
+            CALL MSG_SETI( 'ON', ORDER )
+            CALL ERR_REP( 'COF_IUEMH_ITYPEIW',
+     :        'Invalid data type (^IT) selected for the IUE MXHI '/
+     :        /'step wavelength in order ^ON.', STATUS )
             GOTO 999
          END IF
 
@@ -618,11 +538,11 @@
 
 *  Created the spaced array using the appropriate data type.
          IF ( ATYPE .EQ. '_REAL' ) THEN
-            CALL CON_SSAZR( UBND, DBLE( STEPW ), DBLE( STARTW ),
+            CALL CON_SSAZR( EL, DBLE( STEPW ), DBLE( STARTW ),
      :                      %VAL( PNTR( 1 ) ), STATUS )
 
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL CON_SSAZD( UBND, DSTEPW, DSTARW, %VAL( PNTR( 1 ) ),
+            CALL CON_SSAZD( EL, DSTEPW, DSTARW, %VAL( PNTR( 1 ) ),
      :                      STATUS )
 
          END IF
@@ -636,7 +556,7 @@
 *  ==============================================
 
 *  Here it is assumed that there are still columns left.
-         CALL NDF_XNEW( NDFO, 'IUE_MX', 'IUEMX_EXT', 0, 0, XLOC,
+         CALL NDF_XNEW( NDFO, 'IUE_MH', 'IUEMH_EXT', 0, 0, XLOC,
      :                  STATUS )
 
 *  Loop through all the fields, copying those not already used and
@@ -650,6 +570,15 @@
                CALL COF_GKEYC( FUNIT, KEYWRD, THERE, COLNAM, COMENT,
      :                         STATUS )
                IF ( THERE ) THEN
+
+*  Obtain the effective length of the name.
+                  NCC = CHR_LEN( COLNAM )
+
+*  Replace any spaces with underscores as HDS will not accept multi-word
+*  component names.  This will replace the trailing spaces too, hence
+*  the previous statement.  The original effective length will be used
+*  to define the component name.
+                  CALL CHR_TRCHR( ' ', '_', COLNAM, STATUS )
 
 *  Find the length and repeat count for the column.  Initialise the
 *  width as the FITSIO routine appears not to do this.
@@ -676,15 +605,17 @@
 
 *  Create a new NDF in the extension via an NDF placeholder.  The data
 *  type and bounds will be changed below once they are known.
-                     CALL NDF_PLACE( XLOC, COLNAM, PLACE, STATUS )
-                     CALL NDF_NEW( CTYPE, 1, 1, REPEAT, PLACE, NDFE,
+                     CALL NDF_PLACE( XLOC, COLNAM( :NCC ), PLACE,
+     :                               STATUS )
+                     CALL NDF_NEW( CTYPE, 1, LBND, UBND, PLACE, NDFE,
      :                             STATUS )
                   ELSE
 
 *  Create the component of the extension, and get a locator to the
 *  component.
-                     CALL DAT_NEW( XLOC, COLNAM, CTYPE, 0, 0, STATUS )
-                     CALL DAT_FIND( XLOC, COLNAM, CLOC, STATUS )
+                     CALL DAT_NEW( XLOC, COLNAM( :NCC ), CTYPE, 0, 0,
+     :                             STATUS )
+                     CALL DAT_FIND( XLOC, COLNAM( :NCC ), CLOC, STATUS )
                   END IF
 
 *  Create the array (NDF) extension components.
@@ -699,27 +630,27 @@
 *  for the chosen type even though only expect real arrays spare, but
 *  let's be defensive in case there are revisions.
                      IF ( CTYPE .EQ. '_UBYTE' ) THEN
-                        CALL FTGCVB( FUNIT, COLNUM, IOBS, 1, EL,
+                        CALL FTGCVB( FUNIT, COLNUM, IORDER, LBND, EL,
      :                               VAL__BADUB, %VAL( PNTR( 1 ) ), BAD,
      :                               FSTAT )
 
                      ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
-                        CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, EL,
+                        CALL FTGCVI( FUNIT, COLNUM, IORDER, LBND, EL,
      :                               VAL__BADW, %VAL( PNTR( 1 ) ), BAD,
      :                               FSTAT )
       
                      ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
-                        CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL,
+                        CALL FTGCVJ( FUNIT, COLNUM, IORDER, LBND, EL,
      :                               VAL__BADI, %VAL( PNTR( 1 ) ), BAD,
      :                               FSTAT )
       
                      ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
-                        CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL,
+                        CALL FTGCVE( FUNIT, COLNUM, IORDER, LBND, EL,
      :                               VAL__BADR, %VAL( PNTR( 1 ) ), BAD,
      :                               FSTAT )
       
                      ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
-                        CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL,
+                        CALL FTGCVD( FUNIT, COLNUM, IORDER, LBND, EL,
      :                               VAL__BADD, %VAL( PNTR( 1 ) ), BAD,
      :                               FSTAT )
 
@@ -728,6 +659,8 @@
 *  Unmap the NDF's data array.
                      CALL NDF_UNMAP( NDFE, 'Data', STATUS )
 
+*  Create the character components.
+*  --------------------------------
 *  Obtain the units for this column, and place it into the NDF.  To do
 *  this first form the names of the units keyword for this column.
                      CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
@@ -743,9 +676,9 @@
 *  ------------------------
 
 *  Only do it for arrays corresponding to the spectrum.  At present that
-*  will be both the remaining array columns, but perhaps the format will
-*  change, so let's be on the safe side.
-                     IF ( REPEAT .EQ. 640 ) THEN
+*  will be all the remaining array columns, but perhaps if the Chebyshev
+*  coefficients are added, that cease to be true.
+                     IF ( REPEAT .EQ. 768 ) THEN
 
 *  Map the NDF component.
                         CALL NDF_AMAP( NDFE, 'Centre', 1, ATYPE,
@@ -784,40 +717,39 @@
 *  Tidy the extension NDF.
                      CALL NDF_ANNUL( NDFE, STATUS )
 
-*  Scalar components
-*  -----------------
-*  
+*  Scalar values
+*  -------------
 *  Extract the scalar value and transfer it to the HDS component.  Only
 *  expect character scalar value spare, but let's be defensive in case
 *  there are revisions.
                   ELSE
                      IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
-                        CALL FTGCVS( FUNIT, COLNUM, IOBS, 1, 1,
+                        CALL FTGCVS( FUNIT, COLNUM, IORDER, 1, 1,
      :                               ' ', CVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, CVAL, STATUS )
 
                      ELSE IF ( CTYPE .EQ. '_UBYTE' ) THEN
-                        CALL FTGCVB( FUNIT, COLNUM, IOBS, 1, 1,
+                        CALL FTGCVB( FUNIT, COLNUM, IORDER, 1, 1,
      :                               VAL__BADUB, UVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, UVAL, STATUS )
 
                      ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
-                        CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, 1,
+                        CALL FTGCVI( FUNIT, COLNUM, IORDER, 1, 1,
      :                               VAL__BADW, WVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, WVAL, STATUS )
       
                      ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
-                        CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, 1,
+                        CALL FTGCVJ( FUNIT, COLNUM, IORDER, 1, 1,
      :                               VAL__BADI, IVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, IVAL, STATUS )
       
                      ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
-                        CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, 1,
+                        CALL FTGCVE( FUNIT, COLNUM, IORDER, 1, 1,
      :                               VAL__BADR, RVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, RVAL, STATUS )
       
                      ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
-                        CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, 1,
+                        CALL FTGCVD( FUNIT, COLNUM, IORDER, 1, 1,
      :                               VAL__BADD, DVAL, BAD, FSTAT )
                         CALL DAT_PUT( CLOC, CTYPE, 0, 0, DVAL, STATUS )
 

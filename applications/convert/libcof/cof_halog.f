@@ -44,6 +44,8 @@
 *  History:
 *     1996 June 29 (MJC):
 *        Original version.
+*     1998 January 6 (MJC):
+*        Allow for 0 RECLEN from INQUIRE
 *     {enter_changes_here}
 
 *  Bugs:

@@ -52,6 +52,8 @@
 *        Original version.
 *     1997 November 15 (MJC):
 *        Added support for primitive objects.
+*     2002 March 13 (AJC):
+*        Pass unvectorised parent to COF_H2BIN to get correct shape.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,8 +149,8 @@
 
 *  Trace through the primitive elements and create a FITS binary table
 *  for them.
-               CALL COF_H2BIN( LCELL( STK ), LVEC( STK ), FUNIT, EXTLEV,
-     :                         ' ', WRITTN, STATUS )
+               CALL COF_H2BIN( LCELL( STK ), LSTART( STK ), FUNIT,
+     :                         EXTLEV, ' ', WRITTN, STATUS )
 
 *  Although some processing could be avoid if the structure does not
 *  contain any further structures, it is easier to follow if each is

@@ -1,20 +1,24 @@
-      SUBROUTINE COF_SBND( FUNIT, NDF, KEYROT, STATUS )
+      SUBROUTINE COF_SBND( FUNIT, NDF, KEYROT, CHECK, STATUS )
 *+
 *  Name:
 *     COF_SBND
 
 *  Purpose:
-*     Sets the bounds of an NDF using a FITS header.
+*     Sets or checks the bounds of an NDF using a FITS header.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_SBND( FUNIT, NDF, KEYROT, STATUS )
+*     CALL COF_SBND( FUNIT, NDF, KEYROT, CHECK, STATUS )
 
 *  Description:
+*     If CHECK is FALSE,
 *     This routine sets the lower and upper bounds of an NDF, by
 *     using the information stored in a FITS header.
+*     IF CHECK is TRUE,
+*     the upper and lower bounds of the NDF and FITS header are compared
+*     and an error reported and STATUS set if they differ.
 
 *  Arguments:
 *     FUNIT = INTEGER (Given)
@@ -27,6 +31,8 @@
 *        If this is a blank value, the lower bounds are assumed to be
 *        one.  It is limited to 7 characters, comprising numbers,
 *        letters, underscore and hyphen.  The normal root is 'LBOUND'.
+*     CHECK = LOGICAL (Given)
+*        If the bounds are to be checked or set
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -37,11 +43,14 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 January 21 (MJC):
 *        Original version.
+*     2000 April 5 (AJC):
+*        Added the check facility
 *     {enter_changes_here}
 
 *  Bugs:
@@ -60,6 +69,7 @@
       INTEGER FUNIT
       INTEGER NDF
       CHARACTER * ( * ) KEYROT
+      LOGICAL CHECK
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -69,6 +79,9 @@
       PARAMETER( FITSOK = 0 )
 
 *  Local Variables:
+      INTEGER ALBND( NDF__MXDIM ) ! Existing lower bounds of the NDF
+      INTEGER AUBND( NDF__MXDIM ) ! Existing upper bounds of the NDF
+      INTEGER ANDIM               ! Existing dimensionality of the NDF
       INTEGER BITPIX             ! FITS BITPIX value (not used)
       CHARACTER * ( 80 ) BUFFER  ! Used to form error messages
       CHARACTER * ( 48 ) COMENT  ! Keyword comment
@@ -142,11 +155,9 @@
 
          DO I = 1, NDIM
             LBND( I ) = 1
+            UBND( I ) = DIMS( I )
          END DO
       
-*  Set the dimensionality, and the dimensions of the NDF.
-         CALL NDF_SBND( NDIM, LBND, DIMS, NDF, STATUS )
-
       ELSE
 
          DO I = 1, NDIM
@@ -177,8 +188,33 @@
                UBND( I ) = DIMS( I )
             END IF
          END DO
+      END IF
 
-*  Set the dimensionality, and the bounds of the NDF.
+
+*  Set or check the dimensionality, and the bounds of the NDF.
+      IF ( CHECK ) THEN
+*  A check was requested
+*  Get the existing bounds
+         CALL NDF_BOUND( NDF, NDF__MXDIM, ALBND, AUBND, ANDIM, STATUS )
+*  and compare with the FITS header
+         IF ( NDIM .EQ. ANDIM ) THEN
+            DO I = 1, NDIM
+               IF ( ( LBND(I) .NE. ALBND(I) ) .OR.
+     :              ( UBND(I) .NE. AUBND(I) ) ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'COF_SBND_BNDER',
+     :             'Bounds mismatch within an extension set', STATUS )
+               END IF
+            END DO
+
+         ELSE
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'COF_SBND_NDIMS',
+     :       'NDIMS mismatch within an extension set', STATUS )
+         END IF
+
+      ELSE
+*  Requested to set the bounds
          CALL NDF_SBND( NDIM, LBND, UBND, NDF, STATUS )
       END IF
 

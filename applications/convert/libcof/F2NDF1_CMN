@@ -1,0 +1,30 @@
+*+
+*  Name:
+*     F2NDF1_CMN
+
+*  Purpose:
+*     Define the EXTABLE variables for FITS2NDF
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE file
+
+      INTEGER MAXCMP             ! Max no of component lines in EXTABLE
+      PARAMETER ( MAXCMP = 7 )
+
+      INTEGER MAXEXT             ! Max number of extension sets in EXTABLE
+      PARAMETER ( MAXEXT = 20 )
+
+      INTEGER NCMP           ! Number of component lines in EXTABLE
+      INTEGER NEXTS          ! Number of extension sets in EXTABLE
+      LOGICAL DONE(MAXCMP,MAXEXT)            ! If extension specifier matched
+      CHARACTER*(DAT__SZNAM) NDFNMS(MAXEXT)  ! NDF names from EXTABLE
+      CHARACTER*12 CODES(MAXCMP)             ! Transformation codes from EXTABLE
+      CHARACTER*(DAT__SZNAM*2) COMPS(MAXCMP) ! Component names from EXTABLE
+      CHARACTER*32 EXTNS(MAXCMP,MAXEXT)      ! Extension table from EXTABLE
+
+      COMMON /F2NDF1_CMN/ NCMP, NEXTS, DONE, NDFNMS, COMPS, CODES, EXTNS
+*.
+

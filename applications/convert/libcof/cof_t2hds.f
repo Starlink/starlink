@@ -38,11 +38,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 February 28 (MJC):
 *        Original version.
+*     2002 March 13 (AJC):
+*        Adjust dimensions for multi-dimensional CHARACTER arrays
 *     {enter_changes_here}
 
 *  Bugs:
@@ -80,7 +83,10 @@
       CHARACTER * ( DAT__SZTYP ) CTYPE ! Column HDS data type
       INTEGER DATCOD             ! FITSIO data-type code
       CHARACTER * ( DAT__SZLOC ) DLOC ! Locator to the DATA component
-      INTEGER DIMS( NDF__MXDIM ) ! Dimensions of the column
+      INTEGER DIMS( NDF__MXDIM + 1) ! Dimensions of the column
+                                    ! +1 allows for character string length as
+                                    ! first dimension for _CHAR arrays
+      INTEGER I                  ! Dimensions index
       INTEGER EL                 ! Number of rows in the table
       INTEGER FSTAT              ! FITSIO status
       CHARACTER * ( 8 ) KEYWRD   ! FITS header keyword
@@ -188,15 +194,23 @@
 *  array will be treated as a vector of length given by TFORMn
 *  (=REPEAT).
             IF ( REPEAT .GT. 1 ) THEN
-               CALL FTGTDM( FUNIT, COLNUM, DAT__MXDIM, NDIM, DIMS,
+               CALL FTGTDM( FUNIT, COLNUM, DAT__MXDIM+1, NDIM, DIMS,
      :                      FSTAT )
-
+               IF ( ( NDIM .GT. 2 ) .AND.
+     :              ( CTYPE(1:5) .EQ. '_CHAR' ) ) THEN
+*  The first dimension is the CHARACTER width - remove it
+                  DO I = 2, NDIM
+                     DIMS(I - 1) = DIMS(I)
+                  END DO
+                  NDIM = NDIM - 1
+               END IF
+               
 *  Dealing with a scalar.
             ELSE
                NDIM = 0
             END IF
 
-*  If there is more trhan one row in the table, the array dimensionality
+*  If there is more than one row in the table, the array dimensionality
 *  has to be enlarged by one, and the additional dimension appended.
             IF ( EL .GT. 1 ) THEN
                NDIM = NDIM + 1

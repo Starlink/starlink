@@ -32,7 +32,7 @@
 *  Notes:
 *     The supported datacode type codes and their equivalent HDS types
 *     are: 1, _UBYTE; 11, _UBYTE; 14, _LOGICAL; 16, _CHAR; 21, _WORD;
-*     41, _INTEGER; 42, _REAL; and 81, _DOUBLE.
+*     41, _INTEGER; 42, _REAL; and 82, _DOUBLE.
 
 *  [optional_subroutine_items]...
 *  Authors:
@@ -42,7 +42,9 @@
 *  History:
 *     1996 January 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1998 January 22 (MJC):
+*        Made 82 _DOUBLE (used to be 81).
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -83,7 +85,7 @@
       ELSE IF ( DATCOD .EQ. 42 ) THEN
          TYPE = '_REAL'
 
-      ELSE IF ( DATCOD .EQ. 81 ) THEN
+      ELSE IF ( DATCOD .EQ. 82 ) THEN
          TYPE = '_DOUBLE'
 
       ELSE IF ( DATCOD .EQ. 14 ) THEN

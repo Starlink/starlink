@@ -39,6 +39,8 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +53,13 @@
 *        Added NHEAD and RETAIN arguments.  Flag NDF-style HISTORY
 *        records by setting their corresponding RETAIN elements to
 *        .FALSE..
+*      8-OCT-1999 (DSB):
+*        Terminate all DO WHILE loops if an error occurs within the loop.
+*        Report an error if CHR conversion routines returns a bad status.
+*        Flush any error at the end of this routine so that the output NDF
+*        can continue to be built.
+*      1-MAY-2001 (AJC):
+*        Allow any non-HISTORY card to terminate a HISTORY record
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +124,7 @@
       INTEGER KINDEX             ! Keyword index
       CHARACTER * ( 8 ) KEYWRD   ! FITS keyword
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to NDF
+      INTEGER LSTAT              ! Local status value
       LOGICAL MAKHIS             ! Make HISTORY structure?
       CHARACTER * ( NDF__SZHUM ) MODE ! Update mode
       LOGICAL MORTEX             ! More text lines to process?
@@ -239,7 +249,16 @@
 
 *  Obtain the current record.
             CRCOL = INDEX( CARD, 'Current record:' )
-            CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
+
+            IF( STATUS .EQ. SAI__OK ) THEN 
+               CALL CHR_CTOI( CARD( CRCOL + 16: ), CURREC, STATUS )
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL MSG_SETC( 'C', CARD )
+                  CALL MSG_SETC( 'F', CARD( CRCOL + 16: ) )
+                  CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer field '//
+     :                          '''^F'' in FITS card ''^C''.', STATUS )
+               END IF
+            END IF
 
 *  Make the CURRENT_RECORD component and assign it the record number
 *  via a locator.
@@ -324,7 +343,7 @@
 
 *  Break the line into words.
                CALL CHR_DCWRD( CARD, MAXWRD, NWORD, START, END, WORDS,
-     :                         STATUS )
+     :                         LSTAT )
 
 *  The username is the third word.  Make the USER component and assign
 *  it the username via a locator.
@@ -343,7 +362,17 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  The width is the seventh word.
-               CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
+               IF( STATUS .EQ. SAI__OK ) THEN 
+                  CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
+                  IF( STATUS .NE. SAI__OK ) THEN
+                     CALL MSG_SETC( 'C', CARD )
+                     CALL MSG_SETC( 'F', WORDS( 7 ) )
+                     CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer '//
+     :                             'field ''^F'' in FITS card ''^C''.', 
+     :                             STATUS )
+                  END IF
+               END IF
+
                WIDTH = MIN( MAXWID, WIDTH )
 
 *  Skip to the next header card.  We assume that these headers have
@@ -387,11 +416,14 @@
                      RETAIN( KINDEX ) = .FALSE.
                   END IF
 
-*  See whether there is a blank card or the END card present, denoting
-*  the end of the HISTORY records.
+*  See if this is the end of a history text paragraph i.e blank HISTORY text
+*  or end of HISTORY record.
+*  Any non-HISTORY card will denote end of HISTORY record.
+
+*  Set PARSKP if end of paragraph within a history record
                   PARSKP = KEYWRD .EQ. 'HISTORY' .AND.
      :                     CARD( 11: ) .EQ. ' ' 
-                  IF ( KEYWRD .EQ. ' ' .OR. KEYWRD .EQ. 'END' .OR.
+                  IF ( KEYWRD .NE. 'HISTORY' .OR.
      :                 PARSKP ) THEN
 
 *  The END card is the last header card so end the search for further
@@ -416,7 +448,8 @@
 
 *  TEXCOL = 0 indicates that there are no more lines in the paragraph.
 *  increment the number of text lines.
-                        IF ( TEXCOL .NE. 0 ) THEN
+                        IF ( TEXCOL .NE. 0 .AND.
+     :                       STATUS .EQ. SAI__OK ) THEN
                            CALL CHR_PFORM( 1, PARAGR, .FALSE., TEXCOL,
      :                                     TEXT( :WIDTH ) )
 
@@ -464,7 +497,7 @@
                   END IF
 
 *  Are there more text records?
-                  MORTEX = KEYWRD .NE. ' ' .AND. KEYWRD .NE. 'END'
+                  MORTEX = KEYWRD .EQ. 'HISTORY'
 
 *  Return to start of DO WHILE loop.
                   GOTO 140
@@ -507,6 +540,16 @@
          CALL COF_FIOER( FSTAT, 'COF_CHISR_ERR', 'FTGREC',
      :                   'Error converting HISTORY header card to NDF '/
      :                   /'HISTORY component.', STATUS )
+      END IF
+
+*  If an error has occurred, issue a warning and flush the error, so that 
+*  we can continue to build the rest of the NDF.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL NDF_MSG( 'NDF', NDF )
+         CALL ERR_REP( 'COF_CHISR_ERR', 'The history information in '//
+     :                 'the output NDF ''^NDF'' may be corrupt.', 
+     :                 STATUS )
+         CALL ERR_FLUSH( STATUS )
       END IF
 
       END

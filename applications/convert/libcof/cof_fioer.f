@@ -56,6 +56,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,6 +64,12 @@
 *        Original version.
 *     1995 November 20 (MJC):
 *        Changed to flush the new FITSIO error stack.
+*     22-JAN-1998 (DSB):
+*        Supplied message is now expanded before being assigned to an MSG
+*        token. This allows the supplied message to contain references to
+*        other (pre-defined) message tokens. 
+*     1-FEB-2000 (DSB):
+*        Enclose MSG_LOAD call in a new error reporting environment.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +94,8 @@
 
 *  Local Variables:
       CHARACTER * ( 80 ) FITBUF  ! Tranlated FITSIO error message
+      CHARACTER * ( 80 ) OPSTR   ! Buffer for supplied message
+      INTEGER OPLEN              ! Used length of OPSTR
       LOGICAL LOOP               ! Loop to flush FITSIO error
 
 *.
@@ -106,11 +115,16 @@
 *  Report the FITSIO message.
 *  ==========================
 
+*  Create a message token, expanding the message first so that
+*  substitutions occur for any embedded message tokens.
+      CALL ERR_BEGIN( STATUS )
+      CALL MSG_LOAD( ' ', MESSGE, OPSTR, OPLEN, STATUS )
+      CALL ERR_END( STATUS )
+
+      CALL MSG_SETC( 'MESSG', OPSTR( : OPLEN ) )
+
 *  Set the global to be bad.
       STATUS = SAI__ERROR
-
-*  Create a message token.
-      CALL MSG_SETC( 'MESSG', MESSGE )
 
 *  Make the introductory error report.  Use slightly different error
 *  messages if no routine name is supplied or not.

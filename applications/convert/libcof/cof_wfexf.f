@@ -54,12 +54,18 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     JAB: Jeremy Bailey (AAO)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 November 16 (MJC):
 *        Original version based upon COF_WREXT.
-*     {enter_any_changes_here}
+*     1998 April 21 (JAB):
+*        Increment CARD on writing END so we don't overwrite
+*        final record.
+*     2002 Dec 20 (AJC):
+*        Don't add END if last was END (A merged header)
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -156,10 +162,10 @@
       CARD = 0
       DO IHEAD = 1, NHEAD
 
-*  Only include the selected headers.
+*  Only include the selected header cards.
          IF ( RETAIN( IHEAD ) ) THEN
 
-*  Obtain the header.
+*  Obtain the header card.
             CALL FTGREC( FUNIT, IHEAD, HEADER, FSTAT )
 
 *  Report if anything went wrong.  Go to the point before the end where
@@ -273,12 +279,15 @@
   980 CONTINUE
       IF ( FSTAT .GT. FITSOK ) STATUS = SAI__OK
 
-*  Append the END card.  Obtain a cell into the extension.  Put the
+*  Append the END card unless the last card was END (this can happen when
+*  headers are mergeed).  Obtain a cell into the extension.  Put the
 *  END card into the cell, and tidy the temporary locator.
-      CALL DAT_CELL( FLOC, 1, CARD, HLOC, STATUS )
-      CALL DAT_PUT0C( HLOC, 'END', STATUS )
-      CALL DAT_ANNUL( HLOC, STATUS )
-
+      IF( HEADER .NE. 'END' ) THEN
+         CALL DAT_CELL( FLOC, 1, CARD + 1, HLOC, STATUS )
+         CALL DAT_PUT0C( HLOC, 'END', STATUS )
+         CALL DAT_ANNUL( HLOC, STATUS )
+      ENDIF
+      
 *  Tidy the locator to the extension.
       CALL DAT_ANNUL( FLOC, STATUS )
 

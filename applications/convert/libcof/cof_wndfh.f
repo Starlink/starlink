@@ -1,5 +1,5 @@
       SUBROUTINE COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, ORIGIN,
-     :                      CMPTHE, STATUS )
+     :                      PROPEX, CMPTHE, STATUS )
 *+
 *  Name:
 *     COF_WNDFH
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, ORIGIN, CMPTHE,
-*                     STATUS )
+*     CALL COF_WNDFH( NDF, COMP, FUNIT, NFLAGS, BITPIX, ORIGIN, PROPEX,
+*                     CMPTHE, STATUS )
 
 *  Description:
 *     This routine writes the mandatory and the optional but reserved
@@ -56,6 +56,9 @@
 *        The BITPIX value for the output FITS file.
 *     ORIGIN = CHARACTER * ( * ) (Given)
 *        The value of the ORIGIN card.
+*     PROPEX = LOGICAL (Given)
+*        Will the NDF FITS extension, if present, be folded into the output
+*        FITS header?
 *     CMPTHE( NFLAGS ) = LOGICAL (Returned)
 *        The flags when set to true indicate that certain optional NDF
 *        components have been used to write descriptors to the NDF.
@@ -67,6 +70,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +81,13 @@
 *        for axis units.  Write CRPIXn. 
 *     1998 January 5 (MJC):
 *        Added ORIGIN argument.
+*     18-FEB-1998 (DSB):
+*        Converted VAL__BADUB and VAL__BADW to INTEGER before passing as
+*        an integer argument to FTPKYJ.
+*     4-FEB-2003 (DSB):
+*        Modified to suppress output of AXIS information if the NDF 
+*        has a WCS component or if the FITS extension has usable WCS
+*        information. Added argument PROPEX.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,12 +111,16 @@
                                   ! presence of certain components
       INTEGER   BITPIX            ! Bits per pixel
       CHARACTER * ( * ) ORIGIN    ! The value of the ORIGIN card
+      LOGICAL PROPEX              ! Propagate contents of FITS extension?
 
 *  Arguments Returned:
       LOGICAL   CMPTHE( NFLAGS )
 
 *  Status:
       INTEGER STATUS              ! Global status
+
+*  External References:
+      LOGICAL COF_ISWCS           ! FITS extension contains usable WCS?
 
 *  Local Constants:
       LOGICAL EXTEND              ! May contain FITS extensions
@@ -144,6 +159,7 @@
       DOUBLE PRECISION DSTART     ! Start value for an axis-centre array
       REAL      END               ! End value for an axis-centre array
       INTEGER   FSTAT             ! FITSIO status
+      LOGICAL   GOTWCS            ! Does NDF have a WCS component?
       INTEGER   I                 ! Loop variable
       REAL      INCREM            ! Incremental value for axis array
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
@@ -162,6 +178,9 @@
       LOGICAL   UNTFND            ! True if NDF UNITS found
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
 
+*  Declare and define the NUM_ type conversion functions.
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
 *.
 
 *  Check the inherited global status.
@@ -207,6 +226,14 @@
 *  =========================
 *  -------------------------
 *      
+*  If the NDF has a WCS component do not propagate the AXIS information.
+      CALL NDF_STATE( NDF, 'WCS', GOTWCS, STATUS )
+
+*  If the FITS extension contains usable WCS information and the contents
+*  of the FITS extension are being propagated to the output FITS file,
+*  do not propagate the AXIS information.
+      IF( PROPEX .AND. COF_ISWCS( NDF, STATUS ) ) GOTWCS = .TRUE.
+
 *  For any axis structure present, the routine checks to see if each
 *  axis data array is linear.  If it is, the start value and incremental
 *  value are written to the appropriate CRVALn and CDELTn keywords
@@ -218,7 +245,7 @@
       DO I = 1, NDIM 
          CALL NDF_ASTAT( NDF, 'Centre', I, THERE, STATUS )
 
-         IF ( THERE ) THEN
+         IF ( THERE .AND. .NOT. GOTWCS ) THEN
 
 *  Determine the data type of the axis array.
             CALL NDF_ATYPE( NDF, 'Centre', I, ATYPE, STATUS )
@@ -591,11 +618,12 @@
             CALL FTPKYJ( FUNIT, 'BLANK', VAL__BADI, 'Bad value', FSTAT )
 
          ELSE IF ( BITPIX .EQ. 16 ) THEN
-            CALL FTPKYJ( FUNIT, 'BLANK', VAL__BADW, 'Bad value', FSTAT )
+            CALL FTPKYJ( FUNIT, 'BLANK', NUM_WTOI( VAL__BADW ), 
+     :                   'Bad value', FSTAT )
 
          ELSE IF ( BITPIX .EQ. 8 ) THEN
-            CALL FTPKYJ( FUNIT, 'BLANK', VAL__BADUB, 'Bad value',
-     :                   FSTAT )
+            CALL FTPKYJ( FUNIT, 'BLANK', NUM_UBTOI( VAL__BADUB ), 
+     :                   'Bad value', FSTAT )
          END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal

@@ -53,6 +53,8 @@
 *        Original version.
 *     1996 April 15 (MJC):
 *        Added PCOUNT argument.
+*     1998 April 22 (MJC):
+*        Bug fix: increment the header count when writing the END card.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -251,6 +253,13 @@
             CALL DAT_PUT0C( HLOC, HEADER, STATUS )
             CALL DAT_ANNUL( HLOC, STATUS )
          END DO
+
+*  Just to be on the safe side set the IHEAD counter and not assume
+*  that it has retained the last value of the DO loop through the
+*  headers.
+      ELSE
+         IHEAD = NHEAD
+
       END IF
 
 *  Use a temporary status if something has gone wrong using FITSIO.
@@ -260,7 +269,7 @@
 
 *  Append the END card.  Obtain a cell into the extension.  Put the
 *  END card into the cell, and tidy the temporary locator.
-      CALL DAT_CELL( FLOC, 1, IHEAD, HLOC, STATUS )
+      CALL DAT_CELL( FLOC, 1, IHEAD + 1, HLOC, STATUS )
       CALL DAT_PUT0C( HLOC, 'END', STATUS )
       CALL DAT_ANNUL( HLOC, STATUS )
 

@@ -41,8 +41,10 @@
 *     -  'SWSAA'    ISO, SWS instrument, auto-analysis product (SWAA)
 *     -  'LWSAA'    ISO, LWS instrument, auto-analysis product (LSAN)
 *     -  'CAMAA'    ISO, CAM instrument, auto-analysis products (CMxx)
+*     -  'INES '    IUE, INES spectra 
 *     -  'IUELI'    IUE, LILO or LIHI linearised flag image products
 *     -  'IUEMX'    IUE, MXLO extracted low-dispersion spectra product
+*     -  'IUEMH'    IUE, MXHI extracted high-dispersion spectra product
 *     -  'IUERI'    IUE, RILO or RIHI raw-image products 
 *     -  'IUESI'    IUE, SILO or SIHI resampled-image products
 *     -  'IUEVD'    IUE, VDLO or VDHI vector-displacement products
@@ -50,6 +52,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +62,14 @@
 *        Added CAM, and IUE formats.
 *     1997 March 3 (MJC):
 *        Added 2dF.
+*     1998 January 22 (MJC):
+*        Added MXHI.
+*     2000 March 21 (AJC):
+*        Don't fail if not Primary Header Unit
+*     2003 May 3 (MJC):
+*        Added support for INES IUE spectra.
+*     2003 Sep 29 (MJC):
+*        Added support for AAO/UKST 6dF data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,12 +129,9 @@
 *  At present there is no inquiry routine, so inquire the number of
 *  the HDU.  1 is the primary HDU.
       CALL FTGHDN( FUNIT, NHDU )
+
+*  Check no further if not the primary HDU
       IF ( NHDU .GT. 1 ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'COF_SPEC',
-     :     'Current header and data unit is not primary.  Therefore, '/
-     :     /'cannot determine if the FITS file belongs to one of the '/
-     :     /'special cases.', STATUS )
          GOTO 999
       END IF
 
@@ -174,8 +182,11 @@
             IF ( FILNAM( CPOS + 1:CPOS + 2 ) .EQ. 'LI' ) THEN
                NAME = 'IUELI'
 
-            ELSE IF ( FILNAM( CPOS + 1:CPOS + 2 ) .EQ. 'MX' ) THEN
+            ELSE IF ( FILNAM( CPOS + 1:CPOS + 4 ) .EQ. 'MXLO' ) THEN
                NAME = 'IUEMX'
+
+            ELSE IF ( FILNAM( CPOS + 1:CPOS + 4 ) .EQ. 'MXHI' ) THEN
+               NAME = 'IUEMH'
 
             ELSE IF ( FILNAM( CPOS + 1:CPOS + 2 ) .EQ. 'RI' ) THEN
                NAME = 'IUERI'
@@ -210,10 +221,16 @@
             CPOS = INDEX( FILNAM, '.' )
             IF ( CPOS .GT. 0 ) THEN
 
-*  Deal with the individual cases.  Only MX is known not to have its
-*  filename in the primary header.
-               IF ( FILNAM( CPOS + 1:CPOS + 2 ) .EQ. 'MX' ) THEN
+*  Deal with the individual cases.  Only MX and INES is known not to
+*  have its filename in the primary header.
+               IF ( FILNAM( CPOS + 1:CPOS + 4 ) .EQ. 'MXLO' ) THEN
                   NAME = 'IUEMX'
+
+               ELSE IF ( FILNAM( CPOS + 1:CPOS + 4 ) .EQ. 'MXHI' ) THEN
+                  NAME = 'IUEMH'
+
+               ELSE IF ( FILNAM( CPOS + 1:CPOS + 4 ) .EQ. 'FITS' ) THEN
+                  NAME = 'INES'
 
                END IF
             END IF
@@ -225,10 +242,11 @@
 *  Test for AAO data.
 *  ==================
       ELSE IF ( TELPRE .AND.
-     :          TELESC .EQ. 'Anglo-Australian Tel' ) THEN
+     :          TELESC .EQ. 'Anglo-Australian Tel' .OR.
+     :          TELESC .EQ. 'UKST' ) THEN
          CALL CHR_UCASE( INSTRU )
          IF ( INSPRE .AND. ( INSTRU .EQ. 'CCD_1' .OR.
-     :        INSTRU .EQ. '2DF' ) ) THEN
+     :        INSTRU .EQ. '2DF' .OR. INSTRU .EQ. '6DF' ) ) THEN
             NAME = 'AAO2DF'
          END IF
 

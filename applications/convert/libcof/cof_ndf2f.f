@@ -1,5 +1,6 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, STATUS )
+     :                      ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, 
+     :                      NATIVE, STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -12,7 +13,8 @@
 
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
-*                     ORIGIN, PROFIT, PROEXT, PROHIS, STATUS )
+*                     ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, NATIVE, 
+*                     STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -56,6 +58,14 @@
 *        If .TRUE., any NDF history records are written to the primary
 *        FITS header as HISTORY cards.  These follow the mandatory
 *        headers and any merged FITS-extension headers (see PROFIT).
+*     ENCOD = CHARACTER * ( * ) (Given)
+*        The encoding to use. If this is blank, then a default encoding 
+*        is chosen based on the contents of the FITS extension. The
+*        supplied string should be a recognised AST encoding such as 'DSS', 
+*        'FITS-WCS', 'NATIVE', etc (or a blank string).
+*     NATIVE = LOGICAL (Given)
+*        Should a NATIVE encoding of the WCS info be included in the
+*        header?
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -144,6 +154,8 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     JAB: Jeremy Bailey (AAO)
 *     {enter_new_authors_here}
 
 *  History:
@@ -170,8 +182,26 @@
 *        Changed the data type of the 2dF fibres extension.
 *     1997 December 2 (MJC):
 *        Initialised the second FITSIO status.
+*     18-DEC-1997 (DSB):
+*        Added AST encoding arguments.
 *     1998 January 5 (MJC):
 *        Use ORIGIN argument as intended.
+*     1998 April 21 (JAB):
+*        Changes to handling of UWORD format NDF's to allow values to be
+*        scaled correctly and avoid overflow errors.
+*     1998 April 22 (MJC):
+*        Rewrote much of the section which determines the block-floating
+*        point conversion and the blank value, paying special note to
+*        _BYTE and _UWORD conversions.
+*     9-NOV-1998 (DSB):
+*        Replaced arguments NENCOD and ENCODS by NATIVE.
+*     22-JUN-1999 (DSB):
+*        Added ENCOD argument.
+*     11-APR-2000 (DSB):
+*        Updated ENCOD argument description.
+*     21-MAR-2003 (DSB):
+*        Annull error caused by all input pixels being BAD, in order to 
+*        create a FITS file containing all blank pixels.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,6 +229,8 @@
       LOGICAL PROFIT
       LOGICAL PROEXT
       LOGICAL PROHIS
+      CHARACTER * ( * ) ENCOD
+      LOGICAL NATIVE
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -442,7 +474,7 @@
 *  First write the standard headers, and merge in the FITS extension
 *  when requested to do so.
          CALL COF_WHEAD( NDF, ARRNAM( ICOMP ), FUNIT, BPOUT, PROPEX,
-     :                   ORIGIN, STATUS )
+     :                   ORIGIN, ENCOD, NATIVE, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine whether or not there are history records in the NDF.
@@ -470,37 +502,70 @@
          DELTA = DBLE( VAL__EPSR )
          FSCALE = 1.0D0 - DELTA
 
+*  Set the null values.  Only one will be needed, depending on the
+*  value of BPOUT, but it as efficient to assign them all.
+         NULL32 = VAL__BADI
+         NULL16 = VAL__BADW
+         NULL8 = VAL__BADUB
+         NUL_32 = VAL__BADR
+         NUL_64 = VAL__BADD
+
 *  Is format conversion required?
 *  ------------------------------
 *
 *  Scaling is required when the requested BITPIX has lower precision
-*  than the array type and BITPIX is an integer type.  It is also
-*  needed when the input data type does not match the FITS data types,
-*  namely _BYTE and _UWORD.  Deal with a special case first as it needs
-*  to be in a separate IF block.
+*  than the array type and BITPIX is an integer type.  Also scaling 
+*  or the application of an offset is needed when the input data type
+*  does not match the FITS data types, namely _BYTE and _UWORD.  Deal
+*  with these special cases first...
 *
-*  When there is scaling to perform we have to convert the input data
-*  type to _INTEGER, as there is no FITSIO routine for writing a _UWORD
-*  array to the FITS file.  Adjust the input BITPIX accordingly.
-         IF ( TYPE .EQ. '_UWORD' .AND. BPOUT .EQ. 8 ) THEN
+*  Unsigned word
+*  -------------
+*  Map the input data using the next integer data type (_INTEGER) that
+*  encompasses the dynamic range of values, as there is no FITSIO
+*  routine for writing a _UWORD array to the FITS file.  Adjust the
+*  input BITPIX accordingly.
+         IF ( TYPE .EQ. '_UWORD' ) THEN
             TYPE = '_INTEGER'
             BPIN = 32
-         END IF
 
-*  Next tackle the non-standard input data types as they are short.
+*  Unsigned words can be stored in FITS as signed words with an offset
+*  of 32k.
+            IF ( BPOUT .EQ. 16 ) THEN
+               SHIFT = .TRUE.
+               BZERO = 32768.0D0
+               BLANK = NUM_UWTOI( VAL__BADUW ) - 32768
+
+*  Eight-bit output data implies that the values will need scaling.
+            ELSE IF ( BPOUT .EQ. 8 ) THEN
+               SCALE = .TRUE.
+               BLANK = NUM_UBTOI( VAL__BADUB )
+
+            ELSE IF ( BPOUT .GT. 0 ) THEN
+               BLANK = VAL__BADI
+            END IF
+
+*  Signed byte
+*  -----------
+*  Map the input data using the next integer data type (_WORD) that
+*  encompasses the dynamic range of values, as there is no FITSIO
+*  routine for writing a _BYTE array to the FITS file.  Adjust the
+*  input BITPIX accordingly.
+         ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
+            TYPE = '_WORD'
+            BPIN = 16
+
 *  Record the fact that an offset is required, and reset the bad pixel
 *  (BLANK) value.
-         IF ( TYPE .EQ. '_BYTE' ) THEN
-            SHIFT = .TRUE.
-            BZERO = -128.0D0
-            BLANK = VAL__BADB + 128
+            IF ( BPOUT .EQ. 8 ) THEN
+               SHIFT = .TRUE.
+               BZERO = -128.0D0
+               BLANK = NUM_BTOI( VAL__BADB ) + 128
 
-*  When there is scaling to perform a simple shift is not adequate
-*  so use the scaling route.
-         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            SHIFT = .TRUE.
-            BZERO = 32768.0D0
-            BLANK = VAL__BADUW - 32768
+            ELSE IF ( BPOUT .GT. 0 ) THEN
+               BLANK = NUM_WTOI( VAL__BADW )
+
+            END IF
 
 *  Compare the component's BITPIX with that supplied.
          ELSE IF ( BPOUTU .LT. BPINU ) THEN
@@ -522,37 +587,20 @@
 
             END IF
 
-*  Set the null values.  Only one will be needed, depending on the
-*  value of BPOUT, but it as efficient to assign them all.
-            NULL32 = VAL__BADI
-            NULL16 = VAL__BADW
-            NULL8 = VAL__BADUB
-            NUL_32 = VAL__BADR
-            NUL_64 = VAL__BADD
-
 *  Deal with the types where no scaling or offset is required.
          ELSE
 
-*  Integer types will have a blank value.  Also set the null values.
-*  These are based upon the type of the NDF array.  The FITSIO routine
-*  will perform any type conversion required.
+*  Integer types will have a blank value.  These are based upon the type
+*  of the NDF array.  The FITSIO routine will perform any type
+*  conversion required.
             IF ( TYPE .EQ. '_INTEGER' ) THEN
                BLANK = VAL__BADI
-               NULL32 = VAL__BADI
 
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                BLANK = NUM_WTOI( VAL__BADW )
-               NULL16 = VAL__BADW
 
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                BLANK = NUM_UBTOI( VAL__BADUB )
-               NULL8 = VAL__BADUB
-
-            ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               NUL_32 = VAL__BADR
-
-            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               NUL_64 = VAL__BADD
 
             END IF
          END IF
@@ -620,6 +668,12 @@
 
             END IF
 
+
+*  Abort if an error has occurred. We do this check so that we can be
+*  confident that any error which is detected after the next block of calls (to
+*  COF_ESCOx) was produiced by COF_ESCOx.
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Evaluate the scaling and offset.  Call the appropriate routine
 *  dependent on the array-component's type to evaluate the scaling.
 *  Note that _UBYTE and _BYTE will never need scaling; _BYTE and _UWORD
@@ -642,6 +696,16 @@
      :                          BSCALE, BZERO, STATUS )
 
             END IF
+
+* An error (SAI__ERROR) will have been reported if all the pixel values
+* were bad. In this case, we annull the error and use default BSCALE and
+* BZERO values (the resulting NDF will be filled with BLANK values).
+            IF( STATUS .EQ. SAI__ERROR .AND. BAD ) THEN
+	       CALL ERR_ANNUL( STATUS )
+               BSCALE = 1.0
+               BZERO = 0.0
+            END IF
+
 
          ELSE
 
@@ -743,7 +807,7 @@
                CALL FTPPNE( FUNIT, 0, 1, EL, %VAL( IPNTR ), NUL_32,
      :                      FSTAT )
 
-            ELSE IF ( BPIN .EQ. -64) THEN
+            ELSE IF ( BPIN .EQ. -64 ) THEN
                CALL FTPPND( FUNIT, 0, 1, EL, %VAL( IPNTR ), NUL_64,
      :                      FSTAT )
             END IF

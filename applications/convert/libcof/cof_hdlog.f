@@ -39,11 +39,16 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield(STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 January 19 (MJC):
 *        Original version.
+*     1998 January 6 (MJC):
+*        Allow for 0 RECLEN from INQUIRE
+*     2000 March 28 (AJC):
+*        Use [] not () as extension syntax
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,7 +96,9 @@
       INTEGER MXFILN             ! Maximum number of characters in the
                                  ! file name that can be displayed
       INTEGER NCF                ! Number of characters in the FITS file
-                                 ! name
+                                 !  specification
+      INTEGER NCN                ! Number of characters in the FITS file
+                                 !  name (without any extension specifier)
       INTEGER NCO                ! Number of characters in the output
       INTEGER NHEAD              ! Number of FITS headers
       INTEGER RECLEN             ! Record length of logfile
@@ -102,8 +109,10 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the length of the filename.
+*  Get the length of the FITS specifier and filename.
       NCF = CHR_LEN( FILE )
+      NCN = INDEX( FILE(1:NCF), '[' ) - 1
+      IF ( NCN .LT. 0 ) NCN = NCF
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
@@ -141,17 +150,17 @@
 *  Add ellipsis where truncated.  Write caption to buffer, truncating
 *  the filename.
       IF ( NCF .GT. MXFILN ) THEN
-         WRITE( DUMMY, '(''** File: ...'',A,'' ('',I3,'' ) header '/
-     :     /'cards'')' ) FILE( MAX( 1, NCF - MXFILN + 3 ):NCF ), CHDU
+         WRITE( DUMMY, '(''** File: ...'',A,'' ['',I3,'' ] header '/
+     :     /'cards'')' ) FILE( MAX( 1, NCN - MXFILN + 3 ):NCN ), CHDU
 
          NCO = MXFILN + 30
 
 *  Write the caption using the full file name.
       ELSE
-         WRITE( DUMMY, '(''** File: '',A,'' ('',I3,'' ) header '/
-     :     /'cards'')' ) FILE( 1:NCF ), CHDU
+         WRITE( DUMMY, '(''** File: '',A,'' ['',I3,'' ] header '/
+     :     /'cards'')' ) FILE( 1:NCN ), CHDU
 
-         NCO = NCF + 30
+         NCO = NCN + 30
       END IF
 
       CALL FIO_WRITE( FDL, DUMMY( :NCO ), STATUS )

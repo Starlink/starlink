@@ -1,4 +1,5 @@
-      SUBROUTINE COF_STYPE( NDF, COMP, TYPE, BITPIX, ITYPE, STATUS )
+      SUBROUTINE COF_STYPE( NDF, COMP, TYPE, BITPIX, FMTCNV, ITYPE, 
+     :                      STATUS )
 *+
 *  Name:
 *     COF_STYPE
@@ -11,37 +12,50 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_STYPE( NDF, COMP, TYPE, BITPIX, ITYPE, STATUS )
+*     CALL COF_STYPE( NDF, COMP, TYPE, BITPIX, FMTCNV, ITYPE, STATUS )
 
 *  Description:
 *     This sets the data type for an NDF array component.  A preferred
-*     type value is used, unless the component is the QUALITY.  The
-*     type may also be undefined, in which case the supplied FITS
-*     BITPIX defines the data type.
+*     type value is used, unless the component is the QUALITY (in which
+*     case the routine returns without action). The type may also be 
+*     undefined, in which case the supplied FITS BITPIX defines the data 
+*     type.
 
 *  Arguments:
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF to be converted from the FITS file.
 *     COMP = CHARACTER * ( * ) (Given)
-*        The array component.  It must be 'Data' or 'Variance'.
+*        The array component.  It must be 'Data', 'Quality' or 'Variance'.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The data type of the component.  If this is null, the BITPIX
 *        defines the data type.
 *     BITPIX = INTEGER (Given)
 *        The FITS BITPIX value to define the data type when TYPE = ' '.
 *        Thus for example -32 would generate _REAL and 16 makes _WORD.
+*     FMTCNV = LOGICAL (Given)
+*        Always return a floating point data type if TYPE is null?
 *     ITYPE = CHARACTER * ( DAT__SZTYP ) (Returned)
 *        The data type selected for the component.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     -  ITYPE is always returned as '_UBYTE' if COMP is 'Quality' since
+*     an NDF QUALITY component can only have this data type.
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 January 19 (MJC):
 *        Original version.
+*     10-DEC-1998 (DSB):
+*        Return without action if COMP is 'Quality', since calling
+*        NDF_STYPE would cause an error to be reported by the NDF library.
+*     8-JAN-1999 (DSB):
+*        Added FMTCNV argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -60,6 +74,7 @@
       CHARACTER * ( * ) COMP
       CHARACTER * ( * ) TYPE
       INTEGER BITPIX
+      LOGICAL FMTCNV
 
 *  Arguments Returned:
       CHARACTER * ( * ) ITYPE
@@ -72,21 +87,27 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Determine the data type of the output array component.  QUALITY
-*  arrays must be unsigned byte.
+*  QUALITY arrays must be unsigned byte, and cannot be changed.
       IF ( COMP .EQ. 'QUALITY' ) THEN
          ITYPE = '_UBYTE'
 
-*  A null supplied type means use the data type of the FITS file.
-      ELSE IF ( TYPE .EQ. ' ' ) THEN
-         CALL COF_BP2HT( BITPIX, ITYPE, STATUS )
+*  For DATA or VARIANCE components...
+      ELSE
+
+*  Determine the data type of the output array component. A null supplied 
+*  type means use the data type of the FITS file (converted to floating
+*  point if format conversion is being performed).
+         IF ( TYPE .EQ. ' ' ) THEN
+            CALL COF_BP2HT( BITPIX, FMTCNV, ITYPE, STATUS )
 
 *  Just use the supplied data type.
-      ELSE
-         ITYPE = TYPE
-      END IF
+         ELSE
+            ITYPE = TYPE
+         END IF
 
 *  Change the type of the component.
-      CALL NDF_STYPE( ITYPE, NDF, COMP, STATUS )
+         CALL NDF_STYPE( ITYPE, NDF, COMP, STATUS )
+
+      END IF
  
       END

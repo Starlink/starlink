@@ -96,11 +96,14 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 June 29 (MJC):
 *        Original version.
+*     8-JAN-1999 (DSB):
+*        Added FMTCNV to argument list for COF_STYPE call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -269,7 +272,8 @@
       IF ( DARRAY ) THEN
 
 *  Set the data type of the data array.
-         CALL COF_STYPE( NDF, 'Data', TYPE, BITPIX, ITYPE, STATUS )
+         CALL COF_STYPE( NDF, 'Data', TYPE, BITPIX, FMTCNV, ITYPE, 
+     :                   STATUS )
 
 *  Set the shape of the NDF.
          DO I = 1, NDIM

@@ -70,6 +70,9 @@
 *        Set null value (as opposed to TNULLn) keywords for integer
 *        columns.  Added TDISP cards for position, magnitude and
 *        programme identification columns.
+*     1998 August 13 (MJC):
+*        No longer writes TNULLn keywords for non-integer columns,
+*        so as not to violate the FITS standard.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,7 +115,7 @@
       CHARACTER * ( 3 ) CN       ! Column number
       CHARACTER * ( DAT__SZNAM ) CNAME ! Component name
       CHARACTER * ( DAT__SZNAM ) CTYPE ! Component type
-      CHARACTER * ( 8 ) CRDNAM   ! Header-card name to insert TNULLn
+      CHARACTER * ( 8 ) CRDNAM   ! Header-card name
       CHARACTER * 80 CVALUE      ! Character value
       CHARACTER * ( 4 ) DSPFMT   ! TDISPn display format
       DOUBLE PRECISION DVALUE    ! D.p. value
@@ -243,15 +246,9 @@
          CALL CHR_APPND( CN, CRDNAM, NC )
 
 *  Process by data type.  Note that the _DOUBLE bad values are replaced
-*  by NaNs and don't have TNULLn cards.
-         IF ( I .EQ. 1  .OR. I .EQ. 9 .OR. I .EQ. 13 .OR.
-     :        I .EQ. 14 .OR. I .EQ. 15 ) THEN
-
-*  Insert the TNULLn card.
-            CALL FTIKYS( FUNIT, CRDNAM, ' ', 'String null value',
-     :                   FSTAT )
-
-         ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
+*  by NaNs and don't have TNULLn cards.  Null character values are
+*  recognised by the presence of the ASCII null as the first character.
+         IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
 
 *  Insert the TNULLn card.
             CALL FTIKYJ( FUNIT, CRDNAM, VAL__BADI, 'Null value', FSTAT )
@@ -557,15 +554,14 @@
 *  Unmap the component.
                 CALL DAT_UNMAP( CLOC, STATUS )
 
-*  There is no null character value, so it is set to be blank by
-*  convention.  Since this is really a fault in the NDF, the user can
-*  suffer a little by calling the FITSIO routine for every element,
-*  instead of getting workspace and filling it with blank values.
+*  Binary tables use the ASCII NULL as the first character to
+*  indicate a null character value.  Since this is really a fault in
+*  the NDF, the user can suffer a little by calling the FITSIO routine
+*  for every element, instead of getting workspace and filling it with
+*  blank values.
              ELSE
-                CVALUE = ' '
                 DO LEL = 1, EL
-                   CALL FTPCLS( FUNIT, I, LEL, 1, 1,
-     :                          CVALUE( 1:STRLEN ), FSTAT )
+                   CALL FTPCLS( FUNIT, I, LEL, 1, 1, NULL, FSTAT )
                 END DO
              END IF
              ROUTIN = 'FTPCLS'

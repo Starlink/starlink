@@ -36,7 +36,7 @@
 *     ZERKEY = INTEGER (Given)
 *        The keyword for the offset value.  It should be either
 *        'BSCALE' or 'TZERn', where n is an integer between 1 and 999.
-*     TYPE = CHARACTER * ( DAT__SZTYP )
+*     TYPE = CHARACTER * ( DAT__SZTYP ) (Returned)
 *        The effective data type for the data array.  It is either
 *        '_REAL' or '_DOUBLE' if the scale and offset do not take their
 *        defaults of one and zero respectively, and TYPE is blank

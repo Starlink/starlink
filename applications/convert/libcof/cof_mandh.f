@@ -71,6 +71,8 @@
 *  History:
 *     1994 September 15 (MJC):
 *        Original version.
+*     2000 November 7  (AJC):
+*        Set Size, NDIM = 0 and DARRAY=.FALSE. if any NAXISn=0
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -258,12 +260,17 @@
 
 *  Loop for each dimension.
          DO N = 1, NDIM
-
 *  Evaluate the number of pixels in the array.
-            IF ( AXIS ( N ) .GT. 0 ) SIZE = SIZE * AXIS( N )
+*  and check that not all NAXISn == 0
+*  SIZE will not be correct if any NAXISn are zero as in a Random Group header
+            DARRAY = .FALSE.
+            IF ( AXIS( N ) .GT. 0 ) THEN
+               SIZE = SIZE * AXIS( N )
+               DARRAY = .TRUE.
+            END IF
          END DO
-      ELSE
 
+      ELSE
 *  No data array is present.
          DARRAY = .FALSE.
          AXIS( 1 ) = VAL__BADI

@@ -95,7 +95,7 @@
 *        the FITS file.
 *        -  Other IMAGE and BINTABLE extensions are propagated to the
 *        NDF extension.  It uses the extension name and type found in
-*        the EXTNAME and EXTTYPE keywords, or names it NDF_EXT_n for
+*        the EXTNAME and EXTTYPE keywords, or names it FITS_EXT_n for
 *        the nth FITS extension.
 *        -  A FITS airlock in the NDF may be written (PROFIT=.TRUE.)
 *        to store the primary data unit's headers.  The airlock
@@ -107,6 +107,8 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -118,6 +120,16 @@
 *        Large rewrite to cope with non-standard and missing extensions.
 *     1997 November 16 (MJC):
 *        Filter out NDF-style HISTORY.
+*     1998 April 30 (MJC):
+*        Increased the maximum CLASS_NAME from 8 to 10 to allow for
+*        MFSOBJECT.
+*     8-JAN-1999 (DSB):
+*        Added FMTCNV to argument list for COF_STYPE call.
+*     5-APR-2000 (AJC):
+*        Add CHECK argument to COF_SBND
+*     30-AUG-2000 (AJC):
+*        Correct description FITS_EXT_n not NDF_EXT_n
+*        Add separate FITS unit numbers in call to COF_WRTAB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,15 +165,17 @@
       EXTERNAL CHR_NTH
 
 *  Local Constants:
-      INTEGER  FITSOK            ! Good status for FITSIO library
+      INTEGER  FITSOK             ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
+      INTEGER  CLASS_LEN          ! Max length of observation class string
+      PARAMETER( CLASS_LEN = 10)  
 
 *  Local Variables:
       LOGICAL BAD                ! True if bad values may be present in
                                  ! array
       INTEGER BITPIX             ! FITS file's BITPIX
       CHARACTER * ( 256 ) BUFFER ! BUFFER for writing error messages
-      CHARACTER * ( 8 ) CLASS    ! Observation class 
+      CHARACTER * ( CLASS_LEN ) CLASS   ! Observation class 
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to CLASS structure
       CHARACTER * ( DAT__SZLOC ) CLLOC ! Locator to CLASS component
       INTEGER COLEXT             ! Character where extension name begins
@@ -522,10 +536,11 @@
 *  is a simple array and is merely filled with dummy data, so test for
 *  this.
             IF ( DARRAY .AND. .NOT. NONSDA ) THEN
-               CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, ITYPE, STATUS )
+               CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, ITYPE, 
+     :                         STATUS )
 
 *  Specify the bounds of the NDF array component.
-               CALL COF_SBND( FUNIT, NDFE, 'LBOUND', STATUS )
+               CALL COF_SBND( FUNIT, NDFE, 'LBOUND', .FALSE., STATUS )
 
 *  Copy the data values into the array component.
 *  ==============================================
@@ -689,7 +704,7 @@
                END IF
 
 *  Create a NAME component, and assign the class to it via a locator.
-               CALL DAT_NEWC( CLOC, 'NAME', 8, 0, 0, STATUS )
+               CALL DAT_NEWC( CLOC, 'NAME', CLASS_LEN, 0, 0, STATUS )
                CALL DAT_FIND( CLOC, 'NAME', CLLOC, STATUS )
                CALL DAT_PUT0C( CLLOC, CLASS, STATUS )
                CALL DAT_ANNUL( CLLOC, STATUS )
@@ -717,8 +732,8 @@
      :                           STATUS )
 
 *  Call routine to create the <TABLE> structure from the FITS binary
-*  or ASCII table.
-                  CALL COF_WRTAB( FUNIT, XLOC, STATUS )
+*  or ASCII table. Header and Data FUNITs are the same (no inheritance)
+                  CALL COF_WRTAB( FUNIT, FUNIT, XLOC, STATUS )
 
 *  Tidy the locator to the extension.
                   CALL DAT_ANNUL( XLOC, STATUS )
