@@ -59,8 +59,54 @@ parent of the node.
 		 nl))
 
 <routine>
+<routinename>node-list-filter
+<description>
+Returns a node-list containing just those members of nl for which proc
+applied to a singleton node-list containing just that member does not
+return #f.
+<returnvalue type=node-list>List of matching nodes
+<argumentlist>
+<parameter>proc
+  <type>procedure
+  <description>The filtering procedure, retrning #t when a node is to
+  be included in the result.
+<parameter>nl
+  <type>node-list
+  <description>The node-list which is to be filtered
+<authorlist>
+<authorref id=iso10179 note='10.2.2'>
+<codebody>
+(define (node-list-filter proc nl)
+  (node-list-reduce nl
+		    (lambda (result snl)
+		      (if (proc snl)
+			  (node-list snl result)
+			  result))
+		    (empty-node-list)))
+
+<routine>
+<routinename>node-list->list
+<description>
+Returns a list containing, for each member of nl, a singleton
+node-list containing just that member
+<returnvalue type=node-list>List of singleton node-lists
+<argumentlist>
+<parameter>nl
+  <type>node-list
+  <description>The node-list which is to be split
+<authorlist>
+<authorref id=iso10179 note='10.2.2'>
+<codebody>
+(define (node-list->list nl)
+  (reverse (node-list-reduce nl
+			     (lambda (result snl)
+			       (cons snl result))
+			     '())))
+
+<routine>
 <description>The old favourites, beloved of Lisp folk
 <codebody>
+(define caar (lambda (x) (car (car x))))
 (define cadr (lambda (x) (car (cdr x))))
 (define caddr (lambda (x) (car (cdr (cdr x)))))
 (define cadddr (lambda (x) (car (cdr (cdr (cdr x))))))

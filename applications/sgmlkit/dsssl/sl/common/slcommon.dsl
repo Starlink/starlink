@@ -994,9 +994,9 @@ evaluate more than one expression one after another!
   (let* ((parts (tokenise-string d boundary-char?: (lambda (c)
 						     (or (char=? c #\-)
 							 (char=? c #\space)))))
-	 (cpts (debug (if (string=? (car parts) "")
+	 (cpts (if (string=? (car parts) "")
 		   (cdr parts)
-		   parts)))
+		   parts))
 	 (strok (equal? (length cpts) 3))
 	 (day (and strok (string->number (car cpts))))
 	 (month-str (and strok (cadr cpts)))
@@ -1376,6 +1376,7 @@ dd-MMM-yyyy.
 	    nl				; return the trailing paragraphs
 	    ))))
 
+<![IGNORE[ <!-- redundant -->
 <routine>
 <routinename>table-colno
 <purpose>Return a list of numbers, indicating the current column number and the
@@ -1408,6 +1409,7 @@ number of columns.
 	       (string->number tgroup-cols))
 	#f				; we're not in a table
 	)))
+]]>
 
 <routine>
 <routinename>get-updates
