@@ -14,8 +14,8 @@ OBJS	= $(strip $(patsubst ../%.f,    %.o, $(SRCS.f)))
 PROD  = red4
 PROD += $(patsubst ../%.ifl, %.ifc, $(wildcard ../*.ifl))
 
-# Things defined by the PROCS macro are installed in $(INSTALL_PROC)
-PROCS = $(patsubst ../%, %, $(wildcard ../*.icl))
+# Things defined by the SCRIPTS macro are installed in $(INSTALL_PROC)
+SCRIPTS = $(patsubst ../%, %, $(wildcard ../*.icl))
 
 # This defines the objects to include in any library that is built.
 # By default, the library isn't installed. To install it you must
@@ -25,8 +25,9 @@ LIBOBJS = $(OBJS)
 # Rules for building targets
 include $(APPLIC_TOP)/config/RULES.Build
 
-red4: red4.o libred4.a libcgsgen.a libcgsfige.a
-	$(ALINK) red4.o -o $@ libred4.a libcgsgen.a libcgsfige.a \
+red4: red4.o libred4.a 
+	$(ALINK) red4.o -o $@ libred4.a -L$(INSTALL_LIB) -lcgsgen -lcgsfige \
           -L$(FIG_LIB) -ldsa -lfig -lpar -ldta -lich -lgen -ljty \
           -L$(STAR_LIB) -lpda `prm_link_adam` `sla_link_adam` \
           `fio_link_adam`  $(LDFLAGS)
+	$(STRIP) $@
