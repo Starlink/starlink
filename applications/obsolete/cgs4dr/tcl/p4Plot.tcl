@@ -116,7 +116,9 @@ proc p4Plot {taskname} {
 # Get the data set name and plot it.
     if {[$taskname path] != 0} {
       cgs4drCursor watch red white
-      $taskname obey lut "port=$port" -inform "cgs4drInform $taskname %V"
+      set display_lut -1
+      $taskname obey lut "port=$port" -inform "cgs4drInform $taskname %V" -endmsg {set display_lut 1}
+      tkwait variable display_lut
       set display_status -1
       $taskname obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V" -endmsg {set display_status 1}
       tkwait variable display_status
