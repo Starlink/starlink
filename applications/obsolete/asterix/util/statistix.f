@@ -47,6 +47,8 @@
 *        Asks if data quality is to be used
 *     LOOP = LOGICAL (read)
 *        Loop over rejecting high sigma points
+*     USEGRP = LOGICAL (read)
+*        Use grouping if present?
 
 *  Examples:
 *     {routine_example_text}
@@ -142,6 +144,8 @@
 *        Protect against nvalid = 1 in chi-squared calculation
 *      8 Mar 1996 V2.0-2 (DJA):
 *        Removed simple mode
+*      3 Apr 1996 V2.0-3 (DJA):
+*        Added grouping handling
 *     {enter_changes_here}
 
 *  Bugs:
@@ -162,15 +166,17 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'STATISTIX Version V2.0-2' )
+        PARAMETER		( VERSION = 'STATISTIX Version V2.0-3' )
 
 *  Local Variables:
-      CHARACTER*150          PATH               ! HDS path to input object
-      CHARACTER*150          INPUTFILE          ! Name of input container file
+      CHARACTER*150          	PATH               	! Path to input object
+      CHARACTER*150          	INPUTFILE          	! Name of input container file
 
       INTEGER			DIMS(ADI__MXDIM)   	! Input dimensions
 
       INTEGER                	AXPTR(ADI__MXDIM)  	! Axis data ptr's
+      INTEGER			GDPTR, GQPTR, GVPTR	! Grouped data
+      INTEGER			GPTR			! Grouping index array
       INTEGER                	IDPTR              	! Data array ptr
       INTEGER			IFID			! Input file identifier
       INTEGER                	IQPTR              	! Data quality ptr
@@ -178,14 +184,17 @@
       INTEGER                	IAX                	! Loop over axes
       INTEGER                	NDIM               	! Input dimensionality
       INTEGER                	NELM               	! Total # data values
-      INTEGER                NUMLEVELS          ! Number of levels in HDS path.
+      INTEGER			NGRP			! # groups
+      INTEGER                	NUMLEVELS          	! # levels in file path
       INTEGER                	OCH                	! Output channel
-      INTEGER                OUTWIDTH           ! 80 if terminal,132 otherwise.
+      INTEGER                	OUTWIDTH           	! 80 if terminal,132 otherwise.
       INTEGER                	WPTR               	! Weights array ptr
 
-      LOGICAL                DATAOK, VAROK      ! Various input
-      LOGICAL                QUALOK, AXOK       ! objects there?
-      LOGICAL                LOOP               ! Loop with sigma rejection?
+      LOGICAL                	DATAOK, VAROK      	! Various input
+      LOGICAL			GRPOK			! Grouping present?
+      LOGICAL                	QUALOK, AXOK       	! objects there?
+      LOGICAL                	LOOP               	! Loop with sigma rejection?
+      LOGICAL			USEGRP			! Use grouping?
 *.
 
 *  Check inherited global status.
@@ -258,6 +267,15 @@
 
       END IF
 
+*  If grouping is present ask user whether its to be used
+      CALL BDI_CHK( IFID, 'Grouping', GRPOK, STATUS )
+      IF ( GRPOK ) THEN
+        CALL USI_GET0L( 'USEGRP', USEGRP, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+      ELSE
+        USEGRP = .FALSE.
+      END IF
+
 *  Find out if looping is required
       CALL USI_GET0L( 'LOOP', LOOP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -285,10 +303,51 @@
 *  Pad extra dimensions to 7D
       CALL AR7_PAD( NDIM, DIMS, STATUS )
 
-*  Do the statistics
-      CALL STATISTIX_INT( NELM, %VAL(IDPTR), %VAL(WPTR), VAROK,
-     :                  %VAL(IVPTR), QUALOK, %VAL(IQPTR), NDIM,
-     :                   DIMS, AXOK, AXPTR, OCH, LOOP, STATUS )
+*  Group if required
+      IF ( USEGRP ) THEN
+
+*    Map grouping array
+        CALL BDI_MAPI( IFID, 'Grouping', IGPTR, STATUS )
+
+*    Count groups
+        CALL UTIL_CNTGRP( NELM, %VAL(IGPTR), NGRP, STATUS )
+
+*    Map work space
+        CALL DYN_MAPD( 1, NGRP, GDPTR, STATUS )
+        IF ( VOK ) THEN
+          CALL DYN_MAPD( 1, NGRP, GVPTR, STATUS )
+        END IF
+        IF ( QOK ) THEN
+          CALL DYN_MAPL( 1, NGRP, GQPTR, STATUS )
+        END IF
+
+*    Perform grouping
+        CALL UTIL_GRPVLQ( NELM, %VAL(IDPTR), VOK, %VAL(IVPTR), QOK,
+     :                    %VAL(IQPTR), %VAL(GPTR), NGRP, %VAL(GDPTR),
+     :                    %VAL(GVPTR), %VAL(GQPTR), STATUS )
+
+*    Do the statistics
+        CALL STATISTIX_INT( USEGRP, NGRP, %VAL(GDPTR), %VAL(WPTR),
+     :                      VAROK, %VAL(GVPTR), QUALOK, %VAL(GQPTR),
+     :                      1, NGRP, .FALSE., 0, OCH, LOOP, STATUS )
+
+*    Release grouping workspace
+        CALL DYN_UNMAP( GDPTR, STATUS )
+        IF ( VOK ) THEN
+          CALL DYN_UNMAP( GVPTR, STATUS )
+        END IF
+        IF ( QOK ) THEN
+          CALL DYN_UNMAP( GQPTR, STATUS )
+        END IF
+
+      ELSE
+
+*    Do the statistics
+        CALL STATISTIX_INT( USEGRP, NELM, %VAL(IDPTR), %VAL(WPTR),
+     :              VAROK, %VAL(IVPTR), QUALOK, %VAL(IQPTR), NDIM,
+     :                     DIMS, AXOK, AXPTR, OCH, LOOP, STATUS )
+
+      END IF
 
 *  Annul PAR__NULL in loop mode
       IF ( LOOP .AND. (STATUS.EQ.PAR__NULL) ) THEN
@@ -306,9 +365,9 @@
 
 
 *+  STATISTIX_INT - Internal routine to evaluate numeric statistics
-      SUBROUTINE STATISTIX_INT( N, DATA, WEIGHTS, VAROK, VAR, QUALOK,
-     :                          QUAL, NDIM, DIMS, AXOK, AXPTR,
-     :                               OCH, LOOP, STATUS )
+      SUBROUTINE STATISTIX_INT( GRP, N, DATA, WEIGHTS, VAROK, VAR,
+     :                          QUALOK, QUAL, NDIM, DIMS, AXOK,
+     :                          AXPTR, OCH, LOOP, STATUS )
 *
 *    Description :
 *
@@ -353,10 +412,11 @@
 *
 *    Import :
 *
-      DOUBLE PRECISION       DATA(*)            ! Mapped DATA_ARRAY
-      DOUBLE PRECISION       VAR(*)             ! Mapped VARIANCE
-      DOUBLE PRECISION       WEIGHTS(*)         ! Mapped weights array
-      LOGICAL                QUAL(*)            ! Mapped QUALITY
+      LOGICAL			GRP			! Grouped data?
+      DOUBLE PRECISION       	DATA(*)            	! Mapped DATA_ARRAY
+      DOUBLE PRECISION       	VAR(*)             	! Mapped VARIANCE
+      DOUBLE PRECISION       	WEIGHTS(*)         	! Mapped weights array
+      LOGICAL                	QUAL(*)            	! Mapped QUALITY
 
       INTEGER                AXPTR(*)           ! Ptrs to axis data
       INTEGER                NDIM               ! Object dimensionality
@@ -492,7 +552,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Display results
-      CALL STATISTIX_DISPLAY( NDIM, DIMS, N, USEWEIGHT, VAROK,
+      CALL STATISTIX_DISPLAY( GRP, NDIM, DIMS, N, USEWEIGHT, VAROK,
      :                        MEAN, SUM,
      :                        STDDEV, SKEWNESS, KURTOSIS, MINVALUE,
      :                        MAXVALUE, MINP, MAXP, MEANERR, NVALID,
@@ -538,7 +598,12 @@
 
 *        Output sigma to be ignored, and header for ignored list.
           CALL MSG_SETD( 'SIG', SIGMA )
-          CALL AIO_WRITE( OCH, ' Ignoring points > ^SIG standard '/
+          IF ( GRP ) THEN
+            CALL MSG_SETC( 'OBJ', 'groups' )
+          ELSE
+            CALL MSG_SETC( 'OBJ', 'points' )
+          END IF
+          CALL AIO_WRITE( OCH, ' Ignoring ^OBJ > ^SIG standard '/
      :                    /'deviations from the mean.', STATUS )
 
 *        Weights already defined?
@@ -602,7 +667,7 @@
      :                 WTSUM, NVALID, CHISQUARE, ENZ, STATUS )
 
 *        ...and display
-      CALL STATISTIX_DISPLAY( NDIM, DIMS, N, USEWEIGHT, VAROK,
+      CALL STATISTIX_DISPLAY( GRP, NDIM, DIMS, N, USEWEIGHT, VAROK,
      :                        MEAN, SUM,
      :                  STDDEV, SKEWNESS, KURTOSIS, MINVALUE, MAXVALUE,
      :                   MINP, MAXP, MEANERR, NVALID, CHISQUARE, ENZ,
@@ -705,7 +770,7 @@
 
 
 *+  STATISTIX_DISPLAY - writes the results to appropriate unit.
-      SUBROUTINE STATISTIX_DISPLAY( NDIM, DIMS, N, WTERR, VAROK,
+      SUBROUTINE STATISTIX_DISPLAY( GRP, NDIM, DIMS, N, WTERR, VAROK,
      :                              MEAN, SUM, STDDEV, SKEWNESS,
      :                              KURTOSIS, MINVALUE, MAXVALUE, MINP,
      :                              MAXP,
@@ -731,6 +796,7 @@
 *
 *    Import :
 *
+      LOGICAL			GRP			! Data is grouped?
       INTEGER                NDIM               ! Input dimensionality
       INTEGER                DIMS(ADI__MXDIM)   ! Input dimensions
       INTEGER                OCH                ! Output channel
@@ -758,6 +824,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*5		OBJ			! Object type
       CHARACTER*79		OBUF			! Output buffer
       CHARACTER*24           	PSTR               	! Pixel index string
 
@@ -773,13 +840,19 @@
       WRITE( OBUF, 10 )
       CALL AIO_WRITE( OCH, OBUF, STATUS )
 
-      WRITE( OBUF, '(7X,A1,2X,I10,1X,A12,5X,I10,1X,A12,8X,A1)' )
-     :         '*', N, 'data points.', NVALID, 'points used.','*'
+      IF ( GRP ) THEN
+        OBJ = 'group'
+      ELSE
+        OBJ = 'point'
+      END IF
+
+      WRITE( OBUF, '(7X,A1,2X,I10,1X,3A,5X,I10,1X,2A,8X,A1)' )
+     :         '*', N, 'data ',OBJ,'s.', NVALID, OBJ, 's used.','*'
       CALL AIO_WRITE( OCH, OBUF, STATUS )
       WRITE( OBUF, 10 )
       CALL AIO_WRITE( OCH, OBUF, STATUS )
-      WRITE( OBUF, '(7x,a1,2x,a27,1Pg15.7,17x,a1)' )
-     :        '*', 'Sum of valid data points = ', SUM, '*'
+      WRITE( OBUF, '(7x,a1,2x,3A,1Pg15.7,17x,a1)' )
+     :        '*', 'Sum of valid data ', OBJ, 's = ', SUM, '*'
       CALL AIO_WRITE( OCH, OBUF, STATUS )
 
 *    WRITE the appropriate message for the mean.
