@@ -1,0 +1,17 @@
+tautog
+starconf.status.local
+starconf.status
+starconf.m4
+libtool
+exampl
+configure
+config.status
+config.log
+autom4te.cache
+aclocal.m4
+acinclude.m4
+Makefile.in
+Makefile
+.libs
+.deps
+
