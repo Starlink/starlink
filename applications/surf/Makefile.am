@@ -1,16 +1,20 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = sculib surflib src
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc
 
-bin_SCRIPTS = $(DYNSCRIPTS)
+dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
 bin_MONOLITHS = surf_mon
 surf_mon_SOURCES = surf_mon.f surf_set_app_name.f
 
-starnewsdir = $(datadir)/doc/surf-@PACKAGE_VERSION@
+starnewsdir = $(datadir)/doc/@PACKAGE_NAME@-@PACKAGE_VERSION@
 starnews_DATA = SURF_CONDITIONS surf.news
+
+# Data files to be installed into bindir
+bindatadir = $(bindir)
+dist_bindata_DATA = $(MISCDATA) 
 
 # Tasks
 surf_mon_TASKS = bolrebin calcsky change_data change_flat change_pointing \
@@ -21,6 +25,19 @@ surf_mon_TASKS = bolrebin calcsky change_data change_flat change_pointing \
 
 # Linking
 surf_mon_LDADD =  src/libsurf.la surflib/libsurflib.la sculib/libsculib.la `$(srcdir)/surf_link_adam`
+
+# Miscellaneous data files
+MISCDATA = misc/calsig_450_850_photom.sdf misc/calsig_450_850_bp2.sdf \
+misc/calsig_450_map.sdf misc/ipfile.dat misc/calsig_450_850_map.sdf    \
+misc/calsig_850_map.sdf misc/polimp.scuba
+
+# Static scripts
+STATICSCRIPTS = scripts/change_nacentre.pl scripts/qdraw	       \
+scripts/scupa.csh scripts/scusetenv.csh scripts/setbolwt.pl	       \
+scripts/remdbm.pl scripts/scuplot.csh scripts/scushift scripts/sigclip \
+scripts/sculog scripts/scupol.pl scripts/scuvax_clkerr.pl	       \
+scripts/calcflat.pl scripts/polphot.pl scripts/scunoise		       \
+scripts/scuquick scripts/sdip.csh
 
 # Dynamically generated scripts
 DYNSCRIPTS = surf.csh surf.icl

@@ -16,11 +16,15 @@ STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
+
+AC_FC_CHECK_INTRINSICS([IEEE_FLAGS])
 
 STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( perl )
+STAR_CHECK_PROGS( hlib )
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
@@ -29,10 +33,16 @@ STAR_DECLARE_DEPENDENCIES([build], [sae prm pcs mers ndf])
 STAR_DECLARE_DEPENDENCIES([link], [ndf fio sla hlp pda prm agi kaplibs pgplot grp ndg])
 dnl    No use dependencies
 
-dnl STAR_LATEX_DOCUMENTATION(sun102)
+dnl Documentation
+STAR_LATEX_DOCUMENTATION( [sun216 ssn72 sc10 sc11] )
 
-AC_CONFIG_SUBDIRS([sculib surflib src scripts misc docs])
+dnl  But we also need to define the docs subdirs
+DOCS_SUBDIRS="hlp sun216 ssn72 sc10 sc11"
+AC_SUBST(DOCS_SUBDIRS)
 
-AC_CONFIG_FILES(Makefile component.xml surf_set_app_name.f surf.ifd)
+dnl AC_CONFIG_FILES(Makefile surflib/Makefile sculib/Makefile src/Makefile docs/Makefile docs/hlp/Makefile docs/sun216/Makefile docs/ssn72/Makefile docs/sc10/Makefile docs/sc11/Makefile component.xml surf_set_app_name.f surf.ifd)
+
+AC_CONFIG_FILES(Makefile sculib/Makefile surflib/Makefile src/Makefile   component.xml surf_set_app_name.f surf.ifd)
+
 
 AC_OUTPUT
