@@ -1730,7 +1730,7 @@ itcl::class gaia::StarAstGrid {
    #  Ast graphics tag used to control redraws etc.
    itk_option define -ast_tag ast_tag Ast_Tag {} {
       if { $itk_option(-ast_tag) == {} } {
-         set itk_option(-ast_tag) "ast_grid[incr grid_count_]"
+         set itk_option(-ast_tag) "ast_element"
       }
    }
 

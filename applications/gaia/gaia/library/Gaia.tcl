@@ -303,8 +303,8 @@ itcl::class gaia::Gaia {
             -float_panel $itk_option(-float_panel) \
             -newimagecmd [code $this cleared] \
             -temporary $itk_option(-temporary) \
-            -ast_tag "ast_${this}" \
-            -grid_command [code $this maybe_draw_grid_] \
+            -ast_tag "$this" \
+            -grid_command [code $this redraw_specials_] \
             -with_warp 1 \
             -panel_layout $itk_option(-panel_layout) \
             -regioncommand [code $this select_region] \
@@ -550,7 +550,7 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -ast_tag "grid_${this}" \
+            -ast_tag "$this" \
             -clone_cmd [code $this make_toolbox astgrid 1] \
             -really_die $cloned
       }
@@ -565,7 +565,7 @@ itcl::class gaia::Gaia {
             -canvas [$image_ get_canvas] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -notify_cmd [code $this maybe_draw_grid_ 1] \
+            -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astreference 1] \
             -really_die $cloned
       }
@@ -578,7 +578,7 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -notify_cmd [code $this maybe_draw_grid_ 1] \
+            -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astdefine 1] \
             -really_die $cloned
       }
@@ -592,7 +592,7 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -filter_types $itk_option(-file_types) \
-            -notify_cmd [code $this maybe_draw_grid_ 1] \
+            -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astcopy 1] \
             -really_die $cloned
       }
@@ -607,7 +607,7 @@ itcl::class gaia::Gaia {
             -canvas [$image_ get_canvas] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -notify_cmd [code $this maybe_draw_grid_ 1] \
+            -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astrefine 1] \
             -really_die $cloned
       }
@@ -620,22 +620,32 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -notify_cmd [code $this maybe_draw_grid_ 1] \
+            -notify_cmd [code $this redraw_specials_ 1] \
             -clone_cmd [code $this make_toolbox astsystem 1] \
             -really_die $cloned
       }
    }
 
-   #  When image is flipped etc. we may want to redraw the grid, if
-   #  it is visible (that is not withdrawn). If auto is set 1 then
-   #  the grid is only redrawn if automatic redraws are on.
-   protected method maybe_draw_grid_ { {auto 0} } {
+   #  When image is flipped etc. we may want to redraw some items
+   #  that are to expense to flip via Tcl commands.
+   #  If auto is set 1 then the grid is only redrawn if automatic
+   #  redraws are on. 
+   protected method redraw_specials_ { {auto 0} } {
       if { [info exists itk_component(astgrid) ] &&
            [winfo exists $itk_component(astgrid) ] } {
 
          #  Check that window isn't withdrawn
          if { [wm state $itk_component(astgrid)] != "withdrawn" } {
             $itk_component(astgrid) draw_grid 0 $auto
+         }
+      }
+
+      if { [info exists itk_component(contour) ] &&
+           [winfo exists $itk_component(contour) ] } {
+
+         #  Check that window isn't withdrawn
+         if { [wm state $itk_component(contour)] != "withdrawn" } {
+            $itk_component(contour) redraw 0
          }
       }
    }
@@ -689,7 +699,7 @@ itcl::class gaia::Gaia {
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
-            -contour_tag "contour_${this}" \
+            -ast_tag "$this" \
             -image $image_ \
             -filter_types $itk_option(-file_types) \
             -transient $itk_option(-transient_tools) \
@@ -821,6 +831,11 @@ itcl::class gaia::Gaia {
       if { [info exists itk_component(astsystem) ] } {
          if { [winfo exists $itk_component(astsystem) ] } {
             $itk_component(astsystem) image_changed
+         }
+      }
+      if { [info exists itk_component(contour) ] } {
+         if { [winfo exists $itk_component(contour) ] } {
+            $itk_component(contour) remove_contours
          }
       }
    }

@@ -255,12 +255,21 @@ itcl::class gaia::GaiaContour {
    public method close {} {
 
       #  Remove the contours.
-      catch {remove_contours_}
+      catch {remove_contours}
 
       if { $itk_option(-really_die) } {
          delete object $this
       } else {
          wm withdraw $w_
+      }
+   }
+
+   #  Public redraw method. Only used externally to this class, which
+   #  means we can decline to draw the contours unless they have already
+   #  been drawn using the button.
+   public method redraw { {override 0} } {
+      if { $contoured_ || $override } {
+         draw 1
       }
    }
 
@@ -636,7 +645,7 @@ itcl::class gaia::GaiaContour {
 
          #  Clear existing contours.
          if { $all } {
-            remove_contours_
+            remove_contours
             update
          } elseif { ! $all } {
             remove_contour_ $index
@@ -674,7 +683,7 @@ itcl::class gaia::GaiaContour {
 
                #  Set the tag used to control clear etc.
                $itk_option(-rtdimage) configure -ast_tag \
-                  "$itk_option(-contour_tag) $leveltags_($ncont)"
+                  "$itk_option(-ast_tag) $leveltags_($ncont)"
 
                #  Draw the contour (return value is number of points).
                set drawn_($ncont) \
@@ -689,7 +698,7 @@ itcl::class gaia::GaiaContour {
          } else {
             #  Set the tag used to control clear etc.
             $itk_option(-rtdimage) configure -ast_tag \
-               "$itk_option(-contour_tag) $leveltags_($index)"
+               "$itk_option(-ast_tag) $leveltags_($index)"
 
             #  Draw the contour.
             set drawn_($index) \
@@ -700,8 +709,12 @@ itcl::class gaia::GaiaContour {
             #  Add/update the key.
             draw_key_
             update idletasks
+
          }
       }
+
+      #  Some contours are now drawn.
+      set contoured_ 1
    }
 
    #  Get the contour levels from the appropriate entry fields.
@@ -810,7 +823,7 @@ itcl::class gaia::GaiaContour {
             $itk_component(value$i) configure -value {}
          }
       }
-      remove_contours_
+      remove_contours
    }
 
    #  Get the rtdimage that is needed for contouring. This can be the
@@ -864,7 +877,7 @@ itcl::class gaia::GaiaContour {
 
    #  Remove all contours. Do it one-by-one so we don't interfere with
    #  other contour objects.
-   protected method remove_contours_ {} {
+   public method remove_contours {} {
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
          $itk_option(-canvas) delete $leveltags_($i)
          set drawn_($i) 0
@@ -872,6 +885,9 @@ itcl::class gaia::GaiaContour {
 
       #  Remove the key.
       $itk_option(-canvas) delete $keytag_
+
+      #  No contours are now drawn.
+      set contoured_ 0
    }
 
    #  Remove a contour by index.
@@ -1221,12 +1237,12 @@ itcl::class gaia::GaiaContour {
       #  Title.
       lassign [get_att_ 1] colour width
       set title [$itk_component(keytitle) get]
-      if { $title != {} } { 
+      if { $title != {} } {
          $itk_option(-canvas) create text [expr $x+$dx] $y \
             -text "$title" \
             -anchor w \
             -fill $keycol \
-            -tags "$keytag_ $texttag_" \
+            -tags "$itk_option(-ast_tag) $keytag_ $texttag_" \
             -width 0 \
             -font $font
          set y [expr $y+$dy]
@@ -1240,12 +1256,12 @@ itcl::class gaia::GaiaContour {
             $itk_option(-canvas) create line $x $y [expr $x+$dx] $y \
                -fill $colour \
                -width $width \
-               -tags "$keytag_ $leveltags_($i)"
+               -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i)"
             $itk_option(-canvas) create text [expr $x+$dx+5] $y \
                -text "$value" \
                -anchor w \
                -fill $colour \
-               -tags "$keytag_ $leveltags_($i) $texttag_" \
+               -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i) $texttag_" \
                -width 0 \
                -font $font
             set y [expr $y+$dy]
@@ -1260,7 +1276,7 @@ itcl::class gaia::GaiaContour {
          set y1 [expr [lindex $bbox 3] +5.0]
          set keyid [$itk_option(-canvas) create rectangle $xori $yori $x1 $y1\
                        -outline $keycol \
-                       -tags "$keytag_" \
+                       -tags "$itk_option(-ast_tag) $keytag_" \
                        -width $keywid \
                        -stipple pat7 \
                        -fill white]
@@ -1427,11 +1443,11 @@ itcl::class gaia::GaiaContour {
       set smooth_ $itk_option(-smooth)
    }
 
-   #  Global canvas tag used to control redraws etc. Individual
-   #  tags are used within this class.
-   itk_option define -contour_tag contour_tag Contour_Tag {} {
-      if { $itk_option(-contour_tag) == {} } {
-         set itk_option(-contour_tag) "ast_contour"
+   #  Global tag used to control redraws etc. Individual tags are used
+   #  within this class.
+   itk_option define -ast_tag ast_tag Ast_Tag {} {
+      if { $itk_option(-ast_tag) == {} } {
+         set itk_option(-ast_tag) "ast_element"
       }
    }
 
@@ -1459,6 +1475,9 @@ itcl::class gaia::GaiaContour {
    #  Which contours are drawn (needed to keep key free of undrawn
    #  levels).
    protected variable drawn_
+
+   #  Whether any contours are drawn (controls redraw).
+   protected variable contoured_ 0
 
    #  Names of the possible colours and their AST index equivalents.
    protected variable colourmap_ {

@@ -771,14 +771,11 @@ itcl::class gaia::StarCanvasDraw {
    #  Take control of rotation (interchange) and flipping so that we
    #  can honour the new -ignore_tag option.
 
-   # rotate the named item(s) 90 degrees by swapping the X and Y coords
+   #  Rotate the named item(s) 90 degrees by swapping the X and Y coords.
    method rotate {item} {
       set ids [$canvas_ find withtag $item]
-      foreach id $ids {
-
-         #  ignore this item if asked
-         if { $itk_option(-ignore_tag) == {} ||
-              ! [string match $itk_option(-ignore_tag) [$canvas_ gettags $id]]} {
+      if { $itk_option(-ignore_tag) == {} } {
+         foreach id $ids {
             catch {
                set coords [$canvas_ coords $id]
                set n [llength $coords]
@@ -789,19 +786,29 @@ itcl::class gaia::StarCanvasDraw {
                eval $canvas_ coords $id $ncoords
             }
          }
+      } else {
+         foreach id $ids {
+            if {! [string match "*$itk_option(-ignore_tag)*" [$canvas_ gettags $id]]} {
+               catch {
+                  set coords [$canvas_ coords $id]
+                  set n [llength $coords]
+                  set ncoords {}
+                  for {set i 0} {$i < $n} {incr i 2} {
+                     lappend ncoords [lindex $coords [expr $i+1]] [lindex $coords $i]
+                  }
+                  eval $canvas_ coords $id $ncoords
+               }
+            }
+         }
       }
    }
 
-   # flip the named item(s) on the X axis by subtracting the x
-   # coordinates from $maxx
-
+   #  Flip the named item(s) on the X axis by subtracting the x
+   #  coordinates from $maxx.
    method flipx {item maxx} {
       set ids [$canvas_ find withtag $item]
-      foreach id $ids {
-
-         #  ignore this item if asked
-         if { $itk_option(-ignore_tag) == {} ||
-              ! [string match $itk_option(-ignore_tag) [$canvas_ gettags $id]]} {
+      if { $itk_option(-ignore_tag) == {} } {
+         foreach id $ids {
             catch {
                set coords [$canvas_ coords $id]
                set n [llength $coords]
@@ -813,19 +820,30 @@ itcl::class gaia::StarCanvasDraw {
                eval $canvas_ coords $id $ncoords
             }
          }
+      } else {
+         foreach id $ids {
+            if {! [string match "*$itk_option(-ignore_tag)*" [$canvas_ gettags $id]]} {
+               catch {
+                  set coords [$canvas_ coords $id]
+                  set n [llength $coords]
+                  set ncoords {}
+                  for {set i 0} {$i < $n} {incr i 2} {
+                     lappend ncoords [expr $maxx-[lindex $coords $i]] \
+                        [lindex $coords [expr $i+1]]
+                  }
+                  eval $canvas_ coords $id $ncoords
+               }
+            }
+         }
       }
    }
 
-   # flip the named item(s) on the Y axis by subtracting the y
-   # coordinates from $maxy
-
+   #  Flip the named item(s) on the Y axis by subtracting the y
+   #  coordinates from $maxy.
    method flipy {item maxy} {
       set ids [$canvas_ find withtag $item]
-      foreach id $ids {
-
-         #  ignore this item if asked
-         if { $itk_option(-ignore_tag) == {} ||
-              ! [string match $itk_option(-ignore_tag) [$canvas_ gettags $id]]} {
+      if { $itk_option(-ignore_tag) == {} } {
+         foreach id $ids {
             catch {
                set coords [$canvas_ coords $id]
                set n [llength $coords]
@@ -834,6 +852,20 @@ itcl::class gaia::StarCanvasDraw {
                   lappend ncoords [lindex $coords $i] [expr $maxy-[lindex $coords [expr $i+1]]]
                }
                eval $canvas_ coords $id $ncoords
+            }
+         }
+      } else {
+         foreach id $ids {
+            if {! [string match "*$itk_option(-ignore_tag)*" [$canvas_ gettags $id]]} {
+               catch {
+                  set coords [$canvas_ coords $id]
+                  set n [llength $coords]
+                  set ncoords {}
+                  for {set i 0} {$i < $n} {incr i 2} {
+                     lappend ncoords [lindex $coords $i] [expr $maxy-[lindex $coords [expr $i+1]]]
+                  }
+                  eval $canvas_ coords $id $ncoords
+               }
             }
          }
       }

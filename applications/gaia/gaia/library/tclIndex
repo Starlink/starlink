@@ -5,7 +5,7 @@
 # sets an element in the auto_index array, where the
 # element name is the name of a command and the value is
 # a script that loads the command.
-puts "Loading GAIA tclIndex"
+
 set auto_index(::util::Batch) [list source [file join $dir Batch.tcl]]
 set auto_index(::gaia::ETable) [list source [file join $dir ETable.tcl]]
 set auto_index(::util::FileSelect) [list source [file join $dir FileSelect.tcl]]
