@@ -195,6 +195,7 @@ $Id$
 				    (empty-sosofo))))
 			    '(;;"routinename"
 			      ;;"purpose"
+			      "moduletype"
 			      "description"
 			      "userkeywords"
 			      "softwarekeywords"
@@ -238,6 +239,10 @@ $Id$
   ;;      (process-children)))
   (element description
     (make command name: "sstdescription"
+	  (process-children)))
+  (element moduletype
+    (make command name: "sstdiytopic"
+	  parameters: ("Type of Module")
 	  (process-children)))
   (element userkeywords
     (make command name: "sstdiytopic"
