@@ -156,7 +156,7 @@
 
 *    Try to invent the object
         CALL BDI1_INVNT( ARGS(1), ARGS(2), ITEM, TYPE, MODE,
-     :                   ITID, NELM, WBPTR, STATUS )
+     :                   ITID, NDIM, DIMS, WBPTR, STATUS )
 
 *    Successful?
         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -172,7 +172,7 @@
 
 *      Store mapping details
           CALL BDI1_STOMAP( PSID, 'inv', DAT__NOLOC, ITID, PTR,
-     :                      NELM, WBPTR, TYPE, MODE, STATUS )
+     :                      NDIM, DIMS, WBPTR, TYPE, MODE, STATUS )
 
         END IF
 
