@@ -37,19 +37,20 @@
 *        Otherwise sigma clipping is not allowed.
 *     IMETH = INTEGER (Returned)
 *        An integer representing the method chosen.
-*        2 = MEAN
-*        3 = MEDIAN
-*        4 = TRIMMED MEAN
-*        5 = MODE
-*        6 = SIGMA CLIPPED MEAN ! allowed if genvar true (has noise
-*                               ! estimates)
-*        7 = THRESHOLD EXCLUSION MEAN
-*        8 = MINMAX MEAN
-*        9 = BROADENED MEDIAN
+*        2  = MEAN
+*        3  = MEDIAN
+*        4  = TRIMMED MEAN
+*        5  = MODE
+*        6  = SIGMA CLIPPED MEAN ! allowed if genvar true (has noise
+*                                ! estimates)
+*        7  = THRESHOLD EXCLUSION MEAN
+*        8  = MINMAX MEAN
+*        9  = BROADENED MEDIAN
+*        10 = SIGMA CLIPPED MEDIAN
 *     CMODE = CHARACTER * ( * ) (Returned)
 *        The method chosen represented as a string.
 *     NITER = INTEGER (Returned)
-*        The maximum number of iterations ( IMETH = 5 and 6 ).
+*        The maximum number of iterations ( IMETH = 5 ).
 *     NSIGMA = REAL (Returned)
 *        The number of sigmas to clip the data at (IMETH = 5 and 6 ).
 *     ALPHA = REAL (Returned)
@@ -76,6 +77,8 @@
 *        is false.
 *     19-JUL-1995 (PDRAPER):
 *        Removed AIF_ calls.
+*     30-JAN-1998 (PDRAPER):
+*        Added sigma clipped mean.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,12 +114,12 @@
 
 *  Find out the combination mode. Use median as the default
       IF ( GENVAR ) THEN
-         CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,'//
-     :                   'MODE ,SIGMA ,THRESHOLD ,MINMAX ,BROADENED', 
-     :                   .FALSE., CMODE, STATUS )
+         CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,MODE '//
+     :               ',SIGMA ,THRESHOLD ,MINMAX ,BROADENED, CLIPMED', 
+     :               .FALSE., CMODE, STATUS )
       ELSE
 
-*  Disallow the SIGMA clipping option.
+*  Disallow the SIGMA clipping options.
          CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN ,MEAN ,TRIMMED ,'//
      :                   'MODE, THRESHOLD ,MINMAX ,BROADENED', 
      :                   .FALSE., CMODE, STATUS )
@@ -140,6 +143,8 @@
          IMETH = 8
       ELSE IF ( CMODE .EQ. 'BROADENED' ) THEN
          IMETH = 9
+      ELSE IF ( CMODE .EQ. 'CLIPMED' ) THEN
+         IMETH = 10
       ELSE
 
 *  Bad return set status and exit.
@@ -153,7 +158,8 @@
 *  Get the trim fraction for trimmed mean.
          CALL PAR_GDR0R( 'ALPHA', 0.2, 0.001, 0.499, .FALSE., ALPHA, 
      :                   STATUS )
-      ELSE IF ( IMETH .EQ. 5  .OR.  IMETH .EQ. 6 ) THEN
+      ELSE IF ( IMETH .EQ. 5  .OR.  IMETH .EQ. 6 .OR. IMETH .EQ. 10 ) 
+     :   THEN
 
 *  Sigma clipping get the number of sigmas to clip at.
          CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA, 

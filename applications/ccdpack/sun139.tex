@@ -169,6 +169,22 @@
    \newcommand{\latexonlysubsubsection}[1]{#1}
 \end{htmlonly}
 
+% Figure environment. Defined for latex2html. #1 is \epsfig qualifiers
+% (file=xxx etc.), #2 the gif file, #3 the label, #4 the caption.
+\newcommand{\myfig} [4] {
+  \begin{figure}
+    \centering\epsfig{#1}
+    \typeout{#1 inserted on page \arabic{page}}
+    \caption{\label{#3}#4}
+  \end{figure}
+  }
+\begin{htmlonly}
+  \renewcommand{\myfig}[4]{
+    \htmladdimg{#2}\\
+    Figure: \label{#3} #4
+    }
+\end{htmlonly}
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -216,6 +232,7 @@
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
+   \htmladdimg{main.gif}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -778,24 +795,19 @@ A typical setup command is:
 In this example certain required characters (the \text{[ ]}) are also
 special to the C shell so must be protected.
 
-\begin{figure}
-\centering\epsfig{file=sun139geo.eps}
-\caption{
-Typical CCD geometries.
-In the figure on the left the readout direction is `Y', the bias
-strips are located with bounds I,J,K,L and the useful CCD area is
-M,J$+1$,N,K$-1$ (ish, you should probably use more than $\pm 1$).
-In the figure on the right the readout direction is `X', the bias
-strips are located with bounds I,J,K,L and the useful CCD area is
-N,J$+1$,K$-1$,M$-1$ (N.B. some observatories recommend that you only use
-the left-hand strip, if you use the right-hand one too, check that it
-isn't contaminated by residual charge).
-\label{CCDPICCY}}
-\end{figure}
-
 \xroutine{CCDSETUP} also allows you to define which parts of the CCD are
 corrupt or unreliable (due to hot spots, bad columns etc.); see
 \hyperref{the section on data-masks}{\S}{}{datamasks}, if you need to do this.
+
+\myfig{file=sun139geo.eps}{geo.gif}{CCDPICCY}{Typical CCD geometries.
+In the figure on the left the readout direction is `Y', the bias
+strips are located with bounds I,J,K,L and the useful CCD area is
+M,J$+1$,N,K$-1$ (ish, you should probably use more than $\pm 1$).  In
+the figure on the right the readout direction is `X', the bias strips
+are located with bounds I,J,K,L and the useful CCD area is
+N,J$+1$,K$-1$,M$-1$ (N.B. some observatories recommend that you only
+use the left-hand strip, if you use the right-hand one too, check that
+it isn't contaminated by residual charge).}
 
 \subsubsection{Setting reduction information \label{settingreductioninfo}}
 
@@ -913,6 +925,7 @@ If you have an import control table (check the
 \xroutine{XREDUCE} program to see what CCDPACK has already)
 then you would just need a script that contained something like:
 
+\newpage
 \begin{center}
 \fbox{Example 1}
 \end{center}
@@ -1503,15 +1516,13 @@ directory, called
 The reduction sequences outlined above are shown in a schematic format
 \latex{in figure \ref{reductionpicture}}.
 
-\begin{figure}
-\centering\epsfig{file=sun139red.eps,height=0.85\textheight}
-\caption{A schematic outline of the order in which CCDPACK reduction
+\myfig{file=sun139red.eps,height=0.85\textheight}{red.gif}
+{reductionpicture}
+{A schematic outline of the order in which CCDPACK reduction
 routines should be used.
 Dashed boxes indicate that this part is optional or not required.
 The \xroutine{MAKECAL}/\xroutine{CALCOR} section may need repeating
-more than once (e.g. if flash and dark frames are to be processed).
-\label{reductionpicture}}
-\end{figure}
+more than once (e.g. if flash and dark frames are to be processed)}
 
 %  Make sure that this schematic gets printed out now.
 \clearpage
@@ -2339,12 +2350,9 @@ ESO/ST-ECF Data Analysis Workshop.
 The order in which the various application should be used are shown in
 schematic form in \hyperref{the following figure}{figure}{}{registration}.
 
-\begin{figure}
-\centering\epsfig{file=sun139reg.eps,height=0.85\textheight}
-\caption{A schematic of the standard sequences
-of commands used to perform registration, resampling and mosaicing.
-\label{registration}}
-\end{figure}
+\myfig{file=sun139reg.eps,height=0.85\textheight}{reg.gif}{registration}
+{A schematic of the standard sequences
+of commands used to perform registration, resampling and mosaicing.}
 
 %  Make sure that this picture get printed out now.
 \clearpage
@@ -2498,7 +2506,7 @@ any reduction sequence logged and/or reported to the terminal is an
 optional feature, the level of reporting being controlled by a global
 or application parameter \text{logto} which is set by
 \xroutine{CCDSETUP}. \text{logto} is a character variable and can take
-one of the following values: 
+one of the following values:
 \begin{myquote}
 \begin{description}
 \item \text{NEITHER} - perform no output.
@@ -2965,6 +2973,7 @@ CCDPACK supports many different methods of data combination:
 \item THRESHOLD CLIPPED MEAN
 \item MINIMUM AND MAXIMUM EXCLUSION MEAN
 \item BROADENED MEDIAN
+\item SIGMA CLIPPED MEDIAN
 \end{itemize}
 
 The aim is to provide you with a fairly exhaustive list of ways in which
@@ -2981,12 +2990,15 @@ which takes no account of the errors in the individual measurements.
 \item[TRIMMED MEAN] Alpha trimmed mean. The final estimate is the mean of the
 values excluding the alpha (a fraction between 0 and 0.5) upper and lower
 values.
-\item[MODE] a maximum likelihood mean. This is essentially an iteratively sigma
-(the standard deviation) clipped mean, where values outside of a given number of
-sigmas of the mean value are rejected on each pass until convergence is
-achieved.
+\item[MODE] a maximum likelihood mean. This is essentially an
+iteratively sigma (the standard deviation) clipped mean, where values
+outside of a given number of sigmas of the mean value are rejected on
+each pass until convergence is achieved. The standard deviation is always
+based on the variation of the data contributing to each output value.
 \item[SIGMA CLIPPED MEAN]  the mean of the values left after rejecting those
-outside of a given number of standard deviation of the initial mean.
+outside of a given number of standard deviation of the initial mean. The
+standard deviation is derived from data variances if available, otherwise
+a standard deviation based on the variation of the data is used.
 \item[THRESHOLD CLIPPED MEAN] the mean of the values after rejecting
 values above and below defined thresholds. Note this usually applies to
 the output data range if some internal normalisation is performed
@@ -2997,6 +3009,11 @@ maximum values are rejected.
 \item[BROADENED MEDIAN] the median if the number of input data values is
 less than five. The mean of the central few values if the number of inputs is
 larger.
+\item[SIGMA CLIPPED MEDIAN]  the weighted median of the values left
+after rejecting those outside of a given number of standard deviations
+of the initial mean. The standard deviation is derived from data
+variances if available, otherwise a standard deviation based on the
+variation of the data is used.
 \end{description}
 \end{myquote}
 
@@ -7456,16 +7473,16 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       names of the FITS keywords to which they map.
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         Extension-item  \>   FITS-keyword
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+Extension-item \> FITS-keyword
       \end{tabbing}
       \end{myquote}
       If the HDS type of the destination Extension-item is known this
       may be included.
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         Extension-item  \>   \_HDS-type  \>   FITS-keyword
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+Extension-item \> \_HDS-type \> FITS-keyword
       \end{tabbing}
       \end{myquote}
       Normally this is inferred. This is the format used by the KAPPA
@@ -7479,8 +7496,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \qt{declarative} form of statement is necessary.
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         \_HDS-type    \>      FITS-keyword
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+\_HDS-type \> FITS-keyword
       \end{tabbing}
       \end{myquote}
      So for instance if you wanted to derive an exposure time for an
@@ -7488,9 +7505,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
      to convert into seconds you would use this sequence of commands:
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         \_INTEGER       \>   EXPOSURE  \\
-         TIMES.DARK  \> \_DOUBLE    \>  1000.0D0$*$EXPOSURE
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+\_INTEGER \> EXPOSURE  \\
+TIMES.DARK \> \_DOUBLE \> 1000.0D0$*$EXPOSURE
       \end{tabbing}
       \end{myquote}
       The \qt{\_INTEGER EXPOSURE} tells this application to find a FITS
@@ -7499,10 +7516,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       and end times (TAI0 and TAI1):
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         \_DOUBLE  \>      TAI0 \\
-         \_DOUBLE  \>      TAI1 \\
-         TIMES.DARK \>   \_DOUBLE   \>    (TAI1-TAI0)
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+\_DOUBLE  \> TAI0 \\
+\_DOUBLE  \> TAI1 \\
+TIMES.DARK \> \_DOUBLE \> (TAI1-TAI0)
       \end{tabbing}
       \end{myquote}
    The function may use any of the usual Fortran operators; +, -, *,
@@ -7514,10 +7531,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       instance constants may be given:
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         EXTENT.MINX  \>  \_INTEGER \>      1\\
-         EXTENT.MINY  \>  \_INTEGER \>      1\\
-         FILTER       \>  \_CHAR    \>     NONE         ! Spectroscopic
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+EXTENT.MINX \> \_INTEGER \> 1\\
+EXTENT.MINY \> \_INTEGER \> 1\\
+FILTER      \> \_CHAR    \> NONE         ! Spectroscopic
       \end{tabbing}
       \end{myquote}
       In this way import tables could actually be used to set all the
@@ -7530,16 +7547,16 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       string to be translated. This is then followed by statements which
       translate an \qt{input} string into an \qt{output} string, i.e.:
       \begin{myquote}
-         FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
+FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
       \end{myquote}
       So for instance if you wanted to translate frame types to those
       recognised by CCDPACK you might use something like:
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         FTYPE \>   \_CHAR  \> OBSTYPE  OBJECT=TARGET -\\
-               \> \>                    FF=FLAT -\\
-               \> \>                    ZERO=BIAS
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+FTYPE \> \_CHAR \> OBSTYPE  OBJECT=TARGET -\\
+\> \> FF=FLAT -\\
+\> \> ZERO=BIAS
       \end{tabbing}
       \end{myquote}
       Which would compare the value of the FITS-keyword OBSTYPE with
@@ -7566,36 +7583,36 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       found with the applications that use these values.
       \begin{myquote}
       \begin{tabbing}
-         xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-         Name  \>          HDS data type \>   Description \\
-         \\
-         ADC  \>           \_DOUBLE    \>    The analogue to digital\\
-              \> \>                          conversion factor.\\
-         BOUNDS.END1  \>   \_INTEGER   \>      The end row or column of the\\
-              \> \>                            first bias strip region.\\
-         BOUNDS.END2  \>   \_INTEGER \>        The end row or column of the\\
-              \> \>                            second bias strip region.\\
-         BOUNDS.START1 \>  \_INTEGER  \>       The first row or column of the\\
-              \> \>                            first bias strip region.\\
-         BOUNDS.START2 \>  \_INTEGER  \>       The first row or column of the\\
-              \> \>                            second bias strip region.\\
-         DEFERRED  \>      \_DOUBLE   \>       The deferred charge.\\
-         DIRECTION \>      \_CHAR     \>       The \qt{readout} direction (X or Y).\\
-         EXTENT.MAXX   \>  \_INTEGER  \>       Maximum X coordinate of useful\\
-              \> \>                            region.\\
-         EXTENT.MAXY  \>   \_INTEGER  \>       Maximum Y coordinate of useful\\
-              \> \>                             region.\\
-         EXTENT.MINX  \>   \_INTEGER  \>       Minimum X coordinate of useful\\
-              \> \>                            region.\\
-         EXTENT.MINY  \>   \_INTEGER  \>       Minimum Y coordinate of useful\\
-              \> \>                            region.\\
-         FILTER    \>      \_CHAR     \>       Filter name.\\
-         FTYPE     \>      \_CHAR     \>       Frame type (TARGET, BIAS, FLAT,\\
-              \> \>                            DARK or FLASH)\\
-         RNOISE    \>      \_DOUBLE   \>       Readout noise (ADUs)\\
-         SATURATION   \>   \_DOUBLE   \>       Pixel saturation count.\\
-         TIMES.DARK   \>   \_DOUBLE   \>       Dark count time.\\
-         TIMES.FLASH  \>   \_DOUBLE   \>       Pre-flash time.
+xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
+Name \> HDS data type \> Description \\
+\\
+ADC \> \_DOUBLE \> The analogue to digital\\
+\> \> conversion factor.\\
+BOUNDS.END1 \> \_INTEGER \>      The end row or column of the\\
+\> \> first bias strip region.\\
+BOUNDS.END2 \> \_INTEGER \> The end row or column of the\\
+\> \> second bias strip region.\\
+BOUNDS.START1 \> \_INTEGER \> The first row or column of the\\
+\> \> first bias strip region.\\
+BOUNDS.START2 \> \_INTEGER \> The first row or column of the\\
+\> \> second bias strip region.\\
+DEFERRED \> \_DOUBLE \> The deferred charge.\\
+DIRECTION \> \_CHAR \> The \qt{readout} direction (X or Y).\\
+EXTENT.MAXX \> \_INTEGER \> Maximum X coordinate of useful\\
+\> \> region.\\
+EXTENT.MAXY \> \_INTEGER \> Maximum Y coordinate of useful\\
+\> \> region.\\
+EXTENT.MINX \> \_INTEGER \> Minimum X coordinate of useful\\
+\> \> region.\\
+EXTENT.MINY \> \_INTEGER \> Minimum Y coordinate of useful\\
+\> \> region.\\
+FILTER \> \_CHAR \> Filter name.\\
+FTYPE \> \_CHAR \> Frame type (TARGET, BIAS, FLAT,\\
+\> \> DARK or FLASH)\\
+RNOISE \> \_DOUBLE \> Readout noise (ADUs)\\
+SATURATION \> \_DOUBLE \> Pixel saturation count.\\
+TIMES.DARK \> \_DOUBLE \> Dark count time.\\
+TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \end{tabbing}
       \end{myquote}
    }
@@ -7770,6 +7787,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
             \sstitem
                BROADENED -- A broadened median (the mean of a small
                                number of central values)
+            \sstitem
+               CLIPMED   -- A sigma clipped median
+
             [MEDIAN]
          }
       }
@@ -7846,9 +7866,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          SIGMAS = \_REAL (Read)
       } {
          Number of standard deviations to reject data at. Used for
-         \qt{MODE} and \qt{SIGMA} methods. For METHOD = \qt{MODE} the standard
-         deviation is estimated from the population of values. For
-         METHOD = \qt{SIGMA} this value is the readout noise.
+         \qt{MODE}, \qt{SIGMA} and \qt{CLIPMED} methods. For METHOD =
+         \qt{MODE} the standard deviation is estimated from the
+         population of values. For METHOD = \qt{SIGMA} and
+         \qt{CLIPMED} this value is the readout noise.
          [4]
       }
       \sstsubsection{
@@ -7952,6 +7973,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       set TRUE. In this case values will be obtained from the input images
       CCDPACK extensions.
    }
+\newpage
    \sstimplementationstatus{
       \sstitemlist{
 
@@ -8133,6 +8155,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
             \sstitem
                BROADENED -- A broadened median (the mean of a small
                                number of central values)
+
+            \sstitem
+               CLIPMED   -- A sigma clipped median
+
             [MEDIAN]
          }
       }
@@ -8169,10 +8195,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          SIGMAS = \_REAL (Read)
       } {
          Number of standard deviations to reject data at. Used for
-         \qt{MODE} and \qt{SIGMA} methods. For METHOD = \qt{MODE} the standard
-         deviation is estimated from the population of values, for
-         METHOD = \qt{SIGMA} the variances are used. If no variances
-         exist then the inverse exposure factors are used.
+         \qt{MODE}, \qt{SIGMA} and \qt{CLIPMED} methods. For METHOD =
+         \qt{MODE} the standard deviation is estimated from the
+         population of values, for METHOD = \qt{SIGMA} and
+         \qt{CLIPMED} the variances
+         are used. If no variances exist then the variation of the
+         population is used to estimate one.
          [4.0]
       }
       \sstsubsection{
@@ -8241,7 +8269,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          when the input images have the same exposure times.
       }
    }
-\newpage
    \sstdiytopic{
       Behaviour of parameters
    } {
@@ -8471,6 +8498,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
             \sstitem
                BROADENED -- A broadened median (the mean of a small
                                number of central values)
+            \sstitem
+               CLIPMED   -- A sigma clipped median
+
             [MEDIAN]
          }
       }
@@ -8506,10 +8536,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          SIGMAS = \_REAL (Read)
       } {
          Number of standard deviations to reject data at. Used for
-         \qt{MODE} and \qt{SIGMA} methods. For METHOD = \qt{MODE} the standard
-         deviation is estimated from the population of values.
-         For METHOD = \qt{SIGMA} this value is the pixel variance it one
-         exists, otherwise it is the inverse of the mean data value.
+         \qt{MODE}, \qt{SIGMA} and \qt{CLIPMED} methods. For METHOD =
+         \qt{MODE} the standard deviation is estimated from the
+         population of values. For METHOD = \qt{SIGMA} and
+         \qt{CLIPMED} this value is the pixel variance if one exists,
+         otherwise one is etimated from the population of values.
          [4.0]
       }
       \sstsubsection{
@@ -8564,7 +8595,14 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          \sstitem
          The data input into this routine should have bias strip
-           regions and any badly vignetted parts removed.
+         regions and any badly vignetted parts removed.
+
+         \sstitem 
+         The input images are normalised to have a mean of one
+         before being combined. This makes sure that all input images
+         contribute to the final result (even though, for instance,
+         they were taken on a source of varying brightness, e.g. the 
+         twilight sky).
       }
    }
    \sstdiytopic{
@@ -8833,6 +8871,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
             \sstitem
                BROADENED -- A broadened median (the mean of a small
                                number of central values)
+            \sstitem
+               CLIPMED   -- A sigma clipped median
+
             [MEDIAN]
          }
       }
@@ -9012,8 +9053,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          SIGMAS = \_REAL (Read)
       } {
          Number of standard deviations at which to reject values if the
-         \qt{mode} or \qt{sigma} data combination methods are selected (see
-         the METHOD parameter). This value must be positive. [4.0]
+         \qt{mode}, \qt{sigma} or \qt{clipmed} data combination
+         methods are selected (see the METHOD parameter). This value
+         must be positive. [4.0]
       }
       \sstsubsection{
          SKYSUP = \_REAL (Read)
@@ -9347,11 +9389,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       values. These global values will always take precedence, except
       when an assignment is made on the command line. Global values may
       be set and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
-   }
-   \sstdiytopic{
-      Copyright
-   } {
-      Copyright (C) 1992 Science \& Engineering Research Council
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -12623,35 +12660,37 @@ makes it possible to wildcard lists of IRAF and FITS files, i.e.:
 makemos in=*.fit out=mosaic.imh
 \end{verbatim}
 \end{quote}
-
-CCDPACK can now also be used from the IRAF/CL command interpreter. 
+CCDPACK can now also be used from the IRAF/CL command interpreter.
 
 More minor changes include:
 \begin{itemize}
+\item A new data combination method has been added. This is a 
+      sigma clipped median (``clipmed'').
+
 \item An error in calculating the variances when median stacking
       2 images has been corrected (previous values where an
       underestimate).
 
-\item The restoration output from CCDSETUP is fixed to work
+\item The restoration output from \xroutine{CCDSETUP} is fixed to work
       correctly when just recording two bias strip bounds.
 
-\item The PAIRNDF application has been improved to give better 
+\item The \xroutine{PAIRNDF} application has been improved to give better
       control of reserved pens.
 
-\item The FINDOFF application now reports when any input files 
+\item The \xroutine{FINDOFF} application now reports when any input files
       have less than 2 positions.
 
-\item The IMPORT application now works on Linux.
+\item The \xroutine{IMPORT} application now works on Linux.
 
-\item The IMPORT application has been extended to allow the
+\item The \xroutine{IMPORT} application has been extended to allow the
       concatenation of FITS character strings.
 
-\item The SCHEDULE application now uses the correct comment  
+\item The \xroutine{SCHEDULE} application now uses the correct comment
       delimeter on Linux.
 
-\item The REGISTER application FITTYPE parameter now works when set
+\item The \xroutine{REGISTER} application FITTYPE parameter now works when set
       to 3 (shift of origin and magnification).
-  
+
 \item HDS files with an object called DATA\_ARRAY which are not NDFs
       are now correctly ignored.
 \end{itemize}

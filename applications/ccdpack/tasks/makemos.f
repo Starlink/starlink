@@ -183,6 +183,8 @@
 *                           removed
 *           -  BROADENED -- A broadened median (the mean of a small
 *                           number of central values)
+*           -  CLIPMED   -- A sigma clipped median (like SIGMA except
+*                           that the median of the clipped values is used)
 *        [MEDIAN]
 *     MIN = _REAL (Read)
 *        Lower limit for input data values which may contribute to the
@@ -334,8 +336,9 @@
 *        [FALSE]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations at which to reject values if the
-*        "mode" or "sigma" data combination methods are selected (see
-*        the METHOD parameter). This value must be positive. [4.0]
+*        "mode", "sigma" or "clipmed" data combination methods are
+*        selected (see the METHOD parameter). This value must be
+*        positive. [4.0] 
 *     SKYSUP = _REAL (Read)
 *        A positive "sky noise suppression factor" used to control the
 *        effects of sky noise when pairs of input NDFs are
@@ -622,6 +625,7 @@
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -648,6 +652,8 @@
 *        Removed all NAG calls.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator control (foreign data access upgrade).
+*     31-JAN-1998 (PDRAPER):
+*        Added clipmed combination method.
 *     {enter_further_changes_here}
 
 *  Bugs:

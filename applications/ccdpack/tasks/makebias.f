@@ -129,6 +129,8 @@
 *                           removed
 *           -  BROADENED -- A broadened median (the mean of a small
 *                           number of central values)
+*           -  CLIPMED   -- A sigma clipped median (like SIGMA except
+*                           that the median of the clipped values is used)
 *        [MEDIAN]
 *     MIN = _REAL (Read)
 *        If METHOD = "THRESH" then this value defines the lower limit
@@ -183,9 +185,9 @@
 *        [Dynamically derived value]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Used for
-*        "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-*        deviation is estimated from the population of values. For
-*        METHOD = "SIGMA" this value is the readout noise.
+*        "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+*        standard deviation is estimated from the population of values. For
+*        METHOD = "SIGMA" and "CLIPMED" this value is the readout noise.
 *        [4]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF
@@ -264,6 +266,9 @@
 *     set TRUE. In this case values will be obtained from the input NDFs
 *     CCDPACK extensions.
 
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -291,6 +296,8 @@
 *        Added prologue information on KEEPIN and USEEXT.
 *     6-OCT-1995 (PDRAPER):
 *        Updated for CCDPACK 2.0.
+*     31-JAN-1998 (PDRAPER):
+*        Added clipmed combination method.
 *     {enter_further_changes_here}
 
 *  Bugs:

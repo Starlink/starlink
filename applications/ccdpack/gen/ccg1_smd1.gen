@@ -118,23 +118,21 @@
       INTEGER NUM_TRAP           ! Numerical error handler
 
 *  Local Variables:
-      DOUBLE PRECISION DVAL1     ! Dummy DBLE value
-      DOUBLE PRECISION DVAL2     ! Dummy DBLE value
-      DOUBLE PRECISION VAL       ! Weighted mean
-      DOUBLE PRECISION VAR       ! Population variance before rejection
-      DOUBLE PRECISION SUM1      ! Weight sums
-      DOUBLE PRECISION SUM2      ! Weighted value sums
-      DOUBLE PRECISION W1        ! Weight
-      DOUBLE PRECISION W2        ! Weight
-      INTEGER NGOOD              ! Number of good pixels
-      INTEGER IGOOD              ! Number of unrejected pixels
-      INTEGER LBND               ! Position of lowest value higher than
-                                 ! rejection threshold
-      INTEGER UBND               ! Position of highest value lower than
-                                 ! rejection threshold
-      INTEGER I                  ! Loop variable
-      INTEGER J                  ! Loop variable
-      INTEGER K                  ! Loop variable
+      DOUBLE PRECISION DVAL1    ! Dummy DBLE value
+      DOUBLE PRECISION DVAL2    ! Dummy DBLE value
+      DOUBLE PRECISION SUM1     ! Weight sums
+      DOUBLE PRECISION SUM2     ! Weighted value sums
+      DOUBLE PRECISION SVAR     ! Population variance before rejection
+      DOUBLE PRECISION VAL      ! Weighted mean
+      DOUBLE PRECISION VAR      ! Population variance after rejection
+      INTEGER NGOOD             ! Number of good pixels
+      INTEGER IGOOD             ! Number of unrejected pixels
+      INTEGER LBND              ! Position of lowest value higher than
+                                ! rejection threshold
+      INTEGER UBND              ! Position of highest value lower than
+                                ! rejection threshold
+      INTEGER I                 ! Loop variable
+      INTEGER J                 ! Loop variable
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -170,15 +168,15 @@
                DVAL1 = NUM_<T>TOD( STACK( I, J ) )
 
 *  Change variance to weight.
-               VAR = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
+               SVAR = 1.0D0 / NUM_<T>TOD( VARS( I, J ) )
 
 *  Increment sums.
-               SUM2 = SUM2 + DVAL1 * VAR
-               SUM1 = SUM1 + VAR
+               SUM2 = SUM2 + DVAL1 * SVAR
+               SUM1 = SUM1 + SVAR
 
 *  Transfer values to working buffers.
                WRK1( NGOOD ) = DVAL1
-               WRK2( NGOOD ) = VAR
+               WRK2( NGOOD ) = SVAR
 
 *  Finally trap numeric errors by rejecting all values.
                IF ( NUM_ERROR .NE. SAI__OK ) THEN
@@ -195,7 +193,7 @@
 
 *  Form the weighted mean and population standard deviation.
             VAL = SUM2 / SUM1
-            VAR = 1.0D0 / SUM1
+            SVAR = 1.0D0 / SUM1
 
 *  Sort data prior to rejection -- this is necessary as clip may be
 *  non-central for (noisy) skew distributions, so the order statitics
@@ -204,8 +202,8 @@
             CALL CCG1_IS3D( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Set the clipping range.
-            DVAL1 = VAL - DBLE( NSIGMA ) * SQRT( VAR )
-            DVAL2 = VAL + DBLE( NSIGMA ) * SQRT( VAR )
+            DVAL1 = VAL - DBLE( NSIGMA ) * SQRT( SVAR )
+            DVAL2 = VAL + DBLE( NSIGMA ) * SQRT( SVAR )
 
 *  Decide which orders of data are to be rejected. Pick out the least
 *  bound greater than the lower bound and the highest bound less than
@@ -220,48 +218,18 @@
 *  Number of values retained.
             IGOOD = UBND - LBND + 1
 
-*  If any values are retained then form the median. Scan used to see 
-*  which values contributed to the median.           
+*  If any values are retained then form the median.
             IF ( IGOOD .GT. 0 ) THEN
-               CALL CCG1_WTM2D( WRK1, WRK2, IGOOD, USED, VAL, STATUS )
-               LBND = 0
-               DO 4 J = 1, NGOOD 
-                  IF ( USED( J ) .AND. LBND .EQ. 0 ) LBND = J
-                  IF ( USED( J ) ) UBND = J
- 4             CONTINUE
+               CALL CCG1_WTM4D( WRK1, WRK2, SVAR, LBND, UBND, NGOOD,
+     :                          USED, COVEC( 1, NGOOD ), VAL, VAR,
+     :                          STATUS )
 
-*  Now we need to calculate the covariance. This is from a population
-*  which is of size NGOOD, not IGOOD...
-               VSUM = 0.0D0
-               DO 5 K = LBND, UBND
-                  IF( K .EQ. LBND ) THEN
-                     IW = W1
-                  ELSE
-                     IW = W2
+*  Update the used line counters.
+               DO 4 J = 1, NGOOD
+                  IF ( USED( J ) ) THEN
+                     NCON( POINT( J ) ) = NCON( POINT( J ) ) + 1.0D0
                   END IF
-                  DO 6 J = K, UBND
-                     IF( J .EQ. LBND ) THEN
-                        JW = W1
-                     ELSE
-                        JW = W2
-                     END IF
-
-*  Sum variances and twice covariances (off diagonal elements) .
-                     IF( K .EQ. J ) THEN
-                        VSUM = VSUM + 
-     :                         IW * JW * COVAR( K + J * ( J - 1 ) / 2 )
-                     ELSE
-                        VSUM = VSUM +
-     :                   2.0D0 * IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
-                     END IF
- 6                CONTINUE
- 5             CONTINUE
-
-*  Right make the new variance estimate. Use the sum of variances
-*  and covariances of the order statistic of the `trimmed' sample size
-*  Sample variance changes to NGOOD * VAR to represent total variance
-*  of original data.
-               VAR = VAR * NGOOD * VSUM
+ 4             CONTINUE
 
 *  Trap occasions when all values are rejected.
             ELSE

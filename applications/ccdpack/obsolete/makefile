@@ -657,7 +657,9 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_cen.gen ccg1_dcn.gen ccg1_is4.gen ccg1_lapn.gen \
  ccg1_mdif.gen ccg1_mkhi.gen ccg1_mnmx.gen ccg1_nab.gen \
  ccg1_renp.gen kpg1_ainb.gen kpg1_iscl.gen kpg1_past.gen \
- kpg1_vasv.gen kpg1_tdli.gen ccg1_qsrt.gen
+ kpg1_vasv.gen kpg1_tdli.gen ccg1_qsrt.gen ccg1_smd1.gen \
+ ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
+ ccg1_smd3.gen ccg1_smr3.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
@@ -2552,3 +2554,11 @@ schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
+ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+ccg1_smr1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_smd2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_smr2.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_smd3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_smr3.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+

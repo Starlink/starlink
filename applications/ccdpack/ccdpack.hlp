@@ -158,6 +158,9 @@
 
  More minor changes include:
 
+    o  A new data combination method has been added. This is a
+       sigma clipped median ("clipmed").
+
     o  An error in calculating the variances when median stacking
        2 images has been corrected (previous values where an
        underestimate).
@@ -3863,6 +3866,9 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -3924,9 +3930,9 @@ RNOISE = _DOUBLE (Read)
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
-   "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-   deviation is estimated from the population of values. For
-   METHOD = "SIGMA" this value is the readout noise.
+   "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+   standard deviation is estimated from the population of values.
+   For METHOD = "SIGMA" this value is the readout noise.
    [4]
 3 TITLE
 TITLE = LITERAL (Read)
@@ -4175,6 +4181,9 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -4200,10 +4209,11 @@ OUT = LITERAL (Write)
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
-   "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-   deviation is estimated from the population of values, for
-   METHOD = "SIGMA" the variances are used. If no variances
-   exist then the inverse exposure factors are used.
+   "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+   standard deviation is estimated from the population of values, for
+   METHOD = "SIGMA" and "CLIPMED" the variances are used. If no
+   variances exist then one is estimated from the population of
+   values.
    [4.0]
 3 TITLE
 TITLE = LITERAL (Read)
@@ -4455,6 +4465,9 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -4479,10 +4492,11 @@ OUT = LITERAL (Write)
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
-   "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-   deviation is estimated from the population of values.
-   For METHOD = "SIGMA" this value is the pixel variance it one
-   exists, otherwise it is the inverse of the mean data value.
+   "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+   standard deviation is estimated from the population of values, for
+   METHOD = "SIGMA" and "CLIPMED" the variances are used. If no
+   variances exist then one is estimated from the population of
+   values.
    [4.0]
 3 TITLE
 TITLE = LITERAL (Read)
@@ -4517,6 +4531,12 @@ makeflat in='ff*' out=master_flat gamma=10 iter=1
 2 Notes
 - The data input into this routine should have bias strip
   regions and any badly vignetted parts removed.
+- The input images are normalised to have a mean of one
+  before being combined. This makes sure that all input images
+  contribute to the final result (even though, for instance,
+  they were taken on a source of varying brightness, e.g. the 
+  twilight sky).
+
 2 Behaviour_of_parameters
    Most parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -4755,6 +4775,9 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
    [MEDIAN]
 3 MIN
 MIN = _REAL (Read)
@@ -4915,8 +4938,8 @@ SCALE = _LOGICAL (Read)
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations at which to reject values if the
-   "mode" or "sigma" data combination methods are selected (see
-   the METHOD parameter). This value must be positive. [4.0]
+   "mode", "sigma" or "clipmed" data combination methods are selected
+   (see the METHOD parameter). This value must be positive. [4.0]
 3 SKYSUP
 SKYSUP = _REAL (Read)
    A positive "sky noise suppression factor" used to control the

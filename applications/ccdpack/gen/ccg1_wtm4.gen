@@ -1,4 +1,4 @@
-      SUBROUTINE CCG1_WTM4<T>( ORDDAT, WEIGHT, VAR, LBND, UBND, NENT, 
+      SUBROUTINE CCG1_WTM4<T>( ORDDAT, WEIGHT, VAR, LBND, UBND, NENT,
      :                         USED, COVAR, RESULT, RESVAR, STATUS )
 *+
 *  Name:
@@ -30,7 +30,7 @@
 *     uses the order statistic covariance array (for a population NENT
 *     big) to estimate the change in the variance from a optimal
 *     measurement from the given population, returning the adjusted
-*     variance. 
+*     variance.
 *
 *     This version is specialised to accept bounds for the values that
 *     can be used in ARR, these are from ARR(LBND:UBND). It is designed
@@ -111,21 +111,21 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION TOTWT     ! The total value of weights
-      INTEGER I                  ! Loop variable
-      INTEGER J                  ! Loop variable
-      INTEGER K                  ! Loop variable
-      INTEGER LBND               ! Lower sum bound
-      INTEGER UBND               ! Upper sum bound
-      DOUBLE PRECISION WTSUM     ! Current sum of weights
-      DOUBLE PRECISION WTINC     ! Increment in current wtsum
-      DOUBLE PRECISION D1        !
-      DOUBLE PRECISION D2        ! Values around half weight
-      DOUBLE PRECISION W1        ! Fractional weight of value
-      DOUBLE PRECISION W2        ! Fractional weight of value
-      DOUBLE PRECISION IW        ! Dummy
-      DOUBLE PRECISION JW        ! Dummy
-      DOUBLE PRECISION VSUM      ! Covariance sum
+      DOUBLE PRECISION TOTWT    ! The total value of weights
+      INTEGER I                 ! Loop variable
+      INTEGER J                 ! Loop variable
+      INTEGER K                 ! Loop variable
+      INTEGER LOWER             ! Lower sum bound
+      INTEGER UPPER             ! Upper sum bound
+      DOUBLE PRECISION WTSUM    ! Current sum of weights
+      DOUBLE PRECISION WTINC    ! Increment in current wtsum
+      DOUBLE PRECISION D1       !
+      DOUBLE PRECISION D2       ! Values around half weight
+      DOUBLE PRECISION W1       ! Fractional weight of value
+      DOUBLE PRECISION W2       ! Fractional weight of value
+      DOUBLE PRECISION IW       ! Dummy
+      DOUBLE PRECISION JW       ! Dummy
+      DOUBLE PRECISION VSUM     ! Covariance sum
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Numeric conversion definitions
@@ -137,7 +137,7 @@
 
 *  If only one input value has been given, do things quickly. Note
 *  we are ignoring LBND and UBND in the case of NENT = 1.
-      IF ( NENT .EQ. 1 ) THEN 
+      IF ( NENT .EQ. 1 ) THEN
 
 *  Just one value, copy the input values to the output values.
          RESULT = NUM_<T>TOD( ORDDAT( 1 ) )
@@ -167,7 +167,7 @@
             IF ( I .EQ. LBND ) THEN
                WTINC = NUM_<T>TOD( WEIGHT( I ) ) * 0.5D0
             ELSE
-               WTINC = ( NUM_<T>TOD( WEIGHT( I ) + WEIGHT( I - 1 ) ) ) 
+               WTINC = ( NUM_<T>TOD( WEIGHT( I ) + WEIGHT( I - 1 ) ) )
      :                 *  0.5D0
             END IF
             WTSUM = WTSUM + WTINC

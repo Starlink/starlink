@@ -37,16 +37,17 @@
 *     VARS( NLINES ) = DOUBLE PRECISION (Given)
 *        The variance to to used for each line of data.
 *     IMETH = INTEGER (Given)
-*        The method to use in combining the lines. Has a code of 2 to 9
+*        The method to use in combining the lines. Has a code of 2 to 10.
 *        which represent.
-*        2 = MEAN
-*        3 = MEDIAN
-*        4 = TRIMMED MEAN
-*        5 = MODE
-*        6 = SIGMA CLIPPED MEAN
-*        7 = THRESHOLD EXCLUSION MEAN
-*        8 = MINMAX MEAN
-*        9 = BROADENED MEDIAN
+*        2  = MEAN
+*        3  = MEDIAN
+*        4  = TRIMMED MEAN
+*        5  = MODE
+*        6  = SIGMA CLIPPED MEAN
+*        7  = THRESHOLD EXCLUSION MEAN
+*        8  = MINMAX MEAN
+*        9  = BROADENED MEDIAN
+*        10 = SIGMA CLIPPED MEDIAN
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
@@ -96,6 +97,8 @@
 *     18-MAY-1992 (PDRAPER):
 *        Original version with no variance propagation. Revamping of
 *        routine structure to increase efficiency.
+*     30-JAN-1998 (PDRAPER):
+*        Added sigma clipped median.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,6 +196,12 @@
          CALL CCG1_BMR3<T>( STACK, NPIX, NLINES, MINPIX, RESULT, WRK1,
      :                      NCON, POINT, USED, STATUS )
 
+      ELSE IF ( IMETH .EQ. 10 ) THEN
+
+*  Forming sigma clipped mean.
+         CALL CCG1_SMR3<T>( NSIGMA, STACK, NPIX, NLINES, VARS, MINPIX,
+     :                      RESULT, WRK1, WRK2, NCON, POINT, USED,
+     :                      STATUS )
       ELSE
 
 *  Invalid method report error

@@ -133,6 +133,8 @@
 *                           removed
 *           -  BROADENED -- A broadened median (the mean of a small
 *                           number of central values)
+*           -  CLIPMED   -- A sigma clipped median (like SIGMA except
+*                           that the median of the clipped values is used)
 *        [MEDIAN]
 *     MIN = _REAL (Read)
 *        If METHOD = "THRESH" then this value defines the lower limit
@@ -152,10 +154,10 @@
 *        specified using indirection through a file.
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Used for
-*        "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-*        deviation is estimated from the population of values.
-*        For METHOD = "SIGMA" this value is the pixel variance it one
-*        exists, otherwise it is the inverse of the mean data value.
+*        "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+*        standard deviation is estimated from the population of values.
+*        For METHOD = "SIGMA" this value is the pixel variance if one
+*        exists, otherwise one is estimated from the population of values.
 *        [4.0]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF.
@@ -221,8 +223,16 @@
 *  Notes:
 *     - The data input into this routine should have bias strip
 *       regions and any badly vignetted parts removed.
-
 *
+*     - The input images are normalised to have a mean of one
+*       before being combined. This makes sure that all input images
+*       contribute to the final result (even though, for instance,
+*       they were taken on a source of varying brightness, e.g. the 
+*       twilight sky).
+
+*  Copyright:
+*     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
@@ -240,6 +250,8 @@
 *        Updated to CCDPACK 2.0.
 *     29-JUL-1996 (PDRAPER):
 *        Added CLEAN parameter.
+*     31-JAN-1998 (PDRAPER):
+*        Added clipmed combination method.
 *     {enter_further_changes_here}
 
 *  Bugs:

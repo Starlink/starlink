@@ -40,14 +40,15 @@
 *        be at least 9 characters.
 *     IMETH = INTEGER (Returned)
 *        An integer representing the required combination method:
-*           2 = MEAN
-*           3 = MEDIAN
-*           4 = TRIMMED MEAN
-*           5 = MODE
-*           6 = SIGMA CLIPPED MEAN
-*           7 = THRESHOLD EXCLUSION MEAN
-*           8 = MINMAX MEAN
-*           9 = BROADENED MEDIAN
+*           2  = MEAN
+*           3  = MEDIAN
+*           4  = TRIMMED MEAN
+*           5  = MODE
+*           6  = SIGMA CLIPPED MEAN
+*           7  = THRESHOLD EXCLUSION MEAN
+*           8  = MINMAX MEAN
+*           9  = BROADENED MEDIAN
+*           10 = SIGMA CLIPPED MEDIAN
 *     USEWT = LOGICAL (Returned)
 *        Set to .TRUE. if user-supplied weights were obtained. If set
 *        to .FALSE, then no weighting is to be used. This value is only
@@ -94,6 +95,8 @@
 *        Changed to return a character string for the chosen method.
 *     19-JUL-1995 (PDRAPER):
 *        Removed AIF_ routines and replaced with PAR_
+*     30-JAN-1998 (PDRAPER):
+*        Added sigma clipped median.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,7 +141,7 @@
 *  Obtain the data combination method to be used, using MEDIAN as the
 *  default.
       CALL PAR_CHOIC( 'METHOD', ' ', 'MEDIAN,MEAN,TRIMMED,MODE,'//
-     :                'SIGMA,THRESHOLD,MINMAX,BROADENED', 
+     :                'SIGMA,THRESHOLD,MINMAX,BROADENED,CLIPMED', 
      :                .FALSE., METH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
@@ -159,6 +162,8 @@
          IMETH = 8
       ELSE IF ( METH .EQ. 'BROADENED' ) THEN
          IMETH = 9
+      ELSE IF ( METH .EQ. 'CLIPMED' ) THEN
+         IMETH = 10
       END IF
 
 *  If variance values are not being used and the data combination
@@ -171,7 +176,8 @@
      :       ( METH .EQ. 'MODE' ) .OR.
      :       ( METH .EQ. 'SIGMA' ) .OR.
      :       ( METH .EQ. 'THRESHOLD' ) .OR.
-     :       ( METH .EQ. 'MINMAX' ) ) ) THEN
+     :       ( METH .EQ. 'MINMAX' )  .OR. 
+     :       ( METH .EQ. 'CLIPMED' ) ) ) THEN
 
 *  Loop until an acceptable set of weights has been obtained.
          CALL ERR_MARK
@@ -218,7 +224,8 @@
 
 *  Sigma clipping: get the number of standard deviations to clip at.
       ELSE IF ( ( METH .EQ. 'MODE' ) .OR.
-     :          ( METH .EQ. 'SIGMA' ) ) THEN
+     :          ( METH .EQ. 'SIGMA' ) .OR.
+     :          ( METH .EQ. 'CLIPMED' ) ) THEN
          CALL PAR_GDR0R( 'SIGMAS', 4.0, 0.1, 100.0, .FALSE., NSIGMA, 
      :                   STATUS )
 

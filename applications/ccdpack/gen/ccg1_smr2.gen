@@ -35,7 +35,7 @@
 *        The number of pixels in a line of data.
 *     NLINES = INTEGER (Given)
 *        The number of lines of data in the stack.
-*     VARS( NPIX ) = DOUBLE PRECISION (Given)
+*     VARS( NLINES ) = DOUBLE PRECISION (Given)
 *        The data variances, one per input line.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
@@ -155,8 +155,7 @@
 
 *  Loop over all possible contributing pixels.
          DO 2 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BAD<T> .AND.
-     :           VARS( I, J ) .NE. VAL__BAD<T> ) THEN
+            IF( STACK( I, J ) .NE. VAL__BAD<T> ) THEN
 
 *  Increment good value counter.
                NGOOD = NGOOD + 1

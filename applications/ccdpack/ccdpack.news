@@ -9,6 +9,9 @@
 
  More minor changes include:
 
+    o  A new data combination method has been added. This is a 
+       sigma clipped median ("clipmed").
+
     o  An error in calculating the variances when median stacking
        2 images has been corrected (previous values where an
        underestimate).
