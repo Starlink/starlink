@@ -241,6 +241,10 @@ f     using AST_GRID
 *        where 1.0 corresponds to a "typical thin line" on the device.
 *        o  Modified LabelUnits attribute so that the default value is zero
 *        for SkyAxes and non-zero for other Axes.
+*     10-DEC-1998 (DSB):
+*        Modified all calls to the "pow" maths function to avoid using
+*        literal constants as arguments. This seems to cause segmentation
+*        violations on some systems.
 *class--
 */
 
@@ -3283,6 +3287,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
    double **ptr4;          /* Pointer to fine grid physical coords */
    double *ptr3b[2];       /* Pointers to next fine grid graphics coords */
    double *ptr4b[2];       /* Pointers to next fine grid physical coords */
+   double power;           /* Exponent in pow call */
    double rlimit;          /* Maximum grid dimension */
    double tol;             /* Fractional plotting tolerance */
    int *flag;              /* Pointer to next cell's flag */
@@ -3321,8 +3326,10 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 /* Set up the dimension of a coarse grid in graphics coordinates to cover the 
    whole plotting area. This is chosen to give a finer grid for smaller
-   plotting tolerances. */
-   dim = (int) pow( tol, -0.666666666 ) + 10;
+   plotting tolerances. Note, putting the power as a literal constant in
+   the call to pow seems to cause a segmentation violation on some systems. */
+   power = -0.666666666;
+   dim = (int) pow( tol, power ) + 10;
    if( dim > 400 ) dim = 400;
 
 /* Create the grid. */
