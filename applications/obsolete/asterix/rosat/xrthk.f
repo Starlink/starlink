@@ -41,8 +41,8 @@
       CHARACTER*7 PARAM                         ! Name of ADAM HK parameter
       CHARACTER*6 PARMIN,PARMAX                 ! Name of ADAM min,max params
       CHARACTER*23 CSTRING1,CSTRING2            ! MJD strings
-      CHARACTER*60 ERFILE                       ! Name of eventrate file
-      CHARACTER*60 ATTFIL                       ! Name of attitude file
+      CHARACTER*132 ERFILE                       ! Name of eventrate file
+      CHARACTER*132 ATTFIL                       ! Name of attitude file
 
       CHARACTER*(DAT__SZLOC) ERLOC               ! Locator to EVR file
       CHARACTER*(DAT__SZLOC) ATTLOC              ! Locator to ATT file
