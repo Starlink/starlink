@@ -5,106 +5,176 @@
 #include "merswrap.h"
 #include "msg_par.h"
 
-/* adamprint - convert a C-style print arguments to ADAM MSG output
-*/
+/*
+ * adamprint - convert a C-style print arguments to ADAM MSG output
+ *
+ * Uses va_list arguments as expected by the format statement.
+ *
+ * PWD: created this new version couldn't seem to find bug in older
+ * one below...
+ */
 void adamprint( FILE *file, char *fmt, ... )
 {
-   va_list ap;  /* points to each unnamed arg in turn */
+    char string[MSG__SZMSG];
+    va_list args;
+    int status = SAI__OK;
+    char *fmtcpy;
+    int len;
+    int i;
+    int j;
 
-   char *p, *pstart, *sval, *fmtcpy;
-   char pfmt[20];
-   char string[MSG__SZMSG]="";
-   char tok[MSG__SZMSG];
-   char cval;
-   int ival;
-   char *i, *j;
-   double dval;
-   int status = SAI__OK;
+    /* Strip out any 4 character escape sequences from format string */
+    len = strlen( fmt );
+    fmtcpy = (char *) malloc( (size_t) len );
+    for ( i = 0, j = 0; i < len; i++, j++ ) {
+        if ( fmt[i] == '\33' ) i += 4;
+        fmtcpy[j] = fmt[i];
+    }
+    fmtcpy[j]= '\0';
 
-   fmtcpy = (char *)malloc( (size_t)strlen( fmt ) + 1 );
-   strcpy( fmtcpy, fmt );
+    /* And create the formatted string using the va_list arguments */
+    va_start( args, fmt );
+    vsprintf( string, fmtcpy, args );
+    va_end( args );
+    
+    /* Write out the string via the message system */
+    msgOut( " ", string, &status );
+}
 
-   va_start(ap, fmt); /* ap points to first unnamed arg */
-   for (p=pstart=fmtcpy; *p; p++) {
-      if (*p != '%') {
-         continue;
-      }
-/* End of  a sequence of text */
-/* Set in token if non-null   */
-      *p++ = '\0';
-      if (p-pstart-1) {
-/* Remove any escape sequences and write to token */
-/* N.B. ASSUMED 4 CHARACTER SEQUENCE */
-         for ( i=pstart,j=tok; *i; *j++=*i++ )
-            if ( *i == '\33' ) i = i+4;
-         *j = '\0';
-/*         msgSetc( "TOK", tok );*/
-         strcat( string, tok );
-      }          
-/* Look for field conversion format */       
-      pstart = p;
-      for ( ; *p; p++ ) {
-         if (strchr("0123456789.-",*p)==NULL) break;
-      }         
+static void old_adamprint( FILE *file, char *fmt, ... ) 
+{
+    char *fmtcpy;
+    char *i;
+    char *j;
+    char *p;
+    char *pstart;
+    char *sval;
+    char cval;
+    char pfmt[20];
+    char string[MSG__SZMSG] = "";
+    char tok[MSG__SZMSG];
+    double dval;
+    int ival;
+    int status = SAI__OK;
+    va_list ap;
 
-/* Construct format string */
-      strcpy( pfmt, "%" );
-      strncat( pfmt, pstart, p-pstart+1 );
-      
-      switch (*p) {
-      case 'c':
-         cval = va_arg( ap, int );
-         sprintf( tok, pfmt, cval );
-         break;
+    /* Copy format so we can safely modify it
+     */
+    fmtcpy = strdup( fmt );
 
-      case 'd':
-         ival = va_arg( ap, int );
-         sprintf( tok, pfmt, ival );
-         break;
+    /* Get ap pointing to first unnamed arg after fmt.
+     */
+    va_start( ap, fmt );
 
-      case 'f':
-         dval = va_arg( ap, double );
-         sprintf( tok, pfmt, dval );
-         break;
+    /* Loop over each character until at end of format string.
+     */
+    for ( p = pstart = fmtcpy; *p; p++ ) {
 
-      case 'g':
-         dval = va_arg( ap, double );
-         sprintf( tok, pfmt, dval );
-         break;
+        /* Skip until we get to start of a format specifier */
+        if ( *p != '%' ) {
+            continue;
+        }
 
-      case 's':
-         sval = va_arg( ap, char* );
-         sprintf( tok, pfmt, sval );
-/*     Remove any escape sequences */
-/*     N.B. ASSUMED 4 CHARACTER SEQUENCE */
-         for ( i=j=tok; *i; i++,j++) {
-            if ( *i == '\33' ) i = i+4;
-            if ( i != j ) *j = *i;
-         }
-         *j = '\0';         
-         break;
-      }
+        /* New format specifier now starting. Replace '%' with
+         * null to terminate string up to this position. Previous
+         * string now extends from pstart.
+         */
+        *p++ = '\0';
 
-/*      msgSetc( "TOK", tok );*/
-      strcat( string, tok );
-      pstart = p + 1;
+        /* Copy previous string to the token buffer, removing any
+         * escape sequences (these are four characters). Skip null
+         * sequences.
+         */
+        if ( p - pstart - 1 ) {
+            for ( i = pstart, j = tok; *i; *j++ = *i++ ) {
+                if ( *i == '\33' ) i = i + 4;
+            }
+            *j = '\0';
+            strcat( string, tok );
+        }
 
-   }
+        /* Now process the trailing format statement. Extract it by
+         * skipping over string until a non-numeric character is
+         * located, or we get to the end of the format string.  
+         */
+        pstart = p;
+        for ( ; *p; p++ ) {
+            if ( strchr( "0123456789.-", *p ) == NULL ) break;
+        }
 
-/* Check for any remainder of format */
-   if ( p != pstart ) {
-/* Remove any escape sequences and write to token */
-/* N.B. ASSUMED 4 CHARACTER SEQUENCE -- PWD: overrun here somewhere*/
-      for ( i=pstart,j=tok; *i; *j++=*i++ )
-         if ( *i == '\33' ) i = i+4;
-      *j = '\0';
-/*      msgSetc( "TOK", tok );*/
-      strcat( string, tok );
-   }
+        /* Re-construct the format string
+         */
+        strcpy( pfmt, "%" );
+        strncat( pfmt, pstart, p - pstart + 1 );
 
-/* Now output the message */
-   msgOut( " ", string, &status );
-/* and clean up */
-   free( fmtcpy );
-   va_end(ap);
+        /* Format the next va_list argument using this format
+         * statemen. Result is place in tok.
+         */
+        switch ( *p ) {
+            case 'c':
+                cval = (char) va_arg( ap, int );
+                sprintf( tok, pfmt, cval );
+                break;
+
+            case 'd':
+                ival = va_arg( ap, int );
+                sprintf( tok, pfmt, ival );
+                break;
+
+            case 'f':
+                dval = va_arg( ap, double );
+                sprintf( tok, pfmt, dval );
+                break;
+
+            case 'g':
+                dval = va_arg( ap, double );
+                sprintf( tok, pfmt, dval );
+                break;
+
+            case 's':
+                sval = va_arg( ap, char* );
+                sprintf( tok, pfmt, sval );
+
+                /* Remove 4 character escape sequences from strings.
+                 */
+                for ( i = j = tok; *i; i++, j++ ) {
+                    if ( *i == '\33' ) i = i + 4;
+                    if ( i != j ) *j = *i;
+                }
+                *j = '\0';
+                break;
+        }
+
+        /* Add the format value to the destination string 
+         */
+        strcat( string, tok );
+
+        /* Start again from end of current format specifier 
+         */
+        pstart = p + 1;
+    }
+
+    /* Check for any remainder of format
+     */
+    if ( p != pstart ) {
+
+        /* Remove any 4 character escape sequences and write to token
+         * PWD: there is an occasional overrun here, when the above
+         * test fails and we don't seem to see the end of the string.
+         */
+        for ( i = pstart, j = tok; *i; *j++ = *i++ ) {
+            if ( *i == '\33' ) i = i + 4;
+        }
+        *j = '\0';
+        strcat( string, tok );
+    }
+
+    /* Now output the message
+     */
+    msgOut( " ", string, &status );
+
+    /* and clean up
+     */
+    free( fmtcpy );
+    va_end( ap );
 }
