@@ -128,14 +128,13 @@ adamMessageRelay: Makefile $(srcdir)/adamMessageRelay.in
 	chmod +x adamMessageRelay.tmp
 	mv adamMessageRelay.tmp adamMessageRelay
 
-# Wish 8.4 needs explicit extension of shared library
-# This will be a problem on none .so systems but Makefile
-# does not publish the suffix
+# Wish 8.4 needs explicit extension of shared library.
+# The suffix is available from tcl as [info sharedlibextension]
 tclIndex: $(LIBRARY_FILES)
 	echo 'auto_mkindex . *.tcl' | @TCLSH@
 	echo >> tclIndex ''
 	echo >> tclIndex \
-           'set auto_index(gwm) [list load [file join $$dir libtkGwm.so] tkGwm]'
+           'set auto_index(gwm) [list load [file join $$dir [concat libtkGwm[info sharedlibextension]] ] tkGwm]'
 	echo >> tclIndex \
-           'set auto_index(adam_start) [list load [file join $$dir libtclAdam.so] tclAdam]'
+           'set auto_index(adam_start) [list load [file join $$dir [concat libtclAdam[info sharedlibextension]] ] tclAdam]'
 
