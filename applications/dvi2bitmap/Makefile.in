@@ -119,7 +119,7 @@ simpledeps_:
 	@ for i in *.cc; do \
 		echo `echo $$i|sed 's/\.cc/.o/'`: $$i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >> Makefile; \
 	done
-	for i in *.h *.cc; do \
+	@ for i in *.h *.cc; do \
 		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >> Makefile; \
 	done
 
