@@ -19,7 +19,14 @@ INTERFACE BARYCORR
    HELP        'Name of the output file created by BARYCORR '
  ENDPARAMETER
 
- PARAMETER SIMPLE_MODE
+ PARAMETER TLIST
+   TYPE        '_CHAR'
+   VPATH       'PROMPT'
+   PPATH       'DYNAMIC'
+   PROMPT      'Name of list containing time tags'
+ ENDPARAMETER
+
+ PARAMETER SIMPLE
    TYPE        '_LOGICAL'
    VPATH       'PROMPT'
    PPATH       'CURRENT,DEFAULT'
@@ -27,7 +34,6 @@ INTERFACE BARYCORR
    DEFAULT     Y
    HELP        'Will not allow for any differential barycentric correction that occurs during the observation'
  ENDPARAMETER
-
 
 
  PARAMETER ABORT
