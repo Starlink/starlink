@@ -233,6 +233,8 @@
 #        Add LINK_TEST
 #     12-OCT-1998 (DSB):
 #        Added LDFLAGS, TK_VERS and TCL_VERS.
+#     22-MAR-2000 (BLY):
+#        Added '-oldstyle_liblookup' to LDFLAGS in alpha_OSF1 case.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -273,7 +275,7 @@
             alpha_OSF1)
                TK_VERS='4.2'
                TCL_VERS='7.6'
-               LDFLAGS=' -ljpeg'
+               LDFLAGS=' -oldstyle_liblookup -ljpeg'
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O -std1'
