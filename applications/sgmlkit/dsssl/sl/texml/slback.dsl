@@ -104,15 +104,23 @@ specifically not as part of the backmatter processing below.  We
 cannot, therefore, automake index processing here.
 <codebody>
 (element index
-  (let ((range (attribute-string (normalize "range"))))
-    (make element gi: "TeXML" attributes: '(("escape" "0"))
-          (make-latex-command name: "index"
-                (literal
-                 (string-append
-                  (trim-data (current-node))
-                  (if range            ; generate makeindex range specifiers
-                      (if (string=? range "open") "|(" "|)")
-                      "")))))))
+  (make-latex-command name: "index"
+        (literal (trim-data (current-node)))))
+; ;; The following version also handles the range attribute, but is currently
+; ;; disabled, and this attribute ignored -- it requires TeXML
+; ;; escaping turned off, but if an index is used within, say,
+; ;; a "dt", then the result is invalid TeXML.
+; (element index
+;   (let ((range (attribute-string (normalize "range"))))
+;     (make element gi: "TeXML" attributes: '(("escape" "0"))
+;           (make-latex-command name: "index"
+;                 (literal
+;                  (string-append
+;                   (trim-data (current-node))
+;                   (if range       ; generate makeindex range specifiers
+;                       (if (string=? range "open") "|(" "|)")
+;                       ""))
+;                  )))))
 
 (define (make-index)
   (let ((indexents (select-elements

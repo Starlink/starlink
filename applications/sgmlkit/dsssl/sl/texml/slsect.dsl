@@ -34,6 +34,20 @@ commands.
     (make-latex-command name: section-cmd
 	  (with-mode section-reference
 	    (process-node-list (current-node))))
+;     (if (attribute-string "indexkey")
+;         (make element gi: "TeXML" attributes: '(("escape" "0"))
+;               (make-latex-command name: "index"
+;                     (literal
+;                      (string-append
+;                       (trim-data (current-node))
+;                       (if (attribute-string "range")
+;                           ;; generate makeindex range specifiers -- probably
+;                           ;; a bad idea, but the user seems to want them...
+;                           (if (string=? (attribute-string "range") "open")
+;                               "|("
+;                               "|)")
+;                           "")))))
+;         (empty-sosofo))
     (if children
 	(process-children)
 	(empty-sosofo))))
