@@ -6,4 +6,4 @@
 # Echo a command then run it.
 echorun() { echo $*; eval $* || exit 1; }
 
-echorun autoreconf
+echorun autoreconf --install --symlink
