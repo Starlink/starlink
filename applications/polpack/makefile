@@ -516,7 +516,7 @@ TEST_SCRIPT = $(PKG_NAME)_test
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun223.tex
-HYPERTEXT_DOCS = 
+HYPERTEXT_DOCS = sun223.htx
 HYPERTEXT_HELP = polka.htx 
 FIGURES = sun223_figures
 
