@@ -84,6 +84,7 @@
 *                         negative data slices. (DJA)
 *     29 Jun 94 : V1.8-0  Put bias to make LOG spacing more useful (DJA)
 *     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
+*     26 Mar 95 : V1.8-2  Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -92,7 +93,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -113,8 +114,6 @@
 *    Local variables :
 *
       CHARACTER*80           	HTXT(MXLINES)         	! History text
-      CHARACTER*(DAT__SZLOC) 	ILOC                  	! Input dataset
-      CHARACTER*(DAT__SZLOC) 	OLOC                  	! Output dataset
       CHARACTER*30           	STR                   	! Format string
 
       REAL			BIAS			! Data bias
@@ -123,11 +122,12 @@
       REAL                   	SNR                   	! Requested signal to noise
 
       INTEGER                	A_X, A_Y, A_T         	! Axis numbers
-      INTEGER                	DIMS(DAT__MXDIM)      	! Input dimensions
+      INTEGER                	DIMS(ADI__MXDIM)      	! Input dimensions
       INTEGER                	FILTER                	! Filter choice
       INTEGER                	I                     	! General loop variable
       INTEGER                	IDPTR                 	! Input data ptr
-      INTEGER                	INORDER(DAT__MXDIM)   	! Inverted transform
+      INTEGER			IFID			! Input dataset id
+      INTEGER                	INORDER(ADI__MXDIM)   	! Inverted transform
       INTEGER                	IQPTR                 	! Input quality ptr
       INTEGER                	IVPTR                 	! Input variance ptr
       INTEGER                	NDIM                  	! Input dimensionality
@@ -138,13 +138,14 @@
       INTEGER                	NSELEM                	! # elements in slice
       INTEGER                	NSLICE                	! # slices
       INTEGER                	ODPTR                 	! Output data ptr
+      INTEGER			OFID			! Output dataset id
       INTEGER                	OPTION                	! Level selection option
-      INTEGER                	SDIMS(DAT__MXDIM)     	! Dimensions to smooth
-      INTEGER                	TDIMS(DAT__MXDIM)     	! Input variance dims
+      INTEGER                	SDIMS(ADI__MXDIM)     	! Dimensions to smooth
+      INTEGER                	TDIMS(ADI__MXDIM)     	! Input variance dims
       INTEGER                	TLEN                  	! Length of char string
       INTEGER                	TNDIM                 	! Input variance dim'ality
-      INTEGER                	TRDIMS(DAT__MXDIM)    	! Transformed dimensions
-      INTEGER                	TRORD(DAT__MXDIM)     	! Transformed axis numbers
+      INTEGER                	TRDIMS(ADI__MXDIM)    	! Transformed dimensions
+      INTEGER                	TRORD(ADI__MXDIM)     	! Transformed axis numbers
       INTEGER                	TDPTR, TQPTR, TVPTR   	! Tranformed input data
       INTEGER                	WDPTR, WQPTR          	! Workspace for layers
       INTEGER                	WSTART                	! Width starting value
@@ -173,14 +174,14 @@
       CALL AST_INIT()
 
 *    Get input and output files
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, IPRIM, STATUS )
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy input to output
-      CALL HDX_COPY( ILOC, OLOC, STATUS )
+      CALL ADI_FCOPY( IFID, OFID, STATUS )
 
 *    Check input data
-      CALL BDA_CHKDATA( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -192,39 +193,40 @@
      :                                                   STATUS )
         GOTO 99
       END IF
-      CALL BDA_MAPDATA( ILOC, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
 
 *    Count input elements
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Input variance present?
-      CALL BDA_CHKVAR( ILOC, VOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKVAR( IFID, VOK, TNDIM, TDIMS, STATUS )
       IF ( VOK ) THEN
-        CALL BDA_MAPVAR( ILOC, 'READ', IVPTR, STATUS )
-        CALL DAT_ERASE( OLOC, 'VARIANCE', STATUS )
+        CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
+        CALL BDI_DELETE( OFID, 'Variance', STATUS )
         POISSON = .FALSE.
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-        CALL MSG_PRNT( '! Warning, no variance present, assuming'/
-     :                                    /' Poisson statistics' )
+        CALL MSG_OUT( ' ', '! Warning, no variance present, assuming'/
+     :                                /' Poisson statistics', STATUS )
         POISSON = .TRUE.
       END IF
 
 *    Input quality present?
-      CALL BDA_CHKQUAL( ILOC, QOK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, QOK, TNDIM, TDIMS, STATUS )
       IF ( QOK ) THEN
-        CALL BDA_MAPMQUAL( ILOC, 'READ', IQPTR, STATUS )
+        CALL BDI_MAPMQUAL( IFID, 'READ', IQPTR, STATUS )
       END IF
 
 *    Map output array
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *    Display list of axes
+      CALL BDI_PRIM( IFID, IPRIM, STATUS )
       IF ( .NOT. IPRIM ) THEN
-        CALL AXIS_LIST( ILOC, NDIM, STATUS )
+        CALL AXIS_TLIST( IFID, NDIM, STATUS )
       END IF
 
 *    Try to find X,Y axes and set default for SDIMS
-      CALL AXIS_FINDXYT( ILOC, NDIM, A_X, A_Y, A_T, STATUS )
+      CALL AXIS_TFINDXYT( IFID, NDIM, A_X, A_Y, A_T, STATUS )
       IF ( (A_X .GT. 0) .AND. (A_Y.GT.0) ) THEN
         SDIMS(1) = A_X
         SDIMS(2) = A_Y
@@ -235,7 +237,7 @@
       END IF
 
 *    Get dimensions to be smoothed
-      CALL USI_GET1I( 'SDIMS', DAT__MXDIM, SDIMS, NSDIM, STATUS )
+      CALL USI_GET1I( 'SDIMS', ADI__MXDIM, SDIMS, NSDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( NSDIM .GT. 2 ) THEN
         STATUS = SAI__ERROR
@@ -354,7 +356,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Pad dimensions to 7D
-      DO I = NDIM+1, DAT__MXDIM
+      DO I = NDIM+1, ADI__MXDIM
         DIMS(I) = 1
       END DO
 
@@ -362,8 +364,8 @@
       CALL STR_DIMTOC( NSDIM, SDIMS, STR )
 
 *    Construct transformation matrix
-      CALL AXIS_GETORD( ILOC, STR(2:CHR_LEN(STR)-1), REORDER, TRORD,
-     :                                       NSDIM, TRDIMS, STATUS )
+      CALL AXIS_TGETORD( IFID, STR(2:CHR_LEN(STR)-1), REORDER, TRORD,
+     :                                        NSDIM, TRDIMS, STATUS )
 
 *    Transformation of axes required? If so create temporary space
 *    and unmap originals to save space
@@ -371,20 +373,20 @@
         CALL DYN_MAPR( NDIM, DIMS, TDPTR, STATUS )
         CALL AR7_AXSWAP_R( DIMS, %VAL(IDPTR), TRORD, TRDIMS,
      :                                 %VAL(TDPTR), STATUS )
-        CALL BDA_UNMAPDATA( ILOC, STATUS )
+        CALL BDI_UNMAPDATA( IFID, STATUS )
         IDPTR = TDPTR
         IF ( QOK ) THEN
           CALL DYN_MAPB( NDIM, DIMS, TQPTR, STATUS )
           CALL AR7_AXSWAP_B( DIMS, %VAL(IQPTR), TRORD, TRDIMS,
      :                                   %VAL(TQPTR), STATUS )
-          CALL BDA_UNMAPQUAL( ILOC, STATUS )
+          CALL BDI_UNMAPQUAL( IFID, STATUS )
           IQPTR = TQPTR
         END IF
         IF ( VOK ) THEN
           CALL DYN_MAPR( NDIM, DIMS, TVPTR, STATUS )
           CALL AR7_AXSWAP_R( DIMS, %VAL(IVPTR), TRORD, TRDIMS,
      :                                   %VAL(TVPTR), STATUS )
-          CALL BDA_UNMAPVAR( ILOC, STATUS )
+          CALL BDI_UNMAPVAR( IFID, STATUS )
           IVPTR = TVPTR
         END IF
       END IF
@@ -419,12 +421,12 @@
         CALL AR7_AXSWAP_R( TRDIMS, %VAL(TDPTR), INORDER, DIMS,
      :                                   %VAL(ODPTR), STATUS )
         CALL DYN_UNMAP( TDPTR, STATUS )
-        CALL BDA_UNMAPDATA( OLOC, STATUS )
+        CALL BDI_UNMAPDATA( OFID, STATUS )
 
       END IF
 
 *    Update history
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Create history text
       HTXT(1) = 'Input {INP}'
@@ -453,7 +455,7 @@
 *    Process text
       NLINES = MXLINES
       CALL USI_TEXT( 4, HTXT, NLINES, STATUS )
-      CALL HIST_PTXT( OLOC, NLINES, HTXT, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, HTXT, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
@@ -495,13 +497,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
 *
       INTEGER                NDIM                  ! # real dimensions
-      INTEGER                DIMS(DAT__MXDIM)      ! Dataset dimensions
+      INTEGER                DIMS(ADI__MXDIM)      ! Dataset dimensions
       INTEGER                NSDIM                 ! Number of dims to smooth
       INTEGER                NSLICE                ! # slices
       INTEGER                NSELEM                ! # elements per slice
@@ -538,7 +540,7 @@
       INTEGER                I                     ! Loop over data
       INTEGER                ILEVEL                ! Loop over smooth levels
       INTEGER                ISLICE                ! Loop over slices
-      INTEGER                WDIMS(DAT__MXDIM)     ! Weights dimensions
+      INTEGER                WDIMS(ADI__MXDIM)     ! Weights dimensions
       INTEGER                WPTR                  ! Weights array
       INTEGER                WTRUNC                ! Truncation radius
 *-
@@ -550,7 +552,7 @@
       CALL ARR_INIT1R( 0.0, NSELEM*NSLICE, OUT, STATUS )
 
 *    Construct weights array dimensions
-      DO I = 1, DAT__MXDIM
+      DO I = 1, ADI__MXDIM
         IF ( I .LE. NSDIM ) THEN
           WDIMS(I) = WMAXSZ*2+1
         ELSE
@@ -661,7 +663,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -824,7 +826,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -906,7 +908,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
@@ -1011,7 +1013,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Import :
@@ -1222,7 +1224,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -1254,7 +1256,7 @@
 *
 *    Local variables :
 *
-      INTEGER                I,J,K,L,M,N,O         ! Loop over data
+      INTEGER                I,J         		! Loop over data
       INTEGER                II,JJ			! Loop over mask
 *-
 
