@@ -138,8 +138,8 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
+*     Copyright (C) 1995,1996,1997,1998,1999, 2004 
+*     Particle Physics and Astronomy Research Council. All Rights Reserved.
 
 *  History:
 *     1986 November 14 (MJC):
@@ -156,8 +156,10 @@
 *        Rewrote the description, added usage and implementation status.
 *     1995 November 9 (MJC):
 *        Modified for UNIX and added the Topic on Navigation.
-*     1996 November 1 (TIMJ)
+*     1996 November 1 (TIMJ):
 *        Modified for SCUBA software
+*     2004 July 27 (TIMJ):
+*        Switch to SHL library
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,76 +172,22 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
 
 *  Status:
       INTEGER STATUS
 
 *  External References:
-      INTEGER
-     :  CHR_LEN                ! Length of character strings ignoring
-                               ! trailing blanks
-
 
 *  Local Constants:
-      CHARACTER*10 LIBNAM      ! Name of the KAPPA help library
-      PARAMETER ( LIBNAM = 'SURF_HELP' )
-      INTEGER MAXLEV           ! Maximum number of help levels
-      PARAMETER ( MAXLEV = 4 )
+      CHARACTER*4 LIBNAM      ! Name of the SURF help library env var
+      PARAMETER ( LIBNAM = 'SURF' )
 
-*  Local Variables:
-      CHARACTER*19
-     :  HLPTXT*80,             ! Composite command
-     :  LIBRAY*132,            ! Library name and path
-     :  PATH*122,              ! Library path
-     :  TOPIC( MAXLEV )        ! Name of the topic required
-
-      INTEGER
-     :  I,                     ! Loop counter
-     :  NC                     ! Number of characters in the help string
-                               ! less trailing blanks
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Translate the environment variable/logical name.
-      CALL PSX_GETENV( LIBNAM, PATH, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Form the full library name.
-         NC = CHR_LEN( PATH )
-         LIBRAY = PATH( :NC )//'.shl'
-
-*  Get topic and subtopics.
-         CALL PAR_GET0C( 'TOPIC', TOPIC(1), STATUS )
-         CALL PAR_CANCL( 'TOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBTOPIC', TOPIC(2), STATUS )
-         CALL PAR_CANCL( 'SUBTOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBSUBTOPIC', TOPIC(3), STATUS )
-         CALL PAR_CANCL( 'SUBSUBTOPIC', STATUS )
-
-         CALL PAR_GET0C( 'SUBSUBSUBTOPIC', TOPIC(4), STATUS )
-         CALL PAR_CANCL( 'SUBSUBSUBTOPIC', STATUS )
-
-*  Concatenate the help topics into a single string
-         HLPTXT = TOPIC( 1 )
-         NC = CHR_LEN( TOPIC( 1 ) ) + 1
-         DO I = 2, MAXLEV
-            CALL CHR_APPND( ' '//TOPIC( I ), HLPTXT, NC )
-         END DO
-
-*  Use a null string when something has gone wrong obtaining the
-*  topics and sub-topics.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )
-            HLPTXT = '         '
-         END IF
-
-*  Get help text.
-         CALL GETHLP( LIBRAY, HLPTXT, STATUS )
-      END IF
+*  Open the help library application layer
+      CALL SHL_ADAM( LIBNAM, .TRUE., STATUS)
 
       END

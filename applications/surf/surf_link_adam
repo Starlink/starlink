@@ -68,6 +68,8 @@
 #        on stardev system.
 #     2004 July 14 (TJ)
 #        Stop using SGS/GKS
+#     2004 July 27 (TJ)
+#        Use SHL
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -77,7 +79,7 @@
 
 # Now find the necessary libraries
       echo `ndf_link_adam` `fio_link_adam` \
-           `sla_link_adam` `hlp_link_adam` `pda_link_adam` \
+           `sla_link_adam` `shl_link_adam` `pda_link_adam` \
            `prm_link_adam` `agp_link_adam` `kaplibs_link_adam -nogks` \
            `pgplot_link_adam` `grp_link_adam` `ndg_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
