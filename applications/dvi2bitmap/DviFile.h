@@ -233,7 +233,7 @@ private:
 	    endmapiter_ = me;
 	    finished_ = false;
 	};
-	const_iterator() : mapiter_(0), endmapiter_(0), finished_(true) { }
+	const_iterator() : finished_(true) { }
 	map<int,PkFont*>::const_iterator mapiter_;
 	map<int,PkFont*>::const_iterator endmapiter_;
 	bool finished_;

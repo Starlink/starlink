@@ -1063,7 +1063,7 @@ const PkFont* DviFile::const_iterator::operator*()
     throw (DviBug)
 {
     if (finished_)
-	throw DviBug("DviFile::const_iterator out of bounds");
+	throw DviBug("DviFile::const_iterator* : out of bounds");
     return mapiter_->second;
 }
 
@@ -1074,6 +1074,8 @@ const PkFont* DviFile::const_iterator::operator*()
  */
 DviFile::const_iterator& DviFile::const_iterator::operator++()
 {
+    if (finished_)
+	throw DviBug("DviFile::const_iterator++ : out of bounds");
     ++mapiter_;
     if (mapiter_ == endmapiter_)
 	finished_ = true;
