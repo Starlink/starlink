@@ -14,7 +14,7 @@ DTDDIR=$(STARLINK_SGML_DIR)/dtd
 
 # This stamp file is tested by ../ssn70/Makefile -- do not rename!
 sgmltext.stamp: starlink-0.2.sgmltext programcode-0.2.sgmltext
-	touch text.stamp
+	touch sgmltext.stamp
 
 starlink-0.2.dtdsummary: $(DTDDIR)/starlink-everything.dtd $(DTDDIR)/starlink-0.2.dtd
 	SGML_SEARCH_PATH=$(DTDDIR) \
