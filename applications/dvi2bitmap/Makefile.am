@@ -47,7 +47,7 @@ EXTRA_libdvi2bitmap_la_SOURCES = \
 	KarlPathSearcher.cc \
 	KarlPathSearcher.h
 EXTRALO=@EXTRALO@
-libdvi2bitmap_la_LIBADD = $(EXTRALO) $(LTLIBOBJS)
+libdvi2bitmap_la_LIBADD = $(EXTRALO) $(LTLIBOBJS) -lm
 libdvi2bitmap_la_DEPENDENCIES = $(EXTRALO) $(LTLIBOBJS)
 libdvi2bitmap_la_LDFLAGS = -version-info @libdvi2bitmap_la_version_info@
 
