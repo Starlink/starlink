@@ -186,6 +186,9 @@
    - A bug in FINDOFF which caused failure when NDFNAMES=false has
      been fixed.
 
+   - FINDOFF will now propagate values in trailing columns from the
+     input to output position lists.
+
    - PLOTLIST has been modified to interact with the AGI database
      in a more KAPPA-compatible way, so that alignment with KAPPA
      graphical output should be improved.
@@ -4377,8 +4380,11 @@ findoff inlist='data*' outlist='*.off' restrict minmatch=2
   positions.  In the output position lists from one run of FINDOFF,
   lines with the same column-1 value in different files represent
   the same object.  In the input position lists column-1 values
-  are ignored.  Values in trailing columns (beyond column three)
-  are ignored.
+  are ignored.  If additional columns are present they must be
+  numeric, and there must be the same number of them in every 
+  line.  These have no effect on the calculations, but FINDOFF
+  will propagate them to the corresponding lines in the output
+  list.
 
   EXTERNAL format - positions are specified using just an X
   and a Y entry and no other entries.

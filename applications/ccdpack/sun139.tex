@@ -9330,11 +9330,14 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
       }
         The column one value must be an integer and is used to identify
-        positions.  In the output position lists from one run of FINDOFF,
+        positions.  In the output position lists from one run of \routine{FINDOFF},
         lines with the same column-1 value in different files represent
         the same object.  In the input position lists column-1 values
-        are ignored.  Values in trailing columns (beyond column three)
-        are ignored.
+        are ignored.  If additional columns are present they must be
+        numeric, and there must be the same number of them in every 
+        line.  These have no effect on the calculations, but \routine{FINDOFF}
+        will propagate them to the corresponding lines in the output
+        list.
 
         EXTERNAL format - positions are specified using just an X
         and a Y entry and no other entries.
@@ -16676,6 +16679,9 @@ This is a major update to CCDPACK.
   \item
      A bug in \xroutine{FINDOFF} which caused failure when NDFNAMES=false has
      been fixed.
+  \item
+     \xroutine{FINDOFF} will now propagate values in trailing columns from the
+     input to output position lists.
   \item
      \xroutine{PLOTLIST} has been modified to interact with the 
      \xref{AGI database}{sun95}{se_agitate}

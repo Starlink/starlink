@@ -27,6 +27,9 @@
    - A bug in FINDOFF which caused failure when NDFNAMES=false has
      been fixed.
 
+   - FINDOFF will now propagate values in trailing columns from the
+     input to output position lists.
+
    - PLOTLIST has been modified to interact with the AGI database
      in a more KAPPA-compatible way, so that alignment with KAPPA 
      graphical output should be improved.
