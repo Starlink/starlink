@@ -294,6 +294,14 @@
                DEFAULT  Y
             ENDPARAMETER
 
+     PARAMETER AXES
+               TYPE    '_CHAR'
+               PROMPT  'Enter integer codes of axes required in data array'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'e.g. for an image enter >1,2'
+     ENDPARAMETER
+
      PARAMETER INTERVAL
                TYPE    '_REAL'
                PROMPT  'Minimum length of a GOOD time window'
