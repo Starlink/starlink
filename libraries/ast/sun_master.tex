@@ -17453,6 +17453,14 @@ labels being drawn on inappropriate edges of the plotting box when using
 \item A bug has been fixed in the IntraMap class which could cause IntraMaps
 to be corrupted after transforming any points.
 
+\item Bugs have been fixed in the FitsChan class which could cause
+inappropriate ordering of headers within a FitsChan when writing or
+reading objects using NATIVE encodings.  
+
+\item A bug has been fixed in the FitsChan class which could cause the
+celestial longitude of a pixel to be estimated incorrectly by 180 degrees
+if the reference point is at either the north or the south pole. 
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
