@@ -165,7 +165,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_preser
-            default FALSE
+            default TRUE
             prompt {Preserve input data type?}
             helpkey *
           }
