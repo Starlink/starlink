@@ -118,6 +118,9 @@
 *     1993 July 28 (MJC):
 *        Removed the VERBOSE parameter.  This functionality should be
 *        provided by a global parameter.
+*     1993 September 30 (MJC):
+*        Do not copy standard FITS headers already added to the FITS
+*        extension.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,9 +196,9 @@
                                  ! image's history string
       INTEGER NCOLS              ! Number of columns
       INTEGER NDF                ! NDF identifier of output NDF
-      INTEGER NELS               ! Number of elements in FITS ext array
       INTEGER NHDRLI             ! Number of IRAF header lines
       INTEGER NHISTL             ! Number of IRAF history lines
+      INTEGER NREJEC             ! Number of rejected FITS cards
       INTEGER NROWS              ! Number of rows
       INTEGER NTICKS             ! Returned by PSX_TIME
       INTEGER PNTR( 1 )          ! Pointer to NDF data array
@@ -204,7 +207,7 @@
       INTEGER TSTRUCT            ! The time structure from psx_localtime
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF axes
       INTEGER XLINES             ! Number of NDF extension lines
-      INTEGER XDIMS( 2 )         ! Number of dimensions in FITS
+      INTEGER XDIMS( 1 )         ! Number of dimensions in FITS
                                  ! extension
 
 *.
@@ -307,11 +310,11 @@
 *  dimensionality and the mapped array to a subroutine. Each line of
 *  the IRAF image will be extracted and propagated to the NDF array.
       IF ( DTYPE .EQ. 3 ) THEN
-         CALL CON_CI2DW( NCOLS, NROWS, NBANDS, IMDESC, ERR,
+         CALL CON_CI2DW( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
      :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), ERR,
      :                   STATUS )
       ELSE
-         CALL CON_CI2DR( NCOLS, NROWS, NBANDS, IMDESC, ERR,
+         CALL CON_CI2DR( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
      :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), ERR,
      :                   STATUS )
       END IF
@@ -386,20 +389,25 @@
       CALL GETLIN( IMDESC, 1, CARD )
 
       ADFITS = .FALSE.
-      IF ( INDEX( CARD( 1:8 ), 'SIMPLE' ) .EQ. 0 ) THEN
+      IF ( INDEX( CARD( 1:8 ), 'SIMPLE' ) .EQ. 0 .OR.
+     :     CARD( 30:30 ) .NE. 'T' ) THEN
          CALL MSG_OUTIF( MSG__VERB, ' ',
-     :      'Inserting FITS keywords not present in the IRAF image '/
-     :      /'into the NDF''s FITS extension.', STATUS )
+     :      'Inserting mandatory FITS keywords not present in the '/
+     :      /'IRAF image into the NDF''s FITS extension.', STATUS )
          ADFITS = .TRUE.
       END IF
 
 *  XLINES is the number of lines there will be in the final extension.
-*  Need 4 lines for SIMPLE, BITPIX, NAXIS, and END. (If required.)
-*  Need one for each dimension in MDIM (NAXISn keyword) (If required.)
-*  Need 2 for the extra history cards that say IRAF2NDF was used.
-      XLINES = NHDRLI + NHISTL + 2
+*  We always need one extra for the mandatory END card image, and two
+*  for the extra history cards that say IRAF2NDF was used.  When the
+*  mandatory card images are added there needs to be three lines for
+*  SIMPLE, BITPIX, and NAXIS cards, and one card for each dimension in
+*  MDIM (NAXISn keyword).  In practice some of the mandatory FITS
+*  headers may be present, and the extension will need to be truncated
+*  at the end.
+      XLINES = NHDRLI + NHISTL + 2 + 1
 
-      IF ( ADFITS ) XLINES = XLINES + 4 + MDIM
+      IF ( ADFITS ) XLINES = XLINES + 3 + MDIM
 
 *  Create and map the FITS extension.
 *  ==================================
@@ -412,7 +420,8 @@
       CALL NDF_XNEW( NDF, 'FITS', '_CHAR*80', 1, XDIMS, FITLOC, STATUS )
             
 *  Map the array so that it can be passed to subroutines for filling.
-      CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', FIPNTR, NELS, STATUS )
+      CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', FIPNTR, XLINES,
+     :               STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 980
 
 *  Fill the FITS extension with the user-area headers.
@@ -430,8 +439,8 @@
 *  header records.  Since the character array is mapped the length must
 *  be passed for this to work under UNIX.  It has no effect under VMS.
       IF ( ADFITS ) THEN
-         CALL CON_WFMAN( NELS, MDIM, DIMS, BITPIX, %VAL( FIPNTR( 1 ) ),
-     :                   STATUS, %VAL( FITSLN ) )
+         CALL CON_WFMAN( XLINES, MDIM, DIMS, BITPIX,
+     :                   %VAL( FIPNTR( 1 ) ), STATUS, %VAL( FITSLN ) )
 
          IF ( STATUS .NE. SAI__OK) GOTO 999
       
@@ -443,6 +452,9 @@
          LINENO = 1
       END IF
 
+*  Initialise the number of rejected header cards.
+      NREJEC = 0
+
 *  Loop for each line of the FITS header (after any mandatory keywords
 *  have been written).
       DO K = LINENO, LINENO + NHDRLI - 1
@@ -453,19 +465,36 @@
 *  Extract each line in the user area.
          CALL GETLIN( IMDESC, K - LINENO + 1, CARD )
 
-*  Report FITS card image in verbose-message mode.
-         CALL MSG_SETC( 'CARD', CARD )
-         CALL MSG_OUTIF( MSG__VERB, ' ', '^CARD', STATUS )
+*  Do we need to write this card to the FITS extension?  No, if it is
+*  the END card, as that will be written after the history cards; no,
+*  if it is a mandatory keyword already written to the start of the
+*  header.  Report FITS card image in verbose-message mode.
+         IF ( CARD( 1:8 ) .NE. 'END     ' .AND. .NOT. ( ADFITS .AND.
+     :        ( CARD( 1:6 ) .EQ. 'SIMPLE' .OR.
+     :          CARD( 1:5 ) .EQ. 'NAXIS' .OR.
+     :          CARD( 1:6 ) .EQ. 'BITPIX' ) )  ) THEN
+
+            CALL MSG_SETC( 'CARD', CARD )
+            CALL MSG_OUTIF( MSG__VERB, ' ', '^CARD', STATUS )
 
 *  Put it into the FITS extension.  Note again that the length of the
 *  mapped character array is passed by value for UNIX.
-         CALL CON_PCARD( CARD, K, NELS, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                   %VAL( FITSLN ) )
+            CALL CON_PCARD( CARD, K - NREJEC, XLINES,
+     :                      %VAL( FIPNTR( 1 ) ), STATUS,
+     :                      %VAL( FITSLN ) )
+         ELSE
+
+*  Count the number of cards excluded.
+*  array element after inserting the header lines.
+             NREJEC = NREJEC + 1
+         END IF
+
       END DO
 
 *  Update the position in the FITS header to index the first empty
 *  array element after inserting the header lines.
-      LINENO = LINENO + NHDRLI 
+      LINENO = LINENO + NHDRLI - NREJEC
+
 
 *  Append the history records in the FITS extension.
 *  =================================================
@@ -489,7 +518,7 @@
 
 *  Put it into the FITS extension.  Note again that the length of the
 *  mapped character array is passed by value for UNIX.
-         CALL CON_PCARD( CARD, K, NELS, %VAL( FIPNTR( 1 ) ), STATUS,
+         CALL CON_PCARD( CARD, K, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
      :                   %VAL( FITSLN ) )
       END DO
 
@@ -511,7 +540,7 @@
      :  /' utility IRAF2NDF from the IRAF image', CARD ) 
 
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, NELS, %VAL( FIPNTR( 1 ) ), STATUS,
+      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
      :                 %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
@@ -545,7 +574,7 @@
       END IF
       
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, NELS, %VAL( FIPNTR( 1 ) ), STATUS,
+      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
      :                 %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
@@ -564,11 +593,25 @@
       CALL CHR_MOVE( 'END', CARD )
 
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, NELS, %VAL( FIPNTR( 1 ) ), STATUS,
+      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
      :                 %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
+
+*  Tidy the extension.
+*  ===================
+
+*  Truncate the extension where necessary.  Note that the size argument
+*  is a vector, and that the array must be unmapped first.
+      IF ( LINENO .LT. XLINES ) THEN
+         CALL DAT_UNMAP( FITLOC, STATUS )
+         XDIMS( 1 ) = LINENO
+         CALL DAT_ALTER( FITLOC, 1, XDIMS, STATUS )
+      END IF
+
+*  Annul the locator.
+      CALL DAT_ANNUL( FITLOC, STATUS )
 
 *  Write the IRAF image's title to the NDF title.
 *  ==============================================      

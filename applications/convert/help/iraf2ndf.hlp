@@ -78,6 +78,10 @@ MJC: Malcolm J. Currie (STARLINK)
  1993 July 28 (MJC):
     Removed the VERBOSE parameter.  This functionality should be
     provided by a global parameter.
+
+ 1993 September 30 (MJC):
+    Do not copy standard FITS headers already added to the FITS
+    extension.
 2 Implementation_Status
    -  Only handles one-, two-, and three-dimensional IRAF files.
 
