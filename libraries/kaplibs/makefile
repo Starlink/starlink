@@ -839,7 +839,7 @@ $(PLATFORM_F) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-KAPGRF_OBJECT_FILES = $(KAPGRP_C_ROUTINES:.c=.o) 
+KAPGRF_OBJECT_FILES = $(KAPGRF_C_ROUTINES:.c=.o) 
 
 AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
 
