@@ -120,8 +120,7 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate object to be got
-      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC,
-     :                 STATUS )
+      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC, STATUS )
 
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
@@ -160,14 +159,16 @@
 
           END IF
 
-*    Free the HDS object
-        CALL DAT_ANNUL( CLOC, STATUS )
+*      Free the HDS object
+          CALL DAT_ANNUL( CLOC, STATUS )
 
-      ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'IT', ITEM )
-        CALL ERR_REP( ' ', 'Unable to get item ^IT data from HDS file',
-     :                STATUS )
+        ELSE
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'IT', ITEM )
+          CALL ERR_REP( ' ', 'Unable to get item ^IT data from'/
+     :                  /' HDS file', STATUS )
+
+        END IF
 
       END IF
 
