@@ -1,126 +1,257 @@
-element-description abstract        
+<!doctype dtddescrip [
+<!element dtddescrip o o (element+)>
+<!element element - o (p+, attribute*)>
+<!element attribute - o (p+)>
+<!element p - o (#pcdata | elemref | example)+>
+<!element elemref - o empty>
+<!element example - - (#pcdata)>
+<!attlist element
+  gi id #required>
+<!attlist attribute
+  name cdata #required>
+<!attlist elemref
+  gi idref #required>
+<!entity amp cdata '&'>
+<!entity lt  cdata '<'>
+<!entity gt  cdata '>'>
+]>
+
+<!-- Fixed attributes not documented -->
+
+<element gi='abstract'>
 <p>The abstract for the document
 
-element-description appendices  
-<p>The appendices element contains the appendices, with one *sect* for
-each appendix. These may be preceded by an optional *routinelist*, if
-the specific Starlink document type allows that element.  Note that
-material such as bibliography and indexes is in a separate
-*backmatter* element, and not an appendix.
+<element gi='appendices'> 
 
-element-description attribution
-<p>The source of a quotation, either as free text or a *citation* element.
+<p>The appendices element contains the
+appendices, with one <elemref gi=sect> for each appendix. These may be
+preceded by an optional <elemref gi=routinelist>, if the specific
+Starlink document type allows that element.  Note that material such
+as bibliography and indexes is in a separate <elemref gi=backmatter>
+element, and not an appendix.
 
-element-description author
+<element gi='attribution'>
+<p>The source of a quotation, either as free text or a <elemref
+gi=citation> element.
+
+<element gi='author'>
 <p>An author/editor of the current document.
 
-element-description author*affiliation
+<attribute name='affiliation'>
 <p>The `home institution' of an author, such as `Starlink, University
 of Glasgow'.
 
-element-description author*email
+<attribute name='email'>
 <p>An email address for the author.
 
-element-description author*id
+<attribute name='id'>
 <p>An ID which may be used to refer to the author from within a
-*history* element, for example.
+<elemref gi=history> element, for example.
 
-element-description author*role
+<attribute name='role'>
 <p>The role this individual has played in the maintenance of this
 document, if it's different from the straightforward `author'.  For
 example, this might be `maintainer', `original version', and so on.
 
-element-description author*webpage
+<attribute name='webpage'>
 <p>A home page for the author, which might contain further contact details.
 
-element-description authorlist
+<element gi='authorlist'>
 <p>The list of authors and editors who have contributed to a
 document.  If a document is passed on from one person to another, it
 might be appropriate for the original author to retain a credit for
-the document, by being listed as one of the *otherauthors*.
+the document, by being listed as one of the <elemref gi=otherauthors>.
 
-element-description backmatter
+<element gi='backmatter'>
 <p>Bundles together the various backmatter elements.
 
-element-description bibliography
-<p>If this element is present within the *backmatter* element, then a
+<element gi='bibliography'>
+<p>If this element is present within the <elemref gi=backmatter>
+element, then a 
 bibliography will be included in the document.  The application will
 generate the bibliography itself -- it is not included within this
 element, which is empty.  
 
 <p>Bibliographic entries are included in the bibliography if they were
-referred to in the document using the *citation* element.
+referred to in the document using the <elemref gi=citation> element.
 
-element-description bibliography*all
+<attribute name='all'>
 <p>If this attribute is present, then the complete bibliography will
 be included, rather than just those entries which were referred to by
-a *citation* element.
+a <elemref gi=citation> element.
 
-element-description bibliography*bib
+<attribute name='bib'>
 <p>Names the bibliography which is to be searched for entries.
 <p>The transformation of this name into an actual bibliography file is
 in principle up to the application which processes the SGML file.  In
 the current application, however, this attribute names a BibTeX
 bib-file (without the .bib extension).
 
-element-description blockquote
-element-description caption
-element-description change
-element-description citation
-element-description cite
-element-description code
-element-description codecollection
-element-description colspec
-element-description copyright
-element-description dd
-element-description distribution
-element-description dl
-element-description docbody
-element-description docdate
-element-description docinfo
-element-description docnumber
-element-description docxref
-element-description draftnote
-element-description dt
-element-description editors
-element-description em
-element-description entry
-element-description figure
-element-description figurecontent
-element-description history
-element-description index
-element-description indexcontents
-element-description kbd
-element-description keyword
-element-description li
-element-description m
-element-description meqnarray
-element-description mequation
-element-description note
-element-description notecontents
-element-description ol
-element-description otherauthors
-element-description p
-element-description px
-element-description quote
-element-description ref
-element-description routinelist
-element-description row
-element-description sect
-element-description strong
-element-description subhead
-element-description subsect
-element-description subsubsect
-element-description subsubsubsect
-element-description sun
-element-description table
-element-description tbody
-element-description tgroup
-element-description thead
-element-description title
-element-description ul
-element-description update
-element-description url
-element-description verbatim
-element-description version
-element-description webref
+<element gi='blockquote'>
+<p>A substantial quotation which will typically (but not, of course,
+necessarily) be set off from the text around it.
+
+<element gi='caption'>
+<p>Caption of a <elemref gi=figure> or <elemref gi=table>.
+
+<element gi='change'>
+<p>Records a change.  See <elemref gi=history>.
+
+<element gi='citation'>
+<p>Refers to an entry in the <elemref gi=bibliography> associated with
+this document.  In the current application, the content is interpreted
+as the key to an entry in a BibTeX database.
+<attribute name='noref'>
+<p>If this attribute is present, then the application should include a
+reference to this citation in the bibliography, but without 
+actually referring to the entry at this position in the text.
+
+<element gi='cite'>
+<p>Refer to a book or article, for example, by name.
+
+<element gi='code'>
+<p>Include `computer text'.  This does not do any escaping of the
+enclosed text: if there are any characters which might be special to
+the SGML parser, then they should be escaped either with an entity
+reference (that is, using an ampersand) or included in a cdata marked
+section.
+
+<p>Text which a user is to type should be marked up with the <elemref
+gi=kbd> element, and larger blocks of text should be marked up with
+<elemref gi=verbatim>.
+
+<element gi='codecollection'>
+<p>This element makes the link between the documentation and a
+collection of code documentation.  The document which this points to
+must be marked up in a DTD which is a client of the programcode
+architecture.  This will typically, but not necessarily, be a suitable
+source code file.
+
+<p>See the documentation which covers this topic for further details.
+<attribute name='doc'>
+<p>A document which is marked up in a DTD which is a client of the
+Starlink programcode architecture.
+<attribute name='ids'>
+<p>If present, this lists the elements within the target document
+which should be processed (not currently implemented).
+
+<element gi='colspec'>
+<p>The colspec element controls the layout of a column in a table (not
+implemented).
+
+<element gi='copyright'>
+<p>Specifies a copyright declaration for the document.
+
+<element gi='dd'>
+<p>`Description data' in a description list.
+
+<element gi='distribution'>
+<p>Records the distribution of a package.  The content is free-text
+notes on the distribution or the packaging.
+<attribute name='string'>
+<p>Identifies the distribution.  This will
+typically be something like '1' or '2', but
+could be 'draft' or something
+descriptive.
+<attribute name='date'>
+<p>The date this distribution was
+made. Format: dd-MMM-yyyy.
+<attribute name='author'>
+<p>Whom the release is attributable to.  This
+links to one of the author elements.
+<attribute name='versionid'>
+<p>An id to allow UPDATE elements to refer to a
+specific version.  It can be anything, but a
+sensible format is v10-5, for example (it can't
+start with a number)
+
+<element gi='dl'>
+<p>A description list, consisting of a number of pairs of a
+`description term', <elemref gi=dt>, and `description data', <elemref
+gi=dd>. Notionally, the <elemref gi=dd> is the definition of a term
+introduced by the <elemref gi=dt>, but the construction can
+legitimately be used a little more widely than this.
+
+<element gi='docbody'>
+<p>The document body, containing all the printable text of the document.
+
+<element gi='docdate'>
+<p>The document date.  The format is `dd-MMM-yyyy' -- a two-digit day
+of the month, the month as three uppercase letters (`JAN', `FEB', and
+so on), and a four-digit year.
+<p>This element will appear in the <elemref gi=docinfo> element of
+those DTDs which do not have a <elemref gi=history> element.
+
+<element gi='docinfo'>
+<p>The document metadata.
+
+<element gi='docnumber'>
+<p>The document number, as assigned by the Starlink librarian.
+<example>&lt;docnumber&gt;123</example>
+<example>&lt;docnumber unassigned&gt;</example>
+<attribute name='unassigned'>
+<p>If this attribute is present, then it records that the document
+number has not (yet?) been assigned by the Starlink librarian.
+
+<element gi='docxref'>
+<p>Make a cross-reference to another Starlink document.
+<example><![ cdata [
+<!doctype sun public "-//Starlink//DTD Starlink SUN//EN" [
+  <!entity otherdoc public "-//Starlink//DOCUMENT Summary SUN/123//EN" subdoc>
+]>
+...
+<p>See also the document <docxref doc=otherdoc>
+]]></example>
+
+<attribute name='doc'>
+<p>Indicates the document we wish to link to.  The value of this
+attribute is an entity (declared in the document declaration subset),
+which references another document.
+<attribute name='loc'>
+<p>Indicates a location within a document.  The value of the loc
+attribute is an ID reference within the target document.
+
+<element gi='draftnote'>
+<element gi='dt'>
+<element gi='editors'>
+<element gi='em'>
+<element gi='entry'>
+<element gi='figure'>
+<element gi='figurecontent'>
+<element gi='history'>
+<element gi='index'>
+<element gi='indexcontents'>
+<element gi='kbd'>
+<element gi='keyword'>
+<element gi='li'>
+<element gi='m'>
+<element gi='meqnarray'>
+<element gi='mequation'>
+<element gi='note'>
+<element gi='notecontents'>
+<element gi='ol'>
+<element gi='otherauthors'>
+<element gi='p'>
+<element gi='px'>
+<element gi='quote'>
+<element gi='ref'>
+<element gi='routinelist'>
+<element gi='row'>
+<element gi='sect'>
+<element gi='strong'>
+<element gi='subhead'>
+<element gi='subsect'>
+<element gi='subsubsect'>
+<element gi='subsubsubsect'>
+<element gi='sun'>
+<element gi='table'>
+<element gi='tbody'>
+<element gi='tgroup'>
+<element gi='thead'>
+<element gi='title'>
+<element gi='ul'>
+<element gi='update'>
+<element gi='url'>
+<element gi='verbatim'>
+<element gi='version'>
+<element gi='webref'>
