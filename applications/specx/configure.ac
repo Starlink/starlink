@@ -29,8 +29,9 @@ AC_FC_RECL_UNIT
 AC_FC_OPEN_SPECIFIERS(readonly)
 STAR_CHECK_PROGS(hlib)
 
-AC_CHECK_HEADERS([readline/readline.h])
-AC_CHECK_HEADERS([readline/history.h])
+dnl    In some cases readline requires stdio.h to be pre-loaded
+AC_CHECK_HEADERS([readline/readline.h],,,[#include <stdio.h>])
+AC_CHECK_HEADERS([readline/history.h],,,[#include <stdio.h>])
 AC_CHECK_FUNCS([rindex index strchr strrchr])
 
 STAR_CNF_COMPATIBLE_SYMBOLS
