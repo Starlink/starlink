@@ -104,11 +104,11 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*4		ADICMP
-        PARAMETER 		( ADICMP = '.BDI' )
+      CHARACTER*7		PSTCMP
+        PARAMETER 		( PSTCMP = '.Pstore' )
 
 *  Local Variables:
-      INTEGER			ADIID			! ADICMP identifier
+      INTEGER			PSTID			! PSTCMP identifier
 
       LOGICAL			CREATED			! Created container?
       LOGICAL			THERE			! Object exists?
@@ -122,23 +122,23 @@
       CREATED = .FALSE.
 
 *  Locate top-level ADI container, creating if required
-      CALL ADI_THERE( ID, ADICMP, THERE, STATUS )
+      CALL ADI_THERE( ID, PSTCMP, THERE, STATUS )
       IF ( CREATE .AND. .NOT. THERE ) THEN
-        CALL ADI_CNEW0( ID, ADICMP, 'STRUC', STATUS )
+        CALL ADI_CNEW0( ID, PSTCMP, 'STRUC', STATUS )
       ELSE IF ( .NOT. THERE ) THEN
         GOTO 99
       END IF
-      CALL ADI_FIND( ID, ADICMP, ADIID, STATUS )
+      CALL ADI_FIND( ID, PSTCMP, PSTID, STATUS )
 
 *  Now locate item container, creating if necessary
-      CALL ADI_THERE( ADIID, ITEM, THERE, STATUS )
+      CALL ADI_THERE( PSTID, ITEM, THERE, STATUS )
       IF ( CREATE .AND. .NOT. THERE ) THEN
-        CALL ADI_CNEW0( ADIID, ITEM, 'STRUC', STATUS )
+        CALL ADI_CNEW0( PSTID, ITEM, 'STRUC', STATUS )
         CREATED = .TRUE.
       ELSE IF ( .NOT. THERE ) THEN
         GOTO 89
       END IF
-      CALL ADI_FIND( ADIID, ITEM, PSID, STATUS )
+      CALL ADI_FIND( PSTID, ITEM, PSID, STATUS )
 
 *  If we created the container, initialise it
       IF ( CREATED ) THEN
@@ -149,9 +149,9 @@
  89   CONTINUE
 
 *  Release ADI container
-      CALL ADI_ERASE( ADIID, STATUS )
+      CALL ADI_ERASE( PSTID, STATUS )
 
-*  Continue after failure to find ADICMP
+*  Continue after failure to find PSTCMP
  99   CONTINUE
 
 *  Report any errors
