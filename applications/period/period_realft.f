@@ -17,7 +17,7 @@ C=============================================================================
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
  
 C-----------------------------------------------------------------------------
 C PERIOD_REALFT declarations. Double precision for the trigonometric variables.

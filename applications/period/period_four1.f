@@ -18,7 +18,7 @@ C------------------------------------------------------------------------------
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
 
       INTEGER          I,J,N,ISIGN,NN,M,MMAX,ISTEP 
       DOUBLE PRECISION WR, WI, WPR, WPI, WTEMP, THETA

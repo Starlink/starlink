@@ -15,7 +15,7 @@ C===========================================================================
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
 
       INTEGER N,K 
       DOUBLE PRECISION FREQ, DATA(N), TIME(N)

@@ -16,7 +16,7 @@ C===========================================================================
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
 
       INTEGER NUMROWS, NUMCOLS, I
       DOUBLE PRECISION IPARRAY(NUMROWS,NUMCOLS)

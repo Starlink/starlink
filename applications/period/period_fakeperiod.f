@@ -16,7 +16,7 @@ C===========================================================================
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
  
       INTEGER NUMPTS, MXCOL, MAXSIN, NUMSIN, K, L
       DOUBLE PRECISION IPARRAY(NUMPTS,MXCOL), PERIOD(MAXSIN)

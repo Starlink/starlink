@@ -58,7 +58,7 @@ C============================================================================
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
  
       INTEGER IFAIL,NP,I,NUM
       DOUBLE PRECISION XDATA(NUM),YDATA(NUM),YERR(NUM)

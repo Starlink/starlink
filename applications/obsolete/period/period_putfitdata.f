@@ -15,7 +15,7 @@ C===========================================================================
 
       IMPLICIT NONE
 
-      INCLUDE "pivars.h"
+      INCLUDE "PIVARS"
  
       INTEGER NUMROWS, MXCOL, I
       DOUBLE PRECISION OPARRAY(NUMROWS,MXCOL)

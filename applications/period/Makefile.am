@@ -2,6 +2,7 @@
 
 bin_PROGRAMS = period
 noinst_LTLIBRARIES = libperiod.la
+noinst_INCLUDES = PIVARS
 
 period_SOURCES = period_main.f
 period_LDADD = libperiod.la `$(srcdir)/period_link`
