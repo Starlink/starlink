@@ -498,6 +498,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        if the mapping from grid to frame is not invertable.
 *        - WorldAxes: Initialise the returned "perm" values to safe values, 
 *        and return these values if no basis vectors cen be created.
+*     19-JAN-2004 (DSB):
+*        - When reading a FITS-WCS header, allow all keywords to be defaulted 
+*        as decribed in paper I.
 *class--
 */
 
@@ -12535,16 +12538,14 @@ static AstMapping *LinearWcs( FitsStore *store, int i, char s,
    if( !astOK ) return ret;
 
 /* Get the CRVAL value for the specified axis. */
-   crv = GetItem( &(store->crval), i, 0, s, FormatKey( "CRVAL", i + 1, -1, s ),
-                  method, class );
+   crv = GetItem( &(store->crval), i, 0, s, NULL, method, class );
+   if( crv == AST__BAD ) crv = 0.0;
 
 /* Create a 1D ShiftMap which adds this value onto the IWCS value. */
-   if( crv != AST__BAD ) {
-      if( crv != 0.0 ) {
-         ret = (AstMapping *) astShiftMap( 1, &crv, "" );
-      } else {
-         ret = (AstMapping *) astUnitMap( 1, "" );
-      }
+   if( crv != 0.0 ) {
+      ret = (AstMapping *) astShiftMap( 1, &crv, "" );
+   } else {
+      ret = (AstMapping *) astUnitMap( 1, "" );
    }
    return ret;
 }
@@ -12732,12 +12733,12 @@ static AstMapping *LogWcs( FitsStore *store, int i, char s,
    ret = NULL;
    if( !astOK ) return ret;
 
-/* Get the CRVAL value for the specified axis. */
-   crv = GetItem( &(store->crval), i, 0, s, FormatKey( "CRVAL", i + 1, -1, s ),
-                     method, class );
-   if( crv != AST__BAD && crv != 0.0 ) {
+/* Get the CRVAL value for the specified axis. Use a default of zero. */
+   crv = GetItem( &(store->crval), i, 0, s, NULL, method, class );
+   if( crv == AST__BAD ) crv = 0.0;
 
-/* Create the MathMap. */
+/* Create the MathMap, if possible. */
+   if( crv != 0.0 ) {
       sprintf( forexp, "s=%.*g*exp(w/%.*g)", DBL_DIG, crv, DBL_DIG, crv );
       sprintf( invexp, "w=%.*g*log(s/%.*g)", DBL_DIG, crv, DBL_DIG, crv );
       fexps[ 0 ] = forexp;
@@ -14975,8 +14976,8 @@ static AstMapping *NonLinSpecWcs( char *algcode, FitsStore *store, int i,
    if( ok ) {
 
 /* Get the CRVAL value for the spectral axis (this will be in the S system). */
-      crv = GetItem( &(store->crval), i, 0, s, FormatKey( "CRVAL", i + 1, -1, s ),
-                     method, class );
+      crv = GetItem( &(store->crval), i, 0, s, NULL, method, class );
+      if( crv == AST__BAD ) crv = 0.0;
 
 /* Convert it to the X system. */
       astTran1( map1, 1, &crv, 1, &crv );
@@ -24147,11 +24148,11 @@ static AstMapping *WcsNative( AstFitsChan *this, FitsStore *store, char s,
 
 /* Store the latitude and longitude (in the standard system) of the fiducial
    point, in radians. */
-      delta0 = GetItem( &(store->crval), fits_ilat, 0, s, FormatKey( "CRVAL", axlat + 1, -1, s ), method, class );
+      delta0 = GetItem( &(store->crval), fits_ilat, 0, s, NULL, method, class );
       if( delta0 == AST__BAD ) delta0 = 0.0;
       delta0 *= AST__DD2R;
 
-      alpha0 = GetItem( &(store->crval), fits_ilon, 0, s, FormatKey( "CRVAL", axlon + 1, -1, s ), method, class );
+      alpha0 = GetItem( &(store->crval), fits_ilon, 0, s, NULL, method, class );
       if( alpha0 == AST__BAD ) alpha0 = 0.0;
       alpha0 *= AST__DD2R;
 
@@ -24957,8 +24958,7 @@ static AstWinMap *WcsShift( FitsStore *store, char s, int naxes,
       for( j = 0; j < naxes; j++ ){
 
 /* Get the CRPIX value for this axis. */
-         crpix = GetItem( &(store->crpix), 0, j, s, 
-                          FormatKey( "CRPIX", j + 1, -1, s ), method, class );
+         crpix = GetItem( &(store->crpix), 0, j, s, NULL, method, class );
          if( crpix == AST__BAD ) crpix = 0.0;
 
 /* Store the corner co-ordinates. */ 
