@@ -32,33 +32,39 @@
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
 
-2 New_in_version_1_5
+2 New_in_version_1_6
 
-Minor update.
+Important changes to SKYDIP and a fix for the clock error problem.
 
 3 New_Tasks
 
-  - SCUBA2MEM officially released (previously it was available
-    but undocumented.
-
-  - The SURF Programming Guide (SSN/72) now available
+  - SCUCLKERR can be used to determine possible clock errors
+    in the acquisition system.
 
 3 Changes_to_existing_tasks
 
-  - SCULOG and related tools rewritten to handle data from
-    multiple UT dates in a single directory. Extended support for
-    POLMAP and POLPHOT observing modes.
+  - Add correction for the SCUVAX clock error problem
 
-  - Improve support of external data model in CALCSKY. Can now
-    import image of arbritrary coordinates and automatically add 
-    chop functions.
+  - Skydips now 'know' the correct value for ETA_TEL, T_COLD and T_HOT
 
-  - ADD_DBM can now be used to addd a triple beam
+  - In REMSKY the outer ring of bolometers can be specified using R-1
+    (ie it counts from the outside in if you use a negative ring number)
 
-  - Scripts now compatible with KAPPA version 0.14
+  - SCUOVER is now a little cleverer (and the text can be a different
+    color to the circles)
 
-3 Bug_fixes
+  - SCUNOISE works on Windows NT.
 
-  - Fix bug in REMDBM when using filtering when data have a pixel
-    origin that is not in the middle of the array.
+  - If the second LST provided to REMSKY is less than the first
+    LST it is now assumed that the time refers to the following day.
+
+3 Bug_Fixes
+
+  - Fixed error when SCUPHOT runs in the pipeline where occasionally the
+    parabola fit of the complete coadd could give incorrect answers.
+
+  - Can now combine data taken at almost the same wavelengths (a 20 micron
+    difference is allowed) when using REBIN.
+
+  - Output file from REMDBM now no longer contains CHOP_* keywords
 
