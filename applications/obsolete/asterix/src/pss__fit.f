@@ -531,7 +531,6 @@
 *    Local variables :
 *
       CHARACTER*12             FNAME                   ! Diagnostic mode o/p
-      CHARACTER*(DAT__SZLOC)   SLOC		       ! Diagnostic output
       CHARACTER*80             TEXT                    ! Output text
       CHARACTER*80             TITLE                   ! Input image title
       CHARACTER 		RASTR*9, DECSTR*10	! Position formatted
