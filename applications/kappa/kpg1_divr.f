@@ -1,5 +1,5 @@
-      SUBROUTINE KPG1_DIVR( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR,
-     :                        STATUS )
+      SUBROUTINE KPG1_DIVR( BAD, VAR, EL, A, VA, B, VB, C, VC, NBAD,
+     :                      STATUS )
 *+
 *  Name:
 *     KPG1_DIVx
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_DIVx( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR, STATUS )
+*     CALL KPG1_DIVx( BAD, VAR, EL, A, VA, B, VB, C, VC, NBAD, STATUS )
  
 *  Description:
 *     The routine divides one vectorised array by another, with
@@ -42,9 +42,8 @@
 *     VC( EL ) = ? (Returned)
 *        Variance values associated with the array C. Not used if VAR
 *        is set to .FALSE..
-*     NERR = INTEGER (Returned)
-*        Number of numerical errors which occurred during the
-*        calculations.
+*     NBAD = INTEGER (Returned)
+*        Number of VAL__BADx values in the returned results array (C).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
  
@@ -53,10 +52,7 @@
 *     precision: replace "x" in the routine name by R or D as
 *     appropriate.  The arrays passed to this routine should all have
 *     the specified data type.
-*     -  This routine will handle numerical overflow. If overflow
-*     occurs, then affected output array elements will be set to the
-*     "bad" value. A count of the numerical errors which occur is
-*     returned via the NERR argument.
+*     -  This routine will NOT handle numerical overflow. 
  
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -70,6 +66,10 @@
 *        Fixed bug when VEC routine returns bad status.
 *     1996 May 20 (MJC):
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
+*     23-JUN-1998 (DSB):
+*        Re-written to avoid dependancy on PRIMDAT error handlers which
+*        are not available on Digital UNIX and Linux. Numerical overflow
+*        is not longer trapped on Solaris as a result.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -84,9 +84,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
  
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR status flag
- 
 *  Arguments Given:
       LOGICAL BAD
       LOGICAL VAR
@@ -99,115 +96,137 @@
 *  Arguments Returned:
       REAL C( EL )
       REAL VC( EL )
-      INTEGER NERR
+      INTEGER NBAD
  
 *  Status:
       INTEGER STATUS             ! Global status
  
-*  External References:
-      EXTERNAL NUM_TRAP
-      INTEGER NUM_TRAP           ! Numerical error handler
- 
 *  Local Variables:
       INTEGER I                  ! Loop counter for array elements
-      INTEGER IERR               ! Initial error position (dummy)
  
 *.
  
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
-*  No variance component to process:
-*  ================================
-*  Simply divide the two data arrays.
-      IF ( .NOT. VAR ) THEN
-         CALL ERR_MARK
-         CALL VEC_DIVR( BAD, EL, A, B, C, IERR, NERR, STATUS )
- 
-*  Annul the bad status due to any divide by zeroes or overflows.
-         CALL ERR_ANNUL( STATUS )
-         CALL ERR_RLSE
- 
-*  Variance component present:
-*  ==========================
-*  Establish a numerical error handler and initialise the numerical
-*  error status and error count.
-      ELSE
-         CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
-         NERR = 0
+
+*  Initialise the number of bad values in the output data array.
+      NBAD = 0
  
 *  No bad values present:
 *  =====================
-         IF ( .NOT. BAD ) THEN
+      IF ( .NOT. BAD ) THEN
  
-*  Divide the data arrays, checking for numerical errors after each
-*  calculation.
-            DO 1 I = 1, EL
-               C( I ) = A( I ) / B( I )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+*  No Variances?
+         IF ( .NOT. VAR ) THEN
+
+*  Process each element.
+            DO I = 1, EL
+
+*  Check denominator.
+               IF( B( I ) .NE. 0.0 ) THEN
+
+*  Store the resulting data value.
+                  C( I ) = A( I ) / B( I )
+
+*  If the denominator is zero, store a bad output value and increment the
+*  number of errors.
+               ELSE 
                   C( I ) = VAL__BADR
-                  NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  NBAD = NBAD + 1
                END IF
- 
-*  Derive the variance values, again checking for numerical errors.
-               VC( I ) = ( VA( I ) + ( VB( I ) * A( I ) * A( I ) ) /
-     :                               ( B( I ) * B( I ) ) ) /
-     :                   ( B( I ) * B( I ) )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+
+            END DO 
+
+*  Variances?
+         ELSE
+
+*  Process each element.
+            DO I = 1, EL
+
+*  Check denominator.
+               IF( B( I ) .NE. 0.0 ) THEN
+
+*  Store the resulting data value.
+                  C( I ) = A( I ) / B( I )
+
+*  Store the resulting variance.
+                  VC( I ) = ( VA( I ) + ( VB( I )*A( I )*A( I ) ) /
+     :                                  ( B( I )*B( I ) ) ) /
+     :                      ( B( I )*B( I ) )
+
+*  If the denominator is zero, store bad output values and increment the
+*  number of errors.
+               ELSE 
+                  C( I ) = VAL__BADR
                   VC( I ) = VAL__BADR
-                  NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  NBAD = NBAD + 1
                END IF
-1           CONTINUE
- 
+
+            END DO 
+
+         END IF
+
 *  Bad values present:
 *  ==================
+      ELSE
+
+*  No Variances?
+         IF ( .NOT. VAR ) THEN
+
+*  Process each element.
+            DO I = 1, EL
+
+*  Check for bad values and zero denominator.
+               IF( A( I ) .NE. VAL__BADR .AND. B( I ) .NE. VAL__BADR 
+     :            .AND. B( I ) .NE. 0.0 ) THEN
+
+*  Store the resulting data value.
+                  C( I ) = A( I ) / B( I )
+
+*  If either value is bad or the denominator is zero, store a bad output 
+*  value and increment the number of errors.
+               ELSE 
+                  C( I ) = VAL__BADR
+                  NBAD = NBAD + 1
+               END IF
+
+            END DO 
+
+*  Variances?
          ELSE
-            DO 2 I = 1, EL
- 
-*  See if either input data value is bad. If so, then set bad output
-*  values.
-               IF ( ( A( I ) .EQ. VAL__BADR ) .OR.
-     :              ( B( I ) .EQ. VAL__BADR ) ) THEN
+
+*  Process each element.
+            DO I = 1, EL
+
+*  Check for bad values and zero denominator.
+               IF( A( I ) .NE. VAL__BADR .AND. B( I ) .NE. VAL__BADR 
+     :            .AND. B( I ) .NE. 0.0 ) THEN
+
+*  Store the resulting data value.
+                  C( I ) = A( I ) / B( I )
+
+*  Check for bad variances. Store the resulting variance if there are none.
+                  IF( VA( I ) .NE. VAL__BADR .AND. 
+     :                VB( I ) .NE. VAL__BADR ) THEN
+                     VC( I ) = ( VA( I ) + ( VB( I )*A( I )*A( I ) ) /
+     :                                     ( B( I )*B( I ) ) ) /
+     :                         ( B( I )*B( I ) )
+                  ELSE
+                     VC( I ) = VAL__BADR
+                  END IF
+
+*  If the denominator is zero, store bad output values and increment the
+*  number of errors.
+               ELSE 
                   C( I ) = VAL__BADR
                   VC( I ) = VAL__BADR
- 
-*  Divide the data values, checking for numerical errors..
-               ELSE
-                  C( I ) = A( I ) / B( I )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                     C( I ) = VAL__BADR
-                     NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
-                  END IF
- 
-*  See if either input variance value is bad. If so, then set a bad
-*  output variance value.
-                  IF ( ( VA( I ) .EQ. VAL__BADR ) .OR.
-     :                 ( VB( I ) .EQ. VAL__BADR ) ) THEN
-                     VC( I ) = VAL__BADR
- 
-*  Calculate the output variance value, again checking for numerical
-*  errors.
-                  ELSE
-                     VC( I ) = ( VA( I ) +
-     :                           ( VB( I ) * A( I ) * A( I ) ) /
-     :                           ( B( I ) * B( I ) ) ) /
-     :                         ( B( I ) * B( I ) )
-                     IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                        VC( I ) = VAL__BADR
-                        NERR = NERR + 1
-                        NUM_ERROR = SAI__OK
-                     END IF
-                  END IF
+                  NBAD = NBAD + 1
                END IF
-2           CONTINUE
+
+            END DO 
+
          END IF
- 
-*  Remove the numerical error handler.
-         CALL NUM_REVRT
+
       END IF
  
       END
