@@ -1,6 +1,6 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
-  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib-jade-1.2.1.dsl" SUBDOC>
   <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
   <!ENTITY params.dsl		PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN">
 ]>
