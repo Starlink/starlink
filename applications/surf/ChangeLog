@@ -1,3 +1,35 @@
+1999-05-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_rebin.f (SURF_REBIN): no longer raise an error when
+	asking for OUT=! - assume this means the output map size is desired.
+
+	* src/rebin.ifl (+int and +bolrebin): Add REFPIX
+
+	* src/surf_rebin.f (SURF_REBIN): Add REFPIX parameter
+
+1999-05-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scan_rlb.f (SURF_SCAN_RLB): Add SECTION
+
+	* surflib/surflib_remove_dc_from_exp.f
+	(SURFLIB_REMOVE_DC_FROM_EXP): Check for bad value from MEDIAN/MEAN 
+	before copying to REAL.
+
+	* surflib/surflib_remove_dc_via_sect.f
+	(SURFLIB_REMOVE_DC_VIA_SECT): Create.
+
+	* src/scan_rlb.ifl: Add SECTION parameter
+
+	* sculib/sculib_bits.f (SCULIB_BITTEST): Add SCULIB_BITTEST
+
+	* surflib/surflib_fill_wplate.f (SURFLIB_FILL_WPLATE): Modify to
+	use SCULIB_FIND_INT
+
+	* sculib/sculib_find_int.f (SCULIB_FIND_INT): Create
+
+	* src/surf_make_weight.f (SURF_MAKE_WEIGHT): Add LIKE, OUTPA,
+	OUTCHOP and OUTPIXSZ parameters.
+
 1999-05-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/sculog: Add POLMAP and POLPHOT
