@@ -52,11 +52,6 @@ PkFont::PkFont(unsigned int dvimag,
     {
 	string pk_file_path;
 	bool got_path = find_font (pk_file_path);
-	if (got_path)
-	    cout << "GOT PATH\n";
-	else
-	    cout << "NOT GOT PATH\n";
-	exit (0);
 	if (! got_path)
 	    throw InputByteStreamError ("can't find font file");
 	path_ = pk_file_path;
@@ -89,12 +84,9 @@ PkFont::PkFont(unsigned int dvimag,
     catch (InputByteStreamError& e)
     {
 	if (verbosity_ > 0)
-	    cerr << "font not found\n";
-#if 0
 	    cerr << "Font " << name << " at "
 		 << dpiScaled() << "dpi ("
 		 << path_ << ") not found\n";
-#endif
 	preamble_.cs = 0;
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
@@ -166,6 +158,7 @@ bool PkFont::find_font (string& path)
 	// Fontpath stuff rudimentary -- but allow it to override kpathsea
 	pkpath += '/';
 	pkpath += name_;
+	pkpath += '.';
 	
 	char numbers[10];
 	sprintf (numbers, "%dpk", scaled_res);

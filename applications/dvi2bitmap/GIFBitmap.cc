@@ -47,62 +47,11 @@ using std::fflush;
 #endif
 
 
-/*
-// Construct a GIFBitmap from a ready-made bitmap, of size w x h
-GIFBitmap::GIFBitmap (const int w, const int h, const Byte *b, const int bpp=1)
-    : w_(w), h_(h), bitmap_(b), bitmapRows_(h), bpp_(bpp),
-      myBitmap_(false), transparent_(false)
-{ 
-}
-*/
-
-// This constructor is for the case where we build up the GIF's
-// bitmap by rows, using method bitmapRow().  We'll be send the rows
-// of the bitmap shortly - for now, initialise the bitmap to receive
-// them, and set myBitmap_ to true, indicating that the bitmap should be
-// deleted in the destructor
-//GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
-//    : w_(w), h_(h), bitmapRows_(0), bpp_(bpp),
-//      myBitmap_(false), transparent_(false)
-//{
-//}
 GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
     : BitmapImage (w, h), bpp_(bpp)
 {
+    fprintf (stderr, "GIFBitmap: w=%d  h=%d\n", w, h);
 }
-
-/*
-GIFBitmap::~GIFBitmap ()
-{
-    if (myBitmap_)
-	delete[] allocBitmap_;
-}
-
-void GIFBitmap::setBitmap (const Byte *b)
-{
-    if (bitmapRows_ != 0)
-	throw DviBug ("setBitmap: bitmap not empty");
-    bitmap_ = b;
-    bitmapRows_ = h_;
-}
-
-void GIFBitmap::setBitmapRow (const Byte *b)
-{
-    if (bitmapRows_ == 0)
-    {
-	allocBitmap_ = new Byte[w_ * h_];
-	bitmap_ = allocBitmap_;
-	myBitmap_ = true;
-    }
-    if (bitmapRows_ == h_)
-	throw DviBug ("too many rows received by GIFBitmap::setBitmapRow");
-    Byte *p = &allocBitmap_[bitmapRows_ * w_];
-    for (int i=0; i<w_; i++)
-	*p++ = *b++;
-    bitmapRows_ ++;
-}
-*/
-
 
 void GIFBitmap::write (const string filename)
 {
@@ -134,13 +83,14 @@ void GIFBitmap::write (const string filename)
 	throw BitmapError ("can't open GIF file "+filename+" to write");
     GIFEncode (F,		// open file
 	       w_, h_,		// width and height of bitmap
-	       1,		// interlace?
+	       0,		// interlace?
 	       0,		// which CT entry is the background?
-	       (isTransparent_ ? 0 : -1),	// make entry 0 transparent, if req'd
+	       (isTransparent_ ? 0 : -1), // make entry 0 transparent, if req'd
 	       bpp_,		// bits-per-pixel
 	       CT, CT, CT	// colour tables
 	       );
     // GIFEncode closes the stream when it's finished
+    delete[] CT;
 }
 
 
@@ -226,6 +176,13 @@ void GIFBitmap::BumpPixel(void)
 int GIFBitmap::GIFNextPixel(void)
 {
         int r;
+	/*
+	static FILE *echo = NULL;
+	if (echo == NULL)
+	{
+	    echo = fopen ("echo.txt", "w");
+	    if (echo == NULL)
+	*/
 
         if( CountDown == 0 )
                 return EOF;
@@ -234,6 +191,9 @@ int GIFBitmap::GIFNextPixel(void)
 
         //r = ( * getpixel )( curx, cury );
 	r = static_cast<int>(bitmap_[cury*w_+curx]);
+	fputc ((bitmap_[cury*w_+curx] ? '*' : '.'), stderr);
+	if (curx == w_-1)
+	    fputc ('\n', stderr);
 
         BumpPixel();
 

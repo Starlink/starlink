@@ -55,6 +55,11 @@ class PkGlyph {
 	    PkRasterdata *rasterdata, PkFont *f);
     // Final constructor is for the single dummy glyph
     PkGlyph(int resolution, PkFont *f);
+    inline unsigned int characterCode() const { return cc_; }
+    inline char characterChar() const
+	{ return (cc_ >= ' ' && cc_ < 127 
+		  ? static_cast<char>(cc_) : '?'); }
+
     // bitmap() returns the character's bitmap.  This runs from the 
     // top-left of the character.
     const Byte *bitmap();
@@ -117,8 +122,8 @@ class PkFont {
     int dpi() const { return resolution_; }
     int dpiScaled() const {
 	return static_cast<int>(resolution_
-				* (double)font_header_.s
-				/(double)font_header_.d
+				* ((double)font_header_.s * (double)dvimag_)
+				/ ((double)font_header_.d * 1000.0)
 				+ 0.5);
     }
     double scale() const {

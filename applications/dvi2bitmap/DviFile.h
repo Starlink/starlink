@@ -63,6 +63,8 @@ private:
     // magmag is a factor by which the file's internal magnification
     // should be increased
     const double magmag_;
+    // ...resulting in a net magnification of:
+    double magfactor_;
 
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output
@@ -79,6 +81,10 @@ private:
 	unsigned int i, num, den, mag;
 	string comment;
     } preamble_;
+    inline magnify_(int i) const
+	{ return (magfactor_==1.0
+		  ? i
+		  : static_cast<int>(magfactor_*(double)i)); }
     void read_postamble ();
     void process_preamble(DviFilePreamble *);
     void check_duplicate_font(int);

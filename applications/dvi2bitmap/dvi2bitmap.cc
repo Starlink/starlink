@@ -108,6 +108,9 @@ main (int argc, char **argv)
 			  case 'i': // debug input
 			    InputByteStream::verbosity(debuglevel);
 			    break;
+			  case 'b': // debug bitmap
+			    Bitmap::verbosity(debuglevel);
+			    break;
 			  case 'm': // debug main program
 			    verbosity = debuglevel;
 			    break;
@@ -123,6 +126,7 @@ main (int argc, char **argv)
 		DviFile::verbosity(0);
 		PkFont::verbosity(0);
 		PkRasterdata::verbosity(0);
+		InputByteStream::verbosity(0);
 		Bitmap::verbosity(0);
 		verbosity = 0;
 		break;
@@ -213,15 +217,10 @@ main (int argc, char **argv)
 	}
 
 	all_fonts_present = true;
-#if 0
 	for (PkFont *f = dvif->firstFont();
 	     f != 0;
 	     f = dvif->nextFont())
-#endif
-	    PkFont *f = dvif->firstFont();
-	while (f)
 	{
-cout << "font " << f->name() << '\n';
 	    string unk = "unknown";
 	    if (!f->loaded())	// flag at least one missing
 		all_fonts_present = false;
@@ -239,10 +238,6 @@ cout << "font " << f->name() << '\n';
 			 << (fn.length() == 0 ? unk : fn)
 			 << '\n';
 		}
-
-	    f = dvif->nextFont();
-	    cout << "next font..."
-		 << (f ? "ok" : "finished") << '\n';
 	}
 
 	if (do_process_file)
@@ -318,11 +313,16 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution)
 	    else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
 	    {
 		glyph = curr_font->glyph(sc->charno);
-		if (verbosity > 2)
-		    cerr << "set glyph " << glyph->w() << 'x' << glyph->h()
-			 << " at position ("
-			 << dvif->currH() << ',' << dvif->currV()
-			 << ")\n";
+		if (verbosity > 1)
+		{
+		    cerr << "glyph `" << glyph->characterChar()
+			 << "\' (" << glyph->characterCode() << ')';
+		    if (verbosity > 2)
+			cerr << " size " << glyph->w() << 'x' << glyph->h()
+			     << " at position ("
+			     << dvif->currH() << ',' << dvif->currV() << ')';
+		    cerr << '\n';
+		}
 		// calculate glyph positions, taking into account the
 		// offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
 		// = (resolution px,resolution px) offset of the TeX origin.

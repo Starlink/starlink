@@ -12,8 +12,9 @@
 class BitmapImage {
  public:
     BitmapImage(const int w, const int h)
-	: w_(w), h_(h), bitmap_(0), bitmapRows_(0),
-	  isTransparent_(false), myBitmap_(false) { };
+	: w_(w), h_(h),
+    	bitmap_(0), allocBitmap_(0), bitmapRows_(0),
+    	isTransparent_(false), myBitmap_(false) { };
     ~BitmapImage();
     void setBitmap (const Byte *B);
     void setBitmapRow (const Byte *B);

@@ -1,6 +1,7 @@
 // Part of dvi2bitmap
 //
 // This is merely an interface to the kpathsea library
+// $Id$
 
 #define NULL 0
 #include <iostream>		// for cerr

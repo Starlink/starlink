@@ -4,6 +4,8 @@
 //
 // $Id$
 
+#include <iostream>
+
 #include <string>
 #include "BitmapImage.h"
 #if ENABLE_GIF
@@ -30,7 +32,10 @@ BitmapImage *BitmapImage::newBitmapImage
 BitmapImage::~BitmapImage ()
 {
     if (myBitmap_)
+    {
 	delete[] allocBitmap_;
+	allocBitmap_ = 0;
+    }
 }
 
 void BitmapImage::setBitmap (const Byte *b)

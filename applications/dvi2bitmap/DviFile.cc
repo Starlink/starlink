@@ -125,8 +125,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 132:		// set_rule
 		{
-		    int a = getSIS(4);
-		    int b = getSIS(4);
+		    int a = magnify_(getSIS(4));
+		    int b = magnify_(getSIS(4));
 		    pending_hupdate_ += b;
 		    if (a > 0 && b > 0)
 			gotEvent = new DviFileSetRule (this, pixel_round(a),
@@ -147,8 +147,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 137:		// put_rule
 		{
-		    int a = getSIS(4);
-		    int b = getSIS(4);
+		    int a = magnify_(getSIS(4));
+		    int b = magnify_(getSIS(4));
 		    if (a > 0 && b > 0)
 			gotEvent = new DviFileSetRule (this, pixel_round(a),
 						       pixel_round(b));
@@ -183,11 +183,11 @@ DviFileEvent *DviFile::getEvent()
 		    PosState ps = PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
 		    posStack_.push(ps);
 		    if (verbosity_ > 1)
-			cerr << ">>("<<h_<<','<<v_<<','
+			cerr << ">> "<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
 			     <<y_<<','<<z_<<','
 			     <<hh_<<','<<vv_
-			     <<")\n";
+			     <<'\n';
 		}
 		break;
 	      case 142:		// pop
@@ -200,6 +200,8 @@ DviFileEvent *DviFile::getEvent()
 		    x_ = ps.x;
 		    y_ = ps.y;
 		    z_ = ps.z;
+		    hh_ = ps.hh;
+		    vv_ = ps.vv;
 		    //delete ps;
 		    //const PosState *ps = posStack_->pop();
 		    //h_ = ps->h;
@@ -212,139 +214,111 @@ DviFileEvent *DviFile::getEvent()
 		    //z_ = ps->z;
 		    //delete ps;
 		    if (verbosity_ > 1)
-			cerr << "<<("<<h_<<','<<v_<<','
+			cerr << "<< "<<h_<<','<<v_<<','
 			     <<w_<<','<<x_<<','
 			     <<y_<<','<<z_<<','
 			     <<hh_<<','<<vv_
-			     <<")\n";
+			     <<'\n';
 		}
 		break;
 	      case 143:		// right1
-		//h_ += getSIS(1);
-		updateH_ (getSIS(1), 0);
+		updateH_ (magnify_(getSIS(1)), 0);
 		break;
 	      case 144:		// right2
-		//h_ += getSIS(2);
-		updateH_ (getSIS(2), 0);
+		updateH_ (magnify_(getSIS(2)), 0);
 		break;
 	      case 145:		// right3
-		//h_ += getSIS(3);
-		updateH_ (getSIS(3), 0);
+		updateH_ (magnify_(getSIS(3)), 0);
 		break;
 	      case 146:		// right4
-		//h_ += getSIS(4);
-		updateH_ (getSIS(4), 0);
+		updateH_ (magnify_(getSIS(4)), 0);
 		break;
 	      case 147:		// w0
-		//h_ += w_;
 		updateH_ (w_, 0);
 		break;
 	      case 148:		// w1
-		w_ = getSIS(1);
-		//h_ += w_;
+		w_ = magnify_(getSIS(1));
 		updateH_ (w_, 0);
 		break;
 	      case 149:		// w2
-		w_ = getSIS(2);
-		//h_ += w_;
+		w_ = magnify_(getSIS(2));
 		updateH_ (w_, 0);
 		break;
 	      case 150:		// w3
-		w_ = getSIS(3);
-		//h_ += w_;
+		w_ = magnify_(getSIS(3));
 		updateH_ (w_, 0);
 		break;
 	      case 151:		// w4
-		w_ = getSIS(4);
-		//h_ += w_;
+		w_ = magnify_(getSIS(4));
 		updateH_ (w_, 0);
 		break;
 	      case 152:		// x0
-		//h_ += x_;
 		updateH_ (x_, 0);
 		break;
 	      case 153:		// x1
-		x_ = getSIS(1);
-		//h_ += x_;
+		x_ = magnify_(getSIS(1));
 		updateH_ (x_, 0);
 		break;
 	      case 154:		// x2
-		x_ = getSIS(2);
-		//h_ += x_;
+		x_ = magnify_(getSIS(2));
 		updateH_ (x_, 0);
 		break;
 	      case 155:		// x3
-		x_ = getSIS(3);
-		//h_ += x_;
+		x_ = magnify_(getSIS(3));
 		updateH_ (x_, 0);
 		break;
 	      case 156:		// x4
-		x_ = getSIS(4);
-		//h_ += x_;
+		x_ = magnify_(getSIS(4));
 		updateH_ (x_, 0);
 		break;
 	      case 157:		// down1
-		//v_ += getSIS(1);
-		updateV_ (getSIS(1));
+		updateV_ (magnify_(getSIS(1)));
 		break;
 	      case 158:		// down2
-		//v_ += getSIS(2);
-		updateV_ (getSIS(2));
+		updateV_ (magnify_(getSIS(2)));
 		break;
 	      case 159:		// down3
-		//v_ += getSIS(3);
-		updateV_ (getSIS(3));
+		updateV_ (magnify_(getSIS(3)));
 		break;
 	      case 160:		// down4
-		//v_ += getSIS(4);
-		updateV_ (getSIS(4));
+		updateV_ (magnify_(getSIS(4)));
 		break;
 	      case 161:		// y0
-		//v_ += y_;
 		updateV_ (y_);
 		break;
 	      case 162:		// y1
-		y_ = getSIS(1);
-		//v_ += y_;
+		y_ = magnify_(getSIS(1));
 		updateV_ (y_);
 		break;
 	      case 163:		// y2
-		y_ = getSIS(2);
-		//v_ += y_;
+		y_ = magnify_(getSIS(2));
 		updateV_ (y_);
 		break;
 	      case 164:		// y3
-		y_ = getSIS(3);
-		//v_ += y_;
+		y_ = magnify_(getSIS(3));
 		updateV_ (y_);
 		break;
 	      case 165:		// y4
-		y_ = getSIS(4);
-		//v_ += y_;
+		y_ = magnify_(getSIS(4));
 		updateV_ (y_);
 		break;
 	      case 166:		// z0
-		//v_ += z_;
 		updateV_ (z_);
 		break;
 	      case 167:		// z1
-		z_ = getSIS(1);
-		//v_ += z_;
+		z_ = magnify_(getSIS(1));
 		updateV_ (z_);
 		break;
 	      case 168:		// z2
-		z_ = getSIS(2);
-		//v_ += z_;
+		z_ = magnify_(getSIS(2));
 		updateV_ (z_);
 		break;
 	      case 169:		// z3
-		z_ = getSIS(3);
-		//v_ += z_;
+		z_ = magnify_(getSIS(3));
 		updateV_ (z_);
 		break;
 	      case 170:		// z4
-		z_ = getSIS(4);
-		//v_ += z_;
+		z_ = magnify_(getSIS(4));
 		updateV_ (z_);
 		break;
 
@@ -618,18 +592,19 @@ void DviFile::updateH_ (int hup, int hhup)
 	     << hup << ',' << hhup << ") -> ("
 	     << h_ << ',' << hh_ << ")\n";
 }
-void DviFile::updateV_ (int y)
+// Similarly, update the vertical position.  vup is in DVI units.
+void DviFile::updateV_ (int vup)
 {
     double range;
     if (current_font_ == 0)	// no quad defined
 	range = 0;
     else
 	range = 0.8 * current_font_->quad();
-    if (abs(y) < range)
-	vv_ += pixel_round(y);
+    if (abs(vup) < range)
+	vv_ += pixel_round(vup);
     else
-	vv_ = pixel_round(v_ + y);
-    v_ += y;
+	vv_ = pixel_round(v_ + vup);
+    v_ += vup;
 
     // check drift
     int Kv = pixel_round(v_);
@@ -644,7 +619,7 @@ void DviFile::updateV_ (int y)
 	vv_ = Kv + sdist*max_drift_;
     if (verbosity_ > 1)
 	cerr << "updateV_ ("
-	     << y << ") -> ("
+	     << vup << ") -> ("
 	     << v_ << ',' << vv_ << ',' << y_ << ',' << z_ << ")\n";
 }
 
@@ -680,13 +655,21 @@ void DviFile::read_postamble()
     int4 = dvif_->getUIU(4);	// denominator
     unsigned int dvimag = dvif_->getUIU(4);	// mag
     // immediately multiply it by magmag
-    if (magmag_ != 1.0)
-	dvimag = static_cast<unsigned int>(dvimag*magmag_);
     postamble_.mag = dvimag;
     postamble_.l = dvif_->getUIU(4);    
     postamble_.u = dvif_->getUIU(4);    
     postamble_.s = dvif_->getUIU(2);    
     postamble_.t = dvif_->getUIU(2);
+    // multiply the page sizes by the magnification
+    if (magmag_ != 1.0)
+    {
+	dvimag = static_cast<unsigned int>(dvimag*magmag_);
+	postamble_.mag = dvimag;
+	postamble_.l = static_cast<unsigned int>(postamble_.l
+						 * (double)dvimag / 1000.0);
+	postamble_.u = static_cast<unsigned int>(postamble_.u
+						 * (double)dvimag / 1000.0);
+    }
     if (verbosity_ > 1)
 	cerr << "Postamble: l=" << postamble_.l
 	     << " u=" << postamble_.u
@@ -796,7 +779,7 @@ void DviFile::read_postamble()
 // DVI unit = sp = num/den x 7227/2.54x10^7 x 1pt.  Given the above
 // values for num and den, this works out as
 // DVI unit = sp = 1/2^16 x 1pt, which we actually knew as soon as we
-// were told that TeX's DVI file have (DVI units=sp).
+// were told that TeX's DVI files have (DVI units=sp).
 void DviFile::process_preamble(DviFilePreamble* p)
 {
     preamble_.i = p->dviType;
@@ -804,13 +787,18 @@ void DviFile::process_preamble(DviFilePreamble* p)
     preamble_.den = p->den;
     preamble_.mag = p->mag;
     preamble_.comment = p->comment;
+    if (p->mag == 1000 && magmag_ == 1.0)
+	magfactor_ = 1.0;
+    else
+	magfactor_ = (double)p->mag/1000.0 * magmag_;
     true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
-    dviu_per_pt_ = true_dviu_per_pt_ * (double)p->mag/1000.0 * magmag_;
+    dviu_per_pt_ = true_dviu_per_pt_ * magfactor_;
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
     if (verbosity_ > 1)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
 	     << ", px_per_dviu_ = " << px_per_dviu_
-	     << ", mag=" << p->mag << '\n';
+	     << ", mag=" << p->mag
+	     << ", magmag=" << magmag_ << '\n';
 }
 
 void DviFile::check_duplicate_font (int ksize)
