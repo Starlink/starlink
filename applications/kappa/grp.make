@@ -42,6 +42,7 @@ kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
 stardemo_procs.tcl adamMessageRelay adamtask.tcl dialog.tcl kappa.demo \
 v0.14-5.demo v0.15-9.demo v0.16-3.demo sty0 sty1 sty2 sty3 pazo.csh \
+v1.0.demo \
 lutedit.help lutedit.tcl cpoint.bit dpoint.bit minus.bit plus.bit \
 unzoom.bit uparrow.bit cpoint.bit dpoint.bit blank.bit
 

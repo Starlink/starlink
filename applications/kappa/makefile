@@ -757,8 +757,8 @@ kappa_display_keystyle.def sty0 sty1 sty2 sty3 kappa_contour_keystyle.def
 
 #  Define the package demo files for use with stardemo.tcl
 
-DEMO_FILES = kappa.demo v0.14-5.demo v0.15-9.demo v0.16-3.demo
-TEST_DEMO = v0.16-3
+DEMO_FILES = kappa.demo v0.14-5.demo v0.15-9.demo v0.16-3.demo v1.0.demo
+TEST_DEMO = v1.0
 
 #  Other miscellaneous files in kappa-source.tar
 MISC_FILES = cpoint.bit dpoint.bit minus.bit plus.bit unzoom.bit \
