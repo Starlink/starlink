@@ -1808,6 +1808,7 @@ sub header {
    }
       
    if ($html && $mimetype eq 'text/html') {
+      print '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">', "\n";
       print "<html>\n";
       print "<head><title>", demeta ($title), "</title></head>\n";
       print "<body>\n";
