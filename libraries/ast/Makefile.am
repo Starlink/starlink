@@ -304,3 +304,9 @@ install-exec-local: libast.la
 	    echo "$(DESTDIR)$(libdir)/libast_pass2.a" >>$$MANIFEST_FILE; \
 	fi
 
+# Installation check
+
+TESTS = ast_test
+check_PROGRAMS = ast_test
+ast_test_SOURCES = ast_test.c
+ast_test_LDADD = `ast_link`
