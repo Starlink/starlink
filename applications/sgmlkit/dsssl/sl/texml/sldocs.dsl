@@ -46,6 +46,13 @@ stdout, then generates an entity which contains the entire LaTeX file.
                       )
                 (make-latex-empty-command name: "usepackage"
                                           parameters: '("graphics"))
+                (let ((indexents (select-elements
+                                  (select-by-class (descendants (document-element))
+                                                   'element)
+                                  (normalize "index"))))
+                  (if (node-list-empty? indexents)
+                      (empty-sosofo)
+                      (make-latex-empty-command name: "makeindex")))
                 (make-latex-environment name: "document"
                                         (process-matching-children 'docinfo)
                                         (process-matching-children 'docbody)

@@ -380,6 +380,10 @@ to need explanation or elaboration.
     (literal "Draft Note:")
     (process-children)))
 
+(element index
+  ;; Index generation is handled in slback.dsl
+  (empty-sosofo))
+
 
 (element angle
   (let ((ishours (and (attribute-string (normalize "unit"))

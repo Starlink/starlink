@@ -29,8 +29,17 @@ Council for the Central Laboratory of the Research Councils
   (external-procedure "UNREGISTERED::James Clark//Procedure::read-entity"))
 (declare-flow-object-class fi
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
-;;(define debug
-;;  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
+(define debug
+  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
+
+;; language objects available only in OpenJade
+;; See http://sources.redhat.com/ml/dssslist/2002-03/msg00007.html
+(define language
+  (external-procedure "UNREGISTERED::OpenJade//Procedure::language"))
+(declare-default-language (language 'en 'us))
+
+
+
 
 <routine>
 <description>
@@ -41,7 +50,11 @@ in mode make-manifest-mode in sl.dsl
   (empty-sosofo))
 
 (define (hasbackmatter?)
-  (or (hasnotes?) (hasbibliography?) (hashistory?) (hasidindex?)))
+  (or (hasnotes?)
+      (hasbibliography?)
+      (hashistory?)
+      (hasidindex?)
+      (haskeywordindex?)))
 
 ;; Do NOT call this within the context of the document-element.  It
 ;; messes up big-time if (current-node) is the document-element,
@@ -57,7 +70,8 @@ in mode make-manifest-mode in sl.dsl
 			  (make-notecontents)
 			  (make-bibliography)
 			  (make-updatelist)
-			  (make-idindex))))
+			  (make-idindex)
+                          (make-keywordindex))))
 	  (if (chunking?)
 	      (html-document (literal "Backmatter")
 			     body
@@ -97,7 +111,11 @@ in mode make-manifest-mode in sl.dsl
     (if (hasidindex?)
 	(make fi data: (string-append (idindex-sys-id) "
 "))
-	(empty-sosofo))))
+	(empty-sosofo))
+    (if (haskeywordindex?)
+        (make fi data: (string-append (keywordindex-sys-id) "
+"))
+        (empty-sosofo))))
 
 ;; This function caters for the possibility that _no_ backmatter 
 ;; needs to be generated.  Generally, the history
@@ -105,51 +123,52 @@ in mode make-manifest-mode in sl.dsl
 ;; no history element?
 (define (make-contents-backmatter)
   (let* ((noteslist
-	  (if (hasnotes?)
-	      (make element gi: "li"
-		    (make element gi: "a"
-			  attributes:
-			  (list (list "href" (string-append
-					      (notes-sys-id)
-					      "#" (notes-frag-id))))
-			  (literal "Notes")))
-	      #f))
+	  (and (hasnotes?)
+               (make element gi: "li"
+                     (make element gi: "a"
+                           attributes:
+                           `(("href" ,(string-append (notes-sys-id)
+                                                     "#" (notes-frag-id))))
+                           (literal "Notes")))))
 	 (biblist
-	  (if (get-bibliography-name)
-	      (make element gi: "li"
-		    (make element gi: "a"
-			  attributes:
-			  (list (list "href" (string-append
-					      (bibliography-sys-id)
-					      "#" (bibliography-frag-id))))
-			  (literal "Bibliography")))
-	      #f))
+	  (and (get-bibliography-name)
+               (make element gi: "li"
+                     (make element gi: "a"
+                           attributes:
+                           `(("href" ,(string-append (bibliography-sys-id)
+                                                     "#" (bibliography-frag-id))))
+                           (literal "Bibliography")))))
 	 (updateslist
-	  (if (hashistory?) ;(get-updates)
-	      (make element gi: "li"
-		    (make element gi: "a"
-			  attributes:
-			  (list (list "href" (string-append
-					      (updatelist-sys-id)
-					      "#" (updatelist-frag-id))))
-			  (literal "Changes")))
-	      #f
-	      ))
+	  (and (hashistory?) ;(get-updates)
+               (make element gi: "li"
+                     (make element gi: "a"
+                           attributes:
+                           `(("href" ,(string-append (updatelist-sys-id)
+                                                     "#" (updatelist-frag-id))))
+                           (literal "Changes")))))
 	 (idindex
-	  (if (hasidindex?)
-	      (make element gi: "li"
-		    (make element gi: "a"
-			  attributes:
-			  (list (list "href" (string-append
-					      (idindex-sys-id)
-					      "#" idindex-frag-id)))
-			  (literal "ID index")))
-	      #f))
-	 (contentslist (if (or noteslist biblist updateslist idindex)
+	  (and (hasidindex?)
+               (make element gi: "li"
+                     (make element gi: "a"
+                           attributes:
+                           `(("href" ,(string-append (idindex-sys-id)
+                                                     "#" idindex-frag-id)))
+                           (literal "ID index")))))
+         (keywordindex
+          (and (haskeywordindex?)
+               (make element gi: "li"
+                     (make element gi: "a"
+                           attributes:
+                           `(("href" ,(string-append (keywordindex-sys-id)
+                                                     "#" keywordindex-frag-id)))
+                           (literal "Keyword index")))))
+	 (contentslist (if (or noteslist biblist updateslist
+                               idindex keywordindex)
 			   (sosofo-append (or noteslist (empty-sosofo))
 					  (or biblist (empty-sosofo))
 					  (or updateslist (empty-sosofo))
-					  (or idindex (empty-sosofo)))
+					  (or idindex (empty-sosofo))
+                                          (or keywordindex (empty-sosofo)))
 			   #f)))
     (if contentslist
 	(make element gi: "li"
@@ -545,6 +564,156 @@ removed from it elements which are expensive to work with.
 				 (process-node-list target))
 		      ))))
 	  (empty-sosofo)))))
+
+<routine>
+<description>
+Indexing support.
+<codebody>
+(define (*get-all-index-elements*)
+  (select-elements (select-by-class (descendants (getdocbody)) 'element)
+                   (normalize "index")))
+(define (haskeywordindex?)
+  (if suppress-keywordindex
+      #f
+      (not (node-list-empty? (*get-all-index-elements*)))))
+(define (keywordindex-sys-id)
+  (if (chunking?)
+      (html-file uniq: "keywordindex")
+      (html-file target_nd: (document-element))))
+(define keywordindex-frag-id "xref__KWDIDX")
+
+;; Evaluates to a sosofo comprising the keyword index, either as a separate
+;; page, or as the index body, to go inline.
+(define (make-keywordindex)
+  (if suppress-keywordindex
+      (empty-sosofo)
+      (let ((body (make sequence
+                    (make element gi: "h2"
+                          (make element gi: "a"
+                                attributes: `(("name" ,keywordindex-frag-id))
+                                (literal "Keyword index")))
+                    (make-keywordindex-sosofo))))
+        (if (chunking?)
+            (html-document (literal "Keyword index")
+                           body
+                           system-id: (keywordindex-sys-id)
+                           force-chunk?: #t
+                           navbars?: #f)
+            body))))
+
+;; *reduce-one-index-entry*: node-list-reduce procedure.
+;; Make a list of index entry pairs.  Each pair has (key . ref-sosofo)
+(define (*reduce-one-index-entry* result n)
+  (let ((key (trim-data n)))
+    (if (= (string-length key) 0)       ; user error, but don't fail
+        result
+        (cons (cons
+               ;; index key: an improper list consisting of the components of
+               ;; the key split at '!', terminated by the all-element-number,
+               ;; which keeps the sort stable, and avoids duplicate keys
+               (let loop ((l (tokenise-string
+                              key
+                              boundary-char?: (lambda (c)
+                                                (char=? c #\!)))))
+                 (cond ((<= (length l) 0)
+                        (error "Impossible length in *reduce-one-index-entry*"))
+                       ((= (length l) 1)
+                        (cons (car l) (all-element-number n)))
+                       (else
+                        (cons (car l) (loop (cdr l))))))
+               ;; reference -- an "a" element
+               (make element gi: "a"
+                     attributes: `(("href" ,(href-to n)))
+                     (make-section-reference
+                      target: (ancestor-member
+                               n
+                               (section-element-list)))))
+              result))))
+
+;; Test ordering of two index lists.
+;; Arguments are lists where the first argument is an improper list consisting
+;; of strings terminated by a single number (as generated by
+;; *reduce-one-index-entry*).  Return #t if the first should be regarded as
+;; "less than or equal" the second.
+(define (*idx<=?* i1 i2)
+  (let loop ((k1 (car i1))
+             (k2 (car i2)))
+    (cond ((and (number? k1) (number? k2))
+           (<= k1 k2))
+          ((number? k1)
+           #t)
+          ((number? k2)
+           #f)
+          ((string=? (car k1) (car k2))
+           (loop (cdr k1) (cdr k2)))
+          (else
+           (string<=? (car k1) (car k2))))))
+
+;; Return true if the two index entries have different text, and false if
+;; they represent the same test.  The true value encodes how they are
+;; different, returning +1/-1/0 according as the second has more/fewer/same
+;; number of levels (this last isn't currently used anywhere).
+(define (*idx-different-text* i1 i2)
+  (let loop ((k1 (car i1))
+             (k2 (car i2)))
+    (cond ((and (number? k1) (number? k2))
+           #f)
+          ((and (pair? k1) (pair? k2))
+           (if (string=? (car k1) (car k2))
+               (loop (cdr k1) (cdr k2))
+               0))
+          (else
+           (if (pair? k1)               ; then k2 is a number
+               -1
+               +1)))))
+
+;; Collapses an input index list (a list of (key . sosofo) pairs) by,
+;; at present, simply appending the sosofos of those entries which have
+;; string-identical keys (according to *idx-different-text*).
+(define (*collapse-index* full-list)
+  (if (null? full-list)
+      '()                               ; an error, probably
+      (let ((first (car full-list))
+            (rest (cdr full-list)))
+        (cond ((null? rest)             ; finished
+               (list first))
+              ((*idx-different-text* first (car rest))
+               (cons first
+                     (*collapse-index* rest)))
+              (else                     ; first has the same index text as next
+               (let ((next (car rest))
+                     (rrest (cdr rest)))
+                 (*collapse-index* (cons (cons (car first)
+                                               (sosofo-append (cdr first)
+                                                              (literal ", ")
+                                                              (cdr next)))
+                                         rrest))))))))
+
+;; Evaluates to a sosofo comprising the formatted index entries
+(define (make-keywordindex-sosofo)
+  (let ((indexents (*get-all-index-elements*)))
+    (if (node-list-empty? indexents)
+        (empty-sosofo)
+        (apply sosofo-append
+               (map (lambda (idxpair)
+                      (make element gi: "p"
+                            (literal
+                             (let strs-to-str ((strs (car idxpair)))
+                               (if (number? (cdr strs))
+                                   (car strs)
+                                   (string-append
+                                    (car strs)
+                                    "/"
+                                    (strs-to-str (cdr strs))))))
+                            (literal ": ")
+                            (make element gi: "em"
+                                  (cdr idxpair))))
+                    (*collapse-index*
+                     (sort-list (node-list-reduce indexents
+                                                  *reduce-one-index-entry*
+                                                  '())
+                                *idx<=?*)))))))
+
 
 <codereference doc="lib.dsl" id="code.lib">
 <title>Library code

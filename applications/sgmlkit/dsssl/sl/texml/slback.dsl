@@ -47,7 +47,8 @@ Support backmatter elements.
 (define (make-backmatter)
   (make sequence
     (make-bibliography)
-    (make-updatelist)))
+    (make-updatelist)
+    (make-index)))
 
 (mode section-reference
   (element backmatter
@@ -94,6 +95,45 @@ Jade pass.
 		parameters: '("Bibliography"))
 	  (make fi data: bibcontents))
 	(empty-sosofo))))
+
+<routine>
+<description>
+Index support.  Very simple -- just emit an <code>\\index</code>
+command.  We can only process the index after a LaTeX run, and
+specifically not as part of the backmatter processing below.  We
+cannot, therefore, automake index processing here.
+<codebody>
+(element index
+  (let ((range (attribute-string (normalize "range"))))
+    (make element gi: "TeXML" attributes: '(("escape" "0"))
+          (make-latex-command name: "index"
+                (literal
+                 (string-append
+                  (trim-data (current-node))
+                  (if range            ; generate makeindex range specifiers
+                      (if (string=? range "open") "|(" "|)")
+                      "")))))))
+
+(define (make-index)
+  (let ((indexents (select-elements
+                    (select-by-class (descendants (document-element))
+                                     'element)
+                    (normalize "index"))))
+    (if (node-list-empty? indexents)
+        (empty-sosofo)
+        (let ((indfilename (string-append (index-file-name) ".ind")))
+          (make sequence
+            (make-latex-command name: "IfFileExists"
+                                (literal indfilename))
+            (make element gi: "group"
+                  (make-latex-empty-command name: "input"
+                                            parameters: `(,indfilename)))
+            (make element gi: "group"
+                  (make-latex-command name: "typeout"
+                        (literal (string-append
+                                  "No index file " indfilename
+                                  ": run \"makeindex " (index-file-name)
+                                  "\", and re-LaTeX " (index-file-name))))))))))
 
 <routine>
 <description>
