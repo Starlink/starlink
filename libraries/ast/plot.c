@@ -16164,7 +16164,6 @@ static void Map4( int n, double *dist, double *x, double *y,
 /* Local Variables: */
    double *ptr1[ 1 ];                /* Pointer to distances data */
    double *ptr3[ 2 ];                /* Pointers to graphics coord data */
-   int i;                            /* Loop count */
    static AstPointSet *pset1 = NULL; /* PointSet holding distances */
    static AstPointSet *pset2 = NULL; /* PointSet holding physical coords */
    static AstPointSet *pset3 = NULL; /* PointSet holding graphics coords */
@@ -16209,7 +16208,7 @@ static void Map4( int n, double *dist, double *x, double *y,
    if( astOK ){
 
 /* Use Map4_umap to convert the supplied distances into physical coords
-   (i.e. coords in the current Frame of the Plot).
+   (i.e. coords in the current Frame of the Plot). */
       ptr1[ 0 ] = dist;
       astSetPoints( pset1, ptr1 );
       (void) astTransform( Map4_umap, pset1, 1, pset2 );
