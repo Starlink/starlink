@@ -51,6 +51,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20 - taken from SURF_REBIN.F
 *     $Log$
+*     Revision 1.2  1998/02/03 00:11:39  timj
+*     Change upper limit of map size to 4096 pixels.
+*
 *     Revision 1.1  1997/10/21 03:12:32  timj
 *     Initial revision
 *
@@ -134,7 +137,7 @@
          J_CENTRE = NINT (REAL(-YMIN) / PIXEL_SZ) + 5
       END IF
 
-      IF ((NX .GT. 1000) .OR. (NY .GT. 1000)) THEN
+      IF ((NX .GT. 4096) .OR. (NY .GT. 4096)) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'CALC_OUTPUT_GRID: output map is too '//
