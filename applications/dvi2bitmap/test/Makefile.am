@@ -79,7 +79,7 @@ modetest-maths-concmath.dvi: modetest-maths.tex
 	rm modetest-maths-concmath.tex
 
 %-sampler.html: %.dvi
-	./make-sampler.scsh -x$(DVI2BITMAP) -o$(@:.html=) $<
+	./make-sampler.scsh -x$(DVI2BITMAP) -o$(@:.html=) -d$<
 
 sampler: sampler.html modetest-sampler.html modetest-maths-sampler.html modetest-maths-concmath-sampler.html
 	test -d sampler || mkdir sampler
