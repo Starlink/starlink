@@ -114,7 +114,7 @@ Exit the adam messaging system.
 
 sub adam_exit {
 
-  carp "Wrong # args: should be adam_exit()\n"
+  croak "Wrong # args: should be adam_exit()\n"
     if (scalar(@_) > 2);
 
   # Exit AMS
@@ -247,6 +247,8 @@ sub adam_process_message {
     # No point in returning input arguments
     return($command, $task, $facerr, $status);
 
+  } else {
+    return(undef,undef, undef, $status);
   }
 
 
@@ -301,12 +303,14 @@ sub adam_getreply {
 	      $inmsg_status, $inmsg_context, $inmsg_name, $inmsg_length,
 	      $inmsg_value, $status);
 
+
    # Check return status
   if ($status != &SAI__OK) {
     ($facility, $ident, $text) = adam_appendstatus($status);
-    print "adam_getreply: Error reading adam message: $status \n";
-    carp  $facility."__$ident: $text\n";
-    return "badstatus",$status;
+    carp "adam_getreply: Error reading adam message: $status \n"
+          . $facility."__$ident: $text\n";
+    my $facerr = $facility."__$ident: $text";
+    return ("badstatus",undef,undef,undef,undef,$status,$inmsg_value,$status);
   } 
 
   # Now examine this message to see what we can found out about it
@@ -376,7 +380,10 @@ sub adam_receive {
     print $fac."__$ident: $text\n";
 
     carp "adam_receive: Error reading adam message: $status\n";
-    return;
+
+    # Return such that the status is stored in the 7th component
+    # to match a normal return
+    return (undef,undef,undef,undef,undef,undef,undef,$status);
   }
 
   # Now examine this message to see what we can found out about it
@@ -407,6 +414,7 @@ sub adam_receive {
 =item adam_reply(path, messid, status, msg_name, value)
 
 Construct an adam message from the supplied arguements and send it.
+Returns status.
 
 =cut
 
@@ -445,7 +453,7 @@ sub adam_reply {
     carp "adam_reply: failed to send adam message\n";
 
   }
-
+  return $status;
 }
 
 ##############################
@@ -486,7 +494,7 @@ sub adam_send {
 
     # Get the numeric context
     $context = adam_strtocont($strcontext, $status);
-
+    $| = 1;
     if ($status == &SAI__OK) {
 
       # Send the message
@@ -495,22 +503,20 @@ sub adam_send {
 
       if ($status != &SAI__OK) {
 	($fac, $ident, $text) = adam_appendstatus($status);
-	print $fac."__$ident: $text\n";
-	carp "adam_send: Failed to send ADAM message to $task\n";
+	carp $fac."__$ident: $text\n" .
+	  "adam_send: Failed to send ADAM message to $task\n";
       }
 
 
     } else {
       ($fac, $ident, $text) = adam_appendstatus($status);
-      print $fac."__$ident: $text\n";
-
-      carp "adam_send:Bad context $strcontext, should be GET,SET, OBEY or CANCEL\n";
+      carp $fac."__$ident: $text\n" .
+           "adam_send:Bad context $strcontext, should be GET,SET, OBEY or CANCEL\n";
     }
 
   } else {
     ($fac, $ident, $text) = adam_appendstatus($status);
-    print $fac."__$ident: $text\n";
-    carp "adam_send: Failed to get path to task $task\n";
+    carp $fac."__$ident: $text\n" . "adam_send: Failed to get path to task $task\n";
   }
 
   return ($path, $messid, $status);
@@ -553,6 +559,8 @@ sub adam_start {
     print $fac."__$ident: $text\n";
     carp "adam_start: Failed to open Adam message system\n";
   }
+
+  return $status;
 
 }
 
