@@ -60,7 +60,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     MATH Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/math.html
+*     MATH Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/math.html
 
 *  Keywords:
 *     package:math, usage:public
