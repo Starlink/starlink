@@ -241,12 +241,12 @@
          IF( FNAME .NE. ' ' ) THEN
             CALL MSG_SETC( 'TAB', FNAME )
             CALL ERR_REP( 'POL1_IMPRT_ERR3', 'Error at or before line'//
-     :                    ' ^LINE of inport control table ''^TAB'':', 
+     :                    ' ^LINE of import control table ''^TAB'':', 
      :                    STATUS )
 
          ELSE
             CALL ERR_REP( 'POL1_IMPRT_ERR4', 'Error at or before line'//
-     :                    ' ^LINE of the default inport control table:', 
+     :                    ' ^LINE of the default import control table:', 
      :                    STATUS )
          END IF
 
