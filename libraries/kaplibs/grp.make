@@ -19,7 +19,7 @@ ctm_com
 
 # Generic source files needed for kpg_source.tar:
 KPG_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
-kpg1_hsta.gen kpg1_hstf.gen kpg1_thrs.gen
+kpg1_hsta.gen kpg1_hstf.gen kpg1_thrs.gen kpg1_bl1d.gen
 
 # Non-generic source files needed for kpg_source.tar:
 KPG_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
@@ -166,7 +166,8 @@ kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
 kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
 kpg1_hstaub.f kpg1_hstauw.f kpg1_hstfd.f kpg1_hstfr.f kpg1_thrsb.f \
 kpg1_thrsd.f kpg1_thrsi.f kpg1_thrsr.f kpg1_thrsub.f kpg1_thrsuw.f \
-kpg1_thrsw.f 
+kpg1_thrsw.f kpg1_bl1dr.f kpg1_bl1dd.f kpg1_bl1di.f kpg1_bl1dw.f \
+kpg1_bl1db.f kpg1_bl1dub.f kpg1_bl1duw.f 
 
 # The contents of the fts_source.tar file:
 FTS_SOURCE = fts_par fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \
