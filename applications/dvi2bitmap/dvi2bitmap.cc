@@ -90,6 +90,7 @@ main (int argc, char **argv)
     int show_font_list = 0;
     bitmap_info bm;
     bool do_process_file = true; // if true, then process DVI file
+    bool process_options_only = false; // if true, exit after options
     bool all_fonts_present = true;
     bool no_font_present = true;
     PageRange PR;
@@ -234,11 +235,6 @@ main (int argc, char **argv)
 		}
 		break;
 	      // case 'l': see below
-	      case 'L':		// show missing fonts
-		show_font_list = 1;
-		if (*++*argv == 'L')
-		    show_font_list = 2;	// show all fonts
-		break;
 	      case 'm':		// set magnification
 		argc--, argv++;
 		if (argc <= 0)
@@ -290,22 +286,45 @@ main (int argc, char **argv)
 		argc--, argv++;
 		break;
 	      case 'q':		// run quietly
-		DviFile::verbosity(quiet);
-		PkFont::verbosity(quiet);
-		PkRasterdata::verbosity(quiet);
-		InputByteStream::verbosity(quiet);
-		Bitmap::verbosity(quiet);
-		BitmapImage::verbosity(quiet);
 		verbosity = quiet;
+		if (*++*argv == 'q') // run very quietly
+		    verbosity = silent;
+		DviFile::verbosity(verbosity);
+		PkFont::verbosity(verbosity);
+		PkRasterdata::verbosity(verbosity);
+		InputByteStream::verbosity(verbosity);
+		Bitmap::verbosity(verbosity);
+		BitmapImage::verbosity(verbosity);
 		break;
 	      case 'Q':		// run silently - no warnings or errors
-		DviFile::verbosity(silent);
-		PkFont::verbosity(silent);
-		PkRasterdata::verbosity(silent);
-		InputByteStream::verbosity(silent);
-		Bitmap::verbosity(silent);
-		BitmapImage::verbosity(silent);
-		verbosity = silent;
+		while (*++*argv != '\0')
+		    switch (**argv)
+		    {
+		      case 'f':		// show missing fonts
+			show_font_list = 1;
+			break;
+		      case 'F':	// show all fonts
+			show_font_list = 2;
+			break;
+		      case 't':	// show file types
+			{
+			    const char *ft
+				= BitmapImage::defaultBitmapImageFormat();
+			    cout << ft;
+			    ft = BitmapImage::otherBitmapImageFormat();
+			    while (ft != 0)
+			    {
+				cout << ' ' << ft;
+				ft = BitmapImage::otherBitmapImageFormat();
+			    }
+			    cout << '\n';
+			    process_options_only = true;
+			    break;
+			}
+		      default:
+			Usage();
+			break;
+		    }
 		break;
 	      case 'r':		// set resolution
 		argc--, argv++;
@@ -328,7 +347,7 @@ main (int argc, char **argv)
 		if (! BitmapImage::supportedBitmapImage (bm.ofile_type))
 		{
 		    bm.ofile_type
-			= BitmapImage::defaultBitmapImageFormat.c_str();
+			= BitmapImage::defaultBitmapImageFormat();
 		    cerr << "Unsupported image type "
 			 << *argv
 			 << ": using "
@@ -365,9 +384,10 @@ main (int argc, char **argv)
 #ifdef DEFAULT_RESOLUTION
 		cout << "  DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << '\n';
 #endif
-		//if (*++*argv == 'V')
-		    cout << RCSID << '\n';
-		exit(0);	// ...and exit
+
+		cout << RCSID << '\n';
+		process_options_only = true; // ...and exit
+		break;
 
 	      default:
 		Usage();
@@ -378,6 +398,9 @@ main (int argc, char **argv)
 		Usage();
 	    dviname = *argv;
 	}
+
+    if (process_options_only)
+	exit (0);
 
     if (dviname.length() == 0)
 	Usage();
@@ -594,7 +617,8 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 						  fn);
 			if (b.ofile_type.length() == 0)
 			{
-			    b.ofile_type = BitmapImage::defaultBitmapImageFormat;
+			    b.ofile_type 
+				= BitmapImage::defaultBitmapImageFormat();
 			    cerr << "Warning: unspecified image format.  Selecting default ("
 				 << b.ofile_type << ")\n";
 			}
@@ -905,7 +929,7 @@ string_list& tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-qQV] [-L[L]] [-b(h|w) size]\n\
+    cerr << "Usage: " << progname << " [-qV] [-Q[Fft]] [-b(h|w) size]\n\
 	[-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
 	[-r resolution] [-P[bt]] [-s scale-factor] [-o outfile-pattern]\n\
 	[-m magmag ] [-[Cc][lrtb]] [-n]\n\
