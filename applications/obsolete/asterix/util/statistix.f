@@ -66,6 +66,7 @@
 *                        positions. Traps huge weights. (DJA)
 *      4 May 94 : V1.7-0 Updated i/o to AIO (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     12 Jan 95 : V1.8-1 Updated data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -74,7 +75,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *
 *    Status :
@@ -83,29 +84,28 @@
 *
 *    Local variables :
 *
-      CHARACTER              ILOC*(DAT__SZLOC)  ! Input object
       CHARACTER*150          PATH               ! HDS path to input object
       CHARACTER*150          INPUTFILE          ! Name of input container file
 
-      INTEGER                DIMS(DAT__MXDIM)   ! Input dimensions
-      INTEGER                TDIMS(DAT__MXDIM)  ! Auxilliary input dimensions
+      INTEGER                DIMS(ADI__MXDIM)   ! Input dimensions
+      INTEGER                TDIMS(ADI__MXDIM)  ! Auxilliary input dimensions
 
-      INTEGER                AXPTR(DAT__MXDIM)  ! Axis data ptr's
-      INTEGER                IDPTR              ! Data array ptr
-      INTEGER                IQPTR              ! Data quality ptr
-      INTEGER                IVPTR              ! Data variance ptr
-      INTEGER                IAX                ! Loop over axes
-      INTEGER                NDIM               ! Input dimensionality
+      INTEGER                	AXPTR(ADI__MXDIM)  	! Axis data ptr's
+      INTEGER                	IDPTR              	! Data array ptr
+      INTEGER			IFID			! Input file identifier
+      INTEGER                	IQPTR              	! Data quality ptr
+      INTEGER                	IVPTR              	! Data variance ptr
+      INTEGER                	IAX                	! Loop over axes
+      INTEGER                	NDIM               	! Input dimensionality
       INTEGER                NELM               ! Total number of data elements
       INTEGER                NUMLEVELS          ! Number of levels in HDS path.
-      INTEGER                OCH                ! Output channel
+      INTEGER                	OCH                	! Output channel
       INTEGER                OUTWIDTH           ! 80 if terminal,132 otherwise.
-      INTEGER                TNDIM              ! Aux dimensionality
-      INTEGER                WPTR               ! Weights array ptr
+      INTEGER                	TNDIM              	! Aux dimensionality
+      INTEGER                	WPTR               	! Weights array ptr
 
       LOGICAL                BADQUAL            ! Any of quality flags set?
       LOGICAL                DATAOK, VAROK      ! Various input
-      LOGICAL                IPRIM              ! Input object primitive?
       LOGICAL                QUALOK, AXOK       ! objects there?
       LOGICAL                LOOP               ! Loop with sigma rejection?
       LOGICAL                SIMPLE             ! Simple mode
@@ -113,7 +113,7 @@
 *    Version id :
 *
       CHARACTER*25           VERSION
-        PARAMETER            ( VERSION = 'STATISTIX Version 1.8-0' )
+        PARAMETER            ( VERSION = 'STATISTIX Version 1.8-1' )
 *-
 
 *    Check status
@@ -123,11 +123,11 @@
       CALL MSG_PRNT( VERSION )
 
 *    Start ASTERIX
-      CALL AST_INIT( STATUS )
+      CALL AST_INIT()
 
-*    Obtain name of data file, and get a locator to it.
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, IPRIM, STATUS )
-      CALL HDS_TRACE( ILOC, NUMLEVELS, PATH, INPUTFILE, STATUS )
+*    Obtain name of data file, and get an identifier to it
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL ADI_FTRACE( IFID, NUMLEVELS, PATH, INPUTFILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Report object name
@@ -147,33 +147,33 @@
       CALL USI_GET0L( 'SIMPLE', SIMPLE, STATUS )
 
 *    Look for components.
-      CALL BDA_CHKDATA( ILOC, DATAOK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, DATAOK, NDIM, DIMS, STATUS )
 
       IF ( DATAOK ) THEN
 
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *      Look for quality - ask user if present
-        CALL BDA_CHKQUAL( ILOC, QUALOK, TNDIM, TDIMS, STATUS )
+        CALL BDI_CHKQUAL( IFID, QUALOK, TNDIM, TDIMS, STATUS )
         IF ( QUALOK ) THEN
           CALL USI_GET0L( 'USEQUALITY', QUALOK, STATUS )
         END IF
 
 *      Look for variance - ask user if present
-        CALL BDA_CHKVAR( ILOC, VAROK, TNDIM, TDIMS, STATUS )
+        CALL BDI_CHKVAR( IFID, VAROK, TNDIM, TDIMS, STATUS )
         IF ( VAROK ) THEN
           CALL USI_GET0L( 'USEERRORS', VAROK, STATUS)
         END IF
 
 *      Check axis values
         DO IAX = 1, NDIM
-          CALL BDA_CHKAXIS( ILOC, IAX, AXOK, STATUS )
+          CALL BDI_CHKAXIS( IFID, IAX, AXOK, STATUS )
         END DO
 
 *      Map the axis values
         IF ( AXOK ) THEN
           DO IAX = 1, NDIM
-            CALL BDA_MAPAXVAL( ILOC, 'READ', IAX, AXPTR(IAX), STATUS )
+            CALL BDI_MAPAXVAL( IFID, 'READ', IAX, AXPTR(IAX), STATUS )
           END DO
         END IF
 
@@ -190,9 +190,9 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map data as _DOUBLE
-      CALL BDA_MAPTDATA( ILOC, '_DOUBLE', 'READ', IDPTR, STATUS )
+      CALL BDI_MAPTDATA( IFID, '_DOUBLE', 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL MSG_PRNT ( 'ERROR : Unable to map input data' )
+        CALL ERR_REP( ' ', 'Unable to map input data', STATUS )
         GOTO 99
       END IF
 
@@ -201,20 +201,20 @@
 
 *    Map variance
       IF ( VAROK ) THEN
-        CALL BDA_MAPTVAR( ILOC, '_DOUBLE', 'READ', IVPTR, STATUS )
+        CALL BDI_MAPTVAR( IFID, '_DOUBLE', 'READ', IVPTR, STATUS )
       END IF
 
 *    Map QUALITY as a logical array.
       IF ( QUALOK ) THEN
-        CALL BDA_MAPLQUAL (ILOC, 'READ', BADQUAL, IQPTR, STATUS )
+        CALL BDI_MAPLQUAL (IFID, 'READ', BADQUAL, IQPTR, STATUS )
         IF ( .NOT. BADQUAL ) THEN
-          CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+          CALL BDI_UNMAPLQUAL( IFID, STATUS )
           QUALOK = .FALSE.
         END IF
       END IF
 
 *    Pad extra dimensions to 7D
-      DO IAX = NDIM+1, DAT__MXDIM
+      DO IAX = NDIM+1, ADI__MXDIM
         DIMS(IAX) = 1
       END DO
 
@@ -232,7 +232,7 @@
       CALL AIO_CANCL( 'DEVICE', STATUS )
 
 *    Release dataset
-      CALL BDA_RELEASE( ILOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
@@ -281,7 +281,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *
 *    Status :
@@ -581,7 +580,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
@@ -605,7 +604,7 @@
       REAL                   ORD                ! Ordinate value for element
 
       INTEGER                IAX                ! Loop over axes
-      INTEGER                INDEX(DAT__MXDIM)  ! Specifies position of element
+      INTEGER                INDEX(ADI__MXDIM)  ! Specifies position of element
                                                 ! within data array
 *-
 
@@ -665,13 +664,13 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
       LOGICAL                SIMPLE             ! Simple mode?
       INTEGER                NDIM               ! Input dimensionality
-      INTEGER                DIMS(DAT__MXDIM)   ! Input dimensions
+      INTEGER                DIMS(ADI__MXDIM)   ! Input dimensions
       INTEGER                OCH                ! Output channel
       INTEGER                N                  ! # points in input
       INTEGER                NVALID             ! # points in statistics
@@ -819,7 +818,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
