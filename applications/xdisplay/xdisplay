@@ -1,0 +1,225 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     xdisplay
+
+#  Purpose:
+#     Ease use of remote X sessions
+
+#  Language:
+#     Unix C shell script
+
+#  Invocation:
+#     Interactively:
+#        xdisplay [X_server_name]
+#     In a shell script:
+#        source /star/etc/xdisplay
+
+#  Description:
+#     This C shell script will set up the DISPLAY environment variable to
+#     point to the machine that you logged in from. This allow X displays
+#     created on a remote X client to be pointed back to your own terminal
+#     or computer.
+
+#  Arguments:
+#     $1 This is the command the user typed to invoke this script. It is
+#        ignored.
+#     $2 (only when used as a shell script)
+#        The name or address of the X server.
+
+#  Examples:
+#     xdisplay
+#        This will automatically set the environment variable DISPLAY to
+#        the name of the machine that you logged in from.
+#     xdisplay adam4
+#        This will set the environment variable DISPLAY to adam4:0. This
+#        is useful if you have not logged into the computer directly from
+#        your X server.
+#     source /star/etc/xdisplay
+#        This is explicitly sourcing the file and is the way to use xdisplay
+#        in your .login file.
+#     setenv DISPLAY adam4:0
+#        This makes no use of xdisplay at all, but is the correct command
+#        to use in your .login file to set DISPLAY to point to a specific
+#        X server.
+
+#  Notes:
+#     This shell script sets the value of the environment variable DISPLAY
+#     and echos its value. This lets the script be used in one of two
+#     ways. The file can be directly sourced, or it can be executed as a
+#     shell script with the result being used to complete a setenv command.
+#     Only in the latter case can a parameter be given to the script.
+#
+#     When using this file as a shell script, the alias xdisplay should be 
+#     defined with the command:
+#        alias xdisplay 'setenv DISPLAY `/star/etc/xdisplay !!`'
+#     The use of !! allows commands of the form:
+#        xdisplay adam4
+#     to be used.
+
+#  Prior Requirements:
+#     The following alias should be defined:
+#        alias xdisplay 'setenv DISPLAY `/star/etc/xdisplay !!`'
+
+#  Authors:
+#     PMA: Peter Allan (Starlink, RAL)
+#     PMC: Paul Collison (Starlink, Oxford)
+#     BKM: Brian McIlwrath (Starlink, RAL)
+
+#  History:
+#     09-JUL-1991 (PMA):
+#        Original version.
+#     01-DEC-1992 (PMA):
+#        Change the use of printenv DISPLAY to echo $DISPLAY as printenv
+#        is not a standard Unix system V command.
+#        Change the prologue to the standard Starlink style.
+#     17-DEC-1992 (PMA):
+#        Add the option of specifying the name of the X-server, e.g:
+#           xdisplay xterm1
+#        This only works interactively, not in a shell script. If you want
+#        to do this in a script, enter the line:
+#           setenv DISPLAY xterm1:0
+#        for TCP/IP transport or
+#           setenv DISPLAY xterm1::0
+#        for DECnet transport.
+#     08-JAN-1993 (PMA):
+#        Try to match a partial remote node name with the full local node
+#        name to determine the full remote node name.
+#     14-JAN-1993 (PMA):
+#        Release version 1.2.
+#     09-FEB-1993 (PMA):
+#        Release version 1.2-1. Fixes bug so that temporary files are
+#        placed in your home directory, not your current directory.
+#     12-FEB-1993 (PMA):
+#        Put the temporary files in /tmp, not the home directory.
+#        Put a \ before the rm command in case the user has defined an
+#        alias for it.
+#     29-JUN-1993 (PMA):
+#        Version 2.0. This version removes the use of !! from this file
+#        and puts it in the alias. This means that you can now source
+#        this file from your .login script.
+#     4-OCT-1993 (PMA):
+#        Add #!/bin/csh -f as the first line. Without this, the script
+#        might get executed by the Bourne shell and fail.
+#     18-OCT-1993 (PMA):
+#        Pipe the output of who am i into sed instead of awk. This prevents
+#        a core dump when who am i does not show the field where the user
+#        logged in from.
+#        Add a check to see if the result of who am i piped through sed is
+#        the empty string.
+#        Remove the echoing of "The X client is the local machine".
+#     19-OCT-1993 (PMA):
+#        Re-work the initial logic so that there is now a multiple if
+#        statement.
+#     29-NOV-1993 (PMA):
+#        Squash the here document down to two lines as putting
+#        backslashes in fails on OSF/1 version 1.3.
+#     3-DEC-1993 (PMA):
+#        The sed on the output of "who am i" now allows for spaces
+#        between the closing parenthesis and the end of the line.
+#     8-APR-1994 (PMA):
+#        Add the shell variable whocommand to cope with the fact that
+#        OSF/1 version 2.0 has changed the behaviour of who am i.
+#     8-MAR-1996 (PMC):
+#        Check for usernames passed by rlogin when replacement login
+#        programs are used.
+#        Version 2.1
+#     13-JUL-1998 (BKM):
+#        Correct logic for 16 character hostnames when `uname -n` does not
+#        return a complete network name.
+#     3-FEB-2000 (BKM):
+#        Add the -l qualifier to the `who am i` command when necessary
+#        under Linux (GNU `who` 2.0 and RedHat Linux 6.1 onwards).
+#        Version 2.2
+#        
+#-
+#===============================================================================
+#
+# If a node name was given on the command, then use it, otherwise get the
+# string between parentheses at the end of the who am i command.
+# If this string is not empty, set DISPLAY to its value, otherwise, use
+# the current value of DISPLAY, or :0 if DISPLAY has no value.
+#
+# The sed command matches:
+#    Any number of characters; an open parenthesis; any number of characters
+#    (giving this the name \1); a closing parenthesis; the end of line.
+
+# Set a shell variable to the command necessary for finding out where
+# the user logged in from.
+
+set whocommand = "who am i"
+if( `uname -s` == "OSF1" && `uname -r | awk -F. '{print $1}'` != "V1" ) then
+   set whocommand = "who -Mm"
+else if( `uname -s` == "Linux" ) then
+   who -l >&/dev/null
+   if( $status == 0 ) set whocommand = "who am i -l"
+endif
+
+if( "$2" != "" ) then
+   setenv DISPLAY $2
+else
+   set xserver = `$whocommand | sed -n 's/.*(\(.*\)) *$/\1/p'`
+   if( "$xserver" != "" ) then
+#
+# Some login programs pass a username on rlogins (such
+# as that produced by Wietse Venema), therefore must checkfor
+# and strip usernames.
+#
+      set hostpart=`echo $xserver | awk -F@ '{print $2}'`
+      if( "$hostpart" != "" ) then
+         setenv DISPLAY $hostpart
+      else
+         setenv DISPLAY $xserver
+      endif
+   else
+      if( ! ${?DISPLAY} ) then
+         setenv DISPLAY :0.0
+      endif
+   endif
+endif
+
+# If DISPLAY contains a colon then the X server is the local machine.
+
+if( `echo $DISPLAY | awk '/:/{print ":"}'` == ":") then
+   echo $DISPLAY
+   exit
+endif
+
+# If DISPLAY contains any lower case letters, it is a TCP/IP node name,
+# as opposed to an IP address. If the length of the name is 16 characters,
+# strip off the last few characters down to the last dot. This is necessary
+# since many machines only store 16 characters of the node name, so the
+# output of "who am i" may not contain the complete node name.
+
+if( `echo $DISPLAY | awk '/[a-z]/'` != "") then
+   if( `uname -n | awk -F. '{print NF}'` != "1") then
+      setenv DISPLAY \
+          `echo $DISPLAY | awk '{if(length!=16)print;else {for(i=length;i>0&&substr($1,i,1)!=".";i--); if(i==0){i=length} else i--;print substr($1,1,i)}}'`
+   endif
+endif
+
+# Try to complete the name of the remote node by matching the (possibly)
+# partial name with the local node name.
+
+set namesfile = /tmp/tempa$$
+set awkfile = /tmp/tempb$$
+echo $DISPLAY >$namesfile
+echo `uname -n` >>$namesfile
+cat <<% >$awkfile
+NR == 1 { if( NF==1 ) { print; exit }  remote=\$0; top=\$NF }
+NR == 2 { if( NF==1 ) { print remote; exit } for( i=NF ; i>0 ; i-- ) if( \$i==top ) break; else head = "." \$i head; if( i == 0 ) print remote; else print remote head }
+%
+setenv DISPLAY `awk -F. -f $awkfile $namesfile`
+\rm $namesfile $awkfile
+
+# Add the screen number to the node name or IP address.
+# If DISPLAY is only upper case letters or digits, assume that the remote
+# connection is via DECnet. Otherwise, assume it is TCP/IP.
+
+if( `echo $DISPLAY | grep '[A-Z]' | grep -v '[a-z\.]'` != "") then
+   setenv DISPLAY $DISPLAY"::0"
+else
+   setenv DISPLAY $DISPLAY":0"
+endif
+
+echo $DISPLAY

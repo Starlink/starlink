@@ -1,0 +1,15 @@
+
+XDISPLAY news file.
+
+   v2.1-1
+      Correction for bug that prevented 16 character names being parsed
+      correctly (Solaris 2 systems).
+
+   v2.1 
+      Compatable with replacement `login' logdaemon used with TCP 
+      Wrappers (C/O Paul Collison, Oxford).
+
+   v2.2
+      Revised to use the -l qualifier to the `who am i` command needed
+      from v2.0 of the GNU `who` command under Linux (RedHat 6.1 ->)
+
