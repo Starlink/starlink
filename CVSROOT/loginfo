@@ -43,3 +43,4 @@
 ^java			mail -s %s ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
 ^applications/autoastrom	mail -s %s norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
 ^applications/sgmlkit	mail -s %s norman@astro.gla.ac.uk
+^libraries/ast		mail -s %s dsb@ast.man.ac.uk norman@astro.gla.ac.uk
