@@ -96,6 +96,8 @@ NGDIN           <number of grid dimensions invalid>
 PATIN           <positional accuracy tolerance invalid>
 SISIN           <sub-pixel interpolation scheme invalid>
 SSPIN           <scale size in pixels invalid>
+
+!  New codes introduced for V1.3.
 UINER           <error in user-supplied sub-pixel interpolation function>
 UK1ER           <error in user-supplied 1-d sub-pixel interpolation kernel>
 
