@@ -52,6 +52,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
