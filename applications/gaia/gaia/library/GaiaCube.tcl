@@ -497,8 +497,6 @@ itcl::class gaia::GaiaNDFCube {
       incr count_
 
       blt::busy hold $w_
-      puts "$collapser_ runwiths in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
-                            estimator=$combination_type_ accept"
       $collapser_ runwiths "in=${ndfname_}$section out=$tmpimage_ axis=$axis_ \
                             estimator=$combination_type_ accept"
    }
