@@ -17711,6 +17711,11 @@ iraf! {
 
      Type kaphelp for help on KAPPA commands.
      Type "showme sun95" to browse the hypertext documentation.
+
+     NOTE, several applications have had major changes made to their
+     parameter lists. See the "Release Notes" section of SUN/95 for
+     details.
+
    }
 
 }
