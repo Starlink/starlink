@@ -3798,11 +3798,11 @@ which is attempting to align separate data frames using
 other methods such as object matching.
 
 Both of these can be addressed to a large extent by careful use of the
-facilities of CCDPACK discussed so far, 
+facilities of CCDPACK described so far, 
 but to make processing of this kind of
 data more painless, CCDPACK provides the concept of a Set of images.  
 The idea is that each exposure from a given instrument produces
-a single Set of data with a given number of members.  
+a single Set of data which may contain more than one frame.
 Sets from a given instrument will consist of a fixed number of members:
 each member of a given Set will share the same Set Name attribute
 indicating its origin, 
@@ -3947,7 +3947,7 @@ you can write
 \end{myquote}
 Care has to be taken with this usage however; it relies on the
 files being presented to \routine{MAKESET} in the correct order,
-which in turn may depend on how the operating system expands
+which in turn may depend on how your operating system expands
 wildcards, which is normally alphabetically.  
 If for instance in the above example the files had been named
 \begin{myquote}
@@ -4104,8 +4104,9 @@ When MODE=SPLIT, it is assumed that the PIXEL coordinates of
 the original image do
 represent this sort of rock-solid alignment, 
 since the Set members have been hewn out of the same data array.
-With the other modes of \routine{MAKESET} it is not assumed that
-there is any Set alignment coordinate system, but if there is
+With the other modes of \routine{MAKESET} Set alignment coordinates
+are not added by default,
+but if the alignment of the Set is known,
 it can be added by setting the ADDWCS parameter.  In this case
 a copy of the Current attached coordinate system of each image
 is used for the CCD\_SET alignment coordinates.
@@ -4151,6 +4152,13 @@ Variations on these methods of adding Set headers, as well as the
 possibility of controlling Set formation from FITS headers,
 are discussed in the description of \routine{MAKESET}
 in \hyperref{the appendix}{\S}{}{MAKESET}.
+
+If you need to add Set alignment coordinates to some files after 
+\routine{MAKESET} has already been run, you can just attach a new 
+coordinate system with the name CCD\_SET, using \xroutine{WCSEDIT} or
+in some other way --- there is no other header information needed.
+However a CCD\_SET-domain coordinate system will only be treated as
+special when the images in question have valid Set headers.
 
 
 \subsection{Removing Set headers}
@@ -4232,8 +4240,8 @@ example in Section \ref{makeset_container}:
 \end{myquote}
 As you can see, it gives very similar output to that written
 by \routine{MAKESET} when the headers were being added.
-If you prefer to have them grouped by Set Index, then change the
-LISTBY parameter (which defaults to `NAME'):
+If you prefer to corresponding images from different Sets grouped together, 
+then change the LISTBY parameter (which defaults to `NAME'):
 \begin{myquote}
 \begin{verbatim}
 % showset 'conv-obs?' listby=index reset
@@ -4275,7 +4283,8 @@ If PICKNAME is set to `LIKE', then the
 NAMELIKE parameter gives a list of other images to act as templates,
 and only images whose Set Name is the same as that of one of the template
 images will be selected.
-The same applies to the PICKINDEX, INDEX and INDEXLIKE parameters.
+The PICKINDEX, INDEX and INDEXLIKE parameters work in the same way
+for Set Index values.
 Returning to another example in the previous section, 
 we can pick out only those images in the same Set as (i.e.\ having
 the same Set Name attribute as) \text{im12}
@@ -4318,7 +4327,7 @@ im12
 \end{verbatim}
 \end{myquote}
 This file can be used with the indirection character (`$^\wedge$')
-to provide input for any other program, so you can write scripts
+to provide input for any other CCDPACK program, so you can write scripts
 with commands which will operate only on members of certain Sets
 or certain Index values.
 For example, you could subsequently use \xroutine{DRAWNDF} to
@@ -4343,7 +4352,7 @@ case unless you have taken steps to set it FALSE using \xroutine{CCDSETUP}
 or on the command line.
 
 The reduction tasks considered here are all concerned with constructing
-calibration frames from a stack of input images 
+calibration frames from a stack of input frames 
 (\routine{MAKEBIAS}, \routine{MAKECAL}, \routine{MAKEFLAT})
 or with applying those calibration frames to a group of data frames
 (\routine{DEBIAS}, \routine{CALCOR}, \routine{FLATCOR}).
@@ -4395,7 +4404,7 @@ For each Set Index value represented in the input files:
       the same Set headers as the input files
 \end{itemize}
 \end{enumerate}
-Note that the output frames have the same Set Index and Set Name
+Notice that the output frames have the same Set Index and Set Name
 attributes as the input frames.
 As long as pre-calibration and post-calibration frames will not
 be presented to the same CCDPACK program at the same time,
@@ -4419,13 +4428,13 @@ and this can be passed using just the single filename
 to the correction programs.
 Both lots of programs will keep track of which frames have come
 from which chip and use them in the correct places.
-When you look at the output of the various calibration programs
-operating on data with Set headers the operation of the 
-above scheme should be clear.  To see it in action, you can
+If you look at the output of the various calibration programs
+operating on data with Set headers the way the 
+above scheme works should be clear.  To see it in action, you can
 look at the log output of the 
 \text{setexercise} script (see section \ref{demos}).
 
-Note that there is currently no convenient mechanism for specifying
+Note that there is currently no easy way for specifying
 different values of the CCDPACK global data reduction parameters
 (RNOISE, ADC, EXTENT etc) for images from different chips 
 (i.e.\ with different Set Index values).
@@ -4453,8 +4462,8 @@ be introduced in the next release of CCDPACK.
 
 This section provides a brief explanation of what the CCDPACK
 registration tasks 
-(\xroutine{FINDOFF}, \xroutine{PAIRNDF}, 
-\xroutine{REGISTER}, \xroutine{WCSREG})
+(\xroutine{FINDOFF}, \xroutine{PAIRNDF}, \xroutine{CCDALIGN},
+\xroutine{IDICURS}, \xroutine{REGISTER}, \xroutine{WCSREG})
 do when they encounter input files with Set header information.
 
 By the registration stage, it is no longer of direct interest
@@ -4484,14 +4493,17 @@ will read in all the input images, construct a single superlist from
 the associated lists of 
 all the members of the same alignment Set, and treat this as if
 it came from a single image.
-\routine{PAIRNDF}, which slides images around under GUI control until
-alignment is achieved, allows the user to manipulate a whole Set at
-once instead of one NDF at a time.
+\routine{IDICURS}, \routine{PAIRNDF} and \routine{CCDALIGN}, 
+which display images in a GUI and allow the user to mark points on them,
+will display a whole Set at once for marking or sliding around
+rather than one NDF at a time.
 And \routine{WCSREG}, which mediates between different coordinate
 systems to come up with a global registration using as many as necessary,
 accords maximum priority to alignment within a Set in CCD\_SET 
 coordinates, and will not allow any realignment to occur which conflicts
 with that.
+Of course images from different Sets are not considered to be aligned
+in their CCD\_SET coordinates.
 
 Once again, for most purposes you can just feed the list of 
 images to the programs and they will do the right thing.
@@ -4646,7 +4658,7 @@ and behaves just as usual.
 
     List  List  No. matches  Completeness  Status   Algorithm
     ----  ----  -----------  ------------  ------   ---------
-     1     2      8          0.5714286     ACCEPTED    SLOW
+     1     2      8          0.8714286     ACCEPTED    FAST
 
      ...
 
@@ -4707,7 +4719,7 @@ Finally, we can simply invoke \xroutine{REGISTER}
 \end{myquote}
 Again it has constructed a list for each Set, and worked out the
 transformation coefficients between these.
-When it has successfully done this, all of the members of each Set
+When it has successfully done this, every members of each Set
 which has been registered will be given a new CCD\_REG coordinate
 system defining the registration, even those which did not 
 have any associated position list (files \text{1a} and \text{2a} in the
@@ -4967,7 +4979,9 @@ appropriate container file \text{expos1234.sdf}, then just supplying:
    IN > expos1234
 \end{verbatim}
 \end{myquote}
-would allow processing of a whole set of related images.
+would allow processing of a whole group of related images.
+Note that it is easy to convert Multi-Extension FITS files (MEFs)
+into HDS container files --- this is explained in section \ref{datatypes}.
 
 The names of images given to programs (except for \xroutine{XREDUCE})
 do not normally require the addition of the file extension. This
