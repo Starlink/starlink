@@ -7,7 +7,8 @@ require_ok("Starlink::AST");
 
 Starlink::AST::Begin();
 
-my $fchan = new Starlink::AST::FitsChan();
+my @cards;
+my $fchan = new Starlink::AST::FitsChan( sink => sub { push @cards, $_[0] } );
 while (<DATA>) {
   $fchan->PutFits($_ ,0);
 }
@@ -59,6 +60,17 @@ is( $$xworld[0], 0, "Reverse mapping of lower bound X co-ordinate" );
 is( $$yworld[0], 0, "Reverse mapping of lower bound Y co-ordinate" );
 is( $$xworld[1], 114, "Reverse mapping of upper bound X co-ordinate" ); 
 is( $$yworld[1], 128, "Reverse mapping of upper bound Y co-ordinate" );
+
+# Writing
+# -------
+
+# test the header
+my $status = $fchan->Write( $wcsinfo );
+my @raw = <DATA>;
+chomp(@raw);
+for my $i (0 .. $#raw) {
+  is( $cards[$i], $raw[$i], "FITS Card number " . $i);  
+}
 
 # Set/Get Stuff
 # -------------
