@@ -77,10 +77,10 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
-      INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
-      INCLUDE 'NDF_PAR'                 ! for NDF__NOID
-      INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'DAT_PAR'                ! for DAT__SZLOC
+      INCLUDE 'PRM_PAR'                ! for VAL__xxxx
+      INCLUDE 'NDF_PAR'                ! for NDF__NOID
+      INCLUDE 'REDS_SYS'               ! REDS constants
 *    Import :
 *    Import-Export :
 *    Export :
@@ -94,91 +94,98 @@
 *    Local Constants :
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
-      BYTE BADBIT                       ! Bad bits mask
+      BYTE BADBIT                      ! Bad bits mask
       PARAMETER (BADBIT = 7)
 *    Local variables :
-      INTEGER BEAM                      ! beam index in DO loop
-      INTEGER BEAM_OFFSET               ! offset in output data array due to
-                                        ! beam index
-      REAL    BEAM_WEIGHT (SCUBA__MAX_BEAM)
-                                        ! weight assigned to the reduced data
-                                        ! for each beam
-      LOGICAL CALIBRATOR                ! .TRUE. if internal calibrator was ON
-      CHARACTER*15 CHOP_FUNCTION        ! type of chop used
-      CHARACTER*64 CWD                  ! Current directory
-      CHARACTER*64 DATA_DIR             ! Data directory
-      CHARACTER*20 DATA_KEPT            ! types of data stored in file
-      INTEGER DEMOD_CALIBRATOR_END      ! pointer to end of scratch calibrator
-      INTEGER DEMOD_CALIBRATOR_PTR      ! pointer to start of scratch calibrator
-      INTEGER DEMOD_CAL_VARIANCE_END    ! pointer to end of scratch cal variance
-      INTEGER DEMOD_CAL_VARIANCE_PTR    ! pointer to start of scratch cal
-                                        ! variance
-      INTEGER DEMOD_DATA_END            ! pointer to end of scratch data
-      INTEGER DEMOD_DATA_PTR            ! pointer to start of scratch data
-      INTEGER DEMOD_QUALITY_END         ! pointer to end of scratch quality
-      INTEGER DEMOD_QUALITY_PTR         ! pointer to start of scratch quality
-      INTEGER DEMOD_VARIANCE_END        ! pointer to end of scratch variance
-      INTEGER DEMOD_VARIANCE_PTR        ! pointer to start of scratch variance
-      INTEGER DIM (MAXDIM)              ! the dimensions of an array
-      INTEGER END_BEAM                  ! last reduced beam
-      INTEGER EXPOSURE                  ! exposure index in DO loop
-      INTEGER EXP_POINTER               ! the offset in the output data array
-                                        ! of a reduced exposure result
+      INTEGER      BEAM                ! beam index in DO loop
+      INTEGER      BEAM_OFFSET         ! offset in output data array due to
+                                       ! beam index
+      REAL         BEAM_WEIGHT (SCUBA__MAX_BEAM)
+                                       ! weight assigned to the reduced data
+                                       ! for each beam
+      LOGICAL      CALIBRATOR          ! .TRUE. if internal calibrator was ON
+      CHARACTER*15 CHOP_FUNCTION       ! type of chop used
+      CHARACTER*64 CWD                 ! Current directory
+      CHARACTER*64 DATA_DIR            ! Data directory
+      CHARACTER*20 DATA_KEPT           ! types of data stored in file
+      INTEGER      DEMOD_CALIBRATOR_END
+                                       ! pointer to end of scratch calibrator
+      INTEGER      DEMOD_CALIBRATOR_PTR
+                                       ! pointer to start of scratch calibrator
+      INTEGER      DEMOD_CAL_VARIANCE_END
+                                       ! pointer to end of scratch cal variance
+      INTEGER      DEMOD_CAL_VARIANCE_PTR 
+                                       ! pointer to start of scratch cal
+                                       ! variance
+      INTEGER      DEMOD_DATA_END      ! pointer to end of scratch data
+      INTEGER      DEMOD_DATA_PTR      ! pointer to start of scratch data
+      INTEGER      DEMOD_QUALITY_END   ! pointer to end of scratch quality
+      INTEGER      DEMOD_QUALITY_PTR   ! pointer to start of scratch quality
+      INTEGER      DEMOD_VARIANCE_END  ! pointer to end of scratch variance
+      INTEGER      DEMOD_VARIANCE_PTR  ! pointer to start of scratch variance
+      INTEGER      DIM (MAXDIM)        ! the dimensions of an array
+      INTEGER      END_BEAM            ! last reduced beam
+      INTEGER      EXPECTED_DIM1       ! expected first dimension of data
+                                       ! array
+      INTEGER      EXPOSURE            ! exposure index in DO loop
+      INTEGER      EXP_POINTER         ! the offset in the output data array
+                                       ! of a reduced exposure result
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
-                                        ! array of FITS keyword lines
-      CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
-      INTEGER I                         ! DO loop index
-      INTEGER IARY1                     ! ARY array identifier
-      INTEGER IARY2                     ! ARY array identifier
-      INTEGER IN_NDF                    ! NDF identifier of input file
-      INTEGER INTEGRATION               ! integration index in DO loop
-      INTEGER IN_DATA_PTR               ! pointer to data array of input file
-      INTEGER IN_DEM_PNTR_PTR           ! pointer to input .SCUBA.DEM_PNTR array
-      INTEGER ISTAT                     ! temporary status
-      INTEGER ITEMP                     ! scratch integer
-      INTEGER LBND (MAXDIM)             ! lower bounds of array
-      CHARACTER*(DAT__SZLOC) LOC1       !
-      CHARACTER*(DAT__SZLOC) LOC2       !
-      INTEGER MEASUREMENT               ! measurement index in DO loop
-      INTEGER NDIM                      ! the number of dimensions in an array
-      INTEGER NREC                      ! number of history records in file
-      INTEGER N_BOLS                    ! number of bolometers measured
-      INTEGER N_EXPOSURES               ! number of exposures per integration
-      INTEGER N_FITS                    ! number of FITS lines read from file
-      INTEGER N_INTEGRATIONS            ! number of integrations per measurement
-      INTEGER N_MEASUREMENTS            ! number of measurements in the file
-      INTEGER N_POS                     ! the total number of positions measured
-      INTEGER N_SWITCHES                ! number of switches per exposure
-      INTEGER N_SWITCH_POS              ! the number of positions in a switch
-      CHARACTER*30 OBJECT               ! name of object observed
-      CHARACTER*15 OBSERVING_MODE       ! type of observation
-      INTEGER OUT_NDF                   ! NDF identifier of output file
-      INTEGER OUT_DATA_PTR              ! pointer to data array in output file
-      INTEGER OUT_DEM_PNTR_PTR          ! pointer to output .SCUBA.DEM_PNTR
+                                       ! array of FITS keyword lines
+      CHARACTER*(DAT__SZLOC) FITS_LOC  ! HDS locator to FITS structure
+      INTEGER I                        ! DO loop index
+      INTEGER      IARY1               ! ARY array identifier
+      INTEGER      IARY2               ! ARY array identifier
+      INTEGER      IN_NDF              ! NDF identifier of input file
+      INTEGER      INTEGRATION         ! integration index in DO loop
+      INTEGER      IN_DATA_PTR         ! pointer to data array of input file
+      INTEGER      IN_DEM_PNTR_PTR     ! pointer to input .SCUBA.DEM_PNTR array
+      INTEGER      ISTAT               ! temporary status
+      INTEGER      ITEMP               ! scratch integer
+      INTEGER      LBND (MAXDIM)       ! lower bounds of array
+      CHARACTER*(DAT__SZLOC) LOC1      !
+      CHARACTER*(DAT__SZLOC) LOC2      !
+      INTEGER      MEASUREMENT         ! measurement index in DO loop
+      INTEGER      NDIM                ! the number of dimensions in an array
+      INTEGER      NREC                ! number of history records in file
+      INTEGER      N_BOLS              ! number of bolometers measured
+      INTEGER      N_EXPOSURES         ! number of exposures per integration
+      INTEGER      N_FITS              ! number of FITS lines read from file
+      INTEGER      N_INTEGRATIONS      ! number of integrations per measurement
+      INTEGER      N_MEASUREMENTS      ! number of measurements in the file
+      INTEGER      N_POS               ! the total number of positions measured
+      INTEGER      N_SWITCHES          ! number of switches per exposure
+      INTEGER      N_SWITCH_POS        ! the number of positions in a switch
+      CHARACTER*30 OBJECT              ! name of object observed
+      CHARACTER*15 OBSERVING_MODE      ! type of observation
+      INTEGER      OUT_NDF             ! NDF identifier of output file
+      INTEGER      OUT_DATA_PTR        ! pointer to data array in output file
+      INTEGER      OUT_DEM_PNTR_PTR    ! pointer to output .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
-                                        ! HDS locator of REDS extension in 
-                                        ! output file
-      INTEGER OUT_QUALITY_PTR           ! pointer to quality array in output 
-      INTEGER OUT_VARIANCE_PTR          ! pointer to variance array in output
-      LOGICAL REDUCE_SWITCH             ! .TRUE. if REDUCE_SWITCH has already
-                                        ! been run on the file
-      INTEGER RUN_NUMBER                ! run number of observation
-      INTEGER SPIKE_LEVEL               ! level to despike
-      INTEGER START_BEAM                ! first reduced beam
-      CHARACTER*20 STEMP                ! scratch string
-      INTEGER SWITCHES                  ! number of switches implied by
-                                        ! SWITCH_MODE
-      CHARACTER*15 SWITCH_MODE          ! switch mode used
-      INTEGER SWITCH1_END               ! index of last point in switch 1
-      INTEGER SWITCH1_START             ! index of first point in switch 1
-      INTEGER SWITCH2_END               ! index of last point in switch 2
-      INTEGER SWITCH2_START             ! index of first point in switch 2
-      INTEGER SWITCH3_END               ! index of last point in switch 3
-      INTEGER SWITCH3_START             ! index of first point in switch 3
-      LOGICAL TRYING                    ! Logical to find NDF files
-      INTEGER UBND (MAXDIM)             ! upper bounds of array
-      LOGICAL USE_CALIBRATOR            ! .TRUE. if internal calibrator signal
-                                        ! is be divided into the data
+                                       ! HDS locator of REDS extension in 
+                                       ! output file
+      INTEGER      OUT_QUALITY_PTR     ! pointer to quality array in output 
+      INTEGER      OUT_VARIANCE_PTR    ! pointer to variance array in output
+      LOGICAL      REDUCE_SWITCH       ! .TRUE. if REDUCE_SWITCH has already
+                                       ! been run on the file
+      INTEGER      RUN_NUMBER          ! run number of observation
+      CHARACTER*15 SAMPLE_MODE         ! sample mode of observation
+      INTEGER      SPIKE_LEVEL         ! level to despike
+      INTEGER      START_BEAM          ! first reduced beam
+      CHARACTER*20 STEMP               ! scratch string
+      INTEGER      SWITCHES            ! number of switches implied by
+                                       ! SWITCH_MODE
+      CHARACTER*15 SWITCH_MODE         ! switch mode used
+      INTEGER      SWITCH1_END         ! index of last point in switch 1
+      INTEGER      SWITCH1_START       ! index of first point in switch 1
+      INTEGER      SWITCH2_END         ! index of last point in switch 2
+      INTEGER      SWITCH2_START       ! index of first point in switch 2
+      INTEGER      SWITCH3_END         ! index of last point in switch 3
+      INTEGER      SWITCH3_START       ! index of first point in switch 3
+      LOGICAL      TRYING              ! Logical to find NDF files
+      INTEGER      UBND (MAXDIM)       ! upper bounds of array
+      LOGICAL      USE_CALIBRATOR      ! .TRUE. if internal calibrator signal
+                                       ! is be divided into the data
 *    Internal References :
 *    Local data :
 *-
@@ -247,6 +254,9 @@
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
      :  OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'SAM_MODE',
+     :  SAMPLE_MODE, STATUS)
+      CALL CHR_UCASE (SAMPLE_MODE)
 
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
@@ -364,10 +374,15 @@
      :  ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 3)        .OR.
-     :       (DIM(1) .NE. 5)      .OR.
-     :       (DIM(2) .NE. N_BOLS) .OR.
-     :       (DIM(3) .LT. 1))     THEN
+         IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+            EXPECTED_DIM1 = 5
+         ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+            EXPECTED_DIM1 = 4
+         END IF
+         IF ((NDIM .NE. 3)               .OR.
+     :       (DIM(1) .NE. EXPECTED_DIM1) .OR.
+     :       (DIM(2) .NE. N_BOLS)        .OR.
+     :       (DIM(3) .LT. 1))            THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI ('NDIM', NDIM)
             CALL MSG_SETI ('DIM1', DIM(1))
@@ -383,7 +398,6 @@
 
 *  map the DEM_PNTR array and check its dimensions
 
-*      CALL NDF_XIARY (IN_NDF, 'SCUBA', 'DEM_PNTR', 'READ', IARY1, STATUS)
       CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', LOC1, STATUS)
       CALL ARY_FIND (LOC1, 'DEM_PNTR', IARY1, STATUS)
       CALL ARY_DIM (IARY1, MAXDIM, DIM, NDIM, STATUS)
@@ -475,21 +489,11 @@
      :  DEMOD_QUALITY_END, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, N_POS, SPIKE_LEVEL,
-     :     %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
+         CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, EXPECTED_DIM1, N_POS,
+     :     SPIKE_LEVEL, %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
      :     %val(DEMOD_VARIANCE_PTR), %val(DEMOD_CALIBRATOR_PTR),
      :     %val(DEMOD_CAL_VARIANCE_PTR), %val(DEMOD_QUALITY_PTR),
      :     STATUS)
-      END IF
-
-*  if required, divide the calibrator signal into the data
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (USE_CALIBRATOR) THEN
-            CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS,
-     :        %val(DEMOD_DATA_PTR), %val(DEMOD_VARIANCE_PTR),
-     :        %val(DEMOD_CALIBRATOR_PTR), %val(DEMOD_QUALITY_PTR))
-         END IF
       END IF
 
 *  now open the output NDF, propagating it from the input one
@@ -523,8 +527,6 @@
 
 *  find the .SCUBA.DEM_PNTR array, change its bounds and map it
 
-*      CALL NDF_XIARY (OUT_NDF, 'SCUBA', 'DEM_PNTR', 'UPDATE', IARY2,
-*     :  STATUS)
       CALL NDF_XLOC (OUT_NDF, 'SCUBA', 'UPDATE', LOC2, STATUS)
       CALL ARY_FIND (LOC2, 'DEM_PNTR', IARY2, STATUS)
       NDIM = 3
@@ -578,6 +580,47 @@
 *  find the number of data in the switch 
 
                   N_SWITCH_POS = SWITCH1_END - SWITCH1_START + 1
+
+*  if required, divide the mean calibrator signal for each switch into the data
+
+                  IF (USE_CALIBRATOR) THEN
+                     CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
+     :                 N_SWITCH_POS,
+     :                 %val(DEMOD_DATA_PTR + 
+     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                 %val(DEMOD_VARIANCE_PTR + 
+     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                 %val(DEMOD_CALIBRATOR_PTR +
+     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                 %val(DEMOD_QUALITY_PTR + 
+     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBUB))
+
+                     IF (N_SWITCHES .GE. 2) THEN
+                        CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
+     :                    N_SWITCH_POS,
+     :                    %val(DEMOD_DATA_PTR + 
+     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_VARIANCE_PTR + 
+     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_CALIBRATOR_PTR +
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_QUALITY_PTR + 
+     :                    (SWITCH2_START - 1) * N_BOLS * VAL__NBUB))
+                     END IF
+
+                     IF (N_SWITCHES .GE. 3) THEN
+                        CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
+     :                    N_SWITCH_POS,
+     :                    %val(DEMOD_DATA_PTR + 
+     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_VARIANCE_PTR + 
+     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_CALIBRATOR_PTR +
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
+     :                    %val(DEMOD_QUALITY_PTR + 
+     :                    (SWITCH3_START - 1) * N_BOLS * VAL__NBUB))
+                     END IF
+                  END IF
 
 *  set up the number of `beams' to be reduced
 
