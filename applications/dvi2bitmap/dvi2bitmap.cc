@@ -1029,7 +1029,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 	    if (curr_font == 0 || bitmap == 0)
 		throw DviBug ("font or bitmap not initialised setting char");
 	    DviFileSetChar& sc = *test;
-	    PkGlyph& glyph = *curr_font->glyph(sc.charno);
+	    PkGlyph& glyph = *curr_font->glyph(sc.charno());
 	    if (verbosity > normal)
 	    {
 		cerr << "glyph `" << glyph.characterChar()
