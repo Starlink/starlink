@@ -47,6 +47,7 @@
 *     19 Nov 92 : V1.7-0  Updated call to AXIS_VAL2PIX (DJA)
 *     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*      6 Dec 94 : V1.8-1  Use updsated QUALITY routines (DJA)
 *
 *    Type Definitions :
 *
@@ -84,7 +85,7 @@
       REAL                   RC(MX_PTS)             ! Circular radii
 
       INTEGER                AORDER(DAT__MXDIM)     !
-      INTEGER                CPTR                   ! Pointer to dynamic
+      INTEGER                TCPTR, CPTR            ! Pointer to dynamic
                                                     ! array
       INTEGER                DIMS(DAT__MXDIM)       ! Length of each dimension
       INTEGER                FSTAT                  ! i/o status
@@ -93,7 +94,7 @@
       INTEGER                NCH                    ! Points changed
       INTEGER                NDIM                   ! Number of dimensions
       INTEGER                NELM                   ! Number of data points
-      INTEGER                NMOD                   ! # modified points
+      INTEGER                NFROM                  ! # selected points
       INTEGER                NRPTS, NXPTS, NYPTS    ! # values entered
       INTEGER                QDIMS(DAT__MXDIM)      ! Length of each dimension
       INTEGER                QNDIM                  ! Number of dimensions
@@ -119,7 +120,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 1.8-0')
+        PARAMETER           (VERSION = 'CQUALITY Version 1.8-1')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -128,7 +129,6 @@
       CALL AST_INIT
 
       MODESET=.FALSE.
-      NMOD = 0
 
 *    Obtain mode from user
       CALL USI_GET0L( 'SET', Q_SET, STATUS )
@@ -276,20 +276,26 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Set up temporary array for flagging selections - initialise to wanted
+*    Set up temporary array for flagging selections - initialised to
+*    selected
       CALL DYN_MAPL( 1, NELM, CPTR, STATUS )
-      CALL ARR_INIT1L( .FALSE., NELM, %VAL(CPTR), STATUS )
-      NMOD = 0
+      CALL DYN_MAPL( 1, NELM, TCPTR, STATUS )
+      CALL ARR_INIT1L( .TRUE., NELM, %VAL(CPTR), STATUS )
 
 *    Map two spatial axes
       CALL BDA_MAPAXVAL( OLOC, 'READ', AORDER(1), XPTR, STATUS )
       CALL BDA_MAPAXVAL( OLOC, 'READ', AORDER(2), YPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Set elements of selection array
+*    Initialise local selection array
+      CALL ARR_INIT1L( .FALSE., NELM, %VAL(TCPTR), STATUS )
+
+*    For each area
       DO I = 1, NXPTS
+
+*      Set elements of selection array
         CALL CQUALITY_CIRSEL( TDIMS, XC(I), YC(I), RC(I), %VAL(XPTR),
-     :                  %VAL(YPTR), %VAL(CPTR), NMOD, NOTON, STATUS )
+     :                       %VAL(YPTR), %VAL(TCPTR), NOTON, STATUS )
         IF ( NOTON ) THEN
           CALL MSG_SETI( 'N', I )
           CALL MSG_PRNT( 'Point ^N is not within the bounds'/
@@ -298,11 +304,20 @@
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get quality value to modify
+*    Combine local with global selection
+      CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
+
+*    Selecting on value?
       IF ( QSEL ) THEN
+
+*      Get quality value to modify
         CALL QUALITY_GETQV( 'MODQUAL', ' ', MODQUAL, BQVAL, STATUS )
-        CALL QUALITY_SETQSEL( NELM, BQVAL, %VAL(TQPTR), %VAL(CPTR),
-     :                                              NMOD, STATUS )
+        CALL QUALITY_SETQSEL( NELM, BQVAL, %VAL(TQPTR), %VAL(TCPTR),
+     :                                                      STATUS )
+
+*      Combine local with global selection
+        CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
+
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -365,9 +380,12 @@
       CALL BDA_UNMAPQUAL( OLOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
+*    Count points selected
+      CALL QUALITY_CNTSEL( NELM, %VAL(CPTR), NFROM, STATUS )
+
 *    Inform user of altered points
-      CALL MSG_SETI( 'NMOD', NMOD )
-      CALL MSG_PRNT( '^NMOD points had quality modified' )
+      CALL MSG_SETI( 'NFROM', NFROM )
+      CALL MSG_PRNT( '^NFROM points had quality modified' )
 
 *    Write history
       CALL HIST_ADD( OLOC, VERSION, STATUS )
@@ -380,6 +398,7 @@
       WRITE( TEXT(4), 80, IOSTAT=FSTAT ) 'X-pos : ',(YC(I),I=1,NXPTS)
       WRITE( TEXT(5), 80, IOSTAT=FSTAT ) 'Radii : ',(RC(I),I=1,NRPTS)
 
+*    Write history
       CALL HIST_PTXT( OLOC, 5, TEXT, STATUS )
 
 *    Exit
@@ -392,7 +411,7 @@
 
 *+  CQUALITY_CIRSEL - Use circular ranges to select valid output pixels
       SUBROUTINE CQUALITY_CIRSEL( DIMS, XC, YC, RC, XAX, YAX, SEL,
-     :                                       NMOD, NOTON, STATUS )
+     :                                             NOTON, STATUS )
 *    Description :
 *    History :
 *    Type definitions :
@@ -413,7 +432,6 @@
 *    Export :
 *
       LOGICAL                SEL(*)             ! Selection array
-      INTEGER                NMOD               ! # points modified
       LOGICAL                NOTON              ! Point in plane?
 *
 *    Status :
@@ -424,7 +442,7 @@
 
       CALL CQUALITY_CIRSEL_INT(DIMS(1),DIMS(2),DIMS(3),DIMS(4),DIMS(5),
      :                         DIMS(6),DIMS(7), XC, YC, RC, XAX, YAX,
-     :                                       SEL, NMOD, NOTON, STATUS )
+     :                                       SEL, NOTON, STATUS )
 
       END
 
@@ -432,7 +450,7 @@
 
 *+  CQUALITY_CIRSEL_INT - Use circular ranges to select valid output pixels
       SUBROUTINE CQUALITY_CIRSEL_INT( D1,D2,D3,D4,D5,D6,D7, XC, YC,
-     :                     RC, XAX, YAX, SEL, NMOD, NOTON, STATUS )
+     :                     RC, XAX, YAX, SEL, NOTON, STATUS )
 *    Description :
 *     Loops over input data array setting SELECT = .TRUE. if values lie
 *     within circular region
@@ -454,7 +472,6 @@
 *    Export :
 *
       LOGICAL                SEL(D1,D2,D3,D4,D5,D6,D7)
-      INTEGER                NMOD                 ! # points modified
       LOGICAL                NOTON                ! Point in plane?
 *
 *    Local variables :
@@ -500,7 +517,6 @@
                     R2 = (XAX(X)-XC)**2 + R2Y
                     IF ( R2 .LE. RC2 ) THEN
                       SEL(X,Y,E,D,C,B,A) = .TRUE.
-                      NMOD = NMOD + 1
                     END IF
                   END DO
                 END DO
