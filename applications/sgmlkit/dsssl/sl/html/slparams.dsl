@@ -48,14 +48,26 @@ The attributes added to the HTML body, controlling text colour, and the like.
 <func>
 <routinename>%html-manifest%
 <description>
-If not '#f' then the list of HTML files created by the
-stylesheet will be written to the file named by '%html-manifest%'.
+If not <code/#f/ then the list of HTML files created by the
+stylesheet will be written to the file named by <code/%html-manifest%/.
 <returnvalue type=string>Manifest filename
 <argumentlist none>
 <codebody>
 (define %html-manifest%
 	"HTML.manifest"
 	)
+
+<func>
+<routinename>suppress-manifest
+<description>
+If true, this will suppress the generation of a manifest, even if the variable 
+<funcname/%html-manifest%/ is given.
+(This option can conveniently be set with <code/-V suppress-manifest/ on the 
+Jade command line).
+<returnvalue type=boolean>True if the manifest is to be suppressed
+<argumentlist none>
+<codebody>
+(define suppress-manifest #f)
 
 <func>
 <routinename>nochunks
@@ -123,12 +135,12 @@ The attributes added to the navigation footer table
   '(("BGCOLOR" "#FFFF99")
     ("WIDTH" "100%")
     ("BORDER" "0")))
-
+ 
 <func>
 <routinename>suppress-banner
 <description>If true, then suppress the production of the banner, even when
-  <code/%starlink-banner%/ is true.  Can be conveniently set using Jade, with
-  the option <code/-V suppress-banner/.
+  <code/%starlink-banner%/ is true (this option can be conveniently set
+  using Jade, with the option <code/-V suppress-banner/).
 <returnvalue type=boolean>True if the banner is <em/not/ to be printed.
 <argumentlist none>
 <codebody>
@@ -202,4 +214,17 @@ for them.
 <argumentlist none>
 <codebody>
 (define %link-extension-list%
-  '(("tex" . "LaTeX") ("ps.gz" . "Compressed postscript")))
+  '(("tex" . "LaTeX") ("ps.gz" . "Postscript")))
+
+<func>
+<routinename>suppress-printable
+<description>If true, then suppress the production of the list of printable
+  alternatives, even when
+  <code/%link-extension-list%/ is true (this option can be conveniently set
+  using Jade, with the option <code/-V suppress-printable/).
+<returnvalue type=boolean>True if the list of printable alternatives
+  is <em/not/ to be generated.
+<argumentlist none>
+<codebody>
+(define suppress-printable #f)
+
