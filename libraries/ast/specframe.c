@@ -5058,11 +5058,11 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 *     This attribute (together with SourceVRF, RefRA and RefDec) defines the 
 *     "Source" standard of rest (see attribute StdOfRest). This is a rest frame
 *     which is moving towards the position given by RefRA and RefDec at a 
-*     velocity given by SourceVel (in km/s). When setting a value for
-*     SourceVel, the velocity should be supplied in the rest frame
-*     specified by the SourceVRF attribute. Likewise, when getting the
-*     value of SourceVel, it will be returned in the rest frame specified
-*     by the SourceVRF attribute.
+*     apparent radial ("relativistic") velocity given by SourceVel (in km/s). 
+*     When setting a value for SourceVel, the velocity should be supplied in 
+*     the rest frame specified by the SourceVRF attribute. Likewise, when 
+*     getting the value of SourceVel, it will be returned in the rest frame 
+*     specified by the SourceVRF attribute.
 *
 *     The default value is zero.
 
