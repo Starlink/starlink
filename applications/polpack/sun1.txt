@@ -1,0 +1,32 @@
+POLPACK is a package of applications for mapping the linear or circular
+polarization of extended astronomical objects, using data obtained from a
+dual-beam polarimeter. At the moment, Stokes vectors cannot be produced
+for single-beam data. It is assumed that the analyser is stepped in units
+of 45 degrees and that no rotation occurs between target exposures. Other
+assumptions regarding the specific form of the data or the polarimeter
+have, as far as possible, been avoided.
+
+POLPACK processes data in NDF format. However, other astronomical data
+formats may also be processed using transparent on-the-fly data
+conversion facilities provided by the NDF subroutine library, and the
+CONVERT package.
+
+The facilities provided by POLPACK include:
+
+  o  alignment of images on the sky.
+  o  extraction of O and E images from a single frame.
+  o  sky subtraction.
+  o  calculation of Stokes parameters.
+  o  binning of Stokes parameters.
+  o  creation of catalogues of polarization vectors.
+  o  graphical display of vector maps.
+
+POLPACK does not provide facilities for performing instrumental
+corrections such as flat-fielding, de-biassing, etc. Such corrections
+should be applied to the data before using POLPACK, so that POLPACK can
+assume that pixel values are proportional to the combined intensity of
+sky and object. Corrections can be made, howeve, to take account of any
+differences in the exposure times between raw frames, and any difference
+in the sensitivity of the two channels of the dual-beam polarimeter.
+These corrections rely on redundancy in the supplied data, and require a
+specific set of analyser positions to be used. 
