@@ -68,11 +68,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     9 Jan 1995 (DJA):
 *        Original version.
+*     11 Apr 1997 (RB):
+*        Add meaningless case for pixels.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -107,18 +110,19 @@
 *  Always return a default
       FACTOR = 1D0
 
-      IF ( STR_ABBREV( UNIT, 'DEGREES' ) ) THEN
+      IF ( STR_ABBREV( UNIT, 'DEG' ) ) THEN
         FACTOR = MATH__DDTOR
 
-      ELSE IF ( STR_ABBREV( UNIT, 'ARCMINUTES' ) .OR.
-     :                          (UNIT.EQ.'ARCMINS') ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'ARCMIN' ) ) THEN
         FACTOR = MATH__DDTOR / 60D0
 
-      ELSE IF ( STR_ABBREV( UNIT, 'ARCSECONDS' ) .OR.
-     :                          (UNIT.EQ.'ARCSECS') ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'ARCSEC' ) ) THEN
         FACTOR = MATH__DDTOR / 3600D0
 
-      ELSE IF ( STR_ABBREV(UNIT, 'RADIANS') ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'RAD') ) THEN
+        FACTOR = 1D0
+
+      ELSE IF ( STR-ABBREV( UNIT, 'PIX' ) ) THEN
         FACTOR = 1D0
 
       ELSE
