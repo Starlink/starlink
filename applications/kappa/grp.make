@@ -66,7 +66,7 @@ noglobals.par nomagic.par normalize.par numb.par outset.par\
 paldef.par palentry.par palread.par palsave.par parget.par \
 paste.par piccur.par picdef.par picempty.par picentire.par picgrid.par \
 picin.par piclabel.par piclist.par picsel.par pictrans.par picvis.par \
-picxy.par pixdupe.par psf.par rift.par rotate.par segment.par \
+picxy.par pixdupe.par psf.par rift.par resample.par rotate.par segment.par \
 setaxis.par setbad.par setbb.par setbound.par setext.par setlabel.par \
 setmagic.par setnorm.par setorigin.par setsky.par settitle.par \
 settype.par setunits.par setvar.par shadow.par slide.par \
@@ -110,7 +110,7 @@ piccur.hlp picdata.hlp picdef.hlp picempty.hlp picentire.hlp picframe.hlp \
 picgrid.hlp picin.hlp piclabel.hlp piclast.hlp piclist.hlp picsel.hlp \
 pictrans.hlp picvis.hlp picxy.hlp pixdupe.hlp problems_problems.hlp \
 procedures.hlp psf.hlp requests.hlp rift.hlp sub.hlp \
-role_of_kappa.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
+role_of_kappa.hlp resample.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
 setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
 shadow.hlp slide.hlp sqorst.hlp stats.hlp substitute.hlp \
@@ -140,7 +140,7 @@ globals.ifl histat.ifl histeq.ifl histogram.ifl kaphelp.ifl laplace.ifl \
 kstest.ifl logar.ifl look.ifl lucy.ifl manic.ifl \
 makesurface.ifl maths.ifl median.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl outset.ifl parget.ifl \
-paste.ifl pixdupe.ifl pow.ifl psf.ifl rift.ifl rotate.ifl \
+paste.ifl pixdupe.ifl pow.ifl psf.ifl rift.ifl resample.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
@@ -170,7 +170,7 @@ globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f permaxes.f \
 kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
 median.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
 numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f rift.f \
-rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
+resample.f rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f trig.f wiener.f zaplin.f mem2d.f \
 listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f kapversion.f
 
@@ -275,7 +275,9 @@ kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
 kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f kps1_ltaba.f \
 kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_look.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f \
-kps1_msa.f kps1_mss.f
+kps1_msa.f kps1_mss.f \
+atl1_creat.f  atl1_gtobj.f  atl1_rdfch.f \
+atl1_gtgrp.f  atl1_rdch.f   atl1_rdgrp.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \

@@ -552,7 +552,7 @@ makesurface.f maths.f median.f \
 mstats.f mult.f noglobals.f nomagic.f \
 normalize.f numb.f outset.f parget.f paste.f \
 permaxes.f pixdupe.f psf.f rift.f \
-rotate.f segment.f setmagic.f shadow.f slide.f \
+resample.f rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f trig.f wiener.f zaplin.f \
 listmake.f listshow.f profile.f wcsalign.f wcstran.f kapversion.f
@@ -662,7 +662,9 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
 kps1_ltaba.f kps1_apadb.f kps1_apadub.f kps1_apadd.f kps1_apaduw.f \
 kps1_apadi.f kps1_apadw.f kps1_apadr.f kps1_laplb.f kps1_lapld.f \
 kps1_lapli.f kps1_laplub.f kps1_lapluw.f kps1_laplr.f kps1_laplw.f \
-kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f
+kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f \
+atl1_creat.f atl1_gtobj.f atl1_rdfch.f \
+atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2372,6 +2374,12 @@ kaphelp.o:	 SAE_PAR PAR_ERR
 kappa_mon.o:	 SAE_PAR
 kapversion.o:	 SAE_PAR PAR_ERR
 kapview_mon.o:	 SAE_PAR
+atl1_creat.o:    SAE_PAR AST_PAR SAE_PAR FIO_ERR
+atl1_gtgrp.o:    SAE_PAR GRP_PAR
+atl1_gtobj.o:    SAE_PAR AST_PAR NDF_PAR
+atl1_rdch.o:     SAE_PAR AST_PAR SAE_PAR GRP_PAR
+atl1_rdfch.o:    SAE_PAR AST_PAR SAE_PAR
+atl1_rdgrp.o:    SAE_PAR AST_PAR GRP_PAR
 kps1_agnch.o:	 SAE_PAR GRP_PAR
 kps1_agncm.o:	 SAE_PAR GRP_PAR
 kps1_agncp.o:	 SAE_PAR
@@ -2797,6 +2805,7 @@ profile.o:	 SAE_PAR NDF_PAR PAR_ERR PAR_PAR AST_PAR
 psf.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR AST_PAR
 reshape.o:	 SAE_PAR NDF_PAR PRM_PAR
 rift.o:	 SAE_PAR NDF_PAR DAT_PAR
+resample.o:	 SAE_PAR NDF_PAR PRM_PAR AST_PAR PAR_ERR
 rotate.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR
 scatter.o:	 SAE_PAR NDF_PAR PRM_PAR
 segment.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_PAR PAR_ERR AST_PAR

@@ -378,6 +378,10 @@
          ELSE IF ( NAME .EQ. 'PSF' ) THEN
             CALL PSF ( STATUS )
 
+*  Transforms an NDF.
+         ELSE IF ( NAME .EQ. 'RESAMPLE' ) THEN
+            CALL RESAMPLE ( STATUS )
+
 *  Adds a scalar to a section of a an NDF data structure to correct
 *  rift-valley defects.
          ELSE IF ( NAME .EQ. 'RIFT' ) THEN

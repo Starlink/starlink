@@ -12648,6 +12648,118 @@ iraf! {
 
       }
 
+      action resample {
+         alias {resamp(le)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter current {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Resample into the current Frame of the input NDF?}
+            helpkey *
+         }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF}
+            helpkey *
+         }
+
+         parameter lbound {
+            size *
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Lower bounds of the output NDF}
+            helpkey *
+         }
+
+         parameter mapping {
+            type FILENAME
+            vpath PROMPT
+            ppath CURRENT
+            prompt {A file containing the Mapping}
+            helpkey *
+         }
+
+         parameter method {
+            position 3
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Re-sampling method}
+            helpkey *
+            default {Nearest}
+         }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF}
+            helpkey *
+         }
+
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter scale {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Additional scaling factor}
+            helpkey *
+         }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default {KAPPA - Resample}
+            prompt {Output NDF title}
+            helpkey *
+         }
+
+         parameter tol {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.2
+            prompt {Tolerance for linear transformation approximation}
+            helpkey *
+         }
+
+         parameter ubound {
+            size *
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Upper bounds of the output NDF}
+            helpkey *
+         }
+
+      }
+
       action rift {
 
          helplib {$KAPPA_HELP}

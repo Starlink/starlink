@@ -418,6 +418,7 @@
       INCLUDE 'AST_PAR'          ! AST definitions and declarations
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF system constants
+      INCLUDE 'PAR_ERR'          ! Parameter system error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
