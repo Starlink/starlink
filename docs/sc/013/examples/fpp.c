@@ -9,9 +9,17 @@
  * $Id$
  */
 
+#include <config.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+
+#if HAVE_ERRNO_H
+#include <errno.h>
+#else
+extern int errno;
+#endif
 
 /* bytesex.h defines BIGENDIAN=1 (true) or 0 */
 #include "bytesex.h"
@@ -81,7 +89,7 @@ Float pinfinity (Float darg);		/* return +ve or -ve infinity */
 /* Functions which do the work of this demo program */
 char *pbits (unsigned int i, unsigned int n);
 int parse_int (const char *s, unsigned int i[NINTS]);
-void reprint_number (char *s, Float farg);
+int reprint_number (char *s, Float farg);
 
 
 
@@ -250,25 +258,32 @@ int parse_int (const char *s, unsigned int i[1])
 
 /*
  * Convert string to number and display in various formats.
- * If s is NULL, then use the number farg instead.
+ * If s is NULL, then use the number farg instead.  If the input
+ * string cannot be interpreted, return non-zero, or zero on success.
  */
-void reprint_number (char *s, Float farg)
+int reprint_number (char *s, Float farg)
 {
     ieeefloat F;
     if (s == NULL)
 	F.f = farg;
     else
     {
-	if (s[0]=='0' && s[1]=='x')         /* it's an integer */
-	{
-	    if (parse_int (s, F.i))
-	    {
+	if (s[0]=='0' && s[1]=='x') { /* it's an integer */
+	    if (parse_int (s, F.i)) {
 		printf ("can't parse integer <%s>\n", s);
-		return;
+		return 1;
 	    }
-	}
-	else
-	    F.f = strtod (s, (char**)NULL);
+	} else {
+            char *endptr;
+            errno = 0;
+	    F.f = strtod (s, &endptr);
+            if (errno != 0)
+                return 1;
+            for (; isspace(*endptr); endptr++)
+                ;
+            if (*endptr != '\0')
+                return 1;
+        }
     }
 
 #if DOUBLEPRECISION
@@ -312,7 +327,7 @@ void reprint_number (char *s, Float farg)
 	    (pisfinite (F.f) ? 'F' : 'f'),
 	    (pisnormal (F.f) ? 'L' : 'l'));
 
-    return;
+    return 0;
 }
 
 int main (int argc, char **argv)
@@ -329,9 +344,8 @@ int main (int argc, char **argv)
     {
         char line[80];
         while (fgets (line, sizeof(line), stdin) != NULL)
-	    if (line[0] == '=')
-		switch (line[1])
-		{
+	    if (line[0] == '=') {
+		switch (line[1]) {
 		  case 'n':
 		    reprint_number (NULL, pnan(""));
 		    break;
@@ -345,8 +359,11 @@ int main (int argc, char **argv)
 		    printf ("eh?\n");
 		    break;
 		}
-	    else
-		reprint_number (line, 0);
+            } else {
+		if (reprint_number (line, 0))
+                    printf("Enter float, 0x... integer, =n, =i, =z, "
+                           "or ^D to exit\n");
+            }
     }
     exit (0);
 }
