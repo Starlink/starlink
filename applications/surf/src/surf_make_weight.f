@@ -156,9 +156,9 @@
 
 *  calculate the required F.T.
 
-         CALL SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE, IDIMS,
-     :     %val(FT_D_PTR), %val(FT_V_PTR), %val(WT_D_PTR),
-     :     %val(WT_V_PTR), STATUS)
+         CALL SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE, IDIMS(1),
+     :        IDIMS(2), %val(FT_D_PTR), %val(FT_V_PTR), %val(WT_D_PTR),
+     :        %val(WT_V_PTR), STATUS)
 
       END IF
 
