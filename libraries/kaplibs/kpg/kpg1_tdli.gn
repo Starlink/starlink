@@ -177,6 +177,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -185,6 +186,8 @@
 *     1993 June 23 (MJC):
 *        Added protection against out-of-bounds indexing, and assigned
 *        ETSR to powers of two.
+*     2002 September 5 (MBT):
+*        Fixed bug; flux value was being ignored.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -698,7 +701,7 @@
 *   Validate that the output element has been computed using sufficient
 *   weight.
             IF ( WSUM .GT. VAL__SMLD ) THEN
-               OUTARR( K ) = NUM_DTO<T>( ASUM / WSUM )
+               OUTARR( K ) = NUM_DTO<T>( FLUX * ASUM / WSUM )
             ELSE
                OUTARR( K ) = VAL__BAD<T>
             END IF
@@ -731,7 +734,7 @@
 *   Validate that the output variance element has been computed using
 *   sufficient weight.
             IF ( WSUM .GT. VAL__SMLD ) THEN
-               OUTVAR( K ) = NUM_DTO<T>( ASUM / WSUM )
+               OUTVAR( K ) = NUM_DTO<T>( FLUX * ASUM / WSUM )
             ELSE
                OUTVAR( K ) = VAL__BAD<T>
             END IF
