@@ -366,33 +366,34 @@ $Id$
 	(make element gi: "li"
 	      (make sequence
 		(make element gi: "a"
+		      ;; make a link to the document we're about to generate
 		      attributes: `(("href" ,(href-to (current-node))))
 		      title)
 		(if (node-list-empty? purp)
 		    (empty-sosofo)
 		    (literal (string-append " - " (data purp))))))
 	(html-document title
-		     (make sequence
-		       (make element gi: "h1"
-			     (make element gi: "a"
-				   attributes:
-				   `(("name" ,(href-to (current-node)
-							frag-only: #t)))
-				   ;; We don't really need this, since
-				   ;; the routine is in a chunk by
-				   ;; itself, but since routine is in
-				   ;; section-element-list, be
-				   ;; consistent with the other
-				   ;; elements in that.
-                                   (make sequence
-                                      title
-                                      (if (node-list-empty? purp)
-                                          (empty-sosofo)
-                                          (literal (string-append 
-                                                       " - "
-                                                       (data purp)))))))
-		       (make element gi: "dl"
-			     (process-node-list rp)))))))
+		       (make sequence
+			 (make element gi: "h1"
+			       (make element gi: "a"
+				     attributes: `(("name"
+						    ,(href-to (current-node)
+							      frag-only: #t)))
+				     ;; We don't really need this, since
+				     ;; the routine is in a chunk by
+				     ;; itself, but since routine is in
+				     ;; section-element-list, be
+				     ;; consistent with the other
+				     ;; elements in that.
+				     (make sequence
+				       title
+				       (if (node-list-empty? purp)
+					   (empty-sosofo)
+					   (literal (string-append 
+						     " - "
+						     (data purp)))))))
+			 (make element gi: "dl"
+			       (process-node-list rp)))))))
 
   (element routinename
     (empty-sosofo))			; discard, in this mode.  See

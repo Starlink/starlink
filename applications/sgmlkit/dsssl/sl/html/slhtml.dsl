@@ -122,7 +122,10 @@ url='http://sunsite.org.uk/rfc/rfc1738.txt' >RFC 1738</webref>.
 <returnvalue type="string">An HTML HREF which can be used to refer to
 the current node.  If the function was called with <code>frag-only</>
 set to <code>#t</> and no fragment ID could be generated, then it
-returns <code>#f</>.
+returns <code>#f</>.  This <code>#f</> return value might well
+generate an error such as `invalid value for "attributes"
+characteristic' -- it should really be tested for whenever href-to is
+invoked in this way.
 <argumentlist>
 <parameter>target
   <type>node-list
@@ -173,7 +176,7 @@ returns <code>#f</>.
 	      ;; Following ones aren't used when referring to targets
 	      ;; with IDs -- used instead for generating
 	      ;; HTX-compatible `name' attributes for certain special
-	      ;; elements.
+	      ;; elements...
 	      ((node-list=? target (document-element)) 
 	       "xref_")
 	      ((equal? (gi target) (normalize "abstract"))
@@ -181,9 +184,15 @@ returns <code>#f</>.
 	      ;; `routine' elements
 	      ;((equal? (gi target) (normalize "routine"))
 	      ; (href-to-fragid-routine target))
-	      ;((member (gi target) (section-element-list))
-	      ; (string-append "_ID" 
-	      ;	      (number->string (all-element-number target))))
+	      ;; ...and for generating HREFs and NAMEs for
+	      ;; internally generated cross-references (ie, link
+	      ;; targets such as routine cross-references, which
+	      ;; aren't linked by a REF element: note that
+	      ;; section-element-list includes both `codegroup' and
+	      ;; `routine').
+	      ((member (gi target) (section-element-list))
+	       (string-append "_ID" 
+			      (number->string (all-element-number target))))
 	      (else #f)))
 	 (entfile (and (not frag-only)
 		       (html-file target_nd: target)))
