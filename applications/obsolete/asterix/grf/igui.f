@@ -129,6 +129,19 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'XPIX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'YPIX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CNAME='DATA'
+        DO I=1,9
+          DO J=1,9
+            WRITE(CNAME(5:5),'(I1)') I
+            WRITE(CNAME(6:6),'(I1)') J
+            CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_CHAR',0,8,SID,STATUS)
+          ENDDO
+        ENDDO
+
         DO I=1,9
           CNAME='RED'
           WRITE(CNAME(4:4),'(I1)') I
@@ -174,6 +187,10 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'Y',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XPIX',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YPIX',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'RA',ITEMID,STATUS)
         CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'DEC',ITEMID,STATUS)
@@ -184,6 +201,15 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'COLOUR',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
+        CNAME='DATA'
+        DO I=1,9
+          DO J=1,9
+            WRITE(CNAME(5:5),'(I1)') I
+            WRITE(CNAME(6:6),'(I1)') J
+            CALL NBS_FIND_ITEM(I_NBID,CNAME,ITEMID,STATUS)
+            CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
+          ENDDO
+        ENDDO
 
       ENDIF
 
