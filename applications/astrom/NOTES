@@ -81,3 +81,31 @@ Sigh....
 
 Star2HTML seems unable to find the sun5.bbl file (though it's there --
 stupid program), so I've (temporarily?) edited it in to sun5.tex.
+
+
+
+2004 July 23
+------------
+
+  * Brought into the Starlink CVS build system, and the autoconfing
+    redone.
+
+  * The astrom script has been discarded, and astrom.f now does its
+    argument parsing alone.  There shouldn't be any breakage to that,
+    but there might be.  You can now additionally specify input=- and
+    report=- to have those sent to stdin and stdout (no specific
+    demand for that, but obviously good, and easy to do).
+
+  * That means that there is no longer an executable astrom.x, but
+    that plain astrom should do what astrom.x used to.
+
+  * The tests in t/ no longer work, and would need a bit of work to
+    have them configured in the right way.  So leave them as they are,
+    but unused.
+
+  * There's a current problem with linking on OSX, which is why the
+    "-L/usr/lib -lgcc" is in the astrom_LDADD line in Makefile.am.
+
+  * Version number increased to 3.8, since the functionality has
+    changed slightly, and the autoconfing is different.
+
