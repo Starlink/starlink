@@ -316,7 +316,7 @@
 *  Transform the input table into word separated GRP groups (dynamic
 *  string allocation is performed using this method).
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL POL1_CFGRP( FDIN, 3, 2, .FALSE., WRDGRP, LINGRP, STATUS )
+         CALL CCD1_CFGRP( FDIN, 3, 2, .FALSE., WRDGRP, LINGRP, STATUS )
 
 *  Translate these groups into groups which contain the keyword and
 *  type of any FITS items which should be extracted from the NDFs
