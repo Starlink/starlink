@@ -122,6 +122,10 @@
 
 *    History:
 *     $Log$
+*     Revision 1.11  2005/03/18 06:26:21  timj
+*     + Initialise some variables
+*     + Protect some calls with STATUS checks
+*
 *     Revision 1.10  2004/09/08 02:03:33  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -350,9 +354,10 @@
 
 *  find out if the observation was aborted
 
+      STATE = ' '
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
      :  STATE, STATUS)
-      CALL CHR_UCASE (STATE)
+      IF (STATUS .EQ. SAI__OK) CALL CHR_UCASE (STATE)
       ABORTED = .FALSE.
       IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
          ABORTED = .TRUE.
@@ -391,6 +396,9 @@
 
 *  map the DEM_PNTR array and check its dimensions
 
+      N_EXPOSURES = 0
+      N_INTEGRATIONS = 0
+      N_MEASUREMENTS = 0
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
      :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
      :     N_MEASUREMENTS, STATUS)
