@@ -191,6 +191,7 @@
           END IF
 
           IF ( (NAME .EQ. 'SPATIAL_RESP') .OR.
+     :         (ALOC .EQ. DAT__NOLOC) .OR.
      :         (STATUS .NE. SAI__OK) ) THEN
 
 *        New error context to protect axis code below

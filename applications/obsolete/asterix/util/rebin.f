@@ -168,7 +168,6 @@
       LOGICAL OK			! data valid
       LOGICAL VOK			! Data VARIANCE present
       LOGICAL QOK                     ! data quality present
-      LOGICAL AOK(ADI__MXDIM)         ! axes data present
       LOGICAL AXOK(ADI__MXDIM)        ! axis(n) ok?
       LOGICAL WDOK(ADI__MXDIM)        ! axis(n).width ok?
       LOGICAL NORM(ADI__MXDIM)        ! data normalised rel. to axis(n)?
