@@ -14,9 +14,10 @@
  * Peter W. Draper 04/03/98  Added putpixel member. Fixed allocation
  *                           of data to bytes_per_line*width when not
  *                           using shared memory. 
+ *                 18/06/03  Some changes to attempt cleanup when
+ *                           shared memory cannot be attached (Solaris
+ *                           limit is 6 segments!).
  */
-
-
 
 #include <stdlib.h>
 #include <string.h>
@@ -172,6 +173,8 @@ int ImageDisplay::updateShm(int width, int height)
     shmInfo_.shmaddr = (char *) shmat(shmInfo_.shmid, 0, 0);
     if (shmInfo_.shmaddr == ((char *) -1)) {
 	XDestroyImage(xImage_);
+        shmctl(shmInfo_.shmid, IPC_RMID, 0);
+        shmdt(shmInfo_.shmaddr);
 	xImage_ = NULL;
 #ifdef DEBUG
 	if (verbose_)
@@ -186,7 +189,10 @@ int ImageDisplay::updateShm(int width, int height)
 
     // check for X errors
     if (errorHandler.errors()) {
-	XDestroyImage(xImage_);
+        XShmDetach(display_, &shmInfo_);
+        XDestroyImage(xImage_);
+        shmctl(shmInfo_.shmid, IPC_RMID, 0);
+        shmdt(shmInfo_.shmaddr);
 	xImage_ = NULL;
 #ifdef DEBUG
 	if (verbose_)
