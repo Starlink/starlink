@@ -104,7 +104,7 @@
 -->
 <!NOTATION documentsummary SYSTEM ''>
 <!ENTITY documentsummary.dtd
-	public "-//Starlink//DTD Document Summary 0.1//EN"
+	public "-//Starlink//DTD Document Summary 0.2//EN"
 	cdata AFDRMeta
 	>
 <!ATTLIST #NOTATION documentsummary
@@ -524,7 +524,7 @@
 	author		-- Whom the release is attributable to.  This
 			   links to one of the author elements. --
 		idref
-		#current
+		#required
 	versionid	-- An id to allow UPDATE elements to refer to a
 			   specific version.  It can be anything, but a
 			   sensible format is v10-5, for example (it can't
@@ -651,8 +651,6 @@
 
 <!element APPENDICES	- o (%appendix.content;)>
 
-<!element BACKMATTER	o o (bibliography? & indexcontents? & notecontents?)>
-
 <!attlist (sect | subsect)
 	%export.id.required;
 	indexkey 		-- contains the text of an index entry
@@ -664,6 +662,16 @@
 	%export.id.optional;
 	indexkey 		-- contains the text of an index entry
 				   which points to this section -- 
+		cdata
+		#implied
+	>
+
+<!--
+<!element BACKMATTER	o o (bibliography? & indexcontents? & notecontents?)>
+-->
+<!element BACKMATTER    - o empty>
+<!attlist BACKMATTER
+	bibliography		-- bibliography name --
 		cdata
 		#implied
 	>
@@ -691,8 +699,10 @@
 		-- version/release when the alteration was made --
 		-- id matches one DISTRIBUTION or CHANGE element --
 	author
-		idref	#required
-		-- author of modification.  id matches author element --
+		idref	#implied
+		-- author of modification.  id matches author element.
+		   If no author given, then take it from author of
+		   change or distribution referred to by versionid --
   	>
 <!-- end of %Feature.Versioning -->
 ]]>
@@ -757,6 +767,12 @@
   is, these are identical at the DTD level.
 -->
 <!element (CODE|KBD) - - (#pcdata)	-- literal text -->
+<!attlist CODE
+	type			-- what type of thing is it?  Used for
+				   formatting hints. --
+		(fspath)
+		#implied
+	>
 
 <!--
   VERBATIM is part of %structuring, and is for extended blocks of verbatim
@@ -767,8 +783,13 @@
   Allow %references within verbatim text, allowing us to include
   <webref> and <ref id=... text=...> within verbatim examples, making
   the corresponding text `live' in online versions of documents.
+
+  Also allow %simplephrase: the intention is to allow KBD in there,
+  to display examples, but there might be legitimate applications of
+  the other elements, too.
 -->
-<!element VERBATIM - - ((#pcdata | %references)*)	-- verbatim text -->
+<!element VERBATIM - - ((#pcdata | %simplephrase | %references)*)
+					-- verbatim text -->
 <![ ignore [
 <!element VERBATIM - - (#pcdata)	-- verbatim text -->
 ]]>
@@ -818,21 +839,26 @@
 		-- just include an entry in the bibliography --
 	>
 
+<![ ignore [
 <!element BIBLIOGRAPHY - o empty	-- bib contents, in
 					   back-matter only -->
 <!attlist bibliography
 	bib	cdata	#required	-- name of bibliography --
 	all	(all)	#implied	-- list all of bib, not just citns --
 	>
+
 <!--
   How about an alternative bibliography, with elements in place?  Or
   make bibliography non-empty, and have its contents supplement those
   in the database.
 -->
+]]>
 
 <!element NOTE - - (px)+		-- foot/endnotes -->
+<![ ignore [
 <!element NOTECONTENTS - o empty	-- body of footnotes, in
 					   back-matter only --> 
+]]>
 
 <!--
   We perhaps need to think carefully about how INDEX interrelates with
@@ -840,11 +866,12 @@
   or target of a link in a down-converted document
 -->
 <!element INDEX - - (#pcdata)>
-<!element INDEXCONTENTS - o empty	-- the index, in back-matter only -->
-
 <!attlist index
 	key	cdata	#implied	-- key, if not element contents --
 	>
+<![ ignore [
+<!element INDEXCONTENTS - o empty	-- the index, in back-matter only -->
+]]>
 
 <!--========== Routine list ==========-->
 <![ %Feature.Routinelist [
