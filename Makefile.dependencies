@@ -1246,7 +1246,7 @@ $(MANIFEST)/itcl: \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/jpeg:
-	cd thirdparty/ijl/jpeg \
+	cd thirdparty/ijg/jpeg \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/jpl: \
