@@ -293,6 +293,9 @@
 *        messages conditional.  Removed a couple of unnecessary calls.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     16-SEP-1998 (DSB):
+*        Correction to component list passed to NDF_PROP; ">WCS" replaced 
+*        by ",WCS".
 *     {enter_further_changes_here}
 
 *  Bugs:
