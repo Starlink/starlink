@@ -87,7 +87,7 @@
         PROMPT   'Remove fitted baseline from output data'
         TYPE     '_LOGICAL'
 	DEFAULT  TRUE
-        PPATH    CURRENT,DEFAULT
+        PPATH    'CURRENT,DEFAULT'
         HELPKEY '*'
       ENDPARAMETER
 

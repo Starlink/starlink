@@ -149,7 +149,7 @@
 
       PARAMETER SFACTOR
         TYPE     '_REAL'
-        PROMPT   'Smoothing factor for spline interpolation
+        PROMPT   'Smoothing factor for spline interpolation'
          HELPKEY  '*'
       ENDPARAMETER
 
