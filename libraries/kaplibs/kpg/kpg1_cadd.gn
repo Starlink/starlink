@@ -58,6 +58,7 @@
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
 *     2004 Oct 1 (TIMJ):
 *        Recreate Generic version from constituent parts.
+*        No longer use NUM_ERROR directly
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -73,7 +74,6 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
  
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
  
 *  Arguments Given:
       LOGICAL BAD
@@ -92,6 +92,8 @@
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
       <TYPE> VAL_DTO<T>          ! Convert from double precision
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Numeric operation successfull
  
 *  Local Variables:
       <LTYPE> <T>CON              ! Type converted constant
@@ -137,7 +139,7 @@
 *  error flag and error count.
       ELSE
          CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NERR = 0
  
 *  No bad values present:
@@ -151,10 +153,10 @@
 *  Check for numerical errors (i.e. overflow). If present, then assign
 *  a bad value to the output array element and count the error. Reset
 *  the numerical error flag.
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   B( I ) = VAL__BAD<T>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 2           CONTINUE
  
@@ -170,10 +172,10 @@
 *  Otherwise, add the constant, again checking for numerical errors.
                ELSE
                   B( I ) = NUM_ADD<T>( A( I ), <T>CON )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      B( I ) = VAL__BAD<T>
                      NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
                END IF
 3           CONTINUE
