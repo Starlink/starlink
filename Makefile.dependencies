@@ -330,6 +330,7 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
@@ -624,6 +625,7 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx

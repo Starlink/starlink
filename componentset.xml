@@ -178,7 +178,7 @@ text files.  CURSA also includes some facilities for accessing remote
 on-line catalogues via the Internet.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgp</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgp</build><build>graphpar</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -396,7 +396,7 @@ proposal, or before or during an observing run.
   Gaussian profiles to galaxies,  generate  pie slice cross-sections
   of galaxies and display profiling results.</p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>mers</build><build>par</build><build>pcs</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>sgs</build><build option='link'>agi</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>ard</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>mers</build><build>par</build><build>pcs</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>sgs</build><build option='link'>agi</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -704,7 +704,7 @@ Traces an HDS file
 </component>
 
 <component id="icl">
-  <version>3.1-9</version>
+  <version>3.1-10</version>
   <path>applications/icl</path>
   <description>Interactive Command Language</description>
   <abstract><p>ICL shell.
@@ -1126,13 +1126,15 @@ package.
       <name>Paul Rees</name>
     </person>
     <person>
-      <uname>pwd</uname>
       <name>Peter W. Draper</name>
+      <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
     </person>
     <person>
-      <uname>aa</uname>
       <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun137</documentation>
@@ -1537,7 +1539,7 @@ to handle data from a variety of different instruments.
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><build>idi</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>pgplot</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2616,7 +2618,7 @@ Ultrix and for SunOS and may still work for them.
   GKS implementation of the PGPLOT graphics library.
   </p></abstract>
   <dependencies >
-    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>psx</link><link>mers</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>graphpar</link><link>psx</link><link>mers</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
