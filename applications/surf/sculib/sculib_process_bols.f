@@ -962,9 +962,9 @@
                   END DO
 
 *     If we are using SCAN_REVERSAL then multiply every other
-*     exposure by -1
+*     exposure by -1 (but only is CHOP is SC)
 
-                  IF (SCAN_REVERSAL) THEN
+                  IF (SCAN_REVERSAL .AND. CHOP_CRD .EQ. 'SC') THEN
                      IF (FLIP) THEN
                         IF (STATUS .EQ. SAI__OK) THEN
                            ITEMP = N_BOL * (EXP_END - EXP_START + 1)
