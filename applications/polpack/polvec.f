@@ -96,9 +96,8 @@
 *        percentage polarization and polarized intensity. The returned 
 *        variance values are unchanged. This correction only applies to
 *        calculations of linear polarization, and cannot be used if the 
-*        input cube does not contain variance values, or if you supply a 
-*        FALSE value for parameter VARIANCE. The dynamic default is equal 
-*        to the value supplied for parameter VARIANCE. []
+*        input cube does not contain variance values. The dynamic default 
+*        is equal to the value supplied for parameter VARIANCE. []
 *     I = NDF (Write)
 *        An output NDF holding the total intensity. A null value can be
 *        supplied if this output image is not required. [!]

@@ -1842,6 +1842,18 @@ same value for STARTHELP until a new value is specified on the command
 line. If necessary, you can still access the hypertext help using the
 \texttt{Help} menu button at the top right corner of the POLKA interface.
 
+\item [``The catalogue produced by POLVEC has lots of zero polarized
+intensity values in it''] - POLVEC can apply a correction to to the values
+of percentage polarisation and polarized intensity to remove statistical
+bias introduced by the squaring and adding of the Stokes parameters $Q$ and
+$U$ (see \htmlref{POLVEC}{POLVEC} parameter DEBIAS). This can result in 
+corrected percentage polarization values which are identically equal to zero
+if the original percentage polarisations are small and the corresponding 
+variances are large. These zero percentage polarization values then result in
+zero polarized intensity values. Note, the $Q$ and $U$ values are
+\emph{not} corrected in any way, since they already give unbiassed
+estimates of the required quantities.
+
 \end{description}
 
 \section{Acknowledging this Software}
@@ -2210,9 +2222,8 @@ for NDF applications.
          percentage polarization and polarized intensity. The returned
          variance values are unchanged. This correction only applies to
          calculations of linear polarization, and cannot be used if the
-         input catalogue does not contain variance values. If a null value
-         (!) is supplied, then the correction is applied if output variances
-         are being created, and not otherwise.           [!]
+         input catalogue does not contain variance values. The dynamic default 
+         is equal to the value supplied for parameter VARIANCE. []
       }
       \sstsubsection{
          IN = LITERAL (Read)
