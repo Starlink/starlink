@@ -61,16 +61,24 @@ Star_Share => $base/share
 
 
 # And close the file
-close PM;
+close PM or die "Error closing Config.pm: $!";
 
 
 # Now Write the makefile
+# We override MAN3PODS since MakeMaker rather cleverly refuses to
+# try to find pods in anything named Config.pm !!!!
+
 WriteMakefile(
     'NAME'      => 'Starlink::Config',
     'VERSION_FROM'   => 'Config.pm',
+    'MAN3PODS'  => { 'Config.pm' => '$(INST_MAN3DIR)/Starlink::Config.3' },
     'clean'     => { FILES => 'Config.pm' },
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
-                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}
+                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
+  ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+     (ABSTRACT => 'Retrieve local Starlink configuration',
+      AUTHOR   => 'Tim Jenness <t.jenness@jach.hawaii.edu>') : ()),
+
 );
 
 # This is the actual perl module!!!!
