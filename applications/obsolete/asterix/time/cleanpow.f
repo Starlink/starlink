@@ -18,14 +18,14 @@
 *    History :
 *     15 Aug 90 : Original
 *      7 Jun 91 : Asterix version   (LTVAD::RDS)
+*     11 Apr 95 : V1.8-0  Updated data interfaces (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
       INCLUDE 'PAR_ERR'
-*    Global variables :
-*    Structure definitions :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -33,8 +33,6 @@
       INTEGER NCL,NBIN
          PARAMETER       (NCL=10000)
          PARAMETER       (NBIN=100)
-      DOUBLE PRECISION PI
-         PARAMETER       (PI=3.14159265358979323846)
 
 *    Local variables :
       INTEGER NTOT                       ! Total number of data points
@@ -79,9 +77,8 @@
      &                TITLE*80, XAXIS*72, YAXIS*72, ZAXIS*72,
      &                FILTIT*6
 
-      CHARACTER*(DAT__SZLOC) LOC               ! Locator to input file
-      CHARACTER*(DAT__SZLOC) LOCO              ! Locator to output file
-*
+      INTEGER			IFID, OFID		! Dataset identifiers
+
       DOUBLEPRECISION GAIN, FREINT,  A
 
       REAL CLNLIM                              ! Noise limit to clean to.
@@ -109,21 +106,20 @@
       DATA CHAINT/'0','1','2','3','4','5','6','7','8','9'/
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'CLEANPOW  version 1.5-1')
+      PARAMETER (VERSION = 'CLEANPOW  version 1.8-0')
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
+
+*  Initialise
       CALL MSG_PRNT(VERSION)
-*
       CALL AST_INIT()
-*
-* Get input data from file
-      CALL TIM_GETDATA(LOC, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
-     &                                            VPNTR, STATUS)
-*
+
+*  Get input data from file
+      CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
+     :                                        VPNTR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-* Set data format flag depending on the presence of variance
+
+*  Set data format flag depending on the presence of variance
       IF (LVAR) THEN
 *
          FILFLG = 3
@@ -181,10 +177,10 @@ C        READ *, LGXFL,LGYFL
 *************** the possibility to change them.                *
 ****************************************************************
 
-* Calculate the min and max times in the data
+*  Calculate the min and max times in the data
       CALL ARR_RANG1R(NGOOD, %val(TPNTR), TMIN, TMAX, STATUS )
-*
-* Calc a rough time resolution
+
+*  Calc a rough time resolution
       TIMDIF = TMAX - TMIN
       TIMRES = TIMDIF / (NGOOD-1)
 *
@@ -359,52 +355,44 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
         ZAXIS='POWER'
         FILTIT='SPECT1'
         TITLE=
-     +    'POWER SPECTRUM ( '//FILE1(:INDEX(FILE1,' '))//')'
-     +     //' '//CHAINT(FILFLG)//'-'//CHAINT(AVERFL)//' '
-*
-* Calc the number of points in periodogram
-        NPOI = KNUM+1
-*
-* Copy double precision results into single precision arrays
-        CALL CLEANPOW_REWRITE(NPOI, %val(FPTR), %val(PPTR),
-     &            %val(PHPTR), %val(SFPTR), %val(SPPTR), %val(SPHPTR))
-*
-* Plot the output periodogram
-        CALL PLTXYZ(%val(SFPTR), %val(SPHPTR), %val(SPPTR),
-     &              NPOI, XAXIS, YAXIS, ZAXIS, TITLE, 0, 0, 0, 0,
-     &              XMAX, XMIN, YMAX, YMIN, ZMAX, ZMIN)
+     :    'POWER SPECTRUM ( '//FILE1(:INDEX(FILE1,' '))//')'
+     :     //' '//CHAINT(FILFLG)//'-'//CHAINT(AVERFL)//' '
 
-* Find the frequency base and increment
-        CALL ARR_RANG1R(NPOI, %val(SFPTR), FMIN, FMAX, STATUS )
+*  Calc the number of points in periodogram
+      NPOI = KNUM+1
+
+*  Copy double precision results into single precision arrays
+      CALL CLEANPOW_REWRITE(NPOI, %val(FPTR), %val(PPTR),
+     :            %val(PHPTR), %val(SFPTR), %val(SPPTR), %val(SPHPTR))
+
+*  Plot the output periodogram
+      CALL PLTXYZ( %val(SFPTR), %val(SPHPTR), %val(SPPTR),
+     :              NPOI, XAXIS, YAXIS, ZAXIS, TITLE, 0, 0, 0, 0,
+     :              XMAX, XMIN, YMAX, YMIN, ZMAX, ZMIN)
+
+*  Find the frequency base and increment
+      CALL ARR_RANG1R(NPOI, %val(SFPTR), FMIN, FMAX, STATUS )
+      FINC = (FMAX - FMIN) / REAL (NPOI-1)
+
+*  Write the output file. Periodogram
+      CALL TIM_PUTOUT( 'OUT', 'POWER_SPECTRUM', NPOI,
+     :                  %val(SPPTR), FMIN, FINC, OFID, STATUS )
+
+*  Add axis label
+      CALL BDI_PUTAXTEXT(OFID, 1, 'Frequency', 'Hz', STATUS)
+
+*  Add history
+      CALL HSI_NEW(OFID, STATUS)
+      CALL HSI_ADD(OFID, VERSION, STATUS)
+
+*  Tidy up
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
+      END
+
+
 *
-        FINC = (FMAX - FMIN) / REAL (NPOI-1)
-*
-* Write the HDS file. Periodogram
-        CALL TIM_OUTPUT('OUT', 'POWER_SPECTRUM', NPOI,
-     &                  %val(SPPTR), FMIN, FINC, LOCO, STATUS)
-*
-*   Add axis label
-        CALL BDA_PUTAXLABEL(LOCO, 1, 'Frequency', STATUS)
-        CALL BDA_PUTAXUNITS(LOCO, 1, 'Hz', STATUS)
-*
-        IF (STATUS .NE. SAI__OK) THEN
-           CALL MSG_PRNT('Error writing output file')
-           GOTO 999
-        ENDIF
-*
-*   Add history
-        CALL HIST_NEW(LOCO, STATUS)
-        CALL HIST_ADD(LOCO, VERSION, STATUS)
-*
-999     CONTINUE
-*
-        IF (STATUS .NE. SAI__OK) THEN
-           CALL ERR_REP(' ','from CLEANPOW',STATUS)
-        ENDIF
-*
-        END
-*
-**********************************************************************
          SUBROUTINE SCLNFT(T,X,W,N,NN,MAXITE,CLNLIM,
      +              SMOOTH,WIDTH,GAIN,MAXFR,MINFR,FREQST,NOAVER,
      +              NOPRT,NUFREQ,
