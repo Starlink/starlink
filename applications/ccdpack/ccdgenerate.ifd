@@ -24,7 +24,7 @@
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
 #     21-FEB-2001 (MBT):
-#        Added CONTAINER parameter.
+#        Added CONTAINER, DATANAME, BIASNAME, FFNAME parameters.
 #     {enter_changes_here}
 
 #-
@@ -104,6 +104,33 @@
             ppath CURRENT DEFAULT
             default .sdf
             prompt {Output data type}
+          }
+
+         parameter biasname {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Base name for output bias NDFs}
+            default {bias}
+          }
+
+         parameter ffname {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Base name for output flat field NDFs}
+            default {ff}
+          }
+
+         parameter dataname {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Base name for output data NDFs}
+            default {data}
           }
 
          parameter logto {

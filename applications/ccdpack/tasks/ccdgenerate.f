@@ -34,14 +34,23 @@
 *        If the values for any or all of the sequences are missing they 
 *        are assumed to be zero. 
 *        [0]
+*     BIASNAME = LITERAL (Read)
+*        The base name for output bias frames.  If CONTAINER is true,
+*        this will give the name of the HDS container file, otherwise 
+*        it will have an integer appended to it to provide the NDF
+*        name for each member of the sequence.
+*        [bias]
 *     CONTAINER = _LOGICAL (Read)
 *        If true, then all the output frames of each type will be
-*        written into a single HDS container file (data files into
-*        one called 'data', flat fields into one called 'ff' and
-*        bias frames into one called 'bias').  If false they will
-*        be written into multiple separate files, called data1, data2...
-*        ff1, ff2,... and bias1, bias2,....
+*        written into a single HDS container file.  If false they will
+*        be written into multiple separate files.
 *        [FALSE]
+*     DATANAME = LITERAL (Read)
+*        The base name for output data frames.  If CONTAINER is true,
+*        this will give the name of the HDS container file, otherwise 
+*        it will have an integer appended to it to provide the NDF
+*        name for each member of the sequence.
+*        [data]
 *     FILE = LITERAL (Read)
 *        Name of a text file which contains the object identifiers,
 *        X and Y positions (pixel coordinates), total intensities
@@ -53,6 +62,12 @@
 *            3     58.693     9.092      3924.      0.227
 *            4     39.359    10.288       198.      0.157
 *            5     17.080    25.503      4256.      0.074
+*     FFNAME = LITERAL (Read)
+*        The base name for output flat field frames.  If CONTAINER is true,
+*        this will give the name of the HDS container file, otherwise 
+*        it will have an integer appended to it to provide the NDF
+*        name for each member of the sequence.
+*        [ff]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter, then no logfile will be written, regardless of
@@ -106,11 +121,7 @@
 *     -  The log file information is very restricted from this
 *     application, just enough to monitor progress is given.
 *
-*     - The output NDFs are named, dataN, ffN and biasN (or just dataN if
-*     REDUCED is TRUE), where N is the current sequence number. 
-*     If CONTAINER is true though, they will be written into multiple-
-*     NDF HDS container files called just data, ff, and bias.
-*     All output data is of type _REAL.
+*     - All output data is of type _REAL.
 
 *  Examples:
 *     ccdgenerate nseq=4 file=test.obj pixels=[128,128]
@@ -126,6 +137,10 @@
 *        This generates just one file, data1, containing an image of the
 *        objects described in file test.obj which does not need to be
 *        debiassed or flat-fielded.
+*
+*     ccdgenerate nseq=4 reduced dataname=testset container=true
+*        This will produce just one HDS container file "testset.sdf",
+*        into which will be written four NDF structures.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -165,7 +180,7 @@
 *     26-APR-1999 (MBT):
 *        Added REDUCED parameter.
 *     21-FEB-2001 (MBT):
-*        Added CONTAINER parameter.
+*        Added CONTAINER, DATANAME, BIASNAME and FFNAME parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,6 +196,7 @@
       INCLUDE 'DAT_PAR'         ! HDS/DAT constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameters
       INCLUDE 'AST_PAR'         ! AST parameters
+      INCLUDE 'GRP_PAR'         ! GRP parameters
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -199,6 +215,9 @@
       CHARACTER * ( DAT__SZLOC ) LOCBIA ! Locator for bias container file
       CHARACTER * ( DAT__SZLOC ) LOCDAT ! Locator for data container file
       CHARACTER * ( DAT__SZLOC ) LOCFF ! Locator for flatfile container file
+      CHARACTER * ( GRP__SZNAM ) BASBIA ! Base name for bias frames
+      CHARACTER * ( GRP__SZNAM ) BASDAT ! Base name for data frames
+      CHARACTER * ( GRP__SZNAM ) BASFF ! Base name for flat field frames
       INTEGER DIMS( 2 )         ! Dimensions of NDF
       INTEGER EL                ! Number of data elements
       INTEGER FDIN              ! Input file identifier
@@ -358,19 +377,11 @@
 *  See if we are going to write into container files.
       CALL PAR_GET0L( 'CONTAINER', CNTNR, STATUS )
 
-*  If so, construct them.
-      LOCDAT = DAT__ROOT
-      LOCFF = DAT__ROOT
-      LOCBIA = DAT__ROOT
-      IF ( CNTNR ) THEN
-         CALL HDS_NEW( 'data', 'DATA', 'NDF_CONTAINER', 0, 0, LOCDAT,
-     :                 STATUS )
-         IF ( .NOT. REDUCE ) THEN
-            CALL HDS_NEW( 'ff', 'FF', 'NDF_CONTAINER', 0, 0, LOCFF,
-     :                    STATUS )
-            CALL HDS_NEW( 'bias', 'BIAS', 'NDF_CONTAINER', 0, 0, LOCBIA,
-     :                    STATUS )
-         END IF
+*  Get base names for NDFs.
+      CALL PAR_GET0C( 'DATANAME', BASDAT, STATUS )
+      IF ( .NOT. REDUCE ) THEN
+         CALL PAR_GET0C( 'FFNAME', BASFF, STATUS )
+         CALL PAR_GET0C( 'BIASNAME', BASBIA, STATUS )
       END IF
 
 *  Zero any angles not explicitly set.
@@ -385,6 +396,24 @@
 *  Get the foreign file type for the data (if needed).
       CALL PAR_GET0C( 'TYPE', TYPE, STATUS )
       IF ( TYPE .EQ. '.sdf' .OR. TYPE .EQ. '.SDF' ) TYPE = ' '
+
+*  If we're going to use container files, construct them.
+      LOCDAT = DAT__ROOT
+      LOCFF = DAT__ROOT
+      LOCBIA = DAT__ROOT
+      IF ( CNTNR ) THEN
+         CALL HDS_NEW( BASDAT, 'DATA', 'NDF_CONTAINER', 0, 0, LOCDAT,
+     :                 STATUS )
+         BASDAT = 'D'
+         IF ( .NOT. REDUCE ) THEN
+            CALL HDS_NEW( BASFF, 'FF', 'NDF_CONTAINER', 0, 0, LOCFF,
+     :                    STATUS )
+            BASFF = 'F'
+            CALL HDS_NEW( BASBIA, 'BIAS', 'NDF_CONTAINER', 0, 0, LOCBIA,
+     :                    STATUS )
+            BASBIA = 'B'
+         END IF
+      END IF
 
 *  Exit if there have been errors.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -408,9 +437,10 @@
      :                 STATUS )
 
 *  Get the object frame.
-         CALL CHR_ITOC( I, COUNT, NCHAR )
-         FNAME = 'data'//COUNT( :NCHAR )//TYPE
-         CALL NDF_PLACE( LOCDAT, FNAME, PLACE, STATUS )
+         CALL MSG_SETC( 'BASE', BASDAT )
+         CALL MSG_SETI( 'SEQ', I )
+         CALL MSG_LOAD( ' ', '^BASE^SEQ', FNAME, NCHAR, STATUS )
+         CALL NDF_PLACE( LOCDAT, FNAME( 1:NCHAR ), PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
 
 *  Generate mapping into image generation frame.
@@ -459,9 +489,10 @@
          IF ( .NOT. REDUCE ) THEN
 
 *  Bias frame.
-            CALL CHR_ITOC( I, COUNT, NCHAR )
-            FNAME = 'bias'//COUNT( :NCHAR )//TYPE
-            CALL NDF_PLACE( LOCBIA, FNAME, PLACE, STATUS )
+            CALL MSG_SETC( 'BASE', BASBIA )
+            CALL MSG_SETI( 'SEQ', I )
+            CALL MSG_LOAD( ' ', '^BASE^SEQ', FNAME, NCHAR, STATUS )
+            CALL NDF_PLACE( LOCBIA, FNAME( 1:NCHAR ), PLACE, STATUS )
             CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
             CALL NDF_PTWCS( IWCS, IDB, STATUS )
 
@@ -474,9 +505,10 @@
             CALL CCD1_ANOI( %VAL( IPBIA ), EL, 1.0, STATUS )
 
 *  Flatfield frame.
-            CALL CHR_ITOC( I, COUNT, NCHAR )
-            FNAME = 'ff'//COUNT( :NCHAR )//TYPE
-            CALL NDF_PLACE( LOCFF, FNAME, PLACE, STATUS )
+            CALL MSG_SETC( 'BASE', BASFF )
+            CALL MSG_SETI( 'SEQ', I )
+            CALL MSG_LOAD( ' ', '^BASE^SEQ', FNAME, NCHAR, STATUS )
+            CALL NDF_PLACE( LOCFF, FNAME( 1:NCHAR ), PLACE, STATUS )
             CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
             CALL NDF_PTWCS( IWCS, IDF, STATUS )
 
