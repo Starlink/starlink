@@ -91,6 +91,11 @@
 <!USEMAP	textmap		
 		(p | px | title | tabular | routinename | author)
 		>
+<!-- ...but simplify it where it's liable to cause trouble (limit it
+     to just the omission of comment-characters) -->
+<!USEMAP	prologuemap
+		(m | mequation | meqnarray | verbatim | code | kbd)
+		>
 
 <!--
   Now some tricksier stuff for documenting routine parameters.
