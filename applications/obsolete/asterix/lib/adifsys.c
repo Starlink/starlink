@@ -471,6 +471,7 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
   ADIobj		rval = id;
   ADIobj		ocls;
   ADIlogical  		atend;
+  ADIobj 		newid;
   int			icp,jcp,fjcp;
 
 /* Check inherited global status. Return input argument if bad */
@@ -482,8 +483,9 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /* Class name of opened object */
   ocls = _DTDEF(id)->aname;
 
-/* Loop over class list supplied to see if we have a match */
+/* Loop over supplied classes trying to create the link */
   icp = 0;
+  found = ADI__false;
   while ( (icp < clen) && _ok(status) && ! found ) {
 
 /* Find end of this class name */
@@ -499,39 +501,11 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /* Store end of first word for later */
     if ( ! icp ) fjcp = jcp;
 
-/* Doesn't match what we've got? Advance to next class name */
+/* Wildcard class? */
     if ( (cls[icp] == '*') && ((jcp-icp) == 1) ) {
       found = ADI__true;
       }
     else {
-      if ( strx_cmpc( cls + icp, jcp - icp, ocls ) )
-	icp = jcp + 1;
-      else
-	found = ADI__true;
-      }
-    }
-
-/* We haven't matched any of the requested classes? */
-  if ( ! found ) {
-    ADIobj newid;
-
-/* Loop over supplied classes trying to create the link */
-    icp = 0;
-    found = ADI__false;
-    while ( (icp < clen) && _ok(status) && ! found ) {
-
-/*   Find end of this class name */
-      jcp = icp;
-      atend = ADI__false;
-      while ( (jcp<clen) && ! atend ) {
-	if ( cls[jcp] == '|' )
-	  atend = ADI__true;
-	else
-	  jcp++;
-	}
-
-/* Store end of first word for later */
-      if ( ! icp ) fjcp = jcp;
 
 /* Create instance of class */
       adix_newn( ADI__nullid, NULL, 0, cls+icp, jcp-icp, 0, NULL,
@@ -546,8 +520,9 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 	rval = newid;
 	}
 
-/* Retry? Link routine has safely decided it can't handle our data */
-      else if ( *status == ADI__RETRY ) {
+/* Retry? Link routine has safely decided it can't handle our data, or */
+/* we have other classes we can try */
+      else if ( (*status == ADI__RETRY) || (jcp<clen) ) {
 
 /*   Cancel the bad status */
 	adic_erranl( status );
