@@ -90,6 +90,11 @@
 
 *  Attempt to read an object from the current channel.
       IAST = AST_READ( CHAN, STATUS )
+      IF( IAST .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'ATL1_RDCH_ERR1', 'No AST Object could be '//
+     :                 'read from the supplied file.', STATUS )
+      END IF
 
 *  Export the returned Object from the current AST context so that it is
 *  not annulled by the following call to AST_END. If an error has occurred,

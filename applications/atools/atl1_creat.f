@@ -94,7 +94,7 @@
       CALL AST_ANNUL( CHAN, STATUS )
 
 *  Close the file.
-      CALL FIO_ANNUL( FD, STATUS )
+      CALL FIO_CLOSE( FD, STATUS )
 
       END
 
