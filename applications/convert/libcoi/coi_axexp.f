@@ -380,6 +380,7 @@
             ELSE
                SYSTEM = 'MULTISPEC'
                NDIM = 2
+               ATYPE( NDIM ) = ATYPE( 1 )
             END IF
          END IF
 
@@ -749,7 +750,7 @@
 *  =================================================
 *
 *  This is written to the WAT2_nnn headers.
-                ELSE IF ( I .EQ. 2 ) THEN
+               ELSE IF ( I .EQ. 2 ) THEN
 
 *  Use the appropriate data type.
                   IF ( ATYPE( I ) .EQ. '_DOUBLE' ) THEN
