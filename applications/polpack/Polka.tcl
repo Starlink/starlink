@@ -303,6 +303,22 @@
    }
    set env(AGI_USER) $ADAM_USER
 
+#  Create a directory in which POLKA can keep the temporary files it
+#  creates. This directory will be deleted on exit. Try to put it in
+#  HDS_SCRATCH, if defined, and in the current directory otherwise.
+   if { [info exists env(HDS_SCRATCH)] } {
+      set dir $env(HDS_SCRATCH)
+   } {
+      set dir [pwd]
+   }
+   set POLKA_SCRATCH "$dir/polka_temp_[pid]"
+
+# Make sure this new directory exists (delete any existing version).
+   if { [file exists $POLKA_SCRATCH] } {
+      catch {exec rm -r -f $POLKA_SCRATCH}
+   }
+   catch {exec mkdir -p $POLKA_SCRATCH}
+
 # Record the process id's of any existing KAPPA processes. All new processes
 # are killed on exit, but processes active on entry are not killed.
    if { ![ catch {exec ps | grep kappa | grep -v grep | \

@@ -356,7 +356,7 @@ proc BeginUF {} {
 #  Globals:
 #     IFILE (Read)
 #        Temporary file names created by UniqueFile are stored in Polka's
-#        temporary ADAM_USER directory so that they are deleted when
+#        temporary POLKA_SCRATCH directory so that they are deleted when
 #        Polka terminates. They have a name of the form polka<i> where 
 #        <i> is an integer, which is different for each file and
 #        increases monotonically throughout the execution of Polka. IFILE
@@ -5094,11 +5094,12 @@ proc EndUF {context leave} {
 #        context. 
 #
 #  Globals:
-#     ADAM_USER (Read)
-#       The path to the temporary ADAM_USER directory used by Polka.
+#     POLKA_SCRATCH 
+#       The path to the temporary directory used to store temporary images 
+#       created by Polka.
 #     IFILE (Read)
 #        Temporary file names created by UniqueFile are stored in Polka's
-#        temporary ADAM_USER directory so that they are deleted when
+#        temporary POLKA_SCRATCH directory which is deleted when
 #        Polka terminates. They have a name of the form polka<i> where 
 #        <i> is an integer, which is different for each file and
 #        increases monotonically throughout the execution of Polka. IFILE
@@ -5109,7 +5110,7 @@ proc EndUF {context leave} {
 #-
    global IFILE
    global IFILE_STACK
-   global ADAM_USER
+   global POLKA_SCRATCH
 
 # Loop round each value of IFILE used in this context. This starts with
 # the value stored by the corresponding call to BeginUF, and ends with
@@ -5120,7 +5121,7 @@ proc EndUF {context leave} {
 
 # Construct the corresponding file name (NB, make sure this next line keeps
 # in step with any changes made in rocedure UniqueFile).
-      set file "$ADAM_USER/polka$i"
+      set file "$POLKA_SCRATCH/polka$i"
 
 # If the file exists (with any file extension), but has not been included
 # in the supplied list of files to be escaped, then delete the file.
@@ -5161,6 +5162,8 @@ proc exit {args} {
 #    OLDKAPPA (Read)
 #       A list of process id.s for any KAPPA processes which were running
 #       when Polka was started.
+#    POLKA_SCRATCH (Read)
+#       The path to the directory used by Polka to store temporary NDFs.
 #
 #  Notes:
 #    - This command replaces the built-in Tcl "exit" command, which should
@@ -5175,6 +5178,7 @@ proc exit {args} {
    global OLD_AGI_USER
    global OLDCCDPACK
    global OLDKAPPA
+   global POLKA_SCRATCH
 
 # Close any log file.
    if { $LOGFILE_ID != "" } { close $LOGFILE_ID }
@@ -5188,6 +5192,9 @@ proc exit {args} {
 
 # Delete the temporary ADAM_USER directory created at the start.
    catch "exec rm -rf $ADAM_USER"
+
+# Delete the POLKA_SCRATCH directory created at the start.
+   catch "exec rm -rf $POLKA_SCRATCH"
 
 # Trap pids for all current KAPPA processes.
    if { ![catch {exec ps | grep kappa | grep -v grep | \
@@ -13687,7 +13694,7 @@ proc UniqueFile {} {
 #
 #  Purpose:
 #     Returns a unique file name for which no file currently exists.
-#     These files are created in the temporary ADAM_USER directory
+#     These files are created in the POLKA_SCRATCH directory
 #     created by Polka, and so do not need to be deleted when finished
 #     with as they will all be deleted when the temporary ADAM_USER
 #     directory is deleted when Polka exits.
@@ -13699,8 +13706,8 @@ proc UniqueFile {} {
 #     The file name.
 #
 #  Globals:
-#     ADAM_USER (Read)
-#        The path to the temporary ADAM_USER directory used by Polka.
+#     POLKA_SCRATCH (Read)
+#        The path to the POLKA_SCRATCH directory.
 #     IFILE (Read and Write)
 #        File names have a name of the form polka<i> where <i> is an 
 #        integer, which is different for each file. IFILE
@@ -13709,15 +13716,15 @@ proc UniqueFile {} {
 #        that used last time.
 #
 #-
-   global ADAM_USER
+   global POLKA_SCRATCH
    global IFILE
 
    incr IFILE
-   set file "$ADAM_USER/polka$IFILE"
+   set file "$POLKA_SCRATCH/polka$IFILE"
 
    while { [llength [glob -nocomplain ${file}.*] ] != 0 } {
       incr IFILE
-      set file "$ADAM_USER/polka$IFILE"
+      set file "$POLKA_SCRATCH/polka$IFILE"
    }
 
    return $file
