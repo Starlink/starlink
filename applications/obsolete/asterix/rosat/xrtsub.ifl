@@ -30,6 +30,7 @@ INTERFACE XRTSUB
                HELP 'Enter dataset name without an extension'
             ENDPARAMETER
 
+
      PARAMETER ROOTNAME
                TYPE    '_CHAR'
                PROMPT  'Rootname of files to sort'
