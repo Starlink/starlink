@@ -88,7 +88,7 @@ endif !%?INSTALLMANIFEST%
 if %?LATEXDOCS%
 # Templates to generate documentation
 .tex.dvi:
-	latex $<
+	latex $<; latex $<
 .dvi.ps:
 	dvips -o $@ $<
 # Don't express a dependency via the directory .htx, or else Make
