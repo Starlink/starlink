@@ -39,7 +39,7 @@
 #include "adiparse.h"
 #include "adierror.h"                   /* ADI error handling */
 
-
+ADIclassDef	*cdef_lst;
 ADIobj       UT_ALLOC_list;             /* _List object allocator */
 
 ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
@@ -83,6 +83,8 @@ void lstx_init( ADIstatus status )
   adic_defcls( "List", "", "first,rest", &UT_ALLOC_list, status );
 
   adic_defprt( UT_ALLOC_list, (ADIcMethodCB) lstx_print, status );
+
+  cdef_lst = _cdef_data(UT_ALLOC_list);
   }
 
 
@@ -131,8 +133,9 @@ ADIobj lstx_revrsi( ADIobj list, ADIstatus status )
   if ( _ok(status) )
     {
     while ( _valid_q(curp) ) {
-      ADIobj next = _CDR(curp);
-      _CDR(curp) = last;
+      ADIobj	*cdr = &_CDR(curp);
+      ADIobj next = *cdr;
+      *cdr = last;
 
       last = curp;
       curp = next;
@@ -155,22 +158,14 @@ ADIobj lstx_rest( ADIobj list, ADIstatus status )
 
 ADIobj lstx_cell( ADIobj aid, ADIobj bid, ADIstatus status )
   {
-  ADIobj	*car,*cdr;
-  ADIobj    lid;
+  ADIobj	idata[2];
 
-  if ( !_ok(status) )                   /* Check status on entry */
-    return ADI__nullid;
+/* Set up initialisation */
+  idata[0] = aid;
+  idata[1] = bid;
 
-  lid = adix_cls_alloc( _cdef_data(UT_ALLOC_list), status );
-
-  if ( _ok(status) ) {
-    _GET_CARCDR_A(car,cdr,lid);
-
-    *car = aid;
-    *cdr = bid;
-    }
-
-  return lid;
+/* Create object with data */
+  return adix_cls_nallocd( cdef_lst, 0, 0, idata, status );
   }
 
 ADIobj lstx_new2( ADIobj aid, ADIobj bid, ADIstatus status )
@@ -233,18 +228,17 @@ ADIobj lstx_append( ADIobj lst1, ADIobj lst2, ADIstatus status )
  */
 void lstx_inscel( ADIobj id, ADIobj **ipoint, ADIstatus status )
   {
-  ADIobj	*car,*cdr;
+  ADIobj	idata[2];
   ADIobj	lid;
 
-  lid = adix_cls_alloc( _cdef_data(UT_ALLOC_list), status );
+  idata[0] = id;
+  idata[1] = ADI__nullid;
+
+  lid = adix_cls_nallocd( cdef_lst, 0, 0, idata, status );
 
   if ( _ok(status) ) {
-    _GET_CARCDR_A(car,cdr,lid);
-
-    *car = id;
-    *cdr = ADI__nullid;
     **ipoint = lid;
-    *ipoint = cdr;
+    *ipoint = &_CDR(lid);
     }
   }
 

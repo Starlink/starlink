@@ -36,6 +36,7 @@
 /*
  * The class definition object
  */
+ADIclassDef	*cdef_etn;
 ADIobj	UT_ALLOC_etn = ADI__nullid;
 
 
@@ -123,6 +124,37 @@ void ADIexprPushFS( int tslot, ADIobj func, ADIstatus status )
   else
     adic_setecs( ADI__OUTMEM, "ADI has overflowed its frame stack", status );
   }
+
+
+void ADIexecRaise( ADIobj except, char *message, ADIstatus status )
+  {
+  fs_top->exec = except;
+  *status = ADI__UNWIND;
+/*  if ( message )
+    ems_rep_c( " ", message, status );
+  else
+    {
+    ECIstringTok( "EXCEP", except );
+    ems_rep_c( " ", "^EXCEP", status );
+    } */
+  }
+
+void ADIexecReset( ADIstatus status )
+  {
+  ems_annul_c( status );
+  if ( *status == ADI__UNWIND )
+    ems_annul_c( status );
+
+  adix_erase( &fs_top->exec, 1, status );
+  }
+
+
+void ADIexecAccept( ADIobj except, ADIstatus status )
+  {
+  if ( fs_top->exec == except )
+    ADIexecReset( status );
+  }
+
 
 
 /*
@@ -403,6 +435,8 @@ ADIobj ADIsymFind( ADIobj name, ADIlogical takefirst, int forms,
 ADIobj ADIsymAddBind( ADIobj name, ADIlogical global, ADIobj bind,
 		      ADIstatus status )
   {
+  ADIsymBinding		*bdata = _sbind_data(bind);
+  ADIsymBinding		*cbdata;
   ADIstackFrame		*fs;
   ADIinteger		exclusive_forms = ADI__class_sb|ADI__mcf_sb;
   ADIobj	nvpair;
@@ -413,25 +447,26 @@ ADIobj ADIsymAddBind( ADIobj name, ADIlogical global, ADIobj bind,
 
   if ( _ok(status) && _valid_q(nvpair) ) {
     ADIobj		*ipoint = &_CDR(nvpair);
-    ADIsbindForm	iform = _sbind_form(bind);
+    ADIsbindForm	iform = bdata->form;
     ADIlogical		ok = ADI__true;
     ADIobj		cbind = *ipoint;
 
 /* Check if binding form demands that only one binding should exist */
     if ( _valid_q(cbind) && (iform & exclusive_forms) ) {
       while ( _valid_q(cbind) && ok ) {
-	if ( iform == _sbind_form(cbind) ) {
+	cbdata = _sbind_data(cbind);
+	if ( iform == cbdata->form ) {
 	  adic_setecs( ADI__SYMDEF,
 		"Symbol already has a binding of requested form", status );
 	  }
 	else
-	  cbind = _sbind_next(cbind);
+	  cbind = cbdata->next;
 	}
       }
 
 /* Add binding to head of symbol binding list */
     if ( ok ) {
-      _sbind_next(bind) = *ipoint;
+      bdata->next = *ipoint;
       *ipoint = bind;
       }
     }
@@ -442,24 +477,14 @@ ADIobj ADIsymAddBind( ADIobj name, ADIlogical global, ADIobj bind,
 
 ADIobj ADIsbindNew( ADIsbindForm form, ADIobj data, ADIstatus status )
   {
-  ADIsymBinding	*bind;
-  ADIobj	newid;
+  ADIsymBinding	bind;
 
-  _chk_stat_ret(ADI__nullid);
+  bind.form = form;
+  bind.defn = data;
+  bind.next = ADI__nullid;
 
 /* Allocate the new binding object */
-  newid = adix_cls_alloc( &KT_DEFN_sbind, status );
-
-/* Set fields if allocation went ok */
-  if ( _ok(status) ) {
-    bind = _sbind_data(newid);
-
-    bind->form = form;
-    bind->defn = data;
-    }
-
-/* Return binding to caller */
-  return newid;
+  return adix_cls_nallocd( &KT_DEFN_sbind, 0, 0, &bind, status );
   }
 
 
@@ -468,17 +493,12 @@ ADIobj ADIsbindNew( ADIsbindForm form, ADIobj data, ADIstatus status )
  */
 ADIobj ADIetnNew( ADIobj head, ADIobj args, ADIstatus status )
   {
-  ADIobj    id = ADI__nullid;
+  ADIobj	idata[2];
 
-  if ( _ok(status) ) {
-    id = adix_cls_alloc( _cdef_data(UT_ALLOC_etn), status );
+  idata[0] = head;
+  idata[1] = args;
 
-    if ( _ok(status) ) {
-      _etn_head(id) = head; _etn_args(id) = args;
-      }
-    }
-
-  return id;
+  return adix_cls_nallocd( cdef_etn, 0, 0, idata, status );
   }
 
 
@@ -521,18 +541,21 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 			ADIstatus status )
   {
   ADIobj                a_bind;         /* Loop over binding list */
+  ADIclassDef		*acdef;		/* Argument class definition */
   ADIlogical               all_list;
   ADIlogical               anyargeval;     /* Any arguments changed? */
   ADIlogical               argchanged;
   ADIsymBinding		*bind;
   ADIlogical               onstack = ADI__false;/* Arguments already on stack? */
   ADIobj                carg;           /* Loop over arguments */
+  char			*data;
   ADIobj		earg;
   ADIlogical            defer_error = ADI__false;
   ADIlogical            finished = ADI__false;
   ADIlogical	    	hasargs;
   ADIlogical	    	hasprops;
   ADIobj		head;
+  ADIobj		*hpobj;		/* Header property list address */
   ADIinteger		iarg;
   ADIlogical		is_etn;
   int                   iter = 0;       /* Iterations through eval loop */
@@ -567,13 +590,16 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
     if ( _etn_q(expr) ) {
       is_etn = ADI__true;
       _GET_HEDARG( head, earg, expr );
-      hasprops = _valid_q(_han_pl(head));
       }
     else
       is_etn = ADI__false;
 
 /* Structured expression? */
     if ( is_etn && _valid_q(earg) ) {
+
+/* Locate property list */
+      hpobj = &_han_pl(head);
+      hasprops = _valid_q(*hpobj);
 
       wereonstack = onstack;
 
@@ -616,17 +642,17 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
       if ( _valid_q(s_bind) && hasargs && hasprops ) {
 
 /* HoldAll arguments? */
-	if ( _valid_q(adix_pl_geti(head, K_HoldAll, status )) )
+	if ( _valid_q(adix_pl_fgeti(hpobj, K_HoldAll, status )) )
 	  vs_first = vs_last + 1;
 
 	else {
 
 /* HoldFirst argument? */
-	  if ( _valid_q(adix_pl_geti( head, K_HoldFirst, status )) )
+	  if ( _valid_q(adix_pl_fgeti( hpobj, K_HoldFirst, status )) )
 	    vs_first++;
 
 /* HoldRest arguments? */
-	  if ( _valid_q(adix_pl_geti( head, K_HoldRest, status )) )
+	  if ( _valid_q(adix_pl_fgeti( hpobj, K_HoldRest, status )) )
 	    vs_last = vs_first;
 	  }
 	}
@@ -652,17 +678,35 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	  }
 	}
 
+/* Initialise the counter which denotes the next argument whose class is to be */
+/* ascertained. By storing that information during the Listable test we don't  */
+/* waste it when testing function symbol bindings */
+      iarg = 0;
+
 /* Listable form? */
       if ( hasargs && hasprops ) {
 	all_list = ADI__true;              /* Are all the arguments lists? */
 	_ARGLOOP_1ST_TO_NTH_AND(vs_ptr,all_list) {
+
 	  this_a_list = ADI__false;
 	  if ( _valid_q(*vs_ptr) ) {
-	    if ( _list_q(*vs_ptr) )
+
+/* Get argument class */
+	    data = adix_iddt( *vs_ptr, &acdef );
+	    if ( acdef == &KT_DEFN_han )
+	      argcls[iarg] = acdef = _ID_TYPE(((ADIobjHan *) data)->id);
+	    else
+	      argcls[iarg] = acdef;
+
+	    if ( acdef->selfid == UT_ALLOC_list )
 	      this_a_list = ADI__true;
-	    else if ( _etn_q(*vs_ptr) )
+	    else if ( acdef == cdef_etn )
 	      this_a_list = (_etn_head(*vs_ptr) == K_List);
 	    }
+	  else
+	    argcls[iarg] = NULL;
+
+	  iarg++;
 
 	  all_list &= this_a_list;
 	  }
@@ -677,7 +721,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
       if ( all_list ) {
 
 /* Listable function? */
-	if ( _valid_q(adix_pl_geti(head, K_Listable, status )) ) {
+	if ( _valid_q(adix_pl_fgeti(hpobj, K_Listable, status )) ) {
 
 /* Get length of first list */
 	  lroot = _list_q(*vs_base) ? *vs_base : _etn_args(*vs_base);
@@ -723,16 +767,14 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	if ( _valid_q(s_bind) ) {
 
 /* Put argument classes into argcls */
-	  for( iarg=0, vs_ptr = vs_base; vs_ptr <= vs_last; vs_ptr++, iarg++ ) {
-	    ADIclassDef	*tdef;
-	    char	*data;
+	  for( vs_ptr = vs_base + iarg; vs_ptr <= vs_last; vs_ptr++, iarg++ ) {
 
 	    if ( _valid_q(*vs_ptr) ) {
-	      data = adix_iddt( *vs_ptr, &tdef );
-	      if ( tdef == &KT_DEFN_han )
+	      data = adix_iddt( *vs_ptr, &acdef );
+	      if ( acdef == &KT_DEFN_han )
 		argcls[iarg] = _ID_TYPE(((ADIobjHan *) data)->id);
 	      else
-		argcls[iarg] = tdef;
+		argcls[iarg] = acdef;
 	      }
 	    else
 	      argcls[iarg] = NULL;
@@ -750,7 +792,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	    }
 	  }
 	else
-          match = ADI__false;
+	  match = ADI__false;
 
 	if ( match ) {                   /* Invoke function if match */
 	  a_bind = car_ab;
@@ -886,10 +928,37 @@ ADIobj ADIexprEval( ADIobj expr, ADIlogical ownres, ADIstatus status )
   }
 
 
+/*
+ *  Evaluate list of expressions, returning value of last one evaluated
+ */
+ADIobj ADIexprEvalList( ADIobj elist, ADIstatus status )
+  {
+  ADIobj	car,curp;
+  ADIobj	robj = ADI__nullid;
+
+  curp = elist;
+  while ( _valid_q(curp) && _ok(status) ) {
+    _GET_CARCDR(car,curp,curp);
+
+    if ( _valid_q(car) )
+      robj = ADIexprEval( car, ADI__false, status );
+    else
+      robj = ADI__nullid;
+
+    if ( _valid_q(curp) && _valid_q(robj) )
+      adix_erase( &robj, 1, status );
+    }
+
+  return robj;
+  }
+
+
 void ADIetnInit( ADIstatus status )
   {
 /* Define the expression node class */
   adic_defcls( "Expression", "", "head,args", &UT_ALLOC_etn, status );
+
+  cdef_etn = _cdef_data(UT_ALLOC_etn);
 
 /* Define the printer */
   adic_defprt( UT_ALLOC_etn, (ADIcMethodCB) ADIetnPrint, status );

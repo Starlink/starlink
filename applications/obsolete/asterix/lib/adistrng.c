@@ -58,8 +58,7 @@ char *strx_alloc( int len, ADIstatus status )
   int           found = ADI__false;
   char          *rval = NULL;
 
-  while ( curp && ! found )             /* Scan string stores for room */
-    {
+  while ( curp && ! found ) {           /* Scan string stores for room */
     if ( curp->nfree >= len )
       found = ADI__true;
     else
@@ -93,6 +92,7 @@ char *strx_alloc( int len, ADIstatus status )
   return rval;
   }
 
+#include <stdio.h>
 
 void strx_free( char *ptr, int len, ADIstatus status )
   {
@@ -104,14 +104,15 @@ void strx_free( char *ptr, int len, ADIstatus status )
 
   _chk_stat;
 
-  while ( curp && ! found )             /* Scan string stores for pointer */
-    {
-    pdif = ptr - curp->data;            /* Distance from data block start */
+/* Scan string stores for pointer */
+  while ( curp && ! found ) {
+
+/* Distance from data block start */
+    pdif = ptr - curp->data;
 
     if ( (pdif>=0) && (pdif<SS_CHARS) )
       found = ADI__true;
-    else
-      {
+    else {
       lcurp = curp; curp = curp->link;
       }
     }
@@ -124,8 +125,7 @@ void strx_free( char *ptr, int len, ADIstatus status )
 
     curp->nhit--;                       /* Decrease reference count on block */
 
-    if ( ! curp->nhit )                 /* Deallocate if gone to zero */
-      {
+    if ( ! curp->nhit ) {               /* Deallocate if gone to zero */
       StrStorePtr       dblock = curp;  /* The dead block */
 
       if ( ! lcurp )                    /* Is this the first block? */
@@ -157,7 +157,7 @@ ADIobj strx_dstrc( int narg, ADIobj args[], ADIstatus status )
   {
   ADIstring         *sptr = _str_data(args[0]);
 
-  if ( sptr->data )
+  if ( sptr->len )
     strx_free( sptr->data, sptr->len, status );
 
   return ADI__nullid;
@@ -298,8 +298,7 @@ int strx_hash( char *str, int slen, int tsize )
   register unsigned int	   lhash = 0;
 
 /* Calculate the hash value */
-  for ( cp = slen, sptr = str;
-	cp; cp-- )
+  for ( cp = slen, sptr = str; cp; cp-- )
     lhash += (lhash<<3) + *sptr++;
 
   return lhash % tsize;

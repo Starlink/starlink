@@ -359,7 +359,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
   _chk_init; _chk_stat;			/* Check status on entry */
 
-  _GET_NAME(fspec,flen);		/* Import strings resolving lengths */
+  _GET_STRING(fspec,flen);		/* Import strings resolving lengths */
   _GET_STRING(cls,clen);
   _GET_STRING(mode,mlen);
 
@@ -429,8 +429,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
     *status = istat;
 
     if ( ! ppos )
-      adic_setecs( ADI__INVARG, "File %*s cannot be opened", status,
-                   flen, fspec );
+      adic_setecs( ADI__INVARG, "File cannot be opened", status );
     }
 
 /* Opened ok? If so, write in details of representation and access mode */

@@ -57,6 +57,7 @@ ADIobj  K_Catch = ADI__nullid;
 ADIobj  K_Concat = ADI__nullid;
 ADIobj  K_Condition = ADI__nullid;
 
+ADIobj  K_DefClass = ADI__nullid;
 ADIobj  K_DefEnum = ADI__nullid;
 ADIobj  K_Divide = ADI__nullid;
 ADIobj  K_DivideBy = ADI__nullid;
@@ -102,6 +103,7 @@ ADIobj  K_PostInc = ADI__nullid;
 ADIobj  K_Power = ADI__nullid;
 ADIobj  K_PreDec = ADI__nullid;
 ADIobj  K_PreInc = ADI__nullid;
+ADIobj  K_Print = ADI__nullid;
 ADIobj  K_Put = ADI__nullid;
 
 ADIobj  K_Query = ADI__nullid;
@@ -1537,8 +1539,11 @@ void ADIdescribeToken( ADItokenType tok, char **str, int *len )
       {TOK__COLON,      "colon"},
       {TOK__COMMA,	"comma"},
       {TOK__CONST,	"constant"},
+      {TOK__LBRAK,	"left bracket ]"},
       {TOK__RBRAK,	"right bracket ]"},
+      {TOK__LBRACE,	"left brace }"},
       {TOK__RBRACE,	"right brace }"},
+      {TOK__LPAREN,	"left parenthesis"},
       {TOK__RPAREN,	"right parenthesis"},
       {TOK__SEMICOLON,  "semi-colon"},
       {TOK__SYM,        "symbol"},
@@ -2029,7 +2034,7 @@ ADIlogical ADIifMatchToken( ADIobj str, ADItokenType t, ADIstatus status )
  *  'endtok'. The list may be empty.
  */
 ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
-			   ADIstatus status )
+			   ADIlogical matchend, ADIstatus status )
   {
   ADIobj	*caradr;		/* Address of _CAR cell */
   ADIobj	robj = ADI__nullid;	/* Returned object */
@@ -2058,11 +2063,14 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
       _GET_CARCDR_A( caradr, lastlinkadr, thisarg );
 
 /* Parse list element into the _CAR cell */
-      *caradr = ADIparseExpInt( pstream, 10, status );
+      if ( ADIifMatchToken( pstream, TOK__COMMA, status ) )
+	*caradr = adix_clone( ADIcvNulCons, status );
+      else
+	*caradr = ADIparseExpInt( pstream, 10, status );
 
       if ( ! ADIifMatchToken( pstream, TOK__COMMA, status ) ) {
 	more = ADI__false;
-	if ( _strm_data(pstream)->ctok.t != endtok ) {
+	if ( matchend && (_strm_data(pstream)->ctok.t != endtok) ) {
 	  ADIdescribeToken( endtok, &tstr, &tlen );
 	  adic_setecs( ADI__SYNTAX,
 		"Error reading list - comma or %*s expected",
@@ -2076,7 +2084,8 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
     }
   while ( more && _ok(status) );
 
-  ADImatchToken( pstream, endtok, status );
+  if ( matchend )
+    ADImatchToken( pstream, endtok, status );
 
   return robj;
   }
@@ -2285,7 +2294,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
 /* Left parenthesis indicates start of function argument list */
       if ( ADIifMatchToken( stream, TOK__LPAREN, status ) )
-	_etn_args(expr) = ADIparseComDelList( stream, TOK__RPAREN, status );
+	_etn_args(expr) = ADIparseComDelList( stream, TOK__RPAREN, ADI__true, status );
 
 /* Underscore sequences indicate start of argument constraint spec */
       else if ( (str->ctok.t == TOK__UND1) ||
@@ -2304,7 +2313,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	symbol = expr;                  /* Store symbol for later */
 
 	expr = ADIetnNew( adix_clone( K_ArrayRef, status ),
-	      ADIparseComDelList( stream, TOK__RBRAK, status ),
+	      ADIparseComDelList( stream, TOK__RBRAK, ADI__true, status ),
 	      status );
 
 /* Splice symbol into arg list */
@@ -2318,7 +2327,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
 /* Parse the array elements and construct list constructor expression */
       expr = ADIetnNew( adix_clone( K_List, status ),
-	       ADIparseComDelList( stream, TOK__RBRAK, status ),
+	       ADIparseComDelList( stream, TOK__RBRAK, ADI__true, status ),
 	       status );
 
 /* Return an array constructor expression using the list */
@@ -2331,7 +2340,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
       ADInextToken( stream, status );
       expr = ADIetnNew( adix_clone( K_List, status ),/* Create List(e1..) constructor */
 	  ADIparseComDelList( stream,
-	    TOK__RBRACE, status ),
+	    TOK__RBRACE, ADI__true, status ),
 	  status );
       break;
 
@@ -2452,6 +2461,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Concat,"Concat"),
     CSTR_TENTRY(K_Condition,"Condition"),
 
+    CSTR_TENTRY(K_DefClass,"DefClass"),
     CSTR_TENTRY(K_DefEnum,"DefEnum"),
     CSTR_TENTRY(K_Divide,"Divide"),
     CSTR_TENTRY(K_DivideBy,"DivideBy"),
@@ -2497,6 +2507,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Power,"Power"),
     CSTR_TENTRY(K_PreDec,"PreDecrement"),
     CSTR_TENTRY(K_PreInc,"PreIncrement"),
+    CSTR_TENTRY(K_Print,"Print"),
     CSTR_TENTRY(K_Put,"Put"),
 
     CSTR_TENTRY(K_Query,"Query"),
