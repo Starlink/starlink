@@ -210,6 +210,8 @@
 *        Original version.
 *     6-OCT-1995 (PDRAPER):
 *        Updated for CCDPACK version 2.0.
+*     29-JUL-1998 (PDRAPER):
+*        Added missing CCD1_END call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -446,6 +448,9 @@
      :   'PLOTLIST: Error plotting positions.',
      :   STATUS )
       END IF
+
+*  Close CCDPACK logging system.
+      CALL CCD1_END( STATUS )
 
       END
 * $Id$

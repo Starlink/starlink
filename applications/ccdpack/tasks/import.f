@@ -237,6 +237,8 @@
 *        Removed top-level locator control (foreign data access upgrade).
 *     12-SEP-1997 (PDRAPER):
 *        Added the concatenate option for character import.
+*     29-JUL-1998 (PDRAPER):
+*        Added missing CCD1_END call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -462,6 +464,7 @@
      :   'IMPORT: Error importing FITS information into CCDPACK.',
      :   STATUS )
       END IF
+      CALL CCD1_END( STATUS )
 
       END
 * $Id$
