@@ -177,6 +177,10 @@
    applications will be replaced by ones which run properly on these 
    visuals.
 
+ - An improved version of the AST file INT-WFC.ast, for astrometry of
+   frames from the WFC mosaic camera on the Isaac Newton Telescope, 
+   has been included.
+
 1 ASTEXP
 Exports coordinate system information from images to an AST file
 
