@@ -1205,6 +1205,16 @@ bool process_special (DviFile *dvif, string specialString,
     bool setDefault = false;
     bool absolute = false;
 
+    // Define units used within specials.  special_unit is used in the
+    // file, but if it's set with `default', then
+    // default_special_unit is set, too.
+    static DviFile::DviUnits default_special_unit = DviFile::unit_pt;
+    DviFile::DviUnits special_unit = default_special_unit;
+
+    if (verbosity > normal)
+	cerr << "dvi2bitmap: special default unit="
+	     << DviFile::unitString(special_unit) << endl;
+
     if (*s == "dvi2bitmap") {	// OK
 	stringOK = true;
 	s++;
@@ -1253,8 +1263,12 @@ bool process_special (DviFile *dvif, string specialString,
 		if (s == l.end()) { stringOK = false; break; }
 		int dimen = atoi (s->c_str());
 		// scale from points to pixels
-		double npixels = dimen/72.0    // to inches
-		    * oneInch;
+		double npixels = DviFile::convertUnits(dimen,
+						       special_unit,
+						       DviFile::unit_pixels,
+						       dvif);
+// 		double npixels = dimen/72.0    // to inches
+// 		    * oneInch;
 		if (absolute)
 		{
 		    // these dimensions are given w.r.t. an origin one inch
@@ -1352,34 +1366,57 @@ bool process_special (DviFile *dvif, string specialString,
 	    } else if (*s == "strut") {
 		int x = dvif->currH() + oneInch;
 		int y = dvif->currV() + oneInch;
-		int left, right, top, bottom;
-		s++;
-		if (s == l.end()) { stringOK = false; break; }
-		left = dvif->pt2px(atof (s->c_str()));
-		s++;
-		if (s == l.end()) { stringOK = false; break; }
-		right = dvif->pt2px(atof (s->c_str()));
-		s++;
-		if (s == l.end()) { stringOK = false; break; }
-		top = dvif->pt2px(atof (s->c_str()));
-		s++;
-		if (s == l.end()) { stringOK = false; break; }
-		bottom = dvif->pt2px(atof (s->c_str()));
-		if (left<0 || right<0 || top<0 || bottom<0)
-		{
-		    if (verbosity > silent)
-			cerr << "Strut must have positive dimensions" << endl;
-		    stringOK = false;
+		int strut_lrtb[4];
+		for (int i=0; i<4; i++) {
+		    s++;
+		    if (s == l.end()) {
+			stringOK = false;
+			break;
+		    }
+		    double x = DviFile::convertUnits(strtod(s->c_str(),0),
+						     special_unit,
+						     DviFile::unit_pixels,
+						     dvif);
+		    strut_lrtb[i] = static_cast<int>
+			    (DviFile::convertUnits(strtod(s->c_str(),0),
+						   special_unit,
+						   DviFile::unit_pixels,
+						   dvif)
+			     + 0.5); // round to nearest pixel
+		    cerr << "dvi2bitmap: strut "
+			 << *s << DviFile::unitString(special_unit)
+			 << " = " << strut_lrtb[i] << "px"
+			 << endl;
+		    if (strut_lrtb[i] < 0) {
+			if (verbosity > silent)
+			    cerr << "Strut must have positive dimensions"
+				 << endl;
+			stringOK = false;
+		    }
 		}
-		else
-		{
+
+		if (stringOK) {
 		    if (verbosity > normal)
 			cerr << "Strut: (" << x << ',' << y
 			     << ") (lrtb)=("
-			     << left << ',' << right << ','
-			     << top  << ',' << bottom << ")" << endl;
-		    bitmap->strut (x, y, left, right, top, bottom);
+			     << strut_lrtb[0] << ',' << strut_lrtb[1] << ','
+			     << strut_lrtb[2] << ',' << strut_lrtb[3]
+			     << ")px" << endl;
+		    bitmap->strut (x, y,
+				   strut_lrtb[0],
+				   strut_lrtb[1],
+				   strut_lrtb[2],
+				   strut_lrtb[3]);
 		}
+	    } else if (*s == "unit") {
+		s++;
+		if (s == l.end()) {
+		    stringOK = false;
+		    break;	// JUMP OUT of special-processing loop
+		}
+		special_unit = DviFile::unitType(*s);
+		if (setDefault)
+		    default_special_unit = special_unit;
             } else if (*s == "mark") {
                 // Set the mark at the current position.  This must
                 // match the offset calculations we make when setting
