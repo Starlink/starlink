@@ -1,4 +1,4 @@
-      REAL FUNCTION SINC( X )
+      REAL FUNCTION SCULIB_SINC( X )
 *+
 *  Name:
 *     SCULIB_SINC
@@ -37,6 +37,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/19 03:46:45  timj
+*     Modify actual code to reflect change of name from SINC to SCULIB_SINC!!
+*
 *     Revision 1.3  1999/08/06 01:48:28  timj
 *     Rename SINC to SCULIB_SINC
 *
@@ -67,10 +70,10 @@
 *.
 
       IF ( X.EQ.0 ) THEN
-         SINC=1.0
+         SCULIB_SINC=1.0
       ELSE
          Y=SPI*X
-         SINC=SIN(Y)/Y
+         SCULIB_SINC=SIN(Y)/Y
       END IF
 
       END
