@@ -73,6 +73,7 @@
 *     28 Feb 94 : V1.7-6 Use BIT_ routines to do bit manipulations (DJA)
 *      7 Sep 94 : V1.8-0 Added fit probability option (DJA)
 *     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
+*     24 Apr 95 : V1.8-2 New data interfaces (DJA)
 *
 *    Type definitions :
 *
@@ -117,11 +118,8 @@
       RECORD /DATASET/       OBDAT(NDSMAX)      ! Observed datasets
       RECORD /PREDICTION/    PREDDAT(NDSMAX)    ! Data predicted by model
 
-      CHARACTER*(DAT__SZLOC) GLOC(MXGRID)       ! Fit grid datasets
       CHARACTER*132          HBUF(7)            ! History buffer
-      CHARACTER*(DAT__SZLOC) ILOC      	        ! Input data (or ref object)
       CHARACTER*40           LABEL              ! Grid label
-      CHARACTER*(DAT__SZLOC) MLOC               ! Model_spec object
       CHARACTER*1            PC                 ! Parameter code
       CHARACTER*80           ROOT, OUTFN        ! Output grid file names
       CHARACTER*80           TEXT               ! Various o/p text
@@ -140,20 +138,23 @@
       REAL                   Z			! Redshift [ Eobs/Esource=1/(1+z) ]
 
       INTEGER                FSTAT		! Fit statistic flag (1=chisq, 2=l'hood)
-      INTEGER                GDPTR(MXGRID)      ! Grid data pointer
-      INTEGER                GDIMS(DAT__MXDIM)  ! Grid dimensions
-      INTEGER                GNELM              ! # grid elements
-      INTEGER                GPARS(MXGRID)      ! Things to be gridded
-      INTEGER                GPS(DAT__MXDIM)    ! Grid parameters
-      INTEGER                GQPTR              ! Grid quality pointer
-      INTEGER                I, J, N            ! Loop variables
+      INTEGER                	GDPTR(MXGRID)      	! Grid data pointer
+      INTEGER                	GDIMS(DAT__MXDIM)  	! Grid dimensions
+      INTEGER 			GFID(MXGRID)       	! Fit grid datasets
+      INTEGER                	GNELM              	! # grid elements
+      INTEGER                	GPARS(MXGRID)      	! Things to be gridded
+      INTEGER                	GPS(DAT__MXDIM)    	! Grid parameters
+      INTEGER                	GQPTR              	! Grid quality pointer
+      INTEGER                	I, J, N            	! Loop variables
+      INTEGER			IFID			! Input dataset id
+      INTEGER			MFID			! Model spec dataset id
       INTEGER                NDOF		! d.o.f. - no of data values
 					        ! - no of unfrozen params
-      INTEGER                NDS		! No of datasets
-      INTEGER                NGOOD		! No of good data elements
-      INTEGER                NGRIDAX            ! # grid axes
-      INTEGER                NGRID              ! # grids
-      INTEGER                NHBUF              ! # lines used in HBUF
+      INTEGER                	NDS			! No of datasets
+      INTEGER                	NGOOD			! # good data elements
+      INTEGER                	NGRIDAX            	! # grid axes
+      INTEGER                	NGRID              	! # grids
+      INTEGER                	NHBUF              	! # lines used in HBUF
       INTEGER                NITMAX		! Return when NIT reaches NITMAX
       INTEGER                NRANGE             ! # range values entered
       INTEGER                NPAR		! No of parameters
@@ -177,15 +178,14 @@
       LOGICAL                LOGARITHMIC        ! Logarithmic grid axis?
       LOGICAL                OPTIMISING         ! Using FIT_MIN in FIT_GRID?
       LOGICAL                PFLAG(NPAMAX)	! Parameter in use flags
-      LOGICAL                PRIM		! Primitive input dataset?
       LOGICAL                SUBSTAT            ! Subtract minimum statistic?
       LOGICAL                UP                 ! Update model after grid
       LOGICAL                WORKSPACE		! Set up workspace for STAT gradients?
 *
 *    Version :
 *
-      CHARACTER*30            VERSION
-	PARAMETER	      ( VERSION='SGRID Version 1.8-1' )
+      CHARACTER*30		VERSION
+	PARAMETER	      	( VERSION='SGRID Version 1.8-2' )
 *-
 
 *    Announce version
@@ -208,10 +208,10 @@
       END IF
 
 *    Get observed data (setting up data weights) and response
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, PRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
       WORKSPACE = .TRUE.
-      CALL FIT_DATINGET( ILOC, 'SPEC', FSTAT, WORKSPACE, CHISTAT, NDS,
-     :                   OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
+      CALL FIT_GETDAT( IFID, 'SPEC', FSTAT, WORKSPACE, CHISTAT, NDS,
+     :                OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Specials for spectral fitting
@@ -251,8 +251,8 @@
       IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
 
 *    Get model specification
-      CALL USI_ASSOCI( 'MODEL', 'UPDATE', MLOC, PRIM, STATUS )
-      CALL FIT_MODGET( MLOC, MODEL, NPAR, PARAM, LB, UB, LE, UE,
+      CALL USI_TASSOCI( 'MODEL', '*', 'UPDATE', MFID, STATUS )
+      CALL FIT_TMODGET( MFID, MODEL, NPAR, PARAM, LB, UB, LE, UE,
      :                                          FROZEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -266,7 +266,7 @@
       CALL SFIT_MAPMODSTK( NDS, PREDDAT, MODEL.STACKPTR, STATUS )
 
 *    List parameters
-      CALL SEDIT_LISTPAR( MLOC, NPAR, PCOMP, PPAR, 6, STATUS )
+      CALL SEDIT_LISTPAR( MFID, NPAR, PCOMP, PPAR, 6, STATUS )
 
 *    Select parameters for grid axes
       CALL USI_GET1I( 'PARS', DAT__MXDIM, GPS, NGRIDAX, STATUS )
@@ -462,7 +462,7 @@
      :                                                  GPARS(I)
 
 *        Open the file
-          CALL HDS_NEW( OUTFN, 'GRID', 'BINDS', 0, 0, GLOC(I), STATUS )
+          CALL ADI_FCREAT( OUTFN, ADI__NULLID, GFID(I), STATUS )
 
 *      Manual file naming
         ELSE
@@ -472,12 +472,12 @@
               CALL USI_PROMT( 'OUT', 'Output filename for 1st grid',
      :                                                      STATUS )
             END IF
-            CALL USI_ASSOCO( 'OUT', 'BINDS', GLOC(I), STATUS )
+            CALL USI_TASSOCO( 'OUT', 'BINDS', GFID(I), STATUS )
 
 *        Prompt for o/p filename
           ELSE
             WRITE( PC, '(I1.1)' ) I
-            CALL USI_ASSOCO( 'OUT'//PC, 'BINDS', GLOC(I), STATUS )
+            CALL USI_TASSOCO( 'OUT'//PC, 'BINDS', GFID(I), STATUS )
 
           END IF
 
@@ -485,14 +485,12 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Create grid axes
-        CALL FIT_CREGRIDAX( GLOC(I), NGRIDAX, GAX, STATUS )
+        CALL FIT_CREGRIDAX( GFID(I), NGRIDAX, GAX, STATUS )
 
 *      Write axis labels and units
         DO J = 1, NGRIDAX
-          CALL BDA_PUTAXLABEL( GLOC(I), J, MODEL.PARNAME(GAX(J).PAR),
-     :                                                       STATUS )
-          CALL BDA_PUTAXUNITS( GLOC(I), J, MODEL.UNITS(GAX(J).PAR),
-     :                                                     STATUS )
+          CALL BDI_PUTAXTEXT( GFID(I), J, MODEL.PARNAME(GAX(J).PAR),
+     :                             MODEL.UNITS(GAX(J).PAR), STATUS )
         END DO
 
 *      Title and units for this grid
@@ -510,20 +508,20 @@
 
 *      Write as axis label for 1-d, otherwise title
         IF ( NGRIDAX .EQ. 1 ) THEN
-          CALL BDA_PUTLABEL( GLOC(I), LABEL, STATUS )
+          CALL BDI_PUTLABEL( GFID(I), LABEL, STATUS )
         ELSE
-          CALL BDA_PUTTITLE( GLOC(I), LABEL, STATUS )
+          CALL BDI_PUTTITLE( GFID(I), LABEL, STATUS )
         END IF
 
 *      Grid units
         IF ( (GPARS(I) .NE. 0) .AND. (GPARS(I).NE.PROB_REPLY) ) THEN
           IF ( MODEL.UNITS(GPARS(I)) .GT. ' ' ) THEN
             IF ( NGRIDAX .GT. 1 ) THEN
-              CALL BDA_PUTTITLE( GLOC(I), LABEL(:CHR_LEN(LABEL))//
+              CALL BDI_PUTTITLE( GFID(I), LABEL(:CHR_LEN(LABEL))//
      :                               ' ('//MODEL.UNITS(GPARS(I))(:
      :              CHR_LEN(MODEL.UNITS(GPARS(I))))//')', STATUS )
             ELSE
-              CALL BDA_PUTUNITS( GLOC(I), MODEL.UNITS(GPARS(I)),
+              CALL BDI_PUTUNITS( GFID(I), MODEL.UNITS(GPARS(I)),
      :                                                  STATUS )
             END IF
           END IF
@@ -534,14 +532,14 @@
         IF ( I .EQ. 1 ) THEN
 
 *        Version id
-          CALL HIST_ADD( GLOC(I), VERSION, STATUS )
+          CALL HIST_ADD( GFID(I), VERSION, STATUS )
 
 *        Input file(s) and model
           HBUF(1) = 'Data {INP}'
           HBUF(2) = 'Model {MODEL}'
           NHBUF = 6
           CALL USI_TEXT( 2, HBUF, NHBUF, STATUS )
-          CALL HIST_PTXT( GLOC(1), NHBUF, HBUF, STATUS )
+          CALL HIST_PTXT( GFID(1), NHBUF, HBUF, STATUS )
 
 *        Grid parameters
           TEXT = 'Gridded parameters ('
@@ -550,10 +548,10 @@
             CALL MSG_SETI( 'P', GPS(J) )
             CALL MSG_MAKE( TEXT(:TLEN)//' ^P', TEXT, TLEN )
           END DO
-          CALL HIST_PTXT( GLOC(1), 1, TEXT(:TLEN)//' )', STATUS )
+          CALL HIST_PTXT( GFID(1), 1, TEXT(:TLEN)//' )', STATUS )
 
         ELSE
-          CALL HIST_COPY( GLOC(1), GLOC(I), STATUS )
+          CALL HIST_COPY( GFID(1), GFID(I), STATUS )
         END IF
 
 *      The item being gridded
@@ -569,11 +567,11 @@
           CALL MSG_MAKE( 'Gridded values are parameter ^P, ^TAG',
      :                                               TEXT, TLEN )
         END IF
-        CALL HIST_PTXT( GLOC(I), 1, TEXT(:TLEN), STATUS )
+        CALL HIST_PTXT( GFID(I), 1, TEXT(:TLEN), STATUS )
 
 *      Create and map data array
-        CALL BDA_CREDATA( GLOC(I), NGRIDAX, GDIMS, STATUS )
-        CALL BDA_MAPDATA( GLOC(I), 'WRITE', GDPTR(I), STATUS )
+        CALL BDI_CREDATA( GFID(I), NGRIDAX, GDIMS, STATUS )
+        CALL BDI_MAPDATA( GFID(I), 'WRITE', GDPTR(I), STATUS )
 
       END DO
 
@@ -607,7 +605,7 @@
      :                              /' is ^VAL.', TEXT, TLEN )
       CALL MSG_PRNT( TEXT(:TLEN) )
       DO I = 1, NGRID
-        CALL HIST_PTXT( GLOC(I), 1, TEXT(:TLEN), STATUS )
+        CALL HIST_PTXT( GFID(I), 1, TEXT(:TLEN), STATUS )
       END DO
 
 *    Update the model?
@@ -616,7 +614,7 @@
       IF ( UP ) THEN
         CALL MSG_PRNT( '** Updating model spec - do not exit'/
      :                                /' until completed **' )
-        CALL FIT_MODUP( MLOC, MODEL.NCOMP, NPAR, PARAM, LE, UE,
+        CALL FIT_TMODUP( MFID, MODEL.NCOMP, NPAR, PARAM, LE, UE,
      :                                          -99.0, STATUS )
         CALL MSG_PRNT( '** Model dataset updated **' )
       END IF
@@ -651,33 +649,33 @@
       IF ( ANYBAD .OR. ANYBADISH ) THEN
 
 *      Create quality for first grid
-        CALL BDA_CREQUAL( GLOC(1), NGRIDAX, GDIMS, STATUS )
-        CALL BDA_MAPQUAL( GLOC(1), 'WRITE', OQPTR, STATUS )
-        CALL BDA_PUTMASK( GLOC(1), GQMASK, STATUS )
+        CALL BDI_CREQUAL( GFID(1), NGRIDAX, GDIMS, STATUS )
+        CALL BDI_MAPQUAL( GFID(1), 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUTMASK( GFID(1), GQMASK, STATUS )
         CALL ARR_COP1B( GNELM, %VAL(GQPTR), %VAL(OQPTR), STATUS )
         CALL DYN_UNMAP( GQPTR, STATUS )
-        CALL BDA_UNMAPQUAL( GLOC(1), STATUS )
+        CALL BDI_UNMAPQUAL( GFID(1), STATUS )
 
 *      Copy quality for subsequent grids
         DO I = 2, NGRID
-          CALL BDA_COPQUAL( GLOC(1), GLOC(I), STATUS )
+          CALL BDI_COPQUAL( GFID(1), GFID(I), STATUS )
         END DO
 
       END IF
 
 *    Close o/p grid files
       DO I = 1, NGRID
-        CALL BDA_RELEASE( GLOC(I), STATUS )
+        CALL BDI_RELEASE( GFID(I), STATUS )
         IF ( AUTO ) THEN
-          CALL HDS_CLOSE( GLOC(I), STATUS )
+          CALL ADI_FCLOSE( GFID(I), STATUS )
         ELSE
-          CALL USI_ANNUL( GLOC(I), STATUS )
+          CALL USI_TANNUL( GFID(I), STATUS )
         END IF
       END DO
 
 *    Tidy up & exit
- 99   CALL USI_ANNUL( MLOC, STATUS )
-      CALL USI_ANNUL( ILOC, STATUS )
+ 99   CALL USI_TANNUL( MFID, STATUS )
+      CALL USI_TANNUL( IFID, STATUS )
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
