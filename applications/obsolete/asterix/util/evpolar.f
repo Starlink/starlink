@@ -62,6 +62,7 @@
 *     11 Sep 93 : V1.7-0 EVPOLAR_CAREA renamed GEO_CAREA (DJA)
 *     25 Feb 94 : V1.7-1 Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     21 Apr 95 : V1.8-1 Updated data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -98,7 +99,6 @@
       CHARACTER*(DAT__SZLOC)    ILOC             ! Input event dataset
       CHARACTER*(DAT__SZLOC)    LLOC(LIST__MXNL) ! Locator to lists in the evds
       CHARACTER*(DAT__SZNAM)    LNAM(LIST__MXNL) ! Names of lists in the evds
-      CHARACTER*(DAT__SZLOC)    OLOC             ! Locator to output dataset
       CHARACTER*40              ORUNIT           ! Output radial unit
       CHARACTER*(DAT__SZLOC)    QLOC             ! Locator to input quality
       CHARACTER*80              TEXT             ! Temporary text string
@@ -114,6 +114,7 @@
                                                  ! > this value.
       INTEGER                   BPTR(2)          ! Binning list pointers
       INTEGER                   I                ! Loop counters
+      INTEGER			IFID			! Input dataset id
       INTEGER                   INDEX(LIST__MXNL)! Index number of selected lists
       INTEGER                   INLIST           ! Number of lists in input EVDS
       INTEGER                   IQPTR            ! Input quality data
@@ -127,6 +128,7 @@
       INTEGER                   OAPTR, OWPTR     ! Output irregular axis data
       INTEGER                   ODIMS(2)         ! Output dataset dimensions
       INTEGER                   ODPTR            ! Output data pointer
+      INTEGER			OFID			! Output dataset id
       INTEGER                   ONELM            ! # output bins
       INTEGER                   OQPTR            ! Output quality pointer
       INTEGER                   WPTR             ! Pointer to workspace array
@@ -143,7 +145,7 @@
 *    Version id :
 *
       CHARACTER*24              VERSION
-         PARAMETER              ( VERSION = 'EVPOLAR Version 1.8-0' )
+         PARAMETER              ( VERSION = 'EVPOLAR Version 1.8-1' )
 *-
 
 *    Version anouncement
@@ -153,11 +155,8 @@
       CALL AST_INIT( STATUS )
 
 *    Get event dataset
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, INPRIM, STATUS )
-      IF ( INPRIM ) THEN
-        CALL MSG_PRNT( 'FATAL ERROR: Input is not an event dataset' )
-        STATUS = SAI__ERROR
-      END IF
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Find all valid lists in INP. Display them to user.
@@ -194,7 +193,7 @@
 
 *      Map it
         CALL DAT_FIND( ILOC, 'QUALITY', QLOC, STATUS )
-        CALL BDA_MAPTDATA( QLOC, '_INTEGER', 'READ', IQPTR, STATUS )
+        CALL BDI_MAPTDATA( QLOC, '_INTEGER', 'READ', IQPTR, STATUS )
 
 *      Get quality processing mode
         CALL USI_GET0I( 'QVAL',  BADQUAL, STATUS )
@@ -221,8 +220,8 @@
 
 *      Map and get attributes
         BNAME(I) = LNAM(INDEX(I))
-        CALL BDA_MAPDATA( BLOC(I), 'READ', BPTR(I), STATUS )
-        CALL BDA_GETUNITS( BLOC(I), BUNIT(I), STATUS )
+        CALL BDI_MAPDATA( BLOC(I), 'READ', BPTR(I), STATUS )
+        CALL BDI_GETUNITS( BLOC(I), BUNIT(I), STATUS )
 
       END DO
 
@@ -307,43 +306,43 @@
       END IF
 
 *    Create output dataset
-      CALL USI_ASSOCO( 'OUT', 'POLAR', OLOC, STATUS )
-      CALL BDA_CREDATA( OLOC, NDIM, ODIMS, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+      CALL USI_ASSOCO( 'OUT', 'POLAR', OFID, STATUS )
+      CALL BDI_CREDATA( OFID, NDIM, ODIMS, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *    Create AXIS structure
-      CALL BDA_CREAXES( OLOC, NDIM, STATUS )
-      CALL BDA_CREAXVAL( OLOC, 1, REG, NRAD, STATUS )
-      CALL BDA_CREAXWID( OLOC, 1, REG, NRAD, STATUS )
+      CALL BDI_CREAXES( OFID, NDIM, STATUS )
+      CALL BDI_CREAXVAL( OFID, 1, REG, NRAD, STATUS )
+      CALL BDI_CREAXWID( OFID, 1, REG, NRAD, STATUS )
       IF ( REG ) THEN
-        CALL BDA_PUTAXVAL( OLOC, 1, 0.0, RBINSIZE, NRAD, STATUS )
-        CALL BDA_PUTAXWID( OLOC, 1, RBINSIZE, STATUS )
+        CALL BDI_PUTAXVAL( OFID, 1, 0.0, RBINSIZE, NRAD, STATUS )
+        CALL BDI_PUTAXWID( OFID, 1, RBINSIZE, STATUS )
       ELSE
-        CALL BDA_MAPAXVAL( OLOC, 'WRITE', 1, OAPTR, STATUS )
-        CALL BDA_MAPAXVAL( OLOC, 'WRITE', 1, OWPTR, STATUS )
+        CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, OAPTR, STATUS )
+        CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, OWPTR, STATUS )
         CALL AXIS_RNG2VALW( NRAD, RANGE, %VAL(OAPTR), %VAL(OWPTR),
      :                                                    STATUS )
       END IF
-      CALL BDA_PUTAXLABEL( OLOC, 1, 'Radius', STATUS )
+      CALL BDI_PUTAXLABEL( OFID, 1, 'Radius', STATUS )
       IF ( ORUNIT .GT. ' ' ) THEN
-        CALL BDA_PUTAXUNITS( OLOC, 1, ORUNIT, STATUS )
+        CALL BDI_PUTAXUNITS( OFID, 1, ORUNIT, STATUS )
       END IF
       IF ( NDIM .EQ. 2 ) THEN
-        CALL BDA_CREAXVAL( OLOC, 2, .TRUE., NAZ, STATUS )
-        CALL BDA_PUTAXVAL( OLOC, 2,0.5*ABINSIZE, ABINSIZE, NAZ, STATUS )
-        CALL BDA_CREAXWID( OLOC, 2, .TRUE., NAZ, STATUS )
-        CALL BDA_PUTAXWID( OLOC, 2, ABINSIZE, STATUS )
-        CALL BDA_PUTAXLABEL( OLOC, 2, 'Azimuth', STATUS )
-        CALL BDA_PUTAXUNITS( OLOC, 2, 'degree', STATUS )
+        CALL BDI_CREAXVAL( OFID, 2, .TRUE., NAZ, STATUS )
+        CALL BDI_PUTAXVAL( OFID, 2,0.5*ABINSIZE, ABINSIZE, NAZ, STATUS )
+        CALL BDI_CREAXWID( OFID, 2, .TRUE., NAZ, STATUS )
+        CALL BDI_PUTAXWID( OFID, 2, ABINSIZE, STATUS )
+        CALL BDI_PUTAXLABEL( OFID, 2, 'Azimuth', STATUS )
+        CALL BDI_PUTAXUNITS( OFID, 2, 'degree', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Initialise quality to data missing
       CALL ARR_SUMDIM( NDIM, ODIMS, ONELM )
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDA_CREQUAL( OLOC, NDIM, ODIMS, STATUS )
-        CALL BDA_MAPQUAL( OLOC, 'WRITE', OQPTR, STATUS )
-        CALL BDA_PUTMASK( OLOC, QUAL__MASK, STATUS )
+        CALL BDI_CREQUAL( OFID, NDIM, ODIMS, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
         CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
       END IF
 
@@ -380,28 +379,28 @@
      :                                LOY, HIY, %VAL(ODPTR), STATUS )
         END IF
       END IF
-      CALL BDA_PUTAXNORM( OLOC, 1, NORMALISE, STATUS )
+      CALL BDI_PUTAXNORM( OFID, 1, NORMALISE, STATUS )
       IF ( NDIM .EQ. 2 ) THEN
-        CALL BDA_PUTAXNORM( OLOC, 2, NORMALISE, STATUS )
+        CALL BDI_PUTAXNORM( OFID, 2, NORMALISE, STATUS )
       END IF
 
 *    Copy ancillary stuff
-      CALL BDA_COPTEXT( ILOC, OLOC, STATUS )
-      CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+      CALL BDI_COPTEXT( IFID, OFID, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Re-write data units
       IF ( NORMALISE ) THEN
         CALL MSG_SETC( 'UN', ORUNIT )
         CALL MSG_MAKE( 'count/^UN**2', TEXT, LEN )
-        CALL BDA_PUTUNITS( OLOC, TEXT(:LEN), STATUS )
+        CALL BDI_PUTUNITS( OFID, TEXT(:LEN), STATUS )
       ELSE
-        CALL BDA_PUTUNITS( OLOC, 'count', STATUS )
+        CALL BDI_PUTUNITS( OFID, 'count', STATUS )
       END IF
 
 *    Update history
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
       NLINE = MXTEXT
       HTEXT(1) = ' Input {INP}'
@@ -421,7 +420,7 @@
       END IF
 
 *    Write expanded text
-      CALL HIST_PTXT( OLOC, NLINE, HTEXT, STATUS )
+      CALL HSI_PTXT( OFID, NLINE, HTEXT, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE
