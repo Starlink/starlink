@@ -36,7 +36,7 @@ static const char* const rcsId="@(#) $Id$";
 #include <stdio.h>
 #include <unistd.h>
 #include "error.h"
-#include "Compress.h"
+#include "Compress.hxx"
 #include "AstroImage.h"
 
 

@@ -38,7 +38,7 @@ static const char* const rcsId="@(#) $Id$";
 #endif
 
 #include "error.h"
-#include "Compress.h"
+#include "Compress.hxx"
 #include "WorldOrImageCoords.h"
 #include "HTTP.h"
 #include "Mem.h"

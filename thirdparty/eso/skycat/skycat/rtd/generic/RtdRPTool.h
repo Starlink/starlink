@@ -25,7 +25,7 @@
 #include "rtdImageEvent.h"
 #include "tk.h"
 #include "FitsIO.hxx"
-#include "Compress.h"
+#include "Compress.hxx"
 #include "rtdSem.h"
 #include "config.h"
 #include "RtdRPFile.h"
