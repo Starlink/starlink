@@ -42,7 +42,7 @@
 #  Expand any generic source files.
       foreach file (`grp generic_sources`)
          echo "Expanding generic source file $file"
-         generic -t n -s ${file}
+         /star/bin/generic -t n -s ${file}
       end
 
 #  Rename unsigned data type files.
