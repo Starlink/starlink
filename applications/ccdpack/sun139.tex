@@ -8531,6 +8531,32 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [TRUE]
       }
    }
+   \sstexamples{
+      \sstexamplesubsection{
+         ccdsetup
+      } {
+         This will prompt you to enter all the global variables.  You
+         can accept defaults or enter the null value for any which
+         you do not need to set.
+      }
+      \sstexamplesubsection{
+         ccdsetup byset index=1
+      } {
+         In this case you will be prompted to enter values which apply
+         to that member of each CCDPACK Set of images which has a
+         Set Index of 1.
+      }
+      \sstexamplesubsection{
+         ccdsetup byset index=2 adc=1.5 mask=badpix2 accept
+      } {
+         This will fix the ADC value to 1.5 and the mask image to the
+         file badpix2 only for those Set members with a Set Index of 2.
+         No other values will be prompted for.  If this command is 
+         issued directly after the last example, then all the other
+         global parameters will take the same values as were entered
+         for index=1.
+      }
+   }
    \sstdiytopic{
       See also:
    } {
@@ -9894,7 +9920,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       values. These global values will always take precedence, except
       when an assignment is made on the command line, or in the case
       of EXTENT, if USEEXT is true.   If USESET is true, a global value
-      for USEEXT corresponding to the Set Index of each image will be
+      for EXTENT corresponding to the Set Index of each image will be
       sought.  Global values may be set and reset using the \xroutine{CCDSETUP}
       and \xroutine{CCDCLEAR} commands.
 

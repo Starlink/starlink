@@ -2561,6 +2561,24 @@ USESET = _LOGICAL (Read)
 
    If BYSET is true, this parameter will default to true also.
    [TRUE]
+2 Examples
+ccdsetup
+   This will prompt you to enter all the global variables.  You
+   can accept defaults or enter the null value for any which
+   you do not need to set.
+
+ccdsetup byset index=1
+   In this case you will be prompted to enter values which apply
+   to that member of each CCDPACK Set of images which has a
+   Set Index of 1.
+
+ccdsetup byset index=2 adc=1.5 mask=badpix2 accept
+   This will fix the ADC value to 1.5 and the mask image to the
+   file badpix2 only for those Set members with a Set Index of 2.
+   No other values will be prompted for.  If this command is 
+   issued directly after the last example, then all the other
+   global parameters will take the same values as were entered
+   for index=1.
 2 Notes
 - Pixel indices. The bounds supplied to DEBIAS should be given as
   pixel indices. These usually start at 1,1 for the pixel at the
@@ -3723,7 +3741,7 @@ drawndf "obs-[abc]" image lines labup labopaque=false
    values. These global values will always take precedence, except
    when an assignment is made on the command line, or in the case
    of EXTENT, if USEEXT is true.  If USESET is true, a global value
-   for USEEXT corresponding to the Set Index of each image will be
+   for EXTENT corresponding to the Set Index of each image will be
    sought.  Global values may be set and reset using the CCDSETUP
    and CCDCLEAR commands.
 
