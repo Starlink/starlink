@@ -1,0 +1,219 @@
+*+
+* Name:
+*   OPT_CMN
+
+* Type of module:
+*   Include file
+
+* Purpose:
+*  Common Block Definitions for Optimizaton
+
+* Authors:
+*   DJA: D.J.Axon, Manchester
+*   TNW: T.N.Wilkins, Manchester until 1/89, Cambridge until 9/92, then Durham
+
+* History:
+*   Altered TNW to have just one common block, also 24/11/88
+*   to use pointers to large arrays, rather than include the
+*   arrays themselves in common.
+*   Allow for 9 component fits, TNW 12/1/89
+*   Order altered so all double precision element are first in the
+*   common block. TNW/Cambridge 7/6/90
+*   2nd virtual memory slot added to here, TNW 9/10/90
+*   DENSZERO added, TNW 13/3/91
+*   Major revision to common blocks to allow for new
+*   Longslit options DJA 3/7/91
+*   GUESSPTR and TIMES added, TNW 9/91
+*   BNDPTR added, TNW 28/6/93
+*   MAX_TIMES added, TNW 7/7/93
+*-
+
+* max num of opt parms
+
+      integer MAX_PARMS
+
+* max no of gaussians
+
+      integer MAX_GAUSS
+
+* Hessian size
+
+      integer MAX_HESL
+
+      parameter (MAX_GAUSS = 9 )
+      parameter (MAX_PARMS = MAX_GAUSS*4+1 )
+      parameter (MAX_HESL  = MAX_PARMS*MAX_PARMS/2)
+
+
+      integer jcrash
+      integer icrash
+      integer kcrash
+
+      integer opt_lu
+      integer opt_slot
+      integer opt_slot2
+
+* data weights
+
+      integer weightptr
+
+* x data values
+
+      integer dataptr
+
+* y data values
+
+      integer densptr
+
+      double precision chi_sq
+
+* y data scaleing
+
+      double precision densc
+
+* xdata scaling
+
+      double precision datsc
+
+* x -zero point
+
+      double precision datazero
+
+* y -zero point
+
+      double precision denszero
+
+* Guesses
+
+      integer guessptr
+
+* Bounds
+
+      integer bndptr
+      real minsig,maxsig
+
+* Loop counter (made use of when more than attempt might be made at the
+* fit)
+
+      integer max_times
+      integer times
+
+* Size of work array for Gausid etc.
+
+      integer wndim
+
+* Ratio to tie double fits
+
+      double precision ratio
+
+* Maximum number of components from DECCNTR (which may be changed during
+* fitting, since keeps current value).
+
+      integer max_cmp
+
+* resid-sum-of squares
+
+      double precision fc
+      double precision t99(MAX_PARMS)
+
+* gradient vector
+
+      double precision gc(MAX_PARMS)
+      double precision norm,condit_no
+
+* if absorption line
+
+      logical absorption
+*
+
+      logical crash
+      logical exception
+      logical nagerror
+      logical got_opt_vm
+      logical got_opt_vm2
+      integer mpts
+
+* symbolic constants for parameter constrainst etc
+
+      integer FREE
+      integer FIXED
+      integer ADD_LINK
+      integer TIMES_LINK
+      integer PERIODIC
+      integer LINEAR
+      parameter (FREE = 0)
+      parameter (FIXED = 1)
+      parameter (ADD_LINK = -1)
+      parameter (TIMES_LINK = -2)
+      parameter (LINEAR = 1)
+      parameter (PERIODIC = 1)
+
+* fixed parameters. The following 2 arrays store list of
+* parameter numbers sepecifiying the FREE or FIXED state
+* of each parameter
+
+      integer parameter_status(MAX_PARMS)
+      integer free_parameters(MAX_PARMS)
+
+* Linked position
+
+      integer link_index(MAX_PARMS)
+      double precision link_constant(MAX_PARMS)
+
+* bounds
+
+      double precision NEG_LARGE
+      double precision POS_LARGE
+      parameter (NEG_LARGE = -1.0D+36)
+      parameter (POS_LARGE = 1.0D+36)
+      double precision lower_bound(MAX_PARMS)
+      double precision upper_bound(MAX_PARMS)
+
+* cyclic functions : none yet defined for longslit
+
+      integer periodic_parameters(MAX_PARMS)
+      double precision parameter_period(MAX_PARMS)
+      double precision parameter_bottom(MAX_PARMS)
+
+* is data periodic?
+
+      logical data_periodic
+      double precision data_period
+
+* This contains various flags etc. to control fitting, which are
+* controlled by parameters of the program.
+*
+*     KEEP_ITT (l): If to keep (or even create) iteration files
+*     CALRAT   (r): Number to multiply default maximum number of iterations
+*     PRFITS   (l): If to write details of fitting to the terminal
+*     CONDHAND (l): If to use the condition handler FIT_HANDLER
+*                   (otherwise the default FIGARO handler will trap errors)
+*     STEPRAT  (l): Number to multiply default step size in optimisation
+
+      real calrat,steprat
+      logical keep_itt,prfits,condhand
+
+      common /opt_common/ ratio,gc,fc,chi_sq,t99,norm,condit_no,mpts,
+     :       opt_lu,opt_slot,got_opt_vm,absorption,got_opt_vm2,opt_slot2
+     :       ,times,max_cmp,wndim,max_times
+      common /opt_scale/ densc,datsc,datazero,denszero
+      common /opt_pointers/ weightptr,dataptr,densptr,guessptr,bndptr
+      common /opt_fail_cm/ crash,icrash,jcrash,kcrash,exception,nagerror
+      common /opt_free_list/ parameter_status, free_parameters
+      common /opt_link_status/ link_constant,link_index
+      common /opt_bounds/ lower_bound, upper_bound,minsig,maxsig
+      common /opt_cyclic_list/ parameter_period,parameter_bottom,
+     :            periodic_parameters
+      common /opt_data_period/ data_period, data_periodic
+      common /opt_commands/ keep_itt,calrat,prfits,condhand,steprat
+
+      save/opt_common/
+      save/opt_scale/
+      save/opt_fail_cm/
+      save/opt_pointers/
+      save/opt_free_list/
+      save/opt_link_status/
+      save/opt_bounds/
+      save/opt_cyclic_list/
+      save/opt_data_period/
+      save/opt_commands/

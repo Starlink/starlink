@@ -1,0 +1,42 @@
+*  Fit coding:
+* T.N.Wilkins, Cambridge, 5/9/91
+
+* Fit types
+
+      integer SINGLE, DOUBLE_FS, DOUBLE_FW, DOUBLE_FH, DOUBLE_U,
+     :             MULTIPLE
+      parameter (SINGLE = 1, DOUBLE_FS = 2, DOUBLE_FW = 3,
+     :           DOUBLE_FH = 4, DOUBLE_U = 5, MULTIPLE = 6)
+
+* Fit models
+
+      integer GAUSSIAN_MODEL, SKEW_MODEL, CAUCHY_MODEL, LORENTZ_MODEL
+      integer MAX_MODELS
+      parameter (GAUSSIAN_MODEL = 1, SKEW_MODEL = 2, CAUCHY_MODEL = 3)
+      parameter (LORENTZ_MODEL = 5, MAX_MODELS = 5)
+
+* Guess methods
+
+      integer CENTROID,PEAK,BIMODF, GUES_PCYG, GUES_HINGE
+      parameter (CENTROID = 1, PEAK = 2, BIMODF = 3, GUES_PCYG = 10,
+     :           GUES_HINGE = 8)
+
+* Background models
+
+      integer CUBIC_SPLINE, CHEBYSHEV
+      parameter (CUBIC_SPLINE = 2, CHEBYSHEV = 3)
+
+* Weighting methods
+
+      integer VARIANCE
+      parameter (VARIANCE = 1)
+
+* Manually alter guesses
+
+      integer MAN_NOALTER, MAN_ALTER
+      parameter (MAN_NOALTER = 0, MAN_ALTER = 1)
+
+* Fit component number control
+
+      integer POSTAIC, PREAIC
+      parameter (POSTAIC = 1, PREAIC = 2)
