@@ -5,6 +5,7 @@
 *  Routine to grab some virtual memory, using system services
 
       IMPLICIT    NONE
+      INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
@@ -13,12 +14,13 @@
       INTEGER     STATUS
 
 *  Ok, go...
+      STATUS = SAI__OK
 
       CALL PSX_MALLOC (NBYTES, IPTR, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugetvm --'
-        TYPE *, '    bad status in PSX_MALLOC = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugetvm --'
+        PRINT *, '    bad status in PSX_MALLOC = ', STATUS
       END IF
 
       RETURN
@@ -31,6 +33,7 @@
 *  Routine to free virtual memory, using system services
 
       IMPLICIT    NONE
+      INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
@@ -39,11 +42,13 @@
 
 *  Ok, go...
 
+      STATUS = SAI__OK
+
       CALL PSX_FREE (IPTR, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ufreevm --'
-        TYPE *, '    bad status in PSX_FREE = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ufreevm --'
+        PRINT *, '    bad status in PSX_FREE = ', STATUS
       END IF
 
       RETURN
@@ -56,6 +61,7 @@
 *  Uses system services to find a translation for a logical name.
 
       IMPLICIT    NONE
+      INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
@@ -65,11 +71,13 @@
 
 *  Ok, go...
 
+      STATUS = SAI__OK
+
       CALL PSX_GETENV (LOGNAME, FILENAME, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- utrnlog --'
-        TYPE *, '    bad status in PSX_GETENV = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- utrnlog --'
+        PRINT *, '    bad status in PSX_GETENV = ', STATUS
       END IF
 
       RETURN
@@ -83,6 +91,7 @@
 *  using available system services
 
       IMPLICIT    NONE
+      INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
@@ -96,18 +105,20 @@
 
 *  Ok, go...
 
+      STATUS = SAI__OK
+
       CALL PSX_TIME  (NTICKS, STATUS)
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugettim --'
-        TYPE *, '    bad status in PSX_TIME = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugettim --'
+        PRINT *, '    bad status in PSX_TIME = ', STATUS
         RETURN
       END IF
 
       CALL PSX_CTIME (NTICKS, CTIME, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugettim --'
-        TYPE *, '    bad status in PSX_CTIME = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugettim --'
+        PRINT *, '    bad status in PSX_CTIME = ', STATUS
         RETURN
       END IF
 
@@ -124,6 +135,7 @@
 *  using available system services
 
       IMPLICIT    NONE
+      INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
@@ -136,20 +148,21 @@
       CHARACTER   CTIME*32
 
 *  Ok, go...
+      STATUS = SAI__OK
 
       CALL PSX_TIME  (NTICKS, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugetdat --'
-        TYPE *, '    bad status in PSX_TIME = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugetdat --'
+        PRINT *, '    bad status in PSX_TIME = ', STATUS
         RETURN
       END IF
 
       CALL PSX_CTIME (NTICKS, CTIME, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugetdat --'
-        TYPE *, '    bad status in PSX_CTIME = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugetdat --'
+        PRINT *, '    bad status in PSX_CTIME = ', STATUS
         RETURN
       END IF
 
@@ -167,6 +180,7 @@
 *  using available system services
 
       IMPLICIT    NONE
+      INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
@@ -180,19 +194,21 @@
 
 *  Ok, go...
 
+      STATUS = SAI__OK
+
       CALL PSX_TIME  (NTICKS, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugetdattim --'
-        TYPE *, '    bad status in PSX_TIME = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugetdattim --'
+        PRINT *, '    bad status in PSX_TIME = ', STATUS
         RETURN
       END IF
 
       CALL PSX_CTIME (NTICKS, CTIME, STATUS)
 
-      IF (STATUS.ne.0) THEN
-        TYPE *, ' -- ugetdattim --'
-        TYPE *, '    bad status in PSX_CTIME = ', STATUS
+      IF (STATUS.NE.SAI__OK) THEN
+        PRINT *, ' -- ugetdattim --'
+        PRINT *, '    bad status in PSX_CTIME = ', STATUS
         RETURN
       END IF
 
