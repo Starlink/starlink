@@ -1,3 +1,35 @@
+
+2003-11-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	***** RELEASE V6.8-2 ******
+	
+2003-11-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* mv4/mv4_mapopn.f (MV4_MAPOPN): Should only compare bounds when
+	STATUS is good (eg when opening a new file you get bad status!)
+
+	* mv4/open_map.f (OPEN_SPECX_MAP): Test of NSPEC was too
+	stringent. Test simply requires that header value is less than
+	data array size. Also, NPTS1 test had incorrect consequences.
+
+2003-06-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	****** RELEASE V6.8-1 ******
+	
+2003-06-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* util/parse_date_obs.f (PARSE_DATE_OBS): Linux does not like
+	'(I4,''-''...)' embedded format style so pull out as explicit
+	format statements Added CCYY-MM-DDTHH:MM format for completeness.
+
+
+	<<<< MANY OTHER CHANGES THAT WERE MISSED FROM CHANGELOG >>>>
+	
+2003-03-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	****** RELEASE V6.7-12 ******
+
+	
 2002-11-25  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* fv4/fv4_filmerg.f (FV4_FILMERG): Initialise Starlink status so
