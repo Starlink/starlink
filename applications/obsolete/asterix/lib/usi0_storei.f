@@ -44,7 +44,7 @@
           DS(I).PAR=PAR
           DS(I).USED=.TRUE.
           DS(I).IO=IO
-          CALL ADI1_PUTLOC( LOC, DS(I).ADI_ID, STATUS )
+          DS(I).ADI_ID = ID
         ELSE
           STATUS=SAI__ERROR
           CALL ERR_REP(' ', 'Maximum number of datasets exceeded',
