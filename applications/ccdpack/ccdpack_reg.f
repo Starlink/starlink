@@ -24,11 +24,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     31-OCT-1995 (PDRAPER):
 *        Original version 
+*     10-MAR-1999 (MBT):
+*        Added new tasks ASTIMP and ASTEXP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,7 +66,13 @@
 
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...  
-      IF ( ACTION.EQ. 'CCDEDIT' ) THEN
+      IF ( ACTION .EQ. 'ASTEXP' ) THEN
+         CALL ASTEXP( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'ASTIMP' ) THEN
+         CALL ASTIMP( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'CCDEDIT' ) THEN
          CALL CCDEDIT( STATUS )
 
       ELSE IF ( ACTION .EQ. 'FINDCENT' ) THEN
