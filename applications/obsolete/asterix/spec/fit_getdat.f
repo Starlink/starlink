@@ -227,12 +227,14 @@
 
       INTEGER 			BDIMS(ADI__MXDIM)	! B/g array dimensions
       INTEGER			BFID(NDSMAX)		! Bgnd datasets
+      INTEGER			CNGOOD			! Current # good points
       INTEGER			DCFID(NDSMAX)		! Source datasets
       INTEGER 			DIMS(ADI__MXDIM)	! Data array dimensions
       INTEGER 			I			! Index
       INTEGER 			NDIM			! I/p dimensionality
       INTEGER 			NDSC			! # dataset files
       INTEGER 			NDSTOP			! NDS at end of current container
+      INTEGER			NDUFVAR			! # duff variances
       INTEGER			NVDIM			! Vignetting dim'ality
       INTEGER 			PTR			! General pointer
       INTEGER 			SETSIZE			! # spectra in set
@@ -716,22 +718,16 @@
               END IF
 	      IF (STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
-	      OBDAT(NDS).WPTR=0				! Flag
+	      OBDAT(NDS).WPTR = 0				! Flag
               OBDAT(NDS).GVPTR = 0
 	    END IF
 
 *        Enter weights (=inverse variances)
-	    CALL FIT_GETDAT_WTS(WEIGHTS,OBDAT(NDS).NDAT,
-     :      %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
-     :      %VAL(OBDAT(NDS).WPTR),NGDAT)
-	    IF (NGDAT.EQ.0) THEN
-	      CALL MSG_SETI('NDS',NDS)
-	      STATUS=SAI__ERROR
-	      CALL ERR_REP('NO_GOOD','No good data in dataset ^NDS',STATUS)
-	      GOTO 99
-	    ELSE
-	      NGOOD=NGOOD+NGDAT
-	    END IF
+            IF ( WEIGHTS ) THEN
+	      CALL FIT_GETDAT_WTS(WEIGHTS,OBDAT(NDS).NDAT,
+     :       %VAL(OBDAT(NDS).VPTR),QUAL,%VAL(OBDAT(NDS).QPTR),
+     :      %VAL(OBDAT(NDS).WPTR),NDUFVAR,STATUS)
+            END IF
 
 *        Default value for vignetting object
             OBDAT(NDS).V_ID = ADI__NULLID
@@ -793,9 +789,10 @@
 	        CALL ARR_INIT1R(0.0,OBDAT(NDS).NDAT,
      :                      %VAL(OBDAT(NDS).BPTR),STATUS)
 	      END IF
+
 	    END IF
 
-*        Grouping specified? If so, group the observed data now
+*        Grouping specified?
             IF ( OBDAT(NDS).GFLAG ) THEN
               CALL FIT_GROUP( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
      :                 (OBDAT(NDS).WPTR.NE.0), %VAL(OBDAT(NDS).WPTR),
@@ -803,6 +800,23 @@
      :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
      :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GVPTR),
      :                 %VAL(OBDAT(NDS).GQPTR), STATUS )
+            END IF
+
+*        Compute number of good points
+            IF ( OBDAT(NDS).QFLAG ) THEN
+              CALL ARR_CNT1L( OBDAT(NDS).NGDAT, %VAL(OBDAT(NDS).GQPTR),
+     :                        .TRUE., CNGOOD, STATUS )
+            ELSE
+              CNGOOD = OBDAT(NDS).NGDAT
+            END IF
+            CNGOOD = CNGOOD - NDUFVAR
+            IF ( CNGOOD .GT. 0 ) THEN
+              NGOOD = NGOOD + CNGOOD
+            ELSE
+	      CALL MSG_SETI('NDS',NDS)
+	      STATUS=SAI__ERROR
+	      CALL ERR_REP(' ', 'No good data in dataset ^NDS', STATUS )
+	      GOTO 99
             END IF
 
 *        Accumulate counts for data in likelihood case. Use quality if
@@ -888,72 +902,67 @@
 
 
 *+  FIT_GETDAT_WTS - Sets up array of data weights
-      SUBROUTINE FIT_GETDAT_WTS(WEIGHTS,NDAT,VARR,QUAL,QARR,WTARR,
-     :                            NGOOD)
+      SUBROUTINE FIT_GETDAT_WTS( NDAT, VARR, QUAL, QARR, WTARR, NDUF,
+     :                           STATUS )
 *    Description :
 *     Array of data weights equal to inverse variance for good data and
 *     zero for bad, is set up.
 *     Data with errors less than or equal to zero are treated as bad.
-*     If WEIGHTS=false then routine only counts the number of good values.
 *    History :
 *     30 Mar 87: Original (TJP)
 *     16 Aug 88: WEIGHTS argument added (TJP)
 *     14 Feb 89: ASTERIX88 version, variance and logical quality passed in (TJP)
 *    Type Definitions :
 	IMPLICIT NONE
+*    Global constants:
+        INCLUDE 'SAE_PAR'
+        INTEGER			STATUS
 *    Import :
-	LOGICAL WEIGHTS		! Set up weights?
 	INTEGER NDAT		! No of data values
 	REAL VARR(*)		! Array of data variances
 	LOGICAL QUAL		! Quality info present?
 	LOGICAL QARR(*)		! Quality array
-*    Import-Export :
 *    Export :
 	REAL WTARR(*)		! Data weights
-	INTEGER NGOOD		! No of good data
-*    Local constants :
+	INTEGER NDUF		! # bad variances in otherwise good points
 *    Local variables :
 	INTEGER I
 *-
 
-	NGOOD=0
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-* Set up weights
-	IF (WEIGHTS) THEN
-	  IF (QUAL) THEN
-	    DO I=1,NDAT
-	      IF (QARR(I).AND.VARR(I).GT.0.0) THEN
-	        WTARR(I)=1.0/VARR(I)
-	        NGOOD=NGOOD+1
-	      ELSE
-	        WTARR(I)=0.0
-	      END IF
-	    END DO
-	  ELSE
-	    DO I=1,NDAT
-	      IF (VARR(I).GT.0.0) THEN
-	        WTARR(I)=1.0/VARR(I)
-	        NGOOD=NGOOD+1
-	      ELSE
-	        WTARR(I)=0.0
-	      END IF
-	    END DO
+*  No duffers initially
+      NDUF = 0
+
+*  Set up weights
+      IF ( QUAL ) THEN
+	DO I = 1, NDAT
+	  IF ( QARR(I) ) THEN
+            IF ( VARR(I) .GT. 0.0 ) THEN
+	      WTARR(I) = 1.0 / VARR(I)
+	    ELSE
+	      NDUF = NDUF + 1
+	      WTARR(I) = 0.0
+	    END IF
 	  END IF
+        END DO
 
-* No weights to be set up
-	ELSE
-	  IF ( QUAL ) THEN
-	    DO I=1,NDAT
-	      IF (QARR(I)) THEN
-	        NGOOD=NGOOD+1
-	      END IF
-	    END DO
+*   Otherwise no quality
+      ELSE
+	DO I = 1, NDAT
+          IF ( VARR(I) .GT. 0.0 ) THEN
+	    WTARR(I) = 1.0 / VARR(I)
 	  ELSE
-	    NGOOD=NGOOD+NDAT
+	    NDUF = NDUF + 1
+	    WTARR(I) = 0.0
 	  END IF
-	END IF
+        END DO
 
-	END
+*  End of switch on quality
+      END IF
+
+      END
 
 
 
