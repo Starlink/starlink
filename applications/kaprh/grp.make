@@ -56,7 +56,7 @@ KAPSUB_GEN = kps1_dscl.gen kps1_hstc.gen
 # Non-generic source files needed for kapsub_sub.tar :
 KAPSUB_NONGEN = cnthlt.f cntkey.f cntsbp.f gethlp.f getv2.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
-inxy.f kaprh_mon.f kps1_clpal.f kps1_cnser.f kps1_cntur.f \
+inxy.f kps1_clpal.f kps1_cnser.f kps1_cntur.f \
 kps1_fainb.f kps1_faind.f kps1_faini.f kps1_fainr.f kps1_fainw.f \
 kps1_imzbo.f kps1_lutwk.f kps1_ncuco.f kps1_trncl.f kps1_wltrn.f \
 kps1_wptrn.f lccell.f linplt.f linset.f mfnext.f mfopen.f moscad.f \

@@ -106,6 +106,7 @@
          set hfile = `basename $file .ifl`.help
          prohlp in=$ffile out=$hfile
       end
+      rm kaprh_mon.help
       cat kaprh.star-hlp *.help > new.hlp
       mv new.hlp kaprh.hlp
       rm *.help kaprh.star-hlp
