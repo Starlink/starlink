@@ -40,6 +40,10 @@
 *        This parameter is not prompted for if NITER is zero. [3.0]
 *     OUT = NDF (Write)
 *        The output NDF holding the Stokes vector cube.
+*     SMBOX = _INTEGER (Read)
+*        The size of the box to use when smoothing Stokes vectors prior to
+*        estimating the input variances (in pixels). Only accessed if input 
+*        variances are being estimated.
 *     TITLE = LITERAL (Read)
 *        A title for the output cube.
 *     WEIGHT = _INTEGER (Read)
@@ -111,6 +115,7 @@
       INTEGER NITER              ! No. of rejection iterations to perform
       INTEGER NNDF               ! No. of input NDFs
       INTEGER PLACE              ! Place holder for co-variances NDF
+      INTEGER SMBOX              ! Full size of smoothign box in pixels
       INTEGER UBNDO( 3 )         ! Upper bounds of output NDF
       INTEGER WEIGHT             ! Weighting scheme to use
       INTEGER WSCH               ! Weighting scheme to use
@@ -286,10 +291,20 @@
          NSIGMA = MAX( 0.0, NSIGMA )
       END IF
 
+*  Get the size of the box to use when smoothing Stokes vectors prior to 
+*  estimating input variances.
+      IF( WSCH .EQ. 3 ) THEN
+         CALL PAR_GET0I( 'SMBOX', SMBOX, STATUS )
+         SMBOX = MAX( 0, SMBOX )
+      ELSE
+         SMBOX = 1
+      END IF
+
 *  Calcualte the I,Q,U values.        
       CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
-     :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, STATUS )
+     :                 INDFO, INDFC, NITER, NSIGMA, ILEVEL, SMBOX/2,
+     :                 STATUS )
 
 *  Tidy up.
 *  ========

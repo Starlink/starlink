@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGFL( INDF, ITER, VSCH, ILEVEL, T, PHI,
-     :                       EPS, DIM1, DIM2, DIM3, STOKES, VSTOK, 
+     :                       EPS, DIM1, DIM2, DIM3, STOKES, 
      :                       WORK, NSIGMA, IPDIN, IPVIN, FRDIN, FRVIN, 
      :                       STATUS )
 *+
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGFL( INDF, ITER, VSCH, ILEVEL, T, PHI, EPS, 
-*                      DIM1, DIM2, DIM3, STOKES, VSTOK, WORK, NSIGMA, IPDIN, 
+*                      DIM1, DIM2, DIM3, STOKES, WORK, NSIGMA, IPDIN, 
 *                      IPVIN, FRDIN, FRVIN, STATUS )
 
 *  Description:
@@ -59,8 +59,6 @@
 *        No. of planes.
 *     STOKES( DIM1, DIM2, DIM3 ) = REAL (Given)
 *        The current (smoothed) estimate of the Stokes parameters.
-*     VSTOK( DIM1, DIM2, DIM3 ) = REAL (Given)
-*        The variances for the Stokes parameters.
 *     WORK( DIM1, DIM2 ) = REAL (Given)
 *        A work array.
 *     NSIGMA = REAL (Given)
@@ -116,7 +114,6 @@
       INTEGER DIM2
       INTEGER DIM3
       REAL STOKES( DIM1, DIM2, DIM3 )
-      REAL VSTOK( DIM1, DIM2, DIM3 )
       REAL WORK( DIM1, DIM2 )
       REAL NSIGMA
 
@@ -210,7 +207,7 @@
 *  returns the max and min NDF intensity values.
          CALL PSX_CALLOC( EL, '_REAL', IPWGT, STATUS )
          CALL POL1_SNGSI( T, PHI, EPS, EL, DIM1, DIM2, STOKES, 
-     :                    VSTOK, %VAL( IPD ), %VAL( IPDIN ), WORK, 
+     :                    %VAL( IPD ), %VAL( IPDIN ), WORK, 
      :                    %VAL( IPWGT ), DINMAX, DINMIN, STATUS )
 
 *  We now need to get the variances for the input image. The scheme

@@ -111,6 +111,7 @@
       DOUBLE PRECISION DEN       ! Denominator value
       DOUBLE PRECISION Y1, Y2, Y3! The effective intensities
       DOUBLE PRECISION V11, V22, V33, V23, V31, V21 ! Matrix factors
+
 *.
 
 *  Check the inherited global status.
@@ -167,15 +168,9 @@
 *  arrays. Store bad values if the matrix is singular. The variances are
 *  the diagonal elements of the inverted curvature matrix, and the QU
 *  co-variance is column 3 row 2 of the inverted curvature matrix.
-            VOUT( I, 1 ) = 4.0*V11/DEN
-            IF( VOUT( I, 1 ) .LE. 0.0 ) VOUT( I, 1 ) = VAL__BADR
-
-            VOUT( I, 2 ) = 4.0*V22/DEN
-            IF( VOUT( I, 2 ) .LE. 0.0 ) VOUT( I, 2 ) = VAL__BADR
-
-            VOUT( I, 3 ) = 4.0*V33/DEN
-            IF( VOUT( I, 3 ) .LE. 0.0 ) VOUT( I, 3 ) = VAL__BADR
-
+            VOUT( I, 1 ) = MAX( 1.0D-20, 4.0*V11/DEN )
+            VOUT( I, 2 ) = MAX( 1.0D-20, 4.0*V22/DEN )
+            VOUT( I, 3 ) = MAX( 1.0D-20, 4.0*V33/DEN )
             COUT( I ) = 4.0*V23/DEN
 
 *  Increment the number of good output pixels.

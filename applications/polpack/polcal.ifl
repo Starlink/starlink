@@ -130,6 +130,16 @@ interface POLCAL
       helpkey  '*'
    endparameter
 
+   parameter   SMBOX
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  7
+      prompt   'Size of Stokes vector smoothing box, in pixels'
+      helpkey  '*'
+   endparameter
+
    parameter STEP
       type     _INTEGER
       access   READ

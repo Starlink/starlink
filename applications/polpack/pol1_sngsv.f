@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, IGRP2, INDFO, INDFC, NITER, NSIGMA, 
-     :                       ILEVEL, STATUS )
+     :                       ILEVEL, HW, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
-*                      IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, 
+*                      IGRP2, INDFO, INDFC, NITER, NSIGMA, ILEVEL, HW,
 *                      STATUS )
 
 *  Description:
@@ -99,6 +99,10 @@
 *        The information level. Zero produces no screen output; 1 gives
 *        brief details of each iteration; 2 gives full details of each
 *        iteration.
+*     HW = INTEGER (Given)
+*        The half size of the box to use when smoothing STokes vectors
+*        prior to estimating input variances (in pixels). The full size
+*        used is 2*HW + 1.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -141,6 +145,7 @@
       INTEGER NITER
       REAL NSIGMA
       INTEGER ILEVEL
+      INTEGER HW
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -150,7 +155,6 @@
       INTEGER DIM2               ! Dimension of output cube on axis 2
       INTEGER DIM3               ! Dimension of output cube on axis 3
       INTEGER EL                 ! No. of elements in a plane of the output NDF
-      INTEGER NEL                ! No. of elements in whole output NDF
       INTEGER I                  ! Index of current input NDF
       INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER INDFS              ! NDF identifier for the input section
@@ -162,21 +166,28 @@
       INTEGER IPIE3              ! Pointer to 3rd effective intensity image
       INTEGER IPMT11             ! Pointer to column 1 row 1 image
       INTEGER IPMT21             ! Pointer to column 2 row 1 image
-      INTEGER IPMT31             ! Pointer to column 3 row 1 image
       INTEGER IPMT22             ! Pointer to column 2 row 2 image
+      INTEGER IPMT31             ! Pointer to column 3 row 1 image
       INTEGER IPMT32             ! Pointer to column 3 row 2 image
       INTEGER IPMT33             ! Pointer to column 3 row 3 image
       INTEGER IPN                ! Pointer to work array holding image counts
       INTEGER IPVIN              ! Pointer to input VARIANCE array
       INTEGER IPVOUT             ! Pointer to output VARIANCE array
+      INTEGER IPX2Y              ! Pointer to work array     
+      INTEGER IPX2Y2             ! Pointer to work array     
+      INTEGER IPX3               ! Pointer to work array     
+      INTEGER IPX3Y              ! Pointer to work array     
+      INTEGER IPX4               ! Pointer to work array     
+      INTEGER IPXY2              ! Pointer to work array     
+      INTEGER IPXY3              ! Pointer to work array     
       INTEGER ITER               ! Number of rejection iterations completed
       INTEGER LBND( 3 )          ! Lower bounds of output NDF
       INTEGER NDIM               ! No. of axes in output NDF
+      INTEGER NEL                ! No. of elements in whole output NDF
+      INTEGER NW                 ! No. of elements in work array
       INTEGER UBND( 3 )          ! Upper bounds of output NDF
       LOGICAL FRDIN              ! Free the IPDIN pointer?
       LOGICAL FRVIN              ! Free the IPVIN pointer?
-
-      common /ssscom/ iter,dim1,dim2
 *.
 
 *  Check the inherited global status.
@@ -232,6 +243,17 @@
 *  contributing to each output pixel.
       CALL PSX_CALLOC( EL, '_REAL', IPN, STATUS )     
 
+*  We also need extra work arrays to hold co-efficient values needed in
+*  POL1_SNGSM.
+      NW = ( 2*HW + 1 )**2
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPX4, STATUS )     
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPX3Y, STATUS )     
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPX2Y2, STATUS )     
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPXY3, STATUS )     
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPX3, STATUS )     
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPX2Y, STATUS )     
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPXY2, STATUS )     
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -245,10 +267,13 @@
 *  Apply light spatial smoothing to the I,Q,U values calculated on the
 *  previous iteration. Each smoothed value is estimated by fitting a least
 *  squares quadratic surface to the data within a 5x5 fitting box.
-      IF( ITER .GT. 0 ) CALL POL1_SNGSM( ILEVEL, DIM1, DIM2, DIM3, 
+      IF( ITER .GT. 0 ) CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIM3, 
      :                                   %VAL( IPVOUT ), %VAL( IPDOUT ), 
      :                                   %VAL( IPCOUT ), %VAL( IPIE1 ),
-     :                                   STATUS )
+     :                                   %VAL( IPX4 ), %VAL( IPX3Y ), 
+     :                                   %VAL( IPX2Y2 ), %VAL( IPXY3 ), 
+     :                                   %VAL( IPX3 ), %VAL( IPX2Y ),
+     :                                   %VAL( IPXY2 ), STATUS )
 
 *  Calculate the effective intensities, transmittances, eficiciencies and
 *  position angles, etc. See the Sparks and Axon paper for details.
@@ -280,9 +305,8 @@
 
 *  Get pointers to the intensity values and associated variance values to
 *  use for this NDF. The co-variance array is used as work space here.
-         CALL POL1_SNGFL( INDFS, ITER, WSCH, ILEVEL, T( I ), 
-     :                    PHI( I ), EPS( I ), DIM1, DIM2, DIM3, 
-     :                    %VAL( IPDOUT ), %VAL( IPVOUT ), 
+         CALL POL1_SNGFL( INDFS, ITER, WSCH, ILEVEL, T( I ), PHI( I ), 
+     :                    EPS( I ), DIM1, DIM2, DIM3, %VAL( IPDOUT ), 
      :                    %VAL( IPCOUT ), NSIGMA, IPDIN, IPVIN, FRDIN, 
      :                    FRVIN, STATUS )
 
@@ -341,6 +365,13 @@
       CALL PSX_FREE( IPMT32, STATUS )
       CALL PSX_FREE( IPMT33, STATUS )
       CALL PSX_FREE( IPN, STATUS )     
+      CALL PSX_FREE( IPX4, STATUS )     
+      CALL PSX_FREE( IPX3Y, STATUS )     
+      CALL PSX_FREE( IPX2Y2, STATUS )     
+      CALL PSX_FREE( IPXY3, STATUS )     
+      CALL PSX_FREE( IPX3, STATUS )     
+      CALL PSX_FREE( IPX2Y, STATUS )     
+      CALL PSX_FREE( IPXY2, STATUS )     
     
       IF( .NOT. OUTVAR ) THEN
          CALL PSX_FREE( IPVOUT, STATUS )

@@ -1,5 +1,6 @@
-      SUBROUTINE POL1_SNGSM( ILEVEL, NPIX, NROW, NP, VAR, DATA, WORK, 
-     :                       WGT, STATUS )
+      SUBROUTINE POL1_SNGSM( ILEVEL, HW, NPIX, NROW, NP, VAR, DATA, 
+     :                       WORK, WGT, X4, X3Y, X2Y2, XY3, X3, X2Y,
+     :                       XY2, STATUS )
 *+
 *  Name:
 *     POL1_SNGSM
@@ -11,20 +12,23 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGSM( ILEVEL, NPIX, NROW, NP, VAR, DATA, WORK, WGT, 
-*                      STATUS )
+*     CALL POL1_SNGSM( ILEVEL, HW, NPIX, NROW, NP, VAR, DATA, WORK, WGT, 
+*                      X4, X3Y, X2Y2, XY3, X3, X2Y, XY2, STATUS )
 
 *  Description:
 *     This routine smoothes each plane of the supplied cube. A quadratic
-*     surface is fitted to the data in a 7x7 box centred on each pixel in
-*     turn. The central pixel value is replaced by the value of the 
-*     fitted surface at the central pixel. 
+*     surface is fitted to the data in a box centred on each pixel in
+*     turn. The size of the box is specified by HW. The central pixel value 
+*     is replaced by the value of the fitted surface at the central pixel. 
 
 *  Arguments:
 *     ILEVEL = INTEGER (Given)
 *        The level of information to display on the screen. Values above 1
 *        result in a message being displayed indicating which images
 *        (I,Q, or U) are being smoothed.
+*     HW = INTEGER (Given)
+*        The half size of the smoothing box in pixels. The full size
+*        used is 2*HW + 1.
 *     NPIX = INTEGER (Given)
 *        The number of pixels per row in each plane.
 *     NROW = INTEGER (Given)
@@ -39,6 +43,20 @@
 *        A work array.
 *     WGT( NPIX, NROW ) = REAL (Given and Returned)
 *        A work array for weights
+*     X4( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
+*     X3Y( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
+*     X2Y2( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
+*     XY3( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
+*     X3( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
+*     X2Y( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
+*     XY2( -HW:HW, -HW:HW ) = DOUBLE PRECISION (Returned)
+*        Work space to hold co-ordinate data.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -68,6 +86,7 @@
 
 *  Arguments Given:
       INTEGER ILEVEL
+      INTEGER HW
       INTEGER NPIX
       INTEGER NROW
       INTEGER NP
@@ -78,12 +97,17 @@
       REAL WORK( NPIX, NROW )
       REAL WGT( NPIX, NROW )
 
+*  Arguments Returned:
+      DOUBLE PRECISION X4( -HW:HW, -HW:HW ) 
+      DOUBLE PRECISION X3Y( -HW:HW, -HW:HW )
+      DOUBLE PRECISION X2Y2( -HW:HW, -HW:HW )
+      DOUBLE PRECISION XY3( -HW:HW, -HW:HW )
+      DOUBLE PRECISION X3( -HW:HW, -HW:HW ) 
+      DOUBLE PRECISION X2Y( -HW:HW, -HW:HW )
+      DOUBLE PRECISION XY2( -HW:HW, -HW:HW ) 
+
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  Local Constants:
-      INTEGER HW                 ! Half-size of the fitting box 
-      PARAMETER ( HW = 3 )
 
 *  Local Variables:
       DOUBLE PRECISION C( 6 )    ! Fit co-efficients
@@ -111,41 +135,31 @@
       DOUBLE PRECISION SY3       ! Sum over the box
       DOUBLE PRECISION SY4       ! Sum over the box
       DOUBLE PRECISION W         ! Pixel weight
+      DOUBLE PRECISION X         ! Co-ordinate data
+      DOUBLE PRECISION X2        ! Co-ordinate data
+      DOUBLE PRECISION XY        ! Co-ordinate data
+      DOUBLE PRECISION Y         ! Co-ordinate data
+      DOUBLE PRECISION Y2        ! Co-ordinate data
+      DOUBLE PRECISION Y3        ! Co-ordinate data
+      DOUBLE PRECISION Y4        ! Co-ordinate data
       INTEGER I                  ! Pixel index
-      INTEGER II                 ! Pixel offset
       INTEGER IHI                ! Upper X bound of fitting box
+      INTEGER II                 ! Pixel offset
       INTEGER ILO                ! Lower X bound of fitting box
       INTEGER IX                 ! Pixel index
       INTEGER IY                 ! Row index
       INTEGER IZ                 ! Plane index
       INTEGER J                  ! Row index
-      INTEGER JJ                 ! Pixel offset
       INTEGER JHI                ! Upper Y bound of fitting box
+      INTEGER JJ                 ! Pixel offset
       INTEGER JLO                ! Lower Y bound of fitting box
       INTEGER K                  ! Loop count
 
-      DOUBLE PRECISION X4( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION X3Y( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION X2Y2( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION XY3( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION Y4                   ! Co-ordinate data
-
-      DOUBLE PRECISION X3( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION X2Y( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION XY2( -HW:HW, -HW:HW ) ! Co-ordinate data
-      DOUBLE PRECISION Y3                   ! Co-ordinate data
-
-      DOUBLE PRECISION X2                   ! Co-ordinate data
-      DOUBLE PRECISION XY                   ! Co-ordinate data
-      DOUBLE PRECISION Y2                   ! Co-ordinate data
-
-      DOUBLE PRECISION X                   ! Co-ordinate data
-      DOUBLE PRECISION Y                   ! Co-ordinate data
-
 *.
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Check the inherited global status. Also return immediately if no
+*  smoothing is required.
+      IF ( STATUS .NE. SAI__OK .OR. HW .EQ. 0 ) RETURN
 
 *  Create the arrays holding the high (3 and 4) powers of X and Y at the 
 *  centre of each pixel in a fitting box. 
@@ -377,10 +391,10 @@
                         END DO
                      END DO
 
-*  If the matrix was singular, return VAL__BADR. Otherwise, return the
-*  central value.
+*  If the matrix was singular, return the original value. Otherwise, return 
+*  the central value.
                      IF( MAT( 6, 6 ) .EQ. 0.0 ) THEN
-                        WORK( IX, IY ) = VAL__BADR
+                        WORK( IX, IY ) = DATA( IX, IY, IZ )
 
                      ELSE
                         WORK( IX, IY ) = REAL( C( 6 )/ MAT( 6, 6 ) )

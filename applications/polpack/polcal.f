@@ -135,6 +135,34 @@
 *        is 10. This is normally reasonable for CCD frames of extended 
 *        objects such as galaxies, but a larger value, say 100, may give 
 *        slightly better results for star fields. [10]
+*     SMBOX = _INTEGER (Read)
+*        This parameter is only accessed by the single-beam algorithm. It
+*        specifies the size (in pixels) of the smoothing box used to
+*        reduce the noise in the Stokes parameters prior to estimating the
+*        variance of the input data. It is only accessed if parameter 
+*        WEIGHTS is given the value 2 or 3 (i.e. if input variances are
+*        to be estimated from the spread of the input data values). 
+*
+*        The error of a given input intensity value can be estimated 
+*        in two ways, by its deviation from the sine curve connecting 
+*        analysed intensity and analyser position, or from its deviation
+*        from its local neighbours. The second method requires a spatial
+*        smoothing to be performed, the size of which is specified by
+*        SMBOX. However, spatial smothing can introduce problems because
+*        it can cause spatial structure in the image to be interpreted as
+*        noise, resulting in over-estimates of the input variances. For
+*        this reason it is best to use a small smoothing size. If you
+*        have data for many analyser positions (say 8 or more) you could
+*        even set SMBOX to zero in order to prevent any spatial smoothing
+*        being performed. In this case, the errors are based purely on
+*        deviations from the expected sine curves. If you do not have
+*        this many analyser positions, you should use some spatial
+*        smoothing. For instance if you only had data for three analyser
+*        positions (the minimum possible number), then the sine curves
+*        would fit the supplied data exactly, no matter what the noise
+*        may be, and would consequently give no information about the input
+*        variances. In this case, a larger value of SMBOX (say 7) may be
+*        necessary. [3]
 *     TITLE = LITERAL (Read)
 *        A title for the output cube. [Output from POLCAL]
 *     TOLS = _REAL (Read)
@@ -192,9 +220,10 @@
 *        In single-bean mode, the I, Q and U values at each output pixel are 
 *        chosen to minimise the sum of the squared residuals between the 
 *        supplied intensity values and the intensity values implied by the I, 
-*        Q and U values. Input intensity values are weighted according to
-*        the scheme chosen using parameter WEIGHTS. The basic algorithm 
-*        is described by Sparks and Axon (submitted to P.A.S.P.). 
+*        Q and U values (this is equivalent to fitting sine curves to the 
+*        input intensity values). Input intensity values are weighted 
+*        according to the scheme chosen using parameter WEIGHTS. The basic 
+*        algorithm is described by Sparks and Axon (submitted to P.A.S.P.). 
 *
 *        Single beam mode can take account of imperfections in the analyser.
 *        The transmission (i.e. the overall throughput) and efficiency
@@ -220,18 +249,18 @@
 *
 *        If the input intensity images do not contain usable variances,
 *        then estimates of these variances can be made from the spread of
-*        supplied data values. This is an expensive iterative process (see
-*        parameters NITER and WEIGHTS). Initially, Stokes vectors are 
-*        estimated assigning a uniform constant weight to all input data 
-*        values. The I, Q and U images are then smoothed by fitting a 
-*        quadratic surface to the data within a 7x7 box centred on each 
-*        pixel. The residuals are then found between the supplied intensities 
-*        and the intensities implied by these smoothed Stokes vectors. These 
-*        residuals are then high pass filtered to remove any zero point error 
-*        (for instance caused by errors in the sky subtraction). The squared 
-*        residuals are then smoothed using a 7x7 pixel mean box filter.
-*        These mean squared residuals are used as the variance estimates for
-*        the input intensity values.
+*        supplied data values. This is an expensive iterative process
+*        (see parameters NITER and WEIGHTS). Initially, Stokes vectors
+*        are estimated assigning a uniform constant weight to all input
+*        data values. The I, Q and U images are then smoothed by fitting
+*        a quadratic surface to the data within a box centred on each
+*        pixel (the size of the box can be specified using parameter
+*        SMBOX). The squared residuals are then found between the
+*        supplied intensities and the intensities implied by these
+*        smoothed Stokes vectors. These squared residuals are then
+*        smoothed using a 7x7 pixel mean box and the mean squared
+*        residuals are used as the variance estimates for the input
+*        intensity values.
 *        
 *        In order to provide some safe-guards against aberrant values in 
 *        the input images, input data values which are badly inconsistent 
