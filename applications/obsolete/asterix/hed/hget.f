@@ -106,7 +106,7 @@
       INTEGER                NELM             ! # of elements
       INTEGER                PTR              ! Ptr to mapped data
       INTEGER                TSTAT            ! Temporary status
-      INTEGER                FC, ID
+      INTEGER                FC
 
       LOGICAL                ECHO             ! Echo to standard output?
       LOGICAL                LVALUE           ! Logical attribute
@@ -127,8 +127,7 @@
       CALL AST_INIT()
 
 *    Get locator to data object and validate it
-      CALL USI_ASSOC( 'INP', '*', 'READ', ID, STATUS )
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', LOC, STATUS )
       CALL DAT_VALID( LOC, OK, STATUS )
 
 *    If OK so far carry on
