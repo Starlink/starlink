@@ -4,6 +4,7 @@
 ## This file contains material ADDITIONAL to FSF automake, for
 ## supporting the Starlink build system.
 
+if %?INSTALLMANIFEST%
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
 	rm -f $@
@@ -12,7 +13,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -25,7 +26,9 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
+endif %?INSTALLMANIFEST%
 
+if %?LATEXDOCS%
 SUFFIXES+=.tex .dvi .ps .htx_tar
 # Templates to generate documentation
 .tex.dvi:
@@ -38,13 +41,5 @@ SUFFIXES+=.tex .dvi .ps .htx_tar
 .tex.htx_tar:
 	- star2html $<
 	tar cf $@ ${<:.tex=.htx}
-
-## if %?MESSGEN%
-## # Compile messages, and declare message dependencies
-## @MESSGEN_DEPENDENCIES@
-## SUFFIXES+=.msg .msg_stamp
-## # Create _all_ the message output files, with names in the .msg_stamp file
-## .msg.msg_stamp:
-## 	$(STARLINK)/bin/messgen -cfFeV $< >$@
-## endif %?MESSGEN%
+endif %?LATEXDOCS%
 
