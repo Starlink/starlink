@@ -13024,7 +13024,7 @@ iraf! {
             position 7
             type _INTEGER
             ppath DYNAMIC
-            vpath DYNAMIC
+            vpath CURRENT DYNAMIC
             prompt {Side length of square for forming marginal profiles}
             helpkey *
           }
@@ -13088,7 +13088,7 @@ iraf! {
             type NDF
             access WRITE
             vpath DEFAULT
-            ppath DEFAULT
+            ppath CURRENT DEFAULT
             association ->GLOBAL.DATA_ARRAY
             prompt {NDF to contain the PSF}
             default !
@@ -13109,7 +13109,7 @@ iraf! {
             type NDF
             access WRITE
             vpath DEFAULT
-            ppath DEFAULT
+            ppath CURRENT DEFAULT
             prompt {NDF to contain the fitted profile}
             default !
             helpkey *
@@ -13119,7 +13119,7 @@ iraf! {
             position 6
             type _REAL
             ppath DYNAMIC
-            vpath DYNAMIC
+            vpath CURRENT DYNAMIC
             prompt {Number of star-profile widths for profile fitting}
             helpkey *
           }
