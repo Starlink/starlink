@@ -28,8 +28,8 @@
     </person>
     <person>
       <name>Norman Gray</name>
-      <uname>ng</uname>
-      <email>norman@ASTRO.GLA.AC.UK</email>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
