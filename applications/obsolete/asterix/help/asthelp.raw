@@ -1790,20 +1790,52 @@
 <a href="http://www.sr.bham.ac.uk/asterix/user">http://www.sr.bham.ac.uk/asterix/user</a><p>
 <a href="http://www.sr.bham.ac.uk/asterix/prog">http://www.sr.bham.ac.uk/asterix/prog</a>
  
-
 1 Binned_dataset_commands.......
  These are general applications working on binned datasets, which
  do not fall into any of the specific categories.<p>
 
 2 ASMOOTH
- Smooths the input N-dimensional dataset with a mask whose width
- varies to achieve constant signal to noise at user defined data
- levels.<p>
+ Adaptively smooths the input N-dimensional dataset to achieve a
+ signal-to-noise (s/n) level specified by the user within each of a set of
+ user-specified "intensity" slices. The program will use data variance,
+ if present, to decide how much smoothing is required to achieve a
+ given s/n, in the absence of variance information, the data will be
+ assumed to be Poissonian.<p>
 
  This application is most useful for smoothing image data containing
  diffuse emission, where a wide mask at low data levels smooths the 
  diffuse emission sufficiently, but a progressively narrower mask 
  as the data value increases means point sources are not blurred out.<p>
+
+ Note that if the program is run on data including background, then
+ this background is effectively included as "signal" when judging the
+ degree of smoothing required to achieve the target s/n. Hence quite
+ large target values of s/n (e.g. >10) may be required to achieve
+ significant smoothing. In the case of background subtracted data,
+ smaller target values will suffice. It is best to experiment.<p>
+
+3 Algorithm
+ The ASMOOTH algorithm differs from that used in most adaptive smoothing
+ programs, which typically smooth with a running box whose size is
+ adjusted from point to point to enclose a constant number of counts.
+ ASMOOTH partitions the data range ("intensity" in the most common case)
+ into user specified slices. Within each slice a simple smooth is
+ performed, but the width of the smoothing function is chosen in each
+ slice to achieve the target s/n value, on average, within that slice.
+ i.e. (mean data value)/sqrt(smoothed mean variance)=target s/n.
+ Hence higher intensity slices will be smoothed progressively less.
+ The program informs the user of the width (or FWHM in the Gaussian
+ case) of the mask being used at each data level.<p>
+
+ This approach typically produces a more visually attractive result
+ than conventional adaptive smoothing, since (i) the filter does not
+ need to be a block filter, (ii) the data slicing approach reduces
+ the leakage from very bright point sources, especially if log spacing
+ is chosen for the data slices, and (iii) the treatment of negative
+ counts amounts to a "total smooth". The disadvantage is that since the
+ processing is genuinely adaptive to the data, it is not possible to
+ propagate errors, or to repeat exactly the same adaptive smooth on different
+ datasets.<p>
 
 3 Input_Output_data
  Input:  A single binned dataset<p>
@@ -1814,7 +1846,9 @@
  These usually occur in background subtracted or patched data. The
  assumption is made that the negative regions are unphysical, and
  so are smoothed completely flat. The normalisation of these slices
- is kept such that the flux is conserved in the total output image.<p>
+ is kept such that the flux is conserved in the total output image
+ - i.e. the negative flux is distributed evenly over the ASMOOTHed
+ dataset.<p>
 
 3 Biasing
  If the minimum data value in the dataset is less than or equal to
@@ -1834,6 +1868,16 @@
  default but larger than <math>|dmin|</math>) a larger dynamic range will be
  retained.<p>
 
+3 Data level options
+ The user can choose between linearly (1) or logarithmically (2) spaced data
+ levels or, alternatively, can specify the level boundaries explicitly (3).
+ In the case of user-defined levels it is only necessary to specify the
+ intermediate level boundaries - the data minimum and maximum levels will be
+ automatically used as the lower and upper bounds, respectively. Thus, for data
+ in the range 0-10, the values "2 7" would specify data layers of 0-2, 2-7 and
+ 7-10. If just one level is required, option (1) should be selected, with the
+ number of levels specified, NLEV = 1.<p>
+
 3 Parameters
  Keyword  Posn  Type        Description
  -------  ----  ----        -----------
@@ -1849,8 +1893,7 @@
  SNR       -    REAL        The target signal to noise. Controls how
                             much smoothing is done at each data level
    Default = 3
- FILTER    -    INTEGER     The mask form. 1=gaussian, 2=tophat, 
-                            3=cosine.
+ FILTER    -    INTEGER     The mask form. 1=gaussian, 2=tophat
    Default = 1
  OPT       -    INTEGER     Option for setting data levels at which
                             input is smoothed. If 1, values are 
@@ -1872,8 +1915,10 @@
                             as you like.
 
 3 Masks
- Three mask types are currently supported by ASMOOTH. The mask is
- chosen using the FILTER parameter, which takes the following values<p>
+ Two mask types are currently supported by ASMOOTH. Gaussian smoothing
+ will produce a more aesthetically pleasing result, and is the default
+ option. The mask is chosen using the FILTER parameter, which takes
+ the following values<p>
 
   <dl>
   <dt> Gaussian
@@ -1882,9 +1927,6 @@
        its FWHW.
   <dt> Top Hat
   <dd> The mask extent always encloses 100% of 
-       the mask power.
-  <dt> Cosine
-  <dd> The mask extent always encloses 100% of
        the mask power.
   </dl>
 
