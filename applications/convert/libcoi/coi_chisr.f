@@ -17,7 +17,8 @@
 *     The routine searches the IRAF header for the HISTORY keywords that
 *     were written by COI_WHISR, and so create the HISTORY structure
 *     in an NDF.  It does assume that the HISTORY text has not been
-*     tampered.
+*     tampered.  It also flags these HISTORY headers so they may be
+*     excluded from the FITS airlock.
 
 *  Arguments:
 *     IMDESC = INTEGER (Given)
@@ -252,7 +253,7 @@
 
 *  Create a new RECORDS element.
 *  =============================
-            DO IREC = NEXREC + 1, NEXREC+ CURREC
+            DO IREC = NEXREC + 1, NEXREC + CURREC
 
 *  Skip to the next header card.  Here we assume that these headers have
 *  not been tampered.
