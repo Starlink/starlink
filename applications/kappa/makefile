@@ -476,7 +476,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W \
                     NUM_DEF NUM_DEF_CVT NUM_DEF_B NUM_DEF_D NUM_DEF_I \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
-                    PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR
+                    PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -979,6 +979,7 @@ ME_COM:      me_com;                  $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
 NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
+AST_PAR:     $(STAR_INC)/ast_par;     $(LINK) $? $@
 NUM_CMN:     $(STAR_INC)/num_cmn;     $(LINK) $? $@
 NUM_DEC:     $(STAR_INC)/num_dec;     $(LINK) $? $@
 NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@

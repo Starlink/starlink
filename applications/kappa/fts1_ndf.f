@@ -4,8 +4,8 @@
      :                     BSCALE, BZERO, DARRAY, NONSDA, GCOUNT,
      :                     PCOUNT, MXPARM, PTYPE, PSCALE, PZERO, FILROO,
      :                     LOGHDR, FD, CFN, SUBFIL, GEXTND, NCARD,
-     :                     SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ, OFFSET, 
-     :                     CURREC, NEXT, PARAMS, STATUS )
+     :                     SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ, 
+     :                     OFFSET, CURREC, NEXT, PARAMS, STATUS )
 *+
 *  Name:
 *     FTS1_NDF

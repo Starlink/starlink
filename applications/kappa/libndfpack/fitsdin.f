@@ -87,15 +87,15 @@
 *        world co-ordinate information stored in NDF's WCS component.  
 *        The allowed values (case-insensitive) are:
 *
-*        "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+*        - "FITS-WCS" -- This uses keywords CRVALi, CDELTi, CRPIXi,
 *           PCiiijjj, etc., as described in the (draft) FITS world
 *           co-ordinate system paper by E.W.Greisen and M.Calabretta
 *           (A & A, in preparation).
 *	    
-*        "DSS" --- This is the system used by the Digital Sky Survey,
+*        - "DSS" -- This is the system used by the Digital Sky Survey,
 *           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *	    
-*        "Native" --- This is the native system used by the AST library
+*        - "Native" -- This is the native system used by the AST library
 *           (see SUN/210), and is the most general.  The others are
 *           limited in the co-ordinate systems they can describe, and
 *           may thus not fully describe the NDF's WCS component.
