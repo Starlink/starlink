@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.12}
+\newcommand{\stardocnumber}    {211.13}
 c-
 f+
-\newcommand{\stardocnumber}    {210.12}
+\newcommand{\stardocnumber}    {210.13}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {8th October 2003}
+\newcommand{\stardocdate}      {13th November 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1055,6 +1055,17 @@ possible to intercept the text being processed by a Channel so that it
 may be redirected to/from any chosen external data store, such as a
 text file, an astronomical dataset, or a network connection.
 
+The text format used by the basic Channel class is peculiar to the AST
+library - no other software will understand it. However, more specialised 
+forms of Channel are provided which use text formats more widely
+understood.
+
+An XmlChan is a type of Channel which stores the text in the form of 
+XML markup. Currently, the only form of markup provided by the XmlChan
+class is closely related to the text format produced by the basic Channel 
+class (currently, no schema or DTD is available describing this format). 
+It is hoped to add more widely understood formats later. 
+
 To further facilitate the storage of coordinate system information in
 astronomical datasets, a more specialised form of Channel called a
 FitsChan is provided. Instead of using free-format text, a FitsChan
@@ -1385,7 +1396,7 @@ f-
 
 c+
 Some datasets which do not easily yield FITS header cards may require
-a different approach, possibly involving use of a Channel
+a different approach, possibly involving use of a Channel or XmlChan
 (\secref{ss:channels}) rather than a FitsChan. In the case of the
 Starlink NDF data format, for example, all the above may be replaced
 by a single call to the function
@@ -1395,7 +1406,7 @@ most data systems, whether they use FITS header cards or not.
 c-
 f+
 Some datasets which do not easily yield FITS header cards may require
-a different approach, possibly involving use of a Channel
+a different approach, possibly involving use of a Channel or XmlChan
 (\secref{ss:channels}) rather than a FitsChan. In the case of the
 Starlink NDF data format, for example, all the above may be replaced
 by a single call to the routine
@@ -2424,7 +2435,7 @@ f-
 
 c+
 For data systems that do not use FITS header cards, a different
-approach may be needed, possibly involving use of a Channel
+approach may be needed, possibly involving use of a Channel or XmlChan
 (\secref{ss:channels}) rather than a FitsChan.  In the case of the
 Starlink NDF data format, for example, all of the above may be
 replaced by a single call to the function
@@ -2434,7 +2445,7 @@ data systems, whether they use FITS header cards or not.
 c-
 f+
 For data systems that do not use FITS header cards, a different
-approach may be needed, possibly involving use of a Channel
+approach may be needed, possibly involving use of a Channel or XmlChan
 (\secref{ss:channels}) rather than a FitsChan.  In the case of the
 Starlink NDF data format, for example, all of the above may be
 replaced by a single call to the routine
@@ -3123,6 +3134,7 @@ Object
       ZoomMap
    Channel
       FitsChan
+      XmlChan
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -12001,11 +12013,12 @@ different external representations in order to be compatible with
 (say) the astronomical data storage system in which they will reside.
 
 In this section, we discuss the basic I/O facilities which support
-external representations based on text. These are implemented using a
-new kind of Object---a Channel. We will examine later how
-to use other representations, based on FITS headers, for storing
-Objects. These are implemented using a more specialised form of
-Channel called a FitsChan (\secref{ss:nativefits}).
+external representations based on a textual format referred to as the AST
+``native format''. These are implemented using a new kind of Object---a
+Channel. We will examine later how to use other representations, based on
+an XML format or on the use of FITS headers, for storing Objects. These
+are implemented using more specialised forms of Channel called XmlChan 
+(\secref{ss:xmlchan}) and FitsChan (\secref{ss:nativefits}).
 
 \subsection{The Channel Model}
 
@@ -13186,6 +13199,31 @@ again. There is generally no need to retain comments.  Other
 possibilities, such as inter-process and network communication, could
 also be implemented {\em{via}} source and sink functions in basically
 the same way.
+
+\cleardoublepage
+\section{\label{ss:xmlchan}Storing AST Objects as XML (XmlChan)}
+
+\begin{latexonly}
+XML\footnote(http://www.w3.org/XML/)
+\end{latexonly}
+\begin{htmlonly}
+\htmladdnormallink{XML}{http://www.w3.org/XML/},
+\end{htmlonly}, and 
+is fast becoming the standard format for passing structured data around
+the internet, and much general purpose software has been written for
+tasks such as the parsing, editing, display and transformation of XML
+data. The XmlChan class (a specialised form of Channel) provides
+facilities for storing AST objects externally in the form of XML documents, 
+thus allowing such software to be used.
+
+Currently, there is no DTD or schema defining the structure of data produced 
+by an XmlChan. At the moment, such data is limited to be a fairly close
+transliteration of the AST native format produced by the basic Channel
+class. The following is the native AST representation of a simple FrameSet:
+
+xxx
+
+
 
 \cleardoublepage
 \section{\label{ss:nativefits}Storing AST Objects in FITS Headers (FitsChans)}
@@ -17899,6 +17937,7 @@ Object             - Base class for all AST Objects
       SkyAxis      - Store celestial axis information
    Channel         - Basic (textual) I/O channel
       FitsChan     - I/O Channel using FITS header cards
+      XmlChan      - I/O Channel using XML
    Mapping         - Inter-relate two coordinate systems
       CmpMap       - Compound Mapping
       DssMap       - Map points using Digitised Sky Survey plate solution
@@ -19656,12 +19695,10 @@ Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.0}
+\subsection{Changes Introduced in V3.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V2.0 and V3.0 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V2.0 and V3.0:
 
 \begin{enumerate}
 
@@ -19821,6 +19858,22 @@ III. Also, the forward and inverse transformations between frequency and
 air-wavelength have been made more compatible by using an iterative
 procedure to calculate the inverse.
 
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.0 and V3.1 (the
+current version):
+
+\begin{enumerate}
+\item Addition of a new class called XmlChan - a Channel which 
+reads and writes AST objects in the form of XML.
+\item A bug has been fixed in the Plot class which could cause incorrect
+graphical attributes to be used for various parts of the plot if either
+axis has no tick marks (i.e. if both major and minor tick marks have zero
+length).
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
