@@ -943,9 +943,16 @@ $(LINK_SCRIPT):
            else echo $@ is not in the tar file; exit 1; fi
 
 $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
-$(I_KAPPA) $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE) \
+$(I_KAPPA) $(PLATFORM_F) $(HELP_SOURCES) \
 $(STYLE_FILES) $(DEMO_FILES) $(MISC_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(MONO_SOURCE):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	sed -e s#PKG_VERS#$(PKG_VERS)# $@ >${@}.edited
+	mv ${@}.edited $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
