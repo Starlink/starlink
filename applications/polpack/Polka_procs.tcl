@@ -3244,6 +3244,8 @@ proc Dump {file} {
    global PNTNXT
    global PNTLBL
    global PNTTAG
+   global PROT_OEMAP
+   global PROT_IMMAP
 
 # Assume no dump is made.
    set ret 0
@@ -9724,6 +9726,8 @@ proc Restore {file} {
    global PNTNXT
    global PNTVID
    global PNTLBL
+   global PROT_OEMAP
+   global PROT_IMMAP
 
 # Open an existing dump file, either the supplied one, or one specified by
 # the user.
