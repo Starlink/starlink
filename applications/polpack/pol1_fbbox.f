@@ -100,7 +100,7 @@
       NL2 = VAL__MAXI
       NU2 = VAL__MINI
       NL3 = VAL__MAXI
-      NU4 = VAL__MINI
+      NU3 = VAL__MINI
 
 *  Indicate that we have not yet found any good values.
       ALLBAD = .TRUE.

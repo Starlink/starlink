@@ -544,7 +544,7 @@
          CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
      :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
          CALL NDF_SBND( 3, LBND, UBND, INDFO, STATUS ) 
-         IF( VAR ) CALL NDF_SBND( 2, LBND, UBND, INDFC, STATUS ) 
+         IF( OUTVAR ) CALL NDF_SBND( 2, LBND, UBND, INDFC, STATUS ) 
       END IF
 
 *  Tidy up
