@@ -56,7 +56,7 @@
         CALL MSG_PRNT( ' ' )
         CALL MSG_PRNT( '  eg. Enter AB to select first two' )
         CALL MSG_PRNT( ' ' )
-        CALL USI_GET0C( 'DIAGOPT', DSEL, STATUS )
+        CALL USI_GET0C( 'DOPT', DSEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         CALL CHR_UCASE( DSEL )
         DI_CHI_V_FLUX = (INDEX(DSEL,'A').NE.0)

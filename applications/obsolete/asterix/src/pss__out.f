@@ -123,7 +123,7 @@
       ELSE
 
 *      Get name of user's output file
-        CALL USI_TASSOCO( 'RESULTS', 'SSDS', SID, STATUS )
+        CALL USI_TASSOCO( 'OUT', 'SSDS', SID, STATUS )
 
       END IF
 

@@ -1,5 +1,5 @@
 *+  SDATA - Sets up file of data object names for fitting of multiple datasets
-	SUBROUTINE SDATA(STATUS)
+      SUBROUTINE SDATA(STATUS)
 *
 *    Description :
 *
@@ -11,12 +11,13 @@
 *
 *    Environment parameters :
 *
-*     REF_OBJ=UNIV(W)
-*            dataset to contain references
 *     INP1..NDSMAX=UNIV(R)
 *            dataset name
 *     DETNO=CHAR(R)
 *            string specifying selected detector range
+*     OUT=UNIV(W)
+*            dataset to contain references
+*
 *    Method :
 *
 *     Uses the Starlink REFERENCE system.
@@ -111,7 +112,7 @@
       IF ( SHOW ) THEN
 
 *      Access old reference object
-	CALL USI_ASSOCI( 'REF_OBJ', 'READ', REFLOC, IPRIM, STATUS )
+	CALL USI_ASSOCI( 'OUT', 'READ', REFLOC, IPRIM, STATUS )
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 *      Check this is a REF_FILE
@@ -180,7 +181,7 @@
       ELSE
 
 *      Create reference object
-	CALL USI_ASSOCO( 'REF_OBJ', FILE_TYPE, REFLOC, STATUS )
+	CALL USI_ASSOCO( 'OUT', FILE_TYPE, REFLOC, STATUS )
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Enter references, terminated with null entry

@@ -12,11 +12,11 @@
 *
 *     INP = UNIV(R)
 *         Input data object
-*     RANGE_MIN = REAL(R)
+*     MIN = REAL(R)
 *         Minimum value for inclusion in slice
-*     RANGE_MAX = REAL(R)
+*     MAX = REAL(R)
 *         Maximum value for inclusion in slice
-*     DEVICE = CHAR(R)
+*     DEV = CHAR(R)
 *         Output ascii device
 *
 *   Method :
@@ -173,16 +173,16 @@
         CALL MSG_SETC( 'UNITS', UNITS )
         CALL MSG_PRNT( 'Range of good quality data is '//
      :                             '^MIN to ^MAX ^UNITS' )
-        CALL USI_DEF0R( 'RANGE_MIN', DQMIN, STATUS )
-        CALL USI_DEF0R( 'RANGE_MAX', DQMAX, STATUS )
+        CALL USI_DEF0R( 'MIN', DQMIN, STATUS )
+        CALL USI_DEF0R( 'MAX', DQMAX, STATUS )
       ELSE
-        CALL USI_DEF0R( 'RANGE_MIN', DMIN, STATUS )
-        CALL USI_DEF0R( 'RANGE_MAX', DMAX, STATUS )
+        CALL USI_DEF0R( 'MIN', DMIN, STATUS )
+        CALL USI_DEF0R( 'MAX', DMAX, STATUS )
       END IF
 
 *    Get range of data
-      CALL USI_GET0R('RANGE_MIN',RMIN,STATUS)
-      CALL USI_GET0R('RANGE_MAX',RMAX,STATUS)
+      CALL USI_GET0R( 'MIN', RMIN, STATUS )
+      CALL USI_GET0R( 'MAX', RMAX, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -217,7 +217,7 @@
       END IF
 
 *    Open the output device
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCI, WIDTH, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCI, WIDTH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Output header
@@ -303,7 +303,7 @@
       END IF
 
 *    Close file and spool
-      CALL AIO_CANCL( 'DEVICE', STATUS )
+      CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Tidy up & exit
  99   CALL AST_CLOSE()

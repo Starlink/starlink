@@ -39,8 +39,8 @@
 *     AUXIN     - Input file name.                       (Univ, read)
 *     OUT       - Output filename                        (Univ, write)
 *     QVAL      - Specified quality value                (Byte, read)
-*     SELAX     - Select axes to have ranges applied     (Character, read)
-*     AXRNG1..7 - Specified axis ranges                  (Character, read)
+*     AXES      - Select axes to have ranges applied     (Character, read)
+*     AXIS1..7  - Specified axis ranges                  (Character, read)
 *     DATRNG    - Specified data value ranges            (Character, read)
 *     MODQUAL   - Quality value to modify                (Character, read)
 *     QVAL      - Specified quality value                (Character, read)
@@ -367,7 +367,7 @@
 *      Get axes to select on
         IF ( NDIM .GT. 1 ) THEN
           CALL MSG_PRNT( ' ' )
-          CALL PRS_GETLIST( 'SELAX', NDIM, AXES, NAXES, STATUS )
+          CALL PRS_GETLIST( 'AXES', NDIM, AXES, NAXES, STATUS )
 
 *        Check status
           IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -388,7 +388,7 @@
           CALL MSG_SETR( 'MIN', AXLO(J) )
           CALL MSG_SETR( 'MAX', AXHI(J) )
           CALL MSG_PRNT( 'Ranges from ^MIN to ^MAX')
-          WRITE( PAR, '(A5,I1)') 'AXRNG', I
+          WRITE( PAR, '(A4,I1)') 'AXIS', I
           CALL MSG_SETR('MIN', AXLO(J) )
           CALL MSG_SETR('MAX', AXHI(J) )
           CALL MSG_MAKE( '^MIN:^MAX', DEF, JUNK )
@@ -445,9 +445,9 @@
         CALL MSG_SETR( 'MIN', DMIN )
         CALL MSG_SETR( 'MAX', DMAX )
         CALL MSG_MAKE(' ^MIN:^MAX', DEF, JUNK )
-        CALL USI_DEF0C( 'DATRNG', DEF, STATUS )
-        CALL PRS_GETRANGES( 'DATRNG', MX_BNDS, 1, DMIN, DMAX, DRANGES,
-     :                                              NDRANGES, STATUS )
+        CALL USI_DEF0C( 'DATA', DEF, STATUS )
+        CALL PRS_GETRANGES( 'DATA', MX_BNDS, 1, DMIN, DMAX, DRANGES,
+     :                                            NDRANGES, STATUS )
 
 *      Check status
         IF ( STATUS .NE. SAI__OK ) GOTO 99
