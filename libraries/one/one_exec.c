@@ -1,6 +1,7 @@
 #include "cnf.h"
 #include "f77.h"
 #include "ems.h"
+#include "one_err.h"
 #include "sae_par.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,28 +35,35 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 *   Authors:
 *      PDRAPER: P.W. Draper (STARLINK - Durham University)
 *      RTP: Roy Platon (STARLINK)
+*      TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *   History:
 *      27-MAR-1995 (PDRAPER):
 *         Original version.
-*      02-AUG-2000 (RTP)
-*         Changed names to add to Odds & Ends Library
+*      02-AUG-2000 (RTP):
+*         Changed names to add to Odds & Ends Library.
+*         Imported from CCDPACK:ccd1_main.c
+*      28-AUG-2004 (TIMJ):
+*         Remove leftover CCD-ism.
+*         Include failed command in error message.
 *
 */
 {
    GENPTR_CHARACTER(command)
    GENPTR_INTEGER(status)
-      
+
    char *cmd;
    int ret;
   
    if ( *status != SAI__OK ) return;
   
-   cmd = cnf_creim( command, command_length ); /* Import the FORTRAN string. */
+   cmd = cnfCreim( command, command_length ); /* Import the FORTRAN string. */
    ret = system( cmd );
    if ( ret != 0 ) {
-      *status = SAI__ERROR;
-      (void) ems_rep_c( "CCD1_EXECERR", "Error executing command", status );
+      *status = ONE__EXECERROR;
+      emsSetc( "COMND", cmd );
+      (void) emsRep( "ONE_EXECERR", "Error executing command '^COMND'", 
+	status );
    }
    return;
 }
