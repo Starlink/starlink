@@ -195,7 +195,7 @@
 *          Determine whether the two co-ordinate systems are
 *          identical.
 
-            IDENTY = IDENTY .AND. .NOT. (
+            IDENTY = IDENTY .AND. (
      :               ABS( SCALE( I ) - 1<CONST> ) .LT. VAL__EPS<T> .AND.
      :               ABS( OFFSET( I ) - 0<CONST> ) .LT. VAL__EPS<T> )
          END IF
