@@ -1,0 +1,9 @@
+EXTRACTOR !.0
+-------------
+
+This is the first releease of Starlink's version of Emmanuel Bertin's
+SExtractor.  Basically the I/O has been changed to use the Starlink
+NDF library, thereby giving access to numerous other data formats and
+the Starlink AST facilities.
+
+AJC 23/11/98
