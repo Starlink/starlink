@@ -530,6 +530,9 @@
 				hint).
 		-->
 
+<!ATTLIST li	id	ID	#IMPLIED>
+<!ATTLIST dt	id	ID	#IMPLIED>
+
 <!--========== Astronomical angles ==========-->
 <!ELEMENT angle %MXO EMPTY>
 <!ATTLIST angle
