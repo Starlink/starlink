@@ -57,11 +57,11 @@
 *       available in the input catalogue
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     24-SEP-1998 (PDRAPER):
+*     24-SEP-1998 (PWD):
 *        Original version. Just for GAIA really not general enough
 *        for other purposes.
 *     {enter_changes_here}

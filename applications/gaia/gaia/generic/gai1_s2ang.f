@@ -31,19 +31,19 @@
 *        Global status.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-MAY-1983 (?OLAF?):
 *        Original version.
-*     6-JUN-1994 (PDRAPER):
+*     6-JUN-1994 (PWD):
 *        Added prologue and made platform independent.
-*     6-DEC-1996 (PDRAPER):
+*     6-DEC-1996 (PWD):
 *        Converted format to read STR buffer in one slurp
 *        into two reads to work around a problem with a compiler
 *        on OSF/1 fortran 4.0, RTL 3.69.
-*     5-OCT-1998 (PDRAPER):
+*     5-OCT-1998 (PWD):
 *        Converted for use in GAIA (was function PARPOS in PONGO).
 *     {enter_changes_here}
 

@@ -21,12 +21,12 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      If an instance of GAIA cannot be located a new one is started.
 #
 #   Authors:
-#      Peter W. Draper (PDRAPER):
+#      Peter W. Draper (PWD):
 #
 #   History:
-#      09-MAR-1998 (PDRAPER):
+#      09-MAR-1998 (PWD):
 #         Original version.
-#      18-MAY-1999 (PDRAPER):
+#      18-MAY-1999 (PWD):
 #         Converted to use standalone binary gaia_stcl.
 #-
 #.

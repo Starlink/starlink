@@ -35,20 +35,20 @@
 #     Inherits CanvasDraw.
 #
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     NG: Norman Gray (Starlink, Glasgow)
 #
 #  Copyright:
 #     Copyright 2000, Central Laboratory of the Research Councils
 #
 #  History:
-#     9-MAY-1996 (PDRAPER):
+#     9-MAY-1996 (PWD):
 #        Original version.
-#     3-JUL-1996 (PDRAPER):
+#     3-JUL-1996 (PWD):
 #        Converted to itcl2.0.
-#     23-APR-1998 (PDRAPER):
+#     23-APR-1998 (PWD):
 #        Converted to SkyCat V2.0.7.
-#     22-FEB-1999 (PDRAPER):
+#     22-FEB-1999 (PWD):
 #        Merged Allan's changes into main GAIA branch:
 #          Ported to work with new CanvasDraw version.
 #          Made clipping an option.

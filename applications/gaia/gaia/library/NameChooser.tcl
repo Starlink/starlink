@@ -42,11 +42,11 @@
 #     TopLevelWidget
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     12-DEC-1997 (PDRAPER):
+#     12-DEC-1997 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 

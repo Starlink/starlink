@@ -48,11 +48,11 @@
 #     LabelWidget.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     08-SEP-1997 (PDRAPER):
+#     08-SEP-1997 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 

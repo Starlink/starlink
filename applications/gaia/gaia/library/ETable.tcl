@@ -212,15 +212,15 @@
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     1-JUN-1995 (PDRAPER):
+#     1-JUN-1995 (PWD):
 #        Original version.
-#     10-JUN-1996 (PDRAPER):
+#     10-JUN-1996 (PWD):
 #        Converted from CCDPACK Ccd_table to ETable for use in RTD.
-#     5-JUL-1996 (PDRAPER):
+#     5-JUL-1996 (PWD):
 #        Converted to [incr Tk] widget.
 #     {enter_changes_here}
 

@@ -79,12 +79,12 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
-#     19-NOV-1996 (PDRAPER):
+#     19-NOV-1996 (PWD):
 #        Original version.
 #     24-APR-1998 (ALLAN) 
 #        Pass command line arguments to "clone" rather than use "after 500".

@@ -38,14 +38,14 @@
 *        The global status.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK)
+*     PWD: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 *  History:
-*     13-DEC-1997 (PDRAPER):
+*     13-DEC-1997 (PWD):
 *        Original version. Based on CCDPACK CCG1_IS4
 *     {enter_further_changes_here}
 

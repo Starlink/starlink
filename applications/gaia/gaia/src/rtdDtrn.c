@@ -12,7 +12,7 @@
  *     Copyright (C) 1998 Central Laboratory of the Research Councils
  *
  *   History:
- *      20-OCT-1997 (PDRAPER):
+ *      20-OCT-1997 (PWD):
  *         Original version.
  *      {enter_changes_here}
  */

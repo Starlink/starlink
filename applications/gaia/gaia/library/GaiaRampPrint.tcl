@@ -41,11 +41,11 @@
 #     rtd::RtdImagePrint
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     26-JUN-1999 (PDRAPER):
+#     26-JUN-1999 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 

@@ -50,24 +50,24 @@
 #     This class inherits no other classes.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     12-MAR-1996 (PDRAPER):
+#     12-MAR-1996 (PWD):
 #        Original version.
-#     9-JUL-1996 (PDRAPER):
+#     9-JUL-1996 (PWD):
 #        Converted to itcl2.0.
-#     29-APR-1998 (PDRAPER):
+#     29-APR-1998 (PWD):
 #        Reworked <up>, <down>, <left> and <right> bindings to
 #        preserve original bindings and remove when deselected.
-#     10-DEC-1998 (PDRAPER):
+#     10-DEC-1998 (PWD):
 #        Changed to refresh detached sky apertures (these could be
 #        incorrect if the zoom is changed).
-#     27-MAY-1999 (PDRAPER):
+#     27-MAY-1999 (PWD):
 #        Added changes to allow optimal photometry objects (normal and
 #        psf reference).
-#     17-MAY-2000 (PDRAPER):
+#     17-MAY-2000 (PWD):
 #        Fixed problem with saving sky circles/ellipses. These could
 #        occasionally reconfigure the main aperture using image,
 #        rather than canvas coordinates (dependended on major axis

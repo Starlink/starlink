@@ -162,10 +162,10 @@ cat > ${script_dir}/wcs2pix.real <<EOF
 #      in GAIA.
 #
 #   Authors:
-#      Peter W. Draper (PDRAPER):
+#      Peter W. Draper (PWD):
 #
 #   History:
-#      29-JAN-2003 (PDRAPER):
+#      29-JAN-2003 (PWD):
 #         Original version.
 #-
 #.

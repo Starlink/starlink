@@ -17,10 +17,10 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      for giving to ASTROM (SUN/5) to perform a "plate" solution.
 
 #   Authors:
-#      Peter W. Draper (PDRAPER):
+#      Peter W. Draper (PWD):
 #
 #   History:
-#      03-MAR-1999 (PDRAPER):
+#      03-MAR-1999 (PWD):
 #         Original version.
 #-
 #.

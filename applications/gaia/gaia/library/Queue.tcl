@@ -41,15 +41,15 @@
 #     This class inherits no other classes.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     23-APR-1996 (PDRAPER):
+#     23-APR-1996 (PWD):
 #        Original version.
-#     9-JUL-1996 (PDRAPER):
+#     9-JUL-1996 (PWD):
 #        Converted to itcl2.0.
-#     20-MAR-1998 (PDRAPER):
+#     20-MAR-1998 (PWD):
 #        Modified from a Stack to a proper (FIFO) queue.
 #     {enter_further_changes_here}
 

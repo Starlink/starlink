@@ -17,10 +17,10 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      be loaded as a local catalogue.
 
 #   Authors:
-#      Peter W. Draper (PDRAPER):
+#      Peter W. Draper (PWD):
 #
 #   History:
-#      14-OCT-1998 (PDRAPER):
+#      14-OCT-1998 (PWD):
 #         Original version.
 #-
 #.

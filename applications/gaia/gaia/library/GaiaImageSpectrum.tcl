@@ -58,16 +58,16 @@
 #     This class inherits the abilities of RtdImageSpectrum.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  Copyright:
 #     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
 
 #  History:
-#     16-JUL-1997 (PDRAPER):
+#     16-JUL-1997 (PWD):
 #        Original version.
-#     26-NOV-1997 (PDRAPER):
+#     26-NOV-1997 (PWD):
 #        Modified to use foreign command to write slice.
 #     {enter_further_changes_here}
 

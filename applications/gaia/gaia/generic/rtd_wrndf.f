@@ -52,28 +52,28 @@
 *        The global status on exit.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 *  History:
-*     16-JAN-1996 (PDRAPER):
+*     16-JAN-1996 (PWD):
 *        Original version.
-*     28-JUN-1996 (PDRAPER):
+*     28-JUN-1996 (PWD):
 *        Now propagates NDF.
-*     03-DEC-1997 (PDRAPER):
+*     03-DEC-1997 (PWD):
 *        Now accepts the name of the component to replace.
-*     28-JUL-1999 (PDRAPER):
+*     28-JUL-1999 (PWD):
 *        Added control of the NDF history component. This is because the
 *        command-line args may not exist (compiler dependent). 
-*     04-AUG-1999 (PDRAPER):
+*     04-AUG-1999 (PWD):
 *        Followup to above. There is now a call 
 *        ndfInit(argc,argv,status), that will do this job
 *        correctly. Left new code in place as more informative than
 *        default.
-*     30-MAY-2001 (PDRAPER):
+*     30-MAY-2001 (PWD):
 *        Now supports _DOUBLE data directly rather than presuming _REAL.
 *     {enter_changes_here}
 

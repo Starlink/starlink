@@ -43,11 +43,11 @@
 *       Name of the output ASCII_HEAD catalogue.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     16-OCT-1998 (PDRAPER):
+*     16-OCT-1998 (PWD):
 *        Original version. Just for GAIA really not general enough
 *        for other purposes.
 *     {enter_changes_here}

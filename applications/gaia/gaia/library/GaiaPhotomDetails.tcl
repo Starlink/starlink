@@ -58,13 +58,13 @@
 #     FrameWidget: basic container class for mega-widgets.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     28-MAR-1996 (PDRAPER):
+#     28-MAR-1996 (PWD):
 #        Original version.
-#     8-JUL-1996 (PDRAPER):
+#     8-JUL-1996 (PWD):
 #        Converted to itcl2.0.
 #     {enter_further_changes_here}
 

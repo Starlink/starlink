@@ -128,33 +128,33 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-MAY-1996 (PDRAPER):
+#     14-MAY-1996 (PWD):
 #        Original version.
-#     14-JUN-1996 (PDRAPER):
+#     14-JUN-1996 (PWD):
 #        Removed much of the functionality to StarArdTool to
 #        generalise things for better reuse.
-#     4-JUL-1996 (PDRAPER):
+#     4-JUL-1996 (PWD):
 #        Converted to itcl2.0, made StarArdTool into a "has a"
 #        relationship to get around inability to mix itcl/itk
 #        inheritance.
-#     28-NOV-1996 (PDRAPER):
+#     28-NOV-1996 (PWD):
 #        Added ARDMASK options.
-#     10-JUN-1997 (PDRAPER):
+#     10-JUN-1997 (PWD):
 #        Finished prologue.
 #     24-Mar-1998 (ALLAN)
 #        Changed "rect" to "rectangle", to reslove conflict with rtd bitmap name.
 #     24-APR-1998 (ALLAN)
 #        Pass command line arguments to "clone" rather than use "after 500".
-#     12-NOV-1998 (PDRAPER):
+#     12-NOV-1998 (PWD):
 #        Added clear stats window button.
-#     4-MAY-1999 (PDRAPER):
+#     4-MAY-1999 (PWD):
 #        Merged Allan's changes.
-#     28-JUN-1999 (PDRAPER):
+#     28-JUN-1999 (PWD):
 #        Added ability to save log window to text file. Renamed to
 #        GaiaArd. Added short_help.
 #     {enter_further_changes_here}

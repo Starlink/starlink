@@ -27,11 +27,11 @@
 #     This class inherits util::FrameWidget.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     28-AUG-1998 (PDRAPER):
+#     28-AUG-1998 (PWD):
 #     	 Original version, based on Allan Brighton's LabelEntry.
 #     {enter_changes_here}
 

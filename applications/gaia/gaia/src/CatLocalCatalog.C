@@ -16,11 +16,11 @@
 //     LocalCatalog
 
 //  Authors:
-//     Peter W. Draper (PDRAPER):
+//     Peter W. Draper (PWD):
 //     {enter_new_authors_here}
 
 //  History:
-//     28-JUN-1996 (PDRAPER):
+//     28-JUN-1996 (PWD):
 //        Original version, based on LocalCatalog.
 //     {enter_changes_here}
 

@@ -74,18 +74,18 @@
 #     FrameWidget
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-MAR-1995 (PDRAPER):
+#     14-MAR-1995 (PWD):
 #     	 Original version.
-#     4-MAY-1995 (PDRAPER):
+#     4-MAY-1995 (PWD):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
-#     11-AUG-1995 (PDRAPER):
+#     11-AUG-1995 (PWD):
 #        Added option for horizontal scrollbar (Tk 4 enhancement).
-#     15-NOV-1996 (PDRAPER):
+#     15-NOV-1996 (PWD):
 #        Now ScrollText in GAIA and converted to itcl2.0.
 #     {enter_further_changes_here}
 

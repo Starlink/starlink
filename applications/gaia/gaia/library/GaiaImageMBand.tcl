@@ -24,16 +24,16 @@
 #     GaiaImageMBand name [configuration options]
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  Inherits:
 #     Nothing
 
 #  History:
-#     29-APR-1999 (PDRAPER):
+#     29-APR-1999 (PWD):
 #        Original version, based on RtdImageMBand.
-#     14-JUL-1999 (PDRAPER):
+#     14-JUL-1999 (PWD):
 #        Modified to use gband command.
 #     {enter_changes_here}
 

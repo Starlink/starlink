@@ -17,7 +17,7 @@
 #     GaiaImageCut name [configuration options]
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  Copyright:
@@ -27,7 +27,7 @@
 #     Methods and configuration options of SkyCat (and Rtd).
 
 #  History:
-#     26-SEP-1997 (PDRAPER):
+#     26-SEP-1997 (PWD):
 #        Original version
 #     {enter_changes_here}
 

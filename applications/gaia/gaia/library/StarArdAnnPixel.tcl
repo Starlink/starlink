@@ -49,15 +49,15 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     21-JUN-1996 (PDRAPER):
+#     21-JUN-1996 (PWD):
 #        Original version.
-#     20-AUG-1996 (PDRAPER):
+#     20-AUG-1996 (PWD):
 #        Converted to itcl2.0.
-#     24-APR-1998 (PDRAPER):
+#     24-APR-1998 (PWD):
 #        Changed to actually return rectangle around pixel (was
 #        just returning a pixel!).
 #     {enter_further_changes_here}

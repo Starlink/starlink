@@ -14,11 +14,11 @@
 #     (in tclutil).
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
-#     21-NOV-1996 (PDRAPER):
+#     21-NOV-1996 (PWD):
 #        Original version
 #     {enter_changes_here}
 

@@ -47,7 +47,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     02-MAY-2001 (PDRAPER):
+#     02-MAY-2001 (PWD):
 #     	 Original version.
 #     {enter_further_changes_here}
 

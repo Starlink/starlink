@@ -61,13 +61,13 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     22-SEP-1998 (PDRAPER):
+*     22-SEP-1998 (PWD):
 *        Original version.
-*     04-JUN-1999 (PDRAPER):
+*     04-JUN-1999 (PWD):
 *        Added check if RA and DEC columns have these names. {HOURS}
 *        isn't a strong enough check, these can also be qualified by
 *        {+IHMS.3} type strings. In which case we cannot "guess" which

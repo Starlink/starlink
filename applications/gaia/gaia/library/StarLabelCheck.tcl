@@ -63,13 +63,13 @@
 #     configuration options.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     26-MAR-1996 (PDRAPER):
+#     26-MAR-1996 (PWD):
 #        Original version.
-#     5-JUL-1996 (PDRAPER):
+#     5-JUL-1996 (PWD):
 #        Converted to itk.
 #     {enter_further_changes_here}
 

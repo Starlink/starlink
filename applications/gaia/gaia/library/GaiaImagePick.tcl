@@ -24,7 +24,7 @@
 #     GAIA package.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  Inherits:
@@ -34,9 +34,9 @@
 #     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
 
 #  History:
-#     19-MAR-1999 (PDRAPER):
+#     19-MAR-1999 (PWD):
 #        Original version, inspired by Andy Adamson.
-#     02-JUL-1999 (PDRAPER):
+#     02-JUL-1999 (PWD):
 #        Added log filename fields and comment. A date & time comment
 #        is also added to the file.
 #     {enter_changes_here}

@@ -36,13 +36,13 @@
 *        The output image.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     2-DEC-1996 (PDRAPER):
+*     2-DEC-1996 (PWD):
 *        Original version.
-*     15-MAY-1998 (PDRAPER):
+*     15-MAY-1998 (PWD):
 *        Added WCS to components that are propagated to new NDF.
 *     {enter_changes_here}
 

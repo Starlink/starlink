@@ -19,13 +19,13 @@
 #     GAIA stands for Graphical Astronomy and Image Analysis tool.
 
 #  Authors:
-#     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     PWD: P.W. Draper (STARLINK, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     21-NOV-1996 (PDRAPER):
+#     21-NOV-1996 (PWD):
 #        Original version.
-#     17-MAY-1999 (PDRAPER):
+#     17-MAY-1999 (PWD):
 #        Now starts up single binary version of GAIA.
 #     {enter_further_changes_here}
 

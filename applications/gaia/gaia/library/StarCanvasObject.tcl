@@ -41,13 +41,13 @@
 #     This class is a base class and inherits from no other classes.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     8-MAY-1996 (PDRAPER):
+#     8-MAY-1996 (PWD):
 #        Original version.
-#     5-JUL-1996 (PDRAPER):
+#     5-JUL-1996 (PWD):
 #        Converted to itcl2.0.
 #     {enter_further_changes_here}
 
