@@ -77,7 +77,7 @@
 *    Write model prescription
       CALL MSG_SETC( 'MODEL', MODEL.SPEC )
       CALL AIO_WRITE( OCI, 'Using model  : ^MODEL', STATUS )
-      CALL HDS_TRACE( MODEL.MLOC, NLEV, PATH, FILE, STATUS )
+      CALL ADI_FTRACE( MODEL.M_ID, NLEV, PATH, FILE, STATUS )
       CALL MSG_SETC( 'MFILE', FILE )
       CALL AIO_WRITE( OCI, 'From dataset : ^MFILE', STATUS )
 

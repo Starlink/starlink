@@ -65,9 +65,6 @@
 *  Locate the response data
       CALL ERI_GETIDS( ID, INDEX, INSTR.R_ID, INSTR.A_ID, STATUS )
 
-*  Fill in dummy field
-      INSTR.ELOC = DAT__NOLOC
-
 *  Went ok?
       IF ( STATUS .EQ. SAI__OK ) THEN
 

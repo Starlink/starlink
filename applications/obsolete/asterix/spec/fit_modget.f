@@ -98,10 +98,6 @@
 *    Extract locator from identifier
       CALL ADI1_GETLOC( FID, FLOC, STATUS )
 
-*    Insert locator into model structure
-      MODEL.MLOC = FLOC
-      IF ( STATUS.NE.SAI__OK ) GOTO 99
-
 *    Check the fit_model object and pull out the model information
       CALL DAT_TYPE( FLOC, TYP, STATUS )
       IF ( TYP .NE. 'FIT_MODEL' ) THEN
