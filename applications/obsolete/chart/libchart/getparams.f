@@ -67,6 +67,8 @@
 
       CALL FILEOPEN( 1, 'PAR', 'OLD', 'DIRECT', 'FORMATTED',
      :              .TRUE., 70, .FALSE., STATUS )
+
+      IF (STATUS .NE. SAI__OK) RETURN
       
       DO I=1,25
          READ (1,REC=I,FMT='(A70)') PARAMS(I)

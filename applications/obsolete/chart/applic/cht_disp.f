@@ -76,11 +76,14 @@
 *    :      CARRIAGECONTROL='LIST',RECL=70, FORM='FORMATTED')
 *
 
+      IF (STATUS .NE. SAI__OK) RETURN
+
       DO 100 COUNT = 1, PARSIZ
          READ (1, REC = COUNT, FMT='(A70)') LINE
          CALL MSG_OUT( ' ', LINE, STATUS )
  100  CONTINUE
 
       CLOSE( UNIT = 1 )      
+
       END
       

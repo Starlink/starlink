@@ -139,6 +139,8 @@
       CALL FILEOPEN( OUT, 'astrom.dat', 'UNKNOWN', ' ', ' ',.TRUE., 80,
      :               .FALSE., STATUS )
 
+      IF (STATUS .NE. SAI__OK) GOTO 900
+
 *  There may be several sets of parameters, corresponding to
 *  several fields.
 *  So - keep restoring until an error occurs.

@@ -143,6 +143,8 @@ C
 *
       CALL FILEOPEN(3, FILE, 'NEW', ' ', ' ', .TRUE., 0, .FALSE.,
      :     STATUS )      
+
+      IF (STATUS .NE. SAI__OK) GOTO 900
 C
 C      Now read a single equinox for ALL the following positions
 C
@@ -254,6 +256,8 @@ C
 C   Close the file to which the entries have been written
 C
       CLOSE (UNIT=3)
+
+ 900  CONTINUE
 
 *  Cancel the remaining parameters.
       CALL PAR_CANCL( 'QFILE', STATUS )
