@@ -2578,7 +2578,7 @@ for NDF applications.
    \sstdescription{
       This application creates a new catalogue of polarization vectors by
       binning the Stokes parameters in the supplied catalogue. The columns in
-      the supplied catalogue should correspond to those created by POLVEC.
+      the supplied catalogue should correspond to those created by \htmlref{POLVEC}{POLVEC}.
 
       The bins used form a grid of equally sized rectangular cells, the
       dimensions of each cell being specified by the parameter BOX in
@@ -3161,7 +3161,7 @@ for NDF applications.
       FITS Keywords
    }{
       The following FITS keywords are created. The POLPACK extension item
-      stored in the keyword is shown in parentheses (see POLIMP for a
+      stored in the keyword is shown in parentheses (see \htmlref{POLIMP}{POLIMP} for a
       description of these extension items):
       \sstitemlist{
 
@@ -3214,7 +3214,7 @@ for NDF applications.
       are supplied directly by the user in response to application
       parameter prompts. If the required information is present within
       each data file in the form of header cards in a FITS extension, then
-      application POLIMP may be used in place of POLEXT (POLIMP reads the
+      application \htmlref{POLIMP}{POLIMP} may be used in place of POLEXT (\htmlref{POLIMP}{POLIMP} reads the
       required values from the FITS extension instead of obtaining values
       from the user).
 
@@ -3274,7 +3274,7 @@ for NDF applications.
          files. If a null (!) value is supplied, any image which already
          has an EPS value retains its existing value, and any other images
          are left with an undefined EPS value (this will cause a value of
-         1.0 to be used by POLCAL). [!]
+         1.0 to be used by \htmlref{POLCAL}{POLCAL}). [!]
       }
       \sstsubsection{
          FILTER = LITERAL (Read)
@@ -3350,7 +3350,7 @@ for NDF applications.
          value is supplied, any image which already has a T value retains
          its existing value, and any other images are left with an
          undefined T value (this will cause a value of 1.0 to be used by
-         POLCAL). [!]
+         \htmlref{POLCAL}{POLCAL}). [!]
       }
       \sstsubsection{
          WPLATE = \_REAL (Read)
@@ -3362,7 +3362,7 @@ for NDF applications.
          existing value, and any other images are left with an undefined
          WPLATE value. Note, when using dual-beam data, Stokes vectors can
          only be calculated for WPLATE values of 0.0, 22.5, 45.0 and 67.5.
-         The POLCAL application will fail if any other values are
+         The \htmlref{POLCAL}{POLCAL} application will fail if any other values are
          supplied. There are no such restrictions on the value of WPLATE
          when using single-beam data. [!]
       }
@@ -3447,7 +3447,7 @@ for NDF applications.
             enter a topic and/or subtopic name(s) to display the help for
                that topic or subtopic, so for example, {\tt "}polka parameters dpi{\tt "}
                gives help on DPI, which is a subtopic of Parameters, which
-               in turn is a subtopic of POLKA;
+               in turn is a subtopic of \htmlref{POLKA}{POLKA};
 
          \sstitem
             press the RETURN key to see more text at a {\tt "}Press RETURN to
@@ -3469,7 +3469,7 @@ for NDF applications.
          \sstitem
             enter an ellipsis {\tt "}...{\tt "} to display all the text below the
                current point in the hierarchy.  For example, {\tt "}POLKA...{\tt "}
-               displays information on the POLKA topic as well as
+               displays information on the \htmlref{POLKA}{POLKA} topic as well as
                information on all the subtopics under POLKA.
 
       }
@@ -3559,7 +3559,7 @@ for NDF applications.
          column names is displayed if a non-existent column name is given.
          An arbitrary algebraic combination of columns may be used by
          supplying a CURSA expression instead of a single column name. See
-         SUN/190 for details of the syntax of these expressions.
+         \xref{SUN/190}{sun190}{} for details of the syntax of these expressions.
       }
       \sstsubsection{
          COLVAR = LITERAL (Read)
@@ -3571,7 +3571,7 @@ for NDF applications.
          An arbitrary algebraic combination of columns may be used by
          supplying a CURSA expression instead of a single column name.
          For instance, supplying the string {\tt "}DP$*$$*$2{\tt "} causes the square of
-         the values in column DP to be used. See SUN/190 for details of the
+         the values in column DP to be used. See \xref{SUN/190}{sun190}{} for details of the
          syntax of these expressions. [!]
       }
       \sstsubsection{
@@ -3581,7 +3581,7 @@ for NDF applications.
          of each data value along the first axis. A list of available column
          names is displayed if a non-existent column name is given. An
          arbitrary algebraic combination of columns may be used by supplying
-         a CURSA expression instead of a single column name. See SUN/190 for
+         a CURSA expression instead of a single column name. See \xref{SUN/190}{sun190}{} for
          details of the syntax of these expressions. Only accessed if
          parameter SHAPE is TRUE. [X]
       }
@@ -3592,7 +3592,7 @@ for NDF applications.
          of each data value along the second axis. A list of available column
          names is displayed if a non-existent column name is given. An
          arbitrary algebraic combination of columns may be used by supplying
-         a CURSA expression instead of a single column name. See SUN/190 for
+         a CURSA expression instead of a single column name. See \xref{SUN/190}{sun190}{} for
          details of the syntax of these expressions. Only accessed if
          parameter SHAPE is TRUE. [Y]
       }
@@ -3600,7 +3600,7 @@ for NDF applications.
          IN = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see SUN/181). A file type of .FIT
+         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A file type of .FIT
          is assumed if no file type is supplied.
       }
       \sstsubsection{
@@ -3718,7 +3718,7 @@ for NDF applications.
       extension to indicate the state of the processing which has been
       applied to the data. This routine also allows values to be assigned
       to these extra extension items and thus can be used to import partially
-      processed data. POLIMP can be used in conjunction with POLEXP to
+      processed data. POLIMP can be used in conjunction with \htmlref{POLEXP}{POLEXP} to
       allow data to be moved backwards and forwards between POLPACK and
       other non-NDF based packages.
    }
@@ -3754,18 +3754,21 @@ for NDF applications.
          keyword values are to be translated into POLPACK extension
          items. If a null value (!) is supplied, then the following default
          table is used which corresponds to the FITS keywords written by
-         POLEXP:
+         \htmlref{POLEXP}{POLEXP}:
 
-\hspace*{1in}  \texttt{ANGROT?}   \texttt{PPCKANGR}\\
-\hspace*{1in}  \texttt{ANLANG?}   \texttt{PPCKANLA}\\
-\hspace*{1in}  \texttt{EPS?}      \texttt{PPCKEPS}\\
-\hspace*{1in}  \texttt{FILTER?}   \texttt{PPCKFILT}\\
-\hspace*{1in}  \texttt{IMGID?}    \texttt{PPCKIMID}\\
-\hspace*{1in}  \texttt{RAY?}      \texttt{PPCKRAY}\\
-\hspace*{1in}  \texttt{STOKES?}   \texttt{PPCKSTOK}\\
-\hspace*{1in}  \texttt{T?}        \texttt{PPCKT}\\
-\hspace*{1in}  \texttt{VERSION?}   \texttt{PPCKVERS}\\
-\hspace*{1in}  \texttt{WPLATE?}   \texttt{PPCKWPLT}
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{ANGROT?}       \> \texttt{PPCKANGR}  \\
+              \>  \texttt{ANLANG?}       \> \texttt{PPCKANLA} \\
+              \>  \texttt{EPS?}          \> \texttt{PPCKEPS} \\
+              \>  \texttt{FILTER?}       \> \texttt{PPCKFILT} \\
+              \>  \texttt{IMGID?}        \> \texttt{PPCKIMID} \\
+              \>  \texttt{RAY?}          \> \texttt{PPCKRAY} \\
+              \>  \texttt{STOKES?}       \> \texttt{PPCKSTOK} \\
+              \>  \texttt{T?}            \> \texttt{PPCKT} \\
+              \>  \texttt{VERSION?}      \> \texttt{PPCKVERS} \\
+              \>  \texttt{WPLATE?}       \> \texttt{PPCKWPLT}
+\end{tabbing}
 
          See the topic {\tt "}Table Format{\tt "} for information on how to create
          translation tables. [!]
@@ -3784,7 +3787,7 @@ for NDF applications.
          This example processes the data files listed in the text file
          {\tt "}names.lis{\tt "} using the default control table appropriate for
          partially processed data which has previously been exported using
-         POLEXP.
+         \htmlref{POLEXP}{POLEXP}.
       }
    }
    \sstnotes{
@@ -3820,23 +3823,26 @@ for NDF applications.
       or constant, to be assigned to the specified extension item. Some
       examples:
 
-
-\hspace*{1in}  \texttt{WPLATE} \texttt{HWP}
-
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{WPLATE}        \> \texttt{HWP}  
+\end{tabbing}
 
       This copies the value of the FITS keyword HWP from the FITS
       extension to the WPLATE component in the POLPACK extension.
 
-
-\hspace*{1in}  \texttt{WPLATE} \texttt{45.0}
-
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{WPLATE}        \> \texttt{45.0}  
+\end{tabbing}
 
       This assigns the value 45.0 to the WPLATE component of the POLPACK
       extension.
 
-
-\hspace*{1in}  \texttt{IMGID} \texttt{"}M51\_PLATEB\texttt{"}
-
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{IMGID}        \> \texttt{"M51\_PLATEB"}  
+\end{tabbing}
 
       This assigns the value M51\_PLATE to the IMGID component of the
       POLPACK extension. Note, textual constants must be enclosed within
@@ -3849,9 +3855,10 @@ for NDF applications.
       lines with the following form in the control table prior to the
       function reference:
 
-
-\hspace*{1in}  \texttt{Data-type} \texttt{FITS-keyword}
-
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{Data-type}        \> \texttt{FITS-keyword}  
+\end{tabbing}
 
       Here {\tt "}Data-type{\tt "} must be one of \_INTEGER, \_REAL, \_DOUBLE, \_WORD, \_BYTE,
       \_CHAR. So for instance if you wanted to assign a value to the WPLATE
@@ -3859,13 +3866,16 @@ for NDF applications.
       the FITS keyword HWP which gives the required value in radians, you
       could use this sequence of commands:
 
-
-\hspace*{1in}  \texttt{\_REAL} \texttt{HWP}\\
-\hspace*{1in}  \texttt{WPLATE} \texttt{57.29578$*$HWP}
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{\_REAL}        \> \texttt{HWP}  \\
+              \>  \texttt{WPLATE}        \> \texttt{57.29578$*$HWP}  
+\end{tabbing}
 
       The function may use any of the usual Fortran operators; $+$, -, $*$, /,
-      $*$$*$ and built-in functions (SIN, COS, TAN, LOG, etc). See SUN/61
-      (appendix A) for complete details.
+      $*$$*$ and built-in functions (SIN, COS, TAN, LOG, etc). See
+      \xref{appendix A}{sun61}{appendix_transformation_functions} of 
+      \xref{SUN/61}{sun61}{} for complete details.
 
       Characters strings cannot be manipulated by these functions so two
       special formats for translating their values are provided.
@@ -3874,9 +3884,12 @@ for NDF applications.
       (which is usually one of the POLPACK special names). The
       concatenation form looks like:
 
-\hspace*{1in}  \texttt{\_INTEGER} \texttt{OBSNUM}\\
-\hspace*{1in}  \texttt{\_INTEGER} \texttt{IDATE}\\
-\hspace*{1in}  \texttt{IMGID} \texttt{OBSNUM//IDATE}
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{\_INTEGER}        \> \texttt{OBSNUM}  \\
+              \>  \texttt{\_INTEGER}        \> \texttt{IDATE}  \\
+              \>  \texttt{IMGID}        \> \texttt{OBSNUM//IDATE}  
+\end{tabbing}
 
       Which results in the IMGID extension item being set to the
       concatenation of the values of the FITS keywords OBSNUM and
@@ -3891,8 +3904,11 @@ for NDF applications.
       waveplate positions to the equivalent strings recognised by POLPACK
       you might use something like:
 
-\hspace*{1in}  \texttt{WPLATE} \texttt{POLPLATE  48.0=0.0 -}\\
-\hspace*{2in}  {}           \texttt{138.0=45.0}
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{WPLATE}        \> \texttt{POLPLATE  48.0=0.0 -} \\
+              \>                         \> \texttt{138.0=45.0} 
+\end{tabbing}
 
       This does a case insensitive comparison between the value of the FITS
       keyword POLPLATE and the strings on the left hand sides of the equals
@@ -3921,8 +3937,11 @@ for NDF applications.
       to its default value if it has one, or left undefined otherwise (see
       below). For instance:
 
-\hspace*{1in}  \texttt{RAY?} \texttt{OLDRAY}\\
-\hspace*{1in}  \texttt{RAY?} \texttt{PPCKRAY}
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx            \= xxxxxxxxxxxxxx \kill
+              \>  \texttt{RAY?}          \> \texttt{OLDRAY} \\
+              \>  \texttt{RAY?}          \> \texttt{PPCKRAY} 
+\end{tabbing}
 
       causes the POLPACK extension item RAY to be assigned the value of the
       FITS keyword PPCKRAY if the keyword has a value in the FITS
@@ -3971,7 +3990,7 @@ for NDF applications.
       have been corrected to remove any instrumental effects
       introduced by the detector (such as de-biassing, flat-fielding, etc).
       Output Stokes vectors can only be produced if all input frames contain
-      a POLPACK extension (see application POLIMP). In dual-beam mode, each
+      a POLPACK extension (see application \htmlref{POLIMP}{POLIMP}). In dual-beam mode, each
       input frame contains two images of the sky (the O and E ray images).
       In single-beam mode, each input frame contains only a single image of
       the sky.
@@ -4074,9 +4093,11 @@ for NDF applications.
 
          5 - A full 6 parameter mapping of the form:
 
-\hspace*{1in} X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in
-
-\hspace*{1in} Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx \kill
+              \>  X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in \\
+              \>  Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in
+\end{tabbing}
 
          Only mapping types 1 and 3 are available when processing
          dual-beam polarimeter data. Mapping types 2 and 4 are also
@@ -4453,7 +4474,7 @@ for NDF applications.
          CAT = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see SUN/181). A file type of .FIT
+         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A file type of .FIT
          is assumed if no file type is supplied.
       }
       \sstsubsection{
@@ -4556,8 +4577,9 @@ for NDF applications.
             the WCS component.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
-            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). [!]
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as 
+            EQUAT(J2000) (see section {\tt "}\xref{Specifying a
+            Co-ordinate Frame}{sun95}{se_scs}{\tt "} in \xref{SUN/95}{sun95}{}). [!]
          }
       }
       \sstsubsection{
@@ -4620,8 +4642,9 @@ for NDF applications.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
-         Attributes{\tt "} in SUN/95 for a description of the available
+         defaulted if a null value (!) is supplied. See section {\tt "}
+         \xref{Plotting Styles and Attributes}{sun95}{se_style}{\tt "} in 
+         \xref{SUN/95}{sun95}{} for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
@@ -4703,8 +4726,9 @@ for NDF applications.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
-         Attributes{\tt "} in SUN/95 for a description of the available
+         defaulted if a null value (!) is supplied. See section {\tt "}
+         \xref{Plotting Styles and Attributes}{sun95}{se_style}{\tt "} in 
+         \xref{SUN/95}{sun95}{} for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
@@ -4741,17 +4765,19 @@ for NDF applications.
          polplot poltab style=$\wedge$mystyle.dat
       }{
          As above, but the annotated axes and vectors are drawn according
-         to the description given in text file $\backslash$verb$+$mystyle.dat$+$. If this
+         to the description given in text file \texttt{mystyle.dat}. If this
          files contains the following lines:
 
-
-\hspace*{1in}\texttt{title=My favorite colours} \\
-\hspace*{1in}\texttt{grid=1} \\
-\hspace*{1in}\texttt{minticklen=0} \\
-\hspace*{1in}\texttt{colour(border)=green} \\
-\hspace*{1in}\texttt{colour(grid)=blue} \\
-\hspace*{1in}\texttt{colour(vec)=red} \\
-\hspace*{1in}\texttt{width(border)=0.05}
+\begin{tabbing}
+ xxxxxxxxxxxx \= xxxxxxxxxxxx \kill
+              \>  \texttt{title = My favorite colours} \\
+              \>  \texttt{grid = 1} \\
+              \>  \texttt{minticklen = 0} \\
+              \>  \texttt{colour(border) = green} \\
+              \>  \texttt{colour(grid) = blue} \\
+              \>  \texttt{colour(vec) = red} \\
+              \>  \texttt{width(border) = 0.05}
+\end{tabbing}
 
          then the title is set to {\tt "}My favourite colours{\tt "}; a grid is drawn
          across the plot instead of tick marks around the edge; the border,
@@ -4807,9 +4833,9 @@ for NDF applications.
          \sstitem
          The columns specified by parameters COLX and COLY should hold
          coordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
-         an AST FrameSet (see SUN/210) in the supplied catalogue. If the
-         catalogue has been produced by one of the POLPACK application polvec
-         or polbin, then the Base Frame will be pixel co-ordinates within the
+         an AST FrameSet (see \xref{SUN/210}{sun210}{}) in the supplied catalogue. If the
+         catalogue has been produced by one of the POLPACK application \htmlref{POLVEC}{POLVEC}
+         or \htmlref{POLBIN}{POLBIN}, then the Base Frame will be pixel co-ordinates within the
          aligned intensity images, and these will be stored in columns with
          names {\tt "}X{\tt "} and {\tt "}Y{\tt "}. If the catalogue was not created by POLPACK, it
          may have no usable WCS information, in which case the supplied
@@ -4853,7 +4879,7 @@ for NDF applications.
          CUBE = NDF (Read)
       }{
          The name of the input 3D cube holding the Stokes parameters,
-         such as produced by POLCAL.
+         such as produced by \htmlref{POLCAL}{POLCAL}.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -4905,10 +4931,10 @@ for NDF applications.
       This application calculates values of percentage polarization,
       polarization angle, total intensity and polarized intensity, based
       on Stokes parameters in the supplied input cube (which will
-      normally have been created by POLKA or POLCAL). These calculated
+      normally have been created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}). These calculated
       values may be stored either in a series of 2D NDFs, or in a single
       catalogue which may be examined and manipulated using the CURSA
-      package (see SUN/190).
+      package (see \xref{SUN/190}{sun190}{}).
    }
    \sstusage{
       polvec in cat [p] [ang] [i] [ip] [q] [u] [v]
@@ -4937,7 +4963,7 @@ for NDF applications.
          performed).
 
          Note, if the output vectors are being stored in a catalogue, it
-         is usually better to use the POLBIN application to bin the Stokes
+         is usually better to use the \htmlref{POLBIN}{POLBIN} application to bin the Stokes
          vectors. [1]
       }
       \sstsubsection{
@@ -4992,13 +5018,14 @@ for NDF applications.
          to avoid binning the Stokes vectors in this application (see
          parameter BOX). Information describing the mappings between pixel
          coordinates and any other known coordinate Frames will be stored in
-         the catalogue in textual form, as an AST FrameSet (see SUN/210).
+         the catalogue in textual form, as an AST FrameSet (see
+         \xref{SUN/210}{sun210}{}).
 
          The storage format of the catalogue is determined by the {\tt "}file
          type{\tt "} specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
          with file extension {\tt "}.FIT{\tt "}. Other possibilities are described in
-         SUN/190.
+         \xref{SUN/190}{sun190}{}.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
@@ -5020,7 +5047,7 @@ for NDF applications.
          IN = NDF (Read)
       }{
          The 3D cube holding the Stokes parameters. This should have been
-         created by POLKA or POLCAL.
+         created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}.
       }
       \sstsubsection{
          IP = NDF (Write)
