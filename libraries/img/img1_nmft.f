@@ -35,6 +35,8 @@
 *        Original version.
 *     22-AUG-1994 (PDRAPER):
 *        Fixed to take account of the 'END' keyword.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -46,14 +48,15 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_FTSP( IMG__MXPAR ) = INTEGER (Read)
 *        Pointer to mapped FITS block.
 *
@@ -86,7 +89,8 @@
 *  %VAL( 80 ) appended after the last genuine argument is the length of
 *  the mapped character strings. This is the usual method that UNIX
 *  compilers use to pass this information.
-      CALL IMG1_CKEY( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ), N,
+      CALL IMG1_CKEY( ECB_FTSN( SLOT ), 
+     :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), N,
      :                STATUS, %VAL( 80 ) )
       END
 * $Id$

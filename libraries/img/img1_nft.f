@@ -37,6 +37,8 @@
 *     31-AUG-1994 (PDRAPER):
 *        Make sure that ITEM is blank if name is out of range (not an
 *        error condition).
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -48,21 +50,22 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_FTSP( IMG__MXPAR ) = INTEGER (Read)
 *        Pointer to mapped FITS block.
 *
 *        ECB_FTSN( IMG__MXPAR ) = INTEGER (Read)
 *        Number of entries in the FITS block.
 
-      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *           NDF identifiers
 
@@ -74,16 +77,16 @@
       CHARACTER * ( * ) ITEM
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
       EXTERNAL CHR_NTH
-      CHARACTER * ( 2 ) CHR_NTH  ! Returns two-character ordinal
+      CHARACTER * ( 2 ) CHR_NTH ! Returns two-character ordinal
 
 *  Local Variables:
-      CHARACTER * ( 2 ) TH       ! Two-character ordinal
-      LOGICAL INRANG             ! Requested index is out of range
+      CHARACTER * ( 2 ) TH      ! Two-character ordinal
+      LOGICAL INRANG            ! Requested index is out of range
 *.
 
 *  Check inherited global status.
@@ -100,7 +103,8 @@
 *  Note that the %VAL( 80 ) appended after the last genuine argument is
 *  the length of the mapped character strings. This is the usual method
 *  that UNIX compilers use to pass this information.
-         CALL IMG1_RKEY( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+         CALL IMG1_RKEY( ECB_FTSN( SLOT ), 
+     :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                   .FALSE., N, ITEM, INRANG, STATUS, %VAL( 80 ) )
          IF ( STATUS .NE. SAI__OK ) THEN
 

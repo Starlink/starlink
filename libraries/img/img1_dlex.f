@@ -47,6 +47,8 @@
 *        locator stack otherwise since a deleted parent deletes all
 *        children. Alternative is to process stack looking for all
 *        children of object to be deleted).
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -58,14 +60,15 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_XNAME( IMG__MXPAR, IMG__MXEXT ) =
 *           CHARACTER * ( NDF__SZXNM ) (Read)
 *        The name of the extension
@@ -80,7 +83,7 @@
 *        ECB_XNSTK( IMG__MXPAR, IMG__MXEXT ) = INTEGER (Read and Write)
 *        The number of locators in an extension stack.
 
-      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *           NDF identifiers
 
@@ -90,31 +93,31 @@
       CHARACTER * ( * ) ITEM
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
       EXTERNAL CHR_LEN
-      INTEGER CHR_LEN            ! Used length of string
+      INTEGER CHR_LEN           ! Used length of string
       EXTERNAL IMG1_NCEL
       CHARACTER * ( DAT__SZLOC ) IMG1_NCEL ! Returns Nth character
                                            ! element of array
 
 *  Local Variables:
-      CHARACTER * ( 132 ) FILE   ! Name of file
-      CHARACTER * ( 132 ) OPATH  ! Full path name of object
-      CHARACTER * ( 132 ) SPATH  ! Full path name of object
+      CHARACTER * ( 132 ) FILE  ! Name of file
+      CHARACTER * ( 132 ) OPATH ! Full path name of object
+      CHARACTER * ( 132 ) SPATH ! Full path name of object
       CHARACTER * ( 2 * DAT__SZNAM ) OBJECT ! Name of "current" object
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Primary locator
       CHARACTER * ( DAT__SZLOC ) LOC2 ! Secondary locator
       CHARACTER * ( DAT__SZLOC ) TMPLOC ! Temporary copy of locator from stack
-      INTEGER I                  ! Loop variable
-      INTEGER IAT                ! Current start position in ITEM
-      INTEGER INOW               ! New position of period
-      INTEGER NLEV               ! Dummy
-      LOGICAL MORE               ! ITEM string has more periods
-      LOGICAL PRIM               ! Object is primitive
-      LOGICAL YES                ! Object exists
+      INTEGER I                 ! Loop variable
+      INTEGER IAT               ! Current start position in ITEM
+      INTEGER INOW              ! New position of period
+      INTEGER NLEV              ! Dummy
+      LOGICAL MORE              ! ITEM string has more periods
+      LOGICAL PRIM              ! Object is primitive
+      LOGICAL YES               ! Object exists
 *.
 
 *  Check inherited global status.
@@ -188,9 +191,10 @@
                   IF ( ECB_XNSTK( SLOT, ESLOT ) .GT. 0 ) THEN
                      CALL HDS_TRACE( LOC2, NLEV, OPATH, FILE, STATUS )
                      DO 2 I = 1, ECB_XNSTK( SLOT, ESLOT )
-                        TMPLOC = IMG1_NCEL( %VAL(ECB_XPSTK(SLOT,ESLOT)),
-     :                                      ECB_XNSTK( SLOT, ESLOT ), I,
-     :                                      STATUS, %VAL( DAT__SZLOC) )
+                        TMPLOC = IMG1_NCEL( 
+     :                           %VAL(CNF_PVAL( ECB_XPSTK(SLOT,ESLOT))),
+     :                           ECB_XNSTK( SLOT, ESLOT ), I,
+     :                           STATUS, %VAL( DAT__SZLOC) )
 
 *  Get the complete path name for this object and compare it with the
 *  name of the object which we are about to delete.
@@ -201,8 +205,8 @@
 *  Have a match need to remove this. Unfortunately this means re-sorting
 *  the locator stack to remove the gap created by this erasure.
                            CALL IMG1_DCEL( ECB_XNSTK( SLOT, ESLOT ), I,
-     :                                     %VAL( ECB_XPSTK(SLOT,ESLOT)),
-     :                                     STATUS, %VAL( DAT__SZLOC) )
+     :                          %VAL(CNF_PVAL( ECB_XPSTK(SLOT,ESLOT)) ),
+     :                          STATUS, %VAL( DAT__SZLOC) )
 
 *  Adjust the locator stack to remove the extra element.
                            ECB_XNSTK( SLOT, ESLOT ) =

@@ -38,6 +38,8 @@
 *        Original version.
 *     12-SEP-1994 (PDRAPER):
 *        Now checks for all occurrences of a keyword.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -49,14 +51,15 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_FTSP( IMG__MXPAR ) = INTEGER (Read)
 *        Pointer to mapped FITS block.
 *
@@ -72,10 +75,10 @@
       INTEGER NCOMP
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
 
 *  Local Variables:
 
@@ -87,7 +90,8 @@
 *  Pass on the work to the appropriate routine. Note the %VAL(80)
 *  follows the last genuine argument. This is the usual method used by
 *  compilers for passing the lengths of strings on UNIX.
-      CALL IMG1_NKEY( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ), ITEM,
+      CALL IMG1_NKEY( ECB_FTSN( SLOT ), 
+     :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), ITEM,
      :                FOUND, NCOMP, STATUS, %VAL( 80 ) )
       END
 

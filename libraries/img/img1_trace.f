@@ -61,6 +61,8 @@
 *     2-SEP-1994 (PDRAPER):
 *        Original version based on a version IMG_NEX. This is part of
 *        the reorganisation to speed indexing of large extensions.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -69,17 +71,18 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_XNAME( IMG__MXPAR, IMG__MXEXT ) =
 *           CHARACTER * ( NDF__SZXNM ) (Read)
 *        The name of the extension
@@ -97,7 +100,7 @@
 *        ECB_XNLEN( IMG__MXPAR, IMG__MXEXT ) = INTEGER (Write)
 *        Length of the (hds_)trace of the extension locator.
 
-      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *        NDF identifiers
 
@@ -106,41 +109,41 @@
       INTEGER ESLOT
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
       EXTERNAL CHR_LEN
-      INTEGER CHR_LEN            ! Used length of string
+      INTEGER CHR_LEN           ! Used length of string
 
 *  Local Constants:
       INTEGER DEPTH
-      PARAMETER ( DEPTH = 100 )  ! Maximum recursion depth.
+      PARAMETER ( DEPTH = 100 ) ! Maximum recursion depth.
       INTEGER CHUNK
-      PARAMETER ( CHUNK = 100 )  ! Size of locator array extension
+      PARAMETER ( CHUNK = 100 ) ! Size of locator array extension
 
 *  Local Variables:
-      CHARACTER * ( 132 ) FILE   ! Name of container file
-      CHARACTER * ( 132 ) PATH   ! Trace of extension path name
+      CHARACTER * ( 132 ) FILE  ! Name of container file
+      CHARACTER * ( 132 ) PATH  ! Trace of extension path name
       CHARACTER * ( DAT__SZLOC ) LOCSTK ( DEPTH ) ! Locators to active
-                                 ! objects (recursion stack)
+                                ! objects (recursion stack)
       CHARACTER * ( DAT__SZLOC ) NEWLOC ! Temporary locator
-      INTEGER ALLOC              ! Amount of storage current available
-      INTEGER DIM( DAT__MXDIM )  ! Dimensions of object
-      INTEGER DONE( DEPTH )      ! Number of component processed at this
-                                 ! level
-      INTEGER I                  ! Loop variable
-      INTEGER IPLOC              ! Pointer to locator storage space
-      INTEGER LEVEL              ! Current component level (recursion
-                                 ! depth)
-      INTEGER NCOMP( DEPTH )     ! Number of components at this level
-      INTEGER NDIM               ! Number of object dimensions
-      INTEGER NLEV               ! Number of levels in name traces
-      INTEGER NOBJ               ! Number of locators on stack
-      INTEGER NPRIM              ! Number of primitives encountered
-      LOGICAL ISPRIM             ! Object is a primitive
-      LOGICAL SCALAR( DEPTH )    ! Object is scalar
-
+      INTEGER ALLOC             ! Amount of storage current available
+      INTEGER DIM( DAT__MXDIM ) ! Dimensions of object
+      INTEGER DONE( DEPTH )     ! Number of component processed at this
+                                ! level
+      INTEGER I                 ! Loop variable
+      INTEGER IPLOC             ! Pointer to locator storage space
+      INTEGER LEVEL             ! Current component level (recursion
+                                ! depth)
+      INTEGER NCOMP( DEPTH )    ! Number of components at this level
+      INTEGER NDIM              ! Number of object dimensions
+      INTEGER NLEV              ! Number of levels in name traces
+      INTEGER NOBJ              ! Number of locators on stack
+      INTEGER NPRIM             ! Number of primitives encountered
+      LOGICAL ISPRIM            ! Object is a primitive
+      LOGICAL SCALAR( DEPTH )   ! Object is scalar
+      
 *.
 
 *  Check inherited global status.
@@ -260,7 +263,7 @@
      :                             IPLOC, STATUS )
                END IF
                CALL IMG1_WCEL( ALLOC, NPRIM, LOCSTK( NOBJ ),
-     :                         %VAL( IPLOC ), STATUS,
+     :                         %VAL( CNF_PVAL( IPLOC ) ), STATUS,
      :                         %VAL( DAT__SZLOC ) )
 
 *  Now try for another object at this level.

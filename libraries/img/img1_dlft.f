@@ -38,8 +38,9 @@
 *     12-SEP-1994 (PDRAPER):
 *        Now doesn't worry about missing items and deals with multiple
 *        occurences.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
-
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -49,26 +50,27 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_FTSP( IMG__MXPAR ) = INTEGER (Read)
 *        Pointer to mapped FITS block.
 *
 *        ECB_FTSN( IMG__MXPAR ) = INTEGER (Read)
 *        Number of entries in the FITS block.
 
-      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *           NDF identifiers
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
 
 *   Arguments Given:
       INTEGER SLOT
@@ -76,10 +78,10 @@
       INTEGER NOCCUR
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      LOGICAL DELETE             ! Item has been located in FITS block
+      LOGICAL DELETE            ! Item has been located in FITS block
 
 *.
 
@@ -93,7 +95,8 @@
 
 *  Try to delete the value (this actually results in the record being
 *  set blank).
-      CALL IMG1_DKEY( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+      CALL IMG1_DKEY( ECB_FTSN( SLOT ), 
+     :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                ITEM, NOCCUR, DELETE, STATUS, %VAL( 80 ) )
       END
 

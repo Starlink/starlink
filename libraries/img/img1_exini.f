@@ -68,6 +68,8 @@
 *     28-NOV-1994 (PDRAPER):
 *        Re-track as readonly access to input NDFs is allowed.
 *        Re-incorporated the code for mapping FITS blocks.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,14 +81,15 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_XNAME( IMG__MXPAR, IMG__MXEXT ) =
 *           CHARACTER * ( NDF__SZXNM ) (Read and Write)
 *        The name of the extension
@@ -101,7 +104,7 @@
 *        ECB_FTSN( IMG__MXPAR ) = INTEGER (Write)
 *        Number of entries in the FITS block.
 
-      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *           NDF identifiers
 
@@ -114,24 +117,24 @@
       INTEGER ESLOT
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
       EXTERNAL CHR_SIMLR
-      LOGICAL CHR_SIMLR          ! Two case independent character
-                                 ! strings are the same
+      LOGICAL CHR_SIMLR         ! Two case independent character
+                                ! strings are the same
 
 *  Local Variables:
       CHARACTER * ( 3 ) END( 1 ) ! 'END' keyword as array element
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to extension
-      INTEGER I                  ! Loop variable
-      INTEGER NFITS              ! Number of elements in FITS block
-      INTEGER NOUT               ! Number of copied FITS records
-      INTEGER POINT              ! Pointer to FITS block
-      LOGICAL CANMOD             ! If modification of the NDF is allowed
-      LOGICAL EXISTS             ! Extension exists
-      LOGICAL FITS               ! True if extension is FITS
+      INTEGER I                 ! Loop variable
+      INTEGER NFITS             ! Number of elements in FITS block
+      INTEGER NOUT              ! Number of copied FITS records
+      INTEGER POINT             ! Pointer to FITS block
+      LOGICAL CANMOD            ! If modification of the NDF is allowed
+      LOGICAL EXISTS            ! Extension exists
+      LOGICAL FITS              ! True if extension is FITS
 
 *  Local Data:
       DATA END / 'END' /
@@ -182,7 +185,7 @@
          ELSE
 
 *  Extension exists so get a locator to it...
-            IF ( CANMOD ) THEN 
+            IF ( CANMOD ) THEN
                CALL NDF_XLOC( PCB_INDF( SLOT ), XNAME, 'UPDATE', LOC,
      :                        STATUS )
             ELSE
@@ -239,9 +242,11 @@
 *  Copy the FITS block. Note the lengths of the strings are appended
 *  after the last genuine argument, this is how most UNIX compilers pass
 *  character string lengths.
-                        CALL IMG1_FTSCP( %VAL( POINT ), NFITS,
-     :                                   %VAL( ECB_FTSP( SLOT ) ), NOUT,
-     :                                   STATUS, %VAL( 80 ), %VAL( 80 ))
+                        CALL IMG1_FTSCP( %VAL( CNF_PVAL( POINT  ) ), 
+     :                                   NFITS,
+     :                                   %VAL(CNF_PVAL(ECB_FTSP(SLOT))), 
+     :                                   NOUT, STATUS, 
+     :                                   %VAL( 80 ), %VAL( 80 ))
 
 *  And release the real data.
                         CALL DAT_UNMAP( LOC, STATUS )

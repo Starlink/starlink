@@ -52,6 +52,8 @@
 *     16-DEC-1996 (PDRAPER):
 *        Moved modification of extension size into modified block. 
 *        Uninitialized variables were breaking this code on Linux.
+*     20-APR-1999 (PDRAPER):
+*        Modified to use CNF_PVAL to deference C memory pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,14 +65,15 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IMG_CONST'        ! IMG_ constants
-      INCLUDE 'IMG_ERR'          ! IMG_ error codes
-      INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'IMG_CONST'       ! IMG_ constants
+      INCLUDE 'IMG_ERR'         ! IMG_ error codes
+      INCLUDE 'NDF_PAR'         ! NDF_ constants
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
+      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
-      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+      INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
 *        ECB_XNAME( IMG__MXPAR, IMG__MXEXT ) =
 *           CHARACTER * ( NDF__SZXNM ) (Read and Write)
 *        The name of the extension
@@ -94,7 +97,7 @@
 *        ECB_XNLEN( IMG__MXPAR, IMG__MXEXT ) = INTEGER (Read and Write)
 *        Length of the (hds_) trace of the extension.
 
-      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+      INCLUDE 'IMG_PCB'         ! IMG Parameter Control Block
 *        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
 *           NDF identifiers
       
@@ -103,21 +106,21 @@
       INTEGER ESLOT
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
-      EXTERNAL IMG1_INIT         ! Initialise common blocks
+      EXTERNAL IMG1_INIT        ! Initialise common blocks
       EXTERNAL IMG1_NCEL
       CHARACTER * ( DAT__SZLOC ) IMG1_NCEL ! Returns element from
-                                 ! character array
+                                           ! character array
 
 *  Local variables:
       CHARACTER * ( DAT__SZLOC ) LOC ! Temporary locator
-      INTEGER I                  ! Loop variable
-      INTEGER IPFITS             ! Pointer to re-mapped FITS block
-      INTEGER NFITS              ! Number of FITS records
-      INTEGER NOUT               ! Number of copied FITS records
-      LOGICAL CANMOD             ! Can modify NDF.
+      INTEGER I                 ! Loop variable
+      INTEGER IPFITS            ! Pointer to re-mapped FITS block
+      INTEGER NFITS             ! Number of FITS records
+      INTEGER NOUT              ! Number of copied FITS records
+      LOGICAL CANMOD            ! Can modify NDF.
 *.
 
 *  Start an error context.
@@ -139,8 +142,9 @@
      :                    'UPDATE', IPFITS, NFITS, STATUS )
 
 *  Now copy the FITS block.
-            CALL IMG1_FTSCP( %VAL( ECB_FTSP( SLOT ) ), NFITS,
-     :                       %VAL( IPFITS ), NOUT, STATUS,
+            CALL IMG1_FTSCP( %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), 
+     :                       NFITS, %VAL( CNF_PVAL( IPFITS  ) ), 
+     :                       NOUT, STATUS,
      :                       %VAL( 80 ), %VAL( 80 ) )
 
 *  and unmap it.
@@ -171,9 +175,9 @@
 *  be freed.
             IF ( ECB_XNSTK( SLOT, ESLOT ) .GT. 0 ) THEN
                DO 1 I = 1, ECB_XNSTK( SLOT, ESLOT )
-                  LOC = IMG1_NCEL( %VAL( ECB_XPSTK( SLOT, ESLOT ) ),
-     :                             ECB_XNSTK( SLOT, ESLOT ), I,
-     :                             STATUS, %VAL( DAT__SZLOC) )
+                  LOC = IMG1_NCEL(%VAL(CNF_PVAL(ECB_XPSTK(SLOT,ESLOT))),
+     :                            ECB_XNSTK( SLOT, ESLOT ), I,
+     :                            STATUS, %VAL( DAT__SZLOC ) )
                   CALL DAT_ANNUL( LOC, STATUS )
  1             CONTINUE
             END IF
