@@ -12,6 +12,7 @@
 *     USE_CALIBRATOR  - Yes, if you want the data for each bolometer measurement
 *                       divided by the corresponding internal calibrator
 *                       signal.
+*     SPIKE_LEVEL     - level at which pixels should be marked bad
 *     OUT             - The name of the file to contain the output data.
 *
 *     If status is good on entry, the routine reads the USE_CALIBRATOR
@@ -89,6 +90,8 @@
 *    Local Constants :
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
+      BYTE BADBIT                       ! Bad bits mask
+      PARAMETER (BADBIT = 7)
 *    Local variables :
       INTEGER BEAM                      ! beam index in DO loop
       INTEGER BEAM_OFFSET               ! offset in output data array due to
@@ -153,6 +156,7 @@
       LOGICAL REDUCE_SWITCH             ! .TRUE. if REDUCE_SWITCH has already
                                         ! been run on the file
       INTEGER RUN_NUMBER                ! run number of observation
+      INTEGER SPIKE_LEVEL               ! level to despike
       INTEGER START_BEAM                ! first reduced beam
       CHARACTER*20 STEMP                ! scratch string
       INTEGER SWITCHES                  ! number of switches implied by
@@ -303,6 +307,9 @@
          END IF
       END IF
 
+* Switch off automatic quality checking
+      CALL NDF_SQMF(.FALSE., IN_NDF, STATUS)
+
 *  map the data array and check its dimensions 
 
       CALL NDF_DIM (IN_NDF, MAXDIM, DIM, NDIM, STATUS)
@@ -401,6 +408,10 @@
      :  'switch(es) in ^N_E exposure(s) in ^N_I integration(s) in '//
      :  '^N_M measurement(s)', STATUS)
 
+* Ask for the level at switch spikes should be removed
+
+      CALL PAR_GET0I('SPIKE_LEVEL', SPIKE_LEVEL, STATUS)
+
 *  get some scratch memory and copy the different sections of the data array
 *  into it
 
@@ -412,11 +423,11 @@
      :  DEMOD_CALIBRATOR_PTR, DEMOD_CALIBRATOR_END, STATUS)
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
      :  DEMOD_CAL_VARIANCE_PTR, DEMOD_CAL_VARIANCE_END, STATUS)
-      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBI, DEMOD_QUALITY_PTR,
+      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB, DEMOD_QUALITY_PTR,
      :  DEMOD_QUALITY_END, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, N_POS,
+         CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, N_POS, SPIKE_LEVEL,
      :     %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
      :     %val(DEMOD_VARIANCE_PTR), %val(DEMOD_CALIBRATOR_PTR),
      :     %val(DEMOD_CAL_VARIANCE_PTR), %val(DEMOD_QUALITY_PTR),
@@ -427,7 +438,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (USE_CALIBRATOR) THEN
-            CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS,
+            CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS, BADBIT,
      :        %val(DEMOD_DATA_PTR), %val(DEMOD_VARIANCE_PTR),
      :        %val(DEMOD_CALIBRATOR_PTR), %val(DEMOD_QUALITY_PTR))
          END IF
@@ -455,12 +466,12 @@
       END IF
       CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
 
+      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :  OUT_QUALITY_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_INTEGER', 'WRITE',
-     :  OUT_QUALITY_PTR, ITEMP, STATUS)
 
 *  find the .SCUBA.DEM_PNTR array, change its bounds and map it
 
@@ -539,32 +550,32 @@
                      BEAM_OFFSET = (BEAM - START_BEAM) * N_POS * N_BOLS
 
                      CALL SCULIB_REDUCE_SWITCH (CHOP_FUNCTION,
-     :                 N_SWITCHES, N_SWITCH_POS * N_BOLS, 
+     :                 N_SWITCHES, N_SWITCH_POS * N_BOLS,
      :                 %val(DEMOD_DATA_PTR + 
      :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                 %val(DEMOD_VARIANCE_PTR + 
      :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBI),
+     :                 (SWITCH1_START - 1) * N_BOLS * VAL__NBUB),
      :                 %val(DEMOD_DATA_PTR +
      :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
      :                 %val(DEMOD_VARIANCE_PTR + 
      :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBR),
      :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBI),
+     :                 (SWITCH2_START - 1) * N_BOLS * VAL__NBUB),
      :                 %val(DEMOD_DATA_PTR + 
      :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
      :                 %val(DEMOD_VARIANCE_PTR + 
      :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBR),
      :                 %val(DEMOD_QUALITY_PTR + 
-     :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBI),
+     :                 (SWITCH3_START - 1) * N_BOLS * VAL__NBUB),
      :                 BEAM,
      :                 %val(OUT_DATA_PTR + (BEAM_OFFSET +
      :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                 %val(OUT_VARIANCE_PTR + (BEAM_OFFSET +
      :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBR),
      :                 %val(OUT_QUALITY_PTR + (BEAM_OFFSET +
-     :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBI),
+     :                 (EXP_POINTER-1) * N_BOLS) * VAL__NBUB),
      :                 BEAM_WEIGHT(BEAM),
      :                 STATUS)
                   END DO
@@ -625,6 +636,10 @@
       CALL SCULIB_FREE ('DEMOD_QUALITY', DEMOD_QUALITY_PTR,
      :  DEMOD_QUALITY_END, STATUS)
 
+* Set the bit mask
+      CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
+
+* Unmap and annul
       CALL ARY_UNMAP (IARY1, STATUS)
       CALL NDF_ANNUL (IN_NDF, STATUS)
       CALL ARY_UNMAP (IARY2, STATUS)
