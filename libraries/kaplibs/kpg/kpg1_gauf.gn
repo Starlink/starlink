@@ -66,6 +66,10 @@
 *     1990 September 18 (MJC):
 *        Made generic, renamed from GAUFIT, added STATUS, commented
 *        the variables and converted the prologue.
+*     1992 April 28 (MJC):
+*        Returns values even if the iteration loop is completed without
+*        convergence to the tolerance.  Assumes oscillation and takes
+*        mean of last two values.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -407,6 +411,21 @@
             SIGMA = X( 3 )
             BACK = X( 4 )
             GO TO 100
+
+*       Since convergence has not been reached, it is assumed that there
+*       is an oscillation present.  Therefore take the approximate mean
+*       of the last pair of values.
+
+         ELSE IF ( ITER .EQ. NITER ) THEN
+
+            AMP  = X( 1 ) + DX( 1 ) / ( 2.0 + 4.0 * ABS( DX( 1 ) /
+     :             MAX( X( 1 ), 1.0E-20 ) ) )
+            X0 = X( 2 ) + DX( 2 ) / ( 2.0 + 4.0 * ABS( DX( 2 ) /
+     :           POINTS ) )
+            SIGMA = X( 3 ) + DX( 3 ) / ( 2.0 + 4.0 * ABS( DX( 3 ) /
+     :              MAX( X( 3 ), 1.0E-20 ) ) )
+            BACK = X( 4 ) + DX( 4 ) / ( 2.0 + 4.0 * ABS( DX( 4 ) /
+     :             MAX( X( 1 ), 1.0E-20 ) ) )
 
          END IF
 
