@@ -16,7 +16,8 @@ and support indexing (soon!) using makeindex.
 <authorlist>
 <author id=ng affiliation='Glasgow'>Norman Gray
 
-<copyright>Copyright 1999, Particle Physics and Astronomy Research Council
+<copyright>Copyright 1999, 2000,
+Council of the Central Laboratories of the Research Councils
 
 <codegroup id='code.back'>
 <title>Support back-matter
@@ -46,17 +47,23 @@ in mode make-manifest-mode in sl.dsl
 ;; messes up big-time if (current-node) is the document-element.
 (define (process-backmatter)
   (if (hasbackmatter?)
-      (html-document (literal "Backmatter")
-		     (make sequence
-		       (make element gi: "ul"
-			     (make-contents-backmatter))
-		       (make-idindex)
-		       (make-notecontents)
-		       (make-bibliography)
-		       (make-updatelist))
-		     system-id: (backmatter-sys-id)
-		     force-chunk?: #t
-		     navbars?: #f)
+      (let ((body (make sequence
+		    (make element gi: "ul"
+			  (make-contents-backmatter))
+		    (make-notecontents)
+		    (make-bibliography)
+		    (make-updatelist)
+		    (make-idindex))))
+	(if (chunking?)
+	    (html-document (literal "Backmatter")
+			   body
+			   system-id: (backmatter-sys-id)
+			   force-chunk?: #t
+			   navbars?: #f)
+	    (make sequence
+	      (make element gi: "h1"
+		    (literal "Backmatter"))
+	      body)))
       (empty-sosofo)))
 
 (define (make-manifest-backmatter)
@@ -214,19 +221,22 @@ Support notes as endnotes.
   (let ((notelist (get-notelist)))
     (if (node-list-empty? notelist)
 	(empty-sosofo)
-	(html-document (literal "Notes")
-		       (make sequence
-			 (make element gi: "h2"
-			       (make element gi: "a"
-				     attributes: (list (list "name"
-							     (notes-frag-id)))
-				     (literal "Notes")))
-			 (make element gi: "dl"
-			       (with-mode extract-notecontents
-				 (process-node-list notelist))))
-		       system-id: (notes-sys-id)
-		       force-chunk?: #t
-		       navbars?: #f))))
+	(let ((body (make sequence
+		      (make element gi: "h2"
+			    (make element gi: "a"
+				  attributes: (list (list "name"
+							  (notes-frag-id)))
+				  (literal "Notes")))
+		      (make element gi: "dl"
+			    (with-mode extract-notecontents
+			      (process-node-list notelist))))))
+	  (if (chunking?)
+	      (html-document (literal "Notes")
+			     body       
+			     system-id: (notes-sys-id)
+			     force-chunk?: #t
+			     navbars?: #f)
+	      body)))))
 
 <routine>
 <description>
@@ -260,17 +270,20 @@ the data of the CITATION element.
 			   (read-entity (string-append (root-file-name)
 						       ".htmlbib.bbl")))))
     (if bibcontents
-	(html-document (literal "Bibliography")
-		       (make sequence
-			 (make element gi: "h2"
-			       (make element gi: "a"
-				     attributes: (list (list "name"
-							     (bibliography-frag-id)))
-				     (literal "Bibliography")))
-			 (make fi data: bibcontents))
-		       system-id: (bibliography-sys-id)
-		       force-chunk?: #t
-		       navbars?: #f)
+	(let ((body (make sequence
+		      (make element gi: "h2"
+			    (make element gi: "a"
+				  attributes: (list (list "name"
+							  (bibliography-frag-id)))
+				  (literal "Bibliography")))
+		      (make fi data: bibcontents))))
+	  (if (chunking?)
+	      (html-document (literal "Bibliography")
+			     body       
+			     system-id: (bibliography-sys-id)
+			     force-chunk?: #t
+			     navbars?: #f)
+	      body))
 	(empty-sosofo))))
 
 <routine>
@@ -285,18 +298,21 @@ update elements which refer to them.
 
 (define (make-updatelist)
   (if (hashistory?)
-      (html-document (literal "Change history")
-		     (make sequence
-		       (make element gi: "h2"
-			     (make element gi: "a"
-				   attributes: (list (list "name"
-							   (updatelist-frag-id)))
-				   (literal "Change history")))
-		       (with-mode extract-updatelist
-			 (process-node-list (getdocinfo 'history))))
-		     system-id: (updatelist-sys-id)
-		     force-chunk?: #t
-		     navbars?: #f)
+      (let ((body (make sequence
+		    (make element gi: "h2"
+			  (make element gi: "a"
+				attributes: (list (list "name"
+							(updatelist-frag-id)))
+				(literal "Change history")))
+		    (with-mode extract-updatelist
+		      (process-node-list (getdocinfo 'history))))))
+	(if (chunking?)
+	    (html-document (literal "Change history")
+			   body
+			   system-id: (updatelist-sys-id)
+			   force-chunk?: #t
+			   navbars?: #f)
+	    body))
       (empty-sosofo)))
 
 ;(define (make-updatelist)
@@ -417,26 +433,28 @@ so that document authors can find them in once place.
 (define (make-idindex)
   (if suppress-idindex
       (empty-sosofo)
-      (html-document
-       (literal "ID Index")
-       (let ((all-els (node-list-filter-by-gi
-		       (select-by-class (descendants (getdocbody))
-					'element)
-		       (target-element-list))))
-	 (make sequence
-	   (make element gi: "h2"
-		 (make element gi: "a"
-		       attributes: (list (list "name" (idindex-frag-id)))
-		       (literal "ID Index")))
-	   (make element gi: "p"
-		 (literal "Index of IDs in this document.  Exported IDs indicated ")
-		 (make element gi: "strong"
-		       (literal "like this.")))
-	   (with-mode make-idindex-mode
-	     (process-node-list all-els))))
-       system-id: (idindex-sys-id)
-       force-chunk?: #t
-       navbars?: #f)))
+      (let ((body (let ((all-els (node-list-filter-by-gi
+				  (select-by-class (descendants (getdocbody))
+						   'element)
+				  (target-element-list))))
+		    (make sequence
+		      (make element gi: "h2"
+			    (make element gi: "a"
+				  attributes: (list (list "name" (idindex-frag-id)))
+				  (literal "ID Index")))
+		      (make element gi: "p"
+			    (literal "Index of IDs in this document.  Exported IDs indicated ")
+			    (make element gi: "strong"
+				  (literal "like this.")))
+		      (with-mode make-idindex-mode
+			(process-node-list all-els))))))
+	(if (chunking?)
+	    (html-document (literal "ID Index")
+			   body
+			   system-id: (idindex-sys-id)
+			   force-chunk?: #t
+			   navbars?: #f)
+	    body))))
 (mode make-idindex-mode
   (default
     (let ((id (attribute-string (normalize "id") (current-node))))

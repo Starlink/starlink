@@ -149,18 +149,25 @@ returns <code/#f/.
   (let* ((exportatt (attribute-string (normalize "export") target))
          (idatt (attribute-string (normalize "id") target))
          (id (cond 
-                (idatt 
-                   (if exportatt (string-append "xref_" idatt) idatt))
-                ((node-list=? target (document-element)) 
-                   "xref_")
-                ((equal? (gi target) (normalize "abstract"))
-                   "xref_abstract")
-                ((member (gi target) (section-element-list))
-                   (string-append "_ID" 
-                                  (number->string (all-element-number target))))
-                ((equal? (gi target) (normalize "mlabel"))
-                   (href-to-fragid-mlabel target))
-                (else #f)))
+	      ((equal? (gi target) (normalize "codecollection"))
+	       #f			; no fragment identifier
+	       )
+	      (idatt 
+	       (if exportatt
+		   (string-append "xref_" idatt)
+		   idatt))
+	      ((node-list=? target (document-element)) 
+	       "xref_")
+	      ((equal? (gi target) (normalize "abstract"))
+	       "xref_abstract")
+	      ((member (gi target) (section-element-list))
+	       (string-append "_ID" 
+			      (number->string (all-element-number target))))
+	      ((equal? (gi target) (normalize "routine"))
+	       (href-to-fragid-routine))
+	      ((equal? (gi target) (normalize "mlabel"))
+	       (href-to-fragid-mlabel target))
+	      (else #f)))
 	 (entfile (and (not frag-only)
 		       (html-file target_nd: target)))
 	 (url (and entfile

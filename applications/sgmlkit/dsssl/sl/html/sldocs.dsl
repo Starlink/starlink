@@ -150,7 +150,7 @@ more-or-less as much like the existing star2html output as possible.
                 (process-node-list manualtype))
              (empty-sosofo))
          (if coverimage
-             (make element gi: "p" attributes: '(("align" "center"))
+             (make element gi: "div" attributes: '(("align" "center"))
                 (process-node-list coverimage)) 
              (empty-sosofo))
          (make empty-element gi: "hr")
@@ -179,8 +179,16 @@ more-or-less as much like the existing star2html output as possible.
                    (literal "Retrieve hardcopy")))
              (empty-sosofo))
          (make empty-element gi: "hr")
+	 ;; Include a TOC here, if we're producing single-file output
+	 (if (chunking?)
+	     (empty-sosofo)
+	     (make sequence
+	       (make element gi: "h2"
+		     (literal "Contents"))
+	       (make-contents (current-node) 2 #t)))
          (process-children)
-         (process-backmatter))))
+         (process-backmatter)
+	 )))
         
 
 

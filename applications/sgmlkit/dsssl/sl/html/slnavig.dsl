@@ -188,7 +188,8 @@ Returns the filename of the html file that contains the given node.
 		     ;; rather than a confusing empty-string
 		     (else "xxx1")
 		     )))
-    (string-append base %html-ext%)))
+    (string-append base %html-ext%)
+    ))
 
 <routine>
 <routinename>chunk-parent
@@ -311,7 +312,7 @@ element.
                       (else #f))))
     (sosofo-append
        (make element gi: "a" 
-             attributes: (list (list "href" (href-to (current-node))))
+             attributes: `(("href" ,(href-to (current-node))))
          (if fmt-type
             (literal 
                (format-number (child-number (current-node)) fmt-type) ". ")

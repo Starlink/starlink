@@ -35,7 +35,7 @@ $Id$
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
 ;; document.  We have to do it rather more by hand, therefore.
-;; Don't yet support the IDS attribute.
+;; Don't yet support the INCLUDEONLY attribute.
 (element codecollection
   (let ((docent (attribute-string (normalize "doc"))))
     (if docent
@@ -52,10 +52,6 @@ $Id$
 				  docent))
 	    (process-node-list de)))
       (empty-sosofo)))
-
-(mode routine-ref-test
-  (element programcode
-    (literal "A program!")))
 
 (mode routine-ref
   (element programcode
@@ -181,12 +177,30 @@ $Id$
 			  (process-node-list (cdr gi-and-nd))
 			  (empty-sosofo)))
 		    kids)))))
+  (element routine
+    (let* ((rp (select-elements (children (current-node)) 'routineprologue))
+	   (rn (and (not (node-list-empty? rp))
+		    (select-elements (children rp) 'routinename))))
+      (make sequence
+	(make empty-element gi: "hr")
+	(make element gi: "h3"
+	      (make element gi: "a"
+		    attributes: `(("name" ,(href-to (current-node)
+						    frag-only: #t)))
+		    (if (node-list-empty? rn)
+			(literal "Anonymous routine")
+			(with-mode routine-ref-get-reference
+			  (process-node-list rn)))))
+	(process-children))))
+;  (element routinename
+;    (make sequence
+;      (make empty-element gi: "hr")
+;      (make element gi: "h3"
+;	    attributes: '(("align" "center"))
+;	    (process-children))))
   (element routinename
-    (make sequence
-      (make empty-element gi: "hr")
-      (make element gi: "h3"
-	    attributes: '(("align" "center"))
-	    (process-children))))
+    (empty-sosofo))			; discard, in this mode.  See
+					; mode routine-ref-get-reference  
   (element name
     (make element gi: "b"
 	  (process-children)))
@@ -344,5 +358,39 @@ $Id$
 ;	      (literal (string-append " (" attrib ")"))
 ;	      (empty-sosofo)))))
   (element name
+    (process-children))
+  (element routinename
     (process-children)))
 
+;(define (href-to-fragid-routine)
+;  (let ((id (or (attribute-string (normalize "id"))
+;		(select-elements (children (current-node)) 'routineprologue))))
+;    (string-append "_R")))
+(define (href-to-fragid-routine)
+  (string-append "_R" (number->string (element-number (current-node)))))
+
+(element coderef
+  (let* ((cc (node-list-or-false
+	      (element-with-id (attribute-string (normalize "collection")))))
+	 (ccdoc (and cc
+		     (document-element-from-entity
+		      (attribute-string (normalize "doc") cc))))
+	 (target (and ccdoc
+		      (node-list-or-false
+		       (element-with-id (attribute-string (normalize "id"))
+					ccdoc))))
+	 (targetroutine (and target
+			     (if (equal? (gi target) (normalize "routine"))
+				 target
+				 (ancestor (normalize "routine")
+					   target))))
+	 (targetfragid (and targetroutine
+			    (href-to targetroutine frag-only: #t))))
+    (if targetfragid
+	(make element gi: "a"
+	      attributes: `(("href" ,(href-to cc force-frag: targetfragid)))
+	      (process-children))
+	(error (string-append "Can't find one of collection "
+			      (attribute-string (normalize "collection"))
+			      " or routine "
+			      (attribute-string (normalize "id")))))))
