@@ -1184,3 +1184,37 @@ itcl::class gaia::Gaia {
 #  Procedure to stop tkwait from working...
 proc false_tkwait {args} {
 }
+
+#  XXX redefine the body of AstroCat::new_catalog, as this contains a
+#  reference to an astrocat instance that is never deleted (leaving a
+#  temporary file around at exit). Need to do this here to make sure
+#  that this code is used.
+itcl::body ::cat::AstroCat::new_catalog {name {id ""} 
+   {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"} 
+   {w ""}} {
+   if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w] != 0} {
+      return
+   }
+   set i "$name,$id"
+   if {[info exists instances_($i)] && [winfo exists $instances_($i)]} {
+      utilRaiseWindow $instances_($i)
+      if {"[$instances_($i).cat servtype]" == "local"} {
+	 $instances_($i) search
+      }
+      return
+   }
+   if {[winfo exists $w]} {
+      set instname $w.ac[incr n_instances_]
+   } else {
+      set instname .ac[incr n_instances_]
+   }
+   set instances_($i) \
+      [$classname $instname \
+	  -id $id \
+	  -debug $debug \
+	  -catalog $name \
+	  -catalogtype $type \
+	  -tcs $tcs_flag \
+	  -transient 0 \
+	  -center 0]
+}
