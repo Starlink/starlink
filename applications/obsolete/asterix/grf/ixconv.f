@@ -546,14 +546,3 @@
 	END DO
 
         END
-
-
-	subroutine printit(m,n,tm,tn)
-	integer m,n,i,j
-	real*8 tm(m,n), tn(m,n)
-	do j = 1, n
-	  do i = 1, m
-	   print *,i,j,tm(i,j), tn(i,j)
-	  end do
-	end do
-	end
