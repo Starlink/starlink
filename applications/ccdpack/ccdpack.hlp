@@ -188,7 +188,8 @@
        matches to regions expected to overlap (RESTRICT parameter).
           Affected tasks:
              FINDOFF   (new parameters MAXDISP, RESTRICT, USEWCS)
-             REGISTER  (new parameters OUTDOMAIN, OUTFORMAT, USEWCS)
+             REGISTER  (new parameters OUTDOMAIN, SIMPFI, SIMPIF, USEWCS,
+                                       WCSFILE)
              TRANLIST  (new parameters FRAMEIN, EPOCHIN, FRAMEOUT, 
                                        EPOCHOUT, WCSFILE)
              TRANNDF   (new parameter  USEWCS)
