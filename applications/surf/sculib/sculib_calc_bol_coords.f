@@ -240,6 +240,14 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     initialisaztion
+      AZ_OFFSET = 0.0D0
+      EL_OFFSET = 0.0D0
+      RD_X_OFFSET = 0.0D0
+      RD_Y_OFFSET = 0.0D0
+      U3_OFFSET = 0.0D0
+      U4_OFFSET = 0.0D0
+
 *  calculate the extra offsets to be added due to jiggling or scanning
 
       IF (OFFSET_COORDS .EQ. 'AZ') THEN
