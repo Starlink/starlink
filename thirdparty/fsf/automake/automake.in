@@ -5693,14 +5693,7 @@ sub yacc_lex_finish_helper
     # allow parallel builds to work correctly.  FIXME: for now, no
     # line number.
     require_conf_file ($configure_ac, FOREIGN, 'ylwrap');
-    if ($config_aux_dir_set_in_configure_in)
-    {
-	&define_variable ('YLWRAP', $config_aux_dir . "/ylwrap", INTERNAL);
-    }
-    else
-    {
-	&define_variable ('YLWRAP', '$(top_srcdir)/ylwrap', INTERNAL);
-    }
+    &define_variable ('YLWRAP', $config_aux_dir . "/ylwrap", INTERNAL);
 }
 
 sub lang_yacc_finish
@@ -7375,7 +7368,7 @@ sub require_conf_file ($$@)
     require_file_internal ($where, $mystrict, @files);
     my $dir = $require_file_paths[0];
     @config_aux_path = @require_file_paths;
-     # Avoid unsightly '/.'s.
+    # Avoid unsightly '/.'s.
     $config_aux_dir = '$(top_srcdir)' . ($dir eq '.' ? "" : "/$dir");
 }
 
