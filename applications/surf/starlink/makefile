@@ -293,6 +293,9 @@
 #      15-Nov-1998 (TIMJ)
 #        Prepare for release v1.3beta
 #        Add REDUCE_NOISE
+#      30-Apr-1999 (TIMJ)
+#        Include PERL symbol. - no longer uses NDFPERL
+#        Version 1.4
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -395,6 +398,9 @@ STAR_HELP = $(STARLINK)/help
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
 STAR_SHARE = $(STARLINK)/share
+
+# Location of PERL binary
+PERL = $(STARLINK)/Perl/bin/perl
 
 #  Pathname of the root directory beneath which the built files for
 #  this package should be installed for use.  This defaults to the
@@ -581,7 +587,8 @@ surflib_stats_grid.f surflib_decode_remsky_string.f \
 surflib_median_regrid.f surflib_remove_dc_from_exp.f surflib_rem_timeseries.f \
 surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_dual_beam.f \
 surflib_process_bols.f surflib_fill_polpack_angles.f surflib_remove_ip.f \
-surflib_fill_wplate.f surflib_read_ipfile.f surflib_calc_polpack_angrot.f
+surflib_fill_wplate.f surflib_read_ipfile.f surflib_calc_polpack_angrot.f \
+surflib_trim_image.f
 
 SCULIB_FCPP_ROUTINES = sculib_bessel_wtinit.F sculib_skydip_temperatures.F
 
@@ -1207,6 +1214,7 @@ install:
                -e s#STARLINK#$(STARLINK)# \
                -e s#PKG_VERS#$(PKG_VERS)# \
                -e s#STAR_BIN#$(STAR_BIN)# \
+               -e s#STAR_PERL#$(PERL)# \
               $(STARTUP_SCRIPT) >$(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
            chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
         else :; fi
@@ -1225,6 +1233,7 @@ install:
 	for f in $(NDFPERL_SCRIPTS) ""; do \
            if test -n "$$f"; then \
               sed -e s#STAR_BIN#$(STAR_BIN)# \
+                  -e s#STAR_PERL#$(PERL)# \
                 $$f > $(INSTALL_BIN)/$$f ;\
               chmod 755 $(INSTALL_BIN)/$$f;\
            else :; fi;\
@@ -1863,6 +1872,7 @@ surflib_stats_grid.o: PRM_PAR SAE_PAR
 surflib_calc_dual_beam.o: PRM_PAR SAE_PAR
 surflib_process_bols.o: PRM_PAR SAE_PAR
 surflib_read_ipfile.o: FIO_ERR SAE_PAR PRM_PAR
+surflib_trim_image.o: SAE_PAR NDF_FUNC
 ctm_xcols.o: CTM_PAR
 gethlp.o: HLPCMD SAE_PAR
 gthlpi.o: HLPCMD SAE_PAR
