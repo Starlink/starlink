@@ -54,8 +54,10 @@ ADC = _DOUBLE (Read)
    The Analogue-to-Digital Conversion factor. This number converts
    input ADUs to detected electrons. This value is used to
    estimate the Poissonian noise in the output (debiassed) data
-   values. If variances are not being generated then this value
-   will not be used.
+   values.  If the EXPAND parameter is true, then the output is 
+   multiplied by ADC so that the output is in counts (electrons)
+   rather than ADUs.  If variances are not being generated 
+   then this value will not be used.
 
    If a global value for this parameter has been set using
    CCDSETUP then this will be used.  If USESET is true then a
@@ -157,7 +159,8 @@ EXPAND
 EXPAND = _LOGICAL (Read)
    This value controls whether or not the output data should be
    multiplied by the ADC factor to convert the input ADUs to
-   counts (electrons). This option is disabled if no variances
+   counts (electrons).  The output variance is affected accordingly
+   (multiplied by ADC**2).  This option is disabled if no variances
    are generated. Care should be taken when using this option
    with a large ADC factor and data types of _WORD,_UWORD,_BYTE
    or _UBYTE as the output data range may exceed that allowed
