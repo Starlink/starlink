@@ -859,18 +859,19 @@ do_test:
         echo SCB_INDEX: $$SCB_INDEX && \
         rm -rf $$SCB_INDEX && \
         mkdir $$SCB_INDEX $$SCB_BROWSER_TMP $$SCB_INDEXER_TMP && \
-        echo "scbindex.pl:  Building test index of scb_test.tar" && \
-        echo " " && \
+        echo "scbindex.pl:  Build test index of scb_test.tar" && \
         $(INSTALL_BIN)/scbindex.pl scb_test.tar && \
         echo " " && \
         echo "scbcp.pl: Copy indices to new directory" && \
+        echo " " && \
         mkdir $$SCB_INDEX/junk && \
         $(INSTALL_BIN)/scbcp.pl $$SCB_INDEX $$SCB_INDEX/junk && \
         echo " " && \
         echo "dbmcat.pl: Print index file contents" && \
+        echo " " && \
         $(INSTALL_BIN)/dbmcat.pl $$SCB_INDEX/junk/func && \
         echo " " && \
-        echo "scb.pl:  Extracting test files" && \
+        echo "scb.pl:  Extract test files" && \
         echo " " && \
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw_  type=func >/dev/null && \
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw   type=func >/dev/null && \
