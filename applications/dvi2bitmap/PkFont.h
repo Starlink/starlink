@@ -22,7 +22,7 @@ class PkRasterdata {
 	{ if (bitmap_ == 0) construct_bitmap(); return bitmap_; }
     static debug (bool sw) { debug_ = sw; }
  private:
-    const Byte *rasterdata_, *eob_;
+    Byte *rasterdata_, *eob_;
     const unsigned int len_, w_, h_;
     Byte dyn_f_;
     bool start_black_;
@@ -44,7 +44,7 @@ class PkGlyph {
 	    unsigned int h,
 	    int hoff,
 	    int voff,
-	    PkRasterdata *rasterdata)
+	    PkRasterdata *rasterdata) 
 	: cc_(cc), tfmwidth_(tfmwidth), dm_(dm), w_(w), h_(h),
 	hoff_(hoff), voff_(voff), rasterdata_(rasterdata),
 	longform_(false), bitmap_(0) { };
@@ -81,10 +81,16 @@ class PkFont {
 	    unsigned int d,
 	    string name);
     ~PkFont();
-    PkGlyph *glyph (unsigned int i) const { return glyphs_[i]; }
+    PkGlyph *glyph (unsigned int i) const {
+	if (i > nglyphs_)
+	    throw DviBug ("requested out-of-range glyph");
+	return glyphs_[i];
+    }
     static debug (bool sw) { debug_ = sw; }
     static void setFontPath(string fp) { fontpath_ = fp; }
     static void setFontPath(char  *fp) { fontpath_ = fp; }
+    bool seenInDoc(void) const { return seen_in_doc_; }
+    void setSeenInDoc() { seen_in_doc_ = true; }
  private:
     unsigned int checksum_, scalefactor_, designsize_;
     string name_;
@@ -94,6 +100,7 @@ class PkFont {
     const nglyphs_ = 256;
     PkGlyph *glyphs_[nglyphs_];
     void read_font(InputByteStream&);
+    bool seen_in_doc_;
     static bool debug_;
     static string fontpath_;	// single string with %F in it
 };

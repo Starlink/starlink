@@ -6,9 +6,11 @@
 
 //#include <fstream>
 #include <string>
-#include <stack>
+//#include <stack>
+#include <map>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
+#include "PkFont.h"
 
 class DviFileEvent;
 
@@ -30,6 +32,7 @@ private:
 	unsigned int l, u, s, t;
     } postamble_;
     void read_postamble ();
+    void check_duplicate_font(int);
     struct PosState {
 	int h, v, w, x, y, z;
 	PosState(int h, int v, int w, int x, int y, int z)
@@ -53,6 +56,7 @@ private:
         const PosState **s;
     };
     PosStateStack *posStack_;
+    map<int,PkFont*> fontMap_;
     static bool debug_;
 };
 
@@ -82,6 +86,7 @@ class DviFileSetRule: public DviFileEvent {
     DviFileSetRule() { }
     void debug() const;
 };
+/*
 class DviFileFontDef : public DviFileEvent {
  public:
     int number;
@@ -90,11 +95,13 @@ class DviFileFontDef : public DviFileEvent {
     DviFileFontDef() { }
     void debug() const;
 };
+*/
 class DviFileFontChange : public DviFileEvent {
  public:
-    unsigned int number;
     DviFileFontChange() { }
     void debug() const;
+    PkFont *font;
+    int number;
 };
 class DviFileSpecial : public DviFileEvent {
  public:

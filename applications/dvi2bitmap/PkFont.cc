@@ -237,6 +237,8 @@ PkRasterdata::PkRasterdata(Byte opcode,
     rasterdata_ = new Byte[len];
     (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
     eob_ = rasterdata_+len_;
+    cerr << "rasterdata for opcode " << static_cast<int>(opcode)
+	 << " initialised\n";
 };
 
 unsigned int PkRasterdata::unpackpk ()

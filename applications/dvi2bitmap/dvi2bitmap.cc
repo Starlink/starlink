@@ -20,7 +20,7 @@ main (int argc, char **argv)
 
     DviFile::debug(true);
     PkFont::debug(true);
-    PkRasterdata::debug(false);
+    //PkRasterdata::debug(false);
     if (char *pkpath = getenv("DVI2BITMAP_PK_PATH"))
 	PkFont::setFontPath(pkpath);
 
@@ -64,13 +64,9 @@ main (int argc, char **argv)
 	{
 	    ev = dvif->getEvent();
 	    ev->debug();
-	    /*
-	    if (DviFileFontDef *fd = dynamic_cast<DviFileFontDef*>(ev))
+	    if (DviFileFontChange *fc = dynamic_cast<DviFileFontChange*>(ev))
 	    {
-		PkFont *f = new PkFont(fd->checksum,
-				       fd->scale,
-				       fd->size,
-				       fd->fontname);
+		PkFont *f = fc->font;
 		for (int gnum=0; gnum<=255; gnum++)
 		{
 		    PkGlyph *g = f->glyph(gnum);
@@ -89,7 +85,6 @@ main (int argc, char **argv)
 		    }
 		}
 	    }
-	    */
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }

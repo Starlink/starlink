@@ -9,7 +9,7 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) -o $@
 
-DviFile.o: DviFile.cc DviFile.h InputByteStream.h
+DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h
 
 InputByteStream.o: InputByteStream.cc InputByteStream.h dvi2bitmap.h
 

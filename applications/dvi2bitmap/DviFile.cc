@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "DviFile.h"
+#include "PkFont.h"
 #include "InputByteStream.h"
 
 // Static debug switch
@@ -38,7 +39,7 @@ DviFileEvent *DviFile::getEvent()
 {
     static DviFileSetChar setChar(this);
     static DviFileSetRule setRule;
-    static DviFileFontDef fontDef;
+    //static DviFileFontDef fontDef;
     static DviFileFontChange fontChange;
     static DviFileSpecial special;
     static DviFilePage page;
@@ -63,6 +64,9 @@ DviFileEvent *DviFile::getEvent()
 	{
 	    // fnt_num_0 to fnt_num_63
 	    fontChange.number = opcode-171;
+	    fontChange.font = fontMap_[fontChange.number];
+	    if (fontChange.font == 0)
+		throw DviError ("undefined font requested");
 	    gotEvent = &fontChange;
 	}
 	else
@@ -277,18 +281,30 @@ DviFileEvent *DviFile::getEvent()
 
 	      case 235:		// fnt1
 		fontChange.number = getSIU(1);
+		fontChange.font = fontMap_[fontChange.number];
+		if (fontChange.font == 0)
+		    throw DviError ("undefined font requested");
 		gotEvent = &fontChange;
 		break;
 	      case 236:		// fnt2
 		fontChange.number = getSIU(2);
+		fontChange.font = fontMap_[fontChange.number];
+		if (fontChange.font == 0)
+		    throw DviError ("undefined font requested");
 		gotEvent = &fontChange;
 		break;
 	      case 237:		// fnt3
 		fontChange.number = getSIU(3);
+		fontChange.font = fontMap_[fontChange.number];
+		if (fontChange.font == 0)
+		    throw DviError ("undefined font requested");
 		gotEvent = &fontChange;
 		break;
 	      case 238:		// fnt4
 		fontChange.number = getSIS(4);
+		fontChange.font = fontMap_[fontChange.number];
+		if (fontChange.font == 0)
+		    throw DviError ("undefined font requested");
 		gotEvent = &fontChange;
 		break;
 	      case 239:		// xxx1
@@ -311,6 +327,23 @@ DviFileEvent *DviFile::getEvent()
 		for (int len = getSIS(4); len>0; len--)
 		    special.specialString += static_cast<char>(getByte());
 		break;
+
+		// fnt_def1 to 4 are read when the postamble is read.
+		// The definitions here should be duplicates - just check
+		// that the font number has been seen already
+	      case 243:		// fnt_def1
+		check_duplicate_font (1);
+		break;
+	      case 244:		// fnt_def2
+		check_duplicate_font (2);
+		break;
+	      case 245:		// fnt_def3
+		check_duplicate_font (3);
+		break;
+	      case 246:		// fnt_def4
+		check_duplicate_font (4);
+		break;
+		/*
 	      case 243:		// fnt_def1
 		fontDef.number = getSIU(1);
 		fontDef.checksum = getUIU(4);
@@ -363,6 +396,7 @@ DviFileEvent *DviFile::getEvent()
 		    fontDef.fontname += static_cast<char>(getByte());
 		gotEvent = &fontDef;
 		break;
+		*/
 	      case 247:		// pre
 		preamble.dviType = getUIU(1);
 		preamble.num = getUIU(4);
@@ -437,19 +471,6 @@ bool DviFile::eof()
 void DviFile::read_postamble()
 {
     const tailbuflen = 64;
-    /*
-    dvif_->gotoEnd();
-    Byte dviB;
-    while ((dviB = dvif_->getByte(0)) == 223)
-	dvif_->backspace();
-    if (dviB != 2)
-	// should be the identification byte, 2
-	throw DviError ("DviFile::read_postamble: id byte not 2");
-    dvif_->backspace(5);	// should now be pointing at post_post opcode
-    if (dvif_->getByte() != 249)
-	throw DviError
-	    ("DviFile::read_postamble: post_post not in correct place");
-    */
     // get final 64 bytes of file
     const Byte *dviBuf = dvif_->getBlock(-1, tailbuflen);
     const Byte *p;
@@ -488,9 +509,141 @@ void DviFile::read_postamble()
 	     << " s=" << postamble_.s
 	     << " t=" << postamble_.t
 	     << '\n';
-    // ignore the following font definitions - the in-file definitions are
-    // processed during the subsequent reading of the file
+
+    // process the following font definitions, building up a map of used fonts
+    bool keepreading = true;
+    while (keepreading)
+    {
+	int num;
+	unsigned int c, s, d;
+	string fontdir, fontname;
+	Byte opcode = getByte();
+	switch (opcode)
+	{
+	  case 243:		// fnt_def1
+	    num = getSIU(1);
+	    cerr << "postamble font1 " << num << '\n';
+	    if (fontMap_[num] != 0)
+	    {
+		char errmsg[64];
+		sprintf (errmsg, "Font %d defined twice", num);
+		throw DviError (errmsg);
+	    }
+	    c = getUIU(4);
+	    s = getUIU(4);
+	    d = getUIU(4);
+	    fontdir = "";	// to be discarded
+	    fontname = "";
+	    for (int a = getSIU(1); a>0; a--)
+		fontdir += static_cast<char>(getByte());
+	    for (int l = getSIU(1); l>0; l--)
+		fontname += static_cast<char>(getByte());
+	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    break;
+
+	  case 244:		// fnt_def2
+	    num = getSIU(2);
+	    cerr << "postamble font1 " << num << '\n';
+	    if (fontMap_[num] != 0)
+	    {
+		char errmsg[64];
+		sprintf (errmsg, "Font %d defined twice", num);
+		throw DviError (errmsg);
+	    }
+	    c = getUIU(4);
+	    s = getUIU(4);
+	    d = getUIU(4);
+	    fontdir = "";
+	    fontname = "";
+	    for (int a = getSIU(1); a>0; a--)
+		fontdir += static_cast<char>(getByte());
+	    for (int l = getSIU(1); l>0; l--)
+		fontname += static_cast<char>(getByte());
+	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    break;
+
+	  case 245:		// fnt_def3
+	    num = getSIU(3);
+	    cerr << "postamble font1 " << num << '\n';
+	    if (fontMap_[num] != 0)
+	    {
+		char errmsg[64];
+		sprintf (errmsg, "Font %d defined twice", num);
+		throw DviError (errmsg);
+	    }
+	    c = getUIU(4);
+	    s = getUIU(4);
+	    d = getUIU(4);
+	    fontdir = "";
+	    fontname = "";
+	    for (int a = getSIU(1); a>0; a--)
+		fontdir += static_cast<char>(getByte());
+	    for (int l = getSIU(1); l>0; l--)
+		fontname += static_cast<char>(getByte());
+	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    break;
+
+	  case 246:		// fnt_def4
+	    num = getSIS(4);
+	    cerr << "postamble font1 " << num << '\n';
+	    if (fontMap_[num] != 0)
+	    {
+		char errmsg[64];
+		sprintf (errmsg, "Font %d defined twice", num);
+		throw DviError (errmsg);
+	    }
+	    c = getUIU(4);
+	    s = getUIU(4);
+	    d = getUIU(4);
+	    fontdir = "";
+	    fontname = "";
+	    for (int a = getSIU(1); a>0; a--)
+		fontdir += static_cast<char>(getByte());
+	    for (int l = getSIU(1); l>0; l--)
+		fontname += static_cast<char>(getByte());
+	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    break;
+
+	  case 249:		// post_post
+	    keepreading = false;
+	    break;
+
+	  default:		// error
+	    {
+		char errmsg[64];
+		sprintf (errmsg, "unexpected opcode (%d) in postamble",opcode);
+		throw DviError (errmsg);
+	    }
+	    break;
+	}
+    }
 }
+
+void DviFile::check_duplicate_font (int ksize)
+{
+    int number;
+    if (ksize == 4)
+	number = getSIS(4);
+    else
+	number = getSIU(ksize);
+    PkFont *f = fontMap_[number];
+    if (f == 0 || f->seenInDoc())
+    {
+	char errmsg[64];
+	sprintf (errmsg, "font %d not declared, or declared twice", number);
+	throw DviError (errmsg);
+    }
+    f->setSeenInDoc();
+    unsigned int int4 = getUIU(4); // c
+    int4 = getUIU(4);		// s
+    int4 = getUIU(4);		// d
+    int namelen = getSIU(1);	// a
+    namelen += getSIU(1);
+    string name = "";
+    for (; namelen>0; namelen--)
+	Byte dummy = getByte();
+}
+
 
 void DviFileEvent::debug ()
 const
@@ -508,12 +661,14 @@ const
 {
     cerr << 'R' << a << 'x' << b << '\n';
 }
+/*
 void DviFileFontDef::debug()
 const
 {
     cerr << 'F' << number << ' ' << scale << '/' << size << ' '
 	 << fontdir << '/' << fontname << '\n';
 }
+*/
 void DviFileFontChange::debug()
 const
 {
