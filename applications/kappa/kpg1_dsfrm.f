@@ -20,7 +20,8 @@
 *     FSET = INTEGER (Given)
 *        An AST pointer to the FrameSet.
 *     TEXT = CHARACTER * ( * ) (Given)
-*        Text to display before the Frame description.
+*        Text to display before the Frame description. May contain MSG
+*        tokens.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -31,6 +32,8 @@
 *  History:
 *     4-FEB-1998 (DSB):
 *        Original version.
+*     25-AUG-1999 (DSB):
+*        Allow MSG tokens in TEXT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -82,6 +85,10 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Display any header text.
+      IF( TEXT .NE. ' ' ) CALL MSG_OUT( 'KPG1_DSFRM_1', TEXT, STATUS )
+      CALL MSG_BLANK( STATUS )
+
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
@@ -101,13 +108,6 @@
      :                 'AST Object (class ^CLASS) supplied '//
      :                 '(programming error).', STATUS )
       END IF      
-
-*  Display any header text.
-      IF( TEXT .NE. ' ' ) THEN
-         CALL MSG_SETC( 'TEXT', TEXT )
-         CALL MSG_OUT( 'KPG1_DSFRM_1', '^TEXT', STATUS )
-      END IF
-      CALL MSG_BLANK( STATUS )
 
 *  Get the Frame title, domain and dimensionality.
       FRMTTL = AST_GETC( CFRM, 'TITLE', STATUS )
