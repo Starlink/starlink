@@ -14,7 +14,7 @@ AM_FCFLAGS = -I..
 ## and static libraries.
 
 # These libraries will be linked into the main library in the parent
-lib_LTLIBRARIES = libagp_base.la
+noinst_LTLIBRARIES = libagp_base.la
 
 # AGP library containing the shared files
 libagp_base_la_SOURCES = $(AGP_F_ROUTINES)
