@@ -485,10 +485,10 @@
                }
 
 #  Plot the NDF inside the GWM.
-               set options {labelling=interior drawaxes=1 border=1 \
+               set options {labelling=interior drawaxes=1 border=1 drawtitle=0 \
                             colour=3 colour(numlab)=1 colour(border)=4}
                lappend options $displaystyle
-               $ndf display "$gwmname/GWM" \
+               $ndf display -resamp "$gwmname/GWM" \
                             [ lindex $scalevals 0 ] [ lindex $scalevals 1 ] \
                             $wcsframe [ join $options "," ]
 
