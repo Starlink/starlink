@@ -237,7 +237,7 @@
             set pa [ $ndf(A) pixelsize $wcsframe(A) ]
             set pb [ $ndf(B) pixelsize $wcsframe(B) ]
             if { [ max [ expr $pa / $pb ] [ expr $pb / $pa ] ] > 20 } {
-               ccdputs -log "  There is a gross discrepancy in pixel sizes; "
+               ccdputs -log "  There is a gross discrepancy in pixel sizes; " \
                             "alignment will be difficult."
             }
 
@@ -435,7 +435,7 @@
 
 #  This may be time-consuming.  Post a waiting message.
          set waitwin [ waiter $itk_interior.wait -text "Drawing images" ]
-             
+
 #  If this pair of NDFs has not been displayed before (but not if only
 #  the display characteristics have changed) then update the title bar.
          if { ! [ array exists displayed ] || \
