@@ -641,7 +641,7 @@
                GO TO 99
 
 *  Mapping failed - inform user.
-            ELSE IF ( .NOT. AST_ISAMAPPING( MAP ) ) THEN
+            ELSE IF ( .NOT. AST_ISAMAPPING( MAP, STATUS ) ) THEN
                CALL MSG_SETC( 'DOM1', 
      :                        AST_GETC( IWCS, 'Domain', STATUS ) )
                CALL MSG_SETC( 'DOM2',
