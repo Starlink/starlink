@@ -62,6 +62,9 @@ f     The IntraMap class does not define any new routines beyond those
 *     15-SEP-1999 (RFWS):
 *        Added a "this" pointer to the external transformation function
 *        used by an IntraMap.
+*     20-JUN-2001 (DSB):
+*        Add an "astClone" call to prevent the pointer for "this" being 
+*        annulled at the end of the Transform method.
 *class--
 */
 
@@ -1578,8 +1581,9 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Obtain a public (external) ID for the IntraMap. This will be
    required (instead of a true C pointer) by the transformation function,
-   since it is user-written. */
-   id = (AstMapping *) astMakeId( this );
+   since it is user-written. Clone the IntraMap pointer so that the call
+   to astAnnulID later on does not annul the IntraMap pointer. */
+   id = (AstMapping *) astMakeId( astClone( this ) );
 
 /* Locate the transformation function data associated with the
    IntraMap and use the wrapper function to invoke the transformation

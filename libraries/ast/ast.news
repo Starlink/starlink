@@ -41,6 +41,9 @@ Main Changes in this Version
   to be drawn on inappropriate edges of the plotting box when using
   interior labelling.
 
+  o A bug has been fixed in the IntraMap class which could cause IntraMaps
+  to be corrupted after transforming any points.
+
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
 These are available on the WWW at:
