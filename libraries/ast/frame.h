@@ -497,6 +497,9 @@
 *     24-JAN-2004 (DSB):
 *        o  Added astFields.
 *        o  Added argument "fmt" to astAbbrev.
+*     24-JUN-2004 (DSB):
+*        Remove unused entry "void (* SetMatchRange)( AstFrame *, int, int );"
+*        from AstFrameVtab structure.
 *-
 */
 
@@ -657,7 +660,6 @@ typedef struct AstFrameVtab {
    void (* SetFormat)( AstFrame *, int, const char * );
    void (* SetLabel)( AstFrame *, int, const char * );
    void (* SetMatchEnd)( AstFrame *, int );
-   void (* SetMatchRange)( AstFrame *, int, int );
    void (* SetMaxAxes)( AstFrame *, int );
    void (* SetMinAxes)( AstFrame *, int );
    void (* SetPermute)( AstFrame *, int );
