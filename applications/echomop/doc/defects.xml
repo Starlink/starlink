@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE defectslist SYSTEM "defects.dtd">
+
+<defectslist>
+
+<title>ECHOMOP issues list</title>
+<version>$Revision$</version>
+<date>$Date$</date>
+
+<p>This list contains the current defects list for the ECHOMOP
+application.  As well as specific deficiencies, these `defects'
+include items which are merely suggestions or TODOs.</p>
+
+<p>If it's not in here, I don't plan to do anything about it.  That
+probably means it's slipped through the (unfortunately rather ragged)
+net, and you should remind me about it.</p>
+
+<p>These are in chronological order, and some have a higher priority
+than others.</p>
+
+<!-- DO NOT CHANGE THE ORDER OF ELEMENTS IN THIS FILE.
+     They're numbered when they're formatted, and it'd be nice to keep
+     those numbers correct.
+     -->
+
+<defectgroup>
+<title>Functionality</title>
+
+<defect status="open"
+	originator="Michael Albrow"
+	originatoremail="phys170@cantua.canterbury.ac.nz"
+	date="1 Feb 1999">
+<title>ech_dekker and ech_object apparently yoked together</title>
+<p>Michael Albrow:
+<blockquote>
+<p>When using
+echmenu, options "4.1" and "4.2" (these are the tasks ech_dekker and
+ech_object)
+don't seem to be able to be invoked separately anymore. Instead, trying
+either option seems to do the same as option "4" (ech_spatial).</p>
+</blockquote>
+</p>
+</defect>
+
+<defect status="open" originator="Rachel North"
+	originatoremail="rcn@astro.soton.ac.uk"
+	date="12-May-2000">
+<title>Single order toggle seems to have no effect</title>
+<p>This is option 24.</p>
+</defect>
+
+<defect status="open" originator="Rachel North"
+originatoremail="rcn@astro.soton.ac.uk"
+date="12-May-2000">
+<title>AI option crashes!</title>
+<p>Rachel North managed to produce crashes using the AI toption of
+ech_idwave and saving scrunched object orders (option 14:
+RESULT_TYPE: SCROBJ).</p>
+</defect>
+
+</defectgroup>
+
+<defectgroup>
+<title>Output and presentation</title>
+
+<defect status="open" originator="Rachel North"
+originatoremail="rcn@astro.soton.ac.uk"
+date="12-May-2000">
+<title>Exporting arc orders</title>
+<p>Rachel:
+<blockquote>
+<p>Basically, I can't seem to export(XP) or import(IM) the arc orders from 
+ech_idwave (option 10) so that the arc can be identified using the FIGARO 
+command ECHARC. This is the error message I'm getting:
+
+<verbatim>%echarc
+>echarc >IMAGE - (IMage) Collapsed echelle arc image to be fitted
+>/@ECH_ARC/ >ECH_ECHAR 
+>ARCTYPE - (ARctype) Type of arc /'thar'/ >
+>UNINITIALISED 
+>.Y.LABEL above not order number
+</verbatim></p></blockquote>
+</p>
+</defect>
+
+<defect status="open" originator="Orlon Petterson"
+originatoremail="o.petterson@phys.canterbury.ac.nz" date="4-Aug-2000">
+<title>Incorrect rounding of pixel values</title>
+<p>Pixel numbers in reduction output often seem to have been rounded
+to integers!  Possibly only when they've been optimally extracted,
+rather than profile extracted.</p>
+</defect>
+
+</defectgroup>
+
+</defectslist>
