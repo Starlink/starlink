@@ -121,7 +121,7 @@
 *        More fixes from MT related to checking for large numbers of
 *        equal-valued pixels, and correcting generic arithmetic.
 *     1-NOV-2001 (DSB):
-*        Corrected argument list for VAL_<T>TOI calls.
+*        Removed use of VAL_<T>TOI calls on MAXV and MINV.
 *     {enter_further_changes_here}
 
 *-
