@@ -137,6 +137,9 @@
 *     30-MAR-1999 (MBT):
 *        Modified to reject matches at greater displacements than 
 *        MAXDIS.
+*     30-JAN-2001 (MBT):
+*        Fixed a (previously harmless) bug in input->output index 
+*        indirection.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -455,7 +458,7 @@
                      YOUT2( NOUT ) = YIN2( KK ) 
 
 *  Record the original positions.
-                     INDO1( NOUT ) = INDI1( L )
+                     INDO1( NOUT ) = INDI1( XRANK( L, KK ) )
                      INDO2( NOUT ) = INDI2( KK )
 
 *  The first value which is located will do as before.
