@@ -35,6 +35,7 @@ f     display by using AST_FORMAT.
 *     - Equinox: Epoch of the mean equinox
 *     - LatAxis: Index of the latitude axis
 *     - LonAxis: Index of the longitude axis
+*     - NegLon: Display longitude values in the range [-pi,pi]?
 *     - Projection: Sky projection description.
 *     - System: Celestial coordinate system
 
@@ -84,6 +85,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        attributes LatAxis and LonAxis.
 *     21-JUN-2001 (DSB):
 *        Added astAngle and astOffset2.
+*     4-SEP-2001 (DSB):
+*        Added NegLon attribute.
 *class--
 */
 
@@ -134,6 +137,7 @@ f     The SkyFrame class does not define any new routines beyond those
 /* --------------- */
 #include <ctype.h>
 #include <float.h>
+#include <limits.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -199,6 +203,7 @@ static int GetAsTime( AstSkyFrame *, int );
 static int GetDirection( AstFrame *, int );
 static int GetLatAxis( AstSkyFrame * );
 static int GetLonAxis( AstSkyFrame * );
+static int GetNegLon( AstSkyFrame * );
 static int IsEquatorial( AstSkySystemType );
 static int MakeSkyMapping( AstSkyFrame *, AstSkyFrame *, AstMapping ** );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
@@ -207,6 +212,7 @@ static int TestAsTime( AstSkyFrame *, int );
 static int TestAttrib( AstObject *, const char * );
 static int TestEpoch( AstSkyFrame * );
 static int TestEquinox( AstSkyFrame * );
+static int TestNegLon( AstSkyFrame * );
 static int TestProjection( AstSkyFrame * );
 static int TestSystem( AstSkyFrame * );
 static int Unformat( AstFrame *, int, const char *, double * );
@@ -214,6 +220,7 @@ static void ClearAsTime( AstSkyFrame *, int );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearEpoch( AstSkyFrame * );
 static void ClearEquinox( AstSkyFrame * );
+static void ClearNegLon( AstSkyFrame * );
 static void ClearProjection( AstSkyFrame * );
 static void ClearSystem( AstSkyFrame * );
 static void Copy( const AstObject *, AstObject * );
@@ -227,6 +234,7 @@ static void SetAsTime( AstSkyFrame *, int, int );
 static void SetAttrib( AstObject *, const char * );
 static void SetEpoch( AstSkyFrame *, double );
 static void SetEquinox( AstSkyFrame *, double );
+static void SetNegLon( AstSkyFrame *, int );
 static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
 static void SetProjection( AstSkyFrame *, const char * );
@@ -538,6 +546,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "equinox" ) ) {
       astClearEquinox( this );
+
+/* NegLon. */
+/* ------- */
+   } else if ( !strcmp( attrib, "neglon" ) ) {
+      astClearNegLon( this );
 
 /* Projection. */
 /* ----------- */
@@ -1038,6 +1051,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    double equinox;               /* Equinox attribute value (as MJD) */
    int as_time;                  /* AsTime attribute value */
    int axis;                     /* SkyFrame axis number */
+   int neglon;                   /* Display long. values as [-pi,pi]? */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by sscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
@@ -1110,6 +1124,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       axis = astGetLonAxis( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", axis + 1 );
+         result = buff;
+      }
+
+/* NegLon */
+/* ------ */
+   } else if ( !strcmp( attrib, "neglon" ) ) {
+      neglon = astGetNegLon( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", neglon );
          result = buff;
       }
 
@@ -2164,11 +2187,13 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    vtab->ClearAsTime = ClearAsTime;
    vtab->ClearEpoch = ClearEpoch;
    vtab->ClearEquinox = ClearEquinox;
+   vtab->ClearNegLon = ClearNegLon;
    vtab->ClearProjection = ClearProjection;
    vtab->ClearSystem = ClearSystem;
    vtab->GetAsTime = GetAsTime;
    vtab->GetEpoch = GetEpoch;
    vtab->GetEquinox = GetEquinox;
+   vtab->GetNegLon = GetNegLon;
    vtab->GetLatAxis = GetLatAxis;
    vtab->GetLonAxis = GetLonAxis;
    vtab->GetProjection = GetProjection;
@@ -2176,11 +2201,13 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
    vtab->SetAsTime = SetAsTime;
    vtab->SetEpoch = SetEpoch;
    vtab->SetEquinox = SetEquinox;
+   vtab->SetNegLon = SetNegLon;
    vtab->SetProjection = SetProjection;
    vtab->SetSystem = SetSystem;
    vtab->TestAsTime = TestAsTime;
    vtab->TestEpoch = TestEpoch;
    vtab->TestEquinox = TestEquinox;
+   vtab->TestNegLon = TestNegLon;
    vtab->TestProjection = TestProjection;
    vtab->TestSystem = TestSystem;
 
@@ -2846,9 +2873,11 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 *     instance, may lie outside the expected range of values) into a
 *     set of acceptable alternative values suitable for display.
 *
-*     This is done by wrapping coordinates so that the longitude lies
-*     in the range 0.0 <= longitude < (2.0*pi) and the latitude lies
-*     in the range (-pi/2.0) <= latitude <= (pi/2.0).
+*     This is done by wrapping coordinates so that the latitude lies
+*     in the range (-pi/2.0) <= latitude <= (pi/2.0). If the NegLon
+*     attribute is zero (the default), then the wrapped longitude value 
+*     lies in the range 0.0 <= longitude < (2.0*pi). Otherwise, it lies
+*     in the range -pi <= longitude < pi.
 
 *  Parameters:
 *     this
@@ -2865,6 +2894,7 @@ static void Norm( AstFrame *this_frame, double value[] ) {
    double sky_lat;               /* Sky latitude value */
    double sky_long;              /* Sky longitude value */
    double v[ 2 ];                /* Permuted value coordinates */
+   int neglon;                   /* Normalize longitude values into [-pi,pi]? */
    int stat;                     /* Status return from SLALIB */
    static double pi;             /* Value of pi */
    static int init = 0;          /* Value of pi initialised? */
@@ -2940,6 +2970,12 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 /* Convert 2*pi longitude into zero. Allow for a small error. */
       if ( fabs( sky_long - ( 2.0 * pi ) ) <=
           ( 2.0 * pi ) * ( DBL_EPSILON * (double) FLT_RADIX ) ) sky_long = 0.0;
+
+/* If the NegLon attribute is set, and the longitude value is good,
+   convert it into the range -pi to +pi. */
+      if( sky_long != AST__BAD && astGetNegLon( this ) ) {
+         sky_long = slaDrange( sky_long );
+      }
 
 /* Return the new values, allowing for any axis permutation. */
       v[ 0 ] = sky_long;
@@ -3412,6 +3448,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
       OVERLAY(Equinox);
       OVERLAY(Projection);
       OVERLAY(System);
+      OVERLAY(NegLon);
    }
 
 /* Undefine macros local to this function. */
@@ -3951,6 +3988,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int equinox;                  /* Offset of Equinox attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by sscanf */
+   int neglon;                   /* Display -ve longitudes? */
    int projection;               /* Offset of Epoch attribute value */
    int system;                   /* Offset of System attribute value */
 
@@ -4011,6 +4049,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                    "\"%s\" given for sky coordinate system.",
                    astGetClass( this ), setting + equinox );
       }
+
+/* NegLon. */
+/* ------- */
+   } else if ( nc = 0,
+             ( 1 == sscanf( setting, "neglon= %d %n", &neglon, &nc ) )
+               && ( nc >= len ) ) {
+      astSetNegLon( this, neglon );
 
 /* Projection. */
 /* ----------- */
@@ -4918,6 +4963,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "equinox" ) ) {
       result = astTestEquinox( this );
 
+/* NegLon. */
+/* ------- */
+   } else if ( !strcmp( attrib, "neglon" ) ) {
+      result = astTestNegLon( this );
+
 /* Projection. */
 /* ----------- */
    } else if ( !strcmp( attrib, "projection" ) ) {
@@ -5356,6 +5406,48 @@ astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))
 /*
 *att++
 *  Name:
+*     NegLon
+
+*  Purpose:
+*     Display negative longitude values?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which controls how longitude values
+c     are normalized for display by astNorm.
+f     are normalized for display by AST_NORM.
+*
+*     If the NegLon attribute is zero (the default), then normalized 
+*     longitude values will be in the range zero to 2.pi. If NegLon is
+*     non-zero, then normalized longitude values will be in the range -pi 
+*     to pi. 
+
+*  Applicability:
+*     SkyFrame
+*        All SkyFrames have this attribute.
+*att--
+*/
+/* Clear the NegLon value by setting it to -INT_MAX. */
+astMAKE_CLEAR(SkyFrame,NegLon,neglon,-INT_MAX)
+
+/* Supply a default of 0 if no NegLon value has been set. */
+astMAKE_GET(SkyFrame,NegLon,int,0,( ( this->neglon != -INT_MAX ) ?
+                                   this->neglon : 0 ))
+
+/* Set a NegLon value of 1 if any non-zero value is supplied. */
+astMAKE_SET(SkyFrame,NegLon,int,neglon,( value != 0 ))
+
+/* The NegLon value is set if it is not -INT_MAX. */
+astMAKE_TEST(SkyFrame,NegLon,( this->neglon != -INT_MAX ))
+
+/*
+*att++
+*  Name:
 *     Projection
 
 *  Purpose:
@@ -5640,6 +5732,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    double dval;                  /* Double value */
    int bessyr;                   /* Format as Besselian years (else Julian) */
    int helpful;                  /* Helpful to display un-set value? */
+   int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
@@ -5719,6 +5812,14 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteDouble( channel, "Epoch", set, helpful, dval,
                    bessyr ? "Besselian epoch of observation" :
                             "Julian epoch of observation" );
+
+/* NegLon. */
+/* ------- */
+   set = TestNegLon( this );
+   ival = set ? GetNegLon( this ) : astGetNegLon( this );
+   astWriteInt( channel, "NegLon", set, 0, ival,
+                ival ? "Display negative longitude values" :
+                       "Display positive longitude values" );
 
 /* Equinox. */
 /* -------- */
@@ -5918,6 +6019,7 @@ AstSkyFrame *astInitSkyFrame_( void *mem, size_t size, int init,
       new->equinox = AST__BAD;
       new->projection = NULL;
       new->system = AST__NOSKYSYSTEM;
+      new->neglon = -INT_MAX;
 
 /* Loop to replace the Axis object associated with each SkyFrame axis with
    a SkyAxis object instead. */
@@ -6116,6 +6218,11 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size, int init,
       SetEquinox( new, ( new->equinox < 1984.0 ) ? slaEpb2d( new->equinox ) :
                                                    slaEpj2d( new->equinox ) );
    }
+
+/* MatchEnd. */
+/* --------- */
+   new->neglon = astReadInt( channel, "neglon", -INT_MAX );
+   if ( TestNegLon( new ) ) SetNegLon( new, new->neglon );
 
 /* If an error occurred, clean up by deleting the new SkyFrame. */
       if ( !astOK ) new = astDelete( new );

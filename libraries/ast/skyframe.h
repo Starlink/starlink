@@ -109,6 +109,11 @@
 *     LonAxis (integer)
 *        A read-only attribute giving the index of the longitude axis, 
 *        taking account of any current axis permutation.
+*     NegLon (integer)
+*        A boolean value that controls how a longitude value is
+*        normalized by astNorm. If non-zero, then longitude values are
+*        normalized into the range [-pi,+pi]. Otherwise (the default), 
+*        they are normalized into the range [0,2.pi].
 *     Projection (string)
 *        This attribute contains a human-readable description of the
 *        type of sky projection used when a SkyFrame is attached to a
@@ -204,6 +209,8 @@
 *           Clear the value of the Epoch attribute for a SkyFrame.
 *        astClearEquinox
 *           Clear the value of the Equinox attribute for a SkyFrame.
+*        astClearNegLon
+*           Clear the value of the NegLon attribute for a SkyFrame.
 *        astClearSystem
 *           Clear the value of the System attribute for a SkyFrame.
 *        astClearProjection
@@ -214,6 +221,8 @@
 *           Obtain the value of the Epoch attribute for a SkyFrame.
 *        astGetEquinox
 *           Obtain the value of the Equinox attribute for a SkyFrame.
+*        astGetNegLon
+*           Obtain the value of the NegLon attribute for a SkyFrame.
 *        astGetProjection
 *           Obtain the value of the Projection attribute for a SkyFrame.
 *        astGetSystem
@@ -224,6 +233,8 @@
 *           Set a value for the Epoch attribute of a SkyFrame.
 *        astSetEquinox
 *           Set a value for the Equinox attribute of a SkyFrame.
+*        astSetNegLon
+*           Set a value for the NegLon attribute of a SkyFrame.
 *        astSetProjection
 *           Set a value for the Projection attribute of a SkyFrame.
 *        astSetSystem
@@ -235,6 +246,9 @@
 *           Test if a value has been set for the Epoch attribute of a SkyFrame.
 *        astTestEquinox
 *           Test if a value has been set for the Equinox attribute of a
+*           SkyFrame.
+*        astTestNegLon
+*           Test if a value has been set for the NegLon attribute of a
 *           SkyFrame.
 *        astTestProjection
 *           Test if a value has been set for the Projection attribute of a
@@ -329,6 +343,7 @@ typedef struct AstSkyFrame {
    char *projection;             /* Description of sky projection */
    double epoch;                 /* Epoch as Modified Julian Date */
    double equinox;               /* Modified Julian Date of mean equinox */
+   int neglon;                   /* Display negative longitude values? */
    AstSkySystemType system;      /* Code identifying sky coordinate system */
 } AstSkyFrame;
 
@@ -350,22 +365,26 @@ typedef struct AstSkyFrameVtab {
    const char *(* GetProjection)( AstSkyFrame * );
    double (* GetEpoch)( AstSkyFrame * );
    double (* GetEquinox)( AstSkyFrame * );
+   int (* GetNegLon)( AstSkyFrame * );
    int (* GetAsTime)( AstSkyFrame *, int );
    int (* GetLatAxis)( AstSkyFrame * );
    int (* GetLonAxis)( AstSkyFrame * );
    int (* TestAsTime)( AstSkyFrame *, int );
    int (* TestEpoch)( AstSkyFrame * );
    int (* TestEquinox)( AstSkyFrame * );
+   int (* TestNegLon)( AstSkyFrame * );
    int (* TestProjection)( AstSkyFrame * );
    int (* TestSystem)( AstSkyFrame * );
    void (* ClearAsTime)( AstSkyFrame *, int );
    void (* ClearEpoch)( AstSkyFrame * );
    void (* ClearEquinox)( AstSkyFrame * );
+   void (* ClearNegLon)( AstSkyFrame * );
    void (* ClearProjection)( AstSkyFrame * );
    void (* ClearSystem)( AstSkyFrame * );
    void (* SetAsTime)( AstSkyFrame *, int, int );
    void (* SetEpoch)( AstSkyFrame *, double );
    void (* SetEquinox)( AstSkyFrame *, double );
+   void (* SetNegLon)( AstSkyFrame *, int );
    void (* SetProjection)( AstSkyFrame *, const char * );
    void (* SetSystem)( AstSkyFrame *, AstSkySystemType );
 } AstSkyFrameVtab;
@@ -403,22 +422,26 @@ AstSkySystemType astGetSystem_( AstSkyFrame * );
 const char *astGetProjection_( AstSkyFrame * );
 double astGetEpoch_( AstSkyFrame * );
 double astGetEquinox_( AstSkyFrame * );
+int astGetNegLon_( AstSkyFrame * );
 int astGetAsTime_( AstSkyFrame *, int );
 int astGetLatAxis_( AstSkyFrame * );
 int astGetLonAxis_( AstSkyFrame * );
 int astTestAsTime_( AstSkyFrame *, int );
 int astTestEpoch_( AstSkyFrame * );
 int astTestEquinox_( AstSkyFrame * );
+int astTestNegLon_( AstSkyFrame * );
 int astTestProjection_( AstSkyFrame * );
 int astTestSystem_( AstSkyFrame * );
 void astClearAsTime_( AstSkyFrame *, int );
 void astClearEpoch_( AstSkyFrame * );
 void astClearEquinox_( AstSkyFrame * );
+void astClearNegLon_( AstSkyFrame * );
 void astClearProjection_( AstSkyFrame * );
 void astClearSystem_( AstSkyFrame * );
 void astSetAsTime_( AstSkyFrame *, int, int );
 void astSetEpoch_( AstSkyFrame *, double );
 void astSetEquinox_( AstSkyFrame *, double );
+void astSetNegLon_( AstSkyFrame *, int );
 void astSetProjection_( AstSkyFrame *, const char * );
 void astSetSystem_( AstSkyFrame *, AstSkySystemType );
 #endif
@@ -479,6 +502,8 @@ astINVOKE(V,astClearAsTime_(astCheckSkyFrame(this),axis))
 astINVOKE(V,astClearEpoch_(astCheckSkyFrame(this)))
 #define astClearEquinox(this) \
 astINVOKE(V,astClearEquinox_(astCheckSkyFrame(this)))
+#define astClearNegLon(this) \
+astINVOKE(V,astClearNegLon_(astCheckSkyFrame(this)))
 #define astClearProjection(this) \
 astINVOKE(V,astClearProjection_(astCheckSkyFrame(this)))
 #define astClearSystem(this) \
@@ -489,6 +514,8 @@ astINVOKE(V,astGetAsTime_(astCheckSkyFrame(this),axis))
 astINVOKE(V,astGetEpoch_(astCheckSkyFrame(this)))
 #define astGetEquinox(this) \
 astINVOKE(V,astGetEquinox_(astCheckSkyFrame(this)))
+#define astGetNegLon(this) \
+astINVOKE(V,astGetNegLon_(astCheckSkyFrame(this)))
 #define astGetLatAxis(this) \
 astINVOKE(V,astGetLatAxis_(astCheckSkyFrame(this)))
 #define astGetLonAxis(this) \
@@ -503,6 +530,8 @@ astINVOKE(V,astSetAsTime_(astCheckSkyFrame(this),axis,value))
 astINVOKE(V,astSetEpoch_(astCheckSkyFrame(this),value))
 #define astSetEquinox(this,value) \
 astINVOKE(V,astSetEquinox_(astCheckSkyFrame(this),value))
+#define astSetNegLon(this,value) \
+astINVOKE(V,astSetNegLon_(astCheckSkyFrame(this),value))
 #define astSetProjection(this,value) \
 astINVOKE(V,astSetProjection_(astCheckSkyFrame(this),value))
 #define astSetSystem(this,value) \
@@ -513,6 +542,8 @@ astINVOKE(V,astTestAsTime_(astCheckSkyFrame(this),axis))
 astINVOKE(V,astTestEpoch_(astCheckSkyFrame(this)))
 #define astTestEquinox(this) \
 astINVOKE(V,astTestEquinox_(astCheckSkyFrame(this)))
+#define astTestNegLon(this) \
+astINVOKE(V,astTestNegLon_(astCheckSkyFrame(this)))
 #define astTestProjection(this) \
 astINVOKE(V,astTestProjection_(astCheckSkyFrame(this)))
 #define astTestSystem(this) \
