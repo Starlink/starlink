@@ -50,6 +50,7 @@ using std::ostringstream;
 
 #ifdef HAVE_STD_NAMESPACE
 using std::ostrstream;
+using std::ends;
 #endif
 
 #endif
