@@ -34,14 +34,17 @@
    following options have an effect only if this is enabled. */
 #define ENABLE_KPATHSEA 0
 
-/* Define MKTEXPK to be the path to the mktexpk program, or leave
-   undefined if not known, not available, or we should not use it. */
+/* Define MKTEXPK to be the path to the mktexpk program, or some other
+   program with the same interface.  Leave undefined if not known, not
+   available, or we should not use it.  If the value of this is a
+   program without a full path, then things will still work, but the
+   program will have to be in the PATH at run time. */
 #undef MKTEXPK
 
-/* Define MAKETEXPK to be the path to the MakeTeXPK program, or leave
-   undefined if not known, not available, or we should not use it.
-   The mktexpk program is newer (I think), and should be used in
-   preference. */
+/* Define MAKETEXPK to be the path to the MakeTeXPK program, or some
+   other program with the same interface.  Leave undefined if not
+   known, not available, or we should not use it.  The mktexpk program
+   is newer (I think), and should be used in preference. */
 #undef MAKETEXPK
 
 /* Define ENABLE_FONT_GEN to be 1 if you wish fonts to be generated
@@ -60,7 +63,11 @@
 
 /* Set DEFAULT_TEXMFCNF to be the location of the texmf.cnf file which
    the kpathsea library is to use.  This will be overridden by a value
-   of TEXMFCNF set in the program's environment. */
+   of TEXMFCNF set in the program's environment at run time.  It is
+   not necessary to set this if the program will be installed
+   alongside the other dvi-ware (if they use kpathsea), since the
+   kpathsea library can find its own configuration file relative to
+   that location. */
 #undef DEFAULT_TEXMFCNF
 
 /* The texmf.cnf file uses the value of variables SELFAUTO..., and
@@ -68,8 +75,8 @@
    (broken!) configuration files have the VARTEXFONTS variable
    depending on these, and this means that font generation fails
    unless the dvi2bitmap program is installed along with the other
-   dviware binaries.  If you have such a configuration file, and you
-   can't or don't want to install the program with the other dviware,
+   dvi-ware binaries.  If you have such a configuration file, and you
+   can't or don't want to install the program with the other dvi-ware,
    then you can define this variable to the location of a binary that
    is in the `correct' place. */
 #undef FAKE_PROGNAME

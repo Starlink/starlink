@@ -72,4 +72,6 @@ tidy:
 
 clean: tidy
 	rm -f *.o $(EXEC)
+	rm -f doc.tar dvi2bitmap.mantext
+	rm -f dvi2bitmap.tar.Z dvi2bitmap_source.tar
 	cd doc; $(MAKE) clean

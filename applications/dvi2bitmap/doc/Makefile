@@ -1,5 +1,7 @@
 include $(STARLINK_SGML_DIR)/lib/Makefile.common
 
+DOCTARBALLS=doc.tar-htx doc.tar-latex doc.tar-htxsingle
+
 doc.tar-htx: dvi2bitmap.sgml
 	$(STARLINK_SGML_DIR)/bin/sgml2docs --html \
 		--packagedir ssn71.htx --tarball $@ $<
@@ -12,14 +14,15 @@ doc.tar-htxsingle: dvi2bitmap.sgml
 	$(STARLINK_SGML_DIR)/bin/sgml2docs --htmlsingle \
 		--packagedir ssn71.htxsingle --tarball $@ $<
 
-doc.tar: doc.tar-htx doc.tar-latex doc.tar-htxsingle
-	for i in doc.tar-htx doc.tar-latex doc.tar-htxsingle; do \
-		tar xf $$i; \
-	done
-	mv ssn71.htxsingle/ssn71.html ssn71.htx/ssn71.single.html
+doc.tar: $(DOCTARBALLS)
+	mkdir dvi2bitmap_doc
+	cd dvi2bitmap_doc; \
+	for i in $(DOCTARBALLS); do \
+		tar xf ../$$i; \
+	done; \
+	mv ssn71.htxsingle/ssn71.html ssn71.htx/ssn71.single.html; \
 	mv ssn71.latex/ssn71.tex .
-	cd ..; tar cf doc.tar doc/ssn71.htx doc/ssn71.tex
-	mv ../doc.tar .
+	tar cf doc.tar dvi2bitmap_doc/ssn71.htx dvi2bitmap_doc/ssn71.tex
 
 #	for f in `cat *.manifest` \
 #			`awk -F: '{print $$1}' dvi2bitmap.html.stamp`.ps.gz \
@@ -64,5 +67,6 @@ dvi2bitmap.html.stamp: dvi2bitmap.sgml dvi2bitmap.imgeq.list.stamp
 index.html: dvi2bitmap.html.stamp
 	ln -sf `awk -F: '{print $$1}' $<`.html $@
 
-localclean:
-	rm -f doc.tar
+clean:
+	rm -f doc.tar $(DOCTARBALLS)
+	rm -Rf ssn71.htx ssn71.latex ssn71.htxsingle ssn71.tex

@@ -4,6 +4,7 @@
 #
 #  Version:
 #     Library makefile Mk V
+#     $Id$
 #
 #  Purpose:
 #     Build and install the dvi2bitmap package
@@ -371,13 +372,6 @@ PKG_NAME = dvi2bitmap
 
 PKG_VERS = 1.0-6
 
-#  List of files comprising the distributed source-only system.  This
-#  defines the minimum set of files required to rebuild completely the
-#  package from source (including this makefile, the associated mk
-#  script and any documentation files).
-
-SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk README.distrib
-
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
@@ -386,7 +380,14 @@ SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk README.distrib
 #PUBLIC_SCRIPTS = star2html xlabel latex2html
 
 #  List of documentation files.
-#FIXME documentation is included within SGML source tree - OK?
+DOCUMENTATION=README.distrib doc.tar
+
+#  List of files comprising the distributed source-only system.  This
+#  defines the minimum set of files required to rebuild completely the
+#  package from source (including this makefile, the associated mk
+#  script and any documentation files).
+
+SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk $(DOCUMENTATION)
 
 #NEWS = $(PKG_NAME).news
 
@@ -530,6 +531,10 @@ build:
 #  modified any of the built files.  It depends on all the built files
 #  being up to date (which causes them to be built).
 
+# testing for the presence of $(DATE_STAMP) is equivalent to testing
+# whether the package has been built.
+$(DATE_STAMP): .BUILT
+
 .BUILT: $(BUILT_FILES)
 #
 #  Enter information about the current machine and build environment
@@ -623,18 +628,23 @@ install:
 
 # The .INSTALLED_$(SYSTEM) target installs dvi2bitmap by copying it
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(BUILT_FILES) dvi2bitmap_doc
-	# Create .INSTALLED_$(SYSTEM), containing $$INSTALL, 
-	# to record that the package is installed (at least in part).
+#	# Create .INSTALLED_$(SYSTEM), containing $$INSTALL, 
+#	# to record that the package is installed (at least in part).
 	echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 	for f in $(BUILT_FILES) ; do \
 		cp $$f $(INSTALL_BIN); \
 	done
-	test -d $(INSTALL_DOCS)/ssn71.htx || mkdir -p $(INSTALL_DOCS)/ssn71.htx
-	test -r dvi2bitmap_doc/HTML.manifest && \
-		cd dvi2bitmap_doc; \
-		cp `cat HTML.manifest` $(INSTALL_DOCS)/ssn71.htx
-	cp dvi2bitmap_doc/SSN-71.tex $(INSTALL_DOCS)/ssn71.htx
-	cp dvi2bitmap_doc/SSN-71.ps.gz $(INSTALL_DOCS)/ssn71.htx
+#	test -d $(INSTALL_DOCS)/ssn71.htx || mkdir -p $(INSTALL_DOCS)/ssn71.htx
+#	test -r dvi2bitmap_doc/HTML.manifest && \
+#		cd dvi2bitmap_doc; \
+#		cp `cat HTML.manifest` $(INSTALL_DOCS)/ssn71.htx
+#	cp dvi2bitmap_doc/SSN-71.tex $(INSTALL_DOCS)/ssn71.htx
+#	cp dvi2bitmap_doc/SSN-71.ps.gz $(INSTALL_DOCS)/ssn71.htx
+	test -d $(INSTALL_DOCS) || mkdir -p $(INSTALL_DOCS)
+	(cd dvi2bitmap_doc; $(TAR_IN) - *) | \
+		(cd $(INSTALL_DOCS); $(TAR_OUT_PIPE) -)
+	- which hlink >/dev/null && hlink $(INSTALL_DOCS)
+	cp -p dvi2bitmap_doc/ssn71.tex $(INSTALL_DOCS)
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
 	chmod 644 $(DATE_STAMP)
@@ -690,7 +700,7 @@ do_deinstall:
 	for f in $(BUILT_FILES); do \
 		rm -f $(INSTALL_BIN)/$$f; \
 	done
-	- rm -Rf $(INSTALL_DOCS)/ssn71.htx
+	- rm -Rf $(INSTALL_DOCS)/ssn71.htx $(INSTALL_DOCS)/ssn71.tex
 	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
            chmod 644 $(DATE_STAMP); rm $(DATE_STAMP);\
            chmod 644 $(INSTALL_DATES)/$(DATE_STAMP);\
@@ -768,7 +778,7 @@ export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
-		$(NEWS) $(DATE_STAMP)
+		$(NEWS) $(DATE_STAMP) $(BUILT_FILES)
 	#  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
            echo;\
@@ -779,7 +789,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk Makefile.starlink $(NEWS) $(BUILT_FILES) \
-           $(DATE_STAMP) .BUILT  \
+           $(DATE_STAMP) $(DOCUMENTATION) .BUILT  \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
@@ -838,8 +848,8 @@ unbuild: clean
 
 
 # The following rules are little subtle, since they have to work both in 
-# the distribution directory, where the sources live and are packaged up,
-# _and_ in the distributed directory, immediately after unpacking.  Use
+# the distribuTION directory, where the sources live and are packaged up,
+# _and_ in the distributED directory, immediately after unpacking.  Use
 # the file dvi2bitmap.cc as a trigger: if that's missing, then we must be
 # in the distributed directory, so unpack the source bundle and move the
 # files up to the current directory.
@@ -849,8 +859,21 @@ unbuild: clean
 # depend on one of the SELFAUTO... variables.  Grep the texmf.cnf file for
 # the pattern 'FONTS.*AUTO', and add this configure option if we find it.
 # This isn't _terribly_ robust, but it should do.
+#
+# When we're making the export_run target, we want to avoid including
+# absolute paths in the binary.  Unfortunately, doing this is
+# potentially tricky in this makefile, since the target export_run is
+# supposed to be made _after_ the package has already been built and
+# installed.  I need to check what's the best thing to do here.  To
+# make a `relocatable' binary, it needs to be configured with the
+# options `--enable-mktexpk=mktexpk --disable-texmfcnf'.  The first
+# would be relatively safe to do in general (since mktexpk is likely to be in
+# the path anyway), but the second means that the program will not
+# work unless either it is installed with the other dvi-ware, or the
+# TEXMFCNF environment variable is set appropriately.
 dvi2bitmap: dvi2bitmap.cc
-	eval test -x "`which kpsewhich`" && grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && TEXMFCNFTEST=--enable-fake-progname ;\
+#	eval test -x "`which kpsewhich`" && grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && TEXMFCNFTEST=--enable-fake-progname ;\
+	which kpsewhich >/dev/null && grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && TEXMFCNFTEST=--enable-fake-progname ;\
 	test -n "$$TEXMFCNFTEST" && echo "Warning: faking dvi2bitmap program name" ; \
 	CXX=$(CXX) ./configure --enable-gif --with-kpathsea $$TEXMFCNFTEST
 	$(MAKE) -f Makefile dvi2bitmap
@@ -862,9 +885,9 @@ dvi2bitmap.cc:
 	mv dvi2bitmap/* .
 	rmdir dvi2bitmap
 
-dvi2bitmap_doc:
+# doc.tar contains a directory dvi2bitmap_doc.  See doc/Makefile
+dvi2bitmap_doc: doc.tar
 	$(TAR_OUT) doc.tar
-	mv doc dvi2bitmap_doc
 
 dvi2bitmap.news: README
 	cp README dvi2bitmap.news
