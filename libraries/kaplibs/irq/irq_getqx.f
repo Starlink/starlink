@@ -111,6 +111,7 @@
      :    STATUS .EQ. IRQ__QEXPL .OR.
      :    STATUS .EQ. IRQ__QREFS ) THEN
 
+         CALL ERR_FLUSH( STATUS )
          CALL PAR_CANCL( PARAM, STATUS )
          GO TO 10
 
