@@ -582,7 +582,7 @@ sub ndf_info ($$$$) {
 	# WCS information in the NDF, else we could use that.
 	my @cmdra = split (/[^0-9]+/, $obsdata->{ra});
 	$returnhash{astromtime} = "$cmdra[0] $cmdra[1]";
-	$returnhash{astromtime} = "command-line RA";
+	$returnhash{astromtimecomment} = "command-line RA";
     } elsif (defined($fitshash{CRVAL1})) {
 	# Take it from the FITS extension
 
@@ -606,6 +606,14 @@ sub ndf_info ($$$$) {
 	    wmessage ('warning',
 		  "Odd FITS file -- not all of CRVAL1,2 CRTYPE1,2 defined!");
 	}
+    } else {
+        # Dear, dear, this is poor: we have no idea when this
+        # observation took place.  Following PWD's advice, we should
+        # take the epoch to be just 2000.
+        # Epoch is a valid Time record in our custom ASTROM, but not
+        # (yet?) in standard ASTROM.
+        $returnhash{astromtime} = 2000.0;
+        $returnhash{astromtimecomment} = 'Last-ditch guess of epoch 2000.0';
     }
     if ($verbose) {
 	if (defined ($returnhash{astromtime})) {
@@ -669,7 +677,7 @@ sub ndf_info ($$$$) {
 	    print STDERR "ndf_info: can't work out ASTROM Obs record\n";
 	}
     }
-    
+
     # ASTROM Met record
     if (defined($obsdata->{met})) {
 	$returnhash{astrommet} = $obsdata->{met};
@@ -715,7 +723,7 @@ sub ndf_info ($$$$) {
 	    print STDERR "ndf_info: can't work out ASTROM Col record\n";
 	}
     }
-    
+
     my $obsdate;
     if (defined($ndfdates->{nje})) {
 	$obsdate = $ndfdates->{nje};
@@ -726,10 +734,9 @@ sub ndf_info ($$$$) {
 	print STDERR "ndf_info: obsdate $obsdate from FITS\n"
 	  if $verbose;
     } else {
-	my @now = localtime();
-	$obsdate = ymd2je ($now[5]+1900, $now[4]+1, $now[3]);
-	print STDERR "ndf_info: WARNING obsdate $obsdate taken to be NOW\n"
-	  if $verbose;
+        $obsdate = 2000.0;
+        print STDERR "ndf_info: WARNING: no date information available, epoch set to 2000.0\n"
+          if $verbose;
     }
 
     # End the NDF context
@@ -817,7 +824,7 @@ sub get_dates ($$$) {
 	    # This is actually the time the file was written.  Last-ditch.
 	    $dates{fje} = parse_fits_date ($$fitshash{'DATE'});
 	}
-	printf STDERR ("fits_read_header{%s} = %s\n",
+	printf STDERR ("get_dates: fje from fits_read_header{%s} = %s\n",
 		       $fitsdatesource, $dates{fje})
 	  if ($verbose && defined($fitsdatesource));
 
@@ -1993,12 +2000,11 @@ sub ymd2je ($$$) {
     my ($year,$month,$day) = @_;
 
     return jd2je (ymd2jd($year, $month, $day));
-    #return 2000 + (ymd2jd($year, $month, $day) - 2451545)/365.25;
 }
 
 # Convert a FITS date into a Julian epoch.  After the 1997-11-10
 # amendment documented in
-# <ftp://nssdc.gsfc.nasa.gov/pub/fits/year2000_agreement.txt>, FITS
+# <http://www.cv.nrao.edu/fits/documents/standards/year2000.txt>, FITS
 # dates can be in one of the forms YYYY-MM-DDThh:mm:ss[.s...],
 # YYYY-MM-DD or DD/MM/YY, with the last representing _only_ dates
 # between 1900-1999.
