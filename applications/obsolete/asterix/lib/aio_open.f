@@ -214,6 +214,10 @@
         CALL PSX_GETENV( 'COLUMNS', COLS, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           CALL CHR_CTOI( COLS, AIO_WIDTH, STATUS )
+          IF ( STATUS .NE. SAI__OK .OR. AIO_WIDTH .LE. 0 ) THEN
+            CALL ERR_ANNUL( STATUS )
+            AIO_WIDTH = 80
+          END IF
         ELSE
           CALL ERR_ANNUL( STATUS )
           AIO_WIDTH = 80
