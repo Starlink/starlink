@@ -21,6 +21,18 @@ $Id$
   ;;  (make-section-reference title: (literal "Routine list")))
   (element routinelist
     (literal "Routine list"))
+  (element codegroup
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
+  (element programcode
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
+  (element codegroup
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
+  (element routine
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
   (element codecollection
     (make-section-reference
      ;set-prefix: (literal (number->string (child-number)) " ")
@@ -189,6 +201,8 @@ $Id$
 					  (process-authorlist allauthors)))))))
 		(empty-sosofo))))
 	(empty-sosofo)))
+  (element routine
+    (process-matching-children 'routineprologue))
   (element routineprologue
     (let ((kids (nl-to-pairs (children (current-node)))))
       (make sequence
@@ -205,7 +219,12 @@ $Id$
 		      (let ((purp (assoc (normalize "purpose") kids)))
 			(if purp
 			    (process-node-list (cdr purp))
-			    (empty-sosofo))))
+			    (if (assoc (normalize "description") kids)
+				(process-node-list
+				 (cdr (assoc (normalize "description")
+					     kids)))
+				(empty-sosofo) ;shouldn't happen
+				))))
 		;; environment contents -- description, etc
 		(apply sosofo-append
 		       (map (lambda (gi)
@@ -241,8 +260,10 @@ $Id$
   (element routinename
     (process-children))
   (element name
-    (make command name: "Code"
-	  (process-children)))
+    (process-children))
+;  (element name
+;    (make command name: "Code"
+;	  (process-children)))
   (element othernames
     (let* ((names (children (current-node)))
 	   (namelist (node-list-reduce
@@ -277,10 +298,15 @@ $Id$
     (let ((none-att (attribute-string (normalize "none")))
 	  (type-att (attribute-string (normalize "type"))))
       (make environment name: "sstreturnedvalue"
-	    (if none-att
-		(make command name: "emph"
-		      (literal "No return value")) ;...and discard any data
-		(process-children)))))
+	    (make sequence
+	      (make empty-command name: "item"
+		    parameters: (if type-att
+				    (list type-att)
+				    '("Unknown type")))
+	      (if none-att
+		  (make command name: "emph"
+			(literal "No return value")) ;...and discard any data
+		  (process-children))))))
   (element parameterlist
     (let ((none-att (attribute-string (normalize "none"))))
       (make environment name: "sstparameters"
@@ -308,7 +334,7 @@ $Id$
 		(process-node-list name)
 		(literal "=")
 		(process-node-list type)
-		(literal "("
+		(literal " ("
 			 (cond
 			  ((and given-att returned-att)
 			   "given and returned")
@@ -404,6 +430,8 @@ $Id$
       (make empty-command name: "item"
 	    parameters: '("?Copyright"))
       (process-children)))
+  (element authorlist
+    (empty-sosofo))			; managed specially in element docblock
   (element history
     (empty-sosofo))
   ;; Following works, it's just that I don't want to produce this output.
@@ -532,7 +560,7 @@ $Id$
 		  (literal "Anonymous routine")
 		  (with-mode routine-ref-get-reference
 		    (process-node-list rn))))
-	(process-children))))
+	(process-node-list rp))))
   (element routineopener
     (empty-sosofo))
   (element description
@@ -558,6 +586,8 @@ $Id$
   (default (empty-sosofo))
   (element programcode
     (process-matching-children 'docblock))
+  (element codegroup
+    (process-matching-children 'docblock))
   (element docblock
     (process-matching-children 'title))
   (element title
@@ -570,36 +600,66 @@ $Id$
 	(if attrib
 	    (literal (string-append " (" attrib ")"))
 	    (empty-sosofo)))))
+  (element routine
+    (process-matching-children 'routineprologue))
   (element name
     (process-children)))
 
+;; Coderef in this context is very simple, just requiring that we
+;; print the element content.  If there's no content, then scurry to
+;; the referenced routine to find its name.
 (element coderef
-  (let* ((cc (node-list-or-false
-	      (element-with-id (attribute-string (normalize "collection")))))
-	 (ccdoc (and cc
-		     (document-element-from-entity
-		      (attribute-string (normalize "doc") cc))))
-	 (target (and ccdoc
-		      (node-list-or-false
-		       (element-with-id (attribute-string (normalize "id"))
-					ccdoc))))
-	 (targetroutine (and target
-			     (if (equal? (gi target) (normalize "routine"))
-				 target
-				 (ancestor (normalize "routine")
-					   target)))))
-    (make sequence
-      (process-children)
-      (if targetroutine
-	  (make sequence
-	    (literal " (p.")
-	    (make empty-command name: "pageref"
-		  parameters: `(,(string-append
-				  "R"
-				  (attribute-string (normalize "id")))))
-	    (literal ")")
-	    (empty-sosofo))
-	  (error (string-append "Can't find one of collection "
-			      (attribute-string (normalize "collection"))
-			      " or routine "
-			      (attribute-string (normalize "id"))))))))
+  (if (string=? (data (current-node)) "")
+      (let* ((cc (node-list-or-false
+		  (element-with-id
+		   (attribute-string (normalize "collection")))))
+	     (ccdoc (and cc
+			 (document-element-from-entity
+			  (attribute-string (normalize "doc") cc))))
+	     (target (and ccdoc
+			  (node-list-or-false
+			   (element-with-id
+			    (attribute-string (normalize "id"))
+			    ccdoc))))
+	     (targetroutine (and target
+				 (if (equal? (gi target)
+					     (normalize "routine"))
+				     target
+				     (ancestor (normalize "routine")
+					       target)))))
+	(with-mode section-reference
+	  (process-node-list targetroutine)))
+      (process-children)))
+
+
+;; Following is a more sophisticated version, which includes a LaTeX pageref.
+; (element coderef
+;   (let* ((cc (node-list-or-false
+; 	      (element-with-id (attribute-string (normalize "collection")))))
+; 	 (ccdoc (and cc
+; 		     (document-element-from-entity
+; 		      (attribute-string (normalize "doc") cc))))
+; 	 (target (and ccdoc
+; 		      (node-list-or-false
+; 		       (element-with-id (attribute-string (normalize "id"))
+; 					ccdoc))))
+; 	 (targetroutine (and target
+; 			     (if (equal? (gi target) (normalize "routine"))
+; 				 target
+; 				 (ancestor (normalize "routine")
+; 					   target)))))
+;     (make sequence
+;       (process-children)
+;       (if targetroutine
+; 	  (make sequence
+; 	    (literal " (p.")
+; 	    (make empty-command name: "pageref"
+; 		  parameters: `(,(string-append
+; 				  "R"
+; 				  (attribute-string (normalize "id")))))
+; 	    (literal ")")
+; 	    (empty-sosofo))
+; 	  (error (string-append "Can't find one of collection "
+; 			      (attribute-string (normalize "collection"))
+; 			      " or routine "
+; 			      (attribute-string (normalize "id"))))))))
