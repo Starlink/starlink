@@ -1,6 +1,6 @@
       SUBROUTINE POL1_IMFIT( FITGRP, DESGRP, NDF, FITBLK, FITLEN,
      :                       IVALS, RVALS, DVALS, LVALS, CVALS,
-     :                       STATUS )
+     :                       GOTFV, STATUS )
 *+
 *  Name:
 *     POL1_IMFIT
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_IMFIT( FITGRP, DESGRP, NDF, FITBLK, FITLEN,
-*                      IVALS, RVALS, DVALS, LVALS, STATUS )
+*                      IVALS, RVALS, DVALS, LVALS, CVALS, GOTFV, STATUS )
 
 *  Description:
 *   This routine interprets the information passed to it as instructions
@@ -46,14 +46,16 @@
 *  Arguments:
 *     FITGRP( 2 ) = INTEGER (Given)
 *        GRP groups of FITS-keywords and their types. FITGRP( 1 )
-*        contains the keywords, FITGRP( 2 ) their HDS types.
+*        contains the keywords (terminated by a question mark if no error
+*        is to be reported if the keyword does not exist), FITGRP( 2 ) 
+*        their HDS types.
 *     DESGRP( 3 ) = INTEGER (Given)
 *        GRP groups of the destination extension item names, their
 *        types and the function used to derive a value for the extension
 *        item. DESGRP( 1 ) contains the extension names (which may be
-*        hierarchical) DESGRP( 2 ) their HDS types and DESGRP( 3 ) the
-*        functions of FITS-keywords which evaluate to the values to be
-*        stored.
+*        hierarchical, and may be terminated by a question mark), 
+*        DESGRP( 2 ) their HDS types and DESGRP( 3 ) the functions of 
+*        FITS-keywords which evaluate to the values to be stored.
 *     NDF = INTEGER (Given)
 *        NDF identifier. This NDF will have a POLPACK extension created
 *        if one does not exist already.
@@ -75,13 +77,17 @@
 *        Storage space for any _DOUBLE values extracted from the FITS
 *        block. This should be at least as large as the number of FITS
 *        items which will be extracted (size of FITGRP groups).
-*     LVALS( * ) = INTEGER (Given)
+*     LVALS( * ) = LOGICAL (Given)
 *        Storage space for any _LOGICAL values extracted from the FITS
 *        block. This should be at least as large as the number of FITS
 *        items which will be extracted (size of FITGRP groups).
 *     CVALS( * ) = INTEGER (Given)
 *        Storage space for any pointers to _CHAR values extracted from
 *        the FITS block. This should be at least as large as the number
+*        of FITS items which will be extracted (size of FITGRP groups).
+*     GOTFV( * ) = LOGICAL (Given)
+*        Storage space for falgs indicating if a value for the corresponding 
+*        keyword was found. This should be at least as large as the number 
 *        of FITS items which will be extracted (size of FITGRP groups).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -111,6 +117,7 @@
       INCLUDE 'GRP_PAR'          ! GRP parameters
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'MSG_PAR'          ! Message system parameters
+      INCLUDE 'TRN_ERR'          ! TRANSFORM error codes
 
 *  Arguments Given:
       INTEGER FITGRP( 2 )
@@ -125,6 +132,7 @@
       REAL RVALS( * )
       DOUBLE PRECISION DVALS( * )
       LOGICAL LVALS( * )
+      LOGICAL GOTFV( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -155,7 +163,6 @@
       INTEGER IZERO( 1 )         ! 0
       INTEGER J                  ! Loop variable
       INTEGER LAST               ! Position of last character in word
-      INTEGER NC                 ! Used length of literal string
       INTEGER NCHAR              ! Number of characters
       INTEGER NEXT               ! Number of extension items
       INTEGER NFITS              ! Number of FITS items
@@ -173,6 +180,7 @@
       INTEGER LENFOR             ! Length of forward expression
       INTEGER LENFIT             ! Length of FIT string
       INTEGER LENTYP             ! Length of item type
+      LOGICAL QUEST              ! Did extension item name end with a "?" ?
 
 *  Local Data:
       DATA DZERO / 0.0D0 / 
@@ -200,21 +208,26 @@
          CVALS( I ) = 0
          IAT = 0
          IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
+            IVALS( I ) = 0
             CALL FTS1_GKEYI( FITLEN, FITBLK, 1, KEYWRD, 0, FOUND,
      :                       IVALS( I ), CMNT, IAT, STATUS )
          ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_REAL' ) THEN
+            RVALS( I ) = 0.0
             CALL FTS1_GKEYR( FITLEN, FITBLK, 1, KEYWRD, 0, FOUND,
      :                       RVALS( I ), CMNT, IAT, STATUS )
          ELSE IF ( FITVAL( 1 : 7 ) .EQ. '_DOUBLE' ) THEN
+            DVALS( I ) = 0.0
             CALL FTS1_GKEYD( FITLEN, FITBLK, 1, KEYWRD, 0, FOUND,
      :                       DVALS( I ), CMNT, IAT, STATUS )
          ELSE IF ( FITVAL( 1 : 8 ) .EQ. '_LOGICAL' ) THEN
+            LVALS( I ) = .FALSE.
             CALL FTS1_GKEYL( FITLEN, FITBLK, 1, KEYWRD, 0, FOUND,
      :                       LVALS( I ), CMNT, IAT, STATUS )
          ELSE IF ( FITVAL( 1 : 5 ) .EQ. '_CHAR' ) THEN
 
 *  Characters are a special case, store these in a GRP group and retain
 *  pointer information to extract them in order.
+            EXTFUN = ' '
             CALL FTS1_GKEYC( FITLEN, FITBLK, 1, KEYWRD, 0, FOUND,
      :                       EXTFUN, CMNT, IAT, STATUS )
             NCHAR = NCHAR + 1
@@ -223,27 +236,21 @@
          ELSE
 
 *  Should never happen. Issue an error and abort.
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'POL1_IMFIT_BADTYP',
+            IF( STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'POL1_IMFIT_BADTYP',
      : '  POL1_IMFIT: Unrecognised HDS type for FITS-keyword', STATUS )
+            END IF
+
             GO TO 99
          END IF
 
 *  If IAT is zero we failed to locate the FITS item.
-         IF ( IAT .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         GOTFV( I ) = ( IAT .NE. 0 )
 
-*  Consider this serious.
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'KEYWRD', KEYWRD )
-            CALL NDF_MSG( 'NDF', NDF )
-            CALL ERR_REP( 'POL1_IMFIT_MISS',
-     :'  Cannot locate the FITS keyword: ^KEYWRD, in the'//
-     :' extension of NDF: ^NDF' , STATUS )
-            GO TO 99
-         END IF
  1    CONTINUE
 
-*  Now have all keywords values. Now loop for all extension items. The
+*  Now have keywords values. Now loop for all extension items. The
 *  values of extension items are derived from the function information
 *  given in DESGRP( 3 ).
       CALL GRP_GRPSZ( DESGRP( 1 ), NEXT, STATUS )
@@ -259,26 +266,38 @@
          LENFUN = CHR_LEN( EXTFUN )
          NOFUN = .FALSE.
          IF ( LENFUN .EQ. 0 ) NOFUN = .TRUE.
-         IF ( EXTTYP( 1 : 5 ) .EQ. '_CHAR' ) THEN             
+
+*  If the extension item name ends with a question mark, then remove it
+*  and indicate that no error should be reported if it cannot be assigned 
+*  a value due to lack of the required FITS keywords.
+         IF ( EXTNAM( LENNAM : LENNAM ) .EQ. '?' ) THEN
+            EXTNAM( LENNAM : LENNAM ) = ' '
+            LENNAM = LENNAM - 1
+            QUEST = .TRUE.
+         ELSE
+            QUEST = .FALSE.
+         END IF
                                                               
+*  Check the data type of the extension item.
+         IF ( EXTTYP( 1 : 5 ) .EQ. '_CHAR' ) THEN             
+
 *  Result is a character value. If the first and last non-blank 
 *  characters are double quotes, store the intervening string in 
 *  the extension.
-            NC = CHR_LEN( EXTFUN )
             IC = 0
-            IF( NC .GT. 0 ) THEN
-               IF( EXTFUN( NC : NC ) .EQ. '"' ) THEN
+            IF( LENFUN .GT. 0 ) THEN
+               IF( EXTFUN( LENFUN : LENFUN ) .EQ. '"' ) THEN
                   IC = 1
-                  DO WHILE( IC .LE. NC .AND. 
+                  DO WHILE( IC .LE. LENFUN .AND. 
      :                      EXTFUN( IC : IC ) .EQ. ' ' )
                      IC = IC + 1
                   END DO
-                  IF( IC .LE. NC ) THEN
+                  IF( IC .LE. LENFUN ) THEN
                      IF( EXTFUN( IC : IC ) .EQ. '"' ) THEN                  
-                        IF( IC + 1 .LE. NC - 1 ) THEN
+                        IF( IC + 1 .LE. LENFUN - 1 ) THEN
                            CALL POL1_STOCC( NDF, EXTNAM, 
-     :                                      EXTFUN( IC + 1 : NC - 1 ),
-     :                                      STATUS )
+     :                                    EXTFUN( IC + 1 : LENFUN - 1 ),
+     :                                    STATUS )
                         ELSE
                            CALL POL1_STOCC( NDF, EXTNAM, ' ', STATUS )
                         END IF                        
@@ -324,8 +343,29 @@
      :            THEN 
                      FOUND = .TRUE.                           
 
-*  Found keyword, now need its value. This could be store in any type so
-*  need to translate.
+*  Found keyword. If it has no value, report an error unless the
+*  extension item terminated in a question mark. Otherwise, jump
+*  forward to do the next extension item.
+                     IF ( .NOT. GOTFV( J ) ) THEN
+                        IF ( .NOT. QUEST ) THEN
+                           IF( STATUS .EQ. SAI__OK ) THEN
+                              STATUS = SAI__ERROR
+                              CALL MSG_SETC( 'KEYWRD', KEYWRD )
+                              CALL NDF_MSG( 'NDF', NDF )
+                              CALL ERR_REP( 'POL1_IMFIT_MISS',
+     :           '  Cannot locate the FITS keyword: ^KEYWRD, in the'//
+     :           ' FITS extension of NDF: ^NDF' , STATUS )
+                           END IF
+
+                           GO TO 99
+
+                        ELSE
+                           GO TO 2
+
+                        END IF
+                     END IF
+
+*  Now need its value. This could be store in any type so need to translate.
                      CALL GRP_GET( FITGRP( 2 ), J, 1, FOR, STATUS )
                      IF ( FOR( 1 : 8 ) .EQ. '_INTEGER' ) THEN
                         CALL CHR_ITOC( IVALS( J ), FITVAL, NCHAR )
@@ -482,7 +522,28 @@
      :            THEN 
                      FOUND = .TRUE.
             
-*  Found keyword, now need its value. This could be store in any type so
+*  Found keyword. If it has no value, report an error unless the
+*  extension item terminated in a question mark. Otherwise, jump
+*  forward to do the next extension item.
+                     IF ( .NOT. GOTFV( J ) ) THEN
+                        IF ( .NOT. QUEST ) THEN
+                           IF( STATUS .EQ. SAI__OK ) THEN
+                              STATUS = SAI__ERROR
+                              CALL MSG_SETC( 'KEYWRD', KEYWRD )
+                              CALL NDF_MSG( 'NDF', NDF )
+                              CALL ERR_REP( 'POL1_IMFIT_MISS',
+     :           '  Cannot locate the FITS keyword: ^KEYWRD, in the'//
+     :           ' FITS extension of NDF: ^NDF' , STATUS )
+                           END IF
+                           GO TO 99
+
+                        ELSE
+                           GO TO 2
+
+                        END IF
+                     END IF
+
+*  Now need its value. This could be store in any type so
 *  need to translate.
                      IF ( EXTTYP( 1 : 8 ) .EQ. '_INTEGER' ) THEN
                         CALL CHR_ITOC( IVALS( J ), FITVAL, NCHAR )
@@ -543,6 +604,7 @@
                CALL GRP_GET( FITGRP( 1 ), J, 1, KEYWRD, STATUS )
                NCHAR = CHR_LEN( KEYWRD )
                CALL GRP_GET( FITGRP( 2 ), J, 1, FITVAL, STATUS )
+               
                IF ( FITVAL( 1 : 8 ) .EQ. '_INTEGER' ) THEN
                   CALL TRN_STOKI( KEYWRD( 1: NCHAR ), IVALS( J ),
      :                            EXTFUN, NSUBS, STATUS )
@@ -558,12 +620,15 @@
 *  character data, no translation. A possible problem with this is
 *  tokens which require parentheses (negative values in certain cases)
 *  so add () to all values.
-                  CALL GRP_GET( CHRGRP, CVALS( J ), 1, FITVAL, STATUS )
+                  CALL GRP_GET( CHRGRP, CVALS( J ), 1, FITVAL, 
+     :                          STATUS )
                   LENFIT = CHR_LEN( FITVAL )
                   FOR = '('//FITVAL( : LENFIT )//')'
                   CALL TRN_STOK( KEYWRD( 1: NCHAR ),
      :                           FOR( : LENFIT + 2 ),
-     :                           EXTFUN( :LENFUN ), NSUBS, STATUS )
+     :                           EXTFUN, NSUBS, STATUS )
+                  LENFUN = CHR_LEN( EXTFUN )
+
                ELSE
 
 *  Must be _LOGICAL, cannot do anything with this. Complain.
@@ -574,6 +639,28 @@
      : STATUS )
                   GO TO 2
                END IF
+
+*  If this FITS value was used in the function, but no value is available,
+*  report an error unless the extensionname was terminated with a
+*  question mark (in which case jump to the next extension item).
+               IF( NSUBS .GT. 0 .AND. .NOT. GOTFV( J ) ) THEN
+                  IF( .NOT. QUEST ) THEN
+                     IF( STATUS .EQ. SAI__OK ) THEN
+                        STATUS = SAI__ERROR
+                        CALL MSG_SETC( 'KEYWRD', KEYWRD )
+                        CALL NDF_MSG( 'NDF', NDF )
+                        CALL ERR_REP( 'POL1_IMFIT_MISS',
+     :           '  Cannot locate the FITS keyword: ^KEYWRD, in the'//
+     :                       ' FITS extension of NDF: ^NDF' , STATUS )
+                     END IF
+
+                     GO TO 99
+
+                  ELSE
+                     GO TO 2
+                  END IF
+               END IF
+
  7          CONTINUE
 
 *  Ok now need to convert the FITS-keyword function string into one
@@ -605,31 +692,35 @@
                   CALL POL1_STOCI( NDF, EXTNAM (:LENNAM ), IFIT,
      :                             STATUS )
                   CALL MSG_SETI( 'VL', IFIT )
+                  CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
                ELSE IF ( EXTTYP( 1 : 5 ) .EQ. '_REAL' ) THEN
                   CALL TRN_TR1R( .FALSE., 1, RZERO, TRID, RFIT, STATUS )
                   CALL POL1_STOCR( NDF, EXTNAM( : LENNAM ), RFIT,
      :                             STATUS )
                   CALL MSG_SETR( 'VL', RFIT )
+                  CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
                ELSE
                   CALL TRN_TR1D( .FALSE., 1, DZERO, TRID, DFIT, STATUS )
                   CALL POL1_STOCD( NDF, EXTNAM( : LENNAM ), DFIT,
      :                             STATUS )
                   CALL MSG_SETD( 'VL', DFIT )
+                  CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
                END IF
-               CALL MSG_OUT( ' ', '     Setting ^NM to ^VL', STATUS )
+
+*  Has an error occurred while evaluating the function?
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
                   STATUS = SAI__ERROR
                   CALL MSG_SETC( 'EXTFUN', EXTFUN( : LENFUN ) )
                   CALL MSG_SETC( 'EXTNAM', EXTNAM( : LENNAM ) )
-                  CALL ERR_REP( ' ', '  Cannot interpret:"^EXTFUN", '//
-     :'as a valid transform for any known FIT-keywords '//
+                  CALL ERR_REP( ' ', '  Cannot interpret:"^EXTFUN"'//
+     :', as a valid transform for any known FIT-keywords '//
      : '(extension item ^EXTNAM).', STATUS )
                   CALL ERR_RLSE
                   GO TO 99
                END IF
                CALL ERR_RLSE
-            END IF
+           END IF
          END IF
  2    CONTINUE
 

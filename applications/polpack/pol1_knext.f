@@ -16,11 +16,12 @@
 *     This routine contains a listing of all the currently known
 *     POLPACK extension items and their data types. The NAME is
 *     a full path excluding the NDF_NAME.MORE.POLPACK header.
-*     (i.e. TIMES.EXPOSURE).
+*     (i.e. TIMES.EXPOSURE). It may be terminated by a question mark,
+*     which is ignored.
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
-*        The name of the supposed POLPACK extension item.
+*        The name of the supposed POLPACK extension item. 
 *     OK = LOGICAL (Returned)
 *        Set true if the NAME is recognised, otherwise is FALSE.
 *     TYPE = CHARACTER * ( * ) (Returned)
@@ -109,6 +110,12 @@
 
 *  Get length of NAME.
       NAMLEN = CHR_LEN( NAME )
+
+*  If the last non-blank character is a question mark, ignore it.
+      IF( NAME( NAMLEN : NAMLEN ) .EQ. '?' ) NAMLEN = NAMLEN - 1
+
+*  If the name is not too long, compare it with each of the known
+*  extension items.
       IF ( NAMLEN .LE. NMLEN ) THEN
          DO 1 I = 1, NCOMP
             IF ( NAMES( I )( 1 : NAMLEN) .EQ. NAME( 1 : NAMLEN ) ) THEN

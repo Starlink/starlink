@@ -21,15 +21,17 @@
 
 *  Description:
 *     This routine imports FITS information into the POLPACK extension
-*     of a list of NDFs. FITS information (probably provided by the
-*     instrument/telescope control systems) can be used to specify
-*     certain parameters which are required by POLPACK. These will
-*     include wave-plate position, filter, etc.
+*     of a list of NDFs. It can be used to prepare raw data prior to processing
+*     with POLPACK by copying required items of information (wave-plate
+*     position, filter, etc) from the FITS headers provided by the 
+*     instrument/telescope control systems, to the POLPACK extension.
+*     It can also be used to import partially processed data which has 
+*     previously been exported using POLEXP.
 *
 *     The import is controlled by a "table" which specifies how FITS
-*     keyword values should be interpreted. This allows the evaluation
-*     of functions containing many FITS keywords as well as the mapping
-*     of POLPACK recognised character items to arbitrary strings.
+*     keyword values should be used to create the corresponding POLPACK
+*     extension items. This allows the evaluation of functions containing
+*     many FITS keywords as well as the translation of arbitrary strings.
 
 *  Usage:
 *     polimp in table
@@ -46,7 +48,18 @@
 *        The name of the table containing the description of how FITS
 *        keyword values are to be translated into POLPACK extension
 *        items. See the topic "Table Format" for information on how to
-*        create a translation table. ['polimp.tab']
+*        create a translation table. If a null parameter value (!) is 
+*        supplied the following table is used which corresponds to the FITS
+*        keywords written by POLEXP:
+*
+*           ANGROT      PPCKANGR
+*           FILTER      PPCKFILT
+*           IMGID       PPCKIMID
+*           RAY?        PPCKRAY
+*           ROTATION?   PPCKROT
+*           WPLATE      PPCKWPLT
+*           YROTATION?  PPCKYROT
+*        [!]
 
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
@@ -134,34 +147,76 @@
 *     Fields in the table may be separated by commas if desired, any
 *     amount of white space and tabs are also allowed. Comments may be
 *     placed anywhere and should start with the characters "#" or "!".
-*     Continuation onto a new line is indicated by use of "-".
+*     Continuation onto a new line is indicated by use of "-". 
+*
+*     If it is not known in advance if the FITS extension will contain the 
+*     keyword values needed to assign a value to a particular POLPACK
+*     extension item, then a question mark may be appended to the name of
+*     the POLPACK extension item. If the required FITS keyword values
+*     cannot be found, then the error messages which would normally be 
+*     issued are suppressed, and the POLPACK extension item is assigned 
+*     its default value if it has one, or is left undefined otherwise (see 
+*     below). For instance:
+*
+*        RAY?  PPCKRAY
+*
+*     causes the POLPACK extension item RAY to be assigned the value of the
+*     FITS keyword PPCKRAY if the keyword has a value in the FITS
+*     extension. RAY is left undefined otherwise.
 
 *  POLPACK extension items:
 *     The POLPACK extension of an NDF may contain the following items.
 *     The names and types of the extension items are those as used in
-*     import tables. 
+*     import tables. Of these, ANGROT, FILTER, WPLATE and possibly IMGID 
+*     are the only ones that most users need be concerned with. Values
+*     should be assigned to these extension items before processing of 
+*     raw data commences. Their values will often be derived from FITS
+*     headers written by the instrument/telescope control system. Values
+*     for the remaining extension items are produced by POLPACK as the
+*     processing proceeds and need only be included in the control
+*     table if you are importing partially processed data.
+*
+*     Some extension items have default values which are used if the 
+*     control table does not specify a value for them. These are
+*     indicated in the descriptions below:
 *
 *        ANGROT (_REAL):  The anti-clockwise angle from the first axis of 
 *        the image to the analyser position corresponding to WPLATE=0.0, 
-*        in degrees. Defaults to 0.0 if not supplied.
+*        in degrees. Defaults to 0.0.
 *
 *        FILTER (_CHAR):  The filter name. If a value is supplied, then 
 *        the value of WPLATE is appended to it (unless the filter already
-*        includes the WPLATE value). If no value is
-*                                         supplied, then a default equal
-*                                         to WPLATE is used. This value
-*                                         is copied into the CCDPACK extension.
-*        IMGID           _CHAR            An arbitrary textual identifier 
-*                                         for each input image, used to
-*                                         associate corresponding O and E ray 
-*                                         images. It must be unique amongst
-*                                         the input images. It defaults to
-*                                         the name of the input image.
-*        WPLATE          _CHAR            The wave-plate position, in
-*                                         degrees. Must be one of; "0.0",
-*                                         "22.5", "45.0", "67.5". An
-*                                         error is reported if this is not
-*                                         supplied.
+*        includes the WPLATE value). This value is also copied to the FILTER
+*        item in the CCDPACK extension. Defaults to the value of WPLATE.
+*
+*        IMGID (_CHAR):  An arbitrary textual identifier for each input 
+*        image, used to associate corresponding O and E ray images. It must 
+*        be unique amongst the input images. Defaults to the name of the
+*        input image.
+*
+*        RAY (_CHAR):  This item should only be specified in the control
+*        table if the images being imported are partially processed images 
+*        which have been split into separate O and E ray images. It
+*        identifies which ray the image is derived from, and can take the 
+*        two values "O" and "E" (upper case). Left undefined by default.
+*
+*        ROTATION (_REAL): This item should only be specified in the 
+*        control table if the images being imported are partially processed 
+*        images which have already been aligned. It is the clockwise 
+*        rotation introduced into the image in order to align it with other 
+*        images, in degrees. Left undefined by default.
+*
+*        WPLATE (_CHAR):  The wave-plate position, in degrees. Must be one 
+*        of; "0.0", "22.5", "45.0", "67.5". There is no default (an error 
+*        is reported if no value is supplied).
+*
+*        YROTATION (_REAL): This item should only be specified in the 
+*        control table if the images being imported are partially processed 
+*        images which have already been aligned, and if the final map may 
+*        contain shear. It gives the clockwise rotation in degrees of the 
+*        Y axis introduced into the image in order to align it with other 
+*        images. In this case the ROTATION item (see above) is understood 
+*        as giving the rotation of the X axis. Left undefined by default.
 
 *  Examples:
 *     polimp in='*' table=$POLPACK_DIR/WHTSKY.DAT
@@ -212,6 +267,7 @@
       INTEGER IPDBLE             ! Pointer to double precision storage
       INTEGER IPFIT              ! Pointer to FITS block
       INTEGER IPINT              ! Pointer to integer storage
+      INTEGER IPGOT              ! Pointer to existence flag workspace
       INTEGER IPLOG              ! Pointer to logical workspace
       INTEGER IPREAL             ! Pointer to real storage
       INTEGER LINGRP             ! GRP identifier for line nos in table
@@ -282,6 +338,7 @@
          CALL CCD1_MALL( NLINES, '_REAL', IPREAL, STATUS )
          CALL CCD1_MALL( NLINES, '_DOUBLE', IPDBLE, STATUS )
          CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
+         CALL CCD1_MALL( NLINES, '_LOGICAL', IPGOT, STATUS )
          CALL CCD1_MALL( NLINES, '_INTEGER', IPCHR, STATUS )
       END IF
 
@@ -348,7 +405,8 @@
             CALL POL1_IMFIT( FITGRP, DESGRP, INDF, %VAL( IPFIT ),
      :                       FITLEN, %VAL( IPINT ), %VAL( IPREAL ),
      :                       %VAL( IPDBLE ), %VAL( IPLOG ),
-     :                       %VAL( IPCHR), STATUS, %VAL( 80 ) )
+     :                       %VAL( IPCHR), %VAL( IPGOT), STATUS, 
+     :                       %VAL( 80 ) )
          END IF
 
 *  Check the values in the POLPACK extension are usable.
