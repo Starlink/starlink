@@ -32,7 +32,7 @@ sex_SOURCES =
 ## These are actually created in sub-directories, so we need a target to get
 ## them into the local dependencies.
 
-BUILT_SOURCES = libextractor.a libfits.a sex extractor.ifl
+BUILT_SOURCES = libextractor.a libfits.a sex$(EXEEXT) extractor.ifl
 
 #  Data for share/extractor. Currently this is any misc docs (news file) 
 dist_pkgdata_DATA = extractor.news
@@ -76,9 +76,9 @@ extract/src/libextractor.a:
 
 #  SExtractor runs to completion.
 
-sex: sextractor/src/sex
+sex$(EXEEXT): sextractor/src/sex$(EXEEXT)
 
-sextractor/src/sex:
+sextractor/src/sex$(EXEEXT):
 	(cd sextractor ;\
         export INSTALL; unset INSTALL;\
         export SHELL; unset SHELL;\
