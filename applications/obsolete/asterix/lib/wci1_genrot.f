@@ -4,7 +4,7 @@
 *     WCI1_GENROT
 
 *  Purpose:
-*     Generates rotation matrix given poles
+*     Generates rotation matrix given pole and reference longitude
 
 *  Language:
 *     Starlink Fortran 77
@@ -72,7 +72,7 @@
 *     {routine_references}...
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:wci, usage:private, rotation matrices
 
 *  Copyright:
 *     {routine_copyright}
