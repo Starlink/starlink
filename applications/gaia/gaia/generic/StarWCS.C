@@ -65,6 +65,14 @@
 #include "error.h"
 #include "StarWCS.h"
 
+//  Trig conversion factors.
+static const double pi_ = 3.14159265358979323846;
+static const double rad_ = pi_/180.;
+
+//  Conversions that have been lost from AST.
+static const double R2D = rad_;
+static const double D2R = 180.0/pi_;
+
 //
 //  Define a function to wrap the AST TranN function using a
 //  C-binding. This function doesn't like being called from C++ using
