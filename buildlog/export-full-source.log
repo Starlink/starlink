@@ -46,6 +46,11 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+     [echo] Executing HELP target: deinstall
+
+deinstall:
+
+real_deinstall:
      [echo] Executing ASTGUI target: deinstall
 
 deinstall:
@@ -189,6 +194,9 @@ clean:
      [echo] Executing DIVA target: clean
 
 clean:
+     [echo] Executing HELP target: clean
+
+clean:
      [echo] Executing ASTGUI target: clean
 
 clean:
@@ -291,13 +299,18 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
-     [copy] Copying 49 files to /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 51 files to /apps/cvsbuild/java/source/jniast/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
      [copy] Copying 852 files to /apps/cvsbuild/java/source/diva/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
+     [echo] Executing HELP target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/help/build/java
+     [copy] Copying 4 files to /apps/cvsbuild/java/source/help/build/java
      [echo] Executing ASTGUI target: javadoc-sources
 
 javadoc-sources:
@@ -420,11 +433,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1864 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1872 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 37 seconds
+Total time: 1 minute 7 seconds

@@ -1229,6 +1229,24 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/uk/ac/starlink/diva/interp/PolynomialInterp.java:38: warning - Tag @link: reference not found: interpolate
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/stylesheet.css...
   [javadoc] 493 warnings
+     [echo] Executing HELP target: javadocs
+
+prepare:
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/help/docs/help/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.help...
+  [javadoc] Loading source files for package uk.ac.starlink.help.images...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
      [echo] Executing ASTGUI target: javadocs
 
 prepare:
@@ -1847,12 +1865,12 @@ javadocs:
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/uk/ac/starlink/sog/photom/AnnulusArea.html...
   [javadoc] "Update the shape to match a new radius etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Update the shape to match a new radius etc. in the various
   [javadoc]  components."
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: sameValue
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: clone
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: toString
@@ -1902,65 +1920,11 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:15: package javax.help does not exist
-  [javadoc] import javax.help.JHelpContentViewer;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:16: package javax.help does not exist
-  [javadoc] import javax.help.HelpSet;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:17: package javax.help does not exist
-  [javadoc] import javax.help.HelpSetException;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:18: package javax.help does not exist
-  [javadoc] import javax.help.InvalidHelpSetContextException;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:19: package javax.help does not exist
-  [javadoc] import javax.help.JHelp;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:20: package javax.help does not exist
-  [javadoc] import javax.help.JHelpTOCNavigator;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:21: package javax.help.event does not exist
-  [javadoc] import javax.help.event.HelpModelEvent;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:22: package javax.help.event does not exist
-  [javadoc] import javax.help.event.HelpModelListener;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:46: cannot resolve symbol
-  [javadoc] symbol  : class JHelp 
-  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
-  [javadoc]     private JHelp jhelp;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:47: cannot resolve symbol
-  [javadoc] symbol  : class HelpSet 
-  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
-  [javadoc]     private HelpSet hset;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:148: cannot resolve symbol
-  [javadoc] symbol  : class JHelp 
-  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
-  [javadoc]     public JHelp getJHelp() {
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:190: cannot resolve symbol
-  [javadoc] symbol  : class JHelp 
-  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
-  [javadoc]     private void pinchHelpToolBarTools( JHelp helpComponent ) {
-  [javadoc]                                         ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:241: cannot resolve symbol
-  [javadoc] symbol  : class JHelp 
-  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
-  [javadoc]     private static void openTOC( JHelp jhelp ) {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java:25: package javax.help does not exist
-  [javadoc] import javax.help.HelpSet;
-  [javadoc]                   ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
-  [javadoc] 14 warnings
      [echo] Executing Treeview target: javadocs
 
 prepare:
@@ -1973,93 +1937,11 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.treeview...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/HDSDataNode.java:23: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:13: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecData;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:14: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecDataComp;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:15: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.AbstractSpecDataImpl;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:16: package uk.ac.starlink.splat.plot does not exist
-  [javadoc] import uk.ac.starlink.splat.plot.DivaPlot;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:17: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:31: cannot resolve symbol
-  [javadoc] symbol  : class DivaPlot 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer
-  [javadoc] public class GraphViewer extends DivaPlot {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:35: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer
-  [javadoc]     public GraphViewer( Ndx ndx ) throws SplatException, IOException {
-  [javadoc]                                          ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:89: cannot resolve symbol
-  [javadoc] symbol  : class AbstractSpecDataImpl 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer.NdxSpecDataImpl
-  [javadoc]     private static class NdxSpecDataImpl extends AbstractSpecDataImpl {
-  [javadoc]                                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:98: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer.NdxSpecDataImpl
-  [javadoc]         public NdxSpecDataImpl( Ndx ndx ) throws IOException, SplatException {
-  [javadoc]                                                               ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java:158: cannot resolve symbol
-  [javadoc] symbol  : class SplatException 
-  [javadoc] location: class uk.ac.starlink.treeview.GraphViewer.NdxSpecDataImpl
-  [javadoc]         public void save() throws SplatException {
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ImageHDUDataNode.java:30: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java:30: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.TableViewer;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayDataNode.java:16: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDataNode.java:43: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:4: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.SpecData;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:5: package uk.ac.starlink.splat.data does not exist
-  [javadoc] import uk.ac.starlink.splat.data.NDXSpecDataImpl;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:6: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowser;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:7: package uk.ac.starlink.splat.iface does not exist
-  [javadoc] import uk.ac.starlink.splat.iface.SplatBrowserMain;
-  [javadoc]                                   ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:8: package uk.ac.starlink.splat.util does not exist
-  [javadoc] import uk.ac.starlink.splat.util.SplatException;
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:17: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.treeview.SplatNdxDisplayer
-  [javadoc]     private SplatBrowser browser;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java:45: cannot resolve symbol
-  [javadoc] symbol  : class SplatBrowser 
-  [javadoc] location: class uk.ac.starlink.treeview.SplatNdxDisplayer
-  [javadoc]     private synchronized SplatBrowser getBrowser( boolean embedded ) {
-  [javadoc]                          ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 22 warnings
      [echo] Executing Coco target: javadocs
 
 prepare:
@@ -2116,20 +1998,6 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.frog.plot...
   [javadoc] Loading source files for package uk.ac.starlink.frog.util...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/PlotControlFrame.java:22: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.TableViewer;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramControlFrame.java:20: package uk.ac.starlink.topcat does not exist
-  [javadoc] import uk.ac.starlink.topcat.TableViewer;
-  [javadoc]                              ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java:10: package bsh does not exist
-  [javadoc] import bsh.Interpreter;
-  [javadoc]            ^
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteServer.java:85: cannot resolve symbol
-  [javadoc] symbol  : class Interpreter 
-  [javadoc] location: class uk.ac.starlink.frog.util.RemoteServer
-  [javadoc]     protected Interpreter interp = null;
-  [javadoc]               ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
@@ -2149,10 +2017,10 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:58: warning - Tag @see: malformed: "#Diva,#AstUtilities"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:58: warning - Tag @see: malformed: "#Diva,#AstUtilities"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/Pointer.java:30: warning - Tag @see: malformed: "Figure, AbstractFigure"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: warning - Tag @see: malformed: "Plot, Figure"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotCompositeFigure.java:29: warning - Tag @see: malformed: "Plot, BackgroundedCompositeFigure, Figure"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - Tag @see: malformed: "SelectionDragger, Plot"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotFigure.java:15: warning - Tag @see: malformed: "Plot, Figure"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/BasicPlotFigure.java:30: warning - Tag @see: malformed: "Plot, Figure"
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - Tag @see: malformed: "SelectionDragger, Plot"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/GramCreationDialog.java:37: warning - Tag @see: malformed: "Gram, TimeSeries"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/themes/AquaTheme.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "This class describes a theme using "blue-green" colors."
@@ -2202,14 +2070,7 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e. moved or transformed)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: warning - Tag @see: malformed: "TimeSeriesImpl, FITSTimeSeriesImpl"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:434: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup interpolated physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup interpolated physical values (i.e. timestamp and data value)
-  [javadoc]   that correspond to a graphics X coordinate, returned in
-  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
-  [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1631: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1507: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return interpolated physical values (i.e. wavelength and data value)
@@ -2221,19 +2082,19 @@ javadocs:
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1507: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1631: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return interpolated physical values (i.e. wavelength and data value)
   [javadoc]  that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:417: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:434: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc] "Lookup interpolated physical values (i.e. timestamp and data value)
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1609: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1485: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
@@ -2245,18 +2106,25 @@ javadocs:
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1485: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1609: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
   [javadoc]  correspond to a graphics X coordinate. "
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:417: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc]   that correspond to a graphics X coordinate, returned in
+  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
+  [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: warning - Tag @see: malformed: "Frog, FrogMain"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:307: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:236: warning - The first sentence is interpreted to be:
   [javadoc] "The full range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
   [javadoc]  yPos, plus the standard deviations in yPos)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:236: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:307: warning - The first sentence is interpreted to be:
   [javadoc] "The full range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
@@ -2271,23 +2139,23 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
   [javadoc]  plot, including zoomed regions that you cannot see)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:51: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] "Get the full range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the full range (i.e. data limits plus standard deviations)
   [javadoc]   of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:51: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] "Get the full range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the full range (i.e. data limits plus standard deviations)
   [javadoc]   of the time series data."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:1131: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaGram.java:1129: warning - Tag @see: malformed: "DivaPlotGraphicsPane, Diva, AbstractFigure, GraphicsPane"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:45: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the range (i.e. data limits) of the time series data."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:45: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:45: warning - The first sentence is interpreted to be:
   [javadoc] "Get the range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the range (i.e. data limits) of the time series data."
@@ -2303,62 +2171,62 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e. what you can see)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:450: warning - The first sentence is interpreted to be:
-  [javadoc] "Get references to series X data (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get references to series X data (i.e. the coordinates)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:379: warning - The first sentence is interpreted to be:
   [javadoc] "Get references to gram X data (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get references to gram X data (i.e. the coordinates)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:461: warning - The first sentence is interpreted to be:
-  [javadoc] "Get references to series Y data (i.e."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:450: warning - The first sentence is interpreted to be:
+  [javadoc] "Get references to series X data (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get references to series Y data (i.e. the data values)."
+  [javadoc] "Get references to series X data (i.e. the coordinates)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:390: warning - The first sentence is interpreted to be:
   [javadoc] "Get references to gram Y data (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get references to gram Y data (i.e. the data values)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:472: warning - The first sentence is interpreted to be:
-  [javadoc] "Get references to series Y data errors (i.e."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:461: warning - The first sentence is interpreted to be:
+  [javadoc] "Get references to series Y data (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get references to series Y data errors (i.e. the data errors)."
+  [javadoc] "Get references to series Y data (i.e. the data values)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:401: warning - The first sentence is interpreted to be:
   [javadoc] "Get references to gram Y data errors (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get references to gram Y data errors (i.e. the data errors)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:400: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:472: warning - The first sentence is interpreted to be:
+  [javadoc] "Get references to series Y data errors (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
-  [javadoc]   that correspond to a graphics X coordinate.
-  [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:68: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. time and data value)
-  [javadoc]   that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1520: warning - The first sentence is interpreted to be:
+  [javadoc] "Get references to series Y data errors (i.e. the data errors)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1396: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time stamp and data value) that
   [javadoc]  correspond to a graphics X coordinate."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:68: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. time and data value)
+  [javadoc]   that correspond to a graphics X coordinate."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:389: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. timestamp and data value)
   [javadoc]   that correspond to a graphics X coordinate.
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:68: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. time and data value)
-  [javadoc]   that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1396: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1520: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time stamp and data value) that
   [javadoc]  correspond to a graphics X coordinate."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:68: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. time and data value)
+  [javadoc]   that correspond to a graphics X coordinate."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:400: warning - The first sentence is interpreted to be:
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc]   that correspond to a graphics X coordinate.
+  [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PathPlotFigure.java:32: warning - The first sentence is interpreted to be:
   [javadoc] "PathPlotFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
@@ -2388,36 +2256,36 @@ javadocs:
   [javadoc]  should implement. see BasicPlotFigure for a concrete implementation
   [javadoc]  of this interface."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotRectangle.java:29: warning - Tag @see: malformed: "Plot, PlotConfigurator"
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:301: warning - The first sentence is interpreted to be:
-  [javadoc] "The range of coordinates spanned (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The range of coordinates spanned (i.e. min/max values in xPos and
-  [javadoc]  yPos)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:224: warning - The first sentence is interpreted to be:
   [javadoc] "The range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The range of coordinates spanned (i.e. min/max values in xPos and
   [javadoc]  yPos)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:57: warning - The first sentence is interpreted to be:
-  [javadoc] "Get the dimension of the time series (i.e."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:301: warning - The first sentence is interpreted to be:
+  [javadoc] "The range of coordinates spanned (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the dimension of the time series (i.e. the number of values
-  [javadoc]   it contains)."
+  [javadoc] "The range of coordinates spanned (i.e. min/max values in xPos and
+  [javadoc]  yPos)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:57: warning - The first sentence is interpreted to be:
   [javadoc] "Get the dimension of the time series (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the dimension of the time series (i.e. the number of values
   [javadoc]   it contains)."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:48: warning - The first sentence is interpreted to be:
-  [javadoc] "The TimeSeriesComp object associated with the fit, i.e."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesAccess.java:57: warning - The first sentence is interpreted to be:
+  [javadoc] "Get the dimension of the time series (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The TimeSeriesComp object associated with the fit, i.e. the
-  [javadoc]  time series of which this is a fit."
+  [javadoc] "Get the dimension of the time series (i.e. the number of values
+  [javadoc]   it contains)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:174: warning - The first sentence is interpreted to be:
   [javadoc] "The TimeSeriesComp object associated with Periodogram, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The TimeSeriesComp object associated with Periodogram, i.e. the
   [javadoc]  time series of which this is a periodogram."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:48: warning - The first sentence is interpreted to be:
+  [javadoc] "The TimeSeriesComp object associated with the fit, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The TimeSeriesComp object associated with the fit, i.e. the
+  [javadoc]  time series of which this is a fit."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TXTTimeSeriesImpl.java:82: warning - @param tag has no arguments.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "Data model and data handling classes
@@ -2442,19 +2310,19 @@ javadocs:
   [javadoc] "Cause the plot to redraw itself, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Cause the plot to redraw itself, i.e. apply our changes. "
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:367: warning - The first sentence is interpreted to be:
-  [javadoc] "Whether this series should be used when auto-ranging (certain classes
-  [javadoc]  of series, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Whether this series should be used when auto-ranging (certain classes
-  [javadoc]  of series, i.e. generated ones, could be expected to have artificial
-  [javadoc]  ranges)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:296: warning - The first sentence is interpreted to be:
   [javadoc] "Whether this gram should be used when auto-ranging (certain classes
   [javadoc]  of gram, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Whether this gram should be used when auto-ranging (certain classes
   [javadoc]  of gram, i.e. generated ones, could be expected to have artificial
+  [javadoc]  ranges)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:367: warning - The first sentence is interpreted to be:
+  [javadoc] "Whether this series should be used when auto-ranging (certain classes
+  [javadoc]  of series, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Whether this series should be used when auto-ranging (certain classes
+  [javadoc]  of series, i.e. generated ones, could be expected to have artificial
   [javadoc]  ranges)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlot.java:75: warning - The first sentence is interpreted to be:
   [javadoc] "Have either scales changed? If so need complete redraw."
@@ -2901,7 +2769,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogSOAPServer.java:71: warning - Tag @link: can't find setFrogBrowser in uk.ac.starlink.frog.util.FrogSOAPServer
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java:17: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/stylesheet.css...
-  [javadoc] 210 warnings
+  [javadoc] 206 warnings
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 57 seconds
+Total time: 4 minutes 43 seconds

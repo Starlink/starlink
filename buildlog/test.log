@@ -29,12 +29,115 @@ build:
 compile-tests:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/testcases
     [javac] Compiling 11 source files to /apps/cvsbuild/java/source/util/build/testcases
-    [javac] /apps/cvsbuild/java/source/util/src/testcases/TestProxySetupFrame.java:27: error while writing <anonymous TestProxySetupFrame$1>: No space left on device
-    [javac]                 public void windowClosing( WindowEvent e ) {
-    [javac]                             ^
-    [javac] 1 error
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.444 sec
+
+    [junit] Testcase: testGetChildElementByName took 0.138 sec
+    [junit] Testcase: testGetTextContent took 0.027 sec
+    [junit] Testcase: testNewDocument took 0.018 sec
+    [junit] Testcase: testRelativizeDOM took 0.256 sec
+    [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.268 sec
+
+    [junit] Testcase: testData took 0.768 sec
+    [junit] Testcase: testIntro took 1.113 sec
+    [junit] Testcase: testStream took 0.548 sec
+    [junit] Testcase: testHybridStream took 0.653 sec
+    [junit] Testcase: testCombo1 took 0.929 sec
+    [junit] Testcase: testResourceStream took 0.253 sec
+    [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.056 sec
+
+    [junit] Testcase: testDataInput took 0.031 sec
+    [junit] Testcase: testInputStream took 0.02 sec
+    [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.19 sec
+
+    [junit] Testcase: testTraversal took 0.186 sec
+    [junit] Testsuite: uk.ac.starlink.util.PipeReaderThreadTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.174 sec
+
+    [junit] Testcase: testPipe1 took 0.148 sec
+    [junit] Testcase: testPipeBlock took 0.022 sec
+    [junit] Testsuite: uk.ac.starlink.util.ReaderThreadTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.013 sec
+
+    [junit] Testcase: testThread took 0.009 sec
+    [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.873 sec
+
+    [junit] Testcase: testGetDOM took 0.869 sec
+    [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.504 sec
+
+    [junit] Testcase: testFlags took 0.328 sec
+    [junit] Testcase: testAssertSource took 0.1 sec
+    [junit] Testcase: testValidation took 0.072 sec
+    [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.794 sec
+
+    [junit] Testcase: testXMLEncodeDecode took 1.781 sec
+
+test:
+     [echo] Executing Task target: test
+
+prepare:
+
+check_packages:
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/task/build/testcases
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/task/build/testcases
+
+run-tests:
+
+test:
+     [echo] Executing JNIAST target: test
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+unpack_jni:
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/i386/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/i386
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/sparc/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/sparc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/x86/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/x86
+
+build:
+
+compile-tests:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/testcases
+    [javac] Compiling 9 source files to /apps/cvsbuild/java/source/jniast/build/testcases
+
+run-tests:
+    [junit] Testsuite: uk.ac.starlink.ast.AstTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.632 sec
+    [junit] ------------- Standard Error -----------------
+    [junit] Feb 18, 2004 5:27:52 AM uk.ac.starlink.ast.AstPackage isAvailable
+    [junit] WARNING: JNIAST native library not on java.library.path - no WCS processing
+    [junit] ------------- ---------------- ---------------
+
+    [junit] Testcase: testAstObject took 0.625 sec
+    [junit] 	FAILED
+    [junit] null
+    [junit] junit.framework.AssertionFailedError
+    [junit] 	at uk.ac.starlink.ast.AstTest.setUp(AstTest.java:45)
+
+    [junit] Testcase: testAstObject
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/util/build.xml:893: Compile failed; see the compiler error output for details.
+file:/apps/cvsbuild/java/source/jniast/build.xml:1301: Test uk.ac.starlink.ast.AstTest failed
 
-Total time: 4 seconds
+Total time: 46 seconds

@@ -6435,6 +6435,7 @@ U java/source/jniast/src/jni/CmpMap.c
 U java/source/jniast/src/jni/FitsChan.c
 U java/source/jniast/src/jni/Frame.c
 U java/source/jniast/src/jni/FrameSet.c
+U java/source/jniast/src/jni/GrfEscape.c
 U java/source/jniast/src/jni/GrismMap.c
 U java/source/jniast/src/jni/IntraMap.c
 U java/source/jniast/src/jni/LutMap.c
@@ -6451,6 +6452,7 @@ U java/source/jniast/src/jni/SlaMap.c
 U java/source/jniast/src/jni/SpecFrame.c
 U java/source/jniast/src/jni/SpecMap.c
 U java/source/jniast/src/jni/SphMap.c
+U java/source/jniast/src/jni/TranMap.c
 U java/source/jniast/src/jni/UnitMap.c
 U java/source/jniast/src/jni/WcsMap.c
 U java/source/jniast/src/jni/WinMap.c
@@ -6506,6 +6508,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/SlaMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SpecFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SpecMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SphMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/TranMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Transformer.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Transformer1.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Transformer2.java
@@ -6523,6 +6526,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfContainer.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfFontManager.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfMarker.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrfState.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/grf/GrfEscape.java
 cvs checkout: Updating java/source/jniast/src/main/uk/ac/starlink/ast/xml
 U java/source/jniast/src/main/uk/ac/starlink/ast/xml/BufferXmlChan.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/xml/XAstReader.java
@@ -6552,6 +6556,7 @@ U java/source/jniast/src/perl/SpecFrame.pl
 U java/source/jniast/src/perl/SpecMap.pl
 U java/source/jniast/src/perl/SphMap.pl
 U java/source/jniast/src/perl/SrcReader.pm
+U java/source/jniast/src/perl/TranMap.pl
 U java/source/jniast/src/perl/UinterpCalculator.pl
 U java/source/jniast/src/perl/UnitMap.pl
 U java/source/jniast/src/perl/WcsMap.pl
@@ -6564,6 +6569,7 @@ cvs checkout: Updating java/source/jniast/src/testcases/uk/ac
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/jniast/src/testcases/uk/ac/starlink/ast
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/AstTest.java
+U java/source/jniast/src/testcases/uk/ac/starlink/ast/EscapeTest.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/MemoryXmlChan.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/XmlChanTest.java
 U java/source/jniast/src/testcases/uk/ac/starlink/ast/alcyone.ast
