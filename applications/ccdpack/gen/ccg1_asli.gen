@@ -157,11 +157,14 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     AA: Alasdair Allan (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-MAR-1999 (AA):
 *        Original version, based on KPG1_TRLI.GEN
+*     5-SEP-2002 (MBT):
+*        Fixed bug; flux value was being ignored.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -678,7 +681,7 @@
 *   Validate that the output element has been computed using sufficient
 *   weight.
             IF ( WSUM .GT. VAL__SMLD ) THEN
-               OUTARR( K ) = NUM_DTO<T>( ASUM / WSUM )
+               OUTARR( K ) = NUM_DTO<T>( FLUX * ASUM / WSUM )
             ELSE
                OUTARR( K ) = VAL__BAD<T>
             END IF
@@ -711,7 +714,7 @@
 *   Validate that the output variance element has been computed using
 *   sufficient weight.
             IF ( WSUM .GT. VAL__SMLD ) THEN
-               OUTVAR( K ) = NUM_DTO<T>( ASUM / WSUM )
+               OUTVAR( K ) = NUM_DTO<T>( FLUX * ASUM / WSUM )
             ELSE
                OUTVAR( K ) = VAL__BAD<T>
             END IF
