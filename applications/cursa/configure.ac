@@ -30,7 +30,10 @@ AC_CHECK_FUNCS([memset bzero])
 
 dnl    Extra libraries needed to link against sockets on this system.
 dnl    These tests are definitely needed for Solaris.
-AC_CHECK_LIB(socket, connect, [AC_CHECK_LIB(nsl, gethostbyname)],,)  
+AC_CHECK_FUNC(gethostbyname,,
+  AC_CHECK_LIB(nsl, gethostbyname))
+AC_CHECK_FUNC(socket,,
+  AC_CHECK_LIB(socket, connect,,,-lnsl))
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp])
