@@ -2,13 +2,15 @@ use ExtUtils::MakeMaker;
 use ExtUtils::F77;
 use Config;
 
-#---- INCLUDES ----
- 
-# This is the location of the Starlink include files
-$starinc = "-I/star/include";
- 
-# This is the location of the standard C includes
-$inc = "-I/usr/include";
+# For location of Starlink libraries and incs
+eval "use Starlink::Config;";
+if ($@) {
+  print "Could not find Starlink::Config - using /star\n";
+  %StarConfig = (
+                 Star_Inc => '/star/include',
+                 Star_Lib => '/star/lib',
+                );
+}
 
 # ---- LIBS -------
 
@@ -55,7 +57,7 @@ $fortranlibs = ExtUtils::F77->runtime;
 
 
 # This is the location of the Starlink NDF libraries
-$starlibs = "-L/star/lib";
+$starlibs = "-L$StarConfig{Star_Lib}";
 
 $libs = "$starlibs $amslibs $fortranlibs";
 
@@ -70,7 +72,10 @@ WriteMakefile(
     'OPTIMIZE'  => $optimize,
     'LIBS'	=> [ "$libs"],   # e.g., '-lm' 
     'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
-    'INC'	=> "$inc $starinc",     # e.g., '-I/usr/include/other' 
+    'INC'	=> "-I$StarConfig{Star_Inc}",     # e.g., '-I/usr/include/other' 
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
-                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'}
+                    'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
+  ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+     (ABSTRACT_FROM => 'ADAM.pm',
+      AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>') : ()),
 );

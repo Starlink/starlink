@@ -4,19 +4,23 @@ use Config;
 
 $osname = $Config{osname};
 
+# For location of Starlink libraries and incs
+eval "use Starlink::Config;";
+if ($@) {
+  print "Could not find Starlink::Config - using /star\n";
+  %StarConfig = (
+                 Star_Inc => '/star/include',
+                 Star_Lib => '/star/lib',
+		 Star_Bin => '/star/bin',
+                );
+}
+
+
 # ------- Install directory
 # This is where the new perl binary will be placed if you 'make perl'
-# and make install. Probably will want to change this to /star/bin.
+# and make install.
 
-$install = "/star/bin";
-
-#---- INCLUDES ----
-
-# This is the location of the Starlink include files
-$starinc = "-I/star/include";
-
-# This is the location of the standard C includes
-$inc = "-I/usr/include";
+$install = $StarConfig{Star_Bin};
 
 #---- LIBS ----
 # The Starlink libraries are picked up via the 'ndf_link' command
@@ -73,16 +77,13 @@ $optimize = $Config{optimize} . " $linkopts";
 
 $fortranlibs = ExtUtils::F77->runtime;
 
-# Need to add -lgcc on my linux system
-$fortranlibs .= " -lgcc" if ($osname eq 'linux');
-
 # Also need to remove -lUfor from the library list if I am
 # using my own version of getarg
 
 $fortranlibs =~ s/-lUfor// if ($osname eq 'dec_osf');
 
 # This is the location of the Starlink NDF libraries
-$starlibs = "-L/star/lib";
+$starlibs = "-L$StarConfig{Star_Lib}";
 
 # Uncomment this if you are explicitly linking with libarrays
 # $arrays = "-Larrays -larrays";
@@ -98,8 +99,11 @@ WriteMakefile(
     'VERSION_FROM' => 'NDF.pm', # finds $VERSION
     'LIBS'      =>  [ "$libs" ],
     'DEFINE'    => "$defines",
-    'INC'       => "$inc $starinc",
+    'INC'       => "-I$StarConfig{Star_Inc}",
     'dist'      => { COMPRESS => "gzip -9f" },
-    'INCLUDE_EXT'=> [ ]         # Only build NDF in the static perl
+    'INCLUDE_EXT'=> [ ],      # Only build NDF in the static perl
+  ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+     (ABSTRACT_FROM => 'NDF.pm',
+      AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>') : ()),
     );
 
