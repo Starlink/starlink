@@ -659,6 +659,7 @@ sub fits_construct_string ($$$) {
   }
 
   # Add comment
+  $comment = '' unless defined $comment;
   $fitsent .= $value.' / '.$comment;
 
   # Fix at 80 characters
