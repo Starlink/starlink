@@ -393,7 +393,11 @@ is in effect.
   (element figure
     (literal (car (get-caption-details))))
   (element subhead			;so we _do_ get inside the subhead
-    (process-children-trim))
+    (let ((disp (select-elements (children (current-node))
+				 (normalize "displaytitle"))))
+      (if (node-list-empty? disp)
+	  (process-children-trim)
+	  (process-node-list disp))))
   )
 
 
@@ -1028,6 +1032,65 @@ dd-MMM-yyyy.
 	  (else (loop (cdr ent-list))))))
 
 <func>
+<routinename>get-best-figurecontent
+<purpose>Extract the `best' figure content.
+
+<description>The FIGURE element has a content model which includes
+  <code>FIGURECONTENT*, PX*</code>.  Each of the FIGURECONTENT
+  elements has an `image' and a `notation' attribute.  If the `image'
+  attribute is present, it refers to an entity which itself has a
+  notation, and the element's content is that entity (the attribute
+  has a CONREF default value).  If that attribute is not present, then
+  the element's content is the image, and the `notation' attribute
+  should be present (it is an application error if it is not).  This
+  function should work through the list of elements it is presented,
+  returning the first element which has a notation in
+  <funcname/req-not/, or the list of paragraphs if none matches.  This
+  merely returns the first match: if you have a hierarchy of
+  preferences, then call the function repeatedly.
+
+<returnvalue type='node-list'>Either a selected figurecontent node, or the
+  collection of paragraphs that follow them.  Or <funcname/#f/ if
+  <em/nothing/ works!
+
+<parameter>nl
+  <type>node-list
+  <description>The list of FIGURECONTENT elements and paragraphs which is
+    part of the content of the FIGURE element.
+<parameter>req-not
+  <type>list of strings
+  <description>A list of notations, as defined in the DTD.
+
+<codebody>
+(define (get-best-figurecontent nl req-not)
+  (if (node-list-empty? nl)
+      #f
+      (let* ((this-one (node-list-first nl))
+	     (is-figurecontent? (string=? (gi this-one)
+					  (normalize "figurecontent")))
+	     (ent (and is-figurecontent?
+		       (attribute-string (normalize "image") this-one)))
+	     (ent-notation (and ent
+				(entity-notation ent (current-node))))
+	     (cont-notation (and is-figurecontent?
+				 (attribute-string (normalize "notation")
+						   this-one))))
+	(if is-figurecontent?
+	    (if ent
+		(if ent-notation	; entity is present and has notation
+		    (if (member ent-notation req-not)
+			this-one
+			(get-best-figurecontent (node-list-rest nl) req-not))
+		    (error (string-append "Entity " ent " has no notation")))
+		(if cont-notation
+		    (if (member cont-notation req-not)
+			this-one
+			(get-best-figurecontent (node-list-rest nl) req-not))
+		    (error "FIGURECONTENT has neither image nor notation")))
+	    nl				; return the trailing paragraphs
+	    ))))
+
+<func>
 <routinename>table-colno
 <purpose>Return a list of numbers, indicating the current column number and the
 total number of columns.
@@ -1092,17 +1155,23 @@ Return a non-empty node-list, or false
 <func>
 <name>get-equation-number
 <description>
-Return the equation number corresponding to the given node
+Return the equation number corresponding to the given equation node.
+The node may be either an MLABEL element, or an element which has an
+MLABEL child in the document instance.
 <returnvalue type='string'>Equation number, or <code/#f/ if the parameter
-  is not a MLABEL element.
+  is neither a MLABEL element, nor has an MLABEL child.
 <parameter optional default='(current-node)'>nl
   <type>node-list
-  <description>Equation to be numbered.  Should be an MLABEL element.
+  <description>Equation to be numbered.
 <codebody>
 (define (get-equation-number #!optional (nl (current-node)))
-  (let ((gi (gi nl)))
-    (if (string=? gi (normalize "mlabel"))
-	(number->string (element-number nl))
+  (let* ((mlabel-gi (normalize "mlabel"))
+	 (mlabel (if (string=? (gi nl) mlabel-gi)
+		     nl
+		     (node-list-or-false
+		      (select-elements (children nl) mlabel-gi)))))
+    (if mlabel
+	(number->string (element-number mlabel))
 	#f)))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->

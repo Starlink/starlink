@@ -19,12 +19,21 @@ Support figures and figurecontent
 <codebody>
 (element figure
   (let* ((caption-details (get-caption-details (current-node)))
-	 (caption-id (caddr caption-details)))
+	 (caption-id (caddr caption-details))
+	 (kids (children (current-node)))
+	 (content (get-best-figurecontent
+		   (node-list (select-elements kids (normalize "figurecontent"))
+			      (select-elements kids (normalize "px")))
+		   '("GIF89A" "JPEG" "LATEXGRAPHICS"))))
     (make element gi: "table"
 	  attributes: '(("align" "center") ("border" "1"))
       (make element gi: "tr"
 	    (make element gi: "td"
-		  (process-matching-children 'figurecontent)))
+		  (if content
+		      (process-node-list content)
+		      (literal "No processable content"))
+		  ;(process-matching-children 'figurecontent)
+		  ))
       (make element gi: "tr"
 	    attributes: '(("align" "left"))
 	    (make element gi: "td"
@@ -51,19 +60,57 @@ Support figures and figurecontent
 ;; mode make-manifest-mode in sl.dsl.
 (element figurecontent
   (let* ((alt-text (attribute-string (normalize "alt")
-				     (current-node)))
-	 (image-ents (attribute-string (normalize "image")
-				       (current-node)))
-	 (best-ent (and image-ents
-			(get-sysid-by-notation image-ents
-					       '("JPEG" "GIF87A")))))
-    (if image-ents
-	(if best-ent
+				     (parent (current-node))))
+	 (ent (attribute-string (normalize "image")
+				(current-node)))
+	 (ent-sysid (and ent
+			 (entity-system-id ent)))
+	 (ent-notation (and ent
+			    (entity-notation ent))))
+    (if ent-notation
+	(if (member ent-notation '("GIF89A" "JPEG"))
 	    (make empty-element gi: "img"
-		  attributes: (list (list "src" best-ent)
-				    (list "alt" alt-text)))
-	    (error "No suitable entity in figurecontent"))
-	(process-children))))
+		  attributes: (list (list "src" ent-sysid)
+				    (list "alt"
+					  (if alt-text
+					      alt-text
+					      (string-append ent-notation
+							     " image")))))
+	    (error (string-append "Can't process entities of type "
+				  ent-notation)))
+	(error "Can't extract entity"))))
+
+(element coverimage
+  (let* ((kids (children (current-node)))
+	 (content (get-best-figurecontent
+		   (node-list (select-elements kids
+					       (normalize "figurecontent"))
+			      (select-elements kids
+					       (normalize "px")))
+		  '("GIF89A" "JPEG"))))
+    (if content
+	(process-node-list content)
+	(error "Can't process coverimage"))))
+
+; ;; If the `image' attribute is not present, then the figure content is
+; ;; given as the element content.
+; ;; Changes here might need matching changes in 
+; ;; mode make-manifest-mode in sl.dsl.
+; (element figurecontent
+;   (let* ((alt-text (attribute-string (normalize "alt")
+; 				     (current-node)))
+; 	 (image-ents (attribute-string (normalize "image")
+; 				       (current-node)))
+; 	 (best-ent (and image-ents
+; 			(get-sysid-by-notation image-ents
+; 					       '("JPEG" "GIF89A")))))
+;     (if image-ents
+; 	(if best-ent
+; 	    (make empty-element gi: "img"
+; 		  attributes: (list (list "src" best-ent)
+; 				    (list "alt" alt-text)))
+; 	    (error "No suitable entity in figurecontent"))
+; 	(process-children))))
 
 
 <misccode>

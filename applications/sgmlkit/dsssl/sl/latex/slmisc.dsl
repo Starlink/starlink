@@ -21,9 +21,18 @@ Changes here might need matching changes in
 mode make-manifest-mode in sl.dsl.
 <codebody>
 (element figure
+  (let* ((kids (children (current-node)))
+	 (content (get-best-figurecontent
+		   (node-list (select-elements kids
+					       (normalize "figurecontent"))
+			      (select-elements kids (normalize "px")))
+		   '("EPS" "LATEXGRAPHICS"))))
   (make environment name: "figure"
+	(if content
+	    (process-node-list content)
+	    (literal "No processable content"))
 	(process-matching-children 'figurecontent)
-	(process-matching-children 'caption)))
+	(process-matching-children 'caption))))
 
 (element caption
   (let ((caption-details (get-caption-details (parent (current-node))))
@@ -40,17 +49,47 @@ mode make-manifest-mode in sl.dsl.
 	  (process-children))))
 
 (element figurecontent
-  (let* ((image-ents (attribute-string (normalize "image")
-				       (current-node)))
-	 (best-ent (and image-ents
-			(get-sysid-by-notation image-ents
-					       '("EPS")))))
-    (if image-ents
-	(if best-ent
-	    (make empty-command name: "includegraphics"
-		  parameters: (list best-ent))
-	    (error "No suitable entity in figurecontent"))
-	(process-children))))
+  (let* ((ent (attribute-string (normalize "image")
+				(current-node)))
+	 (ent-sysid (and ent
+			 (entity-system-id ent)))
+	 (ent-notation (and ent-sysid
+			    (entity-notation ent))))
+    (if ent-notation
+	(case ent-notation
+	  (("EPS")
+	   (make empty-command name: "includegraphics"
+		 parameters: (list ent-sysid)))
+	  (("LATEXGRAPHICS")
+	   (let ((package (entity-attribute-string ent
+						   (normalize "package")
+						   (current-node))))
+	     (if package
+		 (error "Entity attribute PACKAGE not supported")
+		 (make fi data: (read-entity ent-sysid)))))
+	  (else
+	   (error (string-append "Can't process entities of type "
+				 ent-notation))))
+	(let ((cont-notation (attribute-string (normalize "notation")
+					       (current-node))))
+	  (if cont-notation
+	      (if (string=? cont-notation "LATEXGRAPHICS")
+		  (make fi data: (data (current-node)))
+		  (error (string-append "Can't process inline graphics of type"
+					cont-notation)))
+	      (error "Can't extract entity"))))))
+
+(element coverimage
+  (let* ((kids (children (current-node)))
+	 (content (get-best-figurecontent
+		   (node-list (select-elements kids
+					       (normalize "figurecontent"))
+			      (select-elements kids
+					       (normalize "px")))
+		  '("EPS" "LATEXGRAPHICS"))))
+    (if content
+	(process-node-list content)
+	(error "Can't process coverimage"))))
 
 <misccode>
 <description>

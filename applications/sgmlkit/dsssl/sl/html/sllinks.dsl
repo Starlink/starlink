@@ -75,9 +75,11 @@ it produces an <funcname/error/.
 <codebody>
 (element docxref
   (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
+	 (gen-sysid (and xrefent
+			 (entity-generated-system-id xrefent)))
 	 (docelem (and xrefent
-		       (document-element
-			(sgml-parse (entity-generated-system-id xrefent)))))
+		       gen-sysid
+		       (document-element (sgml-parse gen-sysid))))
 	 (xrefid (attribute-string (normalize "loc") (current-node)))
 	 ;; xreftarget is the element the docxref refers to, or #f if
 	 ;; attribute LOC is implied or the document doesn't have such
@@ -88,41 +90,45 @@ it produces an <funcname/error/.
 		       (get-link-policy-target xreftarget)))
 	 (linktext (attribute-string (normalize "text")
 				     (current-node))))
-    (if (string=? (gi docelem)
-		  (normalize "documentsummary")) ; sanity check...
-	(if xrefent
-	    (if xreftarget
-		(if (car xrefurl)	; link to element by id
-		    (error (car xrefurl)) ; violated policy - complain
-		    (make element gi: "A"
-			  attributes: (list (list "HREF"
-						  (cdr xrefurl)))
+    (if docelem
+	(if (string=? (gi docelem)
+		      (normalize "documentsummary")) ; sanity check...
+	    (if xrefent
+		(if xreftarget
+		    (if (car xrefurl)	; link to element by id
+			(error (car xrefurl)) ; violated policy - complain
+			(make element gi: "A"
+			      attributes: (list (list "HREF"
+						      (cdr xrefurl)))
+			      (if linktext
+				  (literal linktext)
+				  (make sequence
+				    (with-mode mk-docxref
+				      (process-node-list (document-element
+							  xreftarget)))
+				    (literal ": ")
+				    (with-mode section-reference
+				      (process-node-list xreftarget))))))
+		    (make element gi: "A"	; link to whole document
+			  attributes:
+			  (list (list "HREF"
+				      (let ((url (attribute-string
+						  (normalize "urlpath") docelem)))
+					(if url
+					    (string-append %starlink-document-server%
+							   url)
+					    (href-to docelem reffrag: #f)))))
 			  (if linktext
 			      (literal linktext)
-			      (make sequence
-				(with-mode mk-docxref
-				  (process-node-list (document-element
-						      xreftarget)))
-				(literal ": ")
-				(with-mode section-reference
-				  (process-node-list xreftarget))))))
-		(make element gi: "A"	; link to whole document
-		      attributes:
-		      (list (list "HREF"
-				  (let ((url (attribute-string
-					      (normalize "urlpath") docelem)))
-				    (if url
-					(string-append %starlink-document-server%
-						       url)
-					(href-to docelem reffrag: #f)))))
-		      (if linktext
-			  (literal linktext)
-			  (with-mode mk-docxref
-			    (process-node-list docelem)))))
-	    (error "No value for docxref's DOC attribute"))
-	(error (string-append "DOCXREF target " xrefent
-			      " has document type " (gi docelem)
-			      ": expected DOCUMENTSUMMARY")))))
+			      (with-mode mk-docxref
+				(process-node-list docelem)))))
+		(error "No value for docxref's DOC attribute"))
+	    (error (string-append "DOCXREF target " xrefent
+				  " has document type " (gi docelem)
+				  ": expected DOCUMENTSUMMARY")))
+	(error (cond (gen-sysid (string-append "DOCXREF: couldn't parse document " xrefent))
+		     (xrefent (string-append "DOCXREF: couldn't get sysid from " xrefent))
+		     (else "DOCXREF: no DOC attribute"))))))
 
 (mode mk-docxref
   (element documentsummary

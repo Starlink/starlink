@@ -53,6 +53,8 @@ These are the document element types.
 ;  (literal (normalise-string (data (current-node)))))
 (element title
   (process-children))
+(element displaytitle
+  (process-children))
 
 (element authorlist
   (process-children))
@@ -178,7 +180,7 @@ are shown at the top of the document.
 		(make element gi: "tr"
 		      (make element gi: "td"
 			    attributes: '(("align" "center"))
-			    (process-node-list (children coverimage)))))
+			    (process-node-list coverimage))))
 	  (empty-sosofo))
       (process-children)
       (if copyright

@@ -86,8 +86,13 @@ depending on whether the element is to be chunked.
 
 <func>
 <routinename>href-to
+<purpose>Return the HTML HREF for the given node.  If chunking has been
+turned off, just return the fragment identifier.
 <description>Return the HTML HREF for the given node.  If chunking has been
 turned off, just return the fragment identifier.
+<p>There can be a number of special cases in the determination of the fragid.
+Each one of these at present consists of a call to a function 
+<funcname/href-to-fragid-giname/, which returns a fragment prefixed by `#'.
 <returnvalue type="string">An HTML HREF which can be used to refer to
 the current node.
 <parameter>target
@@ -106,10 +111,17 @@ the current node.
 	 (entfile (html-file target_nd: target))
 	 (url (string-append (if full-url %starlink-document-server% "")
 			     entfile))
-	 (fragid (if (or (chunk? target)
-			 (not id))
-		     ""
-		     (string-append "#xref_" id))))
+	 (fragid (case (gi target)
+		   (("MLABEL") (href-to-fragid-mlabel target))
+		   (else (if (or (chunk? target)
+				 (not id))
+			     ""
+			     (string-append "#xref_" id)))))
+	 ;(fragid (if (or (chunk? target)
+		;	 (not id))
+		;     ""
+		;     (string-append "#xref_" id)))
+	 )
     (if reffrag
 	(string-append url fragid)
 	url)))
