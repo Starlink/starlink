@@ -60,6 +60,7 @@ CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
+REAL_INSTALL = install-recursive
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AUTOCONF = @AUTOCONF@
@@ -184,8 +185,8 @@ install-nodist_pkgdataDATA: $(nodist_pkgdata_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(nodist_pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f"; \
 	  $(nodist_pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f; \
-	  if test -n "$(MANIFEST_FD)"; then \
-	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >&$(MANIFEST_FD); \
+	  if test -n "$$MANIFEST_FD"; then \
+	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >&$${MANIFEST_FD-0}; \
 	  else :; fi; \
 	done
 
@@ -359,49 +360,40 @@ all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkdir_p) $(DESTDIR)$(pkgdatadir)
-install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
 
-# Wrap the installation in an environment which has MANIFEST_FD open on
-# a manifest file which the rest of the installation
-# should append to.  Only do this if STAR_MANIFEST_DIR is defined and
-# MANIFEST_FD isn't -- this should always be the case, but don't
-# fail if it isn't.  If we permit MANIFEST_FD to be defined, then
-# (a) it makes it possible to control this from outside by defining
-# this variable deliberately (given that we were ever to decide that
-# was a cunning plan), and (b) if one of these makefiles has its
-# `install-am' target invoked (which I don't _think_ should happen)
-# then we don't end up creating two manifests.
-install-am: all-am
-# Create an install manifest, and install it in the required manifest location
-	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$(MANIFEST_FD)"; then \
-	    $(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR); \
-	    MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
-	    echo "<?xml version='1.0'?>"                          >&5 ; \
-	    echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
-	    echo "<manifest component='$(PACKAGE_NAME)'>"         >&5 ; \
-	    echo "<version>$(PACKAGE_VERSION)</version>"          >&5 ; \
-	    echo "<files>"                                        >&5 ; \
-	    MANIFEST_FD=5 $(MAKE) $(AM_MAKEFLAGS) \
-	        install-exec-am install-data-am; \
-	    echo "</files>"                                       >&5; \
-	    echo "</manifest>"                                    >&5; \
-	    exec 5>&-; \
-	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
-	    rm -f $$MF; \
+# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
+# invoke the install-manifest target, otherwise, do the real install
+# rule.  This means that if this is being invoked from within an
+# install-manifest rule further up the process tree, we don't create
+# another manifest.
+install:  all-am
+	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
+	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
 	else \
-	    $(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am; \
+	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
 	fi
-	rm -f stamp-starlink-install
-	echo "component=\"$(PACKAGE_NAME)\"" >stamp-starlink-install
-	echo "version=\"$(PACKAGE_VERSION)\"" >>stamp-starlink-install
-	echo "date=\"`date`\"" >>stamp-starlink-install
-	$(mkdir_p) $(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) stamp-starlink-install \
-	    $(STAR_MANIFEST_DIR)/stamp-`echo $(PACKAGE_NAME) | sed 's/[^A-Za-z0-9.-]/_/g'`
-	rm -f stamp-starlink-install
+
+install-manifest:
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	  echo "<?xml version='1.0'?>" >&5 ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
+	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
+	  echo "<files>" >&5 ; \
+	  MANIFEST_FD=5; export MANIFEST_FD; \
+	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
+	  echo "</files>"                                       >&5; \
+	  echo "</manifest>"                                    >&5; \
+	  exec 5>&-; \
+	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	  rm -f $$MF
+
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 installcheck: installcheck-recursive
 install-strip:
@@ -474,12 +466,13 @@ uninstall-info: uninstall-info-recursive
 	distdir dvi dvi-am html html-am info info-am install \
 	install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-nodist_pkgdataDATA install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-recursive pdf \
-	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-info-am uninstall-nodist_pkgdataDATA
+	install-manifest install-nodist_pkgdataDATA install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-info-am \
+	uninstall-nodist_pkgdataDATA
 
 autom4te.cfg: $(srcdir)/autom4te.in Makefile
 	rm -f autom4te.cfg autom4te.tmp

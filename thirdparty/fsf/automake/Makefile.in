@@ -36,8 +36,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
-	ChangeLog INSTALL NEWS THANKS TODO
+	$(srcdir)/Makefile.in $(srcdir)/component.xml.in \
+	$(top_srcdir)/configure AUTHORS COPYING ChangeLog INSTALL NEWS \
+	THANKS TODO
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -45,12 +46,13 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = component.xml
 am__installdirs = $(DESTDIR)$(bindir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
+STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -59,7 +61,6 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	uninstall-recursive
 ETAGS = etags
 CTAGS = ctags
-INSTALL_STARDATA = $(INSTALL_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
@@ -73,6 +74,7 @@ DIST_ARCHIVES = $(distdir).tar.gz $(distdir).tar.bz2
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
+REAL_INSTALL = install-recursive
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 APIVERSION = @APIVERSION@
@@ -201,6 +203,8 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+component.xml: $(top_builddir)/config.status $(srcdir)/component.xml.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -210,8 +214,8 @@ install-binSCRIPTS: $(bin_SCRIPTS)
 	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	    echo " $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f"; \
 	    $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(bindir)/$$f" >>$$MANIFEST_FILE; \
+	    if test -n "$$MANIFEST_FD"; then \
+		echo "$(DESTDIR)$(bindir)/$$f" >&$${MANIFEST_FD-0}; \
 	    else :; fi; \
 	  else :; fi; \
 	done
@@ -341,32 +345,10 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/tests
+	$(mkdir_p) $(distdir)/. $(distdir)/tests
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -509,10 +491,37 @@ all-am: Makefile $(SCRIPTS)
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkdir_p) $(DESTDIR)$(bindir)
-install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
+
+# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
+# invoke the install-manifest target, otherwise, do the real install
+# rule.  This means that if this is being invoked from within an
+# install-manifest rule further up the process tree, we don't create
+# another manifest.
+install:  all-am
+	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
+	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
+	else \
+	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
+	fi
+
+install-manifest:
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	  echo "<?xml version='1.0'?>" >&5 ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
+	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
+	  echo "<files>" >&5 ; \
+	  MANIFEST_FD=5; export MANIFEST_FD; \
+	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
+	  echo "</files>"                                       >&5; \
+	  echo "</manifest>"                                    >&5; \
+	  exec 5>&-; \
+	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	  rm -f $$MF
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -597,12 +606,12 @@ uninstall-info: uninstall-info-recursive
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binSCRIPTS install-data \
 	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-recursive pdf \
-	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-info-am
+	install-info-am install-man install-manifest install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-binSCRIPTS uninstall-info-am
 
 
 install-exec-hook:

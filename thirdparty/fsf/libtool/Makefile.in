@@ -55,6 +55,7 @@ pkgdataSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS) $(pkgdata_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
+STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -66,7 +67,6 @@ pkgdataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(aclocal_DATA) $(pkgdata_DATA)
 ETAGS = etags
 CTAGS = ctags
-INSTALL_STARDATA = $(INSTALL_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -79,6 +79,7 @@ DIST_ARCHIVES = $(distdir).tar.gz
 GZIP_ENV = --best
 distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
+REAL_INSTALL = install-recursive
 pkgdatadir = @pkgdatadir@
 ACINCLUDE_M4_LIST = @ACINCLUDE_M4_LIST@
 ACLOCAL = @ACLOCAL@
@@ -275,8 +276,8 @@ install-binSCRIPTS: $(bin_SCRIPTS)
 	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	    echo " $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f"; \
 	    $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(bindir)/$$f" >>$$MANIFEST_FILE; \
+	    if test -n "$$MANIFEST_FD"; then \
+		echo "$(DESTDIR)$(bindir)/$$f" >&$${MANIFEST_FD-0}; \
 	    else :; fi; \
 	  else :; fi; \
 	done
@@ -297,8 +298,8 @@ install-pkgdataSCRIPTS: $(pkgdata_SCRIPTS)
 	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	    echo " $(pkgdataSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f"; \
 	    $(pkgdataSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f; \
-	    if test -n "$$MANIFEST_FILE"; then \
-		echo "$(DESTDIR)$(pkgdatadir)/$$f" >>$$MANIFEST_FILE; \
+	    if test -n "$$MANIFEST_FD"; then \
+		echo "$(DESTDIR)$(pkgdatadir)/$$f" >&$${MANIFEST_FD-0}; \
 	    else :; fi; \
 	  else :; fi; \
 	done
@@ -328,8 +329,8 @@ install-aclocalDATA: $(aclocal_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(aclocalDATA_INSTALL) $$d$$p $(DESTDIR)$(aclocaldir)/$$f"; \
 	  $(aclocalDATA_INSTALL) $$d$$p $(DESTDIR)$(aclocaldir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(aclocaldir)/$$f" >>$$MANIFEST_FILE; \
+	  if test -n "$$MANIFEST_FD"; then \
+	  	echo "$(DESTDIR)$(aclocaldir)/$$f" >&$${MANIFEST_FD-0}; \
 	  else :; fi; \
 	done
 
@@ -348,8 +349,8 @@ install-pkgdataDATA: $(pkgdata_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f"; \
 	  $(pkgdataDATA_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >>$$MANIFEST_FILE; \
+	  if test -n "$$MANIFEST_FD"; then \
+	  	echo "$(DESTDIR)$(pkgdatadir)/$$f" >&$${MANIFEST_FD-0}; \
 	  else :; fi; \
 	done
 
@@ -476,28 +477,6 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
@@ -644,10 +623,37 @@ all-am: Makefile $(SCRIPTS) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkdir_p) $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir) $(DESTDIR)$(aclocaldir) $(DESTDIR)$(pkgdatadir)
-install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
+
+# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
+# invoke the install-manifest target, otherwise, do the real install
+# rule.  This means that if this is being invoked from within an
+# install-manifest rule further up the process tree, we don't create
+# another manifest.
+install:  all-am
+	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
+	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
+	else \
+	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
+	fi
+
+install-manifest:
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	  echo "<?xml version='1.0'?>" >&5 ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
+	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
+	  echo "<files>" >&5 ; \
+	  MANIFEST_FD=5; export MANIFEST_FD; \
+	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
+	  echo "</files>"                                       >&5; \
+	  echo "</manifest>"                                    >&5; \
+	  exec 5>&-; \
+	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	  rm -f $$MF
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -735,14 +741,15 @@ uninstall-info: uninstall-info-recursive
 	dvi-am html html-am info info-am install install-aclocalDATA \
 	install-am install-binSCRIPTS install-data install-data-am \
 	install-exec install-exec-am install-info install-info-am \
-	install-man install-pkgdataDATA install-pkgdataSCRIPTS \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	maintainer-clean-recursive mostlyclean mostlyclean-generic \
-	mostlyclean-libtool mostlyclean-recursive pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-aclocalDATA \
-	uninstall-am uninstall-binSCRIPTS uninstall-info-am \
-	uninstall-local uninstall-pkgdataDATA uninstall-pkgdataSCRIPTS
+	install-man install-manifest install-pkgdataDATA \
+	install-pkgdataSCRIPTS install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic maintainer-clean-recursive \
+	mostlyclean mostlyclean-generic mostlyclean-libtool \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-aclocalDATA uninstall-am \
+	uninstall-binSCRIPTS uninstall-info-am uninstall-local \
+	uninstall-pkgdataDATA uninstall-pkgdataSCRIPTS
 
 
 libtool: $(srcdir)/ltmain.sh $(top_builddir)/configure.ac

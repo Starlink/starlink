@@ -45,6 +45,7 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
+STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -57,10 +58,10 @@ nodist_perllibDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_perllib_DATA) $(nodist_perllib_DATA)
 ETAGS = etags
 CTAGS = ctags
-INSTALL_STARDATA = $(INSTALL_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
+REAL_INSTALL = install-recursive
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 APIVERSION = @APIVERSION@
@@ -204,8 +205,8 @@ install-dist_perllibDATA: $(dist_perllib_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(dist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f"; \
 	  $(dist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(perllibdir)/$$f" >>$$MANIFEST_FILE; \
+	  if test -n "$$MANIFEST_FD"; then \
+	  	echo "$(DESTDIR)$(perllibdir)/$$f" >&$${MANIFEST_FD-0}; \
 	  else :; fi; \
 	done
 
@@ -224,8 +225,8 @@ install-nodist_perllibDATA: $(nodist_perllib_DATA)
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(nodist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f"; \
 	  $(nodist_perllibDATA_INSTALL) $$d$$p $(DESTDIR)$(perllibdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(perllibdir)/$$f" >>$$MANIFEST_FILE; \
+	  if test -n "$$MANIFEST_FD"; then \
+	  	echo "$(DESTDIR)$(perllibdir)/$$f" >&$${MANIFEST_FD-0}; \
 	  else :; fi; \
 	done
 
@@ -353,28 +354,6 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
@@ -421,10 +400,37 @@ all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkdir_p) $(DESTDIR)$(perllibdir) $(DESTDIR)$(perllibdir)
-install: install-recursive
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
+
+# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
+# invoke the install-manifest target, otherwise, do the real install
+# rule.  This means that if this is being invoked from within an
+# install-manifest rule further up the process tree, we don't create
+# another manifest.
+install:  all-am
+	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
+	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
+	else \
+	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
+	fi
+
+install-manifest:
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	  echo "<?xml version='1.0'?>" >&5 ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
+	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
+	  echo "<files>" >&5 ; \
+	  MANIFEST_FD=5; export MANIFEST_FD; \
+	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
+	  echo "</files>"                                       >&5; \
+	  echo "</manifest>"                                    >&5; \
+	  exec 5>&-; \
+	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	  rm -f $$MF
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -501,7 +507,7 @@ uninstall-info: uninstall-info-recursive
 	distdir dvi dvi-am html html-am info info-am install \
 	install-am install-data install-data-am \
 	install-dist_perllibDATA install-exec install-exec-am \
-	install-info install-info-am install-man \
+	install-info install-info-am install-man install-manifest \
 	install-nodist_perllibDATA install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic maintainer-clean-recursive \
