@@ -135,20 +135,7 @@
 *        Rebin the files specified in test.bat but storing each integration
 *        in a separate NDF (named I1, I2 etc).
 
-*  Notes: 
-*     For each file name that is entered, values for the parameters
-*     WEIGHT, SHIFT_DX and SHIFT_DY are requested.
-*     - The application can read in up to 100 separate input datasets. 
-*     - The output map will be large enough to include all data points.
-*     - Spline regridding may have problems with SCAN/MAP (since integrations
-*     contain lots of overlapping data points).
-*     - SCUBA sections can be given along with any input NDF
-*     - The relative weights associated with each point in the output map
-*     are stored in a WEIGHTS NDF in the REDS extension of the output 
-*     data. For spline rebinning each point is equivalent to the number
-*     of integrations added into the final data point. For weight function
-*     regridding the situation is more complicated.
-
+*  ASCII input files:
 *     The REF and IN parameters accept ASCII text files as input. These
 *     text files may contain comments (signified by a #), NDF names,
 *     values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
@@ -169,6 +156,20 @@
 *     convert it to NDF format before processing -- this is probably not
 *     what you want.
 
+*  Notes: 
+*     For each file name that is entered, values for the parameters
+*     WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+*     - The application can read in up to 100 separate input datasets. 
+*     - The output map will be large enough to include all data points.
+*     - Spline regridding may have problems with SCAN/MAP (since integrations
+*     contain lots of overlapping data points).
+*     - SCUBA sections can be given along with any input NDF
+*     - The relative weights associated with each point in the output map
+*     are stored in a WEIGHTS NDF in the REDS extension of the output 
+*     data. For spline rebinning each point is equivalent to the number
+*     of integrations added into the final data point. For weight function
+*     regridding the situation is more complicated.
+
 *  Related Applications:
 *     SURF: SCUQUICK, EXTRACT_DATA
 
@@ -181,6 +182,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.38  1997/06/28 00:55:10  timj
+*     Put the ASCII text file part into its own section of the header.
+*
 *     Revision 1.37  1997/06/27 23:31:05  timj
 *     Change to support '-' negation of sections.
 *     Support passing of WAVELENGTH to WRITE_MAP_INFO.
