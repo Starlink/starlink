@@ -92,7 +92,7 @@ EXTRA_DIST += $(EXAMPLES)
 ## copy them through to the output.
 
 ##  Generic
-GENERIC=@GENERIC@
+GENERIC=@FGENERIC@
 
 #  Run generic to get numeric types.
 GFLAGS = n
