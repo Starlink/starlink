@@ -1403,18 +1403,30 @@ itcl::class gaia::StarAstGrid {
       }
       pack $itk_component(label1) -side top -fill x -ipadx 1m -ipady 1m
 
-      puts "[scope labelattrib_]"
-      #  XXX cannot have label(1) in scope, so use expansion instead
-      #  was -- [scope label_($this,$sname)]
-      foreach {sname lname} $labelattrib_ {
-         itk_component add Label$sname {
-            LabelEntry $parent.label$sname \
-               -text "$lname:" \
-               -labelwidth 8 \
-               -textvariable "::gaia::StarAstGrid::label_($this,$sname)" \
-               -command [code $this redraw_]
+      global ::tcl_version
+      if {$tcl_version >= 8.0} {
+         #  In tcl8 cannot have label(1) in scope, so use expansion instead
+         foreach {sname lname} $labelattrib_ {
+            itk_component add Label$sname {
+               LabelEntry $parent.label$sname \
+                  -text "$lname:" \
+                  -labelwidth 8 \
+                  -textvariable "::gaia::StarAstGrid::label_($this,$sname)" \
+                  -command [code $this redraw_]
+            }
+            pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
          }
-         pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
+      } else { 
+         foreach {sname lname} $labelattrib_ {
+            itk_component add Label$sname {
+               LabelEntry $parent.label$sname \
+                  -text "$lname:" \
+                  -labelwidth 8 \
+                  -textvariable [scope label_($this,$sname)] \
+                  -command [code $this redraw_]
+            }
+            pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
+         }
       }
    }
 

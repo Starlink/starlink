@@ -240,8 +240,9 @@ itcl::class gaia::GaiaImageCtrl {
       $w_.pick pick_object
    }
 
-   #  Make a hard copy of the image display, just override to remove 
-   #  ESO references and reduce the page width slightly (not A4?).
+   #  Make a hard copy of the image display, just override use
+   #  GaiaImagePrint, remove ESO references and reduce the page width
+   #  slightly (not A4?).
    public method print {} {
         if {[$image_ isclear]} {
             warning_dialog "No image is currently loaded" $w_
@@ -253,15 +254,15 @@ itcl::class gaia::GaiaImageCtrl {
         set user [id user]
         set app [lindex [winfo name .] 0]
         set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
-        utilReUseWidget rtd::RtdImagePrint $w_.print \
+        utilReUseWidget gaia::GaiaImagePrint $w_.print \
             -image $this \
             -show_footer 1 \
             -whole_canvas 0 \
             -transient 1 \
             -pagewidth 8.1i \
-            -top_left "GAIA/Skycat\n$object" \
+            -top_left  "GAIA::Skycat\n$object" \
             -top_right "$file\n$center" \
-            -bot_left "$user" \
+            -bot_left  "$user" \
             -bot_right "$date"
    }
 
