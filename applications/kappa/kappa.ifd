@@ -345,6 +345,7 @@ package kappa {
           }
 
          parameter files {
+            size *
             position 1
             type LITERAL
             vpath PROMPT
@@ -523,6 +524,7 @@ package kappa {
           }
 
          parameter files {
+            size *
             position 2
             type _CHAR
             vpath PROMPT
@@ -975,6 +977,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter aend {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -982,6 +985,7 @@ package kappa {
           }
 
          parameter aform {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -989,6 +993,7 @@ package kappa {
           }
 
          parameter alabel {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -996,6 +1001,7 @@ package kappa {
           }
 
          parameter amono {
+            size *
             type _LOGICAL
             access WRITE
             vpath INTERNAL
@@ -1003,6 +1009,7 @@ package kappa {
           }
 
          parameter anorm {
+            size *
             type _LOGICAL
             access WRITE
             vpath INTERNAL
@@ -1010,6 +1017,7 @@ package kappa {
           }
 
          parameter astart {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -1017,6 +1025,7 @@ package kappa {
           }
 
          parameter atype {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -1024,6 +1033,7 @@ package kappa {
           }
 
          parameter aunits {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -1031,6 +1041,7 @@ package kappa {
           }
 
          parameter avariance {
+            size *
             type _LOGICAL
             access WRITE
             vpath INTERNAL
@@ -1070,6 +1081,7 @@ package kappa {
           }
 
          parameter dims {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -1077,6 +1089,7 @@ package kappa {
           }
 
          parameter extname {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -1084,6 +1097,7 @@ package kappa {
           }
 
          parameter exttype {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -1091,6 +1105,7 @@ package kappa {
           }
 
          parameter fdim {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -1098,6 +1113,7 @@ package kappa {
           }
 
          parameter fdomain {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -1113,6 +1129,7 @@ package kappa {
           }
 
          parameter ftitle {
+            size *
             type LITERAL
             access WRITE
             vpath INTERNAL
@@ -1163,6 +1180,7 @@ package kappa {
           }
 
          parameter lbound {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -1238,6 +1256,7 @@ package kappa {
           }
 
          parameter ubound {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -1269,6 +1288,7 @@ package kappa {
           }
 
          parameter width {
+            size *
             type _LOGICAL
             access WRITE
             vpath INTERNAL
@@ -1627,6 +1647,7 @@ package kappa {
           }
 
          parameter shape {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC CURRENT
@@ -1746,6 +1767,7 @@ package kappa {
           }
 
          parameter origin {
+            size *
             position 2
             type _INTEGER
             access READ
@@ -1834,6 +1856,7 @@ package kappa {
           }
 
          parameter pixelref {
+            size *
 				 # position
             type LITERAL
             access READ
@@ -1845,6 +1868,7 @@ package kappa {
           }
 
          parameter pixelsize {
+            size *
             position 9
             type LITERAL
             access READ
@@ -2078,6 +2102,7 @@ package kappa {
           }
 
          parameter tr {
+            size *
             position 4
             type _DOUBLE
             access READ
@@ -2194,6 +2219,7 @@ package kappa {
           }
 
          parameter tr {
+            size *
             position 3
             type _DOUBLE
             access READ
@@ -2245,6 +2271,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter frames {
+            size *
             position 2
             type _CHAR
             vpath PROMPT
@@ -2655,6 +2682,7 @@ package kappa {
           }
 
          parameter shape {
+            size *
             position 3
             type _INTEGER
             vpath PROMPT
@@ -2765,6 +2793,7 @@ package kappa {
           }
 
          parameter heights {
+            size *
             type _REAL
             prompt {Give the heights of the contours}
             vpath PROMPT
@@ -2783,6 +2812,7 @@ package kappa {
           }
 
          parameter keypos {
+            size *
             type _REAL
             prompt {Horizontal and vertical position of key}
             vpath CURRENT DEFAULT
@@ -2801,6 +2831,7 @@ package kappa {
           }
 
          parameter length {
+            size *
             type _REAL
             access WRITE
             vpath INTERNAL
@@ -2808,6 +2839,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -2847,6 +2879,7 @@ package kappa {
           }
 
          parameter number {
+            size *
                                  
             type _INTEGER
             access WRITE
@@ -2873,6 +2906,7 @@ package kappa {
           }
 
          parameter percentiles {
+            size *
             type _REAL
             prompt {Give the heights of the contours as percentiles}
             vpath PROMPT
@@ -2977,6 +3011,7 @@ package kappa {
           }
 
          parameter heights {
+            size *
             type _REAL
             prompt {Give the heights of the contours}
             vpath PROMPT
@@ -3035,6 +3070,7 @@ package kappa {
           }
 
          parameter percentiles {
+            size *
             type _REAL
             prompt {Give the heights of the contours as percentiles}
             vpath PROMPT
@@ -3066,6 +3102,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter colour {
+            size *
             type LITERAL
             vpath PROMPT
             prompt {New palette colour}
@@ -3073,6 +3110,7 @@ package kappa {
           }
 
          parameter colrange {
+            size *
             type _INTEGER
             vpath PROMPT
             prompt {Select one or two colours from the palette}
@@ -3194,6 +3232,7 @@ package kappa {
           }
 
          parameter penrange {
+            size *
             type _INTEGER
             vpath PROMPT
             prompt {First and last pen of the LUT to be modified}
@@ -3217,6 +3256,7 @@ package kappa {
           }
 
          parameter valrange {
+            size *
             type _DOUBLE
             vpath PROMPT
             prompt {Data-value range to be assigned colours}
@@ -3309,6 +3349,7 @@ package kappa {
           }
 
          parameter lastpos {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -3496,6 +3537,7 @@ package kappa {
           }
 
          parameter nsigma {
+            size *
             position 2
             type _REAL
             vpath PROMPT
@@ -3653,6 +3695,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -3791,6 +3834,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter anglim {
+            size *
             type _REAL
             vpath DEFAULT
             ppath DEFAULT
@@ -4451,6 +4495,7 @@ package kappa {
           }
 
          parameter planes {
+            size *
             position 1
             type _INTEGER
             prompt {Memory plane number(s)?}
@@ -4706,6 +4751,7 @@ package kappa {
           }
 
          parameter lbound {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC
@@ -4796,6 +4842,7 @@ package kappa {
           }
 
          parameter peind {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC
@@ -4821,6 +4868,7 @@ package kappa {
           }
 
          parameter slend {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC
@@ -4839,6 +4887,7 @@ package kappa {
           }
 
          parameter slstart {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC
@@ -4871,6 +4920,7 @@ package kappa {
           }
 
          parameter ubound {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC
@@ -4879,6 +4929,7 @@ package kappa {
           }
 
          parameter vaind {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC
@@ -5028,6 +5079,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -5288,6 +5340,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter colour {
+            size *
             position 1
             type LITERAL
             vpath PROMPT
@@ -5517,6 +5570,7 @@ package kappa {
           }
 
          parameter lbound {
+            size *
             type _REAL
             vpath PROMPT
             ppath CURRENT DYNAMIC
@@ -5571,6 +5625,7 @@ package kappa {
           }
 
          parameter ubound {
+            size *
             type _REAL
             vpath PROMPT
             ppath CURRENT DYNAMIC
@@ -5658,6 +5713,7 @@ package kappa {
           }
 
          parameter keypos {
+            size *
             type _REAL
             prompt {Horizontal and vertical position of key}
             vpath CURRENT DEFAULT
@@ -5703,6 +5759,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -5741,6 +5798,7 @@ package kappa {
           }
 
          parameter offset {
+            size *
             type _REAL
             vpath PROMPT
             ppath CURRENT
@@ -5920,6 +5978,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter colour {
+            size *
             position 2
             type LITERAL
             vpath PROMPT
@@ -6133,6 +6192,7 @@ package kappa {
           }
 
          parameter fraction {
+            size *
             position 2
             type _REAL
             vpath DYNAMIC
@@ -6152,6 +6212,7 @@ package kappa {
           }
 
          parameter lbound {
+            size *
             position 5
             type _REAL
             vpath PROMPT
@@ -6189,6 +6250,7 @@ package kappa {
           }
 
          parameter size {
+            size *
             type _REAL
             vpath DEFAULT
             ppath DEFAULT
@@ -6198,6 +6260,7 @@ package kappa {
           }
 
          parameter ubound {
+            size *
             position 6
             type _REAL
             vpath PROMPT
@@ -6570,6 +6633,7 @@ package kappa {
           }
 
          parameter inxy {
+            size *
             position 1
             type _DOUBLE
             vpath PROMPT
@@ -6668,6 +6732,7 @@ package kappa {
           }
 
          parameter compress {
+            size *
             type _INTEGER
             vpath DEFAULT
             ppath CURRENT DEFAULT
@@ -6709,6 +6774,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -6840,6 +6906,7 @@ package kappa {
           }
 
          parameter planes {
+            size *
             position 7
             type _INTEGER
             prompt {Image memory planes to dump}
@@ -7000,6 +7067,7 @@ package kappa {
           }
 
          parameter heights {
+            size *
             type _REAL
             prompt {Give the heights of the contours}
             vpath PROMPT
@@ -7118,6 +7186,7 @@ package kappa {
           }
 
          parameter percentiles {
+            size *
             type _REAL
             prompt {Give the heights of the contours as percentiles}
             vpath PROMPT
@@ -7264,6 +7333,7 @@ package kappa {
           }
 
          parameter keypos {
+            size *
             type _REAL
             prompt {Horizontal and vertical position of key}
             vpath CURRENT DEFAULT
@@ -7291,6 +7361,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -7540,6 +7611,7 @@ package kappa {
           }
  
          parameter operands {
+            size *
             type _INTEGER
             prompt {Indices of regions to combine or invert}
             ppath DYNAMIC
@@ -7587,6 +7659,7 @@ package kappa {
           }
  
          parameter regions {
+            size *
             type LITERAL
             vpath PROMPT
             prompt {Give a list of the indices of the regions to be deleted}
@@ -8552,6 +8625,7 @@ package kappa {
           }
 
          parameter maxshift {
+            size *
             position 6
             type _REAL
             vpath DEFAULT
@@ -8630,6 +8704,7 @@ package kappa {
           }
 
          parameter search {
+            size *
             position 4
             type _INTEGER
             vpath DEFAULT
@@ -8832,6 +8907,7 @@ package kappa {
           }
 
          parameter compress {
+            size *
             position 3
             type _INTEGER
             vpath PROMPT
@@ -8915,6 +8991,7 @@ package kappa {
           }
 
          parameter compress {
+            size *
             position 3
             type _INTEGER
             vpath PROMPT
@@ -8989,6 +9066,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter compress {
+            size *
             position 3
             type _INTEGER
             vpath PROMPT
@@ -9009,6 +9087,7 @@ package kappa {
           }
 
          parameter origin {
+            size *
             position 4
             type _INTEGER
             vpath DEFAULT
@@ -9605,6 +9684,7 @@ package kappa {
           }
 
          parameter thresh {
+            size *
             position 5
             type _DOUBLE
             vpath DEFAULT
@@ -10125,6 +10205,7 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter box {
+            size *
             type _INTEGER
             vpath DEFAULT
             ppath DYNAMIC DEFAULT
@@ -10134,6 +10215,7 @@ package kappa {
           }
 
          parameter fwhm {
+            size *
             position 3
             type _REAL
             vpath PROMPT
@@ -10302,6 +10384,7 @@ package kappa {
           }
 
          parameter maxcoord {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -10317,6 +10400,7 @@ package kappa {
           }
 
          parameter maxpos {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -10340,6 +10424,7 @@ package kappa {
           }
 
          parameter mincoord {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -10355,6 +10440,7 @@ package kappa {
           }
 
          parameter minpos {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -10414,6 +10500,7 @@ package kappa {
           }
 
          parameter percentiles {
+            size *
             position 3
             type _REAL
             vpath DEFAULT
@@ -10423,6 +10510,7 @@ package kappa {
           }
 
          parameter perval {
+            size *
             access WRITE
             type _DOUBLE
             vpath INTERNAL
@@ -10549,6 +10637,7 @@ package kappa {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -10578,6 +10667,7 @@ package kappa {
           }
 
          parameter range {
+            size *
             position 3
             type _DOUBLE
             vpath PROMPT
@@ -10771,6 +10861,7 @@ iraf! {
           }
 
          parameter dist {
+            size *
 				 # distributions.
             type _REAL
             access WRITE
@@ -10788,6 +10879,7 @@ iraf! {
           }
 
          parameter files {
+            size *
             type _CHAR
             access WRITE
             vpath DEFAULT
@@ -10851,6 +10943,7 @@ iraf! {
           }
 
          parameter prob {
+            size *
             type _REAL
             access WRITE
             vpath DEFAULT
@@ -11450,6 +11543,7 @@ iraf! {
           }
 
          parameter xlimit {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -11458,6 +11552,7 @@ iraf! {
           }
 
          parameter ylimit {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -11898,6 +11993,7 @@ iraf! {
           }
 
          parameter lbound {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath CURRENT
@@ -12188,6 +12284,7 @@ iraf! {
           }
 
          parameter ubound {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath CURRENT
@@ -12547,6 +12644,7 @@ iraf! {
           }
 
          parameter step {
+            size *
             type _INTEGER
             vpath DEFAULT
             ppath DYNAMIC
@@ -13099,6 +13197,7 @@ iraf! {
           }
 
          parameter datarange {
+            size *
             type _REAL
             vpath DEFAULT
             ppath DYNAMIC DEFAULT
@@ -13138,6 +13237,7 @@ iraf! {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -13207,6 +13307,7 @@ iraf! {
           }
 
          parameter pcrange {
+            size *
             type _REAL
             vpath DYNAMIC
             prompt {Percentage range for auto-scaling}
@@ -13745,6 +13846,7 @@ iraf! {
          helplib {$KAPPA_HELP}
 
          parameter expand {
+            size *
             position 3
             type _INTEGER
             vpath PROMPT
@@ -13952,6 +14054,7 @@ iraf! {
           }
 
          parameter margin {
+            size *
             type _REAL
             prompt {Widths of margins around DATA picture}
             vpath CURRENT DEFAULT
@@ -14343,6 +14446,7 @@ iraf! {
          helplib {$KAPPA_HELP}
 
          parameter axes {
+            size *
             type _INTEGER
             vpath DYNAMIC
             ppath DYNAMIC
@@ -14369,6 +14473,7 @@ iraf! {
           }
  
          parameter coords {
+            size *
             type _REAL
             access READ
             prompt {Co-ordinates of next polygon vertex}
@@ -14907,6 +15012,7 @@ iraf! {
          helplib {$KAPPA_HELP}
 
          parameter clip {
+            size *
             position 3
             type _REAL
             access READ
@@ -14940,6 +15046,7 @@ iraf! {
           }
 
          parameter maxcoord {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -14955,6 +15062,7 @@ iraf! {
           }
 
          parameter maxpos {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -14970,6 +15078,7 @@ iraf! {
           }
 
          parameter mincoord {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -14985,6 +15094,7 @@ iraf! {
           }
 
          parameter minpos {
+            size *
             type _INTEGER
             access WRITE
             vpath INTERNAL
@@ -15167,6 +15277,7 @@ iraf! {
           }
 
          parameter bindim {
+            size *
             type _INTEGER
             vpath DEFAULT
             ppath DYNAMIC DEFAULT
@@ -15205,6 +15316,7 @@ iraf! {
           }
 
          parameter fitclip {
+            size *
             type _REAL
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
@@ -15244,6 +15356,7 @@ iraf! {
           }
 
          parameter knots {
+            size *
             type _INTEGER
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
@@ -15253,6 +15366,7 @@ iraf! {
           }
 
          parameter order {
+            size *
             type _INTEGER
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
@@ -15433,6 +15547,7 @@ iraf! {
           }
 
          parameter lbound {
+            size *
             type _INTEGER
             vpath DEFAULT
             ppath DYNAMIC DEFAULT
@@ -15484,6 +15599,7 @@ iraf! {
           }
 
          parameter shape {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath CURRENT
@@ -15589,6 +15705,7 @@ iraf! {
          helplib {$KAPPA_HELP}
 
          parameter class {
+            size *
             type LITERAL
             prompt {Classifications of the transformation}
             vpath PROMPT
@@ -16249,6 +16366,7 @@ iraf! {
           }
 
          parameter lbound {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -16257,6 +16375,7 @@ iraf! {
           }
 
          parameter lcoord {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -16315,6 +16434,7 @@ iraf! {
           }
 
          parameter ubound {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -16323,6 +16443,7 @@ iraf! {
           }
 
          parameter ucoord {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -16624,6 +16745,7 @@ iraf! {
           }
 
          parameter columns {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -16671,6 +16793,7 @@ iraf! {
           }
 
          parameter lines {
+            size *
             type _DOUBLE
             vpath PROMPT
             ppath DYNAMIC
@@ -17009,6 +17132,7 @@ iraf! {
           }
 
          parameter posns {
+            size *
             type _DOUBLE
             access WRITE
             vpath INTERNAL
@@ -17155,6 +17279,7 @@ iraf! {
           }
 
          parameter lbnd {
+            size *
             position 3
             type _INTEGER
             access READ
@@ -17212,6 +17337,7 @@ iraf! {
           }
 
          parameter ubnd {
+            size *
             position 4
             type _INTEGER
             access READ
