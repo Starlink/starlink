@@ -2468,20 +2468,51 @@ Directory /cvs/libraries/pcs/adam added to the repository
           processing of their sources in the process of creating this
           `source' tarball; in these cases, you should attempt to obtain
           a more fundamental set of sources from the package's developer
-          (if that is not you).  Ideally, that developer may have a CVS
-          or RCS repository holding the sources, and in that case you
-          should follow the CVS manual's instructions on importing such
-          repositories (in the CVS case, just place the new CVS tree in
-          your target repository, and for RCS, create the appropriate
-          hierarchy by hand in the CVS repository and place the RCS
-          files there).</p>
+          (if that is not you).</p>
+
+        <p>The ideal source for new code is a CVS or RCS repository.
+          A CVS repository is easy to import -- you just tar it up and
+          unpack it into the correct place within the Starlink
+          repository.  An RCS repository is barely harder, with the
+          only difference being that you have to create the Starlink
+          repository directory structure by hand, and copy the RCS
+          files into place within it.  The only gotcha with this route
+          is that you must make sure that the permissions are correct
+          on the resulting repository: you must make sure that
+          everyone who should have any access to the repository can
+          read <em>and write</em> each of the directories.</p>
+
+        <p>CVS repository access is controlled by groups (at least
+          when the repository is shared), and so each directory within
+          the repository must have a suitable group ownership, with
+          group-write permissions.  Each directory must also have the
+          setgid bit set, so that any directories created within it
+          inherit its gid.  Within the Starlink repository in
+          particular, where all participants are part of the
+          <code>cvs</code> group.  In short, you can set the correct
+          permissions on an imported directory <code>foo</code> with
+          the commands
+<verbatim>
+% find foo -type d | xargs chgrp cvs
+% find foo -type d | xargs chmod g+sw
+</verbatim>
+          This sets the group-owner of each directory to be
+          <code>cvs</code>, and sets the group-write and set-group-id
+          bits in the permissions mask (don't tinker with file
+          permissions, since these affect the permissions of the
+          checked out files).  You need not worry about file or
+          directory ownership, since this always ends up being the
+          last person who committed a file.  Note: The instructions
+          here are based on observation of CVS repositories: the
+          actual requirements don't seem to be formally documented
+          anywhere.</p>
 
         <p>Add <em>all</em> of the source files, including files like
           the <code>mk</code> script and the old <code>makefile</code>,
           which we are about to remove.  Tag this initial import with a
           tag <em>&lt;component&gt;</em><code>-initial-import</code>, so
           that it is possible to recover this old-style distribution if
-          necessary.  As the previous paragraph points out, it is not
+          necessary.  As mentioned above, it is not
           always completely clear what constitutes the old-style source
           set: so don't do this step mechanically, use your judgement,
           and above all avoid losing information.  Note also that some
