@@ -50,24 +50,21 @@ Interface FOLDLOTS
       help        'This routine folds at a range of trial periods'
    EndParameter
 
-   Parameter    PHASE_0_EPOCH
+   Parameter    EPOCH
       position    7
-      keyword     'EPOCH'
       type        '_double'
       prompt      'Enter epoch of phase zero'
 help   'Enter in atomic time. The default value is the BASE_TAI in the header'
    EndParameter
 
    Parameter    NPHASE
-      position    8
-      keyword     'BINS'
-      type        '_integer'
+      POSITION    8
+      TYPE        '_INTEGER'
       prompt      'Enter number of phase bins'
       help        'This is the no. of elements in the output fold DATA_ARRAY.'
    EndParameter
 
-   Parameter    WEIGHT
-      keyword     'WEIGHTED'
+   Parameter    WEIGHTED
       TYPE        '_LOGICAL'
       prompt      'Are weighted means required?'
       default     N
