@@ -410,7 +410,7 @@ PRIVATE_INCLUDES = $(I_NDG) $(I_CTG) $(I_SUB1)
 I_NDG = ndg_com ndg_const ndg_err
 I_CTG = ctg_const ctg_err
 
-I_SUB1 = hlpcmd ccd1_par ccd1_memcm kpg_par kpg_ast
+I_SUB1 = hlpcmd ccd1_par ccd1_memcm 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -443,8 +443,7 @@ ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
 ctg1_gtyps.f ctg1_crexp.f ctg1_lasto.f ctg_catas.f ctg_gtsup.f ctg1_subst.f \
 ctg_asso1.f ctg_assoc.f ctg_crea1.f ctg_creat.f ctg1_sort.f
 
-F_SUB1 =  kpg1_rcatw.f kpg1_srcta.f \
-ccd1_asfio.f ccd1_cmprr.f ccd1_hvcon.f \
+F_SUB1 = ccd1_asfio.f ccd1_cmprr.f ccd1_hvcon.f \
 ccd1_iscom.f ccd1_mfree.f ccd1_orvar.f \
 ccd1_qntlr.f ccd1_qsrtr.f ccd1_rdlin.f ccd1_rmcom.f \
 ccd1_skysr.f ccg1_cenr.f ccg1_clipr.f ccg1_cmltr.f ccg1_is2r.f \
@@ -653,8 +652,7 @@ $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) $(IRAF_DEMO) $(IRAF_DATA)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
-CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST CTG_ERR CTG_CONST \
-KPG_PAR KPG_AST
+CCD1_PAR CCD1_MEMCM HLPCMD NDG_ERR NDG_CONST CTG_ERR CTG_CONST 
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -665,9 +663,6 @@ NDG_CONST:   ndg_const;               $(LINK) $? $@
 NDG_ERR:     ndg_err;                 $(LINK) $? $@
 CTG_CONST:   ctg_const;               $(LINK) $? $@
 CTG_ERR:     ctg_err;                 $(LINK) $? $@
-KPG_AST:     kpg_ast;                 $(LINK) $? $@
-KPG_PAR:     kpg_par;                 $(LINK) $? $@
-
 
 ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
@@ -1912,10 +1907,6 @@ pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 polversion.o:	 SAE_PAR PAR_ERR
-
-kpg1_rcatw.o: SAE_PAR DAT_PAR AST_PAR CAT_PAR GRP_PAR KPG_AST
-kpg1_srcta.o: SAE_PAR DAT_PAR GRP_PAR KPG_PAR AST_PAR KPG_AST 
-
 
 #-------------------------------------------------------------------------------
 #

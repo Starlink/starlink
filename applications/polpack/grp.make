@@ -24,7 +24,7 @@ polimage polsim polstack polversion
 
 #  Fixed KAPPA subroutines which are here only until the fixes are
 #  available in KAPPA.
-KAPFIX = kpg1_rcatw.f kpg1_srcta.f kpg_par kpg_ast
+KAPFIX = 
  
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl adamMessageRelay \
