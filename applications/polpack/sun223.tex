@@ -2728,6 +2728,22 @@ for NDF applications.
    }
    \sstparameters{
       \sstsubsection{
+         DEZERO = _LOGICAL (Read)
+      }{
+         This parameter is only accessed by the single-beam algorithm
+         when parameter WEIGHTS is set to 3. If TRUE, a constant value
+         is added to the data values read from each input data array 
+         to correct for any differences in zero points. The constant
+         value used for each input array is chosen so that the residuals
+         between the input array and the corresponding intensity values
+         implied by the Stokes vectors produced on the previous iteration, 
+         have a mean value of zero. Selecting the DEZERO option can
+         reduce the variances in the output cube, but usually slows down 
+         convergence of the iterative procedure. Thus you may have to give 
+         a larger value for parameter MAXIT, resulting in significantly 
+         longer run time. [FALSE]
+      }
+      \sstsubsection{
          DUALBEAM = \_LOGICAL (Read)
       }{
          If TRUE, then the input images are processed as dual-beam data.
@@ -3093,6 +3109,17 @@ for NDF applications.
       image are used as the variance estimates for the input data (note,
       the same variance estimates are used for all the input images).
 
+      If the input arrays have differing zero points, the residuals
+      for any one image will usually not be centred on zero, but will
+      have some non-zero mean determined by the zero point for the
+      array. If uncorrected this would led to an artifically high
+      estimate of the input variance. There is an option (see parameter 
+      DEZERO) to reduce this effect, by using the mean of the residuals 
+      as a zero point correction for the input array. Note however, that
+      selecting this option will usually result in significantly
+      longer run times, and may require larger values for parameter
+      MAXIT.
+      
       In order to provide some safe-guards against aberrant values in
       the input images, input data values which are badly inconsistent
       with the smoothed Stokes vectors are rejected at this point. Pixels
@@ -6016,7 +6043,21 @@ nearest 5 data values.}
 values which would be expected on the basis of the smoothed Stokes vectors.
 
 \item For each input image, the residuals between these expected intensity 
-values and the corresponding observed intensity values are found, and squared.
+values and the corresponding observed intensity values are found, and
+squared. If the input images have differing zero points (caused by
+instrumental effects or inperfect sky subtraction, for instance), then
+the residuals for an individual image may well not have a mean of zero.
+If left uncorrected, this would result in the mean squared residual at
+each pixel being an over-estimate of the actual input variance. To reduce
+this effect, there is an option (see parameter DEZERO) to apply a zero
+point correction to each input image. This takes the form of a constant
+value to be added to the image. This constant value is chosen so that the
+mean of the residuals calculated in this step is zero, and is displayed
+if parameter ILEVEL is set to 3 or more. If the DEZERO option is
+selected, the zero point corrections are also used when calculating the
+Stokes vectors themselves. The DEZERO option slows down the convergence
+of the iterative procedure, resulting in a larger number of iterations
+being required, and thus a larger run time. 
 
 \item The images containing the squared residuals are stacked together
 into a single image holding the mean squared residual at each input pixel.
