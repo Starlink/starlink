@@ -20,6 +20,7 @@
  ******************************************************************************
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
@@ -31,6 +32,7 @@
 #include "icl.h"
 #include "interp.h"
 #include "icl_io.h"
+#include "output.h"
 
 /* node.h included by init_os() only */
 
@@ -106,6 +108,22 @@ extern int iopid;						/* main.c */
 static value 
 Setenv(char *var, char *valu)
 {
+#if HAVE_SETENV && HAVE_UNSETENV
+  int retval;
+  if (valu != CHARNIL) {
+    retval = setenv(var, valu, 1);
+    if (retval == 0) {
+      return trueval;
+    } else {
+      return exception("Setenv: ICL has exhausted its memory");
+    }
+  } else {
+    unsetenv(var);
+  }
+  return trueval;
+#else
+ /* Should consider optionally using putenv here. I worry 
+    about memory leaks though */
     extern char **environ;			/* run time environment */
     char **environ_new;
     int ind = 0, i;
@@ -146,6 +164,7 @@ Setenv(char *var, char *valu)
     strcat(environ[ind], valu);
     environ[++ind] = CHARNIL;
     return trueval;
+#endif
 }
 
 /******************************************************************************
@@ -425,7 +444,7 @@ func_file_exists(char *s)
 int 
 os_command(char *command)
 {
-    int nchars, pid, status=-1, iostatus=0;
+    int pid, status=-1, iostatus=0;
     struct sigaction oact;
     char *shell;
     extern void sendtoiosubsystem(int command, int info, char *message);
@@ -575,7 +594,7 @@ proc_edit(node *n)
     extern value fileaproc(char *procname, char *filename,
 			   char *command);			/* symtab.c */
     char *name;
-    char filename[ICL_BUFSIZE], command[ICL_BUFSIZE], *getenv();
+    char filename[ICL_BUFSIZE], command[ICL_BUFSIZE];
     node *proc;
     value val;
 
@@ -621,7 +640,6 @@ static value
 proc_default(node *n)
 {
     char *dir, *fulldir, *taskname;
-    char buf[ICL_BUFSIZE];
     value val;
     extern value adam_control(char *taskname, char *action, char *message);
 								/* adam.c */
@@ -676,8 +694,8 @@ proc_default(node *n)
 static value 
 proc_cd(node *n)
 {
-    char *dir, *fulldir;
-    extern char *getenv(const char *);
+    char *dir = CHARNIL;
+    char *fulldir = CHARNIL;
     value val;
 
     if (n != NODENIL) {
@@ -707,7 +725,6 @@ value
 proc_version(node *n)
 {
     extern char *version;
-    value val;
 
     if (nargs != 0)
 	return exception("TOMANYARGS  Too many arguments to VERSION");

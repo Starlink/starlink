@@ -45,6 +45,13 @@
 # include <config.h>
 #endif
 
+/* strsignal only appears if we turn on _GNU_SOURCE */
+#if HAVE_STRSIGNAL
+# ifndef _GNU_SOURCE
+#  define _GNU_SOURCE
+# endif
+#endif
+
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
@@ -108,7 +115,9 @@ extern node *node1(value (*interpreter)(), value val, node *n0); /* node.c   */
  ******************************************************************************
  */
 
+#if HAVE_PUTENV && !HAVE_SETENV
 static char env[22];		/* environment variable - see init_adam() */
+#endif
 static char buf[255];		/* General purpose buffer */
 
 /* Circular buffer recording details of ADAM tasks known to ICL */
@@ -680,12 +689,17 @@ int detached		/* Flag to inidicate 'detached' status (given) */
  * it the name it should register with for the ADAM message system
  */
 
-#ifndef linux
-    if (getenv("ICL_TASK_NAME") == CHARNIL)
-	putenv(env);
-    sprintf(env, "ICL_TASK_NAME=%s", adam_taskname);
-#else
+#if HAVE_SETENV
     setenv("ICL_TASK_NAME", adam_taskname, 1);
+#elif HAVE_PUTENV
+    if (getenv("ICL_TASK_NAME") == CHARNIL) {
+      /* Note that the string "env" becomes part of the environment
+         directly so modifying it modifies the environment */
+	putenv(env);
+        sprintf(env, "ICL_TASK_NAME=%s", adam_taskname);
+    }
+#else
+# error "Unable to set an environment variable"
 #endif
 
 /* Reset SIGCHLD handling to its default */
