@@ -85,11 +85,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
 
-*  Global Variables:
-c      INCLUDE 'GMI_CMN'                                 ! GMI common block
-*       GMI_INIT = LOGICAL (given)
-*         GMI class definitions loaded?
-
 *  Arguments Given:
       INTEGER			ID			! Dataset identifier
 
@@ -114,7 +109,12 @@ C      IF ( .NOT. GMI_INIT ) CALL GMI0_INIT( STATUS )
 
 *  Extract locator and call HDS version
       CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL GMD_QMULT( LOC, MULT, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CALL GMD_QMULT( LOC, MULT, STATUS )
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+        MULT= .FALSE.
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_QMULT', STATUS )
