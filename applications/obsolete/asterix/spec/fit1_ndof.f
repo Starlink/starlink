@@ -95,42 +95,36 @@
 *    Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initially the number of good data values
-      NDOF = NGOOD
+*    Initially the number of good data values less the number of parameters
+      NDOF = NGOOD - MODEL.NPAR
 
-*    Less the frozen parameters
+*    Loop over parameters
       DO J = 1, MODEL.NPAR
-	IF ( .NOT. FROZEN(J) ) NDOF = NDOF - 1
-      END DO
 
-*    Less the constrained parameters
-      IF ( MODEL.NTIE .GT. 0 ) THEN
+*      Parameter frozen?
+        IF ( FROZEN(J) ) THEN
 
-*      Loop over parameters
-        DO J = 1, MODEL.NPAR
+          NDOF = NDOF + 1
 
-*        Parameter not already frozen
-	  IF ( .NOT. FROZEN(J) ) THEN
+*      Ties present?
+	ELSE IF ( MODEL.NTIE .GT. 0 ) THEN
 
-*          In a tie group?
-            IF ( MODEL.TGROUP(J) .GT. 0 ) THEN
+*        In a tie group?
+          IF ( MODEL.TGROUP(J) .GT. 0 ) THEN
 
-*            Not the base parameter of the group
-              IF ( MODEL.TSTART(MODEL.TGROUP(J)) .NE. J ) THEN
-                NDOF = NDOF - 1
-              END IF
-
-*          End of tie group test
+*          Not the base parameter of the group
+            IF ( MODEL.TSTART(MODEL.TGROUP(J)) .NE. J ) THEN
+              NDOF = NDOF + 1
             END IF
 
-*        End of frozen test
+*        End of tie group test
           END IF
 
-*      End of parameter loop
-        END DO
+*      End of frozen test
+        END IF
 
-*    End of any ties present test
-      END IF
+*    End of parameter loop
+      END DO
 
 *    Check ok
       IF ( NDOF .EQ. 0 ) THEN
