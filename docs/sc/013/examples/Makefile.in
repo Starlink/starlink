@@ -1,0 +1,98 @@
+# Makefile for the demo programs for SC/13
+#
+# $Id$
+
+
+# Compilers to use
+CC=@CC@
+F77=@F77@
+DEFS=@DEFS@
+
+# Some of the programs in here require specific compiler options.  
+#
+# The configure script should sort these out, but you might need to
+# specify them by hand in the makefile.  For example:
+#
+# Sun's f77:
+#    PROFILING=-pg
+#    NOUNDERSCORES=-ext_names=plain
+# gcc/g77:
+#    PROFILING=-pg  ???
+#    NOUNDERSCORES=-fno-underscoring
+#
+# If you can tell norman@astro.gla.ac.uk the appropriate settings for
+# your machine, along with the `Target system' string reported by the
+# configure script, I can add them to the special-cases within the
+# configure script.
+PROFILING=@PROFILINGOPTION@
+NOUNDERSCORES=@NOUNDERSCORES@
+
+
+EXECS=timewaster fpdemo fpp mixed crash
+
+all: $(EXECS)
+
+#
+# Floating-point demo
+#
+# The DEFS line above should have -DBIGENDIAN=1 or -DBIGENDIAN=0
+# depending on whether the machine is big- or little-endian.
+# Intel and Alpha chips are little-endian.
+# Sparc, Motorola 68k and PowerPC chips are big-endian.
+# Compile with -DBIGENDIAN=1 on the latter.
+
+
+# Simple link of the FP programs
+fpdemo: fpdemo.c
+	$(CC) $(DEFS) -o $@ fpdemo.c
+
+fpp: fpp.o
+	$(LINK.C) $(DEFS) -o $@ fpp.o $(LDLIBS)
+
+#
+# Compile all three profiled programs with the $(PROFILING) flag, 
+# to enable us to use the profiler.
+# 
+p1.o: p1.f
+	$(F77) $(PROFILING) -c p1.f
+
+p2.o: p2.f
+	$(F77) $(PROFILING) -c p2.f
+
+p3.o: p3.f
+	$(F77) $(PROFILING) -c p3.f
+
+timewaster: p1.o p2.o p3.o
+	$(F77) -o $@ $(PROFILING) p1.o p2.o p3.o
+
+#
+# Compile and link the mixed-language demo.
+#
+mixed: mixed-f.o mixed-c.o
+	$(LINK.F) -o mixed mixed-c.o mixed-f.o
+
+# Compile the Fortran code with no trailing underscores
+mixed-f.o: mixed-f.f
+	$(F77) -c mixed-f.f $(NOUNDERSCORES)
+
+mixed-c.o: mixed-c.c
+	$(CC) -c mixed-c.c
+
+
+# Tar up the current directory
+examples.tar: clean
+	(THISDIR=`basename \`pwd\``; cd .. ; tar cf $@ $$THISDIR)
+	mv ../$@ .
+
+%.gz: %
+	gzip -9 $<
+
+configure: config/configure.in
+	autoconf $< >$@
+	chmod 755 configure
+
+tidy:
+	rm -f *~ core gmon.out timewaster.gprof *.gz
+
+clean: tidy
+	rm -f *.o $(EXECS)
