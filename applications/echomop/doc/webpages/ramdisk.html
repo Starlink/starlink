@@ -1,0 +1,78 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP ramdisking
+</TITLE>
+</HEAD>
+
+<BODY>
+<HR>
+<H1>Echomop reductions using a ramdisk</H1>
+<HR>
+
+I've been doing a little experimenting with ECHOMOP on our alphas.
+<P>
+
+We found that when one user is running an echelle data reduction job this
+takes a fair while, and that the machine is very slow for all other users
+(You can type faster than the machine can echo the characters...).  This
+appears to be because the echelle process is spending a lot of time in WAIT
+states while accessing data on disk.
+<P>
+
+I've run a single reduction (options 1 to 8 in ECHOMOP) in a few different
+configurations: with data on a local disk, with data on an nfs mounted disk
+and with data on a local RAM disk.  The data were all 1024x512 pixel CCD
+frames.
+<P>
+
+These are the results:
+<P>
+
+Machine: zuaxp0, DEC Alpha 2000/300, OSF/1 v3.2.
+
+<PRE>
+Data location  U.CPU  S.CPU  Elapsed  %CPU
+Remote disk      73    156    20:20     19
+Local disk       85    113    13:54     23
+RAM disk         71     95     4:32     60
+</PRE>
+
+These were one-off tests with the echelle job being the only "CPU-hungry"
+user process (I did the timed tests one evening).
+<P>
+
+It's clear that running with data on a local disk instead of remote saves
+time - as you would expect.
+<P>
+
+The RAM disk used was 50Mbytes - more than enough for a single dataset of
+this type.  We found that apart from the faster echelle reduction process
+the general performance of the machine for other users was "better" when
+using the RAM disk.  Of course, this depends what everyone else is doing at
+the time...
+<P>
+
+Some extra time should be added for copying the dataset to and from the
+ram disk (&lt;3s CPU time, &lt;30s elapsed time) and the CPU time required by
+the mount_mfs process which runs the ramdisk (~25% of the echelle CPU time).
+<P>
+
+It's not at all difficult to set up a ramdisk on the alphas - Adrian did so
+in a couple of minutes.  Anyone using ECHOMOP (especially using it a lot)
+may like to experiment with a ramdisk at their site.
+<P>
+
+<A HREF="echelle.html">Go back</A> to the EDR home page.
+<P>
+
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc</A>@<A
+   HREF="http://www.star.ucl.ac.uk/">star</A>.<A
+   HREF="http://www.ucl.ac.uk/">ucl</A>.ac.uk</A><BR>
+Thu May 04 16:27:00 BST 1995
+</ADDRESS>
+
+</BODY>
+</HTML>

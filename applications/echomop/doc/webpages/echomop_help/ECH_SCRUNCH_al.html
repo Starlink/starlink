@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_SCRUNCH_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_SCRUNCH_A.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ Setup/Examine mode variables
+ Loop through orders
+    Initialise output arrays
+    If interpolating between two wavelength scales then
+       Calculate interpolated wavelength scale
+    Else calculate wavelength scale
+    End if
+    If not a global scale then fill up relevant section of
+    'wavelength_scale'
+    Initialise this orders' start/end bin indices
+      Loop through wavelength scale array
+       If less than first scrunched wavelength, set min index
+       If less than last scrunched wavelength, set min index
+      End loop
+    Set wavelength scale indices for order
+    Rebin order spectrum into new wavelength scale
+    Re-initialise output arrays
+    Loop through limits of wavelength scale for this order
+       Copy scrunched data/scale into output arrays
+    End loop
+    Re-initialise output arrays
+    Loop through limits of wavelength scale for this order
+       Copy scrunched variance/scale into output arrays
+    End loop
+    Re-initialise output arrays
+    Loop through limits of wavelength scale for this order
+       Copy scrunched variance/scale into output arrays
+    End loop
+    Merge scrunched order into 1d spectrum if enabled
+ End loop
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_SCRUNCH_A.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_FFIELD_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_FFIELD.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ If order trace polynomial is active (order in use) then
+    Initialise flat field balance model to unity everywhere
+    Calculate order trace path across frame
+    If input frame already contains balance factors then
+       Copy balance factors into model arrays
+    Else if both polynomial num-coeffs are zero, or reject threshold is 0
+    then
+       Leave all balance factors set to unity
+    Else
+       If y polynomial fitting is enabled then
+          Loop through profile subsampling at 10 samples per pixel
+             Sum nearest (good) pixels along order
+          End loop
+          Loop while re-fit required
+             If not interactive clear re-fit flag now
+             Fit the X polynomial to subsampled profile
+             If interactive fitting then
+                Plot fit and original data
+                Get user input option
+             End if
+          End loop
+          Calculate xfit balance factors (from spatial profile fit)
+       End if
+       If x polynomial fitting is enabled (degree&gt;0) then
+          Loop Loading arrays for polynomial fit to spectral dependence
+          of flat field at offset 'ioff' from trace centre
+             Loop through x coords along order trace path at offset 'ioff'
+                If pixel ok then add to sum
+             End loop
+             Loop while re-fit flag set
+                If not interactive, then clear re-fit flag now
+                If polynomial degree &gt; 1 then
+                   Fit the wavelength direction data with a polynomial
+                Else if poly degree is 1 then
+                   Model the flat field using local averages (NOT global
+                   average)
+                End if
+                If interactive fitting is required then
+                   Plot data and fit with appropriate title
+                   Get user option input
+                End if
+             End loop
+             Calculate yfit balance factors
+             Loop through x pixel coordinates
+                If pixel within frame boundaries then
+                   If good pixel then
+                      Calculate balance factor from fits
+                      If flat field error was supplied then use it
+                      (scaled appropriately) else estimate variance
+                   Else set negative balance factor
+                   End if
+                End if
+             End loop
+             Final check sets any zeros or negative values in balance
+             factors to 1.
+          End loop
+          Report any non-positive pixels
+          Report any hugely deviant pixels
+       End if
+    End if
+ Else that warn order is disabled
+ End if
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_FFIELD.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:44 1995
+</ADDRESS>
+</BODY>
+</HTML>

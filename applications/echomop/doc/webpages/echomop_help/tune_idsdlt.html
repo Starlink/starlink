@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_idsdlt.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_IDSDLT</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_IDSDLT=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ Specifies the starting number of neighbouring features (on EACH
+ side) to examine when generating ratios for matching.  Increasing
+ this will lead to exponential increases in CPU time, so it should
+ be used with caution when all else fails.
+<P>
+ Higher values are tried automatically by the program if no solution
+ can be found.  The number of neighbours considered is increased
+ monotonically until it reaches the maximum of TUNE_IDMDLT, when the
+ program gives up.
+<P>
+ The default value is 3.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:51 1995
+</ADDRESS>
+</BODY>
+</HTML>

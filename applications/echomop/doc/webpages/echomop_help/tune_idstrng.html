@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_idstrng.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_IDSTRNG</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_IDSTRNG=_REAL</H3>
+<H2>Description</H2>
+<P>
+ Specifies the minimum strength of features to be used for initial
+ identification.  It is specified by relating the strength of a
+ feature to that of the strongest feature present in that order.
+ Any features of strength max/TUNE_IDSTRNG or greater, will be
+ included in the initial set.
+<P>
+ The default value is 10.0, thus all features which are at least one
+ tenth as strong of the strongest feature will be eligible for
+ identification.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:51 1995
+</ADDRESS>
+</BODY>
+</HTML>

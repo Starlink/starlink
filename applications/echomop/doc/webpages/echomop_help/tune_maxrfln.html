@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_maxrfln.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_MAXRFLN</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_MAXRFLN=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ Set to the maximum number of reference lines per order which are
+ allowed.  This parameter is used to dimension objects in the
+ reduction structure file and should not normally need to be
+ altered.  Some users may feel tempted to lower it to avoid the
+ seeming profusion of 'false' line candidates produced by
+ ECH_LINLOC.  This is not a good idea if the automatic line
+ identification mode is being used because it requires the presence
+ of faint feature positions if it is to operate reliably.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:51 1995
+</ADDRESS>
+</BODY>
+</HTML>

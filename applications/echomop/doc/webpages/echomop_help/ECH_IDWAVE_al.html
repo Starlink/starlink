@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_IDWAVE_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_IDWAVE.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ Zero any unused coefficients
+ Check for possible order id number generation (also provides
+ search limits)
+ If failed, then try a guesstimate based on central order number and
+ wavelength
+ End if
+ If mode is automatic identification/fitting then
+    Loop processing orders in order of increasing distance from the
+         middle of the frame
+       If middle order, or nth order above middle is present then
+          If good status, generate wavelength scale values
+       End if
+       If NOT middle order AND nth order below middle is present then
+          If good status, generate wavelength scale values
+       End if
+       If we have processed 3+ orders then
+          Re-Check for possible order number determinations
+       End if
+    End loop
+ Else
+    Loop until user selects the EXIT/QUIT options
+          If good status, generate wavelength scale values
+          Re-Check for possible order number determinations
+    End loop
+ End if
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_IDWAVE.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,113 @@
+<HTML>
+<HEAD>
+<TITLE>New Features in ECHOMOP Version 3.3-0</TITLE>
+</HEAD>
+
+<BODY>
+<HR>
+<H1>ECHOMOP Version 3.3-0</H1>
+<HR>
+
+This page lists the changes made to ECHOMOP between the current release
+<A HREF="echomop_v320.html">version 3.2-0</A>, and the next release version 
+3.3-0.
+<P>
+
+<B>
+This will be an interim release of ECHOMOP.
+<P>
+
+This file will often be updated as and when fixes and changes are
+implemented, until version 3.3-0 is made available for release.
+Contact <A HREF="mailto:mjc@star.ucl.ac.uk">Martin Clayton</A> if you
+need access to a fixed version of ECHOMOP prior to the release.
+<P>
+</B>
+
+<UL>
+<LI><A HREF="echelle.html">Go back</A> to the EDR home page.
+<LI><A HREF="#ECHOMOPBUGFIX">Go forward</A> to a list of
+     bug fixes in this version of ECHOMOP.
+</UL>
+
+<H2><IMG SRC="gifs/ball.green.gif" ALT="o"> New features</H2>
+<UL>
+<LI>The output option (Option 14) can now produce DIPSO stacks of
+   echelle data.  For example, to output a stack called 'ECHOMOP_STK.sdf'
+   containing the extracted object orders:
+
+<PRE>
+   % ech_result result_format=stack result_type=extobj stack=ECHOMOP
+</PRE>
+
+   See the on-line HELP for more details.
+<LI>When writting an ASCII file in Option 14 the name of the file can
+   now be changed by setting the parameter ASCII_FILE.
+<LI>In the plotter, the ASCII-dump option now produces a files which
+   DIPSO SP2RD can read.  The output filename is no longer fixed.
+</UL>
+
+<H2><IMG SRC="gifs/ball.green.gif" ALT="o"> Other changes</H2>
+<UL>
+
+<LI>The Thorium-Argon arc-line list and database have been expanded.
+<LI>A line list and database for Thorium-Neon arcs has been added.
+   The relevant files are THNE.ARC and THNE.sdf.
+<LI>An extra line has been added to the Copper-Argon line list and 
+   database.
+<LI>Non-standard PGPLOT calls have been removed from the source code.
+   This will lead to a minor performance improvement.
+<LI>Deferred PGPLOT errors (which would be reported on exit from
+   ECHOMOP) have been removed.
+<LI>HELP is now available within the plotter task.
+
+</UL>
+
+<H2><A NAME=ECHOMOPBUGFIX><IMG SRC="gifs/ball.green.gif" ALT="o"> Bug fixes</A></H2>
+<UL>
+
+<LI>The program now reports an error when unable to successfully
+   access an input file.  The program reprompts the user.
+   Previously the program would crash when trying to use "unaccessed"
+   data.
+<LI>The "Path syntax" in the plotter is now correctly displayed.
+<LI>In browse mode in the plotter SPLINE traces are now supported.
+   Previously POLY was assumed with unpredictable side-effects.
+<LI>Limits in plotter browse mode are now correctly enforced, avoiding
+   common crashes.
+<LI>All advertised style options in the plotter now work.
+<LI>A bug in Option 3 (Trace clip), which would decrease the number of
+   knots for a SPLINE fit by 2 on each invocation, has been removed.
+<LI>In Option 14 (Output results) the OSPECT output product can now
+   be used without causing a crash.
+<LI>The conversion from air to vacuum wavelengths enabled by
+   TUNE_AIRTOVAC is applied to the output data file when requested.
+   Previously, the correction was applied to the reduction database
+   wavelengths, not to the output file.
+
+</UL>
+
+Please report bugs in v3.3-0 <B>only </B>to
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A>.
+<P>
+
+Please report bugs in v3.2-0 to
+<A HREF="mailto:ussc@star.rl.ac.uk,mjc@star.ucl.ac.uk">ussc@star.rl.ac.uk
+and mjc@star.ucl.ac.uk</A>.
+<P>
+
+<A HREF="echelle.html"> Go back</A> to the EDR home page.<P>
+
+<IMG SRC="gifs/pparc2.gif" ALT="|PPARC|">
+&copy; 1996-1997 Particle Physics &amp; Astronomy Research Council.
+<P>
+
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc</A>@<A
+   HREF="http://www.star.ucl.ac.uk/">star</A>.<A
+   HREF="http://www.ucl.ac.uk/">ucl</A>.ac.uk</A><BR>
+Fri Apr 18 18:30:00 BST 1997
+</ADDRESS>
+</BODY>
+</HTML>

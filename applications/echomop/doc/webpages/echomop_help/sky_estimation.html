@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Sky_estimation.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Sky Estimation</H2><HR>
+<P>
+ The sky intensity may be modeled using a poly/spline at each
+ increment along the order. The degree of the polynomials is tunable
+ and by default is set to 0 to obtain the 'mean' sky behavior.
+<P>
+ The use of polynomials of higher degree is useful when there is a
+ significant gradient to the sky intensity along the slit, as the
+ polynomials are used to predict the sky intensity at each object
+ pixel in the order independently. Note that the meaning of
+ 'increment' differs between regular and 2D distortion corrected
+ extractions.
+<P>
+ For a simple extraction an increment is a single pixel column. For
+ a 2D extraction each increment is a scrunched wavelength scale
+ unit, thus ensuring the accurate modeling of distorted bright
+ emission lines in the sky.
+<P>
+ The determination of which pixels are sky pixels is done using the
+ masks determined by the profiling task/option. These masks can be
+ freely edited to cope with any special requirements as to which
+ regions of the slit are to be used for the sky.
+<P>
+ This facility is of particular use when processing frames where
+ 'periscopes' have been used to add in 'sky' regions when observing
+ an extended source. In such cases ECHOMOP currently provides no
+ special treatment and the periscope sky pixels' positions will have
+ to be edited into the sky mask using the ECH_SPATIAL task/option.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:46 1995
+</ADDRESS>
+</BODY>
+</HTML>

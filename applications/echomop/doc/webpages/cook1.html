@@ -1,0 +1,81 @@
+<HTML>
+<HEAD>
+<TITLE>PREPRUN - for echelle data reduction</TITLE>
+</HEAD>
+
+<BODY>
+<HR>
+<H1>PREPRUN - for echelle data reduction</H1>
+<HR>
+
+<FORM ACTION="http:" METHOD="POST">
+
+<B>ECHOMOP reduction strcuture</B><BR>
+<INPUT SIZE=32 TYPE=TEXT NAME="rdf">
+<P>
+
+<B>CCD Noise</B><BR>
+<INPUT SIZE=32 TYPE=TEXT VALUE="0" NAME="noise">
+<P>
+
+<B>CCD Gain</B><BR>
+<INPUT SIZE=32 TYPE=TEXT VALUE="1" NAME="gain">
+<P>
+
+<B>Overscan area</B><BR>
+<INPUT SIZE=32 TYPE=TEXT NAME="overscan">
+<P>
+
+<B>Image area</B><BR>
+<INPUT SIZE=32 TYPE=TEXT NAME="image">
+<P>
+
+Enter lists of files in each box - these will then be editted into the PREPRUN
+script for you.  Note that I can't check wildcards!  You may as well supply
+full filename lists.  Separate the filenames with spaces or newlines, 
+not commas.  This means you can't have a space in a filename - sorry!
+<P>
+
+<B>Bias frames</B><BR>
+<TEXTAREA NAME="bias" ROWS=2 COLS=32></TEXTAREA><BR>
+<P>
+
+<B>Flat-field frames</B><BR>
+<TEXTAREA NAME="flat" ROWS=2 COLS=32></TEXTAREA><BR>
+<P>
+
+<B>Object frames</B><BR>
+<TEXTAREA NAME="objs" ROWS=2 COLS=32></TEXTAREA><BR>
+<P>
+
+<B>Arc frames</B><BR>
+This field works slightly differently to the others -
+put one arc file per line with the corresponding mask file on the same line;
+for example
+
+<PRE>
+arc012 obj013
+arc014 obj013
+</PRE>
+
+<TEXTAREA NAME="arcs" ROWS=2 COLS=32></TEXTAREA><BR>
+<P>
+
+<INPUT type=submit value="  Submit Script  ">
+<INPUT type=reset value="  Reset Form  ">
+
+</FORM>
+
+<IMG SRC="gifs/pparc2.gif" ALT="|PPARC|">
+Copyright 1995 Particle Physics &amp; Astronomy Research Council.<P>
+
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc</A>@<A
+   HREF="http://www.star.ucl.ac.uk/">star</A>.<A
+   HREF="http://www.ucl.ac.uk/">ucl</A>.ac.uk</A><BR>
+Fri Jun 21 17:15:00 BST 1996
+</ADDRESS>
+
+</BODY>
+</HTML>

@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_SKY_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_SKY.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ If order has a valid trace then
+    Ensure photon conversion factor is reasonable
+    Zero sky model and variance arrays
+    If polynomial degree is &lt; 0 then default is to leave sky=0
+    everywhere
+    Else
+       Calculate order trace coordinates
+       If x polynomials to be used then
+          Loop through offsets above/below order trace
+             If a sky pixel offset then collect sky data
+                Fit the wavelength polynomial
+                Calculate deviations from fit
+                Set initial sky model to fitted values
+             End if
+          End loop
+       End if
+       Compute number of sky pixels available for fit
+       Initialise counters etc
+       Loop through increments in wavelength direction
+          Load sky data into arrays for poly-fit at this increment
+          Fit polynomial by least squares
+          Apply KDH scaling
+          Apply the pixel rejection criterion (Poisson)
+          Only one pixel at a time is rejected.
+          Evaluate and stow the sky polynomial over the object region
+          Report pixel rejects
+       End loop
+    End if
+ End if
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_SKY.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Bad_order.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>BAD_ORDER</H2><HR>
+<H2>Usage</H2>
+<H3>BAD_ORDER=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ Specify which order is to be disabled from further processing.  The
+ default is set to zero; so if a mistake is made then attempting to
+ disable order zero will cause no damage.  Orders are disabled by
+ writing the 'bad value' quantity into the first coefficient of the
+ trace polynomial.  This ensures that they also appear disabled to
+ any other tasks (almost all of which will need the trace info).  To
+ re-enable an order it must therefore have a polynomial re-fitted to
+ its traced-centre samples.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:48 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_COUNT_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_COUNT.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ Loop through all rows of input frame summing within the sampling
+ box, and convolving with a 5 pixel triangle function
+<P>
+    Loop through pixels in sample box and convolve summed row values
+    with the triangle function
+     If any good pixels, convolve sum with triangle filter
+    End loop
+ End loop
+<P>
+ Calculate autocorrelation function for all pixel separations
+ up to one third the y dimension of the input frame.
+ Normalise autocorrelation
+ Smooth autocorrelation
+<P>
+ Loop through autocorrelation array
+     If this is a local peak, and larger than any previous peak in
+     magnitude, then check its independence
+         If first peak found then remember its position
+         Else check its independence by insisting that its position
+         is not within +/- 1.5 pixel-units of a multiple of the
+         previously selected peak.
+          New peak found, remember where
+         End if
+     End if
+ End loop
+ Convolve central region of frame and find peaks
+ plot up a graph of the convolved central section and let the
+ user select the order centres with a cursor
+    Plot graph and loop gathering cursor positions until the user
+    types a 'Q' to finish
+ Check possible partial orders by using 'slope' and top/bottom
+ order position estimates
+ Check for partial orders parallel to detector rows
+ Setup result for caller
+    Setup the parameter NUM_ORDERS to reflect the number found
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_COUNT.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:44 1995
+</ADDRESS>
+</BODY>
+</HTML>

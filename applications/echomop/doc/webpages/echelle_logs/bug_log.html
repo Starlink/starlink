@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>ECHOMOP: Bug Report Log</TITLE>
+</HEAD>
+
+<BODY>
+<HR>
+<H1>ECHOMOP Reported Bugs</H1>
+<HR>
+
+This is a link to <A HREF="../echelle_bugs.html"> go back </A> to the
+bug report page.
+<HR>
+
+<H3><IMG SRC="../gifs/ball.green.gif" ALIGN=TOP ALT="o">
+    Bug Report at: Thu 29 Feb 1996 19:49:30 GMT</H3>
+<PRE>
+From: Martin Clayton
+Email: mjc@star.ucl.ac.uk
+Version: 3.1-0
+Operating system: Digital UNIX (all)
+
+<B>Bug synopsis:</B>
+   $ADAM_USER not defined by echomopsetup.
+
+<B>Severity:</B>
+   Usability problem
+
+<B>Bug description:</B>
+   The environment variable $ADAM_USER is not defined by the
+   ECHOMOP setup procedure.  This appears to be used to locate
+   structure files and so on.
+
+<B>Bug replication method:</B>
+   Just start ECHMENU...the error message appears.
+
+<B>Workaround:</B>
+   % setenv ADAM_USER ${HOME}/adam
+
+   does the trick.
+
+</PRE>
+
+<B>Status:</B><BR>
+This will be fixed in the next fix release of ECHOMOP.
+
+<HR>
+
+This is a link to <A HREF="../echelle_bugs.html"> go back </A> to the
+bug report page.
+<P>
+
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc</A>@<A
+   HREF="http://www.star.ucl.ac.uk/">star</A>.<A
+   HREF="http://www.ucl.ac.uk/">ucl</A>.ac.uk</A><BR>
+Thu Feb 29 19:55:00 GMT 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_EXTRCT_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_EXTRCT.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ Exit right away if the order is disabled
+ Initialise spectrum
+ Check balance model for naff values
+ Report characteristics of extraction selected
+ Estimate the spatial extent in pixels
+ Set appropriate subsampling rate
+ Calculate object limits above and below order trace
+ Abort if no pixels marked as object
+ If only a single object pixel and not 'simple' extraction,
+ default to it
+ Check for profile weighted extraction selected
+ Warn user if X-profile modeling is active
+ Calculate coordinates of order trace across frame
+ If simple extraction required then do it
+ Else
+    Calculate sky co-variance matrix
+    Loop through wavelength increments
+       Extract data at this increment and estimate variance
+       Initial estimate of the spectrum is a normal sum across the
+       profile.
+       If profile weighted extraction then do it
+       Else
+          If Reject cosmic rays then do it
+          Else If not cosmic ray zapping, just give normal weighted
+          estimate, with an extra loop to refine the variances.
+          End if
+       End if
+       Apply ADU to photon scaling to get counts in photons
+    End loop
+ End if
+ Report on any bad pixels excluded from the extraction
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_EXTRCT.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:44 1995
+</ADDRESS>
+</BODY>
+</HTML>

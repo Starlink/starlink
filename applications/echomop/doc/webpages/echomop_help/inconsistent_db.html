@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Inconsistent_db.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Inconsistent_db</H2><HR>
+<P>
+ The program has detected a potential inconsistency between the .ARC
+ file and the .FDB database file for the arc line list specified by
+ the user. The database is generated using the .ARC list and
+ includes a specification of the location of the list used within
+ it. The most likely cause is that although the list has not been
+ changed, it has been moved to a new location. In this case there is
+ no need to re-generate the database. A task will be provided to
+ update the databases' arc list reference  for this case (future).
+<P>
+ If the arc line list HAS been changed, then it is necessary to
+ regenerate the .FDB database file before proceeding. This is a very
+ CPU intensive task and the user may prefer to perform it in batch
+ using the supplied command file ECH_MAKE_FDBS. Note that if the arc
+ line list is a standard one then the system manager will need to be
+ asked to perform the operation.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:47 1995
+</ADDRESS>
+</BODY>
+</HTML>

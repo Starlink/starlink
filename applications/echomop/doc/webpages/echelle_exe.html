@@ -1,0 +1,111 @@
+<HTML>
+<HEAD>
+<TITLE>ECHOMOP v3.3-0 prerelease</TITLE>
+</HEAD>
+
+<BODY>
+<HR>
+<H1>ECHOMOP version 3.3-0 pre-release</H1>
+<HR>
+
+This page contains links to the available test versions of ECHOMOP and
+to copies of the new arc line database files THAR.sdf and THAR.ARC.
+<P>
+
+This build is likely to be the one included on the forthcoming Starlink
+CD.
+See the <A HREF="echomop_v330.html">notes on changes</A> for this version.
+<P>
+
+<B>Please note that</B>, there may well be changes made to these before they 
+are made available in the Starlink Software Collection.
+<P>
+
+<H3>New arc line databases</H3>
+
+This is a minor change for anyone interested.  The revised databases 
+contain some lines missing in earlier versions; the lines have been 
+added from the Figaro line lists.
+<P>
+
+The Thorium-Neon database was supplied by Michael Albrow.
+
+<UL>
+
+<LI><A HREF="ftp://ftp.star.ucl.ac.uk/pub/mjc/echomop/THAR.sdf.gz"
+     >THAR.sdf.gz</A> Thorium-Argon database.
+<LI><A HREF="ftp://ftp.star.ucl.ac.uk/pub/mjc/echomop/THAR.ARC.gz"
+     >THAR.ARC.gz</A> Thorium-Argon line list.
+<LI><A HREF="ftp://ftp.star.ucl.ac.uk/pub/mjc/echomop/THNE.sdf.gz"
+     >THNE.sdf.gz</A> Thorium-Neon database.
+<LI><A HREF="ftp://ftp.star.ucl.ac.uk/pub/mjc/echomop/THNE.ARC.gz"
+     >THNE.ARC.gz</A> Thorium-Neon line list.
+<LI><A HREF="ftp://ftp.star.ucl.ac.uk/pub/mjc/echomop/CUAR.sdf.gz"
+     >CUAR.sdf.gz</A> Copper-Argon database.
+<LI><A HREF="ftp://ftp.star.ucl.ac.uk/pub/mjc/echomop/CUAR.ARC.gz"
+     >CUAR.ARC.gz</A> Copper-Argon line list.
+</UL>
+
+<H3>Pre-release ECHOMOP versions available</H3>
+
+<LI><A 
+HREF="echomop_alpha_OSF1_alpha.tar.Z">echomop_alpha_OSF1_alpha.tar.Z</A> -
+      Digital UNIX version.
+<LI><A 
+HREF="echomop_sun4_Solaris_alpha.tar.Z">echomop_sun4_Solaris_alpha.tar.Z</A> - 
+      Solaris version.
+<LI><A 
+HREF="echomop_ix86_Linux_alpha.tar.Z">echomop_ix86_Linux_alpha.tar.Z</A> - 
+      Linux version.
+
+<H3>Instructions for setting up the test versions</H3>
+
+<UL>
+
+<LI>Copy the .Z file to an empty directory where you will "install" the
+    test version.  You need about 9 Mbytes for the completed installation,
+    up to 17 Mbytes are needed during the installation procedure.
+    <P>
+
+<LI>Uncompress and extract the archive, e.g.:
+
+<PRE>
+   % zcat echomop_*_alpha.Z | tar xvf -
+</PRE>
+
+<LI>To make the installation:
+
+<PRE>
+   % make alphainstall
+</PRE>
+
+</UL>
+
+<H3>Using the test version</H3>
+
+You will be able to setup for using the test version of ECHOMOP by
+"source"ing the file echalpha.csh in the installation directory.
+<P>
+
+<B>NOTE:</B> you have to run the standard Starlink "echomopsetup" prior to
+the test-version set up as the test version still uses datafiles from the
+standard installation.
+<P>
+
+Once you have the test version set up you can use "echomop" to get back
+to the Starlink release and "echalpha" to get to the test version.
+<P>
+
+<IMG SRC="gifs/pparc2.gif" ALT="|PPARC|">
+&copy; 1995-1997 Particle Physics &amp; Astronomy Research Council.<P>
+
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc</A>@<A
+   HREF="http://www.star.ucl.ac.uk/">star</A>.<A
+   HREF="http://www.ucl.ac.uk/">ucl</A>.ac.uk</A><BR>
+Tue Jul 22 15:05:00 BST 1997
+</ADDRESS>
+
+</BODY>
+</HTML>

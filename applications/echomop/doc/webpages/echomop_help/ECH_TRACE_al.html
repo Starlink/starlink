@@ -1,0 +1,120 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_TRACE_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_TRACE.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ If 'U' mode (user supplied coords) selected, use next character
+       Fit a polynomial
+ If 'R' mode (re-traceing using old poly)  selected, use next character
+    Use old coefficients
+ If 'A' mode (automatic switching) selected, use next character
+    Check for 'T' mode also set
+ Else if 'T' mode (triangle filtering) selected, use next character
+    Check for 'A' mode also set
+ End if
+ Determine mode G,E,B or C (default) flags
+ Setup x increment per sample, and initial y coord of trace at frame centre
+ Loop progressively stepping out (-x_step) pixels further from the centre
+ column
+    If still tracing left hand extent then
+       Loop trying to determine centre
+          Calculate mean/median over sample row/columns
+          If triangle filtering is enabled then apply it now
+          End if
+          Find centre of sampled mean/median intensity profile
+          If we failed to get a reliable centre value then
+             If automatic mode switching is enabled then
+                Select next least stringent mode and try again
+             End if
+          End if
+          If still no centre found then increase sampling box
+             If sampling box now too large, set bad sample flag
+          Else set centre found flag
+          End if
+       End loop
+       Check that this centre is near enough to the last one found
+       If a good centre was obtained then
+          Set current centre to nearest pixel
+          Add coords to arrays of fitable coordinates
+       Else if a bad sample then
+          increment bad-sample count and terminate
+          leftwards scan if too many bad-samples
+          (>max_bad_samples consecutive)
+          Estimate new centre of trace using old position and slope
+          If user supplied coords have supplied an estimated trace or
+          re-tracing then
+       End if
+    End if
+ End loop
+ Loop progressively stepping out (+x_step) pixels further from the centre
+ column
+    If still tracing right hand extent then
+       Loop trying to determine centre
+          Calculate mean/median over sample row/columns
+          If triangle filtering is enabled then apply it now
+          End if
+          Find centre of sampled mean/median intensity profile
+          If we failed to get a reliable centre value then
+             If automatic mode switching is enabled then
+                Select next least stringent mode and try again
+             End if
+          End if
+          If still no center found then increase sampling box
+             If sampling box now too large, set bad sample flag
+          Else set centre found flag
+          End if
+       End loop
+       Check that this centre is near enough to the last one found
+       If a good centre was obtained then
+          Set current centre to nearest pixel
+          Add coords to arrays of fitable coordinates
+       Else if a bad sample then
+          increment bad-sample count and terminate
+          rightwards scan if too many bad-samples
+          (>max_bad_samples consecutive)
+          Estimate new centre of trace using old position and slope
+          If user supplied coords have supplied an estimated trace or
+          re-tracing then
+       End if
+    End if
+ End loop
+ Report result, and test for the case where the spectrum
+  could not be traced at all.
+  If not enough 'good' centres found then
+     Default to straight line description of order trace
+  Else
+     Save the traced points for later re-fitting
+     Fit a polynomial
+     And save the coefficients
+     Calculate deviations from fit
+     Overlay path of initial fit to trace on image if possible
+     Report traced range to user
+  End if
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_TRACE.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

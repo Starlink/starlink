@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_LOCATE_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_LOCATE_A.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ If automatic order location is being tried then
+    Convolve central region of frame and find peaks
+ Else transfer user specified positions from graphics routine common
+ End if
+ Check possible partial orders by using 'slope' and top/bottom
+ order position estimates
+ Check for partial orders parallel to detector rows
+ Exit now if no orders were counted
+ Estimate order size to be used as a box size for tracing
+ Loop through located orders
+    Loop through central three columns
+       Get order peak (assumed) pixel value
+       If reasonable (>0) value find object edges (approx)
+          Loop stepping out from order towards top/bottom of frame
+            If not found upper edge yet, and still in frame, then
+                If pixel intensity has dropped below peak intensity times
+                a threshold value (default 90%) then
+                    Store upper limit
+                End if
+            End if
+            If not found lower edge yet, and still in frame, then
+                If pixel intensity has dropped below peak intensity times
+                a threshold value (default 90%) then
+                    Store lower limit
+                End if
+            End if
+          End loop
+          If we found both an upper and lower limit for this order
+          column combination then
+             Add estimate to sum of estimates so far
+          End if
+       End if
+    End loop
+ End loop
+ If we found any estimates at all, work out the average value
+ Else default the trace width estimate to the average order separation
+ End if
+ Setup result for caller
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_LOCATE_A.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

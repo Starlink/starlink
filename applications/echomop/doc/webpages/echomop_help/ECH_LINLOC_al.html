@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_LINLOC_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_LINLOC_A.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ Loop through each order in turn
+   If a good trace polynomial is available for this order then
+     Calculate the order trace
+     Clear result and workspace arrays
+     Loop through all x increments (following order trace)
+        Loop from 1 pixel below trace to 1 pixel above trace
+          If pixel is within frame limits then add value to average
+        End loop
+        Calc average of the 3 pixels sampled
+     End loop
+     Copy estimated reference spectrum into  reduction object if empty
+     Loop through reference spectrum
+        If a local minimum at this pixel then store its value
+        Else store a flag
+        End if
+     End loop
+     Extend edge values for either end of the continuum
+     Set pointer to beginning of continuum array
+     Loop until end of array reached
+        If current continuum entry is a FLAG then
+           Remember start point and continue stepping through continuum
+                     array until a non FLAG value is reached
+           Replace FLAG value by their nearest non-FLAG neighbour in
+                             the continuum array
+        Else leave value as it is, and step to next entry
+        End if
+     End loop
+     Smooth the continuum array with a 3 pixel average, replacing
+          any values which exceed the original sample value, with
+          the original sample. Repeat process.
+     Multiply by reference threshold factor, continuum then holds the
+           level at each pixel which any line candidate must exceed
+     Plot the spectrum, and the continuum
+     Smooth line spectrum in the x direction by a 3 pixel average
+     Set FLAGs array, FLAG replaced by intensity when a line peak is
+     suspected
+     Loop  repeatedly locating maximum peak
+        Loop through spectrum in x (ignoring end few pixels)
+           If no flagged values in local set of 5 then
+            If local values form a smooth peaked set then
+              If highest peak so far, record it
+            End if
+           End if
+        End loop
+        If a peak has been located then
+            Loop through neighbouring entries, flagging them as 'used'
+            End loop
+        End if
+     End loop
+     Loop through flag/values recording the remaining values, each one
+          being a local peak as established above
+         If  entry is not a flag then
+            If value exceeds line/continuum avg_spectrum (user tunable)
+            then
+              Increment located line counter, and save its
+              position/intensity
+            End if
+         End if
+     End loop
+     Fit Gaussian to all candidates, rejecting the badly fitting ones
+     Count number of successfully fitted lines
+     Add positional indicators to graph for line candidates
+     Report number of lines found in this order
+   End if
+ End loop
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_LINLOC_A.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

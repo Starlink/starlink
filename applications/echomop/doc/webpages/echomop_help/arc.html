@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ARC.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>ARC</H2><HR>
+<H2>Usage</H2>
+<H3>ARC=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ Specifies an input structure.
+<P>
+ The names of all reference images to be used for wavelength
+ calibration must be supplied here.  The number of images should be
+ equivalent to the number specified for parameter NREF_FRAME.  The
+ image names should be separated by commas, for example:
+<P>
+<PRE WIDTH=72>
+    reffrm1,reffrm2
+</PRE>
+<P>
+ Note that in most circumstances there will only be two reference
+ frames.  One taken prior to the object frame, and one subsequently.
+ If you do not wish to provide an arc frame at all then you may reply
+ NONE is response to this prompt or, alternatively set the hidden
+ tuning parameter TUNE_NOARC = YES.  If no arc is provided then the
+ user must provide their own sets of wavelength feature positions, or
+ wavelength scales, IF wavelength calibration is required.
+<P>
+<P>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:48 1995
+</ADDRESS>
+</BODY>
+</HTML>

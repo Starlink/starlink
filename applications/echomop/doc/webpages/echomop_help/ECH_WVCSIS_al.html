@@ -1,0 +1,119 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_WVCSIS_al.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_WVCSIS.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Algorithm</H2><HR>
+<P>
+<PRE WIDTH=72>
+ If less than 3 orders give up now
+  Loop until no more changes necessary (i.e. orders all consistent)
+    Loop through each x increment using order polynomials to predict
+    wavelengths
+       Loop through orders evaluating order specific polynomial
+        If a polynomial is NOT available then flag bad value
+        Else
+          Evaluate wavelength polynomial at x increment,
+          and x+1 increment
+          If x and x+1 samples are in a stable polynomial region then
+             Save order number and wavelength
+          End if
+        End if
+       End loop
+       Fit a polynomial through the order-number/wavelengths
+       Loop evaluating predicted y coordinates for each order at this
+       increment
+          If a good coordinate was obtained then
+             Calculate deviation from one fit to the other and
+             update stats
+          Else use a fake (large) deviation
+          End if
+          Update statistics
+       End loop
+    End loop
+    Calculate mean and standard deviation of differences
+    Loop through x increments
+       Loop through orders evaluating order specific polynomial
+        If a polynomial is NOT available then flag bad value
+        Else
+          Evaluate order polynomial at x increment
+          If x and x+1 samples are in a stable polynomial region then
+             Save order number and y coordinate
+          End if
+        End if
+       End loop
+       Fit a polynomial through the order-number/y-coordinates
+       Loop evaluating predicted y coordinates for each order at this
+       increment
+          Record prediction for order
+          If a valid point obtained from original order polynomial
+          then
+             Calculate difference between the two fits at this
+             increment
+             If point is TOO deviant then use new prediction
+             Else use original prediction
+             End if
+          Else use new prediction
+          End if
+       End loop
+    End loop
+    Report details of deviation between the two types of fit
+    Determine 'worst' order
+    Loop reporting details for each order
+      If 'worst' order AND number of deviating points is significant
+      then
+         Re-fit a polynomial for the order
+         Evaluate new fit and plot it
+         Re-Evaluate old fit and plot it over the top of the new one
+      End if
+     Predict wavelength for feature position
+     Search for nearest matching wavelength in database
+     If match is close enough then
+        Flag feature as identified, use feature strength to as weight
+     End if
+   End loop
+   Fit a polynomial through the feature wavelength/position data
+       If we are in user interactive mode then
+          Decide if user wants to accept/reject the new polynomial fit
+          If user accepts fit, set a modify flag
+          Else if they choose to abandon this order, then ensure it
+               is flagged as inactive
+          Else if - then alter degree of inter-order fit
+          Else if + then alter degree of inter-order fit
+          Else (default) we keep the previous fit
+          End if
+       Else set modification required flag by default
+       End if
+       If order polynomial is to be replaced by the new one, then
+          Zero all coefficients
+          Copy new coefficients
+       End if
+      End if
+     End loop
+  End loop
+ End if
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_WVCSIS.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:45 1995
+</ADDRESS>
+</BODY>
+</HTML>

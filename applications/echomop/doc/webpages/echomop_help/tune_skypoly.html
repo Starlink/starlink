@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_skypoly.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_SKYPOLY</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_SKYPOLY=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ When TUNE_SKYPOLY &gt; 0 it specifies the degree of polynomial to use
+ when trying to fit to the sky intensity at any single constant-x /
+ lambda increment.  These polynomials are used to predict the
+ contributory sky intensity in the object pixels.
+<P>
+ The default value is TUNE_SKYPOLY=0 to obtain sky averaging (i.e.,
+ sky model is constant at each order/column).  Set TUNE_SKYPOLY=-1
+ when there is no sky to be modeled (i.e., sky model is zero
+ everywhere).
+<P>
+ INITIAL SUGGESTED VALUE: 0.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:52 1995
+</ADDRESS>
+</BODY>
+</HTML>

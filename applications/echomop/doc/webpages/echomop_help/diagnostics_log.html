@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Diagnostics_log.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="output_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Diagnostics Log</H2><HR>
+<P>
+ Activating the diagnostics class of event logging (See 'Event log')
+ causes ECHOMOP to produce a very detailed trace of the operations
+ performed during the reduction.  This slows the reduction down
+ substantially and may also occupy a fair amount  of disk space. 
+ Diagnostics should therefore only be enabled when a problem with
+ the software is suspected (or it crashes).
+<P>
+ To create a diagnostics event log, set the TUNE_DIAGNOSE parameter
+ to YES.  Then repeat the operations which led to the problem/crash. 
+ The problem should then be reported using the command
+<P>
+<PRE WIDTH=72>
+    ECH_BUGSWAT
+</PRE>
+<P>
+ which will e-mail the most recent diagnostics and normal event logs'
+ to the package maintainer for investigation.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  4 15:45:48 1995
+</ADDRESS>
+</BODY>
+</HTML>
