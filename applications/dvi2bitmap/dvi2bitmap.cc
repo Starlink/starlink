@@ -147,8 +147,6 @@ int main (int argc, char **argv)
     processing_.set(process_preamble);
     processing_.set(process_postamble);
     
-    bool all_fonts_present = true;
-    bool no_font_present = false;
     PageRange PR;
 
 
@@ -830,6 +828,7 @@ int main (int argc, char **argv)
 	exit(1);
     }
 
+    bool fonts_ok = true;	// are there accumulated font errors?
     try
     {
 	DviFile *dvif = new DviFile(dviname, resolution, magmag,
@@ -843,19 +842,20 @@ int main (int argc, char **argv)
 	    exit(1);
 	}
 
+	bool all_fonts_present = true; // are all expected fonts found?
+
 	if (dvif->haveReadPostamble()) {
 	    all_fonts_present = true;
-	    no_font_present = true;
-
+	    bool no_font_present = true; // are no expected fonts found?
+	    
 	    const DviFile::FontSet* fontset = dvif->getFontSet();
 	    for (DviFile::FontSet::const_iterator ci = fontset->begin();
 		 ci != fontset->end();
 		 ++ci)
 	    {
 		const PkFont *f = *ci;
-		if (f->loaded())
-		{
-		    no_font_present = false;
+		if (f->loaded()) {
+ 		    no_font_present = false;
 		    if (verbosity > normal)
 			cerr << "dvi2bitmap: loaded font " << f->name()
 			     << endl;
@@ -866,7 +866,8 @@ int main (int argc, char **argv)
 		if (show_font_info.test(font_show)) {
 		    bool fld = show_font_info.test(font_long_display);
 		    if (show_font_info.test(font_cmds)) {
-			if (show_font_info.test(font_incfound) || !f->loaded()) {
+			if (show_font_info.test(font_incfound)
+			    || !f->loaded()) {
 			    // If f->loaded() is true, then we're here
 			    // because FONT_INCFOUND was set, so indicate
 			    // this in the output.
@@ -882,8 +883,8 @@ int main (int argc, char **argv)
 				 << endl;
 			}
 		    } else {
-			if (show_font_info.test(font_incfound) || !f->loaded())
-			{
+			if (show_font_info.test(font_incfound)
+			    || !f->loaded()) {
 			    // If f->loaded() is true, then we're here
 			    // because FONT_INCFOUND was set, so indicate
 			    // this in the output.
@@ -908,25 +909,40 @@ int main (int argc, char **argv)
 		    }
 		}
 	    }
+
+	    // Font loading is deemed `successful' if either all the
+	    // fonts are loaded, or failing that, if it's not the case
+	    // that _no_ fonts were loaded.  Note that if there were
+	    // _no_ fonts listed in the postamble (an odd DVI file,
+	    // but not impossible), then both all_fonts_present and
+	    // no_font_present are true, and this expression evaluates
+	    // to true.
+	    fonts_ok = all_fonts_present || !no_font_present;
 	} else {
 	    // haven't read postamble
 	    if (show_font_info.any()) {
 		cerr << "Font information requested, "
 		     << "but DVI postamble suppressed" << endl;
-		no_font_present = true;
+		fonts_ok = false; // deem this an error
 	    } else {
-		all_fonts_present = true; // ...effectively
-		no_font_present = false;
+		fonts_ok = true; // don't know any better
 	    }
 	}
 
 	if (processing_.test(process_dvi)) {
-	    if (no_font_present) { // give up!
-		if (verbosity > silent)
-		    cerr << progname << ": no fonts found!  Giving up" << endl;
+	    if (fonts_ok) {
+		process_dvi_file(dvif, bm, resolution, PR);
 	    } else {
-		process_dvi_file (dvif, bm, resolution, PR);
+		// something's gone wrong -- we'll exit with an error below
+		if (verbosity > silent)
+ 		    cerr << progname << ": no fonts found!  Giving up" << endl;
 	    }
+	} else {
+	    // We were not processing the DVI file, just (presumably)
+	    // the preamble and postamble.  In this case, require that
+	    // _all_ the fonts are present, but if fonts_ok was false
+	    // for some other reason, keep it false.
+	    fonts_ok = fonts_ok && all_fonts_present;
 	}
     }
     catch (DviBug& e)
@@ -940,16 +956,12 @@ int main (int argc, char **argv)
 	    e.print();
     }
 
-    // Exit non-zero if we were just checking the pre- and postambles,
-    // and we found some missing fonts.
-    // Or put another way: exit zero if (a) we were processing the DVI
+    // Exit status depends on the final value of fonts_ok.  The
+    // result of the above logic is (should be) that we
+    // exit zero/success if (a) we were processing the DVI
     // file normally and we found at least one font, or (b) we were
     // just checking the preamble and we found _all_ the fonts.
-    if (no_font_present
-	|| (!processing_.test(process_dvi) && !all_fonts_present))
-	exit (1);
-    else
-	exit (0);
+    exit(fonts_ok ? 0 : 1);
 }
 
 void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
@@ -1472,7 +1484,7 @@ void show_help()
 "  --output=filename-pattern      Specify pattern for output bitmaps",
 "  --output-type=type             Type of output bitmap, cf --query=types",
 "  --paper-size=string            Preset bitmap size, cf --query=paper",
-"  --process=[options-only|preamble-only|blur|transparent|crop]=boolean",
+"  --process=[no][dvi,postamble,blur,transparent,crop]|options",
 "                                 Processing to do",
 "  --query=[missing-fonts|missing-fontgen|all-fonts|all-fontgen|f|F|g|G]",
 "                                 Display missing/present fonts",
