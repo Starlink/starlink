@@ -103,7 +103,7 @@
 
 *  Local Variables:
       CHARACTER*16 		FMT,TYPE
-      INTEGER 			DISP,SIZ,J
+      INTEGER 			DISP,SIZ,J,INDX
 *.
 
 *  Check inherited global status.
