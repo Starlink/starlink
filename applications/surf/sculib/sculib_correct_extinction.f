@@ -1,7 +1,7 @@
 *+  SCULIB_CORRECT_EXTINCTION - correct bolometers for sky opacity
       SUBROUTINE SCULIB_CORRECT_EXTINCTION (SIZE_BOL, N_BOL, BOL_DATA,
      :  BOL_VARIANCE, BOL_QUALITY, BOL_RA, BOL_DEC, LST, LAT_OBS,
-     :  TAUZ, STATUS)
+     :  TAUZ, BADBIT, STATUS)
 *    Description :
 *     This routine corrects bolometer data for the effect of sky opacity.
 *     It does this by calculating the airmass of the point that each
@@ -21,7 +21,7 @@
 *           bolometer data
 *     BOL_VARIANCE (SIZE_BOL)        = REAL (Given and returned)
 *           variance on BOL_DATA
-*     BOL_QUALITY (SIZE_BOL)         = INTEGER (Given)
+*     BOL_QUALITY (SIZE_BOL)         = BYTE (Given)
 *           quality on BOL_DATA
 *     BOL_RA (SIZE_BOL)              = DOUBLE PRECISION (Given)
 *           apparent RA of bolometer (radians)
@@ -33,6 +33,8 @@
 *           latitude of observatory (radians)
 *     TAUZ                           = REAL (Given)
 *           the zenith sky opacity
+*     BADBIT                         = BYTE (Given)
+*           the bit mask
 *     STATUS                         = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -51,12 +53,13 @@
 *    Import :
       INTEGER          SIZE_BOL
       INTEGER          N_BOL
-      INTEGER          BOL_QUALITY (SIZE_BOL)
+      BYTE             BOL_QUALITY (SIZE_BOL)
       DOUBLE PRECISION BOL_RA (SIZE_BOL)
       DOUBLE PRECISION BOL_DEC (SIZE_BOL)
       DOUBLE PRECISION LST
       DOUBLE PRECISION LAT_OBS
       REAL             TAUZ
+      BYTE             BADBIT
 *    Import-Export :
       REAL             BOL_DATA (SIZE_BOL)
       REAL             BOL_VARIANCE (SIZE_BOL)
@@ -77,6 +80,8 @@
       DOUBLE PRECISION Z                     ! zenith disatance (radians)
 *    Internal References :
 *    Local data :
+*    Local function:
+      INCLUDE 'NDF_FUNC'                     ! Bit mask
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -84,7 +89,7 @@
       IF (N_BOL .GT. 0) THEN
 
          DO BOL = 1, N_BOL
-            IF (BOL_QUALITY(BOL) .EQ. 0) THEN
+            IF (NDF_QMASK(BOL_QUALITY(BOL), BADBIT)) THEN
 
 *  calculate the zenith distance and airmass of the bolometer
 
