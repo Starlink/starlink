@@ -1,6 +1,6 @@
 /* GNU m4 -- A simple macro processor
 
-   Copyright (C) 1989, 1990, 1991, 1992, 1993, 1994, 2000 Free
+   Copyright (C) 1989, 1990, 1991, 1992, 1993, 1994, 2000, 2004 Free
    Software Foundation, Inc.
   
    This program is free software; you can redistribute it and/or modify
@@ -767,6 +767,7 @@ m4_esyscmd (struct obstack *obs, int argc, token_data **argv)
     return;
 
   debug_flush_files ();
+  errno = 0;
   pin = popen (ARG (1), "r");
   if (pin == NULL)
     {
@@ -1081,6 +1082,7 @@ m4_maketemp (struct obstack *obs, int argc, token_data **argv)
   int fd;
   if (bad_argc (argv[0], argc, 2, 2))
     return;
+  errno = 0;
   if ((fd = mkstemp (ARG (1))) < 0)
     {
       M4ERROR ((warning_status, errno, "Cannot create tempfile %s", ARG (1)));
