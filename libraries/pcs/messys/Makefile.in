@@ -54,7 +54,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES = component.xml
-am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(starhelpdir)
+am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(starhelpdir) $(DESTDIR)$(includedir)
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libmessys_adam_la_LIBADD =
@@ -80,13 +80,12 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libmessys_adam_la_SOURCES)
 DIST_SOURCES = $(libmessys_adam_la_SOURCES)
+starhelpDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(starhelp_DATA)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-starhelpSTARDATA_INSTALL = $(INSTALL_STARDATA)
-STARDATA = $(starhelp_STARDATA)
-INSTALL_STARDATA = $(INSTALL_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -149,7 +148,10 @@ PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
-PACKAGE_VERSIONINT = @PACKAGE_VERSIONINT@
+PACKAGE_VERSION_INTEGER = @PACKAGE_VERSION_INTEGER@
+PACKAGE_VERSION_MAJOR = @PACKAGE_VERSION_MAJOR@
+PACKAGE_VERSION_MINOR = @PACKAGE_VERSION_MINOR@
+PACKAGE_VERSION_RELEASE = @PACKAGE_VERSION_RELEASE@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
@@ -203,7 +205,9 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-starhelp_STARDATA = @starhelp_STARDATA@
+stardocsdir = @stardocsdir@
+staretcdir = @staretcdir@
+starhelp_DATA = @starhelp_DATA@
 starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
@@ -352,6 +356,26 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-starhelpDATA: $(starhelp_DATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(starhelpdir)
+	@list='$(starhelp_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(starhelpDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
+	  $(starhelpDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-starhelpDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(starhelp_DATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
+	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
+	done
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(includedir)
@@ -430,26 +454,7 @@ messys_err.h: messys_err.msg
 	@MESSGEN@ -c messys_err.msg
 fac_110_err: messys_err.msg
 	@MESSGEN@ -e messys_err.msg
-install-starhelpSTARDATA: $(starhelp_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(starhelpdir)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
-	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-starhelpSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
-	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
-	done
+install-manifest: install-manifest-am
 
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
@@ -467,7 +472,7 @@ install-manifest.xml: all-am
 # We should respect $(DESTDIR), but needn't worry about $(srcdir),
 # since we know that the file was created in the current directory.
 # Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
+install-manifest-am: install-manifest.xml
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
@@ -603,9 +608,9 @@ distcleancheck: distclean
 check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(HEADERS) $(STARDATA)
+all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(DATA) $(HEADERS)
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(starhelpdir)
+	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(starhelpdir) $(DESTDIR)$(includedir)
 install: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
@@ -653,7 +658,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS install-starhelpSTARDATA
+install-data-am: install-includeHEADERS install-starhelpDATA
 
 install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
 
@@ -684,7 +689,7 @@ ps-am:
 
 uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-starhelpSTARDATA
+	uninstall-starhelpDATA
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-generic clean-libLTLIBRARIES clean-libtool ctags dist \
@@ -695,14 +700,14 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	install install-am install-binSCRIPTS install-data \
 	install-data-am install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
-	install-libLTLIBRARIES install-man install-starhelpSTARDATA \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-starhelpSTARDATA
+	install-libLTLIBRARIES install-man install-manifest \
+	install-manifest-am install-starhelpDATA install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binSCRIPTS \
+	uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES uninstall-starhelpDATA
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

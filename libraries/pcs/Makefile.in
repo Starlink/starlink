@@ -14,11 +14,6 @@
 
 @SET_MAKE@
 
-# Makefile for the PCS system.  This is just a shell for the various
-# subsystems, so this makefile is atypical
-#
-# It is not at present intended to be distributable by itself
-
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -57,15 +52,14 @@ DIST_SOURCES =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
-	install-recursive installcheck-recursive installdirs-recursive \
-	pdf-recursive ps-recursive uninstall-info-recursive \
-	uninstall-recursive
+	install-manifest-recursive install-recursive \
+	installcheck-recursive installdirs-recursive pdf-recursive \
+	ps-recursive uninstall-info-recursive uninstall-recursive
+am__installdirs = $(DESTDIR)$(stardocsdir)
+stardocsDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(stardocs_DATA)
 ETAGS = etags
 CTAGS = ctags
-am__installdirs = $(DESTDIR)$(stardocsdir)
-stardocsSTARDATA_INSTALL = $(INSTALL_STARDATA)
-STARDATA = $(stardocs_STARDATA)
-INSTALL_STARDATA = $(INSTALL_DATA)
 SUFFIXES = .tex .dvi .ps .htx_tar
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
@@ -105,7 +99,10 @@ PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
-PACKAGE_VERSIONINT = @PACKAGE_VERSIONINT@
+PACKAGE_VERSION_INTEGER = @PACKAGE_VERSION_INTEGER@
+PACKAGE_VERSION_MAJOR = @PACKAGE_VERSION_MAJOR@
+PACKAGE_VERSION_MINOR = @PACKAGE_VERSION_MINOR@
+PACKAGE_VERSION_RELEASE = @PACKAGE_VERSION_RELEASE@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -139,32 +136,14 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-stardocs_STARDATA = @stardocs_STARDATA@
+stardocs_DATA = @stardocs_DATA@
 stardocsdir = @stardocsdir@
+staretcdir = @staretcdir@
+starhelpdir = @starhelpdir@
 subdirs = @subdirs@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-
-#SUBPACKAGES = \
-#	adam	\
-#	adamnet \
-#	ams 	\
-#	atimer 	\
-#	dtask 	\
-#	hdspar	\
-#	lex	\
-#	messys	\
-#	misc	\
-#	msp	\
-#	parsecon	\
-#	sock	\
-#	string	\
-#	subpar	\
-#	task
-SUBPACKAGES = \
-	subpar
-
-SUBDIRS = $(SUBPACKAGES)
+SUBDIRS = @subdirs@
 all: all-recursive
 
 .SUFFIXES:
@@ -205,6 +184,26 @@ $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 component.xml: $(top_builddir)/config.status $(srcdir)/component.xml.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 uninstall-info-am:
+install-stardocsDATA: $(stardocs_DATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(stardocsdir)
+	@list='$(stardocs_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(stardocsDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f"; \
+	  $(stardocsDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(stardocsdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-stardocsDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(stardocs_DATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(stardocsdir)/$$f"; \
+	  rm -f $(DESTDIR)$(stardocsdir)/$$f; \
+	done
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -321,26 +320,7 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-install-stardocsSTARDATA: $(stardocs_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(stardocsdir)
-	@list='$(stardocs_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f"; \
-	  $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(stardocsdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-stardocsSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(stardocs_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(stardocsdir)/$$f"; \
-	  rm -f $(DESTDIR)$(stardocsdir)/$$f; \
-	done
+install-manifest: install-manifest-recursive
 
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
@@ -358,7 +338,7 @@ install-manifest.xml: all-am
 # We should respect $(DESTDIR), but needn't worry about $(srcdir),
 # since we know that the file was created in the current directory.
 # Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
+install-manifest-am: install-manifest.xml
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
@@ -519,7 +499,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(STARDATA)
+all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
 	$(mkdir_p) $(DESTDIR)$(stardocsdir)
@@ -566,7 +546,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-stardocsSTARDATA
+install-data-am: install-stardocsDATA
 
 install-exec-am:
 
@@ -594,7 +574,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-info-am uninstall-stardocsSTARDATA
+uninstall-am: uninstall-info-am uninstall-stardocsDATA
 
 uninstall-info: uninstall-info-recursive
 
@@ -606,12 +586,13 @@ uninstall-info: uninstall-info-recursive
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-stardocsSTARDATA install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic maintainer-clean-recursive \
-	mostlyclean mostlyclean-generic mostlyclean-recursive pdf \
-	pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-info-am uninstall-stardocsSTARDATA
+	install-manifest install-manifest-am install-stardocsDATA \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	maintainer-clean-recursive mostlyclean mostlyclean-generic \
+	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-info-am \
+	uninstall-stardocsDATA
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
