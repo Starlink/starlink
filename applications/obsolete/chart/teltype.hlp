@@ -1,0 +1,16 @@
+0 TELTYPE
+
+ This is the type of telescope on which the plate was taken.  It
+ allows appropriate geometric corrections to be made.
+
+ The responses are :-
+    AAT2         when corrections for the AAT prime focus
+                 doublet are applied.
+    AAT3         when corrections for the AAT prime focus
+                 triplet are applied.
+    ASTRograph   when a conventional tangent-plane solution
+                 is performed.
+    SCHMidt      when corrections for plate curvature are
+                 applied.
+
+ Anything else is equivalent to SCHMIDT.

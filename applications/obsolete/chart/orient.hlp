@@ -1,0 +1,7 @@
+0 ORIENT
+
+ This specifies the orientation of the error box measured in degrees.
+ It is measured from the central meridian from the north, eastwards.
+
+ The orientation is of the longer diameter for ellipses and the longer
+ side for rectangular error boxes.

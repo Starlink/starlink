@@ -1,0 +1,6 @@
+0 COORDS
+
+ If a quadrilateral error box was selected this defines the file in
+ which the coordinates of its vertices are stored.
+
+ Use the program QCREATE to enter the values into a file.

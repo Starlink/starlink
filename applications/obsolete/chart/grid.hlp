@@ -1,0 +1,11 @@
+0 GRID
+
+ The answer determines whether an RA, Dec coordinate grid will be
+ plotted along with the stars found.
+
+ A string starting with Y or y will be stored as YES;
+
+ a string starting with M or m will plot an abbreviated (or MINI)
+ grid, giving RA/DEC markers, but no grid lines;
+
+ anything else will be stored as NO.

@@ -1,0 +1,13 @@
+0 RA
+
+ Input a single Right Ascension.
+
+ The format may be:-
+    Hr  Min Sec      eg 17 45 0.0
+    Hr  Min             17 45.0
+    Hr                  17.75
+
+ A total of 80 characters may be used, and the value must be in the
+ range 0 to 24 hours.  The "space" may be any non-numeric character.
+
+ A null response, i.e. <CR>, will exit from this loop.

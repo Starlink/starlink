@@ -1,0 +1,13 @@
+0 SELECT
+
+ Define any further criterion by which stars are to be selected. The
+ options are:-
+
+    ALL         no further selection
+    NUM         selection by number
+    MAG         selection by magnitude
+    CAT         selection by original catalogue
+
+ Any other entry is interpreted as ALL.
+
+ Note that these selection restrictions are not available in NSO Mode.

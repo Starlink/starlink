@@ -1,0 +1,8 @@
+0 SCALE
+
+ This is the scale of the plot in arcsec/mm.
+
+ The standard default value (67.14) corresponds to the Palomar and
+ ESO/SRC sky surveys.
+
+ It should be a positive real number.

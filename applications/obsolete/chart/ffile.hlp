@@ -1,0 +1,7 @@
+0 FFILE
+
+ The name of the file containing the list of field centres.
+
+ No file type should be entered, since .DAT is assumed.
+
+ The default is CENT.DAT

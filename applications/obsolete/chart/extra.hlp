@@ -1,0 +1,10 @@
+0 EXTRA
+
+ Do you wish to plot any extra (ie user supplied) objects? If so,
+ where are their positions stored?
+
+ Options are:-    NONE          no such objects
+                  name          a file called name.DAT
+
+ Note that a list of objects may be created by using ECREATE when the
+ default file name will be EXTRA.DAT

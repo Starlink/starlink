@@ -1,0 +1,6 @@
+0 EPOCH
+
+ The required epoch of the output positions.
+
+ A response of TODAY will cause the computer to make up an epoch for
+ today's date.

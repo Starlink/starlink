@@ -1,0 +1,14 @@
+0 XORR
+
+ This asks the user to specify whether the next series of
+ positions to be entered are to be X,Y (for conversion to
+ RA, Dec) or RA, Dec (for conversion to X,Y).
+
+ In either case NAMEs may be specified optionally.
+
+ A response of X will cause the program to prompt for X,Y positions
+
+ A response of R (or anything NOT starting with X) will cause the
+ program to prompt for positions specified by RA,DEC,EQUINOX
+
+ A null response (hitting <CR>) forces exit from ASTRO.

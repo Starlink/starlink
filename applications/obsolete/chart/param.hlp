@@ -1,0 +1,18 @@
+0 PARAM
+
+ The following parameters can be selected:-
+
+    LABEL      A label for plots     DEVICE    The plotting device
+    SAREA      Size of search area   PAREA     Size of plot area
+    EQUINOX    Equinox of positions  SCALE     Plotting scale
+    EPOCH      Epoch of positions    SYMBOL    Symbol used for stars
+    MODE       Catalogue used        KEY       Magnitude scale/numbers
+    SELECTION  Selection criteria    GRID      An RA/DEC grid
+    NUMBER     Max. no. of stars     ERRBOX    An error box
+    MAGNITUDE  Magnitude limit       RADIUS    Radius of error box
+    CATALOGUES Which to use          COORDS    Corners of error box
+    FIELDS     Source of fields      EXTRA     Extra objects
+                                     RATIO     Aspect ratio
+                                     FACTOR    Extra scaling factor
+                                     DIRECT    Direction of RA axis
+                                     CROSS     Central cross

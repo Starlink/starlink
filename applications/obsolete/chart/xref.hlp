@@ -1,0 +1,9 @@
+0 XREF
+
+ This is the measured X co-ordinate of a star position.
+
+ It should be entered as a floating point number; no default is
+ allowed.
+
+ The X coordinate should run approximately east-west. (If this is not
+ the case, see SUN/5 note 12 for the consequences.)

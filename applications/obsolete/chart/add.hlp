@@ -1,0 +1,7 @@
+0 ADD
+
+ A file with the name you have supplied already exists. You have the
+ option of adding data to this file or creating a new file.
+
+ A reply of Y will add to the current version of the file. A reply of
+ N will overwrite the existing file.

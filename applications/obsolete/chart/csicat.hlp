@@ -1,0 +1,21 @@
+0 CSICAT
+
+ The CSI catalogue contains stars taken from many catalogues, and each
+ entry contains information about which catalogues that star appears
+ in. It is possible to select, for example, only variable stars which
+ appear in the selected area.
+
+ The catalogues are described fully in section 5 of SUN/32, and are
+ referred to by abbreviations. The valid entries, WHICH ARE NOT
+ CHECKED ON ENTRY, are:-
+
+        HD    AGK   HZ    CPC   YZ    CCFS  BOSS  SAO   ADS   IDS
+        GCRV  YBS   N30   FK4   JSK   A+B   KDY   UVBY  BAY   USNP
+        GCTP  GCVS  UBV   IC    CLA   CLB   LS    IRC   CEU   GEN
+        U+F   SB    DM2   YZO   MMAG  UPM   UVM
+
+ More than one criterion may be included, separated by spaces. Thus
+ SAO GCRV UBV   will select all SAO variable stars with measured UBVs.
+
+ If the entries are prefaced with the word NOT, then stars which are
+ not in those catalogues will be stored.

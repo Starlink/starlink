@@ -1,0 +1,57 @@
+*+
+*  Name:
+*     CATINF
+
+*  Purpose:
+*     CHART catalogue information
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE file
+
+*  Description:
+*     The common block containing the catalogue information
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JAN-1993 (PMA):
+*        Original version.
+*     15-MAR-1993 (AJJB):
+*        Name of common block changed from CATINF to CATINF_CMN as the
+*        DEC Fortran compiler complained about a name clash with the
+*        CATINF subroutine.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Variables:
+      DOUBLE PRECISION RA        ! [local_variable_description]
+      DOUBLE PRECISION DEC       ! [local_variable_description]
+      INTEGER MAGP               ! [local_variable_description]
+      INTEGER MAGV               ! [local_variable_description]
+      INTEGER NHD                ! [local_variable_description]
+      INTEGER DMNO               ! [local_variable_description]
+      INTEGER IEPS               ! [local_variable_description]
+      INTEGER IPA                ! [local_variable_description]
+      INTEGER IPD                ! [local_variable_description]
+      INTEGER ICAT               ! [local_variable_description]
+      INTEGER NCAT               ! [local_variable_description]
+      LOGICAL*1 IDLIST( IDBYTE ) ! [local_variable_description]
+      INTEGER DIAMET             ! [local_variable_description]
+
+*  Common Blocks:
+      COMMON /CATINF_CMN/ RA, DEC, MAGP, MAGV, NHD, DMNO, IEPS, IPA,
+     : IPD, ICAT, NCAT, IDLIST, DIAMET
+
+*.

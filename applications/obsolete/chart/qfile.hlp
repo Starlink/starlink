@@ -1,0 +1,8 @@
+0 QFILE
+
+ The name of a file to be used to store the positions of the vertices
+ of the quadrilateral error box.
+
+ No filetype should be specified, since .DAT is assumed.
+
+ The default file is VERT.DAT.

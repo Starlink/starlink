@@ -1,0 +1,10 @@
+0 FIELDS
+
+ Do you wish to enter field centres from the terminal or have them
+ read from a file?
+
+ Replies    TERMINAL        means from the terminal
+            name            means from file name.DAT
+
+ Note that a file of field centres may be created using the program
+ FCREATE, when the default file will be CENT.DAT

@@ -1,0 +1,7 @@
+0 PAREA
+
+ This is the length of the side of the square area which is to be
+ plotted. It will normally be the same as the size of the search area
+ (SAREA) but need not be.
+
+ The units are degrees, and the input value must be positive.

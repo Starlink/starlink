@@ -1,0 +1,13 @@
+0 TYPE
+
+ The response defines the type of error box to be plotted along with
+ the stars.
+
+ A string starting with C or c will be stored as CIRC (for a circular
+ error box).
+
+ A string starting with E or e will be stored as ELLI (for an
+ elliptical error box).
+
+ A string starting with Q or q will be stored as QUAD (for a
+ rectangular error box).

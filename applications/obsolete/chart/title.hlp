@@ -1,0 +1,6 @@
+0 TITLE
+
+ An optional title to be displayed with the data.
+
+ A blank title is acceptable, and up to 80 characters may be entered,
+ but only the first 10 characters will be output on the chart.

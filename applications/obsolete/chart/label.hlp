@@ -1,0 +1,9 @@
+0 LABEL
+
+ This is a label associated with the full set of parameters.
+
+ It could for example be the user's initials or the name of a
+ telescope.
+
+ A null label is acceptable.  Up to 50 characters may be entered, but
+ only the first 10 characters will be output on the chart.

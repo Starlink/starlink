@@ -1,0 +1,18 @@
+0 MODE
+
+ Four modes of operation are allowed:-
+
+    CSI   where the Combined Stellar Index is searched.  There are
+          many stars, lots of cross-references, but the positions are
+          not very accurate and there are no proper motions.
+
+    AST   where a combined astrometric catalogue prepared at RGO is
+          searched.  There are fewer stars than in CSI, but the
+          positions are more accurate and proper motions are included.
+
+    NSO   which searches Dixon's list of assorted non-stellar (and
+          some stellar!) objects.  Some objects appear more than once.
+          Note that selection restrictions are not available for this
+          catalogue.
+
+    PRI   where a private astrometric catalogue is searched.

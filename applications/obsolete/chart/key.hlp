@@ -1,0 +1,15 @@
+0 KEY
+
+ This permits magnitude and scale keys to be drawn on the plot, and
+ also gives the user the option to supress the numbering of the stars.
+ Valid responses are:-
+
+    YES         Magnitude and scale keys are plotted, and
+                stars on the plot are numbered.
+    SCALES      Only magnitude and scale keys are plotted, no
+                star numbering takes place.
+    NUMBERS     Stars are numbered, but no keys are plotted.
+    NO          Neither keys or star numbers are plotted.
+
+ Note: on very small charts, star numbers are not plotted even if the
+ user has asked for them.

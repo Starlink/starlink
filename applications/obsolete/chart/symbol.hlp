@@ -1,0 +1,9 @@
+0 SYMBOL
+
+ There is a choice of symbols to represent objects on the chart.
+
+    CIRCLE  will draw a circle for each object.
+
+    CROSS   will draw an exploded cross for each object.
+
+    SPOT    will draw a filled circle for each object.

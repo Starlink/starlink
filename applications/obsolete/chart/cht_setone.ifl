@@ -1,0 +1,27 @@
+interface SETONE
+
+   helplib 'CHART_HELP:'
+
+   parameter PARAM		# Name of CHART parameter
+      position 1
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  ' '
+      prompt   'Parameter name'
+      helpkey  '*'
+   endparameter
+
+   parameter VALUE		# Value of CHART parameter
+      position 2
+      type     _CHAR
+      access   READ
+      vpath    'PROMPT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  ' '
+      prompt   'Parameter value'
+      helpkey  '*'
+   endparameter
+
+endinterface

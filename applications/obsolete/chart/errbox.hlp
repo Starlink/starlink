@@ -1,0 +1,15 @@
+0 ERRBOX
+
+ The response defines whether an error box is to be plotted along with
+ the stars, and if so of what type.
+
+ A string starting with C or c will be stored as CIRC (for a circular
+ error box).
+
+ A string starting with Q or q will be stored as QUAD (for a
+ quadrilateral error box).
+
+ A string starting with P or p will be stored as PROMPT (for an error
+ box to be defined by SEARCH).
+
+ Anything else will be stored as NONE.

@@ -1,0 +1,11 @@
+0 EQCENTRE
+
+ This is the EQUINOX of the position of the plate centre which has
+ just been supplied.
+
+ The default is the equinox which was given for the field centre used
+ by  SEARCH.
+
+ It should be in years, eg. 1950.0
+
+ It may be prefaced by a B or a J  eg B1950.0

@@ -1,0 +1,5 @@
+0 YDIAM
+
+ This specifies the shorter diameter of an elliptical error box or the
+ length of the shorter side of a rectangular error box (in seconds
+ of arc).

@@ -1,0 +1,11 @@
+0 RATIO
+
+ This allows the square area of sky requested to be plotted as a
+ rectangle with sides such that :-
+
+    Horizontal : Vertical = RATIO : 1.0
+
+ Certain hard copy units, when connected to the video output of a
+ graphics device, produce copies with different horizontal and
+ vertical scales.  This parameter's principal function is to distort
+ the plot on the screen so that the hardcopied output appears square.

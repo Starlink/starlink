@@ -1,0 +1,20 @@
+0 ASTROCAT
+
+ The combined astrometric catalogue contains stars culled from three
+ source catalogues. Any combination of 1, 2 or 3 from this list may be
+ used.
+
+ The catalogues are:-
+    A   AGK3
+    S   SAO
+    P   PERTH70
+  so valid entries are
+    ALL
+    A
+    P S
+ and so on.
+
+ Note that if ALL is selected only those AGK3 stars north of the
+ equator and only SAO stars south of the equator will be used, but if
+ mode A is chosen then AGK3 stars to the catalogue cut-off point at
+ 3 degrees south will be used.

@@ -1,0 +1,514 @@
+1ZW to      Zwicky, F. 1961-68. Seven privately circulated lists.
+8ZW         Zwicky, F., Sargent, W. L. W., and Kowal, C. T. 1975. Eighth
+            list of compact galaxies. Astr. J. 80:545.
+A2          Barbieri, C., and L. Rosino. 1972. Studies of blue objects at high
+            galactic latitudes. Astrophys. and Sp. Sci. 16:324.
+A3          Barbieri, C., and P. Benvenuti. 1974. Studies of blue objects
+            at high galactic latitudes III. Faint blue obects in the field
+            of BD+15 2469. Ast. & Astrophys. Suppl. 13:269.
+ACK         Acker, A. 1975. Private counication.
+AGU         Aguero, E. L. 1971. A list of interesting southern galaxies.
+            Publ. Astr. Soc. Pacific 83:310.
+AL          Barbieri, C., L. Erculiani, and J. Rosino. 1968. Faint blue objects
+            in the field of 88 Leonis. Publ. Oss. Astr. Padova, No. 143.
+ALL         Allen, D. A. 1973. A new planetary nebula. Observatory 93:85.
+AMES        Ames, A. 1932. A catalogue of 2778 nebulae, including the
+            Coma-Virgo group. Harvard Annals 88:1.
+AND         van den Bergh, S. 1972. Search for faint companions to M31.
+            Astrophys. J. 171:231.
+AR          Astronomer Royal(Communicated by). 1910. Observations of nebulae
+            made at the Royal Observatory, Greenwich. Mon. Not. Roy. Astr.
+            Soc. 71:509.
+ARC         Abell,G. O. 1958. The distribution of rich clusters of galaxies.
+            Astrophys.J.Suppl.3:211.
+ARP         Arp, H. 1966. Atlas of peculiar galaxies. Astrophys. J. Suppl. 14:1.
+ARP.65      Arp. H. 1965. A very small condensed galaxy. Astrophys. J. 142:402.
+ASS         Alter, G., B. Balasz, and J. Ruprecht. 1970. Catalogue of star
+            clusters and associations. Budapest: Akademia Kiado.
+B           Barnard, E. E. 1927. A photographic atlas of selected regions of
+            the Milky Way. Carnegie Institute of Washington, No. 247.
+BA          Wooden, W. H. 1971. RGU photographic photometry of the galactic
+            clusters K4 and Ba 10. Astr. & Astrophys. 13:218.
+BA 11       Grubissich, C. 1973. The stellar group Basel 11 in Taurus. Ast. and
+            Astrophys. Suppl. 11, 283.
+BA6         Kiral, A. 1969a. Die Sterngruppe Ba 6. Ast. & Astrophys. 2:22.
+BA7         Kiral, A. 1969b. Die Sterngruppe Ba 7. Ast. & Astrophys. 3:327.
+BA8         Wagner, R. 1971. The stellar groups Ba 8, Ba 9, and Be 68. Ast.
+            & Astrophys. 14:283.
+BAA         Baade, W., and H. Arp. 1964. Positions of emission nebulae in
+            M31. Astrophys. J. 139:1027.
+BAK1        Baker, R. H. 1933. A catalogue of 985 galaxies in Fornax and
+            Eridanus. Harvard Annals 88:77.
+BAK2        Baker, R. H. 1937. A catalogue of 1113 galaxies in a region of
+            Fornax and Eridanus. Harvard Annals 88:163.
+BB          Bahcall, N. A.,and J. N. Bahcall. 1970. Galaxies in the direction
+            of QSO's with small redshifts. Publ. Astr. Soc. Pacific 82:1276.
+BC          Barbieri, C., and M. Capacciolo. 1974. Catalogue of quasistellar
+            objects. Publ. Oss. Astr. Padov. Edited July 1. 1974.
+BCL         Boulesteix, J. G. Courtes, et al. 1974. An optical study of M33:1.
+            Morphology of the gas. Ast. & Astrophys. 37:33.
+BEM         Bertola, F., and P. Maffei. 1974. Two faint companions to M81.
+            Ast. & Astrophys. 32:117.
+BFG         Bracessi, A., L. Formiggini, and E. Gandolfi. 1970. Magnitudes,
+            colours, and coordinates of 175 ultraviolet-excess objects in the
+            field 13h. + 36 . Ast. & Astrophys. 5:264.
+BFG         Bracessi, A., L. Formiggini, and E. Gandolfi. 1973. Erratum:
+            Correction of an error in the paper: Magnitudes, colours and
+            coordinates of 175 UV-excess objects in the field 13h. +36 .
+            Ast. & Astrophys. 23:159.
+BFGS        Bracessi, A., L. Formiggini, and I. Gioia. 1972. Two galaxies
+            dominated by bright ultraviolet knots. Publ. Astr. Soc. Pacific
+            84:592.
+BFL         Borngen, F., G. Friedrich, G. Lenk, R. Richter, and N. B. Richter.
+            1970. OB-stars on the outmost borders of M31. Mitt. Karl Schwarzchild
+            Obs. Tautenberg, Nr. 50.
+BIGO        Bigourdan, G. 1912. Cinquieme liste de nebuleuses decouverts a
+            l'Observatoire de Paris. Comptes rendus 155:1049.
+BOH         Bohlin, K. 1922. Ein Nebelobjekt im Taurus. Ast. Nach 216:31.
+BON         Bond, H. E. 1972. The optically variable galaxies: V 395 Herculis.
+            Astrophys. J. 174:L163.
+BON         Bond, H. E. 1973. A search for extragalactic objects in the General
+            catalogue of variable stars. Astrophys J. 181:L23.
+BOR         Borngen, F. 1966. Blaue Objekte in einem Feld bei -22 Galakteischer
+            Breite. Mitt. Karl Schwarzchild Obs. Tautenberg, Nr. 28.
+BRON        Bronkalla, W. 1971. Schwache blaue Objekte in der Nahe des galaktischen
+            Nordpols (Umgebung von M3). Ast. Nach 292:263.
+BV          Haro G., and Luyten, W. J. 1960. Note on some further faint blue
+            variables. Bol. Obs. Ton. y Tacubaya Vol. 2, No. 19, 17.
+BV          Luyten, W., and Haro, G. 1959. Note on some faint blue variables.
+            Publ. Astr. Soc. Pacific 71:469.
+CAR         Carpenter, E. F. 1931. A cluster of extragalactic nebulae in Cancer.
+            Publ. Astr. Soc. Pacific 43:247.
+CED         Cederblad, S. 1946. Catalogue of bright diffuse galactic nebulae.
+            Lund Annals, Series 2. No. 119.
+CHR         Christie, W. H. 1931. Note on the cluster of extragalactic nebulae
+            in Leo. Publ. Astr. Soc. Pacific 43:350.
+CM          Cheriguene, M. G., and Monnet, G. 1972. Etude cinematique de
+            l'hydrogen ionise dans le Grand Nuage de Magellan. Ast. & Astrophys.
+            16:28.
+COU         Courtes, G. 1951. Etude de la voie Lactee Enluminiere Monochromatique
+            H de 320 a 350 et de 25 a 80 de longitude galactique. Comptes
+            Rendus 232:795.
+CR          Chincarini, G., and Rood, H. J. 1971. Dynamics of the Perseus
+            cluster of galaxies. Astrophys. J. 168:321.
+CS          Courtes, G., and Sivan, J. P. 1972, Two new large-diameter galactic
+            regions of faint H-alpha emission. Astrophys. Lett. 11:159.
+DDKS        Danziger, I. J., Dennefeld, H., Kunth, D., and Schuster, H. E. 1974.
+            A large southern reflection nebula at high galactic latitude.
+            Ast. & Astrophys. 37:419.
+DG          Dorschner, V. J., and Gurtler, J. 1964. Untersuchungen uber
+            Reflexionsnebel am Palomar Sky Survey I. Catalog. Ast. Nach 287:257.
+DUN         Duncan, J. C. 1923. Photographic studies of nebulae. Astrophys. J.
+            57:137.
+DV.55       de Vaucouleurs, G. 1955. Emission nebulosities near the South Pole.
+            Observatory 75:129.
+DV.56       de Vaucouleurs, G. 1956. Survey of brighter galaxies south of
+            Dec = -35. Mem. of the Commonwealth Obs. Vol. 3, No. 3.
+DVDV        de Vaucouleurs, g., and de Vaucouleurs, A. 1961. Classification
+            and radial velocities of bright southern galaxies. Mem. Roy. Astr.
+            Soc. 68:69.
+EM          McCluskey, S. W. 1961. Emission objects near Selected Area 158.
+            Publ. Astr. Soc. Pacific 73:264.
+FAI         Fairall, A. P. 1968. A list of compact and bright-nucleus galaxies.
+            Mon. Not. Astr. Soc. S. Afr. 27:67.
+FAI         Fairall, A. P. 1970. A second list of compact and bright-nucleus
+            galaxies. Mon. Not. Astr. Soc. S. Afr. 29:48.
+FATH        Fath, E. A. 1914. A study of nebulae. Astr. J. 28:75.
+FEIG        Feige, J. 1958. A search for under-luminous hot stars. Astr. J.
+            128:267.
+FIT.G       Fitzgerald, M. P. 1974a. Eighteen possible galaxies in Puppis.
+            Ast. & Astrophys. 31:467.
+FIT.N       Fitzgerald, M. P. 1974b. A remarkable "bright dark nebula" in
+            Chamaeleon. Ast. & Astrophys. 32:465.
+G0          Grossie, H. H. R., and Opik. E. J. 1968. Star chains around Eta
+            Carinae. Irish Astr. J. 8:249.
+GRA         Graham, J. A. 1974. A peculiar southern ring galaxy. Observatory
+            94:290.
+HARO        Haro, G. 1956. Nota preliminar sombre galaxias azules con lineas de
+            emision. Bol. Obs. Ton. y Tacubaya Vol. 2. No. 14, 8.
+HAW         Harrington, R. G., and Wilson, A. G. 1950. Two new stellar systems
+            in Leo. Publ. Astr. Soc. Pacific 62:118.
+HELW        Gregory, C. C. L. 1921a. Third list of nebulae photographed with
+            the Reynolds reflector. Helwan Obs. 21:201.
+HELW        Gregory, C. C. L. 1921b. Fourth list of nebulae photographed with
+            the Reynolds reflector. Helwan Obs. 22:219.
+HELW        Knox-Shaw, H. 1912. Observations of nebulae made during 1909-1911.
+            Helwan Obs. 9:69.
+HELW        Knox-Shaw, H. 1915. Observations of nebulae made during 1912-1914.
+            Helwan Obs. 15:129.
+HELW        Madwar, M. R. 1932. Sixth list of nebulae photographed with the
+            Reynolds Reflector. Helwan Obs. 38:1.
+HH          Herbig, G. H. 1974, Draft catalog of Herbig-Haro Objects. Lick Obs.
+            Bull. No. 658, February.
+HMS         Humason, M. L., Mayall, N. U., and Sandage, A. R. 1956. Redshifts
+            and magnitudes of extragalactic nebulae. Astr. J. 61:97.
+HN          Bailey, S. I. 1913. 1649 new nebulae. Harvard Annals 72:17.
+HN          Harvard Annals (no author given). 1908. Nebulae discovered at the
+            Harvard College Observatory. Harvard Annals 60:147.
+HO          Holmberg, E. 1950. A photometric study of nearby galaxies. Lund
+            Annals Series 2,Vol.6,No5.
+HOAG        Hoag, A. A. 1950. A peculiar object in Serpens. Astr. J. 55:170.
+HOAG        O'Connell, R. W., Scargle, J. D., and Sargent, W. L. W. 1974.
+            The nature of Hoag's Object. Astrophys. J. 191:61.
+HOD.60      Hodge, P. W. 1959. Dwarf members of a southern cluster I. Publ.
+            Astr. Soc. Pacific 71:28.
+HOD.60      Hodge, P. W. 1960b. Dwarf members of a southern cluster II. Publ.
+            Astr. Soc. Pacific 72:188.
+HOD.61      Hodge, P. W. 1961. The Fornax dwarf galaxy. I. The globular clusters
+            . Astr. J. 66:83.
+HOD.72      Hodge, P. W. 1972. Dark nebulae in the Large Magellanic Cloud. Publ.
+            Astr. Soc. Pacific. 84:365.
+HODG        Hodge, P. W. 1960a. Studies of the Large Magallanic Cloud I. The
+            red globular clusters. Astrophys, J. 131:351.
+HOFF        Hoffleit, D. 1953. A preliminary survey of nebulosities and associated
+            B-stars in Carina. Harvard Annals 119:37.
+HOLM        Holmberg, E. 1937. A study of double and multiple galaxies together
+            with inquiries into some general metagalactic problems. Lund
+            Annals 6.
+HOW         Hodge, P. W., and Wright, F. W. 1974. Catalog of 86 new star clusters
+            in the Small Magellanic Cloud. Astr. J. 79:858.
+HPW         Hodge, P. W., Pyper, D. M., and Webb, C.J. 1965. Dwarf galaxies
+            in the Fornax Cluster. Astr. J. 70:559.
+HSE         Hodge, P. W., and Sexton, J. A. 1966. 457 new star clusters in the
+            Large Magellanic Cloud. Astr.J. 71:363.
+HSN         Hodge, P. W., and Snow, T.P. 1975. Finding list of bright galaxies
+            behind the Small Magellanic Cloud. Astr. J. 80:9.
+HUB         Hubble. E. 1922. A general study of diffuse galactic nebulae.
+            Astrophys. J. 56:162.
+HZ          Humason, M. L., and Zwicky, F. 1947. A search for faint blue stars.
+            Astrophys. J. 105:85.
+IC          Corwin, G. 1974. Private communications.
+IC          Dreyer, J. L. E. 1962. New general catalogue(1888), Index catalogue
+            (1895), and Second index catalogue(1908). Royal Astronomical Society.
+ISS         Isserstedt, J. 1968. Sternringe, eine Neue Art von sternaggregaten
+            und ihre Berzichung zur galaktischen Strutur. Veroff. des
+            Astronomischen Instituts der Ruhr-Universitat Bochum 1:1.
+ISS         Isserstedt, J. 1970. Optical spiral tracers and galactic structure
+            Ast. & Astrophys. 9:70.
+KARA.68     Karachentseva, V.E. 1968. The distribution of sculptor-type dwarf
+            galaxies. Publ. Byurakan Obs. 39:61.
+KARA.72     Karachentseva, I. D. 1972. A catalog of isolated pairs of galaxies
+            in the Northern Hemisphere. Astrofiz. Issled. Izu, Spets. Astrofiz.
+            7:3.
+KARA.73     Karachentseva, V. E. 1973a. Dwarf galaxies of the sculptor type
+            in the zones -36 to -42 of the Palomar Sky Atlas. Astrofiz. Issled.
+            Izv. Spets. Astrofiz. 5:10.
+KARA.73B    Karachentseva, V. E. 1973b. A catalog of isolated galaxies. Astrofiz.
+            Issled. Izv. Spets. Astrofiz. 8, 3.
+KAZ         Kazaryan, M. A. 1966. Two new planetary nebulae. Astrofizika 2:371.
+KEEL        Keeler, J. E. 1900. Photographs of nebulae and clusters made with
+            the Crossley Reflector. Astrophys. J. 11:325.
+KEEN        Keenan, P. C. 1935. Studies of extragalactic nebulae. Astrophys.
+            J. 83:62.
+KHAV        Khavtassi, J. 1955. A statistical study of dark nebulae. Buyll.
+            Abastuman. Astrofiz. Obs. No. 18, 29.
+KLEM        Klemola, A. R. 1969. Groups and clusters of southern galaxies.
+            Astr. J. 74:804.
+KN          Wolf, M. 1909a. Konigstuhl Nebel-Liste 10. Veroff. der Sternwarte
+            zu Heidelberg 6:1.
+KN          Wolf, M. 1909b. Konigstuhl Nebel-Liste 11. Veroff. der Sternwarte
+            zu Heidelberg 6:5.
+KN          Wolfe, M. 1911. Konigstuhl Nebel-Liste 12. Veroff. der Sternwarte
+            zu Heidelberg 6:9.
+KN          Wolf, M. 1912. Konigstuhl Nebel-Liste 13. Veroff. der Sternwarte
+            zu Heidelberg 6:85.
+KN          Wolfe, M., and Ernst E. 1913. Konigstuhl Nebel-Liste 14. Veroff.
+            der Sternwarte zu Heidelberg 6:115.
+KN          Wolfe, M. 1916. Konigstuhl Nebel-Liste 15. Veroff. der Sternwarte
+            zu Heidelberg 7:169.
+KN          Wolfe, M. 1928. Konigstuhl Nebel-Liste 16. Veroff. der Sternwarte
+            zu Heidelberg 8:113.
+KON         Kondratjeva, L. N. 1972. He 2-10: an extragalactic object. Asst.
+            Tsirk. No. 683, 7.
+KW          Khachikian, E. Y., and Weedman, D. W. 1974, An atlas of Seyfert
+            Galaxies. Astrophys. J. 192:581.
+LB          Luyten, W. 1967a. A search for faint blue stars. Papers 1-30.
+            The Observatory, U. of Minn.
+LB          Luyten, W. 1967b. A search for faint blue stars. Papers 31-50.
+            The Observatory, U. of Minn.
+LBN         Lynds, B. T. 1965. Catalogue of bright nebulae. Astrophys. J. 7:163.
+LDN         Lynds, B. T. 1962. Catalogue of dark nebulae. Astrophys. J. Suppl.
+            7:1.
+LH          Lucke, P. B., and Hodge, P. W. 1970. Catalogue of stellar
+            associations in the Large Magellanic Cloud. Astr. J. 75:171.
+LH115       Henize, K. G. 1956. Catalogues of H-alpha emission stars and nebulae
+            in the Large and Small Magellanic Clouds. Astrophys. J. Suppl. 2:315.
+LIN         Lindsay, E. M. 1961. A new catalogue of emission-line stars and
+            planetary nebulae in the Small Magellanic Cloud. Astr. J. 66:169.
+LIN.CL      Lindsay, E. M. 1958. Cluster system of the Small Magellanic Cloud,
+            Mon. Not. Roy. Astr. Soc. 118:172.
+LW          Lynga, G., and Westerlund, B. E. 1963. Catalogue of clusters in the
+            outer parts of the Large Magellanic Cloud. Mon. Not. Roy. Astr. Soc.
+            127:31.
+LYNG        Lynga, G. 1970. On the distribution of OB stars in the Southern
+            Milky Way. Ast. & Astrophys. 8:41.
+MACL        Mathewson, D. S., and Clark, J. N. 1972. A supernova remnant in
+            the Small Magellanic Cloud. Astrophys. J. 178:L105.
+MAFFEI      Maffei, P. 1968. Infrared object in the region of IC 1805. Publ.
+            Astr. Soc. Pacific 80:618.
+MAI         Mailyan, N. Sh. 1973. Search for dwarf spheroidal galaxies.
+            Astrofizika 9:63.
+MCG         Vorontsov-Velyaminov, B. A., and Arhipova, V. P. 1963. Morpholo-
+            gical catalog of galaxies, Part III. Moscow State University.
+MCG         Vorontsov-Velyaminov, B. A., and Arhipova, V. P. 1964. Morpholo-
+            gical catalog of galaxies, Part II. Moscow State University.
+MCG         Vorontsov-Velyaminov, B. A., and Arhipova, V. P. 1968. Morpholo
+            gical catalog of galaxies, Part IV. Moscow State University.
+MCG         Vorontsov-Velyaminov, B. A., and Arhipova, V. P. 1974. Morpholo-
+            gical catalog of galaxies, Part V. Moscow State University.
+MCG         Vorontsov-Velyaminov, B. A., and Krasnogorskaja, A. A. 1962. Morphological
+            catalog of galaxies, Part I. Moscow State University.
+MEL         Melotte, P. J. 1926. New nebulae shown on Franklin-Adams chart
+            plates. Mon. Not. Roy. Astr. Soc. 86:636.
+MHW         Mathewson, D. S., Healey, J. R., and Westerlund, B. E. 1963. A
+            supernova remnant in the Large Magellanic Cloud. Nature 199:681.
+MIL         Milne, D. K. 1970. Non-thermal galactic radio sources. Austral. J.
+            Phys. 23:425.
+MIN.46      Minkowski, R. 1946. New emission nebulae. Publ. Astr. Soc. Pacific
+            53:305.
+MIN.47      Minkowski, R. 1947. New emission nebulae. Publ. Astr. Soc. Pacific
+            59:257.
+MIN.48      Minkowski, R. 1948. New emission nebulae. Publ. Astr. Soc. Pacific
+            60:386.
+MKW         Morgan, W. W., Kayser, S., and White, R. A. 1975. CD galaxies in
+            poor clusters. Astrophys. J. 199:545.
+MOHR        Mohr, J. 1935. Outlying star clusters of the Small Magellanic Cloud.
+            Harvard Bulletin No. 899.15.
+MRK         Markarian, B. E. 1967. Galaxies with an ultraviolet continuum
+            I. Astrofizika 3:55.
+MRK         Markarian, B. E. 1969a. Galaxies with an ultraviolet continuum
+            II. Astrofizika 5:443.
+MRK         Markarian, B. E. 1969b. Galaxies with an ultraviolet continuum
+            III. Astrofizika 5:581.
+MRK         Markarian, B. E. 1971. Galaxies with an ultraviolet continuum
+            IV. Astrofizika 7:229.
+MRK         Markarian, B. E., and Lipovetskii, V. A. 1972. Galaxies with an
+            ultraviolet continuum V. Astrofizika 8:89.
+MRK         Markarian, B. E., and Lipovetskii, V. A. 1973. Galaxies with an
+            ultraviolet continuum VI. Astrofizika 9:487.
+MRK         Markarian, B. E., and Lipovetskii, V. A. 1974. Galaxies with an
+            ultraviolet continuum VII. Astrofizika 10:307.
+MRSL        Marsalkova, P. 1974. A comparison catalogue of H II Regions.
+            Astrophys. & Sp. Sci. 27:3.
+NAB         Bahcall, N. A.,J. N. Bahcall,and M.Schmidt. 1973. Observations
+            of QSO's in the direction of clusters of galaxies. Astrophys.
+            J. 183:777.
+PHL         Haro, G., and Luyten, W. J. 1962. Faint blue stars in the region
+            near the South Galactic Pole. Bol. Obs. Ton. y Tacubaya Vol. 3, No.
+            22, 37.
+PIS         Pismis, P. 1970. Studies on star clusters: a new small cluster
+            near NGC 2175 and some remarks on the latter. Bol. Ton. y Tacubaya
+            Vol. 5, No. 34, 219.
+PK          Perek, L., and Kohoutek, L. 1967. Catalogue of galactic planetary
+            nebulae. Academia Publishing House of the Czechoslovakian Academy
+            of Sciences. Prague.
+PK          Perek, L., and Kohoutek, L. 1968. Errata-Catalog of galactic
+            planetary nebulae. Bull. Astr. Soc. Czech. 18:252.
+PK          Perek, L., and Kohoutek, L. 1969. Errata-Catalog of galactic
+            planetary nebulae. Bull. Astr. Soc. Czech. 20:381.
+PRA         Prata, S. W. 1966. Non-stellar objects in the Tonantzintla catalogue
+            of blue stars. Publ. Astr. Soc. Pacific 78:61.
+RB          Rood, H. J., and Baum, W. A. 1967. Photographic brightness profiles
+            of Coma Cluster galaxies: Catalog of program galaxies. Astr. J.
+            72:398.
+RDS         Rood, H. J., and Sastry, G. N. 1972. Static properties of galaxies
+            in the Abell Cluster 2199. Astr. J. 77:451.
+REA         Reaves, G. 1952. Dwarf galaxies in the Virgo Cluster. Ph.D.
+            Dissertation. University of California, Berkeley.
+REA         Reaves, G. 1962. Dwarf galaxies in the Virgo Cluster. Publ. Astr.
+            Soc. Pacific 74:392.
+REA.66      Reaves, G. 1966. Dwarf galaxies in the Coma Cluster. Publ. Astr.
+            Soc. Pacific 78:407.
+REIN1       Reinmuth, K. 1916. 141 photographische Nebel Positionen. Veroff.
+            der Sternwarte zu Heidelberg 7:175.
+REIN2       Reinmuth, K. 1927. Photographische Positionsbestimmung von
+            Nebelflecken. Veroff. der Sternwarte zu Heidelberg 8:25.
+REIN3       Reinmuth, K. 1927. Photographische Positionsbestimmung von
+            Nebelflecken in Virgo. Veroff. der Sternwarte zu Heidelberg 8:69.
+REIN4       Reinmuth, K. 1928. Photographische Positionsbestimmung von 317
+            Nebelflecken. Veroff. der Sternwarte zu Heidelberg 8:133.
+REIN5       Reinmuth, K. 1929. Photographische Positionsbestimmung von 351
+            Nebelflecken und schwacharen Sternen. Veroff. der Sternwarte zu
+            Heidelberg 8:167.
+REIN6       Reinmuth, K. 1932. Photographische Positionsbestimmung von 234
+            Nebelflecken. Veroff. der Sternwarte zu Heidelberg 8:191.
+REIN7       Reinmuth, K. 1940. Photographische Positionsbestimmung von 207
+            Nebelflecken. Veroff. der Sternwarte zu Heidelberg 12:27.
+REIZ        Reiz, A. 1941. A study of external galaxies with special regard
+            to the distribution problem. Annals Obs. Lund. 9.
+RIC         Richter, G. A. 1974. Katalog blauer Objekte in der weiteren
+            Ungebung von M31. Veroff. Sternwarte Sonneberg 8:75.
+RLWT        Rubin, V. C., and Losee, J. 1972. A finding list of faint blue
+            stars in the anticenter region of the galaxy. Astr. J. 76:1099.
+RLWT        Rubin, V. C., Westpfahl, D., and Tuve, M. 1974. Second finding
+            list of faint blue stars in the anticenter region of the galaxy.
+            Astr. J. 79:1406.
+RMB         Rubin, V. C., Moore, S., and Bertiau, F. C. 1967. Faint blue
+            objects in the Virgo Cluster Region. Astr. J. 72:59.
+RNGC        Sulentic, J. W., and Tifft, W. F. 1973, The revised new general
+            catalog of nonstellar astronomical objects. U. of Ariz. Press,
+            Tucson.
+RRS         Richter, L., Richter, N., and Schnell, A. 1968. Statistik blauer
+            Objekte in der Nahe des galaktisches Nordpoles: Teil II. Mitt.
+            Karl Schwarzchild Obs. No. 38.
+RS          Richter, N., and Sahakjan, K. 1965. Statistik blauer Objekte in
+            der Nahe des galaktisches Nordpoles: Teil I. Mitt. Karl-
+            Schwarzchild-Obs. No. 24.
+SA          Shapley, H., and Ames, A. 1932. A survey of the external galaxies
+            brighter than mag 13.0. Harvard Annals 88:43.
+SAAK        Saakyan, K. A. 1965. Two extremely blue objects near a D galaxy.
+            Astrofizika 1:126.
+SAP         Sanduleak, N., and Philip, A. G. D. 1968. A stellar group in line
+            of sight with the Large Magellanic Cloud. Astrophys. J. 73:113.
+SB          Slettebak, A., and Brundage, R. 1971. A finding list of early-type
+            stars near the South Galactic Pole. Astr. J. 76:338.
+SC          Shapley, H., Menzel, D., and Campbell, L. 1924. Descriptions and
+            positions of 2829 new nebulae. Harvard Annals 85:113.
+SCH         Schanberg, B. C. 1973. An isophotometric and photographic atlas
+            of peculiar galaxies. Astrophys J. Suppl. 26:115.
+SCHO        Schoenberg, E. 1964. Katalog von 1456 Dunkelwolken der nordlichen
+            Milchstrasse bis zu sudlichen Deklination = -36 ,Bayerische Akad.
+            Wissen. Vol. 5, No. 26, 5.
+SEA         Sersic, J. L., and Aguero, E. L. 1972. Chain of galaxies in Centaurus
+            Astrophys. & Sp. Sci. 19:387.
+SER         Sersic, J. L. 1974. A list of peculiar galaxies, interacting pairs
+            groups, and clusters south of declination -43 . Astrophys. & Sp.
+            Sci. 28:365.
+SEY         Seyfert, C. K. 1937. A study of faint northern galaxies. Harvard
+            Annals 105:219.
+SG1         Shain, G. A., and Gaze, V. F. 1950. Certain results from the
+            investigation of bright galactic nebulae. Simeiz Crimean Astrophys.
+            Obs. Contr. 6:3.
+SG2         Gaze, V. F., and Shain, G. A. 1951. A second list of diffuse
+            nebulae. Simeiz Crimean Astrophys. Obs. Contr. 7:93.
+SG3         Gaze, V. F. and Shain, G. A. 1952. A third list of diffuse emission
+             nebulae. Simeiz Crimean Astrophys. Obs. Contr. 9:52.
+SHAH        Baier, F. W.,M. B. Petrosian,H. Tiersch,and R. K. Shabhazian.
+            1974. Compact groups of compact galaxies III. Astrofizika 10:327.
+SHAH        Petrosian, M. B. 1974. Compact groups of compact galaxies IV.
+            Astrofizika 10:471.
+SHAH        Shahbazian, R. K. 1973. Compact groups of compact galaxies. I.
+            Astrofizika 9:495.
+SHAH        Shdahbazian, R. K., and Petrozian, M. B. 1974. Compact groups
+            of compact galaxies II. Astrofizika 10:13.
+SHAP        Shapley, H. 1935. A catalog of 7889 external galaxies in Horogium
+            and surrounding regions. Harvard Annals 88:107.
+SHB         Smith-Haenni, A. L. 1977. A comprehensive catalogue of quasi-stellar
+            objects. Astr. & Astrophys. Suppl. 27:205.
+SHER        Sher, D. 1963. An extended object in the southern sky. Observatory
+            83:256.
+SHP         Shapley, H. 1938. A stellar system of a new type. Harvard Bulletin
+            No. 908, 1.
+SHRV.73A    Sharov, A. S. 1973a. Compact galaxies in the region of Andromeda
+            Nebula. Astr. Zh. 50:1023.
+SHRV.73B    Sharov, A. S. 1973b. Compact galaxies in the neighborhood of the
+            Andromeda Nebula. Astr. Zh. 50:1023.
+SIV         Sivan, J. P. 1974. Interstellar hydrogen wide field photographic
+            H-alpha survey. Ast. & Astrophys. Suppl. 16:163.
+SL          Lindsay, E. M. 1974. Remarks on some Lynga-Westerlund objects in
+            the Large Magellanic Cloud Irish Astr. J. 6:233.
+SL          Shapley, H., and Lindsay, E. M. 1963. A catalogue of clusters in
+            the Large Magellanic Cloud. Irish Astr. J.6:74.
+SM1         Saakyan, K. A., and Mnatsakanyan, R. G. 1965a. On two blue galaxies.
+            Astrofizika 1:125.
+SM2         Saakyan, K. A., and Mnatsakanyan, R. G. 1965b. Faint blue stars in
+            the region Dec = 17h18m, Dec = 43.5 (1950.0). Astrofizika 1:229.
+SMI         Smith, B. M. 1972. Catalogue of nebulae in Crux, Centaurus, Circinus
+            and Norma. U. of Arizona, Steward Obs. September.
+SN          Kowal, C. T., and Sargent, W. L. W. 1971. Supernovae discovered
+            since 1885. Astr. J. 76:756.
+SN          Kowal, C. T. 1975. Private communication.
+SNO         Snow, T. P. 1970. Groups and clusters of galaxies. Astr. J. 75:237.
+SPA         Shapley, H., and Paraskevopoulos, J. 1940. Southern clusters and
+            galaxies. Harvard Bulletin No. 914, 1.
+SPC         Sersic, J. L., Pastoriza, M. G., and Carranza, G. J. 1968. A trio
+            of southern galaxies. Astrophys. Lett. 2:45.
+SS          Struve, O., and Straka, W. C. 1962. Notes on diffuse galactic
+            nebulae. Publ. Astr. Soc. Pacific 74:474.
+ST          Strohmeier, W. 1950. Rote-Nebel in der Wintermilchstrasse. Zs.f.
+            Astrophys. 27:49.
+STOCK       Stockton, A. N. 1968. Blue condensations associated with galaxies.
+            Ph.D. diss., Univ. of Arizona.
+SV          Sandage, A. R., and Vernon, P. 1965. Photometric results of a
+            special survey of interlopers. Astrophys. J. 142:412.
+SVEN        Svenonius, B. 1937. Catalog of anagalactic objects photographed
+            at Helwan for which resolution, dimensions and total magnitude
+            has been determined. Annals Obs. Lund 6.
+T           Tifft, W. F., Jewsbury, C. P., and Sargent, T. A. 1973. Investigation
+            of the Cancer Cluster of galaxies. Astrophys. J. 185:115.
+TER         Terzan, A. 1971. Quatre nouveaux amas stellaires dans la direction
+            de la region centrale de la galaxie. Ast. & Astrophys. 12:477.
+TON-N       Chavira, E. 1959. Estrellas Azules en el casquete galactico norte
+            II. Bol. Obs. Ton. y Tacubaya Vol. 2, No. 18, 3.
+TON-N       Iriarte, B., and Chavira, E. 1957. Estrellas azules en el Casquete
+            Galactico Norte. Bol. Obs. Ton. y Tacubaya 2, No. 16, 3.
+TON-S       Chavira, E. 1958. Estrellas azules en el casquete galactico, sur.
+            Bol. Obs. Ton. y Tacubaya Vol. 2, No. 17, 15.
+UGC         Nilson, P. 1973. Uppsala general catalogue of galaxies. Nova Acta
+            Regiae Societatis Scientiarum Ser. V, Vol. 1, Uppsala.
+URA         Uranova, T. A. 1973a. Supplement list of stellar rings. I. Ast.
+            Tsirk. No. 772, 4.
+URA         Uranova, T. A. 1973b. Supplement list of stellar rings II. Ast.
+            Tsirk. No. 773, 3.
+VB          Vidal, N. V., and Bern, K. A. 1973. Stellar rings and the structure
+            of the galaxy. Astr. & Astrophys. 29:277.
+VDB.66B     van den Bergh, S. 1966a, Observation of faint blue objects. Astrophys.
+            J. 144:866.
+VDB.66G     van den Bergh, S. 1966c. Luminosity classifications of dwarf
+            galaxies. Astr. J. 71:922.
+VDB.66N     van den Bergh, S. 1966b. A study of reflection nebulae. Astr. J.
+            71:990.
+VHA         van den Bergh, S., and Hagen, G. L. 1975. Uniform survey of clusters
+            in the Southern Milky Way. Astr. J. 80:11.
+VHE         van den Bergh, S., and Herbst, W. 1975. Catalogue of southern
+            stars imbedded in nebulosity. Astr. J. 80:208.
+VMT         van den Bergh, S., Marschner, A. P., and Terzian, Y. 1973. An
+            optical atlas of galactic supernovae remnants. Astrophys. J. Suppl.
+            26:19.
+VV          Vorontsov-Velyaminov, B. A. 1959. Atlas and catalog of interacting
+            galaxies. Sternberg, Inst., Moscow State University.
+VVI         Vorontsov-Velyaminov, B. A., and Ivanisevic, G. 1974. Survey of
+            galaxies with Seyfert and Seyfert-like spectra. Astron. Zh. 51:300.
+WEED        Weedman, D. W. 1971. Very blue stellar objects near galaxies.
+            Astrophys. Lett. 9:49.
+WEI         Weistrop, D. 1973. A search for faint blue objects near the North
+            Galactic Pole. Ast. & Astrophys. 23:215.
+WIL         Wild, P. 1953. An interesting group of galaxies. Publ. Astr. Soc.
+            Pacific 65:202.
+WIL         Zwicky, F., and Humason, M. L. 1961. Spectra and other characteristics
+            of interconnected galaxies and of galaxies in groups and in
+            clusters II. Astrophys. J. 133:794.
+WK          Wolfe, M., and Kaiser, F. 1913. Positionsbestimmungen von 124
+            Nebelflecjen in Perseue-Nebel-haufen. Veroff. der Sternwarte
+            zu Heidelberg 6:131.
+WRA         Wray, J. D. 1966. A study of H emission objects in the Southern
+            Milky Way, Ph.D.Dissertation, Northwestern Univ.
+WS          Westerlund, B. E., and Smith, L. F. 1963. Planetary nebulae in
+            the Large Magellanic Cloud. Mon. Not. Roy. Astr. Soc. 127:449.
+YC          Lu, P. K. 1971. Some unusual Southern Hemisphere objects. Astr. J.
+            76:775.
+YM          Jonson, H. M. 1955. Symmetric galactic nebulae. Astrophys. J.
+            121:604.
+YM          Johnson, H. M. 1956. Symmetric galactic nebulae II. Astrophys. J.
+            124:90.
+ZC          Zwicky, F., and Herzog, E. 1963. Catalogue of galaxies and clusters
+            of galaxies, Volume II. Cal. Tech. Press, Pasadena.
+ZC          Zwicky, F., and Herzog, E. 1966. Catalogue of galaxies and clusters
+            of galaxies, Volume III. Cal. Tech. Press, Pasadena.
+ZC          Zwicky, F., and Herzog, E. 1968. Catalogue of galaxies and clusters
+            of galaxies. Volume IV. Cal. Tech. Press, Pasadena.
+ZC          Zwicky, F., Herzog, E., and Wild, P. 1961 Catalogue of galaxies
+            and clusters of galaxies, Volume I. Cal. Tech. Press, Pasadena.
+ZC          Zwicky, F., Karpowicz, M., and Kowal, C. T. 1968. Catalogue of
+            galaxies and clusters of galaxies, Volume V. Cal. Tech. Press,
+            Pasadena.
+ZC          Zwicky, F., and Kowal, C. T. 1968. Catalogue of galaxies and clusters
+            of galaxies, Volume VI. Cal. Tech. Press, Pasadena.
+ZCG         Zwicky, F. 1971. Catalogue of selected compact galaxies and post-
+            eruptive galaxies. Offsetdruk L. Speich, Zurich.
+ZH          Zwicky, F., and Humason, M. L. 1964. Spectra and other
+            characteristics of interconnected galaxies and of galaxies in
+            groups and in clusters III. Astrophys. J. 139:269.
+ZL          Zwicky, F., and Luyten, W. 1967. A search for faint blue stars
+            XLV. Ultra faint blue stars observed with the 200" Telescope.
+            The Observatory, U. of Minn.

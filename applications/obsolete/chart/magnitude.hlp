@@ -1,0 +1,7 @@
+0 MAGNITUDE
+
+ This is the magnitude limit used to select stars. Stars fainter than
+ this limit will not be stored.
+
+ The value should be real, and it is assumed that a value which is
+ less than or equal to zero is an error.

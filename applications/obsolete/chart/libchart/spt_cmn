@@ -1,0 +1,43 @@
+*+
+*  Name:
+*     SPT
+
+*  Purpose:
+*     Spectral type and name of object
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE file
+
+*  Description:
+*     The common block containing the spectral type, name and
+*     description of an object in a catalogue.
+
+*  Copyright:
+*     Copyright (C) 1993 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JAN-1993 (PMA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Variables:
+      CHARACTER * ( 2 ) SPEC     ! Spectral type
+      CHARACTER * ( 14 ) NAM     ! Name
+      CHARACTER * ( 24 ) DES     ! Description
+
+*  Common Blocks:
+      COMMON /SPT/ SPEC, NAM, DES
+
+*.

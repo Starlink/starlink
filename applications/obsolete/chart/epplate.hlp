@@ -1,0 +1,8 @@
+0 EPPLATE
+
+ This is the EPOCH at which the plate was taken.
+
+ The default value as displayed is TODAY. The input should be given in
+ years and decimals, eg 1983.123
+
+ It may be prefaced by a B or a J, eg J1984.123

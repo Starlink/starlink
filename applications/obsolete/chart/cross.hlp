@@ -1,0 +1,8 @@
+0 CROSS
+
+ This concerns the central cross plotted at the position of the field
+ centre. It may be omitted by responding NO; otherwise it will be
+ plotted as before.
+
+ Omitting it may be an advantage if there is a star at the field
+ centre.

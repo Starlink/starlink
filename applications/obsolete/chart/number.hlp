@@ -1,0 +1,7 @@
+0 NUMBER
+
+ This is the maximum number of stars which will be stored.
+
+ Only the MAXNUM brightest will be stored.
+
+ The maximum possible is 1000.

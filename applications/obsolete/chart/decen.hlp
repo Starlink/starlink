@@ -1,0 +1,11 @@
+0 DECEN
+
+ This is the declination of the centre of the plate. It may be the
+ same as the field centre used in SEARCH, but need not be.
+
+ The format is the same as other Decs,
+    eg  [-]DD.DDD
+        [-]DD MM.MMM
+        [-]DD MM SS.SSS
+
+ There is no default and a null entry is not allowed.

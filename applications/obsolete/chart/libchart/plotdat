@@ -1,0 +1,108 @@
+*+
+*  Name:
+*     PLOTDAT
+
+*  Purpose:
+*     Plotting CHART common blocks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     CHART common blocks used to stor plotting information.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-JAN-1992 (PMA):
+*        Original version.
+*     1-MAR-1993 (PMA):
+*        Split the common block PLOTDAT up into NPLOTDAT and CPLOTDAT as
+*        you should not have numeric data and character data in the same
+*        common block.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+
+*+
+*
+*   Variables are as follows:
+*
+*   NAME       TYPE    SETUP IN              DESCRIPTION
+*
+*   PIC       LOGICAL  PPARIN   If '.TRUE.' the Graphics Device is Picture Oriented e.g. Tektronix 4010
+*   PLOT      LOGICAL  PPARIN   If '.TRUE.' the Workstation Opened Correctly and Plotting is Possible
+*   SYMBOL    CHAR*4   PPARIN   Value defines the type of symbol to be plotted
+*                               CIRC, SPOT, CROS are acceptable.
+*   ASPECT    LOGICAL  PPARIN   If '.TRUE.' then an aspect ratio other than 1:1 is being used
+*   KEYNUMB   LOGICAL  PPARIN   If '.TRUE.' then stars on the plot will be numbered
+*   KEYSCALE  LOGICAL  PPARIN   If '.TRUE.' then scales will be drawn upon the plot, if '.FALSE.' no
+*                               scales will be drawn
+*   TWOLINE   LOGICAL  SETUP    If '.TRUE.' there will be two lines of titles, three lines otherwise
+*   EXTENS    LOGICAL  SETUP    If '.TRUE.' then Magnitude Zone has been lengthened in the x - direction
+*   LNAME     LOGICAL  PPARIN   '.TRUE.' if a logical name translation is being used.   
+*   PLOTTER   LOGICAL  PPARIN   This is set to '.TRUE.' if the output device is a plotter
+*                               i.e. device 5,7,9,(10 at some sites) or 16
+*   COLOUR    LOGICAL  PPARIN   '.TRUE.' if colours required on the plot. (Currently only for the ARGS.
+*   IZTOTAL   INTEGER  SETUP    This is the Base Chart Zone (Total display suface)
+*   IZONID    INTEGER  PPARIN   Workstation Zone Identifier.    
+*   IZBASE    INTEGER  SETUP    Base Zone Identifier
+*   IZAREA    INTEGER  CHARTSUB Overall Plotting Area Zone Identifier
+*   IZCHART   INTEGER  CHARTSUB Actual Chart Area Zone Identifier
+*   NPIC      INTEGER  INIT     Running Count of Fields Plotted
+*   WKTYPE    INTEGER  SETUP    The GKS Workstation Type Number
+*   IWKID     INTEGER  SETUP    The GKS Workstation Identification Number
+*   IFLD      INTEGER  PLOT     The Field Number.
+*   CHAREA    REAL     SETUP    Overall Plotting Area Size in mm.
+*   SIZEMM    REAL     SETUP    The Size of the Chart, in mm.
+*   XMAX      REAL     SETUP    The Maximum X-Dimension of the Plotting Area Used, in mm.
+*   YMAX      REAL     SETUP    The Maximum Y-Dimension of the Plotting Area Used, in mm.
+*   CH        REAL     TITLES   The Character Height used in the Title Block Areas, in World Co-ords.
+*                                 (Value can be updated in other routines)
+*   CW        REAL     TITLES   The Corresponding Width for the above Character Height, in World Co-ords.
+*                                 (This Width includes the distance between Characters)
+*   TITLEH    REAL     SETUP    The Height of the Title Window, in NDC.
+*   TITLEW    REAL     SETUP     "  Width  "   "    "     "    "    "
+*   MAGH      REAL     SETUP    The Height Of the Magnitudes and Scales Window, in NDC.
+*   MAGW      REAL     SETUP     "  Width  "   "      "       "    "      "     "   "
+*   CRH       REAL     SETUP    The Height of the Cursor Return Window, in NDC.
+*   CRW       REAL     SETUP     "  Width  "   "    "      "      "     "   "
+*   ARATIO    REAL     PPARIN   The plot aspect ratio if applicable
+*   FACTOR    REAL     PPARIN   The extra plot scale factor if applicable
+*   TOTX      REAL     SETUP    This is the x-dimension of the total display surface in metres
+*   TOTY      REAL     SETUP    This is the y-dimension of the total display surface in metres.
+*   XCHART    REAL     SETUP    This is the position of the bottom left hand corner of the chart
+*   YCHART    REAL     SETUP    The corresponding Y value for XCHART
+*   DATA      REAL     SETUP    This is the saved value of the aspect ratio for when 
+*                               PLOTTER and ASPECT = .TRUE.
+*   LOGNAME   CHAR*20  PPARIN   Array to contain logical name if used.
+*-
+      
+      LOGICAL PIC,PLOT,ASPECT,KEYNUMB,KEYSCALE,TWOLINE
+      LOGICAL EXTENS,LNAME,PLOTTER,COLOUR
+      INTEGER IZTOTAL,IZONID,IZBASE,IZAREA,IZCHART,NPIC,WKTYPE
+      INTEGER IWKID,IFLD
+      REAL    CHAREA,SIZEMM,XMAX,YMAX,CH,CW
+      REAL    TITLEH,TITLEW,MAGH,MAGW,ARATIO,FACTOR
+      REAL    XMM,YMM,XDIAM,YDIAM
+      REAL    TOTX,TOTY,XCHART,YCHART
+      REAL    DATA
+      CHARACTER*20 LOGNAME
+      CHARACTER*4 SYMBOL
+      COMMON /NPLOTDAT/ PIC,PLOT,ASPECT,KEYNUMB,KEYSCALE,TWOLINE,
+     : EXTENS,LNAME,PLOTTER,COLOUR,IZTOTAL,IZONID,IZBASE,IZAREA,IZCHART,
+     : NPIC,WKTYPE,IWKID,IFLD,
+     : CHAREA,SIZEMM,XMAX,YMAX,CH,CW,TITLEH,TITLEW,MAGH,MAGW,
+     : ARATIO,FACTOR,
+     : XMM,YMM,XDIAM,YDIAM,TOTX,TOTY,XCHART,YCHART,DATA
+
+      COMMON /CPLOTDAT/ SYMBOL,LOGNAME

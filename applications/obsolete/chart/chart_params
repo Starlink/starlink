@@ -1,0 +1,70 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     chart_params
+
+#  Purpose:
+#     Point a soft link to the CHART parameters
+
+#  Language:
+#     C-shell script
+
+#  Invocation:
+#     chart_params
+
+#  Description:
+#     Set up a soft link to point the file containing the CHART
+#     parameters.
+
+#  Arguments:
+#     $1
+#        The command used to invok this script (ignored).
+#     $2
+#        The name of the file that the soft link will point to.
+
+#  Algorithm:
+#     -  Remove any file or soft link called PAR.
+#     -  Create a soft link PAR to the parameter file named in the
+#           second argument. Use charpar.dat if the second argument
+#           was null.
+#     -  If the file pointed to by PAR does not exist, create it by
+#        copying the standard chartpar.dat to this file.
+
+#  Copyright:
+#     Copyright (C) 1994 Science & Engineering Research Council
+
+#  Authors:
+#     PMA: Peter Allan (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-APR-1993 (PMA):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+#.
+
+#  Remove any file or soft link called PAR.
+
+if ( -f PAR ) then
+   rm PAR
+endif
+
+#  If a parameter was given, make PAR a soft link to this file,
+#  otherwise, make PAR a soft link to chartpar.dat.
+#  If the parameter file does not exist, create it from the standard
+#  parameter file.
+
+if ( "$2" == "" ) then
+   set parfile = "chartpar.dat"
+else
+   set parfile = "$2"
+endif
+ln -s ${parfile} PAR
+if ( ! -f ${parfile} ) then
+   cp INSTALL_ETC/chartpar.dat ./PAR
+endif

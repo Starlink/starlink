@@ -1,0 +1,9 @@
+0 Y
+
+ This is the measured Y co-ordinate of a star position.
+
+ It should be entered as a floating point number; no default is
+ allowed.
+
+ The Y coordinate should run approximately north-south.  (If this is
+ not the case, see SUN/5 note 12 for the consequences.)

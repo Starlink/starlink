@@ -1,0 +1,68 @@
+*+
+*  Name:
+*     CHT_ERR
+
+*  Purpose:
+*     CHART symbolic error constants
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     INCLUDE file
+
+*  Description:
+*     Define the CHT_xxxxx symbolic constants for use in the CHART
+*     monolith.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-JUN-1992 (PMA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Constants:
+      INTEGER CHT__UNOIF         ! Unable to open intermediate file
+      PARAMETER ( CHT__UNOIF = 1 )
+
+c      INTEGER CHT__NONUM         ! No number found
+c      PARAMETER ( CHT__NONUM = 1 )
+
+      INTEGER CHT__FMTERR        ! Invalid number format
+      PARAMETER ( CHT__FMTERR = 2 )
+
+      INTEGER CHT__IVSEX         ! CONVPOS - Invalid sexagesimal number
+      PARAMETER ( CHT__IVSEX = 2 )
+
+      INTEGER CHT__DECBG         ! CONVDEC - DEC too big
+      PARAMETER ( CHT__DECBG = 3 )
+
+      INTEGER CHT__RABIG         ! CONVRA - RA too big
+      PARAMETER ( CHT__RABIG = 3 )
+
+      INTEGER CHT__NOCAT         ! Can't open star catalogue
+      PARAMETER ( CHT__NOCAT = 1001 )
+
+      INTEGER CHT__NODEV         ! Can't open plotting device
+      PARAMETER ( CHT__NODEV = 1002 )
+
+      INTEGER CHT__NOFIL         ! Can't open file
+      PARAMETER ( CHT__NOFIL = 1003 )
+
+      INTEGER CHT__BADRD         ! Can't read file 
+      PARAMETER ( CHT__BADRD = 1004 )
+
+C      [local_constant_specification]...
+*.
+

@@ -1,0 +1,479 @@
+0 CHART
+
+  The CHART program searches star catalogues and plots the stars in
+  various projections.
+
+1 ASTRO
+
+  This is a program which prepares a file for input to the standard
+  Starlink program ASTROM, which performs astrometry in a selected
+  field.
+
+  The program prompts for certain input, including astrometric stars
+  which must be selected from those found in the most recent SEARCH
+  run.  The user will need to refer to these stars by their list
+  numbers from LISTO.  The useris prompted for the (x,y) position of
+  each star.  When this has been done for as many reference stars as
+  desired, the user is allowed to specify the (x,y) or (RA,DEC) of an
+  arbitrary number of unknown stars.
+
+  The output is written to a file ASTROM.DAT. No means have been
+  provided to edit this file.  Users are therefore advised to use one
+  of the standard editors.  (Remember that any record will be ignored
+  by ASTROM if it starts with an "*".)
+
+  When you are happy with the file simply type the command ASTROM to
+  run the standard astrometry program. Comprehensive results are
+  written to the file ASTROM.LIS and a summary appears on the
+  terminal.
+
+  NB:  To do worthwhile astrometry you need accurate positions and
+  proper motions.  These are available if and ONLY if you have used
+  MODE=AST during your SEARCH.  Users should be aware of the precise
+  meaning of the parameters which they are asked to supply - these
+  are described more fully in the prompt information for each one,
+  which is displayed in response to an entry of ?.
+
+2 Parameters
+
+@CHART_HELPDIR:eqres 3 EQRES
+
+@CHART_HELPDIR:teltype 3 TELTYPE
+
+@CHART_HELPDIR:racen 3 RACEN
+
+@CHART_HELPDIR:decen 3 DECEN
+
+@CHART_HELPDIR:eqcentre 3 EQCENTRE
+
+@CHART_HELPDIR:epplate 3 EPPLATE
+
+@CHART_HELPDIR:number 3 NUMBER
+
+@CHART_HELPDIR:xorr 3 XorR
+
+1 ASTROM
+
+  This is the standard Starlink astrometry program described in much
+  more detail in Starlink User Note 5.
+
+  It may be used to read the file ASTROM.DAT created by ASTRO.  It
+  writes its results to a file ASTROM.LIS, and a summary is produced
+  on the terminal.
+
+1 BSEARCH
+
+  This is a variation on the normal SEARCH command, which looks
+  through the selected catalogue for stars in a band around the sky
+  (from 0 Hr. to 24 Hr.) at constant declination, rather than in a
+  square of fixed size centered on the input field centre.  It uses
+  all the parameters which can be defined by SSET, but interprets the
+  parameter SAREA as the width (in degrees) of the band to be
+  searched.  Although it is not actually used it is still essential to
+  enter an RA for the field centre, to retain compatibility with
+  SEARCH.
+
+  Users should remember that BSEARCH can only store information on
+  1000 stars.  On reaching this limit it will stop looking, report the
+  fact and end properly.  However only a part of the selected area
+  will have been searched.
+
+2 Parameters
+
+@CHART_HELPDIR:ra 3 RA
+
+@CHART_HELPDIR:dec 3 DEC
+
+@CHART_HELPDIR:equinox 3 EQUINOX
+
+@CHART_HELPDIR:title 3 TITLE
+
+@CHART_HELPDIR:type 3 TYPE
+
+@CHART_HELPDIR:xdiam 3 XDIAM
+
+@CHART_HELPDIR:ydiam 3 YDIAM
+
+@CHART_HELPDIR:orient 3 ORIENT
+
+
+1 Device
+
+  This is the device on which any plotting will be done.  The devices
+  should be specified by its GNS name.  The type of graphics terminal
+  available will vary from place to place, but most sites should have
+  X window devices (GNS name xwindows) and postcript laser printers
+  (GNS name ps_l).
+
+  Any of the device names may have the characters "_A" appended; this
+  indicates that a hard copy unit is being used, which requires the
+  user to specify an aspect ratio and scale factor.  These will be
+  prompted for by OSET, and stored in the usual way.
+
+  Output to hard copy devices is not automatically printed.  This must
+  be done with the appropriate command which is site specific.
+
+1 DISP
+
+  Provides a concise listing of all current parameter values.
+
+1 DISPLAY
+
+  This lists the current status of all active parameters on the
+  terminal.  After the first section (the S parameters) it waits for
+  you to hit <CR> before continuing.
+
+  For a quicker look at parameter values simply type disp.
+
+1 ECREATE
+
+  This allows you to enter the positions of any extra
+  ("supplementary") objects which you would like to have plotted with
+  those found from the catalogues.
+
+  Exit from the loop is by hitting <CR> in response to the prompt for
+  RA.
+
+  If you wish to use this file you MUST use OSET to say so.
+
+2 Parameters
+
+@CHART_HELPDIR:efile 3 EFILE
+
+@CHART_HELPDIR:ra 3 RA
+
+@CHART_HELPDIR:dec 3 DEC
+
+@CHART_HELPDIR:equinox 3 EQUINOX
+
+
+1 FCREATE
+
+  If you wish field centres to be taken from a file you should use
+  this program to create the list of field centres which is to be
+  used.
+
+  Exit from the loop is by hitting <CR> in response to the prompt for
+  RA.
+
+  If you wish to use this file you MUST use the sset command to say
+  so.
+
+2 Parameters
+
+@CHART_HELPDIR:ffile 3 FFILE
+
+@CHART_HELPDIR:ra 3 RA
+
+@CHART_HELPDIR:dec 3 DEC
+
+@CHART_HELPDIR:equinox 3 EQUINOX
+
+@CHART_HELPDIR:title 3 TITLE
+
+
+1 LISTO
+
+  This creates a printable file from the results of the most recent
+  run of SEARCH.  No input is required from the user, but the O
+  parameter SCALE is used in LISTO and may be set before running if
+  desired.
+
+  Output is stored in the file output.lis, but is not printed.
+
+1 OSET
+
+  Allows the user to specify any O parameters needed for output (in
+  particular, plotted output) and to specify if any extra objects are
+  to be plotted.  The O parameters are:
+
+     DEVICE       output device GKS workstation sequence 
+                  number (also optional connection identifier
+                  and/or aspect ratio - see HELP Device)
+     PAREA        the size of the square area to be 
+                  plotted, in degrees (not necessarily the
+                  same as SAREA)
+     SCALE        scale of the plot (arcsec/mm)
+     SYMBOL       type of symbol used to represent stars
+     KEY          allows the plotting of magnitude and
+                  scale keys, also allows star numbering
+                  to be suppressed
+     GRID         allows the plotting of a coordinate grid
+     ERRBOX       allows the plotting of an error box
+     RADIUS       size of error box, if circular
+     COORDS       name of file containing vertices of error
+                  box, if quadrilateral
+     EXTRA        allows the user to specify if extra 
+                  objects are to be plotted
+     DIRECT       specifies the direction of the RA axis.
+                  The usual response will be NORMAL; the
+                  alternative is REVERSED.
+     CROSS        specifies whether the central cross is
+                  to be plotted. NO or N will give NO,
+                  whilst anything else will give YES.
+
+  When you are running OSET, full explanations of these parameters 
+  can be obtained by typing ? as you are prompted for them.
+
+2 Parameters
+
+@CHART_HELPDIR:device 3 DEVICE
+
+@CHART_HELPDIR:parea 3 PAREA
+
+@CHART_HELPDIR:scale 3 SCALE
+
+@CHART_HELPDIR:symbol 3 SYMBOL
+
+@CHART_HELPDIR:key 3 KEY
+
+@CHART_HELPDIR:grid 3 GRID
+
+@CHART_HELPDIR:errbox 3 ERRBOX
+
+@CHART_HELPDIR:coords 3 COORDS
+
+@CHART_HELPDIR:extra 3 EXTRA
+
+@CHART_HELPDIR:direct 3 DIRECT
+
+@CHART_HELPDIR:cross 3 CROSS
+
+1 PLOTO
+
+  This generates graphical output from the results of the most recent
+  run of SEARCH with no further input required from the user. It may
+  be used as many times as required, for example on different devices,
+  without having to run SEARCH again. It uses the current values of
+  the O parameters, which may be reset between runs.
+
+  If the graphical output device is some form of terminal, then the
+  output is plotted on that device.  If the grahical output device is a
+  hard copy device, then a file containing the plot is prodcued.  This
+  must be sent to the printer/plotter separately.
+
+1 QCREATE
+
+  This allows you to create a file containing the coordinates of the
+  vertices of a quadrilateral error box.  This is the only way to
+  define this information.
+
+  If you wish to use this file you MUST use OSET to select ERRBOX=QUAD
+  and set COORDS to the name of the file which you have created.
+
+  The four vertices will be joined up in the order supplied.
+
+2 Parameters
+
+@CHART_HELPDIR:qfile 3 QFILE
+
+@CHART_HELPDIR:ra 3 RA
+
+@CHART_HELPDIR:dec 3 DEC
+
+@CHART_HELPDIR:equinox 3 EQUINOX
+
+
+1 RGOGS
+
+  This command, pronounced RGO Guide Stars, is an alternative to the
+  usual LISTO command which also computes the positions of all the
+  stars as seen in the astrometric telescopes at RGO and La palma. In
+  particular positions in the 26-inch Merz guider, the 13-inch giuder
+  and the 1-metre are listed.
+
+1 SEARCH
+
+  This is the main program in this package. It uses the current 
+  values of the S parameters and searches the catalogues for the
+  objects requested.  The only input it requires is the field centres,
+  unless FIELDS and FCREATE have been used to set up a file of
+  positions.
+
+  It does not create printable output or any graphical output (see
+  LISTO and PLOTO).
+
+  It does not need to be rerun after a change of O parameters.
+
+2 Parameters
+
+@CHART_HELPDIR:ra 3 RA
+
+@CHART_HELPDIR:dec 3 DEC
+
+@CHART_HELPDIR:equinox 3 EQUINOX
+
+@CHART_HELPDIR:title 3 TITLE
+
+@CHART_HELPDIR:type 3 TYPE
+
+@CHART_HELPDIR:xdiam 3 XDIAM
+
+@CHART_HELPDIR:ydiam 3 YDIAM
+
+@CHART_HELPDIR:orient 3 ORIENT
+
+
+1 SETONE
+
+  This program allows the user to change a single parameter without
+  being asked about every parameter. It may be used like other
+  programs, waiting for prompts, or as a command line:-
+
+     setone parameter value
+
+  If it is run by responding to prompts, as with the other programs,
+  a response of ? will list all the parameters which may be changed.
+
+  *********************************************
+  N.B. No error checking or validation is done.
+  *********************************************
+
+2 Parameters
+
+@CHART_HELPDIR:param 3 PARAM
+
+3 VALUE
+
+  This is the value that the selected CHART parameter will be set to.
+
+  Type ?? if you have not already done so. This will leave you in the
+  help system. Then type the name of the parameter that you are
+  setting to get help on its possible values.
+  
+@CHART_HELPDIR:label 4 LABEL
+
+@CHART_HELPDIR:sarea 4 SAREA
+
+@CHART_HELPDIR:equinox 4 EQUINOX
+
+@CHART_HELPDIR:epoch 4 EPOCH
+
+@CHART_HELPDIR:mode 4 MODE
+
+@CHART_HELPDIR:select 4 SELECT
+
+@CHART_HELPDIR:fields 4 FIELDS
+
+@CHART_HELPDIR:device 4 DEVICE
+
+@CHART_HELPDIR:parea 4 PAREA
+
+@CHART_HELPDIR:scale 4 SCALE
+
+@CHART_HELPDIR:symbol 4 SYMBOL
+
+@CHART_HELPDIR:key 4 KEY
+
+@CHART_HELPDIR:grid 4 GRID
+
+@CHART_HELPDIR:errbox 4 ERRBOX
+
+@CHART_HELPDIR:radius 4 RADIUS
+
+@CHART_HELPDIR:coords 4 COORDS
+
+@CHART_HELPDIR:extra 4 EXTRA
+
+@CHART_HELPDIR:direct 4 DIRECT
+
+@CHART_HELPDIR:cross 4 CROSS
+
+1 Sizes
+
+  Each graphical output device has a maximum size of chart that can be
+  plotted. If the chart is too large it is reduced just prior to
+  plotting, and a message sent to the terminal.
+
+  Note that the size in question is given by:-
+
+      PAREA(degrees)*SCALE(arcsec/mm)*3600
+
+1 SSET
+
+  Allows the user to set up and alter the search (S) parameters,
+  select the catalogues which are to be searched,and impose certain
+  other restrictions.  The S parameters are:
+
+     LABEL       A label for the parameters
+     SAREA       The size of the square area of sky 
+                    to be searched (in degrees)
+     EQUINOX     The equinox of the output positions
+     EPOCH       The epoch of the output positions 
+                   (required in ASTROMETRIC mode only)
+     MODE        The source catalogue to be searched
+     INPUT       Specifies the provate astrometric
+                    catalogue to be used
+     SELECTION   Limits the magnitudes or number of stars
+                    selected (not available in NONSTELLAR mode)
+     MAGNITUDE   Faint magnitude limit of search
+     NUMBER      Maximum number of objects
+     CATALOGUES  Selects subsets of the source catalogue
+                    (only possible in AST or CSI mode)
+     FIELDS      Allows the reading of field centres from
+                    the terminal or from a specified file
+
+  When you are running SSET, full explanations of these parameters 
+  can be obtained by typing ? as you are prompted for them.
+
+2 Parameters
+
+@CHART_HELPDIR:label 3 LABEL
+
+@CHART_HELPDIR:sarea 3 SAREA
+
+@CHART_HELPDIR:equinox 3 EQUINOX
+
+@CHART_HELPDIR:epoch 3 EPOCH
+
+@CHART_HELPDIR:mode 3 MODE
+
+@CHART_HELPDIR:select 3 SELECT
+
+@CHART_HELPDIR:fields 3 FIELDS
+
+1 Summary
+
+  The following is a brief summary of all the available commands.
+
+            Displaying parameters 
+
+                   DISP         for a concise display
+                   DISPLAY      for a more informative display
+
+            Setting parameters 
+
+                   SSET          sets search (S) parameters 
+                   OSET          sets output (O) parameters
+                   SETONE        sets a single parameter
+                                 of any type.
+
+            Creating lists of positions 
+
+                   FCREATE       creates a list of Field centres 
+                   ECREATE       creates a list of Extra objects 
+                   QCREATE       creates a file of the vertices 
+                                 of a Quadrilateral error box. 
+
+            Searching the catalogues 
+
+                   SEARCH        searches, using S parameters
+                   BSEARCH       searches a band of declination
+
+            Processing the output from SEARCH. 
+
+                   LISTO         creates printable file OUTPUT.LIS
+                   TYPEO         sends list of objects to terminal
+                   PLOTO         plots output to given device
+                   ASTRO         creates input file for ASTROM
+                   RGOGS         computes postions of stars for
+                                      guiding
+
+1 TYPEO
+
+  This creates a list at the terminal of the results of the most
+  recent run of SEARCH.  No input is required from the user, but the O
+  parameter SCALE is used in TYPEO and may be set before running if
+  desired.
+
+  The output is displayed upon the terminal, one screenful at a time.

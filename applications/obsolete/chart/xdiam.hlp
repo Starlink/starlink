@@ -1,0 +1,5 @@
+0 XDIAM
+
+ This specifies the longer diameter of an elliptical error box or the
+ diameter of a circular error box or the length of the longer side of
+ a rectangular error box (in seconds of arc).

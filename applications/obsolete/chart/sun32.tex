@@ -1,0 +1,1018 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {32.12}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {24 April 1989}
+\newcommand{\stardoctitle}     {CHART --- Finding chart and stellar data
+system\footnote{This paper was converted to \LaTeX\ format by P M Allan.
+The text of the original version by J V Carey \& K F Hartley has only been
+slightly modified with the conversion to GKS 7.2.}
+}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\begin{center}
+{\Large\bf Version 3.3}
+\end{center}
+
+\section{Introduction}
+
+The CHART package extracts positions, magnitudes and other data from certain
+stellar and non-stellar astronomical catalogues.
+The results may be listed on a terminal or printer, or used to plot finding
+charts or perform astrometric reductions.
+
+There are four modes of operation:
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf CSI}]
+Stars can be selected from the Catalogue of Stellar Identifications (CSI) 1979
+edition, prepared by the Stellar Data Centre, Strasbourg.
+This is a compilation of 434,927 stars, extracted from a wide range of original
+source catalogues.
+Approximate positions are available for each star, together with cross
+references into the original source catalogues (see section \ref{catalogues}).
+Magnitudes are available for most of the stars (see section \ref{catalogues}).
+Used in this mode, the program can act as a stellar data retrieval system to
+find, for example, which stars are (or are not) in a particular catalogue, or
+what information is known about the stars in a particular field.
+This is also the normal mode of use when preparing overlays or finding charts.
+\item[{\bf ASTROMETRIC}]
+Stars can be selected from a merged astrometric catalogue (prepared at RGO by
+W.~Nicholson).
+This contains the whole of the AGK3 catalogue (extending down to Dec -3), the
+SAO stars south of the celestial equator, and the complete PERTH70 catalogue.
+This catalogue contains fewer stars than the CSI catalogue, but includes
+accurate positions and proper motions as well as magnitudes and spectral types.
+This mode is most useful when preparing to carry out astrometry.
+\item[{\bf NONSTELLAR}]
+Nonstellar objects can be selected from the Dixon `Master List of Nonstellar
+Objects'.
+This was formed by a simple merging of many catalogues and lists (a number of
+stellar objects also appear).
+The total number is about 185,000.
+Approximate angular sizes and magnitudes are given for many objects.
+Full details of these three groups of catalogues are given in section 
+\ref{catalogues}.
+\item[{\bf PRIVATE}]
+Stars can be selected from any catalogue that has been produced in the form that
+CHART expects for `ASTROMETRIC' mode.
+A program is included in CHARTDIR (EXAMPLE.FOR) as an example of how this might
+be performed.
+\end{list}
+You can select which of these four modes to work in and specify a series of
+search areas.
+In CSI, ASTROMETRIC or PRIVATE modes you can also place magnitude or total
+number limits on the search and choose which source catalogues to include or
+exclude.
+A series of field centres may be input at the terminal or read from a previously
+prepared file.
+
+After the search is made, you may list the results at a terminal or on the
+printer.
+Positional information may be precessed to a specified equinox.
+In the case of ASTROMETRIC data, proper motions may be applied up to a specified
+epoch.
+
+You may also plot the results in the form of an overlay or finding chart.
+Extra objects, i.e.\ with positions supplied by you, may be added to the plot at
+this stage.
+The plot may be made on any GKS device, and a number of different plot options
+are available, such as scale and area, an RA and Dec coordinate grid and various
+forms of error box.
+
+This version of CHART allows you to choose between having hard copy 
+output plotted automatically, or being in complete control yourself.
+This should help CHART users over the network.
+
+You may also use the results as input to an astrometry program, i.e.\ CHART
+can be used to select ASTROMETRIC stars as positional references.
+In this case, you will be asked to supply x,y positions for the reference
+stars from a measuring machine, and can then convert unknown x,y positions to
+RA, Dec or vice versa.
+The Starlink program ASTROM (see SUN/5) performs the actual astrometry, from
+within CHART if necessary.
+\section{A Beginner's User Guide}
+\subsection{Starting up}
+Since CHART creates a number of files in the user's filestore, it is important
+that there is sufficient free space available.
+A minimum of 500 free blocks is advised.
+The program is started up by typing the command:
+\begin{quote}
+{\tt \$ CHART}
+\end{quote}
+The command PROMPT will give an introductory summary of the principal commands,
+followed by the prompt `CHART$>$'.
+\subsection{Help}
+Once the CHART environment has been set up in this way, typing HELP now gives
+information about CHART, not about VMS commands.
+\subsection{Prompts}
+When running programs in the CHART environment, you will frequently be prompted
+for a value for a parameter, and a default value will be suggested if
+appropriate, as in `EQUINOX/1950.0/:='.
+Just hitting $<$CR$>$ will give the default value.
+
+To make the programs less verbose for experienced users, no other prompts are
+given.
+However, a user who does not understand the question being asked or cannot
+remember the valid responses may respond with a `?' or HELP, when several lines
+of information will be displayed on the terminal.
+You will then be re-prompted for the value, with the same default as before.
+
+One exception to the rule that $<$CR$>$ means `take the default value' occurs
+when you are being prompted for a list of entries, for example a series of
+several field centres. In general, hitting $<$CR$>$ in response to the first
+prompt will cause an exit from the loop (see for example sections \ref{create}
+and \ref{search}). 
+
+\subsection{Search and output parameters}
+The available search and output options are represented by a set of parameters
+(listed in section~\ref{defpar}), to which a sensible set of default values 
+is assigned when the program is started up.
+The values of the parameters may be reviewed at any time by the commands DISPLAY
+or DISP.
+The parameters are of two kinds, search (S) parameters associated with the
+catalogue search phase, and output (O) parameters associated with the output
+phases.
+The command SSET is used in order to alter any or all of the S parameters and
+the command OSET to alter any or all of the O parameters.
+Each parameter will be presented in turn with its current value, which you may
+change or leave as it is.
+A single parameter may be changed by using the new command 1SET.
+\subsection{The search phase}
+When satisfied with the S parameters, you should issue the command SEARCH to run
+the search phase of the program.
+The program will prompt for the coordinates of the field centres.
+Remember to respond $<$CR$>$ to the prompt `RA:=' when the input of field
+centres is complete. 
+\subsection{Output options}
+The results of the search phase may be presented at the terminal by issuing the
+command TYPEO.
+Alternatively, a printable file (called OUTPUT.LIS) can be created in your
+directory by issuing the command LISTO.
+This file can of course be listed on the printer using PRINT OUTPUT.
+
+Results can also be plotted in the form of finding charts on any GKS graphics
+device.
+The plotting output (O) parameters must first be set up to your satisfaction
+(using OSET if necessary).
+The command PLOTO will then initiate the plotting.
+
+The results of an ASTROMETRIC mode search may also be used as input to the
+Starlink astrometry program ASTROM.
+A description of this option appears below under ASTRO in section~\ref{output}.
+\subsection{Exiting from CHART}
+Exit from the program is made by typing STOP or EXIT.
+On exit, two files (CHARTINT.DAT and CHARTPAR.DAT) will have been created in
+your directory.
+They may be deleted at any time, but if retained might well be useful in a
+subsequent CHART run.
+Their significance is explained below (sections \ref{env} and \ref{search}).
+\section{The Standard Default Parameters}
+\label{defpar}
+The parameters which are available and their standard default values are as
+follows:
+\begin{verbatim}
+        S LABEL             STARCHART
+        S SAREA             2.0
+        S EQUINOX           1950.0
+        S EPOCH             1950.0
+        S MODE              CSI
+        S INPUT             CATALOGDIR:ASTROM84.CAT
+        S SELECTION         ALL
+        S NUMBER            2000
+        S MAGNITUDE         26.0
+        S CATALOGUES        ALL
+        S FIELDS            TERMINAL
+        O DEVICE            CANON
+        O PAREA             2.0
+        O SCALE             67.14
+        O SYMBOL            CROSS
+        O KEY               YES
+        O GRID              NO
+        O ERRBOX            NONE
+        O RADIUS            2.0
+        O COORDS            VERT
+        O EXTRA             NONE
+        O RATIO             1.0
+        O FACTOR            1.0
+        O DIRECT            NORMAL
+        O CROSS             YES
+
+\end{verbatim}
+These parameters are explained below (section~\ref{setpar}), and the on-line 
+HELP system is available to define the meaning of each parameter as it occurs
+within a program. 
+
+\section{An Advanced User Guide}
+\subsection{The CHART environment}
+\label{env}
+The CHART package is a collection of programs, arranged in a similar way to the
+ASPIC package.
+These programs may be used as many times as required and in any order.
+You must initially set up the `CHART environment'.
+This is done by typing the command:
+\begin{quote}
+{\tt \$ CHART $<$name$>$}
+\end{quote}
+where $<$name$>$ is optional.
+If $<$name$>$ is omitted, it is equivalent to typing  CHART CHARTPAR.
+
+All the parameters needed by the CHART programs are stored in a file in your
+current directory.
+When you type CHART a connection is made between this file and the CHART
+programs, as follows.
+If the file name.DAT (or CHARTPAR.DAT) exists in the current directory then that
+file is used and {\em all the parameters are exactly as they were when last 
+set up.}
+If the file does not exist then a copy is made of a standard set and given the
+name requested.
+Consequently, the next time CHART is executed, the file does exist and those
+parameters are used.
+This means that you may set up a personal set of parameters once, and use them
+for ever.
+For example, you may always want charts of a certain size and scale for a
+particular telescope, always want to use the CSI catalogue and always want
+reversed plots with no central cross.
+
+The point of allowing a user-supplied name is that you may have more than one
+standard set of parameters and can choose to use any one of them for a
+particular run.
+
+$<$name$>$ may also be a logical name, in which case the file which has been
+previously assigned to it is used.
+
+When finished, type the command:
+\begin{quote}
+{\tt STOP}
+\end{quote}
+which will return control to the normal command-input mode.
+EXIT is a valid alternative to STOP, both leaving everything tidy; other methods
+of stopping CHART, including CTRL/Y, will leave unwanted files and logical
+names lying around.
+
+Within the CHART environment, each of the CHART programs may be run simply by
+typing its name.
+Users familiar with ASPIC/DSCL should be aware that the usual DSCL facilities
+are available (e.g.\ the standard command line default mechanism will work, most
+DCL commands are available, and it is possible to write CHART procedures) but it
+is not essential to understand this to use CHART effectively.
+The programs will prompt you for all the input that is required.
+
+The programs fall naturally into the following categories:
+\subsection{Programs which display parameter values}
+* DISPLAY
+
+This simply provides a neatly formatted display on the screen, explaining the
+current values of the parameters.
+If some of the rarer options are not being used, then DISPLAY does not mention
+them.
+
+* DISP
+
+A more succinct display may be generated by simply listing the parameter file
+using the command DISP.
+\subsection{Programs which set parameters}
+\label{setpar}
+The parameters are in two groups according to their function.
+The groups are identified by the first letter (S or O) in the list given in
+section~\ref{defpar}.
+Each group has its own program for setting new values.
+The two programs are named SSET and OSET, and they set the search (S) parameters
+and output (O) parameters respectively.
+There is a third program, called 1SET (note the 1, not I), which allows a
+single parameter to be changed.
+
+* SSET
+
+SSET sets those parameters which are required by the search process.
+They include a specification of the search catalogue, and an indication of the
+source of the required field centres.
+The parameters are:
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf LABEL}] gives a label to this set of parameters.
+\item[{\bf SAREA}] the length (in degrees) of the side of the square area of sky
+which is to be searched. 
+\item[{\bf EQUINOX}]  the required equinox for the output positions.
+\item[{\bf EPOCH}]   the required epoch for the output positions.
+This is only relevant in ASTROMETRIC mode, because it is the only one which
+gives proper motions.
+\item[{\bf MODE}]   selects the main catalogue to be searched.
+The choices are CSI (for the CSI catalogue), AST (for ASTROMETRIC mode), PRI
+(for a private catalogue) and NSO (for the Nonstellar Object catalogue).
+\item[{\bf INPUT}]  specifies the catalogue to be used if PRI has been set as
+the mode. The file name of the catalogue is specified. 
+\item[{\bf SELECT}]   offers further ways of selecting objects from those found
+in the specified area. 
+A response of ALL ensures that all stars are stored.
+Other possible responses are
+N for number (when only a fixed number of stars will be stored),
+M for magnitude (when only stars brighter than some magnitude limit will be
+stored), or
+C for catalogue (when only stars from selected source catalogues within the mode
+catalogues will be stored).
+If the response is not recognised ALL stars are stored.
+SELECT is not available in NONSTELLAR mode.
+\item[{\bf NUMBER}]  specifies (if SELECT is set to N) the maximum number of
+stars (up to 2000) to be stored. The brightest N will be stored. 
+\item[{\bf MAGNITUD}]   is the faint magnitude limit for the stars to be stored
+(if SELECT is set to N). Stars in the CSI catalogue with no magnitudes given
+will be selected regardless of the magnitude limit. 
+\item[{\bf CATALOGU}]   restricts the choice of stars to specified source
+catalogues (if SELECT is set to C). This requires different responses in AST and
+CSI modes. The on-line information summarises the choices, and examples of the
+more complicated possibilities are given in section~\ref{catalogues}. 
+\item[{\bf FIELDS}]   where the response should be TERMINAL if the fields are to
+be specified at the terminal, or the name of a file which contains a list of
+positions. No filetype should be specified as it must be .DAT. If a filename is
+given, a suitable file may be created by using the program FCREATE. 
+\end{list}
+
+* OSET
+
+This allows you to specify those parameters needed for the output part of the
+package.
+These parameters include one which identifies whether there are any extra
+objects.
+The parameters are:
+
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf DEVICE}]  is the name of the graphics device to be used.
+It may be any of the devices supported by GKS and may be specified in several
+different ways.
+In particular, CHART sets up a list of names for all devices; individual users
+or site managers may set up other names for their devices.
+Appending an `\_A' to the name will allow the aspect ratio and scale factor to
+be changed for some hard-copy devices. 
+Further information on device specification will be found in HELP DEVICE; the
+maximum size of the actual chart which can be plotted on any device can be found
+under HELP SIZES.
+
+\item[{\bf RATIO}]
+If the selected device has an `\_A' in it, you can define an aspect ratio
+(horizontal:vertical) to correct any distortion introduced by some
+hard-copiers.
+
+\item[{\bf FACTOR}]
+If the selected device has an `\_A' in it, you can define an additional
+scale factor (over and above SCALE) which will help to make the hardcopy of the
+plot come out to the scale defined by SCALE.
+
+\item[{\bf PAREA}]
+specifies the length (in degrees) of the side of the square which is to
+be plotted.
+In general, it will be the same as SAREA, but need not be.
+
+\item[{\bf SCALE}]   specifies the plot scale in arcsec/mm.
+PAREA (when multiplied by 3600 to convert it to arcseconds) divided by SCALE 
+ought to be less than the size given for the selected DEVICE under HELP SIZES.
+
+\item[{\bf SYMBOL}]
+specifies what symbol is to be used to represent stars on the plot.
+CIRCLE will give circles, CROSS will give exploded crosses, and SPOT will give
+filled circles.
+
+\item[{\bf KEY}]
+specifies whether magnitude and scale keys will be included on the plot,
+and whether stars plotted are to be numbered.
+Responses are YES if scales and numbering are required, SCALES if only scale
+keys are to be included, NUMBERS if only star numbers are wanted, and NO if
+neither scale keys nor numbers are required.
+
+\item[{\bf GRID}]
+specifies whether a full RA, Dec coordinate grid, or an abbreviated one
+is to be plotted.
+Responses are YES, MINI or NO.
+
+\item[{\bf ERRBOX}]
+specifies whether an error box is to be plotted, and if so of what type.
+The allowed responses are NONE for no error box, CIRC for a circular error box
+at the field centre, QUAD for a quadrilateral one, and PROMPT to allow the error
+box to be defined in SEARCH for each field.
+Further information will be found in the description of SEARCH.
+
+\item[{\bf RADIUS}]
+if a circular error box was chosen, this defines its radius in minutes
+of arc.
+
+\item[{\bf COORDS}]
+if a quadrilateral error box was chosen, this defines the file which
+contains the vertices.
+No filetype should be specified, as it must be .DAT.
+A suitable file may be created by using the program QCREATE.
+
+\item[{\bf EXTRA}]
+where the response should be NONE if there are no extra (user supplied)
+objects for plotting, otherwise the name of the file in which they are stored.
+No filetype should be specified, as it must be .DAT.
+If a filename is given, a suitable file can be created by using the program
+ECREATE.
+
+\item[{\bf DIRECT}]
+allows the RA axis to be plotted in the normal direction (NORMAL) or
+reversed (REVERSED) for users who compare charts with plates when the emulsion
+is `down', or with the view in instruments with inverting optics.
+
+\item[{\bf CROSS}]
+allows the central cross to be plotted (YES) or not (NO).
+\end{list}
+
+* 1SET
+
+This allows you to select a single parameter by name and then enter a new value
+for it.
+However, be careful because this program does not validate your input, unlike
+SSET and OSET.
+The parameters are:
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf PARAMETER}]
+the name of the parameter which is to be altered, as listed by
+the command DISP.
+A response of `?' or HELP will list the names of all the parameters.
+
+\item[{\bf VALUE}]
+the new value for the selected parameter, the default being the current value.
+A response of `?' or HELP will give the same information as is available within
+SSET and OSET.
+\end{list}
+It may also be used by typing the command:
+\begin{quote}
+{\tt 1SET parameter value}
+\end{quote}
+where `parameter' and `value' are appropriate strings.
+If the value has spaces in it must be enclosed in quotes.
+\subsection{Programs which create files of coordinates}
+\label{create}
+There are three files which may be required, each containing lists of RAs and
+Decs.
+There is a separate program for each of them.
+
+* FCREATE
+
+This creates a file of field centres for use in the SEARCH program.
+You must supply a file name; if a file of the given name already exists, you are
+asked whether entries are to be added to the file or whether a new file is to be
+created.
+
+The program loops around prompting for:-
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf RA}] A null response breaks out of the loop.
+\item[{\bf DEC}] \
+\item[{\bf EQUINOX}] A response of TODAY will pick up today's date.
+\item[{\bf TITLE}] This is used to label output for this field centre.
+\end{list}
+
+After each set of values has been entered, you are asked if they are `OK?'.
+Responses are $<$CR$>$, T, TRUE, Y, YES for yes and most other things for no.
+This program does {\em not\/} set the parameter which would ensure that this
+file is used; this is done by program SSET described above. 
+
+* ECREATE
+
+This creates a list of supplementary objects.
+You must supply a file name and an equinox which must be the same for all the
+objects in the file.
+If a file of the given name already exists, you are asked whether entries are to
+be added to the file or whether a new file is to be created.
+You are then prompted for RA and Dec in turn.
+A null response to RA terminates input.
+This program does {\em not\/} set the parameter which would ensure that this
+file is used; this is done by the program OSET as described above. 
+
+* QCREATE
+
+This may be used to set up the coordinates of the four vertices of a
+quadrilateral error box, together with an equinox, and store them in a named
+file.
+This program does {\em not\/} set the parameter which would ensure that this
+file is used; this is done by program OSET as described above. 
+\subsection{Files of co-ordinates}
+The three programs described in the previous section all create files.
+You may find it useful to understand the formats used, so you can write programs
+to create such files from different sources.
+All the files are variable record length, sequential access files, each record
+of which corresponds to one piece of information written exactly as entered, in
+ASCII characters.
+There is no file terminator, except for end-of-file.
+
+FCREATE, ECREATE and QCREATE create files whose records are in order:
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+FCREATE   &  ECREATE  &  QCREATE \\ \hline
+RA        &  EQUINOX  &  EQUINOX \\
+DEC       &  RA       &  RA \\      
+EQUINOX   &  DEC      &  DEC \\
+TITLE     &  RA       &  RA \\
+RA        &  ....etc. &  ....etc. \\
+DEC       &           &  (4 pairs in all) \\
+....etc.  &           & \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+
+The formats allowed for RA and DEC are exactly the same as those allowed for
+keyboard entry of the same parameters, i.e.\ decimal hours, or hours and decimal
+minutes or hours, minutes and decimal seconds, and so on, as described in the
+on-line help.
+\subsection{Programs which search catalogues}
+\label{search}
+* SEARCH
+
+This program reads the current S parameters, searches the catalogue selected and
+stores all the results in an intermediate file, called CHARTINT.DAT.
+If the parameter FIELD is set to a file name then no user input is required.
+Otherwise you are prompted in turn for RA, DEC, EQUINOX and TITLE.
+A null response to the RA prompt ends the program.
+
+If the parameter ERRBOX has been set to PROMPT, then some or all of the
+following are prompted for after TITLE: TYPE, XDIAM, YDIAM and ORIENT.
+TYPE can take the values:
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf C}] for a circular error box
+\item[{\bf E}] for an elliptical error box
+\item[{\bf Q}] for a rectangular error box
+\end{list}
+Only those parameters needed for the specified error box type are then prompted
+for:
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf XDIAM}]
+defines the length of the longer diameter/side in seconds of arc.
+\item[{\bf YDIAM}]
+defines the length of the shorter diameter/side in seconds of arc.
+\item[{\bf ORIENT}]
+defines the orientation of the longer diameter/side measured from the
+north through east in degrees.
+\end{list}
+The position parameters here, and everywhere else, may be specified in the same
+very flexible way that was used in the earlier CHART program.
+It is described in the prompt information on RA and DEC.
+
+This program must have been run before trying to print or plot the output, but
+once it has been run the output may be plotted as many times as required, 
+e.g.\ changing the output device (or any other O parameter).
+However, it must be rerun after a change has been made to any S parameter.
+
+On exit from CHART, the CHARTINT.DAT files will be PURGEd, so the most recently
+created version can be preserved and used in a subsequent session if required.
+
+* BSEARCH
+
+This is a variation on the normal SEARCH command, which looks through the
+selected catalogue for stars in a band around the sky (from 0 Hr to 24 Hr) at
+constant declination, rather than in a square of fixed size centered on the
+input field centre.
+It uses all the parameters which can be defined by SSET, but interprets the
+parameter SAREA as the width (in degrees) of the band to be searched.
+Although it is not actually used, it is still essential to enter an RA for the
+field centre, to retain compatibility with SEARCH.
+
+Remember that BSEARCH can only store information on 2000 stars.
+On reaching this limit it will stop looking, report the fact and end properly.
+However, only a part of the selected area will have been searched.
+This can be a serious limitation when searching a complete band round the sky.
+Consequently, you should think carefully about the width of band to be searched;
+the actual value will, of course, depend on the declination of the band.
+
+All the catalogues have positions stored in 1950.0 co-ordinates.
+Consequently, the band searched is as defined in those co-ordinates.
+The positions found are then precessed to the requested equinox and, if in
+ASTROMETRIC mode, proper motions are applied up to the requested epoch.
+Consequently, the band of stars found will not strictly be a band at constant
+declination at the output equinox.
+It would be extremely difficult to get round this problem.
+
+No changes have been made to the output programs TYPEO, LISTO and PLOTO.
+PLOTO will therefore not plot all the stars found, as this would be meaningless
+in the `tangent plane projection' which it uses.
+TYPEO works perfectly, but LISTO gives some `output conversion errors', which
+are not fatal, but simply mean that the star in question is too many seconds of
+arc away from the field centre to be printed in the given format.
+\subsection{Selection strategy}
+The SEARCH program allows various methods of selecting stars, but not all of
+them are ideal for all jobs.
+SEARCH only has room for 2000 stars and it searches in bands of DEC from north
+to south.
+Consequently, if a large or very densely populated region is being searched and
+this limit is reached, only the northern part of the search area will contain
+stars.
+
+When NUMBER selection is chosen, all the stars in the region are found and
+sorted into order of increasing magnitude.
+The list is then truncated, leaving only the N brightest stars.
+However, if the 2000 star limit is reached before the whole area has been
+searched, only the N brightest stars in the area which had been searched when
+the limit was reached will actually be stored.
+Clearly, it is not possible to select the N brightest stars in a region until
+all the stars in the region have actually been found.
+
+On the other hand, when MAGNITUDE selection is chosen, each star may be
+accepted or rejected as it is found.
+Therefore, it is much safer to use magnitude limits when there are likely to be
+more than 2000 stars in the selected region, provided the magnitude cutoff is
+chosen so as to restrict the total number of accepted stars to less than 2000.
+
+You should also be aware of a minor inconsistency when using catalogue selection
+in astrometric mode.
+As stated elsewhere, the AGK3 catalogue reaches -3 degrees.
+However, for southern declinations the same stars will appear in the SAO
+catalogue.
+Consequently, when both AGK3 and SAO are selected, only AGK3 stars with zero and
+positive declinations and SAO stars with negative declinations are used.
+However, if only AGK3 stars are requested, they will be found to the declination
+limit of the catalogue.
+Of course, this is only relevant in the narrow band just south of the equator.
+\subsection{Programs which produce output}
+\label{output}
+Currently, listing, plotting and astrometry are available.
+OSET can be used to change the output parameters to produce different output
+from the current intermediate file, but there is no need to re-SEARCH unless the
+search parameters are changed.
+
+* LISTO
+
+This program reads the intermediate file (and uses SCALE from the current
+parameter file) and generates printable output.
+No user input is required.
+
+To create a printed copy of the output use the command:
+\begin{quote}
+{\tt PRINT OUTPUT}
+\end{quote}
+In all modes, the basic run parameters are first printed, including the field
+centre equatorial coordinates both for equinox 1950 and for the required output
+equinox.
+The field centre is also given in ecliptic and equatorial coordinates.
+The approximate coordinates of the field centre on the major sky surveys
+(Palomar, UK Schmidt \& ESO) are given in millimetres relative to the south
+eastern corner of the relevant chart.
+
+The main listing of the catalogue data is largely self explanatory.
+In all modes, offsets are given in arcseconds relative to the field centre.
+In ASTROMETRIC mode, these offsets are additionally given in millimetres using
+the O parameter SCALE.
+In ASTROMETRIC mode, proper motions are listed.
+The sense of the x coordinates is different for arcseconds and millimetres:
+arc measurements are positive in the same sense as RA increases, as described in
+the on-line help.
+See section~\ref{catalogues} for more details of the listed catalogue data.
+
+* TYPEO
+
+Like LISTO, this program also reads the intermediate file, but the output
+generated is returned to your terminal, one screenful at a time.
+The output is similar to LISTO, but is shortened in order to fit the screen.
+
+* PLOTO $<$anything$>$
+
+This program reads the intermediate file and the parameter file and either
+generates plotted output on the specified device, or, in the case of the
+hard copy devices, generates an output file for subsequent plotting.
+If the optional parameter is absent, the output file is automatically submitted
+to the appropriate queue and that file deleted.
+If the parameter is present (its value is immaterial), the files are left
+untouched and nothing is submitted to a print queue.
+In this case, it is up to you to handle the files and job submission yourself.
+This might include transferring the files over the network.
+No graphical output files are deleted or purged.
+When the specified device is a graphics terminal, a $<$CR$>$ is
+required at the end of each plot to clear the screen; this input is not prompted
+for. 
+
+If the output device can plot in colour, the program asks you if you actually
+want to use colour. This option is intended for use with pen plotters as it 
+may be inappropriate to have a coloured plot, for example, if the plot is to be
+reproduced.
+
+A tangent plane projection is plotted; this is sufficiently accurate to be used
+as an overlay on most telescope plates or prints.
+In stellar modes, each star is plotted either as an exploded cross with a gap at
+the exact star position, as a filled circle to simulate a direct view of the
+star field, or as a circle centred on the star position.
+If requested, a number is drawn beneath each symbol to correspond with the
+listings from TYPEO or LISTO.
+The symbol sizes are related to the stellar magnitude.
+Visual magnitudes are plotted, except for AGK3 stars in ASTROMETRIC mode which
+are photographic.
+A standard range of symbols representing magnitudes 4--11 is optionally shown
+beside the chart as a key, except when a magnitude limit is present, in which
+case the magnitude scale only goes to the next faintest magnitude to that limit;
+a square demonstrating the linear scale is also drawn.
+
+Nonstellar objects are plotted as a fixed size lozenge.
+
+Supplementary user-defined objects are plotted as squares with diagonal tick
+marks.
+Their reference numbers are plotted with negative signs to distinguish them from
+catalogue objects.
+
+There several other options available, including an RA,DEC grid, an error box
+and a central cross.
+It is also possible to plot the chart directly or reversed.
+
+If the requested area is larger than can be fitted on the graphics device, only
+the central portion is plotted.
+
+* ASTRO
+
+This program creates a file which may be used as input to the standard Starlink
+astrometry program ASTROM (see SUN/5).
+It does not use the O parameters in the parameter file, but does use other
+parameters, which are prompted for, and help is available in response to `?' or
+HELP.
+For the results to be meaningful, accurate positions and proper motions are
+needed; these are only available in ASTROMETRIC mode so you need to have used
+MODE=AST when carrying out your SEARCH.
+
+The parameters used are:
+\begin{list}{}{\setlength{\leftmargin}{20mm}
+\setlength{\labelsep}{5mm}
+\setlength{\labelwidth}{5mm}
+}
+\item[{\bf EQRES}]   the equinox to be used for the output positions.
+\item[{\bf TELTYPE}] the type of telescope used.
+The responses are AAT2, AAT3, ASTROGRAPH and SCHMIDT.
+\item[{\bf RACEN/DECEN}] the position (RA, Dec) of the centre of the plate.
+\item[{\bf EQCENTRE}] the equinox of that position.
+\item[{\bf EPPLATE}] the epoch when the plate was taken.
+\item[{\bf NUMBER}] the sequence number (in the list from LISTO) of one of 
+the reference stars.
+After receiving a valid sequence number, ASTRO prompts for an X and Y for that
+star.
+Exit by hitting $<$CR$>$.
+\item[{\bf XorR}] indicates whether the next series of entries will be X,Y
+positions for conversion to RA, Dec (X) or vice versa (R). Exit from ASTRO by
+hitting $<$CR$>$. 
+If X is selected, ASTRO loops round prompting for an X coordinate, a Y
+coordinate and a name.
+If R is selected, ASTRO loops round prompting for an RA, a Dec, an equinox and
+a name.
+Exit from either loop by hitting $<$CR$>$ in response to X or RA, whichever the
+case may be.
+On exit you are returned to the XorR prompt.
+\end{list}
+A file ASTROM.DAT is created, suitable for input to ASTROM.
+You may edit this file at this point if required.
+When you are happy with the file, type the command ASTROM to run the standard
+astrometry program (you do not have to exit from CHART).
+Comprehensive results are written to the file ASTROM.LIS and a summary appears
+on the terminal, in the way described in SUN/5.
+
+* RGOGS
+
+This command, pronounced RGO Guide Stars, is an alternative to the usual LISTO
+command which also computes the positions of all the stars as seen in the
+astrometric telescopes at RGO and La Palma.
+In particular, positions in the 26-inch Merz guider, the 13-inch guider and the
+1-metre are listed.
+It writes its output to a file RGOGS.LIS, which may be printed in the usual way.
+\section{The Catalogues}
+\label{catalogues}
+\subsection{The CSI catalogue}
+The Catalogue of Stellar Identifications (CSI) has been prepared by the Stellar
+Data Centre, Strasbourg.
+It contains 434,927 stars extracted from several catalogues merged together (see
+references 1--4).
+It is believed to be complete to visual magnitude 9.5.
+Approximate positions and magnitudes homogenised on the UBV system are available
+for each star and several star identifications (HD, AGK, Durchmusterung etc.)
+are available explicitly.
+The catalogue also indicates whether a star is found in a quite wide range of
+other catalogues.
+Details of these catalogues are given in the table below.
+
+In the listing from LISTO, the two primary star identifications HD and
+Durchmusterung are given explicitly.
+Some stars, not in the Durchmusterungen, are given the DM name of `**'.
+In these cases, the zone and number are derived from the star's 1950 equatorial
+coordinates.
+B and V magnitudes are given; a bracketed magnitude indicates an approximate
+magnitude.
+
+About 6000 stars in the catalogue have no magnitudes given for B and V. The
+search and output programs now pick these stars up and display/plot them.
+
+\begin{tabular}{rl}
+\multicolumn{2}{c}{\bf Catalogues indexed in the catalogue of stellar 
+identifications} \\
+& \\
+Abbrev & \multicolumn{1}{c}{Catalogue} \\
+&\\
+  HD  &  Henry Draper Catalogue (including extensions)\\
+  AG  &  AGK2/3\\
+  HZ  &  Herz Star Catalogue for Equinox 1890
+         (Zone -6 $<$ -10Dec) (Berlin,1906)\\
+ CPC  &  Cape Photographic Catalogue (Cape Annals vol. 17--21)\\
+ YZ   &  Yale Zones Catalogue\\
+CCFS  &  Cape Catalogue of Faint Stars (Zone -40 $<$ -52 Dec)\\
+BOSS  &  B Boss Albany General Catalogue\\
+ SAO  &  SAO Catalogue\\
+ ADS  &  Aitken Double Star Catalogue\\
+ IDS  &  Lick Index Catalogue of Visual Double Stars\\
+GCRV  &  Wilson General Catalogue of Radial Velocities\\
+ YBS  &  Yale Catalogue of Bright Stars\\
+ N30  &  Catalogue of 5268 stars based on the normal N30 system\\
+ FK4  &  FK4 and FK4 supplement\\
+ JSK  &  Jascheck: La Plata Catalogue of Stellar Spectra in
+         Morgan Keenan System\\
+ A+B  &  Abt \& Biggs Bibliography of Stellar Radial Velocities\\
+ KDY  &  Kennedy MK Classification Southern Extension\\
+UVBY  &  (uvby) Photometry exists in Hauck \& Mermilliod Catalogue\\
+ BAY  &  Bayer or Flamsteed number\\
+USNP  &  Blanco Photoelectric Catalogue\\
+GCTP  &  Yale General Catalogue of Trigonometric Parallaxes\\
+GCVS  &  General Catalogue of Variable Stars (3rd. Edition)\\
+ UBV  &  Mermilliod Catalogue of UBV Photoelectric Photometry\\
+ NGC  &  Identification in NGC open Cluster\\
+ IC   &  Identification in IC open Cluster\\
+ CLA  &  Identification in anonymous Cluster
+         (In lists of less than 100 Clusters)\\
+ CLB  &  Identification in anonymous Cluster
+         (In lists of 100 or more Clusters)\\
+ LS   &  Luminous stars in Milky Way
+         (Hamburg-Bergedorf/Warner Swasey)\\
+ IRC  &  Two micron Sky Survey (Neugebauer \& Leighton)\\
+ CEL  &  Celescope Catalogue of Ultraviolet Magnitudes\\
+ GEN  &  Rufener Catalogue of Stars measured in the Geneva System\\
+ U+F  &  Uesugi \& Fukuda Catalogue of Rotational Velocities\\
+ SB   &  Batten Spectroscopic Binary Catalogue\\
+ BE*  &  Wackerling catalogue of early type stars whose spectra
+         have shown emission lines\\
+  GL  &  Gliese catalogue of nearby stars\\
+JP11  &  Morel UBVRIJKLMNH Photoelectric photometric catalogue\\
+HGAM  &  Petrie et al A catalogue of H Gamma measures\\
+ MSS  &  Houk \& Cowley. Michigen Catalogue of 2 dimensional
+         spectral types for the HD stars\\
+  CF  &  Spencer \& Jackson Catalogue of 20554 faint stars in the
+         astrographic zone -40 to -52 Dec\\
+  UM  & \\
+  FE  & \\
+  RY  & \\
+AMAS  & \\
+ DM2  &  Durchmusterung Cross Identification Exists
+         (CoD/CPD or BD/CoD)\\
+ YZO  &  Overlap in Yale Zones\\
+MMAG  &  Magnitudes refer to a multiple system\\
+& \\
+& \\
+\end{tabular}
+
+Details of the cluster identifications (NGC, IC, CLA, CLB) are in reference 5
+(sections dealing with code numbers 2 to 5).
+This information is also available in the file CATALOGDIR:STARNAMES.LIS.
+
+The listing shows in which catalogues the star may be found, as indicated in the
+CSI.
+The catalogues are denoted by the abbreviations listed in the table.
+
+If catalogue star selection is chosen when using the CSI (SELECT set to C),
+you can select stars that are present in or absent from particular catalogues.
+This is done by giving a list of one or more catalogue names for the parameter
+CATALOGU.
+The names should be supplied in the abbreviated form as given in the table.
+By prefacing the list by `NOT', the criterion for selection is reversed,
+i.e.\ only those stars which are not in the catalogue(s) specified will be
+selected.
+
+Examples of the kind of information which could be obtained are as follows:
+
+\begin{tabbing}
+\hspace{10mm}\=Which stars have been photo-electrically \hspace{10mm}\=UBV\\
+\>measured in the UBV system?\\ \\
+
+\>Which stars have both MK spectral types \>JSK GCRV \\
+\>and radial velocities? \\ \\
+
+\>Which stars are not in the SAO or AGK2/3 \>NOT SAO AGK \\
+\>catalogues?
+\end{tabbing}
+
+\subsection{The ASTROMETRIC catalogue}
+The ASTROMETRIC catalogue contains stars with positions of greater accuracy than
+the CSI.
+Stars are taken from three catalogues:
+the whole of AGK3 (covering the northern hemisphere and extending down to Dec
+-3), all SAO stars south of the celestial equator, and the whole of the PERTH70
+catalogue.
+PERTH70 is a southern hemisphere catalogue (with a few northern FK4 stars) that
+is sparser but more accurate than the SAO.
+The catalogue includes the epoch of observation and proper motions for each star
+in addition to its magnitude and spectral type.
+
+In the listing from LISTO, the star names in the specified catalogue(s) are
+given.
+Magnitudes printed are visual, except for AGK3 where they are photographic.
+\subsection{The NONSTELLAR catalogue}
+The nonstellar object catalogue is the Dixon Master List of Nonstellar Objects
+(ref 6).
+This was formed by a simple merging of many catalogues and lists of
+`nonstellar objects'; the total number is about 185,000.
+Some catalogues used are largely stellar, e.g.\ Luyten's Faint Blue Star
+surveys. The precision of the positions in the list is variable, being
+transcribed directly from the source catalogue. 
+Approximate angular size and magnitude are given for many objects.
+No cross identification was attempted, therefore many objects will have more
+than one entry in the list.
+A full bibliography of the sources used in compiling the list is available in
+the file CHARTDIR:NSOREF.TXT.
+This file is arranged alphabetically by catalogue name abbreviation, thus
+enabling the object names used in the list to be identified.
+
+In the listing from LISTO, the name of the object is printed as given in the
+master list.
+The approximate position is always given, and where available the approximate
+magnitude and angular size.
+A brief description of the object (24 characters or less) is also printed.
+\subsection{References}
+\begin{enumerate}
+\item Ochsenbein, F, Bischoff, M (1975), CDS Inform. Bull. 8, 2.
+\item Ochsenbein, F, Egret, D, Bischoff M (1977), Proc. IAU Coll. 35,
+    `Compilation, Critical Evaluation \& Distribution of Stellar Data'.
+\item Ochsenbein, F (1974), Astron. Astrophys. Suppl. 15, 215.
+\item Ochsenbein, F, Bischoff, M, Egret, D (1981), Astron. Astrophys.
+    Suppl 43, 259.
+\item Mermilliod, J-C (1978), CDS Inform. Bull. 14, 32.
+\item Dixon, R S, Sonneborn, G (1980),  A Master List of Non-stellar
+    Optical Astronomical Objects (Ohio University Press).
+\end{enumerate}
+\section{Acknowledgments}
+The current version of CHART originates from two programs written at the RGO in
+1967, A06E by Bill Nicholson and R19D by Roger Wood.
+These were amalgamated by Philip Taylor to run as one program, first on the
+1903T and later on the VAX for Starlink.
+Leslie Bell documented and made various improvements to the early Starlink
+version.
+At the request of the Starlink `Database Special Interest Group', Ken Hartley
+and Keith Tritton drew up a specification for a major change to the program,
+resulting in the present modular structure and the use of SGS/GKS graphics.
+This specification was mainly implemented by Ken Hartley (the `CHART
+environment') and Joe Vickerstaff (graphical output).
+
+Tim Wilkins (Manchester) did most of the work to convert CHART to use GKS~7.2. 
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

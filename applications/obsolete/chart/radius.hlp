@@ -1,0 +1,6 @@
+0 RADIUS
+
+ If a circular error box is selceted this defines its radius in units
+ of MINUTES of arc.
+
+ The value should be a positive real number.

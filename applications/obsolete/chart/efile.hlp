@@ -1,0 +1,8 @@
+0 EFILE
+
+ The name of a file to be used to store the positions of your extra
+ (supplementary) objects.
+
+ No filetype should be specified since .DAT is assumed.
+
+ The default filename is EXTRA.DAT.

@@ -1,0 +1,137 @@
+*+
+*  Name:
+*     MAIN
+
+*  Purpose:
+*     Main CHART common blocks
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Main CHART common blocks
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-JAN-1992 (PMA):
+*        Original version.
+*     1-MAR-1993 (PMA):
+*        Split the common block CONTROL up into NCONTROL and CCONTROL as
+*        you should not have numeric data and character data in the same
+*        common block.
+*     15-MAR-1993 (AJJB):
+*        Changed the order of variables in the common blocks to have
+*        double precision first, followed by reals and then integers.
+*     17-MAR-1993 (AJJB):
+*        Logical EPROM was declared but not used in any common block, so
+*        I tacked it on the end of /NCONTROL/ to keep the Sun compiler
+*        quiet.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Constants:
+      INTEGER IDIM               ! Maximum number of stars to be held
+                                 ! in internal arrays
+      PARAMETER ( IDIM = 2000 )
+      INTEGER IDBYTE             ! Number of bytes to hold CSI
+                                 ! supplementary identifications
+      PARAMETER ( IDBYTE = 8 )
+
+*  Global Variables:
+      LOGICAL CATRUN             ! Select stars from particular
+                                 ! catalogues?
+      LOGICAL CHOOSE             ! Select specified CSI entries only?
+      LOGICAL SQUARE             ! (NOT USED)
+      LOGICAL QEBOX              ! If true, plot quadrilateral error box
+      LOGICAL IDENTS             ! Want all CSI identifications?
+      LOGICAL DEFAULT            ! default chart parameters required?
+      LOGICAL NONS               ! Nonstellar objects to be selected?
+      LOGICAL BATCH              ! Batch input of field centres?
+      LOGICAL END                ! True in batch mode if EOF
+      LOGICAL ERR                ! TRUE if an error box is to be plotted
+      LOGICAL SUPP               ! TRUE if user supplied objects input
+      LOGICAL DIRECT             ! Defines normal or reversed DEC axis
+      LOGICAL CENCROS            ! Should we plot a central cross?
+      LOGICAL EPROM              ! Plot error box from search params?
+      LOGICAL*1 ID( IDBYTE, IDIM ) ! Array of 8*IDBYTE bit ident.
+                                 ! strings from CSI
+      INTEGER IND                ! (NOT USED)
+      INTEGER IPRINT             ! Printing control flag
+      INTEGER JCAT               ! (NOT USED)
+      INTEGER MAXNUM             ! Maximum number of field stars
+                                 ! required
+      INTEGER NUM                ! Number of field stars found in
+                                 ! catalogue
+      INTEGER YESCAT( 50 )       ! Array of catalogue numbers to be
+                                 ! included
+      INTEGER NOCAT( 50 )        ! Array of catalogue numbers to be
+                                 ! avoided
+      INTEGER DIAM( IDIM )       ! Array of nonstellar object diameters
+      INTEGER NSTAR( 4, IDIM )   ! Data array for the field stars
+      INTEGER IP( IDIM )         ! Index array to point to the 'MAXNUM'
+                                 ! brightest stars
+      INTEGER ICAT1( 0 : 10 )    ! If 'catrun' true, selects catalogues:
+                                 ! ICAT1(0) = 0 <User supplied cat.>
+                                 ! ICAT1(1) = 1 <AGK3>
+                                 ! ICAT1(2) = 2 <SAO>
+                                 ! ICAT1(3) = 3 <PERTH70>
+                                 ! Other elements will be assigned
+                                 ! identities as they are put into the
+                                 ! catalogue
+      INTEGER NCH                ! Number of catalogues selected if
+                                 ! CHOOSE true. Additively used to
+                                 ! indicate more than 1 catalogue.
+      INTEGER NUMSUPP            ! Number of user supplied objects.
+                                 ! May be modified in sort.
+      REAL SCALE                 ! Plotting scale in arcseconds/mm
+      REAL SIZE                  ! Half-width of field in degrees
+      REAL ERRB                  ! Error box size,in arcseconds
+      REAL FAINT                 ! Magnitude of faintest star required
+      REAL QEBC( 8 )             ! Array defining corners of error box
+                                 ! if QEBOX is true
+      REAL EQUIN                 ! Equinox of input field centre
+                                 ! positions
+      REAL EQUOUT                ! Required equinox of field star
+                                 ! positions
+      REAL EPOCH                 ! Required epoch of field star
+                                 ! positions if CATRUN is true
+      REAL PM( 2, IDIM )         ! proper motions
+      REAL ERDIAM( 3 )           ! Error box X diameter, Y diameter and
+                                 ! orientation
+      DOUBLE PRECISION A         ! Input field centre RA
+      DOUBLE PRECISION D         ! Input field centre DEC 
+      DOUBLE PRECISION AP        ! Field centre RA at equinox 1950.0
+      DOUBLE PRECISION DP        ! Field centre DEC at equinox 1950.0
+      DOUBLE PRECISION AO        ! Field centre RA at equinox 'EQUOUT'
+      DOUBLE PRECISION DO        ! Field centre DEC at equinox 'EQUOUT'
+      DOUBLE PRECISION STAR( 2, IDIM ) ! Field stars
+      DOUBLE PRECISION OWNOBJ( 2, 1000 ) ! User supplied object
+                                         ! positions
+      CHARACTER * ( 2 ) CSTAR( IDIM ) ! Spectral types
+      CHARACTER * ( 14 ) NAME( IDIM ) ! Non-stellar object names
+      CHARACTER * ( 24 ) DESCR( IDIM ) ! Non-stellar object descriptions
+      CHARACTER * ( 10 ) IDFLD   ! Field identifier
+      CHARACTER * ( 10 ) IDCHAR  ! Run identifier
+      CHARACTER * ( 2 ) GRID     ! Defines type of RA/DEC grid
+
+*  Global Variables:
+      COMMON /NCONTROL/  OWNOBJ, A, D, AP, DP, AO, DO, STAR, CATRUN,
+     :   CHOOSE, SQUARE, QEBOX, IDENTS, SCALE, SIZE, ERRB, FAINT,
+     :   QEBC, EQUIN, EQUOUT, EPOCH, PM, ERDIAM,
+     :   IND, IPRINT, JCAT, MAXNUM, NUM, YESCAT, NOCAT, DIAM, NSTAR,
+     :   IP, ICAT1, NCH, NUMSUPP, DIRECT,
+     :   CENCROS, ID, DEFAULT, NONS, BATCH, END, ERR, SUPP, EPROM
+
+      COMMON /CCONTROL/ IDCHAR, IDFLD, GRID
+
+      COMMON /SPECS/ CSTAR, DESCR, NAME

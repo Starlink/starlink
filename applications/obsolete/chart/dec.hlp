@@ -1,0 +1,12 @@
+0 DEC
+
+ Enter a single declination.
+
+ Format may be:-
+
+           [-]Deg Min Sec       eg   -45  45  0.0
+           [-]Deg Min                -45  45.0
+           [-]Deg                    -45.75
+
+ Up to 80 characters may be input, and the value must be in the range
+ -90 to +90 degrees. The "space" may be any non-numeric character.

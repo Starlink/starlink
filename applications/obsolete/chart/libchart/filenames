@@ -1,0 +1,16 @@
+* INCLUDE FILE for SELECT.FOR, to allow pathnames for catalogue
+* files to be changed easily. This is the version for UNIX machines.
+*
+* Author:
+* Andrew Broderick (AJJB) 8-MAR-1993.
+
+*  Local Constants:
+      CHARACTER * ( 63 ) AST     ! Pathname of Astrom catalogue
+      PARAMETER ( AST =
+     :'CATALOGDIR/astrom84.cat')
+      CHARACTER * ( 63 ) CSI     ! Pathname of CSI catalogue
+      PARAMETER ( CSI =
+     :'CATALOGDIR/csi79.cat')
+      CHARACTER * ( 63 ) NSO     ! Pathname of NSO catalogue
+      PARAMETER ( NSO =
+     :'CATALOGDIR/nso.cat')

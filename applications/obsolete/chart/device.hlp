@@ -1,0 +1,15 @@
+0 DEVICE
+
+ This is the device which will be used for the plotted chart.  All
+ devices supported by GKS are available. Devices may be specified by
+ GKS number or by GNS name e.g. xwindows.
+
+ Although an exhaustive list cannot be given here due to variations
+ between sites, all sites should be able to use xwindows for plotting
+ on workstations and postscript (GNS name ps_l) for hard copy.
+
+ Users of hard-copy devices may append the characters "_A" to the
+ device name, giving them access to other relevant parameters, e.g.
+ PS_L_A
+
+ See HELP DEVICE and SIZES for further information.

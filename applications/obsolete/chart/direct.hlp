@@ -1,0 +1,9 @@
+0 DIRECT.PRO
+
+ This defines the direction of the Right Ascension axis in the
+ finished plot.
+
+ The usual response is NORMAL, as before; the alternative is REVERSED.
+
+ This may be of value if the chart is to be compared with a plate when
+ the emulsion is to be DOWN.

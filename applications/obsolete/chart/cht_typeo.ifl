@@ -1,0 +1,15 @@
+interface TYPEO
+
+   helplib 'CHART_HELP:'
+
+   parameter MORE		# Continue the operation?
+      type     _LOGICAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  'TRUE'
+      prompt   'Continue?'
+      helpkey  '*'
+   endparameter
+
+endinterface

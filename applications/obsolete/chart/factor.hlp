@@ -1,0 +1,9 @@
+0 FACTOR
+
+ This is a re-scaling factor which may be used in conjunction with the
+ RATIO parameter to ensure that the distorted chart is finally
+ produced to the correct scale on the hard-copy device.
+
+ In effect the selected SCALE value is multiplied by this FACTOR so
+ that the user can continue to think in terms of the final output
+ scale.
