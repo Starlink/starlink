@@ -265,6 +265,9 @@
 *        and typo's corrected.  Called KPG1_GTNDF.  Constrained ANGROT.
 *        Used modern-style variable declarations.  Added headings to
 *        the commentary.
+*     30-AUG-1999 (DSB):
+*        Do not cancel the DEVICE Parameter when closing the graphics
+*        system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -921,7 +924,7 @@
  999  CONTINUE
       
 *  Shut down the graphics database.
-      CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
+      CALL AGS_DEASS( 'DEVICE', .FALSE., STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

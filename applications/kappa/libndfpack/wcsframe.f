@@ -142,7 +142,9 @@
       CALL NDG_STATE( 'FRAME', STATE, STATUS )
       IF( STATE .NE. PAR__ACTIVE ) THEN
          CALL MSG_BLANK( STATUS )
-         CALL KPG1_DSFRM( IWCS, 'Current co-ordinate Frame:', STATUS )
+         CALL NDF_MSG( 'NDF', INDF )
+         CALL KPG1_DSFRM( IWCS, 'Current co-ordinate Frame in ^NDF:', 
+     :                    STATUS )
       END IF
 
 *  Abort if an error has occurred.

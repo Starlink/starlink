@@ -111,8 +111,8 @@
 *        the image, in the current co-ordinate Frame of the NDF (supplying 
 *        a colon ":" will display details of the current co-ordinate Frame). 
 *        The position should be supplied as a list of formatted axis values 
-*        separated by spaces or commas. See also parameter USEAXIS. 
-*        [centre of the image]
+*        separated by spaces or commas. See also parameter USEAXIS.  A
+*        null (!) value causes the centre of the image to be used. [!]
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the current picture is to be cleared before the image is 
 *        displayed. [current value]

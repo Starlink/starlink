@@ -69,6 +69,8 @@
 *        Increase the accuracy of the formatted default value so that
 *        it accurately represents the supplied default values. Normalize
 *        the supplied default position. 
+*     30-AUG-1999 (DSB):
+*        If a null parameter is given use the dynamic default value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,6 +109,7 @@
 *  Local Variables:
       CHARACTER ATT*10           ! AST attribute name
       CHARACTER DOM*30           ! Domain of current frame
+      CHARACTER DPOS*255         ! Default position string
       CHARACTER FMT*100          ! List of axis format strings
       CHARACTER LAB( NDF__MXDIM )*30 ! Axis labels
       CHARACTER NEXT*1           ! Next character to be read
@@ -274,16 +277,16 @@
 
 *  Construct a string holding the default position (a comma separated
 *  list of formatted axis values) using the Digits value set above.
-         POS = AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS )
+         DPOS = AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS )
          IAT = CHR_LEN( POS )
          DO I = 2, NCAXES
             IAT = IAT + 1
             CALL CHR_APPND( AST_FORMAT( CURFRM, I, CC( I ), STATUS ),
-     :                      POS, IAT )
+     :                      DPOS, IAT )
          END DO
 
 *  Use this string as the dynamic default for the parameter.
-         CALL PAR_DEF0C( PARAM, POS, STATUS )
+         CALL PAR_DEF0C( PARAM, DPOS, STATUS )
 
 *  Clear the Digits value.
          CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
@@ -321,6 +324,13 @@
 
 *  Get a value for the parameter.
          CALL PAR_GET0C( PARAM, POS, STATUS )
+
+*  If a null parameter value has been given, annul the error and return
+*  the dynamic default if there is a dynamic default.
+         IF( STATUS .EQ. PAR__NULL .AND. GOOD ) THEN
+            CALL ERR_ANNUL( STATUS )
+            POS = DPOS
+         END IF            
 
 *  Get the indices of the first and last non-blank characters.
          CALL CHR_FANDL( POS, F, L )
