@@ -423,4 +423,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
 
-Total time: 1 minute 0 seconds
+Total time: 58 seconds

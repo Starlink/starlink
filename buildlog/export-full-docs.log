@@ -1965,6 +1965,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -2257,4 +2258,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
 
-Total time: 4 minutes 6 seconds
+Total time: 4 minutes 8 seconds
