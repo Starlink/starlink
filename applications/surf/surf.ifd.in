@@ -855,6 +855,8 @@ package surf {
 #        Add a parameter for writing MEDIAN image
 #     1998 June 3 (TIMJ)
 #        Add DEFOUT. Remove GRID parameter.
+#     2005 March 22 (TIMJ):
+#        Add CLEAR and STYLE parameters
 #     {enter_further_changes_here}
 
 #-
@@ -862,6 +864,24 @@ package surf {
       action despike {
 
          helplib {$SURF_HELP}
+
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Is the current picture to be cleared before plotting?}
+            helpkey *
+            default TRUE
+          }
+
+         parameter style {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Style for graphics and formatted axis values}
+            helpkey *
+            default !
+          }
 
          parameter ref {
                         # First reference date file
