@@ -1,4 +1,4 @@
-      SUBROUTINE POLSIM( STATUS )
+      SUBROUTINE POLSIM( STATUS )   
 *+
 *  Name:
 *     POLSIM
