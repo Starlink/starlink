@@ -25,7 +25,11 @@ const string *BitmapImage::softwareversion = 0;
 const string *BitmapImage::inputfilename = 0;
 const string *BitmapImage::furtherinfo = 0;
 
+#if ENABLE_PNG
+const string BitmapImage::defaultBitmapImageFormat = "png";
+#else
 const string BitmapImage::defaultBitmapImageFormat = "xbm";
+#endif
 
 verbosities BitmapImage::verbosity_ = normal;
 
@@ -43,17 +47,17 @@ BitmapImage *BitmapImage::newBitmapImage
 #if ENABLE_PNG
     if (format == "png")
 	return new PNGBitmap (w, h, bpp);
-    else
 #endif
+
 #if ENABLE_GIF
     if (format == "gif")
 	return new GIFBitmap (w, h, bpp);
-    else
 #endif
+
     if (format == "xbm")
 	return new XBMBitmap (w, h);
-    else
-	return 0;
+
+    return 0;
 }
 
 // Return true if newBitmapImage would succeed -- ie, if the format is
