@@ -561,18 +561,6 @@ $(MANIFEST)/extractor: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/extreme: \
-		$(MANIFEST)/chr \
-		$(MANIFEST)/cnf \
-		$(MANIFEST)/ems \
-		$(MANIFEST)/fio \
-		$(MANIFEST)/hds \
-		$(MANIFEST)/hlp \
-		$(MANIFEST)/mers \
-		$(MANIFEST)/one \
-		$(MANIFEST)/par \
-		$(MANIFEST)/pcs \
-		$(MANIFEST)/psx \
-		$(MANIFEST)/sae \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html
 	cd applications/extreme \
@@ -1058,6 +1046,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
+		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/tcl \
@@ -1107,6 +1096,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
+		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/trn
