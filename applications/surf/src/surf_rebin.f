@@ -65,6 +65,15 @@
 *     DEFOUT = LOGICAL (Read) - Used by DESPIKE only
 *        Use default output names (if TRUE). Default is to ask for
 *        output file names.
+*     GUARD = LOGICAL (Read)
+*        Determines whether a guard ring of bolometers should be used
+*        during the weight function regridding. A guard ring simulates
+*        a ring of bolometers at the edge of the supplied data containing
+*        a value of zero volts. Default is to use a guard ring. It should be
+*        turned off if the edge of the observed dataset does not have zero
+*        flux. Currently this should also be turned off if the regridding
+*        parameters are modified (eg if WTFNRAD or SCALE are changed from
+*        their default values).
 *     IN = CHAR (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
@@ -131,6 +140,9 @@
 *        to the zero of the cone, for BESSEL it is the first zero of the
 *        Bessel function (PI) and for Gaussian it is the half-width
 *        half maximum (HWHM).
+*     SFACTOR = REAL (Read)
+*        This is the smoothing factor to use for a SPLINE2 regrid.
+*        See the PDA_SURFIT documentation for more information.
 *     SHIFT_DX = REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinte frame.
@@ -154,15 +166,6 @@
 *        Note that, in general, the number of pixels in the output grid
 *        exceeds the number of independent beams in the image.
 *        The data can be accessed as OUT.more.reds.times. Default is FALSE.
-*     GUARD = LOGICAL (Read)
-*        Determines whether a guard ring of bolometers should be used
-*        during the weight function regridding. A guard ring simulates
-*        a ring of bolometers at the edge of the supplied data containing
-*        a value of zero volts. Default is to use a guard ring. It should be
-*        turned off if the edge of the observed dataset does not have zero
-*        flux. Currently this should also be turned off if the regridding
-*        parameters are modified (eg if WTFNRAD or SCALE are changed from
-*        their default values).
 *     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 *     WEIGHTS = LOGICAL (Read)
@@ -246,6 +249,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.74  2000/05/11 19:57:45  timj
+*     Add SFACTOR to documentation header
+*
 *     Revision 1.73  1999/08/19 21:17:54  timj
 *     Remove debug print statements.
 *
