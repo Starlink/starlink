@@ -51,9 +51,9 @@
       tol=0.002
 
 #  Always draw a border around the regions of the plot containing
-#  valid co-ordinates. Make it slightly wider than its default width.
+#  valid co-ordinates. Make it twice wider the default width.
       border=1
-      width(border)=0.01
+      width(border)=2.0
 
 #  Always include textual labels describing the axes.
       textlab=1
