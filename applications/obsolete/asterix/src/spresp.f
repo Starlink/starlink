@@ -187,7 +187,6 @@
       INTEGER                	PSFSIZ			! Psf size in bytes
       INTEGER 		     	RBIN      		! Loop over off-axis angle
       INTEGER                	RLIMIT			! Limiting psf radius
-      INTEGER			SID			! Response identifier
       INTEGER		     	SI_PTR			! Spatial reponse index
       INTEGER                SNELM           	! Total no. elements in response
       INTEGER		     	SP_PTR			! Full spatial reponse
@@ -239,7 +238,7 @@
       CALL DAT_NEW( SLOC, 'MORE', 'EXTENSION', 0, 0, STATUS )
 
 *  Import locator to make a file object
-      CALL ADI1_MKFILE( SLOC, 'UPDATE', SID, STATUS )
+      CALL ADI1_MKFILE( SLOC, 'UPDATE', BIID, STATUS )
 
 *  Write SPRESP version id
       CALL HDX_PUTC( SLOC, 'VERSION', 1, VERSION, STATUS )
@@ -391,8 +390,7 @@
       NPSF = SNELM / (DIMS(1)*DIMS(2))
 
 *  Create BinDS object and link it to the response locator
-      CALL BDI_NEW( 'BinDS', NDIM, DIMS, 'REAL', BIID, STATUS )
-      CALL ADI_SETLNK( BIID, SID, STATUS )
+      CALL BDI_LINK( 'BinDS', NDIM, DIMS, 'REAL', BIID, STATUS )
 
 *  Write some axes
       CALL BDI_PUT0C( BIID, 'Label', 'Psf amplitude', STATUS )
@@ -433,45 +431,49 @@
 *  Copy energy axis if present
       IF ( E_AX .GT. 0 ) THEN
         CALL BDI_AXPUT0C( BIID, NDIM, 'Label', EAXLAB, STATUS )
-        CALL BDI_AXGET0C( IFID, E_AX, 'Units', UNITS, STATUS )
-        CALL BDI_AXPUT0C( BIID, NDIM, 'Units', UNITS, STATUS )
+        CALL BDI_AXCOPY( IFID, E_AX, 'Units', BIID, NDIM, STATUS )
         SPARR(1) = EBASE
         SPARR(2) = ESCALE
-        CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
+      ELSE
+        CALL BDI_AXPUT0C( BIID, NDIM, 'Label', 'Energy bin number',
+     :                    STATUS )
+        SPARR(1) = 1.0
+        SPARR(2) = 1.0
       END IF
+      CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
 
-*    Map space for expanded spatial response structure
+*  Map space for expanded spatial response structure
       CALL DYN_MAPR( NDIM, DIMS, SP_PTR, STATUS )
 
-*    Fill it with data
+*  Fill it with data
       PSFSIZ = DIMS(1)*DIMS(2)*VAL__NBR
       CP_PTR = SP_PTR
 
-*    Loop over energy
+*  Loop over energy
       DO EBIN = 1, DIMS(NDIM)
 
-*      Define energy band if appropriate
+*    Define energy band if appropriate
         IF ( E_AX .GT. 0 ) THEN
 
-*        Extract EBIN'th energy bin
+*      Extract EBIN'th energy bin
           IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
             CALL ARR_ELEM1R( EPTR, ONEBIN, EBIN, E, STATUS )
           ELSE
             E = EBASE + REAL(EBIN-1)*ESCALE
           END IF
 
-*        Define this energy band
+*      Define this energy band
           CALL PSF_DEF( IPSF, 0.0D0, 0.0D0, NINT(E), NINT(E), 0, 0,
      :                                                     STATUS )
 
-*        Announce to user
+*      Announce to user
           CALL MSG_SETR( 'ENERGY', E )
           CALL MSG_SETC( 'AXLAB', EAXLAB )
           CALL MSG_PRNT( 'Doing ^AXLAB band ^ENERGY' )
 
         END IF
 
-*      Radial symmetry?
+*    Radial symmetry?
         IF ( RADIAL ) THEN
 
 *        Loop over radial bins
