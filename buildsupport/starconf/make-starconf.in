@@ -50,10 +50,12 @@ cat >&3 <<\_STARCONF_EOD
 datadir=@datadir@
 ln_s="@LN_S@"
 
-# Always include acinclude.m4 to add Starlink autoconf macros.
-# Always include install-with-manifest.in, since the STAR_DEFAULTS macro
-# depends on it.
-defaultchunks="acinclude.m4 install-with-manifest.in"
+# Always include the following files:
+#   acinclude.m4: to add Starlink autoconf macros;
+#   install-with-manifest.in: since the STAR_DEFAULTS macro depends on it;
+#   component.xml: every starconf directory should have a component.xml
+defaultchunks="acinclude.m4 install-with-manifest.in component.xml "
+# Extra chunks should be added to this variable
 extrachunks=""
 
 # Make sure we have a configure.ac in the current directory
@@ -67,10 +69,10 @@ fi
 # Scan configure.ac, getting all the used macros into a string
 starmacros=`sed -n 's/^\(STAR[_A-Z]*\).*/\1/p' configure.ac | sed '{:a;N;s/\n/ /;t a;}'`
 
-# Certain macros depend on certain additional files.  Scan the list of used
-# macros, and add the required files to $extrachunks.  There are no such
-# interdependencies at present, but if they are added, the dependencies
-# should be documented here.
+# Certain macros depend on certain additional files.  Scan the list of
+# used macros, and add the required files to $extrachunks.  There are
+# currently no macros in starconf.m4.in which require such files, but
+# if they are added, the dependencies should be documented here.
 found_star_defaults=false
 for foundmacro in $starmacros dummy
 do
@@ -94,18 +96,6 @@ fi
 # We now know what files we're going to include in the generated
 # starconf.status
 filelist=" $defaultchunks $extrachunks "
-
-# Before doing anything else, verify that the component.xml file is present
-if test ! -e component.xml; then
-    echo "$0: no file component.xml found.  Stub file created"
-    cat >>component.xml <<\_EOF
-<?xml version="1.0"?>
-<!DOCTYPE component SYSTEM "componentinfo.dtd">
-
-<component id="???">
-</component>
-_EOF
-fi
 
 # Make sure there's a link to the installed componentinfo.dtd
 test -e componentinfo.dtd || $ln_s $datadir/componentinfo.dtd componentinfo.dtd
