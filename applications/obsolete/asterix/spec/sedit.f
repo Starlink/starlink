@@ -836,8 +836,8 @@
                FROZ='   '
             END IF
             IF ( ETHERE ) FROZ = 'E'//FROZ(2:3)
-            IF ( (NTIE.GT.0) .AND. (TGROUP(J).GT.0) ) THEN
-              IF ( J .NE. TSTART(TGROUP(J)) ) THEN
+            IF ( (NTIE.GT.0) .AND. (TGROUP(PARTOT).GT.0) ) THEN
+              IF ( PARTOT .NE. TSTART(TGROUP(PARTOT)) ) THEN
                 FROZ(2:2) = 'C'
               END IF
             END IF
