@@ -120,8 +120,6 @@
         CALL ERR_REP( ' ', 'Don''t know how to delete ^ITEM', STATUS )
       END IF
 
-      END
-
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_DELETE', STATUS )
 
