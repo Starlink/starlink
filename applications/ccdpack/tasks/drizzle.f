@@ -355,7 +355,7 @@
 *     01-SEP-1999 (AA):
 *        Added SCALE and ZERO point corrections to code
 *     03-SEP-1999 (AA):
-*        Propogation of WCS component from reference NDF
+*        Propagation of WCS component from reference NDF
 *     06-SEP-1999 (AA):
 *        Changed MULTI from _INTEGER to _DOUBLE and propgated changes
 *     06-SEP-1999 (AA):
@@ -363,10 +363,17 @@
 *     07-SEP-1999 (AA):
 *        Added weighting by inverse variance map to code (MAPVAR parameter)
 *     07-SEP-1999 (AA):
-*        Renamed some KPG1_* routines and propogated changes
+*        Renamed some KPG1_* routines and propagated changes
 *     23-SEP-1999 (MBT):
 *        Cosmetic changes, replaced some calls with standard CCDPACK ones,
 *        initialised output array with BAD value.
+*     25-OCT-1999 (AA):
+*        Added propagation of (incorrect!) variances through drizzling
+*        Propagated input data type through drizzling routine
+*        Changed to use temporary workspace for weight arrays
+*     26-OCT-1999 (AA):
+*        Added preserve keyword and associated changes
+*        Changed to use CCD1_MKTMP to create temporary workspace
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -417,9 +424,14 @@
 *  Local Variables:
       CHARACTER * ( 6 ) ACMODE              ! NDF access mode
       CHARACTER * ( DAT__SZTYP ) ITYPE      ! NDF array implementation type
-      CHARACTER * ( DAT__SZLOC ) DLOC       ! Drizzle extention locator
+      CHARACTER * ( DAT__SZTYP ) OTYPE      ! NDF array implementation type
+      CHARACTER * ( DAT__SZLOC ) DLOC       ! CCDPACK extension locator
       CHARACTER * ( 255 ) NAME           ! NDF file name (without file type).
-      
+
+      INTEGER WDREF
+      INTEGER WVREF
+      INTEGER CNREF
+     
       DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis
       DOUBLE PRECISION AEND( NDF__MXDIM )   ! End co-ord of each axis
       DOUBLE PRECISION DDLBND( NDF__MXDIM ) ! Co-ord lower bound of input NDF 
@@ -440,6 +452,7 @@
         
       INTEGER CFRAME( CCD1__MXNDF + 1 )   ! Index value of the current AST Frame
       INTEGER DIMSIZ                      ! Output NDF dimension size
+      INTEGER EL                          ! Size of vectorised ouput array
       INTEGER FDIN                        ! Pointer to INFILE file descriptor
       INTEGER FRCUR( CCD1__MXNDF + 1 )    ! Pointer to the Current AST Frame
       INTEGER FRM                    ! AST pointer to frame under consideration
@@ -476,14 +489,15 @@
       INTEGER OUBND( NDF__MXDIM, CCD1__MXNDF )  ! Output NDF upper bounds
       INTEGER OCNT                   ! Pointer to the Output NDF Counts
       INTEGER ODAT                   ! Pointer to the Output NDF Data component
-      INTEGER ODIM ( NDF__MXDIM )    ! Ouptut extention dimension sizes
-*      INTEGER OVAR                   ! Pointer to the Ouput NDF Variances
+      INTEGER ODIM ( NDF__MXDIM )    ! Ouptut extension dimension sizes
+      INTEGER OVAR                   ! Pointer to the Ouput NDF Variances
       INTEGER OWCS              ! Pointer to the WCS extension of the output NDF
       INTEGER OWHT                   ! Pointer to the Ouput NDF Weights
       INTEGER PFRAME                 ! Index of the PIXEL frame
       INTEGER PLACE                  ! NDF place holder
       INTEGER UBNDX( NDF__MXDIM )    ! Maximum (overall) upper bound
       INTEGER VALPIX                 ! Number of valid pixels in array (dummy)
+      INTEGER VWHT                   ! Pointer to the variance weights
       
       LOGICAL ADJUST                 ! Apply scale/zero corrections?
       LOGICAL ISECT                  ! NDFs intersect? (not used)
@@ -496,6 +510,7 @@
       LOGICAL SAME                   ! NDFs are the same?
       LOGICAL SWCS                   ! WCS component present if .TRUE. 
       LOGICAL VAR                    ! Variance array present?
+      LOGICAL PREVD                  ! Preserve input data type?
 
 *  Internal references:
       INCLUDE 'NUM_DEC_CVT'      ! Conversion declarations
@@ -523,6 +538,9 @@
       IF( GETM ) THEN
          GETV = .TRUE.
       ENDIF
+      
+*  Are we preserving the input data type?
+      CALL PAR_GET0L( 'PRESERVE', PREVD, STATUS )
               
 *  Get the scaling size for drizzling (ie linear scaling of output
 *  to input pixels), this defaults to 2.0.
@@ -560,6 +578,10 @@
       CALL MSG_SETD( 'REP_MULTI', MULTI )
       CALL CCD1_MSG( ' ', '    Scaling (output/input): ^REP_MULTI',
      :               STATUS )
+      CALL MSG_SETL( 'REP_PREVD', PREVD )
+      CALL CCD1_MSG( ' ', '    Preserve input data type: ^REP_PREVD',
+     :               STATUS )
+     
 
 *  Loop to obtain an identifier for each NDF and get the bounds for
 *  the mosaiced image + determine presence of variance component
@@ -594,6 +616,9 @@
             CALL CCD1_MSG( ' ', 
      :                     '    NDF variance component: present', 
      :                     STATUS )
+            CALL CCD1_MSG( ' ', 
+     :                     '    Propagating variances: TRUE', 
+     :                     STATUS )     
             IF( GETV ) THEN
                CALL MSG_SETL( 'REP_USEVAR', GETV )
                CALL CCD1_MSG( ' ', '    Using variances as '//
@@ -634,7 +659,7 @@
              STATUS = SAI__ERROR
              CALL NDF_MSG( 'NDFNAME', NDF( I ) )
              CALL ERR_REP( 'DRIZZLE_FRAME', '  NDF ^NDFNAME '//
-     :'does not have a WCS extention with class FrameSet.', STATUS)
+     :'does not have a WCS extension with class FrameSet.', STATUS)
              GO TO 940             
          ENDIF
           
@@ -1073,55 +1098,76 @@
          CALL NDF_TYPE( NDF( 1 ), 'Data', ITYPE, STATUS )
       ENDIF
 
-*  Create the output NDF, I'm going to make it a _REAL. 
+*  Create the output NDF, check to see whether we're preserving type
+
+      IF ( PREVD ) THEN
+         OTYPE = ITYPE
+      ELSE IF( ITYPE .EQ. '_DOUBLE' .OR. 
+     :    ITYPE .EQ. '_INTEGER' ) THEN
+          OTYPE = '_DOUBLE'
+      ELSE
+         OTYPE = '_REAL'
+      ENDIF
+
       CALL PAR_GET0C( 'OUT', NAME, STATUS )
       CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', 
      :               OUTNDF, PLACE, STATUS )
-      CALL NDF_NEW( '_REAL', NDIMX, LBNDX, UBNDX, PLACE, 
+      CALL NDF_NEW( OTYPE, NDIMX, LBNDX, UBNDX, PLACE, 
      :              OUTNDF, STATUS)
-     
+
       IF ( STATUS .NE. SAI__OK ) GOTO 940
       
 *  Map the Data array to force them into existance
-      CALL NDF_MAP( OUTNDF, 'Data', '_REAL', 'WRITE/BAD', 
+      CALL NDF_MAP( OUTNDF, 'Data', OTYPE, 'WRITE/BAD', 
      :              ODAT, NPXOUT, STATUS )
 
-*  Variances are currently not propogated, so there is no point
-*  in wasting disk space with the varaince array for the output
-*  image
-*     
-*      CALL NDF_MAP( OUTNDF, 'Variance', '_REAL', 'WRITE/BAD', 
-*     :              OVAR, NPXOUT, STATUS )
+*  We want to propagate the variance information, so we need an
+*  ouput variance array. It should be noted, that the propagated
+*  variances are STATISTICALLY INCORRECT (error are correlated).
+      CALL NDF_MAP( OUTNDF, 'Variance', OTYPE, 'WRITE/BAD', 
+     :              OVAR, NPXOUT, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) GOTO 940      
-     
-*  Create a Weight array and map it      
+
+*  Create the CCDPACK_EXT extension
+      CALL CCD1_CEXT( OUTNDF, .TRUE., 'UPDATE', DLOC, STATUS )
+      CALL CCD1_TOUCH( OUTNDF, 'DRIZZLE', STATUS )
+    
+*  Setup stuff for workspace creation 
+      EL = 0     
       DO IDIM = 1, NDIMX
          DIMSIZ = UBNDX( IDIM ) - LBNDX( IDIM ) + 1
          ODIM( IDIM ) = DIMSIZ
+         IF( IDIM .EQ. 1 ) THEN
+            EL = ODIM( IDIM )
+         ELSE
+            EL = EL*ODIM( IDIM )
+         END IF
       END DO
       
-      CALL NDF_XNEW( OUTNDF, 'CCDPACK', 'CCDPACK_EXT', 0, 
-     :               0, DLOC, STATUS )
-      CALL DAT_NEW( DLOC, 'Weight', '_REAL', NDIMX, ODIM, STATUS )
-      CALL CMP_MAPN( DLOC, 'Weight', '_REAL', 'WRITE', NDIMX,
-     :               OWHT, ODIM, STATUS )
-    
+
+*  Create a Weight array and map it 
+      CALL CCD1_MKTMP( EL, OTYPE, WDREF, STATUS )
+      CALL CCD1_MPTMP( WDREF, 'WRITE', OWHT, STATUS )
+      
+*  Create a Weight array for the variances and map it      
+      CALL CCD1_MKTMP( EL, OTYPE, WVREF, STATUS )
+      CALL CCD1_MPTMP( WVREF, 'WRITE', VWHT, STATUS )
+                 
 *  Create a Count array and map it, we'll use this to count the
 *  number of input pixels we've drizzled onto the output image
-      CALL DAT_NEW( DLOC, 'Count', '_INTEGER', NDIMX, ODIM, STATUS )
-      CALL CMP_MAPN( DLOC, 'Count', '_INTEGER', 'WRITE', NDIMX,
-     :               OCNT, ODIM, STATUS )     
-      
+      CALL CCD1_MKTMP( EL, OTYPE, CNREF, STATUS )
+      CALL CCD1_MPTMP( CNREF, 'WRITE', OCNT, STATUS )  
+             
       IF ( STATUS .NE. SAI__OK ) GOTO 940
 
 *  Add a title to the new NDF.
       CALL NDF_CINP( 'TITLE', OUTNDF, 'TITLE', STATUS )
 
-*  Propogate the WCS component to the output NDF
+*  Propagate the WCS component to the output NDF
 *  =============================================
 *
-*  Propogate the WCS component of either the first NDF or the reference
+*  Propagate the WCS component of either the first NDF or the reference
 *  NDF if we have one, we might have an RA and DEC calibration or something
 *  else we don't want to loose.
 
@@ -1179,29 +1225,47 @@
          CALL CCD1_MSG( ' ',  ' ', STATUS )   
 
 *  Get the data type for the input NDF
-         CALL NDF_TYPE( NDF(I), 'Data', ITYPE, STATUS )
-      
+         CALL NDF_TYPE( NDF( I ), 'Data', ITYPE, STATUS )
+
+*  Test to see whether the NDF contains variance information and count
+*  the number which do.
+         CALL NDF_STATE( NDF( I ), 'Variance', VAR, STATUS ) 
+              
 *  The subroutine will drop the input images onto OUTNDF directly
 *  one at a time, weights are accumulated in the WEIGHT array
-*  located in the CCDPACK_EXT NDF extention
+*  located in the CCDPACK_EXT NDF extension
          CALL NDF_DIM( NDF(I), NDF__MXDIM, IDIMS, NDIMI, STATUS )
 
-         CALL CCD1_DODIZ( NDF(I), WEIGHT(I), NPXIN(I), 
-     :                    ITYPE, %VAL(ODAT), %VAL(OWHT), 
-     :                    %VAL(OCNT), FRCUR(I), MAPN(I), 
-     :                    IDIMS(1), IDIMS(2), NDIMI, ODIM(1), 
-     :                    ODIM(2), NVOUT, ILBND, LBNDX, 
-     :                    PIXFRAC, GETV, GETS, GETZ, GETM, 
-     :                    SCALE(I), ZERO(I), VARFAC, STATUS )
+
+*  We have a _REAL output array
+         IF( OTYPE .EQ. '_REAL' ) THEN
+
+            CALL CCG1_DODIZR( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS )
+
+*  We have a _DOUBLE output array     
+         ELSE IF( OTYPE .EQ. '_DOUBLE' ) THEN
+
+            CALL CCG1_DODIZD( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS )         
+         ENDIF
      
          IF ( STATUS .NE. SAI__OK ) GOTO 940
      
       END DO
 
-*  Erase the count array from the output NDF, we don't need it anymore
-      CALL CMP_UNMAP( DLOC, 'Count', STATUS )
-      CALL DAT_ERASE( DLOC, 'Count', STATUS )
-      
 *  Display information about the output mosaic.
 *  ===========================================     
 
@@ -1225,8 +1289,9 @@
       CALL MSG_SETC( 'INPUT_TYPE', ITYPE )
       CALL CCD1_MSG( ' ',
      :   '    Input frame(s) data type: ^INPUT_TYPE', STATUS )
+      CALL MSG_SETC( 'OUTPUT_TYPE', OTYPE )
       CALL CCD1_MSG( ' ',
-     :   '    Output mosaic data type: _REAL', STATUS ) 
+     :   '    Output mosaic data type: ^OUTPUT_TYPE', STATUS ) 
       CALL MSG_SETL( 'IN_WHT', GETV )
       CALL CCD1_MSG( ' ', '    Weighted by inverse variance: '
      :             //' ^IN_WHT', STATUS )
@@ -1266,7 +1331,6 @@
 999   CONTINUE
 
 *  Release NDFs and close container files
-      CALL DAT_ANNUL( DLOC, STATUS )
       CALL NDF_ANNUL( OUTNDF, STATUS )
       DO I = 1, NNDF
          CALL NDF_UNMAP( NDF( I ), '*', STATUS )
