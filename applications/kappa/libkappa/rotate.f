@@ -102,13 +102,13 @@
 *  Implementation Status:
 *     The propagation rules depend on parameters ANGLE and NNMETH.
 *     -  For rotations that are multiples of 90-degrees, VARIANCE,
-*     QUALITY, AXIS, HISTORY, LABEL and UNITS components of the input
-*     NDF are propagated to the output NDF.  The axis components are
-*     switched and flipped as appropriate.
+*     QUALITY, AXIS, HISTORY, LABEL WCS and UNITS components of the input
+*     NDF are propagated to the output NDF.  The axis and WCS components 
+*     are switched and flipped as appropriate.
 *     -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
-*     LABEL and UNITS components of the input NDF are propagated to the
-*     output NDF.
-*     -  For the linear interpolation method HISTORY, LABEL and
+*     LABEL, WCS and UNITS components of the input NDF are propagated to 
+*     the output NDF.
+*     -  For the linear interpolation method HISTORY, LABEL, WCS and
 *     UNITS components of the input NDF are propagated to the output
 *     NDF.  In addition if parameter VARIANCE is TRUE, variance
 *     information is derived from the input variance; and if parameter
@@ -123,11 +123,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 May 14 (MJC):
 *        Original NDF version.
+*     12-JUN-1998 (DSB):
+*        Added propagation of the NDF WCS component.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -148,6 +151,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
+      DOUBLE PRECISION DTOR      ! Degs to radians factor
+      PARAMETER ( DTOR = 0.01745329251994329577 )
+
       INTEGER NDIM
       PARAMETER ( NDIM = 2 )     ! Dimensionality of input/output arrays
 
@@ -161,6 +167,16 @@
                                  ! across 14 000 pixels.
 
 *  Local Variables:
+      DOUBLE PRECISION
+     :  COSANG,                  ! Cosine of rotation angle
+     :  IXC,                     ! X pix. coord. at centre of input array
+     :  IYC,                     ! Y pix. coord. at centre of input array
+     :  MATRIX( NDIM*NDIM ),     ! Rotation matrix for i/p -> o/p mapping
+     :  OFFSET( NDIM ),          ! Offset vector for i/p -> o/p mapping
+     :  OXC,                     ! X pix. coord. at centre of output array
+     :  OYC,                     ! Y pix. coord. at centre of output array
+     :  SINANG                   ! Sine of rotation angle
+
       CHARACTER * ( 8 ) ACOMP( 3 ) ! Axis array components to process
       REAL ANGLE                 ! Clockwise degrees rotation
       CHARACTER * ( 80 ) AXCOMP  ! Axis character component
@@ -980,6 +996,28 @@
 
          END IF
       END IF
+
+*  Propagate the WCS component, incorporating a linear mapping between
+*  pixel coordinates. This mapping is described by a matrix and an offset
+*  vector. Set these up. 
+      COSANG = DBLE( COS( ANGLE * DTOR ) )
+      SINANG = DBLE( SIN( ANGLE * DTOR ) )
+
+      MATRIX( 1 ) = COSANG
+      MATRIX( 2 ) = -SINANG
+      MATRIX( 3 ) = SINANG
+      MATRIX( 4 ) = COSANG
+
+      OXC = 0.5D0*DBLE( UBNDO( 1 ) + LBNDO( 1 ) - 1 )
+      OYC = 0.5D0*DBLE( UBNDO( 2 ) + LBNDO( 2 ) - 1 )
+      IXC = 0.5D0*DBLE( UBND( 1 ) + LBND( 1 ) - 1 )
+      IYC = 0.5D0*DBLE( UBND( 2 ) + LBND( 2 ) - 1 )
+
+      OFFSET( 1 ) = OXC - IXC*COSANG + IYC*SINANG
+      OFFSET( 2 ) = OYC - IXC*SINANG - IYC*COSANG
+
+*  Propagate the WCS component.
+      CALL KPG1_ASPRP( 2, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
   999 CONTINUE
 
