@@ -64,6 +64,8 @@
 *        Added INEXT parameter + associated changes.
 *     1-APR-1999 (MBT):
 *        Added WCS mode and farmed out TR output to CCD1_TROUT.
+*     1-NOV-1999 (MBT):
+*        Changed calling sequence for CCD1_TROUT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,7 +117,7 @@
      :   STATUS )
 
 *  Output coefficients.
-         CALL CCD1_TROUT( TR, STATUS )
+         CALL CCD1_TROUT( TR, 0, .FALSE., STATUS )
 
 *  Transformation given as a expression.
       ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN 

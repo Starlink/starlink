@@ -52,12 +52,9 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     - this routine writes information using the CCDPACK logfile
-*     system, so this must be opened first.
-
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +62,8 @@
 *        Original version.
 *     17-MAR-1995 (PDRAPER):
 *        Removed unused argument NNODE.
+*     1-NOV-1999 (MBT):
+*        Removed output part, which now resides in CCD1_PROFF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -211,31 +210,6 @@
 *  Next while.
          GO TO 2
       END IF     
-
-*  Write out the offsets to the log file.
-*  First construct a header string.
-      BUFFER = '  List'
-      IAT = VAL__SZI + 4
-      BUFFER( IAT: ) = '     X-offset '
-      XS = IAT + 2
-      IAT = IAT + VAL__SZD + 4
-      BUFFER( IAT: ) = '     Y-offset '
-      YS = IAT + 2
-      CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_MSG( ' ', BUFFER, STATUS )
-
-*  Now write out the offsets for those nodes along spanning graph.
-       DO I = 1, NCOMP
-         IF ( BEEN( I ) )  THEN
-            BUFFER = ' '
-            CALL CHR_ITOC( I, BUFFER( 5: ), IAT )
-            IAT = 5 + IAT
-            BUFFER( IAT : IAT ) = ')'
-            CALL CHR_DTOC( XOFFN( I ), BUFFER( XS: ), IAT )
-            CALL CHR_DTOC( YOFFN( I ), BUFFER( YS: ), IAT )
-            CALL CCD1_MSG( ' ', BUFFER, STATUS )
-         END IF
-      END DO 
 
       END
 * $Id$

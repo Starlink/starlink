@@ -490,6 +490,9 @@
 *        Changed to use WCS components as well as TRANSFORM structures.
 *     21-MAY-1999 (MBT):
 *        Added USEWCS parameter.
+*     1-NOV-1999 (MBT):
+*        Modified so that output is in units appropriate to Current 
+*        coordinate frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -551,10 +554,10 @@
       DOUBLE PRECISION RMS      ! Root mean square difference in fitted lists and reference list
       DOUBLE PRECISION TOLER    ! Tolerance in RMS devations
       DOUBLE PRECISION TR( 6, CCD1__MXLIS ) ! The transformation coefficients
-      DOUBLE PRECISION TRCR( 6 ) ! Approx coefficients for Current->OUTDM map
       INTEGER FDIN              ! FIO file descriptors
       INTEGER FDREFO            ! Output reference set descriptor
       INTEGER FIOGR             ! IRH group of input list names
+      INTEGER FRMS( CCD1__MXLIS ) ! AST pointers to Current coordinate frames
       INTEGER FRREG             ! AST pointer to frame in OUTDM domain
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position within string
@@ -721,6 +724,10 @@
                CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
                MAP1 = AST_GETMAPPING( IWCS, JPIX, JCUR, STATUS )
                MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
+
+*  Get the Current frame of the WCS component (used for formatting 
+*  coordinate output).
+               FRMS( I ) = AST_GETFRAME( IWCS, JCUR, STATUS )
             END IF
 
 *  Write message about NDF name and domain.
@@ -975,6 +982,17 @@
      :                    IFIT, TOLER, TR, %VAL( IPXR ), %VAL( IPYR ),
      :                    %VAL( IPIDR ), %VAL( IPWX ), %VAL( IPWY ),
      :                    %VAL( IPWID ), NOUT, RMS, STATUS )
+
+*  Report coefficients of linear transformation to the user.
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '    Transformation coefficients', STATUS )
+         CALL CCD1_MSG( ' ', '    ---------------------------', STATUS )
+         DO 11 I = 1, NOPEN
+            CALL CCD1_MSG( ' ', ' ', STATUS )
+            CALL MSG_SETC( 'ID', FNAME( I ) )
+            CALL CCD1_MSG( ' ', '  ^ID:', STATUS )
+            CALL CCD1_TROUT( TR( 1, I ), FRMS( I ), USEWCS, STATUS )
+ 11      CONTINUE
 
 *  Store the transformation information.
          IF ( STATUS .EQ. SAI__OK ) THEN

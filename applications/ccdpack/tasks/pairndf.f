@@ -1192,6 +1192,10 @@
      :                    NNDF, %VAL( IPBEEN ), %VAL( IPQUE ),
      :                    XOFFN, YOFFN, STATUS )
 
+*  Output offset information to the user.
+         CALL CCD1_PROFF( NNDF, %VAL( IPBEEN ), XOFFN, YOFFN, 0, 
+     :                    .FALSE., STATUS )
+
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
          CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NNODE, IPX1, IPY1, IPX2,

@@ -126,6 +126,7 @@
 *     DUVAD::RFWS: R.F.Warren-Smith (Durham Polarimetry Group)
 *     DUVAD::TMG: Tim Gledhill (Durham Polarimetry Group)
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -146,6 +147,8 @@
 *        Added numeric handler for rms sums.
 *     4-OCT-1996 (PDRAPER):
 *        Changed LIB$ calls to NUM_.
+*     1-NOV-1999 (MBT):
+*        Removed output part (now done elsewhere).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -431,19 +434,6 @@
      :      'change on last iteration was ^CHANGE with target of '//
      :      '^TARGET', status )
          ENDIF
-      ENDIF
-
-*  If successful, print results.
-      IF ( STATUS .EQ. SAI__OK ) then
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ', '    Transformation coefficients', STATUS )
-         CALL CCD1_MSG( ' ', '    ---------------------------', STATUS )
-         DO 16 I = 1, NIM
-            CALL CCD1_MSG( ' ', ' ', STATUS )
-            CALL MSG_SETC( 'ID', LISTID( I ) )
-            CALL CCD1_MSG( ' ', '  ^ID:', STATUS )
-            CALL CCD1_TROUT( TR( 1, I ), STATUS )
- 16      CONTINUE
       ENDIF
 
 *  Cancel the condition handler.

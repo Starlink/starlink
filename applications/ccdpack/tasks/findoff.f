@@ -441,6 +441,9 @@
 *     28-OCT-1999 (MBT):
 *        Modified so that ERROR and MAXDISP are in units of pixels (not
 *        current coordinates).
+*     1-NOV-1999 (MBT):
+*        Modified so that output is in units appropriate to current 
+*        coordinate frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -491,6 +494,7 @@
       INTEGER FDIN              ! Input FIO descriptor
       INTEGER FDOUT             ! Output FIO descriptor
       INTEGER FIOGR             ! Input IRH group identifier
+      INTEGER FRMS( CCD1__MXLIS ) ! AST pointers to Current coordinate frames
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in CHR_ string
       INTEGER IDIN              ! NDF identifier
@@ -579,11 +583,11 @@
 *  Start the CCDPACK logging system.
       CALL CCD1_START( 'FINDOFF', STATUS )
 
-*  Begin NDF context.
-      CALL NDF_BEGIN( STATUS )
-
 *  Begin AST context.
       CALL AST_BEGIN( STATUS )
+
+*  Begin NDF context.
+      CALL NDF_BEGIN( STATUS )
 
 *  Find out what is to be used for the source of the position list
 *  names. Are they stored in NDF extensions or will just straight list
@@ -690,6 +694,10 @@
                MAP1 = AST_GETMAPPING( IWCS, JPIX, JCUR, STATUS )
                MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
 
+*  Get the Current frame of the WCS component (used for formatting 
+*  coordinate output).
+               FRMS( I ) = AST_GETFRAME( IWCS, JCUR, STATUS )
+
 *  Get NDF bounding box in pixel coordinates.
                CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
                IF ( RSTRCT ) THEN
@@ -743,7 +751,8 @@
             ELSE
 
 *  Not using WCS; set pixel size to unity, since the coordinates we will
-*  be using will be pixel coordinates.
+*  be using will be pixel coordinates, and set coordinate frames to null
+*  values.
                PSIZE( I ) = 1D0
             END IF
 
@@ -1291,9 +1300,6 @@
  4       CONTINUE 
  3    CONTINUE    
 
-*  End AST context.
-      CALL AST_END( STATUS )
-
 *  End NDF context.
       CALL NDF_END( STATUS )
                   
@@ -1408,6 +1414,10 @@
      :                    NOPEN, %VAL( IPBEEN ), %VAL( IPQUE ),
      :                    XOFFN, YOFFN, STATUS )
 
+*  Output the offsets to the user.
+         CALL CCD1_PROFF( NOPEN, %VAL( IPBEEN ), XOFFN, YOFFN, FRMS,
+     :                    USEWCS, STATUS )
+
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
          CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NNODE, IPXO1, IPYO1,
@@ -1519,6 +1529,9 @@
       CALL IRH_ANNUL( FIOGR, STATUS )
       IF ( NDFS ) CALL IRH_ANNUL( NDFGR, STATUS )
       CALL IRH_CLOSE( STATUS )
+
+*  Close AST.
+      CALL AST_END( STATUS )
 
 *  Free all workspace.
       CALL CCD1_MFREE( -1, STATUS )
