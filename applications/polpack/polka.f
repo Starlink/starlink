@@ -621,8 +621,15 @@
 
 *  If any other error occurred, then report a contextual message.
          ELSE
+            IF( DBEAM ) THEN
+               CALL MSG_SETC( 'BEAM', 'dual' )
+            ELSE
+               CALL MSG_SETC( 'BEAM', 'single' )
+            END IF
+
             CALL ERR_REP( 'POLKA_ERR4', 'POLKA: Unable to process '//
-     :                    'dual beam polarisation data.', STATUS )
+     :                    '^BEAM beam polarimetry data.', STATUS )
+
          END IF
 
       END IF
