@@ -589,7 +589,7 @@ sculib_addare.f sculib_addcad.f sculib_addcai.f sculib_addcar.f \
 sculib_airmass.f sculib_analyse_photom_jiggle.f sculib_apparent_2_mp.f \
 sculib_apparent_2_tp.f sculib_bessj1.f sculib_bits.f sculib_boldecode.f \
 sculib_bolname.f sculib_bolselect.f sculib_calc_apparent.f \
-sculib_calc_azna_offset.f sculib_calc_bol_coords.f \
+sculib_calc_bol_coords.f \
 sculib_calc_flatfield.f sculib_calc_grid.f sculib_calc_output_coords.f \
 sculib_calc_skydip_temps.f sculib_calc_sub_bols.f sculib_cfillb.f \
 sculib_cfilld.f sculib_cfilli.f sculib_cfillr.f sculib_clip_bol.f \
@@ -1702,7 +1702,6 @@ sculib_boldecode.o: SAE_PAR
 sculib_bolname.o: SAE_PAR
 sculib_bolselect.o: PRM_PAR SAE_PAR
 sculib_calc_apparent.o: SAE_PAR
-sculib_calc_azna_offset.o: SAE_PAR
 sculib_calc_bol_coords.o: PRM_PAR SAE_PAR
 sculib_calc_flatfield.o: PRM_PAR SAE_PAR
 sculib_calc_grid.o: SAE_PAR
