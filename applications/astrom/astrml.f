@@ -167,6 +167,7 @@
 *       Plate:                  central RA Dec Equinox [Epoch]
 *       Date/time:       either 'T' Date Time
 *                        or     'T' ST
+*                        or     'T' Epoch
 *       Observatory:     either 'O' Obs ID
 *                            or 'O' [Long] Lat [Height (metre)]
 *       Meteorological:         'M' Temp (degK) [Pressure (mB)]
@@ -591,10 +592,18 @@
 *  Number of coefficients and maximum so far
       INTEGER NC,NTERMS
 
-*  Plate constants: 4, 6 and 6+ coeff solutions and inverses
-      INTEGER MAXSOL
-      PARAMETER (MAXSOL=3)
+*  Plate constants: 4, 6 and 6+ coeff solutions and inverses.
+*  PLTCON(1..3,n) holds plate constants (a1,a2,a3), and
+*  PLTCON(BVALS+1..3,n) constants (b1,b2,b3), for solution
+*  n=NSOL=(1,2,..).  PLTCON(1..6,n+MAXSOL) holds the inverse of
+*  PLTCON(1..6,n) for solution NSOL=n.  Maximum number of solutions is
+*  MAXSOL.
+      INTEGER MAXSOL,BVALS
+      PARAMETER (MAXSOL=5,BVALS=3)
       DOUBLE PRECISION PLTCON(6,MAXSOL*2)
+
+*  Pattern of extra non-linear fits to attempt (elements 1 and 2 ignored)
+      INTEGER EXTRAFITS(MAXSOL)
 
 *  Maximum number of terms in the 6+ coefficient model
       INTEGER MAXTRM
@@ -953,8 +962,19 @@
 *     The "approx" flag is invalid here
          IF (APPROX) GO TO 990
 
-*     UT date/time, or LST?
-         IF (NFLD.EQ.2) THEN
+*     Julian epoch, UT date/time, or LST?
+         IF (NFLD.EQ.1) THEN
+            
+*         Julian epoch, double
+            UTMJD=WORK(1)
+            GOTUT=.TRUE.
+
+*         Replace any plate epoch
+            EPPCG=sla_EPJ(UTMJD)
+            KPPCG='J'
+            GOTPEP=.TRUE.
+
+         ELSE IF (NFLD.EQ.2) THEN
 
 *        LST h,m
             W1=WORK(1)
@@ -1612,12 +1632,38 @@
 
 *  Decide how many solutions to attempt
       IF ((FITDI.OR.FITPC).AND.NREF.GE.10) THEN
-         NSOLS=3
+         EXTRAFITS(1)=0
+         EXTRAFITS(2)=0
+         IF (FITDI.AND.FITPC) THEN
+            NSOLS=5
+            EXTRAFITS(3)=7
+            EXTRAFITS(4)=8
+            EXTRAFITS(5)=9
+         ELSE
+            NSOLS=3
+            IF (FITDI) THEN
+               EXTRAFITS(3)=7
+            ELSE
+               EXTRAFITS(3)=8
+            ENDIF
+            EXTRAFITS(4)=0
+            EXTRAFITS(5)=0
+         ENDIF
+*      Following settings redundant
+         FITDI=.FALSE.
+         FITPC=.FALSE.
       ELSE IF (NREF.GE.3) THEN
          NSOLS=2
       ELSE
          NSOLS=1
       END IF
+      
+      IF (NSOLS.GT.MAXSOL) THEN
+*      Ooops -- this isn't right
+         WRITE (LUR, '("Can''t happen!  NSOLS=",I3/"ABORTING")') NSOLS
+         WRITE (LUS, '("Can''t happen!  NSOLS=",I3/"ABORTING")') NSOLS
+         GO TO 997
+      ENDIF
 
 *  Solutions (4 unflipped, 4 flipped, 6, 6+)
       DO NSOL=0,NSOLS
@@ -1651,7 +1697,31 @@
          ELSE IF (NSOL.EQ.2) THEN
             NC=6
          ELSE
+*         3 <= NSOL,NSOLS <= MAXSOL
             NITS=20
+*         XXX I should reset both DISTE and PC to the same values each extra 
+*         time round here 
+            WRITE (LUX, '("INFO TEMP DISTE=",F10.3," DISTOR=",F10.3)')
+     :           DISTE,DISTOR
+            DISTE=DISTOR
+*         Which combination of non-linear fits are we attempting this time?
+            IF (EXTRAFITS(NSOL).EQ.7) THEN
+               FITDI=.TRUE.
+               FITPC=.FALSE.
+            ELSE IF (EXTRAFITS(NSOL).EQ.8) THEN
+               FITDI=.FALSE.
+               FITPC=.TRUE.
+            ELSE IF (EXTRAFITS(NSOL).EQ.9) THEN
+               FITDI=.TRUE.
+               FITPC=.TRUE.
+            ELSE
+*            Ooops -- EXTRAFITS should only have values 7, 8, 9
+               WRITE (LUR, '("Can''t happen!  EXTRAFITS(",I1,")=",I3
+     :              /"ABORTING")') NSOL, EXTRAFITS(NSOL)
+               WRITE (LUS, '("Can''t happen!  EXTRAFITS(",I1,")=",I3
+     :              /"ABORTING")') NSOL, EXTRAFITS(NSOL)
+               GO TO 997
+            ENDIF
          END IF
 
 *     Iterate
@@ -2092,11 +2162,11 @@
                WRITE (LUR,
      :          '(5X,''X,Y = expected plate coordinates (radians)''//'//
      :                       '5X,SP,''X = '',G15.7,28X,''Y = '',G15.7)')
-     :                              PLTCON(1,NSOL),PLTCON(1+MAXSOL,NSOL)
+     :                              PLTCON(1,NSOL),PLTCON(BVALS+1,NSOL)
                WRITE (LUR,
      :             '(9X,sp,G15.7,'' * Xmeas'',24X,G15.7,'' * Xmeas''/'//
      :                '9X,G15.7,'' * Ymeas'',24X,G15.7,'' * Ymeas''//)')
-     :          (PLTCON(I,NSOL)/FNORM,PLTCON(I+MAXSOL,NSOL)/FNORM,I=2,3)
+     :          (PLTCON(I,NSOL)/FNORM,PLTCON(BVALS+I,NSOL)/FNORM,I=2,3)
 *            Write out a block of results (terminated by `ENDFIT' below)
 *            corresponding to one successful fit.
                IF (LUX.GT.0) THEN
@@ -2124,7 +2194,8 @@
      :             '(1X,SP,''Xmeas = '',G15.7,24X,''Ymeas = '',G15.7/'//
      :                         '9X,G15.7,'' * X'',28X,G15.7,'' * X''/'//
      :                        '9X,G15.7,'' * Y'',28X,G15.7,'' * Y''//)')
-     : (FNORM*PLTCON(I,NSOL+MAXSOL),FNORM*PLTCON(I+3,NSOL+MAXSOL),I=1,3)
+     :              (FNORM*PLTCON(I,NSOL+MAXSOL),
+     :               FNORM*PLTCON(BVALS+I,NSOL+MAXSOL),I=1,3)
 
 *           Plate scale(s), nonperpendicularity and orientation
                CALL sla_DCMPF(PLTCON(1,NSOL),
@@ -2249,15 +2320,24 @@
 *               are in the projected plane, and are the `intermediate
 *               world coordinates' of the FITS-WCS proposals.  Note that we
 *               are outputting the `report' coordinates, RAPCX and DCPCX.
+                  CALL sla_DR2TF(1,sla_DRANRM(RAPCX),KSRA,IRAVEC)
+*               Because of the dranrm, KSRA is always '+'
+                  WRITE (FTWS, '("Projection pole -- RA =  ",
+     :                 I3,":",I2.2,":",I2.2,".",I1)')
+     :                 IRAVEC
                   CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCX/D2R, 7,
-     :                 'Projection pole -- RA', FTSTAT)
+     :                 FTWS, FTSTAT)
+                  CALL sla_DR2AF(0,sla_DRANGE(DCPCX),KSDC,IDCVEC)
+                  WRITE (FTWS, '("Projection pole -- Dec = ",
+     :                 A,I2.2,":",I2.2,":",I2.2)')
+     :                 KSDC, (IDCVEC(N),N=1,3)
                   CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCX/D2R, 7,
-     :                 'Projection pole -- DEC', FTSTAT)
+     :                 FTWS, FTSTAT)
                   CALL FTPKYG (FTUNIT, 'CRPIX1', 
-     :                 fnorm*pltcon(1,nsol+maxsol), 7,
+     :                 FNORM*PLTCON(1,NSOL+MAXSOL), 7,
      :                 'Projection pole -- x-pixels', FTSTAT)
                   CALL FTPKYG (FTUNIT, 'CRPIX2', 
-     :                 fnorm*pltcon(4,nsol+maxsol), 7,
+     :                 FNORM*PLTCON(4,NSOL+MAXSOL), 7,
      :                 'Projection pole -- y-pixels', FTSTAT)
 *               Note that the coordinates, and the
 *               transformation matrix, are required to be in degrees
@@ -2279,11 +2359,11 @@
      :                 'Transformation to intermed. world coords',
      :                 FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_1',
-     :                 PLTCON(2+MAXSOL,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
+     :                 PLTCON(BVALS+2,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD1_2',
      :                 PLTCON(3,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_2',
-     :                 PLTCON(3+MAXSOL,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
+     :                 PLTCON(BVALS+3,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
 *               Include the relevant coefficients of the TAN distortion.
 *               If we write the undistorted gnomonic projection
 *               coordinates as (\xi, \eta), following C&G, and the distorted 
