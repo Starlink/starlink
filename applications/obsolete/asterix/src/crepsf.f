@@ -28,12 +28,13 @@
 *
 *    History :
 *
-*     25 Jun 90 : V1.2-0  Original (DJA)
-*      2 Aug 90 : V1.2-1  Writes psf energy radii to psf structure (DJA)
-*     10 Aug 90 : V1.2-2  Allows user to specify a MJD for the dataset (DJA)
-*     15 Feb 92 : V1.6-0  Don't bother with energy table. (DJA)
-*     10 Mar 92 : V1.6-1  Added X0,Y0 parameters (DJA)
-*     15 Dec 92 : V1.7-0  Made units switchable, and added DX,DY parameter (DJA)
+*     25 Jun 90 : V1.2-0 Original (DJA)
+*      2 Aug 90 : V1.2-1 Writes psf energy radii to psf structure (DJA)
+*     10 Aug 90 : V1.2-2 Allows user to specify a MJD for the dataset (DJA)
+*     15 Feb 92 : V1.6-0 Don't bother with energy table. (DJA)
+*     10 Mar 92 : V1.6-1 Added X0,Y0 parameters (DJA)
+*     15 Dec 92 : V1.7-0 Made units switchable, and added DX,DY parameter (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -90,13 +91,13 @@
       CALL USI_ASSOCO( 'OUT', 'PSF_DATA', OLOC, STATUS )
 
 *    Get units to work with
-      CALL PAR_GET0C( 'UNITS', UNITS, STATUS )
+      CALL USI_GET0C( 'UNITS', UNITS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
 *    Decide on image size etc.
-      CALL PAR_PROMT( 'PIXSIZE', 'Pixel size in '//UNITS, STATUS )
-      CALL PAR_GET0R( 'PIXSIZE', SCALE, STATUS )
+      CALL USI_PROMT( 'PIXSIZE', 'Pixel size in '//UNITS, STATUS )
+      CALL USI_GET0R( 'PIXSIZE', SCALE, STATUS )
 
 *    Create axes
       CALL BDA_CREAXES( OLOC, 2, STATUS )
@@ -107,15 +108,15 @@
       CALL BDA_PUTUNITS( OLOC, 'Probability/pixel', STATUS )
 
 *    Image position
-      CALL PAR_GET0R( 'X0', X0, STATUS )
-      CALL PAR_GET0R( 'Y0', Y0, STATUS )
+      CALL USI_GET0R( 'X0', X0, STATUS )
+      CALL USI_GET0R( 'Y0', Y0, STATUS )
 
 *    Convert to radians
       X0 = X0 * TOR
       Y0 = Y0 * TOR
 
 *    Try for an MJD
-      CALL PAR_GET0D( 'MJD', MJD, STATUS )
+      CALL USI_GET0D( 'MJD', MJD, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         GOT_MJD = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -135,7 +136,7 @@
       END IF
 
 *    Get size of output psf dataset
-      CALL PAR_GET0I( 'RADIUS', RADIUS, STATUS )
+      CALL USI_GET0I( 'RADIUS', RADIUS, STATUS )
       DIMS(1) = RADIUS*2+1
       DIMS(2) = RADIUS*2+1
 
@@ -153,8 +154,8 @@
       CALL BDA_MAPDATA( OLOC, 'WRITE', DPTR, STATUS )
 
 *    Get psf <-> grid offsets
-      CALL PAR_GET0R( 'DX', DX, STATUS )
-      CALL PAR_GET0R( 'DY', DY, STATUS )
+      CALL USI_GET0R( 'DX', DX, STATUS )
+      CALL USI_GET0R( 'DY', DY, STATUS )
       DX = DX * TOR
       DY = DY * TOR
 

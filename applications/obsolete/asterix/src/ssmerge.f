@@ -39,7 +39,8 @@
 *     10 Aug 92 : V1.6-4  File indirection added (DJA)
 *     17 Dec 92 : V1.7-0  Recoded using internal UTIL_FINDFILE routines (DJA)
 *     22 Jul 93 : V1.7-1  Added PPROB field (DJA)
-*     26 Nov 93 : V1.7-3  COrrect termination when no wildcards used (DJA)
+*     26 Nov 93 : V1.7-3  Correct termination when no wildcards used (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -157,7 +158,7 @@
       DO WHILE ( (NSPEC.LE.MAXPAR) .AND. (STATUS.EQ.SAI__OK) )
         CALL MSG_SETI( 'P', NSPEC+1 )
         CALL MSG_MAKE( 'INP^P', PAR, PLEN )
-        CALL PAR_GET0C( PAR(:PLEN), SPEC(NSPEC+1), STATUS )
+        CALL USI_GET0C( PAR(:PLEN), SPEC(NSPEC+1), STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           NSPEC = NSPEC + 1
           INDIR(NSPEC) = (SPEC(NSPEC)(1:1) .EQ. '@')

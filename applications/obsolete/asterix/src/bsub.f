@@ -45,6 +45,7 @@
 *    History :
 *
 *     03 Mar 90 : V1.2-0  Original (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -59,7 +60,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SRCLIB(BSUB_CMN)'
+      INCLUDE 'BSUB_CMN'
 *
 *    Status :
 *
@@ -114,7 +115,7 @@
 *    Version :
 *
 	CHARACTER*30   		VERSION
-	PARAMETER               (VERSION = 'BSUB Version 1.3-18')
+	PARAMETER               (VERSION = 'BSUB Version 1.8-0')
 
 	CHARACTER*3		  SC_UN		!comparison unit type
 	CHARACTER*80		  UNITS		!units of axis
@@ -181,7 +182,7 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get Output write parameter
-      CALL PAR_GET0L('OUT_MESSAGES',LOUD,STATUS)
+      CALL USI_GET0L('OUT_MESSAGES',LOUD,STATUS)
       IF(STATUS.NE.SAI__OK)RETURN
 
 *    Initialise
@@ -752,7 +753,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 *
 *    Global variables :
 *
-      INCLUDE 'SRCLIB(BSUB_CMN)'
+      INCLUDE 'BSUB_CMN'
 *
 	BSUB_SUBTRACT_BACKGROUND=.TRUE.
 *-
@@ -778,7 +779,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 *  now be entered as a user input
 *
 	CALL MSG_PRNT(' ')
-	CALL PAR_GET0R('SOURCE_THRESH',DETECTION_THRESH,STATUS)
+	CALL USI_GET0R('SOURCE_THRESH',DETECTION_THRESH,STATUS)
 	IF(STATUS.NE.SAI__OK)THEN
 	  RETURN
 	ENDIF
@@ -794,7 +795,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 	BOXSIZE=0
 
 	CALL MSG_PRNT(' ')
-	CALL PAR_GET0I('BOX_DIM',BOXSIZE,STATUS)
+	CALL USI_GET0I('BOX_DIM',BOXSIZE,STATUS)
 	IF(STATUS.NE.SAI__OK)THEN
 	  RETURN
 	ENDIF
@@ -824,7 +825,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 *
 *  Do edge finding?
 *
-        CALL PAR_GET0L( 'SLOPING_EDGES', EDGES, STATUS )
+        CALL USI_GET0L( 'SLOPING_EDGES', EDGES, STATUS )
         IF ( STATUS .NE. SAI__OK ) RETURN
 
         IF ( EDGES .AND. .NOT. ALL_ZEROS ) THEN
@@ -1247,7 +1248,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 	BYTE QUALITY(NX,NY)
 
 	COMMON/FACTORIALS/LOG_FACTORIALS
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *-
 
 *    Check status
@@ -1292,7 +1293,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 	  FILT=' '
 	  DO WHILE(FILT.NE.'H'.AND.FILT.NE.'G')
 	    CALL MSG_PRNT(' ')
-	    CALL PAR_GET0C('SM_FILT',FILT,STATUS)
+	    CALL USI_GET0C('SM_FILT',FILT,STATUS)
 	    IF(STATUS.NE.SAI__OK)THEN
 	      RETURN
 	    ENDIF
@@ -1307,7 +1308,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 	  IF(FILT.EQ.'H')THEN
 
 	    CALL MSG_PRNT(' ')
-	    CALL PAR_GET0I('SMOOTH_SIZE',SM_SIZE,STATUS)
+	    CALL USI_GET0I('SMOOTH_SIZE',SM_SIZE,STATUS)
 	    IF(STATUS.NE.SAI__OK)THEN
 	      RETURN
 	    ENDIF
@@ -1321,14 +1322,14 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 	    IF(MOD(SM_SIZE,2).NE.1)SM_SIZE=SM_SIZE+1	!make odd size
 	    HSIZE=INT(SM_SIZE/2.)
 
-	    CALL PAR_GET0L('SMOOTH_BORDER',SM_BORDER,STATUS)
+	    CALL USI_GET0L('SMOOTH_BORDER',SM_BORDER,STATUS)
 	    IF(STATUS.NE.SAI__OK)THEN
 	      RETURN
 	    ENDIF
 
 	  ELSEIF(FILT.EQ.'G')THEN
 
-	    CALL PAR_GET0R('SM_FWHM',FWHM,STATUS)
+	    CALL USI_GET0R('SM_FWHM',FWHM,STATUS)
 	    IF(STATUS.NE.SAI__OK)THEN
 	      RETURN
 	    ENDIF
@@ -1737,7 +1738,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER   STATUS
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 
 	COMMON/FACTORIALS/LOG_FACTORIALS
 *
@@ -2449,7 +2450,7 @@ d		  E(M+1)=1.D0
 	INTEGER   STATUS
 *
 	COMMON/FACTORIALS/LOG_FACTORIALS
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -2544,7 +2545,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER   STATUS
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -2654,7 +2655,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -2788,7 +2789,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER   OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 
 	BSUB_GAUSS_ELIM=.TRUE.
 *
@@ -2914,7 +2915,7 @@ d		  E(M+1)=1.D0
 	INCLUDE 'SAE_PAR'
 	INCLUDE 'DAT_PAR'
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 
 	CHARACTER*(DAT__SZLOC)	OLOC		!output image locator
 
@@ -3253,7 +3254,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER   STATUS
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *-
 
 *    Check status
@@ -3382,7 +3383,7 @@ d		  E(M+1)=1.D0
 
 	REAL   DY, WT				!internal variables
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -3518,7 +3519,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -3695,7 +3696,7 @@ d		  E(M+1)=1.D0
 
 	COMMON/FACTORIALS/LOG_FACTORIALS
 *
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -3798,7 +3799,7 @@ d		  E(M+1)=1.D0
 
 	INTEGER OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -3920,7 +3921,7 @@ D	IMPLICIT NONE
 
 	INTEGER   OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -4194,7 +4195,7 @@ C     &  (bcoef(ii),ii=1,4)
 
 	INTEGER   OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *
 *-
 
@@ -4283,7 +4284,7 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	INTEGER   OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *-
 
 *    Check status
@@ -4347,7 +4348,7 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	INTEGER   OLD_ROUTINE
 
-	INCLUDE 'SRCLIB(BSUB_CMN)'
+	INCLUDE 'BSUB_CMN'
 *-
 
 *    Check status

@@ -83,6 +83,7 @@
 *                          FIT_STRUC and POI_STR structures remain. (DJA)
 *      3 Jun 94 : V1.7-5   A few changes to allow spectral images with one
 *                          energy bin to be searched (DJA)
+*     24 Nov 94 : V1.8-0   Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -127,7 +128,7 @@
       CALL PSS_OP_INIT( STATUS )
 
 *    Multiple file mode?
-      CALL PAR_GET0L( 'MULTI', CP_MULTI, STATUS )
+      CALL USI_GET0L( 'MULTI', CP_MULTI, STATUS )
       IF ( CP_MULTI ) THEN
         CALL PSS_MUL_INIT( NFILE, STATUS )
       ELSE
@@ -153,12 +154,12 @@
           CALL PSS_GET_MODE( 'MODE', STATUS )
 
 *        Expert mode?
-          CALL PAR_GET0L( 'EXPERT', CP_EXPERT, STATUS )
+          CALL USI_GET0L( 'EXPERT', CP_EXPERT, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Diagnostic mode?
           IF ( CP_EXPERT ) THEN
-            CALL PAR_GET0L( 'DIAG', DI_ON, STATUS )
+            CALL USI_GET0L( 'DIAG', DI_ON, STATUS )
             IF ( DI_ON ) THEN
               CALL PSS_DIAG_GETSEL( STATUS )
             END IF
@@ -175,9 +176,9 @@
 *      Find source extension too?
         IF ( CP_OPT .AND. (IFILE.EQ.1) ) THEN
           IF ( .NOT. CP_EXPERT ) THEN
-            CALL PAR_DEF0L( 'EXTEN', .FALSE., STATUS )
+            CALL USI_DEF0L( 'EXTEN', .FALSE., STATUS )
           END IF
-          CALL PAR_GET0L( 'EXTEN', CP_FITWIDTH, STATUS )
+          CALL USI_GET0L( 'EXTEN', CP_FITWIDTH, STATUS )
         END IF
 
 *      Choose routine based on mode

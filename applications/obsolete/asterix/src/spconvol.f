@@ -92,6 +92,8 @@
 *  History:
 *     16-Aug-94 (DJA):
 *        V1.8-0  Original version.
+*     25-NOV-94 (DJA):
+*        V1.8-1  User interface now uses USI exclusively
 *     {enter_changes_here}
 
 *  Bugs:
@@ -164,7 +166,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPCONVOL Version 1.8-0' )
+        PARAMETER        ( VERSION = 'SPCONVOL Version 1.8-1' )
 *.
 
 *    Check inherited global status.

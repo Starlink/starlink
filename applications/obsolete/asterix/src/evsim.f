@@ -49,19 +49,20 @@
 *    History :
 *
 *     20 Jul 89 : Original (RDJ)
-*     26 May 90 : V1.2-0  Generalised PSF access and converted to Asterix (DJA)
-*     24 Jul 90 : V1.2-1  Simulation parameters written to output file. If
-*                         seed supplied, counts are not deviated (DJA)
-*      2 Aug 90 : V1.2-2  Bug in source photon distribution fixedd (DJA)
-*      4 Dec 90 : V1.3-0  Can convolve source psf with gaussian of any width
-*                         (DJA)
-*     25 Jul 91 : V1.5-0  Takes background model as well as counts (DJA)
-*      4 Mar 92 : V1.6-1  Takes spatial parameters from model if present (DJA)
-*     12 Mar 92 : V1.6-2  Use 2D psf system (DJA)
-*     22 May 92 : V1.6-3  Use ERR_ANNUL to reset all status (DJA)
-*      9 Dec 92 : V1.7-0  Uses SLA_ random number generator (DJA)
-*      5 Mar 93 : V1.7-1  Use non-congruential number generator, SIM_RND (DJA)
-*     14 Jul 93 : V1.7-2  USe MATH_RND generator (DJA)
+*     26 May 90 : V1.2-0 Generalised PSF access and converted to Asterix (DJA)
+*     24 Jul 90 : V1.2-1 Simulation parameters written to output file. If
+*                        seed supplied, counts are not deviated (DJA)
+*      2 Aug 90 : V1.2-2 Bug in source photon distribution fixedd (DJA)
+*      4 Dec 90 : V1.3-0 Can convolve source psf with gaussian of any width
+*                        (DJA)
+*     25 Jul 91 : V1.5-0 Takes background model as well as counts (DJA)
+*      4 Mar 92 : V1.6-1 Takes spatial parameters from model if present (DJA)
+*     12 Mar 92 : V1.6-2 Use 2D psf system (DJA)
+*     22 May 92 : V1.6-3 Use ERR_ANNUL to reset all status (DJA)
+*      9 Dec 92 : V1.7-0 Uses SLA_ random number generator (DJA)
+*      5 Mar 93 : V1.7-1 Use non-congruential number generator, SIM_RND (DJA)
+*     14 Jul 93 : V1.7-2 Use MATH_RND generator (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -156,7 +157,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'EVSIM Version 1.7-2' )
+         PARAMETER      ( VERSION = 'EVSIM Version 1.8-0' )
 *-
 
 *    Check status
@@ -170,18 +171,18 @@
       CALL PSF_INIT( STATUS )
 
 *    Get number of files
-      CALL PAR_GET0I( 'NFILE', NFILE, STATUS )
+      CALL USI_GET0I( 'NFILE', NFILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get output dataset root name
       IF ( NFILE .GT. 1 ) THEN
-        CALL PAR_GET0I( 'FFILE', FFILE, STATUS )
-        CALL PAR_PROMT( 'OUT', 'Root name for multiple outputs',STATUS )
+        CALL USI_GET0I( 'FFILE', FFILE, STATUS )
+        CALL USI_PROMT( 'OUT', 'Root name for multiple outputs',STATUS )
       END IF
-      CALL PAR_GET0C( 'OUT', OROOT, STATUS )
+      CALL USI_GET0C( 'OUT', OROOT, STATUS )
 
 *    See if user supplied seed given
-      CALL PAR_GET0I( 'SEED', SEED, STATUS )
+      CALL USI_GET0I( 'SEED', SEED, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         SEED_GIVEN = .FALSE.
@@ -200,7 +201,7 @@
       CALL MATH_SETRND( SEED )
 
 *    Prompt for the background counts in field
-      CALL PAR_GET0C( 'MODEL', MODEL, STATUS )
+      CALL USI_GET0C( 'MODEL', MODEL, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Try to open it
@@ -276,8 +277,8 @@
         CALL ERR_ANNUL( STATUS )
 
 *      Decide on image size etc.
-        CALL PAR_GET0R( 'FIELDSIZE', FSIZE, STATUS )
-        CALL PAR_GET0R( 'PIXSIZE', PSIZE, STATUS )
+        CALL USI_GET0R( 'FIELDSIZE', FSIZE, STATUS )
+        CALL USI_GET0R( 'PIXSIZE', PSIZE, STATUS )
         UNITS = 'arcmin'
         XDEC = .TRUE.
         YDEC = .FALSE.
@@ -293,7 +294,7 @@
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
 *    Get number of background counts
- 10   CALL PAR_GET0I( 'BACK', ONBACK, STATUS )
+ 10   CALL USI_GET0I( 'BACK', ONBACK, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         ONBACK = 0
@@ -304,7 +305,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Prompt for the number of source counts
- 20   CALL PAR_GET1I( 'SOURCEC', MAXSRC, OSCOUNT, NSRC, STATUS )
+ 20   CALL USI_GET1I( 'SOURCEC', MAXSRC, OSCOUNT, NSRC, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         NSRC = 0
@@ -328,10 +329,10 @@
       IF ( NSRC .GT. 0 ) THEN
 
 *      Get source positions
- 30     CALL PAR_GET1R( 'SOURCEP', NSRC*2, SPOS, ACTSRC, STATUS )
+ 30     CALL USI_GET1R( 'SOURCEP', NSRC*2, SPOS, ACTSRC, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( ACTSRC .NE. (NSRC*2) ) THEN
-          CALL PAR_CANCL('SOURCEP',STATUS)
+          CALL USI_CANCL('SOURCEP',STATUS)
           GOTO 30
         END IF
         DO ISRC = 1, NSRC
@@ -343,19 +344,19 @@
         ACTWID = 1
         IF ( NSRC .GT. 0 ) THEN
  40       IF ( NSRC .EQ. 1 ) THEN
-            CALL PAR_GET0R( 'WIDTHS', WIDS, STATUS )
+            CALL USI_GET0R( 'WIDTHS', WIDS, STATUS )
           ELSE
             DO IWID = 1,NSRC
               WIDS(IWID) = 0
             END DO
-            CALL PAR_DEF1R( 'WIDTHS', NSRC, WIDS, STATUS )
-            CALL PAR_GET1R( 'WIDTHS', NSRC, WIDS, ACTWID, STATUS )
+            CALL USI_DEF1R( 'WIDTHS', NSRC, WIDS, STATUS )
+            CALL USI_GET1R( 'WIDTHS', NSRC, WIDS, ACTWID, STATUS )
             IF ( ACTWID .EQ. 1 ) THEN
               CALL ARR_INIT1R( WIDS(1), NSRC, WIDS, STATUS )
             ELSE IF ( STATUS .NE. SAI__OK ) THEN
               GOTO 99
             ELSE IF ( ACTWID .NE. NSRC ) THEN
-              CALL PAR_CANCL( 'WIDTHS', STATUS )
+              CALL USI_CANCL( 'WIDTHS', STATUS )
               GOTO 40
             END IF
           END IF
@@ -363,10 +364,10 @@
         END IF
 
 *      Psf to vary across field
-        CALL PAR_GET0L( 'PSFCON', PSFCON, STATUS )
+        CALL USI_GET0L( 'PSFCON', PSFCON, STATUS )
 
 *      Psf size
-        CALL PAR_GET0I( 'SRADIUS', PSW, STATUS )
+        CALL USI_GET0I( 'SRADIUS', PSW, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Map psf data

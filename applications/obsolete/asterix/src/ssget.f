@@ -41,7 +41,8 @@
 *
 *    History :
 *
-*      6 Oct 94 : V1.8-0  Original, adapted from HGET (DJA)
+*      6 Oct 94 : V1.8-0 Original, adapted from HGET (DJA)
+*     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -102,7 +103,7 @@
 *    Version id :
 *
       CHARACTER*40           VERSION
-        PARAMETER            ( VERSION='SSGET Version 1.8-0' )
+        PARAMETER            ( VERSION='SSGET Version 1.8-1' )
 *-
 
 *    Check status
@@ -121,7 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get item code
-      CALL PAR_GET0C( 'ITEM', ITEM, STATUS )
+      CALL USI_GET0C( 'ITEM', ITEM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL CHR_UCASE( ITEM )
 
@@ -166,7 +167,7 @@
         IF ( CPOS .EQ. 0 ) THEN
 
 *        Get source number
-          CALL PAR_GET0I( 'ISRC', ISRC, STATUS )
+          CALL USI_GET0I( 'ISRC', ISRC, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
           CALL SSO_MAPFLD( SLOC, FIELD, '_DOUBLE', 'READ', PTR, STATUS )
@@ -178,7 +179,7 @@
         ELSE IF ( STR_ABBREV( FITEM, 'ERROR' ) ) THEN
 
 *        Get source number
-          CALL PAR_GET0I( 'ISRC', ISRC, STATUS )
+          CALL USI_GET0I( 'ISRC', ISRC, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
           CALL SSO_MAPFLDERR( SLOC, FIELD, '_DOUBLE', 'READ', PTR,
@@ -203,24 +204,24 @@
       END IF
 
 *    Echo to output?
-      CALL PAR_GET0L( 'ECHO', ECHO, STATUS )
+      CALL USI_GET0L( 'ECHO', ECHO, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Write attribute
       TSTAT = SAI__OK
       IF ( ATYPE .EQ. TYP_INT ) THEN
-        CALL PAR_PUT0I( 'ATTR', IVALUE, TSTAT )
+        CALL USI_PUT0I( 'ATTR', IVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETI( 'VAL', IVALUE )
       ELSE IF ( ATYPE .EQ. TYP_LOG ) THEN
         CVALUE = TRUTH(LVALUE)
-        CALL PAR_PUT0C( 'ATTR', CVALUE(:5), TSTAT )
+        CALL USI_PUT0C( 'ATTR', CVALUE(:5), TSTAT )
         IF ( ECHO ) CALL MSG_SETC( 'VAL', CVALUE(1:5) )
       ELSE IF ( ATYPE .EQ. TYP_DBLE ) THEN
-        CALL PAR_PUT0D( 'ATTR', DVALUE, TSTAT )
+        CALL USI_PUT0D( 'ATTR', DVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETD( 'VAL', DVALUE )
       ELSE IF ( ATYPE .EQ. TYP_CHAR ) THEN
         CLEN = CHR_LEN( CVALUE )
-        CALL PAR_PUT0C( 'ATTR', CVALUE(:CLEN), TSTAT )
+        CALL USI_PUT0C( 'ATTR', CVALUE(:CLEN), TSTAT )
         IF ( ECHO ) CALL MSG_SETC( 'VAL', CVALUE(1:CLEN) )
       END IF
 

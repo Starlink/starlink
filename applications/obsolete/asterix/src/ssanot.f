@@ -27,10 +27,11 @@
 *
 *    History :
 *
-*      6 Aug 90 : V1.2-0  Original (DJA)
-*     26 Jun 91 : V1.5-0  Handles multi-graph datasets. New SSO system (DJA)
-*     27 Mar 92 : V1.6-0  Use ERR_ANNUL properly (DJA)
-*     16 Aug 93 : V1.7-0  Use new graphics routines and POI_INIT (DJA)
+*      6 Aug 90 : V1.2-0 Original (DJA)
+*     26 Jun 91 : V1.5-0 Handles multi-graph datasets. New SSO system (DJA)
+*     27 Mar 92 : V1.6-0 Use ERR_ANNUL properly (DJA)
+*     16 Aug 93 : V1.7-0 Use new graphics routines and POI_INIT (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -46,7 +47,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(POI_STR)'
+      INCLUDE 'POI_STR'
 *
 *    Status :
 *
@@ -97,7 +98,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSANOT Version 1.7-0' )
+        PARAMETER           ( VERSION = 'SSANOT Version 1.8-0' )
 *-
 
 *    Check status
@@ -151,7 +152,7 @@
       CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ', DPTR, STATUS )
 
 *    Use errors?
-      CALL PAR_GET0L( 'ERROR', ERR_OK, STATUS )
+      CALL USI_GET0L( 'ERROR', ERR_OK, STATUS )
 
 *    Get pos error data
       IF ( ERR_OK ) THEN
@@ -172,13 +173,13 @@
       END IF
 
 *    Get plotting attributes
-      CALL PAR_GET0I( 'SYMBOL', SYMBOL, STATUS )
+      CALL USI_GET0I( 'SYMBOL', SYMBOL, STATUS )
       SSET = ( STATUS .EQ. SAI__OK )
       IF ( STATUS .EQ. PAR__NULL) THEN
         SYMBOL = 0
         CALL ERR_ANNUL( STATUS )
       END IF
-      CALL PAR_GET0I( 'BOLD', BOLD, STATUS )
+      CALL USI_GET0I( 'BOLD', BOLD, STATUS )
       BSET = ( STATUS .EQ. SAI__OK )
       IF ( STATUS .EQ. PAR__NULL) THEN
         BOLD = 0

@@ -109,6 +109,8 @@
 *        V1.7-3  Write first 2 axis attributes.
 *     17-Aug-94 (DJA):
 *        V1.7-4  Reduces expanded dimensions to minimum required
+*     25-Nov-94 (DJA):
+*        V1.8-0  User interface now uses only USI.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -187,7 +189,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 1.7-4' )
+        PARAMETER        ( VERSION = 'SPRESP Version 1.8-0' )
 *.
 
 *    Check inherited global status.
@@ -236,11 +238,11 @@
 *    the default for the RADIAL parameter
       CALL PSF_QHINT( IPSF, PSF_H_RADSYM, H_OK, RADIAL, STATUS )
       IF ( H_OK ) THEN
-        CALL PAR_DEF0L( 'RADIAL', RADIAL, STATUS )
+        CALL USI_DEF0L( 'RADIAL', RADIAL, STATUS )
       END IF
 
 *    Assume radial symmetry
-      CALL PAR_GET0L( 'RADIAL', RADIAL, STATUS )
+      CALL USI_GET0L( 'RADIAL', RADIAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL HDX_PUTL( SLOC, 'RADIAL', 1, RADIAL, STATUS )
       IF ( RADIAL ) THEN
@@ -259,19 +261,19 @@
       CALL BDA_GETAXUNITS( ILOC, X_AX, UNITS, STATUS )
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
       IF ( RADIAL ) THEN
-        CALL PAR_PROMT( 'SRES', 'Radial sampling of psf in '/
+        CALL USI_PROMT( 'SRES', 'Radial sampling of psf in '/
      :                  /UNITS(:CHR_LEN(UNITS)), STATUS )
       ELSE
-        CALL PAR_PROMT( 'SRES', 'X,Y sampling of psf in '/
+        CALL USI_PROMT( 'SRES', 'X,Y sampling of psf in '/
      :                  /UNITS(:CHR_LEN(UNITS)), STATUS )
       END IF
-      CALL PAR_GET0R( 'SRES', SRES, STATUS )
+      CALL USI_GET0R( 'SRES', SRES, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Only require energy resolution if event dataset, otherwise we use
 *    the full energy variation
       IF ( EVDS ) THEN
-        CALL PAR_GET0R( 'ERES', ERES, STATUS )
+        CALL USI_GET0R( 'ERES', ERES, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
       ELSE
 
@@ -300,15 +302,15 @@
       END IF
 
 *    Pixel centred or vertex centred array
-      CALL PAR_GET0L( 'PIXCENT', PIXCENT, STATUS )
+      CALL USI_GET0L( 'PIXCENT', PIXCENT, STATUS )
       CALL HDX_PUTL( SLOC, 'PIXCENT', 1, PIXCENT, STATUS )
 
 *    Fractional amplitude to cut-off
-      CALL PAR_GET0R( 'CUTOFF', CUTOFF, STATUS )
+      CALL USI_GET0R( 'CUTOFF', CUTOFF, STATUS )
       CALL HDX_PUTR( SLOC, 'CUTOFF', 1, CUTOFF, STATUS )
 
 *    Limiting radius
-      CALL PAR_GET0I( 'RLIMIT', RLIMIT, STATUS )
+      CALL USI_GET0I( 'RLIMIT', RLIMIT, STATUS )
       CALL HDX_PUTI( SLOC, 'RLIMIT', 1, RLIMIT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 

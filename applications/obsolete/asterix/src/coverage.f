@@ -30,7 +30,8 @@
 *
 *    History :
 *
-*     15 Jun 92 : Original (DJA)
+*     15 Jun 92 : V1.7-0 Original (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -40,7 +41,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -75,7 +75,7 @@
 *    Version :
 *
       CHARACTER*30             VERSION
-        PARAMETER              (VERSION = 'COVERAGE Version 1.7-0')
+        PARAMETER              (VERSION = 'COVERAGE Version 1.8-0')
 *-
 
 *    Check status
@@ -127,16 +127,16 @@
       END IF
 
 *    Set defaults for coverage graph
-      CALL PAR_DEF0R( 'MIN', DMIN, STATUS )
-      CALL PAR_DEF0R( 'MAX', DMAX, STATUS )
+      CALL USI_DEF0R( 'MIN', DMIN, STATUS )
+      CALL USI_DEF0R( 'MAX', DMAX, STATUS )
 
 *    Get range for coverage
-      CALL PAR_GET0R( 'MIN', DMIN, STATUS )
-      CALL PAR_GET0R( 'MAX', DMAX, STATUS )
+      CALL USI_GET0R( 'MIN', DMIN, STATUS )
+      CALL USI_GET0R( 'MAX', DMAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get number of bins for coverage array
-      CALL PAR_GET0I( 'NBIN', NCBIN, STATUS )
+      CALL USI_GET0I( 'NBIN', NCBIN, STATUS )
 
 *    Create output dimensions
       ODIMS(1) = NCBIN

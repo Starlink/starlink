@@ -49,13 +49,14 @@
 *
 *    History :
 *
-*      7 Jul 92 : V1.6-0  Original. Adapted from EVSIM (DJA)
-*      1 Sep 92 : V1.6-1  PSFCON no longer needed (DJA)
-*      4 Dec 92 : V1.7-0  Added Log NS mode. Changed from RAN to SLA_RANDOM
-*                         for SUN portability (DJA)
-*      5 Mar 93 : V1.7-1  Changed to non-congruential random generator (DJA)
-*     14 Jul 93 : V1.7-2  Changed it again to the MATH_RND generator which
-*                         uses the GNU generator (DJA)
+*      7 Jul 92 : V1.6-0 Original. Adapted from EVSIM (DJA)
+*      1 Sep 92 : V1.6-1 PSFCON no longer needed (DJA)
+*      4 Dec 92 : V1.7-0 Added Log NS mode. Changed from RAN to SLA_RANDOM
+*                        for SUN portability (DJA)
+*      5 Mar 93 : V1.7-1 Changed to non-congruential random generator (DJA)
+*     14 Jul 93 : V1.7-2 Changed it again to the MATH_RND generator which
+*                        uses the GNU generator (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -164,7 +165,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-        PARAMETER       ( VERSION = 'IMSIM Version 1.7-2' )
+        PARAMETER       ( VERSION = 'IMSIM Version 1.8-0' )
 *-
 
 *    Check status
@@ -180,18 +181,18 @@
       LNSRC = 0
 
 *    Get number of files
-      CALL PAR_GET0I( 'NFILE', NFILE, STATUS )
+      CALL USI_GET0I( 'NFILE', NFILE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get output dataset root name
       IF ( NFILE .GT. 1 ) THEN
-        CALL PAR_GET0I( 'FFILE', FFILE, STATUS )
-        CALL PAR_PROMT( 'OUT', 'Root name for multiple outputs',STATUS )
+        CALL USI_GET0I( 'FFILE', FFILE, STATUS )
+        CALL USI_PROMT( 'OUT', 'Root name for multiple outputs',STATUS )
       END IF
-      CALL PAR_GET0C( 'OUT', OROOT, STATUS )
+      CALL USI_GET0C( 'OUT', OROOT, STATUS )
 
 *    See if user supplied seed given
-      CALL PAR_GET0I( 'SEED', SEED, STATUS )
+      CALL USI_GET0I( 'SEED', SEED, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         SEED_GIVEN = .FALSE.
@@ -201,7 +202,7 @@
       PDEV = (.NOT.SEED_GIVEN)
 
 *    Prompt for the background counts in field
-      CALL PAR_GET0C( 'MODEL', MODEL, STATUS )
+      CALL USI_GET0C( 'MODEL', MODEL, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Try to open it
@@ -268,8 +269,8 @@
         CALL ERR_ANNUL( STATUS )
 
 *      Decide on image size etc.
-        CALL PAR_GET0R( 'FIELDSIZE', FSIZE, STATUS )
-        CALL PAR_GET0R( 'PIXSIZE', PSIZE, STATUS )
+        CALL USI_GET0R( 'FIELDSIZE', FSIZE, STATUS )
+        CALL USI_GET0R( 'PIXSIZE', PSIZE, STATUS )
         XSCALE = -PSIZE
         XBASE = FSIZE/2.0 + XSCALE / 2.0
         YSCALE = PSIZE
@@ -293,7 +294,7 @@
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
 *    Get number of background counts
- 10   CALL PAR_GET0I( 'BACK', ONBACK, STATUS )
+ 10   CALL USI_GET0I( 'BACK', ONBACK, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         ONBACK = 0
@@ -304,20 +305,20 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Log NS mode?
-      CALL PAR_GET0L( 'LOGNS', LOGNS, STATUS )
+      CALL USI_GET0L( 'LOGNS', LOGNS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get source counts
       IF ( LOGNS ) THEN
 
 *      Get parameters for Log N S specification
-        CALL PAR_GET0D( 'SMIN', SMIN, STATUS )
-        CALL PAR_GET0D( 'SMAX', SMAX, STATUS )
-        CALL PAR_GET0D( 'SB', SB, STATUS )
-        CALL PAR_GET0D( 'SNORM', SNORM, STATUS )
-        CALL PAR_GET0R( 'NSNORM', NSNORM, STATUS )
-        CALL PAR_GET0D( 'ED', ED, STATUS )
-        CALL PAR_GET0D( 'EU', EU, STATUS )
+        CALL USI_GET0D( 'SMIN', SMIN, STATUS )
+        CALL USI_GET0D( 'SMAX', SMAX, STATUS )
+        CALL USI_GET0D( 'SB', SB, STATUS )
+        CALL USI_GET0D( 'SNORM', SNORM, STATUS )
+        CALL USI_GET0R( 'NSNORM', NSNORM, STATUS )
+        CALL USI_GET0D( 'ED', ED, STATUS )
+        CALL USI_GET0D( 'EU', EU, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      No Poisson deviation of source fluxes
@@ -330,7 +331,7 @@
       ELSE
 
 *      Prompt for the number of source counts
- 20     CALL PAR_GET1I( 'SOURCEC', MAXSRC, OSCOUNT, NSRC, STATUS )
+ 20     CALL USI_GET1I( 'SOURCEC', MAXSRC, OSCOUNT, NSRC, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           CALL ERR_ANNUL( STATUS )
           NSRC = 0
@@ -358,10 +359,10 @@
 *      Get source positions. In LOGNS mode we generate random positions
         IF ( .NOT. LOGNS ) THEN
 
- 30       CALL PAR_GET1R( 'SOURCEP', NSRC*2, SPOS, ACTSRC, STATUS )
+ 30       CALL USI_GET1R( 'SOURCEP', NSRC*2, SPOS, ACTSRC, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
           IF ( ACTSRC .NE. (NSRC*2) ) THEN
-            CALL PAR_CANCL( 'SOURCEP', STATUS )
+            CALL USI_CANCL( 'SOURCEP', STATUS )
             GOTO 30
           END IF
           DO ISRC = 1, NSRC
@@ -375,19 +376,19 @@
         ACTWID = 1
         IF ( NSRC .GT. 0 ) THEN
  40       IF ( NSRC .EQ. 1 ) THEN
-            CALL PAR_GET0R( 'WIDTHS', WIDS, STATUS )
+            CALL USI_GET0R( 'WIDTHS', WIDS, STATUS )
           ELSE
             DO IWID = 1,NSRC
               WIDS(IWID) = 0
             END DO
-            CALL PAR_DEF1R( 'WIDTHS', NSRC, WIDS, STATUS )
-            CALL PAR_GET1R( 'WIDTHS', NSRC, WIDS, ACTWID, STATUS )
+            CALL USI_DEF1R( 'WIDTHS', NSRC, WIDS, STATUS )
+            CALL USI_GET1R( 'WIDTHS', NSRC, WIDS, ACTWID, STATUS )
             IF ( ACTWID .EQ. 1 ) THEN
               CALL ARR_INIT1R( WIDS(1), NSRC, WIDS, STATUS )
             ELSE IF ( STATUS .NE. SAI__OK ) THEN
               GOTO 99
             ELSE IF ( ACTWID .NE. NSRC ) THEN
-              CALL PAR_CANCL( 'WIDTHS', STATUS )
+              CALL USI_CANCL( 'WIDTHS', STATUS )
               GOTO 40
             END IF
           END IF
@@ -395,7 +396,7 @@
         END IF
 
 *      Psf size
-        CALL PAR_GET0I( 'SRADIUS', PSW, STATUS )
+        CALL USI_GET0I( 'SRADIUS', PSW, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Map psf data
@@ -922,7 +923,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SRCLIB(IMSIM_CMN)'
+      INCLUDE 'IMSIM_CMN'
 *
 *    Functions :
 *
@@ -1006,7 +1007,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SRCLIB(IMSIM_CMN)'
+      INCLUDE 'IMSIM_CMN'
 *
 *    Import :
 *
@@ -1046,7 +1047,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SRCLIB(IMSIM_CMN)'
+      INCLUDE 'IMSIM_CMN'
 *
 *    Import :
 *

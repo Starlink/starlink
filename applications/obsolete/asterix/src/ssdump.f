@@ -62,6 +62,7 @@
 *     25 Mar 93 : V1.7-1  Improved precision for HRI data (DJA)
 *     12 May 93 : V1.7-2  Fixed bug displaying double precision data (DJA)
 *      4 May 94 : V1.7-3  Upgraded i.o to use AIO (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -71,11 +72,10 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(SSDUMP_STR)'
+      INCLUDE 'SSDUMP_STR'
 *
 *    Status :
 *
@@ -142,7 +142,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSDUMP Version 1.7-3' )
+        PARAMETER           ( VERSION = 'SSDUMP Version 1.8-0' )
 *-
 
 *    Check status
@@ -166,7 +166,7 @@
       CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
 
 *    Output field errors?
-      CALL PAR_GET0L( 'ERRORS', DOERR, STATUS )
+      CALL USI_GET0L( 'ERRORS', DOERR, STATUS )
 
 *    Open device
       CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, DEVWID, STATUS )
@@ -212,7 +212,7 @@
 
 *        Display in hms?
           IF ( POINT_OK ) THEN
-            CALL PAR_GET0L( 'HMS', HMS, STATUS )
+            CALL USI_GET0L( 'HMS', HMS, STATUS )
             FLD(NFLD-1).HMS = HMS
             FLD(NFLD).HMS = HMS
           END IF
@@ -250,9 +250,9 @@
 
 *    Define default for fields if overflowing page width
       IF ( CCOL .GT. 131 ) THEN
-        CALL PAR_DEF0C( 'FLDS', FLIST(:FLEN), STATUS )
+        CALL USI_DEF0C( 'FLDS', FLIST(:FLEN), STATUS )
       END IF
-      CALL PAR_GET0C( 'FLDS', FLIST, STATUS )
+      CALL USI_GET0C( 'FLDS', FLIST, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Parse field list string
@@ -326,7 +326,7 @@
  49   CCOL = MAX( 110, CCOL )
 
 *    Write out heading
-      CALL PAR_GET0L( 'HEADER', HEADER, STATUS )
+      CALL USI_GET0L( 'HEADER', HEADER, STATUS )
       IF ( HEADER ) THEN
 
 *      Last column of header
@@ -492,7 +492,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(SSDUMP_STR)'
+      INCLUDE 'SSDUMP_STR'
 
       STRUCTURE /ADATUM/
        UNION
@@ -752,7 +752,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(SSDUMP_STR)'
+      INCLUDE 'SSDUMP_STR'
 *
 *    Status :
 *
@@ -993,7 +993,7 @@
 *
 *    Structure definitions :
 *
-      INCLUDE 'SRCLIB(SSDUMP_STR)'
+      INCLUDE 'SSDUMP_STR'
 *
 *    Import :
 *
