@@ -34,9 +34,7 @@ first.
   (let* ((caption-details (get-caption-details (current-node)))
 	 (caption-id (caddr caption-details)))
     (make sequence
-      (make element gi: "table"
-	    attributes: '(("border" "1"))
-	    (process-matching-children 'tgroup))
+      (process-matching-children 'tabular)
       (make element gi: "blockquote"
 	    (make element gi: "p"
 		  (if caption-id
@@ -50,6 +48,11 @@ first.
 		      (literal (display-element-ids (current-node)))
 		      (empty-sosofo)))
 	    (process-matching-children 'caption)))))
+
+(element tabular
+  (make element gi: "table"
+	attributes: '(("border" "1"))
+	(process-matching-children 'tgroup)))
 
 (element tgroup
   (make sequence
