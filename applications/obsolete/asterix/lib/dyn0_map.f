@@ -238,7 +238,7 @@
           CALL HDS_NEW( FNAME(:FLEN), 'DYN', '_BYTE', 1, NBYTE, LOC,
      :                                                      STATUS )
           CALL DAT_MAPV( LOC, '_BYTE', 'WRITE', PTR, NBYTE, STATUS )
-          CALL ADI1_PUTLOC( FID, LOC, STATUS )
+          CALL ADI1_PUTLOC( LOC, FID, STATUS )
 
 *      Failed? If so, create new error context and try deleting the
 *      file. HDS unfortunately can create files which it cannot then

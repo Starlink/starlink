@@ -107,19 +107,24 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+	print *,'Unmapping slot ',slot
 
 *  File based memory?
       IF ( DYS_FID(SLOT) .NE. ADI__NULLID ) THEN
+
+	print *,'File sec'
 
 *    Extract locator
         CALL ADI1_GETLOC( DYS_FID(SLOT), LOC, STATUS )
 
 *    Unmap the memory
         CALL DAT_UNMAP( LOC, STATUS )
+	print *,'unmap status = ',status
 
 *    Delete the file
         CALL HDS_ERASE( LOC, STATUS )
 
+	print *,'erase status = ',status
 *    Free the ADI object
         CALL ADI_ERASE( DYS_FID(SLOT), STATUS )
 
