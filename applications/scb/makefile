@@ -395,7 +395,7 @@ TEST_FILES = $(PKG_NAME)_test.tar
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES) $(TEST_FILES)
+BUILT_FILES = $(ALL_SCRIPTS) $(PERL_MODULES)
 
 #  Rules for extracting source files from the source archive.
 
@@ -964,7 +964,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  Remove any pre-existing tar files before creating new ones.
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
            rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
-	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
+	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) $(TEST_FILES) \
            $(DATE_STAMP) .BUILT \
            | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
