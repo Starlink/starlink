@@ -30,7 +30,7 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 # All numeric types
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn \
-kpg1_csub.gn
+kpg1_csub.gn kpg1_past.gn
 
 # All except unsigned types
 KPG_BDIRW_GEN = kpg1_iscl.gbdirw
@@ -109,8 +109,7 @@ kpg1_noisub.f kpg1_noisuw.f kpg1_noisw.f kpg1_nthmb.f kpg1_nthmd.f \
 kpg1_nthmi.f kpg1_nthmr.f kpg1_nthmub.f kpg1_nthmuw.f kpg1_nthmw.f \
 kpg1_numbb.f kpg1_numbd.f kpg1_numbi.f kpg1_numbr.f kpg1_numbub.f \
 kpg1_numbuw.f kpg1_numbw.f kpg1_numfl.f \
-kpg1_pastb.f kpg1_pastd.f kpg1_pasti.f kpg1_pastr.f kpg1_pastub.f \
-kpg1_pastuw.f kpg1_pastw.f kpg1_pl2ge.f kpg1_pl2pu.f kpg1_poisb.f \
+kpg1_pl2ge.f kpg1_pl2pu.f kpg1_poisb.f \
 kpg1_poisd.f kpg1_poisi.f kpg1_poisr.f kpg1_poisub.f kpg1_poisuw.f \
 kpg1_poisw.f kpg1_prcvt.f kpg1_prowd.f kpg1_prowr.f \
 kpg1_prsad.f kpg1_prsai.f kpg1_prsar.f kpg1_px2ax.f kpg1_pxdpb.f \
