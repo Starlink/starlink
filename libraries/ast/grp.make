@@ -120,7 +120,8 @@ winmap.h \
 zoommap.h
 
 F_INCLUDE_FILES = \
-ast_par.source
+ast_par.source \
+grf_par
 
 LATEX_DOCUMENTATION_FILES = \
 sun210.tex \

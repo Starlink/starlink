@@ -38,6 +38,7 @@
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -45,6 +46,8 @@
 #        Original version.
 #     18-NOV-1997 (RFWS):
 #        Adapted prologue for document extraction.
+#     13-JUN-2001 (DSB):
+*        Added GRF_PAR.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -65,11 +68,12 @@
          LINK INSTALL_INC/ast.h ast.h
          LINK INSTALL_INC/ast_par AST_PAR
          LINK INSTALL_INC/ast_err AST_ERR
+         LINK INSTALL_INC/grf_par GRF_PAR
          ;;
 
 #  Argument is "remove": delete links.
       remove)
-         rm -f ast.h AST_PAR AST_ERR
+         rm -f ast.h AST_PAR AST_ERR GRF_PAR
          ;;
 
 #  Any other argument is invalid: report an error.
