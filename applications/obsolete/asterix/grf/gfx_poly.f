@@ -22,14 +22,28 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      REAL X1,X2,Y1,Y2
+      REAL XW1,XW2,YW1,YW2
       INTEGER I,N
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL OK
       LOGICAL XLOG,YLOG			! whether axes are log
       LOGICAL FIRST			! first point of a continuous segment
+*    Statement function :
+      LOGICAL INBOX
+      REAL X,Y
+      INBOX(X,Y)=(X.GE.X1.AND.X.LE.X2.AND.Y.GE.Y1.AND.Y.LE.Y2)
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
+
+*  get window bounds so points outside can be filtered out
+        CALL PGQWIN(XW1,XW2,YW1,YW2)
+        X1=MIN(XW1,XW2)
+        X2=MAX(XW1,XW2)
+        Y1=MIN(YW1,YW2)
+        Y2=MAX(YW1,YW2)
+
 
 *  see if log axes
         CALL GCB_GETL('XAXIS_LOG',OK,XLOG,STATUS)
@@ -59,14 +73,26 @@
 
 *  simple case of lin/lin axes
         IF (.NOT.(XLOG.OR.YLOG)) THEN
-          N=N2-N1+1
-          CALL PGLINE(N,X(N1),Y(N1))
+          FIRST=.TRUE.
+          DO I=N1,N2
+            IF (INBOX(X(I),Y(I))) THEN
+              IF (FIRST) THEN
+                CALL PGMOVE(X(I),Y(I))
+                FIRST=.FALSE.
+              ELSE
+                CALL PGDRAW(X(I),Y(I))
+              ENDIF
+            ELSE
+              FIRST=.TRUE.
+            ENDIF
+          ENDDO
+
 
 *  one or both log axes
         ELSEIF (XLOG.AND..NOT.YLOG) THEN
           FIRST=.TRUE.
           DO I=N1,N2
-            IF (X(I).GT.VAL__SMLR) THEN
+            IF (INBOX(X(I),Y(I)).AND.X(I).GT.VAL__SMLR) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(LOG10(X(I)),Y(I))
                 FIRST=.FALSE.
@@ -81,7 +107,7 @@
         ELSEIF (.NOT.XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
           DO I=N1,N2
-            IF (Y(I).GT.VAL__SMLR) THEN
+            IF (INBOX(X(I),Y(I)).AND.Y(I).GT.VAL__SMLR) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(X(I),LOG10(Y(I)))
                 FIRST=.FALSE.
@@ -97,7 +123,8 @@
         ELSEIF (XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
           DO I=N1,N2
-            IF (X(I).GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR) THEN
+            IF (INBOX(X(I),Y(I)).AND.
+     :                X(I).GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(LOG10(X(I)),LOG10(Y(I)))
                 FIRST=.FALSE.
