@@ -81,17 +81,16 @@
 *        for instance. It is assumed that the two NDFs are aligned (i.e. the 
 *        pixel co-ordinates of any feature are the same in both NDFs).
 *     wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
-*        This example assumes that the application SQORST has previously
-*        been used to change the size of a 2-dimensional NDF called m51,
-*        producing a new NDF called m51_sqorst. Since SQORST has not yet
-*        been updated to support the full NDF structure, the output NDF
-*        m51_sqorst will not have a WCS component. More than this, SQORST
-*        also throws away the pixel origin information, effectively
-*        resetting the output origin to (1,1). This example shows how
-*        WCSCOPY can be used to rectify this by copying the WCS component
+*        This example assumes that an application similar to SQORST has 
+*        previously been used to change the size of a 2-dimensional NDF 
+*        called m51, producing a new NDF called m51_sqorst. It is assumed
+*        that this SQORST-like application does not propagate WCS and also
+*        resets the pixel origin to [1,1]. In fact, this is what
+*        KAPPA:SQORST actually did, prior to version 1.0. This example shows 
+*        how WCSCOPY can be used to rectify this by copying the WCS component
 *        from the original NDF m51 to the squashed NDF m51_sqorst,
 *        modifying it in the process to take account of both the
-*        squashing and the resetting of the pixel origin produced by
+*        squashing and the resetting of the pixel origin produced by 
 *        sqorst. To do this, you need to work out the transformation in
 *        pixel co-ordinates produced by SQORST, and specify this when
 *        running WCSCOPY using the TR parameter. Let's assume the first
@@ -129,51 +128,8 @@
 *        example are for an image with pixel index bounds of 52:251 on both
 *        axes which was squashed by SQORST to produce an image with 100 pixels
 *        on each axis.
-*     wcscopy m51_glitch m51 [-51,1,0,-51,0,1]
-*        The application GLITCH has been used to replace bad pixels in a
-*        2-dimensional NDF called m51, producing a new NDF called
-*        m51_glitch. Since GLITCH has not yet been updated to support the 
-*        full NDF structure, the output NDF m51_sqorst will not have a WCS 
-*        component. More than this, GLITCH also throws away the pixel origin 
-*        information, effectively resetting the output origin to (1,1). You 
-*        can use WCSCOPY to rectify this by copying the WCS component from 
-*        the original NDF m51 to the de-glitched NDF m51_glitch, modifying it 
-*        in the process to take account of the resetting of the pixel origin 
-*        produced by GLITCH. To do this, you to work out the transformation 
-*        in pixel co-ordinates produced by GLITCH, and specify this when 
-*        running WCSCOPY using the TR parameter. Let's assume the first axis 
-*        of NDF m51 has pixel index bounds of I1:I2 (these values can be 
-*        found using NDFTRACE). GLITCH will produce an image with the
-*        same number of pixels along the axis but the first pixel will have 
-*        index 1 instead of I1. Thus the shift in the pixel origin is:
-*
-*        	SX = ( 1 - I1 )
-*
-*        Likewise, the first pixel on the second axis will be reset to 1
-*        by GLITCH, and so if the bounds of the second axis in m51 are J1:J2, 
-*        the shift in the pixel origin for the second axis is:
-*
-*        	SY = ( 1 - J1 )
-*
-*        You would then use the following values for parameter TR when
-*        running WCSCOPY:
-*
-*        	TR = [SX, 1.0, 0.0, SY, 0.0, 1.0]
-*
-*        Note, the zero terms indicate that the axes are independent (i.e. 
-*        there is no rotation of the image), and the 1.0 terms indicate
-*        that the pixels are not changed in size. The numerical values in the 
-*        example are for an image with pixel index bounds of 52:251 on both
-*        axes. Another (maybe simpler) way to rectify the loss of origin
-*        information is to use application SETORIGIN to restore the pixel
-*        origin, and then use WCSCOPY, accepting the default null value for
-*        the parameter TR.
 
 *  Notes:
-*     -  It is not necessary to use this application after running
-*     KAPPA applications such as ROTATE or PIXDUPE, since all KAPPA 
-*     applications which produce a linear transformation in pixel 
-*     co-ordinates correctly copy WCS information from input to output.
 *     -  An error is reported if the transformation supplied using parameter 
 *     TR is singular. 
 *     -  The pixel with pixel index I spans a range of pixel co-ordinate
