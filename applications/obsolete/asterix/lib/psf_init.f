@@ -57,9 +57,6 @@
         P_USED(I) = .FALSE.
       END DO
 
-*  Reset default time/energy block
-      TE_INIT = .FALSE.
-
 *  Psf system now initialised
       PSFINIT = .TRUE.
 

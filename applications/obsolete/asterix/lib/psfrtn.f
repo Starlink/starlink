@@ -1453,6 +1453,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
       INTEGER			CHR_LEN
       LOGICAL                   CHR_SIMLR
+      EXTERNAL			PSF_ASCA
+      EXTERNAL			PSF1_ASCA_EPF
       EXTERNAL			PSF_ASCA_HINT
 *
 *    Local variables :
@@ -1559,6 +1561,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END IF
 
 *  Store methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_ASCA, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Eprofile', PSF1_ASCA_EPF, STATUS )
       CALL PSF0_SETRTN( PSID, 'Hint', PSF_ASCA_HINT, STATUS )
 
 *    Tidy up
@@ -1866,6 +1870,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       INTEGER			PSID
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
+*
+      EXTERNAL			PSF_PWFC
 *-
 
 *  Check inherited global status
@@ -1876,6 +1882,9 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *  Load data from dataset
       CALL PSF_WFC_LOADD( FID, .FALSE., PSID, STATUS )
+
+*  Store methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_PWFC, STATUS )
 
       END
 
@@ -3800,6 +3809,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			PSID
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
+*
+      EXTERNAL			PSF_WFC
 *-
 
 *  Check inherited global status
@@ -3810,6 +3821,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Load data from file
       CALL PSF_WFC_LOADD( FID, .TRUE., PSID, STATUS )
+
+*  Store methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_WFC, STATUS )
 
       END
 

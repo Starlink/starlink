@@ -55,13 +55,6 @@
       CALL ADI_CPUT0I( P_PSID(SLOT), 'PhaHi', HIGHE, STATUS )
       CALL ADI_CPUT0L( P_PSID(SLOT), 'PhaDef', .TRUE., STATUS )
 
-*  Do some global definition
-      TE_TLO = LOWT
-      TE_THI = HIGHT
-      TE_ELO = LOWE
-      TE_EHI = HIGHE
-      TE_INIT = .TRUE.
-
 *  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_DEF', STATUS )
