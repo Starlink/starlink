@@ -119,7 +119,7 @@ line
 	| BLANK_LINE
 			{ $$ = $1; }
 	| error LINE_END
-			{ handle_error(); $$ = scat( 0 ); }
+			{ handle_error(); yyerrok; $$ = scat( 0 ); }
 	;
 
 module_start_line
@@ -878,7 +878,7 @@ token_brac
       }
       else {
          printf( "%s", text );
-         yyerrok;
+         /*yyerrok;*/
          yyclearin;
       }
 

@@ -129,7 +129,7 @@ external_definition
 	| ';'
 		{ $$ = $1; }
 	| error
-		{ handle_error(); $$ = scat( 0 ); }
+		{ handle_error(); yyerrok; $$ = scat( 0 ); }
 	;
 
 bracket_sequence
@@ -473,7 +473,7 @@ identifier
       }
       else {
          printf( "%s", text );
-         yyerrok;
+         /*yyerrok;*/
          yyclearin;
       }
 
