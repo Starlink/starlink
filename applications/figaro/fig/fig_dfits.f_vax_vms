@@ -1,0 +1,554 @@
+C+
+C                        F I G _ D F I T S _ O P E N
+C
+C  Routine name:
+C     FIG_DFITS_OPEN
+C
+C  Function:
+C     Opens a 'disk FITS' file for input.
+C
+C  Description:
+C     This routine is designed to work with FIG_DFITS_READ and FIG_DFITS_HREAD
+C     to provide a simple set of routines that can access 'disk FITS' files.
+C     The way unformatted files are read varies between different systems,
+C     and these routines exist in order to hide these differences from the
+C     main application code.  FIG_DFITS_OPEN will open a 'disk FITS' file,
+C     and FIG_DFITS_READ will read a 2880 byte data record from that file
+C     and FIG_DFITS_HREAD will read a 2880 byte header record from it.
+C     Finally, FIG_DFITS_CLOSE will close the file.
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL FIG_DFITS_OPEN (LUN,FILENAME,STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (>) LUN           (Integer, ref) The logical unit number to use
+C                       to access the file.
+C     (>) FILENAME      (Fixed string,descr) The name of the file in
+C                       question.  This will normally be as provided by
+C                       the parameter system.  The string will be 'case-
+C                       sensitive but not case-prescriptive' - the routine
+C                       will first try the string exactly as provided, and
+C                       if it does not find such a file will fold it to
+C                       the preferred case for the system in question.
+C     (<) STATUS        (Integer,ref) Status for the operation.  0=>OK,
+C                       non-zero => unable to open file.  If an error has
+C                       occurred, suitable error messages will be output
+C                       by this routine through PAR_WRUSER calls.
+C
+C  External variables used:
+C     Only internal variables used by the FIG_DFITS_xxx routines.
+C
+C  External subroutines / functions used:
+C     GEN_FORTERR, ICH_CI, ICH_LEN, PAR_WRUSER
+C
+C  Prior requirements:  None.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 20th Aug 1990.
+C-
+C  Note:
+C     This version is for a VMS VAX system, and attempts to take into
+C     account as many as possible of the various file types the VAX
+C     supports.
+C
+C  Subroutine / function details:
+C     ICH_CI       Formats an integer into a character string.
+C     ICH_LEN      Position of last non-blank character in string.
+C     GEN_FORTERR  Returns text describing a FORTRAN error code.
+C     PAR_WRUSER   Output a message to a Figaro user.
+C
+C  History:
+C     20th Aug 1990.   Original version.  KS / AAO.  (Based on earlier
+C                      modifications to FIG_FITIN by PWH/StA.)
+C     26th Jul 1994.   Make common blocks SAVE. HME / UoE, Starlink.
+C+
+      SUBROUTINE FIG_DFITS_OPEN (LUN,FILENAME,STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER LUN,STATUS
+      CHARACTER*(*) FILENAME
+C
+C     Functions used
+C
+      INTEGER ICH_LEN
+      CHARACTER*16 ICH_CI
+C
+C     Global variables
+C
+      INTEGER   BUFF_MAX             ! Bytes in internal record buffer
+      PARAMETER (BUFF_MAX=4096)      ! (Change format in FIG_DFITS_READ 
+                                     ! as well if this is changed.)
+C
+      INTEGER   LU                   ! Logical unit for file. 0 if not open.
+      LOGICAL   FIXED                ! True if records are of fixed length
+      INTEGER   RLEN                 ! Length of record read from file
+      INTEGER   RNEXT                ! Next unused byte in RECBUF.
+      BYTE      RECBUF(BUFF_MAX)     ! Buffer to hold a single file record.
+      LOGICAL   SEGMENTED            ! True if file has segmented records.
+      COMMON /FIG_DFITS/ LU,FIXED,RLEN,RNEXT,RECBUF,SEGMENTED
+      SAVE /FIG_DFITS/
+C
+C     Local variables
+C
+      CHARACTER ERROR*64             ! Description of I/O error
+      LOGICAL   EXIST                ! True if the file exists
+      INTEGER   IGNORE               ! A status value we don't care about
+      CHARACTER NUMBER*16            ! Used to format record length
+      LOGICAL   OK                   ! Indicates variable file opened OK
+      CHARACTER RECTYP*10            ! Record type
+      CHARACTER STRING*80            ! Used to read first line of FITS header
+      CHARACTER UNFORM*4             ! If file can be read unformatted
+C
+C     See if the file exists.  On a VAX file names are case-insensitive,
+C     so no case conversion will help if it is not found first time.
+C     Also get its record type and record length.
+C
+      STATUS = 0
+      LU = 0
+      INQUIRE (FILE=FILENAME,EXIST=EXIST,RECORDTYPE=RECTYP,RECL=RLEN,
+     :                         UNFORMATTED=UNFORM,IOSTAT=IGNORE)
+      IF (.NOT.EXIST) THEN
+         CALL PAR_WRUSER ('Unable to open disk FITS file '//
+     :                            FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+         CALL PAR_WRUSER ('File does not exist.',IGNORE)
+         STATUS = 1
+         GO TO 500       ! Error exit
+      END IF
+C
+C     File exists.  First of all, see if its records are variable
+C     or fixed.  (Segmented records will show up as variable, and the
+C     various STREAM file types can't sensibly be used for disk FITS
+C     files - they might contain carriage control characters in the
+C     real data.)  Then check the record length.
+C
+      IF (UNFORM.NE.'YES') THEN
+         CALL PAR_WRUSER ('Unable to open disk FITS file '//
+     :                            FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+         CALL PAR_WRUSER (
+     :             'File cannot be opened for unformatted I/O',IGNORE)
+         STATUS = 1
+         GO TO 500         ! Error exit
+      END IF
+      IF (RLEN.GT.BUFF_MAX) THEN
+         NUMBER=ICH_CI(RLEN)
+         CALL PAR_WRUSER ('Unable to open disk FITS file '//
+     :                            FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+         CALL PAR_WRUSER ('Record length of '//NUMBER(:ICH_LEN(NUMBER))
+     :           //' is too large for internal buffer.',IGNORE)
+         STATUS = 1
+         GO TO 500         ! Error exit
+      END IF
+C
+C     It looks as if we can handle the file.  If the records are fixed
+C     length then things are quite easy, and we open the file for
+C     the unformatted I/O that one might expect.  We then set the logical
+C     unit number in common - this indicates that the file is open OK.
+C     Also set the buffer pointer (RNEXT) to a value that will force
+C     a new record to be read.
+C
+      IF (RECTYP.EQ.'FIXED') THEN
+         OPEN (UNIT=LUN,FILE=FILENAME,STATUS='OLD',FORM='UNFORMATTED',
+     :              ACCESS='SEQUENTIAL',READONLY,SHARED,IOSTAT=STATUS)
+         IF (STATUS.EQ.0) THEN
+            LU = LUN
+            RNEXT = BUFF_MAX + 1
+            FIXED = .TRUE.
+         ELSE
+            CALL PAR_WRUSER ('Error opening disk FITS file '//
+     :                          FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+            CALL GEN_FORTERR (STATUS,.FALSE.,ERROR)
+            CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
+         END IF
+C
+      ELSE IF (RECTYP.EQ.'VARIABLE') THEN
+C
+C        If the records genuinely are going to be of varying length then we 
+C        will have to determine the length of each record as we read it, 
+C        which means opening the file for formatted I/O and using Q format.
+C        (Reading it as fixed and knowing that the first two bytes are the
+C        byte count is possible, but somehow seems a little non-kosher.)
+C        However, the real problem with variable length records is the
+C        possibility that they might actually be segmented -  and you can
+C        only tell by opening the file, reading a record, and seeing if you
+C        like what you get!  (Fortunately, we know exactly how a FITS file
+C        should start.)
+C 
+         OPEN (UNIT=LUN,FILE=FILENAME,STATUS='OLD',FORM='FORMATTED',
+     :                             ACCESS='SEQUENTIAL',READONLY,SHARED,
+     :                             RECORDTYPE='VARIABLE',IOSTAT=STATUS)
+         IF (STATUS.NE.0) THEN
+            CALL PAR_WRUSER ('Error opening disk FITS file '//
+     :                            FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+            CALL GEN_FORTERR (STATUS,.FALSE.,ERROR)
+            CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
+            STATUS = 1
+            GO TO 500       ! Error exit
+         END IF
+         READ (LUN,'(A)',IOSTAT=STATUS) STRING
+         IF (STATUS.NE.0) THEN
+            CALL PAR_WRUSER ('Error reading disk FITS file '//
+     :                            FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+            CALL GEN_FORTERR (STATUS,.FALSE.,ERROR)
+            CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
+            STATUS = 1
+            GO TO 500       ! Error exit
+         END IF
+C
+C        Having read the first few bytes from the file, look at what we've
+C        got.  If the file is segmented, the first two bytes of each record
+C        data (not counting the byte count) control the segmentation.  If
+C        it is not segmented, then they are real data.  Now, a FITS file
+C        should start with the characters 'SIMPLE'.  Therefore:
+C
+         IF (STRING(1:6).EQ.'SIMPLE') THEN
+            SEGMENTED = .FALSE.
+         ELSE IF (STRING(3:8).EQ.'SIMPLE') THEN
+            SEGMENTED = .TRUE.
+         ELSE
+            CALL PAR_WRUSER('Unable to determine whether file '//
+     :            FILENAME(:ICH_LEN(FILENAME))//' has variable',IGNORE)
+            CALL PAR_WRUSER('or segmented records.  Will assume '
+     :                      //'the records are not segmented.',IGNORE)
+            SEGMENTED = .FALSE.
+         END IF
+C
+C        Now rewind the file and set the various other common variables.
+C
+         REWIND (LUN,IOSTAT=IGNORE)
+         LU = LUN
+         RNEXT = BUFF_MAX + 1
+         FIXED = .FALSE.
+C
+      ELSE
+C
+C        File has unformatted records, but their type is neither fixed
+C        nor variable.  Whatever it is, we can't handle it.
+C
+         CALL PAR_WRUSER ('Unable to open disk FITS file '//
+     :                            FILENAME(:ICH_LEN(FILENAME)),IGNORE)
+         CALL PAR_WRUSER ('Cannot handle a file with "'//
+     :             RECTYP(:ICH_LEN(RECTYP))//'" type records.',IGNORE)
+         STATUS = 1
+         GO TO 500      ! Error exit
+      END IF
+C
+C     Exit
+C
+  500 CONTINUE
+C
+      END
+C+
+C                      F I G _ D F I T S _ H R E A D
+C
+C  Routine name:
+C     FIG_DFITS_HREAD
+C
+C  Function:
+C     Reads a 2880 byte header record from a disk FITS file.
+C
+C  Description:
+C     This routine reads a single logical 2880 byte header record from the
+C     'disk FITS' file that has been opened using FIG_DFITS_OPEN.  This
+C     routine is almost identical to FIG_DFITS_READ except that the record
+C     read is returned in a character string.
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL FIG_DFITS_HREAD (HEADER,BUFFER,STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (<) HEADER        (Fixed string,descr) A 2880 byte character string
+C                       into which the header record is to be read.
+C     (W) BUFFER        (Numeric array of any type, ref) An array of 2880
+C                       bytes that - depending on the system in use - may
+C                       have to be used as an intermediate buffer for the
+C                       I/O.
+C     (<) STATUS        (Integer,ref) Status for the operation.  0=>OK,
+C                       non-zero => unable to read record. If an error has
+C                       occurred, suitable error messages will be output
+C                       by this routine through PAR_WRUSER calls.
+C
+C  External variables used:
+C     Only internal variables used by the FIG_DFITS_xxx routines.
+C
+C  External subroutines / functions used:
+C     FIG_DFITS_READ, PAR_WRUSER
+C
+C  Prior requirements:  File must have been opened by FIG_DFITS_OPEN.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 20th Aug 1990.
+C-
+C  Subroutine / function details:
+C     FIG_DFITS_READ    Read next 2880 byte record into buffer.
+C     PAR_WRUSER        Output a message to a Figaro user.
+C
+C  History:
+C     20th Aug 1990.   Original version.  KS / AAO.
+C+
+      SUBROUTINE FIG_DFITS_HREAD (HEADER,BUFFER,STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER STATUS
+      BYTE BUFFER(2880)
+      CHARACTER*(*) HEADER
+C
+C     Local variables
+C
+      INTEGER I                      
+      INTEGER IGNORE
+C
+C     Check validity of buffer and check that file is open.
+C
+      STATUS = 0
+      IF (LEN(HEADER).LT.2880) THEN
+         CALL PAR_WRUSER (
+     :       'Error reading header record from disk FITS file.',IGNORE)
+         CALL PAR_WRUSER(
+     :       'Header string too small for FITS header record.',IGNORE)
+         STATUS = 1
+      ELSE
+C
+C        Read record.
+C
+         CALL FIG_DFITS_READ (BUFFER,STATUS)
+C
+C        If OK (FIG_DFITS_READ will have output any error messages if not)
+C        copy numeric array into character array.
+C
+         IF (STATUS.EQ.0) THEN
+            DO I=1,2880
+               HEADER(I:I)=CHAR(BUFFER(I))
+            END DO
+         END IF
+      END IF
+C
+      END
+C+
+C                      F I G _ D F I T S _ R E A D
+C
+C  Routine name:
+C     FIG_DFITS_READ
+C
+C  Function:
+C     Reads a 2880 byte record from a disk FITS file.
+C
+C  Description:
+C     This routine reads a single logical 2880 byte record from the
+C     'disk FITS' file that has been opened using FIG_DFITS_OPEN.
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL FIG_DFITS_HREAD (RECORD,STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (<) RECORD        (Numeric array of any type, ref) An array of 2880
+C                       bytes that will receive the next logical record
+C                       in the disk FITS file.
+C     (<) STATUS        (Integer,ref) Status for the operation.  0=>OK,
+C                       non-zero => unable to read record. If an error has
+C                       occurred, suitable error messages will be output
+C                       by this routine through PAR_WRUSER calls.
+C
+C  External variables used:
+C     Only internal variables used by the FIG_DFITS_xxx routines.
+C
+C  External subroutines / functions used:
+C     ICH_LEN, GEN_FORTERR
+C
+C  Prior requirements:  The file must have been opened by FIG_DFITS_OPEN.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 20th Aug 1990.
+C-
+C  Subroutine / function details:
+C     ICH_LEN      Position of last non-blank character in string.
+C     GEN_FORTERR  Returns text describing a FORTRAN error code.
+C     PAR_WRUSER   Output a message to a Figaro user.
+C
+C  History:
+C     20th Aug 1990.   Original version.  KS / AAO.
+C     26th Jul 1994.   Make common blocks SAVE. HME / UoE, Starlink.
+C+
+      SUBROUTINE FIG_DFITS_READ (RECORD,STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER STATUS
+      BYTE RECORD(2880)
+C
+C     Functions
+C
+      INTEGER ICH_LEN
+C
+C     Global variables
+C
+      INTEGER   BUFF_MAX             ! Bytes in internal record buffer
+      PARAMETER (BUFF_MAX=4096)
+C
+      INTEGER   LU                   ! Logical unit for file. 0 if not open.
+      LOGICAL   FIXED                ! True if records are of fixed length
+      INTEGER   RLEN                 ! Length of record read from file
+      INTEGER   RNEXT                ! Next unused byte in RECBUF.
+      BYTE      RECBUF(BUFF_MAX)     ! Buffer to hold a single file record.
+      LOGICAL   SEGMENTED            ! True if file has segmented records.
+      COMMON /FIG_DFITS/ LU,FIXED,RLEN,RNEXT,RECBUF,SEGMENTED
+      SAVE /FIG_DFITS/
+C
+C     Local variables
+C
+      INTEGER   I                    ! Index through elements of RECORD
+      INTEGER   IB                   ! Index through bytes being read
+      INTEGER   IGNORE               ! Status code we don't care about
+      CHARACTER ERROR*64             ! Text description of I/O error
+C
+C     Check that file is open.
+C
+      STATUS = 0
+      IF (LU.EQ.0) THEN
+         ERROR='No disk FITS file open.'
+         STATUS = 1
+         GO TO 500     ! Error exit
+      END IF
+C
+C     Copy 2880 bytes from the internal buffer into the supplied
+C     logical record.  If the buffer is exhausted, read a new one.
+C
+      DO I=1,2880
+         IF (RNEXT.GT.RLEN) THEN
+C
+C           Here, we need to read a new record.  How we do this depends
+C           on whether or not the file was opened formatted (for variable
+C           record files) or unformatted (for fixed record files).
+C           (Note that the '4096' in the format should really be a
+C           formatted version of BUFF_MAX).  If the file is segmented,
+C           skip the two bytes of segment information.
+C
+            IF (FIXED) THEN
+               READ (LU,IOSTAT=STATUS) (RECBUF(IB),IB=1,RLEN)
+            ELSE
+               READ (LU,'(Q,4096A1)',IOSTAT=STATUS) 
+     :                               RLEN,(RECBUF(IB),IB=1,RLEN)
+            END IF
+            IF (STATUS.NE.0) THEN
+               CALL GEN_FORTERR (STATUS,.FALSE.,ERROR)
+               STATUS = 1
+               GO TO 500      ! Error exit
+            END IF
+            IF (SEGMENTED) THEN
+               RNEXT = 3
+            ELSE
+               RNEXT = 1
+            END IF
+         END IF
+         RECORD(I) = RECBUF(RNEXT)
+         RNEXT = RNEXT + 1
+      END DO
+C
+C     Exit and log any error
+C
+  500 CONTINUE
+      IF (STATUS.NE.0) THEN
+         CALL PAR_WRUSER ('Error reading record from disk FITS file.',
+     :                                                          IGNORE)
+         CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
+      END IF
+C            
+      END
+C+
+C                      F I G _ D F I T S _ C L O S E
+C
+C  Routine name:
+C     FIG_DFITS_CLOSE
+C
+C  Function:
+C     Closes a disk FITS file opened by FIG_DFITS_OPEN.
+C
+C  Description:
+C     This routine closes any file opened by FIG_DFITS_OPEN. 
+C     If no file was open, this routine does nothing.
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL FIG_DFITS_CLOSE (STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (<) STATUS        (Integer,ref) Status for the operation.  0=>OK,
+C                       non-zero => error closing file. If an error has
+C                       occurred, suitable error messages will be output
+C                       by this routine through PAR_WRUSER calls.
+C
+C  External variables used:
+C     Only internal variables used by the FIG_DFITS_xxx routines.
+C
+C  External subroutines / functions used: None.
+C
+C  Prior requirements:  The file must have been opened by FIG_DFITS_OPEN.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 20th Aug 1990.
+C-
+C  History:
+C     20th Aug 1990.   Original version.  KS / AAO.
+C     26th Jul 1994.   Make common blocks SAVE. HME / UoE, Starlink.
+C+
+      SUBROUTINE FIG_DFITS_CLOSE (STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER STATUS
+C
+C     Global variables
+C
+      INTEGER   BUFF_MAX             ! Bytes in internal record buffer
+      PARAMETER (BUFF_MAX=4096)
+C
+      INTEGER   LU                   ! Logical unit for file. 0 if not open.
+      LOGICAL   FIXED                ! True if records are of fixed length
+      INTEGER   RLEN                 ! Length of record read from file
+      INTEGER   RNEXT                ! Next unused byte in RECBUF.
+      BYTE      RECBUF(BUFF_MAX)     ! Buffer to hold a single file record.
+      LOGICAL   SEGMENTED            ! True if file has segmented records.
+      COMMON /FIG_DFITS/ LU,FIXED,RLEN,RNEXT,RECBUF,SEGMENTED
+      SAVE /FIG_DFITS/
+C
+C     Local variables
+C
+      INTEGER   IGNORE               ! Status value we don't care about
+C
+C     If file is open, close it.  Always return good status.
+C
+      IF (LU.NE.0) THEN
+         CLOSE (LU,IOSTAT=IGNORE) 
+         LU = 0
+      END IF
+      STATUS = 0
+C
+      END
