@@ -1,10 +1,10 @@
       SUBROUTINE SURF_DESPIKE (STATUS)
 *+
 *  Name:
-*     DESPIKE
+*     DESPIKE2
 
 *  Purpose:
-*     remove spikes from SCAN/MAP observations
+*     Remove spikes from SCAN/MAP observations
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,7 +20,63 @@
 *        The global status
  
 *  Description:
-*     This routine removes spike from SCAN/MAP observations.
+*     This routine removes spikes from SCAN/MAP observations.
+*     The scan map differential despiking algorithm uses 2 criteria
+*     to decide which points are spikes.
+*
+*     First, for each bolometer used a pass is made through each
+*     scan calculating for each point:-
+*
+*       diff(i) = point(i) - (point(i-1) + point(i+1))
+*                            -------------------------
+*                                       2.0 
+*
+*
+*     Values of 'diff' for the first and last points in the scan are
+*     calculated in a similar way but subtracting the mean of points
+*     2 and 3 and points n-1 and n-2 respectively.
+*
+*     The mean and standard deviation of 'diff' are calculated by
+*     coadding the 10 points at each end of the scan where,
+*     hopefully, there is no source emission. Spikes in these
+*     regions are handled by removing points from the coadd that lie
+*     further than 3 sigma from the mean, then redoing the
+*     calculation recursively until no further points need be
+*     removed.
+*
+*     The first criterion for a spike is that it's 'diff' value
+*     should be further from the mean of 'diff' by NSIGMA times the
+*     sigma derived from the endpoints.
+*     
+*     The problem with this simple approach is that bright sources
+*     in the scan themselves lead to excursions in 'diff' that can
+*     be wrongly identified as spikes. To prevent this happening a
+*     second criterion is used. In this the scan values are
+*     convolved with a 3 sample wide box so that each 'box' point is
+*     the average of the point itself and the points on either side of
+*     it. 'Box' is expected to increase faster for real sources than
+*     for spikes because in them the increase will be spread over
+*     all 3 averaged points rather than just 1.
+* 
+*     The second criterion for a spike is met, therefore, if a
+*     point's 'diff' is further from the 'diff' mean than the value
+*     of 'box' at that point.
+*
+*     Fixed-up values for points that have identified as spikes are
+*     calculated by interpolating between the closest healthy points
+*     on either side.
+*
+*     The second spike criterion also means unfortunately that the
+*     technique is less sensitive to spikes on bright sources than
+*     elsewhere. In addition, it is still possible to clip bright
+*     sources if too low a value for NSIGMA is used. It is
+*     recommended to run despike several times with different values
+*     of NSIGMA. Begin with NSIGMA=5, look at the result to see how
+*     effective despiking has been, then repeat the process with
+*     NSIGMA=4.5, 4.0 etc. until you start to clip source
+*     information.
+
+
 
 *  Usage:
 *     restore in out nsigma
@@ -29,7 +85,7 @@
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
 *     MSG_FILTER = CHAR (Read)
-*        Message filter level. Default is NORM.
+*        Message filter level. Default is NORM. No verbose messages are used.
 *     NSIGMA = REAL (Read)
 *        Nsigma from mean at which 'spikes' begin.
 *     OUT = NDF (Write)
@@ -38,9 +94,17 @@
 *        input.
 
 *  Examples:
+*     restore o37 o37_des 5.0
+*       Despike o37.sdf at 5.0 sigma.
+*     restore o37 \
+*       Despike using the default sigma level and writing to the
+*       default output file.
 
 *  Notes:
+*     Care must be taken when despiking bright sources.
 
+*  Related Applications:
+*     SURF: DESPIKE, SCUCLIP, SIGCLIP, RESTORE
 
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
@@ -48,6 +112,9 @@
 
 *    History :
 *     $Log$
+*     Revision 1.3  1997/11/30 01:40:01  timj
+*     Add some documentation.
+*
 *     Revision 1.2  1997/11/06 23:22:45  timj
 *     Add the verbose suffix option.
 *
