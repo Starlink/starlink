@@ -188,6 +188,12 @@
 					  (string-append ", " opt-att)
 					  ""))))
 	(process-node-list desc))))
+  ;; The funcname element could be made more sophisticated, so that
+  ;; it includes a link (possibly using the source-code browser) to
+  ;; the function definition/documentation.
+  (element funcname
+    (make element gi: "code"
+          (literal (string-append "(" (data (current-node)) ")"))))
   ;; discard the following elements, at present
   (element codebody
     (empty-sosofo))
