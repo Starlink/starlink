@@ -475,8 +475,8 @@
       DY = 0.005*( SYHI - SYLO )
       BLO( 1 ) = SXLO - DX
       BLO( 2 ) = SYLO - DY
-      BHI( 3 ) = SXHI + DX
-      BHI( 4 ) = SYHI + DY
+      BHI( 1 ) = SXHI + DX
+      BHI( 2 ) = SYHI + DY
 
 *  Allow the user to over-ride these values. 
       CALL PAR_GDR1R( 'LBND', 2, BLO, -VAL__MAXR, VAL__MAXR, .FALSE.,
