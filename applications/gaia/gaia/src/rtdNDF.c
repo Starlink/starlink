@@ -125,7 +125,7 @@ int rtdAccessNDF( const char *filename, int *type, int *width, int *height,
 
   /* Convert the FITS headers into a C string */
   *header = cnf_creib( (char *)charPtr, 80 * (*header_length) );
-  free( (void *)charPtr );
+  cnf_free( (void *)charPtr );
   ems_rlse_c();
 
   return 1;
