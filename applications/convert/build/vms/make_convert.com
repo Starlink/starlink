@@ -83,6 +83,7 @@ $!
 $!  Purge old versions of the executable file.
 $!
 $    PURGE/NOLOG/NOCONFIRM CONVERT.EXE
+$    DELETE CONVERT.OBJ;0
 $!
 $!  Exit the procedure.
 $!
