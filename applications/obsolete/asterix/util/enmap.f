@@ -239,6 +239,7 @@
       CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
 
 *    Write threshold value
+      CALL MSG_SETR( 'THRESH', THRESH )
       CALL MSG_MAKE( 'Threshold value ^THRESH', TEXT, TLEN )
       CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
 
