@@ -326,15 +326,16 @@
       REAL             SECOND_TAU
       LOGICAL          USE_LST
 
-*     Arguments Returned:      
+*  Given & Returned
+      REAL             NDATA(N_BOL, N_POS, N_BEAMS)
+      REAL             NVARIANCE(N_BOL, N_POS, N_BEAMS)
+      INTEGER          N_POS_BEAMS
+
+*  Arguments Returned:      
       DOUBLE PRECISION BOL_DEC(N_BOL, N_POS, N_POS_BEAMS)
       DOUBLE PRECISION BOL_RA(N_BOL, N_POS, N_POS_BEAMS)
       DOUBLE PRECISION LST_DATA ( N_POS )
 
-*     Given & Returned
-      REAL             NDATA(N_BOL, N_POS, N_BEAMS)
-      REAL             NVARIANCE(N_BOL, N_POS, N_BEAMS)
-      INTEGER          N_POS_BEAMS
 
 *  Status:
       INTEGER STATUS             ! Global status
