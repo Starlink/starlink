@@ -25,7 +25,7 @@
 *     etc.) by averaging the pixels in perpendicular directions, or grown
 *     into new dimensions by duplicating an existing N-dimensional
 *     surface. The order of the axes can also be changed at the same time.
-*     Any combination of these abilities is also possible.
+*     Any combination of these operations is also possible.
 *
 *     The shape of the output NDF is specified using parameter AXES. This
 *     is a list of integers, each element of which identifies the source
@@ -38,22 +38,22 @@
 *     the relevant pixel axis (or axes).
 
 *  Usage:
-*     manic in out axes 
+*     manic in out axes
 
 *  ADAM Parameters:
-*     AXES( * ) = _INTEGER (Read)
+*     AXES( ) = _INTEGER (Read)
 *        An array of integers which define the pixel axes of the output
 *        NDF. The array should contain one value for each pixel axis in
 *        the output NDF. Each value can be either a positive integer or
 *        zero. If positive, it is taken to be the index of a pixel axis
 *        within the input NDF which is to be used as the output axis. If
 *        zero, the output axis will be formed by replicating the entire
-*        output NDF a specified number of times (see parameters LBND and
-*        UBND). At least one non-zero value must appear in the list, and
-*        no input axis can be used more than once.
-*     IN  = NDF (Read)
+*        output NDF a specified number of times (see parameters LBOUND and
+*        UBOUND). At least one non-zero value must appear in the list, and
+*        no input axis may be used more than once.
+*     IN = NDF (Read)
 *        The input NDF. 
-*     LBND( * ) = _INTEGER (Read)
+*     LBOUND( ) = _INTEGER (Read)
 *        An array holding the lower pixel bounds of any new axes in the
 *        output NDF (that is, output axes which have a zero value in the
 *        corresponding element of the AXES parameter). One element must
@@ -63,9 +63,8 @@
 *     OUT = NDF (Write)
 *        The output NDF.
 *     TITLE = LITERAL (Read)
-*        Title for the output NDF.  A null value (!) propagates the title 
-*        from the input NDF to the output NDF. [!]
-*     UBND( * ) = _INTEGER (Read)
+*        Title for the output NDF. ["KAPPA - Manic"]
+*     UBOUND( ) = _INTEGER (Read)
 *        An array holding the upper pixel bounds of any new axes in the
 *        output NDF (that is, output axes which have a zero value in the
 *        corresponding element of the AXES parameter). One element must 
@@ -81,27 +80,27 @@
 *        the Domain of the current Frame is PIXEL or AXES. For instance,
 *        if the current Frame has Domain "SKY", with axis 1 being RA and
 *        axis 2 being DEC, then these will be unchanged in the output NDF.
-*        However, the Mapping which is used to related (RA,DEC) positions
+*        However, the Mapping which is used to relate (RA,DEC) positions
 *        to pixel positions will be modified to take the permutation of
 *        the pixel axes into account.
-*     manic cube summ [3]
+*     manic cube summ 3
 *        This creates a one dimensional output NDF called summ, in which
 *        the single pixel axis corresponds to the Z (third) axis in an input
 *        NDF called (cube). Each element in the output is equal to the 
 *        average data value in the corresponding XY plane of the input.
-*     manic line plane [0,1] lbnd=1 ubnd=25
+*     manic line plane [0,1] lbound=1 ubound=25
 *        This takes a 1-dimensional NDF called line and expands it into a 
 *        2-dimensional NDF called plane.  The second pixel axis of the output 
 *        NDF corresponds to the first (and only) pixel axis in the input NDF.
 *        The first pixel axes of the output is formed by replicating the 
 *        the input NDF 25 times.
-*     manic line plane [1,0] lbnd=1 ubnd=25
+*     manic line plane [1,0] lbound=1 ubound=25
 *        This does the same as the last example except that the output
 *        NDF is transposed. That is, the input NDF is copied into the
 *        output NDF so that it is parallel to pixel axis 1 (X) in the 
 *        output NDF, instead of pixel axis 2 (Y) as before.
-*     manic cube hyper [1,0,0,0,0,0,3] ubnd=[2,4,2,2,1] accept
-*        This example projects the second dimension of an input
+*     manic cube hyper [1,0,0,0,0,0,3] ubound=[2,4,2,2,1] accept
+*        This manic example projects the second dimension of an input
 *        3-dimensional NDF onto the plane formed by its first and third
 *        dimensions by averaging, and grows the resulting plane
 *        up through five new dimensions with a variety of extents.
@@ -134,8 +133,11 @@
 *     8-NOV-2001 (MBT):
 *        Original version (parts were heavily informed by COLLAPSE).
 *     23-NOV-2001 (DSB):
-*        Minor mods to the prologue. Check that UBND values are not less
-*        than LBND values.
+*        Minor mods to the prologue. Check that UBOUND values are not less
+*        than LBOUND values.
+*     11-JAN-2002 (DSB):
+*        Added "Implementation Status" to prologue. Correct the
+*        annullment of LOC5.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -189,7 +191,7 @@
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER MAXS( NDF__MXDIM ) ! Maximum legal values for AXES elements
-      INTEGER MAXUB( NDF__MXDIM )! Maximum legal values for the UBND elements
+      INTEGER MAXUB( NDF__MXDIM )! Maximum legal values for the UBOUND elements
       INTEGER MINS( NDF__MXDIM ) ! Minimum legal values for AXES elements
       INTEGER NBFRM            ! AST pointer to new Base Frame
       INTEGER NCOMP            ! Number of HDS components
@@ -271,14 +273,14 @@
 
 *  Set the default for the lower bounds dynamically to all 1s.
          CALL KPG1_FILLI( 1, NEXPAN, DFLS, STATUS )
-         CALL PAR_DEF1I( 'LBND', NEXPAN, DFLS, STATUS )
+         CALL PAR_DEF1I( 'LBOUND', NEXPAN, DFLS, STATUS )
 
 *  Store maximum values for the upper bound (VAL__MAXI).
          CALL KPG1_FILLI( VAL__MAXI, NEXPAN, MAXUB, STATUS )
 
 *  Get the values from the environment.
-         CALL PAR_EXACI( 'LBND', NEXPAN, NEWLB, STATUS )
-         CALL PAR_GRM1I( 'UBND', NEXPAN, NEWLB, NEWLB, MAXUB, .FALSE., 
+         CALL PAR_EXACI( 'LBOUND', NEXPAN, NEWLB, STATUS )
+         CALL PAR_GRM1I( 'UBOUND', NEXPAN, NEWLB, NEWLB, MAXUB, .FALSE., 
      :                   NEWUB, STATUS ) 
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -302,7 +304,7 @@
       CALL LPG_PROP( INDF1, 'Axis,Units', 'OUT', INDF2, STATUS )
 
 *  Set the title of the output NDF.
-      CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDF1, INDF2, STATUS )
+      CALL NDF_CINP( 'TITLE', INDF2, 'TITLE', STATUS )
 
 *  The shape and size of the output NDF created above will be wrong, so
 *  we need to correct it by removing the collapse axis. This is easy if
