@@ -503,13 +503,13 @@ class gaia::GaiaImageCtrl {
       }
       set $itk_option(-temporary) 0
    }
-   itk_option define -file_change_cmd file_change_cmd File_Change_Cmd {}
+   itk_option define -file_change_cmd file_change_cmd File_change_cmd {}
 
    #  Debugging flag.
    itk_option define -debug debug Debug 0
 
    #  Floating panel option (for small displays).
-   # itk_option define -float_panel float_panel Float_Panel 0
+   itk_option define -float_panel float_panel Float_Panel 0
 
    #  Is image temporary. If set after image is displayed/configured
    #  then the associated file will be deleted when replaced or when this
@@ -517,11 +517,11 @@ class gaia::GaiaImageCtrl {
    itk_option define -temporary teMpoRaRy TeMpoRaRy 0
 
    #  Names and extensions of known data types.
-   itk_option define -file_types file_types File_Types \
+   itk_option define -file_types file_types File_types \
       {{any *} {ndf *.sdf} {fits *.fit*}}
 
    #  Whether up, down, left and right arrows warp the cursor.
-   itk_option define -with_warp with_warp With_Warp 1
+   itk_option define -with_warp with_warp With_warp 1
 
    #  Protected variables:
    #  ====================

@@ -296,45 +296,45 @@ class gaia::Gaia {
 
    #  Create the rtd image widget with the extended RTD functionality
    #  needed by GAIA.
-   public method make_rtdimage {} {
+   protected method make_rtdimage {} {
       set image_ $w_.image
-      itk_component add image {
-         GaiaImageCtrl $image_ \
-            -file $itk_option(-file) \
-            -file_change_cmd [code $this configure -file] \
-            -file_types $itk_option(-file_types) \
-            -usexshm $itk_option(-usexshm) \
-            -verbose $itk_option(-verbose) \
-            -shm_header $itk_option(-shm_header) \
-            -shm_data $itk_option(-shm_data) \
-            -min_colors $itk_option(-min_colors) \
-            -max_colors $itk_option(-max_colors) \
-            -drag_scroll $itk_option(-drag_scroll) \
-            -scrollbars $itk_option(-scrollbars) \
-            -subsample $itk_option(-subsample) \
-            -use_zoom_view $itk_option(-use_zoom_view) \
-            -zoom_view_propagate $itk_option(-zoom_view_propagate) \
-            -with_zoom_window $itk_option(-with_zoom_window) \
-            -dozoom $itk_option(-dozoom) \
-            -with_pan_window $itk_option(-with_pan_window) \
-            -zoom_factor $itk_option(-zoom_factor) \
-            -zoom_width $itk_option(-zoom_width) \
+       itk_component add image {
+          GaiaImageCtrl $image_ \
+             -file $itk_option(-file) \
+             -file_change_cmd [code $this configure -file] \
+             -file_types $itk_option(-file_types) \
+             -usexshm $itk_option(-usexshm) \
+             -verbose $itk_option(-verbose) \
+             -shm_header $itk_option(-shm_header) \
+             -shm_data $itk_option(-shm_data) \
+             -min_colors $itk_option(-min_colors) \
+             -max_colors $itk_option(-max_colors) \
+             -drag_scroll $itk_option(-drag_scroll) \
+             -scrollbars $itk_option(-scrollbars) \
+             -subsample $itk_option(-subsample) \
+             -use_zoom_view $itk_option(-use_zoom_view) \
+             -zoom_view_propagate $itk_option(-zoom_view_propagate) \
+             -with_zoom_window $itk_option(-with_zoom_window) \
+             -dozoom $itk_option(-dozoom) \
+             -with_pan_window $itk_option(-with_pan_window) \
+             -zoom_factor $itk_option(-zoom_factor) \
+             -zoom_width $itk_option(-zoom_width) \
             -zoom_height $itk_option(-zoom_height) \
-            -pan_width $itk_option(-pan_width) \
-            -pan_height $itk_option(-pan_height) \
-            -colorramp_height $itk_option(-colorramp_height) \
-            -default_cmap $itk_option(-default_cmap) \
-            -default_itt $itk_option(-default_itt) \
-            -with_colorramp $itk_option(-with_colorramp) \
-            -feedback [code $this feedback] \
-            -port $itk_option(-port) \
-            -shorthelpwin $this \
-            -debug $itk_option(-debug) \
-            -float_panel $itk_option(-float_panel) \
-            -newimagecmd [code $this cleared] \
-            -temporary $itk_option(-temporary) \
-            -grid_command [code $this maybe_draw_grid_] \
-            -component $itk_option(-component)
+             -pan_width $itk_option(-pan_width) \
+             -pan_height $itk_option(-pan_height) \
+             -colorramp_height $itk_option(-colorramp_height) \
+             -default_cmap $itk_option(-default_cmap) \
+             -default_itt $itk_option(-default_itt) \
+             -with_colorramp $itk_option(-with_colorramp) \
+             -feedback [code $this feedback] \
+             -port $itk_option(-port) \
+             -shorthelpwin $this \
+             -debug $itk_option(-debug) \
+             -float_panel $itk_option(-float_panel) \
+             -newimagecmd [code $this cleared] \
+             -temporary $itk_option(-temporary) \
+             -grid_command [code $this maybe_draw_grid_] \
+             -component $itk_option(-component)
       }
 
       #  Keep a list of SkyCat/GAIA instances.

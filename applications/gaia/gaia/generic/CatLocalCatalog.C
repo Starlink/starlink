@@ -116,7 +116,7 @@ int CatLocalCatalog::openCat( const char *filename )
   if ( gaiaAccessCat( filename, &catId_, &error_mess ) ) {
 
     // And read it into the various parts we require.
-    if ( gaiaReadCat( catId_, tabData_, &error_mess ) ) {
+    if ( gaiaReadCat( catId_, &tabData_, &error_mess ) ) {
       return 1;
     } else {
       error( error_mess );

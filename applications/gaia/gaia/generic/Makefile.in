@@ -30,11 +30,15 @@ TK_INCLUDE    	= @TKINCSW@
 X_INCLUDE     	= @XINCSW@
 
 # ------------------------------------------------------------------------
-CPPSRCS         =  Gaia.C NDFIO.C StarRtdImage.C bitmaps.C GaiaLocalCatalog.C \
-                   GaiaSkySearch.C StarWCS.C
+CPPSRCS         =  GaiaSkySearch.C StarRtdImage.C \
+                   Gaia.C NDFIO.C StarWCS.C GaiaLocalCatalog.C  \
+                   StarFitsIO.C bitmaps.C
 
-CSRCS           =  rtdNDF.c rtdRotBoxEllipse.c patch.c rtdDtrn.c \
-	           writeslice.c centroid.c gaiacat.c grf_tkcan.c
+CSRCS           =  ast_tclerr.c patch.c rtdNDF.c writeslice.c \
+                   centroid.c rotated.c rtdRotBoxEllipse.c \
+                   gaiacat.c rtdDtrn.c rtdSegment.c \
+                   grf_tkcan.c rtdMark.c rtdWord.c
+
 
 FSRCS           =  rtd_rdndf.f rtd_wrndf.f rtd1_wndfh.f rtd1_crfit.f \
                    rtd_axlid.f rtd_axlir.f rpatch.f pda_sfit.f \
