@@ -391,9 +391,9 @@ build_demo:
 
 build:
     [javac] Compiling 106 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 63 files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 64 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 27 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
+     [copy] Copying 28 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 4 files to /apps/cvsbuild/java/source/topcat/lib/topcat
      [echo] Executing Treeview target: build
@@ -474,4 +474,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 7 seconds
+Total time: 1 minute 6 seconds

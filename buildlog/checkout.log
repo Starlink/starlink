@@ -9051,6 +9051,7 @@ U java/source/topcat/src/docs/figures/LoadQueryWindow.gif
 U java/source/topcat/src/docs/figures/MatchWindow.gif
 U java/source/topcat/src/docs/figures/MatchWindow1.gif
 U java/source/topcat/src/docs/figures/MethodWindow.gif
+U java/source/topcat/src/docs/figures/ParameterQueryWindow.gif
 U java/source/topcat/src/docs/figures/ParameterWindow.gif
 U java/source/topcat/src/docs/figures/PlotWindow.gif
 U java/source/topcat/src/docs/figures/PlotWindow_blob.gif
@@ -9244,6 +9245,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exit.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exrows.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/false.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/folder_node.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx_leaf.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
