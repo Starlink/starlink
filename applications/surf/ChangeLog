@@ -1,3 +1,23 @@
+2003-04-02  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_remove_ip.f (SURFLIB_REMOVE_IP): Fix
+	calculation. Now does S(meas)*(1- P(1+cos() ))
+
+2003-04-01  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_reduce_noise.f (SURF_REDUCE_NOISE): Protect bad pixels
+	when changing type with VEC
+
+	* src/surf_scuba2mem.f (SURF_SCUBA2MEM): Make sure that VEC_ calls
+	protect bad pixels when changing type
+
+	* src/surf_par: Increase MAX_FITS so that it can hold MAX_FILES
+
+	* scripts/scunoise: Add Remo's update
+
+	* src/surf_write_map_info.F: Now uses PSX_GMTIME rather than
+	GMTIME and now puts units at start of comment in [] for FITS headers. 
+
 2002-10-06  Tim Jenness  <timj@jach.hawaii.edu>
 
 	************  V1.6-10 ***************
