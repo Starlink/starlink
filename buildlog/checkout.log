@@ -10684,6 +10684,7 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/InfoPanel.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/JDBCDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/MetaTable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/MetamapGroup.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/MyspaceContainerDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayImage.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NDFDataNode.java
@@ -10813,6 +10814,7 @@ U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/smallbox1.gi
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/sogimage.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/squishdat.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/star_gold.gif
+U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/starlinklogo1b.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/starlinklogo3.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/sxtree6.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/table10.gif

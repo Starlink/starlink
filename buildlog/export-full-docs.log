@@ -2327,7 +2327,7 @@ dist:
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 132 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 133 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
      [echo] Executing Coco target: install
 
@@ -2426,4 +2426,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 25 seconds
+Total time: 7 minutes 29 seconds

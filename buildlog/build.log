@@ -359,7 +359,7 @@ execute_mk_script:
      [exec] Running MK script...
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e build
-     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
+     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -fPIC -c NDFJImpl.c
      [exec] mkdir temp
      [exec] (cd temp; \
      [exec]    for f in `../splat_libraries` ""; do \
@@ -429,10 +429,10 @@ build_demo:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 114 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 115 source files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 5 empty directories to 2 empty directories under /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copying 68 files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 69 files to /apps/cvsbuild/java/source/treeview/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
      [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/lib/treeview
      [echo] Executing Coco target: build
@@ -491,4 +491,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 16 seconds
+Total time: 1 minute 17 seconds

@@ -867,6 +867,7 @@ dist:
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 4 empty directories to 1 empty directory under /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 513 files to /apps/cvsbuild/java/source/splat/docs/splat
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -938,7 +939,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Dec 8, 2004 5:19:16 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 9, 2004 5:19:28 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1026,7 +1027,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/treeview
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 132 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 133 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
      [echo] Executing Coco target: install
 
@@ -1136,4 +1137,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 39 seconds
+Total time: 5 minutes 38 seconds
