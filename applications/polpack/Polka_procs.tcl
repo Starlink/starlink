@@ -40,6 +40,8 @@
 #        TMG mail 2/9/99, 3/99/99 (saved in PINE on 15/9/99).
 #     28-FEB-2000 (DSB):
 #        Modified call to KAPPA:SEGMENT to do away with COSYS parameter.
+#     19-APR-2000 (DSB):
+#        Added USEWCS=NO to CCDPACK:TRANNDF parameter list.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -13946,7 +13948,7 @@ proc TranImage {data map trandata section fittype} {
             set method NEAREST
          }
 
-         set ok [Obey ccdpack tranndf "inext=no logto=neither method=$method out=$trandata in=$data $shape transform=$trn"] 
+         set ok [Obey ccdpack tranndf "inext=no usewcs=no logto=neither method=$method out=$trandata in=$data $shape transform=$trn"] 
          catch "exec ls -al ${trandata}*"
 
 # Modify the WCS information in the mapped image (if the mapping is not a
