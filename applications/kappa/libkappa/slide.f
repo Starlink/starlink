@@ -114,6 +114,22 @@
 *     "Sub-pixel Interpolation Schemes" section of the REGRID task
 *     documentation.
 
+*  Notes:
+*     -  If the NDF is shifted by a whole number of pixels along each
+*     axis, this application merely changes the pixel origin in the NDF.
+*     It can thus be compared with the SETORIGIN command.
+
+*  Implementation Status:
+*     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
+*     propagated. TITLE is controlled by the TITLE parameter. DATA,
+*     VARIANCE, AXIS and WCS are propagated after appropriate modification.
+*     QUALITY component is also propagated if Nearest Neighbour
+*     interpolation is being used. 
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.
+*     -  There can be an arbitrary number of NDF dimensions.
+
 *  Related Applications:
 *     KAPPA: REGRID, SQORST, WCSADD
 
@@ -126,16 +142,19 @@
 *        Original version.
 *     15-JAN-2002 (DSB):
 *        Modified so that positions are always obtained in pixel coords.
+*        Added propagation of QUALITY. Also changed code to look more like 
+*        REGRID. Added propagation of the AXIS component.
 *-
-
+      
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST definitions and declarations
-      INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF system constants
+      INCLUDE 'PAR_ERR'          ! Parameter system error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -149,45 +168,60 @@
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
       CHARACTER METHOD * ( 16 )  ! Name of resampling scheme
       CHARACTER STYPE * ( 16 )   ! Type of shift to be supplied
-      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
-      DOUBLE PRECISION DLBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
-      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
-      DOUBLE PRECISION DUBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input array
       DOUBLE PRECISION FID( NDF__MXDIM ) ! Co-ordinates of fiducial point
+      DOUBLE PRECISION LPO       ! Lower bound in output array
       DOUBLE PRECISION OBJ( NDF__MXDIM ) ! Co-ordinates of standard object
-      DOUBLE PRECISION PARAMS( 8 ) ! Auxiliary parameters for resampling
+      DOUBLE PRECISION PARAMS( 4 ) ! Additional parameters for resampler
       DOUBLE PRECISION PIA( NDF__MXDIM ) ! First input point
       DOUBLE PRECISION PIB( NDF__MXDIM ) ! Second input point
       DOUBLE PRECISION POA( NDF__MXDIM ) ! First output point
       DOUBLE PRECISION POB( NDF__MXDIM ) ! Second output point
-      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector
-      DOUBLE PRECISION TOL       ! Linear approximation tolerance
-      DOUBLE PRECISION XL( NDF__MXDIM ) ! Position of lower outliers (dummy)
-      DOUBLE PRECISION XU( NDF__MXDIM ) ! Position of upper outliers (dummy)
+      DOUBLE PRECISION PT1I( NDF__MXDIM ) ! First input point
+      DOUBLE PRECISION PT1O( NDF__MXDIM ) ! First output point
+      DOUBLE PRECISION PT2I( NDF__MXDIM ) ! Second input point
+      DOUBLE PRECISION PT2O( NDF__MXDIM ) ! Second output point
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector      
+      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input array
+      DOUBLE PRECISION TOL       ! Tolerance for linear transform approximation
+      DOUBLE PRECISION UPO       ! Upper bound in output array
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! Position of lowest value
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! Position of highest value
       INTEGER ELI                ! Number of elements in input NDF
       INTEGER ELO                ! Number of elements in output NDF
-      INTEGER FLAGS              ! Flags for resampling routine
+      INTEGER FLAGS              ! Flags sent to AST_RESAMPLE<X>
       INTEGER I                  ! Loop variable
-      INTEGER INTERP             ! Resampling scheme
-      INTEGER IPDATI             ! Pointer to input data array
-      INTEGER IPDATO             ! Pointer to output data array
-      INTEGER IPVARI             ! Pointer to input variance array
-      INTEGER IPVARO             ! Pointer to output variance array
-      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER INTERP             ! Resampling scheme identifier
+      INTEGER IPAI               ! Pointer to input AXIS Centre array
+      INTEGER IPAO               ! Pointer to output AXIS Centre array
+      INTEGER IPDATI             ! Pointer to input Data array
+      INTEGER IPDATO             ! Pointer to output Data array
+      INTEGER IPQUAI             ! Pointer to input Quality array
+      INTEGER IPQUAO             ! Pointer to output Quality array
+      INTEGER IPVARI             ! Pointer to input Variance array
+      INTEGER IPVARO             ! Pointer to output Variance array
+      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel co-ordinates
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
-      INTEGER MAP                ! AST Mapping for resampling
-      INTEGER MAPPIX             ! AST Mapping from i/p PIXEL to o/p PIXEL
-      INTEGER MAXPIX             ! Maximum extent of linear approximation
-      INTEGER NBAD               ! Number of bad pixels written
-      INTEGER NDFI               ! Input NDF identifier
-      INTEGER NDFO               ! Output NDF identifier
-      INTEGER NDIM               ! Number of dimensions of NDF
-      INTEGER NPARAM             ! Number of auxiliary resampling parameters
-      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
+      INTEGER MAPA               ! Mapping from i/ axis centre to o/p axis centre
+      INTEGER MAPHI              ! Half-pixel shift Mapping at input end
+      INTEGER MAPHIO             ! Mapping with half-pixel shifts at both ends
+      INTEGER MAPHO              ! Half-pixel shift Mapping at output end
+      INTEGER MAPIO              ! Mapping from input to output NDF
+      INTEGER MAXPIX             ! Max size of linear approximation region
+      INTEGER NBAD               ! Number of bad pixels
+      INTEGER NDFI               ! NDF identifier of input NDF
+      INTEGER NDFO               ! NDF identifier of output NDF
+      INTEGER NDIM               ! Number of dimensions of input and output NDF
+      INTEGER NPARAM             ! Number of parameters required for resampler
+      INTEGER OUTPRM( NDF__MXDIM ) ! Output axis permutation array for PMAP1
+      INTEGER PMAP1              ! A PermMap which selects the current axis
+      INTEGER PMAP2              ! The inverse of PMAP1
+      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel co-ordinates
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       LOGICAL BAD                ! May there be bad pixels?
-      LOGICAL HASVAR             ! Do we have a variance component?
-
+      LOGICAL HASQUA             ! Does the input NDF have Quality component?
+      LOGICAL HASVAR             ! Does the input NDF have Variance component?
+      LOGICAL HASAX              ! Does the input NDF have an AXIS Centre array?
 *.
 
 *  Check the inherited global status.
@@ -205,26 +239,14 @@
 *  Open the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*  Find out if we have a variance component
-      CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
-
-*  Determine a data type which can be used for operations on its Data
-*  and possibly Variance components.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,' //
-     :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
-     :                DTYPE, STATUS )
-
-*  Get its shape.
+*  Get its dimensions.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
 
-*  See if it has bad pixels in the Data or Variance component.
-      CALL NDF_BAD( NDFI, 'DATA', .FALSE., BAD, STATUS )
-      IF ( HASVAR .AND. .NOT. BAD ) THEN
-         CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
-      END IF
+*  See if it has a Variance component.
+      CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
 
-*  Determine the pixel shifts required.
-*  ====================================
+*  Get the input PIXEL -> output PIXEL Mapping.
+*  ============================================
 
 *  See if we want a relative or absolute shift.
       CALL PAR_CHOIC( 'STYPE', 'ABSOLUTE', 'ABSOLUTE,RELATIVE', .TRUE.,
@@ -243,25 +265,10 @@
 *  Get the co-ordinates of the standard object.
          CALL PAR_EXACD( 'OBJ', NDIM, OBJ, STATUS ) 
 
-*  Set the shift as the difference between the two.
+*  Set the shift as the difference between the two. 
          DO I = 1, NDIM
             SHIFT( I ) = FID( I ) - OBJ( I )
          END DO
-      END IF
-
-*  Create and configure the output NDF.
-*  ====================================
-
-*  Propagate the input to the output NDF.
-      CALL LPG_PROP( NDFI, 'UNIT', 'OUT', NDFO, STATUS )
-
-*  Get a title for the new NDF from the parameter system.
-      CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
-
-*  Set the Data and possibly Variance component data types.
-      CALL NDF_STYPE( ITYPE, NDFO, 'DATA', STATUS )
-      IF ( HASVAR ) THEN
-         CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
       END IF
 
 *  Construct a Mapping from input PIXEL to output PIXEL corresponding to 
@@ -272,139 +279,231 @@
          POA( I ) = PIA( I ) + SHIFT( I )
          POB( I ) = PIB( I ) + SHIFT( I )
       END DO
-      MAPPIX = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
+      MAPIO = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
 
-*  Work out the bounds of an array which would contain the resampled
-*  copy of the whole input array.
-      DO I = 1, NDIM
-         DLBNDI( I ) = DBLE( LBNDI( I ) - 1 )
-         DUBNDI( I ) = DBLE( UBNDI( I ) )
-      END DO
-      DO I = 1, NDIM
-         CALL AST_MAPBOX( MAPPIX, DLBNDI, DUBNDI, .TRUE., I, 
-     :                    DLBNDO( I ), DUBNDO( I ), XL, XU, STATUS )
-      END DO
+*  Get the qualifications to the transformation.
+*  =============================================
 
-*  Work out the corresponding shape of the output NDF.
-      DO I = 1, NDIM
-         LBNDO( I ) = KPG1_FLOOR( REAL( DLBNDO( I ) ) ) + 1
-         UBNDO( I ) = KPG1_CEIL( REAL( DUBNDO( I ) ) )
-      END DO
-
-*  Set the shape of the output NDF.
-      CALL NDF_SBND( NDIM, LBNDO, UBNDO, NDFO, STATUS )
-
-*  Fix up the output WCS according to the changes we will make.
-      CALL KPG1_ASFIX( MAPPIX, NDFI, NDFO, STATUS )
-
-*  Resample data from the input to output NDF.
-*  ===========================================
-*  Construct the Mapping to be used for the resampling. This is from the
-*  input GRID Frame to the output GRID Frame.
-      DO I = 1, NDIM
-         PIA( I ) = 0D0
-         PIB( I ) = 1D0
-         POA( I ) = PIA( I ) + SHIFT( I ) + 
-     :              DBLE( LBNDI( I ) - LBNDO( I ) )
-         POB( I ) = PIB( I ) + SHIFT( I ) +
-     :              DBLE( LBNDI( I ) - LBNDO( I ) )
-      END DO
-      MAP = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
-
-*  Map the input and output data arrays.
-      CALL NDF_MAP( NDFI, 'DATA', ITYPE, 'READ', IPDATI, ELI, STATUS )
-      CALL NDF_MAP( NDFO, 'DATA', ITYPE, 'WRITE', IPDATO, ELO, STATUS )
-
-*  If necessary map the input and output variance arrays.
-      IF ( HASVAR ) THEN
-         CALL NDF_MAP( NDFI, 'VARIANCE', ITYPE, 'READ', IPVARI, ELI,
-     :                 STATUS )
-         CALL NDF_MAP( NDFO, 'VARIANCE', ITYPE, 'WRITE', IPVARO, ELO,
-     :                 STATUS )
-      END IF
-
-*  Set flags for the resampling routine.
+*  Initialise the resampling routine control flags.
       FLAGS = 0
-      IF ( HASVAR ) FLAGS = FLAGS + AST__USEVAR
-      IF ( BAD ) FLAGS = FLAGS + AST__USEBAD
-      TOL = 0.1D0
-      MAXPIX = 500
 
-*  Determine the resampling scheme to use.
-      CALL PAR_CHOIC( 'METHOD', 'LINEAR', 'LINEAR,NEAREST,SINC,' //
-     :                'SINCSINC,SINCCOS,SINCGAUSS,BLOCKAVE', .TRUE.,
+*  Get the method for calculating the output array value from the
+*  input values.
+      CALL PAR_CHOIC( 'METHOD', 'NEAREST', 'NEAREST,LINEAR,SINC,'//
+     :                'SINCSINC,SINCCOS,SINCGAUSS,BLOCKAVE', .FALSE.,
      :                METHOD, STATUS )
+
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
       IF ( METHOD .EQ. 'NEAREST' ) THEN
+         CALL MSG_SETC( 'M', 'Nearest Neighbour' )
          INTERP = AST__NEAREST
          NPARAM = 0
       ELSE IF ( METHOD .EQ. 'LINEAR' ) THEN
+         CALL MSG_SETC( 'M', 'Bilinear' )
          INTERP = AST__LINEAR
          NPARAM = 0
       ELSE IF ( METHOD .EQ. 'SINC' ) THEN
+         CALL MSG_SETC( 'M', 'Sinc' )
          INTERP = AST__SINC
          NPARAM = 1
       ELSE IF ( METHOD .EQ. 'SINCSINC' ) THEN
+         CALL MSG_SETC( 'M', 'SincSinc' )
          INTERP = AST__SINCSINC
          NPARAM = 2
       ELSE IF ( METHOD .EQ. 'SINCCOS' ) THEN
+         CALL MSG_SETC( 'M', 'SincCos' )
          INTERP = AST__SINCCOS
          NPARAM = 2
       ELSE IF ( METHOD .EQ. 'SINCGAUSS' ) THEN
+         CALL MSG_SETC( 'M', 'SincGauss' )
          INTERP = AST__SINCGAUSS
          NPARAM = 2
       ELSE IF ( METHOD .EQ. 'BLOCKAVE' ) THEN
+         CALL MSG_SETC( 'M', 'BlockAve' )
          INTERP = AST__BLOCKAVE
          NPARAM = 1
       END IF
+      CALL MSG_OUT( 'SLIDE_MSG1', '  Using ^M interpolation.', 
+     :              STATUS )
 
 *  Get an additional parameter vector if required.
       IF ( NPARAM .GT. 0 ) THEN
          CALL PAR_EXACD( 'PARAMS', NPARAM, PARAMS, STATUS )
       END IF
 
+*  Set the tolerance for Mapping linear approximation.
+      TOL = 0.1D0
+
+*  Set the initial scale size for the Mapping linear approximation
+*  algorithm (see AST_RESAMPLE<X> documentation).
+      MAXPIX = 500
+
+*  Get the bounds of the output NDF.
+*  =================================
+
+*  Work out the bounds of an array which would contain the resampled 
+*  copy of the whole input array.
+      DO I = 1, NDIM
+         DLBNDI( I ) = DBLE( LBNDI( I ) - 1 )
+         DUBNDI( I ) = DBLE( UBNDI( I ) )
+      END DO
+      DO I = 1, NDIM
+         CALL AST_MAPBOX( MAPIO, DLBNDI, DUBNDI, .TRUE., I, LPO, UPO,
+     :                    XL, XU, STATUS )
+         LBNDO( I ) = KPG1_FLOOR( REAL( LPO ) ) + 1
+         UBNDO( I ) = KPG1_CEIL( REAL( UPO ) )
+      END DO
+
+*  Create and configure the output NDF.
+*  ====================================
+
+*  Create a new NDF by propagation from the input one.
+      CALL LPG_PROP( NDFI, 'UNIT', 'OUT', NDFO, STATUS )
+
+*  Get a title for the new NDF from the parameter system.
+      CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Set the shape of the output NDF.
+      CALL NDF_SBND( NDIM, LBNDO, UBNDO, NDFO, STATUS )
+
+*  Determine a data type which can be used for operations on the
+*  Data and possibly Variance components of the NDF.
+      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
+     :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
+     :                DTYPE, STATUS )
+
+*  Set the Data and possibly Variance component data types.
+      CALL NDF_STYPE( ITYPE, NDFO, 'DATA', STATUS )
+      IF ( HASVAR ) THEN
+         CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
+      END IF
+      
+*  Store a suitably modified copy of the input WCS in the output.
+      CALL KPG1_ASFIX( MAPIO, NDFI, NDFO, STATUS )
+
+*  Map the array components.
+*  =========================
+
+*  Map the Data array of the input and output NDFs.
+      CALL NDF_MAP( NDFI, 'DATA', ITYPE, 'READ', IPDATI, ELI, STATUS )
+      CALL NDF_MAP( NDFO, 'DATA', ITYPE, 'WRITE', IPDATO, ELO,
+     :              STATUS )
+
+*  Find out if there may be bad pixels in the mapped Data array.
+      CALL NDF_BAD( NDFI, 'DATA', .FALSE., BAD, STATUS )
+
+*  Map the Variance component of the input and output NDFs if we are
+*  processing variances.
+      IF ( HASVAR ) THEN
+         CALL NDF_MAP( NDFI, 'VARIANCE', ITYPE, 'READ', IPVARI, ELI,
+     :                 STATUS )
+         CALL NDF_MAP( NDFO, 'VARIANCE', ITYPE, 'WRITE', IPVARO,
+     :                 ELO, STATUS )
+
+*  Unless we already know of bad values in the Data component, see 
+*  whether the Variance component may contain them.
+         IF ( .NOT. BAD ) THEN
+            CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
+         END IF
+
+*  Record the fact that variances should be processed.
+         FLAGS = FLAGS + AST__USEVAR
+      END IF
+
+*  If either the Data or Variance component of the input NDF may have
+*  bad values, record this fact.
+      IF ( BAD ) THEN
+         FLAGS = FLAGS + AST__USEBAD
+      END IF
+
 *  Perform the resampling.
+*  =======================
+
+*  Since AST_RESAMPLE<X> requires the centre of pixels to be represented
+*  by integers (the LBND and UBND arrays) it is necessary to add a 
+*  half-pixel shift onto both ends of the Mapping prior to executing
+*  the resample.  First construct a Mapping which transforms minus a 
+*  half pixel in every input dimension.
+      DO I = 1, NDIM
+         PT1I( I ) = 0D0
+         PT2I( I ) = 1D0
+         PT1O( I ) = PT1I( I ) - 0.5D0
+         PT2O( I ) = PT2I( I ) - 0.5D0
+      END DO
+      MAPHI = AST_WINMAP( NDIM, PT1I, PT2I, PT1O, PT2O, ' ', STATUS )
+
+*  Then one which transforms plus a half-pixel in every output dimension.
+      DO I = 1, NDIM
+         PT1I( I ) = 0D0
+         PT2I( I ) = 1D0
+         PT1O( I ) = PT1I( I ) + 0.5D0
+         PT2O( I ) = PT2I( I ) + 0.5D0
+      END DO
+      MAPHO = AST_WINMAP( NDIM, PT1I, PT2I, PT1O, PT2O, ' ', STATUS )
+
+*  Combine these to get a Mapping which does what we want it to,
+*  correcting for the half pixel at either end.
+      MAPHIO = AST_CMPMAP( MAPHI, MAPIO, .TRUE., ' ', STATUS )
+      MAPHIO = AST_CMPMAP( MAPHIO, MAPHO, .TRUE., ' ', STATUS )
+      MAPHIO = AST_SIMPLIFY( MAPHIO, STATUS )
+
+*  Perform the resampling according to data type.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         NBAD = AST_RESAMPLEB( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADB,
-     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLEB( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADB, NDIM, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
+
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         NBAD = AST_RESAMPLEUB( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                          %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADUB,
-     :                          NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                          %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLEUB( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                          %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                          VAL__BADUB, NDIM, LBNDO, UBNDO, LBNDO,
+     :                          UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                          STATUS )
+
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         NBAD = AST_RESAMPLEW( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADW,
-     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLEW( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADW, NDIM, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
+
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         NBAD = AST_RESAMPLEUW( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                          %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADUW,
-     :                          NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                          %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLEUW( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                          %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                          AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                          VAL__BADUW, NDIM, LBNDO, UBNDO, LBNDO,
+     :                          UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                          STATUS )
+
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         NBAD = AST_RESAMPLEI( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADI,
-     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLEI( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADI, NDIM, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
+
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         NBAD = AST_RESAMPLER( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADR,
-     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLER( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADR, NDIM, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
+
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         NBAD = AST_RESAMPLED( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
-     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
-     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADD,
-     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
-     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+         NBAD = AST_RESAMPLED( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                         %VAL( IPDATI ), %VAL( IPVARI ), INTERP,
+     :                         AST_NULL, PARAMS, FLAGS, TOL, MAXPIX,
+     :                         VAL__BADD, NDIM, LBNDO, UBNDO, LBNDO,
+     :                         UBNDO, %VAL( IPDATO ), %VAL( IPVARO ),
+     :                         STATUS )
       END IF
 
 *  We can set the bad pixels flag according to the bad pixel count 
@@ -414,6 +513,139 @@
       IF ( HASVAR ) THEN
          CALL NDF_SBAD( BAD, NDFO, 'VARIANCE', STATUS )
       END IF
+
+*  If using Nearest Neighbour interpolation, resample any QUALITY array.
+*  =====================================================================
+      CALL NDF_STATE( NDFI, 'QUALITY', HASQUA, STATUS )
+      IF( INTERP .EQ. AST__NEAREST .AND. HASQUA ) THEN
+
+*  Map the QUALITY array of the input and output NDFs. Note, QUALITY
+*  arrays should always be mapped as _UBYTE.
+         CALL NDF_MAP( NDFI, 'DATA', '_UBYTE', 'READ', IPQUAI, ELI, 
+     :                 STATUS )
+         CALL NDF_MAP( NDFO, 'DATA', '_UBYTE', 'WRITE', IPQUAO, ELO,
+     :                 STATUS )
+
+*  Do the resampling.
+         NBAD = AST_RESAMPLEUB( MAPHIO, NDIM, LBNDI, UBNDI,
+     :                          %VAL( IPQUAI ), %VAL( IPQUAI ), INTERP,
+     :                          AST_NULL, PARAMS, 0, TOL, MAXPIX,
+     :                          VAL__BADUB, NDIM, LBNDO, UBNDO, LBNDO,
+     :                          UBNDO, %VAL( IPQUAO ), %VAL( IPQUAO ),
+     :                          STATUS )
+
+      END IF
+
+*  Resample any AXIS arrays.
+*  =========================
+
+*  Initialize the output axis permutation array to hold zeros, indicating
+*  that none of the outputs from the PermMap are connected to an input.
+      DO I = 1, NDIM
+         OUTPRM( I ) = 0
+      END DO
+
+*  Loop round each NDF axis which has a defined AXIS Centre array.
+      DO I = 1, NDIM
+         CALL NDF_ASTAT( NDFI, 'Centre', I, HASAX, STATUS ) 
+         IF( HASAX ) THEN
+
+*  Modify the Mapping to select this axis at both ends.
+            OUTPRM( I ) = 1
+            PMAP1 = AST_PERMMAP( 1, I, NDIM, OUTPRM, 0.0D0, ' ', 
+     :                           STATUS )
+            OUTPRM( I ) = 0
+
+            PMAP2 = AST_COPY( PMAP1, STATUS )
+            CALL AST_INVERT( PMAP2, STATUS )
+
+            MAPA = AST_CMPMAP( AST_CMPMAP( PMAP1, MAPHIO, .TRUE., ' ', 
+     :                                     STATUS ),
+     :                         PMAP2, .TRUE., ' ', STATUS )
+
+*  Get the data type of the Centre array and map it in both input and
+*  output NDFs.
+            CALL NDF_ATYPE( NDFI, 'Centre', I, ITYPE, STATUS )      
+
+            CALL NDF_AMAP( NDFI, 'Centre', I, ITYPE, 'READ', IPAI, ELI,
+     :                     STATUS )
+            CALL NDF_AMAP( NDFO, 'Centre', I, ITYPE, 'WRITE', IPAO, ELO,
+     :                     STATUS )
+
+*  Tell AST_RESAMPLE to recognize bad values.
+            FLAGS = AST__USEBAD
+
+*  Perform the resampling according to data type.
+            IF ( ITYPE .EQ. '_BYTE' ) THEN
+               NBAD = AST_RESAMPLEB( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADB, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+      
+            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+               NBAD = AST_RESAMPLEUB( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADUB, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+      
+            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+               NBAD = AST_RESAMPLEW( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADW, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+      
+            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+               NBAD = AST_RESAMPLEUW( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADUW, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+      
+            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+               NBAD = AST_RESAMPLEI( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADI, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+      
+            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+               NBAD = AST_RESAMPLER( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADR, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+      
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               NBAD = AST_RESAMPLED( MAPA, 1, LBNDI( I ), UBNDI( I ),
+     :                               %VAL( IPAI ), %VAL( IPAI ), INTERP,
+     :                               AST_NULL, PARAMS, FLAGS, TOL, 
+     :                               MAXPIX, VAL__BADD, 1, LBNDO( I ), 
+     :                               UBNDO( I ), LBNDO( I ), UBNDO( I ), 
+     :                               %VAL( IPAO ), %VAL( IPAO ), 
+     :                               STATUS )
+            END IF
+
+*  Unmap the Centre arrays.
+            CALL NDF_AUNMP( NDFI, 'Centre', I, STATUS )
+            CALL NDF_AUNMP( NDFO, 'Centre', I, STATUS )
+
+         END IF
+      END DO
 
 *  Tidy up.
 *  ========
@@ -433,8 +665,8 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'SLIDE_ERR1', 'SLIDE: Unable to translate an '//
-     :                 'NDF', STATUS )
+         CALL ERR_REP( 'SLIDE_ERR1', 'SLIDE: Unable to shift pixels '//
+     :                 'in an NDF.', STATUS )
       END IF
 
       END

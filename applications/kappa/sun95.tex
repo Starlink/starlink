@@ -37311,6 +37311,27 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
       {\tt "}Sub-pixel Interpolation Schemes{\tt "} section of the REGRID task
       documentation.
    }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The LABEL, UNITS, and HISTORY components, and all extensions are
+         propagated. TITLE is controlled by the TITLE parameter. DATA,
+         VARIANCE, AXIS and WCS are propagated after appropriate modification. 
+         The QUALITY component is also propagated if Nearest Neighbour
+         interpolation is being used.  
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+
+         \sstitem
+         There can be an arbitrary number of NDF dimensions.
+      }
+   }
    \sstdiytopic{
       Related Applications
    }{
