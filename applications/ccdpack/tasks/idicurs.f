@@ -795,7 +795,7 @@
       
 *  If left-hand trigger has been pressed then mark position.
       ELSE IF ( TRIGS( 1 ) .NE. 0 ) THEN
-      
+
 *  Read the cursor position relative to the memory origin.
          CALL IICRCP( ID, MEMID, NUMCUR, XC, YC, OUTMID, ISTAT )
          IF ( ISTAT .NE. IDI__OK ) GO TO 99
