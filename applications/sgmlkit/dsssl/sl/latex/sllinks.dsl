@@ -43,19 +43,19 @@ immediately resolve the indirection.
 		     (element-with-id (attribute-string (normalize "to")
 							tmp-target))
 		     tmp-target))
-	 (linktext (attribute-string (normalize "text")
-				     (current-node))))
+	 (linktext (data (current-node))))
     (if (and target
 	     (member (gi target) (ref-target-element-list)))
-	(if linktext
-	    (literal linktext)	;override generation of link text
+	(if (string=? linktext "")
 	    (if (member (gi target) (section-element-list))
 		(make command name: "textit"
 		      (make-section-reference target: target
 					      specify-type: #t
 					      short-ref: %short-crossrefs%))
 		(with-mode section-reference
-			(process-node-list target))))
+			(process-node-list target)))
+	    (literal linktext)	;override generation of link text
+	    )
 	(if target
 	    (error (string-append
 		    "The stylesheet is presently unable to link to elements of type "
