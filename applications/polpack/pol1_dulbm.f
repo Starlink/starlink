@@ -121,6 +121,8 @@
 *     22-JAN-2001 (DSB):
 *        Modified to allow the input images to be planes from a 3D x/y/freq
 *        cube.
+*     24-OCT-2001 (DSB):
+*        Map the output data array prior to calling POL1_FBBOX.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -964,6 +966,10 @@
 *  If required, trim the output NDF to exclude any margins of bad pixels.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
       IF( TRIM ) THEN
+
+*  Map the output NDF again.
+         CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'READ', IPDOUT, NOUT, 
+     :                 STATUS )
 
 *  Find the new bounds.
          CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), 
