@@ -1,0 +1,12 @@
+s/<T>/R/g
+s/<TYPE>/REAL/g
+s/<LTYPE>/REAL/g
+s/<CONST>/.0E0/g
+s/<HTYPE>/_REAL/g
+s/<COMM>/REAL/g
+s/<t>/R/g
+s/<type>/REAL/g
+s/<ltype>/REAL/g
+s/<const>/.0E0/g
+s/<htype>/_REAL/g
+s/<comm>/REAL/g

@@ -1,0 +1,16 @@
+/!/ { print $0 }
+!/!/{
+if ( ( substr($0,1,1) == "*" ) || \
+     ( substr($0,1,1) == "C" ) || \
+     ( substr($0,1,1) == "c" ) || \
+     ( substr($0,1,1) == "D" ) || \
+     ( substr($0,1,1) == "d" ) || \
+     ( length < 73 ) \
+   )
+   print $0
+else
+   {
+      print substr($0,1,72);
+      print "     :"substr($0,73,length-72)
+   }
+}

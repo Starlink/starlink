@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="generic">
+  <version>1.1-2</version>
+  <path>applications/generic</path>
+  <description>A Utility for Compiling Generic Fortran Subroutines</description>
+  <abstract><p>GENERIC is a utility which preprocesses a generic
+  Fortran subroutine into its different types and concatenates these
+  routines into a file.  The file can then be compiled with the
+  Fortran compiler to produce an object module.</p></abstract>
+  <dependencies >
+    <build>prm</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>S M Beard</name>
+    </person>
+    <person>
+      <name>P M Allan</name>
+    </person>
+  </developers>
+  <documentation> sun7</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

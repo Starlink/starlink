@@ -1,0 +1,20 @@
+s/<CONV>/ /g
+s/<EXT>/ /g
+s/<BRAK>/ /g
+s/<ICONV>/NINT(/g
+s/<IEXT>/ /g
+s/<IBRAK>/)/g
+s/<REV>/ /g
+s/<RVBRAK>/ /g
+s/<IREV>/REAL(/g
+s/IRVBRAK>/)/g
+s/<conv>/ /g
+s/<ext>/ /g
+s/<brak>/ /g
+s/<iconv>/NINT(/g
+s/<iext>/ /g
+s/<ibrak>/)/g
+s/<rev>/ /g
+s/<rvbrak>/ /g
+s/<irev>/REAL(/g
+s/irvbrak>/)/g

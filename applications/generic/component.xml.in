@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/generic</path>
+  <description>A Utility for Compiling Generic Fortran Subroutines</description>
+  <abstract><p>GENERIC is a utility which preprocesses a generic
+  Fortran subroutine into its different types and concatenates these
+  routines into a file.  The file can then be compiled with the
+  Fortran compiler to produce an object module.</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>S M Beard</name>
+    </person>
+    <person>
+      <name>P M Allan</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

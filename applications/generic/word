@@ -1,0 +1,12 @@
+s/<T>/W/g
+s/<TYPE>/INTEGER*2/g
+s/<LTYPE>/INTEGER*2/g
+s/<CONST>/ /g
+s/<HTYPE>/_WORD/g
+s/<COMM>/WORD/g
+s/<t>/W/g
+s/<type>/INTEGER*2/g
+s/<ltype>/INTEGER*2/g
+s/<const>/ /g
+s/<htype>/_WORD/g
+s/<comm>/WORD/g

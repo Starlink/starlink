@@ -1,0 +1,20 @@
+s/<CONV>/SNGL(/g
+s/<EXT>/ /g
+s/<BRAK>/)/g
+s/<ICONV>/NINT(/g
+s/<IEXT>/ /g
+s/<IBRAK>/)/g
+s/<REV>/DBLE(/g
+s/<RVBRAK>/)/g
+s/<IREV>/DBLE(/g
+s/IRVBRAK>/)/g
+s/<conv>/SNGL(/g
+s/<ext>/ /g
+s/<brak>/)/g
+s/<iconv>/NINT(/g
+s/<iext>/ /g
+s/<ibrak>/)/g
+s/<rev>/DBLE(/g
+s/<rvbrak>/)/g
+s/<irev>/DBLE(/g
+s/irvbrak>/)/g

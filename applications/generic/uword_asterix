@@ -1,0 +1,20 @@
+s/<CONV>/REAL(/g
+s/<EXT>/ZEXT(/g
+s/<BRAK>/))/g
+s/<ICONV>/ /g
+s/<IEXT>/ZEXT(/g
+s/<IBRAK>/)/g
+s/<REV>/NINT(/g
+s/<RVBRAK>/)/g
+s/<IREV>/ /g
+s/IRVBRAK>/ /g
+s/<conv>/REAL(/g
+s/<ext>/ZEXT(/g
+s/<brak>/))/g
+s/<iconv>/ /g
+s/<iext>/ZEXT(/g
+s/<ibrak>/)/g
+s/<rev>/NINT(/g
+s/<rvbrak>/)/g
+s/<irev>/ /g
+s/irvbrak>/ /g

@@ -1,0 +1,4 @@
+      SUBROUTINE ANSWER_TO_LIFE_ETC_<T>( ARG )
+      <TYPE> ARG
+      ARG = 42<CONST>
+      END

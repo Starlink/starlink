@@ -1,0 +1,12 @@
+s/<T>/I/g
+s/<TYPE>/INTEGER/g
+s/<LTYPE>/INTEGER/g
+s/<CONST>/ /g
+s/<HTYPE>/_INTEGER/g
+s/<COMM>/INTEGER/g
+s/<t>/I/g
+s/<type>/INTEGER/g
+s/<ltype>/INTEGER/g
+s/<const>/ /g
+s/<htype>/_INTEGER/g
+s/<comm>/INTEGER/g

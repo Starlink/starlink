@@ -1,0 +1,12 @@
+s/<T>/B/g
+s/<TYPE>/BYTE/g
+s/<LTYPE>/BYTE/g
+s/<CONST>/ /g
+s/<HTYPE>/_BYTE/g
+s/<COMM>/BYTE/g
+s/<t>/B/g
+s/<type>/BYTE/g
+s/<ltype>/BYTE/g
+s/<const>/ /g
+s/<htype>/_BYTE/g
+s/<comm>/BYTE/g
