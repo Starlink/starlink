@@ -7,6 +7,7 @@ cvs checkout: Updating java/pal/src/main/uk/ac
 cvs checkout: Updating java/pal/src/main/uk/ac/starlink
 cvs checkout: Updating java/pal/src/main/uk/ac/starlink/pal
 cvs checkout: Updating java/source
+U java/source/README
 U java/source/ant_import
 U java/source/build.xml
 U java/source/keystore
@@ -6498,7 +6499,9 @@ U java/source/jsky/src/lib/dom4j.jar
 U java/source/jsky/src/lib/hcompress.jar
 U java/source/jsky/src/lib/jcommon.jar
 U java/source/jsky/src/lib/jel.jar
+U java/source/jsky/src/lib/jfreechart.README
 U java/source/jsky/src/lib/jfreechart.jar
+U java/source/jsky/src/lib/jfreechart.jar.ori
 U java/source/jsky/src/lib/log4j.jar
 cvs checkout: Updating java/source/jsky/src/main
 cvs checkout: Updating java/source/jsky/src/main/jsky
@@ -9018,6 +9021,7 @@ U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/ProxySetup.java
+U java/source/util/src/main/uk/ac/starlink/util/ReaderThread.java
 U java/source/util/src/main/uk/ac/starlink/util/ResourceDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/SourceReader.java
 U java/source/util/src/main/uk/ac/starlink/util/StarEntityResolver.java
@@ -9066,6 +9070,7 @@ U java/source/util/src/testcases/uk/ac/starlink/util/DOMUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/DataSourceTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/IOUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/NodeDescendantsTest.java
+U java/source/util/src/testcases/uk/ac/starlink/util/ReaderThreadTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java

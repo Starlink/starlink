@@ -41,7 +41,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 35 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 36 source files to /apps/cvsbuild/java/source/util/build/classes
      [copy] Copying 11 files to /apps/cvsbuild/java/source/util/build/classes
      [echo] Executing Task target: build
 
@@ -216,7 +216,7 @@ build:
 prepare:
 
 check_packages:
-[available] Dec 16, 2003 5:15:59 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 18, 2003 5:17:25 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -372,7 +372,7 @@ build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/build/classes
     [javac] Compiling 332 source files to /apps/cvsbuild/java/source/jsky/build/classes
      [copy] Copying 185 files to /apps/cvsbuild/java/source/jsky/build/classes
-     [copy] Copying 6 files to /apps/cvsbuild/java/source/jsky/lib/jsky
+     [copy] Copying 8 files to /apps/cvsbuild/java/source/jsky/lib/jsky
      [echo] Executing Pal target: build
 
 prepare:
@@ -582,4 +582,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 54 seconds
+Total time: 2 minutes 20 seconds
