@@ -1,0 +1,97 @@
+#! /bin/sh -
+#
+# $Id$
+
+PROGNAME=`basename $0`
+while [ $# -gt 0 ]; do
+	SGMLSRC=$1
+	shift
+done
+
+USAGE="Usage: $0 sgml-file"
+
+# Check that the SGMLSRC argument is present, and prepend `pwd` if it isn't
+# an absolute file name.
+case $SGMLSRC in
+	'') echo $USAGE; exit 1 ;;
+	/*) ;;
+	*) SGMLSRC=`pwd`/$SGMLSRC ;;
+esac
+
+
+LIBDIR=${STARLINK_SGML_DIR}/lib
+DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
+STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
+
+JADE=jade
+JADEFLAGS=
+IMGEQ=$LIBDIR/img-eqlist.pl
+DVI2BITMAP=dvi2bitmap
+LATEX=latex
+BIBTEX=bibtex
+
+
+## Make a work directory.  Can't use mktemp, as that only creates files.
+## Fail if the directory already exists.
+#WORKDIR=/tmp/$PROGNAME.$$
+#if [ -d $WORKDIR -o -f $WORKDIR ]; then
+#	echo "$0: temp dir $WORKDIR already exists - not overwriting"
+#	exit 1
+#fi
+#
+#mkdir -p $WORKDIR
+#if [ $? -ne 0 ]; then
+#    echo "$0: Can't make temp dir $WORKDIR"
+#    exit 1
+#fi
+
+# TEST
+WORKDIR=/tmp/sgml2html
+rm -f $WORKDIR/*
+# /TEST
+
+cd $WORKDIR
+if [ $? -ne 0 ]; then
+    echo "$0: Can't cd to temp dir $WORKDIR"
+    exit 1
+fi
+
+pwd
+
+# generate $ROOT.imgeq.list and convert it to a set of bitmaps
+echo "Processing maths..."
+$JADE -t sgml -iOnly.web $JADEFLAGS \
+	-d $STYLESHEET/html/slmaths.dsl#maths.main $SGMLSRC \
+	> tmp.stamp
+ROOT=`awk -F: '{print $1}' tmp.stamp`
+# If there are no maths-mode elements, there's no list file generated
+if [ -f $ROOT.imgeq.list ]; then
+    $IMGEQ $ROOT.imgeq.list
+
+    echo "LaTeXing maths..."
+    $LATEX $ROOT.imgeq
+
+    echo "dvi2bitmap..."
+    $DVI2BITMAP -m 2 -s 2 -Pt -t gif $ROOT.imgeq.dvi
+fi
+
+
+
+# Generate backmatter.  Don't fail if no .aux file was generated
+echo "Backmatter..."
+$JADE -t sgml -d $STYLESHEET/html/slback.dsl#back.main $SGMLSRC > tmp.stamp
+if [ -r "$ROOT.htmlbib.aux" ]; then
+	BSTINPUTS=$LIBDIR $BIBTEX $ROOT.htmlbib
+	sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
+	mv t.bbl $ROOT.htmlbib.bbl
+fi
+
+# Generate the destination file
+echo "Generating output..."
+$JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
+	-d $STYLESHEET/html/sl.dsl#html $SGMLSRC > tmp.stamp
+
+
+
+exit 0
+
