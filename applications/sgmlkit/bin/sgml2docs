@@ -62,13 +62,13 @@ STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
 # Allow the names of the jade and sgmlnorm binaries to be overridden
 # (mostly for testing, though I can imagine _some_ production use of
 # this feature).
-test -n "$JADE"     || JADE=jade
-test -n "$SGMLNORM" || SGMLNORM=sgmlnorm
+test -n "$JADE"       || JADE=jade
+test -n "$SGMLNORM"   || SGMLNORM=sgmlnorm
 JADEFLAGS=
-IMGEQ=$LIBDIR/img-eqlist.pl
-DVI2BITMAP=dvi2bitmap
-LATEX=latex
-BIBTEX=bibtex
+test -n "$IMGEQ"      || IMGEQ=$LIBDIR/img-eqlist.pl
+test -n "$DVI2BITMAP" || DVI2BITMAP='dvi2bitmap'
+test -n "$LATEX"      || LATEX=latex
+test -n "$BIBTEX"     || BIBTEX=bibtex
 
 TARGETFORMAT=0			# html
 OPTIONS=
@@ -211,7 +211,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	$run $LATEX $ROOT.imgeq.tex
 
 	echo "dvi2bitmap..."
-	$run $DVI2BITMAP -m 2 -s 2 -Pt -t gif $ROOT.imgeq.dvi
+	$run $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi
     fi
 
     # Generate backmatter.  Don't fail if no .aux file was generated
