@@ -108,7 +108,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Convert pixel position to axis values
-      CALL WCI_CNA2P( PPOS, PIXID, APOS, STATUS )
+      CALL WCI_CNP2A( PPOS, PIXID, APOS, STATUS )
 
 *  Convert axis position to standard system
       CALL WCI_CNA2S( APOS, PIXID, PRJID, SPOS, STATUS )
