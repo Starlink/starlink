@@ -4,23 +4,44 @@
 
 buildsupportonly=false
 dryrun=false
+force_starconf=false
 need_gnu_m4=false
 
-USAGE="Usage: $0 [--buildsupport-only | --dry-run | -n | --help]"
+USAGE="Usage: $0 [--buildsupport-only | --force-starconf | --dry-run | -n | --help]"
 
 while test $# -gt 0
 do
     case $1 in
+
     --buildsupport-only)
         buildsupportonly=true
         ;;
+
     --dry-run|-n)
-        dryrun=true;
+        dryrun=true
         ;;
+
+    --force-starconf)
+        force_starconf=true
+        ;;
+
     --help)
-        echo $USAGE
+cat <<EOD
+Usage: $0 [options]
+
+Available options:
+    --buildsupport-only     Build and install the buildsupport tools, and
+                            nothing else.
+    -n, --dry-run           Show the installation locations which the
+                            script works out, but don't actually do anything.
+    --force-starconf        Force the starconf component to be rebuilt,
+                            which is useful if you have changed STARCONF_...
+                            and are _re_bootstrapping the checkout.
+    --help                  Show this help.
+EOD
         exit 0
         ;;
+
     *)
         echo $USAGE >&2
         exit 1
@@ -118,6 +139,7 @@ test -f componentinfo.dtd ||
 test -d $STARCONF_DEFAULT_PREFIX/bin || \
     echorun mkdir -p $STARCONF_DEFAULT_PREFIX/bin
 
+
 sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 (
 
@@ -132,6 +154,11 @@ sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
     export BUILDSUPPORT_PREFIX
     # The commands run within makefiles must use the correct buildsupport tools
     export PATH
+
+    if $force_starconf; then
+        test -f $STAR_MANIFEST_DIR/starconf \
+            && rm -f $STAR_MANIFEST_DIR/starconf
+    fi
 
     if $need_gnu_m4; then
         echo "Building GNU m4:"
