@@ -75,8 +75,6 @@
           IF (SUBMODE.EQ.'NEW') THEN
             CALL IMG_SETWHOLE(STATUS)
             MERGE=.FALSE.
-          ELSEIF (SUBMODE.EQ.'ADD') THEN
-            MERGE=.FALSE.
           ELSE
 *  otherwise save current region mask and get memory to store new stuff
             RPTR=I_REG_PTR
@@ -163,7 +161,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
-      BYTE BIT_ANDUB
+      BYTE BIT_ANDUB,BIT_ORUB
 *    Local constants :
 *    Local variables :
       INTEGER I,J
@@ -175,6 +173,14 @@
           DO J=1,I_NY
             DO I=1,I_NX
               OLDREG(I,J)=BIT_ANDUB(OLDREG(I,J),NEWREG(I,J))
+            ENDDO
+          ENDDO
+
+        ELSEIF (MODE.EQ.'ADD') THEN
+
+          DO J=1,I_NY
+            DO I=1,I_NX
+              OLDREG(I,J)=BIT_ORUB(OLDREG(I,J),NEWREG(I,J))
             ENDDO
           ENDDO
 
@@ -441,6 +447,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL IMG_GETBOX('XC','YC','XWID','YWID',XC,YC,DX,DY,STATUS)
+        CALL IMG_BOX(XC,YC,DX,DY,STATUS)
         CALL IMG_SETBOX(XC,YC,DX,DY,EXCLUDE,STATUS)
 
 
