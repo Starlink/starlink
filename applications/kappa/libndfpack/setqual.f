@@ -23,7 +23,7 @@
 *     This routine assigns (or optionally removes) the quality
 *     specified by parameter QNAME to (or from) selected pixels in an
 *     NDF. For more information about using quality within KAPPA see 
-*     the appendix "Quality in KAPPA" within SUN/95.
+*     the appendix "Using Quality Names" within SUN/95.
 *
 *     The user can select the pixels to be operated on in one of three
 *     ways (see parameter SELECT):
@@ -38,8 +38,7 @@
 *     the NDF which are to be selected. The ARD system (see SUN/183) uses a
 *     textual language to describe geometric regions of an array. Text
 *     files containing ARD description suitable for use with this
-*     routine can be created interactively using the KAPPA routine
-*     ARDGEN.
+*     routine can be created interactively using the routine ARDGEN.
 *
 *     The operation to be performed on the pixels is specified by
 *     parameter FUNCTION. The given quality may be assigned to or
@@ -159,7 +158,7 @@
 *        This example assigns the quality "source_b" to pixels of the
 *        NDF "m51" as described by an ARD description stored in the text
 *        file "background.ard". This text file could for instance have
-*        been created using KAPPA routine ARDGEN.
+*        been created using routine ARDGEN.
 
 *  Notes:
 *     -  All the quality names which are currently defined within an
