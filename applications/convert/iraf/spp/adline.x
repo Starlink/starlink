@@ -10,7 +10,7 @@ define	IDB_RECLEN	80
 procedure adline (im, card)
 
 #  Name:
-#     addline
+#     adline
 
 #  Adds a 80 character line to an IRAF image.
 
@@ -33,13 +33,17 @@ procedure adline (im, card)
 #  Authors:
 #     Suzanne Jacoby (NOAO, Kitt Peak)
 #     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+#     MJC: Malcolm J. Currie (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     25-SEP-1992 (sjacoby):
 #        Original version.
-#     28-SEP-1992 (RAHM)
+#     28-SEP-1992 (RAHM):
 #        Added STARLINK style prologue and a few comments.
+#     1997 August 19 (MJC):
+#        Revised to pad strings to eighty characters from code provided
+#        by Frank Valdes (IRAF).
 
 #  Bugs:
 #     {note_any_bugs_here}
@@ -78,23 +82,25 @@ begin
               Memc[rp] = '\n'
               rp = rp + 1
           }
-  
-# Append the new record with an uninitialized value field.  Keyword
-# value pairs are encoded in FITS format.
-  
-   do op = rp, rp + IDB_RECLEN             # blank fill card
-      Memc[op] = ' '
-  
-      call amovc (Memc[cp], Memc[rp], IDB_RECLEN)
-  
+
+# Append the supplied card.
+    for (op = rp; op <= rp + IDB_RECLEN; op = op + 1) {
+        if (Memc[cp] == EOS || Memc[cp] == '\n')
+            break
+        Memc[op] = Memc[cp]
+        cp = cp + 1
+    }
+
+# Pad with blanks, if necessary.
+    for (; op <= rp+IDB_RECLEN; op = op + 1)
+        Memc[op] = ' '
+
 # Terminate the card.
-      Memc[rp+IDB_RECLEN] = '\n'
-      Memc[rp+IDB_RECLEN+1] = EOS
+    Memc[op] = '\n'
+    Memc[op+1] = EOS
+
+    IM_UPDATE(im) = YES
   
-      IM_UPDATE(im) = YES
-  
-      call sfree (sp)
+    call sfree (sp)
 end
-
-
 

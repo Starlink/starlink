@@ -35,13 +35,23 @@
             memc(rp) = 10
             rp = rp + 1
 130      continue
-         do 140 op = rp, rp + 80
+         op = rp
+140      if (.not.(op .le. rp + 80)) goto 142
+            if (.not.(memc(cp) .eq. 0 .or. memc(cp) .eq. 10)) goto 150
+               goto 142
+150         continue
+            memc(op) = memc(cp)
+            cp = cp + 1
+141         op = op + 1
+            goto 140
+142      continue
+160      if (.not.(op .le. rp+80)) goto 162
             memc(op) = 32
-140      continue
-141      continue
-         call amovc (memc(cp), memc(rp), 80)
-         memc(rp+80) = 10
-         memc(rp+80+1) = 0
+161         op = op + 1
+            goto 160
+162      continue
+         memc(op) = 10
+         memc(op+1) = 0
          memi(im+2) = 1
          call sfree (sp)
 100      return
