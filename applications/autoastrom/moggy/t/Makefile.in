@@ -6,8 +6,9 @@
 #
 # $Id$
 
+DEFS=@DEFS@
 CXX=@CXX@
-CXXFLAGS=@CXXFLAGS@
+CXXFLAGS=@CXXFLAGS@ $(DEFS)
 PERLBIN=@PERL@
 ECHONONL=@ECHONONL@
 
@@ -15,7 +16,7 @@ test: local.config ../moggy
 	PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests && touch test
 
 t3.run: t3.C ../util.o
-	$(CXX) $(CXXFLAGS) -o $@ t3.C ../util.o
+	$(CXX) $(CXXFLAGS) -o $@ t3.C -I.. ../util.o
 
 clean:
 	rm -f *~ *.run *.stderr *.stdout *.tmp *.diff test
