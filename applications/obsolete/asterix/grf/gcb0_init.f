@@ -93,6 +93,7 @@
 *  External References:
       EXTERNAL			GCB1_LOAD
       EXTERNAL			GCB1_SAVE
+      EXTERNAL			GCB2_LOAD
       EXTERNAL			GCB2_SAVE
 
 *  Local variables:
@@ -108,6 +109,7 @@
 *    Define the methods
         CALL ADI_DEFMTH( 'LoadGCB(HDSfile)', GCB1_LOAD, DID, STATUS )
         CALL ADI_DEFMTH( 'SaveGCB(HDSfile)', GCB1_SAVE, DID, STATUS )
+        CALL ADI_DEFMTH( 'LoadGCB(FITSfile)', GCB2_LOAD, DID, STATUS )
         CALL ADI_DEFMTH( 'SaveGCB(FITSfile)', GCB2_SAVE, DID, STATUS )
 
 *    Now initialised
