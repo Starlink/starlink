@@ -1,58 +1,143 @@
-*+  CONV_UNIT2R - Returns conversion factor of given units to radians
-      SUBROUTINE CONV_UNIT2R( UNITS, CONV ,STATUS )
-*    History :
-*
-*     07 Nov 89 : Original ( BHVAD :: DJA )
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'MATH_PAR'
-*
-*    Import :
-*
-      CHARACTER*(*) UNITS
-*
-*    Export :
-*
-      REAL CONV                             ! Conversion factor to radians
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Function definitions :
-*
-      LOGICAL      STR_ABBREV
+      SUBROUTINE CONV_UNIT2R( UNITS, CONV, STATUS )
+*+
+*  Name:
+*     CONV_UNIT2R
+
+*  Purpose:
+*     Convert angular unit string to radian conversion factor
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL CONV_UNIT2R( UNITS, CONV, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     UNITS = CHARACTER*(*) (given)
+*        The units string
+*     CONV = REAL (returned)
+*        Conversion factor from UNITS to radians
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     Should really be a double precision factor returned
+
+*  References:
+*     CONV Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/conv.html
+
+*  Keywords:
+*     package:conv, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      7 Sep 1989 (DJA):
+*        Original version.
+*     19 Feb 1996 (DJA):
+*        No direct terminal output
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
-      CONV=1.0
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-        IF ( STR_ABBREV( UNITS, 'DEGREES' ) ) THEN
-          CONV = MATH__DTOR
-        ELSE IF ( STR_ABBREV( UNITS, 'ARCMINUTES' ) .OR.
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MATH_PAR'
+
+*  Arguments Given:
+      CHARACTER*(*)		UNITS
+
+*  Arguments Returned:
+      REAL			CONV
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      LOGICAL			STR_ABBREV
+        EXTERNAL		STR_ABBREV
+
+*  Local Variables:
+      {data_type} {name}[dimensions] ! [local_variable_description]
+
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set default
+      CONV = 1.0
+
+*  Degrees
+      IF ( STR_ABBREV( UNITS, 'DEGREES' ) ) THEN
+        CONV = MATH__DTOR
+
+*  Arcminutes
+      ELSE IF ( STR_ABBREV( UNITS, 'ARCMINUTES' ) .OR.
      :                          (UNITS.EQ.'ARCMINS') ) THEN
-          CONV = MATH__DTOR / 60.0
-        ELSE IF ( STR_ABBREV( UNITS, 'ARCSECONDS' ) .OR.
-     :                          (UNITS.EQ.'ARCSECS') ) THEN
-          CONV = MATH__DTOR / 3600.0
-        ELSE IF ( STR_ABBREV(UNITS, 'RADIANS') ) THEN
-          CONV = 1.0
-        ELSE
-          CALL MSG_SETC( 'UN', UNITS )
-          CALL MSG_PRNT( '! unrecognised units ^UN' )
-          STATUS = SAI__ERROR
-        END IF
+        CONV = MATH__DTOR / 60.0
 
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP(' ','from CONV_UNIT2R',STATUS)
-        END IF
+*  Arcseconds
+      ELSE IF ( STR_ABBREV( UNITS, 'ARCSECONDS' ) .OR.
+     :                          (UNITS.EQ.'ARCSECS') ) THEN
+        CONV = MATH__DTOR / 3600.0
+
+*  Radians
+      ELSE IF ( STR_ABBREV(UNITS, 'RADIANS') ) THEN
+        CONV = 1.0
+
+*  Otherwise duff
+      ELSE
+        CALL MSG_SETC( 'UN', UNITS )
+        CALL ERR_REP( ' ', 'Unrecognised angular units ^UN', STATUS )
 
       END IF
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'CONV_UNIT2R', STATUS )
 
       END
