@@ -116,7 +116,7 @@
 *     such an axis array, it processes the array using the following
 *     rules, rather than those given above.
 *
-*            .X.DATA         ->   .AXIS(1).MORE.FIGARO.DATA
+*            .X.DATA         ->   .AXIS(1).MORE.FIGARO.DATA_ARRAY
 *                                 (AXIS(1).DATA_ARRAY is filled with
 *                                 pixel co-ordinates)
 *            .X.ERRORS       ->   .AXIS(1).MORE.FIGARO.VARIANCE (after
@@ -190,6 +190,13 @@
 *        Allowed the output NDF to be written to an arbitrary structure.
 *        Used NDF_ library to access the NDF to enable NDF automatic
 *        conversion to work.
+*     1995 December 19 (MJC):
+*        Places an n-dimensional axis into AXIS.MORE.FIGARO.DATA_ARRAY.
+*        Previously, the component name was DATA.
+*     1996 February 10 (MJC):
+*        Allowed for scalar width in DST.  Fixed bug which prevented a
+*        missing axis being created whenever there was no FITS extension
+*        to write.
 *     {enter_further_changes_here}
 
 *  Bugs:
