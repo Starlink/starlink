@@ -24,15 +24,25 @@ AC_PROG_LIBTOOL
 dnl    Platform-dependent/preprocessed sources.  This is slightly
 dnl    subtle: file random.fpp is a preprocessable file.  However,
 dnl    there are also versions available for VAX/VMS
-dnl    (random.f_dec_osf) and Microsoft Fortran (random.f__win), and
+dnl    (random.fpp__vms) and Microsoft Fortran (random.fpp__win), and
 dnl    these are sufficiently distinct that it's not worth just
 dnl    configuring the function name.
 dnl
+dnl    The random and gresid VMS and Windows files have a .fpp
+dnl    extension: there's no preprocessable code in them, but they
+dnl    have to have the same name as the file which does have.
+dnl
 dnl    Problem: Is the code in the *__win files specific to Windows
 dnl    or to MSFortran?  Since you'd only get MSFortran on Windows, I
-dnl    suppose it's the former (or might as well be)
-STAR_PLATFORM_SOURCES([random.fpp gresid.fpp],
-                      [_dec_osf __win default])
+dnl    suppose it's the former (or might as well be).
+dnl    
+dnl    The __vms files will never be matched by this macro (will the
+dnl    __win files?), since config.guess doesn't cover VMS at all, but
+dnl    the following, as well as documenting the relationship, also
+dnl    causes the corresponding files to be included in the
+dnl    distribution, where they might be of use to someone.
+STAR_PLATFORM_SOURCES([random.fpp gresid.fpp wait.f],
+                      [__vms __win default])
 
 if cmp -s random.fpp random.fppdefault; then
     # The unix version, to be configured
@@ -48,14 +58,6 @@ if cmp -s random.fpp random.fppdefault; then
 fi
 
 STAR_FPP_SOURCES(random gresid)
-
-dnl    wait.f__vms has VMS-specific system calls in it.  This will
-dnl    never be matched by this macro, since config.guess doesn't
-dnl    cover VMS at all, but the following, as well as documenting the
-dnl    relationship, also causes the corresponding files to be
-dnl    included in the distribution, where they might be of use to someone.
-STAR_PLATFORM_SOURCES([wait.f],
-                      [__vms __win default])
 
 AC_CONFIG_HEADERS([config.h])
 
