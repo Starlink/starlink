@@ -118,6 +118,7 @@
       INTEGER			NELM			! # mapped items
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address
+      INTEGER			WPTR			! Workspace
 *.
 
 *  Check inherited global status.
