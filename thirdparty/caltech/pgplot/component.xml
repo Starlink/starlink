@@ -8,7 +8,7 @@
   <description>Native PGPLOT</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    
+    <build>cnf</build><build>gwm</build><link>gwm</link><link>cnf</link>
   </dependencies>
   <!--
   <developers>
