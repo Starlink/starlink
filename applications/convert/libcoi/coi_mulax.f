@@ -182,8 +182,8 @@
       CALL ERR_MARK
       CALL COI_WCCAT( IMDESC, 1, BUFFER, BUFLEN, STATUS )
 
-*  Extract the label.
-      IF ( STATUS .EQ. SAI__OK ) THEN
+*  Extract the label.  Watch for a null string.
+      IF ( STATUS .EQ. SAI__OK .AND. BUFLEN .GT. 1 ) THEN
 
 *  Extract the label.
          CALL COI_WCWRD( BUFFER( :BUFLEN ), 'label', LABEL,
