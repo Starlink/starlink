@@ -202,6 +202,12 @@ case $SGMLSRC in
 	*) SGMLSRC=$PWD/$SGMLSRC ;;
 esac
 
+# Sanity-check: we _do_ have a source file, don't we?
+if [ ! -r $SGMLSRC ]; then
+    echo "$PROGNAME:E: I can't find file $SGMLSRC !"
+    exit 1
+fi
+
 $VERBOSE && echo "$PROGNAME:I: Processing $SGMLSRC..."
 case $TARGETFORMAT in
     0)  $VERBOSE && echo "$PROGNAME:I: Target HTML...";
