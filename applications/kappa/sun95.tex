@@ -3778,19 +3778,28 @@ value is used for the attribute, determined as follows:
       used. The defaults file is found as follows:
 
 \begin{itemize}
-\item If the environment variable {\tt KAPPA\_<PARAM>} is defined (where
-      {\tt <PARAM>} is the upper-case name of the parameter, {\it e.g.} STYLE, 
-      KEYSTYLE, BORSTYLE, {\it etc}), its value is taken to be the full path to 
-      the defaults file. No error is reported if the specified file 
-      cannot be accessed.
+\item If the environment variable {\tt KAPPA\_<APP>\_<PARAM>} is defined (where
+      {\tt <APP>} is the name of the application {\it e.g.} DISPLAY, and 
+      {\tt <PARAM>} is the name of the parameter, {\it e.g.} STYLE, both
+      in upper-case), its value is taken to be the full path to 
+      the defaults file. 
+
+\item If {\tt KAPPA\_<APP>\_<PARAM>} is not defined, the file {\tt 
+      \$HOME/kappa\_<app>\_<param>.def} is used (where {\tt <app>} and
+      {\tt <param>} are in lower case this time). 
+   
+\item If the file {\tt \$HOME/kappa\_<app>\_<param>.def} cannot be accessed, 
+      the file {\tt \$KAPPA\_DIR/kappa\_<app>\_<param>.def} is used.
+
+\item If the file {\tt \$KAPPA\_DIR/kappa\_<app>\_<param>.def} cannot be 
+      accessed, then the value of the environment variable 
+      {\tt KAPPA\_<PARAM>} is used as the full path to the defaults file. 
    
 \item If {\tt KAPPA\_<PARAM>} is not defined, the file {\tt 
-      \$HOME/kappa\_<param>.def} is used (where {\tt <param>} is the parameter name 
-      in lower case). Again, no error is reported if the file cannot be 
-      accessed.
+      \$HOME/kappa\_<param>.def} is used.
    
 \item If the file {\tt \$HOME/kappa\_<param>.def} cannot be accessed, the file
-      {\tt \$KAPPA\_DIR/<param>.def} is used.
+      {\tt \$KAPPA\_DIR/kappa\_<param>.def} is used.
 \end{itemize}
 
 \item If the above process failed to produce a value for the attribute
@@ -3801,19 +3810,23 @@ attributes later in this section.
 
 \end{enumerate}
 
+From the above, you can see that defaults can be specified either for 
+individual applications, or for all applications (any application-specific 
+defaults file will be used in preference to the general defaults file).
+
 It should be remembered that settings for unknown attributes are ignored,
 and do not cause the application to abort.\footnote{This is because they
-may be synonyms recognised by other other applications.} So if you set a value for an
-attribute and it seems to have no effect, it may be worth checking that
-you have used the correct spelling for the attribute name.
+may be synonyms recognised by other other applications.} So if you set a
+value for an attribute and it seems to have no effect, it may be worth
+checking that you have used the correct spelling for the attribute name.
 
 \subsection{Descriptions of Plotting Attributes}
 
 This section lists the available plotting attributes. Note, the default
 value included in each description is the value which will be used if no
 other default value is supplied (for instance within a defaults file).
-In particular, the standard {\footnotesize KAPPA} default style file
-{\tt \$KAPPA\_DIR/style.def} includes alternative default values for several
+In particular, the standard {\footnotesize KAPPA} default style files
+contained in \$KAPPA\_DIR include alternative default values for several
 attributes which will be used in preference to those described below.
 
 Individual applications may over-ride the normal behaviour of
@@ -5583,12 +5596,23 @@ By default, CURSOR reports positions in the co-ordinate Frame which was
 current when the NDF was displayed (RA/DEC in this case), but other
 co-ordinate Frames may be requested using the FRAME parameter ({\it e.g.}\ 
 FRAME=PIXEL displays pixel co-ordinates). In addition to the co-ordinate
-Frames inherited from the NDF, there are also two extra Frames available;
-one called GRAPHICS which specifies positions in terms of millimetres
+Frames inherited from the NDF, there are also three extra Frames available:
+
+\begin{description}
+
+\item [GRAPHICS] -- specifies positions in terms of millimetres
 from the bottom left corner of the graphics device ({\it e.g.}\ X-window or
-paper), and another called BASEPIC which is similar to GRAPHICS but which
-specifies positions in a normalised co-ordinate system in which the shorter
-of the two axes has a length of 1.0 (the scales on both axes are equal).
+paper).
+
+\item [BASEPIC] -- similar to GRAPHICS but specifies positions in a
+normalised co-ordinate system in which the shorter dimension of the
+screen or paper has a length of 1.0 (the scales on both axes are equal).
+
+\item [CURPIC] -- similar to BASEPIC except that it covers only the
+specified picture. Thus, the bottom left corner of the each picture is 
+at $(0,0)$ and the shorter dimension of each picture has length 1.0.
+
+\end{description}
 
 Going through the parameters supplied to the above CURSOR command, the
 first one (SHOWPIXEL) causes the pixel co-ordinates at each selected
@@ -6114,7 +6138,7 @@ Domains GRID, PIXEL, AXIS and SKY will also be available.
 
 Pictures created by older applications which do not yet support WCS 
 information will not have all of these Frames. They will still have
-GRAPHICS and BASEPIC Frames, but the only additional Frames will be:
+GRAPHICS, BASEPIC and CURPIC Frames, but the only additional Frames will be:
 
 \begin{description}
 \item [AGI\_WORLD] - This corresponds to AGI ``world'' co-ordinates. 
@@ -6659,7 +6683,8 @@ We start with the ``selection box'' drawn over the main image. The
 corners of this box are currently stored in the {\tt boxpos} positions
 list. This file contains the RA and DEC at the corners of the box,
 together with WCS information copied from the NDF {\tt m31}. But this
-does \emph{not} include the BASEPIC Frame, which is only available within
+does \emph{not} include the BASEPIC or CURPIC Frame, which are only 
+available within
 the WCS information stored with graphics database pictures. In order to
 find the BASEPIC co-ordinates at the corners of the box, we need to 
 align the RA/DEC values in the positions list with the WCS information
@@ -7318,6 +7343,9 @@ of the device.
 \item [BASEPIC] --- Reserved to represent positions on a graphics device 
 in normalised units, in which the shorter axis of the graphics device has
 length 1.0.
+\item [CURPIC] --- Reserved to represent positions in normalised units within 
+each individual graphics database picture. The shorter axis of each 
+picture has length 1.0 in this Frame.
 \end{description}
 
 \subsection{\xlabel{se_scs}Specifying a Co-ordinate Frame\label{se:scs}}
@@ -7387,8 +7415,8 @@ from a FrameSet), you can either give a {\tt Domain} name, or an SCS
 specification, but you cannot give a Frame index. Any string may be used
 as a {\tt Domain} name, and you will usually be required to specify
 the number of axes in the Frame. The exception to this is if you specify
-one of the {\tt Domain} names SKY, GRAPHICS or BASEPIC, in which case
-a two dimensional Frame is always created.
+one of the {\tt Domain} names SKY, GRAPHICS, CURPIC or BASEPIC, in which 
+case a two dimensional Frame is always created.
 
 
 \subsection{Propagation of WCS Information}
@@ -7616,8 +7644,8 @@ of an NDF, and change the values of those which are not read-only.
       same Domain value can be aligned with it. 
 
       Some Frames are given standard Domain values when they are created
-      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, BASEPIC, GRAPHICS). Frames
-      created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
+      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, CURPIC, BASEPIC, GRAPHICS). 
+      Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
       can have any Domain value, but the standard Domain names should be
       avoided unless the standard meanings are appropriate for the Frame
       being created.
@@ -43354,13 +43382,14 @@ be found, any FITS header cards in the FITS extension will be used.
 Applications which write WCS information to an NDF will always write it
 in the form of a WCS component.
 
-One of the major changes is that some graphics applications which previously had 
-many parameters to control the appearance of the plot (ABSLAB, ORDLAB,
-FONT, PLTITL, {\it etc}), now use a single STYLE parameter instead. The value
-supplied for a STYLE parameter should be a group of {\em plotting
-attributes}. Defaults for unspecified plotting attributes are read from the
-text file \verb+$KAPPA_DIR/style.def+. A different defaults file may be
-specified by setting the environment variable {\tt KAPPA\_STYLE} to hold
+One of the major changes is that some graphics applications which
+previously had many parameters to control the appearance of the plot
+(ABSLAB, ORDLAB, FONT, PLTITL, {\it etc}), now use a single STYLE
+parameter instead. The value supplied for a STYLE parameter should be a
+group of {\em plotting attributes}. Defaults for unspecified plotting
+attributes are read from text files within \$KAPPA\_DIR (\emph{e.g.}
+\verb+$KAPPA_DIR/style.def+}. Alternative defaults files may be specified 
+by setting environment variables (\emph{e.g.} {\tt KAPPA\_STYLE}) to hold 
 the name of the defaults file to use.
 
 Another major change is that the new and modified applications no longer
@@ -44341,9 +44370,20 @@ correlated random shifts.
 
 \item Several significant memory leaks have been fixed.
 
+\item The WCS information stored with each picture in the graphics database
+now includes a Frame with Domain CURPIC which represents normalized
+co-ordinates with in each individual picture. 
+
+\item Defaults for style parameters can now be set for individual
+applications. See \latexelsehtml{Section~\ref{se:styles}}
+{\htmlref{here}{se:styles}}.
+
 \item The following applications have been converted to use the GKS version of 
 PGPLOT instead of SGS/NCAR (there are no changes in functionality): 
-\htmlref{GDNAMES}{GDNAMES}.
+\htmlref{GDNAMES}{GDNAMES}, \htmlref{GDCLEAR}{GDCLEAR}, \htmlref{IDCLEAR}{IDCLEAR},
+\htmlref{OVCLEAR}{OVCLEAR}, \htmlref{GDSET}{GDSET}, \htmlref{IDSET}{IDSET},
+\htmlref{OVSET}{OVSET}, \htmlref{PALENTRY}{PALENTRY}, \htmlref{PALDEF}{PALDEF},
+\htmlref{PALSAVE}{PALSAVE}, \htmlref{PALREAD}{PALREAD}.
 
 \item The implementation of dynamic defaults for parameters has been changed.
 These were previously indicated in the reference documentation by an
@@ -44357,6 +44397,9 @@ will probably be that the parameter values actually used are no longer
 stored in the application's parameter file in the user's ADAM directory,
 and so they cannot be obtained using \htmlref{PARGET}{PARGET} for instance.
 This is a rather unlikely thing to want to do however!
+
+\item A bug has been fixed which could prevent numerical axis labels from
+appearing when a set of annotated axes is drawn.
 
 \end{itemize}
 
