@@ -65,6 +65,7 @@ static void Report( const char * );
 /* ==================== */
 
 void Perl_storeGrfObject ( SV * plotobject ) {
+  printf( "Storing object in plot object\n");
   CurrentPlot = plotobject;
 }
 
@@ -79,13 +80,17 @@ void Perl_clearGrfObject() {
 
 SV* Perl_getcb ( char * attr ) {
   SV** elem;
+
+  if (CurrentPlot == NULL ) {
+    Perl_croak(aTHX_ "Massive internal inconsistency in AstPlot Grf infrastructure");
+  }
  
   /* we know this is already a hash ref */
   HV * hash_object = (HV*) SvRV( CurrentPlot );
 
   elem = hv_fetch( hash_object, attr, strlen(attr), 0);
 
-  if (elem = NULL) {
+  if (elem == NULL) {
     return NULL;
   } else {
     return *elem;
@@ -100,7 +105,10 @@ int astGFlush( void ){
   int retval;
 
   if (!astOK) return 0;
-  if (CurrentPlot == NULL ) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
 
   cb = Perl_getcb( "_gline" );
  
@@ -136,10 +144,11 @@ int astGLine( int n, const float *x, const float *y ){
   AV * YY;
   int retval;
 
-  Report("astGlinePerl");
-
   if (!astOK) return 0;
-  if (CurrentPlot == NULL ) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
 
   cb = Perl_getcb( "_gline" );
  

@@ -1876,9 +1876,8 @@ void
 astBorder( this )
   AstPlot * this
  PREINIT:
-  SV* arg;
+  SV* arg = ST(0);
  CODE:
-  arg = ST(0);
   PLOTCALL(arg,
 	   astBorder(this);
   )
@@ -1891,8 +1890,9 @@ astBoundingBox( this )
   float cubnd[2];
   AV* lbnd;
   AV* ubnd;
+  SV * arg = ST(0);
  PPCODE:
-  ASTCALL (
+  PLOTCALL (arg,
    astBoundingBox( this, clbnd, cubnd );
   )
   lbnd = newAV();
@@ -1914,6 +1914,7 @@ astClip( this, iframe, lbnd, ubnd )
   double * clbnd;
   double * cubnd;
   int naxes;
+  SV * arg = ST(0);
  CODE:
   naxes = astGetI( this, "Naxes" );
   len = av_len( lbnd ) + 1;
@@ -1922,7 +1923,7 @@ astClip( this, iframe, lbnd, ubnd )
   if ( len != naxes ) Perl_croak( aTHX_ "ubnd must contain %d elements", naxes );
   clbnd = pack1D(newRV_noinc((SV*)lbnd), 'd');
   cubnd = pack1D(newRV_noinc((SV*)ubnd), 'd');
-  ASTCALL (
+  PLOTCALL (arg,
    astClip( this, iframe, clbnd, cubnd );
   )
 
@@ -1936,6 +1937,7 @@ astCurve( this, start, finish )
   double * cstart;
   double * cfinish;
   int naxes;
+  SV* arg = ST(0);
  CODE:
   naxes = astGetI(this, "Naxes" );
   len = av_len( start ) + 1;
@@ -1944,7 +1946,7 @@ astCurve( this, start, finish )
   if ( len != naxes ) Perl_croak( aTHX_ "finish must contain %d elements", naxes);
   cstart = pack1D(newRV_noinc((SV*)start), 'd');
   cfinish = pack1D(newRV_noinc((SV*)finish), 'd');
-  ASTCALL (
+  PLOTCALL (arg,
    astCurve( this, cstart, cfinish );
   )
 
@@ -1952,32 +1954,20 @@ void
 astGenCurve( this, map )
   AstPlot * this
   AstMapping * map
+ PREINIT:
+  SV * arg = ST(0);
  CODE:
-  ASTCALL(
+  PLOTCALL(arg,
    astGenCurve(this, map);
-  )
-
-void
-astGrfPop( this )
-  AstPlot * this
- CODE:
-  ASTCALL(
-   astGrfPop(this);
-  )
-
-void
-astGrfPush( this )
-  AstPlot * this
- CODE:
-  ASTCALL(
-   astGrfPush(this);
   )
 
 void
 astGrid( this )
   AstPlot * this
+ PREINIT:
+  SV * arg = ST(0);
  CODE:
-  ASTCALL(
+  PLOTCALL(arg,
    astGrid(this);
   )
 
@@ -1991,12 +1981,13 @@ astGridLine( this, axis, start, length )
   double * cstart;
   int naxes;
   int len;
+  SV * arg = ST(0);
  CODE:
   naxes = astGetI( this, "Naxes" );
   len = av_len( start ) + 1;
   if ( len != naxes ) Perl_croak( aTHX_ "start must contain %d elements", naxes );
   cstart = pack1D(newRV_noinc((SV*)start), 'd');
-  ASTCALL(
+  PLOTCALL(arg,
     astGridLine( this, axis, cstart, length );
   )
 
@@ -2027,6 +2018,7 @@ astText( this, text, pos, up, just )
   float * cup;
   double * cpos;
   int naxes;
+  SV * arg = ST(0);
  CODE:
   naxes = astGetI( this, "Naxes" );
   len = av_len( pos ) + 1;
@@ -2035,7 +2027,7 @@ astText( this, text, pos, up, just )
   if ( len != 1 ) Perl_croak( aTHX_ "up must contain 2 elements");
   cpos = pack1D(newRV_noinc((SV*)pos), 'd');
   cup = pack1D(newRV_noinc((SV*)up), 'f');
-  ASTCALL(
+  PLOTCALL(arg,
     astText( this, text, cpos, cup, just );
   )
 

@@ -422,6 +422,19 @@ sub GAttr {
   return $self->{_gattr};
 }
 
+# Nullify graphic callbacks
+
+sub null {
+  my $self = shift;
+  $self->GFlush( undef );
+  $self->GLine( undef );
+  $self->GQch( undef );
+  $self->GMark( undef );
+  $self->GText( undef );
+  $self->GTxExt( undef );
+  $self->GAttr( undef );
+
+}
 
 
 
