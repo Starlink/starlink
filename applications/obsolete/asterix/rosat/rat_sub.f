@@ -1193,10 +1193,12 @@ c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
       NSEL = HEAD.NTRANGE * 2
 	print *,'time ranges=',nsel
 *
+	print *,'writing times to array'
       DO LP=1,HEAD.NTRANGE
          RAWTIM(1+(LP-1)*2) = HEAD.TSTART(LP)
          RAWTIM(LP*2) = HEAD.TEND(LP)
       ENDDO
+	print *,'done that!'
 *
 999   CONTINUE
 *
