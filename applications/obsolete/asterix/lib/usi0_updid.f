@@ -27,7 +27,7 @@
         I=1
         FOUND = .FALSE.
 *  scan list to find first empty slot
-        DO WHILE (.NOT.SPARE.AND.I.LE.USI__NMAX)
+        DO WHILE (.NOT.FOUND.AND.I.LE.USI__NMAX)
           IF ( DS(I).USED .AND. (PAR.EQ.DS(I).PAR) ) THEN
             FOUND=.TRUE.
           ELSE
