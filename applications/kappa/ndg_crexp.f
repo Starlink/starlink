@@ -36,6 +36,14 @@
 *     NDF_FORMATS_OUT environment variable (see SSN/20) is used. If this
 *     is "*" then the file type is copied from the corresponding input
 *     file. 
+*
+*     If possible, explicit file types are included in all the elements
+*     of the returned group. If no file type is suppllied by the user,
+*     then a file type will be obtained from the NDF_FORMATS_OUT value,
+*     or from the basis name (if a modification element was supplied).
+*     This is done because the name may be passed out to a script (eg
+*     POLPACK:POLKA) which may change the value of NDF_FORMATS_OUT before
+*     using the NDF name.
 
 *  Arguments:
 *     GRPEXP = CHARACTER*(*) (Given)
@@ -65,6 +73,13 @@
 *        Original version.
 *     29-AUG-1997 (DSB):
 *        Modified to use automatic NDF data conversion.
+*     22-FEB-1999 (DSB):
+*        If no HDS component path is supplied, inherit it from the
+*        basis element.
+*     25-MAY-1999 (DSB):
+*        Modified to allow the basis group to be created directly by GRP,
+*        as well as by NDF (i.e. cater for possibility that no slave groups 
+*        exist).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,6 +92,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT constants.
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'NDG_CONST'        ! NDG constants.
       INCLUDE 'PSX_ERR'          ! PSX error constants
@@ -99,33 +115,32 @@
       INTEGER CHR_LEN
 
 *  Local Variables:
-      CHARACTER COMP*(GRP__SZNAM)  ! HDS component path from supplied spec
-      CHARACTER COMP0*(GRP__SZNAM) ! HDS component path from basis spec
       CHARACTER DEFTYP*(GRP__SZNAM)! Default file type from NDF_FORMATS_OUT
-      CHARACTER FDIRN*(GRP__SZNAM) ! Directory path from supplied spec.
-      CHARACTER FDIRN0*(GRP__SZNAM)! Directory path from basis spec.
+      CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
       CHARACTER FMTOUT*(NDG__SZFMT)! List of output NDF formats
-      CHARACTER FNAME*(GRP__SZNAM) ! Base name from supplied spec
-      CHARACTER FNAME0*(GRP__SZNAM)! Base name from basis spec
-      CHARACTER FSPEC*(GRP__SZNAM) ! Total file specification 
-      CHARACTER FSPEC0*(GRP__SZNAM)! Total file spec from basis group 
-      CHARACTER FTYPE*(GRP__SZNAM) ! File type from supplied spec
-      CHARACTER FTYPE0*(GRP__SZNAM)! File type from basis spec
-      CHARACTER NAME*(GRP__SZNAM)  ! Current name.
-      CHARACTER SLICE*(GRP__SZNAM) ! NDF slice from supplied spec
-      CHARACTER SLICE0*(GRP__SZNAM)! NDF slice from basis spec
-      CHARACTER TYPE*(GRP__SZTYP)  ! Group type string.
-      INTEGER ADDED              ! No. of names added to the group.
+      CHARACTER LOC*(DAT__SZLOC)   ! Locator to top-level HDS object
+      CHARACTER NAME*(GRP__SZNAM)  ! Current name
+      CHARACTER NAM*(GRP__SZNAM)   ! Basis name
+      CHARACTER PATH*(GRP__SZNAM)  ! HDS component path 
+      CHARACTER SPEC*(GRP__SZNAM)  ! Basis container file spec
+      CHARACTER TYP*(GRP__SZNAM)   ! File type 
+      INTEGER ADDED              ! No. of names added to the group
       INTEGER CL                 ! Index of 1st closing parenthesis
       INTEGER COMMA              ! Index of 1st comma in NDF_FORMATS_OUT
-      INTEGER FORM               ! The form of the file spec.
-      INTEGER I                  ! Loop count.
-      INTEGER IAT                ! Index of last non-blank character.
+      INTEGER DOT                ! Index of first "."
+      INTEGER I                  ! Loop count
+      INTEGER IAT                ! Index of last non-blank character
+      INTEGER IAT2               ! Index of last non-blank character
+      INTEGER IGRPB              ! Group of file base names
+      INTEGER IGRPD              ! Group of directories
+      INTEGER IGRPF              ! Group of initialised HDS files
+      INTEGER IGRPH              ! Group of HDS paths
+      INTEGER IGRPT              ! Group of file types
+      INTEGER IND                ! Index of matching group element
       INTEGER MODIND             ! Index of basis spec
-      INTEGER MODSIZ             ! Size of basis group.
       INTEGER OP                 ! Index of 1st opening parenthesis
+      INTEGER PAR                ! Index of first "("
       INTEGER SIZE0              ! Size of group on entry.
-      INTEGER TMPGRP             ! Group holding NDF names only.
       LOGICAL IN                 ! Does IGRP identify a valid group?
       LOGICAL INGRP              ! Does IGRP0 identify a valid group?
 *.
@@ -148,39 +163,45 @@
 
 *  If it is not defined, use a default value of "." (i.e. use native NDF
 *  format).
-      IF( FMTOUT .EQ. ' ' ) FMTOUT = '.'
+      IF( FMTOUT .EQ. ' ' ) THEN
+         DEFTYP = '.'
+
+*  Otherwise, 
+      ELSE
 
 *  Get the file type from the first entry in NDF_FORMATS_OUT (stored within
 *  opening and closing parenthesise before the first comma). If the first
 *  entry is "*", then store "*" (meaning "use the input file type"), otherwise 
 *  if the first entry is "." or does not contain a file type, store "."
 *  (meaning "use native NDF format").
-      COMMA = INDEX( FMTOUT, ',' )
-      IF( COMMA .EQ. 0 ) COMMA = CHR_LEN( FMTOUT ) + 1
-
-      IF( FMTOUT( : COMMA - 1 ) .EQ. '.' ) THEN
-         DEFTYP = '.'
-
-      ELSE IF( FMTOUT( : COMMA - 1 ) .EQ. '*' ) THEN
-         DEFTYP = '*'
-
-      ELSE
-         OP = INDEX( FMTOUT( : COMMA - 1 ), '(' )
-         CL = INDEX( FMTOUT( : COMMA - 1 ), ')' )
-         IF( OP .NE. 0 .AND. CL .NE. 0 .AND. CL - OP .GT. 1 ) THEN
-            DEFTYP = FMTOUT( OP + 1 : CL - 1 )
-         ELSE
+         COMMA = INDEX( FMTOUT, ',' )
+         IF( COMMA .EQ. 1 ) THEN
             DEFTYP = '.'
-         END IF
+         ELSE
+            IF( COMMA .EQ. 0 ) COMMA = CHR_LEN( FMTOUT ) + 1
 
+            IF( FMTOUT( : COMMA - 1 ) .EQ. '.' ) THEN
+               DEFTYP = '.'
+
+            ELSE IF( FMTOUT( : COMMA - 1 ) .EQ. '*' ) THEN
+               DEFTYP = '*'
+
+            ELSE
+               OP = INDEX( FMTOUT( : COMMA - 1 ), '(' )
+               CL = INDEX( FMTOUT( : COMMA - 1 ), ')' )
+               IF( OP .NE. 0 .AND. CL .NE. 0 .AND. CL - OP .GT. 1 ) THEN
+                  DEFTYP = FMTOUT( OP + 1 : CL - 1 )
+               ELSE
+                  DEFTYP = '.'
+               END IF
+            END IF
+         END IF
       END IF
 
 *  If the supplied value of IGRP is GRP__NOID, create a new group to
 *  hold the names of the NDFs.
       IF( IGRP .EQ. GRP__NOID ) THEN
-         TYPE = ' '
-         TYPE = 'A list of data sets'
-         CALL GRP_NEW( TYPE, IGRP, STATUS )
+         CALL GRP_NEW( 'A list of data sets', IGRP, STATUS )
          SIZE0 = 0
          IN = .FALSE.
 
@@ -198,95 +219,220 @@
 *  See if IGRP0 is a valid GRP identifier.
       CALL GRP_VALID( IGRP0, INGRP, STATUS )
 
-*  If the identifier is valid, set the group to be case insensitive if
-*  the host file system is case insensitive, and get the group size.
+*  If the identifier is valid, get identifiers for the associated groups 
+*  holding the individual fields.
       IF( INGRP ) THEN
-         IF( NDG__UCASE ) CALL GRP_SETCS( IGRP0, .FALSE., STATUS )
-         CALL GRP_GRPSZ( IGRP0, MODSIZ, STATUS )
-
-*  Create a new temporary group containing just the file name field
-*  from the total file specifications given in the group identified by
-*  IGRP0.
-         CALL GRP_NEW( ' ', TMPGRP, STATUS )
-         IF( NDG__UCASE ) CALL GRP_SETCS( TMPGRP, .FALSE., STATUS )
-
-         DO I = 1, MODSIZ
-            CALL GRP_GET( IGRP0, I, 1, FSPEC0, STATUS )
-
-*  Extact the file basename from the total file specification, and store 
-*  it in the temporary group.
-            CALL NDG1_HSPEC( FSPEC0, FMTOUT, .FALSE., FDIRN0, FNAME0, 
-     :                       FTYPE0, COMP0, SLICE0, FORM, STATUS )
-            CALL GRP_PUT( TMPGRP, 1, FNAME0, 0, STATUS )
-
-         END DO
-
+         CALL GRP_OWN( IGRP0, IGRPD, STATUS )
+         IF( IGRPD .NE. GRP__NOID ) THEN 
+            CALL GRP_OWN( IGRPD, IGRPB, STATUS )
+            CALL GRP_OWN( IGRPB, IGRPT, STATUS )
+            CALL GRP_OWN( IGRPT, IGRPH, STATUS )
+         ELSE
+            IGRPB = IGRP0
+            IGRPT = GRP__NOID
+            IGRPH = GRP__NOID
+         END IF
       END IF
 
 *  Call GRP_GRPEX to append NDF names specified using the supplied 
-*  group expresson, to the group. 
-      CALL GRP_GRPEX( GRPEXP, TMPGRP, IGRP, SIZE, ADDED, FLAG, STATUS )
+*  group expresson, to the group. Any modification elements are based on
+*  the group holding the file base names.
+      CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG, STATUS )
 
-*  Go through each new name in the group, filling in any fields in the
-*  full file specification which were not provided.
+*  Create a group to hold the names of HDS container files which have
+*  been initialised to hold NDFs within them.
+      CALL GRP_NEW( 'Initialised HDS files', IGRPF, STATUS )
+
+*  Go through each new name in the group.
       DO I = SIZE0 + 1, SIZE
 
 *  Get the next new name added to the output group.
          CALL GRP_GET( IGRP, I, 1, NAME, STATUS )
-
-*  Split the new name up into directory, file basename, file type, 
-*  HDS component, and NDF slice strings.
-         CALL NDG1_HSPEC( NAME, FMTOUT, .FALSE., FDIRN, FNAME, FTYPE, 
-     :                    COMP, SLICE, FORM, STATUS )
 
 *  Get the index of the name within the basis group from which the new
 *  name was derived. If the new name was not specified by a
 *  modification element the index will be returned equal to zero.
          CALL GRP_INFOI( IGRP, I, 'MODIND', MODIND, STATUS )
 
-*  If the name was specified by a modification element...
+*  If the name was specified by a modification element, we need to fill in
+*  any fields which have not been supplied, using the fields associated
+*  with the basis group as defaults.
          IF( MODIND .NE. 0 ) THEN
 
-*  ...get the file specification used as the basis for the current name
-*  and split it up into the same set of parts as before.
-            CALL GRP_GET( IGRP0, MODIND, 1, FSPEC0, STATUS )
-            CALL NDG1_HSPEC( FSPEC0, FMTOUT, .FALSE., FDIRN0, FNAME0, 
-     :                       FTYPE0, COMP0, SLICE0, FORM, STATUS )
+*  Get the last "/" in the supplied string, marking the end of the
+*  directory path.
+            CALL NDG1_LASTO( NAME, '/', IAT, STATUS )
 
-*  If no file type was given, use the input file type if the first entry
-*  in NDF_FORMATS_OUT is "*"; leave the file type blank if the first entry
-*  in NDF_FORMATS_OUT is "."; and otherwise use the file type specified in
-*  parenthesise in the first entry in NDF_FORMATS_OUT.
-            IF( FTYPE .EQ. ' ' ) THEN
-               IF( DEFTYP .EQ. '*' ) THEN
-                  FTYPE = FTYPE0
-               ELSE IF( DEFTYP .NE. '.' ) THEN
-                  FTYPE = DEFTYP
+*  If there is no directory specification in the supplied string, prefix
+*  it with the directory spec from the basis group.
+            IF( IAT .EQ. 0 .AND. IGRPD .NE. GRP__NOID ) THEN
+               CALL GRP_GET( IGRPD, MODIND, 1, DIR, STATUS )
+               IF( DIR .NE. ' ' ) THEN
+                  IAT = CHR_LEN( DIR )
+                  IAT2 = IAT
+                  CALL CHR_APPND( NAME, DIR, IAT2 )
+                  NAME = DIR
                END IF
             END IF
 
-*  The directory path is inherited from the basis element if it was 
-*  not supplied.
-            IF( FDIRN .EQ. ' ' ) FDIRN = FDIRN0
+*  Get the first "." or "(" following the directory path. This marks the 
+*  start of a file type or an HDS path.
+            DOT = INDEX( NAME( IAT + 1 : ), '.' )
+            PAR = INDEX( NAME( IAT + 1 : ), '(' )
+
+*  If any text was supplied after the base name, leave it as it is. If no
+*  text was supplied after the base name, we may need to append an HDS
+*  path or a file type.
+            IF( DOT .EQ. 0 .AND. PAR .EQ. 0 ) THEN
+
+*  No file type was specified, so we need to choose one now on the basis
+*  of the NDF_FORMATS_OUT default file type, and the file type of the
+*  basis element. If the default file type is "." use ".sdf".
+               IF( DEFTYP .EQ. '.' ) THEN
+                  TYP = '.sdf'
+
+*  If the default file type is "*" use the file type from the basis
+*  element.
+               ELSE IF( DEFTYP .EQ. '*' .AND. 
+     :                  IGRPT .NE. GRP__NOID ) THEN
+                  CALL GRP_GET( IGRPT, MODIND, 1, TYP, STATUS )
+
+*  If an explicit default file is available, use it.
+               ELSE
+                  TYP = DEFTYP
+               END IF
+
+*  If the file type is ".sdf"...
+               IF( TYP .EQ. '.sdf' ) THEN
+
+*  See if the HDS structure within the output file has already been
+*  initialised. If it has, the output container file spec (without the
+*  .sdf file type) will be somewhere in the IGRPF group. IND will be
+*  returned as zero if the structure has not been initialised.
+                  CALL GRP_INDEX( NAME, IGRPF, 1, IND, STATUS )
+
+*  See if any HDS path was included in the basis NDF spec.
+                  IF( IGRPH .NE. GRP__NOID ) THEN
+                     CALL GRP_GET( IGRPH, MODIND, 1, PATH, STATUS )
+                  ELSE
+                     PATH = ' '
+                  END IF
+
+                  IF( PATH .NE. ' ' ) THEN
+
+*  We get here if the output is a native NDF for which no HDS component
+*  path was explicitly given, but which has inherited a non-blank component 
+*  path from the basis NDF. The NDF library will only create an NDF within
+*  an HDS container file if all the parent components already exist in
+*  the container file. In the particular case of an output NDF specified
+*  by a modification element, we create the required parent structures
+*  now by copying the basis container file to the output container file.
+*  If the structure of the output file has already been initialised, 
+*  do not initialise it again.
+                     IF( IND .EQ. 0 ) THEN
+
+*  Get the directory, base name and file type for the basis NDF.
+                        CALL GRP_GET( IGRPB, MODIND, 1, NAM, STATUS )
+                        IF( IGRPD .NE. GRP__NOID ) THEN
+                           CALL GRP_GET( IGRPD, MODIND, 1, DIR, STATUS )
+                           CALL GRP_GET( IGRPT, MODIND, 1, TYP, STATUS )
+                        ELSE
+                           DIR = ' '
+                           TYP = ' '   
+                        END IF
+
+*  If the basis file is a .sdf file, form the full spec for the container 
+*  file.
+                        IF( TYP .EQ. '.sdf' ) THEN
+                           SPEC = ' '
+                           IAT2 = 0
+                           CALL CHR_APPND( DIR, SPEC, IAT2 )
+                           CALL CHR_APPND( NAM, SPEC, IAT2 )
+                           CALL CHR_APPND( TYP, SPEC, IAT2 )
+
+*  Open it.
+                           CALL HDS_OPEN( SPEC( : IAT2 ), 'READ', LOC, 
+     :                                    STATUS ) 
+
+*  Create the output container file, and copy the contents of basis container 
+*  file to it. The file base name is used as the HDS top-level object name.
+                           CALL HDS_COPY( LOC, NAME, NAME( IAT + 1 : ), 
+     :                                    STATUS )
+
+*  Close the input container file.
+                           CALL DAT_ANNUL( LOC, STATUS )
+
+*  Open the output container file.
+                           CALL HDS_OPEN( NAME, 'UPDATE', LOC, STATUS ) 
+
+*  Now go through the output container file, deleting all existing NDFs.
+*  This needs to be done sine the NDF library will not create an NDF if
+*  there is an existing NDF with the same HDS path.
+                           CALL NDG1_NDFDL( LOC, STATUS )
+
+*  Close the output container file.
+                           CALL DAT_ANNUL( LOC, STATUS )
+
+*  Put the spec of this output file into the group of files which have
+*  had their structure initialised.
+                           CALL GRP_PUT( IGRPF, 1, NAME, 0, STATUS )
+
+                        END IF
+
+                     END IF
+
+*  Append the HDS path from the basis element to the output NDF spec.
+                     IAT = CHR_LEN( NAME )
+                     CALL CHR_APPND( PATH, NAME, IAT )
+
+                  END IF
+
+*  For any non-HDS file, just append the file type.
+               ELSE
+                  IAT = CHR_LEN( NAME )
+                  CALL CHR_APPND( TYP, NAME, IAT )
+               END IF
+            END IF
+
+*  If the name was not specified by a modification element, we use the
+*  string as given, except that we append a file type (if possible) if
+*  the supplied string did not include a file type.
+         ELSE
+
+*  Get the last "/" in the supplied string, marking the end of the
+*  directory path.
+            CALL NDG1_LASTO( NAME, '/', IAT, STATUS )
+
+*  Get the first "." or "(" following the directory path. This marks the 
+*  start of a file type or an HDS path.
+            DOT = INDEX( NAME( IAT + 1 : ), '.' )
+            PAR = INDEX( NAME( IAT + 1 : ), '(' )
+
+*  If any text followed the file base name, assume the file type has been
+*  specified. Otherwise we append one now.
+            IF( PAR .EQ. 0 .AND. DOT .EQ. 0 ) THEN
+
+*  We can only append a file type if NDF_FORMATS_OUT gives us an explicit
+*  default file type.
+               IF( DEFTYP .NE. '.' .AND. DEFTYP .NE. '*' .AND.
+     :             DEFTYP .NE. ' ' ) THEN               
+
+                  IAT = CHR_LEN( NAME )
+                  CALL CHR_APPND( DEFTYP, NAME, IAT )
+
+               END IF
+
+            END IF
 
          END IF
 
-*  Construct a file specification from the required elements. The NDF
-*  slice specification is set blank.
-         CALL NDG1_MSPEC( FMTOUT, FDIRN, FNAME, FTYPE, COMP, ' ', 
-     :                    .FALSE., FSPEC, FORM, STATUS )
-
-*  Replace the supplied name with the expanded file specification.
-         CALL GRP_PUT( IGRP, 1, FSPEC, I, STATUS )
-
-*  Abort if an error has occured.
-         IF ( STATUS .NE. SAI__OK ) GO TO 999
+*  Replace the supplied string with the expanded string.
+         CALL GRP_PUT( IGRP, 1, NAME, I, STATUS )
 
       END DO
 
-*  Delete the temporary group.
- 999  CONTINUE
-      IF( INGRP ) CALL GRP_DELET( TMPGRP, STATUS )
+*  Delete the group holding initialised HDS files.
+      CALL GRP_DELET( IGRPF, STATUS )
 
 *  If an error occured, reset the group back to its original size if a 
 *  group was supplied, or delete the group if no group was supplied.

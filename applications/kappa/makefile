@@ -534,9 +534,11 @@ ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
 
 NDG_F_ROUTINES = \
-ndg1_expan.f ndg1_lasto.f ndg1_ndfch.f ndg_annul.f ndg_asexp.f \
-ndg_assoc.f ndg_creat.f ndg_crexp.f ndg_delet.f ndg_ndfas.f  \
-ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f 
+ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
+ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_creat.f ndg1_fparx.f \
+ndg1_appen.f ndg_crexp.f ndg1_hcut.f ndg_delet.f ndg1_hfind.f \
+ndg1_ndfch.f ndg_annul.f ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f \
+ndg_ndfcr.f ndg1_sdfex.f ndg1_ndfdl.f
 
 IRM_F_ROUTINES = \
 irm1_rglmt.f irm_mline.f irm_stats.f \
@@ -3472,19 +3474,27 @@ ncropn.o:	 SAE_PAR PAR_ERR
 ndfcopy.o:	 SAE_PAR PAR_ERR NDF_PAR
 ndfpack_mon.o:	 SAE_PAR
 ndftrace.o:	 SAE_PAR DAT_PAR NDF_PAR PRM_PAR AST_PAR NUM_DEC_CVT NUM_DEF_CVT
-ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR NDG_CONST NDG_ERR
-ndg1_hspec.o:	 SAE_PAR GRP_PAR
+ndg1_appen.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR
+ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
+ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_hsplt.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_lasto.o:	 SAE_PAR
-ndg1_match.o:	 SAE_PAR GRP_PAR NDG_CONST
-ndg1_mspec.o:	 SAE_PAR GRP_PAR
 ndg1_ndfch.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
-ndg1_subst.o:	 SAE_PAR
+ndg1_ndfdl.o:	 SAE_PAR GRP_PAR DAT_PAR
+ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
+ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
 ndg_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
 ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
 ndg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
-ndg_crexp.o:	 SAE_PAR GRP_PAR NDG_CONST PSX_ERR
+ndg_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
 ndg_ndfas.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfcr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
 ndg_ndfpr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_test.o:	 SAE_PAR GRP_PAR
 nmplot.o:	 SAE_PAR PRM_PAR
 noglobals.o:	 SAE_PAR DAT_PAR DAT_ERR
 nomagic.o:	 SAE_PAR NDF_PAR PAR_ERR MSG_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT

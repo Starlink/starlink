@@ -35,6 +35,8 @@
 *  History:
 *     28-FEB-1992 (PDRAPER):
 *        Original version.
+*     25-MAY-1999 (DSB):
+*         Initialize IAT to zero before checking status.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,6 +67,9 @@
       LOGICAL MORE               ! Flag for more loops required
 
 *.
+
+*  Initialise.
+      IAT = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN

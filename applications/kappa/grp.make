@@ -48,9 +48,11 @@ irm_stgrd.f irm_stlmt.f irm_stlog.f irm_stmap.f irm_stnul.f irm_stpen.f \
 irm_stpha.f irm_table.f irm_tmenu.f irm_vmenu.f 
 
 # The contents of the ndg_sub.tar file:
-NDG_SUB = ndg1_expan.f ndg1_lasto.f ndg1_ndfch.f ndg_annul.f ndg_asexp.f \
-ndg_assoc.f ndg_creat.f ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f \
-ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f ndg1_wild.c
+NDG_SUB = ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
+ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_creat.f ndg1_fparx.f \
+ndg1_appen.f ndg_crexp.f ndg1_hcut.f ndg_delet.f ndg1_hfind.f \
+ndg1_ndfch.f ndg_annul.f ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f \
+ndg_ndfcr.f ndg1_sdfex.f ndg1_ndfdl.f ndg1_wild.c
 
 # The contents of the ira_sub.tar file:
 IRA_SUB = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
