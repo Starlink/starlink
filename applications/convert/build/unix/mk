@@ -309,6 +309,8 @@
                BLD_SHR=\
 'f() ld -shared -update_registry $(INSTALL)/lib/so_locations -o $$1 $$2 $$3 \
 -lfor -lFutil -lUfor -lm -lots -lc; f'
+               CC='cc'
+               CFLAGS='-O -I/star/include'
                FC='f77'
                LINK='ln -s'
                MACHINE_TYPE=$SYSTEM
@@ -337,6 +339,8 @@
 #  DECstations running OSF1.
 #  ------------------------
             mips_OSF1)
+               CC='cc'
+               CFLAGS='-O -I/star/include'
                FC='f77'
                LINK='ln -s'
                MACHINE_TYPE=$SYSTEM
@@ -370,6 +374,8 @@
 #  ---------------------------------------------
             sun4_Solaris)
                BLD_SHR='f() ld -G -z text -o $$1 $$2; f'
+               CC='cc'
+               CFLAGS='-O -I/star/include'
                FC='f77'
                FFLAGS='-O -PIC'
                LINK='ln -s'
