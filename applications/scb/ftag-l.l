@@ -1,7 +1,55 @@
+/*+
+* Name:
+*    ftag-l.l
+*
+*  Type of module:
+*     lex source
+*
+*  Purpose:
+*     Tokenise Fortran 77 source code for feeding to parser.
+*
+*  Description:
+*     This file contains the lex source code to build a lexical analyser
+*     for tokenising Fortran 77 source code well enough to feed it to a 
+*     corresponding grammar parser (written as yacc).
+*
+*     The type of yylval returned value is in all cases pointer to char.
+*     The text thus pointed to contains all the text of the original fortran
+*     source file in such a way that if the text for each token which is
+*     passed to yacc is output as it is encountered, then the original
+*     fortran source file will be reconstructed with the following 
+*     HTML-like addition:
+*        - The characters '<', '>' and '&' are replaced by their HTML
+*          entity reference equivalents.
+*
+*  Timing:
+*     Probably the C output by lex would be considerably smaller, and 
+*     perhaps more efficient, if the BLANKs were not scooped up as part
+*     of each matched pattern.  lex doesn't seem to do this in a very
+*     efficient way, it would likely be better to match the tokens 
+*     without blanks and match the blanks separately adding these into
+*     the yylval without the pattern-matching machine's knowledge. 
+*     This would (I think) require matching blanks before, not after,
+*     each pattern, and hence some restructuring.  See the C lexer
+*     (ctag-l.l) for an example of this approach.
+*
+*  Bugs:
+*     Blanks within, for instance, reserved words are not ignored as
+*     they really should be within Fortran 77 (except in cases where 
+*     one expects them to maybe crop up).
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     26-NOV-1999 (MBT):
+*        Initial version.
+*-
+*/
 
 CONT			(\n[^cCdD!*\n]....[^ 0\n])
 BLANK			([ \t]|!.*|{CONT}|\n[ \t]*!.*)*
-LETTER			[A-Za-z$_%]
+LETTER			[A-Za-z<>$_%]
 DIGIT			[0-9]
 A			[Aa]
 B			[Bb]
@@ -100,13 +148,76 @@ void count();
 #include <string.h>
 
    int yywrap() {
+/*
+*+ 
+*  Name:
+*     yywrap
+*  
+*  Purpose:
+*     Do necessary tidying up at end of lex input file.
+*  
+*  Description:
+*     This routine has to return 1 to the caller (yylex) to indicate that
+*     there is no further text to come.
+*-
+*/
       return(1);
    }
 
 
    void count() {
-      yylval = malloc( yyleng + 1 );
-      strcpy( yylval, yytext );
+/*
+*+
+*  Name:
+*     count
+*
+*  Purpose:
+*     Ensure that yylval has all the proper text.
+*
+*  Description:
+*     This routine sets yylval (the value which is passed up to the parser)
+*     to the string of all the characters which have been encountered
+*     since the last token was passed back.  Note that it mallocs storage
+*     for this purpose, so this must be free'd at some point by the parser.
+*
+*     SGML-like entity references are substituted in where necessary.
+*-
+*/
+      char *entity, c;
+      int leng, wleng, i, j;
+
+      leng = yyleng;
+      yylval = malloc( leng + 1 );
+      for ( i = j = 0; i < yyleng; i++ ) {
+         c = yytext[ i ];
+         switch( c ) {
+            case '<':
+               entity = "&lt;";
+               wleng = 4;
+               break;
+            case '>':
+               entity = "&gt;";
+               wleng = 4;
+               break;
+            case '&':
+               entity = "&amp;";
+               wleng = 5;
+               break;
+            default:
+               wleng = 1;
+         }
+         if ( wleng == 1 ) {
+            yylval[ j++ ] = c;
+         }
+         else {
+            wleng = strlen( entity );
+            leng += wleng;
+            yylval = realloc( yylval, leng + 1 );
+            strcpy( yylval + j, entity );
+            j += wleng;
+         }
+      }
+      yylval[ j ] = '\0';
       BEGIN 0;
    }
 
