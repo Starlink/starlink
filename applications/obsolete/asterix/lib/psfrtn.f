@@ -426,11 +426,11 @@
       END
 
 *+  PSF_ANAL_INIT - Analytic defined PSF initialisation
-      SUBROUTINE PSF_ANAL_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_ANAL_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
-*     Gets a user defined PSF and associates it with a PSF slot.
+*     Gets a user defined PSF and associates it with a psf object
 *
 *    Environment parameters :
 *
@@ -462,7 +462,6 @@
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *
@@ -970,6 +969,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       CHARACTER*132		FNAME
       CHARACTER*3		INS			! Instrument name
 
+      REAL			CSCALE			! Channel scaling
       REAL                      ENERGY                  ! Mean photon energy
       REAL                     	NORM                   ! Normalisation constant
       REAL                      P_SCALE                 ! Scale size of psf
@@ -1318,7 +1318,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 
 *+  PSF_ASCA_HINT - ASCA psf hint handler
-      SUBROUTINE PSF_ASCA_HINT( SLOT, HINT, DATA, STATUS )
+      SUBROUTINE PSF_ASCA_HINT( PSID, HINT, DATA, STATUS )
 *
 *    Description :
 *
@@ -1341,15 +1341,10 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_ASCA_CMN'
 *
 *    Import :
 *
-      INTEGER                 	SLOT            	! PSF handle
+      INTEGER                 	PSID
       CHARACTER*(*)           	HINT		 	! Hint name
 *
 *    Export :
@@ -1392,11 +1387,11 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_ASCA_INIT - ASCA psf initialisation
-      SUBROUTINE PSF_ASCA_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_ASCA_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
-*     Associate a slot with an ASCA psf.
+*     Associate a psf object with an ASCA psf
 *
 *    Environment parameters :
 *
@@ -1427,7 +1422,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *
@@ -1450,6 +1444,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       REAL			RCLO,RCHI,CLO,CHI
       REAL 			ENERGY			! Mean photon energy
 
+      INTEGER			SLOT			! Psf slot number
       INTEGER			X_AX,Y_AX,E_AX,T_AX
 
       LOGICAL			PHADEF			! PHA band defined?
@@ -1515,6 +1510,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         END IF
 
 *      Get channel axis range
+        CALL ADI_CGET0I( PSID, 'Slot', SLOT, STATUS )
         CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( E_AX .GT. 0 ) THEN
           CALL PSF_QAXEXT( SLOT, E_AX, CLO, CHI, STATUS )
@@ -1744,7 +1740,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_PWFC_INIT - Initialise the WFC pointed psf system
-      SUBROUTINE PSF_PWFC_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_PWFC_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -1776,7 +1772,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *-
@@ -2081,11 +2076,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_RADIAL_INIT - Radially defined PSF initialisation
-      SUBROUTINE PSF_RADIAL_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_RADIAL_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
-*     Gets a user defined PSF and associates it with a PSF slot.
+*     Gets a 1-D radial PSF and associates it with a psf object
 *
 *    Environment parameters :
 *
@@ -2114,7 +2109,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *
@@ -2332,7 +2326,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_RESPFILE_CMN'
 *
 *    Import :
 *
@@ -2350,17 +2343,19 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
-      REAL                     R			! Off-axis angle
+      REAL			RBASE(5),RSCALE(5)	! Axis attributes
+      REAL                      R			! Off-axis angle
 
-      INTEGER                  IE			! Response energy bin
-      INTEGER                  IPSF			! Sequential psf number
-      INTEGER                  IPTR			! Pointer into index
-      INTEGER                  IR			! Response radial bin
-      INTEGER                  IX			! Response X axis bin
-      INTEGER                  IY			! Response Y axis bin
+      INTEGER			DIMS(5),NDIM		! Response dimensions
+      INTEGER                   IPSF			! Sequential psf number
+      INTEGER                   IPTR			! Pointer into index
+      INTEGER                   IE, IR, IX, IY		! Response axis bins
       INTEGER			PHALO, PHAHI		! PHA band
+      INTEGER			RDPTR, RIPTR, RRPTR	! Response data/index
+      INTEGER			RNXY			! Resample size
 
       LOGICAL			PHADEF			! PHA band defined?
+      LOGICAL			RADIAL			! Psf is radial?
 *-
 
 *  Check inherited global status
@@ -2371,37 +2366,52 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
       CALL PSF0_GETID0I( PSID, 'PhaHi', PHAHI, STATUS )
 
-*    Radial response?
-      IF ( RF_RADIAL(SLOT) ) THEN
+*  Response data and index
+      CALL PSF0_GETID0I( PSID, 'Dptr', RDPTR, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Iptr', RIPTR, STATUS )
+
+*  Details of resampling space
+      CALL PSF0_GETID0I( PSID, 'Rptr', RRPTR, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Rnxy', RNXY, STATUS )
+
+*  Get dimensions of response
+      CALL PSF0_GETID1I( PSID, 'Dims', 5, DIMS, NDIM, STATUS )
+
+*  Get axis attributes
+      CALL PSF0_GETID1R( PSID, 'Base', 5, RBASE, NDIM, STATUS )
+      CALL PSF0_GETID1R( PSID, 'Scale', 5, RSCALE, NDIM, STATUS )
+
+*  Radial response?
+      CALL PSF0_GETID0L( PSID, 'Radial', RADIAL, STATUS )
+      IF ( RADIAL ) THEN
 
 *      Choose radial bin
         R = SQRT( X0**2 + Y0**2 )
-        IR = INT(0.5+(R-RF_BASE(3,SLOT)) / RF_SCALE(3,SLOT)) + 1
-        IR = MIN( IR, RF_DIMS(3,SLOT) )
+        IR = INT(0.5+(R-RBASE(3)) / RSCALE(3)) + 1
+        IR = MIN( IR, DIMS(3) )
 
 *      Choose energy bin
-        IF ( PHADEF .AND. (RF_NDIM(SLOT).GT.3) ) THEN
-          IE = INT((PHALO-RF_BASE(4,SLOT)) /
-     :                       RF_SCALE(4,SLOT)) + 1
+        IF ( PHADEF .AND. (NDIM.GT.3) ) THEN
+          IE = INT((PHALO-RBASE(4)) / RSCALE(4)) + 1
         ELSE
           IE = 1
         END IF
 
 *      This selects the psf
-        IPSF = (IE-1)*RF_DIMS(3,SLOT) + IR
+        IPSF = (IE-1)*DIMS(3) + IR
 
       ELSE
 
 *      Choose spatial bins
-        IX = INT(0.5+(X0-RF_BASE(3,SLOT)) / RF_SCALE(3,SLOT)) + 1
-        IY = INT(0.5+(Y0-RF_BASE(4,SLOT)) / RF_SCALE(4,SLOT)) + 1
-        IF ( (IX.LT.1) .OR. (IX.GT.RF_DIMS(3,SLOT)) .OR.
-     :       (IY.LT.1) .OR. (IY.GT.RF_DIMS(4,SLOT)) ) THEN
+        IX = INT(0.5+(X0-RBASE(3)) / RSCALE(3)) + 1
+        IY = INT(0.5+(Y0-RBASE(4)) / RSCALE(4)) + 1
+        IF ( (IX.LT.1) .OR. (IX.GT.DIMS(3)) .OR.
+     :       (IY.LT.1) .OR. (IY.GT.DIMS(4)) ) THEN
           STATUS = SAI__ERROR
           CALL MSG_SETI( 'XR', IX )
           CALL MSG_SETI( 'YR', IY )
-          CALL MSG_SETI( 'NX', RF_DIMS(3,SLOT) )
-          CALL MSG_SETI( 'NY', RF_DIMS(4,SLOT) )
+          CALL MSG_SETI( 'NX', DIMS(3) )
+          CALL MSG_SETI( 'NY', DIMS(4) )
           CALL ERR_REP( ' ', 'Psf requested at response grid '/
      :                  /'(^XR,^YR) when the bounds are (^NX,^NY). '/
      :                  /'Will continue but there may an SPRESP '/
@@ -2411,52 +2421,50 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *      Force IX,IY into range
           IX = MAX(1,IX)
           IY = MAX(1,IY)
-          IX = MIN(IX,RF_DIMS(3,SLOT))
-          IY = MIN(IY,RF_DIMS(4,SLOT))
+          IX = MIN(IX,DIMS(3))
+          IY = MIN(IY,DIMS(4))
 
         END IF
 
 *      Choose energy bin
-        IF ( RF_PHA_DEF(SLOT) .AND. (RF_NDIM(SLOT).GT.4) ) THEN
-          IE = INT((RF_PHALO(SLOT)-RF_BASE(5,SLOT)) /
-     :                       RF_SCALE(5,SLOT)) + 1
+        IF ( PHADEF .AND. (NDIM.GT.4) ) THEN
+          IE = INT((PHALO-RBASE(5)) / RSCALE(5)) + 1
         ELSE
           IE = 1
         END IF
 
 *      This selects the psf
-        IPSF = (IE-1)*RF_DIMS(3,SLOT)*RF_DIMS(4,SLOT) +
-     :         (IY-1)*RF_DIMS(3,SLOT) + IX
+        IPSF = (IE-1)*DIMS(3)*DIMS(4) + (IY-1)*DIMS(3) + IX
 
       END IF
 
 *    The psf index allows us to index the INDEX array
-      IPTR = RF_IPTR(SLOT) + 3*VAL__NBI*(IPSF-1)
+      IPTR = RIPTR + 3*VAL__NBI*(IPSF-1)
 
 *    Use that index to unpack the response data
-      CALL PSF_RESPFILE_INT( %VAL(IPTR), %VAL(RF_DPTR(SLOT)),
+      CALL PSF_RESPFILE_INT( %VAL(IPTR), %VAL(RDPTR),
      :                       NX, NY, ARRAY, STATUS )
 
 *    Non-zero offset?
       IF ( (QX.NE.0.0) .AND. (QY.NE.0.0) ) THEN
 
 *      Reallocate resampling workspace if not enough
-        IF ( (RF_RESPTR(SLOT) .GT. 0) .AND.
-     :       (NX*NY.LT.RF_RESNXY(SLOT)) ) THEN
-          CALL DYN_UNMAP( RF_RESPTR(SLOT), STATUS )
-          RF_RESPTR(SLOT) = 0
+        IF ( (RRPTR .GT. 0) .AND. (NX*NY.LT.RNXY) ) THEN
+          CALL DYN_UNMAP( RRPTR, STATUS )
+          RRPTR = 0
         END IF
-        IF ( RF_RESPTR(SLOT) .EQ. 0 ) THEN
-          CALL DYN_MAPR( 1, NX*NY, RF_RESPTR(SLOT), STATUS )
-          RF_RESNXY(SLOT) = NX*NY
+        IF ( RRPTR .EQ. 0 ) THEN
+          CALL DYN_MAPR( 1, NX*NY, RRPTR, STATUS )
+          CALL PSF0_SETID0I( PSID, 'Rptr', RRPTR, STATUS )
+          CALL PSF0_SETID0I( PSID, 'Rnxy', NX*NY, STATUS )
         END IF
 
-*      Make copy of psf
-        CALL ARR_COP1R( NX*NY, ARRAY, %VAL(RF_RESPTR(SLOT)), STATUS )
+*    Make copy of psf
+        CALL ARR_COP1R( NX*NY, ARRAY, %VAL(RRPTR), STATUS )
 
-*      Resample it
-        CALL PSF_RESAMPLE( NX, NY, %VAL(RF_RESPTR(SLOT)), QX/DX, QY/DY,
-     :                                               0, ARRAY, STATUS )
+*    Resample it
+        CALL PSF_RESAMPLE( NX, NY, %VAL(RRPTR), QX/DX, QY/DY,
+     :                                     0, ARRAY, STATUS )
 
       END IF
 
@@ -2561,7 +2569,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_RESPFILE_HINT - Spatial response hint handler
-      SUBROUTINE PSF_RESPFILE_HINT( SLOT, HINT, DATA, STATUS )
+      SUBROUTINE PSF_RESPFILE_HINT( PSID, HINT, DATA, STATUS )
 *
 *    Description :
 *
@@ -2589,13 +2597,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
 *
-*    Global variables :
-*
-      INCLUDE 'PSF_RESPFILE_CMN'
-*
 *    Import :
 *
-      INTEGER                 	SLOT            	! PSF handle
+      INTEGER                 	PSID			!
       CHARACTER*(*)           	HINT		 	! Hint name
 *
 *    Export :
@@ -2605,47 +2609,72 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Status :
 *
       INTEGER STATUS
+*
+*    Local variables:
+*
+      REAL			RSCALE(5)		! Axis attributes
+
+      INTEGER			DIMS(5), NDIM		! Response dimensions
+
+      LOGICAL			RADIAL			! Radial psf?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Radial symmetry?
+*  Psf is radial?
+      CALL PSF0_GETID0L( PSID, 'Radial', RADIAL, STATUS )
+
+*  Radial symmetry?
       IF ( HINT .EQ. PSF_H_RADSYM ) THEN
 
-*      Radially symmetric flag from common block
-        CALL ARR_COP1L( 1, RF_RADIAL(SLOT), DATA, STATUS )
+*    Radially symmetric flag from common block
+        CALL ARR_COP1L( 1, RADIAL, DATA, STATUS )
 
 *    Energy dependent
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
 
-*      Energy dependent if last dimension has dimension other than one
-        CALL ARR_COP1L( 1, (RF_DIMS(RF_NDIM(SLOT),SLOT).NE.1),
-     :                  DATA, STATUS )
+*    Get dimensions of response
+        CALL PSF0_GETID1I( PSID, 'Dims', 5, DIMS, NDIM, STATUS )
+
+*    Get axis attributes
+        CALL PSF0_GETID1R( PSID, 'Base', 5, RBASE, NDIM, STATUS )
+
+*    Energy dependent if last dimension has dimension other than one
+        CALL ARR_COP1L( 1, (DIMS(NDIM).NE.1), DATA, STATUS )
 
 *    Maximum radius
       ELSE IF ( HINT .EQ. PSF_H_MAXRAD ) THEN
 
-*      Can't be more than radius of a response psf
-        CALL ARR_COP1I( 1, RF_DIMS(1,SLOT)/2, DATA, STATUS )
+*    Get dimensions of response
+        CALL PSF0_GETID1I( PSID, 'Dims', 5, DIMS, NDIM, STATUS )
 
-*    Spatial granularity
+*    Can't be more than radius of a response psf
+        CALL ARR_COP1I( 1, DIMS(1)/2, DATA, STATUS )
+
+*  Spatial granularity
       ELSE IF ( HINT .EQ. PSF_H_SPATGRAN ) THEN
 
+*    Get psf axis attributes
+        CALL PSF0_GETID1R( PSID, 'Scale', 5, RSCALE, NDIM, STATUS )
+
 *      Radial psf?
-        IF ( RF_RADIAL(SLOT) ) THEN
-          CALL ARR_COP1R( 1, RF_SCALE(3,SLOT), DATA, STATUS )
+        IF ( RADIAL ) THEN
+          CALL ARR_COP1R( 1, RSCALE(3), DATA, STATUS )
         ELSE
-          CALL ARR_COP1R( 1,
-     :                    ABS(MIN(RF_SCALE(3,SLOT),RF_SCALE(4,SLOT))),
+          CALL ARR_COP1R( 1, ABS(MIN(RSCALE(3),RSCALE(4))),
      :                    DATA, STATUS )
         END IF
 
-*    Energy granularity
+*  Energy granularity
       ELSE IF ( HINT .EQ. PSF_H_EGRAN ) THEN
 
-*      Radial psf?
-        CALL ARR_COP1R( 1, RF_SCALE(RF_NDIM(SLOT),SLOT), DATA, STATUS )
+*    Get psf axis attributes
+        CALL PSF0_GETID1I( PSID, 'Dims', 5, DIMS, NDIM, STATUS )
+        CALL PSF0_GETID1R( PSID, 'Scale', 5, RSCALE, NDIM, STATUS )
+
+*    Radial psf?
+        CALL ARR_COP1R( 1, RSCALE(NDIM), DATA, STATUS )
 
       ELSE
         STATUS = SAI__ERROR
@@ -2659,11 +2688,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_RESPFILE_CLOSE - Delete a psf handle
-      SUBROUTINE PSF_RESPFILE_CLOSE( SLOT, STATUS )
-*
+      SUBROUTINE PSF_RESPFILE_CLOSE( PSID, STATUS )
+ *
 *    Description :
-*
-*     Gets a user defined PSF and associates it with a PSF slot.
 *
 *    Environment parameters :
 *
@@ -2684,34 +2711,38 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_RESPFILE_CMN'
 *
 *    Import :
 *
-      INTEGER			SLOT			! Psf slot number
+      INTEGER			PSID
 *
 *    Status :
 *
       INTEGER STATUS
+*
+*    Local variables:
+*
+      INTEGER			PTR
 *-
 
 *  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Release dynamic data
-      CALL DYN_UNMAP( RF_IPTR(SLOT), STATUS )
-      CALL DYN_UNMAP( RF_DPTR(SLOT), STATUS )
+      CALL PSF0_GETID0I( PSID, 'Iptr', PTR, STATUS )
+      CALL DYN_UNMAP( PTR, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Dptr', PTR, STATUS )
+      CALL DYN_UNMAP( PTR, STATUS )
 
       END
 
 
 *+  PSF_RESPFILE_INIT - Response defined PSF initialisation
-      SUBROUTINE PSF_RESPFILE_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_RESPFILE_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
-*     Gets a user defined PSF and associates it with a PSF slot.
+*     Gets a PSF from a spatial response and associates it with a psf object
 *
 *    Environment parameters :
 *
@@ -2740,13 +2771,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_RESPFILE_CMN'
 *
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *
@@ -2777,6 +2805,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       INTEGER			DAX			! Dataset axis no.
       INTEGER		      	DIM			! Size of response axis
+      INTEGER			DIMS(5), NDIM		! Response full size
+      INTEGER			DPTR, IPTR		! Response data
       INTEGER			DX, DY			!
       INTEGER			FSTAT			! i/o status code
       INTEGER                 	IAX			! Loop over axes
@@ -2788,6 +2818,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			X_AX, Y_AX, E_AX, T_AX	! Axis identifiers
 
       LOGICAL                 	IN_DATASET        	! Response found in dataset
+      LOGICAL			PHADEF			! PHA band defined?
+      LOGICAL			RADIAL			! Radial response?
 *-
 
 *    Check status
@@ -2820,42 +2852,36 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *  Get expanded response dimensions
-      CALL CMP_GET1I( SLOC, 'DIMS', 5, RF_DIMS(1,SLOT), RF_NDIM(SLOT),
-     :                STATUS )
+      CALL CMP_GET1I( SLOC, 'DIMS', 5, DIMS, NDIM, STATUS )
+      CALL PSF0_SETID1I( PSID, 'Dims', NDIM, DIMS, STATUS )
 
 *  Get radial limit so we can use BDI to access the axis structures
       CALL CMP_GET0I( SLOC, 'RLIMIT', RLIM, STATUS )
-      DX = RF_DIMS(1,SLOT)
-      DY = RF_DIMS(2,SLOT)
-      RF_DIMS(1,SLOT) = RLIM*2 + 1
-      RF_DIMS(2,SLOT) = RLIM*2 + 1
+      DX = DIMS(1)
+      DY = DIMS(2)
+      DIMS(1) = RLIM*2 + 1
+      DIMS(2) = RLIM*2 + 1
 
 *  Link the response object to a BinDS so we can access its axis info
-      CALL BDI_LINK( 'BinDS', RF_NDIM(SLOT), RF_DIMS(1,SLOT), 'REAL',
-     :               SID, STATUS )
-      RF_DIMS(1,SLOT) = DX
-      RF_DIMS(2,SLOT) = DY
+      CALL BDI_LINK( 'BinDS', NDIM, DIMS, 'REAL', SID, STATUS )
+      DIMS(1) = DX
+      DIMS(2) = DY
 
 *  Load index into memory
       CALL CMP_SIZE( SLOC, 'INDEX', NELM, STATUS )
-      CALL DYN_MAPI( 1, NELM, RF_IPTR(SLOT), STATUS )
-      CALL CMP_GETVI( SLOC, 'INDEX', NELM, %VAL(RF_IPTR(SLOT)),
-     :                NELM, STATUS )
+      CALL DYN_MAPI( 1, NELM, IPTR, STATUS )
+      CALL CMP_GETVI( SLOC, 'INDEX', NELM, %VAL(IPTR), NELM, STATUS )
 
 *  Load the response into memory
       CALL CMP_SIZE( SLOC, 'DATA_ARRAY', NELM, STATUS )
-      CALL DYN_MAPR( 1, NELM, RF_DPTR(SLOT), STATUS )
-      CALL CMP_GETVR( SLOC, 'DATA_ARRAY', NELM, %VAL(RF_DPTR(SLOT)),
+      CALL DYN_MAPR( 1, NELM, DPTR, STATUS )
+      CALL PSF0_SETID0I( PSID, 'Dptr', DPTR, STATUS )
+      CALL CMP_GETVR( SLOC, 'DATA_ARRAY', NELM, %VAL(DPTR),
      :                NELM, STATUS )
 
-*  Is it compressed?
-      CALL CMP_GET0L( SLOC, 'COMPRESSED', RF_PIXCENT(SLOT), STATUS )
-
-*  Is it pixel centred?
-      CALL CMP_GET0L( SLOC, 'PIXCENT', RF_PIXCENT(SLOT), STATUS )
-
 *  Is it a radial response?
-      CALL CMP_GET0L( SLOC, 'RADIAL', RF_RADIAL(SLOT), STATUS )
+      CALL CMP_GET0L( SLOC, 'RADIAL', RADIAL, STATUS )
+      CALL PSF0_SETID0L( PSID, 'Radial', RADIAL, STATUS )
 
 *  Get creator version id
       CALL CMP_GET0C( SLOC, 'VERSION', VERSION, STATUS )
@@ -2905,34 +2931,27 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
         END DO
 
-*    End of switch on SPRESP version
+*  End of switch on SPRESP version
       END IF
 
-*    Get axis info
-      IF ( RF_RADIAL(SLOT) ) THEN
-        DO IAX = 3, 4
-          CALL BDI_AXGET1R( SID, IAX, 'SpacedData', 2, SPARR, DIM,
+*  Get axis info
+      DO IAX = 3, NDIM
+        CALL BDI_AXGET1R( SID, IAX, 'SpacedData', 2, SPARR, DIM,
      :                      STATUS )
-          RF_BASE(IAX,SLOT) = SPARR(1)
-          RF_SCALE(IAX,SLOT) = SPARR(2)
-        END DO
-      ELSE
-        DO IAX = 3, 5
-          CALL BDI_AXGET1R( SID, IAX, 'SpacedData', 2, SPARR, DIM,
-     :                      STATUS )
-          RF_BASE(IAX,SLOT) = SPARR(1)
-          RF_SCALE(IAX,SLOT) = SPARR(2)
-        END DO
-      END IF
+        BASE(IAX) = SPARR(1)
+        SCALE(IAX) = SPARR(2)
+      END DO
+      CALL PSF0_SETID1R( PSID, 'Base', NDIM, BASE, STATUS )
+      CALL PSF0_SETID1R( PSID, 'Scale', NDIM, SCALE, STATUS )
 
 *    If the PHA band is not defined, and the response has a significant
 *    energy dimension, then we need a mean photon energy to index that
 *    energy dimension.
-      IF ( (RF_DIMS(RF_NDIM(SLOT),SLOT).GT.1) .AND.
-     :                     .NOT. RF_PHA_DEF(SLOT) ) THEN
+      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      IF ( (DIMS(NDIM).GT.1) .AND. .NOT. PHADEF ) THEN
 
 *    Construct prompt
-        CALL BDI_AXGET0C( SID, RF_NDIM(SLOT), 'Units', EUNITS, STATUS )
+        CALL BDI_AXGET0C( SID, NDIM, 'Units', EUNITS, STATUS )
         CALL MSG_SETC( 'UNITS', EUNITS )
         CALL MSG_MAKE( 'Mean photon energy in ^UNITS', TEXT, TLEN )
         CALL USI_PROMT( 'AUX', TEXT(:TLEN), STATUS )
@@ -2956,7 +2975,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *  Reset workspace
-      RF_RESPTR(SLOT) = 0
+      CALL PSF0_SETID0I( PSID, 'Rptr', 0, STATUS )
 
 *  Abort point
  99   CONTINUE
@@ -3029,8 +3048,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ASCA_CMN'
-      INCLUDE 'PSF_RESPFILE_CMN'
-      INCLUDE 'PSF_TABULAR_CMN'
       INCLUDE 'PSF_XRT_PSPC_CMN'
 *
 *    Status :
@@ -3071,8 +3088,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Reset the SYSTEM_INIT flag in each common block
       AS_INIT = .TRUE.
-      TB_INIT = .TRUE.
-      RF_INIT = .TRUE.
       RX_INIT = .TRUE.
       RX_CB_OPEN = .FALSE.
 
@@ -3100,7 +3115,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR - 2D user supplied psf handler
-      SUBROUTINE PSF_TABULAR( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+      SUBROUTINE PSF_TABULAR( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
      :                                             NY, ARRAY, STATUS )
 *
 *    Description :
@@ -3131,13 +3146,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_TABULAR_CMN'
 *
 *    Import :
 *
       REAL                     DX, DY, X0, Y0,QX,QY
-      INTEGER                  NX,NY,SLOT
+      INTEGER                  NX,NY,PSID
       LOGICAL                  INTEG
 *
 *    Export :
@@ -3150,17 +3163,22 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
-      INTEGER                  TPTR                    ! Temp array for resample
+      INTEGER                  	TPTR                    ! Temp array for resample
+      INTEGER			DIMS(2), NDIM, DPTR
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Call internal routine
-      CALL PSF_TABULAR_INT( TB_DIMS(SLOT,1), TB_DIMS(SLOT,2),
-     :                 %VAL(TB_DPTR(SLOT)), NX, NY, ARRAY, STATUS )
+*  Extract tabular control data
+      CALL PSF0_GETID1I( PSID, 'Dims', 2, DIMS, NDIM, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Dptr', DPTR, STATUS )
 
-*    Non-zero offset?
+*  Call internal routine
+      CALL PSF_TABULAR_INT( DIMS(1), DIMS(2),
+     :                      %VAL(DPTR), NX, NY, ARRAY, STATUS )
+
+*  Non-zero offset?
       IF ( (QX.NE.0.0) .AND. (QY.NE.0.0) ) THEN
         CALL DYN_MAPR( 1, NX*NY, TPTR, STATUS )
         CALL ARR_COP1R( NX*NY, ARRAY, %VAL(TPTR), STATUS )
@@ -3236,11 +3254,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR_INIT - Tabular defined PSF initialisation
-      SUBROUTINE PSF_TABULAR_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_TABULAR_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
-*     Gets a user defined PSF and associates it with a PSF slot.
+*     Gets a 2-d tabular image and associates it with a psf object
 *
 *    Environment parameters :
 *
@@ -3269,13 +3287,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_TABULAR_CMN'
 *
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *
@@ -3293,11 +3308,15 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CHARACTER*80            	TNAME             	! Table file name
       CHARACTER*40            	UNITS             	! Spatial units
 
+      REAL			ELEVS(10), RADII(10)
       REAL			SPARR(2)		! Axis definition
+      REAL			TOR			! Radian conversion
 
       INTEGER			IDUM			! Dummy argument
       INTEGER                 	NDIM, DIMS(ADI__MXDIM)  ! Size of data array
+      INTEGER			NLEV			! Number of levels
       INTEGER                 	DPTR              	! Ptr to data
+      INTEGER                 	TDPTR              	! Dyn ptr to data
       INTEGER			TFID			! Table identifier
 
       LOGICAL                 ELEVS_OK          ! Energy levels structure ok?
@@ -3334,24 +3353,25 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Get axis units
         CALL BDI_AXGET0C( TFID, 1, 'Units', UNITS, STATUS )
-        CALL CONV_UNIT2R( UNITS, TB_TOR(SLOT), STATUS )
+        CALL CONV_UNIT2R( UNITS, TOR, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          TB_TOR(SLOT) = 1.0
+          TOR = 1.0
         END IF
 
 *      Get axis values
         CALL BDI_AXGET1R( TFID, 1, 'SpacedData', 2, SPARR, IDUM,
      :                    STATUS )
-        TB_TOR(SLOT) = ABS(TB_TOR(SLOT)*SPARR(2))
+        TOR = ABS(TOR*SPARR(2))
+        CALL PSF0_SETID0R( PSID, 'Tor', TOR, STATUS )
 
 *      If ok then make a copy of this data and store
         IF ( STATUS .EQ. SAI__OK ) THEN
-          TB_DIMS(SLOT,1) = DIMS(1)
-          TB_DIMS(SLOT,2) = DIMS(2)
-          CALL DYN_MAPR( 2, DIMS, TB_DPTR(SLOT), STATUS )
+          CALL PSF0_SETID1I( PSID, 'Dims', 2, DIMS, STATUS )
+          CALL DYN_MAPR( 2, DIMS, TDPTR, STATUS )
+          CALL PSF0_SETID0I( PSID, 'Dptr', TDPTR, STATUS )
           CALL ARR_COP1R( DIMS(1)*DIMS(2), %VAL(DPTR),
-     :                   %VAL(TB_DPTR(SLOT)), STATUS )
+     :                    %VAL(TDPTR), STATUS )
         END IF
 
 *      Inform user
@@ -3363,22 +3383,21 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *  Look for energy radii
-      TB_NLEV(SLOT) = 0
+      NLEV = 0
       CALL ADI1_LOCPSF( TFID, .FALSE., PLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         CALL DAT_THERE( PLOC, 'ELEVS', ELEVS_OK, STATUS )
         CALL DAT_THERE( PLOC, 'RADII', RADII_OK, STATUS )
         IF ( ELEVS_OK .AND. RADII_OK ) THEN
-          CALL CMP_GET1R( PLOC, 'ELEVS', 10, TB_ELEVS(SLOT,1),
-     :                                   TB_NLEV(SLOT), STATUS )
-          CALL CMP_GET1R( PLOC, 'RADII', 10, TB_RADII(SLOT,1),
-     :                                   TB_NLEV(SLOT), STATUS )
+          CALL CMP_GET1R( PLOC, 'ELEVS', 10, ELEVS, NLEV, STATUS )
+          CALL CMP_GET1R( PLOC, 'RADII', 10, RADII, NLEV, STATUS )
         END IF
       ELSE
         CALL ERR_ANNUL( STATUS )
       END IF
+      CALL PSF0_SETID0I( PSID, 'Nlev', NLEV, STATUS )
 
-*    Release from BDA
+*  Release from BDI
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
@@ -3391,7 +3410,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR_PFL - Tabular energy profiling
-      SUBROUTINE PSF_TABULAR_PFL( SLOT, NFRAC, FRAC, RADII, STATUS )
+      SUBROUTINE PSF_TABULAR_PFL( PSID, NFRAC, FRAC, RADII, STATUS )
 *
 *    Description :
 *
@@ -3417,12 +3436,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_TABULAR_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT,NFRAC
+      INTEGER                  PSID,NFRAC
       REAL                     FRAC(*)
 *
 *    Export :
@@ -3432,23 +3449,32 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Status :
 *
       INTEGER                  STATUS                  ! Run-time error
+*
+*    Local variables:
+*
+      REAL			TOR
+      INTEGER			DIMS(2), NDIM, DPTR
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Call internal routine
-      CALL PSF_TABULAR_PFL_INT( SLOT, TB_DIMS(SLOT,1), TB_DIMS(SLOT,2),
-     :                          %VAL(TB_DPTR(SLOT)), NFRAC, FRAC,
-     :                          RADII, STATUS )
+*  Extract tabular control data
+      CALL PSF0_GETID0R( PSID, 'Tor', TOR, STATUS )
+      CALL PSF0_GETID1I( PSID, 'Dims', 2, DIMS, NDIM, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Dptr', DPTR, STATUS )
+
+*  Call internal routine
+      CALL PSF_TABULAR_PFL_INT( PSID, DIMS(1), DIMS(2), %VAL(DPTR),
+     :                          TOR, NFRAC, FRAC, RADII, STATUS )
 
       END
 
 
 
 *+  PSF_TABULAR_PFL_INT -
-      SUBROUTINE PSF_TABULAR_PFL_INT( SLOT, NX, NY, DATA, NFRAC, FRAC,
-     :                                                 RADII, STATUS )
+      SUBROUTINE PSF_TABULAR_PFL_INT( PSID, NX, NY, DATA, TOR,
+     :                                NFRAC, FRAC, RADII, STATUS )
 *
 *    Description :
 *
@@ -3470,13 +3496,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_TABULAR_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT,NFRAC
-      REAL                     FRAC(*)
+      INTEGER                  PSID,NFRAC
+      REAL                     FRAC(*), TOR
       INTEGER                  NX,NY
       REAL                     DATA(-NX/2:NX/2,-NY/2:NY/2)
 *
@@ -3560,7 +3584,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         END IF
 
 *      Convert to radians from fractional pixels
-        RADII(I) = RADII(I) * TB_TOR(SLOT)
+        RADII(I) = RADII(I) * TOR
 
       END DO
 
@@ -3647,7 +3671,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_WFC_INIT - Initialise the WFC survey psf system
-      SUBROUTINE PSF_WFC_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_WFC_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -3679,7 +3703,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *-
@@ -3937,7 +3960,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_XRT_HRI - ROSAT XRT HRI PSF
-      SUBROUTINE PSF_XRT_HRI( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+      SUBROUTINE PSF_XRT_HRI( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
      :                                              NY, ARRAY, STATUS )
 *
 *    Description :
@@ -3979,7 +4002,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       REAL                     DX, DY, X0, Y0,QX,QY
-      INTEGER                  NX,NY,SLOT
+      INTEGER                  NX,NY,PSID
       LOGICAL                  INTEG
 *
 *    Export :
@@ -4150,7 +4173,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_XRT_PSPC - ROSAT XRT PSPC PSF
-      SUBROUTINE PSF_XRT_PSPC( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+      SUBROUTINE PSF_XRT_PSPC( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
      :                                              NY, ARRAY, STATUS )
 *
 *    Description :
@@ -4226,7 +4249,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       REAL                      DX, DY, X0, Y0,QX,QY
-      INTEGER                   NX,NY,SLOT
+      INTEGER                   NX,NY,PSID
       LOGICAL                   INTEG
 *
 *    Export :
@@ -4264,6 +4287,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
+      CHARACTER*3		OPT			! Profile option
+
       REAL                     ENERGY                  ! Mean photon energy
       REAL                     FWHM, SIG               ! Gaussian attrs
       REAL                     LNORM                   ! Normalisation constant
@@ -4289,7 +4314,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                  I, J                    ! Major pixel loops
       INTEGER                  II, JJ                  ! Sub-pixel loops
       INTEGER                  MNX, MNY                ! Local calc bounds
-      INTEGER                  OPT                     ! Psf option #
       INTEGER                  XSUB, YSUB              ! Sub-pixel factors
 
       LOGICAL                  SYMMETRIC               ! Symmetric about centre?
@@ -4305,21 +4329,23 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                O2_A2*MATH_EXPR(-SQRT(DEL/O2_S2))
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Defined energy band?
-      IF ( RX_PHA_DEF(SLOT) ) THEN
-        ENERGY = REAL(RX_PHALO(SLOT))/100.0
+*  Defined energy band?
+      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      IF ( PHADEF ) THEN
+        CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
+        ENERGY = REAL(PHALO)/100.0
       ELSE
-        ENERGY = RX_ENERGY(SLOT)
+        CALL PSF0_GETID0I( PSID, 'Energy', ENERGY, STATUS )
       END IF
 
-*    Get PSPC option and energy
-      OPT = RX_OPTION(SLOT)
+*  Get PSPC option
+      CALL PSF0_GETID0C( PSID, 'Form', OPT, STATUS )
 
-*    The variable gaussian option
-      IF ( OPT .EQ. PSF_PSPC__VARG ) THEN
+*  The variable gaussian option
+      IF ( OPT .EQ. 'VGS' ) THEN
 
 *      Get off-axis angle in arcminutes
         ROFF = SQRT( X0**2 + Y0**2 ) * MATH__RTOD * 60.0
@@ -4340,7 +4366,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       ELSE
 
 *      A few variables to speed things up
-        IF ( OPT .EQ. PSF_PSPC__ONAX3 ) THEN
+        IF ( OPT .EQ. 'ON3' ) THEN
 
 *        Relative fractions of 3 components
           O3_A2 = 10**(-1.618+0.507*ENERGY+0.148*ENERGY*ENERGY) ! exponential
@@ -4371,7 +4397,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           P_SCALE = SQRT(O3_SIGMA**2+O3_RC**2)/RTOS
 
 *      2-component on axis
-        ELSE IF ( OPT .EQ. PSF_PSPC__ONAX2 ) THEN
+        ELSE IF ( OPT .EQ. 'ON2' ) THEN
           O2_S1_2 = -0.5 / O2_S1**2
           P_SCALE = O2_S1/RTOS
 
@@ -4379,11 +4405,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         ELSE IF ( OPT .EQ. PSF_PSPC__VARP ) THEN
 
 *        Select energy bin
-          EBIN = PSF_XRT_PSPC_EBIN( RX_CB_NEBIN,
-     :                              %VAL(RX_CB_EAPTR),
+          EBIN = PSF_XRT_PSPC_EBIN( RX_CB_NEBIN, %VAL(RX_CB_EAPTR),
      :                              (RX_CB_EWPTR.NE.0),
-     :                              %VAL(RX_CB_EWPTR),
-     :                              ENERGY )
+     :                              %VAL(RX_CB_EWPTR), ENERGY )
 
 *        Off-axis angle in arcmin
           OFFAXIS = SQRT(X0*X0+Y0*Y0)*MATH__RTOD*60.0
@@ -4444,9 +4468,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
             SDX = DX / XSUB
 
 *          Correct normalisation for sub-pixel and pixel size
-            IF ( OPT .EQ. PSF_PSPC__VARP ) THEN
+            IF ( OPT .EQ. 'VRP' ) THEN
               LNORM = ABS(SDX*SDY*RTOM*RTOM)
-            ELSE IF ( OPT .EQ. PSF_PSPC__ONAX3 ) THEN
+            ELSE IF ( OPT .EQ. 'ON3' ) THEN
               LNORM = ABS(SDX*SDY*RTOS*RTOS)/NORM/408.7386
             ELSE
               LNORM = ABS(SDX*SDY*RTOS*RTOS)/NORM
@@ -4465,7 +4489,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
               XPS = XP0 + DX*(I-1) + 0.5*SDX
 
 *            For each sub-pixel
-              IF ( OPT .EQ. PSF_PSPC__VARP ) THEN
+              IF ( OPT .EQ. 'VRP' ) THEN
 
                 DO II = 0, XSUB-1
 
@@ -4482,7 +4506,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
                 END DO
 
-              ELSE IF ( OPT .EQ. PSF_PSPC__ONAX3 ) THEN
+              ELSE IF ( OPT .EQ. 'ON3' ) THEN
 
                 DO II = 0, XSUB-1
 
@@ -4769,7 +4793,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_XRT_PSPC_HINT - XRT PSPC psf hint handler
-      SUBROUTINE PSF_XRT_PSPC_HINT( SLOT, HINT, DATA, STATUS )
+      SUBROUTINE PSF_XRT_PSPC_HINT( PSID, HINT, DATA, STATUS )
 *
 *    Description :
 *
@@ -4793,15 +4817,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_XRT_PSPC_CMN'
 *
 *    Import :
 *
-      INTEGER                 	SLOT            	! PSF handle
+      INTEGER                 	PSID
       CHARACTER*(*)           	HINT		 	! Hint name
 *
 *    Export :
@@ -4811,28 +4830,34 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Status :
 *
       INTEGER                   STATUS
+*
+*   Local variables:
+*
+      CHARACTER*3		OPT			! Psf form
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Radial symmetry?
+*  Radial symmetry?
       IF ( HINT .EQ. PSF_H_RADSYM ) THEN
 
-*      All our models are radially symmetric about on-axis direction
+*    All our models are radially symmetric about on-axis direction
         CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
 
-*    Position dependent
+*  Position dependent?
       ELSE IF ( HINT .EQ. PSF_H_POSDEP ) THEN
 
-*      The ONAXIS psf isn't position dependent
-        CALL ARR_COP1L( 1, (RX_OPTION(SLOT).NE.PSF_PSPC__ONAX3),
-     :                                            DATA, STATUS )
+*    Get the psf form
+        CALL PSF0_GETID0C( PSID, 'Form', OPT, STATUS )
 
-*    Energy dependent
+*    The ONAXIS3 psf isn't position dependent
+        CALL ARR_COP1L( 1, (OPT.NE.'ON3'), DATA, STATUS )
+
+*  Energy dependent
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
 
-*      They all vary with energy
+*    They all vary with energy
         CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
 
       ELSE
@@ -4845,7 +4870,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_XRT_PSPC_INIT - XRT PSPC psf initialisation
-      SUBROUTINE PSF_XRT_PSPC_INIT( PSID, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_XRT_PSPC_INIT( PSID, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -4881,7 +4906,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
 *
@@ -4897,8 +4921,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC)	CBLOC			! Cube locator
+      CHARACTER*3		OPT			! Profile option
 
+      REAL			ENERGY			! Psf energy
       REAL			SPARR(2)
+
       CHARACTER*132           FNAME             ! File name of cube
       CHARACTER*20            MASK              ! Mask name
 
@@ -4934,12 +4961,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       ELSE IF ( STR_ABBREV(MASK,'VARGAUSS') ) THEN
 
-        RX_OPTION(SLOT) = PSF_PSPC__VARG
+        OPT = 'VGS'
 
       ELSE IF ( STR_ABBREV(MASK,'VARPROFILE') ) THEN
 
 *      Set option
-        RX_OPTION(SLOT) = PSF_PSPC__VARP
+        OPT = 'VRP'
 
 *      Open the cube
         IF ( .NOT. RX_CB_OPEN ) THEN
@@ -4999,11 +5026,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       ELSE IF ( STR_ABBREV(MASK,'ONAXIS_3') ) THEN
 
-        RX_OPTION(SLOT) = PSF_PSPC__ONAX3
+        OPT = 'ON3'
 
       ELSE IF ( STR_ABBREV(MASK,'ONAXIS_2') ) THEN
 
-        RX_OPTION(SLOT) = PSF_PSPC__ONAX2
+        OPT = 'ON2'
 
       ELSE
         STATUS = SAI__ERROR
@@ -5012,14 +5039,18 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END IF
 
-*    Get a mean photon energy
-      IF ( (RX_OPTION(SLOT) .NE. PSF_PSPC__ONAX2)
-     :      .AND. .NOT. RX_PHA_DEF(SLOT) ) THEN
+*  Get a mean photon energy unless PHA band is defined
+      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      IF ( (OPT .NE. 'ON2') .AND. .NOT. PHADEF ) THEN
         CALL USI_PROMT( 'AUX', 'Mean photon energy in KeV', STATUS )
-        CALL USI_GET0R( 'AUX', RX_ENERGY(SLOT), STATUS )
+        CALL USI_GET0R( 'AUX', ENERGY, STATUS )
+        CALL PSF0_SETID0R( PSID, 'Energy', ENERGY, STATUS )
       END IF
 
-*    Tidy up
+*  Store option
+      CALL PSF0_SETID0C( PSID, 'Form', OPT, STATUS )
+
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_XRT_PSPC_INIT', STATUS )
       END IF
