@@ -73,8 +73,8 @@
       IF ( NAME .EQ. 'DATAPIC' ) THEN
          CALL DATAPIC( STATUS )
 
-      ELSE IF ( NAME .EQ. 'CALPOL' ) THEN
-         CALL CALPOL( STATUS )
+      ELSE IF ( NAME .EQ. 'POLCAL' ) THEN
+         CALL POLCAL( STATUS )
 
       ELSE IF ( NAME .EQ. 'POLEXP' ) THEN
          CALL POLEXP( STATUS )

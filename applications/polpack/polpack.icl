@@ -35,7 +35,7 @@
 {  Basic command definitions.
 define polexp            $POLPACK_DIR/polpack_mon
 define polimp            $POLPACK_DIR/polpack_mon
-define calpol            $POLPACK_DIR/polpack_mon
+define polcal            $POLPACK_DIR/polpack_mon
 define polmap            $POLPACK_DIR/polpack_mon
 define polka             $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
@@ -43,7 +43,7 @@ defstring polh(elp)      !$POLPACK_DIR/polhelp
 {  Full command definitions.
 define pol_polexp        $POLPACK_DIR/polpack_mon polexp
 define pol_polimp        $POLPACK_DIR/polpack_mon polimp
-define pol_calpol        $POLPACK_DIR/polpack_mon calpol
+define pol_polcal        $POLPACK_DIR/polpack_mon polcal
 define pol_polmap        $POLPACK_DIR/polpack_mon polmap
 define pol_polka         $POLPACK_DIR/polpack_mon polka
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
@@ -53,7 +53,7 @@ defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
 defhelp  polhelp         $POLPACK_HELP
 defhelp  polmap          $POLPACK_HELP
 defhelp  polka           $POLPACK_HELP
-defhelp  calpol          $POLPACK_HELP
+defhelp  polcal          $POLPACK_HELP
 defhelp  polexp          $POLPACK_HELP
 defhelp  polimp          $POLPACK_HELP
 

@@ -2,7 +2,7 @@ Monolith polpack_mon
 
 #+
 #  Name:
-#     CALPOL.IFL
+#     POLCAL.IFL
 
 #  Type of Module:
 #     ADAM A-task parameter interface.
@@ -18,18 +18,18 @@ Monolith polpack_mon
 
 #-
 
-interface CALPOL
+interface POLCAL
 
-   helplib ' '
+   helplib 'POLPACK_HELP:'
 
    parameter IN
       position 1
-      keyword  IN
-      type     LITERAL
+      type     NDF
       access   READ
-      vpath    'CURRENT'
-      ppath    'CURRENT'
-      prompt   'Input polarisation image'
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input polarisation images'
       helpkey  '*'
    endparameter
 
@@ -121,14 +121,14 @@ interface CALPOL
       helpkey  '*'
    endparameter
 
-   parameter  TSPOUT           # TEMPORARY TSP OUTPUT
-      type    NDF
-      access  WRITE
-      vpath   'CURRENT,PROMPT'
-      ppath   'CURRENT'
-      prompt  'TEMPORARY TSP OUTPUT - DELETE THIS!!'
-      helpkey '*'
-   endparameter
+#   parameter  TSPOUT           # TEMPORARY TSP OUTPUT
+#      type    NDF
+#      access  WRITE
+#      vpath   'CURRENT,PROMPT'
+#      ppath   'CURRENT'
+#      prompt  'TEMPORARY TSP OUTPUT - DELETE THIS!!'
+#      helpkey '*'
+#   endparameter
 
 endinterface
 

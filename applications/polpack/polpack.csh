@@ -57,7 +57,7 @@
 #  Define symbols for the applications and scripts.
 #  ===============================================
 #
-      alias calpol    INSTALL_BIN/calpol
+      alias polcal    INSTALL_BIN/polcal
       alias polhelp   INSTALL_BIN/polhelp 
       alias polexp    INSTALL_BIN/polexp
       alias polimp    INSTALL_BIN/polimp
@@ -66,7 +66,7 @@
 #
 #  Now do the same with alternative names.
 #
-      alias pol_calpol    INSTALL_BIN/pol_calpol
+      alias pol_polcal    INSTALL_BIN/pol_polcal
       alias pol_polhelp   INSTALL_BIN/polhelp 
       alias pol_polexp    INSTALL_BIN/pol_polexp
       alias pol_polimp    INSTALL_BIN/pol_polimp
