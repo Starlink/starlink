@@ -285,7 +285,7 @@
       END DO
 
 *  Access an NDG group containing a list of NDF names.
-      CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NNDF, STATUS )
+      CALL CCD1_NDFGL( 'IN', 1, 10 * CCD1__MXNDF, INGRP, NNDF, STATUS )
 
 *  Get the primary sort key.
       CALL PAR_CHOIC( 'LISTBY', ' ', 'INDEX,NAME,NONE', .FALSE., SRTKEY,

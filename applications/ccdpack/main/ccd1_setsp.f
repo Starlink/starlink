@@ -189,6 +189,17 @@
 *  control characters etc of the old group.
             IF ( GOTKEY .EQ. 0 ) THEN
                NOGRP = NOGRP + 1
+
+*  Check that we have not exceeded the maximum number of output groups.
+               IF ( NOGRP .GT. MAXOG ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'MAXOG', MAXOG )
+                  CALL ERR_REP( 'CCD1_SETSP_MAXOG',
+     :'CCD1_SETSP: Too many output groups (maximum is ^MAXOG)', STATUS )
+                  GO TO 99
+               END IF
+
+*  Create a new group with the new entry in it.
                GOTKEY = NOGRP
                IOUT = 1
                CALL GRP_COPY( IGNDF, I, I, .FALSE., OGNDF( GOTKEY ),
@@ -219,5 +230,7 @@
      :                 'CCD1_SETSP: Bad group key ^KEY', STATUS )
       END IF
 
+*  Error exit label.
+ 99   CONTINUE
       END
 * $Id$
