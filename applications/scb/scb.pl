@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/stardev/Perl/bin/perl -w
 
 #+
 #  Name:
@@ -1367,6 +1367,7 @@ sub output {
 #  Get arguments.
 
    my ($file, $package) = @_;
+   $package ||= "";
 
 #  Get file extension.
 
@@ -1395,7 +1396,7 @@ sub output {
       $ext = '';
       $ext = $1 if ($file =~ /\.([^.]+)$/);
       if (taggable $file) {
-         eval { $tagged = &{$tagger{$ext}} (join ('', <FILE>), $ext) };
+         eval { $tagged = &{$tagger{$ext}} (*FILE, $ext) };
          error "Internal: tagging error: $@" if ($@);
 
 #     Turn the pseudo-HTML produced by the tagging routine into real

@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/stardev/Perl/bin/perl -w
 
 #+
 #  Name:
@@ -693,7 +693,7 @@ sub index_source {
       print "Failed to open $file in directory ".cwd."\n";
       return;
    }
-   my $tagged = &$rtagger (join ('', <SOURCE>), $ext);
+   my $tagged = &$rtagger (*SOURCE, $ext);
    close SOURCE;
 
 #  Write index entries for all the "<a name=''>" type tags.
