@@ -4,6 +4,8 @@
         PARAMETER 		( DYN__NMAX = 500 )
 
       LOGICAL			DYN_ISINIT		! Sub-system initialised?
+      LOGICAL			DYS_DIAG                ! Diagnostics on?
+
       INTEGER			DYS_ISEQ		! File sequence number
       INTEGER			DYS_PTR(DYN__NMAX)	! Section pointers
       INTEGER			DYS_NITEM(DYN__NMAX)	! Section total elements
@@ -12,6 +14,7 @@
 
 *  Word aligned items
       COMMON /DYN_CMN_1/	DYN_ISINIT, DYS_ISEQ, DYS_PTR,
-     :                            DYS_NITEM, DYS_NBYTE, DYS_FID
+     :                            DYS_NITEM, DYS_NBYTE, DYS_FID,
+     :                            DYS_DIAG
 
       SAVE /DYN_CMN_1/
