@@ -3365,6 +3365,11 @@ LONG = CHAR (Read)
 3 MSG_FILTER
 MSG_FILTER = CHAR (Read)
    Message filter level. Default is NORM.
+3 NBEAMS
+NBEAMS = INTEGER (Read)
+   Number of output beams to be written to file. NBEAMS=1 just
+   writes the Middle beam, NBEAMS=2 writes the Left (negative)
+   and Right beams, NBEAMS=3 writes Middle, Left and Right beams.
 3 OUT
 OUT = NDF (Write)
    This parameter specifies the name of the output file to be used
