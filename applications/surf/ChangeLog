@@ -1,3 +1,7 @@
+1999-05-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/sculog: Add POLMAP and POLPHOT
+
 1999-05-18  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_scuover.f (SURF_SCUOVER): Read MJD-OBS from AST/WCS if

@@ -696,6 +696,25 @@ $fitsitem{'OBSDEF'}, $fname
 
 .
 
+##### MAP ######
+
+format POLMAP =
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec @< PA: @<<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'CHOP_PA'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
 ##### FLATFIELD ######
 
 format FLATFIELD =
@@ -825,6 +844,27 @@ $photom_result
 ---------
 
 .
+
+###### Photom ######
+format POLPHOT =
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA: @> @> @<<<< Dec: @>> @> @<<<  Observed centre: @<<<<<<<<<<<
+ @ra, @dec, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$photom_result
+---------
+
+.
+
 
 #####################
 # Now need to define the summary fields (SHORT is default)
