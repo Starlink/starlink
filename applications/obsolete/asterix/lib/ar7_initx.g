@@ -46,7 +46,7 @@
 *     {algorithm_description}...
 
 *  References:
-*     AR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/ar.html
+*     AR7 Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/ar7.html
 
 *  Keywords:
 *     package:ar7, usage:public, initialisation, 7-D
