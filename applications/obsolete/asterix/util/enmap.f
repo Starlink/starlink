@@ -31,6 +31,7 @@
 *     28 Jun 93 : V1.7-0  Handle quality and writes full history (DJA)
 *     28 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1  New data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -39,8 +40,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -49,8 +49,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   ILOC		! Locator to input file
-      CHARACTER*(DAT__SZLOC)   OLOC		! Locator to output file
       CHARACTER*80             LABEL(3)         ! Axis labels
       CHARACTER*80             PATH(4)          ! Input dataset path for History
       CHARACTER*80             TEXT             ! History text
@@ -59,19 +57,21 @@
 
       INTEGER                  AXLP
       INTEGER                  AXPTR            ! Input energy axis data
-      INTEGER                  DIMS(DAT__MXDIM) ! Data dimensions
+      INTEGER                  DIMS(ADI__MXDIM) ! Data dimensions
       INTEGER                  ENAX             ! Axis number containing energy
       INTEGER                  IDPTR            ! Input data
+      INTEGER			IFID			! Input dataset id
       INTEGER                  IQPTR            ! Input quality
       INTEGER                  NDIM             ! Data dimensionality
       INTEGER                  NLINES           ! No. of lines of history text
       INTEGER                  ODIM(2)          ! Dimensionas of output array
       INTEGER                  ODPTR            ! Output data
+      INTEGER			OFID			! Output dataset id
       INTEGER                  OQPTR            ! Output quality
       INTEGER                  ORDER(3)         ! Order of input axes
                                                 ! energy is order(3)
       INTEGER                  QNDIM            ! Quality dimensions
-      INTEGER                  QDIMS(DAT__MXDIM)
+      INTEGER                  QDIMS(ADI__MXDIM)
       INTEGER                  TLEN             ! Length of text used
       INTEGER                  TPTR             ! Workspace
 
@@ -82,8 +82,8 @@
 *
 *    Version :
 *
-      CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'ENMAP Version 1.8-0')
+      CHARACTER*30		VERSION
+        PARAMETER  		( VERSION = 'ENMAP Version 1.8-1' )
 *-
 
 *    Check status
@@ -92,36 +92,35 @@
 *    Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise Asterix common blocks
-      CALL AST_INIT
+*    Initialise Asterix
+      CALL AST_INIT()
 
 *    Get name of input file and output file
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC,
-     :                                       INPRIM, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Is data array there ?
-      CALL BDA_CHKDATA( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       IF ( .NOT. OK ) THEN
         CALL MSG_PRNT('Error accessing data_array')
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Check that input data is 3 dimensional
       IF (NDIM .NE. 3) THEN
         CALL MSG_PRNT('** Input data must be 3-dimensional **')
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Get thresholding value from the environment.
       CALL USI_GET0R('THRESH', THRESH, STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *   Copy the relevant parts of the input file to the output file
 *    Title, label and units:
-        CALL BDA_COPTEXT(ILOC, OLOC, STATUS)
+        CALL BDI_COPTEXT(IFID, OFID, STATUS)
 *    More box:
-        CALL BDA_COPMORE(ILOC, OLOC, STATUS)
+        CALL BDI_COPMORE(IFID, OFID, STATUS)
 *
         IF (STATUS .NE. SAI__OK) THEN
            CALL MSG_PRNT('Warning: Error copying auxilliary '/
@@ -130,23 +129,23 @@
         ENDIF
 
 *    Map the input data array
-      CALL BDA_MAPDATA( ILOC, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error mapping data array')
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Is quality present?
-      CALL BDA_CHKQUAL( ILOC, QOK, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, QOK, QNDIM, QDIMS, STATUS )
       IF ( QOK ) THEN
-        CALL BDA_MAPQUAL( ILOC, 'READ', IQPTR, STATUS )
-        CALL BDA_GETMASK( ILOC, IQMASK, STATUS )
+        CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
+        CALL BDI_GETMASK( IFID, IQMASK, STATUS )
       END IF
 
 *    Find which axis is the energy axis
       ENAX = 0
       DO AXLP=1,3
-        CALL BDA_GETAXLABEL(ILOC, AXLP, LABEL(AXLP), STATUS)
+        CALL BDI_GETAXLABEL(IFID, AXLP, LABEL(AXLP), STATUS)
         IF ( INDEX(LABEL(AXLP), 'ENERGY') .NE. 0 .OR.
      :       INDEX(LABEL(AXLP), 'PH') .NE. 0 ) THEN
           ENAX=AXLP
@@ -160,14 +159,14 @@
         IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL(STATUS)
 
 *      Get axis choice from user
-        CALL AXIS_GET(ILOC, 'AMP', 'ENAXIS', 3, ENAX, STATUS)
-        IF (STATUS .NE. SAI__OK) GOTO 999
+        CALL AXIS_TGET( IFID, 'AMP', 'ENAXIS', 3, ENAX, STATUS )
+        IF (STATUS .NE. SAI__OK) GOTO 99
 
       END IF
 
 *    Attempt to map the energy axis. NB: this routine fills the array with
 *    values 1-N if the axis isn't present in the input file
-      CALL BDA_MAPAXVAL( ILOC, 'READ', ENAX, AXPTR, STATUS )
+      CALL BDI_MAPAXVAL( IFID, 'READ', ENAX, AXPTR, STATUS )
 
 *    Create order array to show where energy axis is
       ORDER(3)=ENAX
@@ -187,18 +186,18 @@
       ODIM(2) = DIMS(ORDER(2))
 
 *    Create output array
-      CALL BDA_CREDATA( OLOC, 2, ODIM, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+      CALL BDI_CREDATA( OFID, 2, ODIM, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error creating and mapping output array')
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Create output quality
       IF ( QOK ) THEN
-        CALL BDA_CREQUAL( OLOC, 2, ODIM, STATUS )
-        CALL BDA_MAPQUAL( OLOC, 'WRITE', OQPTR, STATUS )
-        CALL BDA_PUTMASK( OLOC, QUAL__MASK, STATUS )
+        CALL BDI_CREQUAL( OFID, 2, ODIM, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
       END IF
 
 *    Zero output arrays
@@ -212,7 +211,7 @@
       CALL DYN_MAPR( 2, ODIM, TPTR, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error mapping temporary space')
-        GOTO 999
+        GOTO 99
       END IF
 
 *    Zero temp. array
@@ -225,32 +224,26 @@
      :                   %VAL(TPTR), %VAL(ODPTR), %VAL(OQPTR), STATUS )
 
 *    Create axis structure in output file and copy relevant axes from input file
-      CALL BDA_CREAXES( OLOC, 2, STATUS )
-      CALL BDA_COPAXIS( ILOC, OLOC, ORDER(1), 1, STATUS )
-      CALL BDA_COPAXIS( ILOC, OLOC, ORDER(2), 2, STATUS )
-
-*    Delete axis structure if there was an error creating it
-      IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_ANNUL( STATUS )
-        CALL DAT_ERASE( OLOC, 'AXIS', STATUS )
-      ENDIF
+      CALL BDI_CREAXES( OFID, 2, STATUS )
+      CALL BDI_COPAXIS( IFID, OFID, ORDER(1), 1, STATUS )
+      CALL BDI_COPAXIS( IFID, OFID, ORDER(2), 2, STATUS )
 
 *    Copy history from the original file
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
 
 *    Add history record
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Create text strings for history
       CALL USI_NAMEI( NLINES, PATH, STATUS)
-      CALL HIST_PTXT( OLOC, NLINES, PATH, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
 
 *    Write threshold value
       CALL MSG_MAKE( 'Threshold value ^THRESH', TEXT, TLEN )
-      CALL HIST_PTXT( OLOC, 1, TEXT(:TLEN), STATUS )
+      CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
 
 *    Tidy up
- 999  CALL AST_CLOSE()
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
