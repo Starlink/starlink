@@ -107,7 +107,7 @@
 
 	CALL GETINP( 'CONTAINER', LOCTOP, STATUS )
 
-	type *, 'after getinp'
+!	print *, 'after getinp'
 	IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL ERR_REP( 'ERR', 'error after GETINP ...', STATUS)
 	  CALL DAT_ANNUL( LOCTOP, STATUS)
@@ -116,7 +116,7 @@
 
 *      find the top level locators for the OBS structure
 
-	type *, 'before dat_find'
+!	print *, 'before dat_find'
 	CALL DAT_FIND( LOCTOP, 'OBS', LOCOBS, STATUS)
 
 	IF ( STATUS .NE. SAI__OK ) THEN
@@ -125,7 +125,7 @@
 	  CALL DAT_ANNUL( LOCTOP, STATUS)
 	  RETURN
 	END IF
-	type *, 'after dat_find'
+!	print *, 'after dat_find'
 
 *      get start, end obs element, the channel name to be used and the
 *      prefix for the output filename sequence
