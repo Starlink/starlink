@@ -206,6 +206,10 @@
      :  ITYPE * ( NDF__SZTYP ),! Numeric type for processing
      :  TYPE * ( NDF__SZTYP )  ! Data type of an array component
 
+      DOUBLE PRECISION
+     :  MATRIX( NDF__MXDIM*NDF__MXDIM ),! Matrix component of linear mapping
+     :  OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
+
       INTEGER
      :  ACTVAL,                ! Actual number of compression factors
      :  ACOMPR( 2 ),           ! 1-d compression for axis (2nd factor
@@ -234,6 +238,7 @@
      :  NDFS,                  ! Identifier to the section of the input
                                ! NDF
      :  NDIM,                  ! Dimensionality of the NDF
+     :  NDIMI,                 ! Actual dimensionality of the NDF
      :  NLIM,                  ! Minimum number of elements in input
                                ! averaging box to form good output value
      :  ODIMS( NDF__MXDIM ),   ! Dimensions of output array
@@ -277,6 +282,7 @@
 
 *  The subroutines require that there must be at least two dimensions
 *  in the arrays, but higher ones may be dummies.
+      NDIMI = NDIM
       NDIM = MAX( NDIM, 2 )
 
 *  Obtain the compression factors.
@@ -297,10 +303,11 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Should less values be entered than is required copy the last value to
-*  higher dimensions.
+*  higher dimensions, limiting it to be no smaller than the corresponding
+*  input NDF axis.
       IF ( ACTVAL .LT. NDIM ) THEN
          DO I = ACTVAL + 1, NDIM
-            COMPRS( I ) = COMPRS( ACTVAL )
+            COMPRS( I ) = MIN( IDIMS( I ), COMPRS( ACTVAL ) )
          END DO
       END IF
 
@@ -359,7 +366,7 @@
 *  arithmetic truncation.  Also derive bounds for the output array.
 *  These are somewhat arbitrary.
       DO I = 1, NDIM
-         ODIMS( I ) = IDIMS( I ) / COMPRS( I )
+         ODIMS( I ) = MAX( 1, IDIMS( I ) / COMPRS( I ) )
          LBNDO( I ) = 1
          UBNDO( I ) = ODIMS( I )
       END DO
@@ -664,6 +671,21 @@
             END IF
          END DO
       END IF
+
+*  Propagate the WCS component, incorporating a linear mapping between
+*  pixel coordinates. This mapping is described by a matrix and an offset
+*  vector. Set these up. 
+      DO I = 1, NDIMI*NDIMI
+         MATRIX( I ) = 0.0
+      END DO
+
+      DO J = 1, NDIMI
+         OFFSET( J ) = DBLE( 1 - LBND( J ) )/DBLE( COMPRS( J ) )
+         MATRIX( NDIMI*( J - 1 ) + J ) = 1.0D0/DBLE( COMPRS( J ) )
+      END DO
+
+*  Propagate the WCS component.
+      CALL KPG1_ASPRP( NDIMI, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
 *  Tidy the counting workspace.
       CALL PSX_FREE( WPNTR1, STATUS )
