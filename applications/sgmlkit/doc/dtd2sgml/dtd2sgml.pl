@@ -65,23 +65,27 @@ foreach $e (@elements) {
     print "</dtdparents>\n";
 
     @content = $dtd->get_base_children ($e, 1);
-    print "<dtdcontent>\n<dtdcontentmodel>\n";
+    print "<dtdcontent>\n";
+    $op = '';
     foreach $ce (@content) {
-	$ce = lc($ce);
-	if ($ce =~ /[a-z]+/) {
-	    if (SGML::DTD->is_elem_keyword($ce)) {
-		print "$ce\n";
-	    } else {
-		print "<dtdelemref id='e.$ce' />\n";
-	    }
+	if (SGML::DTD->is_occur_indicator($ce)
+	    || SGML::DTD->is_group_connector($ce)) {
+	    $op .= " $ce\n";
+	} elsif (SGML::DTD->is_tag_name($ce)) {
+	    $ce = lc($ce);
+	    $op .= "<dtdelemref id='e.$ce'/>";
 	} else {
-	    print " $ce ";
+	    $op .= "$ce";
 	}
     }
+    # escape ampersands
+    $op =~ s/&/&amp;/g;
+    print "<dtdcontentmodel>\n$op</dtdcontentmodel>\n";
 
-    print "</dtdcontentmodel>\n<dtdcontenttree>\n";
+    print "<dtdcontenttree><![CDATA[";
     $dtd->print_tree($e, 2);
-    print "</dtdcontenttree>\n";
+    print "]]></dtdcontenttree>\n";
+
     print "</dtdcontent>\n";
 
     # FIXME -- following doesn't deal with notations properly
