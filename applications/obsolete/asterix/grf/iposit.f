@@ -326,7 +326,8 @@
               IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
-                CALL SSI_GETNSRC( SFID, NSRC, STATUS )
+                CALL ADI_CGET0I( SFID, 'NSRC', NSRC, STATUS )
+
                 IF (NSRC.EQ.0 ) THEN
                   CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
                 ELSE
