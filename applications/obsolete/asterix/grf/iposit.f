@@ -42,38 +42,25 @@
         CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
 
-*  being run from a GUI - find out which mode
-        IF (I_GUI) THEN
-          CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
-          CALL NBS_GET_CVALUE(OID,0,OPTION,NB,STATUS)
-          IF (OPTION(1:1).EQ.'T') THEN
-            CALL IPOSIT_GUI(STATUS)
-          ENDIF
-        ELSE
-          OPTION=' '
-        ENDIF
-
-        IF (OPTION(1:1).NE.'T') THEN
 
 *  see if dealing with multiple positions
-          CALL USI_GET0L('ENTER',ENTER,STATUS)
-          IF (ENTER) THEN
+        CALL USI_GET0L('ENTER',ENTER,STATUS)
+        IF (ENTER) THEN
 
-            CALL IPOSIT_ENTER(STATUS)
+          CALL IPOSIT_ENTER(STATUS)
 
-          ELSEIF (I_NPOS.GT.0) THEN
-            CALL USI_GET0L('SHOW',SHOW,STATUS)
-            IF (SHOW) THEN
+        ELSEIF (I_NPOS.GT.0) THEN
+          CALL USI_GET0L('SHOW',SHOW,STATUS)
+          IF (SHOW) THEN
 
-              CALL IPOSIT_SHOW(STATUS)
+            CALL IPOSIT_SHOW(STATUS)
 
-            ELSE
-              CALL USI_GET0L('SEL',SEL,STATUS)
-              IF (SEL) THEN
+          ELSE
+            CALL USI_GET0L('SEL',SEL,STATUS)
+            IF (SEL) THEN
 
-                CALL IPOSIT_SELECT(STATUS)
+              CALL IPOSIT_SELECT(STATUS)
 
-              ENDIF
             ENDIF
           ENDIF
 
@@ -113,11 +100,18 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
-      CHARACTER*1 CH
+      CHARACTER CH*1,OPT*8
       CHARACTER*20 SRA,SDEC
       DOUBLE PRECISION RA,DEC,ELON,ELAT,B,L
       REAL X,Y,XPIX,YPIX
+      REAL XP1,XP2,YP1,YP2
+      REAL XW1,XW2,YW1,YW2
+      REAL XSCALE,YSCALE
+      REAL XOLD,YOLD
       INTEGER FRAME
+      INTEGER IXPMAX,IYPMAX
+      INTEGER IXP,IYP
+      LOGICAL FOK
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
@@ -126,12 +120,99 @@
 *  ensure transformations correct
         CALL GTR_RESTORE(STATUS)
 
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
+*  running from GUI
+        IF (I_GUI) THEN
+
+*  get transformation info
+          CALL IMG_NBGET0I('XPMAX',IXPMAX,STATUS)
+          CALL IMG_NBGET0I('YPMAX',IYPMAX,STATUS)
+          CALL PGQVP(3,XP1,XP2,YP1,YP2)
+          CALL PGQWIN(XW1,XW2,YW1,YW2)
+          XSCALE=(XW2-XW1)/(XP2-XP1)
+          YSCALE=(YW2-YW1)/(YP2-YP1)
+          XOLD=I_X
+          YOLD=I_Y
+
+*  form input, track or point
+          CALL IMG_NBGET0C('OPTIONS',OPT,STATUS)
+          IF (OPT(:4).EQ.'FORM') THEN
+            I_FORM=.TRUE.
+          ELSE
+            I_FORM=.FALSE.
+            IF (OPT(:5).EQ.'TRACK') THEN
+*  track position until signal received from GUI
+              FLAG=0
+              DO WHILE (FLAG.EQ.0)
+                CALL IMG_NBGET0I('XP',IXP,STATUS)
+                CALL IMG_NBGET0I('YP',IYP,STATUS)
+                IYP=IYPMAX-IYP
+                X=XW1+(REAL(IXP)-XP1)*XSCALE
+                Y=YW1+(REAL(IYP)-YP1)*YSCALE
+                CALL IMG_SETPOS(X,Y,STATUS)
+                CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
+              ENDDO
+              IF (FLAG.EQ.3) THEN
+*  switched to form input
+                I_FORM=.TRUE.
+              ELSEIF (FLAG.NE.1) THEN
+*  revert to previous position
+                CALL IMG_SETPOS(XOLD,YOLD,STATUS)
+              ENDIF
+            ELSEIF (OPT(:5).EQ.'POINT') THEN
+*  get position from GUI and convert to various frames
+              CALL IMG_NBGET0I('XP',IXP,STATUS)
+              CALL IMG_NBGET0I('YP',IYP,STATUS)
+              IYP=IYPMAX-IYP
+              X=XW1+(REAL(IXP)-XP1)*XSCALE
+              Y=YW1+(REAL(IYP)-YP1)*YSCALE
+              CALL IMG_SETPOS(X,Y,STATUS)
+            ENDIF
+
+          ENDIF
+
+*  form input
+          IF (I_FORM) THEN
+            CALL IMG_FORMOK(FOK,STATUS)
+            IF (FOK) THEN
+              CALL IMG_NBGET0I('PAR_I1',FRAME,STATUS)
+              IF (FRAME.EQ.1) THEN
+                CALL IMG_NBGET0R('PAR_R1',X,STATUS)
+                CALL IMG_NBGET0R('PAR_R2',Y,STATUS)
+
+              ELSEIF (FRAME.EQ.2) THEN
+                CALL IMG_NBGET0C('PAR_C1',SRA,STATUS)
+                CALL IMG_NBGET0C('PAR_C2',SDEC,STATUS)
+                CALL CONV_RADEC(SRA,SDEC,RA,DEC,STATUS)
+                CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
+
+              ELSEIF (FRAME.EQ.3) THEN
+                CALL IMG_NBGET0D('PAR_R1',ELON,STATUS)
+                CALL IMG_NBGET0D('PAR_R2',ELAT,STATUS)
+                CALL IMG_ECLTOWORLD(ELON,ELAT,X,Y,STATUS)
+
+              ELSEIF (FRAME.EQ.4) THEN
+                CALL USI_GET0D('PAR_R1',L,STATUS)
+                CALL USI_GET0D('PAR_R2',B,STATUS)
+                CALL IMG_GALTOWORLD(L,B,X,Y,STATUS)
+
+              ENDIF
+
+              CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
+              CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
+              CALL IMG_NBGET0R('PAR_R3',RAD,STATUS)
+            ENDIF
+          ENDIF
+
+
+
+*  command mode cursor input
+        ELSEIF (I_MODE.EQ.1) THEN
           CALL MSG_PRNT(' ')
           CALL MSG_PRNT('Select position...')
 
           CALL PGCURSE(X,Y,CH)
+
+          CALL IMG_SETPOS(X,Y,STATUS)
 
 *  keyboard mode
         ELSE
@@ -166,9 +247,10 @@
 
           ENDIF
 
+          CALL IMG_SETPOS(X,Y,STATUS)
+
         ENDIF
 
-        CALL IMG_SETPOS(X,Y,STATUS)
 
       ENDIF
 
@@ -527,136 +609,3 @@
 
 
 
-*+  IPOSIT_GUI
-      SUBROUTINE IPOSIT_GUI(STATUS)
-*    Description :
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*    History :
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PRM_PAR'
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Functions :
-*    Local Constants :
-*    Local variables :
-      REAL XP,YP
-      CHARACTER*8 NAME
-      CHARACTER*8 STRING
-      CHARACTER*10 FMT
-      CHARACTER*12 OPTIONS
-      CHARACTER*12 RAS,DECS
-      CHARACTER*12 PIXS
-      BYTE Q
-      INTEGER IXP,IYP,IXPMAX,IYPMAX
-      INTEGER IX,IY
-      INTEGER I,J,II,JJ
-      INTEGER I1,I2,J1,J2
-      INTEGER ISTAT
-      INTEGER XPID,YPID,XPMID,YPMID,FID,OID,XID,YID,PID
-      INTEGER RAID,DECID
-      INTEGER FLAG
-      INTEGER ISCALE
-      INTEGER NB
-      INTEGER N
-      REAL XP1,XP2,YP1,YP2
-      REAL XW,YW
-      REAL XWOLD,YWOLD
-      REAL XW1,XW2,YW1,YW2
-      REAL SCVAL,VAL,VAL2
-      REAL XC,YC,DX,DY
-      REAL XSCALE,YSCALE
-      DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
-      LOGICAL VAR,ERR,SIGNIF,QUAL
-*    Global Variables :
-      INCLUDE 'IMG_CMN'
-*-
-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-*  store current position
-        XWOLD=I_X
-        YWOLD=I_Y
-
-*  locate noticeboard items
-        CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'PIXEL',PID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'XP',XPID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'RA',RAID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'DEC',DECID,STATUS)
-        NAME='DATA'
-        CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
-
-*  get device size
-        CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,NB,STATUS)
-        CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,NB,STATUS)
-
-*  get plot window parameters
-        CALL PGQVP(3,XP1,XP2,YP1,YP2)
-        CALL PGQWIN(XW1,XW2,YW1,YW2)
-
-        XSCALE=(XW2-XW1)/(XP2-XP1)
-        YSCALE=(YW2-YW1)/(YP2-YP1)
-
-        FLAG=0
-        DO WHILE (FLAG.EQ.0)
-
-*  get current cursor position in device coords
-          CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
-          CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
-          IYP=IYPMAX-IYP
-
-*  convert to world coords
-          XW=XW1+(REAL(IXP)-XP1)*XSCALE
-          YW=YW1+(REAL(IYP)-YP1)*YSCALE
-
-*  convert to other frames
-          CALL IMG_WORLDTOCEL(XW,YW,RA,DEC,STATUS)
-          CALL CONV_DEGHMS(REAL(RA),RAS)
-          CALL CONV_DEGDMS(REAL(DEC),DECS)
-          CALL IMG_WORLDTOECL(XW,YW,ELON,ELAT,STATUS)
-          CALL IMG_WORLDTOGAL(XW,YW,GLON,GLAT,STATUS)
-          CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
-          IX=NINT(XP)
-          IY=NINT(YP)
-          CALL CHR_ITOC(IX,PIXS,N)
-          PIXS=PIXS(:N)//','
-          N=N+2
-          CALL CHR_ITOC(IY,PIXS(N:),N)
-
-
-
-          CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
-          CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
-          CALL NBS_PUT_CVALUE(PID,0,PIXS,STATUS)
-          CALL NBS_PUT_CVALUE(RAID,0,RAS,STATUS)
-          CALL NBS_PUT_CVALUE(DECID,0,DECS,STATUS)
-          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
-
-        ENDDO
-
-        IF (FLAG.NE.1) THEN
-          XW=XWOLD
-          YW=YWOLD
-        ENDIF
-
-        CALL IMG_SETPOS(XW,YW,STATUS)
-
-
-      ENDIF
-
-      END
