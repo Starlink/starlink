@@ -80,8 +80,9 @@ awish_LDADD = `nbs_link` `chr_link_adam` \
         `starX_link`
 
 # For some reason starX_link is different to the other _link scripts. 
-# Stop the attempt to create it.
-.PHONY: `starX_link`
+# Stop the attempt to create it by naming the awish dependencies.
+awish_DEPENDENCIES = libtclAdam.la libtkGwm.la
+
 
 # Define what is to be done with which sets of files.
 
