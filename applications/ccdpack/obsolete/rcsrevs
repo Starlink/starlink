@@ -3,7 +3,7 @@
 #  
 makefile: 1.79
 mk: 1.3
-sun139.tex: 1.99
+sun139.tex: 1.100
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
@@ -43,7 +43,7 @@ ccdpack_red.f: 1.1
 ccdpack_reg.f: 1.8
 ccdpack_res.f: 1.2
 ccdpack_scr.f: 1.2
-ccdpack.hlp: 1.78
+ccdpack.hlp: 1.79
 ccdwish.c: 1.12
 grf_ccdpack.c: 1.1
 ccdpack.ifd: 1.15
@@ -252,7 +252,7 @@ Helpcontrol.tcl: 1.3
 Marknumcontrol.tcl: 1.5
 Markstylecontrol.tcl: 1.6
 Ndfalign.tcl: 1.23
-Ndfchoose.tcl: 1.37
+Ndfchoose.tcl: 1.39
 Ndfview.tcl: 1.23
 Percentilecontrol.tcl: 1.8
 Stylecontrol.tcl: 1.7
@@ -571,15 +571,15 @@ subpar_init.f: 1.2
 ccd1_exec.c: 1.1
 slv.c: 1.5
 find_file.c: 1.1
-tcltalk.c: 1.15
+tcltalk.c: 1.16
 tclbg.c: 1.2
-ndf.c: 1.31
+ndf.c: 1.33
 ndfdrawpair.c: 1.10
 ccdputs.c: 1.6
 ccdAppInit.c: 1.11
 ccdaux.c: 1.1
 ndgexpand.c: 1.3
-ccd1_tcurs.c: 1.10
+ccd1_tcurs.c: 1.12
 ccd1_algn.c: 1.5
 ccd1_pndf.c: 1.10
 ccg1_xcly.dgen: 1.1
@@ -752,7 +752,7 @@ register.f: 1.35
 tranlist.f: 1.12
 plotlist.f: 1.14
 findoff.f: 1.36
-pairndf.f: 1.31
+pairndf.f: 1.32
 ccdedit.f: 1.6
 makemos.f: 1.17
 tranndf.f: 1.15
@@ -761,7 +761,7 @@ astimp.f: 1.20
 astexp.f: 1.21
 wcsreg.f: 1.25
 wcsedit.f: 1.15
-drawndf.f: 1.23
+drawndf.f: 1.24
 ccdsetup.f: 1.9
 ccdclear.f: 1.6
 ccdnote.f: 1.1
@@ -812,7 +812,7 @@ makeflat.hlp: 1.5
 ccdedit.hlp: 1.5
 makemos.hlp: 1.7
 ccdfork.hlp: 1.3
-pairndf.hlp: 1.12
+pairndf.hlp: 1.13
 ccdndfac.hlp: 1.3
 plotlist.hlp: 1.7
 ccdnote.hlp: 1.2
