@@ -3149,14 +3149,16 @@ c      LOGICAL VOK,QOK
 
         N=I_NX*I_NY
         IF (I_DPTR_M.EQ.0) THEN
-	print *,1
+	print *,1,status
 	call flush(6)
           CALL DYN_MAPR(1,N,I_DPTR_M,STATUS)
           CALL DYN_MAPR(1,I_NX,I_XPTR_M,STATUS)
           CALL DYN_MAPR(1,I_NY,I_YPTR_M,STATUS)
+	print *,11,status
+	call flush(6)
         ELSE
           CALL DYN_SIZE(I_DPTR_M,M,STATUS)
-	print *,2
+	print *,2,status
 	call flush(6)
           IF (M.LT.N) THEN
             CALL DYN_UNMAP(I_DPTR_M,STATUS)
@@ -3169,7 +3171,7 @@ c      LOGICAL VOK,QOK
         ENDIF
         IF (V) THEN
           IF (I_VPTR_M.EQ.0) THEN
-	print *,3
+	print *,3,status
 	call flush(6)
 
             CALL DYN_MAPR(1,N,I_VPTR_M,STATUS)
@@ -3186,9 +3188,11 @@ c      LOGICAL VOK,QOK
         ENDIF
         IF (Q) THEN
           IF (I_QPTR_M.EQ.0) THEN
-	print *,5
+	print *,5,status
 	call flush(6)
             CALL DYN_MAPB(1,N,I_QPTR_M,STATUS)
+	print *,55,status
+	call flush(6)
           ELSE
             CALL DYN_SIZE(I_QPTR_M,M,STATUS)
 	print *,6
@@ -3201,7 +3205,11 @@ c      LOGICAL VOK,QOK
           ENDIF
         ENDIF
         IF (I_CACHE_M.EQ.0) THEN
+          print *,7,status
+          call flush(6)
           CALL GCB_CRECACHE(I_CACHE_M,STATUS)
+          print *,77,status
+          call flush(6)
         ENDIF
 
       ENDIF
