@@ -12,7 +12,8 @@ STAR_LATEX_DOCUMENTATION(ssn68)
 STAR_DECLARE_DEPENDENCIES(build, [tclsys])
 
 dnl    Locate the tclsh binary.
-STAR_CHECK_PROGS(tclsh8.2)
+dnl    Do not care which version of tclsh
+STAR_CHECK_PROGS(tclsh)
 
 AC_CONFIG_FILES([Makefile component.xml])
 
