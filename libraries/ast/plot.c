@@ -374,6 +374,16 @@ f     - Title: The Plot title drawn using AST_GRID
 *       their normal ranges are not rejected by Map1.
 *       - Only use tick marks which are within the axis range given by the
 *       Bottom and Top Axis attributes.
+*       - Norm1: If the normalized current frame coords are bad, do not 
+*       reinstate the original unnormalized values. For instance, current
+*       Frame values which are outside the valid domain of the projection
+*       should result in bad values when normalized, not the original
+*       good values. The original comment stated "If the normalization 
+*       produced bad coords (e.g. as may happen if the supplied refernce 
+*       value corresponds to a point on the line through the tick mark 
+*       which is outside the valid region of the mapping) leave the original
+*       tick mark values unchanged".
+
 *class--
 */
 
@@ -17441,16 +17451,16 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 /* Transform the Base Frame positions back into the Current Frame. */
    (void) astTransform( map, pset2, 1, pset1 );
 
-/* If good, store these values back in the supplied array. If the
-   normalization produced bad coords (e.g. as may happen if the supplied
-   refernce value corresponds to a point on the line through the tick mark 
-   which is outside the valid region of the mapping) leave the original
-   tick mark values unchanged. */
+/* If good, store these values back in the supplied array. */If the
    if( astOK ) {
       a = ptr1[ axis ];
       for( i = 0; i < nv; i++){
-         newval = *(a++);
-	 if( newval != AST__BAD ) vals[ i ] = newval;
+
+/*       newval = *(a++);
+         if( newval != AST__BAD ) vals[ i ] = newval; */
+
+         vals[ i ] = *(a++);
+
       }
    }
 
