@@ -44,7 +44,7 @@
 # include <time.h>
 #endif
 
-#define INCLUDE_FILE  "ERRNO_PAR"
+#define INCLUDE_FILE  "ERRNO_ERR"
 
 /* internal declarations */
 const char* todaysdate(void);
@@ -66,7 +66,7 @@ int main (int argc, char ** argv) {
         fprintf(OutputFile,
 "*+\n"
 "*  Name:\n"
-"*     ERRNO_PAR\n"
+"*     %s\n"
 "\n"
 "*  Type of Module:\n"
 "*     Fortran include file.\n"
@@ -91,7 +91,7 @@ int main (int argc, char ** argv) {
 "\n"
 "*-\n"
 "\n",
-		progname, todaysdate(), progname);
+		INCLUDE_FILE, progname, todaysdate(), progname);
 
 	
 
