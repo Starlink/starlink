@@ -60,6 +60,10 @@
 *  Status:
       INTEGER  STATUS
 
+*  External References:
+      EXTERNAL RESHAPE            ! To distinguish KAPPA RESHAPE from Fortran
+                                  ! intrinsic function of the same name.
+
 *  Local Variables:
       CHARACTER NAME * ( 15 )     ! Task name from the command
 
