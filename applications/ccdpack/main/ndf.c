@@ -46,9 +46,11 @@
 *
 *     ndfset setname ndfname ?ndfname ...?
 *        Creates a new ndfset object with the given identifying setname
-*        (for presentation to the user) and containing the named NDFs.
-*        Returns the name of a new object command which can be used
-*        to manipulatte the ndfset object.
+*        (for presentation to the user via the ndfset name object command)
+*        and containing the named NDFs.  If an empty string is supplied
+*        for the setname then the name of the first NDF in the list will
+*        be used.  Returns the name of a new object command which can be
+*        used to manipulate the new ndfset object.
 
 *  Object commands:
 *
@@ -81,9 +83,16 @@
 *        according to the frame argument.  Loperc and hiperc give the
 *        percentile values to use for cutoffs.  The plotstyle string
 *        may contain any plotting options desired, in astSet format.
+*
 *        If the '-resamp' option is given, then the image will be 
 *        resampled into the indicated frame before plotting; otherwise
 *        the frame argument is just used for plotting axes.
+*
+*        Applied to an ndf object without the -resamp option, the image
+*        is plotted in its Base frame.  Applied to an ndfset object
+*        without -resamp, it is resampled into its CCD_SET frame.
+*        It is an error to attempt to display an ndfset object without
+*        -resamp unless all its member ndf objects have CCD_SET frames.
 *
 *        The frame may be specified either as a numerical frame index,
 *        as a domain name, or as one of the special strings "BASE"
@@ -683,12 +692,8 @@
 /* Get the number of NDFs in the Set. */
       nndf = objc - 2;
 
-/* Get the name of the ndfset. */
-      ndfsetname = Tcl_GetStringFromObj( objv[ 1 ], &nleng );
-
 /* Allocate the data structure to hold the client data. */
       ndfset = (Ndfset *) malloc( sizeof( Ndfset ) );
-      ndfset->name = malloc( nleng );
       ndfset->plotarray = malloc( sizeof( Plotarray ) );
       ndfset->content.ndfs = malloc( nndf * sizeof( Ndf * ) );
       if ( tclmemok( interp, ndfset ) != TCL_OK ||
@@ -706,13 +711,22 @@
          }
       }
 
+/* Set the name of the ndfset.  If the empty string is supplied, use the
+   name of the first NDF. */
+      ndfsetname = Tcl_GetStringFromObj( objv[ 1 ], &nleng );
+      if ( nleng == 0 ) {
+         ndfsetname = ndfset->content.ndfs[ 0 ]->name;
+         nleng = strlen( ndfsetname );
+      }
+      ndfset->name = malloc( nleng );
+      strcpy( ndfset->name, ndfsetname );
+
 /* Set the ndfset's WCS frameset, arbitrarily, to that of the first of
    of the NDFs. */
       ndfset->wcs = ndfset->content.ndfs[ 0 ]->wcs;
 
 /* Do some other initialisation. */
       ndfset->nmember = nndf;
-      strcpy( ndfset->name, ndfsetname );
       ndfset->plotarray->exists = 0;
       ndfset->plotarray->data = NULL;
 
@@ -925,10 +939,33 @@
             return TCL_ERROR;
          }
 
-/* Set the frame into which the image will be resampled for plotting to 
-   the GRID frame. */
-         for ( i = 0; i < nndf; i++ ) {
-            pframes[ i ] = resamp ? iframes[ i ] : AST__BASE;
+/* Set the frame into which the image will be resampled.  If resamp is
+   true, then it will be the frame specified in the arguments.  If
+   resamp is false, then it will be AST__BASE for a single image or
+   the CCD_SET frame for an Ndfset. */
+         if ( resamp ) {
+            for ( i = 0; i < nndf; i++ ) {
+               pframes[ i ] = iframes[ i ];
+            }
+         }
+         else if ( nndf > 1 ) {
+            if ( NdfGetIframesFromObj( interp,
+                                       Tcl_NewStringObj( "CCD_SET", -1 ),
+                                       ndfset, pframes )
+                 != TCL_OK ) {
+               return TCL_ERROR;
+            }
+            for ( i = 0; i < nndf; i++ ) {
+               if ( pframes[ i ] == AST__NOFRAME ) {
+                  result = Tcl_NewStringObj( "CCD_SET alignment frame " 
+                           "absent in one or more Ndfset members.", -1 );
+                  Tcl_SetObjResult( interp, result );
+                  return TCL_ERROR;
+               }
+            }
+         }
+         else {
+            pframes[ 0 ] = AST__BASE;
          }
 
 /* Open the PGPLOT plotting device. */
