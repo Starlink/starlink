@@ -442,7 +442,7 @@ PRIVATE_INCLUDES = c1_com me_com irm_com ctm_com ctm_par fts_par \
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR AGI_ERR AST_DEV CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
+EXTERNAL_INCLUDES = SAE_PAR AGI_ERR AST_PAR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     FIO_PAR GKS_PAR GNS_PAR GRP_PAR IDI_ERR IDI_PAR \
                     IRA_PAR MAG_ERR MSG_PAR NDF_ERR NDF_PAR NUM_CMN \
                     NUM_DEC NUM_DEC_CVT NUM_DEC_B NUM_DEC_D NUM_DEC_I \
@@ -2982,7 +2982,7 @@ ncraxs.o:          SAE_PAR
 ncrbck.o:          SAE_PAR
 ncropn.o:          SAE_PAR PAR_ERR
 ndfcopy.o:         SAE_PAR PAR_ERR NDF_PAR
-ndftrace.o:        SAE_PAR DAT_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT AST_DEV
+ndftrace.o:        SAE_PAR DAT_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT AST_PAR
 nmplot.o:          SAE_PAR PRM_PAR
 noglobals.o:       SAE_PAR DAT_PAR DAT_ERR
 nomagic.o:         SAE_PAR NDF_PAR PAR_ERR MSG_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
