@@ -882,7 +882,10 @@ itcl::class gaia::Gaia {
             GaiaBlink $w_.\#auto \
                -transient $itk_option(-transient_tools) \
                -number $clone_ \
-               -clone_cmd [code $this make_toolbox blink 1]
+               -clone_cmd [code $this make_toolbox blink 1] \
+               -usexshm $itk_option(-usexshm) \
+               -verbose $itk_option(-verbose) \
+               -subsample $itk_option(-subsample)
          }
       } else {
          error_dialog "Not enough images are displayed to blink."
