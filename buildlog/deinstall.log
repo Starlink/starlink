@@ -1,6 +1,161 @@
-shell-init: could not get current directory: getcwd: cannot access parent directories: No such file or directory
 /apps/jdk
-pwd: could not get current directory: getcwd: cannot access parent directories: No such file or directory
-chdir: could not get current directory: getcwd: cannot access parent directories: No such file or directory
-Buildfile: build.xml does not exist!
-Build failed
+Buildfile: build.xml
+
+prepare:
+
+deinstall:
+
+call_package_ant:
+     [echo] Executing JUnit target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing tamfits target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing axis target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Jetty target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing UTIL target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Task target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing JNIAST target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing ASTGUI target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing JNIHDS target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing HDX target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing NDArray target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing NDX target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Table target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing NDTools target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing HDS target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing FITS target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing DIVA target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing JSky target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Pal target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing VOTable target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing JAIUtil target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing SOAPSERVER target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing SOG target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing SPLAT target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Mirage target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing TOPCAT target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Treeview target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing Coco target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing RV target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing FROG target: deinstall
+
+deinstall:
+
+real_deinstall:
+
+BUILD SUCCESSFUL
+Total time: 8 seconds

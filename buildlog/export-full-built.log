@@ -1,6 +1,21 @@
-shell-init: could not get current directory: getcwd: cannot access parent directories: No such file or directory
 /apps/jdk
-pwd: could not get current directory: getcwd: cannot access parent directories: No such file or directory
-chdir: could not get current directory: getcwd: cannot access parent directories: No such file or directory
-Buildfile: build.xml does not exist!
-Build failed
+Buildfile: build.xml
+
+prepare:
+
+install:
+
+call_package_ant:
+     [echo] Executing JUnit target: install
+
+prepare:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/junit/lib/junit
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/junit/lib/junit
+
+jars:
+      [jar] Updating jar: /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/src.jar
+/apps/cvsbuild/starjava/bin/ant: line 239: 18625 Killed                  "$JAVACMD" $ANT_OPTS -classpath "$LOCALCLASSPATH" -Dant.home="${ANT_HOME}" org.apache.tools.ant.Main $ANT_ARGS "$@"
