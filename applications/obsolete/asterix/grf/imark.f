@@ -21,6 +21,8 @@
 *       5 Sep 94: V1.7-4 OFF option added (RJV)
 *       6 Sep 94: V1.7-5 numbering hived off to GFX routine (RJV)
 *      10 Apr 95: V1.8-0 ALL option for internal list (RJV)
+*      14 Nov 95: V2.0-0 Support for HEASARC database format (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -28,6 +30,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIO_ERR'
       INCLUDE 'PAR_ERR'
+      INCLUDE 'MATH_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -40,7 +43,7 @@
       CHARACTER*(DAT__SZLOC) DLOC
       CHARACTER*132 FILENAME
       CHARACTER*80 REC,RAS*20,DECS*20
-      DOUBLE PRECISION RA,DEC
+      DOUBLE PRECISION RA,DEC,CEL(2),CEL1950(2)
       REAL SIZE
       INTEGER I
       INTEGER NSRC,NPOS
@@ -55,9 +58,10 @@
       LOGICAL EXIST
       LOGICAL NUMBER
       LOGICAL OFF
+      LOGICAL HDB
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IMARK Version 1.8-0')
+      PARAMETER (VERSION = 'IMARK Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -150,19 +154,46 @@
               INQUIRE(FILE=FILENAME,EXIST=EXIST)
 *  if it does - assume it to be text file
               IF (EXIST) THEN
+
+*  Is it a HEASARC file?
+                CALL USI_GET0L( 'HDB', HDB, STATUS )
+
                 CALL FIO_OPEN(FILENAME,'READ','NONE',0,IFD,STATUS)
                 DO WHILE ( STATUS .EQ. SAI__OK )
                   CALL FIO_READF(IFD,REC,STATUS)
                   IF (STATUS.EQ.SAI__OK) THEN
 *  ignore blank lines
-                    IF (REC.GT.' ') THEN
+                    IF (REC.GT.' '.AND.REC(1:1).NE.'#') THEN
+
+*  HEASARC format?
+                      IF ( HDB ) THEN
+                        READ( REC, '(2(1X,F11.7))',IOSTAT=FSTAT )
+     :                                          CEL1950(1),CEL1950(2)
+                        IF ( FSTAT.NE. 0 ) THEN
+                          STATUS = SAI__ERROR
+                          CALL ERR_REP( ' ', 'Error reading HEASARC'/
+     :                                    /' database file', STATUS )
+                        ELSE
+
+*              Convert to file system
+                          CEL1950(1) = CEL1950(1) * MATH__DDTOR
+                          CEL1950(2) = CEL1950(2) * MATH__DDTOR
+                          CALL WCI_CNS2S( I_FK4SYS, CEL1950, I_SYSID,
+     :                                    CEL, STATUS )
+                          RA = CEL(1) * MATH__DRTOD
+                          DEC = CEL(2) * MATH__DRTOD
+
+                        END IF
+
+                      ELSE
 *  remove leading blanks
-                      CALL CHR_LDBLK( REC )
+                        CALL CHR_LDBLK( REC )
 
 *  split record into ra and dec
-                      CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
+                        CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
 *  parse and save
-                      CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+                        CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+                      END IF
                       CALL IMARK_SAVE(1,RA,DEC,SYMBOL,COLOUR,SIZE,BOLD,
      :                                                           STATUS)
                     ENDIF
