@@ -695,7 +695,7 @@ $(SKYCAT_FILES): .skycat.built
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL; \
 	SKYCAT_WRAPPER_DIR=et; export SKYCAT_WRAPPER_DIR; \
-	./configure --prefix=$${pwd}/built --with-$(CC);\
+	./configure --prefix=$${pwd}/built;\
 	make -e all install)
 	cp -p ./built/bin/rtdClient .
 	cp -p ./built/bin/rtdServer .
