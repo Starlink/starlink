@@ -285,23 +285,24 @@ sub extract_objects ($$$$) {
 	    wmessage ('warning',
 		      "filterdefects must be a hash reference.  Ignored");
 	} else {
-	    # Cut out CCD blemishes.  Some of the `objects' detected by
-	    # EXTRACTOR are in fact CCD defects, or readout errors, or the
-	    # like.  These are very bright, so they can confuse a matching
-	    # program which examines only or preferentially the brightest
-	    # objects.  However these are either very small or, if they're
-	    # defects such as a line, extremely elliptical, with
-	    # A/B=10+. Examining the list of detections with the test
-	    # image r106282xx, all the defects which had an area of more
-	    # than 100 pixels also had an `ellipticity' A/B of more than
-	    # 3.5.  I think that the 100-pixel threshold will be
-	    # independent of the size of the CCD, so it can be hard-wired
-	    # into this routine.
+	    # Cut out CCD blemishes.  Some of the `objects' detected
+	    # by EXTRACTOR are in fact CCD defects, or readout errors,
+	    # or the like.  These are very bright, so they can confuse
+	    # a matching program which examines only or preferentially
+	    # the brightest objects.  However these are either very
+	    # small or, if they're defects such as a line, extremely
+	    # elliptical, with A/B=10+. Examining the list of
+	    # detections with the test image r106282xx, all the
+	    # defects which had an area of more than 100 pixels also
+	    # had an `ellipticity' A/B of more than 3.5.  I think that
+	    # the 100-pixel and ellipticity thresholds will be
+	    # independent of the size of the CCD, so these make
+	    # sensible defaults.
 
 	    # Cut off very small objects.  We're doing this to remove
 	    # CCD flaws which are often bright `objects', but only ten
 	    # or twenty pixels in area, whereas the largest objects
-	    # are thousands. 
+	    # are thousands.
 
 	    # The filterdefects hash may contain either or both of the
 	    # keys {area} and {ellipticity} which indicate the minimum
@@ -323,12 +324,16 @@ sub extract_objects ($$$$) {
 
 
     # Construct an array holding references to temporary hashes each
-    # containing one `row' of the catalogue of extracted objects.
+    # containing one `row' of the catalogue of extracted objects.  In
+    # this step remove any objects which fail the
+    # cutoffarea/cutoffellip cuts described above, and also any for
+    # which Extractor has found negative fluxes.
     my @catarr;
     while ($maxobj > 0 && $#sortcat >= 0) {
 	my $l = $cathash{$sortcat[0]};
  	if ($l->[$AREAcol] >= $cutoffarea
- 	    && ($l->[$Acol]/$l->[$Bcol] < $cutoffellip)) {
+ 	    && ($l->[$Acol]/$l->[$Bcol] < $cutoffellip)
+            && ($l->[$FLUXcol] > 0)) {
 
 	    my %t;
 	    $t{id} = $l->[$NUMBERcol];
@@ -341,17 +346,18 @@ sub extract_objects ($$$$) {
 	    $maxobj--;
 	    push (@catarr, \%t);
  	} else {
- 	    printf STDERR ("extract_objects: deleted object %d, area %f (min %f), ellipticity %f (max %f)\n",
- 			   $l->[$NUMBERcol],
- 			   $l->[$AREAcol], $cutoffarea,
- 			   $l->[$Acol]/$l->[$Bcol], $cutoffellip)
+ 	    printf STDERR ("extract_objects: deleted object %d, area %f (min %f), ellipticity %f (max %f), flux %f\n",
+                           $l->[$NUMBERcol],
+                           $l->[$AREAcol], $cutoffarea,
+                           $l->[$Acol]/$l->[$Bcol], $cutoffellip,
+                           $l->[$FLUXcol])
 	      if $verbose;
  	}
  	shift (@sortcat);
     }
 
     if (defined($opts->{todump})) {
-	# Dump the catalogue to the sppecified file, for later reuse
+	# Dump the catalogue to the specified file, for later reuse
 	# by {fromdump}.
 	open (DUMPCAT, '>'.$opts->{todump}) || return undef;
 	print DUMPCAT "# Extractor catalogue, munged by $0\n";
