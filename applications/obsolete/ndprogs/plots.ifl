@@ -1,0 +1,219 @@
+#+
+#  Name:
+#     PLOTS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface PLOTS
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMAGE) Name of the 3D image (ZXY-sorted)'
+         help 'Enter the filename of the image you wish to process.'
+      endparameter
+
+      parameter IMAGE1
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image1'
+         prompt '(IMAGE1) Name of the 2D image to be displayed.'
+         help 'Enter the filename of the 2D image you wish to view.'
+      endparameter
+
+      parameter SCALE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.scale'
+         prompt '(SCALE) Use a common scale for spectrum plots?'
+         help 'Setting this keyword will plot all spectra using a common data range'
+      endparameter
+
+      parameter SLOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.slow'
+         prompt '(SLOW) Low value of spectrum plots'
+         help 'Enter the lowest value you wish to be plotted in the spectra'
+  endparameter
+
+  parameter SHIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shigh'
+         prompt '(HIgh) High value of spectrum plots'
+         help 'Enter the highest value to appear in the spectra '
+      endparameter
+
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+
+      parameter TABLE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.table'
+         prompt '(TABle) Name of lookup table'
+         help 'Enter the name of the colour look-up table you wish to use.'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+      endparameter
+
+      parameter SLABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.slabel'
+         prompt '(SLABEL) Label for spectrum plots'
+         help 'Type the string with which the spectra will be labelled.'
+      endparameter
+
+      parameter XPIX
+         type '_real
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.xpix'
+         prompt '(XPIX) X pixels(s), outside to quit.' 
+         help 'XPIX contains the x pixel number(s) of the extraction point(s).'
+      endparameter
+
+      parameter YPIX
+         type '_real
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ypix'
+         prompt '(YPIX) Y pixels(s), outside to quit.' 
+         help 'YPIX contains the y pixel number(s) of the extraction point(s).'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Magnification of image plot' 
+         help 'The factor by which the plotted image is scaled before displaying'
+      endparameter
+
+      parameter BIN
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.bin'
+         prompt '(BIN) Binning interval for averaging spectra'
+         help 'BIN is the size of box to average spectra over.'
+       endparameter
+
+      parameter WRITE
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.write'
+         prompt '(WRITE) Write extracted spectra to data structures?'
+         help 'If specified, each spectrum will be saved to a file.'
+      endparameter
+
+      parameter SPECTRUM
+         type '_literal
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.spectrum'
+         prompt '(SPECTRUM) Name of file to contain spectrum'
+         help 'Enter the name of the file you wish to write the current spectrum to.'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+      parameter CHARACTER_INPUT
+         keyword ' '
+         type '_char'
+         vpath 'prompt'
+         help 'Type one of I,W,R,M,L,C,K,P,B,E,D,S,A,O,H, or Q.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,68 @@
+#+
+#  Name:
+#     STRETCH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface STRETCH
+
+      parameter  IMAGE1
+         type   'literal'
+         prompt  '(IMAGE1) Name of input image'
+         association '<->global.image1'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE1 is the name of the image to be stretched.'
+      endparameter
+
+      parameter  IMAGE2
+         type   'literal'
+         prompt  '(IMAGE2) Name of reference image'
+         association '<->global.image2'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE2 defines the dimensions IMAGE1 will be scaled to.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting stretched image.'
+      endparameter
+
+      parameter  VERBOSE
+         type   '_logical'
+         association '<->global.verbose'
+         vpath 'default,dynamic,current,global'
+         default 'false'
+      endparameter
+
+      parameter INTERP
+         type    '_char'
+         prompt  '(INTERP) (C)onstant or (L)inear interpolation?'
+         association '<->global.interp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Specify C or L for the type of interpolation to perform.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,3770 @@
+#+
+#  Name:
+#     NDPROGS_MON.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+monolith NDPROGS_MON
+
+#+
+#  Name:
+#     ADDND.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+
+   interface ADDND
+
+      parameter FILES
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.files'
+         prompt '(FILES) Name of an image filename list.'
+         help 'The name of the ASCII file listing the files to be added.'
+      endparameter
+
+      parameter IMAGE
+         ppath 'current,default'
+         association '<->global.image'
+      endparameter
+
+      parameter OUTPUT
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.output'
+         prompt '(OUTPUT) Name of the output image'
+         help 'The name of the structure containing the result of the addition.'
+      endparameter
+
+      parameter SHIFTS
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shifts'
+         prompt '(SHIFTS) File of pixel offsets for images'
+         help 'A file specifying the shift in each dimension for each file in FILES'
+      endparameter
+
+      parameter VERBOSE
+        type '_logical'
+        vpath 'default,dynamic,current,global'
+        default 'false'
+        association '<->global.verbose'
+      endparameter
+
+      parameter AVERAGE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.average'
+         prompt '(AVERAGE) Are the images to be averaged?'
+         help 'If set, this keyword will compute the mean of the pixels added.'
+      endparameter
+
+      parameter USEAXES
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.useaxes'
+         prompt '(USEAXES) Use axis information to compute shifts?'
+         help 'If set, ADDND will use axis arrays to compute shift values.'
+      endparameter
+
+      parameter SMALL
+         type '_real'
+         default '1E-7'
+         vpath 'default,dynamic,current,global'
+         association '<->global.small'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     ARITH1.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+
+   interface ARITH1
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the image you wish to process.' 
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) +, -, *, /, **'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter arithmetic option: +,-,*,/ or **.'
+      endparameter
+  
+      parameter  VALUE
+         type    '_real'
+         prompt  '(VALUE) Scalar or power value'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the scalar value to combine pixels with'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.' 
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     ARITH2.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+
+   interface ARITH2
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of first input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the first image you wish to process.' 
+      endparameter
+
+      parameter  IMAGE1
+         type   'literal'
+         prompt  '(IMAGE1) Name of second input image'
+         association '<->global.image1'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the second image you wish to process.' 
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) +, -, *, /, **'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter arithmetic option: +,-,*,/ or **.'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     AXFLIP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+ 
+   interface AXFLIP
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMAGE) Name of input image'
+         help 'The name of the structure containing the image to process.'
+      endparameter
+
+      parameter OUTPUT
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.output'
+         prompt '(OUTPUT) Name of the output image'
+         help 'The name of the structure containing the result of the addition.'
+      endparameter
+
+      parameter AXIS
+         type '_integer'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.axis'
+         prompt '(AXIS) Axis to be reversed.'
+         help 'The number of the axis to be reversed (eg 1 for x, 2 for y...)'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     COLLAPSE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface COLLAPSE
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help   'IMAGE is the name of the image you wish to collapse.'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for dimensions to be collapsed.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (AXKEY[i] != 0) the i-th axis will be collapsed.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHole) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified the entire image will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is the array containg the start coords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is the array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  FLOAT
+         type   '_logical'                                              
+         prompt  '(FLOAT) Create an output data array of type FLOAT?'
+         association '<->global.float'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If FLOAT is specified, the output data will be of type FLOAT.'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'OUTPUT is the name of the resulting compressed image.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     DEGAMMA.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface DEGAMMA
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the 3D stack of images to process,'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the resulting processed image.'
+      endparameter
+
+      parameter  VERBOSE
+         type    '_logical'
+         association '<->global.verbose'
+         vpath 'default,dynamic,current,global'
+         default 'false'
+      endparameter
+
+      parameter  XYWEIGHT
+         type    '_real'
+         association '<->global.xyweight'
+         vpath 'default,dynamic,current,global'
+      endparameter
+ 
+      parameter  NDEVS
+         type    '_real'
+         prompt  '(NDEVS) Number of standard deviations for a legal pixel'
+         association '<->global.ndevs'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Specify the width of the tolerance band in standard deviations.'
+      endparameter
+
+      parameter  FLAGBAD
+         type    '_logical'
+         prompt  '(FLAGBAD) Set defective pixels quality as bad?'
+         association '<->global.flagbad'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If TRUE, pixels eliminated will be replaced with magic values.'
+      endparameter
+ 
+      parameter  DOEDGE
+         type    '_logical'
+         prompt  '(DOEDGE) Include edge pixels in the search?'
+         association '<->global.doedge'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If TRUE, pixels at edges will be processed as well.'
+      endparameter
+ 
+      parameter   NNPIX
+         type     '_real'
+         prompt   '(NNPIX) Number of neighbour pixels to compare.'
+         association '<->global.nnpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'How many neighbour pixels (0-6) shall I look at ?'
+      endparameter
+
+      parameter  TOL
+         type    '_real'
+         prompt  '(TOL) Tolerance for pixel equality'
+         association '<->global.tol'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (ABS(PIXEL(1)-PIXEL(2)) < TOL) then these pixels are "equal".'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is the array containing the start coords of the subset.`
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is the array containing the end coords of the subset.'
+      endparameter
+
+      parameter  WHOLE
+         type    '_logical'
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If TRUE, the entire 3D iamge will be processed.'
+      endparameter
+
+      parameter  POSDEV
+         type    '_logical'
+         prompt  '(POSDEV) Only look for positive deviations from the mean?'
+         association '<->global.posdev'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Cosmic rays produce positive deviations only.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     DEPICT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface DEPICT
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMage) Name of image to view'
+         help 'Enter the filename of the image you wish to view.'
+      endparameter
+
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+
+      parameter PLACE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.place'
+         prompt '(PLACE) Location of plot'
+         help 'Type BL,BC,BR,LC,CC,RC,TL,TC or TR to locate the plotted image'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Plot magnification'
+         help 'Enter the magnification by which to scale the image'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+        endparameter
+
+  
+      parameter AXES
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.axes'
+         prompt '(AXes) Plot image axes?'
+         help 'Setting this keyword will plot axes around the image.'
+      endparameter
+
+      parameter RAMP
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ramp'
+         prompt '(RAMP) Plot colour ramp?'
+         help 'Setting this keyword will plot a colour ramp next to the image.'
+      endparameter
+
+      parameter CONTOUR
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.contour'
+         prompt '(CONTour) Overplot with contours?'
+         help 'Setting this keyword will result in a contour map being plotted.'
+      endparameter
+
+      parameter IMAGE1
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image1'
+         prompt '(IMage) Name of image to contour'
+         help 'Enter the filename of the image you wish to contour.'
+      endparameter
+
+      parameter LOW1
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low1'
+         prompt '(LOW1) Lowest value to be contoured'
+         help 'Pixel values below LOW1 will not be contoured.'
+      endparameter
+
+      parameter HIGH1
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high1'
+         prompt '(LOW1) Highest value to be contoured'
+         help 'Pixel values above HIGH1 will not be contoured.'
+      endparameter
+
+      parameter LEVELS
+         type '_integer'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.levels'
+         prompt '(LEVELS) Number of contour levels'
+         help 'Enter the number of different contour values to draw.'
+      endparameter
+
+      parameter HARDCOPY
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.hardcopy'
+         prompt '(HArdcopy) Produce hardcopy plot?'
+         help 'Setting this keyword will result in the image being printed.'
+      endparameter
+
+      parameter TABLE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.table'
+         prompt '(TABle) Name of lookup table'
+         help 'Enter the name of the colour look-up table you wish to use.'
+      endparameter
+
+      parameter ERASE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.erase'
+         prompt '(ERase) Erase screen before plotting?'
+         help 'If specified, the screen will be cleared before plotting'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+  
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     DUMMY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface DUMMY
+
+      Parameter  OUTPUT
+         Type    'LITERAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.OUTPUT'
+         Prompt  '(OUTput) Name of image to be created'
+         Help    'Enter the name of the structure you wisht to create.'
+      EndParameter
+                  
+      Parameter  NDIM
+         Type    '_INTEGER'
+         Range   1,6
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.NDIM'
+         Prompt  '(NDIM) Number of dimensions'
+         Help    'Enter the dimensionality of the image.'
+      EndParameter
+
+      Parameter  SIZE
+         Type    '_INTEGER'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.SIZE'
+         Prompt  '(SIZE) Dimensions of image.'
+         Help    'Specify the size of the image in each dimension'
+      EndParameter
+
+      Parameter  AXES
+         Type    '_LOGICAL'                                              
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXES'
+         Prompt  '(AXes) Calibrate the axes?'
+         Help    'Enter yes to calibrate each of the axes in your image.'
+      EndParameter
+
+      Parameter  AXKEY
+         Type    '_INTEGER'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXKEY'
+         Prompt  '(AXKEY) Keys for axes to be calibrated.'
+         Help    'Enter a 1 to calibrate an axis or a 0 to omit calibration.'
+      EndParameter
+
+      Parameter  AXSTART
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXSTART'
+         Prompt  '(AXSTart) Start values of axes.'
+         Help    'Enter the start values for each axis.'
+      EndParameter
+ 
+      Parameter  AXEND
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXEND'
+         Prompt  '(AXSTart) End values of axes.'
+         Help    'Enter the end values for each axis.'
+      EndParameter
+
+      Parameter  AXLOG
+         Type    '_INTEGER'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXLOG'
+         Prompt  '(AXLOG) Keys for logarithmic scaling.'
+         Help    'Enter a 1 to scale the axis logarithmically, 0 for linear.'
+      EndParameter
+ 
+      Parameter  EXTRA 
+         Type    '_CHAR'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.EXTRA'
+         Prompt  '(EXtra) (M)agic values, (Q)uality arrays or (E)rror arrays?'
+         Help    'Type a letter to add one of the extra features listed.'
+      EndParameter
+ 
+      Parameter  VALUE
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.VALUE'
+         Prompt  '(VALue) Value to be assigned to every pixel'
+      EndParameter
+     
+      Parameter  DTYPE
+         Type    '_CHAR'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.DTYPE'
+         Prompt  '(DTYpe) Choose data type as B(yte), S(hort) or F(loat)'
+         Help    'Type B,S or F to choose the data type of the array.'
+      EndParameter
+ 
+      Parameter  ERRVAL
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.ERRVAL'
+         Prompt  '(ERRVal) Value to be assigned to the error array'
+         Help    'Enter the value to be assigned to the error array.'
+      EndParameter
+ 
+      Parameter  QVAL
+         TYPE    '_BYTE'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.QVAL'
+         Prompt  '(QVal) Value to be assigned to the quality array'
+         Help    'Enter the value to place in the quality array.'
+      EndParameter
+ 
+   EndInterface
+
+#+
+#  Name:
+#     HILITE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface HILITE
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMage) Name of image to view'
+         help 'Enter the filename of the image you wish to view.'
+      endparameter
+
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'  
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+
+      parameter PLACE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.place'
+         prompt '(PLACE) Location of plot'
+         help 'Type BL,BC,BR,LC,CC,RC,TL,TC or TR to locate the plotted image'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Plot magnification'
+         help 'Enter the magnification by which to scale the image'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+      endparameter
+  
+      parameter AXES
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.axes'
+         prompt '(AXes) Plot image axes?'
+         help 'Setting this keyword will plot axes around the image.'
+      endparameter
+
+      parameter RAMP
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ramp'
+         prompt '(RAMP) Plot colour ramp?'
+         help 'Setting this keyword will plot a colour ramp next to the image.'
+      endparameter
+
+      parameter DATA
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.data'
+         prompt '(DATA) Plot data values?'
+         help 'If set, this keyword will display the current highlighted data value.'
+      endparameter
+
+      parameter SHOWS
+         type '_integer'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shows'
+         prompt '(SHOWS) Number of shows'
+         help 'This sets the number of times the colours will be cycled through.'
+      endparameter
+
+      parameter ERASE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.erase'
+         prompt '(ERase) Erase screen before plotting?'
+         help 'If specified, the screen will be cleared before plotting'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+   
+   endinterface
+#+
+#  Name:
+#     LOGIC1.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface LOGIC1
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the image you wish to process.' 
+      endparameter
+ 
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+ 
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) Logical operation'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter logical option: AND, OR, XOR, NAND, NOR, NXOR.'
+      endparameter
+  
+      parameter  VALUE
+         type    '_real'
+         prompt  '(VALUE) Scalar or power value'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the scalar value to combine pixels with'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+ 
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+ 
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     LOGIC2.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface LOGIC2
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of first input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the first image you wish to process.' 
+      endparameter
+ 
+      parameter  IMAGE1
+         type   'literal'
+         prompt  '(IMAGE1) Name of second input image'
+         association '<->global.image1'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the second image you wish to process.' 
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) Enter logical operation'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter logical option: AND,OR,XOR,NAND,NOR,NXOR'
+      endparameter
+  
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+ 
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+ 
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     LOOK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface LOOK
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the structure you wish to examine.'
+      endparameter
+ 
+      parameter  STAPIX
+         type   '_integer'
+         prompt  '(STAPIX) Start pixel of subset.'
+         association '<->global.stapix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STAPIX is an array containing the starting pixels of the subset.'
+      endparameter
+
+      parameter  ENDPIX
+         type   '_integer'
+         prompt  '(ENDPIX) End pixel of subset.'
+         association '<->global.endpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ENDPIX is an array containing the end pixels of the subset.'
+      endparameter
+
+      parameter  AGAIN  
+         type    '_logical'
+         prompt  '(AGAIN) Look at another subset?'
+         association '<->global.again'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Type Y to examine another subset of IMAGE.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     MAGIC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MAGIC
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image you wish to be processed.'
+      endparameter
+ 
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Setting this keyword results in the entire image being processed.'
+      endparameter
+ 
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is the vector of the start co-ords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is the vector of end co-ords of the subset.'
+      endparameter
+ 
+      parameter  LOW
+         type    '_real'
+         prompt  '(LOW) Lowest value to be kept'
+         association '<->global.low'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels with values below LOW will be replaced with magic values.'
+      endparameter
+ 
+      parameter  HIGH
+         type    '_real'
+         prompt  '(HIGH) Highest value to be kept'
+         association '<->global.high'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels with values above HIGH will be replaced with magic values.'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the resulting processed image.'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     MASK1.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MASK1
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the image you wish to process.' 
+      endparameter
+ 
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+ 
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) MAX, MIN, REPG,REPB'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'MAXimum, MINimum, REPlace Good pixels or REPlace Bad pixels.'
+      endparameter
+  
+      parameter  VALUE
+         type    '_real'
+         prompt  '(VALUE) Scalar or power value'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the scalar value to combine pixels with'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+ 
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+ 
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     MASK2.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MASK2
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of first input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the first image you wish to process.' 
+      endparameter
+
+      parameter  IMAGE1
+         type   'literal'
+         prompt  '(IMAGE1) Name of second input image'
+         association '<->global.image1'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the second image you wish to process.' 
+      endparameter
+ 
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+ 
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) Enter masking operation'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'MAX,MIN,REP1,REP2,REP3,REP4'
+      endparameter
+  
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+ 
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+ 
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     MOMENTS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MOMENTS
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image (ZXY-sorted)'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the 3D (z,x,y) sorted image to process.'
+      endparameter
+  
+      parameter  USEMASK
+         type    '_logical'
+         prompt  '(USEMASK) Use a mask image?'
+         association '<->global.usermask'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Do you wish to use a mask file to exclude pixels from processing?'
+      endparameter
+
+      parameter  MASK
+         type   'literal'
+         prompt  '(MASK) Name of mask image'
+         association '<->global.mask'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image you wish to use as a pixel mask.'
+      endparameter
+
+      parameter  FINDSEQ
+         type    '_logical'
+         prompt  '(FINDSEQ) Find peaks in sequence from pixel 1?'
+         association '<->global.findseq'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Set this keyword to scan the spectrum for a sequence of peaks.'
+      endparameter
+ 
+      parameter  PEAKS
+         type    '_integer'
+         prompt  '(PEAKS) Number of peaks to be found'
+         association '<->global.peaks'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the number of emission components to find.'
+      endparameter
+
+      parameter  THRESH
+         type    '_real'
+         prompt  '(THRESH) Threshold pixel value for peak search'
+         association '<->global.thresh'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'A pixel with value above THRESH will be considered as a peak'
+      endparameter
+
+      parameter  WIDTH
+         type    '_real'
+         prompt  '(WIDTH) Width of peaks in pixels'
+         association '<->global.width'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'WIDTH is the expected width at the base of each peak.'
+       endparameter
+
+      parameter  GAP
+         type    '_real'
+         prompt  '(GAP) Minimum separation of peaks in pixels'
+         association '<->global.gap'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'GAP is the expected separation of the centres of adjacent peaks.'
+      endparameter
+
+      parameter  BIN
+         type    '_integer'
+         prompt  '(BIN) Binning factor in XY plane'
+         association '<->global.bin'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'BIN is the size of the area which will be processed per spectrum.'
+      endparameter
+
+      parameter  RESULTS
+         type   'literal'
+         prompt  '(RESULTS) Name of results structure'
+         association '<->global.results'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the structure to store results in.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     MOVIE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MOVIE
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image to be animated.'
+      endparameter
+ 
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt  '(WHOLE) Display the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Set this keyword to view the entire 2D imaged.'
+      endparameter
+ 
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+     
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  STEP
+         type   '_integer'
+         prompt  '(STEP) Frame step'
+         association '<->global.step'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STEP is the increment between displayed frames.'
+      endparameter
+ 
+      parameter  LOW
+         type   '_real'
+         prompt  '(LOW) Lowest value to be displayed'
+         association '<->global.low'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels with value below LOW will not be plotted.'
+      endparameter
+                          
+      parameter  HIGH
+         type   '_real'
+         prompt  '(HIGH) Highest value to be displayed'
+         association '<->global.high'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+  
+      parameter  PLACE
+         type   '_char'
+         prompt  '(PLACE) Location of plot'
+         association '<->global.place'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Options are BL,BC,BR,LC,CC,RC,TL,TC, and TR.'
+      endparameter
+ 
+      parameter  MAG
+         type   '_real'
+         prompt  '(MAG) Magnification of plot'
+         association '<->global.mag'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MAG is the display scaling factor for the plot.'
+      endparameter
+ 
+      parameter  LABEL
+         type    CHAR
+         prompt  '(LABEL) Label for plot'
+         association '<->global.label'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'LABEL is the title to be displayed above the images.'
+      endparameter
+ 
+      parameter  AXES
+         type   '_logical'
+         prompt  '(AXES) Plot image axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXES is specified, the x and y axes will be plotted.'
+      endparameter
+ 
+      parameter  RAMP
+         type   '_logical'
+         prompt  '(RAMP) Plot ramp of colour or grey scale?'
+         association '<->global.ramp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If RAMP is TRUE, a colour ramp is plotted next to the images.'
+      endparameter
+ 
+      parameter  TABLE
+         type    CHAR
+         prompt  '(TABLE) Name of lookup table'
+         association '<->global.table'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'TABLE is the name of the colour look-up table for the images.'
+      endparameter
+ 
+      parameter  ERASE
+         type   '_logical'
+         prompt  '(ERase) Erase screen before plotting?'
+         association '<->global.erase'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If ERASE is TRUE, the display will be cleared before plotting.'
+      endparameter
+ 
+      parameter SOFTDEV
+        ptype 'device'
+        type 'literal'
+        vpath 'global'
+        ppath 'global,dynamic,current,default'
+        association '<->global.softdev'
+      endparameter
+ 
+      parameter HARDDEV
+        ptype 'device'
+        type 'literal'
+        vpath 'global'
+        ppath 'global,dynamic,current,default'
+        association '<->global.harddev'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     PEEK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface PEEK
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image whose values you wish to peek.'
+      endparameter
+
+      parameter  PIXEL
+         type   '_integer'
+         prompt  '(PIXel) Pixel number.'
+         association '<->global.pixel'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'PIXEL is the array of co-ordinates of the pixel to be peeked at.'
+      endparameter
+
+      parameter  AGAIN  
+         type   '_logical'
+         prompt  '(AGAIN) Display another pixel?'
+         association '<->global.again'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AGAIN gives you the option to view another pixel or quit.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     PLOTS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface PLOTS
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMAGE) Name of the 3D image (ZXY-sorted)'
+         help 'Enter the filename of the image you wish to process.'
+      endparameter
+
+      parameter IMAGE1
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image1'
+         prompt '(IMAGE1) Name of the 2D image to be displayed.'
+         help 'Enter the filename of the 2D image you wish to view.'
+      endparameter
+
+      parameter SCALE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.scale'
+         prompt '(SCALE) Use a common scale for spectrum plots?'
+         help 'Setting this keyword will plot all spectra using a common data range'
+      endparameter
+
+      parameter SLOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.slow'
+         prompt '(SLOW) Low value of spectrum plots'
+         help 'Enter the lowest value you wish to be plotted in the spectra'
+  endparameter
+
+  parameter SHIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shigh'
+         prompt '(HIgh) High value of spectrum plots'
+         help 'Enter the highest value to appear in the spectra '
+      endparameter
+
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+
+      parameter TABLE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.table'
+         prompt '(TABle) Name of lookup table'
+         help 'Enter the name of the colour look-up table you wish to use.'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+      endparameter
+
+      parameter SLABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.slabel'
+         prompt '(SLABEL) Label for spectrum plots'
+         help 'Type the string with which the spectra will be labelled.'
+      endparameter
+
+      parameter XPIX
+         type '_real
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.xpix'
+         prompt '(XPIX) X pixels(s), outside to quit.' 
+         help 'XPIX contains the x pixel number(s) of the extraction point(s).'
+      endparameter
+
+      parameter YPIX
+         type '_real
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ypix'
+         prompt '(YPIX) Y pixels(s), outside to quit.' 
+         help 'YPIX contains the y pixel number(s) of the extraction point(s).'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Magnification of image plot' 
+         help 'The factor by which the plotted image is scaled before displaying'
+      endparameter
+
+      parameter BIN
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.bin'
+         prompt '(BIN) Binning interval for averaging spectra'
+         help 'BIN is the size of box to average spectra over.'
+       endparameter
+
+      parameter WRITE
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.write'
+         prompt '(WRITE) Write extracted spectra to data structures?'
+         help 'If specified, each spectrum will be saved to a file.'
+      endparameter
+
+      parameter SPECTRUM
+         type '_literal
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.spectrum'
+         prompt '(SPECTRUM) Name of file to contain spectrum'
+         help 'Enter the name of the file you wish to write the current spectrum to.'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+      parameter CHARACTER_INPUT
+         keyword ' '
+         type '_char'
+         vpath 'prompt'
+         help 'Type one of I,W,R,M,L,C,K,P,B,E,D,S,A,O,H, or Q.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     SETAXES.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SETAXES
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image whose axes are to be modified.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the resultant image.'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for axes to be calibrated.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXKEY[i] is 1, the i-th axis will be calibrated.'
+      endparameter
+
+      parameter  AXSTART
+         type   '_real'
+         prompt  '(AXSTART) Start values of axes.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXSTART is an array containing the axis starting values.'
+      endparameter
+ 
+      parameter  AXEND
+         type   '_real'
+         prompt  '(AXEND) End values of axes.'
+         association '<->global.axend'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXEND is an array containing the axis end values.'
+      endparameter
+ 
+      parameter  AXLOG
+         type   '_integer'
+         prompt  '(AXLOG) Keys for logarithmic scaling.'
+         association '<->global.axlog'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXLOG[i] is 1, the i-th axis will be logarithmically scaled.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     SLICE3D.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SLICE3D
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image to be sliced. It MUST be 3D.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of file to save slice to'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WRITE is TRUE, the current slice will be written to OUTPUT.'
+      endparameter
+
+      parameter  LOW
+         type   '_real'
+         prompt  '(LOW) Lowest value to be displayed'
+         association '<->global.low'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels of value <= LOW are plotted in the lowest colour index.'
+      endparameter
+                         
+      parameter  HIGH
+         type   '_real'
+         prompt  '(HIGH) Highest value to be displayed'
+         association '<->global.high'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels of value >= HIGH are plotted in the highest colour index.'
+       endparameter
+ 
+      parameter  PLACE
+         type    CHAR
+         prompt  '(PLACE) Location of plot'
+         association '<->global.place'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter one of: BL,BC,BR,LC,CC,RC,TL,TC or TR.'
+      endparameter
+
+      parameter  MAG
+         type   '_real'
+         prompt  '(MAG) Magnification of plot'
+         association '<->global.mag'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MAG is the scaling factor to display the image with.'
+      endparameter
+
+      parameter  AXES
+         type   '_logical'
+         prompt  '(AXES) Plot image axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXES is TRUE, calibrated axes will be drawn around the image.'
+      endparameter
+ 
+      parameter  RAMP
+         type   '_logical'
+         prompt  '(RAMP) Plot colour or grey scale ramp?'
+         association '<->global.ramp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If RAMP is TRUE, the colour table is plotted next to the image.'
+      endparameter
+
+      parameter  TABLE 
+         type    '_char'
+         prompt  '(TABLE) Name of lookup table'
+         association '<->global.table'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the colour lookup table to draw the image with.'
+      endparameter
+
+      parameter  ERASE
+         type   '_logical'
+         prompt  '(ERASE) Erase screen before plotting?'
+         association '<->global.erase'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Set this keyword to clear the screen before plotting.'
+      endparameter
+
+      parameter  WRITE
+         type   '_logical'
+         prompt  '(WRITE) Write slice to a file?'
+         association '<->global.write'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Specify YES if you wish to save the current slice to disk.'
+      endparameter
+
+      parameter  VIEW
+         type   '_real'
+         prompt  '(VIEW) Which axis will you view the cube along?'
+         association '<->global.view'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'VIEW is the number of the axis you wish to look along.'
+      endparameter
+ 
+      parameter  ACTION
+         type    '_char'
+         prompt  '(T)ry again or (Q)uit?'
+         association '<->global.action'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter T to slice again or Q to quit SLICE3D.'
+      endparameter
+
+      parameter  VERBOSE
+         type   '_logical'
+         association '<->global.verbose'
+         vpath 'default,dynamic,current,global'
+         default 'false'
+      endparameter
+     
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+     endparameter
+   
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     SMOOTH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SMOOTH
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'The name of the image to be smoothed.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt '(WHOLE) Process the entire image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WHOLE is TRUE, all of IMAGE will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  SMOOTH
+         type   '_integer'
+         prompt  '(SMOOTH) Smoothing function'
+         association '<->global.smooth'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help '1=top hat , 2=Gaussian , 3=Sinc , 4=Moffat (1D only).'
+      endparameter
+
+      parameter  FNDIM
+         type   '_integer'
+         prompt  '(FNDIM) No. of dims in smoothing function'
+         association '<->global.fndim'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'FNDIM can be 1,2 or 3.'
+      endparameter
+
+      parameter  BOX
+         type   '_integer'
+         prompt  '(BOX) Size of function box in pixels'
+         association '<->global.box'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'BOX is the (odd integer) size of the smoothing box.'
+      endparameter
+
+      parameter  WIDTHS
+         type   '_real'
+         prompt  '(WIDTHS) Width of function in each dim.'
+         association '<->global.widths'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'WIDTHS is an array of the function widths in each dimension.'
+      endparameter
+                                                  
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the smoothed image.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     SPECTRUM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SPECTRUM
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMage) Name of the 3D image (ZXY-sorted)'
+         help 'Enter the filename of the image you wish to process.'
+         endparameter
+
+      parameter IMAGE1
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image1'
+         prompt '(IMAGE1) Name of the 2D image to be displayed.'
+         help 'Enter the filename of the 2D image you wish to view.'
+      endparameter
+
+      parameter SCALE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.scale'
+         prompt '(SCALE) Use a common scale for spectrum plots?'
+         help 'Setting this keyword will plot all spectra using a common data range'
+      endparameter
+   
+      parameter SLOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.slow'
+         prompt '(SLOW) Low value of spectrum plots'
+         help 'Enter the lowest value you wish to be plotted in the spectra'
+      endparameter
+ 
+      parameter SHIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shigh'
+         prompt '(HIgh) High value of spectrum plots'
+         help 'Enter the highest value to appear in the spectra '
+      endparameter
+ 
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+ 
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+ 
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+ 
+      parameter TABLE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.table'
+         prompt '(TABle) Name of lookup table'
+         help 'Enter the name of the colour look-up table you wish to use.'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+      endparameter
+
+      parameter SLABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.slabel'
+         prompt '(SLABEL) Label for spectrum plots'
+         help 'Type the string with which the spectra will be labelled.'
+      endparameter
+
+      parameter XPIX
+         type '_real
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.xpix'
+         prompt '(XPIX) X pixels(s), outside to quit.' 
+         help 'XPIX contains the x pixel number(s) of the extraction point(s).'
+      endparameter
+
+      parameter YPIX
+         type '_real
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ypix'
+         prompt '(YPIX) Y pixels(s), outside to quit.' 
+         help 'YPIX contains the y pixel number(s) of the extraction point(s).'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Magnification of image plot' 
+         help 'The factor by which the plotted image is scaled before displaying'
+      endparameter
+
+      parameter NPLOTS
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.nplots'
+         prompt '(NPLOTS) Number of spectrum plots' 
+         help 'NPLOTS is the number of spectra to be plotted next to the image.'
+      endparameter
+
+      parameter BIN
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.bin'
+         prompt '(BIN) Binning interval for averaging spectra'
+         help 'BIN is the size of box to average spectra over.'
+      endparameter
+
+      parameter TWOCUR
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.twocur'
+         prompt '(TWOCUR) Use two points to select rectangle?'
+         help 'TWOCUR allows you to extract spectra from within a rectangular zone.'
+      endparameter
+  
+      parameter WRITE
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.write'
+         prompt '(WRITE) Write extracted spectra to data structures?'
+         help 'If specified, each spectrum will be saved to a file.'
+      endparameter
+
+      parameter SPECTRUM
+         type '_literal
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.spectrum'
+         prompt '(SPECTRUM) Name of file to contain spectrum'
+         help 'Enter the name of the file you wish to write the current spectrum to.'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+      parameter CHARACTER_INPUT
+         keyword ' '
+         type '_char'
+         vpath 'prompt'
+         help 'Type one of I,W,R,M,L,C,K,P,N,B,D,S,T,O,H or Q.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     SQUINT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SQUINT
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image you wish to SQUINT at.'
+      endparameter
+
+      parameter  STAPIX
+         type   '_integer'
+         prompt  '(STAPIX) Start pixel of subset.'
+         association '<->global.stapix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STAPIX is an array containing the start pixels of the subset.'
+      endparameter
+ 
+      parameter  ENDPIX
+         type   '_integer'
+         prompt  '(ENDPIX) End pixel of subset.'
+         association '<->global.endpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ENDPIX is an array containing the end pixels of the subset.'
+      endparameter
+
+      parameter  AGAIN  
+         type   '_logical'
+         prompt  '(AGAIN) Look at another subset?'
+         association '<->global.again'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Type Y to have another SQUINT or N to quit.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     STACK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface STACK
+
+      parameter FILES
+         type   'literal'
+         prompt '(FILES) List of input filenames.'
+         association '<->global.files'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'FILES is an ASCII file listing the images to be stacked together.'
+      endparameter
+
+      parameter  IMAGE
+         type   'literal'
+         association '<->global.image'
+         ppath 'current'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting stacked image.'
+      endparameter
+
+      parameter  VERBOSE
+         type   '_logical'
+         association '<->global.verbose'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'VERBOSE causes progress messages to be written to the terminal.'
+      endparameter
+
+      parameter  USEAXES
+         type   '_logical'
+         prompt  '(USEAXes) Use axis information to compute stacking order?'
+         association '<->global.useaxes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If USEAXES is TRUE, axis data is used to compute stacking order,'
+      endparameter
+
+      parameter  SMALL
+         type   '_real'
+         association '<->global.small'
+         vpath 'default,dynamic,current,global'
+         default '1E-7'
+      endparameter
+
+      parameter  JOIN
+         type   '_real'
+         prompt  '(JOIN) Which axis are the cubes to be joined along?'
+         association '<->global.join'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'JOIN sets the axis (1,2 or 3) which will be common to the stack.'
+      endparameter
+
+      parameter  PADVAL
+         type   '_real'
+         prompt  '(PADval) Enter the value to pad arrays out with'
+         association '<->global.padval'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If an image is expanded, PADVAL will be used to fill the spaces.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     STATS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface STATS
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of image to be inspected'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image you wish to analyze.'
+      endparameter
+
+      parameter  CHECK
+         type   '_logical'                                               
+         prompt  '(CHECK) Check the bad pixel flag?'
+         association '<->global.check'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'CHECK ensures that the bad pixel flag is set correctly.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt  '(WHole) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WHOLE is TRUE, all of IMAGE will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  PASS2
+         type   '_logical'                                               
+         prompt  '(PASS2) Perform two passes?'
+         association '<->global.pass2'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If IMAGE has more than 10,000 pixels, set PASS2 to TRUE.'
+      endparameter
+
+      parameter  STAT_TOTAL
+         type   '_real'
+         association '->stats.total'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_MAX
+         type   '_real'
+         association '->stats.max'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_MIN
+         type   '_real'
+         association '->stats.min'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_MEAN
+         type   '_real'
+         association '->stats.mean'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_SIGMA
+         type   '_real'
+         association '->stats.sigma'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_SIZE
+         type   '_real'
+         association '->stats.size'
+         vpath 'dynamic,current,global'
+      endparameter
+
+      parameter  STAT_BADPIX
+         type   '_real'
+         association '->stats.badpix'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1MIN
+         type   '_real'
+         association '->stats.1min'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1MAX
+         type   '_real'
+         association '->stats.1max'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1START
+         type   '_real'
+         association '->stats.1start'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1END
+         type   '_real'
+         association '->stats.1end'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter STAT_2MIN
+         type   '_real'
+         association '->stats.2min'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter STAT_2MAX
+         type   '_real'
+         association '->stats.2max'
+         vpath 'dynamic,current,global'
+      endparameter
+
+      parameter STAT_2START
+         type   '_real'
+         association '->stats.2start'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter STAT_2END
+         type   '_real'
+         association '->stats.2end'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     STRETCH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface STRETCH
+
+      parameter  IMAGE1
+         type   'literal'
+         prompt  '(IMAGE1) Name of input image'
+         association '<->global.image1'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE1 is the name of the image to be stretched.'
+      endparameter
+
+      parameter  IMAGE2
+         type   'literal'
+         prompt  '(IMAGE2) Name of reference image'
+         association '<->global.image2'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE2 defines the dimensions IMAGE1 will be scaled to.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting stretched image.'
+      endparameter
+
+      parameter  VERBOSE
+         type   '_logical'
+         association '<->global.verbose'
+         vpath 'default,dynamic,current,global'
+         default 'false'
+      endparameter
+
+      parameter INTERP
+         type    '_char'
+         prompt  '(INTERP) (C)onstant or (L)inear interpolation?'
+         association '<->global.interp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Specify C or L for the type of interpolation to perform.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     SUBSET.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SUBSET
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image file to be subsetted.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resultinh subsetted image.'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     TEST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface TEST
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of image to be created'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+                  
+      parameter  NDIM
+         type   '_integer'
+         prompt  '(NDIM) Number of dimensions'
+         association '<->global.ndim'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  SIZE
+         type   '_integer'
+         prompt  '(SIZE) Dimensions of image.'
+         association '<->global.size'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXES
+         type   '_logical'                                               
+         prompt  '(AXes) Calibrate the axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for axes to be calibrated.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXSTART
+         type   '_real'
+         prompt  '(AXSTart) Start values of axes.'
+         association '<->global.axstart'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXEND
+         type   '_real'
+         prompt  '(AXENd) End values of axes.'
+         association '<->global.axend'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXLOG
+         type   '_integer'
+         prompt  '(AXLOG) Keys for logarithmic scaling.'
+         association '<->global.axlog'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  EXTRA
+         type    CHAR
+         prompt  '(EXtra) (M)agic values, (Q)uality arrays or (E)rror arrays?'
+         association '<->global.extra'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+ 
+      parameter  VALUE
+         type   '_real'
+         prompt  '(VALue) Value to be assigned to every pixel'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+      
+      parameter  Dtype
+         type    CHAR
+         prompt  '(DTYpe) Choose data type as B(yte), S(hort) or F(loat)'
+         association '<->global.dtype'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+  
+      parameter  ERRVAL
+         type   '_real'
+         prompt  '(ERRVal) Value to be assigned to the error array'
+         association '<->global.errval'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+  
+      parameter  QVAL
+         type    BYTE
+         prompt  '(QVal) Value to be assigned to the quality array'
+         association '<->global.qval'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+ 
+   endinterface
+
+#+
+#  Name:
+#     TRANSFORM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface TRANSFORM
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image file to be tranformed.'
+      endparameter
+
+      parameter  SHIFT
+         type   '_real'
+         prompt  '(SHIFT) Shift amount.'
+         association '<->global.shift'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'SHIFT is an array specifying the pixel translations of IMAGE.'
+      endparameter
+
+      parameter  CENTRE
+         type   '_real'
+         prompt  '(CENTRE) Centre of rotation.'
+         association '<->global.centre'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'CENTRE is an array specifying the (pixel) centre of rotation.'
+      endparameter
+
+      parameter  ANGLE
+         type   '_real'
+         prompt  '(ANGLE) Angle of rotation in degrees'
+         association '<->global.angle'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ANGLE is an array specifying the rotation about each axis.'
+      endparameter
+
+      parameter  RESAMPLE
+         type   '_real'
+         prompt  '(RESAMPLE) Resampling factor.'
+         association '<->global.resample'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'RESAMPLE is an array of resampling factors for each dimension.'
+      endparameter
+
+      parameter  STAPIX
+         type   '_integer'
+         prompt  '(STAPIX) Start pixel of output.'
+         association '<->global.stapix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STAPIX is an array specifying the start pixels of the subset.'
+      endparameter
+ 
+      parameter  ENDPIX
+         type   '_integer'
+         prompt  '(ENDPIX) End pixel of output.'
+         association '<->global.endpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ENDPIX is an array containing the end pixels of the subset.'
+      endparameter
+
+      parameter INTERP
+         type   '_integer'
+         prompt  '(INTERP) Interpolation method'
+         association '<->global.interp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help '1=nearest neighbour , 3=linear.'
+      endparameter
+
+      parameter  MINCORN
+         type   '_integer'
+         prompt  '(MINCORN) Minimum no. of non-magic corner pixels'
+         association '<->global.mincorn'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MINCORN must lie in [1,2^NDIM].'
+      endparameter
+
+      parameter  AXES
+         type   '_logical'                                               
+         prompt  '(AXes) Calibrate the output axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If you wish to calibrate any axes, set this TRUE.'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for axes to be calibrated.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (AXKEY[i] != 0) then the i-th axis will be calibrated.'
+      endparameter
+
+      parameter  AXSTART
+         type   '_real'
+         prompt  '(AXSTart) Start values of axes.'
+         association '<->global.axstart'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXSTART is an array specifying the start values of the axes.'
+      endparameter
+
+      parameter  AXEND
+         type   '_real'
+         prompt  '(AXENd) End values of axes.'
+         association '<->global.axend'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXEND is an array specifying the end values of the axes.'
+      endparameter
+
+      parameter  AXLOG
+         type   '_integer'
+         prompt  '(AXLOG) Keys for logarithmic scaling.'
+         association '<->global.axlog'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (AXLOG[i] != 0), the i-th axis will be logarithmically scaled.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting transformed image.'
+      endparameter
+
+      parameter  ERR_VAL
+         type   '_real'
+         prompt  '(ERR_VAL) Value to pad error arrays with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter a value to fill new areas in error arrays with.'
+      endparameter
+
+   endinterface
+
+    interface TRANSPOSE
+
+     parameter  IMAGE
+        type   'literal'
+        prompt  '(IMage) Name of input image'
+        association '<->global.image'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'IMAGE is the name of the image file to be transposed.'
+     endparameter
+
+     parameter  ORDER
+        type   '_real'
+        prompt  '(ORDER) Transposed axis order.'
+        association '<->global.order'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'ORDER specifies the order of the transposed axes (x=1,y=2,z=3).'
+     endparameter
+
+     parameter  OUTPUT
+        type   'literal'
+        prompt  '(OUTput) Name of output image'
+        association '<->global.output'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'OUTPUT is the name of the resulting tranaposed image.'
+     endparameter
+
+     parameter  TUNE
+        type   '_real'
+        prompt  '(TUNE) Tuning factor'
+        association '<->global.tune'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'TUNE adjust the number of image planes read at once.'
+     endparameter
+
+endinterface
+#+
+#  Name:
+#     TYPECON.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface TYPECON
+
+      parameter IMAGE
+         type 'literal'
+         prompt '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image file for type conversion.'
+      endparameter
+
+      parameter OUTPUT
+         type 'literal'
+         prompt '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting type-converted image.'
+      endparameter
+
+      parameter SHORT
+         type 'literal'
+      endparameter
+
+      parameter FLOAT
+         type 'literal'
+      endparameter
+
+   endinterface
+
+#+
+#  Name:
+#     UNMAGIC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface UNMAGIC
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image file to be processed.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt  '(WHole) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WHOLE is TRUE, the whole of IMAGE will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter INTERP
+         type   '_integer'
+         prompt  '(INTERP) Interpolation method'
+         association '<->global.interp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help '2=average of neighbours, 3=linear, 5=replace with constant.'
+      endparameter
+
+      parameter  MINADJ
+         type   '_integer'
+         prompt  '(MINADJ) Minimum no. of non-magic adjacent pixels'
+         association '<->global.minadj'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MINADJ must be in [1,3^NDIM-1].'
+      endparameter
+
+      parameter  VALUE
+         type   '_real'
+         prompt  '(VALue) Constant value'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the constant value to replace magic values with.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting processed image.'
+      endparameter
+
+   endinterface
+
+endmonolith

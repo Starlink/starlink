@@ -1,0 +1,165 @@
+#+
+#  Name:
+#     SLICE3D.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SLICE3D
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image to be sliced. It MUST be 3D.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of file to save slice to'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WRITE is TRUE, the current slice will be written to OUTPUT.'
+      endparameter
+
+      parameter  LOW
+         type   '_real'
+         prompt  '(LOW) Lowest value to be displayed'
+         association '<->global.low'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels of value <= LOW are plotted in the lowest colour index.'
+      endparameter
+                         
+      parameter  HIGH
+         type   '_real'
+         prompt  '(HIGH) Highest value to be displayed'
+         association '<->global.high'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels of value >= HIGH are plotted in the highest colour index.'
+       endparameter
+ 
+      parameter  PLACE
+         type    CHAR
+         prompt  '(PLACE) Location of plot'
+         association '<->global.place'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter one of: BL,BC,BR,LC,CC,RC,TL,TC or TR.'
+      endparameter
+
+      parameter  MAG
+         type   '_real'
+         prompt  '(MAG) Magnification of plot'
+         association '<->global.mag'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MAG is the scaling factor to display the image with.'
+      endparameter
+
+      parameter  AXES
+         type   '_logical'
+         prompt  '(AXES) Plot image axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXES is TRUE, calibrated axes will be drawn around the image.'
+      endparameter
+ 
+      parameter  RAMP
+         type   '_logical'
+         prompt  '(RAMP) Plot colour or grey scale ramp?'
+         association '<->global.ramp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If RAMP is TRUE, the colour table is plotted next to the image.'
+      endparameter
+
+      parameter  TABLE 
+         type    '_char'
+         prompt  '(TABLE) Name of lookup table'
+         association '<->global.table'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the colour lookup table to draw the image with.'
+      endparameter
+
+      parameter  ERASE
+         type   '_logical'
+         prompt  '(ERASE) Erase screen before plotting?'
+         association '<->global.erase'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Set this keyword to clear the screen before plotting.'
+      endparameter
+
+      parameter  WRITE
+         type   '_logical'
+         prompt  '(WRITE) Write slice to a file?'
+         association '<->global.write'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Specify YES if you wish to save the current slice to disk.'
+      endparameter
+
+      parameter  VIEW
+         type   '_real'
+         prompt  '(VIEW) Which axis will you view the cube along?'
+         association '<->global.view'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'VIEW is the number of the axis you wish to look along.'
+      endparameter
+ 
+      parameter  ACTION
+         type    '_char'
+         prompt  '(T)ry again or (Q)uit?'
+         association '<->global.action'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter T to slice again or Q to quit SLICE3D.'
+      endparameter
+
+      parameter  VERBOSE
+         type   '_logical'
+         association '<->global.verbose'
+         vpath 'default,dynamic,current,global'
+         default 'false'
+      endparameter
+     
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+     endparameter
+   
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+   endinterface
+

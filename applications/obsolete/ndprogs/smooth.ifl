@@ -1,0 +1,106 @@
+#+
+#  Name:
+#     SMOOTH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SMOOTH
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'The name of the image to be smoothed.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt '(WHOLE) Process the entire image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WHOLE is TRUE, all of IMAGE will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  SMOOTH
+         type   '_integer'
+         prompt  '(SMOOTH) Smoothing function'
+         association '<->global.smooth'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help '1=top hat , 2=Gaussian , 3=Sinc , 4=Moffat (1D only).'
+      endparameter
+
+      parameter  FNDIM
+         type   '_integer'
+         prompt  '(FNDIM) No. of dims in smoothing function'
+         association '<->global.fndim'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'FNDIM can be 1,2 or 3.'
+      endparameter
+
+      parameter  BOX
+         type   '_integer'
+         prompt  '(BOX) Size of function box in pixels'
+         association '<->global.box'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'BOX is the (odd integer) size of the smoothing box.'
+      endparameter
+
+      parameter  WIDTHS
+         type   '_real'
+         prompt  '(WIDTHS) Width of function in each dim.'
+         association '<->global.widths'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'WIDTHS is an array of the function widths in each dimension.'
+      endparameter
+                                                  
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the smoothed image.'
+      endparameter
+
+   endinterface
+

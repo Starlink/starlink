@@ -1,0 +1,55 @@
+      subroutine stack_<t>(array,nx,ny,nz,start,jdim,
+     &                     oarray,nox,noy,noz,
+     &                     error,earray,oearray,
+     &                     quality,qarray,oqarray)
+      integer    nx,ny,nz
+      <type>     array(nx,ny,nz),earray(nx,ny,nz)
+      byte       qarray(nx,ny,nx)
+      integer    nox,noy,noz
+      <type>     oarray(nox,noy,noz),oearray(nox,noy,noz)
+      byte       oqarray(nox,noy,noz)
+      integer    jdim,start
+      logical    error,quality
+c
+      integer    i,ii,j,jj,k,kk
+c
+      do i = 1,nx
+        do j = 1,ny
+          do k = 1,nz
+            if (jdim .eq. 1) then
+              ii = i + start - 1
+              jj = j
+              kk = k
+            else if (jdim .eq.2) then
+              ii = i
+              jj = j + start - 1
+              kk = k
+            else
+              ii = i
+              jj = j
+              kk = k + start - 1
+            end if
+            oarray(ii,jj,kk) = array(i,j,k)
+            if (error) oearray(ii,jj,kk) = earray(i,j,k)
+            if (quality) oqarray(ii,jj,kk) = qarray(i,j,k)
+          end do
+        end do
+      end do
+c
+      return
+      end
+
+
+*******************************************************************************
+
+      subroutine stack_fill_<t>(nelm,array,value)
+      integer    nelm
+      <type>     array(nelm),value
+c
+      integer    i
+c
+      do i = 1,nelm
+        array(i) = value
+      end do
+      return
+      end

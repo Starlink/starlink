@@ -1,0 +1,203 @@
+      SUBROUTINE SQUINT_DATA_<t>
+     &  (ARRAY,NX,NY,STAPIX,ENDPIX,MAXVAL,MINVAL,QUAL,QARRAY)
+C
+      IMPLICIT NONE
+C
+C     Functions
+C          
+      INTEGER   ICH_ENCODE,ICH_LEN
+C
+C     Parameters
+C
+      INTEGER   NX,NY,STAPIX(6),ENDPIX(6)
+      REAL      MAXVAL,MINVAL
+      <TYPE>
+     &          ARRAY(NX,NY)
+      LOGICAL   QUAL
+      BYTE      QARRAY(NX,NY)
+C
+C     Local variables
+C                     
+      INTEGER   DUMINT       ! INTEGER dummy variable
+      INTEGER   I            ! Loop counter
+      INTEGER   J            ! Loop counter
+      INTEGER   NEXT         ! Pointer returned by ICH_ENCODE
+      REAL      RANGE        ! Range of values in subset
+      CHARACTER STRING*160   ! Message string
+      INTEGER   STATUS       ! Status code
+      CHARACTER SYMBOLS(8)   ! Eight-level scale of characters
+      REAL      VALUE        ! Pixel value
+C                                       
+      DATA      SYMBOLS /'.',':','/','+','*','%','@','#'/
+C
+      INCLUDE   'DCV_FUN'
+C
+      IF(MAXVAL.GT.MINVAL)THEN
+        RANGE=MAXVAL-MINVAL
+      ELSE
+        RANGE=1.0
+      END IF
+C
+C     Display details of subset
+C
+      CALL DSA_WRUSER(' \\N')
+      DO I=1,2
+        IF(I.EQ.1)THEN
+          STRING='  Horizontal: dimension '
+        ELSE
+          STRING='  Vertical:   dimension '
+        END IF
+        DUMINT=ICH_ENCODE(STRING,REAL(I),25,0,NEXT)
+        STRING(NEXT:)=', pixels '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(STAPIX(I)),NEXT+9,0,NEXT)
+        STRING(NEXT:)=' to '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(ENDPIX(I)),NEXT+4,0,NEXT)
+        IF(I.EQ.1)THEN
+          STRING(NEXT:)=' (left to right)'
+        ELSE
+          STRING(NEXT:)=' (bottom to top)'
+        END IF
+        CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+      END DO
+      CALL DSA_WRUSER('  This display is the right way up!\\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER('  Eight-level scale is  . : / + * % @ # \\N')
+      STRING='  where . = '
+      DUMINT=ICH_ENCODE(STRING,MINVAL,13,3,NEXT)
+      STRING(NEXT:)=' and # = '
+      DUMINT=ICH_ENCODE(STRING,MAXVAL,NEXT+9,3,NEXT)
+      CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+      CALL DSA_WRUSER('  B = bad quality pixel \\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C                           
+C     Loop through the image, displaying each row
+C
+      NEXT=1
+      DO J=ENDPIX(2),STAPIX(2),-1
+        DO I=STAPIX(1),ENDPIX(1)
+          NEXT=NEXT+2
+          IF (QUAL) THEN
+            IF (QARRAY(I,J).EQ.0) THEN
+              VALUE=DCV_<T>toR(ARRAY(I,J))
+              STRING(NEXT:)=SYMBOLS(NINT(((VALUE-MINVAL)/RANGE)*7.0)+1)
+            ELSE
+              STRING(NEXT:)='B'
+            END IF ! (QARRAY...)
+          ELSE
+            VALUE=DCV_<T>toR(ARRAY(I,J))
+            STRING(NEXT:)=SYMBOLS(NINT(((VALUE-MINVAL)/RANGE)*7.0)+1)
+          END IF
+        END DO
+c       CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        CALL PAR_WRUSER(STRING(:ICH_LEN(STRING)),STATUS)
+        NEXT=1
+      END DO
+C
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C                                                        
+      END
+
+
+
+      SUBROUTINE SQUINT_DATA_<T>Q
+     &  (ARRAY,NX,NY,STAPIX,ENDPIX,MAXVAL,MINVAL,MAGICVAL)
+C
+      IMPLICIT NONE
+C
+C     Functions
+C          
+      INTEGER   ICH_ENCODE,ICH_LEN
+C
+C     Parameters
+C
+      INTEGER   NX,NY,STAPIX(6),ENDPIX(6)
+      REAL      MAXVAL,MINVAL
+      <TYPE>
+     &          ARRAY(NX,NY),MAGICVAL
+C
+C     Local variables
+C                     
+      INTEGER   DUMINT       ! INTEGER dummy variable
+      INTEGER   I            ! Loop counter
+      INTEGER   J            ! Loop counter
+      INTEGER   NEXT         ! Pointer returned by ICH_ENCODE
+      REAL      RANGE        ! Range of values in subset
+      CHARACTER STRING*160   ! Message string
+      INTEGER   STATUS       ! Status code
+      CHARACTER SYMBOLS(8)   ! Eight-level scale of characters
+      REAL      VALUE        ! Pixel value
+C                                       
+      DATA      SYMBOLS /'.',':','/','+','*','%','@','#'/
+C
+      INCLUDE   'DCV_FUN'
+C
+      IF(MAXVAL.GT.MINVAL)THEN
+        RANGE=MAXVAL-MINVAL
+      ELSE
+        RANGE=1.0
+      END IF
+C
+C     Display details of subset
+C
+      CALL DSA_WRUSER(' \\N')
+      DO I=1,2
+        IF(I.EQ.1)THEN
+          STRING='  Horizontal: dimension '
+        ELSE
+          STRING='  Vertical:   dimension '
+        END IF
+        DUMINT=ICH_ENCODE(STRING,REAL(I),25,0,NEXT)
+        STRING(NEXT:)=', pixels '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(STAPIX(I)),NEXT+9,0,NEXT)
+        STRING(NEXT:)=' to '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(ENDPIX(I)),NEXT+4,0,NEXT)
+        IF(I.EQ.1)THEN
+          STRING(NEXT:)=' (left to right)'
+        ELSE
+          STRING(NEXT:)=' (bottom to top)'
+        END IF
+        CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+      END DO
+      CALL DSA_WRUSER('  This display is the right way up!\\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER('  Eight-level scale is  . : / + * % @ # \\N')
+      STRING='  where . = '
+      DUMINT=ICH_ENCODE(STRING,MINVAL,13,3,NEXT)
+      STRING(NEXT:)=' and # = '
+      DUMINT=ICH_ENCODE(STRING,MAXVAL,NEXT+9,3,NEXT)
+      CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+      CALL DSA_WRUSER('  M = magic value pixel \\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C                           
+C     Loop through the image, displaying each row
+C
+      NEXT=1
+      DO J=ENDPIX(2),STAPIX(2),-1
+        DO I=STAPIX(1),ENDPIX(1)
+          NEXT=NEXT+2
+          IF(ARRAY(I,J).GT.MAGICVAL)THEN
+            VALUE=DCV_<T>toR(ARRAY(I,J))
+            STRING(NEXT:)=SYMBOLS(NINT(((VALUE-MINVAL)/RANGE)*7.0)+1)
+          ELSE
+            STRING(NEXT:)='M'
+          END IF
+        END DO
+c       CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        CALL PAR_WRUSER(STRING(:ICH_LEN(STRING)),STATUS)
+        NEXT=1
+      END DO
+C
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C                                                        
+      END
+
+
+

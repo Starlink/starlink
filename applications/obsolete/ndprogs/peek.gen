@@ -1,0 +1,349 @@
+      SUBROUTINE PEEK_DATA_<T>
+     &  (ARRAY,DIMS,NDIM,NELM,PIXEL,STAPIX,ENDPIX,MAXVAL,MINVAL,
+     &   QUAL,QARRAY)
+C
+      IMPLICIT NONE
+C
+C     Functions
+C
+      INTEGER   ICH_ENCODE,ICH_LEN
+C                          
+C     Parameters
+C
+      INTEGER   DIMS(10),NDIM,NELM,PIXEL(6),STAPIX(6),ENDPIX(6)
+      REAL      MAXVAL,MINVAL
+      <TYPE>
+     &          ARRAY(NELM)
+      BYTE      QARRAY(NELM)
+      LOGICAL   QUAL
+C
+C     Local variables
+C                     
+      INTEGER   DUMINT       ! INTEGER dummy variable
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   LENGTH       ! Maximum character length of value
+      INTEGER   LENMAX       ! Character length of maximum value
+      INTEGER   LENMIN       ! Character length of minimum value
+      INTEGER   NEXT         ! Pointer returned by ICH_ENCODE
+      LOGICAL   OUT          ! Pixel outside image flag
+      CHARACTER STRING*80    ! Message string
+      INTEGER   STATUS       ! Status code
+      REAL      VALUE        ! Pixel value
+C
+      INCLUDE   'DCV_FUN'
+C
+C     Initialize
+C
+      OUT=.FALSE.
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Find maximum character length of value, with one decimal digit, plus 
+C     following space
+C
+      VALUE=INT(MAXVAL)+0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMAX)
+      VALUE=INT(MINVAL)-0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMIN)
+      LENGTH=MAX(LENMAX,LENMIN)
+C
+C     Extract and display required pixel 
+C
+      CALL DSA_WRUSER(' \\N')
+C
+C     If dimensionality is 3 or less -
+C
+      IF(NDIM.LE.3)THEN
+C
+C     - display details of subset
+C
+        CALL DSA_WRUSER(' \\N')
+        DO I=1,NDIM
+          IF(I.EQ.1)THEN
+            STRING='  Horizontal: dimension '
+          ELSE IF(I.EQ.2)THEN
+            STRING='  Vertical:   dimension '
+          ELSE
+            STRING='  Sections:   dimension '
+          END IF
+          DUMINT=ICH_ENCODE(STRING,REAL(I),25,0,NEXT)
+          STRING(NEXT:)=', pixels '
+          DUMINT=ICH_ENCODE(STRING,REAL(STAPIX(I)),NEXT+9,0,NEXT)
+          STRING(NEXT:)=' to '
+          DUMINT=ICH_ENCODE(STRING,REAL(ENDPIX(I)),NEXT+4,0,NEXT)
+          IF(I.EQ.1)THEN
+            STRING(NEXT:)=' (left to right)'
+          ELSE
+            STRING(NEXT:)=' (bottom to top)'
+          END IF
+          CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        END DO     
+        CALL DSA_WRUSER('  This display is the right way up!\\N')
+        CALL DSA_WRUSER(' \\N')
+        CALL DSA_WRUSER('  B = bad quality pixel \\N')
+        CALL DSA_WRUSER('  X = pixel outside image \\N')
+        CALL DSA_WRUSER(' \\N')
+        CALL DSA_WRUSER(' \\N')
+C
+C    - display required pixel and its neighbours
+C
+        NEXT=3-LENGTH
+        DO IND3=ENDPIX(3),STAPIX(3),-1
+          IOFF3=(IND3-1)*INC(3)
+          DO IND2=ENDPIX(2),STAPIX(2),-1
+            IOFF2=(IND2-1)*INC(2)
+            DO IND1=STAPIX(1),ENDPIX(1)
+              IOFF1=IND1-1
+              IOFF=1+IOFF1+IOFF2+IOFF3
+C
+              OUT=.FALSE.
+              IF(IND1.LT.1 .OR. IND1.GT.DIMS(1))OUT=.TRUE.
+              IF(NDIM.GE.2)THEN
+                IF(IND2.LT.1 .OR. IND2.GT.DIMS(2))OUT=.TRUE.
+              END IF
+              IF(NDIM.EQ.3)THEN
+                IF(IND3.LT.1 .OR. IND3.GT.DIMS(3))OUT=.TRUE.
+              END IF
+C
+              NEXT=NEXT+LENGTH
+              IF(.NOT.OUT)THEN
+                IF (QUAL) THEN
+                  IF (QARRAY(IOFF).NE.0) THEN
+                    STRING(NEXT:)='B'
+                  ELSE
+                    VALUE=DCV_<T>toR(ARRAY(IOFF))
+                    DUMINT=ICH_ENCODE(STRING,VALUE,NEXT,1,DUMINT)
+                  END IF ! (QARRAY...)
+                ELSE      
+                  VALUE=DCV_<T>toR(ARRAY(IOFF))
+                  DUMINT=ICH_ENCODE(STRING,VALUE,NEXT,1,DUMINT)
+                END IF ! (QUAL)
+              ELSE
+                STRING(NEXT:)='X'
+              END IF ! (.NOT.OUT...)
+C
+            END DO
+            CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+            CALL DSA_WRUSER(' \\N')
+            NEXT=3-LENGTH
+          END DO
+          CALL DSA_WRUSER(' \\N')
+        END DO
+C
+C     If dimensionality is greater than 3, display required pixel only
+C
+      ELSE                
+        IOFF6=(PIXEL(6)-1)*INC(6)
+        IOFF5=(PIXEL(5)-1)*INC(5)
+        IOFF4=(PIXEL(4)-1)*INC(4)
+        IOFF3=(PIXEL(3)-1)*INC(3)
+        IOFF2=(PIXEL(2)-1)*INC(2)
+        IOFF1=PIXEL(1)-1
+        IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+        STRING='Pixel value = '
+        VALUE=DCV_<T>toR(ARRAY(IOFF))
+        DUMINT=ICH_ENCODE(STRING,VALUE,15,1,DUMINT)
+        CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        CALL DSA_WRUSER(' \\N')
+        CALL DSA_WRUSER(' \\N')
+      END IF
+C
+      RETURN
+      END
+
+
+
+      SUBROUTINE PEEK_DATA_<T>Q
+     &  (ARRAY,DIMS,NDIM,NELM,PIXEL,STAPIX,ENDPIX,MAXVAL,MINVAL,
+     &   MAGICVAL)
+C
+      IMPLICIT NONE
+C
+C     Functions
+C
+      INTEGER   ICH_ENCODE,ICH_LEN
+C                          
+C     Parameters
+C
+      INTEGER   DIMS(10),NDIM,NELM,PIXEL(6),STAPIX(6),ENDPIX(6)
+      REAL      MAXVAL,MINVAL
+      <TYPE>
+     &          ARRAY(NELM),
+     &          MAGICVAL
+C
+C     Local variables
+C                     
+      INTEGER   DUMINT       ! INTEGER dummy variable
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   LENGTH       ! Maximum character length of value
+      INTEGER   LENMAX       ! Character length of maximum value
+      INTEGER   LENMIN       ! Character length of minimum value
+      INTEGER   NEXT         ! Pointer returned by ICH_ENCODE
+      LOGICAL   OUT          ! Pixel outside image flag
+      CHARACTER STRING*80    ! Message string
+      INTEGER   STATUS       ! Status code
+      REAL      VALUE        ! Pixel value
+C
+      INCLUDE   'DCV_FUN'
+C
+C     Initialize
+C
+      OUT=.FALSE.
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Find maximum character length of value, with one decimal digit, plus 
+C     following space
+C
+      VALUE=INT(MAXVAL)+0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMAX)
+      VALUE=INT(MINVAL)-0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMIN)
+      LENGTH=MAX(LENMAX,LENMIN)
+C
+C     Extract and display required pixel 
+C
+      CALL DSA_WRUSER(' \\N')
+C
+C     If dimensionality is 3 or less -
+C
+      IF(NDIM.LE.3)THEN
+C
+C     - display details of subset
+C
+        CALL DSA_WRUSER(' \\N')
+        DO I=1,NDIM
+          IF(I.EQ.1)THEN
+            STRING='  Horizontal: dimension '
+          ELSE IF(I.EQ.2)THEN
+            STRING='  Vertical:   dimension '
+          ELSE
+            STRING='  Sections:   dimension '
+          END IF
+          DUMINT=ICH_ENCODE(STRING,REAL(I),25,0,NEXT)
+          STRING(NEXT:)=', pixels '
+          DUMINT=ICH_ENCODE(STRING,REAL(STAPIX(I)),NEXT+9,0,NEXT)
+          STRING(NEXT:)=' to '
+          DUMINT=ICH_ENCODE(STRING,REAL(ENDPIX(I)),NEXT+4,0,NEXT)
+          IF(I.EQ.1)THEN
+            STRING(NEXT:)=' (left to right)'
+          ELSE
+            STRING(NEXT:)=' (bottom to top)'
+          END IF
+          CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        END DO     
+        CALL DSA_WRUSER('  This display is the right way up!\\N')
+        CALL DSA_WRUSER(' \\N')
+        CALL DSA_WRUSER('  M = magic value pixel \\N')
+        CALL DSA_WRUSER('  X = pixel outside image \\N')
+        CALL DSA_WRUSER(' \\N')
+        CALL DSA_WRUSER(' \\N')
+C
+C    - display required pixel and its neighbours
+C
+        NEXT=3-LENGTH
+        DO IND3=ENDPIX(3),STAPIX(3),-1
+          IOFF3=(IND3-1)*INC(3)
+          DO IND2=ENDPIX(2),STAPIX(2),-1
+            IOFF2=(IND2-1)*INC(2)
+            DO IND1=STAPIX(1),ENDPIX(1)
+              IOFF1=IND1-1
+              IOFF=1+IOFF1+IOFF2+IOFF3
+C
+              OUT=.FALSE.
+              IF(IND1.LT.1 .OR. IND1.GT.DIMS(1))OUT=.TRUE.
+              IF(NDIM.GE.2)THEN
+                IF(IND2.LT.1 .OR. IND2.GT.DIMS(2))OUT=.TRUE.
+              END IF
+              IF(NDIM.EQ.3)THEN
+                IF(IND3.LT.1 .OR. IND3.GT.DIMS(3))OUT=.TRUE.
+              END IF
+C
+              NEXT=NEXT+LENGTH
+              IF(.NOT.OUT)THEN
+                IF(ARRAY(IOFF).GT.MAGICVAL)THEN                
+                  VALUE=DCV_<T>toR(ARRAY(IOFF))
+                  DUMINT=ICH_ENCODE(STRING,VALUE,NEXT,1,DUMINT)
+                ELSE
+                  STRING(NEXT:)='M'
+                END IF
+              ELSE
+                STRING(NEXT:)='X'
+              END IF
+C
+            END DO
+            CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+            CALL DSA_WRUSER(' \\N')
+            NEXT=3-LENGTH
+          END DO
+          CALL DSA_WRUSER(' \\N')
+        END DO
+C
+C     If dimensionality is greater than 3, display required pixel only
+C
+      ELSE                
+        IOFF6=(PIXEL(6)-1)*INC(6)
+        IOFF5=(PIXEL(5)-1)*INC(5)
+        IOFF4=(PIXEL(4)-1)*INC(4)
+        IOFF3=(PIXEL(3)-1)*INC(3)
+        IOFF2=(PIXEL(2)-1)*INC(2)
+        IOFF1=PIXEL(1)-1
+        IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+        STRING='Pixel value = '
+        IF(ARRAY(IOFF).EQ.MAGICVAL)THEN
+          STRING(15:)='M'
+        ELSE
+          VALUE=DCV_<T>toR(ARRAY(IOFF))
+          DUMINT=ICH_ENCODE(STRING,VALUE,15,1,DUMINT)
+        END IF
+        CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        CALL DSA_WRUSER(' \\N')
+        CALL DSA_WRUSER(' \\N')
+      END IF
+C
+      RETURN
+      END

@@ -1,0 +1,97 @@
+#+
+#  Name:
+#     UNMAGIC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface UNMAGIC
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image file to be processed.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt  '(WHole) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WHOLE is TRUE, the whole of IMAGE will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter INTERP
+         type   '_integer'
+         prompt  '(INTERP) Interpolation method'
+         association '<->global.interp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help '2=average of neighbours, 3=linear, 5=replace with constant.'
+      endparameter
+
+      parameter  MINADJ
+         type   '_integer'
+         prompt  '(MINADJ) Minimum no. of non-magic adjacent pixels'
+         association '<->global.minadj'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MINADJ must be in [1,3^NDIM-1].'
+      endparameter
+
+      parameter  VALUE
+         type   '_real'
+         prompt  '(VALue) Constant value'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the constant value to replace magic values with.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting processed image.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,137 @@
+#+
+#  Name:
+#     DEGAMMA.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface DEGAMMA
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the 3D stack of images to process,'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the resulting processed image.'
+      endparameter
+
+      parameter  VERBOSE
+         type    '_logical'
+         association '<->global.verbose'
+         vpath 'default,dynamic,current,global'
+         default 'false'
+      endparameter
+
+      parameter  XYWEIGHT
+         type    '_real'
+         association '<->global.xyweight'
+         vpath 'default,dynamic,current,global'
+      endparameter
+ 
+      parameter  NDEVS
+         type    '_real'
+         prompt  '(NDEVS) Number of standard deviations for a legal pixel'
+         association '<->global.ndevs'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Specify the width of the tolerance band in standard deviations.'
+      endparameter
+
+      parameter  FLAGBAD
+         type    '_logical'
+         prompt  '(FLAGBAD) Set defective pixels quality as bad?'
+         association '<->global.flagbad'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If TRUE, pixels eliminated will be replaced with magic values.'
+      endparameter
+ 
+      parameter  DOEDGE
+         type    '_logical'
+         prompt  '(DOEDGE) Include edge pixels in the search?'
+         association '<->global.doedge'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If TRUE, pixels at edges will be processed as well.'
+      endparameter
+ 
+      parameter   NNPIX
+         type     '_real'
+         prompt   '(NNPIX) Number of neighbour pixels to compare.'
+         association '<->global.nnpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'How many neighbour pixels (0-6) shall I look at ?'
+      endparameter
+
+      parameter  TOL
+         type    '_real'
+         prompt  '(TOL) Tolerance for pixel equality'
+         association '<->global.tol'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (ABS(PIXEL(1)-PIXEL(2)) < TOL) then these pixels are "equal".'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is the array containing the start coords of the subset.`
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is the array containing the end coords of the subset.'
+      endparameter
+
+      parameter  WHOLE
+         type    '_logical'
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If TRUE, the entire 3D iamge will be processed.'
+      endparameter
+
+      parameter  POSDEV
+         type    '_logical'
+         prompt  '(POSDEV) Only look for positive deviations from the mean?'
+         association '<->global.posdev'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Cosmic rays produce positive deviations only.'
+      endparameter
+
+   endinterface
+

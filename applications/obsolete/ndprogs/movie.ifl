@@ -1,0 +1,166 @@
+#+
+#  Name:
+#     MOVIE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MOVIE
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image to be animated.'
+      endparameter
+ 
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt  '(WHOLE) Display the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Set this keyword to view the entire 2D imaged.'
+      endparameter
+ 
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+     
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  STEP
+         type   '_integer'
+         prompt  '(STEP) Frame step'
+         association '<->global.step'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STEP is the increment between displayed frames.'
+      endparameter
+ 
+      parameter  LOW
+         type   '_real'
+         prompt  '(LOW) Lowest value to be displayed'
+         association '<->global.low'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Pixels with value below LOW will not be plotted.'
+      endparameter
+                          
+      parameter  HIGH
+         type   '_real'
+         prompt  '(HIGH) Highest value to be displayed'
+         association '<->global.high'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+  
+      parameter  PLACE
+         type   '_char'
+         prompt  '(PLACE) Location of plot'
+         association '<->global.place'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Options are BL,BC,BR,LC,CC,RC,TL,TC, and TR.'
+      endparameter
+ 
+      parameter  MAG
+         type   '_real'
+         prompt  '(MAG) Magnification of plot'
+         association '<->global.mag'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MAG is the display scaling factor for the plot.'
+      endparameter
+ 
+      parameter  LABEL
+         type    CHAR
+         prompt  '(LABEL) Label for plot'
+         association '<->global.label'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'LABEL is the title to be displayed above the images.'
+      endparameter
+ 
+      parameter  AXES
+         type   '_logical'
+         prompt  '(AXES) Plot image axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXES is specified, the x and y axes will be plotted.'
+      endparameter
+ 
+      parameter  RAMP
+         type   '_logical'
+         prompt  '(RAMP) Plot ramp of colour or grey scale?'
+         association '<->global.ramp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If RAMP is TRUE, a colour ramp is plotted next to the images.'
+      endparameter
+ 
+      parameter  TABLE
+         type    CHAR
+         prompt  '(TABLE) Name of lookup table'
+         association '<->global.table'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'TABLE is the name of the colour look-up table for the images.'
+      endparameter
+ 
+      parameter  ERASE
+         type   '_logical'
+         prompt  '(ERase) Erase screen before plotting?'
+         association '<->global.erase'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If ERASE is TRUE, the display will be cleared before plotting.'
+      endparameter
+ 
+      parameter SOFTDEV
+        ptype 'device'
+        type 'literal'
+        vpath 'global'
+        ppath 'global,dynamic,current,default'
+        association '<->global.softdev'
+      endparameter
+ 
+      parameter HARDDEV
+        ptype 'device'
+        type 'literal'
+        vpath 'global'
+        ppath 'global,dynamic,current,default'
+        association '<->global.harddev'
+      endparameter
+ 
+   endinterface
+

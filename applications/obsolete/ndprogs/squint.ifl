@@ -1,0 +1,61 @@
+#+
+#  Name:
+#     SQUINT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SQUINT
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image you wish to SQUINT at.'
+      endparameter
+
+      parameter  STAPIX
+         type   '_integer'
+         prompt  '(STAPIX) Start pixel of subset.'
+         association '<->global.stapix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STAPIX is an array containing the start pixels of the subset.'
+      endparameter
+ 
+      parameter  ENDPIX
+         type   '_integer'
+         prompt  '(ENDPIX) End pixel of subset.'
+         association '<->global.endpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ENDPIX is an array containing the end pixels of the subset.'
+      endparameter
+
+      parameter  AGAIN  
+         type   '_logical'
+         prompt  '(AGAIN) Look at another subset?'
+         association '<->global.again'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Type Y to have another SQUINT or N to quit.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,73 @@
+      SUBROUTINE SUBSET_DATA_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,ODIMS,ONELM,STAPIX,ENDPIX)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C                   
+      INTEGER   DIMS(10),NDIM,NELM,ODIMS(10),ONELM,STAPIX(6),ENDPIX(6)
+      <type>
+     &          ARRAY(NELM),OARRAY(ONELM)
+C
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Subsetted axis 1 index
+      INTEGER   IND2         ! Subsetted axis 2 index
+      INTEGER   IND3         ! Subsetted axis 3 index
+      INTEGER   IND4         ! Subsetted axis 4 index
+      INTEGER   IND5         ! Subsetted axis 5 index
+      INTEGER   IND6         ! Subsetted axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   OOFF         ! 1-D offset in OARRAY
+C
+C     Initialize
+C      
+      OOFF=1
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Subset
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  OARRAY(OOFF)=ARRAY(IOFF)
+                  OOFF=OOFF+1
+                END DO
+              END DO
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END

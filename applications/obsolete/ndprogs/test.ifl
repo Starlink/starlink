@@ -1,0 +1,129 @@
+#+
+#  Name:
+#     TEST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface TEST
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of image to be created'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+                  
+      parameter  NDIM
+         type   '_integer'
+         prompt  '(NDIM) Number of dimensions'
+         association '<->global.ndim'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  SIZE
+         type   '_integer'
+         prompt  '(SIZE) Dimensions of image.'
+         association '<->global.size'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXES
+         type   '_logical'                                               
+         prompt  '(AXes) Calibrate the axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for axes to be calibrated.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXSTART
+         type   '_real'
+         prompt  '(AXSTart) Start values of axes.'
+         association '<->global.axstart'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXEND
+         type   '_real'
+         prompt  '(AXENd) End values of axes.'
+         association '<->global.axend'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  AXLOG
+         type   '_integer'
+         prompt  '(AXLOG) Keys for logarithmic scaling.'
+         association '<->global.axlog'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+
+      parameter  EXTRA
+         type    CHAR
+         prompt  '(EXtra) (M)agic values, (Q)uality arrays or (E)rror arrays?'
+         association '<->global.extra'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+ 
+      parameter  VALUE
+         type   '_real'
+         prompt  '(VALue) Value to be assigned to every pixel'
+         association '<->global.value'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+      
+      parameter  Dtype
+         type    CHAR
+         prompt  '(DTYpe) Choose data type as B(yte), S(hort) or F(loat)'
+         association '<->global.dtype'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+  
+      parameter  ERRVAL
+         type   '_real'
+         prompt  '(ERRVal) Value to be assigned to the error array'
+         association '<->global.errval'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+  
+      parameter  QVAL
+         type    BYTE
+         prompt  '(QVal) Value to be assigned to the quality array'
+         association '<->global.qval'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+      endparameter
+ 
+   endinterface
+

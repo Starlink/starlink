@@ -1,0 +1,500 @@
+      subroutine plots_splot_<t>
+     &  (array,spaxis,work1,work2,work3,work4,valid,nx,ny,nz,
+     &   xpix,ypix,scale,slow,shigh,bin,device,slabel,axes,
+     &   write,hard,points,badpix,magicval,
+     &   nx1,ny1,polygon,mask,status)
+c
+      implicit none
+c
+      integer  ich_encode,ich_len,pgbegin
+c
+      character*(*) device,slabel
+      integer       nx,ny,nz,bin,nx1,ny1
+      integer*2     valid(nx)
+      logical       polygon
+      byte          mask(nx1,ny1)
+      logical       scale,axes,write,hard,points,badpix
+      real          spaxis(nx),
+     &              work1(nx),work2(nx),
+     &              work3(nx),work4(nx),
+     &              xpix(2),ypix(2),slow,shigh
+      <type>
+     &              array(nx,ny,nz),
+     &              magicval
+      integer       status
+c
+      character basename*32
+      logical   do_it
+      integer   dumint
+      real      dumreal
+      integer   i
+      integer   j
+      integer   jj
+      integer   k
+      integer   kk
+      integer   last(2)
+      character mode*16
+      integer   next
+      integer   nplot
+      integer   nxdiv
+      integer   nydiv
+      character plabel*32
+      character string*80
+      real      xend
+      real      xsta
+      real      yspe
+      real      ysps
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   Return immediately if no points have been selected
+c
+      if(.not.points)then
+        call dsa_wruser('Point(s) must be selected first.\\N')
+        go to 500
+      end if
+c
+c   Initialize
+c
+      nplot=0
+c
+c   Get a name for the output data if needed and create data file
+c
+      if (write) then
+        call par_cnpar('spectrum')
+        call par_rdchar('spectrum','plots',basename)
+        if (polygon) then
+          call plots_write_polygon_data(basename,nx1,ny1,mask,
+     &                                  int(xpix(1)),int(ypix(1)),
+     &                                  bin,status)
+        else
+          call plots_write_rect_data(basename,
+     &                               int(xpix(1)),int(ypix(1)),
+     &                               last(1),last(2),bin,status)
+        end if
+        if (status .ne.0) go to 500
+      end if
+c
+c   Set common scale for all plots if required
+c
+      if(scale)then
+        ysps=slow
+        yspe=shigh
+        yspe=yspe+(yspe-ysps)*0.1
+      end if
+c
+c   Compute start pixel of last bin
+c
+      last(1)=int(xpix(1))+((int(xpix(2)-xpix(1)+1.0)/bin)-1)*bin
+      last(2)=int(ypix(1))+((int(ypix(2)-ypix(1)+1.0)/bin)-1)*bin
+c
+c   Compute number of plot divisions in X and Y
+c
+      nxdiv=int((xpix(2)-xpix(1)+1.0)/real(bin))
+      nydiv=int((ypix(2)-ypix(1)+1.0)/real(bin))
+c
+c   Quit if the area selected is smaller than one bin
+c
+      if(nxdiv.eq.0 .or. nydiv.eq.0)then
+        call dsa_wruser('The selected area is smaller than the ')
+        call dsa_wruser('binning interval. Either increase the size ')
+        call dsa_wruser('of the area, or decrease the binning ')
+        call dsa_wruser('interval.\\N')
+        go to 500
+c
+c   Issue warning if there are partial bins in either direction
+c
+      else
+        dumreal=(xpix(2)-xpix(1)+1.0)/real(bin)
+        if(dumreal-real(nxdiv).gt.0.0)then
+          call dsa_wruser('Warning: there are partial bins at the ')
+          call dsa_wruser('right edge which will not be plotted.\\N')
+        end if
+        dumreal=(ypix(2)-ypix(1)+1.0)/real(bin)
+        if(dumreal-real(nydiv).gt.0.0)then
+          call dsa_wruser('Warning: there are partial bins at the ')
+          call dsa_wruser('bottom edge which will not be plotted.\\N')
+        end if
+c
+c   State dimensions of spectrum display
+c
+        string='The spectrum display will measure '
+        dumint=ich_encode(string,real(nxdiv),35,0,next)
+        string(next:)=' plots by '
+        dumint=ich_encode(string,real(nydiv),next+10,0,next)
+        string(next:)=' plots.'
+        call dsa_wruser(string(:ich_len(string))//'\\n')
+      end if
+c
+c   Open device with required number of divisions
+c
+      call pgend
+      status=pgbegin(0,device,nxdiv,nydiv)
+      if(status.ne.1)go to 500
+      status=0
+      call pgask(.false.)
+c
+c   Set hardcopy line width (suitable for the Canon)
+c
+      if(hard)call pgslw(2)
+c
+c   Perform extraction(s)
+c
+      do kk=last(2),int(ypix(1)),bin*-1
+        do jj=int(xpix(1)),last(1),bin
+          do_it = .false.
+          if (.not.polygon) do_it = .true.
+          if (polygon) then
+            if (mask(jj,kk).ne.0) do_it = .true.
+          end if
+          if (do_it) then
+c
+c   - extract and sum spectra within the bin
+c
+            do i=1,nx
+              work1(i)=0.0
+              valid(i)=0
+            end do
+            do k=kk,kk+bin-1
+              do j=jj,jj+bin-1
+                do i=1,nx
+                  work2(i)=dcv_<t>toR(array(i,j,k))
+                  valid(i)=valid(i)+1
+                end do
+                call ndp_add(nx,badpix,work1,work2,work1)
+              end do
+            end do
+c
+c   - compute average spectrum
+c
+            do i=1,nx
+              work1(i)=work1(i)/real(valid(i))
+            end do
+c
+c   Get range of axis values
+c
+            call gen_rangef(spaxis,1,nx,xend,xsta)
+c
+c   If common scale is not required, get the range of the spectrum data.
+c
+            if(.not.scale)then
+              call ndp_range(work1,1,nx,badpix,yspe,ysps)
+              if(yspe.eq.ysps)then
+                yspe=ysps+1.0
+                ysps=ysps-1.0
+              else
+                yspe=yspe+(yspe-ysps)*0.1
+              end if
+            end if
+c
+c   Plot spectrum
+c
+            call pgadvance
+            call pgwindow(xsta,xend,ysps,yspe)
+            if(axes)then
+              call pgbox('BCNT',0.0,0,'BCNST',0.0,0)
+            else
+              call pgbox('BC',0.0,0,'BC',0.0,0)
+            end if
+            call ndp_pgbin(spaxis,work1,work3,work4,nx,badpix,.true.)
+            nplot=nplot+1
+c
+c   - construct label from pixel numbers if required
+c
+            if(axes)then
+              plabel='('
+              dumint=ich_encode(plabel,xpix(1),2,0,next)
+              plabel(next:)=','
+              dumint=ich_encode(plabel,ypix(1),next+1,0,next)
+              plabel(next:)=')'
+              next=next+1
+              plabel(next:)=' to ('
+              dumint=ich_encode(plabel,xpix(2),next+5,0,next)
+              plabel(next:)=','
+              dumint=ich_encode(plabel,ypix(2),next+1,0,next)
+              plabel(next:)=')'
+              call pglabel(plabel,' ',' ')
+            end if
+c
+            if(hard)then
+              string='Spectrum plot '
+              dumint=ich_encode(string,real(nplot),15,0,next)
+              string(next:)=' completed.'
+              call dsa_wruser(string(:ich_len(string))//'\\n')
+            end if
+c
+c   Write spectrum to data structure if required
+c
+            if(.not.hard .and. write)then
+              if (polygon) then
+                mode = 'POLYGON'
+              else 
+                mode = 'RECTANGLE'
+              end if
+              call plots_write(work1,spaxis,nx,badpix,nplot,
+     &                         basename,j,k,bin,mode,status)
+              if(status.ne.0)go to 500
+            end if
+c
+          else
+            call pgadvance
+          end if ! (do_it)... 
+        end do
+      end do
+c
+        if(hard)call dsa_wruser('Hardcopy plot completed.\\N')
+c
+  500 continue
+      end
+
+
+
+      subroutine plots_splot_<t>q
+     &  (array,spaxis,work1,work2,work3,work4,valid,nx,ny,nz,
+     &   xpix,ypix,scale,slow,shigh,bin,device,slabel,axes,
+     &   write,hard,points,badpix,magicval,
+     &   nx1,ny1,polygon,mask,status)
+c
+      implicit none
+c
+      integer  ich_encode,ich_len,pgbegin
+c
+      character*(*) device,slabel
+      integer       nx,ny,nz,bin,nx1,ny1
+      integer*2     valid(nx)
+      logical       polygon
+      byte          mask(nx1,ny1)
+      logical       scale,axes,write,hard,points,badpix
+      real          spaxis(nx),
+     &              work1(nx),work2(nx),
+     &              work3(nx),work4(nx),
+     &              xpix(2),ypix(2),slow,shigh
+      <type>
+     &              array(nx,ny,nz),
+     &              magicval
+      integer       status
+c
+      character basename*32
+      logical   do_it
+      integer   dumint
+      real      dumreal
+      integer   i
+      integer   j
+      integer   jj
+      integer   k
+      integer   kk
+      integer   last(2)
+      character mode*16
+      integer   next
+      integer   nplot
+      integer   nxdiv
+      integer   nydiv
+      character plabel*32
+      character string*80
+      real      xend
+      real      xsta
+      real      yspe
+      real      ysps
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   Return immediately if no points have been selected
+c
+      if(.not.points)then
+        call dsa_wruser('Point(s) must be selected first.\\N')
+        go to 500
+      end if
+c
+c   Initialize
+c
+      nplot=0
+c
+c   Get a name for output data file then
+c
+      if (write) then
+        call par_cnpar('spectrum')
+        call par_rdchar('spectrum','plots',basename)
+      end if
+c
+c   Set common scale for all plots if required
+c
+      if(scale)then
+        ysps=slow
+        yspe=shigh
+        yspe=yspe+(yspe-ysps)*0.1
+      end if
+c
+c   Compute start pixel of last bin
+c
+      last(1)=int(xpix(1))+((int(xpix(2)-xpix(1)+1.0)/bin)-1)*bin
+      last(2)=int(ypix(1))+((int(ypix(2)-ypix(1)+1.0)/bin)-1)*bin
+c
+c   Compute number of plot divisions in X and Y
+c
+      nxdiv=int((xpix(2)-xpix(1)+1.0)/real(bin))
+      nydiv=int((ypix(2)-ypix(1)+1.0)/real(bin))
+c
+c   Quit if the area selected is smaller than one bin
+c
+      if(nxdiv.eq.0 .or. nydiv.eq.0)then
+        call dsa_wruser('The selected area is smaller than the ')
+        call dsa_wruser('binning interval. Either increase the size ')
+        call dsa_wruser('of the area, or decrease the binning ')
+        call dsa_wruser('interval.\\N')
+        go to 500
+c
+c   Issue warning if there are partial bins in either direction
+c
+      else
+        dumreal=(xpix(2)-xpix(1)+1.0)/real(bin)
+        if(dumreal-real(nxdiv).gt.0.0)then
+          call dsa_wruser('Warning: there are partial bins at the ')
+          call dsa_wruser('right edge which will not be plotted.\\N')
+        end if
+        dumreal=(ypix(2)-ypix(1)+1.0)/real(bin)
+        if(dumreal-real(nydiv).gt.0.0)then
+          call dsa_wruser('Warning: there are partial bins at the ')
+          call dsa_wruser('bottom edge which will not be plotted.\\N')
+        end if
+c
+c   State dimensions of spectrum display
+c
+        string='The spectrum display will measure '
+        dumint=ich_encode(string,real(nxdiv),35,0,next)
+        string(next:)=' plots by '
+        dumint=ich_encode(string,real(nydiv),next+10,0,next)
+        string(next:)=' plots.'
+        call dsa_wruser(string(:ich_len(string))//'\\n')
+      end if
+c
+c   Open device with required number of divisions
+c
+      call pgend
+      status=pgbegin(0,device,nxdiv,nydiv)
+      if(status.ne.1)go to 500
+      status=0
+      call pgask(.false.)
+c
+c   Set hardcopy line width (suitable for the Canon)
+c
+      if(hard)call pgslw(2)
+c
+c   Perform extraction(s)
+c
+      do kk=last(2),int(ypix(1)),bin*-1
+        do jj=int(xpix(1)),last(1),bin
+          do_it = .false.
+          if (.not.polygon) do_it = .true.
+          if (polygon) then
+            if (mask(jj,kk).ne.0) do_it = .true.
+          end if
+          if (do_it) then
+c
+c   - extract and sum spectra within the bin
+c
+            do i=1,nx
+              work1(i)=0.0
+              valid(i)=0
+            end do
+            do k=kk,kk+bin-1
+              do j=jj,jj+bin-1
+                do i=1,nx
+                  if(array(i,j,k).gt.magicval)then
+                    work2(i)=dcv_<t>toR(array(i,j,k))
+                    valid(i)=valid(i)+1
+                  else
+                    work2(i)=magic_float
+                  end if
+                end do
+                call ndp_add(nx,badpix,work1,work2,work1)
+              end do
+            end do
+c
+c   - compute average spectrum
+c
+            do i=1,nx
+              if(valid(i).gt.0)then
+                work1(i)=work1(i)/real(valid(i))
+              else
+                work1(i)=magic_float
+              end if
+            end do
+c
+c   Get range of axis values
+c
+            call gen_rangef(spaxis,1,nx,xend,xsta)
+c
+c   If common scale is not required, get the range of the spectrum data.
+c
+            if(.not.scale)then
+              call ndp_range(work1,1,nx,badpix,yspe,ysps)
+              if(yspe.eq.ysps)then
+                yspe=ysps+1.0
+                ysps=ysps-1.0
+              else
+                yspe=yspe+(yspe-ysps)*0.1
+              end if
+            end if
+c
+c   Plot spectrum
+c
+            call pgadvance
+            call pgwindow(xsta,xend,ysps,yspe)
+            if(axes)then
+              call pgbox('BCNT',0.0,0,'BCNST',0.0,0)
+            else
+              call pgbox('BC',0.0,0,'BC',0.0,0)
+            end if
+            call ndp_pgbin(spaxis,work1,work3,work4,nx,badpix,.true.)
+            nplot=nplot+1
+c
+c   - construct label from pixel numbers if required
+c
+            if(axes)then
+              plabel='('
+              dumint=ich_encode(plabel,xpix(1),2,0,next)
+              plabel(next:)=','
+              dumint=ich_encode(plabel,ypix(1),next+1,0,next)
+              plabel(next:)=')'
+              next=next+1
+              plabel(next:)=' to ('
+              dumint=ich_encode(plabel,xpix(2),next+5,0,next)
+              plabel(next:)=','
+              dumint=ich_encode(plabel,ypix(2),next+1,0,next)
+              plabel(next:)=')'
+              call pglabel(plabel,' ',' ')
+            end if
+c
+            if(hard)then
+              string='Spectrum plot '
+              dumint=ich_encode(string,real(nplot),15,0,next)
+              string(next:)=' completed.'
+              call dsa_wruser(string(:ich_len(string))//'\\n')
+            end if
+c
+c   Write spectrum to data structure if required
+c
+            if(.not.hard .and. write)then
+              if (polygon) then
+                mode = 'POLYGON'
+              else 
+                mode = 'RECTANGLE'
+              end if
+              call plots_write(work1,spaxis,nx,badpix,nplot,
+     &                         basename,j,k,bin,mode,status)
+              if(status.ne.0)go to 500
+            end if
+c
+          else
+            call pgadvance
+          end if ! (do_it)
+        end do
+      end do
+c
+      if(hard)call dsa_wruser('Hardcopy plot completed.\\N')
+c
+  500 continue
+      end
+

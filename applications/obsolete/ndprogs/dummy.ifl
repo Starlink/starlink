@@ -1,0 +1,142 @@
+#+
+#  Name:
+#     DUMMY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface DUMMY
+
+      Parameter  OUTPUT
+         Type    'LITERAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.OUTPUT'
+         Prompt  '(OUTput) Name of image to be created'
+         Help    'Enter the name of the structure you wisht to create.'
+      EndParameter
+                  
+      Parameter  NDIM
+         Type    '_INTEGER'
+         Range   1,6
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.NDIM'
+         Prompt  '(NDIM) Number of dimensions'
+         Help    'Enter the dimensionality of the image.'
+      EndParameter
+
+      Parameter  SIZE
+         Type    '_INTEGER'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.SIZE'
+         Prompt  '(SIZE) Dimensions of image.'
+         Help    'Specify the size of the image in each dimension'
+      EndParameter
+
+      Parameter  AXES
+         Type    '_LOGICAL'                                              
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXES'
+         Prompt  '(AXes) Calibrate the axes?'
+         Help    'Enter yes to calibrate each of the axes in your image.'
+      EndParameter
+
+      Parameter  AXKEY
+         Type    '_INTEGER'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXKEY'
+         Prompt  '(AXKEY) Keys for axes to be calibrated.'
+         Help    'Enter a 1 to calibrate an axis or a 0 to omit calibration.'
+      EndParameter
+
+      Parameter  AXSTART
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXSTART'
+         Prompt  '(AXSTart) Start values of axes.'
+         Help    'Enter the start values for each axis.'
+      EndParameter
+ 
+      Parameter  AXEND
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXEND'
+         Prompt  '(AXSTart) End values of axes.'
+         Help    'Enter the end values for each axis.'
+      EndParameter
+
+      Parameter  AXLOG
+         Type    '_INTEGER'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.AXLOG'
+         Prompt  '(AXLOG) Keys for logarithmic scaling.'
+         Help    'Enter a 1 to scale the axis logarithmically, 0 for linear.'
+      EndParameter
+ 
+      Parameter  EXTRA 
+         Type    '_CHAR'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.EXTRA'
+         Prompt  '(EXtra) (M)agic values, (Q)uality arrays or (E)rror arrays?'
+         Help    'Type a letter to add one of the extra features listed.'
+      EndParameter
+ 
+      Parameter  VALUE
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.VALUE'
+         Prompt  '(VALue) Value to be assigned to every pixel'
+      EndParameter
+     
+      Parameter  DTYPE
+         Type    '_CHAR'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.DTYPE'
+         Prompt  '(DTYpe) Choose data type as B(yte), S(hort) or F(loat)'
+         Help    'Type B,S or F to choose the data type of the array.'
+      EndParameter
+ 
+      Parameter  ERRVAL
+         Type    '_REAL'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.ERRVAL'
+         Prompt  '(ERRVal) Value to be assigned to the error array'
+         Help    'Enter the value to be assigned to the error array.'
+      EndParameter
+ 
+      Parameter  QVAL
+         TYPE    '_BYTE'
+         Vpath   'PROMPT'
+         Ppath   'GLOBAL,DYNAMIC,CURRENT,DEFAULT'
+         association '<->GLOBAL.QVAL'
+         Prompt  '(QVal) Value to be assigned to the quality array'
+         Help    'Enter the value to place in the quality array.'
+      EndParameter
+ 
+   EndInterface
+

@@ -1,0 +1,20 @@
+1 NDPROGS_released_on_Unix
+ 
+  NDPROGS has been ported to Unix and released at v3.2.  It is available
+  for the Unix shell and ICL.  To make the command set available, type:
+
+       % ndprogssetup
+
+  or
+
+       ICL> load $NDPROGS_DIR/ndprogs
+
+  where % and ICL> are the shell and ICL prompts respectively.
+
+  Please note that the tau2fig application is not available for Unix.
+
+  NDPROGS is described in SUN/19.
+
+  Please report any problems to Grant Privett (g.privett@astro.cf.ac.uk)
+  and the Starlink Software Librarian (ussc@star.rl.ac.uk).
+

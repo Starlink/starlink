@@ -1,0 +1,166 @@
+#+
+#  Name:
+#     HILITE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface HILITE
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMage) Name of image to view'
+         help 'Enter the filename of the image you wish to view.'
+      endparameter
+
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'  
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+
+      parameter PLACE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.place'
+         prompt '(PLACE) Location of plot'
+         help 'Type BL,BC,BR,LC,CC,RC,TL,TC or TR to locate the plotted image'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Plot magnification'
+         help 'Enter the magnification by which to scale the image'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+      endparameter
+  
+      parameter AXES
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.axes'
+         prompt '(AXes) Plot image axes?'
+         help 'Setting this keyword will plot axes around the image.'
+      endparameter
+
+      parameter RAMP
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ramp'
+         prompt '(RAMP) Plot colour ramp?'
+         help 'Setting this keyword will plot a colour ramp next to the image.'
+      endparameter
+
+      parameter DATA
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.data'
+         prompt '(DATA) Plot data values?'
+         help 'If set, this keyword will display the current highlighted data value.'
+      endparameter
+
+      parameter SHOWS
+         type '_integer'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shows'
+         prompt '(SHOWS) Number of shows'
+         help 'This sets the number of times the colours will be cycled through.'
+      endparameter
+
+      parameter ERASE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.erase'
+         prompt '(ERase) Erase screen before plotting?'
+         help 'If specified, the screen will be cleared before plotting'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+   
+   endinterface

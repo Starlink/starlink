@@ -1,0 +1,1299 @@
+      subroutine spectrum_hardcopy_<t>
+     &  (array,spaxis,array1,xaxis,yaxis,
+     &   work1,work2,work3,work4,valid,
+     &   nx,ny,nz,nx1,ny1,stapix,endpix,start,end,mag,high,low,nplots,
+     &   bin,twocur,xpix,ypix,scale,slow,shigh,label,slabel,badpix,
+     &   magicval,polygon,mask,gfxbuff,status)
+c                   
+      implicit none
+c
+      integer  ich_encode,ich_len
+c
+      character*(*) label,slabel
+      integer       nx,ny,nz,nx1,ny1,stapix(6),endpix(6),
+     &              nplots,bin
+      integer*2     valid(nx)
+      logical       twocur,scale,badpix
+      byte	    mask(nx1,ny1)
+      logical       polygon
+      real          spaxis(nx),                              
+     &              array1(nx1,ny1),
+     &              work1(nx),work2(nx),
+     &              work3(nx),work4(nx),
+     &              xaxis(nx1),yaxis(ny1),
+     &              start(2),end(2),mag,high,low,
+     &              xpix(2,10),ypix(2,10),slow,shigh
+      <type>
+     &              array(nx,ny,nz),
+     &              magicval
+      integer       gfxbuff(nx1,ny1),
+     &              status
+c
+      logical   area
+      integer   dumint
+      integer   i
+      integer   ipos
+      integer   j
+      integer   k
+      integer   ncol
+      integer   next
+      integer   nrow
+      real      sqvp
+      character string*80
+      real      xend
+      real      ximv(2)
+      real      xine
+      real      xins
+      real      xmax
+      real      xmin
+      real      xspv(2)
+      real      xsta
+      real      yimv(2)
+      real      yine
+      real      yins
+      real      ymax
+      real      ymin
+      real      ysiz
+      real      yspe
+      real      ysps
+      real      yspv(2)                                
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   Initialize
+c
+      if(twocur .or. bin.gt.1 .or. polygon)then
+        area=.true.
+      else
+        area=.false.
+      end if
+      ncol=endpix(1)-stapix(1)+1
+      nrow=endpix(2)-stapix(2)+1
+c
+c   Set common scale for all plots if required
+c
+      if(scale)then
+        ysps=slow
+        yspe=shigh
+        yspe=yspe+(yspe-ysps)*0.1
+      end if
+c
+c   Test whether any points have been selected
+c
+      if(xpix(1,1).eq.0.0)then
+        call dsa_wruser('No spectra selected - will plot image only.\\N')
+      end if                                                                   
+c
+c   Advise use of image option after hardcopy plotting - this is because the 
+c   screen device has been closed in order to open the hardcopy device
+c
+      call dsa_wruser
+     &  ('Note option I must be used after hardcopy plotting.\\N')
+c
+c   Set line width (suitable for the Canon)
+c
+      call pgslw(3)
+c
+c   Compute viewport for image plot
+c
+      call ndp_image_viewport(stapix,endpix,mag,'LC',ximv,yimv,sqvp)
+c
+c   Plot image
+c
+      call ndp_image_index(nx1*ny1,low,high,array1,badpix,
+     &                     gfxbuff,status)
+      if (status .ne. 0) go to 500
+      call ndp_image_plot
+     &  (gfxbuff,nx1,ny1,stapix,endpix,start,end,high,
+     &   low,label,'A',ximv,yimv)
+c
+c   Plot spectra   
+c
+      call pgsci(1)
+c
+      do ipos=1,nplots
+        if(xpix(1,ipos).gt.0.0 .and. ypix(1,ipos).gt.0.0)then
+c
+c   Compute location of viewport for spectrum plot
+c   - set viewport to full screen
+c   - set world coords to inches 
+c
+          call pgvstand
+          call pgqvp(1,xmin,xmax,ymin,ymax)
+          call pgwindow(xmin,xmax,ymin,ymax)
+          xspv(1)=ximv(2)+(xmax-ximv(2))*0.2
+          xspv(2)=xmax
+          ysiz=(ymax-ymin)/real(nplots)
+          yspv(1)=ymin+ysiz*(real(nplots)-real(ipos))+ysiz*0.2
+          yspv(2)=yspv(1)+ysiz*0.8
+c                     
+c   Draw indicator line
+c
+          if(area)then
+            xins=ximv(1)
+     &        +(ximv(2)-ximv(1))
+     &        *(xpix(2,ipos)-real(stapix(1)))
+     &        /real(ncol-1)
+            yins=yimv(1)
+     &        +(yimv(2)-yimv(1))
+     &        *(ypix(1,ipos)+((ypix(2,ipos)-ypix(1,ipos))/2.0)
+     &        -real(stapix(2)))
+     &        /real(nrow-1)
+          else
+            xins=ximv(1)
+     &        +(ximv(2)-ximv(1))
+     &        *(xpix(1,ipos)-real(stapix(1)))
+     &        /real(ncol-1)
+            yins=yimv(1)
+     &        +(yimv(2)-yimv(1))
+     &        *(ypix(1,ipos)-real(stapix(2)))
+     &        /real(nrow-1)
+          end if
+          xine=xspv(1)
+          yine=yspv(1)+(yspv(2)-yspv(1))/2.0
+c
+          call pgmove(xins,yins)
+          call pgdraw(xine,yine)
+c
+c   Draw rectangle if required
+c   - set viewport to image plot location
+c   - set world coords to pixels
+c
+          if(area)then
+            call pgvsize(ximv(1),ximv(2),yimv(1),yimv(2))
+            call pgwindow
+     &        (real(stapix(1)),real(endpix(1)),
+     &         real(stapix(2)),real(endpix(2)))
+            call pgmove(xpix(1,ipos),ypix(1,ipos))
+            call pgdraw(xpix(2,ipos),ypix(1,ipos))
+            call pgdraw(xpix(2,ipos),ypix(2,ipos))
+            call pgdraw(xpix(1,ipos),ypix(2,ipos))
+            call pgdraw(xpix(1,ipos),ypix(1,ipos))
+          end if   
+c
+c   Perform extraction(s)
+c   - extract spectra within required area
+c
+          if(area)then
+            do i=1,nx
+              work1(i)=0.0
+              valid(i)=0                 
+            end do
+            do k=int(ypix(1,ipos)),int(ypix(2,ipos))         
+              do j=int(xpix(1,ipos)),int(xpix(2,ipos))
+                if ((.not.polygon).or.(mask(j,k) .eq. 1)) then
+                  do i=1,nx
+                      work2(i)=DCV_<T>TOR(array(i,j,k))
+                      valid(i)=valid(i)+1
+                  end do
+                  call ndp_add(nx,badpix,work1,work2,work1)        
+                end if ! (mask...)
+              end do
+            end do
+c
+c   - compute average spectrum
+c
+            do i=1,nx
+                work1(i)=work1(i)/real(valid(i))
+            end do
+c
+c   - extract single spectrum
+c
+          else
+            do i=1,nx
+              j=int(xpix(1,ipos))
+              k=int(ypix(1,ipos))
+                work1(i)=DCV_<T>TOR(array(i,j,k))
+            end do
+          end if
+c
+c   Get range of axis values
+c
+          call gen_rangef(spaxis,1,nx,xend,xsta)
+c
+c   If common scale is not required, get the range of the spectrum data.
+c
+          if(.not.scale)then
+            call ndp_range(work1,1,nx,badpix,yspe,ysps)
+            if(yspe.eq.ysps)then
+              yspe=ysps+1.0
+              ysps=ysps-1.0
+            else
+              yspe=yspe+(yspe-ysps)*0.1
+            end if
+          end if
+c
+c   Plot spectrum
+c   - set viewport to spectrum plot location
+c   - set world coords to spectrum axis units
+c             
+          call pgvsize(xspv(1),xspv(2),yspv(1),yspv(2))
+          call pgwindow(xsta,xend,ysps,yspe)
+          call pgbox('BCNST',0.0,0,'BCNSTV',0.0,0)
+          call ndp_pgbin(spaxis,work1,work3,work4,nx,badpix,.true.)
+c
+          string='Spectrum plot '
+          dumint=ich_encode(string,real(ipos),15,0,next)
+          string(next:)=' completed.'
+          call dsa_wruser(string(:ich_len(string))//'\\n')
+        end if                       
+      end do
+c
+c   Plot label below last spectrum viewport
+c
+      call pglabel(slabel,' ',' ')
+c
+c   Close hardcopy device
+c                                        
+      call pgend
+      call dsa_wruser('Hardcopy plot completed.\\N')
+c
+  500 continue
+      polygon = .false.
+      end                                 
+
+
+      subroutine spectrum_hardcopy_<t>q
+     &  (array,spaxis,array1,xaxis,yaxis,
+     &   work1,work2,work3,work4,valid,
+     &   nx,ny,nz,nx1,ny1,stapix,endpix,start,end,mag,high,low,nplots,
+     &   bin,twocur,xpix,ypix,scale,slow,shigh,label,slabel,badpix,
+     &   magicval,polygon,mask,gfxbuff,status)
+c                   
+      implicit none
+c
+      integer  ich_encode,ich_len
+c
+      character*(*) label,slabel
+      integer       nx,ny,nz,nx1,ny1,stapix(6),endpix(6),
+     &              nplots,bin
+      integer*2     valid(nx)
+      logical       twocur,scale,badpix
+      byte	    mask(nx1,ny1)
+      logical       polygon
+      real          spaxis(nx),                              
+     &              array1(nx1,ny1),
+     &              work1(nx),work2(nx),
+     &              work3(nx),work4(nx),
+     &              xaxis(nx1),yaxis(ny1),
+     &              start(2),end(2),mag,high,low,
+     &              xpix(2,10),ypix(2,10),slow,shigh
+      <type>
+     &              array(nx,ny,nz),
+     &              magicval
+      integer       gfxbuff(nx1,ny1),
+     &              status
+c
+      logical   area
+      integer   dumint
+      integer   i
+      integer   ipos
+      integer   j
+      integer   k
+      integer   ncol
+      integer   next
+      integer   nrow
+      real      sqvp
+      character string*80
+      real      xend
+      real      ximv(2)
+      real      xine
+      real      xins
+      real      xmax
+      real      xmin
+      real      xspv(2)
+      real      xsta
+      real      yimv(2)
+      real      yine
+      real      yins
+      real      ymax
+      real      ymin
+      real      ysiz
+      real      yspe
+      real      ysps
+      real      yspv(2)                                
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   Initialize
+c
+      if(twocur .or. bin.gt.1 .or. polygon)then
+        area=.true.
+      else
+        area=.false.
+      end if
+      ncol=endpix(1)-stapix(1)+1
+      nrow=endpix(2)-stapix(2)+1
+c
+c   Set common scale for all plots if required
+c
+      if(scale)then
+        ysps=slow
+        yspe=shigh
+        yspe=yspe+(yspe-ysps)*0.1
+      end if
+c
+c   Test whether any points have been selected
+c
+      if(xpix(1,1).eq.0.0)then
+        call dsa_wruser('No spectra selected - will plot image only.\\N')
+      end if                                                                   
+c
+c   Advise use of image option after hardcopy plotting - this is because the 
+c   screen device has been closed in order to open the hardcopy device
+c
+      call dsa_wruser
+     &  ('Note option I must be used after hardcopy plotting.\\N')
+c
+c   Set line width (suitable for the Canon)
+c
+      call pgslw(3)
+c
+c   Compute viewport for image plot
+c
+      call ndp_image_viewport(stapix,endpix,mag,'LC',ximv,yimv,sqvp)
+c
+c   Plot image
+c
+      call ndp_image_index(nx1*ny1,low,high,array1,badpix,
+     &                     gfxbuff,status)
+      if (status .ne. 0) go to 500
+     &                     
+      call ndp_image_plot
+     &  (gfxbuff,nx1,ny1,stapix,endpix,start,end,high,
+     &   low,label,'A',ximv,yimv)
+c
+c   Plot spectra   
+c
+      call pgsci(1)
+c
+      do ipos=1,nplots
+        if(xpix(1,ipos).gt.0.0 .and. ypix(1,ipos).gt.0.0)then
+c
+c   Compute location of viewport for spectrum plot
+c   - set viewport to full screen
+c   - set world coords to inches 
+c
+          call pgvstand
+          call pgqvp(1,xmin,xmax,ymin,ymax)
+          call pgwindow(xmin,xmax,ymin,ymax)
+          xspv(1)=ximv(2)+(xmax-ximv(2))*0.2
+          xspv(2)=xmax
+          ysiz=(ymax-ymin)/real(nplots)
+          yspv(1)=ymin+ysiz*(real(nplots)-real(ipos))+ysiz*0.2
+          yspv(2)=yspv(1)+ysiz*0.8
+c                     
+c   Draw indicator line
+c
+          if(area)then
+            xins=ximv(1)
+     &        +(ximv(2)-ximv(1))
+     &        *(xpix(2,ipos)-real(stapix(1)))
+     &        /real(ncol-1)
+            yins=yimv(1)
+     &        +(yimv(2)-yimv(1))
+     &        *(ypix(1,ipos)+((ypix(2,ipos)-ypix(1,ipos))/2.0)
+     &        -real(stapix(2)))
+     &        /real(nrow-1)
+          else
+            xins=ximv(1)
+     &        +(ximv(2)-ximv(1))
+     &        *(xpix(1,ipos)-real(stapix(1)))
+     &        /real(ncol-1)
+            yins=yimv(1)
+     &        +(yimv(2)-yimv(1))
+     &        *(ypix(1,ipos)-real(stapix(2)))
+     &        /real(nrow-1)
+          end if
+          xine=xspv(1)
+          yine=yspv(1)+(yspv(2)-yspv(1))/2.0
+c
+          call pgmove(xins,yins)
+          call pgdraw(xine,yine)
+c
+c   Draw rectangle if required
+c   - set viewport to image plot location
+c   - set world coords to pixels
+c
+          if(area)then
+            call pgvsize(ximv(1),ximv(2),yimv(1),yimv(2))
+            call pgwindow
+     &        (real(stapix(1)),real(endpix(1)),
+     &         real(stapix(2)),real(endpix(2)))
+            call pgmove(xpix(1,ipos),ypix(1,ipos))
+            call pgdraw(xpix(2,ipos),ypix(1,ipos))
+            call pgdraw(xpix(2,ipos),ypix(2,ipos))
+            call pgdraw(xpix(1,ipos),ypix(2,ipos))
+            call pgdraw(xpix(1,ipos),ypix(1,ipos))
+          end if   
+c
+c   Perform extraction(s)
+c   - extract spectra within required area
+c
+          if(area)then
+            do i=1,nx
+              work1(i)=0.0
+              valid(i)=0                 
+            end do
+            do k=int(ypix(1,ipos)),int(ypix(2,ipos))         
+              do j=int(xpix(1,ipos)),int(xpix(2,ipos))
+                if ((.not.polygon).or.(mask(j,k) .eq. 1)) then
+                  do i=1,nx
+                    if(array(i,j,k).gt.magicval)then
+                      work2(i)=DCV_<T>TOR(array(i,j,k))
+                      valid(i)=valid(i)+1
+                    else
+                      work2(i)=magic_float
+                    end if
+                  end do
+                  call ndp_add(nx,badpix,work1,work2,work1)        
+                end if ! (mask...)
+              end do
+            end do
+c
+c   - compute average spectrum
+c
+            do i=1,nx
+              if(valid(i).gt.0)then
+                work1(i)=work1(i)/real(valid(i))
+              else
+                work1(i)=magic_float
+              end if
+            end do
+c
+c   - extract single spectrum
+c
+          else
+            do i=1,nx
+              j=int(xpix(1,ipos))
+              k=int(ypix(1,ipos))
+              if(array(i,j,k).gt.magicval)then
+                work1(i)=DCV_<T>TOR(array(i,j,k))
+              else
+                work1(i)=magic_float
+              end if
+            end do
+          end if
+c
+c   Get range of axis values
+c
+          call gen_rangef(spaxis,1,nx,xend,xsta)
+c
+c   If common scale is not required, get the range of the spectrum data.
+c
+          if(.not.scale)then
+            call ndp_range(work1,1,nx,badpix,yspe,ysps)
+            if(yspe.eq.ysps)then
+              yspe=ysps+1.0
+              ysps=ysps-1.0
+            else
+              yspe=yspe+(yspe-ysps)*0.1
+            end if
+          end if
+c
+c   Plot spectrum
+c   - set viewport to spectrum plot location
+c   - set world coords to spectrum axis units
+c             
+          call pgvsize(xspv(1),xspv(2),yspv(1),yspv(2))
+          call pgwindow(xsta,xend,ysps,yspe)
+          call pgbox('BCNST',0.0,0,'BCNSTV',0.0,0)
+          call ndp_pgbin(spaxis,work1,work3,work4,nx,badpix,.true.)
+c
+          string='Spectrum plot '
+          dumint=ich_encode(string,real(ipos),15,0,next)
+          string(next:)=' completed.'
+          call dsa_wruser(string(:ich_len(string))//'\\n')
+        end if                       
+      end do
+c
+c   Plot label below last spectrum viewport
+c
+      call pglabel(slabel,' ',' ')
+c
+c   Close hardcopy device
+c                                        
+      call pgend
+      call dsa_wruser('Hardcopy plot completed.\\N')
+c
+  500 continue
+      polygon = .false.
+      end                                 
+
+
+
+      subroutine spectrum_splot_<t>
+     &  (array,spaxis,xaxis,yaxis,
+     &   work1,work2,work3,work4,valid,
+     &   nx,ny,nz,nx1,ny1,stapix,endpix,start,end,mag,nplots,iplot,bin,
+     &   twocur,xpix,ypix,scale,slow,shigh,cursor,write,image,badpix,
+     &   magicval,quit,polygon,mask,status)
+c
+      implicit none
+      character    ich_ci*4
+c
+      integer      nx,ny,nz,nx1,ny1,stapix(6),endpix(6),
+     &             mag,nplots,iplot,bin
+      integer*2    valid(nx)
+      logical      twocur,scale,cursor,write,image,badpix,quit
+      logical      polygon
+      byte         mask(nx1,ny1)
+      real         spaxis(nx),
+     &             xaxis(nx1),yaxis(ny1),
+     &             work1(nx),work2(nx),
+     &             work3(nx),work4(nx),
+     &             start(2),end(2),
+     &             xpix(2,10),ypix(2,10),slow,shigh
+      <type>       array(nx,ny,nz),
+     &             magicval
+      integer      status
+c
+      logical      area
+      logical      erase
+      integer      height
+      integer      i
+      integer      ipos
+      integer      j
+      integer      k
+      integer      l
+      character    mode*16
+      integer      ncol      
+      integer      ncur
+      integer      nid
+      integer      nloop
+      integer      nrow
+      character    specname*64
+      real         sqvp
+      integer      width
+      real         xend
+      real         ximv(2)          
+      real         xine
+      real         xins
+      real         xmax
+      real         xmin
+      real         xspv(2)
+      real         xsta
+      real         xlast
+      real         xpmn(2)
+      real         xpmx(2)
+      real         xtemp(2)
+      real         yimv(2)          
+      real         yine
+      real         yins
+      real         ylast
+      real         ymax
+      real         ymin
+      real         ypmn(2)
+      real         ypmx(2)
+      real         ysiz
+      real         yspe
+      real         ysps
+      real         yspv(2)
+      real         ytemp(2)
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   Return immediately if image has not been plotted
+c
+      if(.not.image)then
+        call dsa_wruser('Image must be plotted first.\\N')
+        quit=.true.     
+        go to 500
+      end if        
+c
+c   Initialize
+c                      
+      quit=.false.
+      if(twocur)then
+        ncur=2
+        area=.true.
+      else if(bin.gt.1)then
+        ncur=1
+        area=.true.
+      else if (polygon) then
+        ncur = 1
+        area = .true.
+      else
+        ncur=1
+        area=.false.
+      end if
+      do i=1,2
+        xpmn(i)=0.0
+        xpmx(i)=real(nx1)
+        ypmn(i)=0.0
+        ypmx(i)=real(ny1)
+      end do
+      ncol=endpix(1)-stapix(1)+1
+      nrow=endpix(2)-stapix(2)+1
+c
+c   Set common scale for all plots if required
+c
+      if(scale)then
+        ysps=slow
+        yspe=shigh
+        yspe=yspe+(yspe-ysps)*0.1
+      end if
+c
+c   Define viewport for image plot
+c
+      call ndp_image_viewport(stapix,endpix,mag,'LC',ximv,yimv,sqvp)
+c
+c   Get cursor point(s) on image plot
+c
+      if (.not. polygon) then
+        if(cursor)then
+          if(twocur)then
+            call dsa_wruser
+     &        ('Select 2 points per spectrum, or Q to quit.\\N')
+          else
+            call dsa_wruser
+     &        ('Select 1 point per spectrum, or Q to quit.\\N')
+          end if
+          if(iplot.eq.0)then
+            call ndp_image_cursor
+     &        (xaxis,yaxis,nx1,ny1,start,end,stapix,endpix,ncur,'CDPS',
+     &         ximv,yimv,xtemp,ytemp,nid,xlast,ylast,quit)
+          else
+            call ndp_image_cursor
+     &        (xaxis,yaxis,nx1,ny1,start,end,stapix,endpix,ncur,'DPS',
+     &         ximv,yimv,xtemp,ytemp,nid,xlast,ylast,quit)
+          end if
+          if(quit)go to 500
+c
+c   Get points from keyboard
+c
+        else
+          call ndp_par_rdary('xpix',xpmn,xpmx,'n',' ',ncur,2,xtemp)
+          if(xtemp(1).lt.real(stapix(1)) .or. 
+     &       xtemp(2).gt.real(endpix(1)))then
+            quit=.true.
+            go to 500
+          end if
+          call ndp_par_rdary('ypix',ypmn,ypmx,'n',' ',ncur,2,ytemp)
+          if(ytemp(1).lt.real(stapix(2)) .or. 
+     &       ytemp(2).gt.real(endpix(2)))then
+            quit=.true.
+            go to 500
+          end if ! (ytemp...)
+        end if ! (cursor)
+      else        
+        call get_polygon_mask(xtemp,ytemp,mask,nx1,ny1,
+     &                        stapix,endpix,xaxis,yaxis,
+     &                        start,end,ximv,yimv,quit,polygon)
+      end if   ! (.not. polygon)
+c
+c   Increment plot counter
+c                
+      iplot=iplot+1
+c
+c   Compute current plot position
+c        
+      if(iplot.gt.nplots)then     
+        ipos=mod(iplot,nplots)
+        if(ipos.eq.0)ipos=nplots
+        nloop=2
+      else 
+        ipos=iplot
+        nloop=1
+      end if
+c                
+c   Do this loop twice if it is necessary to erase a previous plot
+c
+      do l=1,nloop
+c
+c   Is this an erasing pass?
+c
+        if(nloop.eq.2)then
+          if(l.eq.1)erase=.true.
+          if(l.eq.2)erase=.false.
+        else
+          erase=.false.
+        end if
+c
+c   Set colour index
+c
+        if(erase)then
+          call pgsci(0)
+        else
+          call pgsci(1)
+        end if
+c
+c   Store pixel coordinates of point(s)
+c   - if selecting an area of spectra
+c
+        if(.not.erase)then
+          if(area)then
+            if(twocur .or. polygon)then                    
+              xpix(1,ipos)=min(xtemp(1),xtemp(2))
+              xpix(2,ipos)=max(xtemp(1),xtemp(2))
+              ypix(1,ipos)=min(ytemp(1),ytemp(2))
+              ypix(2,ipos)=max(ytemp(1),ytemp(2))
+            else          
+              xpix(2,ipos)=xtemp(1)+real(bin/2)
+              ypix(2,ipos)=ytemp(1)+real(bin/2)
+              if(mod(bin,2).ne.0)then
+                xpix(1,ipos)=xtemp(1)-real(bin/2)
+                ypix(1,ipos)=ytemp(1)-real(bin/2)
+              else
+                xpix(1,ipos)=xtemp(1)-real(bin/2)+1.0
+                ypix(1,ipos)=ytemp(1)-real(bin/2)+1.0
+              end if
+            end if
+            if(xpix(1,ipos).lt.real(stapix(1)))
+     &        xpix(1,ipos)=real(stapix(1))
+            if(xpix(2,ipos).gt.real(endpix(1)))
+     &        xpix(2,ipos)=real(endpix(1))
+            if(ypix(1,ipos).lt.real(stapix(2)))
+     &        ypix(1,ipos)=real(stapix(2))
+            if(ypix(2,ipos).gt.real(endpix(2)))
+     &        ypix(2,ipos)=real(endpix(2))
+c
+c   - if selecting a single spectrum
+c
+          else
+            xpix(1,ipos)=xtemp(1)
+            xpix(2,ipos)=0.0
+            ypix(1,ipos)=ytemp(1)
+            ypix(2,ipos)=0.0
+          end if
+        end if
+c
+c   Compute location of viewport for spectrum plot
+c   - set viewport to full screen
+c   - set world coords to inches
+c
+        call pgvstand
+        call pgqvp(1,xmin,xmax,ymin,ymax)
+        call pgwindow(xmin,xmax,ymin,ymax)
+        xspv(1)=ximv(2)+(xmax-ximv(2))*0.2
+        xspv(2)=xmax
+        ysiz=(ymax-ymin)/real(nplots)
+        yspv(1)=ymin+ysiz*(real(nplots)-real(ipos))+ysiz*0.2
+        yspv(2)=yspv(1)+ysiz*0.8              
+c
+c   Draw indicator line
+c
+        if(area)then
+          xins=ximv(1)
+     &      +(ximv(2)-ximv(1))
+     &      *(xpix(2,ipos)-real(stapix(1)))
+     &      /real(ncol-1)
+          yins=yimv(1)
+     &      +(yimv(2)-yimv(1))
+     &      *(ypix(1,ipos)+((ypix(2,ipos)-ypix(1,ipos))/2.0)
+     &      -real(stapix(2)))
+     &      /real(nrow-1)
+        else
+          xins=ximv(1)
+     &      +(ximv(2)-ximv(1))
+     &      *(xpix(1,ipos)-real(stapix(1)))
+     &      /real(ncol-1)
+          yins=yimv(1)
+     &      +(yimv(2)-yimv(1))
+     &      *(ypix(1,ipos)-real(stapix(2)))
+     &      /real(nrow-1)
+        end if
+        xine=xspv(1)
+        yine=yspv(1)+(yspv(2)-yspv(1))/2.0
+c
+        call pgmove(xins,yins)
+        call pgdraw(xine,yine)
+c
+c   Draw rectangle if required
+c   - set viewport to image plot location
+c   - set world coords to pixels
+c
+        if(area)then
+          call pgvsize(ximv(1),ximv(2),yimv(1),yimv(2))
+          call pgwindow
+     &      (real(stapix(1)),real(endpix(1)),
+     &       real(stapix(2)),real(endpix(2)))
+          call pgmove(xpix(1,ipos),ypix(1,ipos))
+          call pgdraw(xpix(2,ipos),ypix(1,ipos))
+          call pgdraw(xpix(2,ipos),ypix(2,ipos))
+          call pgdraw(xpix(1,ipos),ypix(2,ipos))
+          call pgdraw(xpix(1,ipos),ypix(1,ipos))
+        end if   
+c
+c   Perform extraction(s)
+c   - extract spectra within required area
+c
+        if(area)then
+          do i=1,nx
+            work1(i)=0.0                 
+            valid(i)=0                 
+          end do
+          do k=int(ypix(1,ipos)),int(ypix(2,ipos))
+            do j=int(xpix(1,ipos)),int(xpix(2,ipos))
+              if ((.not.polygon).or.(mask(j,k) .eq. 1)) then
+                do i=1,nx
+                    work2(i)=DCV_<T>TOR(array(i,j,k))
+                    valid(i)=valid(i)+1
+                end do
+                call ndp_add(nx,badpix,work1,work2,work1)        
+              end if ! (mask...)
+            end do
+          end do
+c
+c   - compute average spectrum
+c
+           do i=1,nx
+              work1(i)=work1(i)/real(valid(i))
+          end do
+c                                                   
+c   - extract single spectrum
+c
+        else
+          do i=1,nx
+            j=int(xpix(1,ipos))
+            k=int(ypix(1,ipos))
+              work1(i)=DCV_<T>TOR(array(i,j,k))
+          end do
+        end if
+c
+c   Get range of axis values
+c
+        call gen_rangef(spaxis,1,nx,xend,xsta)
+c
+c   If common scale is not required, get the range of the spectrum data.
+c
+        if(.not.scale)then
+          call ndp_range(work1,1,nx,badpix,yspe,ysps)
+          if(yspe.eq.ysps)then
+            yspe=ysps+1.0
+            ysps=ysps-1.0
+          else
+            yspe=yspe+(yspe-ysps)*0.1
+          end if
+        end if
+c
+c   Plot spectrum
+c   - set viewport to spectrum plot location
+c   - set world coords to spectrum axis units
+c             
+        call pgvsize(xspv(1),xspv(2),yspv(1),yspv(2))
+        call pgwindow(xsta,xend,ysps,yspe)
+        call pgbox('BCNST',0.0,0,'BCNSTV',0.0,0)
+        call ndp_pgbin(spaxis,work1,work3,work4,nx,badpix,.true.)
+c
+c   Write spectrum to data structure if required
+c
+        if(write)then
+          if (twocur) then
+            mode = 'RECTANGLE'
+            width = int(abs(xpix(2,ipos)-xpix(1,ipos)))
+            height = int(abs(ypix(2,ipos)-ypix(1,ipos)))
+          else if (polygon) then
+            mode = 'POLYGON'
+          else
+            mode = 'PIXEL'
+          end if
+          call par_cnpar('spectrum')
+          call par_rdchar('spectrum','spec',specname)
+          call spectrum_write(work1,spaxis,nx,badpix,
+     &                        specname,j,k,bin,mode,
+     &                        polygon,nx1,ny1,mask,
+     &                        twocur,width,height,status)
+          if(status.ne.0)go to 500
+        end if
+      end do
+c     
+  500 continue
+      end                                 
+
+
+      subroutine spectrum_splot_<t>q
+     &  (array,spaxis,xaxis,yaxis,
+     &   work1,work2,work3,work4,valid,
+     &   nx,ny,nz,nx1,ny1,stapix,endpix,start,end,mag,nplots,iplot,bin,
+     &   twocur,xpix,ypix,scale,slow,shigh,cursor,write,image,badpix,
+     &   magicval,quit,polygon,mask,status)
+c
+      implicit none
+c
+      integer       nx,ny,nz,nx1,ny1,stapix(6),endpix(6),
+     &              mag,nplots,iplot,bin
+      integer*2     valid(nx)
+      logical       twocur,scale,cursor,write,image,badpix,quit
+      logical       polygon
+      byte          mask(nx1,ny1)
+      real          spaxis(nx),
+     &              xaxis(nx1),yaxis(ny1),
+     &              work1(nx),work2(nx),
+     &              work3(nx),work4(nx),
+     &              start(2),end(2),
+     &              xpix(2,10),ypix(2,10),slow,shigh
+      <type>        array(nx,ny,nz),
+     &              magicval
+      integer status
+c
+      logical      area
+      logical      erase
+      integer      height
+      integer      i
+      integer      ipos
+      integer      j
+      integer      k
+      integer      l
+      character    mode*16
+      integer      ncol      
+      integer      ncur
+      integer      nid
+      integer      nloop
+      integer      nrow
+      character    specname*64
+      real         sqvp
+      integer      width
+      real         xend
+      real         ximv(2)          
+      real         xine
+      real         xins
+      real         xmax
+      real         xmin
+      real         xspv(2)
+      real         xsta
+      real         xlast
+      real         xpmn(2)
+      real         xpmx(2)
+      real         xtemp(2)
+      real         yimv(2)          
+      real         yine
+      real         yins
+      real         ylast
+      real         ymax
+      real         ymin
+      real         ypmn(2)
+      real         ypmx(2)
+      real         ysiz
+      real         yspe
+      real         ysps
+      real         yspv(2)
+      real         ytemp(2)
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   Return immediately if image has not been plotted
+c
+      if(.not.image)then
+        call dsa_wruser('Image must be plotted first.\\N')
+        quit=.true.     
+        go to 500
+      end if        
+c
+c   Initialize
+c                      
+      quit=.false.
+      if(twocur)then
+        ncur=2
+        area=.true.
+      else if(bin.gt.1)then
+        ncur=1
+        area=.true.
+      else if (polygon) then
+        ncur = 1
+        area = .true.
+      else
+        ncur=1
+        area=.false.
+      end if
+      do i=1,2
+        xpmn(i)=0.0
+        xpmx(i)=real(nx1)
+        ypmn(i)=0.0
+        ypmx(i)=real(ny1)
+      end do
+      ncol=endpix(1)-stapix(1)+1
+      nrow=endpix(2)-stapix(2)+1
+c
+c   Set common scale for all plots if required
+c
+      if(scale)then
+        ysps=slow
+        yspe=shigh
+        yspe=yspe+(yspe-ysps)*0.1
+      end if
+c
+c   Define viewport for image plot
+c
+      call ndp_image_viewport(stapix,endpix,mag,'LC',ximv,yimv,sqvp)
+c
+c   Get cursor point(s) on image plot
+c
+      if (.not. polygon) then
+        if(cursor)then
+          if(twocur)then
+            call dsa_wruser
+     &        ('Select 2 points per spectrum, or Q to quit.\\N')
+          else
+            call dsa_wruser
+     &        ('Select 1 point per spectrum, or Q to quit.\\N')
+          end if
+          if(iplot.eq.0)then
+            call ndp_image_cursor
+     &        (xaxis,yaxis,nx1,ny1,start,end,stapix,endpix,ncur,'CDPS',
+     &         ximv,yimv,xtemp,ytemp,nid,xlast,ylast,quit)
+          else
+            call ndp_image_cursor
+     &        (xaxis,yaxis,nx1,ny1,start,end,stapix,endpix,ncur,'DPS',
+     &         ximv,yimv,xtemp,ytemp,nid,xlast,ylast,quit)
+          end if
+          if(quit)go to 500
+c
+c   Get points from keyboard
+c
+        else
+          call ndp_par_rdary('xpix',xpmn,xpmx,'n',' ',ncur,2,xtemp)
+          if(xtemp(1).lt.real(stapix(1)) .or. 
+     &       xtemp(2).gt.real(endpix(1)))then
+            quit=.true.
+            go to 500
+          end if
+          call ndp_par_rdary('ypix',ypmn,ypmx,'n',' ',ncur,2,ytemp)
+          if(ytemp(1).lt.real(stapix(2)) .or. 
+     &       ytemp(2).gt.real(endpix(2)))then
+            quit=.true.
+            go to 500
+          end if ! (ytemp...)
+        end if ! (cursor)
+      else        
+        call get_polygon_mask(xtemp,ytemp,mask,nx1,ny1,
+     &                        stapix,endpix,xaxis,yaxis,
+     &                        start,end,ximv,yimv,quit,polygon)
+      end if   ! (.not. polygon)
+c
+c   Increment plot counter
+c                
+      iplot=iplot+1
+c
+c   Compute current plot position
+c        
+      if(iplot.gt.nplots)then     
+        ipos=mod(iplot,nplots)
+        if(ipos.eq.0)ipos=nplots
+        nloop=2
+      else 
+        ipos=iplot
+        nloop=1
+      end if
+c                
+c   Do this loop twice if it is necessary to erase a previous plot
+c
+      do l=1,nloop
+c
+c   Is this an erasing pass?
+c
+        if(nloop.eq.2)then
+          if(l.eq.1)erase=.true.
+          if(l.eq.2)erase=.false.
+        else
+          erase=.false.
+        end if
+c
+c   Set colour index
+c
+        if(erase)then
+          call pgsci(0)
+        else
+          call pgsci(1)
+        end if
+c
+c   Store pixel coordinates of point(s)
+c   - if selecting an area of spectra
+c
+        if(.not.erase)then
+          if(area)then
+            if(twocur .or. polygon)then                    
+              xpix(1,ipos)=min(xtemp(1),xtemp(2))
+              xpix(2,ipos)=max(xtemp(1),xtemp(2))
+              ypix(1,ipos)=min(ytemp(1),ytemp(2))
+              ypix(2,ipos)=max(ytemp(1),ytemp(2))
+            else          
+              xpix(2,ipos)=xtemp(1)+real(bin/2)
+              ypix(2,ipos)=ytemp(1)+real(bin/2)
+              if(mod(bin,2).ne.0)then
+                xpix(1,ipos)=xtemp(1)-real(bin/2)
+                ypix(1,ipos)=ytemp(1)-real(bin/2)
+              else
+                xpix(1,ipos)=xtemp(1)-real(bin/2)+1.0
+                ypix(1,ipos)=ytemp(1)-real(bin/2)+1.0
+              end if
+            end if
+            if(xpix(1,ipos).lt.real(stapix(1)))
+     &        xpix(1,ipos)=real(stapix(1))
+            if(xpix(2,ipos).gt.real(endpix(1)))
+     &        xpix(2,ipos)=real(endpix(1))
+            if(ypix(1,ipos).lt.real(stapix(2)))
+     &        ypix(1,ipos)=real(stapix(2))
+            if(ypix(2,ipos).gt.real(endpix(2)))
+     &        ypix(2,ipos)=real(endpix(2))
+c
+c   - if selecting a single spectrum
+c
+          else
+            xpix(1,ipos)=xtemp(1)
+            xpix(2,ipos)=0.0
+            ypix(1,ipos)=ytemp(1)
+            ypix(2,ipos)=0.0
+          end if
+        end if
+c
+c   Compute location of viewport for spectrum plot
+c   - set viewport to full screen
+c   - set world coords to inches
+c
+        call pgvstand
+        call pgqvp(1,xmin,xmax,ymin,ymax)
+        call pgwindow(xmin,xmax,ymin,ymax)
+        xspv(1)=ximv(2)+(xmax-ximv(2))*0.2
+        xspv(2)=xmax
+        ysiz=(ymax-ymin)/real(nplots)
+        yspv(1)=ymin+ysiz*(real(nplots)-real(ipos))+ysiz*0.2
+        yspv(2)=yspv(1)+ysiz*0.8              
+c
+c   Draw indicator line
+c
+        if(area)then
+          xins=ximv(1)
+     &      +(ximv(2)-ximv(1))
+     &      *(xpix(2,ipos)-real(stapix(1)))
+     &      /real(ncol-1)
+          yins=yimv(1)
+     &      +(yimv(2)-yimv(1))
+     &      *(ypix(1,ipos)+((ypix(2,ipos)-ypix(1,ipos))/2.0)
+     &      -real(stapix(2)))
+     &      /real(nrow-1)
+        else
+          xins=ximv(1)
+     &      +(ximv(2)-ximv(1))
+     &      *(xpix(1,ipos)-real(stapix(1)))
+     &      /real(ncol-1)
+          yins=yimv(1)
+     &      +(yimv(2)-yimv(1))
+     &      *(ypix(1,ipos)-real(stapix(2)))
+     &      /real(nrow-1)
+        end if
+        xine=xspv(1)
+        yine=yspv(1)+(yspv(2)-yspv(1))/2.0
+c
+        call pgmove(xins,yins)
+        call pgdraw(xine,yine)
+c
+c   Draw rectangle if required
+c   - set viewport to image plot location
+c   - set world coords to pixels
+c
+        if(area)then
+          call pgvsize(ximv(1),ximv(2),yimv(1),yimv(2))
+          call pgwindow
+     &      (real(stapix(1)),real(endpix(1)),
+     &       real(stapix(2)),real(endpix(2)))
+          call pgmove(xpix(1,ipos),ypix(1,ipos))
+          call pgdraw(xpix(2,ipos),ypix(1,ipos))
+          call pgdraw(xpix(2,ipos),ypix(2,ipos))
+          call pgdraw(xpix(1,ipos),ypix(2,ipos))
+          call pgdraw(xpix(1,ipos),ypix(1,ipos))
+        end if   
+c
+c   Perform extraction(s)
+c   - extract spectra within required area
+c
+        if(area)then
+          do i=1,nx
+            work1(i)=0.0                 
+            valid(i)=0                 
+          end do
+          do k=int(ypix(1,ipos)),int(ypix(2,ipos))
+            do j=int(xpix(1,ipos)),int(xpix(2,ipos))
+              if ((.not.polygon).or.(mask(j,k) .eq. 1)) then
+                do i=1,nx
+                  if(array(i,j,k).gt.magicval)then
+                    work2(i)=DCV_<T>TOR(array(i,j,k))
+                    valid(i)=valid(i)+1
+                  else
+                    work2(i)=magic_float
+                  end if
+                end do
+                call ndp_add(nx,badpix,work1,work2,work1)        
+              end if ! (mask...)
+            end do
+          end do
+c
+c   - compute average spectrum
+c
+          do i=1,nx
+            if(valid(i).gt.0)then
+              work1(i)=work1(i)/real(valid(i))
+            else
+              work1(i)=magic_float
+            end if
+          end do
+c                                                   
+c   - extract single spectrum
+c
+        else
+          do i=1,nx
+            j=int(xpix(1,ipos))
+            k=int(ypix(1,ipos))
+            if(array(i,j,k).gt.magicval)then
+              work1(i)=DCV_<T>TOR(array(i,j,k))
+            else
+              work1(i)=magic_float
+            end if
+          end do
+        end if
+c
+c   Get range of axis values
+c
+        call gen_rangef(spaxis,1,nx,xend,xsta)
+c
+c   If common scale is not required, get the range of the spectrum data.
+c
+        if(.not.scale)then
+          call ndp_range(work1,1,nx,badpix,yspe,ysps)
+          if(yspe.eq.ysps)then
+            yspe=ysps+1.0
+            ysps=ysps-1.0
+          else
+            yspe=yspe+(yspe-ysps)*0.1
+          end if
+        end if
+c
+c   Plot spectrum
+c   - set viewport to spectrum plot location
+c   - set world coords to spectrum axis units
+c             
+        call pgvsize(xspv(1),xspv(2),yspv(1),yspv(2))
+        call pgwindow(xsta,xend,ysps,yspe)
+        call pgbox('BCNST',0.0,0,'BCNSTV',0.0,0)
+        call ndp_pgbin(spaxis,work1,work3,work4,nx,badpix,.true.)
+c
+c   Write spectrum to data structure if required
+c
+        if(write)then
+          if (twocur) then
+            mode = 'RECTANGLE'
+            width = int(abs(xpix(2,ipos)-xpix(1,ipos)))
+            height = int(abs(ypix(2,ipos)-ypix(1,ipos)))
+          else if (polygon) then
+            mode = 'POLYGON'
+          else
+            mode = 'PIXEL'
+          end if     
+          call par_cnpar('spectrum')
+          call par_rdchar('spectrum','spec',specname)
+          call spectrum_write(work1,spaxis,nx,badpix,
+     &                        specname,j,k,bin,mode,
+     &                        polygon,nx1,ny1,mask,
+     &                        twocur,width,height,status)
+
+          if(status.ne.0)go to 500
+        end if
+      end do
+c     
+  500 continue
+      end                                 
+

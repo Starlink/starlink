@@ -1,0 +1,213 @@
+#+
+#  Name:
+#     DEPICT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface DEPICT
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMage) Name of image to view'
+         help 'Enter the filename of the image you wish to view.'
+      endparameter
+
+      parameter WHOLE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.whole'
+         prompt '(WHole) Process the whole image?'
+         help 'This keyword determines whether you view some or all of the image.'
+      endparameter
+
+      parameter START
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.start'
+         prompt '(STart) Start co-ords of subset'
+         help 'Enter the starting (axis) values of the subset you wish to view.'
+      endparameter
+
+      parameter END
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.end'
+         prompt '(ENd) End co-ords of subset'
+         help 'Enter the end (axis) values of the image subset.'
+      endparameter
+
+      parameter LOW
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low'
+         prompt '(LOw) Lowest value to be displayed'
+         help 'Enter the lowest value you wish to be plotted in the image'
+      endparameter
+
+      parameter HIGH
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high'
+         prompt '(HIgh) Highest value to be displayed'
+         help 'Enter the highest value to appear in the image plot'
+      endparameter
+
+      parameter PLACE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.place'
+         prompt '(PLACE) Location of plot'
+         help 'Type BL,BC,BR,LC,CC,RC,TL,TC or TR to locate the plotted image'
+      endparameter
+
+      parameter MAG
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.mag'
+         prompt '(MAG) Plot magnification'
+         help 'Enter the magnification by which to scale the image'
+      endparameter
+
+      parameter LABEL
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.label'
+         prompt '(LABel) Label for plot'
+         help 'Type the string with which the plot will be labelled.'
+        endparameter
+
+  
+      parameter AXES
+         type '_logical
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.axes'
+         prompt '(AXes) Plot image axes?'
+         help 'Setting this keyword will plot axes around the image.'
+      endparameter
+
+      parameter RAMP
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.ramp'
+         prompt '(RAMP) Plot colour ramp?'
+         help 'Setting this keyword will plot a colour ramp next to the image.'
+      endparameter
+
+      parameter CONTOUR
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.contour'
+         prompt '(CONTour) Overplot with contours?'
+         help 'Setting this keyword will result in a contour map being plotted.'
+      endparameter
+
+      parameter IMAGE1
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image1'
+         prompt '(IMage) Name of image to contour'
+         help 'Enter the filename of the image you wish to contour.'
+      endparameter
+
+      parameter LOW1
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.low1'
+         prompt '(LOW1) Lowest value to be contoured'
+         help 'Pixel values below LOW1 will not be contoured.'
+      endparameter
+
+      parameter HIGH1
+         type '_real'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.high1'
+         prompt '(LOW1) Highest value to be contoured'
+         help 'Pixel values above HIGH1 will not be contoured.'
+      endparameter
+
+      parameter LEVELS
+         type '_integer'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.levels'
+         prompt '(LEVELS) Number of contour levels'
+         help 'Enter the number of different contour values to draw.'
+      endparameter
+
+      parameter HARDCOPY
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.hardcopy'
+         prompt '(HArdcopy) Produce hardcopy plot?'
+         help 'Setting this keyword will result in the image being printed.'
+      endparameter
+
+      parameter TABLE
+         type '_char'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.table'
+         prompt '(TABle) Name of lookup table'
+         help 'Enter the name of the colour look-up table you wish to use.'
+      endparameter
+
+      parameter ERASE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.erase'
+         prompt '(ERase) Erase screen before plotting?'
+         help 'If specified, the screen will be cleared before plotting'
+      endparameter
+
+      parameter SOFTDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.softdev'
+      endparameter
+  
+      parameter HARDDEV
+         ptype 'device'
+         type 'literal'
+         vpath 'global'
+         ppath 'global,dynamic,current,default'
+         association '<->global.harddev'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,138 @@
+      SUBROUTINE MOVIE_DISPLAY_<T>
+     &  (ARRAY,SUBSET1,SUBSET2,TABLE,NX,NY,NZ,STAPIX,ENDPIX,STEP,START,
+     &   END,HIGH,LOW,LABEL,AXES,BADPIX,MAGICVAL,QUAL,QARRAY,XIMV,YIMV,
+     &   STATUS)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      CHARACTER*(*) LABEL,TABLE
+      INTEGER       NX,NY,NZ,
+     &              STAPIX(6),
+     &              ENDPIX(6),
+     &              STEP,
+     &              SUBSET1(NX,NY)
+      LOGICAL       AXES,BADPIX
+      REAL          SUBSET2(NX,NY),
+     &              START(6),END(6),HIGH,LOW,XIMV(2),YIMV(2)
+      <TYPE>
+     &              ARRAY(NX,NY,NZ),MAGICVAL
+      LOGICAL       QUAL
+      BYTE          QARRAY(NX,NY)
+      INTEGER       STATUS
+C
+C   Local variables.
+C
+      REAL          BORDER
+      INTEGER       DUMINT               
+      REAL          ENDWC(2)
+      INTEGER       I
+      INTEGER       J
+      INTEGER       K
+      INTEGER       NELM
+      CHARACTER     NEWFR*8
+      CHARACTER     OLDFR*8
+      REAL          STAWC(2)
+C
+C   Functions.
+C
+      INTEGER       ICH_ENCODE
+c
+      include       'DCV_FUN'
+c
+c   Initialize.
+c
+      newfr='        '
+      oldfr='        '
+c
+c   Define image viewport.
+c
+      call pgvsize(ximv(1),ximv(2),yimv(1),yimv(2))
+c
+c   Set world coordinates to axis units. Make the window slightly larger
+c   than required so that the image plot will not obliterate the axes.
+c
+      border=max(0.05*abs(end(1)-start(1)),0.05*abs(end(2)-start(2)))
+      do i=1,2
+        if(start(i).le.end(i))then
+          stawc(i)=start(i)-border
+          endwc(i)=end(i)+border
+        else
+          stawc(i)=start(i)+border
+          endwc(i)=end(i)-border
+        end if
+      end do
+      call pgwindow(stawc(1),endwc(1),stawc(2),endwc(2))
+c
+c   Plot axes if required.
+c
+      if(axes)then
+        call pgbox('BCINST',0.0,0,'BCINST',0.0,0)
+      else
+        call pgbox('BC',0.0,0,'BC',0.0,0)
+      end if
+c
+c   Workspace size
+c
+      nelm = nx*ny
+c
+c   Plot label
+c
+      call pglabel(' ',' ',label)
+      call pgsch(1.5)
+c
+c   Number of elements in workspace...
+c
+      nelm = nx*ny
+c
+c   Display movie.
+c
+      do k=stapix(3),endpix(3),step
+c
+c   Copy data into workspace (NDP_IMAGE_INDEX needs a REAL array)
+c
+        do j = 1,ny
+          do i = 1,nx
+            subset2(i,j) = dcv_<t>toR(array(i,j,k))
+          end do
+        end do
+c
+c   - Replace bad quality pixels if need be...
+c
+      if (qual) then
+        call ndp_replace_qual_r(subset2,qarray,nelm,low-1.0)
+      end if
+c
+c   Convert data into colour indices
+c
+        call ndp_image_index(nelm,low,high,subset2,badpix,
+     &                       subset1,status)
+        if (status .ne. 0) go to 500
+c
+c   - write new frame number to terminal so movie can be paused with CTRL-S. 
+c
+        dumint=ich_encode(newfr,real(k),1,0,dumint) 
+        call dsa_wruser('Frame no. '//newfr//'\\N')
+c
+c   - erase previous frame number.
+c
+        call pgsci(0)
+        call pgmtext('B',2.0,0.5,0.5,oldfr)
+c
+c   - plot new frame number.
+c                         
+        call pgsci(1)
+        call pgmtext('B',2.0,0.5,0.5,newfr)
+        oldfr=newfr
+c
+c   - plot extracted plane.
+c
+        call pgpixl
+     &    (subset1,nx,ny,stapix(1),endpix(1),
+     &     stapix(2),endpix(2),start(1),end(1),
+     &     start(2),end(2))
+      end do
+c
+  500 end
+                  

@@ -1,0 +1,169 @@
+#+
+#  Name:
+#     TRANSFORM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface TRANSFORM
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image file to be tranformed.'
+      endparameter
+
+      parameter  SHIFT
+         type   '_real'
+         prompt  '(SHIFT) Shift amount.'
+         association '<->global.shift'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'SHIFT is an array specifying the pixel translations of IMAGE.'
+      endparameter
+
+      parameter  CENTRE
+         type   '_real'
+         prompt  '(CENTRE) Centre of rotation.'
+         association '<->global.centre'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'CENTRE is an array specifying the (pixel) centre of rotation.'
+      endparameter
+
+      parameter  ANGLE
+         type   '_real'
+         prompt  '(ANGLE) Angle of rotation in degrees'
+         association '<->global.angle'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ANGLE is an array specifying the rotation about each axis.'
+      endparameter
+
+      parameter  RESAMPLE
+         type   '_real'
+         prompt  '(RESAMPLE) Resampling factor.'
+         association '<->global.resample'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'RESAMPLE is an array of resampling factors for each dimension.'
+      endparameter
+
+      parameter  STAPIX
+         type   '_integer'
+         prompt  '(STAPIX) Start pixel of output.'
+         association '<->global.stapix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'STAPIX is an array specifying the start pixels of the subset.'
+      endparameter
+ 
+      parameter  ENDPIX
+         type   '_integer'
+         prompt  '(ENDPIX) End pixel of output.'
+         association '<->global.endpix'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'ENDPIX is an array containing the end pixels of the subset.'
+      endparameter
+
+      parameter INTERP
+         type   '_integer'
+         prompt  '(INTERP) Interpolation method'
+         association '<->global.interp'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help '1=nearest neighbour , 3=linear.'
+      endparameter
+
+      parameter  MINCORN
+         type   '_integer'
+         prompt  '(MINCORN) Minimum no. of non-magic corner pixels'
+         association '<->global.mincorn'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'MINCORN must lie in [1,2^NDIM].'
+      endparameter
+
+      parameter  AXES
+         type   '_logical'                                               
+         prompt  '(AXes) Calibrate the output axes?'
+         association '<->global.axes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If you wish to calibrate any axes, set this TRUE.'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for axes to be calibrated.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (AXKEY[i] != 0) then the i-th axis will be calibrated.'
+      endparameter
+
+      parameter  AXSTART
+         type   '_real'
+         prompt  '(AXSTart) Start values of axes.'
+         association '<->global.axstart'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXSTART is an array specifying the start values of the axes.'
+      endparameter
+
+      parameter  AXEND
+         type   '_real'
+         prompt  '(AXENd) End values of axes.'
+         association '<->global.axend'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXEND is an array specifying the end values of the axes.'
+      endparameter
+
+      parameter  AXLOG
+         type   '_integer'
+         prompt  '(AXLOG) Keys for logarithmic scaling.'
+         association '<->global.axlog'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (AXLOG[i] != 0), the i-th axis will be logarithmically scaled.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting transformed image.'
+      endparameter
+
+      parameter  ERR_VAL
+         type   '_real'
+         prompt  '(ERR_VAL) Value to pad error arrays with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter a value to fill new areas in error arrays with.'
+      endparameter
+
+   endinterface
+

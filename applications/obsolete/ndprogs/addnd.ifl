@@ -1,0 +1,89 @@
+#+
+#  Name:
+#     ADDND.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+
+   interface ADDND
+
+      parameter FILES
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.files'
+         prompt '(FILES) Name of an image filename list.'
+         help 'The name of the ASCII file listing the files to be added.'
+      endparameter
+
+      parameter IMAGE
+         ppath 'current,default'
+         association '<->global.image'
+      endparameter
+
+      parameter OUTPUT
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.output'
+         prompt '(OUTPUT) Name of the output image'
+         help 'The name of the structure containing the result of the addition.'
+      endparameter
+
+      parameter SHIFTS
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.shifts'
+         prompt '(SHIFTS) File of pixel offsets for images'
+         help 'A file specifying the shift in each dimension for each file in FILES'
+      endparameter
+
+      parameter VERBOSE
+        type '_logical'
+        vpath 'default,dynamic,current,global'
+        default 'false'
+        association '<->global.verbose'
+      endparameter
+
+      parameter AVERAGE
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.average'
+         prompt '(AVERAGE) Are the images to be averaged?'
+         help 'If set, this keyword will compute the mean of the pixels added.'
+      endparameter
+
+      parameter USEAXES
+         type '_logical'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.useaxes'
+         prompt '(USEAXES) Use axis information to compute shifts?'
+         help 'If set, ADDND will use axis arrays to compute shift values.'
+      endparameter
+
+      parameter SMALL
+         type '_real'
+         default '1E-7'
+         vpath 'default,dynamic,current,global'
+         association '<->global.small'
+      endparameter
+
+   endinterface
+

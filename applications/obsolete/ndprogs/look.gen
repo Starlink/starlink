@@ -1,0 +1,196 @@
+      SUBROUTINE LOOK_DATA_<T>
+     &  (ARRAY,DIMS1,DIMS2,STAPIX,ENDPIX,MAXVAL,MINVAL,QUAL,QARRAY)
+C
+      IMPLICIT NONE
+C
+C     Functions
+C
+      INTEGER       ICH_ENCODE,ICH_LEN
+C
+C     Parameters
+C                   
+      INTEGER       DIMS1,DIMS2,STAPIX(6),ENDPIX(6)
+      REAL          MAXVAL,MINVAL
+      <TYPE>
+     &              ARRAY(DIMS1,DIMS2)
+      LOGICAL       QUAL
+      BYTE          QARRAY(DIMS1,DIMS2)
+C
+C     Local variables
+C                     
+      INTEGER   DUMINT       ! INTEGER dummy variable
+      INTEGER   I            ! Loop counter
+      INTEGER   J            ! Loop counter
+      INTEGER   LENGTH       ! Maximum character length of value
+      INTEGER   LENMAX       ! Character length of maximum value
+      INTEGER   LENMIN       ! Character length of minimum value
+      INTEGER   NEXT         ! Pointer returned by ICH_ENCODE
+      CHARACTER STRING*640   ! Message string
+      INTEGER   STATUS       ! Status code
+      REAL      VALUE        ! Pixel value
+C
+      INCLUDE   'DCV_FUN'
+C
+C     Find maximum character length of value, with one decimal digit, plus 
+C     following space
+C
+      VALUE=INT(MAXVAL)+0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMAX)
+      VALUE=INT(MINVAL)-0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMIN)
+      LENGTH=MAX(LENMAX,LENMIN)
+C
+C     Display details of subset
+C
+      CALL DSA_WRUSER(' \\N')
+      DO I=1,2
+        IF(I.EQ.1)THEN
+          STRING='  Horizontal: dimension '
+        ELSE
+          STRING='  Vertical:   dimension '
+        END IF
+        DUMINT=ICH_ENCODE(STRING,REAL(I),25,0,NEXT)
+        STRING(NEXT:)=', pixels '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(STAPIX(I)),NEXT+9,0,NEXT)
+        STRING(NEXT:)=' to '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(ENDPIX(I)),NEXT+4,0,NEXT)
+        IF(I.EQ.1)THEN
+          STRING(NEXT:)=' (left to right)'
+        ELSE
+          STRING(NEXT:)=' (bottom to top)'
+        END IF
+        CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+      END DO     
+      CALL DSA_WRUSER('  This display is the right way up!\\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER('  B = bad quality pixel \\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C
+C     Loop through the image, displaying each row
+C
+      NEXT=3-LENGTH
+      DO J=ENDPIX(2),STAPIX(2),-1
+        DO I=STAPIX(1),ENDPIX(1)
+          NEXT=NEXT+LENGTH
+          IF (QUAL) THEN
+            IF (QARRAY(I,J).EQ.0) THEN
+              VALUE=DCV_<T>toR(ARRAY(I,J))
+              DUMINT=ICH_ENCODE(STRING,VALUE,NEXT,1,DUMINT)
+            ELSE
+              STRING(NEXT:)='B'
+            END IF ! (QARRAY...)
+          ELSE
+            VALUE=DCV_<T>toR(ARRAY(I,J))
+            DUMINT=ICH_ENCODE(STRING,VALUE,NEXT,1,DUMINT)
+          END IF ! (QUAL)
+        END DO
+c       CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        CALL PAR_WRUSER(STRING(:ICH_LEN(STRING)),STATUS)
+        CALL DSA_WRUSER(' \\N')
+        NEXT=3-LENGTH
+      END DO
+C
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C                                                        
+      END
+
+
+
+
+
+      SUBROUTINE LOOK_DATA_<T>Q
+     &  (ARRAY,DIMS1,DIMS2,STAPIX,ENDPIX,MAXVAL,MINVAL,MAGICVAL)
+C
+      IMPLICIT NONE
+C
+C     Functions
+C
+      INTEGER       ICH_ENCODE,ICH_LEN
+C
+C     Parameters
+C                   
+      INTEGER       DIMS1,DIMS2,STAPIX(6),ENDPIX(6)
+      REAL          MAXVAL,MINVAL
+      <TYPE>
+     &              ARRAY(DIMS1,DIMS2),MAGICVAL
+C
+C     Local variables
+C                     
+      INTEGER   DUMINT       ! INTEGER dummy variable
+      INTEGER   I            ! Loop counter
+      INTEGER   J            ! Loop counter
+      INTEGER   LENGTH       ! Maximum character length of value
+      INTEGER   LENMAX       ! Character length of maximum value
+      INTEGER   LENMIN       ! Character length of minimum value
+      INTEGER   NEXT         ! Pointer returned by ICH_ENCODE
+      CHARACTER STRING*640   ! Message string
+      INTEGER   STATUS       ! Status code
+      REAL      VALUE        ! Pixel value
+C
+      INCLUDE   'DCV_FUN'
+C
+C     Find maximum character length of value, with one decimal digit, plus 
+C     following space
+C
+      VALUE=INT(MAXVAL)+0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMAX)
+      VALUE=INT(MINVAL)-0.1
+      DUMINT=ICH_ENCODE(STRING,VALUE,1,1,LENMIN)
+      LENGTH=MAX(LENMAX,LENMIN)
+C
+C     Display details of subset
+C
+      CALL DSA_WRUSER(' \\N')
+      DO I=1,2
+        IF(I.EQ.1)THEN
+          STRING='  Horizontal: dimension '
+        ELSE
+          STRING='  Vertical:   dimension '
+        END IF
+        DUMINT=ICH_ENCODE(STRING,REAL(I),25,0,NEXT)
+        STRING(NEXT:)=', pixels '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(STAPIX(I)),NEXT+9,0,NEXT)
+        STRING(NEXT:)=' to '
+        DUMINT=ICH_ENCODE
+     &    (STRING,REAL(ENDPIX(I)),NEXT+4,0,NEXT)
+        IF(I.EQ.1)THEN
+          STRING(NEXT:)=' (left to right)'
+        ELSE
+          STRING(NEXT:)=' (bottom to top)'
+        END IF
+        CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+      END DO     
+      CALL DSA_WRUSER('  This display is the right way up!\\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER('  M = magic value pixel \\N')
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C
+C     Loop through the image, displaying each row
+C
+      NEXT=3-LENGTH
+      DO J=ENDPIX(2),STAPIX(2),-1
+        DO I=STAPIX(1),ENDPIX(1)
+          NEXT=NEXT+LENGTH
+          IF(ARRAY(I,J).GT.MAGICVAL)THEN
+            VALUE=DCV_<T>toR(ARRAY(I,J))
+            DUMINT=ICH_ENCODE(STRING,VALUE,NEXT,1,DUMINT)
+          ELSE
+            STRING(NEXT:)='M'
+          END IF
+        END DO
+c       CALL DSA_WRUSER(STRING(:ICH_LEN(STRING))//'\\N')
+        CALL PAR_WRUSER(STRING(:ICH_LEN(STRING)),STATUS)
+        CALL DSA_WRUSER(' \\N')
+        NEXT=3-LENGTH
+      END DO
+C
+      CALL DSA_WRUSER(' \\N')
+      CALL DSA_WRUSER(' \\N')
+C                                                        
+      END

@@ -1,0 +1,52 @@
+#+
+#  Name:
+#     PEEK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface PEEK
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image to be displayed'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image whose values you wish to peek.'
+      endparameter
+
+      parameter  PIXEL
+         type   '_integer'
+         prompt  '(PIXel) Pixel number.'
+         association '<->global.pixel'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'PIXEL is the array of co-ordinates of the pixel to be peeked at.'
+      endparameter
+
+      parameter  AGAIN  
+         type   '_logical'
+         prompt  '(AGAIN) Display another pixel?'
+         association '<->global.again'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AGAIN gives you the option to view another pixel or quit.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,190 @@
+      SUBROUTINE MAGIC_DATA_<T>
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,LOW,HIGH,
+     &   MAGICPIX,MAGICVAL,QUAL,QARRAY)
+C
+      IMPLICIT NONE
+C
+C  Parameters
+C                                                       
+      INTEGER   NELM,NDIM,DIMS(10),STAPIX(6),ENDPIX(6)
+      REAL      MAGICPIX
+      <TYPE>
+     &          ARRAY(NELM),OARRAY(NELM),LOW,HIGH,MAGICVAL
+      LOGICAL   QUAL
+      BYTE      QARRAY(NELM)
+C                          
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset
+      INTEGER   IOFF1        ! 1-D offset for axis 1          
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   STATUS       ! Status code
+C              
+      MAGICPIX=0.0
+C
+C     Compute offset needed to increment each dimension
+C
+      DO I=1,NDIM                      
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO   
+C
+C     Perform edit operation
+C     
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+C
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+C
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+C
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+C
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)   
+C
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1   
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                    IF(ARRAY(IOFF).LT.LOW .OR. 
+     &                 ARRAY(IOFF).GT.HIGH)THEN
+                         IF (.NOT.QUAL) THEN
+                           OARRAY(IOFF)=MAGICVAL
+                         ELSE
+                           OARRAY(IOFF)=ARRAY(IOFF)
+                           QARRAY(IOFF)=1
+                         END IF
+                         MAGICPIX=MAGICPIX+1.0
+                    ELSE
+                         OARRAY(IOFF)=ARRAY(IOFF)
+                         IF (QUAL) QARRAY(IOFF)=0
+                    END IF
+                END DO
+C
+              END DO
+C
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+C
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+C
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+C
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END
+                    
+
+
+      SUBROUTINE MAGIC_DATA_<T>Q
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,LOW,HIGH,
+     &   MAGICPIX,MAGICVAL)
+C
+      IMPLICIT NONE
+C
+C  Parameters
+C                                                       
+      INTEGER   NELM,NDIM,DIMS(10),STAPIX(6),ENDPIX(6)
+      REAL      MAGICPIX
+      <TYPE>
+     &          ARRAY(NELM),OARRAY(NELM),LOW,HIGH,MAGICVAL
+C                          
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset
+      INTEGER   IOFF1        ! 1-D offset for axis 1          
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   STATUS       ! Status code
+C              
+      MAGICPIX=0.0
+C
+C     Compute offset needed to increment each dimension
+C
+      DO I=1,NDIM                      
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO   
+C
+C     Perform edit operation
+C     
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+C
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+C
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+C
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+C
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)   
+C
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1   
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  IF(ARRAY(IOFF).GT.MAGICVAL)THEN
+                    IF(ARRAY(IOFF).LT.LOW .OR. 
+     &                 ARRAY(IOFF).GT.HIGH)THEN
+                      OARRAY(IOFF)=MAGICVAL
+                      MAGICPIX=MAGICPIX+1.0
+                    ELSE
+                      OARRAY(IOFF)=ARRAY(IOFF)
+                    END IF
+                  END IF
+                END DO
+C
+              END DO
+C
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+C
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+C
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+C
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END
+                    

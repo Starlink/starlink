@@ -1,0 +1,91 @@
+#+
+#  Name:
+#     STACK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface STACK
+
+      parameter FILES
+         type   'literal'
+         prompt '(FILES) List of input filenames.'
+         association '<->global.files'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'FILES is an ASCII file listing the images to be stacked together.'
+      endparameter
+
+      parameter  IMAGE
+         type   'literal'
+         association '<->global.image'
+         ppath 'current'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTput) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'OUTPUT is the name of the resulting stacked image.'
+      endparameter
+
+      parameter  VERBOSE
+         type   '_logical'
+         association '<->global.verbose'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'VERBOSE causes progress messages to be written to the terminal.'
+      endparameter
+
+      parameter  USEAXES
+         type   '_logical'
+         prompt  '(USEAXes) Use axis information to compute stacking order?'
+         association '<->global.useaxes'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If USEAXES is TRUE, axis data is used to compute stacking order,'
+      endparameter
+
+      parameter  SMALL
+         type   '_real'
+         association '<->global.small'
+         vpath 'default,dynamic,current,global'
+         default '1E-7'
+      endparameter
+
+      parameter  JOIN
+         type   '_real'
+         prompt  '(JOIN) Which axis are the cubes to be joined along?'
+         association '<->global.join'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'JOIN sets the axis (1,2 or 3) which will be common to the stack.'
+      endparameter
+
+      parameter  PADVAL
+         type   '_real'
+         prompt  '(PADval) Enter the value to pad arrays out with'
+         association '<->global.padval'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If an image is expanded, PADVAL will be used to fill the spaces.'
+      endparameter
+
+   endinterface
+

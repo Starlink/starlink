@@ -1,0 +1,392 @@
+      SUBROUTINE COLLAPSE_AX1COL_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,ONELM,STAPIX,ENDPIX,AXKEY,
+     &   QUAL,IQARRAY,OQARRAY,ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER DIMS(10),NDIM,NELM,ONELM,STAPIX(6),ENDPIX(6),AXKEY(6)
+      <type>
+     &        ARRAY(NELM),
+     &        IEARRAY(NELM),OEARRAY(ONELM),
+     &        OARRAY(ONELM)
+      LOGICAL QUAL,ERR
+      BYTE    IQARRAY(NELM),OQARRAY(ONELM)
+C
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   OOFF         ! 1-D offset in OARRAY
+C
+C     Initialization
+C      
+      OOFF=1
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Collapse any axes including axis 1
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  IF (QUAL) THEN
+                    IF (IQARRAY(IOFF).EQ.0) THEN
+                      OARRAY(OOFF)=OARRAY(OOFF)+ARRAY(IOFF)
+                      IF (ERR) CALL NDP_ERROR_ARITH_<T>('+',
+     &                           OARRAY(OOFF),ARRAY(IOFF),
+     &                           OEARRAY(OOFF),IEARRAY(IOFF),
+     &                           OEARRAY(OOFF))
+                    ELSE
+                      OQARRAY(OOFF)=1
+                    END IF
+                  ELSE
+                    OARRAY(OOFF)=OARRAY(OOFF)+ARRAY(IOFF)
+                    IF (ERR) CALL NDP_ERROR_ARITH_<T>('+',
+     &                         OARRAY(OOFF),ARRAY(IOFF),
+     &                         OEARRAY(OOFF),IEARRAY(IOFF),
+     &                         OEARRAY(OOFF))
+                  END IF ! (QUAL)  
+                END DO
+                IF(IND2.LT.ENDPIX(2) .AND. AXKEY(2).EQ.0)OOFF=OOFF+1
+              END DO
+              IF(IND3.LT.ENDPIX(3) .AND. AXKEY(3).EQ.0)OOFF=OOFF+1
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(IND4.LT.ENDPIX(4) .AND. AXKEY(4).EQ.0)OOFF=OOFF+1
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(IND5.LT.ENDPIX(5) .AND. AXKEY(5).EQ.0)OOFF=OOFF+1
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(IND6.LT.ENDPIX(6) .AND. AXKEY(6).EQ.0)OOFF=OOFF+1
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END
+
+
+
+
+
+      SUBROUTINE COLLAPSE_AX1NOTCOL_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,ONELM,STAPIX,ENDPIX,AXKEY,
+     &   QUAL,IQARRAY,OQARRAY,ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER DIMS(10),NDIM,NELM,ONELM,STAPIX(6),ENDPIX(6),AXKEY(6)
+      <type>
+     &        ARRAY(NELM),
+     &        IEARRAY(NELM),OEARRAY(ONELM),
+     &        OARRAY(ONELM)
+      LOGICAL QUAL,ERR
+      BYTE    IQARRAY(NELM),OQARRAY(ONELM)
+C
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   OOFF         ! 1-D offset in OARRAY
+C
+C     Initialization
+C      
+      OOFF=1
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Collapse any axes except axis 1
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  IF (QUAL) THEN
+                    IF (IQARRAY(IOFF).EQ.0) THEN
+                      OARRAY(OOFF)=OARRAY(OOFF)+ARRAY(IOFF)
+                      IF (ERR) CALL NDP_ERROR_ARITH_<T>('+',
+     &                           OARRAY(OOFF),ARRAY(IOFF),
+     &                           OEARRAY(OOFF),IEARRAY(IOFF),
+     &                           OEARRAY(OOFF))
+                    ELSE
+                      OQARRAY(OOFF)=1
+                    END IF
+                  ELSE
+                    OARRAY(OOFF)=OARRAY(OOFF)+ARRAY(IOFF)
+                    IF (ERR) CALL NDP_ERROR_ARITH_<T>('+',
+     &                         OARRAY(OOFF),ARRAY(IOFF),
+     &                         OEARRAY(OOFF),IEARRAY(IOFF),
+     &                         OEARRAY(OOFF))
+                  END IF ! (QUAL)  
+                  OOFF=OOFF+1
+                END DO
+                IF(AXKEY(2).EQ.1)OOFF=1
+              END DO
+              IF(AXKEY(3).EQ.1)OOFF=1
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(AXKEY(4).EQ.1)OOFF=1
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(AXKEY(5).EQ.1)OOFF=1
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(AXKEY(6).EQ.1)OOFF=1
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END
+
+
+
+
+
+
+
+
+      SUBROUTINE COLLAPSE_AX1COL_<t>Q
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,ONELM,STAPIX,ENDPIX,AXKEY,MAGICVAL,
+     &   ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER DIMS(10),NDIM,NELM,ONELM,STAPIX(6),ENDPIX(6),AXKEY(6)
+      <type>
+     &        ARRAY(NELM),
+     &        IEARRAY(NELM),OEARRAY(ONELM),
+     &        OARRAY(ONELM),
+     &        MAGICVAL
+      LOGICAL ERR
+C
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   OOFF         ! 1-D offset in OARRAY
+C
+C     Initialization
+C      
+      OOFF=1
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Collapse any axes including axis 1
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  IF(ARRAY(IOFF).GT.MAGICVAL)THEN
+                    OARRAY(OOFF)=OARRAY(OOFF)+ARRAY(IOFF)
+                    IF (ERR) CALL NDP_ERROR_ARITH_<T>('+',
+     &                         OARRAY(OOFF),ARRAY(IOFF),
+     &                         OEARRAY(OOFF),IEARRAY(IOFF),
+     &                         OEARRAY(OOFF))
+                  END IF
+                END DO
+                IF(IND2.LT.ENDPIX(2) .AND. AXKEY(2).EQ.0)OOFF=OOFF+1
+              END DO
+              IF(IND3.LT.ENDPIX(3) .AND. AXKEY(3).EQ.0)OOFF=OOFF+1
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(IND4.LT.ENDPIX(4) .AND. AXKEY(4).EQ.0)OOFF=OOFF+1
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(IND5.LT.ENDPIX(5) .AND. AXKEY(5).EQ.0)OOFF=OOFF+1
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(IND6.LT.ENDPIX(6) .AND. AXKEY(6).EQ.0)OOFF=OOFF+1
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END
+
+
+
+
+
+      SUBROUTINE COLLAPSE_AX1NOTCOL_<t>Q
+     &  (ARRAY,OARRAY,DIMS,NDIM,NELM,ONELM,STAPIX,ENDPIX,AXKEY,MAGICVAL,
+     &   ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER DIMS(10),NDIM,NELM,ONELM,STAPIX(6),ENDPIX(6),AXKEY(6)
+      <type>
+     &        ARRAY(NELM),
+     &        OARRAY(ONELM),
+     &        IEARRAY(NELM),OEARRAY(ONELM),
+     &        MAGICVAL
+      LOGICAL ERR
+C
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for input dimensions
+      INTEGER   IND1         ! Axis 1 index
+      INTEGER   IND2         ! Axis 2 index
+      INTEGER   IND3         ! Axis 3 index
+      INTEGER   IND4         ! Axis 4 index
+      INTEGER   IND5         ! Axis 5 index
+      INTEGER   IND6         ! Axis 6 index
+      INTEGER   IOFF         ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1        ! 1-D offset for axis 1
+      INTEGER   IOFF2        ! 1-D offset for axis 2
+      INTEGER   IOFF3        ! 1-D offset for axis 3
+      INTEGER   IOFF4        ! 1-D offset for axis 4
+      INTEGER   IOFF5        ! 1-D offset for axis 5
+      INTEGER   IOFF6        ! 1-D offset for axis 6
+      INTEGER   OOFF         ! 1-D offset in OARRAY
+C
+C     Initialization
+C      
+      OOFF=1
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C                           
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Collapse any axes except axis 1
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  IF(ARRAY(IOFF).GT.MAGICVAL)THEN
+                    OARRAY(OOFF)=OARRAY(OOFF)+ARRAY(IOFF)
+                    IF (ERR) CALL NDP_ERROR_ARITH_<T>('+',
+     &                          OARRAY(OOFF),ARRAY(IOFF),
+     &                          OEARRAY(OOFF),IEARRAY(IOFF),
+     &                          OEARRAY(OOFF))
+                  END IF
+                  OOFF=OOFF+1
+                END DO
+                IF(AXKEY(2).EQ.1)OOFF=1
+              END DO
+              IF(AXKEY(3).EQ.1)OOFF=1
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(AXKEY(4).EQ.1)OOFF=1
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(AXKEY(5).EQ.1)OOFF=1
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(AXKEY(6).EQ.1)OOFF=1
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END

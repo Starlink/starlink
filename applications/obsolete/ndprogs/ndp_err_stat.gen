@@ -1,0 +1,84 @@
+      subroutine ndp_error_stats_<t>(array,err,earray,qual,qarray,badpix,
+     &                               magicval,nelm,mean,sdev,status)
+c
+c   This routine calculates the mean and standard deviation of an error array, 
+c   taking into account magic values in the data and the possible presence of 
+c   a quality array.
+c
+c   Arguments
+c   ---------   
+c
+c   array     (> TYPE)            Main data array
+c   err       (> logical)         Does an error array exist?
+c   earray    (> array of TYPE)   Error array
+c   qual      (> logical)         Does a quality array exist?
+c   qarray    (> array of byte)   Quality array
+c   badpix    (> logical)         Are magic values present?
+c   magicval  (> TYPE)            The magic value
+c   nelm      (> integer)         Number of elements in arrays
+c   mean      (< real)            Average error
+c   sdev      (< real)            Standard deviation of errors
+c   status    (! integer)         DSA status flag
+c
+c   Author
+c   ------
+c
+c   Julian Gold   RGO   (CAVAD::GOLDJIL or GOLDJIL@UK.AC.CAM.AST-STAR)
+c   9/10/91
+c
+      implicit         none
+c
+      integer          nelm
+      <type>           array(nelm),earray(nelm),magicval
+      logical          qual,err,badpix
+      real             mean,sdev
+      byte             qarray(nelm)
+      integer          status
+c
+      integer          i
+      real             count
+      double precision sum,sumsq,temp,error
+      logical          valid
+c
+      include      'DCV_FUN'
+c
+c   First check status flag
+c 
+      if (status.ne.0) go to 999
+c
+c   Now check there's actually an error array!
+c
+      if (.not.err) then
+        call dsa_wruser
+     &          ('\\n *** There''s no error data in this image ***\\n')
+        go to 999
+      end if
+c
+c   Compute the mean
+c
+      sum=0.0d0
+      count=0.0
+      sumsq=0.0d0
+      do i=1,nelm
+        if (badpix) then
+          valid=(array(i).ne.magicval)
+        else if (qual) then
+          valid=(qarray(i).eq.0)
+        else
+          valid=.true.
+        end if
+        if (valid) then
+          error=dcv_<t>tod(earray(i))
+          sum=sum+error
+          sumsq=sumsq+error*error
+          count=count+1.0
+        end if
+      end do
+      mean=sngl(sum)/count
+      temp=dble(count)*sumsq-sum*sum
+      sdev=sqrt(abs(sngl(temp))/(count-1.0))
+c
+c   All done
+c
+999   continue
+      end

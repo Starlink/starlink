@@ -1,0 +1,42 @@
+      SUBROUTINE TRANSPOSE_3D_<T>
+     &  (ARRAY,OARRAY,NX,NY,NZ,NOX,NOY,NOZ,ORDER)
+C            
+      IMPLICIT NONE
+C
+C     Parameters.
+C
+      INTEGER   NX,NY,NZ,
+     &          NOX,NOY,NOZ,
+     &          ORDER(6),
+     &          R(6),
+     &          W(6)
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NOX,NOY,NOZ)
+C                                              
+C     Functions.
+C                      
+      INTEGER   ICH_ENCODE,ICH_LEN
+C
+C     Local variables.
+C                     
+      INTEGER   I              ! Array index
+      INTEGER   IND(3)         ! Array indices
+      INTEGER   J              ! Array index
+      INTEGER   K              ! Array index
+C                       
+C     Transpose the entire image at once 
+C
+      DO K=1,NOZ
+        IND(ORDER(3))=K
+        DO J=1,NOY
+          IND(ORDER(2))=J
+          DO I=1,NOX
+            IND(ORDER(1))=I
+            OARRAY(I,J,K)=ARRAY(IND(1),IND(2),IND(3))
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,K)
+      END DO
+C
+      END

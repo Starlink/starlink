@@ -1,0 +1,79 @@
+#+
+#  Name:
+#     SETAXES.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface SETAXES
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image whose axes are to be modified.'
+      endparameter
+
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the resultant image.'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for axes to be calibrated.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXKEY[i] is 1, the i-th axis will be calibrated.'
+      endparameter
+
+      parameter  AXSTART
+         type   '_real'
+         prompt  '(AXSTART) Start values of axes.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXSTART is an array containing the axis starting values.'
+      endparameter
+ 
+      parameter  AXEND
+         type   '_real'
+         prompt  '(AXEND) End values of axes.'
+         association '<->global.axend'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'AXEND is an array containing the axis end values.'
+      endparameter
+ 
+      parameter  AXLOG
+         type   '_integer'
+         prompt  '(AXLOG) Keys for logarithmic scaling.'
+         association '<->global.axlog'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If AXLOG[i] is 1, the i-th axis will be logarithmically scaled.'
+      endparameter
+
+   endinterface
+

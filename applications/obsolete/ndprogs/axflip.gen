@@ -1,0 +1,68 @@
+      SUBROUTINE AXFLIP_3D_<T>(ARRAY,OARRAY,NX,NY,NZ,DIMS,AXIS)
+C            
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER   NX,NY,NZ,NRX,NRY,
+     &          DIMS(10),
+     &          AXIS,
+     &          ELEM                             
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ)
+C                                              
+C     Functions.
+C                      
+      INTEGER   ICH_ENCODE,ICH_LEN
+C
+C     Local variables.
+C                     
+      INTEGER   DUMINT         ! INTEGER dummy variable
+      REAL      DUMREAL        ! REAL dummy variable
+      INTEGER   ENDPIX(3)      ! End pixel in each dimension
+      INTEGER   I              ! Array index
+      INTEGER   II             ! Array index
+      INTEGER   INC(3)         ! Increment in each dimension
+      INTEGER   IND(3)         ! Array indices
+      INTEGER   J              ! Array index
+      INTEGER   JJ             ! Array index
+      INTEGER   K              ! Array index
+      INTEGER   KK             ! Array index
+      INTEGER   STAPIX(3)      ! Start pixel in each dimension
+      INTEGER   STATUS         ! Status code
+      CHARACTER STRING*80      ! Message string
+C
+C     Initialize.
+C
+      KK=1
+C
+C     - set up start and end pixels in each dimension.
+C
+      DO I=1,3
+        IF(AXIS.EQ.I)THEN
+          STAPIX(I)=DIMS(I)
+          ENDPIX(I)=1
+          INC(I)=-1
+        ELSE
+          STAPIX(I)=1
+          ENDPIX(I)=DIMS(I)
+          INC(I)=1
+        END IF
+      END DO
+C
+      DO K=STAPIX(3),ENDPIX(3),INC(3)
+        JJ=1
+        DO J=STAPIX(2),ENDPIX(2),INC(2)
+          II=1           
+          DO I=STAPIX(1),ENDPIX(1),INC(1)
+            OARRAY(II,JJ,KK)=ARRAY(I,J,K)
+            II=II+1
+          END DO
+        JJ=JJ+1            
+        END DO
+        KK=KK+1
+        CALL NDP_DISPLAY_PROGRESS(3,KK)
+      END DO
+C
+      END

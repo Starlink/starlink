@@ -1,0 +1,377 @@
+C+
+C
+C   -------------------------
+C   N D P _ S T A T S _ < T >
+C   -------------------------
+C
+C   Description
+C   -----------
+C   Computes statistics (total, minimum, maximum, pixel coords of min and 
+C   max, mean, standard deviation, number of pixels) for an INTEGER*2 image.
+C   Magic value pixels are not distinguished from valid pixels.
+C
+C
+C   Parameters
+C   ----------
+C   ARRAY     (> short integer array). Image data array.
+C   DIMS      (> integer array). Dimensions of image data array.
+C   NDIM      (> integer). Number of dimensions in image.
+C   NELM      (> integer). Number of elements in data array.
+C   STAPIX    (> integer array). Start pixels to be inspected.
+C   ENDPIX    (> integer array). End pixels to be inspected.
+C   TOTAL     (< real). Total of all valid pixels.
+C   MAXVAL    (< real). Maximum value.
+C   MINVAL    (< real). Minimum value.
+C   MEAN      (< real). Mean value.
+C   MAXPIX    (< integer array). Pixel coordinates of maximum value.
+C   MINPIX    (< integer array). Pixel coordinates of minimum value.
+C   SIGMA     (< real). Standard deviation.
+C   SIZE      (< real). Number of valid pixels.
+C   MAGICPIX  (< real). Number of magic value pixels.
+C   BADPIX    (< real). Number of bad quality pixels.
+C
+C
+C   External functions & subroutines called
+C   ---------------------------------------
+C   None.
+C
+C
+C   INCLUDE statements
+C   ------------------
+C   INCLUDE 'MAGIC_VALUES'
+C   INCLUDE 'NUMERIC_RANGES'
+C   INCLUDE 'DCV_FUN'                                             
+C
+C   Extensions to FORTRAN77
+C   -----------------------
+C   END DO / IMPLICIT NONE / INCLUDE / Names > 6 characters
+C
+C
+C   VAX-specific statements
+C   -----------------------
+C   None.
+C
+C
+C   Author/s
+C   --------
+C   Nick Fuller  RGO  (RGVAD::NMJF or NMJF@UK.AC.RGO.STAR)
+C   Julian Gold  RGO  (CAVAD::GOLDJIL or GOLDJIL@UK.AC.CAM.AST-STAR)
+C
+C
+C   History
+C   -------
+C   01-FEB-1989   - Original program
+C   08-OCT-1991   - Converted  to GENERIC format, quality array handling
+C                   added.
+C   12-OCT-1992   - Fixed bug that averaged data over all pixels rather than
+C                   all *valid* pixels.
+C+-----------------------------------------------------------------------------
+      SUBROUTINE NDP_STATS_<T>
+     &  (ARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,
+     &   TOTAL,MAXVAL,MINVAL,MEAN,MAXPIX,MINPIX,
+     &   SIGMA,SIZE,MAGICVAL,QUAL,QARRAY,BADPIX)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER   DIMS(10)       ! Dimensions of the image
+      INTEGER   NDIM           ! Number of dimensions in the image
+      INTEGER   NELM           ! Number of elements in the image
+      INTEGER   STAPIX(6)      ! Start pixel of subset
+      INTEGER   ENDPIX(6)      ! End pixel of subset       
+      REAL      TOTAL          ! Total of pixel values in subset
+      REAL      MEAN           ! Mean of pixel values in subset
+      REAL      MAXPIX(6)      ! Coordinates of maximum pixel value
+      REAL      MINPIX(6)      ! Coordinates of minimum pixel value     
+      REAL      SIGMA          ! Standard deviation of pixel values in subset
+      REAL      SIZE           ! Number of pixels in subset
+      REAL      BADPIX         ! Number of pixels found with bad quality
+      REAL      MAXVAL         ! Maximum pixel value in subset
+      REAL      MINVAL         ! Minimum   "     "   "    "
+      LOGICAL   QUAL           ! 
+      BYTE      QARRAY(NELM)   ! Quality array
+C
+      <TYPE>    ARRAY(NELM),   ! The image array                             
+     &          MAGICVAL       ! 
+C
+C     Local variables           
+C
+      LOGICAL   BADVAL         ! Flags that a pixel is bad quality
+      REAL      DUMREAL        ! REAL dummy variable
+      INTEGER   I              ! Loop counter
+      INTEGER   II             ! Loop counter
+      INTEGER   INC(6)         ! 1-D increments for input dimensions
+      INTEGER   IOFF           ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1          ! 1-D offset for axis 1
+      INTEGER   IOFF2          ! 1-D offset for axis 2
+      INTEGER   IOFF3          ! 1-D offset for axis 3
+      INTEGER   IOFF4          ! 1-D offset for axis 4
+      INTEGER   IOFF5          ! 1-D offset for axis 5
+      INTEGER   IOFF6          ! 1-D offset for axis 6
+      INTEGER   IND1           ! Axis 1 index
+      INTEGER   IND2           ! Axis 2 index
+      INTEGER   IND3           ! Axis 3 index
+      INTEGER   IND4           ! Axis 4 index
+      INTEGER   IND5           ! Axis 5 index
+      INTEGER   IND6           ! Axis 6 index
+      REAL      TOTSQ          ! Total of squares
+      REAL      VALID          ! Number of valid pixels
+      REAL      VALUE          ! Pixel value
+C
+      INCLUDE 'MAGIC_VALUES'
+      INCLUDE 'NUMERIC_RANGES'
+      INCLUDE 'DCV_FUN'
+C
+C     Initialize
+C
+      BADPIX=0.0
+      TOTAL=0.0
+      TOTSQ=0.0
+      MEAN=0.0
+      SIGMA=0.0
+      DO I=1,NDIM
+        MINPIX(I)=STAPIX(I)
+        MAXPIX(I)=STAPIX(I)
+      END DO
+      MINVAL=ABS(DCV_<T>toR(MAGICVAL))
+      MAXVAL=-MINVAL
+C
+C     Compute number of pixels to be inspected
+C                         
+      SIZE=1.0      
+      DO I=1,NDIM
+        SIZE=SIZE*REAL(ENDPIX(I)-STAPIX(I)+1)
+      END DO
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Loop through the image array
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                    VALUE=DCV_<T>toR(ARRAY(IOFF))
+                    BADVAL=.FALSE.
+                    IF (QUAL) BADVAL=(QARRAY(IOFF).NE.0)
+                    IF (BADVAL) THEN
+                      BADPIX=BADPIX+1.0
+                    ELSE 
+                      IF(VALUE.LT.MINVAL)THEN
+                        MINVAL=VALUE
+                        MINPIX(1)=IND1
+                        MINPIX(2)=IND2
+                        MINPIX(3)=IND3
+                        MINPIX(4)=IND4
+                        MINPIX(5)=IND5
+                        MINPIX(6)=IND6
+                      END IF
+                      IF(VALUE.GT.MAXVAL)THEN 
+                        MAXVAL=VALUE
+                        MAXPIX(1)=IND1
+                        MAXPIX(2)=IND2
+                        MAXPIX(3)=IND3
+                        MAXPIX(4)=IND4
+                        MAXPIX(5)=IND5
+                        MAXPIX(6)=IND6
+                      END IF
+                      TOTAL=TOTAL+VALUE
+                      DUMREAL=VALUE*VALUE
+                      TOTSQ=TOTSQ+DUMREAL
+                    END IF ! (BADVAL)
+                END DO
+              END DO
+            END DO
+          END DO
+        END DO
+      END DO
+C
+      VALID=SIZE-BADPIX
+      IF (VALID .NE. 0.0) THEN
+        MEAN=TOTAL/VALID
+      ELSE
+        CALL DSA_WRUSER('%NDP_STATS-W-NOVALID  ')
+        CALL DSA_WRUSER('No valid pixels exist in this image.\\n')
+      END IF
+C
+      IF (VALID .GT. 1) THEN
+        SIGMA=SQRT(ABS((TOTSQ-(TOTAL*TOTAL)/VALID)/(VALID-1.0)))
+      ELSE
+        CALL DSA_WRUSER('%NDP_STATS-W-INVALID  ')
+        CALL DSA_WRUSER('Insufficent valid pixels in this image.\\n')
+      END IF
+C                                                        
+      END
+
+
+
+
+      SUBROUTINE NDP_STATS_<T>Q
+     &  (ARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,
+     &   TOTAL,MAXVAL,MINVAL,MEAN,MAXPIX,MINPIX,
+     &   SIGMA,SIZE,MAGICVAL,MAGICPIX)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER   DIMS(10)       ! Dimensions of the image
+      INTEGER   NDIM           ! Number of dimensions in the image
+      INTEGER   NELM           ! Number of elements in the image
+      INTEGER   STAPIX(6)      ! Start pixel of subset
+      INTEGER   ENDPIX(6)      ! End pixel of subset       
+      REAL      TOTAL          ! Total of pixel values in subset
+      REAL      MEAN           ! Mean of pixel values in subset
+      REAL      MAXPIX(6)      ! Coordinates of maximum pixel value
+      REAL      MINPIX(6)      ! Coordinates of minimum pixel value     
+      REAL      SIGMA          ! Standard deviation of pixel values in subset
+      REAL      SIZE           ! Number of pixels in subset
+      REAL      MAGICPIX       ! Number of pixels found with the magic value
+      REAL      MAXVAL         ! Maximum pixel value in subset
+      REAL      MINVAL         ! Minimum   "     "   "    "
+C
+      <TYPE>    ARRAY(NELM),   ! The image array                          
+     &          MAGICVAL       ! The magic value
+C
+C     Local variables           
+C
+      REAL      DUMREAL        ! REAL dummy variable
+      INTEGER   I              ! Loop counter
+      INTEGER   II             ! Loop counter
+      INTEGER   INC(6)         ! 1-D increments for input dimensions
+      INTEGER   IOFF           ! Total 1-D offset in ARRAY
+      INTEGER   IOFF1          ! 1-D offset for axis 1
+      INTEGER   IOFF2          ! 1-D offset for axis 2
+      INTEGER   IOFF3          ! 1-D offset for axis 3
+      INTEGER   IOFF4          ! 1-D offset for axis 4
+      INTEGER   IOFF5          ! 1-D offset for axis 5
+      INTEGER   IOFF6          ! 1-D offset for axis 6
+      INTEGER   IND1           ! Axis 1 index
+      INTEGER   IND2           ! Axis 2 index
+      INTEGER   IND3           ! Axis 3 index
+      INTEGER   IND4           ! Axis 4 index
+      INTEGER   IND5           ! Axis 5 index
+      INTEGER   IND6           ! Axis 6 index
+      REAL      TOTSQ          ! Total of squares
+      REAL      VALID          ! Number of valid pixels in image
+      REAL      VALUE          ! Pixel value
+C
+      INCLUDE 'MAGIC_VALUES'
+      INCLUDE 'NUMERIC_RANGES'
+      INCLUDE 'DCV_FUN'
+C
+C     Initialize
+C
+      MAGICPIX=0.0
+      TOTAL=0.0
+      TOTSQ=0.0
+      MEAN=0.0
+      SIGMA=0.0
+      DO I=1,NDIM
+        MINPIX(I)=STAPIX(I)
+        MAXPIX(I)=STAPIX(I)
+      END DO
+      MAXVAL=-ABS(DCV_<T>toR(MAGICVAL))
+      MINVAL=-MAXVAL
+C
+C     Compute number of pixels to be inspected
+C                         
+      SIZE=1.0      
+      DO I=1,NDIM
+        SIZE=SIZE*REAL(ENDPIX(I)-STAPIX(I)+1)
+      END DO
+C
+C     Compute offset in ARRAY needed to increment each dimension
+C
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO
+C
+C     Loop through the image array
+C
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+                  IF(ARRAY(IOFF).GT.MAGICVAL)THEN
+                    VALUE=ARRAY(IOFF)
+                    IF(VALUE.LT.MINVAL)THEN
+                      MINVAL=VALUE
+                      MINPIX(1)=IND1
+                      MINPIX(2)=IND2
+                      MINPIX(3)=IND3
+                      MINPIX(4)=IND4
+                      MINPIX(5)=IND5
+                      MINPIX(6)=IND6
+                    END IF
+                    IF(VALUE.GT.MAXVAL)THEN 
+                      MAXVAL=VALUE
+                      MAXPIX(1)=IND1
+                      MAXPIX(2)=IND2
+                      MAXPIX(3)=IND3
+                      MAXPIX(4)=IND4
+                      MAXPIX(5)=IND5
+                      MAXPIX(6)=IND6
+                    END IF
+                    TOTAL=TOTAL+VALUE
+                    DUMREAL=VALUE*VALUE
+                    TOTSQ=TOTSQ+DUMREAL
+                  ELSE
+                    MAGICPIX=MAGICPIX+1.0
+                  END IF
+                END DO
+              END DO
+            END DO
+          END DO
+        END DO
+      END DO
+C
+      VALID=SIZE-MAGICPIX
+      IF (VALID .NE. 0.0) THEN
+        MEAN=TOTAL/VALID
+      ELSE
+        CALL DSA_WRUSER('%NDP_STATS-W-NOVALID  ')
+        CALL DSA_WRUSER('No valid pixels exist in this image.\\n')
+      END IF
+C
+      IF (VALID .GT. 1) THEN
+        SIGMA=SQRT(ABS((TOTSQ-(TOTAL*TOTAL)/VALID)/(VALID-1.0)))
+      ELSE
+        CALL DSA_WRUSER('%NDP_STATS-W-INVALID  ')
+        CALL DSA_WRUSER('Too few valid pixels in image for SD.\\n')
+      END IF
+C                                                        
+      END
+
+
+
+

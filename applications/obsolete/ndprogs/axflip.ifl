@@ -1,0 +1,52 @@
+#+
+#  Name:
+#     AXFLIP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+ 
+   interface AXFLIP
+
+      parameter IMAGE
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.image'
+         prompt '(IMAGE) Name of input image'
+         help 'The name of the structure containing the image to process.'
+      endparameter
+
+      parameter OUTPUT
+         type 'literal'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.output'
+         prompt '(OUTPUT) Name of the output image'
+         help 'The name of the structure containing the result of the addition.'
+      endparameter
+
+      parameter AXIS
+         type '_integer'
+         vpath 'prompt'
+         ppath 'global,dynamic,current,default'
+         association '<->global.axis'
+         prompt '(AXIS) Axis to be reversed.'
+         help 'The number of the axis to be reversed (eg 1 for x, 2 for y...)'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,115 @@
+#+
+#  Name:
+#     MOMENTS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface MOMENTS
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of image (ZXY-sorted)'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the 3D (z,x,y) sorted image to process.'
+      endparameter
+  
+      parameter  USEMASK
+         type    '_logical'
+         prompt  '(USEMASK) Use a mask image?'
+         association '<->global.usermask'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Do you wish to use a mask file to exclude pixels from processing?'
+      endparameter
+
+      parameter  MASK
+         type   'literal'
+         prompt  '(MASK) Name of mask image'
+         association '<->global.mask'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the image you wish to use as a pixel mask.'
+      endparameter
+
+      parameter  FINDSEQ
+         type    '_logical'
+         prompt  '(FINDSEQ) Find peaks in sequence from pixel 1?'
+         association '<->global.findseq'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Set this keyword to scan the spectrum for a sequence of peaks.'
+      endparameter
+ 
+      parameter  PEAKS
+         type    '_integer'
+         prompt  '(PEAKS) Number of peaks to be found'
+         association '<->global.peaks'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the number of emission components to find.'
+      endparameter
+
+      parameter  THRESH
+         type    '_real'
+         prompt  '(THRESH) Threshold pixel value for peak search'
+         association '<->global.thresh'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'A pixel with value above THRESH will be considered as a peak'
+      endparameter
+
+      parameter  WIDTH
+         type    '_real'
+         prompt  '(WIDTH) Width of peaks in pixels'
+         association '<->global.width'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'WIDTH is the expected width at the base of each peak.'
+       endparameter
+
+      parameter  GAP
+         type    '_real'
+         prompt  '(GAP) Minimum separation of peaks in pixels'
+         association '<->global.gap'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'GAP is the expected separation of the centres of adjacent peaks.'
+      endparameter
+
+      parameter  BIN
+         type    '_integer'
+         prompt  '(BIN) Binning factor in XY plane'
+         association '<->global.bin'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'BIN is the size of the area which will be processed per spectrum.'
+      endparameter
+
+      parameter  RESULTS
+         type   'literal'
+         prompt  '(RESULTS) Name of results structure'
+         association '<->global.results'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'Enter the name of the structure to store results in.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,17 @@
+      subroutine test_fill_<t>(nelm,array)
+c
+      integer stripes
+      parameter (stripes = 16)
+c
+      integer nelm
+      <type> array(nelm)
+c
+      integer i,n
+c
+      do n = 1,stripes
+        do i = 1+(n-1)*nelm/stripes , n*nelm/stripes
+          array(i) = mod(2*n + i,256)
+        end do
+      end do
+      return
+      end

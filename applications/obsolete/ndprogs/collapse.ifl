@@ -1,0 +1,88 @@
+#+
+#  Name:
+#     COLLAPSE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface COLLAPSE
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help   'IMAGE is the name of the image you wish to collapse.'
+      endparameter
+
+      parameter  AXKEY
+         type   '_integer'
+         prompt  '(AXKEY) Keys for dimensions to be collapsed.'
+         association '<->global.axkey'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If (AXKEY[i] != 0) the i-th axis will be collapsed.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHole) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified the entire image will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is the array containg the start coords of the subset.'
+      endparameter
+ 
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is the array containing the end coords of the subset.'
+      endparameter
+ 
+      parameter  FLOAT
+         type   '_logical'                                              
+         prompt  '(FLOAT) Create an output data array of type FLOAT?'
+         association '<->global.float'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If FLOAT is specified, the output data will be of type FLOAT.'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'OUTPUT is the name of the resulting compressed image.'
+      endparameter
+
+   endinterface
+

@@ -1,0 +1,53 @@
+      subroutine slice_copy_<t>(slice,nx,ny,oarray,
+     &                          err,earray,oearray,
+     &                          qual,qarray,oqarray,
+     &                          axis1,axis2,start,end)
+c------------------------------------------------------------------------------
+c     Description:
+c       Copies data/errors/quality from slice into output structure,
+c       performing the necessary type conversions and fills axis arrays.
+c     Parameters:
+c       > slice                Slice (2D real array treated as 1D)
+c       > nx,ny                Slice dimensions (integers)
+c       < oarray               Output data array (<type> 2D array treated as 1D)
+c       > err                  Error array flag (logical)
+c       > earray               Slice error array (real 2D array treated as 1D)
+c       < oearray              O/p error array (<type> 2D array treated as 1D)
+c       > qual                 Quality array flag (logical)
+c       > qarray               Slice quality array (byte 2D array treated as 1D)
+c       > oqarray              O/p quality array (byte 2D array treated as 1D)
+c       < axis1,axis2          Output axes (real arrays)
+c       > start,end            Start and end values of axes
+c------------------------------------------------------------------------------
+      integer    nx,ny
+      real       slice(nx*ny),earray(nx*ny)
+      <type>     oarray(nx*ny),oearray(nx*ny)
+      byte       qarray(nx*ny),oqarray(nx*ny)
+      logical    err,qual
+      real       axis1(nx),axis2(ny)
+      real       start(2),end(2)
+c
+      integer    i
+      real       h1,h2
+c 
+      include    'DCV_FUN'
+c
+      if (qual) call gen_move(nx*ny,qarray,oqarray)
+
+      do i = 1,nx*ny
+        oarray(i) = dcv_rto<t>(slice(i))
+        if (err) oearray(i) = dcv_rto<t>(earray(i))
+      end do
+
+      h1 = (end(1)-start(1)) / (real(nx)-1.0)
+      h2 = (end(2)-start(2)) / (real(ny)-1.0)
+
+      do i = 1,nx
+        axis1(i) = start(1) + real(i-1)*h1
+      end do
+
+      do i = 1,ny
+        axis2(i) = start(2) + real(i-1)*h2
+      end do	
+      return
+      end

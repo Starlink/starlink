@@ -1,0 +1,459 @@
+      SUBROUTINE UNMAGIC_CONSTANT_<T>
+     &  (OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,VALUE,ZAPPIX,MAGICVAL,
+     &   QUAL,IQARRAY,OQARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C                                                       
+      INTEGER   DIMS(10),NDIM,NELM,STAPIX(6),ENDPIX(6)
+      REAL      ZAPPIX
+      <TYPE>
+     &          OARRAY(NELM),VALUE,MAGICVAL
+      LOGICAL   QUAL
+      BYTE      IQARRAY(NELM),OQARRAY(NELM)
+C
+C     Local variables
+C                     
+      INTEGER   I            ! Loop counter
+      INTEGER   II           ! Loop counter
+      INTEGER   INC(6)       ! 1-D increments for dimensions of OARRAY
+      INTEGER   IND1         ! OARRAY axis 1 index
+      INTEGER   IND2         ! OARRAY axis 2 index
+      INTEGER   IND3         ! OARRAY axis 3 index
+      INTEGER   IND4         ! OARRAY axis 4 index
+      INTEGER   IND5         ! OARRAY axis 5 index
+      INTEGER   IND6         ! OARRAY axis 6 index
+      INTEGER   OOFF         ! Total 1-D offset in OARRAY
+      INTEGER   OOFF1        ! 1-D offset for axis 1
+      INTEGER   OOFF2        ! 1-D offset for axis 2
+      INTEGER   OOFF3        ! 1-D offset for axis 3
+      INTEGER   OOFF4        ! 1-D offset for axis 4
+      INTEGER   OOFF5        ! 1-D offset for axis 5
+      INTEGER   OOFF6        ! 1-D offset for axis 6
+C
+C     Initialize.
+C
+      ZAPPIX=0.0
+C
+C     Compute offset in OARRAY needed to increment each dimension.
+C
+      DO I=1,NDIM
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO   
+C
+C     Replace bad pixels with constant value.
+C
+      DO IND6=STAPIX(6),MAX(1,ENDPIX(6))
+        OOFF6=(IND6-1)*INC(6)
+        DO IND5=STAPIX(5),MAX(1,ENDPIX(5))
+          OOFF5=(IND5-1)*INC(5)
+          DO IND4=STAPIX(4),MAX(1,ENDPIX(4))
+            OOFF4=(IND4-1)*INC(4)
+            DO IND3=STAPIX(3),MAX(1,ENDPIX(3))
+              OOFF3=(IND3-1)*INC(3)
+              DO IND2=STAPIX(2),MAX(1,ENDPIX(2))
+                OOFF2=(IND2-1)*INC(2)   
+                DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                  OOFF1=IND1-1
+                  OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+C
+                  IF (QUAL) THEN
+                    IF (IQARRAY(OOFF).NE.0) THEN
+                      OARRAY(OOFF)=VALUE
+                      ZAPPIX=ZAPPIX+1.0
+                      OQARRAY(OOFF)=0
+                    END IF ! (IQARRAY...)
+                  ELSE IF(OARRAY(OOFF).EQ.MAGICVAL)THEN
+                    OARRAY(OOFF)=VALUE
+                    ZAPPIX=ZAPPIX+1.0
+                  END IF ! (QUAL...)
+C
+                END DO
+              END DO
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO   
+C
+      END
+
+
+
+
+
+      SUBROUTINE UNMAGIC_LINEAR_<T>
+     &   (ARRAY,OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,
+     &    MINADJ,ZAPPIX,MAGICPIX,MAGICVAL,QUAL,IQARRAY,OQARRAY)
+C     
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER    DIMS(10),NDIM,NELM,STAPIX(6),ENDPIX(6),MINADJ
+      REAL       ZAPPIX,MAGICPIX
+      <TYPE>
+     &           ARRAY(NELM),
+     &           OARRAY(NELM),
+     &           MAGICVAL
+      LOGICAL    QUAL
+      BYTE       IQARRAY(NELM),OQARRAY(NELM)
+C
+C   Local variables.
+C
+      INTEGER   ADJAC(6,729)    ! Adjacent pixels in primitive image
+      INTEGER   ADJOFF          ! Adjacent pixel offset in ARRAY
+      INTEGER   ADJOK(6,729)    ! Adjacent pixels included in interpolation
+      INTEGER   ADJPIX(6)       ! Adjacent pixel
+      REAL      ADJVALS(729)    ! Adjacent values for interpolation
+      LOGICAL   BADVAL          ! Flags a bad pixel
+      INTEGER   CENTRAL         ! Element of ADJAC which is the central pixel
+      REAL      DUMREAL         ! REAL dummy variable
+      REAL      FPIXEL(6)       ! Fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   II              ! Loop counter
+      INTEGER   INC(6)          ! 1-D increments for input dimensions
+      INTEGER   IND1            ! Axis 1 index
+      INTEGER   IND2            ! Axis 2 index
+      INTEGER   IND3            ! Axis 3 index
+      INTEGER   IND4            ! Axis 4 index
+      INTEGER   IND5            ! Axis 5 index
+      INTEGER   IND6            ! Axis 6 index
+      INTEGER   IOFF            ! Total 1-D offset
+      INTEGER   IOFF1           ! 1-D offset for axis 1          
+      INTEGER   IOFF2           ! 1-D offset for axis 2
+      INTEGER   IOFF3           ! 1-D offset for axis 3
+      INTEGER   IOFF4           ! 1-D offset for axis 4
+      INTEGER   IOFF5           ! 1-D offset for axis 5
+      INTEGER   IOFF6           ! 1-D offset for axis 6
+      INTEGER   J               ! Loop counter
+      INTEGER   NADJ            ! Number of adjacent pixels
+      INTEGER   NOK             ! Number of pixels included in interpolation
+      INTEGER   OK              ! Flag to include pixel in interpolation
+      INTEGER   PIXEL(6)        ! Current pixel
+      INTEGER   PRIMDIMS(6)     ! Dimensions of primitive image
+      REAL      RESULT          ! Interpolated pixel value
+C
+      INCLUDE   'DCV_FUN'
+C
+C  Initialize.
+C                                                       
+      ZAPPIX=0.0
+      MAGICPIX=0.0
+      DO I=1,6
+        FPIXEL(I)=0.5
+      END DO
+C
+C   Compute offset needed to increment each dimension.
+C
+      DO I=1,NDIM                      
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO   
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,6
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NADJ,ADJAC)
+      DO I=1,6
+        DO J=1,NADJ
+          ADJAC(I,J)=ADJAC(I,J)-1
+        END DO
+      END DO
+C
+C   Perform editing operation.
+C     
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        PIXEL(6)=IND6
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          PIXEL(5)=IND5
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            PIXEL(4)=IND4
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              PIXEL(3)=IND3
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)   
+                PIXEL(2)=IND2
+C                              
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1  
+                  PIXEL(1)=IND1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+C
+C   Test for a bad pixel
+C
+                  IF (QUAL) THEN
+                    BADVAL=(IQARRAY(IOFF).NE.0)
+                  ELSE
+                    BADVAL=(ARRAY(IOFF).EQ.MAGICVAL)
+                  END IF
+                  IF (BADVAL) THEN
+                    NOK=0
+C
+C   Test each adjacent pixel to see if it can be used in the interpolation.
+C
+                    DO J=1,NADJ
+                      OK=.TRUE.
+C
+C   - if the actual pixel coordinate is outside the array, it fails.
+C
+                      IF(OK)THEN
+                        DO I=1,NDIM
+                          ADJPIX(I)=PIXEL(I)+(2*ADJAC(I,J)-1)
+                          IF(ADJPIX(I).LT.1 .OR.
+     &                       ADJPIX(I).GT.DIMS(I))OK=.FALSE.
+                        END DO
+C
+C   - if the pixel is bad, it fails.
+C
+                        IF(OK)THEN
+                          CALL NDP_ELEMENT(DIMS,NDIM,ADJPIX,ADJOFF)
+                          IF (QUAL) THEN
+                            OK=(IQARRAY(ADJOFF).EQ.0)
+                          ELSE
+                            OK=(ARRAY(ADJOFF).NE.MAGICVAL)
+                          END IF 
+C
+C   - if the pixel passes, store its value and relative coordinates.
+C
+                          IF(OK)THEN
+                            NOK=NOK+1
+                            ADJVALS(NOK)=ARRAY(ADJOFF)
+c                           DO I=1,NDIM
+c                             ADJOK(I,NOK)=ADJAC(I,J)
+c                           END DO
+                          END IF
+                        END IF
+                      END IF
+                    END DO
+C
+C   If the required number of pixels have passed, perform the interpolation.
+C
+                    IF(NOK.GE.MINADJ)THEN
+                      CALL NDP_LINEAR
+     &                 (NDIM,NOK,ADJOK,ADJVALS,FPIXEL,RESULT)
+                      OARRAY(IOFF)=DCV_Rto<T>(RESULT)
+                      IF (QUAL) OQARRAY(IOFF)=0
+                      ZAPPIX=ZAPPIX+1.0
+C
+C   If not, increment the count of bad pixels remaining.
+C
+                    ELSE
+                      MAGICPIX=MAGICPIX+1.0
+                    END IF
+                  END IF
+C                             
+                END DO
+              END DO
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END
+
+
+
+
+
+      SUBROUTINE UNMAGIC_AVERAGE_<T>
+     &   (ARRAY,OARRAY,DIMS,NDIM,NELM,STAPIX,ENDPIX,
+     &    MINADJ,ZAPPIX,MAGICPIX,MAGICVAL,QUAL,IQARRAY,OQARRAY)
+C     
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER    DIMS(10),NDIM,NELM,STAPIX(6),ENDPIX(6),MINADJ
+      REAL       ZAPPIX,MAGICPIX
+      <TYPE>
+     &           ARRAY(NELM),
+     &           OARRAY(NELM),
+     &           MAGICVAL
+      LOGICAL    QUAL
+      BYTE       IQARRAY(NELM),OQARRAY(NELM)
+C
+C   Local variables.
+C
+      INTEGER   ADJAC(6,729)    ! Adjacent pixels in primitive image
+      INTEGER   ADJOFF          ! Adjacent pixel offset in ARRAY
+      INTEGER   ADJOK(6,729)    ! Adjacent pixels included in interpolation
+      INTEGER   ADJPIX(6)       ! Adjacent pixel
+      REAL      ADJVALS(729)    ! Adjacent values for interpolation
+      LOGICAL   BADVAL          ! Flags a bad pixel
+      INTEGER   CENTRAL         ! Element of ADJAC which is the central pixel
+      REAL      DUMREAL         ! REAL dummy variable
+      INTEGER   I               ! Loop counter
+      INTEGER   II              ! Loop counter
+      INTEGER   INC(6)          ! 1-D increments for input dimensions
+      INTEGER   IND1            ! Axis 1 index
+      INTEGER   IND2            ! Axis 2 index
+      INTEGER   IND3            ! Axis 3 index
+      INTEGER   IND4            ! Axis 4 index
+      INTEGER   IND5            ! Axis 5 index
+      INTEGER   IND6            ! Axis 6 index
+      INTEGER   IOFF            ! Total 1-D offset
+      INTEGER   IOFF1           ! 1-D offset for axis 1          
+      INTEGER   IOFF2           ! 1-D offset for axis 2
+      INTEGER   IOFF3           ! 1-D offset for axis 3
+      INTEGER   IOFF4           ! 1-D offset for axis 4
+      INTEGER   IOFF5           ! 1-D offset for axis 5
+      INTEGER   IOFF6           ! 1-D offset for axis 6
+      INTEGER   J               ! Loop counter
+      INTEGER   NADJ            ! Number of adjacent pixels
+      INTEGER   NOK             ! Number of pixels included in interpolation
+      INTEGER   OK              ! Flag to include pixel in interpolation
+      INTEGER   PIXEL(6)        ! Current pixel
+C
+C   Initialize.
+C
+      ZAPPIX=0.0
+      MAGICPIX=0.0
+C
+C   Compute offset needed to increment each dimension.
+C
+      DO I=1,NDIM                      
+        INC(I)=1
+        DO II=1,I-1
+          INC(I)=INC(I)*DIMS(II)
+        END DO
+      END DO   
+C
+C   Obtain the coordinates of the 3**NDIM pixels of a primitive image 
+C   (the central pixel is included) and convert them to range 0 to 1.
+C
+      CALL NDP_ADJACENT(NDIM,NADJ,ADJAC)
+      DO J=1,NADJ
+        DO I=1,NDIM
+          ADJAC(I,J)=(ADJAC(I,J)-1)/2
+        END DO
+      END DO
+C
+C   Compute which element of ADJAC is the central pixel.
+C
+      CENTRAL=1+(NADJ-1)/2
+C
+C   Perform editing operation.
+C     
+      DO IND6=STAPIX(6),ENDPIX(6)
+        IOFF6=(IND6-1)*INC(6)
+        PIXEL(6)=IND6
+        DO IND5=STAPIX(5),ENDPIX(5)
+          IOFF5=(IND5-1)*INC(5)
+          PIXEL(5)=IND5
+          DO IND4=STAPIX(4),ENDPIX(4)
+            IOFF4=(IND4-1)*INC(4)
+            PIXEL(4)=IND4
+            DO IND3=STAPIX(3),ENDPIX(3)
+              IOFF3=(IND3-1)*INC(3)
+              PIXEL(3)=IND3
+              DO IND2=STAPIX(2),ENDPIX(2)
+                IOFF2=(IND2-1)*INC(2)   
+                PIXEL(2)=IND2
+C
+                DO IND1=STAPIX(1),ENDPIX(1)
+                  IOFF1=IND1-1  
+                  PIXEL(1)=IND1
+                  IOFF=1+IOFF1+IOFF2+IOFF3+IOFF4+IOFF5+IOFF6
+C
+C   Test for a bad pixel
+C
+                  IF (QUAL) THEN
+                    BADVAL=(IQARRAY(IOFF).NE.0)
+                  ELSE
+                    BADVAL=(ARRAY(IOFF).EQ.MAGICVAL)
+                  END IF
+                  IF (BADVAL) THEN
+                    NOK=0
+C
+C   Test each adjacent pixel to see if it can be used in the interpolation.
+C
+                    DO J=1,NADJ
+                      OK=.TRUE.
+C
+C   - if the pixel is actually the central pixel, it fails.
+C
+                      IF(J.EQ.CENTRAL)OK=.FALSE.
+C
+C   - if the actual pixel coordinate is outside the array, it fails.
+C
+                      IF(OK)THEN
+                        DO I=1,NDIM
+                          ADJPIX(I)=PIXEL(I)+(2*ADJAC(I,J)-1)
+                          IF(ADJPIX(I).LT.1 .OR.
+     &                       ADJPIX(I).GT.DIMS(I))OK=.FALSE.
+                        END DO
+C
+C   - if the pixel is bad, it fails.
+C
+                        IF(OK)THEN
+                          CALL NDP_ELEMENT(DIMS,NDIM,ADJPIX,ADJOFF)
+                          IF (QUAL) THEN
+                            OK=(IQARRAY(ADJOFF).EQ.0)
+                          ELSE
+                            OK=(ARRAY(ADJOFF).NE.MAGICVAL)
+                          END IF
+C
+C   - if the pixel passes, store its value and relative coordinates.
+C
+                          IF(OK)THEN
+                            NOK=NOK+1
+                            ADJVALS(NOK)=ARRAY(ADJOFF)
+c                           DO I=1,NDIM
+c                             ADJOK(I,NOK)=ADJAC(I,J)
+c                           END DO
+                          END IF
+                        END IF
+                      END IF
+                    END DO
+C
+C   If the required number of pixels have passed, perform the interpolation.
+C
+                    IF(NOK.GE.MINADJ)THEN
+                      DUMREAL=0.0
+                      DO I=1,NOK
+                        DUMREAL=DUMREAL+ADJVALS(I)
+                      END DO
+                      OARRAY(IOFF)=DUMREAL/REAL(NOK)
+                      IF (QUAL) OQARRAY(IOFF)=0
+                      ZAPPIX=ZAPPIX+1.0
+C
+C   If not, increment the count of magic value pixels remaining.
+C
+                    ELSE
+                      MAGICPIX=MAGICPIX+1.0
+                    END IF
+                  END IF
+C                             
+                END DO
+              END DO
+              IF(NDIM.EQ.3)CALL NDP_DISPLAY_PROGRESS(3,IND3)
+            END DO
+            IF(NDIM.EQ.4)CALL NDP_DISPLAY_PROGRESS(4,IND4)
+          END DO
+          IF(NDIM.EQ.5)CALL NDP_DISPLAY_PROGRESS(5,IND5)
+        END DO
+        IF(NDIM.EQ.6)CALL NDP_DISPLAY_PROGRESS(6,IND6)
+      END DO
+C
+      END

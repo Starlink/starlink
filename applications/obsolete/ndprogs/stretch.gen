@@ -1,0 +1,280 @@
+      subroutine stretch_1D_<t>(image,output,xdim,oxdim,type)
+*******************************************************************************
+* Stretching subroutine using linear or constant interpolation for 1D images. 
+* The neighbouring pixels in image which the pixel in output lies between are 
+* used to define a slope. This is then used to compute an interpolated value.
+*
+* Arguments:
+*     > image    (<type>) input array
+*     < output   (<type>) stretched image
+*     > xdim     (integer) dimension of input array
+*     > oxdim    (integer) dimension of stretched array
+*     > type     (integer) interpolation type: 0=constant,1=linear
+******************************************************************************
+      integer    xdim,oxdim
+      <type>     image(xdim)
+      <type>     output(oxdim)
+      integer    type
+*
+      real       frac
+*
+      integer    i,k
+      real       h,s
+      real       delta
+      real       temp
+*
+      include 'DCV_FUN'
+*
+* Compute linear scaling co-efficient between grids
+*
+      delta = real(xdim-1)/real(oxdim-1)
+      x = -delta
+*
+      do i = 1,oxdim
+*
+* Now work out effective index in input array...
+*
+        x = x+delta
+*
+* ...hence the actual pixel bracket [k,k+1] and a scale value in [0,1)
+*
+        k = int(x)+1
+        s = frac(x)
+*
+* Now do the interpolation
+*
+        temp = dcv_<t>tor(image(k))
+        if (type .eq. 1) then ! linear
+*
+* End pixels are handled differently (use previous slope value)
+*
+          if (k .eq. xdim) then
+            h = dcv_<t>tor(image(xdim)-image(xdim-1))
+          else
+            h = dcv_<t>tor(image(k+1)-image(k))
+          end if
+*
+          temp = temp + s*h
+        end if
+*
+        output(i) = dcv_rto<t>(temp)
+*
+      end do
+*
+      return
+      end
+
+*******************************************************************************
+
+      subroutine stretch_2D_<t>(image,output,xdim,ydim,oxdim,oydim,type)
+*******************************************************************************
+* Stretching subroutine using linear or constant interpolation for 2D images. 
+* The neighbouring pixels in image which the pixel in output lies between are 
+* used to define a slope. This is then used to compute an interpolated value.
+*
+* Arguments:
+*     > image    (<type>) input array
+*     < output   (<type>) stretched image
+*     > xdim     (integer) x dimension of input array
+*     > ydim     (integer) y dimension  "   "     "
+*     > oxdim    (integer) x dimension of stretched array
+*     > oydim    (integer) y     "      "     "       "
+*     > type     (integer) interpolation type: 0=constant,1=linear
+******************************************************************************
+      integer    xdim,ydim,oxdim,oydim
+      <type>     image(xdim,ydim)
+      <type>     output(oxdim,oydim)
+      integer    type
+*
+      real       frac
+*
+      integer    i,j
+      integer    i1,i2,j1,j2
+      integer    xi,yi,xpix,ypix
+      real       xr,yr,dx,dy
+      real       gradx,grady
+      real       xdelta,ydelta
+      real       temp
+*
+      include    'DCV_FUN'
+*
+* Compute scaling factors
+*
+      xdelta = real(xdim-1) / real(oxdim-1)
+      ydelta = real(ydim-1) / real(oydim-1)
+      xr = -xdelta
+*
+      do i = 1,oxdim
+*
+* Compute x-slope and effective index
+*
+        xr = xr+xdelta
+        xi = int(xr)+1
+        dx = frac(xr)
+*
+        yr = -ydelta
+        do j = 1,oydim
+*
+* Same stuff for y
+*
+          yr = yr+ydelta
+          yi = int(yr)+1
+          dy = frac(yr)
+*
+          temp = dcv_<t>tor(image(xi,yi))
+          if (type .eq. 1) then ! linear
+*
+* Edge pixels use the gradient from the previous pair
+*
+            if (xi .eq. xdim) then
+              i1 = xdim-1
+              i2 = xdim
+            else
+              i1 = xi
+              i2 = xi+1
+            end if
+*
+            if (yi .eq. ydim) then
+              j1 = ydim-1
+              j2 = ydim
+            else
+              j1 = yi
+              j2 = yi+1
+            end if
+*
+* Compute gradient vector
+*
+            gradx = dcv_<t>tor(image(i2,yi)-image(i1,yi))
+            grady = dcv_<t>tor(image(xi,j2)-image(xi,j1))
+*
+            temp = temp + dx*gradx + dy*grady
+          end if
+*
+          output(i,j) = dcv_rto<t>(temp)
+*
+        end do
+*
+      end do
+*
+      return
+      end
+
+******************************************************************************
+
+      subroutine stretch_3D_<t>(image,output,xdim,ydim,zdim,
+     &                          oxdim,oydim,ozdim,type)
+*******************************************************************************
+* Stretching subroutine using linear or constant interpolation for 3D images. 
+* The neighbouring pixels in image which the pixel in output lies between are 
+* used to define a slope. This is then used to compute an interpolated value.
+*
+* Arguments:
+*     > image    (<type>) input array
+*     < output   (<type>) stretched image
+*     > xdim     (integer) x dimension of input array
+*     > ydim     (integer) y dimension  "   "     "
+*     > zdim     (integer) z dimension  "   "     "
+*     > oxdim    (integer) x dimension of stretched array
+*     > oydim    (integer) y     "      "     "       "
+*     > ozdim    (integer) z     "      "     "       "
+*     > type     (integer) interpolation type: 0=constant,1=linear
+******************************************************************************
+      integer    xdim,ydim,zdim
+      integer    oxdim,oydim,ozdim
+      <type>     image(xdim,ydim,zdim)
+      <type>     output(oxdim,oydim,ozdim)
+      integer    type
+*
+      real       frac
+*
+      integer    i,j,k
+      integer    i1,i2,j1,j2,k1,k2
+      integer    xi,yi,zi
+      real       xr,yr,zr,dx,dy,dz
+      real       gradx,grady,gradz
+      real       xdelta,ydelta,zdelta
+      real       temp
+*
+      include    'DCV_FUN'
+*
+* Compute scaling factors
+*
+      xdelta = real(xdim-1) / real(oxdim-1)
+      ydelta = real(ydim-1) / real(oydim-1)
+      zdelta = real(zdim-1) / real(ozdim-1)
+*
+      xr = -xdelta
+      do i = 1,oxdim
+*
+* Compute x-slope and effective index
+*
+        xr = xr+xdelta
+        xi = int(xr)+1
+        dx = frac(xr)
+*
+        yr = -ydelta
+        do j = 1,oydim
+*
+* Same stuff for y
+*
+          yr = yr+ydelta
+          yi = int(yr)+1
+          dy = frac(yr)
+*
+          zr = -zdelta
+          do k = 1,ozdim
+*
+* And the same stuff for z
+*
+            zr = zr+zdelta
+            zi = int(zr)+1
+            dz = frac(zr)
+*
+            temp = dcv_<t>tor(image(xi,yi,zi))
+            if (type .eq. 1) then ! linear
+*
+* Edge pixels use the gradient from the previous pair
+*
+              if (xi .eq. xdim) then
+                i1 = xdim-1
+                i2 = xdim
+              else
+                i1 = xi
+                i2 = xi+1
+              end if
+*
+              if (yi .eq. ydim) then
+                j1 = ydim-1
+                j2 = ydim
+              else
+                j1 = yi
+                j2 = yi+1
+              end if
+*
+              if (zi .eq. zdim) then
+                k1 = zdim-1
+                k2 = zdim
+              else
+                k1 = zi
+                k2 = zi+1
+              end if
+*
+* Compute gradient vector
+*
+              gradx = dcv_<t>tor(image(i2,yi,zi)-image(i1,yi,zi))
+              grady = dcv_<t>tor(image(xi,j2,zi)-image(xi,j1,zi))
+              gradz = dcv_<t>tor(image(xi,yi,k2)-image(xi,yi,k1))
+*
+              temp = temp + dx*gradx + dy*grady + dz*gradz
+            end if
+*
+            output(i,j,k) = dcv_rto<t>(temp)
+*
+          end do
+*
+        end do
+*
+      end do
+*
+      return
+      end

@@ -1,0 +1,39 @@
+    interface TRANSPOSE
+
+     parameter  IMAGE
+        type   'literal'
+        prompt  '(IMage) Name of input image'
+        association '<->global.image'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'IMAGE is the name of the image file to be transposed.'
+     endparameter
+
+     parameter  ORDER
+        type   '_real'
+        prompt  '(ORDER) Transposed axis order.'
+        association '<->global.order'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'ORDER specifies the order of the transposed axes (x=1,y=2,z=3).'
+     endparameter
+
+     parameter  OUTPUT
+        type   'literal'
+        prompt  '(OUTput) Name of output image'
+        association '<->global.output'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'OUTPUT is the name of the resulting tranaposed image.'
+     endparameter
+
+     parameter  TUNE
+        type   '_real'
+        prompt  '(TUNE) Tuning factor'
+        association '<->global.tune'
+        ppath 'global,dynamic,current,default'
+        vpath 'prompt'
+	help 'TUNE adjust the number of image planes read at once.'
+     endparameter
+
+endinterface

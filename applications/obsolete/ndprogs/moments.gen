@@ -1,0 +1,238 @@
+      SUBROUTINE MOMENTS_MASKBIN_<T>
+     &  (ARRAY,MASK,SPEC,VALID,BINNED,ERR,VARS,VBIN,
+     &   NX,NY,NZ,NBX,NBY,NBZ,
+     &   BIN,USEMASK,MASKVAL,TEMP)
+C                                    
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER      NX,NY,NZ,
+     &             NBX,NBY,NBZ,
+     &             BIN
+      INTEGER*2    VALID(NX)
+      LOGICAL      USEMASK,ERR
+      REAL         SPEC(NX),
+     &             MASK(NY,NZ),
+     &             MASKVAL,
+     &             BINNED(NBX,NBY,NBZ),
+     &             VBIN(NBX,NBY,NBZ),
+     &             TEMP(NX)
+      <TYPE>
+     &             ARRAY(NX,NY,NZ),
+     &             VARS(NX,NY,NZ)
+C
+C   Local variables.
+C                        
+      INTEGER      ENDPIX
+      INTEGER      I
+      INTEGER      J
+      INTEGER      JEN
+      INTEGER      JJ
+      INTEGER      JST
+      INTEGER      K
+      INTEGER      KEN
+      INTEGER      KK
+      INTEGER      KST
+      LOGICAL      MASKED
+      INTEGER      STAPIX
+c
+      include 'DCV_FUN'
+c
+c   For each bin -
+c
+      do kk=1,nbz
+        do jj=1,nby
+c                
+c   - initialize.
+c
+          masked=.false.
+          do i=1,nx
+            spec(i)=0.0
+            temp(i)=0.0
+            valid(i)=0
+          end do
+          jst=(jj-1)*bin+1
+          jen=jst+bin-1
+          kst=(kk-1)*bin+1
+          ken=kst+bin-1
+c             
+c   - if a mask is being used, check its value for each spectrum in the bin.
+c     If the mask element for a spectrum is clear, i.e. is not equal to the
+c     designated masking value, add the spectrum to the bin sum. If any pixel
+c     in the spectrum has the magic value, it is not a valid pixel and does not 
+c     contribute to the average spectrum in the bin.
+c
+          if(usemask)then
+            do k=kst,ken
+              do j=jst,jen
+                if(mask(j,k).ne.maskval)then
+                  do i=1,nx
+                      spec(i)=spec(i)+array(i,j,k)
+                      if (err) 
+     &                  temp(i)=temp(i)+dcv_<t>toR(vars(i,j,k))
+                      valid(i)=valid(i)+1
+                  end do
+                else
+                  masked=.true.
+                end if
+              end do
+            end do
+c
+c   - if a mask is not being used.
+c
+          else
+            do k=kst,ken
+              do j=jst,jen
+                do i=1,nx
+                    spec(i)=spec(i)+array(i,j,k)
+                    if (err) 
+     &                temp(i)=temp(i)+dcv_<t>toR(vars(i,j,k))
+                    valid(i)=valid(i)+1
+                end do
+              end do
+            end do
+          end if
+c
+c   - compute average spectrum.
+c
+          if(.not.masked)then
+            do i=1,nx
+                 binned(i,jj,kk)=spec(i)/valid(i)
+                 if (err) vbin(i,jj,kk)=temp(i)/valid(i)
+            end do
+          end if
+c
+        end do
+      end do    
+c
+      end
+
+
+
+
+
+
+
+      SUBROUTINE MOMENTS_MASKBIN_<T>Q
+     &  (ARRAY,MASK,SPEC,VALID,BINNED,ERR,VARS,VBIN,
+     &   NX,NY,NZ,NBX,NBY,NBZ,
+     &   BIN,USEMASK,MASKVAL,MAGICVAL,TEMP)
+C                                    
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER      NX,NY,NZ,
+     &             NBX,NBY,NBZ,
+     &             BIN
+      INTEGER*2    VALID(NX)
+      LOGICAL      USEMASK,ERR
+      REAL         SPEC(NX),
+     &             MASK(NY,NZ),
+     &             MASKVAL,
+     &             BINNED(NBX,NBY,NBZ),
+     &             VBIN(NBX,NBY,NBZ),
+     &             TEMP(NX)
+      <TYPE>
+     &             ARRAY(NX,NY,NZ),
+     &             VARS(NX,NY,NZ),
+     &             MAGICVAL
+C
+C   Local variables.
+C                        
+      INTEGER      ENDPIX
+      INTEGER      I
+      INTEGER      J
+      INTEGER      JEN
+      INTEGER      JJ
+      INTEGER      JST
+      INTEGER      K
+      INTEGER      KEN
+      INTEGER      KK
+      INTEGER      KST
+      LOGICAL      MASKED
+      INTEGER      STAPIX
+c
+      include 'MAGIC_VALUES'
+      include 'DCV_FUN'
+c
+c   For each bin -
+c
+      do kk=1,nbz
+        do jj=1,nby
+c                
+c   - initialize.
+c
+          masked=.false.
+          do i=1,nx
+            spec(i)=0.0
+            temp(i)=0.0
+            valid(i)=0
+          end do
+          jst=(jj-1)*bin+1
+          jen=jst+bin-1
+          kst=(kk-1)*bin+1
+          ken=kst+bin-1
+c             
+c   - if a mask is being used, check its value for each spectrum in the bin.
+c     If the mask element for a spectrum is clear, i.e. is not equal to the
+c     designated masking value, add the spectrum to the bin sum. If any pixel
+c     in the spectrum has the magic value, it is not a valid pixel and does not 
+c     contribute to the average spectrum in the bin.
+c
+          if(usemask)then
+            do k=kst,ken
+              do j=jst,jen
+                if(mask(j,k).ne.maskval)then
+                  do i=1,nx
+                    if(array(i,j,k).gt.magicval)then
+                      spec(i)=spec(i)+array(i,j,k)
+                      if (err) 
+     &                  temp(i)=temp(i)+dcv_<t>toR(vars(i,j,k))
+                      valid(i)=valid(i)+1
+                    end if
+                  end do
+                else
+                  masked=.true.
+                end if
+              end do
+            end do
+c
+c   - if a mask is not being used.
+c
+          else
+            do k=kst,ken
+              do j=jst,jen
+                do i=1,nx
+                  if(array(i,j,k).gt.magicval)then
+                    spec(i)=spec(i)+array(i,j,k)
+                    if (err) 
+     &                temp(i)=temp(i)+dcv_<t>toR(vars(i,j,k))
+                    valid(i)=valid(i)+1
+                  end if
+                end do
+              end do
+            end do
+          end if
+c
+c   - compute average spectrum.
+c
+          if(.not.masked)then
+            do i=1,nx
+              if(valid(i).gt.0)then
+                 binned(i,jj,kk)=spec(i)/valid(i)
+                 if (err) vbin(i,jj,kk)=temp(i)/valid(i)
+               else
+                 binned(i,jj,kk)=magic_float
+                 vbin(i,jj,kk)=magic_float
+              end if
+            end do
+          end if
+c
+        end do
+      end do    
+c
+      end
+
+

@@ -1,0 +1,1242 @@
+      SUBROUTINE TRANSFORM_2DROT1_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,
+     &   SHIFT,ANGLE,CENTRE,SAMPLE,STAPIX,MAGICPIX,MAGICVAL,
+     &   DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C               
+      IMPLICIT NONE
+C
+C   Parameters.
+C                                  
+      INTEGER DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &        ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM,
+     &        STAPIX(6)
+      REAL    SHIFT(6),ANGLE(6),CENTRE(6),SAMPLE(6),MAGICPIX
+      <type>
+     &        ARRAY(DIMS_1,DIMS_2),OARRAY(ODIMS_1,ODIMS_2),MAGICVAL
+C
+C   Local variables.
+C     
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   I               ! Loop counter
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel nearest to de-transformed point
+      INTEGER   MODE            ! Forward/reverse flag
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value from the nearest pixel in ARRAY.
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+      DO IND2=1,MAX(1,ODIMS(2))
+        COORDS1(2)=REAL(STAPIX(2)+(IND2-1))
+C
+        DO IND1=1,MAX(1,ODIMS(1))
+          COORDS1(1)=REAL(STAPIX(1)+(IND1-1))
+C
+          CALL TRANSFORM_2DTRANR
+     &      (SHIFT,ANGLE,CENTRE,SAMPLE,MODE,COORDS1,COORDS2)
+C
+C   If nearest neighbour is within ARRAY, set OARRAY pixel to ARRAY value. 
+C   Otherwise, set to magic value.
+C     
+          OK=.TRUE.
+          DO I=1,2
+            IPIXEL(I)=NINT(COORDS2(I))
+            IF(IPIXEL(I).LT.1 .OR. IPIXEL(I).GT.DIMS(I))OK=.FALSE.
+          END DO
+C
+          IF(OK)THEN
+            OARRAY(IND1,IND2)=ARRAY(IPIXEL(1),IPIXEL(2))
+          ELSE
+            OARRAY(IND1,IND2)=MAGICVAL
+            MAGICPIX=MAGICPIX+1.0
+          END IF
+C
+        END DO
+      END DO
+C                           
+      END
+
+      
+
+      SUBROUTINE TRANSFORM_2DROT3_<t>
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,ANGLE,CENTRE,SAMPLE,STAPIX,MAGICPIX,MAGICVAL,
+     &     DIMS_1,DIMS_2,ODIMS_1,ODIMS_2)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ONDIM,
+     &              MINCORN,STAPIX(6)
+      REAL          SHIFT(6),ANGLE(6),CENTRE(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2),
+     &              OARRAY(ODIMS_1,ODIMS_2),
+     &              MAGICVAL
+C
+C   Local variables.
+C
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! Interpolated OARRAY pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,2
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,2
+        DO J=1,4
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value by linear interpolation of the corners nearest the ARRAY
+C   pixel. 
+C
+      DO IND2=1,MAX(1,ODIMS(2))
+        COORDS1(2)=REAL(STAPIX(2)+(IND2-1))
+C
+        DO IND1=1,MAX(1,ODIMS(1))
+          COORDS1(1)=REAL(STAPIX(1)+(IND1-1))
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C         
+          CALL TRANSFORM_2DTRANR
+     &      (SHIFT,ANGLE,CENTRE,SAMPLE,MODE,COORDS1,COORDS2)
+          DO I=1,2
+            IPIXEL(I)=INT(COORDS2(I))
+            FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+          END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+          OK = .TRUE.
+          DO I=1,2
+            IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+          END DO
+C
+          IF(OK)THEN
+            DO J=1,4
+              DO I=1,2    
+                ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+              END DO
+              CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J))
+            END DO           
+          END IF
+C
+C   Interpolate.
+C
+   10     CONTINUE
+          IF(OK)THEN
+            CALL NDP_LINEAR
+     &        (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+              OARRAY(IND1,IND2)=RESULT
+          ELSE
+            OARRAY(IND1,IND2)=MAGICVAL
+            MAGICPIX=MAGICPIX+1.0
+          END IF
+C                             
+        END DO
+      END DO     
+C
+      END
+
+
+
+
+
+      SUBROUTINE TRANSFORM_3DROT1_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,
+     &   SHIFT,ANGLE,CENTRE,SAMPLE,STAPIX,MAGICPIX,MAGICVAL,
+     &   DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &        ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM,
+     &        STAPIX(6)
+      REAL    SHIFT(6),ANGLE(6),CENTRE(6),SAMPLE(6),MAGICPIX
+      <type>
+     &        ARRAY(DIMS_1,DIMS_2,DIMS_3),
+     &        OARRAY(ODIMS_1,ODIMS_2,ODIMS_3),
+     &        MAGICVAL
+C
+C   Local variables.
+C
+      REAL      A(3,3)          ! Rotation matrix
+      REAL      B(3,3)          ! Rotation matrix
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   I               ! Loop counter
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IND3            ! OARRAY axis 3 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel nearest to de-transformed point
+      INTEGER   MODE            ! Forward/reverse flag
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+C   Compute rotation matrices.
+C
+      CALL TRANSFORM_3DMATRIX(ANGLE,CENTRE,A,B)
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value from the nearest pixel in ARRAY.
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+      DO IND3=1,MAX(1,ODIMS(3))
+        COORDS1(3)=REAL(STAPIX(3)+(IND3-1))
+C
+        DO IND2=1,MAX(1,ODIMS(2))
+          COORDS1(2)=REAL(STAPIX(2)+(IND2-1))  
+C
+          DO IND1=1,MAX(1,ODIMS(1))
+            COORDS1(1)=REAL(STAPIX(1)+(IND1-1))
+C
+            CALL TRANSFORM_3DTRANR
+     &        (SHIFT,ANGLE,CENTRE,SAMPLE,MODE,COORDS1,COORDS2,A,B)
+C
+C   If nearest neighbour is within ARRAY, set OARRAY pixel to ARRAY value. 
+C   Otherwise, set to magic value.
+C     
+            OK=.TRUE.
+            DO I=1,3
+              IPIXEL(I)=NINT(COORDS2(I))
+              IF(IPIXEL(I).LT.1 .OR. IPIXEL(I).GT.DIMS(I))OK=.FALSE.
+            END DO
+C
+            IF(OK)THEN
+              OARRAY(IND1,IND2,IND3)=
+     &          ARRAY(IPIXEL(1),IPIXEL(2),IPIXEL(3))
+            ELSE
+              OARRAY(IND1,IND2,IND3)=MAGICVAL
+              MAGICPIX=MAGICPIX+1.0
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,IND3)
+      END DO
+C
+      END
+
+
+
+
+
+      SUBROUTINE TRANSFORM_3DROT3_<t>
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,ANGLE,CENTRE,SAMPLE,STAPIX,MAGICPIX,MAGICVAL,
+     &    DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM,
+     &              MINCORN,STAPIX(6)
+      REAL          SHIFT(6),ANGLE(6),CENTRE(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2,DIMS_3),
+     &              OARRAY(ODIMS_1,ODIMS_2,ODIMS_3),
+     &              MAGICVAL
+C
+C   Local variables.
+C
+      REAL      A(3,3)          ! Rotation matrix
+      REAL      B(3,3)          ! Rotation matrix
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IND3            ! OARRAY axis 3 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! OARRAY interpolated pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Compute rotation matrices.
+C
+      CALL TRANSFORM_3DMATRIX(ANGLE,CENTRE,A,B)
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,3
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,3
+        DO J=1,8
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value by linear interpolation of the corners nearest the ARRAY
+C   pixel. 
+C
+      DO IND3=1,MAX(1,ODIMS(3))
+        COORDS1(3)=REAL(STAPIX(3)+(IND3-1))
+C
+        DO IND2=1,MAX(1,ODIMS(2))
+          COORDS1(2)=REAL(STAPIX(2)+(IND2-1))
+C
+          DO IND1=1,MAX(1,ODIMS(1))
+            COORDS1(1)=REAL(STAPIX(1)+(IND1-1))
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C
+            CALL TRANSFORM_3DTRANR
+     &        (SHIFT,ANGLE,CENTRE,SAMPLE,MODE,COORDS1,COORDS2,A,B)
+            DO I=1,3
+              IPIXEL(I)=INT(COORDS2(I))
+              FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+            END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+            OK = .TRUE.
+            DO I=1,3
+              IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+            END DO
+C
+            IF(OK)THEN
+              DO J=1,8
+                DO I=1,3    
+                  ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+                END DO
+                CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J),ICORPIX(3,J))
+              END DO           
+            END IF
+C
+C   Interpolate.
+C
+   10       CONTINUE
+            IF(OK)THEN
+              CALL NDP_LINEAR
+     &          (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+                OARRAY(IND1,IND2,IND3)=RESULT
+            ELSE
+              OARRAY(IND1,IND2,IND3)=MAGICVAL
+              MAGICPIX=MAGICPIX+1.0
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,IND3)
+      END DO
+C
+      END
+                                          
+
+
+
+
+      SUBROUTINE TRANSFORM_2DNOROT1_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,
+     &   SHIFT,SAMPLE,MAGICPIX,MAGICVAL,
+     &   DIMS_1,DIMS_2,ODIMS_1,ODIMS_2)
+C               
+      IMPLICIT NONE
+C
+C   Parameters.
+C                                  
+      INTEGER DIMS(10),DIMS_1,DIMS_2,NDIM,
+     &        ODIMS(10),ODIMS_1,ODIMS_2,ONDIM
+      REAL    SHIFT(6),SAMPLE(6),MAGICPIX
+      <type>
+     &        ARRAY(DIMS_1,DIMS_2),OARRAY(ODIMS_1,ODIMS_2),MAGICVAL
+C
+C   Local variables.
+C     
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   I               ! Loop counter
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel nearest to de-transformed point
+      INTEGER   MODE            ! Forward/reverse flag
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value from the nearest pixel in ARRAY.
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+      DO IND2=1,MAX(1,ODIMS(2))
+        COORDS1(2)=REAL(IND2)
+C
+        DO IND1=1,MAX(1,ODIMS(1))
+          COORDS1(1)=REAL(IND1)
+C
+          CALL TRANSFORM_2DTRANNR(SHIFT,SAMPLE,MODE,COORDS1,COORDS2)
+C
+C   If nearest neighbour is within ARRAY, set OARRAY pixel to ARRAY value. 
+C   Otherwise, set to magic value.
+C     
+          OK=.TRUE.
+          DO I=1,2
+            IPIXEL(I)=NINT(COORDS2(I))
+            IF(IPIXEL(I).LT.1 .OR. IPIXEL(I).GT.DIMS(I))OK=.FALSE.
+          END DO
+C
+          IF(OK)THEN
+            OARRAY(IND1,IND2)=ARRAY(IPIXEL(1),IPIXEL(2))
+          ELSE
+            OARRAY(IND1,IND2)=MAGICVAL
+            MAGICPIX=MAGICPIX+1.0
+          END IF
+C
+        END DO
+      END DO
+C                           
+      END
+
+
+
+
+
+      SUBROUTINE TRANSFORM_2DNOROT3_<t>
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,SAMPLE,MAGICPIX,MAGICVAL,
+     &    DIMS_1,DIMS_2,ODIMS_1,ODIMS_2)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ONDIM,
+     &              MINCORN
+      REAL          SHIFT(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2),
+     &              OARRAY(ODIMS_1,ODIMS_2),
+     &              MAGICVAL
+C
+C   Local variables.
+C
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! Interpolated OARRAY pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,2
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,2
+        DO J=1,4
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift and resampling in reverse on each pixel in OARRAY to find the
+C   corresponding exact or fractional pixel in ARRAY. Obtain the OARRAY pixel 
+C   value by linear interpolation of the corners nearest the ARRAY pixel. 
+C
+      DO IND2=1,MAX(1,ODIMS(2))
+        COORDS1(2)=REAL(IND2)
+C
+        DO IND1=1,MAX(1,ODIMS(1))
+          COORDS1(1)=REAL(IND1)
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C
+          CALL TRANSFORM_2DTRANNR(SHIFT,SAMPLE,MODE,COORDS1,COORDS2)
+          DO I=1,2
+            IPIXEL(I)=INT(COORDS2(I))
+            FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+          END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+          OK=.TRUE.
+          DO I=1,2
+            IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+          END DO
+C
+          IF(OK)THEN
+            DO J=1,4
+              DO I=1,2    
+                ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+              END DO
+              CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J))
+            END DO           
+          END IF
+C
+C   Interpolate.
+C
+   10     CONTINUE
+          IF(OK)THEN
+            CALL NDP_LINEAR
+     &        (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+              OARRAY(IND1,IND2)=RESULT
+          ELSE
+            OARRAY(IND1,IND2)=MAGICVAL
+            MAGICPIX=MAGICPIX+1.0
+          END IF
+C                             
+        END DO
+      END DO     
+C
+      END
+
+
+
+
+
+      SUBROUTINE TRANSFORM_3DNOROT1_<t>
+     &  (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,
+     &   SHIFT,SAMPLE,MAGICPIX,MAGICVAL,
+     &   DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &        ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM
+      REAL    SHIFT(6),SAMPLE(6),MAGICPIX
+      <type>
+     &        ARRAY(DIMS_1,DIMS_2,DIMS_3),
+     &        OARRAY(ODIMS_1,ODIMS_2,ODIMS_3),
+     &        MAGICVAL
+C
+C   Local variables.
+C
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   I               ! Loop counter
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IND3            ! OARRAY axis 3 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel nearest to de-transformed point
+      INTEGER   MODE            ! Forward/reverse flag
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value from the nearest pixel in ARRAY.
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+      DO IND3=1,MAX(1,ODIMS(3))
+        COORDS1(3)=REAL(IND3)
+C
+        DO IND2=1,MAX(1,ODIMS(2))
+          COORDS1(2)=REAL(IND2)  
+C
+          DO IND1=1,MAX(1,ODIMS(1))
+            COORDS1(1)=REAL(IND1)
+C
+            CALL TRANSFORM_3DTRANNR(SHIFT,SAMPLE,MODE,COORDS1,COORDS2)
+C
+C   If nearest neighbour is within ARRAY, set OARRAY pixel to ARRAY value. 
+C   Otherwise, set to magic value.
+C     
+            OK=.TRUE.
+            DO I=1,3
+              IPIXEL(I)=NINT(COORDS2(I))
+              IF(IPIXEL(I).LT.1 .OR. IPIXEL(I).GT.DIMS(I))OK=.FALSE.
+            END DO
+C
+            IF(OK)THEN
+              OARRAY(IND1,IND2,IND3)=
+     &          ARRAY(IPIXEL(1),IPIXEL(2),IPIXEL(3))
+            ELSE
+              OARRAY(IND1,IND2,IND3)=MAGICVAL
+              MAGICPIX=MAGICPIX+1.0
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,IND3)
+      END DO
+C
+      END
+
+
+
+
+
+      SUBROUTINE TRANSFORM_3DNOROT3_<t>
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,SAMPLE,MAGICPIX,MAGICVAL,
+     &    DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM,
+     &              MINCORN
+      REAL          SHIFT(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2,DIMS_3),
+     &              OARRAY(ODIMS_1,ODIMS_2,ODIMS_3),
+     &              MAGICVAL
+C
+C   Local variables.
+C                            
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IND3            ! OARRAY axis 3 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! OARRAY interpolated pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,3
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,3
+        DO J=1,8
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift and resampling in reverse on each pixel in OARRAY to find the
+C   corresponding exact or fractional pixel in ARRAY. Obtain the OARRAY pixel 
+C   value by linear interpolation of the corners nearest the ARRAY pixel. 
+C
+      DO IND3=1,MAX(1,ODIMS(3))
+        COORDS1(3)=REAL(IND3)
+C
+        DO IND2=1,MAX(1,ODIMS(2))
+          COORDS1(2)=REAL(IND2)
+C
+          DO IND1=1,MAX(1,ODIMS(1))
+            COORDS1(1)=REAL(IND1)
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C
+            CALL TRANSFORM_3DTRANNR(SHIFT,SAMPLE,MODE,COORDS1,COORDS2)
+            DO I=1,3
+              IPIXEL(I)=INT(COORDS2(I))
+              FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+            END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+            OK=.TRUE.
+            DO I=1,3
+              IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+            END DO
+C
+            IF(OK)THEN
+              DO J=1,8
+                DO I=1,3    
+                  ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+                END DO
+                CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J),ICORPIX(3,J))
+              END DO           
+            END IF
+C
+C   Interpolate.
+C
+   10       CONTINUE
+            IF(OK)THEN
+              CALL NDP_LINEAR
+     &          (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+                OARRAY(IND1,IND2,IND3)=RESULT
+            ELSE
+              OARRAY(IND1,IND2,IND3)=MAGICVAL
+              MAGICPIX=MAGICPIX+1.0
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,IND3)
+      END DO
+C
+      END
+
+C---------------------- Quality -------------------------
+
+      SUBROUTINE TRANSFORM_2DROT3_<t>Q
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,ANGLE,CENTRE,SAMPLE,STAPIX,MAGICPIX,MAGICVAL,
+     &     DIMS_1,DIMS_2,ODIMS_1,ODIMS_2)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ONDIM,
+     &              MINCORN,STAPIX(6)
+      REAL          SHIFT(6),ANGLE(6),CENTRE(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2),
+     &              OARRAY(ODIMS_1,ODIMS_2),
+     &              MAGICVAL
+C
+C   Local variables.
+C
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! Interpolated OARRAY pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      INCLUDE 'DCV_FUN'
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,2
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,2
+        DO J=1,4
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value by linear interpolation of the corners nearest the ARRAY
+C   pixel. 
+C
+      DO IND2=1,MAX(1,ODIMS(2))
+        COORDS1(2)=REAL(STAPIX(2)+(IND2-1))
+C
+        DO IND1=1,MAX(1,ODIMS(1))
+          COORDS1(1)=REAL(STAPIX(1)+(IND1-1))
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C         
+          CALL TRANSFORM_2DTRANR
+     &      (SHIFT,ANGLE,CENTRE,SAMPLE,MODE,COORDS1,COORDS2)
+          DO I=1,2
+            IPIXEL(I)=INT(COORDS2(I))
+            FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+          END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+          OK = .TRUE.
+          DO I=1,2
+            IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+          END DO
+C
+          IF(OK)THEN
+            DO J=1,4
+              DO I=1,2    
+                ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+              END DO
+              CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J))
+              IF(CORVALS(J).EQ.DCV_<T>TOR(MAGICVAL))THEN
+                OK=.FALSE.
+                GO TO 10
+              END IF
+            END DO           
+          END IF
+C
+C   Interpolate.
+C
+   10     CONTINUE
+          IF(OK)THEN
+            CALL NDP_LINEAR
+     &        (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+              OARRAY(IND1,IND2)=RESULT
+          ELSE
+            OARRAY(IND1,IND2)=MAGICVAL
+            MAGICPIX=MAGICPIX+1.0
+          END IF
+C                             
+        END DO
+      END DO     
+C
+      END
+
+
+
+      SUBROUTINE TRANSFORM_3DROT3_<t>Q
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,ANGLE,CENTRE,SAMPLE,STAPIX,MAGICPIX,MAGICVAL,
+     &    DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM,
+     &              MINCORN,STAPIX(6)
+      REAL          SHIFT(6),ANGLE(6),CENTRE(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2,DIMS_3),
+     &              OARRAY(ODIMS_1,ODIMS_2,ODIMS_3),
+     &              MAGICVAL
+C
+C   Local variables.
+C
+      REAL      A(3,3)          ! Rotation matrix
+      REAL      B(3,3)          ! Rotation matrix
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IND3            ! OARRAY axis 3 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! OARRAY interpolated pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      INCLUDE 'DCV_FUN'
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Compute rotation matrices.
+C
+      CALL TRANSFORM_3DMATRIX(ANGLE,CENTRE,A,B)
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,3
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,3
+        DO J=1,8
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift, rotation, and resampling in reverse on each pixel in OARRAY 
+C   to find the corresponding exact or fractional pixel in ARRAY. Obtain the 
+C   OARRAY pixel value by linear interpolation of the corners nearest the ARRAY
+C   pixel. 
+C
+      DO IND3=1,MAX(1,ODIMS(3))
+        COORDS1(3)=REAL(STAPIX(3)+(IND3-1))
+C
+        DO IND2=1,MAX(1,ODIMS(2))
+          COORDS1(2)=REAL(STAPIX(2)+(IND2-1))
+C
+          DO IND1=1,MAX(1,ODIMS(1))
+            COORDS1(1)=REAL(STAPIX(1)+(IND1-1))
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C
+            CALL TRANSFORM_3DTRANR
+     &        (SHIFT,ANGLE,CENTRE,SAMPLE,MODE,COORDS1,COORDS2,A,B)
+            DO I=1,3
+              IPIXEL(I)=INT(COORDS2(I))
+              FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+            END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+            OK = .TRUE.
+            DO I=1,3
+              IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+            END DO
+C
+            IF(OK)THEN
+              DO J=1,8
+                DO I=1,3    
+                  ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+                END DO
+                CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J),ICORPIX(3,J))
+                IF(CORVALS(J).EQ.DCV_<T>TOR(MAGICVAL))THEN
+                  OK=.FALSE.
+                  GO TO 10
+                END IF
+              END DO           
+            END IF
+C
+C   Interpolate.
+C
+   10       CONTINUE
+            IF(OK)THEN
+              CALL NDP_LINEAR
+     &          (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+                OARRAY(IND1,IND2,IND3)=RESULT
+            ELSE
+              OARRAY(IND1,IND2,IND3)=MAGICVAL
+              MAGICPIX=MAGICPIX+1.0
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,IND3)
+      END DO
+C
+      END
+
+
+
+      SUBROUTINE TRANSFORM_2DNOROT3_<t>Q
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,SAMPLE,MAGICPIX,MAGICVAL,
+     &    DIMS_1,DIMS_2,ODIMS_1,ODIMS_2)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ONDIM,
+     &              MINCORN
+      REAL          SHIFT(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2),
+     &              OARRAY(ODIMS_1,ODIMS_2),
+     &              MAGICVAL
+C
+C   Local variables.
+C
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! Interpolated OARRAY pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      INCLUDE 'DCV_FUN'
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,2
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,2
+        DO J=1,4
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift and resampling in reverse on each pixel in OARRAY to find the
+C   corresponding exact or fractional pixel in ARRAY. Obtain the OARRAY pixel 
+C   value by linear interpolation of the corners nearest the ARRAY pixel. 
+C
+      DO IND2=1,MAX(1,ODIMS(2))
+        COORDS1(2)=REAL(IND2)
+C
+        DO IND1=1,MAX(1,ODIMS(1))
+          COORDS1(1)=REAL(IND1)
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C
+          CALL TRANSFORM_2DTRANNR(SHIFT,SAMPLE,MODE,COORDS1,COORDS2)
+          DO I=1,2
+            IPIXEL(I)=INT(COORDS2(I))
+            FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+          END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+          OK=.TRUE.
+          DO I=1,2
+            IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+          END DO
+C
+          IF(OK)THEN
+            DO J=1,4
+              DO I=1,2    
+                ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+              END DO
+              CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J))
+              IF(CORVALS(J).EQ.DCV_<T>TOR(MAGICVAL))THEN
+                OK=.FALSE.
+                GO TO 10
+              END IF
+            END DO           
+          END IF
+C
+C   Interpolate.
+C
+   10     CONTINUE
+          IF(OK)THEN
+            CALL NDP_LINEAR
+     &        (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+              OARRAY(IND1,IND2)=RESULT
+          ELSE
+            OARRAY(IND1,IND2)=MAGICVAL
+            MAGICPIX=MAGICPIX+1.0
+          END IF
+C                             
+        END DO
+      END DO     
+C
+      END
+
+
+
+      SUBROUTINE TRANSFORM_3DNOROT3_<t>Q
+     &   (ARRAY,OARRAY,DIMS,NDIM,ODIMS,ONDIM,MINCORN,
+     &    SHIFT,SAMPLE,MAGICPIX,MAGICVAL,
+     &    DIMS_1,DIMS_2,DIMS_3,ODIMS_1,ODIMS_2,ODIMS_3)
+C
+      IMPLICIT NONE
+C
+C   Parameters.
+C
+      INTEGER       DIMS(10),DIMS_1,DIMS_2,DIMS_3,NDIM,
+     &              ODIMS(10),ODIMS_1,ODIMS_2,ODIMS_3,ONDIM,
+     &              MINCORN
+      REAL          SHIFT(6),SAMPLE(6),MAGICPIX
+      <type>
+     &              ARRAY(DIMS_1,DIMS_2,DIMS_3),
+     &              OARRAY(ODIMS_1,ODIMS_2,ODIMS_3),
+     &              MAGICVAL
+C
+C   Local variables.
+C                            
+      REAL      COORDS1(6)      ! OARRAY coordinate before de-transformation
+      REAL      COORDS2(6)      ! OARRAY coordinate after de-transformation
+      INTEGER   CORNERS(6,64)   ! Primitive image corner pixels
+      REAL      CORVALS(64)     ! ARRAY corner values for interpolation
+      REAL      FPIXEL(6)       ! ARRAY fractional pixel to be interpolated
+      INTEGER   I               ! Loop counter
+      INTEGER   ICORPIX(6,64)   ! ARRAY corner pixels
+      INTEGER   IND1            ! OARRAY axis 1 index
+      INTEGER   IND2            ! OARRAY axis 2 index
+      INTEGER   IND3            ! OARRAY axis 3 index
+      INTEGER   IPIXEL(6)       ! ARRAY pixel reached by de-transformation
+      INTEGER   J               ! Loop counter
+      INTEGER   MODE            ! Forward/reverse flag
+      INTEGER   NCORN           ! Number of corners
+      LOGICAL   OK              ! Interpolation possible flag
+      INTEGER   PRIMDIMS(10)    ! Dimensions of primitive image
+      REAL      RESULT          ! OARRAY interpolated pixel value
+      INTEGER   STATUS          ! Status code
+      CHARACTER STRING*80       ! Message string            
+C
+      INCLUDE 'DCV_FUN'
+C
+      MAGICPIX=0.0
+      MODE=-1
+C
+C   Obtain the coordinates of the corners of a primitive image and convert to 
+C   range 0 to 1.
+C
+      DO I=1,3
+        PRIMDIMS(I)=2
+      END DO
+      CALL NDP_CORNERS(PRIMDIMS,NDIM,NCORN,CORNERS)
+      DO I=1,3
+        DO J=1,8
+          CORNERS(I,J)=CORNERS(I,J)-1
+        END DO
+      END DO
+C
+C   Perform shift and resampling in reverse on each pixel in OARRAY to find the
+C   corresponding exact or fractional pixel in ARRAY. Obtain the OARRAY pixel 
+C   value by linear interpolation of the corners nearest the ARRAY pixel. 
+C
+      DO IND3=1,MAX(1,ODIMS(3))
+        COORDS1(3)=REAL(IND3)
+C
+        DO IND2=1,MAX(1,ODIMS(2))
+          COORDS1(2)=REAL(IND2)
+C
+          DO IND1=1,MAX(1,ODIMS(1))
+            COORDS1(1)=REAL(IND1)
+C
+C   De-transform pixel and separate integer and fractional parts of result.
+C
+            CALL TRANSFORM_3DTRANNR(SHIFT,SAMPLE,MODE,COORDS1,COORDS2)
+            DO I=1,3
+              IPIXEL(I)=INT(COORDS2(I))
+              FPIXEL(I)=COORDS2(I)-REAL(IPIXEL(I))
+            END DO
+C
+C   If the de-transformed pixel is outside ARRAY, or any of its corner pixels
+C   has the magic value, interpolation is not possible. 
+C
+            OK=.TRUE.
+            DO I=1,3
+              IF(IPIXEL(I).LE.1 .OR. IPIXEL(I).GE.DIMS(I))OK=.FALSE.
+            END DO
+C
+            IF(OK)THEN
+              DO J=1,8
+                DO I=1,3    
+                  ICORPIX(I,J)=IPIXEL(I)+CORNERS(I,J)
+                END DO
+                CORVALS(J)=ARRAY(ICORPIX(1,J),ICORPIX(2,J),ICORPIX(3,J))
+                IF(CORVALS(J).EQ.DCV_<T>TOR(MAGICVAL))THEN
+                  OK=.FALSE.
+                  GO TO 10
+                END IF
+              END DO           
+            END IF
+C
+C   Interpolate.
+C
+   10       CONTINUE
+            IF(OK)THEN
+              CALL NDP_LINEAR
+     &          (NDIM,NCORN,CORNERS,CORVALS,FPIXEL,RESULT)
+                OARRAY(IND1,IND2,IND3)=RESULT
+            ELSE
+              OARRAY(IND1,IND2,IND3)=MAGICVAL
+              MAGICPIX=MAGICPIX+1.0
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,IND3)
+      END DO
+C
+      END
+

@@ -1,0 +1,169 @@
+#+
+#  Name:
+#     STATS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Modified for ICL.
+#     {enter_changes_here}
+
+#-
+
+   interface STATS
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMage) Name of image to be inspected'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'IMAGE is the name of the image you wish to analyze.'
+      endparameter
+
+      parameter  CHECK
+         type   '_logical'                                               
+         prompt  '(CHECK) Check the bad pixel flag?'
+         association '<->global.check'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'CHECK ensures that the bad pixel flag is set correctly.'
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                               
+         prompt  '(WHole) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If WHOLE is TRUE, all of IMAGE will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(STart) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(ENd) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  PASS2
+         type   '_logical'                                               
+         prompt  '(PASS2) Perform two passes?'
+         association '<->global.pass2'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help 'If IMAGE has more than 10,000 pixels, set PASS2 to TRUE.'
+      endparameter
+
+      parameter  STAT_TOTAL
+         type   '_real'
+         association '->stats.total'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_MAX
+         type   '_real'
+         association '->stats.max'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_MIN
+         type   '_real'
+         association '->stats.min'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_MEAN
+         type   '_real'
+         association '->stats.mean'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_SIGMA
+         type   '_real'
+         association '->stats.sigma'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_SIZE
+         type   '_real'
+         association '->stats.size'
+         vpath 'dynamic,current,global'
+      endparameter
+
+      parameter  STAT_BADPIX
+         type   '_real'
+         association '->stats.badpix'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1MIN
+         type   '_real'
+         association '->stats.1min'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1MAX
+         type   '_real'
+         association '->stats.1max'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1START
+         type   '_real'
+         association '->stats.1start'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter  STAT_1END
+         type   '_real'
+         association '->stats.1end'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter STAT_2MIN
+         type   '_real'
+         association '->stats.2min'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter STAT_2MAX
+         type   '_real'
+         association '->stats.2max'
+         vpath 'dynamic,current,global'
+      endparameter
+
+      parameter STAT_2START
+         type   '_real'
+         association '->stats.2start'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+      parameter STAT_2END
+         type   '_real'
+         association '->stats.2end'
+         vpath 'dynamic,current,global'
+      endparameter
+ 
+   endinterface
+

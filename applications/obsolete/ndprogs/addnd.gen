@@ -1,0 +1,210 @@
+      subroutine addnd_<t>(array,dim1,dim2,dim3,dim4,dim5,dim6,
+     &                     oarray,odim1,odim2,odim3,odim4,odim5,odim6,
+     &                     error,earray,oearray,
+     &                     quality,qarray,oqarray,
+     &                     shift1,shift2,shift3,shift4,shift5,shift6,
+     &                     average,count)
+c
+      integer dim1,dim2,dim3,dim4,dim5,dim6
+      integer odim1,odim2,odim3,odim4,odim5,odim6
+      <type>  array(dim1,dim2,dim3,dim4,dim5,dim6),
+     &        earray(dim1,dim2,dim3,dim4,dim5,dim6),
+     &        oarray(odim1,odim2,odim3,odim4,odim5,odim6),
+     &        oearray(odim1,odim2,odim3,odim4,odim5,odim6)
+      byte    qarray(dim1,dim2,dim3,dim4,dim5,dim6),
+     &        oqarray(odim1,odim2,odim3,odim4,odim5,odim6)
+      logical error,quality,average
+      integer shift1,shift2,shift3,shift4,shift5,shift6
+      byte    count(odim1,odim2,odim3,odim4,odim5,odim6)
+c
+      integer i1,i2,i3,i4,i5,i6
+      integer j1,j2,j3,j4,j5,j6
+c
+      include 'QUALITY_MASK'
+c
+      do i1 = 1,dim1
+       j1 = i1 + shift1
+       do i2 = 1,dim2
+        j2 = i2 + shift2
+        do i3 = 1,dim3
+         j3 = i3 + shift3
+         do i4 = 1,dim4
+          j4 = i4 + shift4
+          do i5 = 1,dim5
+           j5 = i4 + shift5
+           do i6 = 1,dim6
+            j6 = i6 + shift6
+c
+            if (quality) then
+c
+             if ((qarray(i1,i2,i3,i4,i5,i6).and.badbits)
+     &            .eq.q_good) then
+              oarray(j1,j2,j3,j4,j5,j6) = 
+     &         oarray(j1,j2,j3,j4,j5,j6) +
+     &                array(i1,i2,i3,i4,i5,i6)
+c
+              if (error) then
+               oearray(j1,j2,j3,j4,j5,j6) = 
+     &          oearray(j1,j2,j3,j4,j5,j6) +
+     &                  earray(i1,i2,i3,i4,i5,i6)
+              end if ! (error)
+c
+              if (average) then
+                count(j1,j2,j3,j4,j5,j6) = 
+     &                count(j1,j2,j3,j4,j5,j6) + 1
+              end if
+c
+             else
+c 
+              oqarray(j1,j2,j3,j4,j5,j6) = q_bad
+c
+             end if ! (qarray...)
+c
+            else
+c
+             oarray(j1,j2,j3,j4,j5,j6) = 
+     &        oarray(j1,j2,j3,j4,j5,j6) + 
+     &               array(i1,i2,i3,i4,i5,i6)
+c
+             if (error) then
+              oearray(j1,j2,j3,j4,j5,j6) = 
+     &         oearray(j1,j2,j3,j4,j5,j6) +
+     &                 earray(i1,i2,i3,i4,i5,i6)
+             end if ! (error)
+c
+             if (average) then
+               count(j1,j2,j3,j4,j5,j6) = 
+     &               count(j1,j2,j3,j4,j5,j6) + 1
+             end if
+c
+            end if ! (quality)
+           end do
+          end do
+         end do
+        end do
+       end do
+      end do
+      return
+      end
+
+*******************************************************************************
+
+      subroutine addnd_<t>q(array,dim1,dim2,dim3,dim4,dim5,dim6,
+     &                      oarray,odim1,odim2,odim3,odim4,odim5,odim6,
+     &                      error,earray,oearray,
+     &                      magicval,
+     &                      shift1,shift2,shift3,shift4,shift5,shift6,
+     &                      average,count)
+c
+      integer dim1,dim2,dim3,dim4,dim5,dim6
+      integer odim1,odim2,odim3,odim4,odim5,odim6
+      <type>  array(dim1,dim2,dim3,dim4,dim5,dim6),
+     &        earray(dim1,dim2,dim3,dim4,dim5,dim6),
+     &        oarray(odim1,odim2,odim3,odim4,odim5,odim6),
+     &        oearray(odim1,odim2,odim3,odim4,odim5,odim6),
+     &        magicval
+      logical error,average
+      integer shift1,shift2,shift3,shift4,shift5,shift6
+      byte    count(odim1,odim2,odim3,odim4,odim5,odim6)
+c
+      integer i1,i2,i3,i4,i5,i6
+      integer j1,j2,j3,j4,j5,j6
+c
+      do i1 = 1,dim1
+       j1 = i1 + shift1
+       do i2 = 1,dim2
+        j2 = i2 + shift2
+        do i3 = 1,dim3
+         j3 = i3 + shift3
+         do i4 = 1,dim4
+          j4 = i4 + shift4
+          do i5 = 1,dim5
+           j5 = i4 + shift5
+           do i6 = 1,dim6
+            j6 = i6 + shift6
+c
+             if ((array(i1,i2,i3,i4,i5,i6).ne.magicval).and.
+     &           (oarray(j1,j2,j3,j4,j5,j6).ne.magicval)) then
+              oarray(j1,j2,j3,j4,j5,j6) = 
+     &         oarray(j1,j2,j3,j4,j5,j6)+array(i1,i2,i3,i4,i5,i6)
+c
+              if (average) then
+                count(j1,j2,j3,j4,j5,j6) = 
+     &                count(j1,j2,j3,j4,j5,j6) + 1
+              end if
+c
+              if (error) then
+               oearray(j1,j2,j3,j4,j5,j6) = 
+     &          oearray(j1,j2,j3,j4,j5,j6)+earray(i1,i2,i3,i4,i5,i6)
+              end if ! (error)
+c
+             else
+c
+              oarray(j1,j2,j3,j4,j5,j6) = magicval
+c
+             end if
+c
+           end do
+          end do
+         end do
+        end do
+       end do
+      end do
+      return
+      end
+
+*******************************************************************************
+
+      subroutine addnd_mean_<t>(array,nelm,
+     &                          quality,qarray,
+     &                          error,earray,
+     &                          count)
+      integer    nelm
+      <type>     array(nelm),earray(nelm)
+      byte       qarray(nelm)
+      logical    error,quality
+      byte       count(nelm)
+c
+      integer i
+c
+      include 'QUALITY_MASK'
+      include 'DCV_FUN'
+c
+      do i = 1,nelm
+        if (quality) then
+          if ((qarray(i).and.badbits) .eq. q_good) then
+            array(i) = array(i) / dcv_btor(count(i))
+            if (error) earray(i) = earray(i) / dcv_btor(count(i))
+          end if
+        else
+          array(i) = array(i) / dcv_btor(count(i))
+          if (error) earray(i) = earray(i) / dcv_btor(count(i))
+        end if
+      end do
+      return
+      end
+
+******************************************************************************
+
+      subroutine addnd_mean_<t>q(array,nelm,
+     &                           magicval,
+     &                           error,earray,
+     &                           count)
+      integer    nelm
+      <type>     array(nelm),earray(nelm),magicval
+      logical    error
+      integer    nfiles
+      byte       count(nelm)
+c
+      integer i
+c
+      include 'DCV_FUN'
+c
+      do i = 1,nelm
+        if (array(i) .ne. magicval) then
+          array(i) = array(i) / dcv_btor(count(i))
+          if (error) earray(i) = earray(i) / dcv_btor(count(i))
+        end if
+      end do
+      return
+      end

@@ -1,0 +1,1193 @@
+      SUBROUTINE SMOOTH_1D1D_<T>
+     &  (ARRAY,OARRAY,FUNC,NX,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &   ERR,IEARRAY,OEARRAY,QUAL,IQARRAY,OQARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX),WIDTH(3)
+      LOGICAL   QUAL,ERR
+      <TYPE>
+     &          ARRAY(NX),
+     &          OARRAY(NX),
+     &          IEARRAY(NX),
+     &          OEARRAY(NX)
+      BYTE      IQARRAY(NX),
+     &          OQARRAY(NX)
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      REAL      FX
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   MAXX      
+      INTEGER   MINX
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W
+C 
+C     Generate the 1-D function box.
+C
+      CALL SMOOTH_1DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO I=STAPIX(1),ENDPIX(1)
+        MINX=MAX(1,I-HALF) 
+        MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+        U=0.0
+        V=0.0 
+        W=0.0
+        FUNCX=MIN(MINX-I+HALF,HALF)
+        DO II=MINX,MAXX
+          FUNCX=FUNCX+1
+          FX=FUNC(FUNCX)
+          IF (QUAL) THEN
+            IF (IQARRAY(II).EQ.0) THEN
+              V=V+ARRAY(II)*FX
+              W=W+FX
+              IF (ERR) THEN
+                TEMP=IEARRAY(II)*FX
+                U=U+TEMP*TEMP
+              END IF
+            END IF
+          ELSE
+            V=V+ARRAY(II)*FX
+            W=W+FX
+            IF (ERR) THEN
+              TEMP=IEARRAY(II)*FX
+              U=U+TEMP*TEMP
+            END IF
+          END IF  
+        END DO
+        IF (QUAL) THEN
+          IF (IQARRAY(I).EQ.0) THEN
+            OARRAY(I)=V/W
+            OQARRAY(I)=0
+            IF (ERR) OEARRAY(I)=SQRT(U)/W
+          ELSE
+            OQARRAY(I)=1
+          END IF
+        ELSE
+          OARRAY(I)=V/W
+          IF (ERR) OEARRAY(I)=SQRT(U)/W
+        END IF
+C
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_2D1D_<T>
+     &  (ARRAY,OARRAY,FUNC,NX,NY,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &   ERR,IEARRAY,OEARRAY,QUAL,IQARRAY,OQARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX),WIDTH(3)
+      LOGICAL   ERR,QUAL
+      <TYPE>
+     &          ARRAY(NX,NY),
+     &          OARRAY(NX,NY),
+     &          IEARRAY(NX,NY),
+     &          OEARRAY(NX,NY)
+      BYTE      IQARRAY(NX,NY),
+     &          OQARRAY(NX,NY)
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      REAL      FX
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   MAXX      
+      INTEGER   MINX
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 1-D function box.
+C
+      CALL SMOOTH_1DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO J=STAPIX(2),ENDPIX(2)
+        DO I=STAPIX(1),ENDPIX(1)
+          MINX=MAX(1,I-HALF) 
+          MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+          U=0.0
+          V=0.0 
+          W=0.0
+          FUNCX=MIN(MINX-I+HALF,HALF)
+          DO II=MINX,MAXX
+            FUNCX=FUNCX+1
+            FX=FUNC(FUNCX)
+            IF (QUAL) THEN
+              IF (IQARRAY(II,J).EQ.0) THEN
+                V=V+ARRAY(II,J)*FX
+                W=W+FX
+                IF (ERR) THEN
+                  TEMP=IEARRAY(II,J)*FX
+                  U=U+TEMP*TEMP
+                END IF ! (ERR)
+              END IF ! (IQARRAY...)
+            ELSE
+              V=V+ARRAY(II,J)*FX
+              W=W+FX
+              IF (ERR) THEN
+                TEMP=IEARRAY(II,J)*FX
+                U=U+TEMP*TEMP
+              END IF ! (ERR)
+            END IF ! (QUAL)
+          END DO
+          IF (QUAL) THEN
+            IF (IQARRAY(I,J).EQ.0) THEN
+              OARRAY(I,J)=V/W
+              OQARRAY(I,J)=0
+              IF (ERR) OEARRAY(I,J)=SQRT(U)/W
+            ELSE
+              OQARRAY(I,J)=1
+            END IF
+          ELSE
+            OARRAY(I,J)=V/W
+            IF (ERR) OEARRAY(I,J)=SQRT(U)/W         
+          END IF
+C
+        END DO
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_2D2D_<T>
+     &  (ARRAY,OARRAY,FUNC,NX,NY,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &   ERR,IEARRAY,OEARRAY,QUAL,IQARRAY,OQARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX,BOX),WIDTH(3)
+      LOGICAL   QUAL,ERR
+      <TYPE>
+     &          ARRAY(NX,NY),
+     &          OARRAY(NX,NY),
+     &          IEARRAY(NX,NY),
+     &          OEARRAY(NX,NY)
+      BYTE      IQARRAY(NX,NY),
+     &          OQARRAY(NX,NY)
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      INTEGER   FUNCY
+      REAL      FXY
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   JJ
+      INTEGER   MAXX      
+      INTEGER   MAXY
+      INTEGER   MINX
+      INTEGER   MINY    
+      REAL      TEMP
+      REAL      U              
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 2-D function box.
+C
+      CALL SMOOTH_2DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C     
+      HALF=(BOX-1)/2
+C
+      DO J=STAPIX(2),ENDPIX(2)
+        MINY=MAX(1,J-HALF)  
+        MAXY=MIN(NY,J+HALF)               
+        DO I=STAPIX(1),ENDPIX(1)
+          MINX=MAX(1,I-HALF) 
+          MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C     
+          FUNCY=MIN(MINY-J+HALF,HALF)
+          V=0.0 
+          W=0.0
+          U=0.0
+          DO JJ=MINY,MAXY 
+            FUNCY=FUNCY+1
+            FUNCX=MIN(MINX-I+HALF,HALF)
+            DO II=MINX,MAXX
+              FUNCX=FUNCX+1
+              FXY=FUNC(FUNCX,FUNCY)
+              IF (QUAL) THEN
+                IF (IQARRAY(II,JJ).EQ.0) THEN
+                  V=V+ARRAY(II,JJ)*FXY
+                  W=W+FXY
+                  IF (ERR) THEN
+                    TEMP=IEARRAY(II,JJ)*FXY
+                    U=U+TEMP*TEMP
+                  END IF
+                END IF
+              ELSE
+                V=V+ARRAY(II,JJ)*FXY
+                W=W+FXY
+                IF (ERR) THEN
+                  TEMP=IEARRAY(II,JJ)*FXY
+                  U=U+TEMP*TEMP
+                END IF
+              END IF
+            END DO
+          END DO
+          IF (QUAL) THEN
+            IF (IQARRAY(I,J).EQ.0) THEN
+              OARRAY(I,J)=V/W
+              OQARRAY(I,J)=0
+              IF (ERR) OEARRAY(I,J)=SQRT(U)/W
+            ELSE
+              OQARRAY(I,J)=1
+            END IF
+          ELSE
+            OARRAY(I,J)=V/W
+            IF (ERR) OEARRAY(I,J)=SQRT(U)/W
+          END IF
+C
+        END DO
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_3D1D_<T>
+     &  (ARRAY,OARRAY,FUNC,NX,NY,NZ,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &   ERR,IEARRAY,OEARRAY,QUAL,IQARRAY,OQARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,NZ,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX),WIDTH(3)
+      LOGICAL   ERR,QUAL
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ),
+     &          IEARRAY(NX,NY,NZ),
+     &          OEARRAY(NX,NY,NZ)
+      BYTE      IQARRAY(NX,NY,NZ),
+     &          OQARRAY(NX,NY,NZ)
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      REAL      FX
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   K
+      INTEGER   MAXX      
+      INTEGER   MINX
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 1-D function box.
+C
+      CALL SMOOTH_1DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO K=STAPIX(3),ENDPIX(3)
+        DO J=STAPIX(2),ENDPIX(2)
+          DO I=STAPIX(1),ENDPIX(1)
+            MINX=MAX(1,I-HALF) 
+            MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+            U=0.0
+            V=0.0 
+            W=0.0
+            FUNCX=MIN(MINX-I+HALF,HALF)
+            DO II=MINX,MAXX
+              FUNCX=FUNCX+1
+              FX=FUNC(FUNCX)
+              IF (QUAL) THEN
+                IF (IQARRAY(II,J,K).EQ.0) THEN
+                  V=V+ARRAY(II,J,K)*FX
+                  W=W+FX
+                  IF (ERR) THEN
+                    TEMP=IEARRAY(II,J,K)*FX
+                    U=U+TEMP*TEMP
+                  END IF
+                END IF
+              ELSE
+                V=V+ARRAY(II,J,K)*FX
+                W=W+FX
+                IF (ERR) THEN
+                  TEMP=IEARRAY(II,J,K)*FX
+                  U=U+TEMP*TEMP
+                END IF
+              END IF  
+            END DO
+            IF (QUAL) THEN
+              IF (IQARRAY(I,J,K).EQ.0) THEN
+                OARRAY(I,J,K)=V/W
+                OQARRAY(I,J,K)=0
+                IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+              ELSE
+                OQARRAY(I,J,K)=1
+              END IF
+            ELSE
+              OARRAY(I,J,K)=V/W
+              IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,K)
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_3D2D_<T>
+     &  (ARRAY,OARRAY,FUNC,NX,NY,NZ,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &   ERR,IEARRAY,OEARRAY,QUAL,IQARRAY,OQARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,NZ,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX,BOX),WIDTH(3)
+      LOGICAL   ERR,QUAL
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ),
+     &          IEARRAY(NX,NY,NZ),
+     &          OEARRAY(NX,NY,NZ)
+      BYTE      IQARRAY(NX,NY,NZ),
+     &          OQARRAY(NX,NY,NZ)
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      INTEGER   FUNCY
+      REAL      FXY
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   JJ
+      INTEGER   K
+      INTEGER   MAXX      
+      INTEGER   MAXY
+      INTEGER   MINX
+      INTEGER   MINY                  
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 2-D function box.
+C
+      CALL SMOOTH_2DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO K=STAPIX(3),ENDPIX(3)
+        DO J=STAPIX(2),ENDPIX(2)
+          MINY=MAX(1,J-HALF)  
+          MAXY=MIN(NY,J+HALF)               
+          DO I=STAPIX(1),ENDPIX(1)
+            MINX=MAX(1,I-HALF) 
+            MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+            FUNCY=MIN(MINY-J+HALF,HALF)
+            U=0.0
+            V=0.0 
+            W=0.0
+            DO JJ=MINY,MAXY 
+              FUNCY=FUNCY+1
+              FUNCX=MIN(MINX-I+HALF,HALF)
+              DO II=MINX,MAXX
+                FUNCX=FUNCX+1
+                FXY=FUNC(FUNCX,FUNCY)
+                IF (QUAL) THEN
+                  IF (IQARRAY(II,JJ,K).EQ.0) THEN
+                    V=V+ARRAY(II,JJ,K)*FXY
+                    W=W+FXY
+                    IF (ERR) THEN
+                      TEMP=IEARRAY(II,JJ,K)*FXY
+                      U=U+TEMP*TEMP
+                    END IF
+                  END IF
+                ELSE
+                  V=V+ARRAY(II,JJ,K)*FXY
+                  W=W+FXY
+                  IF (ERR) THEN
+                    TEMP=IEARRAY(II,JJ,K)*FXY
+                    U=U+TEMP*TEMP
+                  END IF
+                END IF
+              END DO
+            END DO
+            IF (QUAL) THEN
+              IF (IQARRAY(I,J,K).EQ.0) THEN
+                OARRAY(I,J,K)=V/W
+                OQARRAY(I,J,K)=0
+                IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+              ELSE
+                OQARRAY(I,J,K)=1
+              END IF
+            ELSE
+              OARRAY(I,J,K)=V/W
+              IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+            END IF
+C
+          END DO
+        END DO
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_3D3D_<T>
+     &  (ARRAY,OARRAY,FUNC,NX,NY,NZ,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &   ERR,IEARRAY,OEARRAY,QUAL,IQARRAY,OQARRAY)   
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C
+      INTEGER   NX,NY,NZ,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX,BOX,BOX),WIDTH(3)
+      LOGICAL   ERR,QUAL
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ),
+     &          IEARRAY(NX,NY,NZ),
+     &          OEARRAY(NX,NY,NZ)
+      BYTE      IQARRAY(NX,NY,NZ),
+     &          OQARRAY(NX,NY,NZ)
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      INTEGER   FUNCY
+      INTEGER   FUNCZ
+      REAL      FXYZ
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   JJ
+      INTEGER   K
+      INTEGER   KK
+      INTEGER   MAXX      
+      INTEGER   MAXY
+      INTEGER   MINX
+      INTEGER   MINY                  
+      INTEGER   MAXZ
+      INTEGER   MINZ
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W
+C 
+C     Generate the 3-D function box.
+C
+      CALL SMOOTH_3DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C                                   
+      DO K=STAPIX(3),ENDPIX(3)
+        MINZ=MAX(1,K-HALF)  
+        MAXZ=MIN(NZ,K+HALF)               
+        DO J=STAPIX(2),ENDPIX(2)
+          MINY=MAX(1,J-HALF)  
+          MAXY=MIN(NY,J+HALF)               
+          DO I=STAPIX(1),ENDPIX(1)
+            MINX=MAX(1,I-HALF) 
+            MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+            U=0.0
+            V=0.0 
+            W=0.0
+            FUNCZ=MIN(MINZ-K+HALF,HALF)
+            DO KK=MINZ,MAXZ
+              FUNCZ=FUNCZ+1
+              FUNCY=MIN(MINY-J+HALF,HALF)
+              DO JJ=MINY,MAXY 
+                FUNCY=FUNCY+1
+                FUNCX=MIN(MINX-I+HALF,HALF)
+                DO II=MINX,MAXX
+                  FUNCX=FUNCX+1
+                  FXYZ=FUNC(FUNCX,FUNCY,FUNCZ)
+                  IF (QUAL) THEN
+                    IF (IQARRAY(II,JJ,KK).EQ.0) THEN
+                      V=V+ARRAY(II,JJ,KK)*FXYZ
+                      W=W+FXYZ
+                      IF (ERR) THEN
+                        TEMP=IEARRAY(II,JJ,KK)*FXYZ
+                        U=U+TEMP*TEMP
+                      END IF
+                    END IF
+                  ELSE
+                    V=V+ARRAY(II,JJ,KK)*FXYZ
+                    W=W+FXYZ
+                    IF (ERR) THEN
+                      TEMP=IEARRAY(II,JJ,KK)*FXYZ
+                      U=U+TEMP*TEMP
+                    END IF
+                  END IF
+                END DO
+              END DO
+            END DO
+            IF (QUAL) THEN
+              IF (IQARRAY(I,J,K).EQ.0) THEN
+                OARRAY(I,J,K)=V/W
+                OQARRAY(I,J,K)=0
+                IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+              ELSE
+                OQARRAY(I,J,K)=1
+              END IF
+            ELSE
+              OARRAY(I,J,K)=V/W
+              IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,K)
+      END DO
+C         
+      END 
+
+
+
+      SUBROUTINE SMOOTH_1D1D_<T>Q
+     &  (ARRAY,OARRAY,FUNC,NX,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,MAGICVAL,
+     &   ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX),WIDTH(3)
+      <TYPE>
+     &          ARRAY(NX),
+     &          OARRAY(NX),
+     &          IEARRAY(NX),
+     &          OEARRAY(NX),
+     &          MAGICVAL
+      LOGICAL   ERR
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      REAL      FX
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   MAXX      
+      INTEGER   MINX
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W
+C 
+C     Generate the 1-D function box.
+C
+      CALL SMOOTH_1DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO I=STAPIX(1),ENDPIX(1)
+        MINX=MAX(1,I-HALF) 
+        MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+        U=0.0
+        V=0.0 
+        W=0.0
+        FUNCX=MIN(MINX-I+HALF,HALF)
+        DO II=MINX,MAXX
+          FUNCX=FUNCX+1
+          FX=FUNC(FUNCX)
+          IF(ARRAY(II).GT.MAGICVAL)THEN
+            V=V+ARRAY(II)*FX
+            W=W+FX
+            IF (ERR) THEN
+              TEMP=IEARRAY(II)*FX
+              U=U+TEMP*TEMP
+            END IF
+          END IF
+        END DO
+        IF(ARRAY(I).GT.MAGICVAL)THEN
+          OARRAY(I)=V/W
+          IF (ERR) OEARRAY(I)=SQRT(U)/W
+        ELSE
+          OARRAY(I)=MAGICVAL
+        END IF
+C
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_2D1D_<T>Q
+     &  (ARRAY,OARRAY,FUNC,NX,NY,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,MAGICVAL,
+     &   ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX),WIDTH(3)
+      <TYPE>
+     &          ARRAY(NX,NY),
+     &          OARRAY(NX,NY),
+     &          IEARRAY(NX,NY),
+     &          OEARRAY(NX,NY),
+     &          MAGICVAL
+      LOGICAL   ERR
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      REAL      FX
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   MAXX      
+      INTEGER   MINX
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 1-D function box.
+C
+      CALL SMOOTH_1DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO J=STAPIX(2),ENDPIX(2)
+        DO I=STAPIX(1),ENDPIX(1)
+          MINX=MAX(1,I-HALF) 
+          MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+          U=0.0
+          V=0.0 
+          W=0.0
+          FUNCX=MIN(MINX-I+HALF,HALF)
+          DO II=MINX,MAXX
+            FUNCX=FUNCX+1
+            FX=FUNC(FUNCX)
+            IF(ARRAY(II,J).GT.MAGICVAL)THEN
+              V=V+ARRAY(II,J)*FX
+              W=W+FX
+              IF (ERR) THEN
+                TEMP=IEARRAY(II,J)*FX
+                U=U+TEMP*TEMP
+              END IF
+            END IF
+          END DO
+          IF(ARRAY(I,J).GT.MAGICVAL)THEN
+            OARRAY(I,J)=V/W
+            IF (ERR) OEARRAY(I,J)=SQRT(U)/W
+          ELSE
+            OARRAY(I,J)=MAGICVAL
+          END IF
+C
+        END DO
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_2D2D_<T>Q
+     &  (ARRAY,OARRAY,FUNC,NX,NY,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,MAGICVAL,
+     &   ERR,IEARRAY,OEARRAY)
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX,BOX),WIDTH(3)
+      <TYPE>
+     &          ARRAY(NX,NY),
+     &          OARRAY(NX,NY),
+     &          IEARRAY(NX,NY),
+     &          OEARRAY(NX,NY),
+     &          MAGICVAL
+      LOGICAL   ERR
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      INTEGER   FUNCY
+      REAL      FXY
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   JJ
+      INTEGER   MAXX      
+      INTEGER   MAXY
+      INTEGER   MINX
+      INTEGER   MINY
+      REAL      TEMP
+      REAL      U                  
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 2-D function box.
+C
+      CALL SMOOTH_2DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C     
+      HALF=(BOX-1)/2
+C
+      DO J=STAPIX(2),ENDPIX(2)
+        MINY=MAX(1,J-HALF)  
+        MAXY=MIN(NY,J+HALF)               
+        DO I=STAPIX(1),ENDPIX(1)
+          MINX=MAX(1,I-HALF) 
+          MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C     
+          FUNCY=MIN(MINY-J+HALF,HALF)
+          U=0.0
+          V=0.0 
+          W=0.0
+          DO JJ=MINY,MAXY 
+            FUNCY=FUNCY+1
+            FUNCX=MIN(MINX-I+HALF,HALF)
+            DO II=MINX,MAXX
+              FUNCX=FUNCX+1
+              FXY=FUNC(FUNCX,FUNCY)
+              IF(ARRAY(II,JJ).GT.MAGICVAL)THEN
+                V=V+ARRAY(II,JJ)*FXY
+                W=W+FXY
+                IF (ERR) THEN
+                  TEMP=IEARRAY(II,JJ)*FXY
+                  U=U+TEMP*TEMP
+                END IF
+              END IF
+            END DO
+          END DO
+          IF(ARRAY(I,J).GT.MAGICVAL)THEN
+            OARRAY(I,J)=V/W
+            IF (ERR) OEARRAY(I,J)=SQRT(U)/W
+          ELSE
+            OARRAY(I,J)=MAGICVAL
+          END IF
+C
+        END DO
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_3D1D_<T>Q
+     &  (ARRAY,OARRAY,FUNC,NX,NY,NZ,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &  MAGICVAL,ERR,IEARRAY,OEARRAY)   
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,NZ,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX),WIDTH(3)
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ),
+     &          IEARRAY(NX,NY,NZ),
+     &          OEARRAY(NX,NY,NZ),
+     &          MAGICVAL
+      LOGICAL   ERR
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      REAL      FX
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   K
+      INTEGER   MAXX      
+      INTEGER   MINX
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 1-D function box.
+C
+      CALL SMOOTH_1DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO K=STAPIX(3),ENDPIX(3)
+        DO J=STAPIX(2),ENDPIX(2)
+          DO I=STAPIX(1),ENDPIX(1)
+            MINX=MAX(1,I-HALF) 
+            MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+            U=0.0
+            V=0.0 
+            W=0.0
+            FUNCX=MIN(MINX-I+HALF,HALF)
+            DO II=MINX,MAXX
+              FUNCX=FUNCX+1
+              FX=FUNC(FUNCX)
+              IF(ARRAY(II,J,K).GT.MAGICVAL)THEN
+                V=V+ARRAY(II,J,K)*FX
+                W=W+FX
+                IF (ERR) THEN
+                  TEMP=IEARRAY(II,J,K)*FX
+                  U=U+TEMP*TEMP
+                END IF
+              END IF
+            END DO
+            IF(ARRAY(I,J,K).GT.MAGICVAL)THEN
+              OARRAY(I,J,K)=V/W
+              IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+            ELSE
+              OARRAY(I,J,K)=MAGICVAL
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,K)
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_3D2D_<T>Q
+     &  (ARRAY,OARRAY,FUNC,NX,NY,NZ,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &  MAGICVAL,ERR,IEARRAY,OEARRAY)   
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C                                       
+      INTEGER   NX,NY,NZ,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX,BOX),WIDTH(3)
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ),
+     &          IEARRAY(NX,NY,NZ),
+     &          OEARRAY(NX,NY,NZ),
+     &          MAGICVAL
+      LOGICAL   ERR
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      INTEGER   FUNCY
+      REAL      FXY
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   JJ
+      INTEGER   K
+      INTEGER   MAXX      
+      INTEGER   MAXY
+      INTEGER   MINX
+      INTEGER   MINY
+      REAL      TEMP
+      REAL      U                  
+      REAL      V
+      REAL      W 
+C 
+C     Generate the 2-D function box.
+C
+      CALL SMOOTH_2DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C
+      DO K=STAPIX(3),ENDPIX(3)
+        DO J=STAPIX(2),ENDPIX(2)
+          MINY=MAX(1,J-HALF)  
+          MAXY=MIN(NY,J+HALF)               
+          DO I=STAPIX(1),ENDPIX(1)
+            MINX=MAX(1,I-HALF) 
+            MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+            FUNCY=MIN(MINY-J+HALF,HALF)
+            U=0.0
+            V=0.0 
+            W=0.0
+            DO JJ=MINY,MAXY 
+              FUNCY=FUNCY+1
+              FUNCX=MIN(MINX-I+HALF,HALF)
+              DO II=MINX,MAXX
+                FUNCX=FUNCX+1
+                FXY=FUNC(FUNCX,FUNCY)
+                IF(ARRAY(II,JJ,K).GT.MAGICVAL)THEN
+                  V=V+ARRAY(II,JJ,K)*FXY
+                  W=W+FXY
+                  IF (ERR) THEN
+                    TEMP=IEARRAY(II,JJ,K)*FXY
+                    U=U+TEMP*TEMP
+                  END IF
+                END IF
+              END DO
+            END DO
+            IF(ARRAY(I,J,K).GT.MAGICVAL)THEN
+              OARRAY(I,J,K)=V/W
+              IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+            ELSE
+              OARRAY(I,J,K)=MAGICVAL
+            END IF
+C
+          END DO
+        END DO
+      END DO
+C         
+      END 
+
+
+
+
+
+      SUBROUTINE SMOOTH_3D3D_<T>Q
+     &  (ARRAY,OARRAY,FUNC,NX,NY,NZ,STAPIX,ENDPIX,FTYPE,BOX,WIDTH,
+     &  MAGICVAL,ERR,IEARRAY,OEARRAY)   
+C
+      IMPLICIT NONE
+C
+C     Parameters.
+C
+      INTEGER   NX,NY,NZ,STAPIX(6),ENDPIX(6),FTYPE,BOX
+      REAL      FUNC(BOX,BOX,BOX),WIDTH(3)
+      <TYPE>
+     &          ARRAY(NX,NY,NZ),
+     &          OARRAY(NX,NY,NZ),
+     &          IEARRAY(NX,NY,NZ),
+     &          OEARRAY(NX,NY,NZ),
+     &          MAGICVAL
+      LOGICAL   ERR
+C
+C     Local variables.
+C      
+      INTEGER   FUNCX
+      INTEGER   FUNCY
+      INTEGER   FUNCZ
+      REAL      FXYZ
+      INTEGER   HALF
+      INTEGER   I
+      INTEGER   II
+      INTEGER   J
+      INTEGER   JJ
+      INTEGER   K
+      INTEGER   KK
+      INTEGER   MAXX      
+      INTEGER   MAXY
+      INTEGER   MINX
+      INTEGER   MINY                  
+      INTEGER   MAXZ
+      INTEGER   MINZ
+      REAL      TEMP
+      REAL      U
+      REAL      V
+      REAL      W
+C 
+C     Generate the 3-D function box.
+C
+      CALL SMOOTH_3DFUNC(FTYPE,BOX,WIDTH,FUNC)
+C
+C     Convolve the image with the function, pixel by pixel, ensuring that at
+C     each pixel only the area of overlap between the image and the function 
+C     box is treated. Each image pixel value is first convolved with the 
+C     function at every point within the overlap, then normalized by dividing 
+C     by the total value of the function within the overlap.
+C
+      HALF=(BOX-1)/2
+C                                   
+      DO K=STAPIX(3),ENDPIX(3)
+        MINZ=MAX(1,K-HALF)  
+        MAXZ=MIN(NZ,K+HALF)               
+        DO J=STAPIX(2),ENDPIX(2)
+          MINY=MAX(1,J-HALF)  
+          MAXY=MIN(NY,J+HALF)               
+          DO I=STAPIX(1),ENDPIX(1)
+            MINX=MAX(1,I-HALF) 
+            MAXX=MIN(NX,I+HALF) 
+C
+C     - convolve each pixel.
+C
+            U=0.0
+            V=0.0 
+            W=0.0
+            FUNCZ=MIN(MINZ-K+HALF,HALF)
+            DO KK=MINZ,MAXZ
+              FUNCZ=FUNCZ+1
+              FUNCY=MIN(MINY-J+HALF,HALF)
+              DO JJ=MINY,MAXY 
+                FUNCY=FUNCY+1
+                FUNCX=MIN(MINX-I+HALF,HALF)
+                DO II=MINX,MAXX
+                  FUNCX=FUNCX+1
+                  FXYZ=FUNC(FUNCX,FUNCY,FUNCZ)
+                  IF(ARRAY(II,JJ,KK).GT.MAGICVAL)THEN
+                    V=V+ARRAY(II,JJ,KK)*FXYZ
+                    W=W+FXYZ
+                    IF (ERR) THEN
+                      TEMP=IEARRAY(II,JJ,KK)*FXYZ
+                      U=U+TEMP*TEMP
+                    END IF
+                  END IF
+                END DO
+              END DO
+            END DO
+            IF(ARRAY(I,J,K).GT.MAGICVAL)THEN
+              OARRAY(I,J,K)=V/W
+              IF (ERR) OEARRAY(I,J,K)=SQRT(U)/W
+            ELSE
+              OARRAY(I,J,K)=MAGICVAL
+            END IF
+C
+          END DO
+        END DO
+        CALL NDP_DISPLAY_PROGRESS(3,K)
+      END DO
+C         
+      END 

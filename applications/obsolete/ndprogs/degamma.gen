@@ -1,0 +1,886 @@
+      SUBROUTINE DEGAMMA_MEAN_<T>(ARRAY,NZ,NX,NY,STAPIX,ENDPIX,
+     :                            MEANS,ERR,EARRAY,QUAL,QARRAY)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to compute the mean z value for every pixel. The means are
+C     computed as per usual, unless an error (variance) array exists, in which
+C     case the variances are used as weights.
+C
+C   Parameters:
+C     ARRAY      (> <TYPE> array)  3D Data array
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     STAPIX     (> INTEGER array) Start pixels of subset
+C     ENDPIX     (> INTEGER array) End pixels of subset
+C     MEANS      (< <TYPE> array)  2D array of mean values
+C     ERR        (> LOGICAL)       Error array existence flag
+C     EARRAY     (> <TYPE> array)  Error array
+C     QUAL       (> LOGICAL)       Quality array existence flag
+C     QARRAY     (> BYTE array)    Quality array
+C
+C   History:
+C     02-OCT-1994  - Found that GOOD_PIX was being used instead of 
+C                    GOOD_PIXEL in degamma_find_. Have replaced. (GJP) 
+C                    
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     ARRAY(NZ,NX,NY),MEANS(NX,NY),
+     :           EARRAY(NZ,NX,NY)
+      BYTE       QARRAY(NZ,NX,NY)
+      LOGICAL    ERR,QUAL
+      INTEGER    STAPIX(6),ENDPIX(6)
+C
+      INTEGER    I,J,K
+      REAL       MEAN
+      REAL       COUNT
+C
+      INCLUDE    'QUALITY_MASK'
+      INCLUDE    'DCV_FUN'
+C
+      DO J = STAPIX(3),ENDPIX(3)
+        DO I = STAPIX(2),ENDPIX(2)
+          COUNT = 0.0
+          MEAN = 0.0
+          DO K = STAPIX(1),ENDPIX(1)
+            IF (QUAL) THEN
+              IF ((QARRAY(K,I,J).AND.BADBITS) .EQ. Q_GOOD) THEN
+                IF (ERR) THEN
+                  COUNT = COUNT + 1.0 / DCV_<T>TOR(EARRAY(K,I,J))
+                  MEAN = MEAN+DCV_<T>TOR(ARRAY(K,I,J))/DCV_<T>TOR(EARRAY(K,I,J))
+                ELSE
+                  COUNT = COUNT + 1.0
+                  MEAN = MEAN + DCV_<T>TOR(ARRAY(K,I,J))
+                END IF
+              END IF
+            ELSE
+              IF (ERR) THEN
+                COUNT = COUNT + 1.0 / DCV_<T>TOR(EARRAY(K,I,J))
+                MEAN = MEAN + DCV_<T>TOR(ARRAY(K,I,J))/DCV_<T>TOR(EARRAY(K,I,J))
+              ELSE
+                COUNT = COUNT + 1.0
+                MEAN = MEAN + DCV_<T>TOR(ARRAY(K,I,J))
+              END IF
+            END IF
+          END DO
+          MEAN = MEAN / COUNT
+          MEANS(I,J) = DCV_RTO<T>(MEAN)
+        END DO
+      END DO 
+C
+      RETURN
+      END 
+
+*******************************************************************************
+
+      SUBROUTINE DEGAMMA_MEAN_<T>Q(ARRAY,NZ,NX,NY,STAPIX,ENDPIX,
+     :                             MEANS,ERR,EARRAY,MAGICVAL)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to compute the mean z value for every pixel. The means are
+C     computed as per usual, unless an error (variance) array exists, in which
+C     case the variances are used as weights.
+C     Magic value version.
+C
+C   Parameters:
+C     ARRAY      (> <TYPE> array)  3D Data array
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     STAPIX     (> INTEGER array) Start pixels of subset
+C     ENDPIX     (> INTEGER array) End pixels of subset
+C     MEANS      (< <TYPE> array)  2D array of mean values
+C     ERR        (> LOGICAL)       Error array existence flag
+C     EARRAY     (> <TYPE> array)  Error array
+C     MAGICVAL   (> TYPE)          Magic value
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     ARRAY(NZ,NX,NY),MEANS(NX,NY),
+     :           EARRAY(NZ,NX,NY),MAGICVAL
+      LOGICAL    ERR
+      INTEGER    STAPIX(6),ENDPIX(6)
+C
+      INTEGER    I,J,K
+      REAL       MEAN
+      REAL       COUNT
+C
+      INCLUDE    'DCV_FUN'
+C
+      DO J = STAPIX(3),ENDPIX(3)
+        DO I = STAPIX(2),ENDPIX(2)
+          COUNT = 0.0
+          MEAN = 0.0
+          DO K = STAPIX(1),ENDPIX(1)
+            IF (ARRAY(K,I,J) .GT. MAGICVAL) THEN
+              IF (ERR) THEN
+                COUNT = COUNT + 1.0 / DCV_<T>TOR(EARRAY(K,I,J))
+                MEAN = MEAN + DCV_<T>TOR(ARRAY(K,I,J))/DCV_<T>TOR(EARRAY(K,I,J))
+              ELSE
+                COUNT = COUNT + 1.0
+                MEAN = MEAN + DCV_<T>TOR(ARRAY(K,I,J))
+              END IF
+            END IF
+          END DO
+          MEAN = MEAN / COUNT
+          MEANS(I,J) = DCV_RTO<T>(MEAN)
+        END DO
+      END DO 
+C
+      RETURN
+      END 
+
+*******************************************************************************
+
+      SUBROUTINE DEGAMMA_SDEV_<T>(ARRAY,NZ,NX,NY,STAPIX,ENDPIX,
+     :                            MEANS,SDEVS,ERR,EARRAY,QUAL,QARRAY)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to compute the standard deviation of  z values for every 
+C     (x,y) pixel. These are computed as per usual, unless an error (variance) 
+C     array exists, in which case the variances are used as weights.
+C
+C   Parameters:
+C     ARRAY      (> <TYPE> array)  3D Data array
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     STAPIX     (> INTEGER array) Start pixels of subset
+C     ENDPIX     (> INTEGER array) End pixels of subset
+C     MEANS      (> <TYPE> array)  2D array of mean values
+C     SDEVS      (< <TYPE> array)  2D array of standard deviations
+C     ERR        (> LOGICAL)       Error array existence flag
+C     EARRAY     (> <TYPE> array)  Error array
+C     QUAL       (> LOGICAL)       Quality array existence flag
+C     QARRAY     (> BYTE array)    Quality array
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     ARRAY(NZ,NX,NY),MEANS(NX,NY),
+     :           SDEVS(NX,NY),EARRAY(NZ,NX,NY)
+      BYTE       QARRAY(NZ,NX,NY)
+      LOGICAL    ERR,QUAL
+      INTEGER    STAPIX(6),ENDPIX(6)
+C
+      INTEGER    I,J,K
+      REAL       SDEV
+      REAL       COUNT
+      REAL       MEAN,PIXEL
+      REAL       DEV2
+C
+      INCLUDE    'QUALITY_MASK'
+      INCLUDE    'DCV_FUN'
+C
+      DO J = STAPIX(3),ENDPIX(3)
+        DO I = STAPIX(2),ENDPIX(2)
+          COUNT = 0.0
+          SDEV = 0.0
+          MEAN = DCV_<T>TOR(MEANS(I,J))
+          DO K = STAPIX(1),ENDPIX(1)
+            PIXEL = DCV_<T>TOR(ARRAY(K,I,J))
+            DEV2 = (PIXEL-MEAN)**2
+            IF (QUAL) THEN
+              IF ((QARRAY(K,I,J).AND.BADBITS) .EQ. Q_GOOD) THEN
+                IF (ERR) THEN
+                  COUNT = COUNT + 1.0 / DCV_<T>TOR(EARRAY(K,I,J))
+                  SDEV = SDEV + DEV2 / DCV_<T>TOR(EARRAY(K,I,J))
+                ELSE
+                  COUNT = COUNT + 1.0
+                  SDEV = SDEV + DEV2
+                END IF
+              END IF
+            ELSE
+              IF (ERR) THEN
+                COUNT = COUNT + 1.0 / DCV_<T>TOR(EARRAY(K,I,J))
+                SDEV = SDEV + DEV2 / DCV_<T>TOR(EARRAY(K,I,J))
+              ELSE
+                COUNT = COUNT + 1.0
+                SDEV = SDEV + DEV2
+              END IF
+            END IF
+          END DO
+          SDEV = SQRT(SDEV) / COUNT
+          SDEVS(I,J) = DCV_RTO<T>(SDEV)
+        END DO
+      END DO 
+C
+      RETURN
+      END 
+
+*******************************************************************************
+
+      SUBROUTINE DEGAMMA_SDEV_<T>Q(ARRAY,NZ,NX,NY,STAPIX,ENDPIX,
+     :                             MEANS,SDEVS,ERR,EARRAY,MAGICVAL)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to compute the standard deviation of  z values for every 
+C     (x,y) pixel. These are computed as per usual, unless an error (variance) 
+C     array exists, in which case the variances are used as weights.
+C     Magic value version.
+C
+C   Parameters:
+C     ARRAY      (> <TYPE> array)  3D Data array
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     STAPIX     (> INTEGER array) Start pixels of subset
+C     ENDPIX     (> INTEGER array) End pixels of subset
+C     MEANS      (> <TYPE> array)  2D array of mean values
+C     SDEVS      (< <TYPE> array)  2D array of standard deviations
+C     ERR        (> LOGICAL)       Error array existence flag
+C     EARRAY     (> <TYPE> array)  Error array
+C     MAGICVAL   (> <TYPE>)        Magic value
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     ARRAY(NZ,NX,NY),MEANS(NX,NY),MAGICVAL,
+     :           SDEVS(NX,NY),EARRAY(NZ,NX,NY)
+      LOGICAL    ERR
+      INTEGER    STAPIX(6),ENDPIX(6)
+C
+      INTEGER    I,J,K
+      REAL       SDEV
+      REAL       COUNT
+      REAL       MEAN,PIXEL
+      REAL       DEV2
+C
+      INCLUDE    'DCV_FUN'
+C
+      DO J = STAPIX(3),ENDPIX(3)
+        DO I = STAPIX(2),ENDPIX(2)
+          COUNT = 0.0
+          SDEV = 0.0
+          MEAN = DCV_<T>TOR(MEANS(I,J))
+          DO K = STAPIX(1),ENDPIX(1)
+            IF (ARRAY(K,I,J) .GT. MAGICVAL) THEN
+              PIXEL = DCV_<T>TOR(ARRAY(K,I,J))
+              DEV2 = (PIXEL-MEAN)**2
+              IF (ERR) THEN
+                COUNT = COUNT + 1.0 / DCV_<T>TOR(EARRAY(K,I,J))
+                SDEV = SDEV + DEV2 / DCV_<T>TOR(EARRAY(K,I,J))
+              ELSE
+                COUNT = COUNT + 1.0
+                SDEV = SDEV + DEV2
+              END IF
+            END IF
+          END DO
+          SDEV = SQRT(SDEV) / COUNT
+          SDEVS(I,J) = DCV_RTO<T>(SDEV)
+        END DO
+      END DO 
+C
+      RETURN
+      END 
+
+
+*******************************************************************************
+
+      SUBROUTINE REPLACE_PIXEL_<T>3(NX,NY,NZ,PIXSTAT,PIXVAL,OARRAY,
+     :                             ERR,OEARRAY,ERRVAL,K,I,J,
+     :                             MEAN,SDEV,VERBOSE)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to change the value of a suspicious pixel either by
+C     (a) Replacing it with an interpolation of its neighbours, or
+C     (b) Replacing it with the mean pixel value for that (I,J).
+C     The latter course will be taken if there is insufficient data 
+C     for the former.
+C
+C   Parameters:
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     PIXSTAT(6) (> INTEGER array) A quality array for pixel neighbours 
+C     PIXVAL(6)  (> <TYPE> array)  Values of neighbours
+C     OARRAY     (! <TYPE> array)  3D Data array
+C     MEAN       (> <TYPE>)        Mean value for pixel
+C     SDEV       (> <TYPE>)        Standard deviation for pixel
+C     ERR        (> LOGICAL)       Error array existence flag
+C     OEARRAY    (> <TYPE> array)  Error array
+C     ERRVAL(6)  (> <TYPE> array)  Error values of neighbours
+C     K,I,J      (> INTEGERs)      Indices of pixel in question.
+C     MEAN       (> <TYPE>)        Mean pixel value
+C     SDEV       (> <TYPE>)        Standard deviation of pixel value.
+C     VERBOSE    (> LOGICAL)       Verbosity flag!
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ,PIXSTAT(6),I,J,K
+      <TYPE>     PIXVAL(6),OARRAY(NZ,NX,NY),OEARRAY(NZ,NX,NY),
+     :           MEAN,SDEV,ERRVAL(6)
+      LOGICAL    ERR,VERBOSE
+C
+      INTEGER    GOOD_PIXEL,BAD_PIXEL,EDGE_PIXEL
+      PARAMETER  (GOOD_PIXEL=0,BAD_PIXEL=1,EDGE_PIXEL=2)
+C
+      INTEGER     P
+      REAL        SUM,ESUM,COUNT,WEIGHT
+C
+      INCLUDE     'QUALITY_MASK'
+      INCLUDE     'DCV_FUN'
+C
+      SUM = 0.0
+      ESUM = 0.0
+      COUNT = 0.0
+      DO P = 1,6
+        IF (PIXSTAT(P) .EQ. GOOD_PIXEL) THEN
+          IF (ERR) THEN
+            WEIGHT = 1.0 / DCV_<T>TOR(ERRVAL(P))
+            ESUM = ESUM + WEIGHT
+          ELSE
+            WEIGHT = 1.0
+          END IF
+          SUM = SUM + PIXVAL(P)*WEIGHT
+          COUNT = COUNT + WEIGHT
+        END IF
+      END DO
+C
+      IF (COUNT .EQ. 0.0) THEN
+        OARRAY(K,I,J) = MEAN
+        IF (ERR) OEARRAY(K,I,J) = SDEV
+        IF (VERBOSE) CALL DEGAMMA_W_SUBMEAN(I,J,K)
+      ELSE
+        OARRAY(K,I,J) = DCV_RTO<T>(SUM / COUNT)
+        IF (ERR) OEARRAY(K,I,J) = DCV_RTO<T>(1.0 / ESUM)
+        IF (VERBOSE) CALL DEGAMMA_W_REPLACED(I,J,K)
+      END IF
+C
+      RETURN
+      END
+
+*******************************************************************************
+
+      SUBROUTINE GET_PIXEL_STATUS_<T>Q(NX,NY,NZ,MAGICVAL,ARRAY,
+     :                                 ERR,EARRAY,ERRVAL,
+     :                                 K,I,J,PIXSTAT,PIXVAL)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to get the values and status of a pixel's neighbours.
+C     Magic value version.
+C
+C   Parameters:
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     MAGICVAL   (> <TYPE>)        Guess what this is?
+C     ARRAY      (> <TYPE> array)  3D Data array
+C     ERR        (> LOGICAL)       Error array existence flag
+C     OEARRAY    (> <TYPE> array)  Error array
+C     ERRVAL(6)  (< <TYPE> array)  Error values of neighbours
+C     K,I,J      (> INTEGERs)      Indices of pixel in question.
+C     PIXSTAT(6) (< INTEGER array) See below
+C     PIXVAL(6)  (< <TYPE> array)  Values of neighbours
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     ARRAY(NZ,NX,NY),PIXVAL(6),
+     :           ERRVAL(6),EARRAY(NZ,NX,NY)
+      INTEGER    K,I,J,PIXSTAT(6)
+      LOGICAL    ERR
+*
+*     The PIXSTAT vector works as follows: each element represents the status
+*     of a neighbouring pixel -
+*         PIXSTAT(1) is the status of ARRAY(K-1,I,J)
+*         PIXSTAT(2) "   "    "    "  ARRAY(K+1,I,J)
+*         PIXSTAT(3) "   "    "    "  ARRAY(K,I-1,J)
+*         PIXSTAT(4) "   "    "    "  ARRAY(K,I+1,J)
+*         PIXSTAT(5) "   "    "    "  ARRAY(K,I,J-1)
+*         PIXSTAT(6) "   "    "    "  ARRAY(K,I,J+1)
+*     where by good status we mean isn't the magic value and/or isn't off the 
+*     edge of the array. The status values are as follows:
+*         GOOD_PIXEL means the pixel contains valid data.
+*         BAD_PIXEL  means the pixel has either non-zero quality or 
+*                    is equal to the magic value.
+*         EDGE_PIXEL means that the pixel lies beyond the array boundary.
+*
+      INTEGER    GOOD_PIXEL,BAD_PIXEL,EDGE_PIXEL
+      PARAMETER  (GOOD_PIXEL=0,BAD_PIXEL=1,EDGE_PIXEL=2)
+C
+      INTEGER    P
+C
+      DO P = 1,6
+        PIXSTAT(P) = GOOD_PIXEL
+      END DO
+C
+      IF (K .EQ. 1)  PIXSTAT(1) = EDGE_PIXEL
+      IF (K .EQ. NZ) PIXSTAT(2) = EDGE_PIXEL
+      IF (I .EQ. 1)  PIXSTAT(3) = EDGE_PIXEL
+      IF (I .EQ. NX) PIXSTAT(4) = EDGE_PIXEL
+      IF (J .EQ. 1)  PIXSTAT(5) = EDGE_PIXEL
+      IF (J .EQ. NY) PIXSTAT(6) = EDGE_PIXEL
+C
+      IF (PIXSTAT(1) .EQ. GOOD_PIXEL) THEN
+        IF (ARRAY(K-1,I,J) .LE. MAGICVAL) THEN
+          PIXSTAT(1)=BAD_PIXEL
+        ELSE
+          PIXVAL(1) = ARRAY(K-1,I,J)
+          IF(ERR) ERRVAL(1) = EARRAY(K-1,I,J)
+        END IF
+      END IF
+C
+      IF (PIXSTAT(2) .EQ. GOOD_PIXEL) THEN
+        IF (ARRAY(K+1,I,J) .LE. MAGICVAL) THEN
+          PIXSTAT(2)=BAD_PIXEL
+        ELSE
+          PIXVAL(2) = ARRAY(K+1,I,J)
+          IF(ERR) ERRVAL(2) = EARRAY(K+1,I,J)
+        END IF
+      END IF
+C
+      IF (PIXSTAT(3) .EQ. GOOD_PIXEL) THEN
+        IF (ARRAY(K,I-1,J) .LE. MAGICVAL) THEN
+          PIXSTAT(3)=BAD_PIXEL
+        ELSE
+          PIXVAL(3) = ARRAY(K,I-1,J)
+          IF(ERR) ERRVAL(3) = EARRAY(K,I-1,J)
+        END IF
+      END IF
+C
+      IF (PIXSTAT(4) .EQ. GOOD_PIXEL) THEN
+        IF (ARRAY(K,I+1,J) .LE. MAGICVAL) THEN
+          PIXSTAT(4)=BAD_PIXEL
+        ELSE
+          PIXVAL(4) = ARRAY(K,I+1,J)
+          IF(ERR) ERRVAL(4) = EARRAY(K,I+1,J)
+        END IF
+      END IF
+C
+      IF (PIXSTAT(5) .EQ. GOOD_PIXEL) THEN
+        IF (ARRAY(K,I,J-1) .LE. MAGICVAL) THEN
+          PIXSTAT(5)=BAD_PIXEL
+        ELSE
+          PIXVAL(5) = ARRAY(K,I,J-1)
+          IF(ERR) ERRVAL(5) = EARRAY(K,I,J-1)
+        END IF
+      END IF
+C
+      IF (PIXSTAT(6) .EQ. GOOD_PIXEL) THEN
+        IF (ARRAY(K,I,J+1) .LE. MAGICVAL) THEN
+          PIXSTAT(6)=BAD_PIXEL
+        ELSE
+          PIXVAL(6) = ARRAY(K,I,J+1)
+          IF(ERR) ERRVAL(6) = EARRAY(K,I,J+1)
+        END IF
+      END IF
+C
+      RETURN
+      END
+
+*******************************************************************************
+
+      SUBROUTINE GET_PIXEL_STATUS_<T>(NX,NY,NZ,QUAL,QARRAY,ARRAY,
+     :                                ERR,EARRAY,ERRVAL,
+     :                                K,I,J,PIXSTAT,PIXVAL)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to get the values and status of a pixel's neighbours.
+C
+C   Parameters:
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     QUAL       (> LOGICAL)       Quality array existence flag
+C     QARRAY     (> BYTE array)    Quality array
+C     ARRAY      (> <TYPE> array)  3D Data array
+C     ERR        (> LOGICAL)       Error array existence flag
+C     OEARRAY    (> <TYPE> array)  Error array
+C     ERRVAL(6)  (< <TYPE> array)  Error values of neighbours
+C     K,I,J      (> INTEGERs)      Indices of pixel in question.
+C     PIXSTAT(6) (< INTEGER array) See GET_PIXEL_STATUS_<T>Q
+C     PIXVAL(6)  (< <TYPE> array)  Values of neighbours
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      BYTE       QARRAY(NZ,NX,NY)
+      INTEGER    K,I,J,PIXSTAT(6)
+      <TYPE>     PIXVAL(6),ARRAY(NZ,NX,NY),EARRAY(NZ,NX,NY),ERRVAL(6)
+      LOGICAL    ERR,QUAL
+C
+C     See comments above for the _<t>q version.
+C
+      INTEGER    GOOD_PIXEL,BAD_PIXEL,EDGE_PIXEL
+      PARAMETER  (GOOD_PIXEL=0,BAD_PIXEL=1,EDGE_PIXEL=2)
+C
+      INCLUDE    'QUALITY_MASK'
+C
+      DO P = 1,6
+        PIXSTAT(P) = GOOD_PIXEL
+      END DO
+C
+      IF (K .EQ. 1)  PIXSTAT(1) = EDGE_PIXEL
+      IF (K .EQ. NZ) PIXSTAT(2) = EDGE_PIXEL
+      IF (I .EQ. 1)  PIXSTAT(3) = EDGE_PIXEL
+      IF (I .EQ. NX) PIXSTAT(4) = EDGE_PIXEL
+      IF (J .EQ. 1)  PIXSTAT(5) = EDGE_PIXEL
+      IF (J .EQ. NY) PIXSTAT(6) = EDGE_PIXEL
+C
+      IF (QUAL) THEN
+        IF (PIXSTAT(1) .EQ. GOOD_PIXEL) THEN
+          IF ((QARRAY(K-1,I,J).AND.BADBITS) .NE. Q_GOOD) THEN
+            PIXSTAT(1)=BAD_PIXEL
+          ELSE
+            PIXVAL(1) = ARRAY(K-1,I,J)
+            IF (ERR) ERRVAL(1) = EARRAY(K-1,I,J)
+          END IF
+        END IF
+C
+        IF (PIXSTAT(2) .EQ. GOOD_PIXEL) THEN
+          IF ((QARRAY(K+1,I,J).AND.BADBITS) .NE. Q_GOOD) THEN
+            PIXSTAT(2)=BAD_PIXEL
+          ELSE
+            PIXVAL(2) = ARRAY(K+1,I,J)
+            IF (ERR) ERRVAL(2) = EARRAY(K+1,I,J)
+          END IF
+        END IF
+C
+        IF (PIXSTAT(3) .EQ. GOOD_PIXEL) THEN
+          IF ((QARRAY(K,I-1,J).AND.BADBITS) .NE. Q_GOOD) THEN
+            PIXSTAT(3)=BAD_PIXEL
+          ELSE
+            PIXVAL(3) = ARRAY(K,I-1,J)
+            IF (ERR) ERRVAL(3) = EARRAY(K,I-1,J)
+          END IF
+        END IF
+C
+        IF (PIXSTAT(4) .EQ. GOOD_PIXEL) THEN
+          IF ((QARRAY(K,I+1,J).AND.BADBITS) .NE. Q_GOOD) THEN
+            PIXSTAT(4)=BAD_PIXEL
+          ELSE
+            PIXVAL(4) = ARRAY(K,I+1,J)
+            IF (ERR) ERRVAL(4) = EARRAY(K,I+1,J)
+          END IF
+        END IF
+C
+        IF (PIXSTAT(5) .EQ. GOOD_PIXEL) THEN
+          IF ((QARRAY(K,I,J-1).AND.BADBITS) .NE. Q_GOOD) THEN
+            PIXSTAT(5)=BAD_PIXEL
+          ELSE
+            PIXVAL(5) = ARRAY(K,I,J-1)
+            IF (ERR) ERRVAL(5) = EARRAY(K,I,J-1)
+          END IF
+        END IF
+C
+        IF (PIXSTAT(6) .EQ. GOOD_PIXEL) THEN
+          IF ((QARRAY(K,I,J+1).AND.BADBITS) .NE. Q_GOOD) THEN
+            PIXSTAT(6)=BAD_PIXEL
+          ELSE
+            PIXVAL(6) = ARRAY(K,I,J+1)
+            IF (ERR) ERRVAL(6) = EARRAY(K,I,J+1)
+          END IF
+        END IF
+
+      ELSE ! No quality array
+
+        IF (PIXSTAT(1) .EQ. GOOD_PIXEL) THEN
+          PIXVAL(1) = ARRAY(K-1,I,J)
+          IF (ERR) ERRVAL(1) = EARRAY(K-1,I,J)
+        END IF
+C
+        IF (PIXSTAT(2) .EQ. GOOD_PIXEL) THEN
+          PIXVAL(2) = ARRAY(K+1,I,J)
+          IF (ERR) ERRVAL(2) = EARRAY(K+1,I,J)
+        END IF
+C
+        IF (PIXSTAT(3) .EQ. GOOD_PIXEL) THEN
+          PIXVAL(3) = ARRAY(K,I-1,J)
+          IF (ERR) ERRVAL(3) = EARRAY(K,I-1,J)
+        END IF
+C
+        IF (PIXSTAT(4) .EQ. GOOD_PIXEL) THEN
+          PIXVAL(4) = ARRAY(K,I+1,J)
+          IF (ERR) ERRVAL(4) = EARRAY(K,I+1,J)
+        END IF
+C
+        IF (PIXSTAT(5) .EQ. GOOD_PIXEL) THEN
+          PIXVAL(5) = ARRAY(K,I,J-1)
+          IF (ERR) ERRVAL(5) = EARRAY(K,I,J-1)
+        END IF
+C
+        IF (PIXSTAT(6) .EQ. GOOD_PIXEL) THEN
+          PIXVAL(6) = ARRAY(K,I,J+1)
+          IF (ERR) ERRVAL(6) = EARRAY(K,I,J+1)
+        END IF
+
+      END IF
+
+      RETURN
+      END
+
+*******************************************************************************
+
+      SUBROUTINE DEGAMMA_FIND_<T>Q(NZ,NX,NY,STAPIX,ENDPIX,
+     :                             IARRAY,OARRAY,
+     :                             ERR,IEARRAY,OEARRAY,
+     :                             MEANS,SDEVS,
+     :                             MAGICVAL,
+     :                             NSD,FLAGBAD,NBADPIX,NGHBPIX,
+     :                             DOEDGE,TOL1,POSDEV,XYWEIGHT,
+     :                             VERBOSE)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to find and remove pixel values that don't seem to fit in with
+C     their environment.
+C     Magic value version.
+C
+C   Parameters:
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     STAPIX     (> INTEGER array) Start pixels of subset
+C     ENDPIX     (> INTEGER array) End pixels of subset
+C     IARRAY     (> <TYPE> array)  3D input data array
+C     OARRAY     (! <TYPE> array)  3D output data array
+C     ERR        (> LOGICAL)       Error array existence flag
+C     IEARRAY    (> <TYPE> array)  Input error array
+C     OEARRAY    (! <TYPE> array)  Output error array
+C     MEANS      (> <TYPE> array)  2D array of mean values
+C     SDEVS      (> <TYPE> array)  2D array of standard deviations
+C     MAGICVAL   (> <TYPE>)        Could it be...a magic value?
+C     NSD        (> INTEGER)       "Number of Standard Deviations" error bar
+C     FLAGBAD    (> LOGICAL)       What do we do with the drunken pixel?
+C     NBADPIX    (< INTEGER)       Number of dodgy pixels found.
+C     NGHBPIX    (> INTEGER)       No. of neighbouring pixels to find equal
+C     DOEDGE     (> LOGICAL)       Process edge pixels?
+C     TOL1       (> REAL)          Amount can pixels differ and still be equal.
+C     POSDEV     (> LOGICAL)       Only count positive deviations as suspect.
+C     XYWEIGHT   (> REAL)          Weighting factor for neighbouring xy pixels.
+C     VERBOSE    (> LOGICAL)       Talkativeness parameter.
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     IARRAY(NZ,NX,NY),OARRAY(NZ,NX,NY),
+     :           IEARRAY(NZ,NX,NY),OEARRAY(NZ,NX,NY),
+     :           MEANS(NX,NY),SDEVS(NX,NY),
+     :           MAGICVAL,PIXVAL(6),ERRVAL(6) 
+      INTEGER    NSD,NBADPIX,NGHBPIX,PIXSTAT(6)
+      INTEGER    STAPIX(6),ENDPIX(6)
+      LOGICAL    FLAGBAD,VERBOSE,DOEDGE,POSDEV
+      REAL       TOL1,XYWEIGHT
+C
+      INTEGER    GOOD_PIXEL,BAD_PIXEL,EDGE_PIXEL
+      PARAMETER  (GOOD_PIXEL=0,BAD_PIXEL=1,EDGE_PIXEL=2)
+C
+      INTEGER    I,J,K,P
+      <TYPE>     DELTA,MEAN,MAXD,TOL,PIXEL
+      REAL       OKPIX
+      LOGICAL    SUSPECT
+C
+      INCLUDE    'DCV_FUN'
+C
+      NBADPIX = 0
+      TOL = DCV_RTO<T>(TOL1)
+
+      IF (.NOT.DOEDGE) THEN
+        IF (STAPIX(1) .EQ. 1) STAPIX(1) = 2
+        IF (STAPIX(2) .EQ. 1) STAPIX(2) = 2
+        IF (STAPIX(3) .EQ. 1) STAPIX(3) = 2
+        IF (ENDPIX(1) .EQ. NZ) ENDPIX(1) = NZ-1
+        IF (ENDPIX(2) .EQ. NX) ENDPIX(2) = NX-1
+        IF (ENDPIX(3) .EQ. NY) ENDPIX(3) = NY-1
+      END IF  
+
+      DO J = STAPIX(3),ENDPIX(3)
+        DO I = STAPIX(2),ENDPIX(2)
+C
+          MEAN = MEANS(I,J)
+          MAXD = SDEVS(I,J)*NSD
+          DO K = STAPIX(1),ENDPIX(1)
+            PIXEL = IARRAY(K,I,J)
+            IF (PIXEL .GT. MAGICVAL) THEN  
+              DELTA = PIXEL-MEAN
+              IF (POSDEV) THEN
+                SUSPECT = (DELTA .GT. MAXD)
+              ELSE 
+                SUSPECT = (ABS(DELTA) .GT. MAXD)
+              END IF
+              IF (SUSPECT) THEN
+                CALL GET_PIXEL_STATUS_<T>Q(NX,NY,NZ,MAGICVAL,IARRAY,
+     :                                     ERR,IEARRAY,ERRVAL,
+     :                                     K,I,J,PIXSTAT,PIXVAL)
+                OKPIX = 0.0
+                DO P = 1,6
+                  IF (PIXSTAT(P) .EQ.  GOOD_PIXEL) THEN
+                    IF (ABS(PIXVAL(P)-PIXEL) .LE. TOL) THEN
+                      IF (P .LE. 2) THEN
+                        OKPIX = OKPIX + 1.0
+                      ELSE
+                        OKPIX = OKPIX + XYWEIGHT
+                      END IF
+                    END IF
+                  END IF
+                END DO
+                IF (DCV_RTOI(OKPIX) .LT. NGHBPIX) THEN
+                  NBADPIX = NBADPIX + 1
+                  IF (FLAGBAD) THEN
+                    OARRAY(K,I,J) = MAGICVAL
+                    IF (VERBOSE) CALL DEGAMMA_W_SETBAD(I,J,K)
+                  ELSE
+                    CALL REPLACE_PIXEL_<T>3(
+     :                           NX,NY,NZ,PIXSTAT,PIXVAL,OARRAY,
+     :                           ERR,OEARRAY,ERRVAL,K,I,J,
+     :                           MEAN,SDEVS(I,J),VERBOSE)
+                  END IF
+                END IF
+              END IF
+            END IF
+          END DO
+C
+        END DO
+      END DO
+      RETURN
+      END
+             
+*******************************************************************************
+
+      SUBROUTINE DEGAMMA_FIND_<T>(NZ,NX,NY,STAPIX,ENDPIX,
+     :                            IARRAY,OARRAY,
+     :                            ERR,IEARRAY,OEARRAY,
+     :                            MEANS,SDEVS,MAGICVAL,
+     :                            QUAL,IQARRAY,OQARRAY,
+     :                            NSD,FLAGBAD,NBADPIX,NGHBPIX,
+     :                            DOEDGE,TOL1,POSDEV,XYWEIGHT,
+     :                            VERBOSE)
+C------------------------------------------------------------------------------
+C   Description:
+C     Subroutine to find and remove pixel values that don't seem to fit in with
+C     their environment.
+C
+C   Parameters:
+C     NX         (> INTEGER)
+C     NY         (> INTEGER)       Actual dimensions of ARRAY
+C     NZ         (> INTEGER)
+C     STAPIX     (> INTEGER array) Start pixels of subset
+C     ENDPIX     (> INTEGER array) End pixels of subset
+C     IARRAY     (> <TYPE> array)  3D input data array
+C     OARRAY     (! <TYPE> array)  3D output data array
+C     ERR        (> LOGICAL)       Error array existence flag
+C     IEARRAY    (> <TYPE> array)  Input error array
+C     OEARRAY    (! <TYPE> array)  Output error array
+C     MEANS      (> <TYPE> array)  2D array of mean values
+C     SDEVS      (> <TYPE> array)  2D array of standard deviations
+C     MAGICVAL   (> <TYPE>)        Could it be...a magic value?
+C     QUAL       (> LOGICAL)       Quality array existence flag
+C     IQARRAY    (> BYTE array)    Input quality array
+C     OQARRAY    (! BYTE array)    Output quality array
+C     NSD        (> INTEGER)       "Number of Standard Deviations" error bar
+C     FLAGBAD    (> LOGICAL)       What do we do with the drunken pixel?
+C     NBADPIX    (< INTEGER)       Number of dodgy pixels found.
+C     NGHBPIX    (> INTEGER)       No. of neighbouring pixels to find equal
+C     DOEDGE     (> LOGICAL)       Process edge pixels?
+C     TOL1       (> REAL)          Amount can pixels differ and still be equal.
+C     POSDEV     (> LOGICAL)       Count only positive deviations as unusual.
+C     XYWEIGHT   (> REAL)          Weighting for xy neighbouring pixels
+C     VERBOSE    (> LOGICAL)       Talkativeness parameter.
+C------------------------------------------------------------------------------
+      INTEGER    NX,NY,NZ
+      <TYPE>     IARRAY(NZ,NX,NY),OARRAY(NZ,NX,NY),
+     :           IEARRAY(NZ,NX,NY),OEARRAY(NZ,NX,NY),
+     :           MEANS(NX,NY),SDEVS(NX,NY),
+     :           MAGICVAL,PIXVAL(6),ERRVAL(6)
+      BYTE       IQARRAY(NZ,NX,NY),OQARRAY(NZ,NX,NY) 
+      INTEGER    NSD,NBADPIX,NGHBPIX,PIXSTAT(6)
+      LOGICAL    FLAGBAD,VERBOSE,DOEDGE,ERR,QUAL,POSDEV
+      REAL       TOL1
+      INTEGER    STAPIX(6),ENDPIX(6)
+C
+      INTEGER    GOOD_PIXEL,BAD_PIXEL,EDGE_PIXEL
+      PARAMETER  (GOOD_PIXEL=0,BAD_PIXEL=1,EDGE_PIXEL=2)
+C
+      INTEGER    I,J,K,P
+      <TYPE>     DELTA,MEAN,MAXD,TOL,PIXEL
+      REAL       OKPIX,XYWEIGHT
+      LOGICAL    SUSPECT
+C
+      INCLUDE    'QUALITY_MASK'
+      INCLUDE    'DCV_FUN'
+C
+      NBADPIX = 0
+      TOL = DCV_RTO<T>(TOL1)
+
+      IF (.NOT.DOEDGE) THEN
+        IF (STAPIX(1) .EQ. 1) STAPIX(1) = 2
+        IF (STAPIX(2) .EQ. 1) STAPIX(2) = 2
+        IF (STAPIX(3) .EQ. 1) STAPIX(3) = 2
+        IF (ENDPIX(1) .EQ. NZ) ENDPIX(1) = NZ-1
+        IF (ENDPIX(2) .EQ. NX) ENDPIX(2) = NX-1
+        IF (ENDPIX(3) .EQ. NY) ENDPIX(3) = NY-1
+      END IF  
+
+      DO J = STAPIX(3),ENDPIX(3)
+        DO I = STAPIX(2),ENDPIX(2)
+C
+          MEAN = MEANS(I,J)
+          MAXD = SDEVS(I,J)*NSD
+          DO K = STAPIX(1),ENDPIX(1)
+C
+            IF (QUAL) THEN
+              IF ((IQARRAY(K,I,J).AND.BADBITS) .EQ. Q_GOOD) THEN
+                PIXEL = IARRAY(K,I,J)
+                DELTA = PIXEL-MEAN
+                IF (POSDEV) THEN
+                  SUSPECT = (DELTA .GT. MAXD)
+                ELSE
+                  SUSPECT = (ABS(DELTA) .GT. MAXD)
+                END IF
+                IF (SUSPECT) THEN
+                  CALL GET_PIXEL_STATUS_<T>(NX,NY,NZ,QUAL,IQARRAY,
+     :                                      IARRAY,ERR,IEARRAY,ERRVAL,
+     :                                      K,I,J,PIXSTAT,PIXVAL)
+                  OKPIX = 0.0
+                  DO P = 1,6
+                    IF (PIXSTAT(P) .EQ.  GOOD_PIXEL) THEN
+                      IF (ABS(PIXVAL(P)-PIXEL) .LE. TOL) THEN
+                        IF (P .LE. 2) THEN
+                          OKPIX = OKPIX + 1.0
+                        ELSE
+                          OKPIX = OKPIX + XYWEIGHT
+                        END IF
+                      END IF
+                    END IF
+                  END DO
+                  IF (OKPIX .LT. NGHBPIX) THEN
+                    NBADPIX = NBADPIX + 1
+                    IF (FLAGBAD) THEN
+                      OQARRAY(K,I,J) = Q_BAD
+                      IF (VERBOSE) CALL DEGAMMA_W_SETBAD(I,J,K)
+                    ELSE
+                      CALL REPLACE_PIXEL_<T>3(
+     :                             NX,NY,NZ,PIXSTAT,PIXVAL,OARRAY,
+     :                             ERR,OEARRAY,ERRVAL,K,I,J,
+     :                             MEAN,SDEVS(I,J),VERBOSE)
+                    END IF
+                  END IF
+                END IF
+              END IF
+            ELSE
+              PIXEL = IARRAY(K,I,J)
+              DELTA = PIXEL-MEAN
+              IF (POSDEV) THEN
+                SUSPECT = (DELTA .GT. MAXD)
+              ELSE
+                SUSPECT = (ABS(DELTA) .GT. MAXD)
+              END IF
+              IF (SUSPECT) THEN
+                CALL GET_PIXEL_STATUS_<T>(NX,NY,NZ,QUAL,IQARRAY,
+     :                                    IARRAY,ERR,IEARRAY,ERRVAL,
+     :                                    K,I,J,PIXSTAT,PIXVAL)
+                OKPIX = 0
+                DO P = 1,6
+                  IF (PIXSTAT(P) .EQ.  GOOD_PIXEL) THEN
+                    IF (ABS(PIXVAL(P)-PIXEL) .LE. TOL) OKPIX=OKPIX+1
+                  END IF
+                END DO
+                IF (OKPIX .LT. NGHBPIX) THEN
+                  NBADPIX = NBADPIX + 1
+                  IF (FLAGBAD) THEN
+                    OARRAY(K,I,J) = MAGICVAL
+                    IF (VERBOSE) CALL DEGAMMA_W_SETBAD(I,J,K)
+                  ELSE
+                    CALL REPLACE_PIXEL_<T>3(
+     :                           NX,NY,NZ,PIXSTAT,PIXVAL,OARRAY,
+     :                           ERR,OEARRAY,ERRVAL,K,I,J,
+     :                           MEAN,SDEVS(I,J),VERBOSE)
+                  END IF
+                END IF
+              END IF
+            END IF
+C
+          END DO
+C
+          END DO
+        END DO
+      RETURN
+      END
+

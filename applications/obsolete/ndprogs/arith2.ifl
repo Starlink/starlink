@@ -1,0 +1,106 @@
+#+
+#  Name:
+#     ARITH2.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-NOV-1994 (GJP):
+#        Original version.
+#     26-NOV-1994 (BLY):
+#        Help added.
+#     {enter_changes_here}
+
+#-
+
+   interface ARITH2
+
+      parameter  IMAGE
+         type   'literal'
+         prompt  '(IMAGE) Name of first input image'
+         association '<->global.image'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the first image you wish to process.' 
+      endparameter
+
+      parameter  IMAGE1
+         type   'literal'
+         prompt  '(IMAGE1) Name of second input image'
+         association '<->global.image1'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the second image you wish to process.' 
+      endparameter
+
+      parameter  WHOLE
+         type   '_logical'                                              
+         prompt  '(WHOLE) Process the whole image?'
+         association '<->global.whole'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If WHOLE is specified, the entire image will be processed.'
+      endparameter
+
+      parameter  START
+         type   '_real'
+         prompt  '(START) Start coordinates of subset.'
+         association '<->global.start'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'START is an array containing the start coords of the subset.'
+      endparameter
+
+      parameter  END
+         type   '_real'
+         prompt  '(END) End coordinates of subset.'
+         association '<->global.end'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'END is an array containing the end coords of the subset.'
+      endparameter
+
+      parameter  OPER
+         type    '_CHAR'
+         prompt  '(OPER) +, -, *, /, **'
+         association '<->global.oper'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter arithmetic option: +,-,*,/ or **.'
+      endparameter
+ 
+      parameter  OUTPUT
+         type   'literal'
+         prompt  '(OUTPUT) Name of output image'
+         association '<->global.output'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the name of the resulting processed image.'
+      endparameter
+
+      parameter  ERR_ACT
+         type    '_char'
+         prompt  '(ERR_ACT) (R)eplace void values or (L)eave'
+         association '<->global.err_act'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'If you wish to replace void values in the error array, type R.' 
+      endparameter
+
+      parameter  ERR_VAL
+         type    '_real'
+         prompt  '(ERR_VAL) Value to replace void errors with'
+         association '<->global.err_val'
+         ppath 'global,dynamic,current,default'
+         vpath 'prompt'
+         help  'Enter the value you wish void errors to be replaced with.'
+      endparameter
+
+   endinterface
+

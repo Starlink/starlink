@@ -1,0 +1,69 @@
+      subroutine ndp_error_arith_<t>(op,data1,data2,err1,err2,res)
+c
+c   This subroutine serves the arithmetic programs in NDPROGS. It computes
+c   the error when two arrays (with respective error arrays) are combined.
+c
+c   Author(s):
+c   ----------
+c   Julian Gold      RGO     CAVAD::GOLDJIL or GOLDJIL@UK.AC.CAM.AST-STAR
+c
+c   History.
+c   --------
+c   14-OCT-1991      Original version
+c   27-NOV-1992      Unix version. 
+c   Arguments
+c   ---------
+c
+c   op        (> char)       One of +,-,*,/,^ ; the arithmetic operation
+c   data1     (> TYPE)       First data value
+c   data2     (> TYPE)       Second data value
+c   err1      (> TYPE)       Error value for data1
+c   err2      (> TYPE)         "     "    "  data2
+c   res       (< TYPE)       Result 
+c
+c   Author
+c   ------
+c
+c   Julian Gold, RGO, 31st July 1991
+c
+      character      op
+      <type>         data1,data2
+      <type>         err1,err2
+      <type>         res
+c
+      real           error,e1,e2              ! Temporary error variables
+      real           d1,d2                    ! Temporary data variables
+c
+      include 'DCV_FUN'
+c
+      if ((op .eq. '+') .or. (op .eq. '-')) then
+        e1 = dcv_<t>tor(err1)
+        e2 = dcv_<t>tor(err2)
+        error = sqrt(e1*e1+e2*e2)
+        res = dcv_rto<t>(error)
+      else if (op .eq. '*') then
+        e1 = dcv_<t>tor(err1)
+        e2 = dcv_<t>tor(err2)
+        d1 = dcv_<t>tor(data1)
+        d2 = dcv_<t>tor(data2)
+        error = d1*d2*sqrt((e1/d1)**2+(e2/d2)**2)
+        res = dcv_rto<t>(error)
+      else if (op .eq. '/') then
+        e1 = dcv_<t>tor(err1)
+        e2 = dcv_<t>tor(err2)
+        d1 = dcv_<t>tor(data1)
+        d2 = dcv_<t>tor(data2)
+        error = d1/d2*sqrt((e1/d1)**2+(e2/d2)**2)
+        res = dcv_rto<t>(error)
+      else if (op .eq. '^') then
+        e1 = dcv_<t>tor(err1)
+        d1 = dcv_<t>tor(data1)
+        d2 = dcv_<t>tor(data2)
+        error = d2*(d1**(d2-1.0))*e1
+        res = dcv_rto<t>(error)
+      else 
+        call dsa_wruser('\n'//op//' is not a valid arithmetic')
+        call dsa_wruser(' operator - specify +,-,* ,/ or ^.\n')
+      end if
+      return
+      end
