@@ -139,10 +139,13 @@ itcl::class gaia::GaiaContour {
 
       #  Add an option to plot carefully, or not.
       $Options add checkbutton \
-         -label {Draw contours using geodesics (slow, but precise)} \
+         -label {Draw contours using geodesics} \
          -variable [scope careful_] \
          -onvalue 1 \
          -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Draw contours using geodesics} \
+         {Use for complex astrometries (slow but precise)}
 
       #  Add an option to plot smooth polyline.
       $Options add checkbutton \
@@ -150,6 +153,29 @@ itcl::class gaia::GaiaContour {
          -variable [scope smooth_] \
          -onvalue 1 \
          -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Draw smooth contours} \
+         {Use splines to join adjacent contour points}
+
+      #  Add an option to use same colour for all lines.
+      $Options add checkbutton \
+         -label {Use single colour} \
+         -variable [scope single_colour_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Use single colour} \
+         {Draw all contours with the same colour}
+
+      #  Add an option to use same width for all lines.
+      $Options add checkbutton \
+         -label {Use single width} \
+         -variable [scope single_width_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Use single width} \
+         {Draw all contours with the same width}
 
       #  Allow selection of the contoured image.
       add_image_controls_
@@ -1102,16 +1128,36 @@ itcl::class gaia::GaiaContour {
       $itk_component(tab) select 0
    }
 
-   #  Set the colour of a contour (if it is drawn).
+   #  Set the colour of a contour (if it is drawn), or all contours if
+   #  using a single colour.
    protected method set_colour_ {index} {
       set colour [$itk_component(colour$index) get]
-      $itk_option(-canvas) itemconfigure $leveltags_($index) -fill $colour
+      if { $single_colour_ } {
+         for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+            if { $i != $index } {
+               $itk_component(colour$i) configure -value $colour
+            }
+            $itk_option(-canvas) itemconfigure $leveltags_($i) -fill $colour
+         }
+      } else {
+         $itk_option(-canvas) itemconfigure $leveltags_($index) -fill $colour
+      }
    }
 
-   #  Set the width of a contour (if it is drawn).
+   #  Set the width of a contour (if it is drawn), or all contours if
+   #  using a single width.
    protected method set_width_ {index} {
       set width [$itk_component(width$index) get]
-      $itk_option(-canvas) itemconfigure $leveltags_($index) -width $width
+      if { $single_width_ } {
+         for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+            if { $i != $index } {
+               $itk_component(width$i) configure -value $width
+            }
+            $itk_option(-canvas) itemconfigure $leveltags_($i) -width $width
+         }
+      } else {
+         $itk_option(-canvas) itemconfigure $leveltags_($index) -width $width
+      }
 
       #  Text of key is special case, keep width 0.
       $itk_option(-canvas) itemconfigure $texttag_ -width 0
@@ -1617,6 +1663,12 @@ itcl::class gaia::GaiaContour {
 
    #  Name of rtdimage used to access external files.
    protected variable image_rtd_ {}
+
+   #  Whether to use a single colour for all lines.
+   protected variable single_colour_ 0
+
+   #  Whether to use a single width for all lines.
+   protected variable single_width_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

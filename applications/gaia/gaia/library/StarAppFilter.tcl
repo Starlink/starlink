@@ -96,34 +96,34 @@ itcl::class gaia::StarAppFilter {
    #  Constructor:
    #  ------------
    constructor {rtdwidget args} {
-       global env gaia_dir
-
-       #  Record the name of the Gaia widget.
-       set rtdwidget_ $rtdwidget
-
-       #  Evaluate any configuration options.
-       eval configure $args
-
-       #  Look for the gaFilter files. First in gaia_dir and then
-       #  in the HOME directory.
-       if { [file readable $gaia_dir/.gaFilters] } {
-	   if { ![catch {set ios [open $gaia_dir/.gaFilters]}] } {
-	       process_filters_ $ios
-	       close $ios
-	   }
+      global env gaia_dir
+      
+      #  Record the name of the Gaia widget.
+      set rtdwidget_ $rtdwidget
+      
+      #  Evaluate any configuration options.
+      eval configure $args
+      
+      #  Look for the gaFilter files. First in gaia_dir and then
+      #  in the HOME directory.
+      if { [file readable $gaia_dir/.gaFilters] } {
+         if { ![catch {set ios [open $gaia_dir/.gaFilters]}] } {
+            process_filters_ $ios
+            close $ios
+         }
+      }
+      if { [file readable $env(HOME)/.gaFilters] } {
+         if { ![catch {set ios [open $env(HOME)/.gaFilters]}] } {
+            process_filters $ios
+            close $ios
+         }
        }
-       if { [file readable $env(HOME)/.gaFilters] } {
-	   if { ![catch {set ios [open $env(HOME)/.gaFilters]}] } {
-	       process_filters $ios
-	       close $ios
-	   }
-       }
-
-       # Check that we have some filters and create the menu to run
-       # them if so.
-       add_menu
+      
+      # Check that we have some filters and create the menu to run
+      # them if so.
+      add_menu
    }
-
+   
    #  Destructor:
    #  -----------
    destructor  {
@@ -138,37 +138,37 @@ itcl::class gaia::StarAppFilter {
    #  is interpreted as an input list then quickly stored away (before
    #  things get difficult).
    private method process_filters_ {ios} {
-       set nf 0
-       set whole ""
-       while { [lgets $ios line] >= 0 } {
-	   set newf [llength $line]
-	   append whole $line
-	   for { set i 0 } { $i < $newf } { incr i } {
-	       incr nf
-	       set newinfo($nf) [lindex $line $i]
-	   }
-	   if { $nf > 0 } {
-	       if { $newinfo($nf) == "\\" || $newinfo($nf) == "" } {
-		   incr nf -1
-	       } else {
-		   # Should have a complete description. Just check
-		   # number of elements and store it.
-		   if { $nf == 6 } {
-		       set info_($nf_,replace) $newinfo(2)
-		       set info_($nf_,binary) $newinfo(3)
-		       set info_($nf_,qualifier) $newinfo(4)
-		       set info_($nf_,output) $newinfo(5)
-		       set info_($nf_,label) $newinfo(6)
-		       incr nf_
-		   } else {
-		       error_dialog "Cannot interpret \"$whole\" as \
-                                    a possible filter description"
-		   }
-		   set nf 0
-		   set whole ""
-	       }
-	   }
-       }
+      set nf 0
+      set whole ""
+      while { [gets $ios line] >= 0 } {
+         set newf [llength $line]
+         append whole $line
+         for { set i 0 } { $i < $newf } { incr i } {
+            incr nf
+            set newinfo($nf) [lindex $line $i]
+         }
+         if { $nf > 0 } {
+            if { $newinfo($nf) == "\\" || $newinfo($nf) == "" } {
+               incr nf -1
+            } else {
+               # Should have a complete description. Just check
+               # number of elements and store it.
+               if { $nf == 6 } {
+                  set info_($nf_,replace) $newinfo(2)
+                  set info_($nf_,binary) $newinfo(3)
+                  set info_($nf_,qualifier) $newinfo(4)
+                  set info_($nf_,output) $newinfo(5)
+                  set info_($nf_,label) $newinfo(6)
+                  incr nf_
+               } else {
+                  error_dialog "Cannot interpret \"$whole\" as \
+                                a possible filter description"
+               }
+               set nf 0
+               set whole ""
+            }
+         }
+      }
    }
 
    #  Create the menu for the list of filters.
@@ -189,7 +189,7 @@ itcl::class gaia::StarAppFilter {
          if { ! [info exists info_($id,app)] } {
             global env
             set app [subst $info_($id,binary)]
-            set info_($id,app) [StarApp \#auto -application \
+            set info_($id,app) [GaiaApp \#auto -application \
                                    "$app" -show_output 0 \
                                    -notify [code $this completed $id]]
          }

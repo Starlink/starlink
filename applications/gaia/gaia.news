@@ -89,3 +89,13 @@
          should be fixed.
 
          Pan window should now work with very thin images (1 pixel wide).
+
+         FITS file with more than one period in name can now be displayed
+         by GAIA. However, some toolboxes are effectively disabled by this.
+
+         Autocuts modified to not use the DATAMIN and DATAMAX keywords
+         and to fix a bug when scaling zoomed images abutted to the top-edge.
+
+         Contour toolbox now has new options to use a single colour and/or
+         width for all lines.
+

@@ -129,3 +129,22 @@ The file types output by the toolbox are restricted to the following:
 
 All these can be restored by reading back as local catalogues.
 
+
+   --- Read back a catalogue:
+
+To read back a catalogue and display it as a series of detection
+ellipses you need to use the "Read old catalogue..." item in the
+"File" menu. 
+
+You can also read back catalogues as using the "Data-Servers" - "Local
+Catalogues" item on the main window. However it is unlikely that
+you'll get suitable ellipses drawn. 
+
+
+   --- Change the colour of the ellipses:
+
+The "Options" - "Set Plot Symbols..." item in the catalogue window
+creates a dialog window in which you can define many things about the
+properties of any shapes that are drawn (these are Tcl expressions of
+the column names). To change the colour just choose a new one and
+apply it.

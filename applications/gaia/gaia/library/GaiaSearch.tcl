@@ -182,7 +182,9 @@ itcl::class gaia::GaiaSearch {
       pack $itk_component(searchopts) -side top -fill x
    }
 
-   #  Set the maximum number of objects.
+   #  Set the maximum number of objects. Returns 1 if succeeded, -1 if
+   #  feature not available (no searches) and 0 if failed (usually sign
+   #  that interface is busy creating itself).
    public method set_maxobjs {value} {
       if { [info exists searchopts_] && [winfo exists $searchopts_] } {
          return [$searchopts_ set_maxobjs $value]

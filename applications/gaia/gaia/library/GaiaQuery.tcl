@@ -52,6 +52,9 @@
 #        Original version.
 #     21-AUG-2000 (PWD):
 #        Added origin corrections to image center.
+#     21-MAR-2001 (PWD):
+#        Changed set_maxobjs to return -1 when feature is not
+#        available (no search facilities).
 #     {enter_further_changes_here}
 
 #-
@@ -68,14 +71,14 @@ itcl::class gaia::GaiaQuery {
       eval itk_initialize $args
    }
    
-   #  Method to set the maximum number of objects allowed. Returns 0
-   #  if we couldn't do request.
+   #  Method to set the maximum number of objects allowed. Returns -1
+   #  if we couldn't do request, because not relevant to interface.
    public method set_maxobjs {value} {
       if { [info exists maxnum_] && [winfo exists $maxnum_] } { 
          $maxnum_ configure -value $value
          return 1
       }
-      return 0
+      return -1
    }
 
    #  Override the set_from_image and get_image_center_radius method

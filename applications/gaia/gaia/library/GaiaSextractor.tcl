@@ -62,10 +62,10 @@
 #     25-MAY-1999 (PWD):
 #        Updated for 2.0.19. Added BACK_TYPE, BACK_VALUE and THRESH_TYPE.
 #     22-MAY-2000 (PWD):
-#        Added RAD_TYPE and RAD_THRESH changes. Includes plotting of 
+#        Added RAD_TYPE and RAD_THRESH changes. Includes plotting of
 #        RAD0 through RAD15 circles.
 #     30-MAY-2000 (PWD):
-#        Added -textvaribles to all entry related fields, this 
+#        Added -textvaribles to all entry related fields, this
 #        ends need to press <return>.
 #     {enter_further_changes_here}
 
@@ -116,6 +116,17 @@ itcl::class gaia::GaiaSextractor {
       bind $w_ <Control-n> [code $this clone_me_]
       $short_help_win_ add_menu_short_help $File \
          {New window} {Create a new toolbox}
+
+      #  Read a previous catalogue, performing the appropriate actions
+      #  to display ellipses. etc.
+      $File add command \
+         -label {Read old catalogue...} \
+         -command [code $this read_old_catalogue] \
+         -accelerator {Control-o}
+      bind $w_ <Control-o> [code $this read_old_catalogue]
+      $short_help_win_ add_menu_short_help $File \
+         {Read old catalogue...}\
+         {Re-read an old catalogue, displaying detection ellipses}
 
       #  Save config parameters to a file.
       $File add command \
@@ -1758,7 +1769,7 @@ itcl::class gaia::GaiaSextractor {
          add_short_help $butt "$desc"
          #  Need to make geometries up to date, otherwise a user define
          #  BorderWidth property seems to leave all widgets size 1.
-         update idletasks 
+         update idletasks
       }
 
       #  Toggle ellipse drawing parameters.
@@ -2123,7 +2134,7 @@ itcl::class gaia::GaiaSextractor {
 	    }
 
             #  And run the application as required. Note NDFs cannot
-            #  be processed by native version, nor can FITS not stored 
+            #  be processed by native version, nor can FITS not stored
             #  in the primary extension.
             if { $native && [native_ok_] } {
                busy {
@@ -2225,6 +2236,92 @@ itcl::class gaia::GaiaSextractor {
       }
    }
 
+   #  Restore an old catalogue, displaying the detection ellipses.
+   public method read_old_catalogue {} {
+      set w [FileSelect .\#auto -title "Read existing compatible catalogue"]
+      if {[$w activate]} {
+         set catalogue [$w get]
+         if { ! [file readable $catalogue] } {
+            return
+         }
+
+         #  Before we can display this catalogue we need to match the
+         #  columns that it has.
+         set astrocat [astrocat $w_.cat]
+         if { ! [catch "$astrocat entry get $catalogue"] } {
+            #  Catalogue already known, remove as may not match setup.
+            $astrocat entry remove $catalogue
+         }
+         create_entry_ $astrocat $catalogue
+         $astrocat open $catalogue
+
+         #  Reset all known columns
+         foreach {param desc} $columnnames_ {
+            set columns_($this,$param) 0
+         }
+
+         #  Now get the actual columns in this catalogue and switch them on.
+         foreach param [$astrocat headings] {
+            set columns_($this,$param) 1
+         }
+         $astrocat delete
+
+         #  Check that we can display the required symbols.
+         if { $values_($this,draw_kron_ellipses) } {
+            set n 0
+            set i 0
+            foreach param "$safecols_ $commoncols_ $kroncols_" {
+               if { [info exists columns_($this,$param)] && 
+                    $columns_($this,$param) } {
+                  incr i
+               }
+               incr n
+            }
+            if { $i != $n } {
+               set values_($this,draw_kron_ellipses) 0
+               toggle_draw_kron_ellipses_
+               warning_dialog "Cannot draw kron ellipses (wrong columns available)"
+            }
+         }
+         if { $values_($this,draw_iso_ellipses) } {
+            set n 0
+            set i 0
+            foreach param "$safecols_ $commoncols_ $isocols_" {
+               if { [info exists columns_($this,$param)] &&
+                    $columns_($this,$param) } {
+                  incr i
+               }
+               incr n
+            }
+            if { $i != $n } {
+               set values_($this,draw_iso_ellipses) 0
+               toggle_draw_iso_ellipses_
+               warning_dialog "Cannot draw isophotal ellipses (wrong columns available)"
+            }
+         }
+         if { $values_($this,draw_circles) } {
+            set n 0
+            set i 0
+            foreach param "$safecols_" {
+               if { [info exists columns_($this,$param)] &&
+                    $columns_($this,$param) } {
+                  incr i
+               }
+               incr n
+            }
+            if { $i != $n } {
+               set values_($this,draw_iso_ellipses) 0
+               toggle_draw_circles_
+               warning_dialog "Cannot draw detection circles (wrong columns available)"
+            }
+         }
+
+         #  And display the catalogue as per normal.
+         display_cat $catalogue
+      }
+      destroy $w
+   }
+
    #  Display a named catalogue in the local catalogue window that is
    #  controlled by this instance.
    public method display_cat {catalogue} {
@@ -2237,7 +2334,7 @@ itcl::class gaia::GaiaSextractor {
       #  so. If already done then just update the coordinate columns
       #  to reflect the current usage.
       set astrocat [astrocat $w_.cat]
-      if { [catch "$astrocat entry get $catalogue"] } {
+      if { [catch "$astrocat entry get $catalogue" msg] } {
          create_entry_ $astrocat $catalogue
       } else {
          #  Catalogue already known. If also already created by this
@@ -2265,6 +2362,7 @@ itcl::class gaia::GaiaSextractor {
             }
             set hadpix [$catwin ispix]
             set hadwcs [$catwin iswcs]
+
             if { $hadwcs && $havwcs } {
                set die 0
             } else {
@@ -2310,13 +2408,19 @@ itcl::class gaia::GaiaSextractor {
          set ncol -1
       }
       foreach "id name" "X_WORLD ra Y_WORLD dec X_IMAGE x Y_IMAGE y" {
-         if { [info exists columns_($this,$id)] && $columns_($this,$id) } {
-            incr ncol
-            $astrocat entry update [list "${name}_col $ncol"] $catalogue
-         } else {
-            $astrocat entry update [list "${name}_col -1"] $catalogue
-         }
+         catch {
+            if { [info exists columns_($this,$id)] && $columns_($this,$id) } {
+               incr ncol
+               $astrocat entry update [list "${name}_col $ncol"] $catalogue
+            } else {
+               $astrocat entry update [list "${name}_col -1"] $catalogue
+            }
+         } msg
       }
+      catch {
+         set equinox [$itk_option(-rtdimage) astget equinox]
+         $astrocat entry update [list "equinox $equinox"] $catalogue
+      } msg
       $astrocat delete
 
       #  Now open the catalogue window.
@@ -2478,7 +2582,7 @@ itcl::class gaia::GaiaSextractor {
       if { "[string index $name 0]" != "/"} {
          set fname [pwd]/$name
       } else {
-         set fname $catalogue
+         set fname $name
       }
       return $fname
    }
