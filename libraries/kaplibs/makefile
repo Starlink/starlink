@@ -459,11 +459,10 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
-KPG_PRIVATE_INCLUDES = kpg_par ctm_com
-GRF_PRIVATE_INCLUDES = grf.h
+KPG_PRIVATE_INCLUDES = kpg_par ctm_com grf.h
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
-                   $(KPG_PRIVATE_INCLUDES) $(GRF_PRIVATE_INCLUDES) 
+                   $(KPG_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -661,10 +660,9 @@ IRA_C_ROUTINES =
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
-KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c 
-GRF_C_ROUTINES = grf_kaplibs.c
+KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c grf_kaplibs.c
 C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
-             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) $(GRF_C_ROUTINES) 
+             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) 
 
 #  The facility error file.
 
@@ -704,7 +702,7 @@ LICENCE = $(PACK_NAME)_CONDITIONS
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
-$(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS) $(GRF_OBJECT_FILES)
+$(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS) 
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -813,7 +811,7 @@ $(AIF_F_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in aif_source.tar; exit 1; fi
 
-$(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS) $(GRF_C_ROUTINES) $(GRF_PRIVATE_INCLUDES):
+$(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in $(PKG_NAME)_source.tar; exit 1; fi
@@ -847,8 +845,6 @@ CTG_OBJECT_FILES = $(CTG_F_ROUTINES:.f=.o) \
 
 KPG_OBJECT_FILES = $(KPG_F_ROUTINES:.f=.o) $(KPG_BLOCK_DATA:.f=.o) \
                   $(KPG_PLATFORM_F:.f=.o) $(KPG_C_ROUTINES:.c=.o)
-
-GRF_OBJECT_FILES = $(GRF_C_ROUTINES:.c=.o)
 
 LPG_OBJECT_FILES = $(LPG_BLOCK_DATA:.f=.o) $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
@@ -1139,16 +1135,6 @@ install:
            else :; fi;\
         done
 #
-#  Install the object modules, giving them world read permission.
-	for f in $(GRF_OBJECT_FILES) ""; do \
-           if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_LIB);\
-              chmod 644 $(INSTALL_LIB)/$$f;\
-              rm -f $$f;\
-              $(LINK) $(INSTALL_LIB)/$$f $$f;\
-           else :; fi;\
-        done
-#
 #  Install shareable libraries, giving them read permission (unless
 #  they are dummy, zero size, files in which case they are left in
 #  place).
@@ -1290,15 +1276,6 @@ do_deinstall:
 #
 #  Deinstall the object libraries, if installed versions exist.
 	- for f in $(OBJECT_LIBRARIES) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_LIB)/$$f; then \
-              rm -f $$f;\
-              cp -p $(INSTALL_LIB)/$$f .;\
-              rm -f $(INSTALL_LIB)/$$f;\
-           else :; fi;\
-        done
-#
-#  Deinstall the object modules, if installed versions exist.
-	- for f in $(GRF_OBJECT_FILES) ""; do \
            if test -n "$$f" -a -f $(INSTALL_LIB)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_LIB)/$$f .;\
