@@ -4404,8 +4404,30 @@ For each Set Index value represented in the input files:
       the same Set headers as the input files
 \end{itemize}
 \end{enumerate}
-Notice that the output frames have the same Set Index and Set Name
-attributes as the input frames.
+
+So if you have a number of frames from a three-chip mosaic camera 
+sorted into Sets to debias, you can replace a sequence like this:
+\begin{myquote}
+\begin{verbatim}
+% makebias in='bias-seta-*' out=master_bias-a
+% makebias in='bias-setb-*' out=master_bias-b
+% makebias in='bias-setc-*' out=master_bias-c
+% debias in='data-seta-*' bias=master_bias-a out='debias_*'
+% debias in='data-setb-*' bias=master_bias-b out='debias_*'
+% debias in='data-setc-*' bias=master_bias-c out='debias_*'
+\end{verbatim}
+\end{myquote}
+by this one, which does just the same thing:
+\begin{myquote}
+\begin{verbatim}
+% makebias in='bias-set*-*' out=master_bias 
+% debias in='data-set*-*' bias=master_bias out='debias_*'
+\begin{verbatim}
+\end{myquote}
+
+You may notice from the scheme above that 
+the output frames have exactly the same Set headers 
+(i.e.\ the same Set Index and Set Name) as the input frames.
 As long as pre-calibration and post-calibration frames will not
 be presented to the same CCDPACK program at the same time,
 which is normally the case, this will cause no trouble.
@@ -4595,7 +4617,6 @@ the commands typed are just the same as for un-Setted data
 but CCDPACK is taking care that frames are only combined/corrected
 in groups with corresponding ones; this will be clear if you 
 look at the log output of these tasks.
-
 
 \subsubsection{\label{mosexset}Registering frames from a mosaic camera}
 
