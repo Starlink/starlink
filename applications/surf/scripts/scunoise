@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.12  1999/10/21 01:39:24  rpt
+#        Fix Y2K bug in semester selection.
+#
 #        Revision 1.11  1999/10/20 23:44:10  rpt
 #        Bug fix: also re-paint flat-field window if new run selected
 #
@@ -1540,7 +1543,7 @@ sub find_sem {
 
    my $sem = "unknown";
    $year = substr($obsdate,2,2);
-   $pyear = $year - 1;
+   $pyear = substr(($obsdate-10000),2,2);
    $monthday= substr($obsdate,4,4);
 
    if ( $monthday > 201 && $monthday < 802 ) {
