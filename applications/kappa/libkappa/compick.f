@@ -110,6 +110,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -117,6 +118,9 @@
 *        Original version.
 *     1995 January 11 (MJC):
 *        Made TITLE propagate from the input NDF.
+*     10-JUN-1998 (DSB):
+*        Propagate WCS component. Ensure each output dimension is at least
+*        one pixel long. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,6 +143,10 @@
       CHARACTER
      :  TYPE * ( NDF__SZTYP )  ! Data type of an array component
 
+      DOUBLE PRECISION
+     :  MATRIX( NDF__MXDIM*NDF__MXDIM ),! Matrix component of linear mapping
+     :  OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
+
       INTEGER
      :  ACTVAL,                ! Actual number of compression factors
      :  CMPMAX( NDF__MXDIM ),  ! Maximum compression factors
@@ -156,13 +164,15 @@
      :  NDFO,                  ! Identifier to the output NDF
      :  NDFS,                  ! Identifier to the section of the input
                                ! NDF
-     :  NDIM                   ! Dimensionality of the NDF
+     :  NDIM,                  ! Padded dimensionality of the NDF
+     :  NDIMI                  ! Actual dimensionality of the NDF 
 
       INTEGER
      :  ODIMS( NDF__MXDIM ),   ! Dimensions of output array
      :  ORGDEF( NDF__MXDIM ),  ! Default origin indices
      :  ORGMAX( NDF__MXDIM ),  ! Maximum origin indices
-     :  ORIGIN( NDF__MXDIM ),  ! Compression origin indices
+     :  ORIGIN( NDF__MXDIM ),  ! Compression origin indices (1-based)
+     :  ORIGN0( NDF__MXDIM ),  ! Compression origin indices (as given)
      :  PNTRI( 1 ),            ! Pointer to an input array component
      :  PNTRO( 1 ),            ! Pointer to an output array component
      :  TOTCMP,                ! Total compression factor
@@ -209,10 +219,11 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Should less values be entered than is required copy the last value to
-*  higher dimensions.
+*  higher dimensions, limiting it to be no smaller than the corresponding
+*  input NDF axis.
       IF ( ACTVAL .LT. NDIM ) THEN
          DO I = ACTVAL + 1, NDIM
-            COMPRS( I ) = COMPRS( ACTVAL )
+            COMPRS( I ) = MIN( IDIMS( I ), COMPRS( ACTVAL ) )
          END DO
       END IF
 
@@ -252,6 +263,7 @@
 *  Convert the origin to offsets within the array as this is required
 *  by the subroutine that will perform the selections.
       DO I = 1, NDIM
+         ORIGN0( I ) = ORIGIN( I )
          ORIGIN( I ) = ORIGIN( I ) - LBND( I ) + 1
       END DO
 
@@ -263,7 +275,8 @@
 *  arithmetic truncation.  Also derive bounds for the output array.
 *  These are somewhat arbitrary.
       DO I = 1, NDIM
-         ODIMS( I ) = ( IDIMS( I ) - ORIGIN( I ) ) / COMPRS( I ) + 1
+         ODIMS( I ) = MAX( 1, ( IDIMS( I ) - ORIGIN( I ) ) / 
+     :                         COMPRS( I ) + 1 )
          LBNDO( I ) = LBND( I ) + ORIGIN( I ) - 1
          UBNDO( I ) = LBNDO( I ) + ODIMS( I ) - 1
       END DO
@@ -611,6 +624,22 @@
             END IF
          END DO
       END IF
+
+*  Propagate the WCS component, incorporating a linear mapping between
+*  pixel coordinates. This mapping is described by a matrix and an offset
+*  vector. Set these up. 
+      DO I = 1, NDIMI*NDIMI
+         MATRIX( I ) = 0.0
+      END DO
+
+      DO J = 1, NDIMI
+         OFFSET( J ) = DBLE( LBNDO( J ) - 1 ) - 
+     :                 DBLE( ORIGN0( J ) - 1 )/DBLE( COMPRS( J ) )
+         MATRIX( NDIMI*( J - 1 ) + J ) = 1.0D0/DBLE( COMPRS( J ) )
+      END DO
+
+*  Propagate the WCS component.
+      CALL KPG1_ASPRP( NDIMI, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
 *  Come here if something has gone wrong.
   999 CONTINUE

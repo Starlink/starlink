@@ -180,6 +180,9 @@
 *        workspace.
 *     27-FEB-1998 (DSB):
 *        Type of local variable AXWT corrected from INTEGER to LOGICAL.
+*     10-JUN-1998 (DSB):
+*        Propagate WCS component. Ensure each output dimension is at least
+*        one pixel long. 
 *     {enter_further_changes}
 
 *  Bugs:
