@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.20  1997/06/12 23:36:21  timj
+*     Comment out CROSSTALK
+*
 *     Revision 1.19  1997/06/12 21:12:39  timj
 *     Change name to SURF_MON (from REDS) and rename subroutine.
 *
@@ -114,11 +117,11 @@ c
 
       CALL TASK_GET_NAME (NAME, STATUS)
 
-      IF (NAME .EQ. 'CROSSTALK') THEN
+*      IF (NAME .EQ. 'CROSSTALK') THEN
 
-         CALL REDS_CROSSTALK (STATUS)
+*         CALL REDS_CROSSTALK (STATUS)
 
-      ELSE IF (NAME .EQ. 'BOLREBIN') THEN
+      IF (NAME .EQ. 'BOLREBIN') THEN
 
          CALL REDS_REBIN (NAME, STATUS)
 
