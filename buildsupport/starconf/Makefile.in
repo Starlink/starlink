@@ -36,20 +36,19 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
-DIST_COMMON = $(am__configure_deps) $(srcdir)/../../install-sh \
-	$(srcdir)/../../missing $(srcdir)/../../mkinstalldirs \
-	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(srcdir)/Makefile.starconf.in \
+DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in $(srcdir)/Makefile.starconf.in \
 	$(srcdir)/bootstrap.installed.in \
 	$(srcdir)/starconf-validate.in $(srcdir)/starconf.m4.in \
-	$(top_srcdir)/configure $(top_srcdir)/java/Makefile.in
+	$(top_srcdir)/configure $(top_srcdir)/java/Makefile.in \
+	install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
+mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES = starconf.m4 Makefile.starconf bootstrap.installed \
 	java/Makefile starconf-validate
 am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)
@@ -160,6 +159,7 @@ CLEANFILES = starconf make-starconf starconf.m4
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@datadir\@,$(datadir),g' \
+	-e 's,@prefix\@,$(prefix),g' \
 	-e 's,@LN_S\@,$(LN_S),g' \
 	-e 's,@STARCONF_DEFAULT_STARLINK\@,@STARCONF_DEFAULT_STARLINK@,g' \
 	-e 's,@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g' \
@@ -287,7 +287,7 @@ install-manifest: install-manifest.xml
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/../.. $(distdir)/java
+	$(mkdir_p) $(distdir)/. $(distdir)/java
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
