@@ -466,6 +466,78 @@ AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
 ])# STAR_FC_LIBRARY_LDFLAGS
 
 
+# STAR_LIBRARY_TCLTK([minversion=0])
+# ----------------------------------
+# Finds a tclsh and wish, and adjusts the CFLAGS and LIBS variables to match.
+# If argument minversion is present, it specifies the minimum Tcl/Tk version
+# number required.  The macro searches first in the path, and then in a
+# selection of standard locations.
+AC_DEFUN([STAR_LIBRARY_TCLTK],
+    [AC_CACHE_CHECK([where to find Tcl/Tk[]m4_ifval([$1], [ $1+])],
+                    [star_cv_settcldir],
+                    [star_cv_settcldir=
+                     reqversint=`echo m4_ifval([$1], [$1], 0.0)-0-0 | [sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/']|dc`
+                     tclsources=`echo $PATH | sed "s/$PATH_SEPARATOR/ /g"`'
+dnl  Search in /usr and /usr/local at least
+/usr/bin
+/usr/local/bin
+dnl  /opt/local and /sw are the default installation locations for OpenDarwin
+dnl  and Fink on OSX
+/opt/local/bin
+/sw/bin'
+                     for d in $tclsources
+                     do
+                         if test -x $d/tclsh \
+                                 -a -x $d/wish \
+                                 -a -r $d/../include/tcl.h \
+                                 -a -r $d/../include/tk.h; then
+                              if test ! -r $d/../lib/tclConfig.sh; then
+                                  echo "$d/../lib/tclConfig.sh not found"
+                                  break
+                              fi
+                              if test ! -r $d/../lib/tkConfig.sh; then
+                                  echo "$d/../lib/tkConfig.sh not found"
+                                  break
+                              fi
+                              rm -f conftest.sh
+                              exec 8>conftest.sh
+                              echo tcldir=`cd $d/..; pwd` >&8
+                              echo reqversint=$reqversint >&8
+                              cat <<\_STAREOF >&8
+. $tcldir/lib/tclConfig.sh
+. $tcldir/lib/tkConfig.sh
+tclversint=`[echo $TCL_VERSION$TCL_PATCH_LEVEL-0-0 | sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/'|dc]`
+if test $tclversint -gt $reqversint; then
+    # New enough version.
+    # These envs include $TCL_DBGX -- expand this out.
+    eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
+    echo "CFLAGS=\"\$CFLAGS $I\"; LIBS=\"\$LIBS $L\""
+    status=0
+else
+    echo "Tcl/Tk versions $TCL_VERSION$TCL_PATCH_LEVEL/$TK_VERSION$TK_PATCH_LEVEL too old"
+    status=1
+fi
+exit $status
+_STAREOF
+                              exec 8<&-
+                              if /bin/sh conftest.sh >conftest.results; then
+                                  star_cv_settcldir=`cat conftest.results`
+                              else
+                                  star_cv_settcldir=unknown
+                              fi
+                              cp conftest.sh saved-conftest.sh
+                              cp conftest.results saved-conftest.results
+                              if test "$star_cv_settcldir" != unknown; then
+                                  break
+                              fi
+                          fi
+                      done])
+     if test "$star_cv_settcldir" != unknown; then
+         eval $star_cv_settcldir
+     fi
+])# STAR_PROG_TCLTK
+
+
 # STAR_LATEX_DOCUMENTATION(documentcode, [targets])
 # -------------------------------------------------
 # Generate the standard makefile targets to handle LaTeX documentation
