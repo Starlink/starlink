@@ -26,9 +26,10 @@
 #     PERCLO = real (Given and Returned)
 #        The percentile of the data below which all values should be 
 #        plotted as the same colour.  Must be between 0 and 100.
-#     POINTS = list of pairs (Returned)
+#     POINTS = list of pairs (Given and Returned)
 #        A list of the pixel coordinates indicated by the user on the NDF.
-#        Each element of the list is of the form {X Y}.
+#        Each element of the list is of the form {I X Y}, where I is a
+#        unique integer index and X and Y are the coordinates.
 #     SHOWIND = integer (Given)
 #        If true (non-zero), then the index numbers of each point will be
 #        displayed.  Otherwise only markers representing the points 
@@ -67,6 +68,14 @@
 
 #  Load the NDF into the widget.
       .viewer loadndf $ndf $MAXCANV
+
+#  If there is an initial point list, plot the points.
+      if { ! [ catch { set POINTS } ] } {
+         foreach point $POINTS {
+            .viewer addpoint [ lindex $point 1 ] [ lindex $point 2 ] \
+                             [ lindex $point 0 ]
+         }
+      }
 
 #  Set the widget to respond to user actions.
       .viewer activate
