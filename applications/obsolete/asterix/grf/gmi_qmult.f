@@ -4,7 +4,7 @@
 *     GMI_QMULT
 
 *  Purpose:
-*     Determines if dataset is multiple type
+*     Determines if dataset is multiple graph type
 
 *  Language:
 *     Starlink Fortran
@@ -83,38 +83,22 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset identifier
+      INTEGER			ID
 
 *  Arguments Returned:
-      LOGICAL			MULT			! ID is multiple?
+      LOGICAL			MULT
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-c      EXTERNAL			GMI0_BLK		! Ensures inclusion
-
-*  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			!
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check initialised
-C      IF ( .NOT. GMI_INIT ) CALL GMI0_INIT( STATUS )
-
-*  Extract locator and call HDS version
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-        CALL GMD_QMULT( LOC, MULT, STATUS )
-      ELSE
-        CALL ERR_ANNUL( STATUS )
-        MULT= .FALSE.
-      END IF
+*  Is the data object class derived from MultiGraph?
+      CALL ADI_DERVD( ID, 'MultiGraph', MULT, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_QMULT', STATUS )

@@ -9,13 +9,14 @@
 *      10 Jun 94 : 1.7-3 DUMP option (RJV)
 *       7 Sep 94 : 1.7-4 OFF added as alternative to CANCEL (RJV)
 *      24 Nov 94 : 1.7-5 SUPPRESS added (RJV)
-*      10 FEB 95 : 1.8-0 open in READ mode for SHOW or DUMP (RJV)
+*      10 Feb 95 : 1.8-0 open in READ mode for SHOW or DUMP (RJV)
+*      12 Sep 95 : 2.0-0 ADI port (DJA)
+*
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GMD_PAR'
 *    Import :
 *    Import-export :
@@ -27,16 +28,14 @@
       INCLUDE 'GMD_CMN'
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GSET Version 1.8-0')
+      PARAMETER (VERSION='GSET Version 2.0-0')
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*10 SWITCH
       CHARACTER*20 CONTEXT
       LOGICAL CANCEL
-      INTEGER NNDF,NSEL
+      INTEGER NNDF,NSEL,FID
       INTEGER NDFS(GMD__MXNDF)
       LOGICAL X,Y
-      LOGICAL PRIM
       LOGICAL MULTI
       LOGICAL ACTIVE,LIVE
       LOGICAL HELP
@@ -110,28 +109,33 @@
       IF (.NOT.LIVE) THEN
         IF (.NOT.G_OPEN) THEN
           CALL AST_INIT()
-*  get locator to top level
+
+*      Get identifier to top level
           IF (SHOW.OR.DUMP) THEN
-            CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)
+            CALL USI_ASSOC( 'INP', 'MultiGraph|BinDS', 'READ', FID,
+     :                      STATUS )
           ELSE
-            CALL USI_ASSOCI('INP','UPDATE',LOC,PRIM,STATUS)
-          ENDIF
-*  check if multiple dataset
-          CALL GMD_QMULT(LOC,MULTI,STATUS)
-*  if not check NDF type
+            CALL USI_ASSOC( 'INP', 'MultiGraph|BinDS', 'UPDATE', FID,
+     :                      STATUS )
+          END IF
+
+*      Check if multiple dataset
+          CALL GMI_QMULT( FID, MULTI, STATUS )
+
+*      If not check NDF type
           IF (.NOT.MULTI) THEN
-            CALL GFX_NDFTYPE(LOC,STATUS)
-            G_LOC=LOC
+            CALL GFX_NDFTYPE(FID,STATUS)
+            G_ID=FID
             G_MULTI=.FALSE.
           ELSE
             G_MULTI=.TRUE.
-            G_MLOC=LOC
+            G_MFID=FID
           ENDIF
         ENDIF
         IF (STATUS.EQ.SAI__OK) THEN
 *  if multiple dataset get NDF numbers
           IF (G_MULTI) THEN
-            CALL GMD_QNDF(G_MLOC,NNDF,STATUS)
+            CALL GMI_QNDF(G_MFID,NNDF,STATUS)
             IF (NNDF.LE.GMD__MXNDF) THEN
               CALL PRS_GETLIST('NDF',NNDF,NDFS,NSEL,STATUS)
             ELSE
@@ -352,17 +356,13 @@
         STATUS=SAI__ERROR
       ENDIF
 
+*  Close dataset if opened in this invokation
       IF (.NOT.LIVE) THEN
         IF (.NOT.G_OPEN) THEN
-          IF (.NOT.G_MULTI) THEN
-            CALL BDA_RELEASE(LOC,STATUS)
-          ENDIF
-          CALL USI_ANNUL('INP',STATUS)
+          CALL USI_ANNUL( 'INP', STATUS )
         ENDIF
-
         CALL GCB_DETACH(STATUS)
-
-      ENDIF
+      END IF
 
       CALL AST_ERR(STATUS)
 
@@ -378,8 +378,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -388,50 +386,26 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CLEAR(STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_ALL_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_ALL_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -447,8 +421,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -458,13 +430,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       LOGICAL OK,RADEC
 *-
 
@@ -472,19 +440,8 @@
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  specific to x-axis
           IF (X) THEN
@@ -518,21 +475,12 @@
             CALL GCB_CANC('YLABEL_TEXT',STATUS)
           ENDIF
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_AXES_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_AXES_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -548,8 +496,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -559,17 +505,13 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*15 OPT
       REAL SIZE
       REAL TICK
       REAL HI,LO
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER WIDTH
       INTEGER FONT
       INTEGER BOLD
@@ -623,83 +565,23 @@
         ELSE
 
 *  get individual control parameters - NULL means no change
-          CALL USI_GET0I('WIDTH',WIDTH,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETW=.FALSE.
-          ENDIF
+          CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
+          CALL GSET_GET0I( 'FONT', SETF, FONT, STATUS )
+          CALL GSET_GET0R( 'SIZE', SETS, SIZE, STATUS )
+          CALL GSET_GET0I( 'BOLD', SETB, BOLD, STATUS )
+          CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
 
-          CALL USI_GET0I('FONT',FONT,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETF=.FALSE.
-          ENDIF
+          CALL GSET_GET0R( 'TICK', SETT, TICK, STATUS )
+          CALL GSET_GET0R( 'DIV', SETD, DIV, STATUS )
 
-          CALL USI_GET0R('SIZE',SIZE,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETS=.FALSE.
-          ENDIF
+          CALL GSET_GET0C( 'OPT', SETO, OPT, STATUS )
 
-          CALL USI_GET0I('BOLD',BOLD,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETB=.FALSE.
-          ENDIF
+          CALL GSET_GET0R( 'LO', SETLO, LO, STATUS )
+          CALL GSET_GET0R( 'HI', SETHI, HI, STATUS )
 
-          CALL USI_GET0I('COLOUR',COLOUR,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETC=.FALSE.
-          ENDIF
-
-          CALL USI_GET0R('TICK',TICK,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETT=.FALSE.
-          ENDIF
-
-          CALL USI_GET0I('DIV',DIV,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETD=.FALSE.
-          ENDIF
-
-          CALL USI_GET0C('OPT',OPT,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETO=.FALSE.
-          ENDIF
-
-          CALL USI_GET0R('LO',LO,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETLO=.FALSE.
-          ENDIF
-
-          CALL USI_GET0R('HI',HI,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETHI=.FALSE.
-          ENDIF
-
-          CALL USI_GET0L('LOG',LOGAX,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETL=.FALSE.
-          ENDIF
-
-          CALL USI_GET0L('RADEC',RADEC,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETRADEC=.FALSE.
-          ENDIF
-
-          CALL USI_GET0L('SCALE',SCALE,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETSCALE=.FALSE.
-          ENDIF
+          CALL GSET_GET0L( 'LOG', SETL, LOGAX, STATUS )
+          CALL GSET_GET0L( 'RADEC', SETRADEC, RADEC, STATUS )
+          CALL GSET_GET0L( 'SCALE', SETSCALE, SCALE, STATUS )
 
         ENDIF
 
@@ -708,23 +590,8 @@
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
 
@@ -801,20 +668,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_AXES_SET',STATUS)
+          CALL AST_REXIT( 'GSET_AXES_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -833,8 +692,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -844,32 +701,17 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  specific to x-axis
           IF (X) THEN
@@ -888,21 +730,12 @@
             CALL GCB_CANI('YLABEL_FONT',STATUS)
           ENDIF
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_LABELS_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_LABELS_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -918,8 +751,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -929,16 +760,12 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*80 TEXT
       REAL SIZE
       REAL OFFSET
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER FONT
       INTEGER BOLD
       LOGICAL SUPPRESS
@@ -968,35 +795,15 @@
         ELSE
 
 *  get individual control parameters - NULL means no change
-          CALL USI_GET0C('TEXT',TEXT,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETT=.FALSE.
-          ENDIF
+          CALL GSET_GET0C( 'TEXT', SETT, TEXT, STATUS )
 
-          CALL USI_GET0I('FONT',FONT,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETF=.FALSE.
-          ENDIF
+          CALL GSET_GET0I( 'FONT', SETF, FONT, STATUS )
 
-          CALL USI_GET0R('SIZE',SIZE,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETS=.FALSE.
-          ENDIF
+          CALL GSET_GET0R( 'SIZE', SETS, SIZE, STATUS )
 
-          CALL USI_GET0I('BOLD',BOLD,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETB=.FALSE.
-          ENDIF
+          CALL GSET_GET0I( 'BOLD', SETB, BOLD, STATUS )
 
-          CALL USI_GET0R('OFFSET',OFFSET,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-            SETO=.FALSE.
-          ENDIF
+          CALL GSET_GET0I( 'OFFSET', SETO, OFFSET, STATUS )
 
         ENDIF
 
@@ -1005,23 +812,8 @@
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
 
@@ -1063,20 +855,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_LABELS_SET',STATUS)
+          CALL AST_REXIT( 'GSET_LABELS_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -1095,8 +879,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1105,53 +887,29 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANC('KEY_OPT',STATUS)
           CALL GCB_CANI('KEY_BOLD',STATUS)
           CALL GCB_CANR('KEY_SIZE',STATUS)
           CALL GCB_CANI('KEY_FONT',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_KEY_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_KEY_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -1167,8 +925,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1177,15 +933,11 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*10 OPT
       REAL SIZE
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER FONT
       INTEGER BOLD
       LOGICAL SETO,SETF,SETS,SETB
@@ -1199,53 +951,20 @@
 
 *  get individual control parameters - NULL means no change
         CALL USI_DEF0C('OPT','PC',STATUS)
-        CALL USI_GET0C('OPT',OPT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETO=.FALSE.
-        ENDIF
+        CALL GSET_GET0C( 'OPT', SETO, OPT, STATUS )
         CALL USI_CANCL('OPT',STATUS)
 
-        CALL USI_GET0I('FONT',FONT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETF=.FALSE.
-        ENDIF
-
-        CALL USI_GET0R('SIZE',SIZE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('BOLD',BOLD,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETB=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'FONT', SETF, FONT, STATUS )
+        CALL GSET_GET0R( 'SIZE', SETS, SIZE, STATUS )
+        CALL GSET_GET0I( 'BOLD', SETB, BOLD, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           IF (SETO) THEN
@@ -1262,20 +981,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_KEY_SET',STATUS)
+          CALL AST_REXIT('GSET_KEY_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -1294,8 +1005,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1304,51 +1013,28 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('STAMP_FLAG',STATUS)
           CALL GCB_CANC('STAMP_TEXT',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_STAMP_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_STAMP_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -1364,8 +1050,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1374,14 +1058,10 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*80 TEXT
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       LOGICAL SET
 *-
       SET=.TRUE.
@@ -1389,35 +1069,15 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-
-        CALL USI_GET0C('TEXT',TEXT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SET=.FALSE.
-        ENDIF
+        CALL GSET_GET0C( 'TEXT', SET, TEXT, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('STAMP_FLAG',.TRUE.,STATUS)
@@ -1426,26 +1086,16 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_STAMP_SET',STATUS)
+          CALL AST_REXIT( 'GSET_STAMP_SET',STATUS)
         ENDIF
 
       ENDIF
       END
-
-
 
 
 
@@ -1459,8 +1109,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1469,32 +1117,17 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANR('DEFAULT_SIZE',STATUS)
           CALL GCB_CANI('DEFAULT_FONT',STATUS)
@@ -1505,20 +1138,14 @@
           IF (LIVE) THEN
             CALL GCB_SETDEF(STATUS)
           ELSE
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
+            CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
           ENDIF
 
         ENDDO
 
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_DEFAULT_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_DEFAULT_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -1534,8 +1161,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1544,14 +1169,10 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       REAL SIZE
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER STYLE,WIDTH,COLOUR,FONT
       LOGICAL SETS,SETW,SETC,SETF,SETSZ
 *-
@@ -1564,61 +1185,19 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETW=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('STYLE',STYLE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-
-        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETC=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('FONT',FONT,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETF=.FALSE.
-        ENDIF
-
-
-        CALL USI_GET0R('SIZE',SIZE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETSZ=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
+        CALL GSET_GET0I( 'STYLE', SETS, STYLE, STATUS )
+        CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
+        CALL GSET_GET0I( 'FONT', SETF, FONT, STATUS )
+        CALL GSET_GET0R( 'SIZE', SETSZ, SIZE, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
-
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           IF (SETS) THEN
             CALL GCB_SETI('DEFAULT_STYLE',STYLE,STATUS)
@@ -1644,19 +1223,13 @@
           IF (LIVE) THEN
             CALL GCB_SETDEF(STATUS)
           ELSE
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
+            CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
           ENDIF
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_DEFAULT_SET',STATUS)
+          CALL AST_REXIT('GSET_DEFAULT_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -1675,8 +1248,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1685,53 +1256,29 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('POLY_FLAG',STATUS)
           CALL GCB_CANI('POLY_STYLE',STATUS)
           CALL GCB_CANI('POLY_WIDTH',STATUS)
           CALL GCB_CANI('POLY_COLOUR',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_POLY_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_POLY_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -1747,8 +1294,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1757,13 +1302,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL SETS,SETW,SETC
 *-
@@ -1775,46 +1316,16 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0I('STYLE',STYLE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETW=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETC=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'STYLE', SETS, STYLE, STATUS )
+        CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
+        CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
-
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('POLY_FLAG',.TRUE.,STATUS)
@@ -1832,20 +1343,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_POLY_SET',STATUS)
+          CALL AST_REXIT( 'GSET_POLY_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -1863,8 +1366,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1873,53 +1374,29 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('STEP_FLAG',STATUS)
           CALL GCB_CANI('STEP_STYLE',STATUS)
           CALL GCB_CANI('STEP_WIDTH',STATUS)
           CALL GCB_CANI('STEP_COLOUR',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_STEP_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_STEP_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -1935,8 +1412,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -1945,13 +1420,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL SETS,SETW,SETC
 *-
@@ -1963,46 +1434,17 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0I('STYLE',STYLE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETW=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETC=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'STYLE', SETS, STYLE, STATUS )
+        CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
+        CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('STEP_FLAG',.TRUE.,STATUS)
@@ -2020,20 +1462,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_STEP_SET',STATUS)
+          CALL AST_REXIT('GSET_STEP_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -2052,8 +1486,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2062,32 +1494,16 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
-*    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('POINT_FLAG',STATUS)
           CALL GCB_CANI('POINT_SYMBOL',STATUS)
@@ -2095,21 +1511,12 @@
           CALL GCB_CANI('POINT_BOLD',STATUS)
           CALL GCB_CANI('POINT_COLOUR',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_POINTS_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_POINTS_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -2125,8 +1532,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2135,13 +1540,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER SYMBOL,BOLD,COLOUR
       REAL SIZE
       LOGICAL SETS,SETB,SETC,SETZ
@@ -2155,52 +1556,18 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('BOLD',BOLD,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETB=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETC=.FALSE.
-        ENDIF
-
-        CALL USI_GET0R('SIZE',SIZE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETZ=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'SYMBOL', SETS, SYMBOL, STATUS )
+        CALL GSET_GET0I( 'BOLD', SETB, BOLD, STATUS )
+        CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
+        CALL GSET_GET0R( 'SIZE', SETZ, SIZE, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('POINT_FLAG',.TRUE.,STATUS)
@@ -2222,20 +1589,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_POINTS_SET',STATUS)
+          CALL AST_REXIT( 'GSET_POINTS_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -2253,8 +1612,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2263,32 +1620,17 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('PIX_FLAG',STATUS)
           CALL GCB_CANR('PIX_MIN',STATUS)
@@ -2296,21 +1638,12 @@
           CALL GCB_CANC('PIX_SCALING',STATUS)
           CALL GCB_CANI('PIX_CYCLES',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_PIXEL_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_PIXEL_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -2326,8 +1659,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2336,14 +1667,10 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*10 SCALING
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER CYCLES
       REAL MIN,MAX
       LOGICAL SETMIN,SETMAX,SETSCA,SETCYC
@@ -2357,56 +1684,24 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0C('SCALING',SCALING,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETSCA=.FALSE.
-        ELSE
+        CALL GSET_GET0C( 'SCALING', SETSCA, SCALING, STATUS )
+        IF ( SETSCA ) THEN
           CALL CHR_UCASE(SCALING)
           IF (SCALING(:3).EQ.'CYC') THEN
-            CALL USI_GET0I('CYCLES',CYCLES,STATUS)
-            IF (STATUS.EQ.PAR__NULL) THEN
-              CALL ERR_ANNUL(STATUS)
-            ELSE
-              SETCYC=.TRUE.
-            ENDIF
+            CALL GSET_GET0I( 'CYCLES', SETCYC, CYCLES, STATUS )
           ENDIF
         ENDIF
 
-        CALL USI_GET0R('MIN',MIN,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETMIN=.FALSE.
-        ENDIF
-
-        CALL USI_GET0R('MAX',MAX,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETMAX=.FALSE.
-        ENDIF
+        CALL GSET_GET0R( 'MIN', SETMIN, MIN, STATUS )
+        CALL GSET_GET0R( 'MAX', SETMAX, MAX, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('PIX_FLAG',.TRUE.,STATUS)
@@ -2428,20 +1723,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_PIXEL_SET',STATUS)
+          CALL AST_REXIT( 'GSET_PIXEL_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -2459,8 +1746,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
       LOGICAL LIVE
@@ -2470,13 +1755,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER N
       LOGICAL OK
 *-
@@ -2485,19 +1766,8 @@
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('CONT_FLAG',STATUS)
           CALL GCB_GETI('CONT_N',OK,N,STATUS)
@@ -2510,21 +1780,12 @@
           CALL GCB_CAN1I('CONT_WIDTH',1,N,STATUS)
           CALL GCB_CAN1I('CONT_COLOUR',1,N,STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_CONTOUR_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_CONTOUR_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -2540,7 +1801,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -2551,13 +1811,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER NLEV
       INTEGER NSTYLE,NWIDTH,NCOL
       INTEGER I
@@ -2606,23 +1862,8 @@
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           IF (.NOT.SETL) THEN
             CALL GCB_GETI('CONT_N',OK,NLEV,STATUS)
@@ -2630,7 +1871,6 @@
               NLEV=0
             ENDIF
           ENDIF
-
 
 *  set new values
           CALL GCB_SETL('CONT_FLAG',.TRUE.,STATUS)
@@ -2662,20 +1902,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_CONTOUR_SET',STATUS)
+          CALL AST_REXIT('GSET_CONTOUR_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -2693,8 +1925,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2703,51 +1933,27 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('SURF_FLAG',STATUS)
           CALL GCB_CANR('SURF_ANGLE',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_SURF_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_SURF_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -2763,8 +1969,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2773,13 +1977,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       REAL ANGLE
       LOGICAL SETA
 *-
@@ -2789,34 +1989,15 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0R('ANGLE',ANGLE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETA=.FALSE.
-        ENDIF
+        CALL GSET_GET0R( 'ANGLE', SETA, ANGLE, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('SURF_FLAG',.TRUE.,STATUS)
@@ -2826,20 +2007,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_SURF_SET',STATUS)
+          CALL AST_REXIT( 'GSET_SURF_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -2857,8 +2030,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2867,51 +2038,27 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANI('GRID_FRAME',STATUS)
           CALL GCB_CANI('GRID_POS',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_GRID_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_GRID_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -2927,8 +2074,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -2937,13 +2082,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER FRAME,POS
       LOGICAL SETF,SETP
 *-
@@ -2954,40 +2095,16 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0I('FRAME',FRAME,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETF=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('POS',POS,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETP=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'FRAME', SETF, FRAME, STATUS )
+        CALL GSET_GET0I( 'POS', SETP, POS, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           IF (SETF) THEN
@@ -2999,20 +2116,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_GRID_SET',STATUS)
+          CALL AST_REXIT('GSET_GRID_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -3031,8 +2140,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -3041,53 +2148,29 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANL('ERR_FLAG',STATUS)
           CALL GCB_CANI('ERR_SHAPE',STATUS)
           CALL GCB_CANI('ERR_WIDTH',STATUS)
           CALL GCB_CANI('ERR_COLOUR',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_ERR_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_ERR_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -3103,8 +2186,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -3113,13 +2194,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER SHAPE,WIDTH,COLOUR
       LOGICAL SETS,SETW,SETC
 *-
@@ -3131,46 +2208,17 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0I('SHAPE',SHAPE,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETS=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETW=.FALSE.
-        ENDIF
-
-        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETC=.FALSE.
-        ENDIF
+        CALL GSET_GET0I( 'SHAPE', SETS, SHAPE, STATUS )
+        CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
+        CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           CALL GCB_SETL('ERR_FLAG',.TRUE.,STATUS)
@@ -3188,20 +2236,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_ERR_SET',STATUS)
+          CALL AST_REXIT( 'GSET_ERR_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -3218,8 +2258,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
       LOGICAL LIVE
@@ -3228,29 +2266,16 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER N
+      INTEGER N,GFID
       LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
         CALL GCB_GETI('TITLE_N',OK,N,STATUS)
         IF (.NOT.OK) THEN
@@ -3263,19 +2288,10 @@
         CALL GCB_CAN1R('TITLE_SIZE',1,N,STATUS)
         CALL GCB_CAN1C('TITLE_JUST',1,N,STATUS)
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_TITLE_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_TITLE_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -3291,7 +2307,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -3301,17 +2316,13 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Functions :
       INTEGER CHR_LEN
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*80 TEXT
       CHARACTER*1 JUST
-      INTEGER N,N1,N2,N3
+      INTEGER N,N1,N2,N3,GFID
       INTEGER FONT,BOLD
       INTEGER L
       REAL SIZE
@@ -3322,21 +2333,8 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  if not in interactive mode
-        IF (.NOT.LIVE) THEN
-*  load existing GCB
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-*  or single dataset
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
 *  are titles to be suppressed altogether
         CALL USI_PROMT('SUPPRESS','Are all titles to be suppressed',
@@ -3362,7 +2360,6 @@
           IF (N2.GT.N1) THEN
             N2=N1+1
           ENDIF
-
 
 *  get individual control parameters - NULL means no change
           RPT=.TRUE.
@@ -3430,19 +2427,10 @@
         ENDIF
 
 *  resave if necessary
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_TITLE_SET',STATUS)
+          CALL AST_REXIT( 'GSET_TITLE_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -3459,8 +2447,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
       LOGICAL LIVE
@@ -3469,29 +2455,16 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER N
+      INTEGER N,GFID
       LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
         CALL GCB_GETI('NOTE_N',OK,N,STATUS)
         IF (.NOT.OK) THEN
@@ -3508,19 +2481,10 @@
         CALL GCB_CAN1C('NOTE_JUST',1,N,STATUS)
         CALL GCB_CAN1I('NOTE_COLOUR',1,N,STATUS)
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_NOTE_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_NOTE_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -3536,7 +2500,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -3546,15 +2509,11 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*80 TEXT
       CHARACTER*1 JUST
-      INTEGER N1,N2
+      INTEGER N1,N2,GFID
       INTEGER FONT,BOLD,COLOUR
       REAL X,Y,ANGLE
       REAL SIZE
@@ -3563,21 +2522,8 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  if not in interactive mode
-        IF (.NOT.LIVE) THEN
-*  load existing GCB
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-*  or single dataset
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
 *  get existing and new number
         CALL GCB_GETI('NOTE_N',OK,N1,STATUS)
@@ -3659,19 +2605,10 @@
         ENDIF
 
 *  resave if necessary
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_NOTE_SET',STATUS)
+          CALL AST_REXIT('GSET_NOTE_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -3689,7 +2626,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -3699,29 +2635,16 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER N
+      INTEGER N,GFID
       LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
         CALL GCB_GETI('MARKER_N',OK,N,STATUS)
         IF (.NOT.OK) THEN
@@ -3737,19 +2660,10 @@
         CALL GCB_CAN1I('MARKER_COLOUR',1,N,STATUS)
         CALL GCB_CANL('MARKER_NUMBER',STATUS)
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_MARKER_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_MARKER_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -3765,7 +2679,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -3775,13 +2688,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER N1,N2
+      INTEGER N1,N2,GFID
       INTEGER SYMBOL
       INTEGER BOLD,COLOUR
       REAL X,Y
@@ -3792,21 +2701,8 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  if not in interactive mode
-        IF (.NOT.LIVE) THEN
-*  load existing GCB
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-*  or single dataset
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
 *  get existing and new number
         CALL GCB_GETI('MARKER_N',OK,N1,STATUS)
@@ -3873,19 +2769,10 @@
         ENDIF
 
 *  resave if necessary
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_MARKER_SET',STATUS)
+          CALL AST_REXIT( 'GSET_MARKER_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -3901,7 +2788,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -3911,29 +2797,16 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER N
+      INTEGER N,GFID
       LOGICAL OK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
         CALL GCB_GETI('SHAPE_N',OK,N,STATUS)
         IF (.NOT.OK) THEN
@@ -3950,19 +2823,10 @@
         CALL GCB_CAN1I('SHAPE_STYLE',1,N,STATUS)
         CALL GCB_CAN1I('SHAPE_COLOUR',1,N,STATUS)
 
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_SHAPE_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_SHAPE_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -3978,7 +2842,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -3988,14 +2851,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
-*    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*20 TYPE
-      INTEGER N1,N2
+      INTEGER N1,N2,GFID
       INTEGER WIDTH,STYLE,COLOUR
       REAL X,Y
       REAL DATA1,DATA2,DATA3
@@ -4004,21 +2862,8 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  if not in interactive mode
-        IF (.NOT.LIVE) THEN
-*  load existing GCB
-          IF (G_MULTI) THEN
-            CALL MSG_PRNT('Multiple dataset:-')
-            CALL MSG_SETI('NDF',NDF)
-            CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-            CALL GMD_LOCNDF(G_MLOC,NDF,GLOC,STATUS)
-            CALL GCB_LOAD(GLOC,STATUS)
-          ELSE
-*  or single dataset
-            CALL GCB_LOAD(G_LOC,STATUS)
-          ENDIF
-        ENDIF
+*    Load GCB
+        CALL GSET_LOAD_GCB(LIVE,1,NDF,GFID,STATUS)
 
 *  get existing and new number
         CALL GCB_GETI('SHAPE_N',OK,N1,STATUS)
@@ -4121,19 +2966,10 @@
         ENDIF
 
 *  resave if necessary
-        IF (.NOT.LIVE) THEN
-          IF (G_MULTI) THEN
-            CALL GCB_SAVE(GLOC,STATUS)
-            CALL BDA_RELEASE(GLOC,STATUS)
-            CALL DAT_ANNUL(GLOC,STATUS)
-          ELSE
-            CALL GCB_SAVE(G_LOC,STATUS)
-          ENDIF
-        ENDIF
-
+        CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_SHAPE_SET',STATUS)
+          CALL AST_REXIT( 'GSET_SHAPE_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -4151,8 +2987,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -4161,53 +2995,29 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_CANR('POS_X1',STATUS)
           CALL GCB_CANR('POS_X2',STATUS)
           CALL GCB_CANR('POS_Y1',STATUS)
           CALL GCB_CANR('POS_Y2',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_POSIT_CANCEL',STATUS)
+          CALL AST_REXIT( 'GSET_POSIT_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -4223,7 +3033,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
@@ -4233,13 +3042,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       REAL X1,X2,Y1,Y2
       LOGICAL SETX1,SETX2,SETY1,SETY2
 *-
@@ -4252,52 +3057,18 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL USI_GET0R('X1',X1,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETX1=.FALSE.
-        ENDIF
-
-        CALL USI_GET0R('X2',X2,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETX2=.FALSE.
-        ENDIF
-
-        CALL USI_GET0R('Y1',Y1,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETY1=.FALSE.
-        ENDIF
-
-        CALL USI_GET0R('Y2',Y2,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETY2=.FALSE.
-        ENDIF
+        CALL GSET_GET0R( 'X1', SETX1, X1, STATUS )
+        CALL GSET_GET0R( 'X2', SETX2, X2, STATUS )
+        CALL GSET_GET0R( 'Y1', SETY1, Y1, STATUS )
+        CALL GSET_GET0R( 'Y2', SETY2, Y2, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new values
           IF (SETX1) THEN
@@ -4317,20 +3088,12 @@
           ENDIF
 
 *  resave if necessary
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_POSIT_SET',STATUS)
+          CALL AST_REXIT('GSET_POSIT_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -4347,8 +3110,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
       LOGICAL LIVE
@@ -4358,13 +3119,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER N
       LOGICAL OK
 *-
@@ -4373,19 +3130,8 @@
 
         DO ISEL=1,NSEL
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
           CALL GCB_GETI('COLOUR_N',OK,N,STATUS)
           IF (.NOT.OK) THEN
@@ -4398,21 +3144,12 @@
           CALL GCB_CANL('COLOUR_RGB',STATUS)
           CALL GCB_CANL('COLOUR_NEG',STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
 
         ENDDO
 
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_COLOUR_CANCEL',STATUS)
+          CALL AST_REXIT('GSET_COLOUR_CANCEL',STATUS)
         ENDIF
 
       ENDIF
@@ -4439,12 +3176,8 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*(DAT__SZLOC) TLOC
       CHARACTER*(DAT__SZTYP) TYPE
       CHARACTER NAME*20,FILE*80
@@ -4453,7 +3186,7 @@
       INTEGER SIZE
       INTEGER NVAL,NCHAR
       INTEGER TABN
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER I
       LOGICAL SETTAB,SETRGB,SETNEG
       LOGICAL RGB,NEG
@@ -4470,12 +3203,8 @@
 
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
-          CALL USI_GET0L('RGB',RGB,STATUS)
-          IF (STATUS.EQ.PAR__NULL) THEN
-            CALL ERR_ANNUL(STATUS)
-          ELSE
-            SETRGB=.TRUE.
-          ENDIF
+          CALL GSET_GET0L( 'RGB', SETRGB, RGB, STATUS )
+
         ELSE
           CALL DAT_TYPE(TLOC,TYPE,STATUS)
           CALL DAT_SIZE(TLOC,SIZE,STATUS)
@@ -4514,34 +3243,15 @@
           ENDDO
         ENDIF
 
-        CALL USI_GET0L('NEG',NEG,STATUS)
-        IF (STATUS.EQ.PAR__NULL) THEN
-          CALL ERR_ANNUL(STATUS)
-          SETNEG=.FALSE.
-        ENDIF
+        CALL GSET_GET0L( 'NEG', SETNEG, NEG, STATUS )
 
 *  NSEL is set to 1 for LIVE mode or single dataset
 *  otherwise to number of NDFs selected from multiple dataset
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  set new table
           IF (SETTAB) THEN
@@ -4562,19 +3272,13 @@
           IF (LIVE) THEN
             CALL GFX_SETCOLS(STATUS)
           ELSE
-            IF (G_MULTI) THEN
-              CALL GCB_SAVE(GLOC,STATUS)
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ELSE
-              CALL GCB_SAVE(G_LOC,STATUS)
-            ENDIF
+            CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
           ENDIF
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_COLOUR_SET',STATUS)
+          CALL AST_REXIT('GSET_COLOUR_SET',STATUS)
         ENDIF
 
       ENDIF
@@ -4591,8 +3295,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -4651,8 +3353,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Import :
       LOGICAL LIVE
@@ -4663,18 +3363,14 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
       CHARACTER*80 CVAL
       CHARACTER*15 ST(4)
       REAL RVAL
       INTEGER I,N
       INTEGER NST
-      INTEGER ISEL
+      INTEGER ISEL,GFID
       INTEGER IVAL
       LOGICAL LVAL
       LOGICAL PIXEL,CONTOUR,SURFACE,POLY,STEP,ERRS,POINTS
@@ -4688,24 +3384,8 @@
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_BLNK()
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
 *  interrogate Control Block for each attribute
 
@@ -5735,10 +4415,13 @@
 
           ENDIF
 
+*      Release the GCB
+          CALL GSET_RLSE_GCB( .FALSE., LIVE, GFID, STATUS )
+
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_SHOW',STATUS)
+          CALL AST_REXIT( 'GSET_SHOW',STATUS)
         ENDIF
 
       ENDIF
@@ -5757,8 +4440,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       LOGICAL LIVE
       INTEGER NSEL
@@ -5767,13 +4448,9 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Global variables :
-      INCLUDE 'GFX_CMN'
-      INCLUDE 'GMD_CMN'
 *    Local Constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      INTEGER ISEL
+      INTEGER ISEL,GFID
 *-
 
 
@@ -5784,39 +4461,248 @@
 
         DO ISEL=1,NSEL
 
-*  if not in interactive mode
-          IF (.NOT.LIVE) THEN
-*  load existing GCB
-            IF (G_MULTI) THEN
-              IF (ISEL.EQ.1) THEN
-                CALL MSG_PRNT('Multiple dataset:-')
-              ENDIF
-              CALL MSG_SETI('NDF',NDFS(ISEL))
-              CALL MSG_PRNT(' processing NDF ^NDF...')
-*  from component of multiple dataset
-              CALL GMD_LOCNDF(G_MLOC,NDFS(ISEL),GLOC,STATUS)
-              CALL GCB_LOAD(GLOC,STATUS)
-            ELSE
-*  or single dataset
-              CALL GCB_LOAD(G_LOC,STATUS)
-            ENDIF
-          ENDIF
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
 
-*  dump it
+*      Dump it
           CALL GCB_DUMP(STATUS)
 
-          IF (.NOT.LIVE) THEN
-            IF (G_MULTI) THEN
-              CALL BDA_RELEASE(GLOC,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
-            ENDIF
-          ENDIF
+*      Release the GCB
+          CALL GSET_RLSE_GCB( .FALSE., LIVE, GFID, STATUS )
 
         ENDDO
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GSET_DUMP',STATUS)
+          CALL AST_REXIT('GSET_DUMP',STATUS)
         ENDIF
 
       ENDIF
+      END
+
+
+*+
+      SUBROUTINE GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Import :
+      LOGICAL LIVE
+      INTEGER ISEL,NDFS(*)
+*    Export :
+      INTEGER                   GFID
+*    Status :
+      INTEGER STATUS
+*    Global variables :
+      INCLUDE 'GFX_CMN'
+      INCLUDE 'GMD_CMN'
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*    If not in interactive mode
+        IF (.NOT.LIVE) THEN
+
+*      Load existing GCB
+          IF (G_MULTI) THEN
+
+*        From component of multi-graph
+            IF (ISEL.EQ.1) THEN
+              CALL MSG_PRNT('Multiple dataset:-')
+            ENDIF
+            CALL MSG_SETI('NDF',NDFS(ISEL))
+            CALL MSG_PRNT(' processing NDF ^NDF...')
+            CALL GMI_LOCNDF(G_MFID,NDFS(ISEL),GFID,STATUS)
+            CALL GCB_FLOAD(GFID,STATUS)
+
+          ELSE
+
+*        Or single dataset
+            CALL GCB_FLOAD( G_ID, STATUS )
+
+          END IF
+
+        END IF
+
+      END IF
+
+      END
+
+
+*+
+      SUBROUTINE GSET_RLSE_GCB( SAVE, LIVE, GFID, STATUS )
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Import :
+      LOGICAL SAVE,LIVE
+      INTEGER                   GFID
+*    Status :
+      INTEGER STATUS
+*    Global variables :
+      INCLUDE 'GFX_CMN'
+      INCLUDE 'GMD_CMN'
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (.NOT.LIVE) THEN
+          IF (G_MULTI) THEN
+            IF ( SAVE ) THEN
+              CALL GCB_FSAVE( GFID, STATUS )
+            END IF
+            CALL ADI_ERASE( GFID, STATUS )
+          ELSE
+            IF ( SAVE ) THEN
+              CALL GCB_FSAVE( G_ID, STATUS )
+            END IF
+          END IF
+        END IF
+
+      END IF
+
+      END
+
+
+*+
+      SUBROUTINE GSET_GET0L( PAR, SET, VALUE, STATUS )
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*)		PAR
+*    Export :
+      LOGICAL			VALUE
+      LOGICAL			SET
+*    Status :
+      INTEGER STATUS
+*-
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        SET = .FALSE.
+        CALL USI_GET0L( PAR, VALUE, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          SET = .TRUE.
+        ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
+
+      END
+
+
+*+
+      SUBROUTINE GSET_GET0I( PAR, SET, VALUE, STATUS )
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*)		PAR
+*    Export :
+      INTEGER			VALUE
+      LOGICAL			SET
+*    Status :
+      INTEGER STATUS
+*-
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        SET = .FALSE.
+        CALL USI_GET0I( PAR, VALUE, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          SET = .TRUE.
+        ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
+
+      END
+
+
+
+*+
+      SUBROUTINE GSET_GET0R( PAR, SET, VALUE, STATUS )
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*)		PAR
+*    Export :
+      REAL			VALUE
+      LOGICAL			SET
+*    Status :
+      INTEGER STATUS
+*-
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        SET = .FALSE.
+        CALL USI_GET0R( PAR, VALUE, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          SET = .TRUE.
+        ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
+
+      END
+
+
+*+
+      SUBROUTINE GSET_GET0C( PAR, SET, VALUE, STATUS )
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*)		PAR
+*    Export :
+      CHARACTER*(*)		VALUE
+      LOGICAL			SET
+*    Status :
+      INTEGER STATUS
+*-
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        SET = .FALSE.
+        CALL USI_GET0C( PAR, VALUE, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          SET = .TRUE.
+        ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
+
       END
