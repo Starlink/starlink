@@ -55,12 +55,14 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+      Richard Beard (Birmingham)
 *
 *    History :
 *
 *     21 Sep 93 : Adapted from old UFIT_CHIMIN and current FIT_MIN. Added
 *                 FSTATC and COMPARATOR arguments (DJA)
 *     23 Feb 93 : Asterix and Starlink include files removed. (DJA)
+*      6 Jun 97 : Convert to PDA (RB)
 *
 *    Type definitions :
 *
@@ -154,18 +156,19 @@ c     INTEGER             FSTAT                 ! Statistic to use
       INTEGER 		  NUNFROZEN		! No of unfrozen parameters
       INTEGER 		  NPFREE		! No of free parameters
       INTEGER 		  IPFREE(NPAMAX)	! Free parameter indices
-      INTEGER 		  J,K			! Parameter indices
+      INTEGER 		  J,K,L,M		! Parameter indices
       INTEGER             LNITER                ! Local number of iterations
       INTEGER 		  LSSCALE		! SSCALE proofed against zero value
       INTEGER             RITER                 ! # repeats of gradient calc'n
 
       LOGICAL 		  NEWPEG(NPAMAX)	! New parameters pegged
 *
-*    Nag related declarations :
+*    PDA related declarations :
 *
-      DOUBLE PRECISION	  LU(NPAMAX,NPAMAX)	! Work space and LU decomp
       DOUBLE PRECISION	  WKS1(NPAMAX),WKS2(NPAMAX)  ! Work space
-      INTEGER 		  FAIL			! NAG error code
+      INTEGER		  IWKS(NPAMAX)
+      INTEGER 		  FAIL			! PDA error code
+      INTEGER		  ACC
 *-
 
 *    Status check
@@ -320,10 +323,22 @@ c     INTEGER             FSTAT                 ! Statistic to use
      :                                       (1.D0+LAMBDA)/LSSCALE
 	END DO
 
-*      Call NAG routine to solve for parameter offsets
-	FAIL=1
-	CALL F04ATF(SCDERIV2,NPAMAX,SCDERIV1,NPFREE,PARSTEP,LU,NPAMAX,
-     :                                                 WKS1,WKS2,FAIL)
+*      Call PDA routine to solve for parameter offsets
+	FAIL=0
+        DO L = 1, NPFREE
+          PARSTEP(K) = SCDERIV1(K)
+        END DO
+        CALL PDA_DGEFS( SCDERIV2, NPAMAX, NPFREE, PARSTEP, 1, ACC,
+     :                  WKS1, WKS2, FAIL )
+        IF ( ACC .LT. 0 ) THEN
+          IF ( ACC .EQ. -3 ) THEN
+            FITERR = 4
+          ELSE IF ( ACC .EQ. -10 ) THEN
+            FITERR = 5
+          END IF
+          GOTO 99
+        END IF
+
         RITER = RITER + 1
 
 *      Check for error in NAG routine
