@@ -20,7 +20,6 @@
 *    Local variables :
       CHARACTER*132 FILE
       INTEGER IFID,FID
-      LOGICAL PRIM
       LOGICAL EXIST
 
 *    Version :
