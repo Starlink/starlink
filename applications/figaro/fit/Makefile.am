@@ -4,12 +4,10 @@
 AM_FCFLAGS = -I../include
 
 lib_LTLIBRARIES = libfigfit.la
+dist_noinst_HEADERS = COMB COMF
 
 libfigfit_la_SOURCES = \
-     $(PRIVATE_INCLUDES) \
      $(F_ROUTINES) $(FPP_ROUTINES)
-
-PRIVATE_INCLUDES = comb comF
 
 F_ROUTINES = \
 fit_abort.f fit_end.f fit_qeot.f fit_wint.f fit_wrays.f fit_bset.f \
