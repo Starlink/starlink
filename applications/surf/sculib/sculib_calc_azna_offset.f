@@ -202,6 +202,7 @@
      :                 (LST - POINT_LST(I)) *
      :                 DBLE (POINT_DEL(I+1) - POINT_DEL(I)) /
      :                 (POINT_LST(I+1) - POINT_LST(I))
+                     DONE = .TRUE.
                   ELSE
                      I = I + 1
                   END IF
