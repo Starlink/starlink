@@ -451,7 +451,7 @@ static int InterpolatePixelLinear##X( int ndim_in, \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
 \
-   if ( ndim_in == 2 && 0 ) { \
+   if ( ndim_in == 2 && 0 ) { /* Doesn't work yet! */ \
       double x; \
       double y; \
       double xmin; \
