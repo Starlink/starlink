@@ -227,7 +227,7 @@
 #     7-OCT-1998 (DSB):
 #        Version 0.13. Added internal NDG library. Added applications
 #        WCSFRAME, WCSALIGN, WCSADD, WCSATTRIB, WCSREMOVE, PROFILE,
-#        LISTMAKE, LISTSHOW, CHAIN, RESHAPE, COPYBAD
+#        LISTMAKE, LISTSHOW, CHAIN, RESHAPE, COPYBAD, WCSTRAN
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -760,7 +760,7 @@ setext.f setlabel.f setnorm.f setorigin.f \
 setsky.f settitle.f settype.f \
 setunits.f setvar.f \
 wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f wcsshow.f \
-chain.f reshape.f
+chain.f reshape.f wcstran.f
 
 MONO_SOURCE = $(KAPPA_MONO_SOURCE) $(KAPVIEW_MONO_SOURCE) \
               $(NDFPACK_MONO_SOURCE)
@@ -3574,6 +3574,7 @@ wcscopy.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
 wcsframe.o:	 SAE_PAR PAR_PAR
 wcsremove.o:	 SAE_PAR AST_PAR
 wcsshow.o:	 SAE_PAR DAT_PAR PAR_ERR GRP_PAR PRM_PAR AST_PAR KPG_AST
+wcstran.o:	 SAE_PAR NDF_PAR AST_PAR
 wiener.o:	 SAE_PAR DAT_PAR PRM_PAR MSG_PAR NDF_PAR PAR_ERR
 zaplin.o:	 SAE_PAR DAT_PAR NDF_PAR NDF_ERR SUBPAR_PAR PAR_ERR FIO_ERR
 zero1d.o:	 SAE_PAR

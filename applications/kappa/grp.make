@@ -226,7 +226,7 @@ trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
 kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
-wcsremove.par wcsshow.par chain.par reshape.par copybad.par
+wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.f
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
@@ -269,7 +269,7 @@ automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
 iraf_usage.hlp listshow.hlp listmake.hlp wcsadd.hlp wcsalign.hlp \
 wcsattrib.hlp wcscopy.hlp wcsframe.hlp wcsremove.hlp wcsshow.hlp \
-chain.hlp reshape.hlp copybad.hlp
+chain.hlp reshape.hlp copybad.hlp wcstran.hlp
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
 KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
@@ -319,7 +319,7 @@ setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 mem2d.ifl wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
-reshape.ifl copybad.ifl
+reshape.ifl copybad.ifl wcstran.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -426,7 +426,7 @@ fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
 hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f setbb.f \
 setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
 settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
-wcsremove.f wcsshow.f chain.f reshape.f
+wcsremove.f wcsshow.f chain.f reshape.f wcstran.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
