@@ -40,7 +40,7 @@
 #  managers which do not guarantee this?
       bind all <Visibility> { set ::visibilityState(%W) %s }
       bind all <Destroy> { catch { unset ::visibilityState(%W) } }
-      bind all <Map> { if !%o 
+      bind all <Map> { if !%o \
                           { set ::visibilityState(%W) VisibilityUnobscured } }
 
 #  Redefine the raise command
