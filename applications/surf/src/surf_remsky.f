@@ -25,6 +25,7 @@
 *     average value for each jiggle and then subtracts this off the
 *     jiggle. Each jiggle is analysed in turn. The average value can be
 *     calculated in two ways:
+*
 *        1) Median - the median value for all the sky bolometers is taken
 *                    from each bolomoter signal.
 *        2) Mean   - the mean of the sky bolometers is used as the average.
@@ -34,12 +35,13 @@
 *                    and standard deviation are calculated.  This process
 *                    is repeated until no bolometers are dropped from the
 *                    mean.
+*
 *     A simple despiking system is also included. Each bolometer is analysed 
 *     independently, a mean and standard deviation are calculated, any points
 *     greater than NSIGMA sigma from the mean are treated as spikes and
-*     removed. Note that this algorithm is only useful for very weak sources.
-*     Bright sources will be removed (since a source  bolometer jiggles on
-*     and off bright sources).
+*     removed. Note that this despiking algorithm is only useful for very weak
+*     sources. Bright sources will be removed (since a source  bolometer
+*     jiggles on and off bright sources).
 
 *  Usage:
 *     REMSKY IN
@@ -93,30 +95,26 @@
       INTEGER STATUS
 
 *  External references :
-      INTEGER CHR_LEN                   ! CHR used string length function
       BYTE    SCULIB_BITON              ! Turn on skybit
 
 *  Local Constants :
       INTEGER          MAX__BOL                  ! max number of bolometers
       PARAMETER (MAX__BOL = 100)                 ! that can be specified
-      INTEGER MAXDIM
+      INTEGER          MAXDIM
       PARAMETER (MAXDIM = 4)
+      CHARACTER * 10   TSKNAME          ! Name of task
+      PARAMETER (TSKNAME = 'REMSKY')
+
 *  Local variables :
       INTEGER          B                ! Loop counter
       INTEGER          BB               ! Loop counter
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
       INTEGER          BOL              ! Loop counter
-      DOUBLE PRECISION BOL_DEC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! apparent Dec of the bolometers at
-                                        ! the time of a measurement
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU3 Nasmyth coord of bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU4 Nasmyth coord of bolometers
-      DOUBLE PRECISION BOL_RA (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! apparent RA of the bolometers at
-                                        ! the time of a measurement
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! bolometer types
       INTEGER          BOL_PTR          ! Pointer to single bolometer
@@ -129,37 +127,14 @@
                                         ! plane that defines telescope axis
       REAL             CENTRE_DU4       ! dU4 Nasmyth coord of point on focal
                                         ! plane that defines telescope axis
-      INTEGER          CHR_STATUS       ! status from CHR routines
-      INTEGER          DATA_OFFSET      ! offset of a datum in an array
-      DOUBLE PRECISION DEC_CENTRE       ! apparent declination of map centre
-                                        ! (radians)
-      REAL             DEC_START        ! Dec offset of scan start (arcsec)
-      REAL             DEC_VEL          ! Dec velocity of scan (arcsec/sec)
       INTEGER          DIM (MAXDIM)     ! the dimensions of an array
-      INTEGER          DIMX (MAXDIM)    ! expected dimensions of an array
       LOGICAL          DOCLIP           ! Clip over bolometers
       REAL             ITERCLIP         ! Number of bols to drop from mean
-      DOUBLE PRECISION DTEMP            ! scratch double
-      INTEGER          EXPOSURE         ! exposure index in DO loop
-      INTEGER          EXP_END          ! end index of data for an exposure
-      DOUBLE PRECISION EXP_LST          ! sidereal time at start of exposure
-      INTEGER          EXP_START        ! start index of data for an exposure
-      REAL             EXP_TIME         ! exposure time per measurement (secs)
       LOGICAL          EXTINCTION       ! .TRUE. if EXTINCTION has been run
-      CHARACTER*20     FIRST_LST        ! sidereal time at which FIRST_TAU
-                                        ! measured
-      DOUBLE PRECISION FIRST_LST_RAD    ! FIRST_LST in radians
-      REAL             FIRST_TAU        ! zenith sky opacity at FIRST_LST
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       INTEGER          I                ! DO loop variable
-      INTEGER          ID               ! day of observation
-      INTEGER          IEND             ! index of end of sub-string
-      INTEGER          IHOUR            ! hour in which observation started
-      INTEGER          IM               ! month of observation
-      INTEGER          IMIN             ! minute in which observation started
       INTEGER          INDF             ! NDF identifier of input file
-      INTEGER          INTEGRATION      ! integration index in DO loop
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
                                         ! input file
@@ -167,43 +142,16 @@
                                         ! channel numbers of bolometers
                                         ! measured in input file
       INTEGER          IN_DATA_PTR      ! pointer to data array of input file
-      INTEGER          IN_DEC_STRT_ARY  ! array identifier to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_STRT_PTR  ! pointer to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_VEL_ARY   ! array identifier to .SCUCD.DEC_VEL
-      INTEGER          IN_DEC_VEL_PTR   ! pointer to .SCUCD.DEC_VEL
-      INTEGER          IN_DEM_PNTR_ARY  ! array identifer to .SCUBA.DEM_PNTR
-      INTEGER          IN_DEM_PNTR_PTR  ! pointer to input .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                         ! locator to FITS extension in input
                                         ! file
-      CHARACTER*(DAT__SZLOC) IN_LOC     ! locator to item in input file
-      INTEGER          IN_LST_STRT_ARY  ! array identifier to .SCUCD.LST_STRT
-      INTEGER          IN_LST_STRT_PTR  ! pointer to input .SCUCD.LST_STRT
-      INTEGER          IN_PHOT_BB (SCUBA__MAX_BEAM, SCUBA__MAX_SUB)
-                                        ! indices in input data array of 
-                                        ! bolometers observing the source in
-                                        ! PHOTOM mode
-      INTEGER          IN_POINTER (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                        ! array connecting output bolometer
-                                        ! positions to input data array
-      INTEGER          IN_QUALITY_PTR   ! pointer to quality array in input
-                                        ! file
-      INTEGER          IN_RA_STRT_ARY   ! array identifier to .SCUCD.RA_STRT
-      INTEGER          IN_RA_STRT_PTR   ! pointer to .SCUCD.RA_STRT
-      INTEGER          IN_RA_VEL_ARY    ! array identifier to .SCUCD.RA_VEL
-      INTEGER          IN_RA_VEL_PTR    ! pointer to .SCUCD.RA_VEL
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                         ! locator to SCUBA extension in input
                                         ! file
       CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC
                                         ! locator to SCUCD extension in input
                                         ! file
-      INTEGER          IN_VARIANCE_PTR  ! pointer to variance array in input
-                                        ! file
-      INTEGER          IPOSN            ! Position in string
-      INTEGER          ISTART           ! index of start of sub-string
       INTEGER          ITEMP            ! scratch integer
-      INTEGER          IY               ! year of observation
       DOUBLE PRECISION LAT_RAD          ! latitude of telescope centre (radians)
       DOUBLE PRECISION LAT2_RAD         ! latitude of telescope centre at MJD2
                                         ! (radians)
@@ -212,11 +160,6 @@
                                         ! (radians)
       DOUBLE PRECISION LONG2_RAD        ! apparent RA of telescope centre at
                                         ! MJD2 (radians)
-      DOUBLE PRECISION LST              ! sidereal time of measurement
-      REAL             MAP_X            ! x offset of map centre from telescope
-                                        ! centre (arcsec)
-      REAL             MAP_Y            ! y offset of map centre from telescope
-                                        ! centre (arcsec)
       DOUBLE PRECISION MJD1             ! modified Julian day at which object 
                                         ! was at LAT,LONG for PLANET centre
                                         ! coordinate system
@@ -231,49 +174,19 @@
                                         ! been reduced
       INTEGER          N_BOLS           ! number of bolometers measured in
                                         ! output file
-      INTEGER          N_EXPOSURES      ! number of exposures per integration
       INTEGER          N_FITS           ! number of FITS lines read from file
       INTEGER          N_GOODBOLS       ! Number of good bols in list
-      INTEGER          N_INTEGRATIONS   ! number of integrations per measurement
-      INTEGER          N_MEASUREMENTS   ! number of measurements in the file
-      INTEGER          N_POINT          ! used size of pointing correction 
-                                        ! arrays
       INTEGER          N_POS            ! the total number of positions measured
       INTEGER          N_SKYBOLS        ! Number of skybols
-      INTEGER          N_SWITCHES       ! number of switches per exposure
       CHARACTER*30     OBJECT           ! name of object observed
       CHARACTER*15     OBSERVING_MODE   ! type of observation
-      INTEGER          OFFSET           ! byte offset of data set
-      CHARACTER*15     OFFSET_COORDS    ! coord system of OFFSET_X and OFFSET_Y
-      REAL             OFFSET_X         ! x offset of measurement
-      REAL             OFFSET_Y         ! y offset of measurement
       INTEGER          OUTNDF           ! NDF identifier of output file
-      INTEGER          OUT_A_PTR        ! Pointer to AXIS 
       INTEGER          OUT_DATA_PTR     ! pointer to data array in output file
-      CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
-                                        ! locator to FITS extension in output
-                                        ! file
-      INTEGER          OUT_PHOT_BB (SCUBA__MAX_BEAM,SCUBA__MAX_SUB)
-                                        ! indices in output data array of
-                                        ! bolometers measuring the source in
-                                        ! PHOTOM mode
-      CHARACTER*(DAT__SZLOC) OUT_SCUBAX_LOC
-                                        ! locator to SCUBA extension in output
-                                        ! file
       INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
-      INTEGER          POSITION         ! Position in array
-      INTEGER          POSITION         ! Position in array
-      DOUBLE PRECISION RA_CENTRE        ! apparent RA of map centre (radians)
-      REAL             RA_START         ! RA offset of scan start (arcsec)
-      REAL             RA_VEL           ! RA velocity of scan (arcsec/sec)
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
-      DOUBLE PRECISION ROTATION         ! angle between apparent north and 
-                                        ! north of input coord system (radians,
-                                        ! measured clockwise from input north) 
       REAL             RTEMP            ! Scratch real
       INTEGER          RUN_NUMBER       ! run number of observation
-      CHARACTER*15     SAMPLE_COORDS    ! coordinate system of sample offsets
       CHARACTER*15     SAMPLE_MODE      ! SAMPLE_MODE of observation
       INTEGER          SECNDF           ! NDF id of section
       INTEGER          SKY_ADC          ! ADC of sky bol
@@ -282,7 +195,6 @@
                                                ! be treated as sky
       INTEGER          SKYBOLS(MAX__BOL)! Indices of sky bolometers
       INTEGER          SKY_CHAN         ! Chan of SKY bol
-      INTEGER          SNDF             ! identifier of section
       CHARACTER*80     STEMP            ! scratch string
       INTEGER          UBND(MAXDIM)     ! Upper bounds of section
 *.
@@ -308,7 +220,8 @@
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: input file '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
@@ -330,7 +243,8 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE observation '//
+      CALL MSG_SETC ('PKG',PACKAGE)
+      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation '//
      :  'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
 *  get the number of history records present in the file
@@ -362,14 +276,16 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_REMSKY: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'REDUCE_SWITCH application has not been run '//
      :           'on the input file', STATUS)
             END IF
 
             IF (.NOT.EXTINCTION) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_REMSKY: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'EXTINCTION application has not been run '//
      :           'on the input file', STATUS)
             END IF
@@ -447,7 +363,8 @@
                CALL MSG_SETI ('DIM1', DIM(1))
                CALL MSG_SETI ('DIM2', DIM(2))
                CALL MSG_SETI ('DIM3', DIM(3))
-               CALL ERR_REP (' ', 'REDS_EXTINCTION: main data '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data '//
      :           'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2 '//
      :           '^DIM3', STATUS)
             END IF
@@ -459,7 +376,8 @@
                CALL MSG_SETI ('NDIM', NDIM)
                CALL MSG_SETI ('DIM1', DIM(1))
                CALL MSG_SETI ('DIM2', DIM(2))
-               CALL ERR_REP (' ', 'REDS_EXTINCTION: main data '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data '//
      :           'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2',
      :           STATUS)
             END IF
@@ -470,97 +388,11 @@
 
       CALL NDF_UNMAP(INDF, '*', STATUS)
 
-
-
 *  get the bolometer description arrays
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_TYPE', IN_LOC, STATUS)
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL DAT_GETNC (IN_LOC, NDIM, DIMX, BOL_TYPE, DIM, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)                 .OR.
-     :       (DIM(1) .NE. SCUBA__NUM_CHAN) .OR.
-     :       (DIM(2) .NE. SCUBA__NUM_ADC)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUBA.BOL_TYPE '//
-     :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
-         END IF
-      END IF
-
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_DU3', IN_LOC, STATUS)
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL DAT_GETNR (IN_LOC, NDIM, DIMX, BOL_DU3, DIM, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)                 .OR.
-     :       (DIM(1) .NE. SCUBA__NUM_CHAN) .OR.
-     :       (DIM(2) .NE. SCUBA__NUM_ADC)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUBA.BOL_DU3 '//
-     :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
-         END IF
-      END IF
-
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_DU4', IN_LOC, STATUS)
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL DAT_GETNR (IN_LOC, NDIM, DIMX, BOL_DU4, DIM, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)                 .OR.
-     :       (DIM(1) .NE. SCUBA__NUM_CHAN) .OR.
-     :       (DIM(2) .NE. SCUBA__NUM_ADC)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: .SCUBA.BOL_DU4 '//
-     :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
-         END IF
-      END IF
-
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_ADC', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  BOL_ADC, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
-
-      IF (ITEMP .NE. N_BOLS) THEN
-         IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: dimension of '//
-     :        '.SCUBA.BOL_ADC does not match main data array',
-     :        STATUS)
-         END IF
-      END IF
-
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_CHAN', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  BOL_CHAN, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
-
-      IF (ITEMP .NE. N_BOLS) THEN
-         IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_EXTINCTION: dimension of '//
-     :        '.SCUBA.BOL_CHAN does not match main data array',
-     :        STATUS)
-         END IF
-      END IF
+      CALL SCULIB_GET_BOL_DESC(IN_SCUBAX_LOC, SCUBA__NUM_CHAN,
+     :     SCUBA__NUM_ADC, N_BOLS, BOL_TYPE, BOL_DU3,
+     :     BOL_DU4, BOL_ADC, BOL_CHAN, STATUS)
 
 ****** END CHECKING ******
 
@@ -606,7 +438,9 @@
                ELSE
                   CALL ERR_ANNUL (STATUS)
                   CALL MSG_SETC('BOL', SKYBOLC(B))
-                  CALL MSG_OUT(' ','Bolometer ^BOL not found', STATUS)
+                  CALL MSG_SETC('PKG', PACKAGE)
+                  CALL MSG_OUT(' ','^PKG: Bolometer ^BOL not found', 
+     :                 STATUS)
                END IF
             END IF
          END DO
@@ -713,10 +547,7 @@
 
 *  set the bad bit mask
 
-      PRINT *, 'BADBIT is now ' ,BADBIT
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
-
-
 
 *  tidy up
 
