@@ -17,7 +17,7 @@
          IN = BDF (Read)
       }{
          The BDF to be converted to an NDF.  A file extension must not
-         be given since {\tt "}.BDF{\tt "} is assumed.
+         be given since {\tt ".BDF"} is assumed.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -99,9 +99,9 @@
             numbers.  The formating adheres to the FITS standard.
             Descriptors already in the FITS format are copied as is, so
             La Palma ING-format headers can be propagated.
-            \item If the BDF descriptors contain the FITS keywords CRVALn,
-            CDELTn, the appropriate axis structures are generated in
-            the output NDF. In addition should CRTYPEn also be present
+            \item If the BDF descriptors contain the FITS keywords CRVAL$n$,
+            CDELT$n$, the appropriate axis structures are generated in
+            the output NDF. In addition should CRTYPE$n$ also be present
             the labels are added to these structures.
             \item If the BDF descriptors contain the FITS keywords TITLE or
             LABEL or BUNITS, the associated character string value is
