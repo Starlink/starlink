@@ -268,6 +268,9 @@
 *  One dimensional swap
       IF ( SWAP_1D ) THEN
 
+*    Map input axis
+        CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', IAPTR, STATUS )
+
 *    Create irregular output axis and map
         CALL BDI_PUT1R( OFID, 'Data', ODIMS(1), %VAL(IAPTR), STATUS )
         CALL BDI_AXPUT1R( OFID, 1, 'Data', ODIMS(1), %VAL(IDPTR),

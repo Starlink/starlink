@@ -21,7 +21,4 @@
 *    Initialize BDA_CMN
       CALL BDA_INIT()
 
-*    Initialize HIST_CMN
-      CALL HIST_INIT()
-
       END

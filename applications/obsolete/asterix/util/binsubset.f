@@ -569,10 +569,9 @@
       INCLUDE 'SAE_PAR'
 *    Import :
       INTEGER			FID			! Dataset identifier
-      LOGICAL                PRIM               ! Input primitive?
-      INTEGER			NDIM			! Dimensionality
-      INTEGER                NDIM               ! Number of dimensions
-      INTEGER                DIMS(*)            ! Length of each axis
+      LOGICAL                	PRIM               	! Input primitive?
+      INTEGER                	NDIM               	! Number of dimensions
+      INTEGER                	DIMS(*)            	! Length of each axis
 *    Export :
       CHARACTER*80           AXUNT(*)           ! Units for each axis
       REAL                   AXLO(*)            ! low value  for each axis
