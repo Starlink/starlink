@@ -460,8 +460,10 @@ itcl::class gaia::GaiaNDFChooser {
    #  This method is called when a line in the NDF list is selected.
    protected method select_ndf_ {} {
       set sel [$table_ get_selected]
+      puts "sel = $sel"
       if {[llength $sel]} {
-         lassign [lindex $sel 0] number type name naxis1 naxis2 havvar havqual
+         lassign [lindex $sel 0] number name naxis1 naxis2 havvar havqual
+         puts "havvar = $havvar"
          if { "$havvar" == "true" } {
             $itk_component(var) configure -state normal
          } else {
