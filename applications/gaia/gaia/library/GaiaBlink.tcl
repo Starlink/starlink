@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarBlink
+#     GaiaBlink
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -20,9 +20,9 @@
 
 #  Invocations:
 #
-#        StarBlink object_name [configuration options]
+#        GaiaBlink object_name [configuration options]
 #
-#     This creates an instance of a StarBlink object. The return is
+#     This creates an instance of a GaiaBlink object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -90,35 +90,37 @@
 #     This widget inherits TopLevelWidget.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
-#     ALLAN Allan Brighton (ESO)
+#     PWD: Peter Draper (STARLINK - Durham University)
+#     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
-#     25-NOV-1996 (PDRAPER):
+#     25-NOV-1996 (PWD):
 #        Original version.
-#     20-JAN-1996 (PDRAPER):
+#     20-JAN-1996 (PWD):
 #        Added scrollbars to control view, clone number display and
 #        offset views.
-#     20-MAR-1997 (PDRAPER):
+#     20-MAR-1997 (PWD):
 #        Added button to refresh images. Tried doing this on every
 #        move of the image, but this is far too slow for interactive
 #        scrolling.
 #     06-MAY-1998 (ALLAN):
 #        Use SkyCat::get_skycat_images to get clones, use "cget -number" to get
 #        clone number.
-#     12-NOV-1998 (PDRAPER):
+#     12-NOV-1998 (PWD):
 #        Added ability to select amongst images and added ScrollArrows
 #        for obvious orientation changes.
+#     10-JUL-2003 (PWD):
+#        Finally renamed GaiaBlink from StarBlink.
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-itk::usual StarBlink {}
+itk::usual GaiaBlink {}
 
-itcl::class gaia::StarBlink {
+itcl::class gaia::GaiaBlink {
 
    #  Inheritances:
    #  -------------

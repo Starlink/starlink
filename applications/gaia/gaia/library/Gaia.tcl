@@ -879,7 +879,7 @@ itcl::class gaia::Gaia {
    public method make_blink_toolbox {name {cloned 0}} {
       if { [llength [SkyCat::get_skycat_images] ] > 1 } {
          itk_component add $name {
-            StarBlink $w_.\#auto \
+            GaiaBlink $w_.\#auto \
                -transient $itk_option(-transient_tools) \
                -number $clone_ \
                -clone_cmd [code $this make_toolbox blink 1]
