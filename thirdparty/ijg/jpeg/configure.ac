@@ -13,17 +13,35 @@ STAR_DEFAULTS
 
 AC_PROG_MAKE_SET
 
-dnl    To configure jpeg, run ./configure in the source directory.
-dnl    Do not invoke AC_CONFIG_SUBDIRS.
-(
+# Check for the presence of the jpeglib.h file.  If it's available,
+# then we don't have to do anything, and we set MAIN_TARGET to be
+# jpeglib-stamp, which the Makefile generates trivially.  If it's not
+# available, then we need to build jpeglib, so drop into the src/
+# directory and configure the software.
+AC_CHECK_HEADER([jpeglib.h],
+  [MAIN_TARGET=jpeglib-stamp],
+  [
+  # To configure jpeg, run ./configure in the source directory.
+  # Do not invoke AC_CONFIG_SUBDIRS.
+  (
     cd src
     echo ./configure --prefix=$prefix --cache-file=config.cache
     ./configure --prefix=$prefix --cache-file=config.cache
-)
+  )
+  MAIN_TARGET=jpeglib
+])
+AC_SUBST(MAIN_TARGET)
 
+dnl  The special install command is processed at a different time from
+dnl  the rest of the script, so can't be skipped within the header
+dnl  check above.  It thus has to be written to respect the result of
+dnl  the test above.
 STAR_SPECIAL_INSTALL_COMMAND([
-    cd src;
-    $(MAKE) INSTALL_ROOT=$$DESTDIR install])
+    if test $(MAIN_TARGET) = jpeglib; then
+      cd src;
+      $(MAKE) INSTALL_ROOT=$$DESTDIR install;
+    fi])
+
 
 AC_CONFIG_FILES([Makefile component.xml])
 
