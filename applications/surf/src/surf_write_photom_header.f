@@ -1,12 +1,30 @@
-*+  REDS_WRITE_PHOTOM - routine to output ASCII results of PHOTOM reduction
-      SUBROUTINE REDS_WRITE_PHOTOM_HEADER (ODF, OBS_DATE, OBS_TIME,
+      SUBROUTINE SURF_WRITE_PHOTOM_HEADER (ODF, OBS_DATE, OBS_TIME,
      :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
      :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
      :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
      :     SKY_SUBTRACTION, MAX_BEAM, 
      :     PHOT_BB, MAX_INT, N_INTEGRATIONS, FD, 
      :     STATUS)
-*    Description :
+*+
+*  Name:
+*     SURF_WRITE_PHOTOM_HEADER
+
+*  Purpose:
+*     Write photom information to text file
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*      CALL SURF_WRITE_PHOTOM_HEADER (ODF, OBS_DATE, OBS_TIME,
+*     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
+*     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
+*     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
+*     :     SKY_SUBTRACTION, MAX_BEAM, 
+*     :     PHOT_BB, MAX_INT, N_INTEGRATIONS, FD, 
+*     :     STATUS)
+
+*  Description:
 *     This routine writes out the header for 1 sub-instrument of a PHOTOM
 *     observation.
 *        If status is good on entry the routine will call FIO_ASSOC to open
@@ -14,7 +32,7 @@
 *     parameter 'FILE'. FIO_WRITE will then be called to write out the results
 *     in the following format:-
 *
-*      Output from REDS reduction of a PHOTOM observation
+*      Output from SURF reduction of a PHOTOM observation
 *      Reduction date        : <date>
 *      Observation definition: <ODF name>
 *      Date of observation   : <date>
@@ -41,21 +59,12 @@
 *      Sample position angle : <angle that x axis of jiggle offsets is rotated
 *                              anticlockwise from the x axis of the sample 
 *                              coord system>
-*      Sky error removal     : <TRUE if the REDS SKY_ERROR application has been
+*      Sky error removal     : <TRUE if the SURF REMSKY application has been
 *                              run on the data>
 *      Analysis mode         : AVERAGE or PARABOLA
 *    
 
-*    Invocation :
-*      CALL REDS_WRITE_PHOTOM_HEADER (ODF, OBS_DATE, OBS_TIME,
-*     :     ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
-*     :     CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
-*     :     OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
-*     :     SKY_SUBTRACTION, MAX_BEAM, 
-*     :     PHOT_BB, MAX_INT, N_INTEGRATIONS, FD, 
-*     :     STATUS)
-
-*    Parameters :
+*    Parameters:
 *     ODF                    = CHARACTER*(*) (Given)
 *           the name of the observation definition file
 *     OBS_DATE               = CHARACTER*(*) (Given)
@@ -121,11 +130,17 @@
 *     $Id$
 *     13-MAR-1996: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
+      INCLUDE 'SURF_PAR'               ! SURF constants
+
 *    Import :
       CHARACTER*(*) ODF
       CHARACTER*(*) OBS_DATE
@@ -168,7 +183,7 @@
       INTEGER            NTICKS          ! number of ticks since some date
 *    Internal References :
 *    Local data :
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -180,7 +195,8 @@
 
 *  write header information
 
-      LINE = 'Output from REDS reduction of a PHOTOM observation'
+      LINE = 'Output from '//PACKAGE//
+     :     ' reduction of a PHOTOM observation'
       CALL FIO_WRITE (FD, LINE, STATUS)
 
       LINE = 'Reduction date        : '
