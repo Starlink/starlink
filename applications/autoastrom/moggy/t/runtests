@@ -69,7 +69,8 @@ do
 	if [ $testval != 0 ]; then
 	    echo "failed (exited with error status $testval)"
 	    nfailures=`expr $nfailures + 1`
-	    $deletetemp && rm -f $name.stdout $name.stderr $name*.tmp
+	    # Don't delete temporary files on failure
+	    # $deletetemp && rm -f $name.stdout $name.stderr $name*.tmp
 	elif [ -r "$name.correct" ]; then
 	    diff $name.correct $name.stdout >$name.diff
 	    rval=$?
