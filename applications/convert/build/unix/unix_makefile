@@ -427,7 +427,7 @@ PKG_LINK = CONVERT
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.6-1, 1996 March
+PKG_VERS = 0.6-3, 1996 September
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
