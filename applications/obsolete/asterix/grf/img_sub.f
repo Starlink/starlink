@@ -4243,7 +4243,6 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           CALL MSG_PRNT('Select any corner...')
           XCORN=XC
           YCORN=YC
-          CH=' '
           CALL GFX_CURS(XCORN,YCORN,LEFT,RIGHT,CH,STATUS)
 
 *  calculate box half-widths
