@@ -25,7 +25,7 @@ f77.h: cnf.h
 
 # CNF_PAR.fpp requires defintions from config.h
 CNF_PAR.f: CNF_PAR.fpp
-	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) $< $(FPP_OUTPUT)
+	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) CNF_PAR.fpp $(FPP_OUTPUT)
 CNF_PAR: CNF_PAR.f
 	rm -f CNF_PAR CNF_PAR.tmp
 	echo "* Generated from CNF_PAR.fpp by Makefile.am" >CNF_PAR.tmp
