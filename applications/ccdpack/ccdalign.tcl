@@ -109,7 +109,7 @@
    "" \
    "   Click with mouse button 1 (left) to add a point" \
    "   Click with mouse button 3 (right) to remove a point" \
-   "   Use the Index control to change the number of the next point marked" \
+   "   Use the `Markers' control to change the index of the next point marked" \
    ""
       set helplines $basichelp
       lappend helplines \

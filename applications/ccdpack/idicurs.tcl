@@ -76,8 +76,8 @@
          "Click with mouse button 3 (right) on the image to remove a point"
       if { $SHOWIND } {
          lappend helplines \
-         "" \
-         "Use the `Index' control to change the number of the next point marked"
+        "" \
+        "Use the `Markers' control to change the index of the next point marked"
       }
       lappend helplines \
          "" \
