@@ -37,17 +37,19 @@ should be used if at all possible.
 
 use strict;
 use Carp;
-use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $AUTOLOAD);
+use vars qw($VERSION @ISA @EXPORT %EXPORT_TAGS $AUTOLOAD $DEBUG);
 
 require Exporter;
- 
+
 @ISA = qw(Exporter);
+
+$DEBUG = 0;
 
 # EXTERNAL MODULES
 
 # This module requires the Starlink::ADAM module so that we can access
 # the ADAM messaging system
- 
+
 use Starlink::ADAM qw/:adam/;
 
 # Use the IO routines to create the pipe handle
@@ -95,7 +97,7 @@ $TIMEOUT = 30;
 
 # Items to export into callers namespace by default. Use tags
 # to be more specific
- 
+
 %EXPORT_TAGS = (
                 'Func'=>[qw/
 			 adamtask_init       adamtask_exit adamtask
@@ -105,9 +107,9 @@ $TIMEOUT = 30;
 			 adamtask_forget
                         /]
                 );
- 
+
 Exporter::export_tags('Func');
- 
+
 $VERSION = '1.01';
 
 
@@ -460,11 +462,11 @@ sub adamtask_send {
 sub adamtask_sendw {
 
   my $command = shift;
-  
+
   my ($reply, @reply, $response, $status);
 
   # First I need to send the command
-  # Since we are evalling an adam_send we should receive the 
+  # Since we are evalling an adam_send we should receive the
   # path and messid to the remote task.
   # This allows us to await the return from a specific task and not
   # get confused by other messages
@@ -472,8 +474,8 @@ sub adamtask_sendw {
   # The assumption is that the command to be evaluated is always a
   # adam_send.
 
-  my (@returns) = eval $command;
-  
+  my (@returns) = eval "$command";
+
   # We had an error sending the command
   if ($@ ne "" || $returns[2] != &Starlink::ADAM::SAI__OK) {
 
@@ -513,7 +515,7 @@ sub adamtask_sendw {
     # Note that the timeout must be given in milliseconds
 
     @reply = adam_getreply(1000 * $TIMEOUT, $returns[0], $returns[1]);
-    
+
     # Now need to acknowledge the message if it is a paramreq or something
     # Send the reply off to a generic subroutine
 
@@ -521,15 +523,15 @@ sub adamtask_sendw {
 
     last if ($status != &Starlink::ADAM::SAI__OK);
 
-    # Exit loop if we received an 'endmsg' or 'get|setresponse' 
-    # If there was an error with the getreply itself (ie the monolith 
+    # Exit loop if we received an 'endmsg' or 'get|setresponse'
+    # If there was an error with the getreply itself (ie the monolith
     # died) then the adam_getreply code provides us with an extra message
     # of 'badstatus'
 
     last if $reply[0] =~ /endmsg|getresponse|setresponse|controlresponse|badstatus/;
 
   }
-  
+
   # Check the status of the completed action:
 
   # An OBEY should finish with DTASK__ACTCOMPLETE
@@ -544,7 +546,7 @@ sub adamtask_sendw {
 
   # Record the error status (whether it was from the task or from the message
   # system
-  
+
 #  if ($reply[0] eq "badstatus") {
 #    $ADAM_STATUS = $reply[7];
 #  } else {
@@ -693,14 +695,14 @@ sub adamtask_paramreply {
 sub adamtask_syncreply {
 
   my $task = shift;
-  
+
   my $path = shift;
   my $messid = shift;
 
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my $result = 
+  my $result =
     adamtask_send("adam_reply($path,$messid,\"SYNCREP\",\"\",\"\")");
 }
 
@@ -750,7 +752,7 @@ sub adamtask_control {
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
   my ($status, $result) = 
-    adamtask_sendw("adam_send(\"$task\",\"$command\",\"CONTROL\",\"$params\")"); 
+    adamtask_sendw("adam_send(\"$task\",\"$command\",\"CONTROL\",\"$params\")");
 
 #  return $result if $command eq 'default';
   return ($result, $status);
@@ -770,7 +772,7 @@ sub adamtask_cancel {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my $status = 
+  my $status =
     adamtask_sendw("adam_send(\"$task\",\"$command\",\"CANCEL\",\"$params\")");
 
   return $status;
@@ -795,7 +797,7 @@ status has the value of Starlink::ADAM::DTASK__ACTCOMPLETE.
 =cut
 
 
-# adamtask_obeyw 
+# adamtask_obeyw
 #
 #  - implement an obeyw
 #     There is no point using the RELAY for this - just send messages
@@ -930,7 +932,7 @@ $PARAMREP_SUB = sub {
 # Exit handler
 END {
   adamtask_exit;
-  print "ADAM exited\n";
+  print "ADAM exited\n" if $DEBUG;
 }
 
 
@@ -1019,11 +1021,11 @@ value) and should return the required value.
 
 =head1 AUTHOR
 
-Tim Jenness (t.jenness@jach.hawaii.edu)
+Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) Particle Physics and Astronomy Research Council 1997, 1998.
+Copyright (C) Particle Physics and Astronomy Research Council 1997-2000.
 All Rights Reserved
 
 =head1 ACKNOWLDEGMENTS
