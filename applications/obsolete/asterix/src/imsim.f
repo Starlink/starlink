@@ -186,6 +186,7 @@
       PIXID = ADI__NULLID
       PRJID = ADI__NULLID
       SYSID = ADI__NULLID
+      TIMID = ADI__NULLID
 
 *    Get number of files
       CALL USI_GET0I( 'NFILE', NFILE, STATUS )
